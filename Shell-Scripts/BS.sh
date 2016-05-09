@@ -59,4 +59,4 @@ rm box.gro
 
 # Directory for output files that aren't needed that often
 mkdir Output
-mv mdout.mdp wiggle.cpt wiggle.edr wiggle.log wiggl.tpr wiggle.trr Output
+mv mdout.mdp wiggle.cpt wiggle.edr wiggle.log wiggle.trr Output
