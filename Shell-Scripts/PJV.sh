@@ -17,7 +17,9 @@ sed -i -e "s/NSTEPS_EM/${NSTEPS_EM}/g" em.mdp
 sed -i -e "s/CUTOFF_EM/${CUTOFF_EM}/g" em.mdp
 sed -i -e "s/NSTLIST_EM/${NSTLIST}/g" em.mdp
 
-INPUT_FILE=/home/bcoscia/PycharmProjects/LLC_Structure_Builder/Monomer_Configurations/monomer4.pdb
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+INPUT_FILE=$DIR/../Structure-Files/monomer4.pdb
 LAYERS=20    # number of layers wanted in the structure
 Z_BOX_VECTOR=$((LAYERS+5)) # kind of arbitrary but should work
 XVECT=8.0
@@ -26,7 +28,7 @@ INCREMENT=0.1
 
 # Build Structure Based on user-defined inputs
 
-#python /home/bcoscia/PycharmProjects/LLC_Structure_Builder/Structure_Builder_for_Bash.py -i $INPUT_FILE -l $LAYERS >> initial.gro
+python $DIR/../Structure_Builder/Structure_Builder_for_Bash.py -i $INPUT_FILE -l $LAYERS >> initial.gro
 
 # Put the structure in a box
 
@@ -61,5 +63,5 @@ gmx grompp -f wiggle.mdp -c box_em.gro -p NaPore.top -o wiggle.tpr
 # remove unecessary files
 find . -type f -name 'box_em'\* -exec rm {} \;
 find . -type f -name '#'\* -exec rm {} \;
-rm initial.gro  
+#rm initial.gro  
 rm box.gro 
