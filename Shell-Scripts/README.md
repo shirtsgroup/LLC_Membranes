@@ -1,5 +1,7 @@
 This folder contain Shell scripts mostly made for the purpose of running simulations as simply and customizable as possible.
 
+* Please note that you may need to modify some of the paths in the folders to match your computer's set-up
+
 Anything that does not end in .sh are files that will be used in the shell scripts:
 
 - wiggle.mdp      : .mdp file for simulations of pore assembly in vacuum
