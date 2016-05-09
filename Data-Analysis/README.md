@@ -18,4 +18,4 @@ Single_monomer.py and Box_vectors.py are both scripts used to view outputs from 
 output from gmx energy. 
 
 Thickness.py calculates the membrane thickness based on the highest and lowest atom positions in the z-direction. Thickness.py is
-the same script adapted for bash so that a file can be input. This file is used for preparing input files
+the same script adapted for bash so that a file can be input. This file is used for preparing input files for membrane simulations. See Shell scripts for its usage.
