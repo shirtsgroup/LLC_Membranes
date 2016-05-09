@@ -14,3 +14,5 @@ Animated_Plot.py was made for Cylindricity_Traj.py and animates how the Pore-to-
 trajectory. It is already incorporated into Cylindricty_Traj.py but it is a good script to understand if you want to make 
 animated plots -- which can be a powerful tool
 
+Single_monomer.py and Box_vectors.py are both scripts used to view outputs from GROMACS in the form of .xvg files. .xvg files are
+output from gmx energy. 
