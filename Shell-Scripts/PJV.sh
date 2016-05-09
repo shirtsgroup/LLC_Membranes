@@ -5,7 +5,17 @@
 
 # Define Variables
 
-#ifv.sh
+ifv.sh
+
+INTEGRATOR='steep'
+NSTEPS_EM=50000
+CUTOFF_EM='verlet'
+NSTLIST=10
+
+sed -i -e "s/INTEGRATOR/${INTEGRATOR}/g" em.mdp
+sed -i -e "s/NSTEPS_EM/${NSTEPS_EM}/g" em.mdp
+sed -i -e "s/CUTOFF_EM/${CUTOFF_EM}/g" em.mdp
+sed -i -e "s/NSTLIST_EM/${NSTLIST}/g" em.mdp
 
 INPUT_FILE=/home/bcoscia/PycharmProjects/LLC_Structure_Builder/Monomer_Configurations/monomer4.pdb
 LAYERS=20    # number of layers wanted in the structure

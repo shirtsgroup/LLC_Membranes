@@ -1,6 +1,6 @@
 :Energy Minimization
-integrator               = steep
-nsteps                   = 50000
-cutoff-scheme = verlet
-nstlist = 10
+integrator               = INTEGRATOR  # use 'steep'
+nsteps                   = NSTEPS_EM  # max number of steps to take during minimization -- 50000 is good 
+cutoff-scheme = CUTOFF_EM  # use 'verlet'
+nstlist = NSTLIST_EM  # 10 works
 
