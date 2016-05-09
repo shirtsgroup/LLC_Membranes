@@ -4,7 +4,6 @@
 # based on inputs to the .mdp files
 
 # Define Variables
-# Test2
 
 INPUT_FILE=/home/bcoscia/PycharmProjects/LLC_Structure_Builder/Monomer_Configurations/monomer4.pdb
 LAYERS=20    # number of layers wanted in the structure
