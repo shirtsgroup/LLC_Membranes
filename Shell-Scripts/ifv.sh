@@ -8,6 +8,3 @@ for file in wiggle.mdp NaPore.top em.mdp; do
 	cp $DIR/Files/$file $PWD
 
 done
-
-echo 'hello'
-
