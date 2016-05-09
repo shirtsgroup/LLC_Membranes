@@ -1,5 +1,5 @@
 # Calculate intensity as a function of q
-# TEST! 8==D
+
 import math
 import numpy as np
 import matplotlib.pyplot as plt
