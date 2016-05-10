@@ -87,10 +87,10 @@ python $DIR/../Structure_Builder/Structure_Builder_for_Bash.py -i $INPUT_FILE -l
 
 gmx editconf -f initial.gro -o box.gro -c -bt triclinic -box $XVECT $YVECT $Z_BOX_VECTOR -angles 90 90 120
 
-## Prepare input file (.tpr) for energy minimization
-#
-#gmx grompp -f em.mdp -c box.gro -p NaPore.top -o box_em.tpr
-#
+# Prepare input file (.tpr) for energy minimization
+
+gmx grompp -f em.mdp -c box.gro -p NaPore.top -o box_em.tpr
+
 ## Run Energy Minimization
 #
 #gmx mdrun -v -deffnm box_em
