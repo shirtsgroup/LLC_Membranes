@@ -91,24 +91,24 @@ gmx editconf -f initial.gro -o box.gro -c -bt triclinic -box $XVECT $YVECT $Z_BO
 
 gmx grompp -f em.mdp -c box.gro -p NaPore.top -o box_em.tpr
 
-## Run Energy Minimization
-#
-#gmx mdrun -v -deffnm box_em
-#
-## Extract Potential Energy from log file
-#ENERGY=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
-#
-## If the potential energy is positive, then the box vector is incremented by a fixed amount until the energy comes out negative
-#
-#while [ $(echo " $ENERGY > 0" | bc) -eq 1 ]; do
-#        XVECT=$(echo "$XVECT + $INCREMENT" | bc -l)
-#        YVECT=$(echo "$YVECT + $INCREMENT" | bc -l)
-#        gmx editconf -f initial.gro -o box.gro -c -bt triclinic -box $XVECT $YVECT $Z_BOX_VECTOR -angles 90 90 120
-#        gmx grompp -f em.mdp -c box.gro -p NaPore.top -o box_em.tpr
-#        gmx mdrun -v -deffnm box_em
-#        ENERGY=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
-#done
-#
+# Run Energy Minimization
+
+gmx mdrun -v -deffnm box_em
+
+# Extract Potential Energy from log file
+ENERGY=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
+
+# If the potential energy is positive, then the box vector is incremented by a fixed amount until the energy comes out negative
+
+while [ $(echo " $ENERGY > 0" | bc) -eq 1 ]; do
+        XVECT=$(echo "$XVECT + $INCREMENT" | bc -l)
+        YVECT=$(echo "$YVECT + $INCREMENT" | bc -l)
+        gmx editconf -f initial.gro -o box.gro -c -bt triclinic -box $XVECT $YVECT $Z_BOX_VECTOR -angles 90 90 120
+        gmx grompp -f em.mdp -c box.gro -p NaPore.top -o box_em.tpr
+        gmx mdrun -v -deffnm box_em
+        ENERGY=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
+done
+
 ## prepare input file for simulation (just letting it wiggle around)
 #
 #gmx grompp -f wiggle.mdp -c box_em.gro -p NaPore.top -o wiggle.tpr
