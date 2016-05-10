@@ -22,8 +22,23 @@ args = parser.parse_args()
 # Row at top of .gro file: (edit as necessary)
 print 'This is a .gro file'
 
+f = open(args.input, "r")
+a = []
+for line in f:
+    a.append(line)
+
+no_atoms = 0  # number of atoms in one monomer including sodium ion
+for i in range(0, len(a)):
+    no_atoms += a[i].count('ATOM')
+
+lines_of_text = 0  # lines of text at top of .pdb input file
+for i in range(0, len(a)):
+    if a[i].count('ATOM') == 0:
+        text += 1
+    if a[i].count('ATOM') == 1:
+        break
+
 no_monomers = args.monomers  # number of monomers packed per layer around a pore
-no_atoms = 138  # number of atoms in one monomer excluding sodium ion
 pore_radius = args.radius  # Radius of pore (unsure of units right now)
 no_pores = args.nopores  # number of pores to be simulated
 dist_bw = args.p2p  # distance between pores (units tbd)
@@ -31,12 +46,7 @@ no_layers = args.layers  # Number of layers in a pore
 sys_atoms = no_layers*no_monomers*no_pores*no_atoms  # total number of atoms in the system
 print '%s' %sys_atoms
 dist = args.dbwl  # distance between layers (units tbd)
-lines_of_text = 4  # lines of text at top of .pdb input file
 
-f = open(args.input, "r")
-a = []
-for line in f:
-    a.append(line)
 
 x_values_inp = []  # list to hold input values of x stored from .pdb file
 y_values_inp = []  # list to hold input values of y stored from .pdb file
