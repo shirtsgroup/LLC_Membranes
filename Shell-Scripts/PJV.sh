@@ -120,6 +120,10 @@ NSTVOUT=$NSTEPS/$FRAMES
 NSTFOUT=$NSTEPS/$FRAMES
 NSTENERGY=$NSTEPS/$FRAMES
 
+echo MOL_LLC
+echo MOL_NA
+echo NSTEPS_MD
+
 # Edit input files:
 
 # Energy Minimization
