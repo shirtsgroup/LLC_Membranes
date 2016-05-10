@@ -152,7 +152,7 @@ sed -i -e "s/MOL_NA/${MOL_NA}/g" NaPore.top
 
 # Build Structure Based on user-defined inputs
 
-python $DIR/../Structure_Builder/Structure_Builder_for_Bash.py -i $INPUT_FILE -l $LAYERS >> initial.gro
+python $DIR/../Structure_Builder/Structure_Builder_for_Bash.py -i $INPUT_FILE -l $LAYERS -m $NO_MONOMERS -r $RADIUS -p $PORE2PORE -n $NOPORES -d DBWL >> initial.gro
 
 # Put the structure in a box
 
