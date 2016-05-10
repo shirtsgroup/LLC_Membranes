@@ -34,7 +34,7 @@ for i in range(0, len(a)):
 lines_of_text = 0  # lines of text at top of .pdb input file
 for i in range(0, len(a)):
     if a[i].count('ATOM') == 0:
-        text += 1
+        lines_of_text += 1
     if a[i].count('ATOM') == 1:
         break
 

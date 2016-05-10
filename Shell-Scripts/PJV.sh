@@ -3,28 +3,42 @@
 # monomer, then energy minimize the structure, and finally run a simulation
 # based on inputs to the .mdp files
 
-# Define Variables
-
+# Copy in necessary files
 ifv.sh
 
-INTEGRATOR='steep'
-NSTEPS_EM=50000
-CUTOFF_EM='verlet'
-NSTLIST=10
+# Define Variables
+
+# Choose which monomer to build with
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # Directory where this script is located
+MONOMER='monomer4.pdb'  # Structure file to be used
+INPUT_FILE=$DIR/../Structure-Files/$MONOMER  # Full path to file where monomer structure is located
+
+# Energy minimization parameters:
+INTEGRATOR='steep'  # Integrator for energy minimization
+NSTEPS_EM=50000  # Maximum number of steps to take for energy minimization
+CUTOFF_EM='verlet'  # Cut-off Scheme
+NSTLIST=10  # Neighborlist - changed automatically by gromacs unless it is set equal to 1
+
+# Membrane Dimensions
+NO_MONOMERS=6  # Number of monomers in 1 layer
+RADIUS=3  # Initial pore radius, angstroms
+PORE2PORE=40  # Pore-to-Pore distance, angstroms
+NOPORES=4  # Number of pores to be built
+DBWL=10  # Distance Between Layers
+LAYERS=20    # Number of layers wanted in the structure
+
+# Box Vector Parameters
+Z_BOX_VECTOR=$((LAYERS+5)) # kind of arbitrary but should work
+XVECT=8.0  # Box vector in the x direction
+YVECT=8.0  # Box vector in the y direction (not this will be multiplied by sin(120) for a monoclinic cell of 120 degrees
+INCREMENT=0.1  # Increment to increase the box vector by if there is a LINCS error
 
 sed -i -e "s/INTEGRATOR/${INTEGRATOR}/g" em.mdp
 sed -i -e "s/NSTEPS_EM/${NSTEPS_EM}/g" em.mdp
 sed -i -e "s/CUTOFF_EM/${CUTOFF_EM}/g" em.mdp
 sed -i -e "s/NSTLIST_EM/${NSTLIST}/g" em.mdp
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-INPUT_FILE=$DIR/../Structure-Files/monomer4.pdb
-LAYERS=20    # number of layers wanted in the structure
-Z_BOX_VECTOR=$((LAYERS+5)) # kind of arbitrary but should work
-XVECT=8.0
-YVECT=8.0
-INCREMENT=0.1
 
 # Build Structure Based on user-defined inputs
 
