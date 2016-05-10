@@ -26,6 +26,8 @@ PORE2PORE=40  # Pore-to-Pore distance, angstroms
 NOPORES=4  # Number of pores to be built
 DBWL=10  # Distance Between Layers
 LAYERS=20    # Number of layers wanted in the structure
+MOL_LLC=$NO_MONOMERS*$NOPORES*$LAYERS
+MOL_NA=$NO_MONOMERS*$NOPORES*$LAYERS
 
 # Box Vector Parameters
 Z_BOX_VECTOR=$((LAYERS+5)) # kind of arbitrary but should work
@@ -78,6 +80,10 @@ sed -i -e "s/PCOUPLTYPE/${PCOUPLTYPE}/g" wiggle.mdp
 sed -i -e "s/REF_P/${REF_P}/g" wiggle.mdp
 sed -i -e "s/COMPRESSIBILITY/${COMPRESSIBILITY}/g" wiggle.mdp
 sed -i -e "s/PBC/${PBC}/g" wiggle.mdp
+
+# Topology
+sed -i -e "s/MOL_LLC/${MOL_LLC}/g" NaPore.top
+sed -i -e "s/MOL_NA/${MOL_NA}/g" NaPore.top
 
 # Build Structure Based on user-defined inputs
 
