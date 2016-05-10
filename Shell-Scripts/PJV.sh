@@ -48,7 +48,6 @@ PBC='xyz'
 # Reference for flags associated with each variable
 
 # -m  :   MONOMER ... Structure file to be used
-# -i  :   INPUT_FILE ... Full path to file where monomer structure is located
 # -I  :   INTEGRATOR_EM ... Integrator for energy minimization
 # -s  :   NSTEPS_EM ... Maximum number of steps to take for energy minimization
 # -c  :   CUTOFF_EM ... Cut-off Scheme
@@ -73,8 +72,40 @@ PBC='xyz'
 # -b  :   PCOUPL ... Pressure Coupling
 # -Y  :   PCOUPLTYPE ... i.e. Isotropic, semiisotropic
 # -B  :   REF_P ... Reference Pressure, bar
-# -e  :   COMPRESSIBILITY ... Isothermal compressibility, bar^-1
+# -R  :   COMPRESSIBILITY ... Isothermal compressibility, bar^-1
 # -Z  :   PBC ... Periodic Boundary directions
+
+while getopts "m:I:s:c:t:n:r:p:P:w:l:x:y:e:T:C:M:S:L:f:v:K:b:Y:B:e:Z:" opt; do
+    case $opt in
+    m)  MONOMER=$OPTARG;;
+    I)  INTEGRATOR_EM=$OPTARG;;
+    s)  NSTEPS_EM=$OPTARG;;
+    c)  CUTOFF_EM=$OPTARG;;
+    t)  NSTLIST=$OPTARG;;
+    n)  NO_MONOMERS=$OPTARG;;
+    r)  RADIUS=$OPTARG;;
+    p)  PORE2PORE=$OPTARG;;
+    P)  NOPORES=$OPTARG;;
+    w)  DBWL=$OPTARG;;
+    l)  LAYERS=$OPTARG;;
+    x)  XVECT=$OPTARG;;
+    y)  YVECT=$OPTARG;;
+    e)  INCREMENT=$OPTARG;;
+    T)  SIM_TITLE=$OPTARG;;
+    C)  CUTOFF_MD=$OPTARG;;
+    M)  INTEGRATOR_MD=$OPTARG;;
+    S)  STEP=$OPTARG;;
+    L)  SIM_LENGTH=$OPTARG;;
+    f)  FRAMES=$OPTARG;;
+    v)  TCOUPL=$OPTARG;;
+    K)  REF_T=$OPTARG;;
+    b)  PCOUPL=$OPTARG;;
+    Y)  PCOUPLTYPE=$OPTARG;;
+    B)  REF_P=$OPTARG;;
+    R)  COMPRESSIBILITY=$OPTARG;;
+    Z)  PBC=$OPTARG;;
+    esac
+done
 
 # Calculated values based on input variables:
 
