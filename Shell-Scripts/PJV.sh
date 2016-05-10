@@ -114,15 +114,12 @@ INPUT_FILE=$DIR/../Structure-Files/$MONOMER  # Full path to file where monomer s
 Z_BOX_VECTOR=$((LAYERS+5)) # kind of arbitrary but should work
 MOL_LLC=$((NO_MONOMERS*NOPORES*LAYERS))  # For topology
 MOL_NA=$((NO_MONOMERS*NOPORES*LAYERS))
-NSTEPS_MD=$((SIM_LENGTH*1000/STEP))  # Number of steps to be taken during simulation to simulate the desired length of time
+NSTEPS_MD=$SIM_LENGTH*1000/$STEP  # Number of steps to be taken during simulation to simulate the desired length of time
 NSTXOUT=$NSTEPS/$FRAMES  # Information output to trajectory
 NSTVOUT=$NSTEPS/$FRAMES
 NSTFOUT=$NSTEPS/$FRAMES
 NSTENERGY=$NSTEPS/$FRAMES
 
-echo MOL_LLC
-echo MOL_NA
-echo NSTEPS_MD
 
 # Edit input files:
 
