@@ -12,7 +12,7 @@ ifv.sh
 MONOMER='monomer4.pdb'  # Structure file to be used
 
 # Energy minimization parameters:
-INTEGRATOR_EM='steep'  # Integrator for energy minimization
+INTEGRATOR_EM=steep  # Integrator for energy minimization
 NSTEPS_EM=50000  # Maximum number of steps to take for energy minimization
 CUTOFF_EM='verlet'  # Cut-off Scheme
 NSTLIST=10  # Neighborlist - changed automatically by gromacs unless it is set equal to 1
@@ -115,12 +115,10 @@ Z_BOX_VECTOR=$((LAYERS+5)) # kind of arbitrary but should work
 MOL_LLC=$((NO_MONOMERS*NOPORES*LAYERS))  # For topology
 MOL_NA=$((NO_MONOMERS*NOPORES*LAYERS))
 NSTEPS_MD=$(echo "$SIM_LENGTH*1000/$STEP" | bc)  # Number of steps to be taken during simulation to simulate the desired length of time
-NSTXOUT=$NSTEPS/$FRAMES  # Information output to trajectory
+NSTXOUT=$(echo "$NSTEPS/$FRAMES" | bc) # Information output to trajectory
 NSTVOUT=$NSTEPS/$FRAMES
 NSTFOUT=$NSTEPS/$FRAMES
 NSTENERGY=$NSTEPS/$FRAMES
-
-echo $NSTEPS_MD
 
 # Edit input files:
 
@@ -129,6 +127,9 @@ sed -i -e "s/INTEGRATOR/${INTEGRATOR_EM}/g" em.mdp
 sed -i -e "s/NSTEPS_EM/${NSTEPS_EM}/g" em.mdp
 sed -i -e "s/CUTOFF_EM/${CUTOFF_EM}/g" em.mdp
 sed -i -e "s/NSTLIST_EM/${NSTLIST}/g" em.mdp
+
+echo $MOL_LLC
+echo $MOL_NA
 
 # Wiggle.mdp
 sed -i -e "s/SIM_TITLE/${SIM_TITLE}/g" wiggle.mdp
