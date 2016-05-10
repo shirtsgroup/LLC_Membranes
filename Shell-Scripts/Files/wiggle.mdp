@@ -1,9 +1,9 @@
-title = Simulated Annealing 
-cutoff-scheme = verlet
+title = SIM_TITLE 
+cutoff-scheme = CUTOFF_MD
 ; Run parameters
-integrator	= md		; leap-frog integrator
-dt		    = 0.002		; 2 fs
-nsteps		= 25000		; 50 ps
+integrator	= INTEGRATOR_MD	
+dt	        = STEP		# Time Step
+nsteps		= NSTEPS	# Number of Steps to be taken
 ; Bond parameters
 continuation	= no		    ; starting up
 constraints	= all-bonds	        ; constrain all bond lengths
@@ -11,10 +11,10 @@ constraint-algorithm = lincs	; holonomic constraints
 lincs-iter	= 1		            ; accuracy of LINCS
 lincs-order	= 4		            ; also related to accuracy
 ; Output control
-nstxout		= 500		; save coordinates every 2 ps
-nstvout		= 500 		; save velocities every 2 ps
-nstfout		= 500		; save forces every 2 ps
-nstenergy	= 500		; save energies every 2 ps
+nstxout		= NSTXOUT		; save coordinates every x ps
+nstvout		= NSTVOUT 		; save velocities every x ps
+nstfout		= NSTFOUT		; save forces every x ps
+nstenergy	= NSTENERGY		; save energies every x ps
 ; Neighborsearching
 nstlist		= 40 		    ; 10 fs
 ns_type		= grid 		; search neighboring grid cells
@@ -26,19 +26,19 @@ coulombtype	= PME		; Particle Mesh Ewald for long-range electrostatics
 pme_order	= 4		    ; cubic interpolation
 fourierspacing  = 0.16		; grid spacing for FFT
 ; Temperature coupling is on in three groups
-Tcoupl	 	= v-rescale     ; keeps velocity distribution
+Tcoupl	 	= TCOUPL     ; keeps velocity distribution
 tc_grps		= LLC   NA 	; three coupling groups - more accurate
 tau_t		= 0.1 	0.1     ; time constant, in ps
-ref_t		= 300 	300     ; reference temperature, one for each group, in K
+ref_t		= REF_T REF_T     ; reference temperature, one for each group, in K
 ; Pressure coupling
-Pcoupl		= berendsen 		        ; Weak coupling
-Pcoupltype      = semiisotropic  ; uniform scaling of x-y vectors. Independent z
-ref_p     	= 1.0 1.0        ; reference pressure (bar)
-compressibility = 4.5e-5 0  ; isotherm compressibility, bar^-1
+Pcoupl		= PCOUPL 		        ; Weak coupling
+Pcoupltype      = PCOUPLTYPE  ; uniform scaling of x-y vectors. Independent z
+ref_p     	= REF_P REF_P        ; reference pressure (bar)
+compressibility = COMPRESSIBILITY 0  ; isotherm compressibility, bar^-1
 ; Generate velocities is off
 gen_vel		= no			; Velocity generation is off
 ; Periodic boundary conditions are on in all directions
-pbc		    = xyz			; 3-D PBC
+pbc		    = PBC			; 3-D PBC
 ; Dispersion correction
 DispCorr	= Ener		; account for cut-off vdW scheme
 ; COM motion removal
