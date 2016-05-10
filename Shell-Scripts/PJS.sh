@@ -35,7 +35,7 @@ SIM_TITLE='Equilibration in Vacuum'  # Title of simulation
 CUTOFF_MD='verlet'  # Cut-off scheme for simulation
 INTEGRATOR_MD='md'  # Integrator type for simulation
 DT=0.002  # Time step (ps)
-WIG_LENGTH=0.01  #length of intermediate 'wiggle' simulation (ns)
+SIM_LENGTH=0.01  #length of intermediate 'wiggle' simulation (ns)
 FRAMES=50  # Number of frames in trajectory
 TCOUPL='v-rescale'
 REF_T=300  # Reference Temperature, K
@@ -47,7 +47,7 @@ PBC='xyz'
 
 # Solvation
 WATER_LAYER=6  # thickness (nm) between membrane layers in the z direction
-SIM_LENGTH=1  # nanoseconds
+SOLV_LENGTH=1  # nanoseconds
 
 # Reference for flags associated with each variable
 
@@ -78,9 +78,9 @@ SIM_LENGTH=1  # nanoseconds
 # -B  :   REF_P ... Reference Pressure, bar
 # -R  :   COMPRESSIBILITY ... Isothermal compressibility, bar^-1
 # -Z  :   PBC ... Periodic Boundary directions
-# -W  :   WIG_LENGTH ... length of intermediate simulation
+# -V  :   SOLV_LENGTH ... length of intermediate simulation
 
-while getopts "m:I:s:c:t:n:r:p:P:w:l:x:y:e:T:C:M:D:L:f:v:K:b:Y:B:e:Z:" opt; do
+while getopts "m:I:s:c:t:n:r:p:P:w:l:x:y:e:T:C:M:D:L:f:v:K:b:Y:B:e:Z:V:" opt; do
     case $opt in
     m)  MONOMER=$OPTARG;;
     I)  INTEGRATOR_EM=$OPTARG;;
@@ -109,7 +109,7 @@ while getopts "m:I:s:c:t:n:r:p:P:w:l:x:y:e:T:C:M:D:L:f:v:K:b:Y:B:e:Z:" opt; do
     B)  REF_P=$OPTARG;;
     R)  COMPRESSIBILITY=$OPTARG;;
     Z)  PBC=$OPTARG;;
-    W)  WIG_LENGTH=$OPTARG;;
+    V)  SOLV_LENGTH=$OPTARG;;
     esac
 done
 
@@ -120,13 +120,16 @@ INPUT_FILE=$DIR/../Structure-Files/$MONOMER  # Full path to file where monomer s
 Z_BOX_VECTOR=$((LAYERS+5)) # kind of arbitrary but should work
 MOL_LLC=$((NO_MONOMERS*NOPORES*LAYERS))  # For topology
 MOL_NA=$((NO_MONOMERS*NOPORES*LAYERS))
-NSTEPS_WIG=$(echo "$WIG_LENGTH*1000/$DT" | bc)
+NSTEPS_SOLV=$(echo "$SOLV_LENGTH*1000/$DT" | bc)
 NSTEPS_MD=$(echo "$SIM_LENGTH*1000/$DT" | bc)  # Number of steps to be taken during simulation to simulate the desired length of time
 NSTXOUT=$(echo "$NSTEPS_MD/$FRAMES" | bc) # Information output to trajectory
 NSTVOUT=$(echo "$NSTEPS_MD/$FRAMES" | bc)
 NSTFOUT=$(echo "$NSTEPS_MD/$FRAMES" | bc)
 NSTENERGY=$(echo "$NSTEPS_MD/$FRAMES" | bc)
-
+NSTXOUT_SOLV=$(echo "$NSTEPS_SOLV/$FRAMES" | bc) # Information output to trajectory
+NSTVOUT_SOLV=$(echo "$NSTEPS_SOLV/$FRAMES" | bc)
+NSTFOUT_SOLV=$(echo "$NSTEPS_SOLV/$FRAMES" | bc)
+NSTENERGY_SOLV=$(echo "$NSTEPS_SOLV/$FRAMES" | bc)
 
 # Edit input files:
 
@@ -141,7 +144,7 @@ sed -i -e "s/SIM_TITLE/${SIM_TITLE}/g" wiggle.mdp
 sed -i -e "s/CUTOFF_MD/${CUTOFF_MD}/g" wiggle.mdp
 sed -i -e "s/INTEGRATOR_MD/${INTEGRATOR_MD}/g" wiggle.mdp
 sed -i -e "s/DT/${DT}/g" wiggle.mdp
-sed -i -e "s/NSTEPS_MD/${NSTEPS_WIG}/g" wiggle.mdp
+sed -i -e "s/NSTEPS_MD/${NSTEPS_MD}/g" wiggle.mdp
 sed -i -e "s/NSTXOUT/${NSTXOUT}/g" wiggle.mdp
 sed -i -e "s/NSTVOUT/${NSTVOUT}/g" wiggle.mdp
 sed -i -e "s/NSTFOUT/${NSTFOUT}/g" wiggle.mdp
@@ -155,28 +158,32 @@ sed -i -e "s/COMPRESSIBILITY/${COMPRESSIBILITY}/g" wiggle.mdp
 sed -i -e "s/PBC/${PBC}/g" wiggle.mdp
 
 # Wiggle_solv.mdp
+sed -i -e "s/NSTENERGY/${NSTENERGY_SOLV}/g" wiggle_solv.mdp
 sed -i -e "s/SIM_TITLE/${SIM_TITLE}/g" wiggle_solv.mdp
 sed -i -e "s/CUTOFF_MD/${CUTOFF_MD}/g" wiggle_solv.mdp
 sed -i -e "s/INTEGRATOR_MD/${INTEGRATOR_MD}/g" wiggle_solv.mdp
 sed -i -e "s/DT/${DT}/g" wiggle_solv.mdp
-sed -i -e "s/NSTEPS_MD/${NSTEPS_WIG}/g" wiggle_solv.mdp
-sed -i -e "s/NSTXOUT/${NSTXOUT}/g" wiggle_solv.mdp
-sed -i -e "s/NSTVOUT/${NSTVOUT}/g" wiggle_solv.mdp
-sed -i -e "s/NSTFOUT/${NSTFOUT}/g" wiggle_solv.mdp
-sed -i -e "s/NSTENERGY/${NSTENERGY}/g" wiggle_solv.mdp
+sed -i -e "s/NSTEPS_SOLV/${NSTEPS_SOLV}/g" wiggle_solv.mdp
+sed -i -e "s/NSTENERGY/${NSTENERGY_SOLV}/g" wiggle_solv.mdp
+sed -i -e "s/NSTXOUT/${NSTXOUT_SOLV}/g" wiggle_solv.mdp
+sed -i -e "s/NSTVOUT/${NSTVOUT_SOLV}/g" wiggle_solv.mdp
+sed -i -e "s/NSTFOUT/${NSTFOUT_SOLV}/g" wiggle_solv.mdp
 sed -i -e "s/TCOUPL/${TCOUPL}/g" wiggle_solv.mdp
 sed -i -e "s/REF_T/${REF_T}/g" wiggle_solv.mdp
 sed -i -e "s/PCOUPL/${PCOUPL}/g" wiggle_solv.mdp
-sed -i -e "s/PTYPE/${PTYPE}/g" wiggle_solv.mdp
 sed -i -e "s/REF_P/${REF_P}/g" wiggle_solv.mdp
 sed -i -e "s/COMPRESSIBILITY/${COMPRESSIBILITY}/g" wiggle_solv.mdp
-sed -i -e "s/PBC/${PBC}/g" wiggle_solv.mdp
 
 # NaPore.top
 sed -i -e "s/MOL_LLC/${MOL_LLC}/g" NaPore.top
 sed -i -e "s/MOL_NA/${MOL_NA}/g" NaPore.top
 
+# NaPore_water.top
+sed -i -e "s/MOL_LLC/${MOL_LLC}/g" NaPore_water.top
+sed -i -e "s/MOL_NA/${MOL_NA}/g" NaPore_water.top
+
 # Build Structure Based on user-defined inputs
+
 
 python $DIR/../Structure_Builder/Structure_Builder_for_Bash.py -i $INPUT_FILE -l $LAYERS -m $NO_MONOMERS -r $RADIUS -p $PORE2PORE -n $NOPORES -d $DBWL >> initial.gro
 
