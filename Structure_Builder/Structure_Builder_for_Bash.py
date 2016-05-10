@@ -11,24 +11,26 @@ import argparse
 
 parser = argparse.ArgumentParser(description = 'Build LLC Structure')
 parser.add_argument('-i', '--input', help = 'Path to input file')
-parser.add_argument('-l', '--layers', help = 'Number of Layers')
-parser.add_argument('-m', '--monomers', help = 'Monomers per layer')
-parser.add_argument('-r', '--radius', help = 'Initial Pore Radius')
-parser.add_argument('-p', '--p2p', help = 'Initial Pore to Pore Distance')
+parser.add_argument('-l', '--layers', default=20, type=int, help = 'Number of Layers')
+parser.add_argument('-m', '--monomers', default=6, type=int, help = 'Monomers per layer')
+parser.add_argument('-r', '--radius', default=3, type=float, help = 'Initial Pore Radius')
+parser.add_argument('-p', '--p2p', default=40, type=float, help = 'Initial Pore to Pore Distance')
+parser.add_argument('-n', '--nopores', default=4, type=int, help = 'Number of Pores')
+parser.add_argument('-d', '--dbwl', default=10, type=float, help = 'Distance between layers')
 args = parser.parse_args()
 
 # Row at top of .gro file: (edit as necessary)
 print 'This is a .gro file'
 
-no_monomers = int(args.monomers)  # number of monomers packed per layer around a pore
+no_monomers = args.monomers  # number of monomers packed per layer around a pore
 no_atoms = 138  # number of atoms in one monomer excluding sodium ion
-pore_radius = int(args.radius)  # Radius of pore (unsure of units right now)
-no_pores = 4  # number of pores to be simulated
-dist_bw = int(args.p2p)  # distance between pores (units tbd)
-no_layers = int(args.layers)  # Number of layers in a pore
+pore_radius = args.radius  # Radius of pore (unsure of units right now)
+no_pores = args.nopores  # number of pores to be simulated
+dist_bw = args.p2p  # distance between pores (units tbd)
+no_layers = args.layers  # Number of layers in a pore
 sys_atoms = no_layers*no_monomers*no_pores*no_atoms  # total number of atoms in the system
 print '%s' %sys_atoms
-dist = 10  # distance between layers (units tbd)
+dist = args.dbwl  # distance between layers (units tbd)
 lines_of_text = 4  # lines of text at top of .pdb input file
 
 f = open(args.input, "r")
