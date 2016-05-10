@@ -9,9 +9,7 @@ ifv.sh
 # Define Variables with Default values
 
 # Choose which monomer to build with
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # Directory where this script is located
 MONOMER='monomer4.pdb'  # Structure file to be used
-INPUT_FILE=$DIR/../Structure-Files/$MONOMER  # Full path to file where monomer structure is located
 
 # Energy minimization parameters:
 INTEGRATOR_EM='steep'  # Integrator for energy minimization
@@ -26,11 +24,8 @@ PORE2PORE=40  # Pore-to-Pore distance, angstroms
 NOPORES=4  # Number of pores to be built
 DBWL=10  # Distance Between Layers
 LAYERS=20    # Number of layers wanted in the structure
-MOL_LLC=$NO_MONOMERS*$NOPORES*$LAYERS
-MOL_NA=$NO_MONOMERS*$NOPORES*$LAYERS
 
 # Box Vector Parameters
-Z_BOX_VECTOR=$((LAYERS+5)) # kind of arbitrary but should work
 XVECT=8.0  # Box vector in the x direction
 YVECT=8.0  # Box vector in the y direction (not this will be multiplied by sin(120) for a monoclinic cell of 120 degrees
 INCREMENT=0.1  # Increment to increase the box vector by if there is a LINCS error
@@ -41,12 +36,7 @@ CUTOFF_MD='verlet'  # Cut-off scheme for simulation
 INTEGRATOR_MD='md'  # Integrator type for simulation
 STEP=0.002  # Time step (ps)
 SIM_LENGTH=1  # nanoseconds
-NSTEPS_MD=$SIM_LENGTH*1000/$STEP  # Number of steps to be taken during simulation to simulate the desired length of time
 FRAMES=50  # Number of frames in trajectory
-NSTXOUT=$NSTEPS/$FRAMES  # Information output to trajectory
-NSTVOUT=$NSTEPS/$FRAMES
-NSTFOUT=$NSTEPS/$FRAMES
-NSTENERGY=$NSTEPS/$FRAMES
 TCOUPL='v-rescale'
 REF_T=300  # Reference Temperature, K
 PCOUPL='berendsen'
@@ -57,39 +47,47 @@ PBC='xyz'
 
 # Reference for flags associated with each variable
 
-# -m  :   MONOMER='monomer4.pdb'  # Structure file to be used
-# -i  :   INPUT_FILE=$DIR/../Structure-Files/$MONOMER  # Full path to file where monomer structure is located
-# -I  :   INTEGRATOR_EM='steep'  # Integrator for energy minimization
-# -s  :   NSTEPS_EM=50000  # Maximum number of steps to take for energy minimization
-# -c  :   CUTOFF_EM='verlet'  # Cut-off Scheme
-# -t  :   NSTLIST=10  # Neighborlist - changed automatically by gromacs unless it is set equal to 1
+# -m  :   MONOMER ... Structure file to be used
+# -i  :   INPUT_FILE ... Full path to file where monomer structure is located
+# -I  :   INTEGRATOR_EM ... Integrator for energy minimization
+# -s  :   NSTEPS_EM ... Maximum number of steps to take for energy minimization
+# -c  :   CUTOFF_EM ... Cut-off Scheme
+# -t  :   NSTLIST ... Neighborlist - changed automatically by gromacs unless it is set equal to 1
 # -n  :   NO_MONOMERS ... Number of monomers in 1 layer
 # -r  :   RADIUS ... Initial pore radius, angstroms
-# -p  :   PORE2PORE=40  # Pore-to-Pore distance, angstroms
-# -P  :   NOPORES=4  # Number of pores to be built
-# -w  :   DBWL=10  # Distance Between Layers
-# -l  :   LAYERS=20    # Number of layers wanted in the structure
-# -x  :   XVECT=8.0  # Box vector in the x direction
-# -y  :   YVECT=8.0  # Box vector in the y direction (not this will be multiplied by sin(120) for a monoclinic cell of 120 degrees
-#     :   INCREMENT=0.1  # Increment to increase the box vector by if there is a LINCS error
-# -T  :   SIM_TITLE='Equilibration in Vacuum'  # Title of simulation
-#CUTOFF_MD='verlet'  # Cut-off scheme for simulation
-#INTEGRATOR_MD='md'  # Integrator type for simulation
-#STEP=0.002  # Time step (ps)
-#SIM_LENGTH=1  # nanoseconds
-#NSTEPS_MD=$SIM_LENGTH*1000/$STEP  # Number of steps to be taken during simulation to simulate the desired length of time
-#FRAMES=50  # Number of frames in trajectory
-#NSTXOUT=$NSTEPS/$FRAMES  # Information output to trajectory
-#NSTVOUT=$NSTEPS/$FRAMES
-#NSTFOUT=$NSTEPS/$FRAMES
-#NSTENERGY=$NSTEPS/$FRAMES
-#TCOUPL='v-rescale'
-#REF_T=300  # Reference Temperature, K
-#PCOUPL='berendsen'
-#PCOUPLTYPE='semiisotropic'
-#REF_P=1  # Reference Pressure, bar
-#COMPRESSIBILITY=4.5e-5  # Isothermal compressibility, bar^-1
-#PBC='xyz'
+# -p  :   PORE2PORE ... Pore-to-Pore distance, angstroms
+# -P  :   NOPORES ... Number of pores to be built
+# -w  :   DBWL ... Distance Between Layers
+# -l  :   LAYERS ... Number of layers wanted in the structure
+# -x  :   XVECT ... Box vector in the x direction
+# -y  :   YVECT ... Box vector in the y direction (not this will be multiplied by sin(120) for a monoclinic cell of 120 degrees
+# -e  :   INCREMENT ... Increment to increase the box vector by if there is a LINCS error
+# -T  :   SIM_TITLE ... Title of simulation
+# -C  :   CUTOFF_MD ... Cut-off scheme for simulation
+# -M  :   INTEGRATOR_MD ... Integrator type for simulation
+# -S  :   STEP ... Time step (ps)
+# -L  :   SIM_LENGTH ... Simulation length, nanoseconds
+# -f  :   FRAMES ... Number of frames in trajectory
+# -v  :   TCOUPL ... Temperature Coupling
+# -K  :   REF_T ... Reference Temperature, K
+# -b  :   PCOUPL ... Pressure Coupling
+# -Y  :   PCOUPLTYPE ... i.e. Isotropic, semiisotropic
+# -B  :   REF_P ... Reference Pressure, bar
+# -e  :   COMPRESSIBILITY ... Isothermal compressibility, bar^-1
+# -Z  :   PBC ... Periodic Boundary directions
+
+# Calculated values based on input variables:
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # Directory where this script is located
+INPUT_FILE=$DIR/../Structure-Files/$MONOMER  # Full path to file where monomer structure is located
+Z_BOX_VECTOR=$((LAYERS+5)) # kind of arbitrary but should work
+MOL_LLC=$NO_MONOMERS*$NOPORES*$LAYERS  # For topology
+MOL_NA=$NO_MONOMERS*$NOPORES*$LAYERS
+NSTEPS_MD=$SIM_LENGTH*1000/$STEP  # Number of steps to be taken during simulation to simulate the desired length of time
+NSTXOUT=$NSTEPS/$FRAMES  # Information output to trajectory
+NSTVOUT=$NSTEPS/$FRAMES
+NSTFOUT=$NSTEPS/$FRAMES
+NSTENERGY=$NSTEPS/$FRAMES
 
 # Edit input files:
 
