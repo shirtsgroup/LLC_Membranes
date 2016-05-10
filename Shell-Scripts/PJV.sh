@@ -112,10 +112,9 @@ done
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # Directory where this script is located
 INPUT_FILE=$DIR/../Structure-Files/$MONOMER  # Full path to file where monomer structure is located
 Z_BOX_VECTOR=$((LAYERS+5)) # kind of arbitrary but should work
-MOL_LLC=$NO_MONOMERS*$NOPORES*$LAYERS  # For topology
-echo $MOL_LLC
-MOL_NA=$NO_MONOMERS*$NOPORES*$LAYERS
-NSTEPS_MD=$SIM_LENGTH*1000/$STEP  # Number of steps to be taken during simulation to simulate the desired length of time
+MOL_LLC=$((NO_MONOMERS*NOPORES*LAYERS))  # For topology
+MOL_NA=$((NO_MONOMERS*NOPORES*LAYERS))
+NSTEPS_MD=$((SIM_LENGTH*1000/STEP))  # Number of steps to be taken during simulation to simulate the desired length of time
 NSTXOUT=$NSTEPS/$FRAMES  # Information output to trajectory
 NSTVOUT=$NSTEPS/$FRAMES
 NSTFOUT=$NSTEPS/$FRAMES
