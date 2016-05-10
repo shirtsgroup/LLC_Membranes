@@ -13,6 +13,8 @@ parser = argparse.ArgumentParser(description = 'Build LLC Structure')
 parser.add_argument('-i', '--input', help = 'Path to input file')
 parser.add_argument('-l', '--layers', help = 'Number of Layers')
 parser.add_argument('-m', '--monomers', help = 'Monomers per layer')
+parser.add_argument('-r', '--radius', help = 'Initial Pore Radius')
+parser.add_argument('-p', '--p2p', help = 'Initial Pore to Pore Distance')
 args = parser.parse_args()
 
 # Row at top of .gro file: (edit as necessary)
@@ -20,9 +22,9 @@ print 'This is a .gro file'
 
 no_monomers = int(args.monomers)  # number of monomers packed per layer around a pore
 no_atoms = 138  # number of atoms in one monomer excluding sodium ion
-pore_radius = 3  # Radius of pore (unsure of units right now)
+pore_radius = int(args.radius)  # Radius of pore (unsure of units right now)
 no_pores = 4  # number of pores to be simulated
-dist_bw = 40  # distance between pores (units tbd)
+dist_bw = int(args.p2p)  # distance between pores (units tbd)
 no_layers = int(args.layers)  # Number of layers in a pore
 sys_atoms = no_layers*no_monomers*no_pores*no_atoms  # total number of atoms in the system
 print '%s' %sys_atoms
