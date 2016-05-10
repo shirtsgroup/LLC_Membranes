@@ -109,12 +109,12 @@ while [ $(echo " $ENERGY > 0" | bc) -eq 1 ]; do
         ENERGY=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
 done
 
-## prepare input file for simulation (just letting it wiggle around)
-#
-#gmx grompp -f wiggle.mdp -c box_em.gro -p NaPore.top -o wiggle.tpr
-#
-## remove unecessary files
-#find . -type f -name 'box_em'\* -exec rm {} \;
-#find . -type f -name '#'\* -exec rm {} \;
-##rm initial.gro
-#rm box.gro
+# prepare input file for simulation (just letting it wiggle around)
+
+gmx grompp -f wiggle.mdp -c box_em.gro -p NaPore.top -o wiggle.tpr
+
+# remove unecessary files
+find . -type f -name 'box_em'\* -exec rm {} \;
+find . -type f -name '#'\* -exec rm {} \;
+#rm initial.gro
+rm box.gro
