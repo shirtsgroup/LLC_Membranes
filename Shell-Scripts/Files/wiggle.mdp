@@ -2,8 +2,8 @@ title = SIM_TITLE
 cutoff-scheme = CUTOFF_MD
 ; Run parameters
 integrator	= INTEGRATOR_MD	
-dt	        = STEP		
-nsteps		= NSTEPS	
+dt	        = DT		
+nsteps		= NSTEPS_MD	
 ; Bond parameters
 continuation	= no		
 constraints	= all-bonds	
@@ -31,7 +31,7 @@ tau_t		= 0.1 	0.1
 ref_t		= REF_T REF_T
 ; Pressure coupling
 Pcoupl		= PCOUPL
-Pcoupltype      = PCOUPLTYPE
+Pcoupltype      = PTYPE
 ref_p     	= REF_P REF_P
 compressibility = COMPRESSIBILITY 0
 gen_vel		= no

@@ -34,13 +34,13 @@ INCREMENT=0.1  # Increment to increase the box vector by if there is a LINCS err
 SIM_TITLE='Equilibration in Vacuum'  # Title of simulation
 CUTOFF_MD='verlet'  # Cut-off scheme for simulation
 INTEGRATOR_MD='md'  # Integrator type for simulation
-STEP=0.002  # Time step (ps)
+DT=0.002  # Time step (ps)
 SIM_LENGTH=1  # nanoseconds
 FRAMES=50  # Number of frames in trajectory
 TCOUPL='v-rescale'
 REF_T=300  # Reference Temperature, K
 PCOUPL='berendsen'
-PCOUPLTYPE='semiisotropic'
+PTYPE='semiisotropic'
 REF_P=1  # Reference Pressure, bar
 COMPRESSIBILITY=4.5e-5  # Isothermal compressibility, bar^-1
 PBC='xyz'
@@ -64,18 +64,18 @@ PBC='xyz'
 # -T  :   SIM_TITLE ... Title of simulation
 # -C  :   CUTOFF_MD ... Cut-off scheme for simulation
 # -M  :   INTEGRATOR_MD ... Integrator type for simulation
-# -S  :   STEP ... Time step (ps)
+# -D  :   DT ... Time step (ps)
 # -L  :   SIM_LENGTH ... Simulation length, nanoseconds
 # -f  :   FRAMES ... Number of frames in trajectory
 # -v  :   TCOUPL ... Temperature Coupling
 # -K  :   REF_T ... Reference Temperature, K
 # -b  :   PCOUPL ... Pressure Coupling
-# -Y  :   PCOUPLTYPE ... i.e. Isotropic, semiisotropic
+# -Y  :   PTYPE ... i.e. Isotropic, semiisotropic
 # -B  :   REF_P ... Reference Pressure, bar
 # -R  :   COMPRESSIBILITY ... Isothermal compressibility, bar^-1
 # -Z  :   PBC ... Periodic Boundary directions
 
-while getopts "m:I:s:c:t:n:r:p:P:w:l:x:y:e:T:C:M:S:L:f:v:K:b:Y:B:e:Z:" opt; do
+while getopts "m:I:s:c:t:n:r:p:P:w:l:x:y:e:T:C:M:D:L:f:v:K:b:Y:B:e:Z:" opt; do
     case $opt in
     m)  MONOMER=$OPTARG;;
     I)  INTEGRATOR_EM=$OPTARG;;
@@ -94,13 +94,13 @@ while getopts "m:I:s:c:t:n:r:p:P:w:l:x:y:e:T:C:M:S:L:f:v:K:b:Y:B:e:Z:" opt; do
     T)  SIM_TITLE=$OPTARG;;
     C)  CUTOFF_MD=$OPTARG;;
     M)  INTEGRATOR_MD=$OPTARG;;
-    S)  STEP=$OPTARG;;
+    D)  DT=$OPTARG;;
     L)  SIM_LENGTH=$OPTARG;;
     f)  FRAMES=$OPTARG;;
     v)  TCOUPL=$OPTARG;;
     K)  REF_T=$OPTARG;;
     b)  PCOUPL=$OPTARG;;
-    Y)  PCOUPLTYPE=$OPTARG;;
+    Y)  PTYPE=$OPTARG;;
     B)  REF_P=$OPTARG;;
     R)  COMPRESSIBILITY=$OPTARG;;
     Z)  PBC=$OPTARG;;
@@ -114,11 +114,11 @@ INPUT_FILE=$DIR/../Structure-Files/$MONOMER  # Full path to file where monomer s
 Z_BOX_VECTOR=$((LAYERS+5)) # kind of arbitrary but should work
 MOL_LLC=$((NO_MONOMERS*NOPORES*LAYERS))  # For topology
 MOL_NA=$((NO_MONOMERS*NOPORES*LAYERS))
-NSTEPS_MD=$(echo "$SIM_LENGTH*1000/$STEP" | bc)  # Number of steps to be taken during simulation to simulate the desired length of time
-NSTXOUT=$(echo "$NSTEPS/$FRAMES" | bc) # Information output to trajectory
-NSTVOUT=$NSTEPS/$FRAMES
-NSTFOUT=$NSTEPS/$FRAMES
-NSTENERGY=$NSTEPS/$FRAMES
+NSTEPS_MD=$(echo "$SIM_LENGTH*1000/$DT" | bc)  # Number of steps to be taken during simulation to simulate the desired length of time
+NSTXOUT=$(echo "$NSTEPS_MD/$FRAMES" | bc) # Information output to trajectory
+NSTVOUT=$(echo "$NSTEPS_MD/$FRAMES" | bc)
+NSTFOUT=$(echo "$NSTEPS_MD/$FRAMES" | bc)
+NSTENERGY=$(echo "$NSTEPS_MD/$FRAMES" | bc)
 
 # Edit input files:
 
@@ -128,14 +128,12 @@ sed -i -e "s/NSTEPS_EM/${NSTEPS_EM}/g" em.mdp
 sed -i -e "s/CUTOFF_EM/${CUTOFF_EM}/g" em.mdp
 sed -i -e "s/NSTLIST_EM/${NSTLIST}/g" em.mdp
 
-echo $MOL_LLC
-echo $MOL_NA
 
 # Wiggle.mdp
 sed -i -e "s/SIM_TITLE/${SIM_TITLE}/g" wiggle.mdp
 sed -i -e "s/CUTOFF_MD/${CUTOFF_MD}/g" wiggle.mdp
 sed -i -e "s/INTEGRATOR_MD/${INTEGRATOR_MD}/g" wiggle.mdp
-sed -i -e "s/STEP/${STEP}/g" wiggle.mdp
+sed -i -e "s/DT/${DT}/g" wiggle.mdp
 sed -i -e "s/NSTEPS_MD/${NSTEPS_MD}/g" wiggle.mdp
 sed -i -e "s/NSTXOUT/${NSTXOUT}/g" wiggle.mdp
 sed -i -e "s/NSTVOUT/${NSTVOUT}/g" wiggle.mdp
@@ -144,7 +142,7 @@ sed -i -e "s/NSTENERGY/${NSTENERGY}/g" wiggle.mdp
 sed -i -e "s/TCOUPL/${TCOUPL}/g" wiggle.mdp
 sed -i -e "s/REF_T/${REF_T}/g" wiggle.mdp
 sed -i -e "s/PCOUPL/${PCOUPL}/g" wiggle.mdp
-sed -i -e "s/PCOUPLTYPE/${PCOUPLTYPE}/g" wiggle.mdp
+sed -i -e "s/PTYPE/${PTYPE}/g" wiggle.mdp
 sed -i -e "s/REF_P/${REF_P}/g" wiggle.mdp
 sed -i -e "s/COMPRESSIBILITY/${COMPRESSIBILITY}/g" wiggle.mdp
 sed -i -e "s/PBC/${PBC}/g" wiggle.mdp
