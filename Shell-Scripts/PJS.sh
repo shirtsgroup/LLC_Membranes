@@ -271,14 +271,12 @@ gmx mdrun -v -deffnm water_em
 #gmx grompp -f wiggle_solv.mdp -c water_em.gro -p NaPore_water.top -o water_wiggle.tpr
 
 # remove unecessary files
-#rm initial.gro water.gro new_box.gro #remove now unnecessary file
+rm initial.gro water.gro new_box.gro #remove now unnecessary file
 rm box.gro # remove unecessary file
 find . -type f -name 'Correct_box'\* -exec rm {} \;
-#find . -type f -name 'water_em'\* -exec rm {} \;
+find . -type f -name 'water_em'\* -exec rm {} \;
 find . -type f -name 'em_new_box'\* -exec rm {} \;
 find . -type f -name 'box_em'\* -exec rm {} \;
 find . -type f -name '#'\* -exec rm {} \;
 find . -type f -name 'wiggle_vac'\* -exec rm {} \;
-# Directory for output files that aren't needed that often
-mkdir Output
-mv mdout.mdp water_wiggle.cpt water_wiggle.edr water_wiggle.log water_wiggle.tpr Output
+rm mdout.mdp
