@@ -67,7 +67,7 @@ SOLV_LENGTH=1  # nanoseconds
 # -e  :   INCREMENT ... Increment to increase the box vector by if there is a LINCS error
 # -T  :   SIM_TITLE ... Title of simulation
 # -C  :   CUTOFF_MD ... Cut-off scheme for simulation
-# -M  :   INTEGRATOR_MD ... Integrator type for simulation
+# -i  :   INTEGRATOR_MD ... Integrator type for simulation
 # -D  :   DT ... Time step (ps)
 # -L  :   SIM_LENGTH ... Simulation length, nanoseconds
 # -f  :   FRAMES ... Number of frames in trajectory
@@ -80,7 +80,7 @@ SOLV_LENGTH=1  # nanoseconds
 # -Z  :   PBC ... Periodic Boundary directions
 # -V  :   SOLV_LENGTH ... length of intermediate simulation
 
-while getopts "M:I:s:c:t:o:r:p:P:w:l:x:y:e:T:C:M:D:L:f:v:K:b:Y:B:e:Z:V:" opt; do
+while getopts "M:I:s:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:e:Z:V:" opt; do
     case $opt in
     M)  MONOMER=$OPTARG;;
     I)  INTEGRATOR_EM=$OPTARG;;
@@ -98,7 +98,7 @@ while getopts "M:I:s:c:t:o:r:p:P:w:l:x:y:e:T:C:M:D:L:f:v:K:b:Y:B:e:Z:V:" opt; do
     e)  INCREMENT=$OPTARG;;
     T)  SIM_TITLE=$OPTARG;;
     C)  CUTOFF_MD=$OPTARG;;
-    M)  INTEGRATOR_MD=$OPTARG;;
+    i)  INTEGRATOR_MD=$OPTARG;;
     D)  DT=$OPTARG;;
     L)  SIM_LENGTH=$OPTARG;;
     f)  FRAMES=$OPTARG;;
