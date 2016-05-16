@@ -47,12 +47,12 @@ PBC='xyz'
 
 # Reference for flags associated with each variable
 
-# -m  :   MONOMER ... Structure file to be used
+# -M  :   MONOMER ... Structure file to be used
 # -I  :   INTEGRATOR_EM ... Integrator for energy minimization
 # -s  :   NSTEPS_EM ... Maximum number of steps to take for energy minimization
 # -c  :   CUTOFF_EM ... Cut-off Scheme
 # -t  :   NSTLIST ... Neighborlist - changed automatically by gromacs unless it is set equal to 1
-# -n  :   NO_MONOMERS ... Number of monomers in 1 layer
+# -o  :   NO_MONOMERS ... Number of monomers in 1 layer
 # -r  :   RADIUS ... Initial pore radius, angstroms
 # -p  :   PORE2PORE ... Pore-to-Pore distance, angstroms
 # -P  :   NOPORES ... Number of pores to be built
@@ -77,12 +77,12 @@ PBC='xyz'
 
 while getopts "m:I:s:c:t:n:r:p:P:w:l:x:y:e:T:C:M:D:L:f:v:K:b:Y:B:e:Z:" opt; do
     case $opt in
-    m)  MONOMER=$OPTARG;;
+    M)  MONOMER=$OPTARG;;
     I)  INTEGRATOR_EM=$OPTARG;;
     s)  NSTEPS_EM=$OPTARG;;
     c)  CUTOFF_EM=$OPTARG;;
     t)  NSTLIST=$OPTARG;;
-    n)  NO_MONOMERS=$OPTARG;;
+    o)  NO_MONOMERS=$OPTARG;;
     r)  RADIUS=$OPTARG;;
     p)  PORE2PORE=$OPTARG;;
     P)  NOPORES=$OPTARG;;
