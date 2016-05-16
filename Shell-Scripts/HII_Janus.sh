@@ -32,7 +32,7 @@ YVECT=8.0  # Box vector in the y direction (not this will be multiplied by sin(1
 INCREMENT=0.1  # Increment to increase the box vector by if there is a LINCS error
 
 # Simulation Parameters
-SIM_TITLE='Equilibration in Vacuum'  # Title of simulation
+SIM_TITLE="'Equilibration in Water'"  # Title of simulation
 CUTOFF_MD='verlet'  # Cut-off scheme for simulation
 INTEGRATOR_MD='md'  # Integrator type for simulation
 DT=0.002  # Time step (ps)
