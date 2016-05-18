@@ -1,23 +1,50 @@
 # Orient plane with origin
 import numpy as np
 import math
+import os
+import argparse
 
+
+location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+parser = argparse.ArgumentParser(description = 'Build LLC Structure')
+parser.add_argument('-i', '--input', default='monomer4.pdb', help = 'Path to input file')
+parser.add_argument('-l', '--layers', default=20, type=int, help = 'Number of Layers')
+parser.add_argument('-m', '--monomers', default=6, type=int, help = 'Monomers per layer')
+parser.add_argument('-r', '--radius', default=3, type=float, help = 'Initial Pore Radius')
+parser.add_argument('-p', '--p2p', default=40, type=float, help = 'Initial Pore to Pore Distance')
+parser.add_argument('-n', '--nopores', default=4, type=int, help = 'Number of Pores')
+parser.add_argument('-d', '--dbwl', default=10, type=float, help = 'Distance between layers')
+args = parser.parse_args()
+
+
+# Row at top of .gro file: (edit as necessary)
 print 'This is a .gro file'
 
-f = open("/home/bcoscia/PycharmProjects/GitHub/Structure-Files/monomer10.pdb", "r")
+f = open("%s/../Structure-Files/%s" %(location, args.input), "r")
+# f = open(args.input, "r")
 a = []
 for line in f:
     a.append(line)
 
-no_monomers = 6  # number of monomers packed per layer around a pore
-no_atoms = 138  # number of atoms in one monomer excluding sodium ion
-pore_radius = 4  # Radius of pore (unsure of units right now)
-no_pores = 4  # number of pores to be simulated
-dist_bw = 40  # distance between pores (units tbd)
-no_layers = 20  # Number of layers in a pore
-dist = 10 # distance between layers (units tbd)
-lines_of_text = 4  # lines of text at top of .pdb file
+no_atoms = 0  # number of atoms in one monomer including sodium ion
+for i in range(0, len(a)):
+    no_atoms += a[i].count('ATOM')
+
+lines_of_text = 0  # lines of text at top of .pdb input file
+for i in range(0, len(a)):
+    if a[i].count('ATOM') == 0:
+        lines_of_text += 1
+    if a[i].count('ATOM') == 1:
+        break
+
+no_monomers = args.monomers  # number of monomers packed per layer around a pore
+pore_radius = args.radius  # Radius of pore (unsure of units right now)
+no_pores = args.nopores  # number of pores to be simulated
+dist_bw = args.p2p  # distance between pores (units tbd)
+no_layers = args.layers  # Number of layers in a pore
 sys_atoms = no_layers*no_monomers*no_pores*no_atoms  # total number of atoms in the system
+dist = args.dbwl  # distance between layers (units tbd)
 
 print '%s' %sys_atoms
 
