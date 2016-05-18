@@ -11,6 +11,9 @@ ifv.sh
 # Choose which monomer to build with
 MONOMER='monomer4.pdb'  # Structure file to be used
 
+#MPI Options
+NODES=16
+
 # Energy minimization parameters:
 INTEGRATOR_EM=steep  # Integrator for energy minimization
 NSTEPS_EM=50000  # Maximum number of steps to take for energy minimization
@@ -74,6 +77,7 @@ PBC='xyz'
 # -B  :   REF_P ... Reference Pressure, bar
 # -R  :   COMPRESSIBILITY ... Isothermal compressibility, bar^-1
 # -Z  :   PBC ... Periodic Boundary directions
+# -m  :   NODES ... Number of nodes to use on parallel machine
 
 while getopts "M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:" opt; do
     case $opt in
@@ -104,6 +108,7 @@ while getopts "M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:" opt; do
     B)  REF_P=$OPTARG;;
     R)  COMPRESSIBILITY=$OPTARG;;
     Z)  PBC=$OPTARG;;
+    m)  NODES=$OPTARG;;
     esac
 done
 
@@ -119,7 +124,7 @@ NSTXOUT=$(echo "$NSTEPS_MD/$FRAMES" | bc) # Information output to trajectory
 NSTVOUT=$(echo "$NSTEPS_MD/$FRAMES" | bc)
 NSTFOUT=$(echo "$NSTEPS_MD/$FRAMES" | bc)
 NSTENERGY=$(echo "$NSTEPS_MD/$FRAMES" | bc)
-
+NP=$((NODES*2))  # for janus ... needs to be modified for other machines once parallelization scheme is known
 
 # Edit input files:
 
@@ -166,7 +171,7 @@ gmx grompp -f em.mdp -c box.gro -p NaPore.top -o box_em.tpr
 
 # Run Energy Minimization
 
-gmx mdrun -v -deffnm box_em
+mpirun -np $NP gmx_mpi mdrun -v -deffnm box_em
 
 # Extract Potential Energy from log file
 ENERGY=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5}')
@@ -178,7 +183,7 @@ while [ $(echo " $ENERGY > 0" | bc) -eq 1 ]; do
         YVECT=$(echo "$YVECT + $INCREMENT" | bc -l)
         gmx editconf -f initial.gro -o box.gro -c -bt triclinic -box $XVECT $YVECT $Z_BOX_VECTOR -angles 90 90 120
         gmx grompp -f em.mdp -c box.gro -p NaPore.top -o box_em.tpr
-        gmx mdrun -v -deffnm box_em
+        mpirun -np $NP gmx_mpi mdrun -v -deffnm box_em
         ENERGY=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
 done
 
@@ -188,14 +193,14 @@ gmx grompp -f wiggle.mdp -c box_em.gro -p NaPore.top -o wiggle.tpr
 
 # run simulation for amount of time specified in wiggle.mdp
 
-gmx mdrun  -v -deffnm wiggle
+mpirun -np $NP gmx_mpi mdrun -v -deffnm wiggle
 
 gmx trjconv -f wiggle.trr -s wiggle.tpr -o traj.gro
 # remove unecessary files
 find . -type f -name 'box_em'\* -exec rm {} \;
 find . -type f -name '#'\* -exec rm {} \;
-rm initial.gro  
-rm box.gro 
+rm initial.gro
+rm box.gro
 
 # Directory for output files that aren't needed that often
 mkdir Output
