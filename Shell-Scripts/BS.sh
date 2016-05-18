@@ -110,7 +110,7 @@ done
 # Calculated values based on input variables:
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # Directory where this script is located
-INPUT_FILE=$DIR/../Structure-Files/$MONOMER  # Full path to file where monomer structure is located
+#INPUT_FILE=$DIR/../Structure-Files/$MONOMER  # Full path to file where monomer structure is located
 Z_BOX_VECTOR=$((LAYERS+5)) # kind of arbitrary but should work
 MOL_LLC=$((NO_MONOMERS*NOPORES*LAYERS))  # For topology
 MOL_NA=$((NO_MONOMERS*NOPORES*LAYERS))
@@ -154,7 +154,7 @@ sed -i -e "s/MOL_NA/${MOL_NA}/g" NaPore.top
 
 # Build Structure Based on user-defined inputs
 
-python $DIR/../Structure_Builder/Structure_Builder_for_Bash.py -i $INPUT_FILE -l $LAYERS -m $NO_MONOMERS -r $RADIUS -p $PORE2PORE -n $NOPORES -d $DBWL >> initial.gro
+python $DIR/../Structure_Builder/Orient_Plane.py -i $MONOMER -l $LAYERS -m $NO_MONOMERS -r $RADIUS -p $PORE2PORE -n $NOPORES -d $DBWL >> initial.gro
 
 # Put the structure in a box
 
