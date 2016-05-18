@@ -5,12 +5,15 @@
 import numpy as np
 import math
 import argparse
+import os
 
 # Input arguments to python file by choosing which monomer to assemble with and number of layers. Can be used in a shell
 # script
 
+location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # working directory
+
 parser = argparse.ArgumentParser(description = 'Build LLC Structure')
-parser.add_argument('-i', '--input', help = 'Path to input file')
+parser.add_argument('-i', '--input', default='monomer4.pdb', help = 'Path to input file')
 parser.add_argument('-l', '--layers', default=20, type=int, help = 'Number of Layers')
 parser.add_argument('-m', '--monomers', default=6, type=int, help = 'Monomers per layer')
 parser.add_argument('-r', '--radius', default=3, type=float, help = 'Initial Pore Radius')
@@ -22,7 +25,7 @@ args = parser.parse_args()
 # Row at top of .gro file: (edit as necessary)
 print 'This is a .gro file'
 
-f = open(args.input, "r")
+f = open("%s/../Structure-Files/%s" %(location, args.input), "r")
 a = []
 for line in f:
     a.append(line)
@@ -44,8 +47,8 @@ no_pores = args.nopores  # number of pores to be simulated
 dist_bw = args.p2p  # distance between pores (units tbd)
 no_layers = args.layers  # Number of layers in a pore
 sys_atoms = no_layers*no_monomers*no_pores*no_atoms  # total number of atoms in the system
-print '%s' %sys_atoms
 dist = args.dbwl  # distance between layers (units tbd)
+print '%s' %sys_atoms
 
 
 x_values_inp = []  # list to hold input values of x stored from .pdb file
