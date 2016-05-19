@@ -79,7 +79,7 @@ PBC='xyz'
 # -Z  :   PBC ... Periodic Boundary directions
 # -m  :   NODES ... Number of nodes to use on parallel machine
 
-while getopts "M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:" opt; do
+while getopts "M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:m:" opt; do
     case $opt in
     M)  MONOMER=$OPTARG;;
     I)  INTEGRATOR_EM=$OPTARG;;
