@@ -1,21 +1,52 @@
 # Orient plane with origin
 import numpy as np
 import math
+import os
+import argparse
 
-f = open("Monomer_Configurations/monomer10.pdb", "r")
+
+location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+parser = argparse.ArgumentParser(description = 'Build LLC Structure')
+parser.add_argument('-i', '--input', default='monomer4.pdb', help = 'Path to input file')
+parser.add_argument('-l', '--layers', default=20, type=int, help = 'Number of Layers')
+parser.add_argument('-m', '--monomers', default=6, type=int, help = 'Monomers per layer')
+parser.add_argument('-r', '--radius', default=3, type=float, help = 'Initial Pore Radius')
+parser.add_argument('-p', '--p2p', default=40, type=float, help = 'Initial Pore to Pore Distance')
+parser.add_argument('-n', '--nopores', default=4, type=int, help = 'Number of Pores')
+parser.add_argument('-d', '--dbwl', default=10, type=float, help = 'Distance between layers')
+args = parser.parse_args()
+
+
+# Row at top of .gro file: (edit as necessary)
+print 'This is a .gro file'
+
+f = open("%s/../Structure-Files/%s" %(location, args.input), "r")
+# f = open(args.input, "r")
 a = []
 for line in f:
     a.append(line)
 
-no_monomers = 6  # number of monomers packed per layer around a pore
-no_atoms = 138  # number of atoms in one monomer excluding sodium ion
-pore_radius = 4  # Radius of pore (unsure of units right now)
-no_pores = 4  # number of pores to be simulated
-dist_bw = 40  # distance between pores (units tbd)
-no_layers = 20  # Number of layers in a pore
-dist = 10 # distance between layers (units tbd)
-lines_of_text = 4  # lines of text at top of .pdb file
+no_atoms = 0  # number of atoms in one monomer including sodium ion
+for i in range(0, len(a)):
+    no_atoms += a[i].count('ATOM')
 
+lines_of_text = 0  # lines of text at top of .pdb input file
+for i in range(0, len(a)):
+    if a[i].count('ATOM') == 0:
+        lines_of_text += 1
+    if a[i].count('ATOM') == 1:
+        break
+
+no_monomers = args.monomers  # number of monomers packed per layer around a pore
+pore_radius = args.radius  # Radius of pore (unsure of units right now)
+no_pores = args.nopores  # number of pores to be simulated
+dist_bw = args.p2p  # distance between pores (units tbd)
+no_layers = args.layers  # Number of layers in a pore
+sys_atoms = no_layers*no_monomers*no_pores*no_atoms  # total number of atoms in the system
+dist = args.dbwl  # distance between layers (units tbd)
+
+print '%s' %sys_atoms
 
 x_values_inp = []  # list to hold input values of x stored from .pdb file
 y_values_inp = []  # list to hold input values of y stored from .pdb file
@@ -224,12 +255,24 @@ for l in range(0, no_pores):  # loop to create multiple pores
                 x_values.append(b*dist_bw + positions[j][i][0])
                 y_values.append(c*dist_bw + positions[j][i][1])
                 z_values.append(k*dist + positions[j][i][2])
-                print '{:5s}{:6d}  {:4s} {:8d}   {:8.3f} {:8.3f}{:8.3f}  {:4.2f}  {:4.2f}          {:>2}{:2s}'\
-                    .format('ATOM', i + 1 + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l,
-                    identity[i], 0, x_values[i+(no_atoms - 1)*j+(no_atoms - 1)*no_monomers*k+(no_atoms - 1)*no_monomers*no_layers*l],
-                    y_values[i + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l],
-                    z_values[i + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l], 0.00,
-                    0.00, 'C', '+0')
+                # print '{:5s}{:6d}  {:4s} {:8d}   {:8.3f} {:8.3f}{:8.3f}  {:4.2f}  {:4.2f}          {:>2}{:2s}'\
+                #     .format('ATOM', i + 1 + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l,
+                #     identity[i], 0, x_values[i+(no_atoms - 1)*j+(no_atoms - 1)*no_monomers*k+(no_atoms - 1)*no_monomers*no_layers*l],
+                #     y_values[i + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l],
+                #     z_values[i + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l], 0.00,
+                #     0.00, 'C', '+0')
+                if i + 1 + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l < 100000:
+                    print '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(1 + j + no_monomers*k + no_monomers*no_layers*l,
+                        'LLC', identity[i], i + 1 + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l,
+                        x_values[i+(no_atoms - 1)*j+(no_atoms - 1)*no_monomers*k+(no_atoms - 1)*no_monomers*no_layers*l]/10.0,
+                        y_values[i + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l]/10.0,
+                        z_values[i + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l]/10.0)
+                else:
+                    print '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(1 + j + no_monomers*k + no_monomers*no_layers*l,
+                        'LLC', identity[i], i + 1 + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l - 100000,
+                        x_values[i+(no_atoms - 1)*j+(no_atoms - 1)*no_monomers*k+(no_atoms - 1)*no_monomers*no_layers*l]/10.0,
+                        y_values[i + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l]/10.0,
+                        z_values[i + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l]/10.0)
 
 # Next, we need to extract connectivity information from the .pdb file
 # this was a pain so appreciate it!
@@ -253,9 +296,19 @@ for l in range(0, no_pores):  # loop to create multiple pores
             x_values.append(b*dist_bw + positions[j][no_atoms - 1][0])
             y_values.append(c*dist_bw + positions[j][no_atoms - 1][1])
             z_values.append(k*dist + positions[j][no_atoms -1][2])
-            print '{:5s}{:6d}  {:4s} {:8d}   {:8.3f} {:8.3f}{:8.3f}  {:4.2f}  {:4.2f}          {:>2}{:2s}'\
-                .format('ATOM', 1 + (no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers,
-                identity[no_atoms - 1], 0, x_values[(no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers],
-                y_values[(no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers],
-                z_values[(no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers], 0.00,
-                0.00, 'C', '+0')
+            if 1 + (no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers < 100000:
+                print '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.\
+                    format(1 + j + no_monomers*k + no_monomers*no_layers*l + no_monomers*no_layers*no_pores,
+                    identity[no_atoms - 1], identity[no_atoms - 1], 1 + (no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers,
+                    x_values[(no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0,
+                    y_values[(no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0,
+                    z_values[(no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0)
+            else:
+                print '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.\
+                    format(1 + j + no_monomers*k + no_monomers*no_layers*l + no_monomers*no_layers*no_pores,
+                    identity[no_atoms - 1], identity[no_atoms - 1], 1 + (no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers - 100000,
+                    x_values[(no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0,
+                    y_values[(no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0,
+                    z_values[(no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0)
+
+print '   0.00000   0.00000  0.00000'

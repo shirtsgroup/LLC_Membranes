@@ -18,7 +18,7 @@ print '%s' %sys_atoms
 dist = 10  # distance between layers (Angstroms)
 lines_of_text = 4  # lines of text at top of .pdb input file
 
-f = open("Monomer_Configurations/monomer4.pdb", "r")
+f = open("/home/bcoscia/PycharmProjects/GitHub/Structure-Files/monomer10.pdb", "r")
 
 a = []
 for line in f:

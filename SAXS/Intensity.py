@@ -276,7 +276,8 @@ for k in range(0, traj_points):
             y_frac_box[i, k] = y_frac[i, k]
             x_frac_box[i, k] = x_frac[i, k]
 
-
+plt.plot(x_frac_box, y_frac_box)
+plt.show()
 # re = 2.81794*10**-15  # radius of the electron [m]
 # Sc = a**2  # area of 2D unit cell [nm^2]
 # L = 28000  # membrane thickness [nm]
@@ -285,48 +286,42 @@ for k in range(0, traj_points):
 #     # h, k are 2D miller indices
 #     # a is the box vector (assumed equal to b)
 #     return 4*math.pi/(math.sqrt(3)*a)*math.sqrt(h**2 + k**2 + h*k)  # based on supplementary info from imperor-clerc
+
+
+# def scattering_factor(a, b, c, d):
+#     # d: 1/2d where d is the d-spacing
+#     f = 0  # intialize summation
+#     for i in range(0, 4):  # for a1, b1, a2, b2, a3, b3, a4, b4
+#         f += a[i]*math.exp(-b[i]*d**2)  # this function was used to fit the data in the Crystallographic tables
+#     f += c  # the constant c is contained outside the summation
+#     return f
 #
 #
-# fitted parameters for Sodium (International Crystallographic Tables, Volume C, Table 6.1.1.3)
-a_p = [3.25650, 3.93620, 1.39980, 1.00320]  # [a1, a2, a3, a4]  _p stands for 'parameters'
-b_p = [2.66710, 6.11530, 0.200100, 14.0390]  # [b1, b2, b3, b4]
-c_p = 0.404000
-
-
-def scattering_factor(a, b, c, d):
-    # d: 1/2d where d is the d-spacing
-    f = 0  # intialize summation
-    for i in range(0, 4):  # for a1, b1, a2, b2, a3, b3, a4, b4
-        f += a[i]*math.exp(-b[i]*d**2)  # this function was used to fit the data in the Crystallographic tables
-    f += c  # the constant c is contained outside the summation
-    return f
-
-
-def structure_factor(h, k, a, x, y):   # |Fhk|^2
-    d = a/math.sqrt(h**2 + k**2)  # d based on miller indices of this plane defined by h and k
-    ratio = 1/(2*d)  # sin(theta) / lambda = 1/ 2d
-    f = scattering_factor(a_p, b_p, c_p, ratio)  # find scattering factor for this value of 1/2d
-    sum1 = 0
-    sum2 = 0
-    for i in range(0, len(x)):
-        sum1 += f*math.cos(2*math.pi*(h*x[i] + k*y[i]))
-        sum2 += f*math.sin(2*math.pi*(h*x[i] + k*y[i]))
-    return sum1**2 + sum2**2
-
-x_rand = []
-y_rand = []
-n_rand = 480
-for i in range(0, n_rand):
-    x_rand.append(random.random())
-    y_rand.append(random.random())
-
-Intensities = []
-Trajectory = np.linspace(0, traj_points, traj_points)
-for i in range(0, len(Trajectory)):
-    Intensities.append(structure_factor(2, 0, a[i], x_frac_box[:, i], y_frac_box[:, i]))
-    # Intensities.append(structure_factor(1, 0, 4, x_rand, y_rand))
-
-print np.mean(Intensities[30:49])
+# def structure_factor(h, k, a, x, y):   # |Fhk|^2
+#     d = a/math.sqrt(h**2 + k**2)  # d based on miller indices of this plane defined by h and k
+#     ratio = 1/(2*d)  # sin(theta) / lambda = 1/ 2d
+#     f = scattering_factor(a_p, b_p, c_p, ratio)  # find scattering factor for this value of 1/2d
+#     sum1 = 0
+#     sum2 = 0
+#     for i in range(0, len(x)):
+#         sum1 += f*math.cos(2*math.pi*(h*x[i] + k*y[i]))
+#         sum2 += f*math.sin(2*math.pi*(h*x[i] + k*y[i]))
+#     return sum1**2 + sum2**2
+#
+# x_rand = []
+# y_rand = []
+# n_rand = 480
+# for i in range(0, n_rand):
+#     x_rand.append(random.random())
+#     y_rand.append(random.random())
+#
+# Intensities = []
+# Trajectory = np.linspace(0, traj_points, traj_points)
+# for i in range(0, len(Trajectory)):
+#     Intensities.append(structure_factor(2, 0, a[i], x_frac_box[:, i], y_frac_box[:, i]))
+#     # Intensities.append(structure_factor(1, 0, 4, x_rand, y_rand))
+#
+# print np.mean(Intensities[30:49])
 # plt.plot(Trajectory, Intensities)
 # plt.show()
 # def Laue(x, N):  # Laue Function
