@@ -1,9 +1,12 @@
+#!/usr/bin/python
+
 import numpy as np
 import math
 import matplotlib.pyplot as plt
 from pylab import *
 from scipy.interpolate import griddata
 from matplotlib import animation
+import argparse
 
 # Pore Numbering : Each corner is the location of the center of the pore
 #      Pore 1 ------------- Pore 2'
@@ -13,7 +16,11 @@ from matplotlib import animation
 #        /            /
 # Pore 4 ------------- Pore 3'
 
-f = open("monomer1_traj.gro", "r")  # .gro file whose positions of Na ions will be read
+parser = argparse.ArgumentParser(description = 'Run Cylindricity script')
+parser.add_argument('-i', '--input', default='Monomer1_Traj.pdb', help = 'Path to input file')
+args = parser.parse_args()
+
+f = open(args.input, "r")  # .gro file whose positions of Na ions will be read
 a = []  # list to hold lines of file
 for line in f:
     a.append(line)
