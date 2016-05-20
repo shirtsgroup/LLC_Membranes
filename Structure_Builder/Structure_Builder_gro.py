@@ -43,7 +43,7 @@ for i in range(0, len(identity)):
     identity[i] = identity[i].strip()
 
 # matrix to translate molecule to origin based on the position of atom 10 (Carbonyl carbon coming off benzene)
-translation = np.matrix([[1, 0, 0,-(pore_radius + positions_inp[9][0])], [0, 1, 0,-(pore_radius+ positions_inp[9][1])],\
+translation = np.matrix([[1, 0, 0,-(pore_radius + positions_inp[9][0])], [0, 1, 0, -(pore_radius+ positions_inp[9][1])],\
                          [0, 0, 1, -(pore_radius + positions_inp[9][2])], [0, 0, 0, 1]])
 for i in range(0, len(positions_inp)):
     positions_inp[i].append(1)
