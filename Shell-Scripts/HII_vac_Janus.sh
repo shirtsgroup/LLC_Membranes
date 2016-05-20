@@ -85,9 +85,9 @@ SOLV_LENGTH=1  # nanoseconds
 # -B  :   REF_P ... Reference Pressure, bar
 # -R  :   COMPRESSIBILITY ... Isothermal compressibility, bar^-1
 # -Z  :   PBC ... Periodic Boundary directions
-# -V  :   SOLV_LENGTH ... length of intermediate simulation
 
-while getopts "h:m:s:n:q:N:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:" opt; do
+
+while getopts "h:m:s:n:q:N:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:" opt; do
     case $opt in 
     h)  SIM_LENGTH_HOURS=$OPTARG;;
     m)  SIM_LENGTH_MIN=$OPTARG;;
@@ -121,8 +121,7 @@ while getopts "h:m:s:n:q:N:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z
     Y)  PTYPE=$OPTARG;;
     B)  REF_P=$OPTARG;;
     R)  COMPRESSIBILITY=$OPTARG;;
-    Z)  PBC=$OPTARG;;
-    V)  SOLV_LENGTH=$OPTARG;;
+    Z)  PBC=$OPTARG;;    
     esac
 done
 
@@ -138,8 +137,10 @@ echo '#SBATCH --time' $SIM_LENGTH_HOURS:$SIM_LENGTH_MIN:$SIM_LENGTH_SEC >> Run_J
 echo '' >> Run_Janus.sh
 echo "ml slurm" >> Run_Janus.sh
 echo "ml gromacs" >> Run_Janus.sh
+echo "ml python/2.7.10" >> Run_Janus.sh
+echo "ml numpy" >> Run_Janus.sh
 echo '' >> Run_Janus.sh
-echo "BSS_MPI.sh -M $MONOMER -I $INTEGRATOR_EM -s $NSTEPS_EM -c $CUTOFF_EM -t $NSTLIST -o $NO_MONOMERS -r $RADIUS \
+echo "BS_MPI.sh -M $MONOMER -I $INTEGRATOR_EM -s $NSTEPS_EM -c $CUTOFF_EM -t $NSTLIST -o $NO_MONOMERS -r $RADIUS \
     -p $PORE2PORE -P $NOPORES -w $DBWL -l $LAYERS -x $XVECT -y $YVECT -e $INCREMENT -T $SIM_TITLE -C $CUTOFF_MD \
     -i $INTEGRATOR_MD -D $DT -L $SIM_LENGTH -f $FRAMES -v $TCOUPL -K $REF_T -b $PCOUPL -Y $PTYPE -B $REF_P \
-    -R $COMPRESSIBILITY -Z $PBC -V $SOLV_LENGTH" >> Run_Janus.sh
+    -R $COMPRESSIBILITY -Z $PBC -m $NODES" >> Run_Janus.sh
