@@ -9,7 +9,7 @@ print 'This is a .gro file'
 
 no_monomers = 6  # number of monomers packed per layer around a pore
 no_atoms = 138  # number of atoms in one monomer excluding sodium ion
-pore_radius = 3  # Radius of pore (Angstroms)
+pore_radius = 5  # Radius of pore (Angstroms)
 no_pores = 4  # number of pores to be simulated
 dist_bw = 35  # distance between pores (Angstroms)
 no_layers = 20  # Number of layers in a pore

@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 # Find the membrane thickness based on a maximum and minimum z position
 # Also gives the amount of space needed for water molecules given the amount of space wanted between periodic boundaries
 # in the z direction
@@ -9,7 +11,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description = 'Measure Membrane Thickness')
 parser.add_argument('-i', '--input', help = 'Path to input file')
-parser.add_argument('-w', '--water', help = 'nm of water between layers')
+parser.add_argument('-w', '--water', default=6, help = 'nm of water between layers')
 args = parser.parse_args()
 
 water_layer = int(args.water)  # nm of water wanted between layers

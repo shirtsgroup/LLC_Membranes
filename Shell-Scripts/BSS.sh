@@ -270,9 +270,9 @@ gmx mdrun -v -deffnm water_em
 
 gmx grompp -f wiggle_solv.mdp -c water_em.gro -p NaPore_water.top -o water_wiggle.tpr
 
-# remove unecessary files
+# remove unnecessary files
 rm initial.gro water.gro new_box.gro #remove now unnecessary file
-rm box.gro # remove unecessary file
+rm box.gro # remove unnecessary file
 find . -type f -name 'Correct_box'\* -exec rm {} \;
 find . -type f -name 'water_em'\* -exec rm {} \;
 find . -type f -name 'em_new_box'\* -exec rm {} \;

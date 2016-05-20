@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 # Orient plane with origin
 import numpy as np
 import math
