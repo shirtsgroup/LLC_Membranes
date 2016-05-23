@@ -18,6 +18,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description = 'Run Cylindricity script')
 parser.add_argument('-i', '--input', default='Monomer1_Traj.pdb', help = 'Path to input file')
+parser.add_argument('-n', '--no_monomers', default=6, help = 'Number of Monomers per layer')
 args = parser.parse_args()
 
 f = open(args.input, "r")  # .gro file whose positions of Na ions will be read
@@ -29,7 +30,7 @@ for line in f:
 length_of_simulation = 5000  # picoseconds
 no_atoms = 137  # number of atoms in a single monomer
 no_layers = 20  # number of layers in the membrane structure
-mon_per_layer = 6  # number of monomers in each layer
+mon_per_layer = int(args.no_monomers)  # number of monomers in each layer
 no_pores = 4  # number of pores
 # no_monomers =  # in case there are random distributions of monomers in each layer
 no_ion = no_layers*mon_per_layer*no_pores

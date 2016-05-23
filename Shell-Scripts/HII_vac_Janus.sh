@@ -46,10 +46,6 @@ REF_P=1  # Reference Pressure, bar
 COMPRESSIBILITY=4.5e-5  # Isothermal compressibility, bar^-1
 PBC='xyz'
 
-# Solvation
-WATER_LAYER=6  # thickness (nm) between membrane layers in the z direction
-SOLV_LENGTH=1  # nanoseconds
-
 # Reference for flags associated with each variable
 
 # -h  :   SIM_LENGTH_HOURS ... estimated simulation length, hours (in addition to min and seconds)
@@ -62,7 +58,7 @@ SOLV_LENGTH=1  # nanoseconds
 # -I  :   INTEGRATOR_EM ... Integrator for energy minimization
 # -s  :   NSTEPS_EM ... Maximum number of steps to take for energy minimization
 # -c  :   CUTOFF_EM ... Cut-off Scheme
-# -t  :   NSTLIST ... Neighborlist - changed automatically by gromacs unless it is set equal to 1
+# -t  :   NSTLIST ... Neighborlist - changed automatically by gromacs unless it is -1- set equal to 1
 # -o  :   NO_MONOMERS ... Number of monomers in 1 layer
 # -r  :   RADIUS ... Initial pore radius, angstroms
 # -p  :   PORE2PORE ... Pore-to-Pore distance, angstroms
