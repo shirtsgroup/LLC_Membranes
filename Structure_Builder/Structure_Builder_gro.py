@@ -9,7 +9,7 @@ print 'This is a .gro file'
 
 no_monomers = 6  # number of monomers packed per layer around a pore
 no_atoms = 138  # number of atoms in one monomer excluding sodium ion
-pore_radius = 3  # Radius of pore (Angstroms)
+pore_radius = 5  # Radius of pore (Angstroms)
 no_pores = 4  # number of pores to be simulated
 dist_bw = 35  # distance between pores (Angstroms)
 no_layers = 20  # Number of layers in a pore
@@ -43,7 +43,7 @@ for i in range(0, len(identity)):
     identity[i] = identity[i].strip()
 
 # matrix to translate molecule to origin based on the position of atom 10 (Carbonyl carbon coming off benzene)
-translation = np.matrix([[1, 0, 0,-(pore_radius + positions_inp[9][0])], [0, 1, 0,-(pore_radius+ positions_inp[9][1])],\
+translation = np.matrix([[1, 0, 0,-(pore_radius + positions_inp[9][0])], [0, 1, 0, -(pore_radius+ positions_inp[9][1])],\
                          [0, 0, 1, -(pore_radius + positions_inp[9][2])], [0, 0, 0, 1]])
 for i in range(0, len(positions_inp)):
     positions_inp[i].append(1)

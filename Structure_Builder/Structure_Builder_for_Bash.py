@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 # Script to build an array of LLC membrane membrane pores in .gro format
 # It is necessary to use this script when there are more than 100,000 atoms
 # This can be used in a shell script

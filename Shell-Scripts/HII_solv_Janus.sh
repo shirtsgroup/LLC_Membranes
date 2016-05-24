@@ -141,7 +141,7 @@ echo "ml gromacs" >> Run_Janus.sh
 echo "ml python/2.7.10" >> Run_Janus.sh
 echo "ml numpy" >> Run_Janus.sh
 echo '' >> Run_Janus.sh
-echo "BSS_MPI.sh -M $MONOMER -I $INTEGRATOR_EM -s $NSTEPS_EM -c $CUTOFF_EM -t $NSTLIST -o $NO_MONOMERS -r $RADIUS \
+echo "BSS_MPI.sh -M $MONOMER -I $INTEGRATOR_EM -S $NSTEPS_EM -c $CUTOFF_EM -t $NSTLIST -o $NO_MONOMERS -r $RADIUS \
     -p $PORE2PORE -P $NOPORES -w $DBWL -l $LAYERS -x $XVECT -y $YVECT -e $INCREMENT -T $SIM_TITLE -C $CUTOFF_MD \
     -i $INTEGRATOR_MD -D $DT -L $SIM_LENGTH -f $FRAMES -v $TCOUPL -K $REF_T -b $PCOUPL -Y $PTYPE -B $REF_P \
     -R $COMPRESSIBILITY -Z $PBC -V $SOLV_LENGTH" >> Run_Janus.sh

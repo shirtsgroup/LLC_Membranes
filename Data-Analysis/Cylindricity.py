@@ -1,7 +1,10 @@
+#!/usr/bin/python
+
 # A script to measure the cylindricity of membrane pores based on their standard deviation from some central axis
 # Also measures distance between pores
 import numpy as np
 import math
+import argparse
 
 # Pore Numbering : Each corner is the location of the center of the pore
 #  Pore 2 ---------- Pore 1
@@ -10,7 +13,11 @@ import math
 #           \         \
 #     Pore 4 ---------- Pore 3
 
-f = open("Monomer1.gro", "r")  # .gro file whose positions of Na ions will be read
+parser = argparse.ArgumentParser(description = 'Run Cylindricity script')
+parser.add_argument('-i', '--input', default='monomer4.pdb', help = 'Path to input file')
+args = parser.parse_args()
+
+f = open(args.input, "r")  # .gro file whose positions of Na ions will be read
 a = []  # list to hold lines of file
 for line in f:
     a.append(line)

@@ -32,7 +32,7 @@ YVECT=8.0  # Box vector in the y direction (not this will be multiplied by sin(1
 INCREMENT=0.1  # Increment to increase the box vector by if there is a LINCS error
 
 # Simulation Parameters
-SIM_TITLE="'Equilibration in Water'"  # Title of simulation
+SIM_TITLE="'Equilibration in Vacuum'"  # Title of simulation
 CUTOFF_MD='verlet'  # Cut-off scheme for simulation
 INTEGRATOR_MD='md'  # Integrator type for simulation
 DT=0.002  # Time step (ps)
@@ -46,10 +46,6 @@ REF_P=1  # Reference Pressure, bar
 COMPRESSIBILITY=4.5e-5  # Isothermal compressibility, bar^-1
 PBC='xyz'
 
-# Solvation
-WATER_LAYER=6  # thickness (nm) between membrane layers in the z direction
-SOLV_LENGTH=1  # nanoseconds
-
 # Reference for flags associated with each variable
 
 # -h  :   SIM_LENGTH_HOURS ... estimated simulation length, hours (in addition to min and seconds)
@@ -62,7 +58,7 @@ SOLV_LENGTH=1  # nanoseconds
 # -I  :   INTEGRATOR_EM ... Integrator for energy minimization
 # -s  :   NSTEPS_EM ... Maximum number of steps to take for energy minimization
 # -c  :   CUTOFF_EM ... Cut-off Scheme
-# -t  :   NSTLIST ... Neighborlist - changed automatically by gromacs unless it is set equal to 1
+# -t  :   NSTLIST ... Neighborlist - changed automatically by gromacs unless it is -1- set equal to 1
 # -o  :   NO_MONOMERS ... Number of monomers in 1 layer
 # -r  :   RADIUS ... Initial pore radius, angstroms
 # -p  :   PORE2PORE ... Pore-to-Pore distance, angstroms
@@ -140,7 +136,7 @@ echo "ml gromacs" >> Run_Janus.sh
 echo "ml python/2.7.10" >> Run_Janus.sh
 echo "ml numpy" >> Run_Janus.sh
 echo '' >> Run_Janus.sh
-echo "BS_MPI.sh -M $MONOMER -I $INTEGRATOR_EM -s $NSTEPS_EM -c $CUTOFF_EM -t $NSTLIST -o $NO_MONOMERS -r $RADIUS \
+echo "BS_MPI.sh -M $MONOMER -I $INTEGRATOR_EM -S $NSTEPS_EM -c $CUTOFF_EM -t $NSTLIST -o $NO_MONOMERS -r $RADIUS \
     -p $PORE2PORE -P $NOPORES -w $DBWL -l $LAYERS -x $XVECT -y $YVECT -e $INCREMENT -T $SIM_TITLE -C $CUTOFF_MD \
     -i $INTEGRATOR_MD -D $DT -L $SIM_LENGTH -f $FRAMES -v $TCOUPL -K $REF_T -b $PCOUPL -Y $PTYPE -B $REF_P \
     -R $COMPRESSIBILITY -Z $PBC -m $NODES" >> Run_Janus.sh
