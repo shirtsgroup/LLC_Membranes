@@ -10,21 +10,34 @@ import argparse
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 parser = argparse.ArgumentParser(description = 'Build LLC Structure')
-parser.add_argument('-i', '--input', default='monomer4.pdb', help = 'Path to input file')
+parser.add_argument('-t', '--type', default = 'LLC', type = str, help = 'membrane type')
+parser.add_argument('-i', '--input', default='monomer2.pdb', help = 'Path to input file')
 parser.add_argument('-l', '--layers', default=20, type=int, help = 'Number of Layers')
 parser.add_argument('-m', '--monomers', default=6, type=int, help = 'Monomers per layer')
-parser.add_argument('-r', '--radius', default=3, type=float, help = 'Initial Pore Radius')
+parser.add_argument('-r', '--radius', default=6, type=float, help = 'Initial Pore Radius')
 parser.add_argument('-p', '--p2p', default=40, type=float, help = 'Initial Pore to Pore Distance')
 parser.add_argument('-n', '--nopores', default=4, type=int, help = 'Number of Pores')
 parser.add_argument('-d', '--dbwl', default=10, type=float, help = 'Distance between layers')
 args = parser.parse_args()
 
-
 # Row at top of .gro file: (edit as necessary)
 print 'This is a .gro file'
 
-f = open("%s/../Structure-Files/%s" %(location, args.input), "r")
-# f = open(args.input, "r")
+
+def functiontype(type):
+    if type == 'LLC':
+        f = open("%s/../Structure-Files/LLC_Monomer_Configurations/%s" % (location, args.input), "r")
+        no_ions = 1
+        t = 'LLC'
+        return f, t, no_ions
+    if type == 'BCC':
+        f = open("%s/../Structure-Files/BCC_Monomer_Configurations/%s" % (location, args.input), "r")
+        no_ions = 2
+        t = 'BCC'
+        return f, t, no_ions
+
+f, t, no_ions = functiontype(args.type)
+
 a = []
 for line in f:
     a.append(line)
@@ -62,7 +75,7 @@ for i in range(lines_of_text, lines_of_text + no_atoms):  # searches relevant li
     y_values_inp.append(float(a[i][38:46]))  # makes sure I backtrack far enough to get all digits(i.e.38 instead of 42)
     z_values_inp.append(float(a[i][46:54]))
     positions_inp.append([x_values_inp[i - lines_of_text], y_values_inp[i - lines_of_text], z_values_inp[i - lines_of_text]])
-    identity.append(a[i][13:16])  # hold name of atom (C, H or O)
+    identity.append(a[i][12:16])  # hold name of atom (C, H or O)
 
 # Now rotate plane to align with xy plane
 
@@ -73,10 +86,28 @@ plane_y = np.zeros((3, 1))
 plane_z = np.zeros((3, 1))
 # This loop only works because of the way the atoms are spaced in the coordinate file. I am looking at atoms C, C2 and
 # C4. Theoretically this will work with any three atoms but I am trying to align the plane of benzene
-for i in range(0, 3):
-    plane_x[i] = float(a[lines_of_text + 2*i][26:38])
-    plane_y[i] = float(a[lines_of_text + 2*i][38:46])
-    plane_z[i] = float(a[lines_of_text + 2*i][46:54])
+
+
+if t == 'LLC':
+    name = 'LLC'
+    for i in range(0, 3):
+        plane_x[i] = float(a[lines_of_text + 2 * i][26:38])
+        plane_y[i] = float(a[lines_of_text + 2 * i][38:46])
+        plane_z[i] = float(a[lines_of_text + 2 * i][46:54])
+
+if t == 'BCC':
+    name = 'MOL'
+    plane_x[0] = float(a[lines_of_text + 21][26:38])
+    plane_y[0] = float(a[lines_of_text + 21][38:46])
+    plane_z[0] = float(a[lines_of_text + 21][46:54])
+
+    plane_x[1] = float(a[lines_of_text + 28][26:38])
+    plane_y[1] = float(a[lines_of_text + 28][38:46])
+    plane_z[1] = float(a[lines_of_text + 28][46:54])
+
+    plane_x[2] = float(a[lines_of_text + 24][26:38])
+    plane_y[2] = float(a[lines_of_text + 24][38:46])
+    plane_z[2] = float(a[lines_of_text + 24][46:54])
 
 # vector pointing from point 1 to point 2
 v12 = [float(plane_x[1]-plane_x[0]), float(plane_y[1]-plane_y[0]), float(plane_z[1]-plane_z[0])]
@@ -92,6 +123,7 @@ theta = math.acos(np.dot(N, N_desired)/(np.linalg.norm(N)*np.linalg.norm(N_desir
 
 L = [RotationAxis[0]/np.linalg.norm(RotationAxis), RotationAxis[1]/np.linalg.norm(RotationAxis),
                    RotationAxis[2]/np.linalg.norm(RotationAxis)]  # normalized Rotation Axis
+
 # to avoid mistakes: L = [u, v, w]
 
 u = L[0]
@@ -99,6 +131,7 @@ v = L[1]
 w = L[2]
 
 # Rotation Matrix to rotate a plane:
+
 R = np.zeros((4, 4))
 R[3, 3] = 1
 R[0, 0] = u**2 + (v**2 + w**2)*math.cos(theta)  # math.cos takes theta in radians by default
@@ -118,8 +151,15 @@ for i in range(0, len(positions_inp)):
 
 # Now translate the structure to the origin
 # matrix to translate molecule to origin based on the position of atom 10 (Carbonyl carbon coming off benzene)
-translation = np.matrix([[1, 0, 0, -(positions_inp[9][0])], [0, 1, 0, -(positions_inp[9][1])],
+
+if t == 'LLC':
+    translation = np.matrix([[1, 0, 0,-(positions_inp[9][0])], [0, 1, 0,-(positions_inp[9][1])],
                          [0, 0, 1, -(positions_inp[9][2])], [0, 0, 0, 1]])
+
+if t == 'BCC':
+    translation = np.matrix([[1, 0, 0,-(positions_inp[25][0])], [0, 1, 0,-(positions_inp[25][1])],
+                         [0, 0, 1, -(positions_inp[25][2])], [0, 0, 0, 1]])
+
 for i in range(0, len(positions_inp)):
     positions_inp[i].append(1)
     x = np.dot(translation, np.array(positions_inp[i]))
@@ -128,17 +168,26 @@ for i in range(0, len(positions_inp)):
 
 # Now rotate the xy coordinates so that the molecule is pointing towards the origin
 
-pt1 = [positions_inp[0][0], positions_inp[0][1]]  # location of C
-pt2 = [positions_inp[3][0], positions_inp[3][1]]  # location of C3
-pt3 = [positions_inp[9][0], positions_inp[9][1]]  # location of carbonyl carbon
+if t == 'LLC':
+    pt1 = [positions_inp[0][0], positions_inp[0][1]]  # location of C
+    pt2 = [positions_inp[3][0], positions_inp[3][1]]  # location of C3
+    pt3 = [positions_inp[9][0], positions_inp[9][1]]  # location of carbonyl carbon
+
+if t == 'BCC':
+    pt1 = [positions_inp[21][0], positions_inp[21][1]]
+    pt2 = [positions_inp[28][0], positions_inp[28][1]]
+    pt3 = [positions_inp[24][0], positions_inp[24][1]]
+
 origin = [0, 0]
 
 # find slope between two points
+
 def slope(pt1, pt2):
     m = (pt1[1] - pt2[1])/(pt1[0] - pt2[0])  # slope
     return m
 
 m1 = slope(pt1, pt2)
+
 m2 = 0  # slope of line y = 0
 
 # find angle between lines
@@ -153,14 +202,15 @@ theta = -math.atan((m1 - m2)/(1 + m1*m2))
 #         |
 #   III   |    IV
 
+
 def quadrant(pt):  # looks at [x,y] values and determines which quadrant the point is in
     if pt[0] > 0 and pt[1] > 0:
         return 1
     elif pt[0] < 0 and pt[1] < 0:
         return 3
-    elif pt[1] < 0 < pt[0] :
+    elif pt[1] < 0 < pt[0]:
         return 4
-    elif pt[0] < 0 < pt[1] :
+    elif pt[0] < 0 < pt[1]:
         return 2
     else:
         return 0  # the case where the point lies on the x or y axis
@@ -168,6 +218,7 @@ def quadrant(pt):  # looks at [x,y] values and determines which quadrant the poi
 # C and C3 are assumed to be on a line so they should lie in the same quadrant
 # Translation matrix
 # figure out in which direction the coordinates will be shifted. They are always shift away from the origin
+
 if quadrant(pt1) == 1:  # e.g. in quadrant 1, the x's are shifted in the positive x and positive y directions
     vx = 1
     vy = 1
@@ -199,7 +250,6 @@ elif quadrant(pt1) == 0 and pt1[1] == 0:  # i.e., it lies on the x - axis
 translation = np.matrix([[1, 0, 0, vx*pore_radius*math.cos(theta)], [0, 1, 0, vy*pore_radius*math.sin(theta)],\
                          [0, 0, 1, 0], [0, 0, 0, 1]])
 
-# print translation
 # Apply matrix to all points
 for i in range(0, len(positions_inp)):
     positions_inp[i].append(1)
@@ -207,17 +257,14 @@ for i in range(0, len(positions_inp)):
     positions_inp[i] = [x[0, 0], x[0, 1], x[0, 2]]
 
 
-# positions1 = []  # will hold the x,y,z coordinates of each atom of monomer 1
-# positions2 = []  # will hold the x,y,z coordinates of each atom of monomer 2
-# positions3 = []  # will hold the x,y,z coordinates of each atom of monomer 3
-# positions4 = []  # will hold the x,y,z coordinates of each atom of monomer 4
-# positions5 = []  # will hold the x,y,z coordinates of each atom of monomer 5
-# positions6 = []  # will hold the x,y,z coordinates of each atom of monomer 6
-# positions7 = []  # here for the case where 7 monomers pack
-# positions = [positions1, positions2, positions3, positions4, positions5, positions6, positions7]  # list of lists
-positions = []
-for i in range(0, no_monomers):
-    positions.append([])
+positions1 = []  # will hold the x,y,z coordinates of each atom of monomer 1
+positions2 = []  # will hold the x,y,z coordinates of each atom of monomer 2
+positions3 = []  # will hold the x,y,z coordinates of each atom of monomer 3
+positions4 = []  # will hold the x,y,z coordinates of each atom of monomer 4
+positions5 = []  # will hold the x,y,z coordinates of each atom of monomer 5
+positions6 = []  # will hold the x,y,z coordinates of each atom of monomer 6
+positions7 = []  # here for the case where 7 monomers pack
+positions = [positions1, positions2, positions3, positions4, positions5, positions6, positions7]  # list of lists
 x_values = []  # will hold x_values in the order that they appear in the positions matrix
 y_values = []  # will hold y_values in the order that they appear in the positions matrix
 z_values = []  # will hold z_values in the order that they appear in the positions matrix
@@ -240,6 +287,7 @@ for k in range(0, len(positions_inp)):
         rot = [float(rot[0]), float(rot[1]), float(rot[2])]  # converts matrix to a list of floats
         positions[i - 1].append(rot)  # appends the atomic coordinates to 'positions'
 
+
 for l in range(0, no_pores):  # loop to create multiple pores
     theta = 30  # angle which will be used to do hexagonal packing
     if l == 0:  # unmodified coordinates
@@ -256,31 +304,24 @@ for l in range(0, no_pores):  # loop to create multiple pores
         c = -math.cos(math.radians(theta))
     for k in range(0, no_layers):
         for j in range(0, no_monomers):  # iterates over each monomer to create coordinates
-            for i in range(0, len(positions[j]) - 1):  #
+            for i in range(0, len(positions[j]) - no_ions):  #
                 x_values.append(b*dist_bw + positions[j][i][0])
                 y_values.append(c*dist_bw + positions[j][i][1])
                 z_values.append(k*dist + positions[j][i][2])
-                # print '{:5s}{:6d}  {:4s} {:8d}   {:8.3f} {:8.3f}{:8.3f}  {:4.2f}  {:4.2f}          {:>2}{:2s}'\
-                #     .format('ATOM', i + 1 + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l,
-                #     identity[i], 0, x_values[i+(no_atoms - 1)*j+(no_atoms - 1)*no_monomers*k+(no_atoms - 1)*no_monomers*no_layers*l],
-                #     y_values[i + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l],
-                #     z_values[i + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l], 0.00,
-                #     0.00, 'C', '+0')
-                if i + 1 + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l < 100000:
+                if i + 1 + (no_atoms - no_ions)*j + (no_atoms - no_ions)*no_monomers*k + (no_atoms - no_ions)*no_monomers*no_layers*l < 100000:
                     print '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(1 + j + no_monomers*k + no_monomers*no_layers*l,
-                        'LLC', identity[i], i + 1 + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l,
-                        x_values[i+(no_atoms - 1)*j+(no_atoms - 1)*no_monomers*k+(no_atoms - 1)*no_monomers*no_layers*l]/10.0,
-                        y_values[i + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l]/10.0,
-                        z_values[i + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l]/10.0)
+                        name, identity[i], i + 1 + (no_atoms - no_ions)*j + (no_atoms - no_ions)*no_monomers*k + (no_atoms - no_ions)*no_monomers*no_layers*l,
+                        x_values[i+(no_atoms - no_ions)*j+(no_atoms - no_ions)*no_monomers*k+(no_atoms - no_ions)*no_monomers*no_layers*l]/10.0,
+                        y_values[i + (no_atoms - no_ions)*j + (no_atoms - no_ions)*no_monomers*k + (no_atoms - no_ions)*no_monomers*no_layers*l]/10.0,
+                        z_values[i + (no_atoms - no_ions)*j + (no_atoms - no_ions)*no_monomers*k + (no_atoms - no_ions)*no_monomers*no_layers*l]/10.0)
                 else:
                     print '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(1 + j + no_monomers*k + no_monomers*no_layers*l,
-                        'LLC', identity[i], i + 1 + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l - 100000,
-                        x_values[i+(no_atoms - 1)*j+(no_atoms - 1)*no_monomers*k+(no_atoms - 1)*no_monomers*no_layers*l]/10.0,
-                        y_values[i + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l]/10.0,
-                        z_values[i + (no_atoms - 1)*j + (no_atoms - 1)*no_monomers*k + (no_atoms - 1)*no_monomers*no_layers*l]/10.0)
+                        name, identity[i], i + 1 + (no_atoms - no_ions)*j + (no_atoms - no_ions)*no_monomers*k + (no_atoms - no_ions)*no_monomers*no_layers*l - 100000,
+                        x_values[i+(no_atoms - no_ions)*j+(no_atoms - no_ions)*no_monomers*k+(no_atoms - no_ions)*no_monomers*no_layers*l]/10.0,
+                        y_values[i + (no_atoms - no_ions)*j + (no_atoms - no_ions)*no_monomers*k + (no_atoms - no_ions)*no_monomers*no_layers*l]/10.0,
+                        z_values[i + (no_atoms - no_ions)*j + (no_atoms - no_ions)*no_monomers*k + (no_atoms - no_ions)*no_monomers*no_layers*l]/10.0)
 
-# Next, we need to extract connectivity information from the .pdb file
-# this was a pain so appreciate it!
+# Ions:
 
 for l in range(0, no_pores):  # loop to create multiple pores
     theta = 30  # angle which will be used to do hexagonal packing
@@ -298,22 +339,29 @@ for l in range(0, no_pores):  # loop to create multiple pores
         c = -math.cos(math.radians(theta))
     for k in range(0, no_layers):
         for j in range(0, no_monomers):  # iterates over each monomer to create coordinates
-            x_values.append(b*dist_bw + positions[j][no_atoms - 1][0])
-            y_values.append(c*dist_bw + positions[j][no_atoms - 1][1])
-            z_values.append(k*dist + positions[j][no_atoms -1][2])
-            if 1 + (no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers < 100000:
-                print '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.\
-                    format(1 + j + no_monomers*k + no_monomers*no_layers*l + no_monomers*no_layers*no_pores,
-                    identity[no_atoms - 1], identity[no_atoms - 1], 1 + (no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers,
-                    x_values[(no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0,
-                    y_values[(no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0,
-                    z_values[(no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0)
-            else:
-                print '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.\
-                    format(1 + j + no_monomers*k + no_monomers*no_layers*l + no_monomers*no_layers*no_pores,
-                    identity[no_atoms - 1], identity[no_atoms - 1], 1 + (no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers - 100000,
-                    x_values[(no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0,
-                    y_values[(no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0,
-                    z_values[(no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0)
+            for i in range(0, no_ions):
+                x_values.append(b*dist_bw + positions[j][no_atoms - (i + 1)][0])
+                y_values.append(c*dist_bw + positions[j][no_atoms - (i + 1)][1])
+                z_values.append(k*dist + positions[j][no_atoms - (i + 1)][2])
+count = 0
+for l in range(0, no_pores):
+    for k in range(0, no_layers):
+        for j in range(0, no_monomers):
+            for i in range(0, no_ions):
+                count += 1
+                if 1 + (no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers < 100000:
+                    print '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.\
+                        format(count + no_monomers*no_layers*no_pores,
+                        identity[no_atoms - (no_ions - i)], identity[no_atoms - (no_ions - i)], 1 + (no_atoms - (no_ions - i))*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers,
+                        x_values[(no_atoms - (no_ions - i))*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0,
+                        y_values[(no_atoms - (no_ions - i))*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0,
+                        z_values[(no_atoms - (no_ions - i))*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0)
+                else:
+                    print '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.\
+                        format(count + no_monomers*no_layers*no_pores,
+                        identity[no_atoms - (i + 1)], identity[no_atoms - (i + 1)], 1 + (no_atoms - (i + 1))*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers - 100000,
+                        x_values[(no_atoms - (i + 1))*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0,
+                        y_values[(no_atoms - (i + 1))*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0,
+                        z_values[(no_atoms - (i + 1))*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0)
 
 print '   0.00000   0.00000  0.00000'
