@@ -197,11 +197,10 @@ mpirun -np $NP gmx_mpi mdrun -v -deffnm wiggle
 
 gmx trjconv -f wiggle.trr -s wiggle.tpr -o traj.gro
 # remove unecessary files
-find . -type f -name 'box_em'\* -exec rm {} \;
-find . -type f -name '#'\* -exec rm {} \;
+rm box_em*
+rm \#*
 rm initial.gro
 rm box.gro
 
-# Directory for output files that aren't needed that often
-mkdir Output
-mv mdout.mdp wiggle.cpt wiggle.edr wiggle.log wiggle.trr Output
+
+
