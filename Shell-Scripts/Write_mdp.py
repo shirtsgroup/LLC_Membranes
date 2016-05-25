@@ -6,7 +6,7 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser(description = 'Write .mdp files for a vacuum simulation')
-
+# Flags mirror those input into bash script for running simulation
 parser.add_argument('-T', '--title', default='Vacuum Simulation', help = 'Title for the simulation')
 parser.add_argument('-C', '--CUTOFF_MD', default='verlet', help = 'Cut-off algorithm')
 parser.add_argument('-i', '--INTEGRATOR_MD', default='md')
@@ -27,6 +27,7 @@ parser.add_argument('-f', '--FRAMES', default = 50, help = 'Number of Frames')
 parser.add_argument('-m', '--monomer', default = 'LLC', help = 'Monomer which structure is built with')
 parser.add_argument('-s', '--solvated', default = 'off', help = 'Will create a .mdp file for solvated system if this is set to "on"')
 parser.add_argument('-V', '--SOLV_LENGTH', default = 1, help = 'Length of simulation of solvated system')
+
 
 args = parser.parse_args()
 

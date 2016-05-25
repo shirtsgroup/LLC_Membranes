@@ -3,15 +3,13 @@
 # monomer, then energy minimize the structure, and finally run a simulation
 # based on inputs to the .mdp files
 
-# Copy in necessary files
-ifs.sh
-
 # Define Variables with Default values
 
 # Choose which monomer to build with
 MONOMER='monomer4.pdb'  # Structure file to be used
 
 #MPI Options
+MPI="on"
 NODES=16
 
 # Energy minimization parameters:
@@ -51,6 +49,7 @@ PBC='xyz'
 # Solvation
 WATER_LAYER=6  # thickness (nm) between membrane layers in the z direction
 SOLV_LENGTH=1  # length of solvated simulation, nanoseconds
+SOLVATION='off'
 
 # Reference for flags associated with each variable
 
@@ -83,8 +82,9 @@ SOLV_LENGTH=1  # length of solvated simulation, nanoseconds
 # -R  :   COMPRESSIBILITY ... Isothermal compressibility, bar^-1
 # -Z  :   PBC ... Periodic Boundary directions
 # -V  :   SOLV_LENGTH ... length of final simulation
+# -S  :   SOLVATION ... Turn solvation on or off
 
-while getopts "M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:" opt; do
+while getopts "M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:S:" opt; do
     case $opt in
     n)  NODES=$OPTARG;;
     M)  MONOMER=$OPTARG;;
@@ -115,71 +115,29 @@ while getopts "M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:" opt; do
     R)  COMPRESSIBILITY=$OPTARG;;
     Z)  PBC=$OPTARG;;
     V)  SOLV_LENGTH=$OPTARG;;
+    S)  SOLVATION=$OPTARG;;
+    m)  MPI=$OPTARG;;
     esac
 done
 
+# Copy in necessary files
+
+if [ ${SOLVATION} == "on" ]; then
+    ifs.sh
+else
+    ifv.sh
+fi
 
 # Calculated values based on input variables:
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # Directory where this script is located
-INPUT_FILE=$DIR/../Structure-Files/$MONOMER  # Full path to file where monomer structure is located
+INPUT_FILE=${DIR}/../Structure-Files/${MONOMER}  # Full path to file where monomer structure is located
 Z_BOX_VECTOR=$((LAYERS+5)) # kind of arbitrary but should work
 MOL_LLC=$((NO_MONOMERS*NOPORES*LAYERS))  # For topology
 MOL_NA=$((NO_MONOMERS*NOPORES*LAYERS))
-NSTEPS_SOLV=$(echo "$SOLV_LENGTH*1000/$DT" | bc)
-NSTEPS_MD=$(echo "$SIM_LENGTH*1000/$DT" | bc)  # Number of steps to be taken during simulation to simulate the desired length of time
-NSTXOUT=$(echo "$NSTEPS_MD/$FRAMES" | bc) # Information output to trajectory
-NSTVOUT=$(echo "$NSTEPS_MD/$FRAMES" | bc)
-NSTFOUT=$(echo "$NSTEPS_MD/$FRAMES" | bc)
-NSTENERGY=$(echo "$NSTEPS_MD/$FRAMES" | bc)
-NSTXOUT_SOLV=$(echo "$NSTEPS_SOLV/$FRAMES" | bc) # Information output to trajectory
-NSTVOUT_SOLV=$(echo "$NSTEPS_SOLV/$FRAMES" | bc)
-NSTFOUT_SOLV=$(echo "$NSTEPS_SOLV/$FRAMES" | bc)
-NSTENERGY_SOLV=$(echo "$NSTEPS_SOLV/$FRAMES" | bc)
 NP=$((NODES*2))
 
-# Edit input files:
-
-# Energy Minimization
-sed -i -e "s/INTEGRATOR/${INTEGRATOR_EM}/g" em.mdp
-sed -i -e "s/NSTEPS_EM/${NSTEPS_EM}/g" em.mdp
-sed -i -e "s/CUTOFF_EM/${CUTOFF_EM}/g" em.mdp
-sed -i -e "s/NSTLIST_EM/${NSTLIST}/g" em.mdp
-
-# Wiggle.mdp
-sed -i -e "s/SIM_TITLE/${SIM_TITLE}/g" wiggle.mdp
-sed -i -e "s/CUTOFF_MD/${CUTOFF_MD}/g" wiggle.mdp
-sed -i -e "s/INTEGRATOR_MD/${INTEGRATOR_MD}/g" wiggle.mdp
-sed -i -e "s/DT/${DT}/g" wiggle.mdp
-sed -i -e "s/NSTEPS_MD/${NSTEPS_MD}/g" wiggle.mdp
-sed -i -e "s/NSTXOUT/${NSTXOUT}/g" wiggle.mdp
-sed -i -e "s/NSTVOUT/${NSTVOUT}/g" wiggle.mdp
-sed -i -e "s/NSTFOUT/${NSTFOUT}/g" wiggle.mdp
-sed -i -e "s/NSTENERGY/${NSTENERGY}/g" wiggle.mdp
-sed -i -e "s/TCOUPL/${TCOUPL}/g" wiggle.mdp
-sed -i -e "s/REF_T/${REF_T}/g" wiggle.mdp
-sed -i -e "s/PCOUPL/${PCOUPL}/g" wiggle.mdp
-sed -i -e "s/PTYPE/${PTYPE}/g" wiggle.mdp
-sed -i -e "s/REF_P/${REF_P}/g" wiggle.mdp
-sed -i -e "s/COMPRESSIBILITY/${COMPRESSIBILITY}/g" wiggle.mdp
-sed -i -e "s/PBC/${PBC}/g" wiggle.mdp
-
-# Wiggle_solv.mdp
-sed -i -e "s/NSTENERGY/${NSTENERGY_SOLV}/g" wiggle_solv.mdp
-sed -i -e "s/SIM_TITLE/${SIM_TITLE}/g" wiggle_solv.mdp
-sed -i -e "s/CUTOFF_MD/${CUTOFF_MD}/g" wiggle_solv.mdp
-sed -i -e "s/INTEGRATOR_MD/${INTEGRATOR_MD}/g" wiggle_solv.mdp
-sed -i -e "s/DT/${DT}/g" wiggle_solv.mdp
-sed -i -e "s/NSTEPS_SOLV/${NSTEPS_SOLV}/g" wiggle_solv.mdp
-sed -i -e "s/NSTENERGY/${NSTENERGY_SOLV}/g" wiggle_solv.mdp
-sed -i -e "s/NSTXOUT/${NSTXOUT_SOLV}/g" wiggle_solv.mdp
-sed -i -e "s/NSTVOUT/${NSTVOUT_SOLV}/g" wiggle_solv.mdp
-sed -i -e "s/NSTFOUT/${NSTFOUT_SOLV}/g" wiggle_solv.mdp
-sed -i -e "s/TCOUPL/${TCOUPL}/g" wiggle_solv.mdp
-sed -i -e "s/REF_T/${REF_T}/g" wiggle_solv.mdp
-sed -i -e "s/PCOUPL/${PCOUPL}/g" wiggle_solv.mdp
-sed -i -e "s/REF_P/${REF_P}/g" wiggle_solv.mdp
-sed -i -e "s/COMPRESSIBILITY/${COMPRESSIBILITY}/g" wiggle_solv.mdp
+# Edit Input Files
 
 # NaPore.top
 sed -i -e "s/MOL_LLC/${MOL_LLC}/g" NaPore.top
@@ -191,100 +149,183 @@ sed -i -e "s/MOL_NA/${MOL_NA}/g" NaPore_water.top
 
 # Build Structure Based on user-defined inputs
 
+Write_mdp.py -T ${SIM_TITLE} -C ${CUTOFF_MD} -i ${INTEGRATOR_MD} -D ${DT} -v ${TCOUPL} -K ${REF_T} -b ${PCOUPL}\
+    -Y ${PTYPE} -B ${REF_P} -R ${COMPRESSIBILITY} -Z ${PBC} -L ${SIM_LENGTH} -I ${INTEGRATOR_EM} -S ${NSTEPS_EM}\
+    -c ${CUTOFF_EM} -f ${FRAMES} -s ${SOLVATION} -V ${SOLV_LENGTH}
 
-python $DIR/../Structure_Builder/Structure_Builder_for_Bash.py -i $INPUT_FILE -l $LAYERS -m $NO_MONOMERS -r $RADIUS -p $PORE2PORE -n $NOPORES -d $DBWL >> initial.gro
+python ${DIR}/../Structure_Builder/Structure_Builder_for_Bash.py -i ${INPUT_FILE} -l ${LAYERS} -m ${NO_MONOMERS} \
+    -r ${RADIUS} -p ${PORE2PORE} -n ${NOPORES} -d ${DBWL} >> initial.gro
 
 # Put the structure in a box
 
-gmx editconf -f initial.gro -o box.gro -c -bt triclinic -box $XVECT $YVECT $Z_BOX_VECTOR -angles 90 90 120
+gmx editconf -f initial.gro -o box.gro -c -bt triclinic -box ${XVECT} ${YVECT} ${Z_BOX_VECTOR} -angles 90 90 120
 
 # Prepare input file (.tpr) for energy minimization
 
 gmx grompp -f em.mdp -c box.gro -p NaPore.top -o box_em.tpr
 
-# Run Energy Minimization
+if [ ${MPI} == "on" ]; then
+    # Run Energy Minimization
 
-mpirun -np $NP gmx_mpi mdrun -v -deffnm box_em
+    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm box_em
 
-# Extract Potential Energy from log file
-ENERGY1=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5}')
+    # Extract Potential Energy from log file
+    ENERGY1=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5}')
 
-# If the potential energy is positive, then the box vector is incremented by a fixed amount until the energy comes out negative
+    # If the potential energy is positive, then the box vector is incremented by a fixed amount until the energy comes out negative
 
-while [ $(echo " $ENERGY1 > 0" | bc) -eq 1 ]; do
-        XVECT1=$(echo "$XVECT + $INCREMENT" | bc -l)
-        YVECT1=$(echo "$YVECT + $INCREMENT" | bc -l)
-        gmx editconf -f initial.gro -o box.gro -c -bt triclinic -box $XVECT $YVECT $THICKNESS -angles 90 90 120
-        gmx grompp -f em.mdp -c box.gro -p NaPore.top -o box_em.tpr
-        mpirun -np $NP gmx_mpi mdrun -v -deffnm box_em
-	ENERGY1=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
-done
+    while [ $(echo " $ENERGY1 > 0" | bc) -eq 1 ]; do
+            XVECT1=$(echo "$XVECT + $INCREMENT" | bc -l)
+            YVECT1=$(echo "$YVECT + $INCREMENT" | bc -l)
+            gmx editconf -f initial.gro -o box.gro -c -bt triclinic -box ${XVECT} ${YVECT} ${Z_BOX_VECTOR} -angles 90 90 120
+            gmx grompp -f em.mdp -c box.gro -p NaPore.top -o box_em.tpr
+            mpirun -np ${NP} gmx_mpi mdrun -v -deffnm box_em
+        ENERGY1=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
+    done
 
-# prepare input file for simulation (just letting it wiggle around)
+    # prepare input file for simulation (just letting it wiggle around)
 
-gmx grompp -f wiggle.mdp -c box_em.gro -p NaPore.top -o wiggle_vac.tpr
+    gmx grompp -f wiggle.mdp -c box_em.gro -p NaPore.top -o wiggle.tpr
 
-# run simulation for amount of time specified in wiggle.mdp
+    # run simulation for amount of time specified in wiggle.mdp
 
-mpirun -np $NP gmx_mpi mdrun -v -deffnm wiggle_vac
+    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm wiggle
 
-INPUT_VAC_FILE=wiggle_vac.gro
+    rm box_em* \#* box.gro  # remove unneeded files to reduce clutter
 
-THICKNESS=$(python /$DIR/../Data-Analysis/Thickness_Bash.py -i $INPUT_VAC_FILE -w $WATER_LAYER)
+    # Stop the script here if there is no solvation
 
-# Edit box to correct dimensions (i.e. so there is room for the specified amount of water)
+    if [ ${SOLVATION} == "off" ]; then
+        exit
+    fi
 
-gmx editconf -f wiggle_vac.gro -o new_box.gro -c -bt triclinic -box 8.5 8.5 $THICKNESS -angles 90 90 60
+    INPUT_VAC_FILE=wiggle.gro
 
-# energy minimize in this new box since everything is shifted around
+    THICKNESS=$(python /${DIR}/../Data-Analysis/Thickness_Bash.py -i $INPUT_VAC_FILE -w $WATER_LAYER)
 
-gmx grompp -f em.mdp -c new_box.gro -p NaPore.top -o em_new_box.tpr
+    # Edit box to correct dimensions (i.e. so there is room for the specified amount of water)
 
-mpirun -np $NP gmx_mpi mdrun -v -deffnm em_new_box
+    gmx editconf -f wiggle_vac.gro -o new_box.gro -c -bt triclinic -box 8.5 8.5 ${THICKNESS} -angles 90 90 60
 
-# Extract Potential energy from that minimization run. A positive value indicates that the box vectors are too small
+    # energy minimize in this new box since everything is shifted around
 
-ENERGY2=$(cat em_new_box.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
-# if the potential energy is positive, then the box vector is increased by a defined increment until the energy is negative after energy minimzation
+    gmx grompp -f em.mdp -c new_box.gro -p NaPore.top -o em_new_box.tpr
 
-while [ $(echo "  $ENERGY2 > 0" | bc) -eq 1 ]; do
-        XVECT2=$(echo "$XVECT + $INCREMENT" | bc -l)
-        YVECT2=$(echo "$YVECT + $INCREMENT" | bc -l)
-        gmx editconf -f wiggle_vac.gro -o new_box.gro -c -bt triclinic -box $XVECT $YVECT $THICKNESS -angles 90 90 60
-        gmx grompp -f em.mdp -c new_box.gro -p NaPore.top -o em_new_box.tpr
-        mpirun -np $NP gmx_mpi mdrun -v -deffnm em_new_box
-	ENERGY2=$(cat em_new_box.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
-done
+    mpirun -np $NP gmx_mpi mdrun -v -deffnm em_new_box
 
-# run simulation in new energy minimized box (Correct_box)
+    # Extract Potential energy from that minimization run. A positive value indicates that the box vectors are too small
 
-gmx grompp -f wiggle.mdp -c em_new_box.gro -p NaPore.top -o Correct_box.tpr
+    ENERGY2=$(cat em_new_box.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
+    # if the potential energy is positive, then the box vector is increased by a defined increment until the energy is negative after energy minimzation
 
-mpirun -np $NP gmx_mpi mdrun -v -deffnm Correct_box
+    while [ $(echo "  $ENERGY2 > 0" | bc) -eq 1 ]; do
+            XVECT2=$(echo "$XVECT + $INCREMENT" | bc -l)
+            YVECT2=$(echo "$YVECT + $INCREMENT" | bc -l)
+            gmx editconf -f wiggle_vac.gro -o new_box.gro -c -bt triclinic -box ${XVECT} ${YVECT} ${THICKNESS} -angles 90 90 60
+            gmx grompp -f em.mdp -c new_box.gro -p NaPore.top -o em_new_box.tpr
+            mpirun -np ${NP} gmx_mpi mdrun -v -deffnm em_new_box
+        ENERGY2=$(cat em_new_box.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
+    done
 
-# Now solvate the box
+    # run simulation in new energy minimized box (Correct_box)
 
-gmx solvate -cp Correct_box.gro -cs spc216.gro -p NaPore_water.top -o water.gro
+    gmx grompp -f wiggle.mdp -c em_new_box.gro -p NaPore.top -o Correct_box.tpr
 
-# Now run a simulation with water in the box
-# first energy minimize
+    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm Correct_box
 
-gmx grompp -f em.mdp -c water.gro -p NaPore_water.top -o water_em.tpr
+    # Now solvate the box
 
-mpirun -np $NP gmx_mpi mdrun -v -deffnm water_em
+    gmx solvate -cp Correct_box.gro -cs spc216.gro -p NaPore_water.top -o water.gro
 
-# Now run the actual simulation
+    # Now run a simulation with water in the box
+    # first energy minimize
 
-gmx grompp -f wiggle_solv.mdp -c water_em.gro -p NaPore_water.top -o water_wiggle.tpr
+    gmx grompp -f em.mdp -c water.gro -p NaPore_water.top -o water_em.tpr
 
-mpirun -np $NP gmx_mpi mdrun -v -deffnm water_wiggle
+    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm water_em
+
+    # Now run the actual simulation
+
+    gmx grompp -f wiggle_solv.mdp -c water_em.gro -p NaPore_water.top -o water_wiggle.tpr
+
+    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm water_wiggle
+else
+    # This does the same thing as the first part of the if statement except gmx is run in place of gmx_mpi
+    # Run Energy Minimization
+
+    gmx mdrun -v -deffnm box_em
+
+    # Extract Potential Energy from log file
+    ENERGY1=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5}')
+
+    # If the potential energy is positive, then the box vector is incremented by a fixed amount until the energy comes out negative
+
+    while [ $(echo " $ENERGY1 > 0" | bc) -eq 1 ]; do
+            XVECT1=$(echo "$XVECT + $INCREMENT" | bc -l)
+            YVECT1=$(echo "$YVECT + $INCREMENT" | bc -l)
+            gmx editconf -f initial.gro -o box.gro -c -bt triclinic -box ${XVECT} ${YVECT} ${Z_BOX_VECTOR} -angles 90 90 120
+            gmx grompp -f em.mdp -c box.gro -p NaPore.top -o box_em.tpr
+            gmx mdrun -v -deffnm box_em
+        ENERGY1=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
+    done
+
+    # prepare input file for simulation (just letting it wiggle around)
+
+    gmx grompp -f wiggle.mdp -c box_em.gro -p NaPore.top -o wiggle_vac.tpr
+
+    # run simulation for amount of time specified in wiggle.mdp
+
+    gmx mdrun  -v -deffnm wiggle_vac
+
+    INPUT_VAC_FILE=wiggle_vac.gro
+
+    THICKNESS=$(python /${DIR}/../Data-Analysis/Thickness_Bash.py -i $INPUT_VAC_FILE -w $WATER_LAYER)
+
+    # Edit box to correct dimensions (i.e. so there is room for the specified amount of water)
+
+    gmx editconf -f wiggle_vac.gro -o new_box.gro -c -bt triclinic -box 8.5 8.5 ${THICKNESS} -angles 90 90 60
+
+    # energy minimize in this new box since everything is shifted around
+
+    gmx grompp -f em.mdp -c new_box.gro -p NaPore.top -o em_new_box.tpr
+
+    gmx mdrun -v -deffnm em_new_box
+
+    # Extract Potential energy from that minimization run. A positive value indicates that the box vectors are too small
+
+    ENERGY2=$(cat em_new_box.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
+    # if the potential energy is positive, then the box vector is increased by a defined increment until the energy is negative after energy minimzation
+
+    while [ $(echo "  $ENERGY2 > 0" | bc) -eq 1 ]; do
+            XVECT2=$(echo "$XVECT + $INCREMENT" | bc -l)
+            YVECT2=$(echo "$YVECT + $INCREMENT" | bc -l)
+            gmx editconf -f wiggle_vac.gro -o new_box.gro -c -bt triclinic -box ${XVECT} ${YVECT} ${THICKNESS} -angles 90 90 60
+            gmx grompp -f em.mdp -c new_box.gro -p NaPore.top -o em_new_box.tpr
+            gmx mdrun -v -deffnm em_new_box
+        ENERGY2=$(cat em_new_box.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
+    done
+
+    # run simulation in new energy minimized box (Correct_box)
+
+    gmx grompp -f wiggle.mdp -c em_new_box.gro -p NaPore.top -o Correct_box.tpr
+
+    gmx mdrun -v -deffnm Correct_box
+
+    # Now solvate the box
+
+    gmx solvate -cp Correct_box.gro -cs spc216.gro -p NaPore_water.top -o water.gro
+
+    # Now run a simulation with water in the box
+    # first energy minimize
+
+    gmx grompp -f em.mdp -c water.gro -p NaPore_water.top -o water_em.tpr
+
+    gmx mdrun -v -deffnm water_em
+
+    # Now run the actual simulation
+
+    gmx grompp -f wiggle_solv.mdp -c water_em.gro -p NaPore_water.top -o water_wiggle.tpr
+fi
 
 # remove unnecessary files
-rm initial.gro water.gro new_box.gro #remove now unnecessary file
-rm box.gro # remove unnecessary file
-find . -type f -name 'Correct_box'\* -exec rm {} \;
-find . -type f -name 'water_em'\* -exec rm {} \;
-find . -type f -name 'em_new_box'\* -exec rm {} \;
-find . -type f -name 'box_em'\* -exec rm {} \;
-find . -type f -name '#'\* -exec rm {} \;
-find . -type f -name 'wiggle_vac'\* -exec rm {} \;
+rm water.gro new_box.gro Correct_box* water_em* em_new_box* wiggle_vac*  #remove now unnecessary file
