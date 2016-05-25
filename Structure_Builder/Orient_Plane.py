@@ -157,7 +157,7 @@ if t == 'LLC':
                          [0, 0, 1, -(positions_inp[9][2])], [0, 0, 0, 1]])
 
 if t == 'BCC':
-    translation = np.matrix([[1, 0, 0,-(positions_inp[25][0])], [0, 1, 0,-(positions_inp[25][1])],
+    translation = np.matrix([[1, 0, 0, -(positions_inp[25][0])], [0, 1, 0, -(positions_inp[25][1])],
                          [0, 0, 1, -(positions_inp[25][2])], [0, 0, 0, 1]])
 
 for i in range(0, len(positions_inp)):
