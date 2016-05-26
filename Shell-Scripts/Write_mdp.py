@@ -55,19 +55,19 @@ title = 'title = %s' %args.title
 cutoff_scheme = 'cutoff-scheme = %s' %args.CUTOFF_MD
 integrator = 'integrator = %s' %args.INTEGRATOR_MD
 dt = 'dt = %s' %args.DT
-steps = int(args.SIM_LENGTH * 1000 / args.DT)
+steps = int(float(args.SIM_LENGTH) * 1000 / float(args.DT))
 nsteps = 'nsteps = %s' %steps
-nstxout = 'nstxout = %s' %(steps/args.FRAMES)
-nstvout = 'nstxout = %s' %(steps/args.FRAMES)
-nstfout = 'nstxout = %s' %(steps/args.FRAMES)
-nstenergy = 'nstxout = %s' %(steps/args.FRAMES)
+nstxout = 'nstxout = %s' %(int(steps/int(args.FRAMES)))
+nstvout = 'nstvout = %s' %(int(steps/int(args.FRAMES)))
+nstfout = 'nstfout = %s' %(int(steps/int(args.FRAMES)))
+nstenergy = 'nstenergy = %s' %(int(steps/int(args.FRAMES)))
 nstlist = 'nstlist = %s' %args.NSTLIST
 tcoupl = 'Tcoupl = %s' %args.TCOUPL
-tc_grps = 'tc_groups = %s' %' '.join(grps)
+tc_grps = 'tc_grps = %s' %' '.join(grps)
 tau_t = 'tau_t = %s' %' '.join([str(0.1) for i in grps])
 ref_t = 'ref_t = %s' %' '.join([str(args.REF_T) for i in grps])
 Pcoupl = 'Pcoupl = %s' %args.PCOUPL
-Pcoupltype = 'Pcoupletype = %s' %args.PTYPE
+Pcoupltype = 'Pcoupltype = %s' %args.PTYPE
 if args.PTYPE == 'semiisotropic':
     compress = 'compressibility = %s' %' '.join([str(args.COMPRESSIBILITY), '0'])
     ref_p = 'ref_p = %s' %' '.join([str(args.REF_P) for i in grps])
@@ -86,18 +86,18 @@ f2.writelines([title + '\n', cutoff_scheme + '\n', integrator + '\n', dt + '\n',
 
 if args.solvated == 'on':
     title = 'title = Solvated System'
-    steps = int(args.SOLV_LENGTH * 1000 / args.DT)
+    steps = int(float(args.SOLV_LENGTH) * 1000 / float(args.DT))
     nsteps = 'nsteps = %s' %steps
-    nstxout = 'nstxout = %s' %(steps/args.FRAMES)
-    nstvout = 'nstxout = %s' %(steps/args.FRAMES)
-    nstfout = 'nstxout = %s' %(steps/args.FRAMES)
-    nstenergy = 'nstxout = %s' %(steps/args.FRAMES)
+    nstxout = 'nstxout = %s' %(steps/int(args.FRAMES))
+    nstvout = 'nstvout = %s' %(steps/int(args.FRAMES))
+    nstfout = 'nstfout = %s' %(steps/int(args.FRAMES))
+    nstenergy = 'nstenergy = %s' %(steps/int(args.FRAMES))
     tcoupl = 'Tcoupl = %s' %args.TCOUPL
-    tc_grps = 'tc_groups = %s' %' '.join(grps_solv)
+    tc_grps = 'tc_grps = %s' %' '.join(grps_solv)
     tau_t = 'tau_t = %s' %' '.join([str(0.1) for i in grps_solv])
     ref_t = 'ref_t = %s' %' '.join([str(args.REF_T) for i in grps_solv])
     Pcoupl = 'Pcoupl = %s' %args.PCOUPL
-    Pcoupltype = 'Pcoupletype = %s' %args.PTYPE
+    Pcoupltype = 'Pcoupltype = isotropic'
     compress = 'compressibility = %s' %args.COMPRESSIBILITY
     ref_p = 'ref_p = %s' %args.REF_P
     pbc = 'pbc = %s' %args.PBC

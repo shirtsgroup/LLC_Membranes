@@ -6,7 +6,7 @@
 # Define Variables with Default values
 
 # Choose which monomer to build with
-MONOMER='monomer4.pdb'  # Structure file to be used
+MONOMER="monomer4.pdb"  # Structure file to be used
 
 #MPI Options
 MPI="on"
@@ -15,7 +15,7 @@ NODES=16
 # Energy minimization parameters:
 INTEGRATOR_EM=steep  # Integrator for energy minimization
 NSTEPS_EM=50000  # Maximum number of steps to take for energy minimization
-CUTOFF_EM='verlet'  # Cut-off Scheme
+CUTOFF_EM="verlet"  # Cut-off Scheme
 NSTLIST=10  # Neighborlist - changed automatically by gromacs unless it is set equal to 1
 
 # Membrane Dimensions
@@ -32,31 +32,31 @@ YVECT=8.0  # Box vector in the y direction (not this will be multiplied by sin(1
 INCREMENT=0.1  # Increment to increase the box vector by if there is a LINCS error
 
 # Simulation Parameters
-SIM_TITLE='Equilibration in Water'  # Title of simulation
-CUTOFF_MD='verlet'  # Cut-off scheme for simulation
-INTEGRATOR_MD='md'  # Integrator type for simulation
+SIM_TITLE="Equilibration in Water"  # Title of simulation
+CUTOFF_MD="verlet"  # Cut-off scheme for simulation
+INTEGRATOR_MD="md"  # Integrator type for simulation
 DT=0.002  # Time step (ps)
 SIM_LENGTH=0.01  #length of intermediate 'wiggle' simulation (ns)
 FRAMES=50  # Number of frames in trajectory
-TCOUPL='v-rescale'
+TCOUPL="v-rescale"
 REF_T=300  # Reference Temperature, K
-PCOUPL='berendsen'
-PTYPE='semiisotropic'
+PCOUPL="berendsen"
+PTYPE="semiisotropic"
 REF_P=1  # Reference Pressure, bar
 COMPRESSIBILITY=4.5e-5  # Isothermal compressibility, bar^-1
-PBC='xyz'
+PBC="xyz"
 
 # Solvation
 WATER_LAYER=6  # thickness (nm) between membrane layers in the z direction
 SOLV_LENGTH=1  # length of solvated simulation, nanoseconds
-SOLVATION='off'
+SOLVATION="off"
 
 # Reference for flags associated with each variable
 
 # -n  :   NODES ... number of nodes to use
 # -M  :   MONOMER ... Structure file to be used
 # -I  :   INTEGRATOR_EM ... Integrator for energy minimization
-# -s  :   NSTEPS_EM ... Maximum number of steps to take for energy minimization
+# -S  :   NSTEPS_EM ... Maximum number of steps to take for energy minimization
 # -c  :   CUTOFF_EM ... Cut-off Scheme
 # -t  :   NSTLIST ... Neighborlist - changed automatically by gromacs unless it is set equal to 1
 # -o  :   NO_MONOMERS ... Number of monomers in 1 layer
@@ -82,9 +82,10 @@ SOLVATION='off'
 # -R  :   COMPRESSIBILITY ... Isothermal compressibility, bar^-1
 # -Z  :   PBC ... Periodic Boundary directions
 # -V  :   SOLV_LENGTH ... length of final simulation
-# -S  :   SOLVATION ... Turn solvation on or off
+# -s  :   SOLVATION ... Turn solvation on or off
+# -m  :   MPI ... Turn MPI on or off depending what Gromacs version you have compiled
 
-while getopts "M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:S:" opt; do
+while getopts "M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:s:m:" opt; do
     case $opt in
     n)  NODES=$OPTARG;;
     M)  MONOMER=$OPTARG;;
@@ -115,45 +116,42 @@ while getopts "M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:S:" opt; 
     R)  COMPRESSIBILITY=$OPTARG;;
     Z)  PBC=$OPTARG;;
     V)  SOLV_LENGTH=$OPTARG;;
-    S)  SOLVATION=$OPTARG;;
+    s)  SOLVATION=$OPTARG;;
     m)  MPI=$OPTARG;;
     esac
 done
 
-# Copy in necessary files
-
-if [ ${SOLVATION} == "on" ]; then
-    ifs.sh
-else
-    ifv.sh
-fi
-
 # Calculated values based on input variables:
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # Directory where this script is located
-INPUT_FILE=${DIR}/../Structure-Files/${MONOMER}  # Full path to file where monomer structure is located
 Z_BOX_VECTOR=$((LAYERS+5)) # kind of arbitrary but should work
 MOL_LLC=$((NO_MONOMERS*NOPORES*LAYERS))  # For topology
 MOL_NA=$((NO_MONOMERS*NOPORES*LAYERS))
 NP=$((NODES*2))
 
-# Edit Input Files
+
+# Copy in necessary files and edit input files
+
+if [ ${SOLVATION} == "on" ]; then
+    ifs.sh
+    #NaPore_water.top
+    sed -i -e "s/MOL_LLC/${MOL_LLC}/g" NaPore_water.top
+    sed -i -e "s/MOL_NA/${MOL_NA}/g" NaPore_water.top
+else
+    ifv.sh
+fi
 
 # NaPore.top
 sed -i -e "s/MOL_LLC/${MOL_LLC}/g" NaPore.top
 sed -i -e "s/MOL_NA/${MOL_NA}/g" NaPore.top
 
-# NaPore_water.top
-sed -i -e "s/MOL_LLC/${MOL_LLC}/g" NaPore_water.top
-sed -i -e "s/MOL_NA/${MOL_NA}/g" NaPore_water.top
-
 # Build Structure Based on user-defined inputs
 
-Write_mdp.py -T ${SIM_TITLE} -C ${CUTOFF_MD} -i ${INTEGRATOR_MD} -D ${DT} -v ${TCOUPL} -K ${REF_T} -b ${PCOUPL}\
+Write_mdp.py -C ${CUTOFF_MD} -i ${INTEGRATOR_MD} -D ${DT} -v ${TCOUPL} -K ${REF_T} -b ${PCOUPL}\
     -Y ${PTYPE} -B ${REF_P} -R ${COMPRESSIBILITY} -Z ${PBC} -L ${SIM_LENGTH} -I ${INTEGRATOR_EM} -S ${NSTEPS_EM}\
     -c ${CUTOFF_EM} -f ${FRAMES} -s ${SOLVATION} -V ${SOLV_LENGTH}
 
-python ${DIR}/../Structure_Builder/Structure_Builder_for_Bash.py -i ${INPUT_FILE} -l ${LAYERS} -m ${NO_MONOMERS} \
+python ${DIR}/../Structure_Builder/Orient_Plane.py -i ${MONOMER} -l ${LAYERS} -m ${NO_MONOMERS} \
     -r ${RADIUS} -p ${PORE2PORE} -n ${NOPORES} -d ${DBWL} >> initial.gro
 
 # Put the structure in a box
@@ -271,13 +269,21 @@ else
 
     # prepare input file for simulation (just letting it wiggle around)
 
-    gmx grompp -f wiggle.mdp -c box_em.gro -p NaPore.top -o wiggle_vac.tpr
+    gmx grompp -f wiggle.mdp -c box_em.gro -p NaPore.top -o wiggle.tpr
 
     # run simulation for amount of time specified in wiggle.mdp
 
-    gmx mdrun  -v -deffnm wiggle_vac
+    gmx mdrun -v -deffnm wiggle
 
-    INPUT_VAC_FILE=wiggle_vac.gro
+    rm box_em* \#* box.gro  # remove unneeded files to reduce clutter
+
+    # Stop the script here if there is no solvation
+
+    if [ ${SOLVATION} == "off" ]; then
+        exit
+    fi
+
+    INPUT_VAC_FILE=wiggle.gro
 
     THICKNESS=$(python /${DIR}/../Data-Analysis/Thickness_Bash.py -i $INPUT_VAC_FILE -w $WATER_LAYER)
 
@@ -325,6 +331,8 @@ else
     # Now run the actual simulation
 
     gmx grompp -f wiggle_solv.mdp -c water_em.gro -p NaPore_water.top -o water_wiggle.tpr
+
+    gmx mdrun  -v -deffnm water_wiggle
 fi
 
 # remove unnecessary files
