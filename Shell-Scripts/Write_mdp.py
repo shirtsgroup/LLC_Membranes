@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import os
 import argparse
 
 parser = argparse.ArgumentParser(description = 'Write .mdp files for a vacuum simulation')
