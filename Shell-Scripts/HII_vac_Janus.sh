@@ -94,8 +94,8 @@ SOLVATION="off"
 # -W  :   SOLVATION ... Turn solvation on or off
 
 
-while getopts "h:m:s:n:q:N:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:W" opt; do
-    case $opt in 
+while getopts "h:m:s:n:q:N:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:W:" opt; do
+    case $opt in
     h)  SIM_LENGTH_HOURS=$OPTARG;;
     m)  SIM_LENGTH_MIN=$OPTARG;;
     s)  SIM_LENGTH_SEC=$OPTARG;;
@@ -138,11 +138,11 @@ NP=$((NODES*2))
 
 echo '#!/bin/bash' > Run_Janus.sh
 echo '' >> Run_Janus.sh
-echo '#SBATCH --job-name' $SIM_TITLE >> Run_Janus.sh
-echo '#SBATCH --qos' $QOS >> Run_Janus.sh
-echo '#SBATCH --nodes' $NODES >> Run_Janus.sh
-echo '#SBATCH --ntasks-per-node' $NTASKS_PER_NODE >> Run_Janus.sh
-echo '#SBATCH --time' $SIM_LENGTH_HOURS:$SIM_LENGTH_MIN:$SIM_LENGTH_SEC >> Run_Janus.sh
+echo '#SBATCH --job-name' ${SIM_TITLE} >> Run_Janus.sh
+echo '#SBATCH --qos' ${QOS} >> Run_Janus.sh
+echo '#SBATCH --nodes' ${NODES} >> Run_Janus.sh
+echo '#SBATCH --ntasks-per-node' ${NTASKS_PER_NODE} >> Run_Janus.sh
+echo '#SBATCH --time' ${SIM_LENGTH_HOURS}:${SIM_LENGTH_MIN}:${SIM_LENGTH_SEC} >> Run_Janus.sh
 echo '' >> Run_Janus.sh
 echo "ml slurm" >> Run_Janus.sh
 echo "ml gromacs" >> Run_Janus.sh
@@ -151,6 +151,6 @@ echo "ml numpy" >> Run_Janus.sh
 echo '' >> Run_Janus.sh
 echo "BSS_MPI.sh -M ${MONOMER} -I ${INTEGRATOR_EM} -S ${NSTEPS_EM} -c ${CUTOFF_EM} -t ${NSTLIST} -o ${NO_MONOMERS} \
     -r ${RADIUS} -p ${PORE2PORE} -P ${NOPORES} -w ${DBWL} -l ${LAYERS} -x ${XVECT} -y ${YVECT} -e ${INCREMENT} \
-    -T ${SIM_TITLE} -C ${CUTOFF_MD} -i ${INTEGRATOR_MD} -D ${DT} -L ${SIM_LENGTH} -f ${FRAMES} -v ${TCOUPL} -K ${REF_T}
-    -b ${PCOUPL} -Y ${PTYPE} -B ${REF_P} -R ${COMPRESSIBILITY} -Z ${PBC} -V ${SOLV_LENGTH} -n ${NODES} -s ${SOLVATION}
+    -T ${SIM_TITLE} -C ${CUTOFF_MD} -i ${INTEGRATOR_MD} -D ${DT} -L ${SIM_LENGTH} -f ${FRAMES} -v ${TCOUPL} -K ${REF_T}\
+    -b ${PCOUPL} -Y ${PTYPE} -B ${REF_P} -R ${COMPRESSIBILITY} -Z ${PBC} -V ${SOLV_LENGTH} -n ${NODES} -s ${SOLVATION} \
     -m ${MPI}" >> Run_Janus.sh
