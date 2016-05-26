@@ -147,8 +147,6 @@ sed -i -e "s/MOL_NA/${MOL_NA}/g" NaPore.top
 
 # Build Structure Based on user-defined inputs
 
-python Write_mdp.py -C ${CUTOFF_MD} -i ${INTEGRATOR_MD} -D ${DT} -v ${TCOUPL} -K ${REF_T} -b ${PCOUPL}\
-
 python ${DIR}/Write_mdp.py -C ${CUTOFF_MD} -i ${INTEGRATOR_MD} -D ${DT} -v ${TCOUPL} -K ${REF_T} -b ${PCOUPL}\
     -Y ${PTYPE} -B ${REF_P} -R ${COMPRESSIBILITY} -Z ${PBC} -L ${SIM_LENGTH} -I ${INTEGRATOR_EM} -S ${NSTEPS_EM}\
     -c ${CUTOFF_EM} -f ${FRAMES} -s ${SOLVATION} -V ${SOLV_LENGTH}
