@@ -85,7 +85,7 @@ SOLVATION="off"
 # -s  :   SOLVATION ... Turn solvation on or off
 # -m  :   MPI ... Turn MPI on or off depending what Gromacs version you have compiled
 
-while getopts "M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:s:m:" opt; do
+while getopts "n:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:s:m:" opt; do
     case $opt in
     n)  NODES=$OPTARG;;
     M)  MONOMER=$OPTARG;;
