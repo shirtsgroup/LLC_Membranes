@@ -1,8 +1,5 @@
 #!/usr/bin/python
 
-import numpy as np
-import math
-import os
 import argparse
 
 parser = argparse.ArgumentParser(description = 'Write .mdp files for a vacuum simulation')
