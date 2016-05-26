@@ -65,7 +65,7 @@ SOLVATION="off"
 # -N  :   NTASKS_PER_NODE ... Number of tasks assigned to each node
 # -M  :   MONOMER ... Structure file to be used
 # -I  :   INTEGRATOR_EM ... Integrator for energy minimization
-# -s  :   NSTEPS_EM ... Maximum number of steps to take for energy minimization
+# -S  :   NSTEPS_EM ... Maximum number of steps to take for energy minimization
 # -c  :   CUTOFF_EM ... Cut-off Scheme
 # -t  :   NSTLIST ... Neighborlist - changed automatically by gromacs unless it is -1- set equal to 1
 # -o  :   NO_MONOMERS ... Number of monomers in 1 layer
@@ -91,10 +91,10 @@ SOLVATION="off"
 # -R  :   COMPRESSIBILITY ... Isothermal compressibility, bar^-1
 # -Z  :   PBC ... Periodic Boundary directions
 # -V  :   SOLV_LENGTH ... length of final simulation
-# -s  :   SOLVATION ... Turn solvation on or off
+# -W  :   SOLVATION ... Turn solvation on or off
 
 
-while getopts "h:m:s:n:q:N:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:s" opt; do
+while getopts "h:m:s:n:q:N:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:W" opt; do
     case $opt in 
     h)  SIM_LENGTH_HOURS=$OPTARG;;
     m)  SIM_LENGTH_MIN=$OPTARG;;
@@ -130,7 +130,7 @@ while getopts "h:m:s:n:q:N:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z
     R)  COMPRESSIBILITY=$OPTARG;;
     Z)  PBC=$OPTARG;;
     V)  SOLV_LENGTH=$OPTARG;;
-    s)  SOLVATION=$OPTARG;;
+    W)  SOLVATION=$OPTARG;;
     esac
 done
 
@@ -153,4 +153,4 @@ echo "BSS_MPI.sh -M ${MONOMER} -I ${INTEGRATOR_EM} -S ${NSTEPS_EM} -c ${CUTOFF_E
     -r ${RADIUS} -p ${PORE2PORE} -P ${NOPORES} -w ${DBWL} -l ${LAYERS} -x ${XVECT} -y ${YVECT} -e ${INCREMENT} \
     -T ${SIM_TITLE} -C ${CUTOFF_MD} -i ${INTEGRATOR_MD} -D ${DT} -L ${SIM_LENGTH} -f ${FRAMES} -v ${TCOUPL} -K ${REF_T}
     -b ${PCOUPL} -Y ${PTYPE} -B ${REF_P} -R ${COMPRESSIBILITY} -Z ${PBC} -V ${SOLV_LENGTH} -n ${NODES} -s ${SOLVATION}
-     -m ${MPI}" >> Run_Janus.sh
+    -m ${MPI}" >> Run_Janus.sh
