@@ -203,7 +203,7 @@ if [ ${MPI} == "on" ]; then
 
     # Edit box to correct dimensions (i.e. so there is room for the specified amount of water)
 
-    gmx editconf -f wiggle_vac.gro -o new_box.gro -c -bt triclinic -box 8.5 8.5 ${THICKNESS} -angles 90 90 60
+    gmx editconf -f wiggle.gro -o new_box.gro -c -bt triclinic -box 8.5 8.5 ${THICKNESS} -angles 90 90 60
 
     # energy minimize in this new box since everything is shifted around
 
@@ -219,7 +219,7 @@ if [ ${MPI} == "on" ]; then
     while [ $(echo "  $ENERGY2 > 0" | bc) -eq 1 ]; do
             XVECT2=$(echo "$XVECT + $INCREMENT" | bc -l)
             YVECT2=$(echo "$YVECT + $INCREMENT" | bc -l)
-            gmx editconf -f wiggle_vac.gro -o new_box.gro -c -bt triclinic -box ${XVECT} ${YVECT} ${THICKNESS} -angles 90 90 60
+            gmx editconf -f wiggle.gro -o new_box.gro -c -bt triclinic -box ${XVECT} ${YVECT} ${THICKNESS} -angles 90 90 60
             gmx grompp -f em.mdp -c new_box.gro -p NaPore.top -o em_new_box.tpr
             mpirun -np ${NP} gmx_mpi mdrun -v -deffnm em_new_box
         ENERGY2=$(cat em_new_box.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
@@ -289,7 +289,7 @@ else
 
     # Edit box to correct dimensions (i.e. so there is room for the specified amount of water)
 
-    gmx editconf -f wiggle_vac.gro -o new_box.gro -c -bt triclinic -box 8.5 8.5 ${THICKNESS} -angles 90 90 60
+    gmx editconf -f wiggle.gro -o new_box.gro -c -bt triclinic -box 8.5 8.5 ${THICKNESS} -angles 90 90 60
 
     # energy minimize in this new box since everything is shifted around
 
@@ -305,7 +305,7 @@ else
     while [ $(echo "  $ENERGY2 > 0" | bc) -eq 1 ]; do
             XVECT2=$(echo "$XVECT + $INCREMENT" | bc -l)
             YVECT2=$(echo "$YVECT + $INCREMENT" | bc -l)
-            gmx editconf -f wiggle_vac.gro -o new_box.gro -c -bt triclinic -box ${XVECT} ${YVECT} ${THICKNESS} -angles 90 90 60
+            gmx editconf -f wiggle.gro -o new_box.gro -c -bt triclinic -box ${XVECT} ${YVECT} ${THICKNESS} -angles 90 90 60
             gmx grompp -f em.mdp -c new_box.gro -p NaPore.top -o em_new_box.tpr
             gmx mdrun -v -deffnm em_new_box
         ENERGY2=$(cat em_new_box.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
@@ -336,4 +336,4 @@ else
 fi
 
 # remove unnecessary files
-rm water.gro new_box.gro Correct_box* water_em* em_new_box* wiggle_vac*  #remove now unnecessary file
+rm water.gro new_box.gro Correct_box* water_em* em_new_box*  #remove now unnecessary file
