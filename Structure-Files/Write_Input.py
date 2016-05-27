@@ -25,18 +25,35 @@ parser.add_argument('-f', '--FRAMES', default = 50, help = 'Number of Frames')
 parser.add_argument('-m', '--monomer', default = 'LLC', help = 'Monomer which structure is built with')
 parser.add_argument('-s', '--solvated', default = 'off', help = 'Will create a .mdp file for solvated system if this is set to "on"')
 parser.add_argument('-V', '--SOLV_LENGTH', default = 1, help = 'Length of simulation of solvated system')
+parser.add_argument('-o', '--NO_MONOMERS', default = 6, help = 'Number of monomers per layer')
+parser.add_argument('-l', '--LAYERS', default = 20, help = 'Number of layers in structure')
+parser.add_argument('-P', '--NOPORES', default = 4, help = 'Number of pores')
 
 
 args = parser.parse_args()
+
+location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in
 
 monomer = args.monomer
 
 if monomer == 'LLC':
     grps = ['LLC', 'NA']
     grps_solv = ['LLC', 'NA', 'SOL']
+    no_ions = 1  # number of ions per monomer
+    ff = '#include "amber99.ff/forcefield.itp"'
+    ion_top = '#include "amber99.ff/ions.itp"'
+    sol_top = '#include "amber99.ff/spc.itp"'
+    ion = 'NA'
+    mon_top = '#include "%s/Monomer_Tops/HII_mon.itp' %location
 elif monomer == 'BCC':
     grps = ['BCC', 'BR']
     grps_solv = ['BCC', 'BR', 'SOL']
+    no_ions = 2  # number of ions per monomer
+    ff = '#include "oplsaa.ff/forcefield.itp"'
+    ion_top = '#include "oplsaa.ff/ions.itp"'
+    sol_top = '#include "oplsaa.ff/spc.itp"'
+    ion = 'BR'
+    mon_top = '#include "%s/Monomer_Tops/BCC_mon.itp' %location
 
 # Energy minimization .mdp file
 title = 'title = Energy Minimization'
@@ -107,3 +124,21 @@ if args.solvated == 'on':
                    'rlist = 1.2\n', 'rcoulomb = 1.2\n', 'rvdw = 1.2\n', 'coulombtype = PME\n', 'pme_order = 4\n',
                    'fourierspacing = 0.16\n', tcoupl + '\n', tc_grps + '\n', tau_t + '\n', ref_t + '\n', Pcoupl + '\n', Pcoupltype + '\n',
                    ref_p + '\n', compress + '\n', 'gen_vel = no\n', pbc + '\n', 'DispCorr = Ener\n'])
+
+# Write topologies
+
+monomers = args.LAYERS*args.NO_MONOMERS*args.NOPORES
+tot_ions = no_ions*monomers
+
+f4 = open('NaPore.top', 'w')
+f4.writelines([';Forcefield\n', ff +'\n','\n', ';Ion Topology\n', ion_top + '\n', '\n', ';Monomer Topology\n',
+               mon_top + '\n', '\n', '[ system ]\n', '%s' %args.title + '\n', '\n', '[ molecules ]\n',
+               '; Compound         nmols' + '\n', '%s                 %s' %(args.monomer, monomers) + '\n',
+               '%s                  %s' %(ion, tot_ions) + '\n'])
+
+if args.solvated == 'on':
+    f5 = open('NaPore_water.top', 'w')
+    f5.writelines([';Forcefield\n', ff +'\n', '\n', ';Solvent Topology\n', sol_top + '\n', '\n', ';Ion Topology\n',
+                   ion_top + '\n', '\n', ';Monomer Topology\n', mon_top + '\n', '\n', '[ system ]\n',
+                   '%s' %args.title + '\n', '\n', '[ molecules ]\n', '; Compound         nmols\n',
+                   '%s                 %s' %(args.monomer, monomers) + '\n', '%s                  %s' %(ion, tot_ions)])
