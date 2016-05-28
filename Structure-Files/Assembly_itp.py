@@ -69,16 +69,26 @@ while a[atoms_count] != '\n':
     nr += 1  # counts number of atoms
 
 no_mon = args.layers * args.no_pores * args.no_monomers  # How many monomer will be in this .itp file
-for i in range(0, no_mon):  # print atom information for each monomer
-    for k in range(0, nr):  # getting the number right
-        print '{:5d}{:25s}{:5d}{:}'.format(i*nr + k + 1, a[k + atoms_index + 2][6:29],
-                                           i*nr + int(a[k + atoms_index + 2][29:34]),
-                                           a[k + atoms_index + 2][34:len(a[k + atoms_index + 2])]),
+# for i in range(0, no_mon):  # print atom information for each monomer
+#     for k in range(0, nr):  # getting the number right
+#         print '{:5d}{:25s}{:5d}{:}'.format(i*nr + k + 1, a[k + atoms_index + 2][6:29],
+#                                            i*nr + int(a[k + atoms_index + 2][29:34]),
+#                                            a[k + atoms_index + 2][34:len(a[k + atoms_index + 2])]),
+
+print ''  # space in between sections
 
 # [ bonds ]
+
+print a[bonds_index],
+print a[bonds_index + 1],
 
 nb = 0  # number of lines in the 'bonds' section
 bond_count = bonds_index + 2
 while a[bond_count] != '\n':
     bond_count += 1  # increments while loop
     nb += 1  # counting number of lines in 'bonds' section
+
+for i in range(0, no_mon):
+    for k in range(0, nb):
+        print '{:6d}{:7d}{:}'.format(i*nr + int(a[k + bonds_index + 2][0:6]), i*nr + int(a[k + bonds_index + 2][6:14]),
+                                     a[k + bonds_index + 2][14:len(a[k+ atoms_index + 2])]),
