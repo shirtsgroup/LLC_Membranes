@@ -17,7 +17,7 @@ import argparse
 # Pore 4 ------------- Pore 3'
 
 parser = argparse.ArgumentParser(description = 'Run Cylindricity script')
-parser.add_argument('-i', '--input', default='Monomer1_Traj.pdb', help = 'Path to input file')
+parser.add_argument('-i', '--input', default='Long_Traj.gro', help = 'Path to input file')
 parser.add_argument('-n', '--no_monomers', default=6, help = 'Number of Monomers per layer')
 args = parser.parse_args()
 
@@ -392,8 +392,8 @@ for i in range(0, len(Sum_list)):
 frames = float(1 / float(traj_points - traj_start))
 Averages = np.dot(Sum_list, frames).tolist()
 Averages.sort()
-print Averages
-print np.mean(Averages[0:4])
+print(Averages)
+print(np.mean(Averages[0:4]))
 
 x = x_axis
 y = y_axis

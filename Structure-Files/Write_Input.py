@@ -53,7 +53,7 @@ elif monomer == 'BCC':
     ion_top = '#include "oplsaa.ff/ions.itp"'
     sol_top = '#include "oplsaa.ff/spc.itp"'
     ion = 'BR'
-    mon_top = '#include "%s/Monomer_Tops/BCC_mon.itp' %location
+    mon_top = '#include "%s/Monomer_Tops/BCC_mon.itp"' %location
 
 # Energy minimization .mdp file
 title = 'title = Energy Minimization'
