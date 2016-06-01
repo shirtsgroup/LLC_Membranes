@@ -18,7 +18,7 @@ parser.add_argument('-t', '--type', default='LLC', help='Type of monomer')
 parser.add_argument('-l', '--layers', default=20, help='Number of layers')
 parser.add_argument('-p', '--pores', default=4, help='Number of pores')
 parser.add_argument('-n', '--no_monomers', default=6, help='Number of monomers per layer')
-parser.add_argument('-c', '--cutoff', default=0.33, help='Anything below this value will be cross linked')
+parser.add_argument('-c', '--cutoff', default=0.313, help='Anything below this value will be cross linked')
 
 args = parser.parse_args()
 
@@ -73,9 +73,9 @@ dist = np.zeros((len(C1x), len(C2x)))
 for i in range(0, len(C1x)):
     for k in range(0, len(C2x)):
         if i != k:  # make sure that C1 and C2 that are a part of the same monomer do not factor into this calculation
-            dist[i, k] = math.sqrt((C1x[i] - C2x[k])**2 + (C1y[i] - C2y[k])**2 + (C1z[i] - C2z[k])**2)
+            dist[k, i] = math.sqrt((C1x[i] - C2x[k])**2 + (C1y[i] - C2y[k])**2 + (C1z[i] - C2z[k])**2)
         else:
-            dist[i, k] = 1000  # artificially high number to keep it from interfering
+            dist[k, i] = 1000  # artificially high number to keep it from interfering
 
 # Find the distance of the closest carbon and its index
 min_dist = np.zeros((len(C1x), 1))
@@ -101,7 +101,6 @@ for i in range(0, len(C1x)):
 
 # Now that everything has an index that needs to be changed, we must interpret those indices
 
-atom_no = np.zeros((len(C1x), tot_monomers))
 # C19 is the 26th atom, C20 is 27th, C33 is 41st, C34 is 42nd, C47 is 56th, C48 is 57th, in each monomer
 
 # We also need to know which index refers to which monomer and tail -- applies equally for C1 and C2
@@ -114,14 +113,18 @@ tail3 = np.arange(2, len(C1x) + 1, 3)
 C1_no = []
 C2_no = []
 for i in range(0, count):
-    if change_index1[i] in tail1:  # This is C1 therefore if this is true, then the atom is C20
-        print (change_index1[i]/3)*(atoms - 1) + 26
+    if change_index1[i] in tail1:  # This is C1 therefore if this is true, then the atom is C20 (atom no 27)
+        C1_no.append((change_index1[i]/3)*(atoms - 1) + 27)
+    if change_index1[i] in tail2:  # This is C1 therefore if this is true, then the atom is C34 (atom no 42)
+        C1_no.append((change_index1[i]/3)*(atoms - 1) + 42)  # division automatically round down
+    if change_index1[i] in tail3:  # This is C1 therefore if this is true, then the atom is C48 (atom no 57)
+        C1_no.append((change_index1[i]/3)*(atoms - 1) + 57)  # division automatically round down
+    if change_index2[i] in tail1:  # This is C2 therefore if this is true, then the atom is C19 (atom no 26)
+        C2_no.append((change_index2[i]/3)*(atoms - 1) + 26)
+    if change_index2[i] in tail2:  # This is C2 therefore if this is true, then the atom is C33 (atom no 41)
+        C2_no.append((change_index2[i]/3)*(atoms - 1) + 41)  # division automatically round down
+    if change_index2[i] in tail3:  # This is C2 therefore if this is true, then the atom is C47 (atom no 56)
+        C2_no.append((change_index2[i]/3)*(atoms - 1) + 56)  # division automatically round down
 
-
-# for i in range(0, len(C2x)):
-#     for k in range(0, len(C1x)):
-
-
-
-# plt.hist(min_dist, 100)
-# plt.show()
+print C1_no, C2_no
+print change_dist
