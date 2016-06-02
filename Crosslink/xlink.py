@@ -42,6 +42,14 @@ if args.type == 'LLC':
     atoms = 138
     atoms_list = ['O5', 'O6', 'O7', '08', 'O9', 'C32', 'C18', 'C46', 'C33', 'C19', 'C47', 'C34', 'C20', 'C47', 'H49',
                   'H24', 'H74', 'H50', 'H25', 'H75', 'H51', 'H26', 'H76']
+    topology = 'HII_mon.itp'
+
+# Use Assembly_itp.py to create a topology for the entire assembly and then write it to a file which will be edited to
+# incorporate cross-links
+
+import subprocess
+with open("crosslinked.itp", "w+") as output:
+    subprocess.call(["python", "./../Structure-Files/Assembly_itp.py"], stdout=output);
 
 tot_atoms = atoms*args.layers*args.no_monomers*args.pores
 tot_monomers = args.layers*args.no_monomers*args.pores
