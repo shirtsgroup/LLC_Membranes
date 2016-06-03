@@ -39,10 +39,11 @@ for i in range(0, len(a)):
         break
 
 if args.type == 'LLC':
-    atoms = 138
+    atoms = 137  # not including sodium
     atoms_list = ['O5', 'O6', 'O7', '08', 'O9', 'C32', 'C18', 'C46', 'C33', 'C19', 'C47', 'C34', 'C20', 'C47', 'H49',
                   'H24', 'H74', 'H50', 'H25', 'H75', 'H51', 'H26', 'H76']
     topology = 'HII_mon.itp'
+    xlink_atoms = 6  # number of atoms involved in cross-linking
 
 # Use Assembly_itp.py to create a topology for the entire assembly and then write it to a file which will be edited to
 # incorporate cross-links
@@ -74,6 +75,92 @@ for line in range(0, lines):  # 15 is where the field containing atom identities
         C2y.append(float(a[line][28:36]))
         C2z.append(float(a[line][36:44]))
 
+# Time to handle periodic boundary conditions
+
+x1 = float(a[len(a) - 1][0:10])  # x box vector
+y1 = float(a[len(a) - 1][10:20])  # component one of y box vector
+y2 = float(a[len(a) - 1][50:60])  # component two of y box vector
+
+# Visualize pbc's like this for the following calculations:
+#  ___________________________
+#  \        \        \        \
+#   \   I    \   II   \  III   \
+#    \________\________\________\
+#     \        \        \        \
+#      \  IV    \  Main  \   V    \
+#       \________\________\________\
+#        \        \        \        \
+#         \   VI   \  VII   \  VIII  \
+#          \________\________\________\
+#
+# We will use x1, y1 and y2 to make copies of the coordinates in the 'Main' box into each of the labeled boxes
+
+# Define lists to hold translated coordinates
+# Lists will be of the format [C1x C1y C1z C2x C2y C2z]
+I = []
+II = []
+III = []
+IV = []
+V = []
+VI = []
+VII = []
+VIII = []
+
+for i in range(0, xlink_atoms):
+    I.append([]), II.append([]), III.append([]), IV.append([]), V.append([]), VI.append([]), VII.append([]), VIII.append([])
+
+for i in range(0, len(C1x)):
+    I[0].append(C1x[i] - x1 + y2), I[1].append(C1y[i] + y1), I[2].append(C1z[i]),\
+    I[3].append(C2x[i] - x1 + y2), I[4].append(C2y[i] + y1), I[5].append(C2z[i])
+    II[0].append(C1x[i] + y2), II[1].append(C1y[i] + y1), II[2].append(C1z[i]),\
+    II[3].append(C2x[i] + y2), II[4].append(C2y[i] + y1), II[5].append(C2z[i])
+    III[0].append(C1x[i] + x1 + y2), III[1].append(C1y[i] + y1), III[2].append(C1z[i]), \
+    III[3].append(C2x[i] + x1 + y2), III[4].append(C2y[i] + y1), III[5].append(C2z[i])
+    IV[0].append(C1x[i] - x1), IV[1].append(C1y[i]), IV[2].append(C1z[i]),\
+    IV[3].append(C2x[i] - x1), IV[4].append(C2y[i]), IV[5].append(C2z[i])
+    V[0].append(C1x[i] + x1), V[1].append(C1y[i]), V[2].append(C1z[i]),\
+    V[3].append(C2x[i] + x1), V[4].append(C2y[i]), V[5].append(C2z[i])
+    VI[0].append(C1x[i] - x1 - y2), VI[1].append(C1y[i] - y1), VI[2].append(C1z[i]),\
+    VI[3].append(C2x[i] - x1 - y2), VI[4].append(C2y[i] - y1), VI[5].append(C2z[i])
+    VII[0].append(C1x[i] - y2), VII[1].append(C1y[i] - y1), VII[2].append(C1z[i]), \
+    VII[3].append(C2x[i] - y2), VII[4].append(C2y[i] - y1), VII[5].append(C2z[i])
+    VIII[0].append(C1x[i] + x1 - y2), VIII[1].append(C1y[i] - y1), VIII[2].append(C1z[i]), \
+    VIII[3].append(C2x[i] + x1 - y2), VIII[4].append(C2y[i] - y1), VIII[5].append(C2z[i])
+
+# Now all of the translated coordinates need to be added to the main list of x, y and z coordinates for each carbon
+
+for i in range(0, len(I[0])):
+    C1x.append(I[0][i]), C1y.append(I[1][i]), C1z.append(I[2][i]), C2x.append(I[3][i]), C2y.append(I[4][i])
+    C2z.append(I[5][i])
+
+for i in range(0, len(II[0])):
+    C1x.append(II[0][i]), C1y.append(II[1][i]), C1z.append(II[2][i]), C2x.append(II[3][i]), C2y.append(II[4][i])
+    C2z.append(II[5][i])
+
+for i in range(0, len(III[0])):
+    C1x.append(III[0][i]), C1y.append(III[1][i]), C1z.append(III[2][i]), C2x.append(III[3][i]), C2y.append(III[4][i])
+    C2z.append(III[5][i])
+
+for i in range(0, len(IV[0])):
+    C1x.append(IV[0][i]), C1y.append(IV[1][i]), C1z.append(IV[2][i]), C2x.append(IV[3][i]), C2y.append(IV[4][i])
+    C2z.append(IV[5][i])
+
+for i in range(0, len(V[0])):
+    C1x.append(V[0][i]), C1y.append(V[1][i]), C1z.append(V[2][i]), C2x.append(V[3][i]), C2y.append(V[4][i])
+    C2z.append(V[5][i])
+
+for i in range(0, len(VI[0])):
+    C1x.append(VI[0][i]), C1y.append(VI[1][i]), C1z.append(VI[2][i]), C2x.append(VI[3][i]), C2y.append(VI[4][i])
+    C2z.append(VI[5][i])
+
+for i in range(0, len(VII[0])):
+    C1x.append(VII[0][i]), C1y.append(VII[1][i]), C1z.append(VII[2][i]), C2x.append(VII[3][i]), C2y.append(VII[4][i])
+    C2z.append(VII[5][i])
+
+for i in range(0, len(VIII[0])):
+    C1x.append(VIII[0][i]), C1y.append(VIII[1][i]), C1z.append(VIII[2][i]), C2x.append(VIII[3][i]), C2y.append(VIII[4][i])
+    C2z.append(VIII[5][i])
+
 # Find distance between carbon 1 and carbon 2 for all pairs
 
 dist = np.zeros((len(C1x), len(C2x)))
@@ -90,14 +177,14 @@ min_dist = np.zeros((len(C1x), 1))
 min_index = np.zeros((len(C1x), 1))  # index of minimum value of distances for each monomer-monomer measurement
 for i in range(0, len(C1x)):
     min_dist[i, 0] = min(dist[:, i])
-    min_index[i, 0] = np.argmin(dist[:, i])  # index corresponds to the monomer with which the minimum C1-C2 distance is achieved
+    min_index[i, 0] = np.argmin(dist[:, i]) % tot_atoms  # index corresponds to the monomer with which the minimum C1-C2 distance is achieved
 
 # Now see which of these distances meet the cutoff criteria
 
 change_dist = []  # distances associated with atoms which need to be changed
 change_index1 = []  # index of C1 from min_dist which needs to be changed
 change_index2 = []  # index of C2 from dist which needs to be changed (index already contained in min_index but will be
-                    # truncated here
+                    # truncated here)
 
 count = 0
 for i in range(0, len(C1x)):
@@ -107,33 +194,47 @@ for i in range(0, len(C1x)):
         change_index2.append(int(min_index[i, 0]))
         count += 1
 
+# Now remove duplicates while preserving order
+
+def uniq(input):
+  output = []
+  for x in input:
+    if x not in output:
+      output.append(x)
+  return output
+
+change_index1 = uniq(change_index1)
+change_index2 = uniq(change_index2)
+
+print len(change_index1)
+print len(change_index2)
 # Now that everything has an index that needs to be changed, we must interpret those indices
 
 # C19 is the 26th atom, C20 is 27th, C33 is 41st, C34 is 42nd, C47 is 56th, C48 is 57th, in each monomer
 
 # We also need to know which index refers to which monomer and tail -- applies equally for C1 and C2
 # Every third index starts a new monomer. Each index in between is a tail (inclusive)
-
-tail1 = np.arange(0, len(C1x) + 1, 3)  # indices of carbons
-tail2 = np.arange(1, len(C1x) + 1, 3)
-tail3 = np.arange(2, len(C1x) + 1, 3)
-
-C1_no = []
-C2_no = []
-for i in range(0, count):
-    if change_index1[i] in tail1:  # This is C1 therefore if this is true, then the atom is C20 (atom no 27)
-        C1_no.append((change_index1[i]/3)*(atoms - 1) + 27)
-    if change_index1[i] in tail2:  # This is C1 therefore if this is true, then the atom is C34 (atom no 42)
-        C1_no.append((change_index1[i]/3)*(atoms - 1) + 42)  # division automatically round down
-    if change_index1[i] in tail3:  # This is C1 therefore if this is true, then the atom is C48 (atom no 57)
-        C1_no.append((change_index1[i]/3)*(atoms - 1) + 57)  # division automatically round down
-    if change_index2[i] in tail1:  # This is C2 therefore if this is true, then the atom is C19 (atom no 26)
-        C2_no.append((change_index2[i]/3)*(atoms - 1) + 26)
-    if change_index2[i] in tail2:  # This is C2 therefore if this is true, then the atom is C33 (atom no 41)
-        C2_no.append((change_index2[i]/3)*(atoms - 1) + 41)  # division automatically round down
-    if change_index2[i] in tail3:  # This is C2 therefore if this is true, then the atom is C47 (atom no 56)
-        C2_no.append((change_index2[i]/3)*(atoms - 1) + 56)  # division automatically round down
-
-print C1_no, C2_no
-print change_dist
-print max(dist[0, :])
+#
+# tail1 = np.arange(0, len(C1x) + 1, 3)  # indices of carbons
+# tail2 = np.arange(1, len(C1x) + 1, 3)
+# tail3 = np.arange(2, len(C1x) + 1, 3)
+#
+# C1_no = []
+# C2_no = []
+# for i in range(0, count):
+#     if change_index1[i] in tail1:  # This is C1 therefore if this is true, then the atom is C20 (atom no 27)
+#         C1_no.append((change_index1[i]/3)*(atoms - 1) + 27)
+#     if change_index1[i] in tail2:  # This is C1 therefore if this is true, then the atom is C34 (atom no 42)
+#         C1_no.append((change_index1[i]/3)*(atoms - 1) + 42)  # division automatically round down
+#     if change_index1[i] in tail3:  # This is C1 therefore if this is true, then the atom is C48 (atom no 57)
+#         C1_no.append((change_index1[i]/3)*(atoms - 1) + 57)  # division automatically round down
+#     if change_index2[i] in tail1:  # This is C2 therefore if this is true, then the atom is C19 (atom no 26)
+#         C2_no.append((change_index2[i]/3)*(atoms - 1) + 26)
+#     if change_index2[i] in tail2:  # This is C2 therefore if this is true, then the atom is C33 (atom no 41)
+#         C2_no.append((change_index2[i]/3)*(atoms - 1) + 41)  # division automatically round down
+#     if change_index2[i] in tail3:  # This is C2 therefore if this is true, then the atom is C47 (atom no 56)
+#         C2_no.append((change_index2[i]/3)*(atoms - 1) + 56)  # division automatically round down
+#
+# print C1_no, C2_no
+# print change_dist
+# print max(dist[0, :])
