@@ -22,7 +22,7 @@ parser.add_argument('-S', '--NSTEPS_EM', default = 50000, help = 'Maximum number
 parser.add_argument('-c', '--CUTOFF_EM', default = 'verlet', help = 'Cutoff algorithm for energy minimzation')
 parser.add_argument('-t', '--NSTLIST', default = 40, help = 'Neighbor search list')
 parser.add_argument('-f', '--FRAMES', default = 50, help = 'Number of Frames')
-parser.add_argument('-m', '--monomer', default = 'LLC', help = 'Monomer which structure is built with')
+parser.add_argument('-m', '--monomer', default = 'HII', help = 'Monomer which structure is built with')
 parser.add_argument('-s', '--solvated', default = 'off', help = 'Will create a .mdp file for solvated system if this is set to "on"')
 parser.add_argument('-V', '--SOLV_LENGTH', default = 1, help = 'Length of simulation of solvated system')
 parser.add_argument('-o', '--NO_MONOMERS', default = 6, help = 'Number of monomers per layer')
@@ -36,9 +36,9 @@ location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__))
 
 monomer = args.monomer
 
-if monomer == 'LLC':
-    grps = ['LLC', 'NA']
-    grps_solv = ['LLC', 'NA', 'SOL']
+if monomer == 'HII':
+    grps = ['HII', 'NA']
+    grps_solv = ['HII', 'NA', 'SOL']
     no_ions = 1  # number of ions per monomer
     ff = '#include "amber99.ff/forcefield.itp"'
     ion_top = '#include "amber99.ff/ions.itp"'
@@ -127,12 +127,12 @@ if args.solvated == 'on':
 
 # Write topologies
 
-monomers = args.LAYERS*args.NO_MONOMERS*args.NOPORES
+monomers = int(args.LAYERS)*int(args.NO_MONOMERS)*int(args.NOPORES)
 tot_ions = no_ions*monomers
 
 f4 = open('NaPore.top', 'w')
-f4.writelines([';Forcefield\n', ff +'\n','\n', ';Ion Topology\n', ion_top + '\n', '\n', ';Monomer Topology\n',
-               mon_top + '\n', '\n', '[ system ]\n', '%s' %args.title + '\n', '\n', '[ molecules ]\n',
+f4.writelines([';Forcefield\n', ff +'\n','\n', ';Monomer Topology\n',  mon_top + '\n', '\n', ';Ion Topology\n',
+               ion_top + '\n', '\n', '[ system ]\n', '%s' %args.title + '\n', '\n', '[ molecules ]\n',
                '; Compound         nmols' + '\n', '%s                 %s' %(args.monomer, monomers) + '\n',
                '%s                  %s' %(ion, tot_ions) + '\n'])
 

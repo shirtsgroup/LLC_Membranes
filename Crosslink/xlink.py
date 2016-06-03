@@ -83,7 +83,7 @@ for i in range(0, len(C1x)):
         if i != k:  # make sure that C1 and C2 that are a part of the same monomer do not factor into this calculation
             dist[k, i] = math.sqrt((C1x[i] - C2x[k])**2 + (C1y[i] - C2y[k])**2 + (C1z[i] - C2z[k])**2)
         else:
-            dist[k, i] = 1000  # artificially high number to keep it from interfering
+            dist[k, i] = 4  # artificially high number to keep it from interfering
 
 # Find the distance of the closest carbon and its index
 min_dist = np.zeros((len(C1x), 1))
@@ -136,3 +136,4 @@ for i in range(0, count):
 
 print C1_no, C2_no
 print change_dist
+print max(dist[0, :])

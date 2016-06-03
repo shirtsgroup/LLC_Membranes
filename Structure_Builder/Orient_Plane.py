@@ -26,7 +26,7 @@ print 'This is a .gro file'
 
 def functiontype(type):
     if type == 'LLC':
-        f = open("%s/../Structure-Files/LLC_Monomer_Configurations/%s" % (location, args.input), "r")
+        f = open("%s/../Structure-Files/HII_Monomer_Configurations/%s" % (location, args.input), "r")
         no_ions = 1
         t = 'LLC'
         return f, t, no_ions

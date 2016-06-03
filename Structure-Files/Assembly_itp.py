@@ -161,9 +161,11 @@ for i in range(dihedrals_imp_count, len(a)):  # This is the last section in the 
     ndimp += 1
 
 for i in range(0, no_mon):
-    for k in range(0, ndimp):
+    for k in range(0, ndimp - 1):
         print '{:6d}{:7d}{:7d}{:7d}{:}'.format(i*nr + int(a[k + dihedrals_imp_index + 3][0:6]),
                                                i*nr + int(a[k + dihedrals_imp_index + 3][6:14]),
                                                i*nr + int(a[k + dihedrals_imp_index + 3][14:22]),
                                                i*nr + int(a[k + dihedrals_imp_index + 3][22:30]),
                                                a[k + dihedrals_imp_index + 3][30:len(a[k + dihedrals_imp_index + 3])]),
+
+
