@@ -6,8 +6,9 @@ import os
 import argparse
 import numpy as np
 import math
+import time
 import matplotlib.pyplot as plt
-
+start = time.time()
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in
 
 parser = argparse.ArgumentParser(description = 'Crosslink LLC structure')
@@ -18,7 +19,8 @@ parser.add_argument('-t', '--type', default='LLC', help='Type of monomer')
 parser.add_argument('-l', '--layers', default=20, help='Number of layers')
 parser.add_argument('-p', '--pores', default=4, help='Number of pores')
 parser.add_argument('-n', '--no_monomers', default=6, help='Number of monomers per layer')
-parser.add_argument('-c', '--cutoff', default=0.313, help='Anything below this value will be cross linked')
+parser.add_argument('-c', '--cutoff', default=5, help='Cutoff distance for cross-linking. Bottom x % of the distribution'
+                                                      'of distances will be cross-linked ')
 
 args = parser.parse_args()
 
@@ -74,6 +76,8 @@ for line in range(0, lines):  # 15 is where the field containing atom identities
         C2x.append(float(a[line][20:28]))
         C2y.append(float(a[line][28:36]))
         C2z.append(float(a[line][36:44]))
+
+no_carbons = len(C1x)  # number of carbon atoms that may be involved in cross-linking
 
 # Time to handle periodic boundary conditions
 
@@ -160,19 +164,38 @@ for i in range(0, len(VII[0])):
 for i in range(0, len(VIII[0])):
     C1x.append(VIII[0][i]), C1y.append(VIII[1][i]), C1z.append(VIII[2][i]), C2x.append(VIII[3][i]), C2y.append(VIII[4][i])
     C2z.append(VIII[5][i])
+stop1 = time.time()
+print 'PBCs set up: %s seconds' %(stop1 - start)
 
 # Find distance between carbon 1 and carbon 2 for all pairs
 
 dist = np.zeros((len(C1x), len(C2x)))
 
+# Create a matrix of 1's and 0's. Entries that are 1's should not be counted in the distance calculations because they
+# represent distances that are between carbons and the same monomer
+
+a = np.ones((1, 12960))[0]
+b = np.ones((1, 11520))[0]
+c = np.ones((1, 10080))[0]
+d = np.ones((1, 8640))[0]
+e = np.ones((1, 7200))[0]
+f = np.ones((1, 5760))[0]
+g = np.ones((1, 4320))[0]
+h = np.ones((1, 2880))[0]
+i = np.ones((1, 1440))[0]
+
+exclude = np.diag(a, 0) + np.diag(b, -1440) + np.diag(b, 1440) + np.diag(c, 2880) + np.diag(c, -2880) + np.diag(d, 4320) + \
+    np.diag(d, -4320) + np.diag(e, 5760) + np.diag(e, -5760) + np.diag(f, 7200) + np.diag(f, -7200) + \
+    np.diag(g, 8640) + np.diag(g, -8640) + np.diag(h, 10080) + np.diag(h, -10080) + np.diag(i, 11520) + np.diag(i, -11520)
+
 for i in range(0, len(C1x)):
     for k in range(0, len(C2x)):
-        if i != k:  # make sure that C1 and C2 that are a part of the same monomer do not factor into this calculation
-            dist[k, i] = math.sqrt((C1x[i] - C2x[k])**2 + (C1y[i] - C2y[k])**2 + (C1z[i] - C2z[k])**2)
-        else:
+        if exclude[k, i] == 1:  # make sure that C1 and C2 that are a part of the same monomer do not factor into this calculation
             dist[k, i] = 1000  # artificially high number to keep it from interfering
-            print 'boop'
-
+        else:
+            dist[k, i] = math.sqrt((C1x[i] - C2x[k])**2 + (C1y[i] - C2y[k])**2 + (C1z[i] - C2z[k])**2)
+stop2 = time.time()
+print 'Distances Calculated: %s seconds' %(stop2 - stop1)
 # Find the distance of the closest carbon and its index
 min_dist = np.zeros((len(C1x), 1))
 min_index = np.zeros((len(C1x), 1))  # index of minimum value of distances for each monomer-monomer measurement
@@ -183,32 +206,29 @@ for i in range(0, len(C1x)):
 
 # Now see which of these distances meet the cutoff criteria
 
-change_dist = []  # distances associated with atoms which need to be changed
 change_index1 = []  # index of C1 from min_dist which needs to be changed
 change_index2 = []  # index of C2 from dist which needs to be changed (index already contained in min_index but will be
                     # truncated here)
 
-count = 0
+# find the cutoff distance for cross-linking
+
+min_list = min_dist.tolist()
+for i in range(0, int((float(args.cutoff)/100)*len(C1x))):  # looks at a percentage of the total values based on user input of cutoff
+    m = min(min_list)  # finds minimum of min_list
+    min_list.remove(m)  # removes that value from min_list
+
+print len(min_list)
+cutoff = min(min_list)  # The minimum value left after the modification of min_list is the cutoff value
+print cutoff
 for i in range(0, len(C1x)):
-    if min_dist[i, 0] <= args.cutoff:
-        change_dist.append(min_dist[i, 0])
-        change_index1.append(i % (len(C1x)/9))
-        change_index2.append(int(min_index[i, 0]))
-        count += 1
+    if min_dist[i, 0] < cutoff:  # find distances which meet the cutoff criteria
+        change_index1.append(i % (len(C1x)/9))  # holds the index of the atom associated with the met criteria for primary carbons (C20, C34, C48)
+        change_index2.append(int(min_index[i, 0]))  # Same as above but for the secondary carbons
 
 # Now remove duplicates while preserving order (if there are any)
 
-
-def uniq(input):
-  output = []
-  for x in input:
-    if x not in output:
-      output.append(x)
-  return output
-
-change_index1_2 = uniq(change_index1)
-change_index2_3 = uniq(change_index2)
-
+# change_index1 = uniq(change_index1)
+# change_index2 = uniq(change_index2)
 
 # Now that everything has an index that needs to be changed, we must interpret those indices
 
@@ -223,7 +243,7 @@ tail3 = np.arange(2, len(C1x) + 1, 3)
 
 C1_no = []
 C2_no = []
-for i in range(0, count):
+for i in range(0, len(change_index1)):
     if change_index1[i] in tail1:  # This is C1 therefore if this is true, then the atom is C20 (atom no 27)
         C1_no.append((change_index1[i]/3)*atoms + 27)
     if change_index1[i] in tail2:  # This is C1 therefore if this is true, then the atom is C34 (atom no 42)
@@ -236,8 +256,35 @@ for i in range(0, count):
         C2_no.append((change_index2[i]/3)*atoms + 41)  # division automatically round down
     if change_index2[i] in tail3:  # This is C2 therefore if this is true, then the atom is C47 (atom no 56)
         C2_no.append((change_index2[i]/3)*atoms + 56)  # division automatically round down
+end = time.time()
+print 'Total time elapsed: %s seconds' %(end - start)
 
-print C1_no
-print C2_no
-# print change_dist
-# print max(dist[0, :])
+# reduce lists down to unique atom pairs
+
+
+def uniq(input1, input2):
+    output1 = []
+    output2 = []
+    for i in range(0, len(input1)):
+        if input1[i] not in output1 and input2[i] not in output2:
+            output1.append(input1[i])
+            output2.append(input2[i])
+    return output1, output2
+
+c1, c2 = uniq(C1_no, C2_no)
+print len(c1)
+print len(c2)
+
+dist_list = []
+for i in range(0, len(c1)):
+    C1 = int(c1[i]) + 1
+    C2 = int(c2[i]) + 1
+    print C1
+    print C2
+    dist_list.append(math.sqrt((float(a[C1][20:28]) - float(a[C2][20:28]))**2 +
+                     (float(a[C1][28:36]) - float(a[C2][28:36]))**2 +
+                     (float(a[C1][36:44]) - float(a[C2][36:44]))**2))
+
+for i in range(0, len(dist_list)):
+    if dist_list[i] > 0.4:
+        print '%s), %s, %s, %s' %(i, c1[i], c2[i], dist_list[i])
