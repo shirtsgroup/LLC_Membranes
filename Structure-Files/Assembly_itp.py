@@ -160,6 +160,7 @@ for i in range(dihedrals_imp_count, len(a)):  # This is the last section in the 
     dihedrals_imp_count += 1
     ndimp += 1
 
+# Can't have any space at the bottom of the file for this loop to work
 for i in range(0, no_mon):
     for k in range(0, ndimp - 1):
         print '{:6d}{:7d}{:7d}{:7d}{:}'.format(i*nr + int(a[k + dihedrals_imp_index + 3][0:6]),

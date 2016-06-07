@@ -1,0 +1,9 @@
+;GENERALIZED AMBER FORCE FIELD
+
+#define _FF_GAFF
+
+; No defaults line included since GAFF is often combined with other force fields.
+; Two defaults lines will give errors
+
+#include "ffnonbonded.itp"
+#include "ffbonded.itp"
