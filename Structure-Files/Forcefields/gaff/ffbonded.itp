@@ -14,6 +14,7 @@
   c2  ce        1     0.1339   469030 ; bond between an sp2 aliphatic C and an inner sp2 C in a conj chain system
   ce  ha        1     0.1089   285770 ; bond between an inner sp2 C in a conj chain system and an H on an aromatic C
   c2  ha        1     0.1087   288110 ; bond between an sp2 aliphatic C and an aromatic C
+  c2  hc        1     0.1087   288110 ; bond between an sp2 aliphatic C and an aliphatic H
 
 [ angletypes ]
 ;ai aj  ak   func    theta       cth
@@ -42,6 +43,9 @@ c2  ce  ha     1    121.100    414.720 ; angle between an sp2 aliphatic C, an in
 h1  c3  h1     1    109.550    327.860 ; angle between two H's on aliphatic C's with 1 EW group and an sp3 C
 hc  c3  hc     1    108.350    329.950 ; angle between two H's on aliphatic C's and and sp3 C
 ha  c2  ha     1    117.650    318.150 ; angle between two H's on aromatic C's and and sp2 aliphatic C
+hc  c3  c      1    109.680    394.970 ; angle between an aliphatic H, an sp3 aliphatic C and a C=O
+c3  c   o      1    123.110    569.280 ; angle between a C=O group and an adjacent sp3 C  
+c   c3  c3     1    110.530    533.790 ; angle between a carbonyl C and two sp3 C's
 
 [ dihedraltypes ]
 ;i   j   k   l     func     C0        C1          C2        C3         C4        C5
