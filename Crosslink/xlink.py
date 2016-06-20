@@ -3,12 +3,14 @@
 #!/usr/bin/python
 
 import os
+import sys
 import argparse
 import numpy as np
 import math
 import time
 import matplotlib.pyplot as plt
 from scipy.sparse import csc_matrix
+import genpairs
 
 start = time.time()
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in
@@ -312,7 +314,6 @@ while b[bond_count] != '\n':
     bond_count += 1  # increments while loop
     nb += 1  # counting number of lines in 'bonds' section
 
-
 # [ angles ]
 
 angles_index = 0  # find index where [ angles ] section begins
@@ -333,7 +334,9 @@ while b[dihedrals_p_index].count('[ dihedrals ] ; propers') == 0:
 
 ndp = 0  # number of lines in the 'dihedrals ; proper' section
 dihedrals_p_count = dihedrals_p_index + 2  # keep track of index of a
+dihedrals_prev = []
 while b[dihedrals_p_count] != '\n':
+    dihedrals_prev.append([int(b[dihedrals_p_count][0:6]), int(b[dihedrals_p_count][6:13]), int(b[dihedrals_p_count][13:20]), int(b[dihedrals_p_count][20:27])])
     dihedrals_p_count += 1
     ndp += 1
 
@@ -364,7 +367,6 @@ for i in range(0, len(c1)):
     b.insert(bond_count, '{:6d}{:7d}{:4d}'.format(c1[i], c2[i], 1))
     bond_count += 1
 
-
 # First find where the [ pairs ] section is located
 
 pairs_index = 0  # find index where [ pairs ] section begins
@@ -373,198 +375,54 @@ while b[pairs_index].count('[ pairs ]') == 0:
 
 npair = 0  # number of lines in the 'pairs' section
 pairs_count = pairs_index + 2  # keep track of index of a
+pairs_list_prev = []
 while b[pairs_count] != '\n':
+    pairs_list_prev.append([int(b[pairs_count][0:6]), int(b[pairs_count][6:13])])  # record pairs that already exist
     pairs_count += 1
     npair += 1
+
 start = time.time()
-# pairs = []
-# for i in range(bonds_index + 2, bond_count):  # look at each bond in [ bonds ] section
-#     for k in range(1, nr + 1):  # look for all atoms
-#         neighbor3 = []  # 1-3 neighbors
-#         neighbor4 = []  # 1-4 neighbors
-#         if int(b[i][0:6]) == k:
-#             neighbor1 = int(b[i][6:13])  # This the atom's immediate neighbor which it is bonded to
-#             for j in range(bonds_index + 2, bond_count):
-#                 if int(b[j][0:6]) == neighbor1:
-#                     if int(b[j][6:13]) != k:
-#                         neighbor3.append(int(b[j][6:13]))
-#                 elif int(b[j][6:13]) == neighbor1:
-#                     if int(b[j][0:6]) != k:
-#                         neighbor3.append(int(b[j][0:6]))
-#             for h in neighbor3:
-#                 for l in range(bonds_index + 2, bond_count):
-#                     if int(b[l][0:6]) == h:
-#                         if int(b[l][6:13]) != neighbor1:
-#                             neighbor4.append(int(b[l][6:13]))
-#                     elif int(b[l][6:13]) == h:
-#                         if int(b[l][0:6]) != neighbor1:
-#                             neighbor4.append(int(b[l][0:6]))
-#         if int(b[i][6:13]) == k:
-#             neighbor1 = int(b[i][0:6])  # This the atom's immediate neighbor which it is bonded to
-#             for j in range(bonds_index + 2, bond_count):
-#                 if int(b[j][0:6]) == neighbor1:
-#                     if int(b[j][6:13]) != k:
-#                         neighbor3.append(int(b[j][6:13]))
-#                 elif int(b[j][6:13]) == neighbor1:
-#                     if int(b[j][0:6]) != k:
-#                         neighbor3.append(int(b[j][0:6]))
-#             for h in neighbor3:
-#                 for l in range(bonds_index + 2, bond_count):
-#                     if int(b[l][0:6]) == h:
-#                         if int(b[l][6:13]) != neighbor1:
-#                             neighbor4.append(int(b[l][6:13]))
-#                     elif int(b[l][6:13]) == h:
-#                         if int(b[l][0:6]) != neighbor1:
-#                             neighbor4.append(int(b[l][0:6]))
-#         count = 0
-#         for m in neighbor4:
-#             pairs.append('{:6d}{:7d}{:7d}'.format(k, neighbor4[count], 1))
-#             count += 1
-list1 = []  # list to hold atom numbers of 1st entry in each row of [ bonds ] section
-list2 = []  # list to hold atom numbers of 2nd entry in each row of [ bonds ] section
-for i in range(bonds_index + 2, bond_count):  # extract atom numbers in [ bonds ] section in order of appearance
-    list1.append(int(b[i][0:6]))  # converts them to integers to save time later
-    list2.append(int(b[i][6:13]))
 
-end_listgen = time.time()
-print 'Lists generated in %s seconds' % (end_listgen - start)
+# See genpairs.pyx to see what is going on in the following lines:
 
-def gen_pairs(list1, list2):
-    pairs = []
-    for i in range(0, len(list1)):  # look at all bonds
-        neighbor3 = []  # redefine lists for each loop since each loops looks at a different bond
-        neighbor4 = []
-        for j in range(0, len(list1)):  # compare to all other bonds
-            if list1[j] == list2[i]:  # look for 1-3 pairs by comparing first entry of each row of [ pairs ] section
-                neighbor3.append(list2[j])
-            elif list2[j] == list2[i]:  # look for 1-3 pairs again
-                if list1[j] != list1[i]:
-                    neighbor3.append(list1[j])
-        for h in neighbor3:
-            for l in range(0, len(list1)):
-                if list1[l] == h:
-                    if list2[l] != list2[i]:
-                        neighbor4.append(list2[l])
-                elif list2[l] == h:
-                    if list1[l] != list2[i]:
-                        neighbor4.append(list1[l])
+# Generate a list of all bonds. List1 has the first atom involved. List 2 has the second atom involved:
+list1, list2 = genpairs.read_lists(b, bonds_index + 2, bond_count)  # only look at new pairs generated
 
-        count = 0
-        for m in neighbor4:
-            pairs.append('{:6d}{:7d}{:7d}'.format(list1[i], neighbor4[count], 1))
-            count += 1
+# Generate a pairs list and a dihedrals list that includes those formed by the newly created bonds
+# pairs1 has the first atom involved in the 1-4 pair. pairs2 holds the other atom involved
+pairs1, pairs2, dihedrals = genpairs.gen_pairs_list(list1, list2, c1, c2, nb)
 
-        neighbor3 = []
-        neighbor4 = []
-        for j in range(0, len(list1)):
-            if list2[j] == list1[i]:
-                neighbor3.append(list1[j])
-            elif list1[j] == list1[i]:
-                if list2[j] != list2[i]:
-                    neighbor3.append(list2[j])
-        for h in neighbor3:
-            for l in range(0, len(list1)):
-                if list1[l] == h:
-                    if list2[l] != list1[i]:
-                        neighbor4.append(list2[l])
-                elif list2[l] == h:
-                    if list1[l] != list1[i]:
-                        neighbor4.append(list1[l])
+# Eliminate duplicates in the entire pairs list
+unique_pairs = genpairs.uniq_pair(pairs1, pairs2, pairs_list_prev)
 
-        count = 0
-        for m in neighbor4:
-            pairs.append('{:6d}{:7d}{:7d}'.format(list2[i], neighbor4[count], 1))
-            count += 1
-    return pairs
+# Eliminate duplicates in the entire dihedrals list
+unique_dihedrals = genpairs.uniq_dihedral(dihedrals, dihedrals_prev)
 
-# max1 = max(list1)
-# max2 = max(list2)
-# max_overall = max(max1, max2)
-#
-# # Make adjacency matrix
-#
-# A = np.zeros((max_overall, max_overall))
-#
-# for i in range(0, len(list1)):
-#     A[list1[i] - 1, list2[i] - 1] = 1
-#     A[list2[i] - 1, list1[i] - 1] = 1
-#
-# def gen_pairs(list1, list2):
-#     max1 = max(list1)
-#     max2 = max(list2)
-#     max_overall = max(max1, max2)
-#
-#     # Make adjacency matrix
-#
-#     A = csc_matrix((max_overall, max_overall), dtype=np.int8).toarray()
-#
-#     for i in range(0, len(list1)):
-#         A[list1[i] - 1, list2[i] - 1] = 1
-#         A[list2[i] - 1, list1[i] - 1] = 1
-#
-#     A2 = np.dot(A, A)
-#     A3 = np.dot(A2, A)
-#     pairs = []
-#
-#     for i in range(0, max_overall):
-#         for k in range(0, max_overall):
-#             if A[i, k] == 0:
-#                 if A2[i, k] == 0:
-#                     if A3[i, k] != 0:
-#                         pairs.append('{:6d}{:7d}{:7d}'.format(i + 1, k + 1, 1))
-#         print i
-#     return pairs
-#
-pairs = gen_pairs(list1, list2)
+end = time.time()
 
-end1 = time.time()
-print 'Pairs search completed in %s seconds' %(end1 - start)
-# eliminate duplicates
-
-def uniq_pair(pairs):
-    output = []
-    for i in range(0, len(pairs)):
-        c = pairs[i]  # the order it is read from the pairs list
-        d = (len(pairs[i][6:13]) - len(str.strip(pairs[i][6:13])) - 1)*' ' + str.strip(pairs[i][6:13]) + ' ' + \
-            pairs[i][0:6] + pairs[i][13:len(pairs[i])]  # switching the order of the pairs for comparison
-        if c not in output:
-            if d not in output:
-                output.append(pairs[i])
-    return output
-
-unique_pairs = uniq_pair(pairs)
-end2 = time.time()
-print 'Duplicates eliminated in %s seconds' %(end2 - end1)
-print 'Total Time elapsed: %s seconds' %(end2 - start)
-
-# Now print them in order (Time-consuming and unnecessary at this point)
-
-# ordered_unique_pairs = []
-# for i in range(1, nr + 1):
-#     no_same_atom = []
-#     for k in range(0, len(unique_pairs)):
-#         if int(unique_pairs[k][0:6]) == i:
-#             no_same_atom.append(unique_pairs[k])
-#     for l in range(1, nr + 1):
-#         for j in range(0, len(no_same_atom)):
-#             if int(no_same_atom[j][6:13]) == l:
-#                 ordered_unique_pairs.append(no_same_atom[j])
-# end3 = time.time()
-# print 'Pairs ordered in %s seconds' %(end3 - end2)
-# print 'Total time elapsed: %s seconds' %(end3 - start)
-# print ordered_unique_pairs
+print 'New Pairs and Dihedrals generated in %s seconds' %(end - start)
 
 # eliminate the old pairs list
 
 del b[pairs_index + 2: pairs_count]
 
-# Add new pairs list
+# Insert new pairs list
 
 count = pairs_index + 2
 for i in range(0, len(unique_pairs)):
     b.insert(count, unique_pairs[i])
     count += 1
 
-# print b[pairs_index:pairs_index + 2]
-# print b[count - 3: count]
-print unique_pairs
+print b[pairs_index:pairs_index + 2]
+print b[count - 3: count]
+
+# eliminate the old dihedrals list
+
+del b[dihedrals_p_index + 2: dihedrals_p_count]
+
+# Insert new dihedrals list
+
+count = dihedrals_p_index + 2
+for i in range(0, len(unique_dihedrals)):
+    b.insert(count, unique_dihedrals[i])
+    count += 1
