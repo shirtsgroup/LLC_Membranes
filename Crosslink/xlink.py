@@ -366,44 +366,44 @@ for i in range(0, len(c2)):
         H.append(c2[i] + 61)
         H.append(c1[i] + 60)
         H.append(c1[i] + 61)
-        H_new1.append(c1[i] + 112)
+        H_new1.append(c2[i] + 113)
     if c2[i] in tail2:  # i.e. C33
         H.append(c2[i] + 69)
         H.append(c2[i] + 70)
         H.append(c2[i] + 71)
         H.append(c1[i] + 70)
         H.append(c1[i] + 71)
-        H_new1.append(c1[i] + 99)
+        H_new1.append(c2[i] + 100)
     if c2[i] in tail3:  # i.e. C47
         H.append(c2[i] + 79)
         H.append(c2[i] + 80)
         H.append(c2[i] + 81)
         H.append(c1[i] + 80)
         H.append(c1[i] + 81)
-        H_new1.append(c1[i] + 86)
+        H_new1.append(c2[i] + 87)
 
 # need to do the same for the termination carbons except we need to include the dummy hydrogen and don't have to worry
 # about the term_c1 list since nothing is happening on that end anymore
 H_new2 = []  # keep these separate for indexing purposes
 for i in range(0, len(term_c2)):
     if term_c2[i] in tail1:  # i.e. C19
-        H.append(c2[i] + 59)
-        H.append(c2[i] + 60)
-        H.append(c2[i] + 61)
-        H_new2.append(c2[i] + 112)
-        H_new2.append(c1[i] + 112)
+        H.append(term_c2[i] + 59)
+        H.append(term_c2[i] + 60)
+        H.append(term_c2[i] + 61)
+        H_new2.append(term_c2[i] + 112)
+        H_new2.append(term_c2[i] + 113)
     if term_c2[i] in tail2:  # i.e. C33
-        H.append(c2[i] + 69)
-        H.append(c2[i] + 70)
-        H.append(c2[i] + 71)
-        H_new2.append(c2[i] + 99)
-        H_new2.append(c1[i] + 99)
+        H.append(term_c2[i] + 69)
+        H.append(term_c2[i] + 70)
+        H.append(term_c2[i] + 71)
+        H_new2.append(term_c2[i] + 99)
+        H_new2.append(term_c2[i] + 100)
     if term_c2[i] in tail3:  # i.e. C47
-        H.append(c2[i] + 79)
-        H.append(c2[i] + 80)
-        H.append(c2[i] + 81)
-        H_new2.append(c2[i] + 86)
-        H_new2.append(c1[i] + 86)
+        H.append(term_c2[i] + 79)
+        H.append(term_c2[i] + 80)
+        H.append(term_c2[i] + 81)
+        H_new2.append(term_c2[i] + 86)
+        H_new2.append(term_c2[i] + 87)
 
 # find the indices of all fields that need to be modified
 
@@ -473,11 +473,19 @@ for i in range(dihedrals_imp_count, len(b)):  # This is the last section in the 
 
 # Replace atom types of bonding carbons with sp3 hybridized carbons
 
+# To be safe, we also need to change the atom type of the non-bonding c1. If it is initiated, then it goes from c2 to c3
+other_c1 = []
+for i in range(0, len(c2)):
+    other_c1.append(c2[i] + 1)
+
+# The other c2 keeps its hybridization
+
+# Now make all of the changes
 for i in range(atoms_index + 2, atoms_count):
     atom_no = str.strip(b[i][22:28])
-    if int(b[i][0:5]) in c1:
+    if int(b[i][0:5]) in c1 or other_c1:
         b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2])]
-    elif int(b[i][0:5]) in c2:
+    elif int(b[i][0:5]) in c2 or term_c2:
         b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2])]
     elif int(b[i][0:5]) in H or int(b[i][0:5]) in H_new1 or int(b[i][0:5]) in H_new2:
         b[i] = b[i][0:5] + b[i][5:10].replace('ha', 'hc') + b[i][10:len(b[atoms_index + 2])]
@@ -488,17 +496,20 @@ for i in range(0, len(c1)):
     b.insert(bond_count, '{:6d}{:7d}{:4d}'.format(c1[i], c2[i], 1) + "\n")
     bond_count += 1
 
-# new H bonds formed during propagation
+# Add new H bonds formed during propagation (dummy H's becoming real)
 for i in range(0, len(H_new1)):
     b.insert(bond_count, '{:6d}{:7d}{:4d}'.format(c1[i], H_new1[i], 1) + "\n")
     bond_count += 1
 
-# new H bonds formed during termination
-for i in range(1, len(H_new2) + 1):  # start at 1 to avoid division by zero errors
-    if i % 2 == 1:  # i.e. an odd number
-        b.insert(bond_count, '{:6d}{:7d}{:4d}'.format(c2[i], H_new2[i], 1) + "\n")
-    else:
-        b.insert(bond_count, '{:6d}{:7d}{:4d}'.format(c1[i], H_new2[i], 1) + "\n")
+# new H bonds formed during termination (2 dummy H's becoming real)
+k = 0
+for i in range(1, len(H_new2) + 1):
+    b.insert(bond_count, '{:6d}{:7d}{:4d}'.format(term_c2[i], H_new2[k], 1) + "\n")
+    k += 1
+    bond_count += 1
+    b.insert(bond_count, '{:6d}{:7d}{:4d}'.format(term_c2[i] + 1, H_new2[k], 1) + "\n")
+    bond_count += 1
+    k += 1
 
 # First find where the [ pairs ] section is located
 
