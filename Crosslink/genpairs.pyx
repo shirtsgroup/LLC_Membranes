@@ -113,3 +113,12 @@ def uniq_dihedral(dihedrals, dihedrals_prev):
 			if b not in dihedrals_prev:
 				dihedrals_prev.append(dihedrals[i])
 	return dihedrals_prev
+
+def calc_dist(C1x, C2x, C1y, C2y, C1z, C2z, exclude, dist):
+	for i in range(0, len(C1x)):
+		for k in range(0, len(C2x)):
+			if exclude[k, i] == 1:  # make sure that C1 and C2 that are a part of the same monomer do not factor into this calculation
+				dist[k, i] = 1000  # artificially high number to keep it from interfering
+			else:
+				dist[k, i] = ((C1x[i] - C2x[k])**2 + (C1y[i] - C2y[k])**2 + (C1z[i] - C2z[k])**2)**(0.5)
+	return dist

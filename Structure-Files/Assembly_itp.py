@@ -15,13 +15,17 @@ parser.add_argument('-t', '--type', default='LLC', help = 'Type of monomer being
 parser.add_argument('-l', '--layers', default=20, help = 'Number of layers')
 parser.add_argument('-P', '--no_pores', default=4, help = 'Number of Pores')
 parser.add_argument('-o', '--no_monomers', default=6, help = 'Number of monomers per layer')
+parser.add_argument('-x', '--xlink', default='off', help = 'Whether this is going to be cross linked')
 
 args = parser.parse_args()
 
 no_mon = args.layers * args.no_pores * args.no_monomers  # How many monomer will be in this .itp file
 
 if args.type == 'LLC':
-    itp = 'HII_mon.itp'
+    if args.xlink == 'on':
+        itp = 'HII_mon_dummy.itp'
+    else:
+        itp = 'HII_mon.itp'
 elif args.type == 'BCC':
     itp = 'BCC_mon.itp'
 

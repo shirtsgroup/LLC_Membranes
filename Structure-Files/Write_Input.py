@@ -143,7 +143,7 @@ if args.xlink == 'off':
 else:
     import subprocess
     with open("Assembly.itp", "w+") as output:
-        subprocess.call(["python", "./../Structure-Files/Assembly_itp.py"], stdout=output);
+        subprocess.call(["python", "./../Structure-Files/Assembly_itp.py", "-x", "on"], stdout=output);
 
     f4 = open('NaPore.top', 'w')
     f4.writelines([';Forcefield\n', ff +'\n', gaff + '\n', '\n', ';Monomer Topology\n',  ass_top + '\n', '\n',

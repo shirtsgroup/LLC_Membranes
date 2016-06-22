@@ -14,7 +14,7 @@ parser.add_argument('-t', '--type', default = 'LLC', type = str, help = 'membran
 parser.add_argument('-i', '--input', default='monomer2.pdb', help = 'Path to input file')
 parser.add_argument('-l', '--layers', default=20, type=int, help = 'Number of Layers')
 parser.add_argument('-m', '--monomers', default=6, type=int, help = 'Monomers per layer')
-parser.add_argument('-r', '--radius', default=6, type=float, help = 'Initial Pore Radius')
+parser.add_argument('-r', '--radius', default=3, type=float, help = 'Initial Pore Radius')
 parser.add_argument('-p', '--p2p', default=40, type=float, help = 'Initial Pore to Pore Distance')
 parser.add_argument('-n', '--nopores', default=4, type=int, help = 'Number of Pores')
 parser.add_argument('-d', '--dbwl', default=10, type=float, help = 'Distance between layers')
