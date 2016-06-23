@@ -8,6 +8,7 @@ import numpy as np
 import math
 import time
 import genpairs
+import copy
 
 start = time.time()  # For informational purposes
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in
@@ -300,7 +301,8 @@ for i in range(array_length - no_ones, array_length):
 
 term_c1 = []
 term_c2 = []
-no_xlinks = len(c2)  # The length of c2 may change in the next loops so I am preserving it here
+no_xlinks = copy.deepcopy(len(c2))  # The length of c2 may change in the next loops so I am preserving it here
+
 for i in range(0, no_xlinks):
     term = np.random.choice(term_prob_array)
     if term == 1:
@@ -441,7 +443,9 @@ while b[angles_index].count('[ angles ]') == 0:
 
 na = 0  # number of lines in the 'angles' section
 angle_count = angles_index + 2  # keep track of index of a
+angles_prev = []
 while b[angle_count] != '\n':
+    angles_prev.append([int(b[angle_count][0:6]), int(b[angle_count][6:13]), int(b[angle_count][13:20])])
     angle_count += 1
     na += 1
 
@@ -481,14 +485,32 @@ for i in range(0, len(c2)):
 # The other c2 keeps its hybridization
 
 # Now make all of the changes
+count = 0
 for i in range(atoms_index + 2, atoms_count):
     atom_no = str.strip(b[i][22:28])
-    if int(b[i][0:5]) in c1 or other_c1:
+    if int(b[i][0:5]) in c1 or int(b[i][0:5]) in other_c1:
         b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2])]
-    elif int(b[i][0:5]) in c2 or term_c2:
+        count += 1
+    if int(b[i][0:5]) in c2 or int(b[i][0:5]) in term_c2:
         b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2])]
-    elif int(b[i][0:5]) in H or int(b[i][0:5]) in H_new1 or int(b[i][0:5]) in H_new2:
+        count += 1
+    if int(b[i][0:5]) in H or int(b[i][0:5]) in H_new1 or int(b[i][0:5]) in H_new2:
         b[i] = b[i][0:5] + b[i][5:10].replace('ha', 'hc') + b[i][10:len(b[atoms_index + 2])]
+        count += 1
+
+print atoms_count - (atoms_index + 2)
+print count
+print len(c1) + len(other_c1)
+print len(H) + len(H_new1) + len(H_new2)
+print len(c2) + len(term_c2)
+print ''
+print len(c1)
+print len(other_c1)
+print len(H)
+print len(H_new1)
+print len(H_new2)
+print len(c2)
+print len(term_c2)
 
 # Add bonds between cross-linking atoms
 
@@ -503,7 +525,7 @@ for i in range(0, len(H_new1)):
 
 # new H bonds formed during termination (2 dummy H's becoming real)
 k = 0
-for i in range(1, len(H_new2) + 1):
+for i in range(0, len(term_c2)):
     b.insert(bond_count, '{:6d}{:7d}{:4d}'.format(term_c2[i], H_new2[k], 1) + "\n")
     k += 1
     bond_count += 1
@@ -525,24 +547,35 @@ while b[pairs_count] != '\n':
     pairs_count += 1
     npair += 1
 
+# Now we need to generate dihedrals, angles and pairs lists. In the above code, all the atoms needed to complete the
+# list which already exists (stored in b) are there except the other carbon on the terminated tail. So lets add that:
+
+other_term_c1 = []
+for i in range(0, len(term_c2)):
+    other_term_c1.append(term_c2[i] + 1)
+
+# There. Now we have all the atoms we need. Let's make one list that holds all of these values:
+
+atoms_of_interest = other_term_c1 + other_c1 + term_c2 + c1 + c2 + H + H_new1 + H_new2
+
 # See genpairs.pyx to see what is going on in the following lines:
 
 # Generate a list of all bonds. List1 has the first atom involved. List 2 has the second atom involved:
-list1, list2 = genpairs.read_lists(b, bonds_index + 2, bond_count)  # only look at new pairs generated
+list, condensed_list = genpairs.read_lists(b, atoms_of_interest, bonds_index + 2, bond_count)  # only look at new pairs generated
 
-# Generate a pairs list and a dihedrals list that includes those formed by the newly created bonds
-# pairs1 has the first atom involved in the 1-4 pair. pairs2 holds the other atom involved
-pairs1, pairs2, dihedrals = genpairs.gen_pairs_list(list1, list2, c1, c2, nb)
-# pairs3, pairs4, dihedrals = genpairs.gen_pairs_list(list1, list2, )
+# Generate a pairs list, a dihedrals list, and an angles list that includes those formed by the newly created bonds
+
+pairs_list, dihedrals_list, angles_list = genpairs.gen_pairs_list(list, condensed_list)
 
 # Eliminate duplicates in the entire pairs list
-unique_pairs = genpairs.uniq_pair(pairs1, pairs2, pairs_list_prev)
+unique_pairs = genpairs.uniq_pair(pairs_list, pairs_list_prev)
+unique_dihedrals = genpairs.uniq_dihedral(dihedrals_list, dihedrals_prev)
+unique_angles = genpairs.uniq_angles(angles_list, angles_prev)
 
-# Eliminate duplicates in the entire dihedrals list
-unique_dihedrals = genpairs.uniq_dihedral(dihedrals, dihedrals_prev)
 
 # format pairs list and dihedrals list
 pairs = []
+angles = []
 dihedrals = []
 
 for i in range(0, len(unique_pairs)):
@@ -551,6 +584,9 @@ for i in range(0, len(unique_pairs)):
 for i in range(0, len(unique_dihedrals)):
     dihedrals.append('{:6d}{:7d}{:7d}{:7d}{:4d}'.format(unique_dihedrals[i][0], unique_dihedrals[i][1],
                                                         unique_dihedrals[i][2], unique_dihedrals[i][3], 3))
+for i in range(0, len(unique_angles)):
+    dihedrals.append('{:6d}{:7d}{:7d}{:7d}'.format(unique_angles[i][0], unique_angles[i][1],
+                                                        unique_angles[i][2], 1))
 
 # eliminate the old pairs list
 
@@ -561,6 +597,17 @@ del b[pairs_index + 2: pairs_count]
 count = pairs_index + 2
 for i in range(0, len(pairs)):
     b.insert(count, pairs[i] + '\n')
+    count += 1
+
+# eliminate the old angles list
+
+del b[angles_index + 2: angle_count]
+
+# Insert new angles list
+
+count = angles_index + 2
+for i in range(0, len(angles)):
+    b.insert(count, angles[i] + "\n")
     count += 1
 
 # eliminate the old dihedrals list

@@ -43,6 +43,11 @@ while a[bond_count] != '\n':
     bond_count += 1  # increments while loop
     nb += 1  # counting number of lines in 'bonds' section
 
+bonds_list = []
+for i in range(bonds_index + 2, bond_count):
+    bonds_list.append(a[i])
+
+
 # [ dihedrals ] ; propers
 
 dihedrals_p_index = 0  # find index where [ dihedrals ] section begins (propers)
@@ -83,114 +88,119 @@ while a[pairs_count] != '\n':
     pairs_count += 1
     npair += 1
 
+# [ angles ]
+
+angles_index = 0  # find index where [ angles ] section begins
+while a[angles_index].count('[ angles ]') == 0:
+    angles_index += 1
+
+na = 0  # number of lines in the 'angles' section
+angle_count = angles_index + 2  # keep track of index of a
+angles_prev = []
+while a[angle_count] != '\n':
+    angles_prev.append([int(a[angle_count][0:6]), int(a[angle_count][6:13]), int(a[angle_count][13:20])])
+    angle_count += 1
+    na += 1
+print na
 start = time.time()
 
-list1 = []  # list to hold atom numbers of 1st entry in each row of [ bonds ] section
-list2 = []  # list to hold atom numbers of 2nd entry in each row of [ bonds ] section
-for i in range(bonds_index + 2, bond_count):  # extract atom numbers in [ bonds ] section in order of appearance
-    list1.append(int(a[i][0:6]))  # converts them to integers to save time later
-    list2.append(int(a[i][6:13]))
+atoms_of_interest = []
+for i in range(0, 137):
+    atoms_of_interest.append(i + 1)
 
-xlinked_list1 = []
-xlinked_list2 = []
-for i in range(bonds_index + 2 + 100, bond_count):  # extract atom numbers in [ bonds ] section in order of appearance
-    xlinked_list1.append(int(a[i][0:6]))  # converts them to integers to save time later
-    xlinked_list2.append(int(a[i][6:13]))
 
-xlinked_list3 = []
-xlinked_list4 = []
-for i in range(bonds_index + 2, bond_count - 37):  # extract atom numbers in [ bonds ] section in order of appearance
-    xlinked_list3.append(int(a[i][0:6]))  # converts them to integers to save time later
-    xlinked_list4.append(int(a[i][6:13]))
+# Make a condensed list of bonds including only the bonds which we are interested in as well as a full list of bonds:
+
+def read_lists(a, atoms_of_interest, start, end):
+    list = []
+    condensed = []
+    for i in range(start, end):  # extract atom numbers in [ bonds ] section in order of appearance
+        list.append([int(a[i][0:6]), int(a[i][6:13])])
+        if int(a[i][0:6]) in atoms_of_interest:
+            condensed.append([int(a[i][0:6]), int(a[i][6:13])])
+        if int(a[i][6:13]) in atoms_of_interest:
+            condensed.append([int(a[i][0:6]), int(a[i][6:13])])
+
+    uniq_condensed = []
+    for i in range(0, len(condensed)):
+        a = condensed[i]
+        b = [condensed[i][1], condensed[i][0]]
+        if a not in uniq_condensed:
+            if b not in uniq_condensed:
+                uniq_condensed.append(a)
+
+    return list, uniq_condensed
+
+list, uniq_condensed = read_lists(a, atoms_of_interest, bonds_index + 2, bond_count)
 
 start = time.time()
 
-def gen_pairs_list(list1, list2, xlinked_list1, xlinked_list2, no_bonds):
-    pairs1 = []
-    pairs2 = []
+
+def gen_pairs_list(list, condensed):
+    pairs = []
+    angles = []
     dihedrals = []
-    dc = 0  # dihedrals count
-    for i in range(0, len(xlinked_list1)):  # look at all bonds
+    for i in range(0, len(condensed)):  # look at all bonds
         neighbor3 = []  # redefine lists for each loop since each loops looks at a different bond
         neighbor4 = []
-        for j in range(0, no_bonds):  # compare to all other bonds
-            if list1[j] == xlinked_list2[i]:  # look for 1-3 pairs by comparing first entry of each row of [ pairs ] section
-                neighbor3.append(list2[j])
-            elif list2[j] == xlinked_list2[i]:  # look for 1-3 pairs again
-                if list1[j] != xlinked_list1[i]:
-                    neighbor3.append(list1[j])
+        for j in range(0, len(list)):  # compare to all other bonds
+            if list[j][0] == condensed[i][1]:  # look for 1-3 pairs by comparing first entry of each row of [ pairs ] section
+                neighbor3.append(list[j][1])
+                angles.append([condensed[i][0], list[j][0], list[j][1]])
+            elif list[j][1] == condensed[i][1]:  # look for 1-3 pairs again
+                if list[j][0] != condensed[i][0]:
+                    neighbor3.append(list[j][0])
+                    angles.append([condensed[i][0], list[j][1], list[j][0]])
         for h in neighbor3:
-            for l in range(0, len(list1)):
-                if list1[l] == h:
-                    if list2[l] != xlinked_list2[i]:
-                        dihedrals.append([])
-                        dihedrals[dc].append(xlinked_list1[i])
-                        dihedrals[dc].append(xlinked_list2[i])
-                        dihedrals[dc].append(h)
-                        dihedrals[dc].append(list2[l])
-                        dc += 1
-                        neighbor4.append(list2[l])
-                elif list2[l] == h:
-                    if list1[l] != xlinked_list2[i]:
-                        dihedrals.append([])
-                        dihedrals[dc].append(xlinked_list1[i])
-                        dihedrals[dc].append(xlinked_list2[i])
-                        dihedrals[dc].append(h)
-                        dihedrals[dc].append(list1[l])
-                        dc += 1
-                        neighbor4.append(list1[l])
+            for l in range(0, len(list)):
+                if list[l][0] == h:
+                    if list[l][1] != condensed[i][1]:
+                        dihedrals.append([condensed[i][0], condensed[i][1], h, list[l][1]])
+                        neighbor4.append(list[l][1])
+                elif list[l][1] == h:
+                    if list[l][0] != condensed[i][1]:
+                        dihedrals.append([condensed[i][0], condensed[i][1], h, list[l][0]])
+                        neighbor4.append(list[l][0])
         count = 0
         for m in neighbor4:
-            pairs1.append(xlinked_list1[i])
-            pairs2.append(neighbor4[count])
-            #pairs.append('{:6d}{:7d}{:7d}'.format(list1[i], neighbor4[count], 1))
+            pairs.append([condensed[i][0], neighbor4[count]])
             count += 1
 
         neighbor3 = []
         neighbor4 = []
-        for j in range(0, no_bonds):
-            if list2[j] == xlinked_list1[i]:
-                neighbor3.append(list1[j])
-            elif list1[j] == xlinked_list1[i]:
-                if list2[j] != xlinked_list2[i]:
-                    neighbor3.append(list2[j])
+        for j in range(0, len(list)):
+            if list[j][1] == condensed[i][0]:
+                angles.append([condensed[i][1], list[j][1], list[j][0]])
+                neighbor3.append(list[j][0])
+            elif list[j][0] == condensed[i][0]:
+                if list[j][1] != condensed[i][1]:
+                    angles.append([condensed[i][1], list[j][0], list[j][1]])
+                    neighbor3.append(list[j][1])
         for h in neighbor3:
-            for l in range(0, len(list1)):
-                if list1[l] == h:
-                    if list2[l] != xlinked_list1[i]:
-                        dihedrals.append([])
-                        dihedrals[dc].append(xlinked_list2[i])
-                        dihedrals[dc].append(xlinked_list1[i])
-                        dihedrals[dc].append(h)
-                        dihedrals[dc].append(list2[l])
-                        dc += 1
-                        neighbor4.append(list2[l])
-                elif list2[l] == h:
-                    if list1[l] != xlinked_list1[i]:
-                        dihedrals.append([])
-                        dihedrals[dc].append(xlinked_list2[i])
-                        dihedrals[dc].append(xlinked_list1[i])
-                        dihedrals[dc].append(h)
-                        dihedrals[dc].append(list1[l])
-                        dc += 1
-                        neighbor4.append(list1[l])
+            for l in range(0, len(list)):
+                if list[l][0] == h:
+                    if list[l][1] != condensed[i][0]:
+                        dihedrals.append([condensed[i][1], condensed[i][0], h, list[l][1]])
+                        neighbor4.append(list[l][1])
+                elif list[l][1] == h:
+                    if list[l][0] != condensed[i][0]:
+                        dihedrals.append([condensed[i][1], condensed[i][0], h, list[l][0]])
+                        neighbor4.append(list[l][0])
 
         count = 0
         for m in neighbor4:
-            pairs1.append(xlinked_list2[i])
-            pairs2.append(neighbor4[count])
-            #pairs.append('{:6d}{:7d}{:7d}'.format(list2[i], neighbor4[count], 1))
+            pairs.append([condensed[i][1], neighbor4[count]])
             count += 1
-    return pairs1, pairs2, dihedrals
+    return pairs, dihedrals, angles
 
 
 end1 = time.time()
 print end1 - start
 
-def uniq_pair(pairs1, pairs2, pairs_list_prev):
-    for i in range(0, len(pairs1)):
-        a = [pairs1[i], pairs2[i]]  # the order it is read from the pairs list
-        b = [pairs2[i], pairs1[i]]
+def uniq_pair(pairs, pairs_list_prev):
+    for i in range(0, len(pairs)):
+        a = pairs[i]  # the order it is read from the pairs list
+        b = [pairs[i][1], pairs[i][0]]
         if a not in pairs_list_prev:
             if b not in pairs_list_prev:
                 pairs_list_prev.append(a)
@@ -205,80 +215,27 @@ def uniq_dihedral(dihedrals, dihedrals_prev):
                 dihedrals_prev.append(dihedrals[i])
     return dihedrals_prev
 
-pairs1, pairs2, dihedrals = gen_pairs_list(list1, list2, xlinked_list1, xlinked_list2, nb)
+def uniq_angles(angles, angles_prev):
+    for i in range(0, len(angles)):
+        a = angles[i]
+        b = [angles[i][2], angles[i][1], angles[i][0]]
+        if a not in angles_prev:
+            if b not in angles_prev:
+                angles_prev.append(angles[i])
+    return angles_prev
 
-unique_pairs1 = uniq_pair(pairs1, pairs2, pairs_list_prev)
+pairs, dihedrals, angles = gen_pairs_list(list, uniq_condensed)
 
-#unique_dihedrals = uniq_dihedral(dihedrals, dihedrals_prev)
-count = 0
-# for i in unique_pairs:
-#     count += 1
-#
-# print count
-
-pairs1, pairs2, dihedrals = gen_pairs_list(list1, list2, xlinked_list3, xlinked_list4, nb)
-
-unique_pairs2 = uniq_pair(pairs1, pairs2, pairs_list_prev)
-
+unique_pairs = uniq_pair(pairs, pairs_list_prev)
 unique_dihedrals = uniq_dihedral(dihedrals, dihedrals_prev)
-count = 0
-for i in dihedrals_prev:
-    count += 1
+unique_angles = uniq_angles(angles, angles_prev)
+print len(unique_pairs)
+print len(unique_dihedrals)
+print len(unique_angles)
+# for i in range(0, len(unique_pairs)):
+#     print '{:4d}{:4d}'.format(unique_pairs[i][0], unique_pairs[i][1])
+#
+# print len(unique_pairs)
+#
+# unique_pairs = uniq_pair(pairs1, pairs2, pairs_list_prev)
 
-print count
-
-# for i in unique_pairs:
-#     print i
-#
-# print end1 - start
-# # end2 = time.time()
-# # # print end2 - end1
-# # # print end2 - start
-# # # Now print them in order
-# #
-# # ordered_unique_pairs = []
-# # for i in range(1, nr + 1):
-# #     no_same_atom = []
-# #     for k in range(0, len(unique_pairs)):
-# #         if int(unique_pairs[k][0:6]) == i:
-# #             no_same_atom.append(unique_pairs[k])
-# #     for l in range(1, nr + 1):
-# #         for j in range(0, len(no_same_atom)):
-# #             if int(no_same_atom[j][6:13]) == l:
-# #                 ordered_unique_pairs.append(no_same_atom[j])
-# #
-# # end3 = time.time()
-# # print end3 - end2
-# # print end3 - start
-# #
-# # # for i in range(0, len(ordered_unique_pairs)):
-# # #     print ordered_unique_pairs[i]
-# #
-#print len(unique_pairs)
-# #
-# # TESTING
-#
-# pairs_index = 0  # find index where [ pairs ] section begins
-# while a[pairs_index].count('[ pairs ]') == 0:
-#     pairs_index += 1
-#
-# npair = 0  # number of lines in the 'pairs' section
-# pairs_count = pairs_index + 2  # keep track of index of a
-# while a[pairs_count] != '\n':
-#     pairs_count += 1
-#     npair += 1
-#
-# test = []
-# for i in range(pairs_index + 2, pairs_count):
-#     test.append(a[i][0:20])
-#
-# count = 0
-# for i in range(0, len(test)):
-#     a = test[i]  # the order it is read from the pairs list
-#     b = (len(test[i][6:13]) - len(str.strip(test[i][6:13])) - 1)*' ' + str.strip(test[i][6:13]) + ' ' + \
-#         test[i][0:6] + test[i][13:len(test[i])]  # switching the order of the pairs for comparison
-#     if a or b in ordered_unique_pairs:
-#         count += 1
-#
-# if count == 349:
-#     print 'It works!'
