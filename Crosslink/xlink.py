@@ -49,6 +49,7 @@ if args.type == 'LLC':
                   'H24', 'H74', 'H50', 'H25', 'H75', 'H51', 'H26', 'H76']
     topology = 'HII_mon.itp'
     xlink_atoms = 6  # number of atoms involved in cross-linking
+    no_dummies = 6
 
 
 tot_atoms = atoms*args.layers*args.no_monomers*args.pores
@@ -298,18 +299,26 @@ for i in range(array_length - no_ones, array_length):
     term_prob_array.append(1)
 
 # Termination occurs at C2
-
+# Move termination carbons to a new list
 term_c1 = []
 term_c2 = []
+term_indices = []
 no_xlinks = copy.deepcopy(len(c2))  # The length of c2 may change in the next loops so I am preserving it here
 
+# Add the termination carbons to new list
 for i in range(0, no_xlinks):
     term = np.random.choice(term_prob_array)
     if term == 1:
         term_c1.append(c1[i])
         term_c2.append(c2[i])
-        del c1[i]
-        del c2[i]
+        term_indices.append(i)
+
+# Remove terminated carbons from c1 and c2
+for i in range(0, len(term_indices)):
+    len_diff = no_xlinks - len(c1)  # Account for varying size of c1 and c2 lists
+    del c1[term_indices[i] - len_diff]
+    del c2[term_indices[i] - len_diff]
+
 
 # Use Assembly_itp.py to create a topology for the entire assembly and then write it to a file which will be edited to
 # incorporate cross-links
@@ -356,8 +365,11 @@ tail3 = []
 
 for i in range(0, tot_monomers):
     tail1.append(atoms*i + C2_1)
+    tail1.append(atoms*i + C2_1 + 1)
     tail2.append(atoms*i + C2_2)
+    tail2.append(atoms*i + C2_2 + 1)
     tail3.append(atoms*i + C2_3)
+    tail3.append(atoms*i + C2_3 + 1)
 
 H = []  # list of residue numbers of H that need to be changed from ha to hc
 H_new1 = []  # list of residue number of H's that will be convert from dummy atoms to real atoms
@@ -366,46 +378,73 @@ for i in range(0, len(c2)):
         H.append(c2[i] + 59)
         H.append(c2[i] + 60)
         H.append(c2[i] + 61)
-        H.append(c1[i] + 60)
-        H.append(c1[i] + 61)
+        if c1[i] in tail1:
+            H.append(c1[i] + 59)
+            H.append(c1[i] + 60)
+        if c1[i] in tail2:
+            H.append(c1[i] + 69)
+            H.append(c1[i] + 70)
+        if c1[i] in tail3:
+            H.append(c1[i] + 79)
+            H.append(c1[i] + 80)
         H_new1.append(c2[i] + 113)
     if c2[i] in tail2:  # i.e. C33
         H.append(c2[i] + 69)
         H.append(c2[i] + 70)
         H.append(c2[i] + 71)
-        H.append(c1[i] + 70)
-        H.append(c1[i] + 71)
+        if c1[i] in tail1:
+            H.append(c1[i] + 59)
+            H.append(c1[i] + 60)
+        if c1[i] in tail2:
+            H.append(c1[i] + 69)
+            H.append(c1[i] + 70)
+        if c1[i] in tail3:
+            H.append(c1[i] + 79)
+            H.append(c1[i] + 80)
         H_new1.append(c2[i] + 100)
     if c2[i] in tail3:  # i.e. C47
         H.append(c2[i] + 79)
         H.append(c2[i] + 80)
         H.append(c2[i] + 81)
-        H.append(c1[i] + 80)
-        H.append(c1[i] + 81)
+        if c1[i] in tail1:
+            H.append(c1[i] + 59)
+            H.append(c1[i] + 60)
+        if c1[i] in tail2:
+            H.append(c1[i] + 69)
+            H.append(c1[i] + 70)
+        if c1[i] in tail3:
+            H.append(c1[i] + 79)
+            H.append(c1[i] + 80)
         H_new1.append(c2[i] + 87)
 
 # need to do the same for the termination carbons except we need to include the dummy hydrogen and don't have to worry
 # about the term_c1 list since nothing is happening on that end anymore
+
+# the c2 where termination is happening is no longer the same c2 which is referenced in term_c2
+term = []  # define those termination atoms as 'term' which are the carbons adjacent to term_c1
+for i in range(0, len(term_c1)):
+    term.append(term_c1[i] - 1)
+
 H_new2 = []  # keep these separate for indexing purposes
-for i in range(0, len(term_c2)):
-    if term_c2[i] in tail1:  # i.e. C19
-        H.append(term_c2[i] + 59)
-        H.append(term_c2[i] + 60)
-        H.append(term_c2[i] + 61)
-        H_new2.append(term_c2[i] + 112)
-        H_new2.append(term_c2[i] + 113)
-    if term_c2[i] in tail2:  # i.e. C33
-        H.append(term_c2[i] + 69)
-        H.append(term_c2[i] + 70)
-        H.append(term_c2[i] + 71)
-        H_new2.append(term_c2[i] + 99)
-        H_new2.append(term_c2[i] + 100)
-    if term_c2[i] in tail3:  # i.e. C47
-        H.append(term_c2[i] + 79)
-        H.append(term_c2[i] + 80)
-        H.append(term_c2[i] + 81)
-        H_new2.append(term_c2[i] + 86)
-        H_new2.append(term_c2[i] + 87)
+for i in range(0, len(term)):
+    if term[i] in tail1:  # i.e. C19
+        H.append(term[i] + 59)
+        H.append(term[i] + 60)
+        H.append(term[i] + 61)
+        H_new2.append(term[i] + 112)
+        H_new2.append(term[i] + 113)
+    if term[i] in tail2:  # i.e. C33
+        H.append(term[i] + 69)
+        H.append(term[i] + 70)
+        H.append(term[i] + 71)
+        H_new2.append(term[i] + 99)
+        H_new2.append(term[i] + 100)
+    if term[i] in tail3:  # i.e. C47
+        H.append(term[i] + 79)
+        H.append(term[i] + 80)
+        H.append(term[i] + 81)
+        H_new2.append(term[i] + 86)
+        H_new2.append(term[i] + 87)
 
 # find the indices of all fields that need to be modified
 
@@ -415,13 +454,11 @@ atoms_index = 0  # find index where [ atoms ] section begins
 while b[atoms_index].count('[ atoms ]') == 0:
     atoms_index += 1
 
-
 atoms_count = atoms_index + 2
 nr = 0  # number of lines in 'atoms' section
 while b[atoms_count] != '\n':
     atoms_count += 1  # increments the while loop
     nr += 1  # counts number of atoms
-
 
 # [ bonds ]
 
@@ -479,38 +516,37 @@ for i in range(dihedrals_imp_count, len(b)):  # This is the last section in the 
 
 # To be safe, we also need to change the atom type of the non-bonding c1. If it is initiated, then it goes from c2 to c3
 other_c1 = []
+radical_c2 = []
 for i in range(0, len(c2)):
     other_c1.append(c2[i] + 1)
+    radical_c2.append(c1[i] - 1)
 
 # The other c2 keeps its hybridization
 
 # Now make all of the changes
+# Also, any carbons that are termination sites and/or become sp3 hybridized will be marked with a 'T' since it should
+# not be considered in further cross-link iterations
 count = 0
 for i in range(atoms_index + 2, atoms_count):
-    atom_no = str.strip(b[i][22:28])
-    if int(b[i][0:5]) in c1 or int(b[i][0:5]) in other_c1:
-        b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2])]
-        count += 1
-    if int(b[i][0:5]) in c2 or int(b[i][0:5]) in term_c2:
-        b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2])]
-        count += 1
-    if int(b[i][0:5]) in H or int(b[i][0:5]) in H_new1 or int(b[i][0:5]) in H_new2:
+    res_num = int(b[i][0:5])
+    if res_num in c1:  # change bonding carbon 1 from c2 to c3 since it becomes sp3 hybridized
+        b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+    if res_num in other_c1:  # The c1 on the same tail as the bonding c2 is now sp3 hybridized
+        b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+    if res_num in c2:  # the bonding c2 becomes sp3 hybridized
+        b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+    if res_num in term:  # the terminating c2 (where the termination actually happens) becomes sp3 hybridized
+        b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+    if res_num in H:  # all of the H's that attach to the new sp3 hybridized carbons
         b[i] = b[i][0:5] + b[i][5:10].replace('ha', 'hc') + b[i][10:len(b[atoms_index + 2])]
-        count += 1
-
-print atoms_count - (atoms_index + 2)
-print count
-print len(c1) + len(other_c1)
-print len(H) + len(H_new1) + len(H_new2)
-print len(c2) + len(term_c2)
-print ''
-print len(c1)
-print len(other_c1)
-print len(H)
-print len(H_new1)
-print len(H_new2)
-print len(c2)
-print len(term_c2)
+    if res_num in H_new1:  # Dummy atoms become real during the bonding process
+        b[i] = b[i][0:5] + b[i][5:10].replace('ha', 'hc') + b[i][10:len(b[atoms_index + 2])]
+    if res_num in H_new2:  # Dummy atoms which become real during the termination process
+        b[i] = b[i][0:5] + b[i][5:10].replace('ha', 'hc') + b[i][10:len(b[atoms_index + 2])]
+    if res_num in radical_c2:  # mark the c2 atoms that are now radicals. They remain sp2 hybridized but are reactive
+        b[i] = b[i][0:len(b[atoms_index + 2]) - 1] + '*' + '\n'
+    if res_num in term_c1:  # c1 in a terminating chain will be sp3
+        b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
 
 # Add bonds between cross-linking atoms
 
@@ -525,11 +561,11 @@ for i in range(0, len(H_new1)):
 
 # new H bonds formed during termination (2 dummy H's becoming real)
 k = 0
-for i in range(0, len(term_c2)):
-    b.insert(bond_count, '{:6d}{:7d}{:4d}'.format(term_c2[i], H_new2[k], 1) + "\n")
+for i in range(0, len(term)):
+    b.insert(bond_count, '{:6d}{:7d}{:4d}'.format(term[i], H_new2[k], 1) + "\n")
     k += 1
     bond_count += 1
-    b.insert(bond_count, '{:6d}{:7d}{:4d}'.format(term_c2[i] + 1, H_new2[k], 1) + "\n")
+    b.insert(bond_count, '{:6d}{:7d}{:4d}'.format(term[i] + 1, H_new2[k], 1) + "\n")
     bond_count += 1
     k += 1
 
@@ -550,13 +586,30 @@ while b[pairs_count] != '\n':
 # Now we need to generate dihedrals, angles and pairs lists. In the above code, all the atoms needed to complete the
 # list which already exists (stored in b) are there except the other carbon on the terminated tail. So lets add that:
 
-other_term_c1 = []
-for i in range(0, len(term_c2)):
-    other_term_c1.append(term_c2[i] + 1)
+# other_term_c1 = []
+# for i in range(0, len(term_c2)):
+#     other_term_c1.append(term_c2[i] + 1)
 
 # There. Now we have all the atoms we need. Let's make one list that holds all of these values:
 
-atoms_of_interest = other_term_c1 + other_c1 + term_c2 + c1 + c2 + H + H_new1 + H_new2
+atoms_of_interest = radical_c2 + c1 + c2 + other_c1 + term + term_c1 + H + H_new1 + H_new2
+
+# Before going further, we need to label all of the dummy atoms that are still dummies so that they are not written into
+# the bonds, angles, dihedrals or pairs section
+
+# generate a list of indices of the dummy atoms
+dummy_list = []
+for i in range(0, tot_monomers):
+    for k in range(0, no_dummies):
+        dummy_list.append(i*atoms + (atoms - k))  # dummies are listed at the end of the atomtypes
+
+leftovers = []  # poor dummies that didn't get turned into real atoms
+for i in range(0, len(dummy_list)):
+    if dummy_list[i] not in H_new1 and dummy_list[i] not in H_new2:  # sees if dummies were turned to real atoms
+        leftovers.append(dummy_list[i])  # if not, they become part of the leftovers
+
+for i in range(0, len(leftovers)):
+    b[leftovers[i] + atoms_index + 1] = b[leftovers[i] + atoms_index + 1][0:len(b[leftovers[i] + atoms_index + 1]) - 1] + 'D' + '\n'
 
 # See genpairs.pyx to see what is going on in the following lines:
 
@@ -632,3 +685,10 @@ target.close()
 
 end = time.time()
 print 'Total time elapsed: %s seconds' %(end - start)
+print c1
+print c2
+print term
+print term_c1
+print other_c1
+print H_new1
+print H_new2
