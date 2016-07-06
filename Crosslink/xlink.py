@@ -446,6 +446,20 @@ for i in range(0, len(term)):
         H_new2.append(term[i] + 86)
         H_new2.append(term[i] + 87)
 
+# Before going further, we need to label all of the dummy atoms that are still dummies so that they are not written into
+# the bonds, angles, dihedrals or pairs section
+
+# generate a list of indices of the dummy atoms
+dummy_list = []
+for i in range(0, tot_monomers):
+    for k in range(0, no_dummies):
+        dummy_list.append(i*atoms + (atoms - k))  # dummies are listed at the end of the atomtypes
+
+leftovers = []  # poor dummies that didn't get turned into real atoms
+for i in range(0, len(dummy_list)):
+    if dummy_list[i] not in H_new1 and dummy_list[i] not in H_new2:  # sees if dummies were turned to real atoms
+        leftovers.append(dummy_list[i])  # if not, they become part of the leftovers
+
 # find the indices of all fields that need to be modified
 
 # [ atoms ]
@@ -462,55 +476,36 @@ while b[atoms_count] != '\n':
 
 # [ bonds ]
 
-bonds_index = 0  # find index where [ bonds ] section begins
+bonds_index = 0  # find index where [ bonds ] section begins\
 while b[bonds_index].count('[ bonds ]') == 0:
     bonds_index += 1
 
 nb = 0  # number of lines in the 'bonds' section
+bond_list = []
 bond_count = bonds_index + 2
 while b[bond_count] != '\n':
+    a_b = int(b[bond_count][0:6])
+    b_b = int(b[bond_count][6:13])
+    if a_b not in leftovers and b_b not in leftovers:
+        bond_list.append([a_b, b_b])
+        nb += 1  # counting number of lines in 'bonds' section
     bond_count += 1  # increments while loop
-    nb += 1  # counting number of lines in 'bonds' section
 
-# [ angles ]
+# properly format dihedrals list
+bonds = []
+for i in range(0, len(bond_list)):
+    bonds.append('{:6d}{:7d}{:4d}'.format(bond_list[i][0], bond_list[i][1], 1))
 
-angles_index = 0  # find index where [ angles ] section begins
-while b[angles_index].count('[ angles ]') == 0:
-    angles_index += 1
+# eliminate the old bonds list
 
-na = 0  # number of lines in the 'angles' section
-angle_count = angles_index + 2  # keep track of index of a
-angles_prev = []
-while b[angle_count] != '\n':
-    angles_prev.append([int(b[angle_count][0:6]), int(b[angle_count][6:13]), int(b[angle_count][13:20])])
-    angle_count += 1
-    na += 1
+del b[bonds_index + 2: bond_count]
 
-# [ dihedrals ] ; propers
+# Insert new bonds list
 
-dihedrals_p_index = 0  # find index where [ dihedrals ] section begins (propers)
-while b[dihedrals_p_index].count('[ dihedrals ] ; propers') == 0:
-    dihedrals_p_index += 1
-
-ndp = 0  # number of lines in the 'dihedrals ; proper' section
-dihedrals_p_count = dihedrals_p_index + 2  # keep track of index of a
-dihedrals_prev = []
-while b[dihedrals_p_count] != '\n':
-    dihedrals_prev.append([int(b[dihedrals_p_count][0:6]), int(b[dihedrals_p_count][6:13]), int(b[dihedrals_p_count][13:20]), int(b[dihedrals_p_count][20:27])])
-    dihedrals_p_count += 1
-    ndp += 1
-
-# [ dihedrals ] ; impropers
-
-dihedrals_imp_index = 0  # find index where [ dihedrals ] section begins (impropers)
-while b[dihedrals_imp_index].count('[ dihedrals ] ; impropers') == 0:
-    dihedrals_imp_index += 1
-
-ndimp = 0  # number of lines in the 'dihedrals ; impropers' section
-dihedrals_imp_count = dihedrals_imp_index + 2
-for i in range(dihedrals_imp_count, len(b)):  # This is the last section in the input .itp file
-    dihedrals_imp_count += 1
-    ndimp += 1
+count = bonds_index + 2
+for i in range(0, len(bonds)):
+    b.insert(count, bonds[i] + '\n')
+    count += 1
 
 # Replace atom types of bonding carbons with sp3 hybridized carbons
 
@@ -551,25 +546,39 @@ for i in range(atoms_index + 2, atoms_count):
 # Add bonds between cross-linking atoms
 
 for i in range(0, len(c1)):
-    b.insert(bond_count, '{:6d}{:7d}{:4d}'.format(c1[i], c2[i], 1) + "\n")
-    bond_count += 1
+    b.insert(nb, '{:6d}{:7d}{:4d}'.format(c1[i], c2[i], 1) + "\n")
+    nb += 1
 
 # Add new H bonds formed during propagation (dummy H's becoming real)
 for i in range(0, len(H_new1)):
-    b.insert(bond_count, '{:6d}{:7d}{:4d}'.format(c1[i], H_new1[i], 1) + "\n")
-    bond_count += 1
+    b.insert(nb, '{:6d}{:7d}{:4d}'.format(c1[i], H_new1[i], 1) + "\n")
+    nb += 1
 
 # new H bonds formed during termination (2 dummy H's becoming real)
 k = 0
 for i in range(0, len(term)):
-    b.insert(bond_count, '{:6d}{:7d}{:4d}'.format(term[i], H_new2[k], 1) + "\n")
+    b.insert(nb, '{:6d}{:7d}{:4d}'.format(term[i], H_new2[k], 1) + "\n")
     k += 1
-    bond_count += 1
-    b.insert(bond_count, '{:6d}{:7d}{:4d}'.format(term[i] + 1, H_new2[k], 1) + "\n")
-    bond_count += 1
+    nb += 1
+    b.insert(nb, '{:6d}{:7d}{:4d}'.format(term[i] + 1, H_new2[k], 1) + "\n")
+    nb += 1
     k += 1
 
-# First find where the [ pairs ] section is located
+# Now we need to generate dihedrals, angles and pairs lists. We have all the atoms we need. Let's make one list that
+# holds all of these values:
+
+atoms_of_interest = radical_c2 + c1 + c2 + other_c1 + term + term_c1 + H + H_new1 + H_new2
+
+# See genpairs.pyx to see what is going on in the following lines:
+
+# Generate a list of all bonds. 'list' contains all bonds. 'Condensed_list' contains bonds only relevant to 'atoms_of_interest'
+list, condensed_list = genpairs.read_lists(b, atoms_of_interest, bonds_index + 2, nb)
+
+# Generate a pairs list, a dihedrals list, and an angles list that includes those formed by the newly created bonds
+
+pairs_list, dihedrals_list, angles_list = genpairs.gen_pairs_list(list, condensed_list)
+
+# Find where the [ pairs ] section is located
 
 pairs_index = 0  # find index where [ pairs ] section begins
 while b[pairs_index].count('[ pairs ]') == 0:
@@ -579,67 +588,20 @@ npair = 0  # number of lines in the 'pairs' section
 pairs_count = pairs_index + 2  # keep track of index of a
 pairs_list_prev = []
 while b[pairs_count] != '\n':
-    pairs_list_prev.append([int(b[pairs_count][0:6]), int(b[pairs_count][6:13])])  # record pairs that already exist
+    a_p = b[pairs_count][0:6]
+    b_p = b[pairs_count][6:13]
+    if a_p not in leftovers and b_p not in leftovers:
+        pairs_list_prev.append([a_p, b_p])  # record pairs that already exist
+        npair += 1
     pairs_count += 1
-    npair += 1
-
-# Now we need to generate dihedrals, angles and pairs lists. In the above code, all the atoms needed to complete the
-# list which already exists (stored in b) are there except the other carbon on the terminated tail. So lets add that:
-
-# other_term_c1 = []
-# for i in range(0, len(term_c2)):
-#     other_term_c1.append(term_c2[i] + 1)
-
-# There. Now we have all the atoms we need. Let's make one list that holds all of these values:
-
-atoms_of_interest = radical_c2 + c1 + c2 + other_c1 + term + term_c1 + H + H_new1 + H_new2
-
-# Before going further, we need to label all of the dummy atoms that are still dummies so that they are not written into
-# the bonds, angles, dihedrals or pairs section
-
-# generate a list of indices of the dummy atoms
-dummy_list = []
-for i in range(0, tot_monomers):
-    for k in range(0, no_dummies):
-        dummy_list.append(i*atoms + (atoms - k))  # dummies are listed at the end of the atomtypes
-
-leftovers = []  # poor dummies that didn't get turned into real atoms
-for i in range(0, len(dummy_list)):
-    if dummy_list[i] not in H_new1 and dummy_list[i] not in H_new2:  # sees if dummies were turned to real atoms
-        leftovers.append(dummy_list[i])  # if not, they become part of the leftovers
-
-for i in range(0, len(leftovers)):
-    b[leftovers[i] + atoms_index + 1] = b[leftovers[i] + atoms_index + 1][0:len(b[leftovers[i] + atoms_index + 1]) - 1] + 'D' + '\n'
-
-# See genpairs.pyx to see what is going on in the following lines:
-
-# Generate a list of all bonds. List1 has the first atom involved. List 2 has the second atom involved:
-list, condensed_list = genpairs.read_lists(b, atoms_of_interest, bonds_index + 2, bond_count)  # only look at new pairs generated
-
-# Generate a pairs list, a dihedrals list, and an angles list that includes those formed by the newly created bonds
-
-pairs_list, dihedrals_list, angles_list = genpairs.gen_pairs_list(list, condensed_list)
 
 # Eliminate duplicates in the entire pairs list
 unique_pairs = genpairs.uniq_pair(pairs_list, pairs_list_prev)
-unique_dihedrals = genpairs.uniq_dihedral(dihedrals_list, dihedrals_prev)
-unique_angles = genpairs.uniq_angles(angles_list, angles_prev)
 
-
-# format pairs list and dihedrals list
+# Create a properly formatted pairs list
 pairs = []
-angles = []
-dihedrals = []
-
 for i in range(0, len(unique_pairs)):
-    pairs.append('{:6d}{:7d}{:7d}'.format(unique_pairs[i][0], unique_pairs[i][1], 1))
-
-for i in range(0, len(unique_dihedrals)):
-    dihedrals.append('{:6d}{:7d}{:7d}{:7d}{:4d}'.format(unique_dihedrals[i][0], unique_dihedrals[i][1],
-                                                        unique_dihedrals[i][2], unique_dihedrals[i][3], 3))
-for i in range(0, len(unique_angles)):
-    dihedrals.append('{:6d}{:7d}{:7d}{:7d}'.format(unique_angles[i][0], unique_angles[i][1],
-                                                        unique_angles[i][2], 1))
+    pairs.append('{:6s}{:7s}{:7d}'.format(unique_pairs[i][0], unique_pairs[i][1], 1))
 
 # eliminate the old pairs list
 
@@ -652,6 +614,33 @@ for i in range(0, len(pairs)):
     b.insert(count, pairs[i] + '\n')
     count += 1
 
+# [ angles ]
+
+angles_index = 0  # find index where [ angles ] section begins
+while b[angles_index].count('[ angles ]') == 0:
+    angles_index += 1
+
+na = 0  # number of lines in the 'angles' section
+angle_count = angles_index + 2  # keep track of index of a
+angles_prev = []
+while b[angle_count] != '\n':
+    a_a = int(b[angle_count][0:6])
+    b_a = int(b[angle_count][6:13])
+    c_a = int(b[angle_count][13:20])
+    if a_a not in leftovers and b_a not in leftovers and c_a not in leftovers:
+        angles_prev.append([a_a, b_a, c_a])
+        na += 1
+    angle_count += 1
+
+# Eliminate duplicates in the entire angles list
+unique_angles = genpairs.uniq_angles(angles_list, angles_prev)
+
+# Create a properly formatted angles list
+angles = []
+for i in range(0, len(unique_angles)):
+    angles.append('{:6d}{:7d}{:7d}{:7d}'.format(unique_angles[i][0], unique_angles[i][1],
+                                                        unique_angles[i][2], 1))
+
 # eliminate the old angles list
 
 del b[angles_index + 2: angle_count]
@@ -663,6 +652,34 @@ for i in range(0, len(angles)):
     b.insert(count, angles[i] + "\n")
     count += 1
 
+# [ dihedrals ] ; propers
+
+dihedrals_p_index = 0  # find index where [ dihedrals ] section begins (propers)
+while b[dihedrals_p_index].count('[ dihedrals ] ; propers') == 0:
+    dihedrals_p_index += 1
+
+ndp = 0  # number of lines in the 'dihedrals ; proper' section
+dihedrals_p_count = dihedrals_p_index + 2  # keep track of index of a
+dihedrals_prev = []
+while b[dihedrals_p_count] != '\n':
+    a_d = int(b[dihedrals_p_count][0:6])
+    b_d = int(b[dihedrals_p_count][6:13])
+    c_d = int(b[dihedrals_p_count][13:20])
+    d_d = int(b[dihedrals_p_count][20:27])
+    if a_d not in leftovers and b_d not in leftovers and c_d not in leftovers and d_d not in leftovers:
+        dihedrals_prev.append([a_d, b_d, c_d, d_d])
+        ndp += 1
+    dihedrals_p_count += 1
+
+# Eliminate duplicates in entire dihedrals list
+unique_dihedrals = genpairs.uniq_dihedral(dihedrals_list, dihedrals_prev)
+
+# properly format dihedrals list
+dihedrals = []
+for i in range(0, len(unique_dihedrals)):
+    dihedrals.append('{:6d}{:7d}{:7d}{:7d}{:4d}'.format(unique_dihedrals[i][0], unique_dihedrals[i][1],
+                                                        unique_dihedrals[i][2], unique_dihedrals[i][3], 3))
+
 # eliminate the old dihedrals list
 
 del b[dihedrals_p_index + 2: dihedrals_p_count]
@@ -673,6 +690,41 @@ count = dihedrals_p_index + 2
 for i in range(0, len(dihedrals)):
     b.insert(count, dihedrals[i] + "\n")
     count += 1
+
+# [ dihedrals ] ; impropers
+
+# In places where the double bond b/w c1 and c2 has changed to a single bond, the improper dihedrals need to be removed
+
+# generate a list of impropers of interest (ones that will potentially be eliminated)
+impropers_list = []
+for i in range(0, tot_monomers):
+    impropers_list.append([atoms*i + 26, atoms*i + 27, atoms*i + 86, atoms*i + 87])
+    impropers_list.append([atoms*i + 41, atoms*i + 42, atoms*i + 111, atoms*i + 112])
+    impropers_list.append([atoms*i + 56, atoms*i + 57, atoms*i + 136, atoms*i + 137])
+    impropers_list.append([atoms*i + 25, atoms*i + 26, atoms*i + 27, atoms*i + 85])
+    impropers_list.append([atoms*i + 40, atoms*i + 41, atoms*i + 42, atoms*i + 110])
+    impropers_list.append([atoms*i + 55, atoms*i + 56, atoms*i + 57, atoms*i + 135])
+
+imp_of_interest = []
+for i in impropers_list:
+    if impropers_list[0] in c1 or impropers_list[1] in c1 or impropers_list[2] in c1 or impropers_list[3] in c1:
+        # check against c1 since it is in both dihedrals of interest. c2 is involved in an improper that we want to keep
+        imp_of_interest.append(impropers_list[i])
+
+dihedrals_imp_index = 0  # find index where [ dihedrals ] section begins (impropers)
+while b[dihedrals_imp_index].count('[ dihedrals ] ; impropers') == 0:
+    dihedrals_imp_index += 1
+
+ndimp = 0  # number of lines in the 'dihedrals ; impropers' section
+dihedrals_imp_count = dihedrals_imp_index + 2
+dihedrals_imp = []
+for i in range(dihedrals_imp_count, len(b)):  # This is the last section in the input .itp file
+    a_imp = [int(b[dihedrals_imp_count][0:6]), int(b[dihedrals_imp_count][6:13]), int(b[dihedrals_imp_count][13:20]), int(b[dihedrals_imp_count][20:27])]
+    for k in range(0, len(imp_of_interest)):
+        if set(a_imp) != set(imp_of_interest[k]):
+            dihedrals_imp.append(b[dihedrals_imp_count])
+            ndimp += 1
+    dihedrals_imp_count += 1
 
 # Now write the new topology to a new file
 
@@ -687,6 +739,13 @@ end = time.time()
 print 'Total time elapsed: %s seconds' %(end - start)
 print c1
 print c2
+print radical_c2
+count = 0
+for i in range(0, len(c2)):
+    for k in range(0, len(radical_c2)):
+        if radical_c2[k] in c2:
+            count += 1
+print 'duplicates: %s' %count
 print term
 print term_c1
 print other_c1
