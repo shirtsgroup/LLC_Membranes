@@ -208,3 +208,14 @@ def calc_dist(C1x, C2x, C1y, C2y, C1z, C2z, exclude, dist):
 			else:
 				dist[k, i] = ((C1x[i] - C2x[k])**2 + (C1y[i] - C2y[k])**2 + (C1z[i] - C2z[k])**2)**(0.5)
 	return dist
+
+def improper_dihedrals(b, start_imp, imp_of_interest, dihedrals_imp_count):
+	dihedrals_imp = []
+	for i in range(start_imp, len(b)):  # This is the last section in the input .itp file
+		a_imp = [int(b[i][0:6]), int(b[i][6:13]), int(b[i][13:20]), int(b[i][20:27])]
+		for k in range(0, len(imp_of_interest)):
+			if set(a_imp) != set(imp_of_interest[k]):
+				if a_imp not in dihedrals_imp:
+					dihedrals_imp.append(a_imp)
+		dihedrals_imp_count += 1
+	return dihedrals_imp

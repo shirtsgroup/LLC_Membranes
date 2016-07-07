@@ -271,7 +271,24 @@ def uniq(input1, input2):
             output2.append(input2[i])
     return output1, output2
 
-c1, c2 = uniq(C1_no, C2_no)
+c1_uniq, c2_uniq = uniq(C1_no, C2_no)
+
+# In some cases, it is possible that a c1 and a c2 on the same chain may be involved in independent cross-link reactions
+# We need to get rid of those to avoid unnecessary confusion. Since c2 is the reactive atom (it is a radical at some
+# point), it will trump c1. So if a c2 and c1 are on the same chain, then c1 will be removed from consideration.
+
+# Create a list of the indices of all the c1 atoms adjacent to reacting c2's
+adjacent_c1 = []
+for i in range(0, len(c2_uniq)):
+    adjacent_c1.append(c2_uniq[i] + 1)
+
+# Create the final lists of c1 and c2 that will be cross-linked
+c1 = []
+c2 = []
+for i in range(0, len(adjacent_c1)):
+    if c1_uniq[i] not in adjacent_c1:  # add values to the lists that have c1's that are not adjacent to reacting c2's
+        c1.append(c1_uniq[i])
+        c2.append(c2_uniq[i])
 
 # Some of the reactions will terminate instead of cross linking. This will result in the dummy hydrogen on C2 to become
 # active.
@@ -319,7 +336,6 @@ for i in range(0, len(term_indices)):
     del c1[term_indices[i] - len_diff]
     del c2[term_indices[i] - len_diff]
 
-
 # Use Assembly_itp.py to create a topology for the entire assembly and then write it to a file which will be edited to
 # incorporate cross-links
 
@@ -330,7 +346,7 @@ with open("crosslinked.itp", "w+") as output:
 # open and read that new file
 
 f = open('crosslinked.itp', 'r')
-
+print 'Crosslinked.itp file written'
 b = []
 for line in f:
     b.append(line)
@@ -491,7 +507,7 @@ while b[bond_count] != '\n':
         nb += 1  # counting number of lines in 'bonds' section
     bond_count += 1  # increments while loop
 
-# properly format dihedrals list
+# properly format bonds list
 bonds = []
 for i in range(0, len(bond_list)):
     bonds.append('{:6d}{:7d}{:4d}'.format(bond_list[i][0], bond_list[i][1], 1))
@@ -532,35 +548,35 @@ for i in range(atoms_index + 2, atoms_count):
         b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
     if res_num in term:  # the terminating c2 (where the termination actually happens) becomes sp3 hybridized
         b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
-    if res_num in H:  # all of the H's that attach to the new sp3 hybridized carbons
-        b[i] = b[i][0:5] + b[i][5:10].replace('ha', 'hc') + b[i][10:len(b[atoms_index + 2])]
-    if res_num in H_new1:  # Dummy atoms become real during the bonding process
-        b[i] = b[i][0:5] + b[i][5:10].replace('ha', 'hc') + b[i][10:len(b[atoms_index + 2])]
-    if res_num in H_new2:  # Dummy atoms which become real during the termination process
-        b[i] = b[i][0:5] + b[i][5:10].replace('ha', 'hc') + b[i][10:len(b[atoms_index + 2])]
+    # if res_num in H:  # all of the H's that attach to the new sp3 hybridized carbons
+    #     b[i] = b[i][0:5] + b[i][5:10].replace('ha', 'hc') + b[i][10:len(b[atoms_index + 2])]
+    # if res_num in H_new1:  # Dummy atoms become real during the bonding process
+    #     b[i] = b[i][0:5] + b[i][5:10].replace('ha', 'hc') + b[i][10:len(b[atoms_index + 2])]
+    # if res_num in H_new2:  # Dummy atoms which become real during the termination process
+    #     b[i] = b[i][0:5] + b[i][5:10].replace('ha', 'hc') + b[i][10:len(b[atoms_index + 2])]
     if res_num in radical_c2:  # mark the c2 atoms that are now radicals. They remain sp2 hybridized but are reactive
-        b[i] = b[i][0:len(b[atoms_index + 2]) - 1] + '*' + '\n'
+        b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c2') + b[i][10:len(b[atoms_index + 2]) - 1] + '*' + '\n'
     if res_num in term_c1:  # c1 in a terminating chain will be sp3
         b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
 
 # Add bonds between cross-linking atoms
 
 for i in range(0, len(c1)):
-    b.insert(nb, '{:6d}{:7d}{:4d}'.format(c1[i], c2[i], 1) + "\n")
+    b.insert(nb + bonds_index + 2, '{:6d}{:7d}{:4d}'.format(c1[i], c2[i], 1) + "\n")
     nb += 1
 
 # Add new H bonds formed during propagation (dummy H's becoming real)
 for i in range(0, len(H_new1)):
-    b.insert(nb, '{:6d}{:7d}{:4d}'.format(c1[i], H_new1[i], 1) + "\n")
+    b.insert(nb + bonds_index + 2, '{:6d}{:7d}{:4d}'.format(c1[i], H_new1[i], 1) + "\n")
     nb += 1
 
 # new H bonds formed during termination (2 dummy H's becoming real)
 k = 0
 for i in range(0, len(term)):
-    b.insert(nb, '{:6d}{:7d}{:4d}'.format(term[i], H_new2[k], 1) + "\n")
+    b.insert(nb + bonds_index + 2, '{:6d}{:7d}{:4d}'.format(term[i], H_new2[k], 1) + "\n")
     k += 1
     nb += 1
-    b.insert(nb, '{:6d}{:7d}{:4d}'.format(term[i] + 1, H_new2[k], 1) + "\n")
+    b.insert(nb + bonds_index + 2, '{:6d}{:7d}{:4d}'.format(term[i] + 1, H_new2[k], 1) + "\n")
     nb += 1
     k += 1
 
@@ -694,8 +710,8 @@ for i in range(0, len(dihedrals)):
 # [ dihedrals ] ; impropers
 
 # In places where the double bond b/w c1 and c2 has changed to a single bond, the improper dihedrals need to be removed
-
 # generate a list of impropers of interest (ones that will potentially be eliminated)
+
 impropers_list = []
 for i in range(0, tot_monomers):
     impropers_list.append([atoms*i + 26, atoms*i + 27, atoms*i + 86, atoms*i + 87])
@@ -706,8 +722,8 @@ for i in range(0, tot_monomers):
     impropers_list.append([atoms*i + 55, atoms*i + 56, atoms*i + 57, atoms*i + 135])
 
 imp_of_interest = []
-for i in impropers_list:
-    if impropers_list[0] in c1 or impropers_list[1] in c1 or impropers_list[2] in c1 or impropers_list[3] in c1:
+for i in range(0, len(impropers_list)):
+    if impropers_list[i][0] in c1 or impropers_list[i][1] in c1 or impropers_list[i][2] in c1 or impropers_list[i][3] in c1:
         # check against c1 since it is in both dihedrals of interest. c2 is involved in an improper that we want to keep
         imp_of_interest.append(impropers_list[i])
 
@@ -715,16 +731,27 @@ dihedrals_imp_index = 0  # find index where [ dihedrals ] section begins (improp
 while b[dihedrals_imp_index].count('[ dihedrals ] ; impropers') == 0:
     dihedrals_imp_index += 1
 
-ndimp = 0  # number of lines in the 'dihedrals ; impropers' section
 dihedrals_imp_count = dihedrals_imp_index + 2
+start_imp = dihedrals_imp_count
+
 dihedrals_imp = []
-for i in range(dihedrals_imp_count, len(b)):  # This is the last section in the input .itp file
-    a_imp = [int(b[dihedrals_imp_count][0:6]), int(b[dihedrals_imp_count][6:13]), int(b[dihedrals_imp_count][13:20]), int(b[dihedrals_imp_count][20:27])]
-    for k in range(0, len(imp_of_interest)):
-        if set(a_imp) != set(imp_of_interest[k]):
-            dihedrals_imp.append(b[dihedrals_imp_count])
-            ndimp += 1
+for i in range(start_imp, len(b)):  # This is the last section in the input .itp file
+    a_imp = [int(b[i][0:6]), int(b[i][6:13]), int(b[i][13:20]), int(b[i][20:27])]
+    a_imp.sort()
+    if a_imp not in imp_of_interest:
+        dihedrals_imp.append(b[i])
     dihedrals_imp_count += 1
+
+# eliminate the old improper dihedrals list
+
+del b[dihedrals_imp_index + 2: dihedrals_imp_count]
+
+# Insert new improper dihedrals list
+
+count = dihedrals_imp_index + 2
+for i in range(0, len(dihedrals_imp)):
+    b.insert(count, dihedrals_imp[i])
+    count += 1
 
 # Now write the new topology to a new file
 
@@ -742,10 +769,11 @@ print c2
 print radical_c2
 count = 0
 for i in range(0, len(c2)):
-    for k in range(0, len(radical_c2)):
-        if radical_c2[k] in c2:
-            count += 1
-print 'duplicates: %s' %count
+    if c2[i] in radical_c2:
+        count += 1
+
+print 'Duplicates: %s' %count
+
 print term
 print term_c1
 print other_c1
