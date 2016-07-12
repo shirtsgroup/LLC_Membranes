@@ -33,12 +33,12 @@ if [ ${RESOURCE}=='janus' ]; then
     USER='beco4952'
     NTASKSPERNODE=1
     NP=$((NODES*2))
-    if [ ${HOURS}>24 ]; then
+    if (( ${HOURS}>24 )); then
         QOS='janus-long'
     else
         QOS='janus'
     fi
-    if [ ${HOURS}>168 ]; then
+    if (( ${HOURS}>168 )); then
         echo 'That is too long'
         exit
     fi
@@ -47,7 +47,7 @@ elif [ ${RESOURCE}=='bridges' ]; then
     QOS='RM'
     NTASKSPERNODE=28
     NP=$((NTASKSPERNODE*NODES))
-    if [ ${HOURS}>48 ]; then
+    if (( ${HOURS}>48 )); then
         echo 'That is too long'
         exit
     fi
