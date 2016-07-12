@@ -115,9 +115,10 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
 
     if $CHECK == 0; then  # if the files are the same (meaning output is no longer being written)
 
-        gmx_mpi convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}
+        scancel ${JOB_ID}  # cancel the job which will be extended
+        gmx_mpi convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}  # make a new, extended .tpr file
 
-        if [ ${RESOURCE}=='janus' ]; then
+        if [ ${RESOURCE}=='janus' ]; then  # write a janus batch submission script
             echo "#! /bin/bash" > ${WORKDIR}/Extend_Sim.sh
             echo >> ${WORKDIR}/Extend_Sim.sh
             echo "#SBATCH --qos ${QOS}" >> ${WORKDIR}/Extend_Sim.sh
@@ -132,7 +133,7 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
             echo >> ${WORKDIR}/Extend_Sim.sh
             echo "mpirun -np ${NP} gmx_mpi mdrun -s ${TPR} -cpi ${CPT} -v -deffnm "${TPR//.tpr}"" >> ${WORKDIR}/Extend_Sim.sh
             sbatch Extend_Sim.sh  # submit job
-        elif [ ${RESOURCE}=='bridges' ]; then
+        elif [ ${RESOURCE}=='bridges' ]; then  # write a bridges batch submission script
             echo "#!/bin/bash" > ${WORKDIR}/Extend_Sim.sh
             echo >> ${WORKDIR}/Extend_Sim.sh
             echo "#SBATCH --partition=${QOS}" >> ${WORKDIR}/Extend_Sim.sh
