@@ -1,13 +1,10 @@
 #!/usr/bin/env bash
 
 EXTENSION=50  # number of picoseconds that you want to extend the simulation by
-N_EXT=1  # number of extensions
 TPR="wiggle.tpr"  # .tpr file to be edited for simulation extension
 CPT="wiggle.cpt"  # .cpt file to be referenced for simulation extension
 LOG="wiggle.log"  # .log file to be monitored for stalling/ending of simulations
-FREQ_M=5  # frequency for checking log file (minutes)
-PREV="log_prev"  # previous log file (last 10 lines -- default for tail command)
-MACH="janus"  # name of machine -- all lowercase
+RESOURCE="janus"  # name of machine -- all lowercase
 EXCLUSIONS=()  # job id's to be excluded (i.e. other jobs that are running). Make this an environment variable
 HOURS=48  # hours requested for sim extension. Default 48 since that's the min of the max queues on janus & bridges
 MIN=00  # minutes requested for sim extension
@@ -17,12 +14,10 @@ NODES=8  # number of nodes requested
 while getopts "e:n:t:c:l:f:j:x:r:h:m:s" opt; do
     case $opt in
     e) EXTENSION=$OPTARG;;
-    n) N_EXT=$OPTARG;;
     t) TPR=$OPTARG;;
     c) CPT=$OPTARG;;
     l) LOG=$OPTARG;;
-    f) FREQ_M=$OPTARG;;
-    j) JOB_ARRAY=$OPTARG;;  # optional since it can be made manually
+    j) JOB_ARRAY+=($OPTARG);;  # optional since it can be made automatically
     x) EXCLUSIONS+=($OPTARG);;  # optional. Use to exclude jobs from JOB_ARRAY the program automatically produces JOB_ARRAY
     r) RESOURCE=$OPTARG;;
     h) HOURS=$OPTARG;;
