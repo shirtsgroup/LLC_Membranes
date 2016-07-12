@@ -33,6 +33,7 @@ if [ ${RESOURCE}=='janus' ]; then
     USER='beco4952'
     NTASKSPERNODE=1
     NP=$((NODES*2))
+    GMX_PATH="/projects/beco4952/pkgs/gromacs/5.1.2/bin"
     if (( ${HOURS}>24 )); then
         QOS='janus-long'
     else
@@ -77,12 +78,12 @@ for i in ${EXCLUSIONS[@]}; do
    JOB_ARRAY=( "${JOB_ARRAY[@]/$i}" )
 done
 
-ITERATION=1
 for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
     squeue --user=$USER > queue  # save the queue information to a temporary file called queue
     LINE=$(sed -n "/${JOB_ID}/=" queue)  # find the line containing the job_id of interest
     if [[ -z ${LINE} ]]; then  # if $LINE is empty, meaning it doesn't exist in the queue, then the job is probably done
         sed -i "/${JOB_ID}/d" -i job_array # remove all instances of that job_id from job_array
+        DONE=1
     else
         STATUS=$(sed "${LINE}q;d" queue | cut -b 48,49)  # search that line to find the job's status
 
@@ -118,10 +119,15 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
     # now change log to the new log_prev for the next iteration
     mv log_${JOB_ID} log_${JOB_ID}_prev
 
-    if $CHECK == 0; then  # if the files are the same (meaning output is no longer being written)
+    if [ $CHECK==0 ]; then  # if the files are the same (meaning output is no longer being written)
 
-        scancel ${JOB_ID}  # cancel the job which will be extended
-        gmx_mpi convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}  # make a new, extended .tpr file
+        if [ $DONE==1 ]; then
+            :  # indicates a job that has completed (i.e. no longer in the queue)
+        else
+            scancel ${JOB_ID}  # run this command to cancel the job only if the job is still running
+        fi
+
+        ${GMX_PATH}/gmx_mpi convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}  # make a new, extended .tpr file
 
         if [ ${RESOURCE}=='janus' ]; then  # write a janus batch submission script
             echo "#! /bin/bash" > ${WORKDIR}/Extend_Sim.sh
@@ -158,5 +164,4 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
             sbatch ${SBATCH}/Extend_Sim.sh # submit job
         fi
     fi
-    ITERATION=$((ITERATION+1))  # increment iteration variable
 done
