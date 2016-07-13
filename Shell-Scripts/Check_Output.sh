@@ -14,6 +14,7 @@ NODES=8  # number of nodes requested
 while getopts "e:n:t:c:l:f:j:x:r:h:m:s" opt; do
     case ${opt} in
     e) EXTENSION=$OPTARG;;
+    n) NODES=$OPTARG;;
     t) TPR=$OPTARG;;
     c) CPT=$OPTARG;;
     l) LOG=$OPTARG;;
@@ -129,40 +130,38 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
         fi
 
         if [ ${RESOURCE}=='janus' ]; then  # write a janus batch submission script
-            echo "#! /bin/bash" > ${WORKDIR}/Extend_Sim.sh
-            echo >> ${WORKDIR}/Extend_Sim.sh
-            echo "#SBATCH --qos ${QOS}" >> ${WORKDIR}/Extend_Sim.sh
-            echo "#SBATCH --nodes ${NODES}" >> ${WORKDIR}/Extend_Sim.sh
-            echo "#SBATCH --ntasks-per-node ${NTASKSPERNODE}" >> ${WORKDIR}/Extend_Sim.sh
-            echo "#SBATCH --time ${HOURS}:${MIN}:${SEC}" >> ${WORKDIR}/Extend_Sim.sh
-            echo >> ${WORKDIR}/Extend_Sim.sh
-            echo "ml slurm" >> ${WORKDIR}/Extend_Sim.sh
-            echo "ml gromacs" >> ${WORKDIR}/Extend_Sim.sh
-            echo "ml python/2.7.10" >> ${WORKDIR}/Extend_Sim.sh
-            echo "ml numpy" >> ${WORKDIR}/Extend_Sim.sh
-            echo >> ${WORKDIR}/Extend_Sim.sh
-            echo "gmx_mpi convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}" >> ${WORKDIR}/Extend_Sim.sh
-            echo "mpirun -np ${NP} gmx_mpi mdrun -s ${TPR} -cpi ${CPT} -v -deffnm "${TPR//.tpr}"" >> ${WORKDIR}/Extend_Sim.sh
-            sbatch ${WORKDIR}/Extend_Sim.sh  # submit job
+            echo "#! /bin/bash" > ${WORKDIR}/Extend_Sim_new.sh
+            echo >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "#SBATCH --qos ${QOS}" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "#SBATCH --nodes ${NODES}" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "#SBATCH --ntasks-per-node ${NTASKSPERNODE}" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "#SBATCH --time ${HOURS}:${MIN}:${SEC}" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "ml slurm" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "ml gromacs" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "ml python/2.7.10" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "ml numpy" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "gmx_mpi convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "mpirun -np ${NP} gmx_mpi mdrun -s ${TPR} -cpi ${CPT} -v -deffnm "${TPR//.tpr}"" >> ${WORKDIR}/Extend_Sim_new.sh
         elif [ ${RESOURCE}=='bridges' ]; then  # write a bridges batch submission script
-            echo "#!/bin/bash" > ${WORKDIR}/Extend_Sim.sh
-            echo >> ${WORKDIR}/Extend_Sim.sh
-            echo "#SBATCH --partition=${QOS}" >> ${WORKDIR}/Extend_Sim.sh
-            echo "#SBATCH -N ${NODES} --tasks-per-node=${NTASKSPERNODE}" >> ${WORKDIR}/Extend_Sim.sh
-            echo "#SBATCH -t ${HOURS}:${MIN}:${SEC}" >> ${WORKDIR}/Extend_Sim.sh
-            echo >> ${WORKDIR}/Extend_Sim.sh
-            echo "set echo" >> ${WORKDIR}/Extend_Sim.sh
-            echo "set -x" >> ${WORKDIR}/Extend_Sim.sh
-            echo "source /usr/share/Modules/init/bash" >> ${WORKDIR}/Extend_Sim.sh
-            echo >> ${WORKDIR}/Extend_Sim.sh
-            echo "module load gromacs" >> ${WORKDIR}/Extend_Sim.sh
-            echo >> ${WORKDIR}/Extend_Sim.sh
-            echo "cd $SLURM_SUBMIT_DIR" >> ${WORKDIR}/Extend_Sim.sh
-            echo "echo "$SLURM_NPROCS=" $SLURM_NPROCS" >> ${WORKDIR}/Extend_Sim.sh
-            echo >> ${WORKDIR}/Extend_Sim.sh
-            echo "gmx_mpi convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}" >> ${WORKDIR}/Extend_Sim.sh
-            echo "mpirun -np ${NP} gmx_mpi mdrun -s ${TPR} -cpi ${CPT} -v -deffnm "${TPR//.tpr}"" >> ${WORKDIR}/Extend_Sim.sh
-            sbatch ${WORKDIR}/Extend_Sim.sh # submit job
+            echo "#!/bin/bash" > ${WORKDIR}/Extend_Sim_new.sh
+            echo >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "#SBATCH --partition=${QOS}" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "#SBATCH -N ${NODES} --tasks-per-node=${NTASKSPERNODE}" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "#SBATCH -t ${HOURS}:${MIN}:${SEC}" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "set echo" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "set -x" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "source /usr/share/Modules/init/bash" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "module load gromacs" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "cd $SLURM_SUBMIT_DIR" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "echo "$SLURM_NPROCS=" $SLURM_NPROCS" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "gmx_mpi convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "mpirun -np ${NP} gmx_mpi mdrun -s ${TPR} -cpi ${CPT} -v -deffnm "${TPR//.tpr}"" >> ${WORKDIR}/Extend_Sim_new.sh
         fi
     fi
 done
