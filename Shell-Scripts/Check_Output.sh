@@ -10,8 +10,10 @@ HOURS=48  # hours requested for sim extension. Default 48 since that's the min o
 MIN=00  # minutes requested for sim extension
 SEC=00  # seconds requested for sim extension
 NODES=8  # number of nodes requested
+B_ALLOC='ct4s8bp'  # bridges allocation
+GMX_LOC="/home/bjc/Programs/Gromacs/bin/GMXRC"  # location of gmx executable if you have compiled your own
 
-while getopts "e:n:t:c:l:f:j:x:r:h:m:s" opt; do
+while getopts "e:n:t:c:l:f:j:x:r:h:m:s:a:g" opt; do
     case ${opt} in
     e) EXTENSION=$OPTARG;;
     n) NODES=$OPTARG;;
@@ -20,10 +22,13 @@ while getopts "e:n:t:c:l:f:j:x:r:h:m:s" opt; do
     l) LOG=$OPTARG;;
     j) JOB_ARRAY+=($OPTARG);;  # optional since it can be made automatically
     x) EXCLUSIONS+=($OPTARG);;  # optional. Use to exclude jobs from JOB_ARRAY the program automatically produces JOB_ARRAY
+    # Note: to have multiple exlusions, use the -x flags multiple times -x job1 -x job2 -x job3 etc.
     r) RESOURCE=$OPTARG;;
     h) HOURS=$OPTARG;;
     m) MIN=$OPTARG;;
     s) SEC=$OPTARG;;
+    a) B_ALLOC=$OPTARG;;
+    g) GMX_LOC=$OPTARG;;
     esac
 done
 
@@ -31,11 +36,11 @@ done
 # sure that we are allowed to run for the amount of hours requested
 
 if [ ${RESOURCE}=='janus' ]; then
-    USER='beco4952'
+    USER='beco4952'  # Can't use environment variable because of cron
     NTASKSPERNODE=1
     NP=$((NODES*2))
-    GMX_PATH="/projects/beco4952/pkgs/gromacs/5.1.2/bin"
-    OUTPUT="/lustre/janus_scratch/beco4952/Cron_Output"  # place where files like job_array, queue and dir will be stored
+    OUTPUT="/lustre/janus_scratch/${USER}/Cron_Output"  # place where files like job_array, queue and dir will be stored
+    GMX_LOC="/projects/${USER}/bin/GMXRC"
     if (( ${HOURS}>24 )); then
         QOS='janus-long'
     else
@@ -43,13 +48,17 @@ if [ ${RESOURCE}=='janus' ]; then
     fi
     if (( ${HOURS}>168 )); then
         echo 'That is too long'
-        exit
+        exit  # Stop the script
     fi
-elif [ ${RESOURCE}=='bridges' ]; then
+fi
+
+if [ ${RESOURCE}=='bridges' ]; then
     USER='bjc'
     QOS='RM'
-    NTASKSPERNODE=28
+    NTASKSPERNODE=4
     NP=$((NTASKSPERNODE*NODES))
+    OUTPUT="/pylon1/${B_ALLOC}/${USER}/Cron_Output"
+    GMX_LOC="/home/${USER}/Programs/Gromacs/bin/GMXRC"
     if (( ${HOURS}>48 )); then
         echo 'That is too long'
         exit
@@ -57,9 +66,7 @@ elif [ ${RESOURCE}=='bridges' ]; then
 fi
 
 # First check that the job is running. It may be stuck in the queue
-# Submit jobs and simultaneously add them to the JOB_ARRAY:
-# JOB_ARRAY+=($(sbatch Run_Janus.sh | cut -b 21,22,23,24,25,26,27))
-# or create an array automatically:
+# Create an array of jobs:
 
 squeue --user=$USER > ${OUTPUT}/queue  # save the queue output to a file
 NO_LINES=$(wc -l < ${OUTPUT}/queue)  # find the number of lines in queue
@@ -141,8 +148,9 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
             echo "ml gromacs" >> ${WORKDIR}/Extend_Sim_new.sh
             echo "ml python/2.7.10" >> ${WORKDIR}/Extend_Sim_new.sh
             echo "ml numpy" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "source ${GMX_LOC}" >> ${WORKDIR}/Extend_sim_new.sh
             echo >> ${WORKDIR}/Extend_Sim_new.sh
-            echo "mpirun -np 1 gmx_mpi convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "gmx convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}" >> ${WORKDIR}/Extend_Sim_new.sh
             echo "mpirun -np ${NP} gmx_mpi mdrun -s ${TPR} -cpi ${CPT} -append -v -deffnm "${TPR//.tpr}"" >> ${WORKDIR}/Extend_Sim_new.sh
         elif [ ${RESOURCE}=='bridges' ]; then  # write a bridges batch submission script
             echo "#!/bin/bash" > ${WORKDIR}/Extend_Sim_new.sh
@@ -151,16 +159,20 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
             echo "#SBATCH -N ${NODES} --tasks-per-node=${NTASKSPERNODE}" >> ${WORKDIR}/Extend_Sim_new.sh
             echo "#SBATCH -t ${HOURS}:${MIN}:${SEC}" >> ${WORKDIR}/Extend_Sim_new.sh
             echo >> ${WORKDIR}/Extend_Sim_new.sh
+            # This block is optional
             echo "set echo" >> ${WORKDIR}/Extend_Sim_new.sh
             echo "set -x" >> ${WORKDIR}/Extend_Sim_new.sh
             echo "source /usr/share/Modules/init/bash" >> ${WORKDIR}/Extend_Sim_new.sh
             echo >> ${WORKDIR}/Extend_Sim_new.sh
+            # End optional part
+            # Add other modules if you need them
             echo "module load gromacs" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo source ${GMX_LOC} >> ${WORKDIR}/Extend_Sim_new.sh
             echo >> ${WORKDIR}/Extend_Sim_new.sh
             echo "cd $SLURM_SUBMIT_DIR" >> ${WORKDIR}/Extend_Sim_new.sh
             echo "echo "$SLURM_NPROCS=" $SLURM_NPROCS" >> ${WORKDIR}/Extend_Sim_new.sh
             echo >> ${WORKDIR}/Extend_Sim_new.sh
-            echo "mpirun -np 1 gmx_mpi convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "gmx convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}" >> ${WORKDIR}/Extend_Sim_new.sh
             echo "mpirun -np ${NP} gmx_mpi mdrun -s ${TPR} -cpi ${CPT} -append -v -deffnm "${TPR//.tpr}"" >> ${WORKDIR}/Extend_Sim_new.sh
         fi
     fi
