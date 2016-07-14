@@ -138,7 +138,9 @@ MOL_NA=$((NO_MONOMERS*NOPORES*LAYERS))
 
 if [ RESOURCE=='janus' ]; then
     NP=$((NODES*2))
-elif [ RESOURCE=='bridges' ]; then
+fi
+
+if [ RESOURCE=='bridges' ]; then
     NP=$((NTASKS_PER_NODE*NODES))
 else
     echo "Specify a valid resource"
