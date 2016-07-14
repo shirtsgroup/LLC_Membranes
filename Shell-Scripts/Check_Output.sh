@@ -88,7 +88,7 @@ for i in ${EXCLUSIONS[@]}; do
    JOB_ARRAY=( "${JOB_ARRAY[@]/$i}" )
 done
 
-for JOB_ID in ${JOB_ARRAY[@]); do
+for JOB_ID in ${JOB_ARRAY[@]}; do
     echo $i > ${OUTPUT}/looparray
 done
 
