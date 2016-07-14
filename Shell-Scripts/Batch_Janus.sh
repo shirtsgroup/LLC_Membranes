@@ -157,7 +157,9 @@ if [ RESOURCE=='janus' ]; then
         -T ${SIM_TITLE} -C ${CUTOFF_MD} -i ${INTEGRATOR_MD} -D ${DT} -L ${SIM_LENGTH} -f ${FRAMES} -v ${TCOUPL} -K ${REF_T}\
         -b ${PCOUPL} -Y ${PTYPE} -B ${REF_P} -R ${COMPRESSIBILITY} -Z ${PBC} -V ${SOLV_LENGTH} -n ${NODES} -s ${SOLVATION} \
         -m ${MPI}" >> Run_Job.sh
-elif [ RESOURCE=='bridges' ]; then
+fi
+
+if [ RESOURCE=='bridges' ]; then
     NP=$((NTASKS_PER_NODE*NODES))
     echo '#!/bin/bash' > Run_Job.sh
     echo '' >> Run_Job.sh
