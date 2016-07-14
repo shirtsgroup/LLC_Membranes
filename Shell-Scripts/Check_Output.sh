@@ -40,6 +40,7 @@ if [ ${RESOURCE}=='janus' ]; then
     NTASKSPERNODE=1
     NP=$((NODES*2))
     OUTPUT="/lustre/janus_scratch/${USER}/Cron_Output"  # place where files like job_array, queue and dir will be stored
+    echo ${OUTPUT}
     GMX_LOC="/projects/${USER}/bin/GMXRC"
     if (( ${HOURS}>24 )); then
         QOS='janus-long'
@@ -123,7 +124,7 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
         echo 'Placeholder' > ${WORKDIR}/log_${JOB_ID}_prev  # if it doesn't exist, make a place holding log_${JOB_ID}_prev file
     fi
 
-    cmp ${WORKDIR}/log_${JOB_ID} ${WORKDIR}/log_${JOB_ID}_prev || export CHECK=1  # if the two files are different, CHECK=1 ... this is what we want unless the job
+    cmp ${WORKDIR}/log_${JOB_ID} ${WORKDIR}/log_${JOB_ID}_prev || export CHECK=1  # if the two files are different then CHECK=1 ... this is what we want unless the job
     # is finished. Otherwise (CHECK=0), it is an indication of a job that needs to be restarted (a stalled or finished job)
     # now change log to the new log_prev for the next iteration
     mv ${WORKDIR}/log_${JOB_ID} ${WORKDIR}/log_${JOB_ID}_prev
