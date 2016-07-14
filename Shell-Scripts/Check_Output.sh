@@ -143,7 +143,7 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
             echo "ml numpy" >> ${WORKDIR}/Extend_Sim_new.sh
             echo >> ${WORKDIR}/Extend_Sim_new.sh
             echo "mpirun -np 1 gmx_mpi convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}" >> ${WORKDIR}/Extend_Sim_new.sh
-            echo "mpirun -np ${NP} gmx_mpi mdrun -s ${TPR} -cpi ${CPT} -v -deffnm "${TPR//.tpr}"" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "mpirun -np ${NP} gmx_mpi mdrun -s ${TPR} -cpi ${CPT} -append -v -deffnm "${TPR//.tpr}"" >> ${WORKDIR}/Extend_Sim_new.sh
         elif [ ${RESOURCE}=='bridges' ]; then  # write a bridges batch submission script
             echo "#!/bin/bash" > ${WORKDIR}/Extend_Sim_new.sh
             echo >> ${WORKDIR}/Extend_Sim_new.sh
@@ -161,7 +161,7 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
             echo "echo "$SLURM_NPROCS=" $SLURM_NPROCS" >> ${WORKDIR}/Extend_Sim_new.sh
             echo >> ${WORKDIR}/Extend_Sim_new.sh
             echo "mpirun -np 1 gmx_mpi convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}" >> ${WORKDIR}/Extend_Sim_new.sh
-            echo "mpirun -np ${NP} gmx_mpi mdrun -s ${TPR} -cpi ${CPT} -v -deffnm "${TPR//.tpr}"" >> ${WORKDIR}/Extend_Sim_new.sh
+            echo "mpirun -np ${NP} gmx_mpi mdrun -s ${TPR} -cpi ${CPT} -append -v -deffnm "${TPR//.tpr}"" >> ${WORKDIR}/Extend_Sim_new.sh
         fi
     fi
 done
