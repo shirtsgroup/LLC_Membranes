@@ -550,10 +550,10 @@ for i in range(atoms_index + 2, atoms_count):
         b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
     # if res_num in H:  # all of the H's that attach to the new sp3 hybridized carbons
     #     b[i] = b[i][0:5] + b[i][5:10].replace('ha', 'hc') + b[i][10:len(b[atoms_index + 2])]
-    # if res_num in H_new1:  # Dummy atoms become real during the bonding process
-    #     b[i] = b[i][0:5] + b[i][5:10].replace('ha', 'hc') + b[i][10:len(b[atoms_index + 2])]
-    # if res_num in H_new2:  # Dummy atoms which become real during the termination process
-    #     b[i] = b[i][0:5] + b[i][5:10].replace('ha', 'hc') + b[i][10:len(b[atoms_index + 2])]
+    if res_num in H_new1:  # Dummy atoms become real during the bonding process and have mass
+        b[i] = b[i][0:53] + b[i][53:61].replace('0.00000', '1.00800') + b[i][61:len(b[atoms_index + 2])]
+    if res_num in H_new2:  # Dummy atoms which become real during the termination process and have mass
+        b[i] = b[i][0:53] + b[i][53:61].replace('0.00000', '1.00800') + b[i][61:len(b[atoms_index + 2])]
     if res_num in radical_c2:  # mark the c2 atoms that are now radicals. They remain sp2 hybridized but are reactive
         b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c2') + b[i][10:len(b[atoms_index + 2]) - 1] + '*' + '\n'
     if res_num in term_c1:  # c1 in a terminating chain will be sp3
@@ -735,11 +735,11 @@ dihedrals_imp_count = dihedrals_imp_index + 2
 start_imp = dihedrals_imp_count
 
 dihedrals_imp = []
-for i in range(start_imp, len(b)):  # This is the last section in the input .itp file
-    a_imp = [int(b[i][0:6]), int(b[i][6:13]), int(b[i][13:20]), int(b[i][20:27])]
+while b[dihedrals_imp_count] != '\n':  # This is the last section in the input .itp file
+    a_imp = [int(b[dihedrals_imp_count][0:6]), int(b[dihedrals_imp_count][6:13]), int(b[dihedrals_imp_count][13:20]), int(b[dihedrals_imp_count][20:27])]
     a_imp.sort()
     if a_imp not in imp_of_interest:
-        dihedrals_imp.append(b[i])
+        dihedrals_imp.append(b[dihedrals_imp_count])
     dihedrals_imp_count += 1
 
 # eliminate the old improper dihedrals list
@@ -751,6 +751,39 @@ del b[dihedrals_imp_index + 2: dihedrals_imp_count]
 count = dihedrals_imp_index + 2
 for i in range(0, len(dihedrals_imp)):
     b.insert(count, dihedrals_imp[i])
+    count += 1
+print dihedrals_imp
+# [ virtual_sites4 ]
+
+vsite_index = 0  # find index where [ virutal_sites4 ] section begins (propers)
+while b[vsite_index].count('[ virtual_sites4 ]') == 0:
+    vsite_index += 1
+
+nv = 0
+vsite_count = vsite_index + 2
+
+for i in range(vsite_count, len(b)):  # This is the last section in the input .itp file
+    vsite_count += 1
+    nv += 1
+
+# we need to make a new list of virtual sites that does not include in the sites which have been turned to real atoms
+# term and H_new1 contain the indices of the hydrogens which need to be removed from the virtual sites list
+
+virtual_sites = []
+for i in range(vsite_index + 2, vsite_count):
+    site = int(b[i][0:8])
+    if site not in H_new2 and site not in H_new1:  # if the site is in the old virtual sites but not in H_new1 or tern
+        virtual_sites.append(b[i])  # then add it to virtual_sites since those hydrogens are still dummies
+
+# eliminate the old virtual_sites4 list
+
+del b[vsite_index + 2: vsite_count]
+
+# Insert new virtual sites list
+
+count = vsite_index + 2
+for i in range(0, len(virtual_sites)):
+    b.insert(count, virtual_sites[i])
     count += 1
 
 # Now write the new topology to a new file

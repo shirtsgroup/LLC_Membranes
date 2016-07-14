@@ -15,7 +15,7 @@ parser.add_argument('-t', '--type', default='LLC', help = 'Type of monomer being
 parser.add_argument('-l', '--layers', default=20, help = 'Number of layers')
 parser.add_argument('-P', '--no_pores', default=4, help = 'Number of Pores')
 parser.add_argument('-o', '--no_monomers', default=6, help = 'Number of monomers per layer')
-parser.add_argument('-x', '--xlink', default='off', help = 'Whether this is going to be cross linked')
+parser.add_argument('-x', '--xlink', default='on', help = 'Whether this is going to be cross linked')
 
 args = parser.parse_args()
 
@@ -61,6 +61,10 @@ while a[dihedrals_p_index].count('[ dihedrals ] ; propers') == 0:
 dihedrals_imp_index = 0  # find index where [ dihedrals ] section begins (impropers)
 while a[dihedrals_imp_index].count('[ dihedrals ] ; impropers') == 0:
     dihedrals_imp_index += 1
+
+vsite_index = 0  # find index where [ dihedrals ] section begins (propers)
+while a[vsite_index].count('[ virtual_sites4 ]') == 0:
+    vsite_index += 1
 
 # print up to ' [ atoms ] ' since everything before it does not need to be modified
 for i in range(0, atoms_index + 2):  # prints up to and including [ atoms ] in addition to the header line after it
@@ -160,7 +164,7 @@ print a[dihedrals_imp_index], a[dihedrals_imp_index + 2],
 ndimp = 0  # number of lines in the 'dihedrals ; impropers' section
 dihedrals_imp_count = dihedrals_imp_index + 3
 
-for i in range(dihedrals_imp_count, len(a)):  # This is the last section in the input .itp file
+while a[dihedrals_imp_count] != '\n':
     dihedrals_imp_count += 1
     ndimp += 1
 
@@ -172,4 +176,26 @@ for i in range(0, no_mon):
                                                i*nr + int(a[k + dihedrals_imp_index + 3][14:22]),
                                                i*nr + int(a[k + dihedrals_imp_index + 3][22:30]),
                                                a[k + dihedrals_imp_index + 3][30:len(a[k + dihedrals_imp_index + 3])]),
+print ''
 
+# [ virtual_sites4 ]
+
+print a[vsite_index], a[vsite_index + 1],
+nv = 0
+vsite_count = vsite_index + 2
+
+for i in range(vsite_count, len(a)):  # This is the last section in the input .itp file
+    vsite_count += 1
+    nv += 1
+
+# Make sure there is no space at the bottom of the topology if you are getting errors
+for i in range(0, no_mon):
+    for k in range(0, nv):
+        print '{:<8d}{:<6d}{:<6d}{:<6d}{:<8d}{:<8d}{:<11}{:<11}{:}'.format(i*nr + int(a[k + vsite_index + 2][0:8]),
+                                               i*nr + int(a[k + vsite_index + 2][8:14]),
+                                               i*nr + int(a[k + vsite_index + 2][14:20]),
+                                               i*nr + int(a[k + vsite_index + 2][20:26]),
+                                               i*nr + int(a[k + vsite_index + 2][26:34]),
+                                               int(a[k + vsite_index + 2][34:42]), a[k + vsite_index + 2][42:53],
+                                               a[k + vsite_index + 2][53:64],
+                                               a[k + vsite_index + 2][64:len(a[k + vsite_index + 2])]),

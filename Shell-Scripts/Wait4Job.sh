@@ -19,5 +19,5 @@ do
 		sleep ${SLEEP}  # sleep for a specified amount of time between checks
 	done
 	mv ${WORKINGDIR}/${FILE} ${WORKINGDIR}/Extend_Sim.sh  # change the name of the file -- this might not be necessary
-	sbatch Extend_Sim.sh  # submit the job
+	sbatch ${WORKINGDIR}/Extend_Sim.sh  # submit the job
 done  # loop never ends so that is continuously checks for new Extend_Sim_new.sh files

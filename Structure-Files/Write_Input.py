@@ -136,9 +136,10 @@ tot_ions = no_ions*monomers
 
 if args.xlink == 'off':
     f4 = open('NaPore.top', 'w')
-    f4.writelines([';Forcefield\n', ff +'\n','\n', ';Monomer Topology\n',  mon_top + '\n', '\n', ';Ion Topology\n',
-                   ion_top + '\n', '\n', '[ system ]\n', '%s' %args.title + '\n', '\n', '[ molecules ]\n',
-                   '; Compound         nmols' + '\n', '%s                 %s' %(args.monomer, monomers) + '\n',
+    f4.writelines([';Forcefield\n', ff +'\n', gaff + '\n', '\n', ';Monomer Topology\n',  mon_top + '\n', '\n',
+                   ';Ion Topology\n', ion_top + '\n', '\n', '[ system ]\n', '%s' %args.title + '\n', '\n',
+                   '[ molecules ]\n', '; Compound         nmols' + '\n',
+                   '%s                 %s' %(args.monomer, monomers) + '\n',
                    '%s                  %s' %(ion, tot_ions) + '\n'])
 else:
     import subprocess
