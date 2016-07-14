@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 EXTENSION=50  # number of picoseconds that you want to extend the simulation by
 TPR="wiggle.tpr"  # .tpr file to be edited for simulation extension
@@ -86,14 +86,17 @@ done
 # Remove any exclusions
 for i in ${EXCLUSIONS[@]}; do
    JOB_ARRAY=( "${JOB_ARRAY[@]/$i}" )
-   echo $i > ${OUTPUT}/looparray
+done
+
+for JOB_ID in ${JOB_ARRAY[@]); do
+    echo $i > ${OUTPUT}/looparray
 done
 
 for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
     squeue --user=$USER > ${OUTPUT}/queue  # save the queue information to a temporary file called queue
     LINE=$(sed -n "/${JOB_ID}/=" ${OUTPUT}/queue) # find the line containing the job_id of interest
     echo $LINE > ${OUTPUT}/line
-    if [[ -z ${LINE} ]]; then  # if $LINE is empty, meaning it doesn't exist in the queue, then the job is probably done
+    if [[ -z ${LINE} ]]; then  # if $LINE is an empty variable, meaning it doesn't exist in the queue, then the job is probably done
         sed -i "/${JOB_ID}/d" -i ${OUTPUT}/job_array # remove all instances of that job_id from job_array
         DONE=1
     else
