@@ -88,6 +88,8 @@ for i in ${EXCLUSIONS[@]}; do
    JOB_ARRAY=( "${JOB_ARRAY[@]/$i}" )
 done
 
+echo ${EXCLUSIONS[@]} > ${OUTPUT}/looparray
+
 for JOB_ID in ${JOB_ARRAY[@]}; do
     echo $i >> ${OUTPUT}/looparray
 done
