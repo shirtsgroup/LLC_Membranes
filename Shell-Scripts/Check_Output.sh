@@ -89,7 +89,7 @@ for i in ${EXCLUSIONS[@]}; do
 done
 
 for JOB_ID in ${JOB_ARRAY[@]}; do
-    echo $i > ${OUTPUT}/looparray
+    echo $i >> ${OUTPUT}/looparray
 done
 
 for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
