@@ -137,7 +137,7 @@ while getopts "h:m:s:n:q:N:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z
     esac
 done
 
-if [ RESOURCE=='janus' ]; then
+if [ ${RESOURCE} == 'janus' ]; then
     NP=$((NODES*2))
     echo '#!/bin/bash' > Run_Job.sh
     echo '' >> Run_Job.sh
@@ -159,7 +159,7 @@ if [ RESOURCE=='janus' ]; then
         -m ${MPI}" >> Run_Job.sh
 fi
 
-if [ RESOURCE=='bridges' ]; then
+if [ ${RESOURCE} == 'bridges' ]; then
     NP=$((NTASKS_PER_NODE*NODES))
     echo '#!/bin/bash' > Run_Job.sh
     echo '' >> Run_Job.sh
