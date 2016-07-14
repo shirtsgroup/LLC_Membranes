@@ -35,7 +35,7 @@ done
 # check what machine this script is being run on so we get the username correct, request the correct partition and make
 # sure that we are allowed to run for the amount of hours requested
 
-if [ ${RESOURCE}=='janus' ]; then
+if [ ${RESOURCE} == 'janus' ]; then
     USER='beco4952'  # Can't use environment variable because of cron
     NTASKSPERNODE=1
     NP=$((NODES*2))
@@ -53,7 +53,7 @@ if [ ${RESOURCE}=='janus' ]; then
     fi
 fi
 
-if [ ${RESOURCE}=='bridges' ]; then
+if [ ${RESOURCE} == 'bridges' ]; then
     USER='bjc'
     QOS='RM'
     NTASKSPERNODE=4
@@ -129,15 +129,15 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
     # now change log to the new log_prev for the next iteration
     mv ${WORKDIR}/log_${JOB_ID} ${WORKDIR}/log_${JOB_ID}_prev
 
-    if [ $CHECK==0 ]; then  # if the files are the same (meaning output is no longer being written)
+    if [ $CHECK == 0 ]; then  # if the files are the same (meaning output is no longer being written)
 
-        if [ $DONE==1 ]; then
+        if [ $DONE == 1 ]; then
             :  # indicates a job that has completed (i.e. no longer in the queue)
         else
             scancel ${JOB_ID}  # run this command to cancel the job only if the job is still running
         fi
 
-        if [ ${RESOURCE}=='janus' ]; then  # write a janus batch submission script
+        if [ ${RESOURCE} == 'janus' ]; then  # write a janus batch submission script
             echo "#! /bin/bash" > ${WORKDIR}/Extend_Sim_new.sh
             echo >> ${WORKDIR}/Extend_Sim_new.sh
             echo "#SBATCH --qos ${QOS}" >> ${WORKDIR}/Extend_Sim_new.sh
@@ -153,7 +153,9 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
             echo >> ${WORKDIR}/Extend_Sim_new.sh
             echo "gmx convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}" >> ${WORKDIR}/Extend_Sim_new.sh
             echo "mpirun -np ${NP} gmx_mpi mdrun -s ${TPR} -cpi ${CPT} -append -v -deffnm "${TPR//.tpr}"" >> ${WORKDIR}/Extend_Sim_new.sh
-        elif [ ${RESOURCE}=='bridges' ]; then  # write a bridges batch submission script
+        fi
+
+        if [ ${RESOURCE} == 'bridges' ]; then  # write a bridges batch submission script
             echo "#!/bin/bash" > ${WORKDIR}/Extend_Sim_new.sh
             echo >> ${WORKDIR}/Extend_Sim_new.sh
             echo "#SBATCH --partition=${QOS}" >> ${WORKDIR}/Extend_Sim_new.sh
