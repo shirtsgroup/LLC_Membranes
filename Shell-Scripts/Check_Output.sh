@@ -150,8 +150,8 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
             echo >> ${WORKDIR}/Extend_Sim_new.sh
             echo "gmx convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}" >> ${WORKDIR}/Extend_Sim_new.sh
             echo "mpirun -np ${NP} gmx_mpi mdrun -s ${TPR} -cpi ${CPT} -append -v -deffnm "${TPR//.tpr}"" >> ${WORKDIR}/Extend_Sim_new.sh
-            mv Extend_Sim_new.sh Extend_Sim.sh  # This prevents Wait4Job.sh from prematurely executing
             sed -i "/${JOB_ID}/d" -i ${OUTPUT}/job_array # remove all instances of this job_id from job_array
+            mv ${WORKDIR}/Extend_Sim_new.sh ${WORKDIR}/Extend_Sim.sh  # This prevents Wait4Job.sh from prematurely executing
         fi
 
         if [ ${RESOURCE} == 'bridges' ]; then  # write a bridges batch submission script
@@ -176,7 +176,7 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
             echo >> ${WORKDIR}/Extend_Sim_new.sh
             echo "gmx convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}" >> ${WORKDIR}/Extend_Sim_new.sh
             echo "mpirun -np ${NP} gmx_mpi mdrun -s ${TPR} -cpi ${CPT} -append -v -deffnm "${TPR//.tpr}"" >> ${WORKDIR}/Extend_Sim_new.sh
-            mv Extend_Sim_new.sh Extend_Sim.sh  # This prevents Wait4Job.sh from prematurely executing
+            mv ${WORKDIR}/Extend_Sim_new.sh ${WORKDIR}/Extend_Sim.sh  # This prevents Wait4Job.sh from prematurely executing
             sed -i "/${JOB_ID}/d" -i ${OUTPUT}/job_array # remove all instances of this job_id from job_array
         fi
     fi

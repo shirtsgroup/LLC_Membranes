@@ -12,6 +12,7 @@ while getopts "p:f:s:" opt; do
     esac
 done
 
+iter=0
 while :  # starts an infinite loop
 do
 	until [ -f ${WORKINGDIR}/${FILE} ]  # runs this loop until ${FILE} exists in ${WORKINGDIR}
@@ -19,4 +20,6 @@ do
 		sleep ${SLEEP}  # sleep for a specified amount of time between checks
 	done
 	sbatch ${WORKINGDIR}/Extend_Sim.sh  # submit the job
+    iter=$((iter+1))
+	mv ${WORKINGDIR}/Extend_Sim.sh ${WORKINGDIR}/Extend_Sim_${iter}.sh
 done  # loop never ends so that is continuously checks for new Extend_Sim_new.sh files
