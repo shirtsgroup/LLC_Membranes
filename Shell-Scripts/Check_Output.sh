@@ -146,7 +146,7 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
             echo "ml gromacs" >> ${WORKDIR}/Extend_Sim_new.sh
             echo "ml python/2.7.10" >> ${WORKDIR}/Extend_Sim_new.sh
             echo "ml numpy" >> ${WORKDIR}/Extend_Sim_new.sh
-            echo "source ${GMX_LOC}" >> ${WORKDIR}/Extend_sim_new.sh
+            echo "source ${GMX_LOC}" >> ${WORKDIR}/Extend_Sim_new.sh
             echo >> ${WORKDIR}/Extend_Sim_new.sh
             echo "gmx convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}" >> ${WORKDIR}/Extend_Sim_new.sh
             echo "mpirun -np ${NP} gmx_mpi mdrun -s ${TPR} -cpi ${CPT} -append -v -deffnm "${TPR//.tpr}"" >> ${WORKDIR}/Extend_Sim_new.sh
