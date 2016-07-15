@@ -171,9 +171,6 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
             echo "module load gromacs" >> ${WORKDIR}/Extend_Sim_new.sh
             echo source ${GMX_LOC} >> ${WORKDIR}/Extend_Sim_new.sh
             echo >> ${WORKDIR}/Extend_Sim_new.sh
-            echo "cd $SLURM_SUBMIT_DIR" >> ${WORKDIR}/Extend_Sim_new.sh
-            echo "echo "$SLURM_NPROCS=" $SLURM_NPROCS" >> ${WORKDIR}/Extend_Sim_new.sh
-            echo >> ${WORKDIR}/Extend_Sim_new.sh
             echo "gmx convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}" >> ${WORKDIR}/Extend_Sim_new.sh
             echo "mpirun -np ${NP} gmx_mpi mdrun -s ${TPR} -cpi ${CPT} -append -v -deffnm "${TPR//.tpr}"" >> ${WORKDIR}/Extend_Sim_new.sh
             mv ${WORKDIR}/Extend_Sim_new.sh ${WORKDIR}/Extend_Sim.sh  # This prevents Wait4Job.sh from prematurely executing

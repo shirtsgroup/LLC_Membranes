@@ -16,7 +16,7 @@ location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__))
 parser = argparse.ArgumentParser(description = 'Crosslink LLC structure')  # allow input from user
 
 # Flags
-parser.add_argument('-i', '--input', default='wiggle.gro', help = 'Name of input file')
+parser.add_argument('-i', '--input', default='wiggle_init.gro', help = 'Name of input file')
 parser.add_argument('-t', '--type', default='LLC', help='Type of monomer')
 parser.add_argument('-l', '--layers', default=20, help='Number of layers')
 parser.add_argument('-p', '--pores', default=4, help='Number of pores')
@@ -752,7 +752,7 @@ count = dihedrals_imp_index + 2
 for i in range(0, len(dihedrals_imp)):
     b.insert(count, dihedrals_imp[i])
     count += 1
-print dihedrals_imp
+
 # [ virtual_sites4 ]
 
 vsite_index = 0  # find index where [ virutal_sites4 ] section begins (propers)
