@@ -88,21 +88,6 @@ for i in ${EXCLUSIONS[@]}; do
 done
 
 for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
-    squeue --user=$USER > ${OUTPUT}/queue  # save the queue information to a temporary file called queue
-    LINE=$(sed -n "/${JOB_ID}/=" ${OUTPUT}/queue) # find the line containing the job_id of interest
-
-    if [[ -z ${LINE} ]]; then  # if $LINE is an empty variable, meaning it doesn't exist in the queue, then the job is probably done
-        DONE=1
-    else
-        STATUS=$(sed "${LINE}q;d" ${OUTPUT}/queue | cut -b 48,49)  # search that line to find the job's status
-
-        if [ ${STATUS} != ' R' ]; then  # if the job is not running but in the queue or completing, leave it. Exit the whole script
-            exit
-        fi
-    fi
-
-    # This point in the loop is reached only if the job is running or finished
-
     # figure out the working directory for the job ID
     scontrol show job ${JOB_ID} > ${OUTPUT}/dir  # save all the information pertaining to the job id to a file
     WORKDIRLINE=$(sed -n '/WorkDir/=' ${OUTPUT}/dir)  # find the line containing the working directory for the job
@@ -128,7 +113,18 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
     # now change log to the new log_prev for the next iteration
     mv ${WORKDIR}/log_${JOB_ID} ${WORKDIR}/log_${JOB_ID}_prev
 
-    echo ${CHECK}
+    squeue --user=$USER > ${OUTPUT}/queue  # save the queue information to a temporary file called queue
+    LINE=$(sed -n "/${JOB_ID}/=" ${OUTPUT}/queue) # find the line containing the job_id of interest
+
+    if [[ -z ${LINE} ]]; then  # if $LINE is an empty variable, meaning it doesn't exist in the queue, then the job is probably done
+        DONE=1
+    else
+        STATUS=$(sed "${LINE}q;d" ${OUTPUT}/queue | cut -b 48,49)  # search that line to find the job's status
+
+        if [ ${STATUS} != ' R' ]; then  # if the job is not running but in the queue or completing, leave it. Exit the whole script
+            exit
+        fi
+    fi
 
     if [ $CHECK == 0 ]; then  # if the files are the same (meaning output is no longer being written)
 
