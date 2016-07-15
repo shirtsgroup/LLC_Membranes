@@ -89,10 +89,8 @@ for i in ${EXCLUSIONS[@]}; do
 done
 
 for JOB_ID in ${JOB_ARRAY[@]}; do
-    echo $i >> ${OUTPUT}/looparray
+    echo $JOB_ID >> ${OUTPUT}/looparray
 done
-
-echo ${JOB_ARRAY[@]}
 
 for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
     squeue --user=$USER > ${OUTPUT}/queue  # save the queue information to a temporary file called queue
@@ -135,6 +133,8 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
     # is finished. Otherwise (CHECK=0), it is an indication of a job that needs to be restarted (a stalled or finished job)
     # now change log to the new log_prev for the next iteration
     mv ${WORKDIR}/log_${JOB_ID} ${WORKDIR}/log_${JOB_ID}_prev
+
+    echo ${CHECK}
 
     if [ $CHECK == 0 ]; then  # if the files are the same (meaning output is no longer being written)
 
