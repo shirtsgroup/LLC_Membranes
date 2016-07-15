@@ -88,11 +88,11 @@ for i in ${EXCLUSIONS[@]}; do
    JOB_ARRAY=( "${JOB_ARRAY[@]/$i}" )
 done
 
-echo ${EXCLUSIONS[@]} > ${OUTPUT}/looparray
-
 for JOB_ID in ${JOB_ARRAY[@]}; do
     echo $i >> ${OUTPUT}/looparray
 done
+
+echo ${JOB_ARRAY[@]}
 
 for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
     squeue --user=$USER > ${OUTPUT}/queue  # save the queue information to a temporary file called queue
