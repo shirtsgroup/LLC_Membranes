@@ -40,7 +40,6 @@ if [ ${RESOURCE} == 'janus' ]; then
     NTASKSPERNODE=1
     NP=$((NODES*2))
     OUTPUT="/lustre/janus_scratch/${USER}/Cron_Output"  # place where files like job_array, queue and dir will be stored
-    echo ${OUTPUT}
     GMX_LOC="/projects/${USER}/bin/GMXRC"
     if (( ${HOURS}>24 )); then
         QOS='janus-long'
@@ -88,16 +87,11 @@ for i in ${EXCLUSIONS[@]}; do
    JOB_ARRAY=( "${JOB_ARRAY[@]/$i}" )
 done
 
-for JOB_ID in ${JOB_ARRAY[@]}; do
-    echo $JOB_ID >> ${OUTPUT}/looparray
-done
-
 for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
     squeue --user=$USER > ${OUTPUT}/queue  # save the queue information to a temporary file called queue
     LINE=$(sed -n "/${JOB_ID}/=" ${OUTPUT}/queue) # find the line containing the job_id of interest
-    echo $LINE > ${OUTPUT}/line
+
     if [[ -z ${LINE} ]]; then  # if $LINE is an empty variable, meaning it doesn't exist in the queue, then the job is probably done
-        sed -i "/${JOB_ID}/d" -i ${OUTPUT}/job_array # remove all instances of that job_id from job_array
         DONE=1
     else
         STATUS=$(sed "${LINE}q;d" ${OUTPUT}/queue | cut -b 48,49)  # search that line to find the job's status
@@ -160,6 +154,7 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
             echo >> ${WORKDIR}/Extend_Sim_new.sh
             echo "gmx convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}" >> ${WORKDIR}/Extend_Sim_new.sh
             echo "mpirun -np ${NP} gmx_mpi mdrun -s ${TPR} -cpi ${CPT} -append -v -deffnm "${TPR//.tpr}"" >> ${WORKDIR}/Extend_Sim_new.sh
+            sed -i "/${JOB_ID}/d" -i ${OUTPUT}/job_array # remove all instances of this job_id from job_array
         fi
 
         if [ ${RESOURCE} == 'bridges' ]; then  # write a bridges batch submission script
@@ -184,6 +179,7 @@ for JOB_ID in ${JOB_ARRAY[@]}; do  # look at all running jobs
             echo >> ${WORKDIR}/Extend_Sim_new.sh
             echo "gmx convert-tpr -s ${TPR} -extend ${EXTENSION} -o ${TPR}" >> ${WORKDIR}/Extend_Sim_new.sh
             echo "mpirun -np ${NP} gmx_mpi mdrun -s ${TPR} -cpi ${CPT} -append -v -deffnm "${TPR//.tpr}"" >> ${WORKDIR}/Extend_Sim_new.sh
+            sed -i "/${JOB_ID}/d" -i ${OUTPUT}/job_array # remove all instances of this job_id from job_array
         fi
     fi
 done
