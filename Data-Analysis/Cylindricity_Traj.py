@@ -27,7 +27,6 @@ for line in f:
     a.append(line)
 
 ###################     MAKE SURE TO EDIT THE PARAMETERS IN THIS SECTION ACCORDING TO THE SYSTEM     ###################
-length_of_simulation = 5000  # picoseconds
 no_atoms = 137  # number of atoms in a single monomer
 no_layers = 20  # number of layers in the membrane structure
 mon_per_layer = int(args.no_monomers)  # number of monomers in each layer
@@ -42,6 +41,8 @@ traj_start = 0  # which trajectory to begin analysis at (may need to wait for sy
 top_lines = 2  # number of lines at top of each frame
 bottom_lines = 2  # number of lines at bottom of each frame
 
+# find the length of the simulation
+length_of_simulation = float(a[len(a) - 3 - no_ion - no_monomers*no_atoms][44:53])  # This'll work until about 10000 ns
 x = []  # list to hold x positions of ions
 y = []  # list to hold y positions of ions
 z = []  # list to hold z positions of ions. Z axis runs parallel to pore
@@ -164,28 +165,33 @@ for i in range(0, traj_points - traj_start):
 
 plt.figure(1)
 time_pts = range(0, (traj_points - traj_start))
-plt.plot(time_pts, pore12, label='1-2')
-plt.plot(time_pts, pore13, label='1-3')
-plt.plot(time_pts, pore34, label='3-4')
-plt.plot(time_pts, pore42, label='4-2')
-plt.plot(time_pts, pore14, label='4-1')
-plt.plot(time_pts, pore23, label='2-3')
+intervals = length_of_simulation/traj_points/1000
+time = []
+for i in range(0, len(time_pts)):
+    time.append(time_pts[i]*intervals)
+
+plt.plot(time, pore12, label='1-2')
+plt.plot(time, pore13, label='1-3')
+plt.plot(time, pore34, label='3-4')
+plt.plot(time, pore42, label='4-2')
+plt.plot(time, pore14, label='4-1')
+plt.plot(time, pore23, label='2-3')
 plt.title('Pore-To-Pore Distance Equilibration')
 plt.ylabel('Pore-To-Pore Distance [nm]')
-plt.xlabel('Frame')
+plt.xlabel('Simulation Time (ns)')
 plt.legend(loc=1)
 
 plt.figure(2)
 time_pts = range(0, (traj_points - traj_start))
-plt.plot(time_pts, pore12_carb, label='1-2')
-plt.plot(time_pts, pore13_carb, label='1-3')
-plt.plot(time_pts, pore34_carb, label='3-4')
-plt.plot(time_pts, pore42_carb, label='4-2')
-plt.plot(time_pts, pore14_carb, label='4-1')
-plt.plot(time_pts, pore23_carb, label='2-3')
+plt.plot(time, pore12_carb, label='1-2')
+plt.plot(time, pore13_carb, label='1-3')
+plt.plot(time, pore34_carb, label='3-4')
+plt.plot(time, pore42_carb, label='4-2')
+plt.plot(time, pore14_carb, label='4-1')
+plt.plot(time, pore23_carb, label='2-3')
 plt.title('Pore-To-Pore Distance Equilibration based on Carbonyl Carbon')
 plt.ylabel('Pore-To-Pore Distance [nm]')
-plt.xlabel('Frame')
+plt.xlabel('Simulation Time (ns)')
 plt.legend(loc=1)
 
 # Find the distance from central axis

@@ -1,6 +1,5 @@
-# Script to crosslink LLC monomers based on distance between carbons at the end of a simulation
-
 #!/usr/bin/python
+# Script to crosslink LLC monomers based on distance between carbons at the end of a simulation
 
 import os
 import argparse
@@ -24,6 +23,8 @@ parser.add_argument('-n', '--no_monomers', default=6, help='Number of monomers p
 parser.add_argument('-c', '--cutoff', default=5, help='Cutoff distance for cross-linking. Bottom x % of the distribution'
                                                       'of distances will be cross-linked ')
 parser.add_argument('-e', '--term_prob', default=5, help='Termination probability (%)')
+parser.add_argument('-y', '--topology', default='crosslinked_new.itp', help='Topology file that will be analyzed and modified')
+parser.add_argument('-r', '--iteration', default=1, help='Iteration number of crosslinking process')
 
 args = parser.parse_args()
 
@@ -47,6 +48,8 @@ if args.type == 'LLC':
     atoms = 143  # not including sodium but including dummy atoms
     atoms_list = ['O5', 'O6', 'O7', '08', 'O9', 'C32', 'C18', 'C46', 'C33', 'C19', 'C47', 'C34', 'C20', 'C47', 'H49',
                   'H24', 'H74', 'H50', 'H25', 'H75', 'H51', 'H26', 'H76']
+    c1_atoms = ['C19', 'C33', 'C47']
+    c2_atoms = ['C20', 'C34', 'C48']
     topology = 'HII_mon.itp'
     xlink_atoms = 6  # number of atoms involved in cross-linking
     no_dummies = 6
@@ -79,7 +82,7 @@ no_carbons = len(C1x)  # number of carbon atoms that may be involved in cross-li
 
 # Time to handle periodic boundary conditions
 
-x1 = float(a[len(a) - 1][0:10])  # x box vector
+x1 = float(a[len(a) - 1][0:10])   # x box vector
 y1 = float(a[len(a) - 1][10:20])  # component one of y box vector
 y2 = float(a[len(a) - 1][50:60])  # component two of y box vector
 
@@ -167,32 +170,57 @@ print 'PBCs set up: %s seconds' %(stop1 - start)
 
 # Find distance between carbon 1 and carbon 2 for all pairs
 
+mat_dim = len(C1x)  # Dimensions of the matrix created in the next step
 dist = np.zeros((len(C1x), len(C2x)))
 
 # Create a matrix of 1's and 0's. Entries that are 1's should not be counted in the distance calculations because they
-# represent distances that are between carbons and the same monomer
+# represent distances that are either between carbons on the same monomer, or are terminated carbons
 
-a = np.ones((1, 12960))[0]
-b = np.ones((1, 11520))[0]
-c = np.ones((1, 10080))[0]
-d = np.ones((1, 8640))[0]
-e = np.ones((1, 7200))[0]
-f = np.ones((1, 5760))[0]
-g = np.ones((1, 4320))[0]
-h = np.ones((1, 2880))[0]
-i = np.ones((1, 1440))[0]
+a = np.ones((1, mat_dim))[0]
+b = np.ones((1, mat_dim - (mat_dim/9)))[0]
+c = np.ones((1, mat_dim - 2*(mat_dim/9)))[0]
+d = np.ones((1, mat_dim - 3*(mat_dim/9)))[0]
+e = np.ones((1, mat_dim - 4*(mat_dim/9)))[0]
+f = np.ones((1, mat_dim - 5*(mat_dim/9)))[0]
+g = np.ones((1, mat_dim - 6*(mat_dim/9)))[0]
+h = np.ones((1, mat_dim - 7*(mat_dim/9)))[0]
+i = np.ones((1, mat_dim - 8*(mat_dim/9)))[0]
 
-exclude = np.diag(a, 0) + np.diag(b, -1440) + np.diag(b, 1440) + np.diag(c, 2880) + np.diag(c, -2880) + np.diag(d, 4320) + \
-    np.diag(d, -4320) + np.diag(e, 5760) + np.diag(e, -5760) + np.diag(f, 7200) + np.diag(f, -7200) + \
-    np.diag(g, 8640) + np.diag(g, -8640) + np.diag(h, 10080) + np.diag(h, -10080) + np.diag(i, 11520) + np.diag(i, -11520)
+exclude = np.diag(a, 0) + np.diag(b, -(mat_dim/9)) + np.diag(b, (mat_dim/9)) + np.diag(c, (2*mat_dim/9)) + np.diag(c, -(2*mat_dim/9)) + np.diag(d, (3*mat_dim/9)) + \
+    np.diag(d, -(3*mat_dim/9)) + np.diag(e, (4*mat_dim/9)) + np.diag(e, -(4*mat_dim/9)) + np.diag(f, (5*mat_dim/9)) + np.diag(f, -(5*mat_dim/9)) + \
+    np.diag(g, (6*mat_dim/9)) + np.diag(g, -(6*mat_dim/9)) + np.diag(h, (7*mat_dim/9)) + np.diag(h, -(7*mat_dim/9)) + np.diag(i, (8*mat_dim/9)) + np.diag(i, -(8*mat_dim/9))
 
-# for i in range(0, len(C1x)):
-#     for k in range(0, len(C2x)):
-#         if exclude[k, i] == 1:  # make sure that C1 and C2 that are a part of the same monomer do not factor into this calculation
-#             dist[k, i] = 1000  # artificially high number to keep it from interfering
-#         else:
-#             dist[k, i] = math.sqrt((C1x[i] - C2x[k])**2 + (C1y[i] - C2y[k])**2 + (C1z[i] - C2z[k])**2)
+# We need to add additional exclusions if there are any terminated/reacted atoms which should be excluded
 
+if args.iteration != 0:
+    f = open(args.topology, 'r')  # take a look at the topology from the previous iteration
+    top = []  # put all of the lines into a list
+    for line in f:
+        top.append(line)
+    # look through each line for the 'T' marker and an '*' marker
+    exclude_T_c1 = []
+    exclude_T_c2 = []
+    reactive_c2 = []
+    # find the [ atoms ] section
+    atoms_index = 0  # find index where [ atoms ] section begins
+    while top[atoms_index].count('[ atoms ]') == 0:
+        atoms_index += 1
+    atoms_end = atoms_index + 2  # start looking on a line where there isn't text
+    while top[atoms_end] != '\n':
+        if str.strip(top[atoms_end])[-1] == 'T':
+            if str.strip(top[atoms_end][22:28]) in c1_atoms:
+                exclude_T_c1.append(int(top[atoms_end][0:5]))
+            if str.strip(top[atoms_end][22:28]) in c2_atoms:
+                exclude_T_c2.append(int(top[atoms_end][0:5]))
+        if str.strip(top[atoms_end])[-1] == '*':
+            reactive_c2.append(int(top[atoms_end][0:5]))
+        atoms_end += 1
+
+# now we have indices of marked c1's and c2's. We need to number them by c1 and c2 number so that they can be included
+# in the exclusion matrix
+
+import sys
+sys.exit()
 dist = genpairs.calc_dist(C1x, C2x, C1y, C2y, C1z, C2z, exclude, dist)
 
 stop2 = time.time()
@@ -276,7 +304,7 @@ c1_uniq, c2_uniq = uniq(C1_no, C2_no)
 # In some cases, it is possible that a c1 and a c2 on the same chain may be involved in independent cross-link reactions
 # We need to get rid of those to avoid unnecessary confusion. Since c2 is the reactive atom (it is a radical at some
 # point), it will trump c1. So if a c2 and c1 are on the same chain, then c1 will be removed from consideration.
-
+#
 # Create a list of the indices of all the c1 atoms adjacent to reacting c2's
 adjacent_c1 = []
 for i in range(0, len(c2_uniq)):
@@ -465,7 +493,7 @@ for i in range(0, len(term)):
 # Before going further, we need to label all of the dummy atoms that are still dummies so that they are not written into
 # the bonds, angles, dihedrals or pairs section
 
-# generate a list of indices of the dummy atoms
+# generate a list of indices of all the dummy atoms including those who will change to real atoms
 dummy_list = []
 for i in range(0, tot_monomers):
     for k in range(0, no_dummies):
@@ -492,7 +520,7 @@ while b[atoms_count] != '\n':
 
 # [ bonds ]
 
-bonds_index = 0  # find index where [ bonds ] section begins\
+bonds_index = 0  # find index where [ bonds ] section begins
 while b[bonds_index].count('[ bonds ]') == 0:
     bonds_index += 1
 
@@ -526,6 +554,7 @@ for i in range(0, len(bonds)):
 # Replace atom types of bonding carbons with sp3 hybridized carbons
 
 # To be safe, we also need to change the atom type of the non-bonding c1. If it is initiated, then it goes from c2 to c3
+# We also need a list of c2's which are left as radicals. They are adjacent to c1
 other_c1 = []
 radical_c2 = []
 for i in range(0, len(c2)):
@@ -548,26 +577,23 @@ for i in range(atoms_index + 2, atoms_count):
         b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
     if res_num in term:  # the terminating c2 (where the termination actually happens) becomes sp3 hybridized
         b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
-    # if res_num in H:  # all of the H's that attach to the new sp3 hybridized carbons
-    #     b[i] = b[i][0:5] + b[i][5:10].replace('ha', 'hc') + b[i][10:len(b[atoms_index + 2])]
     if res_num in H_new1:  # Dummy atoms become real during the bonding process and have mass
-        b[i] = b[i][0:53] + b[i][53:61].replace('0.00000', '1.00800') + b[i][61:len(b[atoms_index + 2])]
+        b[i] = b[i][0:5] + b[i][5:15].replace('hc_d', 'hc  ') + b[i][15:53] + b[i][53:61].replace('0.00000', '1.00800') + b[i][61:len(b[atoms_index + 2])]
     if res_num in H_new2:  # Dummy atoms which become real during the termination process and have mass
-        b[i] = b[i][0:53] + b[i][53:61].replace('0.00000', '1.00800') + b[i][61:len(b[atoms_index + 2])]
+        b[i] = b[i][0:5] + b[i][5:15].replace('hc_d', 'hc  ') + b[i][15:53] + b[i][53:61].replace('0.00000', '1.00800') + b[i][61:len(b[atoms_index + 2])]
     if res_num in radical_c2:  # mark the c2 atoms that are now radicals. They remain sp2 hybridized but are reactive
         b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c2') + b[i][10:len(b[atoms_index + 2]) - 1] + '*' + '\n'
     if res_num in term_c1:  # c1 in a terminating chain will be sp3
         b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
 
 # Add bonds between cross-linking atoms
-
 for i in range(0, len(c1)):
     b.insert(nb + bonds_index + 2, '{:6d}{:7d}{:4d}'.format(c1[i], c2[i], 1) + "\n")
     nb += 1
 
 # Add new H bonds formed during propagation (dummy H's becoming real)
 for i in range(0, len(H_new1)):
-    b.insert(nb + bonds_index + 2, '{:6d}{:7d}{:4d}'.format(c1[i], H_new1[i], 1) + "\n")
+    b.insert(nb + bonds_index + 2, '{:6d}{:7d}{:4d}'.format(c2[i] + 1, H_new1[i], 1) + "\n")
     nb += 1
 
 # new H bonds formed during termination (2 dummy H's becoming real)
@@ -588,7 +614,7 @@ atoms_of_interest = radical_c2 + c1 + c2 + other_c1 + term + term_c1 + H + H_new
 # See genpairs.pyx to see what is going on in the following lines:
 
 # Generate a list of all bonds. 'list' contains all bonds. 'Condensed_list' contains bonds only relevant to 'atoms_of_interest'
-list, condensed_list = genpairs.read_lists(b, atoms_of_interest, bonds_index + 2, nb)
+list, condensed_list = genpairs.read_lists(b, atoms_of_interest, bonds_index + 2, nb + bonds_index + 2)
 
 # Generate a pairs list, a dihedrals list, and an angles list that includes those formed by the newly created bonds
 
@@ -617,7 +643,7 @@ unique_pairs = genpairs.uniq_pair(pairs_list, pairs_list_prev)
 # Create a properly formatted pairs list
 pairs = []
 for i in range(0, len(unique_pairs)):
-    pairs.append('{:6s}{:7s}{:7d}'.format(unique_pairs[i][0], unique_pairs[i][1], 1))
+    pairs.append('{:6d}{:7d}{:7d}'.format(int(unique_pairs[i][0]), int(unique_pairs[i][1]), 1))
 
 # eliminate the old pairs list
 
@@ -721,10 +747,10 @@ for i in range(0, tot_monomers):
     impropers_list.append([atoms*i + 40, atoms*i + 41, atoms*i + 42, atoms*i + 110])
     impropers_list.append([atoms*i + 55, atoms*i + 56, atoms*i + 57, atoms*i + 135])
 
+imp_remove_c = term + term_c1 + other_c1 + c1 + c2  # carbons that are part of improper dihedrals that will be removed
 imp_of_interest = []
 for i in range(0, len(impropers_list)):
-    if impropers_list[i][0] in c1 or impropers_list[i][1] in c1 or impropers_list[i][2] in c1 or impropers_list[i][3] in c1:
-        # check against c1 since it is in both dihedrals of interest. c2 is involved in an improper that we want to keep
+    if impropers_list[i][1] in imp_remove_c:
         imp_of_interest.append(impropers_list[i])
 
 dihedrals_imp_index = 0  # find index where [ dihedrals ] section begins (impropers)
@@ -735,7 +761,7 @@ dihedrals_imp_count = dihedrals_imp_index + 2
 start_imp = dihedrals_imp_count
 
 dihedrals_imp = []
-while b[dihedrals_imp_count] != '\n':  # This is the last section in the input .itp file
+while b[dihedrals_imp_count] != '\n':
     a_imp = [int(b[dihedrals_imp_count][0:6]), int(b[dihedrals_imp_count][6:13]), int(b[dihedrals_imp_count][13:20]), int(b[dihedrals_imp_count][20:27])]
     a_imp.sort()
     if a_imp not in imp_of_interest:
@@ -755,7 +781,7 @@ for i in range(0, len(dihedrals_imp)):
 
 # [ virtual_sites4 ]
 
-vsite_index = 0  # find index where [ virutal_sites4 ] section begins (propers)
+vsite_index = 0  # find index where [ virtual_sites4 ] section begins (propers)
 while b[vsite_index].count('[ virtual_sites4 ]') == 0:
     vsite_index += 1
 
@@ -772,7 +798,7 @@ for i in range(vsite_count, len(b)):  # This is the last section in the input .i
 virtual_sites = []
 for i in range(vsite_index + 2, vsite_count):
     site = int(b[i][0:8])
-    if site not in H_new2 and site not in H_new1:  # if the site is in the old virtual sites but not in H_new1 or tern
+    if site not in H_new2 and site not in H_new1:  # if the site is in the old virtual sites but not in H_new1 or term
         virtual_sites.append(b[i])  # then add it to virtual_sites since those hydrogens are still dummies
 
 # eliminate the old virtual_sites4 list
