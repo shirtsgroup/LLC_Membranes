@@ -24,7 +24,8 @@ parser.add_argument('-c', '--cutoff', default=5, help='Cutoff distance for cross
                                                       'of distances will be cross-linked ')
 parser.add_argument('-e', '--term_prob', default=5, help='Termination probability (%)')
 parser.add_argument('-y', '--topology', default='crosslinked_new.itp', help='Topology file that will be analyzed and modified')
-parser.add_argument('-r', '--iteration', default=1, help='Iteration number of crosslinking process')
+parser.add_argument('-r', '--iteration', default=0, help='Iteration number of crosslinking process')
+parser.add_argument('-d', '--cutoff_rad', default=10, help='Cutoff Distance for radical reaction')
 
 args = parser.parse_args()
 
@@ -37,7 +38,7 @@ for line in f:
     a.append(line)
     lines += 1  # count number of lines in the file
 
-lines_of_text = 0  # find the number of lines of relevant text
+lines_of_text = 0  # find the number of lines of irrelevant text at the top of the file
 for i in range(0, len(a)):
     if a[i].count('1LLC') == 0:
         lines_of_text += 1
@@ -48,11 +49,12 @@ if args.type == 'LLC':
     atoms = 143  # not including sodium but including dummy atoms
     atoms_list = ['O5', 'O6', 'O7', '08', 'O9', 'C32', 'C18', 'C46', 'C33', 'C19', 'C47', 'C34', 'C20', 'C47', 'H49',
                   'H24', 'H74', 'H50', 'H25', 'H75', 'H51', 'H26', 'H76']
-    c1_atoms = ['C19', 'C33', 'C47']
-    c2_atoms = ['C20', 'C34', 'C48']
+    c1_atoms = ['C20', 'C34', 'C48']
+    c2_atoms = ['C19', 'C33', 'C47']
     topology = 'HII_mon.itp'
     xlink_atoms = 6  # number of atoms involved in cross-linking
     no_dummies = 6
+    images = 9 # total periodic images used for distance calculations
 
 
 tot_atoms = atoms*args.layers*args.no_monomers*args.pores
@@ -171,42 +173,53 @@ print 'PBCs set up: %s seconds' %(stop1 - start)
 # Find distance between carbon 1 and carbon 2 for all pairs
 
 mat_dim = len(C1x)  # Dimensions of the matrix created in the next step
-dist = np.zeros((len(C1x), len(C2x)))
+dist = np.zeros((len(C2x), len(C1x)))
 
 # Create a matrix of 1's and 0's. Entries that are 1's should not be counted in the distance calculations because they
 # represent distances that are either between carbons on the same monomer, or are terminated carbons
 
 a = np.ones((1, mat_dim))[0]
-b = np.ones((1, mat_dim - (mat_dim/9)))[0]
-c = np.ones((1, mat_dim - 2*(mat_dim/9)))[0]
-d = np.ones((1, mat_dim - 3*(mat_dim/9)))[0]
-e = np.ones((1, mat_dim - 4*(mat_dim/9)))[0]
-f = np.ones((1, mat_dim - 5*(mat_dim/9)))[0]
-g = np.ones((1, mat_dim - 6*(mat_dim/9)))[0]
-h = np.ones((1, mat_dim - 7*(mat_dim/9)))[0]
-i = np.ones((1, mat_dim - 8*(mat_dim/9)))[0]
+b = np.ones((1, mat_dim - (mat_dim/images)))[0]
+c = np.ones((1, mat_dim - 2*(mat_dim/images)))[0]
+d = np.ones((1, mat_dim - 3*(mat_dim/images)))[0]
+e = np.ones((1, mat_dim - 4*(mat_dim/images)))[0]
+f = np.ones((1, mat_dim - 5*(mat_dim/images)))[0]
+g = np.ones((1, mat_dim - 6*(mat_dim/images)))[0]
+h = np.ones((1, mat_dim - 7*(mat_dim/images)))[0]
+i = np.ones((1, mat_dim - 8*(mat_dim/images)))[0]
 
-exclude = np.diag(a, 0) + np.diag(b, -(mat_dim/9)) + np.diag(b, (mat_dim/9)) + np.diag(c, (2*mat_dim/9)) + np.diag(c, -(2*mat_dim/9)) + np.diag(d, (3*mat_dim/9)) + \
-    np.diag(d, -(3*mat_dim/9)) + np.diag(e, (4*mat_dim/9)) + np.diag(e, -(4*mat_dim/9)) + np.diag(f, (5*mat_dim/9)) + np.diag(f, -(5*mat_dim/9)) + \
-    np.diag(g, (6*mat_dim/9)) + np.diag(g, -(6*mat_dim/9)) + np.diag(h, (7*mat_dim/9)) + np.diag(h, -(7*mat_dim/9)) + np.diag(i, (8*mat_dim/9)) + np.diag(i, -(8*mat_dim/9))
+exclude = np.diag(a, 0) + np.diag(b, -(mat_dim/images)) + np.diag(b, (mat_dim/images)) + np.diag(c, (2*mat_dim/images)) + np.diag(c, -(2*mat_dim/images)) + np.diag(d, (3*mat_dim/images)) + \
+    np.diag(d, -(3*mat_dim/images)) + np.diag(e, (4*mat_dim/images)) + np.diag(e, -(4*mat_dim/images)) + np.diag(f, (5*mat_dim/images)) + np.diag(f, -(5*mat_dim/images)) + \
+    np.diag(g, (6*mat_dim/images)) + np.diag(g, -(6*mat_dim/images)) + np.diag(h, (7*mat_dim/images)) + np.diag(h, -(7*mat_dim/images)) + np.diag(i, (8*mat_dim/images)) + np.diag(i, -(8*mat_dim/images))
 
 # We need to add additional exclusions if there are any terminated/reacted atoms which should be excluded
 
 if args.iteration != 0:
+
     f = open(args.topology, 'r')  # take a look at the topology from the previous iteration
+
     top = []  # put all of the lines into a list
     for line in f:
         top.append(line)
+
     # look through each line for the 'T' marker and an '*' marker
     exclude_T_c1 = []
     exclude_T_c2 = []
     reactive_c2 = []
+    c1_ndx = []  # we also need to number c1 and c2 in the context of other c1's and c2's
+    c2_ndx = []  # i.e. we need numbers of c1-1, c1-2 ... and c2-1, c2-2 ... and see how they relate to the indices
+
     # find the [ atoms ] section
     atoms_index = 0  # find index where [ atoms ] section begins
     while top[atoms_index].count('[ atoms ]') == 0:
         atoms_index += 1
+
     atoms_end = atoms_index + 2  # start looking on a line where there isn't text
     while top[atoms_end] != '\n':
+        if str.strip(top[atoms_end][22:28]) in c1_atoms:
+            c1_ndx.append(int(top[atoms_end][0:5]))
+        if str.strip(top[atoms_end][22:28]) in c2_atoms:
+            c2_ndx.append(int(top[atoms_end][0:5]))
         if str.strip(top[atoms_end])[-1] == 'T':
             if str.strip(top[atoms_end][22:28]) in c1_atoms:
                 exclude_T_c1.append(int(top[atoms_end][0:5]))
@@ -216,30 +229,63 @@ if args.iteration != 0:
             reactive_c2.append(int(top[atoms_end][0:5]))
         atoms_end += 1
 
-# now we have indices of marked c1's and c2's. We need to number them by c1 and c2 number so that they can be included
-# in the exclusion matrix
+    c1_ex_no = []  # Now give them a number in the context of c1 and c2 (between 1 and 1440)
+    c2_ex_no = []
+    c2_reactive_no = []  # and the radical
+    for i in range(0, len(exclude_T_c1)):
+        c1_ex_no.append(c1_ndx.index(exclude_T_c1[i]))
+    for i in range(0, len(exclude_T_c2)):  #exclude_T_c2 and exclude_T_c1 are not necessarily the same length so we need a second loop
+        c2_ex_no.append(c2_ndx.index(exclude_T_c2[i]))
+    for i in range(0, len(reactive_c2)):
+        c2_reactive_no.append(c2_ndx.index(reactive_c2[i]))
 
-import sys
-sys.exit()
+    for i in range(0, len(c1_ex_no)):
+        for j in range(0, images):
+            exclude[:, j*mat_dim/images + c1_ex_no[i]] = 1  # excludes across all pbc's too
+
+    for i in range(0, len(c2_ex_no)):
+        for j in range(0, images):
+            exclude[j*mat_dim/images + c2_ex_no[i], :] = 1
+
 dist = genpairs.calc_dist(C1x, C2x, C1y, C2y, C1z, C2z, exclude, dist)
 
 stop2 = time.time()
 
 print 'Distances Calculated: %s seconds' %(stop2 - stop1)
 
-# Find the distance of the closest carbon and its index
+# Now see which of these distances meet the cutoff criteria
+
+# Find the distance of the closest carbon to each c1 and its index
 min_dist = np.zeros((len(C1x), 1))
 min_index = np.zeros((len(C1x), 1))  # index of minimum value of distances for each monomer-monomer measurement
 for i in range(0, len(C1x)):
     min_dist[i, 0] = min(dist[:, i])
-    min_index[i, 0] = np.argmin(dist[:, i]) % (len(C1x)/9)  # index corresponds to the monomer with which
-                                                                        # the minimum C1-C2 distance is achieved
-
-# Now see which of these distances meet the cutoff criteria
+    min_index[i, 0] = np.argmin(dist[:, i]) % (len(C1x)/images)  # index corresponds to the monomer with which
 
 change_index1 = []  # index of C1 from min_dist which needs to be changed
-change_index2 = []  # index of C2 from dist which needs to be changed (index already contained in min_index but will be
-                    # truncated here)
+change_index2 = []  # index of C2 from dist which needs to be changed
+
+if args.iteration != 0:
+    # Looking just at the radical reactive sites
+    min_dist_rad = np.zeros((len(c2_reactive_no), 1))
+    min_index_rad = np.zeros((len(c2_reactive_no), 1))
+    for i in range(0, len(c2_reactive_no)):
+        min_dist_rad[i, 0] = min(dist[c2_reactive_no[i], :])
+        min_index_rad[i, 0] = np.argmin(dist[c2_reactive_no[i], :]) % (len(C1x)/images)
+
+    min_list_rad = min_dist.tolist()
+    for i in range(0, int((float(args.cutoff_rad)/100)*len(C1x))):  # This could be done by sorting then cutting off first ten percent -- its probably better that way
+        m = min(min_list_rad)
+        min_list_rad.remove(m)
+
+    cutoff = min(min_list_rad)
+
+    for i in range(0, len(min_index_rad)):
+        if min_dist_rad[i, 0] < cutoff:
+            change_index1.append(int(min_index_rad[i]))
+            change_index2.append(c2_reactive_no[i])
+    print len(change_index2)
+    no_radical_rxns = len(change_index2)
 
 # find the cutoff distance for cross-linking
 
@@ -250,16 +296,14 @@ for i in range(0, int((float(args.cutoff)/100)*len(C1x))):  # looks at a percent
 
 cutoff = min(min_list)  # The minimum value left after the modification of min_list is the cutoff value
 
+count = 0
 for i in range(0, len(C1x)):
     if min_dist[i, 0] < cutoff:  # find distances which meet the cutoff criteria
         change_index1.append(i % (len(C1x)/9))  # holds the index of the atom associated with the met criteria for primary carbons (C20, C34, C48)
         change_index2.append(int(min_index[i, 0]))  # Same as above but for the secondary carbons
+        count += 1
 
-# Now remove duplicates while preserving order (if there are any)
-
-# change_index1 = uniq(change_index1)
-# change_index2 = uniq(change_index2)
-
+print 'Regular bonds count: %s' %count
 # Now that everything has an index that needs to be changed, we must interpret those indices
 
 # C19 is the 26th atom, C20 is 27th, C33 is 41st, C34 is 42nd, C47 is 56th, C48 is 57th, in each monomer
@@ -287,6 +331,13 @@ for i in range(0, len(change_index1)):
     if change_index2[i] in tail3:  # This is C2 therefore if this is true, then the atom is C47 (atom no 56)
         C2_no.append((change_index2[i]/3)*atoms + 56)  # division automatically round down
 
+if args.iteration != 0:
+    c2_rad_ndx = []
+    c1_rad_ndx = []
+    for i in range(0, no_radical_rxns):  # The first entries in C2_no are all radicals up to no_radical_rxns
+        c2_rad_ndx.append(C2_no[i])
+        c1_rad_ndx.append(C1_no[i])
+
 # reduce lists down to unique atom pairs
 
 
@@ -304,7 +355,7 @@ c1_uniq, c2_uniq = uniq(C1_no, C2_no)
 # In some cases, it is possible that a c1 and a c2 on the same chain may be involved in independent cross-link reactions
 # We need to get rid of those to avoid unnecessary confusion. Since c2 is the reactive atom (it is a radical at some
 # point), it will trump c1. So if a c2 and c1 are on the same chain, then c1 will be removed from consideration.
-#
+
 # Create a list of the indices of all the c1 atoms adjacent to reacting c2's
 adjacent_c1 = []
 for i in range(0, len(c2_uniq)):
@@ -490,20 +541,6 @@ for i in range(0, len(term)):
         H_new2.append(term[i] + 86)
         H_new2.append(term[i] + 87)
 
-# Before going further, we need to label all of the dummy atoms that are still dummies so that they are not written into
-# the bonds, angles, dihedrals or pairs section
-
-# generate a list of indices of all the dummy atoms including those who will change to real atoms
-dummy_list = []
-for i in range(0, tot_monomers):
-    for k in range(0, no_dummies):
-        dummy_list.append(i*atoms + (atoms - k))  # dummies are listed at the end of the atomtypes
-
-leftovers = []  # poor dummies that didn't get turned into real atoms
-for i in range(0, len(dummy_list)):
-    if dummy_list[i] not in H_new1 and dummy_list[i] not in H_new2:  # sees if dummies were turned to real atoms
-        leftovers.append(dummy_list[i])  # if not, they become part of the leftovers
-
 # find the indices of all fields that need to be modified
 
 # [ atoms ]
@@ -517,6 +554,23 @@ nr = 0  # number of lines in 'atoms' section
 while b[atoms_count] != '\n':
     atoms_count += 1  # increments the while loop
     nr += 1  # counts number of atoms
+
+# Before going further, we need to label all of the dummy atoms that are still dummies so that they are not written into
+# the bonds, angles, dihedrals or pairs section
+
+# generate a list of indices of all the dummy atoms including those who will change to real atoms
+dummy_list = []
+# for i in range(0, tot_monomers):
+#     for k in range(0, no_dummies):
+#         dummy_list.append(i*atoms + (atoms - k))  # dummies are listed at the end of the atomtypes
+for i in range(atoms_index + 2, atoms_count):
+    if str.strip(b[i][5:13]) == 'hc_d':
+        dummy_list.append(int(b[i][0:5]))
+
+leftovers = []  # poor dummies that didn't get turned into real atoms
+for i in range(0, len(dummy_list)):
+    if dummy_list[i] not in H_new1 and dummy_list[i] not in H_new2:  # sees if dummies were turned to real atoms
+        leftovers.append(dummy_list[i])  # if not, they become part of the leftovers
 
 # [ bonds ]
 
@@ -566,6 +620,12 @@ for i in range(0, len(c2)):
 # Now make all of the changes
 # Also, any carbons that are termination sites and/or become sp3 hybridized will be marked with a 'T' since it should
 # not be considered in further cross-link iterations
+
+if args.iteration != 0:
+    # break apart the c1 and c2 list for now while atom types are being changed
+    del c1[:no_radical_rxns]
+    del c2[:no_radical_rxns]
+
 count = 0
 for i in range(atoms_index + 2, atoms_count):
     res_num = int(b[i][0:5])
@@ -576,7 +636,7 @@ for i in range(atoms_index + 2, atoms_count):
     if res_num in c2:  # the bonding c2 becomes sp3 hybridized
         b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
     if res_num in term:  # the terminating c2 (where the termination actually happens) becomes sp3 hybridized
-        b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+        b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'  # if it doesn't find the string to replace it does nothing
     if res_num in H_new1:  # Dummy atoms become real during the bonding process and have mass
         b[i] = b[i][0:5] + b[i][5:15].replace('hc_d', 'hc  ') + b[i][15:53] + b[i][53:61].replace('0.00000', '1.00800') + b[i][61:len(b[atoms_index + 2])]
     if res_num in H_new2:  # Dummy atoms which become real during the termination process and have mass
@@ -585,7 +645,20 @@ for i in range(atoms_index + 2, atoms_count):
         b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c2') + b[i][10:len(b[atoms_index + 2]) - 1] + '*' + '\n'
     if res_num in term_c1:  # c1 in a terminating chain will be sp3
         b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+    if args.iteration != 0:
+        if res_num in c2_rad_ndx:
+            b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+        if res_num in c1_rad_ndx:
+            b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+        if res_num in term:
+            b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
 
+if args.iteration != 0:
+    # re-assemble the full c1, c2 list
+    c1 = c1_rad_ndx + c1
+    c2 = c2_rad_ndx + c2
+print c1_rad_ndx
+print c2_rad_ndx
 # Add bonds between cross-linking atoms
 for i in range(0, len(c1)):
     b.insert(nb + bonds_index + 2, '{:6d}{:7d}{:4d}'.format(c1[i], c2[i], 1) + "\n")
@@ -825,6 +898,8 @@ end = time.time()
 print 'Total time elapsed: %s seconds' %(end - start)
 print c1
 print c2
+print len(c2)
+print len(c1)
 print radical_c2
 count = 0
 for i in range(0, len(c2)):

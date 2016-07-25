@@ -16,7 +16,6 @@ NODES=16
 
 # Choose which monomer to build with
 MONOMER='monomer4.pdb'  # Structure file to be used
-
 # Energy minimization parameters:
 INTEGRATOR_EM=steep  # Integrator for energy minimization
 NSTEPS_EM=50000  # Maximum number of steps to take for energy minimization
@@ -90,7 +89,7 @@ SOLVATION="off"
 # -Y  :   PTYPE ... i.e. Isotropic, semiisotropic
 # -B  :   REF_P ... Reference Pressure, bar
 # -R  :   COMPRESSIBILITY ... Isothermal compressibility, bar^-1
-# -Z  :   PBC ... Periodic Boundary directions
+# -Z  :   PBC ... Periodic Boundary directions-T
 # -V  :   SOLV_LENGTH ... length of final simulation
 # -W  :   SOLVATION ... Turn solvation on or off
 # -H  :   RESOURCE ... Which machine is being using
