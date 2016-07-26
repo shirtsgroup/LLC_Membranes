@@ -23,8 +23,8 @@ parser.add_argument('-n', '--no_monomers', default=6, help='Number of monomers p
 parser.add_argument('-c', '--cutoff', default=5, help='Cutoff distance for cross-linking. Bottom x % of the distribution'
                                                       'of distances will be cross-linked ')
 parser.add_argument('-e', '--term_prob', default=5, help='Termination probability (%)')
-parser.add_argument('-y', '--topology', default='crosslinked_new.itp', help='Topology file that will be analyzed and modified')
-parser.add_argument('-r', '--iteration', default=0, help='Iteration number of crosslinking process')
+parser.add_argument('-y', '--topology', default='crosslinked.itp', help='Topology file that will be analyzed and modified')
+parser.add_argument('-r', '--iteration', default=1, help='Iteration number of crosslinking process')
 parser.add_argument('-d', '--cutoff_rad', default=10, help='Cutoff Distance for radical reaction')
 
 args = parser.parse_args()
@@ -54,7 +54,7 @@ if args.type == 'LLC':
     topology = 'HII_mon.itp'
     xlink_atoms = 6  # number of atoms involved in cross-linking
     no_dummies = 6
-    images = 9 # total periodic images used for distance calculations
+    images = 9  # total periodic images used for distance calculations
 
 
 tot_atoms = atoms*args.layers*args.no_monomers*args.pores
@@ -71,10 +71,12 @@ C2y = []  # list to hold y positions of atoms of interest
 C2z = []  # list to hold z positions of atoms of interest. Z axis runs parallel to pore
 
 for line in range(0, lines):  # 15 is where the field containing atom identities ends
+    #if str.strip(a[line][8:15]) in c1_atoms:
     if a[line][0:15].count('C20') == 1 or a[line][0:15].count('C34') == 1 or a[line][0:15].count('C48') == 1:
         C1x.append(float(a[line][20:28]))
         C1y.append(float(a[line][28:36]))
         C1z.append(float(a[line][36:44]))
+    #elif str.strip(a[line][8:15]) in c2_atoms:
     elif a[line][0:15].count('C19') == 1 or a[line][0:15].count('C33') == 1 or a[line][0:15].count('C47') == 1:
         C2x.append(float(a[line][20:28]))
         C2y.append(float(a[line][28:36]))
@@ -83,7 +85,7 @@ for line in range(0, lines):  # 15 is where the field containing atom identities
 no_carbons = len(C1x)  # number of carbon atoms that may be involved in cross-linking
 
 # Time to handle periodic boundary conditions
-
+# Get the box dimensions:
 x1 = float(a[len(a) - 1][0:10])   # x box vector
 y1 = float(a[len(a) - 1][10:20])  # component one of y box vector
 y2 = float(a[len(a) - 1][50:60])  # component two of y box vector
@@ -194,7 +196,7 @@ exclude = np.diag(a, 0) + np.diag(b, -(mat_dim/images)) + np.diag(b, (mat_dim/im
 
 # We need to add additional exclusions if there are any terminated/reacted atoms which should be excluded
 
-if args.iteration != 0:
+if int(args.iteration) != 0:
 
     f = open(args.topology, 'r')  # take a look at the topology from the previous iteration
 
@@ -265,7 +267,7 @@ for i in range(0, len(C1x)):
 change_index1 = []  # index of C1 from min_dist which needs to be changed
 change_index2 = []  # index of C2 from dist which needs to be changed
 
-if args.iteration != 0:
+if int(args.iteration) != 0:
     # Looking just at the radical reactive sites
     min_dist_rad = np.zeros((len(c2_reactive_no), 1))
     min_index_rad = np.zeros((len(c2_reactive_no), 1))
@@ -284,9 +286,10 @@ if args.iteration != 0:
         if min_dist_rad[i, 0] < cutoff:
             change_index1.append(int(min_index_rad[i]))
             change_index2.append(c2_reactive_no[i])
-    print len(change_index2)
-    no_radical_rxns = len(change_index2)
 
+    no_radical_rxns = len(change_index2)
+print change_index1
+print change_index2
 # find the cutoff distance for cross-linking
 
 min_list = min_dist.tolist()
@@ -303,7 +306,6 @@ for i in range(0, len(C1x)):
         change_index2.append(int(min_index[i, 0]))  # Same as above but for the secondary carbons
         count += 1
 
-print 'Regular bonds count: %s' %count
 # Now that everything has an index that needs to be changed, we must interpret those indices
 
 # C19 is the 26th atom, C20 is 27th, C33 is 41st, C34 is 42nd, C47 is 56th, C48 is 57th, in each monomer
@@ -331,14 +333,21 @@ for i in range(0, len(change_index1)):
     if change_index2[i] in tail3:  # This is C2 therefore if this is true, then the atom is C47 (atom no 56)
         C2_no.append((change_index2[i]/3)*atoms + 56)  # division automatically round down
 
-if args.iteration != 0:
+if int(args.iteration) != 0:
     c2_rad_ndx = []
     c1_rad_ndx = []
     for i in range(0, no_radical_rxns):  # The first entries in C2_no are all radicals up to no_radical_rxns
         c2_rad_ndx.append(C2_no[i])
         c1_rad_ndx.append(C1_no[i])
+#print 'c1_rad_ndx: %s' %c1_rad_ndx
+#print 'c2_rad_ndx: %s' %c2_rad_ndx
 
 # reduce lists down to unique atom pairs
+
+# Save the list of radicals from the previous iteration
+if int(args.iteration) != 0:
+    c1_rad_ndx_prev = c1_rad_ndx
+    c2_rad_ndx_prev = c2_rad_ndx
 
 
 def uniq(input1, input2):
@@ -351,12 +360,35 @@ def uniq(input1, input2):
     return output1, output2
 
 c1_uniq, c2_uniq = uniq(C1_no, C2_no)
+print c1_uniq[0:10]
+
+def rad_index(c1_rad_ndx_prev, c2_rad_ndx_prev, c1, c2):
+    c1_rad_ndx = []
+    c2_rad_ndx = []
+    for i in c1_rad_ndx_prev:
+        if i in c1:
+            c1_rad_ndx.append(i)
+    for i in c2_rad_ndx_prev:
+        if i in c2:
+            c2_rad_ndx.append(i)
+    return c1_rad_ndx, c2_rad_ndx
+
+if int(args.iteration) != 0:
+    c1_rad_ndx, c2_rad_ndx = rad_index(c1_rad_ndx_prev, c2_rad_ndx_prev, c1_uniq, c2_uniq)
+
+#print c1_rad_ndx
+#print c2_rad_ndx
 
 # In some cases, it is possible that a c1 and a c2 on the same chain may be involved in independent cross-link reactions
 # We need to get rid of those to avoid unnecessary confusion. Since c2 is the reactive atom (it is a radical at some
 # point), it will trump c1. So if a c2 and c1 are on the same chain, then c1 will be removed from consideration.
 
 # Create a list of the indices of all the c1 atoms adjacent to reacting c2's
+
+if int(args.iteration) != 0:  # preserve previous radical indices for testing later since some may be eliminated
+    c1_rad_ndx_prev = c1_rad_ndx
+    c2_rad_ndx_prev = c2_rad_ndx
+
 adjacent_c1 = []
 for i in range(0, len(c2_uniq)):
     adjacent_c1.append(c2_uniq[i] + 1)
@@ -369,8 +401,15 @@ for i in range(0, len(adjacent_c1)):
         c1.append(c1_uniq[i])
         c2.append(c2_uniq[i])
 
-# Some of the reactions will terminate instead of cross linking. This will result in the dummy hydrogen on C2 to become
-# active.
+if int(args.iteration) != 0:
+    c1_rad_ndx, c2_rad_ndx = rad_index(c1_rad_ndx_prev, c2_rad_ndx_prev, c1, c2)
+
+
+# Some reactions will terminate instead of cross linking. This will cause the dummy hydrogen on C2 to become active
+
+if int(args.iteration) != 0:  # preserve our old list of radicals again
+    c1_rad_ndx_prev = c1_rad_ndx
+    c2_rad_ndx_prev = c2_rad_ndx
 
 tp = args.term_prob  # termination probability
 if type(tp) == int:
@@ -408,27 +447,42 @@ for i in range(0, no_xlinks):
         term_c1.append(c1[i])
         term_c2.append(c2[i])
         term_indices.append(i)
-
+#print 'term_c1: %s' %term_c1
+#print 'term_c2: %s' %term_c2
 # Remove terminated carbons from c1 and c2
+#no_rad_rxns_prev = no_radical_rxns
 for i in range(0, len(term_indices)):
     len_diff = no_xlinks - len(c1)  # Account for varying size of c1 and c2 lists
     del c1[term_indices[i] - len_diff]
     del c2[term_indices[i] - len_diff]
 
-# Use Assembly_itp.py to create a topology for the entire assembly and then write it to a file which will be edited to
-# incorporate cross-links
+if int(args.iteration) != 0:
+    c1_rad_ndx, c2_rad_ndx = rad_index(c1_rad_ndx_prev, c2_rad_ndx_prev, c1, c2)
 
-import subprocess
-with open("crosslinked.itp", "w+") as output:
-    subprocess.call(["python", "./../Structure-Files/Assembly_itp.py", "-x", "on"], stdout=output);
+#print len(c1_rad_ndx)
+#print len(c2_rad_ndx)
 
-# open and read that new file
+# For the first iteration, use Assembly_itp.py to create a topology for the entire assembly and then write it to a file
+# which will be edited to incorporate cross-links. Otherwise, read the topology from the previous iteration
 
-f = open('crosslinked.itp', 'r')
-print 'Crosslinked.itp file written'
-b = []
-for line in f:
-    b.append(line)
+if int(args.iteration) == 0:
+    import subprocess
+    with open("crosslinked.itp", "w+") as output:
+        subprocess.call(["python", "./../Structure-Files/Assembly_itp.py", "-x", "on"], stdout=output);
+
+    # open and read that new file
+
+    f = open('crosslinked.itp', 'r')
+    print 'Crosslinked.itp file written'
+    b = []
+    for line in f:
+        b.append(line)
+else:
+    f = open(args.topology, 'r')
+    b = []
+    for line in f:
+        b.append(line)
+    print '%s read into list' %args.topology
 
 # Make lists with numbers of H atoms whose type needs to change as a consequence of the cross linking reaction
 # Type should change from ha to hc
@@ -614,17 +668,18 @@ radical_c2 = []
 for i in range(0, len(c2)):
     other_c1.append(c2[i] + 1)
     radical_c2.append(c1[i] - 1)
-
+#print 'other_c1: %s ' %other_c1
 # The other c2 keeps its hybridization
 
 # Now make all of the changes
 # Also, any carbons that are termination sites and/or become sp3 hybridized will be marked with a 'T' since it should
 # not be considered in further cross-link iterations
-
-if args.iteration != 0:
+#print 'c1: %s:' %c1
+#print 'c2: %s:' %c2
+if int(args.iteration) != 0:
     # break apart the c1 and c2 list for now while atom types are being changed
-    del c1[:no_radical_rxns]
-    del c2[:no_radical_rxns]
+    del c1[:len(c1_rad_ndx)]
+    del c2[:len(c2_rad_ndx)]
 
 count = 0
 for i in range(atoms_index + 2, atoms_count):
@@ -645,7 +700,7 @@ for i in range(atoms_index + 2, atoms_count):
         b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c2') + b[i][10:len(b[atoms_index + 2]) - 1] + '*' + '\n'
     if res_num in term_c1:  # c1 in a terminating chain will be sp3
         b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
-    if args.iteration != 0:
+    if int(args.iteration) != 0:
         if res_num in c2_rad_ndx:
             b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
         if res_num in c1_rad_ndx:
@@ -653,12 +708,12 @@ for i in range(atoms_index + 2, atoms_count):
         if res_num in term:
             b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
 
-if args.iteration != 0:
+if int(args.iteration) != 0:
     # re-assemble the full c1, c2 list
     c1 = c1_rad_ndx + c1
     c2 = c2_rad_ndx + c2
-print c1_rad_ndx
-print c2_rad_ndx
+print c1
+print c2
 # Add bonds between cross-linking atoms
 for i in range(0, len(c1)):
     b.insert(nb + bonds_index + 2, '{:6d}{:7d}{:4d}'.format(c1[i], c2[i], 1) + "\n")

@@ -45,7 +45,10 @@ if monomer == 'HII':
     ion_top = '#include "amber99.ff/ions.itp"'
     sol_top = '#include "amber99.ff/spc.itp"'
     ion = 'NA'
-    mon_top = '#include "%s/Monomer_Tops/HII_mon.itp' %location
+    if args.xlink == 'on':
+        mon_top='#include "%s/crosslinked_new.itp"' %os.getcwd()
+    else:
+        mon_top = '#include "%s/Monomer_Tops/HII_mon.itp' %location
 elif monomer == 'BCC':
     grps = ['BCC', 'BR']
     grps_solv = ['BCC', 'BR', 'SOL']
@@ -57,7 +60,6 @@ elif monomer == 'BCC':
     mon_top = '#include "%s/Monomer_Tops/BCC_mon.itp"' %location
 
 gaff = '#include "%s/Forcefields/gaff/gaff.itp"' %location  # generalized amber force field
-ass_top = '#include "%s/Assembly.itp"' %location  # used in the case of crosslinking
 
 # Energy minimization .mdp file
 title = 'title = Energy Minimization'
@@ -142,12 +144,8 @@ if args.xlink == 'off':
                    '%s                 %s' %(args.monomer, monomers) + '\n',
                    '%s                  %s' %(ion, tot_ions) + '\n'])
 else:
-    import subprocess
-    with open("Assembly.itp", "w+") as output:
-        subprocess.call(["python", "./../Structure-Files/Assembly_itp.py", "-x", "on"], stdout=output);
-
     f4 = open('NaPore.top', 'w')
-    f4.writelines([';Forcefield\n', ff +'\n', gaff + '\n', '\n', ';Monomer Topology\n',  ass_top + '\n', '\n',
+    f4.writelines([';Forcefield\n', ff +'\n', gaff + '\n', '\n', ';Monomer Topology\n',  mon_top + '\n', '\n',
                    ';Ion Topology\n', ion_top + '\n', '\n', '[ system ]\n', '%s' %args.title + '\n', '\n',
                    '[ molecules ]\n', '; Compound         nmols' + '\n', '%s                 1' %(args.monomer) + '\n',
                    '%s                  %s' %(ion, tot_ions) + '\n'])
