@@ -26,6 +26,7 @@ parser.add_argument('-e', '--term_prob', default=5, help='Termination probabilit
 parser.add_argument('-y', '--topology', default='crosslinked_new.itp', help='Topology file that will be analyzed and modified')
 parser.add_argument('-r', '--iteration', default=1, help='Iteration number of crosslinking process')
 parser.add_argument('-d', '--cutoff_rad', default=10, help='Cutoff Distance for radical reaction')
+parser.add_argument('-x', '--xlinks', default= 0, help='Total number of c1-c2 crosslinks')
 
 args = parser.parse_args()
 
@@ -649,7 +650,10 @@ for i in range(atoms_index + 2, atoms_count):
     if res_num in other_c1:  # The c1 on the same tail as the bonding c2 is now sp3 hybridized
         b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
     if res_num in c2:  # the bonding c2 becomes sp3 hybridized
-        b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+        if b[i][5:10].count('ce') == 1:
+            b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+        if b[i][5:10].count('c2') == 1:
+            b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
     if res_num in term:  # the terminating c2 (where the termination actually happens) becomes sp3 hybridized
         b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'  # if it doesn't find the string to replace it does nothing
     if res_num in H_new1:  # Dummy atoms become real during the bonding process and have mass
@@ -723,8 +727,10 @@ for i in range(0, len(bonds)):
     count += 1
 
 # Add bonds between cross-linking atoms
+xlinks = int(args.xlinks)
 for i in range(0, len(c1)):
     b.insert(nb + bonds_index + 2, '{:6d}{:7d}{:4d}'.format(c1[i], c2[i], 1) + "\n")
+    xlinks += 1
     nb += 1
 
 # Add new H bonds formed during propagation (dummy H's becoming real)
@@ -983,7 +989,7 @@ for i in range(atoms_index + 2, atoms_count):
     if str.strip(b[i])[-1] == 'T' and str.strip(b[i + 1])[-1] == 'T':
         terminated += 1
 
-percent_completion = terminated/tot_double_bonds
+percent_completion = (float(terminated)/float(tot_double_bonds))*100
 
 end = time.time()
 
@@ -994,14 +1000,19 @@ if int(args.iteration) != 0:
     f.writelines(['Total time elapsed: %s seconds' %(end - start) + '\n', '\n', 'c1: %s' %c1 + '\n', '\n', 'c2: %s' %c2 + '\n',
                   '\n', 'radical_c2: %s' %radical_c2 + '\n', '\n', 'term: %s' %term + '\n', '\n', 'term_c1: %s' %term_c1 + '\n',
                   '\n', 'other_c1: %s' %other_c1 + '\n', '\n', 'H_new1: %s' %H_new1 + '\n', '\n', 'H_new2: %s' %H_new2 + '\n',
-                  '\n', 'Reacted c1 Radical Indices: %s' %c1_rad_ndx + '\n', '\n',
-                  'c2s which reacted with radical c1: %s' %c2_rad_ndx + '\n', '\n', 'term_rad_c2: %s' %term_rad_c2 + '\n',
-                  '\n', 'reactive_c2_term: %s' %reactive_c2_term + '\n', '\n', 'H_new3: %s' %H_new3 + '\n', '\n'
-                  'Vinyl groups terminated: %s' %terminated + '\n', '\n', 'Percent Completion: %s' %percent_completion])
+                  '\n', 'Reacted c2 Radical Indices: %s' %c1_rad_ndx + '\n', '\n',
+                  'c1s which reacted with radical c2: %s' %c2_rad_ndx + '\n', '\n', 'term_rad_c2: %s' %term_rad_c2 + '\n',
+                  '\n', 'reactive_c2_term: %s' %reactive_c2_term + '\n', '\n', 'H_new3: %s' %H_new3 + '\n', '\n',
+                  'Cutoff distance: %s nm' %cutoff + '\n','\n', 'Vinyl groups terminated: %s' %terminated + '\n', '\n',
+                  'Percent Completion: ' + '{:.1f}'.format(percent_completion) + ' %' + '\n', '\n',
+                  'Total Crosslinks: %s' %xlinks])
 
 if int(args.iteration) == 0:
     f = open('xlink.log', 'w')
     f.writelines(['Total time elapsed: %s seconds' %(end - start) + '\n', '\n', 'c1: %s' %c1 + '\n', '\n', 'c2: %s' %c2 + '\n',
                   '\n', 'radical_c2: %s' %radical_c2 + '\n', '\n', 'term: %s' %term + '\n', '\n', 'term_c1: %s' %term_c1 + '\n',
                   '\n', 'other_c1: %s' %other_c1 + '\n', '\n', 'H_new1: %s' %H_new1 + '\n', '\n',
-                  'H_new2: %s' %H_new2 + '\n', '\n', 'Percent Completion: %s' %percent_completion])
+                  'H_new2: %s' %H_new2 + '\n', '\n', 'Cutoff distance: %s nm' %cutoff, '\n'
+                  'Vinyl groups terminated: %s' %terminated + '\n',
+                  'Percent Completion: ' + '{.1f}'.format(percent_completion) + '%' + '\n',
+                  '\n', 'Total Crosslinks: %s' %xlinks])
