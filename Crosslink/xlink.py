@@ -23,7 +23,7 @@ parser.add_argument('-n', '--no_monomers', default=6, help='Number of monomers p
 parser.add_argument('-c', '--cutoff', default=5, help='Cutoff distance for cross-linking. Bottom x % of the distribution'
                                                       'of distances will be cross-linked ')
 parser.add_argument('-e', '--term_prob', default=5, help='Termination probability (%)')
-parser.add_argument('-y', '--topology', default='crosslinked.itp', help='Topology file that will be analyzed and modified')
+parser.add_argument('-y', '--topology', default='crosslinked_new.itp', help='Topology file that will be analyzed and modified')
 parser.add_argument('-r', '--iteration', default=1, help='Iteration number of crosslinking process')
 parser.add_argument('-d', '--cutoff_rad', default=10, help='Cutoff Distance for radical reaction')
 
@@ -217,39 +217,39 @@ if int(args.iteration) != 0:
         atoms_index += 1
 
     atoms_end = atoms_index + 2  # start looking on a line where there isn't text
-    while top[atoms_end] != '\n':
-        if str.strip(top[atoms_end][22:28]) in c1_atoms:
+    while top[atoms_end] != '\n':  # look through the whole [ atoms ] section
+        if str.strip(top[atoms_end][22:28]) in c1_atoms:  # make a list of the indices of all c1 atoms
             c1_ndx.append(int(top[atoms_end][0:5]))
-        if str.strip(top[atoms_end][22:28]) in c2_atoms:
+        if str.strip(top[atoms_end][22:28]) in c2_atoms:  # make a list of the indices of all c2 atoms
             c2_ndx.append(int(top[atoms_end][0:5]))
-        if str.strip(top[atoms_end])[-1] == 'T':
-            if str.strip(top[atoms_end][22:28]) in c1_atoms:
+        if str.strip(top[atoms_end])[-1] == 'T':  # see which lines are terminated and should therefore be excluded
+            if str.strip(top[atoms_end][22:28]) in c1_atoms:  # if its a c1, add it to a list of terminated c1's
                 exclude_T_c1.append(int(top[atoms_end][0:5]))
-            if str.strip(top[atoms_end][22:28]) in c2_atoms:
+            if str.strip(top[atoms_end][22:28]) in c2_atoms:  # if its a c2, add it to a list of terminated c2's
                 exclude_T_c2.append(int(top[atoms_end][0:5]))
-        if str.strip(top[atoms_end])[-1] == '*':
-            reactive_c2.append(int(top[atoms_end][0:5]))
-        atoms_end += 1
+        if str.strip(top[atoms_end])[-1] == '*':  # see which atoms are reactive radicals
+            reactive_c2.append(int(top[atoms_end][0:5]))  # if it is, add it too a list of reactive c2 atoms
+        atoms_end += 1  # increment while loop
 
-    c1_ex_no = []  # Now give them a number in the context of c1 and c2 (between 1 and 1440)
-    c2_ex_no = []
+    c1_ex_no = []  # Now number the c1's out of all c1's
+    c2_ex_no = []  # Same as above but for c2
     c2_reactive_no = []  # and the radical
     for i in range(0, len(exclude_T_c1)):
-        c1_ex_no.append(c1_ndx.index(exclude_T_c1[i]))
+        c1_ex_no.append(c1_ndx.index(exclude_T_c1[i]))  # their number is based on the index where they are located
     for i in range(0, len(exclude_T_c2)):  #exclude_T_c2 and exclude_T_c1 are not necessarily the same length so we need a second loop
         c2_ex_no.append(c2_ndx.index(exclude_T_c2[i]))
     for i in range(0, len(reactive_c2)):
         c2_reactive_no.append(c2_ndx.index(reactive_c2[i]))
 
-    for i in range(0, len(c1_ex_no)):
-        for j in range(0, images):
+    for i in range(0, len(c1_ex_no)):  # now fill the exclusions matrix with 1's where we don't want a distance calc.
+        for j in range(0, images):  # do it for all of the periodic cells
             exclude[:, j*mat_dim/images + c1_ex_no[i]] = 1  # excludes across all pbc's too
 
-    for i in range(0, len(c2_ex_no)):
+    for i in range(0, len(c2_ex_no)):  # do the same for c2
         for j in range(0, images):
             exclude[j*mat_dim/images + c2_ex_no[i], :] = 1
 
-dist = genpairs.calc_dist(C1x, C2x, C1y, C2y, C1z, C2z, exclude, dist)
+dist = genpairs.calc_dist(C1x, C2x, C1y, C2y, C1z, C2z, exclude, dist)  # calculated distances between all non-exclusions
 
 stop2 = time.time()
 
@@ -268,7 +268,7 @@ change_index1 = []  # index of C1 from min_dist which needs to be changed
 change_index2 = []  # index of C2 from dist which needs to be changed
 
 if int(args.iteration) != 0:
-    # Looking just at the radical reactive sites
+    # Looking just at the radical reactive sites. Does the same thing as the previous block but for a smaller list
     min_dist_rad = np.zeros((len(c2_reactive_no), 1))
     min_index_rad = np.zeros((len(c2_reactive_no), 1))
     for i in range(0, len(c2_reactive_no)):
@@ -280,16 +280,15 @@ if int(args.iteration) != 0:
         m = min(min_list_rad)
         min_list_rad.remove(m)
 
-    cutoff = min(min_list_rad)
+    cutoff = min(min_list_rad)  # Now the cutoff value is the minimum of min_list_rad
 
-    for i in range(0, len(min_index_rad)):
+    for i in range(0, len(min_index_rad)):  # Add to change_index if they meet the cutoff criteria
         if min_dist_rad[i, 0] < cutoff:
             change_index1.append(int(min_index_rad[i]))
             change_index2.append(c2_reactive_no[i])
 
     no_radical_rxns = len(change_index2)
-print change_index1
-print change_index2
+
 # find the cutoff distance for cross-linking
 
 min_list = min_dist.tolist()
@@ -339,16 +338,24 @@ if int(args.iteration) != 0:
     for i in range(0, no_radical_rxns):  # The first entries in C2_no are all radicals up to no_radical_rxns
         c2_rad_ndx.append(C2_no[i])
         c1_rad_ndx.append(C1_no[i])
-#print 'c1_rad_ndx: %s' %c1_rad_ndx
-#print 'c2_rad_ndx: %s' %c2_rad_ndx
 
-# reduce lists down to unique atom pairs
 
 # Save the list of radicals from the previous iteration
 if int(args.iteration) != 0:
     c1_rad_ndx_prev = c1_rad_ndx
     c2_rad_ndx_prev = c2_rad_ndx
 
+
+def rad_index(c1_rad_ndx_prev, c2_rad_ndx_prev, c1, c2):  # function to modify c1_rad_ndx and c2_rad_ndx since it might
+    # change during manipulations of c1 and c2 lists
+    c1_rad_ndx = []
+    c2_rad_ndx = []
+    for i in range(0, len(c1_rad_ndx_prev)):
+        if c1_rad_ndx_prev[i] in c1 and c2_rad_ndx_prev[i] in c2:
+            if c1_rad_ndx_prev[i] not in c1_rad_ndx and c2_rad_ndx_prev[i] not in c2_rad_ndx:
+                c1_rad_ndx.append(c1_rad_ndx_prev[i])
+                c2_rad_ndx.append(c2_rad_ndx_prev[i])
+    return c1_rad_ndx, c2_rad_ndx
 
 def uniq(input1, input2):
     output1 = []
@@ -360,24 +367,9 @@ def uniq(input1, input2):
     return output1, output2
 
 c1_uniq, c2_uniq = uniq(C1_no, C2_no)
-print c1_uniq[0:10]
-
-def rad_index(c1_rad_ndx_prev, c2_rad_ndx_prev, c1, c2):
-    c1_rad_ndx = []
-    c2_rad_ndx = []
-    for i in c1_rad_ndx_prev:
-        if i in c1:
-            c1_rad_ndx.append(i)
-    for i in c2_rad_ndx_prev:
-        if i in c2:
-            c2_rad_ndx.append(i)
-    return c1_rad_ndx, c2_rad_ndx
 
 if int(args.iteration) != 0:
     c1_rad_ndx, c2_rad_ndx = rad_index(c1_rad_ndx_prev, c2_rad_ndx_prev, c1_uniq, c2_uniq)
-
-#print c1_rad_ndx
-#print c2_rad_ndx
 
 # In some cases, it is possible that a c1 and a c2 on the same chain may be involved in independent cross-link reactions
 # We need to get rid of those to avoid unnecessary confusion. Since c2 is the reactive atom (it is a radical at some
@@ -404,17 +396,16 @@ for i in range(0, len(adjacent_c1)):
 if int(args.iteration) != 0:
     c1_rad_ndx, c2_rad_ndx = rad_index(c1_rad_ndx_prev, c2_rad_ndx_prev, c1, c2)
 
-
 # Some reactions will terminate instead of cross linking. This will cause the dummy hydrogen on C2 to become active
 
 if int(args.iteration) != 0:  # preserve our old list of radicals again
     c1_rad_ndx_prev = c1_rad_ndx
     c2_rad_ndx_prev = c2_rad_ndx
 
-tp = args.term_prob  # termination probability
+tp = int(args.term_prob)  # termination probability
 if type(tp) == int:
     no_decimals = 0  # there aren't decimals in a integer
-else:
+else:  # len(str(int(float(tp)))) works in the following line if you want non-integer term probabilities
     no_decimals = len(str(tp)) - len(str(int(tp))) - 1  # subtract the length of the integer value from the length
                                                         # of the float value and subtract one for the decimal point to
                                                         # get the number of decimal places in the number
@@ -447,28 +438,44 @@ for i in range(0, no_xlinks):
         term_c1.append(c1[i])
         term_c2.append(c2[i])
         term_indices.append(i)
-#print 'term_c1: %s' %term_c1
-#print 'term_c2: %s' %term_c2
+
 # Remove terminated carbons from c1 and c2
-#no_rad_rxns_prev = no_radical_rxns
+
 for i in range(0, len(term_indices)):
     len_diff = no_xlinks - len(c1)  # Account for varying size of c1 and c2 lists
     del c1[term_indices[i] - len_diff]
     del c2[term_indices[i] - len_diff]
 
 if int(args.iteration) != 0:
-    c1_rad_ndx, c2_rad_ndx = rad_index(c1_rad_ndx_prev, c2_rad_ndx_prev, c1, c2)
-
-#print len(c1_rad_ndx)
-#print len(c2_rad_ndx)
+    c1_rad_ndx, c2_rad_ndx = rad_index(c1_rad_ndx_prev, c2_rad_ndx_prev, c1, c2)  # rewrite c1_rad_ndx and c2_rad_ndx
+    # Separate the termination lists into a list for termination immediately upon initiation (term) and a list for
+    # termination occurring on already initiated radicals
+    reactive_c2_term = []  # reactive c2's which didn't meet distance cut-off criteria but, since there is still a
+    # possibility for these to terminate, we must account for them
+    for i in reactive_c2:  # This list contains all the entries in c2_rad_ndx
+        if i not in c2_rad_ndx:  # so first make sure that we aren't adding something from c2_rad_ndx to the list
+            term = np.random.choice(term_prob_array)
+            if term == 1:
+                reactive_c2_term.append(i)  # These carbons will terminate
+    term_rad_c1 = []  # radicals from previous iterations which will terminate
+    term_rad_c2 = []
+    for i in term_c2:  # look at all the entries in term
+        if i in c2_rad_ndx:  # if it is in c2_rad_ndx
+            term_rad_c1.append(term_c1.index(i))  # then find the corresponding c1 and record it
+            term_rad_c2.append(i)  # record that value (c1 and c2 are in pairs)
+            del term_c1[term_c1.index(i)]  # now delete those values from the previous term lists
+            del term_c2[term_c2.index(i)]
 
 # For the first iteration, use Assembly_itp.py to create a topology for the entire assembly and then write it to a file
 # which will be edited to incorporate cross-links. Otherwise, read the topology from the previous iteration
 
 if int(args.iteration) == 0:
     import subprocess
+    import os
+    location = os.environ['GITHUB']  # if there is an error here, you need to add the path to where all of the github
+    # files are stored to an environment variable in your .bashrc
     with open("crosslinked.itp", "w+") as output:
-        subprocess.call(["python", "./../Structure-Files/Assembly_itp.py", "-x", "on"], stdout=output);
+        subprocess.call(["python", "%s/Structure-Files/Assembly_itp.py" %location, "-x", "on"], stdout=output);
 
     # open and read that new file
 
@@ -485,7 +492,6 @@ else:
     print '%s read into list' %args.topology
 
 # Make lists with numbers of H atoms whose type needs to change as a consequence of the cross linking reaction
-# Type should change from ha to hc
 
 # first, redefine tail 1, 2 and 3 using C2 atom numbers as a reference
 # find the residue numbers of the first C33, C47, C19 (C2 carbons)
@@ -520,8 +526,21 @@ for i in range(0, tot_monomers):
     tail3.append(atoms*i + C2_3)
     tail3.append(atoms*i + C2_3 + 1)
 
-H = []  # list of residue numbers of H that need to be changed from ha to hc
-H_new1 = []  # list of residue number of H's that will be convert from dummy atoms to real atoms
+# We need to change the atom type of the non-bonding c1. If it is initiated, then it goes from c2 to c3
+# We also need a list of c2's which are left as radicals. They are adjacent to c1
+other_c1 = []
+radical_c2 = []
+for i in range(0, len(c2)):
+    other_c1.append(c2[i] + 1)
+    radical_c2.append(c1[i] - 1)
+
+if int(args.iteration) != 0:
+    # break apart the c1 and c2 list for now while atom types are being changed
+    del c1[:len(c1_rad_ndx)]
+    del c2[:len(c2_rad_ndx)]
+
+H = []  # list of residue numbers of H that need to be changed from ha to hc -- unneeded. Delete once this whole thing works
+H_new1 = []  # list of residue number of H's that will be converted from dummy atoms to real atoms
 for i in range(0, len(c2)):
     if c2[i] in tail1:  # i.e. C19
         H.append(c2[i] + 59)
@@ -574,7 +593,8 @@ term = []  # define those termination atoms as 'term' which are the carbons adja
 for i in range(0, len(term_c1)):
     term.append(term_c1[i] - 1)
 
-H_new2 = []  # keep these separate for indexing purposes
+H_new2 = []  # keep these separate for indexing purposes. In H_new2, termination is based on the tail containing c1
+    # since initiation occurs at c1.
 for i in range(0, len(term)):
     if term[i] in tail1:  # i.e. C19
         H.append(term[i] + 59)
@@ -595,6 +615,18 @@ for i in range(0, len(term)):
         H_new2.append(term[i] + 86)
         H_new2.append(term[i] + 87)
 
+if int(args.iteration) != 0:
+    H_new3 = []  # termination at radicals that exist from previous iterations will occur at c2. The terminated chain is
+    # determined by the location of the radical c2. Nothing happens on the tail containing
+    H_rad_carbons = term_rad_c2 + reactive_c2_term
+    for i in range(0, len(H_rad_carbons)):
+        if H_rad_carbons[i] in tail1:
+            H_new3.append(H_rad_carbons[i] + 112)
+        if H_rad_carbons[i] in tail2:
+            H_new3.append(H_rad_carbons[i] + 99)
+        if H_rad_carbons[i] in tail3:
+            H_new3.append(H_rad_carbons[i] + 86)
+
 # find the indices of all fields that need to be modified
 
 # [ atoms ]
@@ -608,6 +640,37 @@ nr = 0  # number of lines in 'atoms' section
 while b[atoms_count] != '\n':
     atoms_count += 1  # increments the while loop
     nr += 1  # counts number of atoms
+
+count = 0
+for i in range(atoms_index + 2, atoms_count):
+    res_num = int(b[i][0:5])
+    if res_num in c1:  # change bonding carbon 1 from c2 to c3 since it becomes sp3 hybridized
+        b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+    if res_num in other_c1:  # The c1 on the same tail as the bonding c2 is now sp3 hybridized
+        b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+    if res_num in c2:  # the bonding c2 becomes sp3 hybridized
+        b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+    if res_num in term:  # the terminating c2 (where the termination actually happens) becomes sp3 hybridized
+        b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'  # if it doesn't find the string to replace it does nothing
+    if res_num in H_new1:  # Dummy atoms become real during the bonding process and have mass
+        b[i] = b[i][0:5] + b[i][5:15].replace('hc_d', 'hc  ') + b[i][15:53] + b[i][53:61].replace('0.00000', '1.00800') + b[i][61:len(b[atoms_index + 2])]
+    if res_num in H_new2:  # Dummy atoms which become real during the termination process and have mass
+        b[i] = b[i][0:5] + b[i][5:15].replace('hc_d', 'hc  ') + b[i][15:53] + b[i][53:61].replace('0.00000', '1.00800') + b[i][61:len(b[atoms_index + 2])]
+    if res_num in radical_c2:  # mark the c2 atoms that are now radicals. They remain sp2 hybridized but are reactive
+        b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c2') + b[i][10:len(b[atoms_index + 2]) - 1] + '*' + '\n'
+    if res_num in term_c1:  # c1 in a terminating chain will be sp3
+        b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+    if int(args.iteration) != 0:
+        if res_num in c2_rad_ndx or res_num in c1_rad_ndx or res_num in term or res_num in reactive_c2_term or res_num in term_rad_c2:
+            b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+        if res_num in H_new3:
+            b[i] = b[i][0:5] + b[i][5:15].replace('hc_d', 'hc  ') + b[i][15:53] + b[i][53:61].replace('0.00000', '1.00800') + b[i][61:len(b[atoms_index + 2])]
+
+if int(args.iteration) != 0:
+    # re-assemble the full c1, c2 list
+    c1 = c1_rad_ndx + c1
+    c2 = c2_rad_ndx + c2
+
 
 # Before going further, we need to label all of the dummy atoms that are still dummies so that they are not written into
 # the bonds, angles, dihedrals or pairs section
@@ -659,70 +722,20 @@ for i in range(0, len(bonds)):
     b.insert(count, bonds[i] + '\n')
     count += 1
 
-# Replace atom types of bonding carbons with sp3 hybridized carbons
-
-# To be safe, we also need to change the atom type of the non-bonding c1. If it is initiated, then it goes from c2 to c3
-# We also need a list of c2's which are left as radicals. They are adjacent to c1
-other_c1 = []
-radical_c2 = []
-for i in range(0, len(c2)):
-    other_c1.append(c2[i] + 1)
-    radical_c2.append(c1[i] - 1)
-#print 'other_c1: %s ' %other_c1
-# The other c2 keeps its hybridization
-
-# Now make all of the changes
-# Also, any carbons that are termination sites and/or become sp3 hybridized will be marked with a 'T' since it should
-# not be considered in further cross-link iterations
-#print 'c1: %s:' %c1
-#print 'c2: %s:' %c2
-if int(args.iteration) != 0:
-    # break apart the c1 and c2 list for now while atom types are being changed
-    del c1[:len(c1_rad_ndx)]
-    del c2[:len(c2_rad_ndx)]
-
-count = 0
-for i in range(atoms_index + 2, atoms_count):
-    res_num = int(b[i][0:5])
-    if res_num in c1:  # change bonding carbon 1 from c2 to c3 since it becomes sp3 hybridized
-        b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
-    if res_num in other_c1:  # The c1 on the same tail as the bonding c2 is now sp3 hybridized
-        b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
-    if res_num in c2:  # the bonding c2 becomes sp3 hybridized
-        b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
-    if res_num in term:  # the terminating c2 (where the termination actually happens) becomes sp3 hybridized
-        b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'  # if it doesn't find the string to replace it does nothing
-    if res_num in H_new1:  # Dummy atoms become real during the bonding process and have mass
-        b[i] = b[i][0:5] + b[i][5:15].replace('hc_d', 'hc  ') + b[i][15:53] + b[i][53:61].replace('0.00000', '1.00800') + b[i][61:len(b[atoms_index + 2])]
-    if res_num in H_new2:  # Dummy atoms which become real during the termination process and have mass
-        b[i] = b[i][0:5] + b[i][5:15].replace('hc_d', 'hc  ') + b[i][15:53] + b[i][53:61].replace('0.00000', '1.00800') + b[i][61:len(b[atoms_index + 2])]
-    if res_num in radical_c2:  # mark the c2 atoms that are now radicals. They remain sp2 hybridized but are reactive
-        b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c2') + b[i][10:len(b[atoms_index + 2]) - 1] + '*' + '\n'
-    if res_num in term_c1:  # c1 in a terminating chain will be sp3
-        b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
-    if int(args.iteration) != 0:
-        if res_num in c2_rad_ndx:
-            b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
-        if res_num in c1_rad_ndx:
-            b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
-        if res_num in term:
-            b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
-
-if int(args.iteration) != 0:
-    # re-assemble the full c1, c2 list
-    c1 = c1_rad_ndx + c1
-    c2 = c2_rad_ndx + c2
-print c1
-print c2
 # Add bonds between cross-linking atoms
 for i in range(0, len(c1)):
     b.insert(nb + bonds_index + 2, '{:6d}{:7d}{:4d}'.format(c1[i], c2[i], 1) + "\n")
     nb += 1
 
 # Add new H bonds formed during propagation (dummy H's becoming real)
-for i in range(0, len(H_new1)):
-    b.insert(nb + bonds_index + 2, '{:6d}{:7d}{:4d}'.format(c2[i] + 1, H_new1[i], 1) + "\n")
-    nb += 1
+if int(args.iteration) != 0:
+    for i in range(0, len(H_new1)):
+        b.insert(nb + bonds_index + 2, '{:6d}{:7d}{:4d}'.format(c2[i + len(c2_rad_ndx)] + 1, H_new1[i], 1) + "\n")
+        nb += 1
+else:
+    for i in range(0, len(H_new1)):
+        b.insert(nb + bonds_index + 2, '{:6d}{:7d}{:4d}'.format(c2[i] + 1, H_new1[i], 1) + "\n")
+        nb += 1
 
 # new H bonds formed during termination (2 dummy H's becoming real)
 k = 0
@@ -734,10 +747,19 @@ for i in range(0, len(term)):
     nb += 1
     k += 1
 
+if int(args.iteration) != 0:
+    # new H bonds formed when radicals from previous iterations are terminated
+    for i in range(0, len(H_new3)):
+        b.insert(nb + bonds_index + 2, '{:6d}{:7d}{:4d}'.format(H_rad_carbons[i], H_new3[i], 1) + "\n")
+        nb += 1
+
 # Now we need to generate dihedrals, angles and pairs lists. We have all the atoms we need. Let's make one list that
 # holds all of these values:
 
-atoms_of_interest = radical_c2 + c1 + c2 + other_c1 + term + term_c1 + H + H_new1 + H_new2
+if int(args.iteration) == 0:
+    atoms_of_interest = radical_c2 + c1 + c2 + other_c1 + term + term_c1 + H + H_new1 + H_new2
+else:
+    atoms_of_interest = radical_c2 + c1 + c2 + other_c1 + term + term_c1 + H + H_new1 + H_new2 + term_rad_c2 + H_new3 + reactive_c2_term
 
 # See genpairs.pyx to see what is going on in the following lines:
 
@@ -924,10 +946,16 @@ for i in range(vsite_count, len(b)):  # This is the last section in the input .i
 # term and H_new1 contain the indices of the hydrogens which need to be removed from the virtual sites list
 
 virtual_sites = []
-for i in range(vsite_index + 2, vsite_count):
-    site = int(b[i][0:8])
-    if site not in H_new2 and site not in H_new1:  # if the site is in the old virtual sites but not in H_new1 or term
-        virtual_sites.append(b[i])  # then add it to virtual_sites since those hydrogens are still dummies
+if int(args.iteration) == 0:
+    for i in range(vsite_index + 2, vsite_count):
+        site = int(b[i][0:8])
+        if site not in H_new2 and site not in H_new1:  # if the site is in the old virtual sites but not in H_new1 or term
+            virtual_sites.append(b[i])  # then add it to virtual_sites since those hydrogens are still dummies
+else:
+    for i in range(vsite_index + 2, vsite_count):
+        site = int(b[i][0:8])
+        if site not in H_new2 and site not in H_new1 and site not in H_new3:  # don't want virtual sites from H_new3
+            virtual_sites.append(b[i])  # then add it to virtual_sites since those hydrogens are still dummies
 
 # eliminate the old virtual_sites4 list
 
@@ -949,22 +977,31 @@ for line in b:
 
 target.close()
 
+tot_double_bonds = len(c1_atoms)*tot_monomers
+terminated = 0
+for i in range(atoms_index + 2, atoms_count):
+    if str.strip(b[i])[-1] == 'T' and str.strip(b[i + 1])[-1] == 'T':
+        terminated += 1
+
+percent_completion = terminated/tot_double_bonds
+
 end = time.time()
-print 'Total time elapsed: %s seconds' %(end - start)
-print c1
-print c2
-print len(c2)
-print len(c1)
-print radical_c2
-count = 0
-for i in range(0, len(c2)):
-    if c2[i] in radical_c2:
-        count += 1
 
-print 'Duplicates: %s' %count
+# Write important output to a log file
 
-print term
-print term_c1
-print other_c1
-print H_new1
-print H_new2
+if int(args.iteration) != 0:
+    f = open('xlink.log', 'w')
+    f.writelines(['Total time elapsed: %s seconds' %(end - start) + '\n', '\n', 'c1: %s' %c1 + '\n', '\n', 'c2: %s' %c2 + '\n',
+                  '\n', 'radical_c2: %s' %radical_c2 + '\n', '\n', 'term: %s' %term + '\n', '\n', 'term_c1: %s' %term_c1 + '\n',
+                  '\n', 'other_c1: %s' %other_c1 + '\n', '\n', 'H_new1: %s' %H_new1 + '\n', '\n', 'H_new2: %s' %H_new2 + '\n',
+                  '\n', 'Reacted c1 Radical Indices: %s' %c1_rad_ndx + '\n', '\n',
+                  'c2s which reacted with radical c1: %s' %c2_rad_ndx + '\n', '\n', 'term_rad_c2: %s' %term_rad_c2 + '\n',
+                  '\n', 'reactive_c2_term: %s' %reactive_c2_term + '\n', '\n', 'H_new3: %s' %H_new3 + '\n', '\n'
+                  'Vinyl groups terminated: %s' %terminated + '\n', '\n', 'Percent Completion: %s' %percent_completion])
+
+if int(args.iteration) == 0:
+    f = open('xlink.log', 'w')
+    f.writelines(['Total time elapsed: %s seconds' %(end - start) + '\n', '\n', 'c1: %s' %c1 + '\n', '\n', 'c2: %s' %c2 + '\n',
+                  '\n', 'radical_c2: %s' %radical_c2 + '\n', '\n', 'term: %s' %term + '\n', '\n', 'term_c1: %s' %term_c1 + '\n',
+                  '\n', 'other_c1: %s' %other_c1 + '\n', '\n', 'H_new1: %s' %H_new1 + '\n', '\n',
+                  'H_new2: %s' %H_new2 + '\n', '\n', 'Percent Completion: %s' %percent_completion])

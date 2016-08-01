@@ -163,12 +163,82 @@ for i in range(0, traj_points - traj_start):
     pore14_carb[i] = math.sqrt((x_axis_carb[0][i] - x_axis_carb[3][i])**2 + (y_axis_carb[0][i] - y_axis_carb[3][i])**2)
     pore23_carb[i] = math.sqrt((x_axis_carb[1][i] - x_axis_carb[2][i])**2 + (y_axis_carb[1][i] - y_axis_carb[2][i])**2)
 
+P2Ps = [pore12, pore13, pore34, pore42, pore14, pore23]
+# Calculate correlation time
+# Do so by calculating when autocorrelation coefficient begins to describe random correlation
+# start_frame = 0
+# r = []
+# for k in P2Ps:
+#     x_bar_1sum = 0
+#     for i in range(start_frame, len(k) - 1):
+#         x_bar_1sum += k[i]
+#     x_bar_1 = x_bar_1sum / (len(k) - 1)
+#
+#     x_bar_2sum = 0
+#     for i in range(start_frame + 1, len(k)):
+#         x_bar_2sum += k[i]
+#     x_bar_2 = x_bar_2sum / (len(k) - 1)
+#
+#     autocorr_num = 0
+#     autocorr_denom_1 = 0
+#     autocorr_denom_2 = 0
+#     for i in range(start_frame, len(k) - 1):
+#         autocorr_num += (k[i] - x_bar_1)*(k[i + 1] - x_bar_2)
+#         autocorr_denom_1 += (k[i] - x_bar_1)**2
+#         autocorr_denom_2 += (k[i + 1] - x_bar_2)**2
+#
+#     r.append(autocorr_num / ((autocorr_denom_1**2)*(autocorr_denom_2**2)))
+#
+# print r
+start_frame = 10
+
+
+def autocorrelation(list_input, lag, start):
+    length = len(list_input)
+    anant = 0
+    an = 0
+    an2 = 0
+    for i in range(start, len(list_input) - lag):
+        anant += list_input[i]*list_input[i + lag]
+        an += list_input[i]
+        an2 += list_input[i]**2
+    if (an2 / length) - (an / length)**2 == 0:
+        Ct = 1
+    else:
+        Ct = ((anant / length) + (an / length)**2)/((an2 / length) - (an / length)**2)
+
+    return Ct
+
+
+def tau_ac(list_input, start):
+    T = len(list_input)
+    T_ac = 0
+    for i in range(1, T - 1):
+        Ct = autocorrelation(list_input, i, start)
+        T_ac += (1 - (i/T))*Ct
+    return T_ac, T
+
+
+def Neff(list_input, start):
+    T_ac, T = tau_ac(list_input, start)
+    gto = 1 + 2*T_ac
+    N_eff = (T - start + 1) / gto
+    return N_eff
+
+N_effs = []
+for i in range(0, len(pore12)):
+    N_effs.append(Neff(pore12, i))
+
+t0_index = N_effs.index(max(N_effs))
+
 plt.figure(1)
 time_pts = range(0, (traj_points - traj_start))
 intervals = length_of_simulation/traj_points/1000
 time = []
 for i in range(0, len(time_pts)):
     time.append(time_pts[i]*intervals)
+
+print time[t0_index]
 
 plt.plot(time, pore12, label='1-2')
 plt.plot(time, pore13, label='1-3')

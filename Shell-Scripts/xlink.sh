@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 # A script to iteratively crosslink a LLC system
 
 N_ITER=10  # number of crosslinking iterations
@@ -22,7 +22,7 @@ done
 
 ITERATION=0
 
-Write_Input.py -I cg -x on -L ${SIM_LENGTH}
+Write_Input.py -x on -L ${SIM_LENGTH} -D 0.001 # -I cg
 
 for i in $(seq 0 $((N_ITER-1))); do
     if [ ${ITERATION} == 0 ]; then
@@ -31,6 +31,7 @@ for i in $(seq 0 $((N_ITER-1))); do
         xlink.py -i ${GRO} -c ${CUTOFF}  -e ${TERM_PROB} -r ${ITERATION} -d ${CUTOFF_RAD} -y crosslinked_new.itp
     fi
     cp crosslinked_new.itp crosslinked_${ITERATION}.itp
+    mv xlink.log xlink_${ITERATION}.log
     gmx grompp -f em.mdp -p NaPore.top -c wiggle.gro -o em
     gmx mdrun -v -deffnm em
     gmx grompp -f wiggle.mdp -p NaPore.top -c em.gro -o wiggle
