@@ -27,7 +27,7 @@ TERM=0  # starting number of vinyl groups that have been terminated (both c1 and
 
 Write_Input.py -x on -L ${SIM_LENGTH} -D 0.001 # -I cg
 
-while [  ${TERM} -lt 1440 ]; do
+while [ ${TERM} -lt 1440 ]; do
     if [ ${ITERATION} == 0 ]; then
         xlink.py -i ${GRO} -c ${CUTOFF}  -e ${TERM_PROB} -r ${ITERATION} -d ${CUTOFF_RAD} -x ${XLINKS}
     else
@@ -40,7 +40,7 @@ while [  ${TERM} -lt 1440 ]; do
     gmx grompp -f wiggle.mdp -p NaPore.top -c em.gro -o wiggle
     gmx mdrun -v -deffnm wiggle
     XLINKS=$(tail xlink_${ITERATION}.log -n 1 | cut -c 19-22)
-    TERM=$(tail -n 5 xlink_9.log | head -n 1 | cut -c 26-29)
+    TERM=$(tail -n 5 xlink_${ITERATION}.log | head -n 1 | cut -c 26-29)
     ITERATION=$((ITERATION+1))
     echo ${TERM}
 done

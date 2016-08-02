@@ -293,11 +293,17 @@ if int(args.iteration) != 0:
 # find the cutoff distance for cross-linking
 
 min_list = min_dist.tolist()
+distances = []
 for i in range(0, int((float(args.cutoff)/100)*len(C1x))):  # looks at a percentage of the total values based on user input of cutoff
     m = min(min_list)  # finds minimum of min_list
+    distances.append(m)
     min_list.remove(m)  # removes that value from min_list
+print distances
 
 cutoff = min(min_list)  # The minimum value left after the modification of min_list is the cutoff value
+
+if cutoff == 1000:
+    cutoff = 1
 
 count = 0
 for i in range(0, len(C1x)):
@@ -1012,7 +1018,7 @@ if int(args.iteration) == 0:
     f.writelines(['Total time elapsed: %s seconds' %(end - start) + '\n', '\n', 'c1: %s' %c1 + '\n', '\n', 'c2: %s' %c2 + '\n',
                   '\n', 'radical_c2: %s' %radical_c2 + '\n', '\n', 'term: %s' %term + '\n', '\n', 'term_c1: %s' %term_c1 + '\n',
                   '\n', 'other_c1: %s' %other_c1 + '\n', '\n', 'H_new1: %s' %H_new1 + '\n', '\n',
-                  'H_new2: %s' %H_new2 + '\n', '\n', 'Cutoff distance: %s nm' %cutoff, '\n'
-                  'Vinyl groups terminated: %s' %terminated + '\n',
-                  'Percent Completion: ' + '{.1f}'.format(percent_completion) + '%' + '\n',
+                  'H_new2: %s' %H_new2 + '\n', '\n', 'Cutoff distance: %s nm' %cutoff, '\n',
+                  'Vinyl groups terminated: %s' %terminated + '\n', '\n',
+                  'Percent Completion: ' + '{:.1f}'.format(percent_completion) + '%' + '\n',
                   '\n', 'Total Crosslinks: %s' %xlinks])
