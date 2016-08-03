@@ -1,0 +1,473 @@
+# This script creates one arm of the BCC phase.
+# Author: Norma Langdon
+print 'This is a .gro file'
+
+import numpy as np
+import math
+import os
+import argparse
+import sys
+
+parser = argparse.ArgumentParser(description = 'Build BCC Structure')
+parser.add_argument('-i', '--input', default = 'monomer58.pdb', help = 'Path to input file')
+parser.add_argument('-l', '--layers', default = 20, type = int, help = 'Number of Layers')
+parser.add_argument('-mi', '--monomers_inner', default = 4, type = int, help = 'Number of monomers in inner ring at limiting radius')
+parser.add_argument('-mo', '--monomers_outer', default = 10, type = int, help = 'Number of monomers in outer ring at limiting radius')
+parser.add_argument('-w', '--pore_width', default = 12, type = float, help = 'Pore width')
+parser.add_argument('-d', '--dist', default = 10, type = float, help = 'Distance between layers')
+args = parser.parse_args()
+
+location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+fileopen = open("%s/../BCC_Monomer_Configurations/%s" % (location, args.input), "r")
+
+no_layers = args.layers
+no_monomers_inner = args.monomers_inner
+no_monomers_outer = args.monomers_outer
+pore_width = args.pore_width
+dist = args.dist
+name = 'MOL'
+no_ions = 2
+
+no_layers_inner = no_layers + 2
+
+read = []
+for line in fileopen:
+    read.append(line)
+lines_of_text = 0
+for i in range(0, len(read)):     # Counts the number of text lines at the top of .pdb file
+    if read[i].count('ATOM') == 0:
+        lines_of_text += 1
+    if read[i].count('ATOM') == 1:
+        break
+no_atoms = 0
+for i in range(0, len(read)):
+    no_atoms += read[i].count('ATOM')     # Counts the number of non-text lines in the .pdb file to find the number of
+                                          # atoms in the monomers
+x_values_inp = []  # list to hold input values of x stored from .pdb file
+y_values_inp = []  # list to hold input values of y stored from .pdb file
+z_values_inp = []  # list to hold input values of z stored from .pdb file
+positions_inp = []  # holds x, y, z coordinates of input .pdb file
+identity = []  # holds the names of atom in the order that they appear in the .pdb file
+for i in range(lines_of_text, lines_of_text + no_atoms): # Searches the non-text lines
+    x_values_inp.append(float(read[i][26:38]))  # Use this to read specific entries in a text file
+    y_values_inp.append(float(read[i][38:46]))
+    z_values_inp.append(float(read[i][46:54]))
+    positions_inp.append([x_values_inp[i - lines_of_text], y_values_inp[i - lines_of_text], z_values_inp[i - lines_of_text]])
+    identity.append(read[i][12:16])  # hold name of atom (C, N, H or BR)
+
+
+# This next section defines a plane through the monomer and rotates the monomer to align with the xy-plane.
+# The plane is defined by three points. The points are locations: N1, N2 and the average of C22 and C23, respectively.
+plane_x = np.zeros((3, 1))
+plane_y = np.zeros((3, 1))
+plane_z = np.zeros((3, 1))
+
+plane_x[0] = float(read[lines_of_text + 21][26:38])
+plane_y[0] = float(read[lines_of_text + 21][38:46])
+plane_z[0] = float(read[lines_of_text + 21][46:54])
+
+plane_x[1] = float(read[lines_of_text + 28][26:38])
+plane_y[1] = float(read[lines_of_text + 28][38:46])
+plane_z[1] = float(read[lines_of_text + 28][46:54])
+
+plane_x[2] = (float(read[lines_of_text + 24][26:38]) + float(read[lines_of_text + 25][26:38]))/2.0
+plane_y[2] = (float(read[lines_of_text + 24][38:46]) + float(read[lines_of_text + 25][38:46]))/2.0
+plane_z[2] = (float(read[lines_of_text + 24][46:54]) + float(read[lines_of_text + 25][46:54]))/2.0
+
+# A plane can be defined by two vectors.
+vector12 = [float(plane_x[1]-plane_x[0]), float(plane_y[1]-plane_y[0]), float(plane_z[1]-plane_z[0])]
+vector13 = [float(plane_x[2]-plane_x[0]), float(plane_y[2]-plane_y[0]), float(plane_z[2]-plane_z[0])]
+# The cross product of the two vectors gives a new vector that is perpendicular to the plane.
+normalvector = np.cross(vector12, vector13)
+# Since we want the plane of the monomer to be the xy-plane, we want the vector normal to the plane to be the z-axis.
+normalvector_desired = [0, 0, 1]
+
+rotation_to_xy = np.cross(normalvector, normalvector_desired)
+# Rotation angle
+theta = math.acos(np.dot(normalvector, normalvector_desired)/(np.linalg.norm(normalvector)*np.linalg.norm(normalvector_desired)))
+# Normalized rotation axis
+rotation_norm = [rotation_to_xy[0]/np.linalg.norm(rotation_to_xy), rotation_to_xy[1]/np.linalg.norm(rotation_to_xy), rotation_to_xy[2]/np.linalg.norm(rotation_to_xy)]
+
+# Rotation matrix to rotate plane:
+Rot_to_xy = np.zeros((4, 4))
+Rot_to_xy[3, 3] = 1
+Rot_to_xy[0, 0] = rotation_norm[0]**2 + (rotation_norm[1]**2 + rotation_norm[2]**2)*math.cos(theta)  # math.cos takes theta in radians by default
+Rot_to_xy[0, 1] = rotation_norm[0]*rotation_norm[1]*(1 - math.cos(theta)) - rotation_norm[2]*math.sin(theta)
+Rot_to_xy[0, 2] = rotation_norm[0]*rotation_norm[2]*(1 - math.cos(theta)) + rotation_norm[1]*math.sin(theta)
+Rot_to_xy[1, 0] = rotation_norm[0]*rotation_norm[1]*(1 - math.cos(theta)) + rotation_norm[2]*math.sin(theta)
+Rot_to_xy[1, 1] = rotation_norm[1]**2 + (rotation_norm[0]**2 + rotation_norm[2]**2)*math.cos(theta)
+Rot_to_xy[1, 2] = rotation_norm[1]*rotation_norm[2]*(1 - math.cos(theta)) - rotation_norm[0]*math.sin(theta)
+Rot_to_xy[2, 0] = rotation_norm[0]*rotation_norm[2]*(1 - math.cos(theta)) - rotation_norm[1]*math.sin(theta)  # math.cos takes theta in radians by default
+Rot_to_xy[2, 1] = rotation_norm[2]*rotation_norm[1]*(1 - math.cos(theta)) + rotation_norm[0]*math.sin(theta)
+Rot_to_xy[2, 2] = rotation_norm[2]**2 + (rotation_norm[0]**2 + rotation_norm[1]**2)*math.cos(theta)
+
+for i in range(0, no_atoms):
+    positions_inp[i].append(1)
+    x = np.dot(Rot_to_xy, np.array(positions_inp[i]))
+    positions_inp[i] = [x[0], x[1], x[2]]
+# Now the monomer is in line with the xy-plane.
+
+
+# This section will move the monomer to the origin. The average of the locations of C22 and C23 will be translated to the origin.
+# Find the location of that center point:
+x_center = (positions_inp[24][0] + positions_inp[25][0])/2.0
+y_center = (positions_inp[24][1] + positions_inp[25][1])/2.0
+z_center = (positions_inp[24][2] + positions_inp[25][2])/2.0
+center = [x_center, y_center, z_center]
+
+translation_to_origin = np.matrix([[1, 0, 0, -(center[0])], [0, 1, 0, -(center[1])], [0, 0, 1, -(center[2])], [0, 0, 0, 1]])
+
+for i in range(0, no_atoms):
+    positions_inp[i].append(1)
+    x = np.dot(translation_to_origin, np.array(positions_inp[i]))
+    positions_inp[i] = [x[0, 0], x[0, 1], x[0, 2]]
+
+
+# This section will rotate the monomer so that it is along the x-axis. The locations of all the atoms are found and averaged.
+# Then a line is drawn between that and the center point. The angle between that line and the x-axis is found, and the
+# monomer is rotated by that angle.
+[x_sum, y_sum, z_sum] = [0, 0, 0]
+for i in range(0, no_atoms):
+    x_sum = x_sum + positions_inp[i][0]
+    y_sum = y_sum + positions_inp[i][1]
+    z_sum = z_sum + positions_inp[i][2]
+x_average = x_sum/no_atoms
+y_average = y_sum/no_atoms
+z_average = z_sum/no_atoms
+pt_average = [x_average, y_average, z_average]
+
+slope_monomer = pt_average[1]/pt_average[0]
+slope_xaxis = 0
+
+theta = -math.atan(slope_monomer) # Angle between lines
+for i in range(0, no_atoms):
+    x = np.array(positions_inp[i])
+    Rot_to_xaxis = np.zeros((3, 3))
+    Rot_to_xaxis[0, 0] = math.cos(theta)
+    Rot_to_xaxis[1, 0] = math.sin(theta)
+    Rot_to_xaxis[0, 1] = -math.sin(theta)
+    Rot_to_xaxis[1, 1] = math.cos(theta)
+    Rot_to_xaxis[2, 2] = 1
+    rotation_to_xaxis = np.dot(Rot_to_xaxis, x)
+    positions_inp[i] = [float(rotation_to_xaxis[0]), float(rotation_to_xaxis[1]), float(rotation_to_xaxis[2])]
+# Now the monomer is along the x-axis.
+# This next section rotates the average point. The average point is checked to see that y = 0. If it is not, something is incorrect.
+x = np.array(pt_average)
+rotation_pt_average = np.dot(Rot_to_xaxis, x)
+pt_average = [float(rotation_pt_average[0]), float(rotation_pt_average[1]), float(rotation_pt_average[2])]
+if abs(pt_average[1]) > 0.001:
+    print 'error with rotation to x-axis (line 157)'
+    sys.exit()
+pt_average = [pt_average[0], 0, pt_average[2]]
+
+
+# The next section works exclusively on the inner ring, the ring inside of the pore. The length of the monomer will be
+# determined. The monomer will be translated so that it is the correct radius and its tail is facing the origin. Then,
+# the monomer will be put into multiple layers and rotated around the z-axis.
+positions_inp_inner = positions_inp
+length_monomer = 0
+for i in range(0, no_atoms):
+    if abs(positions_inp[i][0]) > abs(length_monomer):
+        length_monomer = positions_inp[i][0]
+max_radius_inner = abs(length_monomer)
+
+# At the smallest part of the ring, the nonpolar tails of the monomer will completely overlap. The limiting radius is found
+# by finding the average of the x-coordinates of the carbons C17 and C28, which are attached directly to the nitrogen rings
+# on the nonpolar tails.
+if abs(positions_inp[17][0]) > abs(positions_inp[32][0]):
+    length_tail = max_radius_inner - abs(positions_inp[17][0])
+if abs(positions_inp[17][0]) < abs(positions_inp[32][0]):
+    length_tail = max_radius_inner - abs(positions_inp[32][0])
+lim_radius_inner = max_radius_inner - abs(length_tail)/2.0
+
+# Determining the basic parabolic curve
+if no_layers % 2 == 0:
+    h = float((no_layers - 2)*dist/2)
+if no_layers % 2 == 1:
+    h = float((no_layers - 1)*dist/2)
+c = lim_radius_inner
+a = (max_radius_inner - lim_radius_inner)/(h*h)
+
+inner_pointlist = []
+inner_dxdzlist = []
+if no_layers % 2 == 0:
+    for i in range(0, no_layers_inner/2):
+        z = dist*(0.5 + i)
+        z2 = dist*i
+        x = a*z2*z2 + c
+        dxdz = 2*a*z2
+        inner_dxdzlist.append(dxdz)
+        points = [x, 0, z]
+        inner_pointlist.append(points)
+    for i in range(0, no_layers_inner/2):
+        z = -dist*(0.5 + i)
+        z2 = -dist*i
+        x = a*z2*z2 + c
+        dxdz = 2*a*z2
+        inner_dxdzlist.insert(0, dxdz)
+        points = [x, 0, z]
+        inner_pointlist.insert(0, points)
+if no_layers % 2 == 1:
+    for i in range(0, ((no_layers_inner + 1)/2)):
+        z = dist*i
+        x = a*z*z + c
+        dxdz = 2*a*z
+        inner_dxdzlist.append(dxdz)
+        points = [x, 0, z]
+        inner_pointlist.append(points)
+    for i in range(1, ((no_layers_inner + 1)/2)):
+        z = -dist*i
+        x = a*z*z + c
+        dxdz = 2*a*z
+        inner_dxdzlist.insert(0, dxdz)
+        points = [x, 0, z]
+        inner_pointlist.insert(0, points)
+
+# Function to determine if the monomer is on the positive or negative x-axis. It will determine the direction in which the monomer is translated.
+def translationtoradius_inner(radius, z):
+    if pt_average[1] != 0:
+        return 'error in determining location on x-axis, line 192'
+        sys.exit()
+    if pt_average[1] == 0:  # The monomer lies on the x-axis
+        if pt_average[0] < 0:  # The monomer lies on the negative x-axis
+            translation = np.matrix([[1, 0, 0, radius], [0, 1, 0, 0], [0, 0, 1, z], [0, 0, 0, 1]])
+            return translation
+        if pt_average[0] > 0:  # The monomer lies on the positive x-axis
+            translation = np.matrix([[1, 0, 0, -radius], [0, 1, 0, 0], [0, 0, 1, z], [0, 0, 0, 1]])
+            return translation
+
+positions_inner = []
+for i in range(0,  no_atoms):
+    positions_inp_inner[i].append(1)
+for i in range(0, no_layers_inner):
+    positions_inner.append([])
+    radius_row = inner_pointlist[i][0]
+    z = inner_pointlist[i][2]
+    translation_inner = translationtoradius_inner(radius_row, z)
+    for j in range(0, no_atoms):
+        positions_inner[i].append([])
+        x = np.dot(translation_inner, np.array(positions_inp_inner[j]))
+        positions_inner[i][j] = [x[0, 0], x[0, 1], x[0, 2]]
+
+positions_perp_inner = []
+for i in range(0, no_layers_inner):
+    positions_perp_inner.append([])
+    normal = -inner_dxdzlist[i]
+    theta = -math.atan(normal)
+    for j in range(0, no_atoms):
+        positions_perp_inner[i].append([])
+        x = np.array(positions_inner[i][j])
+        Rot_perp = np.zeros((3,3))
+        Rot_perp[0, 0] = math.cos(theta)
+        Rot_perp[2, 0] = -math.sin(theta)
+        Rot_perp[1, 1] = 1
+        Rot_perp[0, 2] = math.sin(theta)
+        Rot_perp[2, 2] = math.cos(theta)
+        rotation_perp = np.dot(Rot_perp, x)
+        positions_perp_inner[i][j] = [float(rotation_perp[0]), float(rotation_perp[1]), float(rotation_perp[2])]
+# The rotation matrix will end up translating, not only rotating, the monomers. This next loop stores the original (before
+# rotation) coordinates, and translates the monomers back to them while keeping them perpendicular to the parabola. ex
+for i in range(0, no_layers_inner):
+    x_old_center = (positions_inner[i][24][0] + positions_inner[i][25][0])/2
+    y_old_center = (positions_inner[i][24][1] + positions_inner[i][25][1])/2
+    z_old_center = (positions_inner[i][24][2] + positions_inner[i][25][2])/2
+    old_center = [x_old_center, y_old_center, z_old_center]
+    x_new_center = (positions_perp_inner[i][24][0] + positions_perp_inner[i][25][0])/2.0
+    y_new_center = (positions_perp_inner[i][24][1] + positions_perp_inner[i][25][1])/2
+    z_new_center = (positions_perp_inner[i][24][2] + positions_perp_inner[i][25][2])/2
+    new_center = [x_new_center, y_new_center, z_new_center]
+    translation_correction = np.matrix([[1, 0, 0, old_center[0] - new_center[0]], [0, 1, 0, 0], [0, 0, 1, old_center[2] - new_center[2]], [0, 0, 0, 1]])
+    for j in range(0, no_atoms):
+        positions_perp_inner[i][j].append(1)
+        x = np.dot(translation_correction, np.array(positions_perp_inner[i][j]))
+        positions_inner[i][j] = [x[0, 0], x[0, 1], x[0,2]]
+
+sys_atoms_inner = 0
+space_per_inner = 2*math.pi*lim_radius_inner/no_monomers_inner
+positionsrot_inner = []
+for i in range(0, no_layers_inner):
+    positionsrot_inner.append([])
+    radius_row = inner_pointlist[i][0]
+    no_monomers_row_float = 2*math.pi*radius_row/space_per_inner
+    no_monomers_row = int(round(no_monomers_row_float, 0))
+    sys_atoms_inner = sys_atoms_inner + no_monomers_row*no_atoms
+    angleinitial = 2*math.pi/float(no_monomers_row)
+    for j in range(0, no_monomers_row):
+        positionsrot_inner[i].append([])
+        angle = j*angleinitial
+        Rx_inner = np.zeros((3, 3))  # makes a 3 x 3 zero matrix
+        Rx_inner[0, 0] = math.cos(angle)  # This line and subsequent edits to Rx fills in entries needed for rotation matrix
+        Rx_inner[1, 0] = math.sin(angle)
+        Rx_inner[0, 1] = -math.sin(angle)
+        Rx_inner[1, 1] = math.cos(angle)
+        Rx_inner[2, 2] = 1
+        for k in range(0, no_atoms):
+            positionsrot_inner[i][j].append([])
+            x = np.array(positions_inner[i][k])
+            rotation = np.dot(Rx_inner, x)
+            rotation = [float(rotation[0]), float(rotation[1]), float(rotation[2])]
+            positionsrot_inner[i][j][k] = rotation
+
+
+
+# This next section will take care of the outer ring. It will essentially do the exact same thing, except that the monomers
+# will face the opposite direction. Additionally, they will be translated from the origin farther, to establish the pore
+# between the inner and outer ring.
+positions_inp_outer = positions_inp
+max_radius_outer = max_radius_inner + pore_width
+# The limiting radius of the outer ring is the sum of the limiting radius of the inner ring, the pore width and the length of the monomer.
+lim_radius_outer = lim_radius_inner + pore_width
+
+f = lim_radius_outer
+d = (max_radius_outer - lim_radius_outer)/(h*h)
+
+outer_pointlist = []
+outer_dxdzlist = []
+if no_layers % 2 == 0:
+    for i in range(0, no_layers/2):
+        z = dist*(0.5 + i)
+        z2 = dist*i
+        x = d*z2*z2 + f
+        dxdz = 2*d*z2
+        outer_dxdzlist.append(dxdz)
+        points = [x, 0, z]
+        outer_pointlist.append(points)
+    for i in range(0, no_layers/2):
+        z = -dist*(0.5 + i)
+        z2 = -dist*i
+        x = d*z2*z2 + f
+        dxdz = 2*d*z2
+        outer_dxdzlist.insert(0, dxdz)
+        points = [x, 0, z]
+        outer_pointlist.insert(0, points)
+if no_layers % 2 == 1:
+    for i in range(0, ((no_layers + 1)/2)):
+        z = dist*i
+        x = d*z*z + f
+        dxdz = 2*d*z
+        outer_dxdzlist.append(dxdz)
+        points = [x, 0, z]
+        outer_pointlist.append(points)
+    for i in range(1, ((no_layers + 1)/2)):
+        z = -dist*i
+        x = d*z*z + f
+        dxdz = 2*d*z
+        outer_dxdzlist.insert(0, dxdz)
+        points = [x, 0, z]
+        outer_pointlist.insert(0, points)
+
+def translationtoradius_outer(radius, z):
+    if pt_average[1] != 0:
+        return 'error in determining location on x-axis, line 192'
+        sys.exit()
+    if pt_average[1] == 0:  # The monomer lies on the x-axis
+        if pt_average[0] < 0:  # The monomer lies on the negative x-axis
+            translation = np.matrix([[1, 0, 0, -radius], [0, 1, 0, 0], [0, 0, 1, z], [0, 0, 0, 1]])
+            return translation
+        if pt_average[0] > 0:  # The monomer lies on the positive x-axis
+            translation = np.matrix([[1, 0, 0, radius], [0, 1, 0, 0], [0, 0, 1, z], [0, 0, 0, 1]])
+            return translation
+
+positions_outer = []
+for i in range(0, no_layers):
+    positions_outer.append([])
+    radius_row = outer_pointlist[i][0]
+    z = outer_pointlist[i][2]
+    translation_outer = translationtoradius_outer(radius_row, z)
+    for j in range(0, no_atoms):
+        positions_outer[i].append([])
+        x = np.dot(translation_outer, np.array(positions_inp_outer[j]))
+        positions_outer[i][j] = [x[0, 0], x[0, 1], x[0, 2]]
+
+positions_perp_outer = []
+for i in range(0, no_layers):
+    positions_perp_outer.append([])
+    normal = outer_dxdzlist[i]
+    theta = -math.atan(normal)
+    for j in range(0, no_atoms):
+        positions_perp_outer[i].append([])
+        x = np.array(positions_outer[i][j])
+        Rot_perp = np.zeros((3,3))
+        Rot_perp[0, 0] = math.cos(theta)
+        Rot_perp[2, 0] = -math.sin(theta)
+        Rot_perp[1, 1] = 1
+        Rot_perp[0, 2] = math.sin(theta)
+        Rot_perp[2, 2] = math.cos(theta)
+        rotation_perp = np.dot(Rot_perp, x)
+        positions_perp_outer[i][j] = [float(rotation_perp[0]), float(rotation_perp[1]), float(rotation_perp[2])]
+# The rotation matrix will end up translating, not only rotating, the monomers. This next loop stores the original (before
+# rotation) coordinates, and translates the monomers back to them while keeping them perpendicular to the parabola. ex
+for i in range(0, no_layers):
+    x_old_center = (positions_outer[i][24][0] + positions_outer[i][25][0])/2
+    y_old_center = (positions_outer[i][24][1] + positions_outer[i][25][1])/2
+    z_old_center = (positions_outer[i][24][2] + positions_outer[i][25][2])/2
+    old_center = [x_old_center, y_old_center, z_old_center]
+    x_new_center = (positions_perp_outer[i][24][0] + positions_perp_outer[i][25][0])/2.0
+    y_new_center = (positions_perp_outer[i][24][1] + positions_perp_outer[i][25][1])/2
+    z_new_center = (positions_perp_outer[i][24][2] + positions_perp_outer[i][25][2])/2
+    new_center = [x_new_center, y_new_center, z_new_center]
+    translation_correction = np.matrix([[1, 0, 0, old_center[0] - new_center[0]], [0, 1, 0, 0], [0, 0, 1, old_center[2] - new_center[2]], [0, 0, 0, 1]])
+    for j in range(0, no_atoms):
+        positions_perp_outer[i][j].append(1)
+        x = np.dot(translation_correction, np.array(positions_perp_outer[i][j]))
+        positions_outer[i][j] = [x[0, 0], x[0, 1], x[0,2]]
+
+sys_atoms_outer = 0
+space_per_outer = 2*math.pi*lim_radius_outer/no_monomers_outer
+positionsrot_outer = []
+for i in range(0, no_layers):
+    positionsrot_outer.append([])
+    radius_row = outer_pointlist[i][0]
+    no_monomers_row_float = 2*math.pi*radius_row/space_per_outer
+    no_monomers_row = int(round(no_monomers_row_float, 0))
+    sys_atoms_outer = sys_atoms_outer + no_monomers_row*no_atoms
+    angleinitial = 2*math.pi/float(no_monomers_row)
+    for j in range(0, no_monomers_row):
+        positionsrot_outer[i].append([])
+        angle = j*angleinitial
+        Rx_outer = np.zeros((3, 3))  # makes a 3 x 3 zero matrix
+        Rx_outer[0, 0] = math.cos(angle)  # This line and subsequent edits to Rx fills in entries needed for rotation matrix
+        Rx_outer[1, 0] = math.sin(angle)
+        Rx_outer[0, 1] = -math.sin(angle)
+        Rx_outer[1, 1] = math.cos(angle)
+        Rx_outer[2, 2] = 1
+        for k in range(0, no_atoms):
+            positionsrot_outer[i][j].append([])
+            x = np.array(positions_outer[i][k])
+            rotation = np.dot(Rx_outer, x)
+            rotation = [float(rotation[0]), float(rotation[1]), float(rotation[2])]
+            positionsrot_outer[i][j][k] = rotation
+
+
+print sys_atoms_inner + sys_atoms_outer
+count_monomer = 1
+count_atom = 1
+for j in range(0, len(positionsrot_inner)):
+    for k in range(0, len(positionsrot_inner[j])):
+        for i in range(0, no_atoms - no_ions):
+            print'{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(count_monomer, name, identity[i], count_atom, positionsrot_inner[j][k][i][0] / 10.0,
+                                                                     positionsrot_inner[j][k][i][1] / 10.0, positionsrot_inner[j][k][i][2] / 10.0)
+            count_atom += 1
+        count_monomer += 1
+for j in range(0, len(positionsrot_outer)):
+    for k in range(0, len(positionsrot_outer[j])):
+        for i in range(0, no_atoms - no_ions):
+            print'{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(count_monomer, name, identity[i], count_atom, positionsrot_outer[j][k][i][0] / 10.0,
+                                                                     positionsrot_outer[j][k][i][1] / 10.0, positionsrot_outer[j][k][i][2] / 10.0)
+            count_atom += 1
+        count_monomer += 1
+for j in range(0, len(positionsrot_inner)):
+    for k in range(0, len(positionsrot_inner[j])):
+        for i in range(no_atoms - no_ions, no_atoms):
+            print'{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(count_monomer, identity[i], identity[i], count_atom, positionsrot_inner[j][k][i][0] / 10.0,
+                                                                     positionsrot_inner[j][k][i][1] / 10.0,  positionsrot_inner[j][k][i][2] / 10.0)
+            count_atom += 1
+            count_monomer += 1
+for j in range(0, len(positionsrot_outer)):
+    for k in range(0, len(positionsrot_outer[j])):
+        for i in range(no_atoms - no_ions, no_atoms):
+            print'{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(count_monomer, identity[i], identity[i], count_atom, positionsrot_outer[j][k][i][0] / 10.0,
+                                                                     positionsrot_outer[j][k][i][1] / 10.0, positionsrot_outer[j][k][i][2] / 10.0)
+            count_atom += 1
+            count_monomer += 1
+print '   0.00000   0.00000  0.00000'
