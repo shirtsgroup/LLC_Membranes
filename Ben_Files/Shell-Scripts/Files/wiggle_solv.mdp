@@ -1,0 +1,50 @@
+title = SIM_TITLE 
+cutoff-scheme = CUTOFF_MD
+; Run parameters
+integrator	= INTEGRATOR_MD		
+dt		    = DT		
+nsteps		= NSTEPS_SOLV 	
+; Bond parameters
+continuation	= no		    
+constraints	= all-bonds	        
+constraint-algorithm = lincs	
+lincs-iter	= 1		
+lincs-order	= 4		
+; Output control
+nstxout		= NSTXOUT
+nstvout		= NSTVOUT
+nstfout		= NSTFOUT
+nstenergy	= NSTENERGY		
+; Neighborsearching
+nstlist		= 40 		    
+ns_type		= grid 		
+rlist		= 1.2		
+rcoulomb	= 1.2		
+rvdw		= 1.2		
+; Electrostatics
+coulombtype	= PME		
+pme_order	= 4		
+fourierspacing  = 0.16		
+; Temperature coupling is on in three groups
+Tcoupl	 	= TCOUPL     
+tc_grps		= LLC   NA  SOL	
+tau_t		= 0.1 	0.1 0.1    
+ref_t		= REF_T REF_T REF_T    
+; Pressure coupling
+Pcoupl		= PCOUPL 		        
+Pcoupltype      = Isotropic  
+ref_p     	= REF_P         
+compressibility = COMPRESSIBILITY
+; Generate velocities is off
+gen_vel		= no			; Velocity generation is off
+; Periodic boundary conditions are on in all directions
+pbc		    = xyz			; 3-D PBC
+; Dispersion correction
+DispCorr	= Ener		; account for cut-off vdW scheme
+; COM motion removal
+
+
+
+
+
+
