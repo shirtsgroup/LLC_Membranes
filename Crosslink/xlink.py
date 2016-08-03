@@ -26,7 +26,8 @@ parser.add_argument('-e', '--term_prob', default=5, help='Termination probabilit
 parser.add_argument('-y', '--topology', default='crosslinked_new.itp', help='Topology file that will be analyzed and modified')
 parser.add_argument('-r', '--iteration', default=1, help='Iteration number of crosslinking process')
 parser.add_argument('-d', '--cutoff_rad', default=10, help='Cutoff Distance for radical reaction')
-parser.add_argument('-x', '--xlinks', default= 0, help='Total number of c1-c2 crosslinks')
+parser.add_argument('-x', '--xlinks', default=0, help='Total number of c1-c2 crosslinks')
+parser.add_argument('-S', '--stop', default='no', help='Is crosslinking reaction finished')
 
 args = parser.parse_args()
 
@@ -298,7 +299,6 @@ for i in range(0, int((float(args.cutoff)/100)*len(C1x))):  # looks at a percent
     m = min(min_list)  # finds minimum of min_list
     distances.append(m)
     min_list.remove(m)  # removes that value from min_list
-print distances
 
 cutoff = min(min_list)  # The minimum value left after the modification of min_list is the cutoff value
 
@@ -473,6 +473,23 @@ if int(args.iteration) != 0:
             del term_c1[term_c1.index(i)]  # now delete those values from the previous term lists
             del term_c2[term_c2.index(i)]
 
+    if args.stop == 'yes':
+        # find the [ atoms ] section ... again
+        atoms_index = 0  # find index where [ atoms ] section begins
+        while top[atoms_index].count('[ atoms ]') == 0:
+            atoms_index += 1
+
+        atoms_end = atoms_index + 2  # start looking on a line where there isn't text
+        count = 0
+        while top[atoms_end] != '\n':  # look through the whole [ atoms ] section
+            # print str.strip(top[atoms_end])[-1]
+            if str.strip(top[atoms_end])[-1] == '*':  # see which atoms are reactive radicals
+                count += 1
+                if int(top[atoms_end][0:5]) not in reactive_c2_term:
+                    reactive_c2_term.append(int(top[atoms_end][0:5]))  # if it is, add it too a list of reactive c2 atoms
+            atoms_end += 1
+        print count
+
 # For the first iteration, use Assembly_itp.py to create a topology for the entire assembly and then write it to a file
 # which will be edited to incorporate cross-links. Otherwise, read the topology from the previous iteration
 
@@ -624,7 +641,7 @@ for i in range(0, len(term)):
 
 if int(args.iteration) != 0:
     H_new3 = []  # termination at radicals that exist from previous iterations will occur at c2. The terminated chain is
-    # determined by the location of the radical c2. Nothing happens on the tail containing
+    # determined by the location of the radical c2. Nothing happens on the tail containing c1
     H_rad_carbons = term_rad_c2 + reactive_c2_term
     for i in range(0, len(H_rad_carbons)):
         if H_rad_carbons[i] in tail1:
@@ -647,6 +664,15 @@ nr = 0  # number of lines in 'atoms' section
 while b[atoms_count] != '\n':
     atoms_count += 1  # increments the while loop
     nr += 1  # counts number of atoms
+
+if args.stop == 'yes':
+    c1 = []
+    c2 = []
+    other_c1 = []
+    radical_c2 = []
+    c1_rad_ndx = []
+    c2_rad_ndx = []
+    H_new1 = []
 
 count = 0
 for i in range(atoms_index + 2, atoms_count):
