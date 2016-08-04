@@ -4,6 +4,10 @@
 # Last edit (07/25/16): The inner arms were made longer so that they meet, like the outer arms.
 print 'This is a .gro file'
 
+#NOTES: Perpendicularization of the outer layer is set to half the normal, not the full <-- Check
+      # The inner ring has 2 more layers than the outer ring
+      # The top and bottom layers of the inner ring have 5 monomers
+
 import numpy as np
 import math
 import os
@@ -17,6 +21,7 @@ parser.add_argument('-mi', '--monomers_inner', default = 4, type = int, help = '
 parser.add_argument('-mo', '--monomers_outer', default = 10, type = int, help = 'Number of monomers in outer ring at limiting radius')
 parser.add_argument('-w', '--pore_width', default = 12, type = float, help = 'Pore width')
 parser.add_argument('-d', '--dist', default = 10, type = float, help = 'Distance between layers')
+parser.add_argument('-p', '--dist_periodic', default = 5, type = float, help = 'Negative distance between periodic boundary conditions')
 args = parser.parse_args()
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -27,6 +32,7 @@ no_monomers_inner = args.monomers_inner
 no_monomers_outer = args.monomers_outer
 pore_width = args.pore_width
 dist = args.dist
+dist_periodic = args.dist_periodic
 name = 'MOL'
 no_ions = 2
 
@@ -204,37 +210,101 @@ z_monomer = z_max_inp - z_min_inp
 inner_pointlist = []
 inner_dxdzlist = []
 if no_layers % 2 == 0:
-    for i in range(0, no_layers_inner/2):
-        z = dist*(0.5 + i)
-        z2 = dist*i
-        x = a*z2*z2 + c
-        dxdz = 2*a*z2
-        inner_dxdzlist.append(dxdz)
-        points = [x, 0, z]
-        inner_pointlist.append(points)
-    for i in range(0, no_layers_inner/2):
-        z = -dist*(0.5 + i)
-        z2 = -dist*i
-        x = a*z2*z2 + c
-        dxdz = 2*a*z2
-        inner_dxdzlist.insert(0, dxdz)
-        points = [x, 0, z]
-        inner_pointlist.insert(0, points)
+    z_top = dist*(no_layers_inner/2.0 - 0.5)
+    height = 2*z_top
+    no_monomers_inner = int(math.floor(height/(z_monomer/2.0)))
+    z_comp = height/float(no_monomers_inner)
+    if no_monomers_inner % 2 == 0:
+        for i in range(0, no_monomers_inner/2):
+            z = z_comp*(0.5 + i)
+            z2 = z_comp*i
+            if i == no_monomers_inner/2:
+                z2 = z_comp * (i - 1)
+            x = a*z2**2 + c
+            dxdz = 2*a*z2
+            inner_dxdzlist.append(dxdz)
+            points = [x, 0, z]
+            inner_pointlist.append(points)
+        for i in range(0, no_monomers_inner/2):
+            z = -z_comp*(0.5 + i)
+            z2 = -z_comp*i
+            if i == no_monomers_inner/2:
+                z2 = -z_comp * (i - 1)
+            x = a*z2**2 + c
+            dxdz = 2*a*z2
+            inner_dxdzlist.insert(0, dxdz)
+            points = [x, 0, z]
+            inner_pointlist.insert(0, points)
+    if no_monomers_inner % 2 == 1:
+        for i in range(0, (no_monomers_inner + 1)/2):
+            z = z_comp*i
+            x = a*z**2 + c
+            if i == no_monomers_inner/2:
+                z2 = z_comp * (i - 1)
+                x = a*z2**2 + c
+            dxdz = 2*a*z
+            inner_dxdzlist.append(dxdz)
+            points = [x, 0, z]
+            inner_pointlist.append(points)
+        for i in range(1, (no_monomers_inner + 1)/2):
+            z = -z_comp*i
+            x = a*z**2 + c
+            if i == no_monomers_inner/2:
+                z2 = -z_comp * (i - 1)
+                x = a*z2**2 + c
+            dxdz = 2*a*z
+            inner_dxdzlist.insert(0, dxdz)
+            points = [x, 0, z]
+            inner_pointlist.insert(0, points)
+    no_layers_inner = no_monomers_inner
 if no_layers % 2 == 1:
-    for i in range(0, ((no_layers_inner + 1)/2)):
-        z = dist*i
-        x = a*z*z + c
-        dxdz = 2*a*z
-        inner_dxdzlist.append(dxdz)
-        points = [x, 0, z]
-        inner_pointlist.append(points)
-    for i in range(1, ((no_layers_inner + 1)/2)):
-        z = -dist*i
-        x = a*z*z + c
-        dxdz = 2*a*z
-        inner_dxdzlist.insert(0, dxdz)
-        points = [x, 0, z]
-        inner_pointlist.insert(0, points)
+    z_top = dist*(no_layers_inner/2.0)
+    height = 2*z_top
+    no_monomers_inner = int(math.floor(height/(z_monomer/2.0)))
+    z_comp = height/float(no_monomers_inner)
+    if no_monomers_inner % 2 == 0:
+        for i in range(0, no_monomers_inner/2):
+            z = z_comp*(0.5 + i)
+            z2 = z_comp*i
+            if i == no_monomers_inner/2:
+                z2 = z_comp * (i - 1)
+            z = a*z2**2 + c
+            dxdz = 2*a*z2
+            inner_dxdzlist.append(dxdz)
+            points = [x, 0, z]
+            inner_pointlist.append(points)
+        for i in range(0, no_monomers_inner/2):
+            z = -z_comp*(0.5 + i)
+            z2 = -z_comp*i
+            if i == no_monomers_inner/2:
+                z2 = -z_comp * (i - 1)
+            x = a*z2**2 + c
+            dxdz = 2*a*z2
+            inner_dxdzlist.insert(0, dxdz)
+            points = [x, 0, z]
+            inner_pointlist.insert(0, points)
+    if no_monomers_inner % 2 == 1:
+        for i in range(0, (no_monomers_inner + 1)/2):
+            z = z_comp*i
+            x = a*z**2 + c
+            if i == (no_monomers_inner + 1)/2:
+                z2 = z_comp * (i - 1)
+                x = a * z2 ** 2 + c
+            dxdz = 2*a*z
+            inner_dxdzlist.append(dxdz)
+            points = [x, 0, z]
+            inner_pointlist.append(points)
+        for i in range(1, (no_monomers_inner + 1)/2):
+            z = -z_comp*i
+            x = a*z**2 + c
+            if i == (no_monomers_inner + 1)/2:
+                z2 = -z_comp * (i - 1)
+                x = a * z2 ** 2 + c
+            dxdz = 2*a*z
+            inner_dxdzlist.insert(0, dxdz)
+            points = [x, 0, z]
+            inner_pointlist.insert(0, points)
+    no_layers_inner = no_monomers_inner
 
 # Function to determine if the monomer is on the positive or negative x-axis. It will determine the direction in which the monomer is translated.
 def translationtoradius_inner(radius, z):
@@ -300,19 +370,20 @@ for i in range(0, no_layers_inner):
         positions_inner[i][j] = [x[0, 0], x[0, 1], x[0,2]]
 
 # This loop makes copies of the monomer and rotates the copies by equal angles to make layers of rings.
-sys_atoms_inner = 0
-space_per_inner = 2*math.pi*lim_radius_inner/no_monomers_inner
+angle = 0
 positionsrot_inner = []
 for i in range(0, no_layers_inner):
     positionsrot_inner.append([])
-    radius_row = inner_pointlist[i][0]
-    no_monomers_row_float = 2*math.pi*radius_row/space_per_inner
-    no_monomers_row = int(round(no_monomers_row_float, 0))
-    sys_atoms_inner = sys_atoms_inner + no_monomers_row*no_atoms
-    angleinitial = 2*math.pi/float(no_monomers_row)
+    if i == 0 or i == no_layers_inner - 1:
+        no_monomers_row = 5
+    else:
+        no_monomers_row = 1
     for j in range(0, no_monomers_row):
+        if no_monomers_row == 1:
+            angle = angle + 2*math.pi/5.0
+        if no_monomers_row == 5:
+            angle = angle + 2*math.pi/5.0
         positionsrot_inner[i].append([])
-        angle = j*angleinitial
         Rx_inner = np.zeros((3, 3))  # makes a 3 x 3 zero matrix
         Rx_inner[0, 0] = math.cos(angle)  # This line and subsequent edits to Rx fills in entries needed for rotation matrix
         Rx_inner[1, 0] = math.sin(angle)
@@ -507,9 +578,9 @@ def transhalf(positions):
     ysum = 0
     zsum = 0
     for i in range(0, len(positions[3])):
-        xsum = xsum + (positions[3][i][24][0] + positions[3][i][25][0])/2.0
-        ysum = ysum + (positions[3][i][24][1] + positions[3][i][25][1])/2.0
-        zsum = zsum + (positions[3][i][24][2] + positions[3][i][25][2])/2.0
+        xsum = xsum + (positions[3][i][24][0] + positions[3][i][25][0])/2.0# - (positions[4][i][24][0] + positions[4][i][25][0] - (positions[3][i][24][0] + positions[3][i][25][0]))/8.0
+        ysum = ysum + (positions[3][i][24][1] + positions[3][i][25][1])/2.0# - (positions[4][i][24][1] + positions[4][i][25][1] - (positions[3][i][24][1] + positions[3][i][25][1]))/8.0
+        zsum = zsum + (positions[3][i][24][2] + positions[3][i][25][2])/2.0# - (positions[4][i][24][2] + positions[4][i][25][2] - (positions[3][i][24][2] + positions[3][i][25][2]))/8.0
     xtrans = xsum/float(len(positions[3]))
     ytrans = ysum/float(len(positions[3]))
     ztrans = zsum/float(len(positions[3]))
@@ -890,45 +961,36 @@ for n in range(0, len(final)):
                         rotation_final = np.dot(Rot_final, x)
                         final[n][i][j][k][l][m] = [float(rotation_final[0]), float(rotation_final[1]), float(rotation_final[2])]
 
-# Code to show inner ring only - to see that the inner arms are touching
-sys_atoms = 0
+x_max = 0; x_min = 0; y_max = 0; y_min = 0; z_max = 0; z_min = 0
 for n in range(0, len(final)):
-    for i in range(0, len(junction)):
-        for j in range(0, 1):
-            for k in range(0, len(junction[i][j])):
-                for l in range(0, len(junction[i][j][k])):
-                    for m in range(0, no_atoms):
-                        sys_atoms += 1
-print sys_atoms
-count_monomer = 1
-count_atom = 1
-for n in range(0, len(final)):
-    for i in range(0, len(junction)):
-        for j in range(0, 1):
-            for k in range(0, len(junction[i][j])):
-                for l in range(0, len(junction[i][j][k])):
+    for i in range(0, len(final[n])):
+        for j in range(0, len(final[n][i])):
+            for k in range(0, len(final[n][i][j])):
+                for l in range(0, len(final[n][i][j][k])):
                     for m in range(0, no_atoms - no_ions):
-                        print'{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(count_monomer, name, identity[m], count_atom, final[n][i][j][k][l][m][0] / 10.0,
-                                                                                 final[n][i][j][k][l][m][1] / 10.0, final[n][i][j][k][l][m][2] / 10.0)
-                        count_atom += 1
-                        if count_atom == 100000:
-                            count_atom = 1
-                    count_monomer += 1
+                        if final[n][i][j][k][l][m][0] > x_max:
+                            x_max = final[n][i][j][k][l][m][0]
+                        if final[n][i][j][k][l][m][0] < x_min:
+                            x_min = final[n][i][j][k][l][m][0]
+                        if final[n][i][j][k][l][m][1] > y_max:
+                            y_max = final[n][i][j][k][l][m][1]
+                        if final[n][i][j][k][l][m][1] < y_min:
+                            y_min = final[n][i][j][k][l][m][1]
+                        if final[n][i][j][k][l][m][2] > z_max:
+                            z_max = final[n][i][j][k][l][m][2]
+                        if final[n][i][j][k][l][m][2] < z_min:
+                            z_min = final[n][i][j][k][l][m][2]
+translation_final = np.matrix([[1, 0, 0, -x_min - 10*dist_periodic/2.0], [0, 1, 0, -y_min - 10*dist_periodic/2.0], [0, 0, 1, -z_min - 10*dist_periodic/2.0], [0, 0, 0, 1]])
 for n in range(0, len(final)):
-    for i in range(0, len(junction)):
-        for j in range(0, 1):
-            for k in range(0, len(junction[i][j])):
-                for l in range(0, len(junction[i][j][k])):
-                    for m in range(no_atoms - no_ions, no_atoms):
-                        print'{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(count_monomer, identity[m], identity[m], count_atom, final[n][i][j][k][l][m][0] / 10.0,
-                                                                                 final[n][i][j][k][l][m][1] / 10.0, final[n][i][j][k][l][m][2] / 10.0)
-                        count_atom += 1
-                        if count_atom == 100000:
-                            count_atom = 1
-                        count_monomer += 1
-print '   0.00000   0.00000  0.00000'
-sys.exit()
-
+    for i in range(0, len(final[n])):
+        for j in range(0, len(final[n][i])):
+            for k in range(0, len(final[n][i][j])):
+                for l in range(0, len(final[n][i][j][k])):
+                    for m in range(0, no_atoms):
+                        if len(final[n][i][j][k][l][m]) == 3:
+                            final[n][i][j][k][l][m].append(1)
+                        x = np.dot(translation_final, np.array(final[n][i][j][k][l][m]))
+                        final[n][i][j][k][l][m] = [x[0, 0], x[0, 1], x[0, 2]]
 
 sys_atoms = 0
 for n in range(0, len(final)):
@@ -967,4 +1029,4 @@ for n in range(0, len(final)):
                         if count_atom == 100000:
                             count_atom = 1
                         count_monomer += 1
-print '   0.00000   0.00000  0.00000'
+print '  ', (x_max - x_min)/10.0 - dist_periodic,'  ', (y_max - y_min)/10.0 - dist_periodic,'  ', (z_max - z_min)/10.0 - dist_periodic,'   0.00000   0.00000  -0.00000   0.00000  -0.00000  -0.00000'

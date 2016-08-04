@@ -4,11 +4,13 @@
 # Last edit (07/25/16): The inner arms were made longer so that they meet, like the outer arms.
 print 'This is a .gro file'
 
-#NOTES: Perpendicularization of the outer layer is set to half the normal, not the full <-- Check
-      # The inner ring has 2 more layers than the outer ring
-      # The top and bottom layers of the inner ring have 5 monomers
-      # Junctions are extra spread (lines 584 - 587) <-- Check
-      # Removed curve from inner spiral (lines 190, 200) <-- Check
+#NOTES: Perpendicularization of the outer layer is set to half the normal, not the full (482)
+      # --> Works when no_layers is low, otherwise junctions must be extra spread
+      # The inner ring has 2 more layers than the outer ring (44)
+      # The top and bottom layers of the inner ring have 1 monomer (385)
+      # Junctions are extra spread (lines 588 - 590)
+      # Removed parabolic oycurve from inner spiral (lines 194, 204)
+      # Inner ring is not perpendicular to parabola -- non-existent at this point (343-376)
 
 import numpy as np
 import math
@@ -23,6 +25,7 @@ parser.add_argument('-mi', '--monomers_inner', default = 4, type = int, help = '
 parser.add_argument('-mo', '--monomers_outer', default = 10, type = int, help = 'Number of monomers in outer ring at limiting radius')
 parser.add_argument('-w', '--pore_width', default = 12, type = float, help = 'Pore width')
 parser.add_argument('-d', '--dist', default = 10, type = float, help = 'Distance between layers')
+parser.add_argument('-p', '--dist_periodic', default = 5, type = float, help = 'Negative distance between periodic boundary conditions')
 args = parser.parse_args()
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -33,11 +36,12 @@ no_monomers_inner = args.monomers_inner
 no_monomers_outer = args.monomers_outer
 pore_width = args.pore_width
 dist = args.dist
+dist_periodic = args.dist_periodic
 name = 'MOL'
 no_ions = 2
 
 # The inner arms are longer than the outer arms, so that they will connect at the junctions.
-no_layers_inner = no_layers + 3
+no_layers_inner = no_layers + 2
 
 read = []
 for line in fileopen:
@@ -169,7 +173,6 @@ if abs(pt_average[1]) > 0.001:
     sys.exit()
 pt_average = [pt_average[0], 0, pt_average[2]]
 
-
 # The next section works exclusively on the inner ring, the ring inside of the pore. The length of the monomer will be
 # determined. The monomer will be translated so that it is the correct radius and its tail is facing the origin. Then,
 # the monomer will be put into multiple layers and rotated around the z-axis.
@@ -188,6 +191,7 @@ if abs(positions_inp[17][0]) > abs(positions_inp[32][0]):
 if abs(positions_inp[17][0]) < abs(positions_inp[32][0]):
     length_tail = max_radius_inner - abs(positions_inp[32][0])
 lim_radius_inner = max_radius_inner - abs(length_tail)/2.0
+max_radius_inner = lim_radius_inner
 
 # Determining the basic parabolic curve
 if no_layers % 2 == 0:
@@ -196,6 +200,8 @@ if no_layers % 2 == 1:
     h = float((no_layers - 1)*dist/2)
 c = lim_radius_inner
 a = (max_radius_inner - lim_radius_inner)/(h*h)
+
+max_radius_inner = abs(length_monomer)
 
 z_min_inp = 0
 z_max_inp = 0
@@ -376,14 +382,14 @@ positionsrot_inner = []
 for i in range(0, no_layers_inner):
     positionsrot_inner.append([])
     if i == 0 or i == no_layers_inner - 1:
-        no_monomers_row = 5
+        no_monomers_row = 1
     else:
         no_monomers_row = 1
     for j in range(0, no_monomers_row):
-        if no_monomers_row == 1:
+        if j == 0:
             angle = angle + angleinitial
-        if no_monomers_row == 5:
-            angle = angle + 2*math.pi/5.0
+        if j == 1 or j == 2:
+            angle = angle + 2*math.pi/3.0
         positionsrot_inner[i].append([])
         Rx_inner = np.zeros((3, 3))  # makes a 3 x 3 zero matrix
         Rx_inner[0, 0] = math.cos(angle)  # This line and subsequent edits to Rx fills in entries needed for rotation matrix
@@ -473,7 +479,7 @@ for i in range(0, no_layers):
 positions_perp_outer = []
 for i in range(0, no_layers):
     positions_perp_outer.append([])
-    normal = outer_dxdzlist[i]
+    normal = 0.5*outer_dxdzlist[i]
     theta = -math.atan(normal)
     for j in range(0, no_atoms):
         positions_perp_outer[i].append([])
@@ -579,9 +585,9 @@ def transhalf(positions):
     ysum = 0
     zsum = 0
     for i in range(0, len(positions[3])):
-        xsum = xsum + (positions[3][i][24][0] + positions[3][i][25][0])/2.0# + (positions[4][i][24][0] + positions[4][i][25][0] - (positions[3][i][24][0] + positions[3][i][25][0]))/8.0
-        ysum = ysum + (positions[3][i][24][1] + positions[3][i][25][1])/2.0# + (positions[4][i][24][1] + positions[4][i][25][1] - (positions[3][i][24][1] + positions[3][i][25][1]))/8.0
-        zsum = zsum + (positions[3][i][24][2] + positions[3][i][25][2])/2.0# + (positions[4][i][24][2] + positions[4][i][25][2] - (positions[3][i][24][2] + positions[3][i][25][2]))/8.0
+        xsum = xsum + (positions[3][i][24][0] + positions[3][i][25][0])/2.0 + (positions[4][i][24][0] + positions[4][i][25][0] - (positions[3][i][24][0] + positions[3][i][25][0]))/4.0
+        ysum = ysum + (positions[3][i][24][1] + positions[3][i][25][1])/2.0 + (positions[4][i][24][1] + positions[4][i][25][1] - (positions[3][i][24][1] + positions[3][i][25][1]))/4.0
+        zsum = zsum + (positions[3][i][24][2] + positions[3][i][25][2])/2.0 + (positions[4][i][24][2] + positions[4][i][25][2] - (positions[3][i][24][2] + positions[3][i][25][2]))/4.0
     xtrans = xsum/float(len(positions[3]))
     ytrans = ysum/float(len(positions[3]))
     ztrans = zsum/float(len(positions[3]))
@@ -962,9 +968,39 @@ for n in range(0, len(final)):
                         rotation_final = np.dot(Rot_final, x)
                         final[n][i][j][k][l][m] = [float(rotation_final[0]), float(rotation_final[1]), float(rotation_final[2])]
 
-"""
+x_max = 0; x_min = 0; y_max = 0; y_min = 0; z_max = 0; z_min = 0
+for n in range(0, len(final)):
+    for i in range(0, len(final[n])):
+        for j in range(0, len(final[n][i])):
+            for k in range(0, len(final[n][i][j])):
+                for l in range(0, len(final[n][i][j][k])):
+                    for m in range(0, no_atoms - no_ions):
+                        if final[n][i][j][k][l][m][0] > x_max:
+                            x_max = final[n][i][j][k][l][m][0]
+                        if final[n][i][j][k][l][m][0] < x_min:
+                            x_min = final[n][i][j][k][l][m][0]
+                        if final[n][i][j][k][l][m][1] > y_max:
+                            y_max = final[n][i][j][k][l][m][1]
+                        if final[n][i][j][k][l][m][1] < y_min:
+                            y_min = final[n][i][j][k][l][m][1]
+                        if final[n][i][j][k][l][m][2] > z_max:
+                            z_max = final[n][i][j][k][l][m][2]
+                        if final[n][i][j][k][l][m][2] < z_min:
+                            z_min = final[n][i][j][k][l][m][2]
+translation_final = np.matrix([[1, 0, 0, -x_min - 10*dist_periodic/2.0], [0, 1, 0, -y_min - 10*dist_periodic/2.0], [0, 0, 1, -z_min - 10*dist_periodic/2.0], [0, 0, 0, 1]])
+for n in range(0, len(final)):
+    for i in range(0, len(final[n])):
+        for j in range(0, len(final[n][i])):
+            for k in range(0, len(final[n][i][j])):
+                for l in range(0, len(final[n][i][j][k])):
+                    for m in range(0, no_atoms):
+                        if len(final[n][i][j][k][l][m]) == 3:
+                            final[n][i][j][k][l][m].append(1)
+                        x = np.dot(translation_final, np.array(final[n][i][j][k][l][m]))
+                        final[n][i][j][k][l][m] = [x[0, 0], x[0, 1], x[0, 2]]
+
 # Code to show inner ring only - to see that the inner arms are touching
-sys_atoms = 0
+"""sys_atoms = 0
 for n in range(0, len(final)):
     for i in range(0, len(junction)):
         for j in range(0, 1):
@@ -1041,4 +1077,4 @@ for n in range(0, len(final)):
                         if count_atom == 100000:
                             count_atom = 1
                         count_monomer += 1
-print '   0.00000   0.00000  0.00000'
+print '  ', (x_max - x_min)/10.0 - dist_periodic,'  ', (y_max - y_min)/10.0 - dist_periodic,'  ', (z_max - z_min)/10.0 - dist_periodic,'   0.00000   0.00000  -0.00000   0.00000  -0.00000  -0.00000'
