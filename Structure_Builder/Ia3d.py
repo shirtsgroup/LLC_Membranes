@@ -1366,9 +1366,49 @@ for i in range(0, len(junction7) - 2):
                     unitjunction7[i][j][k][l].append([])
                     unitjunction7[i][j][k][l][m] = junction7[i][j][k][l][m]
 
-final = [unitjunction, unitjunction2, unitjunction3, unitjunction4, unitjunction5, unitjunction6, unitjunction7]
+unitjunction8_x = []; unitjunction8_y = []; unitjunction8_z = []
+for i in range(0, len(unitjunction)):
+    unitjunction8_x.append([]); unitjunction8_y.append([]); unitjunction8_z.append([])
+    for j in range(0, len(unitjunction[i])):
+        unitjunction8_x[i].append([]); unitjunction8_y[i].append([]); unitjunction8_z[i].append([])
+        for k in range(0, len(unitjunction[i][j])):
+            unitjunction8_x[i][j].append([]); unitjunction8_y[i][j].append([]); unitjunction8_z[i][j].append([])
+            for l in range(0, len(unitjunction[i][j][k])):
+                unitjunction8_x[i][j][k].append([]); unitjunction8_y[i][j][k].append([]); unitjunction8_z[i][j][k].append([])
+                for m in range(0, no_atoms):
+                    unitjunction8_x[i][j][k][l].append([]); unitjunction8_y[i][j][k][l].append([]); unitjunction8_z[i][j][k][l].append([])
+                    unitjunction8_x[i][j][k][l][m] = unitjunction[i][j][k][l][m]; unitjunction8_y[i][j][k][l][m] = unitjunction[i][j][k][l][m]
+                    unitjunction8_z[i][j][k][l][m] = unitjunction[i][j][k][l][m]
 
-theta_final_y = -math.pi/6.0
+"""theta_j8 = math.pi/3.0
+Rot_j8 = np.zeros((3, 3))
+Rot_j8[0, 0] = math.cos(theta_j8)
+Rot_j8[1, 0] = math.sin(theta_j8)
+Rot_j8[0, 1] = -math.sin(theta_j8)
+Rot_j8[1, 1] = math.cos(theta_j8)
+Rot_j8[2, 2] = 1
+for i in range(0, len(unitjunction8_x)):
+    for j in range(0, len(unitjunction8_x[i])):
+        for k in range(0, len(unitjunction8_x[i][j])):
+            for l in range(0, len(unitjunction8_x[i][j][k])):
+                for m in range(0, no_atoms):
+                    x = np.array(unitjunction8_x[i][j][k][l][m])
+                    x = [x[0], x[1], x[2]]
+                    rotation_j8_x = np.dot(Rot_j8, x)
+                    unitjunction8_x[i][j][k][l][m] = [float(rotation_j8_x[0]), float(rotation_j8_x[1]), float(rotation_j8_x[2])]
+                    y = np.array(unitjunction8_y[i][j][k][l][m])
+                    y = [y[0], y[1], y[2]]
+                    rotation_j8_y = np.dot(Rot_j8, y)
+                    unitjunction8_y[i][j][k][l][m] = [float(rotation_j8_y[0]), float(rotation_j8_y[1]), float(rotation_j8_y[2])]
+                    z = np.array(unitjunction8_z[i][j][k][l][m])
+                    z = [z[0], z[1], z[2]]
+                    rotation_j8_z = np.dot(Rot_j8, z)
+                    unitjunction8_z[i][j][k][l][m] = [float(rotation_j8_z[0]), float(rotation_j8_z[1]), float(rotation_j8_z[2])]"""
+
+final7 = [unitjunction, unitjunction2, unitjunction3, unitjunction4, unitjunction5, unitjunction6, unitjunction7]
+final = [unitjunction, unitjunction2, unitjunction3, unitjunction4, unitjunction5, unitjunction6, unitjunction7, unitjunction8_x, unitjunction8_y, unitjunction8_z]
+
+"""theta_final_y = -math.pi/6.0
 Rot_final_y = np.zeros((3, 3))
 Rot_final_y[0, 0] = math.cos(theta_final_y)
 Rot_final_y[2, 0] = -math.sin(theta_final_y)
@@ -1385,7 +1425,6 @@ for n in range(0, len(final)):
                         x = [x[0], x[1], x[2]]
                         rotation_final = np.dot(Rot_final_y, x)
                         final[n][i][j][k][l][m] = [float(rotation_final[0]), float(rotation_final[1]), float(rotation_final[2])]
-
 # ?????
 theta_final_x = math.pi/6.0
 Rot_final_x = np.zeros((3, 3))
@@ -1421,76 +1460,29 @@ for n in range(0, len(final)):
                         x = np.array(final[n][i][j][k][l][m])
                         x = [x[0], x[1], x[2]]
                         rotation_final = np.dot(Rot_final_z, x)
-                        final[n][i][j][k][l][m] = [float(rotation_final[0]), float(rotation_final[1]), float(rotation_final[2])]
-
-unitjunction8 = []
-for i in range(0, len(unitjunction)):
-    unitjunction8.append([])
-    for j in range(0, len(unitjunction[i])):
-        unitjunction8[i].append([])
-        for k in range(0, len(unitjunction[i][j])):
-            unitjunction8[i][j].append([])
-            for l in range(0, len(unitjunction[i][j][k])):
-                unitjunction8[i][j][k].append([])
-                for m in range(0, no_atoms):
-                    unitjunction8[i][j][k][l].append([])
-                    unitjunction8[i][j][k][l][m] = unitjunction[i][j][k][l][m]
-
-# Translation junction 8 to the x-min of unitjunction3, y-min of unitjunction5 and z-min of unitjunction6
-x_min_j8 = 0; y_min_j8 = 0; z_min_j8 = 0
-for i in range(0, len(unitjunction8)):
-    for k in range(0, len(unitjunction8[i][1])):
-        for l in range(0, len(unitjunction8[i][1][k])):
-            if (unitjunction8[i][1][k][l][24][0] + unitjunction8[i][1][k][l][25][0])/2.0 < x_min_j8:
-                x_min_j8 = (unitjunction8[i][1][k][l][24][0] + unitjunction8[i][1][k][l][25][0])/2.0
-            if (unitjunction8[i][1][k][l][24][1] + unitjunction8[i][1][k][l][25][1])/2.0 < y_min_j8:
-                y_min_j8 = (unitjunction8[i][1][k][l][24][1] + unitjunction8[i][1][k][l][25][1])/2.0
-            if (unitjunction8[i][1][k][l][24][2] + unitjunction8[i][1][k][l][25][2])/2.0 < z_min_j8:
-                z_min_j8 = (unitjunction8[i][1][k][l][24][2] + unitjunction8[i][1][k][l][25][2])/2.0
-
-x_min_j3 = 0; y_min_j5 = 0; z_min_j6 = 0
-for i in range(0, len(unitjunction3)):
-    for k in range(0, len(unitjunction3[i][1])):
-        for l in range(0, len(unitjunction3[i][1][k])):
-            if (unitjunction3[i][1][k][l][24][0] + unitjunction3[i][1][k][l][25][0])/2.0 < x_min_j3:
-                x_min_j3 = (unitjunction3[i][1][k][l][24][0] + unitjunction3[i][1][k][l][25][0])/2.0
-            if (unitjunction5[i][1][k][l][24][1] + unitjunction5[i][1][k][l][25][1])/2.0 < y_min_j5:
-                y_min_j5 = (unitjunction5[i][1][k][l][24][1] + unitjunction5[i][1][k][l][25][1])/2.0
-            if (unitjunction6[i][1][k][l][24][2] + unitjunction6[i][1][k][l][25][2])/2.0 < z_min_j6:
-                z_min_j6 = (unitjunction6[i][1][k][l][24][2] + unitjunction6[i][1][k][l][25][2])/2.0
-translation_j8 = np.matrix([[1, 0, 0, x_min_j3 - x_min_j8], [0, 1, 0, y_min_j5 - y_min_j8], [0, 0, 1, z_min_j6 - z_min_j8], [0, 0, 0, 1]])
-for i in range(0, len(unitjunction8)):
-    for j in range(0, len(unitjunction8[i])):
-        for k in range(0, len(unitjunction8[i][j])):
-            for l in range(0, len(unitjunction8[i][j][k])):
-                for m in range(0, no_atoms):
-                    unitjunction8[i][j][k][l][m].append(1)
-                    x = np.dot(translation_j8, np.array(unitjunction8[i][j][k][l][m]))
-                    unitjunction8[i][j][k][l][m] = [x[0, 0], x[0, 1], x[0, 2]]
-
-final.append(unitjunction8)
+                        final[n][i][j][k][l][m] = [float(rotation_final[0]), float(rotation_final[1]), float(rotation_final[2])]"""
 
 # The final structure is not centered at the origin, causing issues with the periodic boundary conditions.
 # Translate the final structure so that its x_max = -x_min, y_max = -y_min, and z_max = -z_min.
 x_max = 0; x_min = 0; y_max = 0; y_min = 0; z_max = 0; z_min = 0
-for n in range(0, len(final)):
-    for i in range(0, len(final[n])):
-        for j in range(0, len(final[n][i])):
-            for k in range(0, len(final[n][i][j])):
-                for l in range(0, len(final[n][i][j][k])):
+for n in range(0, len(final7)):
+    for i in range(0, len(final7[n])):
+        for j in range(0, len(final7[n][i])):
+            for k in range(0, len(final7[n][i][j])):
+                for l in range(0, len(final7[n][i][j][k])):
                     for m in range(0, no_atoms - no_ions):
-                        if final[n][i][j][k][l][m][0] > x_max:
-                            x_max = final[n][i][j][k][l][m][0]
-                        if final[n][i][j][k][l][m][0] < x_min:
-                            x_min = final[n][i][j][k][l][m][0]
-                        if final[n][i][j][k][l][m][1] > y_max:
-                            y_max = final[n][i][j][k][l][m][1]
-                        if final[n][i][j][k][l][m][1] < y_min:
-                            y_min = final[n][i][j][k][l][m][1]
-                        if final[n][i][j][k][l][m][2] > z_max:
-                            z_max = final[n][i][j][k][l][m][2]
-                        if final[n][i][j][k][l][m][2] < z_min:
-                            z_min = final[n][i][j][k][l][m][2]
+                        if final7[n][i][j][k][l][m][0] > x_max:
+                            x_max = final7[n][i][j][k][l][m][0]
+                        if final7[n][i][j][k][l][m][0] < x_min:
+                            x_min = final7[n][i][j][k][l][m][0]
+                        if final7[n][i][j][k][l][m][1] > y_max:
+                            y_max = final7[n][i][j][k][l][m][1]
+                        if final7[n][i][j][k][l][m][1] < y_min:
+                            y_min = final7[n][i][j][k][l][m][1]
+                        if final7[n][i][j][k][l][m][2] > z_max:
+                            z_max = final7[n][i][j][k][l][m][2]
+                        if final7[n][i][j][k][l][m][2] < z_min:
+                            z_min = final7[n][i][j][k][l][m][2]
 translation_final = np.matrix([[1, 0, 0, -x_min - 10*dist_periodic/2.0], [0, 1, 0, -y_min - 10*dist_periodic/2.0], [0, 0, 1, -z_min - 10*dist_periodic/2.0], [0, 0, 0, 1]])
 for n in range(0, len(final)):
     for i in range(0, len(final[n])):
@@ -1502,6 +1494,65 @@ for n in range(0, len(final)):
                             final[n][i][j][k][l][m].append(1)
                         x = np.dot(translation_final, np.array(final[n][i][j][k][l][m]))
                         final[n][i][j][k][l][m] = [x[0, 0], x[0, 1], x[0, 2]]
+
+j8x_x_sum = 0; j8x_y_sum = 0; j8x_z_sum = 0
+j8y_x_sum = 0; j8y_y_sum = 0; j8y_z_sum = 0
+j8z_x_sum = 0; j8z_y_sum = 0; j8z_z_sum = 0
+divisor = 0
+for i in range(0, len(unitjunction[1][1][no_layers - 1])):
+    j8x_x_sum = j8x_x_sum + (unitjunction5[1][1][no_layers - 1][i][24][0] + unitjunction5[1][1][no_layers - 1][i][25][0])/2.0
+    j8x_y_sum = j8x_y_sum + (unitjunction5[1][1][no_layers - 1][i][24][1] + unitjunction5[1][1][no_layers - 1][i][25][1])/2.0
+    j8x_z_sum = j8x_z_sum + (unitjunction5[1][1][no_layers - 1][i][24][2] + unitjunction5[1][1][no_layers - 1][i][25][2])/2.0
+    j8y_x_sum = j8y_x_sum + (unitjunction6[2][1][no_layers - 1][i][24][0] + unitjunction6[2][1][no_layers - 1][i][25][0])/2.0
+    j8y_y_sum = j8y_y_sum + (unitjunction6[2][1][no_layers - 1][i][24][1] + unitjunction6[2][1][no_layers - 1][i][25][1])/2.0
+    j8y_z_sum = j8y_z_sum + (unitjunction6[2][1][no_layers - 1][i][24][2] + unitjunction6[2][1][no_layers - 1][i][25][2])/2.0
+    j8z_x_sum = j8z_x_sum + (unitjunction3[0][1][no_layers - 1][i][24][0] + unitjunction3[0][1][no_layers - 1][i][25][0])/2.0
+    j8z_y_sum = j8z_y_sum + (unitjunction3[0][1][no_layers - 1][i][24][1] + unitjunction3[0][1][no_layers - 1][i][25][1])/2.0
+    j8z_z_sum = j8z_z_sum + (unitjunction3[0][1][no_layers - 1][i][24][2] + unitjunction3[0][1][no_layers - 1][i][25][2])/2.0
+    divisor += 1
+j8x_x = j8x_x_sum/float(divisor); j8x_y = j8x_y_sum/float(divisor); j8x_z = j8x_z_sum/float(divisor)
+j8y_x = j8y_x_sum/float(divisor); j8y_y = j8y_y_sum/float(divisor); j8y_z = j8y_z_sum/float(divisor)
+j8z_x = j8z_x_sum/float(divisor); j8z_y = j8z_y_sum/float(divisor); j8z_z = j8z_z_sum/float(divisor)
+
+j1x_x_sum = 0; j1x_y_sum = 0; j1x_z_sum = 0
+j1y_x_sum = 0; j1y_y_sum = 0; j1y_z_sum = 0
+j1z_x_sum = 0; j1z_y_sum = 0; j1z_z_sum = 0
+divisor = 0
+for i in range(0, len(unitjunction[1][1][no_layers - 1])):
+    j1x_x_sum = j1x_x_sum + (unitjunction8_x[0][1][no_layers - 1][i][24][0] + unitjunction8_x[0][1][no_layers - 1][i][25][0])/2.0
+    j1x_y_sum = j1x_y_sum + (unitjunction8_x[0][1][no_layers - 1][i][24][1] + unitjunction8_x[0][1][no_layers - 1][i][25][1])/2.0
+    j1x_z_sum = j1x_z_sum + (unitjunction8_x[0][1][no_layers - 1][i][24][2] + unitjunction8_x[0][1][no_layers - 1][i][25][2])/2.0
+    j1y_x_sum = j1y_x_sum + (unitjunction8_x[1][1][no_layers - 1][i][24][0] + unitjunction8_x[1][1][no_layers - 1][i][25][0])/2.0
+    j1y_y_sum = j1y_y_sum + (unitjunction8_x[1][1][no_layers - 1][i][24][1] + unitjunction8_x[1][1][no_layers - 1][i][25][1])/2.0
+    j1y_z_sum = j1y_z_sum + (unitjunction8_x[1][1][no_layers - 1][i][24][2] + unitjunction8_x[1][1][no_layers - 1][i][25][2])/2.0
+    j1z_x_sum = j1z_x_sum + (unitjunction8_x[2][1][no_layers - 1][i][24][0] + unitjunction8_x[2][1][no_layers - 1][i][25][0])/2.0
+    j1z_y_sum = j1z_y_sum + (unitjunction8_x[2][1][no_layers - 1][i][24][1] + unitjunction8_x[2][1][no_layers - 1][i][25][1])/2.0
+    j1z_z_sum = j1z_z_sum + (unitjunction8_x[2][1][no_layers - 1][i][24][2] + unitjunction8_x[2][1][no_layers - 1][i][25][2])/2.0
+    divisor += 1
+j1x_x = j1x_x_sum/float(divisor); j1x_y = j1x_y_sum/float(divisor); j1x_z = j1x_z_sum/float(divisor)
+j1y_x = j1y_x_sum/float(divisor); j1y_y = j1y_y_sum/float(divisor); j1y_z = j1y_z_sum/float(divisor)
+j1z_x = j1z_x_sum/float(divisor); j1z_y = j1z_y_sum/float(divisor); j1z_z = j1z_z_sum/float(divisor)
+
+translation_j8_x = np.matrix([[1, 0, 0, j8x_x - j1x_x], [0, 1, 0, j8x_y - j1x_y], [0, 0, 1, j8x_z - j1x_z], [0, 0, 0, 1]])
+translation_j8_y = np.matrix([[1, 0, 0, j8y_x - j1y_x], [0, 1, 0, j8y_y - j1y_y], [0, 0, 1, j8y_z - j1y_z], [0, 0, 0, 1]])
+translation_j8_z = np.matrix([[1, 0, 0, j8z_x - j1z_x], [0, 1, 0, j8z_y - j1z_y], [0, 0, 1, j8z_z - j1z_z], [0, 0, 0, 1]])
+for i in range(0, len(unitjunction)):
+    for j in range(0, len(unitjunction[i])):
+        for k in range(0, len(unitjunction[i][j])):
+            for l in range(0, len(unitjunction[i][j][k])):
+                for m in range(0, no_atoms):
+                    unitjunction8_x[i][j][k][l][m].append(1); unitjunction8_y[i][j][k][l][m].append(1); unitjunction8_z[i][j][k][l][m].append(1)
+                    x = np.dot(translation_j8_x, np.array(unitjunction8_x[i][j][k][l][m]))
+                    y = np.dot(translation_j8_y, np.array(unitjunction8_y[i][j][k][l][m]))
+                    z = np.dot(translation_j8_z, np.array(unitjunction8_z[i][j][k][l][m]))
+                    unitjunction8_x[i][j][k][l][m] = [x[0, 0], x[0, 1], x[0, 2]]
+                    unitjunction8_y[i][j][k][l][m] = [y[0, 0], y[0, 1], y[0, 2]]
+                    unitjunction8_z[i][j][k][l][m] = [z[0, 0], z[0, 1], z[0, 2]]
+
+final.append(unitjunction8_x)
+final.append(unitjunction8_y)
+final.append(unitjunction8_z)
+
 
 sys_atoms = 0
 for n in range(0, len(final)):

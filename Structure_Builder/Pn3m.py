@@ -7,6 +7,7 @@ print 'This is a .gro file'
 #NOTES: Perpendicularization of the outer layer is set to half the normal, not the full <-- Check
       # The inner ring has 2 more layers than the outer ring
       # The top and bottom layers of the inner ring have 5 monomers
+      # Radius of inner ring has been expanded by half the length of a single monomer's tail (194)
 
 import numpy as np
 import math
@@ -187,6 +188,7 @@ if abs(positions_inp[17][0]) > abs(positions_inp[32][0]):
     length_tail = max_radius_inner - abs(positions_inp[17][0])
 if abs(positions_inp[17][0]) < abs(positions_inp[32][0]):
     length_tail = max_radius_inner - abs(positions_inp[32][0])
+max_radius_inner = abs(length_monomer) + abs(length_tail)/2.0
 lim_radius_inner = max_radius_inner - abs(length_tail)/2.0
 
 # Determining the basic parabolic curve

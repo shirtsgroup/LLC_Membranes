@@ -9,8 +9,9 @@ print 'This is a .gro file'
       # The inner ring has 2 more layers than the outer ring (44)
       # The top and bottom layers of the inner ring have 1 monomer (385)
       # Junctions are extra spread (lines 588 - 590)
-      # Removed parabolic oycurve from inner spiral (lines 194, 204)
+      # Removed parabolic curve from inner spiral (lines 194-195, 205)
       # Inner ring is not perpendicular to parabola -- non-existent at this point (343-376)
+
 
 import numpy as np
 import math
@@ -190,8 +191,8 @@ if abs(positions_inp[17][0]) > abs(positions_inp[32][0]):
     length_tail = max_radius_inner - abs(positions_inp[17][0])
 if abs(positions_inp[17][0]) < abs(positions_inp[32][0]):
     length_tail = max_radius_inner - abs(positions_inp[32][0])
-lim_radius_inner = max_radius_inner - abs(length_tail)/2.0
-max_radius_inner = lim_radius_inner
+#lim_radius_inner = max_radius_inner - abs(length_tail)/2.0
+lim_radius_inner = max_radius_inner
 
 # Determining the basic parabolic curve
 if no_layers % 2 == 0:
@@ -201,7 +202,7 @@ if no_layers % 2 == 1:
 c = lim_radius_inner
 a = (max_radius_inner - lim_radius_inner)/(h*h)
 
-max_radius_inner = abs(length_monomer)
+max_radius_inner = max_radius_inner + abs(length_tail)/2.0
 
 z_min_inp = 0
 z_max_inp = 0
