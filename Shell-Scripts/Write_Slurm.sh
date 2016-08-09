@@ -5,7 +5,8 @@
 SIM_LENGTH_HOURS=24
 SIM_LENGTH_MIN=00
 SIM_LENGTH_SEC=00
-NODES=16
+NODES=4
+RESOURCE='janus'
 QOS='janus'  # Quality of Service
 NTASKS_PER_NODE=1
 
@@ -15,7 +16,6 @@ NODES=16
 
 # Choose which monomer to build with
 MONOMER='monomer4.pdb'  # Structure file to be used
-
 # Energy minimization parameters:
 INTEGRATOR_EM=steep  # Integrator for energy minimization
 NSTEPS_EM=50000  # Maximum number of steps to take for energy minimization
@@ -89,12 +89,13 @@ SOLVATION="off"
 # -Y  :   PTYPE ... i.e. Isotropic, semiisotropic
 # -B  :   REF_P ... Reference Pressure, bar
 # -R  :   COMPRESSIBILITY ... Isothermal compressibility, bar^-1
-# -Z  :   PBC ... Periodic Boundary directions
+# -Z  :   PBC ... Periodic Boundary directions-T
 # -V  :   SOLV_LENGTH ... length of final simulation
 # -W  :   SOLVATION ... Turn solvation on or off
+# -H  :   RESOURCE ... Which machine is being using
 
 
-while getopts "h:m:s:n:q:N:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:W:" opt; do
+while getopts "h:m:s:n:q:N:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:W:H:" opt; do
     case $opt in
     h)  SIM_LENGTH_HOURS=$OPTARG;;
     m)  SIM_LENGTH_MIN=$OPTARG;;
@@ -131,26 +132,51 @@ while getopts "h:m:s:n:q:N:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z
     Z)  PBC=$OPTARG;;
     V)  SOLV_LENGTH=$OPTARG;;
     W)  SOLVATION=$OPTARG;;
+    H)  RESOURCE=$OPTARG;;
     esac
 done
 
-NP=$((NODES*2))
+if [ ${RESOURCE} == 'janus' ]; then
+    NP=$((NODES*2))
+    echo '#!/bin/bash' > Run_Job.sh
+    echo '' >> Run_Job.sh
+    echo '#SBATCH --job-name' ${SIM_TITLE} >> Run_Job.sh
+    echo '#SBATCH --qos' ${QOS} >> Run_Job.sh
+    echo '#SBATCH --nodes' ${NODES} >> Run_Job.sh
+    echo '#SBATCH --ntasks-per-node' ${NTASKS_PER_NODE} >> Run_Job.sh
+    echo '#SBATCH --time' ${SIM_LENGTH_HOURS}:${SIM_LENGTH_MIN}:${SIM_LENGTH_SEC} >> Run_Job.sh
+    echo '' >> Run_Job.sh
+    echo "ml slurm" >> Run_Job.sh
+    echo "ml gromacs" >> Run_Job.sh
+    echo "ml python/2.7.10" >> Run_Job.sh
+    echo "ml numpy" >> Run_Job.sh
+    echo '' >> Run_Job.sh
+    echo "Build_and_Sim.sh -M ${MONOMER} -I ${INTEGRATOR_EM} -S ${NSTEPS_EM} -c ${CUTOFF_EM} -t ${NSTLIST} -o ${NO_MONOMERS} \
+        -r ${RADIUS} -p ${PORE2PORE} -P ${NOPORES} -w ${DBWL} -l ${LAYERS} -x ${XVECT} -y ${YVECT} -e ${INCREMENT} \
+        -T ${SIM_TITLE} -C ${CUTOFF_MD} -i ${INTEGRATOR_MD} -D ${DT} -L ${SIM_LENGTH} -f ${FRAMES} -v ${TCOUPL} -K ${REF_T}\
+        -b ${PCOUPL} -Y ${PTYPE} -B ${REF_P} -R ${COMPRESSIBILITY} -Z ${PBC} -V ${SOLV_LENGTH} -n ${NODES} -s ${SOLVATION} \
+        -m ${MPI}" >> Run_Job.sh
+fi
 
-echo '#!/bin/bash' > Run_Janus.sh
-echo '' >> Run_Janus.sh
-echo '#SBATCH --job-name' ${SIM_TITLE} >> Run_Janus.sh
-echo '#SBATCH --qos' ${QOS} >> Run_Janus.sh
-echo '#SBATCH --nodes' ${NODES} >> Run_Janus.sh
-echo '#SBATCH --ntasks-per-node' ${NTASKS_PER_NODE} >> Run_Janus.sh
-echo '#SBATCH --time' ${SIM_LENGTH_HOURS}:${SIM_LENGTH_MIN}:${SIM_LENGTH_SEC} >> Run_Janus.sh
-echo '' >> Run_Janus.sh
-echo "ml slurm" >> Run_Janus.sh
-echo "ml gromacs" >> Run_Janus.sh
-echo "ml python/2.7.10" >> Run_Janus.sh
-echo "ml numpy" >> Run_Janus.sh
-echo '' >> Run_Janus.sh
-echo "Build_and_Sim.sh -M ${MONOMER} -I ${INTEGRATOR_EM} -S ${NSTEPS_EM} -c ${CUTOFF_EM} -t ${NSTLIST} -o ${NO_MONOMERS} \
-    -r ${RADIUS} -p ${PORE2PORE} -P ${NOPORES} -w ${DBWL} -l ${LAYERS} -x ${XVECT} -y ${YVECT} -e ${INCREMENT} \
-    -T ${SIM_TITLE} -C ${CUTOFF_MD} -i ${INTEGRATOR_MD} -D ${DT} -L ${SIM_LENGTH} -f ${FRAMES} -v ${TCOUPL} -K ${REF_T}\
-    -b ${PCOUPL} -Y ${PTYPE} -B ${REF_P} -R ${COMPRESSIBILITY} -Z ${PBC} -V ${SOLV_LENGTH} -n ${NODES} -s ${SOLVATION} \
-    -m ${MPI}" >> Run_Janus.sh
+if [ ${RESOURCE} == 'bridges' ]; then
+    NP=$((NTASKS_PER_NODE*NODES))
+    echo '#!/bin/bash' > Run_Job.sh
+    echo '' >> Run_Job.sh
+    echo '#SBATCH --nodes' ${NODES} >> Run_Job.sh
+    echo '#SBATCH --ntasks-per-node' ${NTASKS_PER_NODE} >> Run_Job.sh
+    echo '#SBATCH --time' ${SIM_LENGTH_HOURS}:${SIM_LENGTH_MIN}:${SIM_LENGTH_SEC} >> Run_Job.sh
+    echo '' >> Run_Job.sh
+    echo "module load gromacs" >> Run_Job.sh
+    echo "module load python/2.7.11_gcc" >> Run_Job.sh
+    echo "source /home/bjc/Programs/Gromacs/bin/GMXRC" >> Run_Job.sh
+    echo '' >> Run_Job.sh
+    echo "Build_and_Sim.sh -M ${MONOMER} -I ${INTEGRATOR_EM} -S ${NSTEPS_EM} -c ${CUTOFF_EM} -t ${NSTLIST} -o ${NO_MONOMERS} \
+        -r ${RADIUS} -p ${PORE2PORE} -P ${NOPORES} -w ${DBWL} -l ${LAYERS} -x ${XVECT} -y ${YVECT} -e ${INCREMENT} \
+        -T ${SIM_TITLE} -C ${CUTOFF_MD} -i ${INTEGRATOR_MD} -D ${DT} -L ${SIM_LENGTH} -f ${FRAMES} -v ${TCOUPL} -K ${REF_T}\
+        -b ${PCOUPL} -Y ${PTYPE} -B ${REF_P} -R ${COMPRESSIBILITY} -Z ${PBC} -V ${SOLV_LENGTH} -n ${NODES} -s ${SOLVATION} \
+        -m ${MPI} -H ${RESOURCE} -a ${NTASKS_PER_NODE}" >> Run_Job.sh
+else
+    echo "Specify a valid resource"
+    echo "NOTE: names are all lowercase"
+    echo "i.e. don't type Janus or Bridges or you might get this message"
+fi

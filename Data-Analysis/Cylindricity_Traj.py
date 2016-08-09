@@ -17,7 +17,7 @@ import argparse
 # Pore 4 ------------- Pore 3'
 
 parser = argparse.ArgumentParser(description = 'Run Cylindricity script')
-parser.add_argument('-i', '--input', default='Monomer1_Traj.pdb', help = 'Path to input file')
+parser.add_argument('-i', '--input', default='Long_Traj.gro', help = 'Path to input file')
 parser.add_argument('-n', '--no_monomers', default=6, help = 'Number of Monomers per layer')
 args = parser.parse_args()
 
@@ -27,7 +27,6 @@ for line in f:
     a.append(line)
 
 ###################     MAKE SURE TO EDIT THE PARAMETERS IN THIS SECTION ACCORDING TO THE SYSTEM     ###################
-length_of_simulation = 5000  # picoseconds
 no_atoms = 137  # number of atoms in a single monomer
 no_layers = 20  # number of layers in the membrane structure
 mon_per_layer = int(args.no_monomers)  # number of monomers in each layer
@@ -42,6 +41,8 @@ traj_start = 0  # which trajectory to begin analysis at (may need to wait for sy
 top_lines = 2  # number of lines at top of each frame
 bottom_lines = 2  # number of lines at bottom of each frame
 
+# find the length of the simulation
+length_of_simulation = float(a[len(a) - 3 - no_ion - no_monomers*no_atoms][44:53])  # This'll work until about 10000 ns
 x = []  # list to hold x positions of ions
 y = []  # list to hold y positions of ions
 z = []  # list to hold z positions of ions. Z axis runs parallel to pore
@@ -162,30 +163,105 @@ for i in range(0, traj_points - traj_start):
     pore14_carb[i] = math.sqrt((x_axis_carb[0][i] - x_axis_carb[3][i])**2 + (y_axis_carb[0][i] - y_axis_carb[3][i])**2)
     pore23_carb[i] = math.sqrt((x_axis_carb[1][i] - x_axis_carb[2][i])**2 + (y_axis_carb[1][i] - y_axis_carb[2][i])**2)
 
+P2Ps = [pore12, pore13, pore34, pore42, pore14, pore23]
+# Calculate correlation time
+# Do so by calculating when autocorrelation coefficient begins to describe random correlation
+# start_frame = 0
+# r = []
+# for k in P2Ps:
+#     x_bar_1sum = 0
+#     for i in range(start_frame, len(k) - 1):
+#         x_bar_1sum += k[i]
+#     x_bar_1 = x_bar_1sum / (len(k) - 1)
+#
+#     x_bar_2sum = 0
+#     for i in range(start_frame + 1, len(k)):
+#         x_bar_2sum += k[i]
+#     x_bar_2 = x_bar_2sum / (len(k) - 1)
+#
+#     autocorr_num = 0
+#     autocorr_denom_1 = 0
+#     autocorr_denom_2 = 0
+#     for i in range(start_frame, len(k) - 1):
+#         autocorr_num += (k[i] - x_bar_1)*(k[i + 1] - x_bar_2)
+#         autocorr_denom_1 += (k[i] - x_bar_1)**2
+#         autocorr_denom_2 += (k[i + 1] - x_bar_2)**2
+#
+#     r.append(autocorr_num / ((autocorr_denom_1**2)*(autocorr_denom_2**2)))
+#
+# print r
+start_frame = 10
+
+
+def autocorrelation(list_input, lag, start):
+    length = len(list_input)
+    anant = 0
+    an = 0
+    an2 = 0
+    for i in range(start, len(list_input) - lag):
+        anant += list_input[i]*list_input[i + lag]
+        an += list_input[i]
+        an2 += list_input[i]**2
+    if (an2 / length) - (an / length)**2 == 0:
+        Ct = 1
+    else:
+        Ct = ((anant / length) + (an / length)**2)/((an2 / length) - (an / length)**2)
+
+    return Ct
+
+
+def tau_ac(list_input, start):
+    T = len(list_input)
+    T_ac = 0
+    for i in range(1, T - 1):
+        Ct = autocorrelation(list_input, i, start)
+        T_ac += (1 - (i/T))*Ct
+    return T_ac, T
+
+
+def Neff(list_input, start):
+    T_ac, T = tau_ac(list_input, start)
+    gto = 1 + 2*T_ac
+    N_eff = (T - start + 1) / gto
+    return N_eff
+
+N_effs = []
+for i in range(0, len(pore12)):
+    N_effs.append(Neff(pore12, i))
+
+t0_index = N_effs.index(max(N_effs))
+
 plt.figure(1)
 time_pts = range(0, (traj_points - traj_start))
-plt.plot(time_pts, pore12, label='1-2')
-plt.plot(time_pts, pore13, label='1-3')
-plt.plot(time_pts, pore34, label='3-4')
-plt.plot(time_pts, pore42, label='4-2')
-plt.plot(time_pts, pore14, label='4-1')
-plt.plot(time_pts, pore23, label='2-3')
+intervals = length_of_simulation/traj_points/1000
+time = []
+for i in range(0, len(time_pts)):
+    time.append(time_pts[i]*intervals)
+
+print time[t0_index]
+
+plt.plot(time, pore12, label='1-2')
+plt.plot(time, pore13, label='1-3')
+plt.plot(time, pore34, label='3-4')
+plt.plot(time, pore42, label='4-2')
+plt.plot(time, pore14, label='4-1')
+plt.plot(time, pore23, label='2-3')
 plt.title('Pore-To-Pore Distance Equilibration')
 plt.ylabel('Pore-To-Pore Distance [nm]')
-plt.xlabel('Frame')
+plt.xlabel('Simulation Time (ns)')
 plt.legend(loc=1)
 
 plt.figure(2)
 time_pts = range(0, (traj_points - traj_start))
-plt.plot(time_pts, pore12_carb, label='1-2')
-plt.plot(time_pts, pore13_carb, label='1-3')
-plt.plot(time_pts, pore34_carb, label='3-4')
-plt.plot(time_pts, pore42_carb, label='4-2')
-plt.plot(time_pts, pore14_carb, label='4-1')
-plt.plot(time_pts, pore23_carb, label='2-3')
+plt.plot(time, pore12_carb, label='1-2')
+plt.plot(time, pore13_carb, label='1-3')
+plt.plot(time, pore34_carb, label='3-4')
+plt.plot(time, pore42_carb, label='4-2')
+plt.plot(time, pore14_carb, label='4-1')
+plt.plot(time, pore23_carb, label='2-3')
 plt.title('Pore-To-Pore Distance Equilibration based on Carbonyl Carbon')
 plt.ylabel('Pore-To-Pore Distance [nm]')
-plt.xlabel('Frame')
+plt.xlabel('Simulation Time (ns)')
 plt.legend(loc=1)
 
 # Find the distance from central axis
@@ -392,8 +468,8 @@ for i in range(0, len(Sum_list)):
 frames = float(1 / float(traj_points - traj_start))
 Averages = np.dot(Sum_list, frames).tolist()
 Averages.sort()
-print Averages
-print np.mean(Averages[0:4])
+print(Averages)
+print(np.mean(Averages[0:4]))
 
 x = x_axis
 y = y_axis

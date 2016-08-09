@@ -5,12 +5,16 @@
 
 # Define Variables with Default values
 
+# Specify what resource is being used
+RESOURCE="janus"
+
 # Choose which monomer to build with
 MONOMER="monomer4.pdb"  # Structure file to be used
 
 #MPI Options
 MPI="on"
 NODES=16
+NTASKS_PER_NODE=4
 
 # Energy minimization parameters:
 INTEGRATOR_EM=steep  # Integrator for energy minimization
@@ -84,8 +88,10 @@ SOLVATION="off"
 # -V  :   SOLV_LENGTH ... length of final simulation
 # -s  :   SOLVATION ... Turn solvation on or off
 # -m  :   MPI ... Turn MPI on or off depending what Gromacs version you have compiled
+# -H  :   RESOURCE ... What HPC resource is being used
+# -a  :   NTASKS_PER_NODE ... how many tasks per node (how many MPI processes do you want on a node)
 
-while getopts "n:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:s:m:" opt; do
+while getopts "n:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:s:m:H:a:" opt; do
     case $opt in
     n)  NODES=$OPTARG;;
     M)  MONOMER=$OPTARG;;
@@ -118,6 +124,8 @@ while getopts "n:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:s:m:" o
     V)  SOLV_LENGTH=$OPTARG;;
     s)  SOLVATION=$OPTARG;;
     m)  MPI=$OPTARG;;
+    H)  RESOURCE=$OPTARG;;
+    a)  NTASKS_PER_NODE=$OPTARG;;
     esac
 done
 
@@ -127,8 +135,18 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # Directory where this 
 Z_BOX_VECTOR=$((LAYERS+5)) # kind of arbitrary but should work
 MOL_LLC=$((NO_MONOMERS*NOPORES*LAYERS))  # For topology
 MOL_NA=$((NO_MONOMERS*NOPORES*LAYERS))
-NP=$((NODES*2))
 
+if [ RESOURCE=='janus' ]; then
+    NP=$((NODES*2))
+fi
+
+if [ RESOURCE=='bridges' ]; then
+    NP=$((NTASKS_PER_NODE*NODES))
+else
+    echo "Specify a valid resource"
+    echo "NOTE: names are all lowercase"
+    echo "i.e. don't type Janus or Bridges or you might get this message"
+fi
 
 # Copy in necessary files and edit input files
 
@@ -147,9 +165,9 @@ sed -i -e "s/MOL_NA/${MOL_NA}/g" NaPore.top
 
 # Build Structure Based on user-defined inputs
 
-python ${DIR}/Write_mdp.py -C ${CUTOFF_MD} -i ${INTEGRATOR_MD} -D ${DT} -v ${TCOUPL} -K ${REF_T} -b ${PCOUPL}\
+python ${DIR}/../Structure-Files/Write_Input.py -C ${CUTOFF_MD} -i ${INTEGRATOR_MD} -D ${DT} -v ${TCOUPL} -K ${REF_T} -b ${PCOUPL}\
     -Y ${PTYPE} -B ${REF_P} -R ${COMPRESSIBILITY} -Z ${PBC} -L ${SIM_LENGTH} -I ${INTEGRATOR_EM} -S ${NSTEPS_EM}\
-    -c ${CUTOFF_EM} -f ${FRAMES} -s ${SOLVATION} -V ${SOLV_LENGTH}
+    -c ${CUTOFF_EM} -f ${FRAMES} -s ${SOLVATION} -V ${SOLV_LENGTH} -o ${NO_MONOMERS} -l ${LAYERS} -P ${NOPORES}
 
 python ${DIR}/../Structure_Builder/Orient_Plane.py -i ${MONOMER} -l ${LAYERS} -m ${NO_MONOMERS} \
     -r ${RADIUS} -p ${PORE2PORE} -n ${NOPORES} -d ${DBWL} >> initial.gro
