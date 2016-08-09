@@ -99,7 +99,7 @@ pbc = 'pbc = %s' %args.PBC
 
 f2 = open('wiggle.mdp', 'w')
 f2.writelines([title + '\n', cutoff_scheme + '\n', integrator + '\n', dt + '\n', nsteps + '\n', 'continuation = no\n',
-               'constraints = all-bonds\n', 'constraint-algorithm = lincs\n', 'lincs-iter = 1\n', 'lincs-order = 4\n',
+               'constraints = h-bonds\n', 'constraint-algorithm = lincs\n', 'lincs-iter = 1\n', 'lincs-order = 4\n',
                nstxout + '\n', nstvout + '\n', nstfout + '\n', nstenergy + '\n', nstlist + '\n', 'ns_type = grid\n'
                'rlist = 1.2\n', 'rcoulomb = 1.2\n', 'rvdw = 1.2\n', 'coulombtype = PME\n', 'pme_order = 4\n',
                'fourierspacing = 0.16\n', tcoupl + '\n', tc_grps + '\n', tau_t + '\n', ref_t + '\n', Pcoupl + '\n', Pcoupltype + '\n',

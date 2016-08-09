@@ -10,7 +10,7 @@ CUTOFF_RAD=10  # percent of distribution that are labeled close enough to bond i
 SIM_LENGTH=.01  # picoseconds of simulation between iterations
 XLINKS=0
 FRAMES=50
-DEGREE=.95  # Degree of crosslinking
+DEGREE=.9  # Degree of crosslinking
 NO_MONOMERS=480
 NO_TAILS=3
 
@@ -32,12 +32,13 @@ done
 
 ITERATION=0  # starting iteration
 TERM=0  # starting number of vinyl groups that have been terminated (both c1 and c2)
-VINYL_GRP_COND=$(echo "${DEGREE}*${NO_MONOMERS}*${NO_TAILS}" | bc)  # The number of vinyl group which must disappear for the simulation to finish
-[ ${TERM} -lt $VINYL_GRP_COND ]
+STOP=0
+#VINYL_GRP_COND=$(echo "${DEGREE}*${NO_MONOMERS}*${NO_TAILS}" | bc)  # The number of vinyl group which must disappear for the simulation to finish
+#[ ${TERM} -lt $VINYL_GRP_COND ]
 
 Write_Input.py -x on -L ${SIM_LENGTH} -D 0.001 -f ${FRAMES} # -I cg
 
-while [ ${TERM} -lt ${VINYL_GRP_COND} ]; do
+while [ ${STOP} -eq 0 ]; do
     if [ ${ITERATION} == 0 ]; then
         xlink.py -i ${GRO} -c ${CUTOFF}  -e ${TERM_PROB} -r ${ITERATION} -d ${CUTOFF_RAD} -x ${XLINKS}
     else
@@ -49,10 +50,14 @@ while [ ${TERM} -lt ${VINYL_GRP_COND} ]; do
     gmx mdrun -v -deffnm em
     gmx grompp -f wiggle.mdp -p NaPore.top -c em.gro -o wiggle
     gmx mdrun -v -deffnm wiggle
-    XLINKS=$(tail xlink_${ITERATION}.log -n 1 | cut -c 19-22)
-    TERM=$(tail -n 5 xlink_${ITERATION}.log | head -n 1 | cut -c 26-29)
+    XLINKS=$(tail xlink_${ITERATION}.log -n 2 | head -n 1 | cut -c 19-22)
+    TERM=$(tail -n 6 xlink_${ITERATION}.log | head -n 1 | cut -c 26-29)
+    STOP=$(tail -n 1 xlink_${ITERATION}.log | cut -c 26)
     ITERATION=$((ITERATION+1))
     echo ${TERM}
+    rm \#*  # get rid of backup files
 done
+
+xlink.py -i ${GRO} -c ${CUTOFF}  -e ${TERM_PROB} -r ${ITERATION} -d ${CUTOFF_RAD} -y crosslinked_new.itp -x ${XLINKS} -S 'yes'
 
 rm \#*

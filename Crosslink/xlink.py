@@ -284,6 +284,9 @@ if int(args.iteration) != 0:
 
     cutoff = min(min_list_rad)  # Now the cutoff value is the minimum of min_list_rad
 
+    if cutoff[0] > 0.7:
+        cutoff[0] = 0.7
+
     for i in range(0, len(min_index_rad)):  # Add to change_index if they meet the cutoff criteria
         if min_dist_rad[i, 0] < cutoff:
             change_index1.append(int(min_index_rad[i]))
@@ -302,12 +305,13 @@ for i in range(0, int((float(args.cutoff)/100)*len(C1x))):  # looks at a percent
 
 cutoff = min(min_list)  # The minimum value left after the modification of min_list is the cutoff value
 
-if cutoff == 1000:
-    cutoff = 1
+if cutoff[0] > 0.6:
+    cutoff[0] = 0.6
 
 count = 0
 for i in range(0, len(C1x)):
     if min_dist[i, 0] < cutoff:  # find distances which meet the cutoff criteria
+        print min_dist[i, 0]
         change_index1.append(i % (len(C1x)/9))  # holds the index of the atom associated with the met criteria for primary carbons (C20, C34, C48)
         change_index2.append(int(min_index[i, 0]))  # Same as above but for the secondary carbons
         count += 1
@@ -664,6 +668,11 @@ nr = 0  # number of lines in 'atoms' section
 while b[atoms_count] != '\n':
     atoms_count += 1  # increments the while loop
     nr += 1  # counts number of atoms
+
+if c1 == [] and c2 == [] and other_c1 == [] and radical_c2 == [] and c1_rad_ndx == [] and c2_rad_ndx == [] and H_new1 == []:
+    Stop_next_iter = 1  # finish this iteration, then next time the system will be completely terminated
+else:
+    Stop_next_iter = 0
 
 if args.stop == 'yes':
     c1 = []
@@ -1037,7 +1046,7 @@ if int(args.iteration) != 0:
                   '\n', 'reactive_c2_term: %s' %reactive_c2_term + '\n', '\n', 'H_new3: %s' %H_new3 + '\n', '\n',
                   'Cutoff distance: %s nm' %cutoff + '\n','\n', 'Vinyl groups terminated: %s' %terminated + '\n', '\n',
                   'Percent Completion: ' + '{:.1f}'.format(percent_completion) + ' %' + '\n', '\n',
-                  'Total Crosslinks: %s' %xlinks])
+                  'Total Crosslinks: %s' %xlinks +'\n', 'Stop on Next Iteration?: %s' %Stop_next_iter])
 
 if int(args.iteration) == 0:
     f = open('xlink.log', 'w')
@@ -1047,4 +1056,4 @@ if int(args.iteration) == 0:
                   'H_new2: %s' %H_new2 + '\n', '\n', 'Cutoff distance: %s nm' %cutoff, '\n',
                   'Vinyl groups terminated: %s' %terminated + '\n', '\n',
                   'Percent Completion: ' + '{:.1f}'.format(percent_completion) + '%' + '\n',
-                  '\n', 'Total Crosslinks: %s' %xlinks])
+                  '\n', 'Total Crosslinks: %s' %xlinks + '\n', 'Stop on Next Iteration?: %s' %Stop_next_iter])
