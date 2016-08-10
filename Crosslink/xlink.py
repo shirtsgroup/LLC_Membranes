@@ -311,7 +311,6 @@ if cutoff[0] > 0.6:
 count = 0
 for i in range(0, len(C1x)):
     if min_dist[i, 0] < cutoff:  # find distances which meet the cutoff criteria
-        print min_dist[i, 0]
         change_index1.append(i % (len(C1x)/9))  # holds the index of the atom associated with the met criteria for primary carbons (C20, C34, C48)
         change_index2.append(int(min_index[i, 0]))  # Same as above but for the secondary carbons
         count += 1

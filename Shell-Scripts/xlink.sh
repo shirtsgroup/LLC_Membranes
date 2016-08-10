@@ -2,7 +2,6 @@
 set -e
 # A script to iteratively crosslink a LLC system
 
-N_ITER=10  # number of crosslinking iterations
 CUTOFF=5  # percent of distribution that will be labeled close enough to bond
 TERM_PROB=5  # probability of termination of carbons meeting bonding criteria
 GRO='wiggle.gro'  # initial .gro file to be crosslinked
@@ -14,9 +13,8 @@ DEGREE=.9  # Degree of crosslinking
 NO_MONOMERS=480
 NO_TAILS=3
 
-while getopts "n:c:t:g:d:s:x:f:D:m:T:" opt; do
+while getopts "c:t:g:d:s:x:f:D:" opt; do
     case $opt in
-    n) N_ITER=$OPTARG;;
     c) CUTOFF=$OPTARG;;
     t) TERM_PROB=$OPTARG;;
     g) GRO=$OPTARG;;
@@ -25,16 +23,11 @@ while getopts "n:c:t:g:d:s:x:f:D:m:T:" opt; do
     x) XLINKS=$OPTARG;;
     f) FRAMES=$OPTARG;;
     D) DEGREE=$OPTARG;;
-    m) NO_MONOMERS=$OPTARG;;
-    T) TAILS=$OTPARG;;
     esac
 done
 
 ITERATION=0  # starting iteration
-TERM=0  # starting number of vinyl groups that have been terminated (both c1 and c2)
 STOP=0
-#VINYL_GRP_COND=$(echo "${DEGREE}*${NO_MONOMERS}*${NO_TAILS}" | bc)  # The number of vinyl group which must disappear for the simulation to finish
-#[ ${TERM} -lt $VINYL_GRP_COND ]
 
 Write_Input.py -x on -L ${SIM_LENGTH} -D 0.001 -f ${FRAMES} # -I cg
 
@@ -55,9 +48,19 @@ while [ ${STOP} -eq 0 ]; do
     STOP=$(tail -n 1 xlink_${ITERATION}.log | cut -c 26)
     ITERATION=$((ITERATION+1))
     echo ${TERM}
-    rm \#*  # get rid of backup files
 done
 
 xlink.py -i ${GRO} -c ${CUTOFF}  -e ${TERM_PROB} -r ${ITERATION} -d ${CUTOFF_RAD} -y crosslinked_new.itp -x ${XLINKS} -S 'yes'
 
-rm \#*
+Cleanup_Top.py  # get rid of dummy atoms in .itp and .gro
+
+find NaPore.top -type f -exec sed -i 's/crosslinked_new.itp/crosslinked.itp/g' {} \;
+
+gmx grompp -f em.mdp -p NaPore.top -c wiggle_no_dummies.gro -o em
+gmx mdrun -v -deffnm em
+gmx grompp -f wiggle.mdp -p NaPore.top -c em.gro -o wiggle
+gmx mdrun -v -deffnm wiggle
+
+mail -s "Crosslinking Done" -a xlink.log benjamin.coscia@colorado.edu <<< "The crosslinking has terminated, woo!"
+
+rm \#*  # get rid of backup files

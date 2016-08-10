@@ -11,10 +11,11 @@ RESOURCE="janus"
 # Choose which monomer to build with
 MONOMER="monomer4.pdb"  # Structure file to be used
 
-#MPI Options
+#MPI/GPU Options
 MPI="on"
 NODES=16
 NTASKS_PER_NODE=4
+GPU="off"
 
 # Energy minimization parameters:
 INTEGRATOR_EM=steep  # Integrator for energy minimization
@@ -90,8 +91,10 @@ SOLVATION="off"
 # -m  :   MPI ... Turn MPI on or off depending what Gromacs version you have compiled
 # -H  :   RESOURCE ... What HPC resource is being used
 # -a  :   NTASKS_PER_NODE ... how many tasks per node (how many MPI processes do you want on a node)
+# -G  :   GPU ... using GPU acceleration?
+# -g  :   NO_GPU ... Number of GPUs to use
 
-while getopts "n:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:s:m:H:a:" opt; do
+while getopts "n:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:s:m:H:a:G:" opt; do
     case $opt in
     n)  NODES=$OPTARG;;
     M)  MONOMER=$OPTARG;;
@@ -126,6 +129,7 @@ while getopts "n:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:s:m:H:a
     m)  MPI=$OPTARG;;
     H)  RESOURCE=$OPTARG;;
     a)  NTASKS_PER_NODE=$OPTARG;;
+    G)  GPU=$OPTARG;;
     esac
 done
 
@@ -183,7 +187,7 @@ gmx grompp -f em.mdp -c box.gro -p NaPore.top -o box_em.tpr
 if [ ${MPI} == "on" ]; then
     # Run Energy Minimization
 
-    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm box_em
+    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm box_em -ntomp 7
 
     # Extract Potential Energy from log file
     ENERGY1=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5}')
@@ -195,7 +199,7 @@ if [ ${MPI} == "on" ]; then
             YVECT1=$(echo "$YVECT + $INCREMENT" | bc -l)
             gmx editconf -f initial.gro -o box.gro -c -bt triclinic -box ${XVECT} ${YVECT} ${Z_BOX_VECTOR} -angles 90 90 120
             gmx grompp -f em.mdp -c box.gro -p NaPore.top -o box_em.tpr
-            mpirun -np ${NP} gmx_mpi mdrun -v -deffnm box_em
+            mpirun -np ${NP} gmx_mpi mdrun -v -deffnm box_em -ntomp 7
         ENERGY1=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
     done
 
@@ -205,7 +209,7 @@ if [ ${MPI} == "on" ]; then
 
     # run simulation for amount of time specified in wiggle.mdp
 
-    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm wiggle
+    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm wiggle -ntomp 7
 
     rm box_em* \#* box.gro  # remove unneeded files to reduce clutter
 
@@ -227,7 +231,7 @@ if [ ${MPI} == "on" ]; then
 
     gmx grompp -f em.mdp -c new_box.gro -p NaPore.top -o em_new_box.tpr
 
-    mpirun -np $NP gmx_mpi mdrun -v -deffnm em_new_box
+    mpirun -np $NP gmx_mpi mdrun -v -deffnm em_new_box -ntomp 7
 
     # Extract Potential energy from that minimization run. A positive value indicates that the box vectors are too small
 
@@ -239,7 +243,7 @@ if [ ${MPI} == "on" ]; then
             YVECT2=$(echo "$YVECT + $INCREMENT" | bc -l)
             gmx editconf -f wiggle.gro -o new_box.gro -c -bt triclinic -box ${XVECT} ${YVECT} ${THICKNESS} -angles 90 90 60
             gmx grompp -f em.mdp -c new_box.gro -p NaPore.top -o em_new_box.tpr
-            mpirun -np ${NP} gmx_mpi mdrun -v -deffnm em_new_box
+            mpirun -np ${NP} gmx_mpi mdrun -v -deffnm em_new_box -ntomp 7
         ENERGY2=$(cat em_new_box.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
     done
 
@@ -247,7 +251,7 @@ if [ ${MPI} == "on" ]; then
 
     gmx grompp -f wiggle.mdp -c em_new_box.gro -p NaPore.top -o Correct_box.tpr
 
-    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm Correct_box
+    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm Correct_box -ntomp 7
 
     # Now solvate the box
 
@@ -258,13 +262,13 @@ if [ ${MPI} == "on" ]; then
 
     gmx grompp -f em.mdp -c water.gro -p NaPore_water.top -o water_em.tpr
 
-    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm water_em
+    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm water_em -ntomp 7
 
     # Now run the actual simulation
 
     gmx grompp -f wiggle_solv.mdp -c water_em.gro -p NaPore_water.top -o water_wiggle.tpr
 
-    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm water_wiggle
+    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm water_wiggle -ntomp 7
 else
     # This does the same thing as the first part of the if statement except gmx is run in place of gmx_mpi
     # Run Energy Minimization
