@@ -28,6 +28,7 @@ parser.add_argument('-r', '--iteration', default=1, help='Iteration number of cr
 parser.add_argument('-d', '--cutoff_rad', default=10, help='Cutoff Distance for radical reaction')
 parser.add_argument('-x', '--xlinks', default=0, help='Total number of c1-c2 crosslinks')
 parser.add_argument('-S', '--stop', default='no', help='Is crosslinking reaction finished')
+parser.add_argument('-m', '--monomer', default='monomer2', help='Which monomer was the structure built with')
 
 args = parser.parse_args()
 
@@ -502,7 +503,7 @@ if int(args.iteration) == 0:
     location = os.environ['GITHUB']  # if there is an error here, you need to add the path to where all of the github
     # files are stored to an environment variable in your .bashrc
     with open("crosslinked.itp", "w+") as output:
-        subprocess.call(["python", "%s/Structure-Files/Assembly_itp.py" %location, "-x", "on"], stdout=output);
+        subprocess.call(["python", "%s/Structure-Files/Assembly_itp.py" %location, "-x", "on", "-m", "%s" %args.monomer], stdout=output);
 
     # open and read that new file
 
@@ -686,27 +687,27 @@ count = 0
 for i in range(atoms_index + 2, atoms_count):
     res_num = int(b[i][0:5])
     if res_num in c1:  # change bonding carbon 1 from c2 to c3 since it becomes sp3 hybridized
-        b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+        b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + ' ;T' + '\n'
     if res_num in other_c1:  # The c1 on the same tail as the bonding c2 is now sp3 hybridized
-        b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+        b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + ' ;T' + '\n'
     if res_num in c2:  # the bonding c2 becomes sp3 hybridized
         if b[i][5:10].count('ce') == 1:
-            b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+            b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + ' ;T' + '\n'
         if b[i][5:10].count('c2') == 1:
-            b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+            b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + ' ;T' + '\n'
     if res_num in term:  # the terminating c2 (where the termination actually happens) becomes sp3 hybridized
-        b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'  # if it doesn't find the string to replace it does nothing
+        b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + ' ;T' + '\n'  # if it doesn't find the string to replace it does nothing
     if res_num in H_new1:  # Dummy atoms become real during the bonding process and have mass
         b[i] = b[i][0:5] + b[i][5:15].replace('hc_d', 'hc  ') + b[i][15:53] + b[i][53:61].replace('0.00000', '1.00800') + b[i][61:len(b[atoms_index + 2])]
     if res_num in H_new2:  # Dummy atoms which become real during the termination process and have mass
         b[i] = b[i][0:5] + b[i][5:15].replace('hc_d', 'hc  ') + b[i][15:53] + b[i][53:61].replace('0.00000', '1.00800') + b[i][61:len(b[atoms_index + 2])]
     if res_num in radical_c2:  # mark the c2 atoms that are now radicals. They remain sp2 hybridized but are reactive
-        b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c2') + b[i][10:len(b[atoms_index + 2]) - 1] + '*' + '\n'
+        b[i] = b[i][0:5] + b[i][5:10].replace('ce', 'c2') + b[i][10:len(b[atoms_index + 2]) - 1] + ' ;*' + '\n'
     if res_num in term_c1:  # c1 in a terminating chain will be sp3
-        b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+        b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + ' ;T' + '\n'
     if int(args.iteration) != 0:
         if res_num in c2_rad_ndx or res_num in c1_rad_ndx or res_num in term or res_num in reactive_c2_term or res_num in term_rad_c2:
-            b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + 'T' + '\n'
+            b[i] = b[i][0:5] + b[i][5:10].replace('c2', 'c3') + b[i][10:len(b[atoms_index + 2]) - 1] + ' ;T' + '\n'
         if res_num in H_new3:
             b[i] = b[i][0:5] + b[i][5:15].replace('hc_d', 'hc  ') + b[i][15:53] + b[i][53:61].replace('0.00000', '1.00800') + b[i][61:len(b[atoms_index + 2])]
 

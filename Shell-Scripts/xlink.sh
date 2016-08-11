@@ -12,8 +12,9 @@ FRAMES=50
 DEGREE=.9  # Degree of crosslinking
 NO_MONOMERS=480
 NO_TAILS=3
+MONOMER="monomer2"
 
-while getopts "c:t:g:d:s:x:f:D:" opt; do
+while getopts "c:t:g:d:s:x:f:m" opt; do
     case $opt in
     c) CUTOFF=$OPTARG;;
     t) TERM_PROB=$OPTARG;;
@@ -22,7 +23,7 @@ while getopts "c:t:g:d:s:x:f:D:" opt; do
     s) SIM_LENGTH=$OPTARG;;
     x) XLINKS=$OPTARG;;
     f) FRAMES=$OPTARG;;
-    D) DEGREE=$OPTARG;;
+    m) MONOMER=$OPTARG;;
     esac
 done
 
@@ -33,7 +34,7 @@ Write_Input.py -x on -L ${SIM_LENGTH} -D 0.001 -f ${FRAMES} # -I cg
 
 while [ ${STOP} -eq 0 ]; do
     if [ ${ITERATION} == 0 ]; then
-        xlink.py -i ${GRO} -c ${CUTOFF}  -e ${TERM_PROB} -r ${ITERATION} -d ${CUTOFF_RAD} -x ${XLINKS}
+        xlink.py -i ${GRO} -c ${CUTOFF}  -e ${TERM_PROB} -r ${ITERATION} -d ${CUTOFF_RAD} -x ${XLINKS} -m ${MONOMER}
     else
         xlink.py -i ${GRO} -c ${CUTOFF}  -e ${TERM_PROB} -r ${ITERATION} -d ${CUTOFF_RAD} -y crosslinked_new.itp -x ${XLINKS}
     fi

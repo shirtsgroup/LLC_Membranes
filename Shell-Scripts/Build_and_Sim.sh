@@ -140,11 +140,11 @@ Z_BOX_VECTOR=$((LAYERS+5)) # kind of arbitrary but should work
 MOL_LLC=$((NO_MONOMERS*NOPORES*LAYERS))  # For topology
 MOL_NA=$((NO_MONOMERS*NOPORES*LAYERS))
 
-if [ RESOURCE=='janus' ]; then
+if [ ${RESOURCE}=='janus' ]; then
     NP=$((NODES*2))
 fi
 
-if [ RESOURCE=='bridges' ]; then
+if [ ${RESOURCE}=='bridges' ]; then
     NP=$((NTASKS_PER_NODE*NODES))
 else
     echo "Specify a valid resource"
