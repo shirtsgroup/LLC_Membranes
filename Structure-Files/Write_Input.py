@@ -49,7 +49,7 @@ if monomer == 'HII':
     if args.xlink == 'on':
         mon_top='#include "%s/crosslinked_new.itp"' %os.getcwd()
     else:
-        mon_top = '#include "%s/Monomer_Tops/HII_mon.itp' %location
+        mon_top = '#include "%s/Monomer_Tops/%s.itp' %(location, args.mon_no)
 elif monomer == 'BCC':
     grps = ['BCC', 'BR']
     grps_solv = ['BCC', 'BR', 'SOL']

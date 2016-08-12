@@ -15,7 +15,7 @@ MPI="on"
 NODES=16
 
 # Choose which monomer to build with
-MONOMER='monomer4.pdb'  # Structure file to be used
+MONOMER='monomer2'  # Structure file to be used
 # Energy minimization parameters:
 INTEGRATOR_EM=steep  # Integrator for energy minimization
 NSTEPS_EM=50000  # Maximum number of steps to take for energy minimization
