@@ -167,7 +167,7 @@ if [ ${RESOURCE} == 'bridges' ]; then
     echo '#!/bin/bash' > Run_Job.sh
     echo '' >> Run_Job.sh
     if [ ${GPU} == 'on' ]; then
-        echo "#SBATCH -p ${QOS} --gres:gpu:${NO_GPU}" >> Run_Job.sh
+        echo "#SBATCH -p ${QOS} --gres=gpu:${NO_GPU}" >> Run_Job.sh
     fi
     echo '#SBATCH --nodes' ${NODES} >> Run_Job.sh
     echo '#SBATCH --ntasks-per-node' ${NTASKS_PER_NODE} >> Run_Job.sh

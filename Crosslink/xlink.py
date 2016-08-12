@@ -41,17 +41,8 @@ for line in f:
     a.append(line)
     lines += 1  # count number of lines in the file
 
-lines_of_text = 0  # find the number of lines of irrelevant text at the top of the file
-for i in range(0, len(a)):
-    if a[i].count('1LLC') == 0:
-        lines_of_text += 1
-    if a[i].count('1LLC') == 1:
-        break
-
 if args.type == 'LLC':
     atoms = 143  # not including sodium but including dummy atoms
-    atoms_list = ['O5', 'O6', 'O7', '08', 'O9', 'C32', 'C18', 'C46', 'C33', 'C19', 'C47', 'C34', 'C20', 'C47', 'H49',
-                  'H24', 'H74', 'H50', 'H25', 'H75', 'H51', 'H26', 'H76']
     c1_atoms = ['C20', 'C34', 'C48']
     c2_atoms = ['C19', 'C33', 'C47']
     topology = 'HII_mon.itp'
@@ -93,7 +84,7 @@ x1 = float(a[len(a) - 1][0:10])   # x box vector
 y1 = float(a[len(a) - 1][10:20])  # component one of y box vector
 y2 = float(a[len(a) - 1][50:60])  # component two of y box vector
 
-# Visualize pbc's like this for the following calculations:
+# """ Visualize pbc's like this for the following calculations:
 #  ___________________________
 #  \        \        \        \
 #   \   I    \   II   \  III   \
@@ -105,7 +96,7 @@ y2 = float(a[len(a) - 1][50:60])  # component two of y box vector
 #         \   VI   \  VII   \  VIII  \
 #          \________\________\________\
 #
-# We will use x1, y1 and y2 to make copies of the coordinates in the 'Main' box into each of the labeled boxes
+# We will use x1, y1 and y2 to make copies of the coordinates in the 'Main' box into each of the labeled boxes """
 
 # Define lists to hold translated coordinates
 # Lists will be of the format [C1x C1y C1z C2x C2y C2z]
@@ -664,10 +655,8 @@ while b[atoms_index].count('[ atoms ]') == 0:
     atoms_index += 1
 
 atoms_count = atoms_index + 2
-nr = 0  # number of lines in 'atoms' section
 while b[atoms_count] != '\n':
     atoms_count += 1  # increments the while loop
-    nr += 1  # counts number of atoms
 
 if c1 == [] and c2 == [] and other_c1 == [] and radical_c2 == [] and c1_rad_ndx == [] and c2_rad_ndx == [] and H_new1 == []:
     Stop_next_iter = 1  # finish this iteration, then next time the system will be completely terminated
@@ -859,7 +848,6 @@ angles_index = 0  # find index where [ angles ] section begins
 while b[angles_index].count('[ angles ]') == 0:
     angles_index += 1
 
-na = 0  # number of lines in the 'angles' section
 angle_count = angles_index + 2  # keep track of index of a
 angles_prev = []
 while b[angle_count] != '\n':
@@ -868,7 +856,6 @@ while b[angle_count] != '\n':
     c_a = int(b[angle_count][13:20])
     if a_a not in leftovers and b_a not in leftovers and c_a not in leftovers:
         angles_prev.append([a_a, b_a, c_a])
-        na += 1
     angle_count += 1
 
 # Eliminate duplicates in the entire angles list
@@ -897,7 +884,6 @@ dihedrals_p_index = 0  # find index where [ dihedrals ] section begins (propers)
 while b[dihedrals_p_index].count('[ dihedrals ] ; propers') == 0:
     dihedrals_p_index += 1
 
-ndp = 0  # number of lines in the 'dihedrals ; proper' section
 dihedrals_p_count = dihedrals_p_index + 2  # keep track of index of a
 dihedrals_prev = []
 while b[dihedrals_p_count] != '\n':
@@ -907,7 +893,6 @@ while b[dihedrals_p_count] != '\n':
     d_d = int(b[dihedrals_p_count][20:27])
     if a_d not in leftovers and b_d not in leftovers and c_d not in leftovers and d_d not in leftovers:
         dihedrals_prev.append([a_d, b_d, c_d, d_d])
-        ndp += 1
     dihedrals_p_count += 1
 
 # Eliminate duplicates in entire dihedrals list
@@ -982,12 +967,10 @@ vsite_index = 0  # find index where [ virtual_sites4 ] section begins (propers)
 while b[vsite_index].count('[ virtual_sites4 ]') == 0:
     vsite_index += 1
 
-nv = 0
 vsite_count = vsite_index + 2
 
 for i in range(vsite_count, len(b)):  # This is the last section in the input .itp file
     vsite_count += 1
-    nv += 1
 
 # we need to make a new list of virtual sites that does not include in the sites which have been turned to real atoms
 # term and H_new1 contain the indices of the hydrogens which need to be removed from the virtual sites list

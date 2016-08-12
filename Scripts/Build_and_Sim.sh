@@ -137,8 +137,6 @@ done
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # Directory where this script is located
 Z_BOX_VECTOR=$((LAYERS+5)) # kind of arbitrary but should work
-#MOL_LLC=$((NO_MONOMERS*NOPORES*LAYERS))  # For topology
-#MOL_NA=$((NO_MONOMERS*NOPORES*LAYERS))
 
 if [ ${RESOURCE}=='janus' ]; then
     NP=$((NODES*2))
@@ -152,24 +150,9 @@ else
     echo "i.e. don't type Janus or Bridges or you might get this message"
 fi
 
-## Copy in necessary files and edit input files
-#
-#if [ ${SOLVATION} == "on" ]; then
-#    ifs.sh
-#    #NaPore_water.top
-#    sed -i -e "s/MOL_LLC/${MOL_LLC}/g" NaPore_water.top
-#    sed -i -e "s/MOL_NA/${MOL_NA}/g" NaPore_water.top
-#else
-#    ifv.sh
-#fi
-#
-## NaPore.top
-#sed -i -e "s/MOL_LLC/${MOL_LLC}/g" NaPore.top
-#sed -i -e "s/MOL_NA/${MOL_NA}/g" NaPore.top
-
 # Write input files and Build Structure Based on user-defined inputs
 
-python ${DIR}/../Structure-Files/Write_Input.py -C ${CUTOFF_MD} -i ${INTEGRATOR_MD} -D ${DT} -v ${TCOUPL} -K ${REF_T} -b ${PCOUPL}\
+python ${DIR}/Write_Input.py -C ${CUTOFF_MD} -i ${INTEGRATOR_MD} -D ${DT} -v ${TCOUPL} -K ${REF_T} -b ${PCOUPL}\
     -Y ${PTYPE} -B ${REF_P} -R ${COMPRESSIBILITY} -Z ${PBC} -L ${SIM_LENGTH} -I ${INTEGRATOR_EM} -S ${NSTEPS_EM}\
     -c ${CUTOFF_EM} -f ${FRAMES} -s ${SOLVATION} -V ${SOLV_LENGTH} -o ${NO_MONOMERS} -l ${LAYERS} -P ${NOPORES} -M ${MONOMER}
 
@@ -194,9 +177,9 @@ if [ ${MPI} == "on" ]; then
 
     # If the potential energy is positive, then the box vector is incremented by a fixed amount until the energy comes out negative
 
-    while [ $(echo " $ENERGY1 > 0" | bc) -eq 1 ]; do
-            XVECT1=$(echo "$XVECT + $INCREMENT" | bc -l)
-            YVECT1=$(echo "$YVECT + $INCREMENT" | bc -l)
+    while [ $(echo " ${ENERGY1} > 0" | bc) -eq 1 ]; do
+            XVECT1=$(echo "${XVECT} + ${INCREMENT}" | bc -l)
+            YVECT1=$(echo "${YVECT} + ${INCREMENT}" | bc -l)
             gmx editconf -f initial.gro -o box.gro -c -bt triclinic -box ${XVECT} ${YVECT} ${Z_BOX_VECTOR} -angles 90 90 120
             gmx grompp -f em.mdp -c box.gro -p NaPore.top -o box_em.tpr
             mpirun -np ${NP} gmx_mpi mdrun -v -deffnm box_em -ntomp 7
@@ -221,7 +204,7 @@ if [ ${MPI} == "on" ]; then
 
     INPUT_VAC_FILE=wiggle.gro
 
-    THICKNESS=$(python /${DIR}/../Data-Analysis/Thickness_Bash.py -i $INPUT_VAC_FILE -w $WATER_LAYER)
+    THICKNESS=$(python /${DIR}/../Data-Analysis/Thickness_Bash.py -i ${INPUT_VAC_FILE} -w ${WATER_LAYER})
 
     # Edit box to correct dimensions (i.e. so there is room for the specified amount of water)
 
@@ -238,9 +221,9 @@ if [ ${MPI} == "on" ]; then
     ENERGY2=$(cat em_new_box.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
     # if the potential energy is positive, then the box vector is increased by a defined increment until the energy is negative after energy minimzation
 
-    while [ $(echo "  $ENERGY2 > 0" | bc) -eq 1 ]; do
-            XVECT2=$(echo "$XVECT + $INCREMENT" | bc -l)
-            YVECT2=$(echo "$YVECT + $INCREMENT" | bc -l)
+    while [ $(echo "  ${ENERGY2} > 0" | bc) -eq 1 ]; do
+            XVECT2=$(echo "${XVECT} + ${INCREMENT}" | bc -l)
+            YVECT2=$(echo "${YVECT} + ${INCREMENT}" | bc -l)
             gmx editconf -f wiggle.gro -o new_box.gro -c -bt triclinic -box ${XVECT} ${YVECT} ${THICKNESS} -angles 90 90 60
             gmx grompp -f em.mdp -c new_box.gro -p NaPore.top -o em_new_box.tpr
             mpirun -np ${NP} gmx_mpi mdrun -v -deffnm em_new_box -ntomp 7

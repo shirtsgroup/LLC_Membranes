@@ -5,7 +5,6 @@
 FILE1='wiggle.tpr'
 FILE2='wiggle.trr'
 FILE3='initial.gro'
-#FILE4='wiggle.gro'
 PATH2FILE='/projects/beco4952/Gromacs/Pores'
 RESOURCE='bridges'
 NO_MONOMERS=6
@@ -38,10 +37,11 @@ if [ ${RESOURCE} == 'bridges' ]; then
 fi
 
 if [ ${RESOURCE} == 'janus' ]; then
-    scp beco4952@login.rc.colorado.edu:$PATH2FILE/\{$FILE1,$FILE2,$FILE3,$FILE4\} ./
+    scp beco4952@login.rc.colorado.edu:$PATH2FILE/\{$FILE1,$FILE2,$FILE3\} ./
     #scp beco4952@login.rc.colorado.edu:$PATH/\{$FILE1,$FILE2\} ./ # copy files to directory this script is run in
 
     echo "0" | gmx trjconv -f $FILE2 -s $FILE1 -o wiggle_traj.gro  # The zero answers the first prompt given by trjconv. It
     # corresponds to doing a conversion of the entire system. Delete echo and the pipe to see the other options.
 fi
-Cylindricity_Traj.py -i wiggle_traj.gro -n ${NO_MONOMERS}
+#Cylindricity_Traj.py -i wiggle_traj.gro -n ${NO_MONOMERS}
+Cylindricity.py -i wiggle_traj.gro -n ${NO_MONOMERS}
