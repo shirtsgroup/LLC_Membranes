@@ -137,8 +137,8 @@ done
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # Directory where this script is located
 Z_BOX_VECTOR=$((LAYERS+5)) # kind of arbitrary but should work
-MOL_LLC=$((NO_MONOMERS*NOPORES*LAYERS))  # For topology
-MOL_NA=$((NO_MONOMERS*NOPORES*LAYERS))
+#MOL_LLC=$((NO_MONOMERS*NOPORES*LAYERS))  # For topology
+#MOL_NA=$((NO_MONOMERS*NOPORES*LAYERS))
 
 if [ ${RESOURCE}=='janus' ]; then
     NP=$((NODES*2))
@@ -152,22 +152,22 @@ else
     echo "i.e. don't type Janus or Bridges or you might get this message"
 fi
 
-# Copy in necessary files and edit input files
+## Copy in necessary files and edit input files
+#
+#if [ ${SOLVATION} == "on" ]; then
+#    ifs.sh
+#    #NaPore_water.top
+#    sed -i -e "s/MOL_LLC/${MOL_LLC}/g" NaPore_water.top
+#    sed -i -e "s/MOL_NA/${MOL_NA}/g" NaPore_water.top
+#else
+#    ifv.sh
+#fi
+#
+## NaPore.top
+#sed -i -e "s/MOL_LLC/${MOL_LLC}/g" NaPore.top
+#sed -i -e "s/MOL_NA/${MOL_NA}/g" NaPore.top
 
-if [ ${SOLVATION} == "on" ]; then
-    ifs.sh
-    #NaPore_water.top
-    sed -i -e "s/MOL_LLC/${MOL_LLC}/g" NaPore_water.top
-    sed -i -e "s/MOL_NA/${MOL_NA}/g" NaPore_water.top
-else
-    ifv.sh
-fi
-
-# NaPore.top
-sed -i -e "s/MOL_LLC/${MOL_LLC}/g" NaPore.top
-sed -i -e "s/MOL_NA/${MOL_NA}/g" NaPore.top
-
-# Build Structure Based on user-defined inputs
+# Write input files and Build Structure Based on user-defined inputs
 
 python ${DIR}/../Structure-Files/Write_Input.py -C ${CUTOFF_MD} -i ${INTEGRATOR_MD} -D ${DT} -v ${TCOUPL} -K ${REF_T} -b ${PCOUPL}\
     -Y ${PTYPE} -B ${REF_P} -R ${COMPRESSIBILITY} -Z ${PBC} -L ${SIM_LENGTH} -I ${INTEGRATOR_EM} -S ${NSTEPS_EM}\
