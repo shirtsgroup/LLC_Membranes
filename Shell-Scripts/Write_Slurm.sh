@@ -10,9 +10,11 @@ RESOURCE='janus'
 QOS='janus'  # Quality of Service
 NTASKS_PER_NODE=1
 
-#MPI Options
+#MPI/GPU Options
 MPI="on"
 NODES=16
+GPU="off"
+NO_GPU=1
 
 # Choose which monomer to build with
 MONOMER='monomer2'  # Structure file to be used
@@ -95,7 +97,7 @@ SOLVATION="off"
 # -H  :   RESOURCE ... Which machine is being using
 
 
-while getopts "h:m:s:n:q:N:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:W:H:" opt; do
+while getopts "h:m:s:n:q:N:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z:V:W:H:G:g:" opt; do
     case $opt in
     h)  SIM_LENGTH_HOURS=$OPTARG;;
     m)  SIM_LENGTH_MIN=$OPTARG;;
@@ -133,6 +135,8 @@ while getopts "h:m:s:n:q:N:M:I:S:c:t:o:r:p:P:w:l:x:y:e:T:C:i:D:L:f:v:K:b:Y:B:R:Z
     V)  SOLV_LENGTH=$OPTARG;;
     W)  SOLVATION=$OPTARG;;
     H)  RESOURCE=$OPTARG;;
+    G)  GPU=$OPTARG;;
+    g)  NO_GPU=$OPTARG;;
     esac
 done
 
@@ -162,6 +166,9 @@ if [ ${RESOURCE} == 'bridges' ]; then
     NP=$((NTASKS_PER_NODE*NODES))
     echo '#!/bin/bash' > Run_Job.sh
     echo '' >> Run_Job.sh
+    if [ ${GPU} == 'on' ]; then
+        echo '#SBATCH -p ${QOS} --gres:gpu:${NO_GPU}' >> Run_Job.sh
+    fi
     echo '#SBATCH --nodes' ${NODES} >> Run_Job.sh
     echo '#SBATCH --ntasks-per-node' ${NTASKS_PER_NODE} >> Run_Job.sh
     echo '#SBATCH --time' ${SIM_LENGTH_HOURS}:${SIM_LENGTH_MIN}:${SIM_LENGTH_SEC} >> Run_Job.sh
