@@ -1,0 +1,25 @@
+HEADER    NONAME 17-Jun-16                                              NONE   1
+TITLE                                                                   NONE   2
+AUTHOR    Apache                                                        NONE   3
+REVDAT   1  17-Jun-16     0                                             NONE   4
+ATOM      1  O   GLC     0       2.413   0.083  -0.302  0.00  0.00           O+0
+ATOM      2  C   GLC     0       1.249   0.664   0.290  0.00  0.00           C+0
+ATOM      3  C1   GLC    0       0.000  -0.038  -0.246  0.00  0.00           C+0
+ATOM      4  O1   GLC    0      -0.000  -1.402   0.180  0.00  0.00           O+0
+ATOM      5  C2   GLC    0      -1.249   0.664   0.290  0.00  0.00           C+0
+ATOM      6  O2   GLC    0      -2.413   0.083  -0.302  0.00  0.00           O+0
+ATOM      7  H   GLC     0       3.176   0.553   0.062  0.00  0.00           H+0
+ATOM      8  H1   GLC    0       1.295   0.547   1.372  0.00  0.00           H+0
+ATOM      9  H2   GLC    0       1.206   1.724   0.040  0.00  0.00           H+0
+ATOM     10  H3   GLC    0       0.000   0.002  -1.336  0.00  0.00           H+0
+ATOM     11  H4   GLC    0      -0.000  -1.392   1.147  0.00  0.00           H+0
+ATOM     12  H5   GLC    0      -1.295   0.547   1.372  0.00  0.00           H+0
+ATOM     13  H6   GLC    0      -1.206   1.724   0.040  0.00  0.00           H+0
+ATOM     14  H7   GLC    0      -3.176   0.553   0.062  0.00  0.00           H+0
+CONECT    1    2    7    0    0                                         NONE  19
+CONECT    2    1    3    8    9                                         NONE  20
+CONECT    3    2    4    5   10                                         NONE  21
+CONECT    4    3   11    0    0                                         NONE  22
+CONECT    5    3    6   12   13                                         NONE  23
+CONECT    6    5   14    0    0                                         NONE  24
+END                                                                     NONE  25

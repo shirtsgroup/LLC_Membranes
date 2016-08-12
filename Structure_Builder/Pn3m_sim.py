@@ -10,8 +10,8 @@ print 'This is a .gro file'
       # The top and bottom layers of the inner ring have 1 monomer (404)
       # Radius of inner ring has been expanded by half the length of a single monomer's tail (194)
       # Junctions are extra spread (617)
-      # Dist_periodic is set to 0, which is better than 5 at low no_layers
-      # Pore width has been expanded to 15 from 12
+      # Dist_periodic is set to 2.5, which is better than 5 at low no_layers
+      # Pore width has been expanded to 17 from 12
                 # Not done: The inner ring is still perpendicular to the parabola
                 # Inner ring still has parabolic curve
 
@@ -25,10 +25,10 @@ parser = argparse.ArgumentParser(description = 'Build BCC Structure')
 parser.add_argument('-i', '--input', default = 'monomer58.pdb', help = 'Path to input file')
 parser.add_argument('-l', '--layers', default = 10, type = int, help = 'Number of Layers')
 parser.add_argument('-mi', '--monomers_inner', default = 4, type = int, help = 'Number of monomers in inner ring at limiting radius')
-parser.add_argument('-mo', '--monomers_outer', default = 10, type = int, help = 'Number of monomers in outer ring at limiting radius')
-parser.add_argument('-w', '--pore_width', default = 15, type = float, help = 'Pore width')
+parser.add_argument('-mo', '--monomers_outer', default = 12, type = int, help = 'Number of monomers in outer ring at limiting radius')
+parser.add_argument('-w', '--pore_width', default = 17, type = float, help = 'Pore width')
 parser.add_argument('-d', '--dist', default = 10, type = float, help = 'Distance between layers')
-parser.add_argument('-p', '--dist_periodic', default = 0, type = float, help = 'Negative distance between periodic boundary conditions')
+parser.add_argument('-p', '--dist_periodic', default = 2.5, type = float, help = 'Negative distance between periodic boundary conditions')
 args = parser.parse_args()
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -619,9 +619,9 @@ def transhalf(positions):
     ysum = 0
     zsum = 0
     for i in range(0, len(positions[3])):
-        xsum = xsum + (positions[3][i][24][0] + positions[3][i][25][0])/2.0 + (positions[4][i][24][0] + positions[4][i][25][0] - (positions[3][i][24][0] + positions[3][i][25][0]))/3.0
-        ysum = ysum + (positions[3][i][24][1] + positions[3][i][25][1])/2.0 + (positions[4][i][24][1] + positions[4][i][25][1] - (positions[3][i][24][1] + positions[3][i][25][1]))/3.0
-        zsum = zsum + (positions[3][i][24][2] + positions[3][i][25][2])/2.0 + (positions[4][i][24][2] + positions[4][i][25][2] - (positions[3][i][24][2] + positions[3][i][25][2]))/3.0
+        xsum = xsum + (positions[3][i][24][0] + positions[3][i][25][0])/2.0 + (positions[4][i][24][0] + positions[4][i][25][0] - (positions[3][i][24][0] + positions[3][i][25][0]))/2.0
+        ysum = ysum + (positions[3][i][24][1] + positions[3][i][25][1])/2.0 + (positions[4][i][24][1] + positions[4][i][25][1] - (positions[3][i][24][1] + positions[3][i][25][1]))/2.0
+        zsum = zsum + (positions[3][i][24][2] + positions[3][i][25][2])/2.0 + (positions[4][i][24][2] + positions[4][i][25][2] - (positions[3][i][24][2] + positions[3][i][25][2]))/2.0
     xtrans = xsum/float(len(positions[3]))
     ytrans = ysum/float(len(positions[3]))
     ztrans = zsum/float(len(positions[3]))

@@ -1,0 +1,6 @@
+:Energy Minimization
+integrator               = cg
+nsteps                   = 500000
+cutoff-scheme = verlet
+nstlist = 10
+
