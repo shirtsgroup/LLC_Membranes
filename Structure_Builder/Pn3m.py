@@ -1,7 +1,7 @@
 # This script creates the BCC Pn3m phase.
 # Author: Norma Langdon
 
-# Last edit (07/25/16): The inner arms were made longer so that they meet, like the outer arms.
+# Last edit (08/12/16): Inserted glycerol between the inner and outer ring
 print 'This is a .gro file'
 
 #NOTES: Perpendicularization of the outer layer is set to half the normal, not the full <-- Check
@@ -36,10 +36,10 @@ dist = args.dist
 dist_periodic = args.dist_periodic
 name = 'MOL'
 no_ions = 2
-
 # The inner arms are longer than the outer arms, so that they will connect at the junctions.
 no_layers_inner = no_layers + 2
 
+# Imports location information about the monomer
 read = []
 for line in fileopen:
     read.append(line)
@@ -51,8 +51,7 @@ for i in range(0, len(read)):     # Counts the number of text lines at the top o
         break
 no_atoms = 0
 for i in range(0, len(read)):
-    no_atoms += read[i].count('ATOM')     # Counts the number of non-text lines in the .pdb file to find the number of
-                                          # atoms in the monomers
+    no_atoms += read[i].count('ATOM')     # Counts the number of non-text lines in the .pdb file to find the number of atoms in the monomers
 x_values_inp = []  # list to hold input values of x stored from .pdb file
 y_values_inp = []  # list to hold input values of y stored from .pdb file
 z_values_inp = []  # list to hold input values of z stored from .pdb file
@@ -65,6 +64,26 @@ for i in range(lines_of_text, lines_of_text + no_atoms): # Searches the non-text
     positions_inp.append([x_values_inp[i - lines_of_text], y_values_inp[i - lines_of_text], z_values_inp[i - lines_of_text]])
     identity.append(read[i][12:16])  # hold name of atom (C, N, H or BR)
 
+# Imports location information about glycerol
+read2 = []
+fileopen2 = open("../BCC_Monomer_Configurations/gly_box_em1.gro", "r")
+for line in fileopen2:
+    read2.append(line)
+x_gly = []; y_gly = []; z_gly = []; positions_inp_gly = []; identity_gly = []
+for i in range(0, len(read2)):
+    x_gly.append(float(read2[i][20:28]))
+    y_gly.append(float(read2[i][28:36]))
+    z_gly.append(float(read2[i][36:44]))
+    positions_inp_gly.append([x_gly[i], y_gly[i], z_gly[i]])
+    identity_gly.append(read2[i][12:16])
+name_GLC = 'GLC'
+x_ave_sum_gly = 0; y_ave_sum_gly = 0; z_ave_sum_gly = 0; divisor = 0
+for i in range(0, len(positions_inp_gly)):
+    x_ave_sum_gly = x_ave_sum_gly + positions_inp_gly[i][0]
+    y_ave_sum_gly = y_ave_sum_gly + positions_inp_gly[i][1]
+    z_ave_sum_gly = z_ave_sum_gly + positions_inp_gly[i][2]
+    divisor += 1
+x_ave_gly = x_ave_sum_gly/float(divisor); y_ave_gly = y_ave_sum_gly/float(divisor); z_ave_gly = z_ave_sum_gly/float(divisor)
 
 # This next section defines a plane through the monomer and rotates the monomer to align with the xy-plane.
 # The plane is defined by three points. The points are locations: N1, N2 and the average of C22 and C23, respectively.
@@ -91,7 +110,6 @@ vector13 = [float(plane_x[2]-plane_x[0]), float(plane_y[2]-plane_y[0]), float(pl
 normalvector = np.cross(vector12, vector13)
 # Since we want the plane of the monomer to be the xy-plane, we want the vector normal to the plane to be the z-axis.
 normalvector_desired = [0, 0, 1]
-
 rotation_to_xy = np.cross(normalvector, normalvector_desired)
 # Rotation angle
 theta = math.acos(np.dot(normalvector, normalvector_desired)/(np.linalg.norm(normalvector)*np.linalg.norm(normalvector_desired)))
@@ -117,7 +135,6 @@ for i in range(0, no_atoms):
     positions_inp[i] = [x[0], x[1], x[2]]
 # Now the monomer is in line with the xy-plane.
 
-
 # This section will move the monomer to the origin. The average of the locations of C22 and C23 will be translated to the origin.
 # Find the location of that center point:
 x_center = (positions_inp[24][0] + positions_inp[25][0])/2.0
@@ -131,7 +148,6 @@ for i in range(0, no_atoms):
     positions_inp[i].append(1)
     x = np.dot(translation_to_origin, np.array(positions_inp[i]))
     positions_inp[i] = [x[0, 0], x[0, 1], x[0, 2]]
-
 
 # This section will rotate the monomer so that it is along the x-axis. The locations of all the atoms are found and averaged.
 # Then a line is drawn between that and the center point. The angle between that line and the x-axis is found, and the
@@ -149,15 +165,28 @@ pt_average = [x_average, y_average, z_average]
 slope_monomer = pt_average[1]/pt_average[0]
 slope_xaxis = 0
 
+def Rot_y(theta):
+    Rotmatrix_y = np.zeros((3, 3))
+    Rotmatrix_y[0, 0] = math.cos(theta)
+    Rotmatrix_y[2, 0] = -math.sin(theta)
+    Rotmatrix_y[1, 1] = 1
+    Rotmatrix_y[0, 2] = math.sin(theta)
+    Rotmatrix_y[2, 2] = math.cos(theta)
+    return Rotmatrix_y
+def Rot_z(theta):
+    Rotmatrix_z = np.zeros((3, 3))
+    Rotmatrix_z[0, 0] = math.cos(theta)
+    Rotmatrix_z[1, 0] = math.sin(theta)
+    Rotmatrix_z[0, 1] = -math.sin(theta)
+    Rotmatrix_z[1, 1] = math.cos(theta)
+    Rotmatrix_z[2, 2] = 1
+    return Rotmatrix_z
+
+
 theta = -math.atan(slope_monomer) # Angle between lines
+Rot_to_xaxis = Rot_z(theta)
 for i in range(0, no_atoms):
     x = np.array(positions_inp[i])
-    Rot_to_xaxis = np.zeros((3, 3))
-    Rot_to_xaxis[0, 0] = math.cos(theta)
-    Rot_to_xaxis[1, 0] = math.sin(theta)
-    Rot_to_xaxis[0, 1] = -math.sin(theta)
-    Rot_to_xaxis[1, 1] = math.cos(theta)
-    Rot_to_xaxis[2, 2] = 1
     rotation_to_xaxis = np.dot(Rot_to_xaxis, x)
     positions_inp[i] = [float(rotation_to_xaxis[0]), float(rotation_to_xaxis[1]), float(rotation_to_xaxis[2])]
 # Now the monomer is along the x-axis.
@@ -169,7 +198,6 @@ if abs(pt_average[1]) > 0.001:
     print 'error with rotation to x-axis (line 157)'
     sys.exit()
 pt_average = [pt_average[0], 0, pt_average[2]]
-
 
 # The next section works exclusively on the inner ring, the ring inside of the pore. The length of the monomer will be
 # determined. The monomer will be translated so that it is the correct radius and its tail is facing the origin. Then,
@@ -341,15 +369,10 @@ for i in range(0, no_layers_inner):
     positions_perp_inner.append([])
     normal = -inner_dxdzlist[i]
     theta = -math.atan(normal)
+    Rot_perp = Rot_y(theta)
     for j in range(0, no_atoms):
         positions_perp_inner[i].append([])
         x = np.array(positions_inner[i][j])
-        Rot_perp = np.zeros((3,3))
-        Rot_perp[0, 0] = math.cos(theta)
-        Rot_perp[2, 0] = -math.sin(theta)
-        Rot_perp[1, 1] = 1
-        Rot_perp[0, 2] = math.sin(theta)
-        Rot_perp[2, 2] = math.cos(theta)
         rotation_perp = np.dot(Rot_perp, x)
         positions_perp_inner[i][j] = [float(rotation_perp[0]), float(rotation_perp[1]), float(rotation_perp[2])]
 # The rotation matrix will end up translating, not only rotating, the monomers. When the above rotation matrix is run,
@@ -386,12 +409,7 @@ for i in range(0, no_layers_inner):
         if no_monomers_row == 5:
             angle = angle + 2*math.pi/5.0
         positionsrot_inner[i].append([])
-        Rx_inner = np.zeros((3, 3))  # makes a 3 x 3 zero matrix
-        Rx_inner[0, 0] = math.cos(angle)  # This line and subsequent edits to Rx fills in entries needed for rotation matrix
-        Rx_inner[1, 0] = math.sin(angle)
-        Rx_inner[0, 1] = -math.sin(angle)
-        Rx_inner[1, 1] = math.cos(angle)
-        Rx_inner[2, 2] = 1
+        Rx_inner = Rot_z(angle)
         for k in range(0, no_atoms):
             positionsrot_inner[i][j].append([])
             x = np.array(positions_inner[i][k])
@@ -469,6 +487,19 @@ for i in range(0, no_layers):
         positions_outer[i].append([])
         x = np.dot(translation_outer, np.array(positions_inp_outer[j]))
         positions_outer[i][j] = [x[0, 0], x[0, 1], x[0, 2]]
+# Translate the glycerol to the middle of the ring
+positions_gly_arc = []
+for i in range(0, no_layers):
+    positions_gly_arc.append([])
+    radius = outer_pointlist[i][0] - pore_width/2.0
+    z = outer_pointlist[i][2]
+    translation_gly = np.matrix([[1, 0, 0, radius - x_ave_gly], [0, 1, 0, -y_ave_gly], [0, 0, 1, z - z_ave_gly], [0, 0, 0, 1]])
+    for j in range(0, len(positions_inp_gly)):
+        positions_gly_arc[i].append([])
+        if len(positions_inp_gly[j]) == 3:
+            positions_inp_gly[j].append(1)
+        x = np.dot(translation_gly, np.array(positions_inp_gly[j]))
+        positions_gly_arc[i][j] = [x[0, 0], x[0, 1], x[0, 2]]
 
 # Make the monomers perpendicular to the parabola.
 positions_perp_outer = []
@@ -479,12 +510,7 @@ for i in range(0, no_layers):
     for j in range(0, no_atoms):
         positions_perp_outer[i].append([])
         x = np.array(positions_outer[i][j])
-        Rot_perp = np.zeros((3,3))
-        Rot_perp[0, 0] = math.cos(theta)
-        Rot_perp[2, 0] = -math.sin(theta)
-        Rot_perp[1, 1] = 1
-        Rot_perp[0, 2] = math.sin(theta)
-        Rot_perp[2, 2] = math.cos(theta)
+        Rot_perp = Rot_y(theta)
         rotation_perp = np.dot(Rot_perp, x)
         positions_perp_outer[i][j] = [float(rotation_perp[0]), float(rotation_perp[1]), float(rotation_perp[2])]
 # Translation matrix to correct the translation made by the above loop.
@@ -519,12 +545,7 @@ for i in range(0, no_layers):
     for j in range(0, no_monomers_row):
         positionsrot_outer[i].append([])
         angle = j*angleinitial
-        Rx_outer = np.zeros((3, 3))  # makes a 3 x 3 zero matrix
-        Rx_outer[0, 0] = math.cos(angle)  # This line and subsequent edits to Rx fills in entries needed for rotation matrix
-        Rx_outer[1, 0] = math.sin(angle)
-        Rx_outer[0, 1] = -math.sin(angle)
-        Rx_outer[1, 1] = math.cos(angle)
-        Rx_outer[2, 2] = 1
+        Rx_outer = Rot_z(angle)
         for k in range(0, no_atoms):
             positionsrot_outer[i][j].append([])
             x = np.array(positions_outer[i][k])
@@ -535,36 +556,48 @@ for i in range(0, no_layers):
 # This is a function to copy a list (or list of lists) and put it in a new list. This is needed because in the code, lists
 # need to be copied. However, if a command is made saying list2 = list1, any changes to list2 will also change list1.
 # Without this loop, the code would essentially make four arm4's, as opposed to arm1-arm4.
-def copylist_inner(old_inner):
-    new_inner = []
-    for i in range(0, no_layers_inner):
-        new_inner.append([])
-        no_monomers_inner = len(old_inner[i])
-        for j in range(0, no_monomers_inner):
-            new_inner[i].append([])
-            for k in range(0, no_atoms):
-                new_inner[i][j].append([])
-                new_inner[i][j][k] = old_inner[i][j][k]
-    return new_inner
-def copylist_outer(old_outer):
-    new_outer = []
-    for i in range(0, no_layers):
-        new_outer.append([])
-        no_monomers_outer = len(old_outer[i])
-        for j in range(0, no_monomers_outer):
-            new_outer[i].append([])
-            for k in range(0, no_atoms):
-                new_outer[i][j].append([])
-                new_outer[i][j][k] = old_outer[i][j][k]
-    return new_outer
+def copylist(old):
+    new = []
+    for i in range(0, len(old)):
+        new.append([])
+        for j in range(0, len(old[i])):
+            new[i].append([])
+            for k in range(0, len(old[i][j])):
+                new[i][j].append([])
+                new[i][j][k] = old[i][j][k]
+    return new
 
-positions_a1_inner = copylist_inner(positionsrot_inner)
-positions_a1_outer = copylist_outer(positionsrot_outer)
+positions_a1_inner = copylist(positionsrot_inner)
+positions_a1_outer = copylist(positionsrot_outer)
+no_mon_in = 0
+for i in range(0, len(positions_a1_inner)):
+    for j in range(0, len(positions_a1_inner[i])):
+        no_mon_in += 1
+no_mon = no_mon_in
+for i in range(0, len(positions_a1_outer)):
+    for j in range(0, len(positions_a1_outer[i])):
+        no_mon += 1
+no_gly = int(round(no_mon*3901/1638.0))
+
+# Make copies of glycerol and rotate them around inside the outer ring.
+positions_a1_gly = []
+for i in range(0, no_layers):
+    positions_a1_gly.append([])
+    no_monomers_row = len(positions_a1_outer[i])
+    no_gly_row = int(round(no_monomers_row*no_gly/float(no_mon - no_mon_in)))
+    angle_gly = 2*math.pi/float(no_gly_row)
+    for j in range(0, no_gly_row):
+        positions_a1_gly[i].append([])
+        angle = j*angle_gly
+        Rx_outer = Rot_z(angle)
+        for k in range(0, len(positions_gly_arc[i])):
+            positions_a1_gly[i][j].append([])
+            x = np.array(positions_gly_arc[i][k])
+            rotation = np.dot(Rx_outer, x)
+            positions_a1_gly[i][j][k] = rotation
 
 def transpivot(positions):
-    xsum = 0
-    ysum = 0
-    zsum = 0
+    xsum = 0; ysum = 0; zsum = 0
     for i in range(0, len(positions[0])):
         xsum = xsum + (positions[0][i][24][0] + positions[0][i][25][0])/2.0
         ysum = ysum + (positions[0][i][24][1] + positions[0][i][25][1])/2.0
@@ -589,278 +622,169 @@ def transhalf(positions):
     translation = np.matrix([[1, 0, 0, xtrans], [0, 1, 0, ytrans], [0, 0, 1, ztrans], [0, 0, 0, 1]])
     return translation
 
+positions_a1 = [positions_a1_inner, positions_a1_outer, positions_a1_gly]
+
 translation_to_pivot = transpivot(positions_a1_outer)
-for i in range(0, len(positions_a1_inner)):
-    for j in range(0, len(positions_a1_inner[i])):
-        for k in range(0, no_atoms):
-            positions_a1_inner[i][j][k].append(1)
-            x = np.dot(translation_to_pivot, np.array(positions_a1_inner[i][j][k]))
-            positions_a1_inner[i][j][k] = [x[0, 0], x[0, 1], x[0, 2]]
-for i in range(0, len(positions_a1_outer)):
-    for j in range(0, len(positions_a1_outer[i])):
-        for k in range(0, no_atoms):
-            positions_a1_outer[i][j][k].append(1)
-            x = np.dot(translation_to_pivot, np.array(positions_a1_outer[i][j][k]))
-            positions_a1_outer[i][j][k] = [x[0, 0], x[0, 1], x[0, 2]]
+for i in range(0, len(positions_a1)):
+    for j in range(0, len(positions_a1[i])):
+        for k in range(0, len(positions_a1[i][j])):
+            for l in range(0, len(positions_a1[i][j][k])):
+                positions_a1[i][j][k][l] = np.append(positions_a1[i][j][k][l], 1)
+                #positions_a1[i][j][k][l].append(1)
+                x = np.dot(translation_to_pivot, np.array(positions_a1[i][j][k][l]))
+                positions_a1[i][j][k][l] = [x[0, 0], x[0, 1], x[0, 2]]
 
 translation_half = transhalf(positions_a1_outer)
-for i in range(0, len(positions_a1_inner)):
-    for j in range(0, len(positions_a1_inner[i])):
-        for k in range(0, no_atoms):
-            positions_a1_inner[i][j][k].append(1)
-            x = np.dot(translation_half, np.array(positions_a1_inner[i][j][k]))
-            positions_a1_inner[i][j][k] = [x[0, 0], x[0, 1], x[0, 2]]
-for i in range(0, len(positions_a1_outer)):
-    for j in range(0, len(positions_a1_outer[i])):
-        for k in range(0, no_atoms):
-            positions_a1_outer[i][j][k].append(1)
-            x = np.dot(translation_half, np.array(positions_a1_outer[i][j][k]))
-            positions_a1_outer[i][j][k] = [x[0, 0], x[0, 1], x[0, 2]]
+for i in range(0, len(positions_a1)):
+    for j in range(0, len(positions_a1[i])):
+        for k in range(0, len(positions_a1[i][j])):
+            for l in range(0, len(positions_a1[i][j][k])):
+                positions_a1[i][j][k][l].append(1)
+                x = np.dot(translation_half, np.array(positions_a1[i][j][k][l]))
+                positions_a1[i][j][k][l] = [x[0, 0], x[0, 1], x[0, 2]]
 
-positions_a2_inner = copylist_inner(positions_a1_inner)
-positions_a2_outer = copylist_outer(positions_a1_outer)
+
+
+
+positions_a2_inner = copylist(positions_a1_inner)
+positions_a2_outer = copylist(positions_a1_outer)
+positions_a2_gly = copylist(positions_a1_gly)
+positions_a2 = [positions_a2_inner, positions_a2_outer, positions_a2_gly]
 theta = math.acos(-1/3.0)
-for i in range(0, len(positions_a2_inner)):
-    Rot_arm2 = np.zeros((3, 3))
-    Rot_arm2[0, 0] = math.cos(theta)
-    Rot_arm2[2, 0] = -math.sin(theta)
-    Rot_arm2[1, 1] = 1
-    Rot_arm2[0, 2] = math.sin(theta)
-    Rot_arm2[2, 2] = math.cos(theta)
-    for j in range(0, len(positions_a2_inner[i])):
-        for k in range(0, no_atoms):
-            x = np.array(positions_a2_inner[i][j][k])
-            rotation_a2 = np.dot(Rot_arm2, x)
-            positions_a2_inner[i][j][k] = [float(rotation_a2[0]), float(rotation_a2[1]), float(rotation_a2[2])]
-for i in range(0, len(positions_a2_outer)):
-    Rot_arm2 = np.zeros((3, 3))
-    Rot_arm2[0, 0] = math.cos(theta)
-    Rot_arm2[2, 0] = -math.sin(theta)
-    Rot_arm2[1, 1] = 1
-    Rot_arm2[0, 2] = math.sin(theta)
-    Rot_arm2[2, 2] = math.cos(theta)
-    for j in range(0, len(positions_a2_outer[i])):
-        for k in range(0, no_atoms):
-            x = np.array(positions_a2_outer[i][j][k])
-            rotation_a2 = np.dot(Rot_arm2, x)
-            positions_a2_outer[i][j][k] = [float(rotation_a2[0]), float(rotation_a2[1]), float(rotation_a2[2])]
+Rot_arm2 = Rot_y(theta)
+for i in range(0, len(positions_a2)):
+    for j in range(0, len(positions_a2[i])):
+        for k in range(0, len(positions_a2[i][j])):
+            for l in range(0, len(positions_a2[i][j][k])):
+                x = np.array(positions_a2[i][j][k][l])
+                rotation_a2 = np.dot(Rot_arm2, x)
+                positions_a2[i][j][k][l] = [float(rotation_a2[0]), float(rotation_a2[1]), float(rotation_a2[2])]
 
 translation_to_pivot = transpivot(positions_a2_outer)
-for i in range(0, len(positions_a2_inner)):
-    for j in range(0, len(positions_a2_inner[i])):
-        for k in range(0, no_atoms):
-            positions_a2_inner[i][j][k].append(1)
-            x = np.dot(translation_to_pivot, np.array(positions_a2_inner[i][j][k]))
-            positions_a2_inner[i][j][k] = [x[0, 0], x[0, 1], x[0, 2]]
-for i in range(0, len(positions_a2_outer)):
-    for j in range(0, len(positions_a2_outer[i])):
-        for k in range(0, no_atoms):
-            positions_a2_outer[i][j][k].append(1)
-            x = np.dot(translation_to_pivot, np.array(positions_a2_outer[i][j][k]))
-            positions_a2_outer[i][j][k] = [x[0, 0], x[0, 1], x[0, 2]]
+for i in range(0, len(positions_a2)):
+    for j in range(0, len(positions_a2[i])):
+        for k in range(0, len(positions_a2[i][j])):
+            for l in range(0, len(positions_a2[i][j][k])):
+                positions_a2[i][j][k][l].append(1)
+                x = np.dot(translation_to_pivot, np.array(positions_a2[i][j][k][l]))
+                positions_a2[i][j][k][l] = [x[0, 0], x[0, 1], x[0, 2]]
 
 translation_half = transhalf(positions_a2_outer)
-for i in range(0, len(positions_a2_inner)):
-    for j in range(0, len(positions_a2_inner[i])):
-        for k in range(0, no_atoms):
-            positions_a2_inner[i][j][k].append(1)
-            x = np.dot(translation_half, np.array(positions_a2_inner[i][j][k]))
-            positions_a2_inner[i][j][k] = [x[0, 0], x[0, 1], x[0, 2]]
-for i in range(0, len(positions_a2_outer)):
-    for j in range(0, len(positions_a2_outer[i])):
-        for k in range(0, no_atoms):
-            positions_a2_outer[i][j][k].append(1)
-            x = np.dot(translation_half, np.array(positions_a2_outer[i][j][k]))
-            positions_a2_outer[i][j][k] = [x[0, 0], x[0, 1], x[0, 2]]
+for i in range(0, len(positions_a2)):
+    for j in range(0, len(positions_a2[i])):
+        for k in range(0, len(positions_a2[i][j])):
+            for l in range(0, len(positions_a2[i][j][k])):
+                positions_a2[i][j][k][l].append(1)
+                x = np.dot(translation_half, np.array(positions_a2[i][j][k][l]))
+                positions_a2[i][j][k][l] = [x[0, 0], x[0, 1], x[0, 2]]
 
-positions_a3_inner = copylist_inner(positions_a2_inner)
-positions_a3_outer = copylist_outer(positions_a2_outer)
+positions_a3_inner = copylist(positions_a2_inner)
+positions_a3_outer = copylist(positions_a2_outer)
+positions_a3_gly = copylist(positions_a2_gly)
+positions_a3 = [positions_a3_inner, positions_a3_outer, positions_a3_gly]
 theta_around = 2*math.pi/3.0
-for i in range(0, len(positions_a3_inner)):
-    Rot_arm3 = np.zeros((3, 3))
-    Rot_arm3[0, 0] = math.cos(theta_around)
-    Rot_arm3[1, 0] = math.sin(theta_around)
-    Rot_arm3[0, 1] = -math.sin(theta_around)
-    Rot_arm3[1, 1] = math.cos(theta_around)
-    Rot_arm3[2, 2] = 1
-    for j in range(0, len(positions_a3_inner[i])):
-        for k in range(0, no_atoms):
-            x = np.array(positions_a3_inner[i][j][k])
-            rotation_a3 = np.dot(Rot_arm3, x)
-            positions_a3_inner[i][j][k] = [float(rotation_a3[0]), float(rotation_a3[1]), float(rotation_a3[2])]
-for i in range(0, len(positions_a3_outer)):
-    Rot_arm3 = np.zeros((3, 3))
-    Rot_arm3[0, 0] = math.cos(theta_around)
-    Rot_arm3[1, 0] = math.sin(theta_around)
-    Rot_arm3[0, 1] = -math.sin(theta_around)
-    Rot_arm3[1, 1] = math.cos(theta_around)
-    Rot_arm3[2, 2] = 1
-    for j in range(0, len(positions_a3_outer[i])):
-        for k in range(0, no_atoms):
-            x = np.array(positions_a3_outer[i][j][k])
-            rotation_a3 = np.dot(Rot_arm3, x)
-            positions_a3_outer[i][j][k] = [float(rotation_a3[0]), float(rotation_a3[1]), float(rotation_a3[2])]
+Rot_arm3 = Rot_z(theta_around)
+for i in range(0, len(positions_a3)):
+    for j in range(0, len(positions_a3[i])):
+        for k in range(0, len(positions_a3[i][j])):
+            for l in range(0, len(positions_a3[i][j][k])):
+                x = np.array(positions_a3[i][j][k][l])
+                rotation_a3 = np.dot(Rot_arm3, x)
+                positions_a3[i][j][k][l] = [float(rotation_a3[0]), float(rotation_a3[1]), float(rotation_a3[2])]
 
 translation_to_pivot = transpivot(positions_a3_outer)
-for i in range(0, len(positions_a3_inner)):
-    for j in range(0, len(positions_a3_inner[i])):
-        for k in range(0, no_atoms):
-            positions_a3_inner[i][j][k].append(1)
-            x = np.dot(translation_to_pivot, np.array(positions_a3_inner[i][j][k]))
-            positions_a3_inner[i][j][k] = [x[0, 0], x[0, 1], x[0, 2]]
-for i in range(0, len(positions_a3_outer)):
-    for j in range(0, len(positions_a3_outer[i])):
-        for k in range(0, no_atoms):
-            positions_a3_outer[i][j][k].append(1)
-            x = np.dot(translation_to_pivot, np.array(positions_a3_outer[i][j][k]))
-            positions_a3_outer[i][j][k] = [x[0, 0], x[0, 1], x[0, 2]]
+for i in range(0, len(positions_a3)):
+    for j in range(0, len(positions_a3[i])):
+        for k in range(0, len(positions_a3[i][j])):
+            for l in range(0, len(positions_a3[i][j][k])):
+                positions_a3[i][j][k][l].append(1)
+                x = np.dot(translation_to_pivot, np.array(positions_a3[i][j][k][l]))
+                positions_a3[i][j][k][l] = [x[0, 0], x[0, 1], x[0, 2]]
 
 translation_half = transhalf(positions_a3_outer)
-for i in range(0, len(positions_a3_inner)):
-    for j in range(0, len(positions_a3_inner[i])):
-        for k in range(0, no_atoms):
-            positions_a3_inner[i][j][k].append(1)
-            x = np.dot(translation_half, np.array(positions_a3_inner[i][j][k]))
-            positions_a3_inner[i][j][k] = [x[0, 0], x[0, 1], x[0, 2]]
-for i in range(0, len(positions_a3_outer)):
-    for j in range(0, len(positions_a3_outer[i])):
-        for k in range(0, no_atoms):
-            positions_a3_outer[i][j][k].append(1)
-            x = np.dot(translation_half, np.array(positions_a3_outer[i][j][k]))
-            positions_a3_outer[i][j][k] = [x[0, 0], x[0, 1], x[0, 2]]
+for i in range(0, len(positions_a3)):
+    for j in range(0, len(positions_a3[i])):
+        for k in range(0, len(positions_a3[i][j])):
+            for l in range(0, len(positions_a3[i][j][k])):
+                positions_a3[i][j][k][l].append(1)
+                x = np.dot(translation_half, np.array(positions_a3[i][j][k][l]))
+                positions_a3[i][j][k][l] = [x[0, 0], x[0, 1], x[0, 2]]
 
-positions_a4_inner = copylist_inner(positions_a3_inner)
-positions_a4_outer = copylist_outer(positions_a3_outer)
-for i in range(0, len(positions_a4_inner)):
-    Rot_arm4 = np.zeros((3, 3))
-    Rot_arm4[0, 0] = math.cos(theta_around)
-    Rot_arm4[1, 0] = math.sin(theta_around)
-    Rot_arm4[0, 1] = -math.sin(theta_around)
-    Rot_arm4[1, 1] = math.cos(theta_around)
-    Rot_arm4[2, 2] = 1
-    for j in range(0, len(positions_a4_inner[i])):
-        for k in range(0, no_atoms):
-            x = np.array(positions_a4_inner[i][j][k])
-            rotation_a4 = np.dot(Rot_arm4, x)
-            positions_a4_inner[i][j][k] = [float(rotation_a4[0]), float(rotation_a4[1]), float(rotation_a4[2])]
-for i in range(0, len(positions_a4_outer)):
-    Rot_arm4 = np.zeros((3, 3))
-    Rot_arm4[0, 0] = math.cos(theta_around)
-    Rot_arm4[1, 0] = math.sin(theta_around)
-    Rot_arm4[0, 1] = -math.sin(theta_around)
-    Rot_arm4[1, 1] = math.cos(theta_around)
-    Rot_arm4[2, 2] = 1
-    for j in range(0, len(positions_a4_outer[i])):
-        for k in range(0, no_atoms):
-            x = np.array(positions_a4_outer[i][j][k])
-            rotation_a4 = np.dot(Rot_arm4, x)
-            positions_a4_outer[i][j][k] = [float(rotation_a4[0]), float(rotation_a4[1]), float(rotation_a4[2])]
+positions_a4_inner = copylist(positions_a3_inner)
+positions_a4_outer = copylist(positions_a3_outer)
+positions_a4_gly = copylist(positions_a3_gly)
+positions_a4 = [positions_a4_inner, positions_a4_outer, positions_a4_gly]
+Rot_arm4 = Rot_z(theta_around)
+for i in range(0, len(positions_a4)):
+    for j in range(0, len(positions_a4[i])):
+        for k in range(0, len(positions_a4[i][j])):
+            for l in range(0, len(positions_a4[i][j][k])):
+                x = np.array(positions_a4[i][j][k][l])
+                rotation_a4 = np.dot(Rot_arm4, x)
+                positions_a4[i][j][k][l] = [float(rotation_a4[0]), float(rotation_a4[1]), float(rotation_a4[2])]
 
 translation_to_pivot = transpivot(positions_a4_outer)
-for i in range(0, len(positions_a4_inner)):
-    for j in range(0, len(positions_a4_inner[i])):
-        for k in range(0, no_atoms):
-            positions_a4_inner[i][j][k].append(1)
-            x = np.dot(translation_to_pivot, np.array(positions_a4_inner[i][j][k]))
-            positions_a4_inner[i][j][k] = [x[0, 0], x[0, 1], x[0, 2]]
-for i in range(0, len(positions_a4_outer)):
-    for j in range(0, len(positions_a4_outer[i])):
-        for k in range(0, no_atoms):
-            positions_a4_outer[i][j][k].append(1)
-            x = np.dot(translation_to_pivot, np.array(positions_a4_outer[i][j][k]))
-            positions_a4_outer[i][j][k] = [x[0, 0], x[0, 1], x[0, 2]]
+for i in range(0, len(positions_a4)):
+    for j in range(0, len(positions_a4[i])):
+        for k in range(0, len(positions_a4[i][j])):
+            for l in range(0, len(positions_a4[i][j][k])):
+                positions_a4[i][j][k][l].append(1)
+                x = np.dot(translation_to_pivot, np.array(positions_a4[i][j][k][l]))
+                positions_a4[i][j][k][l] = [x[0, 0], x[0, 1], x[0, 2]]
 
 translation_half = transhalf(positions_a4_outer)
-for i in range(0, len(positions_a4_inner)):
-    for j in range(0, len(positions_a4_inner[i])):
-        for k in range(0, no_atoms):
-            positions_a4_inner[i][j][k].append(1)
-            x = np.dot(translation_half, np.array(positions_a4_inner[i][j][k]))
-            positions_a4_inner[i][j][k] = [x[0, 0], x[0, 1], x[0, 2]]
-for i in range(0, len(positions_a4_outer)):
-    for j in range(0, len(positions_a4_outer[i])):
-        for k in range(0, no_atoms):
-            positions_a4_outer[i][j][k].append(1)
-            x = np.dot(translation_half, np.array(positions_a4_outer[i][j][k]))
-            positions_a4_outer[i][j][k] = [x[0, 0], x[0, 1], x[0, 2]]
+for i in range(0, len(positions_a4)):
+    for j in range(0, len(positions_a4[i])):
+        for k in range(0, len(positions_a4[i][j])):
+            for l in range(0, len(positions_a4[i][j][k])):
+                positions_a4[i][j][k][l].append(1)
+                x = np.dot(translation_half, np.array(positions_a4[i][j][k][l]))
+                positions_a4[i][j][k][l] = [x[0, 0], x[0, 1], x[0, 2]]
 
-positions_a1 = [positions_a1_inner, positions_a1_outer]
-positions_a2 = [positions_a2_inner, positions_a2_outer]
-positions_a3 = [positions_a3_inner, positions_a3_outer]
-positions_a4 = [positions_a4_inner, positions_a4_outer]
 junction = [positions_a1, positions_a2, positions_a3, positions_a4]
 
 theta_junc = -math.acos(-1/3.0)/2.0
-Rot_junc = np.zeros((3, 3))
-Rot_junc[0, 0] = math.cos(theta_junc)
-Rot_junc[2, 0] = -math.sin(theta_junc)
-Rot_junc[1, 1] = 1
-Rot_junc[0, 2] = math.sin(theta_junc)
-Rot_junc[2, 2] = math.cos(theta_junc)
+Rot_junc = Rot_y(theta_junc)
 for i in range(0, len(junction)):
     for j in range(0, len(junction[i])):
         for k in range(0, len(junction[i][j])):
             for l in range(0, len(junction[i][j][k])):
-                for m in range(0, no_atoms):
+                for m in range(0, len(junction[i][j][k][l])):
                     x = np.array(junction[i][j][k][l][m])
                     rotation_junc = np.dot(Rot_junc, x)
                     junction[i][j][k][l][m] = [float(rotation_junc[0]), float(rotation_junc[1]), float(rotation_junc[2])]
 
-junction2 = []
-for i in range(0, len(junction)):
-    junction2.append([])
-    for j in range(0, len(junction[i])):
-        junction2[i].append([])
-        for k in range(0, len(junction[i][j])):
-            junction2[i][j].append([])
-            for l in range(0, len(junction[i][j][k])):
-                junction2[i][j][k].append([])
-                for m in range(0, no_atoms):
-                    junction2[i][j][k][l].append([])
-                    junction2[i][j][k][l][m] = junction[i][j][k][l][m]
+def copyjunction(old):
+    new = []
+    for i in range(0, len(old)):
+        new.append([])
+        for j in range(0, len(old[i])):
+            new[i].append([])
+            for k in range(0, len(old[i][j])):
+                new[i][j].append([])
+                for l in range(0, len(old[i][j][k])):
+                    new[i][j][k].append([])
+                    for m in range(0, len(old[i][j][k][l])):
+                        new[i][j][k][l].append([])
+                        new[i][j][k][l][m] = old[i][j][k][l][m]
+    return new
+
+junction2 = copyjunction(junction)
 
 theta_junc2 = math.pi/2.0
-Rot_junc2 = np.zeros((3, 3))
-Rot_junc2[0, 0] = math.cos(theta_junc2)
-Rot_junc2[1, 0] = math.sin(theta_junc2)
-Rot_junc2[0, 1] = -math.sin(theta_junc2)
-Rot_junc2[1, 1] = math.cos(theta_junc2)
-Rot_junc2[2, 2] = 1
+Rot_junc2 = Rot_z(theta_junc2)
 for i in range(0, len(junction2)):
     for j in range(0, len(junction2[i])):
         for k in range(0, len(junction2[i][j])):
             for l in range(0, len(junction[i][j][k])):
-                for m in range(0, no_atoms):
+                for m in range(0, len(junction[i][j][k][l])):
                     x = np.array(junction2[i][j][k][l][m])
                     rotation_junc2 = np.dot(Rot_junc2, x)
                     junction2[i][j][k][l][m] = [float(rotation_junc2[0]), float(rotation_junc2[1]), float(rotation_junc2[2])]
 
-junction3 = []
-junction4 = []
-junction5 = []
-for i in range(0, len(junction2)):
-    junction3.append([])
-    junction4.append([])
-    junction5.append([])
-    for j in range(0, len(junction2[i])):
-        junction3[i].append([])
-        junction4[i].append([])
-        junction5[i].append([])
-        for k in range(0, len(junction2[i][j])):
-            junction3[i][j].append([])
-            junction4[i][j].append([])
-            junction5[i][j].append([])
-            for l in range(0, len(junction2[i][j][k])):
-                junction3[i][j][k].append([])
-                junction4[i][j][k].append([])
-                junction5[i][j][k].append([])
-                for m in range(0, no_atoms):
-                    junction3[i][j][k][l].append([])
-                    junction4[i][j][k][l].append([])
-                    junction5[i][j][k][l].append([])
-                    junction3[i][j][k][l][m] = junction2[i][j][k][l][m]
-                    junction4[i][j][k][l][m] = junction2[i][j][k][l][m]
-                    junction5[i][j][k][l][m] = junction2[i][j][k][l][m]
+junction3 = copyjunction(junction2)
+junction4 = copyjunction(junction2)
+junction5 = copyjunction(junction2)
 
 # Translate junction2 to position of arm1 of junction
 # Arm4 of junction2 will move to position of arm1 of junction
@@ -932,7 +856,7 @@ for i in range(0, len(junction2)):
     for j in range(0, len(junction2[i])):
         for k in range(0, len(junction2[i][j])):
             for l in range(0, len(junction2[i][j][k])):
-                for m in range(0, no_atoms):
+                for m in range(0, len(junction2[i][j][k][l])):
                     junction2[i][j][k][l][m].append(1)
                     x = np.dot(translation_j2, np.array(junction2[i][j][k][l][m]))
                     junction2[i][j][k][l][m] = [x[0, 0], x[0, 1], x[0, 2]]
@@ -946,18 +870,13 @@ for i in range(0, len(junction2)):
 final = [junction2, junction3, junction4, junction5]
 
 theta_final = math.pi/4.0
-Rot_final = np.zeros((3, 3))
-Rot_final[0, 0] = math.cos(theta_final)
-Rot_final[1, 0] = math.sin(theta_final)
-Rot_final[0, 1] = -math.sin(theta_final)
-Rot_final[1, 1] = math.cos(theta_final)
-Rot_final[2, 2] = 1
+Rot_final = Rot_z(theta_final)
 for n in range(0, len(final)):
     for i in range(0, len(junction)):
         for j in range(0, len(junction[i])):
             for k in range(0, len(junction[i][j])):
                 for l in range(0, len(junction[i][j][k])):
-                    for m in range(0, no_atoms):
+                    for m in range(0, len(junction[i][j][k][l])):
                         x = np.array(final[n][i][j][k][l][m])
                         x = [x[0], x[1], x[2]]
                         rotation_final = np.dot(Rot_final, x)
@@ -966,7 +885,7 @@ for n in range(0, len(final)):
 x_max = 0; x_min = 0; y_max = 0; y_min = 0; z_max = 0; z_min = 0
 for n in range(0, len(final)):
     for i in range(0, len(final[n])):
-        for j in range(0, len(final[n][i])):
+        for j in range(0, len(final[n][i]) - 1):
             for k in range(0, len(final[n][i][j])):
                 for l in range(0, len(final[n][i][j][k])):
                     for m in range(0, no_atoms - no_ions):
@@ -988,7 +907,7 @@ for n in range(0, len(final)):
         for j in range(0, len(final[n][i])):
             for k in range(0, len(final[n][i][j])):
                 for l in range(0, len(final[n][i][j][k])):
-                    for m in range(0, no_atoms):
+                    for m in range(0, len(final[n][i][j][k][l])):
                         if len(final[n][i][j][k][l][m]) == 3:
                             final[n][i][j][k][l][m].append(1)
                         x = np.dot(translation_final, np.array(final[n][i][j][k][l][m]))
@@ -1000,15 +919,14 @@ for n in range(0, len(final)):
         for j in range(0, len(final[n][i])):
             for k in range(0, len(final[n][i][j])):
                 for l in range(0, len(final[n][i][j][k])):
-                    for m in range(0, no_atoms):
+                    for m in range(0, len(final[n][i][j][k][l])):
                         sys_atoms += 1
-
 print sys_atoms
 count_monomer = 1
 count_atom = 1
 for n in range(0, len(final)):
     for i in range(0, len(final[n])):
-        for j in range(0, len(final[n][i])):
+        for j in range(0, len(final[n][i]) - 1):
             for k in range(0, len(final[n][i][j])):
                 for l in range(0, len(final[n][i][j][k])):
                     for m in range(0, no_atoms - no_ions):
@@ -1018,10 +936,20 @@ for n in range(0, len(final)):
                         if count_atom == 100000:
                             count_atom = 1
                     count_monomer += 1
-
 for n in range(0, len(final)):
     for i in range(0, len(final[n])):
-        for j in range(0, len(final[n][i])):
+        for k in range(0, len(final[n][i][2])):
+            for l in range(0, len(final[n][i][2][k])):
+                for m in range(0, len(final[n][i][2][k][l])):
+                    print'{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(count_monomer, name_GLC, identity_gly[m], count_atom, final[n][i][2][k][l][m][0]/10.0,
+                                                                             final[n][i][2][k][l][m][1]/10.0, final[n][i][2][k][l][m][2]/10.0)
+                    count_atom += 1
+                    if count_atom == 100000:
+                        count_atom = 1
+                count_monomer += 1
+for n in range(0, len(final)):
+    for i in range(0, len(final[n])):
+        for j in range(0, len(final[n][i]) - 1):
             for k in range(0, len(final[n][i][j])):
                 for l in range(0, len(final[n][i][j][k])):
                     for m in range(no_atoms - no_ions, no_atoms):

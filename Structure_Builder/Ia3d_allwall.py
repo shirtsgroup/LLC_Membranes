@@ -1422,89 +1422,17 @@ for n in range(0, len(final)):
                         rotation_final = np.dot(Rot_final_z, x)
                         final[n][i][j][k][l][m] = [float(rotation_final[0]), float(rotation_final[1]), float(rotation_final[2])]
 
-# The final structure is not centered at the origin, causing issues with the periodic boundary conditions.
-# Translate the final structure so that its x_max = -x_min, y_max = -y_min, and z_max = -z_min.
-x_max = 0; x_min = 0; y_max = 0; y_min = 0; z_max = 0; z_min = 0
-for n in range(0, len(final)):
-    for i in range(0, len(final[n])):
-        for j in range(0, len(final[n][i])):
-            for k in range(0, len(final[n][i][j])):
-                for l in range(0, len(final[n][i][j][k])):
-                    for m in range(0, no_atoms - no_ions):
-                        if final[n][i][j][k][l][m][0] > x_max:
-                            x_max = final[n][i][j][k][l][m][0]
-                        if final[n][i][j][k][l][m][0] < x_min:
-                            x_min = final[n][i][j][k][l][m][0]
-                        if final[n][i][j][k][l][m][1] > y_max:
-                            y_max = final[n][i][j][k][l][m][1]
-                        if final[n][i][j][k][l][m][1] < y_min:
-                            y_min = final[n][i][j][k][l][m][1]
-                        if final[n][i][j][k][l][m][2] > z_max:
-                            z_max = final[n][i][j][k][l][m][2]
-                        if final[n][i][j][k][l][m][2] < z_min:
-                            z_min = final[n][i][j][k][l][m][2]
-translation_final = np.matrix([[1, 0, 0, -x_min - 10*dist_periodic/2.0], [0, 1, 0, -y_min - 10*dist_periodic/2.0], [0, 0, 1, -z_min - 10*dist_periodic/2.0], [0, 0, 0, 1]])
-for n in range(0, len(final)):
-    for i in range(0, len(final[n])):
-        for j in range(0, len(final[n][i])):
-            for k in range(0, len(final[n][i][j])):
-                for l in range(0, len(final[n][i][j][k])):
-                    for m in range(0, no_atoms):
-                        if len(final[n][i][j][k][l][m]) == 3:
-                            final[n][i][j][k][l][m].append(1)
-                        x = np.dot(translation_final, np.array(final[n][i][j][k][l][m]))
-                        final[n][i][j][k][l][m] = [x[0, 0], x[0, 1], x[0, 2]]
-
-periodic2 = []
-for n in range(0, len(final)):
-    periodic2.append([])
-    for i in range(0, len(final[n])):
-        periodic2[n].append([])
-        for j in range(0, len(final[n][i])):
-            periodic2[n][i].append([])
-            for k in range(0, len(final[n][i][j])):
-                periodic2[n][i][j].append([])
-                for l in range(0, len(final[n][i][j][k])):
-                    periodic2[n][i][j][k].append([])
-                    for m in range(0, no_atoms):
-                        periodic2[n][i][j][k][l].append([])
-                        periodic2[n][i][j][k][l][m] = final[n][i][j][k][l][m]
-translation_p2 = np.matrix([[1, 0, 0, 0], [0, 1, 0, y_max - y_min - 10*dist_periodic], [0, 0, 1, 0], [0, 0, 0, 1]])
-for n in range(0, len(periodic2)):
-    for i in range(0, len(periodic2[n])):
-        for j in range(0, len(periodic2[n][i])):
-            for k in range(0, len(periodic2[n][i][j])):
-                for l in range(0, len(periodic2[n][i][j][k])):
-                    for m in range(0, no_atoms):
-                        if len(periodic2[n][i][j][k][l][m]) == 3:
-                            periodic2[n][i][j][k][l][m].append(1)
-                        x = np.dot(translation_p2, np.array(periodic2[n][i][j][k][l][m]))
-                        periodic2[n][i][j][k][l][m] = [x[0, 0], x[0, 1], x[0, 2]]
-
-x_ave_sum = 0; y_ave_sum = 0; z_ave_sum = 0; x_p2_sum = 0; y_p2_sum = 0; z_p2_sum = 0
-divisor = 0
-for n in range(0, len(final)):
-    for i in range(0, len(final[n])):
-        for j in range(0, len(final[n][i][1])):
-            for k in range(0, len(final[n][i][1][j])):
-                x_ave_sum = x_ave_sum + (final[n][i][1][j][k][24][0] + final[n][i][1][j][k][25][0])/2.0
-                y_ave_sum = y_ave_sum + (final[n][i][1][j][k][24][1] + final[n][i][1][j][k][25][1])/2.0
-                z_ave_sum = z_ave_sum + (final[n][i][1][j][k][24][2] + final[n][i][1][j][k][25][2])/2.0
-                x_p2_sum = x_p2_sum + (periodic2[n][i][1][j][k][24][0] + periodic2[n][i][1][j][k][25][0])/2.0
-                y_p2_sum = y_p2_sum + (periodic2[n][i][1][j][k][24][1] + periodic2[n][i][1][j][k][25][1])/2.0
-                z_p2_sum = z_p2_sum + (periodic2[n][i][1][j][k][24][2] + periodic2[n][i][1][j][k][25][2])/2.0
-                divisor += 1
-x_ave = x_ave_sum/float(divisor); y_ave = y_ave_sum/float(divisor); z_ave = z_ave_sum/float(divisor)
-x_p2 = x_p2_sum/float(divisor); y_p2 = y_p2_sum/float(divisor); z_p2 = z_p2_sum/float(divisor)
-
-angle_dist = []
-for a in range(0, 17):
-    angle_dist.append([])
-    for b in range(0, 17):
-        angle_dist[a].append([])
-        for c in range(0, 17):
-            angle_dist[a][b].append([])
-            angle_x = (a - 8)*math.pi/180.0; angle_y = (b - 8)*math.pi/180.0; angle_z = (c - 8)*math.pi/180.0
+print '{:^21}{:_^36}{:^1}{:_^36}{:^1}{:_^36}'.format(' ','x-periodic','|','y-periodic','|','z-periodic')
+print '{:^7}{:^7}{:^7}{:^9}{:^9}{:^9}{:^9}{:^9}{:^9}{:^9}{:^9}{:^9}{:^9}{:^9}{:^9}'.format('x','y','z','d^2','d_x','d_y','d_z','d^2','d_x','d_y','d_z','d^2','d_x','d_y','d_z')
+max_angle = 15
+x_angle_dist = []; y_angle_dist = []; z_angle_dist = []
+for x_rotation in range(0, 2*max_angle + 1):
+    x_angle_dist.append([]); y_angle_dist.append([]); z_angle_dist.append([])
+    for y_rotation in range(0, 2*max_angle + 1):
+        x_angle_dist[x_rotation].append([]); y_angle_dist[x_rotation].append([]); z_angle_dist[x_rotation].append([])
+        for z_rotation in range(0, 2*max_angle + 1):
+            x_angle_dist[x_rotation][y_rotation].append([]); y_angle_dist[x_rotation][y_rotation].append([]); z_angle_dist[x_rotation][y_rotation].append([])
+            angle_x = (x_rotation - max_angle)*math.pi/180.0; angle_y = (y_rotation - max_angle)*math.pi/180.0; angle_z = (z_rotation - max_angle)*math.pi/180.0
             Rot_x = np.zeros((3, 3))
             Rot_x[0, 0] = 1
             Rot_x[1, 1] = math.cos(angle_x)
@@ -1521,9 +1449,6 @@ for a in range(0, 17):
                                     x = [x[0], x[1], x[2]]
                                     rotation_x = np.dot(Rot_x, x)
                                     final[n][i][j][k][l][m] = [float(rotation_x[0]), float(rotation_x[1]), float(rotation_x[2])]
-                                    x = np.array(periodic2[n][i][j][k][l][m])
-                                    rotation_x = np.dot(Rot_x, x)
-                                    periodic2[n][i][j][k][l][m] = [float(rotation_x[0]), float(rotation_x[1]), float(rotation_x[2])]
             Rot_y = np.zeros((3, 3))
             Rot_y[0, 0] = math.cos(angle_y)
             Rot_y[2, 0] = -math.sin(angle_y)
@@ -1539,9 +1464,6 @@ for a in range(0, 17):
                                     y = np.array(final[n][i][j][k][l][m])
                                     rotation_y = np.dot(Rot_y, y)
                                     final[n][i][j][k][l][m] = [float(rotation_y[0]), float(rotation_y[1]), float(rotation_y[2])]
-                                    y = np.array(periodic2[n][i][j][k][l][m])
-                                    rotation_y = np.dot(Rot_y, y)
-                                    periodic2[n][i][j][k][l][m] = [float(rotation_y[0]), float(rotation_y[1]), float(rotation_y[2])]
             Rot_z = np.zeros((3, 3))
             Rot_z[0, 0] = math.cos(angle_z)
             Rot_z[1, 0] = math.sin(angle_z)
@@ -1557,68 +1479,189 @@ for a in range(0, 17):
                                     z = np.array(final[n][i][j][k][l][m])
                                     rotation_z = np.dot(Rot_z, z)
                                     final[n][i][j][k][l][m] = [float(rotation_z[0]), float(rotation_z[1]), float(rotation_z[2])]
-                                    z = np.array(periodic2[n][i][j][k][l][m])
-                                    rotation_z = np.dot(Rot_z, z)
-                                    periodic2[n][i][j][k][l][m] = [float(rotation_z[0]), float(rotation_z[1]), float(rotation_z[2])]
-            final_newx_sum = 0; final_newy_sum = 0; final_newz_sum = 0; p2_newx_sum = 0; p2_newy_sum = 0; p2_newz_sum = 0
-            divisor = 0
+            # The final structure is not centered at the origin, causing issues with the periodic boundary conditions.
+            # Translate the final structure so that its x_max = -x_min, y_max = -y_min, and z_max = -z_min.
+            x_max = 0; x_min = 0; y_max = 0; y_min = 0; z_max = 0; z_min = 0
             for n in range(0, len(final)):
                 for i in range(0, len(final[n])):
-                    for j in range(0, len(final[n][i][1])):
-                        for k in range(0, len(final[n][i][1][j])):
-                            final_newx_sum = final_newx_sum + (final[n][i][1][j][k][24][0] + final[n][i][1][j][k][25][0])/2.0
-                            final_newy_sum = final_newy_sum + (final[n][i][1][j][k][24][1] + final[n][i][1][j][k][25][1])/2.0
-                            final_newz_sum = final_newz_sum + (final[n][i][1][j][k][24][2] + final[n][i][1][j][k][25][2])/2.0
-                            p2_newx_sum = p2_newx_sum + (periodic2[n][i][1][j][k][24][0] + periodic2[n][i][1][j][k][25][0])/2.0
-                            p2_newy_sum = p2_newy_sum + (periodic2[n][i][1][j][k][24][1] + periodic2[n][i][1][j][k][25][1])/2.0
-                            p2_newz_sum = p2_newz_sum + (periodic2[n][i][1][j][k][24][2] + periodic2[n][i][1][j][k][25][2])/2.0
-                            divisor += 1
-            final_newx = final_newx_sum/float(divisor); final_newy = final_newy_sum/float(divisor); final_newz = final_newz_sum/float(divisor);
-            p2_newx = p2_newx_sum/float(divisor); p2_newy = p2_newy_sum/float(divisor); p2_newz = p2_newz_sum/float(divisor)
-            translation_final = np.matrix([[1, 0, 0, x_ave - final_newx], [0, 1, 0, y_ave - final_newy], [0, 0, 1, z_ave - final_newz], [0, 0, 0, 1]])
-            translation_p2 = np.matrix([[1, 0, 0, x_p2 - p2_newx], [0, 1, 0, y_p2 - p2_newy], [0, 0, 1, z_p2 - p2_newz], [0, 0, 0, 1]])
+                    for j in range(0, len(final[n][i])):
+                        for k in range(0, len(final[n][i][j])):
+                            for l in range(0, len(final[n][i][j][k])):
+                                for m in range(0, no_atoms - no_ions):
+                                    if final[n][i][j][k][l][m][0] > x_max:
+                                        x_max = final[n][i][j][k][l][m][0]
+                                    if final[n][i][j][k][l][m][0] < x_min:
+                                        x_min = final[n][i][j][k][l][m][0]
+                                    if final[n][i][j][k][l][m][1] > y_max:
+                                        y_max = final[n][i][j][k][l][m][1]
+                                    if final[n][i][j][k][l][m][1] < y_min:
+                                        y_min = final[n][i][j][k][l][m][1]
+                                    if final[n][i][j][k][l][m][2] > z_max:
+                                        z_max = final[n][i][j][k][l][m][2]
+                                    if final[n][i][j][k][l][m][2] < z_min:
+                                        z_min = final[n][i][j][k][l][m][2]
+            translation_final = np.matrix([[1, 0, 0, -x_min - 10*dist_periodic/2.0], [0, 1, 0, -y_min - 10*dist_periodic/2.0],
+                 [0, 0, 1, -z_min - 10*dist_periodic/2.0], [0, 0, 0, 1]])
             for n in range(0, len(final)):
                 for i in range(0, len(final[n])):
                     for j in range(0, len(final[n][i])):
                         for k in range(0, len(final[n][i][j])):
                             for l in range(0, len(final[n][i][j][k])):
                                 for m in range(0, no_atoms):
-                                    final[n][i][j][k][l][m].append(1)
+                                    if len(final[n][i][j][k][l][m]) == 3:
+                                        final[n][i][j][k][l][m].append(1)
                                     x = np.dot(translation_final, np.array(final[n][i][j][k][l][m]))
                                     final[n][i][j][k][l][m] = [x[0, 0], x[0, 1], x[0, 2]]
-                                    periodic2[n][i][j][k][l][m].append(1)
+            periodic1 = []; periodic2 = []; periodic3 = []
+            for n in range(0, len(final)):
+                periodic1.append([]); periodic2.append([]); periodic3.append([])
+                for i in range(0, len(final[n])):
+                    periodic1[n].append([]); periodic2[n].append([]); periodic3[n].append([])
+                    for j in range(0, len(final[n][i])):
+                        periodic1[n][i].append([]); periodic2[n][i].append([]); periodic3[n][i].append([])
+                        for k in range(0, len(final[n][i][j])):
+                            periodic1[n][i][j].append([]); periodic2[n][i][j].append([]); periodic3[n][i][j].append([])
+                            for l in range(0, len(final[n][i][j][k])):
+                                periodic1[n][i][j][k].append([]); periodic2[n][i][j][k].append([]); periodic3[n][i][j][k].append([])
+                                for m in range(0, no_atoms):
+                                    periodic1[n][i][j][k][l].append([]); periodic2[n][i][j][k][l].append([]); periodic3[n][i][j][k][l].append([])
+                                    periodic1[n][i][j][k][l][m] = final[n][i][j][k][l][m]
+                                    periodic2[n][i][j][k][l][m] = final[n][i][j][k][l][m]
+                                    periodic3[n][i][j][k][l][m] = final[n][i][j][k][l][m]
+            translation_p1 = np.matrix([[1, 0, 0, x_max - x_min - 10*dist_periodic], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
+            for n in range(0, len(periodic1)):
+                for i in range(0, len(periodic1[n])):
+                    for j in range(0, len(periodic1[n][i])):
+                        for k in range(0, len(periodic1[n][i][j])):
+                            for l in range(0, len(periodic1[n][i][j][k])):
+                                for m in range(0, no_atoms):
+                                    if len(periodic1[n][i][j][k][l][m]) == 3:
+                                        periodic1[n][i][j][k][l][m].append(1)
+                                    x = np.dot(translation_p1, np.array(periodic1[n][i][j][k][l][m]))
+                                    periodic1[n][i][j][k][l][m] = [x[0, 0], x[0, 1], x[0, 2]]
+            translation_p2 = np.matrix([[1, 0, 0, 0], [0, 1, 0, y_max - y_min - 10*dist_periodic], [0, 0, 1, 0], [0, 0, 0, 1]])
+            for n in range(0, len(periodic2)):
+                for i in range(0, len(periodic2[n])):
+                    for j in range(0, len(periodic2[n][i])):
+                        for k in range(0, len(periodic2[n][i][j])):
+                            for l in range(0, len(periodic2[n][i][j][k])):
+                                for m in range(0, no_atoms):
+                                    if len(periodic2[n][i][j][k][l][m]) == 3:
+                                        periodic2[n][i][j][k][l][m].append(1)
                                     x = np.dot(translation_p2, np.array(periodic2[n][i][j][k][l][m]))
                                     periodic2[n][i][j][k][l][m] = [x[0, 0], x[0, 1], x[0, 2]]
+            translation_p3 = np.matrix([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, z_max - z_min - 10*dist_periodic], [0, 0, 0, 1]])
+            for n in range(0, len(periodic3)):
+                for i in range(0, len(periodic3[n])):
+                    for j in range(0, len(periodic3[n][i])):
+                        for k in range(0, len(periodic3[n][i][j])):
+                            for l in range(0, len(periodic3[n][i][j][k])):
+                                for m in range(0, no_atoms):
+                                    if len(periodic3[n][i][j][k][l][m]) == 3:
+                                        periodic3[n][i][j][k][l][m].append(1)
+                                    x = np.dot(translation_p3, np.array(periodic3[n][i][j][k][l][m]))
+                                    periodic3[n][i][j][k][l][m] = [x[0, 0], x[0, 1], x[0, 2]]
+            x_plane_j3x_sum = 0; x_plane_j3y_sum = 0; x_plane_j3z_sum = 0; divisor = 0
+            for i in range(0, len(periodic1[2][1][1][no_layers - 1])):
+                x_plane_j3x_sum = x_plane_j3x_sum + (periodic1[2][1][1][no_layers - 1][i][24][0] + periodic1[2][1][1][no_layers - 1][i][25][0])/2.0
+                x_plane_j3y_sum = x_plane_j3y_sum + (periodic1[2][1][1][no_layers - 1][i][24][1] + periodic1[2][1][1][no_layers - 1][i][25][1])/2.0
+                x_plane_j3z_sum = x_plane_j3z_sum + (periodic1[2][1][1][no_layers - 1][i][24][0] + periodic1[2][1][1][no_layers - 1][i][25][2])/2.0
+                divisor += 1
+            x_plane_j3x = x_plane_j3x_sum/float(divisor); x_plane_j3y = x_plane_j3y_sum/float(divisor); x_plane_j3z = x_plane_j3z_sum/float(divisor)
+            x_plane_j4x_sum = 0; x_plane_j4y_sum = 0; x_plane_j4z_sum = 0; divisor = 0
+            for i in range(0, len(final[3][0][1][0])):
+                x_plane_j4x_sum = x_plane_j4x_sum + (final[3][0][1][0][i][24][0] + final[3][0][1][0][i][25][0])/2.0
+                x_plane_j4y_sum = x_plane_j4y_sum + (final[3][0][1][0][i][24][1] + final[3][0][1][0][i][25][1])/2.0
+                x_plane_j4z_sum = x_plane_j4z_sum + (final[3][0][1][0][i][24][0] + final[3][0][1][0][i][25][2])/2.0
+                divisor += 1
+            x_plane_j4x = x_plane_j4x_sum/float(divisor); x_plane_j4y = x_plane_j4y_sum/float(divisor); x_plane_j4z = x_plane_j4z_sum/float(divisor)
+            x_dist_x = x_plane_j3x - x_plane_j4x; x_dist_y = x_plane_j3y - x_plane_j4y; x_dist_z = x_plane_j3z - x_plane_j4z
+            x_angle_dist[x_rotation][y_rotation][z_rotation] = [x_dist_x, x_dist_y, x_dist_z]
+            x_square_dist = x_dist_x**2 + x_dist_y**2 + x_dist_z**2
             y_plane_j5x_sum = 0; y_plane_j5y_sum = 0; y_plane_j5z_sum = 0; divisor = 0
             for i in range(0, len(periodic2[4][2][1][no_layers - 1])):
                 y_plane_j5x_sum = y_plane_j5x_sum + (periodic2[4][2][1][no_layers - 1][i][24][0] + periodic2[4][2][1][no_layers - 1][i][25][0])/2.0
                 y_plane_j5y_sum = y_plane_j5y_sum + (periodic2[4][2][1][no_layers - 1][i][24][1] + periodic2[4][2][1][no_layers - 1][i][25][1])/2.0
                 y_plane_j5z_sum = y_plane_j5z_sum + (periodic2[4][2][1][no_layers - 1][i][24][0] + periodic2[4][2][1][no_layers - 1][i][25][2])/2.0
                 divisor += 1
-            y_plane_j5x = y_plane_j5x_sum/float(divisor); y_plane_j5y = y_plane_j5y_sum/float(divisor); y_plane_j5z = y_plane_j5z_sum/float(divisor)
+            y_plane_j5x = y_plane_j5x_sum / float(divisor); y_plane_j5y = y_plane_j5y_sum / float(divisor); y_plane_j5z = y_plane_j5z_sum / float(divisor)
             y_plane_j7x_sum = 0; y_plane_j7y_sum = 0; y_plane_j7z_sum = 0; divisor = 0
             for i in range(0, len(final[6][0][1][0])):
-                y_plane_j7x_sum = y_plane_j7x_sum + (final[6][0][1][0][i][24][0] + final[6][0][1][0][i][25][0])/2.0
-                y_plane_j7y_sum = y_plane_j7y_sum + (final[6][0][1][0][i][24][1] + final[6][0][1][0][i][25][1])/2.0
-                y_plane_j7z_sum = y_plane_j7z_sum + (final[6][0][1][0][i][24][0] + final[6][0][1][0][i][25][2])/2.0
+                y_plane_j7x_sum = y_plane_j7x_sum + (final[6][0][1][0][i][24][0] + final[6][0][1][0][i][25][0]) / 2.0
+                y_plane_j7y_sum = y_plane_j7y_sum + (final[6][0][1][0][i][24][1] + final[6][0][1][0][i][25][1]) / 2.0
+                y_plane_j7z_sum = y_plane_j7z_sum + (final[6][0][1][0][i][24][0] + final[6][0][1][0][i][25][2]) / 2.0
                 divisor += 1
             y_plane_j7x = y_plane_j7x_sum/float(divisor); y_plane_j7y = y_plane_j7y_sum/float(divisor); y_plane_j7z = y_plane_j7z_sum/float(divisor)
-            dist_x = y_plane_j5x - y_plane_j7x; dist_y = y_plane_j5y - y_plane_j7y; dist_z = y_plane_j5z - y_plane_j7z
-            angle_dist[a][b][c] = [dist_x, dist_y, dist_z]
-            if dist_x**2 + dist_y**2 + dist_z**2 < 5000:
-                print a, b, c, dist_x**2 + dist_y**2 + dist_z**2
-dist_min = 5000; i_min = 100; j_min = 100; k_min = 100
-for i in range(0, len(angle_dist)):
-    for j in range(0, len(angle_dist[i])):
-        for k in range(0, len(angle_dist[i][j])):
-            if (angle_dist[i][j][k][0])**2 + (angle_dist[i][j][k][1])**2 + (angle_dist[i][j][k][2])**2 < dist_min:
-                dist_min = (angle_dist[i][j][k][0])**2 + (angle_dist[i][j][k][1])**2 + (angle_dist[i][j][k][2])**2
-                i_min = i; j_min = j; k_min = k
-print dist_min, angle_dist[i_min][j_min][k_min], i_min, j_min, k_min
+            y_dist_x = y_plane_j5x - y_plane_j7x; y_dist_y = y_plane_j5y - y_plane_j7y; y_dist_z = y_plane_j5z - y_plane_j7z
+            y_angle_dist[x_rotation][y_rotation][z_rotation] = [y_dist_x, y_dist_y, y_dist_z]
+            y_square_dist = y_dist_x ** 2 + y_dist_y ** 2 + y_dist_z ** 2
+            z_plane_j6x_sum = 0; z_plane_j6y_sum = 0; z_plane_j6z_sum = 0; divisor = 0
+            for i in range(0, len(periodic3[5][0][1][no_layers - 1])):
+                z_plane_j6x_sum = z_plane_j6x_sum + (periodic3[5][0][1][no_layers - 1][i][24][0] + periodic3[5][0][1][no_layers - 1][i][25][0])/2.0
+                z_plane_j6y_sum = z_plane_j6y_sum + (periodic3[5][0][1][no_layers - 1][i][24][1] + periodic3[5][0][1][no_layers - 1][i][25][1])/2.0
+                z_plane_j6z_sum = z_plane_j6z_sum + (periodic3[5][0][1][no_layers - 1][i][24][0] + periodic3[5][0][1][no_layers - 1][i][25][2])/2.0
+                divisor += 1
+            z_plane_j6x = z_plane_j6x_sum/float(divisor); z_plane_j6y = z_plane_j6y_sum/float(divisor); z_plane_j6z = z_plane_j6z_sum/float(divisor)
+            z_plane_j2x_sum = 0; z_plane_j2y_sum = 0; z_plane_j2z_sum = 0; divisor = 0
+            for i in range(0, len(final[1][0][1][0])):
+                z_plane_j2x_sum = z_plane_j2x_sum + (final[1][0][1][0][i][24][0] + final[1][0][1][0][i][25][0]) / 2.0
+                z_plane_j2y_sum = z_plane_j2y_sum + (final[1][0][1][0][i][24][1] + final[1][0][1][0][i][25][1]) / 2.0
+                z_plane_j2z_sum = z_plane_j2z_sum + (final[1][0][1][0][i][24][0] + final[1][0][1][0][i][25][2]) / 2.0
+                divisor += 1
+            z_plane_j2x = z_plane_j2x_sum/float(divisor); z_plane_j2y = z_plane_j2y_sum/float(divisor); z_plane_j2z = z_plane_j2z_sum/float(divisor)
+            z_dist_x = z_plane_j6x - z_plane_j2x; z_dist_y = z_plane_j6y - z_plane_j2y; z_dist_z = z_plane_j6z - z_plane_j2z
+            z_angle_dist[x_rotation][y_rotation][z_rotation] = [z_dist_x, z_dist_y, z_dist_z]
+            z_square_dist = z_dist_x ** 2 + z_dist_y ** 2 + z_dist_z ** 2
+            if x_square_dist < 5000 and y_square_dist < 5000 and z_square_dist < 5000:
+                print '{:^7}{:^7}{:^7}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}'.format(x_rotation - max_angle,
+                    y_rotation - max_angle, z_rotation - max_angle, x_square_dist, x_dist_x, x_dist_y, x_dist_z, y_square_dist, y_dist_x, y_dist_y, y_dist_z,
+                    z_square_dist, z_dist_x, z_dist_y, z_dist_z)
+            if x_square_dist >= 5000 and y_square_dist < 5000 and z_square_dist < 5000:
+                print '{:^7}{:^7}{:^7}{:^36}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}'.format(x_rotation - max_angle, y_rotation - max_angle,
+                    z_rotation - max_angle, ' ', y_square_dist, y_dist_x, y_dist_y, y_dist_z, z_square_dist, z_dist_x, z_dist_y, z_dist_z)
+            if x_square_dist < 5000 and y_square_dist >= 5000 and z_square_dist < 5000:
+                print '{:^7}{:^7}{:^7}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^36}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}'.format(x_rotation - max_angle, y_rotation - max_angle,
+                    z_rotation - max_angle, x_square_dist, x_dist_x, x_dist_y, x_dist_z, ' ', z_square_dist, z_dist_x, z_dist_y, z_dist_z)
+            if x_square_dist < 5000 and y_square_dist < 5000 and z_square_dist >= 5000:
+                print '{:^7}{:^7}{:^7}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}'.format(x_rotation - max_angle, y_rotation - max_angle,
+                    z_rotation - max_angle, x_square_dist, x_dist_x, x_dist_y, x_dist_z, y_square_dist, y_dist_x, y_dist_y, y_dist_z)
+            if x_square_dist >= 5000 and y_square_dist >= 5000 and z_square_dist < 5000:
+                print '{:^7}{:^7}{:^7}{:^36}{:^36}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}'.format(x_rotation - max_angle, y_rotation - max_angle, z_rotation - max_angle,
+                    ' ', ' ', z_square_dist, z_dist_x, z_dist_y, z_dist_z)
+            if x_square_dist >= 5000 and y_square_dist < 5000 and z_square_dist >= 5000:
+                print '{:^7}{:^7}{:^7}{:^36}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}'.format(x_rotation - max_angle, y_rotation - max_angle, z_rotation - max_angle,
+                    ' ', y_square_dist, y_dist_x, y_dist_y, y_dist_z)
+            if x_square_dist < 5000 and y_square_dist >= 5000 and z_square_dist >= 5000:
+                print '{:^7}{:^7}{:^7}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}'.format(x_rotation - max_angle, y_rotation - max_angle, z_rotation - max_angle, x_square_dist,
+                    x_dist_x, x_dist_y, x_dist_z)
+x_dist_min = 5000; x_i_min = 100; x_j_min = 100; x_k_min = 100
+y_dist_min = 5000; y_i_min = 100; y_j_min = 100; y_k_min = 100
+z_dist_min = 5000; z_i_min = 100; z_j_min = 100; z_k_min = 100
+all_dist_min = 15000; all_i_min = 100; all_j_min = 100; all_k_min = 100
+for i in range(0, len(x_angle_dist)):
+    for j in range(0, len(x_angle_dist[i])):
+        for k in range(0, len(x_angle_dist[i][j])):
+            if (x_angle_dist[i][j][k][0])**2 + (x_angle_dist[i][j][k][1])**2 + (x_angle_dist[i][j][k][2])**2 < x_dist_min:
+                x_dist_min = (x_angle_dist[i][j][k][0])**2 + (x_angle_dist[i][j][k][1])**2 + (x_angle_dist[i][j][k][2])**2
+                x_i_min = i; x_j_min = j; x_k_min = k
+            if (y_angle_dist[i][j][k][0])**2 + (y_angle_dist[i][j][k][1])**2 + (y_angle_dist[i][j][k][2])**2 < y_dist_min:
+                y_dist_min = (y_angle_dist[i][j][k][0])**2 + (y_angle_dist[i][j][k][1])**2 + (y_angle_dist[i][j][k][2])**2
+                y_i_min = i; y_j_min = j; y_k_min = k
+            if (z_angle_dist[i][j][k][0])**2 + (z_angle_dist[i][j][k][1])**2 + (z_angle_dist[i][j][k][2])**2 < z_dist_min:
+                z_dist_min = (z_angle_dist[i][j][k][0])**2 + (z_angle_dist[i][j][k][1])**2 + (z_angle_dist[i][j][k][2])**2
+                z_i_min = i; z_j_min = j; z_k_min = k
+            if (x_angle_dist[i][j][k][0])**2 + (x_angle_dist[i][j][k][1])**2 + (x_angle_dist[i][j][k][2])**2 + (y_angle_dist[i][j][k][0])**2 + (y_angle_dist[i][j][k][1])**2 + (y_angle_dist[i][j][k][2])**2 + (z_angle_dist[i][j][k][0])**2 + (z_angle_dist[i][j][k][1])**2 + (z_angle_dist[i][j][k][2])**2 < all_dist_min:
+                all_dist_min = (x_angle_dist[i][j][k][0])**2 + (x_angle_dist[i][j][k][1])**2 + (x_angle_dist[i][j][k][2])**2 + (y_angle_dist[i][j][k][0])**2 + (y_angle_dist[i][j][k][1])**2 + (y_angle_dist[i][j][k][2])**2 + (z_angle_dist[i][j][k][0])**2 + (z_angle_dist[i][j][k][1])**2 + (z_angle_dist[i][j][k][2])**2
+                all_i_min = i; all_j_min = j; all_k_min = k
+
+print 'minimum x: ',x_dist_min,'   ',x_angle_dist[x_i_min][x_j_min][x_k_min],'    ',x_i_min,'  ',x_j_min,'  ',x_k_min
+print 'minimum y: ',y_dist_min,'   ',y_angle_dist[y_i_min][y_j_min][y_k_min],'    ',y_i_min,'  ',y_j_min,'  ',y_k_min
+print 'minimum z: ',z_dist_min,'   ',z_angle_dist[z_i_min][z_j_min][z_k_min],'    ',z_i_min,'  ',z_j_min,'  ',z_k_min
+print 'minimum in all directions: ',all_dist_min,'    i: ',all_i_min,'   j: ',all_j_min,'   k: ',all_k_min
+print '       x: ',x_angle_dist[all_i_min][all_j_min][all_k_min],'   y: ',y_angle_dist[all_i_min][all_j_min][all_k_min],'   z: ',z_angle_dist[all_i_min][all_j_min][all_k_min]
 sys.exit()
 
-final = [unitjunction, unitjunction2, unitjunction3, unitjunction4, unitjunction5, unitjunction6, unitjunction7,
-         periodic2[0], periodic2[1], periodic2[2], periodic2[3], periodic2[4], periodic2[5], periodic2[6]]
+#final = [unitjunction, unitjunction2, unitjunction3, unitjunction4, unitjunction5, unitjunction6, unitjunction7, periodic1[0], periodic1[1], periodic1[2], periodic1[3], periodic1[4], periodic1[5], periodic1[6]]
 
 sys_atoms = 0
 for n in range(0, len(final)):
@@ -1656,3 +1699,4 @@ for n in range(0, len(final)):
                             count_atom = 1
                         count_monomer += 1
 print '  ', (x_max - x_min)/10.0 - dist_periodic,'  ', (y_max - y_min)/10.0 - dist_periodic,'  ', (z_max - z_min)/10.0 - dist_periodic,'   0.00000   0.00000  -0.00000   0.00000  -0.00000  -0.00000'
+
