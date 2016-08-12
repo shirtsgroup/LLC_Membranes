@@ -9,7 +9,7 @@
 RESOURCE="janus"
 
 # Choose which monomer to build with
-MONOMER="monomer4.pdb"  # Structure file to be used
+MONOMER="monomer2"  # Structure file to be used
 
 #MPI/GPU Options
 MPI="on"
@@ -171,9 +171,9 @@ sed -i -e "s/MOL_NA/${MOL_NA}/g" NaPore.top
 
 python ${DIR}/../Structure-Files/Write_Input.py -C ${CUTOFF_MD} -i ${INTEGRATOR_MD} -D ${DT} -v ${TCOUPL} -K ${REF_T} -b ${PCOUPL}\
     -Y ${PTYPE} -B ${REF_P} -R ${COMPRESSIBILITY} -Z ${PBC} -L ${SIM_LENGTH} -I ${INTEGRATOR_EM} -S ${NSTEPS_EM}\
-    -c ${CUTOFF_EM} -f ${FRAMES} -s ${SOLVATION} -V ${SOLV_LENGTH} -o ${NO_MONOMERS} -l ${LAYERS} -P ${NOPORES}
+    -c ${CUTOFF_EM} -f ${FRAMES} -s ${SOLVATION} -V ${SOLV_LENGTH} -o ${NO_MONOMERS} -l ${LAYERS} -P ${NOPORES} -M ${MONOMER}
 
-python ${DIR}/../Structure_Builder/Orient_Plane.py -i ${MONOMER} -l ${LAYERS} -m ${NO_MONOMERS} \
+python ${DIR}/../Structure_Builder/Orient_Plane.py -i ${MONOMER}.pdb -l ${LAYERS} -m ${NO_MONOMERS} \
     -r ${RADIUS} -p ${PORE2PORE} -n ${NOPORES} -d ${DBWL} >> initial.gro
 
 # Put the structure in a box

@@ -29,6 +29,7 @@ parser.add_argument('-o', '--NO_MONOMERS', default = 6, help = 'Number of monome
 parser.add_argument('-l', '--LAYERS', default = 20, help = 'Number of layers in structure')
 parser.add_argument('-P', '--NOPORES', default = 4, help = 'Number of pores')
 parser.add_argument('-x', '--xlink', default='off', help = 'Whether to set up for cross linking or not')
+parser.add_argument('-M', '--mon_no', default='monomer2', help = 'Monomer number used to build structure')
 
 
 args = parser.parse_args()
@@ -57,7 +58,7 @@ elif monomer == 'BCC':
     ion_top = '#include "oplsaa.ff/ions.itp"'
     sol_top = '#include "oplsaa.ff/spc.itp"'
     ion = 'BR'
-    mon_top = '#include "%s/Monomer_Tops/BCC_mon.itp"' %location
+    mon_top = '#include "%s/Monomer_Tops/%s.itp"' %(location, args.mon_no)
 
 gaff = '#include "%s/Forcefields/gaff/gaff.itp"' %location  # generalized amber force field
 
