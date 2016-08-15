@@ -31,7 +31,7 @@ elif args.type == 'BCC':
     itp = 'BCC_mon.itp'
 
 
-f = open("%s/Monomer_Tops/%s" % (location, itp), "r")
+f = open("%s/../Structure-Files/Monomer_Tops/%s" % (location, itp), "r")
 
 a = []
 for line in f:

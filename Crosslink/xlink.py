@@ -45,7 +45,7 @@ if args.type == 'LLC':
     atoms = 143  # not including sodium but including dummy atoms
     c1_atoms = ['C20', 'C34', 'C48']
     c2_atoms = ['C19', 'C33', 'C47']
-    topology = 'HII_mon.itp'
+    topology = 'monomer2.itp'
     xlink_atoms = 6  # number of atoms involved in cross-linking
     no_dummies = 6
     images = 9  # total periodic images used for distance calculations
@@ -494,7 +494,7 @@ if int(args.iteration) == 0:
     location = os.environ['GITHUB']  # if there is an error here, you need to add the path to where all of the github
     # files are stored to an environment variable in your .bashrc
     with open("crosslinked.itp", "w+") as output:
-        subprocess.call(["python", "%s/Structure-Files/Assembly_itp.py" %location, "-x", "on", "-m", "%s" %args.monomer], stdout=output);
+        subprocess.call(["python", "%s/Scripts/Assembly_itp.py" %location, "-x", "on", "-m", "%s" %args.monomer], stdout=output);
 
     # open and read that new file
 
@@ -516,19 +516,22 @@ else:
 # find the residue numbers of the first C33, C47, C19 (C2 carbons)
 
 index = 0
-while str.strip(b[index][22:29]) != 'C19':
+#while str.strip(b[index][22:29]) != 'C19':
+while b[index].count('C19') == 0:
     index += 1  # increments the while loop
 
 C2_1 = int(b[index][0:5])
 
 index = 0
-while str.strip(b[index][22:29]) != 'C33':
+while b[index].count('C33') == 0:
+#while str.strip(b[index][22:29]) != 'C33':
     index += 1  # increments the while loop
 
 C2_2 = int(b[index][0:5])
 
 index = 0
-while str.strip(b[index][22:29]) != 'C47':
+while b[index].count('C47') == 0:
+#while str.strip(b[index][22:29]) != 'C47':
     index += 1  # increments the while loop
 
 C2_3 = int(b[index][0:5])

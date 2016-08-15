@@ -15,10 +15,10 @@ import os
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # working directory
 
 parser = argparse.ArgumentParser(description = 'Build LLC Structure')
-parser.add_argument('-i', '--input', default='monomer4.pdb', help = 'Path to input file')
+parser.add_argument('-i', '--input', default='monomer2.pdb', help = 'Path to input file')
 parser.add_argument('-l', '--layers', default=20, type=int, help = 'Number of Layers')
 parser.add_argument('-m', '--monomers', default=6, type=int, help = 'Monomers per layer')
-parser.add_argument('-r', '--radius', default=3, type=float, help = 'Initial Pore Radius')
+parser.add_argument('-r', '--radius', default=6, type=float, help = 'Initial Pore Radius')
 parser.add_argument('-p', '--p2p', default=40, type=float, help = 'Initial Pore to Pore Distance')
 parser.add_argument('-n', '--nopores', default=4, type=int, help = 'Number of Pores')
 parser.add_argument('-d', '--dbwl', default=10, type=float, help = 'Distance between layers')
@@ -86,7 +86,8 @@ positions4 = []  # will hold the x,y,z coordinates of each atom of monomer 4
 positions5 = []  # will hold the x,y,z coordinates of each atom of monomer 5
 positions6 = []  # will hold the x,y,z coordinates of each atom of monomer 6
 positions7 = []  # here for the case where 7 monomers pack
-positions = [positions1, positions2, positions3, positions4, positions5, positions6, positions7]  # list of lists
+positions8 = []
+positions = [positions1, positions2, positions3, positions4, positions5, positions6, positions7, positions8]  # list of lists
 x_values = []  # will hold x_values in the order that they appear in the positions matrix
 y_values = []  # will hold y_values in the order that they appear in the positions matrix
 z_values = []  # will hold z_values in the order that they appear in the positions matrix

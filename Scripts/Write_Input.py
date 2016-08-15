@@ -49,7 +49,7 @@ if monomer == 'HII':
     if args.xlink == 'on':
         mon_top='#include "%s/crosslinked_new.itp"' %os.getcwd()
     else:
-        mon_top = '#include "%s/Monomer_Tops/%s.itp' %(location, args.mon_no)
+        mon_top = '#include "%s/../Structure-Files/Monomer_Tops/%s.itp' %(location, args.mon_no)
 elif monomer == 'BCC':
     grps = ['BCC', 'BR']
     grps_solv = ['BCC', 'BR', 'SOL']
@@ -60,7 +60,7 @@ elif monomer == 'BCC':
     ion = 'BR'
     mon_top = '#include "%s/Monomer_Tops/%s.itp"' %(location, args.mon_no)
 
-gaff = '#include "%s/Forcefields/gaff/gaff.itp"' %location  # generalized amber force field
+gaff = '#include "%s/../Structure-Files/Forcefields/gaff/gaff.itp"' %location  # generalized amber force field
 
 # Energy minimization .mdp file
 title = 'title = Energy Minimization'
