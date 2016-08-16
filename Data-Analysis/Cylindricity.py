@@ -17,7 +17,7 @@ import argparse
 # Pore 4 ------------- Pore 3'
 
 parser = argparse.ArgumentParser(description = 'Run Cylindricity script')
-parser.add_argument('-i', '--input', default='../Crosslink/wiggle_traj.gro', help = 'Path to input file')
+parser.add_argument('-i', '--input', default='wiggle_traj.gro', help = 'Path to input file')
 parser.add_argument('-n', '--no_monomers', default=6, help = 'Number of Monomers per layer')
 parser.add_argument('-a', '--atoms', default=137, help='Number of atoms per monomer')
 parser.add_argument('-l', '--layers', default=20, help='Number of layers in each pore')

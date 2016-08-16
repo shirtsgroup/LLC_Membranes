@@ -5,22 +5,25 @@
 FILE1='wiggle.tpr'
 FILE2='wiggle.trr'
 FILE3='initial.gro'
+FILE4='wiggle.gro'
 PATH2FILE='/projects/beco4952/Gromacs/Pores'
 RESOURCE='bridges'
 NO_MONOMERS=6
+DONE='no'
 
 # Flags
 # -f  : FILE1 ... .tpr file
 # -F  : FILE2 ... .trr file
 # -p  : PATH2FILE ... path to file/folder which will be copied over
 
-while getopts "f:F:p:r:m:" opt; do
+while getopts "f:F:p:r:m:d:" opt; do
     case $opt in
     f) FILE1=$OPTARG;;
     F) FILE2=$OPTARG;;
     p) PATH2FILE=$OPTARG;;
     r) RESOURCE=$OPTARG;;
     m) NO_MONOMERS=$OPTARG;;
+    d) DONE=$OPTARG;;
     esac
 done
 
@@ -45,3 +48,13 @@ if [ ${RESOURCE} == 'janus' ]; then
 fi
 #Cylindricity_Traj.py -i wiggle_traj.gro -n ${NO_MONOMERS}
 Cylindricity.py -i wiggle_traj.gro -n ${NO_MONOMERS}
+
+if [ ${DONE} == 'yes' ]; then
+    if [ ${RESOURCE} == 'bridges' ]; then
+        scp bjc@bridges.psc.edu:$PATH2FILE/${FILE4} ./
+    fi
+    if [ ${RESOURCE} == 'janus' ]; then
+        scp beco4952@login.rc.colorado.edu:$PATH2FILE/${FILE4} ./
+    fi
+    Thickness_Bash.py -i wiggle.gro
+fi

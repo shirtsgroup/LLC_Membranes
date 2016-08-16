@@ -259,15 +259,7 @@ for i in range(0, len(positions_inp)):
 positions = []
 for i in range(0, args.monomers):
     positions.append([])
-# positions1 = []  # will hold the x,y,z coordinates of each atom of monomer 1
-# positions2 = []  # will hold the x,y,z coordinates of each atom of monomer 2
-# positions3 = []  # will hold the x,y,z coordinates of each atom of monomer 3
-# positions4 = []  # will hold the x,y,z coordinates of each atom of monomer 4
-# positions5 = []  # will hold the x,y,z coordinates of each atom of monomer 5
-# positions6 = []  # will hold the x,y,z coordinates of each atom of monomer 6
-# positions7 = []  # here for the case where 7 monomers pack
-# positions8 = []
-# positions = [positions1, positions2, positions3, positions4, positions5, positions6, positions7]  # list of lists
+
 x_values = []  # will hold x_values in the order that they appear in the positions matrix
 y_values = []  # will hold y_values in the order that they appear in the positions matrix
 z_values = []  # will hold z_values in the order that they appear in the positions matrix
