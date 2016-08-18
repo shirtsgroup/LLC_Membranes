@@ -173,7 +173,7 @@ time = []
 for i in range(0, len(time_pts)):
     time.append(time_pts[i]*intervals)
 
-print time[t0_index]
+print 'Correlation Time: %s ns' %time[t0_index]
 
 plt.plot(time, pore12, label='1-2')
 plt.plot(time, pore13, label='1-3')
@@ -306,7 +306,7 @@ frames = float(1 / float(traj_points - traj_start))
 Averages = np.dot(Sum_list, frames).tolist()
 Averages.sort()
 print(Averages)
-print(np.mean(Averages[0:4]))
+print 'Average Pore-to-Pore Distance: %s +/- %s nm' %(np.mean(Averages[0:4]), np.std(Averages[0:4]))
 
 x = x_axis
 y = y_axis

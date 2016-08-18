@@ -54,7 +54,7 @@ if [ ${DONE} == 'yes' ]; then
         scp bjc@bridges.psc.edu:$PATH2FILE/${FILE4} ./
     fi
     if [ ${RESOURCE} == 'janus' ]; then
-        scp beco4952@login.rc.colorado.edu:$PATH2FILE/${FILE4} ./
+        scp beco4952@login.rc.colorado.edu:$PATH2FILE/${FILE4} ./ >/dev/null
     fi
-    Thickness_Bash.py -i wiggle.gro
+    Thickness.py -i wiggle.gro
 fi

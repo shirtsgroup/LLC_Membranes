@@ -404,11 +404,13 @@ if int(args.iteration) != 0:  # preserve our old list of radicals again
     c1_rad_ndx_prev = c1_rad_ndx
     c2_rad_ndx_prev = c2_rad_ndx
 
-tp = int(args.term_prob)  # termination probability
-if type(tp) == int:
+
+tp = args.term_prob  # termination probability
+
+if tp.count('.') == 0:
     no_decimals = 0  # there aren't decimals in a integer
-else:  # len(str(int(float(tp)))) works in the following line if you want non-integer term probabilities
-    no_decimals = len(str(tp)) - len(str(int(tp))) - 1  # subtract the length of the integer value from the length
+else:
+    no_decimals = len(str(tp)) - len(str(int(float(tp)))) - 1  # subtract the length of the integer value from the length
                                                         # of the float value and subtract one for the decimal point to
                                                         # get the number of decimal places in the number
 
@@ -417,7 +419,7 @@ else:  # len(str(int(float(tp)))) works in the following line if you want non-in
 # If tp is 5.46 % then it should be an array of length 10000 with 546 1's and the rest 0
 
 array_length = 100 * 10 ** no_decimals  # multiply 100 % by 10 raised to the number of decimal points
-no_ones = int(tp * 10 ** no_decimals)  # multiply the termination probability by the same amount
+no_ones = int(float(tp) * 10 ** no_decimals)  # multiply the termination probability by the same amount
 
 term_prob_array = []  # make an array with a a percentage of 1's equal to the termination probability
 for i in range(0, array_length - no_ones):

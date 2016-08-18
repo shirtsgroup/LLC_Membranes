@@ -29,7 +29,6 @@ line = 0
 while a[line].count('HII') == 0:
     line += 1
 
-print line
 z = []  # list to hold z positions of all atoms
 
 benz_carbs = ['C', 'C1', 'C2', 'C3', 'C4', 'C5']
@@ -48,4 +47,4 @@ z_min = min(z)
 thickness = z_max - z_min
 tot_thickness = thickness + water_layer
 
-print tot_thickness
+print 'Membrane Thickness: %s nm' %tot_thickness
