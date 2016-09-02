@@ -33,13 +33,10 @@ z = []  # list to hold z positions of all atoms
 
 benz_carbs = ['C', 'C1', 'C2', 'C3', 'C4', 'C5']
 
-for i in range(line, len(a) -1):
-    if str.strip(a[i][11:15]) in benz_carbs:
-        z.append(float(a[i][36:44]))
-# for i in range(0, tot_monomers):
-#     for k in range(0, 5):
-#         z.append(float(a[i*args.atoms + k + line][36:44]))
-
+while a[line].count('HII') != 0:
+    if str.strip(a[line][11:15]) in benz_carbs:
+        z.append(float(a[line][36:44]))
+    line += 1
 
 z_max = max(z)
 z_min = min(z)
@@ -47,4 +44,4 @@ z_min = min(z)
 thickness = z_max - z_min
 tot_thickness = thickness + water_layer
 
-print 'Membrane Thickness: %s nm' %tot_thickness
+print 'Membrane Thickness: %s nm' %thickness

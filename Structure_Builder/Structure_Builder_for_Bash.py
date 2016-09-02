@@ -27,7 +27,7 @@ args = parser.parse_args()
 # Row at top of .gro file: (edit as necessary)
 print 'This is a .gro file'
 
-f = open("%s/../Structure-Files/%s" %(location, args.input), "r")
+f = open("%s/../Structure-Files/HII_Monomer_Configurations/%s" %(location, args.input), "r")
 a = []
 for line in f:
     a.append(line)

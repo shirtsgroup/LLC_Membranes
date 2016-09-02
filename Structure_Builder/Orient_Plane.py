@@ -14,15 +14,17 @@ parser.add_argument('-t', '--type', default = 'LLC', type = str, help = 'membran
 parser.add_argument('-i', '--input', default='monomer2.pdb', help = 'Path to input file')
 parser.add_argument('-l', '--layers', default=20, type=int, help = 'Number of Layers')
 parser.add_argument('-m', '--monomers', default=6, type=int, help = 'Monomers per layer')
-parser.add_argument('-r', '--radius', default=3, type=float, help = 'Initial Pore Radius')
-parser.add_argument('-p', '--p2p', default=40, type=float, help = 'Initial Pore to Pore Distance')
+parser.add_argument('-r', '--radius', default=6, type=float, help = 'Initial Pore Radius')
+parser.add_argument('-p', '--p2p', default=45, type=float, help = 'Initial Pore to Pore Distance')
 parser.add_argument('-n', '--nopores', default=4, type=int, help = 'Number of Pores')
-parser.add_argument('-d', '--dbwl', default=10, type=float, help = 'Distance between layers')
+parser.add_argument('-d', '--dbwl', default=5, type=float, help = 'Distance between layers')
+parser.add_argument('-s', '--layer_distribution', default='uniform', help = 'The distribution of monomes per layer')
+parser.add_argument('-a', '--alt_1', default=6, help='Monomers per layer for the first type of alternating layer')
+parser.add_argument('-A', '--alt_2', default=8, help='Monomers per layer for the second type of alternating layer')
 args = parser.parse_args()
 
 # Row at top of .gro file: (edit as necessary)
 print 'This is a .gro file'
-
 
 def functiontype(type):
     if type == 'LLC':
@@ -53,12 +55,24 @@ for i in range(0, len(a)):
     if a[i].count('ATOM') == 1:
         break
 
+layer_distribution = [0]*args.layers*args.nopores
+
+if args.layer_distribution == 'uniform':
+    for i in range(0, len(layer_distribution)):
+        layer_distribution[i] = args.monomers
+if args.layer_distribution == 'alternating':
+    for i in range(0, len(layer_distribution)):
+        if i % 2 == 0:
+            layer_distribution[i] = int(args.alt_1)
+        if i % 2 == 1:
+            layer_distribution[i] = int(args.alt_2)
+
 no_monomers = args.monomers  # number of monomers packed per layer around a pore
 pore_radius = args.radius  # Radius of pore (unsure of units right now)
 no_pores = args.nopores  # number of pores to be simulated
 dist_bw = args.p2p  # distance between pores (units tbd)
 no_layers = args.layers  # Number of layers in a pore
-sys_atoms = no_layers*no_monomers*no_pores*no_atoms  # total number of atoms in the system
+sys_atoms = sum(layer_distribution)*no_atoms  # total number of atoms in the system
 dist = args.dbwl  # distance between layers (units tbd)
 
 print '%s' %sys_atoms
@@ -86,7 +100,6 @@ plane_y = np.zeros((3, 1))
 plane_z = np.zeros((3, 1))
 # This loop only works because of the way the atoms are spaced in the coordinate file. I am looking at atoms C, C2 and
 # C4. Theoretically this will work with any three atoms but I am trying to align the plane of benzene
-
 
 if t == 'LLC':
     name = 'LLC'
@@ -257,32 +270,37 @@ for i in range(0, len(positions_inp)):
     positions_inp[i] = [x[0, 0], x[0, 1], x[0, 2]]
 
 positions = []
-for i in range(0, args.monomers):
+for i in range(0, len(set(layer_distribution))):  # add a list to positions for each unique value of monomers per layer
     positions.append([])
+for i in range(0, len(positions)):
+    for j in range(0, sorted(list(set(layer_distribution)))[i]):
+        positions[i].append([])
 
-x_values = []  # will hold x_values in the order that they appear in the positions matrix
-y_values = []  # will hold y_values in the order that they appear in the positions matrix
-z_values = []  # will hold z_values in the order that they appear in the positions matrix
+x_values = []  # will hold x values in the order that they appear in the positions matrix
+y_values = []  # will hold y values in the order that they appear in the positions matrix
+z_values = []  # will hold z values in the order that they appear in the positions matrix
 
 # rotate coordinates and store each rotated coordinate as a separate list:
 
-for k in range(0, len(positions_inp)):
-    x = np.array(positions_inp[k])
-    for i in range(1, no_monomers + 1):
-        theta = i * math.pi / (no_monomers / 2.0)  # angle to rotate about axis determined from no of monomers per layer
-        # Creates a rotation matrix to rotate input vector about y-axis making a new coordinate at evenly spaced points.
-        # Each rotation belongs to a different monomer's position.The no of points corresponds to the number of monomers
-        Rx = np.zeros((3, 3))  # makes a 3 x 3 zero matrix
-        Rx[0, 0] = math.cos(theta)  # This line and subsequent edits to Rx fills in entries needed for rotation matrix
-        Rx[1, 0] = math.sin(theta)
-        Rx[0, 1] = -math.sin(theta)
-        Rx[1, 1] = math.cos(theta)
-        Rx[2, 2] = 1
-        rot = np.dot(Rx, x)  # multiplies atomic coordinates by the rotation vector to generate new coordinates
-        rot = [float(rot[0]), float(rot[1]), float(rot[2])]  # converts matrix to a list of floats
-        positions[i - 1].append(rot)  # appends the atomic coordinates to 'positions'
+for j in range(0, len(positions)):
+    for k in range(0, len(positions_inp)):
+        x = np.array(positions_inp[k])
+        for i in range(1, len(positions[j]) + 1):
+            theta = i * math.pi / (len(positions[j]) / 2.0)  # angle to rotate about axis determined from no of monomers per layer
+            # Creates a rotation matrix to rotate input vector about y-axis making a new coordinate at evenly spaced points.
+            # Each rotation belongs to a different monomer's position.The no of points corresponds to the number of monomers
+            Rx = np.zeros((3, 3))  # makes a 3 x 3 zero matrix
+            Rx[0, 0] = math.cos(theta)  # This line and subsequent edits to Rx fills in entries needed for rotation matrix
+            Rx[1, 0] = math.sin(theta)
+            Rx[0, 1] = -math.sin(theta)
+            Rx[1, 1] = math.cos(theta)
+            Rx[2, 2] = 1
+            rot = np.dot(Rx, x)  # multiplies atomic coordinates by the rotation vector to generate new coordinates
+            rot = [float(rot[0]), float(rot[1]), float(rot[2])]  # converts matrix to a list of floats
+            positions[j][i - 1].append(rot)  # appends the atomic coordinates to 'positions'
 
-
+atom_count = 1
+monomer_count = 0
 for l in range(0, no_pores):  # loop to create multiple pores
     theta = 30  # angle which will be used to do hexagonal packing
     if l == 0:  # unmodified coordinates
@@ -298,23 +316,19 @@ for l in range(0, no_pores):  # loop to create multiple pores
         b = -math.sin(math.radians(theta))
         c = -math.cos(math.radians(theta))
     for k in range(0, no_layers):
-        for j in range(0, no_monomers):  # iterates over each monomer to create coordinates
-            for i in range(0, len(positions[j]) - no_ions):  #
-                x_values.append(b*dist_bw + positions[j][i][0])
-                y_values.append(c*dist_bw + positions[j][i][1])
-                z_values.append(k*dist + positions[j][i][2])
-                if i + 1 + (no_atoms - no_ions)*j + (no_atoms - no_ions)*no_monomers*k + (no_atoms - no_ions)*no_monomers*no_layers*l < 100000:
-                    print '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(1 + j + no_monomers*k + no_monomers*no_layers*l,
-                        name, identity[i], i + 1 + (no_atoms - no_ions)*j + (no_atoms - no_ions)*no_monomers*k + (no_atoms - no_ions)*no_monomers*no_layers*l,
-                        x_values[i+(no_atoms - no_ions)*j+(no_atoms - no_ions)*no_monomers*k+(no_atoms - no_ions)*no_monomers*no_layers*l]/10.0,
-                        y_values[i + (no_atoms - no_ions)*j + (no_atoms - no_ions)*no_monomers*k + (no_atoms - no_ions)*no_monomers*no_layers*l]/10.0,
-                        z_values[i + (no_atoms - no_ions)*j + (no_atoms - no_ions)*no_monomers*k + (no_atoms - no_ions)*no_monomers*no_layers*l]/10.0)
-                else:
-                    print '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(1 + j + no_monomers*k + no_monomers*no_layers*l,
-                        name, identity[i], i + 1 + (no_atoms - no_ions)*j + (no_atoms - no_ions)*no_monomers*k + (no_atoms - no_ions)*no_monomers*no_layers*l - 100000,
-                        x_values[i+(no_atoms - no_ions)*j+(no_atoms - no_ions)*no_monomers*k+(no_atoms - no_ions)*no_monomers*no_layers*l]/10.0,
-                        y_values[i + (no_atoms - no_ions)*j + (no_atoms - no_ions)*no_monomers*k + (no_atoms - no_ions)*no_monomers*no_layers*l]/10.0,
-                        z_values[i + (no_atoms - no_ions)*j + (no_atoms - no_ions)*no_monomers*k + (no_atoms - no_ions)*no_monomers*no_layers*l]/10.0)
+        layer_mons = layer_distribution[l*no_layers + k]
+        positions_index = sorted(set(layer_distribution)).index(layer_mons)  # The index in positions which should be read from
+        for j in range(0, layer_mons):  # iterates over each monomer to create coordinates
+            monomer_count += 1
+            for i in range(0, no_atoms - no_ions):
+                x_values.append(b*dist_bw + positions[positions_index][j][i][0])
+                y_values.append(c*dist_bw + positions[positions_index][j][i][1])
+                z_values.append(k*dist + positions[positions_index][j][i][2])
+                hundreds = int(math.floor(atom_count/100000))
+                print '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(monomer_count, name, identity[i],
+                    atom_count - hundreds*100000, x_values[atom_count - 1]/10.0, y_values[atom_count - 1]/10.0,
+                    z_values[atom_count - 1]/10.0)
+                atom_count += 1
 
 # Ions:
 
@@ -333,30 +347,29 @@ for l in range(0, no_pores):  # loop to create multiple pores
         b = -math.sin(math.radians(theta))
         c = -math.cos(math.radians(theta))
     for k in range(0, no_layers):
-        for j in range(0, no_monomers):  # iterates over each monomer to create coordinates
+        layer_mons = layer_distribution[l*no_layers + k]
+        positions_index = sorted(set(layer_distribution)).index(layer_mons)  # The index in positions which should be read from
+        for j in range(0, layer_mons):  # iterates over each monomer to create coordinates
             for i in range(0, no_ions):
-                x_values.append(b*dist_bw + positions[j][no_atoms - (i + 1)][0])
-                y_values.append(c*dist_bw + positions[j][no_atoms - (i + 1)][1])
-                z_values.append(k*dist + positions[j][no_atoms - (i + 1)][2])
+                x_values.append(b*dist_bw + positions[positions_index][j][no_atoms - (i + 1)][0])
+                y_values.append(c*dist_bw + positions[positions_index][j][no_atoms - (i + 1)][1])
+                z_values.append(k*dist + positions[positions_index][j][no_atoms - (i + 1)][2])
+
 count = 0
 for l in range(0, no_pores):
     for k in range(0, no_layers):
-        for j in range(0, no_monomers):
+        layer_mons = layer_distribution[l*no_layers + k]
+        positions_index = sorted(set(layer_distribution)).index(layer_mons)  # The index in positions which should be read from
+        for j in range(0, layer_mons):  # iterates over each monomer to create coordinates
             for i in range(0, no_ions):
                 count += 1
-                if 1 + (no_atoms - 1)*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers < 100000:
-                    print '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.\
-                        format(count + no_monomers*no_layers*no_pores,
-                        identity[no_atoms - (no_ions - i)], identity[no_atoms - (no_ions - i)], 1 + (no_atoms - (no_ions - i))*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers,
-                        x_values[(no_atoms - (no_ions - i))*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0,
-                        y_values[(no_atoms - (no_ions - i))*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0,
-                        z_values[(no_atoms - (no_ions - i))*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0)
-                else:
-                    print '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.\
-                        format(count + no_monomers*no_layers*no_pores,
-                        identity[no_atoms - (i + 1)], identity[no_atoms - (i + 1)], 1 + (no_atoms - (i + 1))*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers - 100000,
-                        x_values[(no_atoms - (i + 1))*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0,
-                        y_values[(no_atoms - (i + 1))*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0,
-                        z_values[(no_atoms - (i + 1))*no_layers*no_pores*no_monomers + j + k*no_monomers + l*no_layers*no_monomers]/10.0)
+                monomer_count += 1  # calling each sodium ion a 'monomer' for ease of numbering
+                if atom_count < 100000:
+                    hundreds = int(math.floor(atom_count/100000))
+                    print '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(monomer_count,
+                        identity[no_atoms - (no_ions - i)], identity[no_atoms - (no_ions - i)],
+                        atom_count - hundreds*100000, x_values[atom_count - 1]/10.0, y_values[atom_count - 1]/10.0,
+                        z_values[atom_count - 1]/10.0)
+                atom_count += 1
 
 print '   0.00000   0.00000  0.00000'

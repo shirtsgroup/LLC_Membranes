@@ -173,14 +173,15 @@ if [ ${MPI} == "on" ]; then
     mpirun -np ${NP} gmx_mpi mdrun -v -deffnm box_em -ntomp 7
 
     # Extract Potential Energy from log file
-    ENERGY1=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5}')
+    ENERGY1=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
 
     # If the potential energy is positive, then the box vector is incremented by a fixed amount until the energy comes out negative
-
+    XVECT1=${XVECT}
+    YVECT1=${YVECT}
     while [ $(echo " ${ENERGY1} > 0" | bc) -eq 1 ]; do
-            XVECT1=$(echo "${XVECT} + ${INCREMENT}" | bc -l)
-            YVECT1=$(echo "${YVECT} + ${INCREMENT}" | bc -l)
-            gmx editconf -f initial.gro -o box.gro -c -bt triclinic -box ${XVECT} ${YVECT} ${Z_BOX_VECTOR} -angles 90 90 120
+            XVECT1=$(echo "${XVECT1} + ${INCREMENT}" | bc -l)
+            YVECT1=$(echo "${YVECT1} + ${INCREMENT}" | bc -l)
+            gmx editconf -f initial.gro -o box.gro -c -bt triclinic -box ${XVECT1} ${YVECT1} ${Z_BOX_VECTOR} -angles 90 90 120
             gmx grompp -f em.mdp -c box.gro -p NaPore.top -o box_em.tpr
             mpirun -np ${NP} gmx_mpi mdrun -v -deffnm box_em -ntomp 7
         ENERGY1=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
@@ -221,10 +222,12 @@ if [ ${MPI} == "on" ]; then
     ENERGY2=$(cat em_new_box.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
     # if the potential energy is positive, then the box vector is increased by a defined increment until the energy is negative after energy minimzation
 
+    XVECT2=${XVECT}
+    YVECT2=${YVECT}
     while [ $(echo "  ${ENERGY2} > 0" | bc) -eq 1 ]; do
-            XVECT2=$(echo "${XVECT} + ${INCREMENT}" | bc -l)
-            YVECT2=$(echo "${YVECT} + ${INCREMENT}" | bc -l)
-            gmx editconf -f wiggle.gro -o new_box.gro -c -bt triclinic -box ${XVECT} ${YVECT} ${THICKNESS} -angles 90 90 60
+            XVECT2=$(echo "${XVECT2} + ${INCREMENT}" | bc -l)
+            YVECT2=$(echo "${YVECT2} + ${INCREMENT}" | bc -l)
+            gmx editconf -f wiggle.gro -o new_box.gro -c -bt triclinic -box ${XVECT2} ${YVECT2} ${THICKNESS} -angles 90 90 60
             gmx grompp -f em.mdp -c new_box.gro -p NaPore.top -o em_new_box.tpr
             mpirun -np ${NP} gmx_mpi mdrun -v -deffnm em_new_box -ntomp 7
         ENERGY2=$(cat em_new_box.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
@@ -263,10 +266,12 @@ else
 
     # If the potential energy is positive, then the box vector is incremented by a fixed amount until the energy comes out negative
 
+    XVECT1=${XVECT}
+    YVECT1=${YVECT}
     while [ $(echo " $ENERGY1 > 0" | bc) -eq 1 ]; do
-            XVECT1=$(echo "$XVECT + $INCREMENT" | bc -l)
-            YVECT1=$(echo "$YVECT + $INCREMENT" | bc -l)
-            gmx editconf -f initial.gro -o box.gro -c -bt triclinic -box ${XVECT} ${YVECT} ${Z_BOX_VECTOR} -angles 90 90 120
+            XVECT1=$(echo "${XVECT1} + $INCREMENT" | bc -l)
+            YVECT1=$(echo "${YVECT1} + $INCREMENT" | bc -l)
+            gmx editconf -f initial.gro -o box.gro -c -bt triclinic -box ${XVECT1} ${YVECT1} ${Z_BOX_VECTOR} -angles 90 90 120
             gmx grompp -f em.mdp -c box.gro -p NaPore.top -o box_em.tpr
             gmx mdrun -v -deffnm box_em
         ENERGY1=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
@@ -307,10 +312,12 @@ else
     ENERGY2=$(cat em_new_box.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
     # if the potential energy is positive, then the box vector is increased by a defined increment until the energy is negative after energy minimzation
 
+    XVECT2=${XVECT}
+    YVECT2=${YVECT}
     while [ $(echo "  $ENERGY2 > 0" | bc) -eq 1 ]; do
-            XVECT2=$(echo "$XVECT + $INCREMENT" | bc -l)
-            YVECT2=$(echo "$YVECT + $INCREMENT" | bc -l)
-            gmx editconf -f wiggle.gro -o new_box.gro -c -bt triclinic -box ${XVECT} ${YVECT} ${THICKNESS} -angles 90 90 60
+            XVECT2=$(echo "${XVECT2} + $INCREMENT" | bc -l)
+            YVECT2=$(echo "${YVECT2} + $INCREMENT" | bc -l)
+            gmx editconf -f wiggle.gro -o new_box.gro -c -bt triclinic -box ${XVECT2} ${YVECT2} ${THICKNESS} -angles 90 90 60
             gmx grompp -f em.mdp -c new_box.gro -p NaPore.top -o em_new_box.tpr
             gmx mdrun -v -deffnm em_new_box
         ENERGY2=$(cat em_new_box.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')

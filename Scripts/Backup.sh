@@ -13,3 +13,7 @@ done
 if [ ${RESOURCE} == 'bridges' ]; then
     cp -r /pylon1/ct4s8bp/bjc/* pylon2/ct4s8bp/bjc  # copy files from pylon1 (scratch) to pylon2 (a persistent filesystem)
 fi
+
+if [ ${RESOURCE} == 'JSCBB' ]; then
+    cp -r /home/bcoscia/PycharmProjects/GitHub/* /home/bcoscia/Documents/Git_Backup
+fi

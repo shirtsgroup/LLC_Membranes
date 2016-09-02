@@ -663,7 +663,7 @@ atoms_count = atoms_index + 2
 while b[atoms_count] != '\n':
     atoms_count += 1  # increments the while loop
 
-if c1 == [] and c2 == [] and other_c1 == [] and radical_c2 == [] and c1_rad_ndx == [] and c2_rad_ndx == [] and H_new1 == []:
+if c1 == [] and c2 == [] and other_c1 == [] and radical_c2 == [] and c1_rad_ndx == [] and c2_rad_ndx == [] and H_new1 == [] and cutoff[0] == 0.6:
     Stop_next_iter = 1  # finish this iteration, then next time the system will be completely terminated
 else:
     Stop_next_iter = 0
@@ -1032,7 +1032,7 @@ if int(args.iteration) != 0:
                   '\n', 'Reacted c2 Radical Indices: %s' %c1_rad_ndx + '\n', '\n',
                   'c1s which reacted with radical c2: %s' %c2_rad_ndx + '\n', '\n', 'term_rad_c2: %s' %term_rad_c2 + '\n',
                   '\n', 'reactive_c2_term: %s' %reactive_c2_term + '\n', '\n', 'H_new3: %s' %H_new3 + '\n', '\n',
-                  'Cutoff distance: %s nm' %cutoff + '\n','\n', 'Vinyl groups terminated: %s' %terminated + '\n', '\n',
+                  'Cutoff distance (nm) : %s ' %cutoff[0] + '\n','\n', 'Vinyl groups terminated: %s' %terminated + '\n', '\n',
                   'Percent Completion: ' + '{:.1f}'.format(percent_completion) + ' %' + '\n', '\n',
                   'Total Crosslinks: %s' %xlinks +'\n', 'Stop on Next Iteration?: %s' %Stop_next_iter])
 
@@ -1041,7 +1041,7 @@ if int(args.iteration) == 0:
     f.writelines(['Total time elapsed: %s seconds' %(end - start) + '\n', '\n', 'c1: %s' %c1 + '\n', '\n', 'c2: %s' %c2 + '\n',
                   '\n', 'radical_c2: %s' %radical_c2 + '\n', '\n', 'term: %s' %term + '\n', '\n', 'term_c1: %s' %term_c1 + '\n',
                   '\n', 'other_c1: %s' %other_c1 + '\n', '\n', 'H_new1: %s' %H_new1 + '\n', '\n',
-                  'H_new2: %s' %H_new2 + '\n', '\n', 'Cutoff distance: %s nm' %cutoff, '\n',
+                  'H_new2: %s' %H_new2 + '\n', '\n', 'Cutoff distance (nm) : %s ' %cutoff[0], '\n',
                   'Vinyl groups terminated: %s' %terminated + '\n', '\n',
                   'Percent Completion: ' + '{:.1f}'.format(percent_completion) + '%' + '\n',
                   '\n', 'Total Crosslinks: %s' %xlinks + '\n', 'Stop on Next Iteration?: %s' %Stop_next_iter])

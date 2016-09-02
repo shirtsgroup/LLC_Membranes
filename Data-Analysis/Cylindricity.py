@@ -24,6 +24,9 @@ parser.add_argument('-l', '--layers', default=20, help='Number of layers in each
 parser.add_argument('-p', '--pores', default=4, help='Number of Pores')
 parser.add_argument('-c', '--counterion', default='NA', help = 'Counterion used to track pore positions')
 parser.add_argument('-f', '--start_frame', default=0, help = 'Frame number to start reading trajectory at')
+parser.add_argument('-s', '--layer_distribution', default='uniform', help = 'The distribution of monomes per layer')
+parser.add_argument('-L', '--alt_1', default=6, help='Monomers per layer for the first type of alternating layer')
+parser.add_argument('-A', '--alt_2', default=8, help='Monomers per layer for the second type of alternating layer')
 args = parser.parse_args()
 
 f = open(args.input, "r")  # .gro file whose positions of Na ions will be read
@@ -36,7 +39,6 @@ no_atoms = int(args.atoms)  # number of atoms in a single monomer
 no_layers = int(args.layers)  # number of layers in the membrane structure
 mon_per_layer = int(args.no_monomers)  # number of monomers in each layer
 no_pores = int(args.pores)  # number of pores
-no_ion = no_layers*mon_per_layer*no_pores
 traj_start = args.start_frame
 
 # Find sodium coordinates and record them
@@ -58,6 +60,30 @@ while line < (len(a) - 1):  # looks through entire file
         z.append(float(a[line][36:44]))
         line += 1
 
+# In the case of a set layer distribution, we need a more complex way to calculate the number of ions per pore and the
+# system as a whole
+
+layer_distribution = [0]*args.layers*args.pores
+
+if args.layer_distribution == 'uniform':
+    for i in range(0, len(layer_distribution)):
+        layer_distribution[i] = int(args.no_monomers)
+if args.layer_distribution == 'alternating':
+    for i in range(0, len(layer_distribution)):
+        if i % 2 == 0:
+            layer_distribution[i] = int(args.alt_1)
+        if i % 2 == 1:
+            layer_distribution[i] = int(args.alt_2)
+
+ion_ppore = []
+for i in range(0, no_pores):
+    sum_ions = 0
+    for j in range(i*args.layers, (i + 1)*args.layers):
+        sum_ions += layer_distribution[j]
+    ion_ppore.append(sum_ions)
+
+no_ion = sum(ion_ppore)
+
 # find the length of the simulation
 
 length_of_simulation = float(a[sodium_start[len(sodium_start) - 2] + no_ion + 1][44:53])  # looks at time stamp on last trajectory frame
@@ -78,7 +104,8 @@ for j in range(traj_start, traj_points):
     for k in range(0, no_pores):  # calculates average x and y values in each pore. Taken to be the center of the pore
         sum_x = 0
         sum_y = 0
-        for i in range(j*no_ion + (k * no_ion/no_pores), j*no_ion + ((k + 1) * no_ion/no_pores)):
+        # for i in range(j*no_ion + (k * no_ion/no_pores), j*no_ion + ((k + 1) * no_ion/no_pores)):
+        for i in range(j*no_ion + int(sum(ion_ppore[0:k])), j*no_ion + int(sum(ion_ppore[0:(k+1)]))):
             sum_x += x[i]
             sum_y += y[i]
         sum_x_traj[k].append(sum_x)
@@ -313,9 +340,25 @@ y = y_axis
 
 pts, traj_pts = np.shape(x)
 
+# Find the max and min in the x and y dimensions for plotting:
+x_maxes = []
+x_mins = []
+y_maxes = []
+y_mins = []
+for i in range(0, len(x_axis)):
+    x_maxes.append(max(x_axis[i]))
+    x_mins.append(min(x_axis[i]))
+    y_maxes.append(max(y_axis[i]))
+    y_mins.append(min(y_axis[i]))
+
+x_max = max(x_maxes)
+x_min = min(x_mins)
+y_max = max(y_maxes)
+y_min = min(y_mins)
+
 # First set up the figure, the axis, and the plot element we want to animate
 fig = plt.figure()
-ax = plt.axes(xlim=(-2, 6), ylim=(-2, 6))
+ax = plt.axes(xlim=(x_min - 1, x_max + 1), ylim=(y_min - 1, y_max + 1))
 line, = ax.plot([], [], lw=2)  # Can include data here
 
 # Create an initialization function in order to hide any plot elements that are not wanted to be shown in every frame

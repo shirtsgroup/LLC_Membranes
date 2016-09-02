@@ -30,6 +30,9 @@ parser.add_argument('-l', '--LAYERS', default = 20, help = 'Number of layers in 
 parser.add_argument('-P', '--NOPORES', default = 4, help = 'Number of pores')
 parser.add_argument('-x', '--xlink', default='off', help = 'Whether to set up for cross linking or not')
 parser.add_argument('-M', '--mon_no', default='monomer2', help = 'Monomer number used to build structure')
+parser.add_argument('-e', '--ensemble', default='NPT', help = 'Ensemble to be simulated')
+parser.add_argument('-u', '--tau_t', default=0.1, help = 'Time constant')
+parser.add_argument('-g', '--lbfgs', default='no', help= 'Will there be an energy minimization with lbfgs')
 
 
 args = parser.parse_args()
@@ -47,9 +50,9 @@ if monomer == 'HII':
     sol_top = '#include "amber99.ff/spc.itp"'
     ion = 'NA'
     if args.xlink == 'on':
-        mon_top='#include "%s/crosslinked_new.itp"' %os.getcwd()
+        mon_top = '#include "%s/crosslinked_new.itp"' % os.getcwd()
     else:
-        mon_top = '#include "%s/../Structure-Files/Monomer_Tops/%s.itp' %(location, args.mon_no)
+        mon_top = '#include "%s/../Structure-Files/Monomer_Tops/%s.itp' % (location, args.mon_no)
 elif monomer == 'BCC':
     grps = ['BCC', 'BR']
     grps_solv = ['BCC', 'BR', 'SOL']
@@ -58,7 +61,7 @@ elif monomer == 'BCC':
     ion_top = '#include "oplsaa.ff/ions.itp"'
     sol_top = '#include "oplsaa.ff/spc.itp"'
     ion = 'BR'
-    mon_top = '#include "%s/Monomer_Tops/%s.itp"' %(location, args.mon_no)
+    mon_top = '#include "%s/Monomer_Tops/%s.itp"' % (location, args.mon_no)
 
 gaff = '#include "%s/../Structure-Files/Forcefields/gaff/gaff.itp"' %location  # generalized amber force field
 
@@ -86,10 +89,13 @@ nstenergy = 'nstenergy = %s' %(int(steps/int(args.FRAMES)))
 nstlist = 'nstlist = %s' %args.NSTLIST
 tcoupl = 'Tcoupl = %s' %args.TCOUPL
 tc_grps = 'tc_grps = %s' %' '.join(grps)
-tau_t = 'tau_t = %s' %' '.join([str(0.1) for i in grps])
+tau_t = 'tau_t = %s' %' '.join([str(args.tau_t) for i in grps])
 ref_t = 'ref_t = %s' %' '.join([str(args.REF_T) for i in grps])
 Pcoupl = 'Pcoupl = %s' %args.PCOUPL
 Pcoupltype = 'Pcoupltype = %s' %args.PTYPE
+periodic_molecules = 'periodic-molecules = no'
+if args.xlink == 'on':
+    periodic_molecules = 'periodic-molecules = yes'
 if args.PTYPE == 'semiisotropic':
     compress = 'compressibility = %s' %' '.join([str(args.COMPRESSIBILITY), '0'])
     ref_p = 'ref_p = %s' %' '.join([str(args.REF_P) for i in grps])
@@ -99,12 +105,21 @@ else:
 pbc = 'pbc = %s' %args.PBC
 
 f2 = open('wiggle.mdp', 'w')
-f2.writelines([title + '\n', cutoff_scheme + '\n', integrator + '\n', dt + '\n', nsteps + '\n', 'continuation = no\n',
+if args.ensemble == 'NVT':
+    f2.writelines([title + '\n', cutoff_scheme + '\n', integrator + '\n', dt + '\n', nsteps + '\n', 'continuation = no\n',
+                   'constraints = h-bonds\n', 'constraint-algorithm = lincs\n', 'lincs-iter = 1\n', 'lincs-order = 4\n',
+                   nstxout + '\n', nstvout + '\n', nstfout + '\n', nstenergy + '\n', nstlist + '\n', 'ns_type = grid\n'
+                   'rlist = 1.2\n', 'rcoulomb = 1.2\n', 'rvdw = 1.2\n', 'coulombtype = PME\n', 'pme_order = 4\n',
+                   'fourierspacing = 0.16\n', tcoupl + '\n', tc_grps + '\n', tau_t + '\n', ref_t + '\n','gen_vel = no\n',
+                   pbc + '\n', 'DispCorr = Ener' + '\n', periodic_molecules + '\n'])
+if args.ensemble == 'NPT':
+    f2.writelines([title + '\n', cutoff_scheme + '\n', integrator + '\n', dt + '\n', nsteps + '\n', 'continuation = no\n',
                'constraints = h-bonds\n', 'constraint-algorithm = lincs\n', 'lincs-iter = 1\n', 'lincs-order = 4\n',
                nstxout + '\n', nstvout + '\n', nstfout + '\n', nstenergy + '\n', nstlist + '\n', 'ns_type = grid\n'
                'rlist = 1.2\n', 'rcoulomb = 1.2\n', 'rvdw = 1.2\n', 'coulombtype = PME\n', 'pme_order = 4\n',
                'fourierspacing = 0.16\n', tcoupl + '\n', tc_grps + '\n', tau_t + '\n', ref_t + '\n', Pcoupl + '\n', Pcoupltype + '\n',
-               ref_p + '\n', compress + '\n', 'gen_vel = no\n', pbc + '\n', 'DispCorr = Ener\n'])
+               ref_p + '\n', compress + '\n', 'gen_vel = no\n', pbc + '\n', 'DispCorr = Ener' + '\n',
+               periodic_molecules + '\n'])
 
 if args.solvated == 'on':
     title = 'title = Solvated System'
@@ -157,3 +172,8 @@ if args.solvated == 'on':
                    ion_top + '\n', '\n', ';Monomer Topology\n', mon_top + '\n', '\n', '[ system ]\n',
                    '%s' %args.title + '\n', '\n', '[ molecules ]\n', '; Compound         nmols\n',
                    '%s                 %s' %(args.monomer, monomers) + '\n', '%s                  %s' %(ion, tot_ions)])
+
+if args.lbfgs == 'yes':
+    f6 = open('em_lbfgs.mdp', 'w')
+    f6.writelines(['integrator = l-bfgs\n', 'vdwtype = shift\n', 'rlist = 1.2\n', 'rvdw = 1.2\n', 'rvdw-switch = 0.8\n',
+                   'coulombtype = PME\n', 'rcoulomb = 1.2'])

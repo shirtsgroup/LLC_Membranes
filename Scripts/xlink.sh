@@ -57,7 +57,10 @@ while [ ${STOP} -eq 0 ]; do
     STOP=$(tail -n 1 xlink_${ITERATION}.log | cut -c 26)
     ITERATION=$((ITERATION+1))
     echo ${TERM}
-    if test -f "\#*"; then rm \#*; fi  # remove backups if they exist
+    files=$(ls ./\#*.cache 2> /dev/null | wc -l)
+    if [ **"$files" != "0"** ]; then
+        rm \#*
+    fi
 done
 
 xlink.py -i ${GRO} -c ${CUTOFF}  -e ${TERM_PROB} -r ${ITERATION} -d ${CUTOFF_RAD} -y crosslinked_new.itp -x ${XLINKS} -S 'yes'

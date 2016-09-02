@@ -10,13 +10,16 @@ PATH2FILE='/projects/beco4952/Gromacs/Pores'
 RESOURCE='bridges'
 NO_MONOMERS=6
 DONE='no'
+ALT='no'
+ALT_1=6
+ALT_2=8
 
 # Flags
 # -f  : FILE1 ... .tpr file
 # -F  : FILE2 ... .trr file
 # -p  : PATH2FILE ... path to file/folder which will be copied over
 
-while getopts "f:F:p:r:m:d:" opt; do
+while getopts "f:F:p:r:m:d:a:l:L:" opt; do
     case $opt in
     f) FILE1=$OPTARG;;
     F) FILE2=$OPTARG;;
@@ -24,6 +27,9 @@ while getopts "f:F:p:r:m:d:" opt; do
     r) RESOURCE=$OPTARG;;
     m) NO_MONOMERS=$OPTARG;;
     d) DONE=$OPTARG;;
+    a) ALT=$OPTARG;;
+    l) ALT_1=$OPTARG;;
+    L) ALT_2=$OPTARG;;
     esac
 done
 
@@ -47,7 +53,11 @@ if [ ${RESOURCE} == 'janus' ]; then
     # corresponds to doing a conversion of the entire system. Delete echo and the pipe to see the other options.
 fi
 #Cylindricity_Traj.py -i wiggle_traj.gro -n ${NO_MONOMERS}
-Cylindricity.py -i wiggle_traj.gro -n ${NO_MONOMERS}
+if [ ${ALT} == 'yes' ]; then
+    Cylindricity.py -i wiggle_traj.gro -n ${NO_MONOMERS} -s "alternating" -L ${ALT_1} -A ${ALT_2}
+else
+    Cylindricity.py -i wiggle_traj.gro -n ${NO_MONOMERS}
+fi
 
 if [ ${DONE} == 'yes' ]; then
     if [ ${RESOURCE} == 'bridges' ]; then

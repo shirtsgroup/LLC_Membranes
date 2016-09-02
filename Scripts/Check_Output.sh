@@ -13,7 +13,7 @@ NODES=8  # number of nodes requested
 B_ALLOC='ct4s8bp'  # bridges allocation
 GMX_LOC="/home/bjc/Programs/Gromacs/bin/GMXRC"  # location of gmx executable if you have compiled your own
 
-while getopts "e:n:t:c:l:f:j:x:r:h:m:s:a:g" opt; do
+while getopts "e:n:t:c:l:f:j:x:r:h:m:s:a:g:" opt; do
     case ${opt} in
     e) EXTENSION=$OPTARG;;
     n) NODES=$OPTARG;;
