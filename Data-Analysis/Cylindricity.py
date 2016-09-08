@@ -382,7 +382,6 @@ def animate(i):
     annotate4 = ax.annotate(('%1.3f A' %dist[3]), xy=((x_traj[0] + x_traj[2])/2 + 2.25, (y_traj[0] + y_traj[2])/2))
     return line, annotate1, annotate2, annotate3, annotate4
 
-
 # call the animator.  blit=True means only re-draw the parts that have changed.
 anim = animation.FuncAnimation(fig, animate, init_func=init,
                                frames=traj_pts, interval=200, blit=True)

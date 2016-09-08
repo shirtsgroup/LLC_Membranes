@@ -34,7 +34,6 @@ parser.add_argument('-e', '--ensemble', default='NPT', help = 'Ensemble to be si
 parser.add_argument('-u', '--tau_t', default=0.1, help = 'Time constant')
 parser.add_argument('-g', '--lbfgs', default='no', help= 'Will there be an energy minimization with lbfgs')
 
-
 args = parser.parse_args()
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in

@@ -24,8 +24,10 @@ output = subprocess.check_output(["Thickness.py", "-i", "%s" % args.gro])
 thickness = float(output[20:26])  # membrane thickness
 
 # Run trjconv and get the trajectory information for sodium ions
-# p1 = subprocess.Popen(["echo", "3"], stdout=subprocess.PIPE)
-# p2 = subprocess.Popen(["gmx", "trjconv", "-f", "%s" % args.trr, "-s", "%s" % args.tpr, "-o", "wiggle_traj.gro"], stdin=p1.stdout)
+p1 = subprocess.Popen(["echo", "3"], stdout=subprocess.PIPE)
+p2 = subprocess.Popen(["gmx", "trjconv", "-f", "%s" % args.trr, "-s", "%s" % args.tpr, "-o", "wiggle_traj.gro"], stdin=p1.stdout)
+
+p2.wait()
 
 f = open('wiggle_traj.gro', 'r')
 

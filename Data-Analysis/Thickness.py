@@ -10,7 +10,7 @@ import argparse
 # script
 
 parser = argparse.ArgumentParser(description = 'Measure Membrane Thickness')
-parser.add_argument('-i', '--input', help = 'Path to input file')
+parser.add_argument('-i', '--input', default='wiggle.gro', help = 'Path to input file')
 parser.add_argument('-w', '--water', default=6, help = 'nm of water between layers')
 parser.add_argument('-m', '--no_monomers', default=6, help= 'number of monomers per layer')
 parser.add_argument('-l', '--layers', default=20, help= 'Number of stacked layers in unit cell')
@@ -44,4 +44,4 @@ z_min = min(z)
 thickness = z_max - z_min
 tot_thickness = thickness + water_layer
 
-print 'Membrane Thickness: %s nm' %thickness
+print 'Membrane Thickness: %s nm' % thickness

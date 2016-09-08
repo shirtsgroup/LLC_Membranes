@@ -10,7 +10,7 @@ import argparse
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 parser = argparse.ArgumentParser(description = 'Build LLC Structure')
-parser.add_argument('-t', '--type', default = 'LLC', type = str, help = 'membrane type')
+parser.add_argument('-t', '--type', default = 'HII', type = str, help = 'membrane type')
 parser.add_argument('-i', '--input', default='monomer2.pdb', help = 'Path to input file')
 parser.add_argument('-l', '--layers', default=20, type=int, help = 'Number of Layers')
 parser.add_argument('-m', '--monomers', default=6, type=int, help = 'Monomers per layer')
@@ -27,10 +27,10 @@ args = parser.parse_args()
 print 'This is a .gro file'
 
 def functiontype(type):
-    if type == 'LLC':
+    if type == 'HII':
         f = open("%s/../Structure-Files/HII_Monomer_Configurations/%s" % (location, args.input), "r")
         no_ions = 1
-        t = 'LLC'
+        t = 'HII'
         return f, t, no_ions
     if type == 'BCC':
         f = open("%s/../Structure-Files/BCC_Monomer_Configurations/%s" % (location, args.input), "r")
@@ -101,8 +101,8 @@ plane_z = np.zeros((3, 1))
 # This loop only works because of the way the atoms are spaced in the coordinate file. I am looking at atoms C, C2 and
 # C4. Theoretically this will work with any three atoms but I am trying to align the plane of benzene
 
-if t == 'LLC':
-    name = 'LLC'
+if t == 'HII':
+    name = 'HII'
     for i in range(0, 3):
         plane_x[i] = float(a[lines_of_text + 2 * i][26:38])
         plane_y[i] = float(a[lines_of_text + 2 * i][38:46])
@@ -165,7 +165,7 @@ for i in range(0, len(positions_inp)):
 # Now translate the structure to the origin
 # matrix to translate molecule to origin based on the position of atom 10 (Carbonyl carbon coming off benzene)
 
-if t == 'LLC':
+if t == 'HII':
     translation = np.matrix([[1, 0, 0,-(positions_inp[9][0])], [0, 1, 0,-(positions_inp[9][1])],
                          [0, 0, 1, -(positions_inp[9][2])], [0, 0, 0, 1]])
 
@@ -181,7 +181,7 @@ for i in range(0, len(positions_inp)):
 
 # Now rotate the xy coordinates so that the molecule is pointing towards the origin
 
-if t == 'LLC':
+if t == 'HII':
     pt1 = [positions_inp[0][0], positions_inp[0][1]]  # location of C
     pt2 = [positions_inp[3][0], positions_inp[3][1]]  # location of C3
     pt3 = [positions_inp[9][0], positions_inp[9][1]]  # location of carbonyl carbon
