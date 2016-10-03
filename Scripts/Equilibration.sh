@@ -21,7 +21,7 @@ while getopts "g:t:l:u:e:" opt; do
 done
 
 # Write input files : wiggle.mdp, em.mdp, em_lbfgs.mdp, NaPore.top
-Write_Input.py -D ${STEP} -L ${LENGTH1} -e "NVT" -u ${TAU_T} -S ${EMSTEPS} -b 'yes'
+Write_Input.py -D ${STEP} -L ${LENGTH1} -e "NVT" -u ${TAU_T} -S ${EMSTEPS} -g 'yes' -a 6 -A 8 -d 'alternating'
 
 gmx grompp -f em.mdp -p ${TOP} -c ${GRO} -o em
 

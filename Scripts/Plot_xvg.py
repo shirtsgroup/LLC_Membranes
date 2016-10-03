@@ -34,9 +34,19 @@ def extract_data(xvg):
     while a[data_start].count('@') != 0:
         data_start += 1
 
+    while a[data_start].count('#') != 0:
+        data_start += 1
+
+    x_end = 0
+    while a[data_start][x_end] == ' ':
+        x_end += 1
+
+    while a[data_start][x_end] != ' ':
+        x_end += 1
+
     for i in range(data_start, len(a)):
-        x.append(float(a[i][0:12]))
-        y.append(float(a[i][14:28]))
+        x.append(float(a[i][0:x_end]))
+        y.append(float(a[i][x_end:len(a[i])]))
 
     return x, y, title, xlabel, ylabel
 
@@ -45,6 +55,9 @@ x, y, title, xlabel, ylabel = extract_data(args.xvg)
 if __name__ == '__main__':
     import numpy as np
     print 'Mean Value: %s' % np.mean(y)
+    maximum = max(y)
+    minimum = min(y[int(len(y)/5.0):len(y)])
+    print 'V_drop = %s' %(maximum - minimum)
     plt.plot(x, y)
     plt.ylabel('%s' % ylabel)
     plt.xlabel('%s' % xlabel)

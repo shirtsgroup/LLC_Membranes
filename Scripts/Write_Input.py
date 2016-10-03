@@ -33,6 +33,9 @@ parser.add_argument('-M', '--mon_no', default='monomer2', help = 'Monomer number
 parser.add_argument('-e', '--ensemble', default='NPT', help = 'Ensemble to be simulated')
 parser.add_argument('-u', '--tau_t', default=0.1, help = 'Time constant')
 parser.add_argument('-g', '--lbfgs', default='no', help= 'Will there be an energy minimization with lbfgs')
+parser.add_argument('-d', '--layer_distribution', default='uniform')
+parser.add_argument('-a', '--alt_1', default=6, help='Monomers per layer for the first type of alternating layer')
+parser.add_argument('-A', '--alt_2', default=8, help='Monomers per layer for the second type of alternating layer')
 
 args = parser.parse_args()
 
@@ -150,6 +153,28 @@ if args.solvated == 'on':
 
 monomers = int(args.LAYERS)*int(args.NO_MONOMERS)*int(args.NOPORES)
 tot_ions = no_ions*monomers
+
+layer_distribution = [0]*int(args.LAYERS)*int(args.NOPORES)
+
+if args.layer_distribution == 'uniform':
+    for i in range(0, len(layer_distribution)):
+        layer_distribution[i] = int(args.NO_MONOMERS)
+if args.layer_distribution == 'alternating':
+    for i in range(0, len(layer_distribution)):
+        if i % 2 == 0:
+            layer_distribution[i] = int(args.alt_1)
+        if i % 2 == 1:
+            layer_distribution[i] = int(args.alt_2)
+
+ion_ppore = []
+for i in range(0, int(args.NOPORES)):
+    sum_ions = 0
+    for j in range(i*int(args.LAYERS), (i + 1)*int(args.LAYERS)):
+        sum_ions += layer_distribution[j]
+    ion_ppore.append(sum_ions)
+
+monomers = sum(layer_distribution)
+tot_ions = sum(ion_ppore)
 
 if args.xlink == 'off':
     f4 = open('NaPore.top', 'w')

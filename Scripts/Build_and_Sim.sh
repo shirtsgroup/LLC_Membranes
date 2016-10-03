@@ -25,10 +25,10 @@ NSTLIST=10  # Neighborlist - changed automatically by gromacs unless it is set e
 
 # Membrane Dimensions
 NO_MONOMERS=6  # Number of monomers in 1 layer
-RADIUS=3  # Initial pore radius, angstroms
-PORE2PORE=40  # Pore-to-Pore distance, angstroms
+RADIUS=6  # Initial pore radius, angstroms
+PORE2PORE=45  # Pore-to-Pore distance, angstroms
 NOPORES=4  # Number of pores to be built
-DBWL=10  # Distance Between Layers
+DBWL=5  # Distance Between Layers
 LAYERS=20    # Number of layers wanted in the structure
 
 # Box Vector Parameters
@@ -262,15 +262,16 @@ else
     gmx mdrun -v -deffnm box_em
 
     # Extract Potential Energy from log file
-    ENERGY1=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5}')
+    ENERGY1=$(cat box_em.log | grep 'Potential Energy' | awk '{print substr($0,21,5)}')
 
     # If the potential energy is positive, then the box vector is incremented by a fixed amount until the energy comes out negative
 
     XVECT1=${XVECT}
     YVECT1=${YVECT}
-    while [ $(echo " $ENERGY1 > 0" | bc) -eq 1 ]; do
-            XVECT1=$(echo "${XVECT1} + $INCREMENT" | bc -l)
-            YVECT1=$(echo "${YVECT1} + $INCREMENT" | bc -l)
+    while [ $(echo " ${ENERGY1} > 0" | bc) -eq 1 ]; do
+            XVECT1=$(echo "${XVECT1} + ${INCREMENT}" | bc -l)
+            YVECT1=$(echo "${YVECT1} + ${INCREMENT}" | bc -l)
+            echo $XVECT1
             gmx editconf -f initial.gro -o box.gro -c -bt triclinic -box ${XVECT1} ${YVECT1} ${Z_BOX_VECTOR} -angles 90 90 120
             gmx grompp -f em.mdp -c box.gro -p NaPore.top -o box_em.tpr
             gmx mdrun -v -deffnm box_em

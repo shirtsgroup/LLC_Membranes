@@ -17,16 +17,20 @@ import argparse
 # Pore 4 ------------- Pore 3'
 
 parser = argparse.ArgumentParser(description = 'Run Cylindricity script')
+
 parser.add_argument('-i', '--input', default='wiggle_traj.gro', help = 'Path to input file')
 parser.add_argument('-n', '--no_monomers', default=6, help = 'Number of Monomers per layer')
 parser.add_argument('-a', '--atoms', default=137, help='Number of atoms per monomer')
 parser.add_argument('-l', '--layers', default=20, help='Number of layers in each pore')
 parser.add_argument('-p', '--pores', default=4, help='Number of Pores')
-parser.add_argument('-c', '--counterion', default='NA', help = 'Counterion used to track pore positions')
+parser.add_argument('-c', '--component', default='C1', help = 'Counterion used to track pore positions')
 parser.add_argument('-f', '--start_frame', default=0, help = 'Frame number to start reading trajectory at')
 parser.add_argument('-s', '--layer_distribution', default='uniform', help = 'The distribution of monomes per layer')
 parser.add_argument('-L', '--alt_1', default=6, help='Monomers per layer for the first type of alternating layer')
 parser.add_argument('-A', '--alt_2', default=8, help='Monomers per layer for the second type of alternating layer')
+parser.add_argument('-d', '--direction', default='z', help='Axis along which to measure a component density')
+parser.add_argument('-S', '--slices', default='250', help='Number of slices to descretize chosen axis direction into')
+
 args = parser.parse_args()
 
 f = open(args.input, "r")  # .gro file whose positions of Na ions will be read
@@ -34,34 +38,36 @@ a = []  # list to hold lines of file
 for line in f:
     a.append(line)
 
-###################     MAKE SURE TO EDIT THE PARAMETERS IN THIS SECTION ACCORDING TO THE SYSTEM     ###################
 no_atoms = int(args.atoms)  # number of atoms in a single monomer
 no_layers = int(args.layers)  # number of layers in the membrane structure
 mon_per_layer = int(args.no_monomers)  # number of monomers in each layer
 no_pores = int(args.pores)  # number of pores
-traj_start = args.start_frame
+traj_start = int(args.start_frame)
 
 # Find sodium coordinates and record them
 
-sodium_start = []
+trj_line = []
 line = 0
 
-x = []  # x positions of sodium ions
-y = []  # y positions of sodium ions
+x = []  # x positions of component
+y = []  # y positions of component
 z = []  # z positions
 
 while line < (len(a) - 1):  # looks through entire file
-    while a[line].count('%s' %args.counterion) == 0:  # finds index where Na coordinates start
-        line += 1
-    sodium_start.append(line)  # adds that index to sodium_start
-    while a[line].count('%s' %args.counterion) != 0:
+    if str.strip(a[line][8:15]) == args.component:
         x.append(float(a[line][20:28]))
         y.append(float(a[line][28:36]))
         z.append(float(a[line][36:44]))
-        line += 1
+    line += 1
 
-# In the case of a set layer distribution, we need a more complex way to calculate the number of ions per pore and the
-# system as a whole
+line = 0
+while line < (len(a) - 1):
+    if a[line].count('trjconv') != 0:
+        trj_line.append(line)
+    line += 1
+
+# In the case of a set layer distribution, we need a more complex way to calculate the number of components per pore
+# and the system as a whole
 
 layer_distribution = [0]*args.layers*args.pores
 
@@ -75,20 +81,20 @@ if args.layer_distribution == 'alternating':
         if i % 2 == 1:
             layer_distribution[i] = int(args.alt_2)
 
-ion_ppore = []
+comp_ppore = []  # component per pore
 for i in range(0, no_pores):
     sum_ions = 0
     for j in range(i*args.layers, (i + 1)*args.layers):
         sum_ions += layer_distribution[j]
-    ion_ppore.append(sum_ions)
+    comp_ppore.append(sum_ions)
 
-no_ion = sum(ion_ppore)
+no_comp = sum(comp_ppore)  # total number of component of interest
 
-# find the length of the simulation
+# find the length of the simulation based on the time stamps on the trajectory
 
-length_of_simulation = float(a[sodium_start[len(sodium_start) - 2] + no_ion + 1][44:53])  # looks at time stamp on last trajectory frame
+length_of_simulation = float(a[trj_line[len(trj_line) - 1]][44:53])  # reads time stamp of last frame
 
-traj_points = len(sodium_start)  # number of trajectory points total
+traj_points = len(trj_line)  # number of trajectory points total
 
 # Find the central axis in each pore:
 # When looking at a bunch of trajectories, we need to calculate the central axis again each time since it shifts after
@@ -104,8 +110,7 @@ for j in range(traj_start, traj_points):
     for k in range(0, no_pores):  # calculates average x and y values in each pore. Taken to be the center of the pore
         sum_x = 0
         sum_y = 0
-        # for i in range(j*no_ion + (k * no_ion/no_pores), j*no_ion + ((k + 1) * no_ion/no_pores)):
-        for i in range(j*no_ion + int(sum(ion_ppore[0:k])), j*no_ion + int(sum(ion_ppore[0:(k+1)]))):
+        for i in range(j*no_comp + int(sum(comp_ppore[0:k])), j*no_comp + int(sum(comp_ppore[0:(k+1)]))):
             sum_x += x[i]
             sum_y += y[i]
         sum_x_traj[k].append(sum_x)
@@ -129,7 +134,7 @@ for k in range(0, no_pores):  # loops through each pore
     x_axis[k] = np.dot(constant, listx)  # finds average of x_axis location values at each frame
     y_axis[k] = np.dot(constant, listy)  # finds average of y_axis location values at each frame
 
-# find distance between pores
+# find distance between pores based on component chosen
 
 pore12 = np.zeros(((traj_points - traj_start), 1))
 pore13 = np.zeros(((traj_points - traj_start), 1))
@@ -154,7 +159,7 @@ P2Ps = [pore12, pore13, pore34, pore42, pore14, pore23]
 
 start_frame = 10
 
-
+# Likely to be replaced with an MBAR tool
 def autocorrelation(list_input, lag, start):
     length = len(list_input)
     anant = 0
@@ -205,7 +210,7 @@ print 'Correlation Time: %s ns' %time[t0_index]
 plt.plot(time, pore12, label='1-2')
 plt.plot(time, pore13, label='1-3')
 plt.plot(time, pore34, label='3-4')
-plt.plot(time, pore42, label='4-2')
+# plt.plot(time, pore42, label='4-2')
 plt.plot(time, pore14, label='4-1')
 plt.plot(time, pore23, label='2-3')
 plt.title('Pore-To-Pore Distance Equilibration')
@@ -298,9 +303,8 @@ plt.title('Distribution of Distances from Center of Pore')
 plt.xlabel('Distance from pore center (nm)')
 plt.ylabel('Number of ions at this distance')
 
-# Density of ions per area
+# Density of components per area
 
-# For Sodium:
 areas = np.zeros((len(distribution_pts), 1))
 for i in range(0, len(distribution_pts) - 1):
     areas[i] = math.pi*distribution_pts[i + 1]**2 - math.pi*distribution_pts[i]**2
@@ -314,10 +318,91 @@ for i in range(0, len(areas)):
 bar_width_2 = bar_width / math.pi
 plt.figure(6)
 plt.bar(areas, density, bar_width_2)
-plt.title('Density of Ions per Area')
+plt.title('Density of %s per Area' %args.component)
 plt.xlabel('Area (nm^2) of annulus from r = 0 outwards')
-plt.ylabel('Density (Ions/nm^2)')
+plt.ylabel('Density (%s/nm^2)' %args.component)
 
+# Density of component in a specific direction
+# Could probably make the following into a class when I have time:
+if args.direction == 'x':
+    coord_start = 20  # character number where coordinate starts
+    coord_end = 28  # character number where coordinate ends
+    bvect_start = 0  # box vector starting character on line containing box information in gro file
+    bvect_end = 10  # box vector ending character
+    coords = x
+if args.direction == 'y':
+    coord_start = 28
+    coord_end = 36
+    bvect_start = 10
+    bvect_end = 20
+    coords = y
+if args.direction == 'z':
+    coord_start = 36
+    coord_end = 44
+    bvect_start = 20
+    bvect_end = 30
+    coords = z
+
+slice_occupation = []  # a list of lists to tell which slice each atom is in at each frame
+for i in range(0, traj_points):
+    slice_occupation.append([])
+    for j in range(0, int(args.slices)):
+        slice_occupation[i].append([])
+
+bins = []
+bar_width_3 = []
+for i in range(0, traj_points):
+    length = float(a[trj_line[i] - 1][bvect_start:bvect_end])  # length of the axis along which we will slice
+    # min_bound = min(coords)  # we need to know where the bottom of the unit cell is
+    # max_bound = max(coords)  # we need to know where the top of the unit cell is too
+    # bin_no = int(np.floor(((z_coord - min_bound)/(max_bound - min_bound))*args.slices))  # This saves a lot of time
+    bins.append(np.linspace(0, length, int(args.slices)))
+    bar_width_3.append(length / float(args.slices))
+    for k in range(i*no_comp, (i + 1)*no_comp):
+        z_coord = float(coords[k])
+        bin_no = int(np.floor((z_coord/length)*int(args.slices)))  # This saves a lot of time. The formula is simplified by
+        # the fact that gromacs places its boxes from the origin to positive coordinates when using gmx editconf.
+        # Otherwise, the formula looks more like: bin_no = int(np.floor(((z_coord - min_bound)/(max_bound - min_bound))*args.slices))
+        if bin_no == int(args.slices):  # if the coordinate happens to be the max z, the equation above doesn't work and we
+                                   # want that atom in the bin below
+            bin_no -= 1
+        slice_occupation[i][bin_no].append(0)
+
+for i in range(0, traj_points):
+    for k in range(0, len(slice_occupation[i])):
+        slice_occupation[i][k] = len(slice_occupation[i][k])
+
+x_traj = bins[i]  # [Pore1, Pore2, Pore4, Pore3]
+y_traj = slice_occupation[i]
+
+# plt.figure(7)
+# plt.bar(bins[50], slice_occupation[50], bar_width_3)
+
+# First set up the figure, the axis, and the plot element we want to animate
+fig = plt.figure()
+ax = plt.axes(xlim=(0, 25), ylim=(0, 25))
+line, = ax.plot([], [], lw=2)  # Can include data here
+
+# Create an initialization function in order to hide any plot elements that are not wanted to be shown in every frame
+def init1():
+    line.set_data([], [])
+    return line,
+
+# Animate function. This is called sequentially. The purpose is to update the plot elements for each frame
+def animate1(i):
+    x_traj = bins[i]  # [Pore1, Pore2, Pore4, Pore3]
+    y_traj = slice_occupation[i]
+    line.set_data(x_traj, y_traj)
+    return line,  # The comma after line is ESSENTIAL -- or else you get error: 'Line2D' object is not iterable
+
+# call the animator.  blit=True means only re-draw the parts that have changed.
+anim = animation.FuncAnimation(fig, animate1, init_func=init1,
+                               frames=traj_points, interval=200, blit=True)
+
+plt.title('Density of %s in %s direction' %(args.component, args.direction))
+plt.ylabel('Total %s per slice' %args.component)
+plt.xlabel('nm along %s axis' %args.direction)
+plt.show()
 
 Pore_list = [pore13, pore14, pore23, pore34, pore12, pore42]
 Sum_list = []
@@ -333,7 +418,7 @@ frames = float(1 / float(traj_points - traj_start))
 Averages = np.dot(Sum_list, frames).tolist()
 Averages.sort()
 print(Averages)
-print 'Average Pore-to-Pore Distance: %s +/- %s nm' %(np.mean(Averages[0:4]), np.std(Averages[0:4]))
+print 'Average Pore-to-Pore Distance: %s +/- %s nm' %(np.mean(Averages[0:5]), np.std(Averages[0:5]))
 
 x = x_axis
 y = y_axis
@@ -362,12 +447,12 @@ ax = plt.axes(xlim=(x_min - 1, x_max + 1), ylim=(y_min - 1, y_max + 1))
 line, = ax.plot([], [], lw=2)  # Can include data here
 
 # Create an initialization function in order to hide any plot elements that are not wanted to be shown in every frame
-def init():
+def init2():
     line.set_data([], [])
     return line,
 
 # Animate function. This is called sequentially. The purpose is to update the plot elements for each frame
-def animate(i):
+def animate2(i):
     x_traj = [x[0][i], x[1][i], x[3][i], x[2][i], x[0][i]]  # [Pore1, Pore2, Pore4, Pore3]
     y_traj = [y[0][i], y[1][i], y[3][i], y[2][i], y[0][i]]
     dist = []
@@ -383,7 +468,7 @@ def animate(i):
     return line, annotate1, annotate2, annotate3, annotate4
 
 # call the animator.  blit=True means only re-draw the parts that have changed.
-anim = animation.FuncAnimation(fig, animate, init_func=init,
+anim = animation.FuncAnimation(fig, animate2, init_func=init2,
                                frames=traj_pts, interval=200, blit=True)
 
 plt.title('Pore Center Trajectory')
