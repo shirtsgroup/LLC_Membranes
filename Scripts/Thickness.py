@@ -25,23 +25,27 @@ a = []  # list to hold lines of file
 for line in f:
     a.append(line)
 
-line = 0
-while a[line].count('HII') == 0:
-    line += 1
+def thickness(a):
+    line = 0
+    while a[line].count('HII') == 0:
+        line += 1
 
-z = []  # list to hold z positions of all atoms
+    z = []  # list to hold z positions of all atoms
 
-benz_carbs = ['C', 'C1', 'C2', 'C3', 'C4', 'C5']
+    benz_carbs = ['C', 'C1', 'C2', 'C3', 'C4', 'C5']
 
-while a[line].count('HII') != 0:
-    if str.strip(a[line][11:15]) in benz_carbs:
-        z.append(float(a[line][36:44]))
-    line += 1
+    while a[line].count('HII') != 0:
+        if str.strip(a[line][11:15]) in benz_carbs:
+            z.append(float(a[line][36:44]))
+        line += 1
 
-z_max = max(z)
-z_min = min(z)
+    z_max = max(z)
+    z_min = min(z)
+    thick = z_max - z_min
+    return thick, z_max, z_min
 
-thickness = z_max - z_min
-tot_thickness = thickness + water_layer
+thick, z_max, z_min = thickness(a)
+tot_thickness = thick + water_layer
 
-print 'Membrane Thickness: %s nm' % thickness
+if __name__ == '__main__':
+    print 'Membrane Thickness: %s nm' % thick
