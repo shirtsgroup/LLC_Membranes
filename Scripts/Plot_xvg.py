@@ -34,7 +34,7 @@ def extract_data(xvg):
     while a[data_start].count('@') != 0:
         data_start += 1
 
-    while a[data_start].count('#') != 0:
+    while a[data_start].count('#') != 0:  # turn off for efield.xvg
         data_start += 1
 
     x_end = 0
@@ -46,15 +46,18 @@ def extract_data(xvg):
 
     for i in range(data_start, len(a)):
         x.append(float(a[i][0:x_end]))
-        y.append(float(a[i][x_end:len(a[i])]))
+        y.append(float(a[i][x_end + 1:len(a[i])]))
+        # y.append(float(a[i][34:46])) # for efield.xvg
 
+    print y.index(max(y))
     return x, y, title, xlabel, ylabel
 
 x, y, title, xlabel, ylabel = extract_data(args.xvg)
 
 if __name__ == '__main__':
     import numpy as np
-    print 'Mean Value: %s' % np.mean(y)
+    print 'Mean Value: %s' % np.mean(y[50:len(y) - 1])
+    print 'Standard Deviation: %s' % np.std(y[50:len(y) - 1])
     maximum = max(y)
     minimum = min(y[int(len(y)/5.0):len(y)])
     print 'V_drop = %s' %(maximum - minimum)
