@@ -19,17 +19,19 @@ import argparse
 parser = argparse.ArgumentParser(description = 'Run Cylindricity script')
 
 parser.add_argument('-i', '--input', default='wiggle_traj.gro', help = 'Path to input file')
-parser.add_argument('-n', '--no_monomers', default=6, help = 'Number of Monomers per layer')
+parser.add_argument('-n', '--no_monomers', default=7, help = 'Number of Monomers per layer')
 parser.add_argument('-a', '--atoms', default=137, help='Number of atoms per monomer')
 parser.add_argument('-l', '--layers', default=20, help='Number of layers in each pore')
 parser.add_argument('-p', '--pores', default=4, help='Number of Pores')
-parser.add_argument('-c', '--component', default='NA', help = 'Counterion used to track pore positions')
+parser.add_argument('-c', '--component', default='O4', help = 'Counterion used to track pore positions')
 parser.add_argument('-f', '--start_frame', default=0, help = 'Frame number to start reading trajectory at')
 parser.add_argument('-s', '--layer_distribution', default='uniform', help = 'The distribution of monomes per layer')
 parser.add_argument('-L', '--alt_1', default=6, help='Monomers per layer for the first type of alternating layer')
 parser.add_argument('-A', '--alt_2', default=8, help='Monomers per layer for the second type of alternating layer')
 parser.add_argument('-d', '--direction', default='z', help='Axis along which to measure a component density')
 parser.add_argument('-S', '--slices', default='250', help='Number of slices to descretize chosen axis direction into')
+parser.add_argument('-g', '--grid_division', default=100, help='Number of blocks in x and y direction for heat map')
+parser.add_argument('-C', '--cmap', default='jet', help='Color Scheme for heat map')
 
 args = parser.parse_args()
 
@@ -65,6 +67,14 @@ while line < (len(a) - 1):
     if a[line].count('trjconv') != 0:
         trj_line.append(line)
     line += 1
+
+x_box = []
+for i in trj_line:
+    x_box.append(float(a[i - 1][0:10]))  # This ends up reading the last line of the file (a[-1]). It reads the second
+    # to last box vector as the last entry in the list
+
+x_box.append(x_box[0])  # move the first entry (which is really the x box vector from the final frame) to the list's end
+del x_box[0]  # delete the first entry. Now we have the list in the correct order
 
 # In the case of a set layer distribution, we need a more complex way to calculate the number of components per pore
 # and the system as a whole
@@ -249,7 +259,7 @@ for j in range(0, traj_points - traj_start):  # will generate a point for each t
 
 plt.figure(3)
 plt.plot(pts, traj_averages, label = 'Sodium')
-plt.title('%s Picosecond Simulation' %length_of_simulation)
+plt.title('%s Picosecond Simulation' % length_of_simulation)
 plt.ylabel('Average Distance from Pore Center (nm)')
 plt.xlabel('Trajectory Point')
 
@@ -318,9 +328,9 @@ for i in range(0, len(areas)):
 bar_width_2 = bar_width / math.pi
 plt.figure(6)
 plt.bar(areas, density, bar_width_2)
-plt.title('Density of %s per Area' %args.component)
+plt.title('Density of %s per Area' % args.component)
 plt.xlabel('Area (nm^2) of annulus from r = 0 outwards')
-plt.ylabel('Density (%s/nm^2)' %args.component)
+plt.ylabel('Density (%s/nm^2)' % args.component)
 
 # Density of component in a specific direction
 # Could probably make the following into a class when I have time:
@@ -393,17 +403,53 @@ def animate1(i):
     x_traj = bins[i]  # [Pore1, Pore2, Pore4, Pore3]
     y_traj = slice_occupation[i]
     line.set_data(x_traj, y_traj)
-    return line,  # The comma after line is ESSENTIAL -- or else you get error: 'Line2D' object is not iterable
+    return line,  # The comma after 'line' is ESSENTIAL -- or else you get error: 'Line2D' object is not iterable
 
 # call the animator.  blit=True means only re-draw the parts that have changed.
-anim = animation.FuncAnimation(fig, animate1, init_func=init1,
-                               frames=traj_points, interval=200, blit=True)
+# anim = animation.FuncAnimation(fig, animate1, init_func=init1,
+#                                frames=traj_points, interval=200, blit=True)
+#
+# plt.title('Density of %s in %s direction' % (args.component, args.direction))
+# plt.ylabel('Total %s per slice' % args.component)
+# plt.xlabel('nm along %s axis' % args.direction)
+# plt.show()
 
-plt.title('Density of %s in %s direction' %(args.component, args.direction))
-plt.ylabel('Total %s per slice' %args.component)
-plt.xlabel('nm along %s axis' %args.direction)
+# Make a heat map of the x-y locations of the components
+
+
+def coords(x_coord, y_coord, grid_len):
+    row = np.ceil((float(y_coord)/float(grid_len))*args.grid_division) - 1
+    col = np.ceil((float(x_coord)/float(grid_len))*args.grid_division) - 1
+    return row, col
+
+grids = []
+for i in range(0, traj_points):
+    grid = np.zeros((args.grid_division, args.grid_division))
+    grid_length = x_box[i] # + np.sin(np.pi/6)*x_box[i]
+    for j in range(0, no_comp):
+        row, col = coords(x[i*no_comp + j], y[i*no_comp + j], grid_length)
+        grid[row, col] += 1
+    grids.append(grid)
+
+# create the figure
+
+fig = plt.figure()
+
+im = plt.imshow(grids[0], cmap='%s' % args.cmap, animated=True, interpolation='none')
+
+
+def updatefig(i):
+    im.set_array(grids[i])
+    return im,
+
+ani = animation.FuncAnimation(fig, updatefig, frames=traj_points, interval=200, blit=True)
+plt.title('Heat Map of x-y location of %s' % args.component)
+plt.xlabel('x location')
+plt.ylabel('y location')
 plt.show()
 
+exit()
+# Now animate pore-to-pore distances
 Pore_list = [pore13, pore14, pore23, pore34, pore12, pore42]
 Sum_list = []
 for i in range(0, len(Pore_list)):

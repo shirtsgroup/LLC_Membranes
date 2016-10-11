@@ -283,9 +283,12 @@ while a[ref_t_index].count('ref-t') == 0:
     ref_t_index += 1
 
 # The following has definite room for improvement
-a[tc_grp_index] = 'tc-grps = Top_Membrane Bottom_Membrane Solute Solvent' + '\n'
-a[tau_t_index] = 'tau-t = 0.1 0.1 0.1 0.1' + '\n'
-a[ref_t_index] = 'ref-t = 300 300 300 300' + '\n'
+# a[tc_grp_index] = 'tc-grps = Top_Membrane Bottom_Membrane Solute Solvent' + '\n'
+# a[tau_t_index] = 'tau-t = 0.1 0.1 0.1 0.1' + '\n'
+# a[ref_t_index] = 'ref-t = 300 300 300 300' + '\n'
+a[tc_grp_index] = 'tc-grps = System' + '\n'
+a[tau_t_index] = 'tau-t = 0.1' + '\n'
+a[ref_t_index] = 'ref-t = 300' + '\n'
 
 a.append(';Computation Electrophysiology Parameters' + '\n')
 a.append('swapcoords     = Z' + '\n')
