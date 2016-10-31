@@ -19,19 +19,19 @@ import argparse
 parser = argparse.ArgumentParser(description = 'Run Cylindricity script')
 
 parser.add_argument('-i', '--input', default='wiggle_traj.gro', help = 'Path to input file')
-parser.add_argument('-n', '--no_monomers', default=7, help = 'Number of Monomers per layer')
+parser.add_argument('-n', '--no_monomers', default=6, help = 'Number of Monomers per layer')
 parser.add_argument('-a', '--atoms', default=137, help='Number of atoms per monomer')
 parser.add_argument('-l', '--layers', default=20, help='Number of layers in each pore')
 parser.add_argument('-p', '--pores', default=4, help='Number of Pores')
-parser.add_argument('-c', '--component', default='O4', help = 'Counterion used to track pore positions')
+parser.add_argument('-c', '--component', default='NA', help = 'Counterion used to track pore positions')
 parser.add_argument('-f', '--start_frame', default=0, help = 'Frame number to start reading trajectory at')
-parser.add_argument('-s', '--layer_distribution', default='uniform', help = 'The distribution of monomes per layer')
+parser.add_argument('-s', '--layer_distribution', default='uniform', help = 'The distribution of monomers per layer')
 parser.add_argument('-L', '--alt_1', default=6, help='Monomers per layer for the first type of alternating layer')
 parser.add_argument('-A', '--alt_2', default=8, help='Monomers per layer for the second type of alternating layer')
 parser.add_argument('-d', '--direction', default='z', help='Axis along which to measure a component density')
 parser.add_argument('-S', '--slices', default='250', help='Number of slices to descretize chosen axis direction into')
 parser.add_argument('-g', '--grid_division', default=100, help='Number of blocks in x and y direction for heat map')
-parser.add_argument('-C', '--cmap', default='jet', help='Color Scheme for heat map')
+parser.add_argument('-C', '--cmap', default='Blues', help='Color Scheme for heat map')
 
 args = parser.parse_args()
 
@@ -215,18 +215,21 @@ time = []
 for i in range(0, len(time_pts)):
     time.append(time_pts[i]*intervals)
 
-print 'Correlation Time: %s ns' %time[t0_index]
+print 'Correlation Time: %s ns' % time[t0_index]
 
+fig = plt.figure()
 plt.plot(time, pore12, label='1-2')
 plt.plot(time, pore13, label='1-3')
 plt.plot(time, pore34, label='3-4')
-plt.plot(time, pore42, label='4-2')
+# plt.plot(time, pore42, label='4-2')
 plt.plot(time, pore14, label='4-1')
-#plt.plot(time, pore23, label='2-3')
-plt.title('Pore-To-Pore Distance Equilibration')
-plt.ylabel('Pore-To-Pore Distance [nm]')
-plt.xlabel('Simulation Time (ns)')
-plt.legend(loc=1)
+plt.plot(time, pore23, label='2-3')
+plt.xticks(size=18)
+plt.yticks(size=18)
+# plt.title('Pore-To-Pore Distance Equilibration', fontsize=22)
+plt.ylabel('Pore-To-Pore Distance [nm]', fontsize=22)
+plt.xlabel('Simulation Time (ns)', fontsize=22)
+plt.legend(loc=1, fontsize=18)
 
 # Find the distance from central axis
 # need to save each value of distance in order to calculate deviation. 4 lists in a list
@@ -325,12 +328,17 @@ for i in range(0, len(areas)):
         density[i] = 0
     else:
         density[i] = group_count[i]/areas[i]
-bar_width_2 = bar_width / math.pi
+
+bar_width_2 = bar_width #/ math.pi
 plt.figure(6)
-plt.bar(areas, density, bar_width_2)
-plt.title('Density of %s per Area' % args.component)
-plt.xlabel('Area (nm^2) of annulus from r = 0 outwards')
-plt.ylabel('Density (%s/nm^2)' % args.component)
+plt.bar(distribution_pts, density, bar_width_2)
+# plt.title('Density of %s per Area' % args.component)
+plt.xlabel('Distance from pore center (nm)', fontsize=22)
+plt.ylabel('Density (%s/nm$^2$)' % args.component, fontsize=22)
+plt.ticklabel_format(style='scientific', axis='y', useOffset=False)
+plt.xticks(size=18)
+plt.yticks(size=18)
+plt.show()
 
 # Density of component in a specific direction
 # Could probably make the following into a class when I have time:
@@ -405,14 +413,14 @@ def animate1(i):
     line.set_data(x_traj, y_traj)
     return line,  # The comma after 'line' is ESSENTIAL -- or else you get error: 'Line2D' object is not iterable
 
-# call the animator.  blit=True means only re-draw the parts that have changed.
-# anim = animation.FuncAnimation(fig, animate1, init_func=init1,
-#                                frames=traj_points, interval=200, blit=True)
-#
-# plt.title('Density of %s in %s direction' % (args.component, args.direction))
-# plt.ylabel('Total %s per slice' % args.component)
-# plt.xlabel('nm along %s axis' % args.direction)
-# plt.show()
+#call the animator.  blit=True means only re-draw the parts that have changed.
+anim = animation.FuncAnimation(fig, animate1, init_func=init1,
+                               frames=traj_points, interval=200, blit=True)
+
+plt.title('Density of %s in %s direction' % (args.component, args.direction))
+plt.ylabel('Total %s per slice' % args.component)
+plt.xlabel('nm along %s axis' % args.direction)
+plt.show()
 
 # Make a heat map of the x-y locations of the components
 
@@ -448,7 +456,6 @@ plt.xlabel('x location')
 plt.ylabel('y location')
 plt.show()
 
-exit()
 # Now animate pore-to-pore distances
 Pore_list = [pore13, pore14, pore23, pore34, pore12, pore42]
 Sum_list = []

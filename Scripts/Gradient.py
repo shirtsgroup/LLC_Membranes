@@ -1,11 +1,38 @@
 #!/usr/bin/python
 
+"""
+General Workflow of this Script with parameters that you can change:
+1) Reads in solvated system and count number of solvent, solute and membrane atoms
+    Inputs:
+    -i : input -- Name of input solvated configuration
+    -l : LC -- The type of liquid crystal being studied
+    -s : solvent -- The name of the solvent. If there are multiple atoms and/or atom types in the solvent, those should
+        be specified
+    -S : Solute -- The name of the solute (i.e. whatever will be replacing the solvent molecules)
+    -a : sol_atoms -- The names of the different atom types contained in the solvent molecules. They should be written
+        in a list in the order which they appear in a .gro file
+2) Create a membrane double layer using GROMACS, then read that file into lists
+3) Calculate membrane z-dimension boundaries of each membrane and then see which solvent molecules are between them
+    -n : n_sol_atoms -- The number of atoms making the solute
+4) Randomly replace solvent molecules in the middle compartment with solute molecules. Edits .gro accordingly
+    -p : percent -- Percent of solvent to replace with solute...easier to work with than concentration (for now)
+    -t : top -- Name of topology file to be modified
+5) Rewrite .gro with fix_gro.py (organizes molecules LC, solvent and Solute for easier topology compatibility)
+6) Modify topology with new number of LC, solvent and solute
+    -d : double -- indicate if we are making a double layered system
+* Stop here if you aren't setting up for CompEL
+7) Generate appropriate index groups for CompEL
+8) Modify .mdp file to perform a CompEL simulation
+    -m : mdp -- Name of .mdp file to be modified
+"""
+
 import argparse
 import Thickness
 import random
 import os.path
 import subprocess
 import fix_gro
+import numpy as np
 
 # Randomly replaces solvent molecules with solute like gmx solvate, but is capable of creating a concentration gradient
 
@@ -14,11 +41,13 @@ parser = argparse.ArgumentParser(description = 'Run Cylindricity script')
 parser.add_argument('-i', '--input', default='wiggle.gro', help = 'Path to input file')
 parser.add_argument('-p', '--percent', default=25, help = 'Percent solvent to replace with solute')
 parser.add_argument('-l', '--LC', default='HII', help='Type of liquid crystal')
-parser.add_argument('-s', '--solvent', default='Ar', help = 'Solvent which will be swapped with solute')
+parser.add_argument('-s', '--solvent', default='SOL', help = 'Solvent which will be swapped with solute')
 parser.add_argument('-S', '--Solute', default='NA', help = 'Name of atom replacing solvent molecules')
 parser.add_argument('-t', '--top', default='NaPore.top', help = 'Name of topology file to be modified')
 parser.add_argument('-d', '--double', default='on', help='Is this a double layer system? (on/off)')
 parser.add_argument('-m', '--mdp', default='wiggle.mdp', help='Name of .mdp file which needs to be modified')
+parser.add_argument('-a', '--sol_atoms', default=['OW', 'HW2', 'HW1'])
+parser.add_argument('-n', '--n_sol_atoms', default=3)
 
 args = parser.parse_args()
 
@@ -31,7 +60,7 @@ for line in f:
 f.close()
 
 # Find planes defining top and bottom of membrane
-thick, z_max_1, z_min_1 = Thickness.thickness(a)
+thick, z_max_1, z_min_1 = Thickness.thickness(args.input)
 
 # Find the z box dimension
 z_box = float(a[len(a) - 1][20:30])
@@ -57,6 +86,8 @@ for i in range(top_lines, len(a) - 1):
         solute += 1
     if str.strip(a[i][5:10]) == args.LC:
         LC += 1
+
+solvent /= len(args.sol_atoms)
 
 # Make the system into a membrane double layer
 p = subprocess.Popen(["gmx", "genconf", "-f", "%s" % args.input, "-nbox", "1", "1", "2", "-o",
@@ -86,30 +117,68 @@ while a[top_lines].count('HII') == 0:
 
 count = -top_lines  # Things get tricky when there are greater than 100000 atoms so I count the number of lines as a way
 # to keep track of atom numbers. The top line numbers are subtracted
+
 for i in range(0, len(a)):
     count += 1
-    if a[i].count(args.solvent) != 0:
-        z = float(a[i][36:44])
-        if z_min_2 > z > z_max_1:  # check to see if the solvent molecule is between the two membrane layers
-            z_sol.append(count)  # if it is, record it
+    # START new Stuff
+    conf_mat = []  # confirmation matrix - confirming that all atoms are within the z boundaries between membranes
+    j = 0
+    while True:
+        try:
+            res_num = int(a[i][0:5])
+            while int(a[i + j][0:5]) == res_num:
+                if str.strip(a[i + j][5:10]) == str(args.solvent) and z_min_2 > float(a[i + j][36:44]) > z_max_1:
+                    conf_mat.append(count + j)
+                j += 1
+            break
+        except ValueError:  # Takes care of the case where there is text instead of numbers
+            break
+    if len(conf_mat) == int(args.n_sol_atoms):
+        for entry in conf_mat:
+            z_sol.append(entry)
+    # END new stuff ... Old stuff below
+    # if a[i].count(args.solvent) != 0:
+    #     z = float(a[i][36:44])
+    #     if z_min_2 > z > z_max_1:  # check to see if the solvent molecule is between the two membrane layers
+    #         z_sol.append(count)  # if it is, record it
     if a[i].count(args.Solute) != 0:
         z = float(a[i][36:44])
         if z_max_1 >= z >= z_min_1:  # if the ions are between the two planes, i.e. they are a part of the pore
             Pore_Ions.append(count)
 
+sol_mol = []  # solvent molecules
+for i in range(0, (len(z_sol)/len(args.sol_atoms))):
+    sol_mol.append(z_sol[len(args.sol_atoms)*i])
+
+no_replacements = int(len(sol_mol)*float(args.percent)/100)
 replacement = []
 i = 0
-while i < int(len(z_sol)*float(args.percent)/100):
-    replacement.append(random.choice(z_sol))  # randomly choose an atom number from z_sol
-    index = z_sol.index(replacement[i])  # get the index of the chosen number
-    del z_sol[index]  # delete the number from z_sol so it can't be chosen again
+while i < no_replacements:  # do this loop percent*(number of eligible solvent molecules)
+    replacement.append(random.choice(sol_mol))  # randomly choose an atom number from sol_mol
+    index = sol_mol.index(replacement[i])  # get the index of the chosen number
+    del sol_mol[index]  # delete the number from z_sol so it can't be chosen again
     i += 1
 
-for i in range(0, len(replacement)):
-    a[replacement[i] + 1] = a[replacement[i] + 1][0:5] + a[replacement[i] + 1][5:10].replace('%s' % args.solvent, '%s' % args.Solute) + \
-        a[replacement[i] + 1][10:15].replace('%s' % args.solvent, '%s' % args.Solute) + a[replacement[i] + 1][15:len(a[replacement[i] + 1])]
+replacement.sort(key=int)
 
-fix_gro.reorder(a, 'double_layer.gro')  # reorders and then rewrites the file with
+# replace solvent with solute
+for i in range(0, len(replacement)):
+    a[replacement[i] + 1] = a[replacement[i] + 1][0:5] + \
+                            a[replacement[i] + 1][5:10].replace(a[replacement[i] + 1][5:10], '{:<5}'.format(args.Solute)) + \
+                            a[replacement[i] + 1][10:15].replace(a[replacement[i] + 1][10:15], '{:>5}'.format(args.Solute)) + \
+                            a[replacement[i] + 1][15:len(a[replacement[i] + 1])]
+
+
+# Now delete residual parts of solvent
+adjust = 0  # since we are deleting lines, we'll need to dynamically adjust which lines get deleted
+for i in range(0, len(replacement)):
+    for j in range(1, len(args.sol_atoms)):
+        del a[replacement[i] + 2 - adjust]
+    adjust += (len(args.sol_atoms) - 1)
+
+f = open('test', 'w')
+
+fix_gro.reorder(a, 'double_layer.gro', args.solvent)  # reorders and then rewrites the file with
 
 # Now modify the topology accordingly
 
@@ -196,11 +265,13 @@ while a[Solute_start + top_lines].count('%s' % args.Solute) == 0:
 
 bot_membrane = []
 top_membrane = []
+print 'LC: %s' % LC
 for i in range(LC_start, LC + LC_start):
     bot_membrane.append(i + 1)
     top_membrane.append(i + 1 + LC)
 
 # Now add the ions associated with the bottom membrane
+print 'solute: %s' % solute
 for i in range(Solute_start, solute + Solute_start):
     bot_membrane.append(i + 1)
 
@@ -214,7 +285,7 @@ start -= top_lines
 for i in range(start, start + solute):
     top_membrane.append(i + 1)
 
-solute_ind = []  # This one is more complicated since the location are a little less organized. Instead, we index them
+solute_ind = []  # This one is more complicated since the locations are a little less organized. Instead, we index them
 # based on the z positions of the solute
 count = -top_lines
 for i in range(0, len(a)):
@@ -229,7 +300,7 @@ for i in range(Solvent_start, multiplier*solvent + Solvent_start - len(solute_in
         solvent_ind.append(i + 1)
 
 System = []
-for i in range(0, no_atoms*multiplier):
+for i in range(0, no_atoms*multiplier - len(replacement)*(args.n_sol_atoms - 1)):
     System.append(i + 1)
 
 ndx = []

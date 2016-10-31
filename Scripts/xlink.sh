@@ -26,7 +26,7 @@ while getopts "c:t:g:d:s:x:f:m:C:" opt; do
     x) XLINKS=$OPTARG;;
     f) FRAMES=$OPTARG;;
     m) MONOMER=$OPTARG;;
-    C) ITERATION=$OPTARG;;  #if the sript is being continued
+    C) ITERATION=$OPTARG;;  #if the script is being continued
     esac
 done
 

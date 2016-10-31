@@ -9,23 +9,25 @@ import argparse
 # Input arguments to python file by choosing which monomer to assemble with and number of layers. Can be used in a shell
 # script
 
-parser = argparse.ArgumentParser(description = 'Measure Membrane Thickness')
-parser.add_argument('-i', '--input', default='wiggle.gro', help = 'Path to input file')
-parser.add_argument('-w', '--water', default=6, help = 'nm of water between layers')
-parser.add_argument('-m', '--no_monomers', default=6, help= 'number of monomers per layer')
-parser.add_argument('-l', '--layers', default=20, help= 'Number of stacked layers in unit cell')
-parser.add_argument('-p', '--pores', default=4, help= 'Number of pores')
-parser.add_argument('-a', '--atoms', default=137, help='Number of atoms excluding ions')
-args = parser.parse_args()
+def run():
+    parser = argparse.ArgumentParser(description = 'Measure Membrane Thickness')
+    parser.add_argument('-i', '--input', default='wiggle.gro', help = 'Path to input file')
+    parser.add_argument('-w', '--water', default=6, help = 'nm of water between layers')
+    parser.add_argument('-m', '--no_monomers', default=6, help= 'number of monomers per layer')
+    parser.add_argument('-l', '--layers', default=20, help= 'Number of stacked layers in unit cell')
+    parser.add_argument('-p', '--pores', default=4, help= 'Number of pores')
+    parser.add_argument('-a', '--atoms', default=137, help='Number of atoms excluding ions')
+    args = parser.parse_args()
+    return args
 
-water_layer = int(args.water)  # nm of water wanted between layers
 
-f = open(args.input, "r")  # .gro file whose positions of Na ions will be read
-a = []  # list to hold lines of file
-for line in f:
-    a.append(line)
+def thickness(filename):
+    f = open(filename, "r")  # .gro file whose positions of Na ions will be read
 
-def thickness(a):
+    a = []  # list to hold lines of file
+    for line in f:
+        a.append(line)
+
     line = 0
     while a[line].count('HII') == 0:
         line += 1
@@ -44,8 +46,9 @@ def thickness(a):
     thick = z_max - z_min
     return thick, z_max, z_min
 
-thick, z_max, z_min = thickness(a)
-tot_thickness = thick + water_layer
-
 if __name__ == '__main__':
+    args = run()
+    water_layer = int(args.water)  # nm of water wanted between layers
+    thick, z_max, z_min = thickness('%s' %args.input)
+    tot_thickness = thick + water_layer
     print 'Membrane Thickness: %s nm' % thick
