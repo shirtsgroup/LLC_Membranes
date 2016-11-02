@@ -52,6 +52,7 @@ import matplotlib.pyplot as plt
 import time
 import Poly_fit
 import numpy as np
+import Diffusivity
 
 start = time.time()
 parser = argparse.ArgumentParser(description = 'Run Cylindricity script')
@@ -64,99 +65,31 @@ parser.add_argument('-s', '--solv', default='no', help='Is the system solvate?')
 parser.add_argument('-b', '--buffer', default='10', help='Distance into membrane from min and max where current '
                                                         'measurements will be made')
 parser.add_argument('-T', '--temp', default=300, help='System Temperature, Kelvin')
+parser.add_argument('-B', '--nboot', default=2000, help='Number of bootstrap trials to be run')
 
 args = parser.parse_args()
 
 pos, vel, trj_times, box = get_positions('%s' % args.trajfile, '%s' % args.ion, '%s' % args.LC_type, '%s' % args.solv)
 
-nT = len(trj_times)
-Nbootstraps = 2000
-frontfrac = 0
-fracshow = 1
-d = 1
-dt = (trj_times[len(trj_times) - 1] - trj_times[0])/(len(trj_times) - 1)
-
-no_ion = len(pos[0][0])
-x = np.zeros([3, no_ion, len(trj_times)])
-for i in range(3):
-    for j in range(no_ion):
-        for k in range(len(trj_times)):
-            x[i, j, k] = pos[k][i][j]
-
-
-def autocorrFFT(x):
-    N = len(x)
-    F = np.fft.fft(x, n=2*N)  # 2*N because of zero-padding
-    PSD = F * F.conjugate()
-    res = np.fft.ifft(PSD)
-    res = (res[:N]).real   # now we have the autocorrelation in convention B
-    n= N*np.ones(N)-np.arange(0, N)  # divide res(m) by (N-m)
-    return res/n  # this is the autocorrelation in convention A
-
-
-def msd_fft(r):
-    N = len(r)
-    D = np.square(r).sum(axis=1)
-    D = np.append(D, 0)
-    S2 = sum([autocorrFFT(r[:, i]) for i in range(r.shape[1])])
-    Q = 2*D.sum()
-    S1 = np.zeros(N)
-    for m in range(N):
-      Q = Q-D[m-1]-D[N-m]
-      S1[m] = Q/(N-m)
-    return S1-2*S2
-
-MSD = np.zeros([nT], dtype=float)
-MSDs = np.zeros([nT, no_ion], dtype=float)  # a set of MSDs per particle
-for n in range(0, no_ion):
-    MSDs[:, n] = msd_fft(x[:, n, :].T)
-    MSD += MSDs[:, n]
-MSD /= no_ion
-
-
-eMSDs = np.zeros([nT, Nbootstraps], dtype=float)  # a set of MSDs per particle (time step?)
-# Now, bootstrap over number of particles, assuming that the particles are sufficiently independent
-for b in range(0, Nbootstraps):
-    indices = np.random.randint(0, no_ion, no_ion)  # randomly select N of the particles with replacement
-    # ^ makes a list of length Nparticles each with a random number from 0 to  Nparticles
-    for n in range(0, no_ion):
-        eMSDs[:, b] += MSDs[:, indices[n]]  # for this bootstrap trial b, add the MSDs of a randomly selected particle
-        # to the particle at each time step
-    eMSDs[:, b] /= no_ion  # Divide every timestep by Nparticles -- average the MSDs
-
-# The result is Nbootstraps trajectories
-
-limits = np.zeros([2, nT], dtype=float)  # a set of MSDs per particle
-# now, let's determine a 95\% error bound for each tau (out of the
-# Nbootstrapped MSD's, use that for the error bars
-for t in range(0, nT):
-    limits[0, t] = np.abs(np.percentile(eMSDs[t, :], 2.5) - MSD[t])
-    limits[1, t] = np.abs(np.percentile(eMSDs[t, :], 97.5) - MSD[t])
-
-# plot just the first half of the MSD (avoid the noisy part)
-endMSD = int(np.floor(nT*fracshow))
-startMSD = int(np.floor(nT*frontfrac))
-print dt*startMSD
-print dt*endMSD
-# plot only 100 bars total
-errorevery = int(np.ceil(fracshow*nT/100.0))
-# Make an error bar plot
-plt.errorbar(dt*np.array(range(0,endMSD)),MSD[:endMSD],yerr=[limits[0,:endMSD],limits[1,:endMSD]],errorevery=errorevery)
-plt.ylabel('MSD')
-plt.xlabel('time (ps)')
-# I'm not sure why the error appears when plt.show is done.
-y_fit2, r_squared2, std2, coeff2 = Poly_fit.poly_fit(dt*np.array(range(startMSD, endMSD)), MSD[startMSD:endMSD], 1)
-print coeff2[1]/(2*d*100)  # slope of MSD plot equals 2 D. Divide by 0.01 to go from nm^2/ps to cm^2/s
-#plt.plot(dt*np.array(range(startMSD, endMSD)), y_fit2)
-plt.title('Stackoverflow/Shirts algorithm MSD results')
-plt.show()
-
-exit()
-# UNITS
+##### UNITS #####
 # pos [=] nm
 # vel [=] nm/ps
 # trj_times [=] ps
 # box [=] nm
+
+no_ion = len(pos[0, :, 0])
+nT = len(trj_times)
+Nbootstraps = 2000
+frontfrac = 0
+fracshow = .3
+d = 1
+dt = (trj_times[len(trj_times) - 1] - trj_times[0])/(len(trj_times) - 1)
+
+# Calculate diffusivity (cm^2/ps)
+D = Diffusivity.dconst(pos, nT, Nbootstraps, frontfrac, fracshow, d, dt)[0]
+
+exit()
+
 
 # Calculate z1 and z2 using z_max and z_min from Thickness.py
 
@@ -198,6 +131,7 @@ def current_autocorrelation(I, steps):
     for i in range(0, steps + 1):
         corr_sum += I[0]*I[i]
     return corr_sum / (steps + 1)
+
 
 def current_autocorrelation2(I, steps):
     itau = 0

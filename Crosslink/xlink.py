@@ -530,8 +530,8 @@ while b[index].count('C33') == 0:
     index += 1  # increments the while loop
 
 C2_2 = int(b[index][0:5])
-
 index = 0
+
 while b[index].count('C47') == 0:
 #while str.strip(b[index][22:29]) != 'C47':
     index += 1  # increments the while loop
