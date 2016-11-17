@@ -35,3 +35,4 @@ class LC(object):
         return self.atoms
 
 HII = LC('Hexagonal', 137, 'monomer2', 9, ['C20', 'C34', 'C48'], ['C19', 'C33', 'C47'], 3, ['HII', 'NA'])
+SOL = LC('Water', 3, 'spc216.gro', 9, ['na'], ['na'], 1, ['OW', 'HW1', 'HW2'])

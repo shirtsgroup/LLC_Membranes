@@ -7,16 +7,19 @@ This script is meant to extract the last frame of trajectory from either a .trr 
 import argparse
 import subprocess
 
-parser = argparse.ArgumentParser(description='Grab the last trajectory frame and make a .gro file')
+def initialize():
+    parser = argparse.ArgumentParser(description='Grab the last trajectory frame and make a .gro file')
 
-parser.add_argument('-f', '--file', default='wiggle.trr', help = 'Path to input file')
-parser.add_argument('-t', '--tpr', default='wiggle.tpr', help = 'Name of .tpr file if extracting from last frame')
-parser.add_argument('-i', '--ion', default='NA', help='Name of ion(s) being used to calculate ionic conductivity')
-parser.add_argument('-l', '--LC_type', default='HII', help='Type of liquid crystal. Should match that defined in '
-                                                           'LC_class.py')
-parser.add_argument('-s', '--solv', default='no', help='Is the system solvate?')
+    parser.add_argument('-f', '--file', default='wiggle.trr', help = 'Path to input file')
+    parser.add_argument('-t', '--tpr', default='wiggle.tpr', help = 'Name of .tpr file if extracting from last frame')
+    parser.add_argument('-i', '--ion', default='NA', help='Name of ion(s) being used to calculate ionic conductivity')
+    parser.add_argument('-l', '--LC_type', default='HII', help='Type of liquid crystal. Should match that defined in '
+                                                               'LC_class.py')
+    parser.add_argument('-s', '--solv', default='no', help='Is the system solvate?')
 
-args = parser.parse_args()
+    args = parser.parse_args()
+    return args
+
 
 def extract_last_gro(filename):
     if filename.endswith('.gro'):
@@ -43,6 +46,7 @@ def extract_last_gro(filename):
     else:
         print 'Incompatible Filetype'
 
+
 def extract_last_trr(filename, tpr):
     if filename.endswith('.trr'):
         # This section doesn't work
@@ -66,6 +70,7 @@ def extract_last_trr(filename, tpr):
         print 'Incompatible Filetype'
 
 if __name__ == "__main__":
+    args = initialize()
     if args.file.endswith('.gro'):
         extract_last_gro('%s' % args.file)
     if args.file.endswith('.trr'):

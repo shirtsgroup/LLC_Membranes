@@ -16,8 +16,8 @@ import matplotlib.pyplot as plt
 import scipy.optimize as sci
 import math
 
-x = [1, 2, 3, 4, 5, 6, 7, 8]
-y = [1, 4, 9, 16, 25, 36, 49, 64]
+# x = [1.01, 1.27, 1.85, 2.38, 2.83, 3.13, 3.96, 4.91]
+# y = [0.00, 0.19, 0.58, 0.96, 1.26, 1.47, 2.07, 2.75]
 
 def z_matrix(degree, t):
     Z = np.zeros((len(t), degree + 1))
@@ -27,15 +27,27 @@ def z_matrix(degree, t):
     return Z
 
 
-def find_A(x, Y, degree):  # Find the matrix of coefficients which give desired fit
+def find_A(x, Y, degree, W = 'none'):  # Find the matrix of coefficients which give desired fit
     # if A is a matrix of coefficients ([a0, a1, ..., an]), then
     # A = ([Z]^T*[Z])^-1*[Z]^T*Y
+    # With a weight matrix:
+    # A = ([Z]^T*W*[Z])^-1*[Z]^T*W*Y
+    # The weight matrix is a square n x n matrix (where n = len(x)) where the diagonals are the inverse of the standard
+    # deviation of the data point squared (1/(sigma_i ** 2))
     Z = z_matrix(degree, x)
     ZT = np.transpose(Z)  # transposed z matrix
-    ZTZ = np.dot(ZT, Z)  # multiply ZT and Z
-    ZTZinv = np.linalg.inv(ZTZ)  # inverse of ZTZ
-    ZTZinvZT = np.dot(ZTZinv, ZT)  # multiply the inverse of Z transposed * Z by Z transposed
-    A = np.array(np.dot(ZTZinvZT, Y).tolist())
+    if W.any() != 'none':
+        ZTW = np.dot(ZT, W)
+        ZTWZ = np.dot(ZTW, Z)
+        ZTWZinv = np.linalg.inv(ZTWZ)
+        ZTWZinvZT = np.dot(ZTWZinv, ZT)
+        ZTWZinvZTW = np.dot(ZTWZinvZT, W)
+        A = np.array(np.dot(ZTWZinvZTW, Y).tolist())
+    else:
+        ZTZ = np.dot(ZT, Z)  # multiply ZT and Z
+        ZTZinv = np.linalg.inv(ZTZ)  # inverse of ZTZ
+        ZTZinvZT = np.dot(ZTZinv, ZT)  # multiply the inverse of Z transposed * Z by Z transposed
+        A = np.array(np.dot(ZTZinvZT, Y).tolist())
     return A
 
 
@@ -47,16 +59,34 @@ def poly_eval(degree, x, A):
     return y
 
 
-def poly_fit(x, y, degree):
-    A = find_A(x, y, degree)
+def poly_fit(x, y, degree, weight='none'):
+
+    if weight.any() != 'none':
+        A = find_A(x, y, degree, weight)
+    else:
+        A = find_A(x, y, degree)
+
     y_val = np.zeros((len(x)))
     St = 0
     Sr = 0
     mean = np.mean(y)
+    n = len(y)
     for i in range(0, len(x)):
         y_val[i] = poly_eval(degree, x[i], A)
         Sr += (y[i] - (y_val[i]))**2
         St += (y[i] - mean)**2
     s = math.sqrt(Sr/(len(y) - 2))
+    x_square = [i**2 for i in x]
+    slope_error = s * np.sqrt(n/(n*sum(x_square) - (sum(x))**2))
+    intercept_error = s * np.sqrt(sum(x_square)/(n*sum(x_square) - (sum(x))**2))
     R_squared = 1 - (Sr/St)
-    return y_val, R_squared, s, A
+    return y_val, R_squared, slope_error, intercept_error, A
+
+# y_fit, r, slope_error, intercept_error, A = poly_fit(x, y, 1, 2)
+# print slope_error
+# print intercept_error
+# print np.std([1, 1.1, 0.9])
+# print np.std([0.1, 0.2, 0.1])
+# plt.plot(x, y)
+# plt.plot(x, y_fit)
+# plt.show()

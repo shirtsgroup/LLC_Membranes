@@ -23,7 +23,7 @@ import numpy as np
 def initialize():
     parser = argparse.ArgumentParser(description = 'Run Cylindricity script')
 
-    parser.add_argument('-i', '--input', default='wiggle_traj.gro', help='Name of file containing coordinates')
+    parser.add_argument('-i', '--input', default='wiggle_traj_754.gro', help='Name of file containing coordinates')
     parser.add_argument('-c', '--component', default='NA', help = 'Path to input file')
     parser.add_argument('-l', '--LC_type', default='HII', help = 'Name of this LC system. Should match its name in'
                                                                  'LC_class.py')
@@ -40,7 +40,7 @@ def traj_time(line, a, box_vect):
         i += 1
     for k in range(0, 3):
         box_vect[k].append(float(a[line - 1][k*10:(k + 1)*10]))
-    if len(a[line - 1]) > 30:  # If the last six entries are zero, they are not included in the .gro file
+    if len(a[line - 1]) > 31:  # If the last six entries are zero, they are not included in the .gro file
         for k in range(3, 9):
             box_vect[k].append(float(a[line - 1][k*10:(k + 1)*10]))
     timestamp = (float((a[line][i + 2: len(a[line]) - 1])))
@@ -126,11 +126,15 @@ def get_positions(input_file, comp, lc, solv):
     if not traj_points:  # unless we are looking at a single frame (meaning traj_points is an empty list)
         for k in range(0, 3):
             box[k].append(float(a[-1][k*10:(k + 1)*10]))
-        if len(a[-1]) > 30:  # If the last six entries are zero, they are not included in the .gro file
+        if len(a[-1]) > 31:  # If the last six entries are zero, they are not included in the .gro file
             for k in range(3, 9):
                 box[k].append(float(a[-1][k*10:(k + 1)*10]))
     else:  # The final box vectors take up the first entry in the box list so move those entries to the end
-        for i in range(0, len(box)):
+        if len(a[-1]) > 31:
+            lenbox = 9
+        else:
+            lenbox = 3
+        for i in range(0, lenbox):
             box[i].append(box[i][0])  # Put the first box entry for each vector at the end each list
             del box[i][0]  # delete the first entry
 
@@ -172,11 +176,12 @@ def get_positions(input_file, comp, lc, solv):
                 vel_np[i, j, k] = vel_frame[k][i][j]
 
     box_np = np.zeros([len(box), frames])
-    for i in range(len(box)):
+    for i in range(lenbox):
         for k in range(frames):
             box_np[i, k] = box[i][k]
 
     return pos_np, vel_np, traj_points, box_np
+
 
 def get_positions_old(input_file, comp, lc, solv):  # unmodified -- works fine but gives output in lists
 
@@ -249,4 +254,7 @@ def get_positions_old(input_file, comp, lc, solv):  # unmodified -- works fine b
 if __name__ == '__main__':
     args = initialize()
     posi, veli, trj_times, box = get_positions('%s' % args.input, '%s' % args.component, '%s' % args.LC_type, '%s' % args.solv)
-    print veli[1][0]
+
+    f = open('pos_754ns', 'w')
+    np.save(f, posi)
+    f.close()

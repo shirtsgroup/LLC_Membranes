@@ -135,6 +135,7 @@ for i in range(0, no_pores):
     x_axis.append([])
     y_axis.append([])
 
+
 constant = 1/float(no_layers*mon_per_layer)  # used to find average. The value of the constant is 1 over the total
 # number of molecules in a pore (since there is one of each atom type in each monomer)
 
@@ -143,6 +144,17 @@ for k in range(0, no_pores):  # loops through each pore
     listy = [y_ for y_ in sum_y_traj[k]]  # same as line above
     x_axis[k] = np.dot(constant, listx)  # finds average of x_axis location values at each frame
     y_axis[k] = np.dot(constant, listy)  # finds average of y_axis location values at each frame
+
+
+# p_center = np.zeros([2, 4, traj_points])
+# for i in range(traj_points):
+#     for j in range(no_pores):
+#         p_center[0, j, i] = x_axis[j][i]
+#         p_center[1, j, i] = y_axis[j][i]
+#
+# f = open('pore_centers2', 'w')
+# np.save(f, p_center)
+# exit()
 
 # find distance between pores based on component chosen
 
@@ -167,8 +179,9 @@ for i in range(0, traj_points - traj_start):
 
 P2Ps = [pore12, pore13, pore34, pore42, pore14, pore23]
 
-start_frame = 10
 
+start_frame = 10
+print 'Things calculated'
 # Likely to be replaced with an MBAR tool
 def autocorrelation(list_input, lag, start):
     length = len(list_input)
@@ -202,11 +215,11 @@ def Neff(list_input, start):
     N_eff = (T - start + 1) / gto
     return N_eff
 
-N_effs = []
-for i in range(0, len(pore12)):
-    N_effs.append(Neff(pore12, i))
-
-t0_index = N_effs.index(max(N_effs))
+# N_effs = []
+# for i in range(0, len(pore12)):
+#     N_effs.append(Neff(pore12, i))
+#
+# t0_index = N_effs.index(max(N_effs))
 
 plt.figure(1)
 time_pts = range(0, (traj_points - traj_start))
@@ -214,8 +227,8 @@ intervals = length_of_simulation/traj_points/1000
 time = []
 for i in range(0, len(time_pts)):
     time.append(time_pts[i]*intervals)
-
-print 'Correlation Time: %s ns' % time[t0_index]
+#
+# print 'Correlation Time: %s ns' % time[t0_index]
 
 fig = plt.figure()
 plt.plot(time, pore12, label='1-2')
@@ -230,7 +243,7 @@ plt.yticks(size=18)
 plt.ylabel('Pore-To-Pore Distance [nm]', fontsize=22)
 plt.xlabel('Simulation Time (ns)', fontsize=22)
 plt.legend(loc=1, fontsize=18)
-
+plt.show()
 # Find the distance from central axis
 # need to save each value of distance in order to calculate deviation. 4 lists in a list
 
