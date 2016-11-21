@@ -93,10 +93,10 @@ parser.add_argument('-B', '--nboot', default=200, help='Number of bootstrap tria
 parser.add_argument('-m', '--nMC', default=1000, help='Number of Monte Carlo trials to estimate error in D and Dq')
 parser.add_argument('-a', '--arrays', default='on', help='If positions, id array are already saved')
 parser.add_argument('-S', '--suffix', default='array612ns', help='Suffix to append to position and id arrays when saving')
-parser.add_argument('-r', '--frontfrac', default=0.1, help='Where to start fitting line for diffusivity calc')
-parser.add_argument('-F', '--fracshow', default=0.5, help='Percent of graph to show, also where to stop fitting line'
+parser.add_argument('-r', '--frontfrac', default=0.05, help='Where to start fitting line for diffusivity calc')
+parser.add_argument('-F', '--fracshow', default=0.4, help='Percent of graph to show, also where to stop fitting line'
                                                          'during diffusivity calculation')
-parser.add_argument('-t', '--nTsub', default=10, help='Number of subtrajectories to break into for generating stats')
+parser.add_argument('-t', '--nTsub', default=4, help='Number of subtrajectories to break into for generating stats')
 parser.add_argument('-M', '--method', default='B', help='Which method to use to calculate Ionic Conductivity: CD ='
                                                          'Collective Diffusion, NE = Nernst Einstein, B = both')
 
@@ -311,7 +311,7 @@ def dQ(frame, positions, channel_length, zmax, zmin):
         # q += e*(Atom_props.charge[id[0, i, frame]])*displacement/channel_length
         q += e*(Atom_props.charge[id[0, i]])*displacement/channel_length
     return q
-
+print nT
 nT -= 1
 n_sub = args.nTsub  # number of sub-trajectories to used for error analysis
 nT_sub = nT/n_sub  # number of points in that subinterval
