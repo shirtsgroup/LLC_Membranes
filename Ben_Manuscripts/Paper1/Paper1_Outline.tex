@@ -25,11 +25,12 @@
 	Self assembling lyotropic liquid crystals (LLCs) share the characteristic ability of nanostructured membrane materials to create highly ordered structures with the benefits of low cost and synthetic techniques feasible for large scale production.
 	\begin{itemize}
 		\item Forms lamellar, bicontinuous cubic and hexagonal phase based on solution composition
-		\item My monomer forms the Colh phase consisting of aligned 
+		\item My monomer form two types of self assembled LLCs - thermotropic (Colh) and lyotropic (HII) - explain difference 
 		\item Hydrophilic regions point towards pore centers
 		\item Until recently, they could not be aligned - hindered progress
 		\item Yale aligns them
 		\item LLC HII phase membranes offer potential for high permeability and selectivity which equals low energy consumption
+		\item This paper will focus on the development of a model of the colh phase
 	\end{itemize}
 %MRS: might want to include effective pore radius.
 %BJC: I'm not sure how to include the pore radius since we don't have a clear method for its measurement (experimentally and consequently
@@ -50,6 +51,7 @@
 	
 	A molecular level understanding of solute transport in LLC membranes will accelerate development efforts by providing guidelines for monomer design.
 	\begin{itemize}
+		\item Two types of self assembled LLCs have been made - thermotropic and lyotropic -- explain difference -- shift focus to Colh
 		\item Colh phase studies currently limited mostly to one monomer with minor variations
 		\item Current optimization efforts performed through trial and error
 		\item Macroscopic models are the only source of predictive modeling
@@ -78,27 +80,29 @@
 	
 	HII monomers were parameterized using the Generalized Amber Forcefield with the Antechamber package provided with AmberTools16. All molecular dynamics simulations were run using Gromacs version 5.1.2.
 
-%MRS: there isn't a single most suitable monomer structure, so should rephrase it. Also, suitable is not defined. So perhaps ``an ensemble of characteristic low-energy vacuum monomoer configurations were constructed''
-	The most suitable monomer structural configuration was decided by applying a simulated annealing process to the parameterized monomer. 
+	An ensemble of characteristic, low-energy vacuum monomer configurations were constructed by applying a simulated annealing process to a parameterized monomer.
 	\begin{itemize}
 		\item Initially parameterized monomer gives unfavorable structure
 		\item Structure cooled from 1000 to 50 K over 10 nanoseconds
 		\item Result not global minimum but close enough for structure building
 		\item Multiple configurations saved from annealing trajectory to prove independence of starting config
+		\item New configurations reparamaterized
 	\end{itemize}
 	
 	The timescale for self assembly of monomers into the hexagonal phase is unknown and likely outside of a reasonable simulation length. 
 	\begin{itemize}
-		\item Work done that shows coarse grain model self assembly in ~1000 ns %MRS: include citation in outline if important for the logic.
-		\item Attempts with HII system not fruitful  %MRS: will eventually report what didn't work.
+		\item Work done that shows coarse grain model self assembly in ~1000 ns , Citation: J. Phys. Chem. B 2013, 117, 4254-4262
+		\item Attempts with Colh system not fruitful  %MRS: will eventually report what didn't work. %BJC Will we not report it here?
 		\item Wrote own code to assemble monomers into HII configuration (described in intro) close to what is expected -- equilibration simulations allow structure to relax into expected configuration 
 		\item Code has adjustable parameters: Pore-to-Pore distance, pore radius, number of monomer layers (justification for parameters chosen in following paragraphs)
 		\item This is the thermotropic phase, information used depends on thermotropic experimental data
 %MRS: somewhere in the outline there should be a description of the difference between thermotropic and lyotropic phases.
+%BJC: added in the intro around line 28 
 	\end{itemize}
 	
 	After some experimentation, it was found that twenty monomer layers per pore provided a balance of structural accuracy and computational efficiency. 
-%MRS: worth it to describe the extent to which the final structure is independent of parameters. 
+%MRS: worth it to describe the extent to which the final structure is independent of parameters.  
+%BJC: So, mention how starting pore-to-pore affects the equilibrium structure, how different crosslinking parameters affect crosslinked structure etc.? Or are you just talking about crosslinking?
 	\begin{itemize}
 		\item Space between membrane layers in z direction - semi-isotropic sims fix z box dimension
 		\item Small number of layers create micellar structure
@@ -114,18 +118,16 @@
 	
 	\noindent NPT simulations were run at 300 K and 1 bar for system equilibration.
 	\begin{itemize}
-		\item Monitored 'hexagonality'
-		\item Pores don't show perfect hexagonal character for short sims (~20 ns) 
-                  %MRS: but does the short time behavior really matter?
-		\item We see a smaller average pore-to-pore distance than reported
+		\item Monitored 'hexagonality' - i.e. how the distance between pores compares to an ideal hexagon
 		\item Varied initial pore-to-pore distance and ran very long simulations
-		\item Starting pore-to-pore distances of 4.0 and 4.5 converge to same average with long\textbf{er} sims 
+		\item Starting pore-to-pore distances of 4.0 and 4.5 converge to same average with longer sims 
 	\end{itemize}
 	
 	After an equilibrated structure was created, a crosslinking procedure was performed in order to better parallel synthetic procedures. 
 	\begin{itemize}
 		\item Crosslinking maintains alignment of cylindrical mesophases
 		\item head to tail addition
+		\item racemic mixture 
 		\item Details of crosslinking algorithm (refer to appendix or supplemental info)
 	\end{itemize}  
 	
@@ -138,6 +140,8 @@
 		\item Direct comparison of conductivity measurements to experimental results
 		\item SAXS structural comparisons
 %MRS: this seems a bit repetitive - SAXS structural comparisons and conductivity are brought up in a few places.  Want to make it a cleaner outline. 
+%BJC: Okay, I can probably delete this paragraph from this section. Maybe the structural stuff is better worked into the methods section since it is really about model development. 
+%BJC: The ionic conductivity measurement and reason for them will be made clear once I actually start talking about it 
 	\end{itemize} 
 	
 	A structurally accurate and reproducible model of the Colh phase LLC membrane has been developed
@@ -158,14 +162,17 @@
 	\begin{itemize}
 		\item Hypothesis: There are an average of 7 monomers per layer when defined per unit volume but there are not well-defined layers as pictured in the literature. While long range order is maintained, hexagonal mesophases are disordered within their hydrophilic and hydrophobic domains. Staying completely ordered, stacked on top of each other is not entropically favorable.
 %MRS: one thing we could to to test to see if pi-pi stacking could order them.  We introduce an explicit dipole in the middle of the aromatic ring, all aligned (I can show you how to set this up using the virtual_sites command). We see how strong it neds to be in order to make the rings line up - or if any strength will really create that ordering. One could imagine that when the dipole gets strong enough, it just pulls ions out of the channel.
+%BJC: I remember us talking about this during one of our meetings. I assume this shouldn't be too hard to set up and simulate before the paper is submitted?
 		\item We can understand how monomer shape/size/length influence pore density
 %MRS: I'm not quite sure how the next sentence fits in. You mean we want to design a membrane that has more pores, and so we want materials with larger pores?
+%BJC: What I'm trying to say is that if we can make the membrane more porous - closer together pores mostly - then we can presumably increase ionic conductivity and permeability
 		\item Ideally we'd want as many pores as possible per membrane area. More monomers per layer means more material needed and less pores formed. 
 	
 	Sodium counterions are distributed randomly within the hydrophilic pore regions. (I should actually come up with a distribution e.g. gaussian)
 	\begin{itemize}
 		\item Past literature reports ions arranged in a circle about pore walls implying some kind of void space as a pore. Simulations show that they are not
-%MRS: I think we need to be a litte. If we see that the pores form this way under a variety of conditions (just the ones we've looked at - different numbers of monomers per layer, different spacing, then that provides strong evidence that the more aligned form is less probable. 	
+%MRS: I think we need to be a litte careful. If we see that the pores form this way under a variety of conditions (just the ones we've looked at - different numbers of monomers per layer, different spacing, then that provides strong evidence that the more aligned form is less probable. 	
+%BJC: So by be careful, you mean word it a little more delicately, for example: "Simulations under a variety of conditions suggest that ions prefer disorder within the pores"
 		\item Ions may play a different role in transport than previously thought. They might hinder transport by slowing diffusion of other sodiums and molecules.
 		\item  Experimentalists may be over-predicting flux through pores because they view it as a hollow channel.
 	
@@ -189,10 +196,10 @@
 			\item The model is valid for non-equilibrium and equilibrium simulations. Our analysis is based on the latter
 			\item A similar model has been derived and validate to predict water permeability using equilibrium simulations
 			\item The pore region is defined as the entire membrane system since lab IC measurements are done on bulk membrane rather than on individual pores. One would expect single channel IC to be much larger than the bulk membrane
-			\item This model suggests that changing the structure of the monomer tails may actually improve conductivity (I don't know how feasible this would actually be, they'd need to be charged somehow) 
-%MRS: interesting idea, but probably we don't want to explore it that much here.  It also seems counterintuitive, since the charge in the tails is essentially trapped -- there is fluctuation, but it is trapped rather than free. 
 			\item Changing the valence of the counterion may also increase ionic conductivity (I need to actually test this by increasing the charge on sodium for a calculation)
 %MRS: increasing charge on the sodium alone probably won't work that well unless you also increase the charge on the carboxylate, since you will then have a lack of electroneutrality.
+%BJC: right, that makes sense. In which case, the fluctuations might cancel and give similar conductivity - maybe I'll just stay away from it for now. I just though it might be nices to have some hypotheses
+%about how to improve ionic conductivity based just on the modeling done so far.
 	\end{itemize}
 
 	Our model can be used to evaluate other liquid crystalline assemblies
@@ -206,13 +213,13 @@
 		
 	\section{Conclusion}
 
-	In this work, a molecular model has been developed which can predict transport in an thermotropic liquid crystal membrane. 
+	In this work, a molecular model has been developed intended to predict transport in a thermotropic liquid crystal membrane. 
 	\begin{itemize}
 		\item Results presented for Colh phase monomer but can be adapted to other LCs
 %MRS: will need to describe more what the differences are.  Is it just whether it's solvated or not? (i.e. different compositions, but structures are similar?)
+%BJC: I'm not sure I follow, differences between what exactly? All I am trying to say is that we can stick other monomers in place of NAGA3C11 and see what happens.
 		\item Model can be used for prediction of transport properties in new membranes
-		\item Yet to solvate system to establish procedures for HII phase prediction
-%MRS: rather than saying yet to do it, describe it for future work.                  
+		\item We will solvate the system to establish procedures for HII phase prediction
 	\end{itemize}
 	
 	
