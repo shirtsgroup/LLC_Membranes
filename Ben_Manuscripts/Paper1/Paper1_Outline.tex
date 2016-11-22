@@ -1,6 +1,5 @@
 \documentclass{article}
 \title{Predicting Transport in Lyotropic Liquid Crystal Membranes with Molecular Dynamics Simulations -- Outline}
-%\author{Benjamin J. Coscia, Michael R. Shirts, Douglas L. Gin, Richard D. Noble}
 \author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble \and Michael R. Shirts} % usually the PI would be the last author.
 \begin{document}
 	\bibliographystyle{ieeetr}
@@ -23,19 +22,18 @@
 			\item Carbon Nanotubes - MD studies are promising but synthetic techniques unable to achieve necessary alignment and pore monodispersity
 		\end{itemize}
 	\end{itemize} 
-%MRS: don't need to use capitals, even if it will become an acronym.
-%MRS: also it's self-assembled LLC's that are an alternative, not
-%LLC's in general.  
-	Lyotropic Liquid Crystals (LLCs) share the characteristic ability of nanostructured membrane materials to create highly ordered structures with the benefits of low cost and synthetic techniques which are feasible for large scale production.
+	Self assembling lyotropic liquid crystals (LLCs) share the characteristic ability of nanostructured membrane materials to create highly ordered structures with the benefits of low cost and synthetic techniques feasible for large scale production.
 	\begin{itemize}
 		\item Forms lamellar, bicontinuous cubic and hexagonal phase based on solution composition
-		\item My monomer forms HII phase consisting of vertically aligned, monodisperse, straight pores in a hexagonal array
+		\item My monomer forms the Colh phase consisting of aligned 
 		\item Hydrophilic regions point towards pore centers
 		\item Until recently, they could not be aligned - hindered progress
 		\item Yale aligns them
 		\item LLC HII phase membranes offer potential for high permeability and selectivity which equals low energy consumption
 	\end{itemize}
-%MRS: might want to include effective pore radius.	
+%MRS: might want to include effective pore radius.
+%BJC: I'm not sure how to include the pore radius since we don't have a clear method for its measurement (experimentally and consequently
+%via simulations). I don't know that we can answer that question which is why I didn't pose it in the intro	
 	Constructing a molecular model may give a clearer picture of the microscopic structure of LLC membranes which will change how we think about their design.
 	\begin{itemize}
 		\item The arrangement of sodium ions in the channels is thought to be confined to the pore walls. It is possible they are arranged more randomly
@@ -51,24 +49,24 @@
 	
 	A molecular level understanding of solute transport in LLC membranes will accelerate development efforts by providing guidelines for monomer design.
 	\begin{itemize}
-		\item HII phase studies currently limited mostly to one monomer with minor variations
+		\item Colh phase studies currently limited mostly to one monomer with minor variations
 		\item Current optimization efforts performed through trial and error
 		\item Macroscopic models are the only source of predictive modeling
 		\item An atomistic understanding of the mechanism of solute transport can identify
 		performance bottle necks and direct design of future monomers/membranes
-		\item Will we observe Donnan exclusion or some variation on it at the pore entrance
 %MRS: Are we going to restrict this paper to dry membranes?  That might be the best way to have a reasonable length paper out in a reasonable amount of time. Follow up with water paper. Donnan exclusion. 
-		\item What are the relative weights of steric and electrical effects that deterimine selectivity -- is there an optimal balance
+%BJC: I think restricting the paper to dry membranes (Colh phase) is a good idea, especially since I don't have much to say about the HII phase yet. 
 		\begin{itemize}
 %MRS: breaking into Coulombic vs. Lennard-Jones doesnt' really help that much.  We can brainstorm other ways to examine it. The cleanest is to run separate simulations with electrostatics turned off, because it's the free energy that matters, not different components of the potential energy
-			\item Look at Coulombic vs. Lennard Jones interactions
+%BJC: Ok, I removed mention of that - We won't study electrostatic/coulombic interactions until we are looking in depth at transport mechanism anyways - right?
 			\item Do ions have trouble getting through because of interactions with other things in the pores (e.g. ions, carbonyl groups, benzene rings) -- related to ionic conduction
 			\item Does concentration of ions in the pore repel incoming ions?
 %MRS: we might want to restrict to what happens INSIDE the ring rather than entering/exiting, since the entrance/exit will differ a lot between pores with and without water.
+%BJC: Ok, removed the point about end effects
 		\end{itemize}
 	\end{itemize}
 %MRS: launch a new phase might be overkill. Enable a qualitatively different type of membrane design.	
-	A physically accurate molecular model with easily modified structural features will launch a new phase of research into directing design of an optimal LLC membrane.
+	A physically accurate molecular model with easily modified structural features will enable a qualitatively different type of membrane design aimed optimization of self assembled LLC membranes.
 	\begin{itemize}
 		\item The paper will illustrate the development of a predictive molecular model
 		\item Measurements made to validate model
