@@ -23,8 +23,8 @@ import numpy as np
 def initialize():
     parser = argparse.ArgumentParser(description = 'Run Cylindricity script')
 
-    parser.add_argument('-i', '--input', default='wiggle_traj_754.gro', help='Name of file containing coordinates')
-    parser.add_argument('-c', '--component', default='NA', help = 'Path to input file')
+    parser.add_argument('-i', '--input', default='wiggle.gro', help='Name of file containing coordinates')
+    parser.add_argument('-c', '--component', default='sys', help = 'Component to extract information of')
     parser.add_argument('-l', '--LC_type', default='HII', help = 'Name of this LC system. Should match its name in'
                                                                  'LC_class.py')
     parser.add_argument('-t', '--traj', default='yes', help = 'Do you want to read a trajectory .gro file?')
@@ -176,7 +176,7 @@ def get_positions(input_file, comp, lc, solv):
                 vel_np[i, j, k] = vel_frame[k][i][j]
 
     box_np = np.zeros([len(box), frames])
-    for i in range(lenbox):
+    for i in range(len(box)):
         for k in range(frames):
             box_np[i, k] = box[i][k]
 
@@ -255,6 +255,13 @@ if __name__ == '__main__':
     args = initialize()
     posi, veli, trj_times, box = get_positions('%s' % args.input, '%s' % args.component, '%s' % args.LC_type, '%s' % args.solv)
 
-    f = open('pos_754ns', 'w')
-    np.save(f, posi)
+    f = open('NA_positions.txt', 'w')
+
+    ions = np.shape(posi)[1]
+    for i in range(ions):
+        row = str(posi[:, i, 0])
+        row = row.replace("[", "")
+        row = row.replace("]", "")
+        f.write(row + "\n")
+
     f.close()
