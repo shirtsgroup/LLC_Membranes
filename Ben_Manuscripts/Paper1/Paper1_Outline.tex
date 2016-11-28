@@ -35,6 +35,7 @@
 %MRS: might want to include effective pore radius.
 %BJC: I'm not sure how to include the pore radius since we don't have a clear method for its measurement (experimentally and consequently
 %via simulations). I don't know that we can answer that question which is why I didn't pose it in the intro	
+%MRS2: if no measurement experimentally, don't need one for simulation at this point!
 	Constructing a molecular model may give a clearer picture of the microscopic structure of LLC membranes which will change how we think about their design.
 	\begin{itemize}
 		\item The arrangement of sodium ions in the channels is thought to be confined to the pore walls. It is possible they are arranged more randomly
@@ -43,6 +44,7 @@
 			\item Could also be a difference between lyotropic and thermotropic phases
 		\end{itemize}
 		%BJC - I'm likely going to cut this since I cannot answer this question definitively - unless we take an approach based on enthalpy differences and structural comparisons (pore-to-pore distance and x-ray scattering data). We probably have enough information for a speculative answer, but I don't know if that should be included in the paper
+                %MRS: I think it's probably useful to report which arrangements are stable and give consistent pore-to-pore distances. Also can help answer the questions whether there are distinct well-separated ``layers'', or if it's more complicated. 
 		\item How many monomers are in a layer?
 		\begin{itemize}
 			\item There is no clear answer to this question in literature. I'd like to confirm or deny past predictions
@@ -86,23 +88,29 @@
 		\item Structure cooled from 1000 to 50 K over 10 nanoseconds
 		\item Result not global minimum but close enough for structure building
 		\item Multiple configurations saved from annealing trajectory to prove independence of starting config
+                 %MRS: say what you mean by reparameterized.  Charges recalculated? Are the charges different from configuration to configuration (hopefully not).  Were multiple configurations used in the reparameterization?
 		\item New configurations reparamaterized
 	\end{itemize}
 	
 	The timescale for self assembly of monomers into the hexagonal phase is unknown and likely outside of a reasonable simulation length. 
 	\begin{itemize}
 		\item Work done that shows coarse grain model self assembly in ~1000 ns , Citation: J. Phys. Chem. B 2013, 117, 4254-4262
-		\item Attempts with Colh system not fruitful  %MRS: will eventually report what didn't work. %BJC Will we not report it here?
+		\item Attempts with Colh system not fruitful  
+                  %MRS: will eventually report what didn't work . 
+                  %BJC Will we not report it here?
+                  %MRS2: no, I meant you eventually will put here what didn't work.
 		\item Wrote own code to assemble monomers into HII configuration (described in intro) close to what is expected -- equilibration simulations allow structure to relax into expected configuration 
 		\item Code has adjustable parameters: Pore-to-Pore distance, pore radius, number of monomer layers (justification for parameters chosen in following paragraphs)
 		\item This is the thermotropic phase, information used depends on thermotropic experimental data
 %MRS: somewhere in the outline there should be a description of the difference between thermotropic and lyotropic phases.
 %BJC: added in the intro around line 28 
+%MRS2: the two are blended together a bit making it hard to see what is investigated where. We can discuss this today.
 	\end{itemize}
 	
 	After some experimentation, it was found that twenty monomer layers per pore provided a balance of structural accuracy and computational efficiency. 
 %MRS: worth it to describe the extent to which the final structure is independent of parameters.  
 %BJC: So, mention how starting pore-to-pore affects the equilibrium structure, how different crosslinking parameters affect crosslinked structure etc.? Or are you just talking about crosslinking?
+%MRS2: I'm just talking about building the system (before crosslinking) - distance between starting config, length of time equilibrated.  Because this is how you are showing that the builds procedure is reasonable and leads to similar structures independently of how you build it. Crosslinking later. 
 	\begin{itemize}
 		\item Space between membrane layers in z direction - semi-isotropic sims fix z box dimension
 		\item Small number of layers create micellar structure
@@ -160,27 +168,34 @@
 	
 	The monomers are arranged into disks containing XXXX monomers in each layer. (Or are there defined layers -- I need to test this idea a bit more) 
 	%BJC: Do you think this point is even worth attacking at the moment?
+        %MRS2: we sort of need to do this to convince ourselves that this approach is reasonable, so we should include it and show others it is reasonable.
 	\begin{itemize}
 		\item Hypothesis: There are an average of 7 monomers per layer when defined per unit volume but there are not well-defined layers as pictured in the literature. While long range order is maintained, hexagonal mesophases are disordered within their hydrophilic and hydrophobic domains. Staying completely ordered, stacked on top of each other is not entropically favorable.
 %MRS: one thing we could to to test to see if pi-pi stacking could order them.  We introduce an explicit dipole in the middle of the aromatic ring, all aligned (I can show you how to set this up using the virtual_sites command). We see how strong it neds to be in order to make the rings line up - or if any strength will really create that ordering. One could imagine that when the dipole gets strong enough, it just pulls ions out of the channel.
 %BJC: I remember us talking about this during one of our meetings. I assume this shouldn't be too hard to set up and simulate before the paper is submitted?
+%MRS2: we can talk about what would need to be done.  We need to get the dipole in the right direction for each monomer. 
 		\item We can understand how monomer shape/size/length influence pore density
 %MRS: I'm not quite sure how the next sentence fits in. You mean we want to design a membrane that has more pores, and so we want materials with larger pores?
 %BJC: What I'm trying to say is that if we can make the membrane more porous - closer together pores mostly - then we can presumably increase ionic conductivity and permeability
+%MRS2: OK, you want to put this where it is connected directly with the other information. Perhaps the thesis of it's own paragraph, with supporting sentences about how one could use MD simulations to do this?
 		\item Ideally we'd want as many pores as possible per membrane area. More monomers per layer means more material needed and less pores formed. 
-	
+	\end{itemize}
 	Sodium counterions are distributed randomly within the hydrophilic pore regions. (I should actually come up with a distribution e.g. gaussian)
 	\begin{itemize}
 		\item Past literature reports ions arranged in a circle about pore walls implying some kind of void space as a pore. Simulations show that they are not
 %MRS: I think we need to be a litte careful. If we see that the pores form this way under a variety of conditions (just the ones we've looked at - different numbers of monomers per layer, different spacing, then that provides strong evidence that the more aligned form is less probable. 	
 %BJC: So by be careful, you mean word it a little more delicately, for example: "Simulations under a variety of conditions suggest that ions prefer disorder within the pores"
+%MRS2: yes.
+%MRS2: below -- hinder transport of what?  Both other ions and water?  Probably need to explain more clearly what people though before about whether they hindered transport or not in order to show that the role is ``different than previously thought''
 		\item Ions may play a different role in transport than previously thought. They might hinder transport by slowing diffusion of other sodiums and molecules.
+%MRS2: should be careful, since they are not necessarily predicting flux yet.  We do know that they have good ionic conductivity. 
 		\item  Experimentalists may be over-predicting flux through pores because they view it as a hollow channel.
-	
+        \end{itemize}	
 	The model gives reasonable estimates of ionic conductivity.
 	\begin{itemize}
 		\item There are a few ways to estimate ionic conductivity as seen in literature. We prefer a method which can extract an estimate based purely on an equilibrium trajectory
 		\item We must also be sure that our analysis of results is consistent with the method use for experimental evaluation (i.e. AC impedance spectroscopy)
+%MRS2: clarify in what situations the azimuthal distribution is necessary.
 		\item We must also account for the azimuthal distributions, linking our perfectly straight microscopic system to the not-so-straight macroscopic system
 		\item Two methods used to for prediction
 		\item Nernst Einstein Relation:
@@ -198,6 +213,7 @@
 			\item A similar model has been derived and validate to predict water permeability using equilibrium simulations
 			\item The pore region is defined as the entire membrane system since lab IC measurements are done on bulk membrane rather than on individual pores. One would expect single channel IC to be much larger than the bulk membrane
 			\item Changing the valence of the counterion may also increase ionic conductivity (I need to actually test this by increasing the charge on sodium for a calculation)
+                \end{itemize}                    
 %MRS: increasing charge on the sodium alone probably won't work that well unless you also increase the charge on the carboxylate, since you will then have a lack of electroneutrality.
 %BJC: right, that makes sense. In which case, the fluctuations might cancel and give similar conductivity - maybe I'll just stay away from it for now. I just though it might be nices to have some hypotheses
 %about how to improve ionic conductivity based just on the modeling done so far.
@@ -219,6 +235,7 @@
 		\item Results presented for Colh phase monomer but can be adapted to other LCs
 %MRS: will need to describe more what the differences are.  Is it just whether it's solvated or not? (i.e. different compositions, but structures are similar?)
 %BJC: I'm not sure I follow, differences between what exactly? All I am trying to say is that we can stick other monomers in place of NAGA3C11 and see what happens.
+%MRS2: got it.
 		\item Model can be used for prediction of transport properties in new membranes
 		\item We will solvate the system to establish procedures for HII phase prediction
 	\end{itemize}
