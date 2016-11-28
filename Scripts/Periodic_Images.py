@@ -34,7 +34,7 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Duplicate points periodically in the x-y directions')
 
-    parser.add_argument('-i', '--images', default=2, help='Number of periodic images')
+    parser.add_argument('-i', '--images', default=10, help='Number of periodic images')
     parser.add_argument('-x', '--xbox', default=8.65745, help='Length of x box vector')
     parser.add_argument('-y', '--ybox', default=8.65745, help='Length of y box vector - NOTE: not y-component, but length of'
                                                         'entire vector')
