@@ -1,6 +1,6 @@
 \documentclass{article}
 \title{Predicting Transport in Lyotropic Liquid Crystal Membranes with Molecular Dynamics Simulations -- Outline}
-\author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble \and Michael R. Shirts} % usually the PI would be the last author.
+\author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble \and Michael R. Shirts} 
 \begin{document}
 	\bibliographystyle{ieeetr}
 	\maketitle
@@ -25,7 +25,7 @@
 	Self assembling lyotropic liquid crystals (LLCs) share the characteristic ability of nanostructured membrane materials to create highly ordered structures with the benefits of low cost and synthetic techniques feasible for large scale production.
 	\begin{itemize}
 		\item Forms lamellar, bicontinuous cubic and hexagonal phase based on solution composition
-		\item My monomer form two types of self assembled LLCs - thermotropic (Colh) and lyotropic (HII) - explain difference 
+		\item My monomer form two types of self assembled LLCs - thermotropic (Colh) and lyotropic (HII) - explain difference % actually explain 
 		\item Hydrophilic regions point towards pore centers
 		\item Until recently, they could not be aligned - hindered progress
 		\item Yale aligns them
@@ -45,6 +45,7 @@
 		\end{itemize}
 		%BJC - I'm likely going to cut this since I cannot answer this question definitively - unless we take an approach based on enthalpy differences and structural comparisons (pore-to-pore distance and x-ray scattering data). We probably have enough information for a speculative answer, but I don't know if that should be included in the paper
                 %MRS: I think it's probably useful to report which arrangements are stable and give consistent pore-to-pore distances. Also can help answer the questions whether there are distinct well-separated ``layers'', or if it's more complicated. 
+		%BJC : try five
 		\item How many monomers are in a layer?
 		\begin{itemize}
 			\item There is no clear answer to this question in literature. I'd like to confirm or deny past predictions
@@ -89,6 +90,7 @@
 		\item Result not global minimum but close enough for structure building
 		\item Multiple configurations saved from annealing trajectory to prove independence of starting config
                  %MRS: say what you mean by reparameterized.  Charges recalculated? Are the charges different from configuration to configuration (hopefully not).  Were multiple configurations used in the reparameterization?
+		%BJC: Openeye software to get the best charge for multiple configurations.
 		\item New configurations reparamaterized
 	\end{itemize}
 	
@@ -196,6 +198,7 @@
 		\item There are a few ways to estimate ionic conductivity as seen in literature. We prefer a method which can extract an estimate based purely on an equilibrium trajectory
 		\item We must also be sure that our analysis of results is consistent with the method use for experimental evaluation (i.e. AC impedance spectroscopy)
 %MRS2: clarify in what situations the azimuthal distribution is necessary.
+%BJC: don't explicity say azimuthal
 		\item We must also account for the azimuthal distributions, linking our perfectly straight microscopic system to the not-so-straight macroscopic system
 		\item Two methods used to for prediction
 		\item Nernst Einstein Relation:
