@@ -71,15 +71,16 @@ def extract_data(xvg, start_fit, end_fit):
 
 if __name__ == '__main__':
     import numpy as np
-    start_fit = 0.05
-    end_fit = 0.23
+    start_fit = 0.25
+    end_fit = 0.1
     if args.fit == 'on':
         x, y, title, xlabel, ylabel, y_fit, coeff = extract_data(args.xvg, start_fit, end_fit)
         plt.plot(x[int(np.floor(start_fit*len(x))):int(np.floor(end_fit*len(x)))], y_fit)
         print 'Diffusion Coefficient: %s' % (coeff[1]/(2*0.1))
     else:
         x, y, title, xlabel, ylabel = extract_data(args.xvg, start_fit, end_fit)
-    print 'Mean Value: %s' % np.mean(y[50:len(y) - 1])
+    # print 'Mean Value: %s' % np.mean(y[50:len(y) - 1])
+    print 'Mean Value: %s' % np.mean(y[12:50])
     print 'Standard Deviation: %s' % np.std(y[50:len(y) - 1])
     maximum = max(y)
     minimum = min(y[int(len(y)/5.0):len(y)])

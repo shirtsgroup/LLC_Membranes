@@ -82,7 +82,7 @@ def d_error(nMC, startfit, endMSD, nT, limits, times, MSD, d):
 
     # Monte Carlo Method
     # nMC = 1000  # number of Monte Carlo trajectories
-    tot_pts = (endMSD - startfit)
+    tot_pts = (int(endMSD) - int(startfit))
     # pts = np.zeros([nMC, tot_pts])
     # for i in range(nMC):
     #     pts[i, :] = limits[0, startfit:endMSD]*np.random.randn(1, tot_pts) + MSD[startfit:endMSD]
@@ -99,7 +99,7 @@ def d_error(nMC, startfit, endMSD, nT, limits, times, MSD, d):
     W = np.zeros((tot_pts, tot_pts))
     for i in range(tot_pts):
         W[i, i] = 1/((limits[0, i + startfit])**2)
-    print np.shape(W)
+
     y_fit, _, slope_error, _, A = Poly_fit.poly_fit(times[startfit:endMSD], MSD[startfit:endMSD], 1, W)
 
     return A[1]/(2*d*1000000), slope_error/(2*d*1000000)

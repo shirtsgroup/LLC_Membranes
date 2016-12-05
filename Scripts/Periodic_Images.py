@@ -73,7 +73,7 @@ def shift_matrices(images, angle, xbox, ybox):
     return x_shift, y_shift
 
 
-def pbcs(pts, images, angle, xbox, ybox):
+def pbcs(pts, images, angle, xbox, ybox, frame):
 
     x_shift, y_shift = shift_matrices(images, angle, xbox, ybox)
     mat_dim = 2 * images + 1
@@ -84,9 +84,9 @@ def pbcs(pts, images, angle, xbox, ybox):
     for p in range(tot_pts):
         for i in range(mat_dim):
             for j in range(mat_dim):
-                translated_pts[0, i*mat_dim + j, p] = x_shift[i, j] + pts[0, p, 0]
-                translated_pts[1, i*mat_dim + j, p] = y_shift[i, j] + pts[1, p, 0]
-                translated_pts[2, i*mat_dim + j, p] = pts[2, p, 0]  # z position unchanged
+                translated_pts[0, i*mat_dim + j, p] = x_shift[i, j] + pts[0, p, frame]
+                translated_pts[1, i*mat_dim + j, p] = y_shift[i, j] + pts[1, p, frame]
+                translated_pts[2, i*mat_dim + j, p] = pts[2, p, frame]  # z position unchanged
 
     return translated_pts
 
@@ -98,11 +98,12 @@ if __name__ == "__main__":
     angle = float(args.angle)
     xbox = float(args.xbox)
     ybox = float(args.ybox)
+    frame = 0
 
     import Get_Positions
     NA = Get_Positions.get_positions('wiggle.gro', 'NA', 'HII', 'no')[0]
 
-    pt_periodic = pbcs(NA, images, angle, xbox, ybox)
+    pt_periodic = pbcs(NA, images, angle, xbox, ybox, frame)
 
     f = open('NA_periodic.gro', 'w')
 

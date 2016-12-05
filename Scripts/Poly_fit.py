@@ -36,7 +36,7 @@ def find_A(x, Y, degree, W = 'none'):  # Find the matrix of coefficients which g
     # deviation of the data point squared (1/(sigma_i ** 2))
     Z = z_matrix(degree, x)
     ZT = np.transpose(Z)  # transposed z matrix
-    if W.any() != 'none':
+    if isinstance(W, np.ndarray):
         ZTW = np.dot(ZT, W)
         ZTWZ = np.dot(ZTW, Z)
         ZTWZinv = np.linalg.inv(ZTWZ)
@@ -61,7 +61,7 @@ def poly_eval(degree, x, A):
 
 def poly_fit(x, y, degree, weight='none'):
 
-    if weight.any() != 'none':
+    if isinstance(weight, np.ndarray):
         A = find_A(x, y, degree, weight)
     else:
         A = find_A(x, y, degree)

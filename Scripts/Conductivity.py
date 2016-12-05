@@ -94,9 +94,9 @@ parser.add_argument('-m', '--nMC', default=1000, help='Number of Monte Carlo tri
 parser.add_argument('-a', '--arrays', default='on', help='If positions, id array are already saved')
 parser.add_argument('-S', '--suffix', default='array612ns', help='Suffix to append to position and id arrays when saving')
 parser.add_argument('-r', '--frontfrac', default=0.05, help='Where to start fitting line for diffusivity calc')
-parser.add_argument('-F', '--fracshow', default=0.4, help='Percent of graph to show, also where to stop fitting line'
+parser.add_argument('-F', '--fracshow', default=.4, help='Percent of graph to show, also where to stop fitting line'
                                                          'during diffusivity calculation')
-parser.add_argument('-t', '--nTsub', default=4, help='Number of subtrajectories to break into for generating stats')
+parser.add_argument('-t', '--nTsub', default=10, help='Number of subtrajectories to break into for generating stats')
 parser.add_argument('-M', '--method', default='B', help='Which method to use to calculate Ionic Conductivity: CD ='
                                                          'Collective Diffusion, NE = Nernst Einstein, B = both')
 
@@ -311,7 +311,7 @@ def dQ(frame, positions, channel_length, zmax, zmin):
         # q += e*(Atom_props.charge[id[0, i, frame]])*displacement/channel_length
         q += e*(Atom_props.charge[id[0, i]])*displacement/channel_length
     return q
-print nT
+
 nT -= 1
 n_sub = args.nTsub  # number of sub-trajectories to used for error analysis
 nT_sub = nT/n_sub  # number of points in that subinterval
@@ -362,8 +362,30 @@ times = np.linspace(dt, nT_sub*dt, nT_sub)
 startfit = int(np.floor(nT_sub*frontfrac))
 endMSD = int(np.floor(nT_sub*fracshow))
 
-plt.errorbar(times[:endMSD], avg_std[0, :endMSD], yerr=avg_std[1, :endMSD])
+tot_pts = endMSD - startfit
+slopes = np.zeros([n_sub])
+for i in range(n_sub):
+    plt.plot(times[:endMSD], msd[i, :endMSD])
+    y_fit, _, slope_error, _, A = Poly_fit.poly_fit(times[startfit:endMSD], msd[i, startfit:endMSD], 1, 'none')
+    # plt.plot(times[startfit:endMSD], y_fit)
+    slopes[i] = A[1]
 
+plt.figure()
+plt.title('%s MSD trajectories' % n_sub)
+plt.xlabel('Time (ps)')
+plt.ylabel('MSD (e$^2$)')
+
+ic_cd_avg = (np.mean(slopes)*(1*10**12)*conv)/(2*kb*float(args.temp))
+ic_cd_std = (np.std(slopes)*(1*10**12)*conv)/(2*kb*float(args.temp))
+ic_cds = slopes*((1*10**12)*conv/(2*kb*float(args.temp)))
+
+plt.hist(ic_cds)
+print "Ionic Conductivity: %s +/- %s S/m" % (ic_cd_avg, ic_cd_std)
+
+plt.show()
+# plt.errorbar(times[:endMSD], avg_std[0, :endMSD], yerr=avg_std[1, :endMSD])
+# plt.show()
+exit()
 # Monte Carlo Method:
 # Fit a line through the points
 # y_fit, r_squared, std2, coeff = Poly_fit.poly_fit(times[startfit:endMSD], avg_std[0, startfit:endMSD], 1)
