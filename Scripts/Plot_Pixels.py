@@ -44,7 +44,7 @@ def get_pixels(file, xpixel, ypixel):
 if __name__ == '__main__':
     args = initialize()
 
-    directory = '/home/bcoscia/Documents/Gromacs/SAXS/saxs_frames/pixels'
+    directory = '/home/bcoscia/Documents/Gromacs/SAXS/saxs_frames_long/pixels'
 
     pixel_sum = np.zeros([1024, 1024])
 
@@ -70,5 +70,6 @@ if __name__ == '__main__':
 
     plt.figure()
     x, intensities = Radial_int_pixels.radial_int(pixel_sum, 1024, 2)
+    print x
     plt.plot(x, intensities)
     plt.show()
