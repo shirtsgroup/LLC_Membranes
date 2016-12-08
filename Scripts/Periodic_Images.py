@@ -15,7 +15,7 @@
           \________\________\________\
 
     images = 1 corresponds to the above 3 x 3 grid. images = 2 corresponds to a 5 x 5 grid. images = 3 is 7 x 7 etc.
-    The meaning of images is the number of time we completely surround point with duplicates of itself
+    The meaning of images is the number of times we completely surround point with duplicates of itself
 
     x_box and y_box are defined as follows:
     <-x_box->
@@ -105,24 +105,24 @@ if __name__ == "__main__":
 
     pt_periodic = pbcs(NA, images, angle, xbox, ybox, frame)
 
-    f = open('NA_periodic.gro', 'w')
+    #f = open('NA_periodic.gro', 'w')
 
     pts = np.shape(pt_periodic)[2]
     duplicates = np.shape(pt_periodic)[1]
 
-    f.write("This is a .gro file\n")
-    f.write("%s\n" % (pts*duplicates))
-    count = 1
-    for j in range(duplicates):
-        for i in range(pts):
-            row = str(pt_periodic[:, j, i])
-            f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:9.3f}'.format(count, 'NA', 'NA', count, pt_periodic[0, j, i],
-                                                                        pt_periodic[1, j, i], pt_periodic[2, j, i]) + "\n")
-            count += 1
+    #f.write("This is a .gro file\n")
+    #f.write("%s\n" % (pts*duplicates))
+    #count = 1
+    #for j in range(duplicates):
+    #    for i in range(pts):
+    #        row = str(pt_periodic[:, j, i])
+    #        f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:9.3f}'.format(count, 'NA', 'NA', count, pt_periodic[0, j, i],
+    #                                                                    pt_periodic[1, j, i], pt_periodic[2, j, i]) + "\n")
+    #        count += 1
 
-    f.write('   0.00000   0.00000  0.00000')
+    #f.write('   0.00000   0.00000  0.00000')
 
-    f.close()
+    #f.close()
 
     f = open('NA_periodic.txt', 'w')
     for j in range(duplicates):
