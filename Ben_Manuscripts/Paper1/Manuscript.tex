@@ -1,0 +1,189 @@
+\documentclass{article}
+\title{Predicting Transport in Lyotropic Liquid Crystal Membranes with Molecular Dynamics Simulations -- Outline}
+\author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble \and Michael R. Shirts} 
+\begin{document}
+	\bibliographystyle{ieeetr}
+	\maketitle
+	\section{Introduction}
+	Nanostructured membrane materials have become increasingly popular in desalination and wastewater treatment applications because they offer the ability to control membrane architecture at the atomic scale.
+	\begin{itemize}
+		\item Current state-of-the-art reverse osmosis membranes are dense and unstructured with tortuous and polydisperse pores which lead to inconsistent performance
+		\item Tortuosity and polydispersity drive up energy requirements which strain developing regions and contribute strongly to CO2 emissions
+		\item With nanostructured materials, solute rejecting pores can be tuned uniformly -- drives down energy requirements
+	\end{itemize}
+	
+	Development of nanostructured materials has been limited by the ability to synthesize and scale various fundamentally sound technologies.
+	\begin{itemize}
+		\item Leading technologies and their limitations:
+		\begin{itemize}
+			\item Graphene sheets -atomically thick which gives excellent permeability but defects during manufacturing severely impact performance
+			\item Carbon Nanotubes - MD studies are promising but synthetic techniques unable to achieve necessary alignment and pore monodispersity
+		\end{itemize}
+	\end{itemize} 
+	Self assembling lyotropic liquid crystals (LLCs) share the characteristic ability of nanostructured membrane materials to create highly ordered structures with the benefits of low cost and synthetic techniques feasible for large scale production.
+	\begin{itemize}
+		\item Forms lamellar, bicontinuous cubic and hexagonal phase based on solution composition
+		\item My monomer form two types of self assembled LLCs - thermotropic (Colh) and lyotropic (HII) 
+		\item The thermotropic, Colh is formed by the self assembly of neat monomer
+		\item The lyotropic, HII phase is formed in the presence of small percentages of water (around 8 percent)
+		\item Both assemble into cyclinders with hydrophilic groups oriented inward towards the pore center and hydrophobic group facing outward. The only difference is the inclusion of water in the structure which leads to minor variations in the structure with potentially different filtration properties (although no filtration experiments have been done on Colh)  
+		\item Hydrophilic regions point towards pore centers
+		\item Until recently, they could not be aligned - hindered progress
+		\item Yale aligns them, then crosslinks them to lock in the structure
+		\item LLC HII phase membranes offer potential for high permeability and selectivity which equals low energy consumption
+		\item This paper will focus on the development of a model of the colh phase since it is a simpler starting point and has just as much experimental data
+	\end{itemize}
+	Constructing a molecular model may give a clearer picture of the microscopic structure of LLC membranes which will change how we think about their design.
+	\begin{itemize}
+		\item The arrangement of sodium ions in the channels is thought to be confined to the pore walls. It is possible they are arranged more randomly
+		\begin{itemize}
+			\item This could change how one thinks about molecules diffusing through membrane
+			\item Could also be a difference between lyotropic and thermotropic phases
+		\end{itemize}
+		\item How many monomers are in a layer?
+		\begin{itemize}
+			\item There is no clear answer to this question in literature. I'd like to confirm or deny past predictions
+			% BJC: It seems that the following discussion should be placed in the results section, with the above lines belonging in this section, posing the question along with past work/justification
+			\item It has been suggested that there are 4 monomers in a each disk/layer, however, simulations have shown that this leads to unstable configurations with dimensions that are too small compared to experiment.
+			\item Stable simulations with 6 and 7 monomers have been performed (will do one with five soon) which give structural characteristics consistent with experiment
+			\item Stable systems have also been simulated consisting of varying numbers of monomers per layer
+			\item This suggests that the arrangement of monomers is more complicated than simple layers stacked on top of each other
+		\end{itemize}
+	\end{itemize}
+	
+	A molecular level understanding of solute transport in LLC membranes will accelerate development efforts by providing guidelines for monomer design.
+	\begin{itemize}
+		\item Two types of self assembled LLCs have been made - thermotropic and lyotropic -- explain difference -- shift focus to Colh
+		\item Colh phase studies currently limited mostly to one monomer with minor variations
+		\item Current optimization efforts performed through trial and error
+		\item Macroscopic models are the only source of predictive modeling
+		\item An atomistic understanding of the mechanism of solute transport can identify
+		performance bottle necks and direct design of future monomers/membranes
+		\begin{itemize}
+			\item Do ions have trouble getting through because of interactions with other things in the pores (e.g. ions, carbonyl groups, benzene rings) -- related to ionic conduction
+			\item Does concentration of ions in the pore repel incoming ions?
+		\end{itemize}
+	\end{itemize}
+	A physically accurate molecular model with easily modified structural features will enable a qualitatively different type of membrane design aimed optimization of self assembled LLC membranes.
+	\begin{itemize}
+		\item The paper will illustrate the development of a predictive molecular model
+		\item Measurements made to validate model
+		\item Observations of transport mechanism
+		\item The model is consistent with experiments and will be used in solvent/solute flux and solute rejection predictions
+	\end{itemize}
+	
+	\section{System Setup}
+	
+	Col\subscript{h} phase forming monomers were parameterized using the Generalized Amber Forcefield with the Antechamber package provided with AmberTools16. All molecular dynamics simulations were run using Gromacs version 5.1.2. An ensemble of characteristic, low-energy vacuum monomer configurations were constructed by applying a simulated annealing process to a parameterized monomer. The structure was cooled from 1000 to 50 K over the course of 10 nanoseconds, resulting in a structure suitable for packing into a simulation box. Multiple configurations were saved from the annealing trajectory to be used in parallel in order to prove independence of starting configuration. A new set of parameters was generated from the annealed structure and used for all configurations tested.
+
+	The timescale for self assembly of monomers into the hexagonal phase is unknown and likely outside of a reasonable simulation length. Past work has shown the ability of other liquid crystals to form into various phases including the hexagonal phase using coarse grain models in c.a. 1000 ns. While 1000 ns would be expensive with an atomistic model, it is not an unreasonable amount of time and prompted an attempt at a self assembly. 480 monomers were packed into a cubic box using Packmol software, with box dimensions chosen based on approximate density of the col\subscript{h} phase. The box was made slightly larger than this to help with Packmol convergence and to give the monomers room to reorient themselves during equilibration. NPT simulations were carried out for 100 ns. In that time, no visible progress was made towards self assembly so simulations were stopped. Even if self assembly happened eventually, it is not a sustainable way to set up the system due to computational cost.
+
+	A script was written to place monomers into a configuration close to the expected equilibrium structure in order to minimize equilibration time. The code makes copies of monomers and rotates them to form disks with a hydrophilic center. The disks are stacked on top of each other to form pores and the pores are duplicated to form a unit cell. The code has adjustable build parameters which should be chosen based on experimental data when possible. Parameters include number of monomers in a disk, the number of disks stacked on top of each in each pore, the distance between the stacked disks, the distance between pores, and the pore radius as defined by the distance between a chosen atom in the monomer and the axis around which the monomers are rotated to form the disks. In all simulations, an initial configuration consisting of four pores was packed into a monoclinic unit cell. The monoclinic unit cell with an angle between the x and y vectors of 60 degrees, is the smallest unit cell which will give hexagonal symmetry with periodic boundaries turned on. 
+
+        The validity of our model can be tested based on its agreement with experimental structural and material property data. Our simulations should mimic the real system as best as possible within the limits imposed by choice of force field. This system is particularly difficult since there has not been a forcefield developed for it and the system has not been studied in the past. Therefor, parameters were chosen carefully based on the ability to reproducibly create acceptably accurate structures. 
+
+	After some experimentation, it was found that twenty monomer layers per pore provided a balance of structural accuracy and computational efficiency. Using too few layers resulted in system which moved towards a micelle-like configuration. The number of layers was progressively increased until straight pores in a hexagonal configuration proved stable. Anything beyond 20 layers provided no extra information only contributing computational expense.  
+	
+	The spacing between layers has a significant impact on the system dimensions. It should be between 4 A and 7 A, with a recommended value of 5 A. A spacing below 4 angstroms risks large repulsions between layers during the first steps of simulation giving unpredictable results. A spacing greater than 7 A has consistently given structural dimensions that are too small. It is hypothesized that it is due to monomer layers slipping between each during the first picoseconds of simulation. The system gets locked into a metastable state from which there is no recovery. A spacing of 5 A allows a more gentle relaxation and subsequent relaxation into a experimentally consistent configuration.   
+	
+	Experimental small angle X-ray scattering results were used to inform our choice of an initial pore to pore distance. The peak corresponding to the d100 plane was used to estimate a distance between pores of 4.12 nm. The sensitivity of the system to the starting pore-to-pore distance was tested by simulating initial configurations with starting pore-to-pore distances of 3.0, 3.5, 4.0 and 4.5 nm. Using 3.0 and 3.5 nm resulted in a structure whose dimensions were too small. The significant overlap between pores at these initial conditions likely locked the pores together with no hope of separation without energy input. Starting pore-to-pore distances of 4.0 and 4.5 nm both converged to expected distances.   
+	\begin{itemize}
+		\item SAXS to get an idea of Pore-to-Pore
+		\begin{itemize}
+			\item multiple starting pore to pore distances tested (3.0, 3.5, 4.0, 4.5 nm)
+			\item 4.0 nm and 4.5 nm converged to similar dimensions, 4.5 nm was most reliable
+		\end{itemize}
+		\item TEM images and rejection give a pore size estimate
+	\end{itemize}
+	
+	\noindent NPT simulations were run at 300 K and 1 bar for system equilibration.
+	\begin{itemize}
+		\item semi-isotropic
+		\item Monitored 'hexagonality' - i.e. how the distance between pores compares to an ideal hexagon
+		\item Varied initial pore-to-pore distance and ran very long simulations - typically > 200 ns
+	\end{itemize}
+	
+	After an equilibrated structure was created, a crosslinking procedure was performed in order to better parallel synthetic procedures. 
+	\begin{itemize}
+		\item Crosslinking maintains alignment of cylindrical mesophases
+		\item head to tail addition
+		\item racemic mixture 
+		\item Details of crosslinking algorithm (refer to appendix or supplemental info)
+	\end{itemize}  
+	
+	\section{Results and Discussion}
+	
+	A structurally accurate and reproducible model of the Colh phase LLC membrane has been developed
+	\begin{itemize}
+		\item Visual perspective - show top view and cross section
+		\item System validated using multiple monomer configurations (working on this now)
+		\item Pore to pore distance
+		\begin{itemize}
+			\item We know from SAXS data what the distance between pores should be
+			\item We require long simulation times to reach an equilibrated structure with the correct dimensions
+			\item Effect of crosslinking
+		\item Pore Radius - a less reliable validation because we don't have an agreed upon way to measure this parameter experimentally
+		\item Density - there are crude lab measurements which my model is in agreement with (no one has reported any values since it wasn't relevant to them)
+		\end{itemize}
+	\end{itemize}
+	
+	The monomers are arranged into disks containing XXXX monomers in each layer. (Or are there defined layers -- I need to test this idea a bit more) 
+	\begin{itemize}
+		\item Hypothesis: There are an average of 7 monomers per layer when defined per unit volume but there are not well-defined layers as pictured in the literature. While long range order is maintained, hexagonal mesophases are disordered within their hydrophilic and hydrophobic domains. Staying completely ordered, stacked on top of each other is not entropically favorable.
+	        \item It has been suggested that there are 4 monomers in a each disk/layer, however, simulations have shown that this leads to unstable configurations with dimensions that are too small compared to experiment.
+                \item Stable simulations with 6 and 7 monomers have been performed (will do one with five soon) which give structural characteristics consistent with experiment
+                \item Stable systems have also been simulated consisting of varying numbers of monomers per layer
+                \item This suggests that the arrangement of monomers is more complicated than simple layers stacked on top of each other
+	\end{itemize}
+
+	Sodium counterions are distributed randomly within the hydrophilic pore regions. (I should actually come up with a distribution e.g. gaussian)
+	\begin{itemize}
+		\item Past literature reports ions arranged in a circle about pore walls implying some kind of void space as a pore. Simulations under a variety of conditions suggest that ions prefer disorder within the pores. 
+		\item A size exclusion mechanism has been proposed in the past, however that might no be the only force at play
+		\item Ions may play a role in transport, hindering flux of solute and solvent by slowing their diffusion
+		\item Experimentalists may be over-estimating the potential for high solvent flux through the pores because they view it as a hollow channel. The membrane may exhibit the permeability-selectivity tradeoff inherent to solution-diffusion type membranes. %BJC: This seems dark and unencouraging but I think it's true. Maybe I shouldn't talk about it for now.
+        \end{itemize}	
+
+	The model gives reasonable estimates of ionic conductivity.
+	\begin{itemize}
+		\item There are a few ways to estimate ionic conductivity as seen in literature. We prefer a method which can extract an estimate based purely on an equilibrium trajectory
+		\item We must also be sure that our analysis of results is consistent with the method use for experimental evaluation (i.e. AC impedance spectroscopy)
+		\item We must also link our perfectly straight microscopic system to the not-so-straight macroscopic system
+		\item Two methods used to for prediction
+		\item Nernst Einstein Relation:
+		\begin{itemize}
+			\item Widely used equation for estimating ionic conductivity
+			\item Estimates DC ionic conductivity -- Frequency used during AC impedance slow enough to be approximated by dc at short enough timescales
+			\item Relates the diffusive motion of ions in the membrane to the membrane's ionic conductivity
+			\item Concentration is concentration of ions in the whole membrane, not just channels
+		\end{itemize}
+		\item Collective Diffusion:
+		\begin{itemize}
+			\item Defines a collective coordinate, Q (charge), to quantify the amount of charge transfer through the system
+			\item In the limit of infinite time, the MSD of Q can be used to formulate a diffusion coefficient of Q that can be related to ionic conductivity
+			\item The model is valid for non-equilibrium and equilibrium simulations. Our analysis is based on the latter
+			\item A similar model has been derived and validate to predict water permeability using equilibrium simulations
+			\item The pore region is defined as the entire membrane system since lab IC measurements are done on bulk membrane rather than on individual pores. One would expect single channel IC to be much larger than the bulk membrane
+                \end{itemize}                    
+	\end{itemize}
+
+	Our model can be used to evaluate other liquid crystalline assemblies
+		\begin{itemize}
+			\item Liquid crystal used - or a mixture of different liquid crystals
+			\item Minor structural variations (e.g. 7, 8, 9, 10, 11 ... CH2's in the tails)
+			\item Counterion -- Size/valence of counterion
+			\item Functional head groups
+			\item How does varying these things effect pore separation, pore size, phase stability, and transport and why are these effects observed
+		\end{itemize} 
+		
+	\section{Conclusion}
+
+	In this work, a molecular model has been developed intended to predict transport in a thermotropic liquid crystal membrane. 
+	\begin{itemize}
+		\item Results presented for Colh phase monomer but can be adapted to other LCs
+		\item Model can be used for prediction of transport properties in new membranes
+		\item We will solvate the system to establish procedures for HII phase prediction
+	\end{itemize}
+	
+	
+\end{document}
