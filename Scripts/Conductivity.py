@@ -96,7 +96,7 @@ parser.add_argument('-S', '--suffix', default='array612ns', help='Suffix to appe
 parser.add_argument('-r', '--frontfrac', default=0.05, help='Where to start fitting line for diffusivity calc')
 parser.add_argument('-F', '--fracshow', default=.4, help='Percent of graph to show, also where to stop fitting line'
                                                          'during diffusivity calculation')
-parser.add_argument('-t', '--nTsub', default=10, help='Number of subtrajectories to break into for generating stats')
+parser.add_argument('-t', '--nTsub', default=20, help='Number of subtrajectories to break into for generating stats')
 parser.add_argument('-M', '--method', default='B', help='Which method to use to calculate Ionic Conductivity: CD ='
                                                          'Collective Diffusion, NE = Nernst Einstein, B = both')
 
@@ -129,7 +129,7 @@ if args.arrays == 'on':
 
     no_comp = np.shape(pos)[1]
     nT = np.shape(pos)[2]
-
+    print nT
     print 'All other constants loaded'
 
 else:
@@ -379,8 +379,28 @@ ic_cd_avg = (np.mean(slopes)*(1*10**12)*conv)/(2*kb*float(args.temp))
 ic_cd_std = (np.std(slopes)*(1*10**12)*conv)/(2*kb*float(args.temp))
 ic_cds = slopes*((1*10**12)*conv/(2*kb*float(args.temp)))
 
-plt.hist(ic_cds)
+# Bootstrap the slopes
+from random import randint
+
+nboot = 200000
+means = np.zeros([nboot])
+for i in range(nboot):
+    sum = 0
+    for j in range(n_sub):
+        index = randint(0, n_sub - 1)
+        sum += slopes[index]
+    means[i] = sum / n_sub
+means *= ((1*10**12)*conv)/(2*kb*float(args.temp))
+bootstrap_mean = np.mean(means)
+bootstrap_std = np.std(means)
+
+plt.figure()
+plt.ylabel('Count')
+plt.xlabel('')
+plt.hist(means, bins=100)
 print "Ionic Conductivity: %s +/- %s S/m" % (ic_cd_avg, ic_cd_std)
+print "Bootstrapped Ionic Conductivity: %s +/- %s S/m" % (bootstrap_mean, bootstrap_std)
+
 
 plt.show()
 # plt.errorbar(times[:endMSD], avg_std[0, :endMSD], yerr=avg_std[1, :endMSD])

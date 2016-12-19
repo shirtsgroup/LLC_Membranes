@@ -34,7 +34,7 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Duplicate points periodically in the x-y directions')
 
-    parser.add_argument('-i', '--images', default=10, help='Number of periodic images')
+    parser.add_argument('-i', '--images', default=1, help='Number of periodic images')
     parser.add_argument('-x', '--xbox', default=8.65745, help='Length of x box vector')
     parser.add_argument('-y', '--ybox', default=8.65745, help='Length of y box vector - NOTE: not y-component, but length of'
                                                         'entire vector')
@@ -101,30 +101,64 @@ if __name__ == "__main__":
     frame = 0
 
     import Get_Positions
-    NA = Get_Positions.get_positions('wiggle.gro', 'NA', 'HII', 'no')[0]
+    pos = Get_Positions.get_positions('wiggle.gro', 'NA', 'HII', 'no')[0]
+    print 'positions got'
+    # For full system
+    # pos = np.load('pos_array612ns')
+    # id = np.load('identity_array612ns')
 
-    pt_periodic = pbcs(NA, images, angle, xbox, ybox, frame)
+    pt_periodic = pbcs(pos, images, angle, xbox, ybox, frame)
+    #
+    f = open('pts_periodic', 'w')
+    np.save(f, pt_periodic)
+    f.close()
 
-    #f = open('NA_periodic.gro', 'w')
+    #
+    # pt_periodic = np.load('pts_periodic')
+    # print np.shape(pt_periodic)
+    # exit()
+
+    f = open('NA_periodic.gro', 'w')
 
     pts = np.shape(pt_periodic)[2]
     duplicates = np.shape(pt_periodic)[1]
 
-    #f.write("This is a .gro file\n")
-    #f.write("%s\n" % (pts*duplicates))
-    #count = 1
-    #for j in range(duplicates):
-    #    for i in range(pts):
-    #        row = str(pt_periodic[:, j, i])
-    #        f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:9.3f}'.format(count, 'NA', 'NA', count, pt_periodic[0, j, i],
-    #                                                                    pt_periodic[1, j, i], pt_periodic[2, j, i]) + "\n")
-    #        count += 1
+    all_positions = np.zeros([3, pts*duplicates])
+    for i in range(duplicates):
+        for j in range(pts):
+            all_positions[:, i*pts + j] = pt_periodic[:, i, j]
 
-    #f.write('   0.00000   0.00000  0.00000')
+    f = open('NA_positions_1_image', 'w')
+    np.save(f, all_positions)
+    f.close()
+    exit()
+    f.write("This is a .gro file\n")
+    f.write("%s\n" % (pts*duplicates))
+    count = 1
+    for j in range(duplicates):
+       for i in range(pts):
 
-    #f.close()
+           row = str(pt_periodic[:, j, i])
 
-    f = open('NA_periodic.txt', 'w')
+           # for full system
+           # if id[0, i] == 'NA':
+           #     res = 'NA'
+           # else:
+           #     res = 'HII'
+           #
+           # f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:9.3f}'.format(count, '%s' % res, '%s' % id[0, i], count, pt_periodic[0, j, i],
+           #                                                             pt_periodic[1, j, i], pt_periodic[2, j, i]) + "\n")
+
+           f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:9.3f}'.format(count, 'NA' , 'NA', count, pt_periodic[0, j, i],
+                                                                       pt_periodic[1, j, i], pt_periodic[2, j, i]) + "\n")
+
+           count += 1
+
+    f.write('   0.00000   0.00000  0.00000')
+
+    f.close()
+
+    f = open('NA_periodic_1.txt', 'w')
     for j in range(duplicates):
         for i in range(pts):
             row = str(pt_periodic[:, j, i])

@@ -215,11 +215,15 @@ def Neff(list_input, start):
     N_eff = (T - start + 1) / gto
     return N_eff
 
-# N_effs = []
-# for i in range(0, len(pore12)):
-#     N_effs.append(Neff(pore12, i))
-#
-# t0_index = N_effs.index(max(N_effs))
+N_effs = []
+
+for i in range(0, len(pore12)):
+    N_effs.append(Neff(pore12, i))
+
+t0_index = N_effs.index(max(N_effs))
+
+print t0_index
+exit()
 
 plt.figure(1)
 time_pts = range(0, (traj_points - traj_start))
@@ -234,7 +238,7 @@ fig = plt.figure()
 plt.plot(time, pore12, label='1-2')
 plt.plot(time, pore13, label='1-3')
 plt.plot(time, pore34, label='3-4')
-# plt.plot(time, pore42, label='4-2')
+plt.plot(time, pore42, label='4-2')
 plt.plot(time, pore14, label='4-1')
 plt.plot(time, pore23, label='2-3')
 plt.xticks(size=18)

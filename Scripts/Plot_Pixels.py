@@ -13,7 +13,7 @@ import os
 def initialize():
     parser = argparse.ArgumentParser(description='Plot a 2D image from an ASCII file')
 
-    parser.add_argument('-f', '--file', default='10periodic.asc', help='Name of file to read')
+    parser.add_argument('-f', '--file', default='1periodic_far.asc', help='Name of file to read')
     parser.add_argument('-x', '--xpixel', default=1024, help='Number of pixels in the x direction')
     parser.add_argument('-y', '--ypixel', default=1024, help='Number of pixels in the y direction')
     parser.add_argument('-c', '--cmap', default='Greys', help='Color Scheme for heat map -- more options at '
@@ -44,7 +44,10 @@ def get_pixels(file, xpixel, ypixel):
 if __name__ == '__main__':
     args = initialize()
 
-    directory = '/home/bcoscia/Documents/Gromacs/SAXS/saxs_frames_long/pixels'
+    # directory = '/home/bcoscia/Documents/Gromacs/SAXS/saxs_frames_long/pixels'
+
+
+    directory = '/home/bcoscia/PycharmProjects/GitHub/Scripts/saxs_frames_far/images'
 
     pixel_sum = np.zeros([1024, 1024])
 
@@ -52,7 +55,7 @@ if __name__ == '__main__':
     for filename in os.listdir(directory):
         if filename.endswith(".asc"):
             count += 1
-            pixel_values = get_pixels('%s' % args.file, '%s' % args.xpixel, '%s' % args.ypixel)
+            pixel_values = get_pixels('%s/%s' % (directory, filename), '%s' % args.xpixel, '%s' % args.ypixel)
             for i in range(1024):
                 for j in range(1024):
                     pixel_values[i, j] -= 40
@@ -64,13 +67,13 @@ if __name__ == '__main__':
     # pixel_values = get_pixels('%s' % args.file, '%s' % args.xpixel, '%s' % args.ypixel)
     # for i in range(1024):
     #     for j in range(1024):
-    #         pixel_values[i, j] -= 40*count
+    #         pixel_values[i, j] -= 40
     # plt.figure()
     # im = plt.imshow(pixel_values, cmap='%s' % args.cmap, interpolation='none', vmin=40, vmax=50)
 
     import Radial_int_pixels
 
     plt.figure()
-    q, theta, intensities = Radial_int_pixels.radial_int(pixel_sum, 1024, .0002, 0.0001, 0.1, 1e-10)
-    plt.plot(q, intensities)
+    q, theta, intensities = Radial_int_pixels.radial_int(pixel_sum, 1024, .0002, 0.0001, 1.18, 1.54e-10)
+    plt.plot(theta, intensities)
     plt.show()

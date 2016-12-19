@@ -19,8 +19,8 @@ def initialize():
     parser.add_argument('-p', '--pixels', default=1024, help='Number of pixels in each direction (i.e. p x p)')
     parser.add_argument('-r', '--dr', default=0.0002, help='Step size for integration')
     parser.add_argument('-d', '--dim', default=0.0001, help='Dimension of pixel (assuming a square pixel) [m]')
-    parser.add_argument('-w', '--wavelength', default=1e-10, help='Wavelength of X-rays, [m]')
-    parser.add_argument('-D', '--dist', default=0.1, help='Distance from sample center to detector center')
+    parser.add_argument('-w', '--wavelength', default=1.54e-10, help='Wavelength of X-rays, [m]')
+    parser.add_argument('-D', '--dist', default=1.18, help='Distance from sample center to detector center')
 
     args = parser.parse_args()
 
@@ -70,14 +70,15 @@ def angle_mat(distance_matrix, dist, wavelength):
     for i in range(m):
         for j in range(n):
             p = distance_matrix[i, j]
-            angles[i, j] = np.arctan(p / d)
+            angles[i, j] = np.arctan(p / d) * 180.0 / np.pi  # convert to degrees
+
 
     maxes = []
     for i in range(m):
         maxes.append(max(angles[:, i]))
 
     theta_max = max(maxes)
-    print theta_max
+
     d_mat = np.zeros([m, n])
     w = float(wavelength)
     m2A_conv = 1e10
@@ -97,7 +98,7 @@ def angle_mat(distance_matrix, dist, wavelength):
     for i in range(m):
         for j in range(n):
             # q_mat[i, j] = 2*np.pi / d_mat[i, j]
-            q_mat[i, j] = 4*np.pi*np.sin(angles[i, j] / 2) / (w * m2A_conv)
+            q_mat[i, j] = 4*np.pi*np.sin(angles[i, j] / 2) * (np.pi / 180) / (w * m2A_conv)
 
     maxes = []
     for i in range(m):
@@ -116,12 +117,11 @@ def radial_int(pixel_intensities, pixels, dr, dim, dist, wavelength):
     dist = float(dist)
 
     distance_mat, max_dist = dist_mat(pixels, dim)
-    print max_dist
+
     angles, theta_max, q_mat, qmax, d_mat, dmax = angle_mat(distance_mat, dist, wavelength)
 
     intensities = np.zeros([int(max_dist/dr)])
     bins = len(intensities)
-    print bins
 
     x = np.linspace(0, max_dist, bins)
     qs = np.linspace(0, qmax, bins)
