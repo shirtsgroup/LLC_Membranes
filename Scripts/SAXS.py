@@ -14,7 +14,7 @@ def initialize():
     parser.add_argument('-p', '--pixels', default=1024, help='Number of pixels in each direction (i.e. p x p)')
     parser.add_argument('-r', '--dr', default=0.0002, help='Step size for integration')
     parser.add_argument('-d', '--dim', default=0.0001, help='Dimension of pixel (assuming a square pixel) [m]')
-    parser.add_argument('-w', '--wavelength', default=1.54e-10, help='Wavelength of X-rays, [m]')
+    parser.add_argument('-w', '--wavelength', default=1.54, help='Wavelength of X-rays, [m]')
     parser.add_argument('-D', '--dist', default=0.1, help='Distance from sample center to detector center')
     parser.add_argument('-i', '--incident', default=[0, 0, 1], help='Incident x_ray vector - input as list')
 
@@ -48,7 +48,7 @@ def detector_coords(pixels, dim, dist):
     return A
 
 
-def k_vectors(detector):
+def k_vectors(detector, wavelength):
     """
     :param: The x, y, z positions of each pixel on the detector relative to the origin placed at the sample location
     :return: k_vect: The normalized vectors pointing from the sample center to each pixel
@@ -56,11 +56,12 @@ def k_vectors(detector):
 
     origin = np.zeros([3])
     pixels = np.shape(detector)[1]
+    K = 2 * np.pi / float(wavelength)  # desired magnitude of the wave-vector
 
     k_vect = np.zeros([3, pixels, pixels])
     for i in range(pixels):
         for j in range(pixels):
-            k_vect[:, i, j] = detector[:, i, j] / np.linalg.norm(detector[:, i, j])
+            k_vect[:, i, j] = K * detector[:, i, j] / np.linalg.norm(detector[:, i, j])
 
     return k_vect
 
@@ -70,22 +71,35 @@ if __name__ == '__main__':
 
     detector_pts = detector_coords(pixels, '%s' % args.dim, '%s' % args.dist)
 
-    k_vect = k_vectors(detector_pts)
+    k_vect = k_vectors(detector_pts, '%s' % args.wavelength)
 
     # pos = np.load('NApos_array612ns')
     # id = np.load('identity_array612ns')
-    #
+
     # pos = pos[:, :, 0]
+
     pos = np.load('NA_positions_1_image')
     atoms = np.shape(pos)[1]
-    print atoms
+    # print atoms
     incident = np.array(args.incident)
 
+    print pos[:, 0]
+    # Switch y and z coordinate
+    for i in range(atoms):
+        temp = pos[1, i]
+        pos[1, i] = pos[2, i]
+        pos[2, i] = temp
+
+    print pos[:, 0]
+    import time
     Intensities = np.zeros([pixels, pixels])
 
     for i in range(pixels):
-        # print '{:2.1f} percent done'.format(100.0 * (i + 1) / pixels)
-        print '%s boobs' % (i + 1)
+        print '{:2.1f} percent done'.format(100.0 * (i + 1) / pixels)
+        if i != 0:
+            remaining_calcs = pixels - i - 1.0
+            print 'Will finish in about %s seconds' % ((end - start) * remaining_calcs)
+        start = time.time()
         for j in range(pixels):
             Re = 0
             Im = 0
@@ -96,6 +110,7 @@ if __name__ == '__main__':
                 Re += Z*np.cos(rq)
                 Im += Z*np.sin(rq)
             Intensities[i, j] += Re ** 2 + Im ** 2
+        end = time.time()
 
     mins = []
     for i in range(1024):

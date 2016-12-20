@@ -10,7 +10,8 @@ from scipy.interpolate import griddata
 from matplotlib import animation
 import argparse
 import Get_Positions
-from pymbar.timeseries import detectEquilibration
+from pymbar import timeseries
+import random as ran
 
 
 def initialize():
@@ -31,6 +32,13 @@ def initialize():
     parser.add_argument('-g', '--grid_division', default=100, help = 'Number of blocks in x and y direction for heat map')
     parser.add_argument('-C', '--cmap', default='Blues', help = 'Color Scheme for heat map')
     parser.add_argument('-m', '--lc', default='HII', help = 'Type of liquid crystal monomer being used')
+    parser.add_argument('-E', '--equil', default='auto', help = 'Frame number where system is equilibrated. "auto" will '
+                        'use pymbar.timeseries.DetectEquilibration to determine which frame to start at. It is worth '
+                        'double checking its choice manually')
+    parser.add_argument('-x', '--exclude', default=4, help = 'Which pore-to-pore distance to exclude - pass the index of'
+                                                            'the pore-to-pore distance as written in the list: '
+                                                            '["1-2", "1-3", "1-4", "2-3", "2-4", "3-4"] ')
+    parser.add_argument('-b', '--nboot', default=200, help = 'Number of bootstrap trials')
 
     args = parser.parse_args()
     return args
@@ -66,10 +74,73 @@ def p2p(p_centers, distances, nT):
         return p2ps
 
 
+def p2p_stats(p2ps, exclude, nboot, equil):
+
+    frames = np.shape(p2ps)[1]
+    exclude = int(exclude)
+    nboot = int(nboot)
+
+    # Get ride of the excluded trajectory
+    p2p_new = np.zeros([5, frames])
+    count = 0
+    for i in range(6):
+        if i != exclude:
+            p2p_new[count, :] = p2ps[i, :]
+            count += 1
+
+    p2ps = p2p_new
+
+    # Find the frame at which the system is equilibrated
+    if equil == 'auto':
+        ts = []
+        for pore in range(5):
+            ts.append(timeseries.detectEquilibration(p2ps[pore, :])[0])
+        t = int(max(ts))  # use the max equil frame to ensure all pores are equilibrated
+    else:
+        t = int(equil)
+
+    # Find the autocorrelation time for each pore - i.e. the time it takes for samples to become uncorrelated
+    taus = []
+    for i in range(5):
+        tau = timeseries.integratedAutocorrelationTime(p2ps[i, t:])
+        taus.append(tau)
+
+    tau = int(max(taus))  # use the max again to ensure all trajectories are independent
+
+    ind_trajectories = (frames - t) / tau  # the number of independent trajectories
+    total_trajectories = ind_trajectories * 5  # the total number of trajectories
+    trajectories = np.zeros([tau, total_trajectories])  # Create a new array to hold all the trajectories
+
+    # fill up trajectory array
+    for i in range(5):
+        for j in range(ind_trajectories):
+            trajectories[:, i * ind_trajectories + j] = p2ps[i, (t + j*tau):(t + (j + 1)*tau)]
+
+    # bootstrap to get statistics
+    p2p_boot = np.zeros([nboot])
+    for i in range(nboot):
+        p2p = 0
+        for j in range(tau):
+            T = ran.randrange(0, total_trajectories)  # pick a random trajectory from all the independent trajectories
+            P = ran.randrange(0, tau)  # choose a random point in that trajectory
+            p2p += trajectories[P, T]
+        p2p_boot[i] = p2p / tau  # add the average from this trial to the p2p_boot
+
+    # take average and standard deviation of bootstrap trial results
+    p2p_avg = np.mean(p2p_boot)
+    p2p_std = np.std(p2p_boot)
+
+    return p2p_avg, p2p_std
+
+
 if __name__ == '__main__':
 
     args = initialize()
 
+    p2ps = np.load('p2ps')
+    p2p_avg, p2p_std = p2p_stats(p2ps, '%s' % args.exclude, '%s' % args.nboot, '%s' % args.equil)
+    print p2p_avg, p2p_std
+    exit()
     f = open(args.input, "r")  # .gro file whose positions of Na ions will be read
     a = []  # list to hold lines of file
     for line in f:
@@ -99,17 +170,11 @@ if __name__ == '__main__':
 
     distances = 6  # number of p2p distances to calculate. My algorithm isn't good enough for anything but six yet
     p2ps = p2p(p_centers, distances, nT)
-    f = open('p2ps', 'w')
-    np.save(f, p2ps)
-    f.close()
+    # f = open('p2ps', 'w')
+    # np.save(f, p2ps)
+    # f.close()
 
-    print 'Calculating Equilibration Time'
-    import time
-    start = time.time()
-    for i in range(0, 6):
-        t, g, Neff_max = detectEquilibration(p2ps[i, :])
-        print t
-    print 'Equilibration detected in %s seconds' % (time.time() - start)
+    p2p_avg, p2p_std = p2p_stats(p2ps, '%s' % args.exclude, '%s' % args.nboot, '%s' % args.equil)
 
     labels = ['1-2', '1-3', '1-4', '2-3', '2-4', '3-4']
     plt.figure()

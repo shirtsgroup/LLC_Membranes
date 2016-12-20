@@ -19,7 +19,7 @@ def initialize():
     parser.add_argument('-p', '--pixels', default=1024, help='Number of pixels in each direction (i.e. p x p)')
     parser.add_argument('-r', '--dr', default=0.0002, help='Step size for integration')
     parser.add_argument('-d', '--dim', default=0.0001, help='Dimension of pixel (assuming a square pixel) [m]')
-    parser.add_argument('-w', '--wavelength', default=1.54e-10, help='Wavelength of X-rays, [m]')
+    parser.add_argument('-w', '--wavelength', default=1.54, help='Wavelength of X-rays, [angstroms]')
     parser.add_argument('-D', '--dist', default=1.18, help='Distance from sample center to detector center')
 
     args = parser.parse_args()
@@ -81,11 +81,10 @@ def angle_mat(distance_matrix, dist, wavelength):
 
     d_mat = np.zeros([m, n])
     w = float(wavelength)
-    m2A_conv = 1e10
 
     for i in range(m):
         for j in range(n):
-            d_mat[i, j] = w / (2 * np.sin(angles[i, j])) * m2A_conv
+            d_mat[i, j] = w / (2 * np.sin(angles[i, j]))
 
     maxes = []
     for i in range(m):
@@ -98,7 +97,7 @@ def angle_mat(distance_matrix, dist, wavelength):
     for i in range(m):
         for j in range(n):
             # q_mat[i, j] = 2*np.pi / d_mat[i, j]
-            q_mat[i, j] = 4*np.pi*np.sin(angles[i, j] / 2) * (np.pi / 180) / (w * m2A_conv)
+            q_mat[i, j] = 4*np.pi*np.sin(angles[i, j] / 2) * (np.pi / 180) / w
 
     maxes = []
     for i in range(m):
@@ -149,8 +148,29 @@ def radial_int(pixel_intensities, pixels, dr, dim, dist, wavelength):
 
 if __name__ == '__main__':
     args = initialize()
-    pixel_intensities = Plot_Pixels.get_pixels('%s' % args.file, '%s' % args.pixels, '%s' % args.pixels)
+    #pixel_intensities = Plot_Pixels.get_pixels('%s' % args.file, '%s' % args.pixels, '%s' % args.pixels)
+    pixel_intensities = np.load('Intensities')
     q, theta, intensity = radial_int(pixel_intensities, '%s' % args.pixels, '%s' % args.dr, '%s' % args.dim,
                                      '%s' % args.dist, '%s' % args.wavelength)
+
+
+    mins = []
+    for i in range(1024):
+        mins.append(min(pixel_intensities[:, i]))
+
+    Imin = min(mins)
+
+    maxes = []
+    for i in range(1024):
+        maxes.append(max(pixel_intensities[:, i]))
+
+    Imax = max(maxes)
+    print 'Imax = %s' % Imax
+
+    im = plt.imshow(pixel_intensities, cmap='Dark2', interpolation='none', vmin=Imin, vmax=Imax)
+
+    Imax = np.argmax(intensity)
+    print q[Imax]
+    plt.figure()
     plt.plot(q, intensity)
     plt.show()

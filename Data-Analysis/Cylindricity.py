@@ -223,7 +223,6 @@ for i in range(0, len(pore12)):
 t0_index = N_effs.index(max(N_effs))
 
 print t0_index
-exit()
 
 plt.figure(1)
 time_pts = range(0, (traj_points - traj_start))
