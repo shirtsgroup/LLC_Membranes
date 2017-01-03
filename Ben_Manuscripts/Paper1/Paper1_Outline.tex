@@ -32,7 +32,9 @@
 		\item Yale aligns them, then crosslinks them to lock in the structure
 		\item LLC HII phase membranes offer potential for high permeability and selectivity which equals low energy consumption
 		\item This paper will focus on the development of a model of the colh phase since it is a simpler starting point and has just as much experimental data
+                  %MRS: Doesn't the data appear to be that they are mostly the same in structure? Should address this to the extent we can.
 	\end{itemize}
+%MRS: don't start with the models.  Instead something like, we wish to obtain a clearler picture of the microscopic struture, by building a model. Focus should always be on the physical things we are trying to study.
 	Constructing a molecular model may give a clearer picture of the microscopic structure of LLC membranes which will change how we think about their design.
 	\begin{itemize}
 		\item The arrangement of sodium ions in the channels is thought to be confined to the pore walls. It is possible they are arranged more randomly
@@ -41,6 +43,8 @@
 			\item Could also be a difference between lyotropic and thermotropic phases
 		\end{itemize}
 		\item How many monomers are in a layer?
+                %MRS: try to rewrite this the way you will in the paper -- set up the question in the introduction, and then decribe what is going on.  Raise the question, but don't answer it here.
+
 		\begin{itemize}
 			\item There is no clear answer to this question in literature. I'd like to confirm or deny past predictions
 			% BJC: It seems that the following discussion should be placed in the results section, with the above lines belonging in this section, posing the question along with past work/justification
@@ -64,29 +68,36 @@
 			\item Does concentration of ions in the pore repel incoming ions?
 		\end{itemize}
 	\end{itemize}
+        %MRS: this is not the best way to phrase the thesis.  I would say that we want to ask what the most likely features of the membrane are using molecular modeling.  we can talk about the phrasing.  But the model should not be the scientific output of the paper. Also, ``physically accurate'' is a high bar - it's probably not more than physically realistic.
 	A physically accurate molecular model with easily modified structural features will enable a qualitatively different type of membrane design aimed optimization of self assembled LLC membranes.
 	\begin{itemize}
 		\item The paper will illustrate the development of a predictive molecular model
 		\item Measurements made to validate model
 		\item Observations of transport mechanism
+                  %MRS: probably not going to make it to transport of water; validation of ion conductivity 
 		\item The model is consistent with experiments and will be used in solvent/solute flux and solute rejection predictions
+                 %MRS: these are results. And the focus should not also be on what you will do in the future - the focus will be on what can be read here.  The introduction should focus on raising the questions that will be answered by the results. 
 	\end{itemize}
 	
+%MRS: call it methods here.
 	\section{System Setup}
 	
 	HII monomers were parameterized using the Generalized Amber Forcefield with the Antechamber package provided with AmberTools16. All molecular dynamics simulations were run using Gromacs version 5.1.2.
 
 	An ensemble of characteristic, low-energy vacuum monomer configurations were constructed by applying a simulated annealing process to a parameterized monomer.
 	\begin{itemize}
+          %MRS: this first about unfavorable structure not relevant - people will understand it needs to equilibrated/annealed.
 		\item Initially parameterized monomer gives unfavorable structure
 		\item Structure cooled from 1000 to 50 K over 10 nanoseconds
 		\item Result not global minimum but close enough for structure building
 		\item Multiple configurations saved from annealing trajectory to prove independence of starting config
 		%BJC: Openeye software to get the best charge for multiple configurations.
+                %MRS: should all be with the same set of charges, so its the same model.     
 		\item New configurations used for reparamaterization, BUT most likely will just use one set of charges for one configuration since I've done 90 percent of simulations based on one parameterization. In the future, I will have a single set of parameters.
 	\end{itemize}
 
 	The timescale for self assembly of monomers into the hexagonal phase is unknown and likely outside of a reasonable simulation length. 
+%MRS: outside resonable for atomistic simulations.
 	\begin{itemize}
 		\item Work done that shows coarse grain model self assembly in ~1000 ns , Citation: J. Phys. Chem. B 2013, 117, 4254-4262
 		\item Attempts with Colh system not fruitful  
@@ -94,6 +105,7 @@
 			\item Packed monomers into box
 			\item Simulated for ~100 ns with no real progress shown towards self assembly
 		\end{itemize}  
+                %MRS: features of the code not that interesting (unless making it available for others.
 		\item Wrote own code to assemble monomers into HII configuration (described in intro) close to what is expected -- equilibration simulations allow structure to relax into expected configuration 
 		\item Code has adjustable parameters: Pore-to-Pore distance, pore radius, number of monomer layers (justification for parameters chosen in following paragraphs)
 		\item This is the thermotropic phase, information used depends on thermotropic experimental data
@@ -101,10 +113,12 @@
 
         The validity of our model can be tested based on its agreement with experimental structural and material property data
         \begin{itemize}
+                %MRS: this next two sentences below sort of goes w/o saying, I don't know that it needs to be emphasizd.
                 \item Our simulations should mimic the real system as best as we can within the limits imposed by choice of force field
                 \item Tougher with a large system for which no force fields have been specifically developed
 	\end{itemize}
 
+        %MRS: important - don't present your work chronologically, but present it to convince people of your theses.
 	After some experimentation, it was found that twenty monomer layers per pore provided a balance of structural accuracy and computational efficiency. 
 	\begin{itemize}
 		\item Space between membrane layers in z direction - semi-isotropic sims fix z box dimension
@@ -113,6 +127,8 @@
 		\item layers spaced far enough apart to avoid large energy repulsions but close enough to prevent disks slipping between one another ~ 5 angstroms works.
 	\end{itemize}
 	
+        %MRS: be careful to be explicit what you mean by parameters here; people might assume FF parameters.
+        %MRS: A lot of these investigations probably belong in results, because they are answering the questions you have: what are the likely physical properties of these membranes? The parameters are actually variables you are investgating. 
 	\noindent The remaining parameters were chosen based on experimental data. 
 	\begin{itemize}
 		\item SAXS to get an idea of Pore-to-Pore
@@ -129,6 +145,7 @@
 		\item Varied initial pore-to-pore distance and ran very long simulations - typically > 200 ns
 	\end{itemize}
 	
+        %MRS: Results of the crosslinking are likely in results -- the fact that it didn't really change the structure of the membrame. 
 	After an equilibrated structure was created, a crosslinking procedure was performed in order to better parallel synthetic procedures. 
 	\begin{itemize}
 		\item Crosslinking maintains alignment of cylindrical mesophases
@@ -138,7 +155,8 @@
 	\end{itemize}  
 	
 	\section{Results and Discussion}
-	
+
+	%MRS: not the right thesis -- focus on the physical constraints put on the membrane by the model.
 	A structurally accurate and reproducible model of the Colh phase LLC membrane has been developed
 	\begin{itemize}
 		\item Visual perspective - show top view and cross section
@@ -167,7 +185,9 @@
 		\item Past literature reports ions arranged in a circle about pore walls implying some kind of void space as a pore. Simulations under a variety of conditions suggest that ions prefer disorder within the pores. 
 		\item A size exclusion mechanism has been proposed in the past, however that might no be the only force at play
 		\item Ions may play a role in transport, hindering flux of solute and solvent by slowing their diffusion
-		\item Experimentalists may be over-estimating the potential for high solvent flux through the pores because they view it as a hollow channel. The membrane may exhibit the permeability-selectivity tradeoff inherent to solution-diffusion type membranes. %BJC: This seems dark and unencouraging but I think it's true. Maybe I shouldn't talk about it for now.
+		\item Experimentalists may be over-estimating the potential for high solvent flux through the pores because they view it as a hollow channel. The membrane may exhibit the permeability-selectivity tradeoff inherent to solution-diffusion type membranes. 
+%BJC: This seems dark and unencouraging but I think it's true. Maybe I shouldn't talk about it for now.
+%MRS: I think the second point can be made without necessarily mentioning the first one for now.
         \end{itemize}	
 
 	The model gives reasonable estimates of ionic conductivity.
@@ -193,6 +213,7 @@
                 \end{itemize}                    
 	\end{itemize}
 
+%MRS: not really a result, but can be included in the discussion. Don't need to talk too much about future work though - a paper should be focused on the current work.
 	Our model can be used to evaluate other liquid crystalline assemblies
 		\begin{itemize}
 			\item Liquid crystal used - or a mixture of different liquid crystals
@@ -204,6 +225,7 @@
 		
 	\section{Conclusion}
 
+        %MRS: restate in terms of the physical things learned.  THe output is knowledge, not a model.
 	In this work, a molecular model has been developed intended to predict transport in a thermotropic liquid crystal membrane. 
 	\begin{itemize}
 		\item Results presented for Colh phase monomer but can be adapted to other LCs
