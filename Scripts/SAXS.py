@@ -5,6 +5,7 @@ import Radial_int_pixels
 import numpy as np
 import matplotlib.pyplot as plt
 import Atom_props
+import time
 
 
 def initialize():
@@ -78,27 +79,27 @@ if __name__ == '__main__':
 
     # pos = pos[:, :, 0]
 
-    pos = np.load('NA_positions_1_image')
+    pos = np.load('NA_positions_5_images')
     atoms = np.shape(pos)[1]
     # print atoms
     incident = np.array(args.incident)
 
-    print pos[:, 0]
     # Switch y and z coordinate
-    for i in range(atoms):
-        temp = pos[1, i]
-        pos[1, i] = pos[2, i]
-        pos[2, i] = temp
+#    for i in range(atoms):
+ #       temp = pos[1, i]
+  #      pos[1, i] = pos[2, i]
+  #      pos[2, i] = temp
 
-    print pos[:, 0]
-    import time
     Intensities = np.zeros([pixels, pixels])
 
     for i in range(pixels):
         print '{:2.1f} percent done'.format(100.0 * (i + 1) / pixels)
         if i != 0:
-            remaining_calcs = pixels - i - 1.0
-            print 'Will finish in about %s seconds' % ((end - start) * remaining_calcs)
+            tm = (end - start) * (pixels - i - 1)
+            hours = int(np.floor(tm / 3600))
+            minute = int(np.floor((tm - 3600 * hours) / 60))
+            seconds = int(tm - (3600 * hours) - (60 * minute))
+            print 'Approximate Time remaining: %02d:%02d:%02d' % (hours, minute, seconds)
         start = time.time()
         for j in range(pixels):
             Re = 0
@@ -125,7 +126,7 @@ if __name__ == '__main__':
     Imax = max(maxes)
     print 'Imax = %s' % Imax
 
-    im = plt.imshow(Intensities, cmap='Greys', interpolation='none', vmin=Imin, vmax=Imax)
+    #im = plt.imshow(Intensities, cmap='Greys', interpolation='none', vmin=Imin, vmax=Imax)
 
     f = open('Intensities', 'w')
     np.save(f, Intensities)

@@ -34,7 +34,7 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Duplicate points periodically in the x-y directions')
 
-    parser.add_argument('-i', '--images', default=1, help='Number of periodic images')
+    parser.add_argument('-i', '--images', default=5, help='Number of periodic images')
     parser.add_argument('-x', '--xbox', default=8.65745, help='Length of x box vector')
     parser.add_argument('-y', '--ybox', default=8.65745, help='Length of y box vector - NOTE: not y-component, but length of'
                                                         'entire vector')
@@ -128,7 +128,7 @@ if __name__ == "__main__":
         for j in range(pts):
             all_positions[:, i*pts + j] = pt_periodic[:, i, j]
 
-    f = open('NA_positions_1_image', 'w')
+    f = open('NA_positions_5_images', 'w')
     np.save(f, all_positions)
     f.close()
     exit()
