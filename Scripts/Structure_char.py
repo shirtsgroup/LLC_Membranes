@@ -140,7 +140,7 @@ if __name__ == '__main__':
     p2ps = np.load('p2ps')
     p2p_avg, p2p_std = p2p_stats(p2ps, '%s' % args.exclude, '%s' % args.nboot, '%s' % args.equil)
     print p2p_avg, p2p_std
-    exit()
+    # exit()
     f = open(args.input, "r")  # .gro file whose positions of Na ions will be read
     a = []  # list to hold lines of file
     for line in f:

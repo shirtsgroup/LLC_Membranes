@@ -37,7 +37,7 @@ def scattering_factor(a, b, c, q):
     f += c  # the constant c is contained outside the summation
     return f
 
-q = np.linspace(0, 6.5, 1000)
+q = np.linspace(0, 75, 1000)
 I = np.zeros((len(q), 1))
 for k in range(0, len(q)):
     for i in range(0, len(x_vals)):

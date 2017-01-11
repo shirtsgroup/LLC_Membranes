@@ -79,7 +79,8 @@ if __name__ == '__main__':
 
     # pos = pos[:, :, 0]
 
-    pos = np.load('NA_positions_5_images')
+    pos = np.load('NA_positions_1_image')
+
     atoms = np.shape(pos)[1]
     # print atoms
     incident = np.array(args.incident)

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+
 class LC(object):
     """A Liquid Crystal monomer has the following attributes which are relevant to crosslinking:
 
