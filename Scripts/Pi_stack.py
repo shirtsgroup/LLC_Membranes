@@ -23,13 +23,14 @@ def initialize():
     parser = argparse.ArgumentParser(description='Duplicate points periodically in the x-y directions')
 
     parser.add_argument('-f', '--file', default='NaPore.top', help='File to replicate periodically')
-    parser.add_argument('-c', '--coord_file', default='test.gro', help='Coordinate file')
+    parser.add_argument('-g', '--gro', default='test.gro', help='Coordinate file')
     parser.add_argument('-o', '--output', default='NaPore_Pi.top', help='Name of output file')
     parser.add_argument('-a', '--atoms', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='Name of carbons in ring')
-    parser.add_argument('-d', '--distance', default=0.1, help='Distance to offset dipole from ring (Angstroms)')
+    parser.add_argument('-d', '--distance', default=2, help='Distance to offset dipole from ring (Angstroms)')
     parser.add_argument('-m', '--monomer', default='monomer2', help='Which monomer topology is being used')
     parser.add_argument('-t', '--toplines', default=2, help='Number of lines at the top of the .gro file to ignore')
     parser.add_argument('-v', '--valence', default=1, help = 'Valence of counterion')
+    parser.add_argument('-c', '--charge', default=0.1, help= 'Charge on dipoles')
 
     args = parser.parse_args()
 
@@ -152,7 +153,7 @@ def dipole_points(centers, perp_vectors, distance):
     return top_pole, bot_pole
 
 
-def write_gro(top_poles, bot_poles, b, rings):
+def write_gro_bak(top_poles, bot_poles, b, rings):
     """
     :param top_poles: The coordinates of the dipoles on the top side of the ring, numpy array [xyz coords, no rings]
     :param bot_poles: The coordinates of the dipoles on the bottom side of the ring, numpy array [xyz coords, no rings]
@@ -172,12 +173,12 @@ def write_gro(top_poles, bot_poles, b, rings):
     count = rings * 2 + 1  # count for the number of residues (first column of numbers in .gro file)
     count1 = atoms + 1  # count for total atoms (fourth column in .gro file
     for i in range(rings):
-        f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(count, 'NA', 'NA', count1, top_poles[0, i],
+        f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(count, 'PI', 'PI', count1, top_poles[0, i],
                                                     top_poles[1, i], top_poles[2, i]) + "\n")
 
         count += 1  # treat all virtual sites as separate residues
         count1 += 1
-        f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(count, 'NA', 'NA', count1, bot_poles[0, i],
+        f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(count, 'PI', 'NA', count1, bot_poles[0, i],
                                             bot_poles[1, i], bot_poles[2, i]) + "\n")
         count += 1
         count1 += 1
@@ -185,10 +186,64 @@ def write_gro(top_poles, bot_poles, b, rings):
     f.close()
 
 
+def write_gro(top_poles, bot_poles, b, rings, toplines, valence):
+    """
+    :param top_poles: The coordinates of the dipoles on the top side of the ring, numpy array [xyz coords, no rings]
+    :param bot_poles: The coordinates of the dipoles on the bottom side of the ring, numpy array [xyz coords, no rings]
+    :param b: A list containing each line of the original .gro file
+    :param rings: the number of benzene rings
+    :param toplines: number of lines at top of .gro file to ignore
+    :param valence: the valence of the counter-ion used. Needed to get the counting right
+    :return: Writes .gro file with new dipole locations
+    """
+
+    atoms = len(b) - 1 - toplines
+    count = rings + 1  # count for the number of residues (first column of numbers in .gro file)
+    count1 = atoms - (1/valence) * rings + 1  # count for total atoms (fourth column in .gro file
+
+    for i in range(toplines):  # delete all irrelevant lines
+        del b[0]
+
+    b.insert(0, '%d\n' % (atoms + rings * 2))  # write new lines at the top of the file
+    b.insert(0, 'This is a .gro file\n')
+
+    toplines = 2
+
+    for i in range(toplines, atoms + toplines):
+        b[i] = b[i][0:5].replace(b[i][0:5], '    1') + b[i][5:len(b[i])]
+
+    for i in range(rings):
+        b.insert(count1 + toplines - 1, '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(1, 'HII', 'PI', count1, top_poles[0, i],
+                                                    top_poles[1, i], top_poles[2, i]) + "\n")
+
+        count1 += 1
+        b.insert(count1 + toplines - 1, '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(1, 'HII', 'PI', count1, bot_poles[0, i],
+                                            bot_poles[1, i], bot_poles[2, i]) + "\n")
+        count1 += 1
+
+    index = count1 + toplines - 1
+    count = 2
+    for i in range((1/valence)*rings):
+        b[index] = '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(count, str.strip(b[index][5:10]), str.strip(b[index][10:15]),
+                                                                       count1, float(b[index][20:28]),
+                                                                           float(b[index][28:36]), float(b[index][36:len(b[index])]))
+        index += 1
+        count += 1
+        count1 += 1
+
+    f = open('dipoles.gro', 'w')  # open a new file for writing
+
+    for line in b:  # write everything back to dipoles.gro (except the box dimension)
+        f.write(line)
+
+    f.close()
+
+
 def virtual_sites(all_coords, monomers, valence, a, b, c, funct):
 
-    n_atoms = np.shape(all_coords)[1]
-    atoms_per_molecule = n_atoms / monomers - valence  # subtract valence to exclude counterion
+    n_atoms = np.shape(all_coords)[1] - (1/valence) * monomers
+    atoms_per_molecule = n_atoms / monomers  # subtract valence to exclude counterion
+
     n_vsites = monomers * 2  # number of virtual sites need to create a dipole (2 per ring)
     vsites = np.zeros([8, n_vsites])
     vsites[4, :] = funct
@@ -215,7 +270,7 @@ if __name__ == "__main__":
         a.append(line)
     f.close()
 
-    f = open('%s' % args.coord_file, 'r')
+    f = open('%s' % args.gro, 'r')
     b = []
     for line in f:
         b.append(line)
@@ -231,7 +286,8 @@ if __name__ == "__main__":
 
     rings = np.shape(centers)[1]
 
-    write_gro(top_poles, bot_poles, b, rings)
+    valence = int(args.valence)
+    write_gro(top_poles, bot_poles, b, rings, 2, valence)
 
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Location of this script
 
@@ -253,14 +309,37 @@ if __name__ == "__main__":
     #  j/______ \k
     # Using every other carbon in the benzene rings makes the above triangle equilateral which corresponds to the
     # following parameters
-    a = 2 / math.sqrt(3)  # distance along vector rij to reach the same 'height' as C
-    b = 2 / math.sqrt(3)  # distance along vector rik to reach the same 'height' as C
+    a = 1.0 / 3.0  # distance along vector rij to reach the same 'height' as C
+    b = 1.0 / 3.0  # distance along vector rik to reach the same 'height' as C
     c = float(args.distance)  # The distance out of the plane to place a virtual site
     funct = 4  # this specifies the 3out type of virtual site
+    vsites = virtual_sites(all_coords, np.shape(centers)[1], valence, a, b, c, funct)
 
-    vsites = virtual_sites(all_coords, np.shape(centers)[1], int(args.valence), a, b, c, funct)
 
-    f = open('dipole.itp', 'a')
+    f = open('dipole.itp', 'r')
+    a = []
+    atoms_count = 0
+    for line in f:
+        a.append(line)
+
+    f.close()
+    for i in range(len(a) - 1):
+        if a[i].count('[ atoms ]') == 1:
+            while a[atoms_count] != '\n':
+                atoms_count += 1
+            break
+        atoms_count += 1
+
+    charge = float(args.charge)
+    for i in range(rings*2):
+        a.insert(atoms_count, '{:5d}{:>5s}{:6d}{:>6s}{:>6s}{:7d}{:5s}{:>1.6f}{:5s}{:2.5f}'.format(atoms + i + 1 - (1/valence)*rings,
+                                'PI', 1, 'HII', 'PI', atoms + i + 1,'', (-1)**i * charge,'', 0.00000) + "\n")
+        atoms_count += 1
+
+    f = open('dipole.itp', 'w')
+
+    for line in a:
+        f.write(line)
 
     f.write("[ virtual_sites3 ]" + "\n")
     f.write("; Site   from                  funct         a             b             c" + "\n")
