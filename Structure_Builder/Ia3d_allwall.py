@@ -1422,8 +1422,8 @@ for n in range(0, len(final)):
                         rotation_final = np.dot(Rot_final_z, x)
                         final[n][i][j][k][l][m] = [float(rotation_final[0]), float(rotation_final[1]), float(rotation_final[2])]
 
-print '{:^21}{:_^36}{:^1}{:_^36}{:^1}{:_^36}'.format(' ','x-periodic','|','y-periodic','|','z-periodic')
-print '{:^7}{:^7}{:^7}{:^9}{:^9}{:^9}{:^9}{:^9}{:^9}{:^9}{:^9}{:^9}{:^9}{:^9}{:^9}'.format('x','y','z','d^2','d_x','d_y','d_z','d^2','d_x','d_y','d_z','d^2','d_x','d_y','d_z')
+print '{:^21}{:_^12}{:^1}{:_^12}{:^1}{:_^12}'.format(' ','x-periodic','|','y-periodic','|','z-periodic')
+print '{:^7}{:^7}{:^7}{:^13}{:^13}{:^13}'.format('x','y','z','d^2','d^2','d^2')
 max_angle = 15
 x_angle_dist = []; y_angle_dist = []; z_angle_dist = []
 for x_rotation in range(0, 2*max_angle + 1):
@@ -1612,53 +1612,9 @@ for x_rotation in range(0, 2*max_angle + 1):
             z_dist_x = z_plane_j6x - z_plane_j2x; z_dist_y = z_plane_j6y - z_plane_j2y; z_dist_z = z_plane_j6z - z_plane_j2z
             z_angle_dist[x_rotation][y_rotation][z_rotation] = [z_dist_x, z_dist_y, z_dist_z]
             z_square_dist = z_dist_x ** 2 + z_dist_y ** 2 + z_dist_z ** 2
-            if x_square_dist < 5000 and y_square_dist < 5000 and z_square_dist < 5000:
-                print '{:^7}{:^7}{:^7}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}'.format(x_rotation - max_angle,
-                    y_rotation - max_angle, z_rotation - max_angle, x_square_dist, x_dist_x, x_dist_y, x_dist_z, y_square_dist, y_dist_x, y_dist_y, y_dist_z,
-                    z_square_dist, z_dist_x, z_dist_y, z_dist_z)
-            if x_square_dist >= 5000 and y_square_dist < 5000 and z_square_dist < 5000:
-                print '{:^7}{:^7}{:^7}{:^36}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}'.format(x_rotation - max_angle, y_rotation - max_angle,
-                    z_rotation - max_angle, ' ', y_square_dist, y_dist_x, y_dist_y, y_dist_z, z_square_dist, z_dist_x, z_dist_y, z_dist_z)
-            if x_square_dist < 5000 and y_square_dist >= 5000 and z_square_dist < 5000:
-                print '{:^7}{:^7}{:^7}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^36}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}'.format(x_rotation - max_angle, y_rotation - max_angle,
-                    z_rotation - max_angle, x_square_dist, x_dist_x, x_dist_y, x_dist_z, ' ', z_square_dist, z_dist_x, z_dist_y, z_dist_z)
-            if x_square_dist < 5000 and y_square_dist < 5000 and z_square_dist >= 5000:
-                print '{:^7}{:^7}{:^7}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}'.format(x_rotation - max_angle, y_rotation - max_angle,
-                    z_rotation - max_angle, x_square_dist, x_dist_x, x_dist_y, x_dist_z, y_square_dist, y_dist_x, y_dist_y, y_dist_z)
-            if x_square_dist >= 5000 and y_square_dist >= 5000 and z_square_dist < 5000:
-                print '{:^7}{:^7}{:^7}{:^36}{:^36}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}'.format(x_rotation - max_angle, y_rotation - max_angle, z_rotation - max_angle,
-                    ' ', ' ', z_square_dist, z_dist_x, z_dist_y, z_dist_z)
-            if x_square_dist >= 5000 and y_square_dist < 5000 and z_square_dist >= 5000:
-                print '{:^7}{:^7}{:^7}{:^36}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}'.format(x_rotation - max_angle, y_rotation - max_angle, z_rotation - max_angle,
-                    ' ', y_square_dist, y_dist_x, y_dist_y, y_dist_z)
-            if x_square_dist < 5000 and y_square_dist >= 5000 and z_square_dist >= 5000:
-                print '{:^7}{:^7}{:^7}{:^9.2f}{:^9.2f}{:^9.2f}{:^9.2f}'.format(x_rotation - max_angle, y_rotation - max_angle, z_rotation - max_angle, x_square_dist,
-                    x_dist_x, x_dist_y, x_dist_z)
-x_dist_min = 5000; x_i_min = 100; x_j_min = 100; x_k_min = 100
-y_dist_min = 5000; y_i_min = 100; y_j_min = 100; y_k_min = 100
-z_dist_min = 5000; z_i_min = 100; z_j_min = 100; z_k_min = 100
-all_dist_min = 15000; all_i_min = 100; all_j_min = 100; all_k_min = 100
-for i in range(0, len(x_angle_dist)):
-    for j in range(0, len(x_angle_dist[i])):
-        for k in range(0, len(x_angle_dist[i][j])):
-            if (x_angle_dist[i][j][k][0])**2 + (x_angle_dist[i][j][k][1])**2 + (x_angle_dist[i][j][k][2])**2 < x_dist_min:
-                x_dist_min = (x_angle_dist[i][j][k][0])**2 + (x_angle_dist[i][j][k][1])**2 + (x_angle_dist[i][j][k][2])**2
-                x_i_min = i; x_j_min = j; x_k_min = k
-            if (y_angle_dist[i][j][k][0])**2 + (y_angle_dist[i][j][k][1])**2 + (y_angle_dist[i][j][k][2])**2 < y_dist_min:
-                y_dist_min = (y_angle_dist[i][j][k][0])**2 + (y_angle_dist[i][j][k][1])**2 + (y_angle_dist[i][j][k][2])**2
-                y_i_min = i; y_j_min = j; y_k_min = k
-            if (z_angle_dist[i][j][k][0])**2 + (z_angle_dist[i][j][k][1])**2 + (z_angle_dist[i][j][k][2])**2 < z_dist_min:
-                z_dist_min = (z_angle_dist[i][j][k][0])**2 + (z_angle_dist[i][j][k][1])**2 + (z_angle_dist[i][j][k][2])**2
-                z_i_min = i; z_j_min = j; z_k_min = k
-            if (x_angle_dist[i][j][k][0])**2 + (x_angle_dist[i][j][k][1])**2 + (x_angle_dist[i][j][k][2])**2 + (y_angle_dist[i][j][k][0])**2 + (y_angle_dist[i][j][k][1])**2 + (y_angle_dist[i][j][k][2])**2 + (z_angle_dist[i][j][k][0])**2 + (z_angle_dist[i][j][k][1])**2 + (z_angle_dist[i][j][k][2])**2 < all_dist_min:
-                all_dist_min = (x_angle_dist[i][j][k][0])**2 + (x_angle_dist[i][j][k][1])**2 + (x_angle_dist[i][j][k][2])**2 + (y_angle_dist[i][j][k][0])**2 + (y_angle_dist[i][j][k][1])**2 + (y_angle_dist[i][j][k][2])**2 + (z_angle_dist[i][j][k][0])**2 + (z_angle_dist[i][j][k][1])**2 + (z_angle_dist[i][j][k][2])**2
-                all_i_min = i; all_j_min = j; all_k_min = k
-
-print 'minimum x: ',x_dist_min,'   ',x_angle_dist[x_i_min][x_j_min][x_k_min],'    ',x_i_min,'  ',x_j_min,'  ',x_k_min
-print 'minimum y: ',y_dist_min,'   ',y_angle_dist[y_i_min][y_j_min][y_k_min],'    ',y_i_min,'  ',y_j_min,'  ',y_k_min
-print 'minimum z: ',z_dist_min,'   ',z_angle_dist[z_i_min][z_j_min][z_k_min],'    ',z_i_min,'  ',z_j_min,'  ',z_k_min
-print 'minimum in all directions: ',all_dist_min,'    i: ',all_i_min,'   j: ',all_j_min,'   k: ',all_k_min
-print '       x: ',x_angle_dist[all_i_min][all_j_min][all_k_min],'   y: ',y_angle_dist[all_i_min][all_j_min][all_k_min],'   z: ',z_angle_dist[all_i_min][all_j_min][all_k_min]
+            if x_square_dist < 5000 or y_square_dist < 5000 or z_square_dist < 5000:
+                print '{:^7}{:^7}{:^7}{:^13.2f}{:^13.2f}{:^13.2f}'.format(x_rotation - max_angle, y_rotation - max_angle,
+                    z_rotation - max_angle, x_square_dist, y_square_dist, z_square_dist)
 sys.exit()
 
 #final = [unitjunction, unitjunction2, unitjunction3, unitjunction4, unitjunction5, unitjunction6, unitjunction7, periodic1[0], periodic1[1], periodic1[2], periodic1[3], periodic1[4], periodic1[5], periodic1[6]]

@@ -14,6 +14,8 @@ print 'This is a .gro file'
       # Pore width has been expanded to 17 from 12
                 # Not done: The inner ring is still perpendicular to the parabola
                 # Inner ring still has parabolic curve
+      # Increased number of monomers in outer ring (30)
+      # Decreased distance between monomers in inner ring, to create more layers (253)
 
 import numpy as np
 import math
@@ -22,13 +24,13 @@ import argparse
 import sys
 
 parser = argparse.ArgumentParser(description = 'Build BCC Structure')
-parser.add_argument('-i', '--input', default = 'monomer58.pdb', help = 'Path to input file')
+parser.add_argument('-i', '--input', default = 'monomer58em.pdb', help = 'Path to input file')
 parser.add_argument('-l', '--layers', default = 10, type = int, help = 'Number of Layers')
 parser.add_argument('-mi', '--monomers_inner', default = 4, type = int, help = 'Number of monomers in inner ring at limiting radius')
-parser.add_argument('-mo', '--monomers_outer', default = 12, type = int, help = 'Number of monomers in outer ring at limiting radius')
+parser.add_argument('-mo', '--monomers_outer', default = 13, type = int, help = 'Number of monomers in outer ring at limiting radius')
 parser.add_argument('-w', '--pore_width', default = 17, type = float, help = 'Pore width')
 parser.add_argument('-d', '--dist', default = 10, type = float, help = 'Distance between layers')
-parser.add_argument('-p', '--dist_periodic', default = 2.5, type = float, help = 'Negative distance between periodic boundary conditions')
+parser.add_argument('-p', '--dist_periodic', default = 6.5, type = float, help = 'Negative distance between periodic boundary conditions')
 args = parser.parse_args()
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -248,7 +250,7 @@ inner_dxdzlist = []
 if no_layers % 2 == 0:
     z_top = dist*(no_layers_inner/2.0 - 0.5)
     height = 2*z_top
-    no_monomers_inner = int(math.floor(height/(z_monomer/2.0)))
+    no_monomers_inner = int(math.floor(height/(z_monomer/2.0))) #2.0)))
     z_comp = height/float(no_monomers_inner)
     if no_monomers_inner % 2 == 0:
         for i in range(0, no_monomers_inner/2):

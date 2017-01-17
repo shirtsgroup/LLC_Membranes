@@ -1334,7 +1334,7 @@ for n in range(0, len(final)):
                         rotation_final = np.dot(Rot_final_y, x)
                         final[n][i][j][k][l][m] = [float(rotation_final[0]), float(rotation_final[1]), float(rotation_final[2])]
 # ?????
-theta_final_x = math.pi/6.0
+"""theta_final_x = math.pi/6.0
 Rot_final_x = Rot_x(theta_final_x)
 for n in range(0, len(final)):
     for i in range(0, len(final[n])):
@@ -1358,7 +1358,7 @@ for n in range(0, len(final)):
                         x = np.array(final[n][i][j][k][l][m])
                         x = [x[0], x[1], x[2]]
                         rotation_final = np.dot(Rot_final_z, x)
-                        final[n][i][j][k][l][m] = [float(rotation_final[0]), float(rotation_final[1]), float(rotation_final[2])]
+                        final[n][i][j][k][l][m] = [float(rotation_final[0]), float(rotation_final[1]), float(rotation_final[2])]"""
 
 x_max = 0; x_min = 0; y_max = 0; y_min = 0; z_max = 0; z_min = 0
 for n in range(0, len(final)):
