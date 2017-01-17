@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/python
 
 """
     The purpose of this script is to edit the topology file of a system containing molecules which have a benzene ring
@@ -27,7 +27,7 @@ def initialize():
     parser.add_argument('-o', '--output', default='NaPore_Pi.top', help='Name of output file')
     parser.add_argument('-a', '--atoms', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='Name of carbons in ring')
     parser.add_argument('-d', '--distance', default=2, help='Distance to offset dipole from ring (Angstroms)')
-    parser.add_argument('-m', '--monomer', default='monomer2', help='Which monomer topology is being used')
+    parser.add_argument('-m', '--monomer', default='monomer2_dummy', help='Which monomer topology is being used')
     parser.add_argument('-t', '--toplines', default=2, help='Number of lines at the top of the .gro file to ignore')
     parser.add_argument('-v', '--valence', default=1, help = 'Valence of counterion')
     parser.add_argument('-c', '--charge', default=0.1, help= 'Charge on dipoles')
@@ -226,7 +226,7 @@ def write_gro(top_poles, bot_poles, b, rings, toplines, valence):
     for i in range((1/valence)*rings):
         b[index] = '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(count, str.strip(b[index][5:10]), str.strip(b[index][10:15]),
                                                                        count1, float(b[index][20:28]),
-                                                                           float(b[index][28:36]), float(b[index][36:len(b[index])]))
+                                                                           float(b[index][28:36]), float(b[index][36:44]))
         index += 1
         count += 1
         count1 += 1
@@ -260,34 +260,60 @@ def virtual_sites(all_coords, monomers, valence, a, b, c, funct):
     return vsites
 
 
+def exclusions(coord_file, monomers, valence, toplines, atoms, n_atoms, vsites):
+    """
+    :param coord_file: the original .gro file stored in a list
+    :param monomers: number of monomers
+    :param valence: charge on ions
+    :param atoms: the names of the atoms which should be excluded
+    :param n_atoms: the number of atoms total
+    :return: a list of exclusions
+    """
+    n_atoms = np.shape(all_coords)[1] - (1/valence) * monomers
+    atoms_per_molecule = n_atoms / monomers  # subtract valence to exclude counterion
+    n_excluded = len(atoms)  # number of atoms being excluded
+
+    n_exclusions = monomers * 2  # number of exclusions to be specified (one for each vsite)
+    exclusions = np.zeros([n_excluded + 1, n_exclusions])  # the first entry is the virtual site itself
+
+    for i in range(np.shape(vsites)[1]):
+        exclusions[0, i] = vsites[0, i]
+
+    x = 0
+    for i in range(monomers):
+        a = 1
+        for j in range(atoms_per_molecule):
+            line = i*atoms_per_molecule + j + toplines
+            if str.strip(coord_file[line][10:15]) in atoms:
+                exclusions[a, x] = int(coord_file[line][15:20])
+                exclusions[a, x + 1] = int(coord_file[line][15:20])
+                a += 1
+        x += 2
+
+    return exclusions
+
 if __name__ == "__main__":
 
     args = initialize()
 
-    f = open('%s' % args.file, 'r')
-    a = []
-    for line in f:
-        a.append(line)
-    f.close()
-
     f = open('%s' % args.gro, 'r')
-    b = []
+    gro = []
     for line in f:
-        b.append(line)
+        gro.append(line)
     f.close()
 
-    coords, atoms, all_coords = get_coordinates(b, 2, args.atoms)
+    coords, atoms, all_coords = get_coordinates(gro, 2, args.atoms)
 
     centers = ring_center(coords, args.atoms)
 
     perp_vectors = perpendicular_vectors(coords, args.atoms)
 
-    top_poles, bot_poles = dipole_points(centers, perp_vectors, float(args.distance))
+    top_poles, bot_poles = dipole_points(centers, perp_vectors, float(args.distance)/10) #convert distance to nanometers
 
     rings = np.shape(centers)[1]
 
     valence = int(args.valence)
-    write_gro(top_poles, bot_poles, b, rings, 2, valence)
+    write_gro(top_poles, bot_poles, gro, rings, 2, valence)
 
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Location of this script
 
@@ -314,7 +340,9 @@ if __name__ == "__main__":
     c = float(args.distance)  # The distance out of the plane to place a virtual site
     funct = 4  # this specifies the 3out type of virtual site
     vsites = virtual_sites(all_coords, np.shape(centers)[1], valence, a, b, c, funct)
-
+    excluded_atoms = ['C', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'O', 'O1', 'O2', 'C7', 'C21', 'C35', 'H', 'H1', 'H2',
+                      'H3', 'H27', 'H28', 'H52', 'H53', 'C8', 'C22', 'C36']
+    exclusions = exclusions(gro, np.shape(centers)[1], valence, 2, excluded_atoms, atoms, vsites)
 
     f = open('dipole.itp', 'r')
     a = []
@@ -347,5 +375,11 @@ if __name__ == "__main__":
         f.write('{:<8d}{:<8d}{:<8d}{:<8d}{:<8d}{:<1.9f}{:5s}{:<1.9f}{:5s}{:<1.9f}'.format(int(vsites[0, i]), int(vsites[1, i]),
                                                                 int(vsites[2, i]), int(vsites[3, i]), int(vsites[4, i]),
                                                                 vsites[5, i],'', vsites[6, i],'', vsites[7, i]) + "\n")
+
+    f.write("\n[ exclusions ]\n")
+    for i in range(rings*2):
+        for j in range(np.shape(exclusions)[0]):
+            f.write('{:<8d}'.format(int(exclusions[j, i])))
+        f.write("\n")
 
     f.close()

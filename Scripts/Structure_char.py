@@ -17,7 +17,7 @@ import random as ran
 def initialize():
     parser = argparse.ArgumentParser(description='Run Cylindricity script')
 
-    parser.add_argument('-i', '--input', default='wiggle_traj_nopbc.gro', help = 'Path to input file')
+    parser.add_argument('-i', '--input', default='wiggle_traj_bak.gro', help = 'Path to input file')
     parser.add_argument('-n', '--no_monomers', default=6, help = 'Number of Monomers per layer')
     parser.add_argument('-a', '--atoms', default=137, help = 'Number of atoms per monomer')
     parser.add_argument('-l', '--layers', default=20, help = 'Number of layers in each pore')
@@ -137,37 +137,212 @@ if __name__ == '__main__':
 
     args = initialize()
 
-    p2ps = np.load('p2ps')
-    p2p_avg, p2p_std = p2p_stats(p2ps, '%s' % args.exclude, '%s' % args.nboot, '%s' % args.equil)
-    print p2p_avg, p2p_std
+    # p2ps = np.load('p2ps')
+    # p2p_avg, p2p_std = p2p_stats(p2ps, '%s' % args.exclude, '%s' % args.nboot, '%s' % args.equil)
+    # print p2p_avg, p2p_std
     # exit()
-    f = open(args.input, "r")  # .gro file whose positions of Na ions will be read
-    a = []  # list to hold lines of file
-    for line in f:
-        a.append(line)
-    f.close()
+    # f = open(args.input, "r")  # .gro file whose positions of Na ions will be read
+    # a = []  # list to hold lines of file
+    # for line in f:
+    #     a.append(line)
+    # f.close()
 
     # pos, _, traj_pts, _ = Get_Positions.get_positions('%s' % args.input, '%s' % args.component, '%s' % args.lc,
     #                                                   'no')
-    pos = np.load('pos_array612ns')
-    traj_pts = np.linspace(0, 614400, 1537)
 
-    # Questionably needed constants
-    no_atoms = int(args.atoms)  # number of atoms in a single monomer
-    no_layers = int(args.layers)  # number of layers in the membrane structure
-    mon_per_layer = int(args.no_monomers)  # number of monomers in each layer
+    # atoms = ['C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C21', 'C22',
+    #          'C23', 'C24', 'C25', 'C26', 'C27', 'C28', 'C29', 'C30', 'C31', 'C32', 'C33', 'C34', 'C35', 'C36', 'C37',
+    #          'C38', 'C39', 'C40', 'C41', 'C42', 'C43', 'C44', 'C45', 'C46', 'C47', 'C48']
+    #
+    # # pos_tails, _, traj_pts, _ = Get_Positions.get_positions('%s' % args.input, atoms, '%s' % args.lc,
+    # #                                                    'no')
+    # # f = open('pos_tails', 'w')
+    # # np.save(f, pos_tails)
+    # # f.close()
+    #
+    # pos_tails = np.load('pos_tails')
+    # pos = np.load('pos_NA')
+    # pos_benzene = np.load('pos_benzene')
+    # # traj_pts = np.shape(pos)[2]
+    # # centers = np.zeros([3, 480, traj_pts])
+    # # for k in range(traj_pts):
+    # #     for i in range(480):
+    # #         sum = np.array([0.0, 0.0, 0.0])
+    # #         for j in range(6):
+    # #             sum += pos[:, i*6 + j, k]
+    # #         centers[:, i, k] = sum / 6.0
+    #
+    # # f = open('pos_benzene_centers', 'w')
+    # # np.save(f, pos)
+    # # f.close()
+    # b_centers = np.load('pos_benzene_centers')
+    # # p_centers = np.load('pcenters')
+    # # print p_centers[:, :, 0]
+    # # print b_centers[:, :6, 0]
+    # # print np.linalg.norm(p_centers[:, 0, 0] - b_centers[:2, 0, 0])
+    # # print np.linalg.norm(p_centers[:, 0, 0] - b_centers[:2, 118, 0])
+    # # print np.linalg.norm(p_centers[:, 0, 0] - b_centers[:2, 117, 0])
+    # # print np.linalg.norm(p_centers[:, 0, 0] - b_centers[:2, 116, 0])
+    #
+    #
+    # # print np.shape(pos_tails)
+    # # pos = np.load('pos_NA')
+    # # pos_benzene = np.load('pos_benzene')
+    # # pos_tails = np.load('pos_tails')
+    # # print np.shape(pos_NA)
+    # # print np.shape(pos_benzene)
+    # # print np.shape(pos_tails)
+    #
+    # # pos = np.load('pos_array612ns')
+    # # traj_pts = np.linspace(0, 614400, 1537)
+    # traj_pts = np.shape(pos)[2]
+    # # Questionably needed constants
+    # no_atoms = int(args.atoms)  # number of atoms in a single monomer
+    # no_layers = int(args.layers)  # number of layers in the membrane structure
+    # mon_per_layer = int(args.no_monomers)  # number of monomers in each layer
+    #
+    # traj_start = int(args.start_frame)
+    # tot_atoms = np.shape(pos)[1]
+    # # nT = len(traj_pts)
+    # nT = traj_pts
+    # no_pores = int(args.pores)  # number of pores
+    # # sim_length = traj_pts[-1]  # the last entry in the traj_pts list corresponds to the length of the simulation
+    # comp_ppore = tot_atoms/no_pores
+    #
+    # # p_centers = avg_pore_loc(no_pores, nT, pos, comp_ppore)
+    # # f = open('pcenters', 'w')
+    # # np.save(f, p_centers)
+    # p_centers = np.load('pcenters')
+    # dist_from_center_NA = np.zeros([tot_atoms*traj_pts])
+    # for k in range(nT):
+    #     for i in range(4):
+    #         for j in range(120):
+    #             dist = np.linalg.norm(pos[:2, i * 120 + j, k] - p_centers[:, i, k])
+    #             if dist < 2:
+    #                 dist_from_center_NA[k * tot_atoms + i * 120 + j] = dist
+    #             else:
+    #                 dist_from_center_NA[k * tot_atoms + i * 120 + j] = 0.5
+    #
+    # tot_atoms = 2880
+    # dist_from_center_benz = np.zeros([tot_atoms*traj_pts])
+    # count = 0
+    # for k in range(nT):
+    #     for i in range(4):
+    #         for j in range(720):
+    #             dist = np.linalg.norm(pos_benzene[:2, i * 720 + j, k] - p_centers[:, i, k])
+    #             dist_from_center_benz[k * tot_atoms + i * 720 + j] = dist
+    #
+    # # tot_atoms = 480 * len(atoms)
+    # # n_ppore = 120 * len(atoms)
+    # # print n_ppore
+    # # dist_from_center_tails = np.zeros([tot_atoms*traj_pts])
+    # # count = 0
+    # # for k in range(nT):
+    # #     for i in range(4):
+    # #         for j in range(n_ppore):
+    # #             dist = np.linalg.norm(pos_tails[:2, i * n_ppore + j, k] - p_centers[:, i, k])
+    # #             dist_from_center_tails[k * tot_atoms + i * n_ppore + j] = dist
+    # #
+    # # f = open('all_tails', 'w')
+    # # np.save(f, dist_from_center_tails)
+    # # f.close()
+    #
+    # dist_from_center_tails = np.load('all_tails')
+    # print np.shape(dist_from_center_tails)
+    #
+    max_x = 3.5
+    bin_width = 0.1
+    bins = int(max_x / bin_width)
+    x_axis = np.linspace(bin_width/2, max_x - bin_width/2, int(bins))
+    x_axis = np.linspace(0, max_x, int(bins) + 1)
+    #
+    # bin_contents_NA = np.zeros([bins])
+    # for i in range(480 * 751):
+    #     distance = dist_from_center_NA[i]
+    #     if distance <= 3.5:
+    #         bin = np.floor((distance / max_x)*bins)
+    #         bin_contents_NA[bin] += 1
+    #
+    # NA_density = np.zeros([bins])
+    # for i in range(bins):
+    #     NA_density[i] = bin_contents_NA[i] / (math.pi*((i + 1)*bin_width)**2 - (i*bin_width)**2)
+    #
+    # bin_contents_benz = np.zeros([int(bins)])
+    # for i in range(2880 * 751):
+    #     distance = dist_from_center_benz[i]
+    #     if distance <= 3.5:
+    #         bin = int(np.floor((distance / max_x)*bins))
+    #         bin_contents_benz[bin] += 1
+    #
+    # benz_density = np.zeros([bins])
+    # for i in range(bins):
+    #     benz_density[i] = bin_contents_benz[i] / (math.pi*((i + 1)*bin_width)**2 - (i*bin_width)**2)
+    #
+    # count = 0
+    # bin_contents_tails = np.zeros([int(bins)])
+    # for i in range(len(dist_from_center_tails)):
+    #     distance = dist_from_center_tails[i]
+    #     if distance <= 3.5:
+    #         count += 1
+    #         bin = int(np.floor((distance / max_x)*bins))
+    #         bin_contents_tails[bin] += 1
+    #
+    # print count
+    #
+    # tails_density = np.zeros([bins])
+    # for i in range(bins):
+    #     tails_density[i] = bin_contents_tails[i] / (math.pi*((i + 1)*bin_width)**2 - (i*bin_width)**2)
+    #
+    # n_sodium = sum(NA_density)
+    # n_benz = sum(benz_density)
+    # n_tails = sum(tails_density)
+    # for i in range(bins):
+    #     tails_density[i] /= n_tails
+    #     benz_density[i] /= n_benz
+    #     NA_density[i] /= n_sodium
+    upto = 25
+    # f = open('tails_rho', 'w')
+    # np.save(f, tails_density)
+    # f.close()
+    # f = open('benz_rho', 'w')
+    # np.save(f, benz_density)
+    # f.close()
+    # f = open('NA_rho', 'w')
+    # np.save(f, NA_density)
+    # f.close()
+    NA_density = np.load('NA_rho')
+    benz_density = np.load('benz_rho')
+    tails_density = np.load('tails_rho')
 
-    traj_start = int(args.start_frame)
-    tot_atoms = np.shape(pos)[1]
-    nT = len(traj_pts)
-    no_pores = int(args.pores)  # number of pores
-    sim_length = traj_pts[-1]  # the last entry in the traj_pts list corresponds to the length of the simulation
-    comp_ppore = tot_atoms/no_pores
+    plt.title('Component Density Around Pore Center', fontsize=26)
+    plt.xlabel('Distance from Pore Center (nm)', fontsize=24)
+    plt.ylabel('Relative Component Density', fontsize=24)
+    font = {'family' : 'normal',
+        'size'   : 16}
+    plt.ylim(0, 0.28)
+    plt.xlim(0, 2.5)
+    matplotlib.rc('font', **font)
+    plt.bar(x_axis[:upto], NA_density[:upto], bin_width, alpha=0.75, color='blue', label='Sodium Ions')
+    plt.bar(x_axis[:upto], benz_density[:upto], bin_width, alpha=0.75, color='red', label='Benzene Carbons')
+    plt.bar(x_axis[:upto], tails_density[:upto], bin_width, alpha=0.75, color=(0.25, 0.75, 0.75), label='Alkyl Chain Carbons')
 
-    p_centers = avg_pore_loc(no_pores, nT, pos, comp_ppore)
+    plt.legend(loc=1)
+    plt.show()
+    exit()
 
-    print p_centers[:, :, -1]
+    weights_benz = np.ones_like(dist_from_center_benz) / len(dist_from_center_benz)
+    # weights_NA = np.ones_like(NA_density) / len(NA_density)
+    weights_tails = np.ones_like(dist_from_center_tails) / len(dist_from_center_tails)
 
+    plt.title('Component Density around pore centers')
+    # plt.hist(NA_density, bins = 50, alpha=0.33, label = 'NA', weights = weights_NA)
+    plt.hist(dist_from_center_benz, bins = 50, alpha=0.33, label = 'Benzene Ring', weights=weights_benz)
+    plt.hist(dist_from_center_tails, bins = 50, alpha=0.33, label = 'Alkyl Tails', weights=weights_tails)
+    plt.xlabel('Distance from pore center (nm)')
+    plt.ylabel('Fraction of group')
+    plt.legend(loc=2)
+    plt.show()
+    exit()
     distances = 6  # number of p2p distances to calculate. My algorithm isn't good enough for anything but six yet
     p2ps = p2p(p_centers, distances, nT)
     # f = open('p2ps', 'w')

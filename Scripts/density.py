@@ -21,14 +21,14 @@ args = parser.parse_args()
 # Figure out the membrane thickness
 output = subprocess.check_output(["Thickness.py", "-i", "%s" % args.gro])
 thickness = float(output[20:26])  # membrane thickness
-
+print thickness
 #Run trjconv and get the trajectory information for sodium ions
-p1 = subprocess.Popen(["echo", "0"], stdout=subprocess.PIPE)
-p2 = subprocess.Popen(["gmx", "trjconv", "-f", "%s" % args.trr, "-s", "%s" % args.tpr, "-o", "wiggle_traj.gro"], stdin=p1.stdout)
+# p1 = subprocess.Popen(["echo", "0"], stdout=subprocess.PIPE)
+# p2 = subprocess.Popen(["gmx", "trjconv", "-f", "%s" % args.trr, "-s", "%s" % args.tpr, "-o", "wiggle_traj.gro"], stdin=p1.stdout)
 
-p2.wait()
+# p2.wait()
 
-f = open('wiggle_traj.gro', 'r')
+f = open('wiggle_traj_bak.gro', 'r')
 
 a = []
 for line in f:
@@ -101,7 +101,10 @@ for i in range(0, len(volume)):
 
 t = [x/1000 for x in t]
 
-print 'Average density = %s' % np.mean(density[5:len(density) - 1])
+start = 2* len(density) / 3
+print start
+print 'Average density = %s' % np.mean(density[start:len(density) - 1])
+print 'Standard Deviation Density = %s' % np.std(density[start:len(density) - 1])
 
 plt.plot(t, density)
 plt.ylabel('Membrane Density (g/cm$3$)')
