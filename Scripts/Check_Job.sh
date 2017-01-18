@@ -56,7 +56,8 @@ fi
 if [ ${ALT} == 'yes' ]; then
     Cylindricity.py -i wiggle_traj.gro -n ${NO_MONOMERS} -s "alternating" -L ${ALT_1} -A ${ALT_2}
 else
-    Cylindricity.py -i wiggle_traj.gro -n ${NO_MONOMERS}
+    #Cylindricity.py -i wiggle_traj.gro -n ${NO_MONOMERS}
+    Structure_char.py -i wiggle_traj.gro -c "NA"
 fi
 
 if [ ${DONE} == 'yes' ]; then

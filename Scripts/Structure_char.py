@@ -22,7 +22,7 @@ def initialize():
     parser.add_argument('-a', '--atoms', default=137, help = 'Number of atoms per monomer')
     parser.add_argument('-l', '--layers', default=20, help = 'Number of layers in each pore')
     parser.add_argument('-p', '--pores', default=4, help = 'Number of Pores')
-    parser.add_argument('-c', '--component', default='sys', help = 'Counterion used to track pore positions')
+    parser.add_argument('-c', '--component', default='NA', help = 'Counterion used to track pore positions')
     parser.add_argument('-f', '--start_frame', default=0, help = 'Frame number to start reading trajectory at')
     parser.add_argument('-s', '--layer_distribution', default='uniform', help = 'The distribution of monomers per layer')
     parser.add_argument('-L', '--alt_1', default=6, help = 'Monomers per layer for the first type of alternating layer')
@@ -105,7 +105,8 @@ def p2p_stats(p2ps, exclude, nboot, equil):
         tau = timeseries.integratedAutocorrelationTime(p2ps[i, t:])
         taus.append(tau)
 
-    tau = int(max(taus))  # use the max again to ensure all trajectories are independent
+    print 'Maximum Autocorrelation Time: %s frames' % max(taus)
+    tau = int(np.ceil(max(taus)))  # use the max again to ensure all trajectories are independent. np.ceil e
 
     ind_trajectories = (frames - t) / tau  # the number of independent trajectories
     total_trajectories = ind_trajectories * 5  # the total number of trajectories
@@ -130,232 +131,114 @@ def p2p_stats(p2ps, exclude, nboot, equil):
     p2p_avg = np.mean(p2p_boot)
     p2p_std = np.std(p2p_boot)
 
-    return p2p_avg, p2p_std
+    return p2p_avg, p2p_std, t
 
+
+def compdensity(component, pore_centers, step, pores=4, bin_width=0.1, rmax=3.5):
+
+    """
+    :param component: the coordinates of the component(s) which you want a radial distribution of at each frame
+                      (numpy array with dimensions: [3 (xyz coordinates), no components, no frames])
+    :param pore_centers: a numpy array of the locations of each pore center at each trajectory frame
+    :param step: the size of the step to take in the radial direction when measuring density (float)
+    :param pores: number of pores (int) default=4
+    :param bin_width: width of the bins which will show up when you plot this (float), default = 0.1 nm
+    :param rmax: maximum distance from pore center to calculate density for, default = 3.5 nm
+    :return: the density of the component (comp_density) as a function the distance from the pore center (x). Also
+             returns the calculated bin width for plotting
+    """
+
+    # Extract basic system information. Its important to follow the format of the component array to get it right
+    n_atoms = np.shape(component)[1]  # the total number of components in a single frame
+    n_ppore = tot_atoms / pores  # the total number of components in each pore
+    nT = np.shape(component)[2]
+
+    dist_from_center = np.zeros([n_atoms*nT])
+
+    # Now find the distance from the center of every atom in every frame
+    for k in range(nT):
+        for i in range(pores):
+            for j in range(n_ppore):
+                dist = np.linalg.norm(component[:2, i * n_ppore + j, k] - pore_centers[:, i, k])
+                dist_from_center[k * n_atoms + i * n_ppore + j] = dist
+
+    # Start setting up parameters necessary for binning
+    bins = int(rmax/bin_width)  # the total number of bins
+    r = np.linspace(0, rmax, int(bins))  # each discrete radius at which we will measure densities
+
+    # Now bin the distances calculated above
+    count = 0
+    bin_contents_tails = np.zeros([int(bins)])
+    for i in range(len(dist_from_center)):
+        distance = dist_from_center[i]
+        if distance <= rmax:
+            count += 1
+            bin = int(np.floor((distance/rmax)*bins))
+            bin_contents_tails[bin] += 1
+
+    # calculate the density of ions in the area of the annulus defined by the inner and outer radii between which
+    # components were calculated
+    density = np.zeros([bins])
+    for i in range(bins):
+        density[i] = bin_contents_tails[i] / (math.pi*((i + 1)*bin_width)**2 - (i*bin_width)**2)
+
+    # normalize
+    n = sum(density)
+    for i in range(bins):
+        density[i] /= n
+
+    return density, r, bin_width
 
 if __name__ == '__main__':
 
     args = initialize()
 
-    # p2ps = np.load('p2ps')
-    # p2p_avg, p2p_std = p2p_stats(p2ps, '%s' % args.exclude, '%s' % args.nboot, '%s' % args.equil)
-    # print p2p_avg, p2p_std
-    # exit()
-    # f = open(args.input, "r")  # .gro file whose positions of Na ions will be read
-    # a = []  # list to hold lines of file
-    # for line in f:
-    #     a.append(line)
-    # f.close()
+    if args.component == 'tails':
+        atoms = ['C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C21', 'C22',
+                 'C23', 'C24', 'C25', 'C26', 'C27', 'C28', 'C29', 'C30', 'C31', 'C32', 'C33', 'C34', 'C35', 'C36', 'C37',
+                 'C38', 'C39', 'C40', 'C41', 'C42', 'C43', 'C44', 'C45', 'C46', 'C47', 'C48']
+    elif args.component == 'benzene':
+        atoms = ['C', 'C1', 'C2', 'C3', 'C4', 'C5']
+    else:
+        atoms = args.component
 
-    # pos, _, traj_pts, _ = Get_Positions.get_positions('%s' % args.input, '%s' % args.component, '%s' % args.lc,
-    #                                                   'no')
+    pos, _, traj_pts, _ = Get_Positions.get_positions('%s' % args.input, atoms, '%s' % args.lc,
+                                                  'no')
+    print 'Positions Got'
 
-    # atoms = ['C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C21', 'C22',
-    #          'C23', 'C24', 'C25', 'C26', 'C27', 'C28', 'C29', 'C30', 'C31', 'C32', 'C33', 'C34', 'C35', 'C36', 'C37',
-    #          'C38', 'C39', 'C40', 'C41', 'C42', 'C43', 'C44', 'C45', 'C46', 'C47', 'C48']
-    #
-    # # pos_tails, _, traj_pts, _ = Get_Positions.get_positions('%s' % args.input, atoms, '%s' % args.lc,
-    # #                                                    'no')
-    # # f = open('pos_tails', 'w')
-    # # np.save(f, pos_tails)
-    # # f.close()
-    #
-    # pos_tails = np.load('pos_tails')
-    # pos = np.load('pos_NA')
-    # pos_benzene = np.load('pos_benzene')
-    # # traj_pts = np.shape(pos)[2]
-    # # centers = np.zeros([3, 480, traj_pts])
-    # # for k in range(traj_pts):
-    # #     for i in range(480):
-    # #         sum = np.array([0.0, 0.0, 0.0])
-    # #         for j in range(6):
-    # #             sum += pos[:, i*6 + j, k]
-    # #         centers[:, i, k] = sum / 6.0
-    #
-    # # f = open('pos_benzene_centers', 'w')
-    # # np.save(f, pos)
-    # # f.close()
-    # b_centers = np.load('pos_benzene_centers')
-    # # p_centers = np.load('pcenters')
-    # # print p_centers[:, :, 0]
-    # # print b_centers[:, :6, 0]
-    # # print np.linalg.norm(p_centers[:, 0, 0] - b_centers[:2, 0, 0])
-    # # print np.linalg.norm(p_centers[:, 0, 0] - b_centers[:2, 118, 0])
-    # # print np.linalg.norm(p_centers[:, 0, 0] - b_centers[:2, 117, 0])
-    # # print np.linalg.norm(p_centers[:, 0, 0] - b_centers[:2, 116, 0])
-    #
-    #
-    # # print np.shape(pos_tails)
-    # # pos = np.load('pos_NA')
-    # # pos_benzene = np.load('pos_benzene')
-    # # pos_tails = np.load('pos_tails')
-    # # print np.shape(pos_NA)
-    # # print np.shape(pos_benzene)
-    # # print np.shape(pos_tails)
-    #
-    # # pos = np.load('pos_array612ns')
-    # # traj_pts = np.linspace(0, 614400, 1537)
-    # traj_pts = np.shape(pos)[2]
-    # # Questionably needed constants
-    # no_atoms = int(args.atoms)  # number of atoms in a single monomer
-    # no_layers = int(args.layers)  # number of layers in the membrane structure
-    # mon_per_layer = int(args.no_monomers)  # number of monomers in each layer
-    #
-    # traj_start = int(args.start_frame)
-    # tot_atoms = np.shape(pos)[1]
-    # # nT = len(traj_pts)
-    # nT = traj_pts
-    # no_pores = int(args.pores)  # number of pores
-    # # sim_length = traj_pts[-1]  # the last entry in the traj_pts list corresponds to the length of the simulation
-    # comp_ppore = tot_atoms/no_pores
-    #
-    # # p_centers = avg_pore_loc(no_pores, nT, pos, comp_ppore)
-    # # f = open('pcenters', 'w')
-    # # np.save(f, p_centers)
-    # p_centers = np.load('pcenters')
-    # dist_from_center_NA = np.zeros([tot_atoms*traj_pts])
-    # for k in range(nT):
-    #     for i in range(4):
-    #         for j in range(120):
-    #             dist = np.linalg.norm(pos[:2, i * 120 + j, k] - p_centers[:, i, k])
-    #             if dist < 2:
-    #                 dist_from_center_NA[k * tot_atoms + i * 120 + j] = dist
-    #             else:
-    #                 dist_from_center_NA[k * tot_atoms + i * 120 + j] = 0.5
-    #
-    # tot_atoms = 2880
-    # dist_from_center_benz = np.zeros([tot_atoms*traj_pts])
-    # count = 0
-    # for k in range(nT):
-    #     for i in range(4):
-    #         for j in range(720):
-    #             dist = np.linalg.norm(pos_benzene[:2, i * 720 + j, k] - p_centers[:, i, k])
-    #             dist_from_center_benz[k * tot_atoms + i * 720 + j] = dist
-    #
-    # # tot_atoms = 480 * len(atoms)
-    # # n_ppore = 120 * len(atoms)
-    # # print n_ppore
-    # # dist_from_center_tails = np.zeros([tot_atoms*traj_pts])
-    # # count = 0
-    # # for k in range(nT):
-    # #     for i in range(4):
-    # #         for j in range(n_ppore):
-    # #             dist = np.linalg.norm(pos_tails[:2, i * n_ppore + j, k] - p_centers[:, i, k])
-    # #             dist_from_center_tails[k * tot_atoms + i * n_ppore + j] = dist
-    # #
-    # # f = open('all_tails', 'w')
-    # # np.save(f, dist_from_center_tails)
-    # # f.close()
-    #
-    # dist_from_center_tails = np.load('all_tails')
-    # print np.shape(dist_from_center_tails)
-    #
-    max_x = 3.5
-    bin_width = 0.1
-    bins = int(max_x / bin_width)
-    x_axis = np.linspace(bin_width/2, max_x - bin_width/2, int(bins))
-    x_axis = np.linspace(0, max_x, int(bins) + 1)
-    #
-    # bin_contents_NA = np.zeros([bins])
-    # for i in range(480 * 751):
-    #     distance = dist_from_center_NA[i]
-    #     if distance <= 3.5:
-    #         bin = np.floor((distance / max_x)*bins)
-    #         bin_contents_NA[bin] += 1
-    #
-    # NA_density = np.zeros([bins])
-    # for i in range(bins):
-    #     NA_density[i] = bin_contents_NA[i] / (math.pi*((i + 1)*bin_width)**2 - (i*bin_width)**2)
-    #
-    # bin_contents_benz = np.zeros([int(bins)])
-    # for i in range(2880 * 751):
-    #     distance = dist_from_center_benz[i]
-    #     if distance <= 3.5:
-    #         bin = int(np.floor((distance / max_x)*bins))
-    #         bin_contents_benz[bin] += 1
-    #
-    # benz_density = np.zeros([bins])
-    # for i in range(bins):
-    #     benz_density[i] = bin_contents_benz[i] / (math.pi*((i + 1)*bin_width)**2 - (i*bin_width)**2)
-    #
-    # count = 0
-    # bin_contents_tails = np.zeros([int(bins)])
-    # for i in range(len(dist_from_center_tails)):
-    #     distance = dist_from_center_tails[i]
-    #     if distance <= 3.5:
-    #         count += 1
-    #         bin = int(np.floor((distance / max_x)*bins))
-    #         bin_contents_tails[bin] += 1
-    #
-    # print count
-    #
-    # tails_density = np.zeros([bins])
-    # for i in range(bins):
-    #     tails_density[i] = bin_contents_tails[i] / (math.pi*((i + 1)*bin_width)**2 - (i*bin_width)**2)
-    #
-    # n_sodium = sum(NA_density)
-    # n_benz = sum(benz_density)
-    # n_tails = sum(tails_density)
-    # for i in range(bins):
-    #     tails_density[i] /= n_tails
-    #     benz_density[i] /= n_benz
-    #     NA_density[i] /= n_sodium
-    upto = 25
-    # f = open('tails_rho', 'w')
-    # np.save(f, tails_density)
-    # f.close()
-    # f = open('benz_rho', 'w')
-    # np.save(f, benz_density)
-    # f.close()
-    # f = open('NA_rho', 'w')
-    # np.save(f, NA_density)
-    # f.close()
-    NA_density = np.load('NA_rho')
-    benz_density = np.load('benz_rho')
-    tails_density = np.load('tails_rho')
+    nT = np.shape(pos)[2]
 
-    plt.title('Component Density Around Pore Center', fontsize=26)
-    plt.xlabel('Distance from Pore Center (nm)', fontsize=24)
-    plt.ylabel('Relative Component Density', fontsize=24)
-    font = {'family' : 'normal',
-        'size'   : 16}
-    plt.ylim(0, 0.28)
-    plt.xlim(0, 2.5)
-    matplotlib.rc('font', **font)
-    plt.bar(x_axis[:upto], NA_density[:upto], bin_width, alpha=0.75, color='blue', label='Sodium Ions')
-    plt.bar(x_axis[:upto], benz_density[:upto], bin_width, alpha=0.75, color='red', label='Benzene Carbons')
-    plt.bar(x_axis[:upto], tails_density[:upto], bin_width, alpha=0.75, color=(0.25, 0.75, 0.75), label='Alkyl Chain Carbons')
+    traj_start = int(args.start_frame)
+    tot_atoms = np.shape(pos)[1]
+    n_pores = int(args.pores)  # number of pores
+    comp_ppore = tot_atoms/n_pores
 
-    plt.legend(loc=1)
-    plt.show()
-    exit()
+    p_centers = avg_pore_loc(n_pores, nT, pos, comp_ppore)
 
-    weights_benz = np.ones_like(dist_from_center_benz) / len(dist_from_center_benz)
-    # weights_NA = np.ones_like(NA_density) / len(NA_density)
-    weights_tails = np.ones_like(dist_from_center_tails) / len(dist_from_center_tails)
-
-    plt.title('Component Density around pore centers')
-    # plt.hist(NA_density, bins = 50, alpha=0.33, label = 'NA', weights = weights_NA)
-    plt.hist(dist_from_center_benz, bins = 50, alpha=0.33, label = 'Benzene Ring', weights=weights_benz)
-    plt.hist(dist_from_center_tails, bins = 50, alpha=0.33, label = 'Alkyl Tails', weights=weights_tails)
-    plt.xlabel('Distance from pore center (nm)')
-    plt.ylabel('Fraction of group')
-    plt.legend(loc=2)
-    plt.show()
-    exit()
-    distances = 6  # number of p2p distances to calculate. My algorithm isn't good enough for anything but six yet
+    distances = 6  # number of p2p distances to calculate. My algorithm isn't smart enough for anything but six yet
     p2ps = p2p(p_centers, distances, nT)
-    # f = open('p2ps', 'w')
-    # np.save(f, p2ps)
-    # f.close()
 
-    p2p_avg, p2p_std = p2p_stats(p2ps, '%s' % args.exclude, '%s' % args.nboot, '%s' % args.equil)
+    p2p_avg, p2p_std, equil_frame = p2p_stats(p2ps, '%s' % args.exclude, '%s' % args.nboot, '%s' % args.equil)
+
+    print 'Statistics calculated starting at frame {:d} ({:2.1f} percent into simulation)'.format(equil_frame, 100.0 * equil_frame / nT)
+    print 'Average Pore to Pore distance: %s' % p2p_avg
+    print 'Standard Deviation of Pore to Pore distances: %s' % p2p_std
 
     labels = ['1-2', '1-3', '1-4', '2-3', '2-4', '3-4']
-    plt.figure()
+    plt.figure(1)
     for i in range(distances):
-        plt.plot(traj_pts, p2ps[i, :], label='%s' % labels[i])
-
+        if i != int(args.exclude):
+            plt.plot(traj_pts, p2ps[i, :], label='%s' % labels[i])
+    plt.title('Pore to Pore Distance Equilibration')
+    plt.ylabel('Distance between pores (nm)')
+    plt.xlabel('Time (ps)')
     plt.legend(loc=1, fontsize=18)
+
+    density, r, bin_width = compdensity(pos, p_centers, 0.1, n_pores)
+    plt.figure(2)
+    plt.title('Component Density Around Pore Center')
+    plt.xlabel('Distance from Pore Center (nm)')
+    plt.ylabel('Relative Component Density')
+    plt.bar(r, density, bin_width)
     plt.show()
 
