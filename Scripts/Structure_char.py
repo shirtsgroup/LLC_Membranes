@@ -12,12 +12,15 @@ import argparse
 import Get_Positions
 from pymbar import timeseries
 import random as ran
+import mdtraj as md
 
 
 def initialize():
     parser = argparse.ArgumentParser(description='Run Cylindricity script')
 
-    parser.add_argument('-i', '--input', default='wiggle_traj_bak.gro', help = 'Path to input file')
+    parser.add_argument('-i', '--input', default='wiggle.trr', help = 'Path to input file')
+    parser.add_argument('-g', '--gro', default='wiggle.gro', help = 'Some kind of configuration file that mdtraj needs'
+                                                                    'Can be a .pdb as well')
     parser.add_argument('-n', '--no_monomers', default=6, help = 'Number of Monomers per layer')
     parser.add_argument('-a', '--atoms', default=137, help = 'Number of atoms per monomer')
     parser.add_argument('-l', '--layers', default=20, help = 'Number of layers in each pore')
@@ -29,7 +32,6 @@ def initialize():
     parser.add_argument('-A', '--alt_2', default=8, help = 'Monomers per layer for the second type of alternating layer')
     parser.add_argument('-d', '--direction', default='z', help = 'Axis along which to measure a component density')
     parser.add_argument('-S', '--slices', default='250', help = 'Number of slices to descretize chosen axis direction into')
-    parser.add_argument('-g', '--grid_division', default=100, help = 'Number of blocks in x and y direction for heat map')
     parser.add_argument('-C', '--cmap', default='Blues', help = 'Color Scheme for heat map')
     parser.add_argument('-m', '--lc', default='HII', help = 'Type of liquid crystal monomer being used')
     parser.add_argument('-E', '--equil', default='auto', help = 'Frame number where system is equilibrated. "auto" will '
@@ -38,7 +40,7 @@ def initialize():
     parser.add_argument('-x', '--exclude', default=4, help = 'Which pore-to-pore distance to exclude - pass the index of'
                                                             'the pore-to-pore distance as written in the list: '
                                                             '["1-2", "1-3", "1-4", "2-3", "2-4", "3-4"] ')
-    parser.add_argument('-b', '--nboot', default=200, help = 'Number of bootstrap trials')
+    parser.add_argument('-b', '--nboot', default=2000, help = 'Number of bootstrap trials')
 
     args = parser.parse_args()
     return args
@@ -53,14 +55,14 @@ def avg_pore_loc(no_pores, pos):
     """
 
     # Find the average location of the pores w.r.t. x and y
-    nT = np.shape(pos)[2]
+    nT = np.shape(pos)[0]
     comp_ppore = np.shape(pos)[1] / no_pores
     p_center = np.zeros([2, no_pores, nT])
 
     for i in range(nT):
         for j in range(no_pores):
             for k in range(comp_ppore*j, comp_ppore*(j + 1)):
-                p_center[:, j, i] += pos[0:2, k, i]
+                p_center[:, j, i] += pos[i, k, 0:2]
             p_center[:, j, i] /= comp_ppore  # take the average
 
     return p_center
@@ -96,13 +98,13 @@ def p2p_stats(p2ps, exclude, nboot, equil):
            choose to detect equilibration manually. Otherwise 'auto' will use pymbar to find it for you
     :return: the average and standard deviation of pore to pore distances
     """
-    frames = np.shape(p2ps)[1]
+
     exclude = int(exclude)
     nboot = int(nboot)
     nT = np.shape(p2ps)[1]
 
     # Get ride of the excluded trajectory
-    p2p_new = np.zeros([5, frames])
+    p2p_new = np.zeros([5, nT])
     count = 0
     for i in range(6):
         if i != exclude:
@@ -129,7 +131,7 @@ def p2p_stats(p2ps, exclude, nboot, equil):
     print 'Maximum Autocorrelation Time: %s frames' % max(taus)
     tau = int(np.ceil(max(taus)))  # use the max again to ensure all trajectories are independent. np.ceil e
 
-    ind_trajectories = (frames - t) / tau  # the number of independent trajectories
+    ind_trajectories = (nT - t) / tau  # the number of independent trajectories
     total_trajectories = ind_trajectories * 5  # the total number of trajectories
     trajectories = np.zeros([tau, total_trajectories])  # Create a new array to hold all the trajectories
 
@@ -176,11 +178,11 @@ def compdensity(component, pore_centers, pores=4, bin_width=0.1, rmax=3.5, buffe
     # Extract basic system information. Its important to follow the format of the component array to get it right
     n_atoms = np.shape(component)[1]  # the total number of components in a single frame
     n_ppore = tot_atoms / pores  # the total number of components in each pore
-    nT = np.shape(component)[2]
+    nT = np.shape(component)[0]
 
     # Find the approximate max and minimum z values of the components based on the last frame
-    zmax = np.max(component[2, :, -1])
-    zmin = np.min(component[2, :, -1])
+    zmax = np.max(component[-1, :, 2])
+    zmin = np.min(component[-1, :, 2])
     thickness = zmax - zmin  # approximate membrane thickness
 
     # now find the maximum and minimum permissible z dimensions based on the buffer
@@ -193,8 +195,8 @@ def compdensity(component, pore_centers, pores=4, bin_width=0.1, rmax=3.5, buffe
     for k in range(nT):
         for i in range(pores):
             for j in range(n_ppore):
-                if zmin_buff < component[2, i * n_ppore + j, k] < zmax_buff:
-                    dist = np.linalg.norm(component[:2, i * n_ppore + j, k] - pore_centers[:, i, k])
+                if zmin_buff < component[k, i * n_ppore + j, 2] < zmax_buff:
+                    dist = np.linalg.norm(component[k, i * n_ppore + j, :2] - pore_centers[:, i, k])
                     # dist_from_center[k * n_atoms + i * n_ppore + j] = dist
                     dist_from_center.append(dist)
 
@@ -232,6 +234,8 @@ if __name__ == '__main__':
 
     args = initialize()  # parse the args
 
+    t = md.load('%s' % args.input, top='%s' % args.gro)
+
     # Check for certain special arguments
     if args.component == 'tails':
         atoms = ['C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C21', 'C22',
@@ -248,15 +252,11 @@ if __name__ == '__main__':
     else:
         atoms = args.component
 
-    # pos, _, traj_pts, _ = Get_Positions.get_positions('%s' % args.input, atoms, '%s' % args.lc,
-    #                                                   'no')
-    # pos = np.load('pos_tails')
-    # pos = np.load('tails_trunc')
-    pos = np.load('tail_front')
+    atoms_to_keep = [a.index for a in t.topology.atoms if a.name in atoms]
+    t.restrict_atoms(atoms_to_keep)
+    pos = t.xyz
 
-    print 'Positions Got'
-
-    nT = np.shape(pos)[2]
+    nT = np.shape(pos)[0]
 
     traj_start = int(args.start_frame)
     tot_atoms = np.shape(pos)[1]
@@ -273,17 +273,17 @@ if __name__ == '__main__':
     print 'Average Pore to Pore distance: %s' % p2p_avg
     print 'Standard Deviation of Pore to Pore distances: %s' % p2p_std
 
-    # labels = ['1-2', '1-3', '1-4', '2-3', '2-4', '3-4']
-    # plt.figure(1)
-    # for i in range(distances):
-    #     if i != int(args.exclude):
-    #         plt.plot(traj_pts, p2ps[i, :], label='%s' % labels[i])
-    # plt.title('Pore to Pore Distance Equilibration')
-    # plt.ylabel('Distance between pores (nm)')
-    # plt.xlabel('Time (ps)')
-    # plt.legend(loc=1, fontsize=18)
+    labels = ['1-2', '1-3', '1-4', '2-3', '2-4', '3-4']
+    plt.figure(1)
+    for i in range(distances):
+        if i != int(args.exclude):
+            plt.plot(t.time, p2ps[i, :], label='%s' % labels[i])
+    plt.title('Pore to Pore Distance Equilibration')
+    plt.ylabel('Distance between pores (nm)')
+    plt.xlabel('Time (ps)')
+    plt.legend(loc=1, fontsize=18)
 
-    density, r, bin_width = compdensity(pos, p_centers, n_pores, buffer=0.4)
+    density, r, bin_width = compdensity(pos, p_centers, n_pores, buffer=0)
     plt.figure(2)
     plt.title('Component Density Around Pore Center')
     plt.xlabel('Distance from Pore Center (nm)')
