@@ -9,7 +9,6 @@ from pylab import *
 from scipy.interpolate import griddata
 from matplotlib import animation
 import argparse
-import Get_Positions
 from pymbar import timeseries
 import random as ran
 import mdtraj as md
