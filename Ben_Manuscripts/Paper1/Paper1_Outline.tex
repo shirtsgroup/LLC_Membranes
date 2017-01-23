@@ -33,15 +33,15 @@
 		\item Yale aligns them, then crosslinks them to lock in the structure
 		\item LLC HII phase membranes offer potential for high permeability and selectivity which equals low energy consumption
 		\item The Colh phase shares the same structural features with the HII phase with the exception of the presence of water. This paper will focus on the development of a model of the Colh phase since it is a simpler starting point and has just as much experimental data. The analysis used in this paper can be readily extended to the HII phase. 
-                  %MRS: Doesn't the data appear to be that they are mostly the same in structure? Should address this to the extent we can.
-		  %BJC: They're structures are almost identical (same d100 plane spacing, monomer orientation) with the exception of water being present in the HII phase. I rephrased the last item to make that clearer.
 	\end{itemize}
 	
 
 	% BJC - I think that this paragraph will not be included since we are not getting into mechansims at all
         %MRS2: some of this is good motivation for WHY we care about the structure of the pore.  Without the structure, we
         % can't understand the mechanism.
-        A molecular level understanding of solute transport in LLC membranes will accelerate development efforts by providing guidelines for monomer design.
+	%BJC2: reworded the following thesis to focus it more in the structural direction
+        A molecular level understanding of LLC membrane structure will elucidate small molecule transport mechanisms, providing guidelines for design of monomers used to create separation-specific membranes.
+	%A molecular level understanding of solute transport in LLC membranes will accelerate development efforts by providing guidelines for monomer design.
         \begin{itemize}
                 \item Two types of self assembled LLCs have been made - thermotropic and lyotropic -- explain difference -- shift focus to Colh
                 \item Colh phase studies currently limited mostly to one monomer with minor variations
@@ -55,7 +55,6 @@
                 \end{itemize}
         \end{itemize}
 
-        %MRS2: correct, focus should be on the picture (the result) not the model (the means to obtain the result)
 	A clearer picture of the microscopic structure of LLC membranes, gained by building a molecular model, will change how we think about their design. 
 	\begin{itemize}
 		\item The arrangement of sodium ions in the channels is thought to be confined to the pore walls. It is possible they are arranged more randomly
@@ -69,18 +68,11 @@
 			\item A simple simulation study of a similar molecule (Head group is a sulfonate in the meta position) suggests that there are 4 monomers in each disk
 			\item Calculations based on the volume of the liquid crystal suggest that there are seven monomers in each layer
 			\item We can directly compare the plausibility of each situation along with other numbers of monomers per layer - 5, 6, 8
-			\item We can also test other, less simplistic arrangements - such as having alternating monomers per layer  %BJC: maybe leave mention of this out right and here and just address it in the results?  
-       %MRS2: right.  Generally, you want to use the introduction to raise questions, not list everything you will do.
 		\end{itemize}
 	\end{itemize}
 	
-        %MRS: this is not the best way to phrase the thesis.  I would say that we want to ask what the most likely features of the membrane are using molecular modeling.  we can talk about the phrasing.  But the model should not be the scientific output of the paper. 
-	%BJC: Okay, tried again below, - basically what I want to communicate is that we want our model to tell us useful things and we can't do that unless we know that the model is realistic. We can have a good idea that it's realistic if we put thought into how we build it and if we can reproduce experimental results. I also want to close off the conclusion since it should be a good segway into the Methods section.
         %MRS2: fine for now.  I'll think about better phrasing as we go.
 	To trust our understanding of which structural features are most likely characteristic of the system, and the conclusions drawn thereof, we must show that our molecular model is physically realistic.   
-
-    
-	% Old thesis: A physically realistic molecular model with easily modified structural features will enable a qualitatively different type of membrane design aimed optimization of self assembled LLC membranes.
 	\begin{itemize}
 		\item This paper will illustrate the careful development of a predictive molecular model and the steps taken to ensure it mimics the real system as best we can 
 		\item To understand how physically realistic the model is, validation by comparison to experiment is necessary
@@ -93,15 +85,12 @@
 
 	An ensemble of characteristic, low-energy vacuum monomer configurations were constructed by applying a simulated annealing process to a parameterized monomer.
 	\begin{itemize}
-          %MRS: this first about unfavorable structure not relevant - people will understand it needs to equilibrated/annealed.
-	  %BJC: But still talk about what I did to anneal it right? 
-          %MRS2: Yes.
-		\item Initially parameterized monomer gives unfavorable structure % Will delete this once I clarify the above comment
 		\item Structure cooled from 1000 to 50 K over 10 nanoseconds
 		\item Result not global minimum but close enough for structure building
+		\item Antechamber used for atomtyping with gaff forcefield
+		\item Used Openeye Quacpac molcharge.py to assign charges
+		\item Anneal again 
 		\item Multiple configurations saved from annealing trajectory to prove independence of starting config
-		\item New configurations used for reparamaterization, BUT most likely will just use one set of charges from one configuration since I've done 90 percent of simulations based on one parameterization. In the future, I will have a single set of parameters. So, I have multiple configurations all with the same set of charges for now.
-%MRS2: now is the time to decide exactly what will be presented in the paper regarding alternative configurations/charges.
 	\end{itemize}
 
 	The timescale for self assembly of monomers into the hexagonal phase is unknown and likely outside of a reasonable length for an atomistic simulation. 
@@ -116,8 +105,10 @@
 		\item Equilibration simulations allow structure to relax into expected configuration 
 	\end{itemize}
 
-	Twenty monomer layers per pore provides a balance of structural accuracy and computational efficiency. 
+	Each pore is made of twenty stacked monomer layers, the smallest number of layers possible without sacrificing the expected aligned hexagonal morphology.
+	%Twenty monomer layers per pore provides a balance of structural accuracy and computational efficiency. 
         %MRS2: describe quantitatively how you decided.  What is the information that made you make the decision?
+	%BJC2: It's hard to give much quantitative back up. We decided on this with more qualitative backup. We chose 20 to be safe but probably could have gotten away with less.
 	\begin{itemize}
 		\item Space between membrane layers in z direction - semi-isotropic sims fix z box dimension
 		\item Small number of layers create micellar structure
@@ -125,8 +116,6 @@
 		\item layers spaced far enough apart to avoid large energy repulsions but close enough to prevent disks slipping between one another ~ 5 angstroms works.
 	\end{itemize}
 	
-        %MRS: A lot of these investigations probably belong in results, because they are answering the questions you have: what are the likely physical properties of these membranes? The parameters are actually variables you are investgating. 
-	%BJC: Okay, condensed a couple paragraphs into one. I just want to explain here where the measurements came from and how 
 	\noindent Initial guesses for the remaining structural parameters were chosen based on experimental data and treated as variables during model development 
 	\begin{itemize}
 		\item SAXS gives an idea of Pore-to-Pore distances
@@ -134,8 +123,6 @@
 		\item Ran long NPT simulations at 300 K and 1 bar ( > 200 ns )
 	\end{itemize}
 	
-        %MRS: Results of the crosslinking are likely in results -- the fact that it didn't really change the structure of the membrame. 
-	%BJC: Okay, then I will just give the gist of how I went about crosslinking and why I think it is the correct way to do it.
 	Using an equilibrated structure, a crosslinking procedure was performed in order to better parallel synthetic procedures. 
 	\begin{itemize}
 		\item Crosslinking maintains alignment of cylindrical mesophases - emphasize that replicating the mechanism/kinetics is not important 
@@ -161,7 +148,8 @@
 	\end{itemize}
 	
 	The monomers are arranged into disks containing XXXX monomers in each layer. (Or are there defined layers -- I need to test this idea a bit more) 
-%MRS2: yes, examine this more. The idea of # of defined layers may be another idea to challenge. 
+%MRS2: yes, examine this more. The idea of # of defined layers may be another idea to challenge.
+%BJC2: I'd like to talk to you more about some calculations before I form a thesis. And that will guide the rest of this paragraph 
 	\begin{itemize}
 		\item Hypothesis: There are an average of 7 monomers per layer when defined per unit volume but there are not well-defined layers as pictured in the literature. While long range order is maintained, hexagonal mesophases are disordered within their hydrophilic and hydrophobic domains. Staying completely ordered, stacked on top of each other is not entropically favorable.
 	        \item It has been suggested that there are 4 monomers in a each disk/layer, however, simulations have shown that this leads to unstable configurations with dimensions that are too small compared to experiment.
@@ -170,6 +158,7 @@
                 \item This suggests that the arrangement of monomers is more complicated than simple layers stacked on top of each other
 	\end{itemize}
 %MRS2: Need to put into the outline how you quantitatively decided that layers wasnt meaningful.  Atom density as a function of Z, showed that it was uniform, not periodic? 
+%BJC2: working on it. It looks somewhat uniform. I'm trying to see what I can learn from the fourier transform
 	Sodium counterions are distributed randomly within the hydrophilic pore regions. (I should actually come up with a distribution e.g. gaussian) 
 %MRS2: right, there are many ways to be distributed randomly.
 	\begin{itemize}
