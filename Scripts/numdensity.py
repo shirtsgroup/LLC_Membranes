@@ -3,6 +3,7 @@
 import argparse
 import numpy as np
 import mdtraj as md
+import matplotlib.pyplot as plt
 
 
 def initialize():
@@ -16,7 +17,7 @@ def initialize():
     parser.add_argument('-a', '--atoms', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='List of atoms of interest')
     parser.add_argument('-c', '--center', default='yes', help='Set this to yes if you want to calculate the number'
                                                               'density based on the centers of the selected atoms')
-    parser.add_argument('-b', '--bin', default=0.1, help='bin size (nm)')
+    parser.add_argument('-b', '--bin', default=.1, help='bin size (nm)')
 
     args = parser.parse_args()
 
@@ -49,7 +50,7 @@ def centers(pos, atoms):
 
 def density(pos, axis, bin, box):
     """
-    Calculate the number density of components along an axis
+    Calculate the number density of components along an axis (last frame only for now)
     :param pos: a numpy array with xyz coordinates of selected atoms for all frames
     :param axis: which axis to split up (x, y or z)
     :param bin: size of the bins which the axis will be split into
@@ -57,7 +58,15 @@ def density(pos, axis, bin, box):
     :return: density as a function of distance along axis
     """
 
-    x = np.lin
+    b = box[-1, axis]
+    x = np.linspace(0, b, b/bin + 1)
+    d = np.zeros([len(x)])
+    for i in range(np.shape(pos)[1]):
+        bin_no = np.floor(pos[-1, i, axis] / bin)
+        d[bin_no] += 1
+
+    return x, d
+
 if __name__ == '__main__':
 
     args = initialize()
@@ -81,3 +90,12 @@ if __name__ == '__main__':
         axis = 2
 
     c = centers(pos, args.atoms)
+    x, d = density(c, axis, float(args.bin), box)
+
+    d = np.trim_zeros(d)
+    x = np.linspace(0, float(args.bin)*len(d), len(d))
+    # avg = np.mean(d)
+    # d = np.array([abs(i - avg) for i in d])
+
+    plt.plot(x, d)
+    plt.show()
