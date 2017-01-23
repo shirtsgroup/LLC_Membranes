@@ -22,15 +22,14 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Duplicate points periodically in the x-y directions')
 
-    parser.add_argument('-f', '--file', default='NaPore.top', help='File to replicate periodically')
-    parser.add_argument('-g', '--gro', default='test.gro', help='Coordinate file')
+    parser.add_argument('-g', '--gro', default='original.gro', help='Coordinate file')
     parser.add_argument('-o', '--output', default='NaPore_Pi.top', help='Name of output file')
     parser.add_argument('-a', '--atoms', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='Name of carbons in ring')
-    parser.add_argument('-d', '--distance', default=2, help='Distance to offset dipole from ring (Angstroms)')
-    parser.add_argument('-m', '--monomer', default='monomer2_dummy', help='Which monomer topology is being used')
+    parser.add_argument('-d', '--distance', default=0.1, help='Distance to offset dipole from ring (Angstroms)')
+    parser.add_argument('-m', '--monomer', default='NAcarb11V_dummy', help='Which monomer topology is being used')
     parser.add_argument('-t', '--toplines', default=2, help='Number of lines at the top of the .gro file to ignore')
     parser.add_argument('-v', '--valence', default=1, help = 'Valence of counterion')
-    parser.add_argument('-c', '--charge', default=0.1, help= 'Charge on dipoles')
+    parser.add_argument('-c', '--charge', default=1, help= 'Charge on dipoles')
 
     args = parser.parse_args()
 
@@ -270,18 +269,25 @@ def exclusions(coord_file, monomers, valence, toplines, atoms, n_atoms, vsites):
     :return: a list of exclusions
     """
     n_atoms = np.shape(all_coords)[1] - (1/valence) * monomers
-    atoms_per_molecule = n_atoms / monomers  # subtract valence to exclude counterion
-    n_excluded = len(atoms)  # number of atoms being excluded
+    atoms_per_molecule = n_atoms / monomers  # subtract valence to exclude counterion (includes new PI atoms)
+
+    n_excluded = len(atoms) + 1  # number of atoms excluded. +1 because it will be excluded from it complementary vsite
 
     n_exclusions = monomers * 2  # number of exclusions to be specified (one for each vsite)
     exclusions = np.zeros([n_excluded + 1, n_exclusions])  # the first entry is the virtual site itself
 
     for i in range(np.shape(vsites)[1]):
         exclusions[0, i] = vsites[0, i]
+        # add exclusion from the complementary vsite. This is pretty specific to the format and will likely need to be
+        # re-written eventually
+        if i % 2 == 0:
+            exclusions[1, i] = vsites[0, i + 1]
+        elif i % 2 == 1:
+            exclusions[1, i] = vsites[0, i - 1]
 
     x = 0
     for i in range(monomers):
-        a = 1
+        a = 2
         for j in range(atoms_per_molecule):
             line = i*atoms_per_molecule + j + toplines
             if str.strip(coord_file[line][10:15]) in atoms:
@@ -325,8 +331,7 @@ if __name__ == "__main__":
 
     f.close()
 
-    Assembly_itp.write_file(a, 'off', 'dipole.itp', rings)
-    print 'dipole.itp file written'
+    Assembly_itp.write_file(a, 'on', 'dipole.itp', rings)
 
     # Parameters for virtual site :
     #      /i\        i, j and k are the points from the plane chosen
@@ -360,8 +365,9 @@ if __name__ == "__main__":
 
     charge = float(args.charge)
     for i in range(rings*2):
-        a.insert(atoms_count, '{:5d}{:>5s}{:6d}{:>6s}{:>6s}{:7d}{:5s}{:>1.6f}{:5s}{:2.5f}'.format(atoms + i + 1 - (1/valence)*rings,
-                                'PI', 1, 'HII', 'PI', atoms + i + 1,'', (-1)**i * charge,'', 0.00000) + "\n")
+        atom_no = atoms + i + 1 - (1/valence)*rings
+        a.insert(atoms_count, '{:5d}{:>5s}{:6d}{:>6s}{:>6s}{:7d}{:5s}{:>1.6f}{:5s}{:2.5f}'.format(atom_no,
+                                'PI', 1, 'HII', 'PI', atom_no,'', (-1)**i * charge,'', 0.00000) + "\n")
         atoms_count += 1
 
     f = open('dipole.itp', 'w')
@@ -369,7 +375,7 @@ if __name__ == "__main__":
     for line in a:
         f.write(line)
 
-    f.write("[ virtual_sites3 ]" + "\n")
+    f.write("\n[ virtual_sites3 ]\n")
     f.write("; Site   from                  funct         a             b             c" + "\n")
     for i in range(rings*2):
         f.write('{:<8d}{:<8d}{:<8d}{:<8d}{:<8d}{:<1.9f}{:5s}{:<1.9f}{:5s}{:<1.9f}'.format(int(vsites[0, i]), int(vsites[1, i]),
@@ -383,3 +389,4 @@ if __name__ == "__main__":
         f.write("\n")
 
     f.close()
+    print 'dipole.itp file written :)'

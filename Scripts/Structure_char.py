@@ -24,7 +24,7 @@ def initialize():
     parser.add_argument('-a', '--atoms', default=137, help = 'Number of atoms per monomer')
     parser.add_argument('-l', '--layers', default=20, help = 'Number of layers in each pore')
     parser.add_argument('-p', '--pores', default=4, help = 'Number of Pores')
-    parser.add_argument('-c', '--component', default='NA', help = 'Counterion used to track pore positions')
+    parser.add_argument('-c', '--component', default='tails', help = 'Counterion used to track pore positions')
     parser.add_argument('-f', '--start_frame', default=0, help = 'Frame number to start reading trajectory at')
     parser.add_argument('-s', '--layer_distribution', default='uniform', help = 'The distribution of monomers per layer')
     parser.add_argument('-L', '--alt_1', default=6, help = 'Monomers per layer for the first type of alternating layer')
@@ -45,7 +45,7 @@ def initialize():
     return args
 
 
-def avg_pore_loc(no_pores, pos):
+def avg_pore_loc(npores, pos, natoms):
     """
     :param no_pores: the number of pores in the unit cell
     :param pos: the coordinates of the component(s) which you are using to locate the pore centers
@@ -55,15 +55,27 @@ def avg_pore_loc(no_pores, pos):
 
     # Find the average location of the pores w.r.t. x and y
     nT = np.shape(pos)[0]
-    comp_ppore = np.shape(pos)[1] / no_pores
-    p_center = np.zeros([2, no_pores, nT])
+    comp_ppore = np.shape(pos)[1] / npores
+    p_center = np.zeros([2, npores, nT])
+
+    # for i in range(nT):
+    #     for j in range(no_pores):
+    #         for k in range(comp_ppore*j, comp_ppore*(j + 1)):
+    #             p_center[:, j, i] += pos[i, k, 0:2]
+    #         p_center[:, j, i] /= comp_ppore  # take the average
+
+    # for i in range(natoms):
+    #     for k in range(np.shape(pos)[1] / natoms):
+    #         for j in range(npores):
+    #             for l in range(nT):
+    #                 p_center[:, j, l] += pos[l, , :2]
 
     for i in range(nT):
-        for j in range(no_pores):
-            for k in range(comp_ppore*j, comp_ppore*(j + 1)):
-                p_center[:, j, i] += pos[i, k, 0:2]
-            p_center[:, j, i] /= comp_ppore  # take the average
+        for j in range(npores):
+            p_center[:, j, i] /= comp_ppore
 
+    print p_center[:, :, :2]
+    exit()
     return p_center
 
 
@@ -155,15 +167,16 @@ def p2p_stats(p2ps, exclude, nboot, equil):
 
     print ' Pore to Pore Statistics calculated starting at frame {:d} ({:2.1f} percent into simulation)'.format(
             t, 100.0 * t / nT)
-    return p2p_avg, p2p_std
+    return p2p_avg, p2p_std, t
 
 
-def compdensity(component, pore_centers, pores=4, bin_width=0.1, rmax=3.5, buffer=0.0):
+def compdensity(component, pore_centers, start, pores=4, bin_width=0.1, rmax=3.5, buffer=0.0):
 
     """
     :param component: the coordinates of the component(s) which you want a radial distribution of at each frame
                       (numpy array with dimensions: [3 (xyz coordinates), no components, no frames])
     :param pore_centers: a numpy array of the locations of each pore center at each trajectory frame
+    :param start: the frame number at which to start calculations (should be after equilibration)
     :param step: the size of the step to take in the radial direction when measuring density (float)
     :param pores: number of pores (int) default=4
     :param bin_width: width of the bins which will show up when you plot this (float), default = 0.1 nm
@@ -174,7 +187,7 @@ def compdensity(component, pore_centers, pores=4, bin_width=0.1, rmax=3.5, buffe
              returns the calculated bin width for plotting
     """
 
-    # Extract basic system information. Its important to follow the format of the component array to get it right
+    # Extract basic system information. It's important to follow the format of the component array to get it right
     n_atoms = np.shape(component)[1]  # the total number of components in a single frame
     n_ppore = tot_atoms / pores  # the total number of components in each pore
     nT = np.shape(component)[0]
@@ -191,7 +204,7 @@ def compdensity(component, pore_centers, pores=4, bin_width=0.1, rmax=3.5, buffe
     # dist_from_center = np.zeros([n_atoms*nT])
     dist_from_center = []
     # Now find the distance from the center of every atom in every frame
-    for k in range(nT):
+    for k in range(start, nT):
         for i in range(pores):
             for j in range(n_ppore):
                 if zmin_buff < component[k, i * n_ppore + j, 2] < zmax_buff:
@@ -219,7 +232,7 @@ def compdensity(component, pore_centers, pores=4, bin_width=0.1, rmax=3.5, buffe
     # components were calculated
     density = np.zeros([bins])
     for i in range(bins):
-        density[i] = bin_contents_tails[i] / (math.pi*((i + 1)*bin_width)**2 - (i*bin_width)**2)
+        density[i] = bin_contents_tails[i] / (math.pi*(((i + 1)*bin_width)**2 - (i*bin_width)**2))
 
     # normalize
     n = sum(density)
@@ -254,7 +267,8 @@ if __name__ == '__main__':
     atoms_to_keep = [a.index for a in t.topology.atoms if a.name in atoms]
     t.restrict_atoms(atoms_to_keep)
     pos = t.xyz
-
+    print pos[0, -3:-1, :]
+    exit()
     nT = np.shape(pos)[0]
 
     traj_start = int(args.start_frame)
@@ -262,27 +276,27 @@ if __name__ == '__main__':
     n_pores = int(args.pores)  # number of pores
     comp_ppore = tot_atoms/n_pores
 
-    p_centers = avg_pore_loc(n_pores, pos)
+    p_centers = avg_pore_loc(n_pores, pos, len(atoms))
 
     distances = 6  # number of p2p distances to calculate. My algorithm isn't smart enough for anything but six yet
     p2ps = p2p(p_centers, distances)
 
-    p2p_avg, p2p_std = p2p_stats(p2ps, '%s' % args.exclude, '%s' % args.nboot, '%s' % args.equil)
+    p2p_avg, p2p_std, equil = p2p_stats(p2ps, '%s' % args.exclude, '%s' % args.nboot, '%s' % args.equil)
 
     print 'Average Pore to Pore distance: %s' % p2p_avg
     print 'Standard Deviation of Pore to Pore distances: %s' % p2p_std
 
-    labels = ['1-2', '1-3', '1-4', '2-3', '2-4', '3-4']
-    plt.figure(1)
-    for i in range(distances):
-        if i != int(args.exclude):
-            plt.plot(t.time, p2ps[i, :], label='%s' % labels[i])
-    plt.title('Pore to Pore Distance Equilibration')
-    plt.ylabel('Distance between pores (nm)')
-    plt.xlabel('Time (ps)')
-    plt.legend(loc=1, fontsize=18)
+    # labels = ['1-2', '1-3', '1-4', '2-3', '2-4', '3-4']
+    # plt.figure(1)
+    # for i in range(distances):
+    #     if i != int(args.exclude):
+    #         plt.plot(t.time, p2ps[i, :], label='%s' % labels[i])
+    # plt.title('Pore to Pore Distance Equilibration')
+    # plt.ylabel('Distance between pores (nm)')
+    # plt.xlabel('Time (ps)')
+    # plt.legend(loc=1, fontsize=18)
 
-    density, r, bin_width = compdensity(pos, p_centers, n_pores, buffer=0)
+    density, r, bin_width = compdensity(pos, p_centers, 300, n_pores, buffer=0)
     plt.figure(2)
     plt.title('Component Density Around Pore Center')
     plt.xlabel('Distance from Pore Center (nm)')
