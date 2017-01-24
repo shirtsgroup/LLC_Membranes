@@ -1,6 +1,7 @@
 \documentclass{article}
 \title{Predicting Transport in Lyotropic Liquid Crystal Membranes with Molecular Dynamics Simulations -- Outline}
 %MRS2: read over the start of the grant for more ideas about details for the motivation.
+%BJC2: Just noticed this comment before sending it back to you. I'll look at the grant again while editing the next iteration. I think I want to move away from framing the membrane as just a desalination membrane
 \author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble \and Michael R. Shirts} 
 \begin{document}
 	\bibliographystyle{ieeetr}
@@ -24,9 +25,10 @@
 	Self assembling lyotropic liquid crystals (LLCs) share the characteristic ability of nanostructured membrane materials to create highly ordered structures with the benefits of low cost and synthetic techniques feasible for large scale production.
 	\begin{itemize}
 		\item Forms lamellar, bicontinuous cubic and hexagonal phase based on solution composition
-		\item My monomer form two types of self assembled LLCs - thermotropic (Colh) and lyotropic (HII) 
+		\item My monomer form two types of self assembled LLCs - thermotropic (Colh) and lyotropic (HII)
+		%BJC: this is making me scratch my head - I'm afraid to talk a lot about this because of Mike's new data. But I think it's important to distinguish between what has been reported in past literature 
 		\item The thermotropic, Colh is formed by the self assembly of neat monomer
-		\item The lyotropic, HII phase is formed in the presence of small percentages of water (around 8 percent)
+		\item The lyotropic, HII phase is formed in the presence of small amounts of water
 		\item Both assemble into cylinders with hydrophilic groups oriented inward towards the pore center and hydrophobic group facing outward. The only difference is the inclusion of water in the structure which leads to minor variations in the structure with potentially different filtration properties (although no filtration experiments have been done on Colh)  
 		\item Hydrophilic regions point towards pore centers
 		\item Until recently, they could not be aligned - hindered progress
@@ -35,27 +37,27 @@
 		\item The Colh phase shares the same structural features with the HII phase with the exception of the presence of water. This paper will focus on the development of a model of the Colh phase since it is a simpler starting point and has just as much experimental data. The analysis used in this paper can be readily extended to the HII phase. 
 	\end{itemize}
 	
-
+	
 	% BJC - I think that this paragraph will not be included since we are not getting into mechansims at all
-        %MRS2: some of this is good motivation for WHY we care about the structure of the pore.  Without the structure, we
-        % can't understand the mechanism.
+	%MRS2: some of this is good motivation for WHY we care about the structure of the pore.  Without the structure, we
+	% can't understand the mechanism.
 	%BJC2: reworded the following thesis to focus it more in the structural direction
-        A molecular level understanding of LLC membrane structure will elucidate small molecule transport mechanisms, providing guidelines for design of monomers used to create separation-specific membranes.
+	A molecular level understanding of LLC membrane structure will elucidate small molecule transport mechanisms, providing guidelines for design of monomers used to create separation-specific membranes.
 	%A molecular level understanding of solute transport in LLC membranes will accelerate development efforts by providing guidelines for monomer design.
-        \begin{itemize}
-                \item Two types of self assembled LLCs have been made - thermotropic and lyotropic -- explain difference -- shift focus to Colh
-                \item Colh phase studies currently limited mostly to one monomer with minor variations
-                \item Current optimization efforts performed through trial and error
-                \item Macroscopic models are the only source of predictive modeling
-                \item An atomistic understanding of the mechanism of solute transport can identify
-                performance bottle necks and direct design of future monomers/membranes
-                \begin{itemize}
-                        \item Do ions have trouble getting through because of interactions with other things in the pores (e.g. ions, carbonyl groups, benzene rings) -- related to ionic conduction
-                        \item Does concentration of ions in the pore repel incoming ions?
-                \end{itemize}
-        \end{itemize}
-
-	A clearer picture of the microscopic structure of LLC membranes, gained by building a molecular model, will change how we think about their design. 
+	\begin{itemize}
+		\item Focus on Colh since it is a simpler system and has the same experimental data
+		\item Colh phase studies currently limited mostly to one monomer with minor variations
+		\item Current optimization efforts performed through trial and error
+		\item Macroscopic models are the only source of predictive modeling
+		\item An atomistic understanding of the mechanism of solute transport can identify
+		performance bottle necks and direct design of future monomers/membranes
+		\begin{itemize}
+			\item Do ions have trouble getting through because of interactions with other things in the pores (e.g. ions, carbonyl groups, benzene rings) -- related to ionic conduction
+			\item Does concentration of ions in the pore repel incoming ions?
+		\end{itemize}
+	\end{itemize}
+	 
+	A clear picture of the microscopic structure of LLC membranes, gained by building a molecular model, will confirm or deny past drawn conclusions that have largely guided our understanding of separation mechanisms. 
 	\begin{itemize}
 		\item The arrangement of sodium ions in the channels is thought to be confined to the pore walls. It is possible they are arranged more randomly
 		\begin{itemize}
@@ -71,7 +73,7 @@
 		\end{itemize}
 	\end{itemize}
 	
-        %MRS2: fine for now.  I'll think about better phrasing as we go.
+	%MRS2: fine for now.  I'll think about better phrasing as we go.
 	To trust our understanding of which structural features are most likely characteristic of the system, and the conclusions drawn thereof, we must show that our molecular model is physically realistic.   
 	\begin{itemize}
 		\item This paper will illustrate the careful development of a predictive molecular model and the steps taken to ensure it mimics the real system as best we can 
@@ -82,7 +84,7 @@
 	\section{Methods}
 	
 	HII monomers were parameterized using the Generalized Amber Forcefield with the Antechamber package provided with AmberTools16. All molecular dynamics simulations were run using Gromacs version 5.1.2.
-
+	
 	An ensemble of characteristic, low-energy vacuum monomer configurations were constructed by applying a simulated annealing process to a parameterized monomer.
 	\begin{itemize}
 		\item Structure cooled from 1000 to 50 K over 10 nanoseconds
@@ -92,8 +94,8 @@
 		\item Anneal again 
 		\item Multiple configurations saved from annealing trajectory to prove independence of starting config
 	\end{itemize}
-
-	The timescale for self assembly of monomers into the hexagonal phase is unknown and likely outside of a reasonable length for an atomistic simulation. 
+	
+	The timescale for self assembly of monomers into the hexagonal phase is unknown and likely outside of a reasonable length for an atomistic simulation, calling for more efficient way to build the system. 
 	\begin{itemize}
 		\item Work done that shows coarse grain model self assembly in ~1000 ns , Citation: J. Phys. Chem. B 2013, 117, 4254-4262
 		\item Attempts with Colh system not fruitful  
@@ -104,10 +106,10 @@
 		\item Wrote code to assemble monomers into Colh configuration (described in intro) close to what is expected 
 		\item Equilibration simulations allow structure to relax into expected configuration 
 	\end{itemize}
-
+	
 	Each pore is made of twenty stacked monomer layers, the smallest number of layers possible without sacrificing the expected aligned hexagonal morphology.
 	%Twenty monomer layers per pore provides a balance of structural accuracy and computational efficiency. 
-        %MRS2: describe quantitatively how you decided.  What is the information that made you make the decision?
+	%MRS2: describe quantitatively how you decided.  What is the information that made you make the decision?
 	%BJC2: It's hard to give much quantitative back up. We decided on this with more qualitative backup. We chose 20 to be safe but probably could have gotten away with less.
 	\begin{itemize}
 		\item Space between membrane layers in z direction - semi-isotropic sims fix z box dimension
@@ -115,9 +117,9 @@
 		\item Beyond 20 layers is unnecessary to get expected configuration
 		\item layers spaced far enough apart to avoid large energy repulsions but close enough to prevent disks slipping between one another ~ 5 angstroms works.
 	\end{itemize}
-	FIGURE: initial configuration
-	caption: A representative initial configuration
-
+	FIGURE: initial configuration \\
+	caption: A representative initial configuration \\
+	\\
 	\noindent Initial guesses for the remaining structural parameters were chosen based on experimental data and treated as variables during model development 
 	\begin{itemize}
 		\item SAXS gives an idea of Pore-to-Pore distances
@@ -134,10 +136,13 @@
 	\end{itemize}  
 	
 	\section{Results and Discussion}
-
+	
 	Proper selection of initial structural parameters results in an equilibrated model that is experimentally consistent 
 	\begin{itemize}
-		\item Visual perspective - show top view and cross section
+		\item Visual perspective \\
+		FIGURE: show top view and cross section (with pbcs on)\\
+		caption: (a) A top view of an equilibrated LLC membrane system shows defined pores and the expected hexagonal morphology. \\
+		(b) A side vew of an equilibrated LLC membrane system shows the straight cylindrical pores, emphasized by large blue sodium ions 
 		\item System validated using multiple monomer configurations 
 		\item Pore to pore distance
 		\begin{itemize}
@@ -147,45 +152,45 @@
 			\item Simulated SAXS data
 		\end{itemize}
 		FIGURE - perhaps a four panel figure
-		(a) Experimental Small Angle X-ray scattering data
-		(b) Equilibration of pores monitored by measuring the distance between pores over time
-		(c) A crosslinked system run for 100 ns shows that the system maintains itself close to its initial position 
-		(d) A simulated x-ray diffraction pattern generated from atomic coordinates matches experimental measurements  	
+		(a) Experimental Small Angle X-ray scattering data \\
+		(b) Equilibration of pores monitored by measuring the distance between pores over time \\
+		(c) A crosslinked system run for 100 ns shows that the system maintains itself close to its initial position \\ 
+		(d) A simulated x-ray diffraction pattern generated from atomic coordinates matches experimental measurements \\  	
 		\item Pore Radius - a less reliable validation because we don't have an agreed upon way to measure this parameter experimentally
 		\item Density - there are crude lab measurements which my model is in agreement with (no one has reported any values since it wasn't relevant to them)
 	\end{itemize}
 	
 	The monomers are arranged into disks containing XXXX monomers in each layer. (Or are there defined layers -- I need to test this idea a bit more) 
-%MRS2: yes, examine this more. The idea of # of defined layers may be another idea to challenge.
-%BJC2: I'd like to talk to you more about some calculations before I form a thesis. And that will guide the rest of this paragraph 
+	%MRS2: yes, examine this more. The idea of # of defined layers may be another idea to challenge.
+	%BJC2: I'd like to talk to you more about some calculations before I form a thesis. And that will guide the rest of this paragraph 
 	\begin{itemize}
 		\item Hypothesis: There are an average of 7 monomers per layer when defined per unit volume but there are not well-defined layers as pictured in the literature. While long range order is maintained, hexagonal mesophases are disordered within their hydrophilic and hydrophobic domains. Staying completely ordered, stacked on top of each other is not entropically favorable.
-	        \item It has been suggested that there are 4 monomers in a each disk/layer, however, simulations have shown that this leads to unstable configurations with dimensions that are too small compared to experiment.
-                \item Stable simulations with 6 and 7 monomers have been performed (will do one with five soon) which give structural characteristics consistent with experiment
-                \item Stable systems have also been simulated consisting of varying numbers of monomers per layer
-                \item This suggests that the arrangement of monomers is more complicated than simple layers stacked on top of each other
-		\item Density of components along Z axis
-	        FIGURE: density of component along z axis (maybe FT for clarity)
-	        caption: The density of head groups along the axis parallel to the pores, as defined by the centroid of each benzene ring. There are no clear layers despite the defined layers in the starting configuration.
-
+		\item It has been suggested that there are 4 monomers in a each disk/layer, however, simulations have shown that this leads to unstable configurations with dimensions that are too small compared to experiment.
+		\item Stable simulations with 6 and 7 monomers have been performed (will do one with five soon) which give structural characteristics consistent with experiment
+		\item Stable systems have also been simulated consisting of varying numbers of monomers per layer
+		\item This suggests that the arrangement of monomers is more complicated than simple layers stacked on top of each other
+		\item Density of components along Z axis \\
+		FIGURE: density of component along z axis (maybe FT for clarity)
+		caption: The density of head groups along the axis parallel to the pores, as defined by the centroid of each benzene ring. There are no clear layers despite the defined layers in the starting configuration.
+		
 	\end{itemize}
-
-%MRS2: Need to put into the outline how you quantitatively decided that layers wasnt meaningful.  Atom density as a function of Z, showed that it was uniform, not periodic? 
-%BJC2: working on it. It looks somewhat uniform. I'm trying to see what I can learn from the fourier transform
+	
+	%MRS2: Need to put into the outline how you quantitatively decided that layers wasnt meaningful.  Atom density as a function of Z, showed that it was uniform, not periodic? 
+	%BJC2: working on it. It looks somewhat uniform. I'm trying to see what I can learn from the fourier transform
 	Sodium counterions are distributed randomly within the hydrophilic pore regions. (I should actually come up with a distribution e.g. gaussian) 
-%MRS2: right, there are many ways to be distributed randomly.
-%BJC2: yes, I need to think about this more rather than assume gaussian
+	%MRS2: right, there are many ways to be distributed randomly.
+	%BJC2: yes, I need to think about this more rather than assume gaussian
 	\begin{itemize}
 		\item Past literature reports ions arranged in a circle about pore walls implying some kind of void space as a pore. Simulations under a variety of conditions suggest that ions prefer disorder within the pores. 
 		\item A size exclusion mechanism has been proposed in the past, however that might no be the only force at play
 		\item Ions may play a role in transport, hindering flux of solute and solvent by slowing their diffusion
 		\item The membrane may exhibit the permeability-selectivity tradeoff inherent to solution-diffusion type membranes.
-		FIGURE - plot from grant - sodium, benzene, tail densities in pores
+		\\FIGURE - plot from grant - sodium, benzene, tail densities in pores
 		caption: The density of sodium (blue), benzene (red), and alkyl tails (cyan) surrounding the membrane pore centers. The center of the pore is a soup of the three components as opposed to a previously assumed hollow region. 
-        \end{itemize}	
-
-%BJC: New x-ray data here? It could potentially support the conclusions made in the previous paragraph.
-
+	\end{itemize}	
+	
+	%BJC: New x-ray data here? It could potentially support the conclusions made in the previous paragraph.
+	
 	The model gives reasonable estimates of ionic conductivity.
 	\begin{itemize}
 		\item There are a few ways to estimate ionic conductivity as seen in literature. We prefer a method which can extract an estimate based purely on an equilibrium trajectory
@@ -206,25 +211,25 @@
 			\item The model is valid for non-equilibrium and equilibrium simulations. Our analysis is based on the latter
 			\item A similar model has been derived and validate to predict water permeability using equilibrium simulations
 			\item The pore region is defined as the entire membrane system since lab IC measurements are done on bulk membrane rather than on individual pores. One would expect single channel IC to be much larger than the bulk membrane
-                \end{itemize}                    
+		\end{itemize}                    
 	\end{itemize}
 	TABLE: Calculated ionic conductivity using Nernst-Einsten and Collective Diffusion
-
-%MRS: not really a result, but can be included in the discussion. Don't need to talk too much about future work though - a paper should be focused on the current work.
-%BJC: Okay, I'll be brief when writing this up
-%MRS2: or not even enumerate all the specific questions, just that it is a generalizable model.
-%BJC2: Okay, then is this even a paragraph? It could just be a final sentence or just moved to the conclusions
+	\\
+	%MRS: not really a result, but can be included in the discussion. Don't need to talk too much about future work though - a paper should be focused on the current work.
+	%BJC: Okay, I'll be brief when writing this up
+	%MRS2: or not even enumerate all the specific questions, just that it is a generalizable model.
+	%BJC2: Okay, then is this even a paragraph? It could just be a final sentence or just moved to the conclusions
 	The procedure used to create and validate our model can be used to evaluate other liquid crystalline assemblies
-		\begin{itemize}
-			\item Liquid crystal used - or a mixture of different liquid crystals
-			\item Minor structural variations (e.g. 7, 8, 9, 10, 11 ... CH2's in the tails)
-			\item Counterion -- Size/valence of counterion
-			\item Functional head groups
-			\item How does varying these things effect pore separation, pore size, phase stability, and transport and why are these effects observed
-		\end{itemize} 
-		
+	\begin{itemize}
+		\item Liquid crystal used - or a mixture of different liquid crystals
+		\item Minor structural variations (e.g. 7, 8, 9, 10, 11 ... CH2's in the tails)
+		\item Counterion -- Size/valence of counterion
+		\item Functional head groups
+		\item How does varying these things effect pore separation, pore size, phase stability, and transport and why are these effects observed
+	\end{itemize} 
+	
 	\section{Conclusion}
-
+	
 	In this work, we have suggested a more detailed picture of the structure of a self assembled thermotropic liquid crystal membrane using an atomistic molecular model.
 	\begin{itemize}
 		\item Channels are more disordered than previously thought and are filled with organic matter rather than being hollow 
@@ -233,19 +238,19 @@
 		\item Model can be used for prediction of transport properties in new membranes
 		\item We will solvate the system to establish procedures for HII phase prediction
 	\end{itemize}
-%MRS2: should this be in there you discussed in the email?
-%A crosslinked system to show that the system shrinks upon crosslinking as expected
-%BJC2: It's included in the first paragraph of Results and Discussion & and proposed as part of a figure
-
-%MRS2: This is worth examining, in the paper, but ONLY if it gives
-%results like the X-ray diffraction shown earlier.  
-% A system with forced pi stacking (via the dipole method) could help us explain (or not) the missing peak in the wide angle data
-%BJC2: would this go in a section about pitfalls of our model if it did prove show pi stacking. 
-%BJC2: It could also be used to refute the pi stacking argument for structuring of the pores if we show that it takes a large amount of energy to force it to even happen.
-
-%MRS2: we should think about where new X-ray data  would go.
-%BJC2: after where we talk about disordered pores?
-
+	%MRS2: should this be in there you discussed in the email?
+	%A crosslinked system to show that the system shrinks upon crosslinking as expected
+	%BJC2: It's included in the first paragraph of Results and Discussion & and proposed as part of a figure
+	
+	%MRS2: This is worth examining, in the paper, but ONLY if it gives
+	%results like the X-ray diffraction shown earlier.  
+	% A system with forced pi stacking (via the dipole method) could help us explain (or not) the missing peak in the wide angle data
+	%BJC2: would this go in a section about pitfalls of our model if it did prove show pi stacking. 
+	%BJC2: It could also be used to refute the pi stacking argument for structuring of the pores if we show that it takes a large amount of energy to force it to even happen.
+	
+	%MRS2: we should think about where new X-ray data  would go.
+	%BJC2: after where we talk about disordered pores?
+	
 	\section{Supplemental Information}
 	
 	Monomer configurations
@@ -255,13 +260,13 @@
 		\item 7 monomer per layer configurations
 	\end{itemize}
 	
-	Crosslinking details
+	\noindent Crosslinking details
 	\begin{itemize}
 		\item Full algorithm? or just detailed description
 		\item Maybe a figure showing the new crosslinks
 	\end{itemize}
 	
-	Ionic conductivity
+	\noindent Ionic conductivity
 	\begin{itemize}
 		\item MSD plots
 	\end{itemize}
