@@ -115,7 +115,9 @@
 		\item Beyond 20 layers is unnecessary to get expected configuration
 		\item layers spaced far enough apart to avoid large energy repulsions but close enough to prevent disks slipping between one another ~ 5 angstroms works.
 	\end{itemize}
-	
+	FIGURE: initial configuration
+	caption: A representative initial configuration
+
 	\noindent Initial guesses for the remaining structural parameters were chosen based on experimental data and treated as variables during model development 
 	\begin{itemize}
 		\item SAXS gives an idea of Pore-to-Pore distances
@@ -142,9 +144,15 @@
 			\item We know from SAXS data what the distance between pores should be
 			\item We require long simulation times to reach an equilibrated structure with the correct dimensions
 			\item Crosslinking locks in structure, maintaining pore distances even after long simulations
+			\item Simulated SAXS data
+		\end{itemize}
+		FIGURE - perhaps a four panel figure
+		(a) Experimental Small Angle X-ray scattering data
+		(b) Equilibration of pores monitored by measuring the distance between pores over time
+		(c) A crosslinked system run for 100 ns shows that the system maintains itself close to its initial position 
+		(d) A simulated x-ray diffraction pattern generated from atomic coordinates matches experimental measurements  	
 		\item Pore Radius - a less reliable validation because we don't have an agreed upon way to measure this parameter experimentally
 		\item Density - there are crude lab measurements which my model is in agreement with (no one has reported any values since it wasn't relevant to them)
-		\end{itemize}
 	\end{itemize}
 	
 	The monomers are arranged into disks containing XXXX monomers in each layer. (Or are there defined layers -- I need to test this idea a bit more) 
@@ -156,18 +164,27 @@
                 \item Stable simulations with 6 and 7 monomers have been performed (will do one with five soon) which give structural characteristics consistent with experiment
                 \item Stable systems have also been simulated consisting of varying numbers of monomers per layer
                 \item This suggests that the arrangement of monomers is more complicated than simple layers stacked on top of each other
+		\item Density of components along Z axis
+	        FIGURE: density of component along z axis (maybe FT for clarity)
+	        caption: The density of head groups along the axis parallel to the pores, as defined by the centroid of each benzene ring. There are no clear layers despite the defined layers in the starting configuration.
+
 	\end{itemize}
+
 %MRS2: Need to put into the outline how you quantitatively decided that layers wasnt meaningful.  Atom density as a function of Z, showed that it was uniform, not periodic? 
 %BJC2: working on it. It looks somewhat uniform. I'm trying to see what I can learn from the fourier transform
 	Sodium counterions are distributed randomly within the hydrophilic pore regions. (I should actually come up with a distribution e.g. gaussian) 
 %MRS2: right, there are many ways to be distributed randomly.
+%BJC2: yes, I need to think about this more rather than assume gaussian
 	\begin{itemize}
 		\item Past literature reports ions arranged in a circle about pore walls implying some kind of void space as a pore. Simulations under a variety of conditions suggest that ions prefer disorder within the pores. 
 		\item A size exclusion mechanism has been proposed in the past, however that might no be the only force at play
 		\item Ions may play a role in transport, hindering flux of solute and solvent by slowing their diffusion
-		\item The membrane may exhibit the permeability-selectivity tradeoff inherent to solution-diffusion type membranes. 
-%MRS2 good to get into the implied mechanism.
+		\item The membrane may exhibit the permeability-selectivity tradeoff inherent to solution-diffusion type membranes.
+		FIGURE - plot from grant - sodium, benzene, tail densities in pores
+		caption: The density of sodium (blue), benzene (red), and alkyl tails (cyan) surrounding the membrane pore centers. The center of the pore is a soup of the three components as opposed to a previously assumed hollow region. 
         \end{itemize}	
+
+%BJC: New x-ray data here? It could potentially support the conclusions made in the previous paragraph.
 
 	The model gives reasonable estimates of ionic conductivity.
 	\begin{itemize}
@@ -191,10 +208,12 @@
 			\item The pore region is defined as the entire membrane system since lab IC measurements are done on bulk membrane rather than on individual pores. One would expect single channel IC to be much larger than the bulk membrane
                 \end{itemize}                    
 	\end{itemize}
+	TABLE: Calculated ionic conductivity using Nernst-Einsten and Collective Diffusion
 
 %MRS: not really a result, but can be included in the discussion. Don't need to talk too much about future work though - a paper should be focused on the current work.
 %BJC: Okay, I'll be brief when writing this up
 %MRS2: or not even enumerate all the specific questions, just that it is a generalizable model.
+%BJC2: Okay, then is this even a paragraph? It could just be a final sentence or just moved to the conclusions
 	The procedure used to create and validate our model can be used to evaluate other liquid crystalline assemblies
 		\begin{itemize}
 			\item Liquid crystal used - or a mixture of different liquid crystals
@@ -206,28 +225,44 @@
 		
 	\section{Conclusion}
 
-        %MRS: restate in terms of the physical things learned.  THe output is knowledge, not a model.
-	In this work, we have 
-%MRS2: revealed 
-%MRS: revealed is too strong.
-suggested 
-a more detailed picture of the structure of a self assembled thermotropic liquid crystal membrane using an atomistic molecular model.
-	%In this work, a molecular model has been developed intended to predict transport in a thermotropic liquid crystal membrane. 
+	In this work, we have suggested a more detailed picture of the structure of a self assembled thermotropic liquid crystal membrane using an atomistic molecular model.
 	\begin{itemize}
-		\item Channels are more disordered than previously thought 
-                  %MRS2: not only disordered, but filled, rather than open.
-		\item There are likely 6 or 7 monomers per layer (or somewhere in between if there is something like alternating layers)
+		\item Channels are more disordered than previously thought and are filled with organic matter rather than being hollow 
+		\item There are likely no defined layers
 		\item Results presented for Colh phase monomer but can be adapted to other LCs
 		\item Model can be used for prediction of transport properties in new membranes
 		\item We will solvate the system to establish procedures for HII phase prediction
 	\end{itemize}
 %MRS2: should this be in there you discussed in the email?
 %A crosslinked system to show that the system shrinks upon crosslinking as expected
+%BJC2: It's included in the first paragraph of Results and Discussion & and proposed as part of a figure
 
 %MRS2: This is worth examining, in the paper, but ONLY if it gives
 %results like the X-ray diffraction shown earlier.  
 % A system with forced pi stacking (via the dipole method) could help us explain (or not) the missing peak in the wide angle data
+%BJC2: would this go in a section about pitfalls of our model if it did prove show pi stacking. 
+%BJC2: It could also be used to refute the pi stacking argument for structuring of the pores if we show that it takes a large amount of energy to force it to even happen.
 
 %MRS2: we should think about where new X-ray data  would go.
+%BJC2: after where we talk about disordered pores?
+
+	\section{Supplemental Information}
 	
+	Monomer configurations
+	\begin{itemize}
+		\item show all pore-to-pore equilibration plots used to prove independence of starting conifiguration
+		\item 3D visualizations of different configurations tested
+		\item 7 monomer per layer configurations
+	\end{itemize}
+	
+	Crosslinking details
+	\begin{itemize}
+		\item Full algorithm? or just detailed description
+		\item Maybe a figure showing the new crosslinks
+	\end{itemize}
+	
+	Ionic conductivity
+	\begin{itemize}
+		\item MSD plots
+	\end{itemize}
 \end{document}
