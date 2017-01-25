@@ -56,26 +56,15 @@ def avg_pore_loc(npores, pos, natoms):
     # Find the average location of the pores w.r.t. x and y
     nT = np.shape(pos)[0]
     comp_ppore = np.shape(pos)[1] / npores
+
     p_center = np.zeros([2, npores, nT])
-
-    # for i in range(nT):
-    #     for j in range(no_pores):
-    #         for k in range(comp_ppore*j, comp_ppore*(j + 1)):
-    #             p_center[:, j, i] += pos[i, k, 0:2]
-    #         p_center[:, j, i] /= comp_ppore  # take the average
-
-    # for i in range(natoms):
-    #     for k in range(np.shape(pos)[1] / natoms):
-    #         for j in range(npores):
-    #             for l in range(nT):
-    #                 p_center[:, j, l] += pos[l, , :2]
 
     for i in range(nT):
         for j in range(npores):
-            p_center[:, j, i] /= comp_ppore
+            for k in range(comp_ppore*j, comp_ppore*(j + 1)):
+                p_center[:, j, i] += pos[i, k, 0:2]
+            p_center[:, j, i] /= comp_ppore  # take the average
 
-    print p_center[:, :, :2]
-    exit()
     return p_center
 
 
@@ -267,8 +256,7 @@ if __name__ == '__main__':
     atoms_to_keep = [a.index for a in t.topology.atoms if a.name in atoms]
     t.restrict_atoms(atoms_to_keep)
     pos = t.xyz
-    print pos[0, -3:-1, :]
-    exit()
+
     nT = np.shape(pos)[0]
 
     traj_start = int(args.start_frame)
@@ -277,24 +265,24 @@ if __name__ == '__main__':
     comp_ppore = tot_atoms/n_pores
 
     p_centers = avg_pore_loc(n_pores, pos, len(atoms))
-
+    print p_centers[:, :, 0]
     distances = 6  # number of p2p distances to calculate. My algorithm isn't smart enough for anything but six yet
     p2ps = p2p(p_centers, distances)
-
+    print p2ps[:, 0]
     p2p_avg, p2p_std, equil = p2p_stats(p2ps, '%s' % args.exclude, '%s' % args.nboot, '%s' % args.equil)
 
     print 'Average Pore to Pore distance: %s' % p2p_avg
     print 'Standard Deviation of Pore to Pore distances: %s' % p2p_std
 
-    # labels = ['1-2', '1-3', '1-4', '2-3', '2-4', '3-4']
-    # plt.figure(1)
-    # for i in range(distances):
-    #     if i != int(args.exclude):
-    #         plt.plot(t.time, p2ps[i, :], label='%s' % labels[i])
-    # plt.title('Pore to Pore Distance Equilibration')
-    # plt.ylabel('Distance between pores (nm)')
-    # plt.xlabel('Time (ps)')
-    # plt.legend(loc=1, fontsize=18)
+    labels = ['1-2', '1-3', '1-4', '2-3', '2-4', '3-4']
+    plt.figure(1)
+    for i in range(distances):
+        if i != int(args.exclude):
+            plt.plot(t.time, p2ps[i, :], label='%s' % labels[i])
+    plt.title('Pore to Pore Distance Equilibration')
+    plt.ylabel('Distance between pores (nm)')
+    plt.xlabel('Time (ps)')
+    plt.legend(loc=1, fontsize=18)
 
     density, r, bin_width = compdensity(pos, p_centers, 300, n_pores, buffer=0)
     plt.figure(2)

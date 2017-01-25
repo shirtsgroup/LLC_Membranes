@@ -22,7 +22,7 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Duplicate points periodically in the x-y directions')
 
-    parser.add_argument('-g', '--gro', default='original.gro', help='Coordinate file')
+    parser.add_argument('-g', '--gro', default='initial.gro', help='Coordinate file')
     parser.add_argument('-o', '--output', default='NaPore_Pi.top', help='Name of output file')
     parser.add_argument('-a', '--atoms', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='Name of carbons in ring')
     parser.add_argument('-d', '--distance', default=0.1, help='Distance to offset dipole from ring (Angstroms)')
@@ -30,6 +30,8 @@ def initialize():
     parser.add_argument('-t', '--toplines', default=2, help='Number of lines at the top of the .gro file to ignore')
     parser.add_argument('-v', '--valence', default=1, help = 'Valence of counterion')
     parser.add_argument('-c', '--charge', default=1, help= 'Charge on dipoles')
+    parser.add_argument('-r', '--restraints', default='on', help='Put "on" if you want position restraint on atoms')
+    parser.add_argument('-A', '--axis', default='xy', help='Axis to restrain along with position restraints')
 
     args = parser.parse_args()
 
@@ -298,6 +300,38 @@ def exclusions(coord_file, monomers, valence, toplines, atoms, n_atoms, vsites):
 
     return exclusions
 
+
+def position_restraints(file, atoms, axis):
+    """
+    Restrain the selected atoms in desired directions
+    :param file: a list where each entry is a line from a coordinate file (.gro)
+    :param atoms: the atoms to positions restrain
+    :param axis: which direction to restrain
+    :return: an array of position restraints formatted for easy writing into the topology (.itp)
+    """
+
+    # define force constants in their respective directions
+    fcx = 0
+    fcy = 0
+    fcz = 0
+    if 'x' in axis:
+        fcx = 100000  # a large enough restraint to cause a large movement penalty
+    if 'y' in axis:
+        fcy = 100000
+    if 'z' in axis:
+        fcz = 100000
+
+    atom_numbers = []  # find the numbers of the atoms which we are restraining
+    for line in file:
+        if str.strip(line[10:15]) in atoms:
+            atom_numbers.append(int(line[15:20]))
+
+    restraints = np.zeros([5, len(atom_numbers)], dtype=int)  # organize them into a list which can be translated to a topology
+    for i in range(len(atom_numbers)):
+        restraints[:, i] = [atom_numbers[i], 1, fcx, fcy, fcz]  # See: http://www.gromacs.org/Documentation/How-tos/Position_Restraints
+
+    return restraints
+
 if __name__ == "__main__":
 
     args = initialize()
@@ -387,6 +421,14 @@ if __name__ == "__main__":
         for j in range(np.shape(exclusions)[0]):
             f.write('{:<8d}'.format(int(exclusions[j, i])))
         f.write("\n")
+
+    if args.restraints == 'on':
+        restraints = position_restraints(gro, args.atoms, '%s' % args.axis)
+
+        f.write("\n[ position_restraints ]\n")
+        for i in range(restraints.shape[1]):
+            f.write('{:6d}{:5d}{:7d}{:7d}{:7d}'.format(restraints[0, i], restraints[1, i], restraints[2, i],
+                                                       restraints[3, i], restraints[4, i]) + "\n")
 
     f.close()
     print 'dipole.itp file written :)'
