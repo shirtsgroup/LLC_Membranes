@@ -4,11 +4,12 @@ import argparse
 import numpy as np
 import mdtraj as md
 import matplotlib.pyplot as plt
+import math
 
 
 def initialize():
 
-    parser = argparse.ArgumentParser(description='Calculate the number densit of selected groups along axis')
+    parser = argparse.ArgumentParser(description='Calculate the number density of selected groups along axis')
 
     parser.add_argument('-g', '--gro', default='wiggle.gro', help='Name of coordinate file')
     parser.add_argument('-t', '--traj', default='wiggle.trr', help='Trajectory file (.trr, .xtc should work)')
@@ -17,7 +18,7 @@ def initialize():
     parser.add_argument('-a', '--atoms', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='List of atoms of interest')
     parser.add_argument('-c', '--center', default='yes', help='Set this to yes if you want to calculate the number'
                                                               'density based on the centers of the selected atoms')
-    parser.add_argument('-b', '--bin', default=.1, help='bin size (nm)')
+    parser.add_argument('-b', '--bin', default=.4, type=float, help='bin size (nm)')
 
     args = parser.parse_args()
 
@@ -59,6 +60,7 @@ def density(pos, axis, bin, box):
     """
 
     b = box[-1, axis]
+    print b
     x = np.linspace(0, b, b/bin + 1)
     d = np.zeros([len(x)])
     for i in range(np.shape(pos)[1]):
@@ -92,10 +94,53 @@ if __name__ == '__main__':
     c = centers(pos, args.atoms)
     x, d = density(c, axis, float(args.bin), box)
 
+
     d = np.trim_zeros(d)
-    x = np.linspace(0, float(args.bin)*len(d), len(d))
+    x = np.linspace(0, args.bin*len(d), len(d))
+    f = open('d', 'w')
+    np.save(f, d)
+    f.close()
+    f = open('x', 'w')
+    np.save(f, x)
+    f.close()
     # avg = np.mean(d)
     # d = np.array([abs(i - avg) for i in d])
+    fft = np.fft.fft(x)
 
-    plt.plot(x, d)
+    # N = fft.shape[-1]
+    # A = np.zeros([N])
+    # phi = np.zeros([N])
+    # f = np.zeros([N])
+    # print np.fft.fftfreq(fft.shape, d=0.1)
+    # for i in range(N):
+    #     A[i] = np.sqrt(fft[i].real ** 2 + fft[i].imag ** 2)
+    #     phi[i] = math.atan2(fft[i].imag, fft[i].real)
+    #     f[i] = A[i]/(2*N)
+
+    # fx = np.zeros([N])
+    # for i in range(N):
+    #     for j in range(N):
+    #         fx[i] += A[]
+
+    N = d.size
+
+    data = d[int(.1*N):int(.9*N)]
+    data = data - np.mean(data)
+    x = x[int(.1*N):int(.9*N)]
+    ps = np.abs(np.fft.fft(data))**2
+
+    time_step = args.bin
+    freqs = np.fft.fftfreq(data.size, time_step)
+    idx = np.argsort(freqs)
+
+    plt.plot(freqs[idx], ps[idx])
+    # plt.plot(x, np.fft.fft(data))
+    plt.title('Power Spectrum')
+    plt.xlabel('Frequency')
+    plt.ylabel('Fourier transformed data squared')
     plt.show()
+
+    # plt.plot(x, d)
+    # plt.xlabel('Distance into membrane, z direction (nm)')
+    # plt.ylabel('Count of benzene centers')
+    # plt.show()

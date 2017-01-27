@@ -12,6 +12,7 @@ import argparse
 from pymbar import timeseries
 import random as ran
 import mdtraj as md
+from scipy.optimize import curve_fit
 
 
 def initialize():
@@ -24,8 +25,8 @@ def initialize():
     parser.add_argument('-a', '--atoms', default=137, help = 'Number of atoms per monomer')
     parser.add_argument('-l', '--layers', default=20, help = 'Number of layers in each pore')
     parser.add_argument('-p', '--pores', default=4, help = 'Number of Pores')
-    parser.add_argument('-c', '--component', default='tails', help = 'Counterion used to track pore positions')
-    parser.add_argument('-f', '--start_frame', default=0, help = 'Frame number to start reading trajectory at')
+    parser.add_argument('-c', '--component', default='NA', help = 'Counterion used to track pore positions')
+    parser.add_argument('-f', '--start_frame', default=278, type=int, help = 'Frame number to start reading trajectory at')
     parser.add_argument('-s', '--layer_distribution', default='uniform', help = 'The distribution of monomers per layer')
     parser.add_argument('-L', '--alt_1', default=6, help = 'Monomers per layer for the first type of alternating layer')
     parser.add_argument('-A', '--alt_2', default=8, help = 'Monomers per layer for the second type of alternating layer')
@@ -36,7 +37,7 @@ def initialize():
     parser.add_argument('-E', '--equil', default='auto', help = 'Frame number where system is equilibrated. "auto" will '
                         'use pymbar.timeseries.DetectEquilibration to determine which frame to start at. It is worth '
                         'double checking its choice manually')
-    parser.add_argument('-x', '--exclude', default=4, help = 'Which pore-to-pore distance to exclude - pass the index of'
+    parser.add_argument('-x', '--exclude', default=3, help = 'Which pore-to-pore distance to exclude - pass the index of'
                                                             'the pore-to-pore distance as written in the list: '
                                                             '["1-2", "1-3", "1-4", "2-3", "2-4", "3-4"] ')
     parser.add_argument('-b', '--nboot', default=2000, help = 'Number of bootstrap trials')
@@ -159,7 +160,7 @@ def p2p_stats(p2ps, exclude, nboot, equil):
     return p2p_avg, p2p_std, t
 
 
-def compdensity(component, pore_centers, start, pores=4, bin_width=0.1, rmax=3.5, buffer=0.0):
+def compdensity(component, pore_centers, start, pores=4, bin_width=0.05, rmax=3.5, buffer=0.0):
 
     """
     :param component: the coordinates of the component(s) which you want a radial distribution of at each frame
@@ -190,7 +191,6 @@ def compdensity(component, pore_centers, start, pores=4, bin_width=0.1, rmax=3.5
     zmax_buff = zmax - thickness * buffer  # Could use buffer/2 depending on how you interpret what buffer % means
     zmin_buff = zmin + thickness * buffer
 
-    # dist_from_center = np.zeros([n_atoms*nT])
     dist_from_center = []
     # Now find the distance from the center of every atom in every frame
     for k in range(start, nT):
@@ -198,18 +198,17 @@ def compdensity(component, pore_centers, start, pores=4, bin_width=0.1, rmax=3.5
             for j in range(n_ppore):
                 if zmin_buff < component[k, i * n_ppore + j, 2] < zmax_buff:
                     dist = np.linalg.norm(component[k, i * n_ppore + j, :2] - pore_centers[:, i, k])
-                    # dist_from_center[k * n_atoms + i * n_ppore + j] = dist
                     dist_from_center.append(dist)
 
     dist_from_center = np.array(dist_from_center)
 
     # Start setting up parameters necessary for binning
     bins = int(rmax/bin_width)  # the total number of bins
-    r = np.linspace(0, rmax, int(bins))  # each discrete radius at which we will measure densities
+    r = np.linspace(0, rmax, int(bins) + 1)  # each discrete radius at which we will measure densities
 
     # Now bin the distances calculated above
     count = 0
-    bin_contents_tails = np.zeros([int(bins)])
+    bin_contents_tails = np.zeros([int(bins) + 1])
     for i in range(len(dist_from_center)):
         distance = dist_from_center[i]
         if distance <= rmax:
@@ -230,6 +229,15 @@ def compdensity(component, pore_centers, start, pores=4, bin_width=0.1, rmax=3.5
 
     return density, r, bin_width
 
+
+def gaus(x, a, sigma):
+    return a*exp(-(x)**2/(2*sigma**2))
+
+from scipy.misc import factorial
+
+
+def poisson(k, lamb):
+    return (lamb**k * np.exp(-lamb)) / factorial(k)
 
 if __name__ == '__main__':
 
@@ -265,12 +273,11 @@ if __name__ == '__main__':
     comp_ppore = tot_atoms/n_pores
 
     p_centers = avg_pore_loc(n_pores, pos, len(atoms))
-    print p_centers[:, :, 0]
+
     distances = 6  # number of p2p distances to calculate. My algorithm isn't smart enough for anything but six yet
     p2ps = p2p(p_centers, distances)
-    print p2ps[:, 0]
-    p2p_avg, p2p_std, equil = p2p_stats(p2ps, '%s' % args.exclude, '%s' % args.nboot, '%s' % args.equil)
 
+    p2p_avg, p2p_std, equil = p2p_stats(p2ps, '%s' % args.exclude, '%s' % args.nboot, '%s' % args.equil)
     print 'Average Pore to Pore distance: %s' % p2p_avg
     print 'Standard Deviation of Pore to Pore distances: %s' % p2p_std
 
@@ -283,12 +290,22 @@ if __name__ == '__main__':
     plt.ylabel('Distance between pores (nm)')
     plt.xlabel('Time (ps)')
     plt.legend(loc=1, fontsize=18)
+    equil = 0
+    density, r, bin_width = compdensity(pos, p_centers, equil, n_pores, buffer=0)
 
-    density, r, bin_width = compdensity(pos, p_centers, 300, n_pores, buffer=0)
+    for i in range(density.shape[-1]):
+        if density[i] == 0:
+            stop = i
+            break
+
+    popt, pcov = curve_fit(gaus, r[:stop], density[:stop], p0=[density[0], 0.4])
+    # parameters, cov_matrix = curve_fit(poisson, r[:stop]/bin_width, density[:stop], p0=[1])
     plt.figure(2)
+    plt.plot(r[:stop], gaus(r[:stop],*popt), 'ro:', label='fit')
+    # plt.plot(r[:stop], poisson(r[:stop]/bin_width, *parameters), 'r-', lw=2)
     plt.title('Component Density Around Pore Center')
     plt.xlabel('Distance from Pore Center (nm)')
     plt.ylabel('Relative Component Density')
-    plt.bar(r, density, bin_width)
+    plt.bar(r[:stop], density[:stop], bin_width)
     plt.show()
 

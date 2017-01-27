@@ -20,23 +20,9 @@ parser.add_argument('-p', '--p2p', default=45, type=float, help = 'Initial Pore 
 parser.add_argument('-n', '--nopores', default=4, type=int, help = 'Number of Pores')
 parser.add_argument('-d', '--dbwl', default=5, type=float, help = 'Distance between layers')
 parser.add_argument('-s', '--layer_distribution', default='uniform', help = 'The distribution of monomes per layer')
-parser.add_argument('-a', '--alt_1', default=6, help='Monomers per layer for the first type of alternating layer')
-parser.add_argument('-A', '--alt_2', default=8, help='Monomers per layer for the second type of alternating layer')
+parser.add_argument('-a', '--alt_1', default=6, type=int, help='Monomers per layer for the first type of alternating layer')
+parser.add_argument('-A', '--alt_2', default=8, type=int, help='Monomers per layer for the second type of alternating layer')
 args = parser.parse_args()
-
-
-def functiontype(type):
-
-    if type == 'HII':
-        f = open("%s/../Structure-Files/HII_Monomer_Configurations/%s" % (location, args.input), "r")
-        no_ions = 1
-        t = 'HII'
-        return f, t, no_ions
-    if type == 'BCC':
-        f = open("%s/../Structure-Files/BCC_Monomer_Configurations/%s" % (location, args.input), "r")
-        no_ions = 2
-        t = 'BCC'
-        return f, t, no_ions
 
 
 def read_pdb_coords(file):
@@ -85,7 +71,9 @@ def read_gro_coords(file):
 
     return xyz, identity, no_atoms, lines_of_text
 
-f, t, no_ions = functiontype(args.type)
+f = open("%s/../Structure-Files/HII_Monomer_Configurations/%s" % (location, args.input), "r")
+t = 'HII'
+no_ions = 1
 
 if args.input.endswith('.pdb'):
     xyz, identity, no_atoms, lines_of_text = read_pdb_coords(f)
@@ -94,17 +82,17 @@ elif args.input.endswith('.gro'):
 else:
     print 'Please input a valid file type (.gro or .pdb)'
 
-layer_distribution = [0]*args.layers*args.nopores
+layer_distribution = np.zeros([args.layers*args.nopores], dtype=int)
 
 if args.layer_distribution == 'uniform':
     for i in range(0, len(layer_distribution)):
         layer_distribution[i] = args.monomers
 if args.layer_distribution == 'alternating':
-    for i in range(0, len(layer_distribution)):
+    for i in range(layer_distribution.shape[-1]):
         if i % 2 == 0:
-            layer_distribution[i] = int(args.alt_1)
+            layer_distribution[i] = args.alt_1
         if i % 2 == 1:
-            layer_distribution[i] = int(args.alt_2)
+            layer_distribution[i] = args.alt_2
 
 no_monomers = args.monomers  # number of monomers packed per layer around a pore
 pore_radius = args.radius  # Radius of pore (unsure of units right now)
@@ -350,10 +338,17 @@ for i in range(np.shape(xyz)[1]):
     xyz[:, i] = x[0, :3]
 
 positions = []
-for i in range(0, len(set(layer_distribution))):  # add a list to positions for each unique value of monomers per layer
+
+# for i in range(0, len(set(layer_distribution))):  # add a list to positions for each unique value of monomers per layer
+#     positions.append([])
+# for i in range(0, len(positions)):
+#     for j in range(0, sorted(list(set(layer_distribution)))[i]):
+#         positions[i].append([])
+
+for i in range(len(np.unique(layer_distribution))):  # add a list to positions for each unique value of monomers per layer
     positions.append([])
-for i in range(0, len(positions)):
-    for j in range(0, sorted(list(set(layer_distribution)))[i]):
+for i in range(len(positions)):
+    for j in range(0, np.sort(np.unique(layer_distribution))[i]):
         positions[i].append([])
 
 x_values = []  # will hold x values in the order that they appear in the positions matrix

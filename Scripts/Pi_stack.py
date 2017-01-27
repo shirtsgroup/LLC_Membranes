@@ -30,7 +30,7 @@ def initialize():
     parser.add_argument('-t', '--toplines', default=2, help='Number of lines at the top of the .gro file to ignore')
     parser.add_argument('-v', '--valence', default=1, help = 'Valence of counterion')
     parser.add_argument('-c', '--charge', default=1, help= 'Charge on dipoles')
-    parser.add_argument('-r', '--restraints', default='on', help='Put "on" if you want position restraint on atoms')
+    parser.add_argument('-r', '--restraints', default='off', help='Put "on" if you want position restraint on atoms')
     parser.add_argument('-A', '--axis', default='xy', help='Axis to restrain along with position restraints')
 
     args = parser.parse_args()
