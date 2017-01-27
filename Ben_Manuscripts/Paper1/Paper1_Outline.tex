@@ -2,6 +2,7 @@
 \title{Predicting Transport in Lyotropic Liquid Crystal Membranes with Molecular Dynamics Simulations -- Outline}
 %MRS2: read over the start of the grant for more ideas about details for the motivation.
 %BJC2: Just noticed this comment before sending it back to you. I'll look at the grant again while editing the next iteration. I think I want to move away from framing the membrane as just a desalination membrane
+%MRS3: I agree - desalination is one possible use, but its more about transport / structure in general.
 \author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble \and Michael R. Shirts} 
 \begin{document}
 	\bibliographystyle{ieeetr}
@@ -54,6 +55,7 @@
 		\begin{itemize}
 			\item Do ions have trouble getting through because of interactions with other things in the pores (e.g. ions, carbonyl groups, benzene rings) -- related to ionic conduction
 			\item Does concentration of ions in the pore repel incoming ions?
+               %MRS3: add potential reasons for transport  about non-ionic solutes as well.           
 		\end{itemize}
 	\end{itemize}
 	 
@@ -65,6 +67,7 @@
 			\item Could also be a difference between lyotropic and thermotropic phases
 		\end{itemize}
 		\item The Colh phase is described as having pores made of disks or layers stacked on top of one another, each containing a set number of monomers. 
+                  %MRS3 rewrite next line to reflect how the thesis will be stated in the paper.
 		\item There is no clear answer in literature defining what that set number of monomers is. I'd like to confirm or deny past predictions
 		\begin{itemize}
 			\item A simple simulation study of a similar molecule (Head group is a sulfonate in the meta position) suggests that there are 4 monomers in each disk
@@ -73,7 +76,8 @@
 		\end{itemize}
 	\end{itemize}
 	
-	%MRS2: fine for now.  I'll think about better phrasing as we go.
+	%MRS3: Take a pass at reprhasing this -- important to get this right. don't start with a preposition.
+
 	To trust our understanding of which structural features are most likely characteristic of the system, and the conclusions drawn thereof, we must show that our molecular model is physically realistic.   
 	\begin{itemize}
 		\item This paper will illustrate the careful development of a predictive molecular model and the steps taken to ensure it mimics the real system as best we can 
@@ -113,10 +117,11 @@
 	%BJC2: It's hard to give much quantitative back up. We decided on this with more qualitative backup. We chose 20 to be safe but probably could have gotten away with less.
 	\begin{itemize}
 		\item Space between membrane layers in z direction - semi-isotropic sims fix z box dimension
-		\item Small number of layers create micellar structure
+		\item Small number of layers create micellar structure %MRS3: specify.
 		\item Beyond 20 layers is unnecessary to get expected configuration
 		\item layers spaced far enough apart to avoid large energy repulsions but close enough to prevent disks slipping between one another ~ 5 angstroms works.
 	\end{itemize}
+%MRS3: what is the thesis? decide what each figure is attempting to communicate to the reader.
 	FIGURE: initial configuration \\
 	caption: A representative initial configuration \\
 	\\
@@ -124,7 +129,7 @@
 	\begin{itemize}
 		\item SAXS gives an idea of Pore-to-Pore distances
 		\item TEM images and rejection give a pore size estimate
-		\item Ran long NPT simulations at 300 K and 1 bar ( > 200 ns )
+		\item Ran long NPT simulations at 300 K and 1 bar ( $>$200 ns )
 	\end{itemize}
 	
 	Using an equilibrated structure, a crosslinking procedure was performed in order to better parallel synthetic procedures. 
@@ -140,10 +145,12 @@
 	Proper selection of initial structural parameters results in an equilibrated model that is experimentally consistent 
 	\begin{itemize}
 		\item Visual perspective \\
+%MRS3: what is the thesis of the figure -- what is it trying to show.  Important when analyzing the outline and deciding what it means.  Make that the caption.
 		FIGURE: show top view and cross section (with pbcs on)\\
 		caption: (a) A top view of an equilibrated LLC membrane system shows defined pores and the expected hexagonal morphology. \\
 		(b) A side vew of an equilibrated LLC membrane system shows the straight cylindrical pores, emphasized by large blue sodium ions 
 		\item System validated using multiple monomer configurations 
+                  %MRS3: be mroe precise what ``validation'' means.
 		\item Pore to pore distance
 		\begin{itemize}
 			\item We know from SAXS data what the distance between pores should be
@@ -151,6 +158,7 @@
 			\item Crosslinking locks in structure, maintaining pore distances even after long simulations
 			\item Simulated SAXS data
 		\end{itemize}
+                %MRS3: see above on putting in thesis and what you are trying to convince readers.
 		FIGURE - perhaps a four panel figure
 		(a) Experimental Small Angle X-ray scattering data \\
 		(b) Equilibration of pores monitored by measuring the distance between pores over time \\
@@ -163,15 +171,19 @@
 	The monomers are arranged into disks containing XXXX monomers in each layer. (Or are there defined layers -- I need to test this idea a bit more) 
 	%MRS2: yes, examine this more. The idea of # of defined layers may be another idea to challenge.
 	%BJC2: I'd like to talk to you more about some calculations before I form a thesis. And that will guide the rest of this paragraph 
+        %MRS3: great, we'll talk tomorrow.  If it is disordered, then there are two kinds of disorder people weren't really talking about -- disorder in the z direction, and disorder in the radial direction.
 	\begin{itemize}
 		\item Hypothesis: There are an average of 7 monomers per layer when defined per unit volume but there are not well-defined layers as pictured in the literature. While long range order is maintained, hexagonal mesophases are disordered within their hydrophilic and hydrophobic domains. Staying completely ordered, stacked on top of each other is not entropically favorable.
 		\item It has been suggested that there are 4 monomers in a each disk/layer, however, simulations have shown that this leads to unstable configurations with dimensions that are too small compared to experiment.
+%MRS3: write as it will appear in the paper.  Add ``will be done'' notes in comments.
 		\item Stable simulations with 6 and 7 monomers have been performed (will do one with five soon) which give structural characteristics consistent with experiment
 		\item Stable systems have also been simulated consisting of varying numbers of monomers per layer
 		\item This suggests that the arrangement of monomers is more complicated than simple layers stacked on top of each other
 		\item Density of components along Z axis \\
 		FIGURE: density of component along z axis (maybe FT for clarity)
-		caption: The density of head groups along the axis parallel to the pores, as defined by the centroid of each benzene ring. There are no clear layers despite the defined layers in the starting configuration.
+		caption: The density of head groups along the axis parallel to the pores, as defined by the centroid of each benzene ring. 
+%MRS3: aha, this here below is a thesis, something you are convincing the reader is true.
+There are no clear layers despite the defined layers in the starting configuration.
 		
 	\end{itemize}
 	
@@ -186,6 +198,7 @@
 		\item Ions may play a role in transport, hindering flux of solute and solvent by slowing their diffusion
 		\item The membrane may exhibit the permeability-selectivity tradeoff inherent to solution-diffusion type membranes.
 		\\FIGURE - plot from grant - sodium, benzene, tail densities in pores
+                %MRS3: again, thesis.
 		caption: The density of sodium (blue), benzene (red), and alkyl tails (cyan) surrounding the membrane pore centers. The center of the pore is a soup of the three components as opposed to a previously assumed hollow region. 
 	\end{itemize}	
 	
@@ -220,6 +233,7 @@
 	%MRS2: or not even enumerate all the specific questions, just that it is a generalizable model.
 	%BJC2: Okay, then is this even a paragraph? It could just be a final sentence or just moved to the conclusions
 	The procedure used to create and validate our model can be used to evaluate other liquid crystalline assemblies
+        %MRS3: I don't think we really need to explore all the other possibilities - just that it allows for design of new nanoporous membranes. 
 	\begin{itemize}
 		\item Liquid crystal used - or a mixture of different liquid crystals
 		\item Minor structural variations (e.g. 7, 8, 9, 10, 11 ... CH2's in the tails)
@@ -236,6 +250,7 @@
 		\item There are likely no defined layers
 		\item Results presented for Colh phase monomer but can be adapted to other LCs
 		\item Model can be used for prediction of transport properties in new membranes
+%MRS3: probably don't need to talk about this, since we don't present these results.
 		\item We will solvate the system to establish procedures for HII phase prediction
 	\end{itemize}
 	%MRS2: should this be in there you discussed in the email?
@@ -250,23 +265,24 @@
 	
 	%MRS2: we should think about where new X-ray data  would go.
 	%BJC2: after where we talk about disordered pores?
-	
+        %MRS3: sure, sounds good.   LEt's talk about what resolution on pores we can get from simulation.	
 	\section{Supplemental Information}
 	
 	Monomer configurations
 	\begin{itemize}
 		\item show all pore-to-pore equilibration plots used to prove independence of starting conifiguration
 		\item 3D visualizations of different configurations tested
-		\item 7 monomer per layer configurations
+		\item 7 monomer per layer configurations  %MRS3: and others if needed.
 	\end{itemize}
 	
 	\noindent Crosslinking details
 	\begin{itemize}
+          %MRS3: we can decide, but enough detail to replicate.  Should have the code in a repository that can be distributed.
 		\item Full algorithm? or just detailed description
-		\item Maybe a figure showing the new crosslinks
+		\item Maybe a figure showing the new crosslinks %MRS3: yes.
 	\end{itemize}
 	
-	\noindent Ionic conductivity
+	\noindent Ionic conductivity % plus more details on implementation.
 	\begin{itemize}
 		\item MSD plots
 	\end{itemize}
