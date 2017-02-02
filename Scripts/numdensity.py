@@ -15,12 +15,10 @@ def initialize():
     parser.add_argument('-t', '--traj', default='wiggle.trr', help='Trajectory file (.trr, .xtc should work)')
     parser.add_argument('-d', '--axis', default='z', help='Axis along which to calculate number density. If you put '
                                                           'anything other than x, y or z, it will default to z')
-    parser.add_argument('-a', '--atoms', default=['C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C21', 'C22',
-                 'C23', 'C24', 'C25', 'C26', 'C27', 'C28', 'C29', 'C30', 'C31', 'C32', 'C33', 'C34', 'C35', 'C36', 'C37',
-                 'C38', 'C39', 'C40', 'C41', 'C42', 'C43', 'C44', 'C45', 'C46', 'C47', 'C48'], help='List of atoms of interest')
+    parser.add_argument('-a', '--atoms', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='List of atoms of interest')
     parser.add_argument('-c', '--center', default='yes', help='Set this to yes if you want to calculate the number'
                                                               'density based on the centers of the selected atoms')
-    parser.add_argument('-b', '--bin', default=.01, type=float, help='bin size (nm)')
+    parser.add_argument('-b', '--bin', default=.1, type=float, help='bin size (nm)')
 
     args = parser.parse_args()
 
@@ -49,6 +47,37 @@ def centers(pos, atoms):
             c[i, j, :] = sum
 
     return c
+
+
+def d_dist(pos, box, bin):
+    """
+    Find the distribution of distances of components from each (basically a radial distribution function)
+    :param pos: A numpy array of positions of components of interest
+    :param box: A numpy array of box vectors used to find the maximum distance
+    :return: Counts of components at a distance vs. distance
+    """
+    nT = box.shape[0]
+    nV = box.shape[1]
+    nA = pos.shape[1]
+    max_d = 0
+    for i in range(nT):
+        for j in range(nV):
+           if box[i, j] > max_d:
+               max_d = box[i, j]
+
+    r = np.linspace(0, max_d, max_d/bin + 1)
+    dist = np.zeros(len(r))
+    bins = len(dist)
+
+    for i in range(nT):
+        for j in range(nA):
+            for k in range(nA):
+                if j != k:
+                    d = np.linalg.norm(pos[i, j, :] - pos[i, k, :])
+                    bin = int(bins * (d / max_d))  # rounds down
+                    dist[bin] += 1
+
+    return dist, r
 
 
 def density(pos, axis, bin, box):
@@ -121,8 +150,6 @@ if __name__ == '__main__':
     t.restrict_atoms(keep)
     pos = t.xyz  # get just the coordinates
     box = t.unitcell_lengths  # get the unit cell lengths
-    print np.shape(box)
-    exit()
     frames = np.shape(pos)[0]
 
     # find out along which axis we are going to analyze
@@ -134,7 +161,11 @@ if __name__ == '__main__':
         axis = 2
 
     c = centers(pos, args.atoms)
-    x, d = density(c, axis, float(args.bin), box)
+    dist, r = d_dist(c, box, args.bin)  # this takes forever. Use a gromacs tool. Probably gmx rdf
+    plt.bar(r, dist, args.bin)
+    plt.show()
+
+    x, d = density(c, axis, args.bin, box)
 
     d = np.trim_zeros(d)
     x = np.linspace(0, args.bin*len(d), len(d))

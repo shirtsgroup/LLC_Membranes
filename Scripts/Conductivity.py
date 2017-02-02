@@ -94,7 +94,7 @@ parser.add_argument('-m', '--nMC', default=1000, help='Number of Monte Carlo tri
 parser.add_argument('-a', '--arrays', default='on', help='If positions, id array are already saved')
 parser.add_argument('-S', '--suffix', default='array612ns', help='Suffix to append to position and id arrays when saving')
 parser.add_argument('-r', '--frontfrac', default=0.05, help='Where to start fitting line for diffusivity calc')
-parser.add_argument('-F', '--fracshow', default=.4, help='Percent of graph to show, also where to stop fitting line'
+parser.add_argument('-F', '--fracshow', default=.8, help='Percent of graph to show, also where to stop fitting line'
                                                          'during diffusivity calculation')
 parser.add_argument('-t', '--nTsub', default=20, help='Number of subtrajectories to break into for generating stats')
 parser.add_argument('-M', '--method', default='B', help='Which method to use to calculate Ionic Conductivity: CD ='

@@ -13,6 +13,7 @@ def initialize():
     parser.add_argument('-f', '--file', default='wiggle_solv.trr', help='Trajectory file (.xtc or .trr should work)')
     parser.add_argument('-c', '--coord', default='wiggle_solv.gro', help='A coordinate file needed by MD traj')
     parser.add_argument('-r', '--radius', default=.5, type=float, help='Radius of cylinder defining pore')
+    parser.add_argument('-b', '--buffer', default=0.1, type=float, help='Percent into membrane to start calculations')
 
     args = parser.parse_args()
 
@@ -87,15 +88,24 @@ if __name__ == "__main__":
     #     for a in t.topology.atoms:
     #         if a.name in benz_carbs:
     #             z.append(t.xyz[i, a.index, 2])
-    #     zmax[i] = max(z)
-    #     zmin[i] = min(z)
-
+    #     buff = (max(z) - min(z))*args.buffer
+    #     zmax[i] = max(z) - buff
+    #     zmin[i] = min(z) + buff
+    #
     # atoms = ['NA']
     # atoms_to_keep = [a.index for a in t.topology.atoms if a.name in atoms or 'HOH' in str(a.residue)]  # SOL is stored as HOH in the traj
     # t.restrict_atoms(atoms_to_keep)
     # pos = t.xyz
-
-
+    #
+    # f = open('zmax', 'w')
+    # np.save(f, zmax)
+    # f.close()
+    # f = open('zmin', 'w')
+    # np.save(f, zmin)
+    # f.close()
+    # f = open('pos', 'w')
+    # np.save(f, pos)
+    # f.close()
     zmax = np.load('zmax')
     zmin = np.load('zmin')
     pos = np.load('pos')
@@ -113,7 +123,7 @@ if __name__ == "__main__":
 
     pcenters = avg_pore_loc(4, filtered_NA)
     water_counts = cylinder_region(water, zmin, zmax, args.radius)
-    t = np.linspace(0, 50, 51)
+    t = np.linspace(0, nT - 1, nT)
     plt.plot(t, water_counts)
     plt.show()
 

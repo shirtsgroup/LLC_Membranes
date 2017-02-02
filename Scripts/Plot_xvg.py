@@ -47,16 +47,21 @@ def extract_data(xvg, start_fit, end_fit):
     while a[data_start][x_end] != ' ':
         x_end += 1
 
+    fields = len(a[data_start].split())
+    data = np.zeros([len(a) - data_start, fields])
+
     for i in range(data_start, len(a)):
-        x.append(float(a[i][0:x_end]))
-        if xvg == 'rdf.xvg':
-            y.append(float(a[i][x_end + 1:x_end + 10]))
-        elif xvg == 'efield.xvg':
-            y.append(float(a[i][34:46]))
-        else:
-            y.append(float(a[i][x_end + 1:len(a[i])]))
-    print len(y)
-    print y.index(max(y))
+        line = a[i].split()
+        for j in range(fields):
+            data[i - data_start, j] = line[j]
+
+        # x.append(float(a[i][0:x_end]))
+        # if xvg == 'rdf.xvg':
+        #     y.append(float(a[i][x_end + 1:x_end + 10]))
+        # elif xvg == 'efield.xvg':
+        #     y.append(float(a[i][34:46]))
+        # else:
+        #     y.append(float(a[i][x_end + 1:len(a[i])]))
 
     if args.fit == 'on':
         dt = x[1] - x[0]
@@ -67,7 +72,7 @@ def extract_data(xvg, start_fit, end_fit):
         y_fit, r_squared, std, coeff = Poly_fit.poly_fit(dt*np.array(range(startMSD, endMSD)), y[startMSD:endMSD], 1)
         return y_fit, coeff
 
-    return x, y, title, xlabel, ylabel
+    return data, title, xlabel, ylabel
 
 if __name__ == '__main__':
     import numpy as np
@@ -78,16 +83,23 @@ if __name__ == '__main__':
         plt.plot(x[int(np.floor(start_fit*len(x))):int(np.floor(end_fit*len(x)))], y_fit)
         print 'Diffusion Coefficient: %s' % (coeff[1]/(2*0.1))
     else:
-        x, y, title, xlabel, ylabel = extract_data(args.xvg, start_fit, end_fit)
+        data, title, xlabel, ylabel = extract_data(args.xvg, start_fit, end_fit)
     # print 'Mean Value: %s' % np.mean(y[50:len(y) - 1])
-    print 'Mean Value: %s' % np.mean(y[12:50])
-    print 'Standard Deviation: %s' % np.std(y[50:len(y) - 1])
-    maximum = max(y)
-    minimum = min(y[int(len(y)/5.0):len(y)])
-    print 'V_drop = %s' % (maximum - minimum)
-    print len(x)
-    print len(y)
-    plt.plot(x, y)
+    # print 'Mean Value: %s' % np.mean(y[12:50])
+    # print 'Standard Deviation: %s' % np.std(y[50:len(y) - 1])
+    # maximum = max(y)
+    # minimum = min(y[int(len(y)/5.0):len(y)])
+    # print 'V_drop = %s' % (maximum - minimum)
+    # print len(x)
+    # print len(y)
+    # titles = ['Pres-XX', 'Pres-XY', 'Pres-XZ', 'Pres-YX', 'Pres-YY', 'Pres-YZ', 'Pres-ZX', 'Pres-ZY', 'Pres-ZZ']
+
+    for i in range(1, data.shape[1]):
+        plt.plot(data[:, 0], data[:, i])
+        plt.xlabel('%s' % xlabel)
+        plt.ylabel('%s' % ylabel)
+        plt.show()
+
     plt.ylabel('%s' % ylabel, fontsize=22)
     plt.xlabel('%s' % xlabel, fontsize=22)
     plt.xticks(size=18)

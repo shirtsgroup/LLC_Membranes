@@ -94,7 +94,8 @@ if __name__ == "__main__":
         f.write('Frame %s' % (i + 1) + '\n')
         f.write('{:^6}{:^8}{:^8}{:^8}'.format('Atom', 'x', 'y', 'z') + '\n')
         for j in range(atoms):
-            f.write('{:6s}{:8.3f}{:8.3f}{:8.3f}'.format(id[0, j], pos[0, j, i], pos[1, j, i], pos[2, j, i]) + '\n')
+            if id[0, j] != 'PI':
+                f.write('{:6s}{:8.3f}{:8.3f}{:8.3f}'.format(id[0, j], pos[0, j, i], pos[1, j, i], pos[2, j, i]) + '\n')
         f.write('{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}'.format(box[0, i], box[1, i], box[2, i], box[3, i]
                                                                                 , box[4, i], box[5, i], box[6, i]
                                                                                 , box[7, i], box[8, i]) + '\n')
