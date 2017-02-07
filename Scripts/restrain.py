@@ -2,9 +2,11 @@
 
 """
     The purpose of this script is to edit the topology file of a system containing molecules which have a benzene ring
-    in order to create an artificial dipole which will as electron clouds participating in a pi bond. The dipole is
-    created by centering two virtual sites above and below the plane of the benzene ring and assigning them appropriate
-    charges values.
+    in order to create your choice of two things:
+    (1) An artificial dipole which will act as electron clouds participating in a pi bond. The dipole is
+        created by centering two virtual sites above and below the plane of the benzene ring and assigning them
+        appropriate charges values.
+    (2) Add position restraints with a given force constant to chosen atoms w.r.t. to a specified axis or axes
 """
 
 import argparse
@@ -22,14 +24,20 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Duplicate points periodically in the x-y directions')
 
-    parser.add_argument('-g', '--gro', default='initial.gro', help='Coordinate file')
+    parser.add_argument('-g', '--gro', default='initial.gro', type=str, help='Coordinate file')
+    parser.add_argument('-o', '--out', default='dipole.itp', type=str, help='Name of output topology file')
+    parser.add_argument('-r', '--restraints', default='on', help='Put "on" if you want position restraint on atoms')
+    parser.add_argument('-D', '--dipoles', default='off', help='Put "on" if you want to create dipoles')
+    parser.add_argument('-w', '--write_gro', default='off', help='Put "on" if you want to create a .gro with dipoles '
+                                                                 'placed in the right spots')
+    parser.add_argument('-f', '--f_const', default=1000, type=int, help='Force constant')
     parser.add_argument('-a', '--atoms', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='Name of carbons in ring')
     parser.add_argument('-d', '--distance', default=0.1, help='Distance to offset dipole from ring (Angstroms)')
     parser.add_argument('-m', '--monomer', default='NAcarb11V_dummy', help='Which monomer topology is being used')
     parser.add_argument('-t', '--toplines', default=2, help='Number of lines at the top of the .gro file to ignore')
     parser.add_argument('-v', '--valence', default=1, help = 'Valence of counterion')
     parser.add_argument('-c', '--charge', default=10, help= 'Charge on dipoles')
-    parser.add_argument('-r', '--restraints', default='off', help='Put "on" if you want position restraint on atoms')
+
     parser.add_argument('-A', '--axis', default='xy', help='Axis to restrain along with position restraints')
 
     args = parser.parse_args()
@@ -58,19 +66,24 @@ def get_coordinates(file, top_lines, atoms):
 
     coords = np.zeros([3, count])
     all_coords = np.zeros([3, n_atoms])
+    ids = np.zeros([n_atoms], dtype=object)
+    res = np.zeros([n_atoms], dtype=object)
 
     count = 0
     for i in range(top_lines, n_atoms + top_lines):
         all_coords[0, i - top_lines] = float(file[i][20:28])
         all_coords[1, i - top_lines] = float(file[i][28:36])
         all_coords[2, i - top_lines] = float(file[i][36:44])
+        ids[i - top_lines] = str.strip(file[i][10:15])
+        res[i - top_lines] = str.strip(file[i][5:10])
         if str.strip(file[i][10:15]) in atoms:
             coords[0, count] = float(file[i][20:28])
             coords[1, count] = float(file[i][28:36])
             coords[2, count] = float(file[i][36:44])
             count += 1
 
-    return coords, n_atoms, all_coords
+
+    return coords, n_atoms, all_coords, ids, res
 
 
 def ring_center(coords, atoms):
@@ -314,11 +327,11 @@ def position_restraints(file, atoms, axis):
     fcy = 0
     fcz = 0
     if 'x' in axis:
-        fcx = 100000  # a large enough restraint to cause a large movement penalty
+        fcx = args.f_const  # a large enough restraint to cause a large movement penalty
     if 'y' in axis:
-        fcy = 100000
+        fcy = args.f_const
     if 'z' in axis:
-        fcz = 100000
+        fcz = args.f_const
 
     atom_numbers = []  # find the numbers of the atoms which we are restraining
     for line in file:
@@ -335,24 +348,17 @@ if __name__ == "__main__":
 
     args = initialize()
 
-    f = open('%s' % args.gro, 'r')
+    f = open(args.gro, 'r')
     gro = []
     for line in f:
         gro.append(line)
     f.close()
 
-    coords, atoms, all_coords = get_coordinates(gro, 2, args.atoms)
+    coords, atoms, all_coords = get_coordinates(gro, 2, args.atoms)[:3]
 
     centers = ring_center(coords, args.atoms)
 
-    perp_vectors = perpendicular_vectors(coords, args.atoms)
-
-    top_poles, bot_poles = dipole_points(centers, perp_vectors, float(args.distance)/10) #convert distance to nanometers
-
     rings = np.shape(centers)[1]
-
-    valence = int(args.valence)
-    write_gro(top_poles, bot_poles, gro, rings, 2, valence)
 
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Location of this script
 
@@ -364,70 +370,88 @@ if __name__ == "__main__":
 
     f.close()
 
-    Assembly_itp.write_file(a, 'on', 'dipole.itp', rings)
+    Assembly_itp.write_file(a, 'on', args.out, rings)
 
-    # Parameters for virtual site :
-    #      /i\        i, j and k are the points from the plane chosen
-    #     /   \
-    #    /  C  \
-    #  j/______ \k
-    # Using every other carbon in the benzene rings makes the above triangle equilateral which corresponds to the
-    # following parameters
-    a = 1.0 / 3.0  # distance along vector rij to reach the same 'height' as C
-    b = 1.0 / 3.0  # distance along vector rik to reach the same 'height' as C
-    c = float(args.distance)  # The distance out of the plane to place a virtual site
-    funct = 4  # this specifies the 3out type of virtual site
-    vsites = virtual_sites(all_coords, np.shape(centers)[1], valence, a, b, c, funct)
-    excluded_atoms = ['C', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'O', 'O1', 'O2', 'C7', 'C21', 'C35', 'H', 'H1', 'H2',
-                      'H3', 'H27', 'H28', 'H52', 'H53', 'C8', 'C22', 'C36']
-    exclusions = exclusions(gro, np.shape(centers)[1], valence, 2, excluded_atoms, atoms, vsites)
+    if args.dipoles == 'on':
 
-    f = open('dipole.itp', 'r')
-    a = []
-    atoms_count = 0
-    for line in f:
-        a.append(line)
+        perp_vectors = perpendicular_vectors(coords, args.atoms)
 
-    f.close()
-    for i in range(len(a) - 1):
-        if a[i].count('[ atoms ]') == 1:
-            while a[atoms_count] != '\n':
-                atoms_count += 1
-            break
-        atoms_count += 1
+        top_poles, bot_poles = dipole_points(centers, perp_vectors, float(args.distance)/10) #convert distance to nanometers
 
-    charge = float(args.charge)
-    for i in range(rings*2):
-        atom_no = atoms + i + 1 - (1/valence)*rings
-        a.insert(atoms_count, '{:5d}{:>5s}{:6d}{:>6s}{:>6s}{:7d}{:5s}{:>1.6f}{:5s}{:2.5f}'.format(atom_no,
-                                'PI', 1, 'HII', 'PI', atom_no,'', (-1)**i * charge,'', 0.00000) + "\n")
-        atoms_count += 1
+        valence = int(args.valence)
 
-    f = open('dipole.itp', 'w')
+        if args.write_gro == 'on':
+            write_gro(top_poles, bot_poles, gro, rings, 2, valence)
 
-    for line in a:
-        f.write(line)
+        # Parameters for virtual site :
+        #      /i\        i, j and k are the points from the plane chosen
+        #     /   \
+        #    /  C  \
+        #  j/______ \k
+        # Using every other carbon in the benzene rings makes the above triangle equilateral which corresponds to the
+        # following parameters
 
-    f.write("\n[ virtual_sites3 ]\n")
-    f.write("; Site   from                  funct         a             b             c" + "\n")
-    for i in range(rings*2):
-        f.write('{:<8d}{:<8d}{:<8d}{:<8d}{:<8d}{:<1.9f}{:5s}{:<1.9f}{:5s}{:<1.9f}'.format(int(vsites[0, i]), int(vsites[1, i]),
-                                                                int(vsites[2, i]), int(vsites[3, i]), int(vsites[4, i]),
-                                                                vsites[5, i],'', vsites[6, i],'', vsites[7, i]) + "\n")
+        a = 1.0 / 3.0  # distance along vector rij to reach the same 'height' as C
+        b = 1.0 / 3.0  # distance along vector rik to reach the same 'height' as C
+        c = float(args.distance)  # The distance out of the plane to place a virtual site
+        funct = 4  # this specifies the 3out type of virtual site
+        vsites = virtual_sites(all_coords, np.shape(centers)[1], valence, a, b, c, funct)
+        excluded_atoms = ['C', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'O', 'O1', 'O2', 'C7', 'C21', 'C35', 'H', 'H1', 'H2',
+                          'H3', 'H27', 'H28', 'H52', 'H53', 'C8', 'C22', 'C36']
+        exclusions = exclusions(gro, np.shape(centers)[1], valence, 2, excluded_atoms, atoms, vsites)
 
-    f.write("\n[ exclusions ]\n")
-    for i in range(rings*2):
-        for j in range(np.shape(exclusions)[0]):
-            f.write('{:<8d}'.format(int(exclusions[j, i])))
-        f.write("\n")
+        f = open(args.out, 'r')
+        a = []
+        atoms_count = 0
+        for line in f:
+            a.append(line)
+
+        f.close()
+        for i in range(len(a) - 1):
+            if a[i].count('[ atoms ]') == 1:
+                while a[atoms_count] != '\n':
+                    atoms_count += 1
+                break
+            atoms_count += 1
+
+        charge = float(args.charge)
+        for i in range(rings*2):
+            atom_no = atoms + i + 1 - (1/valence)*rings
+            a.insert(atoms_count, '{:5d}{:>5s}{:6d}{:>6s}{:>6s}{:7d}{:5s}{:>1.6f}{:5s}{:2.5f}'.format(atom_no,
+                                    'PI', 1, 'HII', 'PI', atom_no,'', (-1)**i * charge,'', 0.00000) + "\n")
+            atoms_count += 1
+
+        f = open(args.out, 'w')
+
+        for line in a:
+            f.write(line)
+
+        f.write("\n[ virtual_sites3 ]\n")
+        f.write("; Site   from                  funct         a             b             c" + "\n")
+        for i in range(rings*2):
+            f.write('{:<8d}{:<8d}{:<8d}{:<8d}{:<8d}{:<1.9f}{:5s}{:<1.9f}{:5s}{:<1.9f}'.format(int(vsites[0, i]), int(vsites[1, i]),
+                                                                    int(vsites[2, i]), int(vsites[3, i]), int(vsites[4, i]),
+                                                                    vsites[5, i],'', vsites[6, i],'', vsites[7, i]) + "\n")
+
+        f.write("\n[ exclusions ]\n")
+        for i in range(rings*2):
+            for j in range(np.shape(exclusions)[0]):
+                f.write('{:<8d}'.format(int(exclusions[j, i])))
+            f.write("\n")
+
+        f.close()
 
     if args.restraints == 'on':
+
         restraints = position_restraints(gro, args.atoms, '%s' % args.axis)
+
+        f = open(args.out, 'a')  # 'a' means append
 
         f.write("\n[ position_restraints ]\n")
         for i in range(restraints.shape[1]):
             f.write('{:6d}{:5d}{:7d}{:7d}{:7d}'.format(restraints[0, i], restraints[1, i], restraints[2, i],
                                                        restraints[3, i], restraints[4, i]) + "\n")
 
-    f.close()
+        f.close()
+
     print 'dipole.itp file written :)'

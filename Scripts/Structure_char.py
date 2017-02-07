@@ -37,7 +37,7 @@ def initialize():
     parser.add_argument('-E', '--equil', default='auto', help = 'Frame number where system is equilibrated. "auto" will '
                         'use pymbar.timeseries.DetectEquilibration to determine which frame to start at. It is worth '
                         'double checking its choice manually')
-    parser.add_argument('-x', '--exclude', default=5, help = 'Which pore-to-pore distance to exclude - pass the index of'
+    parser.add_argument('-x', '--exclude', default=4, help = 'Which pore-to-pore distance to exclude - pass the index of'
                                                             'the pore-to-pore distance as written in the list: '
                                                             '["1-2", "1-3", "1-4", "2-3", "2-4", "3-4"] ')
     parser.add_argument('-b', '--nboot', default=2000, help = 'Number of bootstrap trials')
@@ -50,21 +50,38 @@ def avg_pore_loc(npores, pos, natoms):
     """
     :param no_pores: the number of pores in the unit cell
     :param pos: the coordinates of the component(s) which you are using to locate the pore centers
-                      (numpy array with dimensions: [3 (xyz coordinates), no components, no frames])
+                      (numpy array with dimensions: [no frames, no components, xyz coordinates, ] or just
+                      [no components, xyz coordinates] for a single frame)
     :return: numpy array containing the x, y coordinates of the center of each pore at each frame
     """
 
     # Find the average location of the pores w.r.t. x and y
-    nT = np.shape(pos)[0]
-    comp_ppore = np.shape(pos)[1] / npores
 
-    p_center = np.zeros([2, npores, nT])
+    if len(pos.shape) == 3:  # multiple frame
 
-    for i in range(nT):
+        nT = np.shape(pos)[0]
+        comp_ppore = np.shape(pos)[1] / npores
+
+        p_center = np.zeros([2, npores, nT])
+
+        for i in range(nT):
+            for j in range(npores):
+                for k in range(comp_ppore*j, comp_ppore*(j + 1)):
+                    p_center[:, j, i] += pos[i, k, 0:2]
+                p_center[:, j, i] /= comp_ppore  # take the average
+    elif len(pos.shape) == 2:  # single frame
+
+        comp_ppore = pos.shape[1] / npores
+        p_center = np.zeros([2, npores])
+
         for j in range(npores):
             for k in range(comp_ppore*j, comp_ppore*(j + 1)):
-                p_center[:, j, i] += pos[i, k, 0:2]
-            p_center[:, j, i] /= comp_ppore  # take the average
+                p_center[:, j] += pos[:2, k]
+            p_center[:, j] /= comp_ppore
+
+    else:
+        return 'Please use a position array with valid dimensions'
+        exit()
 
     return p_center
 
@@ -298,14 +315,14 @@ if __name__ == '__main__':
             stop = i
             break
 
-    popt, pcov = curve_fit(gaus, r[:stop], density[:stop], p0=[density[0], 0.4])
-    # parameters, cov_matrix = curve_fit(poisson, r[:stop]/bin_width, density[:stop], p0=[1])
-    plt.figure(2)
-    plt.plot(r[:stop], gaus(r[:stop],*popt), 'ro:', label='fit')
-    # plt.plot(r[:stop], poisson(r[:stop]/bin_width, *parameters), 'r-', lw=2)
-    plt.title('Component Density Around Pore Center')
-    plt.xlabel('Distance from Pore Center (nm)')
-    plt.ylabel('Relative Component Density')
-    plt.bar(r[:stop], density[:stop], bin_width)
+    # popt, pcov = curve_fit(gaus, r[:stop], density[:stop], p0=[density[0], 0.4])
+    # # parameters, cov_matrix = curve_fit(poisson, r[:stop]/bin_width, density[:stop], p0=[1])
+    # plt.figure(2)
+    # plt.plot(r[:stop], gaus(r[:stop],*popt), 'ro:', label='fit')
+    # # plt.plot(r[:stop], poisson(r[:stop]/bin_width, *parameters), 'r-', lw=2)
+    # plt.title('Component Density Around Pore Center')
+    # plt.xlabel('Distance from Pore Center (nm)')
+    # plt.ylabel('Relative Component Density')
+    # plt.bar(r[:stop], density[:stop], bin_width)
     plt.show()
 

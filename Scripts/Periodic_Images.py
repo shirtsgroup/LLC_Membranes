@@ -150,46 +150,43 @@ if __name__ == "__main__":
     # f = open('NA_positions_5_images', 'w')
     # np.save(f, all_positions)
     # f.close()
-
+    print 'here'
     f.write("This is a .gro file\n")
     f.write("%s\n" % (pts*duplicates))
     count = 0
     count1 = 1
     for j in range(duplicates):
         print j
-        if j == 6:
-            break
-        if j != 2 and j != 3:
-            for i in range(pts):
+        # if j == 6:
+        #     break
+        # if j != 2 and j != 3:
+        for i in range(pts):
+            row = str(pt_periodic[:, j, i])
 
-                row = str(pt_periodic[:, j, i])
-
-                # for full system
-                if id[0, i] == 'NA':
-                    res = 'NA'
+            # for full system
+            if id[0, i] == 'NA':
+                res = 'NA'
+                count += 1
+            else:
+                res = 'HII'
+                if id[0, i - 1] == 'NA':
                     count += 1
-                else:
-                    res = 'HII'
-                    if id[0, i - 1] == 'NA':
-                        count += 1
-                    if i != 0 and i % 137 == 0:
-                        count += 1
+                if i != 0 and i % 137 == 0:
+                    count += 1
+            f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(count, '%s' % res, '%s' % id[0, i], count1, pt_periodic[0, j, i],
+                                                                       pt_periodic[1, j, i], pt_periodic[2, j, i]) + "\n")
 
-                f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(count, '%s' % res, '%s' % id[0, i], count1, pt_periodic[0, j, i],
-                                                                           pt_periodic[1, j, i], pt_periodic[2, j, i]) + "\n")
+            # f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:9.3f}'.format(count, 'NA' , 'NA', count, pt_periodic[0, j, i],
+            #                                                             pt_periodic[1, j, i], pt_periodic[2, j, i]) + "\n")
+            # count += 1
+            # count1 += 1
 
-
-                # f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:9.3f}'.format(count, 'NA' , 'NA', count, pt_periodic[0, j, i],
-                #                                                             pt_periodic[1, j, i], pt_periodic[2, j, i]) + "\n")
-                # count += 1
-                # count1 += 1
-
-                count1 += 1
-                if count1 == 100000:
-                    count1 = 0
+            count1 += 1
+            if count1 == 100000:
+                count1 = 0
 
 
-    f.write('   0.00000   0.00000  0.00000')
+    f.write('   0.00000   0.00000  0.00000\n')
 
     f.close()
 

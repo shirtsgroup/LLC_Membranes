@@ -14,6 +14,8 @@ def initialize():
     parser.add_argument('-c', '--coord', default='wiggle_solv.gro', help='A coordinate file needed by MD traj')
     parser.add_argument('-r', '--radius', default=.5, type=float, help='Radius of cylinder defining pore')
     parser.add_argument('-b', '--buffer', default=0.1, type=float, help='Percent into membrane to start calculations')
+    parser.add_argument('-s', '--save', default='on', type=str, help='Save the arrays or not')
+    parser.add_argument('-l', '--load', default='off', type=str, help='If youve already save the arrays, load them for speedup')
 
     args = parser.parse_args()
 
@@ -74,41 +76,46 @@ def cylinder_region(pos, zmin, zmax, radius):
 if __name__ == "__main__":
     args = initialize()
 
-    # t = md.load('%s' % args.file, top='%s' % args.coord)
-    # nT = t.xyz.shape[0]
-    # natoms = t.xyz.shape[1]
-    # zmax = np.zeros([nT])
-    # zmin = np.zeros([nT])
-    # benz_carbs = ['C', 'C1', 'C2', 'C3', 'C4', 'C5']
-    # resnames = np.zeros([natoms])
-    #
-    # # find the thickness of the membrane at each frame
-    # for i in range(nT):
-    #     z = []
-    #     for a in t.topology.atoms:
-    #         if a.name in benz_carbs:
-    #             z.append(t.xyz[i, a.index, 2])
-    #     buff = (max(z) - min(z))*args.buffer
-    #     zmax[i] = max(z) - buff
-    #     zmin[i] = min(z) + buff
-    #
-    # atoms = ['NA']
-    # atoms_to_keep = [a.index for a in t.topology.atoms if a.name in atoms or 'HOH' in str(a.residue)]  # SOL is stored as HOH in the traj
-    # t.restrict_atoms(atoms_to_keep)
-    # pos = t.xyz
-    #
-    # f = open('zmax', 'w')
-    # np.save(f, zmax)
-    # f.close()
-    # f = open('zmin', 'w')
-    # np.save(f, zmin)
-    # f.close()
-    # f = open('pos', 'w')
-    # np.save(f, pos)
-    # f.close()
-    zmax = np.load('zmax')
-    zmin = np.load('zmin')
-    pos = np.load('pos')
+    if args.load == 'on':
+        zmax = np.load('zmax')
+        zmin = np.load('zmin')
+        pos = np.load('pos')
+    else:
+
+        t = md.load('%s' % args.file, top='%s' % args.coord)
+        nT = t.xyz.shape[0]
+        natoms = t.xyz.shape[1]
+        zmax = np.zeros([nT])
+        zmin = np.zeros([nT])
+        benz_carbs = ['C', 'C1', 'C2', 'C3', 'C4', 'C5']
+        resnames = np.zeros([natoms])
+
+        # find the thickness of the membrane at each frame
+        for i in range(nT):
+            z = []
+            for a in t.topology.atoms:
+                if a.name in benz_carbs:
+                    z.append(t.xyz[i, a.index, 2])
+            buff = (max(z) - min(z))*args.buffer
+            zmax[i] = max(z) - buff
+            zmin[i] = min(z) + buff
+
+        atoms = ['NA']
+        atoms_to_keep = [a.index for a in t.topology.atoms if a.name in atoms or 'HOH' in str(a.residue)]  # SOL is stored as HOH in the traj
+        t.restrict_atoms(atoms_to_keep)
+        pos = t.xyz
+
+        if args.save == 'on':
+            f = open('zmax', 'w')
+            np.save(f, zmax)
+            f.close()
+            f = open('zmin', 'w')
+            np.save(f, zmin)
+            f.close()
+            f = open('pos', 'w')
+            np.save(f, pos)
+            f.close()
+
     nT = pos.shape[0]
     NA = pos[:, :480, :]
     water = pos[:, 480:, :]

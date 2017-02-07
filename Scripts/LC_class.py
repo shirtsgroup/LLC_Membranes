@@ -2,7 +2,7 @@
 
 
 class LC(object):
-    """A Liquid Crystal monomer has the following attributes which are relevant to crosslinking:
+    """A Liquid Crystal monomer has the following attributes which are relevant to building and crosslinking:
 
     Attributes:
         name: A string representing the monomer's name.
@@ -16,16 +16,21 @@ class LC(object):
         no_vsites: A string indicating whether there are dummy atoms associated with this monomer.
     """
 
-    def __init__(self, name, atoms, build_mon, images, c1_atoms, c2_atoms, tails, residues, no_vsites=0):
-        self.name = name
-        self.atoms = atoms
-        self.build_mon = build_mon
-        self.no_vsites = no_vsites
+    def __init__(self, name, atoms, build_mon, images, c1_atoms, c2_atoms, tails, residues, valence, planeatoms,
+                 lineatoms, ref_atom_index, no_vsites=0):
+        self.name = name  # residue name
+        self.atoms = atoms  # number of atoms in the monomer (no counterion)
+        self.build_mon = build_mon  # the name of the monomer coordinate file used for building
         self.images = images
-        self.c1_atoms = c1_atoms
-        self.c2_atoms = c2_atoms
-        self.tails = tails
-        self.residues = residues
+        self.c1_atoms = c1_atoms  # c1 atoms (closest to tail ends) used in crosslinking vinyl groups
+        self.c2_atoms = c2_atoms  # c2 atoms (adjacent to c1) used in crosslinking vinyl groups
+        self.tails = tails  # number of tails
+        self.residues = residues  # residues present in the full structure including counter ions
+        self.valence = valence  # valence of counter ions
+        self.planeatoms = planeatoms  # atoms defining a plane. Used for orientation during build
+        self.lineatoms = lineatoms  # indices of atoms used to create a straight line while building. (see build.py)
+        self.ref_atom_index = ref_atom_index  # atom index number used as a reference for rotation during build
+        self.no_vsites = no_vsites
         self.tot_atoms = self.atoms + self.no_vsites
         self.topology = '%s.itp' % self.build_mon
 
@@ -35,5 +40,16 @@ class LC(object):
         self.atoms += self.no_vsites
         return self.atoms
 
-HII = LC('Hexagonal', 137, 'monomer2', 9, ['C20', 'C34', 'C48'], ['C19', 'C33', 'C47'], 3, ['HII', 'NA'])
-SOL = LC('Water', 3, 'spc216.gro', 9, ['na'], ['na'], 1, ['OW', 'HW1', 'HW2'])
+NAcarb8V = LC('HII', 110, 'NAcarb8V.pdb', 9, ['C14', 'C26', 'C38'], ['C13', 'C25', 'C37'], 3, ['HII', 'NA'],
+                1, ['C2', 'C15', 'C39'], [1, 2], 2)
+NAcarb9V = LC('HII', 119, 'NAcarb9V.pdb', 9, ['C15', 'C28', 'C41'], ['C14', 'C27', 'C40'], 3, ['HII', 'NA'],
+                1, ['C2', 'C16', 'C42'], [1, 2], 2)
+NAcarb10V = LC('HII', 128, 'NAcarb10V.pdb', 9, ['C16', 'C30', 'C44'], ['C15', 'C29', 'C43'], 3, ['HII', 'NA'],
+                1, ['C2', 'C17', 'C45'], [1, 2], 2)
+NAcarb11V = LC('HII', 137, 'NAcarb11V_1.gro', 9, ['C20', 'C34', 'C48'], ['C19', 'C33', 'C47'], 3, ['HII', 'NA'], 1,
+               ['C', 'C2', 'C4'], [0, 3], 9)
+NAcarb11Vd = LC('HII', 143, 'NAcarb11V_1_dummy.gro', 9, ['C20', 'C34', 'C48'], ['C19', 'C33', 'C47'], 3, ['HII', 'NA'],
+                1, ['C', 'C2', 'C4'], [0, 3, 9], 9)
+
+# SOL should be deleted. Need to check for usage first
+SOL = LC('Water', 3, 'spc216.gro', 9, ['na'], ['na'], 1, ['OW', 'HW1', 'HW2'], 0, ['OW', 'HW1', 'HW2'], ['C', 'C3', 'C6'], 9)

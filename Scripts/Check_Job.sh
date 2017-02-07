@@ -4,7 +4,7 @@
 
 FILE1='wiggle.tpr'
 FILE2='wiggle.trr'
-FILE3='initial.gro'
+FILE3='wiggle.gro'
 FILE4='wiggle.gro'
 PATH2FILE='/projects/beco4952/Gromacs/Pores'
 RESOURCE='bridges'
@@ -41,7 +41,7 @@ if [ ${RESOURCE} == 'bridges' ]; then
     scp bjc@bridges.psc.edu:$PATH2FILE/\{$FILE1,$FILE2,$FILE3\} ./
     #scp beco4952@login.rc.colorado.edu:$PATH/\{$FILE1,$FILE2\} ./ # copy files to directory this script is run in
 
-    echo "0" | gmx trjconv -f $FILE2 -s $FILE1 -o wiggle_traj.gro  # The zero answers the first prompt given by trjconv. It
+    #echo "0" | gmx trjconv -f $FILE2 -s $FILE1 -o wiggle_traj.gro  # The zero answers the first prompt given by trjconv. It
     # corresponds to doing a conversion of the entire system. Delete echo and the pipe to see the other options.
 fi
 
@@ -49,7 +49,7 @@ if [ ${RESOURCE} == 'janus' ]; then
     scp beco4952@login.rc.colorado.edu:$PATH2FILE/\{$FILE1,$FILE2,$FILE3\} ./
     #scp beco4952@login.rc.colorado.edu:$PATH/\{$FILE1,$FILE2\} ./ # copy files to directory this script is run in
 
-    echo "0" | gmx trjconv -f $FILE2 -s $FILE1 -o wiggle_traj.gro  # The zero answers the first prompt given by trjconv. It
+    #echo "0" | gmx trjconv -f $FILE2 -s $FILE1 -o wiggle_traj.gro  # The zero answers the first prompt given by trjconv. It
     # corresponds to doing a conversion of the entire system. Delete echo and the pipe to see the other options.
 fi
 #Cylindricity_Traj.py -i wiggle_traj.gro -n ${NO_MONOMERS}
@@ -57,7 +57,7 @@ if [ ${ALT} == 'yes' ]; then
     Cylindricity.py -i wiggle_traj.gro -n ${NO_MONOMERS} -s "alternating" -L ${ALT_1} -A ${ALT_2}
 else
     #Cylindricity.py -i wiggle_traj.gro -n ${NO_MONOMERS}
-    Structure_char.py -i wiggle_traj.gro -c "NA"
+    Structure_char.py -i wiggle.trr -g wiggle.gro
 fi
 
 if [ ${DONE} == 'yes' ]; then

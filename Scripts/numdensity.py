@@ -28,13 +28,14 @@ def initialize():
 def centers(pos, atoms):
     """
     Find the average coordinates based on coordinates of selected atoms. (useful for rings i.e. benzene)
-    :param pos: numpy array with xyz coordinates of selected atoms for all frames
+    :param pos: numpy array with xyz coordinates of selected atoms for all frames [frames, no_atoms, xyz coords]
     :param atoms: list of selected atoms
     :return: the coordinates for the centers of all selected atoms
     """
     frames = np.shape(pos)[0]
     natoms = np.shape(pos)[1]
     ncenters = natoms / len(atoms)  # the number of centers that will be calculated
+
     c = np.zeros([frames, ncenters, 3])
     nselect = len(atoms)  # the number of selected atoms
 
@@ -96,11 +97,13 @@ def density(pos, axis, bin, box):
     b = box[0, axis] / 2  # middle of the box with respect to axis
     count = 0
     x = []
+
     while (b - bin*count) >= 0:  # increment from box center to bottom of box using bin size. (POTENTIAL ERROR here)
         x.append(b - bin*count)
         count += 1
     # potential future errors on the bounds of the box. It is assumed that the bottom of the box is at 0 and the top is
     # at whatever the box[i, axis] is equal to
+
     count = 1
     while (b + bin*count) <= 2*b:  # increment from box center to bottom of box using bin size. (POTENTIAL ERROR here)
         x.append(b + bin*count)
@@ -108,7 +111,7 @@ def density(pos, axis, bin, box):
 
     x.sort()  # sort the list in order
     x = np.array(x)
-    d = np.zeros([len(x) - 1])
+    d = np.zeros([len(x)])
 
     for i in range(nT):
 
@@ -130,7 +133,6 @@ def density(pos, axis, bin, box):
 
         for j in range(nA):
             a = pos[i, j, axis]
-            print a
             bin_no = len(x) / 2 + np.floor((a - b)/bin)
             d[bin_no] += 1
 
@@ -138,6 +140,40 @@ def density(pos, axis, bin, box):
         d[i] /= nT
 
     return x, d
+
+
+def power_spectrum(data, bin):
+    """
+    Compute the power spectrum of the data (find dominant frequencies in the fourier series fitting discrete data)
+    :param data: Data to be fourier transformed (1D numpy array)
+    :param bin: bin size (nm)
+    :return: power spectrum of data (ps) with corresponding frequencies (freqs), the max frequency (max) and
+    """
+
+    x = np.linspace(0, bin*len(data), len(data))
+
+    # subtract the mean from all data points
+    avg = np.mean(data)
+    data = np.array([abs(i - avg) for i in data])
+
+    N = data.size
+
+    data = data[int(.1*N):int(.9*N)]
+    data = data - np.mean(data)
+    ps = np.abs(np.fft.fft(data))**2
+
+    freqs = np.fft.fftfreq(data.size)
+    idx = np.argsort(freqs)
+
+    max_freq = np.argmax(np.abs(np.fft.fft(data)))
+    freq = freqs[max_freq]
+
+    # modify things so they'll plot nicely and in the correct units
+    freqs = freqs[idx] / bin
+    ps = ps[idx]
+    max = abs(freq / bin)  # maximum frequency in hertz
+
+    return ps, freqs, max
 
 if __name__ == '__main__':
 
@@ -161,43 +197,20 @@ if __name__ == '__main__':
         axis = 2
 
     c = centers(pos, args.atoms)
-    dist, r = d_dist(c, box, args.bin)  # this takes forever. Use a gromacs tool. Probably gmx rdf
-    plt.bar(r, dist, args.bin)
-    plt.show()
+
+    # uncomment to see radial distribution
+    # dist, r = d_dist(c, box, args.bin)  # this takes forever. Use a gromacs tool. Probably gmx rdf
+    # plt.bar(r, dist, args.bin)
+    # plt.show()
 
     x, d = density(c, axis, args.bin, box)
 
-    d = np.trim_zeros(d)
-    x = np.linspace(0, args.bin*len(d), len(d))
-    f = open('d', 'w')
-    np.save(f, d)
-    f.close()
-    f = open('x', 'w')
-    np.save(f, x)
-    f.close()
-    # avg = np.mean(d)
-    # d = np.array([abs(i - avg) for i in d])
-    fft = np.fft.fft(x)
+    ps, freqs, max_freq = power_spectrum(d, args.bin)
 
-    N = d.size
-
-    data = d[int(.1*N):int(.9*N)]
-    data = data - np.mean(data)
-    ps = np.abs(np.fft.fft(data))**2
-
-    time_step = args.bin
-    freqs = np.fft.fftfreq(data.size)
-    idx = np.argsort(freqs)
-
-    max_freq = np.argmax(np.abs(np.fft.fft(data)))
-    freq = freqs[max_freq]
-
-    freq_in_hertz = abs(freq / args.bin)
-
-    print 'Maximum frequency: %s cycles/nm' % freq_in_hertz
+    print 'Maximum frequency: %s cycles/nm' % max_freq
 
     plt.figure(1)
-    plt.plot(freqs[idx] / args.bin, ps[idx])
+    plt.plot(freqs, ps)
     plt.suptitle('Power Spectrum', fontsize=16)
     plt.title('Bin size = %s nm' % args.bin, fontsize=12)
     plt.xlabel('Frequency')

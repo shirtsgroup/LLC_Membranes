@@ -99,9 +99,9 @@ def get_positions(input_file, comp, lc, solv):
                 pos[0].append(float(a[i][20:28]))
                 pos[1].append(float(a[i][28:36]))
                 pos[2].append(float(a[i][36:44]))
-                vel[0].append(float(a[i][44:52]))
-                vel[1].append(float(a[i][52:60]))
-                vel[2].append(float(a[i][60:68]))
+                # vel[0].append(float(a[i][44:52]))
+                # vel[1].append(float(a[i][52:60]))
+                # vel[2].append(float(a[i][60:68]))
             else:
                 if a[i].count('trjconv') != 0:
                     timestamp, box = traj_time(i, a, box)
@@ -113,9 +113,9 @@ def get_positions(input_file, comp, lc, solv):
                     pos[0].append(float(a[i][20:28]))
                     pos[1].append(float(a[i][28:36]))
                     pos[2].append(float(a[i][36:44]))
-                    vel[0].append(float(a[i][44:52]))
-                    vel[1].append(float(a[i][52:60]))
-                    vel[2].append(float(a[i][60:68]))
+                    # vel[0].append(float(a[i][44:52]))
+                    # vel[1].append(float(a[i][52:60]))
+                    # vel[2].append(float(a[i][60:68]))
             else:
                 if a[i].count('trjconv') != 0:
                     timestamp, box = traj_time(i, a, box)
@@ -159,7 +159,7 @@ def get_positions(input_file, comp, lc, solv):
         for k in range(0, 3):
             for j in range(0, no_res_per_frame):
                 pos_frame[i][k].append(pos[k][i*no_res_per_frame + j])
-                vel_frame[i][k].append(vel[k][i*no_res_per_frame + j])
+                # vel_frame[i][k].append(vel[k][i*no_res_per_frame + j])
 
     # Now into numpy arrays
     no_atoms = len(pos_frame[0][0])
@@ -170,10 +170,10 @@ def get_positions(input_file, comp, lc, solv):
                 pos_np[i, j, k] = pos_frame[k][i][j]
 
     vel_np = np.zeros([3, no_atoms, frames])
-    for i in range(3):
-        for j in range(no_atoms):
-            for k in range(len(traj_points)):
-                vel_np[i, j, k] = vel_frame[k][i][j]
+    # for i in range(3):
+    #     for j in range(no_atoms):
+    #         for k in range(len(traj_points)):
+    #             vel_np[i, j, k] = vel_frame[k][i][j]
 
     box_np = np.zeros([len(box), frames])
     for i in range(len(box)):
