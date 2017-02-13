@@ -57,7 +57,7 @@ def avg_pore_loc(npores, pos, natoms):
 
     # Find the average location of the pores w.r.t. x and y
 
-    if len(pos.shape) == 3:  # multiple frame
+    if len(pos.shape) == 3:  # multiple frames
 
         nT = np.shape(pos)[0]
         comp_ppore = np.shape(pos)[1] / npores
@@ -67,8 +67,9 @@ def avg_pore_loc(npores, pos, natoms):
         for i in range(nT):
             for j in range(npores):
                 for k in range(comp_ppore*j, comp_ppore*(j + 1)):
-                    p_center[:, j, i] += pos[i, k, 0:2]
+                    p_center[:, j, i] += pos[i, k, :2]
                 p_center[:, j, i] /= comp_ppore  # take the average
+
     elif len(pos.shape) == 2:  # single frame
 
         comp_ppore = pos.shape[1] / npores
@@ -278,9 +279,15 @@ if __name__ == '__main__':
     else:
         atoms = args.component
 
-    atoms_to_keep = [a.index for a in t.topology.atoms if a.name in atoms]
-    t.restrict_atoms(atoms_to_keep)
-    pos = t.xyz
+    if args.component != 'sys':
+        atoms_to_keep = [a.index for a in t.topology.atoms if a.name in atoms]
+        t.restrict_atoms(atoms_to_keep)
+        pos = t.xyz
+    else:
+        # NOTE: if you use 'sys', use gmx trjconv -f *.trr -s *.tpr -pbc atom
+        #                        then gmx trjconv -f *.trr -s *.tpr -pbc whole
+        # This will make sure everything is in the box. The output is a .xtc file
+        pos = t.xyz
 
     nT = np.shape(pos)[0]
 

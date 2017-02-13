@@ -81,13 +81,14 @@ def d_dist(pos, box, bin):
     return dist, r
 
 
-def density(pos, axis, bin, box):
+def density(pos, axis, bin, box, sum='yes'):
     """
     Calculate the average number density of components along an axis
     :param pos: a numpy array with xyz coordinates of selected atoms for all frames
     :param axis: which axis to split up (x, y or z)
     :param bin: size of the bins which the axis will be split into
     :param box: the box
+    :param sum: if sum = 'yes' then all frames will be added together and averaged
     :return: density as a function of distance along axis
     """
 
@@ -111,7 +112,12 @@ def density(pos, axis, bin, box):
 
     x.sort()  # sort the list in order
     x = np.array(x)
-    d = np.zeros([len(x)])
+    L = len(x)
+    if sum == 'yes':
+        d = np.zeros([L])
+    else:
+        d = np.zeros([nT, L])
+        xT = np.zeros([nT, L])
 
     for i in range(nT):
 
@@ -130,16 +136,26 @@ def density(pos, axis, bin, box):
 
         x.sort()
         x = np.array(x)
+        L = len(x)
+        if sum == 'no':
+            xT[i, :L] = x
 
         for j in range(nA):
             a = pos[i, j, axis]
             bin_no = len(x) / 2 + np.floor((a - b)/bin)
-            d[bin_no] += 1
+            if sum == 'yes':
+                d[bin_no] += 1
+            else:
+                d[i, bin_no] += 1
 
-    for i in range(len(d)):  # take the average
-        d[i] /= nT
+    if sum == 'yes':
+        for i in range(len(d)):  # take the average
+            d[i] /= nT
 
-    return x, d
+    if sum == 'yes':
+        return x, d
+    else:
+        return xT, d
 
 
 def power_spectrum(data, bin):

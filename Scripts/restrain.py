@@ -449,7 +449,7 @@ if __name__ == "__main__":
 
         f.write("\n[ position_restraints ]\n")
         for i in range(restraints.shape[1]):
-            f.write('{:6d}{:5d}{:7d}{:7d}{:7d}'.format(restraints[0, i], restraints[1, i], restraints[2, i],
+            f.write('{:6d}{:6d}{:9d}{:9d}{:9d}'.format(restraints[0, i], restraints[1, i], restraints[2, i],
                                                        restraints[3, i], restraints[4, i]) + "\n")
 
         f.close()

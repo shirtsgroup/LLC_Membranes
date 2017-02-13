@@ -16,9 +16,10 @@ class LC(object):
         no_vsites: A string indicating whether there are dummy atoms associated with this monomer.
     """
 
-    def __init__(self, name, atoms, build_mon, images, c1_atoms, c2_atoms, tails, residues, valence, planeatoms,
+    def __init__(self, name, counterion, atoms, build_mon, images, c1_atoms, c2_atoms, tails, residues, valence, planeatoms,
                  lineatoms, ref_atom_index, no_vsites=0):
         self.name = name  # residue name
+        self.counterion = counterion  # name of counter ion in monomer salt
         self.atoms = atoms  # number of atoms in the monomer (no counterion)
         self.build_mon = build_mon  # the name of the monomer coordinate file used for building
         self.images = images
@@ -40,16 +41,16 @@ class LC(object):
         self.atoms += self.no_vsites
         return self.atoms
 
-NAcarb8V = LC('HII', 110, 'NAcarb8V.pdb', 9, ['C14', 'C26', 'C38'], ['C13', 'C25', 'C37'], 3, ['HII', 'NA'],
+NAcarb8V = LC('HII', 'NA', 110, 'NAcarb8V.pdb', 9, ['C14', 'C26', 'C38'], ['C13', 'C25', 'C37'], 3, ['HII', 'NA'],
                 1, ['C2', 'C15', 'C39'], [1, 2], 2)
-NAcarb9V = LC('HII', 119, 'NAcarb9V.pdb', 9, ['C15', 'C28', 'C41'], ['C14', 'C27', 'C40'], 3, ['HII', 'NA'],
+NAcarb9V = LC('HII', 'NA', 119, 'NAcarb9V.pdb', 9, ['C15', 'C28', 'C41'], ['C14', 'C27', 'C40'], 3, ['HII', 'NA'],
                 1, ['C2', 'C16', 'C42'], [1, 2], 2)
-NAcarb10V = LC('HII', 128, 'NAcarb10V.pdb', 9, ['C16', 'C30', 'C44'], ['C15', 'C29', 'C43'], 3, ['HII', 'NA'],
+NAcarb10V = LC('HII', 'NA', 128, 'NAcarb10V.pdb', 9, ['C16', 'C30', 'C44'], ['C15', 'C29', 'C43'], 3, ['HII', 'NA'],
                 1, ['C2', 'C17', 'C45'], [1, 2], 2)
-NAcarb11V = LC('HII', 137, 'NAcarb11V_1.gro', 9, ['C20', 'C34', 'C48'], ['C19', 'C33', 'C47'], 3, ['HII', 'NA'], 1,
+NAcarb11V = LC('HII', 'NA', 137, 'NAcarb11V_1.gro', 9, ['C20', 'C34', 'C48'], ['C19', 'C33', 'C47'], 3, ['HII', 'NA'], 1,
                ['C', 'C2', 'C4'], [0, 3], 9)
-NAcarb11Vd = LC('HII', 143, 'NAcarb11V_1_dummy.gro', 9, ['C20', 'C34', 'C48'], ['C19', 'C33', 'C47'], 3, ['HII', 'NA'],
+NAcarb11Vd = LC('HII', 'NA', 143, 'NAcarb11V_1_dummy.gro', 9, ['C20', 'C34', 'C48'], ['C19', 'C33', 'C47'], 3, ['HII', 'NA'],
                 1, ['C', 'C2', 'C4'], [0, 3, 9], 9)
 
 # SOL should be deleted. Need to check for usage first
-SOL = LC('Water', 3, 'spc216.gro', 9, ['na'], ['na'], 1, ['OW', 'HW1', 'HW2'], 0, ['OW', 'HW1', 'HW2'], ['C', 'C3', 'C6'], 9)
+SOL = LC('Water', 'H', 3, 'spc216.gro', 9, ['na'], ['na'], 1, ['OW', 'HW1', 'HW2'], 0, ['OW', 'HW1', 'HW2'], ['C', 'C3', 'C6'], 9)

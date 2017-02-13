@@ -13,13 +13,13 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Build LLC Structure')
 
-    parser.add_argument('-b', '--build_mon', default='NAcarb10V', type=str, help='Name of class of monomer using to build with')
+    parser.add_argument('-b', '--build_mon', default='NAcarb11Vd', type=str, help='Name of class of monomer using to build with')
     parser.add_argument('-o', '--out', default='initial.gro', help='name of output file')
-    parser.add_argument('-l', '--layers', default=1, type=int, help = 'Number of Layers')
+    parser.add_argument('-l', '--layers', default=20, type=int, help = 'Number of Layers')
     parser.add_argument('-m', '--monomers', default=6, type=int, help = 'Monomers per layer')
     parser.add_argument('-r', '--radius', default=6, type=float, help = 'Initial Pore Radius (Angstroms)')
     parser.add_argument('-p', '--p2p', default=45, type=float, help = 'Initial Pore to Pore Distance')
-    parser.add_argument('-n', '--nopores', default=1, type=int, help = 'Number of Pores')
+    parser.add_argument('-n', '--nopores', default=4, type=int, help = 'Number of Pores')
     parser.add_argument('-d', '--dbwl', default=5, type=float, help = 'Distance between layers')
     parser.add_argument('-s', '--layer_distribution', default='uniform', help = 'The distribution of monomers per layer')
     parser.add_argument('-a', '--alt_1', default=6, type=int, help='Monomers per layer for the first type of alternating layer')
@@ -145,53 +145,55 @@ def rotateplane(plane_atoms):
     return R
 
 
-def quadrant(pt):
+def quadrant(pt, origin=[0, 0]):
     """ Find out which quadrant of the xy plane a point is sitting in
     II    |    I
           |
     -------------
-        |
+          |
     III   |    IV
+    :param: pt: point to be tested
+    :param: origin: the location of the origin. Default is [0, 0] but can be set arbitrarily (such as a pore center)
     """
-    if pt[0] > 0 and pt[1] > 0:
+    if pt[0] > origin[0] and pt[1] > origin[1]:
         return 1
-    elif pt[0] < 0 and pt[1] < 0:
+    elif pt[0] < origin[0] and pt[1] < origin[1]:
         return 3
-    elif pt[1] < 0 < pt[0]:
+    elif pt[0] > origin[0] and pt[1] < origin[1]:
         return 4
-    elif pt[0] < 0 < pt[1]:
+    elif pt[0] < origin[0] and pt[1] > origin[1]:
         return 2
     else:
         return 0  # the case where the point lies on the x or y axis
 
 
-def transdir(pt):
+def transdir(pt, origin=[0, 0]):
     """
     figure out in which direction the coordinates will be shifted. They are always shifted away from the origin
     :param pt:
     :return:
     """
-    if quadrant(pt) == 1:  # e.g. in quadrant 1, the x's are shifted in the positive x and positive y directions
+    if quadrant(pt, origin) == 1:  # e.g. in quadrant 1, the x's are shifted in the positive x and positive y directions
         vx = 1
         vy = 1
-    elif quadrant(pt) == 2:  # in quadrant 2, the x's are shifted negative and the y's are shifted positive
+    elif quadrant(pt, origin) == 2:  # in quadrant 2, the x's are shifted negative and the y's are shifted positive
         vx = -1
         vy = 1
-    elif quadrant(pt) == 3:  # in quadrant 3, the x's and y's are shifted down
+    elif quadrant(pt, origin) == 3:  # in quadrant 3, the x's and y's are shifted down
         vx = -1
         vy = -1
-    elif quadrant(pt) == 4:  # in quadrant 4, the x's are shifted positive and the y's are shifted negative
+    elif quadrant(pt, origin) == 4:  # in quadrant 4, the x's are shifted positive and the y's are shifted negative
         vx = 1
         vy = -1
     # These next three conditionals are very unlikely but are included for completeness and to avoid future errors
-    elif quadrant(pt) == 0 and pt[0] == 0:  # i.e., it lies on the y - axis
+    elif quadrant(pt, origin) == 0 and pt[0] == origin[0]:  # i.e., it lies on the y - axis
         if pt[1] > 0:  # the point is on the positive y-axis
             vx = 0  # no x-shift
             vy = 1  # shift in the positive y direction
         if pt[1] < 0:  # the point is on the negative y-axis
             vx = 0  # no x-shift
             vy = -1  # shift in the negative y direction
-    elif quadrant(pt) == 0 and pt[1] == 0:  # i.e., it lies on the x - axis
+    elif quadrant(pt, origin) == 0 and pt[1] == origin[1]:  # i.e., it lies on the x - axis
         if pt[0] > 0:  # the point is on the positive x-axis
             vx = 1  # shift in the positive x direction
             vy = 0  # no y-shift
@@ -217,7 +219,7 @@ def rotate(theta):
     return Rx
 
 
-def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions):
+def write_gro_bak(positions, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions):
 
     f = open('%s' % args.out, 'w')
 
@@ -248,7 +250,7 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
                 for i in range(0, no_atoms - no_ions):
                     x_values.append(b*p2p + positions[positions_index][j][i][0])
                     y_values.append(c*p2p + positions[positions_index][j][i][1])
-                    z_values.append(k*dist + positions[positions_index][j][i][2])
+                    z_values.append(k*dist + + (dist/float(layer_mons))*j + positions[positions_index][j][i][2])
                     hundreds = int(math.floor(atom_count/100000))
                     f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(monomer_count, name, identity[i],
                         atom_count - hundreds*100000, x_values[atom_count - 1]/10.0, y_values[atom_count - 1]/10.0,
@@ -278,7 +280,8 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
                 for i in range(0, no_ions):
                     x_values.append(b*p2p + positions[positions_index][j][no_atoms - (i + 1)][0])
                     y_values.append(c*p2p + positions[positions_index][j][no_atoms - (i + 1)][1])
-                    z_values.append(k*dist + positions[positions_index][j][no_atoms - (i + 1)][2])
+                    #z_values.append(k*dist + positions[positions_index][j][no_atoms - (i + 1)][2])
+                    z_values.append(k*dist + (dist/float(layer_mons))*j + positions[positions_index][j][no_atoms - (i + 1)][2])  # helix
 
     count = 0
     for l in range(0, no_pores):
@@ -295,6 +298,81 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
                             identity[no_atoms - (no_ions - i)], identity[no_atoms - (no_ions - i)],
                             atom_count - hundreds*100000, x_values[atom_count - 1]/10.0, y_values[atom_count - 1]/10.0,
                             z_values[atom_count - 1]/10.0) + "\n")
+                    atom_count += 1
+
+    f.write('   0.00000   0.00000  0.00000\n')
+    f.close()
+
+
+def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions):
+
+    f = open('%s' % args.out, 'w')
+
+    f.write('This is a .gro file\n')
+    f.write('%s\n' % sys_atoms)
+
+    rot = math.pi / 4
+
+    # main monomer
+    atom_count = 1
+    monomer_count = 0
+    for l in range(0, no_pores):  # loop to create multiple pores
+        theta = 30  # angle which will be used to do hexagonal packing
+        if l == 0:  # unmodified coordinates
+            b = 0
+            c = 0
+        elif l == 1:  # move a pore directly down
+            b = -1
+            c = 0
+        elif l == 2:  # moves pore up and to the right
+            b = -math.sin(math.radians(theta))
+            c = -math.cos(math.radians(theta))
+        elif l == 3:  # moves a pore down and to the right
+            b = math.cos(math.radians(90 - theta))
+            c = -math.sin(math.radians(90 - theta))
+        for k in range(no_layers):
+            layer_mons = layer_distribution[l*no_layers + k]
+            for j in range(layer_mons):  # iterates over each monomer to create coordinates
+                monomer_count += 1
+                theta = j * math.pi / (layer_mons / 2.0) + rot
+                Rx = rotate(theta)
+                xyz = np.zeros(positions.shape)
+                for i in range(no_atoms - no_ions):
+                    xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist + (dist/float(layer_mons))*j]
+                    hundreds = int(math.floor(atom_count/100000))
+                    f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(monomer_count, name, identity[i],
+                        atom_count - hundreds*100000, xyz[0, i]/10.0, xyz[1, i]/10.0, xyz[2, i]/10.0) + "\n")
+                    atom_count += 1
+
+    # Ions:
+
+    for l in range(0, no_pores):  # loop to create multiple pores
+        theta = 30  # angle which will be used to do hexagonal packing
+        if l == 0:  # unmodified coordinates
+            b = 0
+            c = 0
+        elif l == 1:  # move a pore directly down
+            b = - 1
+            c = 0
+        elif l == 2:  # moves pore up and to the right
+            b = math.cos(math.radians(90 - theta))
+            c = -math.sin(math.radians(90 - theta))
+        elif l == 3:  # moves a pore down and to the right
+            b = -math.sin(math.radians(theta))
+            c = -math.cos(math.radians(theta))
+        for k in range(0, no_layers):
+            layer_mons = layer_distribution[l*no_layers + k]
+            for j in range(0, layer_mons):  # iterates over each monomer to create coordinates
+                theta = j * math.pi / (layer_mons / 2.0) + (l % 2) * math.pi / 6 # angle to rotate about axis determined from no of monomers per layer
+                Rx = rotate(theta)
+                xyz = np.zeros([3, no_ions])
+                for i in range(0, no_ions):
+                    monomer_count += 1
+                    xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b*p2p, c*p2p, k*dist + (dist/float(layer_mons))*j]
+                    hundreds = int(math.floor(atom_count/100000))
+                    f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(monomer_count, identity[no_atoms - (i + 1)],
+                        identity[no_atoms - (i + 1)], atom_count - hundreds*100000, xyz[0, i]/10.0, xyz[1, i]/10.0,
+                        xyz[2, i]/10.0) + "\n")
                     atom_count += 1
 
     f.write('   0.00000   0.00000  0.00000\n')
@@ -404,4 +482,5 @@ if __name__ == "__main__":
                 rot = [float(rot[0]), float(rot[1]), float(rot[2])]  # converts matrix to a list of floats
                 positions[j][i - 1].append(rot)  # appends the atomic coordinates to 'positions'
 
-    write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions)
+    #write_gro_bak(positions, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions)
+    write_gro(xyz, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions)

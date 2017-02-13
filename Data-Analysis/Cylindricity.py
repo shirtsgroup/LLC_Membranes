@@ -183,47 +183,47 @@ P2Ps = [pore12, pore13, pore34, pore42, pore14, pore23]
 start_frame = 10
 print 'Things calculated'
 # Likely to be replaced with an MBAR tool
-def autocorrelation(list_input, lag, start):
-    length = len(list_input)
-    anant = 0
-    an = 0
-    an2 = 0
-    for i in range(start, len(list_input) - lag):
-        anant += list_input[i]*list_input[i + lag]
-        an += list_input[i]
-        an2 += list_input[i]**2
-    if (an2 / length) - (an / length)**2 == 0:
-        Ct = 1
-    else:
-        Ct = ((anant / length) + (an / length)**2)/((an2 / length) - (an / length)**2)
-
-    return Ct
-
-
-def tau_ac(list_input, start):
-    T = len(list_input)
-    T_ac = 0
-    for i in range(1, T - 1):
-        Ct = autocorrelation(list_input, i, start)
-        T_ac += (1 - (i/T))*Ct
-    return T_ac, T
-
-
-def Neff(list_input, start):
-    T_ac, T = tau_ac(list_input, start)
-    gto = 1 + 2*T_ac
-    N_eff = (T - start + 1) / gto
-    return N_eff
-
-N_effs = []
-
-for i in range(0, len(pore12)):
-    N_effs.append(Neff(pore12, i))
-
-t0_index = N_effs.index(max(N_effs))
-
-print t0_index
-
+# def autocorrelation(list_input, lag, start):
+#     length = len(list_input)
+#     anant = 0
+#     an = 0
+#     an2 = 0
+#     for i in range(start, len(list_input) - lag):
+#         anant += list_input[i]*list_input[i + lag]
+#         an += list_input[i]
+#         an2 += list_input[i]**2
+#     if (an2 / length) - (an / length)**2 == 0:
+#         Ct = 1
+#     else:
+#         Ct = ((anant / length) + (an / length)**2)/((an2 / length) - (an / length)**2)
+#
+#     return Ct
+#
+#
+# def tau_ac(list_input, start):
+#     T = len(list_input)
+#     T_ac = 0
+#     for i in range(1, T - 1):
+#         Ct = autocorrelation(list_input, i, start)
+#         T_ac += (1 - (i/T))*Ct
+#     return T_ac, T
+#
+#
+# def Neff(list_input, start):
+#     T_ac, T = tau_ac(list_input, start)
+#     gto = 1 + 2*T_ac
+#     N_eff = (T - start + 1) / gto
+#     return N_eff
+#
+# N_effs = []
+#
+# for i in range(0, len(pore12)):
+#     N_effs.append(Neff(pore12, i))
+#
+# t0_index = N_effs.index(max(N_effs))
+#
+# print t0_index
+#
 plt.figure(1)
 time_pts = range(0, (traj_points - traj_start))
 intervals = length_of_simulation/traj_points/1000
@@ -247,6 +247,7 @@ plt.ylabel('Pore-To-Pore Distance [nm]', fontsize=22)
 plt.xlabel('Simulation Time (ns)', fontsize=22)
 plt.legend(loc=1, fontsize=18)
 plt.show()
+exit()
 # Find the distance from central axis
 # need to save each value of distance in order to calculate deviation. 4 lists in a list
 

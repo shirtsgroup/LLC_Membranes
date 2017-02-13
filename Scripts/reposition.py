@@ -8,13 +8,14 @@ import Structure_char
 import restrain
 import math
 import numpy as np
+import build
 
 
 def initialize():
     parser = argparse.ArgumentParser(description='Build LLC Structure')
 
-    parser.add_argument('-f', '--file', default='1layer.gro', type=str, help='.gro coordinate input file')
-    parser.add_argument('-r', '--radius', default=4, type=float, help='distance from pore center to reposition monomers')
+    parser.add_argument('-f', '--file', default='wiggle.gro', type=str, help='.gro coordinate input file')
+    parser.add_argument('-r', '--radius', default=.2, type=float, help='distance from pore center to reposition monomers')
     parser.add_argument('-a', '--atoms', default=['C6', 'C'], help='Atoms which will be used to determine pore centers.'
                                                                    'The first entry in the list should be the atom '
                                                                    'which you want to rotate the monomer about')
@@ -60,22 +61,39 @@ def angles(pts, pcenters):
     return thetas
 
 
-def translate(obj, pt=np.array([0, 0, 0])):
+def translate(obj, pt=np.array([0, 0, 0]), r='na'):
     """
     Create a translation matrix to translate an object by a vector v
     :param obj: the position of the object being translated
     :param pt: the point to which you want to translate the object (optional, default is the origin)
-    :return: tranlsation matrix
+    :param r: distance to translate an object at fixed angle. Useful for translating a point radially outward from the
+    origin
+    :return: translation matrix
     """
-    T = np.zeros([4, 4])  # Create the skeleton of a translation matrix
-    for i in range(4):
-        for j in range(4):
-            if i == j:
-                T[i, j] = 1  # the diagonal is all one
+    if r == 'na':
+        T = np.zeros([4, 4])  # Create the skeleton of a translation matrix
+        for i in range(4):
+            for j in range(4):
+                if i == j:
+                    T[i, j] = 1  # the diagonal is all one
 
-    v = pt - obj  # direction in which to move the object
+        v = pt - obj  # direction in which to move the object
 
-    T[:3, 3] = v  # the last column contains the vector in whose direction we wish to translate the object
+        T[:2, 3] = v[:2]  # the last column contains the vector in whose direction we wish to translate the object. We
+                          # also do not want to translate in the z direction in this case
+
+    else:
+        vx, vy = build.transdir(obj, origin=pt)
+        theta = math.atan(obj[1]/obj[0])
+
+        T = np.zeros([4, 4])  # Create the skeleton of a translation matrix
+        for i in range(4):
+            for j in range(4):
+                if i == j:
+                    T[i, j] = 1  # the diagonal is all one
+
+        T[0, 3] = vx*r*math.cos(theta)
+        T[1, 3] = vy*r*math.sin(theta)
 
     return T
 
@@ -110,37 +128,68 @@ def rmatrix(theta):
     return Rx
 
 
-def rotate(pts, thetas, pcenters, atom_no):
+def reposition(pts, nMon, pcenters, atom_no, t_atom, valence):
     """
     Rotate monomers to face toward the pore centers
     :param pts: all of the coordinates from coordinate file in a numpy array: [xyz, n_atoms]
     :param thetas: angles by which to rotate each monomer
     :return: all of the monomers rotated in the correct direction
     """
-    atomspmon = pts.shape[1] / thetas.shape[0]  # atoms per monomer
-    nMon = thetas.shape[0]
+    atoms = pts.shape[1]
+    atomspmon = atoms / nMon - 1  # atoms per monomer
     t_origin = np.zeros(pts.shape)  # translate to origin
     rotated = np.zeros(pts.shape)  # rotate
     t_back = np.zeros(pts.shape)  # translate back to starting point
     pores = pcenters.shape[1]
     monppore = pts.shape[1] / pores
 
+    # for i in range(nMon):
+    #     loc = pts[:, i*atomspmon + atom_no]  # the xy coordinates of the chosen atom of this monomer
+    #     T_fwd = translate(loc)  # translate from loc to origin
+    #     T_bwd = translate(-loc)  # translate from origin back to loc
+    #     Rx = rmatrix(thetas[i])  # rotation matrix at origin
+    #     for j in range(atomspmon):
+    #         cat = np.append(pts[:, i*atomspmon + j], [1])
+    #         t_origin[:, i*atomspmon + j] = np.dot(T_fwd, cat)[:3]
+    #     for j in range(atomspmon):
+    #         cat = t_origin[:, i*atomspmon + j]
+    #         rotated[:, i*atomspmon + j] = np.dot(Rx, cat)[:3]
+    #     for j in range(atomspmon):
+    #         cat = np.append(rotated[:, i*atomspmon + j], [1])
+    #         t_back[:, i*atomspmon + j] = np.dot(T_bwd, cat)[:3]
+
     for i in range(nMon):
-        loc = pts[:, i*atomspmon + atom_no]  # the xy coordinates of the chosen atom of this monomer
-        T_fwd = translate(loc)  # translate from loc to origin
-        T_bwd = translate(-loc)  # translate from origin back to loc
-        Rx = rmatrix(thetas[i])  # rotation matrix at origin
+        pore = int(i / (nMon/pores))
+        center = np.append(pcenters[:, pore], [0])
+        loc = pts[:, i*atomspmon + atom_no]
+        T_fwd = translate(loc, pt=center)  # translate from loc to origin
         for j in range(atomspmon):
             cat = np.append(pts[:, i*atomspmon + j], [1])
             t_origin[:, i*atomspmon + j] = np.dot(T_fwd, cat)[:3]
+        cat = np.append(pts[:, atoms - nMon + i], [1])
+        t_origin[:, atoms - nMon + i] = np.dot(T_fwd, cat)[:3]
+        T_bwd = translate(t_origin[:, i*atomspmon + t_atom], r=args.radius, pt=center)
         for j in range(atomspmon):
-            cat = t_origin[:, i*atomspmon + j]
-            rotated[:, i*atomspmon + j] = np.dot(Rx, cat)[:3]
-        for j in range(atomspmon):
-            cat = np.append(rotated[:, i*atomspmon + j], [1])
+            cat = np.append(t_origin[:, i*atomspmon + j], [1])
             t_back[:, i*atomspmon + j] = np.dot(T_bwd, cat)[:3]
+        cat = np.append(t_origin[:, atoms - nMon + i], [1])
+        t_back[:, atoms - nMon + i] = np.dot(T_bwd, cat)[:3]
 
     return t_back
+
+
+def sort(pts, nMon, valence):
+
+    atoms = pts.shape[1]
+    atomspmon = pts.shape[1] / nMon
+
+    sorted_coords = np.zeros(pts.shape)
+    for i in range(nMon):
+        for j in range(atomspmon - valence):
+            sorted_coords[:, i*(atomspmon - valence) + j] = pts[:, i*atomspmon + j]
+        sorted_coords[:, atoms - nMon*valence + i] = pts[:, i*atomspmon + j + 1]
+
+    return sorted_coords
 
 
 def write_gro(pts, ids, res, name="repositioned.gro"):
@@ -161,7 +210,7 @@ def write_gro(pts, ids, res, name="repositioned.gro"):
     for i in range(atoms):
         f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(n_res, '%s' % res[i], '%s' % ids[i], i + 1, pts[0, i],
                                                                        pts[1, i], pts[2, i]))
-        if i != atoms - 1 and res[i + 1] != res[i]:
+        if i != atoms - 1 and res[i + 1] != res[i] or res[i] == 'NA':
             n_res += 1
 
     f.write('0.0000000 0.0000000 0.0000000\n')
@@ -169,48 +218,25 @@ def write_gro(pts, ids, res, name="repositioned.gro"):
 
 if __name__ == "__main__":
 
-    # args = initialize()
-    #
-    # f = open(args.file, 'r')
-    # gro = []
-    # for line in f:
-    #     gro.append(line)
-    # f.close()
-    #
-    # coords, atoms, all_coords, ids, res = restrain.get_coordinates(gro, 2, args.atoms)
-    #
-    # atom_no = np.where(ids == args.atoms[0])[0][0]  # meh
-    #
-    # p_centers = Structure_char.avg_pore_loc(1, coords, atoms)
-    #
-    # thetas = angles(coords, p_centers)
-    #
-    # rotated = rotate(all_coords, thetas, p_centers, atom_no)
-    #
-    # write_gro(rotated, ids, res)
+    args = initialize()
 
+    f = open(args.file, 'r')
+    gro = []
+    for line in f:
+        gro.append(line)
+    f.close()
 
-    loc = np.array([1.0, 1.0, 0])  # the xy coordinates of the chosen atom of this monomer
-    pt = [-2.0, 3.0, 0]
-    r = 2
-    T_fwd = translate(loc)  # translate from loc to origin
-    T_bwd = translate(-loc)  # translate from origin back to loc
-    m1 = slope(pt, loc)
-    b = loc[1] - loc[0]*m1
-    print b
-    print m1
-    m2 = slope(loc, [0, 0, 0])
-    print m2
-    theta = -math.atan((m1 - m2)/(1 + m1*m2))  # find angle between lines
-    print theta
-    print theta * 180 / math.pi
-    Rx = rmatrix(theta)  # rotation matrix at origin
-    cat = np.append(pt, [1])
-    t_origin = np.dot(T_fwd, cat)[:3]
-    print t_origin
-    cat = t_origin
-    rotated = np.dot(Rx, cat)[:3]
-    print rotated
-    cat = np.append(rotated, [1])
-    t_back = np.dot(T_bwd, cat)[:3]
-    print t_back
+    coords, atoms, all_coords, ids, res = restrain.get_coordinates(gro, 2, 'NA')
+
+    atom_no = np.where(ids == args.atoms[0])[0][0]  # meh
+    t_atom = np.where(ids == args.atoms[1])[0][0]  # double meh
+
+    p_centers = Structure_char.avg_pore_loc(4, coords, atoms)
+
+    thetas = angles(coords, p_centers)
+
+    translated = reposition(all_coords, coords.shape[1], p_centers, atom_no, t_atom, 1)
+
+    # repositioned = sort(translated, coords.shape[1], 1)
+
+    write_gro(translated, ids, res)
