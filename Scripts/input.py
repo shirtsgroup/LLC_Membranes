@@ -40,7 +40,7 @@ if args.xlink == 'on':
 else:
     mon_top = '#include "%s/../Structure-Files/Monomer_Tops/%s.itp' % (location, args.build_mon)
 
-gaff = '#include "%s/../Structure-Files/Forcefields/gaff/' % location  # generalized amber force field
+gaff = '#include "%s/../Structure-Files/Forcefields/gaff' % location  # generalized amber force field
 
 # Energy minimization .mdp file
 title = 'title = Energy Minimization'
@@ -69,6 +69,7 @@ if args.ensemble == 'npt':
     a.append(['nstenergy = %s\n' % int(args.length / (args.dt * args.frames))])
     a.append(['nstlist = 40\n'])
     a.append(['nstype = grid\n'])
+    a.append(['vdwtype = PME\n'])
     a.append(['coulombtype = PME\n'])
     a.append(['Tcoupl = v-rescale\n'])
     a.append(['tc_grps = %s\n' % ' '.join(grps)])
@@ -83,7 +84,7 @@ if args.ensemble == 'npt':
         a.append(['compressibility = 4.5e-5 0\n'])
     a.append(['gen_vel = yes\n'])
     a.append(['pbc = xyz\n'])
-    a.append(['DispCorr = Ener\n'])
+    a.append(['DispCorr = EnerPres\n'])
     if args.xlink == 'on':
         a.append('periodic-molecules = yes\n')
     if args.restraints == 'on':
@@ -112,6 +113,7 @@ if args.ensemble == 'nvt':
     a.append(['nstenergy = %s\n' % int(args.length / (args.dt * args.frames))])
     a.append(['nstlist = 40\n'])
     a.append(['nstype = grid\n'])
+    a.append(['vdwtype = PME\n'])
     a.append(['coulombtype = PME\n'])
     a.append(['Tcoupl = v-rescale\n'])
     a.append(['tc_grps = %s\n' % ' '.join(grps)])
@@ -119,7 +121,7 @@ if args.ensemble == 'nvt':
     a.append(['ref_t = %s\n' % ' '.join([str(300) for i in grps])])
     a.append(['gen_vel = yes\n'])
     a.append(['pbc = xyz\n'])
-    a.append(['DispCorr = Ener\n'])
+    a.append(['DispCorr = EnerPres\n'])
     if args.xlink == 'on':
         a.append('periodic-molecules = yes\n')
     if args.restraints == 'on':
@@ -133,7 +135,7 @@ if args.ensemble == 'nvt':
 
 a = []
 a.append(';Forcefield\n')
-a.append('%s\n' % gaff)
+a.append('%s/gaff.itp\n' % gaff)
 a.append('\n')
 a.append(';Monomer Topology\n')
 if args.restraints == 'on':

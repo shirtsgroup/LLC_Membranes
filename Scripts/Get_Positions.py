@@ -25,7 +25,7 @@ def initialize():
 
     parser.add_argument('-i', '--input', default='wiggle.gro', help='Name of file containing coordinates')
     parser.add_argument('-c', '--component', default='sys', help = 'Component to extract information of')
-    parser.add_argument('-l', '--LC_type', default='HII', help = 'Name of this LC system. Should match its name in'
+    parser.add_argument('-l', '--LC_type', default='NAcarb11Vd', help = 'Name of this LC system. Should match its name in'
                                                                  'LC_class.py')
     parser.add_argument('-t', '--traj', default='yes', help = 'Do you want to read a trajectory .gro file?')
     parser.add_argument('-s', '--solv', default='no', help = 'Is the system solvated?')

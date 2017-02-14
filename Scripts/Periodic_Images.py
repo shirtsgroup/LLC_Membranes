@@ -28,6 +28,7 @@
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
+import MDAnalysis as md
 
 
 def initialize():
@@ -37,9 +38,6 @@ def initialize():
     parser.add_argument('-f', '--file', default='15nm.gro', help='File to replicate periodically')
     parser.add_argument('-o', '--output', default='Periodic.gro', help='Name of output file')
     parser.add_argument('-i', '--images', default=1, help='Number of periodic images')
-    parser.add_argument('-x', '--xbox', default=8.11920, help='Length of x box vector')
-    parser.add_argument('-y', '--ybox', default=8.11920, help='Length of y box vector - NOTE: not y-component, but '
-                                                              'length of entire vector')
     parser.add_argument('-a', '--angle', default=60, help='Angle between x and y box vector')
 
     args = parser.parse_args()
@@ -80,15 +78,24 @@ def pbcs(pts, images, angle, xbox, ybox, frame):
     x_shift, y_shift = shift_matrices(images, angle, xbox, ybox)
     mat_dim = 2 * images + 1
 
-    tot_pts = np.shape(pts)[1]
+    tot_pts = np.shape(pts)[0]
+
     translated_pts = np.zeros([3, mat_dim**2, tot_pts])
 
-    for p in range(tot_pts):
-        for i in range(mat_dim):
-            for j in range(mat_dim):
-                translated_pts[0, i*mat_dim + j, p] = x_shift[i, j] + pts[0, p, frame]
-                translated_pts[1, i*mat_dim + j, p] = y_shift[i, j] + pts[1, p, frame]
-                translated_pts[2, i*mat_dim + j, p] = pts[2, p, frame]  # z position unchanged
+    if len(pts.shape) == 3:
+        for p in range(tot_pts):
+            for i in range(mat_dim):
+                for j in range(mat_dim):
+                    translated_pts[0, i*mat_dim + j, p] = x_shift[i, j] + pts[0, p, frame]
+                    translated_pts[1, i*mat_dim + j, p] = y_shift[i, j] + pts[1, p, frame]
+                    translated_pts[2, i*mat_dim + j, p] = pts[2, p, frame]  # z position unchanged
+    else:
+        for p in range(tot_pts):
+            for i in range(mat_dim):
+                for j in range(mat_dim):
+                    translated_pts[0, i*mat_dim + j, p] = x_shift[i, j] + pts[p, 0]/10
+                    translated_pts[1, i*mat_dim + j, p] = y_shift[i, j] + pts[p, 1]/10
+                    translated_pts[2, i*mat_dim + j, p] = pts[p, 2]/10  # z position unchanged
 
     return translated_pts
 
@@ -98,18 +105,18 @@ if __name__ == "__main__":
     args = initialize()
     images = int(args.images)
     angle = float(args.angle)
-    xbox = float(args.xbox)
-    ybox = float(args.ybox)
     frame = 0
 
-    import Get_Positions
-    pos = Get_Positions.get_positions('%s' % args.file, 'sys', 'HII', 'no')[0]
-    print 'positions got'
-    # For full system
-    # pos = np.load('pos_array612ns')
-    # id = np.load('identity_array612ns')
+    gro = md.coordinates.core.reader('%s' % args.file)
+    pos = gro.ts._pos
+    box = gro.ts._unitcell
+    xbox = box[0]/10
+    ybox = box[1]/10
+    zbox = box[2]/10
 
-    no_comp = np.shape(pos)[1]
+    print 'positions got'
+
+    no_comp = np.shape(pos)[0]
 
     id = np.zeros([1, no_comp], dtype=object)
 
@@ -126,17 +133,6 @@ if __name__ == "__main__":
         count += 1
 
     pt_periodic = pbcs(pos, images, angle, xbox, ybox, frame)
-    #
-    # f = open('pts_periodic', 'w')
-    # np.save(f, pt_periodic)
-    # f.close()
-
-    #
-    # pt_periodic = np.load('pts_periodic')
-    # print np.shape(pt_periodic)
-    # exit()
-
-    f = open('%s' % args.output, 'w')
 
     pts = np.shape(pt_periodic)[2]
     duplicates = np.shape(pt_periodic)[1]
@@ -147,19 +143,14 @@ if __name__ == "__main__":
         for j in range(pts):
             all_positions[:, i*pts + j] = pt_periodic[:, i, j]
 
-    # f = open('NA_positions_5_images', 'w')
-    # np.save(f, all_positions)
-    # f.close()
-    print 'here'
+    f = open('%s' % args.output, 'w+')
+
     f.write("This is a .gro file\n")
     f.write("%s\n" % (pts*duplicates))
     count = 0
     count1 = 1
     for j in range(duplicates):
         print j
-        # if j == 6:
-        #     break
-        # if j != 2 and j != 3:
         for i in range(pts):
             row = str(pt_periodic[:, j, i])
 
@@ -185,8 +176,7 @@ if __name__ == "__main__":
             if count1 == 100000:
                 count1 = 0
 
-
-    f.write('   0.00000   0.00000  0.00000\n')
+    f.write('{:>3.6f}{:>3.6f}{:>3.6f}\n'.format(xbox*(2*images + 1), ybox*(2*images + 1), zbox))
 
     f.close()
 

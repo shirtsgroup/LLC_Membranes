@@ -3,6 +3,7 @@
 import argparse
 import numpy as np
 import mdtraj as md
+import MDAnalysis as mda
 import matplotlib.pyplot as plt
 import math
 
@@ -15,10 +16,12 @@ def initialize():
     parser.add_argument('-t', '--traj', default='wiggle.trr', help='Trajectory file (.trr, .xtc should work)')
     parser.add_argument('-d', '--axis', default='z', help='Axis along which to calculate number density. If you put '
                                                           'anything other than x, y or z, it will default to z')
-    parser.add_argument('-a', '--atoms', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='List of atoms of interest')
+    parser.add_argument('-a', '--atoms', nargs='+', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], type=str, help='List of atoms of interest')
     parser.add_argument('-c', '--center', default='yes', help='Set this to yes if you want to calculate the number'
                                                               'density based on the centers of the selected atoms')
     parser.add_argument('-b', '--bin', default=.1, type=float, help='bin size (nm)')
+    parser.add_argument('--single_frame', help='Optional argument to turn on if you are looking at a single frame',
+                        action="store_true")
 
     args = parser.parse_args()
 
@@ -32,20 +35,37 @@ def centers(pos, atoms):
     :param atoms: list of selected atoms
     :return: the coordinates for the centers of all selected atoms
     """
-    frames = np.shape(pos)[0]
-    natoms = np.shape(pos)[1]
-    ncenters = natoms / len(atoms)  # the number of centers that will be calculated
 
-    c = np.zeros([frames, ncenters, 3])
-    nselect = len(atoms)  # the number of selected atoms
+    if len(pos.shape) == 3:
+        frames = pos.shape[0]
+        natoms = pos.shape[1]
+        ncenters = natoms / len(atoms)  # the number of centers that will be calculated
 
-    for i in range(frames):
-        for j in range(ncenters):
-            sum = np.zeros([3])
-            for k in range(nselect):
-                sum += pos[i, j*nselect + k, :]
-            sum /= nselect
-            c[i, j, :] = sum
+        c = np.zeros([frames, ncenters, 3])
+        nselect = len(atoms)  # the number of selected atoms
+
+        for i in range(frames):
+            for j in range(ncenters):
+                sum = np.zeros([3])
+                for k in range(nselect):
+                    sum += pos[i, j*nselect + k, :]
+                sum /= nselect
+                c[i, j, :] = sum
+    else:  # single frame case
+        natoms = pos.shape[0]
+        ncenters = natoms / len(atoms)
+        frames = 1
+
+        c = np.zeros([1, ncenters, 3])
+        nselect = len(atoms)
+
+        for i in range(frames):
+            for j in range(ncenters):
+                sum = np.zeros([3])
+                for k in range(nselect):
+                    sum += pos[j*nselect + k, :]
+                sum /= nselect
+                c[i, j, :] = sum
 
     return c
 
@@ -95,7 +115,11 @@ def density(pos, axis, bin, box, sum='yes'):
     nT = pos.shape[0]  # number of trajectory points
     nA = pos.shape[1]  # number of atoms
 
-    b = box[0, axis] / 2  # middle of the box with respect to axis
+    if nT == 1:
+        b = box[axis] / 2
+    else:
+        b = box[0, axis] / 2  # middle of the box with respect to axis
+
     count = 0
     x = []
 
@@ -121,7 +145,10 @@ def density(pos, axis, bin, box, sum='yes'):
 
     for i in range(nT):
 
-        b = box[i, axis] / 2  # center of the membrane with respect to axis
+        if nT != 1:
+            b = box[i, axis] / 2  # center of the membrane with respect to axis
+        else:
+            b = box[axis] / 2
 
         count = 0
         x = []
@@ -196,13 +223,21 @@ if __name__ == '__main__':
     args = initialize()
 
     # load trajectory
-    t = md.load('%s' % args.traj, top='%s' % args.gro)
-    atoms = args.atoms
-    keep = [a.index for a in t.topology.atoms if a.name in atoms]  # restrict trajectory to chosen atoms
-    t.restrict_atoms(keep)
-    pos = t.xyz  # get just the coordinates
-    box = t.unitcell_lengths  # get the unit cell lengths
-    frames = np.shape(pos)[0]
+    if args.single_frame:
+        u = mda.Universe('%s' % args.gro)  # make universe with coordinate file
+        atom_names = ['name %s' % a for a in args.atoms]  # format string properly for use in select_atoms class
+        list = ' or '.join(atom_names)
+        pos = u.select_atoms("%s" % list).positions / 10 # get coordinates of selected atoms
+        box = u.dimensions[:3] / 10
+        frames = 1
+    else:
+        t = md.load('%s' % args.traj, top='%s' % args.gro)
+        atoms = args.atoms
+        keep = [a.index for a in t.topology.atoms if a.name in atoms]  # restrict trajectory to chosen atoms
+        t.restrict_atoms(keep)
+        pos = t.xyz  # get just the coordinates
+        box = t.unitcell_lengths  # get the unit cell lengths
+        frames = np.shape(pos)[0]
 
     # find out along which axis we are going to analyze
     if args.axis == 'x':

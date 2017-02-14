@@ -13,7 +13,7 @@ cp npt.trr 100000.trr
 
 for f in 3162 56 8 3 2 1 0; do
 	restrain.py -f ${f} -A xyz -r on -D off -w off
-	gmx grompp -f npt.mdp -p NaPore.top -c npt.gro -o npt
+	gmx grompp -f npt.mdp -p topol.top -c npt.gro -o npt
 	gmx mdrun -v -deffnm npt
 	cp npt.gro ${f}.gro
 	cp npt.trr ${f}.trr
