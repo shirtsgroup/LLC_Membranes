@@ -79,7 +79,7 @@
 	\end{itemize}
 	
 	%MRS3: Take a pass at reprhasing this -- important to get this right. don't start with a preposition.
-
+        %MRS4: maybe ``consistent with physical observations?''
 	We must show that the developed molecular model is physically realistic so that we can trust conclusions drawn about structural features characteristic of the system.
 	%old:To trust our understanding of which structural features are most likely characteristic of the system, and the conclusions drawn thereof, we must show that our molecular model is physically realistic.   
 	\begin{itemize}
@@ -121,6 +121,7 @@
 	%Twenty monomer  per pore provides a balance of structural accuracy and computational efficiency. 
 	%MRS2: describe quantitatively how you decided.  What is the information that made you make the decision?
 	%BJC2: It's hard to give much quantitative back up. We decided on this with more qualitative backup. We chose 20 to be safe but probably could have gotten away with less.
+        %MRS4: OK, but note that we will need to expand this to be enough convincing qualitative information.  Could also use quantitaitve information about how far from the surface you see the effects of the surface.
 	\begin{itemize}
 		\item Space between membrane layers in z direction - semi-isotropic sims fix z box dimension
 		\item 5 layers create micellar structure
@@ -130,6 +131,7 @@
 %MRS3: what is the thesis? decide what each figure is attempting to communicate to the reader.
 %BJC3: Maybe i include this in the supplemental information. I don't think a picture of the initial configuration is actually that interesting or important. I can't think of a thesis for a figure that is purely illustrative 
 	FIGURE: initial configuration \\
+%MRS4: I'm not quite sure what ``pores are rotated'' means.
 	caption: A representative initial configuration. The pores are rotated to prevent overlaps \\
 	\\
 	\noindent Initial guesses for the remaining structural parameters were chosen based on experimental data and treated as variables during model development 
@@ -155,7 +157,10 @@
 	
 	\section{Results and Discussion}
 	
-	Proper selection of initial structural parameters results in an equilibrated model that is experimentally consistent 
+	Proper selection of initial structural parameters results in an equilibrated model that is 
+%MRS4: change to be more specific.
+consistent with several key experimental measurements.
+%experimentally consistent 
 	\begin{itemize}
 		\item Visual perspective \\
 %MRS3: what is the thesis of the figure -- what is it trying to show.  Important when analyzing the outline and deciding what it means.  Make that the caption.
@@ -173,11 +178,13 @@
 			\item Crosslinking locks in structure, maintaining pore distances even after long simulations
 			\item Simulated SAXS data
 		\end{itemize}
+%MRS4: seems like an awful lot to put into one figure, even with multiple panels.
 		FIGURE - perhaps a four panel figure
 		(a) Experimental Small Angle X-ray scattering data shows confirms a hexagonally packed morphology and tells us the distance between pores \\
 		(b) Measuring the distance between pores over time indicates equilibration when the distances stop changing \\
 		(c) A crosslinked system run for 100 ns shows that the system maintains itself close to its initial position \\ 
-		(d) A simulated x-ray diffraction pattern generated from atomic coordinates matches experimental measurements \\  	
+		(d) A simulated x-ray diffraction pattern generated from atomic coordinates matches experimental measurements \\
+%MRS4: I think we will need to be much more specific about how the simulated x-ray diffraction pattern matches experimental masurement, and the different features that do match.  	
 		\item Pore Radius - a less reliable validation because we don't have an agreed upon way to measure this parameter experimentally
 		\item Density - there are crude lab measurements which my model is in agreement with (no one has reported any values since it wasn't relevant to them)
 	\end{itemize}
@@ -193,9 +200,13 @@
 		\\ Figure \\
 		(a) The number density of benzene ring centers in the z direction shows regions with higher concentrations of the component \\
 		(b) A power spectrum of the data in (a) indicates that a new layer is defined every 4 angstroms implying that there are 5 monomers per layer.\\
+%MRS4: make it clear that this is calculated from the equilbrium distance. 
+%MRS5: in general, there should be some information we can see looking directly at the density, not just the power spectrum.  We will need to convince people there is something there.
 		\item Even though there are defined regions of higher component density, there is still considerable variation in the position of the components (shown by the extra noise in the power spectrum)
 		\item This suggests that the arrangement of monomers is more complicated than simple layers stacked on top of each other
 		\item Density of components along Z axis \\
+%MRS4: we need to reconcile the idea ``there are 5 monomers per layer'' and ``there are not clear layers''.  It will be hard for me to reconcile them without knowing a bit more information.
+%MRS4: question: are the monomers themselves in a helical shape (not just the head groups?)
 		\item There are not clear layers despite the defined layers in the starting configuration.
 		
 	\end{itemize}
@@ -208,16 +219,19 @@
 		\item The membrane may exhibit the permeability-selectivity tradeoff inherent to solution-diffusion type membranes.
 		\\FIGURE - plot from grant - sodium, benzene, tail densities in pores
                 %MRS3: again, thesis.
+%MRS4: we should think a little bit about whether which parts of the alkyl tail we plot, and whether to just focus on the core (ignoring the first 5 A or so from each end).  Depends on what we are trying to show.
 		caption: The densities of sodium (blue), benzene (red), and alkyl tail carbons (cyan) surrounding the membrane pore centers indicate that each the pore region is a soup of the three components opposing the previously assumed hollow region. 
 	\end{itemize}	
 	
 	%BJC: New x-ray data here. Need higher resolution simulated data (working on it) and supporting experimental results first.
+        %MRS4 got it.  Will need to do some work on making this clear.
 	
 	The model gives reasonable estimates of ionic conductivity.
 	\begin{itemize}
 		\item There are a few ways to estimate ionic conductivity as seen in literature. We prefer a method which can extract an estimate based purely on an equilibrium trajectory
 		\item We must also be sure that our analysis of results is consistent with the method use for experimental evaluation (i.e. AC impedance spectroscopy)
 		\item We must also link our perfectly straight microscopic system to the not-so-straight macroscopic system
+                %MRS4: not sure you describe how to do that here.
 		\item Two methods used to for prediction
 		\item Nernst Einstein Relation:
 		\begin{itemize}
