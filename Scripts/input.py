@@ -135,16 +135,16 @@ if args.ensemble == 'nvt':
 
 a = []
 a.append(';Forcefield\n')
-a.append('%s/gaff.itp\n' % gaff)
+a.append('%s/gaff.itp"\n' % gaff)
 a.append('\n')
 a.append(';Monomer Topology\n')
 if args.restraints == 'on':
     a.append('#include "./dipole.itp"\n')
 else:
-    a.append('%s/gaff.itp\n' % mon_top)
+    a.append('%s/gaff.itp"\n' % mon_top)
 a.append('\n')
 a.append(';Ion Topology\n')
-a.append('%s/ions.itp\n' % gaff)
+a.append('%s/ions.itp"\n' % gaff)
 a.append('\n')
 a.append('[ system ]\n')
 a.append('%s simulation of %s\n' % (args.ensemble, args.build_mon))

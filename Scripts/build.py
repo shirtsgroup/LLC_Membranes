@@ -388,6 +388,7 @@ if __name__ == "__main__":
     exec "plane_atoms = LC_class.%s.planeatoms" % args.build_mon
     exec "ref_index = LC_class.%s.ref_atom_index" % args.build_mon
     exec "lineatoms = LC_class.%s.lineatoms" % args.build_mon
+     
     no_monomers = args.monomers  # number of monomers packed per layer around a pore
     pore_radius = args.radius  # Radius of pore (unsure of units right now)
     no_pores = args.nopores  # number of pores to be simulated
@@ -396,8 +397,8 @@ if __name__ == "__main__":
     dist = args.dbwl  # distance between layers (units tbd)
 
     f = open("%s/../Structure-Files/HII_Monomer_Configurations/%s" % (location, build_mon), "r")
-
     if build_mon.endswith('.pdb'):
+    	print 'hello'
         xyz, identity, no_atoms, lines_of_text = read_pdb_coords(f)
     elif build_mon.endswith('.gro'):
         xyz, identity, no_atoms, lines_of_text = read_gro_coords(f)
