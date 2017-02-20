@@ -398,7 +398,6 @@ if __name__ == "__main__":
 
     f = open("%s/../Structure-Files/HII_Monomer_Configurations/%s" % (location, build_mon), "r")
     if build_mon.endswith('.pdb'):
-    	print 'hello'
         xyz, identity, no_atoms, lines_of_text = read_pdb_coords(f)
     elif build_mon.endswith('.gro'):
         xyz, identity, no_atoms, lines_of_text = read_gro_coords(f)

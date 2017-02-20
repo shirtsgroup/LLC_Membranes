@@ -169,7 +169,7 @@ def density(pos, axis, bin, box, sum='yes'):
 
         for j in range(nA):
             a = pos[i, j, axis]
-            bin_no = len(x) / 2 + np.floor((a - b)/bin)
+            bin_no = int(len(x) / 2 + np.floor((a - b)/bin))
             if sum == 'yes':
                 d[bin_no] += 1
             else:

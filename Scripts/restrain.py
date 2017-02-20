@@ -39,6 +39,8 @@ def initialize():
     parser.add_argument('-c', '--charge', default=10, help= 'Charge on dipoles')
 
     parser.add_argument('-A', '--axis', default='xy', help='Axis to restrain along with position restraints')
+    parser.add_argument('--noxlink', help='Specify this if the system will not be crosslinked or there are no '
+                                          'virtual sites in the system', action="store_true")
 
     args = parser.parse_args()
 
@@ -370,7 +372,10 @@ if __name__ == "__main__":
 
     f.close()
 
-    Assembly_itp.write_file(a, 'on', args.out, rings)
+    if args.noxlink:
+        Assembly_itp.write_file(a, 'off', args.out, rings)
+    else:
+        Assembly_itp.write_file(a, 'on', args.out, rings)
 
     if args.dipoles == 'on':
 
