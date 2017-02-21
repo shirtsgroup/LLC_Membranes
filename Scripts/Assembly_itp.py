@@ -224,7 +224,7 @@ if __name__ == "__main__":
 
     f.close()
 
-    write_file(a, '%s' % args.xlink, '%s' % args.output)
+    write_file(a, '%s' % args.xlink, '%s' % args.output, no_mon)
 
 
 

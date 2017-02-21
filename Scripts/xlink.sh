@@ -46,6 +46,7 @@ while [ ${STOP} -eq 0 ]; do
     else
         xlink.py -i ${GRO} -c ${CUTOFF}  -e ${TERM_PROB} -r ${ITERATION} -d ${CUTOFF_RAD} -y crosslinked_new.itp -x ${XLINKS}
     fi
+    restrain.py -r on -g wiggle.gro -o crosslinked_new.itp -f 100000 -A xyz -D off -w off  -m NAcarb11V_dummy --xlink  # this should just add the restraints section to the .itp
     cp crosslinked_new.itp crosslinked_${ITERATION}.itp
     mv xlink.log xlink_${ITERATION}.log
     gmx grompp -f em.mdp -p NaPore.top -c wiggle.gro -o em

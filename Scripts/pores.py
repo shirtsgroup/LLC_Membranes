@@ -38,9 +38,9 @@ if __name__ == '__main__':
     centers = np.zeros([4, 2])
 
     for i in range(4):
-        for j in range(60):
-            centers[i, :] += pos[i*60 + j, :2]
-        centers[i, :] /= 60
+        for j in range(120):
+            centers[i, :] += pos[i*120 + j, :2]
+        centers[i, :] /= 120
 
     # for i in range(4):
     #     for j in range(17160):

@@ -495,8 +495,8 @@ if int(args.iteration) == 0:
     import os
     location = os.environ['GITHUB']  # if there is an error here, you need to add the path to where all of the github
     # files are stored to an environment variable in your .bashrc
-    with open("crosslinked.itp", "w+") as output:
-        subprocess.call(["python", "%s/Scripts/Assembly_itp.py" %location, "-x", "on", "-m", "%s" %args.monomer], stdout=output);
+    subprocess.call(["python", "%s/Scripts/Assembly_itp.py" % location, "-x", "on", "-m", "%s" % args.monomer,
+                     "-O", "crosslinked.itp"])
 
     # open and read that new file
 
@@ -974,9 +974,11 @@ while b[vsite_index].count('[ virtual_sites4 ]') == 0:
 
 vsite_count = vsite_index + 2
 
-for i in range(vsite_count, len(b)):  # This is the last section in the input .itp file
-    vsite_count += 1
+# for i in range(vsite_count, len(b)):  # This is the last section in the input .itp file
+#     vsite_count += 1
 
+while b[vsite_count] != '\n':
+    vsite_count += 1
 # we need to make a new list of virtual sites that does not include in the sites which have been turned to real atoms
 # term and H_new1 contain the indices of the hydrogens which need to be removed from the virtual sites list
 

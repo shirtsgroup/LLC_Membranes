@@ -18,8 +18,8 @@ parser.add_argument('-d', '--dt', default=0.002, type=float, help='time step (ps
 parser.add_argument('-l', '--length', default=1000, type=int, help='simulation length (ps)')
 parser.add_argument('-f', '--frames', default=50, type=int, help='number of frames')
 parser.add_argument('-p', '--pcoupltype', default='semiisotropic', type=str, help='Pressure Couple Type')
-parser.add_argument('-r', '--restraints', default='off', type=str, help='If restraints are on, another mdp option needs'
-                                                                        'to be turned on')
+parser.add_argument('--restraints', help='If restraints are on, another mdp option needs to be turned on, so specify '
+                                         'this flag', action="store_true")
 parser.add_argument('-x', '--xlink', default='off', type=str, help='Turn this to "on" if the the system is crosslinked')
 parser.add_argument('-c', '--coord', default='initial.gro', type=str, help='coordinate file of system to be simulated')
 
@@ -87,7 +87,7 @@ if args.ensemble == 'npt':
     a.append(['DispCorr = EnerPres\n'])
     if args.xlink == 'on':
         a.append('periodic-molecules = yes\n')
-    if args.restraints == 'on':
+    if args.restraints:
         a.append(['refcoord_scaling = all\n'])
 
     f = open('%s.mdp' % args.ensemble, 'w')
@@ -124,7 +124,7 @@ if args.ensemble == 'nvt':
     a.append(['DispCorr = EnerPres\n'])
     if args.xlink == 'on':
         a.append('periodic-molecules = yes\n')
-    if args.restraints == 'on':
+    if args.restraints:
         a.append(['refcoord_scaling = all\n'])
 
     f = open('%s.mdp' % args.ensemble, 'w')
@@ -138,10 +138,10 @@ a.append(';Forcefield\n')
 a.append('%s/gaff.itp"\n' % gaff)
 a.append('\n')
 a.append(';Monomer Topology\n')
-if args.restraints == 'on':
+if args.restraints:
     a.append('#include "./dipole.itp"\n')
 else:
-    a.append('%s/gaff.itp"\n' % mon_top)
+    a.append('%s"\n' % mon_top)
 a.append('\n')
 a.append(';Ion Topology\n')
 a.append('%s/ions.itp"\n' % gaff)
@@ -167,10 +167,10 @@ for i in range(len(gro)):
 
 nmon = int(nres / natoms)
 
-if args.restraints == 'off':
-    a.append('%s                %s\n' % (mon_name, nmon))
-else:
+if args.restraints:
     a.append('%s                1\n' % (mon_name))
+else:
+    a.append('%s                %s\n' % (mon_name, nmon))
 a.append('%s                 %s\n' % (ion, nion))
 
 f = open('topol.top', 'w')

@@ -16,9 +16,10 @@ def initialize():
     parser.add_argument('-c', '--coord', default='wiggle_solv.gro', help='A coordinate file needed by MD traj')
     parser.add_argument('-r', '--radius', default=.6, type=float, help='Radius of cylinder defining pore (nm)')
     parser.add_argument('-b', '--buffer', default=0.1, type=float, help='Percent into membrane to start calculations')
-    parser.add_argument('-s', '--save', default='on', type=str, help='Save the arrays or not')
-    parser.add_argument('-l', '--load', default='off', type=str, help='If youve already save the arrays, load them for speedup')
+    parser.add_argument('--save', help='Save the arrays or not', action="store_true")
+    parser.add_argument('--load', help='If youve already save the arrays, load them for speedup', action="store_true")
     parser.add_argument('-B', '--bin', default=0.1, type=float, help='bin size for calculating density')
+    parser.add_argument('--gif', help='Save output as .gif', action="store_true")
 
     args = parser.parse_args()
 
@@ -83,7 +84,7 @@ if __name__ == "__main__":
 
     args = initialize()
 
-    if args.load == 'on':
+    if args.load:
         zmax = np.load('zmax')
         zmin = np.load('zmin')
         pos = np.load('pos')
@@ -116,7 +117,7 @@ if __name__ == "__main__":
         t.restrict_atoms(atoms_to_keep)
         pos = t.xyz
 
-        if args.save == 'on':
+        if args.save:
             f = open('zmax', 'w')
             np.save(f, zmax)
             f.close()
@@ -189,6 +190,7 @@ if __name__ == "__main__":
     plt.ylabel('Count of waters')
     plt.xlabel('Distance into membrane (nm)')
     plt.title('Density of water along z axis')
-    anim.save('Water_Density.gif', writer='imagemagick')
+    if args.gif:
+        anim.save('Water_Density.gif', writer='imagemagick')
     plt.show()
 

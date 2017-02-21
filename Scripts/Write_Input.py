@@ -121,7 +121,7 @@ if args.ensemble == 'NPT':
                'rlist = 1.2\n', 'rcoulomb = 1.2\n', 'rvdw = 1.2\n', 'coulombtype = PME\n', 'pme_order = 4\n',
                'fourierspacing = 0.16\n', tcoupl + '\n', tc_grps + '\n', tau_t + '\n', ref_t + '\n', Pcoupl + '\n', Pcoupltype + '\n',
                ref_p + '\n', compress + '\n', 'gen_vel = no\n', pbc + '\n', 'DispCorr = Ener' + '\n',
-               periodic_molecules + '\n'])
+               periodic_molecules + '\n', 'refcoord-scaling = all'])
 
 if args.solvated == 'on':
     title = 'title = Solvated System'
