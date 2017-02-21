@@ -39,8 +39,10 @@ def initialize():
     parser.add_argument('-c', '--charge', default=10, help= 'Charge on dipoles')
 
     parser.add_argument('-A', '--axis', default='xy', help='Axis to restrain along with position restraints')
-    parser.add_argument('--noxlink', help='Specify this if the system will not be crosslinked or there are no '
+    parser.add_argument('--novsites', help='Specify this if the system will not be crosslinked or there are no '
                                           'virtual sites in the system', action="store_true")
+    parser.add_argument('--xlink', help='Specify this flag if the system is being crosslinked while restrained',
+                        action="store_true")
 
     args = parser.parse_args()
 
@@ -372,10 +374,14 @@ if __name__ == "__main__":
 
     f.close()
 
-    if args.noxlink:
-        Assembly_itp.write_file(a, 'off', args.out, rings)
+    if args.novsites:
+        Assembly_itp.write_file(a, 'off', args.out, rings)  # there will be an error if the second argument is 'on' with
+                                                            # no virtual sites
     else:
-        Assembly_itp.write_file(a, 'on', args.out, rings)
+        if args.xlink:  # don't re-write the topology file if you are iteratively crosslinking
+            pass
+        else:
+            Assembly_itp.write_file(a, 'on', args.out, rings)
 
     if args.dipoles == 'on':
 
