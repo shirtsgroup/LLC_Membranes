@@ -24,6 +24,7 @@ def initialize():
     parser.add_argument('-s', '--layer_distribution', default='uniform', help = 'The distribution of monomers per layer')
     parser.add_argument('-a', '--alt_1', default=6, type=int, help='Monomers per layer for the first type of alternating layer')
     parser.add_argument('-A', '--alt_2', default=8, type=int, help='Monomers per layer for the second type of alternating layer')
+    parser.add_argument('-t', '--tilt', default=0, type=float, help='Monomer tilt angle')
 
     args = parser.parse_args()
 
@@ -97,10 +98,11 @@ def slope(pt1, pt2):
     return m
 
 
-def rotateplane(plane_atoms):
+def rotateplane(plane_atoms, angle=0):
     """
     Calculate a rotation matrix to rotate a plane in 3 dimensions
     :param plane_atoms: names of atoms making up plane which is being aligned in the xy plane
+    :param angle: desired angle between xy plane (optional, default = 0 i.e. in plane)
     :return:
     """
     # Arrays to hold x,y,z values of each point of interest
@@ -119,7 +121,7 @@ def rotateplane(plane_atoms):
     # The cross product of v12 and v13 give a vector that is perpendicular to the plane:
     N = np.cross(v12, v13)
 
-    N_desired = [0, 0, 1]  # We want the normal vector to be perpendicular to a horizontal plane at the origin
+    N_desired = [0, math.sin(angle), math.cos(angle)]  # vector in the direction normal to our desired plane orientation
 
     RotationAxis = np.cross(N, N_desired)
     theta = math.acos(np.dot(N, N_desired)/(np.linalg.norm(N)*np.linalg.norm(N_desired)))  #  Rotation Angle (radians)
@@ -409,7 +411,7 @@ if __name__ == "__main__":
     sys_atoms = sum(layer_distribution)*no_atoms  # total number of atoms in the system
 
     # Now rotate plane to align with xy plane
-    R = rotateplane(plane_atoms)
+    R = rotateplane(plane_atoms, angle=(args.tilt*math.pi / 180))
 
     b = np.ones([1])
     for i in range(np.shape(xyz)[1]):
