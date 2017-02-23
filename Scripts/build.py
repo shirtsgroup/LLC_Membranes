@@ -25,6 +25,8 @@ def initialize():
     parser.add_argument('-a', '--alt_1', default=6, type=int, help='Monomers per layer for the first type of alternating layer')
     parser.add_argument('-A', '--alt_2', default=8, type=int, help='Monomers per layer for the second type of alternating layer')
     parser.add_argument('-t', '--tilt', default=0, type=float, help='Monomer tilt angle')
+    parser.add_argument('-H', '--helix', help="Specify this flag if you want to build in a helical configuration",
+                        action="store_true")
 
     args = parser.parse_args()
 
@@ -340,8 +342,12 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
                 Rx = rotate(theta)
                 xyz = np.zeros(positions.shape)
                 for i in range(no_atoms - no_ions):
-                    xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist + (dist/float(layer_mons))*j]
-                    hundreds = int(math.floor(atom_count/100000))
+                    if args.helix:
+                        xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist + (dist/float(layer_mons))*j]
+                        hundreds = int(math.floor(atom_count/100000))
+                    else:
+                        xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist]
+                        hundreds = int(math.floor(atom_count/100000))
                     f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(monomer_count, name, identity[i],
                         atom_count - hundreds*100000, xyz[0, i]/10.0, xyz[1, i]/10.0, xyz[2, i]/10.0) + "\n")
                     atom_count += 1
@@ -370,8 +376,12 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
                 xyz = np.zeros([3, no_ions])
                 for i in range(0, no_ions):
                     monomer_count += 1
-                    xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b*p2p, c*p2p, k*dist + (dist/float(layer_mons))*j]
-                    hundreds = int(math.floor(atom_count/100000))
+                    if args.helix:
+                        xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b*p2p, c*p2p, k*dist + (dist/float(layer_mons))*j]
+                        hundreds = int(math.floor(atom_count/100000))
+                    else:
+                        xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b*p2p, c*p2p, k*dist]
+                        hundreds = int(math.floor(atom_count/100000))
                     f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(monomer_count, identity[no_atoms - (i + 1)],
                         identity[no_atoms - (i + 1)], atom_count - hundreds*100000, xyz[0, i]/10.0, xyz[1, i]/10.0,
                         xyz[2, i]/10.0) + "\n")
