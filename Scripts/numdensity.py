@@ -101,7 +101,7 @@ def d_dist(pos, box, bin):
     return dist, r
 
 
-def density(pos, axis, bin, box, sum='yes'):
+def density(pos, axis, bin, box, sum='yes', smooth_factor=1):
     """
     Calculate the average number density of components along an axis
     :param pos: a numpy array with xyz coordinates of selected atoms for all frames
@@ -109,6 +109,7 @@ def density(pos, axis, bin, box, sum='yes'):
     :param bin: size of the bins which the axis will be split into
     :param box: the box
     :param sum: if sum = 'yes' then all frames will be added together and averaged
+    :param smooth_factor = x: record measurements every x frames (only relevant for trajectories)
     :return: density as a function of distance along axis
     """
 
@@ -140,13 +141,13 @@ def density(pos, axis, bin, box, sum='yes'):
     if sum == 'yes':
         d = np.zeros([L])
     else:
-        d = np.zeros([nT, L])
-        xT = np.zeros([nT, L])
+        d = np.zeros([int(nT/smooth_factor), L])
+        xT = np.zeros([int(nT/smooth_factor), L])
 
-    for i in range(nT):
+    for i in range(int(nT/smooth_factor)):
 
         if nT != 1:
-            b = box[i, axis] / 2  # center of the membrane with respect to axis
+            b = box[i*smooth_factor, axis] / 2  # center of the membrane with respect to axis
         else:
             b = box[axis] / 2
 
@@ -168,7 +169,7 @@ def density(pos, axis, bin, box, sum='yes'):
             xT[i, :L] = x
 
         for j in range(nA):
-            a = pos[i, j, axis]
+            a = pos[i*smooth_factor, j, axis]
             bin_no = int(len(x) / 2 + np.floor((a - b)/bin))
             if sum == 'yes':
                 d[bin_no] += 1
@@ -177,7 +178,7 @@ def density(pos, axis, bin, box, sum='yes'):
 
     if sum == 'yes':
         for i in range(len(d)):  # take the average
-            d[i] /= nT
+            d[i] /= (nT / smooth_factor)
 
     if sum == 'yes':
         return x, d
