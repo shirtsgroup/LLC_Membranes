@@ -109,7 +109,7 @@ if __name__ == '__main__':
     print 'mean = %s' % mean
 
     plt.figure()
-    im = plt.imshow(pixels, cmap='%s' % args.cmap, interpolation='none', vmin=1e6, vmax=1e11)
+    im = plt.imshow(pixels, cmap='%s' % args.cmap, interpolation='gaussian', vmin=1e6, vmax=1e11)
     plt.show()
     # plt.figure()
     # q, theta, intensities = Radial_int_pixels.radial_int(pixel_sum, 1024, .0002, 0.0001, 1.18, 1.54e-10)
