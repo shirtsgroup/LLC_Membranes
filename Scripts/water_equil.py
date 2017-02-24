@@ -16,11 +16,11 @@ def initialize():
     parser.add_argument('-c', '--coord', default='wiggle_solv.gro', help='A coordinate file needed by MD traj')
     parser.add_argument('-r', '--radius', default=.6, type=float, help='Radius of cylinder defining pore (nm)')
     parser.add_argument('-b', '--buffer', default=0.1, type=float, help='Percent into membrane to start calculations')
-    parser.add_argument('--save', help='Save the arrays or not', action="store_true")
-    parser.add_argument('--load', help='If youve already save the arrays, load them for speedup', action="store_true")
+    parser.add_argument('-s', '--save', help='Save the arrays or not', action="store_true")
+    parser.add_argument('-l', '--load', help='If youve already save the arrays, load them for speedup', action="store_true")
     parser.add_argument('-B', '--bin', default=0.1, type=float, help='bin size for calculating density')
-    parser.add_argument('--gif', help='Save output as .gif', action="store_true")
-    parser.add_argument('-s', '--smooth_factor', type=int, default=5, help='Record measurements every x frames')
+    parser.add_argument('-g', '--gif', help='Save output as .gif', action="store_true")
+    parser.add_argument('-S', '--smooth_factor', type=int, default=5, help='Record measurements every x frames')
 
     args = parser.parse_args()
 
@@ -187,7 +187,7 @@ if __name__ == "__main__":
             #annotate = ax.annotate('Time: %s ns' % (time[i]/1000.0), xy=((zmin[-1] + zmax[-1]) / 2, density[-1, end]*2/3))
         return rects  #, annotate
 
-    anim = animation.FuncAnimation(fig, animate, frames=int(nT/args.smooth_factor), interval=40, init_func=init)
+    anim = animation.FuncAnimation(fig, animate, frames=int(nT/args.smooth_factor), interval=100, init_func=init)
     plt.ylabel('Count of waters')
     plt.xlabel('Distance into membrane (nm)')
     plt.title('Density of water along z axis')

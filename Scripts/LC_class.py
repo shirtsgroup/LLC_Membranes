@@ -47,10 +47,12 @@ NAcarb9V = LC('HII', 'NA', 119, 'NAcarb9V.pdb', 9, ['C15', 'C28', 'C41'], ['C14'
                 1, ['C2', 'C16', 'C42'], [1, 2], 2)
 NAcarb10V = LC('HII', 'NA', 128, 'NAcarb10V.pdb', 9, ['C16', 'C30', 'C44'], ['C15', 'C29', 'C43'], 3, ['HII', 'NA'],
                 1, ['C2', 'C17', 'C45'], [1, 2], 2)
-NAcarb11V = LC('HII', 'NA', 137, 'NAcarb11V_1.gro', 9, ['C20', 'C34', 'C48'], ['C19', 'C33', 'C47'], 3, ['HII', 'NA'], 1,
+NAcarb11V = LC('HII', 'NA', 137, 'monomer6.gro', 9, ['C20', 'C34', 'C48'], ['C19', 'C33', 'C47'], 3, ['HII', 'NA'], 1,
                ['C', 'C2', 'C4'], [0, 3], 9)
 NAcarb11Vd = LC('HII', 'NA', 143, 'NAcarb11V_1_dummy.gro', 9, ['C20', 'C34', 'C48'], ['C19', 'C33', 'C47'], 3, ['HII', 'NA'],
                 1, ['C', 'C2', 'C4'], [0, 3, 9], 9)
+NAcarb11Vflat = LC('HII', 'NA', 137, 'NAcarb11V_1.gro', 9, ['C20', 'C34', 'C48'], ['C19', 'C33', 'C47'], 3, ['HII', 'NA'], 1,
+               ['C', 'C2', 'C4'], [0, 3], 9)
 
 # SOL should be deleted. Need to check for usage first
 SOL = LC('Water', 'H', 3, 'spc216.gro', 9, ['na'], ['na'], 1, ['OW', 'HW1', 'HW2'], 0, ['OW', 'HW1', 'HW2'], ['C', 'C3', 'C6'], 9)

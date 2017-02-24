@@ -27,6 +27,8 @@ def initialize():
     parser.add_argument('-t', '--tilt', default=0, type=float, help='Monomer tilt angle')
     parser.add_argument('-H', '--helix', help="Specify this flag if you want to build in a helical configuration",
                         action="store_true")
+    parser.add_argument('-O', '--offset', help="Specify this flag to build the system in an offset configuration",
+                        action="store_true")
 
     args = parser.parse_args()
 
@@ -339,6 +341,8 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
             for j in range(layer_mons):  # iterates over each monomer to create coordinates
                 monomer_count += 1
                 theta = j * math.pi / (layer_mons / 2.0) + rot
+                if args.offset:
+                    theta += (k % 2) * (math.pi / layer_mons)
                 Rx = rotate(theta)
                 xyz = np.zeros(positions.shape)
                 for i in range(no_atoms - no_ions):
@@ -354,7 +358,7 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
 
     # Ions:
 
-    for l in range(0, no_pores):  # loop to create multiple pores
+    for l in range(no_pores):  # loop to create multiple pores
         theta = 30  # angle which will be used to do hexagonal packing
         if l == 0:  # unmodified coordinates
             b = 0
@@ -368,10 +372,12 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
         elif l == 3:  # moves a pore down and to the right
             b = -math.sin(math.radians(theta))
             c = -math.cos(math.radians(theta))
-        for k in range(0, no_layers):
+        for k in range(no_layers):
             layer_mons = layer_distribution[l*no_layers + k]
-            for j in range(0, layer_mons):  # iterates over each monomer to create coordinates
-                theta = j * math.pi / (layer_mons / 2.0) + (l % 2) * math.pi / 6 # angle to rotate about axis determined from no of monomers per layer
+            for j in range(layer_mons):  # iterates over each monomer to create coordinates
+                theta = j * math.pi / (layer_mons / 2.0)
+                if args.offset:
+                    theta += (k % 2) * (math.pi / layer_mons)
                 Rx = rotate(theta)
                 xyz = np.zeros([3, no_ions])
                 for i in range(0, no_ions):
