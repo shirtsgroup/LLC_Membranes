@@ -440,7 +440,7 @@ if __name__ == "__main__":
         f.write("\n[ virtual_sites3 ]\n")
         f.write("; Site   from                  funct         a             b             c" + "\n")
         for i in range(rings*2):
-            f.write('{:<8d}{:<8d}{:<8d}{:<8d}{:<8d}{:<1.9f}{:5s}{:<1.9f}{:5s}{:<1.9f}'.format(int(vsites[0, i]), int(vsites[1, i]),
+            f.write('{:<9d}{:<9d}{:<9d}{:<9d}{:<9d}{:<1.9f}{:5s}{:<1.9f}{:5s}{:<1.9f}'.format(int(vsites[0, i]), int(vsites[1, i]),
                                                                     int(vsites[2, i]), int(vsites[3, i]), int(vsites[4, i]),
                                                                     vsites[5, i],'', vsites[6, i],'', vsites[7, i]) + "\n")
 

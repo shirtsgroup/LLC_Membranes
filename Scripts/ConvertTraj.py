@@ -21,6 +21,8 @@ def initialize():
     parser.add_argument('-r', '--res', default='HII', help='Name of residue wanted')
     parser.add_argument('-b', '--begin', default=0, type=int, help='Frame number to begin reading')
     parser.add_argument('-e', '--end', type=int, help='specify if you want to end somewhere other than the last frame')
+    parser.add_argument('--single_frame', help='Will create a copy of the current frame to make an artificial traj',
+                        action="store_true")
 
     args = parser.parse_args()
 
@@ -30,12 +32,20 @@ if __name__ == "__main__":
 
     args = initialize()
 
-    t = md.load('%s' % args.file, top='%s' % args.coord)
+    if args.single_frame:
+        t = md.load('%s' % args.coord)
+        f = open('%s' % args.coord, 'r')
+        a = f.readlines()
+        f.close()
+        box = a[-1].split()
+    else:
+        t = md.load('%s' % args.traj, top='%s' % args.coord)
+        box = t.unitcell_vectors  # get the unit cell lengths
+    # t = md.load('%s' % args.file, top='%s' % args.coord)
     pos = t.xyz
     id = np.array([a.name for a in t.topology.atoms])
-    box = t.unitcell_vectors  # get the unit cell lengths
-    nT = t.xyz.shape[0]
-    atoms = t.xyz.shape[1]
+    nT = pos.shape[0]
+    atoms = pos.shape[1]
     time = t.time
     print 'Trajectory read'
 
@@ -57,16 +67,27 @@ if __name__ == "__main__":
     print 'Writing file ...'
     with open('%s' % args.output, 'w') as f:
         f.write('%s %s\n' % (atoms, (end - begin + 1)))
-        for i in range(begin - 1, end):
-            # f.write('Frame %s, time = %s ps\n' % ((i + 1), time[i]))
-            f.write('Frame %s\n' % (i + 1))
-            f.write('{:^6}{:^8}{:^8}{:^8}'.format('Atom', 'x', 'y', 'z') + '\n')
-            for j in range(atoms):
-                if id[j] != 'PI':
-                    f.write('{:6s}{:8.3f}{:8.3f}{:8.3f}'.format(id[j], pos[i, j, 0], pos[i, j, 1], pos[i, j, 2]) + '\n')
-            f.write('{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}\n'.format(box[i, 0, 0], box[i, 1, 1], box[i, 2, 2]
-                                                                                ,box[i, 0, 1], box[i, 1, 0], box[i, 2, 0]
-                                                                                ,box[i, 0, 2], box[i, 1, 2], box[i, 2, 0]))
+        if args.single_frame:
+            for i in range(2):
+                f.write('Frame %s\n' % (i + 1))
+                f.write('{:^6}{:^8}{:^8}{:^8}'.format('Atom', 'x', 'y', 'z') + '\n')
+                for j in range(atoms):
+                    if id[j] != 'PI':
+                        f.write('{:6s}{:8.3f}{:8.3f}{:8.3f}\n'.format(id[j], pos[0, j, 0], pos[0, j, 1], pos[0, j, 2]))
+                f.write('{:10s}{:10s}{:10s}{:10s}{:10s}{:10s}{:10s}{:10s}{:10s}\n'.format(box[0], box[1], box[2]
+                                                                                    ,box[3], box[4], box[5]
+                                                                                    ,box[6], box[7], box[8]))
+        else:
+            for i in range(begin - 1, end):
+                # f.write('Frame %s, time = %s ps\n' % ((i + 1), time[i]))
+                f.write('Frame %s\n' % (i + 1))
+                f.write('{:^6}{:^8}{:^8}{:^8}'.format('Atom', 'x', 'y', 'z') + '\n')
+                for j in range(atoms):
+                    if id[j] != 'PI':
+                        f.write('{:6s}{:8.3f}{:8.3f}{:8.3f}\n'.format(id[j], pos[i, j, 0], pos[i, j, 1], pos[i, j, 2]))
+                f.write('{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}\n'.format(box[i, 0, 0], box[i, 1, 1], box[i, 2, 2]
+                                                                                    ,box[i, 0, 1], box[i, 1, 0], box[i, 2, 0]
+                                                                                    ,box[i, 0, 2], box[i, 1, 2], box[i, 2, 0]))
 
     print 'Output file %s written' % args.output
 

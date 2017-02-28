@@ -77,10 +77,11 @@ if args.ensemble == 'npt':
     a.append(['ref_t = %s\n' % ' '.join([str(300) for i in grps])])
     a.append(['Pcoupl = berendsen\n'])
     a.append(['Pcoupltype = %s\n' % args.pcoupltype])
-    a.append(['ref_p = %s\n' % ' '.join([str(1) for i in grps])])
     if args.pcoupltype == 'Isotropic':
+        a.append(['ref_p = 1\n'])
         a.append(['compressibility = 4.5e-5\n'])
     else:
+        a.append(['ref_p = %s\n' % ' '.join([str(1) for i in grps])])
         a.append(['compressibility = 4.5e-5 0\n'])
     a.append(['gen_vel = yes\n'])
     a.append(['pbc = xyz\n'])
