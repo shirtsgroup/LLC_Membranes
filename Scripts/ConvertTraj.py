@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#! /usr/bin/env python
 
 """
 Convert a trajectory file in .gro format into simple ascii format with plain atom names and their coordinates
@@ -39,7 +39,7 @@ if __name__ == "__main__":
         f.close()
         box = a[-1].split()
     else:
-        t = md.load('%s' % args.traj, top='%s' % args.coord)
+        t = md.load('%s' % args.file, top='%s' % args.coord)
         box = t.unitcell_vectors  # get the unit cell lengths
     # t = md.load('%s' % args.file, top='%s' % args.coord)
     pos = t.xyz
