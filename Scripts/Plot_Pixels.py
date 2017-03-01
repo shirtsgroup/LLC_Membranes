@@ -18,6 +18,10 @@ def initialize():
     parser.add_argument('-y', '--ypixel', default=1024, help='Number of pixels in the y direction')
     parser.add_argument('-c', '--cmap', default='Greys', help='Color Scheme for heat map -- more options at '
                                                               'http://matplotlib.org/examples/color/colormaps_reference.html')
+    parser.add_argument('--max', default=1, type=float, help='Maximum intensity for heat map (normalized so 1 is the max)')
+    parser.add_argument('--min', default=0, type=float, help='Minimum intensity for heat map')
+    parser.add_argument('-r', '--radius', default=1, type=int, help='Radius of block of pixels to set to zero to get rid of high '
+                                                       'intensity signals that throw off plotting')
 
     args = parser.parse_args()
 
@@ -41,6 +45,15 @@ def get_pixels_asc(file, xpixel, ypixel):
 
     return pixel_values
 
+
+def beamstop(pixels, r):
+
+    c = pixels.shape[0] / 2
+    for i in range(r):
+        pixels[c + i, c - r + i: c + r - i] = 0
+        pixels[c - 1 - i, c - r + i: c + r - i] = 0
+
+    return pixels
 
 if __name__ == '__main__':
     args = initialize()
@@ -74,6 +87,8 @@ if __name__ == '__main__':
 
     # import Radial_int_pixels
     #pixels = np.loadtxt(args.file)
+
+
     f = open(args.file, 'r')
     a = []
     for line in f:
@@ -106,10 +121,13 @@ if __name__ == '__main__':
     Imax = max(maxes)
     mean = np.mean(means)
     print 'Imax = %s' % Imax
-    print 'mean = %s' % mean
+    # print 'mean = %s' % mean
+    print args.file
+    for i in range(pixels.shape[1]):  # normalize
+        pixels[:, i] /= Imax
 
     plt.figure()
-    im = plt.imshow(pixels, cmap='%s' % args.cmap, interpolation='gaussian', vmin=1e6, vmax=1e11)
+    im = plt.imshow(pixels, cmap='%s' % args.cmap, interpolation='gaussian', vmin=args.min, vmax=args.max)
     plt.show()
     # plt.figure()
     # q, theta, intensities = Radial_int_pixels.radial_int(pixel_sum, 1024, .0002, 0.0001, 1.18, 1.54e-10)
