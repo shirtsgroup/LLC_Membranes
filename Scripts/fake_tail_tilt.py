@@ -42,7 +42,7 @@ mpl = 6
 dbwl = .37
 layers = 20
 offset = 'yes'
-sigma = 0.5
+sigma = 0.1
 npores = 4
 p2p = 4.5
 
