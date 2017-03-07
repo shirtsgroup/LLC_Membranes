@@ -78,10 +78,7 @@
 		\item We can use fourier analysis to determine if there are distinct layers, and if so, how many monomers are situated in each layer.
 	\end{itemize}
 	
-	%MRS3: Take a pass at reprhasing this -- important to get this right. don't start with a preposition.
-        %MRS4: maybe ``consistent with physical observations?''
-	We must show that the developed molecular model is physically realistic so that we can trust conclusions drawn about structural features characteristic of the system.
-	%old:To trust our understanding of which structural features are most likely characteristic of the system, and the conclusions drawn thereof, we must show that our molecular model is physically realistic.   
+	We must show that the developed molecular model is consistent with physical observations so that we can trust conclusions drawn about structural features characteristic of the system.
 	\begin{itemize}
 		\item This paper will illustrate the careful development of a predictive molecular model and the steps taken to ensure it mimics the real system as best we can 
 		\item To understand how physically realistic the model is, validation by comparison to experiment is necessary
@@ -118,21 +115,18 @@
 	\end{itemize}
 	
 	Each pore is made of twenty stacked monomer layers, the smallest number of layers possible without sacrificing the expected aligned hexagonal morphology.
-	%Twenty monomer  per pore provides a balance of structural accuracy and computational efficiency. 
-	%MRS2: describe quantitatively how you decided.  What is the information that made you make the decision?
-	%BJC2: It's hard to give much quantitative back up. We decided on this with more qualitative backup. We chose 20 to be safe but probably could have gotten away with less.
         %MRS4: OK, but note that we will need to expand this to be enough convincing qualitative information.  Could also use quantitaitve information about how far from the surface you see the effects of the surface.
 	\begin{itemize}
 		\item Space between membrane layers in z direction - semi-isotropic sims fix z box dimension
 		\item 5 layers create micellar structure
 		\item Beyond 20 layers is unnecessary to get expected configuration
 		\item layers spaced far enough apart to avoid large energy repulsions but close enough to prevent disks slipping between one another ~ 5 angstroms works.
+		\item How far into membrane do we have to go to avoid effects of the surface (this is a TODO)
 	\end{itemize}
 %MRS3: what is the thesis? decide what each figure is attempting to communicate to the reader.
 %BJC3: Maybe i include this in the supplemental information. I don't think a picture of the initial configuration is actually that interesting or important. I can't think of a thesis for a figure that is purely illustrative 
 	FIGURE: initial configuration \\
-%MRS4: I'm not quite sure what ``pores are rotated'' means.
-	caption: A representative initial configuration. The pores are rotated to prevent overlaps \\
+	caption: A representative initial configuration. Each pore is rotated about the z axis rotated to prevent overlaps between pores \\
 	\\
 	\noindent Initial guesses for the remaining structural parameters were chosen based on experimental data and treated as variables during model development 
 	\begin{itemize}
@@ -157,41 +151,83 @@
 	
 	\section{Results and Discussion}
 	
-	Proper selection of initial structural parameters results in an equilibrated model that is 
-%MRS4: change to be more specific.
-consistent with several key experimental measurements.
-%experimentally consistent 
+	Appropriate selection of initial structural parameters including interlayer spacing, relative interlayer orientation, and pore spacing results in an equilibrated model that is experimentally consistent.
 	\begin{itemize}
 		\item Visual perspective \\
 %MRS3: what is the thesis of the figure -- what is it trying to show.  Important when analyzing the outline and deciding what it means.  Make that the caption.
 		FIGURE: shows top view and cross section (with pbcs on)\\
-		%caption: (a) A top view of an equilibrated LLC membrane system shows defined pores and the expected hexagonal morphology. \\
-		%(b) A side vew of an equilibrated LLC membrane system shows the straight cylindrical pores, emphasized by large blue sodium ions 
-			caption: % BJC3: Attempt #2 trying to make it more thesis like. These aren't meant to do much other than show that we get, qualitatively, the same strucure described in the literature
-		(a) The expected hexagonal membrane morphology is preserved upon equilibration
-		(b) Straight cylindrical pore regions are present 
+		caption: \\ 
+		(a) The expected hexagonal membrane morphology is preserved upon equilibration \\
+		(b) Straight cylindrical pore regions are present \\
 		\item System dimensions and properties are consistent upon equilibration using multiple monomer configurations 
 		\item Pore to pore distance
 		\begin{itemize}
 			\item We know from SAXS data what the distance between pores should be
 			\item We require long simulation times to reach an equilibrated structure with the correct dimensions
 			\item Crosslinking locks in structure, maintaining pore distances even after long simulations
-			\item Simulated SAXS data
 		\end{itemize}
-%MRS4: seems like an awful lot to put into one figure, even with multiple panels.
-		FIGURE - perhaps a four panel figure
-		(a) Experimental Small Angle X-ray scattering data shows confirms a hexagonally packed morphology and tells us the distance between pores \\
-		(b) Measuring the distance between pores over time indicates equilibration when the distances stop changing \\
-		(c) A crosslinked system run for 100 ns shows that the system maintains itself close to its initial position \\ 
-		(d) A simulated x-ray diffraction pattern generated from atomic coordinates matches experimental measurements \\
-%MRS4: I think we will need to be much more specific about how the simulated x-ray diffraction pattern matches experimental masurement, and the different features that do match.  	
+
+		FIGURE - 2 panels \\
+		(a) Measuring the distance between pores over time indicates equilibration when the distances stop changing \\
+		(b) A crosslinked system run for 100 ns shows that the system maintains itself close to its initial position \\
+ 
+		\item Simulated X-ray Diffraction
+		\begin{itemize}
+			\item We used the 3 dimensional fourier transformed electron density to generate simulated 1D and 2D diffraction patterns
+			\item The 1D patterns are generated by spherical integration of the FT
+			\item 2D patterns are generated by taking cross sections of the FT in the qx, qy and qz planes
+			\item We matched experiments based on iterative improvement of our choice in initial structure and equilibration procedure
+		\end{itemize}
+	        
+		FIGURE - 4 panels \\
+        	(a) Experimental Small Angle X-ray Scattering data confirms a hexagonally packed morphology and tells us the average distance between pores \\
+        	(b) A simulated 1D x-ray diffraction pattern generated from atomic coordinates matches experimental measurements \\
+        	(c) Experimental Wide Angle X-ray Scattering patterns provide details of structure on a length scale less than 1 nm. The diffuse ring at q = 1.4 A\textsuperscript{-1} represents the average distance between carbons in packed alkyl chains. Meridional reflections at q = TBD A\textsuperscript{-1} are caused by pi-stacking. The weak meridional reflections at q = TBD A\textsuperscript{-1} are hypothesized to be a consequence of parallel-displaced stacking of benzene rings \\
+		(d) Simulated X-ray diffraction pattern show the same dominant reflections which appear experimentally
+
 		\item Pore Radius - a less reliable validation because we don't have an agreed upon way to measure this parameter experimentally
 		\item Density - there are crude lab measurements which my model is in agreement with (no one has reported any values since it wasn't relevant to them)
 	\end{itemize}
-	
+
+        Experiments to be run!
+        \begin{itemize}
+                   \item Layered vs. offset configuration
+                   \begin{itemize}
+                        \item All simulations involving 'offset' configurations (which seems to be the correct configuration) will have a 'layered' counterpart in order to highlight difference between the two configurations.
+                        \item The comparison can be a figure in supplemental information
+                   \end{itemize}
+                   \item Measures of stability / analysis (These methods will be applied to all simulations run)
+                   \begin{itemize}
+                        \item Pore-to-pore distances
+                        \item Tilt angle vs. time
+                        \item Radial distribution functions
+                        \item Simulated diffraction patterns
+                   \end{itemize}
+                   \item Effect of temperature on stability of configurations
+                   \begin{itemize}
+                        \item Three different temperature systems have been set up and simulated for 20 ns (All with 20 layers and no vapor gap): 260K, 280K and 300K
+                        \item I have systems with no restraints on at all three temperatures
+                        \item We can look at them with weak restraints in case the systems misbehave as time goes on. As of now, the tilt angles look to stabilize after 10 ns
+                        \item If we get stable configurations with correct XRD patterns at lower temps but not higher, it may be a consequence of the forcefield
+                        \end{itemize}
+                   \item Effect of restraints on stability
+		   \begin{itemize}
+                        \item Run out simulations with weak restraints (f = 0.1 kJ/mol*nm2)
+                        \item Higher restraints may cause the system to be too ordered, but it may be worth running in the case of long term movement
+                        \item Run out simulations with no restraints (same simulation as 300K, no restraints from temperature stability sims)
+                        \item Hopefully this will let us abandon restraints after equilibration
+                   \end{itemize}
+		   \item Other simulations
+                   \begin{itemize}
+                        \item Offset, no vapor gap, 20 layer : No tilt (i.e. use monomers that I have previously used). I want to see if the diagonal spots still show up. The concern here is that I wont be able to get the monomers close enough together without causing some unreconcilable energy minimization errors.
+                        \item Offset, higher tilt. I'm working on a monomer that tilted more than the one I previously used. Can I make spots appear based purely on tilt? Also, what implications does this have for the pore spacing.
+                   \end{itemize}
+        \end{itemize}
+
 	The monomers are arranged into disks containing 5 monomers in each layer.
 	%BJC: So, it looks like there is some kind of z directional order 
-        
+       	%BJC5: This will require some re-evaluation once we come to a reliable starting configuration and equilibration procedure based on the diffraction results
+ 
 	\begin{itemize}
 		\item It has been suggested that there are 4 monomers in a each disk/layer, however, simulations have shown that this leads to unstable configurations with dimensions that are too small compared to experiment.
 		\item Stable simulations with 6 and 7 monomers have been performed which give structural characteristics consistent with experiment
@@ -206,7 +242,7 @@ consistent with several key experimental measurements.
 		\item This suggests that the arrangement of monomers is more complicated than simple layers stacked on top of each other
 		\item Density of components along Z axis \\
 %MRS4: we need to reconcile the idea ``there are 5 monomers per layer'' and ``there are not clear layers''.  It will be hard for me to reconcile them without knowing a bit more information.
-%MRS4: question: are the monomers themselves in a helical shape (not just the head groups?)
+%BJC5: Hopefully I'll have an answer to this soon. For now I'm leaving it untouched
 		\item There are not clear layers despite the defined layers in the starting configuration.
 		
 	\end{itemize}
@@ -232,6 +268,7 @@ consistent with several key experimental measurements.
 		\item We must also be sure that our analysis of results is consistent with the method use for experimental evaluation (i.e. AC impedance spectroscopy)
 		\item We must also link our perfectly straight microscopic system to the not-so-straight macroscopic system
                 %MRS4: not sure you describe how to do that here.
+		%BJC5: We should discuss how we will actually make the link. We talked about it once but kind of left it hanging. It will likely be just some constant that we multiply our number by. To calculate the constant, I think using the azimuthal distribution is a good way to go about it. Although for that we'd need more data points telling us ionic conductivity as a function of azimuthal angle. That data will definitely be hard to come by in the near future so maybe a linear model is an okay estimate for now -- just to have something. For that, we know ionic conductivity with randomly oriented crystalline domains and we know ionic conductivity of a 'perfectly' aligned system (from our simulations). So we can make ionic conductivity as a linear function of alignment, I(x) (Actually it'd be piecewise with opposite slopes on either side of the an azimuthal angle of 90). Then we can integrate the azimuthal distribution weighted by I(x) to get a number to multiply our measurements by. 
 		\item Two methods used to for prediction
 		\item Nernst Einstein Relation:
 		\begin{itemize}
