@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import argparse
 import numpy as np
@@ -256,7 +256,8 @@ if __name__ == '__main__':
     # plt.show()
 
     x, d = density(c, axis, args.bin, box)
-
+    print x.shape
+    print d.shape
     ps, freqs, max_freq = power_spectrum(d, args.bin)
 
     print 'Maximum frequency: %s cycles/nm' % max_freq

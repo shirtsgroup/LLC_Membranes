@@ -25,9 +25,11 @@ def initialize():
                         'angle. Each group should have a header line of the format [ groupname ]. The following line '
                         'should list the atoms in the order of their connectivity Each grouped should be separated by a '
                         'blank line')
+    parser.add_argument('-o', '--output', default='tilt.png', type=str, help='Name of plot to be saved')
     parser.add_argument('-s', '--save', help='Save angle array', action="store_true")
     parser.add_argument('-l', '--load', help='Load previously saved angle array', action="store_true")
     parser.add_argument('--single_frame', help='Specify this for a single frame', action="store_true")
+    parser.add_argument('--noshow', help='Specify this flag if you do not want to see the output plot', action="store_true")
 
     args = parser.parse_args()
 
@@ -56,7 +58,7 @@ def read_index(index):
     return grps
 
 
-def angles(pos, atoms, normal=[0, 0, 1]):
+def angles(pos, atoms, normal=[0, 0, -1]):
     """
     :param pos: xyz positions of atoms in tail
     :param atoms: number of atoms
@@ -75,7 +77,7 @@ def angles(pos, atoms, normal=[0, 0, 1]):
             avg_tilt = 0
             for k in range(atoms - 1):  # atoms - 1 since there are n - 1 relevant vector in a straight chain
                 v = pos[i, j*atoms + k, :] - pos[i, j*atoms + k + 1, :]
-                vn = np.dot(v, normal)
+                vn = abs(np.dot(v, normal))
                 nn = np.linalg.norm(normal)
                 vv = np.linalg.norm(v)
                 avg_tilt += np.arcsin(vn / (nn * vv)) * (180 / np.pi)
@@ -139,10 +141,15 @@ if __name__ == "__main__":
         for i in range(nT):
             stds[i] = np.std(all_tilt_angles[i, :])
             avgs[i] = np.mean(all_tilt_angles[i, :])
-        print stds[0]
 
+        print np.mean(avgs[nT/2:])
+        print np.mean(stds[nT/2:])
+        # Format and save figure
         plt.figure()
         plt.errorbar(times, avgs, yerr=stds)
-
-        plt.show()
-
+        plt.title('Tilt angle versus time')
+        plt.xlabel('Time (ps)')
+        plt.ylabel('Tilt angle w.r.t xy plane (degrees)')
+        plt.savefig(args.output)
+        if not args.noshow:
+            plt.show()
