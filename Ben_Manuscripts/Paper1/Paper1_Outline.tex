@@ -190,36 +190,44 @@
 	\end{itemize}
 
         Experiments to be run!
+%MRS4: more generally, we may want to explore the fact that there are other stable configurations (like the disordered ones we have found).  We should brainstorm ways of calculating the free energy difference, BUT we should avoid it in this paper.
         \begin{itemize}
                    \item Layered vs. offset configuration
                    \begin{itemize}
                         \item All simulations involving 'offset' configurations (which seems to be the correct configuration) will have a 'layered' counterpart in order to highlight difference between the two configurations.
+%MRS4: Which, hopefully, will show that that is not consistent with experiment.
                         \item The comparison can be a figure in supplemental information
                    \end{itemize}
                    \item Measures of stability / analysis (These methods will be applied to all simulations run)
                    \begin{itemize}
                         \item Pore-to-pore distances
-                        \item Tilt angle vs. time
-                        \item Radial distribution functions
+                        \item Tilt angle vs. time  % it seems more likely that the circular anisotropy is NOT tilt angle but it is worth monitoring for now.
+                        \item Radial distribution functions  %MRS: this may be some thing that we present as an analysis AFTER we look at stability, since the other things are more things that can be verified vs. experiment.
                         \item Simulated diffraction patterns
                    \end{itemize}
-                   \item Effect of temperature on stability of configurations
+                   %MRS4: so this is something that we want to be careful about how we present the rationale.  THe original rationale is that if the interactions were effectively too weak compared to experiemnt, then the 'effective' temperature would be a bit higher than we the 'thermostatted' temperature.  I think that  
+                   \item Effect of temperature on stability of configurations.  15 degrees off (room temperature is 295) is much more likely than 260, though for our purposes, we probably want to run lower just to be sure.  Would be interesting to know the temperature stability of the experimental structure before cross-linking . . .  
                    \begin{itemize}
                         \item Three different temperature systems have been set up and simulated for 20 ns (All with 20 layers and no vapor gap): 260K, 280K and 300K
+                          %MRS4: we will need longer than 20 ns to make sure they have stabilized.  We know there are structures that are at least metastable (our somewhat more disordered phase)
                         \item I have systems with no restraints on at all three temperatures
                         \item We can look at them with weak restraints in case the systems misbehave as time goes on. As of now, the tilt angles look to stabilize after 10 ns
-                        \item If we get stable configurations with correct XRD patterns at lower temps but not higher, it may be a consequence of the forcefield
+%MRS4: yea, the reason for weak restraints would be to kind of replace the force field errors -- i.e. what would it look like if it HAPPENED to have a slightly larger bias toward that configuration.  Ideally, we won't need restraints.
+%MRS4: and maybe we do it with just the 3 temperatures first, before adding restraints.  THere are so many variables, we want to be sure we are running simulations which are more likely to give results.
+                        \item If we get stable configurations with correct XRD patterns at lower temps but not higher, it may be a consequence of the forcefield %MRS: correct, though it's better if it works ok at 280 vs 260.  We don't want it to start to crystallize.
                         \end{itemize}
                    \item Effect of restraints on stability
 		   \begin{itemize}
-                        \item Run out simulations with weak restraints (f = 0.1 kJ/mol*nm2)
+                        \item Run out simulations with weak restraints (f = 0.1 kJ/mol*nm2) %MRS4: or possibly weaker.  Should work out the RMSD allowed by the restraints, and possibly let them move as much as 1/6 of the way around the circle.  
                         \item Higher restraints may cause the system to be too ordered, but it may be worth running in the case of long term movement
                         \item Run out simulations with no restraints (same simulation as 300K, no restraints from temperature stability sims)
                         \item Hopefully this will let us abandon restraints after equilibration
                    \end{itemize}
 		   \item Other simulations
                    \begin{itemize}
+                     %MRS4: OK, so this is the same as above, except with no tilt in the monomers?
                         \item Offset, no vapor gap, 20 layer : No tilt (i.e. use monomers that I have previously used). I want to see if the diagonal spots still show up. The concern here is that I wont be able to get the monomers close enough together without causing some unreconcilable energy minimization errors.
+%MRS4: it is good to see if spots an appear from the tilt, though it looks like we can get them with layered configurations even w/o the tilt.
                         \item Offset, higher tilt. I'm working on a monomer that tilted more than the one I previously used. Can I make spots appear based purely on tilt? Also, what implications does this have for the pore spacing.
                    \end{itemize}
         \end{itemize}
