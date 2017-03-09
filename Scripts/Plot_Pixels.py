@@ -16,7 +16,7 @@ def initialize():
     parser.add_argument('-f', '--file', default='1periodic_far.asc', help='Name of file to read')
     parser.add_argument('-x', '--xpixel', default=1024, help='Number of pixels in the x direction')
     parser.add_argument('-y', '--ypixel', default=1024, help='Number of pixels in the y direction')
-    parser.add_argument('-c', '--cmap', default='Greys', help='Color Scheme for heat map -- more options at '
+    parser.add_argument('-c', '--cmap', default='inferno', help='Color Scheme for heat map -- more options at '
                                                               'http://matplotlib.org/examples/color/colormaps_reference.html')
     parser.add_argument('--max', default=1, type=float, help='Maximum intensity for heat map (normalized so 1 is the max)')
     parser.add_argument('--min', default=0, type=float, help='Minimum intensity for heat map')
