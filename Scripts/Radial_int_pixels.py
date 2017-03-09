@@ -130,7 +130,7 @@ def radial_int(pixel_intensities, pixels, dr, dim, dist, wavelength):
         for j in range(pixels):
             intensity = pixel_intensities[i, j]
             distance = distance_mat[j, i]  # indices flipped in this matrix ...
-            bin_no = np.floor(distance/max_dist * bins)
+            bin_no = int(np.floor(distance/max_dist * bins))
             if bin_no == bins:
                 intensities[bin_no - 1] += intensity
             else:
@@ -159,6 +159,9 @@ if __name__ == '__main__':
         mins.append(min(pixel_intensities[:, i]))
 
     Imin = min(mins)
+
+    print Imin
+    print np.amax(pixel_intensities)
 
     maxes = []
     for i in range(1024):
