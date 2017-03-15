@@ -100,6 +100,7 @@
 		\item Used Openeye Quacpac molcharge.py to assign charges
 		\item Anneal again 
 		\item Multiple configurations saved from annealing trajectory to prove independence of starting config
+		\item Manual modifications to the structure were made to create specific geometries
 	\end{itemize}
 	
 	The timescale for self assembly of monomers into the hexagonal phase is unknown and likely outside of a reasonable length for an atomistic simulation, calling for a more efficient way to build the system. 
@@ -114,31 +115,39 @@
 		\item Equilibration simulations allow structure to relax into expected configuration 
 	\end{itemize}
 	
-	Each pore is made of twenty stacked monomer layers, the smallest number of layers possible without sacrificing the expected aligned hexagonal morphology.
-        %MRS4: OK, but note that we will need to expand this to be enough convincing qualitative information.  Could also use quantitaitve information about how far from the surface you see the effects of the surface.
-	\begin{itemize}
-		\item Space between membrane layers in z direction - semi-isotropic sims fix z box dimension
-		\item 5 layers create micellar structure
-		\item Beyond 20 layers is unnecessary to get expected configuration
-		\item layers spaced far enough apart to avoid large energy repulsions but close enough to prevent disks slipping between one another ~ 5 angstroms works.
-		\item How far into membrane do we have to go to avoid effects of the surface (this is a TODO)
-	\end{itemize}
+% 	Each pore is made of twenty stacked monomer layers, the smallest number of layers possible without sacrificing the expected aligned hexagonal morphology.
+%         %MRS4: OK, but note that we will need to expand this to be enough convincing qualitative information.  Could also use quantitaitve information about how far from the surface you see the effects of the surface.
+% 	\begin{itemize}
+% 		\item Space between membrane layers in z direction - semi-isotropic sims fix z box dimension
+% 		\item 5 layers create micellar structure
+% 		\item Beyond 20 layers is unnecessary to get expected configuration
+% 		\item layers spaced far enough apart to avoid large energy repulsions but close enough to prevent disks slipping between one another ~ 5 angstroms works.
+% 		\item How far into membrane do we have to go to avoid effects of the surface (this is a TODO)
+% 	\end{itemize}
 %MRS3: what is the thesis? decide what each figure is attempting to communicate to the reader.
 %BJC3: Maybe i include this in the supplemental information. I don't think a picture of the initial configuration is actually that interesting or important. I can't think of a thesis for a figure that is purely illustrative 
+	Each pore is made of twenty stacked monomer layers with continuity in all directions, avoiding any edge effects and creating an infinite length pore ideal for studying transport. 
+	\begin{itemize}
+		\item A thinner system is better to reduce the computational cost and allow us to look at longer timescales
+		\item Number of layers chosen to give sufficient resolution when simulating XRD patterns
 	FIGURE: initial configuration \\
 	caption: A representative initial configuration. Each pore is rotated about the z axis rotated to prevent overlaps between pores \\
 	\\
 	\noindent Initial guesses for the remaining structural parameters were chosen based on experimental data and treated as variables during model development 
 	\begin{itemize}
-		\item SAXS gives an idea of Pore-to-Pore distances
+		\item XRD gives Pore-to-Pore distances of ~4.1 nm and indicates possible pi-stacking at ~3.7 Angstroms
+		\item Pi-stacking exists in multiple stable configurations: sandwiched, T-shaped and parallel-displaced
+		\item T-shaped and parallel-displaced are nearly isoenergetic and more stable than the sandwiched configuration.
+		\item T-shaped configuration is most stable when benzene centers are ~ 5 A apart which is not consistent with WAXS. http://www.jbc.org/content/273/25/15458.full 
+		\item System made with stacked and parallel-displaced benzene rings to see what is favored and matches XRD
 		\item TEM images and rejection studies give a pore size estimate
 		\item To prevent unrealistic jumps during initial equilibration steps, the following equilibration scheme was adopted
-			\begin{itemize}
+		\begin{itemize}
 			\item Apply position restraints to monomer head groups during energy minimization 
 			\item Leave position restraints for npt simulations to allow tails to intermingle (this also helps ensure independence of starting configuration)
-			\item Gradually reduce force constants (by square root every 50 ps) until they are completely off
+			\item Gradually reduce force constants from 1000000 (by square root every 50 ps) until they are completely off
 			\item Run long NPT simulations at 300 K and 1 bar ( $>$200 ns ) to fully equilibrate
-			\end{itemize}
+		\end{itemize}
 	\end{itemize}
 	
 	Using an equilibrated structure, a crosslinking procedure was performed in order to better parallel synthetic procedures. 
