@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# !/usr/bin/env python
 
 """
 Convert a trajectory file in .gro format into simple ascii format with plain atom names and their coordinates
