@@ -93,9 +93,7 @@ if __name__ == "__main__":
 
     print 'Output file %s written' % args.output
 
-<<<<<<< HEAD
     f.close()
-=======
     if args.avg_dims:
         if args.single_frame:
             xyz = box[:3]
@@ -105,4 +103,3 @@ if __name__ == "__main__":
             f.write('{:10f}{:10f}{:10f}'.format(xyz[0], xyz[1], xyz[2]))
 
     print 'Average box dimensions written'
->>>>>>> c39d00be9be02eabaf67815f8353a5ce338a041f
