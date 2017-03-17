@@ -30,8 +30,8 @@ def initialize():
     parser.add_argument('-D', '--dipoles', default='off', help='Put "on" if you want to create dipoles')
     parser.add_argument('-w', '--write_gro', default='off', help='Put "on" if you want to create a .gro with dipoles '
                                                                  'placed in the right spots')
-    parser.add_argument('-f', '--f_const', default=1000, type=int, help='Force constant')
-    parser.add_argument('-a', '--atoms', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='Name of carbons in ring')
+    parser.add_argument('-f', '--f_const', default=1000, type=float, help='Force constant')
+    parser.add_argument('-a', '--atoms', nargs='+', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5', 'C20', 'C34', 'C48'], type=str, help='Name of carbons in ring')
     parser.add_argument('-d', '--distance', default=0.1, help='Distance to offset dipole from ring (Angstroms)')
     parser.add_argument('-m', '--monomer', default='NAcarb11Vd', help='Which monomer topology is being used')
     parser.add_argument('-t', '--toplines', default=2, help='Number of lines at the top of the .gro file to ignore')
@@ -342,7 +342,7 @@ def position_restraints(file, atoms, axis):
         if str.strip(line[10:15]) in atoms:
             atom_numbers.append(int(line[15:20]))
 
-    restraints = np.zeros([5, len(atom_numbers)], dtype=int)  # organize them into a list which can be translated to a topology
+    restraints = np.zeros([5, len(atom_numbers)])  # organize them into a list which can be translated to a topology
     for i in range(len(atom_numbers)):
         restraints[:, i] = [atom_numbers[i], 1, fcx, fcy, fcz]  # See: http://www.gromacs.org/Documentation/How-tos/Position_Restraints
 
@@ -460,8 +460,8 @@ if __name__ == "__main__":
 
         f.write("\n[ position_restraints ]\n")
         for i in range(restraints.shape[1]):
-            f.write('{:6d}{:6d}{:9d}{:9d}{:9d}'.format(restraints[0, i], restraints[1, i], restraints[2, i],
-                                                       restraints[3, i], restraints[4, i]) + "\n")
+            f.write('{:6d}{:6d}{:1s}{:9f}{:1s}{:9f}{:1s}{:9f}\n'.format(int(restraints[0, i]), int(restraints[1, i]),'',
+                                                        restraints[2, i], '', restraints[3, i], '', restraints[4, i]))
 
         f.close()
 

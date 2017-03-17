@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # This is the revamped version of Cylindricity.py
 
@@ -37,7 +37,7 @@ def initialize():
     parser.add_argument('-E', '--equil', default='auto', help = 'Frame number where system is equilibrated. "auto" will '
                         'use pymbar.timeseries.DetectEquilibration to determine which frame to start at. It is worth '
                         'double checking its choice manually')
-    parser.add_argument('-x', '--exclude', default=4, help = 'Which pore-to-pore distance to exclude - pass the index of'
+    parser.add_argument('-x', '--exclude', default=3, help = 'Which pore-to-pore distance to exclude - pass the index of'
                                                             'the pore-to-pore distance as written in the list: '
                                                             '["1-2", "1-3", "1-4", "2-3", "2-4", "3-4"] ')
     parser.add_argument('-b', '--nboot', default=2000, help = 'Number of bootstrap trials')
@@ -297,13 +297,14 @@ if __name__ == '__main__':
     comp_ppore = tot_atoms/n_pores
 
     p_centers = avg_pore_loc(n_pores, pos, len(atoms))
+    print p_centers[:, :, -1]
 
     distances = 6  # number of p2p distances to calculate. My algorithm isn't smart enough for anything but six yet
     p2ps = p2p(p_centers, distances)
 
-    # p2p_avg, p2p_std, equil = p2p_stats(p2ps, '%s' % args.exclude, '%s' % args.nboot, '%s' % args.equil)
-    # print 'Average Pore to Pore distance: %s' % p2p_avg
-    # print 'Standard Deviation of Pore to Pore distances: %s' % p2p_std
+    p2p_avg, p2p_std, equil = p2p_stats(p2ps, '%s' % args.exclude, '%s' % args.nboot, '%s' % args.equil)
+    print 'Average Pore to Pore distance: %s' % p2p_avg
+    print 'Standard Deviation of Pore to Pore distances: %s' % p2p_std
 
     labels = ['1-2', '1-3', '1-4', '2-3', '2-4', '3-4']
     plt.figure(1)

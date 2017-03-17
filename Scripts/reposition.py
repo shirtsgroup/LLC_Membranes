@@ -79,7 +79,9 @@ def translate(obj, pt=np.array([0, 0, 0]), r='na'):
 
         v = pt - obj  # direction in which to move the object
 
-        T[:2, 3] = v[:2]  # the last column contains the vector in whose direction we wish to translate the object. We
+        T[:3, 3] = v[:3]
+
+        #T[:2, 3] = v[:2]  # the last column contains the vector in whose direction we wish to translate the object. We
                           # also do not want to translate in the z direction in this case
 
     else:
