@@ -12,6 +12,7 @@ parser = argparse.ArgumentParser(description='Write .mdp files and topology file
 
 parser.add_argument('-T', '--title', default='Generic Molecular Dynamics Simulation', type=str, help='Simulation Title')
 parser.add_argument('-b', '--build_mon', default='NAcarb11Vd', type=str, help='Monomer structure used for build')
+parser.add_argument('-t', '--itp', default='dipole.itp', type=str, help='Name of .itp describing monomers')
 parser.add_argument('-s', '--em_steps', default=50000, type=int, help='Steps to take during energy minimization')
 parser.add_argument('-e', '--ensemble', default='npt', type=str, help='Thermodynamic ensemble to put system in')
 parser.add_argument('-d', '--dt', default=0.002, type=float, help='time step (ps)')
@@ -72,9 +73,9 @@ if args.ensemble == 'npt':
     a.append(['vdwtype = PME\n'])
     a.append(['coulombtype = PME\n'])
     a.append(['Tcoupl = v-rescale\n'])
-    a.append(['tc_grps = %s\n' % ' '.join(grps)])
-    a.append(['tau_t = %s\n' % ' '.join([str(0.1) for i in grps])])
-    a.append(['ref_t = %s\n' % ' '.join([str(300) for i in grps])])
+    a.append(['tc_grps = system\n'])
+    a.append(['tau_t = %s\n' % str(0.1)])
+    a.append(['ref_t = %s\n' % 300])
     a.append(['Pcoupl = berendsen\n'])
     a.append(['Pcoupltype = %s\n' % args.pcoupltype])
     if args.pcoupltype == 'Isotropic':
@@ -82,7 +83,7 @@ if args.ensemble == 'npt':
         a.append(['compressibility = 4.5e-5\n'])
     else:
         a.append(['ref_p = %s\n' % ' '.join([str(1) for i in grps])])
-        a.append(['compressibility = 4.5e-5 0\n'])
+        a.append(['compressibility = 4.5e-5 4.5e-5\n'])
     a.append(['gen_vel = yes\n'])
     a.append(['pbc = xyz\n'])
     a.append(['DispCorr = EnerPres\n'])
@@ -117,9 +118,9 @@ if args.ensemble == 'nvt':
     a.append(['vdwtype = PME\n'])
     a.append(['coulombtype = PME\n'])
     a.append(['Tcoupl = v-rescale\n'])
-    a.append(['tc_grps = %s\n' % ' '.join(grps)])
-    a.append(['tau_t = %s\n' % ' '.join([str(0.1) for i in grps])])
-    a.append(['ref_t = %s\n' % ' '.join([str(300) for i in grps])])
+    a.append(['tc_grps = system\n'])
+    a.append(['tau_t = %s\n' % str(0.1)])
+    a.append(['ref_t = %s\n' % 300])
     a.append(['gen_vel = yes\n'])
     a.append(['pbc = xyz\n'])
     a.append(['DispCorr = EnerPres\n'])
@@ -140,7 +141,7 @@ a.append('%s/gaff.itp"\n' % gaff)
 a.append('\n')
 a.append(';Monomer Topology\n')
 if args.restraints:
-    a.append('#include "./dipole.itp"\n')
+    a.append('#include "./%s"\n' % args.itp)
 else:
     a.append('%s"\n' % mon_top)
 a.append('\n')
@@ -160,7 +161,7 @@ for line in f:
 
 nres = 0
 nion = 0
-for i in range(len(gro)):
+for i in range(2, len(gro)):
     if gro[i].count('%s' % mon_name) != 0:
         nres += 1
     if gro[i].count('%s' % ion) != 0:

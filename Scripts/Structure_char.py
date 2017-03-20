@@ -18,7 +18,7 @@ from scipy.optimize import curve_fit
 def initialize():
     parser = argparse.ArgumentParser(description='Run Cylindricity script')
 
-    parser.add_argument('-i', '--input', default='wiggle.trr', help = 'Path to input file')
+    parser.add_argument('-t', '--input', default='wiggle.trr', help = 'Path to input file')
     parser.add_argument('-g', '--gro', default='wiggle.gro', help = 'Some kind of configuration file that mdtraj needs'
                                                                     'Can be a .pdb as well')
     parser.add_argument('-n', '--no_monomers', default=6, help = 'Number of Monomers per layer')
@@ -37,10 +37,11 @@ def initialize():
     parser.add_argument('-E', '--equil', default='auto', help = 'Frame number where system is equilibrated. "auto" will '
                         'use pymbar.timeseries.DetectEquilibration to determine which frame to start at. It is worth '
                         'double checking its choice manually')
-    parser.add_argument('-x', '--exclude', default=3, help = 'Which pore-to-pore distance to exclude - pass the index of'
+    parser.add_argument('-x', '--exclude', default=[4], nargs='+', help = 'Which pore-to-pore distance to exclude - pass the index of'
                                                             'the pore-to-pore distance as written in the list: '
                                                             '["1-2", "1-3", "1-4", "2-3", "2-4", "3-4"] ')
     parser.add_argument('-b', '--nboot', default=2000, help = 'Number of bootstrap trials')
+    parser.add_argument('--noshow', help='Specify this flag to prevent the plot from showing', action="store_true")
 
     args = parser.parse_args()
     return args
@@ -97,12 +98,28 @@ def p2p(p_centers, distances):
     p2ps = np.zeros([distances, nT])  # distances in the order 1-2, 1-3, 1-4, 2-3, 2-4, 3-4
     for i in range(nT):
         # So ugly ... sadness :(
-        p2ps[0, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 1, i])
-        p2ps[1, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 2, i])
-        p2ps[2, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 3, i])
-        p2ps[3, i] = np.linalg.norm(p_centers[:, 1, i] - p_centers[:, 2, i])
-        p2ps[4, i] = np.linalg.norm(p_centers[:, 1, i] - p_centers[:, 3, i])
+        # p2ps[0, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 1, i])
+        # p2ps[1, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 2, i])
+        # p2ps[2, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 3, i])
+        # p2ps[3, i] = np.linalg.norm(p_centers[:, 1, i] - p_centers[:, 2, i])
+        # p2ps[4, i] = np.linalg.norm(p_centers[:, 1, i] - p_centers[:, 3, i])
+        # p2ps[5, i] = np.linalg.norm(p_centers[:, 2, i] - p_centers[:, 3, i])
+        p2ps[0, i] = np.linalg.norm(p_centers[:, 1, i] - p_centers[:, 4, i])
+        p2ps[1, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 1, i])
+        p2ps[2, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 2, i])
+        p2ps[3, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 4, i])
+        p2ps[4, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 3, i])
         p2ps[5, i] = np.linalg.norm(p_centers[:, 2, i] - p_centers[:, 3, i])
+        p2ps[6, i] = np.linalg.norm(p_centers[:, 2, i] - p_centers[:, 5, i])
+        p2ps[7, i] = np.linalg.norm(p_centers[:, 5, i] - p_centers[:, 3, i])
+        p2ps[8, i] = np.linalg.norm(p_centers[:, 4, i] - p_centers[:, 3, i])
+        p2ps[9, i] = np.linalg.norm(p_centers[:, 5, i] - p_centers[:, 6, i])
+        p2ps[10, i] = np.linalg.norm(p_centers[:, 7, i] - p_centers[:, 3, i])
+        p2ps[11, i] = np.linalg.norm(p_centers[:, 6, i] - p_centers[:, 7, i])
+        p2ps[12, i] = np.linalg.norm(p_centers[:, 4, i] - p_centers[:, 7, i])
+        p2ps[13, i] = np.linalg.norm(p_centers[:, 7, i] - p_centers[:, 8, i])
+        p2ps[14, i] = np.linalg.norm(p_centers[:, 4, i] - p_centers[:, 8, i])
+        p2ps[15, i] = np.linalg.norm(p_centers[:, 3, i] - p_centers[:, 6, i])
 
     return p2ps
 
@@ -118,15 +135,16 @@ def p2p_stats(p2ps, exclude, nboot, equil):
     :return: the average and standard deviation of pore to pore distances
     """
 
-    exclude = int(exclude)
     nboot = int(nboot)
-    nT = np.shape(p2ps)[1]
+    nT = p2ps.shape[1]
+    ndist = p2ps.shape[0]
+    ndist -= len(exclude)
 
-    # Get ride of the excluded trajectory
-    p2p_new = np.zeros([5, nT])
+    # Get rid of the excluded trajectory
+    p2p_new = np.zeros([ndist, nT])
     count = 0
-    for i in range(6):
-        if i != exclude:
+    for i in range(ndist + len(exclude)):
+        if i not in exclude:
             p2p_new[count, :] = p2ps[i, :]
             count += 1
 
@@ -135,7 +153,7 @@ def p2p_stats(p2ps, exclude, nboot, equil):
     # Find the frame at which the system is equilibrated
     if equil == 'auto':
         ts = []
-        for pore in range(5):
+        for pore in range(ndist):
             ts.append(timeseries.detectEquilibration(p2ps[pore, :])[0])
         t = int(max(ts))  # use the max equil frame to ensure all pores are equilibrated
     else:
@@ -143,39 +161,50 @@ def p2p_stats(p2ps, exclude, nboot, equil):
 
     # Find the autocorrelation time for each pore - i.e. the time it takes for samples to become uncorrelated
     taus = []
-    for i in range(5):
+    for i in range(ndist - len(exclude)):
         tau = timeseries.integratedAutocorrelationTime(p2ps[i, t:])
         taus.append(tau)
 
     print 'Maximum Autocorrelation Time: %s frames' % max(taus)
     tau = int(np.ceil(max(taus)))  # use the max again to ensure all trajectories are independent. np.ceil e
 
+    if tau == 0:
+        tau = 1
+
     ind_trajectories = (nT - t) / tau  # the number of independent trajectories
-    total_trajectories = ind_trajectories * 5  # the total number of trajectories
-    trajectories = np.zeros([tau, total_trajectories])  # Create a new array to hold all the trajectories
+
+    trajectories = np.zeros([ndist, ind_trajectories, tau])  # Create a new array to hold all the trajectories
 
     # fill up trajectory array
-    for i in range(5):
+    for i in range(ndist):
         for j in range(ind_trajectories):
-            trajectories[:, i * ind_trajectories + j] = p2ps[i, (t + j*tau):(t + (j + 1)*tau)]
+            # trajectories[i*ind_trajectories + j, :] = p2ps[i, (t + j*tau):(t + (j + 1)*tau)]
+            trajectories[i, j, :] = p2ps[i, (t + j*tau):(t + (j + 1)*tau)]
 
     # bootstrap to get statistics
-    p2p_boot = np.zeros([nboot])
+    p2p_boot = np.zeros([ndist, nboot*ind_trajectories])  # bootstrap each pore
     for i in range(nboot):
-        p2p = 0
-        for j in range(tau):
-            T = ran.randrange(0, total_trajectories)  # pick a random trajectory from all the independent trajectories
-            P = ran.randrange(0, tau)  # choose a random point in that trajectory
-            p2p += trajectories[P, T]
-        p2p_boot[i] = p2p / tau  # add the average from this trial to the p2p_boot
+        for j in range(ndist):
+            for k in range(ind_trajectories):
+                T = ran.randrange(0, ind_trajectories)  # pick a random trajectory from all the independent trajectories
+                P = ran.randrange(0, tau)  # choose a random point in that trajectory
+                p2p_boot[j, i*ind_trajectories + k] = trajectories[j, T, P]
 
-    # take average and standard deviation of bootstrap trial results
-    p2p_avg = np.mean(p2p_boot)
-    p2p_std = np.std(p2p_boot)
+    avg = np.zeros([ndist])  # find the average of each trajectory
+    for i in range(ndist):
+        avg[i] = np.mean(p2p_boot[i, :])
+
+    ensemble_avg = np.mean(avg)  # the ensemble average, <x>, is the average p2p of all the trajectories
+
+    stds = np.zeros([ndist])  # find the standard deviation for each pore : s = sqrt((<x> - x)^2) where x is the avg[i]
+    for i in range(ndist):
+        stds[i] = np.sqrt((ensemble_avg - avg[i])**2)
+
+    p2p_std = np.mean(stds)  # report the average of the standard deviations
 
     print ' Pore to Pore Statistics calculated starting at frame {:d} ({:2.1f} percent into simulation)'.format(
             t, 100.0 * t / nT)
-    return p2p_avg, p2p_std, t
+    return ensemble_avg, p2p_std, t
 
 
 def compdensity(component, pore_centers, start, pores=4, bin_width=0.05, rmax=3.5, buffer=0.0):
@@ -297,24 +326,28 @@ if __name__ == '__main__':
     comp_ppore = tot_atoms/n_pores
 
     p_centers = avg_pore_loc(n_pores, pos, len(atoms))
-    print p_centers[:, :, -1]
 
     distances = 6  # number of p2p distances to calculate. My algorithm isn't smart enough for anything but six yet
+    distances = 16  # for 9 pore system
     p2ps = p2p(p_centers, distances)
 
-    p2p_avg, p2p_std, equil = p2p_stats(p2ps, '%s' % args.exclude, '%s' % args.nboot, '%s' % args.equil)
+    exclude = [int(i) for i in args.exclude]
+
+    p2p_avg, p2p_std, equil = p2p_stats(p2ps, exclude, '%s' % args.nboot, '%s' % args.equil)
     print 'Average Pore to Pore distance: %s' % p2p_avg
     print 'Standard Deviation of Pore to Pore distances: %s' % p2p_std
 
     labels = ['1-2', '1-3', '1-4', '2-3', '2-4', '3-4']
+    labels = ['1-4', '1-0', '0-2', '0-4', '0-3', '2-3', '2-5', '5-3', '3-4', '5-6', '3-7', '6-7', '4-7', '7-8',
+              '4-8', '3-6']
     plt.figure(1)
     for i in range(distances):
-        if i != int(args.exclude):
+        if i not in exclude:
             plt.plot(t.time, p2ps[i, :], label='%s' % labels[i])
     plt.title('Pore to Pore Distance Equilibration')
     plt.ylabel('Distance between pores (nm)')
     plt.xlabel('Time (ps)')
-    plt.legend(loc=1, fontsize=18)
+    # plt.legend(loc=1, fontsize=18)
     equil = 0
     density, r, bin_width = compdensity(pos, p_centers, equil, n_pores, buffer=0)
 
@@ -332,5 +365,6 @@ if __name__ == '__main__':
     # plt.xlabel('Distance from Pore Center (nm)')
     # plt.ylabel('Relative Component Density')
     # plt.bar(r[:stop], density[:stop], bin_width)
-    plt.show()
+    if not args.noshow:
+        plt.show()
 

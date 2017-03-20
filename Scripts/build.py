@@ -5,6 +5,7 @@ import math
 import os
 import argparse
 import LC_class
+import Periodic_Images
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -29,6 +30,7 @@ def initialize():
                         action="store_true")
     parser.add_argument('-O', '--offset', help="Specify this flag to build the system in an offset configuration",
                         action="store_true")
+    parser.add_argument('--rot', default=45, type=float, help="Rotate pores by this amount (degrees)")
 
     args = parser.parse_args()
 
@@ -302,19 +304,24 @@ def write_gro_bak(positions, identity, no_layers, layer_distribution, dist, no_p
     f.close()
 
 
-def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions):
+def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions, rot):
 
     f = open('%s' % args.out, 'w')
 
     f.write('This is a .gro file\n')
     f.write('%s\n' % sys_atoms)
 
-    rot = math.pi / 4
+    rot *= (np.pi/180)  # convert input (degrees) to radians
+
+    grid = Periodic_Images.shift_matrices(1, 60, p2p, p2p)
+    grid = np.reshape(grid, (2, 9))
 
     # main monomer
     atom_count = 1
     monomer_count = 0
     for l in range(0, no_pores):  # loop to create multiple pores
+        # b = grid[0, l]
+        # c = grid[1, l]
         theta = 30  # angle which will be used to do hexagonal packing
         if l == 0:  # unmodified coordinates
             b = 0
@@ -328,6 +335,7 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
         elif l == 3:  # moves a pore down and to the right
             b = math.cos(math.radians(90 - theta))
             c = -math.sin(math.radians(90 - theta))
+
         for k in range(no_layers):
             layer_mons = layer_distribution[l*no_layers + k]
             for j in range(layer_mons):  # iterates over each monomer to create coordinates
@@ -343,6 +351,7 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
                         hundreds = int(math.floor(atom_count/100000))
                     else:
                         xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist]
+                        # xyz[:, i] = np.dot(Rx, positions[:, i]) + [b, c, k*dist]
                         hundreds = int(math.floor(atom_count/100000))
                     f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(monomer_count, name, identity[i],
                         atom_count - hundreds*100000, xyz[0, i]/10.0, xyz[1, i]/10.0, xyz[2, i]/10.0) + "\n")
@@ -351,6 +360,8 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
     # Ions:
 
     for l in range(no_pores):  # loop to create multiple pores
+        # b = grid[0, l]
+        # c = grid[1, l]
         theta = 30  # angle which will be used to do hexagonal packing
         if l == 0:  # unmodified coordinates
             b = 0
@@ -379,6 +390,7 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
                         hundreds = int(math.floor(atom_count/100000))
                     else:
                         xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b*p2p, c*p2p, k*dist]
+                        # xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b, c, k*dist]
                         hundreds = int(math.floor(atom_count/100000))
                     f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(monomer_count, identity[no_atoms - (i + 1)],
                         identity[no_atoms - (i + 1)], atom_count - hundreds*100000, xyz[0, i]/10.0, xyz[1, i]/10.0,
@@ -502,4 +514,4 @@ if __name__ == "__main__":
                 positions[j][i - 1].append(rot)  # appends the atomic coordinates to 'positions'
 
     #write_gro_bak(positions, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions)
-    write_gro(xyz, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions)
+    write_gro(xyz, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions, args.rot)

@@ -58,7 +58,7 @@ def read_index(index):
     return grps
 
 
-def angles(pos, atoms, normal=[0, 0, -1]):
+def angles(pos, atoms, normal=[0, 0, 1]):
     """
     :param pos: xyz positions of atoms in tail
     :param atoms: number of atoms
@@ -72,17 +72,20 @@ def angles(pos, atoms, normal=[0, 0, -1]):
     chains = natoms / atoms
     w = np.zeros([nT, chains])
 
+    count = 0
     for i in range(nT):
         for j in range(chains):
             avg_tilt = 0
             for k in range(atoms - 1):  # atoms - 1 since there are n - 1 relevant vector in a straight chain
                 # MOST IMPORTANT BLOCK
-                v = pos[i, j*atoms + k, :] - pos[i, j*atoms + k + 1, :]
+                v = pos[i, j*atoms + k + 1, :] - pos[i, j*atoms + k, :]
                 vn = np.dot(v, normal)
                 nn = np.linalg.norm(normal)
                 vv = np.linalg.norm(v)
                 avg_tilt += np.arcsin(vn / (nn * vv)) * (180 / np.pi)
+                count += 1
             avg_tilt /= (atoms - 1)
+
             w[i, j] = avg_tilt
 
     return w
@@ -143,8 +146,7 @@ if __name__ == "__main__":
             stds[i] = np.std(all_tilt_angles[i, :])
             avgs[i] = np.mean(all_tilt_angles[i, :])
 
-        print np.mean(avgs[nT/2:])
-        print np.mean(stds[nT/2:])
+        print 'Average tilt angle : %s +/- %s' % (np.mean(avgs[nT/2:]), np.mean(stds[nT/2:]))
         # Format and save figure
         plt.figure()
         plt.errorbar(times, avgs, yerr=stds)
@@ -152,5 +154,6 @@ if __name__ == "__main__":
         plt.xlabel('Time (ps)')
         plt.ylabel('Tilt angle w.r.t xy plane (degrees)')
         plt.savefig(args.output)
+
         if not args.noshow:
             plt.show()

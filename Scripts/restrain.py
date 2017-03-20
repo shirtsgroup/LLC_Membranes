@@ -43,6 +43,10 @@ def initialize():
                                           'virtual sites in the system', action="store_true")
     parser.add_argument('--xlink', help='Specify this flag if the system is being crosslinked while restrained',
                         action="store_true")
+    parser.add_argument('--append', help='Specify this to prevent the topology from being re-written, and instead, add '
+                                         'restraints to the topology for other atoms', action="store_true")
+    parser.add_argument('-i', '--input', type=str, default='dipole.itp', help='Name of topology file to be edited if '
+                                                                              'you use the option --append')
 
     args = parser.parse_args()
 
@@ -378,7 +382,7 @@ if __name__ == "__main__":
         Assembly_itp.write_file(a, 'off', args.out, rings)  # there will be an error if the second argument is 'on' with
                                                             # no virtual sites
     else:
-        if args.xlink:  # don't re-write the topology file if you are iteratively crosslinking
+        if args.xlink or args.append:  # don't re-write the topology file if you are iteratively crosslinking
             pass
         else:
             Assembly_itp.write_file(a, 'on', args.out, rings)
@@ -456,9 +460,11 @@ if __name__ == "__main__":
 
         restraints = position_restraints(gro, args.atoms, '%s' % args.axis)
 
-        f = open(args.out, 'a')  # 'a' means append
+        f = open(args.input, 'a')  # 'a' means append
 
-        f.write("\n[ position_restraints ]\n")
+        if not args.append:
+            f.write("\n[ position_restraints ]\n")
+
         for i in range(restraints.shape[1]):
             f.write('{:6d}{:6d}{:1s}{:9f}{:1s}{:9f}{:1s}{:9f}\n'.format(int(restraints[0, i]), int(restraints[1, i]),'',
                                                         restraints[2, i], '', restraints[3, i], '', restraints[4, i]))
