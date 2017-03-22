@@ -375,6 +375,8 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
         flipped = np.reshape(flipped, positions.shape)
         flip = 'yes'
         unflipped = copy.deepcopy(positions)
+    else:
+        flip = 'no'
 
     # main monomer
     atom_count = 1
