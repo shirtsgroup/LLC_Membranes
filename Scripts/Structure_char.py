@@ -98,28 +98,28 @@ def p2p(p_centers, distances):
     p2ps = np.zeros([distances, nT])  # distances in the order 1-2, 1-3, 1-4, 2-3, 2-4, 3-4
     for i in range(nT):
         # So ugly ... sadness :(
-        # p2ps[0, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 1, i])
-        # p2ps[1, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 2, i])
-        # p2ps[2, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 3, i])
-        # p2ps[3, i] = np.linalg.norm(p_centers[:, 1, i] - p_centers[:, 2, i])
-        # p2ps[4, i] = np.linalg.norm(p_centers[:, 1, i] - p_centers[:, 3, i])
-        # p2ps[5, i] = np.linalg.norm(p_centers[:, 2, i] - p_centers[:, 3, i])
-        p2ps[0, i] = np.linalg.norm(p_centers[:, 1, i] - p_centers[:, 4, i])
-        p2ps[1, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 1, i])
-        p2ps[2, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 2, i])
-        p2ps[3, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 4, i])
-        p2ps[4, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 3, i])
+        p2ps[0, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 1, i])
+        p2ps[1, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 2, i])
+        p2ps[2, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 3, i])
+        p2ps[3, i] = np.linalg.norm(p_centers[:, 1, i] - p_centers[:, 2, i])
+        p2ps[4, i] = np.linalg.norm(p_centers[:, 1, i] - p_centers[:, 3, i])
         p2ps[5, i] = np.linalg.norm(p_centers[:, 2, i] - p_centers[:, 3, i])
-        p2ps[6, i] = np.linalg.norm(p_centers[:, 2, i] - p_centers[:, 5, i])
-        p2ps[7, i] = np.linalg.norm(p_centers[:, 5, i] - p_centers[:, 3, i])
-        p2ps[8, i] = np.linalg.norm(p_centers[:, 4, i] - p_centers[:, 3, i])
-        p2ps[9, i] = np.linalg.norm(p_centers[:, 5, i] - p_centers[:, 6, i])
-        p2ps[10, i] = np.linalg.norm(p_centers[:, 7, i] - p_centers[:, 3, i])
-        p2ps[11, i] = np.linalg.norm(p_centers[:, 6, i] - p_centers[:, 7, i])
-        p2ps[12, i] = np.linalg.norm(p_centers[:, 4, i] - p_centers[:, 7, i])
-        p2ps[13, i] = np.linalg.norm(p_centers[:, 7, i] - p_centers[:, 8, i])
-        p2ps[14, i] = np.linalg.norm(p_centers[:, 4, i] - p_centers[:, 8, i])
-        p2ps[15, i] = np.linalg.norm(p_centers[:, 3, i] - p_centers[:, 6, i])
+        # p2ps[0, i] = np.linalg.norm(p_centers[:, 1, i] - p_centers[:, 4, i])
+        # p2ps[1, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 1, i])
+        # p2ps[2, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 2, i])
+        # p2ps[3, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 4, i])
+        # p2ps[4, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 3, i])
+        # p2ps[5, i] = np.linalg.norm(p_centers[:, 2, i] - p_centers[:, 3, i])
+        # p2ps[6, i] = np.linalg.norm(p_centers[:, 2, i] - p_centers[:, 5, i])
+        # p2ps[7, i] = np.linalg.norm(p_centers[:, 5, i] - p_centers[:, 3, i])
+        # p2ps[8, i] = np.linalg.norm(p_centers[:, 4, i] - p_centers[:, 3, i])
+        # p2ps[9, i] = np.linalg.norm(p_centers[:, 5, i] - p_centers[:, 6, i])
+        # p2ps[10, i] = np.linalg.norm(p_centers[:, 7, i] - p_centers[:, 3, i])
+        # p2ps[11, i] = np.linalg.norm(p_centers[:, 6, i] - p_centers[:, 7, i])
+        # p2ps[12, i] = np.linalg.norm(p_centers[:, 4, i] - p_centers[:, 7, i])
+        # p2ps[13, i] = np.linalg.norm(p_centers[:, 7, i] - p_centers[:, 8, i])
+        # p2ps[14, i] = np.linalg.norm(p_centers[:, 4, i] - p_centers[:, 8, i])
+        # p2ps[15, i] = np.linalg.norm(p_centers[:, 3, i] - p_centers[:, 6, i])
 
     return p2ps
 
@@ -328,7 +328,7 @@ if __name__ == '__main__':
     p_centers = avg_pore_loc(n_pores, pos, len(atoms))
 
     distances = 6  # number of p2p distances to calculate. My algorithm isn't smart enough for anything but six yet
-    distances = 16  # for 9 pore system
+    #distances = 16  # for 9 pore system
     p2ps = p2p(p_centers, distances)
 
     exclude = [int(i) for i in args.exclude]

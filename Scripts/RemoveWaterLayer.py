@@ -15,6 +15,8 @@ def initialize():
     parser.add_argument('-b', '--buffer', default=0.1, type=float, help='Float b/w 0 and 1. Used to widen the bounds on'
                                                                         'the water layer by making zmax and zmin smaller'
                                                                         'and bigger respectively')
+    parser.add_argument('--index', help='If this is specified, this script will create an index group containing all of '
+                                        'the waters left after they are removed', action="store_true")
 
     args = parser.parse_args()
 
@@ -75,6 +77,31 @@ def write_gro(nolayer, out):
                                                                     ,box[0, 0, 2], box[0, 1, 2], box[0, 2, 0]))
 
 
+def write_ndx(keep, t):
+    """ Generate index groups for waters inside membrane. The indices are the same as those in the fully solvated
+    structure """
+
+    waters = []
+    for a in t.topology.atoms:
+        if a.index in keep and 'HOH' in str(a.residue):
+            waters.append(a.index)
+
+    print len(waters)
+
+    count = 0
+    with open('water_index.ndx', 'w') as f:
+        for index in waters:
+            if count % 8 != 0:
+                f.write('{:<10s}'.format(str(index)))
+            else:
+                f.write('{:<10s}\n'.format(str(index)))
+            count += 1
+
+
+
+    return waters
+
+
 if __name__ == "__main__":
 
     args = initialize()
@@ -92,3 +119,6 @@ if __name__ == "__main__":
     nolayer = t.atom_slice(keep)
 
     write_gro(nolayer, args.output)
+
+    if args.index:
+        write_ndx(keep, t)

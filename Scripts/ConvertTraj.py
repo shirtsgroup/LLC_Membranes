@@ -13,8 +13,8 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Duplicate points periodically in the x-y directions')
 
-    parser.add_argument('-f', '--file', default='wiggle.trr', help='trajectory file (.xtc or .trr)')
-    parser.add_argument('-c', '--coord', default='wiggle.gro', help='Coordinate file')
+    parser.add_argument('-t', '--file', default='wiggle.trr', help='trajectory file (.xtc or .trr)')
+    parser.add_argument('-g', '--coord', default='wiggle.gro', help='Coordinate file')
     parser.add_argument('-a', '--atoms', default='sys', help='Name of atom(s) you want in the output. Put sys if you '
                                                              'want all of them')
     parser.add_argument('-o', '--output', default='traj.txt', help='Name of output file')

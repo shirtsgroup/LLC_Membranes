@@ -6,6 +6,7 @@ import os
 import argparse
 import LC_class
 import Periodic_Images
+import copy
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -31,6 +32,8 @@ def initialize():
     parser.add_argument('-O', '--offset', help="Specify this flag to build the system in an offset configuration",
                         action="store_true")
     parser.add_argument('--rot', default=45, type=float, help="Rotate pores by this amount (degrees)")
+    parser.add_argument('--flip', help='Flip the orientation of monomer in every other pore by 180 degrees',
+                        action="store_true")
 
     args = parser.parse_args()
 
@@ -71,7 +74,7 @@ def read_gro_coords(file):
         a.append(line)
     f.close()
 
-    lines_of_text = 2  # Hard Coded -> BAD
+    lines_of_text = 2  # Hard Coded -> BAD .. but I've seen this in mdtraj
     no_atoms = len(a) - lines_of_text - 1  # subtract one for the bottom box vector line
 
     xyz = np.zeros([3, no_atoms])
@@ -219,6 +222,57 @@ def rotate(theta):
     return Rx
 
 
+def reposition(xyz, R, ref_index, lineatoms):
+
+    b = np.ones([1])
+    for i in range(np.shape(xyz)[1]):
+        coord = np.concatenate((xyz[:, i], b))
+        x = np.dot(R, coord)
+        xyz[:, i] = x[:3]
+
+    # Now translate the structure to the origin
+
+    translation = np.matrix([[1, 0, 0,-xyz[0, ref_index]], [0, 1, 0,-xyz[1, ref_index]],
+                         [0, 0, 1, -xyz[2, ref_index]], [0, 0, 0, 1]])
+
+    b = np.ones([1])
+    for i in range(np.shape(xyz)[1]):
+        coord = np.concatenate((xyz[:, i], b))
+        x = np.dot(translation, coord)
+        xyz[:, i] = x[0, :3]
+
+    # Now rotate the xy coordinates so that the molecule is pointing towards the origin
+
+    pt1 = [xyz[0, lineatoms[0]], xyz[1, lineatoms[0]]]  # location of C
+    pt2 = [xyz[0, lineatoms[1]], xyz[1, lineatoms[1]]]  # location of C3
+
+    origin = [0, 0]
+
+    # find slope between two points
+
+    m1 = slope(pt1, pt2)
+
+    m2 = 0  # slope of line y = 0
+
+    # find angle between lines
+
+    theta = -math.atan((m1 - m2)/(1 + m1*m2))
+
+    vx, vy = transdir(pt1)
+
+    # Translation matrix
+    translation = np.matrix([[1, 0, 0, vx*pore_radius*math.cos(theta)], [0, 1, 0, vy*pore_radius*math.sin(theta)],\
+                             [0, 0, 1, 0], [0, 0, 0, 1]])
+
+    b = np.ones([1])
+    for i in range(np.shape(xyz)[1]):
+        coord = np.concatenate((xyz[:, i], b))
+        x = np.dot(translation, coord)
+        xyz[:, i] = x[0, :3]
+
+    return xyz
+
+
 def write_gro_bak(positions, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions):
 
     f = open('%s' % args.out, 'w')
@@ -304,7 +358,7 @@ def write_gro_bak(positions, identity, no_layers, layer_distribution, dist, no_p
     f.close()
 
 
-def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions, rot):
+def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions, rot, *flipped):
 
     f = open('%s' % args.out, 'w')
 
@@ -315,6 +369,12 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
 
     grid = Periodic_Images.shift_matrices(1, 60, p2p, p2p)
     grid = np.reshape(grid, (2, 9))
+
+    if flipped:
+        flipped = np.asarray(flipped)
+        flipped = np.reshape(flipped, positions.shape)
+        flip = 'yes'
+        unflipped = copy.deepcopy(positions)
 
     # main monomer
     atom_count = 1
@@ -329,13 +389,18 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
         elif l == 1:  # move a pore directly down
             b = -1
             c = 0
+            if flip == 'yes':
+                positions[:, :] = flipped
         elif l == 2:  # moves pore up and to the right
             b = -math.sin(math.radians(theta))
             c = -math.cos(math.radians(theta))
+            if flip == 'yes':
+                positions[:, :] = unflipped
         elif l == 3:  # moves a pore down and to the right
             b = math.cos(math.radians(90 - theta))
             c = -math.sin(math.radians(90 - theta))
-
+            if flip == 'yes':
+                positions[:, :] = flipped
         for k in range(no_layers):
             layer_mons = layer_distribution[l*no_layers + k]
             for j in range(layer_mons):  # iterates over each monomer to create coordinates
@@ -418,11 +483,12 @@ if __name__ == "__main__":
     no_layers = args.layers  # Number of layers in a pore
     dist = args.dbwl  # distance between layers (units tbd)
 
+    # Read in build monomer coordinates
     f = open("%s/../Structure-Files/HII_Monomer_Configurations/%s" % (location, build_mon), "r")
     if build_mon.endswith('.pdb'):
-        xyz, identity, no_atoms, lines_of_text = read_pdb_coords(f)
+        pos, identity, no_atoms, lines_of_text = read_pdb_coords(f)
     elif build_mon.endswith('.gro'):
-        xyz, identity, no_atoms, lines_of_text = read_gro_coords(f)
+        pos, identity, no_atoms, lines_of_text = read_gro_coords(f)
     else:
         print 'Please input a valid file type (.gro or .pdb)'
 
@@ -437,81 +503,100 @@ if __name__ == "__main__":
     count = 0
     for i in range(no_atoms):
         if identity[i] in plane_atoms:
-            plane[count, :] = xyz[:, i]
+            plane[count, :] = pos[:, i]
             count += 1
 
-    R = rotateplane(plane, angle=(args.tilt*math.pi / 180))
+    if args.flip:
+        tilt = 0
+        R_down = rotateplane(plane, angle=math.pi)
+        xyz_down = reposition(pos, R_down, ref_index, lineatoms)
+        xyz_down = copy.deepcopy(xyz_down)
+        tilt = math.pi
+    else:
+        tilt = args.tilt
 
-    b = np.ones([1])
-    for i in range(np.shape(xyz)[1]):
-        coord = np.concatenate((xyz[:, i], b))
-        x = np.dot(R, coord)
-        xyz[:, i] = x[:3]
+    R = rotateplane(plane, angle=tilt)
+    xyz_up = reposition(pos, R, ref_index, lineatoms)
 
-    # Now translate the structure to the origin
+    # b = np.ones([1])
+    # for i in range(np.shape(xyz)[1]):
+    #     coord = np.concatenate((xyz[:, i], b))
+    #     if args.flip:
+    #         x_down = np.dot(R_down, coord)
+    #         xyz_down[:, i] = x_down[:3]
+    #     x = np.dot(R, coord)
+    #     xyz[:, i] = x[:3]
+    #
+    # # Now translate the structure to the origin
+    #
+    # if args.flip:
+    #     t_down = np.matrix([[1, 0, 0,-xyz_down[0, ref_index]], [0, 1, 0,-xyz_down[1, ref_index]],
+    #                  [0, 0, 1, -xyz_down[2, ref_index]], [0, 0, 0, 1]])
+    # else:
+    #     translation = np.matrix([[1, 0, 0,-xyz[0, ref_index]], [0, 1, 0,-xyz[1, ref_index]],
+    #                          [0, 0, 1, -xyz[2, ref_index]], [0, 0, 0, 1]])
+    #
+    # b = np.ones([1])
+    # for i in range(np.shape(xyz)[1]):
+    #     coord = np.concatenate((xyz[:, i], b))
+    #     x = np.dot(translation, coord)
+    #     xyz[:, i] = x[0, :3]
+    #
+    #
+    # # Now rotate the xy coordinates so that the molecule is pointing towards the origin
+    #
+    # pt1 = [xyz[0, lineatoms[0]], xyz[1, lineatoms[0]]]  # location of C
+    # pt2 = [xyz[0, lineatoms[1]], xyz[1, lineatoms[1]]]  # location of C3
+    #
+    # origin = [0, 0]
+    #
+    # # find slope between two points
+    #
+    # m1 = slope(pt1, pt2)
+    #
+    # m2 = 0  # slope of line y = 0
+    #
+    # # find angle between lines
+    #
+    # theta = -math.atan((m1 - m2)/(1 + m1*m2))
+    #
+    # vx, vy = transdir(pt1)
+    #
+    # # Translation matrix
+    # translation = np.matrix([[1, 0, 0, vx*pore_radius*math.cos(theta)], [0, 1, 0, vy*pore_radius*math.sin(theta)],\
+    #                          [0, 0, 1, 0], [0, 0, 0, 1]])
+    #
+    # b = np.ones([1])
+    # for i in range(np.shape(xyz)[1]):
+    #     coord = np.concatenate((xyz[:, i], b))
+    #     x = np.dot(translation, coord)
+    #     xyz[:, i] = x[0, :3]
 
-    translation = np.matrix([[1, 0, 0,-xyz[0, ref_index]], [0, 1, 0,-xyz[1, ref_index]],
-                             [0, 0, 1, -xyz[2, ref_index]], [0, 0, 0, 1]])
+    # positions = []
+    #
+    # for i in range(len(np.unique(layer_distribution))):  # add a list to positions for each unique value of monomers per layer
+    #     positions.append([])
+    # for i in range(len(positions)):
+    #     for j in range(0, np.sort(np.unique(layer_distribution))[i]):
+    #         positions[i].append([])
+    #
+    # x_values = []  # will hold x values in the order that they appear in the positions matrix
+    # y_values = []  # will hold y values in the order that they appear in the positions matrix
+    # z_values = []  # will hold z values in the order that they appear in the positions matrix
+    #
+    # # rotate coordinates and store each rotated coordinate as a separate list:
+    #
+    # for j in range(0, len(positions)):
+    #     for k in range(np.shape(xyz)[1]):
+    #         x = np.array(xyz[:, k])
+    #         for i in range(1, len(positions[j]) + 1):
+    #             theta = i * math.pi / (len(positions[j]) / 2.0)  # angle to rotate about axis determined from no of monomers per layer
+    #             Rx = rotate(theta)
+    #             rot = np.dot(Rx, x)  # multiplies atomic coordinates by the rotation vector to generate new coordinates
+    #             rot = [float(rot[0]), float(rot[1]), float(rot[2])]  # converts matrix to a list of floats
+    #             positions[j][i - 1].append(rot)  # appends the atomic coordinates to 'positions'
 
-    b = np.ones([1])
-    for i in range(np.shape(xyz)[1]):
-        coord = np.concatenate((xyz[:, i], b))
-        x = np.dot(translation, coord)
-        xyz[:, i] = x[0, :3]
-
-
-    # Now rotate the xy coordinates so that the molecule is pointing towards the origin
-
-    pt1 = [xyz[0, lineatoms[0]], xyz[1, lineatoms[0]]]  # location of C
-    pt2 = [xyz[0, lineatoms[1]], xyz[1, lineatoms[1]]]  # location of C3
-
-    origin = [0, 0]
-
-    # find slope between two points
-
-    m1 = slope(pt1, pt2)
-
-    m2 = 0  # slope of line y = 0
-
-    # find angle between lines
-
-    theta = -math.atan((m1 - m2)/(1 + m1*m2))
-
-    vx, vy = transdir(pt1)
-
-    # Translation matrix
-    translation = np.matrix([[1, 0, 0, vx*pore_radius*math.cos(theta)], [0, 1, 0, vy*pore_radius*math.sin(theta)],\
-                             [0, 0, 1, 0], [0, 0, 0, 1]])
-
-    b = np.ones([1])
-    for i in range(np.shape(xyz)[1]):
-        coord = np.concatenate((xyz[:, i], b))
-        x = np.dot(translation, coord)
-        xyz[:, i] = x[0, :3]
-
-    positions = []
-
-    for i in range(len(np.unique(layer_distribution))):  # add a list to positions for each unique value of monomers per layer
-        positions.append([])
-    for i in range(len(positions)):
-        for j in range(0, np.sort(np.unique(layer_distribution))[i]):
-            positions[i].append([])
-
-    x_values = []  # will hold x values in the order that they appear in the positions matrix
-    y_values = []  # will hold y values in the order that they appear in the positions matrix
-    z_values = []  # will hold z values in the order that they appear in the positions matrix
-
-    # rotate coordinates and store each rotated coordinate as a separate list:
-
-    for j in range(0, len(positions)):
-        for k in range(np.shape(xyz)[1]):
-            x = np.array(xyz[:, k])
-            for i in range(1, len(positions[j]) + 1):
-                theta = i * math.pi / (len(positions[j]) / 2.0)  # angle to rotate about axis determined from no of monomers per layer
-                Rx = rotate(theta)
-                rot = np.dot(Rx, x)  # multiplies atomic coordinates by the rotation vector to generate new coordinates
-                rot = [float(rot[0]), float(rot[1]), float(rot[2])]  # converts matrix to a list of floats
-                positions[j][i - 1].append(rot)  # appends the atomic coordinates to 'positions'
-
-    #write_gro_bak(positions, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions)
-    write_gro(xyz, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions, args.rot)
+    if args.flip:
+        write_gro(xyz_up, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions, args.rot, xyz_down)
+    else:
+        write_gro(xyz_up, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions, args.rot)
