@@ -2,5 +2,5 @@ from distutils.core import setup
 from Cython.Build import cythonize
 
 setup(
-	ext_modules=cythonize("file_rw.pyx"),
+    ext_modules = cythonize("physical.pyx")
 )

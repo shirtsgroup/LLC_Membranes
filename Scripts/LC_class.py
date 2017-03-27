@@ -51,7 +51,7 @@ NAcarb11V = LC('HII', 'NA', 137, 'monomer6.gro', 9, ['C20', 'C34', 'C48'], ['C19
                ['C', 'C2', 'C4'], [0, 3], 9)
 NAcarb11Vd = LC('HII', 'NA', 143, 'NAcarb11V_1_dummy.gro', 9, ['C20', 'C34', 'C48'], ['C19', 'C33', 'C47'], 3, ['HII', 'NA'],
                 1, ['C', 'C2', 'C4'], [0, 3, 9], 9)
-NAcarb11Vflat = LC('HII', 'NA', 137, 'high_tilt.gro', 9, ['C20', 'C34', 'C48'], ['C19', 'C33', 'C47'], 3, ['HII', 'NA'], 1,
+NAcarb11Vflat = LC('HII', 'NA', 137, 'flat.gro', 9, ['C20', 'C34', 'C48'], ['C19', 'C33', 'C47'], 3, ['HII', 'NA'], 1,
                ['C', 'C2', 'C4'], [0, 3], 9)
 
 # SOL should be deleted. Need to check for usage first

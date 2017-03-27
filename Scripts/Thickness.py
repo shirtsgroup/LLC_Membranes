@@ -5,11 +5,13 @@
 # in the z direction
 
 import argparse
+from llclib import physical
 
 # Input arguments to python file by choosing which monomer to assemble with and number of layers. Can be used in a shell
 # script
 
-def run():
+
+def initialize():
     parser = argparse.ArgumentParser(description = 'Measure Membrane Thickness')
     parser.add_argument('-i', '--input', default='wiggle.gro', help = 'Path to input file')
     parser.add_argument('-w', '--water', default=6, help = 'nm of water between layers')
@@ -47,7 +49,7 @@ def thickness(filename):
     return thick, z_max, z_min
 
 if __name__ == '__main__':
-    args = run()
+    args = initialize()
     water_layer = int(args.water)  # nm of water wanted between layers
     thick, z_max, z_min = thickness('%s' %args.input)
     tot_thickness = thick + water_layer

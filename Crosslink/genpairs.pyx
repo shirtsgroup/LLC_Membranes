@@ -4,15 +4,6 @@
 # The pairs list lists atoms that are 1-4 neighbors
 import cython
 
-# def read_lists(a, start, end):
-# 	list1 = []  # list to hold atom numbers of 1st entry in each row of [ bonds ] section
-# 	list2 = []  # list to hold atom numbers of 2nd entry in each row of [ bonds ] section
-# 	for i in range(start, end):  # extract atom numbers in [ bonds ] section in order of appearance
-# 		list1.append(int(a[i][0:6]))  # converts them to integers to save time later
-# 		list2.append(int(a[i][6:13]))
-#
-# 	return list1, list2
-
 def read_lists(a, atoms_of_interest, start, end):
 	list = []
 	condensed = []

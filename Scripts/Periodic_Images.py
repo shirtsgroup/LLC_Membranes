@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#! /usr/bin/env python
 
 """ Use this script to duplicate points periodically in the x-y directions.
 
