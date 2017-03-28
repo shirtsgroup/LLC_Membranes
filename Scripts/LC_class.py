@@ -20,7 +20,7 @@ class LC(object):
                  lineatoms, ref_atom_index, no_vsites=0):
         self.name = name  # residue name
         self.counterion = counterion  # name of counter ion in monomer salt
-        self.atoms = atoms  # number of atoms in the monomer (no counterion)
+        self.atoms = atoms  # number of atoms in the monomer residue (no counterion)
         self.build_mon = build_mon  # the name of the monomer coordinate file used for building
         self.images = images
         self.c1_atoms = c1_atoms  # c1 atoms (closest to tail ends) used in crosslinking vinyl groups
@@ -34,7 +34,6 @@ class LC(object):
         self.no_vsites = no_vsites
         self.tot_atoms = self.atoms + self.no_vsites
         self.topology = '%s.itp' % self.build_mon
-
 
     def vsites(self, no_vsites):
         """Returns the total number of atoms per monomer including virtual sites"""

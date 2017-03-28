@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # Find the membrane thickness based on a maximum and minimum z position
 # Also gives the amount of space needed for water molecules given the amount of space wanted between periodic boundaries

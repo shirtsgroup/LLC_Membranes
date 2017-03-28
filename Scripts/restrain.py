@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 """
     The purpose of this script is to edit the topology file of a system containing molecules which have a benzene ring
@@ -14,10 +14,10 @@ import Get_Positions
 import numpy as np
 import math
 import warnings
-import Assembly_itp
 import subprocess
 import os
 import Assembly_itp
+from llclib import file_rw
 
 
 def initialize():
@@ -380,7 +380,7 @@ if __name__ == "__main__":
     f.close()
 
     if args.novsites:
-        Assembly_itp.write_file(a, 'off', args.out, rings)  # there will be an error if the second argument is 'on' with
+        file_rw.write_assembly(a, 'off', args.out, rings)  # there will be an error if the second argument is 'on' with
                                                             # no virtual sites
     else:
         if args.xlink or args.append:  # don't re-write the topology file if you are iteratively crosslinking

@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 
 """
 This library has all routines involving reading and writing files
@@ -357,8 +357,7 @@ def last_frame(trr, gro):
 
         t = md.load('%s' % trr, top='%s' % gro)
         last = t.slice(-1)
-        print last
-        exit()
+
         pos = t.xyz
 
         # 'last' will hold all gro information
@@ -366,7 +365,6 @@ def last_frame(trr, gro):
         res_name = [a.residue.name for a in t.topology.atoms]
 
 
-        print res_no[66000]
         last = np.zeros([pos.shape[1], pos.shape[2]])
         last[:, :] = pos[-1, :, :]
 

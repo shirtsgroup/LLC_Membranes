@@ -328,7 +328,7 @@ if __name__ == '__main__':
     p_centers = avg_pore_loc(n_pores, pos, len(atoms))
 
     distances = 6  # number of p2p distances to calculate. My algorithm isn't smart enough for anything but six yet
-    #distances = 16  # for 9 pore system
+    # distances = 16  # for 9 pore system
     p2ps = p2p(p_centers, distances)
 
     exclude = [int(i) for i in args.exclude]

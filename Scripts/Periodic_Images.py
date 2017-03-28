@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 
 """ Use this script to duplicate points periodically in the x-y directions.
 
@@ -78,7 +78,7 @@ def pbcs(pts, images, angle, xbox, ybox, frame):
     x_shift, y_shift = shift_matrices(images, angle, xbox, ybox)
     mat_dim = 2 * images + 1
 
-    tot_pts = np.shape(pts)[0]
+    tot_pts = np.shape(pts)[1]
 
     translated_pts = np.zeros([3, mat_dim**2, tot_pts])
 
@@ -86,9 +86,9 @@ def pbcs(pts, images, angle, xbox, ybox, frame):
         for p in range(tot_pts):
             for i in range(mat_dim):
                 for j in range(mat_dim):
-                    translated_pts[0, i*mat_dim + j, p] = x_shift[i, j] + pts[0, p, frame]
-                    translated_pts[1, i*mat_dim + j, p] = y_shift[i, j] + pts[1, p, frame]
-                    translated_pts[2, i*mat_dim + j, p] = pts[2, p, frame]  # z position unchanged
+                    translated_pts[0, i*mat_dim + j, p] = x_shift[i, j] + pts[frame, p, 0]  # changed order for xlink.py and compatibility with mdtraj
+                    translated_pts[1, i*mat_dim + j, p] = y_shift[i, j] + pts[frame, p, 1]
+                    translated_pts[2, i*mat_dim + j, p] = pts[frame, p, 2]  # z position unchanged
     else:
         for p in range(tot_pts):
             for i in range(mat_dim):

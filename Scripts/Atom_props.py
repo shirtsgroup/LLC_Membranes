@@ -1,4 +1,4 @@
-#!/bin/bash/python
+#! /usr/bin/env python
 
 # Dictionary of atomic masses associated with various atom types
 

@@ -194,3 +194,68 @@ def reposition(xyz, R, ref_index, lineatoms, pore_radius):
         xyz[:, i] = x[0, :3]
 
     return xyz
+
+
+def shift_matrices(images, angle, xbox, ybox):
+
+    mat_dim = images * 2 + 1
+    x_shift = np.zeros((mat_dim, mat_dim))
+    y_shift = np.zeros((mat_dim, mat_dim))
+
+    # shift in x and y direction due to angle
+    x_comp = np.cos(angle*np.pi/180)*ybox
+    y_comp = np.sin(angle*np.pi/180)*ybox
+
+    for i in range(images + 1):
+        x_shift[images, images + i] = i*xbox
+        x_shift[images, images - i] = -i*xbox
+
+    for i in range(1, images + 1):
+        for j in range(images + 1):
+            x_shift[images + i, images + j] = -i*x_comp + j*xbox
+            x_shift[images - i, images + j] = i*x_comp + j*xbox
+            x_shift[images + i, images - j] = -i*x_comp - j*xbox
+            x_shift[images - i, images - j] = i*x_comp - j*xbox
+
+    for i in range(1, images + 1):
+        y_shift[images + i, :] = - i * y_comp
+        y_shift[images - i, :] = i * y_comp
+
+    return x_shift, y_shift
+
+
+def pbcs(pts, images, angle, box, frame, nogap=False):
+
+    xbox = np.linalg.norm(box[0, 0, :])
+    ybox = np.linalg.norm(box[0, 1, :])
+    zbox = np.linalg.norm(box[0, 2, :])
+
+    x_shift, y_shift = shift_matrices(images, angle, xbox, ybox)
+    mat_dim = 2 * images + 1
+
+    tot_pts = np.shape(pts)[1]
+
+    if nogap:
+        translated_pts = np.zeros([3, 3*mat_dim**2, tot_pts])  # include all images in z direction as well
+        z = [-1, 0, 1]
+    else:
+        translated_pts = np.zeros([3, mat_dim**2, tot_pts])
+        z = [0]
+
+    if len(pts.shape) == 3:
+        for p in range(tot_pts):
+            for i in range(mat_dim):
+                for j in range(mat_dim):
+                    for k in z:
+                        translated_pts[0, i*mat_dim + j, p] = x_shift[i, j] + pts[frame, p, 0] # changed order for xlink.py and compatibility with mdtraj
+                        translated_pts[1, i*mat_dim + j, p] = y_shift[i, j] + pts[frame, p, 1]
+                        translated_pts[2, i*mat_dim + j, p] = pts[frame, p, 2] + zbox*k
+    else:
+        for p in range(tot_pts):
+            for i in range(mat_dim):
+                for j in range(mat_dim):
+                    translated_pts[0, i*mat_dim + j, p] = x_shift[i, j] + pts[p, 0]/10
+                    translated_pts[1, i*mat_dim + j, p] = y_shift[i, j] + pts[p, 1]/10
+                    translated_pts[2, i*mat_dim + j, p] = pts[p, 2]/10  # z position unchanged
+
+    return translated_pts

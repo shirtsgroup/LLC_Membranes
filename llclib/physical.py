@@ -35,8 +35,6 @@ def thickness(filename):
 
 def conc(traj, gro, comp, b, lc, solv):
 
-    cdef double factor
-
     t = md.load('%s' % traj, top='%s' % gro)
     box = t.unitcell_vectors
     last = t.slice(-1)
