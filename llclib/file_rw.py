@@ -10,6 +10,7 @@ import math
 from Scripts import Periodic_Images
 import transform
 import mdtraj as md
+import os
 
 
 def read_pdb_coords(file):
@@ -58,9 +59,24 @@ def read_gro_coords(file):
     return xyz, identity, no_atoms, lines_of_text
 
 
-def write_assembly(a, xlink, output, no_mon):
+def write_assembly(b, xlink, output, no_mon):
     # Formerly 'write_file'
+    """
+    :param b: Name of build monomer (string)
+    :param xlink: specify 'on' if the system will be crosslinked
+    :param output: name of output file
+    :param no_mon: number of monomers in the assembly
+    :return:
+    """
     # print up to ' [ atoms ] ' since everything before it does not need to be modified
+
+    location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Location of this script
+
+    with open("%s/../Structure-Files/Monomer_Tops/%s" % (location, '%s.itp' % b), "r") as f:
+
+        a = []
+        for line in f:
+            a.append(line)
 
     atoms_index, bonds_index, pairs_index, angles_index, dihedrals_p_index, \
     dihedrals_imp_index, vsite_index = get_indices(a, xlink)

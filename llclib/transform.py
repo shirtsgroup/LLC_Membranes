@@ -244,12 +244,12 @@ def pbcs(pts, images, angle, box, frame, nogap=False):
 
     if len(pts.shape) == 3:
         for p in range(tot_pts):
-            for i in range(mat_dim):
-                for j in range(mat_dim):
-                    for k in z:
-                        translated_pts[0, i*mat_dim + j, p] = x_shift[i, j] + pts[frame, p, 0] # changed order for xlink.py and compatibility with mdtraj
-                        translated_pts[1, i*mat_dim + j, p] = y_shift[i, j] + pts[frame, p, 1]
-                        translated_pts[2, i*mat_dim + j, p] = pts[frame, p, 2] + zbox*k
+            for k in range(len(z)):
+                for i in range(mat_dim):
+                    for j in range(mat_dim):
+                        translated_pts[0, k*mat_dim**2 + i*mat_dim + j, p] = x_shift[i, j] + pts[frame, p, 0] # changed order for xlink.py and compatibility with mdtraj
+                        translated_pts[1, k*mat_dim**2 + i*mat_dim + j, p] = y_shift[i, j] + pts[frame, p, 1]
+                        translated_pts[2, k*mat_dim**2 + i*mat_dim + j, p] = pts[frame, p, 2] + zbox*z[k]
     else:
         for p in range(tot_pts):
             for i in range(mat_dim):

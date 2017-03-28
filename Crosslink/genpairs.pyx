@@ -128,34 +128,14 @@ def calc_dist(C1x, C2x, C1y, C2y, C1z, C2z, exclude, dist):
 	return dist
 
 
-def calc_dist2(C1, C2, exclude, box, buffer):
+def calc_dist2(C1, C2, C1_restriction, C2_restriction):
 
-	v1 = [box[0, 0, 0], box[0, 0, 1]]
-	v2 = [box[0, 1, 0], box[0, 1, 1]]
-	v3 = [box[0, 0, 0] + box[0, 1, 0], box[0, 1, 1]]
-	v4 = [0, 0]
-	xyverts = np.array([v1, v2, v3, v4]) * buffer
-	zmax = max(box[0, 2, :])
-	zmin = min(box[0, 2, :])
-	thick = zmax - zmin
-	zmax += thick * buffer
-	zmin -= thick * buffer
+	dist = np.zeros([C1.shape[1], C2.shape[1]]) + 1000
+	for i in C1_restriction:
+		for k in C2_restriction:
+			dist[k, i] = np.linalg.norm(C1[:, i] - C2[:, k])
 
-	p = path.Path(xyverts)
-
-	dist = np.zeros([C1.shape[1], C2.shape[1]])
-	for i in range(C1.shape[1]):
-		print i
-		for k in range(C2.shape[1]):
-			c1 = C1[:, i]
-			c2 = C2[:, k]
-			if exclude[k, i] == 1 or not p.contains_points([c1[:2], c2[:2]]).all() \
-					or (zmax >= c1[2] and zmin <= c1[2]) or (zmax >= c1[2] and zmin <= c2[2]):
-				dist[k, i] = 1000
-			else:
-				dist[k, i] = np.linalg.norm(C1[:, i] - C2[:, k])
 	return dist
-
 
 def improper_dihedrals(b, start_imp, imp_of_interest, dihedrals_imp_count):
 	dihedrals_imp = []
