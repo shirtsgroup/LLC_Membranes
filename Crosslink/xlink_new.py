@@ -22,7 +22,7 @@ def initialize():
 
     parser = argparse.ArgumentParser(description = 'Crosslink LLC structure')  # allow input from user
 
-    parser.add_argument('-i', '--input', default='wiggle.gro', help = 'Name of input file')
+    parser.add_argument('-i', '--input', default='wiggle_init.gro', help = 'Name of input file')
     parser.add_argument('-b', '--build_mon', default='NAcarb11Vd', type=str, help='Type of monomer the system is built with')
     parser.add_argument('-l', '--layers', default=20, help='Number of layers')
     parser.add_argument('-p', '--pores', default=4, help='Number of pores')
@@ -183,19 +183,18 @@ if __name__ == "__main__":
     C2 = np.zeros(C1.shape)
     C1_indices = [a.index for a in t.topology.atoms if a.name in c1_atoms]  # get indices of all c1 atoms
     C2_indices = [a.index for a in t.topology.atoms if a.name in c2_atoms]  # get indices of all c2 atoms
-    C1_mon_indices = np.array(C1_indices[:tails]) + 1 # add one because GROMACS counts starting at 1, not zero
+    C1_mon_indices = np.array(C1_indices[:tails]) + 1  # add one because GROMACS counts starting at 1, not zero
     C2_mon_indices = np.array(C2_indices[:tails]) + 1
     print C1_mon_indices
     print C2_mon_indices
-    exit()
     C1t = t.atom_slice(C1_indices)  # create a new mdtraj trajectory object including only c1 atoms
     C2t = t.atom_slice(C2_indices)  # create a new mdtraj trajectory object including only c2 atoms
     C1 = C1t.xyz  # get just the positions
     C2 = C2t.xyz  # get just the positions
 
     no_carbons = C1.shape[1]  # number of carbon atoms that may be involved in cross-linking
-    C1_grid = transform.pbcs(C1, 1, 60, box, 0, nogap=args.nogap)
-    C2_grid = transform.pbcs(C2, 1, 60, box, 0, nogap=args.nogap)
+    C1_grid = transform.pbcs(C1, 1, 60, box, 0, nogap=True)
+    C2_grid = transform.pbcs(C2, 1, 60, box, 0, nogap=True)
     C1 = np.reshape(C1_grid, (3, C1_grid.shape[1]*C1_grid.shape[2]))
     C2 = np.reshape(C2_grid, (3, C2_grid.shape[1]*C2_grid.shape[2]))
 
@@ -209,10 +208,6 @@ if __name__ == "__main__":
 
     mat_dim = C1.shape[1]  # Dimensions of the matrix created in the next step
     # dist = np.zeros((len(C2x), len(C1x)))
-
-    # exclude = exclude_adjacent(mat_dim, images) # slow! (even when cythonized - not surprising since numpy is c wrapped)
-    # stop2 = time.time()
-    # print 'Exclusion generated: %s seconds' % (stop2 - stop1)
 
     # We need to add additional exclusions if there are any terminated/reacted atoms which should be excluded
 
@@ -272,13 +267,17 @@ if __name__ == "__main__":
         C1_restricted = exclude(C1_restricted, c1_ex_no, images, C1.shape[1]/images)
         C2_restricted = exclude(C2_restricted, c2_ex_no, images, C2.shape[1]/images)
 
-
     print 'beginning distance calculation'
 
     start_dist = time.time()
     dist = genpairs.calc_dist2(C1, C2, C1_restricted, C2_restricted)
     stop3 = time.time()
 
+    d = [d for d in dist[:, C2_restricted[1]] if d < 1000]
+    print min(d)
+    print C1_restricted[np.argmin(d)] % 1440
+    print C2_restricted[1] % 1440
+    exit()
     print 'Distances Calculated: %s seconds' % (stop3 - start_dist)
 
     # Now see which of these distances meet the cutoff criteria
@@ -289,8 +288,8 @@ if __name__ == "__main__":
     min_dist = np.zeros([ncarb1]) + 1000
     min_index = np.zeros([ncarb1])  # index of minimum value of distances for each monomer-monomer measurement
     for i in C1_restricted:
-        min_dist[i] = min(dist[:, i])
-        min_index[i] = np.argmin(dist[:, i]) % (ncarb1/images)  # index corresponds to the monomer with which
+        min_dist[i] = min(dist[i, :])
+        min_index[i] = np.argmin(dist[i, :]) % (ncarb1/images)  # index corresponds to the monomer with which
 
     change_index1 = []  # index of C1 from min_dist which needs to be changed
     change_index2 = []  # index of C2 from dist which needs to be changed
@@ -348,7 +347,9 @@ if __name__ == "__main__":
             change_index1.append(i % (ncarb1/images))  # holds the index of the atom associated with the met criteria for primary carbons (C20, C34, C48)
             change_index2.append(int(min_index[i]))  # Same as above but for the secondary carbons
             count += 1
-
+    print change_index1
+    print change_index2
+    exit()
     # Now that everything has an index that needs to be changed, we must interpret those indices
 
     # C19 is the 26th atom, C20 is 27th, C33 is 41st, C34 is 42nd, C47 is 56th, C48 is 57th, in each monomer
