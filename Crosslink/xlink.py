@@ -296,7 +296,9 @@ for i in range(0, int((float(args.cutoff)/100)*len(C1x))):  # looks at a percent
     min_list.remove(m)  # removes that value from min_list
 
 cutoff = min(min_list)  # The minimum value left after the modification of min_list is the cutoff value
-
+print cutoff
+print distances
+exit()
 if cutoff[0] > 0.6:
     cutoff[0] = 0.6
 

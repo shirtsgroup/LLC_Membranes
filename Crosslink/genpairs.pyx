@@ -133,7 +133,9 @@ def calc_dist2(C1, C2, C1_restriction, C2_restriction):
 	dist = np.zeros([C1.shape[1], C2.shape[1]]) + 1000
 	for i in C1_restriction:
 		for k in C2_restriction:
-			dist[k, i] = np.linalg.norm(C1[:, i] - C2[:, k])
+			sep = np.linalg.norm(C1[:, i] - C2[:, k])
+			if sep > 0.25:  # meh .. a quick way to make sure we aren't including bonded carbons
+				dist[i, k] = sep
 
 	return dist
 
@@ -147,3 +149,20 @@ def improper_dihedrals(b, start_imp, imp_of_interest, dihedrals_imp_count):
 					dihedrals_imp.append(a_imp)
 		dihedrals_imp_count += 1
 	return dihedrals_imp
+
+def exclude_adjacent(mat_dim, images):
+
+	# Create a matrix of 1's and 0's. Entries that are 1's should not be counted in the distance calculations because they
+	# represent distances that are either between carbons on the same monomer, or are terminated carbons
+
+	atoms = mat_dim/images
+	ones = np.ones((1, mat_dim))[0]
+	exclude = np.diag(ones, 0)
+
+	for i in range(1, images):
+		ones = np.ones((1, mat_dim - i*atoms))[0]
+		diag = np.diag(ones, -i*atoms)
+		exclude += diag
+		exclude += np.diag(ones, i*atoms)
+
+	return exclude

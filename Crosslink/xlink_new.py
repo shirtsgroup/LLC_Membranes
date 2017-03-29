@@ -96,6 +96,33 @@ def restrict(box, atom_list, buffer):
     return np.array(restricted)
 
 
+def exclude(restrictions, exclusion_indices, images, natoms):
+    """
+    :param restrictions: existing restrictions (created using restrict function)
+    :param exclusion_indices: indices of carbons that need to be excluded
+    :param images: the number of periodic images. (with 3D periodic boundaries, this is 27)
+    :param natoms: the total number of atoms in the unit cell
+    :return: a new list of restricted atoms that does not include the excluded atoms. This list is meant to be
+     passed into the distance search (genpairs.calc_dist)
+    """
+
+    nex = len(exclusion_indices)  # the number of indices to be excluded
+    ex = np.zeros([nex*images])
+
+    for j in range(images):
+        count = 0
+        for i in exclusion_indices:
+            ex[count + j*nex] = exclusion_indices[count] + j*natoms
+            count += 1
+
+    new_restrictions = []
+    for i in restrictions:
+        if i not in ex:
+            new_restrictions.append(i)
+
+    return np.array(new_restrictions)
+
+
 def rad_index(c1_rad_ndx_prev, c2_rad_ndx_prev, c1, c2):  # function to modify c1_rad_ndx and c2_rad_ndx since it might
     # change during manipulations of c1 and c2 lists
     c1_rad_ndx = []
@@ -154,39 +181,21 @@ if __name__ == "__main__":
     # Coordinates of carbon 1 (the carbon on the end of the chain) and 2 (the second carbon from the end of the chains)
     C1 = np.zeros([tot_monomers*tails, 3])
     C2 = np.zeros(C1.shape)
-    # C1x = []  # list to hold x positions of atoms of interest
-    # C1y = []  # list to hold y positions of atoms of interest
-    # C1z = []  # list to hold z positions of atoms of interest. Z axis runs parallel to pore
-    #
-    # # List of coordinates for carbon 2 (i.e. the second carbon from the end of the chains
-    # C2x = []  # list to hold x positions of atoms of interest
-    # C2y = []  # list to hold y positions of atoms of interest
-    # C2z = []  # list to hold z positions of atoms of interest. Z axis runs parallel to pore
-    #
-    # for line in range(0, lines):  # 15 is where the field containing atom identities ends
-    #     #if str.strip(a[line][8:15]) in c1_atoms:
-    #     if a[line][0:15].count('C20') == 1 or a[line][0:15].count('C34') == 1 or a[line][0:15].count('C48') == 1:
-    #         C1x.append(float(a[line][20:28]))
-    #         C1y.append(float(a[line][28:36]))
-    #         C1z.append(float(a[line][36:44]))
-    #     #elif str.strip(a[line][8:15]) in c2_atoms:
-    #     elif a[line][0:15].count('C19') == 1 or a[line][0:15].count('C33') == 1 or a[line][0:15].count('C47') == 1:
-    #         C2x.append(float(a[line][20:28]))
-    #         C2y.append(float(a[line][28:36]))
-    #         C2z.append(float(a[line][36:44]))
     C1_indices = [a.index for a in t.topology.atoms if a.name in c1_atoms]  # get indices of all c1 atoms
     C2_indices = [a.index for a in t.topology.atoms if a.name in c2_atoms]  # get indices of all c2 atoms
     C1_mon_indices = np.array(C1_indices[:tails]) + 1 # add one because GROMACS counts starting at 1, not zero
     C2_mon_indices = np.array(C2_indices[:tails]) + 1
+    print C1_mon_indices
+    print C2_mon_indices
+    exit()
     C1t = t.atom_slice(C1_indices)  # create a new mdtraj trajectory object including only c1 atoms
     C2t = t.atom_slice(C2_indices)  # create a new mdtraj trajectory object including only c2 atoms
     C1 = C1t.xyz  # get just the positions
     C2 = C2t.xyz  # get just the positions
-    all_pts = np.concatenate((C1, C2), axis=1)
 
     no_carbons = C1.shape[1]  # number of carbon atoms that may be involved in cross-linking
-    C1_grid = transform.pbcs(C1, 1, 60, box, 0, nogap=True)
-    C2_grid = transform.pbcs(C2, 1, 60, box, 0, nogap=True)
+    C1_grid = transform.pbcs(C1, 1, 60, box, 0, nogap=args.nogap)
+    C2_grid = transform.pbcs(C2, 1, 60, box, 0, nogap=args.nogap)
     C1 = np.reshape(C1_grid, (3, C1_grid.shape[1]*C1_grid.shape[2]))
     C2 = np.reshape(C2_grid, (3, C2_grid.shape[1]*C2_grid.shape[2]))
 
@@ -194,91 +203,6 @@ if __name__ == "__main__":
     C1_restricted = restrict(box, C1, 0.1)
     C2_restricted = restrict(box, C2, 0.1)
 
-    # # Time to handle periodic boundary conditions
-    # # Get the box dimensions:
-    # x1 = float(a[len(a) - 1][0:10])   # x box vector
-    # y1 = float(a[len(a) - 1][10:20])  # component one of y box vector
-    # y2 = float(a[len(a) - 1][50:60])  # component two of y box vector
-    #
-    # # """ Visualize pbc's like this for the following calculations:
-    # #  ___________________________
-    # #  \        \        \        \
-    # #   \   I    \   II   \  III   \
-    # #    \________\________\________\
-    # #     \        \        \        \
-    # #      \  IV    \  Main  \   V    \
-    # #       \________\________\________\
-    # #        \        \        \        \
-    # #         \   VI   \  VII   \  VIII  \
-    # #          \________\________\________\
-    # #
-    # # We will use x1, y1 and y2 to make copies of the coordinates in the 'Main' box into each of the labeled boxes """
-    #
-    # # Define lists to hold translated coordinates
-    # # Lists will be of the format [C1x C1y C1z C2x C2y C2z]
-    # I = []
-    # II = []
-    # III = []
-    # IV = []
-    # V = []
-    # VI = []
-    # VII = []
-    # VIII = []
-    #
-    # for i in range(0, xlink_atoms):
-    #     I.append([]), II.append([]), III.append([]), IV.append([]), V.append([]), VI.append([]), VII.append([]), VIII.append([])
-    #
-    # for i in range(0, len(C1x)):
-    #     I[0].append(C1x[i] - x1 + y2), I[1].append(C1y[i] + y1), I[2].append(C1z[i]),\
-    #     I[3].append(C2x[i] - x1 + y2), I[4].append(C2y[i] + y1), I[5].append(C2z[i])
-    #     II[0].append(C1x[i] + y2), II[1].append(C1y[i] + y1), II[2].append(C1z[i]),\
-    #     II[3].append(C2x[i] + y2), II[4].append(C2y[i] + y1), II[5].append(C2z[i])
-    #     III[0].append(C1x[i] + x1 + y2), III[1].append(C1y[i] + y1), III[2].append(C1z[i]), \
-    #     III[3].append(C2x[i] + x1 + y2), III[4].append(C2y[i] + y1), III[5].append(C2z[i])
-    #     IV[0].append(C1x[i] - x1), IV[1].append(C1y[i]), IV[2].append(C1z[i]),\
-    #     IV[3].append(C2x[i] - x1), IV[4].append(C2y[i]), IV[5].append(C2z[i])
-    #     V[0].append(C1x[i] + x1), V[1].append(C1y[i]), V[2].append(C1z[i]),\
-    #     V[3].append(C2x[i] + x1), V[4].append(C2y[i]), V[5].append(C2z[i])
-    #     VI[0].append(C1x[i] - x1 - y2), VI[1].append(C1y[i] - y1), VI[2].append(C1z[i]),\
-    #     VI[3].append(C2x[i] - x1 - y2), VI[4].append(C2y[i] - y1), VI[5].append(C2z[i])
-    #     VII[0].append(C1x[i] - y2), VII[1].append(C1y[i] - y1), VII[2].append(C1z[i]), \
-    #     VII[3].append(C2x[i] - y2), VII[4].append(C2y[i] - y1), VII[5].append(C2z[i])
-    #     VIII[0].append(C1x[i] + x1 - y2), VIII[1].append(C1y[i] - y1), VIII[2].append(C1z[i]), \
-    #     VIII[3].append(C2x[i] + x1 - y2), VIII[4].append(C2y[i] - y1), VIII[5].append(C2z[i])
-    #
-    # # Now all of the translated coordinates need to be added to the main list of x, y and z coordinates for each carbon
-    #
-    # for i in range(0, len(I[0])):
-    #     C1x.append(I[0][i]), C1y.append(I[1][i]), C1z.append(I[2][i]), C2x.append(I[3][i]), C2y.append(I[4][i])
-    #     C2z.append(I[5][i])
-    #
-    # for i in range(0, len(II[0])):
-    #     C1x.append(II[0][i]), C1y.append(II[1][i]), C1z.append(II[2][i]), C2x.append(II[3][i]), C2y.append(II[4][i])
-    #     C2z.append(II[5][i])
-    #
-    # for i in range(0, len(III[0])):
-    #     C1x.append(III[0][i]), C1y.append(III[1][i]), C1z.append(III[2][i]), C2x.append(III[3][i]), C2y.append(III[4][i])
-    #     C2z.append(III[5][i])
-    #
-    # for i in range(0, len(IV[0])):
-    #     C1x.append(IV[0][i]), C1y.append(IV[1][i]), C1z.append(IV[2][i]), C2x.append(IV[3][i]), C2y.append(IV[4][i])
-    #     C2z.append(IV[5][i])
-    #
-    # for i in range(0, len(V[0])):
-    #     C1x.append(V[0][i]), C1y.append(V[1][i]), C1z.append(V[2][i]), C2x.append(V[3][i]), C2y.append(V[4][i])
-    #     C2z.append(V[5][i])
-    #
-    # for i in range(0, len(VI[0])):
-    #     C1x.append(VI[0][i]), C1y.append(VI[1][i]), C1z.append(VI[2][i]), C2x.append(VI[3][i]), C2y.append(VI[4][i])
-    #     C2z.append(VI[5][i])
-    #
-    # for i in range(0, len(VII[0])):
-    #     C1x.append(VII[0][i]), C1y.append(VII[1][i]), C1z.append(VII[2][i]), C2x.append(VII[3][i]), C2y.append(VII[4][i])
-    #     C2z.append(VII[5][i])
-    #
-    # for i in range(0, len(VIII[0])):
-    #     C1x.append(VIII[0][i]), C1y.append(VIII[1][i]), C1z.append(VIII[2][i]), C2x.append(VIII[3][i]), C2y.append(VIII[4][i])
-    #     C2z.append(VIII[5][i])
     stop1 = time.time()
     print 'PBCs set up: %s seconds' % (stop1 - start)
     # Find distance between carbon 1 and carbon 2 for all pairs
@@ -286,33 +210,19 @@ if __name__ == "__main__":
     mat_dim = C1.shape[1]  # Dimensions of the matrix created in the next step
     # dist = np.zeros((len(C2x), len(C1x)))
 
-    # a = np.ones((1, mat_dim))[0]
-    # b = np.ones((1, mat_dim - (mat_dim/images)))[0]
-    # c = np.ones((1, mat_dim - 2*(mat_dim/images)))[0]
-    # d = np.ones((1, mat_dim - 3*(mat_dim/images)))[0]
-    # e = np.ones((1, mat_dim - 4*(mat_dim/images)))[0]
-    # f = np.ones((1, mat_dim - 5*(mat_dim/images)))[0]
-    # g = np.ones((1, mat_dim - 6*(mat_dim/images)))[0]
-    # h = np.ones((1, mat_dim - 7*(mat_dim/images)))[0]
-    # i = np.ones((1, mat_dim - 8*(mat_dim/images)))[0]
-    #
-    # exclude = np.diag(a, 0) + np.diag(b, -(mat_dim/images)) + np.diag(b, (mat_dim/images)) + np.diag(c, (2*mat_dim/images)) + np.diag(c, -(2*mat_dim/images)) + np.diag(d, (3*mat_dim/images)) + \
-    #     np.diag(d, -(3*mat_dim/images)) + np.diag(e, (4*mat_dim/images)) + np.diag(e, -(4*mat_dim/images)) + np.diag(f, (5*mat_dim/images)) + np.diag(f, -(5*mat_dim/images)) + \
-    #     np.diag(g, (6*mat_dim/images)) + np.diag(g, -(6*mat_dim/images)) + np.diag(h, (7*mat_dim/images)) + np.diag(h, -(7*mat_dim/images)) + np.diag(i, (8*mat_dim/images)) + np.diag(i, -(8*mat_dim/images))
-
+    # exclude = exclude_adjacent(mat_dim, images) # slow! (even when cythonized - not surprising since numpy is c wrapped)
     # stop2 = time.time()
-    # exclude = exclude_adjacent(mat_dim, images)
-    # print 'Exclusion generated: %s seconds' %(stop2 - start)
+    # print 'Exclusion generated: %s seconds' % (stop2 - stop1)
 
     # We need to add additional exclusions if there are any terminated/reacted atoms which should be excluded
 
     if int(args.iteration) != 0:
 
-        f = open(args.topology, 'r')  # take a look at the topology from the previous iteration
+        with open(args.topology, 'r') as f:  # take a look at the topology from the previous iteration
 
-        top = []  # put all of the lines into a list
-        for line in f:
-            top.append(line)
+            top = []  # put all of the lines into a list
+            for line in f:
+                top.append(line)
 
         # look through each line for the 'T' marker and an '*' marker
         exclude_T_c1 = []
@@ -349,7 +259,7 @@ if __name__ == "__main__":
         for i in range(len(exclude_T_c2)):  #exclude_T_c2 and exclude_T_c1 are not necessarily the same length so we need a second loop
             c2_ex_no.append(c2_ndx.index(exclude_T_c2[i]))
         for i in range(len(reactive_c2)):
-            c2_reactive_no.append(c2_ndx.index(reactive_c2[i]))
+            c2_reactive_no.append(c2_ndx.index(reactive_c2[i]))  # the indices of the radical carbons
 
         # for i in c1_ex_no:  # now fill the exclusions matrix with 1's where we don't want a distance calc.
         #     for j in range(0, images):  # do it for all of the periodic cells
@@ -359,11 +269,14 @@ if __name__ == "__main__":
         #     for j in range(0, images):
         #         exclude[j*mat_dim/images + i, :] = 1
 
+        C1_restricted = exclude(C1_restricted, c1_ex_no, images, C1.shape[1]/images)
+        C2_restricted = exclude(C2_restricted, c2_ex_no, images, C2.shape[1]/images)
+
+
     print 'beginning distance calculation'
+
     start_dist = time.time()
     dist = genpairs.calc_dist2(C1, C2, C1_restricted, C2_restricted)
-    #dist = genpairs.calc_dist(C1x, C2x, C1y, C2y, C1z, C2z, exclude, dist)  # calculated distances between all non-exclusions
-
     stop3 = time.time()
 
     print 'Distances Calculated: %s seconds' % (stop3 - start_dist)
@@ -374,57 +287,65 @@ if __name__ == "__main__":
     ncarb1 = C1.shape[1]
     ncarb2 = C2.shape[1]
     min_dist = np.zeros([ncarb1]) + 1000
-    min_index = np.zeros([ncarb1]) - 1  # index of minimum value of distances for each monomer-monomer measurement
+    min_index = np.zeros([ncarb1])  # index of minimum value of distances for each monomer-monomer measurement
     for i in C1_restricted:
         min_dist[i] = min(dist[:, i])
         min_index[i] = np.argmin(dist[:, i]) % (ncarb1/images)  # index corresponds to the monomer with which
-    print 'min_dist calcd'
+
     change_index1 = []  # index of C1 from min_dist which needs to be changed
     change_index2 = []  # index of C2 from dist which needs to be changed
 
     if int(args.iteration) != 0:
-        # Looking just at the radical reactive sites. Does the same thing as the previous block but for a smaller list
-        min_dist_rad = np.zeros((len(c2_reactive_no), 1))
-        min_index_rad = np.zeros((len(c2_reactive_no), 1))
-        for i in range(0, len(c2_reactive_no)):
-            min_dist_rad[i, 0] = min(dist[c2_reactive_no[i], :])
-            min_index_rad[i, 0] = np.argmin(dist[c2_reactive_no[i], :]) % (len(C1x)/images)
 
-        min_list_rad = min_dist.tolist()
-        for i in range(0, int((float(args.cutoff_rad)/100)*len(C1x))):  # This could be done by sorting then cutting off first ten percent -- its probably better that way
+        # Looking just at the radical reactive sites. Does the same thing as the previous block but for a smaller list
+
+        c2_radicals = []
+        for i in C2_restricted:
+            if i % (ncarb1/images) in c2_reactive_no:
+                c2_radicals.append(i)
+
+        min_dist_rad = np.zeros([len(c2_radicals)])
+        min_index_rad = np.zeros([len(c2_radicals)])
+        for i in range(len(c2_radicals)):
+            min_dist_rad[i] = min(dist[c2_radicals[i], :])
+            min_index_rad[i] = np.argmin(dist[c2_radicals[i], :]) % (ncarb1/images)
+
+        min_list_rad = min_dist_rad.tolist()
+        for i in range(int((float(args.cutoff_rad)/100)*len(min_list_rad))):  # This could be done by sorting then cutting off first ten percent -- its probably better that way
             m = min(min_list_rad)
             min_list_rad.remove(m)
 
         cutoff = min(min_list_rad)  # Now the cutoff value is the minimum of min_list_rad
 
-        if cutoff[0] > 0.7:
-            cutoff[0] = 0.7
+        if cutoff > 0.7:
+            cutoff = 0.7
 
-        for i in range(0, len(min_index_rad)):  # Add to change_index if they meet the cutoff criteria
-            if min_dist_rad[i, 0] < cutoff:
+        for i in range(len(min_index_rad)):  # Add to change_index if they meet the cutoff criteria
+            if min_dist_rad[i] < cutoff:
                 change_index1.append(int(min_index_rad[i]))
-                change_index2.append(c2_reactive_no[i])
+                change_index2.append(c2_radicals[i])
 
         no_radical_rxns = len(change_index2)
 
     # find the cutoff distance for cross-linking
 
-    min_list = min_dist.tolist()
+    min_list = [a for a in min_dist if a < 1000]
+
     distances = []
-    for i in range(int((float(args.cutoff)/100)*ncarb1)):  # looks at a percentage of the total values based on user input of cutoff
+    for i in range(int((float(args.cutoff)/100)*len(min_list))):  # looks at a percentage of the total values based on user input of cutoff
         m = min(min_list)  # finds minimum of min_list
         distances.append(m)
         min_list.remove(m)  # removes that value from min_list
 
     cutoff = min(min_list)  # The minimum value left after the modification of min_list is the cutoff value
-
+    print 'Cutoff = %s nm' % cutoff
     if cutoff > 0.6:
         cutoff = 0.6
 
     count = 0
     for i in C1_restricted:
         if min_dist[i] < cutoff:  # find distances which meet the cutoff criteria
-            change_index1.append(i % (ncarb1/9))  # holds the index of the atom associated with the met criteria for primary carbons (C20, C34, C48)
+            change_index1.append(i % (ncarb1/images))  # holds the index of the atom associated with the met criteria for primary carbons (C20, C34, C48)
             change_index2.append(int(min_index[i]))  # Same as above but for the secondary carbons
             count += 1
 
@@ -442,7 +363,7 @@ if __name__ == "__main__":
     C1_no = []
     C2_no = []
 
-    for i in range(0, len(change_index1)):
+    for i in range(len(change_index1)):
         if change_index1[i] in tail1:  # This is C1 therefore if this is true, then the atom is C20 (atom no 27)
             C1_no.append((change_index1[i]/3)*atoms + C1_mon_indices[0])
         if change_index1[i] in tail2:  # This is C1 therefore if this is true, then the atom is C34 (atom no 42)
@@ -458,9 +379,9 @@ if __name__ == "__main__":
 
     if int(args.iteration) != 0:
 
-        c2_rad_ndx = []
         c1_rad_ndx = []
-        for i in range(0, no_radical_rxns):  # The first entries in C2_no are all radicals up to no_radical_rxns
+        c2_rad_ndx = []
+        for i in range(no_radical_rxns):  # The first entries in C2_no are all radicals up to no_radical_rxns
             c2_rad_ndx.append(C2_no[i])
             c1_rad_ndx.append(C1_no[i])
 
@@ -483,7 +404,7 @@ if __name__ == "__main__":
         c2_rad_ndx_prev = c2_rad_ndx
 
     adjacent_c1 = []
-    for i in range(0, len(c2_uniq)):
+    for i in range(len(c2_uniq)):
         adjacent_c1.append(c2_uniq[i] + 1)
 
     # Create the final lists of c1 and c2 that will be cross-linked
@@ -534,7 +455,7 @@ if __name__ == "__main__":
     no_xlinks = copy.deepcopy(len(c2))  # The length of c2 may change in the next loops so I am preserving it here
 
     # Add the termination carbons to new list
-    for i in range(0, no_xlinks):
+    for i in range(no_xlinks):
         term = np.random.choice(term_prob_array)
         if term == 1:
             term_c1.append(c1[i])
@@ -543,7 +464,7 @@ if __name__ == "__main__":
 
     # Remove terminated carbons from c1 and c2
 
-    for i in range(0, len(term_indices)):
+    for i in range(len(term_indices)):
         len_diff = no_xlinks - len(c1)  # Account for varying size of c1 and c2 lists
         del c1[term_indices[i] - len_diff]
         del c2[term_indices[i] - len_diff]
@@ -583,7 +504,6 @@ if __name__ == "__main__":
                     if int(top[atoms_end][0:5]) not in reactive_c2_term:
                         reactive_c2_term.append(int(top[atoms_end][0:5]))  # if it is, add it too a list of reactive c2 atoms
                 atoms_end += 1
-            print count
 
     # For the first iteration, use Assembly_itp.py to create a topology for the entire assembly and then write it to a file
     # which will be edited to incorporate cross-links. Otherwise, read the topology from the previous iteration
@@ -611,7 +531,7 @@ if __name__ == "__main__":
         b = []
         for line in f:
             b.append(line)
-        print '%s read into list' %args.topology
+        print '%s read into list' % args.topology
 
 
     # Make lists with numbers of H atoms whose type needs to change as a consequence of the cross linking reaction
@@ -639,20 +559,51 @@ if __name__ == "__main__":
     #     index += 1  # increments the while loop
     #
     # C2_3 = int(b[index][0:5])
-    C1_mon_indices = np.array(C1_indices[:tails]) + 1 # add one because GROMACS counts starting at 1, not zero
-    C2_mon_indices = np.array(C2_indices[:tails]) + 1
+
+    index = 0
+    #while str.strip(b[index][22:29]) != 'C19':
+    while b[index].count('C19') == 0:
+        index += 1  # increments the while loop
+
+    C2_1 = int(b[index][0:5])
+
+    index = 0
+    while b[index].count('C33') == 0:
+    #while str.strip(b[index][22:29]) != 'C33':
+        index += 1  # increments the while loop
+
+    C2_2 = int(b[index][0:5])
+    index = 0
+
+    while b[index].count('C47') == 0:
+    #while str.strip(b[index][22:29]) != 'C47':
+        index += 1  # increments the while loop
+
+    C2_3 = int(b[index][0:5])
 
     tail1 = []
     tail2 = []
     tail3 = []
 
     for i in range(0, tot_monomers):
-        tail1.append(atoms*i + C2_mon_indices[0])  # this can obviously be improved to the commented loop below
-        tail1.append(atoms*i + C1_mon_indices[0])
-        tail2.append(atoms*i + C2_mon_indices[1])
-        tail2.append(atoms*i + C1_mon_indices[1])
-        tail3.append(atoms*i + C2_mon_indices[2])
-        tail3.append(atoms*i + C1_mon_indices[2])
+        tail1.append(atoms*i + C2_1)
+        tail1.append(atoms*i + C2_1 + 1)
+        tail2.append(atoms*i + C2_2)
+        tail2.append(atoms*i + C2_2 + 1)
+        tail3.append(atoms*i + C2_3)
+        tail3.append(atoms*i + C2_3 + 1)
+
+    # tail1 = []
+    # tail2 = []
+    # tail3 = []
+    #
+    # for i in range(0, tot_monomers):
+    #     tail1.append(atoms*i + C2_mon_indices[0])  # this can obviously be improved to the commented loop below
+    #     tail1.append(atoms*i + C1_mon_indices[0])
+    #     tail2.append(atoms*i + C2_mon_indices[1])
+    #     tail2.append(atoms*i + C1_mon_indices[1])
+    #     tail3.append(atoms*i + C2_mon_indices[2])
+    #     tail3.append(atoms*i + C1_mon_indices[2])
 
     # alltails = np.zeros([tails, 2*tot_monomers])
     # for i in range(tails):
@@ -724,12 +675,13 @@ if __name__ == "__main__":
 
     # the c2 where termination is happening is no longer the same c2 which is referenced in term_c2
     term = []  # define those termination atoms as 'term' which are the carbons adjacent to term_c1
-    for i in range(0, len(term_c1)):
+    for i in range(len(term_c1)):
         term.append(term_c1[i] - 1)
 
     H_new2 = []  # keep these separate for indexing purposes. In H_new2, termination is based on the tail containing c1
         # since initiation occurs at c1.
-    for i in range(0, len(term)):
+
+    for i in range(len(term)):
         if term[i] in tail1:  # i.e. C19
             H.append(term[i] + 59)
             H.append(term[i] + 60)
@@ -762,9 +714,6 @@ if __name__ == "__main__":
                 H_new3.append(H_rad_carbons[i] + 86)
 
     # find the indices of all fields that need to be modified
-
-    atoms_index, bonds_index, pairs_index, angles_index, dihedrals_p_index, \
-    dihedrals_imp_index, vsite_index = file_rw.get_indices(b, 'on')
 
     # [ atoms ]
 
@@ -894,7 +843,8 @@ if __name__ == "__main__":
 
     # new H bonds formed during termination (2 dummy H's becoming real)
     k = 0
-    for i in range(0, len(term)):
+
+    for i in range(len(term)):
         b.insert(nb + bonds_index + 2, '{:6d}{:7d}{:4d}'.format(term[i], H_new2[k], 1) + "\n")
         k += 1
         nb += 1
@@ -1086,31 +1036,31 @@ if __name__ == "__main__":
     while b[vsite_index].count('[ virtual_sites4 ]') == 0:
         vsite_index += 1
 
-    vsite_count = vsite_index + 2
+    # vsite_count = vsite_index + 2
 
     # for i in range(vsite_count, len(b)):  # This is the last section in the input .itp file
     #     vsite_count += 1
 
-    while b[vsite_count] != '\n':
-        vsite_count += 1
+    # while b[vsite_count] != '\n':
+    #     vsite_count += 1
     # we need to make a new list of virtual sites that does not include in the sites which have been turned to real atoms
     # term and H_new1 contain the indices of the hydrogens which need to be removed from the virtual sites list
 
     virtual_sites = []
     if int(args.iteration) == 0:
-        for i in range(vsite_index + 2, vsite_count):
+        for i in range(vsite_index + 2, len(b)):
             site = int(b[i][0:8])
             if site not in H_new2 and site not in H_new1:  # if the site is in the old virtual sites but not in H_new1 or term
                 virtual_sites.append(b[i])  # then add it to virtual_sites since those hydrogens are still dummies
     else:
-        for i in range(vsite_index + 2, vsite_count):
+        for i in range(vsite_index + 2, len(b)):
             site = int(b[i][0:8])
             if site not in H_new2 and site not in H_new1 and site not in H_new3:  # don't want virtual sites from H_new3
                 virtual_sites.append(b[i])  # then add it to virtual_sites since those hydrogens are still dummies
 
     # eliminate the old virtual_sites4 list
 
-    del b[vsite_index + 2: vsite_count]
+    del b[vsite_index + 2: len(b)]
 
     # Insert new virtual sites list
 
@@ -1121,12 +1071,9 @@ if __name__ == "__main__":
 
     # Now write the new topology to a new file
 
-    target = open('crosslinked_new.itp', 'w')
-
-    for line in b:
-        target.write(line)
-
-    target.close()
+    with open('crosslinked_new.itp', 'w') as target:
+        for line in b:
+            target.write(line)
 
     tot_double_bonds = len(c1_atoms)*tot_monomers
     terminated = 0
@@ -1143,12 +1090,12 @@ if __name__ == "__main__":
     if int(args.iteration) != 0:
         f = open('xlink.log', 'w')
         f.writelines(['Total time elapsed: %s seconds\n' %(end - start), '\n', 'c1: %s\n' % c1, '\n', 'c2: %s\n' % c2,
-                      '\n', 'radical_c2: %s\n' % radical_c2, '\n', 'term: %s\n' %vterm, '\n', 'term_c1: %s\n' % term_c1,
+                      '\n', 'radical_c2: %s\n' % radical_c2, '\n', 'term: %s\n' % term, '\n', 'term_c1: %s\n' % term_c1,
                       '\n', 'other_c1: %s\n' % other_c1, '\n', 'H_new1: %s\n' % H_new1, '\n', 'H_new2: %s\n' % H_new2,
                       '\n', 'Reacted c2 Radical Indices: %s\n' % c1_rad_ndx, '\n',
                       'c1s which reacted with radical c2: %s\n' % c2_rad_ndx, '\n', 'term_rad_c2: %s\n' % term_rad_c2,
                       '\n', 'reactive_c2_term: %s\n' % reactive_c2_term, '\n', 'H_new3: %s\n' % H_new3, '\n',
-                      'Cutoff distance (nm) : %s\n' % cutoff[0],'\n', 'Vinyl groups terminated: %s\n' % terminated, '\n',
+                      'Cutoff distance (nm) : %s\n' % cutoff,'\n', 'Vinyl groups terminated: %s\n' % terminated, '\n',
                       'Percent Completion: ' + '{:.1f}'.format(percent_completion) + ' %\n', '\n',
                       'Total Crosslinks: %s\n' % xlinks, 'Stop on Next Iteration?: %s\n' % Stop_next_iter])
 
@@ -1157,7 +1104,7 @@ if __name__ == "__main__":
         f.writelines(['Total time elapsed: %s seconds\n' % (end - start), '\n', 'c1: %s\n' % c1, '\n', 'c2: %s\n' % c2,
                       '\n', 'radical_c2: %s\n' % radical_c2, '\n', 'term: %s\n' % term, '\n', 'term_c1: %s\n' % term_c1,
                       '\n', 'other_c1: %s\n' % other_c1, '\n', 'H_new1: %s\n' % H_new1, '\n',
-                      'H_new2: %s\n' % H_new2, '\n', 'Cutoff distance (nm) : %s\n' % cutoff[0], '\n',
+                      'H_new2: %s\n' % H_new2, '\n', 'Cutoff distance (nm) : %s\n' % cutoff, '\n',
                       'Vinyl groups terminated: %s\n' % terminated, '\n',
                       'Percent Completion: ' + '{:.1f}'.format(percent_completion) + '%\n',
                       '\n', 'Total Crosslinks: %s\n' % xlinks, 'Stop on Next Iteration?: %s\n' % Stop_next_iter])
