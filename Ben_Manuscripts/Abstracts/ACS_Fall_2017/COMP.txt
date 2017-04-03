@@ -1,0 +1,35 @@
+# Division of Computers in Chemistry
+
+Nanostructured membranes offer the ability to control pore architecture
+at the atomic lengthscale. Lyotropic liquid crystals (LLC) are a class 
+of nanostructured materials that can be modified, assembled and 
+crosslinked into stable membranes which can perform solute specific 
+separations. Self-assembled LLC membranes can form the HII phase, 
+which is characterized by hexagonally packed, hydrophilic, aligned, 
+cylindrical pore regions. Pore diameters on the order of 1 nm make LLC
+membranes well suited for aqueous separations such as desalination 
+and biorefinement. For the first time, to our knowledge, the complex
+LLC system is being studied atomistically using molecular dynamics 
+simulations. Our intention is to create a python based platform for the 
+directed design of separation specific LLC membranes. An iterative
+approach of simulation and experiment will help us reduce the large 
+chemical design space available for LLC monomer design to a smaller 
+subset of optimal structures. Monomer selection will be based on our
+understanding of the molecular level transport mechanisms governing 
+movement of solutes through the pores and how it relates to macroscopic
+observables such as permeability and rejection. To date, our focus has been on 
+creating a molecular model which is consistent with experimentally 
+measured structural features and material properties. We have developed
+methods to simulate the crosslinking mechanism and to measure ionic
+conductivity from atomistic simulations. Simulated X-ray diffraction 
+(XRD) patterns based on atomic coordinates generate 1D and 2D simulated
+XRD patterns containing all major features present experimentally. Using
+our methods to characterize the molecular model, we have discovered an
+additional metastable state which may form under the wrong experimental
+conditions. Each configuration gives different structural properties but
+persists for simulations longer than 500 nanoseconds. Free energy 
+calculations will make it clear which state is favored and contribute to
+synthetic guidelines. We have created a model that is consistent with
+experiment and have developed methods that generalize our model for use
+with any other HII phase forming monomer, providing the basis to achieve
+our ultimate goal of directed LLC membrane design.         
