@@ -5,7 +5,7 @@ import mdtraj as md
 import numpy as np
 
 
-def thickness(filename):
+def thickness(filename, ref_atoms=['C', 'C1', 'C2', 'C3', 'C4', 'C5']):
 
     f = open(filename, "r")  # .gro file whose positions of Na ions will be read
 
@@ -19,10 +19,8 @@ def thickness(filename):
 
     z = []  # list to hold z positions of all atoms
 
-    benz_carbs = ['C', 'C1', 'C2', 'C3', 'C4', 'C5']
-
     while a[line].count('HII') != 0:
-        if str.strip(a[line][11:15]) in benz_carbs:
+        if str.strip(a[line][11:15]) in ref_atoms:
             z.append(float(a[line][36:44]))
         line += 1
 
@@ -33,9 +31,15 @@ def thickness(filename):
     return thick, z_max, z_min
 
 
-def conc(traj, gro, comp, b, lc, solv):
+def conc(t, t_comp, b):
+    """
+    Calculate the concentration of the specified component
+    :param t: mdtraj trajectory object for system being studied
+    :param comp: component which you want the concentration of
+    :param b: buffer. distance into membrane to go before starting calculation
+    :return: concentration
+    """
 
-    t = md.load('%s' % traj, top='%s' % gro)
     box = t.unitcell_vectors
     last = t.slice(-1)
     file_rw.write_gro(last, 'last_frame.gro')
@@ -46,9 +50,7 @@ def conc(traj, gro, comp, b, lc, solv):
     thick = z_max - z_min
 
     # Calculate concentration (an average of all frames)
-    keep = [a.index for a in t.topology.atoms if a.name == 'NA']
-    comp_only = t.atom_slice(keep)
-    pos = comp_only.xyz
+    pos = t_comp.xyz
     ncomp = pos.shape[1]  # number of components in the simulation which you want the concentration of
     nT = pos.shape[0]
     count = np.zeros([nT])
@@ -73,3 +75,94 @@ def conc(traj, gro, comp, b, lc, solv):
     avg_cross = np.mean(cross)
 
     return avg_conc, std, avg_cross, thick, z_max, z_min
+
+
+def avg_pore_loc(npores, pos):
+    """
+    :param no_pores: the number of pores in the unit cell
+    :param pos: the coordinates of the component(s) which you are using to locate the pore centers
+                      (numpy array with dimensions: [no frames, no components, xyz coordinates, ] or just
+                      [no components, xyz coordinates] for a single frame)
+    :return: numpy array containing the x, y coordinates of the center of each pore at each frame
+    """
+
+    # Find the average location of the pores w.r.t. x and y
+
+    if len(pos.shape) == 3:  # multiple frames
+
+        nT = np.shape(pos)[0]
+        comp_ppore = np.shape(pos)[1] / npores
+
+        p_center = np.zeros([2, npores, nT])
+
+        for i in range(nT):
+            for j in range(npores):
+                for k in range(comp_ppore*j, comp_ppore*(j + 1)):
+                    p_center[:, j, i] += pos[i, k, :2]
+                p_center[:, j, i] /= comp_ppore  # take the average
+
+    elif len(pos.shape) == 2:  # single frame
+
+        comp_ppore = pos.shape[1] / npores
+        p_center = np.zeros([2, npores])
+
+        for j in range(npores):
+            for k in range(comp_ppore*j, comp_ppore*(j + 1)):
+                p_center[:, j] += pos[:2, k]
+            p_center[:, j] /= comp_ppore
+
+    else:
+        return 'Please use a position array with valid dimensions'
+        exit()
+
+    return p_center
+
+
+def p2p(p_centers, distances):
+    """
+    :param p_centers: the x, y locations of the pore centers in the format return from avg_pore_loc()
+    :param distances: the number of distinct distances between pores
+    :return: all of the pore to pore distances
+    """
+    nT = np.shape(p_centers)[2]
+    p2ps = np.zeros([distances, nT])  # distances in the order 1-2, 1-3, 1-4, 2-3, 2-4, 3-4
+    for i in range(nT):
+        # So ugly ... sadness :(
+        p2ps[0, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 1, i])
+        p2ps[1, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 2, i])
+        p2ps[2, i] = np.linalg.norm(p_centers[:, 0, i] - p_centers[:, 3, i])
+        p2ps[3, i] = np.linalg.norm(p_centers[:, 1, i] - p_centers[:, 2, i])
+        p2ps[4, i] = np.linalg.norm(p_centers[:, 1, i] - p_centers[:, 3, i])
+        p2ps[5, i] = np.linalg.norm(p_centers[:, 2, i] - p_centers[:, 3, i])
+
+    return p2ps
+
+
+def limits(pos, pcenters):
+    """
+    Estimate the pore 'radius' based on the position of some component and it's maximum deviation from the pore center
+    :param: pos: the positions of all atoms included in making the estimate
+    :param: pcenters: the x,y positions of the pore centers for each frame
+    :return: an approximate pore radius. Beyond which, we have entered the alkane region
+    """
+
+    nT = pcenters.shape[2]
+    npores = pcenters.shape[1]
+    natoms= pos.shape[1]
+    atom_ppore = natoms / npores
+
+    deviation = np.zeros([nT, npores, atom_ppore])
+    for f in range(nT):
+        for i in range(atom_ppore):
+            for j in range(npores):
+                deviation[f, j, i] = np.linalg.norm(pos[f, j*atom_ppore + i, :2] - pcenters[:, j, f])  # left off here
+
+    deviation = np.reshape(deviation, (nT, natoms))
+    fr = np.zeros([nT])
+    frstd = np.zeros([nT])
+
+    for i in range(nT):
+        fr[i] = np.mean(deviation[i, :])  # + np.std(deviation[i, :]) # maybe?
+        frstd = np.std(deviation[i, :])
+
+    return fr, frstd

@@ -42,6 +42,8 @@ def initialize():
                                                             '["1-2", "1-3", "1-4", "2-3", "2-4", "3-4"] ')
     parser.add_argument('-b', '--nboot', default=2000, help = 'Number of bootstrap trials')
     parser.add_argument('--noshow', help='Specify this flag to prevent the plot from showing', action="store_true")
+    parser.add_argument('--auto_exclude', action="store_true", help="Specifying this will decide which pore-to-pore"
+                                                    "distance to exclude automatically by dropping the highest value")
 
     args = parser.parse_args()
     return args
@@ -134,6 +136,12 @@ def p2p_stats(p2ps, exclude, nboot, equil):
            choose to detect equilibration manually. Otherwise 'auto' will use pymbar to find it for you
     :return: the average and standard deviation of pore to pore distances
     """
+
+    if args.auto_exclude:
+        means = np.zeros([p2ps.shape[0]])
+        for i in range(p2ps.shape[0]):
+            means[i] = np.mean(p2ps[i, :])
+        exclude = [np.argmax(means)]
 
     nboot = int(nboot)
     nT = p2ps.shape[1]

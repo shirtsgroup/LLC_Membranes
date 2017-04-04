@@ -21,8 +21,10 @@ parser.add_argument('-f', '--frames', default=50, type=int, help='number of fram
 parser.add_argument('-p', '--pcoupltype', default='semiisotropic', type=str, help='Pressure Couple Type')
 parser.add_argument('--restraints', help='If restraints are on, another mdp option needs to be turned on, so specify '
                                          'this flag', action="store_true")
-parser.add_argument('-x', '--xlink', default='off', type=str, help='Turn this to "on" if the the system is crosslinked')
+parser.add_argument('-x', '--xlink', help='Turn this to "on" if the the system is crosslinked', action="store_true")
 parser.add_argument('-c', '--coord', default='initial.gro', type=str, help='coordinate file of system to be simulated')
+parser.add_argument('-S', '--solvate', help='Specify this if the system has water so an extra line can be added to the '
+                                            'topology', action="store_true")
 
 args = parser.parse_args()
 
@@ -36,12 +38,12 @@ exec "name = LC_class.%s.name" % args.build_mon
 exec "grps = LC_class.%s.residues" % args.build_mon
 exec "natoms = LC_class.%s.atoms" % args.build_mon
 
-if args.xlink == 'on':
+if args.xlink:
     mon_top = '#include "%s/crosslinked_new.itp"' % os.getcwd()
 else:
-    mon_top = '#include "%s/../Structure-Files/Monomer_Tops/%s.itp' % (location, args.build_mon)
+    mon_top = '#include "%s/../top/Monomer_Tops/%s.itp' % (location, args.build_mon)
 
-gaff = '#include "%s/../Structure-Files/Forcefields/gaff' % location  # generalized amber force field
+gaff = '#include "%s/../top/Forcefields/gaff' % location  # generalized amber force field
 
 # Energy minimization .mdp file
 title = 'title = Energy Minimization'
@@ -87,7 +89,7 @@ if args.ensemble == 'npt':
     a.append(['gen_vel = yes\n'])
     a.append(['pbc = xyz\n'])
     a.append(['DispCorr = EnerPres\n'])
-    if args.xlink == 'on':
+    if args.xlink:
         a.append('periodic-molecules = yes\n')
     if args.restraints:
         a.append(['refcoord_scaling = all\n'])
@@ -124,7 +126,7 @@ if args.ensemble == 'nvt':
     a.append(['gen_vel = yes\n'])
     a.append(['pbc = xyz\n'])
     a.append(['DispCorr = EnerPres\n'])
-    if args.xlink == 'on':
+    if args.xlink:
         a.append('periodic-molecules = yes\n')
     if args.restraints:
         a.append(['refcoord_scaling = all\n'])
@@ -148,6 +150,10 @@ a.append('\n')
 a.append(';Ion Topology\n')
 a.append('%s/ions.itp"\n' % gaff)
 a.append('\n')
+if args.solvate:
+    a.append(';Water Topology\n')
+    a.append('%s/tip3p.itp\n' % gaff)
+    a.append('\n')
 a.append('[ system ]\n')
 a.append('%s simulation of %s\n' % (args.ensemble, args.build_mon))
 a.append('\n')

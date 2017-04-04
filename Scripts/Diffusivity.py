@@ -8,6 +8,7 @@ import Poly_fit
 
 
 def initialize():
+
     parser = argparse.ArgumentParser(description = 'Run Cylindricity script')
     parser.add_argument('-i', '--input', default='wiggle_traj.gro', help = 'Path to input file')
     parser.add_argument('-c', '--comp', default='NA', help='Name of ion(s) being used to calculate ionic conductivity')
@@ -20,6 +21,7 @@ def initialize():
     parser.add_argument('-s', '--solv', default='no', help='Is the system solvated or not?')
     parser.add_argument('-m', '--nMC', default=1000, help='Number of Monte Carlo trials to estimate error in D')
     args = parser.parse_args()
+
     return args
 
 
@@ -106,7 +108,12 @@ def d_error(nMC, startfit, endMSD, nT, limits, times, MSD, d):
 
 
 def dconst(x, nT, Nbootstraps, frontfrac, fracshow, d, dt, nMC):
+
     no_comp = len(x[0, :, 0])
+    print x.shape[0]
+    print x.shape[1]
+    print x.shape[2]
+    exit()
     MSD, MSDs = msd(x, nT, no_comp)
     print 'MSDs done'
     limits = bootstrap(nT, Nbootstraps, no_comp, MSDs, MSD)

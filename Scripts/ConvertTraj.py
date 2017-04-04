@@ -24,6 +24,7 @@ def initialize():
     parser.add_argument('--single_frame', help='Will create a copy of the current frame to make an artificial traj',
                         action="store_true")
     parser.add_argument('--avg_dims', help='Print the average dimensions Lx, Ly, and Lz', action="store_true")
+    parser.add_argument('-l', '--last', type=int, help='Number of frames before the end to start writing output. optional')
 
     args = parser.parse_args()
 
@@ -59,7 +60,10 @@ if __name__ == "__main__":
         elif id[i].count('O') != 0:
             id[i] = 'O'
 
-    begin = args.begin
+    if args.last:
+        begin = nT - args.last
+    else:
+        begin = args.begin
     if args.end:
         end = args.end
     else:
@@ -102,4 +106,4 @@ if __name__ == "__main__":
         with open('dims.txt', 'w') as f:
             f.write('{:10f}{:10f}{:10f}'.format(xyz[0], xyz[1], xyz[2]))
 
-    print 'Average box dimensions written'
+        print 'Average box dimensions written'

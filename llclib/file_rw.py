@@ -72,7 +72,7 @@ def write_assembly(b, xlink, output, no_mon):
 
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Location of this script
 
-    with open("%s/../Structure-Files/Monomer_Tops/%s" % (location, '%s.itp' % b), "r") as f:
+    with open("%s/../top/Monomer_Tops/%s" % (location, '%s.itp' % b), "r") as f:
 
         a = []
         for line in f:
@@ -281,27 +281,27 @@ def write_initial_config(positions, identity, name, no_layers, layer_distributio
     monomer_count = 0
     no_atoms = positions.shape[1]
     for l in range(0, no_pores):  # loop to create multiple pores
-        b = grid[0, l]
-        c = grid[1, l]
+        # b = grid[0, l]
+        # c = grid[1, l]
         theta = 30  # angle which will be used to do hexagonal packing
-        # if l == 0:  # unmodified coordinates
-        #     b = 0
-        #     c = 0
-        # elif l == 1:  # move a pore directly down
-        #     b = -1
-        #     c = 0
-        #     if flip == 'yes':
-        #         positions[:, :] = flipped
-        # elif l == 2:  # moves pore up and to the right
-        #     b = -math.sin(math.radians(theta))
-        #     c = -math.cos(math.radians(theta))
-        #     if flip == 'yes':
-        #         positions[:, :] = unflipped
-        # elif l == 3:  # moves a pore down and to the right
-        #     b = math.cos(math.radians(90 - theta))
-        #     c = -math.sin(math.radians(90 - theta))
-        #     if flip == 'yes':
-        #         positions[:, :] = flipped
+        if l == 0:  # unmodified coordinates
+            b = 0
+            c = 0
+        elif l == 1:  # move a pore directly down
+            b = -1
+            c = 0
+            if flip == 'yes':
+                positions[:, :] = flipped
+        elif l == 2:  # moves pore up and to the right
+            b = -math.sin(math.radians(theta))
+            c = -math.cos(math.radians(theta))
+            if flip == 'yes':
+                positions[:, :] = unflipped
+        elif l == 3:  # moves a pore down and to the right
+            b = math.cos(math.radians(90 - theta))
+            c = -math.sin(math.radians(90 - theta))
+            if flip == 'yes':
+                positions[:, :] = flipped
         for k in range(no_layers):
             layer_mons = layer_distribution[l*no_layers + k]
             for j in range(layer_mons):  # iterates over each monomer to create coordinates
@@ -326,21 +326,21 @@ def write_initial_config(positions, identity, name, no_layers, layer_distributio
     # Ions:
 
     for l in range(no_pores):  # loop to create multiple pores
-        b = grid[0, l]
-        c = grid[1, l]
+        # b = grid[0, l]
+        # c = grid[1, l]
         theta = 30  # angle which will be used to do hexagonal packing
-        # if l == 0:  # unmodified coordinates
-        #     b = 0
-        #     c = 0
-        # elif l == 1:  # move a pore directly down
-        #     b = - 1
-        #     c = 0
-        # elif l == 2:  # moves pore up and to the right
-        #     b = math.cos(math.radians(90 - theta))
-        #     c = -math.sin(math.radians(90 - theta))
-        # elif l == 3:  # moves a pore down and to the right
-        #     b = -math.sin(math.radians(theta))
-        #     c = -math.cos(math.radians(theta))
+        if l == 0:  # unmodified coordinates
+            b = 0
+            c = 0
+        elif l == 1:  # move a pore directly down
+            b = - 1
+            c = 0
+        elif l == 2:  # moves pore up and to the right
+            b = math.cos(math.radians(90 - theta))
+            c = -math.sin(math.radians(90 - theta))
+        elif l == 3:  # moves a pore down and to the right
+            b = -math.sin(math.radians(theta))
+            c = -math.cos(math.radians(theta))
         for k in range(no_layers):
             layer_mons = layer_distribution[l*no_layers + k]
             for j in range(layer_mons):  # iterates over each monomer to create coordinates

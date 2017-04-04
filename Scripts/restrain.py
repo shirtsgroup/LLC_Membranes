@@ -371,7 +371,7 @@ if __name__ == "__main__":
 
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Location of this script
 
-    f = open("%s/../Structure-Files/Monomer_Tops/%s" % (location, '%s.itp' % args.monomer), "r")
+    f = open("%s/../top/Monomer_Tops/%s" % (location, '%s.itp' % args.monomer), "r")
 
     a = []
     for line in f:
@@ -380,13 +380,13 @@ if __name__ == "__main__":
     f.close()
 
     if args.novsites:
-        file_rw.write_assembly(a, 'off', args.out, rings)  # there will be an error if the second argument is 'on' with
+        file_rw.write_assembly(args.monomer, 'off', args.out, rings)  # there will be an error if the second argument is 'on' with
                                                             # no virtual sites
     else:
         if args.xlink or args.append:  # don't re-write the topology file if you are iteratively crosslinking
             pass
         else:
-            Assembly_itp.write_file(a, 'on', args.out, rings)
+            file_rw.write_assembly(args.monomer, 'on', args.out, rings)
 
     if args.dipoles == 'on':
 
