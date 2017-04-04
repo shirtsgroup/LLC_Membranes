@@ -1,0 +1,17 @@
+;Forcefield
+#include "amber99.ff/forcefield.itp"
+#include "/home/bcoscia/PycharmProjects/GitHub/Scripts/../Structure-Files/Forcefields/gaff/gaff.itp"
+
+;Monomer Topology
+#include "/home/bcoscia/PycharmProjects/GitHub/Scripts/../Structure-Files/Monomer_Tops/monomer2_dummy.itp
+
+;Ion Topology
+#include "amber99.ff/ions.itp"
+
+[ system ]
+Vacuum Simulation
+
+[ molecules ]
+; Compound         nmols
+HII                 1
+NA                  1
