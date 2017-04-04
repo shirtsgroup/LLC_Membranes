@@ -167,6 +167,7 @@ if __name__ == '__main__':
         keep = [a.index for a in t.topology.atoms if a.name == args.ion]
         t_ion = t.atom_slice(keep)
         pos = t.xyz
+        print pos.shape
         pos_ion = t_ion.xyz
         time = t.time
 
