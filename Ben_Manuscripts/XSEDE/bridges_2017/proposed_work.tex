@@ -1,0 +1,165 @@
+subsection{How do water and ions move in nanostructured charged polymeric membranes?}
+\subsubsection*{Background} 
+
+The ability to design nanostructured membranes with concomitant high chemical
+specificity is an important goal of the membrane separations
+community.~\cite{Humplik2011} The ability to control
+the nanoscale architecture of membranes will allow membranes to be 
+designed precisely for the purpose of separating specific compounds.
+~\cite{SmithRC1997,Zhu2006} The membranes being studied in this project
+have pores sizes smaller than 1 nanometer, allowing size-selective 
+filtration of small molecules and gases, as well as desalination of salt
+water based on charge repulsion and size-exclusion of hydrated salt ions.
+
+The membrane system we propose to model in this project is composed of
+lyotropic liquid crystals (LLCs) which self-assemble into hexagonally
+packed, cylindrical pores with acidic groups facing toward the cylinder
+center, complexed to counterions. Subsequent cross-linking to forms
+a mechanically strong structure (Fig.~\ref{figure:membrane}).
+~\cite{Zhou2003,Feng2014,Feng2016} The pores, at the level of resolution
+obtained by SAXS and TEM, appear to be straight and uniform in size 
+(Fig.~\ref{figure:membrane}).  This is very different from most 
+commercially available membranes which have a pore size distribution
+with tortuous pathways that reduce selectivity and flux respectively.
+The ordered structure exhibited by LLC membranes makes them well suited 
+for modeling using molecular dynamics simulations because the
+system has a defined structure that can be studied in a reasonably sized 
+unit cell.
+
+Our initial systems were built by first parameterizing a single
+monomer using the General Amber Force Field (GAFF). Because the
+self-assembly process is long relative to times which we can simulate,
+monomers were rotated into layers of six monomers and stacked into
+cylinders to give a starting configuration close to where we expect
+the system to settle at equilibrium. While a single lyotropic liquid
+crystal consists of a small number of atoms (138), the entire unit
+cell consists of about 66K atoms. This number increases to 
+approximately 100K when water molecules are added to the system.
+
+% BJC: The following is technically true although I've been creating
+% specific configurations for testing purposes. 
+In order to assemble the structures shown in Fig.~\ref{figure:membrane}, a
+suitable monomer configuration needed to be chosen. Thermal annealing
+of the monomer using GROMACS yielded many low energy configurations
+close to what is expected. 
+
+Initial simulations have been performed which energy minimize and
+allow the system to stabilize over the course of 20 ns in vacuum.  The
+final structure and trajectory are analyzed quantitatively by
+measuring pore size, distance between pores, and distribution of
+sodium ions in the pore. These measurements are compared to values
+measured experimentally with SAXS and TEM imaging in order to validate
+the final structure. SAXS and TEM images were taken using dry membrane
+which justifies our initial study of the system in vacuum.
+
+%\begin{figure}[h]
+%\begin{center}
+%\begin{tabular}{c}
+%\includegraphics[width=8cm]{modeled.png}\\
+%\includegraphics[height=5cm]{membrane2.pdf}\\
+%\end{tabular}
+%\end{center}
+%\caption{(above) SAXS and TEM experimental data, with hypothesized
+%  membrane structure. (Below, left) Top view of atomistic simulation,
+%  with hydrophilic head groups in orange, counterions in blue, and
+%  hydrophobic chains in blue. (Below, right) Side view of atomistic
+%  simulation showing counterions in dark blue and other atoms in light
+%  blue. These simulations demonstrate the heterogeneity in the
+%  modeled systems.~\label{figure:membrane}}
+%\end{figure}
+
+\subsubsection*{Proposed Experiments and Justification of Resources}
+
+Vacuum simulations of this system with a unit cell consisting of 4
+pores, each with twenty layers of six monomers, total 66K atoms. On
+Bridges, using MPI-enabled GROMACS 5.1.2, we obtain
+99 ns/day using 224 cores, beyond which the scaling becomes mildly
+nonlinear (See Figure~\ref{figure:gromacs} in the ``Code Performance
+and Scaling'' document for more details). Simulations of the same
+system solvated in water results in a total of 100K atoms, which ran
+at 121 ns/day using 336 cores, at the limit of the near linear scaling
+regime.  By creating a system with 80 layers, we reached 265K atoms,
+which scaled nearly linearly up to 29 ns/day on 224 cores. We will use
+these timings to estimate the time required for these experiments.
+
+We repeated scaling studies with the same system using the GPU-enabled 
+GROMACS 2016 which was compiled for optimal use with NVIDIA Tesla K80
+accelerators. On Bridges we obtain 58 ns/day for the 66K atom system
+using 4 GPUs and 28 cores. Simulating the solvated configuration, we
+obtain 56.4 ns/day on 4 GPUs and 28 cores. Simulating the 265K atom 
+system we obtain 10.1 ns/day on 4 GPUs and 28 cores.
+
+In order to study the relative stability of the two metastable phases 
+we have discovered, we need will need to perform a computationally 
+intensive free energy calculation using the Multistate Bennett
+Acceptance Ratio (MBAR) technique. MBAR estimates free energy 
+difference with current lowest variance when compared to other estimators.
+In order to make a reasonable estimate, we will need to conduct 
+simulations all intermediate states which lead from one metastable
+state to another. Each configuration in the pathway mapping the two
+states must be sufficiently similar to adjacent configurations so that
+we achieve enough phase space overlap for a more precise calculation. 
+We estimate that we will need at least 50 intermediate states, each run
+for 50 ns for a total of 2500 ns of simulation time. This will require 
+(2500 ns / (99.2 ns/day))* 24 hrs/day * 224 cores = 135K SU using
+MPI on the RM partition. This will require (2500 ns / (58 ns/day)) * 24
+hours * 4 GPUs = 4.1K SU on the K80 GPU nodes.
+
+The resolution of simulated X-ray diffraction patterns is dependent on the
+size of the simulated unit cell. To create higher resolution patterns in 
+the x, y or z directions, requires an increase in the respective dimension
+of the unit cell by adding more atoms. The fundamental reason for this
+limitation is the necessity of meeting the Bragg condition. When met,
+constructive X-ray interference occurs, producing a signal on a nearby 
+detector. The lattice planes in the crystal, defined by the reciprocal
+space Miller indices h, k, and l, are separated by a distance, d. One can
+calculate all possible d values given all unit cell parameters. It is
+not trivial to see that an increase in box vector leads to a wider range
+of accessible hkl values and increases the resolution. A simple way to 
+estimate the simulated resolution in each direction is using the equations
+qx = 2*pi/x, qy = 2*pi/y, qz = 2*pi/z. Our current resolution with a 66K
+atom system is ~ 0.078 inverse angstroms. We propose a 4x increase in our
+z dimension resolution which will help us to distinguish reflections 
+deemed a consequence of benzene ring pi-stacking (reflection occurs at 1.53
+inverse angstroms) from simple alkane chain packing (reflection occurs
+between 1.4 and 1.57 inverse angstroms). We also hope to pick up finer 
+details such as the sharp line that appears at ~.85 inverse angstroms 
+experimentally but is absent in the simulated patterns. A system of this 
+type is made of 265K atoms. Stacking equilibrated membrane layers 
+directly on top of each will allow facilitate a fast equilibration of the
+large system. Equilibration will be allowed to run for at least 50 ns 
+followed by 50 ns of simulation needed to collect enough information to
+simulate the XRD pattern. 100 ns of simulation time for a 265K atom system 
+will require 19K SU on the RM nodes and 950 SU on K80 GPU nodes.     
+%HIGH RESOLUTION XRD (to pick up additional features)
+
+%CROSSLINKING?
+
+Once equilibrated and cross-linked, we will examine the effect of
+solvation of the membranes on the pores. We have learned that at least 
+1000 ns of total simulation is required to observe full penetration of
+water through pores resulting in a cost of 
+%UPDATE
+(2000 ns / (86 ns/day)) * 24
+hours * 224 cores = 124K required SU, if we assume the initial
+membrane simulation boxes are sufficiently large.
+%UPDATE
+
+We will carry out the same procedure with a set of new monomers. In addition to the simulations outlined above, we will need to equilibrate each system
+using the developed procedures. Equilibration for 500 ns  
+
+%\begin{wraptable}{r}{0.4\textwidth} 
+%\begin{tabular}{|l|c|}
+%\hline
+%Simulation Set                & SU \\ 
+%\hline
+%Initial vacuum equilibration      &  57K \\
+%Test of monomer structuring       & 114K \\
+%System-size dependence            & 102K  \\
+%Membrane solvation                &  375K \\
+%Diffusion studies                 & 72K \\
+%Differences in bound counterion  & 430K \\
+%\hline
+%            Total         & 1140K \\
+%\hline
+%\end{tabular}
