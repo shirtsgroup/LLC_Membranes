@@ -152,6 +152,7 @@ if __name__ == "__main__":
     outer_limits, outer_std = limits(outer, p_centers)
 
     inner_limits += inner_std
+    outer_limits -= outer_std
 
     d = density(inner_limits, outer_limits, p_centers, t)
 
