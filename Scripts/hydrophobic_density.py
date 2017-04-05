@@ -21,6 +21,8 @@ def initialize():
                                                                         'used to define outer limit of alkane region')
     parser.add_argument('--vis', help='visualize the atoms that are included in the density calculation by outputting'
                                       'a restricted .gro file', action="store_true")
+    parser.add_argument('--noshow', help='specify this flag if you do not want a plot shown after the calculations. The'
+                                         'average of the density will then be reported', action="store_true")
     args = parser.parse_args()
 
     return args
@@ -157,6 +159,9 @@ if __name__ == "__main__":
         restricted = visualize(inner_limits, outer_limits, p_centers, t)
         file_rw.write_gro(restricted, 'restricted.gro')
 
-    plt.plot(t.time, d)
-    plt.show()
+    if not args.noshow:
+        plt.plot(t.time, d)
+        plt.show()
+    else:
+        print "Average Density: %s g/cm^3" % np.mean(d)
 
