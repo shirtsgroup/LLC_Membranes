@@ -23,6 +23,9 @@ def initialize():
                                       'a restricted .gro file', action="store_true")
     parser.add_argument('--noshow', help='specify this flag if you do not want a plot shown after the calculations. The'
                                          'average of the density will then be reported', action="store_true")
+    parser.add_argument('--nudge_inner', default = 1, type=float, help='number of sigma to move the inner limit out')
+    parser.add_argument('--nudge_outer', default= 1, type=float, help='number of sigma to move the outer limit in')
+
     args = parser.parse_args()
 
     return args
@@ -68,7 +71,7 @@ def density(inner_limits, outer_limits, pcenters, t):
     """
 
     NA = 6.022*10**23  # avogadros number
-    conv = 1*10**-21
+    conv = 1*10**-21  # convert nm^3 to cm^3
     pos = t.xyz  # get positions
     box = t.unitcell_vectors
 
@@ -86,7 +89,7 @@ def density(inner_limits, outer_limits, pcenters, t):
         # http://stackoverflow.com/questions/1667310/combined-area-of-overlapping-circles
         z = np.linalg.norm(box[i, 2, :])  # z dimension
 
-        vol[i] = a*z*conv  # convert nm^3 to cm^3
+        vol[i] = a*z*conv
 
     mass = np.zeros([atoms])  # molar mass of each atom
     count = 0
@@ -151,8 +154,8 @@ if __name__ == "__main__":
     inner_limits, inner_std = limits(inner, p_centers)
     outer_limits, outer_std = limits(outer, p_centers)
 
-    inner_limits += inner_std
-    outer_limits -= outer_std
+    inner_limits += inner_std * args.nudge_inner
+    outer_limits -= outer_std * args.nudge_outer
 
     d = density(inner_limits, outer_limits, p_centers, t)
 
@@ -164,5 +167,5 @@ if __name__ == "__main__":
         plt.plot(t.time, d)
         plt.show()
     else:
-        print "Average Density: %s g/cm^3" % np.mean(d)
+        print "Average Density: %s g/cm^3" % np.mean(d[-5:])
 
