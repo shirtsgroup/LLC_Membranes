@@ -28,7 +28,6 @@
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
-import MDAnalysis as md
 
 
 def initialize():

@@ -52,6 +52,6 @@ NAcarb11Vd = LC('HII', 'NA', 143, 'NAcarb11V_1_dummy.gro', 9, ['C20', 'C34', 'C4
                 1, ['C', 'C2', 'C4'], [0, 3, 9], 9)
 NAcarb11Vflat = LC('HII', 'NA', 137, 'flat.gro', 9, ['C20', 'C34', 'C48'], ['C19', 'C33', 'C47'], 3, ['HII', 'NA'], 1,
                ['C', 'C2', 'C4'], [0, 3], 9)
-
+Halanine11V = LC('MOL', 'H', 147, 'Halanine11V.pdb', 9, ['C', 'C29', 'C51'], ['C1','C28','C50'], 3, ['MOL'], 0, ['C15', 'C31', 'C37'], [36, 37], 37)
 # SOL should be deleted. Need to check for usage first
 SOL = LC('Water', 'H', 3, 'spc216.gro', 9, ['na'], ['na'], 1, ['OW', 'HW1', 'HW2'], 0, ['OW', 'HW1', 'HW2'], ['C', 'C3', 'C6'], 9)
