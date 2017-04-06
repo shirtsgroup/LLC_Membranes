@@ -82,12 +82,19 @@ regime.  By creating a system with 80 layers, we reached 265K atoms,
 which scaled nearly linearly up to 29 ns/day on 224 cores. We will use
 these timings to estimate the time required for these experiments.
 
-We repeated scaling studies with the same system using the GPU-enabled 
+We repeated scaling studies with the same system using GPU-enabled 
 GROMACS 2016 which was compiled for optimal use with NVIDIA Tesla K80
-accelerators. On Bridges we obtain 58 ns/day for the 66K atom system
-using 4 GPUs and 28 cores. Simulating the solvated configuration, we
-obtain 56.4 ns/day on 4 GPUs and 28 cores. Simulating the 265K atom 
-system we obtain 10.1 ns/day on 4 GPUs and 28 cores.
+accelerators. On Bridges we obtain 58 ns/day, 56.4 ns/day and 10.1 ns/day
+for the 66K, 100K and 256K atom systems respectively. Although the system
+scales nearly linearly for greater than 4 GPUs in all cases, additional
+GPUs require more than 1 node which has signficantly extended queue wait
+times in our experience. It is preferable to run jobs longer on one GPU
+for a long time than to delay a job from starting but have it run for a
+shorter time. Since trajectory files are written while simulating, it
+is beneficial to check progress and cancel jobs which show no value.
+We plan to work with PSC to compile a version of gromacs that is performs
+optimally with the
+ 
 
 In order to study the relative stability of the two metastable phases 
 we have discovered, we need will need to perform a computationally 
