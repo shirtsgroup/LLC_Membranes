@@ -1,0 +1,17 @@
+;Forcefield
+#include "amber99.ff/forcefield.itp"
+#include "/home/NormaKLangdon/2017/gaff/gaff.itp"
+
+;Monomer Topology
+#include "/home/NormaKLangdon/2017/NAcarb9V/NAcarb9V.itp"
+
+;Ion Topology
+#include "amber99.ff/ions.itp"
+
+[ system ]
+Vacuum Simulation
+
+[ molecules ]
+; Compound        nmols
+ HII              1     
+ NA               1
