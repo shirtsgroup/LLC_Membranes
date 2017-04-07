@@ -1,10 +1,50 @@
 # Division of Computers in Chemistry
 
 Nanostructured membranes offer the ability to control pore architecture
-at the atomic lengthscale. Self-assembled lyotropic liquid crystal (LLC)
-membranes are a class of materials that can be easily modified to 
-perform solute specific separations. HII phase LLC membranes are 
-characterized by hexagonally packed, hydrophilic, aligned cylindrical pore 
-regions. Pore diameters on the order of 1 nm make LLCs membranes well
-suited for aqueous separations such as desalination and biorefinement. 
+at the atomic lengthscale. Lyotropic liquid crystals (LLC) are a class 
+of nanostructured materials that can be modified, assembled and 
+crosslinked into stable membranes which can perform solute specific 
+separations. Self-assembled LLC membranes can form the HII phase, 
+which is characterized by hexagonally packed, hydrophilic, aligned, 
+cylindrical pore regions. Pore diameters on the order of 1 nm make LLC
+membranes well suited for aqueous separations such as desalination 
+and biorefinement. 
+%MRS: Too much introduction in the abstract above.  Cut to the chase sooner.
+For the first time, to our knowledge, the complex
+%MRS: there is not a single LLC system, so we can't say "the complex LLC system"
+LLC system is being studied atomistically using molecular dynamics 
+simulations. 
+%MRS: PSCE doesn't care about computer programs, they care about what you discover -- this is more appropriate for COMP.
+%MRS: also, don't talk about your intention, but what you have discovered so far (or what you feel pretty sure you will have done by this summer. 
+Our intention is to create a python based platform for the 
+directed design of separation specific LLC membranes. An iterative
+approach of simulation and experiment will help us reduce the large 
+chemical design space available for LLC monomer design to a smaller 
+subset of optimal structures. Monomer selection will be based on our
+understanding of the molecular level transport mechanisms governing 
+movement of solutes through the pores and how it relates to macroscopic
+observables such as permeability and rejection. To date, our focus has been on 
+creating a molecular model which is consistent with experimentally 
+measured structural features and material properties. We have developed
+methods to simulate the crosslinking mechanism and to measure ionic
+conductivity from atomistic simulations. Simulated X-ray diffraction 
+(XRD) patterns based on atomic coordinates generate 1D and 2D simulated
+XRD patterns containing all major features present experimentally. Using
+%MRS: focus on the finding so far, like below. -- see the seed grant for my
+ thoughts about what is interesting to people who study these systems.
+%MRS: talk some more about 
+%1. the implications of the different geometries on transport.
+%2.  Talk about matching to X-ray diffraction.
+%3.  Say you will present transport (I feel confident we will get there by august), but you can just say you compare
+%transport between them.
+%4. You can talk a little bit about the potential of MD to answer questions 
+our methods to characterize the molecular model, we have discovered an
+additional metastable state which may form under certain experimental
+conditions. Each configuration gives different structural properties but
+persists for simulations longer than 500 nanoseconds. Free energy 
+calculations will make it clear which state is favored and contribute to
+synthetic guidelines. Through our efforts, we have created a model that
+is consistent with experiment and have developed methods that generalize
+our model for use with any other HII phase forming monomer, providing
+the basis to achieve our ultimate goal of directed LLC membrane design.
 
