@@ -1,36 +1,66 @@
 # Division of Polymeric Science and Engineering
 
 Nanostructured membranes offer the ability to control pore architecture
-at the atomic lengthscale. Lyotropic liquid crystals (LLC) are a class 
+at the atomic length scale. Lyotropic liquid crystals (LLC) are a class 
 of nanostructured materials that can be modified, assembled and 
-crosslinked into stable membranes with uniform straight pores which can
-perform solute specific separations. Pore diameters on the order of 1 nm
-make LLC membranes well suited for aqueous separations such as desalination 
-and biorefinement. To advance our knowledge of transport in these systems,
-thus teaching us how to better design monomers, we have studied an
-experimentally known system using molecular dynamics simulations in order 
-to develop a predictive model for membrane design. To date, our focus has
-been on creating a molecular model which is consistent with experimentally
-measured structural features and material properties as well as studying
-solute transport in through the pores. We have developed methods to simulate
+crosslinked into stable membranes with uniform straight pores that can
+perform solute-specific separations. Pore diameters on the order of 1 nm
+make LLC membranes well-suited for aqueous separations such as desalination 
+and biorefinement.  However, without a clear understanding of mechanisms 
+of transport in these complex self-assembled systems, it is challenging to 
+choose momoners to achieve specific separations goals.
+
+To advance our knowledge of transport in these systems, 
+%MRS:
+%in order to choose monomers for 
+%thus teaching us how to better design monomers, 
+we have studied an
+experimentally 
+%MRS:
+%known 
+characterized model
+system using molecular dynamics simulations in order 
+to develop a predictive model for membrane design. 
+%To date, our focus has
+We have created 
+%been on creating 
+a molecular model which is maximally consistent with experimentally
+measured structural features and material properties, and examined solute 
+transport in through the pores. We have developed methods to simulate
 the crosslinking mechanism, simulate X-ray diffraction (XRD) patterns and to
-measure ionic conductivity from atomistic simulations. Simulating X-ray
-diffraction patterns has enhanced our understanding of the system's
-microscopic structure. By matching simulated and experimental 2D WAXS patterns,
+measure ionic conductivity from atomistic simulations.
+
+%Simulating X-ray
+%diffraction patterns has enhanced our understanding of the system's
+%microscopic structure. 
+
+By matching simulated and experimental 2D WAXS patterns,
 we have discovered an additional metastable state, mainly characterized
 by its pore structure, which may form under certain experimental conditions.
 The first state has a condensed, narrow pore with high radial disorder.
-Although stable, the XRD pattern does not match experimental results.
+Although stable out to 100's of nanoseconds, the XRD pattern does not match experimental results.
 The second, whose XRD pattern gives a good match to experiment, is noticeably
-more open with aromatic rings stacked in a parallel displaced conformation.
-The difference in pore structure will surely affect the mechanism by which
+more open with aromatic rings stacked in a parallel displaced conformation. 
+Other theorized pore arrangements are not stable in simulation.
+The difference in pore structure 
+%will surely 
+affects the mechanism by which
 solutes diffuse across the membrane directly impacting macroscopic fluxes and
 % BJC: I'm having trouble phrasing the following since its something I haven't
 % actually done yet. Do I say "I will do this before the conference" or
 % "I did do this" or "I am doing this"?
-solute rejections. We compare transport in each configuration to see 
-which will result in a high performance membrane. We examine transport of 
+solute rejections. 
+%We compare transport in each configuration to see 
+which will result in a high performance membrane. 
+We examine transport of 
 water, monovalent and divalent ions, and a range of small polar molecules
-with a range of hydrodynamic radii. These studies provide a clear answer 
-to which state should be synthesized. Our simulations can advise 
-experimentalists on which synthetic conditions result in the desired state.
+with a range of hydrodynamic radii. 
+These studies can help guide the choice of monomer for specific separations objectives.
+%These studies provide a clear answer 
+%to which state should be synthesized. 
+%Our simulations can advise 
+%experimentalists on which synthetic conditions result in the desired state.
+
+ LocalWords:  Nanostructured Lyotropic LLC nanostructured crosslinked solute
+ LocalWords:  desalination biorefinement crosslinking XRD WAXS solutes BJC
+ LocalWords:  monovalent
