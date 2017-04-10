@@ -7,25 +7,23 @@ crosslinked into stable membranes with uniform straight pores that can
 perform solute specific separations. Pore diameters on the order of 1 nm
 make LLC membranes well-suited for aqueous separations such as desalination 
 and biorefinement. For the first time, to our knowledge, a LLC system is
-being studied atomistically using molecular dynamics simulations. 
-We are developing a python based platform for the directed design of
-separation specific LLC membranes. Without a clear understanding of
-mechanisms of transport in these complex self-assembled systems,
-it is challenging to choose monomers to achieve specific separation
-goals. An iterative approach of simulation and experiment is being used to
-help us characterize and reduce the large chemical design space available
-for LLC monomer design. To date, our focus has been on 
-creating a molecular model which is consistent with experimentally 
-measured structural features and material properties. To ensure our model's 
-with experiment, we have developed methods to simulate the
-crosslinking mechanism, simulate X-ray diffraction (XRD) patterns and 
-calculate ionic conductivity from atomistic simulations.
-Simulated XRD patterns based on atomic coordinates generate 1D and 2D simulated
-XRD patterns containing all major features present experimentally. Using
-our methods to characterize the molecular model, we have discovered an
-additional metastable state which may form under certain experimental
-conditions. Each configuration gives different structural properties but
-persists for 100's of simulated nanoseconds.
+being studied atomistically using molecular dynamics simulations. An iterative
+approach of simulation and experiment is being used to help us characterize
+and reduce the large chemical design space available for LLC monomer design.
+A properly conditioned model will provide a link between monomer structure and 
+macroscopic separation performance. With a clear understanding of mechanisms of 
+transport in these complex self-assembled systems, one can choose monomers
+to achieve specific separation goals. To date, our focus has been on creating a 
+molecular model which is consistent with experimentally measured structural 
+features and material properties. To ensure agreement with experiment, we have
+developed a method to simulate the crosslinking mechanism, a key step during 
+synthesis. We have adopted and compared multiple methods for calculating ionic
+conductivity from atomistic simulations. Simulated XRD patterns based on 
+atomic coordinates generate 1D and 2D simulated XRD patterns containing all 
+major features present experimentally. Using these methods to characterize 
+the molecular model, we have discovered an additional metastable state which 
+may form under certain experimental conditions. Each configuration gives 
+different structural properties but persists for 100's of simulated nanoseconds.
 %BJC: mention free energy calculations here? It seem that it is something we
 % will be doing soon and would be of interest to people in this forum.
 We have studied the transport of a range of solutes with various charges
