@@ -3,6 +3,7 @@
 \author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble \and Michael R. Shirts} 
 \begin{document}
 	\bibliographystyle{ieeetr}
+	\graphicspath{{./figures/}}
 	\maketitle
 	\section{Introduction}
 	Nanostructured membrane materials have become increasingly popular for aqueous separations applications because they offer the ability to control membrane architecture at the atomic scale allowing design of solute-specific separation membranes.
@@ -70,25 +71,30 @@
 			\item This could change how one thinks about molecules diffusing through membrane
 			\item Could also be a difference between lyotropic and thermotropic phases
 		\end{itemize}
-		\item How do the monomer head groups prefer to be oriented relative to each other?
-		\begin{itemize}		
-			\item The Colh phase is described as having pores made of disks or layers stacked on top of one another, each containing a set number of monomers. 
-			\begin{itemize}
-				\item Do the benzene rings prefer to be stacked on top of each other or in another pi-stacking mode.
-				\item Gas phase ab initio studies of benzene dimers have shown a clear energetic advantage for a parallel displaced or T-shaped conformation versus a stacked conformation. %BJC: Although the system is made of bulky substituted benzenes, I think it's easy to see how one can hypothesize for our system based on the simpler system.   	
-		\item A simple simulation study of a similar molecule (Head group is a sulfonate in the meta position) suggests that there are 4 monomers in each disk
-		\item Calculations based on the volume of the liquid crystal suggest that there are seven monomers in each 
-		\item We can use fourier analysis to determine if there are distinct layers, and if so, how many monomers are situated in each layer.
+		\item The Colh phase is described as having pores made of disks or layers stacked on top of one another, each containing a set number of monomers. 
+		\begin{itemize}
+			\item How do the monomer head groups pack together? Do the benzene rings prefer to be stacked on top of each other or in another pi-stacking mode.
+			\item Gas phase ab initio studies of benzene dimers have shown a clear energetic advantage for a parallel displaced or T-shaped conformation versus a stacked conformation. %BJC: Although the system is made of bulky substituted benzenes, I think it's easy to see how one can hypothesize for our system based on the simpler system.   	
+			\item A simple simulation study of a similar molecule (Head group is a sulfonate in the meta position) suggests that there are 4 monomers in each disk
+			\item Calculations based on the volume of the liquid crystal suggest that there are seven monomers in each layer 
+			\item We can use fourier analysis to determine if there are distinct layers, and if so, how many monomers are situated in each layer.
+		\end{itemize}
+		\item It is possible there are more than one metastable states associated with this LLC system
+		\begin{itemize}
+			\item Which phase is consistent with experiment?
+			\item Can both phases be created experimentally?
+			\item How will each state affect transport?
+		\end{itemize}
 	\end{itemize}
 	
 	We must show that the developed molecular model is consistent with physical observations so that we can trust conclusions drawn about structural features characteristic of the system.
 	\begin{itemize}
 		\item This paper will illustrate the careful development of a predictive molecular model and the steps taken to ensure it mimics the real system as best we can 
 		\item To understand how physically realistic the model is, validation by comparison to experiment is necessary
-		\item We are primarily interested in reproducing the conclusions about structure which can be made from SAXS experiments, predicting ionic conductivity with a reasonable comparison to experiment, and reproducing experimental density measurements.    
-			\item We can simulate x ray diffraction patterns based on atomic coordinates
-			\item We can predict ionic conductivity using two agreeing methods
-			\item Density? - I will ask Mike to take more density measurements. It seems worthwhile     
+		\item We are primarily interested in reproducing the conclusions about structure which have been made from SAXS experiments and ionic conductivity  measurements.    
+		\item We have written an algorithm to simulate the crosslinking mechanism and understand its influence on membrane structure
+		\item We can simulate x ray diffraction patterns based on atomic coordinates in order to compare major feature present in the 2D patterns
+		\item We can predict ionic conductivity using two agreeing methods
 	\end{itemize}
 	
 	\section{Methods}
@@ -129,22 +135,27 @@
 % 	\end{itemize}
 %MRS3: what is the thesis? decide what each figure is attempting to communicate to the reader.
 %BJC3: Maybe i include this in the supplemental information. I don't think a picture of the initial configuration is actually that interesting or important. I can't think of a thesis for a figure that is purely illustrative 
-	Each pore is made of twenty stacked monomer layers with continuity in all directions, avoiding any edge effects and creating an infinite length pore ideal for studying transport. 
+	Each pore is made of twenty stacked monomer layers with continuity in all directions, avoiding any edge effects and creating an infinite length pore ideal for studying transport (Fig.~\ref{fig:initial})
 	\begin{itemize}
 		\item A thinner system is better to reduce the computational cost and allow us to look at longer timescales
 		\item Number of layers chosen to give sufficient resolution when simulating XRD patterns
-	FIGURE: initial configuration \\
-	caption: A representative initial configuration. Each pore is rotated about the z axis rotated to prevent overlaps between pores \\
-	\\
+
+	\begin{figure}
+	\includegraphics{placeholder.tex}
+		\caption{Monomers are placed in an initial configuration close to the expected equilibrium configuration and allowed to relax}
+		\label{fig:initial}
+	\end{figure}
+
 	\noindent Initial guesses for the remaining structural parameters were chosen based on experimental data and treated as variables during model development 
 	\begin{itemize}
-		\item XRD gives Pore-to-Pore distances of ~4.1 nm and indicates possible pi-stacking at ~3.7 Angstroms
+		\item XRD gives Pore-to-Pore distances of ~4.1 nm and indicates possible pi-stacking at ~3.7 Angstroms (see figure blah blah later on - comparison of experimental vs. simulated)
 		\item Pi-stacking exists in multiple stable configurations: sandwiched, T-shaped and parallel-displaced
 		\item T-shaped and parallel-displaced are nearly isoenergetic and more stable than the sandwiched configuration.
 		\item T-shaped configuration is most stable when benzene centers are ~ 5 A apart which is not consistent with WAXS. http://www.jbc.org/content/273/25/15458.full 
 		\item System made with stacked and parallel-displaced benzene rings to see what is favored and matches XRD
 		\item TEM images and rejection studies give a pore size estimate
-		\item To prevent unrealistic jumps during initial equilibration steps, the following equilibration scheme was adopted
+
+	To prevent unrealistic jumps caused by poor atom placement during early equilibration steps, the following equilibration scheme was adopted.
 		\begin{itemize}
 			\item Apply position restraints to monomer head groups during energy minimization 
 			\item Leave position restraints for npt simulations to allow tails to intermingle (this also helps ensure independence of starting configuration)
@@ -163,34 +174,52 @@
 	
 	\section{Results and Discussion}
 	
-	Appropriate selection of initial structural parameters including interlayer spacing, relative interlayer orientation, and pore spacing results in an equilibrated model that is experimentally consistent.
+	Simulations of systems built by stacking monomers in the parallel-displaced and stacked configurations results in two different structures that are both stable for $>$ 500 ns, suggesting the existence of more than one metastable state.
 	\begin{itemize}
-		\item Visual perspective \\
-%MRS3: what is the thesis of the figure -- what is it trying to show.  Important when analyzing the outline and deciding what it means.  Make that the caption.
-		FIGURE: shows top view and cross section (with pbcs on)\\
-		caption: \\ 
-		(a) The expected hexagonal membrane morphology is preserved upon equilibration \\
-		(b) Straight cylindrical pore regions are present \\
-		\item System dimensions and properties are consistent upon equilibration using multiple monomer configurations 
-		\item Pore to pore distance
-		\begin{itemize}
-			\item We know from SAXS data what the distance between pores should be
-			\item We require long simulation times to reach an equilibrated structure with the correct dimensions
-			\item Crosslinking locks in structure, maintaining pore distances even after long simulations
-		\end{itemize}
+		\item There are distinct differences in the pore structures between each state (Fig ~\ref{fig:porestructures})
+		\item The stacked configuration results in a pore with high radial disorder. 
+		\item The parallel displaced configuration results in an open cylindrical pore. Benzene rings remain offset and form a helix. The membrane is thinner and the pore spacing is greater. Density stays the same (?)
+	\end{itemize}
 
-		FIGURE - 2 panels \\
-		(a) Measuring the distance between pores over time indicates equilibration when the distances stop changing \\
-		(b) A crosslinked system run for 100 ns shows that the system maintains itself close to its initial position \\
+	\begin{figure}
+	\centering
+	\includegraphics{placeholder.pdf}
+		\caption{Different pore structure are clear between systems built with benzene rings layered in a (a) stacked or (b) parallel-displaced conformation}
+		\label{fig:porestructures}
+	\end{figure}
+
+	Comparison of experimental 2D WAXS with simulated X-ray diffraction patterns produced from MD trajectories shows the most consistency with the parallel-displaced configuration
+	\begin{itemize} 
+		\item Stacked configuration is missing reflections at 2, 4, 8 and 10 0'clock
+		\item Those reflections are present from the 2D 
+%	Appropriate selection of initial structural parameters including interlayer spacing, relative interlayer orientation, and pore spacing results in an equilibrated model that is experimentally consistent.
+%	\begin{itemize}
+%		\item Visual perspective \\
+%MRS3: what is the thesis of the figure -- what is it trying to show.  Important when analyzing the outline and deciding what it means.  Make that the caption.
+%		FIGURE: shows top view and cross section (with pbcs on)\\
+%		caption: \\ 
+%		(a) The expected hexagonal membrane morphology is preserved upon equilibration \\
+%		(b) Straight cylindrical pore regions are present \\
+%		\item System dimensions and properties are consistent upon equilibration using multiple monomer configurations 
+%		\item Pore to pore distance
+%		\begin{itemize}
+%			\item We know from SAXS data what the distance between pores should be
+%			\item We require long simulation times to reach an equilibrated structure with the correct dimensions
+%			\item Crosslinking locks in structure, maintaining pore distances even after long simulations
+%		\end{itemize}
+
+%		FIGURE - 2 panels \\
+%		(a) Measuring the distance between pores over time indicates equilibration when the distances stop changing \\
+%		(b) A crosslinked system run for 100 ns shows that the system maintains itself close to its initial position \\
  
-		\item Simulated X-ray Diffraction
-		\begin{itemize}
-			\item We used the 3 dimensional fourier transformed electron density to generate simulated 1D and 2D diffraction patterns
-			\item The 1D patterns are generated by spherical integration of the FT
-			\item 2D patterns are generated by taking cross sections of the FT in the qx, qy and qz planes
-			\item We matched experiments based on iterative improvement of our choice in initial structure and equilibration procedure
-		\end{itemize}
-	        
+%		\item Simulated X-ray Diffraction
+%		\begin{itemize}
+%			\item We used the 3 dimensional fourier transformed electron density to generate simulated 1D and 2D diffraction patterns
+%			\item The 1D patterns are generated by spherical integration of the FT
+%			\item 2D patterns are generated by taking cross sections of the FT in the qx, qy and qz planes
+%			\item We matched experiments based on iterative improvement of our choice in initial structure and equilibration procedure
+%		\end{itemize}
+%	        
 		FIGURE - 4 panels \\
         	(a) Experimental Small Angle X-ray Scattering data confirms a hexagonally packed morphology and tells us the average distance between pores \\
         	(b) A simulated 1D x-ray diffraction pattern generated from atomic coordinates matches experimental measurements \\
