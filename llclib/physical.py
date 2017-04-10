@@ -44,7 +44,7 @@ def conc(t, t_comp, b):
     last = t.slice(-1)
     file_rw.write_gro(last, 'last_frame.gro')
     thick, z_max, z_min = thickness('last_frame.gro')
-    buffer = thick*float(b)
+    buffer = thick*b
     z_max -= buffer
     z_min += buffer
     thick = z_max - z_min

@@ -4,7 +4,7 @@ import numpy as np
 import math
 import os
 import argparse
-import LC_class
+import lc_class
 import Periodic_Images
 import copy
 from llclib import file_rw, transform
@@ -16,7 +16,7 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Build LLC Structure')
 
-    parser.add_argument('-b', '--build_mon', default='NAcarb11Vd', type=str, help='Name of class of monomer using to build with')
+    parser.add_argument('-b', '--build_mon', default='NAcarb11V.gro', type=str, help='Name of class of monomer using to build with')
     parser.add_argument('-o', '--out', default='initial.gro', help='name of output file')
     parser.add_argument('-l', '--layers', default=20, type=int, help = 'Number of Layers')
     parser.add_argument('-m', '--monomers', default=6, type=int, help = 'Monomers per layer')
@@ -471,6 +471,8 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
 if __name__ == "__main__":
 
     args = initialize()
+
+    properties = lc_class.LC('%s' % args.build_mon)
 
     exec "build_mon = LC_class.%s.build_mon" % args.build_mon
     exec "no_ions = LC_class.%s.valence" % args.build_mon

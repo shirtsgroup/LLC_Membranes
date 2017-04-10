@@ -36,7 +36,10 @@ def autocorrFFT(x):
 
 
 def msd_fft(r):
+
     N = len(r)
+    # N = r.shape[1]
+    # print N
     D = np.square(r).sum(axis=1)
     D = np.append(D, 0)
     S2 = sum([autocorrFFT(r[:, i]) for i in range(r.shape[1])])
@@ -48,21 +51,26 @@ def msd_fft(r):
     return S1-2*S2
 
 
-def msd(x, nT, no_comp):
+def msd(x):
+
+    nT = x.shape[0]
+    no_comp = x.shape[1]
     MSD = np.zeros([nT], dtype=float)
     MSDs = np.zeros([nT, no_comp], dtype=float)  # a set of MSDs per particle
-    for n in range(0, no_comp):
-        MSDs[:, n] = msd_fft(x[:, n, :].T)
+
+    for n in range(no_comp):
+        MSDs[:, n] = msd_fft(x[:, n, :])
         MSD += MSDs[:, n]
     MSD /= no_comp
+
     return MSD, MSDs
 
 
 def bootstrap(nT, Nbootstraps, no_comp, MSDs, MSD):
+
     eMSDs = np.zeros([nT, Nbootstraps], dtype=float)  # a set of MSDs per particle (time step?)
     # Now, bootstrap over number of particles, assuming that the particles are sufficiently independent
     for b in range(0, Nbootstraps):
-        print 'bootstrap trial number %s' % (b + 1)
         indices = np.random.randint(0, no_comp, no_comp)  # randomly select N of the particles with replacement
         # ^ makes a list of length Nparticles each with a random number from 0 to  Nparticles
         for n in range(0, no_comp):
@@ -109,21 +117,19 @@ def d_error(nMC, startfit, endMSD, nT, limits, times, MSD, d):
 
 def dconst(x, nT, Nbootstraps, frontfrac, fracshow, d, dt, nMC):
 
-    no_comp = len(x[0, :, 0])
-    print x.shape[0]
-    print x.shape[1]
-    print x.shape[2]
-    exit()
-    MSD, MSDs = msd(x, nT, no_comp)
+    MSD, MSDs = msd(x)
     print 'MSDs done'
-    limits = bootstrap(nT, Nbootstraps, no_comp, MSDs, MSD)
+    limits = bootstrap(nT, Nbootstraps, x.shape[1], MSDs, MSD)
     print 'Bootstrapping Done'
     endMSD = int(np.floor(nT*fracshow))
     startMSD = int(np.floor(nT*frontfrac))
+
     # coeff = Poly_fit.poly_fit(dt*np.array(range(startMSD, endMSD)), MSD[startMSD:endMSD], 1)[3]
     # D = coeff[1]/(2*d*1000000)  # slope of MSD plot equals 2 D. Divide by 1 million to go from nm^2/ps to m^2/s
     times = dt*np.array(range(0,endMSD))
+
     avg_D, std_D = d_error(nMC, startMSD, endMSD, nT, limits, times, MSD, d)
+
     return MSD, endMSD, limits, avg_D, std_D
 
 
