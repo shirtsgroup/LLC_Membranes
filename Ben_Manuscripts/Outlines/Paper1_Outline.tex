@@ -5,7 +5,7 @@
 	\bibliographystyle{ieeetr}
 	\maketitle
 	\section{Introduction}
-	Nanostructured membrane materials have become increasingly popular for aqueous separations applications because they offer the ability to control membrane architecture at the atomic scale.
+	Nanostructured membrane materials have become increasingly popular for aqueous separations applications because they offer the ability to control membrane architecture at the atomic scale allowing design of solute-specific separation membranes.
 	\begin{itemize}
 		\item Current state-of-the-art reverse osmosis membranes are dense and unstructured with tortuous and polydisperse pores which lead to inconsistent performance
 		\item Tortuosity and polydispersity drive up energy requirements which strain developing regions and contribute strongly to CO2 emissions
@@ -14,18 +14,18 @@
 		\item Many current RO membranes degrade in typical chlorine filled municipal water supplies (debating this point because there aren't any studies of LLC membrane fouling resistance)  
 		\item With nanostructured materials, solute rejecting pores can be tuned uniformly -- drives down energy requirements
 		\item Targeted separations can be accomplished by tuning the molecular building blocks which form these materials
-		\item Entirely different mechanisms govern the separation processes in various nano structured materials which can inspire novel separation techniques
+		\item Entirely different mechanisms govern the separation processes in various nanostructured materials which can inspire novel separation techniques
 	\end{itemize}
 	
 	Development of nanostructured materials has been limited by the ability to synthesize and scale various fundamentally sound technologies.
 	\begin{itemize}
 		\item Leading technologies and their limitations:
 		\begin{itemize}
-			\item Graphene sheets -atomically thick which gives excellent permeability but defects during manufacturing severely impact 
+			\item Graphene sheets -atomically thick which gives excellent permeability but defects during manufacturing severely impact selectivity
 			\item Carbon Nanotubes - MD studies are promising but synthetic techniques unable to achieve necessary alignment and pore monodispersity
 			%BJC: The following are ideas pulled from the grant. I need to do some reserach and come up with some one liners as to why each have not been successful
 			\item Track-etch membranes
-		    \item Molecular squares
+		    	\item Molecular squares
 			\item Macrocyclic surfactants 
 		\end{itemize}
 	\end{itemize}
@@ -47,22 +47,20 @@
 		\item The Colh phase shares the same structural features with the HII phase with the exception of the presence of water. This paper will focus on the development of a model of the Colh phase since it is a simpler starting point and has just as much experimental data. The analysis used in this paper can be readily extended to the HII phase. 
 	\end{itemize}
 	
-	A molecular level understanding of LLC membrane structure will elucidate small molecule transport mechanisms, providing guidelines for design of monomers used to create separation-specific membranes.
+	A molecular level understanding of LLC membrane structure will elucidate small molecule transport mechanisms, providing guidelines to reduce the chemical space for design of monomers used to create separation-specific membranes.
 	\begin{itemize}
-		\item We do not yet understand how to reduce the effective pore size and/or tune the chemical environment in the HII nanopores for effect water desalination and small organic separations. Rejection studies show that this membrane can't do desalination
-		\item We can create a molecular model that will give us the desired understanding
-		\item Our focus is on Colh since it is a simpler system and has the same experimental data
-		\item Colh phase studies currently limited mostly to one monomer
-		\item Optimization efforts performed through trial and error
-		\item Macroscopic models are the only source of predictive modeling and existing theories do not adequately describe transport at these length scales
-		\item An atomistic understanding of the mechanism of solute transport can identify
-		performance bottle necks and direct design of future monomers/membranes
-		\begin{itemize}
-			\item Do ions have trouble getting through because of interactions with other things in the pores (e.g. ions, carbonyl groups, benzene rings) -- related to ionic conduction
-			\item Does concentration of ions in the pore repel incoming ions?
-			\item Do neutral solutes get rejected based solely on size rejection, or do interactions within the pore lead to selective rejection
-			\item Is water structured inside the pores leading to transport barriers?  
-		\end{itemize}
+                \item We do not yet understand how to reduce the effective pore size and/or tune the chemical environment in the HII nanopores for effective water desalination and small organic separations. Rejection studies show that this membrane can not do desalination yet
+		\item Colh phase studies currently limited to one monomer
+                \item Optimization efforts performed through trial and error over the past 20 years
+                \item Macroscopic models are the only source of predictive modeling and existing theories do not adequately describe transport at these length scales
+                \begin{itemize}
+                        \item Do ions have trouble getting through because of interactions with other things in the pores (e.g. ions, carbonyl groups, benzene rings) -- related to ionic conduction
+                        \item Does concentration of ions in the pore repel incoming ions?
+                        \item Do neutral solutes get rejected based solely on size rejection, or do interactions within the pore lead to selective rejection
+                        \item Is water structured inside the pores leading to transport barriers?
+			\item What does the microscopic pore structure look like and how can we relate that to monomer design and transport?
+		\item An atomistic understanding of the mechanism of solute transport can identify performance bottle necks and direct design of future monomers/membranes
+		\item We can use molecular dynamics simulations to enhance our understanding 
 	\end{itemize}
 	 
 	A clear picture of the microscopic structure of LLC membranes, gained by building a molecular model, will confirm or deny past drawn conclusions that have largely guided our understanding of separation mechanisms. 
@@ -72,7 +70,12 @@
 			\item This could change how one thinks about molecules diffusing through membrane
 			\item Could also be a difference between lyotropic and thermotropic phases
 		\end{itemize}
-		\item The Colh phase is described as having pores made of disks or layers stacked on top of one another, each containing a set number of monomers. 
+		\item How do the monomer head groups prefer to be oriented relative to each other?
+		\begin{itemize}		
+			\item The Colh phase is described as having pores made of disks or layers stacked on top of one another, each containing a set number of monomers. 
+			\begin{itemize}
+				\item Do the benzene rings prefer to be stacked on top of each other or in another pi-stacking mode.
+				\item Gas phase ab initio studies of benzene dimers have shown a clear energetic advantage for a parallel displaced or T-shaped conformation versus a stacked conformation. %BJC: Although the system is made of bulky substituted benzenes, I think it's easy to see how one can hypothesize for our system based on the simpler system.   	
 		\item A simple simulation study of a similar molecule (Head group is a sulfonate in the meta position) suggests that there are 4 monomers in each disk
 		\item Calculations based on the volume of the liquid crystal suggest that there are seven monomers in each 
 		\item We can use fourier analysis to determine if there are distinct layers, and if so, how many monomers are situated in each layer.
