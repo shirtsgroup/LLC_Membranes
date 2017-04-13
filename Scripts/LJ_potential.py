@@ -4,12 +4,13 @@
 A script to play around with the lennard jones potential
 e (epsilon) = well depth
 s (sigma) = radius at which the potential is zero
+rm = distance at deepest part of well
 """
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-def vlj(e1, s1, e2, s2, r):
+def vlj_comb(e1, s1, e2, s2, r):
     # define equation for calculation of lennard jones potential
     s = (s1*s2)**.5
     e = (e1*e2)**.5
@@ -17,6 +18,18 @@ def vlj(e1, s1, e2, s2, r):
     for i in range(0, len(r)):
         V.append(4*e*((s/r[i])**12 - (s/r[i])**6))
     return V, e, s
+
+
+def vlj(e, s, r):
+
+    # define equation for calculation of lennard jones potential
+
+    V = []
+    for i in range(0, len(r)):
+        V.append(4*e*((s/r[i])**12 - (s/r[i])**6))
+
+    return V, e, s
+
 
 e_ref = .978638
 s_ref = .3401
@@ -27,7 +40,8 @@ e2 = 2
 s2 = .3401
 
 
-V, e, s = vlj(e2, s2, e_ref, s_ref, r)
+# V, e, s = vlj_comb(e2, s2, e_ref, s_ref, r)
+V, e, s = vlj(.3598, .339967, r)
 
 rm = s*(2**(1.0/6.0))  # radius at which minimum potential well depth is located
 

@@ -1,5 +1,5 @@
 [ atomtypes ]
-;name   atom_no        mass     charge   ptype   sigma         epsilon       Amb
+;name   atom_no        mass     charge   ptype   sigma*        epsilon*      Amb
  ca       12          12.0100  0.00000   A     3.39967e-01   3.59824e-01 ; 1.91  0.0860
  os       16          16.0000  0.00000   A     3.00001e-01   7.11280e-01 ; 1.68  0.1700
  c        12          12.0100  0.00000   A     3.39967e-01   3.59824e-01 ; 1.91  0.0860
@@ -15,4 +15,6 @@
  Na       NA          22.9900  0.00000   A     3.32840e-01   1.15897e-02  
  OW       16          16.0000  0.00000   A     3.15061e-01   6.36386e-01
  HW       1            1.0080  0.00000   A     0.00000e+00   0.00000e+00
+; * paramters are from gaff.dat and converted to gromacs units (sigma [=] nm,
+; epsilon [=] kJ/mol) from A and kcal/mol 
 

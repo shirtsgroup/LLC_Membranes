@@ -109,6 +109,7 @@ def initialize():
     parser.add_argument('-s', '--save', help='Save arrays generated for future use', action="store_true")
     parser.add_argument('--discard', type=int, help='Specify the number of nanoseconds to discard starting'
                                                                'from the beginning of the simulation')
+    parser.add_argument('--noshow', action="store_true", help='Specify this to not show any plots')
 
     args = parser.parse_args()
 
@@ -292,6 +293,7 @@ if __name__ == '__main__':
 
     n_sub = args.nTsub  # number of sub-trajectories to used for error analysis
     nT_sub = nT/n_sub  # number of points in that subinterval
+    l_sub = dt * nT_sub / 1000  # ns in the subinterval
 
     # Break dq_all into sub-trajectories
     dq = np.zeros([n_sub, nT_sub])
@@ -303,6 +305,12 @@ if __name__ == '__main__':
     dq_cum[:, 0] = dq[:, 0]
     for i in range(nT_sub):
         dq_cum[:, i] = dq[:, i] + dq_cum[:, i - 1]
+
+    # for i in range(n_sub):
+    #     plt.plot(np.arange(0,nT_sub), dq_cum[i, :])
+    #
+    # plt.show()
+    # exit()
 
     msd = np.zeros([n_sub, nT_sub])
     itau = 0  # counts up to the number of trajectory frames
@@ -363,6 +371,8 @@ if __name__ == '__main__':
     plt.xlabel('')
     plt.hist(means, bins=100)
     # print "Ionic Conductivity: %s +/- %s S/m" % (ic_cd_avg, ic_cd_std)
+    print "Slope fit from %1.0f ns to %1.0f ns of each subtrajectory" % (args.frontfrac*l_sub, args.fracshow*l_sub)
     print "Bootstrapped Ionic Conductivity: %s +/- %s S/m" % (bootstrap_mean, bootstrap_std)
 
-    plt.show()
+    if not args.noshow:
+        plt.show()

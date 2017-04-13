@@ -406,9 +406,16 @@ def write_gro(t, out):
         f.write('%s\n' % t.n_atoms)
 
         count = 0
+
+        d = {'H1': 'HW1', 'H2': 'HW2', 'O': 'OW'}  # mdtraj renames water residues for some unhelpful reason
+
         for a in t.topology.atoms:
-            f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(a.residue.index + 1, a.residue.name, a.name,
+            if a.residue.name == 'HOH':
+                f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(a.residue.index + 1, 'SOL', d[a.name],
                                                     count + 1, pos[0, count, 0], pos[0, count, 1], pos[0, count, 2]))
+            else:
+                f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(a.residue.index + 1, a.residue.name, a.name,
+                                                        count + 1, pos[0, count, 0], pos[0, count, 1], pos[0, count, 2]))
             count += 1
 
         f.write('{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}\n'.format(v[0, 0, 0], v[0, 1, 1], v[0, 2, 2],

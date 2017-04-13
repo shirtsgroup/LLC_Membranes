@@ -11,13 +11,13 @@ import LC_class
 parser = argparse.ArgumentParser(description='Write .mdp files and topology files for various types of simulation')
 
 parser.add_argument('-T', '--title', default='Generic Molecular Dynamics Simulation', type=str, help='Simulation Title')
-parser.add_argument('-b', '--build_mon', default='NAcarb11Vd', type=str, help='Monomer structure used for build')
+parser.add_argument('-b', '--build_mon', default='NAcarb11V', type=str, help='Monomer structure used for build')
 parser.add_argument('-t', '--itp', default='dipole.itp', type=str, help='Name of .itp describing monomers')
 parser.add_argument('-s', '--em_steps', default=50000, type=int, help='Steps to take during energy minimization')
 parser.add_argument('-e', '--ensemble', default='npt', type=str, help='Thermodynamic ensemble to put system in')
 parser.add_argument('-d', '--dt', default=0.002, type=float, help='time step (ps)')
 parser.add_argument('-l', '--length', default=1000, type=int, help='simulation length (ps)')
-parser.add_argument('-f', '--frames', default=50, type=int, help='number of frames')
+parser.add_argument('-f', '--frames', default=100, type=int, help='number of frames')
 parser.add_argument('-p', '--pcoupltype', default='semiisotropic', type=str, help='Pressure Couple Type')
 parser.add_argument('--restraints', help='If restraints are on, another mdp option needs to be turned on, so specify '
                                          'this flag', action="store_true")
@@ -25,6 +25,7 @@ parser.add_argument('-x', '--xlink', help='Turn this to "on" if the the system i
 parser.add_argument('-c', '--coord', default='initial.gro', type=str, help='coordinate file of system to be simulated')
 parser.add_argument('-S', '--solvate', help='Specify this if the system has water so an extra line can be added to the '
                                             'topology', action="store_true")
+parser.add_argument('--temp', default=300, help='Specify temperature at which to run simulation')
 
 args = parser.parse_args()
 
@@ -77,15 +78,16 @@ if args.ensemble == 'npt':
     a.append(['Tcoupl = v-rescale\n'])
     a.append(['tc_grps = system\n'])
     a.append(['tau_t = %s\n' % str(0.1)])
-    a.append(['ref_t = %s\n' % 300])
-    a.append(['Pcoupl = berendsen\n'])
-    a.append(['Pcoupltype = %s\n' % args.pcoupltype])
-    if args.pcoupltype == 'Isotropic':
-        a.append(['ref_p = 1\n'])
-        a.append(['compressibility = 4.5e-5\n'])
-    else:
-        a.append(['ref_p = %s\n' % ' '.join([str(1) for i in grps])])
-        a.append(['compressibility = 4.5e-5 4.5e-5\n'])
+    a.append(['ref_t = %s\n' % args.temp])
+    if not args.restraints:
+        a.append(['Pcoupl = berendsen\n'])
+        a.append(['Pcoupltype = %s\n' % args.pcoupltype])
+        if args.pcoupltype == 'Isotropic':
+            a.append(['ref_p = 1\n'])
+            a.append(['compressibility = 4.5e-5\n'])
+        else:
+            a.append(['ref_p = %s\n' % ' '.join([str(1) for i in grps])])
+            a.append(['compressibility = 4.5e-5 4.5e-5\n'])
     a.append(['gen_vel = yes\n'])
     a.append(['pbc = xyz\n'])
     a.append(['DispCorr = EnerPres\n'])
@@ -122,7 +124,7 @@ if args.ensemble == 'nvt':
     a.append(['Tcoupl = v-rescale\n'])
     a.append(['tc_grps = system\n'])
     a.append(['tau_t = %s\n' % str(0.1)])
-    a.append(['ref_t = %s\n' % 300])
+    a.append(['ref_t = %s\n' % args.temp])
     a.append(['gen_vel = yes\n'])
     a.append(['pbc = xyz\n'])
     a.append(['DispCorr = EnerPres\n'])

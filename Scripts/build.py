@@ -5,6 +5,7 @@ import math
 import os
 import argparse
 import lc_class
+import LC_class
 import Periodic_Images
 import copy
 from llclib import file_rw, transform
@@ -472,7 +473,7 @@ if __name__ == "__main__":
 
     args = initialize()
 
-    properties = lc_class.LC('%s' % args.build_mon)
+    # properties = lc_class.LC('%s' % args.build_mon)
 
     exec "build_mon = LC_class.%s.build_mon" % args.build_mon
     exec "no_ions = LC_class.%s.valence" % args.build_mon

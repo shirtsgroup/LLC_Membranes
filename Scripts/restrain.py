@@ -33,7 +33,7 @@ def initialize():
     parser.add_argument('-f', '--f_const', default=1000, type=float, help='Force constant')
     parser.add_argument('-a', '--atoms', nargs='+', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], type=str, help='Name of carbons in ring')
     parser.add_argument('-d', '--distance', default=0.1, help='Distance to offset dipole from ring (Angstroms)')
-    parser.add_argument('-m', '--monomer', default='NAcarb11Vd', help='Which monomer topology is being used')
+    parser.add_argument('-m', '--monomer', default='NAcarb11V', help='Which monomer topology is being used')
     parser.add_argument('-t', '--toplines', default=2, help='Number of lines at the top of the .gro file to ignore')
     parser.add_argument('-v', '--valence', default=1, help = 'Valence of counterion')
     parser.add_argument('-c', '--charge', default=10, help= 'Charge on dipoles')
@@ -89,7 +89,6 @@ def get_coordinates(file, top_lines, atoms):
             coords[1, count] = float(file[i][28:36])
             coords[2, count] = float(file[i][36:44])
             count += 1
-
 
     return coords, n_atoms, all_coords, ids, res
 
