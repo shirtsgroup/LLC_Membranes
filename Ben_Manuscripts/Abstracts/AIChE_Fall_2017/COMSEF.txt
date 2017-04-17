@@ -1,36 +1,30 @@
-# Division of Computers in Chemistry
+# Computational Molecular Science and Engineer Forum (COMSEF)
 
-Nanostructured membranes offer the ability to control pore architecture
-at the atomic lengthscale. Lyotropic liquid crystals (LLC) are a class 
-of nanostructured materials that can be modified, assembled and 
-crosslinked into stable membranes with uniform straight pores that can
-perform solute specific separations. Pore diameters on the order of 1 nm
-make LLC membranes well-suited for aqueous separations such as desalination 
-and biorefinement. For the first time, to our knowledge, a LLC system is
-being studied atomistically using molecular dynamics simulations. 
-We are developing a python based platform for the directed design of
-separation specific LLC membranes. Without a clear understanding of
-mechanisms of transport in these complex self-assembled systems,
-it is challenging to choose monomers to achieve specific separation
-goals. An iterative approach of simulation and experiment is being used to
-help us characterize and reduce the large chemical design space available
-for LLC monomer design. To date, our focus has been on 
-creating a molecular model which is consistent with experimentally 
-measured structural features and material properties. To ensure our model's 
-with experiment, we have developed methods to simulate the
-crosslinking mechanism, simulate X-ray diffraction (XRD) patterns and 
-calculate ionic conductivity from atomistic simulations.
-Simulated XRD patterns based on atomic coordinates generate 1D and 2D simulated
-XRD patterns containing all major features present experimentally. Using
-our methods to characterize the molecular model, we have discovered an
-additional metastable state which may form under certain experimental
+For the first time, to our knowledge, a lyotropic liquid crystal (LLC)
+system is studied atomistically using molecular dynamics simulations.
+LLC's are a class of nanostructured materials that can be modified,
+assembled and crosslinked into stable membranes with uniform straight
+pores that can perform solute specific separations and offer the ability
+to control pore architecture at the atomic lengthscale. Pore diameters
+on the order of 1 nm make LLC membranes well-suited for aqueous
+separations such as desalination and biorefinement. A molecular model
+which is consistent with experimentally measured structural features
+and material properties can provide a link between monomer structure and
+macroscopic separation performance. We have used simulations with
+experimental data to create such a model. In our model, we have 
+developed a method to simulate the crosslinking mechanism, a key step
+during synthesis. We have also adopted and compared multiple methods
+for calculating ionic conductivity from atomistic simulations. Simulated
+X-ray diffraction patterns based on atomic coordinates generate 1D and
+2D diffraction patterns containing all major features present experimentally.
+Using these methods to characterize the molecular model, we have discovered
+an additional metastable state which may form under certain experimental
 conditions. Each configuration gives different structural properties but
-persists for 100's of simulated nanoseconds.
-%BJC: mention free energy calculations here? It seem that it is something we
-% will be doing soon and would be of interest to people in this forum.
-We have studied the transport of a range of solutes with various charges
-and hydrodynamic radii. We can use this information to draw correlations 
-between pore structure and selective preferences. These studies will help 
-guide monomer choice for separation-specific objectives.
-%BJC: I noticed in the session that there is an NVIDIA GPU poster award. Do
-% you think it is worth having anything about how we ran the simulations? 
+persists for 100's of simulated nanoseconds. We have also studied the
+transport of a range of solutes with various charges and hydrodynamic
+radii. With a clear understanding of mechanisms of transport in these
+complex self-assembled systems, one can choose monomers to achieve
+specific separation goals. We can use this information to draw
+correlations between pore structure and selective preferences. These
+studies will help guide monomer choice for separation-specific objectives.
+
