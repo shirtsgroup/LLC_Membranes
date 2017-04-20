@@ -7,4 +7,5 @@
 4. Parameterize with antechamber following the <a href="http://ambermd.org/tutorials/basic/tutorial4b/">tutorial</a>.
 5. Convert the output *.prmtop and *.inpcrd files to gromacs *.gro and *.top file using acpype.py
 6. Energy minimze the new structure
+
 _NOTE: Steps 4 - 6 can be done automatically using param.sh_
