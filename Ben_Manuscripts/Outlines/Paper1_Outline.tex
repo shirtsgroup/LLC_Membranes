@@ -35,15 +35,14 @@
 	\begin{itemize}
 		\item LLCs are versatile and controllable with a large chemical design space available for membrane design
 		\item Synthetic techniques are cheap and amenable to creating any monomer in this large design space
-		\item LLCs forms lamellar, bicontinuous cubic and hexagonal phase based on solution composition
-		\item Na-GA3C11 forms two types of self assembled LLCs - thermotropic (Colh) and lyotropic (HII)
-		%BJC: this is making me scratch my head - I'm afraid to talk a lot about this because of Mike's new data. But I think it's important to distinguish between what has been reported in past literature 
+		\item LLCs forms lamellar, bicontinuous cubic and hexagonal phases based on solution composition
+		\item Na-GA3C11 has been described in literature as forming two types of self assembled phases - thermotropic (Colh) and lyotropic (HII)
 		\item The thermotropic, Colh, is formed by the self assembly of neat monomer
 		\item The lyotropic, HII phase is formed in the presence of small amounts of water
-		\item Both assemble into cylinders with hydrophilic groups oriented inward towards the pore center and hydrophobic group facing outward. The only difference is the inclusion of water in the structure which leads to minor variations in the structure with potentially different filtration properties (although no filtration experiments have been done on Colh)  
+		\item Both assemble into cylinders with hydrophilic groups oriented inward towards the pore center and hydrophobic groups facing outward. The only difference is the inclusion of water in the structure which leads to minor variations in the structure with potentially different filtration properties (although no filtration experiments have been done on Colh)  
 		\item Hydrophilic regions point towards pore centers
 		\item Until recently, they could not be aligned - hindered progress
-		\item Yale aligns them, then crosslinks them to lock in the structure - reference 2014 and 2016 papers
+		\item Yale aligns them, then crosslinks them to lock in the structure - reference 2014 and 2016 papers. They say that they are scalable techniques
 		\item LLC HII phase membranes offer potential for high permeability and selectivity which equals low energy consumption
 		\item The Colh phase shares the same structural features with the HII phase with the exception of the presence of water. This paper will focus on the development of a model of the Colh phase since it is a simpler starting point and has just as much experimental data. The analysis used in this paper can be readily extended to the HII phase. 
 	\end{itemize}
@@ -64,7 +63,7 @@
 		\item We can use molecular dynamics simulations to enhance our understanding 
 	\end{itemize}
 	 
-	A clear picture of the microscopic structure of LLC membranes, gained by building a molecular model, will confirm or deny past drawn conclusions that have largely guided our understanding of separation mechanisms. 
+	A clear picture of the nanoscopic structure of LLC membranes, gained by building a molecular model, will confirm or deny past drawn conclusions that have largely guided our understanding of separation mechanisms. 
 	\begin{itemize}
 		\item The arrangement of sodium ions in the channels is thought to be confined to the pore walls. It is possible they are arranged more randomly
 		\begin{itemize}
@@ -74,12 +73,13 @@
 		\item The Colh phase is described as having pores made of disks or layers stacked on top of one another, each containing a set number of monomers. 
 		\begin{itemize}
 			\item How do the monomer head groups pack together? Do the benzene rings prefer to be stacked on top of each other or in another pi-stacking mode.
-			\item Gas phase ab initio studies of benzene dimers have shown a clear energetic advantage for a parallel displaced or T-shaped conformation versus a stacked conformation. %BJC: Although the system is made of bulky substituted benzenes, I think it's easy to see how one can hypothesize for our system based on the simpler system.   	
+			\item Gas phase ab initio studies of benzene dimers have shown a clear energetic advantage for a parallel displaced or T-shaped conformation versus a stacked conformation. 
+			\item Substituted benzene preferred stacking mode? Learning more about this   	
 			\item A simple simulation study of a similar molecule (Head group is a sulfonate in the meta position) suggests that there are 4 monomers in each disk
 			\item Calculations based on the volume of the liquid crystal suggest that there are seven monomers in each layer 
-			\item We can use fourier analysis to determine if there are distinct layers, and if so, how many monomers are situated in each layer.
+			\item Does the equilibrated structure exist in distinct layers? Fourier analysis can help answer this question
 		\end{itemize}
-		\item It is possible there are more than one metastable states associated with this LLC system
+		\item It is possible there is more than one metastable states associated with this LLC system
 		\begin{itemize}
 			\item Which phase is consistent with experiment?
 			\item Can both phases be created experimentally?
@@ -91,15 +91,15 @@
 	\begin{itemize}
 		\item This paper will illustrate the careful development of a predictive molecular model and the steps taken to ensure it mimics the real system as best we can 
 		\item To understand how physically realistic the model is, validation by comparison to experiment is necessary
-		\item We are primarily interested in reproducing the conclusions about structure which have been made from SAXS experiments and ionic conductivity  measurements.    
+		\item We are primarily interested in reproducing the conclusions about structure which have been made from XRD experiments and ionic conductivity measurements.    
 		\item We have written an algorithm to simulate the crosslinking mechanism and understand its influence on membrane structure
-		\item We can simulate x ray diffraction patterns based on atomic coordinates in order to compare major feature present in the 2D patterns
-		\item We can predict ionic conductivity using two agreeing methods
+		\item We can simulate x ray diffraction patterns based on atomic coordinates in order to compare major features present in the 2D patterns
+		\item We can predict ionic conductivity using two agreeing methods -- Collective diffusion and nernst einstein
 	\end{itemize}
 	
 	\section{Methods}
 	
-	HII monomers were parameterized using the Generalized Amber Forcefield with the Antechamber package provided with AmberTools16. All molecular dynamics simulations were run using Gromacs version 5.1.2.
+	HII monomers were parameterized using the Generalized Amber Forcefield with the Antechamber package provided with AmberTools16. All molecular dynamics simulations were run using Gromacs version 5.1.2 and Gromacs version 2016.
 	
 	An ensemble of characteristic, low-energy vacuum monomer configurations were constructed by applying a simulated annealing process to a parameterized monomer.
 	\begin{itemize}
@@ -109,7 +109,7 @@
 		\item Used Openeye Quacpac molcharge.py to assign charges
 		\item Anneal again 
 		\item Multiple configurations saved from annealing trajectory to prove independence of starting config
-		\item Manual modifications to the structure were made to create specific geometries
+		\item Manual modifications to the structure were made to create specific geometries for xray diffraction experiments
 	\end{itemize}
 	
 	The timescale for self assembly of monomers into the hexagonal phase is unknown and likely outside of a reasonable length for an atomistic simulation, calling for a more efficient way to build the system. 
@@ -135,11 +135,10 @@
 % 	\end{itemize}
 %MRS3: what is the thesis? decide what each figure is attempting to communicate to the reader.
 %BJC3: Maybe i include this in the supplemental information. I don't think a picture of the initial configuration is actually that interesting or important. I can't think of a thesis for a figure that is purely illustrative 
-	Each pore is made of twenty stacked monomer layers with continuity in all directions, avoiding any edge effects and creating an infinite length pore ideal for studying transport (Fig.~\ref{fig:initial})
+	Each pore is made of twenty stacked monomer layers with periodic continuity in all directions, avoiding any edge effects and creating an infinite length pore ideal for studying transport (Fig.~\ref{fig:initial})
 	\begin{itemize}
 		\item A thinner system is better to reduce the computational cost and allow us to look at longer timescales
 		\item Number of layers chosen to give sufficient resolution when simulating XRD patterns
-
 	\begin{figure}
 	\includegraphics{placeholder.tex}
 		\caption{Monomers are placed in an initial configuration close to the expected equilibrium configuration and allowed to relax}
@@ -154,13 +153,14 @@
 		\item T-shaped configuration is most stable when benzene centers are ~ 5 A apart which is not consistent with WAXS. http://www.jbc.org/content/273/25/15458.full 
 		\item System made with stacked and parallel-displaced benzene rings to see what is favored and matches XRD
 		\item TEM images and rejection studies give a pore size estimate
+	\end{itemize}
 
-	To prevent unrealistic jumps caused by poor atom placement during early equilibration steps, the following equilibration scheme was adopted.
+	An equilibration scheme with position restraints placed on benzene rings prevents unrealistic jumps during early equilibration steps.
 		\begin{itemize}
 			\item Apply position restraints to monomer head groups during energy minimization 
-			\item Leave position restraints for npt simulations to allow tails to intermingle (this also helps ensure independence of starting configuration)
+			\item Leave position restraints on for nvt simulations to allow tails to intermingle (this also helps ensure independence of starting configuration)
 			\item Gradually reduce force constants from 1000000 (by square root every 50 ps) until they are completely off
-			\item Run long NPT simulations at 300 K and 1 bar ( $>$200 ns ) to fully equilibrate
+			\item Run long NPT simulations at 300 K and 1 bar ( $>$200 ns ) to fully equilibrate 
 		\end{itemize}
 	\end{itemize}
 	
@@ -174,11 +174,33 @@
 	
 	\section{Results and Discussion}
 	
-	Simulations of systems built by stacking monomers in the parallel-displaced and stacked configurations results in two different structures that are both stable for $>$ 500 ns, suggesting the existence of more than one metastable state.
+
+	Varying number of monomers in each stacked layer between 4 and 8, as well as the benzene stacking configuration between sandwiched and parallel displaced, results in multiple stable structures.
+        \begin{itemize}
+                \item We did a systematic study of the properties resulting from each starting configuration
+		\item Layers stacked 3.7 \AA apart based on WAXS
+		\item We showed that we can rule out systems consisting of 4, 7, and 8 monomers based purely on membrane dimensions ~\ref{table:p2p}  % I think even six is too big. Leaving it in consideration though since the disordered version gives pretty good p2p distances
+		\item A characteristic of all systems was a defined, cylindrical and open pore structure. Benzene rings arrange in a helical conformation after equil. Membrane about 8 nm thick % BJC: maybe include thickness in the table?
+		\item Sandwiched and parallel-displaced configurations are both stable for 100's of nanoseconds and give reasonable xray diffraction patterns.
+		\item Free energy calculation to say which is more stable?
+		\item hypothesis: Parallel displaced is more stable and allows the benzene rings to stack closer together  
+	\end{itemize} 
+
+	\begin{center}
+	\begin{tabular}{|c|c|}
+	\hline
+	table & here \\
+	\hline
+	\caption{Pore spacings inconsistent with experimentally measured data indicate that the respective configuration will not be stable in a laboratory setting and should not be studied further~\label{table:p2p}  
+	\end{tabular}
+	\end{center}
+
+	%BJC: Simulations of systems built by stacking monomers in the parallel-displaced and stacked configurations results in two different structures that are both stable for $>$ 500 ns, suggesting the existence of more than one metastable state.
+	Simulations of systems built with layers stacked 5 \AA apart results in a pore structure characterized by high radial disorder
 	\begin{itemize}
 		\item There are distinct differences in the pore structures between each state (Fig ~\ref{fig:porestructures})
-		\item The stacked configuration results in a pore with high radial disorder. 
-		\item The parallel displaced configuration results in an open cylindrical pore. Benzene rings remain offset and form a helix. The membrane is thinner and the pore spacing is greater. Density stays the same (?)
+		\item Membrane thicker with a smaller p2p distance
+		\item Two metastable states?
 	\end{itemize}
 
 	\begin{figure}
