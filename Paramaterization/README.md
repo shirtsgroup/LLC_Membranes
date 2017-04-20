@@ -11,5 +11,6 @@
     1. Use <a href="https://docs.eyesopen.com/quacpac/molchargeusage.html">molcharge</a> which is shipped with QUACPAC
     2. Use the <a href="https://docs.eyesopen.com/quacpac/molchargetheory.html#am1bcc-charges">am1bccsym</a> method to assign charges symmetrically after a conformational search is performed
     3. Use insertmol2charges.py to replace the charges output by antechamber with those output by molcharge
+8. Energy minimize again to get final structure with charges and parameters
 
 _NOTE: Steps 4 - 7 can be done automatically using param.sh_
