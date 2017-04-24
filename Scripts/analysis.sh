@@ -8,14 +8,12 @@ tpr="wiggle.tpr"
 pore_components="C C1 C2 C3 C4 C5"  # components used to estimate pore size
 xrd_frames=50
 
-while getopts "b:x:y:z:r:t:x" opt; do
+while getopts "t:g:r:p:x" opt; do
     case $opt in
-    b) BUILD_MON=$OPTARG;;
-    x) x=$OPTARG;;
-    y) y=$OPTARG;;
-    z) z=$OPTARG;;
-    r) ring_restraints=$OPTARG;;
-    t) tail_restraints=$OPTARG;;
+    t) trajectory=$OPTARG;;
+    g) gro=$OPTARG;;
+    r) tpr=$OPTARG;;
+    p) pore_components=$OPTARG;;
     x) xrd_frames=$OPTARG;;
     esac
 done
@@ -38,3 +36,5 @@ echo "" >> analysis.log
 echo "poresize.py output" >> analysis.log
 poresize.py -t traj_whole.xtc -g ${gro} -c ${pore_components} >> analysis.log
 echo "" >> analysis.log
+echo "Output from Thickness.py" >> analysis.log
+Thickness.py -i ${gro} >> analysis.log

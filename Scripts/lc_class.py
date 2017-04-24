@@ -119,13 +119,13 @@ class LC(object):
         self.c2_atoms = C2
 
 
-test = LC('NAcarb11V.pdb')
-print test.natoms
-print test.planeatoms
-print test.lineatoms
-print test.ref_atom_index
-print test.residues
-print test.nresidues
-print test.c1_atoms
-print test.c2_atoms
-print test.valence
+# test = LC('NAcarb11V.pdb')
+# print test.natoms
+# print test.planeatoms
+# print test.lineatoms
+# print test.ref_atom_index
+# print test.residues
+# print test.nresidues
+# print test.c1_atoms
+# print test.c2_atoms
+# print test.valence

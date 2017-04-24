@@ -16,7 +16,7 @@ def initialize():
     parser.add_argument('-m', '--mol2', default='out.mol2', help='Name of mol2 file')
     parser.add_argument('-t', '--itp', default='monomer2.itp', help='Name of topology file in which charges will be replaced')
     parser.add_argument('-o', '--out', default='new_charges.out', help='Name of output file')
-    parser.add_argument('-c', '--charge', default=-1, help='The formal charge of the whole molecule')
+    parser.add_argument('-c', '--charge', default=-1, type=int, help='The formal charge of the whole molecule')
 
     args = parser.parse_args()
 
@@ -42,9 +42,11 @@ def extractcharge(mol2, formalcharge):
     charge = np.array(charges)
 
     # the total charge on the system needs to be corrected to the normalized charge
-    correction = sum(charge) / int(formalcharge)
+
+    correction = (float(formalcharge) - sum(charge)) / len(charge)
+
     for i in range(len(charge)):
-        charge[i] /= correction
+        charge[i] += correction
 
     return charge
 
@@ -90,11 +92,11 @@ if __name__ == '__main__':
         top.append(line)
     f.close()
 
-    charges = extractcharge(mol2, '%d' % args.charge)
+    charges = extractcharge(mol2, args.charge)
 
     new_charges = replacecharge(top, charges)
 
-    f = open('%s' %args.out, 'w')
+    f = open('%s' % args.out, 'w')
     for line in new_charges:
         f.write(line)
     f.close()

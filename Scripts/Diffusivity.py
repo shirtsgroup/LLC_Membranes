@@ -128,13 +128,19 @@ def dconst(x, nT, Nbootstraps, frontfrac, fracshow, d, dt, nMC):
     # D = coeff[1]/(2*d*1000000)  # slope of MSD plot equals 2 D. Divide by 1 million to go from nm^2/ps to m^2/s
     times = dt*np.array(range(0,endMSD))
 
+    # plt.plot(times, MSD[:endMSD])
+    # plt.show()
+    # exit()
+
     avg_D, std_D = d_error(nMC, startMSD, endMSD, nT, limits, times, MSD, d)
 
     return MSD, endMSD, limits, avg_D, std_D
 
 
 if __name__ == '__main__':
+
     args = initialize()
+
     # pos, _, trj_times, _ = gp('%s' % args.input, '%s' % args.comp, '%s' % args.LC_type, '%s' % args.solv)
     # f = open('d_pos', 'w')
     # np.save(f, pos)

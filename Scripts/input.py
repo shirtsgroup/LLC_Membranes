@@ -26,6 +26,7 @@ parser.add_argument('-c', '--coord', default='initial.gro', type=str, help='coor
 parser.add_argument('-S', '--solvate', help='Specify this if the system has water so an extra line can be added to the '
                                             'topology', action="store_true")
 parser.add_argument('--temp', default=300, help='Specify temperature at which to run simulation')
+parser.add_argument('--mdp', action="store_true", help='Only the .mdp will be written if this option is specified')
 
 args = parser.parse_args()
 
@@ -138,6 +139,9 @@ if args.ensemble == 'nvt':
         f.write(line[0])
 
     f.close()
+
+if args.mdp:
+    exit()
 
 a = []
 a.append(';Forcefield\n')

@@ -87,7 +87,8 @@ def initialize():
     parser = argparse.ArgumentParser(description = 'Calculate Ionic Conductivity using the Nernst Einstein relation or'
                                                    'the Collective Diffusion Model')
 
-    parser.add_argument('-t', '--traj', default='wiggle.trr', type=str, help='Trajectory file (.xtc or .trr)')
+    parser.add_argument('-t', '--traj', default='wiggle.trr', type=str, help='Trajectory file (.xtc or .trr)'
+                                                   'IMPORTANT: Pre-process the trajectory with gmx trjconv -pbc nojump')
     parser.add_argument('-g', '--gro', default='wiggle.gro', type=str, help='Coordinate file')
     parser.add_argument('-d', '--build_mon', default='NAcarb11V', type=str, help='Monomer with which the system was built')
     parser.add_argument('-i', '--ion', default='NA', help='Name of ion(s) being used to calculate ionic conductivity')
@@ -131,7 +132,7 @@ def nernst_einstein(D, D_std, C, C_std, T):
     return NE_av, NE_error
 
 
-def dQ(frame, positions, channel_length, zmax, zmin):
+def dQ(frame, positions, channel_length, zmax, zmin, charges, id):
 
     q = 0
     natoms = positions.shape[1]
@@ -155,8 +156,7 @@ def dQ(frame, positions, channel_length, zmax, zmin):
         if prev_frame == zmax and current_frame == zmax:
             pass
         displacement = current_frame - prev_frame
-        # q += e*(Atom_props.charge[id[0, i, frame]])*displacement/channel_length
-        q += e*(Atom_props.charge[id[i]])*displacement/channel_length
+        q += e*(charges[id[i]])*displacement/channel_length
 
     return q
 
@@ -268,10 +268,12 @@ if __name__ == '__main__':
 
     if not args.load:
 
+        charge = Atom_props.charges(args.build_mon)
+        charge['NA'] = 1.00
         print 'Calculating q'
         dq_all = np.zeros([nT])
         for i in range(nT):
-            dq_all[i] = dQ(i, pos, Lc, z_2, z_1)
+            dq_all[i] = dQ(i, pos, Lc, z_2, z_1, charge, id)
 
         if args.save:
             with open('dq_%s' % args.suffix, 'w') as f:

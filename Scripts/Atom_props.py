@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 
+import make_dict
+
 # Dictionary of atomic masses associated with various atom types
 
 mass = {}
@@ -149,6 +151,14 @@ mass['HW1'] = 1.008
 mass['HW2'] = 1.008
 
 # fill in charge dictionary (Used make_dict.py to generate the following list)
+
+
+def charges(monomer):
+
+    c = make_dict.mk_dict(monomer)
+
+    return c
+
 
 charge['C'] = -0.0946
 charge['C1'] = -0.1495

@@ -163,6 +163,6 @@ def limits(pos, pcenters):
 
     for i in range(nT):
         fr[i] = np.mean(deviation[i, :])  # + np.std(deviation[i, :]) # maybe?
-        frstd = np.std(deviation[i, :])
+        frstd[i] = np.std(deviation[i, :])
 
     return fr, frstd

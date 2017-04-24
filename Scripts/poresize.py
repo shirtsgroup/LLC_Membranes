@@ -4,6 +4,7 @@ import argparse
 import mdtraj as md
 import numpy as np
 from llclib import physical
+import matplotlib.pyplot as plt
 
 
 def initialize():
@@ -16,6 +17,7 @@ def initialize():
     parser.add_argument('-g', '--gro', default='wiggle.gro', type=str, help = 'Name of coordinate file')
     parser.add_argument('-c', '--components', nargs='+', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'],
                         help='component used to track pore positions and define pore radius')
+    parser.add_argument('--plot', action="store_true", help='Plot the trajectory of pore size and order parameter')
 
     args = parser.parse_args()
 
@@ -34,4 +36,22 @@ if __name__ == "__main__":
 
     r, r_std = physical.limits(pos, pcenters)
 
-    print 'Average Pore Size: %1.2f nm' % np.mean(r)
+    print 'Average Pore Size: %1.2f +/- %1.2f nm' %(np.mean(r), np.mean(r_std))
+    print 'Average Order Parameter: %1.2f' % np.mean(r/r_std)
+
+    if args.plot:
+
+        plt.figure(1)
+        plt.plot(t.time, r)
+        plt.ylabel('Average distance of benzene from pore center (Pore Size)')
+        plt.xlabel('Time')
+
+        plt.figure(2)
+        plt.plot(t.time, r_std)
+        plt.ylabel('Standard deviation of distance of benzene from pore center')
+        plt.xlabel('Time')
+
+        plt.figure(3)
+        plt.plot(t.time, r/r_std)
+
+        plt.show()
