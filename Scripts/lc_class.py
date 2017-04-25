@@ -45,6 +45,7 @@ class LC(object):
             residues = [str.strip(a[2][5:10])]
             nres = []
             res_count = 0
+            benzene_carbons = []
             for i in range(2, len(a) - 1):
                 res = str.strip(a[i][5:10])
                 if res in residues:
@@ -68,6 +69,8 @@ class LC(object):
                         C2.append(str.strip(a[i][10:15]))
                     if 'I' in annotations:
                         self.valence = Atom_props.charge[str.strip(a[i][10:15])]
+                    if 'B' in annotations:
+                        benzene_carbons.append(str.strip(a[i][10:15]))
 
             nres.append(res_count)
 
@@ -84,6 +87,7 @@ class LC(object):
             residues = [str.strip(a[start][17:22])]
             nres = []
             res_count = 0
+            benzene_carbons = []
             for i in range(start, end):
                 res = str.strip(a[i][17:22])
                 if res in residues:
@@ -107,6 +111,8 @@ class LC(object):
                         C2.append(str.strip(a[i][11:16]))
                     if 'I' in annotations:
                         self.valence = Atom_props.charge[str.strip(a[i][11:16])]
+                    if 'B' in annotations:
+                        benzene_carbons.append(str.strip(a[i][11:16]))
 
             nres.append(res_count)
 
@@ -117,6 +123,7 @@ class LC(object):
         self.nresidues = nres
         self.c1_atoms = C1
         self.c2_atoms = C2
+        self.benzene_carbons = benzene_carbons
 
 
 # test = LC('NAcarb11V.pdb')
