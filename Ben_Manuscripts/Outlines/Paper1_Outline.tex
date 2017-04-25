@@ -2,6 +2,10 @@
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage{subcaption}
+\usepackage{geometry}
+\geometry{legalpaper, margin=1in}
+\usepackage{amsmath} % or simply amstext
+\newcommand{\angstrom}{\textup{\AA}}
 \title{Predicting Transport in Lyotropic Liquid Crystal Membranes with Molecular Dynamics Simulations -- Outline}
 \author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble \and Michael R. Shirts} 
 \begin{document}
@@ -142,10 +146,10 @@
 
 	\noindent Initial guesses for the remaining structural parameters were chosen based on experimental data and treated as variables during model development 
 	\begin{itemize}
-		\item XRD gives Pore-to-Pore distances of ~4.1 nm and indicates possible pi-stacking at ~3.7 Angstroms (see figure blah blah later on - comparison of experimental vs. simulated)
+		\item XRD gives Pore-to-Pore distances of $\approx$ 4.1 nm and indicates possible pi-stacking at $\approx$ 3.7 \angstrom (see figure~\ref{fig:xrd}) on - comparison of experimental vs. simulated)
 		\item Pi-stacking exists in multiple stable configurations: sandwiched, T-shaped and parallel-displaced
 		\item T-shaped and parallel-displaced are nearly isoenergetic and more stable than the sandwiched configuration.
-		\item T-shaped configuration is most stable when benzene centers are ~ 5 A apart which is not consistent with WAXS. http://www.jbc.org/content/273/25/15458.full 
+		\item T-shaped configuration is most stable when benzene centers are $\approx$ 5 \angstrom apart which is not consistent with WAXS. % http://www.jbc.org/content/273/25/15458.full 
 		\item System made with stacked and parallel-displaced benzene rings to see what is favored and matches XRD
 		\item TEM images and rejection studies give a pore size estimate
 	\end{itemize}
@@ -180,43 +184,37 @@
 	% Ionic conductivity here probably
 	\section{Results and Discussion}
 	
-        %\begin{wraptable}
-        %\begin{tabular}{|c|c|}
-        %\hline
-        %table & here \\
-        %\hline
-        %\end{tabular}
-        %\caption{Pore spacings inconsistent with experimentally measured data indicate that the respective configuration will not be stable in a laboratory setting and should not be studied further~\label{table:p2p}}
-        %\end{wraptable}
-
 	Varying number of monomers in each stacked layer between 4 and 8, as well as the benzene stacking configuration between sandwiched and parallel displaced, results in more than one stable structures.
         \begin{itemize}
                 \item We did a systematic study of the properties resulting from each starting configuration
-		\item In the real system, layers are stacked 3.7 \AA apart based on WAXS data. Pore spacing should be $ \approx 4.1 nm $
-		\item We showed that we can rule out systems consisting of 4, 7, and 8 monomers based purely on membrane dimensions ~\ref{table:p2p}  % I think even six is too big. Leaving it in consideration though since the disordered version gives pretty good p2p distances
+		\item In the real system, layers are stacked 3.7 \angstrom apart based on WAXS data. Pore spacing should be $\approx$ 4.1 nm
+		\item We showed that we can rule out systems consisting of 4, 7, and 8 monomers based purely on membrane dimensions (Fig~\ref{table:p2p})  % I think even six is too big. Leaving it in consideration though since the disordered version gives pretty good p2p distances
 		\item A characteristic of all systems simulated in this way, is a defined, cylindrical and open pore structure. Benzene rings arrange in a helical conformation after equil. Membrane about 8 nm thick (Fig ~\ref{fig:phaseA}) % BJC: Still trying to prove that layered is trying to go towards a helical conformation. Also, maybe include thickness in the table?
 		\item This will be called phase A for simplicity  % BJC: I can come up with better phase names if that's important
 		\item Sandwiched and parallel-displaced configurations are both stable for 100's of nanoseconds and give reasonable xray diffraction patterns.
 		\item hypothesis: Parallel displaced is more stable and allows the benzene rings to stack closer together  
 	\end{itemize} 
 
-%	\begin{wraptable}
-%	\begin{tabular}{|c|c|}
-%	\hline
-%	table & here \\
-%	\hline
-%	\end{tabular}
-%	\caption{Pore spacings inconsistent with experimentally measured data indicate that the respective configuration will not be stable in a laboratory setting and should not be studied further~\label{table:p2p}}  
-%	\end{wraptable}
+	%\begin{wraptable}{m}{5.5cm}
+	\begin{table}
+	\centering
+	\begin{tabular}{|c|c|}
+	\hline
+	table & here \\
+	\hline
+	\end{tabular}
+	\caption{Pore spacings inconsistent with experimentally measured data indicate that the respective configuration will not be stable in a laboratory setting and should not be studied further~\label{table:p2p}}  
+	\end{table}
+	%\end{wraptable}
 
 	%BJC: Simulations of systems built by stacking monomers in the parallel-displaced and stacked configurations results in two different structures that are both stable for $>$ 500 ns, suggesting the existence of more than one metastable state.
-	Simulations of systems built with layers stacked 5 \AA apart results in a pore structure characterized by high radial disorder.
+	Simulations of systems built with layers stacked 5 \angstrom apart results in a pore structure characterized by high radial disorder.
 	\begin{itemize}
-		\item This will be called phase B (~\ref{fig:phaseB})
-		\itme The arrangement of sodium ions (which are closely bound to carbonyl head groups) can be fit to a gaussian distribution % BJC: supplemental info probably
+		\item This will be called phase B (Fig~\ref{fig:phaseB})
+		\item The arrangement of sodium ions (which are closely bound to carbonyl head groups) can be fit to a gaussian distribution % BJC: supplemental info probably
 		\item Like phase A, phase B can form at 280K. The only difference in simulations leading to this state, is the starting configuration
 		\item The phase is also present when phase A is heated close to its isotropic transition point
-		\item There are distinct differences in the membrane and pore structures between each state (Fig ~\ref{fig:porestructures})
+		\item There are distinct differences in the membrane and pore structures between each state (Fig~\ref{fig:porestructures})
 		\begin{itemize}
 			\item Phase B has a closed pore, while phase A is open. This will impact transport mechanisms
 			\item Phase B membranes are thicker
@@ -237,7 +235,7 @@
 		\centering
 		\caption{~\label{fig:phaseB}}
 	\end{subfigure}
-	\caption{Different pore structure are clear between systems built with benzene rings stacked (a) 3.7 \AA apart and (b) 5.0 \AA apart}
+	\caption{Different pore structure are clear between systems built with benzene rings stacked (a) 3.7 \angstrom apart and (b) 5.0 \angstrom apart}
 	\label{fig:porestructures}
 	\end{figure}
 
@@ -251,7 +249,7 @@
 		\end{itemize}
 		\item Phase B
 		\begin{itemize}
-			\item Stacking refelctions present indicating separation of $ \approx 5 \AA $
+			\item Stacking refelctions present indicating separation of $\approx$ 5 \angstrom
 			\item No spots at all which is consistent with the disorder shown by the rings in the pore
 		\end{itemize}
 	\end{itemize} 
@@ -302,9 +300,18 @@
 			\item A similar model has been derived and validate to predict water permeability using equilibrium simulations
 			\item The pore region is defined as the entire membrane system since lab IC measurements are done on bulk membrane rather than on individual pores. One would expect single channel IC to be much larger than the bulk membrane
 		\end{itemize}                    
+		\item See comparison of methods in Table~\ref{table:conductivity}
 	\end{itemize}
-	TABLE: Calculated ionic conductivity using Nernst-Einsten and Collective Diffusion agree within error
-	\\
+	
+	\begin{table}
+	\centering
+	\begin{tabular}{|c|c|}
+	\hline
+	Nernst Einstein & Collective Diffusion \\
+	\hline
+	\end{tabular}
+	\caption{Calculated ionic conductivity using Nernst-Einsten and Collective Diffusion agree within error~\label{table:conductivity}}
+	\end{table}
 
 	The procedure used to create and validate our model can be used to evaluate other liquid crystalline assemblies. Using the design framework and analysis methods applied herin, we have the ability to reliably predict structures of new nanoporous membranes.
 	
