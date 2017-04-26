@@ -28,6 +28,9 @@ def initialize():
     parser.add_argument('-g', '--gro', default='wiggle.gro', help='Name of coordinate file (.gro)')
     parser.add_argument('-b', '--build_mon', default='NAcarb11V', help='Class of monomer used to build structure')
     parser.add_argument('--single_frame', action="store_true", help='Only looking at a single frame')
+    parser.add_argument('--skip', type=int, help='Input: n; read frame every n frames')
+    parser.add_argument('--begin', type=int, help='Frame number to begin analysis')
+    parser.add_argument('--end', type=int, help='Frame number to end analysis')
 
     args = parser.parse_args()
 
@@ -268,6 +271,39 @@ def all_overlaps(pos, pairs, atoms_p_ring=6):
     return area
 
 
+def stacking_distance(centers, pairs):
+    """
+    :param centers: trajectory of position of benzene ring centers
+    :param pairs: pairs of rings whose overlaps will be compared
+    :return: The average pi-pi stacking distance
+    """
+
+    nT = centers.shape[0]  # number of trajectory points
+    nrings = centers.shape[1]  # number of rings
+
+    stack_d = np.zeros(pairs.shape)  # will hold all stacking distances
+
+    for t in range(nT):
+        for i in range(nrings):
+            stack_d[t, i] = abs(centers[t, i, 2] - centers[t, pairs[t, i], 2])   # subtract only z positions of pairs
+
+    # find average stacking distance for each frame, ignoring obvious outliers from mistaken pbcs
+    avg_stack = np.zeros([nT])
+    for t in range(nT):
+        avg = np.mean(stack_d[0, :])
+        std = np.std(stack_d[0, :])
+        count = 0
+        d = 0
+        for i in range(nrings):
+            dist = stack_d[t, i]
+            if dist < (avg + std):
+                d += dist
+                count += 1
+        d /= count
+        avg_stack[t] = d
+
+    return avg_stack
+
 if __name__ == "__main__":
 
     args = initialize()
@@ -278,29 +314,51 @@ if __name__ == "__main__":
 
     if not args.single_frame:
         t = md.load(args.traj, top=args.gro)
+        # slice up the trajectory if desired
+        if args.end:  # frame to end analysis on
+            last = args.end
+        else:
+            last = t.n_frames  # if nothing is specified, it defaults to the end of the trajectory
+        if args.begin:  # frame to begin analysis
+            start = args.begin
+        else:
+            start = 0  # if nothing is specified, it defaults to the beginning of the trajectory
+        t = t[start:last]  # slice the trajectory
+        if args.skip:  # slice more if specified
+            t = t[::args.skip]  # skips every args.skip steps
     else:
         t = md.load(args.gro)
 
-    box = t.unitcell_vectors
+    box = t.unitcell_vectors  # get the unit cell vectors (a 3x3 matrix)
 
-    keep = [a.index for a in t.topology.atoms if a.name in benzene_c]
-    pos = t.atom_slice(keep).xyz
+    keep = [a.index for a in t.topology.atoms if a.name in benzene_c]  # only keep benzene ring carbons
+    pos = t.atom_slice(keep).xyz  # only keep benzene carbon atom positions
 
-    centers = ring_centers(pos)
+    centers = ring_centers(pos)  # find the centers of the rings at all trajectory points
 
-    periodic = pbz(centers, box)
+    periodic = pbz(centers, box)  # duplicate the system periodically once in the +/- z directions
 
-    pairs = overlap_pairs(periodic)
+    pairs = overlap_pairs(periodic)  # determine the pairs of benzene rings whose overlap will be tested
 
-    overlap_area = all_overlaps(pos, pairs)
+    overlap_area = all_overlaps(pos, pairs)  # calculate the total overlap area for all pairs
+
+    pistack = stacking_distance(centers, pairs)  # find the average pi stacking distance between pairs
 
     # Area of a single benzene ring - calculated separately based on a perfect hexagon with C-C bond length = .14 nm
     # benzene_area = 0.0497955083847  # nm^2 -- calculated using PolyArea and vertices of benzene from an initial config created with build.py
     benzene_area = 0.0509222937  # nm^2 -- based on a perfect hexagon with C-C bond length = .14 nm
     total_benzene_area = pos.shape[1] / len(benzene_c) * benzene_area
 
+    plt.figure(1)
     plt.plot(t.time, 100 * overlap_area / total_benzene_area)
     plt.title('Degree of sandwiched stacking vs time')
     plt.xlabel('Time (ps)')
     plt.ylabel('Degree of layering (%)')
+
+    plt.figure(2)
+    plt.plot(t.time, pistack)
+    plt.title('Average Pi-Stacking Distance')
+    plt.xlabel('Time (ps)')
+    plt.ylabel('Pi-stacking distance (nm)')
+
     plt.show()

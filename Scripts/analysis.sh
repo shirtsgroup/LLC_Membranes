@@ -38,3 +38,6 @@ poresize.py -t traj_whole.xtc -g ${gro} -c ${pore_components} >> analysis.log
 echo "" >> analysis.log
 echo "Output from Thickness.py" >> analysis.log
 Thickness.py -i ${gro} >> analysis.log
+echo "" >> analysis.log
+echo "Output from eclipse.py" >> analysis.log
+eclipse.py -t traj_whole.xtc
