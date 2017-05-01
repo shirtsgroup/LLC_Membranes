@@ -344,9 +344,9 @@ def write_initial_config(positions, identity, name, no_layers, layer_distributio
         for k in range(no_layers):
             layer_mons = layer_distribution[l*no_layers + k]
             for j in range(layer_mons):  # iterates over each monomer to create coordinates
-                theta = j * math.pi / (layer_mons / 2.0)
+                theta = j * math.pi / (layer_mons / 2.0) + rot
                 if offset:
-                    theta += (k % 2) * (math.pi / layer_mons)
+                    theta += (k % 2) * (math.pi / layer_mons) + rot
                 Rx = transform.rotate_z(theta)
                 xyz = np.zeros([3, no_ions])
                 for i in range(0, no_ions):

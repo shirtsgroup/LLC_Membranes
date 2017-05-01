@@ -14,6 +14,7 @@ from scipy.spatial import ConvexHull
 import warnings
 import lc_class
 from llclib import physical
+from pymbar import timeseries
 
 warnings.filterwarnings("ignore")  # Couldn't get this to work: http://docs.python.org/2/library/warnings.html#temporarily-suppressing-warnings
 
@@ -31,6 +32,8 @@ def initialize():
     parser.add_argument('--skip', type=int, help='Input: n; read frame every n frames')
     parser.add_argument('--begin', type=int, help='Frame number to begin analysis')
     parser.add_argument('--end', type=int, help='Frame number to end analysis')
+    parser.add_argument('--nboot', type=int, default=200, help='Number of bootstrap trials')
+    parser.add_argument('--eclipse_equil', type=int, help='Manual specification of when to start calculating average eclipse')
 
     args = parser.parse_args()
 
@@ -92,7 +95,7 @@ def intersection(A,B,C,D):
 
 def overlap_pts(shape1, shape2, sides=6):
 
-    pts = np.zeros([sides*2, 2])  # the max number of pts making up the intersecting polygon is somewhere around this. I'll fix it when it fails
+    pts = np.zeros([sides*3, 2])  # the max number of pts making up the intersecting polygon is somewhere around this. I'll fix it when it fails
     count = 0
     for i in range(sides):
         for j in range(sides):
@@ -101,8 +104,6 @@ def overlap_pts(shape1, shape2, sides=6):
                 pts[count, :] = pt
                 count += 1
 
-    # xyverts1 = np.array(box1)
-    # xyverts2 = np.array(box2)
     # create matplotlib path objects that defines the two benzene rings as polygon l in 2D
     p1 = path.Path(shape1)
     p2 = path.Path(shape2)
@@ -271,7 +272,27 @@ def all_overlaps(pos, pairs, atoms_p_ring=6):
     return area
 
 
-def stacking_distance(centers, pairs):
+def bootstrap_stacking(stack_d, start_frame, Nbootstraps):
+
+    nT = stack_d.shape[0]
+    no_comp = stack_d.shape[1]
+
+    eMSDs = np.zeros([nT - start_frame, Nbootstraps], dtype=float)  # a set of MSDs per particle (time step?)
+    # Now, bootstrap over number of particles, assuming that the particles are sufficiently independent
+    for b in range(Nbootstraps):
+        indices = np.random.randint(0, no_comp, no_comp)  # randomly select N of the particles with replacement
+        # ^ makes a list of length Nparticles each with a random number from 0 to  Nparticles
+        for n in range(no_comp):
+            eMSDs[:, b] += stack_d[start_frame:, indices[n]]  # for each trajectory point, randomly choose and add one stacking
+            #  distance from that time step to the bootstrap trial
+        eMSDs[:, b] /= no_comp  # Divide every timestep by Nparticles -- average the MSDs
+
+    limits = [np.abs(np.percentile(eMSDs, 2.5)), np.abs(np.percentile(eMSDs, 97.5))]
+
+    return np.mean(eMSDs), limits
+
+
+def stacking_distance(centers, pairs, nboot):
     """
     :param centers: trajectory of position of benzene ring centers
     :param pairs: pairs of rings whose overlaps will be compared
@@ -280,29 +301,44 @@ def stacking_distance(centers, pairs):
 
     nT = centers.shape[0]  # number of trajectory points
     nrings = centers.shape[1]  # number of rings
-
     stack_d = np.zeros(pairs.shape)  # will hold all stacking distances
 
     for t in range(nT):
         for i in range(nrings):
-            stack_d[t, i] = abs(centers[t, i, 2] - centers[t, pairs[t, i], 2])   # subtract only z positions of pairs
+            d = abs(centers[t, i, 2] - centers[t, pairs[t, i], 2])
+            # if d > 1:
+            #     stack_d[t, i] = np.linalg.norm(box[t, 2, :]) - d  # correct errors from pbcs
+            # else:
+            #     stack_d[t, i] = d
+            stack_d[t, i] = d
 
     # find average stacking distance for each frame, ignoring obvious outliers from mistaken pbcs
     avg_stack = np.zeros([nT])
     for t in range(nT):
-        avg = np.mean(stack_d[0, :])
-        std = np.std(stack_d[0, :])
+        avg = np.mean(stack_d[t, :])
+        std = np.std(stack_d[t, :])
         count = 0
         d = 0
         for i in range(nrings):
             dist = stack_d[t, i]
-            if dist < (avg + std):
+            if dist < (avg + std):  # filters out erroneous calculations from pbcs
                 d += dist
                 count += 1
+            else:
+                # update stack_d by changing erroneous outliers to random stacking distances from the frame
+                while dist > (avg + std):  # keep doing it until we have a reasonable value
+                    r = np.random.randint(0, nrings)
+                    stack_d[t, i] = stack_d[t, r]
+                    dist = stack_d[t, i]
+
         d /= count
         avg_stack[t] = d
 
-    return avg_stack
+    equil_frame = timeseries.detectEquilibration(avg_stack)[0]  # frame at which stacking distance is equilibrated
+
+    avg_d, limits = bootstrap_stacking(stack_d, equil_frame, nboot)
+
+    return avg_stack, avg_d, limits
 
 if __name__ == "__main__":
 
@@ -342,18 +378,28 @@ if __name__ == "__main__":
 
     overlap_area = all_overlaps(pos, pairs)  # calculate the total overlap area for all pairs
 
-    pistack = stacking_distance(centers, pairs)  # find the average pi stacking distance between pairs
+    pistack, avg_stack, limits = stacking_distance(centers, pairs, args.nboot)  # find the average pi stacking distance between pairs
+
+    print 'Average stacking distance: %s 95%% CI [%s, %s]' %(avg_stack,limits[0], limits[1])
 
     # Area of a single benzene ring - calculated separately based on a perfect hexagon with C-C bond length = .14 nm
     # benzene_area = 0.0497955083847  # nm^2 -- calculated using PolyArea and vertices of benzene from an initial config created with build.py
     benzene_area = 0.0509222937  # nm^2 -- based on a perfect hexagon with C-C bond length = .14 nm
     total_benzene_area = pos.shape[1] / len(benzene_c) * benzene_area
 
+    if args.eclipse_equil:
+        equil_frame = args.eclipse_equil
+    else:
+        equil_frame = timeseries.detectEquilibration(overlap_area)[0]
+
+    print 'Average overlap: %s +/- %s' % (np.mean(overlap_area[equil_frame:]) / total_benzene_area,
+                                          np.std(overlap_area[equil_frame:]) / total_benzene_area)  # generating stats here is less important
+
     plt.figure(1)
-    plt.plot(t.time, 100 * overlap_area / total_benzene_area)
+    plt.plot(t.time, overlap_area / total_benzene_area)
     plt.title('Degree of sandwiched stacking vs time')
     plt.xlabel('Time (ps)')
-    plt.ylabel('Degree of layering (%)')
+    plt.ylabel('Degree of layering')
 
     plt.figure(2)
     plt.plot(t.time, pistack)
