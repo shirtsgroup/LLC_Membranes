@@ -1,0 +1,12 @@
+color Display Background white
+axes location off
+display height 5 
+render TachyonInternal top_full.tga
+mol selection name C C1 C2 C3 C4 C5 
+mol modrep 0 0
+mol modstyle 0 0 CPK 0.5 0.5 10 10
+display height 4
+render TachyonInternal top.tga
+rotate x by 90
+render TachyonInternal side.tga
+exit

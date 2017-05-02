@@ -5,28 +5,50 @@ import mdtraj as md
 import numpy as np
 
 
-def thickness(filename, ref_atoms=['C', 'C1', 'C2', 'C3', 'C4', 'C5']):
+def thickness(filename, ref_atoms, *traj):
+    """
+    :param filename: name of .gro file
+    :param ref_atoms: atoms which thickness will be based on
+    :param traj: trajectory of positions
+    :return: trajectory of thicknesses or single thickness based on max/min z coordinate of reference atoms
+    """
 
-    f = open(filename, "r")  # .gro file whose positions of Na ions will be read
+    if traj:
 
-    a = []  # list to hold lines of file
-    for line in f:
-        a.append(line)
+        traj = np.asarray(traj)[0]  # optional arguments of the form *args need to be convert back to numpy arrays
+        nT = traj.shape[0]  # number of trajectory points
 
-    line = 0
-    while a[line].count('HII') == 0:
-        line += 1
+        thick = np.zeros([nT])
+        z_max = np.zeros([nT])
+        z_min = np.zeros([nT])
+        for t in range(nT):
+            z_max_t = max(traj[t, :, 2])
+            z_min_t = min(traj[t, :, 2])
+            thick[t] = z_max_t - z_min_t
+            z_max[t] = z_max_t
+            z_min[t] = z_min_t
 
-    z = []  # list to hold z positions of all atoms
+    else:
+        f = open(filename, "r")  # .gro file whose positions of Na ions will be read
 
-    while a[line].count('HII') != 0:
-        if str.strip(a[line][11:15]) in ref_atoms:
-            z.append(float(a[line][36:44]))
-        line += 1
+        a = []  # list to hold lines of file
+        for line in f:
+            a.append(line)
 
-    z_max = max(z)
-    z_min = min(z)
-    thick = z_max - z_min
+        line = 0
+        while a[line].count('HII') == 0:
+            line += 1
+
+        z = []  # list to hold z positions of all atoms
+
+        while a[line].count('HII') != 0:
+            if str.strip(a[line][11:15]) in ref_atoms:
+                z.append(float(a[line][36:44]))
+            line += 1
+
+        z_max = max(z)
+        z_min = min(z)
+        thick = z_max - z_min
 
     return thick, z_max, z_min
 

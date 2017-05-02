@@ -7,14 +7,16 @@ gro="wiggle.gro"
 tpr="wiggle.tpr"
 pore_components="C C1 C2 C3 C4 C5"  # components used to estimate pore size
 xrd_frames=50
+save=true
 
-while getopts "t:g:r:p:x" opt; do
+while getopts "t:g:r:p:x:" opt; do
     case $opt in
     t) trajectory=$OPTARG;;
     g) gro=$OPTARG;;
     r) tpr=$OPTARG;;
     p) pore_components=$OPTARG;;
     x) xrd_frames=$OPTARG;;
+    s) save=$OPTARG;;
     esac
 done
 

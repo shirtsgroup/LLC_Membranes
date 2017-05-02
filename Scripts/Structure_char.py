@@ -44,6 +44,7 @@ def initialize():
     parser.add_argument('--noshow', help='Specify this flag to prevent the plot from showing', action="store_true")
     parser.add_argument('--auto_exclude', action="store_true", help="Specifying this will decide which pore-to-pore"
                                                     "distance to exclude automatically by dropping the highest value")
+    parser.add_argument('--save', action="store_true", help='Save the output plot')
 
     args = parser.parse_args()
     return args
@@ -136,12 +137,6 @@ def p2p_stats(p2ps, exclude, nboot, equil):
            choose to detect equilibration manually. Otherwise 'auto' will use pymbar to find it for you
     :return: the average and standard deviation of pore to pore distances
     """
-
-    if args.auto_exclude:
-        means = np.zeros([p2ps.shape[0]])
-        for i in range(p2ps.shape[0]):
-            means[i] = np.mean(p2ps[i, :])
-        exclude = [np.argmax(means)]
 
     nboot = int(nboot)
     nT = p2ps.shape[1]
@@ -339,11 +334,17 @@ if __name__ == '__main__':
     # distances = 16  # for 9 pore system
     p2ps = p2p(p_centers, distances)
 
-    exclude = [int(i) for i in args.exclude]
+    if args.auto_exclude:
+        means = np.zeros([p2ps.shape[0]])
+        for i in range(p2ps.shape[0]):
+            means[i] = np.mean(p2ps[i, :])
+        exclude = [np.argmax(means)]
+    else:
+        exclude = [int(i) for i in args.exclude]
 
     p2p_avg, p2p_std, equil = p2p_stats(p2ps, exclude, '%s' % args.nboot, '%s' % args.equil)
-    print 'Average Pore to Pore distance: %s' % p2p_avg
-    print 'Standard Deviation of Pore to Pore distances: %s' % p2p_std
+    print 'Average Pore to Pore distance: %.3f' % p2p_avg
+    print 'Standard Deviation of Pore to Pore distances: %.3f' % p2p_std
 
     labels = ['1-2', '1-3', '1-4', '2-3', '2-4', '3-4']
     labels = ['1-4', '1-0', '0-2', '0-4', '0-3', '2-3', '2-5', '5-3', '3-4', '5-6', '3-7', '6-7', '4-7', '7-8',
@@ -373,6 +374,7 @@ if __name__ == '__main__':
     # plt.xlabel('Distance from Pore Center (nm)')
     # plt.ylabel('Relative Component Density')
     # plt.bar(r[:stop], density[:stop], bin_width)
+    if args.save:
+        plt.savefig('p2p.png')
     if not args.noshow:
         plt.show()
-
