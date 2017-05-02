@@ -7,9 +7,7 @@
 \usepackage{amsmath} % or simply amstext
 \newcommand{\angstrom}{\textup{\AA}}
 \title{Predicting Transport in Lyotropic Liquid Crystal Membranes with Molecular Dynamics Simulations -- Outline}
-\author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble \and Michael R. Shirts} 
-%MRS: we probably will want to add in Glaser's student (and possibly glaser) for their work on the X-ray simulations.
-%MRS: also possibly Xunda if we end up using X-ray diffraction images of theirs that are not published.
+\author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble \and Joseph Yelk \and Matthew Glaser \and Xunda Feng \and Michael R. Shirts} 
 \begin{document}
 	\bibliographystyle{ieeetr}
 	\graphicspath{{./figures/}}
@@ -22,7 +20,8 @@
 		\item Designing RO membranes to achieve targeted separations of specific solutes is nearly impossible due to the separation (hypothesized to be) controlled by fluctuating polymer voids
 		\item RO has difficulty separating neutral organics because they tend to dissolve in polymer matrix
 		\item Many current RO membranes degrade in typical chlorine filled municipal water supplies (debating this point because there aren't any studies of LLC membrane fouling resistance)
-                  %MRS: Doug should have information on the chemistry here and how resistant they might be.
+                %MRS: Doug should have information on the chemistry here and how resistant they might be.
+		%BJC: Doug said they didn't do any chemical stability testing since the membranes had flux problems in the first place. So I won't mention this
 		\item With nanostructured materials, solute rejecting pores can be tuned uniformly -- drives down energy requirements
 		\item Targeted separations can be accomplished by tuning the molecular building blocks which form these materials
 		\item Entirely different mechanisms govern the separation processes in various nanostructured materials which can inspire novel separation techniques
@@ -65,22 +64,18 @@
                 \item Optimization efforts performed through trial and error over the past 20 years
                 \item Macroscopic models are the only source of predictive modeling and existing theories do not adequately describe transport at these length scales
                 \begin{itemize}
-                        \item Do ions have trouble getting through because of interactions with other things in the pores (e.g. ions, carbonyl groups, benzene rings) -- related to ionic conduction
-                          %MRS: vvv this point below should be made more specific.  Ionic gradient at the end?  Donnan exclusion?
-                        \item Does concentration of ions in the pore repel incoming ions?
+                        \item What does the microscopic pore structure look like?
+			\item Do ions have trouble getting through because of interactions with other things in the pores (e.g. ions, carbonyl groups, benzene rings) -- related to ionic conduction
+			\item Is rejection of ions due to donnan exclusion?
                         \item Do neutral solutes get rejected based solely on size rejection, or do interactions within the pore lead to selective rejection?
-                         %MRS: vvv can you be a bit more specific about ``transport barriers?''
-                        \item Is water structured inside the pores leading to transport barriers?
-                          %MRS: vvv maybe put this higher, since the other bullet points above are dependent on this.  Also, this point conflacts understanding the structure, and then modifying it, which are sort of two steps.
-			\item What does the microscopic pore structure look like and how can we relate that to monomer design and transport?
+                        \item Is water structured inside the pores, restricting low energy pathways for solutes to follow? %BJC: saw something like this in a paper
 		\end{itemize}
+		\item How can microscopic pore structure guide membrane design
 		\item An atomistic understanding of the mechanism of solute transport can identify performance bottle necks and direct design of future monomers/membranes
 		\item We can use molecular dynamics simulations to enhance our understanding 
 	\end{itemize}
 	 
-	A clear picture of the nanoscopic structure of LLC membranes, gained by building a molecular model, 
-%MRS: a molecular model can't really confirm or deny, because of the approximations.  provide evidence to support or call into question previous conclusions.
-will provide evidence to support or call into question past drawn conclusions that have largely guided our understanding of separation mechanisms. 
+	A clear picture of the nanoscopic structure of LLC membranes, gained by building a molecular model, will provide evidence to support or call into question past drawn conclusions that have largely guided our understanding of separation mechanisms. 
 	\begin{itemize}
 		\item The arrangement of sodium ions in the channels is thought to be confined to the pore walls. It is possible they are arranged more randomly
 		\begin{itemize}
@@ -91,9 +86,9 @@ will provide evidence to support or call into question past drawn conclusions th
 		\begin{itemize}
 			\item How do the monomer head groups pack together? Do the benzene rings prefer to be stacked on top of each other or in another pi-stacking mode.
 			\item Gas phase ab initio studies of benzene dimers have shown a clear energetic advantage for a parallel displaced or T-shaped conformation versus a stacked conformation. 
-			\item Substituted benzene preferred stacking mode? Learning more about this   	
+			\item Substituted benzene rings exhibit an even stronger pi-stacking attraction %BJC: reference ab initio papers   	
 			\item A simple simulation study of a similar molecule (Head group is a sulfonate in the meta position) suggests that there are 4 monomers in each disk
-			\item Calculations based on the volume of the liquid crystal suggest that there are seven monomers in each layer 
+			\item Calculations based on the volume of the liquid crystal suggest that there are seven monomers in each layer % reference 2005-ish Zhou paper 
 		\end{itemize}
 		\item It is possible there is more than one metastable states associated with this LLC system
 		\begin{itemize}
@@ -105,16 +100,12 @@ will provide evidence to support or call into question past drawn conclusions th
 	
 	We must show that the developed molecular model is consistent with physical observations so that we can trust conclusions drawn about structural features characteristic of the system.
 	\begin{itemize}
-          %MRS: ``careful'': better to show, not tell that it is careful.
 		\item This paper will illustrate the development of a predictive molecular model and the steps taken to ensure it mimics the real system as best we can 
 		\item To understand how physically realistic the model is, validation by comparison to experiment is necessary
 		\item We are primarily interested in reproducing the conclusions about structure which have been made from XRD experiments and ionic conductivity measurements.    
-                  %MRS: algorithm not really the main finding.
-		  %BJC: so don't mention it here then? maybe save it for the methods
-		\item We examined crosslinking mechanism and understand its influence on membrane structure
-                  %MRS: the fact that we can is not that much interest, rather that we do.  Restate along lines of ``we havecompared simulated x-ray diffraction to experiment''
-		\item We can simulate x ray diffraction patterns based on atomic coordinates in order to compare major features present in the 2D patterns
+		\item We have comparied simulated X-ray diffraction patterns to experiment in order to match major features present in the 2D patterns
 		\item We can predict ionic conductivity using two agreeing methods -- Collective diffusion and nernst einstein
+		\item We examined crosslinking mechanism and understand its influence on membrane structure
 	\end{itemize}
 	
 	\section{Methods}
@@ -126,18 +117,46 @@ will provide evidence to support or call into question past drawn conclusions th
 		\item Structure cooled from 1000 to 50 K over 10 nanoseconds
 		\item Result not global minimum but close enough for structure building
 		\item Antechamber used for atomtyping with gaff forcefield
-		\item Used Openeye Quacpac molcharge.py to assign charges %MRS: explain reason for 2 charge steps.
+		\item Used Openeye Quacpac molcharge.py to assign charges
+		\item The am1bccsym method provided with Quacpac performs a conformational search and applies charges symmetrically based on the lowest energy subset of possible conformations
 		\item Anneal again 
-		\item Multiple configurations saved from annealing trajectory to prove independence of starting config
-		\item Manual modifications to the structure were made to create specific geometries for xray diffraction experiments
+		\item Multiple configurations saved from annealing trajectory to prove independence of starting config. A representative structure is given in Figure ~\ref{fig:monatomistic}
+		\item Manual modifications to the structure were made to create specific geometries for X-ray diffraction experiments
 	\end{itemize}
+	
+	%BJC: I'm not sure where to place this figure. ACS nano requires the methods section to go last (after conclusions). It seems like this should go earlier, but it fits the context best around here.
+	\begin{figure}
+	\centering
+	\begin{subfigure}{.45\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{placeholder.png}
+		\caption{}\label{fig:chemdraw}
+	\end{subfigure}
+	\begin{subfigure}{.45\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{placeholder.png}
+		\caption{}\label{fig:monatomistic}
+	\end{subfigure}
+	\medskip
+	\begin{subfigure}{.45\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{placeholder.png}
+		\caption{}\label{fig:cartoonlayer}
+	\end{subfigure}
+	\begin{subfigure}{.45\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{placeholder.png}
+		\caption{}\label{fig:layeratomistic}
+	\end{subfigure}
+	\caption{(a) The chemical structure of NAGA3C11 (b) The chemical structure visualized atomistically enhances intuition about system behavior (c) Wedge-shaped monomers assemble into layers (d) An atomistic view of a layer suggests geometric constraints based on monomer structure}\label{fig:cartoonvatomistic}  
+	\end{figure}	
 	
 	The timescale for self assembly of monomers into the hexagonal phase is unknown and likely outside of a reasonable length for an atomistic simulation, calling for a more efficient way to build the system. 
 	\begin{itemize}
 		\item Work done shows coarse grain model self assembly in ~1000 ns , Citation: J. Phys. Chem. B 2013, 117, 4254-4262
 		\item Attempts with Colh system not fruitful  
 		\begin{itemize}
-			\item Packed monomers into box
+			\item Packed monomers into box with Packmol
 			\item Simulated for ~100 ns with no progress shown towards self assembly
 		\end{itemize}  
 		\item Wrote code to assemble monomers into Colh configuration close to what is expected 
@@ -151,13 +170,6 @@ will provide evidence to support or call into question past drawn conclusions th
                 \item Decided on 20 layers using a system which held a vacuum gap above and below the membrane
                 \item Too few layers leads to micelle-like formations
 	\end{itemize}
-
-	\begin{figure}
-	
-	\includegraphics{placeholder.png}
-		\caption{Monomers are placed in an initial configuration close to the expected equilibrium configuration and allowed to relax}
-		\label{fig:initial}
-	\end{figure}
 
 	\noindent Initial guesses for the remaining structural parameters were chosen based on experimental data and treated as variables during model development 
 	\begin{itemize}
@@ -174,7 +186,7 @@ will provide evidence to support or call into question past drawn conclusions th
 		\item Equilibration scheme:
 		\begin{itemize}
 			\item Apply position restraints to monomer head groups during energy minimization 
-			\item Leave position restraints on for nvt simulations to allow tails to intermingle (this also helps ensure independence of starting configuration)
+			\item Leave position restraints on for nvt simulations to allow tails to intermingle (this also helps ensure independence of starting monomer configuration)
 			\item Gradually reduce force constants from 1000000 (by square root every 50 ps) until they are completely off
 			\item Run long NPT simulations at 300 K and 1 bar ( $>$200 ns ) to fully equilibrate 
 		\end{itemize}
@@ -196,14 +208,13 @@ will provide evidence to support or call into question past drawn conclusions th
                \item We matched experiments based on iterative improvement of our choice in initial structure and equilibration procedure
         \end{itemize}
 
-	% Ionic conductivity here probably
 	The Nernst Einstein relation and the Collective Diffusion model were both applied to the system in order to estimate ionic conductivity.
+	\begin{itemize}
 		\item There are a few ways to estimate ionic conductivity as seen in literature. We prefer a method which can extract an estimate based purely on an equilibrium trajectory (reference to computational electrophysiology) 
                 \item We must also be sure that our analysis of results is consistent with the method used for experimental evaluation (i.e. AC impedance spectroscopy)
                 \item We must also link our perfectly straight microscopic system to the not-so-straight macroscopic system. %BJC: worth getting into? Could also just say 
 		% that we expect our calculated value to be higher since ours is perfectly aligned relative to the real system.
                 \item Two methods used to for prediction
-                %BJC: probably belongs in methods:
                 \item Nernst Einstein Relation:
                 \begin{itemize}
                         \item Widely used equation for estimating ionic conductivity
@@ -224,23 +235,23 @@ will provide evidence to support or call into question past drawn conclusions th
 	\section{Results and Discussion}
 
 	In order to construct an initial configuration which gives reliable trends, we need to understand the composition of layers, how far apart to stack the layers, and how to orient them with respect to each other.
-	
+		
 	To understand the composition of the monomer layers, we ran simulations created with 4 - 8 monomers per layer 
 	\begin{itemize}
 		\item All configurations were stable for at least a short time %BJC: I am going to run out these simulations further and will have more to say
-                \item We showed that we can rule out systems consisting of 4, 7, and 8 monomers based purely on membrane dimensions (Fig~\ref{table:p2p})
+                \item We showed that we can rule out systems consisting of 4, 7, and 8 monomers based purely on membrane dimensions (Table~\ref{table:p2p})
         \end{itemize}
-
-        The initial distance between layers is a key determining factor of the equilibrium configuration.
+        
+	The initial distance between layers is a key determining factor of the equilibrium configuration.
 	\begin{itemize}
                 \item In the real system, layers are stacked 3.7 \angstrom apart based on WAXS data. 
                 \item A characteristic of all systems simulated in this way, is a defined, cylindrical and open pore structure. Benzene rings arrange in a helical conformation after equil. Membrane about 8 nm thick (Fig ~\ref{fig:phaseA}) % BJC: Still trying to prove that layered is trying to go towards a helical conformation. Also, maybe include thickness in the table?
                 \item This will be called phase A for simplicity  
-	        Simulations of systems built with layers stacked 5 \angstrom apart results in a pore structure characterized by high radial disorder.
+	        \item Simulations of systems built with layers stacked 5 \angstrom apart results in a pore structure characterized by high radial disorder.
         	\begin{itemize}
                 	\item This will be called phase B (Fig~\ref{fig:phaseB})
                 	\item The arrangement of sodium ions (which are closely bound to carbonyl head groups) can be well-approximated by a gaussian distribution 
-                	\item Like phase A, phase B can form at 280K. The only difference in simulations leading to this state, is the starting configuration
+                	\item Like phase A, phase B can form at 280K. The only difference in simulations leading to this state, is the initial interlayer spacing
                 	\item The phase is also present when phase A is heated close to its isotropic transition point
                 	\item There are distinct differences in the membrane and pore structures between each state (Fig~\ref{fig:porestructures})
                 	\begin{itemize}
@@ -248,14 +259,15 @@ will provide evidence to support or call into question past drawn conclusions th
                         	\item Phase B membranes are thicker
                         	\item Consequently, the pore spacing is smaller
                 	\end{itemize}
+		\end{itemize}
                 \item We have at least two metastable states
         \end{itemize}
 
 	We varied the relative interlayer orientation between sandwiched and parallel-displaced based on our knowledge of the stability of these two pi-stacking modes.
         \begin{itemize}
-		\item Simulated Xray diffraction patterns generated from initial configurations of each pi-stacking mode, shows a clear relation between the parallel displaced and sandwiched configuration %BJC: A figure would probably be good here
+		\item Simulated Xray diffraction patterns generated from initial configurations of each pi-stacking mode, shows a clear relation between the parallel displaced configuration and major features present in the XRD patterns %BJC: A figure would probably be good here
 		\item Diagonal spots in the alkane chain region are only generated for structures created in the parallel displaced configuration
-		\item Both configurations are stable for 100's of nanoseconds
+		\item However, both configurations are stable for 100's of nanoseconds
 		\item Xray diffraction of the sandwiched configuration after equilibration shows the spots. This indicates that there is a shift towards the offset configuration.
 	\end{itemize} 
 
@@ -268,12 +280,12 @@ will provide evidence to support or call into question past drawn conclusions th
 		\item Simulating the system at room temperature should be sufficient to see both phases
 	\end{itemize}
 
-	A summary of all experiments and relevant structural parameters are presented in table ~\ref{fig:p2p}
+	A summary of all experiments and relevant structural parameters are presented in table ~\ref{table:p2p}
 
 	\begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{placeholder.png}
-	\caption{As temperature is increased, Phase A transitions to Phase B, as indicated by the shown order parameter. An order parameter of 1 indicates perfect ordering, while 0 indicates disorder~\label{fig:transition}}
+	\caption{As temperature is increased, Phase A transitions to Phase B, as indicated by the shown order parameter. An order parameter of 1 indicates perfect ordering, while 0 indicates disorder}\label{fig:transition}
 	\end{figure}	
 
 	\begin{table}
@@ -283,7 +295,7 @@ will provide evidence to support or call into question past drawn conclusions th
 	table & here \\
 	\hline
 	\end{tabular}
-	\caption{The system built with 5 monomers per layer in a parallel displaced configuration results in a structure closest to experimental data~\label{fig:p2p} 
+	\caption{A system built with 5 monomers per layer in a parallel displaced configuration results in a structure closest to experimental data}\label{table:p2p} 
 	\end{table}
 	
 	\begin{figure}
@@ -301,8 +313,9 @@ will provide evidence to support or call into question past drawn conclusions th
 	\caption{There are clear differences in pore structure between systems built with layers stacked (a) 3.7 \angstrom apart and (b) 5.0 \angstrom apart}
 	\label{fig:porestructures}
 	\end{figure}
-	
-	Comparison of experimental 2D WAXS with simulated X-ray diffraction patterns produced from MD trajectories shows the most consistency with the parallel-displaced configuration
+
+	%BJC: I might eliminate the other paragraph (2 before this one), where I justify parallel-displaced vs. sandwiched, and do it all in this paragraph.	
+	Full comparison of experimental 2D WAXS with simulated X-ray diffraction patterns produced from MD trajectories shows the most consistency with the parallel-displaced configuration made up of 5 monomers per layer.
 	\begin{itemize}
 		\item Phase A
 		\begin{itemize}	
@@ -316,7 +329,7 @@ will provide evidence to support or call into question past drawn conclusions th
 			\item Stacking refelctions present indicating separation of $\approx$ 5 \angstrom
 			\item No spots at all which is consistent with the disorder shown by the rings in the pore
 		\end{itemize}
-		\item Both phases show a ring in the simulated 2D WAXS patterns at q $\approx$ 1.4 \angstrom\texsuperscript{-1} which is typical of packed alkane chains
+		\item Both phases show a ring in the simulated 2D WAXS patterns at q $\approx$ 1.4 \angstrom\textsuperscript{-1} which is typical of packed alkane chains
 		\item Both phases exhibit axial reflections. Even though the rings are not ordered in phase B, they are still partitioned into layers which gives rise to an axial refelction at the same distance where we expect alkane chain packing to be present   
 	\end{itemize} 
 
@@ -379,14 +392,14 @@ will provide evidence to support or call into question past drawn conclusions th
 	Monomer configurations
 	\begin{itemize}
 		\item Pore-to-pore equilibration plots
-                  %MRS: ^^^ probably should include how we determined if we ran long enough.
+		\item Plots of other things that level off indicating equilibration
 		\item 3D visualizations of different configurations tested
-                  %MRS: vvv this might be in the main text, since it is what allows us to say what is more likely.
-		\item Table of measurements on 5-8 monomer per layer configurations
 		\item Sodium ion distribution in disordered phase
 	\end{itemize}
 	
-        \includegraphics{placeholder.png}
+        \begin{figure}
+		\centering
+		\includegraphics{placeholder.png}
                 \caption{Monomers are placed in an initial configuration close to the expected equilibrium configuration and allowed to relax}
                 \label{fig:initial}
         \end{figure}
