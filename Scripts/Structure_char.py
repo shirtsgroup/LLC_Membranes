@@ -205,8 +205,8 @@ def p2p_stats(p2ps, exclude, nboot, equil):
 
     p2p_std = np.mean(stds)  # report the average of the standard deviations
 
-    print ' Pore to Pore Statistics calculated starting at frame {:d} ({:2.1f} percent into simulation)'.format(
-            t, 100.0 * t / nT)
+    #print ' Pore to Pore Statistics calculated starting at frame {:d} ({:2.1f} percent into simulation)'.format(
+    #        t, 100.0 * t / nT)
     return ensemble_avg, p2p_std, t
 
 
@@ -343,6 +343,7 @@ if __name__ == '__main__':
         exclude = [int(i) for i in args.exclude]
 
     p2p_avg, p2p_std, equil = p2p_stats(p2ps, exclude, '%s' % args.nboot, '%s' % args.equil)
+    print 'Equilibration detected after %d ns' % (t.time[equil] / 1000)
     print 'Average Pore to Pore distance: %.3f' % p2p_avg
     print 'Standard Deviation of Pore to Pore distances: %.3f' % p2p_std
 

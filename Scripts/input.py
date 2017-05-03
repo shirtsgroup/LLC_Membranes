@@ -60,7 +60,7 @@ f.writelines([title + '\n', integrator + '\n', nsteps + '\n', cutoff_scheme + '\
 if args.ensemble == 'npt':
 
     a = []
-    a.append(['title = NPT simulation of %s\n' % args.build_mon])
+    a.append(['title = NPT simulation of %s\n at %s K' % (args.build_mon, args.temp)])
     # a.append(['cutoff-scheme = verlet'])  # I think verlet is default
     a.append(['integrator = md\n'])  # this also might be default
     a.append(['dt = %s\n' % args.dt])

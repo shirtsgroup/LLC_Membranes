@@ -36,8 +36,7 @@ p2p_output="$(Structure_char.py -t ${trajectory} -g ${gro} --noshow --auto_exclu
 autocorrelation="$(grep -Po '(?<=Maximum Autocorrelation Time: )[0-9]+\.[0-9]+' <<< ${p2p_output})"
 p2p_avg="$(grep -Po '(?<=Pore to Pore distance: )[0-9]+\.[0-9]+' <<< ${p2p_output})"
 p2p_std="$(grep -Po '(?<=Standard Deviation of Pore to Pore distances: )[0-9]+\.[0-9]+' <<< ${p2p_output})"
-equil_frame_p2p="$(grep -Po '(?<=frame )\d+' <<< ${p2p_output})"
-equil_percent="$(grep -Po '(?<=\()[0-9]+\.[0-9]+' <<< ${p2p_output})"
+equil_p2p="$(grep -Po '(?<=Equilibration detected after )\d+' <<< ${p2p_output})"
 
 echo 'Calculating thickness'
 # Thickness.py
@@ -50,7 +49,7 @@ echo 'Calculating overlap and pi-stacking distance'
 eclipse="$(eclipse.py -g ${gro} -t traj_whole.xtc -b ${build_mon} --noshow --save)"
 pistack="$(grep -Po '(?<=Average stacking distance: )[0-9]+\.[0-9]+' <<< ${eclipse})"
 lowerlimit_stack="$(grep -Po '(?<=CI \[)[0-9]+\.[0-9]+' <<< ${eclipse})"
-limit_stack="$(grep -Po '(?<=, )[0-9]+\.[0-9]+' <<< ${eclipse})"
+upperlimit_stack="$(grep -Po '(?<=, )[0-9]+\.[0-9]+' <<< ${eclipse})"
 avg_overlap="$(grep -Po '(?<=Average overlap: )[0-9]+\.[0-9]+' <<< ${eclipse})"
 std_overlap="$(grep -Po '(?<=- )[0-9]+\.[0-9]+' <<< ${eclipse})"
 pistack_equil="$(grep -Po '(?<=Pi-stacking distance equilibrated after )\d+' <<< ${eclipse})"
@@ -63,6 +62,20 @@ order_equil="$(grep -Po '(?<=Order parameter equilibrated after )\d+' <<< ${pore
 avg_poresize="$(grep -Po '(?<=Average Pore Size: )[0-9]+\.[0-9]+' <<< ${poresize})"
 std_poresize="$(grep -Po '(?<=- )[0-9]+\.[0-9]+' <<< ${poresize})"
 avg_order="$(grep -Po '(?<=Average Order Parameter: )[0-9]+\.[0-9]+' <<< ${poresize})"
+
+# Create an input file that will cause vmd to produce the desired output
+echo "color Display Background white" >> input.txt  # change background color to white
+echo "axes location off" >> input.txt  # turn off axes
+echo "display height 5" >> input.txt  # set size of window
+echo "render TachyonInternal top_full.tga" >> input.txt  # render the scene
+echo "mol selection name ${pore_components}" >> input.txt  # make an atom selection with only benzene rings
+echo "mol modrep 0 0" >> input.txt  # display the new representation
+echo "mol modstyle 0 0 CPK 0.5 0.5 10 10" >> input.txt  # make the drawing mode CPK with bond width = 0.5 and sphere size=0.5
+echo "display height 4" >> input.txt  # change the display window size again
+echo "render TachyonInternal top.tga" >> input.txt  # render the scene
+echo "rotate x by 90" >> input.txt  # rotate the system to look at a side view
+echo "render TachyonInternal side.tga" >> input.txt  # render the scene
+echo "exit" >> input.txt  # exit vmd
 
 vmd wiggle.gro -e input.txt  # take a few pictures of the membrane
 
@@ -105,12 +118,12 @@ echo '\centering' >> analysis.tex
 echo '\begin{subfigure}{0.45\textwidth}' >> analysis.tex
 echo '\centering' >> analysis.tex
 echo '\includegraphics[width=\textwidth]{p2p.png}' >> analysis.tex
-echo "\caption*{Average pore-to-Pore distance : ${p2p_avg} $\pm$ ${p2p_std} nm. Equilibration detected after frame
-        ${equil_frame} , ${equil_percent} \% into simulation}\label{fig:p2p}" >> analysis.tex
+echo "\caption*{Average pore-to-pore distance : ${p2p_avg} $\pm$ ${p2p_std} nm. Equilibration detected after
+        ${equil_p2p} ns}\label{fig:p2p}" >> analysis.tex
 echo '\end{subfigure}' >> analysis.tex
 echo '\begin{subfigure}{0.45\textwidth}' >> analysis.tex
 echo '\includegraphics[width=\textwidth]{thickness.png}' >> analysis.tex
-echo "\caption*{Average thickness : ${avg_thick} $\pm$ ${std_thick} nm. Equilibrationd detected after ${equil_frame_thick} ns}\label{fig:thickness}" >> analysis.tex
+echo "\caption*{Average thickness : ${avg_thick} $\pm$ ${std_thick} nm. Equilibration detected after ${equil_frame_thick} ns}\label{fig:thickness}" >> analysis.tex
 echo '\end{subfigure}' >> analysis.tex
 echo '\end{figure}' >> analysis.tex
 # Overlap and pi-stacking
@@ -142,6 +155,26 @@ echo '\includegraphics[width=\textwidth]{order.png}' >> analysis.tex
 echo "\caption*{Average order parameter: ${avg_order}. Equilibration detected after ${order_equil} ns}\label{fig:order}" >> analysis.tex
 echo '\end{subfigure}' >> analysis.tex
 echo '\end{figure}' >> analysis.tex
+# Summarize results in a table
+echo '\begin{center}' >> analysis.tex
+echo '\begin{tabular}{|c|c|c|}' >> analysis.tex
+echo '\hline' >> analysis.tex
+echo '\bf{Measurement} & \bf{Value} & \bf{Equil Frame} \\' >> analysis.tex
+echo '\hline' >> analysis.tex
+echo "Average Pore-to-Pore distance & ${p2p_avg} $\pm$ ${p2p_std} nm & ${equil_p2p} \\\\" >> analysis.tex  # need 4 backslashes in double quotes since each printed backslash needs to be escaped with a backslash
+echo '\hline' >> analysis.tex
+echo "Average Thickness & ${avg_thick} $\pm$ ${std_thick} nm & ${equil_frame_thick} \\\\" >> analysis.tex
+echo '\hline' >> analysis.tex
+echo "Average Overlap & ${avg_overlap} $\pm$ ${std_overlap} nm & ${overlap_equil} \\\\" >> analysis.tex
+echo '\hline' >> analysis.tex
+echo "Average stacking distance & ${pistack} [${lowerlimit_stack}, ${upperlimit_stack}] & ${pistack_equil} \\\\" >> analysis.tex
+echo '\hline' >> analysis.tex
+echo "Average pore size & ${avg_poresize} $\pm$ ${std_poresize} & ${poresize_equil} \\\\" >> analysis.tex
+echo '\hline' >> analysis.tex
+echo "Average order parameter & ${avg_order} & ${order_equil} \\\\" >> analysis.tex
+echo '\hline' >> analysis.tex
+echo '\end{tabular}' >> analysis.tex
+echo '\end{center}' >> analysis.tex
 
 echo '\end{document}' >> analysis.tex
 
