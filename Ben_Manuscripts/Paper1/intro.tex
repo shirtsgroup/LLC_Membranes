@@ -1,0 +1,119 @@
+\section*{Introduction}
+
+Nanostructured membrane materials have become increasingly popular for 
+aqueous separations applications because they offer the ability to 
+control membrane architecture at the atomic scale allowing design of 
+solute-specific separation membranes \cite{humplik_nanostructured_2011}.
+Most membrane-based aqueous separations of small molecules can be 
+achieved using reverse osmosis (RO) or nanofiltration (NF). 
+
+While RO and NF have seen many advances in the past few decades, they 
+are far from perfect separation technologies. Current state-of-the-art
+RO membranes are unstructured with tortuous and polydisperse diffusion
+pathways which can lead to inconsistent performance. Tortuosity and 
+polydispersity drive up energy requirements which strain developing regions and 
+contribute strongly to CO\textsubscript{2} emissions. Designing RO 
+membranes to achieve targeted separations of specific solutes is nearly
+impossible. Various solutes dissolve into and diffuse through the polymer
+matrix at different rates. At best, one can exploit these differences 
+to create a functional selective barrier. NF was introduced as an 
+intermediate between RO and ultrafiltration (UF), having the abilitiy to
+separate organic matter and salts on the order of one nanometer in size.
+Larger and well-defined pores drive down energy requirements while still
+affording separation of solutes as small as ions to some degree. This is
+why NF is often used as a precursor to reverse osmosis. Unfortunately,
+NF membranes, like RO, are produced with a pore size distribution which 
+limits their ability to perform precise separations.
+
+Nanostructured membranes can bypass many of the performance issues which
+plague traditional NF and RO membranes. Targeted separations can be 
+accomplished by tuning size and functionality of the molecular building
+blocks which form these materials. Solute rejecting pore sizes can be
+tuned uniformly, resulting in sharp size cut-offs. Entirely different
+mechanisms may govern the separation processes in a given nanostructured
+material which can inspire novel separation techniques.
+	
+Development of nanostructured materials has been limited by the ability
+to synthesize and scale various fundamentally sound technologies.
+Graphene sheets are atomically thick which gives excellent permeability
+but defects during manufacturing severely impact selectivity 
+\cite{cohen-tanugi_multilayer_2016}. Molecular dynamics simulations of
+carbon nanotubes show promise \cite{humplik_nanostructured_2011} but 
+synthetic techniques are unable to achieve scalable alignment and pore
+monodispersity \cite{hata_water-assisted_2004,maruyama_growth_2005}.
+Zeolites have sub-nm pores with a narrow size distribution and MD simulations
+exhibited complete rejection of solvated ions \cite{murad_molecular_1998},
+however, experimental rejection was low and attributed to interstitial
+defects formed during membrane synthesis \cite{li_desalination_2004}.
+	  
+Self assembling lyotropic liquid crystals (LLCs) share the characteristic
+ability of nanostructured membrane materials to create highly ordered 
+structures with the added benefits of low cost and synthetic techniques
+feasible for large scale production.
+\begin{itemize}
+	\item LLCs are versatile and controllable with a large chemical design space available for membrane design
+	\item Synthetic techniques are cheap and amenable to creating any monomer in this large design space
+	\item LLCs forms lamellar, bicontinuous cubic and hexagonal phases based on solution composition
+	\item Na-GA3C11 has been described in literature as forming two types of self assembled phases - thermotropic (Colh) and lyotropic (HII)
+	\item The thermotropic, Colh, is formed by the self assembly of neat monomer
+	\item The lyotropic, HII phase is formed in the presence of small amounts of water
+	\item Both assemble into cylinders with hydrophilic groups oriented inward towards the pore center and hydrophobic groups facing outward. The only difference is the inclusion of water in the structure which leads to minor variations in the structure with potentially different filtration properties (although no filtration experiments have been done on Colh)  
+	\item Hydrophilic regions point towards pore centers
+	\item Until recently, they could not be aligned - hindered progress
+	\item Yale aligns them, then crosslinks them to lock in the structure - reference 2014 and 2016 papers. They say that they are scalable techniques
+	\item LLC HII phase membranes offer potential for high permeability and selectivity which equals low energy consumption
+	\item The Colh phase shares the same structural features with the HII phase with the exception of the presence of water. This paper will focus on the development of a model of the Colh phase since it is a simpler starting point and has just as much experimental data. The analysis used in this paper can be readily extended to the HII phase. 
+\end{itemize}
+	
+A molecular level understanding of LLC membrane structure will elucidate small molecule transport mechanisms, providing guidelines to reduce the chemical space for design of monomers used to create separation-specific membranes.
+\begin{itemize}
+        \item We do not yet understand how to reduce the effective pore size and/or tune the chemical environment in the HII nanopores for effective water desalination and small organic separations. Rejection studies show that this membrane can not do desalination yet
+%MRS: ^^^nice way to turn a weakness of the materials class into an opportunity to improve them requring research! 
+	\item Colh phase studies currently limited to one monomer
+        \item Optimization efforts performed through trial and error over the past 20 years
+        \item Macroscopic models are the only source of predictive modeling and existing theories do not adequately describe transport at these length scales
+        \begin{itemize}
+                \item What does the microscopic pore structure look like?
+		\item Do ions have trouble getting through because of interactions with other things in the pores (e.g. ions, carbonyl groups, benzene rings) -- related to ionic conduction
+		\item Is rejection of ions due to donnan exclusion?
+                \item Do neutral solutes get rejected based solely on size rejection, or do interactions within the pore lead to selective rejection?
+                \item Is water structured inside the pores, restricting low energy pathways for solutes to follow? %BJC: saw something like this in a paper
+	\end{itemize}
+	\item How can microscopic pore structure guide membrane design
+	\item An atomistic understanding of the mechanism of solute transport can identify performance bottle necks and direct design of future monomers/membranes
+	\item We can use molecular dynamics simulations to enhance our understanding 
+\end{itemize}
+ 
+A clear picture of the nanoscopic structure of LLC membranes, gained by building a molecular model, will provide evidence to support or call into question past drawn conclusions that have largely guided our understanding of separation mechanisms. 
+\begin{itemize}
+	\item The arrangement of sodium ions in the channels is thought to be confined to the pore walls. It is possible they are arranged more randomly
+	\begin{itemize}
+		\item This could change how one thinks about molecules diffusing through membrane
+		\item Could also be a difference between lyotropic and thermotropic phases
+	\end{itemize}
+	\item The Colh phase is described as having pores made of disks or layers stacked on top of one another, each containing a set number of monomers. 
+	\begin{itemize}
+		\item How do the monomer head groups pack together? Do the benzene rings prefer to be stacked on top of each other or in another pi-stacking mode.
+		\item Gas phase ab initio studies of benzene dimers have shown a clear energetic advantage for a parallel displaced or T-shaped conformation versus a stacked conformation. 
+		\item Substituted benzene rings exhibit an even stronger pi-stacking attraction %BJC: reference ab initio papers   	
+		\item A simple simulation study of a similar molecule (Head group is a sulfonate in the meta position) suggests that there are 4 monomers in each disk
+		\item Calculations based on the volume of the liquid crystal suggest that there are seven monomers in each layer % reference 2005-ish Zhou paper 
+	\end{itemize}
+	\item It is possible there is more than one metastable states associated with this LLC system
+	\begin{itemize}
+		\item Which phase is consistent with experiment?
+		\item Can both phases be created experimentally?
+		\item How will each state affect transport?
+	\end{itemize}
+\end{itemize}
+
+We must show that the developed molecular model is consistent with physical observations so that we can trust conclusions drawn about structural features characteristic of the system.
+\begin{itemize}
+	\item This paper will illustrate the development of a predictive molecular model and the steps taken to ensure it mimics the real system as best we can 
+	\item To understand how physically realistic the model is, validation by comparison to experiment is necessary
+	\item We are primarily interested in reproducing the conclusions about structure which have been made from XRD experiments and ionic conductivity measurements.    
+	\item We have comparied simulated X-ray diffraction patterns to experiment in order to match major features present in the 2D patterns
+	\item We can predict ionic conductivity using two agreeing methods -- Collective diffusion and nernst einstein
+	\item We examined crosslinking mechanism and understand its influence on membrane structure
+\end{itemize}
+	
