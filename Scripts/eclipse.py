@@ -34,6 +34,8 @@ def initialize():
     parser.add_argument('--end', type=int, help='Frame number to end analysis')
     parser.add_argument('--nboot', type=int, default=200, help='Number of bootstrap trials')
     parser.add_argument('--eclipse_equil', type=int, help='Manual specification of when to start calculating average eclipse')
+    parser.add_argument('--save', action="store_true", help='Save the plots')
+    parser.add_argument('--noshow', action="store_true", help='Do not show the plots')
 
     args = parser.parse_args()
 
@@ -338,7 +340,7 @@ def stacking_distance(centers, pairs, nboot):
 
     avg_d, limits = bootstrap_stacking(stack_d, equil_frame, nboot)
 
-    return avg_stack, avg_d, limits
+    return avg_stack, avg_d, limits, equil_frame
 
 if __name__ == "__main__":
 
@@ -378,9 +380,10 @@ if __name__ == "__main__":
 
     overlap_area = all_overlaps(pos, pairs)  # calculate the total overlap area for all pairs
 
-    pistack, avg_stack, limits = stacking_distance(centers, pairs, args.nboot)  # find the average pi stacking distance between pairs
+    pistack, avg_stack, limits, equil_frame = stacking_distance(centers, pairs, args.nboot)  # find the average pi stacking distance between pairs
 
-    print 'Average stacking distance: %s 95%% CI [%s, %s]' %(avg_stack,limits[0], limits[1])
+    print 'Pi-stacking distance equilibrated after %d ns' %(t.time[equil_frame] / 1000)
+    print 'Average stacking distance: %.3f nm 95%% CI [%.3f, %.3f]' %(avg_stack,limits[0], limits[1])
 
     # Area of a single benzene ring - calculated separately based on a perfect hexagon with C-C bond length = .14 nm
     # benzene_area = 0.0497955083847  # nm^2 -- calculated using PolyArea and vertices of benzene from an initial config created with build.py
@@ -392,7 +395,8 @@ if __name__ == "__main__":
     else:
         equil_frame = timeseries.detectEquilibration(overlap_area)[0]
 
-    print 'Average overlap: %s +/- %s' % (np.mean(overlap_area[equil_frame:]) / total_benzene_area,
+    print 'Overlap equilibrated after %d ns' % (t.time[equil_frame] / 1000)
+    print 'Average overlap: %.2f +/- %.2f' % (np.mean(overlap_area[equil_frame:]) / total_benzene_area,
                                           np.std(overlap_area[equil_frame:]) / total_benzene_area)  # generating stats here is less important
 
     plt.figure(1)
@@ -400,11 +404,16 @@ if __name__ == "__main__":
     plt.title('Degree of sandwiched stacking vs time')
     plt.xlabel('Time (ps)')
     plt.ylabel('Degree of layering')
+    if args.save:
+        plt.savefig('overlap.png')
 
     plt.figure(2)
     plt.plot(t.time, pistack)
     plt.title('Average Pi-Stacking Distance')
     plt.xlabel('Time (ps)')
     plt.ylabel('Pi-stacking distance (nm)')
+    if args.save:
+        plt.savefig('pistack.png')
 
-    plt.show()
+    if not args.noshow:
+        plt.show()

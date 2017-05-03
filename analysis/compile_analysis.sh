@@ -7,14 +7,16 @@ gro="wiggle.gro"
 tpr="wiggle.tpr"
 pore_components="C C1 C2 C3 C4 C5"  # components used to estimate pore size
 xrd_frames=50
+build_mon='NAcarb11V'
 
-while getopts "t:g:r:p:x:" opt; do
+while getopts "t:g:r:p:x:b:" opt; do
     case $opt in
     t) trajectory=$OPTARG;;
     g) gro=$OPTARG;;
     r) tpr=$OPTARG;;
     p) pore_components=$OPTARG;;
     x) xrd_frames=$OPTARG;;
+    b) build_mon=$OPTARG;;
     esac
 done
 
@@ -44,13 +46,23 @@ avg_thick="$(grep -Po '(?<=Average membrane thickness: )[0-9]+\.[0-9]+' <<< ${th
 std_thick="$(grep -Po '(?<=- )[0-9]+\.[0-9]+' <<< ${thick})"
 equil_frame_thick="$(grep -Po '(?<=Equilibration detected after )\d+' <<< ${thick})"
 
-#echo "poresize.py output" >> analysis.log
-#poresize.py -t traj_whole.xtc -g ${gro} -c ${pore_components} >> analysis.log
-#echo "" >> analysis.log
-#
-#echo "" >> analysis.log
-#echo "Output from eclipse.py" >> analysis.log
-#eclipse.py -t traj_whole.xtc
+echo 'Calculating overlap and pi-stacking distance'
+eclipse="$(eclipse.py -g ${gro} -t traj_whole.xtc -b ${build_mon} --noshow --save)"
+pistack="$(grep -Po '(?<=Average stacking distance: )[0-9]+\.[0-9]+' <<< ${eclipse})"
+lowerlimit_stack="$(grep -Po '(?<=CI \[)[0-9]+\.[0-9]+' <<< ${eclipse})"
+limit_stack="$(grep -Po '(?<=, )[0-9]+\.[0-9]+' <<< ${eclipse})"
+avg_overlap="$(grep -Po '(?<=Average overlap: )[0-9]+\.[0-9]+' <<< ${eclipse})"
+std_overlap="$(grep -Po '(?<=- )[0-9]+\.[0-9]+' <<< ${eclipse})"
+pistack_equil="$(grep -Po '(?<=Pi-stacking distance equilibrated after )\d+' <<< ${eclipse})"
+overlap_equil="$(grep -Po '(?<=Overlap equilibrated after )\d+' <<< ${eclipse})"
+
+echo 'Calculating pore size and order parameter'
+poresize="$(poresize.py -t traj_whole.xtc -g ${gro} -c ${pore_components} --save --noshow)"
+poresize_equil="$(grep -Po '(?<=Pore size equilibrated after )\d+' <<< ${poresize})"
+order_equil="$(grep -Po '(?<=Order parameter equilibrated after )\d+' <<< ${poresize})"
+avg_poresize="$(grep -Po '(?<=Average Pore Size: )[0-9]+\.[0-9]+' <<< ${poresize})"
+std_poresize="$(grep -Po '(?<=- )[0-9]+\.[0-9]+' <<< ${poresize})"
+avg_order="$(grep -Po '(?<=Average Order Parameter: )[0-9]+\.[0-9]+' <<< ${poresize})"
 
 vmd wiggle.gro -e input.txt  # take a few pictures of the membrane
 
@@ -72,6 +84,7 @@ echo '\date{\today}' >> analysis.tex
 echo '\geometry{legalpaper, margin=0.5in}' >> analysis.tex
 echo '\begin{document}' >> analysis.tex
 echo '\maketitle' >> analysis.tex
+# VMD screenshots
 echo '\begin{figure}[h]' >> analysis.tex
 echo '\centering' >> analysis.tex
 echo '\begin{subfigure}{0.3\textwidth}' >> analysis.tex
@@ -86,17 +99,47 @@ echo '\begin{subfigure}{0.3\textwidth}' >> analysis.tex
 echo '\includegraphics[width=\textwidth]{side.png}' >> analysis.tex
 echo '\end{subfigure}'>> analysis.tex
 echo '\end{figure}' >> analysis.tex
+# Pore-to-pore and Thickness
 echo '\begin{figure}[h]' >> analysis.tex
 echo '\centering' >> analysis.tex
 echo '\begin{subfigure}{0.45\textwidth}' >> analysis.tex
 echo '\centering' >> analysis.tex
 echo '\includegraphics[width=\textwidth]{p2p.png}' >> analysis.tex
-echo "\caption{Average pore-to-Pore distance : ${p2p_avg} $\pm$ ${p2p_std} nm. Equilibration detected after frame
+echo "\caption*{Average pore-to-Pore distance : ${p2p_avg} $\pm$ ${p2p_std} nm. Equilibration detected after frame
         ${equil_frame} , ${equil_percent} \% into simulation}\label{fig:p2p}" >> analysis.tex
 echo '\end{subfigure}' >> analysis.tex
 echo '\begin{subfigure}{0.45\textwidth}' >> analysis.tex
 echo '\includegraphics[width=\textwidth]{thickness.png}' >> analysis.tex
-echo "\caption{Average thickness : ${avg_thick} $\pm$ ${std_thick} nm. Equilibrationd detected after ${equil_frame_thick} ns}\label{fig:thickness}" >> analysis.tex
+echo "\caption*{Average thickness : ${avg_thick} $\pm$ ${std_thick} nm. Equilibrationd detected after ${equil_frame_thick} ns}\label{fig:thickness}" >> analysis.tex
+echo '\end{subfigure}' >> analysis.tex
+echo '\end{figure}' >> analysis.tex
+# Overlap and pi-stacking
+echo '\begin{figure}[h]' >> analysis.tex
+echo '\centering' >> analysis.tex
+echo '\begin{subfigure}{0.45\textwidth}' >> analysis.tex
+echo '\centering' >> analysis.tex
+echo '\includegraphics[width=\textwidth]{overlap.png}' >> analysis.tex
+echo "\caption*{Average overlap : ${avg_overlap} $\pm$ ${std_overlap} nm. Equilibration detected after
+        ${overlap_equil} ns}\label{fig:overlap}" >> analysis.tex
+echo '\end{subfigure}' >> analysis.tex
+echo '\begin{subfigure}{0.45\textwidth}' >> analysis.tex
+echo '\includegraphics[width=\textwidth]{pistack.png}' >> analysis.tex
+echo "\caption*{Average stacking distance: ${pistack} 95 \% CI [${lowerlimit_stack}, ${upperlimit_stack}].
+        Equilibration detected after ${pistack_equil} ns}\label{fig:pistack}" >> analysis.tex
+echo '\end{subfigure}' >> analysis.tex
+echo '\end{figure}' >> analysis.tex
+# Pore size and order parameter
+echo '\begin{figure}[h]' >> analysis.tex
+echo '\centering' >> analysis.tex
+echo '\begin{subfigure}{0.45\textwidth}' >> analysis.tex
+echo '\centering' >> analysis.tex
+echo '\includegraphics[width=\textwidth]{poresize.png}' >> analysis.tex
+echo "\caption*{Average pore size : ${avg_poresize} $\pm$ ${std_poresize} nm. Equilibration detected after
+        ${poresize_equil} ns}\label{fig:poresize}" >> analysis.tex
+echo '\end{subfigure}' >> analysis.tex
+echo '\begin{subfigure}{0.45\textwidth}' >> analysis.tex
+echo '\includegraphics[width=\textwidth]{order.png}' >> analysis.tex
+echo "\caption*{Average order parameter: ${avg_order}. Equilibration detected after ${order_equil} ns}\label{fig:order}" >> analysis.tex
 echo '\end{subfigure}' >> analysis.tex
 echo '\end{figure}' >> analysis.tex
 

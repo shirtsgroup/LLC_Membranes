@@ -5,6 +5,7 @@ import mdtraj as md
 import numpy as np
 from llclib import physical
 import matplotlib.pyplot as plt
+from pymbar import timeseries
 
 
 def initialize():
@@ -17,7 +18,8 @@ def initialize():
     parser.add_argument('-g', '--gro', default='wiggle.gro', type=str, help = 'Name of coordinate file')
     parser.add_argument('-c', '--components', nargs='+', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'],
                         help='component used to track pore positions and define pore radius')
-    parser.add_argument('--plot', action="store_true", help='Plot the trajectory of pore size and order parameter')
+    parser.add_argument('--noshow', action="store_true", help='Do not show the plots')
+    parser.add_argument('--save', action="store_true", help='Save plots')
 
     args = parser.parse_args()
 
@@ -36,22 +38,34 @@ if __name__ == "__main__":
 
     r, r_std = physical.limits(pos, pcenters)
 
-    print 'Average Pore Size: %1.2f +/- %1.2f nm' %(np.mean(r), np.mean(r_std))
-    print 'Average Order Parameter: %1.2f' % np.mean(r/r_std)
+    poresize_equil = timeseries.detectEquilibration(r)[0]
+    order_equil = timeseries.detectEquilibration(r/r_std)[0]
 
-    if args.plot:
+    print 'Pore size equilibrated after %d ns' % (t.time[poresize_equil] / 1000)
+    print 'Average Pore Size: %.2f +/- %.2f nm' %(np.mean(r[poresize_equil:]), np.mean(r_std[poresize_equil:]))
+    print 'Order parameter equilibrated after %d ns' % (t.time[order_equil] / 1000)
+    print 'Average Order Parameter: %.2f' % np.mean(r[order_equil:]/r_std[order_equil:])
 
-        plt.figure(1)
-        plt.plot(t.time, r)
-        plt.ylabel('Average distance of benzene from pore center (Pore Size)')
-        plt.xlabel('Time')
+    plt.figure(1)
+    plt.plot(t.time, r)
+    plt.title('Pore size vs time')
+    plt.ylabel('Average distance of benzene from pore center (nm)')
+    plt.xlabel('Time')
+    if args.save:
+        plt.savefig('poresize.png')
 
-        plt.figure(2)
-        plt.plot(t.time, r_std)
-        plt.ylabel('Standard deviation of distance of benzene from pore center')
-        plt.xlabel('Time')
+    # plt.figure(2)
+    # plt.plot(t.time, r_std)
+    # plt.ylabel('Standard deviation of distance of benzene from pore center')
+    # plt.xlabel('Time')
 
-        plt.figure(3)
-        plt.plot(t.time, r/r_std)
+    plt.figure(3)
+    plt.plot(t.time, r/r_std)
+    plt.title('Order parameter vs time')
+    plt.xlabel('Time (ps)')
+    plt.ylabel('Order parameter')
+    if args.save:
+        plt.savefig('order.png')
 
+    if not args.noshow:
         plt.show()
