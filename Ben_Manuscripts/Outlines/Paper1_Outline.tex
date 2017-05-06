@@ -8,6 +8,7 @@
 \newcommand{\angstrom}{\textup{\AA}}
 \title{Predicting Transport in Lyotropic Liquid Crystal Membranes with Molecular Dynamics Simulations -- Outline}
 \author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble \and Joseph Yelk \and Matthew Glaser \and Xunda Feng \and Michael R. Shirts} 
+%MRS2: might need Osuji on this -- you can ask Xunda.  Check with people's published work on whether they use their middle initial. 
 \begin{document}
 	\bibliographystyle{ieeetr}
 	\graphicspath{{./figures/}}
@@ -17,14 +18,19 @@
 	
 	While RO anad NF have seen many advances in the past few decades, they are far from perfect separation technologies
 	\begin{itemize}
-		\item Current state-of-the-art reverse osmosis membranes are dense and unstructured with tortuous and polydisperse pores which lead to inconsistent performance
-		\item Tortuosity and polydispersity drive up energy requirements which strain developing regions and contribute strongly to CO2 emissions
+		\item Current state-of-the-art reverse osmosis membranes are dense and unstructured with tortuous and polydisperse pores which lead to 
+%MRS2: is inconsistent the right word?
+inconsistent performance
+		\item Tortuosity and polydispersity drive up energy requirements which 
+%MRS2: are ``strain developing regions'' the right words?
+strain developing regions and contribute strongly to CO2 emissions
 		\item Designing RO membranes to achieve targeted separations of specific solutes is nearly impossible due to the separation (hypothesized to be) controlled by fluctuating polymer voids
 		\item RO has difficulty separating neutral organics because they tend to dissolve in polymer matrix
 		\item Many current RO membranes degrade in typical chlorine filled municipal water supplies (debating this point because there aren't any studies of LLC membrane fouling resistance)
                 %MRS: Doug should have information on the chemistry here and how resistant they might be.
-		%BJC: Doug said they didn't do any chemical stability testing since the membranes had flux problems in the first place. So I won't mention this
-		\item nanofiltration was introduced as an intermediate between RO and ultrafiltration
+		%BJC: Doug said they didn't do any chemical stability testing since the membranes had flux problems in the first place. So I won't mention this.
+                %MRS2: sounds good.  Or could simply say (somewhere) that a greater variety of chemistries are needed to handle diverse types of inflow streams.
+		\item Nanofiltration was introduced as an intermediate between RO and ultrafiltration
 		\item Larger and well-defined pores drive down energy requirements while still affording separation of solutes as small as ions, to some degree
 		\item Like RO membranes, NF membranes have a pore size distribution which limits their ability to perform precise separations
 	\end{itemize}	
@@ -53,9 +59,11 @@
 		\item LLCs forms lamellar, bicontinuous cubic and hexagonal phases based on solution composition
 		\item Na-GA3C11 has been described in literature as forming two types of self assembled phases - thermotropic (Colh) and lyotropic (HII)
 		\item The thermotropic, Colh, is formed by the self assembly of neat monomer
-		\item The lyotropic, HII phase is formed in the presence of small amounts of water
+                  %MRS2: small change below.
+		\item The lyotropic, HII phase is formed without (or in practice, with very small amounts of water)
 		\item Both assemble into cylinders with hydrophilic groups oriented inward towards the pore center and hydrophobic groups facing outward. The only difference is the inclusion of water in the structure which leads to minor variations in the structure with potentially different filtration properties (although no filtration experiments have been done on Colh)  
 		\item Hydrophilic regions point towards pore centers
+                  %MRS2: Be more specific on ``hindered progress'' 
 		\item Until recently, they could not be aligned - hindered progress
 		\item Yale aligns them, then crosslinks them to lock in the structure - reference 2014 and 2016 papers. They say that they are scalable techniques
 		\item LLC HII phase membranes offer potential for high permeability and selectivity which equals low energy consumption
@@ -72,18 +80,26 @@
                 \begin{itemize}
                         \item What does the microscopic pore structure look like?
 			\item Do ions have trouble getting through because of interactions with other things in the pores (e.g. ions, carbonyl groups, benzene rings) -- related to ionic conduction
-			\item Is rejection of ions due to donnan exclusion?
+%MRS2: ``related to ionic conduction'' is vague
+			\item Is rejection of ions due to Donnan exclusion?
                         \item Do neutral solutes get rejected based solely on size rejection, or do interactions within the pore lead to selective rejection?
-                        \item Is water structured inside the pores, restricting low energy pathways for solutes to follow? %BJC: saw something like this in a paper
+                        \item Is water structured inside the pores, restricting low energy pathways for solutes to follow? 
+%BJC: saw something like this in a paper 
+%MRS2: good, cite if you can.
 		\end{itemize}
-		\item How can microscopic pore structure guide membrane design
+		\item How can microscopic pore structure guide membrane design?
+                  \begin{itemize}
 		\item An atomistic understanding of the mechanism of solute transport can identify performance bottle necks and direct design of future monomers/membranes
 		\item We can use molecular dynamics simulations to enhance our understanding 
+                  \end{itemize}
 	\end{itemize}
 	 
-	A clear picture of the nanoscopic structure of LLC membranes, gained by building a molecular model, will provide evidence to support or call into question past drawn conclusions that have largely guided our understanding of separation mechanisms. 
+	A clear picture of the nanoscopic structure of LLC membranes, gained by building 
+%MRS2: suggest ``molecular models'', as one can argue that each way of doing it is a different model, or that it might require trying 2-3 things.
+a molecular model, will provide evidence to support or call into question past drawn conclusions that have largely guided our understanding of separation mechanisms. 
 	\begin{itemize}
-		\item The arrangement of sodium ions in the channels is thought to be confined to the pore walls. It is possible they are arranged more randomly
+%MRS2: a thought - it would be great to add what is exactly meant by ``pore walls'' and how well defined they are is not clear. For example, how strict is the division between the hydrophobic tails, the head groups, and the ionic groups?  This directly affects what is meant by the ``size'' of the nanopore, and (to put somewhere else in the outline) what size exclusion means.
+ 		\item The arrangement of sodium ions in the channels is thought to be confined to the pore walls. It is possible they are arranged more randomly
 		\begin{itemize}
 			\item This could change how one thinks about molecules diffusing through membrane
 			\item Could also be a difference between lyotropic and thermotropic phases
@@ -154,11 +170,12 @@
 		\includegraphics[width=\linewidth]{placeholder.png}
 		\caption{}\label{fig:layeratomistic}
 	\end{subfigure}
-	\caption{(a) The chemical structure of NAGA3C11 (b) The chemical structure visualized atomistically enhances intuition about system behavior (c) Wedge-shaped monomers assemble into layers (d) An atomistic view of a layer suggests geometric constraints based on monomer structure}\label{fig:cartoonvatomistic}  
+	\caption{(a) The chemical structure of NAGA3C11 (b) The chemical structure visualized atomistically enhances intuition about system behavior %MRS2: in what way? (c) Wedge-shaped monomers assemble into layers (d) An atomistic view of a layer suggests geometric constraints based on monomer structure %MRS2: suggests what?}\label{fig:cartoonvatomistic}  
 	\end{figure}	
 	
 	The timescale for self assembly of monomers into the hexagonal phase is unknown and likely outside of a reasonable length for an atomistic simulation, calling for a more efficient way to build the system. 
 	\begin{itemize}
+          %MRS2: specify what type of self assembly -- could be that layers are faster than hexagonal pores to get to.
 		\item Work done shows coarse grain model self assembly in ~1000 ns , Citation: J. Phys. Chem. B 2013, 117, 4254-4262
 		\item Attempts with Colh system not fruitful  
 		\begin{itemize}
@@ -169,17 +186,19 @@
 		\item Equilibration simulations allow structure to relax into expected configuration 
 	\end{itemize}
 	
+%MRS2: need to be careful describing which stacking/layering is described where/when based on experiments actually reported.
 	Each pore is made of twenty stacked monomer layers with periodic continuity in all directions, avoiding any edge effects and creating an infinite length pore ideal for studying transport (Fig.~\ref{fig:initial})
 	\begin{itemize}
 		\item A thinner system is better to reduce the computational cost and allow us to look at longer timescales
 		\item Number of layers chosen to give sufficient resolution when simulating XRD patterns
                 \item Decided on 20 layers using a system which held a vacuum gap above and below the membrane
-                \item Too few layers leads to micelle-like formations
+                \item Too few layers leads to micelle-like formations %MRS: with gap.
 	\end{itemize}
 
 	\noindent Initial guesses for the remaining structural parameters were chosen based on experimental data and treated as variables during model development 
+%MRS2: ``treated as variables'' is vague. Be specific about what it means you are doing.
 	\begin{itemize}
-		\item XRD gives Pore-to-Pore distances of $\approx$ 4.1 nm and indicates possible pi-stacking at $\approx$ 3.7 \angstrom (see figure~\ref{fig:xrd}) on - comparison of experimental vs. simulated)
+		\item XRD gives pore-to-pore distances of $\approx$ 4.1 nm and indicates possible pi-stacking at $\approx$ 3.7 \angstrom (see figure~\ref{fig:xrd}) on - comparison of experimental vs. simulated)
 		\item Pi-stacking exists in multiple stable configurations: sandwiched, T-shaped and parallel-displaced
 		\item T-shaped and parallel-displaced are nearly isoenergetic and more stable than the sandwiched configuration.
 		\item T-shaped configuration is most stable when benzene centers are $\approx$ 5 \angstrom apart which is not consistent with WAXS. % http://www.jbc.org/content/273/25/15458.full 
@@ -208,10 +227,11 @@
 	
 	Simulated X-ray diffraction patterns were generated based on atomic coordinates to give a deeper understanding of the pore structure and spacing. 
         \begin{itemize}
-               \item 3 dimensional fourier transformed electron density generates simulated 1D and 2D diffraction patterns
+               \item 3 dimensional Fourier transformed electron density generates simulated 1D and 2D diffraction patterns
                \item The 1D patterns are generated by spherical integration of the FT
                \item 2D patterns are generated by taking cross sections of the FT in the qx, qy and qz planes
                \item We matched experiments based on iterative improvement of our choice in initial structure and equilibration procedure
+                 %MRS2: ``iterative improvement'' is vague -- other researchers could not implement that (unless you say you give details elsewhere)
         \end{itemize}
 
 	The Nernst Einstein relation and the Collective Diffusion model were both applied to the system in order to estimate ionic conductivity.
@@ -234,7 +254,7 @@
                         \item In the limit of infinite time, the MSD of Q can be used to formulate a diffusion coefficient of Q that can be related to ionic conductivity
                         \item The model is valid for non-equilibrium and equilibrium simulations. Our analysis is based on the latter
                         \item A similar model has been derived and validate to predict water permeability using equilibrium simulations
-                        \item The pore region is defined as the entire membrane system since lab IC measurements are done on bulk membrane rather than on individual pores. One would expect single channel IC to be much larger than the bulk membrane
+                        \item The pore region is defined as the entire membrane system since lab IC measurements are done on bulk membrane rather than on individual pores. One would expect single channel IC to be much larger than the bulk membrane %MRS: per area, since extensively, bulk would be be bigger (multiple pores)
                 \end{itemize}
         \end{itemize}
 
@@ -254,9 +274,11 @@
                 \item A characteristic of all systems simulated in this way, is a defined, cylindrical and open pore structure. Benzene rings arrange in a helical conformation after equil. Membrane about 8 nm thick (Fig ~\ref{fig:phaseA}) % BJC: Still trying to prove that layered is trying to go towards a helical conformation. Also, maybe include thickness in the table?
                 \item This will be called phase A for simplicity  
 	        \item Simulations of systems built with layers stacked 5 \angstrom apart results in a pore structure characterized by high radial disorder.
+%MRS2: higher radial disorder - make clear still hydrophobic/hydrophilic.
         	\begin{itemize}
                 	\item This will be called phase B (Fig~\ref{fig:phaseB})
                 	\item The arrangement of sodium ions (which are closely bound to carbonyl head groups) can be well-approximated by a gaussian distribution 
+                          %MRS2: below: ``Only difference''.  Only difference is in how they are prepared.  But presumably, there are a number of initial configurations that can lead to this one, so emphasizing that it's the only difference isn't that important.  Also, we want to be emphasizing the thermodynamic differences, not kinetics.
                 	\item Like phase A, phase B can form at 280K. The only difference in simulations leading to this state, is the initial interlayer spacing
                 	\item The phase is also present when phase A is heated close to its isotropic transition point
                 	\item There are distinct differences in the membrane and pore structures between each state (Fig~\ref{fig:porestructures})
@@ -271,7 +293,9 @@
 
 	We varied the relative interlayer orientation between sandwiched and parallel-displaced based on our knowledge of the stability of these two pi-stacking modes.
         \begin{itemize}
-		\item Simulated Xray diffraction patterns generated from initial configurations of each pi-stacking mode, shows a clear relation between the parallel displaced configuration and major features present in the XRD patterns %BJC: A figure would probably be good here
+		\item Simulated Xray diffraction patterns generated from initial configurations of each pi-stacking mode, shows a 
+%MRS2: ``clear relation'' is a bit indirect. 
+clear relation between the parallel displaced configuration and major features present in the XRD patterns %BJC: A figure would probably be good here %MRS2: yep, refer a figure here.
 		\item Diagonal spots in the alkane chain region are only generated for structures created in the parallel displaced configuration
 		\item However, both configurations are stable for 100's of nanoseconds
 		\item Xray diffraction of the sandwiched configuration after equilibration shows the spots. This indicates that there is a shift towards the offset configuration.
@@ -284,14 +308,17 @@
 		\item when bumped to 300K it is also stable, however with a larger degree of disorder %BJC: can quantify this with order parameter
 		\item We see a clear transition to Phase B for any starting configuration when the temperature is raised above 310K (~\ref{fig:transition})
 		\item Simulating the system at room temperature should be sufficient to see both phases
+                  %MRS2: what does ``sufficient'' mean here?  Sufficient for what purpose?
 	\end{itemize}
 
-	A summary of all experiments and relevant structural parameters are presented in table ~\ref{table:p2p}
+        %MRS2: Tables should also have specific theses as well, so think about that.  Merely saying ``here is the information'' isn't as useful without a guide through it.
+	A summary of all experiments and relevant structural parameters are presented in Table ~\ref{table:p2p}
 
 	\begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{placeholder.png}
 	\caption{As temperature is increased, Phase A transitions to Phase B, as indicated by the shown order parameter. An order parameter of 1 indicates perfect ordering, while 0 indicates disorder}\label{fig:transition}
+%MRS2: maybe provide a bit more information what data will be here?  Order parametr vs time? One panel with order paramter vs. time, one with configurations from 0 and 1 endpoints?
 	\end{figure}	
 
 	\begin{table}
@@ -301,6 +328,7 @@
 	table & here \\
 	\hline
 	\end{tabular}
+        %MRS2: what is the thesis here?
 	\caption{A system built with 5 monomers per layer in a parallel displaced configuration results in a structure closest to experimental data}\label{table:p2p} 
 	\end{table}
 	
@@ -317,10 +345,12 @@
 		\caption{~\label{fig:phaseB}}
 	\end{subfigure}
 	\caption{There are clear differences in pore structure between systems built with layers stacked (a) 3.7 \angstrom apart and (b) 5.0 \angstrom apart}
+        %MRS2: explain theses?  Also, the exact configurations used to start them are probably not that important; many different initial configurations will probably lead to most of them.  It's the thermodyamics that are important.
 	\label{fig:porestructures}
 	\end{figure}
 
 	%BJC: I might eliminate the other paragraph (2 before this one), where I justify parallel-displaced vs. sandwiched, and do it all in this paragraph.	
+        %MRS2: a little hard to say until the data is in.
 	Full comparison of experimental 2D WAXS with simulated X-ray diffraction patterns produced from MD trajectories shows the most consistency with the parallel-displaced configuration made up of 5 monomers per layer.
 	\begin{itemize}
 		\item Phase A
@@ -336,7 +366,10 @@
 			\item No spots at all which is consistent with the disorder shown by the rings in the pore
 		\end{itemize}
 		\item Both phases show a ring in the simulated 2D WAXS patterns at q $\approx$ 1.4 \angstrom\textsuperscript{-1} which is typical of packed alkane chains
-		\item Both phases exhibit axial reflections. Even though the rings are not ordered in phase B, they are still partitioned into layers which gives rise to an axial refelction at the same distance where we expect alkane chain packing to be present   
+		\item Both phases exhibit axial reflections. Even though the rings are not ordered in phase B, 
+%MRS2: not quite clear what physical structures the axial reflections correspond to (what are the distances? What do they correspond to?)
+they are still partitioned into layers which gives rise to an axial refelction at the same distance where we expect alkane chain packing to be present   
+%MRS2: how are they layers defined here? Can you bring in more information about the nonuniformity of the density?
 	\end{itemize} 
 
 	\begin{figure}
@@ -356,7 +389,7 @@
                 \includegraphics[width=\linewidth]{placeholder.png}
                 \caption{~\label{fig:xrdB}}
         \end{subfigure}
-	\caption{Phase A (a) provides a good match to experiment (b). Phase B (c) is missing reflections present in the experimental pattern} % BJC: any more detail? 
+	\caption{Phase A (a) provides a good match to experiment (b). Phase B (c) is missing reflections present in the experimental pattern} % BJC: any more detail?  %MRS2: yes, give distances, and describe what you mean as ``good match''
 	\label{fig:xrd}
 	\end{figure}
 
@@ -364,7 +397,7 @@
 	\begin{itemize}
 		\item See comparison of methods in Table~\ref{table:conductivity}
 		\item The methods agree reasonably well within error
-		\item In the future, we will probably only use Nernst Einstein because it requires less simulation to get good statistics. %BJC: probably don't need to mention this
+		\item In the future, we will probably only use Nernst Einstein because it requires less simulation to get good statistics. %BJC: probably don't need to mention this %MRS2: can mention it peforms better, informing future work.
 		\item Our calculated values are higher than experimental values, as expected.
 		\item The real system, although mostly aligned and straight, still has a distribution of azimuthal angles, lowering the effective ionic conductivity of the bulk membrane. 
 		\item The ordering from isotropic to mostly aligned mesophases showed an 85x increase in ionic conductivity. We would expect more gains in a perfect system.
@@ -379,6 +412,7 @@
 	\hline
 	\end{tabular}
 	\caption{Calculated ionic conductivity using Nernst-Einsten and Collective Diffusion agree within error. Both methods give calculated values of ionic conductivity which are higher than experimental values~\label{table:conductivity}}
+%MRS2: I would say that they are reasonable close to experiment, though higher. Also somewhat contradicted in other places.
 	\end{table}
 
 	The procedure used to create and validate our model can be used to evaluate other liquid crystalline assemblies. Using the design framework and analysis methods applied herin, we have the ability to reliably predict structures of new nanoporous membranes.
@@ -388,12 +422,13 @@
 	In this work, we have suggested a more detailed picture of the structure of a self assembled thermotropic liquid crystal membrane using an atomistic molecular model.
 	\begin{itemize}
 		\item The model's physical properties are consistent with experimental measurements
+                  %MRS2: are these two disordered and offset?  If so, then one is stable (Though we are not sure at 300K which is which).  Or are you referring to three phases?
 		\item We have discovered the existence of two metastable configurations that persist at room temperature
 		\item This methodology has been developed for a specific case but can be readily adapted to other LLCs
 	\end{itemize}
-	% focus around what we learned about the system - not that we have a model
+	%MRS: focus around what we learned about the system - not that we have a model
 
-	\section{Supplemental Information}
+	\section{Supplemental Information} %MRS2: check, might be called supporting information, depending on the journal.
 	
 	Monomer configurations
 	\begin{itemize}
@@ -407,6 +442,7 @@
 		\centering
 		\includegraphics{placeholder.png}
                 \caption{Monomers are placed in an initial configuration close to the expected equilibrium configuration and allowed to relax}
+                %MRS2: what is the thesis?
                 \label{fig:initial}
         \end{figure}
 
