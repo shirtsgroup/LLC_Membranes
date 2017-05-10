@@ -20,14 +20,14 @@ while getopts "t:g:r:p:x:b:" opt; do
     esac
 done
 
-## modify the trajectory so all monomers stay whole
-#echo 0 | gmx trjconv -f ${trajectory} -o traj_whole.xtc -s ${tpr} -pbc whole
-#echo "Trajectory Converted"
-#
-## Convert the trajectory so that it is usable with XrayDiffraction.exe
-#ConvertTraj.py -l ${xrd_frames} -t ${trajectory} -g ${gro} --avg_dims
-#echo "Last ${xrd_frames} frames of trajectory converted for X-ray Diffraction calculation using ConvertTraj.py"
-#echo "Average dimension written to dims.txt" >> analysis.log
+# modify the trajectory so all monomers stay whole
+echo 0 | gmx trjconv -f ${trajectory} -o traj_whole.xtc -s ${tpr} -pbc whole
+echo "Trajectory Converted"
+
+# Convert the trajectory so that it is usable with XrayDiffraction.exe
+ConvertTraj.py -l ${xrd_frames} -t ${trajectory} -g ${gro} --avg_dims
+echo "Last ${xrd_frames} frames of trajectory converted for X-ray Diffraction calculation using ConvertTraj.py"
+echo "Average dimension written to dims.txt"
 
 # Structure_char.py
 echo 'Calculating pore to pore distances'
@@ -75,7 +75,7 @@ echo "display height 4" >> input.txt  # change the display window size again
 echo "render TachyonInternal top.tga" >> input.txt  # render the scene
 echo "rotate x by 90" >> input.txt  # rotate the system to look at a side view
 echo "render TachyonInternal side.tga" >> input.txt  # render the scene
-echo "exit" >> input.txt  # exit vmd
+echo "exit" >> input.txt  # exit vmdi
 
 vmd wiggle.gro -e input.txt  # take a few pictures of the membrane
 
@@ -159,19 +159,19 @@ echo '\end{figure}' >> analysis.tex
 echo '\begin{center}' >> analysis.tex
 echo '\begin{tabular}{|c|c|c|}' >> analysis.tex
 echo '\hline' >> analysis.tex
-echo '\bf{Measurement} & \bf{Value} & \bf{Equil Frame} \\' >> analysis.tex
+echo '\bf{Measurement} & \bf{Value} & \bf{Equil Time} \\' >> analysis.tex
 echo '\hline' >> analysis.tex
-echo "Average Pore-to-Pore distance & ${p2p_avg} $\pm$ ${p2p_std} nm & ${equil_p2p} \\\\" >> analysis.tex  # need 4 backslashes in double quotes since each printed backslash needs to be escaped with a backslash
+echo "Average Pore-to-Pore distance & ${p2p_avg} $\pm$ ${p2p_std} nm & ${equil_p2p} ns \\\\" >> analysis.tex  # need 4 backslashes in double quotes since each printed backslash needs to be escaped with a backslash
 echo '\hline' >> analysis.tex
-echo "Average Thickness & ${avg_thick} $\pm$ ${std_thick} nm & ${equil_frame_thick} \\\\" >> analysis.tex
+echo "Average Thickness & ${avg_thick} $\pm$ ${std_thick} nm & ${equil_frame_thick} ns \\\\" >> analysis.tex
 echo '\hline' >> analysis.tex
-echo "Average Overlap & ${avg_overlap} $\pm$ ${std_overlap} nm & ${overlap_equil} \\\\" >> analysis.tex
+echo "Average Overlap & ${avg_overlap} $\pm$ ${std_overlap} nm & ${overlap_equil} ns \\\\" >> analysis.tex
 echo '\hline' >> analysis.tex
-echo "Average stacking distance & ${pistack} [${lowerlimit_stack}, ${upperlimit_stack}] & ${pistack_equil} \\\\" >> analysis.tex
+echo "Average stacking distance & ${pistack} [${lowerlimit_stack}, ${upperlimit_stack}] & ${pistack_equil} ns \\\\" >> analysis.tex
 echo '\hline' >> analysis.tex
-echo "Average pore size & ${avg_poresize} $\pm$ ${std_poresize} & ${poresize_equil} \\\\" >> analysis.tex
+echo "Average pore size & ${avg_poresize} $\pm$ ${std_poresize} & ${poresize_equil} ns \\\\" >> analysis.tex
 echo '\hline' >> analysis.tex
-echo "Average order parameter & ${avg_order} & ${order_equil} \\\\" >> analysis.tex
+echo "Average order parameter & ${avg_order} & ${order_equil} ns \\\\" >> analysis.tex
 echo '\hline' >> analysis.tex
 echo '\end{tabular}' >> analysis.tex
 echo '\end{center}' >> analysis.tex

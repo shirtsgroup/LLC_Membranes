@@ -45,17 +45,20 @@ def initialize():
     parser.add_argument('--auto_exclude', action="store_true", help="Specifying this will decide which pore-to-pore"
                                                     "distance to exclude automatically by dropping the highest value")
     parser.add_argument('--save', action="store_true", help='Save the output plot')
+    parser.add_argument('--buffer', default=0, type=float, help='Distance into membrane to look for components')
 
     args = parser.parse_args()
+
     return args
 
 
-def avg_pore_loc(npores, pos, natoms):
+def avg_pore_loc(npores, pos, buffer):
     """
     :param no_pores: the number of pores in the unit cell
     :param pos: the coordinates of the component(s) which you are using to locate the pore centers
                       (numpy array with dimensions: [no frames, no components, xyz coordinates, ] or just
                       [no components, xyz coordinates] for a single frame)
+    :param buffer: distance into membrane to look
     :return: numpy array containing the x, y coordinates of the center of each pore at each frame
     """
 
@@ -69,10 +72,18 @@ def avg_pore_loc(npores, pos, natoms):
         p_center = np.zeros([2, npores, nT])
 
         for i in range(nT):
+            zmax = np.amax(pos[i, :, 2])  # maximum z value for this frame
+            zmin = np.amin(pos[i, :, 2])  # minimum z value for this frame
+            thick = zmax - zmin
+            zmax -= buffer*thick
+            zmin += buffer*thick
             for j in range(npores):
+                count = 0
                 for k in range(comp_ppore*j, comp_ppore*(j + 1)):
-                    p_center[:, j, i] += pos[i, k, :2]
-                p_center[:, j, i] /= comp_ppore  # take the average
+                    if zmax >= pos[i, k, 2] >= zmin:
+                        p_center[:, j, i] += pos[i, k, :2]
+                        count += 1
+                p_center[:, j, i] /= count  # take the average
 
     elif len(pos.shape) == 2:  # single frame
 
@@ -328,7 +339,7 @@ if __name__ == '__main__':
     n_pores = int(args.pores)  # number of pores
     comp_ppore = tot_atoms/n_pores
 
-    p_centers = avg_pore_loc(n_pores, pos, len(atoms))
+    p_centers = avg_pore_loc(n_pores, pos, args.buffer)
 
     distances = 6  # number of p2p distances to calculate. My algorithm isn't smart enough for anything but six yet
     # distances = 16  # for 9 pore system

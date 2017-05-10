@@ -27,6 +27,9 @@ parser.add_argument('-S', '--solvate', help='Specify this if the system has wate
                                             'topology', action="store_true")
 parser.add_argument('--temp', default=300, help='Specify temperature at which to run simulation')
 parser.add_argument('--mdp', action="store_true", help='Only the .mdp will be written if this option is specified')
+parser.add_argument('--barostat', default='berendsen', type=str, help='pressure coupling scheme to use')
+parser.add_argument('--genvel', default='yes', type=str, help='generate velocities according to a maxwell'
+                                                                 'distribution')
 
 args = parser.parse_args()
 
@@ -60,7 +63,7 @@ f.writelines([title + '\n', integrator + '\n', nsteps + '\n', cutoff_scheme + '\
 if args.ensemble == 'npt':
 
     a = []
-    a.append(['title = NPT simulation of %s\n at %s K' % (args.build_mon, args.temp)])
+    a.append(['title = NPT simulation of %s at %s K\n' % (args.build_mon, args.temp)])
     # a.append(['cutoff-scheme = verlet'])  # I think verlet is default
     a.append(['integrator = md\n'])  # this also might be default
     a.append(['dt = %s\n' % args.dt])
@@ -68,6 +71,7 @@ if args.ensemble == 'npt':
     a.append(['continuation = no\n'])
     a.append(['constraints = h-bonds\n'])
     a.append(['constraint-algorithm = lincs\n'])
+    a.append(['cutoff-scheme = Verlet\n'])
     a.append(['nstxout = %s\n' % int(args.length / (args.dt * args.frames))])
     a.append(['nstvout = %s\n' % int(args.length / (args.dt * args.frames))])
     a.append(['nstfout = %s\n' % int(args.length / (args.dt * args.frames))])
@@ -77,25 +81,31 @@ if args.ensemble == 'npt':
     a.append(['vdwtype = PME\n'])
     a.append(['coulombtype = PME\n'])
     a.append(['Tcoupl = v-rescale\n'])
-    a.append(['tc_grps = system\n'])
-    a.append(['tau_t = %s\n' % str(0.1)])
-    a.append(['ref_t = %s\n' % args.temp])
+    a.append(['tc-grps = system\n'])
+    a.append(['tau-t = %s\n' % str(0.1)])
+    a.append(['ref-t = %s\n' % args.temp])
     if not args.restraints:
-        a.append(['Pcoupl = berendsen\n'])
+        a.append(['Pcoupl = %s\n' % args.barostat])
         a.append(['Pcoupltype = %s\n' % args.pcoupltype])
+        if args.barostat == 'Parrinello-Rahman':
+            a.append(['tau-p = %s\n' % (40 * args.dt)])  # tau-p should be at least  20 times larger than nstpcouple*dt. nstpcoupl defaults to the value of nstlist (40)
         if args.pcoupltype == 'Isotropic':
-            a.append(['ref_p = 1\n'])
+            a.append(['ref-p = 1\n'])
             a.append(['compressibility = 4.5e-5\n'])
         else:
-            a.append(['ref_p = %s\n' % ' '.join([str(1) for i in grps])])
+            a.append(['ref-p = %s\n' % ' '.join([str(1) for i in grps])])
             a.append(['compressibility = 4.5e-5 4.5e-5\n'])
-    a.append(['gen_vel = yes\n'])
+    if args.genvel == 'yes':
+        a.append(['gen-vel = yes\n'])
+        a.append(['gen-temp = %s\n' % args.temp])
+    else:
+        a.append(['gen-vel = no\n'])
     a.append(['pbc = xyz\n'])
     a.append(['DispCorr = EnerPres\n'])
     if args.xlink:
         a.append('periodic-molecules = yes\n')
     if args.restraints:
-        a.append(['refcoord_scaling = all\n'])
+        a.append(['refcoord-scaling = all\n'])
 
     f = open('%s.mdp' % args.ensemble, 'w')
     for line in a:

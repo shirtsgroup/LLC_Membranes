@@ -24,7 +24,7 @@ while getopts "b:x:y:z:r:m:t:p:" opt; do
     esac
 done
 
-input.py -b ${BUILD_MON} -l 50 --restraints --temp ${T} -f 50
+input.py -b ${BUILD_MON} -l 50 --restraints --temp ${T} -f 50 --genvel yes
 restrain.py -f 1000000 -A xyz -r on -D off -w off -g initial.gro --novsites -m ${BUILD_MON} -a ${ring_restraints}
 
 if [ "${MPI}" == "on" ]; then
@@ -44,6 +44,8 @@ fi
 cp npt.gro 1000000.gro
 cp npt.trr 1000000.trr
 
+input.py --mdp -b ${BUILD_MON} -l 50 --restraints --temp ${T} -f 50 --genvel no  # use velocities from previous sim
+
 for f in 3162 56 8 3 2 1 0; do
 	restrain.py -f ${f} -A xyz -r on -D off -w off --novsites -m ${BUILD_MON} -a ${ring_restraints}
 	if [ ${MPI} == 'on' ]; then
@@ -57,9 +59,10 @@ for f in 3162 56 8 3 2 1 0; do
 	cp npt.trr ${f}.trr
 done
 
-input.py -b ${BUILD_MON} -l 100 --temp ${T} -f 50  # put pressure control back on
+input.py -b ${BUILD_MON} -l 100 --temp ${T} -f 50 --barostat Parrinello-Rahman --genvel no # put pressure control back on
 gmx grompp -f npt.mdp -p topol.top -c 0.gro -o wiggle # run it out for a bit
 gmx mdrun -v -deffnm wiggle
 
+input.py -b ${BUILD_MON} -l 100000 --temp ${T} -f 100 --barostat Parrinello-Rahman --genvel no
 analysis.sh # get pore spacing, thickness, pore size, convert the trajectory to be used in XrayDiffraction.exe
 
