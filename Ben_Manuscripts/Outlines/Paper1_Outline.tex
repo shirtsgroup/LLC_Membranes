@@ -35,7 +35,7 @@ strain developing regions and contribute strongly to CO2 emissions
 		\item Like RO membranes, NF membranes have a pore size distribution which limits their ability to perform precise separations
 	\end{itemize}	
 
-	Nanostructured membranes can bypass many of the performance issues which plague traditional NF and RO membranes.
+	Nanostructured membranes can bypass many of the performance issues which plague traditional NF and RdO membranes.
 	\begin{itemize}
 		\item With nanostructured materials, solute rejecting pores can be tuned uniformly -- drives down energy requirements
 		\item Targeted separations can be accomplished by tuning the molecular building blocks which form these materials
@@ -80,7 +80,6 @@ strain developing regions and contribute strongly to CO2 emissions
                 \begin{itemize}
                         \item What does the microscopic pore structure look like?
 			\item Do ions have trouble getting through because of interactions with other things in the pores (e.g. ions, carbonyl groups, benzene rings) -- related to ionic conduction
-%MRS2: ``related to ionic conduction'' is vague
 			\item Is rejection of ions due to Donnan exclusion?
                         \item Do neutral solutes get rejected based solely on size rejection, or do interactions within the pore lead to selective rejection?
                         \item Is water structured inside the pores, restricting low energy pathways for solutes to follow? 
@@ -96,7 +95,7 @@ strain developing regions and contribute strongly to CO2 emissions
 	 
 	A clear picture of the nanoscopic structure of LLC membranes, gained by building 
 %MRS2: suggest ``molecular models'', as one can argue that each way of doing it is a different model, or that it might require trying 2-3 things.
-a molecular model, will provide evidence to support or call into question past drawn conclusions that have largely guided our understanding of separation mechanisms. 
+molecular models, will provide evidence to support or call into question past drawn conclusions that have largely guided our understanding of separation mechanisms. 
 	\begin{itemize}
 %MRS2: a thought - it would be great to add what is exactly meant by ``pore walls'' and how well defined they are is not clear. For example, how strict is the division between the hydrophobic tails, the head groups, and the ionic groups?  This directly affects what is meant by the ``size'' of the nanopore, and (to put somewhere else in the outline) what size exclusion means.
  		\item The arrangement of sodium ions in the channels is thought to be confined to the pore walls. It is possible they are arranged more randomly
@@ -147,6 +146,7 @@ a molecular model, will provide evidence to support or call into question past d
 	\end{itemize}
 	
 	%BJC: I'm not sure where to place this figure. ACS nano requires the methods section to go last (after conclusions). It seems like this should go earlier, but it fits the context best around here.
+	%BJC2: I think I might make this a six panel figure. The other two panels will show a cartoon and atomistic pore view.
 	\begin{figure}
 	\centering
 	\begin{subfigure}{.45\linewidth}
@@ -170,12 +170,14 @@ a molecular model, will provide evidence to support or call into question past d
 		\includegraphics[width=\linewidth]{placeholder.png}
 		\caption{}\label{fig:layeratomistic}
 	\end{subfigure}
-	\caption{(a) The chemical structure of NAGA3C11 (b) The chemical structure visualized atomistically enhances intuition about system behavior %MRS2: in what way? (c) Wedge-shaped monomers assemble into layers (d) An atomistic view of a layer suggests geometric constraints based on monomer structure %MRS2: suggests what?}\label{fig:cartoonvatomistic}  
+	\caption{(a) The chemical structure of NAGA3C11 (b) The chemical structure visualized atomistically enhances intuition how monomers might pack together %MRS2: in what way?
+(c) Wedge-shaped monomers assemble into layers (d) An atomistic view of a layer suggests a reasonable range of monomers per layer to test\label{fig:cartoonvatomistic}  
 	\end{figure}	
 	
 	The timescale for self assembly of monomers into the hexagonal phase is unknown and likely outside of a reasonable length for an atomistic simulation, calling for a more efficient way to build the system. 
 	\begin{itemize}
           %MRS2: specify what type of self assembly -- could be that layers are faster than hexagonal pores to get to.
+	  %BJC2: Don't I suggest the type of self assembly to be assembly into the hexagonal phase? Or should I be more broad as in, we see no type of self-assembly occuring.
 		\item Work done shows coarse grain model self assembly in ~1000 ns , Citation: J. Phys. Chem. B 2013, 117, 4254-4262
 		\item Attempts with Colh system not fruitful  
 		\begin{itemize}
@@ -187,6 +189,7 @@ a molecular model, will provide evidence to support or call into question past d
 	\end{itemize}
 	
 %MRS2: need to be careful describing which stacking/layering is described where/when based on experiments actually reported.
+%BJC2: can you clarify this point?
 	Each pore is made of twenty stacked monomer layers with periodic continuity in all directions, avoiding any edge effects and creating an infinite length pore ideal for studying transport (Fig.~\ref{fig:initial})
 	\begin{itemize}
 		\item A thinner system is better to reduce the computational cost and allow us to look at longer timescales
@@ -195,7 +198,7 @@ a molecular model, will provide evidence to support or call into question past d
                 \item Too few layers leads to micelle-like formations %MRS: with gap.
 	\end{itemize}
 
-	\noindent Initial guesses for the remaining structural parameters were chosen based on experimental data and treated as variables during model development 
+	\noindent Initial guesses for the remaining structural parameters were chosen based on experimental data and varied in order to develop a model that agrees with experiment. 
 %MRS2: ``treated as variables'' is vague. Be specific about what it means you are doing.
 	\begin{itemize}
 		\item XRD gives pore-to-pore distances of $\approx$ 4.1 nm and indicates possible pi-stacking at $\approx$ 3.7 \angstrom (see figure~\ref{fig:xrd}) on - comparison of experimental vs. simulated)
@@ -230,8 +233,7 @@ a molecular model, will provide evidence to support or call into question past d
                \item 3 dimensional Fourier transformed electron density generates simulated 1D and 2D diffraction patterns
                \item The 1D patterns are generated by spherical integration of the FT
                \item 2D patterns are generated by taking cross sections of the FT in the qx, qy and qz planes
-               \item We matched experiments based on iterative improvement of our choice in initial structure and equilibration procedure
-                 %MRS2: ``iterative improvement'' is vague -- other researchers could not implement that (unless you say you give details elsewhere)
+               \item We matched experiment by varying the initial structure. The selection of initial structure is explained later
         \end{itemize}
 
 	The Nernst Einstein relation and the Collective Diffusion model were both applied to the system in order to estimate ionic conductivity.
@@ -273,13 +275,12 @@ a molecular model, will provide evidence to support or call into question past d
                 \item In the real system, layers are stacked 3.7 \angstrom apart based on WAXS data. 
                 \item A characteristic of all systems simulated in this way, is a defined, cylindrical and open pore structure. Benzene rings arrange in a helical conformation after equil. Membrane about 8 nm thick (Fig ~\ref{fig:phaseA}) % BJC: Still trying to prove that layered is trying to go towards a helical conformation. Also, maybe include thickness in the table?
                 \item This will be called phase A for simplicity  
-	        \item Simulations of systems built with layers stacked 5 \angstrom apart results in a pore structure characterized by high radial disorder.
-%MRS2: higher radial disorder - make clear still hydrophobic/hydrophilic.
+	        \item Simulations of systems built with layers stacked 5 \angstrom apart results in a pore structure characterized by high radial disorder, while maintaining partitioning between hydrophobic and hydrophilic regions.
         	\begin{itemize}
                 	\item This will be called phase B (Fig~\ref{fig:phaseB})
                 	\item The arrangement of sodium ions (which are closely bound to carbonyl head groups) can be well-approximated by a gaussian distribution 
                           %MRS2: below: ``Only difference''.  Only difference is in how they are prepared.  But presumably, there are a number of initial configurations that can lead to this one, so emphasizing that it's the only difference isn't that important.  Also, we want to be emphasizing the thermodynamic differences, not kinetics.
-                	\item Like phase A, phase B can form at 280K. The only difference in simulations leading to this state, is the initial interlayer spacing
+                	\item Like phase A, phase B can form at 280K. %BJC2: ^^ so get rid of this part : The only difference in simulations leading to this state, is the initial interlayer spacing
                 	\item The phase is also present when phase A is heated close to its isotropic transition point
                 	\item There are distinct differences in the membrane and pore structures between each state (Fig~\ref{fig:porestructures})
                 	\begin{itemize}
@@ -295,7 +296,8 @@ a molecular model, will provide evidence to support or call into question past d
         \begin{itemize}
 		\item Simulated Xray diffraction patterns generated from initial configurations of each pi-stacking mode, shows a 
 %MRS2: ``clear relation'' is a bit indirect. 
-clear relation between the parallel displaced configuration and major features present in the XRD patterns %BJC: A figure would probably be good here %MRS2: yep, refer a figure here.
+%BJC2: clear link? 
+clear link between the parallel displaced configuration and major features present in the XRD patterns %BJC: A figure would probably be good here %MRS2: yep, refer a figure here.
 		\item Diagonal spots in the alkane chain region are only generated for structures created in the parallel displaced configuration
 		\item However, both configurations are stable for 100's of nanoseconds
 		\item Xray diffraction of the sandwiched configuration after equilibration shows the spots. This indicates that there is a shift towards the offset configuration.
@@ -316,8 +318,22 @@ clear relation between the parallel displaced configuration and major features p
 
 	\begin{figure}
 	\centering
-	\includegraphics[width=\linewidth]{placeholder.png}
-	\caption{As temperature is increased, Phase A transitions to Phase B, as indicated by the shown order parameter. An order parameter of 1 indicates perfect ordering, while 0 indicates disorder}\label{fig:transition}
+	\begin{subfigure}
+		\centering
+		\includegraphics[width=\linewidth]{placeholder.png}
+		\caption{}\label{fig:orderparameter}
+	\end{subfigure}
+	\begin{subfigure}
+		\centering
+		\includegraphics[width=\linewidth]{placeholder.png}
+		\caption{}\label{fig:order}
+	\end{subfigure}
+	\begin{subfigure}
+		\centering
+		\includegraphics[width=\linewidth]{placeholder.png}
+		\caption{}\label{fig:disorder}
+	\end{subfigure}
+	\caption{(a) As temperature is increased, Phase A transitions to Phase B, becoming more disordered. An order parameter of 1 indicates perfect ordering, while 0 indicates disorder. (b) The system is ordered, characteristic of Phase A, initially (c) The system becomes disordered, characteristic of Phase B, as temperature is raised beyond 310K}\label{fig:transition}
 %MRS2: maybe provide a bit more information what data will be here?  Order parametr vs time? One panel with order paramter vs. time, one with configurations from 0 and 1 endpoints?
 	\end{figure}	
 
@@ -328,8 +344,7 @@ clear relation between the parallel displaced configuration and major features p
 	table & here \\
 	\hline
 	\end{tabular}
-        %MRS2: what is the thesis here?
-	\caption{A system built with 5 monomers per layer in a parallel displaced configuration results in a structure closest to experimental data}\label{table:p2p} 
+	\caption{The pore spacing of the model increases as number of monomers in each layer increases. The pore spacing of a system starting in the sandwiched configuration is systematically lower than that started in an offset configuration. Systems built with 5 monomers per layer in a parallel displaced configuration results in a pore spacing closest to experimental data}\label{table:p2p} 
 	\end{table}
 	
 	\begin{figure}
@@ -346,6 +361,8 @@ clear relation between the parallel displaced configuration and major features p
 	\end{subfigure}
 	\caption{There are clear differences in pore structure between systems built with layers stacked (a) 3.7 \angstrom apart and (b) 5.0 \angstrom apart}
         %MRS2: explain theses?  Also, the exact configurations used to start them are probably not that important; many different initial configurations will probably lead to most of them.  It's the thermodyamics that are important.
+	%BJC: okay, so just rephrase it, worded in a way that doesn't reference the initial configuration/layer spacing?
+	%BJC: what do you  mean by 'thermodynamics that are important' -- just distinguishing which state is more favorable under what conditions?
 	\label{fig:porestructures}
 	\end{figure}
 
@@ -370,6 +387,7 @@ clear relation between the parallel displaced configuration and major features p
 %MRS2: not quite clear what physical structures the axial reflections correspond to (what are the distances? What do they correspond to?)
 they are still partitioned into layers which gives rise to an axial refelction at the same distance where we expect alkane chain packing to be present   
 %MRS2: how are they layers defined here? Can you bring in more information about the nonuniformity of the density?
+%BJC2: Are you thinking about the fourier transforms? I could bring that in
 	\end{itemize} 
 
 	\begin{figure}
@@ -390,6 +408,7 @@ they are still partitioned into layers which gives rise to an axial refelction a
                 \caption{~\label{fig:xrdB}}
         \end{subfigure}
 	\caption{Phase A (a) provides a good match to experiment (b). Phase B (c) is missing reflections present in the experimental pattern} % BJC: any more detail?  %MRS2: yes, give distances, and describe what you mean as ``good match''
+%BJC2: what is a clear way to describe the spots in the ring. Diagonal reflections? radial spots?
 	\label{fig:xrd}
 	\end{figure}
 
@@ -411,7 +430,7 @@ they are still partitioned into layers which gives rise to an axial refelction a
 	Nernst Einstein & Collective Diffusion \\
 	\hline
 	\end{tabular}
-	\caption{Calculated ionic conductivity using Nernst-Einsten and Collective Diffusion agree within error. Both methods give calculated values of ionic conductivity which are higher than experimental values~\label{table:conductivity}}
+	\caption{Calculated ionic conductivity using Nernst-Einsten and Collective Diffusion agree within error. Both methods give calculated values of ionic conductivity which are higher, but reasonably close to experimental values~\label{table:conductivity}}
 %MRS2: I would say that they are reasonable close to experiment, though higher. Also somewhat contradicted in other places.
 	\end{table}
 
@@ -428,7 +447,7 @@ they are still partitioned into layers which gives rise to an axial refelction a
 	\end{itemize}
 	%MRS: focus around what we learned about the system - not that we have a model
 
-	\section{Supplemental Information} %MRS2: check, might be called supporting information, depending on the journal.
+	\section{Supplemental Information} %MRS2: check, might be called supporting information, depending on the journal. %BJC2: Also, it's a separate document in ACS nano at least
 	
 	Monomer configurations
 	\begin{itemize}
@@ -445,6 +464,8 @@ they are still partitioned into layers which gives rise to an axial refelction a
                 %MRS2: what is the thesis?
                 \label{fig:initial}
         \end{figure}
+
+	Equilibration procedure
 
 	\noindent Crosslinking details
 	\begin{itemize}
