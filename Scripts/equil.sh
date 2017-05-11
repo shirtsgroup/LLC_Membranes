@@ -30,7 +30,7 @@ restrain.py -f 1000000 -A xyz -r on -D off -w off -g initial.gro --novsites -m $
 if [ "${MPI}" == "on" ]; then
     gmx_mpi editconf -f initial.gro -o box.gro -c -bt triclinic -box ${x} ${y} ${z} -angles 90 90 120
     gmx_mpi grompp -f em.mdp -p topol.top -c box.gro -o em
-    mpirun -np ${NP} gmx_mpi mrdrun -v -deffnm em
+    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm em
     gmx_mpi grompp -f npt.mdp -p topol.top -c em.gro -o npt
     mpirun -np ${NP} gmx_mpi mdrun -v -deffnm npt
 else
@@ -64,5 +64,6 @@ gmx grompp -f npt.mdp -p topol.top -c 0.gro -o wiggle # run it out for a bit
 gmx mdrun -v -deffnm wiggle
 
 input.py -b ${BUILD_MON} -l 100000 --temp ${T} -f 100 --barostat Parrinello-Rahman --genvel no
+gmx grompp -f npt.mdp -p topol.top -c wiggle.gro -o wiggle
 analysis.sh # get pore spacing, thickness, pore size, convert the trajectory to be used in XrayDiffraction.exe
 
