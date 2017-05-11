@@ -59,11 +59,11 @@ for f in 3162 56 8 3 2 1 0; do
 	cp npt.trr ${f}.trr
 done
 
-input.py -b ${BUILD_MON} -l 100 --temp ${T} -f 50 --barostat Parrinello-Rahman --genvel no # put pressure control back on
+input.py -b ${BUILD_MON} -l 50 --temp ${T} -f 50 --barostat berendsen --genvel no # put pressure control back on
 gmx grompp -f npt.mdp -p topol.top -c 0.gro -o wiggle # run it out for a bit
 gmx mdrun -v -deffnm wiggle
 
 input.py -b ${BUILD_MON} -l 100000 --temp ${T} -f 100 --barostat Parrinello-Rahman --genvel no
 gmx grompp -f npt.mdp -p topol.top -c wiggle.gro -o wiggle
-analysis.sh # get pore spacing, thickness, pore size, convert the trajectory to be used in XrayDiffraction.exe
+#analysis.sh # get pore spacing, thickness, pore size, convert the trajectory to be used in XrayDiffraction.exe
 

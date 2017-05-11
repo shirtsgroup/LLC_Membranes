@@ -8,7 +8,8 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Normalize charge so that it sums to the system formal charge')
 
-    parser.add_argument('-t', '--top', type=str, help='name of topology file (.itp)')
+    parser.add_argument('-t', '--top', type=str, help='name of topology file '
+                                                      '(.itp)')
     parser.add_argument('-c', '--charge', default=-1, type=int, help='formal charge on molecule')
 
     args = parser.parse_args()
