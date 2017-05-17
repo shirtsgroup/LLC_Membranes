@@ -24,10 +24,8 @@ done
 echo 0 | gmx trjconv -f ${trajectory} -o traj_whole.xtc -s ${tpr} -pbc whole
 echo "Trajectory Converted"
 
-# Convert the trajectory so that it is usable with XrayDiffraction.exe
-ConvertTraj.py -l ${xrd_frames} -t ${trajectory} -g ${gro} --avg_dims
-echo "Last ${xrd_frames} frames of trajectory converted for X-ray Diffraction calculation using ConvertTraj.py"
-echo "Average dimension written to dims.txt"
+# Simulate X-ray Diffraction
+main_gromacs.py -top ${gro} -traj traj_whole.xtc --lcscale 1.25 --cscale 0.05
 
 # Structure_char.py
 echo 'Calculating pore to pore distances'

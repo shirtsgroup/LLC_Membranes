@@ -12,7 +12,7 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Measure the density inside the hydrophobic region of an LLC system')
 
-    parser.add_argument('-t', '--traj', default='wiggle.xtc', type=str, help = 'Trajectory file (.xtc or .trr). The'
+    parser.add_argument('-t', '--traj', default='traj_whole.xtc', type=str, help = 'Trajectory file (.xtc or .trr). The'
                         'trajectory should be preprocessed beforehand to make molecules whole or else the distance '
                         'calculation get thrown off. Use "gmx trjconv -pbc whole" to do this')
     parser.add_argument('-g', '--gro', default='wiggle.gro', type=str, help = 'Name of coordinate file')
