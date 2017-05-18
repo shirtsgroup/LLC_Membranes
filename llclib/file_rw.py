@@ -255,7 +255,7 @@ def get_indices(a, xlink):
 
 
 def write_initial_config(positions, identity, name, no_layers, layer_distribution, dist, no_pores, p2p, no_ions, rot, out,
-              offset, helix, *flipped):
+              offset, helix, offset_angle, *flipped):
 
     f = open('%s' % out, 'w')
 
@@ -307,6 +307,7 @@ def write_initial_config(positions, identity, name, no_layers, layer_distributio
             for j in range(layer_mons):  # iterates over each monomer to create coordinates
                 monomer_count += 1
                 theta = j * math.pi / (layer_mons / 2.0) + rot
+                theta += k * math.pi * (offset_angle/180)
                 if offset:
                     theta += (k % 2) * (math.pi / layer_mons)
                 Rx = transform.rotate_z(theta)

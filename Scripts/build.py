@@ -36,6 +36,7 @@ def initialize():
     parser.add_argument('--rot', default=45, type=float, help="Rotate pores by this amount (degrees)")
     parser.add_argument('--flip', help='Flip the orientation of monomer in every other pore by 180 degrees',
                         action="store_true")
+    parser.add_argument('--offset_angle', default=0, type=float)
 
     args = parser.parse_args()
 
@@ -527,8 +528,8 @@ if __name__ == "__main__":
 
     if args.flip:
         file_rw.write_initial_config(xyz_up, identity, name, no_layers, layer_distribution, dist, no_pores, p2p,
-                                     no_ions, args.rot, args.out, args.offset, args.helix, xyz_down)
+                                     no_ions, args.rot, args.out, args.offset, args.helix, args.offset_angle, xyz_down)
     else:
         # write_gro(xyz_up, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions, args.rot)
         file_rw.write_initial_config(xyz_up, identity, name, no_layers, layer_distribution, dist, no_pores, p2p,
-                                     no_ions, args.rot, args.out, offset=args.offset, helix=args.helix)
+                                     no_ions, args.rot, args.out, args.offset, args.helix, args.offset_angle)
