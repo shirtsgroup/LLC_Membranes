@@ -52,6 +52,37 @@ def initialize():
     return args
 
 
+def restrict_atoms(t, component):
+
+    # Check for certain special arguments
+    if component == 'tails':
+        atoms = ['C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C21', 'C22',
+                 'C23', 'C24', 'C25', 'C26', 'C27', 'C28', 'C29', 'C30', 'C31', 'C32', 'C33', 'C34', 'C35', 'C36', 'C37',
+                 'C38', 'C39', 'C40', 'C41', 'C42', 'C43', 'C44', 'C45', 'C46', 'C47', 'C48']
+    elif component == 'benzene':
+        atoms = ['C', 'C1', 'C2', 'C3', 'C4', 'C5']
+    elif component == 'tail_ends':
+        atoms = ['C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C24', 'C25', 'C26', 'C27',
+                 'C28', 'C29', 'C30', 'C31', 'C32', 'C33', 'C34', 'C38', 'C39', 'C40', 'C41', 'C42', 'C43', 'C44', 'C45',
+                 'C46', 'C47', 'C48']
+    elif component == 'tail_fronts':
+        atoms = ['C7', 'C8', 'C9', 'C21', 'C22', 'C23', 'C35', 'C36', 'C37']
+    else:
+        atoms = component
+
+    if component != 'sys':
+        atoms_to_keep = [a.index for a in t.topology.atoms if a.name in atoms]
+        t.restrict_atoms(atoms_to_keep)
+        pos = t.xyz
+    else:
+        # NOTE: if you use 'sys', use gmx trjconv -f *.trr -s *.tpr -pbc atom
+        #                        then gmx trjconv -f *.trr -s *.tpr -pbc whole
+        # This will make sure everything is in the box. The output is a .xtc file
+        pos = t.xyz
+
+    return pos
+
+
 def avg_pore_loc(npores, pos, buffer):
     """
     :param no_pores: the number of pores in the unit cell
@@ -221,7 +252,7 @@ def p2p_stats(p2ps, exclude, nboot, equil):
     return ensemble_avg, p2p_std, t
 
 
-def compdensity(component, pore_centers, start, pores=4, bin_width=0.05, rmax=3.5, buffer=0.0):
+def compdensity(component, pore_centers, start, tot_atoms, pores=4, bin_width=0.05, rmax=3.5, buffer=0.0):
 
     """
     :param component: the coordinates of the component(s) which you want a radial distribution of at each frame
@@ -244,7 +275,9 @@ def compdensity(component, pore_centers, start, pores=4, bin_width=0.05, rmax=3.
     nT = np.shape(component)[0]
 
     # Find the approximate max and minimum z values of the components based on the last frame
+
     zmax = np.max(component[-1, :, 2])
+
     zmin = np.min(component[-1, :, 2])
     thickness = zmax - zmin  # approximate membrane thickness
 
@@ -265,7 +298,7 @@ def compdensity(component, pore_centers, start, pores=4, bin_width=0.05, rmax=3.
 
     # Start setting up parameters necessary for binning
     bins = int(rmax/bin_width)  # the total number of bins
-    r = np.linspace(0, rmax, int(bins) + 1)  # each discrete radius at which we will measure densities
+    r = np.linspace(0, rmax, int(bins))  # each discrete radius at which we will measure densities
 
     # Now bin the distances calculated above
     count = 0
@@ -306,32 +339,7 @@ if __name__ == '__main__':
 
     t = md.load('%s' % args.input, top='%s' % args.gro)
 
-    # Check for certain special arguments
-    if args.component == 'tails':
-        atoms = ['C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C21', 'C22',
-                 'C23', 'C24', 'C25', 'C26', 'C27', 'C28', 'C29', 'C30', 'C31', 'C32', 'C33', 'C34', 'C35', 'C36', 'C37',
-                 'C38', 'C39', 'C40', 'C41', 'C42', 'C43', 'C44', 'C45', 'C46', 'C47', 'C48']
-    elif args.component == 'benzene':
-        atoms = ['C', 'C1', 'C2', 'C3', 'C4', 'C5']
-    elif args.component == 'tail_ends':
-        atoms = ['C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C24', 'C25', 'C26', 'C27',
-                 'C28', 'C29', 'C30', 'C31', 'C32', 'C33', 'C34', 'C38', 'C39', 'C40', 'C41', 'C42', 'C43', 'C44', 'C45',
-                 'C46', 'C47', 'C48']
-    elif args.component == 'tail_fronts':
-        atoms = ['C7', 'C8', 'C9', 'C21', 'C22', 'C23', 'C35', 'C36', 'C37']
-    else:
-        atoms = args.component
-
-    if args.component != 'sys':
-        atoms_to_keep = [a.index for a in t.topology.atoms if a.name in atoms]
-        t.restrict_atoms(atoms_to_keep)
-        pos = t.xyz
-    else:
-        # NOTE: if you use 'sys', use gmx trjconv -f *.trr -s *.tpr -pbc atom
-        #                        then gmx trjconv -f *.trr -s *.tpr -pbc whole
-        # This will make sure everything is in the box. The output is a .xtc file
-        pos = t.xyz
-
+    pos = restrict_atoms(t, args.component)
     nT = np.shape(pos)[0]
 
     traj_start = int(args.start_frame)

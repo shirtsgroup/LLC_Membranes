@@ -22,6 +22,11 @@ def initialize():
     parser.add_argument('-b', '--bin', default=.1, type=float, help='bin size (nm)')
     parser.add_argument('--single_frame', help='Optional argument to turn on if you are looking at a single frame',
                         action="store_true")
+    parser.add_argument('--fourier', action="store_true", help='Create a power spectrum')
+    parser.add_argument('--begin', default=0, type=int, help='start frame')
+    parser.add_argument('--end', type=int, help='end frame')
+    parser.add_argument('--entropy', action="store_true")
+    parser.add_argument('--noshow', action="store_true")
 
     args = parser.parse_args()
 
@@ -170,9 +175,12 @@ def density(pos, axis, bin, box, sum='yes', smooth_factor=1):
 
         for j in range(nA):
             a = pos[i*smooth_factor, j, axis]
+
             bin_no = int(len(x) / 2 + np.floor((a - b)/bin))
+
             if sum == 'yes':
-                d[bin_no] += 1
+                if bin_no < L:
+                    d[bin_no] += 1
             else:
                 d[i, bin_no] += 1
 
@@ -219,6 +227,25 @@ def power_spectrum(data, bin):
 
     return ps, freqs, max
 
+
+def entropy(x, d):
+    """
+    Calculate the entropy of a discrete data series using information theory
+    :param x: possible values
+    :param d: distribution
+    """
+
+    # normalize the distribution
+    d /= sum(d)
+    d = np.trim_zeros(d, 'fb')  # get rid of zeros at front and back of distribution
+
+    H = 0  # entropy
+    for i in range(d.shape[0]):
+        H += -d[i]*(math.log(d[i]))
+
+    return H
+
+
 if __name__ == '__main__':
 
     args = initialize()
@@ -232,11 +259,15 @@ if __name__ == '__main__':
         box = u.dimensions[:3] / 10
         frames = 1
     else:
-        t = md.load('%s' % args.traj, top='%s' % args.gro)
+
+        if args.end:
+            t = md.load('%s' % args.traj, top='%s' % args.gro)[args.begin:args.end]
+        else:
+            t = md.load('%s' % args.traj, top='%s' % args.gro)[args.begin:]
+
         atoms = args.atoms
         keep = [a.index for a in t.topology.atoms if a.name in atoms]  # restrict trajectory to chosen atoms
-        t.restrict_atoms(keep)
-        pos = t.xyz  # get just the coordinates
+        pos = t.atom_slice(keep).xyz  # get just the coordinates
         box = t.unitcell_lengths  # get the unit cell lengths
         frames = np.shape(pos)[0]
 
@@ -256,23 +287,36 @@ if __name__ == '__main__':
     # plt.show()
 
     x, d = density(c, axis, args.bin, box)
-    print x.shape
-    print d.shape
-    ps, freqs, max_freq = power_spectrum(d, args.bin)
 
-    print 'Maximum frequency: %s cycles/nm' % max_freq
+    nfig = 1
 
-    plt.figure(1)
-    plt.plot(freqs, ps)
-    plt.suptitle('Power Spectrum', fontsize=16)
-    plt.title('Bin size = %s nm' % args.bin, fontsize=12)
-    plt.xlabel('Frequency')
-    plt.ylabel('Fourier transformed data squared')
+    if args.fourier:
 
-    plt.figure(2)
-    plt.plot(x, d)
-    plt.suptitle('Line number density of components along %s axis' % args.axis, fontsize=16)
-    plt.title('Bin size = %s nm' % args.bin, fontsize=12)
-    plt.xlabel('Distance into membrane, z direction (nm)')
-    plt.ylabel('NA count')
-    plt.show()
+        ps, freqs, max_freq = power_spectrum(d, args.bin)
+
+        print 'Maximum frequency: %s cycles/nm' % max_freq
+
+        plt.figure(nfig)
+        plt.plot(freqs, ps)
+        plt.suptitle('Power Spectrum', fontsize=16)
+        plt.title('Bin size = %s nm' % args.bin, fontsize=12)
+        plt.xlabel('Frequency')
+        plt.ylabel('Fourier transformed data squared')
+
+        nfig += 1
+
+    if args.entropy:
+
+        H_real = entropy(x, d)
+        H_uniform = entropy(x, np.ones(d.shape))
+
+        print 'Entropy difference from uniform distribution : %s' % (H_uniform - H_real)
+
+    if not args.noshow:
+        plt.figure(nfig)
+        plt.plot(x, d)
+        plt.suptitle('Line number density of components along %s axis' % args.axis, fontsize=16)
+        plt.title('Bin size = %s nm' % args.bin, fontsize=12)
+        plt.xlabel('Distance into membrane, z direction (nm)')
+        plt.ylabel('NA count')
+        plt.show()

@@ -12,7 +12,7 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Measure the density inside the hydrophobic region of an LLC system')
 
-    parser.add_argument('-t', '--traj', default='wiggle.xtc', type=str, help = 'Trajectory file (.xtc or .trr). The'
+    parser.add_argument('-t', '--traj', default='traj_whole.xtc', type=str, help = 'Trajectory file (.xtc or .trr). The'
                         'trajectory should be preprocessed beforehand to make molecules whole or else the distance '
                         'calculation get thrown off. Use "gmx trjconv -pbc whole" to do this')
     parser.add_argument('-g', '--gro', default='wiggle.gro', type=str, help = 'Name of coordinate file')
@@ -20,6 +20,7 @@ def initialize():
                         help='component used to track pore positions and define pore radius')
     parser.add_argument('--noshow', action="store_true", help='Do not show the plots')
     parser.add_argument('--save', action="store_true", help='Save plots')
+    parser.add_argument('--normalize', action="store_true", help='Normalize order parameter so max is 1 and min is 0')
 
     args = parser.parse_args()
 
@@ -41,10 +42,18 @@ if __name__ == "__main__":
     poresize_equil = timeseries.detectEquilibration(r)[0]
     order_equil = timeseries.detectEquilibration(r/r_std)[0]
 
+    if args.normalize:
+        order = r/r_std
+        order -= min(order)
+        order /= max(order)
+
     print 'Pore size equilibrated after %d ns' % (t.time[poresize_equil] / 1000)
     print 'Average Pore Size: %.2f +/- %.2f nm' %(np.mean(r[poresize_equil:]), np.mean(r_std[poresize_equil:]))
     print 'Order parameter equilibrated after %d ns' % (t.time[order_equil] / 1000)
-    print 'Average Order Parameter: %.2f' % np.mean(r[order_equil:]/r_std[order_equil:])
+    if args.normalize:
+        print 'Average Order Parameter: %.2f' % np.mean(order[order_equil:])
+    else:
+        print 'Average Order Parameter: %.2f' % np.mean(r[order_equil:]/r_std[order_equil:])
 
     plt.figure(1)
     plt.plot(t.time, r)
@@ -60,9 +69,17 @@ if __name__ == "__main__":
     # plt.xlabel('Time')
 
     plt.figure(3)
-    plt.plot(t.time, r/r_std)
+
+    T = np.linspace(280, 340, t.time.shape[0])
+
+    if args.normalize:
+        # plt.plot(t.time, order)
+        plt.plot(T, order)
+    else:
+        plt.plot(t.time, r/r_std)
     plt.title('Order parameter vs time')
-    plt.xlabel('Time (ps)')
+    # plt.xlabel('Time (ps)')
+    plt.xlabel('Temperature (K)')
     plt.ylabel('Order parameter')
     if args.save:
         plt.savefig('order.png')
