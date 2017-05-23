@@ -76,7 +76,7 @@ def angles(pos, atoms, normal=[0, 0, 1]):
     for i in range(nT):
         for j in range(chains):
             avg_tilt = 0
-            for k in range(atoms - 1):  # atoms - 1 since there are n - 1 relevant vector in a straight chain
+            for k in range(atoms - 1):  # atoms - 1 since there are n - 1 relevant vectors in a straight chain
                 # MOST IMPORTANT BLOCK
                 v = pos[i, j*atoms + k + 1, :] - pos[i, j*atoms + k, :]
                 vn = np.dot(v, normal)

@@ -455,3 +455,25 @@ def write_water_ndx(keep, t):
             else:
                 f.write('{:<8s}\n'.format(str(index + 1)))
             count += 1
+
+
+def write_gro_pos(pos, out, name='NA'):
+    """
+    write a .gro file from positions
+    :param pos: xyz coordinates in
+    :param out: name of output .gro file
+    :param name: name to give atoms being put in the .gro
+    :return: A .gro file
+    """
+
+    with open(out, 'w') as f:
+
+        f.write('This is a .gro file\n')
+        f.write('%s\n' % pos.shape[0])
+
+        for i in range(pos.shape[0]):
+
+            f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(i + 1, '%s' % name, '%s' % name, i + 1, pos[i, 0],
+                                                        pos[i, 1], pos[i, 2]))
+
+        f.write('{:10f}{:10f}{:10f}\n'.format(0, 0, 0))

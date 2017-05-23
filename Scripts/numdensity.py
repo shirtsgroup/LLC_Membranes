@@ -6,6 +6,7 @@ import mdtraj as md
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
 import math
+from pymbar import timeseries
 
 
 def initialize():
@@ -13,20 +14,20 @@ def initialize():
     parser = argparse.ArgumentParser(description='Calculate the number density of selected groups along axis')
 
     parser.add_argument('-g', '--gro', default='wiggle.gro', help='Name of coordinate file')
-    parser.add_argument('-t', '--traj', default='wiggle.trr', help='Trajectory file (.trr, .xtc should work)')
+    parser.add_argument('-t', '--traj', default='wiggle.trr', help='Trajectory file (.trr or .xtc)')
     parser.add_argument('-d', '--axis', default='z', help='Axis along which to calculate number density. If you put '
                                                           'anything other than x, y or z, it will default to z')
     parser.add_argument('-a', '--atoms', nargs='+', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], type=str, help='List of atoms of interest')
     parser.add_argument('-c', '--center', default='yes', help='Set this to yes if you want to calculate the number'
                                                               'density based on the centers of the selected atoms')
     parser.add_argument('-b', '--bin', default=.1, type=float, help='bin size (nm)')
-    parser.add_argument('--single_frame', help='Optional argument to turn on if you are looking at a single frame',
-                        action="store_true")
     parser.add_argument('--fourier', action="store_true", help='Create a power spectrum')
     parser.add_argument('--begin', default=0, type=int, help='start frame')
-    parser.add_argument('--end', type=int, help='end frame')
+    parser.add_argument('--end', default=-1, type=int, help='end frame')
     parser.add_argument('--entropy', action="store_true")
     parser.add_argument('--noshow', action="store_true")
+    parser.add_argument('--trajectory', action="store_false")
+    parser.add_argument('--kb', action="store_true", help='Calculate kullback-leibler divergence')
 
     args = parser.parse_args()
 
@@ -106,7 +107,7 @@ def d_dist(pos, box, bin):
     return dist, r
 
 
-def density(pos, axis, bin, box, sum='yes', smooth_factor=1):
+def density(pos, axis, bin, box, sum=True, smooth_factor=1):
     """
     Calculate the average number density of components along an axis
     :param pos: a numpy array with xyz coordinates of selected atoms for all frames
@@ -143,7 +144,7 @@ def density(pos, axis, bin, box, sum='yes', smooth_factor=1):
     x.sort()  # sort the list in order
     x = np.array(x)
     L = len(x)
-    if sum == 'yes':
+    if sum:
         d = np.zeros([L])
     else:
         d = np.zeros([int(nT/smooth_factor), L])
@@ -169,26 +170,27 @@ def density(pos, axis, bin, box, sum='yes', smooth_factor=1):
 
         x.sort()
         x = np.array(x)
-        L = len(x)
-        if sum == 'no':
-            xT[i, :L] = x
+
+        if not sum:
+            xT[i, :min(L, len(x))] = x[:min(L, len(x))]
 
         for j in range(nA):
             a = pos[i*smooth_factor, j, axis]
 
             bin_no = int(len(x) / 2 + np.floor((a - b)/bin))
 
-            if sum == 'yes':
+            if sum:
                 if bin_no < L:
                     d[bin_no] += 1
             else:
-                d[i, bin_no] += 1
+                if bin_no < L:
+                    d[i, bin_no] += 1
 
-    if sum == 'yes':
+    if sum:
         for i in range(len(d)):  # take the average
             d[i] /= (nT / smooth_factor)
 
-    if sum == 'yes':
+    if sum:
         return x, d
     else:
         return xT, d
@@ -228,48 +230,76 @@ def power_spectrum(data, bin):
     return ps, freqs, max
 
 
-def entropy(x, d):
+def entropy(d, traj=False):
     """
     Calculate the entropy of a discrete data series using information theory
     :param x: possible values
     :param d: distribution
     """
 
-    # normalize the distribution
-    d /= sum(d)
-    d = np.trim_zeros(d, 'fb')  # get rid of zeros at front and back of distribution
+    if traj:  # return time depenedent entropy based on a trajectory
 
-    H = 0  # entropy
-    for i in range(d.shape[0]):
-        H += -d[i]*(math.log(d[i]))
+        nT = d.shape[0]  # number of points in trajectory
+        nbins = d.shape[1]
+        H = np.zeros([nT])
+
+        for t in range(nT):
+            # normalize
+            frame = np.zeros([nbins])
+            frame = d[t, :]
+            frame /= sum(frame)
+            frame = np.trim_zeros(frame, 'fb')
+
+            for b in range(len(frame)):
+                if frame[b] != 0:  # https://stats.stackexchange.com/questions/57069/alternative-to-shannons-entropy-when-probability-equal-to-zero
+                    H[t] += -frame[b]*math.log(frame[b])
+
+    else:
+        # normalize the distribution
+        d /= sum(d)
+        d = np.trim_zeros(d, 'fb')  # get rid of zeros at front and back of distribution
+
+        H = 0  # entropy
+        for i in range(d.shape[0]):
+            if d[i] != 0:
+                H += -d[i]*(math.log(d[i]))
 
     return H
+
+
+def kullback_leiblier(p, q):
+    """
+    Find the kullback-leiblier divergence from q to p
+
+    :param p: probability distribution 1
+    :param q: probability distribution 2
+    :return: kb : kullback-leiblier divergence - the amount of information lost when q is used to approximate p
+    """
+    # normalize
+    p /= sum(p)
+    q /= sum(q)
+
+    nbins = p.shape[0]
+
+    kb = 0
+    for i in range(nbins):
+        if p[i] != 0 and q[i] != 0:
+            kb += p[i]*math.log(p[i]/q[i])
+
+    return kb
 
 
 if __name__ == '__main__':
 
     args = initialize()
 
-    # load trajectory
-    if args.single_frame:
-        u = mda.Universe('%s' % args.gro)  # make universe with coordinate file
-        atom_names = ['name %s' % a for a in args.atoms]  # format string properly for use in select_atoms class
-        list = ' or '.join(atom_names)
-        pos = u.select_atoms("%s" % list).positions / 10 # get coordinates of selected atoms
-        box = u.dimensions[:3] / 10
-        frames = 1
-    else:
+    t = md.load('%s' % args.traj, top='%s' % args.gro)[args.begin:args.end]
 
-        if args.end:
-            t = md.load('%s' % args.traj, top='%s' % args.gro)[args.begin:args.end]
-        else:
-            t = md.load('%s' % args.traj, top='%s' % args.gro)[args.begin:]
-
-        atoms = args.atoms
-        keep = [a.index for a in t.topology.atoms if a.name in atoms]  # restrict trajectory to chosen atoms
-        pos = t.atom_slice(keep).xyz  # get just the coordinates
-        box = t.unitcell_lengths  # get the unit cell lengths
-        frames = np.shape(pos)[0]
+    atoms = args.atoms
+    keep = [a.index for a in t.topology.atoms if a.name in atoms]  # restrict trajectory to chosen atoms
+    pos = t.atom_slice(keep).xyz  # get just the coordinates
+    box = t.unitcell_lengths  # get the unit cell lengths
+    frames = np.shape(pos)[0]
 
     # find out along which axis we are going to analyze
     if args.axis == 'x':
@@ -286,9 +316,18 @@ if __name__ == '__main__':
     # plt.bar(r, dist, args.bin)
     # plt.show()
 
-    x, d = density(c, axis, args.bin, box)
-
+    x, d = density(c, axis, args.bin, box, sum=args.trajectory)
     nfig = 1
+
+    # to avoid confusion reading this later
+    traj = True
+    if len(x.shape) == 1:
+        traj = False
+
+    if traj:
+        bins = d.shape[1]
+    else:
+        bins = d.shape[0]  # because trajectory
 
     if args.fourier:
 
@@ -307,12 +346,50 @@ if __name__ == '__main__':
 
     if args.entropy:
 
-        H_real = entropy(x, d)
-        H_uniform = entropy(x, np.ones(d.shape))
+        H_real = entropy(d, traj)
 
-        print 'Entropy difference from uniform distribution : %s' % (H_uniform - H_real)
+        H_uniform = entropy(np.ones(bins), traj=False)
+
+        if traj:
+            H_diff = np.zeros(H_real.shape)
+            for frame in range(H_real.shape[0]):
+                H_diff[frame] = H_uniform - H_real[frame]
+
+            H_diff /= max(H_diff)
+            equil = timeseries.detectEquilibration(H_diff)[0]
+            print "Equilibration after %d ns" % (t.time[equil] / 1000)
+            avg_order = np.mean(H_diff[equil:])
+
+        else:
+            print 'Entropy difference from uniform distribution : %s' % (H_uniform - H_real)
+
+    if args.kb:
+        # Calculate Kullback-Leibler divergence
+        if traj:
+            x_kb, d_kb = density(c, axis, args.bin, box, sum=True)
+            kb_fwd = kullback_leiblier(np.ones(bins), d_kb)
+            kb_bwd = kullback_leiblier(d_kb, np.ones(bins))
+
+        else:
+            kb_fwd = kullback_leiblier(np.ones(bins) / bins, d)
+            kb_bwd = kullback_leiblier(d, np.ones(bins) / bins)
+
+        print 'kb_fwd = %.3f' % kb_fwd
+        print 'kb_bwd = %.3f' % kb_bwd
 
     if not args.noshow:
+
+        if traj and args.entropy:
+            plt.figure(nfig)
+            plt.plot(t.time, H_diff)
+            # plt.title('Entropy vs. time')
+            # plt.ylabel('$/delta$ S between real and uniform distribution')
+            plt.title('Equilibrium order fraction : %.2f' % avg_order)
+            plt.ylabel('Order Fraction')
+            plt.xlabel('Time (ps)')
+            plt.ylim(ymin=0)
+            nfig += 1
+
         plt.figure(nfig)
         plt.plot(x, d)
         plt.suptitle('Line number density of components along %s axis' % args.axis, fontsize=16)
