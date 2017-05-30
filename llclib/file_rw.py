@@ -457,7 +457,7 @@ def write_water_ndx(keep, t):
             count += 1
 
 
-def write_gro_pos(pos, out, name='NA'):
+def write_gro_pos(pos, out, name='NA', box=[0, 0, 0]):
     """
     write a .gro file from positions
     :param pos: xyz coordinates in
@@ -476,4 +476,8 @@ def write_gro_pos(pos, out, name='NA'):
             f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(i + 1, '%s' % name, '%s' % name, i + 1, pos[i, 0],
                                                         pos[i, 1], pos[i, 2]))
 
-        f.write('{:10f}{:10f}{:10f}\n'.format(0, 0, 0))
+        for i in range(len(box)):
+            f.write('{:10f}'.format(box[i]))
+
+        f.write('\n')
+        # f.write('{:10f}{:10f}{:10f}\n'.format(0, 0, 0))
