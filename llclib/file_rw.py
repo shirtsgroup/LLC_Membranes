@@ -415,8 +415,8 @@ def write_gro(t, out):
                 f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(a.residue.index + 1, 'SOL', d[a.name],
                                                     count + 1, pos[0, count, 0], pos[0, count, 1], pos[0, count, 2]))
             else:
-                f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(a.residue.index + 1, a.residue.name, a.name,
-                                                        count + 1, pos[0, count, 0], pos[0, count, 1], pos[0, count, 2]))
+                f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format((a.residue.index + 1) % 100000, a.residue.name, a.name,
+                                            (count + 1) % 100000, pos[0, count, 0], pos[0, count, 1], pos[0, count, 2]))
             count += 1
 
         f.write('{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}\n'.format(v[0, 0, 0], v[0, 1, 1], v[0, 2, 2],
@@ -473,8 +473,8 @@ def write_gro_pos(pos, out, name='NA', box=[0, 0, 0]):
 
         for i in range(pos.shape[0]):
 
-            f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(i + 1, '%s' % name, '%s' % name, i + 1, pos[i, 0],
-                                                        pos[i, 1], pos[i, 2]))
+            f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format((i + 1) % 100000, '%s' % name, '%s' % name,
+                                                                    (i + 1) % 100000, pos[i, 0], pos[i, 1], pos[i, 2]))
 
         for i in range(len(box)):
             f.write('{:10f}'.format(box[i]))

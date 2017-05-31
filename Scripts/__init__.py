@@ -1,1 +1,1 @@
-#! /usr/bin/env python
+import lc_class
