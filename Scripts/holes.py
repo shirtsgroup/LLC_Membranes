@@ -158,6 +158,34 @@ def check_layers(pt, layers, width):
     return contained
 
 
+def check_disks(pt, disk_locations, layer_width, disk_radius):
+    """
+    :param pt: point which we are checking
+    :param pores: coordinates of pore locations
+    :param r: radius of pores
+    :return: True/False - whether pt is contained in one of the pore regions
+    """
+
+    contained = False
+    ndisks = disk_locations.shape[0]
+
+    for i in range(ndisks):
+        radius = np.linalg.norm(disk_locations[i, :2] - pt[:2])
+        width = abs(disk_locations[i, 2] - pt[2])
+        if radius <= disk_radius and width <= 0.5*layer_width:
+            if args.gaussian:
+                # allow points inside the pores based on a gaussian probability
+                # The full cdf sums to 1. We are using half the pdf so the max the cdf will get is 0.5. So multiply by 2
+                probability = 2*scipy.stats.norm(r, r/2).cdf(radius)
+                if np.random.rand() >= probability:  # generate random number between 0 and 1 as a test
+                    contained = True  # Will only be excluded if it meets the condition
+            else:
+                contained = True
+            break
+
+    return contained
+
+
 if __name__ == "__main__":
 
     args = initialize()
@@ -207,8 +235,8 @@ if __name__ == "__main__":
         disks_per_layer = 6
         nlayers = int(z / args.dbwl)
         pore_radius = args.radius
-        disk_radius = .05
-        disk_location = np.zeros([npores*nlayers*disks_per_layer, 3])
+        disk_radius = 0.1
+        disk_locations = np.zeros([npores*nlayers*disks_per_layer, 3])
         for i in range(npores):
             for j in range(nlayers):
                 for k in range(disks_per_layer):
@@ -216,20 +244,15 @@ if __name__ == "__main__":
                     pt = np.array([pore_radius, 0, 0])
                     pt = Rz(pt, theta)
                     pore = np.append(pore_locations[i, :], layer_locations[j])
-                    disk_location[i*nlayers*disks_per_layer + j*disks_per_layer + k, :] = translate(pt, pore)
+                    disk_locations[i*nlayers*disks_per_layer + j*disks_per_layer + k, :] = translate(pt, pore)
 
-    file_rw.write_gro_pos(disk_location, 'disks.gro')
-    exit()
-
-    # plt.scatter(pore_locations[:, 0], pore_locations[:, 1])
-    # plt.plot(corners[:4, 0], corners[:4, 1])
-    # plt.show()
-    # exit()
     points = np.zeros([frames, npts, 3])
     rs = []
     # generate random points inside box
     for t in range(frames):
         for i in range(npts):
+            if i % 10000 == 0:
+                print i
             u = np.random.rand()
             b = np.random.rand()
             h = np.random.rand()
@@ -246,6 +269,13 @@ if __name__ == "__main__":
                     b = np.random.rand()
                     h = np.random.rand()
                     pt = A + u * AB + b * AD + h * AE
+            if args.disks:
+                while check_disks(pt, disk_locations, args.layer_width, disk_radius):
+                    u = np.random.rand()
+                    b = np.random.rand()
+                    h = np.random.rand()
+                    pt = A + u * AB + b * AD + h * AE
+
             points[t, i, :] = pt
 
     # plt.hist(rs)
