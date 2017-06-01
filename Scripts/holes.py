@@ -27,6 +27,7 @@ def initialize():
     parser.add_argument('--uniform', action="store_true", help='build a system with a uniform distribution of points')
     parser.add_argument('-lw', '--layer_width', default=0.1, type=float, help='width of layers')
     parser.add_argument('-dbwl', default=0.37, type=float, help='Distance between layers (nm)')
+    parser.add_argument('--disks', action="store_true", help='Create a system with stacked disks')
 
     args = parser.parse_args()
 
@@ -64,6 +65,40 @@ def position_restraints(file, atoms, axis, fconst):
         restraints[:, i] = [atom_numbers[i], 1, fcx, fcy, fcz]  # See: http://www.gromacs.org/Documentation/How-tos/Position_Restraints
 
     return restraints
+
+
+def translate(pt, translation):
+    """
+    :param pt: 3D coordinates of points to translate
+    :param translation: How far to translate the point in each direction
+    :return: translated point
+    """
+    translation = np.array(translation)
+    t = np.append(translation, [1])
+    T = np.zeros([4, 4])
+    for i in range(4):
+        T[i, i] = 1
+
+    T[:3, 3] = pt
+
+    return np.dot(T, t.T)[:3]
+
+
+def Rz(pt, theta):
+    """
+    :param pt: 3D coordinates of point to be rotated
+    :param theta: angle to rotate with respect z axis
+    :return: rotated point
+    """
+
+    R = np.zeros([3, 3])
+    R[2, 2] = 1
+    R[0, 0] = math.cos(theta)
+    R[0, 1] = -math.sin(theta)
+    R[1, 0] = math.sin(theta)
+    R[1, 1] = math.cos(theta)
+
+    return np.dot(R, pt)
 
 
 def check_pores(pt, pores, r):
@@ -138,7 +173,7 @@ if __name__ == "__main__":
     npores = rows**2
     frames = args.nframes
 
-    if args.layers:
+    if args.layers or args.disks:
         nlayers = z / args.dbwl
         z = nlayers * args.dbwl
         layer_locations = np.linspace(0, z, nlayers)
@@ -167,6 +202,24 @@ if __name__ == "__main__":
     for i in range(rows):
         for j in range(rows):
             pore_locations[i*rows + j, :] = [p2p*(0.5 + j) + p2p*(0.5 + i)*math.cos(angle), p2p/2*math.sin(angle) + i*p2p*math.sin(angle)]
+
+    if args.disks:
+        disks_per_layer = 6
+        nlayers = int(z / args.dbwl)
+        pore_radius = args.radius
+        disk_radius = .05
+        disk_location = np.zeros([npores*nlayers*disks_per_layer, 3])
+        for i in range(npores):
+            for j in range(nlayers):
+                for k in range(disks_per_layer):
+                    theta = 2*np.pi*k / disks_per_layer  # angle by which to rotate about pore axis
+                    pt = np.array([pore_radius, 0, 0])
+                    pt = Rz(pt, theta)
+                    pore = np.append(pore_locations[i, :], layer_locations[j])
+                    disk_location[i*nlayers*disks_per_layer + j*disks_per_layer + k, :] = translate(pt, pore)
+
+    file_rw.write_gro_pos(disk_location, 'disks.gro')
+    exit()
 
     # plt.scatter(pore_locations[:, 0], pore_locations[:, 1])
     # plt.plot(corners[:4, 0], corners[:4, 1])
