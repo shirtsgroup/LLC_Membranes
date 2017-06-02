@@ -28,6 +28,9 @@ def initialize():
     parser.add_argument('--noshow', action="store_true")
     parser.add_argument('--trajectory', action="store_false")
     parser.add_argument('--kb', action="store_true", help='Calculate kullback-leibler divergence')
+    parser.add_argument('--layers', action="store_true", help='Calculate the number of layers by binning')
+    parser.add_argument('-bb', '--binbins', type=int, help='number of bins')
+    parser.add_argument('--shift', default=0, type=int, help='shift starting point for binning to the right')
 
     args = parser.parse_args()
 
@@ -319,6 +322,35 @@ if __name__ == '__main__':
     x, d = density(c, axis, args.bin, box, sum=args.trajectory)
     nfig = 1
 
+    if args.layers:
+        # create a number of bins equal to the number of layers we are guessing
+        # leading_zeros = 0
+        # while d[leading_zeros] == 0:
+        #     leading_zeros += 1
+        #
+        # trailing_zeros = -1
+        # while d[trailing_zeros] == 0:
+        #     trailing_zeros -= 1
+        #
+        # trailing_zeros += d.shape[0]
+        # nnonzero = trailing_zeros - leading_zeros
+
+        shift = args.shift
+        density = np.trim_zeros(d, 'fb')  # get ride of leading and trailing zeros of density distribution
+        nvalues = density.shape[0]
+        values_per_bin = nvalues / args.binbins  # number of values in each bin
+        bins = np.zeros([values_per_bin])
+        for i in range(args.binbins):
+            for j in range(values_per_bin):
+                bins[j] += density[(i*values_per_bin + j + shift) % nvalues]
+
+        width = args.bin * values_per_bin
+        bin_width = x[1] - x[0]
+        x_values = np.linspace(0, width, values_per_bin)
+        plt.bar(x_values, bins, bin_width)
+        plt.show()
+        exit()
+
     # to avoid confusion reading this later
     traj = True
     if len(x.shape) == 1:
@@ -390,8 +422,9 @@ if __name__ == '__main__':
             plt.ylim(ymin=0)
             nfig += 1
 
+        bin_width = max(x[:d.shape[0]]) / d.shape[0]
         plt.figure(nfig)
-        plt.plot(x, d)
+        plt.bar(x[:d.shape[0]], d, bin_width)
         plt.suptitle('Line number density of components along %s axis' % args.axis, fontsize=16)
         plt.title('Bin size = %s nm' % args.bin, fontsize=12)
         plt.xlabel('Distance into membrane, z direction (nm)')
