@@ -10,8 +10,6 @@ import Periodic_Images
 import copy
 from llclib import file_rw, transform
 
-location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-
 
 def initialize():
 
