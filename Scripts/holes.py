@@ -8,13 +8,14 @@ import argparse
 import math
 import matplotlib.pyplot as plt
 import scipy.stats
+from scipy import spatial
+import tqdm
 
 
 def initialize():
 
     parser = argparse.ArgumentParser(description='Apply flat-bottomed position restraints based on a reference position')
 
-    parser.add_argument('-g', '--gro', default='wiggle.gro', help='A coordinate file')
     parser.add_argument('-xy', '--xy', default=8, type=float, help='box vector length in x and y direction')
     parser.add_argument('-z', '--z', default=8, type=float, help='box vector in z direction')
     parser.add_argument('-r', '--radius', default=0.5, type=float, help='radius of pores')
@@ -28,6 +29,7 @@ def initialize():
     parser.add_argument('-lw', '--layer_width', default=0.1, type=float, help='width of layers')
     parser.add_argument('-dbwl', default=0.37, type=float, help='Distance between layers (nm)')
     parser.add_argument('--disks', action="store_true", help='Create a system with stacked disks')
+    parser.add_argument('-m', '--min_dist', default=0.1, type=float, help='Minimum distance points must be from each other (nm)')
 
     args = parser.parse_args()
 
@@ -101,11 +103,26 @@ def Rz(pt, theta):
     return np.dot(R, pt)
 
 
-def check_pores(pt, pores, r):
+def nn(pt, all_pts):
+
+    if all_pts.shape[0] > 0:
+        neighbor = spatial.KDTree(all_pts).query(pt)[1]
+        ld = np.linalg.norm(pt - all_pts[neighbor, :])
+
+        if ld >= min_dist:
+            return True
+        else:
+            return False
+    else:
+        return True
+
+
+def check_pores(pt, pores, r, all_pts):
     """
     :param pt: point which we are checking
     :param pores: coordinates of pore locations
     :param r: radius of pores
+    :param all_pts: coordinates of all points placed so far in this frame
     :return: True/False - whether pt is contained in one of the pore regions
     """
 
@@ -116,7 +133,7 @@ def check_pores(pt, pores, r):
         radius = np.linalg.norm(pores[i] - pt[:2])
         if radius <= r:
             if args.gaussian:
-                # allow points inside the pores based on a gaussian probability
+               # allow points inside the pores based on a gaussian probability
                # The full cdf sums to 1. We are using half the pdf so the max the cdf will get is 0.5. So multiply by 2
                 probability = 2*scipy.stats.norm(r, r/2).cdf(radius)
                 if np.random.rand() >= probability:  # generate random number between 0 and 1 as a test
@@ -126,6 +143,9 @@ def check_pores(pt, pores, r):
             else:
                 contained = True
             break
+
+        elif not nn(pt, all_pts):
+            contained = True
 
     return contained
 
@@ -194,6 +214,7 @@ if __name__ == "__main__":
     y = args.xy
     z = args.z
 
+    min_dist = args.min_dist
     pore_radius = args.radius
     angle = np.pi / 3
     npts = args.npoints
@@ -204,7 +225,7 @@ if __name__ == "__main__":
     if args.layers or args.disks:
         nlayers = z / args.dbwl
         z = nlayers * args.dbwl
-       layer_locations = np.linspace(0, z, nlayers)
+        layer_locations = np.linspace(0, z, nlayers)
 
     corners = np.zeros([8, 3])
 
@@ -249,16 +270,14 @@ if __name__ == "__main__":
     points = np.zeros([frames, npts, 3])
     rs = []
     # generate random points inside box
-    for t in range(frames):
-        for i in range(npts):
-            if i % 10000 == 0:
-                print i
+    for t in tqdm.tqdm(range(frames)):
+        for i in tqdm.tqdm(range(npts)):
             u = np.random.rand()
             b = np.random.rand()
             h = np.random.rand()
             pt = A + u*AB + b*AD + h*AE  # places point inside 3D box defined by box vector AB, AD and AE
             if args.pores:
-                while check_pores(pt, pore_locations, pore_radius):  # force all points outside the pore region
+                while check_pores(pt, pore_locations, pore_radius, points[t, :i, :]):  # force all points outside the pore region
                     u = np.random.rand()
                     b = np.random.rand()
                     h = np.random.rand()
@@ -276,8 +295,16 @@ if __name__ == "__main__":
                     h = np.random.rand()
                     pt = A + u * AB + b * AD + h * AE
 
-            points[t, i, :] = pt
+            points[t, i, :] = np.round(pt, 1)
 
+    d = []
+    tree = spatial.KDTree(points[0, :, :])
+    for i in range(npts):
+        pt = tree.query(points[0, i, :], k=2)[1][1]
+        d.append(np.linalg.norm(points[0, pt, :] - points[0, i, :]))
+
+    print sorted(d)[:10]
+    print sorted(d)[-10:]
     # plt.hist(rs)
     # plt.show()
 

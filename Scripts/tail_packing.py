@@ -9,6 +9,7 @@ from scipy import spatial
 import matplotlib.pyplot as plt
 import math
 import os
+import tqdm
 
 
 def initialize():
@@ -25,7 +26,7 @@ def initialize():
     parser.add_argument('--end', default=-1, type=int, help='end frame')
     parser.add_argument('--noshow', action="store_true", help='Do not show plots at end')
     parser.add_argument('--suffix', help='Output suffix', default='traj')
-    parser.add_argument('--load', help='load previously saved arrays')
+    parser.add_argument('--load', action="store_true", help='load previously saved arrays')
     parser.add_argument('--write_gro', action="store_true", help='create .gro file of centroids')
 
     args = parser.parse_args()
@@ -48,7 +49,8 @@ def tail_centroid(pos, grps):
 
     centroids = np.zeros([nT, nmon * ngrps, 3])
 
-    for t in range(nT):
+    print 'Calculating tail centroids'
+    for t in tqdm.tqdm(range(nT)):
         for i in range(nmon):
             for j in range(ngrps):
                 centroid = np.zeros([3])
@@ -75,7 +77,8 @@ def nearest_neighbors(arr, d, lower_limit=0.4):
         for i in range(npts):
             nn_list[t].append([])  #using lists since this will vary in length
 
-    for t in range(nT):
+    print 'Calculating nearest neighbors'
+    for t in tqdm.tqdm(range(nT)):
         frame = arr[t, :, :]
         for i in range(npts):
             others = np.delete(frame, i, 0)  # delete self entry or else the nearest neighbor is itself
@@ -106,7 +109,8 @@ def angles_ld(arr, indices, normal=[0, 0, 1]):
     angles = []
     ld = []
 
-    for t in range(nT):
+    print 'Calculating angles between nearest neigbors'
+    for t in tqdm.tqdm(range(nT)):
         for i in range(npts):
             # for j in range(len(indices[i])):
             for j in indices[t][i]:
@@ -162,7 +166,7 @@ if __name__ == "__main__":
     if not args.load:
         nlist = nearest_neighbors(centroids, args.cutoff)
     else:
-        np.load('nlist')
+        np.load('nlist.npy')
 
     if args.save and not args.load:
         np.save('nlist', nlist)

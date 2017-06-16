@@ -488,6 +488,8 @@ if __name__ == "__main__":
     no_layers = args.layers  # Number of layers in a pore
     dist = args.dbwl  # distance between layers (units tbd)
 
+    location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
     # Read in build monomer coordinates
     f = open("%s/../top/HII_Monomer_Configurations/%s" % (location, build_mon), "r")
     if build_mon.endswith('.pdb'):

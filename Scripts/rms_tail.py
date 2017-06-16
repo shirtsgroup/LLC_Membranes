@@ -8,6 +8,8 @@ from pymbar import timeseries
 import matplotlib.pyplot as plt
 from tabulate import tabulate
 import math
+import tqdm
+import progressbar
 
 
 def initialize():
@@ -25,6 +27,10 @@ def initialize():
     parser.add_argument('--taper', action="store_true", help='Step through each tail atom and calculate individual rmsds'
                                                              'then use that to calculate taper angle')
     parser.add_argument('--skip', default=1, type=int, help='Only read every nth frame')
+    parser.add_argument('--avg', action="store_true", help='Calculate the average rmsd over all frames')
+    parser.add_argument('--length', action="store_true", help='Calculate average length of monomers from head to tail')
+    parser.add_argument('--all', action="store_true", help='Do all of the optional calculations')
+    parser.add_argument('--noshow', action="store_true", help='Do not show plots')
 
     args = parser.parse_args()
 
@@ -274,6 +280,34 @@ def taper_plane(tail):
 
     return tapers
 
+
+def monomer_length(tail1, tail2, tail3, ref):
+    """
+    :param tail1: xyz positions of tail 1
+    :param tail2: xyz positions of tail 2
+    :param tail3: xyz positions of tail 3
+    :param ref: reference atom position signifying the front end of the monomer
+    :return: Average monomer length (nm)
+    """
+
+    nmon = ref.shape[1]  # number of monomers in unit cell
+    atoms_per_tail = tail1.shape[1] / nmon  # number of atoms in each tail. Assuming identical length tails
+    nT = ref.shape[0]  # number of frames
+
+    d = []
+    for t in range(nT):
+        for i in range(nmon):
+            ref_xyz = ref[t, i, :]
+            # To speed up the calculation, only calculate distance between reference atom and last carbon on tail
+            dist1 = np.linalg.norm(tail1[t, atoms_per_tail*(i + 1) - 1, :] - ref_xyz)
+            dist2 = np.linalg.norm(tail2[t, atoms_per_tail*(i + 1) - 1, :] - ref_xyz)
+            dist3 = np.linalg.norm(tail3[t, atoms_per_tail*(i + 1) - 1, :] - ref_xyz)
+            d.append(dist1)
+            d.append(dist2)
+            d.append(dist3)
+
+    return np.mean(d), np.std(d)
+
 if __name__ == "__main__":
 
     args = initialize()
@@ -281,7 +315,7 @@ if __name__ == "__main__":
     t = md.load(args.traj, top=args.gro)[::args.skip]  # load trajectory
     time = t.time
     nT = t.n_frames
-
+    bar = progressbar.ProgressBar()
     mon = lc_class.LC(args.monomer)  # create monomer object
     lineatoms = mon.lineatoms  # indices of atoms in monomer used to make reference line. These happen to be the same
                                # ones that are used to build initial configurations
@@ -295,184 +329,341 @@ if __name__ == "__main__":
 
     lines_keep = [i for i in range(nmon*atoms_per_monomer) if i % atoms_per_monomer == lineatoms[0] or i % atoms_per_monomer == lineatoms[1]]
     plane_keep = [a.index for a in t.topology.atoms if a.name in planeatoms]
-    if args.taper:
+    if args.taper or args.length or args.all:
         taper_keep = [i for i in range(nmon*atoms_per_monomer) if i % atoms_per_monomer == taper_atom]
 
     pts = t.atom_slice(lines_keep).xyz  # point defining reference line or plane
     planes = t.atom_slice(plane_keep).xyz  # point defining reference line or plane
-    if args.taper:
+    if args.taper or args.length or args.all:
         taper_ref = t.atom_slice(taper_keep).xyz  # points used as a reference for defining the taper angle
 
     grps = read_index(args.index)  # read the index file containing names of atoms in tail
     atoms_per_tail = len(grps[0])  # number of atoms in each tail (assumed to be equal in all tails)
 
     tail1_index = [a.index for a in t.topology.atoms if a.name in grps[0]]  # indices of all tail1 atoms
-    if args.axis == 'z':  # include the middle tail
+    if args.axis == 'z' or args.length or args.all:  # include the middle tail
         tail2_index = [a.index for a in t.topology.atoms if a.name in grps[1]]
     tail3_index = [a.index for a in t.topology.atoms if a.name in grps[2]]
 
     # positions of all atoms in chains
     tail1 = t.atom_slice(tail1_index).xyz
-    if args.axis == 'z':  # include the middle chain
+    if args.axis == 'z' or args.length or args.all:  # include the middle chain
         tail2 = t.atom_slice(tail2_index).xyz
     tail3 = t.atom_slice(tail3_index).xyz
 
-    tail1_distance = np.zeros([nT, tail1.shape[1]])
-    if args.axis == 'z': # include the middle chain
-        tail2_distance = np.zeros([nT, tail2.shape[1]])
-    tail3_distance = np.zeros([nT, tail3.shape[1]])
+    if args.axis == 'xy' or args.all:
+        tail1_distance_xy = np.zeros([nT, tail1.shape[1]])
+        tail3_distance_xy = np.zeros([nT, tail3.shape[1]])
+
+    if args.axis == 'z' or args.all:
+        tail1_distance_z = np.zeros([nT, tail1.shape[1]])
+        tail2_distance_z = np.zeros([nT, tail2.shape[1]])
+        tail3_distance_z = np.zeros([nT, tail3.shape[1]])
 
     ntails = tail1.shape[1] / atoms_per_tail  # really the number of monomers
 
-    if args.axis == 'xy':  # measure xy distance from each point in outside tails to reference line drawn down monomer
-        for t in range(nT):
+    if args.axis == 'xy' or args.all:  # measure xy distance from each point in outside tails to reference line drawn down monomer
+        print 'Calculating xy distance between carbon and reference line'
+        for t in bar(range(nT)):
             for i in range(ntails):
                 for j in range(atoms_per_tail):
                     plane = np.zeros([3, 3])
                     plane[0, :] = planes[t, 3*i, :]
                     plane[1, :] = planes[t, 3*i + 1, :]
                     plane[2, :] = planes[t, 3*i + 2, :]
-                    tail1_distance[t, atoms_per_tail*i + j] = dist2line(tail1[t, atoms_per_tail*i + j], pts[t, 2*i, :], pts[t, 2*i + 1, :], plane, axis=args.axis)
+                    tail1_distance_xy[t, atoms_per_tail*i + j] = dist2line(tail1[t, atoms_per_tail*i + j], pts[t, 2*i, :], pts[t, 2*i + 1, :], plane, axis=args.axis)
                     # tail2_distance[t, atoms_per_tail*i + j] = dist2line(tail2[t, atoms_per_tail*i + j], pts[t, 2*i, :], pts[t, 2*i + 1, :], axis=args.axis)
-                    tail3_distance[t, atoms_per_tail*i + j] = dist2line(tail3[t, atoms_per_tail*i + j], pts[t, 2*i, :], pts[t, 2*i + 1, :], plane, axis=args.axis)
+                    tail3_distance_xy[t, atoms_per_tail*i + j] = dist2line(tail3[t, atoms_per_tail*i + j], pts[t, 2*i, :], pts[t, 2*i + 1, :], plane, axis=args.axis)
 
             # mask arrays in case of nan's. They do not occur often but 1 is enough to mess up the whole calculation
-            tail1_distance = np.ma.masked_array(tail1_distance, np.isnan(tail1_distance))
-            tail3_distance = np.ma.masked_array(tail3_distance, np.isnan(tail3_distance))
+            tail1_distance_xy = np.ma.masked_array(tail1_distance_xy, np.isnan(tail1_distance_xy))
+            tail3_distance_xy = np.ma.masked_array(tail3_distance_xy, np.isnan(tail3_distance_xy))
 
-    elif args.axis == 'z':  # measure distance from each tail to a plane defined by benzene ring
-        for t in range(nT):
+    if args.axis == 'z' or args.all:  # measure distance from each tail to a plane defined by benzene ring
+        print 'Calculating z distance between carbon and reference plane'
+        for t in bar(range(nT)):
             for i in range(ntails):
                 for j in range(atoms_per_tail):
-                    tail1_distance[t, atoms_per_tail*i + j] = pt2plane(tail1[t, atoms_per_tail*i + j], planes[t, 3*i, :], planes[t, 3*i + 1, :], planes[t, 3*i + 2, :])
-                    tail2_distance[t, atoms_per_tail*i + j] = pt2plane(tail2[t, atoms_per_tail*i + j], planes[t, 3*i, :], planes[t, 3*i + 1, :], planes[t, 3*i + 2, :])
-                    tail3_distance[t, atoms_per_tail*i + j] = pt2plane(tail3[t, atoms_per_tail*i + j], planes[t, 3*i, :], planes[t, 3*i + 1, :], planes[t, 3*i + 2, :])
+                    tail1_distance_z[t, atoms_per_tail*i + j] = pt2plane(tail1[t, atoms_per_tail*i + j], planes[t, 3*i, :], planes[t, 3*i + 1, :], planes[t, 3*i + 2, :])
+                    tail2_distance_z[t, atoms_per_tail*i + j] = pt2plane(tail2[t, atoms_per_tail*i + j], planes[t, 3*i, :], planes[t, 3*i + 1, :], planes[t, 3*i + 2, :])
+                    tail3_distance_z[t, atoms_per_tail*i + j] = pt2plane(tail3[t, atoms_per_tail*i + j], planes[t, 3*i, :], planes[t, 3*i + 1, :], planes[t, 3*i + 2, :])
 
         # mask arrays in case of nan's. They do not occur often but 1 is enough to mess up the whole calculation
-        tail1_distance = np.ma.masked_array(tail1_distance, np.isnan(tail1_distance))
-        tail2_distance = np.ma.masked_array(tail2_distance, np.isnan(tail2_distance))
-        tail3_distance = np.ma.masked_array(tail3_distance, np.isnan(tail3_distance))
+        tail1_distance_z = np.ma.masked_array(tail1_distance_z, np.isnan(tail1_distance_z))
+        tail2_distance_z = np.ma.masked_array(tail2_distance_z, np.isnan(tail2_distance_z))
+        tail3_distance_z = np.ma.masked_array(tail3_distance_z, np.isnan(tail3_distance_z))
 
-    if args.taper:
-        RMSD1 = np.zeros([nT, atoms_per_tail])
-        if args.axis == 'z':
-            RMSD2 = np.zeros([nT, atoms_per_tail])
-        RMSD3 = np.zeros([nT, atoms_per_tail])
+    # if args.taper or args.all:
+    #     RMSD1 = np.zeros([nT, atoms_per_tail])
+    #     if args.axis == 'z' or args.all:
+    #         RMSD2 = np.zeros([nT, atoms_per_tail])
+    #     RMSD3 = np.zeros([nT, atoms_per_tail])
+    #
+    #     for i in range(atoms_per_tail):
+    #         RMSD1[:, i] = rmsd(tail1_distance[:, i::atoms_per_tail])
+    #         if args.axis == 'z' or args.all:
+    #             RMSD2[:, i] = rmsd(tail2_distance[:, i::atoms_per_tail])
+    #         RMSD3[:, i] = rmsd(tail3_distance[:, i::atoms_per_tail])
+    #
+    # else:
+    #     RMSD1 = rmsd(tail1_distance)
+    #     if args.axis == 'z':
+    #         RMSD2 = rmsd(tail2_distance)
+    #     RMSD3 = rmsd(tail3_distance)
+
+    if args.length or args.all:
+
+        L, L_std = monomer_length(tail1, tail2, tail3, taper_ref)
+
+        print 'Average monomer length from head to tail : %.2f +/- %.2f' %(L, L_std)
+
+    if args.taper or args.all:
+
+        if args.axis == 'xy' or args.all:
+            RMSD1_xy = np.zeros([nT, atoms_per_tail])
+            RMSD3_xy = np.zeros([nT, atoms_per_tail])
+
+        if args.axis == 'z' or args.all:
+            RMSD1_z = np.zeros([nT, atoms_per_tail])
+            RMSD2_z = np.zeros([nT, atoms_per_tail])
+            RMSD3_z = np.zeros([nT, atoms_per_tail])
 
         for i in range(atoms_per_tail):
-            RMSD1[:, i] = rmsd(tail1_distance[:, i::atoms_per_tail])
-            if args.axis == 'z':
-                RMSD2[:, i] = rmsd(tail2_distance[:, i::atoms_per_tail])
-            RMSD3[:, i] = rmsd(tail3_distance[:, i::atoms_per_tail])
 
-    else:
-        RMSD1 = rmsd(tail1_distance)
-        if args.axis == 'z':
-            RMSD2 = rmsd(tail2_distance)
-        RMSD3 = rmsd(tail3_distance)
+            if args.axis == 'xy' or args.all:
+                RMSD1_xy[:, i] = rmsd(tail1_distance_xy[:, i::atoms_per_tail])
+                RMSD3_xy[:, i] = rmsd(tail3_distance_xy[:, i::atoms_per_tail])
 
-    if not args.time and not args.taper:
-
-        equil_frames = []
-        equil_frames.append(timeseries.detectEquilibration(RMSD1)[0])
-        if args.axis == 'z':
-            equil_frames.append(timeseries.detectEquilibration(RMSD2)[0])
-        equil_frames.append(timeseries.detectEquilibration(RMSD3)[0])
-
-        equil = max(equil_frames)
-
-        RMSDsum = RMSD1[equil:] + RMSD3[equil:]
-        if args.axis == 'z':
-            RMSDsum += RMSD2[equil:]
-            n = 3.0
-        else:
-            n = 2.0
-
-        RMSD = np.mean(RMSDsum) / n
-
-        print 'Root mean square deviation with respect to %s axis = %.3f nm' % (args.axis, RMSD)
-
-    elif args.taper:
+            if args.axis == 'z' or args.all:
+                RMSD1_z[:, i] = rmsd(tail1_distance_z[:, i::atoms_per_tail])
+                RMSD2_z[:, i] = rmsd(tail2_distance_z[:, i::atoms_per_tail])
+                RMSD3_z[:, i] = rmsd(tail3_distance_z[:, i::atoms_per_tail])
 
         # find when each rmsd value equilibrates
         equil_frames = []
 
         for i in range(atoms_per_tail):  # look for equilibration of each tail atom
-            equil_frames.append(timeseries.detectEquilibration(RMSD1[:, i])[0])
-            if args.axis == 'z':
-                equil_frames.append(timeseries.detectEquilibration(RMSD2[:, i])[0])
-            equil_frames.append(timeseries.detectEquilibration(RMSD3[:, i])[0])
+
+            if args.axis == 'xy' or args.all:
+                equil_frames.append(timeseries.detectEquilibration(RMSD1_xy[:, i])[0])
+                equil_frames.append(timeseries.detectEquilibration(RMSD3_xy[:, i])[0])
+
+            if args.axis == 'z' or args.all:
+                equil_frames.append(timeseries.detectEquilibration(RMSD1_z[:, i])[0])
+                equil_frames.append(timeseries.detectEquilibration(RMSD2_z[:, i])[0])
+                equil_frames.append(timeseries.detectEquilibration(RMSD3_z[:, i])[0])
 
         equil = max(equil_frames)  # choose the largest of them all to be safe
 
-        RMSD = np.zeros([atoms_per_tail])  # average all the values
-        for i in range(atoms_per_tail):
-            RMSD[i] += np.mean(RMSD1[equil:, i])
-            if args.axis == 'z':
-                RMSD[i] += np.mean(RMSD2[equil:, i])
-            RMSD[i] += np.mean(RMSD3[equil:, i])
+        if args.axis == 'xy' or args.all:
+            RMSD_xy = np.zeros([atoms_per_tail])  # average all the values
+            for i in range(atoms_per_tail):
+                RMSD_xy[i] += np.mean(RMSD1_xy[equil:, i])
+                RMSD_xy[i] += np.mean(RMSD3_xy[equil:, i])
 
-        if args.axis == 'z':
-            n = 3  # 3 tails are analyzed when looking at the z axis
-        else:
-            n = 2
+            RMSD_xy /= 2.0
 
-        RMSD /= n
+        if args.axis == 'z' or args.all:
+            RMSD_z = np.zeros([atoms_per_tail])  # average all the values
+            for i in range(atoms_per_tail):
+                RMSD_z[i] += np.mean(RMSD1_z[equil:, i])
+                RMSD_z[i] += np.mean(RMSD2_z[equil:, i])
+                RMSD_z[i] += np.mean(RMSD3_z[equil:, i])
+
+            RMSD_z /= 3.0
 
         # make a table
         headers = ['Carbon', 'RMSD']
-        carbons = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11']
+        carbons = []
+        for i in range(atoms_per_tail):
+            carbons.append('C%s' % (i + 1))
 
-        table = []
-        for i in range(len(carbons)):
-            table.append([])
-            table[i].append(carbons[i])
-            table[i].append(round(RMSD[i], 3))
+        if args.axis == 'xy' or args.all:
+            table = []
+            if args.time:
+                if nT > 20:  # not considering system equilibration since we are looking at a time dependent trajectory
+                    jump = nT / 10
+                    entries = 10
+                else:
+                    jump = 1
+                    entries = nT
+                for i in range(len(carbons)):
+                    table.append([])
+                    table[i].append(carbons[i])
+                    for j in range(entries):
+                        value = (np.mean(RMSD1_xy[j*jump:(j+1)*jump, i]) + np.mean(RMSD3_xy[j*jump:(j+1)*jump, i])) / 2
+                        table[i].append(round(value, 3))
+            else:
+                for i in range(len(carbons)):
+                    table.append([])
+                    table[i].append(carbons[i])
+                    table[i].append(round(RMSD_xy[i], 3))
 
-        print tabulate(table, headers=headers)
+            print 'RMSD of individual carbons with respect to xy axis'
+            print tabulate(table, headers=headers)
+
+        if args.axis == 'z' or args.all:
+            table = []
+            if args.time:
+                if nT > 20:  # not considering system equilibration since we are looking at a time dependent trajectory
+                    jump = nT / 10
+                    entries = 10
+                else:
+                    jump = 1
+                    entries = nT
+                for i in range(len(carbons)):
+                    table.append([])
+                    table[i].append(carbons[i])
+                    for j in range(entries):
+                        value = (np.mean(RMSD1_z[j*jump:(j+1)*jump, i]) + np.mean(RMSD2_z[j*jump:(j+1)*jump, i]) +
+                                 np.mean(RMSD3_z[j*jump:(j+1)*jump, i])) / 3
+                        table[i].append(round(value, 3))
+            else:
+                for i in range(len(carbons)):
+                    table.append([])
+                    table[i].append(carbons[i])
+                    table[i].append(round(RMSD_z[i], 3))
+
+            print 'RMSD of individual carbons with respect to z axis'
+            print tabulate(table, headers=headers)
 
         # now find the taper angle
-        if args.axis == 'xy':
+        if args.axis == 'xy' or args.all:
 
-            tapers = np.zeros([nT, 2*ntails])
-            tapers[:, :ntails] = taper_line(tail1, planes)
-            tapers[:, ntails:] = taper_line(tail3, planes)
+            n = 2
+            tapers_xy = np.zeros([nT, n*ntails])
+            tapers_xy[:, :ntails] = taper_line(tail1, planes)
+            tapers_xy[:, ntails:] = taper_line(tail3, planes)
 
-        if args.axis == 'z':
+        if args.axis == 'z' or args.all:
 
-            tapers = np.zeros([nT, 3*ntails])
-            tapers[:, :ntails] = taper_plane(tail1)
-            tapers[:, ntails:2*ntails] = taper_plane(tail2)
-            tapers[:, 2*ntails:] = taper_plane(tail3)
+            n = 3
+            tapers_z = np.zeros([nT, n*ntails])
+            tapers_z[:, :ntails] = taper_plane(tail1)
+            tapers_z[:, ntails:2*ntails] = taper_plane(tail2)
+            tapers_z[:, 2*ntails:] = taper_plane(tail3)
 
-        mean = np.zeros([nT])
-        for t in range(nT):
-            mean[t] = np.mean(tapers[t, :])
+        equil = []
+        if args.axis == 'xy' or args.all:
+            mean_xy = np.zeros([nT])
+            for t in range(nT):
+                mean_xy[t] = np.mean(tapers_xy[t, :])
 
-        equil = timeseries.detectEquilibration(mean)[0]
+            equil.append(timeseries.detectEquilibration(mean_xy)[0])
 
-        print 'Average taper angle: %.2f degrees' % np.mean(tapers[t, equil:])
-        plt.plot(time, mean)
-        plt.show()
+        if args.axis == 'z' or args.all:
+            mean_z = np.zeros([nT])
+            for t in range(nT):
+                mean_z[t] = np.mean(tapers_z[t, :])
 
-    if args.time:
+            equil.append(timeseries.detectEquilibration(mean_z)[0])
 
-        if args.taper:
-            RMSD1 = rmsd(tail1_distance)
+        equil = max(equil)
+
+        if args.axis == 'xy' or args.all:
+            print 'Average taper angle w.r.t in xy plane: %.2f degrees' % np.mean(tapers_xy[t, equil:])
+            plt.plot(time, mean_xy)
+        if args.axis == 'z' or args.all:
+            print 'Average taper angle w.r.t z plane: %.2f degrees' % np.mean(tapers_z[t, equil:])
+            plt.plot(time, mean_z)
+
+        if not args.noshow:
+            plt.show()
+
+    if args.avg or args.all:
+
+        if args.axis == 'xy' or args.all:
+
+            RMSD1_xy = rmsd(tail1_distance_xy)
+            RMSD3_xy = rmsd(tail3_distance_xy)
+
+        if args.axis == 'z' or args.all:
+
+            RMSD1_z = rmsd(tail1_distance_z)
+            RMSD2_z = rmsd(tail2_distance_z)
+            RMSD3_z = rmsd(tail3_distance_z)
+
+        # need to do some modification of RMSD lists if you use --avg with --taper since the structure of the arrays are different : ([nT]) versus ([nT, mon_per_tail])
+        equil_frames = []
+        # print RMSD1.shape, RMSD2.shape, RMSD3.shape
+        if args.axis == 'xy' or args.all:
+            equil_frames.append(timeseries.detectEquilibration(RMSD1_xy)[0])
+            equil_frames.append(timeseries.detectEquilibration(RMSD3_xy)[0])
+
+        if args.axis == 'z' or args.all:
+            equil_frames.append(timeseries.detectEquilibration(RMSD1_z)[0])
+            equil_frames.append(timeseries.detectEquilibration(RMSD2_z)[0])
+            equil_frames.append(timeseries.detectEquilibration(RMSD3_z)[0])
+
+        equil = max(equil_frames)
+
+        if args.axis == 'xy' or args.all:
+
+            n = 2.0
+            RMSDsum = RMSD1_xy[equil:] + RMSD3_xy[equil:]
+            RMSD_xy = np.mean(RMSDsum) / n
+            RMSD_xy_std = np.std(RMSDsum) / n
+            print 'Root mean square deviation with respect to xy axis = %.3f +/- %.3f nm' % (RMSD_xy, RMSD_xy_std)
+
+        if args.axis == 'z' or args.all:
+
+            n = 3.0
+            RMSDsum = RMSD1_z[equil:] + RMSD2_z[equil:] + RMSD3_z[equil:]
+            RMSD_z = np.mean(RMSDsum) / n
+            RMSD_z_std = np.std(RMSDsum) / n
+            print 'Root mean square deviation with respect to z axis = %.3f +/- %.3f nm' % (RMSD_z, RMSD_z_std)
+
+    if args.all:
+        # special bonus unlockable when specifying the --all flag
+        # The Volume of a monomer 'cone' with an elliptical base : (1/3)*pi*a*b*h
+        # a : length  of semimajor axis (RMSD in xy)
+        # b : length of semiminor axis (RMSD in z)
+        # h : height of cone (monomer length)
+
+        V = (1. / 3.) * np.pi * RMSD_z * RMSD_xy * L
+        # uncertainty
+        s = np.sqrt(L_std ** 2 + RMSD_z_std ** 2 + RMSD_xy_std ** 2)
+
+        print 'Average monomer volume : %.3f +/- %.3f nm3' %(V, s)
+
+    if args.time or args.all:
+
+        if not args.avg or not args.all:
+
+            if args.axis == 'xy':
+
+                RMSD1_xy = rmsd(tail1_distance_xy)
+                RMSD3_xy = rmsd(tail3_distance_xy)
+
             if args.axis == 'z':
-                RMSD2 = rmsd(tail2_distance)
-            RMSD3 = rmsd(tail3_distance)
 
-        plt.plot(time, RMSD1, label='Tail 1')
-        if args.axis == 'z':
-            plt.plot(time, RMSD2, label='Tail 2')
-            reference = 'plane'
-        else:
-            reference = 'tail'
-        plt.plot(time, RMSD3, label='Tail 3')
-        plt.title('Root mean square deviation of tail atoms from reference %s' % reference)
-        plt.xlabel('time (ps)')
-        plt.ylabel('RMSD')
-        plt.legend()
-        plt.show()
+                RMSD1_z = rmsd(tail1_distance_z)
+                RMSD2_z = rmsd(tail2_distance_z)
+                RMSD3_z = rmsd(tail3_distance_z)
+
+        nfig = 0
+
+        if args.axis == 'xy' or args.all:
+            nfig += 1
+            plt.figure(nfig)
+            plt.plot(time, RMSD1_xy, label='Tail 1')
+            plt.plot(time, RMSD3_xy, label='Tail 3')
+            plt.title('Root mean square deviation of tail atoms from reference tail')
+            plt.xlabel('time (ps)')
+            plt.ylabel('RMSD')
+            plt.legend()
+
+        if args.axis == 'z' or args.all:
+            nfig += 1
+            plt.figure(nfig)
+            plt.plot(time, RMSD1_z, label='Tail 1')
+            plt.plot(time, RMSD2_z, label='Tail 2')
+            plt.plot(time, RMSD3_z, label='Tail 3')
+            plt.title('Root mean square deviation of tail atoms from reference plane')
+            plt.xlabel('time (ps)')
+            plt.ylabel('RMSD')
+            plt.legend()
+
+        if not args.noshow:
+            plt.show()
 

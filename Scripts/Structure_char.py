@@ -46,6 +46,7 @@ def initialize():
                                                     "distance to exclude automatically by dropping the highest value")
     parser.add_argument('--save', action="store_true", help='Save the output plot')
     parser.add_argument('--buffer', default=0, type=float, help='Distance into membrane to look for components')
+    parser.add_argument('--plot_avg', action="store_true", help='Plot average p2p distance at each frame')
 
     args = parser.parse_args()
 
@@ -369,10 +370,26 @@ if __name__ == '__main__':
     labels = ['1-2', '1-3', '1-4', '2-3', '2-4', '3-4']
     labels = ['1-4', '1-0', '0-2', '0-4', '0-3', '2-3', '2-5', '5-3', '3-4', '5-6', '3-7', '6-7', '4-7', '7-8',
               '4-8', '3-6']
-    plt.figure(1)
-    for i in range(distances):
-        if i not in exclude:
-            plt.plot(t.time, p2ps[i, :], label='%s' % labels[i])
+
+    if args.plot_avg:
+        plt.figure(1)
+        avg = np.zeros(p2ps[0, :].shape)
+        n = 0
+        for i in range(distances):
+            if i not in exclude:
+                avg += p2ps[i, :]
+                n += 1
+
+        avg /= n
+
+        plt.plot(t.time, avg)
+
+    else:
+        plt.figure(1)
+        for i in range(distances):
+            if i not in exclude:
+                plt.plot(t.time, p2ps[i, :], label='%s' % labels[i])
+
     plt.title('Pore to Pore Distance Equilibration')
     plt.ylabel('Distance between pores (nm)')
     plt.xlabel('Time (ps)')
