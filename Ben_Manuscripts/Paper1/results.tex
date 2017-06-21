@@ -1,0 +1,228 @@
+\section{Results and Discussion}
+
+In order to construct an initial configuration which gives reliable 
+trends, we need to understand the composition of layers, how far apart
+to stack the layers, and how to orient them with respect to each other.
+
+The initial distance between layers can influence the approach towards
+equilibrium. In the real system, according to wide angle X-ray
+scattering (WAXS) experiments, layers are stacked 3.7 \angstrom apart.
+A characteristic of equilibrated systems simulated in this way, is a
+defined, cylindrical and open pore structure. Benzene rings arrange in
+a helical conformation after equilbration. The membrane is about 8 nm
+thick. We will refer to this system as Phase A. (Fig ~\ref{fig:phaseA})
+Simulations of systems built with layers stacked > 4 \angstrom apart
+results in a pore structure characterized by high radial disorder,
+while maintaining partitioning between hydrophobic and hydrophilic
+regions. This will be called phase B (Fig~\ref{fig:phaseB})
+% The arrangement of sodium ions (which are closely bound to carbonyl
+% head groups) can be well-approximated by a gaussian distribution 
+It is apparent that this LLC membrane may exist in at least two
+metastable states. The distinct difference in pore structure exhibited
+by each phase will likely lead to different transport mechanisms.
+Understanding which phase exists experimentally is necessary in order
+to appropriately study the system.
+%Like phase A, phase B can form at 280K. 
+%The phase is also present when phase A is heated close to its isotropic transition point
+%There are distinct differences in the membrane and pore structures between each state (Fig~\ref{fig:porestructures})
+
+        Full comparison of experimental 2D WAXS with simulated X-ray diffraction patterns produced from MD trajectories shows the most consistency with the parallel-displaced configuration made up of 5 monomers per layer.
+        \begin{itemize}
+                \item Phase A
+                \begin{itemize}
+                        \item Purely stacked configuration is missing reflections at 2, 4, 8 and 10 0'clock, but they are there in the parallel displaced conformation
+                        \item There is evidence that the stacked configuration will shift towards an offset configuration over time. WAXS spots show up after short simulations, in which case there is visible movement away from a perfectly stacked, towards a parallel displaced conformation
+                        \item Pi-stacking reflections are present in all cases but at spacings higher than shown experimentally. This is not surprising since GAFF will not properly treat pi-stacking.
+                        \item Interestingly, the spots, which are usually associated with alkyl chain tilt, still appear with an average tilt angle of 0 degrees
+                \end{itemize}
+                \item Phase B
+                \begin{itemize}
+                        \item Stacking refelctions present indicating separation of $\approx$ 5 \angstrom
+                        \item No spots at all which is consistent with the disorder shown by the rings in the pore
+                \end{itemize}
+                \item Both phases show a ring in the simulated 2D WAXS patterns at q $\approx$ 1.4 \angstrom \textsuperscript{-1} which is typical of packed alkane chains
+                \item Both phases exhibit axial reflections. Even though the rings are not ordered in phase B,
+%MRS2: not quite clear what physical structures the axial reflections correspond to (what are the distances? What do they correspond to?)
+they are still partitioned into layers which gives rise to an axial refelction at the same distance where we expect alkane chain packing to be present
+%MRS2: how are they layers defined here? Can you bring in more information about the nonuniformity of the density?
+%BJC2: Are you thinking about the fourier transforms? I could bring that in
+        \end{itemize}
+
+
+
+We varied the relative interlayer orientation between sandwiched and 
+parallel-displaced based on our knowledge of the stability of these two
+pi-stacking modes. Short simulations were run with position restraints
+on benzene rings. Simulated X-ray diffraction patterns generated from 
+each configuration establishes a link between the parallel displaced 
+stacking mode and major features present in experimental XRD patterns.  % FIGURE!!!!!!!!!!
+The faint ring at a distance of $\approx$ 1.5 \angstrom \textsuperscript{-1} 
+is commonly identified as a result of the average packing distance 
+between alkane chains. Four spots of higher intensity are visible in the 
+alkane chain region creating an x-shaped pattern. The spots are only
+generated for structures created in the parallel displaced configuration.
+In the past, the spots have been attributed to the tilt angle of the 
+alkane chains. Theoretically the angle is the same as that made between 
+the spots and the x-axis. However, we achieved the same pattern with 
+a calculated average tilt angle of 0 $\pm$ 9 degrees. % GET THE RIGHT NUMBER !!!!!
+
+Further simulation indicates that both configurations are stable for 
+100's of nanoseconds. Simulated diffraction of the sandwiched 
+configuration after equilibration shows the spots which were not initially
+present, implying that there is a shift towards the parallel-displaced
+mode. To quantify the degree of sandwiched stacking, we measured the 
+amount of overlap between projections of benzene rings and those below
+them. The amount of overlap between projections decreases rapidly. % FIGURE !!! overlap 
+	
+To understand the composition of the monomer layers, we ran simulations
+created using between 4 and 8 monomers in each layer. All configurations 
+were run for at least 200 ns. We showed that we can rule out systems 
+consisting of 4, 7, and 8 monomers based purely on comparison of 
+simulated pore spacing to experimental measurements.
+(Table~\ref{table:p2p}). 
+        
+The stability of crystalline phases is strongly dependent on temperature,
+requiring evaluation of our force field's ability to represent the 
+temperature at which we are simulating. All simulations were run and 
+equilibrated at 280K. To observe temperature dependent behavior, 
+the system temperature of 280K equilibrations were changed and the system
+was equilibrated again. Phase B is stable at all temperatures with 
+Phase A is stable at 280K. When temperature is raised to 300K, it is also
+stable, however there is a larger degree of disorder. We see a transition
+to Phase B in all cases when the temperature is raised above 310K 
+(~\ref{fig:transition}). 
+
+        %MRS2: Tables should also have specific theses as well, so think about that.  Merely saying ``here is the information'' isn't as useful without a guide through it.
+	A summary of all experiments and relevant structural parameters are presented in Table ~\ref{table:p2p}
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.3\textwidth}
+	\centering
+	\includegraphics[width=\linewidth]{placeholder.png}
+	\caption{}\label{fig:orderparameter}
+\end{subfigure}
+\begin{subfigure}{0.3\textwidth}
+	\centering
+	\includegraphics[width=\linewidth]{placeholder.png}
+	\caption{}\label{fig:order}
+\end{subfigure}
+\begin{subfigure}{0.3\textwidth}
+	\centering
+	\includegraphics[width=\linewidth]{placeholder.png}
+	\caption{}\label{fig:disorder}
+\end{subfigure}
+\caption{(a) As temperature is increased, Phase A transitions to Phase B, becoming more disordered. An order parameter of 1 indicates perfect ordering, while 0 indicates disorder. (b) The system is ordered, characteristic of Phase A, initially (c) The system becomes disordered, characteristic of Phase B, as temperature is raised beyond 310K}\label{fig:transition}
+%MRS2: maybe provide a bit more information what data will be here?  Order parametr vs time? One panel with order paramter vs. time, one with configurations from 0 and 1 endpoints?
+\end{figure}	
+
+\begin{table}
+\centering
+\begin{tabular}{|c|c|}
+\hline
+table & here \\
+\hline
+\end{tabular}
+\caption{The pore spacing of the model increases as number of monomers in each layer increases. The pore spacing of a system starting in the sandwiched configuration is systematically lower than that started in an offset configuration. Systems built with 5 monomers per layer in a parallel displaced configuration results in a pore spacing closest to experimental data}\label{table:p2p} 
+\end{table}
+	
+\begin{figure}
+\centering
+\begin{subfigure}{.45\textwidth}
+	\centering
+	\includegraphics[width=\linewidth]{placeholder.png}
+	\caption{}\label{fig:phaseA}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+	\includegraphics[width=\linewidth]{placeholder.png}
+	\centering
+	\caption{}\label{fig:phaseB}
+\end{subfigure}
+\caption{There are clear differences in pore structure between systems built with layers stacked (a) 3.7 \angstrom apart and (b) 5.0 \angstrom apart}
+%MRS2: explain theses?  Also, the exact configurations used to start them are probably not that important; many different initial configurations will probably lead to most of them.  It's the thermodyamics that are important.
+%BJC: okay, so just rephrase it, worded in a way that doesn't reference the initial configuration/layer spacing?
+%BJC: what do you  mean by 'thermodynamics that are important' -- just distinguishing which state is more favorable under what conditions?
+\label{fig:porestructures}
+\end{figure}
+%BJC: I might eliminate the other paragraph (2 before this one), where I justify parallel-displaced vs. sandwiched, and do it all in this paragraph.	
+%MRS2: a little hard to say until the data is in.
+
+	Full comparison of experimental 2D WAXS with simulated X-ray diffraction patterns produced from MD trajectories shows the most consistency with the parallel-displaced configuration made up of 5 monomers per layer.
+	\begin{itemize}
+		\item Phase A
+		\begin{itemize}	
+			\item Purely stacked configuration is missing reflections at 2, 4, 8 and 10 0'clock, but they are there in the parallel displaced conformation
+			\item There is evidence that the stacked configuration will shift towards an offset configuration over time. WAXS spots show up after short simulations, in which case there is visible movement away from a perfectly stacked, towards a parallel displaced conformation 
+			\item Pi-stacking reflections are present in all cases but at spacings higher than shown experimentally. This is not surprising since GAFF will not properly treat pi-stacking.
+			\item Interestingly, the spots, which are usually associated with alkyl chain tilt, still appear with an average tilt angle of 0 degrees
+		\end{itemize}
+		\item Phase B
+		\begin{itemize}
+			\item Stacking refelctions present indicating separation of $\approx$ 5 \angstrom
+			\item No spots at all which is consistent with the disorder shown by the rings in the pore
+		\end{itemize}
+		\item Both phases show a ring in the simulated 2D WAXS patterns at q $\approx$ 1.4 \angstrom\textsuperscript{-1} which is typical of packed alkane chains
+		\item Both phases exhibit axial reflections. Even though the rings are not ordered in phase B, 
+%MRS2: not quite clear what physical structures the axial reflections correspond to (what are the distances? What do they correspond to?)
+they are still partitioned into layers which gives rise to an axial refelction at the same distance where we expect alkane chain packing to be present   
+%MRS2: how are they layers defined here? Can you bring in more information about the nonuniformity of the density?
+%BJC2: Are you thinking about the fourier transforms? I could bring that in
+	\end{itemize} 
+
+	\begin{figure}
+	\centering
+	\begin{subfigure}{.3\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{placeholder.png}
+		\caption{~\label{fig:xrdA}}
+	\end{subfigure}
+	\begin{subfigure}{.3\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{placeholder.png}
+		\caption{~\label{fig:xrdexp}}
+	\end{subfigure}
+        \begin{subfigure}{.3\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{placeholder.png}
+                \caption{~\label{fig:xrdB}}
+        \end{subfigure}
+	\caption{Phase A (a) provides a good match to experiment (b). Phase B (c) is missing reflections present in the experimental pattern} % BJC: any more detail?  %MRS2: yes, give distances, and describe what you mean as ``good match''
+%BJC2: what is a clear way to describe the spots in the ring. Diagonal reflections? radial spots?
+	\label{fig:xrd}
+	\end{figure}
+
+The model gives reasonable estimates of ionic conductivity for both phases.
+Calculated values of ionic conductivity obtained using the Nernst Einstein
+relation and Collective Diffusion model are compared in Table~\ref{table:conductivity}.
+The two methods agree with each other within error, although the 
+uncertainty obtained using the Collective Diffusion model is much higher.
+For this reason we will likely only use the Nernst Einstein relation
+in future calculations of this type. It is evident that the ordered 
+phase has a higher ionic conductivity than the disordered phase. 
+Conductivity is enhanced in Phase A because the pores are more open,
+increasing the likelihood of site hopping. In all cases, our calculated values
+are higher than experimental values, as expected. The real system, 
+although mostly aligned and straight, still has a distribution of 
+azimuthal angles, lowering the effective ionic conductivity of the bulk 
+membrane. The ordering from isotropic to mostly aligned mesophases 
+showed an 85 fold increase in ionic conductivity. We would expect additional
+gains in a perfect system.
+
+\begin{table}
+\centering
+\begin{tabular}{ccc}
+\toprule
+\multicolumn{3}{c}{Calculated Ionic Conductivity \si{\siemens\per\meter}} \\
+\hline
+Method & Phase A & Phase B \\
+\midrule
+Nernst Einstein & \num{8e-5} & \num{8e-5} \\
+Collective Diffusion & \num{6e-5} & \num{6e-5} \\
+Experiment & \num{1.3e-5} & \num{1.3e-5} \\
+\bottomrule
+\end{tabular}
+\caption{Calculated ionic conductivity using Nernst-Einsten and Collective Diffusion agree within error. Both methods give calculated values of ionic conductivity which are higher, but reasonably close to experimental values~\label{table:conductivity}}
+%MRS2: I would say that they are reasonable close to experiment, though higher. Also somewhat contradicted in other places.
+	\end{table}
+
+	The procedure used to create and validate our model can be used to evaluate other liquid crystalline assemblies. Using the design framework and analysis methods applied herin, we have the ability to reliably predict structures of new nanoporous membranes.
