@@ -3,7 +3,11 @@
 """
 Coordinate transforms and related manipulations of positions
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import range
+from past.utils import old_div
 import numpy as np
 import math
 
@@ -25,7 +29,7 @@ def layer_dist(layers, nopores, distribution, monomers, alt_1, alt_2):
 
 
 def slope(pt1, pt2):
-    m = (pt1[1] - pt2[1])/(pt1[0] - pt2[0])  # slope
+    m = old_div((pt1[1] - pt2[1]),(pt1[0] - pt2[0]))  # slope
     return m
 
 
@@ -37,37 +41,70 @@ def rotateplane(plane, angle=0):
     :return:
     """
 
-    # vector pointing from point 1 to point 2
-    v12 = plane[1, :] - plane[0, :]
-    v13 = plane[2, :] - plane[0, :]
+    if plane[0, 2] == plane[1, 2] and plane[1, 2] == plane[2, 2]:
 
-    # The cross product of v12 and v13 give a vector that is perpendicular to the plane:
-    N = np.cross(v12, v13)
-    N_desired = [0, math.sin(angle), math.cos(angle)]  # vector in the direction normal to our desired plane orientation
+        print('Planes are already coplanar')
 
-    RotationAxis = np.cross(N, N_desired)
+        return False
 
-    theta = math.acos(np.dot(N, N_desired)/(np.linalg.norm(N)*np.linalg.norm(N_desired)))  #  Rotation Angle (radians)
+    else:
+        # vector pointing from point 1 to point 2
+        v12 = plane[1, :] - plane[0, :]
+        v13 = plane[2, :] - plane[0, :]
 
-    L = [RotationAxis[0]/np.linalg.norm(RotationAxis), RotationAxis[1]/np.linalg.norm(RotationAxis),
-                       RotationAxis[2]/np.linalg.norm(RotationAxis)]  # normalized Rotation Axis
-    # ^ see: http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/
+        # The cross product of v12 and v13 give a vector that is perpendicular to the plane:
+        N = np.cross(v12, v13)
+        N_desired = [0, math.sin(angle), math.cos(angle)]  # vector in the direction normal to our desired plane orientation
 
-    u, v, w = L[0], L[1], L[2]
+        RotationAxis = np.cross(N, N_desired)
 
-    R = np.zeros((4, 4))
-    R[3, 3] = 1
-    R[0, 0] = u**2 + (v**2 + w**2)*math.cos(theta)  # math.cos takes theta in radians by default
-    R[0, 1] = u*v*(1 - math.cos(theta)) - w*math.sin(theta)
-    R[0, 2] = u*w*(1 - math.cos(theta)) + v*math.sin(theta)
-    R[1, 0] = u*v*(1 - math.cos(theta)) + w*math.sin(theta)
-    R[1, 1] = v**2 + (u**2 + w**2)*math.cos(theta)
-    R[1, 2] = v*w*(1 - math.cos(theta)) - u*math.sin(theta)
-    R[2, 0] = u*w*(1 - math.cos(theta)) - v*math.sin(theta)  # math.cos takes theta in radians by default
-    R[2, 1] = w*v*(1 - math.cos(theta)) + u*math.sin(theta)
-    R[2, 2] = w**2 + (u**2 + v**2)*math.cos(theta)
+        theta = math.acos(old_div(np.dot(N, N_desired),(np.linalg.norm(N)*np.linalg.norm(N_desired))))  #  Rotation Angle (radians)
 
-    return R
+        L = [old_div(RotationAxis[0],np.linalg.norm(RotationAxis)), old_div(RotationAxis[1],np.linalg.norm(RotationAxis)),
+                           old_div(RotationAxis[2],np.linalg.norm(RotationAxis))]  # normalized Rotation Axis
+        # ^ see: http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/
+
+        u, v, w = L[0], L[1], L[2]
+
+        R = np.zeros((4, 4))
+        R[3, 3] = 1
+        R[0, 0] = u**2 + (v**2 + w**2)*math.cos(theta)  # math.cos takes theta in radians by default
+        R[0, 1] = u*v*(1 - math.cos(theta)) - w*math.sin(theta)
+        R[0, 2] = u*w*(1 - math.cos(theta)) + v*math.sin(theta)
+        R[1, 0] = u*v*(1 - math.cos(theta)) + w*math.sin(theta)
+        R[1, 1] = v**2 + (u**2 + w**2)*math.cos(theta)
+        R[1, 2] = v*w*(1 - math.cos(theta)) - u*math.sin(theta)
+        R[2, 0] = u*w*(1 - math.cos(theta)) - v*math.sin(theta)  # math.cos takes theta in radians by default
+        R[2, 1] = w*v*(1 - math.cos(theta)) + u*math.sin(theta)
+        R[2, 2] = w**2 + (u**2 + v**2)*math.cos(theta)
+
+        return R
+
+
+def rotateplane_coords(xyz, plane, angle=0):
+    """
+    Calculate a rotation matrix to rotate a plane in 3 dimensions
+    :param xyz: xyz coordinates of all positions to be rotated
+    :param plane: indices of atoms making up plane which is being aligned in the xy plane
+    :param angle: desired angle between xy plane (optional, default = 0 i.e. in plane)
+    :return:
+    """
+
+    if plane[0, 2] == plane[1, 2] and plane[1, 2] == plane[2, 2]:
+
+        pass
+
+    else:
+
+        R = rotateplane(plane, angle=angle)
+
+        b = np.ones([1])
+        for i in range(np.shape(xyz)[0]):
+            coord = np.concatenate((xyz[i, :], b))
+            x = np.dot(R, coord)
+            xyz[i, :] = x[:3]
+
+    return xyz
 
 
 def quadrant(pt, origin=[0, 0]):
@@ -179,7 +216,7 @@ def reposition(xyz, R, ref_index, lineatoms, pore_radius):
 
     # find angle between lines
 
-    theta = -math.atan((m1 - m2)/(1 + m1*m2))
+    theta = -math.atan(old_div((m1 - m2),(1 + m1*m2)))
 
     vx, vy = transdir(pt1)
 
@@ -192,6 +229,28 @@ def reposition(xyz, R, ref_index, lineatoms, pore_radius):
         coord = np.concatenate((xyz[:, i], b))
         x = np.dot(translation, coord)
         xyz[:, i] = x[0, :3]
+
+    return xyz
+
+
+def translate(xyz, before, after):
+    """
+    :param xyz: coordinates of set of points to be translated [npts, 3]
+    :param before: reference coordinate location before [3]
+    :param after: reference coordinate location after [3]
+    :return: translated points with respect to reference coordinate before/after locations [npts, 3]
+    """
+
+    direction = after - before
+
+    translation = np.matrix([[1, 0, 0, direction[0]], [0, 1, 0, direction[1]],
+                         [0, 0, 1, direction[2]], [0, 0, 0, 1]])
+
+    b = np.ones([1])
+    for i in range(np.shape(xyz)[0]):
+        coord = np.concatenate((xyz[i, :], b))
+        x = np.dot(translation, coord)
+        xyz[i, :] = x[0, :3]
 
     return xyz
 
@@ -254,8 +313,47 @@ def pbcs(pts, images, angle, box, frame, nogap=False):
         for p in range(tot_pts):
             for i in range(mat_dim):
                 for j in range(mat_dim):
-                    translated_pts[0, i*mat_dim + j, p] = x_shift[i, j] + pts[p, 0]/10
-                    translated_pts[1, i*mat_dim + j, p] = y_shift[i, j] + pts[p, 1]/10
-                    translated_pts[2, i*mat_dim + j, p] = pts[p, 2]/10  # z position unchanged
+                    translated_pts[0, i*mat_dim + j, p] = x_shift[i, j] + old_div(pts[p, 0],10)
+                    translated_pts[1, i*mat_dim + j, p] = y_shift[i, j] + old_div(pts[p, 1],10)
+                    translated_pts[2, i*mat_dim + j, p] = old_div(pts[p, 2],10)  # z position unchanged
 
     return translated_pts
+
+
+def rotate_vector(xyz, v1, v2):
+    """
+    :param xyz: xyz coordinates of object to be rotated
+    :param v1: original vector
+    :param v2: direction you want v1 to be pointing in
+    :return: rotated coordinates
+    """
+
+    # first find the angle between v1 and v2
+
+    num = np.dot(v1, v2)
+    denom = np.linalg.norm(v1) * np.linalg.norm(v2)
+    theta = np.arccos(old_div(num, denom))
+
+    Rz = rotate_z(-theta)
+
+    for i in range(np.shape(xyz)[0]):
+        xyz[i, :] = np.dot(Rz, xyz[i, :])
+
+    return xyz
+
+
+def rotate_coords_z(xyz, angle):
+    """
+    :param xyz: xyz coordinates of atoms to be rotated
+    :param angle: angle to rotate them by w.r.t origin
+    :return:
+    """
+
+    angle *= (old_div(np.pi, 180))  # convert to radians
+
+    R = rotate_z(angle)
+
+    for i in range(np.shape(xyz)[0]):
+        xyz[i, :] = np.dot(R, xyz[i, :])
+
+    return xyz

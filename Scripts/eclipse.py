@@ -4,7 +4,12 @@
 Calculate the degree to which benzene rings are stacked. 0 implies no stacking, while 1 implies perfect stacking,
 i.e. one benzene ring completely eclipses the ring below
 """
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
+from builtins import range
+from past.utils import old_div
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
@@ -59,7 +64,7 @@ def intersect(A,B,C,D):
 
 def slope(pt1, pt2):
 
-    m = (pt1[1] - pt2[1]) / (pt1[0] - pt2[0])
+    m = old_div((pt1[1] - pt2[1]), (pt1[0] - pt2[0]))
     b = pt1[1] - m * pt1[0]
 
     return m, b
@@ -86,7 +91,7 @@ def intersection(A,B,C,D):
             x_intersect = A[0]
             y_intersect = m2 * x_intersect + b2
         else:  # a normal case
-            x_intersect = (b1 - b2) / (m2 - m1)
+            x_intersect = old_div((b1 - b2), (m2 - m1))
             y_intersect = m1 * x_intersect + b1
 
         return [x_intersect, y_intersect]
@@ -173,7 +178,7 @@ def ring_centers(all_pos, natoms=6):
     """
 
     nT = all_pos.shape[0]  # number of trajectory points
-    nrings = all_pos.shape[1] / natoms  # number of rings in the system
+    nrings = old_div(all_pos.shape[1], natoms)  # number of rings in the system
 
     ring_center = np.zeros([nT, nrings, 3])  # new array with only the average positions of each benzene ring
 
@@ -198,7 +203,7 @@ def pbz(pos, box, pores=4):
 
     nT = pos.shape[0]
     npos = pos.shape[1]
-    posppore = npos / 4
+    posppore = old_div(npos, 4)
 
     newpos = np.zeros([nT, 3*npos, 3])
     z = [-1, 0, 1]
@@ -223,9 +228,9 @@ def overlap_pairs(centers, pores=4, layers=20, layersearch=1):
 
     nT = centers.shape[0]  # number of trajectory points
     rings = centers.shape[1]  # number of rings in 'centers'
-    real_rings = rings/3  # the total number of rings, not including periodic duplications
-    real_rings_ppore = real_rings / pores  # number of rings per pore
-    ring_per_layer = real_rings_ppore / layers  # monomers per layer
+    real_rings = old_div(rings,3)  # the total number of rings, not including periodic duplications
+    real_rings_ppore = old_div(real_rings, pores)  # number of rings per pore
+    ring_per_layer = old_div(real_rings_ppore, layers)  # monomers per layer
 
     pairs = np.zeros([nT, real_rings], dtype=int)  # dictionary of closest stacked pairs
 
@@ -257,7 +262,7 @@ def all_overlaps(pos, pairs, atoms_p_ring=6):
 
     nT = pos.shape[0]
     natoms = pos.shape[1]
-    rings = natoms / atoms_p_ring
+    rings = old_div(natoms, atoms_p_ring)
 
     area = np.zeros([nT])
     for t in range(nT):
@@ -382,8 +387,8 @@ if __name__ == "__main__":
 
     pistack, avg_stack, limits, equil_frame = stacking_distance(centers, pairs, args.nboot)  # find the average pi stacking distance between pairs
 
-    print 'Pi-stacking distance equilibrated after %d ns' %(t.time[equil_frame] / 1000)
-    print 'Average stacking distance: %.3f nm 95%% CI [%.3f, %.3f]' %(avg_stack,limits[0], limits[1])
+    print('Pi-stacking distance equilibrated after %d ns' %(old_div(t.time[equil_frame], 1000)))
+    print('Average stacking distance: %.3f nm 95%% CI [%.3f, %.3f]' %(avg_stack,limits[0], limits[1]))
 
     # Area of a single benzene ring - calculated separately based on a perfect hexagon with C-C bond length = .14 nm
     # benzene_area = 0.0497955083847  # nm^2 -- calculated using PolyArea and vertices of benzene from an initial config created with build.py
@@ -395,12 +400,12 @@ if __name__ == "__main__":
     else:
         equil_frame = timeseries.detectEquilibration(overlap_area)[0]
 
-    print 'Overlap equilibrated after %d ns' % (t.time[equil_frame] / 1000)
-    print 'Average overlap: %.2f +/- %.2f' % (np.mean(overlap_area[equil_frame:]) / total_benzene_area,
-                                          np.std(overlap_area[equil_frame:]) / total_benzene_area)  # generating stats here is less important
+    print('Overlap equilibrated after %d ns' % (old_div(t.time[equil_frame], 1000)))
+    print('Average overlap: %.2f +/- %.2f' % (old_div(np.mean(overlap_area[equil_frame:]), total_benzene_area),
+                                          old_div(np.std(overlap_area[equil_frame:]), total_benzene_area)))  # generating stats here is less important
 
     plt.figure(1)
-    plt.plot(t.time, overlap_area / total_benzene_area)
+    plt.plot(t.time, old_div(overlap_area, total_benzene_area))
     plt.title('Degree of sandwiched stacking vs time')
     plt.xlabel('Time (ps)')
     plt.ylabel('Degree of layering')

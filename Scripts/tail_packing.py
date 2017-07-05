@@ -18,7 +18,7 @@ def initialize():
 
     parser.add_argument('-g', '--gro', type=str, default='wiggle.gro', help='Path to input file')
     parser.add_argument('-t', '--traj', type=str, default='traj_whole.xtc', help='Trajectory file (.xtc or .trr)')
-    parser.add_argument('-i', '--index', default='index.ndx', type=str, help='Index file containing names of tail carbons')
+    parser.add_argument('-i', '--index', default='tail_index.ndx', type=str, help='Index file containing names of tail carbons')
     parser.add_argument('-c', '--cutoff', default=0.45, type=float, help='Cutoff distance for neighbor search')
     parser.add_argument('--save', action="store_true", help='Save output plots')
     parser.add_argument('--fit', action="store_true", help='Plot a fourier fit')

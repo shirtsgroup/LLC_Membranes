@@ -4,6 +4,9 @@
 # Also gives the amount of space needed for water molecules given the amount of space wanted between periodic boundaries
 # in the z direction
 
+from __future__ import division
+from __future__ import print_function
+from past.utils import old_div
 import argparse
 from llclib import physical
 import mdtraj as md
@@ -69,7 +72,7 @@ if __name__ == '__main__':
     if not args.trajectory:
         thick, z_max, z_min = physical.thickness('%s' % args.gro, args.ref_atoms)
         tot_thickness = thick + water_layer
-        print 'Membrane Thickness: %s nm' % thick
+        print('Membrane Thickness: %s nm' % thick)
     else:
 
         # load trajectory and restrict atoms to reference atoms only
@@ -82,9 +85,9 @@ if __name__ == '__main__':
 
         # Decide when the system is equilibrated and take the average of thicknesses after equilibration
         equil_frame = timeseries.detectEquilibration(thick)[0]
-        print 'Equilibration detected after %d ns' % (t.time[equil_frame] / 1000.0)
-        print 'Average membrane thickness: %.2f +/- %.2f nm' % (np.mean(thick[equil_frame:]),
-                                                                  np.std(thick[equil_frame:]))
+        print('Equilibration detected after %d ns' % (old_div(t.time[equil_frame], 1000.0)))
+        print('Average membrane thickness: %.2f +/- %.2f nm' % (np.mean(thick[equil_frame:]),
+                                                                  np.std(thick[equil_frame:])))
 
         # Plot thickness vs time
         plt.plot(t.time, thick)

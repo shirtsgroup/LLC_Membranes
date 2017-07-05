@@ -2,6 +2,10 @@
 
 # This is the revamped version of Cylindricity.py
 
+from __future__ import division
+from __future__ import print_function
+from builtins import range
+from past.utils import old_div
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -99,7 +103,7 @@ def avg_pore_loc(npores, pos, buffer):
     if len(pos.shape) == 3:  # multiple frames
 
         nT = np.shape(pos)[0]
-        comp_ppore = np.shape(pos)[1] / npores
+        comp_ppore = old_div(np.shape(pos)[1], npores)
 
         p_center = np.zeros([2, npores, nT])
 
@@ -119,7 +123,7 @@ def avg_pore_loc(npores, pos, buffer):
 
     elif len(pos.shape) == 2:  # single frame
 
-        comp_ppore = pos.shape[1] / npores
+        comp_ppore = old_div(pos.shape[1], npores)
         p_center = np.zeros([2, npores])
 
         for j in range(npores):
@@ -211,13 +215,13 @@ def p2p_stats(p2ps, exclude, nboot, equil):
         tau = timeseries.integratedAutocorrelationTime(p2ps[i, t:])
         taus.append(tau)
 
-    print 'Maximum Autocorrelation Time: %s frames' % max(taus)
+    print('Maximum Autocorrelation Time: %s frames' % max(taus))
     tau = int(np.ceil(max(taus)))  # use the max again to ensure all trajectories are independent. np.ceil e
 
     if tau == 0:
         tau = 1
 
-    ind_trajectories = (nT - t) / tau  # the number of independent trajectories
+    ind_trajectories = old_div((nT - t), tau)  # the number of independent trajectories
 
     trajectories = np.zeros([ndist, ind_trajectories, tau])  # Create a new array to hold all the trajectories
 
@@ -272,7 +276,7 @@ def compdensity(component, pore_centers, start, tot_atoms, pores=4, bin_width=0.
 
     # Extract basic system information. It's important to follow the format of the component array to get it right
     n_atoms = np.shape(component)[1]  # the total number of components in a single frame
-    n_ppore = tot_atoms / pores  # the total number of components in each pore
+    n_ppore = old_div(tot_atoms, pores)  # the total number of components in each pore
     nT = np.shape(component)[0]
 
     # Find the approximate max and minimum z values of the components based on the last frame
@@ -298,7 +302,7 @@ def compdensity(component, pore_centers, start, tot_atoms, pores=4, bin_width=0.
     dist_from_center = np.array(dist_from_center)
 
     # Start setting up parameters necessary for binning
-    bins = int(rmax/bin_width)  # the total number of bins
+    bins = int(old_div(rmax,bin_width))  # the total number of bins
     r = np.linspace(0, rmax, int(bins))  # each discrete radius at which we will measure densities
 
     # Now bin the distances calculated above
@@ -308,14 +312,14 @@ def compdensity(component, pore_centers, start, tot_atoms, pores=4, bin_width=0.
         distance = dist_from_center[i]
         if distance <= rmax:
             count += 1
-            bin = int(np.floor((distance/rmax)*bins))
+            bin = int(np.floor((old_div(distance,rmax))*bins))
             bin_contents_tails[bin] += 1
 
     # calculate the density of ions in the area of the annulus defined by the inner and outer radii between which
     # components were calculated
     density = np.zeros([bins])
     for i in range(bins):
-        density[i] = bin_contents_tails[i] / (math.pi*(((i + 1)*bin_width)**2 - (i*bin_width)**2))
+        density[i] = old_div(bin_contents_tails[i], (math.pi*(((i + 1)*bin_width)**2 - (i*bin_width)**2)))
 
     # normalize
     n = sum(density)
@@ -326,13 +330,13 @@ def compdensity(component, pore_centers, start, tot_atoms, pores=4, bin_width=0.
 
 
 def gaus(x, a, sigma):
-    return a*exp(-(x)**2/(2*sigma**2))
+    return a*exp(old_div(-(x)**2,(2*sigma**2)))
 
 from scipy.misc import factorial
 
 
 def poisson(k, lamb):
-    return (lamb**k * np.exp(-lamb)) / factorial(k)
+    return old_div((lamb**k * np.exp(-lamb)), factorial(k))
 
 if __name__ == '__main__':
 
@@ -340,13 +344,13 @@ if __name__ == '__main__':
 
     t = md.load('%s' % args.input, top='%s' % args.gro)
 
-    pos = restrict_atoms(t, args.component)
+    pos = restrict_atoms(t, args.component)  # convenience function
     nT = np.shape(pos)[0]
 
     traj_start = int(args.start_frame)
     tot_atoms = np.shape(pos)[1]
     n_pores = int(args.pores)  # number of pores
-    comp_ppore = tot_atoms/n_pores
+    comp_ppore = old_div(tot_atoms,n_pores)
 
     p_centers = avg_pore_loc(n_pores, pos, args.buffer)
 
@@ -363,9 +367,9 @@ if __name__ == '__main__':
         exclude = [int(i) for i in args.exclude]
 
     p2p_avg, p2p_std, equil = p2p_stats(p2ps, exclude, '%s' % args.nboot, '%s' % args.equil)
-    print 'Equilibration detected after %d ns' % (t.time[equil] / 1000)
-    print 'Average Pore to Pore distance: %.3f' % p2p_avg
-    print 'Standard Deviation of Pore to Pore distances: %.3f' % p2p_std
+    print('Equilibration detected after %d ns' % (old_div(t.time[equil], 1000)))
+    print('Average Pore to Pore distance: %.3f' % p2p_avg)
+    print('Standard Deviation of Pore to Pore distances: %.3f' % p2p_std)
 
     labels = ['1-2', '1-3', '1-4', '2-3', '2-4', '3-4']
     labels = ['1-4', '1-0', '0-2', '0-4', '0-3', '2-3', '2-5', '5-3', '3-4', '5-6', '3-7', '6-7', '4-7', '7-8',

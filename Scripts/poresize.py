@@ -1,5 +1,8 @@
 #! /usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
+from past.utils import old_div
 import argparse
 import mdtraj as md
 import numpy as np
@@ -40,20 +43,20 @@ if __name__ == "__main__":
     r, r_std = physical.limits(pos, pcenters)
 
     poresize_equil = timeseries.detectEquilibration(r)[0]
-    order_equil = timeseries.detectEquilibration(r/r_std)[0]
+    order_equil = timeseries.detectEquilibration(old_div(r,r_std))[0]
 
     if args.normalize:
-        order = r/r_std
+        order = old_div(r,r_std)
         order -= min(order)
         order /= max(order)
 
-    print 'Pore size equilibrated after %d ns' % (t.time[poresize_equil] / 1000)
-    print 'Average Pore Size: %.2f +/- %.2f nm' %(np.mean(r[poresize_equil:]), np.mean(r_std[poresize_equil:]))
-    print 'Order parameter equilibrated after %d ns' % (t.time[order_equil] / 1000)
+    print('Pore size equilibrated after %d ns' % (old_div(t.time[poresize_equil], 1000)))
+    print('Average Pore Size: %.2f +/- %.2f nm' %(np.mean(r[poresize_equil:]), np.mean(r_std[poresize_equil:])))
+    print('Order parameter equilibrated after %d ns' % (old_div(t.time[order_equil], 1000)))
     if args.normalize:
-        print 'Average Order Parameter: %.2f' % np.mean(order[order_equil:])
+        print('Average Order Parameter: %.2f' % np.mean(order[order_equil:]))
     else:
-        print 'Average Order Parameter: %.2f' % np.mean(r[order_equil:]/r_std[order_equil:])
+        print('Average Order Parameter: %.2f' % np.mean(old_div(r[order_equil:],r_std[order_equil:])))
 
     plt.figure(1)
     plt.plot(t.time, r)
@@ -76,7 +79,7 @@ if __name__ == "__main__":
         # plt.plot(t.time, order)
         plt.plot(T, order)
     else:
-        plt.plot(t.time, r/r_std)
+        plt.plot(t.time, old_div(r,r_std))
     plt.title('Order parameter vs time')
     # plt.xlabel('Time (ps)')
     plt.xlabel('Temperature (K)')

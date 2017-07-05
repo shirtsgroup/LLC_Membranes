@@ -17,7 +17,7 @@ parser.add_argument('-s', '--em_steps', default=50000, type=int, help='Steps to 
 parser.add_argument('-e', '--ensemble', default='npt', type=str, help='Thermodynamic ensemble to put system in')
 parser.add_argument('-d', '--dt', default=0.002, type=float, help='time step (ps)')
 parser.add_argument('-l', '--length', default=1000, type=int, help='simulation length (ps)')
-parser.add_argument('-f', '--frames', default=100, type=int, help='number of frames')
+parser.add_argument('-f', '--frames', default=500, type=int, help='number of frames')
 parser.add_argument('-p', '--pcoupltype', default='semiisotropic', type=str, help='Pressure Couple Type')
 parser.add_argument('--restraints', help='If restraints are on, another mdp option needs to be turned on, so specify '
                                          'this flag', action="store_true")
