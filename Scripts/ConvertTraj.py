@@ -45,6 +45,7 @@ if __name__ == "__main__":
         box = t.unitcell_vectors  # get the unit cell lengths
     # t = md.load('%s' % args.file, top='%s' % args.coord)
     pos = t.xyz
+    
     id = np.array([a.name for a in t.topology.atoms])
     nT = pos.shape[0]
     atoms = pos.shape[1]
