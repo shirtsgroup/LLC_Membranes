@@ -21,8 +21,8 @@ while getopts "t:g:r:p:x:b:" opt; do
 done
 
 # modify the trajectory so all monomers stay whole
-#echo 0 | gmx trjconv -f ${trajectory} -o traj_whole.xtc -s ${tpr} -pbc whole
-#echo "Trajectory Converted"
+echo 0 | gmx trjconv -f ${trajectory} -o traj_whole.xtc -s ${tpr} -pbc whole
+echo "Trajectory Converted"
 
 # Simulate X-ray Diffraction
 #main_gromacs.py -top ${gro} -traj traj_whole.xtc --lcscale 1.25 --cscale 0.05

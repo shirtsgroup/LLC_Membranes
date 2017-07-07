@@ -1,5 +1,9 @@
 #! /usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
+from builtins import range
+from past.utils import old_div
 import numpy as np
 import argparse
 import mdtraj as md
@@ -40,7 +44,7 @@ def z_periodic(positions, unitcell_vectors, images=1):
     nimages = images*2 + 1
     periodic = np.zeros([nT, natoms*nimages, 3])
     npores = 4
-    atomppore = natoms / npores
+    atomppore = old_div(natoms, npores)
 
     # for t in range(nT):
     #     z = np.array([0, 0, box[t, 2, 2]])
@@ -77,15 +81,15 @@ def zdf(positions, npores, atoms_per_layer, box, images=1, tol=0.01):
     natoms = positions.shape[1]
 
     z = np.zeros([nT, natoms, natoms])  # distance b/w each atom and all other atoms at each frame
-    atoms_ppore = natoms / npores
+    atoms_ppore = old_div(natoms, npores)
 
-    print 'Calculating z distribution function of atom %s' % atom
-    for t in tqdm.tqdm(range(nT)):
+    print('Calculating z distribution function of atom %s' % atom)
+    for t in tqdm.tqdm(list(range(nT))):
         for p in range(npores):
 
             # ensure we are only looking at pores from the original unit cell (the middle image in the periodic cell created by z_periodic)
-            start = p*atoms_ppore + (atoms_ppore / nimages)
-            end = start + (atoms_ppore / nimages)
+            start = p*atoms_ppore + (old_div(atoms_ppore, nimages))
+            end = start + (old_div(atoms_ppore, nimages))
             for i in range(start, end):
                 pore_start = p * atoms_ppore
                 pore_end = (p + 1) * atoms_ppore
@@ -93,14 +97,14 @@ def zdf(positions, npores, atoms_per_layer, box, images=1, tol=0.01):
                     # now calculate distance between atoms in original unit cell and all atoms in periodic cell
                     # atoms in the same layer will be at about the same z height. We aren't interested in those values
                     # We also only want to calculate distances within pores.
-                    if int(i/atoms_per_layer) != int(j/atoms_per_layer): # and int(i / atoms_ppore) == int(j / atoms_ppore):
+                    if int(old_div(i,atoms_per_layer)) != int(old_div(j,atoms_per_layer)): # and int(i / atoms_ppore) == int(j / atoms_ppore):
                         # ^ if the atoms aren't in the same layer but they are in the same pore ^
                         d = positions[t, i, 2] - positions[t, j, 2]
                         z[t, i, j] = d
 
     L = np.mean(box[:, 2, 2])  # average z length of unit cell
 
-    p = atoms_ppore / ((images*2 + 1)*L)  # average number density of atoms [particles / nm]
+    p = old_div(atoms_ppore, ((images*2 + 1)*L))  # average number density of atoms [particles / nm]
 
     # in periodic cell. Atoms in same layer are not counted (particles / nm)
 
@@ -117,7 +121,7 @@ def zdf(positions, npores, atoms_per_layer, box, images=1, tol=0.01):
 
     dx = edges[-1] - edges[-2]
 
-    bins = [i / (2 * nT * p * dx * L * npores) for i in bins]  # normalize by number density
+    bins = [old_div(i, (2 * nT * p * dx * L * npores)) for i in bins]  # normalize by number density
 
     # control = np.zeros([len(bins)]) + np.mean(bins[:end])
 
@@ -126,7 +130,7 @@ def zdf(positions, npores, atoms_per_layer, box, images=1, tol=0.01):
     if not args.avg:
         plot_zdf(edges, bins, end=end)
 
-    return edges[:end], bins[:end]
+    return edges[:int(end)], bins[:int(end)]
 
 
 def plot_zdf(z, d, end=-1):

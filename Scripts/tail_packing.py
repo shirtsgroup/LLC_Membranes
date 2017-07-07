@@ -1,9 +1,14 @@
 #! /usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import range
+from past.utils import old_div
 import numpy as np
 import mdtraj as md
 import argparse
-import tilt
+from . import tilt
 from llclib import file_rw
 from scipy import spatial
 import matplotlib.pyplot as plt
@@ -49,8 +54,8 @@ def tail_centroid(pos, grps):
 
     centroids = np.zeros([nT, nmon * ngrps, 3])
 
-    print 'Calculating tail centroids'
-    for t in tqdm.tqdm(range(nT)):
+    print('Calculating tail centroids')
+    for t in tqdm.tqdm(list(range(nT))):
         for i in range(nmon):
             for j in range(ngrps):
                 centroid = np.zeros([3])
@@ -77,8 +82,8 @@ def nearest_neighbors(arr, d, lower_limit=0.4):
         for i in range(npts):
             nn_list[t].append([])  #using lists since this will vary in length
 
-    print 'Calculating nearest neighbors'
-    for t in tqdm.tqdm(range(nT)):
+    print('Calculating nearest neighbors')
+    for t in tqdm.tqdm(list(range(nT))):
         frame = arr[t, :, :]
         for i in range(npts):
             others = np.delete(frame, i, 0)  # delete self entry or else the nearest neighbor is itself
@@ -109,8 +114,8 @@ def angles_ld(arr, indices, normal=[0, 0, 1]):
     angles = []
     ld = []
 
-    print 'Calculating angles between nearest neigbors'
-    for t in tqdm.tqdm(range(nT)):
+    print('Calculating angles between nearest neigbors')
+    for t in tqdm.tqdm(list(range(nT))):
         for i in range(npts):
             # for j in range(len(indices[i])):
             for j in indices[t][i]:
@@ -118,7 +123,7 @@ def angles_ld(arr, indices, normal=[0, 0, 1]):
                 vn = np.dot(v, normal)
                 nn = np.linalg.norm(normal)
                 vv = np.linalg.norm(v)
-                angle = np.arcsin(vn / (nn * vv)) * (180 / np.pi)
+                angle = np.arcsin(old_div(vn, (nn * vv))) * (old_div(180, np.pi))
                 angles.append(angle)
                 ld.append(vv)
 
@@ -127,7 +132,7 @@ def angles_ld(arr, indices, normal=[0, 0, 1]):
 
 def cn(n, T, bin_locations):
     c = counts*np.exp(-1j*2*n*np.pi*bin_locations/T)
-    return c.sum()/c.size
+    return old_div(c.sum(),c.size)
 
 
 def f(x, Nh, T, bin_locations):

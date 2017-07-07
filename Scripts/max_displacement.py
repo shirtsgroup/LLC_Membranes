@@ -19,6 +19,7 @@ def initialize():
     parser.add_argument('-a', '--atoms', nargs='+', type=str, default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'],
                         help='Name of atoms to track')
     parser.add_argument('--time', action="store_true", help='Plot the average max displacement against time')
+    parser.add_argument('--save', action="store_true", help='Save output figures')
 
     args = parser.parse_args()
 
@@ -79,7 +80,7 @@ def displacements(pos):
     :return: max displacement for each atom
     """
 
-    natoms = pos.shape[0]
+    natoms = pos.shape[1]
     disp = np.zeros([natoms])
 
     for a in range(natoms):
@@ -108,6 +109,8 @@ if __name__ == "__main__":
         plt.plot(t.time, d)
         plt.xlabel('Time (ps)')
         plt.ylabel('Average maximum displacement')
+        if args.save:
+            plt.savefig('average_max_displacement.png')
 
     else:
 
@@ -115,8 +118,16 @@ if __name__ == "__main__":
 
         d = np.ma.masked_greater(d, L)
 
+        a = np.argmax(d)
+        mon = np.floor(a/len(args.atoms))
+        print(mon)
+        print('Watch atoms %s to %s' %(int(mon*137), int((mon + 1)*137)))
+        print(d[a])
+
         plt.hist(d.compressed(), bins=25)
         plt.xlabel('Maximum displacement (nm)')
         plt.ylabel('Count')
+        if args.save:
+            plt.savefig('max_displacement.png')
 
     plt.show()
