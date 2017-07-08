@@ -10,6 +10,8 @@ for i in $jobs; do  # check all jobs
 	if [ -f ${path} ]; then  # check if the file at the given path exists. If it doesn't exist then job hasn't started running yet
 		if grep -q 'LINCS' ${path}; then # Check if there are LINCS warnings
 			scancel $i  # cancel the job because it is probably stopped
+			DIR=$(dirname "${path}")
+			sbatch ${DIR}/Run.sh
 		fi
 	fi
 done
