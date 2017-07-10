@@ -8,7 +8,7 @@ for i in $jobs; do  # check all jobs
 	scontrol show job $i > job_info; # get info about running jobs
 	path=$(get_job_path.py -i job_info);  # get paths to the StdOut
 	if [ -f ${path} ]; then  # check if the file at the given path exists. If it doesn't exist then job hasn't started running yet
-		if grep -q 'LINCS' ${path}; then # Check if there are LINCS warnings
+		if grep -q 'Fatal' ${path}; then # Check if there are LINCS warnings
 			scancel $i  # cancel the job because it is probably stopped
 			DIR=$(dirname "${path}")
 			sbatch ${DIR}/Run.sh
