@@ -10,14 +10,14 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Rename residues based on input')
 
-    parser.add_argument('-i', '--index', default='PZPZ.ndx', type=str, help='Index file describing names of residues '
+    parser.add_argument('-i', '--index', default='res.ndx', type=str, help='Index file describing names of residues '
                                                                             'and atomic indices included in the residue')
-    parser.add_argument('-t', '--top', default='PZPZ.top', type=str, help='Gromacs topology file with an '
+    parser.add_argument('-t', '--top', default='PPPP.top', type=str, help='Gromacs topology file with an '
                                                                           '[ atoms ] section')
-    parser.add_argument('-g', '--gro', default='PZPZ.gro', type=str, help='Name of gromacs coordinate file')
+    parser.add_argument('-g', '--gro', default='PPPP.gro', type=str, help='Name of gromacs coordinate file')
     parser.add_argument('-ot', '--output_top', default='out.top', help='Name of output topology')
     parser.add_argument('-og', '--output_gro', default='out.gro', help='Name of output .gro coordinate file')
-    parser.add_argument('-n', '--name', default='PZPZ', type=str, help='Name of residue being replaced')
+    parser.add_argument('-n', '--name', default='PPPP', type=str, help='Name of residue being replaced')
 
     args = parser.parse_args()
 
@@ -94,6 +94,53 @@ if __name__ == "__main__":
 
         replacement[3] = replacement[3][0]
         out.append('{:>6}{:>5}{:>6}{:>6}{:>6}{:>6}{:>13}{:>13}\n'.format(*tuple(replacement)))
+
+    # renumber atoms in each residue
+
+    C = 0
+    O = 0
+    N = 0
+    S = 0
+    H = 0
+    res_start = 0
+    while out[res_start].count('residue') == 0:
+        res_start += 1
+
+    res_no = -1
+    new_names = {}
+    for i in range(res_start, len(out)):
+        if out[i].count('residue') == 0:
+            line = out[i].split()
+            old_name = line[4]
+            atom = line[4][0]
+            if atom == 'C':
+                C += 1
+                n = C
+            elif atom == 'O':
+                O += 1
+                n = O
+            elif atom == 'N':
+                N += 1
+                n = N
+            elif atom == 'S':
+                S += 1
+                n = S
+            elif atom == 'H':
+                H += 1
+                n = H
+            if used_residues[res_no] == 'MTH' or used_residues[res_no] == 'M2':
+                line[4] = '%sM%s' % (atom, n)
+            else:
+                line[4] = '%s%s' % (atom, n)
+            new_names[old_name] = line[4]
+            out[i] = '{:>6}{:>5}{:>6}{:>6}{:>6}{:>6}{:>13}{:>13}\n'.format(*tuple(line))
+        else:
+            res_no += 1
+            C = 0
+            O = 0
+            N = 0
+            S = 0
+            H = 0
 
     ################# BONDS #######################
 
@@ -220,7 +267,8 @@ if __name__ == "__main__":
         k = list(renumber_atoms.keys())[list(renumber_atoms.values()).index(i)]
         replacement = a[k + 1].split()  # add two for top lines
         replacement[0] = renumber_res[k]  # residue number associated with that atom number
-        replacement[1] = used_residues[renumber_res[k] - 1]
+        replacement[1] = used_residues[renumber_res[k] - 1][0]
+        replacement[2] = new_names[replacement[2]]
         replacement[3] = i
 
         out.append('{:>5}{:>5}{:>5}{:>5}{:>8}{:>8}{:>8}\n'.format(*tuple(replacement)))

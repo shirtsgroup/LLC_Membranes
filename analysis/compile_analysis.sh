@@ -29,7 +29,7 @@ echo "Trajectory Converted"
 
 # Structure_char.py
 echo 'Calculating pore to pore distances'
-p2p_output="$(Structure_char.py -t ${trajectory} -g ${gro} --noshow --auto_exclude --save)"  # capture all stdout in one variable
+p2p_output="$(Structure_char.py -t ${trajectory} -g ${gro} --noshow --auto_exclude --save --plot_avg)"  # capture all stdout in one variable
 # extract all information we care about from p2p_ouput. http://stackoverflow.com/questions/19399238/under-bash-how-to-extract-two-numbers-by-parsing-a-string#comment28753888_19399302
 autocorrelation="$(grep -Po '(?<=Maximum Autocorrelation Time: )[0-9]+\.[0-9]+' <<< ${p2p_output})"
 p2p_avg="$(grep -Po '(?<=Pore to Pore distance: )[0-9]+\.[0-9]+' <<< ${p2p_output})"

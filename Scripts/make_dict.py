@@ -1,5 +1,6 @@
 #! /bin/bash/env python
 
+from __future__ import print_function
 import argparse
 import os
 
@@ -53,4 +54,4 @@ if __name__ == "__main__":
 
     charge = mk_dict(args.mon)
 
-    print charge
+    print(charge)
