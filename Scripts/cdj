@@ -3,17 +3,14 @@
 # Changes directories to where a job associated with the input job ID is running
 # Run this script prefixed by '.' so that it actually changes directories, otherwise directories are changed in a bash
 # subshell and the user will see no change
+# Create an alias for this script : alias cdj=". cdj"   and you'll avoid the above issue 
 
-while getopts "j:" opt; do
-    case $opt in
-    j) JOBID=$OPTARG;;
-    esac
-done
+#scontrol show job ${1} > job  # get all the information about the job and save it to a file
 
-scontrol show job ${JOBID} > job  # get all the information about the job and save it to a file
+#workdir=$(sed -n 's/^   WorkDir=//p' job)  # extract the working directory from that file
 
-workdir=$(sed -n 's/^   WorkDir=//p' job)  # extract the working directory from that file
+workdir=$(scontrol show job ${1} | sed -n 's/^   WorkDir=//p')
 
-rm job  # remove job as it is no longer needed
+#rm job  # remove job as it is no longer needed
 
 cd $workdir  # change to the working directory for the job of interest
