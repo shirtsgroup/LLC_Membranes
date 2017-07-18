@@ -13,10 +13,10 @@ for i in $jobs; do  # check all jobs
 			DIR=$(dirname "${path}") # directory where job is located
 			KEEP=$(grep -n 'module' ${DIR}/Run.sh | tail -n1 | cut -d: -f1)  # keep up to this line from the original Run.sh file
 			head -n ${KEEP} ${DIR}/Run.sh > ${DIR}/continue.sh  # copy lines up to KEEP into a new batch script
-			processes=$(get_node_config.py -i Run.sh)  # number of processes
+			processes=$(get_node_config.py -i ${DIR}/Run.sh)  # number of processes
 			echo '' >> ${DIR}/continue.sh
-			echo "mpirun -np ${processes} gmx_mpi mdrun -s wiggle.tpr -cpi wiggle.cpt -append -v -deffnm wiggle" >> continue.sh # command to continue where the simulation left off
-			sbatch ${DIR}/continue.sh  # submit job for continuation
+			echo "mpirun -np ${processes} gmx_mpi mdrun -s wiggle.tpr -cpi wiggle.cpt -append -v -deffnm wiggle" >> ${DIR}/continue.sh # command to continue where the simulation left off
+			sbatch --workdir ${DIR} ${DIR}/continue.sh  # submit job for continuation
 			time=$(date '+%H:%M')
 			mail -s "Job ${i} Cancelled at $time" benjamin.coscia@colorado.edu <<< "Path to job failure: ${path}"  # email myself the location of failed job
 		fi
