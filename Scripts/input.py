@@ -1,12 +1,19 @@
-#!/usr/bin/python
+#! /usr/bin/env python
 
 """
 Write input files. Default settings are not included. Add an argument if you need to change a default that isn't shown
 """
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
+from builtins import str
+from builtins import range
+from past.utils import old_div
 import os
 import argparse
 import LC_class
+import lc_class
 
 parser = argparse.ArgumentParser(description='Write .mdp files and topology files for various types of simulation')
 
@@ -35,13 +42,8 @@ args = parser.parse_args()
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in
 
-exec "build_mon = LC_class.%s.build_mon" % args.build_mon
-exec "ion = LC_class.%s.counterion" % args.build_mon
-exec "mon_name = LC_class.%s.name" % args.build_mon
-exec "no_ions = LC_class.%s.valence" % args.build_mon
-exec "name = LC_class.%s.name" % args.build_mon
-exec "grps = LC_class.%s.residues" % args.build_mon
-exec "natoms = LC_class.%s.atoms" % args.build_mon
+props = lc_class.LC('%s.gro' % args.build_mon)
+mon_name = props.residues[0]
 
 if args.xlink:
     mon_top = '#include "%s/crosslinked_new.itp"' % os.getcwd()
@@ -53,7 +55,7 @@ gaff = '#include "%s/../top/Forcefields/gaff' % location  # generalized amber fo
 # Energy minimization .mdp file
 title = 'title = Energy Minimization'
 integrator = 'integrator = steep'
-nsteps = 'nsteps = %s' %args.em_steps
+nsteps = 'nsteps = %s' % args.em_steps
 cutoff_scheme = 'cutoff-scheme = verlet'
 nstlist = 'nstlist = 40'
 
@@ -67,15 +69,15 @@ if args.ensemble == 'npt':
     # a.append(['cutoff-scheme = verlet'])  # I think verlet is default
     a.append(['integrator = md\n'])  # this also might be default
     a.append(['dt = %s\n' % args.dt])
-    a.append(['nsteps = %s\n' % int(args.length / args.dt)])
+    a.append(['nsteps = %s\n' % int(old_div(args.length, args.dt))])
     a.append(['continuation = no\n'])
     a.append(['constraints = h-bonds\n'])
     a.append(['constraint-algorithm = lincs\n'])
     a.append(['cutoff-scheme = Verlet\n'])
-    a.append(['nstxout = %s\n' % int(args.length / (args.dt * args.frames))])
-    a.append(['nstvout = %s\n' % int(args.length / (args.dt * args.frames))])
-    a.append(['nstfout = %s\n' % int(args.length / (args.dt * args.frames))])
-    a.append(['nstenergy = %s\n' % int(args.length / (args.dt * args.frames))])
+    a.append(['nstxout = %s\n' % int(old_div(args.length, (args.dt * args.frames)))])
+    a.append(['nstvout = %s\n' % int(old_div(args.length, (args.dt * args.frames)))])
+    a.append(['nstfout = %s\n' % int(old_div(args.length, (args.dt * args.frames)))])
+    a.append(['nstenergy = %s\n' % int(old_div(args.length, (args.dt * args.frames)))])
     a.append(['nstlist = 40\n'])
     a.append(['nstype = grid\n'])
     a.append(['vdwtype = PME\n'])
@@ -93,7 +95,7 @@ if args.ensemble == 'npt':
             a.append(['ref-p = 1\n'])
             a.append(['compressibility = 4.5e-5\n'])
         else:
-            a.append(['ref-p = %s\n' % ' '.join([str(1) for i in grps])])
+            a.append(['ref-p = %s\n' % ' '.join([str(1) for i in props.residues])])
             a.append(['compressibility = 4.5e-5 4.5e-5\n'])
     if args.genvel == 'yes':
         a.append(['gen-vel = yes\n'])
@@ -120,14 +122,14 @@ if args.ensemble == 'nvt':
     # a.append(['cutoff-scheme = verlet'])  # I think verlet is default
     a.append(['integrator = md\n'])  # this also might be default
     a.append(['dt = %s\n' % args.dt])
-    a.append(['nsteps = %s\n' % int(args.length / args.dt)])
+    a.append(['nsteps = %s\n' % int(old_div(args.length, args.dt))])
     a.append(['continuation = no\n'])
     a.append(['constraints = h-bonds\n'])
     a.append(['constraint-algorithm = lincs\n'])
-    a.append(['nstxout = %s\n' % int(args.length / (args.dt * args.frames))])
-    a.append(['nstvout = %s\n' % int(args.length / (args.dt * args.frames))])
-    a.append(['nstfout = %s\n' % int(args.length / (args.dt * args.frames))])
-    a.append(['nstenergy = %s\n' % int(args.length / (args.dt * args.frames))])
+    a.append(['nstxout = %s\n' % int(old_div(args.length, (args.dt * args.frames)))])
+    a.append(['nstvout = %s\n' % int(old_div(args.length, (args.dt * args.frames)))])
+    a.append(['nstfout = %s\n' % int(old_div(args.length, (args.dt * args.frames)))])
+    a.append(['nstenergy = %s\n' % int(old_div(args.length, (args.dt * args.frames)))])
     a.append(['nstlist = 40\n'])
     a.append(['nstype = grid\n'])
     a.append(['vdwtype = PME\n'])
@@ -163,9 +165,10 @@ if args.restraints:
 else:
     a.append('%s"\n' % mon_top)
 a.append('\n')
-a.append(';Ion Topology\n')
-a.append('%s/ions.itp"\n' % gaff)
-a.append('\n')
+if props.no_ions > 0:
+    a.append(';Ion Topology\n')
+    a.append('%s/ions.itp"\n' % gaff)
+    a.append('\n')
 if args.solvate:
     a.append(';Water Topology\n')
     a.append('%s/tip3p.itp\n' % gaff)
@@ -182,20 +185,25 @@ for line in f:
     gro.append(line)
 
 nres = 0
-nion = 0
 for i in range(2, len(gro)):
     if gro[i].count('%s' % mon_name) != 0:
         nres += 1
-    if gro[i].count('%s' % ion) != 0:
-        nion += 1
 
-nmon = int(nres / natoms)
+if props.ions:
+    nion = 0
+    for i in range(2, len(gro)):
+        if gro[i].count('%s' % props.ions[0]) != 0:
+            nion += 1
+
+nmon = int(old_div(nres, props.natoms))
 
 if args.restraints:
     a.append('%s                1\n' % (mon_name))
 else:
     a.append('%s                %s\n' % (mon_name, nmon))
-a.append('%s                 %s\n' % (ion, nion))
+
+if props.ions:
+    a.append('%s                 %s\n' % (props.ions[0], nion))
 
 f = open('topol.top', 'w')
 for line in a:

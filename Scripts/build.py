@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import range
+from past.utils import old_div
 import numpy as np
 import math
 import os
@@ -366,7 +371,7 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
     f.write('This is a .gro file\n')
     f.write('%s\n' % sys_atoms)
 
-    rot *= (np.pi/180)  # convert input (degrees) to radians
+    rot *= (old_div(np.pi,180))  # convert input (degrees) to radians
 
     grid = Periodic_Images.shift_matrices(1, 60, p2p, p2p)
     grid = np.reshape(grid, (2, 9))
@@ -408,21 +413,21 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
             layer_mons = layer_distribution[l*no_layers + k]
             for j in range(layer_mons):  # iterates over each monomer to create coordinates
                 monomer_count += 1
-                theta = j * math.pi / (layer_mons / 2.0) + rot
+                theta = j * math.pi / (old_div(layer_mons, 2.0)) + rot
                 if args.offset:
-                    theta += (k % 2) * (math.pi / layer_mons)
+                    theta += (k % 2) * (old_div(math.pi, layer_mons))
                 Rx = rotate(theta)
                 xyz = np.zeros(positions.shape)
                 for i in range(no_atoms - no_ions):
                     if args.helix:
-                        xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist + (dist/float(layer_mons))*j]
-                        hundreds = int(math.floor(atom_count/100000))
+                        xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist + (old_div(dist,float(layer_mons)))*j]
+                        hundreds = int(math.floor(old_div(atom_count,100000)))
                     else:
                         xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist]
                         # xyz[:, i] = np.dot(Rx, positions[:, i]) + [b, c, k*dist]
-                        hundreds = int(math.floor(atom_count/100000))
+                        hundreds = int(math.floor(old_div(atom_count,100000)))
                     f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(monomer_count, name, identity[i],
-                        atom_count - hundreds*100000, xyz[0, i]/10.0, xyz[1, i]/10.0, xyz[2, i]/10.0) + "\n")
+                        atom_count - hundreds*100000, old_div(xyz[0, i],10.0), old_div(xyz[1, i],10.0), old_div(xyz[2, i],10.0)) + "\n")
                     atom_count += 1
 
     # Ions:
@@ -446,23 +451,23 @@ def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores
         for k in range(no_layers):
             layer_mons = layer_distribution[l*no_layers + k]
             for j in range(layer_mons):  # iterates over each monomer to create coordinates
-                theta = j * math.pi / (layer_mons / 2.0)
+                theta = j * math.pi / (old_div(layer_mons, 2.0))
                 if args.offset:
-                    theta += (k % 2) * (math.pi / layer_mons)
+                    theta += (k % 2) * (old_div(math.pi, layer_mons))
                 Rx = rotate(theta)
                 xyz = np.zeros([3, no_ions])
                 for i in range(0, no_ions):
                     monomer_count += 1
                     if args.helix:
-                        xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b*p2p, c*p2p, k*dist + (dist/float(layer_mons))*j]
-                        hundreds = int(math.floor(atom_count/100000))
+                        xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b*p2p, c*p2p, k*dist + (old_div(dist,float(layer_mons)))*j]
+                        hundreds = int(math.floor(old_div(atom_count,100000)))
                     else:
                         xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b*p2p, c*p2p, k*dist]
                         # xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b, c, k*dist]
-                        hundreds = int(math.floor(atom_count/100000))
+                        hundreds = int(math.floor(old_div(atom_count,100000)))
                     f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(monomer_count, identity[no_atoms - (i + 1)],
-                        identity[no_atoms - (i + 1)], atom_count - hundreds*100000, xyz[0, i]/10.0, xyz[1, i]/10.0,
-                        xyz[2, i]/10.0) + "\n")
+                        identity[no_atoms - (i + 1)], atom_count - hundreds*100000, old_div(xyz[0, i],10.0), old_div(xyz[1, i],10.0),
+                        old_div(xyz[2, i],10.0)) + "\n")
                     atom_count += 1
 
     f.write('   0.00000   0.00000  0.00000\n')
@@ -472,14 +477,7 @@ if __name__ == "__main__":
 
     args = initialize()
 
-    # properties = lc_class.LC('%s' % args.build_mon)
-
-    exec "build_mon = LC_class.%s.build_mon" % args.build_mon
-    exec "no_ions = LC_class.%s.valence" % args.build_mon
-    exec "name = LC_class.%s.name" % args.build_mon
-    exec "plane_atoms = LC_class.%s.planeatoms" % args.build_mon
-    exec "ref_index = LC_class.%s.ref_atom_index" % args.build_mon
-    exec "lineatoms = LC_class.%s.lineatoms" % args.build_mon
+    props = lc_class.LC('%s' % args.build_mon)
      
     no_monomers = args.monomers  # number of monomers packed per layer around a pore
     pore_radius = args.radius  # Radius of pore (unsure of units right now)
@@ -491,13 +489,13 @@ if __name__ == "__main__":
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
     # Read in build monomer coordinates
-    f = open("%s/../top/HII_Monomer_Configurations/%s" % (location, build_mon), "r")
-    if build_mon.endswith('.pdb'):
+    f = open("%s/../top/HII_Monomer_Configurations/%s" % (location, args.build_mon), "r")
+    if args.build_mon.endswith('.pdb'):
         pos, identity, no_atoms, lines_of_text = file_rw.read_pdb_coords(f)
-    elif build_mon.endswith('.gro'):
+    elif args.build_mon.endswith('.gro'):
         pos, identity, no_atoms, lines_of_text = file_rw.read_gro_coords(f)
     else:
-        print 'Please input a valid file type (.gro or .pdb)'
+        print('Please input a valid file type (.gro or .pdb)')
 
     layer_distribution = transform.layer_dist(args.layers, args.nopores, args.layer_distribution, args.monomers,
                                               args.alt_1, args.alt_2)
@@ -510,26 +508,26 @@ if __name__ == "__main__":
 
     count = 0
     for i in range(no_atoms):
-        if identity[i] in plane_atoms:
+        if identity[i] in props.planeatoms:
             plane[count, :] = pos[:, i]
             count += 1
 
     if args.flip:
         tilt = 0
         R_down = transform.rotateplane(plane, angle=math.pi)
-        xyz_down = transform.reposition(pos, R_down, ref_index, lineatoms, args.radius)
+        xyz_down = transform.reposition(pos, R_down, props.ref_atom_index, props.lineatoms, args.radius)
         xyz_down = copy.deepcopy(xyz_down)
         tilt = math.pi
     else:
         tilt = args.tilt
 
     R = transform.rotateplane(plane, angle=tilt)
-    xyz_up = transform.reposition(pos, R, ref_index, lineatoms, args.radius)
+    xyz_up = transform.reposition(pos, R, props.ref_atom_index, props.lineatoms, args.radius)
 
     if args.flip:
-        file_rw.write_initial_config(xyz_up, identity, name, no_layers, layer_distribution, dist, no_pores, p2p,
-                                     no_ions, args.rot, args.out, args.offset, args.helix, args.offset_angle, xyz_down)
+        file_rw.write_initial_config(xyz_up, identity, props.residues[0], no_layers, layer_distribution, dist, no_pores, p2p,
+                                     props.no_ions, args.rot, args.out, args.offset, args.helix, args.offset_angle, xyz_down)
     else:
         # write_gro(xyz_up, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions, args.rot)
-        file_rw.write_initial_config(xyz_up, identity, name, no_layers, layer_distribution, dist, no_pores, p2p,
-                                     no_ions, args.rot, args.out, args.offset, args.helix, args.offset_angle)
+        file_rw.write_initial_config(xyz_up, identity, props.residues[0], no_layers, layer_distribution, dist, no_pores, p2p,
+                                     props.no_ions, args.rot, args.out, args.offset, args.helix, args.offset_angle)

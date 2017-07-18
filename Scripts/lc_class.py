@@ -27,7 +27,7 @@ class LC(object):
 
     def __init__(self, name):
 
-        self.name = name  # build monomer name
+        self.name = os.path.splitext(name)[0]  # build monomer name
 
         a = []
         with open('%s/../top/HII_Monomer_Configurations/%s' % (location, name)) as f:
@@ -38,6 +38,8 @@ class LC(object):
         L = []
         C1 = []
         C2 = []
+        self.no_ions = 0
+        self.ions = []
 
         if name.endswith('.gro'):
 
@@ -68,7 +70,11 @@ class LC(object):
                     if 'C2' in annotations:
                         C2.append(str.strip(a[i][10:15]))
                     if 'I' in annotations:
-                        self.valence = Atom_props.charge[str.strip(a[i][10:15])]
+                        self.no_ions += 1
+                        ion = str.strip(a[i][10:15])
+                        self.valence = Atom_props.charge[ion]
+                        if ion not in self.ions:
+                            self.ions.append(ion)
                     if 'B' in annotations:
                         benzene_carbons.append(str.strip(a[i][10:15]))
 
@@ -116,7 +122,7 @@ class LC(object):
 
             nres.append(res_count)
 
-        self.natoms = sum(nres)
+        self.natoms = sum(nres) - self.no_ions
         self.planeatoms = P
         self.lineatoms = L
         self.residues = residues

@@ -3,7 +3,11 @@
 """
 Calculate the tilt angle of alkyl chains
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import range
+from past.utils import old_div
 import argparse
 import numpy as np
 import mdtraj as md
@@ -12,7 +16,7 @@ import copy
 import math
 import matplotlib.pyplot as plt
 from matplotlib import animation
-import MDAnalysis as mda
+import tqdm
 
 
 def initialize():
@@ -69,11 +73,11 @@ def angles(pos, atoms, normal=[0, 0, 1]):
     normal = np.array(normal)
     nT = pos.shape[0]
     natoms = pos.shape[1]
-    chains = natoms / atoms
+    chains = old_div(natoms, atoms)
     w = np.zeros([nT, chains])
 
     count = 0
-    for i in range(nT):
+    for i in tqdm.tqdm(range(nT)):
         for j in range(chains):
             avg_tilt = 0
             for k in range(atoms - 1):  # atoms - 1 since there are n - 1 relevant vectors in a straight chain
@@ -82,7 +86,7 @@ def angles(pos, atoms, normal=[0, 0, 1]):
                 vn = np.dot(v, normal)
                 nn = np.linalg.norm(normal)
                 vv = np.linalg.norm(v)
-                avg_tilt += np.arcsin(vn / (nn * vv)) * (180 / np.pi)
+                avg_tilt += np.arcsin(old_div(vn, (nn * vv))) * (old_div(180, np.pi))
                 count += 1
             avg_tilt /= (atoms - 1)
 
@@ -103,7 +107,7 @@ if __name__ == "__main__":
     if args.load:
         all_tilt_angles = np.load('angles')
         times = np.load('times')
-        print 'arrays loaded'
+        print('arrays loaded')
     else:
         if args.single_frame:
             traj = md.load('%s' % args.gro)
@@ -124,11 +128,9 @@ if __name__ == "__main__":
                 all_tilt_angles = np.concatenate((all_tilt_angles, tilt_angles_grp), axis=1)
 
         if args.save:
-            with open('angles', 'w') as f:
-                np.save(f, all_tilt_angles)
-            with open('times', 'w') as f:
-                np.save(f, times)
-            print "Arrays saved"
+            np.save('angles', all_tilt_angles)
+            np.save('times', times)
+            print("Arrays saved")
 
     if args.single_frame:
         # a = all_tilt_angles[0, :20]
@@ -136,7 +138,7 @@ if __name__ == "__main__":
         # for i in range(a.shape[0] - 1):
         #     b[i] = a[i + 1] - a[i]
         # print b
-        print "Average Angle: %s +/- %s degrees" % (np.mean(all_tilt_angles[0, :]), np.std(all_tilt_angles[0, :]))
+        print("Average Angle: %s +/- %s degrees" % (np.mean(all_tilt_angles[0, :]), np.std(all_tilt_angles[0, :])))
     else:
         nT = all_tilt_angles.shape[0]
         avgs = np.zeros([nT])
@@ -146,7 +148,7 @@ if __name__ == "__main__":
             stds[i] = np.std(all_tilt_angles[i, :])
             avgs[i] = np.mean(all_tilt_angles[i, :])
 
-        print 'Average tilt angle : %s +/- %s' % (np.mean(avgs[nT/2:]), np.mean(stds[nT/2:]))
+        print('Average tilt angle : %s +/- %s' % (np.mean(avgs[old_div(nT,2):]), np.mean(stds[old_div(nT,2):])))
         # Format and save figure
         plt.figure()
         plt.errorbar(times, avgs, yerr=stds)

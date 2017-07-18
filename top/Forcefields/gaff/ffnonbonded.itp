@@ -15,6 +15,17 @@
  Na       NA          22.9900  0.00000   A     3.32840e-01   1.15897e-02  
  OW       16          16.0000  0.00000   A     3.15061e-01   6.36386e-01
  HW       1            1.0080  0.00000   A     0.00000e+00   0.00000e+00
+ n        14          14.0100  0.00000   A     3.24999e-01   7.11280e-01 ; 1.8240 0.1700
+ hn       1            1.0080  0.00000   A     1.06907e-01   6.56888e-02 ; 0.60 0.0157 
+ oh       16          16.0000  0.00000   A     3.06647e-01   8.80313e-01 ; 1.7210 0.2104
+ ho       1            1.0080  0.00000   A     0.00000e+00   0.00000e+00 ; 0.0 0.0
 ; * paramters are from gaff.dat and converted to gromacs units (sigma [=] nm,
 ; epsilon [=] kJ/mol) from A and kcal/mol 
-
+; You can find the LJ pararmeters in gaff.dat by searching for the section
+; beginning with 'MOD4'
+; 1 kcal = 4.184 kJ
+; convert sigma like this:(2 / 10) * (sigma / (2^(1/6)))
+; the number given as the 'sigma' parameter is actually Rmin / 2 so you multiply by 2
+; convert to nanometers by dividing by 10
+; divide by 2^(1/6) to get sigma since that is the conversion between Rmin and sigma
+; More here : https://www.researchgate.net/post/Where_are_the_charge_sigma_epsilon_parameters_in_GAFF

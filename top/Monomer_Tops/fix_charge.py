@@ -1,5 +1,8 @@
 #! /usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
+from past.utils import old_div
 import argparse
 import numpy as np
 
@@ -11,6 +14,7 @@ def initialize():
     parser.add_argument('-t', '--top', type=str, help='name of topology file '
                                                       '(.itp)')
     parser.add_argument('-c', '--charge', default=-1, type=int, help='formal charge on molecule')
+    parser.add_argument('-o', '--output', default='out.top', type=str, help='Name of output file')
 
     args = parser.parse_args()
 
@@ -63,11 +67,15 @@ if __name__ == "__main__":
 
     while abs(sum(charges) - args.charge) > 10**-9:
         tot = sum(charges)
-        charges = [round(i/abs(tot), 6) for i in charges]
+        if args.charge != 0:
+            charges = [round(old_div(i,abs(tot)), 6) for i in charges]
+        else:
+            mean = np.mean(charges)
+            charges = [i - mean for i in charges]
 
     new_charges = replacecharge(a, charges)
 
-    f = open(args.top, 'w')
+    f = open(args.output, 'w')
     for line in new_charges:
         f.write(line)
 

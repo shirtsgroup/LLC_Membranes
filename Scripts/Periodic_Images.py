@@ -25,6 +25,11 @@
       \________\  \
                    v
 """
+from __future__ import division
+from __future__ import print_function
+from builtins import str
+from builtins import range
+from past.utils import old_div
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
@@ -92,9 +97,9 @@ def pbcs(pts, images, angle, xbox, ybox, frame):
         for p in range(tot_pts):
             for i in range(mat_dim):
                 for j in range(mat_dim):
-                    translated_pts[0, i*mat_dim + j, p] = x_shift[i, j] + pts[p, 0]/10
-                    translated_pts[1, i*mat_dim + j, p] = y_shift[i, j] + pts[p, 1]/10
-                    translated_pts[2, i*mat_dim + j, p] = pts[p, 2]/10  # z position unchanged
+                    translated_pts[0, i*mat_dim + j, p] = x_shift[i, j] + old_div(pts[p, 0],10)
+                    translated_pts[1, i*mat_dim + j, p] = y_shift[i, j] + old_div(pts[p, 1],10)
+                    translated_pts[2, i*mat_dim + j, p] = old_div(pts[p, 2],10)  # z position unchanged
 
     return translated_pts
 
@@ -109,11 +114,11 @@ if __name__ == "__main__":
     gro = md.coordinates.core.reader('%s' % args.file)
     pos = gro.ts._pos
     box = gro.ts._unitcell
-    xbox = box[0]/10
-    ybox = box[1]/10
-    zbox = box[2]/10
+    xbox = old_div(box[0],10)
+    ybox = old_div(box[1],10)
+    zbox = old_div(box[2],10)
 
-    print 'positions got'
+    print('positions got')
 
     no_comp = np.shape(pos)[0]
 
@@ -135,7 +140,7 @@ if __name__ == "__main__":
 
     pts = np.shape(pt_periodic)[2]
     duplicates = np.shape(pt_periodic)[1]
-    print duplicates
+    print(duplicates)
 
     all_positions = np.zeros([3, pts*duplicates])
     for i in range(duplicates):
@@ -149,7 +154,7 @@ if __name__ == "__main__":
     count = 0
     count1 = 1
     for j in range(duplicates):
-        print j
+        print(j)
         for i in range(pts):
             row = str(pt_periodic[:, j, i])
 

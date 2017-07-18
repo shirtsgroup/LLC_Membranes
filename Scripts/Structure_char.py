@@ -29,7 +29,7 @@ def initialize():
     parser.add_argument('-a', '--atoms', default=137, help = 'Number of atoms per monomer')
     parser.add_argument('-l', '--layers', default=20, help = 'Number of layers in each pore')
     parser.add_argument('-p', '--pores', default=4, help = 'Number of Pores')
-    parser.add_argument('-c', '--component', default='NA', help = 'Counterion used to track pore positions')
+    parser.add_argument('-c', '--component', default='NA', nargs='+', help = 'Counterion used to track pore positions')
     parser.add_argument('-f', '--start_frame', default=0, type=int, help = 'Frame number to start reading trajectory at')
     parser.add_argument('-s', '--layer_distribution', default='uniform', help = 'The distribution of monomers per layer')
     parser.add_argument('-L', '--alt_1', default=6, help = 'Monomers per layer for the first type of alternating layer')
