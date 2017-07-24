@@ -8,8 +8,9 @@ for i in $jobs; do  # check all jobs
 	scontrol show job $i > job_info; # get info about running jobs
 	path=$(get_job_path.py -i job_info);  # get paths to the StdOut
 	if [ -f ${path} ]; then  # check if the file at the given path exists. If it doesn't exist then job hasn't started running yet
-		if grep -q 'Fatal' ${path}; then # Check if there are LINCS warnings
+		if grep -q 'Fatal' ${path} || [ -f core.* ]; then # Check if there are LINCS warnings
 			scancel $i  # cancel the job because it is probably stopped
+			rm core.* # remove any of these files so the if statement doesn't get triggered everytime
 			DIR=$(dirname "${path}") # directory where job is located
 			KEEP=$(grep -n 'module' ${DIR}/Run.sh | tail -n1 | cut -d: -f1)  # keep up to this line from the original Run.sh file
 			head -n ${KEEP} ${DIR}/Run.sh > ${DIR}/continue.sh  # copy lines up to KEEP into a new batch script
