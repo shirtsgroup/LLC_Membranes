@@ -3,7 +3,7 @@
 Nanostructured membrane materials have become increasingly popular for 
 aqueous separations applications such as desalination and biorefinement
 because they offer the ability to control membrane architecture at the
-atomic scale allowing design of solute-specific separation membranes 
+atomic scale allowing the design of solute-specific separation membranes 
 \cite{humplik_nanostructured_2011}. Most membrane-based aqueous 
 separations of small molecules can be achieved using reverse osmosis 
 (RO) or nanofiltration (NF)\cite{van_der_bruggen_review_2003}. 
@@ -28,15 +28,22 @@ This is why NF is often used as a precursor to reverse osmosis.
 Unfortunately, NF membranes, like RO, are produced with a pore size 
 distribution which limits their ability to perform precise separations
 \cite{bowen_modelling_2002}.
+% Thesis: RO and NF are imperfect
+% RO membranes are tortuous and polydisperse, energy intensive, can't do targeted separations well
+% NF lower energy but has a pore size distribution
 
 Nanostructured membranes can bypass many of the performance issues which
-plague traditional NF and RO membranes. Targeted separations can be 
-accomplished by tuning size and functionality of the molecular building
-blocks which form these materials. Solute rejecting pore sizes can be
+plague traditional NF and RO membranes. One can accomplish targeted
+separations by tuning size and functionality of the molecular building
+blocks which form these materials. Solute rejecting pore sizes can be  % BJC: "these materials" --> "nanostructured membranes", or is that redundant?
 tuned uniformly, resulting in sharp size cut-offs. Entirely different
 mechanisms may govern the separation processes in a given nanostructured
 material which can inspire novel separation techniques.
-	
+% Thesis: Nanostructured materials can overcome issues seen in RO and NF
+% We can achieve targeted separations by controlling the system arhitecture
+% We can get uniform pore sizes 
+% we can create new separation techniques by learning about these systems <-- This point might be better elsewhere
+
 Development of nanostructured materials has been limited by the ability
 to synthesize and scale various fundamentally sound technologies.
 Graphene sheets are atomically thick which results in excellent permeability
@@ -49,8 +56,13 @@ Zeolites have sub-nm pores with a narrow size distribution and MD simulations
 exhibit complete rejection of solvated ions \cite{murad_molecular_1998},
 however, experimental rejection was low and attributed to interstitial
 defects formed during membrane synthesis \cite{li_desalination_2004}.
-	  
-Self assembling lyotropic liquid crystals (LLCs) share the characteristic
+% Thesis: Past development has been limited by the ability to create working membranes at a useful scale	  
+% Graphene sheets have defects
+% Carbon nanotubes can't be made uniform or aligned
+% Zeolites may have interstitial defects hurting performance
+
+Self assembling lyotropic liquid crystals (LLCs) are a suitable candidate
+for aqueous separation applications. They share the characteristic
 ability of nanostructured membrane materials to create highly ordered 
 structures with the added benefits of low cost and synthetic techniques
 feasible for large scale production\cite{feng_scalable_2014}. LLCs are
@@ -62,7 +74,7 @@ zhou_supported_2005,resel_h2-phase_2000,feng_scalable_2014,feng_thin_2016}.
 Neat monomer forms the thermotropic, Col\textsubscript{h} phase. The 
 presence of small amounts of water results in the H\textsubscript{II} 
 phase. In both cases, monomers assemble into mesophases made of 
-hexagonally packed cylinders with hydrophilic groups oriented inward
+hexagonally packed, uniform size, cylinders with hydrophilic groups oriented inward
 towards the pore center and hydrophobic groups facing outward. Until
 % BJC: reproduce the figure from ACS nano? It does a good job
 % BJC: I can also color in the atomistic layer a bit 
@@ -73,13 +85,21 @@ field with subsequent crosslinking to lock the structure in place
 \cite{feng_scalable_2014}. In 2016, Feng et al. showed that the same 
 result could be obtained using a technique called soft confinement
 \cite{feng_thin_2016}. Following this breakthrough, research into LLC
-membranes has been reinvigorated. This paper will focus on 
-the development of a model of the Col\textsubscript{h} phase membrane
-meant to accelerate development of LLC membranes. We have chosen to 
-model the Col\textsubscript{h} phase since it is a simpler starting 
-point and has just as much experimental structural data as the 
-H\textsubscript{II} phase. 
-	
+membranes has been reinvigorated. We have chosen to focus our efforts 
+on the development of a model of the Col\textsubscript{h} phase membrane
+in order to accelerate development of LLC membranes.  Compared to the 
+H\textsubscript{II} phase, the Col\textsubscript{h} phase is a simpler
+starting point, due to the absence of water, and has equivalent 
+experimental structural data. 
+. 
+% Thesis: LLCs would make good filtration membranes
+% They share the same properties as other nanostructured materials
+% They can be scaled and are cheap to make
+% LLCs have a large chemical design space
+% It has been studied extensively
+% Ordered - hexagonally packed cylinders with uniform sized pore regions
+% Scalable - alignment gets rid of some performance issues associated with misalignment
+
 \begin{figure}
 \centering
 \begin{subfigure}{.45\linewidth}
@@ -113,22 +133,22 @@ structure}\label{fig:cartoonvatomistic}
 % a cartoon and atomistically
 
 A molecular level understanding of LLC membrane structure will elucidate
-small molecule transport mechanisms, providing guidelines to reduce the
-chemical space for design of monomers used to create separation-specific
+small molecule transport mechanisms, providing guidelines for reducing the
+chemical space for the design of monomers used to create separation-specific
 membranes. We do not yet understand how to reduce the effective pore
-size or tune the chemical environment in the H\textsubscript{II} 
+size or how to tune the chemical environment in the H\textsubscript{II} 
 nanopores for effective water desalination and small organic separations.
 Rejection studies show that this membrane can not perform desalination yet 
 because the pores are too large\cite{zhou_supported_2005}. Over the past
 20 years, LLC membrane studies have been limited primarily 
 to Na-GA3C11 with some characterization done after minor structural 
 modifications\cite{resel_structural_2000}. Optimization has been 
-performed through trial and error. The only source of predictive modeling
+performed through trial and error. The only source of predictive modeling  % BJC: Reference. I think it is just w.r.t. bicontinuous cubic
 has been macroscopic models which likely do not adequately describe 
 transport at these length scales. A good model should incorporate a 
 detailed picture of the nanoscopic pore structure. Pore components may 
-play a role in rejection of charged or uncharged solutes. Choice of 
-counterion may influence the establishment of a donnan potential
+play a role in the rejection of charged or uncharged solutes. Choice of 
+counterion may influence the establishment of a Donnan potential
 affecting the degree to which the membrane can exclude charged species.
 Moieties inside the pores may interact with neutral solutes, rejecting
 % BJC: (so I can remember this theory in the future) A donnan potential
@@ -155,12 +175,25 @@ radius. An atomistic understanding of pore structure and its influence on
 % for solutes to follow? 
 transport can help identify performance bottle necks and direct design of
 future membranes. 
+%Thesis: A molecular model will help us understand solute transport in these
+% systems and aid in the selection of monomers for creating new membranes
+% We can figure out a way to make desalination feasible
+% Most attempts at improvement have been based on trial and error
+% Past modeling hasn't been nanoscopically detailed and can't tell us what
+% we need to know to make improved membranes 
+% An atomistic model can actually help direct design
 
-%BJC: I dont like this sentence vvv
+%BJC: Can't decide which thesis to use
+% Thesis 1
 A clear picture of the nanoscopic structure of LLC membranes, gained by
-building a molecular model, will provide evidence to support or call
+building a molecular model will provide evidence to support or call
 into question past drawn conclusions that have largely guided our 
-understanding of separation mechanisms.	The arrangement of sodium ions
+understanding of the system. 
+% Thesis 2
+A clear picture of the nanoscopic LLC membrane structure, gained by building 
+a molecular model will provide evidence to answer existing and newly proposed
+questions.
+The arrangement of sodium ions
 in the channels is thought to be confined to the pore walls. It is 
 possible they are arranged more randomly. This would change the way
 one thinks about molecules diffusing through the membrane. The
@@ -170,12 +203,12 @@ on top of one another, each containing a set number of monomers. A
 simple simulation study of a similar molecule suggests that there are 4
 monomers in each disk~\cite{zhu_methacrylated_2006}. A separate calculation
 based on the volume of the liquid crystal monomers proposes that there 
-are seven monomers in each layer~\cite{resel_structural_2000}. Once we 
+are seven monomers in each layer~\cite{resel_structural_2000}. Once we %BJC: why is knowing the number of monomers in each layer important to experimentalists at all - find monomers which prefer to pack more densely - high ionic conductivity?
 know the number of monomers in each layer, we still do not know how 
 monomers in each layer are positioned with respect to other layers. 
 One of the driving forces for self % reference something with self assembly of aromatic compounds
 assembly in this system is thought to be pi-stacking interactions
-between headgroup benzene rings\cite{gazit_possible_2002}. Gas phase ab
+between aromatic headgroups\cite{gazit_possible_2002}. Gas phase ab
 initio studies of benzene dimers have shown a clear energetic advantage
 for parallel displaced and T-shaped pi-stacking conformations versus a
 sandwiched conformation~\cite{sinnokrot_estimates_2002}.
@@ -187,12 +220,18 @@ provide answers to these questions using a molecular model, there remains
 the possibility that there is more than one metastable state associated
 with a given LLC system. We must be able to identify which states can
 %BJC: might get rid of this last point since we don't address experimental viability of metastable states
+%BJC2: well let's see what results Xunda can pull out
 be produced experimentally and what implications each state might have
 regarding transport properties.
+% Thesis: Knowing what the molecular structure can validate and explain work that has been done in the past
+% We might construct a different picture of the arrangement of sodium ions 
+% We might be able to answer how many monomers are in each layer
+% How do benzene rings stack on top of each other?
+% Is it possible there are more metastable states?
 
 We must show that the developed molecular model is consistent with
-physical observations so that we can trust conclusions drawn about 
-structural features characteristic of the system. This paper will
+physical observations so that we can trust conclusions drawn about % better word for trust?
+structural features characteristic of the system. This article will
 illustrate the development of a predictive molecular model and the steps
 taken to ensure it mimics the real system within the constraints 
 inherent to MD. To understand how physically realistic the model is,
@@ -202,8 +241,9 @@ made from XRD experiments and ionic conductivity measurements
 \cite{feng_thin_2016}. We have comparied simulated X-ray diffraction
 patterns to experiment in order to match major features present in the
 2D patterns. We calculate ionic conductivity using two agreeing methods.
-We examined the crosslinking mechanism and understand its influence on
+We examined the the influence of crosslinking on
 membrane structure. The analysis used in this paper can be readily
-extended to the H\textsubscript{II} phase.
-
+extended to the H\textsubscript{II} phase and other similar LC systems.
+% Thesis: Our model needs to be consistent with experimental observations
+% A bunch of things we can compare to 
 	
