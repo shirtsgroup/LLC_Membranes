@@ -14,7 +14,7 @@ parameterized monomer. Monomers were cooled from 1000K to 50K over 10
 nanoseconds. A low energy configuration was pulled from the trajectory 
 and charges were reassigned using the am1bccsym method of molcharge
 shipped with Openeye Scientific software's QUACPAC. Using the new
-charges, the monomer system was annealed again and multiple monomer
+charges, the monomer system was annealed again and monomer
 configurations were pulled from the trajectory to be used for full
 system construction.
 	
@@ -33,11 +33,15 @@ configuration to relax into an equilibrium configuration. Our logic for
 choosing a starting configuration and the details of the equilibration 
 schemes are presented below.
 
-Each pore consists of twenty stacked monomer layers with periodic 
-continuity in all directions, avoiding any edge effects and creating an
-infinite length pore ideal for studying transport. A small number of
-layers is preferred in order to reduce computational cost and to allow
-us look at longer timescales. Ultimately, we chose to build a system
+A typical simulation volume contains four pores in a monoclinic unit cell,
+the smallest unit cell that maintains hexagonal symmetry when extended 
+periodically. Each pore is made of twenty stacked monomer layers with
+% describe unit cell in terms of alpha beta gamma angles?
+% mention semi-isotropic pressure coupling here or later
+periodic continuity in all directions, avoiding any edge effects and 
+creating an infinite length pore ideal for studying transport. A small
+number of layers is preferred in order to reduce computational cost and 
+to allow us to look at longer timescales. Ultimately, we chose to build a system
 with 20 layers of monomer in each pore in order to give sufficient
 resolution when simulating X-ray diffraction patterns.
 
