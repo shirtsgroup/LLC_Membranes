@@ -5,8 +5,9 @@ HII monomers were parameterized using the Generalized AMBER Forcefield
 provided with AmberTools16\cite{case_ambertools16_2016}. Charges were
 assigned using tools from Openeye Scientific Software. All molecular 
 dynamics simulations were run using Gromacs version 5.1.2 and Gromacs 
-version 2016. \cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,
+version 2016. \cite{bekker_gromacs:_1993,berendse n_gromacs:_1995,
 van_der_spoel_gromacs:_2005,hess_gromacs_2008}
+% Software used
 	
 An ensemble of characteristic, low-energy vacuum monomer configurations
 were constructed by applying a simulated annealing process to a
@@ -17,6 +18,7 @@ shipped with Openeye Scientific software's QUACPAC. Using the new
 charges, the monomer system was annealed again and monomer
 configurations were pulled from the trajectory to be used for full
 system construction.
+% monomer parametrization
 	
 The timescale for self assembly of monomers into the hexagonal phase is
 unknown and likely outside of a reasonable length for an atomistic
@@ -25,13 +27,14 @@ Previous work has shown a coarse grain model self assemble into the HII
 phase configuration in $\approx$ 1000 ns \cite{mondal_self-assembly_2013}.
 Atomistic self-assembly was attempted by packing monomers into a box 
 using Packmol\cite{martinez_packmol:_2009}. Simulations of $>$ 100 ns 
-show no progress towards an ordered system. To bypass the slow self-assembly
-process, python code was written that assembles monomers into a structure 
-close to the expected equilibrium configuration. A short, restrained 
-equilibration, followed by NPT simulations $>$ 500 ns, allows the initial
-configuration to relax into an equilibrium configuration. Our logic for
-choosing a starting configuration and the details of the equilibration 
-schemes are presented below.
+show no indicators of progress towards an ordered system. To bypass the
+slow self-assembly process, python scripts are used to assemble 
+monomers into a structure close to the expected equilibrium configuration.
+A short, restrained equilibration, followed by NPT simulations $>$ 500 ns, 
+allows the initial configuration to relax into an equilibrium configuration.
+Our logic for choosing a starting configuration and the details of the equilibration 
+schemes are presented below. % eliminate this sentence?
+% Unit Cell building method and justification
 
 A typical simulation volume contains four pores in a monoclinic unit cell,
 the smallest unit cell that maintains hexagonal symmetry when extended 
@@ -42,8 +45,8 @@ periodic continuity in all directions, avoiding any edge effects and
 creating an infinite length pore ideal for studying transport. A small
 number of layers is preferred in order to reduce computational cost and 
 to allow us to look at longer timescales. Ultimately, we chose to build a system
-with 20 layers of monomer in each pore in order to give sufficient
-resolution when simulating X-ray diffraction patterns.
+with 20 monomer layers each pore in order to give sufficient
+resolution when simulating X-ray diffraction patterns.  % BJC: reword / mention xrd resolution - system size dependence in previous sentence
 
 % Questionably needed figure
 %\begin{figure}
@@ -58,36 +61,40 @@ based on experimental data and treated as variables during model
 development. The distance between pores was based on experimental SAXS
 data for this system \cite{feng_thin_2016}. Initial configuration pore
 spacing was chosen to be 10 \% larger than the experimental value. 
-The layer spacing was based on reflections from experimental 2D WAXS
-data at 3.7 \angstrom, thought to represent pi-stacking between stacked
-benzene rings\cite{feng_scalable_2014}. The tendency of simulations to
-equilibrate to slightly larger interlayer spacing inspired systems
-starting with layer spacings $>$ 4 \angstrom.
+The layer spacing was based on experimental 2D WAXS data which shows
+reflections corresponding to features spaced 3.7 \angstrom apart. It has 
+been hypothesized that the features are present due to pi-pi
+interactions between stacked aromatic rings\cite{feng_scalable_2014}. 
+Our simulations tend to equilibrate to a wider interlayer spacing of \approx 4.1 \angstrom,
+which inspired separate systems starting with layer spacings $>$ 4 \angstrom.
+Initial pore radius estimates were based on past TEM 
+images and size exclusion rejection data\cite{feng_scalable_2014,
+feng_thin_2016,zhou_supported_2005}.
 % There is plenty I can say about initial configuration. Starting layers
 % too far apart, too close, tilted initial configurations etc.
-The relative interlayer orientation was chosen based on the various 
-stacking modes of benzene and substituted benzene rings: sandwiched,
-T-shaped and parallel-displaced. The T-shaped configuration was ruled
-out based on the inconsistency of its preferred stacking distance of 
-$\approx$ 5 \angstrom, with diffraction data. The system's preference
+The relative interlayer orientation was chosen based on clues from diffraction
+data as well as the various known stacking modes of benzene and substituted 
+benzene rings: sandwiched, T-shaped and parallel-displaced. The T-shaped configuration was ruled
+% BJC: Figure showing benzene pi-stacking modes and 
+out based on the inconsistency of its $\approx$ 5 \angstrom equilibrium 
+stacking distance with diffraction data. The system's preference
 towards the sandwiched vs. parallel displaced stacking modes was left
-as a variable. Initial pore radius estimates were based on past TEM 
-images and size exclusion rejection data\cite{feng_scalable_2014,
-feng_thin_2016,zhou_supported_2005}.    
+to be explored. Visualization of each configuration suggests entropic differences 
+based on the way the tails are able to pack. This difference may 
+explain, in part, which stacking mode is more favorable.
 
-An equilibration scheme with position restraints placed on benzene rings
+An equilibration scheme with position restraints placed on aromatic rings
 prevents unrealistic jumps during early equilibration steps. Restraints
-allow the monomer head groups to remain in the sandwiched or parallel-displaced 
-configurations while monomer tails settle. Doing so also helps prevent
-system dependence on initial monomer configuration. During the restrained
-equilibration, force constants are reduced by the square root of the 
-previous force constant every 50 ps, with a starting value of 1e6 KJ
-mol\textsuperscript{-1} nm\textsuperscript{-2}. Once the force constant
+fix monomer head groups in the sandwiched or parallel-displaced 
+configurations while allowing monomer tails to settle. Doing so also mitigates 
+system dependence on initial monomer configuration. Restrained
+equilibrations are run in the NVT ensemble. Every 50 ps, force constants 
+are reduced by the square root of its previous value, starting from 
+1e6 KJ mol\textsuperscript{-1} nm\textsuperscript{-2}. Once the force constant
 is below 10 KJ mol\textsuperscript{-1} nm\textsuperscript{-2}, the 
-restraints are slowly released until there is no more restriaining 
-potential. All restrained equilibrations are run in the NVT ensemble. 
-The resulting unrestrained structure is subsequently allowed to 
-equilibrate in the NPT ensemble for $>$ 200 ns.  
+restraints are slowly released until there is no more restraining 
+potential. The resulting unrestrained structure is allowed to 
+equilibrate in the NPT ensemble for $>$ 200 ns.  % should probably run all of them to x ns rather than making it ambiguous
 
 %Determination of equilibration 
 %\begin{itemize}
@@ -119,6 +126,7 @@ crosslinks between monomer tails of the same monomer, monomers stacked on
 top of each other and monomers in other pores, including across periodic
 boundaries. The pore spacing shrinks by $\approx$ 1 \angstrom and stays 
 constant under a range of simulation conditions (see supplemental info). 
+% BJC: This paragraph could be shortened and some of it put in the supplemental info, but I like it here for now
 
 Simulated X-ray diffraction patterns were generated based on atomic
 coordinates to give a deeper understanding of the pore structure and
@@ -132,14 +140,15 @@ integration of the FT yields a 1 dimensional curve which is the same
 as that generated in a diffraction experiment. We matched experimental
 1D and 2D WAXS patterns by iterative improvement of our choice of 
 initial structure and equilibration procedure 
+% Replace with a description written by Joe
 
 Ionic conductivity was calculated using two different methods for
 robustness. The Nernst-Einstein relation relates 
 the DC ionic conductivity to ion diffusivity, $D$, concentration,
 $C$, ion charge, $q$, the boltzmann constant, $k_b$, and temperature,
 $T$: $$\sigma = \dfrac{q^2CD}{k_b T}$$ Sodium ion diffusion 
-coefficients were found by calculating the slope of mean square
-displacement curve as indicated by the einstein relation
+coefficients were found by calculating the slope of the linear
+region of the mean square displacement curve as indicated by the einstein relation
 \cite{einstein_investigations_1956}. Ion concentration was measured with
 respect to the entire unit cell. The second method, termed the 'Collective
 Diffusion' model \cite{liu_collective_2013}, measures the movement of
@@ -150,3 +159,4 @@ the system can be calculated as: $$ \gamma = \dfrac{D_Q}{k_b T} $$
 Conversion to ionic conductivity is achieved by multiplying by channel 
 length and dividing by the membrane cross sectional area. A full 
 derivation of the model can be accessed elsewhere\cite{liu_collective_2013}.  
+% Talk about error somewhere?
