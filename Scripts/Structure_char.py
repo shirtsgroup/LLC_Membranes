@@ -22,12 +22,9 @@ from scipy.optimize import curve_fit
 def initialize():
     parser = argparse.ArgumentParser(description='Run Cylindricity script')
 
-    parser.add_argument('-t', '--input', default='wiggle.trr', help = 'Path to input file')
-    parser.add_argument('-g', '--gro', default='wiggle.gro', help = 'Some kind of configuration file that mdtraj needs'
+    parser.add_argument('-t', '--input', default='wiggle.trr', type=str, help = 'Path to input file')
+    parser.add_argument('-g', '--gro', default='wiggle.gro', type=str, help = 'Some kind of configuration file that mdtraj needs'
                                                                     'Can be a .pdb as well')
-    parser.add_argument('-n', '--no_monomers', default=6, help = 'Number of Monomers per layer')
-    parser.add_argument('-a', '--atoms', default=137, help = 'Number of atoms per monomer')
-    parser.add_argument('-l', '--layers', default=20, help = 'Number of layers in each pore')
     parser.add_argument('-p', '--pores', default=4, help = 'Number of Pores')
     parser.add_argument('-c', '--component', default='NA', nargs='+', help = 'Counterion used to track pore positions')
     parser.add_argument('-f', '--start_frame', default=0, type=int, help = 'Frame number to start reading trajectory at')
@@ -51,6 +48,15 @@ def initialize():
     parser.add_argument('--save', action="store_true", help='Save the output plot')
     parser.add_argument('--buffer', default=0, type=float, help='Distance into membrane to look for components')
     parser.add_argument('--plot_avg', action="store_true", help='Plot average p2p distance at each frame')
+    parser.add_argument('--plot_std', action="store_true", help='Plot average p2p distance at each frame')
+    parser.add_argument('-T', help='Use for concatenated trajectories of simulations run at multiple '
+                                                 'temperatures. Supply the name of index file with temperatures and '
+                                                 'times where the switch occurs. On each line supply the info with'
+                                                 'the format temp:time')
+    parser.add_argument('--begin', default=0, type=int, help='Frame to begin calculations')
+    parser.add_argument('--end', default=-1, type=int, help='Frame to stop calculations')
+    parser.add_argument('--skip', default=1, type=int, help='Usage: --skip n . Sample every nth frame')
+    parser.add_argument('--plot_every', default=1, type=int, help='Plot every n frames')
 
     args = parser.parse_args()
 
@@ -232,13 +238,23 @@ def p2p_stats(p2ps, exclude, nboot, equil):
             trajectories[i, j, :] = p2ps[i, (t + j*tau):(t + (j + 1)*tau)]
 
     # bootstrap to get statistics
-    p2p_boot = np.zeros([ndist, nboot*ind_trajectories])  # bootstrap each pore
+    p2p_boot = np.zeros([ndist, nboot])
     for i in range(nboot):
         for j in range(ndist):
-            for k in range(ind_trajectories):
+            for k in range(nT - t):
                 T = ran.randrange(0, ind_trajectories)  # pick a random trajectory from all the independent trajectories
                 P = ran.randrange(0, tau)  # choose a random point in that trajectory
-                p2p_boot[j, i*ind_trajectories + k] = trajectories[j, T, P]
+                p2p_boot[j, i] += trajectories[j, T, P]
+            p2p_boot[j, i] /= (nT - t)
+
+    # Old way of doing things:
+    # p2p_boot = np.zeros([ndist, nboot*ind_trajectories])  # Recreate the dataset
+    # for i in range(nboot):
+    #     for j in range(ndist):
+    #         for k in range(ind_trajectories):
+    #             T = ran.randrange(0, ind_trajectories)  # pick a random trajectory from all the independent trajectories
+    #             P = ran.randrange(0, tau)  # choose a random point in that trajectory
+    #             p2p_boot[j, i*ind_trajectories + k] = trajectories[j, T, P]
 
     avg = np.zeros([ndist])  # find the average of each trajectory
     for i in range(ndist):
@@ -248,12 +264,12 @@ def p2p_stats(p2ps, exclude, nboot, equil):
 
     stds = np.zeros([ndist])  # find the standard deviation for each pore : s = sqrt((<x> - x)^2) where x is the avg[i]
     for i in range(ndist):
-        stds[i] = np.sqrt((ensemble_avg - avg[i])**2)
+        stds[i] = np.sqrt((ensemble_avg - avg[i])**2) / np.sqrt(ndist - 1)
 
-    p2p_std = np.mean(stds)  # report the average of the standard deviations
+    p2p_std = np.mean(stds)   # report the average of the standard deviations
 
-    #print ' Pore to Pore Statistics calculated starting at frame {:d} ({:2.1f} percent into simulation)'.format(
-    #        t, 100.0 * t / nT)
+    ensemble_avg = np.mean(p2p_boot)
+
     return ensemble_avg, p2p_std, t
 
 
@@ -338,16 +354,109 @@ from scipy.misc import factorial
 def poisson(k, lamb):
     return old_div((lamb**k * np.exp(-lamb)), factorial(k))
 
+
+def parse_txt(txt, points, times, std=False):
+    """
+    Find out where to place lines in plot
+    :param txt: a text file with pertinent information. Temperatures which the simulation was run at and at what time
+    the simulation is at that temperature should be of the form Temperature:time (i.e. at `time` ps the simulation
+    switches to `Temperature`). That section should be donoted by a header of the form [ T ]. You can also include a
+    benchmark value which will be plotted as a straight line with dotted lines representing the error bounds. Start that
+    section with the header [ bench ] with subsequent lines of the form value+/-error. Sections should be
+    separated by a blank line
+    :return: vertical lines where temperature switches occur (with T labels) and horizontal lines for the benchmark
+    value with dotted horizontal lines representing the error bounds
+    """
+
+    with open(txt, 'r') as f:
+
+        a = []
+        for line in f:
+            a.append(line)
+
+    T = 0
+    while a[T].count('[ T ]') == 0:
+        T += 1
+    T += 1
+    temp = []
+    time = []
+    while a[T] != '\n':
+        info = a[T].split(':')
+        temp.append(int(info[0]))
+        time.append(float(info[1]))
+        T += 1
+
+    for i, T in enumerate(temp):
+        x = np.array([time[i], time[i]])
+        y = np.array([0, 5])
+        plt.plot(x, y, '--', linewidth=3, color='r', scaley=False)
+        plt.annotate('T = %s' % T, xy=(time[i], np.mean(points)), xytext=(time[i] + 10000, np.amax(points)))
+
+    if std:
+        std_equil = np.zeros([4, len(time) - 1])
+        for i in range(len(time) - 1):
+            begin = np.where(times == time[i])[0][0]
+            end = np.where(times == time[i + 1])[0][0]
+            slice = p2ps[:, begin:end]
+            p2p_avg, p2p_std, equil = p2p_stats(slice, exclude, '%s' % args.nboot, '%s' % args.equil)
+            std_equil[:, i] = [p2p_avg, p2p_std, equil + begin, end]
+
+        for i in range(std_equil.shape[1]):
+            avg = std_equil[0, i]
+            std = std_equil[1, i]
+            x = np.array([times[int(std_equil[2, i])], times[int(std_equil[3, i])]])
+            upperbound = np.array([avg + std, avg + std])
+            lowerbound = np.array([avg - std, avg - std])
+            plt.fill_between(x, upperbound, lowerbound, alpha=0.5, color='orange')
+            # plt.plot(x, upperbound, '--', linewidth=1, color='orange')
+            # plt.plot(x, lowerbound, '--', linewidth=1, color='orange')
+
+    B = 0
+    while a[B].count('[ bench ]') == 0:
+        B += 1
+    B += 1
+
+    benchval = []
+    bencherr = []
+    y_low = [np.amin(points)]
+    y_high = [np.amax(points)]
+
+    while a[B] != '\n' and B < len(a):
+        info = a[B].split('+/-')
+        benchval.append(float(info[0]))
+        bencherr.append(float(info[1]))
+        B += 1
+
+    for i, v in enumerate(benchval):
+        if i < len(temp) - 1:
+            x = np.array([time[i], time[i + 1]])
+        else:
+            x = np.array([time[i], (time[i] + 1)*1000000])
+        y = np.array([v, v])
+        y_low.append(v - bencherr[i])
+        y_high.append(v + bencherr[i])
+        upperbound = np.array([v + bencherr[i], v + bencherr[i]])
+        lowerbound = np.array([v - bencherr[i], v - bencherr[i]])
+        plt.fill_between(x, upperbound, lowerbound, alpha=0.5, color='g')
+        plt.plot(x, y, linewidth=2, color='k', scalex=False)
+        # plt.plot(x, upperbound, '--', linewidth=1, color='g')
+        # plt.plot(x, lowerbound, '--', linewidth=1, color='g')
+
+    ybounds = np.array([min(y_low)*.99, max(y_high)*1.01])
+    xbounds = np.array([-100, max(times)])
+
+    return xbounds, ybounds
+
+
 if __name__ == '__main__':
 
     args = initialize()  # parse the args
 
-    t = md.load('%s' % args.input, top='%s' % args.gro)
+    t = md.load(args.input, top=args.gro)[args.begin:args.end:args.skip]
 
     pos = restrict_atoms(t, args.component)  # convenience function
     nT = np.shape(pos)[0]
 
-    traj_start = int(args.start_frame)
     tot_atoms = np.shape(pos)[1]
     n_pores = int(args.pores)  # number of pores
     comp_ppore = old_div(tot_atoms,n_pores)
@@ -386,13 +495,18 @@ if __name__ == '__main__':
 
         avg /= n
 
-        plt.plot(t.time, avg)
+        plt.plot(t.time[::args.plot_every], avg[::args.plot_every])
+
+        if args.T:
+            xbounds, ybounds = parse_txt(args.T, avg[::args.plot_every], t.time[::args.plot_every], std=args.plot_std)
+            plt.ylim(ybounds)
+            plt.xlim(xbounds)
 
     else:
         plt.figure(1)
         for i in range(distances):
             if i not in exclude:
-                plt.plot(t.time, p2ps[i, :], label='%s' % labels[i])
+                plt.plot(t.time[::args.plot_every], p2ps[i, ::args.plot_every], label='%s' % labels[i])
 
     plt.title('Pore to Pore Distance Equilibration')
     plt.ylabel('Distance between pores (nm)')

@@ -6,9 +6,32 @@ from past.utils import old_div
 from llclib import file_rw
 import mdtraj as md
 import numpy as np
+import matplotlib.path as mplPath
+import mdtraj as md
+from random import randint
 
 
-def thickness(filename, ref_atoms, *traj):
+class region:
+    """
+    Define a region as an extrusion of a polygon in the z direction
+    """
+
+    def __init__(self, sides):
+        """
+        :param sides: number of sides making up the region in the xy plane
+        :return: region
+        """
+        self.sides = sides
+
+    def xyregion(self, corners):
+        """
+        :param corners: points defining the corners of the polygon making up the xy region
+        :return: a region defined by corners
+        """
+        path = mplPath.Path(corners)
+
+
+def thickness(filename, ref_atoms, grid, *traj, **kwargs):
     """
     :param filename: name of .gro file
     :param ref_atoms: atoms which thickness will be based on
@@ -24,6 +47,7 @@ def thickness(filename, ref_atoms, *traj):
         thick = np.zeros([nT])
         z_max = np.zeros([nT])
         z_min = np.zeros([nT])
+        thick_std = np.zeros([nT])
         for t in range(nT):
             z_max_t = max(traj[t, :, 2])
             z_min_t = min(traj[t, :, 2])
@@ -42,18 +66,75 @@ def thickness(filename, ref_atoms, *traj):
         while a[line].count('HII') == 0:
             line += 1
 
-        z = []  # list to hold z positions of all atoms
+        if grid:
 
-        while a[line].count('HII') != 0:
-            if str.strip(a[line][11:15]) in ref_atoms:
-                z.append(float(a[line][36:44]))
-            line += 1
+            pos = md.load(filename).xyz[0, :, :]  # positions of all atoms
 
-        z_max = max(z)
-        z_min = min(z)
-        thick = z_max - z_min
+            # define boundaries of each grid area
+            grid_res = kwargs['grid_res']
+            nregions = (grid_res - 1) ** 2
+            g = np.zeros([2, grid_res, grid_res])
+            dims = a[-1].split()
+            xbox = np.linalg.norm([dims[0], dims[3], dims[4]])
+            ybox = np.linalg.norm([dims[1], dims[5], dims[6]])
+            yangle = np.arctan(float(dims[1])/abs(float(dims[5])))
 
-    return thick, z_max, z_min
+            for i in range(grid_res):
+                g[0, i, :] = np.linspace(0, xbox, grid_res) + (float(i) / grid_res)*float(dims[5])
+                g[1, :, i] = np.linspace(0, ybox, grid_res)*np.sin(yangle)
+
+            corners = np.zeros([nregions, 4, 2])
+            zmaxes = np.zeros([nregions])
+            zmins = np.zeros([nregions])
+            thicks = np.zeros([nregions])
+
+            for i in range(grid_res - 1):
+                for j in range(grid_res - 1):
+                    # define corners of grid region
+                    r = i*(grid_res - 1) + j
+                    corners[r, 0, :] = g[:, i, j]
+                    corners[r, 1, :] = g[:, i + 1, j]
+                    corners[r, 2, :] = g[:, i + 1, j + 1]
+                    corners[r, 3, :] = g[:, i, j + 1]
+
+                    # create a region using the corners (corners need to be traced in order)
+                    path = mplPath.Path(corners[r, :, :])
+                    contained = path.contains_points(pos[:, :2])  # check whether each point is in the region
+                    z = pos[np.where(contained), 2]  # get the z position of all atoms contained in the region
+                    zmaxes[r] = np.max(z)
+                    zmins[r] = np.min(z)
+                    thicks[r] = zmaxes[r] - zmins[r]
+
+            # bootstrap to get statistics
+            nboot = 2000
+            vmax = np.zeros([nboot])
+            vmin = np.zeros([nboot])
+
+            for i in range(nboot):
+                imax = randint(0, nregions - 1)
+                imin = randint(0, nregions - 1)
+                vmax[i] = zmaxes[imax]
+                vmin[i] = zmins[imin]
+
+            z_max = np.mean(vmax)
+            z_min = np.mean(vmin)
+            thick = np.mean(vmax - vmin)
+            thick_std = np.std(vmax - vmin)
+
+        else:
+            z = []  # list to hold z positions of all atoms
+
+            while a[line].count('HII') != 0:
+                if str.strip(a[line][11:15]) in ref_atoms:
+                    z.append(float(a[line][36:44]))
+                line += 1
+
+            z_max = max(z)
+            z_min = min(z)
+            thick = z_max - z_min
+            thick_std = 0
+
+    return thick, z_max, z_min, thick_std
 
 
 def conc(t, t_comp, b):

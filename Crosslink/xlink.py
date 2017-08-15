@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 # Script to crosslink LLC monomers based on distance between carbons at the end of a simulation
 
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import range
+from past.utils import old_div
 import os
 import argparse
 import numpy as np
@@ -48,7 +53,7 @@ def exclude_adjacent(mat_dim, images):
     # Create a matrix of 1's and 0's. Entries that are 1's should not be counted in the distance calculations because they
     # represent distances that are either between carbons on the same monomer, or are terminated carbons
 
-    atoms = mat_dim/images
+    atoms = old_div(mat_dim,images)
     ones = np.ones((1, mat_dim))[0]
     exclude = np.diag(ones, 0)
 
@@ -142,11 +147,11 @@ def convert_index(c1_atoms, c2_atoms, c1, c2):
     c1 %= 1440
     c2 %= 1440
 
-    mon_c1 = int(c1 / 3)
-    mon_c2 = int(c2 / 3)
+    mon_c1 = int(old_div(c1, 3))
+    mon_c2 = int(old_div(c2, 3))
 
-    r_c1 = int(((c1 / 3) - mon_c1)*3)
-    r_c2 = int(((c2 / 3) - mon_c2)*3)
+    r_c1 = int(((old_div(c1, 3)) - mon_c1)*3)
+    r_c2 = int(((old_div(c2, 3)) - mon_c2)*3)
 
     return [mon_c1*143 + int(c1_atoms[r_c1]), mon_c2*143 + int(c2_atoms[r_c2])]
 
@@ -178,14 +183,14 @@ if __name__ == "__main__":
     box = t.unitcell_vectors
 
     # get all of this information from the class defining the specified build monomer
-    exec "atoms = LC_class.%s.atoms" % args.build_mon
-    exec "c1_atoms = LC_class.%s.c1_atoms" % args.build_mon
-    exec "c2_atoms = LC_class.%s.c2_atoms" % args.build_mon
+    exec("atoms = LC_class.%s.atoms" % args.build_mon)
+    exec("c1_atoms = LC_class.%s.c1_atoms" % args.build_mon)
+    exec("c2_atoms = LC_class.%s.c2_atoms" % args.build_mon)
     topology = "%s.itp" % args.build_mon
-    exec "xlink_atoms = LC_class.%s.no_vsites" % args.build_mon
-    exec "no_dummies = LC_class.%s.no_vsites" % args.build_mon
-    exec "images = LC_class.%s.images" % args.build_mon  # total periodic images used for distance calculations
-    exec "tails = LC_class.%s.tails" % args.build_mon
+    exec("xlink_atoms = LC_class.%s.no_vsites" % args.build_mon)
+    exec("no_dummies = LC_class.%s.no_vsites" % args.build_mon)
+    exec("images = LC_class.%s.images" % args.build_mon)  # total periodic images used for distance calculations
+    exec("tails = LC_class.%s.tails" % args.build_mon)
 
     if args.nogap:
         images *= 3
@@ -220,7 +225,7 @@ if __name__ == "__main__":
     indices = convert_index(C1_mon_indices, C2_mon_indices, C1_restricted[0], C2_restricted[0])
 
     stop1 = time.time()
-    print 'PBCs set up: %s seconds' % (stop1 - start)
+    print('PBCs set up: %s seconds' % (stop1 - start))
     # Find distance between carbon 1 and carbon 2 for all pairs
 
     mat_dim = C1.shape[1]  # Dimensions of the matrix created in the next step
@@ -281,10 +286,10 @@ if __name__ == "__main__":
         #     for j in range(0, images):
         #         exclude[j*mat_dim/images + i, :] = 1
 
-        C1_restricted = exclude(C1_restricted, c1_ex_no, images, C1.shape[1]/images)
-        C2_restricted = exclude(C2_restricted, c2_ex_no, images, C2.shape[1]/images)
+        C1_restricted = exclude(C1_restricted, c1_ex_no, images, old_div(C1.shape[1],images))
+        C2_restricted = exclude(C2_restricted, c2_ex_no, images, old_div(C2.shape[1],images))
 
-    print 'beginning distance calculation'
+    print('beginning distance calculation')
 
     start_dist = time.time()
     dist = genpairs.calc_dist2(C1, C2, C1_restricted, C2_restricted)
@@ -295,7 +300,7 @@ if __name__ == "__main__":
 
     indices = convert_index(C1_mon_indices, C2_mon_indices, C1_restricted[np.argmin(d)], C2_restricted[1])
 
-    print 'Distances Calculated: %s seconds' % (stop3 - start_dist)
+    print('Distances Calculated: %s seconds' % (stop3 - start_dist))
 
     # Now see which of these distances meet the cutoff criteria
     # Find the distance of the closest carbon to each c1 and its index
@@ -306,7 +311,7 @@ if __name__ == "__main__":
     min_index = np.zeros([ncarb1])  # index of minimum value of distances for each monomer-monomer measurement
     for i in C1_restricted:
         min_dist[i] = min(dist[i, :])
-        min_index[i] = np.argmin(dist[i, :]) % (ncarb1/images)  # index corresponds to the monomer with which
+        min_index[i] = np.argmin(dist[i, :]) % (old_div(ncarb1,images))  # index corresponds to the monomer with which
 
     change_index1 = []  # index of C1 from min_dist which needs to be changed
     change_index2 = []  # index of C2 from dist which needs to be changed
@@ -317,17 +322,17 @@ if __name__ == "__main__":
 
         c2_radicals = []
         for i in C2_restricted:
-            if i % (ncarb1/images) in c2_reactive_no:
+            if i % (old_div(ncarb1,images)) in c2_reactive_no:
                 c2_radicals.append(i)
 
         min_dist_rad = np.zeros([len(c2_radicals)])
         min_index_rad = np.zeros([len(c2_radicals)])
         for i in range(len(c2_radicals)):
             min_dist_rad[i] = min(dist[c2_radicals[i], :])
-            min_index_rad[i] = np.argmin(dist[c2_radicals[i], :]) % (ncarb1/images)
+            min_index_rad[i] = np.argmin(dist[c2_radicals[i], :]) % (old_div(ncarb1,images))
 
         min_list_rad = min_dist_rad.tolist()
-        for i in range(int((float(args.cutoff_rad)/100)*len(min_list_rad))):  # This could be done by sorting then cutting off first ten percent -- its probably better that way
+        for i in range(int((old_div(float(args.cutoff_rad),100))*len(min_list_rad))):  # This could be done by sorting then cutting off first ten percent -- its probably better that way
             m = min(min_list_rad)
             min_list_rad.remove(m)
 
@@ -348,20 +353,20 @@ if __name__ == "__main__":
     min_list = [a for a in min_dist if a < 1000]
 
     distances = []
-    for i in range(int((float(args.cutoff)/100)*len(min_list))):  # looks at a percentage of the total values based on user input of cutoff
+    for i in range(int((old_div(float(args.cutoff),100))*len(min_list))):  # looks at a percentage of the total values based on user input of cutoff
         m = min(min_list)  # finds minimum of min_list
         distances.append(m)
         min_list.remove(m)  # removes that value from min_list
 
     cutoff = min(min_list)  # The minimum value left after the modification of min_list is the cutoff value
-    print 'Cutoff = %s nm' % cutoff
+    print('Cutoff = %s nm' % cutoff)
     if cutoff > 0.6:
         cutoff = 0.6
 
     count = 0
     for i in C1_restricted:
         if min_dist[i] < cutoff:  # find distances which meet the cutoff criteria
-            change_index1.append(i % (ncarb1/images))  # holds the index of the atom associated with the met criteria for primary carbons (C20, C34, C48)
+            change_index1.append(i % (old_div(ncarb1,images)))  # holds the index of the atom associated with the met criteria for primary carbons (C20, C34, C48)
             change_index2.append(int(min_index[i]))  # Same as above but for the secondary carbons
             count += 1
 
@@ -381,17 +386,17 @@ if __name__ == "__main__":
 
     for i in range(len(change_index1)):
         if change_index1[i] in tail1:  # This is C1 therefore if this is true, then the atom is C20 (atom no 27)
-            C1_no.append((change_index1[i]/3)*atoms + C1_mon_indices[0])
+            C1_no.append((old_div(change_index1[i],3))*atoms + C1_mon_indices[0])
         if change_index1[i] in tail2:  # This is C1 therefore if this is true, then the atom is C34 (atom no 42)
-            C1_no.append((change_index1[i]/3)*atoms + C1_mon_indices[1])  # division automatically round down
+            C1_no.append((old_div(change_index1[i],3))*atoms + C1_mon_indices[1])  # division automatically round down
         if change_index1[i] in tail3:  # This is C1 therefore if this is true, then the atom is C48 (atom no 57)
-            C1_no.append((change_index1[i]/3)*atoms + C1_mon_indices[2])  # division automatically round down
+            C1_no.append((old_div(change_index1[i],3))*atoms + C1_mon_indices[2])  # division automatically round down
         if change_index2[i] in tail1:  # This is C2 therefore if this is true, then the atom is C19 (atom no 26)
-            C2_no.append((change_index2[i]/3)*atoms + C2_mon_indices[0])
+            C2_no.append((old_div(change_index2[i],3))*atoms + C2_mon_indices[0])
         if change_index2[i] in tail2:  # This is C2 therefore if this is true, then the atom is C33 (atom no 41)
-            C2_no.append((change_index2[i]/3)*atoms + C2_mon_indices[1])  # division automatically round down
+            C2_no.append((old_div(change_index2[i],3))*atoms + C2_mon_indices[1])  # division automatically round down
         if change_index2[i] in tail3:  # This is C2 therefore if this is true, then the atom is C47 (atom no 56)
-            C2_no.append((change_index2[i]/3)*atoms + C2_mon_indices[2])  # division automatically round down
+            C2_no.append((old_div(change_index2[i],3))*atoms + C2_mon_indices[2])  # division automatically round down
 
     if int(args.iteration) != 0:
 
@@ -442,7 +447,7 @@ if __name__ == "__main__":
 
     tp = args.term_prob  # termination probability
 
-    indices = random.sample(range(0, 99), tp)
+    indices = random.sample(list(range(0, 99)), tp)
     term_prob_array = np.zeros([100])  # make an array with a a percentage of 1's equal to the termination probability
     for i in indices:
         term_prob_array[i] = 1
@@ -520,7 +525,7 @@ if __name__ == "__main__":
         from llclib import file_rw
 
         file_rw.write_assembly(args.build_mon, 'on', "crosslinked.itp", ncarb1/tails/images)
-        print 'Crosslinked.itp file written'
+        print('Crosslinked.itp file written')
 
         f = open('crosslinked.itp', 'r')
         b = []
@@ -531,7 +536,7 @@ if __name__ == "__main__":
         b = []
         for line in f:
             b.append(line)
-        print '%s read into list' % args.topology
+        print('%s read into list' % args.topology)
 
 
     # Make lists with numbers of H atoms whose type needs to change as a consequence of the cross linking reaction
@@ -1081,7 +1086,7 @@ if __name__ == "__main__":
         if str.strip(b[i])[-1] == 'T' and str.strip(b[i + 1])[-1] == 'T':
             terminated += 1
 
-    percent_completion = (float(terminated)/float(tot_double_bonds))*100
+    percent_completion = (old_div(float(terminated),float(tot_double_bonds)))*100
 
     end = time.time()
 

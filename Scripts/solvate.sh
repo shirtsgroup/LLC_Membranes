@@ -26,11 +26,6 @@ while getopts "t:g:s:b:p:o:r:m:c:" opt; do
     esac
 done
 
-round()
-{
-echo $(env printf %.$2f $(echo "scale=$2;(((10^$2)*$1)+0.5)/(10^$2)" | bc))
-};
-
 # put reference atoms in the format of a python list
 ref="["
 for atom in ${ref_atoms}; do

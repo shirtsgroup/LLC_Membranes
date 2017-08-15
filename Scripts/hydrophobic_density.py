@@ -1,5 +1,9 @@
 #! /usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
+from builtins import range
+from past.utils import old_div
 import argparse
 import numpy as np
 import mdtraj as md
@@ -42,7 +46,7 @@ def limits(pos, pcenters):
     nT = pcenters.shape[2]
     npores = pcenters.shape[1]
     natoms= pos.shape[1]
-    atom_ppore = natoms / npores
+    atom_ppore = old_div(natoms, npores)
 
     deviation = np.zeros([nT, npores, atom_ppore])
     for f in range(nT):
@@ -79,7 +83,7 @@ def density(inner_limits, outer_limits, pcenters, t):
     nT = pos.shape[0]
     atoms = pos.shape[1]
     npores = pcenters.shape[1]
-    atomsppore = atoms / npores
+    atomsppore = old_div(atoms, npores)
 
     # calculate volume of alkane region at each frame
     vol = np.zeros([nT])
@@ -103,7 +107,7 @@ def density(inner_limits, outer_limits, pcenters, t):
             for k in range(atomsppore):
                 if inner_limits[f] < np.linalg.norm(pos[f, j*atomsppore + k, :2] - pcenters[:, j, f]) \
                         < outer_limits[f]:  # check if x^2 + y^2 is inside limits
-                    d[f] += (mass[j*atomsppore + k] / NA)  # add the mass of the atom meeting conditions and convert to mass of single atom
+                    d[f] += (old_div(mass[j*atomsppore + k], NA))  # add the mass of the atom meeting conditions and convert to mass of single atom
 
     for f in range(nT):
         d[f] /= vol[f]
@@ -125,7 +129,7 @@ def visualize(inner_limits, outer_limits, pcenters, t, frame=-1):
     pos = t.xyz
     natoms = pos.shape[1]
     npores = pcenters.shape[1]
-    atomsppore = natoms / npores
+    atomsppore = old_div(natoms, npores)
 
     keep = []
     for i in range(npores):
@@ -167,5 +171,5 @@ if __name__ == "__main__":
         plt.plot(t.time, d)
         plt.show()
     else:
-        print "Average Density: %s g/cm^3" % np.mean(d[-5:])
+        print("Average Density: %s g/cm^3" % np.mean(d[-5:]))
 

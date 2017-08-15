@@ -207,26 +207,10 @@ def initialize():
 if __name__ == "__main__":
 
     args = initialize()
-    no_mon = args.layers * args.no_pores * args.no_monomers  # How many monomer will be in this .itp file
 
-    if args.type == 'LLC':
-        if args.xlink == 'on':
-            itp = '%s_dummy.itp' % args.monomer
-        else:
-            itp = '%s.itp' % args.monomer
-    elif args.type == 'BCC':
-        itp = 'BCC_mon.itp'
+    no_mon = args.layers * args.no_pores * args.no_monomers  # How many monomers will be in this .itp file
 
-    location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory where this file is located
-    f = open("%s/../Structure-Files/Monomer_Tops/%s" % (location, itp), "r")
-
-    a = []
-    for line in f:
-        a.append(line)
-
-    f.close()
-
-    file_rw.write_assembly(a, '%s' % args.xlink, '%s' % args.output, no_mon)
+    file_rw.write_assembly(args.monomer, '%s' % args.xlink, '%s' % args.output, no_mon)
 
 
 

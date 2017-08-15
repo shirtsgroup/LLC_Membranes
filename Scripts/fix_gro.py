@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # Script to reorder and renumber .gro files 
 
 import argparse
@@ -6,13 +6,15 @@ import numpy as np
 
 
 def run():
+
     parser = argparse.ArgumentParser(description='Rewrite .gro file so that it matches topology')  # allow input from user
 
     parser.add_argument('-i', '--input', default='HII_packed.gro', help='Name of input file')
     parser.add_argument('-s', '--solvent', default='SOL', help='Name of solvent')
     parser.add_argument('-o', '--output', default='Ordered.gro', help='Name of reordered output file')
-
+    parser.add_argument('-n', '--natoms', default=137, help='Number of atoms in residue, excluding ions')
     args = parser.parse_args()
+
     return args
 
 
@@ -21,7 +23,7 @@ def reorder(gro, output, sol):
     b = []
     c = []
 
-    count = 1
+    count = 1 
     hundreds = 0
     for line in gro:
         if line.count('HII') == 1:
@@ -36,12 +38,13 @@ def reorder(gro, output, sol):
         if count >= 100000:
             count = 0
             hundreds += 1
-
+    
     count1 = (count + 100000*hundreds)/137  # 960
+
     count2 = 0
     for line in gro:
         if line.count('NA') != 0:
-            b.append(line[0:5].replace(line[0:5], '{:>5}'.format(count1 + 1)) + line[5:15] +
+            b.append(line[0:5].replace(line[0:5], '{:>5d}'.format(int(count1 + 1))) + line[5:15] +
                      line[15:20].replace(line[15:20], '{:>5}'.format(str(count))) + line[20:len(line)])
             count1 += 1
             count += 1

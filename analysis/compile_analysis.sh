@@ -20,16 +20,17 @@ while getopts "t:g:r:p:x:b:" opt; do
     esac
 done
 
+out_xtc='traj_whole.xtc'
 # modify the trajectory so all monomers stay whole
-echo 0 | gmx trjconv -f ${trajectory} -o traj_whole.xtc -s ${tpr} -pbc whole
-echo "Trajectory Converted"
+# echo 0 | gmx trjconv -f ${trajectory} -o ${out_xtc} -s ${tpr} -pbc whole
+# echo "Trajectory Converted"
 
 # Simulate X-ray Diffraction
-#main_gromacs.py -top ${gro} -traj traj_whole.xtc --lcscale 1.25 --cscale 0.05
+#main_gromacs.py -top ${gro} -traj ${out_xtc} --lcscale 1.25 --cscale 0.05
 
 # Structure_char.py
 echo 'Calculating pore to pore distances'
-p2p_output="$(Structure_char.py -t traj_whole.xtc -g ${gro} --noshow --auto_exclude --save --plot_avg)"  # capture all stdout in one variable
+p2p_output="$(Structure_char.py -t ${out_xtc} -g ${gro} --noshow --auto_exclude --save --plot_avg)"  # capture all stdout in one variable
 # extract all information we care about from p2p_ouput. http://stackoverflow.com/questions/19399238/under-bash-how-to-extract-two-numbers-by-parsing-a-string#comment28753888_19399302
 autocorrelation="$(grep -Po '(?<=Maximum Autocorrelation Time: )[0-9]+\.[0-9]+' <<< ${p2p_output})"
 p2p_avg="$(grep -Po '(?<=Pore to Pore distance: )[0-9]+\.[0-9]+' <<< ${p2p_output})"
@@ -38,13 +39,13 @@ equil_p2p="$(grep -Po '(?<=Equilibration detected after )\d+' <<< ${p2p_output})
 
 echo 'Calculating thickness'
 # Thickness.py
-thick="$(Thickness.py -g ${gro} -t traj_whole.xtc --noshow --save --trajectory)"
+thick="$(Thickness.py -g ${gro} -t ${out_xtc} --noshow --save --trajectory)"
 avg_thick="$(grep -Po '(?<=Average membrane thickness: )[0-9]+\.[0-9]+' <<< ${thick})"
 std_thick="$(grep -Po '(?<=- )[0-9]+\.[0-9]+' <<< ${thick})"
 equil_frame_thick="$(grep -Po '(?<=Equilibration detected after )\d+' <<< ${thick})"
 
 echo 'Calculating overlap and pi-stacking distance'
-eclipse="$(eclipse.py -g ${gro} -t traj_whole.xtc -b ${build_mon} --noshow --save)"
+eclipse="$(eclipse.py -g ${gro} -t ${out_xtc} -b ${build_mon} --noshow --save)"
 pistack="$(grep -Po '(?<=Average stacking distance: )[0-9]+\.[0-9]+' <<< ${eclipse})"
 lowerlimit_stack="$(grep -Po '(?<=CI \[)[0-9]+\.[0-9]+' <<< ${eclipse})"
 upperlimit_stack="$(grep -Po '(?<=, )[0-9]+\.[0-9]+' <<< ${eclipse})"
@@ -54,7 +55,7 @@ pistack_equil="$(grep -Po '(?<=Pi-stacking distance equilibrated after )\d+' <<<
 overlap_equil="$(grep -Po '(?<=Overlap equilibrated after )\d+' <<< ${eclipse})"
 
 echo 'Calculating pore size and order parameter'
-poresize="$(poresize.py -t traj_whole.xtc -g ${gro} -c ${pore_components} --save --noshow)"
+poresize="$(poresize.py -t ${out_xtc} -g ${gro} -c ${pore_components} --save --noshow)"
 poresize_equil="$(grep -Po '(?<=Pore size equilibrated after )\d+' <<< ${poresize})"
 order_equil="$(grep -Po '(?<=Order parameter equilibrated after )\d+' <<< ${poresize})"
 avg_poresize="$(grep -Po '(?<=Average Pore Size: )[0-9]+\.[0-9]+' <<< ${poresize})"

@@ -6,7 +6,7 @@ CUTOFF=5  # percent of distribution that will be labeled close enough to bond
 TERM_PROB=5  # probability of termination of carbons meeting bonding criteria
 GRO='wiggle.gro'  # initial .gro file to be crosslinked
 CUTOFF_RAD=10  # percent of distribution that are labeled close enough to bond in the context of reactive radicals
-SIM_LENGTH=.01  # picoseconds of simulation between iterations
+SIM_LENGTH=10  # picoseconds of simulation between iterations
 XLINKS=0
 FRAMES=50
 DEGREE=.9  # Degree of crosslinking
@@ -15,8 +15,11 @@ NO_TAILS=3
 MONOMER="NAcarb11Vd"
 ITERATION=0  # starting iteration
 STOP=0
+TOP='topol.top'
+MDP='npt.mdp'
+INIT_CONFIG='initial.gro'
 
-while getopts "c:t:g:d:s:x:f:m:C:" opt; do
+while getopts "c:t:g:d:s:x:f:m:C:p:M:i:" opt; do
     case $opt in
     c) CUTOFF=$OPTARG;;
     t) TERM_PROB=$OPTARG;;
@@ -27,6 +30,9 @@ while getopts "c:t:g:d:s:x:f:m:C:" opt; do
     f) FRAMES=$OPTARG;;
     m) MONOMER=$OPTARG;;
     C) ITERATION=$OPTARG;;  #if the script is being continued
+    p) TOP=$OPTARG;;
+    M) MDP=$OPTARG;;
+    i) INIT_CONFIG=$OPTARG;;
     esac
 done
 
@@ -38,7 +44,7 @@ if [ ${ITERATION} != 0 ]; then
     ITERATION=$((ITERATION+1))
 fi
 
-#Write_Input.py -x on -L ${SIM_LENGTH} -D 0.001 -f ${FRAMES} # -I cg
+input.py -b ${MONOMER} -S -c ${INIT_CONFIG} -x -l ${SIM_LENGTH} -f ${FRAMES} --genvel no
 
 while [ ${STOP} -eq 0 ]; do
     if [ ${ITERATION} == 0 ]; then
@@ -49,9 +55,9 @@ while [ ${STOP} -eq 0 ]; do
     # restrain.py -r on -g wiggle.gro -o crosslinked_new.itp -f 100000 -A xyz -D off -w off  -m NAcarb11V_dummy --xlink  # this should just add the restraints section to the .itp
     cp crosslinked_new.itp crosslinked_${ITERATION}.itp
     mv xlink.log xlink_${ITERATION}.log
-    gmx grompp -f em.mdp -p NaPore.top -c wiggle.gro -o em
+    gmx grompp -f em.mdp -p ${TOP} -c wiggle.gro -o em
     gmx mdrun -v -deffnm em
-    gmx grompp -f wiggle.mdp -p NaPore.top -c em.gro -o wiggle
+    gmx grompp -f ${MDP} -p ${TOP} -c em.gro -o wiggle
     gmx mdrun -v -deffnm wiggle
     XLINKS=$(tail xlink_${ITERATION}.log -n 2 | head -n 1 | cut -c 19-22)
     TERM=$(tail -n 6 xlink_${ITERATION}.log | head -n 1 | cut -c 26-29)
@@ -65,14 +71,16 @@ while [ ${STOP} -eq 0 ]; do
 done
 
 xlink.py -i ${GRO} -c ${CUTOFF}  -e ${TERM_PROB} -r ${ITERATION} -d ${CUTOFF_RAD} -y crosslinked_new.itp -x ${XLINKS} -S 'yes'
+# Put all the atoms back in the unit cell
+#gmx trjconv -f wiggle.gro -o unitcell.gro -ur tric -pbc atom -s ${INIT_CONFIG}  # good for visualization, bad for simulation (inconsistent shifts)
 
 Cleanup_Top.py  # get rid of dummy atoms in .itp and .gro
 
-find NaPore.top -type f -exec sed -i 's/crosslinked_new.itp/crosslinked.itp/g' {} \;
+find ${TOP} -type f -exec sed -i 's/crosslinked_new.itp/crosslinked.itp/g' {} \;
 
-gmx grompp -f em.mdp -p NaPore.top -c wiggle_no_dummies.gro -o em
+gmx grompp -f em.mdp -p ${TOP} -c wiggle_no_dummies.gro -o em
 gmx mdrun -v -deffnm em
-gmx grompp -f wiggle.mdp -p NaPore.top -c em.gro -o wiggle
+gmx grompp -f ${NPT} -p ${TOP} -c em.gro -o wiggle
 gmx mdrun -v -deffnm wiggle
 
 mail -s "Crosslinking Done" -a xlink.log benjamin.coscia@colorado.edu <<< "The crosslinking has terminated, woo!"

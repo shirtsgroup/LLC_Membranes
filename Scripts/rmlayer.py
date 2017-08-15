@@ -43,9 +43,6 @@ def water_indices(pos, max, min, buffer, t):
     indices = [a.index for a in t.topology.atoms if a.name == 'O' and 'HOH' in str(a.residue)]
     #indices = [a.index for a in t.topology.atoms if a.residue.is_water]
     indices = t.topology.select("water")
-    print len(indices)
-    exit()
-
 
     thickness = max - min
     b = thickness * buffer
@@ -153,22 +150,22 @@ if __name__ == "__main__":
     tail = t.atom_slice(tail_index).xyz
 
     p_centers = physical.avg_pore_loc(4, pore)  # calculate pore centers based on average sodium ion positions
-    print p_centers
+    # print p_centers
 
     pore_limits, pore_std = limits(pore, p_centers)
     tail_limits, tail_std = limits(tail, p_centers)
-    print pore_limits
-    print tail_limits
+    # print pore_limits
+    # print tail_limits
 
-    # remove = water_indices(pos, zmax, zmin, args.buffer, t)
-    #
-    # # keep = [a.index for a in t.topology.atoms if a.index not in remove]
-    # #
-    # # nolayer = t.atom_slice(keep)
-    # nolayer, keep = top.keep(remove, t, exclude=True)
-    #
-    # write_gro(nolayer, args.output)
+    remove = water_indices(pos, zmax, zmin, args.buffer, t)
 
-    # if args.index:
-    #     file_rw.write_water_ndx(keep, t)
+    # keep = [a.index for a in t.topology.atoms if a.index not in remove]
+    #
+    # nolayer = t.atom_slice(keep)
+    nolayer, keep = top.keep(remove, t, exclude=True)
+
+    write_gro(nolayer, args.output)
+
+    if args.index:
+        file_rw.write_water_ndx(keep, t)
 

@@ -23,7 +23,7 @@ parser.add_argument('-t', '--itp', default='dipole.itp', type=str, help='Name of
 parser.add_argument('-s', '--em_steps', default=50000, type=int, help='Steps to take during energy minimization')
 parser.add_argument('-e', '--ensemble', default='npt', type=str, help='Thermodynamic ensemble to put system in')
 parser.add_argument('-d', '--dt', default=0.002, type=float, help='time step (ps)')
-parser.add_argument('-l', '--length', default=1000, type=int, help='simulation length (ps)')
+parser.add_argument('-l', '--length', default=1000, type=float, help='simulation length (ps)')
 parser.add_argument('-f', '--frames', default=500, type=int, help='number of frames')
 parser.add_argument('-p', '--pcoupltype', default='semiisotropic', type=str, help='Pressure Couple Type')
 parser.add_argument('--restraints', help='If restraints are on, another mdp option needs to be turned on, so specify '
@@ -198,12 +198,22 @@ if props.ions:
 nmon = int(old_div(nres, props.natoms))
 
 if args.restraints:
-    a.append('%s                1\n' % (mon_name))
+    a.append('%s                1\n' % mon_name)
 else:
-    a.append('%s                %s\n' % (mon_name, nmon))
+    if args.xlink:
+        nmon = 1
+    a.append('%s                 %s\n' % (mon_name, nmon))
 
 if props.ions:
     a.append('%s                 %s\n' % (props.ions[0], nion))
+
+if args.solvate:
+    sol = 0
+    for i in range(2, len(gro)):
+        if gro[i].count('SOL') != 0:
+            sol += 1
+
+    a.append('SOL                %s\n' % (sol/3))
 
 f = open('topol.top', 'w')
 for line in a:

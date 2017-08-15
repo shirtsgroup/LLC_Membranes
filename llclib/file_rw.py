@@ -100,7 +100,7 @@ def write_assembly(b, xlink, output, no_mon):
         atoms_count += 1  # increments the while loop
         nr += 1  # counts number of atoms
 
-    for i in range(0, no_mon):  # print atom information for each monomer
+    for i in range(int(no_mon)):  # print atom information for each monomer
         for k in range(0, nr):  # getting the number right
             f.write('{:5d}{:25s}{:5d}{:}'.format(i*nr + k + 1, a[k + atoms_index + 2][6:29],
                                                i*nr + int(a[k + atoms_index + 2][29:34]),
@@ -118,7 +118,7 @@ def write_assembly(b, xlink, output, no_mon):
         bond_count += 1  # increments while loop
         nb += 1  # counting number of lines in 'bonds' section
 
-    for i in range(0, no_mon):
+    for i in range(int(no_mon)):
         for k in range(0, nb):
             f.write('{:6d}{:7d}{:}'.format(i*nr + int(a[k + bonds_index + 2][0:6]), i*nr + int(a[k + bonds_index + 2][6:14]),
                                          a[k + bonds_index + 2][14:len(a[k+ atoms_index + 2])]))
@@ -135,7 +135,7 @@ def write_assembly(b, xlink, output, no_mon):
         pairs_count += 1
         npair += 1
 
-    for i in range(0, no_mon):
+    for i in range(int(no_mon)):
         for k in range(0, npair):
             f.write('{:6d}{:7d}{:}'.format(i*nr + int(a[k + pairs_index + 2][0:6]), i*nr + int(a[k + pairs_index + 2][6:14]),
                                          a[k + pairs_index + 2][14:len(a[k + pairs_index + 2])]))
@@ -152,7 +152,7 @@ def write_assembly(b, xlink, output, no_mon):
         angle_count += 1
         na += 1
 
-    for i in range(0, no_mon):
+    for i in range(int(no_mon)):
         for k in range(0, na):
             f.write('{:6d}{:7d}{:7d}{:}'.format(i*nr + int(a[k + angles_index + 2][0:6]), i*nr + int(a[k + angles_index + 2][6:14]),
                                               i*nr + int(a[k + angles_index + 2][14:22]),
@@ -170,7 +170,7 @@ def write_assembly(b, xlink, output, no_mon):
         dihedrals_p_count += 1
         ndp += 1
 
-    for i in range(0, no_mon):
+    for i in range(int(no_mon)):
         for k in range(0, ndp):
             f.write('{:6d}{:7d}{:7d}{:7d}{:}'.format(i*nr + int(a[k + dihedrals_p_index + 3][0:6]),
                                                    i*nr + int(a[k + dihedrals_p_index + 3][6:14]),
@@ -191,7 +191,7 @@ def write_assembly(b, xlink, output, no_mon):
         ndimp += 1
 
     # Can't have any space at the bottom of the file for this loop to work
-    for i in range(0, no_mon):
+    for i in range(int(no_mon)):
         for k in range(0, ndimp):
             f.write('{:6d}{:7d}{:7d}{:7d}{:}'.format(i*nr + int(a[k + dihedrals_imp_index + 3][0:6]),
                                                    i*nr + int(a[k + dihedrals_imp_index + 3][6:14]),
@@ -211,7 +211,7 @@ def write_assembly(b, xlink, output, no_mon):
             nv += 1
 
         # Make sure there is no space at the bottom of the topology if you are getting errors
-        for i in range(0, no_mon):
+        for i in range(int(no_mon)):
             for k in range(0, nv):
                 f.write('{:<8d}{:<6d}{:<6d}{:<6d}{:<8d}{:<8d}{:<11}{:<11}{:}'.format(i*nr + int(a[k + vsite_index + 2][0:8]),
                                                        i*nr + int(a[k + vsite_index + 2][8:14]),

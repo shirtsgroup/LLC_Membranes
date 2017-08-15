@@ -8,7 +8,7 @@ from past.utils import old_div
 import numpy as np
 import mdtraj as md
 import argparse
-from . import tilt
+import tilt
 from llclib import file_rw
 from scipy import spatial
 import matplotlib.pyplot as plt
@@ -33,6 +33,7 @@ def initialize():
     parser.add_argument('--suffix', help='Output suffix', default='traj')
     parser.add_argument('--load', action="store_true", help='load previously saved arrays')
     parser.add_argument('--write_gro', action="store_true", help='create .gro file of centroids')
+    parser.add_argument('--all', action="store_true", help='Calculate angle distribution using all atoms')
 
     args = parser.parse_args()
 
@@ -50,7 +51,7 @@ def tail_centroid(pos, grps):
     natoms = pos.shape[1]
     atomsptail = len(grps[0])
     nT = pos.shape[0]
-    nmon = natoms / len(grps[0]) / ngrps
+    nmon = int(natoms / len(grps[0]) / ngrps)
 
     centroids = np.zeros([nT, nmon * ngrps, 3])
 
@@ -80,12 +81,12 @@ def nearest_neighbors(arr, d, lower_limit=0.4):
     for t in range(nT):
         nn_list.append([])
         for i in range(npts):
-            nn_list[t].append([])  #using lists since this will vary in length
+            nn_list[t].append([])  # using lists since this will vary in length
 
     print('Calculating nearest neighbors')
     for t in tqdm.tqdm(list(range(nT))):
         frame = arr[t, :, :]
-        for i in range(npts):
+        for i in tqdm.tqdm(list(range(npts))):
             others = np.delete(frame, i, 0)  # delete self entry or else the nearest neighbor is itself
             nn = spatial.KDTree(others).query(frame[i, :])[1]  # find index of nearest neighbor
             index = np.where(frame == others[nn])  # find the index in others corresponding to nn in arr
@@ -150,40 +151,47 @@ if __name__ == "__main__":
 
     args = initialize()
 
-    t = md.load(args.traj, top=args.gro)[args.start:args.end]  # load trajectory
+    if not args.load:
+        t = md.load(args.traj, top=args.gro)[args.start:args.end]  # load trajectory
 
-    grps = tilt.read_index(args.index)  # read index file
-    ngrps = len(grps)
+        grps = tilt.read_index(args.index)  # read index file
+        ngrps = len(grps)
 
-    all_atoms = []
-    for i in range(ngrps):
-        for j in range(len(grps[i])):
-            all_atoms.append(grps[i][j])
+        all_atoms = []
+        for i in range(ngrps):
+            for j in range(len(grps[i])):
+                all_atoms.append(grps[i][j])
 
-    keep = [a.index for a in t.topology.atoms if a.name in all_atoms]
-    tails = t.atom_slice(keep).xyz
+        keep = [a.index for a in t.topology.atoms if a.name in all_atoms]
+        tails = t.atom_slice(keep).xyz
+        if not args.all:
+            centroids = tail_centroid(tails, grps)
+            nlist = nearest_neighbors(centroids, args.cutoff)
+            angles, ld = angles_ld(centroids, nlist)
+            np.savez_compressed('angles_ld_%s.npz' % args.suffix, angles=angles, ld=ld, nlist=nlist, centroids=centroids)
+        else:
+            nlist = nearest_neighbors(tails, args.cutoff)
+            angles, ld = angles_ld(tails, nlist)
+            np.savez_compressed('angles_ld_%s.npz' % args.suffix, angles=angles, ld=ld, nlist=nlist)
 
-    centroids = tail_centroid(tails, grps)
+    else:
+        print("Loading saved arrays")
+        arrays = np.load('angles_ld_%s.npz' % args.suffix, encoding='bytes')
+        angles = arrays['angles']
+        ld = arrays['ld']
+        nlist = arrays['nlist']
+        centroids = arrays['centroids']
 
     if args.write_gro:
         file_rw.write_gro_pos(centroids[-1, :, :], 'centroids.gro', name='NA')
-
-    if not args.load:
-        nlist = nearest_neighbors(centroids, args.cutoff)
-    else:
-        np.load('nlist.npy')
-
-    if args.save and not args.load:
-        np.save('nlist', nlist)
-
-    angles, ld = angles_ld(centroids, nlist)
-
-    np.savez_compressed('angles_ld_%s.npz' % args.suffix, angles=angles, ld=ld, nlist=nlist)
 
     angles = [value for value in angles if not math.isnan(value)]
     plt.figure(1)
     nbins = 45
     (counts, bins, patches) = plt.hist(angles, bins=nbins)
+    plt.xlabel('Angle (degrees)', fontsize=14)
+    plt.ylabel('Count', fontsize=14)
+    plt.axes().tick_params(labelsize=14)
 
     if args.fit:
         bin_locations = np.linspace(-90, 90, nbins)
@@ -193,10 +201,10 @@ if __name__ == "__main__":
     if args.save:
         plt.savefig('angles_%s.png' % args.suffix)
 
-    plt.figure(2)
-    plt.hist(ld)
-    if args.save:
-        plt.savefig('distances_%s.png' % args.suffix)
+    # plt.figure(2)
+    # plt.hist(ld)
+    # if args.save:
+    #     plt.savefig('distances_%s.png' % args.suffix)
 
     if not args.noshow:
         plt.show()

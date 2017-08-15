@@ -34,6 +34,7 @@ def initialize():
     parser.add_argument('-l', '--load', help='Load previously saved angle array', action="store_true")
     parser.add_argument('--single_frame', help='Specify this for a single frame', action="store_true")
     parser.add_argument('--noshow', help='Specify this flag if you do not want to see the output plot', action="store_true")
+    parser.add_argument('--plot_every', default=1, type=int, help='Plot every n frames')
 
     args = parser.parse_args()
 
@@ -151,7 +152,7 @@ if __name__ == "__main__":
         print('Average tilt angle : %s +/- %s' % (np.mean(avgs[old_div(nT,2):]), np.mean(stds[old_div(nT,2):])))
         # Format and save figure
         plt.figure()
-        plt.errorbar(times, avgs, yerr=stds)
+        plt.errorbar(times[::args.plot_every], avgs[::args.plot_every], yerr=stds[::args.plot_every])
         plt.title('Tilt angle versus time')
         plt.xlabel('Time (ps)')
         plt.ylabel('Tilt angle w.r.t xy plane (degrees)')

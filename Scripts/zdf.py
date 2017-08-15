@@ -142,9 +142,10 @@ def plot_zdf(z, d, end=-1):
 
     plt.figure()
     plt.plot(z[:end], d[:end])
-    plt.title('Z distribution function')
-    plt.xlabel('z distance (nm)')
-    plt.ylabel('count')
+    # plt.title('Z distribution function')
+    plt.xlabel('Z distance separation (nm)', fontsize=14)
+    plt.ylabel('Count', fontsize=14)
+    plt.savefig('zdf.png')
     plt.show()
 
 
