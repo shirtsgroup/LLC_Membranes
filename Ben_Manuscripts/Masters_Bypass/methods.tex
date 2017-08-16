@@ -29,12 +29,21 @@ Atomistic self-assembly was attempted by packing monomers into a box
 using Packmol\cite{martinez_packmol:_2009}. Simulations of $>$ 100 ns 
 show no indicators of progress towards an ordered system. To bypass the
 slow self-assembly process, python scripts are used to assemble 
-monomers into a structure close to the expected equilibrium configuration.
+monomers into a structure close to the expected equilibrium configuration (Fig~\ref{fig:python})
 A short, restrained equilibration, followed by NPT simulations $>$ 500 ns, 
 allows the initial configuration to relax into an equilibrium configuration.
 Our logic for choosing a starting configuration and the details of the equilibration 
 schemes are presented below. % eliminate this sentence?
 % Unit Cell building method and justification
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\linewidth]{build.PNG}
+	\caption{(a) Single monomers are parameterized and annealed to produce a low energy
+		configuration. (b) Monomers are rotated and assembled into layers with 
+		hydrophlic centers. (c) Twenty layers are stacked on top of each other to create
+		a pore. (d) Pores are duplicated and place in a monoclinic unit cell}\label{fig:python}
+\end{figure}
 
 A typical simulation volume contains four pores in a monoclinic unit cell,
 the smallest unit cell that maintains hexagonal symmetry when extended 
