@@ -10,18 +10,54 @@ scattering (WAXS), and ionic conductivity measurements.
 To discern the composition of the monomer layers, we ran simulations of 
 systems created with 4 - 8 monomers per layer. Both the sandwiched and 
 parallel displaced configurations were tested. All systems remained
-stable for at least 50 ns. Pair correlation functions calculated between 
-aromatic rings along the length of the pores indicate that systems prefer to
-stay partitioned into layers (Fig~\ref{fig:zdf}). Pore spacings were 
-calculated by measuring the distance between the pore centers. Pore centers
-were located by averaging the coordinates of sodium ions in their 
-respective pores. Statistics were generated using the bootstrapping 
-technique. Table~\ref{table:p2p} shows the pore spacing for all systems tested.
+stable for at least 50 ns. Pore spacings were calculated by measuring
+the distance between the pore centers. Pore centers were located by
+averaging the coordinates of sodium ions in their respective pores. 
+Statistics were generated using the bootstrapping technique. Table
+~\ref{table:p2p} shows the pore spacing for all systems tested.
 Systems built with 5 monomers in each layer equilibrate to a pore
 spacing that is most consistent with the experimental value of 4.12 nm
 derived from SAXS measurements (Figure~\ref{fig:SAXS}). The remainder of
 this discussion will focus on the analysis of systems built with 5 
-monomers per layer.
+monomers per layer. Pair correlation functions calculated between 
+aromatic rings along the length of the pores indicate that systems
+prefer to stay partitioned into layers (Fig~\ref{fig:zdf}).
+
+\begin{table}
+\centering
+\begin{tabular}{|c|c|c|}
+\toprule
+                   & \multicolumn{2}{c}{Starting Configuration} \\
+Monomers per layer & Sandwiched & Parallel Displaced \\
+\midrule
+4 & $3.71 \pm 0.08$ & $3.82 \pm 0.06$ \\
+5 & $3.99 \pm 0.08$ & $4.16 \pm 0.09$ \\
+6 & $4.83 \pm 0.08$ & $4.85 \pm 0.05$ \\
+7 & $4.73 \pm 0.06$ & $4.84 \pm 0.06$ \\
+8 & $5.08 \pm 0.08$ & $5.46 \pm 0.07$ \\
+\bottomrule
+\end{tabular}
+\caption{The pore spacing of the model increases as number of monomers
+in each layer increases. The pore spacing of a system starting in the 
+sandwiched configuration is systematically lower than that started in an 
+offset configuration. Systems built with 5 monomers per layer in a parallel
+displaced configuration results in a pore spacing closest to experimental
+data}\label{table:p2p} 
+\end{table}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{zdf5layered.png}
+		\caption{}\label{fig:zdf_layered}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{zdf5offset.png}
+		\caption{}\label{fig:zdf_offset}
+	\end{subfigure}
+\end{figure}
 
 The experimental 2D WAXS measurement contains five major reflections which
 our model intends to reproduce (Figure~\ref{fig:WAXS}). The first is located
@@ -93,8 +129,8 @@ that Basin B is present at higher temperatures. This is evidenced by
 a simulation of a system in Basin A whose temperature was linearly
 ramped from 280K to 340K over 100 ns. Visually, there is a distinct
 change in pore structure from one characteristic of Basin A 
-(Figure~\ref{fig:280K_pore} to one characteristic of Basin B 
-(Figure~\ref{fig:340K_pore}. To quantify our observation, we chose 
+(Figure~\ref{fig:280K_pore}) to one characteristic of Basin B 
+(Figure~\ref{fig:340K_pore}). To quantify our observation, we chose 
 three easily measurable order parameters: the distance between pores,
 the membrane the thickness and the ratio of pore radius to the uncertainty
 in pore radius. The distance between pores was measured as described 
@@ -104,19 +140,21 @@ between the center of mass of each aromatic ring and the center of mass
 of all aromatic rings in respective pores. The pore radius is divided by
 its uncertainty in order to understand the degree to which monomers 
 obstruct the pore region. Referring back to our temperature ramped system,
-the slope of all order parameters change around 310K indicating the 
+the slope of all order parameters change around 310K 
+(\Cref{fig:p2p_tramp,fig:thickness_tramp,fig:order_tramp}) indicating the 
 possibility of an abrupt change in system ordering. To prove that the 
 basins are in fact two different phases, we must observe evidence of a
 first order phase transition, which would be indicated by a discontinuity
 in an order parameter as a function of temperature. Our 100 ns temperature
-ramp may have been too fast and may have suffered hysteresis. To mitigate
-hysteresis, we performed a slow, stepwise temperature ranp. Started from
+ramp may have been too fast causing the system to suffer from hysteresis. To mitigate
+hysteresis, we performed a slow, stepwise temperature ramp. Starting from
 structures equilibrated at 280K, the system temperature was raised to 
 300K and allowed to equilibrate for 200 ns. At the end of 200 ns, the
 temperature was raised 5K and equilibrated again for 200 ns. We repeated
-this process until the system was equilibrated for 200 ns at 325K. In all
+this process until the system was equilibrated for 200 ns at 320K. In all
 cases, we observed smooth changes in order parameters as temperature was
-increased implying that we have not found two phases.
+increased implying that we have not found two phases 
+(Figure~\ref{fig:phase_transition}).
 
 \begin{figure}
         \centering
@@ -148,6 +186,25 @@ increased implying that we have not found two phases.
                 \caption{}\label{fig:order_tramp}
         \end{subfigure}
         \caption{}\label{fig:tramp}
+\end{figure}
+
+\beging{figure}
+	\centering
+	\begin{subfigure}{0.325\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{p2p_layered.png}
+		\caption{}\label{fig:p2p_layered}
+	\end{subfigure}
+	\begin{subfigure}{0.325\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{thickness_layered.png}
+		\caption{}\label{fig:thickness_layered}
+	\end{subfigure}
+	\begin{subfigure}{0.325\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{order_layered.png}
+		\caption{}\label{fig:order_layered}
+	\end{subfigure}
 \end{figure}
 
 We varied the relative interlayer orientation between sandwiched and 
@@ -221,84 +278,6 @@ nearly hexagonal array of packed tails.
 	\includegraphics[width=0.4\textwidth]{tilt.png}
 	\caption{The average angle between alkyl chains and the xy plane is nearly zero degrees}\label{fig:tilt}
 \end{wrapfigure}
-
-        %MRS2: Tables should also have specific theses as well, so think about that.  Merely saying ``here is the information'' isn't as useful without a guide through it.
-A summary of all experiments and relevant structural parameters are presented in Table ~\ref{table:p2p}
-
-\begin{figure}
-	\centering
-	\begin{subfigure}{0.3\textwidth}
-		\centering
-		\includegraphics[width=\linewidth]{placeholder.png}
-		\caption{}\label{fig:orderparameter}
-	\end{subfigure}
-	\begin{subfigure}{0.3\textwidth}
-		\centering
-		\includegraphics[width=\linewidth]{placeholder.png}
-		\caption{}\label{fig:order}
-	\end{subfigure}
-	\begin{subfigure}{0.3\textwidth}
-		\centering
-		\includegraphics[width=\linewidth]{placeholder.png}
-		\caption{}\label{fig:disorder}
-	\end{subfigure}
-	\caption{(a) As temperature is increased, Phase A transitions to 
-	Basin B, becoming more disordered. An order parameter of 1 indicates perfect ordering, while 0 indicates disorder. (b) The system is ordered, characteristic of Phase A, initially (c) The system becomes disordered, characteristic of Phase B, as temperature is raised beyond 310K}\label{fig:transition}
-	%MRS2: maybe provide a bit more information what data will be here?  Order parametr vs time? One panel with order paramter vs. time, one with configurations from 0 and 1 endpoints?
-\end{figure}	
-
-\begin{table}
-\centering
-\begin{tabular}{|c|c|}
-\hline
-table & here \\
-\hline
-\end{tabular}
-\caption{The pore spacing of the model increases as number of monomers in each layer increases. The pore spacing of a system starting in the sandwiched configuration is systematically lower than that started in an offset configuration. Systems built with 5 monomers per layer in a parallel displaced configuration results in a pore spacing closest to experimental data}\label{table:p2p} 
-\end{table}
-	
-\begin{figure}
-\centering
-\begin{subfigure}{.45\textwidth}
-	\centering
-	\includegraphics[width=\linewidth]{placeholder.png}
-	\caption{}\label{fig:phaseA}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-	\includegraphics[width=\linewidth]{placeholder.png}
-	\centering
-	\caption{}\label{fig:phaseB}
-\end{subfigure}
-\caption{There are clear differences in pore structure between systems built with layers stacked (a) 3.7 \angstrom apart and (b) 5.0 \angstrom apart}
-%MRS2: explain theses?  Also, the exact configurations used to start them are probably not that important; many different initial configurations will probably lead to most of them.  It's the thermodyamics that are important.
-%BJC: okay, so just rephrase it, worded in a way that doesn't reference the initial configuration/layer spacing?
-%BJC: what do you  mean by 'thermodynamics that are important' -- just distinguishing which state is more favorable under what conditions?
-\label{fig:porestructures}
-\end{figure}
-%BJC: I might eliminate the other paragraph (2 before this one), where I justify parallel-displaced vs. sandwiched, and do it all in this paragraph.	
-%MRS2: a little hard to say until the data is in.
-
-\begin{figure}
-	\centering
-	\begin{subfigure}{.3\textwidth}
-		\centering
-		\includegraphics[width=\linewidth]{placeholder.png}
-		\caption{~\label{fig:xrdA}}
-	\end{subfigure}
-	\begin{subfigure}{.3\textwidth}
-		\centering
-		\includegraphics[width=\linewidth]{placeholder.png}
-		\caption{~\label{fig:xrdexp}}
-	\end{subfigure}
-        \begin{subfigure}{.3\textwidth}
-                \centering
-                \includegraphics[width=\linewidth]{placeholder.png}
-                \caption{~\label{fig:xrdB}}
-        \end{subfigure}
-	\caption{Phase A (a) provides a good match to experiment (b). Phase B (c) is missing reflections present in the experimental pattern} % BJC: any more detail?  %MRS2: yes, give distances, and describe what you mean as ``good match''
-%BJC2: what is a clear way to describe the spots in the ring. Diagonal reflections? radial spots?
-	\label{fig:xrd}
-\end{figure}
 
 The model gives reasonable estimates of ionic conductivity for both phases.
 Calculated values of ionic conductivity obtained using the Nernst Einstein
