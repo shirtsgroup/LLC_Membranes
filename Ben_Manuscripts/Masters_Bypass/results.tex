@@ -390,14 +390,18 @@ Calculated values of ionic conductivity obtained using the Nernst Einstein
 relation and Collective Diffusion model are compared in Table~\ref{table:conductivity}.
 The two methods agree with each other within error, although the 
 uncertainty obtained using the Collective Diffusion model is much higher.
+Much longer simulations are needed to lower the uncertainty.
 For this reason we will likely only use the Nernst Einstein relation
-in future calculations of this type. It is evident that the ordered 
-phase has a higher ionic conductivity than the disordered phase. 
-Conductivity is enhanced in Phase A because the pores are more open,
-increasing the likelihood of site hopping. In all cases, our calculated values
-are higher than experimental values, as expected. The real system, 
-although mostly aligned and straight, still has a distribution of 
-azimuthal angles, lowering the effective ionic conductivity of the bulk 
+in future calculations of this type. Interestingly, Basin B 
+has a higher ionic conductivity than Basin A. Conductivity is enhanced in
+Basin B due to a higher sodium ion diffusivity. Transport of sodium is
+likely facilitated by the homgeneity of Basin B. Sodium ions have less
+sites to move to in Basin A. In all cases, our calculated values
+are higher than experimental values, as expected. Some of the 
+discrepancy is likely a result of using an imperfect forcefield. However, the real system, 
+although mostly aligned and straight, has a distribution of 
+azimuthal angles. This means that the pores have a degree of tortuosity 
+which lowers the effective ionic conductivity of the bulk 
 membrane. The ordering from isotropic to mostly aligned mesophases 
 showed an 85 fold increase in ionic conductivity. We would expect additional
 gains in a perfect system.
@@ -408,13 +412,15 @@ gains in a perfect system.
 \toprule
 \multicolumn{3}{c}{Calculated Ionic Conductivity \si{\siemens\per\meter}} \\
 \hline
-Method & Phase A & Phase B \\
+Method & Basin A & Basin B \\
 \midrule
-Nernst Einstein & \num{8e-5} & \num{8e-5} \\
-Collective Diffusion & \num{6e-5} & \num{6e-5} \\
-Experiment & \num{1.3e-5} & \num{1.3e-5} \\
+Nernst Einstein & \num{(1.23$\pm$0.01)e-4} & \num{(1.76$\pm$0.02)e-4} \\
+Collective Diffusion & \num{(1.40$\pm$0.32)e-4} & \num{(4.6$\pm$2.4)e-4} \\
+Experiment & \num{(1.33$\pm$ 0.10)e-5} & -- \\
 \bottomrule
 \end{tabular}
-\caption{Calculated ionic conductivity using Nernst-Einsten and Collective Diffusion agree within error. Both methods give calculated values of ionic conductivity which are higher, but reasonably close to experimental values~\label{table:conductivity}}
+\caption{Calculated ionic conductivity using Nernst-Einsten and Collective Diffusion 
+agree within error. Both methods give calculated values of ionic conductivity which
+are an order of magnitude higher than experimental values~\label{table:conductivity}}
 %MRS2: I would say that they are reasonable close to experiment, though higher. Also somewhat contradicted in other places.
 	\end{table}
