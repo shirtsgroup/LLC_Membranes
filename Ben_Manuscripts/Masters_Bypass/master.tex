@@ -2,7 +2,7 @@
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage{subcaption}
-\usepackage{geometry}
+\usepackage[margin=1in]{geometry}
 \usepackage{amsmath} % or simply amstext
 \usepackage{siunitx}
 \usepackage{booktabs}
@@ -17,6 +17,7 @@
 
 \begin{document}
 
+\bibliographystyle{ieeetr}
 \graphicspath{{./figures/}}  % put all the figures here
 \maketitle
 
@@ -28,5 +29,5 @@
 %\include{supp} supplementary info should be included as a separate document for ACSnano
 
 \newpage
-\bibliography{llc.bib}
+\bibliography{llc}
 \end{document}

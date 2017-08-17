@@ -6,24 +6,24 @@ because they offer the ability to control membrane architecture at the
 atomic scale allowing the design of solute-specific separation membranes 
 \cite{humplik_nanostructured_2011}. Most membrane-based aqueous 
 separations of small molecules can be achieved using reverse osmosis 
-(RO) or nanofiltration (NF)\cite{van_der_bruggen_review_2003}. 
+(RO) or nanofiltration (NF) \cite{van_der_bruggen_review_2003}. 
 
 While RO and NF have seen many advances in the past few decades, they 
 are far from perfect separation technologies. Current state-of-the-art
 RO membranes are unstructured with tortuous and polydisperse diffusion
-pathways which leads to inconsistent performance\cite{song_nano_2011}.
+pathways which leads to inconsistent performance \cite{song_nano_2011}.
 Necessarily high feed pressures drive up energy requirements which 
 strain developing regions and contribute strongly to CO\textsubscript{2} 
-emissions\cite{mcginnis_global_2008}. Moreover, designing RO 
+emissions \cite{mcginnis_global_2008}. Moreover, designing RO 
 membranes to achieve targeted separations of specific solutes is nearly
 impossible because various solutes dissolve into and diffuse through the polymer
-matrix at different rates\cite{wijmans_solution-diffusion_1995}. At best,
+matrix at different rates \cite{wijmans_solution-diffusion_1995}. At best,
 one can exploit these differences to create a functional selective 
 barrier. NF was introduced as an intermediate between RO and 
 ultrafiltration, having the ability to separate organic matter and salts
 on the order of one nanometer in size. Larger and well-defined pores 
 drive down energy requirements while still affording separation of 
-solutes as small as ions to some degree\cite{van_der_bruggen_review_2003}.
+solutes as small as ions to some degree \cite{van_der_bruggen_review_2003}.
 This is why NF is often used as a precursor to reverse osmosis. 
 Unfortunately, NF membranes, like RO, are produced with a pore size 
 distribution which limits their ability to perform precise separations
@@ -35,10 +35,10 @@ distribution which limits their ability to perform precise separations
 Nanostructured membranes can bypass many of the performance issues which
 plague traditional NF and RO membranes. One can accomplish targeted
 separations by tuning size and functionality of the molecular building
-blocks which form these materials. Solute rejecting pore sizes can be  % BJC: "these materials" --> "nanostructured membranes", or is that redundant?
-tuned uniformly, resulting in sharp size cut-offs. Entirely different
-mechanisms may govern the separation processes in a given nanostructured
-material which can inspire novel separation techniques.
+blocks which form these materials. Solute rejecting pores can have their  % BJC: "these materials" --> "nanostructured membranes", or is that redundant?
+size tuned uniformly, resulting in sharp size cut-offs. Entirely different
+mechanisms may govern transport in a given nanostructured material which
+can inspire novel separation techniques.
 % Thesis: Nanostructured materials can overcome issues seen in RO and NF
 % We can achieve targeted separations by controlling the system arhitecture
 % We can get uniform pore sizes 
@@ -52,7 +52,7 @@ but defects during manufacturing severely impact selectivity
 carbon nanotubes show promise \cite{humplik_nanostructured_2011} but 
 synthetic techniques are unable to achieve scalable alignment and pore
 monodispersity \cite{hata_water-assisted_2004,maruyama_growth_2005}.
-Zeolites have sub-nm pores with a narrow size distribution and MD simulations
+Zeolites have sub-nm pores with a narrow pore size distribution and MD simulations
 exhibit complete rejection of solvated ions \cite{murad_molecular_1998},
 however, experimental rejection was low and attributed to interstitial
 defects formed during membrane synthesis \cite{li_desalination_2004}.
@@ -65,11 +65,11 @@ Self assembling lyotropic liquid crystals (LLCs) are a suitable candidate
 for aqueous separation applications. They share the characteristic
 ability of nanostructured membrane materials to create highly ordered 
 structures with the added benefits of low cost and synthetic techniques
-feasible for large scale production\cite{feng_scalable_2014}. LLCs are
+feasible for large scale production \cite{feng_scalable_2014}. LLCs are
 versatile and controllable with a large chemical design space available
 for membrane design. We will be studying assemblies formed by Na-GA3C11 
-(Figures~\ref{fig:chemdraw} and ~\ref{fig:monatomistic}), a system which
-has been extensively studied experimentally\cite{smith_ordered_1997,
+(Fig~\ref{fig:python}a), a system which
+has been extensively studied experimentally \cite{smith_ordered_1997,
 zhou_supported_2005,resel_h2-phase_2000,feng_scalable_2014,feng_thin_2016}. 
 Neat monomer forms the thermotropic, Col\textsubscript{h} phase. The 
 presence of small amounts of water results in the H\textsubscript{II} 
@@ -85,7 +85,7 @@ field with subsequent crosslinking to lock the structure in place
 \cite{feng_scalable_2014}. In 2016, Feng et al. showed that the same 
 result could be obtained using a technique termed soft confinement
 \cite{feng_thin_2016}. Following this breakthrough, research into LLC
-membranes has been reinvigorated. We have chosen to focus our efforts 
+membranes has been reinvigorated. We have chosen to focus our initial efforts 
 on the development of a model of the Col\textsubscript{h} phase membrane
 in order to accelerate development of LLC membranes.  Compared to the 
 H\textsubscript{II} phase, the Col\textsubscript{h} phase is a simpler
@@ -100,49 +100,17 @@ experimental structural data.
 % Ordered - hexagonally packed cylinders with uniform sized pore regions
 % Scalable - alignment gets rid of some performance issues associated with misalignment
 
-\begin{figure}
-\centering
-\begin{subfigure}{.45\linewidth}
-	\centering
-        \includegraphics[width=\linewidth]{placeholder.png}
-        \caption{}\label{fig:chemdraw}
-\end{subfigure}
-\begin{subfigure}{.45\linewidth}
-	\centering
-        \includegraphics[width=\linewidth]{placeholder.png}
-        \caption{}\label{fig:monatomistic}
-\end{subfigure}
-\medskip
-\begin{subfigure}{.45\linewidth}
-	\centering
-        \includegraphics[width=\linewidth]{placeholder.png}
-        \caption{}\label{fig:cartoonlayer}
-\end{subfigure}
-\begin{subfigure}{.45\linewidth}
-	\centering
-        \includegraphics[width=\linewidth]{placeholder.png}
-        \caption{}\label{fig:layeratomistic}
-\end{subfigure}
-\caption{(a) The chemical structure of NAGA3C11 (b) The chemical 
-structure visualized atomistically enhances intuition about system
-behavior (c) Wedge-shaped monomers assemble into layers (d) An atomistic
-view of a layer suggests geometric constraints based on monomer
-structure}\label{fig:cartoonvatomistic}
-\end{figure}
-%BJC: maybe add 2 more panels with full assemblies represented with
-% a cartoon and atomistically
-
 A molecular level understanding of LLC membrane structure will elucidate
 small molecule transport mechanisms, providing guidelines for reducing the
 chemical space for the design of monomers used to create separation-specific
 membranes. We do not yet understand how to reduce the effective pore
-size or how to tune the chemical environment in the H\textsubscript{II} 
+size or how to tune the chemical environment in the 
 nanopores for effective water desalination and small organic separations.
-Rejection studies show that this membrane can not perform desalination yet 
-because the pores are too large\cite{zhou_supported_2005}. Over the past
+Rejection studies show that this membrane can not perform separations of solutes less than 1.2 nm  
+because the pores are too large \cite{zhou_supported_2005}. Over the past
 20 years, LLC membrane studies have been limited primarily 
 to Na-GA3C11 with some characterization done after minor structural 
-modifications\cite{resel_structural_2000}. Optimization has been 
+modifications \cite{resel_structural_2000}. Optimization has been 
 performed through trial and error. The only source of predictive modeling  % BJC: Reference. I think it is just w.r.t. bicontinuous cubic
 has been macroscopic models which likely do not adequately describe 
 transport at these length scales. A good model should incorporate a 
@@ -193,12 +161,12 @@ understanding of the system.
 A clear picture of the nanoscopic LLC membrane structure, gained by building 
 a molecular model will provide evidence to answer existing and newly proposed
 questions.
-The arrangement of sodium ions
+The arrangement of monomers
 in the channels is thought to be confined to the pore walls. It is 
 possible they are arranged more randomly. This would change the way
 one thinks about molecules diffusing through the membrane. The
 Col\textsubscript{h} phase is described as having pores made of disks or
-layers (Figure~\ref{fig:cartoonlayer},~\ref{fig:layeratomistic}) stacked
+layers stacked
 on top of one another, each containing a set number of monomers. A 
 simple simulation study of a similar molecule suggests that there are 4
 monomers in each disk~\cite{zhu_methacrylated_2006}. A separate calculation
@@ -207,12 +175,12 @@ are seven monomers in each layer~\cite{resel_structural_2000}. Once we %BJC: why
 know the number of monomers in each layer, we still do not know how 
 monomers in each layer are positioned with respect to other layers. 
 One of the driving forces for self % reference something with self assembly of aromatic compounds
-assembly in this system is thought to be pi-stacking interactions
+assembly in this system is thought to be pi-pi stacking interactions
 between aromatic headgroups \cite{gazit_possible_2002}. Gas phase ab
 initio studies of benzene dimers have shown a clear energetic advantage
-for parallel displaced and T-shaped pi-stacking conformations versus a
+for parallel displaced and T-shaped pi-pi stacking conformations versus a
 sandwiched conformation~\cite{sinnokrot_estimates_2002}.
-Substituted benzene rings exhibit an even stronger pi-stacking 
+Substituted benzene rings exhibit an even stronger pi-pi stacking 
 attraction which favors the parallel displaced configuration in all cases
 except where the substitutions are extremely electron withdrawing
 \cite{waller_hybrid_2006,ringer_effect_2006}. While we might be able to
