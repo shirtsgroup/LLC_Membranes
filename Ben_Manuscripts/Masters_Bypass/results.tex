@@ -227,7 +227,7 @@ intersection with the R-alkanes. Most significantly, the line is no
 longer present where R-helix exists and, perhaps coincidentally, the 
 intersection with R-alkanes occurs where one would expect to see R-spots.
 
-\beging{figure}
+\begin{figure}
 	\centering
 	\begin{subfigure}{0.475\textwidth}
 		\centering
@@ -251,7 +251,7 @@ conformation 5 \angstrom apart in order to guide it towards Basin B. For ease of
 reference, the third system will be referred to as the disordered system. The 
 three systems were equilibrated according to our procedure with NPT simulations of 
 greater than 400 ns. Simulated diffration patterns were generated using 
-portions of the trajectory after equilibration. Equilibration was detected
+portions of the trajectory after equilibration (Figure~\ref{fig:XRDsim}). Equilibration was detected
 when the distance between pores and the membrane thickness stopped changing.
 Simulated diffraction patterns for all three structures are shown in 
 Fig~\ref{fig:XRDsim}. The equilibrated parallel displaced structure exhibits 
@@ -271,6 +271,26 @@ the sandwiched packing which gives rise to such features. Finally, the
 disordered structure exhibits R-alkanes and R-pores. R-helix and R-spots are not
 present. Given the evidence, the sandwiched configuration with layers spaced
 3.7 \angstrom apart gives rise to an equilibrated structure closest to experiment. 
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.31\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{sandwich_rzplot.png}
+		\caption{}\label{fig:sandwich_rzplot}
+	\end{subfigure}
+	\begin{subfigure}{0.31\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{offset_rzplot.png}
+		\caption{}\label{fig:offsetrzplot}
+	\end{subfigure}
+	\begin{subfigure}{0.31\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{disorder_rzplot.png}
+		\caption{}\label{fig:disorder_rzplot.png}
+	\end{subfigure}
+	\caption{}\label{fig:XRDsim}
+\end{figure}
 
 The spots that appear in the simulated XRD pattern of the sandwiched
 conformation are a result of the way alkane tails pack together. Previously,
@@ -293,6 +313,31 @@ nearly hexagonal array of packed tails.
 	\includegraphics[width=0.4\textwidth]{tilt.png}
 	\caption{The average angle between alkyl chains and the xy plane is nearly zero degrees}\label{fig:tilt}
 \end{wrapfigure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{tails_topview.png}
+		\caption{}\label{fig:tails_topview}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{tails_rzplot.png}
+		\caption{}\label{fig:tails_rzplot}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{centroids_box.png}
+		\caption{}\label{fig:centroids}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{angles_traj_layered.png}
+		\caption{}\label{fig:angle_distribution}
+	\end{subfigure}
+	\caption{}\label{fig:tail_packing}
+\end{figure}
 
 The model gives reasonable estimates of ionic conductivity for both phases.
 Calculated values of ionic conductivity obtained using the Nernst Einstein
