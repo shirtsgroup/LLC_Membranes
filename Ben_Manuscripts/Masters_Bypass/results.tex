@@ -7,7 +7,7 @@ To verify our choices for each parameter, we compare our calculations
 to experimental small angle X-ray scattering (SAXS), wide angle X-ray
 scattering (WAXS), and ionic conductivity measurements.
 
-To understand the composition of the monomer layers, we ran simulations of 
+To discern the composition of the monomer layers, we ran simulations of 
 systems created with 4 - 8 monomers per layer. Both the sandwiched and 
 parallel displaced configurations were tested. All systems remained
 stable for at least 50 ns. Pair correlation functions calculated between 
@@ -16,21 +16,22 @@ stay partitioned into layers (Fig~\ref{fig:zdf}). Pore spacings were
 calculated by measuring the distance between the pore centers. Pore centers
 were located by averaging the coordinates of sodium ions in their 
 respective pores. Statistics were generated using the bootstrapping 
-technique. Systems built with 5 monomers in each layer equilibrate to a pore
+technique. Table~\ref{table:p2p} shows the pore spacing for all systems tested.
+Systems built with 5 monomers in each layer equilibrate to a pore
 spacing that is most consistent with the experimental value of 4.12 nm
-derived from SAXS measurements (Table~\ref{table:p2p}). The remainder of
+derived from SAXS measurements (Figure~\ref{fig:SAXS}). The remainder of
 this discussion will focus on the analysis of systems built with 5 
 monomers per layer.
 
 The experimental 2D WAXS measurement contains five major reflections which
-our model intends to reproduce (Fig ~\ref{fig:WAXSexp}). The first is located
+our model intends to reproduce (Figure~\ref{fig:WAXS}). The first is located
 at qz = 1.7 \angstrom \textsuperscript{-1}, corresponding to a real space 
 spacing of 3.7 \angstrom. The reflection is attributed to pi-pi stacking
 between aromatic rings in the direction perpendicular to the membrane plane, or z-axis. 
 For simplicity, this reflection will be referred to as R-pi. A weak intensity
 line is located at exactly half the qz value of R-pi (qz = 0.85 \angstrom \textsuperscript{-1}), corresponding to a 
 real space periodic spacing of 7.4 \angstrom. This reflection has been 
-attributed to 2\textsubscript{1} helical ordering of aromatic rings along the
+interpreted  as 2\textsubscript{1} helical ordering of aromatic rings along the
 z axis and will therefore be referred to as R-helix. If positions of the 
 aromatic rings can be traced by a helix, then for each turn in the helix, 
 there should be two aromatic rings. A third major reflection is marked by 
@@ -40,43 +41,45 @@ of the average spacing between packed alkane chains. This reflection will be
 called R-alkanes. Within R-alkanes, are four spots of higher intensity which 
 will be called R-spots. All are located $\approx 40$ degrees from the qz axis
 in their respective quadrants. In many liquid crystal systems this can be
-attributed to the tilt angle of the alkane chains with respect to the xy axis. 
+explained by the tilt angle of the alkane chains with respect to the xy plane. 
 The final major reflections correspond to the spacing and symmetry of the d100 
 plane which can be related to the distance between pores. The feature, which 
 will be called R-pores, is characterized by dots along qz = 0. The spacing
 between dots is indicative of the hexagonal symmetry of the packed pores. It
 is easiest to interpret the data by radially integrating the 2D data to get 
-a 1D curve which has also been done.
+a 1D curve which is shown in Figure~\ref{fig:SAXS}.
 
 \begin{figure}
 	\centering
-	\begin{subfigure}{0.47\linewidth}
+	\begin{subfigure}[t]{0.47\linewidth}
 		\centering
-		\includegraphics[width=\linewidth, valign=t]{WAXS_soft_confined.png}
+		\raisebox{.2\textwidth}{%
+		\includegraphics[width=\linewidth]{WAXS_soft_confined.png}
+		}
 		\caption{}\label{fig:WAXS}
 	\end{subfigure}
-	\begin{subfigure}{0.43\linewidth}
+	\begin{subfigure}[t]{0.43\linewidth}
 		\centering
-		\vspace{12mm}
+	%	\vspace{12mm}
 		\includegraphics[width=\linewidth]{SAXS.png}
-		\caption{}\label{figs:SAXS}
+		\caption{}\label{fig:SAXS}
 	\end{subfigure}
 	\caption{(a) 2D wide angle X-ray scattering gives details about repeating features less than 1 nanometer apart (b) 1D small angle X-ray scattering indicates hexagonal packing of pores as well as the spacing between pores.}\label{fig:SWAXS}
 \end{figure}
 
 The initial distance between layers can influence the approach towards
-equilibrium. Equilibrated systems built according to the 3.7 \angstrom
+equilibrium. Equilibrated systems built according to the 3.7 \angstrom 
 spacing indicated by R-pi are characterized by a defined, cylindrical and
 open pore structure. Aromatic rings are arranged in a helical conformation.
-We will refer to this system as Basin A (Fig ~\ref{fig:phaseA}). Simulations
-of systems built with layers stacked > 4 \angstrom apart results in a pore
+We will refer to this system as Basin A (Figure~\ref{fig:280K_pore}). Simulations
+of systems built with layers stacked greater than 4 \angstrom apart results in a pore
 structure characterized by high radial disorder, while still maintaining 
 partitioning between hydrophobic and hydrophilic regions. This will be 
-called Basin B (Fig~\ref{fig:phaseB}). It is apparent that this LLC membrane
+called Basin B (Figure~\ref{fig:340K_pore}). It is apparent that this LLC membrane
 may exist in at least two metastable states. The distinct difference in 
-pore structure (Fig~\ref{fig:porestructures}) exhibited by each phase will
-likely lead to different transport mechanisms. Understanding which phase 
-exists experimentally is necessary in order to appropriately study the system.
+pore structure exhibited by each phase will likely lead to different transport
+mechanisms. Understanding which phase exists experimentally is necessary in 
+order to appropriately study the system.
 % BJC: include more examples of the difference between the two basins
 % The arrangement of sodium ions (which are closely bound to carbonyl
 % head groups) can be well-approximated by a gaussian distribution 
@@ -85,23 +88,35 @@ exists experimentally is necessary in order to appropriately study the system.
 % There are distinct differences in the membrane and pore structures between each state (Fig~\ref{fig:porestructures})
 
 Basin A and Basin B are two configurationally metastable basins. 
-\begin{itemize}
-	\item We hesitate to classify the basins as separate phases
-	\item We hypothesize that Basin B is present at higher temperatures
-	\item This is evidenced by a simulation of a system in Basin A whose temperature was linearly ramped from 280K to 340K over 100 ns
-	\item Visually, there is a distinct change in pore structure
-	\item To quantify our observations we chose 3 easily measurable order parameters: the distance between pores, the membrane the thickness and the ratio of pore radius to the uncertainty in pore radius.
-	\item The distance between pores was measured as described previously
-	\item The membrane thickness was measured using the length of the z-box vector
-	\item The pore radius was measured by calculating the distance between the center of mass of each aromatic ring and the center of mass of all aromatic rings in respective pores.
-	\item The pore radius is divided by its uncertainty in order to understand the degree to which monomers obstruct the pore region.
-	\item We observe changes in slope around 310K indicating the possibility of an abrupt change in system ordering
-	\item To prove that the basins are in fact two different phases, we search for a first order phase transition, which would be indicated by a discontinuity in an order parameter.
-	\item Our 100 ns temperature ramp may have been to fast to avoid hysteresis
-	\item To mitigate hysteresis, we started with structures equilibrated at 280K. The temperature was raised to 300K and allowed to equilibrate for 200 ns.
-	\item At the end of 200 ns, the temperature was raised 5K and equilibrated again for 200 ns. This processed continued until we reached 325K. 
-	\item We observed only smooth changes in order parameters as temperature was increased indicating that we have not found two phases.
-\end{itemize}
+We hesitate to classify the basins as separate phases. We hypothesize
+that Basin B is present at higher temperatures. This is evidenced by
+a simulation of a system in Basin A whose temperature was linearly
+ramped from 280K to 340K over 100 ns. Visually, there is a distinct
+change in pore structure from one characteristic of Basin A 
+(Figure~\ref{fig:280K_pore} to one characteristic of Basin B 
+(Figure~\ref{fig:340K_pore}. To quantify our observation, we chose 
+three easily measurable order parameters: the distance between pores,
+the membrane the thickness and the ratio of pore radius to the uncertainty
+in pore radius. The distance between pores was measured as described 
+previously. The membrane thickness was measured using the length of the
+z box vector. The pore radius was measured by calculating the distance
+between the center of mass of each aromatic ring and the center of mass
+of all aromatic rings in respective pores. The pore radius is divided by
+its uncertainty in order to understand the degree to which monomers 
+obstruct the pore region. Referring back to our temperature ramped system,
+the slope of all order parameters change around 310K indicating the 
+possibility of an abrupt change in system ordering. To prove that the 
+basins are in fact two different phases, we must observe evidence of a
+first order phase transition, which would be indicated by a discontinuity
+in an order parameter as a function of temperature. Our 100 ns temperature
+ramp may have been too fast and may have suffered hysteresis. To mitigate
+hysteresis, we performed a slow, stepwise temperature ranp. Started from
+structures equilibrated at 280K, the system temperature was raised to 
+300K and allowed to equilibrate for 200 ns. At the end of 200 ns, the
+temperature was raised 5K and equilibrated again for 200 ns. We repeated
+this process until the system was equilibrated for 200 ns at 325K. In all
+cases, we observed smooth changes in order parameters as temperature was
+increased implying that we have not found two phases.
 
 \begin{figure}
         \centering
@@ -145,7 +160,7 @@ $\approx 1.5$ \angstrom \textsuperscript{-1}. R-pi is also present in each
 pattern, although it appears to intersect R-alkanes because the spacing
 between aromatic rings is similar to the alkane chain packing. The difference 
 in aromatic ring spacing between experiment and simulation is likely a result
-of the inability of GAFF to properly handle pi interactions. The parallel
+of the inability of GAFF to properly handle aromatic interactions. The parallel
 displaced configuration contains two lines of high intensity with maximum
 intensity occurring where they intersect the alkane chain region due to
 constructive interference between the two features. The lines are located
@@ -179,9 +194,9 @@ features in the restrained simulations faded upon equilibration which suggests
 that monomers in the parallel-displaced conformation may not give rise to the 
 experimental WAXS pattern seen. Simulated XRD of the sandwiched configuration 
 contains all features except for R-helix. Most notably, R-spots appears in the
-expected location, which suggests that there is something intrinsically to
+expected location, which suggests that there is something intrinsic to
 the sandwiched packing which gives rise to such features. Finally, the 
-disordered structure exhibits R-alkanes and R-pores. R-helix are R-spots are not
+disordered structure exhibits R-alkanes and R-pores. R-helix and R-spots are not
 present. Given the evidence, the sandwiched configuration with layers spaced
 3.7 \angstrom apart gives rise to an equilibrated structure closest to experiment. 
 
@@ -200,6 +215,12 @@ distribution of these angles is consistent with the location of the spots.
 We reason that monomer tails stacked closely in the sandwiched conformation
 are forced to splay apart and pack in between in each other which creates a
 nearly hexagonal array of packed tails. 
+
+\begin{wrapfigure}{R}{0.4\textwidth}
+	\centering
+	\includegraphics[width=0.4\textwidth]{tilt.png}
+	\caption{The average angle between alkyl chains and the xy plane is nearly zero degrees}\label{fig:tilt}
+\end{wrapfigure}
 
         %MRS2: Tables should also have specific theses as well, so think about that.  Merely saying ``here is the information'' isn't as useful without a guide through it.
 A summary of all experiments and relevant structural parameters are presented in Table ~\ref{table:p2p}
