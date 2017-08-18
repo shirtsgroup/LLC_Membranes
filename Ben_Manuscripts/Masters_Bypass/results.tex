@@ -25,9 +25,10 @@ prefer to stay partitioned into layers (Fig~\ref{fig:zdf}).
 
 \begin{table}
 \centering
-\begin{tabular}{|c|c|c|}
+\begin{tabular}{ccc}
 \toprule
                    & \multicolumn{2}{c}{Starting Configuration} \\
+\hline
 Monomers per layer & Sandwiched & Parallel Displaced \\
 \midrule
 4 & $3.71 \pm 0.08$ & $3.82 \pm 0.06$ \\
@@ -65,10 +66,11 @@ data}\label{table:p2p}
 	possesses the highest degree of layer partitioning.}\label{fig:zdf}
 \end{figure}
 
-The experimental 2D WAXS measurement contains five major reflections which
+Experimental WAXS measurements encode all structural details. 
+There are five major features present in the 2D experimental pattern which
 our model intends to reproduce (Figure~\ref{fig:WAXS}). The first is located
-at qz = 1.7 \angstrom \textsuperscript{-1}, corresponding to a real space 
-spacing of 3.7 \angstrom. The reflection is attributed to pi-pi stacking
+at qz = 1.7 \angstrom \textsuperscript{-1}, corresponding to a real spacing 
+of 3.7 \angstrom. The reflection is attributed to pi-pi stacking
 between aromatic rings in the direction perpendicular to the membrane plane, or z-axis. 
 For simplicity, this reflection will be referred to as R-pi. A weak intensity
 line is located at exactly half the qz value of R-pi (qz = 0.85 \angstrom \textsuperscript{-1}), corresponding to a 
@@ -84,7 +86,7 @@ called R-alkanes. Within R-alkanes, are four spots of higher intensity which
 will be called R-spots. All are located $\approx 40$ degrees from the qz axis
 in their respective quadrants. In many liquid crystal systems this can be
 explained by the tilt angle of the alkane chains with respect to the xy plane. 
-The final major reflections correspond to the spacing and symmetry of the d100 
+The final major reflections correspond to the spacing and symmetry of the d\textsubscript{100} 
 plane which can be related to the distance between pores. The feature, which 
 will be called R-pores, is characterized by dots along qz = 0. The spacing
 between dots is indicative of the hexagonal symmetry of the packed pores. It
@@ -143,14 +145,14 @@ in pore radius. The distance between pores was measured as described
 previously. The membrane thickness was measured using the length of the
 z box vector. The pore radius was measured by calculating the distance
 between the center of mass of each aromatic ring and the center of mass
-of all aromatic rings in respective pores. The pore radius is divided by
+of all aromatic rings in their respective pores. The pore radius is divided by
 its uncertainty in order to understand the degree to which monomers 
 obstruct the pore region. Referring back to our temperature ramped system,
 the slope of all order parameters change around 315K - 325K 
 (\Cref{fig:p2p_tramp,fig:thickness_tramp,fig:order_tramp}) indicating the 
 possibility of an abrupt change in system ordering. To prove that the 
 basins are in fact two different phases, we must observe evidence of a
-first order phase transition, which would be indicated by a discontinuity
+first order phase transition, which would be marked by a discontinuity
 in an order parameter as a function of temperature. Our 100 ns temperature
 ramp may have been too fast causing the system to suffer from hysteresis. To mitigate
 hysteresis, we performed a slow, stepwise temperature ramp. Starting from
@@ -241,15 +243,17 @@ $\approx 1.5$ \angstrom \textsuperscript{-1}. R-pi is also present in each
 pattern, although it appears to intersect R-alkanes because the spacing
 between aromatic rings is similar to the alkane chain packing. The difference 
 in aromatic ring spacing between experiment and simulation is likely a result
-of the inability of GAFF to properly handle aromatic interactions. The parallel
+of the inability of GAFF to properly handle aromatic interactions. The 
+sandwiched configuration shows R-spots in the expected location. A faint
+reflection is present in the location of R-helix. The parallel
 displaced configuration contains two lines of high intensity with maximum
 intensity occurring where they intersect the alkane chain region due to
 constructive interference between the two features. The lines are located
-where one would expect to see R-helix. As the simulation is progressed, 
-the full line begins to fade and the reflection persists only at the 
-intersection with the R-alkanes. Most significantly, the line is no
-longer present where R-helix exists and, perhaps coincidentally, the 
+where one would expect to see R-helix and, perhaps coincidentally, the 
 intersection with R-alkanes occurs where one would expect to see R-spots.
+As the simulation is progressed, the full line begins to fade 
+(Figure~\ref{fig:XRDsim}). Most significantly, the line is no longer present
+where R-helix exists.
 
 \begin{figure}
 	\centering
@@ -276,32 +280,32 @@ intersection with R-alkanes occurs where one would expect to see R-spots.
 
 Full comparison of experimental 2D WAXS with simulated X-ray diffraction
 patterns produced from equilibrated MD trajectories shows the most consistency
-with the sandwiched conformation in Basin A. Systems were built in both the 
-parallel displaced and sandwiched conformations with an intial layer spacing of
+with the sandwiched configuration in Basin A. Systems were built in both the 
+parallel displaced and sandwiched configurations with an intial layer spacing of
 3.7 \angstrom. A third system was created by stacking layers in the sandwiched 
-conformation 5 \angstrom apart in order to guide it towards Basin B. For ease of
+configuration 5 \angstrom apart in order to guide it towards Basin B. For ease of
 reference, the third system will be referred to as the disordered system. The 
 three systems were equilibrated according to our procedure with NPT simulations of 
 greater than 400 ns. Simulated diffration patterns were generated using 
-portions of the trajectory after equilibration (Figure~\ref{fig:XRDsim}). Equilibration was detected
+portions of the trajectory after equilibration. Equilibration was detected
 when the distance between pores and the membrane thickness stopped changing.
 Simulated diffraction patterns for all three structures are shown in 
-Fig~\ref{fig:XRDsim}. The equilibrated parallel displaced structure exhibits 
+Figure ~\ref{fig:XRDsim}. The equilibrated parallel displaced structure exhibits 
 R-alkanes and R-pores in the expected locations. Due to low resolution, making
 out the individual spots of R-pores is challenging and can be validated upon
-further inspection of the 3D structure factor. R-pi is also present, however it
-intersects R-alkanes because it is at a lower q than expected. This can be 
-explained by our model's inability to appropriately represent aromatic interactions.
+full spherical integration of the 3D structure factor. However, the same information
+can be extracted by measuring the pore spacing as described earlier. R-pi is
+also present, intersecting R-alkanes at a lower q value than in experiment.
 The rings prefer to stack $\approx 4.1 \angstrom$ apart as opposed to 3.7 \angstrom.
-R-helix and R-spots are both missing. The line which intersected both of these
+R-helix and R-spots are also both missing. The line which intersected both of these
 features in the restrained simulations faded upon equilibration which suggests
-that monomers in the parallel-displaced conformation may not give rise to the 
+that monomers in the parallel-displaced configuration may not give rise to the 
 experimental WAXS pattern seen. Simulated XRD of the sandwiched configuration 
 contains all features except for R-helix. Most notably, R-spots appears in the
 expected location, which suggests that there is something intrinsic to
-the sandwiched packing which gives rise to such features. Finally, the 
-disordered structure exhibits R-alkanes and R-pores. R-helix and R-spots are not
-present. Given the evidence, the sandwiched configuration with layers spaced
+the sandwiched packing that gives rise to such features. Finally, the 
+disordered structure exhibits R-alkanes and R-pores but R-helix, R-pi and R-spots are not
+present. Given the evidence, the sandwiched configuration created with layers spaced
 3.7 \angstrom apart gives rise to an equilibrated structure closest to experiment. 
 
 \begin{figure}
@@ -336,13 +340,13 @@ conformation are a result of the way alkane tails pack together. Previously,
 the spots in the diffraction pattern had been explained as the product of
 tilted alkane chains. We measured the tilt angle of the alkane chains and 
 showed that our system equilibrates to an average tilt angle close to zero 
-degrees (Fig~\ref{fig:tilt}). To understand the origin of the spots, we 
+degrees (Figure~\ref{fig:tilt}). To understand the origin of the spots, we 
 determined which atoms gave rise to the feature. By removing atoms from 
 the trajectory and simulating a diffraction pattern, we were able to isolate
-the cause of the spots to the tails. Since the tails are mostly flat, we
+the cause of the spots to the tails (Figure~\ref{fig:tails_rzplot}. Since the tails are mostly flat, we
 plotted the centroids of the tails and measured the angle between each centroid 
-and its nearest neighbors with respect to the plane of the membrane. The 
-distribution of these angles is consistent with the location of the spots.
+and its nearest neighbors with respect to the plane of the membrane (Figure~\ref{centroids}). The 
+distribution of these angles is consistent with the location of the spots (Figure~\ref{fig:angle_distribution}).
 We reason that monomer tails stacked closely in the sandwiched conformation
 are forced to splay apart and pack in between in each other which creates a
 nearly hexagonal array of packed tails. 
@@ -350,7 +354,7 @@ nearly hexagonal array of packed tails.
 \begin{wrapfigure}{R}{0.4\textwidth}
 	\centering
 	\includegraphics[width=0.4\textwidth]{tilt.png}
-	\caption{The average angle between alkyl chains and the xy plane is nearly zero degrees}\label{fig:tilt}
+	\caption{The average angle between alkane chains and the xy plane is nearly zero degrees}\label{fig:tilt}
 \end{wrapfigure}
 
 \begin{figure}
@@ -385,19 +389,23 @@ nearly hexagonal array of packed tails.
 	of R-spots}\label{fig:tail_packing}
 \end{figure}
 
-\subsection{Ionic conductivity calculation}
+\subsection*{Ionic conductivity calculation}
 
 The model gives reasonable estimates of ionic conductivity for both phases.
 Calculated values of ionic conductivity obtained using the Nernst Einstein
 relation and Collective Diffusion model are compared in Table~\ref{table:conductivity}.
 The two methods agree with each other within error, although the 
 uncertainty obtained using the Collective Diffusion model is much higher.
-Much longer simulations are needed to lower the uncertainty.
+Much longer simulations are needed to lower the uncertainty. This is 
+especially true of the value calculated for Basin B using the collective
+diffusion model. The simulation was only run for 200 ns. Basin A collective
+diffusion calculations were generated from a 500 ns simulation. In both 
+cases, our calculated values would benefit from longer simulations. 
 For this reason we will likely only use the Nernst Einstein relation
 in future calculations of this type. Interestingly, Basin B 
 has a higher ionic conductivity than Basin A. Conductivity is enhanced in
 Basin B due to a higher sodium ion diffusivity. Transport of sodium is
-likely facilitated by the homgeneity of Basin B. Sodium ions have less
+likely facilitated by the homogeneity of Basin B. Sodium ions have less
 sites to move to in Basin A. Currently there is no experimental
 evidence of this trend, but it may be the subject of a future study. 
 In both cases, our calculated values for Basin A are higher than the 
@@ -417,9 +425,9 @@ We would expect additional gains in a perfect system.
 \hline
 Method & Basin A & Basin B \\
 \midrule
-Nernst Einstein & \num{(1.23$\pm$0.01)e-4} & \num{(1.76$\pm$0.02)e-4} \\
-Collective Diffusion & \num{(1.40$\pm$0.32)e-4} & \num{(4.6$\pm$2.4)e-4} \\
-Experiment & \num{(1.33$\pm$ 0.10)e-5} & -- \\
+Nernst Einstein & \num{1.23e-4} (0.01) & \num{1.76e-4} (0.02) \\
+Collective Diffusion & \num{1.40e-4} (0.32) & \num{4.6e-4}(2.4) \\
+Experiment & \num{1.33e-5} (0.10) & -- \\
 \bottomrule
 \end{tabular}
 \caption{Calculated ionic conductivity using Nernst-Einsten and Collective Diffusion 
@@ -427,7 +435,7 @@ agree within error. Both methods give calculated values of ionic conductivity wh
 are an order of magnitude higher than experimental values~\label{table:conductivity}}.
 \end{table}
 
-\subsection{Implementation of the crosslinking algorithm}
+\subsection*{Implementation of the crosslinking algorithm}
 
 We applied the crosslinking algorithm to an equilibrated structure in Basin B.
 The procedure will be repeated with Basin A in the near future.
@@ -449,7 +457,7 @@ transport studies.
 	\centering
 	\begin{subfigure}{0.31\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{p2p_diagram.png}
+		\includegraphics[width=\textwidth]{p2p_diagram.PNG}
 		\caption{}\label{fig:p2p_diagram}
 	\end{subfigure}
 		\begin{subfigure}{0.31\textwidth}
