@@ -3,7 +3,12 @@
 """
     This script is intended to radially integrate a 2D image defined by a numpy array of pixel intensities
 """
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
+from builtins import range
+from past.utils import old_div
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
@@ -70,7 +75,7 @@ def angle_mat(distance_matrix, dist, wavelength):
     for i in range(m):
         for j in range(n):
             p = distance_matrix[i, j]
-            angles[i, j] = np.arctan(p / d) * 180.0 / np.pi  # convert to degrees
+            angles[i, j] = np.arctan(old_div(p, d)) * 180.0 / np.pi  # convert to degrees
 
 
     maxes = []
@@ -84,7 +89,7 @@ def angle_mat(distance_matrix, dist, wavelength):
 
     for i in range(m):
         for j in range(n):
-            d_mat[i, j] = w / (2 * np.sin(angles[i, j]))
+            d_mat[i, j] = old_div(w, (2 * np.sin(angles[i, j])))
 
     maxes = []
     for i in range(m):
@@ -97,7 +102,7 @@ def angle_mat(distance_matrix, dist, wavelength):
     for i in range(m):
         for j in range(n):
             # q_mat[i, j] = 2*np.pi / d_mat[i, j]
-            q_mat[i, j] = 4*np.pi*np.sin(angles[i, j] / 2) * (np.pi / 180) / w
+            q_mat[i, j] = 4*np.pi*np.sin(old_div(angles[i, j], 2)) * (old_div(np.pi, 180)) / w
 
     maxes = []
     for i in range(m):
@@ -119,7 +124,7 @@ def radial_int(pixel_intensities, pixels, dr, dim, dist, wavelength):
 
     angles, theta_max, q_mat, qmax, d_mat, dmax = angle_mat(distance_mat, dist, wavelength)
 
-    intensities = np.zeros([int(max_dist/dr)])
+    intensities = np.zeros([int(old_div(max_dist,dr))])
     bins = len(intensities)
 
     x = np.linspace(0, max_dist, bins)
@@ -160,20 +165,20 @@ if __name__ == '__main__':
 
     Imin = min(mins)
 
-    print Imin
-    print np.amax(pixel_intensities)
+    print(Imin)
+    print(np.amax(pixel_intensities))
 
     maxes = []
     for i in range(1024):
         maxes.append(max(pixel_intensities[:, i]))
 
     Imax = max(maxes)
-    print 'Imax = %s' % Imax
+    print('Imax = %s' % Imax)
 
     im = plt.imshow(pixel_intensities, cmap='Dark2', interpolation='none', vmin=Imin, vmax=Imax)
 
     Imax = np.argmax(intensity)
-    print q[Imax]
+    print(q[Imax])
     plt.figure()
     plt.plot(q, intensity)
     plt.show()

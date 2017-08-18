@@ -1,22 +1,27 @@
 #! /usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import range
+from past.utils import old_div
 import argparse
 from Last_Frame import extract_last_gro
 from Thickness import thickness
 from Get_Positions import get_positions as gp
 import numpy as np
 from llclib import physical
+import mdtraj as md
 
 
 def initialize():
 
     parser = argparse.ArgumentParser(description = 'Run Cylindricity script')
 
-    parser.add_argument('-i', '--input', default='wiggle_traj.gro')
     parser.add_argument('-t', '--traj', default='wiggle.trr', help='Path to input file')
     parser.add_argument('-g', '--gro', default='wiggle.gro', help='Path to input file')
-    parser.add_argument('-c', '--comp', default='NA', help='Name of component whose concentration is needed')
-    parser.add_argument('-b', '--buffer', default=0.1, help='percent depth into membrane where measurements are taken')
+    parser.add_argument('-c', '--comp', default='NA', type=str, help='Name of component whose concentration is needed')
+    parser.add_argument('-b', '--buffer', default=0.1, type=float, help='percent depth into membrane where measurements are taken')
     parser.add_argument('-l', '--LC_type', default='NAcarb11V', help='Type of liquid crystal being studied')
     parser.add_argument('-s', '--solv', default='no', help='Is the system solvated or not?')
 
@@ -50,10 +55,10 @@ def conc(file, comp, b, lc, solv):
             if z_max >= pos[2, c, t] >= z_min:
                 count[t] += 1
 
-    factor = 1/(1*10**-27)  # convert from ions/nm^3 to ions/m^3
+    factor = old_div(1,(1*10**-27))  # convert from ions/nm^3 to ions/m^3
     conc = np.zeros([trj_points])
     for c in range(trj_points):
-        conc[c] = (count[c]/box_vol[c])*factor
+        conc[c] = (old_div(count[c],box_vol[c]))*factor
 
     avg_conc = np.mean(conc)
     std = np.std(conc)
@@ -61,17 +66,17 @@ def conc(file, comp, b, lc, solv):
     return avg_conc, std, avg_cross, thick, z_max, z_min
 
 if __name__ == '__main__':
-    args = initialize()
-    import time
-    start = time.time()
-    # Avg, std, cross, thick, z_max, z_min = conc('%s' % args.input, '%s' %args.comp, '%s' % args.buffer, '%s' % args.LC_type, '%s' % args.solv)
-    Avg, std, cross, thick, z_max, z_min = physical.conc('%s' % args.traj, '%s' %args.gro, '%s' % args.comp,
-                                                         '%s' % args.buffer, '%s' % args.LC_type, '%s' % args.solv)
 
-    print Avg
-    print std
-    print cross
-    print z_max
-    print z_min
-    print 'Average Concentration: %s +/- %s mol/m^3' % (Avg, std)
-    print 'Done in %s seconds' % (time.time() - start)
+    args = initialize()
+
+    t = md.load(args.traj, top=args.gro)
+
+    # Avg, std, cross, thick, z_max, z_min = conc('%s' % args.input, '%s' %args.comp, '%s' % args.buffer, '%s' % args.LC_type, '%s' % args.solv)
+    Avg, std, cross, thick, z_max, z_min = physical.conc(t, args.comp, args.buffer)
+
+    print(Avg)
+    print(std)
+    print(cross)
+    print(z_max)
+    print(z_min)
+    print('Average Concentration: %s +/- %s mol/m^3' % (Avg, std))

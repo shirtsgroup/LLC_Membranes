@@ -109,7 +109,7 @@ def parse_txt(txt, points, times, std=False):
         x = np.array([time[i], time[i]])
         y = np.array([0, 20])
         plt.plot(x, y, '--', linewidth=3, color='r', scaley=False)
-        plt.annotate('T = %s' % T, xy=(time[i], np.mean(points)), xytext=(time[i] + 10000, np.amax(points)))
+        plt.annotate('T = %s' % T, xy=(time[i], np.mean(points)), xytext=(time[i] + 10, np.amax(points)))
 
     if std:
         std_equil = np.zeros([4, len(time) - 1])
@@ -164,7 +164,7 @@ def parse_txt(txt, points, times, std=False):
         # plt.plot(x, lowerbound, '--', linewidth=1, color='g')
 
     ybounds = np.array([min(y_low)*.99, max(y_high)*1.01])
-    xbounds = np.array([-100, max(times)])
+    xbounds = np.array([-3, max(times)])
 
     return xbounds, ybounds
 
@@ -197,13 +197,24 @@ if __name__ == '__main__':
                                                                   np.std(thick[equil_frame:])))
 
         # Plot thickness vs time
-        plt.plot(t.time[::args.plot_every], thick[::args.plot_every])
-        plt.title('Membrane thickness vs. time')
-        plt.xlabel('Time (ps)')
-        plt.ylabel('Membrane thickness (nm)')
+        fig = plt.figure()
+        ax1 = fig.add_subplot(111)
+        # ax2 = ax1.twiny()
+        ax1.plot(t.time[::args.plot_every]/1000, thick[::args.plot_every])
+        #plt.title('Membrane thickness vs. time')
+        ax1.set_xlabel('Time (ns)', fontsize=14)
+        # new_tick_locations = np.linspace(0, t.time[-1], 7)
+        # new_tick_labels = [int(280 + 60*(x/t.time[-1])) for x in new_tick_locations]
+        # ax2.set_xlim(ax1.get_xlim())
+        # ax2.set_xticks(new_tick_locations)
+        # ax2.set_xticklabels(new_tick_labels)
+        # ax2.set_xlabel("Temperature (K)", fontsize=14)
+        ax1.set_ylabel('Membrane thickness (nm)', fontsize=14)
+        ax1.tick_params(labelsize=14)
+        # ax2.tick_params(labelsize=14)
 
         if args.T:
-            xbounds, ybounds = parse_txt(args.T, thick[::args.plot_every], t.time[::args.plot_every], std=args.plot_std)
+            xbounds, ybounds = parse_txt(args.T, thick[::args.plot_every], t.time[::args.plot_every]/1000, std=args.plot_std)
             plt.ylim(ybounds)
             plt.xlim(xbounds)
 

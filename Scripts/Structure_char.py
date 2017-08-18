@@ -390,7 +390,7 @@ def parse_txt(txt, points, times, std=False):
         x = np.array([time[i], time[i]])
         y = np.array([0, 5])
         plt.plot(x, y, '--', linewidth=3, color='r', scaley=False)
-        plt.annotate('T = %s' % T, xy=(time[i], np.mean(points)), xytext=(time[i] + 10000, np.amax(points)))
+        plt.annotate('T = %s' % T, xy=(time[i], np.mean(points)), xytext=(time[i] + 10, np.amax(points)))
 
     if std:
         std_equil = np.zeros([4, len(time) - 1])
@@ -443,7 +443,7 @@ def parse_txt(txt, points, times, std=False):
         # plt.plot(x, lowerbound, '--', linewidth=1, color='g')
 
     ybounds = np.array([min(y_low)*.99, max(y_high)*1.01])
-    xbounds = np.array([-100, max(times)])
+    xbounds = np.array([-3, max(times)])
 
     return xbounds, ybounds
 
@@ -485,7 +485,10 @@ if __name__ == '__main__':
               '4-8', '3-6']
 
     if args.plot_avg:
-        plt.figure(1)
+        fig = plt.figure(1)
+        ax1 = fig.add_subplot(111)
+        # ax2 = ax1.twiny()
+
         avg = np.zeros(p2ps[0, :].shape)
         n = 0
         for i in range(distances):
@@ -495,22 +498,33 @@ if __name__ == '__main__':
 
         avg /= n
 
-        plt.plot(t.time[::args.plot_every], avg[::args.plot_every])
+        ax1.plot(t.time[::args.plot_every]/1000, avg[::args.plot_every])
 
         if args.T:
-            xbounds, ybounds = parse_txt(args.T, avg[::args.plot_every], t.time[::args.plot_every], std=args.plot_std)
+            xbounds, ybounds = parse_txt(args.T, avg[::args.plot_every], t.time[::args.plot_every]/1000, std=args.plot_std)
             plt.ylim(ybounds)
             plt.xlim(xbounds)
 
     else:
-        plt.figure(1)
+        fig = plt.figure(1)
+        ax1 = fig.add_subplot(111)
+
         for i in range(distances):
             if i not in exclude:
                 plt.plot(t.time[::args.plot_every], p2ps[i, ::args.plot_every], label='%s' % labels[i])
 
-    plt.title('Pore to Pore Distance Equilibration')
-    plt.ylabel('Distance between pores (nm)')
-    plt.xlabel('Time (ps)')
+    ax1.set_xlabel('Time (ps)')
+    # new_tick_locations = np.linspace(0, t.time[-1], 7)
+    # new_tick_labels = [int(280 + 60*(x/t.time[-1])) for x in new_tick_locations]
+    # ax2.set_xlim(ax1.get_xlim())
+    # ax2.set_xticks(new_tick_locations)
+    # ax2.set_xticklabels(new_tick_labels)
+    # ax2.set_xlabel("Temperature (K)", fontsize=14)
+    # plt.title('Pore to Pore Distance Equilibration')
+    ax1.set_ylabel('Distance between pores (nm)', fontsize=14)
+    ax1.set_xlabel('Time (ns)', fontsize=14)
+    ax1.tick_params(labelsize=14)
+    # ax2.tick_params(labelsize=14)
     # plt.legend(loc=1, fontsize=18)
     equil = 0
     density, r, bin_width = compdensity(pos, p_centers, equil, n_pores, buffer=0)

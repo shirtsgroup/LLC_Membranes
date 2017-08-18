@@ -106,8 +106,8 @@ if __name__ == "__main__":
     # atoms = list(itertools.chain.from_iterable(grps))
 
     if args.load:
-        all_tilt_angles = np.load('angles')
-        times = np.load('times')
+        all_tilt_angles = np.load('angles.npy')
+        times = np.load('times.npy')
         print('arrays loaded')
     else:
         if args.single_frame:
@@ -153,9 +153,10 @@ if __name__ == "__main__":
         # Format and save figure
         plt.figure()
         plt.errorbar(times[::args.plot_every], avgs[::args.plot_every], yerr=stds[::args.plot_every])
-        plt.title('Tilt angle versus time')
-        plt.xlabel('Time (ps)')
-        plt.ylabel('Tilt angle w.r.t xy plane (degrees)')
+        #plt.title('Tilt angle versus time')
+        plt.xlabel('Time (ps)', fontsize=14)
+        plt.ylabel('Tilt angle w.r.t xy plane (degrees)', fontsize=14)
+        plt.axes().tick_params(labelsize=14)
         plt.savefig(args.output)
 
         if not args.noshow:

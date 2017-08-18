@@ -1,8 +1,12 @@
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 #!/usr/bin/bash
 
+from builtins import range
+from past.utils import old_div
 import argparse
 import numpy as np
-from Get_Positions import get_positions as gp
 import matplotlib.pyplot as plt
 import Poly_fit
 
@@ -32,7 +36,7 @@ def autocorrFFT(x):
     res = np.fft.ifft(PSD)
     res = (res[:N]).real   # now we have the autocorrelation in convention B
     n= N*np.ones(N)-np.arange(0, N)  # divide res(m) by (N-m)
-    return res/n  # this is the autocorrelation in convention A
+    return old_div(res,n)  # this is the autocorrelation in convention A
 
 
 def msd_fft(r):
@@ -47,7 +51,7 @@ def msd_fft(r):
     S1 = np.zeros(N)
     for m in range(N):
       Q = Q-D[m-1]-D[N-m]
-      S1[m] = Q/(N-m)
+      S1[m] = old_div(Q,(N-m))
     return S1-2*S2
 
 
@@ -108,25 +112,25 @@ def d_error(nMC, startfit, endMSD, nT, limits, times, MSD, d):
     # Weight least squares -- first generate a weight matrix
     W = np.zeros((tot_pts, tot_pts))
     for i in range(tot_pts):
-        W[i, i] = 1/((limits[0, i + startfit])**2)
+        W[i, i] = old_div(1,((limits[0, i + startfit])**2))
 
     y_fit, _, slope_error, _, A = Poly_fit.poly_fit(times[startfit:endMSD], MSD[startfit:endMSD], 1, W)
 
-    return A[1]/(2*d*1000000), slope_error/(2*d*1000000)
+    return old_div(A[1],(2*d*1000000)), old_div(slope_error,(2*d*1000000))
 
 
 def dconst(x, nT, Nbootstraps, frontfrac, fracshow, d, dt, nMC):
 
     MSD, MSDs = msd(x)
-    print 'MSDs done'
+    print('MSDs done')
     limits = bootstrap(nT, Nbootstraps, x.shape[1], MSDs, MSD)
-    print 'Bootstrapping Done'
+    print('Bootstrapping Done')
     endMSD = int(np.floor(nT*fracshow))
     startMSD = int(np.floor(nT*frontfrac))
 
     # coeff = Poly_fit.poly_fit(dt*np.array(range(startMSD, endMSD)), MSD[startMSD:endMSD], 1)[3]
     # D = coeff[1]/(2*d*1000000)  # slope of MSD plot equals 2 D. Divide by 1 million to go from nm^2/ps to m^2/s
-    times = dt*np.array(range(0,endMSD))
+    times = dt*np.array(list(range(0,endMSD)))
 
     # plt.plot(times, MSD[:endMSD])
     # plt.show()
@@ -150,17 +154,17 @@ if __name__ == '__main__':
     # f.close()
     trj_times = np.load('d_traj')
     pos = np.load('d_pos')
-    print 'got positions'
+    print('got positions')
     nT = len(trj_times)
     Nbootstraps = args.nboot
     frontfrac = args.frontfrac
     fracshow = args.fracshow
     d = args.dim
-    dt = (trj_times[len(trj_times) - 1] - trj_times[0])/(len(trj_times) - 1)
-    print 'Getting the D ...'
+    dt = old_div((trj_times[len(trj_times) - 1] - trj_times[0]),(len(trj_times) - 1))
+    print('Getting the D ...')
     MSD, endMSD, limits, D_av, D_std = dconst(pos, nT, Nbootstraps, frontfrac, fracshow, d, dt, args.nMC)
     errorevery = int(np.ceil(fracshow*nT/100.0))  # plot only 100 bars total
-    plt.errorbar(dt*np.array(range(0,endMSD)),MSD[:endMSD],yerr=[limits[0,:endMSD],limits[1,:endMSD]],errorevery=errorevery)
+    plt.errorbar(dt*np.array(list(range(0,endMSD))),MSD[:endMSD],yerr=[limits[0,:endMSD],limits[1,:endMSD]],errorevery=errorevery)
     plt.ylabel('MSD (nm^2)')
     plt.xlabel('time (ps)')
     plt.title('D = %s $\pm$ %s m$^2$/s' % (D_av, D_std))

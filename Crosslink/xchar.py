@@ -1,7 +1,12 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # Characterize Crosslinked systems
 
+from __future__ import division
+from __future__ import print_function
+from builtins import str
+from builtins import range
+from past.utils import old_div
 import argparse
 import math
 
@@ -27,11 +32,13 @@ t = []
 for line in f:
     t.append(line)
 
-exec 'from Scripts.LC_class import %s' % args.monomer
-exec 'c1_atoms = %s.c1_atoms' % args.monomer
-exec 'c2_atoms = %s.c2_atoms' % args.monomer
-exec 'tails = %s.tails' % args.monomer
-
+# exec 'from Scripts.LC_class import %s' % args.monomer
+# exec 'c1_atoms = %s.c1_atoms' % args.monomer
+# exec 'c2_atoms = %s.c2_atoms' % args.monomer
+# exec 'tails = %s.tails' % args.monomer
+c1_atoms = ['C14', 'C26', 'C38']
+c2_atoms = ['C13', 'C25', 'C37']
+tails = 3
 # Find which atoms the carbons are bonded to
 
 # find [ atoms ] section in topology
@@ -118,7 +125,7 @@ for i in range(atoms_index + 3, count):
 intra_mon = 0
 for i in range(0, len(c1_xlinks)):
     for j in range(0, len(c1_xlinks[i])):
-        if c1_xlinks[i][j] in mon_ranges[int(math.floor(i/tails))]:
+        if c1_xlinks[i][j] in mon_ranges[int(math.floor(old_div(i,tails)))]:
             intra_mon += 1
 
 # Find the distance between crosslinked atoms
@@ -147,7 +154,7 @@ for i in range(0, len(distances)):
 # Calculate crosslinks between pores
 
 pore_ranges = []  # a range of indices for each pore
-mon_per_pore = len(c1_xlinks)/tails/args.no_pores
+mon_per_pore = int(len(c1_xlinks)/tails/args.no_pores)
 
 for i in range(0, args.no_pores):
     pore_ranges.append([])
@@ -168,17 +175,17 @@ intra_pore = 0
 for i in range(0, len(c1_xlinks)):
     for j in range(0, len(c1_xlinks[i])):
         if c1_xlinks[i][j] in pore_ranges[int(math.floor(i/tails/mon_per_pore))]:
-            if c1_xlinks[i][j] not in mon_ranges[int(math.floor(i/tails))]:
+            if c1_xlinks[i][j] not in mon_ranges[int(math.floor(old_div(i,tails)))]:
                 intra_pore += 1
 
 # Outputs
 
-print 'Total Number of crosslinks: %s' %xlinks
-print ''
-print ' ______________________________________'
-print '|____________________| Number |   %    |'
-print '|Intra-Monomer xlinks|{:^8}|{:^8}|'.format(intra_mon, 100*intra_mon/xlinks)
+print('Total Number of crosslinks: %s' %xlinks)
+print('')
+print(' ______________________________________')
+print('|____________________| Number |   %    |')
+print('|Intra-Monomer xlinks|{:^8}|{:^8}|'.format(intra_mon, 100*intra_mon/xlinks))
 # print '|Xlinks across PBCs  |{:^8}|{:^8}|'.format(bonds_across_pbcs, 100*bonds_across_pbcs/xlinks)
-print '| Inter-Pore xlinks  |{:^8}|{:^8}|'.format(inter_pore, 100*inter_pore/xlinks)
-print '| Intra-Pore xlinks  |{:^8}|{:^8}|'.format(intra_pore, 100*intra_pore/xlinks)
-print ' --------------------------------------'
+print('| Inter-Pore xlinks  |{:^8}|{:^8}|'.format(inter_pore, 100*inter_pore/xlinks))
+print('| Intra-Pore xlinks  |{:^8}|{:^8}|'.format(intra_pore, 100*intra_pore/xlinks))
+print(' --------------------------------------')

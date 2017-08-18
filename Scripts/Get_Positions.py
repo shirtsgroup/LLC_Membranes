@@ -14,7 +14,12 @@ Outputs:
     (iii) Box vectors for each trajectory frame
     (iv) The timestamps on each trajectory frame
 """
+from __future__ import division
+from __future__ import absolute_import
 
+from builtins import str
+from builtins import range
+from past.utils import old_div
 import argparse
 import LC_class
 import numpy as np
@@ -55,7 +60,7 @@ def get_positions(input_file, comp, lc, solv):
     for line in f:
         a.append(line)
 
-    exec 'residues = LC_class.%s.residues' % lc
+    exec('residues = LC_class.%s.residues' % lc)
 
     if solv == 'yes':
         residues.append('SOL')
@@ -144,7 +149,7 @@ def get_positions(input_file, comp, lc, solv):
     else:
         frames = 1
 
-    no_res_per_frame = len(pos[0])/frames
+    no_res_per_frame = old_div(len(pos[0]),frames)
 
     pos_frame = []
     vel_frame = []
@@ -196,7 +201,7 @@ def get_positions_old(input_file, comp, lc, solv):  # unmodified -- works fine b
     traj_points = []  # The time stamps of each trajectory frame
     box = [[], [], [], [], [], [], [], [], []]  # box vectors, see: http://manual.gromacs.org/current/online/gro.html
 
-    exec 'residues = LC_class.%s.residues' % lc
+    exec('residues = LC_class.%s.residues' % lc)
 
     if comp not in residues:
         residues.append(comp)  # Just in case the component is not normally associated with the LC_class
@@ -233,7 +238,7 @@ def get_positions_old(input_file, comp, lc, solv):  # unmodified -- works fine b
         del box[i][0]  # delete the first entry
 
     # Put all the positions and velocities into separate lists for each frame
-    no_res_per_frame = len(pos[0])/len(traj_points)
+    no_res_per_frame = old_div(len(pos[0]),len(traj_points))
     pos_frame = []
     vel_frame = []
     for i in range(0, len(traj_points)):

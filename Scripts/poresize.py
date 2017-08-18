@@ -71,7 +71,7 @@ def parse_txt(txt, points, times, name, std=False):
         x = np.array([time[i], time[i]])
         y = np.array([0, 20])
         plt.plot(x, y, '--', linewidth=3, color='r')
-        plt.annotate('T = %s' % T, xy=(time[i], np.mean(points)), xytext=(time[i] + 10000, np.amax(points)))
+        plt.annotate('T = %s' % T, xy=(time[i], np.mean(points)), xytext=(time[i] + 10, np.amax(points)))
 
     if std:
         std_equil = np.zeros([4, len(time) - 1])
@@ -122,12 +122,12 @@ def parse_txt(txt, points, times, name, std=False):
         upperbound = np.array([v + bencherr[i], v + bencherr[i]])
         lowerbound = np.array([v - bencherr[i], v - bencherr[i]])
         plt.fill_between(x, upperbound, lowerbound, alpha=0.5, color='g')
-        plt.plot(x, y, linewidth=2, color='g')
+        plt.plot(x, y, linewidth=2, color='black')
         # plt.plot(x, upperbound, '--', linewidth=1, color='b')
         # plt.plot(x, lowerbound, '--', linewidth=1, color='b')
 
     ybounds = np.array([min(y_low)*.99, max(y_high)*1.01])
-    xbounds = np.array([-100, max(times)])
+    xbounds = np.array([-3, max(times)])
 
     return xbounds, ybounds
 
@@ -180,25 +180,35 @@ if __name__ == "__main__":
     # plt.ylabel('Standard deviation of distance of benzene from pore center')
     # plt.xlabel('Time')
 
-    plt.figure(3)
-
     T = np.linspace(280, 340, t.time.shape[0])
+
+    fig = plt.figure(3)
+    ax1 = fig.add_subplot(111)
+    # ax2 = ax1.twiny()
 
     if args.normalize:
         # plt.plot(t.time, order)
-        plt.plot(T, order)
+        ax1.plot(T, order)
     else:
-        plt.plot(t.time[::args.plot_every], old_div(r,r_std)[::args.plot_every])
+        x = t.time[::args.plot_every]/1000
+        ax1.plot(x, old_div(r,r_std)[::args.plot_every])
 
-    plt.title('Order parameter vs time')
-    plt.xlabel('Time (ps)')
-    # plt.xlabel('Temperature (K)')
-    plt.ylabel('Order parameter')
+    ax1.set_xlabel('Time (ns)', fontsize=14)
+    # new_tick_locations = np.linspace(0, t.time[-1], 7)
+    # new_tick_labels = [int(280 + 60*(x/t.time[-1])) for x in new_tick_locations]
+    # ax2.set_xlim(ax1.get_xlim())
+    # ax2.set_xticks(new_tick_locations)
+    # new_tick_labels = t.time[::args.plot_every]/1000
+    # ax1.set_xticklabels(new_tick_labels)
+    # ax2.set_xlabel("Temperature (K)", fontsize=14)
+    ax1.set_ylabel("Pore Radius / Pore Radius Uncertainty", fontsize=14)
+    ax1.tick_params(labelsize=14)
+    # ax2.tick_params(labelsize=14)
 
     if args.T:
-        xbounds, ybounds = parse_txt(args.T, old_div(r,r_std)[::args.plot_every], t.time[::args.plot_every], 'order', std=args.plot_std)
-        plt.ylim(ybounds)
-        plt.xlim(xbounds)
+        xbounds, ybounds = parse_txt(args.T, old_div(r,r_std)[::args.plot_every], t.time[::args.plot_every]/1000, 'order', std=args.plot_std)
+        ax1.set_ylim(ybounds)
+        ax1.set_xlim(xbounds)
 
     if args.save:
         plt.savefig('order.png')

@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.path as mplPath
 import mdtraj as md
 from random import randint
+from pymbar import timeseries
 
 
 class region:
@@ -137,7 +138,7 @@ def thickness(filename, ref_atoms, grid, *traj, **kwargs):
     return thick, z_max, z_min, thick_std
 
 
-def conc(t, t_comp, b):
+def conc(t, comp, b):
     """
     Calculate the concentration of the specified component
     :param t: mdtraj trajectory object for system being studied
@@ -147,34 +148,50 @@ def conc(t, t_comp, b):
     """
 
     box = t.unitcell_vectors
-    last = t.slice(-1)
-    file_rw.write_gro(last, 'last_frame.gro')
-    thick, z_max, z_min = thickness('last_frame.gro')
+    equil = timeseries.detectEquilibration(box[:, 2, 2])[0]
+    thick = np.mean(box[equil:, 2, 2])
+
+    z_max = thick
+    z_min = 0
     buffer = thick*b
     z_max -= buffer
     z_min += buffer
     thick = z_max - z_min
 
     # Calculate concentration (an average of all frames)
+    keep = [a.index for a in t.topology.atoms if a.name == comp]
+    t_comp = t.atom_slice(keep)
+
     pos = t_comp.xyz
     ncomp = pos.shape[1]  # number of components in the simulation which you want the concentration of
     nT = pos.shape[0]
-    count = np.zeros([nT])
-    box_vol = np.zeros([nT])
-    cross = np.zeros([nT])
-    for t in range(nT):
-        x_dim = np.linalg.norm(box[t, 0, :])
-        y_dim = np.linalg.norm(box[t, 1, :])
-        cross[t] = x_dim*y_dim
-        box_vol[t] = x_dim*y_dim*thick
-        for c in range(ncomp):
-            if z_max >= pos[t, c, 2] >= z_min:
-                count[t] += 1
 
-    factor = old_div(1,(1*10**-27))  # convert from ions/nm^3 to ions/m^3. Trouble here for cython. Need to declare types
+    if b > 0:
+        count = np.zeros([nT])
+        box_vol = np.zeros([nT])
+        cross = np.zeros([nT])
+        for t in range(nT):
+            x_dim = np.linalg.norm(box[t, 0, :])
+            y_dim = np.linalg.norm(box[t, 1, :])
+            cross[t] = x_dim*y_dim
+            box_vol[t] = x_dim*y_dim*thick
+            for c in range(ncomp):
+                if z_max >= pos[t, c, 2] >= z_min:
+                    count[t] += 1
+    else:
+        count = ncomp*np.ones([nT])
+        box_vol = np.zeros([nT])
+        cross = np.zeros([nT])
+        for t in range(nT):
+            x_dim = np.linalg.norm(box[t, 0, :])
+            y_dim = np.linalg.norm(box[t, 1, :])
+            cross[t] = x_dim*y_dim
+            box_vol[t] = x_dim*y_dim*thick
+
+    factor = old_div(1, (1*10**-27))  # convert from ions/nm^3 to ions/m^3
     conc = np.zeros([nT])
     for c in range(nT):
-        conc[c] = (old_div(count[c],box_vol[c]))*factor
+        conc[c] = (old_div(count[c], box_vol[c])) * factor
 
     avg_conc = np.mean(conc)
     std = np.std(conc)

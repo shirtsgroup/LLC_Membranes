@@ -67,9 +67,13 @@ across the membrane (which can be found using gmx potential with a careful look 
 One can also employ the Computational Electrophysiology Module included with GROMACS to create a double layer membrane
 system which maintains a concentration gradient across the membrane, inducing a current.
 """
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
+from builtins import range
+from past.utils import old_div
 import argparse
-from Get_Positions import get_positions
 import Atom_props
 import matplotlib.pyplot as plt
 import time
@@ -100,7 +104,7 @@ def initialize():
     parser.add_argument('-a', '--arrays', default='off', help='If positions, id array are already saved')
     parser.add_argument('-S', '--suffix', default='saved', help='Suffix to append to position and id arrays when saving')
     parser.add_argument('-r', '--frontfrac', default=0.1, help='Where to start fitting line for diffusivity calc')
-    parser.add_argument('-F', '--fracshow', default=0.4, type=float, help='Percent of graph to show, also where to stop fitting line'
+    parser.add_argument('-F', '--fracshow', default=0.5, type=float, help='Percent of graph to show, also where to stop fitting line'
                                                              'during diffusivity calculation')
     parser.add_argument('--nTsub', default=20, type=int, help='Number of subtrajectories to break into for generating stats')
     parser.add_argument('-M', '--method', default='NE', help='Which method to use to calculate Ionic Conductivity: CD ='
@@ -126,8 +130,9 @@ def nernst_einstein(D, D_std, C, C_std, T):
     :param T: temperature simulation is run at
     :return: Ionic Conductivity as calculated by the nernst einsten relation
     """
+
     NE_av = q**2*C*D/(kb*float(T))
-    NE_error = NE_av*np.sqrt((D_std/D)**2 + (C_std/C)**2)
+    NE_error = NE_av*np.sqrt((old_div(D_std, D))**2 + (old_div(C_std, C))**2)
 
     return NE_av, NE_error
 
@@ -167,16 +172,22 @@ if __name__ == '__main__':
 
     if args.load:
 
+        data = np.load("conductivity_%s.npz" % args.suffix)
         # If we are just looking at different trajectories or fitting different parts of msd curves, we can just load what
         # has already been calculated
+        pos = data['pos']
+        pos_ion = data['pos_ion']
+        id = data['id']
+        Conc_props = data['Conc_props']
+        dt = data['dt']
 
-        pos = np.load('pos_%s' % args.suffix)
+        # pos = np.load('pos_%s' % args.suffix)
+        #
+        # id = np.load('identity_%s' % args.suffix)
+        #
+        # dt = np.load('dt_%s' % args.suffix)
 
-        id = np.load('identity_%s' % args.suffix)
-
-        dt = np.load('dt_%s' % args.suffix)
-
-        Conc_props = np.load('C_props_%s' % args.suffix)
+        # Conc_props = np.load('C_props_%s' % args.suffix)
         C = Conc_props[0]
         C_std = Conc_props[1]
         Lc = Conc_props[2]
@@ -184,28 +195,29 @@ if __name__ == '__main__':
         z_2 = Conc_props[4]
         z_1 = Conc_props[5]
 
-        D_tails = np.load('D_tails_%s' % args.suffix)
+        D_tails = np.load('D_tails_%s.npy' % args.suffix)
         D_av = D_tails[0]
         D_std = D_tails[1]
-
+        print(D_av)
         no_comp = np.shape(pos)[1]
         nT = np.shape(pos)[0]
 
-        print 'All arrays/properties loaded'
+        print('All arrays/properties loaded')
 
     else:
 
         t = md.load(args.traj, top=args.gro)
+
         keep = [a.index for a in t.topology.atoms if a.name == args.ion]
         t_ion = t.atom_slice(keep)
         pos = t.xyz
         pos_ion = t_ion.xyz
         time = t.time
 
-        C, C_std, cross, Lc, z_2, z_1 = physical.conc(t, t_ion, args.buffer)
+        C, C_std, cross, Lc, z_2, z_1 = physical.conc(t, args.ion, args.buffer)
 
         factor = 1*10**9  # number of nm in a m
-        conv = (Lc/factor)/(cross/(factor**2))
+        conv = old_div((old_div(Lc,factor)),(old_div(cross,(factor**2))))
 
         Conc_props = np.array([C, C_std, Lc, conv, z_1, z_2])
 
@@ -218,22 +230,23 @@ if __name__ == '__main__':
 
         if args.save:
 
-            with open('pos_%s' % args.suffix, 'w') as f: # Save the positions for running the script again
-                np.save(f, pos)
+            np.savez_compressed('conductivity_%s' % args.suffix, pos=pos, pos_ion=pos_ion, id=id, Conc_props=Conc_props, dt=dt)
+            # with open('pos_%s' % args.suffix, 'w') as f: # Save the positions for running the script again
+            #     np.save(f, pos)
+            #
+            # with open('%spos_%s' % (args.ion, args.suffix), 'w') as f:  # Save the positions for running the script again
+            #     np.save(f, pos_ion)
+            #
+            # with open('identity_%s' % args.suffix, 'w') as f:
+            #     np.save(f, id)
+            #
+            # with open('C_props_%s' % args.suffix, 'w') as f:
+            #     np.save(f, Conc_props)
+            #
+            # with open('dt_%s' % args.suffix, 'w') as f:
+            #     np.save(f, dt)
 
-            with open('%spos_%s' % (args.ion, args.suffix), 'w') as f:  # Save the positions for running the script again
-                np.save(f, pos_ion)
-
-            with open('identity_%s' % args.suffix, 'w') as f:
-                np.save(f, id)
-
-            with open('C_props_%s' % args.suffix, 'w') as f:
-                np.save(f, Conc_props)
-
-            with open('dt_%s' % args.suffix, 'w') as f:
-                np.save(f, dt)
-
-            print 'All arrays/properties saved'
+            print('All arrays/properties saved')
 
     # Constants
 
@@ -248,18 +261,17 @@ if __name__ == '__main__':
 
         if not args.load:
 
-            print 'Calculating Diffusivity'
+            print('Calculating Diffusivity')
             # Calculate diffusivity (m^2/s)
 
             _, _, _, D_av, D_std = Diffusivity.dconst(pos_ion, nT, args.nboot, frontfrac, fracshow, d, dt, args.nMC)
             D_tails = [D_av, D_std]  # Get it? D_tails, i.e. details about D
 
             if args.save:
-                with open('D_tails_%s' % args.suffix, 'w') as f:
-                    np.save(f, D_tails)
+                np.save('D_tails_%s' % args.suffix, D_tails)
 
         IC_NE, IC_NE_std = nernst_einstein(D_av, D_std, C, C_std, '%s' % args.temp)
-        print 'Nernst Einstein Ionic Conductivity: %s +/- %s S/m' % (IC_NE, IC_NE_std)
+        print('Nernst Einstein Ionic Conductivity: %s +/- %s S/m' % (IC_NE, IC_NE_std))
 
         if args.method == 'NE':
             exit()
@@ -270,31 +282,30 @@ if __name__ == '__main__':
 
         charge = Atom_props.charges(args.build_mon)
         charge['NA'] = 1.00
-        print 'Calculating q'
+        print('Calculating q')
         dq_all = np.zeros([nT])
         for i in range(nT):
             dq_all[i] = dQ(i, pos, Lc, z_2, z_1, charge, id)
 
         if args.save:
-            with open('dq_%s' % args.suffix, 'w') as f:
-                np.save(f, dq_all)
-                f.close()
-                print 'q saved'
+
+            np.save('dq_%s' % args.suffix, dq_all)
+            print('q saved')
 
     else:
 
-        dq_all = np.load('dq_%s' % args.suffix)
-        print 'q loaded'
+        dq_all = np.load('dq_%s.npy' % args.suffix)
+        print('q loaded')
 
     if args.discard:
-        discarded_frames = int(args.discard / (dt/1000))  # convert nanoseconds to frames of discarded simulation
-        print 'First %s frames discarded (%s ns)' %(discarded_frames, args.discard)
+        discarded_frames = int(old_div(args.discard, (old_div(dt,1000))))  # convert nanoseconds to frames of discarded simulation
+        print('First %s frames discarded (%s ns)' %(discarded_frames, args.discard))
         nT -= discarded_frames
     else:
         discarded_frames = 0
 
     n_sub = args.nTsub  # number of sub-trajectories to used for error analysis
-    nT_sub = nT/n_sub  # number of points in that subinterval
+    nT_sub = old_div(nT,n_sub)  # number of points in that subinterval
     l_sub = dt * nT_sub / 1000  # ns in the subinterval
 
     # Break dq_all into sub-trajectories
@@ -349,8 +360,8 @@ if __name__ == '__main__':
         # plt.plot(times[startfit:endMSD], y_fit)
         slopes[i] = A[1]
 
-    ic_cd_avg = (np.mean(slopes)*(1*10**12)*conv)/(2*kb*float(args.temp))
-    ic_cd_std = (np.std(slopes)*(1*10**12)*conv)/(2*kb*float(args.temp))
+    ic_cd_avg = old_div((np.mean(slopes)*(1*10**12)*conv),(2*kb*float(args.temp)))
+    ic_cd_std = old_div((np.std(slopes)*(1*10**12)*conv),(2*kb*float(args.temp)))
     ic_cds = slopes*((1*10**12)*conv/(2*kb*float(args.temp)))
 
     # Bootstrap the slopes
@@ -363,8 +374,8 @@ if __name__ == '__main__':
         for j in range(n_sub):
             index = randint(0, n_sub - 1)
             sum += slopes[index]
-        means[i] = sum / n_sub
-    means *= ((1*10**12)*conv)/(2*kb*float(args.temp))
+        means[i] = old_div(sum, n_sub)
+    means *= old_div(((1*10**12)*conv),(2*kb*float(args.temp)))
     bootstrap_mean = np.mean(means)
     bootstrap_std = np.std(means)
 
@@ -373,8 +384,8 @@ if __name__ == '__main__':
     plt.xlabel('')
     plt.hist(means, bins=100)
     # print "Ionic Conductivity: %s +/- %s S/m" % (ic_cd_avg, ic_cd_std)
-    print "Slope fit from %1.0f ns to %1.0f ns of each subtrajectory" % (args.frontfrac*l_sub, args.fracshow*l_sub)
-    print "Bootstrapped Ionic Conductivity: %s +/- %s S/m" % (bootstrap_mean, bootstrap_std)
+    print("Slope fit from %1.0f ns to %1.0f ns of each subtrajectory" % (args.frontfrac*l_sub, args.fracshow*l_sub))
+    print("Bootstrapped Ionic Conductivity: %s +/- %s S/m" % (bootstrap_mean, bootstrap_std))
 
     if not args.noshow:
         plt.show()

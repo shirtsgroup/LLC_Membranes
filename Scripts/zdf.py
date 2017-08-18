@@ -25,6 +25,7 @@ def initialize():
     parser.add_argument('--avg', action="store_true", help='Average the distributions of all selected atoms')
     parser.add_argument('-bins', default=1000, type=int, help='Number of bins to use when binning distances')
     parser.add_argument('-apl', default=5, type=float, help='Atoms or monomers per layer')
+    parser.add_argument('-l', '--load', type=str, help='Load compressed numpy array')
 
     args = parser.parse_args()
 
@@ -145,6 +146,7 @@ def plot_zdf(z, d, end=-1):
     # plt.title('Z distribution function')
     plt.xlabel('Z distance separation (nm)', fontsize=14)
     plt.ylabel('Count', fontsize=14)
+    plt.axes().tick_params(labelsize=14)
     plt.savefig('zdf.png')
     plt.show()
 
@@ -161,32 +163,43 @@ if __name__ == "__main__":
     box = t.unitcell_vectors
     L = np.mean(box[:, 2, 2])  # average z length of unit cell
 
-    if args.avg:
+    if args.load:
 
-        zdf_avg = np.zeros([args.bins])
+        zdf = np.load(args.load)
+        zdf_avg = zdf["zdf_avg"]
+        z = zdf["z"]
+        plot_zdf(z[:-2], zdf_avg[:z.shape[0] - 2])
 
-    for atom in args.atoms:
-
-        keep = [a.index for a in t.topology.atoms if a.name == atom]
-
-        pos = t.atom_slice(keep).xyz
-
-        periodic = z_periodic(pos, box)
-
-        # from llclib import file_rw
-        # file_rw.write_gro_pos(periodic[0, :, :], 'first')
-        # exit()
-
-        z, d = zdf(periodic, 4, args.apl, box)
+    else:
 
         if args.avg:
 
-            zdf_avg[:len(d)] += d
+            zdf_avg = np.zeros([args.bins])
 
-    if args.avg:
+        for atom in args.atoms:
 
-        zdf_avg /= len(args.atoms)  # average of all zdfs
+            keep = [a.index for a in t.topology.atoms if a.name == atom]
 
-        zdf_avg = np.trim_zeros(zdf_avg, trim='b')
+            pos = t.atom_slice(keep).xyz
 
-        plot_zdf(z, zdf_avg[:z.shape[0]])
+            periodic = z_periodic(pos, box)
+
+            # from llclib import file_rw
+            # file_rw.write_gro_pos(periodic[0, :, :], 'first')
+            # exit()
+
+            z, d = zdf(periodic, 4, args.apl, box)
+
+            if args.avg:
+
+                zdf_avg[:len(d)] += d
+
+        if args.avg:
+
+            zdf_avg /= len(args.atoms)  # average of all zdfs
+
+            zdf_avg = np.trim_zeros(zdf_avg, trim='b')
+
+            np.savez_compressed("zdf", zdf_avg=zdf_avg, z=z)
+
+            plot_zdf(z, zdf_avg[:z.shape[0]])

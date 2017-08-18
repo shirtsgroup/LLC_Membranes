@@ -3,7 +3,11 @@
 """
     This script is intended for plotting a 2D image in matplotlib using pixel values from an ASCII format file
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import range
+from past.utils import old_div
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
@@ -48,7 +52,7 @@ def get_pixels_asc(file, xpixel, ypixel):
 
 def beamstop(pixels, r):
 
-    c = pixels.shape[0] / 2
+    c = old_div(pixels.shape[0], 2)
     for i in range(r):
         pixels[c + i, c - r + i: c + r - i] = 0
         pixels[c - 1 - i, c - r + i: c + r - i] = 0
@@ -112,7 +116,7 @@ if __name__ == '__main__':
         means.append(np.mean(pixels[:, i]))
 
     Imin = min(mins)
-    print 'Imin = %s' % Imin
+    print('Imin = %s' % Imin)
 
     maxes = []
     for i in range(pixels.shape[1]):
@@ -120,9 +124,9 @@ if __name__ == '__main__':
 
     Imax = max(maxes)
     mean = np.mean(means)
-    print 'Imax = %s' % Imax
+    print('Imax = %s' % Imax)
     # print 'mean = %s' % mean
-    print args.file
+    print(args.file)
     for i in range(pixels.shape[1]):  # normalize
         pixels[:, i] /= Imax
 
