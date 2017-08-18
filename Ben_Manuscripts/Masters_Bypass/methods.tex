@@ -101,7 +101,7 @@ to be explored. Visualization of each configuration
 entropic differences based on the way the tails are able to pack.
 In the sandwiched configuration, all tails start out directly on top 
 of each other which may prevent closely stacked benzene rings. In the offset
-configuration, the tails in between each other which may allow layers
+configuration, the tails are placed in between each other which may allow layers
 to come together in a compact way. This difference may explain, in part,
 which stacking mode is more favorable.
 
@@ -141,8 +141,8 @@ prevents unrealistic jumps during early equilibration steps. Restraints
 fix monomer head groups in the sandwiched or parallel-displaced 
 configurations while allowing monomer tails to settle. Doing so also mitigates 
 system dependence on initial monomer configuration. Restrained
-equilibrations are run in the NVT ensemble. Every 50 ps, force constants 
-are reduced by the square root of its previous value, starting from 
+equilibrations are run in the NVT ensemble. Every 50 ps, we reduce the force constants 
+by the square root of its previous value, starting from 
 1e6 KJ mol\textsuperscript{-1} nm\textsuperscript{-2}. Once the force constant
 is below 10 KJ mol\textsuperscript{-1} nm\textsuperscript{-2}, the 
 restraints are slowly released until there is no more restraining 
@@ -154,6 +154,38 @@ equilibrate in the NPT ensemble for 400 - 500 ns.
 %	\item Pore spacing 
 %	\item Benzene ring stacking
 %\end{itemize} 
+
+Simulated X-ray diffraction patterns were generated based on atomic
+coordinates for a direct experimental comparison. All atomic coordinates
+were simulated as gaussian spheres of electron density corresponding to
+each atom's atomic number. A three dimensional fourier transform 
+(FT) of the array of electron density results in a three dimensional structure
+factor whicih represents the unit cell in reciprocal space. We perform an
+angular average of the structure factor about the z axis to generate a
+2D cross section close to what one would see experimentally. We matched 
+experimental 2D WAXS patterns by iterative improvement of our choice of 
+initial structure and equilibration procedure. 
+% Replace with a description written by Joe eventually
+
+Ionic conductivity was calculated using two different methods for
+robustness. The Nernst-Einstein relation relates 
+the DC ionic conductivity to ion diffusivity, $D$, concentration,
+$C$, ion charge, $q$, the boltzmann constant, $k_b$, and temperature,
+$T$: $$\sigma = \dfrac{q^2CD}{k_b T}$$ Sodium ion diffusion 
+coefficients were found by calculating the slope of the linear
+region of the mean square displacement curve as indicated by the
+einstein relation \cite{einstein_investigations_1956}. Ion concentration
+was measured with respect to the entire unit cell. The second method, 
+termed the 'Collective Diffusion' model \cite{liu_collective_2013}, 
+measures the movement of the collective variable, Q, which is defined as
+the amount of charge transfer through the system. The diffusion 
+coefficient of Q, $D_Q$, can be calculated using the einstein relation.
+The conductance, $\gamma$ of the system can be calculated as:
+$$ \gamma = \dfrac{D_Q}{k_b T} $$ Conversion to ionic conductivity is
+achieved by multiplying by channel length and dividing by the membrane
+cross sectional area. A full derivation of the model can be accessed 
+elsewhere \cite{liu_collective_2013}.  
+% Talk about error somewhere?
 
 Using an equilibrated structure, a crosslinking procedure was performed
 in order to better parallel synthetic procedures. The purpose of 
@@ -179,35 +211,3 @@ crosslinks between monomer tails of the same monomer, monomers stacked on
 top of each other and monomers in other pores, including across periodic
 boundaries. The pore spacing shrinks by $\approx$ 1 \angstrom and stays 
 constant under a range of simulation conditions. 
-
-Simulated X-ray diffraction patterns were generated based on atomic
-coordinates to give a deeper understanding of the pore structure and
-spacing. All atomic coordinates were simulated as gaussian spheres of
-electron density  corresponding to each atom's atomic number. A three
-dimensional fourier transform (FT) of the array of electron density 
-results in a 3 dimensional structure factor representing the unit cell
-in reciprocal space. We perform an angular average of the structure factor
-about the z axis to generate a 2D cross section close to what one would see
-experimentally. We matched experimental 2D WAXS patterns by iterative
-improvement of our choice of initial structure and equilibration procedure. 
-% Replace with a description written by Joe eventually
-
-Ionic conductivity was calculated using two different methods for
-robustness. The Nernst-Einstein relation relates 
-the DC ionic conductivity to ion diffusivity, $D$, concentration,
-$C$, ion charge, $q$, the boltzmann constant, $k_b$, and temperature,
-$T$: $$\sigma = \dfrac{q^2CD}{k_b T}$$ Sodium ion diffusion 
-coefficients were found by calculating the slope of the linear
-region of the mean square displacement curve as indicated by the
-einstein relation \cite{einstein_investigations_1956}. Ion concentration
-was measured with respect to the entire unit cell. The second method, 
-termed the 'Collective Diffusion' model \cite{liu_collective_2013}, 
-measures the movement of the collective variable, Q, which is defined as
-the amount of charge transfer through the system. The diffusion 
-coefficient of Q, $D_Q$, can be calculated using the einstein relation.
-The conductance, $\gamma$ of the system can be calculated as:
-$$ \gamma = \dfrac{D_Q}{k_b T} $$ Conversion to ionic conductivity is
-achieved by multiplying by channel length and dividing by the membrane
-cross sectional area. A full derivation of the model can be accessed 
-elsewhere \cite{liu_collective_2013}.  
-% Talk about error somewhere?
