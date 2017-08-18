@@ -38,10 +38,10 @@ schemes are presented below. % eliminate this sentence?
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.75\linewidth]{build.PNG}
-	\caption{(a) Single monomers are parameterized and annealed to produce a low energy
+	\caption{(a) A single monomer was parameterized and annealed to produce a low energy
 		configuration. (b) Monomers are rotated and assembled into layers with 
 		hydrophlic centers. (c) Twenty layers are stacked on top of each other to create
-		a pore. (d) Pores are duplicated and place in a monoclinic unit cell}\label{fig:python}
+		a pore. (d) Pores are duplicated and placed in a monoclinic unit cell}\label{fig:python}
 \end{figure}
 
 A typical simulation volume contains four pores in a monoclinic unit cell,
@@ -52,9 +52,11 @@ periodically. Each pore is made of twenty stacked monomer layers with
 periodic continuity in all directions, avoiding any edge effects and 
 creating an infinite length pore ideal for studying transport. A small
 number of layers is preferred in order to reduce computational cost and 
-to allow us to look at longer timescales. Ultimately, we chose to build a system
-with 20 monomer layers in each pore in order to give sufficient
-resolution when simulating X-ray diffraction patterns.  % BJC: reword / mention xrd resolution - system size dependence in previous sentence
+to allow us to look at longer timescales. Ultimately, we chose to build a 
+system with 20 monomer layers in each pore in order to   
+obtain sufficient resolution when simulating X-ray diffraction patterns.
+This point will be explained in more detail later. 
+% BJC: reword / mention xrd resolution - system size dependence in previous sentence
 
 % Questionably needed figure
 %\begin{figure}
@@ -76,39 +78,49 @@ been hypothesized that the features are present due to pi-pi
 interactions between stacked aromatic rings \cite{feng_scalable_2014}. 
 Our simulations tend to equilibrate to a wider interlayer spacing of $\approx$ 4.1 \angstrom,
 which inspired separate systems starting with layer spacings greater than
- 4 \angstrom. Initial pore radius estimates of 0.6 nm were based on past TEM 
+ 4 \angstrom. We estimate the pore radius to be 0.6 nm based on past TEM 
 images and size exclusion rejection data\cite{feng_scalable_2014,
-feng_thin_2016,zhou_supported_2005}.
+feng_thin_2016,zhou_supported_2005}. Comparing a geometric
+measurement of pore size taken from an atomistic model, to a less
+precise, experimentally derived pore size estimate, will give ambiguous
+results. When constructing pores, we chose the carboxylate carbon from
+the monomer head group as a reference atom, and placed it a distance r from the
+pore center, where r is the pore radius. We will not make direct comparisons
+of pore radius between our model and experiment to avoid the ambiguity. 
 % There is plenty I can say about initial configuration. Starting layers
 % too far apart, too close, tilted initial configurations etc.
 The relative interlayer orientation was chosen based on clues from diffraction
 data as well as the various known stacking modes of benzene and substituted 
-benzene rings: sandwiched, parallel-displaced and T-shaped 
+benzene rings: sandwiched, parallel-displaced and T-shaped ~\cite{sinnokrot_estimates_2002}
 (\Cref{fig:sandwiched,fig:pd,fig:tshaped}). The T-shaped 
 configuration was ruled out based on the inconsistency of its $\approx$ 
-5 \angstrom equilibrium stacking distance. The system's preference
+5 \angstrom equilibrium stacking distance ~\cite{sinnokrot_estimates_2002}. The system's preference
 towards the sandwiched vs. parallel displaced stacking modes was left
 to be explored. Visualization of each configuration 
 (\Cref{fig:sandwichedlayers,fig:offsetlayers}) suggests 
-entropic differences based on the way the tails are able to pack. 
-This difference may explain, in part, which stacking mode is more favorable.
+entropic differences based on the way the tails are able to pack.
+In the sandwiched configuration, all tails start out directly on top 
+of each other which may prevent closely stacked benzene rings. In the offset
+configuration, the tails in between each other which may allow layers
+to come together in a compact way. This difference may explain, in part,
+which stacking mode is more favorable.
 
 \begin{figure}[ht]
 	\centering
 	\begin{subfigure}[b]{0.32\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{sandwiched.png}
-		\caption{Sandwiched}\label{fig:sandwiched}
+		\caption{Sandwiched benzene dimers stack 3.8 \anstrom apart}\label{fig:sandwiched}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.32\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{PD.png}
-		\caption{Parallel-Displaced}\label{fig:pd}
+		\caption{Parallel-Displaced benzene dimers stack 3.4 \angstrom vertically and 1.6 \angstrom horizontally apart}\label{fig:pd}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.32\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{Tshaped.png}
-		\caption{T-shaped}\label{fig:tshaped}
+		\caption{T-shaped benzene dimers stack 5.0 \angstrom apart}\label{fig:tshaped}
 	\end{subfigure}
 	\vskip\baselineskip
 	\begin{subfigure}[b]{0.475\textwidth}
