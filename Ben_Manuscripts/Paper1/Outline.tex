@@ -109,30 +109,88 @@
   A clear picture of the nanoscopic LLC membrane structure, gained by building 
   a molecular model will provide evidence to answer existing and newly proposed
   questions.
-    \begin{itemize}
+  \begin{itemize}
     \item We will limit our initial studies to studying assemblies formed by Na-GA3C11
     \item We have also chosen to focus our initial efforts on the development of 
     a model of the Col\textsubscript{h} phase membrane.
     \item Compared to the H\textsubscript{II} phase, the Col\textsubscript{h}
     phase is a simpler starting point, due to the absence of water, and has
     equivalent experimental structural data.
-    \item Despite the structural data, the
-  
-  A molecular level understanding of LLC membrane structure will elucidate
-  small molecule transport mechanisms, providing guidelines to reduce the
-  chemical space for the design of monomers used to create separation-specific
-  membranes.
-    \begin{itemize}
-    \item LLCs are versatile and controllable with a \textbf{large chemical design
-    space} available for membrane design
-    \item It will be challenging to narrow down the design space and optimize 
-    solute-specific membranes
+    \item Despite having structural data, there is still information which 
+    experiment cannot definitively answer
+    \item The Col\textsubscript{h} phase is described as having pores made of
+    disks or layers stacked on top of one another, each containing a set 
+    number of monomers. A simple simulation study of a similar molecule suggests
+    that there are 4 monomers in each disk~\cite{zhu_methacrylated_2006}. A 
+    separate calculation based on the volume of the liquid crystal monomers proposes
+    that there are seven monomers in each layer~\cite{resel_structural_2000}. 
+    A molecular model has the best chance of directly answering this question.
+    \item Once we know the number of monomers in each layer, we still do not know how 
+    monomers in each layer are positioned with respect to other layers. 
+    \item A driving force of self assembly in this system is thought to be pi-pi
+    stacking interactions between aromatic headgroups \cite{gazit_possible_2002}. 
+    \item Gas phase ab initio studies of benzene dimers have shown a clear energetic
+    advantage for parallel displaced and T-shaped pi-pi stacking conformations versus a
+    sandwiched conformation ~\cite{sinnokrot_estimates_2002}.
+    \item Substituted benzene rings exhibit an even stronger pi-pi stacking 
+    attraction which favors the parallel displaced configuration in all cases
+    except where the substitutions are extremely electron withdrawing
+    \cite{waller_hybrid_2006,ringer_effect_2006}.
+    \item While we might be able to provide answers to these questions using a 
+    molecular model, there remains the possibility that there is more than one 
+    metastable state associated with a given LLC system.
+    \item We must be able to identify which states can be produced experimentally
+    and what implications each state might have regarding transport properties.
+  \end{itemize}
+    
+  A molecular level understanding of LLC membrane structure will provide guidelines
+  to reduce the large chemical space available to design monomers for creation of 
+  separation-specific membranes.
+  \begin{itemize}
+%     \item LLCs are versatile and controllable with a \textbf{large chemical design
+%     space} available for membrane design  %BJC: redundant
     \item  We do not yet understand how to reduce the effective pore size or 
     how to tune the chemical environment in the nanopores for effective water
     desalination or small organic separations.
-    \item 
-    \end{itemize}
+    \item Rejection studies show that this membrane can not perform separations of
+    solutes less than 1.2 nm because the pores are too large \cite{zhou_supported_2005}.
+    \item Over the past 20 years, LLC membrane studies have been limited primarily 
+    to Na-GA3C11 with some characterization done after minor structural modifications
+    \cite{resel_structural_2000}. 
+    \item Optimization has been performed through trial and error. The only source of 
+    predictive modeling has been macroscopic models which likely do not adequately describe 
+    transport at these length scales. % BJC: Reference. I think it is just w.r.t. bicontinuous cubic
+    \item It will be challenging to efficiently narrow down the design space in 
+    a laboratory setting.
+    \item A good molecular model should incorporate a detailed picture of the nanoscopic pore 
+    structure which will be crucial to understanding the role of monomer structure in 
+    membrane design.
+    \item Choice of head group may play a role in the rejection of charged or uncharged solutes.
+    \item Choice of counterion may influence the establishment of a Donnan potential 
+    affecting the degree to which the membrane can exclude charged species.
+    \item Moieties inside the pores may interact with neutral solutes, rejecting
+    on the basis of shape and size, rather than just hydrodynamic radius.
+    \item  An atomistic understanding of pore structure and its influence on transport 
+    is necessary to identify performance bottle necks and direct design of future membranes. 
+  \end{itemize}
   
   We must show that the developed molecular model is consistent with
   physical observations so that we can rely on conclusions drawn about % better word for trust?
   structural features characteristic of the system.
+  \begin{itemize}
+    \item This article will illustrate the development of a predictive molecular model 
+    and the steps taken to ensure it mimics the real system within the constraints 
+    inherent to MD.
+    \item To understand how physically realistic the model is, validation by comparison
+    to experiment is necessary. We are primarily interested in reproducing the 
+    conclusions about structure which have been made from X-ray diffraction (XRD) 
+    experiments and in matching ionic conductivity measurements~\cite{feng_thin_2016}.
+    \item We have comparied simulated X-ray diffraction patterns to experiment in 
+    order to match major features present in the 2D patterns.
+    \item We calculated ionic conductivity using two agreeing methods.
+    \item We examined the the influence of crosslinking on membrane structure.
+    \item We have created a model that can be used to probe the large design space
+    available for membrane design
+    \item The analysis used in this paper can be readily extended to the H\textsubscript{II}
+    phase and other similar LC systems.
+  \end{itemize}
