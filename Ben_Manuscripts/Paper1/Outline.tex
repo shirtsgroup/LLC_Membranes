@@ -310,9 +310,35 @@
 
   An equilibration scheme with position restraints placed on aromatic rings
   prevents unrealistic jumps during early equilibration steps.
+  \begin{itemize}
+    \item Restraints fix monomer head groups in the sandwiched or parallel-displaced
+    configurations while allowing monomer tails to settle.
+    \item Doing so also mitigates system dependence on initial monomer configuration.
+    \item Restrained equilibrations are run in the NVT ensemble.
+    \item Every 50 ps, we reduce the force constants by the square root of its 
+    previous value, starting from 1e6 KJ mol\textsuperscript{-1} nm\textsuperscript{-2}.
+    \item Once the force constant is below 10 KJ mol\textsuperscript{-1} 
+    nm\textsuperscript{-2}, the restraints are slowly released until there is no more 
+    restraining potential.  %BJC: I can reference an equilibration script that can be released with the supplemental info or something
+    \item The resulting unrestrained structure is allowed to equilibrate in the NPT
+    ensemble for 400 - 500 ns.
+  \end{itemize}
   
+  %BJC: the following paragraph will be replaced with something that Joe writes
   Simulated X-ray diffraction patterns were generated based on atomic
   coordinates for a direct experimental comparison.
+  \begin{itemize}
+    \item All atomic coordinates were simulated as gaussian spheres of electron
+    density corresponding to each atom's atomic number.
+    \item A three dimensional fourier transform (FT) of the array of electron 
+    density results in a three dimensional structure factor which represents
+    the unit cell in reciprocal space.
+    \item We perform an angular average of the structure factor about the 
+    z axis to generate a 2D cross section close to what one would see 
+    experimentally.
+    \item We matched experimental 2D WAXS patterns by iterative improvement
+    of our choice of initial structure and equilibration procedure.
+  \end{itemize}
   
   \begin{figure}[H]
 	\centering
@@ -350,6 +376,55 @@
   
   Ionic conductivity was calculated using two different methods for
   robustness.
-  
+  \begin{itemize}
+    \item The Nernst-Einstein relation relates the DC ionic conductivity to 
+    ion diffusivity, $D$, concentration, $C$, ion charge, $q$, the boltzmann 
+    constant, $k_b$, and temperature, $T$: $$\sigma = \dfrac{q^2CD}{k_b T}$$  %BJC: need citation
+    \item Sodium ion diffusion coefficients were found by calculating the slope
+    of the linear region of the mean square displacement curve as indicated by
+    the einstein relation \cite{einstein_investigations_1956}.]
+    \item Ion concentration was measured with respect to the entire unit cell. %BJC: I don't think this needs to be said
+    \item The second method, termed the 'Collective Diffusion' model, measures 
+    the movement of the collective variable, Q, which is defined as the amount
+    of charge transfer through the system.
+    \item The diffusion coefficient of Q, $D_Q$, can be calculated using the 
+    einstein relation.
+    \item The conductance, $\gamma$ of the system can be calculated as:
+    $$ \gamma = \dfrac{D_Q}{k_b T} $$ Conversion to ionic conductivity is
+    achieved by multiplying by channel length and dividing by the membrane
+    cross sectional area.
+    \item A full derivation of the model can be accessed elsewhere \cite{liu_collective_2013}.
+  \end{itemize}
+    
   Using an equilibrated structure, a crosslinking procedure was performed
   in order to better parallel synthetic procedures. 
+  \begin{itemize}
+    \item The purpose of crosslinking is to maintain macroscopic alignment of 
+    the crystalline domains, ensuring aligned, hexagonally packed pores.
+    \item For that reason, we are not concerned with replicating the kinetics 
+    of the reaction, but instead emphasize the consistency of the final structure
+    with experimental structural data.
+    \item The algorithm was developed based on the known reaction mechanism.
+    \item Crosslinking of this system is a free radical polymerization (FRP)
+    taking place between terminal vinyl groups present on each of the three
+    monomer tails.
+    \item FRPs require an initiator which bonds to the system, meaning new atoms
+    were introduced into the system.
+    \item For simplicity, the initiator was simulated as hydrogen and made present 
+    in the simulation by including them in all possible bonding positions as dummy atoms.
+    \item The crosslinking procedure is carried out iteratively.
+    \item During each iteration, bonding carbon atoms are chosen based on a distance cut-off.
+    \item The topology is updated with new bonds and dummy hydrogen atoms are 
+    changed to appropriate hydrogen types. 
+    \item Head-to-tail addition was the only propagation mode considered due to 
+    its dominance the real system.
+    \item Direction of attack was not considered because the resultant mixture 
+    is racemic.
+    %BJC: The following items belongs in results/discussion
+    \item The resulting crosslinked structure has an even distribution of
+    crosslinks between monomer tails of the same monomer, monomers stacked on
+    top of each other and monomers in other pores, including across periodic
+    boundaries.
+    \item The pore spacing shrinks by $\approx$ 1 \angstrom and stays 
+    constant under a range of simulation conditions.
+  \end{itemize}
