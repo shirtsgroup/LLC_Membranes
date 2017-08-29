@@ -262,16 +262,51 @@
   
   We chose initial guesses for the remaining structural parameters based on 
   experimental data and treated them as variables during model development.
+  %BJC: I could potentially break this paragraph into smaller paragraphs centered around
+  % the bolded structural parameters
   \begin{itemize}
-    \item The distance between pores was based on experimental SAXS data for
+    \item \textbf{The distance between pores} was based on experimental SAXS data for
     this system \cite{feng_thin_2016}.
-    \item The model's pores are spaced 4.5 nm apart initially, \approx 10 \% larger
-    than the experimental value in order to reduce unintended repulsions 
+    \item The model's pores are spaced 4.5 nm apart initially, $\approx$ 10 \% larger
+    than the experimental value of 4.12 nm in order to reduce unintended repulsions 
     resulting from a tightly packed initial configuration.
     \item The layer spacing is based on experimental 2D WAXS data.
     \item The pattern shows reflections corresponding to features spaced 3.7 \angstrom apart.
     \item It has been hypothesized that the features are a result of pi-pi
     interactions between stacked aromatic rings \cite{feng_scalable_2014}. 
+    \item Our simulations tend to equilibrate to a wider interlayer spacing of
+    $\approx$ 4.1 \angstrom, which inspired separate systems starting with layer 
+    spacings greater than 4 \angstrom.
+    \item We estimate the \textbf{pore radius} to be 0.6 nm based on past TEM images 
+    and size exclusion rejection data\cite{feng_scalable_2014,feng_thin_2016,
+    zhou_supported_2005}.
+    \item Comparing a geometric measurement of pore size derived from an 
+    atomistic model, to a less precise, experimentally derived pore size estimate,
+    will give ambiguous results.
+    \item What is meant by pore radius will not be clear until we have a clear picture
+    of the nanoscopic pore environment.
+    \item When constructing pores, we chose the carboxylate carbon from the monomer
+    head group as a reference atom, and placed it a distance r from the pore center,
+    where r is the pore radius.  %BJC: figure making that clear
+    \item We will not make direct comparisons of pore radius between our model 
+    and experiment to avoid the ambiguity. 
+    \item The \textbf{relative interlayer orientation} was chosen based on clues from 
+    diffraction data as well as the various known stacking modes of benzene 
+    and substituted benzene rings: sandwiched, parallel-displaced and T-shaped
+    ~\cite{sinnokrot_estimates_2002} (\Cref{fig:sandwiched,fig:pd,fig:tshaped}).
+    \item The T-shaped configuration was ruled out based on the inconsistency of
+    its $\approx$ 5 \angstrom equilibrium stacking distance ~\cite{sinnokrot_estimates_2002}.
+    \item The system's preference towards the sandwiched vs. parallel displaced 
+    stacking modes will be explored.
+    %BJC: I think the following commentary belongs elsewhere, maybe even in the discussion
+    \item Visualization of each configuration (\Cref{fig:sandwichedlayers,fig:offsetlayers})
+    suggests entropic differences based on the way the tails are able to pack.
+    \item In the sandwiched configuration, all tails start out directly on top
+    of each other which may prevent closely stacked benzene rings.
+    \item In the offset configuration, the tails are placed in between each other 
+    which may allow layers to come together in a compact way.
+    \item This difference may explain, in part, which stacking mode is more favorable.
+  \end{itemize}
 
   An equilibration scheme with position restraints placed on aromatic rings
   prevents unrealistic jumps during early equilibration steps.
