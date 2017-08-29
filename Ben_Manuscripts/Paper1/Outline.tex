@@ -194,3 +194,127 @@
     \item The analysis used in this paper can be readily extended to the H\textsubscript{II}
     phase and other similar LC systems.
   \end{itemize}
+  
+  \section*{Methods}
+  
+  HII monomers were parameterized using the Generalized AMBER Forcefield
+  \cite{wang_development_2004} with the Antechamber package \cite{wang_automatic_2006}
+  provided with AmberTools16 \cite{case_ambertools16_2016}. Atomic charges were
+  assigned using tools from Openeye Scientific Software. All molecular dynamics 
+  simulations were run using the latest version of Gromacs 2016. 
+  \cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008}
+  
+  An ensemble of characteristic, low-energy vacuum monomer configurations
+  were constructed by applying a simulated annealing process to a
+  parameterized monomer.
+  \begin{itemize}
+    \item Monomers were cooled from 1000K to 50K over 10 nanoseconds.
+    \item A low energy configuration was pulled from the trajectory 
+    and charges were reassigned using the am1bccsym method of molcharge
+    shipped with Openeye Scientific software's QUACPAC % BJC: how to cite?
+    \item Using the new charges, the monomer system was annealed again and monomer
+    configurations were pulled from the trajectory to be used for full
+    system construction (Figure~\ref{fig:python}a).
+  \end{itemize}
+  
+  The timescale for self assembly of monomers into the hexagonal phase is
+  unknown and likely outside of a reasonable length for an atomistic
+  simulation, calling for a more efficient way to build the system. 
+  \begin{itemize}
+    \item Previous work has shown a coarse grain model self assemble into
+    the H\textsubscript{II} phase configuration in $\approx$ 1000 ns \cite{mondal_self-assembly_2013}.
+    \item We attempted atomistic self-assembly by packing monomers into a box 
+    using Packmol \cite{martinez_packmol:_2009}.
+    \item Simulations of greater than 100 ns show no indicators of progress 
+    towards an ordered system.
+    \item To bypass the slow self-assembly process, python scripts are used
+    to assemble monomers into a structure close to the expected equilibrium 
+    configuration (Figure~\ref{fig:python}).
+    \item A short, restrained equilibration, followed by NPT simulations 
+    between 400 and 500 ns, allows the initial configuration to relax into
+    an equilibrium configuration.
+    \item Our logic for choosing a starting configuration and the details 
+    of the equilibration schemes are presented below.
+  \end{itemize}
+  
+  \begin{figure}[H]
+	\centering
+	\includegraphics[width=0.75\linewidth]{build.PNG} %BJC: put an xyz axis with the unit cell
+	\caption{(a) A single monomer was parameterized and annealed to produce a low energy
+		configuration. (b) Monomers are rotated and assembled into layers with 
+		hydrophlic centers. (c) Twenty layers are stacked on top of each other to create
+		a pore. (d) Pores are duplicated and placed in a monoclinic unit cell}\label{fig:python}
+  \end{figure}
+  
+  A typical simulation volume contains four pores in a monoclinic unit cell,
+  the smallest unit cell that maintains hexagonal symmetry when extended 
+  periodically.
+  \begin{itemize}
+    \item Each pore is made of twenty stacked monomer layers with periodic 
+    continuity in the z direction, avoiding any edge effects and creating an 
+    infinite length pore ideal for studying transport.
+    \item A small number of layers is preferred in order to reduce computational
+    cost and to allow us to look at longer timescales.
+    \item Ultimately, we chose to build a system with 20 monomer layers in each pore
+    in order to obtain sufficient resolution when simulating X-ray diffraction patterns.
+    This point will be explained in more detail later.
+  \end{itemize}
+  
+  We chose initial guesses for the remaining structural parameters based on 
+  experimental data and treated them as variables during model development.
+  \begin{itemize}
+    \item The distance between pores was based on experimental SAXS data for
+    this system \cite{feng_thin_2016}.
+    \item The model's pores are spaced 4.5 nm apart initially, \approx 10 \% larger
+    than the experimental value in order to reduce unintended repulsions 
+    resulting from a tightly packed initial configuration.
+    \item The layer spacing is based on experimental 2D WAXS data.
+    \item The pattern shows reflections corresponding to features spaced 3.7 \angstrom apart.
+    \item It has been hypothesized that the features are a result of pi-pi
+    interactions between stacked aromatic rings \cite{feng_scalable_2014}. 
+
+  An equilibration scheme with position restraints placed on aromatic rings
+  prevents unrealistic jumps during early equilibration steps.
+  
+  Simulated X-ray diffraction patterns were generated based on atomic
+  coordinates for a direct experimental comparison.
+  
+  \begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.32\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{sandwiched.png}
+		\caption{}\label{fig:sandwiched}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.32\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{PD.png}
+		\caption{}\label{fig:pd}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.32\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{Tshaped.png}
+		\caption{}\label{fig:tshaped}
+	\end{subfigure}
+	\vskip\baselineskip
+	\begin{subfigure}[b]{0.475\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{sandwichedlayers.png}
+		\caption{}\label{fig:sandwichedlayers}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.475\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{offsetlayers.png}
+		\caption{}\label{fig:offsetlayers}
+	\end{subfigure}
+	\caption{(a) Sandwiched benzene dimers stack 3.8 \angstrom apart. (b) Parallel-Displaced benzene dimers stack
+	3.4 \angstrom vertically and 1.6 \angstrom horizontally apart. (c) T-shaped benzene dimers stack 5.0 \angstrom apart. 
+	(d) Two monomer layers stacked in the sandwiched configuration (e) Two monomer layers stacked in the parallel-displaced
+	configuration }\label{fig:stacking}
+  \end{figure}
+  
+  Ionic conductivity was calculated using two different methods for
+  robustness.
+  
+  Using an equilibrated structure, a crosslinking procedure was performed
+  in order to better parallel synthetic procedures. 
