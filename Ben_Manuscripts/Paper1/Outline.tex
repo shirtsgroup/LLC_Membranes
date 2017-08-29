@@ -267,10 +267,24 @@
   \begin{itemize}
     \item \textbf{The distance between pores} was based on experimental SAXS data for
     this system \cite{feng_thin_2016}.
-    \item The model's pores are spaced 4.5 nm apart initially, $\approx$ 10 \% larger
+    \item The model's pore centers are spaced 4.5 nm apart initially, $\approx$ 10 \% larger
     than the experimental value of 4.12 nm in order to reduce unintended repulsions 
     resulting from a tightly packed initial configuration.
-    \item The layer spacing is based on experimental 2D WAXS data.
+    \item To calculate the equilibrated pore spacing, we measured the distance between pore
+    centers.
+    \item Pore centers were located by averaging the coordinates of sodium ions in their 
+    respective pores.
+    \item Statistics were generated using the bootstrapping technique.
+    \item For each bootstrap trial, we recreate an equilibrium trajectory by randomly 
+    sampling from the original trajectory
+    % This might be too much detail. Maybe leave excess detail for 
+    \item We are interested in 5 pore-to-pore distances which should all be equal in 
+    a perfect hexagonal array. Only 4 are independent  %BJC: small figure here for clarity? supplemental info?
+    \item Each pore spacing has its own trajectory with its own average value
+    \item The average value of each pore spacing is averaged to get the overall
+    average pore spacing. 
+    \item The standard deviation of average values is reported as the uncertainty in pore spacing.
+    \item The \textbf{layer spacing} is based on experimental 2D WAXS data.
     \item The pattern shows reflections corresponding to features spaced 3.7 \angstrom apart.
     \item It has been hypothesized that the features are a result of pi-pi
     interactions between stacked aromatic rings \cite{feng_scalable_2014}. 
@@ -428,3 +442,326 @@
     \item The pore spacing shrinks by $\approx$ 1 \angstrom and stays 
     constant under a range of simulation conditions.
   \end{itemize}
+  
+  \section*{Results and Discussion}
+  
+  \subsection*{Determination of Nanoscopic Structural Details}
+  
+  In order to construct an initial configuration which gives reliable 
+  trends, we need to understand the composition of layers, how far apart
+  to stack the layers, and how to orient them with respect to each other.
+  \begin{itemize}
+  	\item To verify our choices for each parameter, we compare our calculations
+	to experimental small angle X-ray scattering (SAXS), wide angle X-ray
+	scattering (WAXS), and ionic conductivity measurements.
+  \end{itemize}
+  
+  To discern the composition of the monomer layers, we ran simulations of 
+  systems created with 4 - 8 monomers per layer.
+  \begin{itemize}
+  	\item Both the sandwiched and parallel displaced configurations were tested.
+	\item All systems remained stable for at least 50 ns.
+	\item Table ~\ref{table:p2p} shows the pore spacing for all systems tested. 
+	Systems built with 5 monomers in each layer equilibrate to a pore spacing
+	that is most consistent with the experimental value of 4.12 nm derived from
+	SAXS measurements (Figure~\ref{fig:SAXS}).
+	\item We verified that the system stays partitioned into layers by plotting 
+	pair correlation functions calculated between aromatic rings along the length
+	of the pores (Fig~\ref{fig:zdf}).
+	\item The remainder of this discussion will focus on the analysis of systems
+	built with 5 monomers per layer. 
+  \end{itemize}
+  
+  \begin{table}[H]
+  \centering
+  \begin{tabular}{ccc}
+  \toprule
+  		   & \multicolumn{2}{c}{Starting Configuration} \\
+  \hline
+  Monomers per layer & Sandwiched & Parallel Displaced \\
+  \midrule
+  4 & $3.71 \pm 0.04$ & $3.82 \pm 0.03$ \\
+  5 & $4.20 \pm 0.04$ & $4.23 \pm 0.04$ \\
+  6 & $4.83 \pm 0.03$ & $4.85 \pm 0.02$ \\
+  7 & $4.73 \pm 0.03$ & $4.84 \pm 0.03$ \\
+  8 & $5.08 \pm 0.04$ & $5.46 \pm 0.03$ \\
+  \bottomrule
+  \end{tabular}
+  \caption{The pore spacing of the model increases as number of monomers
+  in each layer increases. The pore spacing of a system starting in the 
+  sandwiched configuration is systematically lower than that started in an 
+  offset configuration. Systems built with 5 monomers per layer in a parallel
+  displaced configuration result in a pore spacing closest to experimental
+  data}\label{table:p2p} 
+  \end{table}
+  
+  \begin{figure}[h]
+	\centering
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{zdf5layered.png}
+		\caption{}\label{fig:zdf_layered}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{zdf5offset.png}
+		\caption{}\label{fig:zdf_offset}
+	\end{subfigure}
+	\caption{Pair distribution functions of aromatic carbons for the
+	(a) 5 monomer per layer, sanwiched and (b) 5 monomer per layer, 
+	parallel displaced configurations. Spikes in the distribution mark
+	distinct layers. The magnitude of the spikes with respect to the 
+	average suggest that the 5 monomer per layer, sandwiched configuration
+	possesses the highest degree of layer partitioning.}\label{fig:zdf}
+  \end{figure}
+
+  The initial distance between layers can influence the approach towards
+  equilibrium. 
+
+  Experimental WAXS measurements encode all structural details. 
+
+  \begin{figure}[ht]
+	\centering
+	\begin{subfigure}[t]{0.47\linewidth}
+		\centering
+		\raisebox{.2\textwidth}{%
+		\includegraphics[width=\linewidth]{WAXS_soft_confined.png}
+		}
+		\caption{}\label{fig:WAXS}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.43\linewidth}
+		\centering
+	%	\vspace{12mm}
+		\includegraphics[width=\linewidth]{SAXS.png}
+		\caption{}\label{fig:SAXS}
+	\end{subfigure}
+	\caption{(a) 2D wide angle X-ray scattering gives details about repeating
+	features less than 1 nanometer apart. (b) 1D small angle X-ray scattering 
+	indicates hexagonal packing of pores as well as the spacing between pores.}\label{fig:SWAXS}
+  \end{figure}
+  
+  We varied the relative interlayer orientation between sandwiched and 
+  parallel-displaced based on our knowledge of the stability of these two
+  pi-stacking modes.
+  
+  \begin{figure}
+	\centering
+	\begin{subfigure}{0.475\textwidth}
+		\hspace{-1.2cm}
+		\centering
+		\includegraphics[width=\textwidth,valign=t]{rzlayeredrestrained.png}
+		\caption{}\label{fig:rzplayeredrestrained}
+	\end{subfigure}
+	\begin{subfigure}{0.475\textwidth}
+		\hspace{-1.2cm}
+		\centering
+		\includegraphics[width=\textwidth,valign=t]{rzoffsetrestrained.png}
+		\caption{}\label{fig:rzoffsetrestrained}
+	\end{subfigure}
+	\caption{(a) Simulated X-ray diffraction of a sandwiched configuration
+	with restraints placed on aromatic carbons shows all major features
+	present in experimental WAXS. Near solid lines at constant z are a result of 
+	the highly ordered aromatic rings. (b) Simulated X-ray diffraction of a similarly
+	restrained parallel displaced configuration may also contain all
+	major experimental WAXS features. One can argue that R-spots is not present
+	but it is difficult to distinguish because of its intersection with the solid
+	R-helix line. Longer simulations are necessary to determine which structure
+	is the best match to experiment}\label{fig:XRDrestrained}
+  \end{figure}
+  
+  Full comparison of experimental 2D WAXS with simulated X-ray diffraction
+  patterns produced from equilibrated MD trajectories shows the most consistency
+  with the sandwiched configuration in Basin A.
+  
+  \begin{figure}[H]
+	\centering
+	\begin{subfigure}{0.31\textwidth}
+		\centering
+		\hspace{-0.9cm}
+		\includegraphics[width=\textwidth]{sandwich_rzplot.png}
+		\caption{}\label{fig:sandwich_rzplot}
+	\end{subfigure}
+	\begin{subfigure}{0.31\textwidth}
+		\centering
+		\hspace{-0.9cm}
+		\includegraphics[width=\textwidth]{offset_rzplot.png}
+		\caption{}\label{fig:offsetrzplot}
+	\end{subfigure}
+	\begin{subfigure}{0.31\textwidth}
+		\centering
+		\hspace{-0.9cm}
+		\includegraphics[width=\textwidth]{disorder_rzplot.png}
+		\caption{}\label{fig:disorder_rzplot.png}
+	\end{subfigure}
+	\caption{(a) All major features except R-helix are present in
+	XRD patterns resulting from an equilibrated sandwiched configuration 
+	in Basin A. R-pi intersescts R-alkanes. R-helix faded during equilbration.
+	(b) All major features execpt R-spots are present in XRD patterns 
+	resulting from an equilibrated parallel displaced configuration in Basin A.
+	R-helix exists faintly in the expected location. (c) R-pores and R-alkanes
+	are the only major features present in XRD patterns resulting from an 
+	equilibrated disordered phase}\label{fig:XRDsim}
+  \end{figure}
+
+  \begin{wrapfigure}{R}{0.4\textwidth}
+        \centering
+        \includegraphics[width=0.4\textwidth]{tilt.png}
+        \caption{The average angle between alkane chains and the xy plane is nearly zero degrees}\label{fig:tilt}
+  \end{wrapfigure}
+  
+  The spots that appear in the simulated XRD pattern of the sandwiched
+  conformation are a result of the way alkane tails pack together.
+  
+  \begin{figure}
+	\centering
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\hspace{-1cm}
+		\vspace{1cm}
+		\includegraphics[width=\textwidth,scale=2]{tails_topview.png}
+		\caption{}\label{fig:tails_topview}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{tails_rzplot.png}
+		\caption{}\label{fig:tails_rzplot}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{centroids_box.png}
+		\caption{}\label{fig:centroids}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{angles_traj_layered.png}
+		\caption{}\label{fig:angle_distribution}
+	\end{subfigure}
+	\caption{(a) The trajectory can be stripped of all atoms except carbon
+	atoms in monomer tails. (b) Simulated diffraction of the tail-only trajectory
+	still gives rise to R-spots. (c) Finding the center of mass and visualizing 
+	their coordinates reveals the hexagonal-like packing of the tails. (d) The 
+	distribution created by measuring the angle between each centroid (e.g. red 
+	in (c)) and its neareset neighbors (e.g. green in (c)) with respect to the xy
+	plane has distinct spikes near 30\degree, which is consistent with the location
+	of R-spots}\label{fig:tail_packing}
+  \end{figure}
+  
+  Basin A and Basin B are two configurationally metastable basins. 
+  
+  \begin{figure}
+        \centering
+        \begin{subfigure}[b]{0.475\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{280K_tramp_close.png}
+                \caption{}\label{fig:280K_pore}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.475\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{340K_tramp_close.png}
+                \caption{}\label{fig:340K_pore}
+        \end{subfigure}
+        \vskip\baselineskip
+        \begin{subfigure}[b]{0.325\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{p2p_tramp.png}
+                \caption{}\label{fig:p2p_tramp}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.325\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{thickness_tramp.png}
+
+                \caption{}\label{fig:thickness_tramp}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.325\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{order_tramp.png}
+                \caption{}\label{fig:order_tramp}
+        \end{subfigure}
+        \caption{(a) The open pore structure exhibited by a structure equilibrated
+	at 280K is characteristic of Basin A. (b) The closed pore structure with 
+	a high degree of radial disorder exhibited when the structure in (a) is 
+	heated to 340K is characteristic of Basin B. (c) A plot of distance between pores
+	vs. temperature changes slope near 325K. (d) A plot of membrane thickness vs. 
+	temperature changes slope near 325K. (e) The plot of the ratio of pore radius to
+	its uncertainty changes slope near 315K.}\label{fig:tramp}
+  \end{figure}
+
+  \begin{figure}
+	\centering
+	\begin{subfigure}{0.325\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{p2p_layered.png}
+		\caption{}\label{fig:p2p_layered}
+	\end{subfigure}
+	\begin{subfigure}{0.325\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{thickness_layered.png}
+		\caption{}\label{fig:thickness_layered}
+	\end{subfigure}
+	\begin{subfigure}{0.325\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{order_layered.png}
+		\caption{}\label{fig:order_layered}
+	\end{subfigure}
+	\caption{In all cases, blue lines represent the measured value of
+	the order parameter, black lines are average values calculated from
+	equilibrated Basin B systems at each temperature, green shaded regions
+	represent the standard deviation of each of the black line values, and 
+	red dashed lines show where the temperature is bumped to the next level.
+	(a) The pore spacing decreases smoothly as it approaches Basin B values.
+	(b) Membrane thickness increases steadily with temperature, however
+	it is still far from the Basin B value after 200 ns at 320K. (c) The
+	ratio of pore radius to is uncertainty rapidly decreases initially and
+	approaches the Basin B value smoothly until they finally overlap at 320K.}\label{fig:phase_transition}
+  \end{figure}
+
+  \subsection*{Ionic conductivity calculation}
+
+  The model gives reasonable estimates of ionic conductivity for both phases.
+  
+  \begin{table}[H]
+  \centering
+  \begin{tabular}{ccc}
+  \toprule
+  \multicolumn{3}{c}{Calculated Ionic Conductivity \si{\siemens\per\meter}} \\
+  \hline
+  Method & Basin A & Basin B \\
+  \midrule
+  Nernst Einstein & \num{1.23e-4} (0.01) & \num{1.76e-4} (0.02) \\
+  Collective Diffusion & \num{1.40e-4} (0.32) & \num{4.6e-4}(2.4) \\
+  Experiment & \num{1.33e-5} (0.10) & -- \\
+  \bottomrule
+  \end{tabular}
+  \caption{Calculated ionic conductivity using Nernst-Einsten and Collective Diffusion 
+  agree within error. Both methods give calculated values of ionic conductivity which
+  are an order of magnitude higher than experimental values~\label{table:conductivity}}.
+  \end{table}
+  
+  \subsection*{Implementation of the crosslinking algorithm}
+
+  We applied the crosslinking algorithm to an equilibrated structure in Basin B.
+  
+  \begin{figure}[H]
+	\centering
+	\begin{subfigure}{0.31\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{p2p_diagram.PNG}
+		\caption{}\label{fig:p2p_diagram}
+	\end{subfigure}
+		\begin{subfigure}{0.31\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{no_xlink_p2p.png}
+		\caption{}\label{fig:no_xlink_p2p}
+	\end{subfigure}
+		\begin{subfigure}{0.31\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{xlink_p2p.png}
+		\caption{}\label{fig:xlink_p2p}
+	\end{subfigure}
+	\caption{(a) The legends of the plots in (b) and (c) refer to the numbers shown.
+	Each numbered circle represents a pore. Distances are measured along each of the 
+	lines shown in addition to the distance from pore 1 to pore 4. (b) The positions
+	of individual pores fluctuate in an uncrosslinked system. (c) The positions of
+	individual pores in the crosslinked system are stable relative to the uncrosslinked
+	system}\label{fig:xlink}
+  \end{figure}
