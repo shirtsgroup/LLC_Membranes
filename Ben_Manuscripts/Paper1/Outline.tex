@@ -2,10 +2,16 @@
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage{subcaption}
-\usepackage{geometry}
-\geometry{legalpaper, margin=1in}
+\usepackage[margin=1in]{geometry}
 \usepackage{amsmath} % or simply amstext
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage[export]{adjustbox}
 \newcommand{\angstrom}{\textup{\AA}}
+\usepackage{cleveref}
+\usepackage{booktabs}
+\usepackage{gensymb}
+\usepackage{float}
 \title{Predicting Transport in Lyotropic Liquid Crystal Membranes with Molecular Dynamics Simulations -- Outline}
 \author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble \and Joe Yelk \and Matthew Glaser \and Xunda Feng \and Michael R. Shirts} 
 \begin{document}
@@ -26,20 +32,20 @@
   While RO and NF have seen many advances in the past few decades, they 
   are far from perfect separation technologies.
   \begin{itemize}
-    \textit{RO membranes}
+    \item \textit{RO membranes}
     \item \textbf{Inconsistent performance} : Current state-of-the-art RO membranes are unstructured with
     tortuous and polydisperse diffusion pathways which leads to 
     inconsistent performance \cite{song_nano_2011}
     \item \textbf{High energy requirements} : Necessarily high feed pressures 
     drive up energy requirements which strains developing regions and
     contributes strongly to CO\textsubscript{2} emissions. \cite{mcginnis_global_2008}
-    \item \textbf{Separation based on differences in solubility and diffusivity:
+    \item \textbf{Separation based on differences in solubility and diffusivity}:
     Moreover, designing RO membranes to achieve targeted separations of 
     specific solutes is nearly impossible because various solutes dissolve
     into and diffuse through the polymer matrix at different rates. \cite{wijmans_solution-diffusion_1995}
     \item At best, one can exploit these differences to create a functional
     selective barrier.
-    \textit{NF membranes}
+    \item \textit{NF membranes}
     \item NF was introduced as an intermediate between RO and ultrafiltration,
     having the ability to separate organic matter and salts on the order of 
     one nanometer in size.
@@ -237,7 +243,7 @@
     of the equilibration schemes are presented below.
   \end{itemize}
   
-  \begin{figure}[H]
+  \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.75\linewidth]{build.PNG} %BJC: put an xyz axis with the unit cell
 	\caption{(a) A single monomer was parameterized and annealed to produce a low energy
@@ -358,7 +364,7 @@
     of our choice of initial structure and equilibration procedure.
   \end{itemize}
   
-  \begin{figure}[H]
+  \begin{figure}[h]
 	\centering
 	\begin{subfigure}[b]{0.32\textwidth}
 		\centering
@@ -476,7 +482,7 @@
 	built with 5 monomers per layer. 
   \end{itemize}
   
-  \begin{table}[H]
+  \begin{table}[h]
   \centering
   \begin{tabular}{ccc}
   \toprule
@@ -706,7 +712,7 @@
 	R-helix, R-pi and R-spots are not present.
   \end{itemize}
   
-  \begin{figure}[H]
+  \begin{figure}[h]
 	\centering
 	\begin{subfigure}{0.31\textwidth}
 		\centering
@@ -832,6 +838,7 @@
 	(Figure~\ref{fig:phase_transition}).
 	\item I have this run out to about 335K right now. I have to see if there is anything
 	noteworthy to report	
+  \end{itemize}
 
   \begin{figure}
         \centering
@@ -933,7 +940,7 @@
 	perfectly aligned system.
   \end{itemize}
 	
-  \begin{table}[H]
+  \begin{table}[h]
   \centering
   \begin{tabular}{ccc}
   \toprule
@@ -966,7 +973,7 @@
   \end{itemize}
   %BJC: THe following figure will be replaced with one representative of the new
   % data I am  collecting above.
-  \begin{figure}[H]
+  \begin{figure}[h]
 	\centering
 	\begin{subfigure}{0.31\textwidth}
 		\centering
@@ -990,3 +997,4 @@
 	individual pores in the crosslinked system are stable relative to the uncrosslinked
 	system}\label{fig:xlink}
   \end{figure}
+\end{document}
