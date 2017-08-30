@@ -519,7 +519,8 @@
 	possesses a higher degree of layer partitioning.}\label{fig:zdf}
   \end{figure}
 
-  Experimental WAXS measurements encode all structural details. 
+  Experimental WAXS measurements encode all remaining structural details. 
+  %BJC: I'm not exactly sure where to place this paragraph. Maybe it can go in methods?
   \begin{itemize}
   	\item There are five major features present in the 2D experimental 
 	pattern which our model intends to reproduce (Figure~\ref{fig:WAXS}).
@@ -578,18 +579,35 @@
 	layer spacing implied by R-pi are characterized by a defined, cylindrical and
 	open pore structure.
 	\item Aromatic rings are arranged in a helical conformation.%BJC: could potentially support with a figure. Mentioning the helical arrangmentment might makes things confusing though
-	\item We will refer to this system as Basin A (Figure~\ref{fig:280K_pore}).
+	\item We will refer to this system as Basin A (Figure~\ref{fig:abasin}).
 	\item Simulations of systems built with layers stacked greater than 4 
 	\angstrom apart results in a pore structure characterized by high radial 
 	disorder, while still maintaining partitioning between hydrophobic and 
 	hydrophilic regions.
-	\item This will be called Basin B (Figure~\ref{fig:340K_pore}).
+	\item This will be called Basin B (Figure~\ref{fig:bbasin}).
 	\item It is apparent that this LLC membrane may exist in at least two metastable states.
 	\item The distinct difference in pore structure exhibited by each phase will 
 	likely lead to different transport mechanisms.
 	\item Understanding which phase exists experimentally is necessary in order
 	to appropriately study the system.
   \end{itemize}
+  
+  \begin{figure}
+        \centering
+        \begin{subfigure}[b]{0.475\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{280K_tramp_close.png}
+                \caption{}\label{fig:abasin}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.475\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{340K_tramp_close.png}
+                \caption{}\label{fig:bbasin}
+        \end{subfigure}
+	\caption{From a qualitative standpoint, Basin A (a) is characterized by a
+	hollow cylindrical pore while pores in Basin B (b) are characterized by a
+	higher degree of radial disorder}\label{fig:basins}
+  \end{figure}
 
   We varied the relative interlayer orientation between sandwiched and 
   parallel-displaced based on our knowledge of the stability of the two
@@ -813,9 +831,8 @@
 	was increased implying that we can not yet claim the existence of two phases 
 	(Figure~\ref{fig:phase_transition}).
 	\item I have this run out to about 335K right now. I have to see if there is anything
-	noteworthy to report
-	
-  
+	noteworthy to report	
+
   \begin{figure}
         \centering
         \begin{subfigure}[b]{0.475\textwidth}
@@ -885,26 +902,26 @@
 
   \subsection*{Ionic conductivity calculation}
 
-  The model gives reasonable estimates of ionic conductivity for both phases.
+  The model gives reasonable estimates of ionic conductivity when compared to 
+  experiment.
   \begin{itemize}
   	\item Calculated values of ionic conductivity obtained using the Nernst 
 	Einstein relation and Collective Diffusion model are compared in 
 	Table~\ref{table:conductivity}.
 	\item The two methods agree with each other within error, although the 
 	uncertainty obtained using the Collective Diffusion model is much higher.
-	\item Much longer simulations are needed to lower the uncertainty.
-	\item  This is especially true of the value calculated for Basin B using
-	the collective diffusion model. % TODO: Run Basin B out longer
-	\item Basin A collective diffusion calculations were generated from a 
-	500 ns simulation.
-	\item In both cases, our calculated values would benefit from longer simulations. 
+	\item Much longer simulations are needed to lower the uncertainty. % TODO: Run Basin B out longer at same conditions as A
+	\item Collective diffusion calculations were generated from 
+	500 ns simulations.
+	\item Our calculated values would benefit from longer simulations. 
 	\item For this reason we will likely only use the Nernst Einstein relation
 	in future calculations of this type. 
 	\item Interestingly, Basin B has a higher ionic conductivity than Basin A.
-	\item Conductivity is enhanced in Basin B due to a higher sodium ion diffusivity.
+	\item We hypothesize that conductivity is enhanced in Basin B due to a 
+	higher sodium ion diffusivity.
 	\item Transport of sodium is likely facilitated by the homogeneity of Basin B.
-	Sodium ions have less ites to move to in Basin A.
-	\item No experimental evidence of this trend. May Xunda will find something
+	Sodium ions have less sites to move to in Basin A.
+	\item There is currently no experimental evidence of this trend. Maybe Xund will find something
 	\item In both cases, our calculated values for Basin A are higher than the 
 	experimental values, as expected. 
 	\item Some of the discrepancy is likely a result of using an imperfect forcefield. 
@@ -938,11 +955,14 @@
 
   We applied the crosslinking algorithm to the equilibrated sandwiched structure in 
   Basin A.
-  \begin{itemize}  %BJC: working on the following
-  	\item Distribution of crosslinks
-	\item Pore spacing
-	\item X-ray diffraction
-	\item Ionic Conductivity
+  \begin{itemize}  %BJC: working on the following. The following is what I expect
+  	\item There is an even distribution of crosslinks between same monomer tails, 
+	between monomers in the same pore and between monomers in different pores 
+	including periodic boundaries.
+	\item The distance between pores shrinks by 1 \angstrom after the system is 
+	crosslinked
+	\item Major features are still present in the X-ray diffraction
+	\item The ionic conductivity is higher/lower in the crosslinked system
   \end{itemize}
   %BJC: THe following figure will be replaced with one representative of the new
   % data I am  collecting above.
