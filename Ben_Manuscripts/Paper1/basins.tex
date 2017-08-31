@@ -15,6 +15,13 @@
 
 \begin{document}
   \graphicspath{{./figures/}}
+  
+  % Context: At this point in the manuscript, I have already narrowed the
+  % systems down to a disordered structure and the ordered sandwiched configuration
+  % I've named them Basin A and Basin B for simplicity. A - ordered, B - disordered
+  % I don't call them the ordered and disordered basins because I think that can 
+  % be misleading 
+  % I'm open to other naming ideas. 
   We can not immediately classify Basin A and Basin B as separate phases.
   \begin{itemize}
 	\item To prove the existence of two phases we need evidence of a
@@ -24,7 +31,7 @@
 	temperature.
 	\item We chose three easily measurable order parameters: the distance
 	between pores, the membrane thickness and the ratio of pore radius to
-	the uncertainty in pore radius.
+	the uncertainty in pore radius.  % BJC: these may change
         \item The pore radius is divided by its uncertainty as a way of quantifying
         the degree to which monomers obstruct the pore region.
   \end{itemize}
@@ -51,7 +58,7 @@
         again for 200 ns.
         \item We continued raising the temperature by 5K and equilibrating for 200 ns
         until the system was equilibrated for 200 ns at 320K.
-	\item The same process was repeated with system equilibrated in Basin B and used
+	\item The same process was repeated with a system equilibrated in Basin B and used
 	as a benchmark for comparison. 
   \end{itemize}
 
@@ -95,14 +102,15 @@
 
   Basin A and Basin B are two configurationally metastable basins.
   \begin{itemize}
-        \item There is litle change in disordered phase properties during the temperature ramp.
+        \item There is litle change in disordered phase properties during the 
+        temperature ramp.
 	\item We observed smooth changes in order parameters as temperature
         of the Basin A system was increased implying that we cannot claim the
 	existence of two phases (Figure~\ref{fig:phase_transition}).
-	\item The Basin A system does not converge to the same order parameter
-	values as Basin B, however they trend in the general direction.
 	\item Qualitatively, the pore structure of the Basin A system becomes
-	comparable to one characteristic of Basin B as temperature is raised.
+        comparable to one characteristic of Basin B as temperature is raised.
+	\item The Basin A system does not converge to the same order parameter
+	values as Basin B, however it is trending towards Basin B values.
 	\item To resolve the quanitative discrepancy, we would need a slower 
 	temperature ramp
 	\item Since there are no abrupt changes in any order parameter along the 
@@ -114,5 +122,50 @@
 	because our model lacks sufficient pi-pi iteractions necessary to 
 	stabilize the system into Basin A. 
   \end{itemize} 
+
+  \begin{figure}
+        \centering
+	% BJC: I'll get actual pictures of the system here. I'm not sure how 
+	% necessary this figure is though. It could go in the supplemental 
+	% information and I can reference the pictures in the previous figure
+	% since they show basically the same idea : Ordered vs. disordered pore
+	% Alternatively, I could show two diffraction patterns here from the 
+	% beginning and end temperature 
+        \begin{subfigure}[b]{0.475\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{280K_tramp_close.png}
+                \caption{}\label{fig:BasinA_280K_pore}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.475\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{340K_tramp_close.png}
+                \caption{}\label{fig:BasinB_340K_pore}
+        \end{subfigure}
+	\vskip\baselineskip
+        \begin{subfigure}[b]{0.325\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{p2p_layered.png}
+                \caption{}\label{fig:p2p_step}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.325\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{thickness_layered.png}
+
+                \caption{}\label{fig:thickness_step}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.325\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{order_layered.png}
+                \caption{}\label{fig:order_step}
+        \end{subfigure}
+	\caption{(a) At 280K, the system is in a configuration reminiscent of
+	Basin A. (b) At 335K, the system resembles a Basin B configuration. (c) The pore
+	spacing of Basin A decreases with temperature approaching the value 
+	exhibited by Basin B. (d) The thickness of Basin A increases smoothly with 
+	temperature but is far from the Basin B value. Longer equilibrations at 
+	each temperature are needed to allow the system to fully expand. (e) The ratio 
+	of pore radius to uncertainty for Basin A changes smoothly with temperature,
+	converging to a value below that exhibited by Basin B.}\label{fig:phase_transition}
+  \end{figure}
 
 \end{document}
