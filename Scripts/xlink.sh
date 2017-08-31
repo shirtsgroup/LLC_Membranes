@@ -2,15 +2,14 @@
 set -e
 # A script to iteratively crosslink a LLC system
 
-CUTOFF=5  # percent of distribution that will be labeled close enough to bond
-TERM_PROB=5  # probability of termination of carbons meeting bonding criteria
+CUTOFF=1  # percent of distribution that will be labeled close enough to bond
+TERM_PROB=1  # probability of termination of carbons meeting bonding criteria
 GRO='wiggle.gro'  # initial .gro file to be crosslinked
-CUTOFF_RAD=10  # percent of distribution that are labeled close enough to bond in the context of reactive radicals
+CUTOFF_RAD=20  # percent of distribution that are labeled close enough to bond in the context of reactive radicals
 SIM_LENGTH=10  # picoseconds of simulation between iterations
 XLINKS=0
 FRAMES=50
 DEGREE=.9  # Degree of crosslinking
-NO_MONOMERS=480
 NO_TAILS=3
 MONOMER="NAcarb11Vd"
 ITERATION=0  # starting iteration
@@ -44,7 +43,7 @@ if [ ${ITERATION} != 0 ]; then
     ITERATION=$((ITERATION+1))
 fi
 
-input.py -b ${MONOMER} -S -c ${INIT_CONFIG} -x -l ${SIM_LENGTH} -f ${FRAMES} --genvel no
+input.py -b ${MONOMER} -S -c ${GRO} -x -l ${SIM_LENGTH} -f ${FRAMES} --genvel no
 
 while [ ${STOP} -eq 0 ]; do
     if [ ${ITERATION} == 0 ]; then
@@ -55,9 +54,14 @@ while [ ${STOP} -eq 0 ]; do
     # restrain.py -r on -g wiggle.gro -o crosslinked_new.itp -f 100000 -A xyz -D off -w off  -m NAcarb11V_dummy --xlink  # this should just add the restraints section to the .itp
     cp crosslinked_new.itp crosslinked_${ITERATION}.itp
     mv xlink.log xlink_${ITERATION}.log
-    gmx grompp -f em.mdp -p ${TOP} -c wiggle.gro -o em
+
+    if [ ${ITERATION} == 0 ]; then
+        gmx grompp -f em.mdp -p topol.top -c ${GRO} -o em
+    else
+        gmx grompp -f em.mdp -p topol.top -c wiggle.gro -o em
+    fi
     gmx mdrun -v -deffnm em
-    gmx grompp -f ${MDP} -p ${TOP} -c em.gro -o wiggle
+    gmx grompp -f ${MDP} -p topol.top -c em.gro -o wiggle
     gmx mdrun -v -deffnm wiggle
     XLINKS=$(tail xlink_${ITERATION}.log -n 2 | head -n 1 | cut -c 19-22)
     TERM=$(tail -n 6 xlink_${ITERATION}.log | head -n 1 | cut -c 26-29)

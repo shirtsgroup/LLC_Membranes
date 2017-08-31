@@ -34,9 +34,9 @@ def initialize():
     parser.add_argument('-n', '--no_monomers', default=6, help='Number of monomers per layer')
     parser.add_argument('-c', '--cutoff', default=5, help='Cutoff distance for cross-linking. Bottom x % of the distribution'
                                                           'of distances will be cross-linked ')
-    parser.add_argument('-e', '--term_prob', default=5, type=int, help='Termination probability (%)')
+    parser.add_argument('-e', '--term_prob', default=5, type=float, help='Termination probability (%)')
     parser.add_argument('-y', '--topology', default='crosslinked_new.itp', help='Topology file that will be analyzed and modified')
-    parser.add_argument('-r', '--iteration', default=0, help='Iteration number of crosslinking process')
+    parser.add_argument('-r', '--iteration', default=0, type=int, help='Iteration number of crosslinking process')
     parser.add_argument('-d', '--cutoff_rad', default=10, help='Cutoff Distance for radical reaction')
     parser.add_argument('-x', '--xlinks', default=0, help='Total number of c1-c2 crosslinks')
     parser.add_argument('-S', '--stop', default='no', help='Is crosslinking reaction finished')
@@ -336,7 +336,10 @@ if __name__ == "__main__":
             m = min(min_list_rad)
             min_list_rad.remove(m)
 
-        cutoff = min(min_list_rad)  # Now the cutoff value is the minimum of min_list_rad
+        if min_list_rad:
+            cutoff = min(min_list_rad)  # Now the cutoff value is the minimum of min_list_rad
+        else:
+            cutoff = 0
 
         if cutoff > 0.7:
             cutoff = 0.7
@@ -424,17 +427,31 @@ if __name__ == "__main__":
         c1_rad_ndx_prev = c1_rad_ndx
         c2_rad_ndx_prev = c2_rad_ndx
 
-    adjacent_c1 = []
-    for i in range(len(c2_uniq)):
-        adjacent_c1.append(c2_uniq[i] + 1)
-
-    # Create the final lists of c1 and c2 that will be cross-linked
     c1 = []
     c2 = []
-    for i in range(len(adjacent_c1)):
-        if c1_uniq[i] not in adjacent_c1:  # add values to the lists that have c1's that are not adjacent to reacting c2's
+    for i in range(len(c1_uniq)):
+        if c2_uniq[i] + 1 in c1_uniq:
+            if c2_uniq[i] + 1 not in c1:
+                c1.append(c1_uniq[i])
+                c2.append(c2_uniq[i])
+        else:
             c1.append(c1_uniq[i])
             c2.append(c2_uniq[i])
+
+    print("c1: %s" %c1)
+    print("c2: %s" %c2)
+
+    # adjacent_c1 = []
+    # for i in range(len(c2_uniq)):
+    #     adjacent_c1.append(c2_uniq[i] + 1)
+    #
+    # # Create the final lists of c1 and c2 that will be cross-linked
+    # c1 = []
+    # c2 = []
+    # for i in range(len(adjacent_c1)):
+    #     if c1_uniq[i] not in adjacent_c1:  # add values to the lists that have c1's that are not adjacent to reacting c2's
+    #         c1.append(c1_uniq[i])
+    #         c2.append(c2_uniq[i])
 
     if int(args.iteration) != 0:
         c1_rad_ndx, c2_rad_ndx = rad_index(c1_rad_ndx_prev, c2_rad_ndx_prev, c1, c2)
@@ -447,10 +464,11 @@ if __name__ == "__main__":
 
     tp = args.term_prob  # termination probability
 
-    indices = random.sample(list(range(0, 99)), tp)
-    term_prob_array = np.zeros([100])  # make an array with a a percentage of 1's equal to the termination probability
-    for i in indices:
-        term_prob_array[i] = 1
+    # indices = random.sample(list(range(0, int(100/tp))), 1)
+    term_prob_array = np.zeros([int(100/tp)])  # make an array with a a percentage of 1's equal to the termination probability
+    # for i in indices:
+    #     term_prob_array[i] = 1
+    term_prob_array[random.randint(0, int(100/tp) - 1)] = 1
 
     # Termination occurs at C2
     # Move termination carbons to a new list
@@ -537,7 +555,6 @@ if __name__ == "__main__":
         for line in f:
             b.append(line)
         print('%s read into list' % args.topology)
-
 
     # Make lists with numbers of H atoms whose type needs to change as a consequence of the cross linking reaction
 
@@ -730,9 +747,12 @@ if __name__ == "__main__":
     while b[atoms_count] != '\n':
         atoms_count += 1  # increments the while loop
 
-    if args.iteration != 0 and c1 == [] and c2 == [] and other_c1 == [] and radical_c2 == [] and c1_rad_ndx == [] \
-            and c2_rad_ndx == [] and H_new1 == [] and cutoff == 0.6:
-        Stop_next_iter = 1  # finish this iteration, then next time the system will be completely terminated
+    if args.iteration != 0:
+        if c1 == [] and c2 == [] and other_c1 == [] and radical_c2 == [] and c1_rad_ndx == [] \
+                    and c2_rad_ndx == [] and H_new1 == [] and cutoff == 0.6:
+            Stop_next_iter = 1  # finish this iteration, then next time the system will be completely terminated
+        else:
+            Stop_next_iter = 0
     else:
         Stop_next_iter = 0
 

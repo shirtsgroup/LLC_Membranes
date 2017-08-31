@@ -38,6 +38,8 @@ class LC(object):
         L = []
         C1 = []
         C2 = []
+        C1_ndx = []
+        C2_ndx = []
         self.no_ions = 0
         self.ions = []
 
@@ -67,8 +69,10 @@ class LC(object):
                         self.ref_atom_index = i - 2
                     if 'C1' in annotations:
                         C1.append(str.strip(a[i][10:15]))
+                        C1_ndx.append(int(a[i][15:20]))
                     if 'C2' in annotations:
                         C2.append(str.strip(a[i][10:15]))
+                        C2_ndx.append(int(a[i][15:20]))
                     if 'I' in annotations:
                         self.no_ions += 1
                         ion = str.strip(a[i][10:15])
@@ -113,8 +117,10 @@ class LC(object):
                         self.ref_atom_index = i - start
                     if 'C1' in annotations:
                         C1.append(str.strip(a[i][11:16]))
+                        C1_ndx.append(int(str.strip(a[i][0:5])))
                     if 'C2' in annotations:
                         C2.append(str.strip(a[i][11:16]))
+                        C2_ndx.append(int(str.strip(a[i][0:5])))
                     if 'I' in annotations:
                         self.valence = Atom_props.charge[str.strip(a[i][11:16])]
                     if 'B' in annotations:
@@ -129,6 +135,8 @@ class LC(object):
         self.nresidues = nres
         self.c1_atoms = C1
         self.c2_atoms = C2
+        self.c1_index = C1_ndx
+        self.c2_index = C2_ndx
         self.benzene_carbons = benzene_carbons
 
 

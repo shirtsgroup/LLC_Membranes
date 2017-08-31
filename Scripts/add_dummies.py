@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     ntails = 3
     ndummies = 6
-    nmonomers = 480
+    nmonomers = 400
     Hd = ['H77', 'H78', 'H79', 'H80', 'H81', 'H82']
 
     atomspmon = pos.shape[1] / nmonomers
@@ -36,14 +36,14 @@ if __name__ == "__main__":
     with open(args.out, 'w') as f:
 
         f.write('This is a .gro file\n')
-        f.write('%s\n' % ((atomspmon + ndummies)*nmonomers))
+        f.write('%s\n' % (int((atomspmon + ndummies)*nmonomers)))
 
         count = 1
         count2 = 0
         for a in t.topology.atoms:
             if count2 != 0 and count2 % (atomspmon - 1) == 0 and count < (nmonomers*(atomspmon - 1 + ndummies)):
                 for j in range(ndummies):
-                    f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(1, 'HII', Hd[j],
+                    f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(int(count / atomspmon), 'HII', Hd[j],
                                         count, 0, 0, 0))
                     count += 1
 
