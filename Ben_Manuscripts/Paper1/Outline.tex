@@ -243,7 +243,7 @@
     of the equilibration schemes are presented below.
   \end{itemize}
   
-  \begin{figure}[h]
+  \begin{figure}[!ht]
 	\centering
 	\includegraphics[width=0.75\linewidth]{build.PNG} %BJC: put an xyz axis with the unit cell
 	\caption{(a) A single monomer was parameterized and annealed to produce a low energy
@@ -364,7 +364,7 @@
     of our choice of initial structure and equilibration procedure.
   \end{itemize}
   
-  \begin{figure}[h]
+  \begin{figure}[!ht]
 	\centering
 	\begin{subfigure}[b]{0.32\textwidth}
 		\centering
@@ -505,7 +505,7 @@
   data}\label{table:p2p} 
   \end{table}
   
-  \begin{figure}[h]
+  \begin{figure}[!ht]
 	\centering
 	\begin{subfigure}{0.45\textwidth}
 		\centering
@@ -558,7 +558,7 @@
 	radially integrating the 2D data to get a 1D curve which is shown in Figure~\ref{fig:SAXS}.
   \end{itemize}
 
-  \begin{figure}[ht]
+  \begin{figure}[!ht]
 	\centering
 	\begin{subfigure}[t]{0.47\linewidth}
 		\centering
@@ -598,7 +598,7 @@
 	to appropriately study the system.
   \end{itemize}
   
-  \begin{figure}
+  \begin{figure}[!ht]
         \centering
         \begin{subfigure}[b]{0.475\textwidth}
                 \centering
@@ -645,7 +645,7 @@
 	where R-helix exists.
   \end{itemize}
 
-  \begin{figure}
+  \begin{figure}[!ht]
 	\centering
 	\begin{subfigure}{0.475\textwidth}
 		\hspace{-1.2cm}
@@ -712,7 +712,7 @@
 	R-helix, R-pi and R-spots are not present.
   \end{itemize}
   
-  \begin{figure}[h]
+  \begin{figure}[!ht]
 	\centering
 	\begin{subfigure}{0.31\textwidth}
 		\centering
@@ -768,7 +768,7 @@
 	nearly hexagonal array of packed tails. 
   \end{itemize}
   
-  \begin{figure}
+  \begin{figure}[!ht]
 	\centering
 	\begin{subfigure}{0.45\textwidth}
 		\centering
@@ -802,30 +802,6 @@
 	of R-spots}\label{fig:tail_packing}
   \end{figure}
   
-  \documentclass{article}
-\usepackage{graphicx}
-\usepackage{wrapfig}
-\usepackage{subcaption}
-\usepackage[margin=1in]{geometry}
-\usepackage{amsmath} % or simply amstext
-\usepackage{siunitx}
-\usepackage{booktabs}
-\usepackage[export]{adjustbox}
-\newcommand{\angstrom}{\textup{\AA}}
-\usepackage{cleveref}
-\usepackage{booktabs}
-\usepackage{gensymb}
-\usepackage{float}
-
-\begin{document}
-  \graphicspath{{./figures/}}
-  
-  % Context: At this point in the manuscript, I have already narrowed the
-  % systems down to a disordered structure and the ordered sandwiched configuration
-  % I've named them Basin A and Basin B for simplicity. A - ordered, B - disordered
-  % I don't call them the ordered and disordered basins because I think that can 
-  % be misleading 
-  % I'm open to other naming ideas. 
   We can not immediately classify Basin A and Basin B as separate phases.
   \begin{itemize}
 	\item To prove the existence of two phases we need evidence of a
@@ -866,7 +842,7 @@
 	as a benchmark for comparison. 
   \end{itemize}
 
-  \begin{figure}
+  \begin{figure}[!ht]
         \centering
         \begin{subfigure}[b]{0.475\textwidth}
                 \centering
@@ -912,7 +888,7 @@
         of the Basin A system was increased implying that we cannot claim the
 	existence of two phases (Figure~\ref{fig:phase_transition}).
 	\item Qualitatively, the pore structure of the Basin A system becomes
-        comparable to one characteristic of Basin B as temperature is raised. (\Cref{fig:BasinA_280K_pore,fig:BasinA_340K_pore})
+        comparable to one characteristic of Basin B as temperature is raised. (\Cref{fig:BasinA_280K_pore,fig:BasinB_340K_pore})
 	\item The Basin A system does not converge to the same order parameter
 	values as Basin B, however it is trending towards Basin B values. (\Cref{fig:p2p_step,fig:thickness_step,fig:order_step})
 	\item To resolve the quanitative discrepancy, we would need a slower 
@@ -927,7 +903,7 @@
 	stabilize the system into Basin A. 
   \end{itemize} 
 
-  \begin{figure}
+  \begin{figure}[!ht]
         \centering
 	% BJC: I'll get actual pictures of the system here. I'm not sure how 
 	% necessary this figure is though. It could go in the supplemental 
@@ -1043,7 +1019,7 @@
   \end{itemize}
   %BJC: THe following figure will be replaced with one representative of the new
   % data I am  collecting above.
-  \begin{figure}[h]
+  \begin{figure}[!ht]
 	\centering
 	\begin{subfigure}{0.31\textwidth}
 		\centering
@@ -1067,4 +1043,8 @@
 	individual pores in the crosslinked system are stable relative to the uncrosslinked
 	system}\label{fig:xlink}
   \end{figure}
+
+\clearpage
+\bibliography{llc}
+
 \end{document}
