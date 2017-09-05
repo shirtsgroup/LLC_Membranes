@@ -118,59 +118,15 @@
     reinvigorated
   \end{itemize}
   
-  A clear picture of the nanoscopic LLC membrane structure, gained by building 
-  a molecular model will provide evidence to answer existing and newly proposed
-  questions.
-%MRS: break this down into more hierarchy - there are 11 separate points.  Can they be grouped at all for clearer understanding? elucidate what the aspects are we need a clearer picture. 
-  \begin{itemize}
-    \item We will limit our initial studies to studying assemblies formed by Na-GA3C11
-    \item We have also chosen to focus our initial efforts on the development of 
-    a model of the Col\textsubscript{h} phase membrane.
-    \item Compared to the H\textsubscript{II} phase, the Col\textsubscript{h}
-    phase is a simpler starting point, due to the absence of water, and has
-    equivalent experimental structural data.
-%MRS: since the questions we answer in the paper have a lot to do with the structure of the membranes, somewhere relatively early in the paper we need to lay out the facts that 1) these membranes could be really good (I think you do establish this) 2) we really would need to know the structure better to really do useful things with these, and 3) MD is a very helpful way to gain more information about the structure, because of the limited range of experiments we can do with these systems. That is the main rationale, and it should be made clear fairly early in the introduction.  Very important to make your story absolutely as clear as possible.
-    \item Despite having structural data, there is still information which 
-    experiment cannot definitively answer
-    \item The Col\textsubscript{h} phase is described as having pores made of
-    disks or layers stacked on top of one another, each containing a set 
-    number of monomers. A simple simulation study of a similar molecule 
-%MRS: suggests isn't the right word, since that implies it may still be valid, which probably isn't correct.  I would probably say how simple that test was, since what they did had almost no chance of getting the right answer in the proper context. We thought they did something reasonable, but they really didn't. 
-%suggests
-suggested
-    that there are 4 monomers in each disk~\cite{zhu_methacrylated_2006}. A 
-    separate calculation based on the volume of the liquid crystal monomers proposes
-    that there are seven monomers in each layer~\cite{resel_structural_2000}. 
-    A molecular model has the best chance of directly answering this question.
-%MRS: phrasing
-    %\item Once we know the number of monomers in each layer, we still do not know how 
-    Even if we knew the number of monomers in each layer, we still would not know how 
-    monomers in each layer are positioned with respect to other layers. 
-    \item A driving force of self assembly in this system is thought to be pi-pi
-    stacking interactions between aromatic headgroups \cite{gazit_possible_2002}. 
-    \item Gas phase ab initio studies of benzene dimers have shown a clear energetic
-    advantage for parallel displaced and T-shaped pi-pi stacking conformations versus a
-    sandwiched conformation ~\cite{sinnokrot_estimates_2002}.
-    \item Substituted benzene rings exhibit an even stronger pi-pi stacking 
-    attraction which favors the parallel displaced configuration in all cases
-    except where the substitutions are extremely electron withdrawing
-    \cite{waller_hybrid_2006,ringer_effect_2006}.
-    \item While we might be able to provide answers to these questions using a 
-    molecular model, there remains the possibility that there is more than one 
-    metastable state associated with a given LLC system.
-    \item We must be able to identify which states can be produced experimentally
-    and what implications each state might have regarding transport properties.
-  \end{itemize}
-    
-  A molecular level understanding of LLC membrane structure will provide guidelines
-  to reduce the large chemical space available to design monomers for creation of 
-  separation-specific membranes.
+  A molecular level understanding of LLC membrane structure, enabled by molecular
+  dynamics simulations, will provide guidelines to reduce the large chemical space
+  available to design monomers for creation of separation-specific membranes.
   \begin{itemize}
 %     \item LLCs are versatile and controllable with a \textbf{large chemical design
 %     space} available for membrane design  %BJC: redundant
     \item  We do not yet understand how to reduce the effective pore size or 
     how to tune the chemical environment in the nanopores for effective water
-    desalination or small organic separations.
+    desalination or small organic molecule separations.
     \item Rejection studies show that this membrane can not perform separations of
     solutes less than 1.2 nm because the pores are too large \cite{zhou_supported_2005}.
     \item Over the past 20 years, LLC membrane studies have been limited primarily 
@@ -191,41 +147,118 @@ suggested
     on the basis of shape and 
     %MRS: size pretty much is hydrodynamic radius
     %size, 
-    interations with specific chemical groups
+    interactions with specific chemical groups
 rather than just hydrodynamic radius.
     %MRS: isn't this next point just a restatement of what was said at the top?
-    \item  An atomistic understanding of pore structure and its influence on transport 
-    is necessary to identify performance bottle necks and direct design of future membranes. 
+    %BJC: yes, deleted
+  \end{itemize}
+  
+  Our approach to constructing a general model will be based on the development of a
+  model of a specific LLC membrane which has ample experimental characterization. %BJC: ample too much?
+    \begin{itemize}
+    \item We have chosen to focus on assemblies formed by Na-GA3C11
+    \item We have also narrowed our scope to the development of 
+    a model of the Col\textsubscript{h} phase membrane.
+    \item Compared to the H\textsubscript{II} phase, the Col\textsubscript{h}
+    phase is a simpler starting point, due to the absence of water, and has
+    equivalent experimental structural data.
+    \item Despite having structural data, there is still information which 
+    experiment cannot definitively answer
+    \end{itemize}
+
+%BJC: the following just seems like filler now that I've reorganized
+%   A clear picture of the nanoscopic LLC membrane structure, gained by building 
+%   a molecular model will provide evidence to answer existing and newly proposed
+%   questions.
+%     \begin{itemize}
+%     \item Despite having structural data, there is still information which 
+%     experiment cannot definitively answer
+%     \end{itemize}
+
+%MRS: break this down into more hierarchy - there are 11 separate points.  Can they be grouped at all for clearer understanding? elucidate what the aspects are we need a clearer picture. 
+%BJC: I moved the logic for choice of monomer to system to model to a separate paragraph (above this). I then moved the other three things I talk about into their own paragraphs to keep the ideas separate (following paragraphs).
+
+%MRS: since the questions we answer in the paper have a lot to do with the structure of the membranes, somewhere relatively early in the paper we need to lay out the facts that 1) these membranes could be really good (I think you do establish this) 2) we really would need to know the structure better to really do useful things with these, and 3) MD is a very helpful way to gain more information about the structure, because of the limited range of experiments we can do with these systems. That is the main rationale, and it should be made clear fairly early in the introduction.  Very important to make your story absolutely as clear as possible.
+%BJC: I moved and edited a paragraph that was originally later on to be 2 above this one. I think it does a better job addressing points 2 and 3. And now it addresses those points earlier in the intro (as early as it could go where I think it still makes sense in context)
+
+  We do not know the number of monomers that constitute the layers which stack
+  on top of each other to create pores.
+  \begin{itemize}
+%     \item The Col\textsubscript{h} phase is described as having pores made of
+%     disks or layers stacked on top of one another, each containing a set 
+%     number of monomers. 
+    \item A simple simulation study of a similar molecule 
+%MRS: suggests isn't the right word, since that implies it may still be valid, which probably isn't correct.  I would probably say how simple that test was, since what they did had almost no chance of getting the right answer in the proper context. We thought they did something reasonable, but they really didn't. 
+%suggests
+%BJC: Okay, added a little more to emphasize that what they did isn't really useful.
+suggested
+    that there are 4 monomers in each layer. Their estimation is based on a
+    simulated system containing only 16 total monomers which likely does not sufficiently
+    model the chemical environment present in the real system.~\cite{zhu_methacrylated_2006}. 
+    \item A separate calculation based on the volume of the liquid crystal monomers proposes
+    that there are seven monomers in each layer~\cite{resel_structural_2000}. 
+    \item A molecular model has the best chance of directly answering this question.
+  \end{itemize}
+%MRS: phrasing
+    %\item Once we know the number of monomers in each layer, we still do not know how 
+    
+    Even if we knew the number of monomers in each layer, we still would not know how 
+    monomers in each layer are positioned with respect to other layers. 
+    \begin{itemize}
+      \item A driving force of self assembly in this system is thought to be pi-pi
+      stacking interactions between aromatic headgroups \cite{gazit_possible_2002}. 
+      \item Gas phase ab initio studies of benzene dimers have shown a clear energetic
+      advantage for parallel displaced and T-shaped pi-pi stacking conformations versus a
+      sandwiched conformation ~\cite{sinnokrot_estimates_2002}.
+      \item Substituted benzene rings exhibit an even stronger pi-pi stacking 
+      attraction which favors the parallel displaced configuration in all cases
+      except where the substitutions are extremely electron withdrawing
+      \cite{waller_hybrid_2006,ringer_effect_2006}.
+    \end{itemize}
+    
+%     \item While we might be able to provide answers to these questions using a 
+%     molecular model, there remains the possibility that there is more than one 
+%     metastable state associated with a given LLC system.
+
+% BJC: Does it make sense to talk about metastable states? It was never really a goal to figure out other metastable states. 
+  There remains the possibility that there is more than one metastable state 
+  associated with a given LLC system.
+  \begin{itemize}
+    \item We must be able to identify which states can be produced experimentally
+    and what implications each state might have regarding transport properties.
   \end{itemize}
   
   We must show that the developed molecular model is consistent with
-  physical observations so that we can rely on conclusions drawn about % better word for trust?
+  physical observations so that we can rely on conclusions drawn about
   structural features characteristic of the system.
   \begin{itemize}
     %MRS: main finding shouldn't be the model, but the things learned from the model. New suggestion below.
     %\item This article will illustrate the development of a predictive molecular model 
     %and the steps taken to ensure it mimics the real system within the constraints 
     %inherent to MD.
-    \item In this study, we build a significantly more realistic atomistic model of LLC membranes than has ever previously been done, and explore what new structural information can be gained and what structure hypotheses are supported by this model.
+    \item In this study, we build a significantly more realistic atomistic model of LLC membranes 
+    than has ever previously been done, and explore what new structural information can be gained
+    and what structure hypotheses are supported by this model.
 
     %MRS: this is kind of understood -- rephrasing?
     %\item To understand how physically realistic the model is, validation by comparison
-    to experiment is necessary. 
-    \item We validate the model using as much experimental information as pissible.
-    We are %primarily 
+    %to experiment is necessary. 
+    \item We validate the model using as much experimental information as possible.
+    \item We are %primarily 
     most interested in reproducing the 
     conclusions about structure which have been made from X-ray diffraction (XRD) 
     experiments and in matching ionic conductivity measurements~\cite{feng_thin_2016}.
+    \begin{itemize}
     %MRS: these are really supporting items to the above: put them indented.
-    \item We have comparied simulated X-ray diffraction patterns to experiment in 
-    order to match major features present in the 2D patterns.
-    \item We calculated ionic conductivity using two agreeing methods.
-    \item We examined the the influence of crosslinking on membrane structure.
-
+	    \item We have comparied simulated X-ray diffraction patterns to experiment in 
+	    order to match major features present in the 2D patterns.
+	    \item We calculated ionic conductivity using two agreeing methods.
+	    \item We examined the the influence of crosslinking on membrane structure.
+    \end{itemize}
     %\item We have created a model that can be used to probe the large design space
-    available for membrane design
-    \item The structure-building approach and analysis used in this paper can be readily extended to the H\textsubscript{II}
-    phase and other similar LC systems.
+    % available for membrane design
+    \item The structure-building approach and analysis used in this paper can be readily extended
+    to the H\textsubscript{II} phase and other similar LC systems.
   \end{itemize}
   
   \section*{Methods}
