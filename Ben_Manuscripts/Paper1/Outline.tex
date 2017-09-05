@@ -275,8 +275,9 @@ suggested
   parameterized monomer.
   \begin{itemize}
     \item Monomers were cooled from 1000K to 50K over 10 nanoseconds.
-    %MRS: how chosen?  randomly?  Be precise.  
-    \item A low energy configuration was pulled from the trajectory 
+    % MRS: how chosen? randomly? be precise
+    % BJC: added randomly to bullet point below
+    \item A low energy configuration was randomly pulled from the trajectory
     and charges were reassigned using the am1bccsym method of molcharge
     shipped with Openeye Scientific software's QUACPAC % BJC: how to cite?
     \item Using the new charges, the monomer system was annealed again and monomer
@@ -298,7 +299,7 @@ suggested
     to assemble monomers into a structure close 
     %MRS:
     %to the expected equilibrium configuration. 
-    one of a number of hypothesized equilibrium configurations (Figure~\ref{fig:python}).
+    to one of a number of hypothesized equilibrium configurations (Figure~\ref{fig:python}).
     \item A short, restrained equilibration, followed by NPT simulations 
     between 400 and 500 ns, allows the initial configuration to relax into
     an equilibrium configuration.
@@ -327,7 +328,8 @@ suggested
     \item Ultimately, we chose to build a system with 20 monomer layers in each pore
     in order to obtain sufficient resolution when simulating X-ray diffraction patterns.
     This point will be explained in more detail later.
-    %MRS: you should give the reasons in the same place you describe the choice, but the supporting data would probably be better in supporting information 
+    %MRS: you should give the reasons in the same place you describe the choice, but the supporting data would probably be better in supporting information
+    %BJC: so refer to supporting info here? Then put plots of diffraction data with different sized system there. I did not explain the resolution point here because I haven't talked about simulated X-ray diffraction yet and it wouldn't make sense. And it doesn't make sense to talk about XRD this early in the methods.
   \end{itemize}
   
   We chose initial guesses for the remaining structural parameters based on 
@@ -336,10 +338,13 @@ suggested
   % the bolded structural parameters
   %MRS Breaking into more structure is good. Short sentences, only 3-5 sentences per paragraph.
   %MRS: really, this the core of the 
-  \begin{itemize}
+
     %MRS: initial distance between pores -- we set the initial, and let it find where it wants to be
     %MRS: Or is this the initial data we COMPARE to? Be more specific about the use of these numbers. The use of the data needs to be clarified, since it's main effort here. 
-    \item \textbf{The distance between pores} was based on experimental SAXS data for
+  We placed monomers at an initial pore spacing, then allowed the system to settle 
+  into its preferred spacing. 
+  \begin{itemize}
+    \item Our chosen distance between pores was based on experimental SAXS data for
     this system \cite{feng_thin_2016}.
     %MRS: somewhere, should explain there's a large dependence of (meta)stable structures based on this initial distance.  It's sort of important to put somewhere. 
     \item The model's pore centers are spaced 4.5 nm apart initially, $\approx$ 10 \% larger
@@ -350,27 +355,34 @@ suggested
     \item Pore centers were located by averaging the coordinates of sodium ions in their 
     respective pores.
     \item Statistics were generated using the bootstrapping technique.
+    %BJC: Do bootstrapping details go in supplemental?
     \item For each bootstrap trial, we recreate an equilibrium trajectory by randomly 
     sampling from the original trajectory
-    % This might be too much detail. Maybe leave excess detail for 
-    \item We are interested in 5 pore-to-pore distances which should all be equal in 
-    a perfect hexagonal array. Only 4 are independent  
-    %BJC: small figure here for clarity? supplemental info?
-    %MRS: probably supplemental. 
-   \item Each pore spacing has its own trajectory with its own average value
+    \item Each pore spacing has its own trajectory with its own average value
     \item The average value of each pore spacing is averaged to get the overall
     average pore spacing. 
-    \item The standard deviation of average values is reported as the uncertainty in pore spacing.
-    %MRS: initial layer spacing.  
-    \item The \textbf{layer spacing} is based on experimental 2D WAXS data.
+    \item The standard deviation of average values is reported as the uncertainty in pore spacing
+    % BJC: The following will go in supplemental
+    \item We are interested in 5 pore-to-pore distances which should all be equal in 
+    a perfect hexagonal array. Only 4 are independent  
+  \end{itemize}
+  
+  %MRS: initial layer spacing.
+  The layer spacing is based on experimental 2D WAXS data.
+  \begin{itemize}  
     \item The pattern shows reflections corresponding to features spaced 3.7 \angstrom~apart.
     \item It has been hypothesized that the features are a result of pi-pi
     interactions between stacked aromatic rings \cite{feng_scalable_2014}. 
     \item Our simulations tend to equilibrate to a wider interlayer spacing of
     $\approx$ 4.1 \angstrom, which inspired separate systems starting with layer 
     spacings greater than 4 \angstrom.
+  \end{itemize}
+    
     %MRS: pore radius is a different category isn't it? Is this an input piece of data?
     % should be put in a different category.
+    %BJC: Well I still have to initially place the monomers some distance away from the pore
+    % centers. That distance is informed by the experimental evidence.
+  \begin{itemize}
     \item We estimate the \textbf{pore radius} to be 0.6 nm based on past TEM images 
     and size exclusion rejection data\cite{feng_scalable_2014,feng_thin_2016,
     zhou_supported_2005}.
@@ -391,7 +403,10 @@ suggested
     \item Pore radius was measured by calculating the distance between the center of 
     mass of each aromatic ring and the center of mass of all aromatic rings in their 
     respective pores.
-    %MRS: OK, this is a variable again that we need to set. 
+  \end{itemize}
+  
+  %MRS: OK, this is a variable again that we need to set. 
+  \begin{itemize}
     \item The \textbf{relative interlayer orientation} was chosen based on clues from 
     diffraction data as well as the various known stacking modes of benzene 
     and substituted benzene rings: sandwiched, parallel-displaced and T-shaped
