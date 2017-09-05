@@ -337,16 +337,16 @@ suggested
   %BJC: I could potentially break this paragraph into smaller paragraphs centered around
   % the bolded structural parameters
   %MRS Breaking into more structure is good. Short sentences, only 3-5 sentences per paragraph.
-  %MRS: really, this the core of the 
 
     %MRS: initial distance between pores -- we set the initial, and let it find where it wants to be
     %MRS: Or is this the initial data we COMPARE to? Be more specific about the use of these numbers. The use of the data needs to be clarified, since it's main effort here. 
-  We placed monomers at an initial pore spacing, then allowed the system to settle 
+  We placed pores at a chosen initial spacing, then allowed the system to settle 
   into its preferred spacing. 
   \begin{itemize}
     \item Our chosen distance between pores was based on experimental SAXS data for
     this system \cite{feng_thin_2016}.
-    %MRS: somewhere, should explain there's a large dependence of (meta)stable structures based on this initial distance.  It's sort of important to put somewhere. 
+    %MRS: somewhere, should explain there's a large dependence of (meta)stable structures based on this initial distance.  It's sort of important to put somewhere.
+    %BJC: Sure, but different choices of pore spacing were based on number of monomers per layer. More monomers per layer means a larger initial pore spacing.
     \item The model's pore centers are spaced 4.5 nm apart initially, $\approx$ 10 \% larger
     than the experimental value of 4.12 nm in order to reduce unintended repulsions 
     resulting from a tightly packed initial configuration.
@@ -368,7 +368,7 @@ suggested
   \end{itemize}
   
   %MRS: initial layer spacing.
-  The layer spacing is based on experimental 2D WAXS data.
+  We chose a layer spacing based on experimental 2D WAXS data.
   \begin{itemize}  
     \item The pattern shows reflections corresponding to features spaced 3.7 \angstrom~apart.
     \item It has been hypothesized that the features are a result of pi-pi
@@ -378,19 +378,25 @@ suggested
     spacings greater than 4 \angstrom.
   \end{itemize}
     
-    %MRS: pore radius is a different category isn't it? Is this an input piece of data?
-    % should be put in a different category.
-    %BJC: Well I still have to initially place the monomers some distance away from the pore
-    % centers. That distance is informed by the experimental evidence.
+  %MRS: pore radius is a different category isn't it? Is this an input piece of data?
+  % should be put in a different category.
+  %BJC: Well I still have to initially place the monomers some distance away from the pore
+  % centers. That distance is informed by the experimental evidence.
+  
+  We based the pore radii of our initial configuration on past TEM and size exclusion 
+  rejection data
+  We used experimental Transmission electron microscopy (TEM) and size exclusion rejection
+  data \cite{feng_scalable_2014,feng_thin_2016,zhou_supported_2005} to inform our definition
+  of pore radius in the initial configuration.
   \begin{itemize}
-    \item We estimate the \textbf{pore radius} to be 0.6 nm based on past TEM images 
-    and size exclusion rejection data\cite{feng_scalable_2014,feng_thin_2016,
-    zhou_supported_2005}.
+    \item Experimental evidence suggests uniform pores with radii of 0.6 nm a pore radius
     \item Comparing a geometric measurement of pore size derived from an 
     atomistic model, to a less precise, experimentally derived pore size estimate,
     will give ambiguous results.
     \item What is meant by pore radius will not be clear until we have a clear picture
     of the nanoscopic pore environment.
+    \item Atomistic simulations do a good job of providing the level of detail we need. The challenge
+    will be to ensure that we are producing the correct picture.
     %MRS: point out this is one of the things that atomistic simulation can actually do very well - 
     % provide a clear picture of a nanoscopic environment (the questions is whether it's 
     % providing the _right_ clear picture).
@@ -406,11 +412,11 @@ suggested
   \end{itemize}
   
   %MRS: OK, this is a variable again that we need to set. 
+  The \textbf{relative interlayer orientation} was chosen based on clues from 
+  diffraction data as well as the various known stacking modes of benzene 
+  and substituted benzene rings: sandwiched, parallel-displaced and T-shaped
+  ~\cite{sinnokrot_estimates_2002} (\Cref{fig:sandwiched,fig:pd,fig:tshaped}).
   \begin{itemize}
-    \item The \textbf{relative interlayer orientation} was chosen based on clues from 
-    diffraction data as well as the various known stacking modes of benzene 
-    and substituted benzene rings: sandwiched, parallel-displaced and T-shaped
-    ~\cite{sinnokrot_estimates_2002} (\Cref{fig:sandwiched,fig:pd,fig:tshaped}).
     \item The T-shaped configuration was ruled out based on the inconsistency of
     its $\approx$ 5 \angstrom~equilibrium stacking distance ~\cite{sinnokrot_estimates_2002}.
     \item The system's preference towards the sandwiched vs. parallel displaced 
@@ -418,35 +424,39 @@ suggested
     %BJC: I think the following commentary belongs elsewhere, maybe even in the discussion
     %MRS: hard to say. It's certainly a big switch from things that are relatively straightforward to things that require 
     % a fair amount of information, so I think it belongs in it's own section -- so far, you're just laying out the approach.  This is what we fix, this is what we leave as a variable.  The analysis probably belongs later.
-    \item Visualization of each configuration (\Cref{fig:sandwichedlayers,fig:offsetlayers})
-    suggests entropic differences based on the way the tails are able to pack.
-    \item In the sandwiched configuration, all tails start out directly on top
-    of each other which may prevent closely stacked benzene rings.
-    \item In the offset configuration, the tails are placed in between each other 
-    which may allow layers to come together in a compact way.
-    \item This difference may explain, in part, which stacking mode is more favorable.
+    %BJC: Yeah, I will leave the rest for discussion
+%     \item Visualization of each configuration (\Cref{fig:sandwichedlayers,fig:offsetlayers})
+%     suggests entropic differences based on the way the tails are able to pack.
+%     \item In the sandwiched configuration, all tails start out directly on top
+%     of each other which may prevent closely stacked benzene rings.
+%     \item In the offset configuration, the tails are placed in between each other 
+%     which may allow layers to come together in a compact way.
+%     \item This difference may explain, in part, which stacking mode is more favorable.
   \end{itemize}
 
   An equilibration scheme with position restraints placed on aromatic rings
   %MRS: 
   %prevents 
-  is required to prevent
-  unrealistic jumps during early equilibration steps.
+  during early equilibration steps is required to prevent high energy repulsions .
   %MRS: should be clearer what you mean by ``unrealistic jumps''.  Hard to visualize.
+  %BJC: 'high energy repulsions' ?
   \begin{itemize}
     \item Restraints fix monomer head groups in the sandwiched or parallel-displaced
     configurations while allowing monomer tails to settle.
     \item Doing so also mitigates system dependence on initial monomer configuration.
-    \item Restrained equilibrations are run in the NVT ensemble.
+    \item The restrained portion of the equilibration scheme is run in the NVT ensemble.
     \item Every 50 ps, we reduce the force constants by the square root of its 
     previous value, starting from 1e6 KJ mol\textsuperscript{-1} nm\textsuperscript{-2}.
     \item Once the force constant is below 10 KJ mol\textsuperscript{-1} 
     nm\textsuperscript{-2}, the restraints are slowly released until there is no more 
-    restraining potential.  %BJC: I can reference an equilibration script that can be released with the supplemental info or something
-    \item The resulting unrestrained structure is allowed to equilibrate in the NPT
+    restraining potential.  
+    \item The resulting unrestrained structure is allowed to equilibrate further in the NPT
     ensemble for 400 - 500 ns.
+   %BJC: I will reference an equilibration script that can be released with the supplemental info
    %MRS: we should release as many scripts as is feasible, can be in a github repository.
+   %BJC: Okay, once we submit, I will need to spend some time cleaning the scripts
    %MRS: You've described two equilibration procedures (or two varieties of the same one?) - need to be crystal clear to the reader as to which is used where.
+   %BJC: Yea I'm just saying that I do 50 ps restrained simulations in NVT ensemble and then once the restraints are gone I switch to NPT. I edited the language to try and make it clearer.
   \end{itemize}
   
   %BJC: the following paragraph will be replaced with something that Joe writes
@@ -500,8 +510,7 @@ suggested
 	configuration }\label{fig:stacking}
   \end{figure}
   
-  Ionic conductivity was calculated using two different methods for
-  robustness.
+  We calculated ionic conductivity using two different methods for robustness.
   \begin{itemize}
     \item The Nernst-Einstein relation relates the DC ionic conductivity to 
     ion diffusivity, $D$, concentration, $C$, ion charge, $q$, the boltzmann 
@@ -509,21 +518,26 @@ suggested
     \item Sodium ion diffusion coefficients were found by calculating the slope
     of the linear region of the mean square displacement curve as indicated by
     the einstein relation \cite{einstein_investigations_1956}.]
-    %MRS: state how you decided which was the linear region.  
+    %MRS: state how you decided which was the linear region.
+    %BJC: nothing fancy other than looking at the msd plot and determing where to
+    % start fitting. I suppose I could minimize R^2 but that seems like overkill
+    \item We looked at the MSD plot to determine where to begin and end a linear fit
     \item Ion concentration was measured with respect to the entire unit cell. 
     %BJC: I don't think this needs to be said
     %MRS: probably - people might think of conduction just occurring in the pore, so clarity is good. Could potentially have a figure illustrating the two ways of calculating conductance?  
     \item The second method, termed the 'Collective Diffusion' model, measures 
     the movement of the collective variable, Q, which is defined as the amount
-    of charge transfer through the system.
-    \item The diffusion coefficient of Q, $D_Q$, can be calculated using the 
-    einstein relation.
-    %MRS: might need a bit more mathematical description of what is done here. For example explicitly stating that the D is 
-    % the diffusion coefficient of the variable D, which is the center of the charge (I think?)
+    of charge transfer through the system and can be thought to represent
+    the center of charge of the system.
     \item The conductance, $\gamma$ of the system can be calculated as:
     $$ \gamma = \dfrac{D_Q}{k_b T} $$ Conversion to ionic conductivity is
     achieved by multiplying by channel length and dividing by the membrane
     cross sectional area.
+    \item $D_Q$ is the diffusion coefficient of the collective variable Q. It can
+    be calculated using the einstein relation.
+    %MRS: might need a bit more mathematical description of what is done here. For example explicitly stating that the D is 
+    % the diffusion coefficient of the variable Q, which is the center of the charge (I think?)
+    %BJC: yea its the center of charge since I add all of the charges together. I added something to the effect of what you are saying. Also put the equation earlier.
     \item A full derivation of the model can be accessed elsewhere \cite{liu_collective_2013}.
     %MRS: still want to state it clearly.   
   \end{itemize}
