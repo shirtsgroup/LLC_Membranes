@@ -593,10 +593,11 @@ suggested
   systems created with 4 - 8 monomers per layer.
   \begin{itemize}
   	\item Both the sandwiched and parallel displaced configurations were tested.
-	\item All systems remained stable for at least 50 ns.
+	\item All systems are stable after 50 ns of simulation.  % BJC: edited this for clarity
         %MRS: you only ran for 50 ns, or after 50 ns some of them started to destabilize?  Is the point you are making that they are ALL pretty stable, or all at least a little stable.   
         %MRS: are they all equally stable? I though you had some additional information on this. Are you saving it for later?  
-        %MRS: remind people where the uncertainty comes from.   
+        %MRS: remind people where the uncertainty comes from.
+	%BJC: It looks like the 7 and 8 monomer systems were only run for 50 ns. The 4 monomer system was run for 200 ns. 5 and 6 have a lot of data. 7 and 8 flattened pretty quickly, so at the time I figured it wasn't worth continuing. But I'll extend them just to be thorough.
 
 	\item Table ~\ref{table:p2p} shows the pore spacing for all systems tested. 
 	Systems built with 5 monomers in each layer equilibrate to a pore spacing
@@ -606,6 +607,7 @@ suggested
 	pair correlation functions calculated between aromatic rings along the length
 	of the pores (Fig~\ref{fig:zdf}).
         %MRS: explain how that conclusion was reached (perioic with period X, minima was Y percent lower than mean, maxima was Y percent higher).
+	%BJC: okay, need to run some calculations here.
 	\item The remainder of this discussion will focus on the analysis of systems
 	built with 5 monomers per layer. 
   \end{itemize}
@@ -661,8 +663,9 @@ suggested
 	possesses a higher degree of layer partitioning.}\label{fig:zdf}
   \end{figure}
 
-  Experimental WAXS measurements encode all remaining structural details. 
+  Experimental WAXS measurements encode all structural details. 
   %MRS: also encodes the pore spacing
+  %BJC: got rid of 'remaining' in 'remaining structural details'
   %BJC: I'm not exactly sure where to place this paragraph. Maybe it can go in methods?
   \begin{itemize}
   	\item There are five major features present in the 2D experimental 
@@ -673,8 +676,9 @@ suggested
 	perpendicular to the membrane plane, or z-axis. For simplicity, this 
 	reflection will be referred to as R-pi.
         %MRS: why R in R-pi? for reflection?
+	%BJC: yes, R = reflection
 	\item A weak intensity line is located at exactly half the qz value of
-	R-pi (qz = 0.85 \angstrom \textsuperscript{-1}), corresponding to a 
+	R-pi (qz = 0.85 \angstrom$^-1$), corresponding to a 
         %MRS: or could use \angstrom$^-1$ instead of \textsuperscript{-1} 
 	real space periodic spacing of 7.4 \angstrom. This reflection has been 
 	interpreted  as 2\textsubscript{1} helical ordering of aromatic rings 
@@ -716,6 +720,8 @@ suggested
 	features less than 1 nanometer apart. (b) 1D small angle X-ray scattering 
 	indicates hexagonal packing of pores as well as the spacing between pores.}\label{fig:SWAXS}
         %MRS: maybe compare the 2D and 1D from simulation here as well?  Need to state the above figure is from another paper (I think at least the 1D is?)
+	%BJC: 1D is from a Yale paper. I'm going to remake the figure from the raw data but will reference that
+	%BJC: The simulated 1D shows the right peaks, but the resolution makes it kind of pointy. I'll let you take a look at it but maybe it belongs in the supplemental
   \end{figure}
   
   The initial distance between layers can influence the approach towards
