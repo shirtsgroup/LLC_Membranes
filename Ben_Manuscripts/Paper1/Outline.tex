@@ -156,14 +156,14 @@ rather than just hydrodynamic radius.
   Our approach to constructing a general model will be based on the development of a
   model of a specific LLC membrane which has ample experimental characterization. %BJC: ample too much?
     \begin{itemize}
-    \item We have chosen to focus on assemblies formed by Na-GA3C11
-    \item We have also narrowed our scope to the development of 
-    a model of the Col\textsubscript{h} phase membrane.
-    \item Compared to the H\textsubscript{II} phase, the Col\textsubscript{h}
-    phase is a simpler starting point, due to the absence of water, and has
-    equivalent experimental structural data.
-    \item Despite having structural data, there is still information which 
-    experiment cannot definitively answer
+	    \item We have chosen to focus on assemblies formed by Na-GA3C11
+	    \item We have also narrowed our scope to the development of 
+	    a model of the Col\textsubscript{h} phase membrane.
+	    \item Compared to the H\textsubscript{II} phase, the Col\textsubscript{h}
+	    phase is a simpler starting point, due to the absence of water, and has
+	    equivalent experimental structural data.
+	    \item Despite having structural data, there is still information which 
+	    experiment cannot definitively answer
     \end{itemize}
 
 %BJC: the following just seems like filler now that I've reorganized
@@ -727,15 +727,20 @@ suggested
   The initial distance between layers can influence the approach towards
   equilibrium. 
   \begin{itemize}
+  	\item Our choice of distance between layers results in long-term stability of 
+	different configurations indicating that we have found more than one metastable
+	free energy basin.
   	\item Equilibrated systems built according to the 3.7 \angstrom 
 	layer spacing implied by R-pi are characterized by a defined, cylindrical and
 	open pore structure.
 	\item Aromatic rings are arranged in a helical conformation.%BJC: could potentially support with a figure. Mentioning the helical arrangmentment might makes things confusing though
         %MRS: 'basin' is not that common a term, and also only makes sense if one explicitly states what 
         %MRS: the basin is with respect to. 
-        We will refer to this large set of configurations, with an open helical pore, as Basin A (Figure~\ref{fig:abasin}).
+	%BJC: added sentence to beginning of paragraph
+        \item We will refer to this large set of configurations, with an open helical pore, as Basin A (Figure~\ref{fig:abasin}).
         %\item We will refer to this system as
         %MRS: maybe Basin O and Basin C for open and closed?
+	%BJC: That works but 'capital oh' might get confused with zero
 	\item Simulations of systems built with layers stacked greater than 4 
 	\angstrom apart results in a pore structure characterized by high radial 
 	disorder, while still maintaining partitioning between hydrophobic and 
@@ -743,11 +748,12 @@ suggested
         %MRS: see above for clarifying ``basins''.
 	\item This will be called Basin B (Figure~\ref{fig:bbasin}).
         %MRS: I don't think enough information has been presented to the reader yet for this to be 'apparent'.
-	\item It is apparent that this LLC membrane may exist in at least two metastable states.
+	\item This LLC membrane may exist in at least two metastable states.
 	\item The distinct difference in pore structure exhibited by each phase will 
 	likely lead to different transport mechanisms.
-	\item Understanding which phase exists experimentally is necessary in order
-	to appropriately study the system.  %MRS: remind people why.
+	\item Because the pore structure will vary between each Basin, understanding 
+	which phase exists experimentally is necessary in order to ensure we are 
+	studying the system which actually dominates.  %MRS: remind people why.
   \end{itemize}
   
   \begin{figure}[!ht]
@@ -773,13 +779,13 @@ suggested
   %so that only the results are left to reveal.  Fit what you are doing 
   %in the logic pattern you lay out (which may sometimes require adjusting the logic a bit)
 
-  We varied the relative interlayer orientation between sandwiched and 
+  We varied the initial relative interlayer orientation between sandwiched and 
   parallel-displaced based on our knowledge of the stability of the two
   pi-stacking modes.
   \begin{itemize}
-  	\item We generated simulated X-ray diffraction patterns from the highly
+  	\item We generated simulated X-ray diffraction patterns using simulation trajectories from the highly
 	restrained initial configurations created during equilibration
-	\item The patterns establish a difference between the two stacking 
+	\item The simulated patterns establish a difference between the two stacking 
 	modes (Figure~\ref{fig:XRDrestrained}).
 	\item In each pattern, R-alkanes is present at a distance of $\approx
 	1.5$ \angstrom \textsuperscript{-1} (4.2 \angstrom in real space).
@@ -787,6 +793,7 @@ suggested
 	intersect R-alkanes because the spacing between aromatic rings is 
 	similar to the alkane chain packing.
         %MRS: for above, may need to clarify that this is in simulation, which is different than experiment.
+	%BJC: okay added some more specific language
 	\item The difference in aromatic ring spacing between experiment and
 	simulation is likely a result of the inability of GAFF to properly handle
 	aromatic interactions. %MRS: provide citations, some mechanistic reasoning.
@@ -827,7 +834,7 @@ suggested
 	but it is difficult to distinguish because of its intersection with the solid
 	R-helix line. 
         %MRS: Longer simulations are necessary to determine which structure
-	is the best match to experiment
+	% is the best match to experiment
         %MRS: we probably want to avoid saying this (above) if we can.
 }\label{fig:XRDrestrained}
   \end{figure}
@@ -850,10 +857,9 @@ suggested
 	\item The three systems were equilibrated according to our procedure with
 	NPT simulations of greater than 400 ns.
 	\item Simulated diffration patterns were generated using portions of the
-	trajectory after equilibration.
-%MRS: something like ``we assume the simulation has equilibrated when the distance . . . ``        
-	\item Equilibration was detected when the distance between pores and the 
-	membrane thickness stopped changing.
+	trajectory after equilibration.  
+	\item We assume the simulation has equilibrated when the distance between 
+	pores and the membrane thickness stopped changing.
 	\item Simulated diffraction patterns for all three structures are shown in 
 	Figure ~\ref{fig:XRDsim}. 
 	%BJC: maybe break into a separate paragraph starting here
@@ -910,6 +916,7 @@ suggested
 	equilibrated disordered phase}\label{fig:XRDsim}
   \end{figure}
 
+% Supplemental VVV
   \begin{wrapfigure}{R}{0.4\textwidth}
         \centering
         \includegraphics[width=0.4\textwidth]{tilt.png}
@@ -937,6 +944,7 @@ suggested
 	nearly hexagonal array of packed tails. 
         %MRS: hmm.  and this doens't happen in parallel displaced? I thought it did.
         %thought it did before. Would be good to explore the equivalent of figure 9 to this, because that comparison would make it clearer what the structural reason is for the R-spots.
+	%BJC: There aren't spots in parallel displaced and the distribution does not have the spikes that the sandwiched configuration does. At this point in the paper, I've tried to say that parallel displaced configuration is not consistent with experiment and I focus the rest of the paper on the sandwiched configuration
   \end{itemize}
   
   \begin{figure}[!ht]
@@ -1118,6 +1126,8 @@ suggested
         %MRS: Are (a) and (b) from the nonequilibrium short run?
         %That's not clear. Not clear it's possible to state that it's
         %the ``right'' disordered basin if from the end of a short heating run.
+	%BJC: They are from the short run, but as I comment above, I need to 
+	% replace them with the correct figures
 
 	\caption{In all cases, blue lines represent the measured value of
 	the order parameter, black lines are average values calculated from
@@ -1157,9 +1167,8 @@ suggested
 	\item We hypothesize that conductivity is enhanced in Basin B due to a 
 	higher sodium ion diffusivity.
 	\item Transport of sodium is likely facilitated by the homogeneity of Basin B.
-	Sodium ions have less sites to move to in Basin A.
-        % total number of sites is the same in both basins, correct? -- do you mean that in basin B, there are more nearby sites?
-	\item There is currently no experimental evidence of this trend. Maybe Xund will find something
+	Sodium ions have less nearby sites to move to in Basin A.
+	\item There is currently no experimental evidence of this trend. Maybe Xunda will find something
 	\item In both cases, our calculated values for Basin A are higher than the 
 	experimental values, as expected. 
 	\item Some of the discrepancy is likely a result of using an imperfect forcefield. 
@@ -1233,6 +1242,8 @@ suggested
 	individual pores in the crosslinked system are stable relative to the uncrosslinked
 	system}\label{fig:xlink}
   \end{figure}
+  
+  \section*{Conclusion}
 
 \clearpage
 \bibliography{llc}
