@@ -2,11 +2,11 @@
 set -e
 # A script to iteratively crosslink a LLC system
 
-CUTOFF=1  # percent of distribution that will be labeled close enough to bond
-TERM_PROB=1  # probability of termination of carbons meeting bonding criteria
+CUTOFF=5  # percent of distribution that will be labeled close enough to bond
+TERM_PROB=5  # probability of termination of carbons meeting bonding criteria
 GRO='wiggle.gro'  # initial .gro file to be crosslinked
 CUTOFF_RAD=20  # percent of distribution that are labeled close enough to bond in the context of reactive radicals
-SIM_LENGTH=10  # picoseconds of simulation between iterations
+SIM_LENGTH=5  # picoseconds of simulation between iterations
 XLINKS=0
 FRAMES=50
 DEGREE=.9  # Degree of crosslinking
@@ -17,8 +17,9 @@ STOP=0
 TOP='topol.top'
 MDP='npt.mdp'
 INIT_CONFIG='initial.gro'
+TIMESTEP=0.001
 
-while getopts "c:t:g:d:s:x:f:m:C:p:M:i:" opt; do
+while getopts "c:t:g:d:s:x:f:m:C:p:M:i:S:" opt; do
     case $opt in
     c) CUTOFF=$OPTARG;;
     t) TERM_PROB=$OPTARG;;
@@ -32,6 +33,7 @@ while getopts "c:t:g:d:s:x:f:m:C:p:M:i:" opt; do
     p) TOP=$OPTARG;;
     M) MDP=$OPTARG;;
     i) INIT_CONFIG=$OPTARG;;
+    S) TIMESTEP=$OPTARG;;
     esac
 done
 
@@ -43,7 +45,7 @@ if [ ${ITERATION} != 0 ]; then
     ITERATION=$((ITERATION+1))
 fi
 
-input.py -b ${MONOMER} -S -c ${GRO} -x -l ${SIM_LENGTH} -f ${FRAMES} --genvel no
+input.py -b ${MONOMER} -S -c ${GRO} -x -l ${SIM_LENGTH} -f ${FRAMES} --genvel no -d ${TIMESTEP}
 
 while [ ${STOP} -eq 0 ]; do
     if [ ${ITERATION} == 0 ]; then
@@ -63,6 +65,7 @@ while [ ${STOP} -eq 0 ]; do
     gmx mdrun -v -deffnm em
     gmx grompp -f ${MDP} -p topol.top -c em.gro -o wiggle
     gmx mdrun -v -deffnm wiggle
+    echo 0 | gmx trjconv -f wiggle.gro -s wiggled.gro -pbc atom -o wiggle.gro -ur tric
     XLINKS=$(tail xlink_${ITERATION}.log -n 2 | head -n 1 | cut -c 19-22)
     TERM=$(tail -n 6 xlink_${ITERATION}.log | head -n 1 | cut -c 26-29)
     STOP=$(tail -n 1 xlink_${ITERATION}.log | cut -c 26)

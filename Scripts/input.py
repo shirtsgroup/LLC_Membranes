@@ -106,6 +106,7 @@ if args.ensemble == 'npt':
     a.append(['DispCorr = EnerPres\n'])
     if args.xlink:
         a.append('periodic-molecules = yes\n')
+        a.append('lincs-iter=4')
     if args.restraints:
         a.append(['refcoord-scaling = all\n'])
 

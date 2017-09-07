@@ -429,6 +429,7 @@ if __name__ == "__main__":
 
     c1 = []
     c2 = []
+
     for i in range(len(c1_uniq)):
         if c2_uniq[i] + 1 in c1_uniq:
             if c2_uniq[i] + 1 not in c1:
@@ -438,8 +439,15 @@ if __name__ == "__main__":
             c1.append(c1_uniq[i])
             c2.append(c2_uniq[i])
 
-    print("c1: %s" %c1)
-    print("c2: %s" %c2)
+    # print("c1: %s" %c1)
+    # print("c2: %s" %c2)
+    # A table of crosslinks
+    print('Crosslinks:')
+    print('{:^10s}{:^10s}'.format('c1', 'c2'))
+    print('--------------------')
+    for i in range(len(c1)):
+        print('{:^8d} -- {:^8d}'.format(c1[i], c2[i]))
+
 
     # adjacent_c1 = []
     # for i in range(len(c2_uniq)):
