@@ -23,9 +23,9 @@ for i in range(23):
     waxs[x, y] = 0
 
 waxs /= np.amax(waxs)  # normalize with respect to highest intensity in pi-stacking reflection
-plt.imshow(waxs, cmap='seismic')
-plt.show()
-exit()
+# plt.imshow(waxs, cmap='seismic')
+# plt.show()
+# exit()
 # x = np.linspace(-2, 2, 2*hw)
 # y = np.linspace(-2, 2, 2*hw)
 # xx, yy = np.meshgrid(x, y)

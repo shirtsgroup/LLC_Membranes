@@ -357,3 +357,39 @@ def rotate_coords_z(xyz, angle):
         xyz[i, :] = np.dot(R, xyz[i, :])
 
     return xyz
+
+
+def Rvect2vect(a, b):
+    """
+    Find rotation of a so that its orientation matches b.
+    :param a: vector to be rotated
+    :param b: vector to rotate to
+    :return: rotation matrix for rotate a to b
+    """
+
+    cross = np.cross(a, b)  # find vector perpendicular to a and b
+    x = cross / np.linalg.norm(cross)  # normalize
+
+    y = np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+    theta = np.arccos(y)
+
+    A = np.matrix([[0, -x[2], x[1]], [x[2], 0, -x[0]], [-x[1], x[0], 0]])
+    I = np.identity(3)
+
+    R = I + np.sin(theta)*A + (1 - np.cos(theta))*(A**2)
+
+    return R
+
+
+def rotate_coords(xyz, R):
+    """
+    Given a rotation matrix, rotate all points in an array
+    :param xyz: xyz coordinates of all positions to be rotated
+    :param R: rotate plane
+    :return: rotated coordinates
+    """
+
+    for i in range(np.shape(xyz)[0]):
+        xyz[i, :] = np.dot(R, xyz[i, :])
+
+    return xyz
