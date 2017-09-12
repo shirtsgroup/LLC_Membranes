@@ -180,5 +180,6 @@ for i in range(grid.shape[0]):
 # ax = fig.add_subplot(111, projection='3d')
 
 X, Y, Z, U, V, W = zip(*gradv)
+
 ax.quiver(X, Y, Z, U, V, W, length=0.25)
 plt.show()
