@@ -129,7 +129,9 @@ def plot_implicit(fn, bbox=(-2.5, 2.5)):
     :return:
     """
     xmin, xmax, ymin, ymax, zmin, zmax = bbox*3
-    fig = plt.figure()
+    #MRS: trying to get aspect ratio equal
+    #fig = plt.figure()
+    fig = plt.figure(figsize=plt.figaspect(1.0))
     ax = fig.add_subplot(111, projection='3d')
     A = np.linspace(xmin, xmax, 100)  # resolution of the contour
     B = np.linspace(xmin, xmax, 50)  # number of slices
@@ -178,6 +180,5 @@ for i in range(grid.shape[0]):
 # ax = fig.add_subplot(111, projection='3d')
 
 X, Y, Z, U, V, W = zip(*gradv)
-
 ax.quiver(X, Y, Z, U, V, W, length=0.25)
 plt.show()
