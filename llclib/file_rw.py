@@ -13,7 +13,7 @@ from past.utils import old_div
 import numpy as np
 import copy
 import math
-from Scripts import Periodic_Images
+import Periodic_Images
 from . import transform
 import mdtraj as md
 import os

@@ -16,7 +16,7 @@ import copy
 import mdtraj as md
 from llclib import transform
 from matplotlib import path
-from Scripts import LC_class
+import LC_class
 import random
 
 start = time.time()  # For informational purposes

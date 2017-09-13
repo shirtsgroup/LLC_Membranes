@@ -12,13 +12,7 @@
 \usepackage{booktabs}
 \usepackage{gensymb}
 \usepackage{float}
-%MRS: paper needs a conclusions section outlined.
-%MRS: maybe replace pi with $\pi$,qz with $q_z$, and \angstrom by \angstrom~ (the tilde is an enforced space)
-%MRS: also maybe \AA instead of \angstrom?  I can't remember which formats better in text.
-%\title{Predicting Transport in Lyotropic Liquid Crystal Membranes with Molecular Dynamics Simulations -- Outline}
-%MRS: focus isn't really on transport, but on what the strucures are.
 \title{Understanding the nanoscale structure of hexagonal phase lyotropic liquid crystal membranes}
-%MRS: I don't know that we need to put MD simulations alone in the title, since we also do a fair amount of comparison to experiment. 
 \author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble \and Joe Yelk \and Matthew Glaser \and Xunda Feng \and Michael R. Shirts} 
 \begin{document}
   \bibliographystyle{ieeetr}
@@ -200,7 +194,7 @@ rather than just hydrodynamic radius.
   \end{itemize}
 
   (2) If layers do exist, how many monomers constitute a single layer?
-  There has been definitive answer to the question in literature.
+  There has been no definitive answer to the question in literature.
 %   We do not know the number of monomers that constitute the layers which stack
 %   on top of each other to create pores.
   \begin{itemize}
@@ -227,12 +221,12 @@ suggested
 %     Even if we knew the number of monomers in each layer, we still would not know how 
 %     monomers in each layer are positioned with respect to other layers. 
     \begin{itemize}
-      \item A driving force of self assembly in this system is thought to be pi-pi
+      \item A driving force of self assembly in this system is thought to be $\pi$-$\pi$
       stacking interactions between aromatic headgroups \cite{gazit_possible_2002}. 
       \item Gas phase ab initio studies of benzene dimers have shown a clear energetic
-      advantage for parallel displaced and T-shaped pi-pi stacking conformations versus a
+      advantage for parallel displaced and T-shaped $\pi$-$\pi$ stacking conformations versus a
       sandwiched conformation ~\cite{sinnokrot_estimates_2002}.
-      \item Substituted benzene rings exhibit an even stronger pi-pi stacking 
+      \item Substituted benzene rings exhibit an even stronger $\pi$-$\pi$ stacking 
       attraction which favors the parallel displaced configuration in all cases
       except where the substitutions are extremely electron withdrawing
       \cite{waller_hybrid_2006,ringer_effect_2006}.
@@ -326,6 +320,19 @@ suggested
     %MRS:
     %to the expected equilibrium configuration. 
     to one of a number of hypothesized equilibrium configurations (Figure~\ref{fig:python}).
+    %\item A short, restrained equilibration, followed by NPT simulations 
+    %between 400 and 500 ns, allows the initial configuration to relax into
+    %an equilibrium configuration.
+    %\item Our logic for choosing a starting configuration and the details
+    %of the equilibration schemes are presented below.
+   \end{itemize}
+
+  We tested a number of equilibration schemes in an effort to match experiment
+  while overcoming kinetic limitations of such a large system that can easily
+  get stuck in multiple metastable states.
+    Equilibration Scheme A:
+    \item Apply position restraints to aromatic rings in order to maintain
+    orientational order. 
     \item A short, restrained equilibration, followed by NPT simulations 
     between 400 and 500 ns, allows the initial configuration to relax into
     an equilibrium configuration.
@@ -397,11 +404,11 @@ suggested
   We chose a layer spacing based on experimental 2D WAXS data.
   \begin{itemize}  
     \item The pattern shows reflections corresponding to features spaced 3.7 \angstrom~apart.
-    \item It has been hypothesized that the features are a result of pi-pi
+    \item It has been hypothesized that the features are a result of $\pi$-$\pi$
     interactions between stacked aromatic rings \cite{feng_scalable_2014}. 
     \item Our simulations tend to equilibrate to a wider interlayer spacing of
-    $\approx$ 4.1 \angstrom, which inspired separate systems starting with layer 
-    spacings greater than 4 \angstrom.
+    $\approx$ 4.1 \angstrom~, which inspired separate systems starting with layer 
+    spacings greater than 4 \angstrom~.
   \end{itemize}
     
   %MRS: pore radius is a different category isn't it? Is this an input piece of data?
@@ -460,30 +467,79 @@ suggested
 %     \item This difference may explain, in part, which stacking mode is more favorable.
   \end{itemize}
 
-  An equilibration scheme with position restraints placed on aromatic rings
+  We tested a number of equilibration schemes of increasing complexity in an effort
+  to match experiment while overcoming kinetic limitations of such a large system 
+  that can easily get stuck in multiple metastable states. All start from an initial
+  configuration generated with chosen structure variables. 
+  \begin{itemize}
+      \item Equilibration Scheme A:
+      \begin{itemize}
+          \item Steepest descent energy minimization
+          \item Short NPT simulation (~ 5 ns ) with berendsen barostat (tau-p = 1) at 300 K 
+          \item Switch to Parrinello-Rahman (tau-p = 10) and run NPT simulation for 400 - 500 ns
+          %\item Final structure strongly influenced by monomer configuration used to build 
+      \end{itemize}
+      \item Equilibration Scheme B:
+      \begin{itemize}
+          \item Restraints fix monomer head groups in the sandwiched or parallel-displaced
+          configurations while allowing monomer tails to settle.
+          \item Doing so also mitigates system dependence on initial monomer configuration.
+          \item The restrained portion of the equilibration scheme is run in the NVT ensemble.
+          \item Every 50 ps, we reduce the force constants by the square root of its
+          previous value, starting from 1e6 KJ mol$^-1$ nm$^-2$.
+          \item Once the force constant is below 10 KJ mol$^-1$ nm$^-2$, the restraints are
+          slowly released until there is no more restraining potential.
+          \item The resulting unrestrained structure is allowed to equilibrate further in the NPT
+          ensemble for 400 - 500 ns in the same way as Scheme A.
+      \end{itemize}
+      \item Equilibration Scheme C:
+      \begin{itemize} 
+          \item A system equilibrated according to scheme B is cut in half so we can access
+          longer simulation timescales
+          \item The system is simulated at 335K, close to its isotropic transition temperature, for 200 ns. % BJC: not entirely sure if it needs to be an already equilibrate structure
+          \item The structure is then linearly cooled back down to 300 K over 500 ns. 
+          \item The system size is doubled back to its original size and equilibrated for 200 ns at 300 K.
+          \item Tried with and without an applied electric field.
+      \end{itemize}
+      \item Equilibration Scheme D:
+      \begin{itemize}
+          \item Even in the near dry Col\textsubscript{h} system, there exists an
+          equilibrium concentration of water.
+          \item The hydrogen bonding network formed by the water may play a role 
+          in structuring the pore.
+          \item We obtained an estimate of equilibrium pore water content by solvating
+          an initial configuration with water baths above and below the membrane. 
+	  \item We ran the solvated system according to Scheme A but for 1000 ns
+          \item Using that number we added water to the pores of an initial 
+	  configuration and equilibrated according to scheme B. 
+      \end{itemize}
+      \item In all cases, the v-rescale thermostat was used with tau-t = 0.1
+  \end{itemize}
+
+%  An equilibration scheme with position restraints placed on aromatic rings
   %MRS: 
   %prevents 
-  during early equilibration steps is required to prevent high energy repulsions .
+%  during early equilibration steps is required to prevent high energy repulsions .
   %MRS: should be clearer what you mean by ``unrealistic jumps''.  Hard to visualize.
   %BJC: 'high energy repulsions' ?
-  \begin{itemize}
-    \item Restraints fix monomer head groups in the sandwiched or parallel-displaced
-    configurations while allowing monomer tails to settle.
-    \item Doing so also mitigates system dependence on initial monomer configuration.
-    \item The restrained portion of the equilibration scheme is run in the NVT ensemble.
-    \item Every 50 ps, we reduce the force constants by the square root of its 
-    previous value, starting from 1e6 KJ mol\textsuperscript{-1} nm\textsuperscript{-2}.
-    \item Once the force constant is below 10 KJ mol\textsuperscript{-1} 
-    nm\textsuperscript{-2}, the restraints are slowly released until there is no more 
-    restraining potential.  
-    \item The resulting unrestrained structure is allowed to equilibrate further in the NPT
-    ensemble for 400 - 500 ns.
+%  \begin{itemize}
+%    \item Restraints fix monomer head groups in the sandwiched or parallel-displaced
+%    configurations while allowing monomer tails to settle.
+%    \item Doing so also mitigates system dependence on initial monomer configuration.
+%    \item The restrained portion of the equilibration scheme is run in the NVT ensemble.
+%    \item Every 50 ps, we reduce the force constants by the square root of its 
+%    previous value, starting from 1e6 KJ mol\textsuperscript{-1} nm\textsuperscript{-2}.
+%    \item Once the force constant is below 10 KJ mol\textsuperscript{-1} 
+%    nm\textsuperscript{-2}, the restraints are slowly released until there is no more 
+%    restraining potential.  
+%    \item The resulting unrestrained structure is allowed to equilibrate further in the NPT
+%    ensemble for 400 - 500 ns.
    %BJC: I will reference an equilibration script that can be released with the supplemental info
    %MRS: we should release as many scripts as is feasible, can be in a github repository.
    %BJC: Okay, once we submit, I will need to spend some time cleaning the scripts
    %MRS: You've described two equilibration procedures (or two varieties of the same one?) - need to be crystal clear to the reader as to which is used where.
    %BJC: Yea I'm just saying that I do 50 ps restrained simulations in NVT ensemble and then once the restraints are gone I switch to NPT. I edited the language to try and make it clearer.
-  \end{itemize}
+%  \end{itemize}
   
   %BJC: the following paragraph will be replaced with something that Joe writes
   %MRS: sounds good.
@@ -495,7 +551,7 @@ suggested
     \item A three dimensional fourier transform (FT) of the array of electron 
     density results in a three dimensional structure factor which represents
     the unit cell in reciprocal space.
-    \item We perform an angular average of the structure factor about the 
+   % \item We perform an angular average of the structure factor about the 
     z axis to generate a 2D cross section close to what one would see 
     experimentally.
     \item We matched experimental 2D WAXS patterns by iterative improvement
@@ -530,8 +586,8 @@ suggested
 		\includegraphics[width=\textwidth]{offsetlayers.png}
 		\caption{}\label{fig:offsetlayers}
 	\end{subfigure}
-	\caption{(a) Sandwiched benzene dimers stack 3.8 \angstrom apart. (b) Parallel-Displaced benzene dimers stack
-	3.4 \angstrom vertically and 1.6 \angstrom horizontally apart. (c) T-shaped benzene dimers stack 5.0 \angstrom apart. 
+	\caption{(a) Sandwiched benzene dimers stack 3.8 \angstrom~apart. (b) Parallel-Displaced benzene dimers stack
+	3.4 \angstrom~vertically and 1.6 \angstrom~horizontally apart. (c) T-shaped benzene dimers stack 5.0 \angstrom~apart. 
 	(d) Two monomer layers stacked in the sandwiched configuration (e) Two monomer layers stacked in the parallel-displaced
 	configuration }\label{fig:stacking}
   \end{figure}
@@ -598,7 +654,7 @@ suggested
     crosslinks between monomer tails of the same monomer, monomers stacked on
     top of each other and monomers in other pores, including across periodic
     boundaries.
-    \item The pore spacing shrinks by $\approx$ 1 \angstrom and stays 
+    \item The pore spacing shrinks by $\approx$ 1 \angstrom~ and stays 
     constant under a range of simulation conditions.
   \end{itemize}
   
@@ -655,7 +711,7 @@ suggested
   \end{tabular}
   \caption{The pore spacing 
   %MRS added
-  (given in \angstrom)
+  (given in \angstrom~)
   of the model increases as number of monomers
   in each layer increases. The pore spacing of a system starting in the 
   sandwiched configuration is systematically lower than that started in an 
@@ -663,7 +719,7 @@ suggested
   displaced configuration result in a pore spacing closest 
   %MRS: clarified.
   %to experimental data
-  to the experimental 4.12 \angstrom}\label{table:p2p} 
+  to the experimental 4.12 \angstrom~}\label{table:p2p} 
   \end{table}
   
   \begin{figure}[!ht]
@@ -696,33 +752,32 @@ suggested
   \begin{itemize}
   	\item There are five major features present in the 2D experimental 
 	pattern which our model intends to reproduce (Figure~\ref{fig:WAXS}).
-	\item The first is located at qz = 1.7 \angstrom \textsuperscript{-1},
-	corresponding to a real spacing of 3.7 \angstrom. The reflection is 
-	attributed to pi-pi stacking between aromatic rings in the direction
+	\item The first is located at $q_z$ = 1.7 \angstrom$^-1$,
+	corresponding to a real spacing of 3.7 \angstrom~. The reflection is 
+	attributed to $\pi$-$\pi$ stacking between aromatic rings in the direction
 	perpendicular to the membrane plane, or z-axis. For simplicity, this 
 	reflection will be referred to as R-$\pi$.
         %MRS: why R in R-pi? for reflection?
 	%BJC: yes, R = reflection
-	\item A weak intensity line is located at exactly half the qz value of
-	R-$\pi$ (qz = 0.85 \angstrom$^-1$), corresponding to a 
-        %MRS: or could use \angstrom$^-1$ instead of \textsuperscript{-1} 
-	real space periodic spacing of 7.4 \angstrom. This reflection has been 
+	\item A weak intensity line is located at exactly half the $q_z$ value of
+	R-$\pi$ ($q_z$ = 0.85 \angstrom$^-1$), corresponding to a 
+	real space periodic spacing of 7.4 \angstrom~. This reflection has been 
 	interpreted  as 2\textsubscript{1} helical ordering of aromatic rings 
 	along the z axis meaning if the positions of the aromatic rings can
 	be traced by a helix, then for each turn in the helix, there should be
 	two aromatic rings. For this reason it will be referred to as R-helix.
 	\item A third major reflection is marked by a low intensity ring located
-	at r = 1.4 \angstrom \textsuperscript{-1}. The real space separation 
-	corresponds to 4.5 \angstrom which is characteristic of the average 
+	at r = 1.4 \angstrom$^-1$. The real space separation 
+	corresponds to 4.5 \angstrom~ which is characteristic of the average 
 	spacing between packed alkane chains. This reflection will be called R-alkanes.
 	\item Within R-alkanes, are four spots of higher intensity which 
-	will be called R-spots. All are located $\approx 40$ degrees from the qz axis
+	will be called R-spots. All are located $\approx 40$ degrees from the $q_z$ axis
 	in their respective quadrants. In many liquid crystal systems this can be
 	explained by the tilt angle of the alkane chains with respect to the xy plane. % BJC: Reference
 	\item The final major reflections correspond to the spacing and symmetry of 
 	the d\textsubscript{100} plane which can be related to the distance between
 	pores. The feature, which will be called R-pores, is characterized by dots 
-	along qz = 0. The spacing between dots is indicative of the hexagonal 
+	along $q_z$ = 0. The spacing between dots is indicative of the hexagonal 
 	symmetry of the packed pores. It is easiest to interpret the data by 
 	radially integrating the 2D data to get a 1D curve which is shown in Figure~\ref{fig:SAXS}.
   \end{itemize}
@@ -756,7 +811,7 @@ suggested
   	\item Our choice of distance between layers results in long-term stability of 
 	different configurations indicating that we have found more than one metastable
 	free energy basin.
-  	\item Equilibrated systems built according to the 3.7 \angstrom 
+  	\item Equilibrated systems built according to the 3.7 \angstrom~ 
 	layer spacing implied by R-$\pi$ are characterized by a defined, cylindrical and
 	open pore structure.
 	\item Aromatic rings are arranged in a helical conformation.%BJC: could potentially support with a figure. Mentioning the helical arrangmentment might makes things confusing though
@@ -768,7 +823,7 @@ suggested
         %MRS: maybe Basin O and Basin C for open and closed?
 	%BJC: That works but 'capital oh' might get confused with zero
 	\item Simulations of systems built with layers stacked greater than 4 
-	\angstrom apart results in a pore structure characterized by high radial 
+	\angstrom~ apart results in a pore structure characterized by high radial 
 	disorder, while still maintaining partitioning between hydrophobic and 
 	hydrophilic regions.
         %MRS: see above for clarifying ``basins''.
@@ -814,7 +869,7 @@ suggested
 	\item The simulated patterns establish a difference between the two stacking 
 	modes (Figure~\ref{fig:XRDrestrained}).
 	\item In each pattern, R-alkanes is present at a distance of $\approx
-	1.5$ \angstrom \textsuperscript{-1} (4.2 \angstrom in real space).
+	1.5$ \angstrom$^-1$ (4.2 \angstrom~ in real space).
   	\item R-$\pi$ is also present in each pattern, although it appears to 
 	intersect R-alkanes because the spacing between aromatic rings is 
 	similar to the alkane chain packing.
@@ -873,9 +928,9 @@ suggested
   with the sandwiched configuration in Basin A.
   \begin{itemize}
   	\item Systems were built in both the parallel displaced and sandwiched 
-	configurations with an intial layer spacing of 3.7 \angstrom.
+	configurations with an intial layer spacing of 3.7 \angstrom~.
 	\item A third system was created by stacking layers in the sandwiched 
-	configuration 5 \angstrom apart in order to guide it towards Basin B.
+	configuration 5 \angstrom~apart in order to guide it towards Basin B.
 	% BJC: I've done an additional offset disordered system which goes to Basin B but I think that will confuse the point
 	\item For ease of reference, the third system will be referred to as the disordered system. 
 %BJC: omit and call it basin B
@@ -897,7 +952,7 @@ suggested
 	the pore spacing as described earlier.
 	\item R-$\pi$ is also present, intersecting R-alkanes at a lower q value than
 	in experiment. The rings prefer to stack $\approx 4.1 \angstrom$ apart as 
-	opposed to 3.7 \angstrom.
+	opposed to 3.7 \angstrom~.
 	\item R-helix and R-spots are also both missing.
 	\item The line which intersected both of these features in the restrained 
 	simulations faded upon equilibration which suggests that monomers in the 
@@ -1110,7 +1165,7 @@ suggested
 	\item Basin B is present in our simulations at lower temperatures 
         %MRS: lower temperatures than experiment.  Though nobody has really done the experiments.  
         %MRS: can we conclude anything from some of the in-situ temperature measurements done by Xunda?  We talked about them, but I don't know they are referenced here.
-	because our model lacks sufficient pi-pi iteractions necessary to 
+	because our model lacks sufficient $\pi$-$\pi$ iteractions necessary to 
 	stabilize the system into Basin A. 
   \end{itemize} 
 
@@ -1237,7 +1292,7 @@ suggested
   	\item There is an even distribution of crosslinks between same monomer tails, 
 	between monomers in the same pore and between monomers in different pores 
 	including periodic boundaries.
-	\item The distance between pores shrinks by 1 \angstrom after the system is 
+	\item The distance between pores shrinks by 1 \angstrom~ after the system is 
 	crosslinked
 	\item Major features are still present in the X-ray diffraction
 	\item The ionic conductivity is higher/lower in the crosslinked system
@@ -1282,7 +1337,7 @@ suggested
 	\item We have identified two metastable basins which each consist of a set of 
 	similar monomer configurations characterized by the degree of order in the pore region.
 	\item We verified that the basins are not separate phases.
-	\item We have explored the affect of two different pi-stacking modes on the equilibrated
+	\item We have explored the affect of two different $\pi$-$\pi$ stacking modes on the equilibrated
 	membrane strucure. 
 	\item Simulated diffration patterns generated from MD trajectories suggest that
 	the offset configuration produces a structure with the closest match to experiment. 
