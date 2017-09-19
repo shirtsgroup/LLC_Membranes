@@ -9,17 +9,18 @@ import bcc_class
 from llclib import transform
 from llclib import file_rw
 
+
 def initialize():
 
-    parser = argparse.ArgumentParser(description='Crosslink LLC structure')  # allow input from user
+    parser = argparse.ArgumentParser(description='Create bicontinuous cubic membrane structure')  # allow input from user
 
-    parser.add_argument('-i', '--input', default='wiggle_init.gro', help = 'Name of input file')
     parser.add_argument('-b', '--build_mon', default='Dibrpyr14.gro', type=str, help='Name of monomer to build with')
-    parser.add_argument('-p', '--phase', default='Ia3d', type=str, help='Which infinite minimal surface to build')
-    parser.add_argument('-l', '--low', default=0, type=float, help='Lower bound of x, y and z dimension')
-    parser.add_argument('--high', default=2*np.pi, type=float, help='Upper bound of x, y and z dimensions')
+    parser.add_argument('-p', '--phase', default='gyroid', type=str, help='Which infinite minimal surface to build')
     parser.add_argument('-n', '--n', default=50, type=int, help='Number of sections to break grid into when '
                                                                 'approximating the chosen implicit function')
+    parser.add_argument('-d', '--dim', default=10, type=float, help='Unit cell dimension (length of x, y and z vector)')
+    parser.add_argument('-o', '--output', default='initial.gro', type=str, help='Name of output .gro file')
+    parser.add_argument('-dens', '--density', default=1, type=float, help='Density of system (g/cm3)')
 
     args = parser.parse_args()
 
@@ -32,24 +33,28 @@ def SchwarzD(x):
     :return: An approximation of the Schwarz D "Diamond" infinite periodic minimal surface
     """
 
-    a = np.sin(x[0])*np.sin(x[1])*np.sin(x[2])
-    b = np.sin(x[0])*np.cos(x[1])*np.cos(x[2])
-    c = np.cos(x[0])*np.sin(x[1])*np.cos(x[2])
-    d = np.cos(x[0])*np.cos(x[1])*np.sin(x[2])
+    n = 2*np.pi / period
+
+    a = np.sin(n*x[0])*np.sin(n*x[1])*np.sin(n*x[2])
+    b = np.sin(n*x[0])*np.cos(n*x[1])*np.cos(n*x[2])
+    c = np.cos(n*x[0])*np.sin(n*x[1])*np.cos(n*x[2])
+    d = np.cos(n*x[0])*np.cos(n*x[1])*np.sin(n*x[2])
 
     return a + b + c + d
 
 
 def gyroid(x):
 
-    a = np.sin(x[0])*np.cos(x[1])
-    b = np.sin(x[1])*np.cos(x[2])
-    c = np.sin(x[2])*np.cos(x[0])
+    n = 2*np.pi / period
+
+    a = np.sin(n*x[0])*np.cos(n*x[1])
+    b = np.sin(n*x[1])*np.cos(n*x[2])
+    c = np.sin(n*x[2])*np.cos(n*x[0])
 
     return a + b + c
 
 
-def gridgen(surf, low, high, n):
+def gridgen(surf, low, high, n, tol=0.05):
 
     # make a cubic grid
     x = np.linspace(low, high, n)
@@ -66,7 +71,7 @@ def gridgen(surf, low, high, n):
         for i in range(n):
             for j in range(n):
                 for k in range(n):
-                    if -0.05 < gyro[i, j, k] < 0.05:
+                    if -tol < gyro[i, j, k] < tol:
                         gyro_eval[count_gyro, :] = [x[i], y[j], z[k]]
                         count_gyro += 1
 
@@ -80,7 +85,7 @@ def gridgen(surf, low, high, n):
         for i in range(n):
             for j in range(n):
                 for k in range(n):
-                    if -0.05 < schwarz[i, j, k] < 0.05:
+                    if -tol < schwarz[i, j, k] < tol:
                         schwarz_eval[count_schwarz, :] = [x[i], y[j], z[k]]
                         count_schwarz += 1
 
@@ -103,17 +108,19 @@ def gradient(v, surf):
     y = v[1]
     z = v[2]
 
+    n = 2*np.pi / period
+
     if surf == 'Ia3d' or surf == 'gyroid' or surf == 'ia3d':
 
-        a = np.cos(x)*np.cos(y) - np.sin(x)*np.sin(z)
-        b = -np.sin(y)*np.sin(x) + np.cos(y)*np.cos(z)
-        c = -np.sin(y)*np.sin(z) + np.cos(z)*np.cos(x)
+        a = n*np.cos(n*x)*np.cos(n*y) - n*np.sin(n*x)*np.sin(n*z)
+        b = -n*np.sin(n*y)*np.sin(n*x) + n*np.cos(n*y)*np.cos(n*z)
+        c = -n*np.sin(n*y)*np.sin(n*z) + n*np.cos(n*z)*np.cos(n*x)
 
     elif surf == 'Pn3m' or surf == 'pn3m':
 
-        a = np.cos(x)*np.sin(y)*np.sin(z) + np.cos(x)*np.cos(y)*np.cos(z) - np.sin(x)*np.sin(y)*np.cos(z) - np.sin(x)*np.cos(y)*np.sin(z)
-        b = np.sin(x)*np.cos(y)*np.sin(z) - np.sin(x)*np.sin(y)*np.cos(z) + np.cos(x)*np.cos(y)*np.cos(z) - np.cos(x)*np.sin(y)*np.sin(z)
-        c = np.sin(x)*np.sin(y)*np.cos(z) - np.sin(x)*np.cos(y)*np.sin(z) - np.cos(x)*np.sin(y)*np.sin(z) + np.cos(x)*np.cos(y)*np.cos(z)
+        a = n*np.cos(n*x)*np.sin(n*y)*np.sin(n*z) + n*np.cos(n*x)*np.cos(n*y)*np.cos(n*z) - n*np.sin(n*x)*np.sin(n*y)*np.cos(n*z) - n*np.sin(n*x)*np.cos(n*y)*np.sin(n*z)
+        b = n*np.sin(n*x)*np.cos(n*y)*np.sin(n*z) - n*np.sin(n*x)*np.sin(n*y)*np.cos(n*z) + n*np.cos(n*x)*np.cos(n*y)*np.cos(n*z) - n*np.cos(n*x)*np.sin(n*y)*np.sin(n*z)
+        c = n*np.sin(n*x)*np.sin(n*y)*np.cos(n*z) - n*np.sin(n*x)*np.cos(n*y)*np.sin(n*z) - n*np.cos(n*x)*np.sin(n*y)*np.sin(n*z) + n*np.cos(n*x)*np.cos(n*y)*np.cos(n*z)
 
     return np.array([a, b, c])
 
@@ -122,42 +129,66 @@ if __name__ == "__main__":
 
     args = initialize()
 
-    LC = bcc_class.LC(args.build_mon)
+    LC = bcc_class.LC(args.build_mon)  # get all properties of the liquid crystal
+    period = args.dim  # length of one side of the unit cell
+    grid = gridgen(args.phase, 0, args.dim, args.n)  # 3d grid of points from 0 to args.dim spaced by args.dim / args.n
 
-    grid = gridgen(args.phase, args.low, args.high, args.n)
-
-    gradv = np.zeros([grid.shape[0], 6])
-    for i in range(grid.shape[0]):
-        gradv[i, :3] = grid[i, :]
-        gradv[i, 3:] = gradient(grid[i, :], args.phase)
-
-    fig = plt.figure(1)
-    ax = fig.add_subplot(111, projection='3d')
-
-    X, Y, Z, U, V, W = zip(*gradv)
-
-    ax.quiver(X, Y, Z, U, V, W, length=0.25)
-    plt.show()
-    exit()
-    natoms = LC.natoms
+    natoms = LC.natoms  # number of atoms in monomer
 
     bcc = np.zeros([natoms*grid.shape[0], 3])
+    count = 0
+
+    # import random
+    # mon = []
+    # for i in range(10):
+    #     mon.append(random.randint(0, grid.shape[0]))
 
     for i in range(grid.shape[0]):
+    # for i in mon:
 
         n = gradient(grid[i, :], args.phase)  # normal vector to surface at point grid[i, :]
 
-        R = transform.Rvect2vect(LC.linevector, n)  # rotation matrix to rotate monomer in same direction as n
-        xyz = transform.rotate_coords(LC.xyz, R)  # rotate all points in bcc monomer with rotation matrix
+        pts = np.zeros([10, 3])
+        for k in range(10):
+            pts[k, :] = (k/10)*n
 
+        normal = transform.translate(pts, pts[0, :], grid[i, :])
+
+        R = transform.Rvect2vect(LC.linevector, n)  # rotation matrix to rotate monomer in same direction as n
+
+        # translate to origin
+        xyz_origin = transform.translate(LC.xyz, LC.reference, np.array([0, 0, 0]))
+
+        xyz_origin = transform.rotate_coords(xyz_origin, R)  # rotate all points in bcc monomer with rotation matrix
+
+        # R = transform.Rvect2vect(LC.linevector, n)  # rotation matrix to rotate monomer in same direction as n
+
+        # transform.rotate_coords(LC.xyz, R)  # rotate all points in bcc monomer with rotation matrix
         # find avg location of reference atoms after rotation (since it will change)
         ref = np.zeros([3])
         for j in range(len(LC.ref_index)):
-            ref += xyz[LC.ref_index[j], :]
+            ref += xyz_origin[LC.ref_index[j], :]
         ref /= len(LC.ref_index)
 
-        xyz = transform.translate(xyz, ref, grid[i, :])
+        xyz_origin = transform.translate(xyz_origin, ref, grid[i, :])  # move monomer to grid point w.r.t. reference point on monomer
 
-        bcc[i*natoms:(i + 1)*natoms, :] = xyz
+        # v1 = np.array([np.mean(xyz_origin[23:27, 0]), np.mean(xyz_origin[23:27, 1]), np.mean(xyz_origin[23:27, 2])])
+        # v2 = xyz_origin[37, :]
+        # print((v1 - v2) / np.linalg.norm(v1 - v2))
+        # print(n / np.linalg.norm(n))
+        #
+        # xyz = np.concatenate((xyz_origin, normal))
+        # if count == 0:
+        #     x = np.concatenate((grid, xyz))
+        # else:
+        #     x = np.concatenate((x, xyz))
+        #
+        # count += 1
+
+    # x = np.concatenate((grid, xyz))
+    # file_rw.write_gro_pos(x, 'test.gro')
+    # exit()
+
+        bcc[i*natoms:(i + 1)*natoms, :] = xyz_origin
 
     file_rw.write_gro_pos(bcc, 'initial.gro', res=LC.resid*grid.shape[0], ids=LC.names*grid.shape[0])

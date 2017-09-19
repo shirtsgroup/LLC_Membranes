@@ -214,7 +214,7 @@ if args.solvate:
         if gro[i].count('SOL') != 0:
             sol += 1
 
-    a.append('SOL                %s\n' % (sol/3))
+    a.append('SOL                %s\n' % int(sol/3))
 
 f = open('topol.top', 'w')
 for line in a:
