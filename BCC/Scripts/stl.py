@@ -167,19 +167,34 @@ ax = plot_implicit(Pn3m)
 
 surface = 'Pn3m'
 
-grid = gridgen(surface, -2.5, 2.5, 40)
+grid = gridgen(surface, -2.5, 2.5, 200)
 #
 # ax.scatter(grid[:, 0], grid[:, 1], grid[:, 2])
 
 gradv = np.zeros([grid.shape[0], 6])
 for i in range(grid.shape[0]):
     gradv[i, :3] = grid[i, :]
-    gradv[i, 3:] = gradient(grid[i, :], surface)
+    gradv[i, 3:] = -gradient(grid[i, :], surface)
 
+import random
+from scipy import spatial
+pt = random.randint(0, gradv.shape[0])  # choose a random point on the grid
+others = np.delete(gradv, pt, 0)  # make an array which excludes that point
+v = np.zeros([6, 3])  # 6 vectors near the pt
+for i in range(6):
+    nn_index = spatial.KDTree(others[:, :3]).query(gradv[pt, :3])[1]  # find nearest neighbor to pt
+    v[i, :] = others[nn_index, :3] - gradv[pt, :3]  # vector between nearest neighbor and pt
+    others = np.delete(others, nn_index, 0)  # delete nearest neighbor so this vector isn't duplicated on the next iteration
+
+dot = np.zeros([6, 3])  # dot products of all nearest neighbor vectors with gradient vector at pt
+for i in range(6):
+    dot[i, :] = np.dot(gradv[pt, 3:], v[i, :])
+
+print(np.linalg.norm(dot))
 # fig = plt.figure(1)
 # ax = fig.add_subplot(111, projection='3d')
 
-X, Y, Z, U, V, W = zip(*gradv)
-
-ax.quiver(X, Y, Z, U, V, W, length=0.25)
-plt.show()
+# X, Y, Z, U, V, W = zip(*gradv)
+#
+# ax.quiver(X, Y, Z, U, V, W, length=0.25)
+# plt.show()

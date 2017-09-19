@@ -141,7 +141,7 @@ class LC(object):
         V = L[1, :] - L[0, :]  # direction monomer is pointing based on points defined by average xyz of L1 and L2
 
         # reference position
-        ref = np.array([sum([l[0] for l in L1]), sum([l[1] for l in L1]), sum([l[2] for l in L1])]) / len(L1)
+        ref = np.array([sum([r[0] for r in R]), sum([r[1] for r in R]), sum([r[2] for r in R])]) / len(R)
 
         self.xyz = xyz
         self.planeatoms = P
@@ -152,3 +152,4 @@ class LC(object):
         self.ref_index = R_i
         self.resid = resid
         self.names = names
+        self.linepts = L

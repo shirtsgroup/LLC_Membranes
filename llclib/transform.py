@@ -241,18 +241,20 @@ def translate(xyz, before, after):
     :return: translated points with respect to reference coordinate before/after locations [npts, 3]
     """
 
+    pos = np.copy(xyz)
+
     direction = after - before
 
     translation = np.matrix([[1, 0, 0, direction[0]], [0, 1, 0, direction[1]],
                          [0, 0, 1, direction[2]], [0, 0, 0, 1]])
 
     b = np.ones([1])
-    for i in range(np.shape(xyz)[0]):
-        coord = np.concatenate((xyz[i, :], b))
+    for i in range(np.shape(pos)[0]):
+        coord = np.concatenate((pos[i, :], b))
         x = np.dot(translation, coord)
-        xyz[i, :] = x[0, :3]
+        pos[i, :] = x[0, :3]
 
-    return xyz
+    return pos
 
 
 def shift_matrices(images, angle, xbox, ybox):
@@ -359,7 +361,7 @@ def rotate_coords_z(xyz, angle):
     return xyz
 
 
-def Rvect2vect(a, b):
+def Rvect2vect(A, B):
     """
     Find rotation of a so that its orientation matches b.
     :param a: vector to be rotated
@@ -367,18 +369,33 @@ def Rvect2vect(a, b):
     :return: rotation matrix for rotate a to b
     """
 
-    cross = np.cross(a, b)  # find vector perpendicular to a and b
-    x = cross / np.linalg.norm(cross)  # normalize
+    # normalize
+    a = A / np.linalg.norm(A)
+    b = B / np.linalg.norm(B)
 
-    y = np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
-    theta = np.arccos(y)
+    v = np.cross(a, b)
+    s = np.linalg.norm(v)
+    c = np.dot(a, b)
 
-    A = np.matrix([[0, -x[2], x[1]], [x[2], 0, -x[0]], [-x[1], x[0], 0]])
-    I = np.identity(3)
+    v_skew = np.matrix([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]])
 
-    R = I + np.sin(theta)*A + (1 - np.cos(theta))*(A**2)
+    R = np.identity(3) + v_skew + v_skew**2*(1 - c)/(s**2)
 
-    return R
+    # print(R)
+    # cross = np.cross(a, b)  # find vector perpendicular to a and b
+    # x = cross / np.linalg.norm(cross)  # normalize
+    #
+    # y = np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+    # theta = np.arccos(y)
+    #
+    # A = np.matrix([[0, -x[2], x[1]], [x[2], 0, -x[0]], [-x[1], x[0], 0]])
+    # I = np.identity(3)
+    #
+    # R = I + np.sin(theta)*A + (1 - np.cos(theta))*(A**2)
+    # print(R)
+    # exit()
+
+    return np.matrix(R)
 
 
 def rotate_coords(xyz, R):
@@ -388,8 +405,8 @@ def rotate_coords(xyz, R):
     :param R: rotate plane
     :return: rotated coordinates
     """
+    pos = np.copy(xyz)
+    for i in range(np.shape(pos)[0]):
+        pos[i, :] = np.dot(R, pos[i, :])
 
-    for i in range(np.shape(xyz)[0]):
-        xyz[i, :] = np.dot(R, xyz[i, :])
-
-    return xyz
+    return pos

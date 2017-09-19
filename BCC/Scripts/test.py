@@ -1,53 +1,57 @@
+#!/usr/bin/env python
+
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import numpy as np
+import bcc_class
+from llclib import transform
+from llclib import file_rw
 
-# x^2 + y^2 + z = 0 -- > z = -y**2 - x**2
-# gradient vector : grad f = < 2x, 2y, 1 >
+LC = bcc_class.LC('Dibrpyr14.gro')
 
+n = np.array([-0.5, -0.6, 0.3])
+# n = LC.linevector
 
-def sphere(x):
+pts = np.zeros([10, 3])
+for k in range(10):
+    pts[k, :] = (k/10)*n
 
-    return x[0] ** 2 + x[1] ** 2 + x[2] ** 2
+normal = transform.translate(pts, pts[0, :], np.array([0, 0, 0]))
 
+# xyz = np.concatenate((LC.xyz, normal))
 
-def grad(v):
+R = transform.Rvect2vect(LC.linevector, n)  # rotation matrix to rotate monomer in same direction as n
 
-    g = np.array([2*v[0], 2*v[1], 2*v[2]])
-    return g / np.linalg.norm(g)
+# translate to origin
+xyz_origin = transform.translate(LC.xyz, LC.reference, np.array([0, 0, 0]))
 
-n = 50
-x = np.linspace(-1.5, 1.5, n)
-y = np.linspace(-1.5, 1.5, n)
-z = np.linspace(-1.5, 1.5, n)
+xyz_origin = transform.rotate_coords(xyz_origin, R)  # rotate all points in bcc monomer with rotation matrix
 
-pts = sphere([x[:, None, None], y[None, :, None], z[None, None, :]])
+v1 = np.array([np.mean(xyz_origin[23:27, 0]), np.mean(xyz_origin[23:27, 1]), np.mean(xyz_origin[23:27, 2])])
+v2 = xyz_origin[37, :]
+print((v1 - v2) / np.linalg.norm(v1 - v2))
+print(n / np.linalg.norm(n))
+# file_rw.write_gro_pos(xyz_origin, 'test.gro')
+file_rw.write_gro_pos(np.concatenate((xyz_origin, normal)), 'test.gro')
+exit()
 
-pts_eval = np.zeros([n**3, 3])
-count = 0
-for i in range(n):
-    for j in range(n):
-        for k in range(n):
-            if .95 < pts[i, j, k] < 1.05:
-                pts_eval[count, :] = [x[i], y[j], z[k]]
-                count += 1
+# find avg location of reference atoms after rotation (since it will change)
+ref = np.zeros([3])
+for j in range(len(LC.ref_index)):
+    ref += xyz[LC.ref_index[j], :]
+ref /= len(LC.ref_index)
 
-pts = pts_eval[:count, :]
+xyz = transform.translate(xyz, ref, grid[i, :])  # move monomer to grid point w.r.t. reference point on monomer
+pt1 = xyz[37, :]
+pt2 = np.array([np.mean(xyz[23:27, 0]), np.mean(xyz[23:27, 1]), np.mean(xyz[23:27, 2])])
+print(n / np.linalg.norm(n), pt1 - pt2 / (np.linalg.norm(pt1 - pt2)))
+xyz = np.concatenate((xyz, normal))
+if count == 0:
+    x = np.concatenate((grid, xyz))
+else:
+    x = np.concatenate((x, xyz))
 
-gradv = np.zeros([pts.shape[0], 6])
+count += 1
 
-for i in range(pts.shape[0]):
-    gradv[i, :3] = pts[i, :]
-    gradv[i, 3:] = grad(pts[i, :])
-
-fig = plt.figure(1)
-ax = fig.add_subplot(111, projection='3d')
-
-X, Y, Z, U, V, W = zip(*gradv)
-
-ax.quiver(X, Y, Z, U, V, W, length=0.1)
-# ax.scatter(pts[:, 0], pts[:, 1], pts[:, 2], marker='.')
-
-plt.show()

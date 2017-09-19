@@ -13,7 +13,7 @@ from past.utils import old_div
 import numpy as np
 import copy
 import math
-from Scripts import Periodic_Images
+import Periodic_Images
 from . import transform
 import mdtraj as md
 import os
@@ -78,7 +78,7 @@ def write_assembly(b, xlink, output, no_mon):
 
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Location of this script
 
-    with open("%s/../top/Monomer_Tops/%s" % (location, '%s.itp' % b), "r") as f:
+    with open("%s/../HII/top/Monomer_Tops/%s" % (location, '%s.itp' % b), "r") as f:
 
         a = []
         for line in f:
@@ -397,11 +397,12 @@ def last_frame(trr, gro):
     return last
 
 
-def write_gro(t, out):
+def write_gro(t, out, frame=-1):
 
     """
     :param t: mdtraj trajectory object. To get a single frame, use t.slice(frame_no)
     :param out: name of gro file to write
+    :param frame: frame number to write
     :return: single frame gro file written to disk
     """
     pos = t.xyz
@@ -419,15 +420,15 @@ def write_gro(t, out):
         for a in t.topology.atoms:
             if a.residue.name == 'HOH':
                 f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(a.residue.index + 1, 'SOL', d[a.name],
-                                                    count + 1, pos[0, count, 0], pos[0, count, 1], pos[0, count, 2]))
+                                                    count + 1, pos[frame, count, 0], pos[frame, count, 1], pos[frame, count, 2]))
             else:
                 f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format((a.residue.index + 1) % 100000, a.residue.name, a.name,
-                                            (count + 1) % 100000, pos[0, count, 0], pos[0, count, 1], pos[0, count, 2]))
+                                            (count + 1) % 100000, pos[frame, count, 0], pos[frame, count, 1], pos[frame, count, 2]))
             count += 1
 
-        f.write('{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}\n'.format(v[0, 0, 0], v[0, 1, 1], v[0, 2, 2],
-                                                                                  v[0, 0, 1], v[0, 2, 0], v[0, 1, 0],
-                                                                                  v[0, 0, 2], v[0, 1, 2], v[0, 2, 0]))
+        f.write('{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}{:10f}\n'.format(v[frame, 0, 0], v[frame, 1, 1], v[frame, 2, 2],
+                                                                                  v[frame, 0, 1], v[frame, 2, 0], v[frame, 1, 0],
+                                                                                  v[frame, 0, 2], v[frame, 1, 2], v[frame, 2, 0]))
 
 
 def write_water_ndx(keep, t):

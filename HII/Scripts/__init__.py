@@ -1,1 +1,1 @@
-import lc_class
+from . import *
