@@ -41,6 +41,7 @@ class LC(object):
         self.ions = []
         names = []
         resid = []
+        MW = 0  # molecular weight
 
         if name.endswith('.gro'):
 
@@ -53,7 +54,9 @@ class LC(object):
             for i in range(2, len(a) - 1):
                 xyz[i - 2, :] = [float(a[i][20:28]), float(a[i][28:36]), float(a[i][36:44])]
                 res = str.strip(a[i][5:10])
-                names.append(str.strip(a[i][10:15]))
+                name = str.strip(a[i][10:15])
+                MW += Atom_props.mass[name]
+                names.append(name)
                 resid.append(res)
                 if res in residues:
                     res_count += 1
@@ -103,6 +106,8 @@ class LC(object):
                 line = a[i].split()
                 xyz[i - start, :] = [float(line[5]), float(line[6]), float(line[7])]
                 res = str.strip(a[i][17:22])
+                name = str.strip(a[i][11:17])
+                MW += Atom_props.mass[name]
                 if res in residues:
                     res_count += 1
                 else:
@@ -153,3 +158,4 @@ class LC(object):
         self.resid = resid
         self.names = names
         self.linepts = L
+        self.MW = MW

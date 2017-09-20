@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 
 import numpy as np
-import math
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import argparse
 import bcc_class
 from llclib import transform
 from llclib import file_rw
+from scipy import spatial
+import tqdm
+import random
+import subprocess
+import os
 
 
 def initialize():
@@ -20,7 +22,11 @@ def initialize():
                                                                 'approximating the chosen implicit function')
     parser.add_argument('-d', '--dim', default=10, type=float, help='Unit cell dimension (length of x, y and z vector)')
     parser.add_argument('-o', '--output', default='initial.gro', type=str, help='Name of output .gro file')
-    parser.add_argument('-dens', '--density', default=1, type=float, help='Density of system (g/cm3)')
+    parser.add_argument('-dens', '--density', default=1.1, type=float, help='Density of system (g/cm3)')
+    parser.add_argument('-c', '--curvature', default=-1, type=int,help='-1 : QI phase, 1, QII phase. Determines whether'
+                        'the phase is normal or inverted')
+    parser.add_argument('-wt', '--weight_percent', default=80.1, type=float, help='Weight %% of monomer in membrane')
+    parser.add_argument('-sol', '--solvent', default='glycerol', type=str, help='Name of solvent mixed with monomer')
 
     args = parser.parse_args()
 
@@ -129,24 +135,55 @@ if __name__ == "__main__":
 
     args = initialize()
 
+    mw = {'glycerol': 92.09382}
+
     LC = bcc_class.LC(args.build_mon)  # get all properties of the liquid crystal
     period = args.dim  # length of one side of the unit cell
     grid = gridgen(args.phase, 0, args.dim, args.n)  # 3d grid of points from 0 to args.dim spaced by args.dim / args.n
+
+    # figure out how many grid points we actually want to keep
+    NA = 6.022 * 10 ** 23  # avogadros number
+    mass = LC.MW / NA  # mass of a single monomer (g)
+    V = args.dim ** 3 * 10 ** -21  # volume of unit cell (cm ^ 3)
+    mon_mass = (args.weight_percent / 100) * args.density * V  # mass of all monomers in unit cell
+    nmon = int(mon_mass / mass)
+
+    mass = mw[args.solvent] / NA
+    solv_mass = args.density * V * (100 - args.weight_percent) / 100
+    nsol = int(solv_mass / mass)
+
+    while grid.shape[0] > nmon:
+        delete = random.randint(0, grid.shape[0] - 1)
+        grid = np.delete(grid, delete, 0)
+
+    # print('Filtering grid points to obtain correct density')
+    # nn = {}
+    # for i in tqdm.tqdm(range(grid.shape[0])):
+    #     others = np.delete(grid, i, 0)  # delete self entry or else the nearest neighbor is itself
+    #     n = spatial.KDTree(others).query(grid[i, :])[1]  # find index of nearest neighbor
+    #     index = np.where(grid == others[n])  # find the index in others corresponding to nn in arr
+    #     ld = np.linalg.norm(grid[i, :] - grid[index[0][0]])  # calc linear distance between position and nearest neighbor
+    #     nn[i] = ld
+    #     if i == 7:
+    #         print(n)
+    #         print(ld)
+    #         exit()
+
+    # nn_sorted = sorted(nn, key=nn.get)[-nmon:]
+    # keep = np.zeros([nmon, 3])
+    # for i in range(nmon):
+    #     keep[i, :] = grid[nn_sorted[i], :]
+    #
+    # grid = keep
 
     natoms = LC.natoms  # number of atoms in monomer
 
     bcc = np.zeros([natoms*grid.shape[0], 3])
     count = 0
 
-    # import random
-    # mon = []
-    # for i in range(10):
-    #     mon.append(random.randint(0, grid.shape[0]))
-
     for i in range(grid.shape[0]):
-    # for i in mon:
 
-        n = gradient(grid[i, :], args.phase)  # normal vector to surface at point grid[i, :]
+        n = args.curvature * gradient(grid[i, :], args.phase)  # normal vector to surface at point grid[i, :]
 
         pts = np.zeros([10, 3])
         for k in range(10):
@@ -161,9 +198,6 @@ if __name__ == "__main__":
 
         xyz_origin = transform.rotate_coords(xyz_origin, R)  # rotate all points in bcc monomer with rotation matrix
 
-        # R = transform.Rvect2vect(LC.linevector, n)  # rotation matrix to rotate monomer in same direction as n
-
-        # transform.rotate_coords(LC.xyz, R)  # rotate all points in bcc monomer with rotation matrix
         # find avg location of reference atoms after rotation (since it will change)
         ref = np.zeros([3])
         for j in range(len(LC.ref_index)):
@@ -172,23 +206,11 @@ if __name__ == "__main__":
 
         xyz_origin = transform.translate(xyz_origin, ref, grid[i, :])  # move monomer to grid point w.r.t. reference point on monomer
 
-        # v1 = np.array([np.mean(xyz_origin[23:27, 0]), np.mean(xyz_origin[23:27, 1]), np.mean(xyz_origin[23:27, 2])])
-        # v2 = xyz_origin[37, :]
-        # print((v1 - v2) / np.linalg.norm(v1 - v2))
-        # print(n / np.linalg.norm(n))
-        #
-        # xyz = np.concatenate((xyz_origin, normal))
-        # if count == 0:
-        #     x = np.concatenate((grid, xyz))
-        # else:
-        #     x = np.concatenate((x, xyz))
-        #
-        # count += 1
-
-    # x = np.concatenate((grid, xyz))
-    # file_rw.write_gro_pos(x, 'test.gro')
-    # exit()
-
         bcc[i*natoms:(i + 1)*natoms, :] = xyz_origin
 
-    file_rw.write_gro_pos(bcc, 'initial.gro', res=LC.resid*grid.shape[0], ids=LC.names*grid.shape[0])
+    file_rw.write_gro_pos(bcc, 'initial.gro', res=LC.resid*grid.shape[0], ids=LC.names*grid.shape[0], box=[args.dim, args.dim, args.dim])
+
+    # solvate system
+
+    location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    subprocess.call(["gmx", "insert-molecules", "-f", "initial.gro", "-ci", "%s/../top/structures/%s.gro" % (location, args.solvent), "-nmol", "%s" % nsol, "-o", "initial.gro"])
