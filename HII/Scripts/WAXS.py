@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 
+import matplotlib
+matplotlib.rc('axes', color_cycle=['r', 'g', 'b', '#004060'])
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+
 
 waxs = np.load('WAXS.npy')
 
@@ -11,8 +14,17 @@ hw = 400  # height and width (pixels)
 r_high = hw - 155
 r_low = hw - 215
 bins = 180
-#
+
 waxs = waxs[center[0]-hw:center[0]+hw, center[1]-hw:center[1]+hw]
+
+qpi = 1.7  # q value of pi-stacking reflection
+axial = np.copy(waxs[:, int(waxs.shape[0]/2)])  # hold x constant at the center, and get all y values. The array is of the shape [y, x]
+mid = axial.shape[0] / 2
+axial[(mid - 150):(mid + 150)] = 0  # zero out middle values so we get the right maximum
+Imax = np.amax(axial)  # max value of Intensity. It will correspond to location of pi-stacking reflection
+Imax_pixel = np.where(axial == Imax)[0][0]
+pixel_to_q = 1.7 / abs(mid - Imax_pixel)
+qmax = mid*pixel_to_q
 
 # The raw data contains super high intensity specs and some intensity near the center that is meant to be blocked out
 # I zero out all of those so that the highest intensity is in the pi-stacking reflection.
@@ -22,17 +34,31 @@ for i in range(23):
     y = np.where(waxs == m)[1][0]
     waxs[x, y] = 0
 
+fig, ax = plt.subplots()
 waxs /= np.amax(waxs)  # normalize with respect to highest intensity in pi-stacking reflection
-# plt.imshow(waxs, cmap='seismic')
-# plt.show()
+# plt.imshow(waxs, cmap='jet', extent=[-qmax, qmax, -qmax, qmax])
+# plt.xlabel('$q_r$', fontsize=14)
+# plt.ylabel('$q_z$', fontsize=14)
+# plt.gcf().get_axes()[0].tick_params(labelsize=14)
+# fig.savefig('raw_WAXS.png')
+# fig.clf()
+# #plt.show()
 # exit()
-# x = np.linspace(-2, 2, 2*hw)
-# y = np.linspace(-2, 2, 2*hw)
-# xx, yy = np.meshgrid(x, y)
-#
-# plt.pcolormesh(xx[:400], yy[:400], waxs, cmap='jet')
-# plt.show()
+x = np.linspace(-qmax, qmax, 2*hw)
+y = np.linspace(qmax, -qmax, 2*hw)
+xx, yy = np.meshgrid(x, y)
 
+plt.pcolormesh(xx, yy, waxs, cmap='jet')
+plt.gcf().get_axes()[0].set_ylim(-2.5, 2.5)
+plt.gcf().get_axes()[0].set_xlim(-2.5, 2.5)
+plt.gcf().get_axes()[0].set_xlabel('$q_r$', fontsize=14)
+plt.gcf().get_axes()[0].set_ylabel('$q_z$', fontsize=14)
+plt.gcf().get_axes()[0].set_aspect('equal')
+plt.gcf().get_axes()[0].tick_params(labelsize=14)
+fig.savefig('raw_WAXS.png')
+fig.clf()
+# plt.show()
+exit()
 angles = np.zeros([bins])
 norm = np.zeros([bins])
 ring = np.zeros_like(waxs)

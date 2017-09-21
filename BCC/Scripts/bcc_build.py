@@ -27,6 +27,8 @@ def initialize():
                         'the phase is normal or inverted')
     parser.add_argument('-wt', '--weight_percent', default=80.1, type=float, help='Weight %% of monomer in membrane')
     parser.add_argument('-sol', '--solvent', default='glycerol', type=str, help='Name of solvent mixed with monomer')
+    parser.add_argument('-shift', '--shift', default=0.5, type=float, help='Shift position of head group shift units '
+                        'in the direction opposite of the normal vector at that point')
 
     args = parser.parse_args()
 
@@ -140,7 +142,7 @@ if __name__ == "__main__":
     LC = bcc_class.LC(args.build_mon)  # get all properties of the liquid crystal
     period = args.dim  # length of one side of the unit cell
     grid = gridgen(args.phase, 0, args.dim, args.n)  # 3d grid of points from 0 to args.dim spaced by args.dim / args.n
-
+    file_rw.write_gro_pos(grid, 'test.gro')
     # figure out how many grid points we actually want to keep
     NA = 6.022 * 10 ** 23  # avogadros number
     mass = LC.MW / NA  # mass of a single monomer (g)
@@ -152,29 +154,28 @@ if __name__ == "__main__":
     solv_mass = args.density * V * (100 - args.weight_percent) / 100
     nsol = int(solv_mass / mass)
 
-    while grid.shape[0] > nmon:
+    # nmon random points used for placement
+    # while grid.shape[0] > nmon:
+    #     delete = random.randint(0, grid.shape[0] - 1)
+
+    # place a monomer, delete nearest neighbors within r, repeat. Some optimization might need to be done to get r right
+    r = 0.6
+    count = 0
+    new_grid = np.zeros([nmon, 3])
+    while count < nmon:
         delete = random.randint(0, grid.shape[0] - 1)
-        grid = np.delete(grid, delete, 0)
+        new_grid[count, :] = grid[delete, :]
+        tree = spatial.cKDTree(grid)
+        nn = tree.query_ball_point(grid[delete, :], r)
+        nn.append(delete)
+        grid = np.delete(grid, nn, 0)
+        count += 1
 
-    # print('Filtering grid points to obtain correct density')
-    # nn = {}
-    # for i in tqdm.tqdm(range(grid.shape[0])):
-    #     others = np.delete(grid, i, 0)  # delete self entry or else the nearest neighbor is itself
-    #     n = spatial.KDTree(others).query(grid[i, :])[1]  # find index of nearest neighbor
-    #     index = np.where(grid == others[n])  # find the index in others corresponding to nn in arr
-    #     ld = np.linalg.norm(grid[i, :] - grid[index[0][0]])  # calc linear distance between position and nearest neighbor
-    #     nn[i] = ld
-    #     if i == 7:
-    #         print(n)
-    #         print(ld)
-    #         exit()
+    if count < nmon:
+        print('Only %s monomers were placed. Try again with a lower r value or different number of grid points' % count)
+        exit()
 
-    # nn_sorted = sorted(nn, key=nn.get)[-nmon:]
-    # keep = np.zeros([nmon, 3])
-    # for i in range(nmon):
-    #     keep[i, :] = grid[nn_sorted[i], :]
-    #
-    # grid = keep
+    grid = new_grid
 
     natoms = LC.natoms  # number of atoms in monomer
 
@@ -184,12 +185,6 @@ if __name__ == "__main__":
     for i in range(grid.shape[0]):
 
         n = args.curvature * gradient(grid[i, :], args.phase)  # normal vector to surface at point grid[i, :]
-
-        pts = np.zeros([10, 3])
-        for k in range(10):
-            pts[k, :] = (k/10)*n
-
-        normal = transform.translate(pts, pts[0, :], grid[i, :])
 
         R = transform.Rvect2vect(LC.linevector, n)  # rotation matrix to rotate monomer in same direction as n
 
@@ -204,13 +199,15 @@ if __name__ == "__main__":
             ref += xyz_origin[LC.ref_index[j], :]
         ref /= len(LC.ref_index)
 
-        xyz_origin = transform.translate(xyz_origin, ref, grid[i, :])  # move monomer to grid point w.r.t. reference point on monomer
+        placement = grid[i, :] - args.shift*n
+
+        xyz_origin = transform.translate(xyz_origin, ref, placement)  # move monomer to grid point w.r.t. reference point on monomer
 
         bcc[i*natoms:(i + 1)*natoms, :] = xyz_origin
 
     file_rw.write_gro_pos(bcc, 'initial.gro', res=LC.resid*grid.shape[0], ids=LC.names*grid.shape[0], box=[args.dim, args.dim, args.dim])
 
     # solvate system
-
+    exit()
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     subprocess.call(["gmx", "insert-molecules", "-f", "initial.gro", "-ci", "%s/../top/structures/%s.gro" % (location, args.solvent), "-nmol", "%s" % nsol, "-o", "initial.gro"])

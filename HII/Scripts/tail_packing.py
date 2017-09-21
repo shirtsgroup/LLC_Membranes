@@ -186,12 +186,20 @@ if __name__ == "__main__":
         file_rw.write_gro_pos(centroids[-1, :, :], 'centroids.gro', name='NA')
 
     angles = [value for value in angles if not math.isnan(value)]
-    plt.figure(1)
+
     nbins = 45
-    (counts, bins, patches) = plt.hist(angles, bins=nbins)
-    plt.xlabel('Angle (degrees)', fontsize=14)
-    plt.ylabel('Count', fontsize=14)
+    (counts, bins) = np.histogram(angles, bins=nbins)
+    bin_width = bins[1] - bins[0]
+
+    plt.figure()
+    bin_centers = [bins[i - 1] + ((bins[i] - bins[i - 1]) / 2) for i in range(1, len(bins))]
+    integrated_area = np.trapz(counts, bin_centers)  # integrated area of histogram for normalization
+    plt.bar(bin_centers, bin_width*counts/integrated_area, width=bin_width)
+    plt.xlabel('Angle made with nearest neighbor (degrees)', fontsize=14)
+    plt.ylabel('Normalized frequency', fontsize=14)
     plt.axes().tick_params(labelsize=14)
+    plt.tight_layout()
+
 
     if args.fit:
         bin_locations = np.linspace(-90, 90, nbins)
