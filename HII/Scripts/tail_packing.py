@@ -189,6 +189,8 @@ if __name__ == "__main__":
 
     nbins = 45
     (counts, bins) = np.histogram(angles, bins=nbins)
+    plt.hist(angles, bins=nbins)
+    plt.show()
     bin_width = bins[1] - bins[0]
 
     plt.figure()
