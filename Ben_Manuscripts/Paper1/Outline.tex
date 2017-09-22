@@ -828,16 +828,17 @@ suggested
 	%BJC: 1D is from a Yale paper. I'm going to remake the figure from the raw data but will reference that
 	%BJC: The simulated 1D shows the right peaks, but the resolution makes it kind of pointy. I'll let you take a look at it but maybe it belongs in the supplemental
   \end{figure}
-  
-  We were inspired to ask question (4) when we observed that the initial distance
-  between layers can influence the approach towards equilibrium. 
+
+  In addition to the parallel displaced and sandwiched configurations we observed
+  that the initial distance between layers can influence the approach towards 
+  equilibrium.
   \begin{itemize}
   	\item Our choice of distance between layers results in long-term stability of 
-	different configurations indicating that we have found more than one metastable
-	free energy basin.
-  	\item Equilibrated systems built according to the 3.7 \angstrom~ 
-	layer spacing implied by R-$\pi$ are characterized by a defined, cylindrical and
-	open pore structure.
+	qualitatively different configurations suggesting that we have found more than
+        one metastable free energy basin.
+  	\item Equilibrated systems built according to the 3.7 \angstrom~layer spacing 
+        implied by R-$\pi$ are characterized by a defined, cylindrical and open pore 
+	structure.
         \item We will refer to this large set of configurations, with an open pore, as 
         Basin OP (open pore) (Figure~\ref{fig:abasin}).
 	\item Simulations of systems built with layers stacked greater than 4 
@@ -937,9 +938,14 @@ suggested
   %MRS: one thought: maybe organize it a different way -- it's not the disordered (and go through the anlysis there), and then separately show that it's more likely the sandwich.  Something to think about.
   %MRS: anyway, this is the key part of the paper, so clarity and organization important.
   %MRS: make sure the figures are comparable.  Could someone look at the figures, and see immediately what you are explaining -- for example, experiment and fully equilibrated disordered, sandwich and parallel displaced all in a row?
-  Full comparison of experimental 2D WAXS with simulated X-ray diffraction
-  patterns produced from equilibrated MD trajectories shows the most consistency
-  with the offset configuration in the OP basin.
+  
+  %Full comparison of experimental 2D WAXS with simulated X-ray diffraction
+  %patterns produced from equilibrated MD trajectories shows the most consistency
+  %with the offset configuration in the OP basin.
+  
+  We created systems using three 
+  distinct initial configurations and examined their structure by simulating 
+  X-ray diffraction patterns produced from equilibrated MD trajectories.
   \begin{itemize}
   	\item Systems were built in both the parallel displaced and sandwiched 
 	configurations with an intial layer spacing of 3.7 \angstrom~.
@@ -947,8 +953,6 @@ suggested
 	configuration 5 \angstrom~apart in order to guide it towards the CP Basin.
 	% BJC: I've done an additional offset disordered system which goes to Basin CP but I think that will confuse the point
 	\item For ease of reference, the third system will be referred to as Basin D (disordered). 
-%BJC: omit and call it basin B
-%MRS or just be consistent from the beginning.  Or call Basins O and D          
 	\item The three systems were equilibrated according to our procedure with
 	NPT simulations of greater than 400 ns.
 	\item Simulated diffration patterns were generated using portions of the
@@ -957,13 +961,29 @@ suggested
 	pores and the membrane thickness stopped changing.
 	\item Simulated diffraction patterns for all three structures are shown in 
 	Figure ~\ref{fig:XRDsim}. 
-	%BJC: maybe break into a separate paragraph starting here
+  \end{itemize}
+
+  % Three paragraphs instead here? Talk about disordered, parallel displaced and 
+  % layered separately? Try it. 
+  % Talk about disordered last so it leads in to 
+  % Also maybe don't talk about question 4 until after this
+  Full comparison of experimental 2D WAXS with simulated X-ray diffraction
+  patterns shows the most consistency with the offset configuration in the OP basin.
+  \begin{itemize}
+        \item The disordered pore structure exhibits R-alkanes and R-pores but R-helix,
+	R-$\pi$ and R-spots are not present. 
+        \item Simulated XRD of the sandwiched configuration contains all features 
+        except for R-helix.
+        \item Most notably, R-spots appears in the expected location, which suggests 
+        that there is something intrinsic to the sandwiched packing that gives rise 
+        to such features. 
+
 	\item The equilibrated parallel displaced structure exhibits R-alkanes and
 	R-pores in the expected locations. 
 	\item Due to low resolution, making out the individual spots of R-pores is
-	challenging and can be validated upon full spherical integration of the 3D 
-	structure factor. However, the same information can be extracted by measuring 
-	the pore spacing as described earlier.
+	challenging and can be validated with slightly better resolution upon full
+	spherical integration of the 3D structure factor. However, the same 
+	information can be extracted by measuring the pore spacing as described earlier.
 	\item R-$\pi$ is also present, intersecting R-alkanes at a lower q value than
 	in experiment. The rings prefer to stack $\approx 4.1 \angstrom$ apart as 
 	opposed to 3.7 \angstrom~.
@@ -977,8 +997,6 @@ suggested
 	\item Most notably, R-spots appears in the expected location, which suggests 
 	that there is something intrinsic to the sandwiched packing that gives rise 
 	to such features. 
-	\item Finally, the disordered structure exhibits R-alkanes and R-pores but 
-	R-helix, R-$\pi$ and R-spots are not present.
   \end{itemize}
   
 % BJC: Replacement figure below this one
@@ -1056,55 +1074,66 @@ suggested
 	as the product of tilted alkane chains.
 	\item We measured the tilt angle of the alkane chains and showed that our 
 	system equilibrates to an average tilt angle close to zero degrees (See Supplemental Information). 
-	\item To understand the origin of the spots, we determined which atoms gave rise to the feature.
+	\item To understand the origin of the spots, we determined which atoms gave rise to the feature.i
+	\item Since R-spots is present as higher intensity spots within R-alkanes, it is likely
+        that the spots arise as a consequence of the tails. 
 	\item By removing atoms from the trajectory and simulating a diffraction 
 	pattern, we were able to isolate the cause of the spots to the tails (Figure~\ref{fig:tails_rzplot}).
 	\item Since the tails stay nearly flat, we plotted the centroids of the 
 	tails and measured the angle between each centroid and its nearest neighbors
 	with respect to the plane of the membrane (Figure~\ref{fig:centroids}).
 	\item The distribution of these angles is consistent with the location of 
-	the spots (Figure~\ref{fig:angle_distribution}).
-	\item We reason that monomer tails stacked closely in the sandwiched conformation
-	are forced to splay apart and pack in between in each other which creates a
-	nearly hexagonal array of packed tails. 
+	the spots (Figure~\ref{fig:tail_packing}).
+	\item The peaks of interest in Figures~\ref{fig:offset_tails}~and~\ref{fig:layered_tails}
+	are located at $\pm$ 33 $\degree$ which is the same location where the highest intensity
+	of spots are located on the simulated patterns (See Supplemental Information for quantitative proof)
+	\item We integrated the raw experimental 2D WAXS data in the region bounding R-alkanes 
+        and found the angle at which R-spots reaches its highest intensity to be $\pm$ 37 $\degree$ which 
+        is a reconcilable difference with our simulated results.  
   \end{itemize}
-  
-  \begin{figure}[!ht]
-	\centering
-	\begin{subfigure}{0.45\textwidth}
-		\centering
-		\hspace{-1cm}
-		\vspace{1cm}
-		\includegraphics[width=\textwidth,scale=2]{tails_topview.png}
-		\caption{}\label{fig:tails_topview}
-	\end{subfigure}
-	\begin{subfigure}{0.45\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{tails_rzplot.png}
-		\caption{}\label{fig:tails_rzplot}
-	\end{subfigure}
-	\begin{subfigure}{0.45\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{centroids_box.png}
-		\caption{}\label{fig:centroids}
-	\end{subfigure}
-	\begin{subfigure}{0.45\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{angles_traj_layered.png}
-		\caption{}\label{fig:angle_distribution}
-	\end{subfigure}
-	\caption{(a) The trajectory can be stripped of all atoms except carbon
-	atoms in monomer tails. (b) Simulated diffraction of the tail-only trajectory
-	still gives rise to R-spots. (c) Finding the center of mass and visualizing 
-	their coordinates reveals the hexagonal-like packing of the tails. (d) The 
-	distribution created by measuring the angle between each centroid (e.g. red 
-	in (c)) and its neareset neighbors (e.g. green in (c)) with respect to the xy
-	plane has distinct spikes near 30\degree, which is consistent with the location
-	of R-spots}\label{fig:tail_packing}
+ 
+  \begin{figure}[ht]
+  \centering
+  \begin{subfigure}{0.3\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{offset_tail_packing.png}
+        \caption{}~\label{fig:offset_tails}
+  \end{subfigure}
+  \begin{subfigure}{0.3\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{angles_traj_layered.png}
+        \caption{}~\label{fig:layered_tails}
+  \end{subfigure}
+  \begin{subfigure}{0.3\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{integrated_WAXS_ring.png}
+        \caption{}~\label{fig:rz_layered}
+  \end{subfigure}
+  \caption{The distribution of angles w.r.t. xy plane between alkane chain tail centroids and nearest
+  neighbor centroids for equilibrated parallel displaced (a) and sandwiched (b) configurations both show
+  distinct peaks at $\pm$ 33 $\degree$. (c) Integrated 2D WAXS data between $q_r$=1 and $q_r$=1.42 shows
+  distinct peaks at with maxima at $\pm$ 37 $\degree$}~\label{fig:tail_packing}
   \end{figure}
+ 
   %MRS: one could ask the question about basins for the parallel displaced and sandwich as well.  
   %MRS: we had talked a lot about interconversion (or conversion one way but not other?) but 
   %MRS: I think things have changed since then? 
+  The disordered basin shares little in common with the ordered basin but 
+  its long term stability suggests that it can exist under some conditions.  
+  Basin B is the dominant configuration at higher temperatures.
+  \begin{itemize}
+        \item We linearly ramped the temperature of a system in Basin A
+        from 280K to 340K over 100 ns.
+        \item Visually, there is a distinct change in pore structure from one
+        characteristic of Basin A (Figure~\ref{fig:280K_pore}) to one characteristic of
+        Basin B (Figure~\ref{fig:340K_pore}).
+        \item The slope of all order parameters changes between 315K and 325K
+        (\Cref{fig:p2p_tramp,fig:thickness_tramp,fig:order_tramp}) indicating the
+        possibility of an abrupt change in system ordering.
+        \item Our 100 ns temperature ramp was likely too fast and caused the system
+        to suffer from hysteresis.
+  \end{itemize}
+
   We can not immediately classify Basin A and Basin B as separate phases.
   \begin{itemize}
 	\item To prove the existence of two phases we need evidence of a
@@ -1117,20 +1146,6 @@ suggested
 	the uncertainty in pore radius.  % BJC: these may change
         \item The pore radius is divided by its uncertainty as a way of quantifying
         the degree to which monomers obstruct the pore region.
-  \end{itemize}
-
-  Basin B is the dominant configuration at higher temperatures.
-  \begin{itemize}
-	\item We linearly ramped the temperature of a system in Basin A 
-	from 280K to 340K over 100 ns.
-        \item Visually, there is a distinct change in pore structure from one
-        characteristic of Basin A (Figure~\ref{fig:280K_pore}) to one characteristic of
-        Basin B (Figure~\ref{fig:340K_pore}).
-        \item The slope of all order parameters changes between 315K and 325K
-	(\Cref{fig:p2p_tramp,fig:thickness_tramp,fig:order_tramp}) indicating the
-        possibility of an abrupt change in system ordering.
-        \item Our 100 ns temperature ramp was likely too fast and caused the system
-        to suffer from hysteresis.
   \end{itemize}
 
   In an attempt to mitigate hysteresis, we performed a slow, stepwise temperature ramp.

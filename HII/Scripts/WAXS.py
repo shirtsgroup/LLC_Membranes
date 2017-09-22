@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import matplotlib
-matplotlib.rc('axes', color_cycle=['r', 'g', 'b', '#004060'])
 import numpy as np
 import matplotlib.pyplot as plt
 import math
@@ -13,18 +12,21 @@ center = np.array([530, 473])
 hw = 400  # height and width (pixels)
 r_high = hw - 155
 r_low = hw - 215
-bins = 180
+bins = 720
+db = 180 / float(bins)
 
 waxs = waxs[center[0]-hw:center[0]+hw, center[1]-hw:center[1]+hw]
 
 qpi = 1.7  # q value of pi-stacking reflection
 axial = np.copy(waxs[:, int(waxs.shape[0]/2)])  # hold x constant at the center, and get all y values. The array is of the shape [y, x]
 mid = axial.shape[0] / 2
-axial[(mid - 150):(mid + 150)] = 0  # zero out middle values so we get the right maximum
+axial[int(mid - 150):int(mid + 150)] = 0  # zero out middle values so we get the right maximum
 Imax = np.amax(axial)  # max value of Intensity. It will correspond to location of pi-stacking reflection
 Imax_pixel = np.where(axial == Imax)[0][0]
 pixel_to_q = 1.7 / abs(mid - Imax_pixel)
 qmax = mid*pixel_to_q
+r_high_pix = 155 * pixel_to_q
+r_low_pix = 215 * pixel_to_q
 
 # The raw data contains super high intensity specs and some intensity near the center that is meant to be blocked out
 # I zero out all of those so that the highest intensity is in the pi-stacking reflection.
@@ -40,6 +42,9 @@ waxs /= np.amax(waxs)  # normalize with respect to highest intensity in pi-stack
 # plt.xlabel('$q_r$', fontsize=14)
 # plt.ylabel('$q_z$', fontsize=14)
 # plt.gcf().get_axes()[0].tick_params(labelsize=14)
+# plt.tight_layout()
+# plt.show()
+
 # fig.savefig('raw_WAXS.png')
 # fig.clf()
 # #plt.show()
@@ -55,10 +60,12 @@ plt.gcf().get_axes()[0].set_xlabel('$q_r$', fontsize=14)
 plt.gcf().get_axes()[0].set_ylabel('$q_z$', fontsize=14)
 plt.gcf().get_axes()[0].set_aspect('equal')
 plt.gcf().get_axes()[0].tick_params(labelsize=14)
-fig.savefig('raw_WAXS.png')
-fig.clf()
+plt.tight_layout()
 # plt.show()
-exit()
+# fig.savefig('raw_WAXS.png')
+# fig.clf()
+# plt.show()
+# exit()
 angles = np.zeros([bins])
 norm = np.zeros([bins])
 ring = np.zeros_like(waxs)
@@ -92,13 +99,27 @@ for i in range(waxs.shape[0]):
 
 
 avg = angles / norm  # normalize intensities so it is on a per count basis
+avg /= sum(avg)
 angles = np.linspace(-90, 90, bins + 1)  # We will only see angles in the range of -90 to 90 since we use np.arctan
 bin_angles = [(angles[i] + angles[i + 1])/2 for i in range(bins)]  # bars will be placed in the middle of the bins
 width = angles[1] - angles[0]  # width of bins
 
+max1 = np.max(avg[int((90 - 50)/db):int((90 - 25)/db)])
+max2 = np.max(avg[int((90 + 25)/db):int((90 + 50)/db)])
+print(90 - np.where(avg == max1)[0][0]*db)
+print(-90 + np.where(avg == max2)[0][0]*db)
+print(max1, max2)
+
+exit()
 print(np.max(avg) / np.mean(avg))
 
+plt.figure()
 plt.bar(bin_angles, avg, width=width)
+plt.xlabel('Angle (degrees)', fontsize=14)
+plt.ylabel('Normalized Intensity', fontsize=14)
+plt.gcf().get_axes()[0].tick_params(labelsize=14)
+plt.tight_layout()
+plt.savefig('integrated_WAXS_ring.png')
 plt.show()
 
 # plt.imshow(ring, vmax=0.05)

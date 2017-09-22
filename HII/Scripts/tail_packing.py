@@ -178,20 +178,34 @@ if __name__ == "__main__":
         print("Loading saved arrays")
         arrays = np.load('angles_ld_%s.npz' % args.suffix, encoding='bytes')
         angles = arrays['angles']
+        centroids = arrays['centroids']
+        atoms_per_frame = int(angles.shape[0] / centroids.shape[0])
+        angles = angles[args.start * atoms_per_frame : args.end * atoms_per_frame]
         ld = arrays['ld']
         nlist = arrays['nlist']
-        centroids = arrays['centroids']
 
     if args.write_gro:
         file_rw.write_gro_pos(centroids[-1, :, :], 'centroids.gro', name='NA')
 
     angles = [value for value in angles if not math.isnan(value)]
 
-    nbins = 45
+    nbins = 180
     (counts, bins) = np.histogram(angles, bins=nbins)
-    plt.hist(angles, bins=nbins)
-    plt.show()
+    # plt.hist(angles, bins=nbins)
+    # plt.show()
+
     bin_width = bins[1] - bins[0]
+    db = bin_width
+    bin_centers = [bins[i - 1] + ((bins[i] - bins[i - 1]) / 2) for i in range(1, len(bins))]
+    integrated_area = np.trapz(counts, bin_centers)  # integrated area of histogram for normalization
+    avg = counts * bin_width / integrated_area
+
+    max1 = np.max(avg[int((-bins[0] - 40)/db):int((-bins[0] - 20)/db)])
+    max2 = np.max(avg[int((-bins[0] + 25)/db):int((-bins[0] + 50)/db)])
+    print(np.where(avg == max2))
+    print(90 - np.where(avg == max1)[0][0]*db)
+    print(-90 + np.where(avg == max2)[0][1]*db)
+    print(max1, max2)
 
     plt.figure()
     bin_centers = [bins[i - 1] + ((bins[i] - bins[i - 1]) / 2) for i in range(1, len(bins))]
@@ -201,8 +215,8 @@ if __name__ == "__main__":
     plt.ylabel('Normalized frequency', fontsize=14)
     plt.axes().tick_params(labelsize=14)
     plt.tight_layout()
-
-
+    plt.show()
+    exit()
     if args.fit:
         bin_locations = np.linspace(-90, 90, nbins)
         fapprox = np.array([f(t, 8, 180, bin_locations).real for t in counts]) + np.mean(bins)
