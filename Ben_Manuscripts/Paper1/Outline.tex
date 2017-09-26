@@ -701,7 +701,7 @@
   %\end{itemize}
   
   We will now address the questions raised in the introduction in the order
-  that they were asked.  %BJC: I dont like this
+  that they were asked.  %BJC: Not a fan of this
 
   To answer (1), we verified that the system stays partitioned into layers by
   plotting the pair correlation function calculated between aromatic rings along
@@ -714,22 +714,46 @@
 	\item Comment on difference between offset/layered, number of monomers per layer
   \end{itemize} 	
 
+  % BJC: might replace with a figure containing alllllll of the zdf's
+  \begin{figure}[!ht]
+        \centering
+        \begin{subfigure}{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{zdf5layered.png}
+                \caption{}\label{fig:zdf_layered}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{zdf5offset.png}
+                \caption{}\label{fig:zdf_offset}
+        \end{subfigure}
+        \caption{Pair distribution functions of aromatic carbons for the
+        (a) 5 monomer per layer, sandwiched and (b) 5 monomer per layer,
+        parallel displaced configurations. Clear periodic maxima in the 
+        $z$ probability density indicate distinct layers. The magnitude 
+        of the spikes with respect to the average suggest that the 5 
+        monomer per layer, sandwiched configuration possesses a higher 
+        degree of layer partitioning.}\label{fig:zdf}
+  \end{figure}
+
+
   To discern the composition of the monomer layers, addressing (2), we ran 
   simulations of systems created with 4 - 8 monomers per layer.  % BJC: can't figure out how to word this : should be 'with between 4 and 8 monomers' or 'with from 4 to 8 monomers'?
   \begin{itemize}
   	\item Both the sandwiched and parallel displaced configurations were tested.
-	\item All systems are stable after 50 ns of simulation.  % BJC: edited this for clarity
+	\item All systems are stable after 400 ns of simulation.  % BJC: edited this for clarity
         %MRS: you only ran for 50 ns, or after 50 ns some of them started to destabilize?  Is the point you are making that they are ALL pretty stable, or all at least a little stable.   
-        %MRS: are they all equally stable? I though you had some additional information on this. Are you saving it for later?  
-        %MRS: remind people where the uncertainty comes from.
-	%BJC: It looks like the 7 and 8 monomer systems were only run for 50 ns. The 4 monomer system was run for 200 ns. 5 and 6 have a lot of data. 7 and 8 flattened pretty quickly, so at the time I figured it wasn't worth continuing. But I'll extend them just to be thorough.
+	%BJC: Working on getting them all run out to 400 ns
 	\item Table ~\ref{table:p2p} shows the pore spacing for all systems tested. 
-	Systems built with 5 monomers in each layer equilibrate to a pore spacing
+	\item Systems built with 5 monomers in each layer equilibrate to a pore spacing
 	that is most consistent with the experimental value of 4.12 nm derived from
 	SAXS measurements (Figure~\ref{fig:SAXS}).
 	\item The remainder of this discussion will focus on the analysis of systems
 	built with 5 monomers per layer. 
   \end{itemize}
+ 
+  % BJC: Even though I will shift focus to only 5 monomers per layer, I can put other data
+  % such as XRD of 4, 6, 7, 8 mon/layer in supplemental information 
   
   \begin{table}[h]
   \centering
@@ -746,121 +770,94 @@
   8 & $5.08 \pm 0.04$ & $5.46 \pm 0.03$ \\
   \bottomrule
   \end{tabular}
-  \caption{The pore spacing 
-  %MRS added
-  (given in \angstrom~)
-  of the model increases as number of monomers
-  in each layer increases. The pore spacing of a system starting in the 
-  sandwiched configuration is systematically lower than that started in an 
-  offset configuration. Systems built with 5 monomers per layer in a parallel
-  displaced configuration result in a pore spacing closest 
-  %MRS: clarified.
-  %to experimental data
-  to the experimental 4.12 \angstrom~}\label{table:p2p} 
+  \caption{The pore spacing (given in $\nm$) of the model increases as
+  number of monomers in each layer increases. The pore spacing of a system
+  starting in the sandwiched configuration is systematically lower than 
+  that started in an offset configuration. Systems built with 5 monomers
+  per layer in a parallel displaced configuration result in a pore spacing
+  closest to the experimental 4.12 $\nm$~}\label{table:p2p} 
   \end{table}
   
-  \begin{figure}[!ht]
-	\centering
-	\begin{subfigure}{0.45\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{zdf5layered.png}
-		\caption{}\label{fig:zdf_layered}
-	\end{subfigure}
-	\begin{subfigure}{0.45\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{zdf5offset.png}
-		\caption{}\label{fig:zdf_offset}
-	\end{subfigure}
-	\caption{Pair distribution functions of aromatic carbons for the
-	(a) 5 monomer per layer, sandwiched and (b) 5 monomer per layer, 
-	parallel displaced configurations. 
-        %MRS: added some info.
-        Clear periodic maxima in the $z$ probability density indicate
-        % Spikes in the distribution mark
-	distinct layers. The magnitude of the spikes with respect to the 
-	average suggest that the 5 monomer per layer, sandwiched configuration
-	possesses a higher degree of layer partitioning.}\label{fig:zdf}
-  \end{figure}
+%  To answer question (3) we require high resolution experimental evidence which we 
+%  can match to our simulations. Experimental WAXS measurements encode all structural
+%  details and we would like to match them as well as possible. 
+%  %MRS: also encodes the pore spacing
+%  %BJC: got rid of 'remaining' in 'remaining structural details'
+%  %BJC: I'm not exactly sure where to place this paragraph. Maybe it can go in methods?
+%  \begin{itemize}
+%  	\item There are five major features present in the 2D experimental 
+%	pattern which our model intends to reproduce (Figure~\ref{fig:WAXS}).
+%	\item The first is located at $q_z$ = 1.7 \angstrom$^-1$,
+%	corresponding to a real spacing of 3.7 \angstrom~. The reflection is 
+%	attributed to $\pi$-$\pi$ stacking between aromatic rings in the direction
+%	perpendicular to the membrane plane, or z-axis. For simplicity, this 
+%	reflection will be referred to as R-$\pi$.
+%       %MRS: why R in R-pi? for reflection?
+%	%BJC: yes, R = reflection
+%	\item A weak intensity line is located at exactly half the $q_z$ value of
+%	R-$\pi$ ($q_z$ = 0.85 \angstrom$^-1$), corresponding to a 
+%	real space periodic spacing of 7.4 \angstrom~. This reflection has been 
+%	interpreted  as 2\textsubscript{1} helical ordering of aromatic rings 
+%	along the z axis meaning if the positions of the aromatic rings can
+%	be traced by a helix, then for each turn in the helix, there should be
+%	two aromatic rings. For this reason it will be referred to as R-helix.
+%	\item A third major reflection is marked by a low intensity ring located
+%	at r = 1.4 \angstrom$^-1$. The real space separation 
+%	corresponds to 4.5 \angstrom~ which is characteristic of the average 
+%	spacing between packed alkane chains. This reflection will be called R-alkanes.
+%	\item Within R-alkanes, are four spots of higher intensity which 
+%	will be called R-spots. All are located $\approx 40$ degrees from the $q_z$ axis
+%	in their respective quadrants. In many liquid crystal systems this can be
+%	explained by the tilt angle of the alkane chains with respect to the xy plane. % BJC: Reference
+%	\item The final major reflections correspond to the spacing and symmetry of 
+%	the d\textsubscript{100} plane which can be related to the distance between
+%	pores. The feature, which will be called R-pores, is characterized by dots 
+%	along $q_z$ = 0. The spacing between dots is indicative of the hexagonal 
+%	symmetry of the packed pores. It is easiest to interpret the data by 
+%	radially integrating the 2D data to get a 1D curve which is shown in Figure~\ref{fig:SAXS}.
+%  \end{itemize}
 
-  To answer question (3) we require high resolution experimental evidence which we 
-  can match to our simulations. Experimental WAXS measurements encode all structural
-  details and we would like to match them as well as possible. 
-  %MRS: also encodes the pore spacing
-  %BJC: got rid of 'remaining' in 'remaining structural details'
-  %BJC: I'm not exactly sure where to place this paragraph. Maybe it can go in methods?
-  \begin{itemize}
-  	\item There are five major features present in the 2D experimental 
-	pattern which our model intends to reproduce (Figure~\ref{fig:WAXS}).
-	\item The first is located at $q_z$ = 1.7 \angstrom$^-1$,
-	corresponding to a real spacing of 3.7 \angstrom~. The reflection is 
-	attributed to $\pi$-$\pi$ stacking between aromatic rings in the direction
-	perpendicular to the membrane plane, or z-axis. For simplicity, this 
-	reflection will be referred to as R-$\pi$.
-        %MRS: why R in R-pi? for reflection?
-	%BJC: yes, R = reflection
-	\item A weak intensity line is located at exactly half the $q_z$ value of
-	R-$\pi$ ($q_z$ = 0.85 \angstrom$^-1$), corresponding to a 
-	real space periodic spacing of 7.4 \angstrom~. This reflection has been 
-	interpreted  as 2\textsubscript{1} helical ordering of aromatic rings 
-	along the z axis meaning if the positions of the aromatic rings can
-	be traced by a helix, then for each turn in the helix, there should be
-	two aromatic rings. For this reason it will be referred to as R-helix.
-	\item A third major reflection is marked by a low intensity ring located
-	at r = 1.4 \angstrom$^-1$. The real space separation 
-	corresponds to 4.5 \angstrom~ which is characteristic of the average 
-	spacing between packed alkane chains. This reflection will be called R-alkanes.
-	\item Within R-alkanes, are four spots of higher intensity which 
-	will be called R-spots. All are located $\approx 40$ degrees from the $q_z$ axis
-	in their respective quadrants. In many liquid crystal systems this can be
-	explained by the tilt angle of the alkane chains with respect to the xy plane. % BJC: Reference
-	\item The final major reflections correspond to the spacing and symmetry of 
-	the d\textsubscript{100} plane which can be related to the distance between
-	pores. The feature, which will be called R-pores, is characterized by dots 
-	along $q_z$ = 0. The spacing between dots is indicative of the hexagonal 
-	symmetry of the packed pores. It is easiest to interpret the data by 
-	radially integrating the 2D data to get a 1D curve which is shown in Figure~\ref{fig:SAXS}.
-  \end{itemize}
-
-  \begin{figure}[!ht]
-	\centering
-	\begin{subfigure}[t]{0.47\linewidth}
-		\centering
-		\raisebox{.2\textwidth}{%
-		\includegraphics[width=\linewidth]{WAXS_soft_confined.png}
-		}
-		\caption{}\label{fig:WAXS}
-	\end{subfigure}
-	\begin{subfigure}[t]{0.43\linewidth}
-		\centering
+%  \begin{figure}[!ht]
+%	\centering
+%	\begin{subfigure}[t]{0.47\linewidth}
+%		\centering
+%		\raisebox{.2\textwidth}{%
+%		\includegraphics[width=\linewidth]{WAXS_soft_confined.png}
+%		}
+%		\caption{}\label{fig:WAXS}
+%	\end{subfigure}
+%	\begin{subfigure}[t]{0.43\linewidth}
+%		\centering
 	%	\vspace{12mm}
-		\includegraphics[width=\linewidth]{SAXS.png}
-		\caption{}\label{fig:SAXS}
-	\end{subfigure}
-	\caption{(a) 2D wide angle X-ray scattering gives details about repeating
-	features less than 1 nanometer apart. (b) 1D small angle X-ray scattering 
-	indicates hexagonal packing of pores as well as the spacing between pores.}\label{fig:SWAXS}
+%		\includegraphics[width=\linewidth]{SAXS.png}
+%		\caption{}\label{fig:SAXS}
+%	\end{subfigure}
+%	\caption{(a) 2D wide angle X-ray scattering gives details about repeating
+%	features less than 1 nanometer apart. (b) 1D small angle X-ray scattering 
+%	indicates hexagonal packing of pores as well as the spacing between pores.}\label{fig:SWAXS}
         %MRS: maybe compare the 2D and 1D from simulation here as well?  Need to state the above figure is from another paper (I think at least the 1D is?)
 	%BJC: 1D is from a Yale paper. I'm going to remake the figure from the raw data but will reference that
 	%BJC: The simulated 1D shows the right peaks, but the resolution makes it kind of pointy. I'll let you take a look at it but maybe it belongs in the supplemental
-  \end{figure}
+%  \end{figure}
 
-  In addition to the parallel displaced and sandwiched configurations we observed
-  that the initial distance between layers can influence the approach towards 
-  equilibrium.
+  The $z$-direction correlation functions show that layers in our model prefer
+  to stack further apart than the 3.7 \angstrom~ suggested by experiment. We attempted equilibration 
+  with layers stacked 4.0 $\nm$ apart and to our surprise, we observed
+  long-term stability of a qualitatively different configurations suggesting
+  that we have found more than one metastable free energy basin.
+  %that the initial distance between layers can influence the approach towards 
+  %equilibrium.
   \begin{itemize}
-  	\item Our choice of distance between layers results in long-term stability of 
-	qualitatively different configurations suggesting that we have found more than
-        one metastable free energy basin.
   	\item Equilibrated systems built according to the 3.7 \angstrom~layer spacing 
         implied by R-$\pi$ are characterized by a defined, cylindrical and open pore 
 	structure.
         \item We will refer to this large set of configurations, with an open pore, as 
-        Basin OP (open pore) (Figure~\ref{fig:abasin}).
+        the OP Basin (open pore) (Figure~\ref{fig:abasin}).
 	\item Simulations of systems built with layers stacked greater than 4 
 	\angstrom~ apart results in a pore structure characterized by high radial 
 	disorder, while still maintaining partitioning between hydrophobic and 
 	hydrophilic regions.
-	\item This will be called Basin CP (closed pore) (Figure~\ref{fig:bbasin}).
+	\item This will be called the CP Basin (closed pore) (Figure~\ref{fig:bbasin}).
 	\item This LLC membrane may exist in at least two metastable states.
 	\item The distinct difference in pore structure exhibited by each phase will 
 	likely lead to different transport mechanisms.
@@ -958,16 +955,18 @@
   %patterns produced from equilibrated MD trajectories shows the most consistency
   %with the offset configuration in the OP basin.
   
-  We created systems using three 
-  distinct initial configurations and examined their structure by simulating 
-  X-ray diffraction patterns produced from equilibrated MD trajectories.
+  We answer question (3) by simulating X-ray diffraction patterns produced from
+  equilibrated MD trajectories. We leave open the possibility that the 
+  experimental structure might be reminiscent of the parallel displaced or sandwiched
+  configurations in the OP or CP basins.
+  %We created systems using three distinct initial configurations and examined
+  %their structure by simulating X-ray diffraction patterns produced from equilibrated MD trajectories.
   \begin{itemize}
-  	\item Systems were built in both the parallel displaced and sandwiched 
+  	\item OP Basin systems were built in both the parallel displaced and sandwiched 
 	configurations with an intial layer spacing of 3.7 \angstrom~.
 	\item A third system was created by stacking layers in the sandwiched 
 	configuration 5 \angstrom~apart in order to guide it towards the CP Basin.
 	% BJC: I've done an additional offset disordered system which goes to Basin CP but I think that will confuse the point
-	\item For ease of reference, the third system will be referred to as Basin D (disordered). 
 	\item The three systems were equilibrated according to our procedure with
 	NPT simulations of greater than 400 ns.
 	\item Simulated diffration patterns were generated using portions of the
@@ -982,36 +981,46 @@
   % layered separately? Try it. 
   % Talk about disordered last so it leads in to 
   % Also maybe don't talk about question 4 until after this
-  Full comparison of experimental 2D WAXS with simulated X-ray diffraction
-  patterns shows the most consistency with the offset configuration in the OP basin.
+  
+  %Full comparison of experimental 2D WAXS with simulated X-ray diffraction
+  %patterns shows the most consistency with the offset configuration in the OP basin.
+  
+  Simulated diffraction of the disordered pore structure in the both the sandwiched
+  and parallel displaced configurations does not match the experimental pattern.
   \begin{itemize}
         \item The disordered pore structure exhibits R-alkanes and R-pores but R-helix,
 	R-$\pi$ and R-spots are not present. 
-        \item Simulated XRD of the sandwiched configuration contains all features 
-        except for R-helix.
-        \item Most notably, R-spots appears in the expected location, which suggests 
-        that there is something intrinsic to the sandwiched packing that gives rise 
-        to such features. 
+        \item Due to low resolution, making out the individual spots of R-pores is
+        challenging and can be validated with slightly better resolution upon full
+        spherical integration of the 3D structure factor. However, the same
+        information can be extracted by measuring the pore spacing as described earlier.
+        %BJC: ^^^This can be more concise 
+        \item Although the structure's diffraction pattern is very different from
+        experiment, its long-term stability suggests that the structure is realistic.
+	We will explore this further when addressing (4). 
+  \end{itemize}
 
-	\item The equilibrated parallel displaced structure exhibits R-alkanes and
-	R-pores in the expected locations. 
-	\item Due to low resolution, making out the individual spots of R-pores is
-	challenging and can be validated with slightly better resolution upon full
-	spherical integration of the 3D structure factor. However, the same 
-	information can be extracted by measuring the pore spacing as described earlier.
-	\item R-$\pi$ is also present, intersecting R-alkanes at a lower q value than
-	in experiment. The rings prefer to stack $\approx 4.1 \angstrom$ apart as 
-	opposed to 3.7 \angstrom~.
-	\item R-helix and R-spots are also both missing.
-	\item The line which intersected both of these features in the restrained 
-	simulations faded upon equilibration which suggests that monomers in the 
-	parallel-displaced configuration may not give rise to the experimental WAXS 
-	pattern seen.
-	\item Simulated XRD of the sandwiched configuration contains all features 
-	except for R-helix.
-	\item Most notably, R-spots appears in the expected location, which suggests 
-	that there is something intrinsic to the sandwiched packing that gives rise 
-	to such features. 
+  Simulated XRD of the sandwiched configuration contains all experimental features
+  except for R-helix.
+  \begin{itemize}
+        \item R-alkanes and R-pores appear in the expected locations.
+        \item R-$\pi$ is also present, intersecting R-alkanes at a lower q value than
+        in experiment. The rings prefer to stack $\approx 4.1 \angstrom$ apart as % update distance if needed
+        opposed to 3.7 \angstrom~.
+        \item Most notably, R-spots appears in the expected location, which suggests 
+        that there is something intrinsic to closer packing that gives rise 
+        to such features. 
+  \end{itemize}
+
+  The parallel displaced configuration results in a simulated XRD pattern with 
+  the closest match to experiment. 
+  \begin{itemize}
+	\item It produces the only pattern that exhibits all major reflections
+	\item R-alkanes, R-pores and R-$\pi$ appear as they do in the sandwiched configuration. 
+	\item R-spots appears, however with a lower intensity relative to R-alkanes
+        when compared to the sandwiched configuration.
+        \item R-helix appears apparently due to the parallel displaced aromatic rings
+        %BJC: Maybe a figure to explain why this happens
   \end{itemize}
   
 % BJC: Replacement figure below this one
@@ -1082,14 +1091,14 @@
   R-alkanes and R-pores in common with experiment}~\label{fig:xrd}
   \end{figure}
 
-  The spots that appear in the simulated XRD pattern of OP basin
+  The spots that appear in the simulated XRD pattern of the OP basin
   conformations are a result of the way alkane tails pack together.
   \begin{itemize}
   	\item Previously, the spots in the diffraction pattern had been explained 
 	as the product of tilted alkane chains.
 	\item We measured the tilt angle of the alkane chains and showed that our 
 	system equilibrates to an average tilt angle close to zero degrees (See Supplemental Information). 
-	\item To understand the origin of the spots, we determined which atoms gave rise to the feature.i
+	\item To understand the origin of the spots, we determined which atoms gave rise to the feature
 	\item Since R-spots is present as higher intensity spots within R-alkanes, it is likely
         that the spots arise as a consequence of the tails. 
 	\item By removing atoms from the trajectory and simulating a diffraction 

@@ -26,10 +26,36 @@ def initialize():
     parser.add_argument('-bins', default=1000, type=int, help='Number of bins to use when binning distances')
     parser.add_argument('-apl', default=5, type=float, help='Atoms or monomers per layer')
     parser.add_argument('-l', '--load', type=str, help='Load compressed numpy array')
+    parser.add_argument('-com', '--com', action="store_true", help='Calculate zdf based on com of atoms')
 
     args = parser.parse_args()
 
     return args
+
+
+def centroids(x, n):
+    """
+    Calculate the centroid of group of atoms based on atomic positions.
+    Same thing as center of mass if all atoms are the same
+    :param x: xyz positions of all atoms
+    :param n: number of atoms in each group (assumed atoms are grouped sequentially)
+    :return: centroids
+    """
+
+    nT = x.shape[0]
+    natoms = x.shape[1]
+    ngrps = int(natoms / n)
+
+    centers = np.zeros([nT, ngrps, 3])
+
+    for t in range(nT):
+        for i in range(ngrps):
+            for j in range(int(n)):
+                centers[t, i, :] += x[t, i*int(n) + j, :]
+
+    centers /= n
+
+    return centers
 
 
 def z_periodic(positions, unitcell_vectors, images=1):
@@ -127,9 +153,10 @@ def zdf(positions, npores, atoms_per_layer, box, images=1, tol=0.01):
     # control = np.zeros([len(bins)]) + np.mean(bins[:end])
 
     end /= 2
-
-    if not args.avg:
-        plot_zdf(edges, bins, end=end)
+    # print(edges, bins)
+    # exit()
+    # if not args.avg:
+    #     plot_zdf(edges, bins, end=end)
 
     return edges[:int(end)], bins[:int(end)]
 
@@ -151,6 +178,61 @@ def plot_zdf(z, d, end=-1):
     plt.show()
 
 
+def spacing(x, y, start=0.3, window=0.25, zcut=4):
+    """
+    Find the layer spacing based on the first maximum of the zdf
+    :param x: z values where zdf is taken
+    :param y: zdf values for each z
+    :param dmax: maximum distance between layers. Search for maxima stops at this distance
+    :return: layer spacing
+    """
+
+    bin_width = x[1] - x[0]
+    window_bins = int(window / bin_width)
+
+    begin = 0
+    while x[begin] < window:
+        begin += 1
+    begin -= 1
+
+    cut = 0
+    while x[cut] < zcut:
+        cut += 1
+
+    maxes = [[], []]
+    mins = [[], []]
+    max_search = 1
+    while (begin + window_bins) < cut:
+
+        if max_search == 1:
+            m = np.max(y[begin:(begin+window_bins)])
+            max_search = 0
+            m_ndx = np.where(y == m)[0][0]
+            maxes[1].append(m)
+            maxes[0].append(x[m_ndx])
+        elif max_search == 0:
+            m = np.min(y[begin:(begin+window_bins)])
+            max_search = 1
+            m_ndx = np.where(y == m)[0][0]
+            mins[1].append(m)
+            mins[0].append(x[m_ndx])
+
+        begin += (m_ndx - begin)
+
+    separation = []
+    fluct = []
+    separation.append(maxes[0][0])
+    for i in range(1, len(maxes[1])):
+        separation.append(maxes[0][i] - maxes[0][i - 1])
+        fluct.append(mins[1][i - 1] - maxes[1][i - 1])
+    fluct.append(mins[1][-1] - maxes[1][-1])
+
+    print(separation)
+    print(fluct)
+
+    return maxes[0][0]
+
+
 if __name__ == "__main__":
 
     args = initialize()
@@ -168,9 +250,25 @@ if __name__ == "__main__":
         zdf = np.load(args.load)
         zdf_avg = zdf["zdf_avg"]
         z = zdf["z"]
+        dbwl = spacing(z, zdf_avg)
         plot_zdf(z[:-2], zdf_avg[:z.shape[0] - 2])
+        print('Distance between layers: %s' % dbwl)
 
     else:
+
+        if args.com:
+
+            keep = [a.index for a in t.topology.atoms if a.name in args.atoms]
+            pos = t.atom_slice(keep).xyz
+            centers = centroids(pos, args.apl)
+            periodic = z_periodic(centers, box)
+            atom = 'center of mass'
+            z, d = zdf(periodic, 4, args.apl, box)
+            d = np.trim_zeros(d, trim='b')
+            plot_zdf(z, d[:z.shape[0]])
+            dbwl = spacing(z, d)
+            print('Distance between layers: %s' % dbwl)
+            exit()
 
         if args.avg:
 
@@ -203,3 +301,5 @@ if __name__ == "__main__":
             np.savez_compressed("zdf", zdf_avg=zdf_avg, z=z)
 
             plot_zdf(z, zdf_avg[:z.shape[0]])
+            dbwl = spacing(z, zdf_avg)
+            print('Distance between layers: %s' % dbwl)
