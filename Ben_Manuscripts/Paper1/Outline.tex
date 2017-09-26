@@ -140,7 +140,7 @@
   \end{itemize}
   
   Our approach to constructing a general model will follow the development of a
-  model of a specific LLC membrane with sufficient experimental characterization. %BJC: ample too much?
+  model of a specific LLC membrane with sufficient experimental characterization.
     \begin{itemize}
 	    \item We have chosen to focus on assemblies formed by Na-GA3C11
 	    \item We have also narrowed our scope to the development of 
@@ -350,7 +350,7 @@
         the d\textsubscript{100} plane which can be related to the distance between
         pores. The feature, which will be called R-pores, is characterized by dots
         along $q_z$ = 0. The spacing between dots is indicative of the hexagonal
-        symmetry of the packed pores. The same information is obtained using a SAXS
+        symmetry of the packed pores. The same information at higher resolution is obtained using a SAXS
         setup. By radially integrating the 2D data one gets a 1D curve which is 
         shown in Figure~\ref{fig:SAXS}.  % BJC: I also have 2D SAXS data
   \end{itemize}
@@ -385,12 +385,19 @@
 %    spacings greater than 4 \angstrom~.
 %  \end{itemize}
 
-  We chose an initial layer spacing based on R-$\pi$.
+  We chose the initial layer spacing based on R-$\pi$.
   \begin{itemize}  
-    \item Each monomer was rotated so the plane of the aromatic ring on the
-    head groups would be parallel to the xy plane.
+    \item Each monomer was rotated so the plane of the aromatic head groups would
+    be parallel to the xy plane.
     \item The layers are placed so aromatic rings are stacked 3.7 \angstrom~
     apart in the z-direction.
+    \item We extracted the equilibrium distance between layers based on the first
+    peak of a spatial correlation function, $g(z)$, measured along the z-axis (perpendicular to 
+    the membrane plane)
+    \item To calculate $g(z)$, we binned the z component distances between 
+    the center of mass of each benzene ring and all others of the same pore 
+    over 50 ns of equilibrated trajectory and then normalized by the average
+    number density.
     \item Our simulations tend to equilibrate to a wider interlayer spacing of
     $\approx$ 4.1 \angstrom~, which inspired separate systems starting with layer 
     spacings greater than 4 \angstrom~.
@@ -461,7 +468,10 @@
     its $\approx$ 5 \angstrom~equilibrium stacking distance ~\cite{sinnokrot_estimates_2002}.
     \item The system's preference towards the sandwiched vs. parallel displaced 
     stacking modes will be explored.
-    \item Both have reported stacking distances near 3.7 \angstrom
+    \item Both have reported stacking distances near 3.7 \angstrom % Reference
+    \item Headgroups in the sandwiched configuration are stacked directly on top of
+    each other while stacked headgroups in the parallel displaced configuration are offset 
+    by $180/nmon$ degrees where $nmon$ equals the number of monomers per layer.
     %BJC: I think the following commentary belongs elsewhere, maybe even in the discussion
     %MRS: hard to say. It's certainly a big switch from things that are relatively straightforward to things that require 
     % a fair amount of information, so I think it belongs in it's own section -- so far, you're just laying out the approach.  This is what we fix, this is what we leave as a variable.  The analysis probably belongs later.
@@ -684,7 +694,7 @@
   %In order to construct an initial configuration which gives reliable 
   %trends, we need to understand the composition of layers, how far apart
   %to stack the layers, and how to orient them with respect to each other.
-  %\begin{itemize}
+  %\begin{itemize
   %	\item To verify our choices for each parameter, we compare our calculations
   %	to experimental small angle X-ray scattering (SAXS), wide angle X-ray
   %	scattering (WAXS), and ionic conductivity measurements.
