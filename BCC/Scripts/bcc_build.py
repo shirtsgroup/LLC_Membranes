@@ -142,6 +142,7 @@ if __name__ == "__main__":
     LC = bcc_class.LC(args.build_mon)  # get all properties of the liquid crystal
     period = args.dim  # length of one side of the unit cell
     grid = gridgen(args.phase, 0, args.dim, args.n)  # 3d grid of points from 0 to args.dim spaced by args.dim / args.n
+
     file_rw.write_gro_pos(grid, 'test.gro')
     # figure out how many grid points we actually want to keep
     NA = 6.022 * 10 ** 23  # avogadros number
@@ -159,7 +160,7 @@ if __name__ == "__main__":
     #     delete = random.randint(0, grid.shape[0] - 1)
 
     # place a monomer, delete nearest neighbors within r, repeat. Some optimization might need to be done to get r right
-    r = 0.6
+    r = 0.5
     count = 0
     new_grid = np.zeros([nmon, 3])
     while count < nmon:
