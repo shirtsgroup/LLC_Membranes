@@ -51,6 +51,7 @@ class LC(object):
             residues = [str.strip(a[2][5:10])]
             nres = []
             res_count = 0
+            self.ref_names = []
             for i in range(2, len(a) - 1):
                 xyz[i - 2, :] = [float(a[i][20:28]), float(a[i][28:36]), float(a[i][36:44])]
                 res = str.strip(a[i][5:10])
@@ -76,6 +77,7 @@ class LC(object):
                     if 'R' in annotations:
                         R.append([float(a[i][20:28]), float(a[i][28:36]), float(a[i][36:44])])
                         R_i.append(i - 2)
+                        self.ref_names.append(str.strip(a[i][10:15]))
                     if 'I' in annotations:
                         self.no_ions += 1
                         ion = str.strip(a[i][10:15])

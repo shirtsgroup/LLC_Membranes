@@ -701,7 +701,7 @@
   %\end{itemize}
   
   We will now address the questions raised in the introduction in the order
-  that they were asked.  %BJC: Not a fan of this
+  that they were asked.  %BJC: Not a fan of this transition
 
   To answer (1), we verified that the system stays partitioned into layers by
   plotting the pair correlation function calculated between aromatic rings along
@@ -1144,7 +1144,7 @@
   %MRS: I think things have changed since then? 
   The disordered basin shares little in common with the ordered basin but 
   its long term stability suggests that it can exist under some conditions.  
-  Basin B is the dominant configuration at higher temperatures.
+  We observed that Basin B is the dominant configuration at higher temperatures.
   \begin{itemize}
         \item We linearly ramped the temperature of a system in Basin A
         from 280K to 340K over 100 ns.
@@ -1172,16 +1172,12 @@
         the degree to which monomers obstruct the pore region.
   \end{itemize}
 
-  In an attempt to mitigate hysteresis, we performed a slow, stepwise temperature ramp.
+  In an attempt to mitigate hysteresis, we performed slow, stepwise temperature ramps
+  on a parallel displaced and a sandwiched configuration previously equilibrated at 300K.
   \begin{itemize}
-        \item Starting from a sandwiched structure equilibrated at 280K, the system
-        temperature was raised to 300K and allowed to equilibrate for 200 ns.
-        \item At the end of 200 ns, the temperature was raised 5K and equilibrated
-        again for 200 ns.
-        \item We continued raising the temperature by 5K and equilibrating for 200 ns
-        until the system was equilibrated for 200 ns at 320K.
-	\item The same process was repeated with a system equilibrated in Basin B and used
-	as a benchmark for comparison. 
+        \item Every 200 ns, the temperature was raised 5K until we reached 345K
+	\item We performed the same procedure with a system equilibrated in the CP Basin
+	and used it as a benchmark for comparison. 
   \end{itemize}
 
   \begin{figure}[!ht]
@@ -1224,29 +1220,30 @@
         its uncertainty changes slope near 315K.}\label{fig:tramp}
   \end{figure}
 
-  Basin A and Basin B are two configurationally metastable basins.
+  The CP and OP basins are two configurationally metastable basins.
   \begin{itemize}
         \item There is litle change in disordered phase properties during the 
         temperature ramp.
 	\item We observed smooth changes in order parameters as temperature
         of the Basin A system was increased implying that we cannot claim the
 	existence of two phases (Figure~\ref{fig:phase_transition}).
-	\item Qualitatively, the pore structure of the Basin A system becomes
-        comparable to one characteristic of Basin B as temperature is raised. (\Cref{fig:BasinA_280K_pore,fig:BasinB_340K_pore})
-	\item The Basin A system does not converge to the same order parameter
-	values as Basin B, however it is trending towards Basin B values. (\Cref{fig:p2p_step,fig:thickness_step,fig:order_step})
+	\item Qualitatively, the pore structure of the OP basin system becomes
+        comparable to one characteristic of the CP basin as temperature is raised. (\Cref{fig:BasinA_280K_pore,fig:BasinB_340K_pore})
+	\item The OP basin system does not converge to the same order parameter
+	values as the CP basin, however it is trending towards Basin B values. (\Cref{fig:p2p_step,fig:thickness_step,fig:order_step})
 	\item To resolve the quanitative discrepancy, we would need a slower 
 	temperature ramp
 	\item Since there are no abrupt changes in any order parameter along the 
 	trajectory, we can conclude that the two basins are not separate phases
-	\item Basin A is the closest match to what is seen experimentally
-	\item Basin B is likely an intermediate between the Col\textsubscript{h} 
+	\item The OP basin is the closest match to what is seen experimentally
+	\item The CP basin is likely an intermediate between the Col\textsubscript{h} 
 	phase and isotropic phase
-	\item Basin B is present in our simulations at lower temperatures 
+	\item The CP basin is present in our simulations at lower temperatures 
         %MRS: lower temperatures than experiment.  Though nobody has really done the experiments.  
         %MRS: can we conclude anything from some of the in-situ temperature measurements done by Xunda?  We talked about them, but I don't know they are referenced here.
+	%BJC: Not with what we have because it's in-situ SAXS data which only shows the pore spacing
 	because our model lacks sufficient $\pi$-$\pi$ iteractions necessary to 
-	stabilize the system into Basin A. 
+	stabilize the system into the OP basin. 
   \end{itemize} 
 
   \begin{figure}[!ht]
@@ -1309,7 +1306,8 @@
 
   \subsection*{Ionic conductivity calculation}
 
-  %MRS: which model? Be specific as to which of the above structural ensembles was used.
+  We use the equilibrated offset system in the OP basin to calculate ionic 
+  conductivity since its structure is the closest match to experiment.
   The model gives reasonable estimates of ionic conductivity when compared to 
   experiment.
   \begin{itemize}
@@ -1324,7 +1322,10 @@
 	\item Our calculated values would benefit from longer simulations. 
 	\item For this reason we will likely only use the Nernst Einstein relation
 	in future calculations of this type. 
-	\item Interestingly, Basin B has a higher ionic conductivity than Basin A.
+  \end{itemize}
+
+  The CP basin has a higher ionic conductivity than the OP basin.
+  \begin{itemize}
 	\item We hypothesize that conductivity is enhanced in Basin B due to a 
 	higher sodium ion diffusivity.
 	\item Transport of sodium is likely facilitated by the homogeneity of Basin B.
@@ -1361,17 +1362,19 @@
 
   %MRS: the next sections maybe should be supporting?
   %MRS: you say ``the distance decreases by 1 A'' but is that true
-  %over all of the different structures? 
+  %over all of the different structures?
+  %BJC: limiting the discussion to the OP basin in the offset configuration 
   %MRS: Maybe show the difference before and after crosslinking in X-ray, to show that you can't tell?
   %MRS: you don't otherwise discuss clearly what effect crosslinking would have. 
   \subsection*{Implementation of the crosslinking algorithm}
 
   We applied the crosslinking algorithm to the equilibrated sandwiched structure in 
-  Basin A.
+  the OP basin.
   \begin{itemize}  %BJC: working on the following. The following is what I expect
   	\item There is an even distribution of crosslinks between same monomer tails, 
 	between monomers in the same pore and between monomers in different pores 
 	including periodic boundaries.
+	\item We reach 95 \% conversion of terminal vinyl groups
 	\item The distance between pores shrinks by 1 \angstrom~ after the system is 
 	crosslinked
 	\item Major features are still present in the X-ray diffraction

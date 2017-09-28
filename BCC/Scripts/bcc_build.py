@@ -158,7 +158,7 @@ if __name__ == "__main__":
     # nmon random points used for placement
     # while grid.shape[0] > nmon:
     #     delete = random.randint(0, grid.shape[0] - 1)
-
+    nmon = 3
     # place a monomer, delete nearest neighbors within r, repeat. Some optimization might need to be done to get r right
     r = 0.5
     count = 0
