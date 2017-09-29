@@ -227,10 +227,40 @@ def spacing(x, y, start=0.3, window=0.25, zcut=4):
         fluct.append(mins[1][i - 1] - maxes[1][i - 1])
     fluct.append(mins[1][-1] - maxes[1][-1])
 
-    print(separation)
-    print(fluct)
-
     return maxes[0][0]
+
+
+def power_spectrum(data, bin):
+    """
+    Compute the power spectrum of the data (find dominant frequencies in the fourier series fitting discrete data)
+    :param data: Data to be fourier transformed (1D numpy array)
+    :param bin: bin size (nm)
+    :return: power spectrum of data (ps) with corresponding frequencies (freqs), the max frequency (max) and
+    """
+
+    data = data - np.mean(data)  # get rid of a peak at zero
+    ps = np.abs(np.fft.fft(data))**2
+
+    freqs = np.fft.fftfreq(data.size)
+    idx = np.argsort(freqs)
+
+    # fft = np.abs(np.fft.fft(data))
+    # flat = fft.flatten()
+    # flat.sort()
+    #
+    # max_freq = np.where(fft == flat[-1])[0][0]
+    max_freq = np.argmax(np.abs(np.fft.fft(data)))
+    freq = freqs[max_freq]
+    # if freq == 0:  # sometimes there is a large spike at 0
+    #     max_freq = np.where(fft == flat[-2])[0][0]
+    #     freq = freqs[max_freq]
+
+    # modify things so they'll plot nicely and in the correct units
+    freqs = freqs[idx] / bin
+    ps = ps[idx]
+    max = abs(freq / bin)  # maximum frequency in hertz
+
+    return ps, freqs, max
 
 
 if __name__ == "__main__":
@@ -250,9 +280,15 @@ if __name__ == "__main__":
         zdf = np.load(args.load)
         zdf_avg = zdf["zdf_avg"]
         z = zdf["z"]
+        bin_width = (z[1] - z[0])
+        ps, freqs, max = power_spectrum(zdf_avg, bin_width)
+        print('Fourier distance between layers: %s nm' % (1/max))
+        plt.figure()
+        plt.plot(freqs, ps)
         dbwl = spacing(z, zdf_avg)
-        plot_zdf(z[:-2], zdf_avg[:z.shape[0] - 2])
+        plot_zdf(z, zdf_avg[:z.shape[0]])
         print('Distance between layers: %s' % dbwl)
+        plt.plot(freqs, ps)
 
     else:
 
@@ -300,6 +336,12 @@ if __name__ == "__main__":
 
             np.savez_compressed("zdf", zdf_avg=zdf_avg, z=z)
 
+            bin_width = (z[1] - z[0])
+            ps, freqs, max = power_spectrum(zdf_avg, bin_width)
+            print('Fourier distance between layers: %s nm' % (1/max))
+            plt.figure()
+            plt.plot(freqs, ps)
+            dbwl = spacing(z, zdf_avg)
             plot_zdf(z, zdf_avg[:z.shape[0]])
             dbwl = spacing(z, zdf_avg)
             print('Distance between layers: %s' % dbwl)

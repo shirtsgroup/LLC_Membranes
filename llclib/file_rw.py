@@ -487,7 +487,7 @@ def write_gro_pos(pos, out, name='NA', box=[0, 0, 0], ids=[], res=[]):
                 f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format((i + 1) % 100000, '%s' % res[i], '%s' % ids[i],
                                                                         (i + 1) % 100000, pos[i, 0], pos[i, 1], pos[i, 2]))
         for i in range(len(box)):
-            f.write('{:10f}'.format(box[i]))
+            f.write('{:10.5f}'.format(box[i]))
 
         f.write('\n')
         # f.write('{:10f}{:10f}{:10f}\n'.format(0, 0, 0))

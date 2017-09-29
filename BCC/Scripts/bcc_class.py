@@ -140,7 +140,7 @@ class LC(object):
         Plane = np.zeros([3, 3])
         for i in range(3):
             Plane[i, :] = P[i]
-
+	
         # direction monomer is pointing
         L = np.zeros([2, 3])
         L[0, :] = np.array([sum([l[0] for l in L1]), sum([l[1] for l in L1]), sum([l[2] for l in L1])]) / len(L1)

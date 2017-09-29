@@ -158,7 +158,6 @@ if __name__ == "__main__":
     # nmon random points used for placement
     # while grid.shape[0] > nmon:
     #     delete = random.randint(0, grid.shape[0] - 1)
-    nmon = 3
     # place a monomer, delete nearest neighbors within r, repeat. Some optimization might need to be done to get r right
     r = 0.5
     count = 0
@@ -167,9 +166,9 @@ if __name__ == "__main__":
         delete = random.randint(0, grid.shape[0] - 1)
         new_grid[count, :] = grid[delete, :]
         tree = spatial.cKDTree(grid)
-        nn = tree.query_ball_point(grid[delete, :], r)
+        nn = tree.query_ball_point(grid[delete, :], r)  # all nearest neighbors to grid[delete, :] within radius r
         nn.append(delete)
-        grid = np.delete(grid, nn, 0)
+        grid = np.delete(grid, nn, 0)  # delete nearest neighbors and itself from grid
         count += 1
 
     if count < nmon:
