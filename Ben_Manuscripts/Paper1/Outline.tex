@@ -172,21 +172,38 @@
   questions that we intend to answer which will be laid out and numbered
   in subsequent paragraphs. 
 
-  (1) Do monomers partition into and persist as defined monomer layers?
-  H\textsubscript{II} and Col\textsubscript{h} phase LC membrane pores are 
-  thought to be composed of monomer layers stacked on top of each other. 
-  \begin{itemize}
-  	\item Their existence is supported by experimental evidence of strong 
-	$\pi$-$\pi$ stacking interactions in the direction perpendicular to the
-	membrane plane.
-	\item $\pi$-$\pi$ stacking will only occur between monomer head groups which
-	leaves no description of what is happening in monomer tail region
-	\item It is possible that $\pi$-$\pi$ stacking occurs vertically 
-	with no order in reference to neighboring stacked columns of the same pore.  % BJC: not sure if this is actually true
-  \end{itemize}
+%BJC: How question (1) and (2) used to be ordered:
+%
+%  (1) Do monomers partition into and persist as defined monomer layers?
+%  H\textsubscript{II} and Col\textsubscript{h} phase LC membrane pores are 
+%  thought to be composed of monomer layers stacked on top of each other. 
+%  \begin{itemize}
+%  	\item Their existence is supported by experimental evidence of strong 
+%	$\pi$-$\pi$ stacking interactions in the direction perpendicular to the
+%	membrane plane.
+%	\item $\pi$-$\pi$ stacking will only occur between monomer head groups which
+%	leaves no description of what is happening in monomer tail region
+%	\item It is possible that $\pi$-$\pi$ stacking occurs vertically 
+%	with no order in reference to neighboring stacked columns of the same pore.  % BJC: not sure if this is actually true
+%  \end{itemize}
+%
+%  (2) If layers do exist, how many monomers constitute a single layer?
+%  There has been no definitive answer to the question in literature.
+%  \begin{itemize}
+%    \item A simple molecular simulation study of a similar molecule suggested
+%    that there are 4 monomers in each layer. Their estimation is based on a
+%    simulated system containing only 16 total monomers which likely does not sufficiently
+%    model the chemical environment present in the real system.~\cite{zhu_methacrylated_2006}. 
+%    \item A separate calculation based on the volume of the liquid crystal monomers proposes
+%    that there are seven monomers in each layer~\cite{resel_structural_2000}. 
+%    \item A molecular model orders of magnitude larger than any other reported atomistic 
+%    liquid crystal membrane simulations has the best chance of directly answering this question.
+%  \end{itemize}
 
-  (2) If layers do exist, how many monomers constitute a single layer?
-  There has been no definitive answer to the question in literature.
+  Monomers in the Col\textsubscript{h} system are theorized to be partitioned
+  into stacked layers which form columnar pores. There has been no definitive
+  answer in literature regarding the number of monomers in each layer. We want to
+  know (1) If layers do exist, how many monomers constitute a single layer?
   \begin{itemize}
     \item A simple molecular simulation study of a similar molecule suggested
     that there are 4 monomers in each layer. Their estimation is based on a
@@ -196,8 +213,23 @@
     that there are seven monomers in each layer~\cite{resel_structural_2000}. 
     \item A molecular model orders of magnitude larger than any other reported atomistic 
     liquid crystal membrane simulations has the best chance of directly answering this question.
+    \item We can directly change the layer composition and note its effect on membrane structure.
   \end{itemize}
-    
+
+  (2) Does our model support the existence of layers and if so, how well defined
+  are the layers?
+  \begin{itemize}
+       \item Experimentally, their existence is supported by evidence of strong 
+       $\pi$-$\pi$ stacking interactions in the direction perpendicular to the
+       membrane plane.
+       \item $\pi$-$\pi$ stacking will only occur between monomer head groups which
+       leaves no description of what is happening in the monomer tail region
+       \item The tails may entangle isotropically while stacking order is maintained
+       among headgroups. 
+       %\item It is possible that $\pi$-$\pi$ stacking occurs vertically 
+       %with no order in reference to neighboring stacked columns of the same pore.  % BJC: not sure if this is actually true
+  \end{itemize}  
+  
    (3) How do monomers in each layer position themselves with respect to surrounding 
    layers?
 %     Even if we knew the number of monomers in each layer, we still would not know how 
@@ -398,6 +430,12 @@
     the center of mass of each benzene ring and all others of the same pore 
     over 50 ns of equilibrated trajectory and then normalized by the average
     number density.
+    \item To extract the average distance between layers we applied a discrete 
+    fourier transform to the data and extracted the highest intensity frequency 
+    \item We compare the degree of layering between systems based on the 
+    amplitude of the first peak in $g(z)$. We halve the difference between the 
+    maximum of the first peak and the following minimum. We compare the difference
+    to the mean to get a percentage deviation from the average number density.
     \item Our simulations tend to equilibrate to a wider interlayer spacing of
     $\approx$ 4.1 \angstrom~, which inspired separate systems starting with layer 
     spacings greater than 4 \angstrom~.
@@ -703,16 +741,87 @@
   We will now address the questions raised in the introduction in the order
   that they were asked.  %BJC: Not a fan of this transition
 
-  To answer (1), we verified that the system stays partitioned into layers by
-  plotting the pair correlation function calculated between aromatic rings along
-  the length of the pores (Fig~\ref{fig:zdf}).
+% BJC: How this section (||||) used to be ordered until deciding to put monomers / layer first
+%                        VVVV
+  %To answer (1), we verified that the system stays partitioned into layers by
+  %plotting the pair correlation function calculated between aromatic rings along
+  %the length of the pores (Fig~\ref{fig:zdf}).
   % BJC: add how this calculation is done to methods section (put where I talk about
   % choosing distance between layers
+  %\begin{itemize}
+%	\item Period of fluctuation (layer spacing)
+ %       \item Magnitude of fluctuations
+%	\item Comment on difference between offset/layered, number of monomers per layer
+ % \end{itemize} 	
+
+  % BJC: might replace with a figure containing alllllll of the zdf's
+  %\begin{figure}[!ht]
+%       \centering
+%       \begin{subfigure}{0.45\textwidth}
+%               \centering
+%               \includegraphics[width=\textwidth]{zdf5layered.png}
+%               \caption{}\label{fig:zdf_layered}
+%       \end{subfigure}
+%       \begin{subfigure}{0.45\textwidth}
+%                \centering
+%                \includegraphics[width=\textwidth]{zdf5offset.png}
+%                \caption{}\label{fig:zdf_offset}
+%        \end{subfigure}
+%        \caption{Pair distribution functions of aromatic carbons for the
+%        (a) 5 monomer per layer, sandwiched and (b) 5 monomer per layer,
+%        parallel displaced configurations. Clear periodic maxima in the 
+%        $z$ probability density indicate distinct layers. The magnitude 
+%        of the spikes with respect to the average suggest that the 5 
+%        monomer per layer, sandwiched configuration possesses a higher 
+%        degree of layer partitioning.}\label{fig:zdf}
+%  \end{figure}
+
+
+%  To discern the composition of the monomer layers, addressing (2), we ran 
+%  simulations of systems created with 4 - 8 monomers per layer.  % BJC: can't figure out how to word this : should be 'with between 4 and 8 monomers' or 'with from 4 to 8 monomers'?
+  %\begin{itemize}
+%  	\item Both the sandwiched and parallel displaced configurations were tested.
+%	\item All systems are stable after 400 ns of simulation.  % BJC: edited this for clarity
+        %MRS: you only ran for 50 ns, or after 50 ns some of them started to destabilize?  Is the point you are making that they are ALL pretty stable, or all at least a little stable.   
+	%BJC: Working on getting them all run out to 400 ns
+%	\item Table ~\ref{table:p2p} shows the pore spacing for all systems tested. 
+%	\item Systems built with 5 monomers in each layer equilibrate to a pore spacing
+%	that is most consistent with the experimental value of 4.12 nm derived from
+%	SAXS measurements (Figure~\ref{fig:SAXS}).
+%	\item The remainder of this discussion will focus on the analysis of systems
+%	built with 5 monomers per layer. 
+%  \end{itemize}
+
+  To discern the composition of the monomer layers, addressing (1), we ran
+  simulations of systems created with 4 - 8 monomers per layer.  % BJC: can't figure out how to word this : should be 'with between 4 and 8 monomers' or 'with from 4 to 8 monomers'?
   \begin{itemize}
-	\item Period of fluctuation (layer spacing)
-        \item Magnitude of fluctuations
-	\item Comment on difference between offset/layered, number of monomers per layer
-  \end{itemize} 	
+        \item Both the sandwiched and parallel displaced configurations were tested.
+        \item All systems are stable after 400 ns of simulation.  % BJC: edited this for clarity
+        %MRS: you only ran for 50 ns, or after 50 ns some of them started to destabilize?  Is the point you are making that they are ALL pretty stable, or all at least a little stable.   
+        %BJC: Working on getting them all run out to 400 ns
+        \item Table ~\ref{table:p2p} shows the pore spacing for all systems tested.
+        \item Systems built with 5 monomers in each layer equilibrate to a pore spacing
+        that is most consistent with the experimental value of 4.12 nm derived from
+        SAXS measurements (Figure~\ref{fig:SAXS}).
+        \item The remainder of this discussion will focus on the analysis of systems
+        built with 5 monomers per layer.
+  \end{itemize}
+
+
+  To answer (2), we verified that the system stays partitioned into layers by
+  plotting the pair correlation function, $g(z)$ calculated between aromatic rings along
+  the length of the pores (Fig~\ref{fig:zdf}).
+  \begin{itemize}
+        \item Sandwiched configuration layers stack 4.29 \angstrom apart while
+        parallel displaced configuration layers stack 4.37 \angstrom apart.
+        The power spectrums used to calculate the reported layer spacing are given in the 
+        Supplemental Information.
+	\item Even though the layer spacing is similar, the sandwiched configuration
+	exhibits more defined layers with its first peak deviating from the mean 
+        number density by 61 \%.
+	\item The parallel displaced configuration deviates from the mean by only 
+	12 \% in comparison.
+  \end{itemize}
 
   % BJC: might replace with a figure containing alllllll of the zdf's
   \begin{figure}[!ht]
@@ -729,29 +838,13 @@
         \end{subfigure}
         \caption{Pair distribution functions of aromatic carbons for the
         (a) 5 monomer per layer, sandwiched and (b) 5 monomer per layer,
-        parallel displaced configurations. Clear periodic maxima in the 
-        $z$ probability density indicate distinct layers. The magnitude 
-        of the spikes with respect to the average suggest that the 5 
-        monomer per layer, sandwiched configuration possesses a higher 
+        parallel displaced configurations. Clear periodic maxima in the
+        $z$ probability density indicate distinct layers. The magnitude
+        of the spikes with respect to the average suggest that the 5
+        monomer per layer, sandwiched configuration possesses a higher
         degree of layer partitioning.}\label{fig:zdf}
   \end{figure}
 
-
-  To discern the composition of the monomer layers, addressing (2), we ran 
-  simulations of systems created with 4 - 8 monomers per layer.  % BJC: can't figure out how to word this : should be 'with between 4 and 8 monomers' or 'with from 4 to 8 monomers'?
-  \begin{itemize}
-  	\item Both the sandwiched and parallel displaced configurations were tested.
-	\item All systems are stable after 400 ns of simulation.  % BJC: edited this for clarity
-        %MRS: you only ran for 50 ns, or after 50 ns some of them started to destabilize?  Is the point you are making that they are ALL pretty stable, or all at least a little stable.   
-	%BJC: Working on getting them all run out to 400 ns
-	\item Table ~\ref{table:p2p} shows the pore spacing for all systems tested. 
-	\item Systems built with 5 monomers in each layer equilibrate to a pore spacing
-	that is most consistent with the experimental value of 4.12 nm derived from
-	SAXS measurements (Figure~\ref{fig:SAXS}).
-	\item The remainder of this discussion will focus on the analysis of systems
-	built with 5 monomers per layer. 
-  \end{itemize}
- 
   % BJC: Even though I will shift focus to only 5 monomers per layer, I can put other data
   % such as XRD of 4, 6, 7, 8 mon/layer in supplemental information 
   
@@ -770,12 +863,13 @@
   8 & $5.08 \pm 0.04$ & $5.46 \pm 0.03$ \\
   \bottomrule
   \end{tabular}
-  \caption{The pore spacing (given in $\nm$) of the model increases as
+  \caption{The pore spacing (given in nm) of the model increases as
   number of monomers in each layer increases. The pore spacing of a system
   starting in the sandwiched configuration is systematically lower than 
   that started in an offset configuration. Systems built with 5 monomers
   per layer in a parallel displaced configuration result in a pore spacing
-  closest to the experimental 4.12 $\nm$~}\label{table:p2p} 
+  closest to the experimental 4.12 nm}
+  \label{table:p2p} 
   \end{table}
   
 %  To answer question (3) we require high resolution experimental evidence which we 
@@ -842,7 +936,7 @@
 
   The $z$-direction correlation functions show that layers in our model prefer
   to stack further apart than the 3.7 \angstrom~ suggested by experiment. We attempted equilibration 
-  with layers stacked 4.0 $\nm$ apart and to our surprise, we observed
+  with layers stacked 4.0 nm apart and to our surprise, we observed
   long-term stability of a qualitatively different configurations suggesting
   that we have found more than one metastable free energy basin.
   %that the initial distance between layers can influence the approach towards 
@@ -852,12 +946,12 @@
         implied by R-$\pi$ are characterized by a defined, cylindrical and open pore 
 	structure.
         \item We will refer to this large set of configurations, with an open pore, as 
-        the OP Basin (open pore) (Figure~\ref{fig:abasin}).
+        the OP Basin (open pore) (Figure~\ref{fig:OPbasin}).
 	\item Simulations of systems built with layers stacked greater than 4 
 	\angstrom~ apart results in a pore structure characterized by high radial 
 	disorder, while still maintaining partitioning between hydrophobic and 
 	hydrophilic regions.
-	\item This will be called the CP Basin (closed pore) (Figure~\ref{fig:bbasin}).
+	\item This will be called the CP Basin (closed pore) (Figure~\ref{fig:CPbasin}).
 	\item This LLC membrane may exist in at least two metastable states.
 	\item The distinct difference in pore structure exhibited by each phase will 
 	likely lead to different transport mechanisms.
@@ -871,15 +965,15 @@
         \begin{subfigure}[b]{0.475\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{280K_tramp_close.png}
-                \caption{}\label{fig:abasin}
+                \caption{}\label{fig:OPbasin}
         \end{subfigure}
         \begin{subfigure}[b]{0.475\textwidth}
                 \centering
-                \includegraphics[width=\textwidth]{340K_tramp_close.png}
-                \caption{}\label{fig:bbasin}
+                \includegraphics[width=\textwidth]{340K_tramp_close_full.png}
+                \caption{}\label{fig:CPbasin}
         \end{subfigure}
-	\caption{From a qualitative standpoint, Basin A (a) is characterized by a
-	hollow cylindrical pore while pores in Basin B (b) are characterized by a
+	\caption{From a qualitative standpoint, the OP Basin (a) is characterized by a
+	hollow cylindrical pore while pores in the CP Basin (b) are characterized by a
 	higher degree of radial disorder}\label{fig:basins}
   \end{figure}
 
@@ -958,7 +1052,7 @@
   We answer question (3) by simulating X-ray diffraction patterns produced from
   equilibrated MD trajectories. We leave open the possibility that the 
   experimental structure might be reminiscent of the parallel displaced or sandwiched
-  configurations in the OP or CP basins.
+  configuration in the OP or CP basin.
   %We created systems using three distinct initial configurations and examined
   %their structure by simulating X-ray diffraction patterns produced from equilibrated MD trajectories.
   \begin{itemize}
@@ -977,11 +1071,7 @@
 	Figure ~\ref{fig:XRDsim}. 
   \end{itemize}
 
-  % Three paragraphs instead here? Talk about disordered, parallel displaced and 
-  % layered separately? Try it. 
-  % Talk about disordered last so it leads in to 
-  % Also maybe don't talk about question 4 until after this
-  
+  %BJC: below (commented out) thesis is from when I had the following three paragraphs combined
   %Full comparison of experimental 2D WAXS with simulated X-ray diffraction
   %patterns shows the most consistency with the offset configuration in the OP basin.
   
@@ -1091,18 +1181,18 @@
   R-alkanes and R-pores in common with experiment}~\label{fig:xrd}
   \end{figure}
 
-  The spots that appear in the simulated XRD pattern of the OP basin
+  R-spots appearing in the simulated XRD pattern of the OP basin
   conformations are a result of the way alkane tails pack together.
   \begin{itemize}
   	\item Previously, the spots in the diffraction pattern had been explained 
-	as the product of tilted alkane chains.
+	as the product of tilted alkane chains. % BJC: reference
 	\item We measured the tilt angle of the alkane chains and showed that our 
 	system equilibrates to an average tilt angle close to zero degrees (See Supplemental Information). 
 	\item To understand the origin of the spots, we determined which atoms gave rise to the feature
 	\item Since R-spots is present as higher intensity spots within R-alkanes, it is likely
         that the spots arise as a consequence of the tails. 
 	\item By removing atoms from the trajectory and simulating a diffraction 
-	pattern, we were able to isolate the cause of the spots to the tails (Figure~\ref{fig:tails_rzplot}).
+	pattern, we were able to isolate the cause of the spots to the tails (Figure~\ref{fig:tails}).
 	\item Since the tails stay nearly flat, we plotted the centroids of the 
 	tails and measured the angle between each centroid and its nearest neighbors
 	with respect to the plane of the membrane (Figure~\ref{fig:centroids}).
@@ -1115,42 +1205,93 @@
         and found the angle at which R-spots reaches its highest intensity to be $\pm$ 37 $\degree$ which 
         is a reconcilable difference with our simulated results.  
   \end{itemize}
- 
-  \begin{figure}[ht]
-  \centering
-  \begin{subfigure}{0.3\linewidth}
-        \centering
-        \includegraphics[width=\linewidth]{offset_tail_packing.png}
-        \caption{}~\label{fig:offset_tails}
-  \end{subfigure}
-  \begin{subfigure}{0.3\linewidth}
-        \centering
-        \includegraphics[width=\linewidth]{angles_traj_layered.png}
-        \caption{}~\label{fig:layered_tails}
-  \end{subfigure}
-  \begin{subfigure}{0.3\linewidth}
-        \centering
-        \includegraphics[width=\linewidth]{integrated_WAXS_ring.png}
-        \caption{}~\label{fig:rz_layered}
-  \end{subfigure}
-  \caption{The distribution of angles w.r.t. xy plane between alkane chain tail centroids and nearest
-  neighbor centroids for equilibrated parallel displaced (a) and sandwiched (b) configurations both show
-  distinct peaks at $\pm$ 33 $\degree$. (c) Integrated 2D WAXS data between $q_r$=1 and $q_r$=1.42 shows
-  distinct peaks at with maxima at $\pm$ 37 $\degree$}~\label{fig:tail_packing}
+
+  \begin{figure}
+	\centering
+	\begin{subfigure}{0.45\linewidth}
+		\centering
+		\includegraphics[width=\textwidth]{tails_topview.png}  % picture of top of unit cell with only tail atoms shown
+		\caption{}\label{fig:topdown_tails_only}
+	\end{subfigure}
+	\begin{subfigure}{0.45\linewidth}
+		\centering
+		\includegraphics[width=\textwidth]{tails_rzplot.png}
+		\caption{}\label{fig:tails_rzplot}
+	\end{subfigure}
+	\caption{(a) All atoms except carbon atoms making up the tails are removed from the 
+	trajectory. (b) The simulated diffraction pattern of the tail-only trajectory still 
+        shows R-spots}\label{fig:tails}
   \end{figure}
  
-  %MRS: one could ask the question about basins for the parallel displaced and sandwich as well.  
-  %MRS: we had talked a lot about interconversion (or conversion one way but not other?) but 
-  %MRS: I think things have changed since then? 
+
+  \begin{figure}[ht]
+  \centering
+  	\begin{subfigure}{\linewidth}
+	\centering
+		\begin{subfigure}{0.45\textwidth}
+        		\centering
+        		\includegraphics[width=\linewidth]{offset_tail_packing.png}
+        		\caption{}~\label{fig:offset_tails}
+		\end{subfigure}
+		\begin{subfigure}{0.45\textwidth}
+		\centering
+	        	\includegraphics[width=\linewidth]{offset_angle_v_I.png}
+		        \caption{}~\label{fig:layered_tails}
+		\end{subfigure}
+	\end{subfigure}
+	\begin{subfigure}{\linewidth}
+	\centering
+		\begin{subfigure}{0.45\textwidth}
+	        \centering
+		        \includegraphics[width=\linewidth]{angles_traj_layered.png}
+		        \caption{}~\label{fig:rz_layered}
+		\end{subfigure}
+		\begin{subfigure}{0.45\textwidth}
+        	\centering
+		        \includegraphics[width=\linewidth]{layered_angle_v_I.png}
+		        \caption{}~\label{fig:test}
+		\end{subfigure}
+	\end{subfigure}
+  \caption{The distribution of angles w.r.t. the xy plane between alkane chain tail centroids and nearest
+  neighbor centroids for equilibrated parallel displaced (a) and sandwiched (c) configurations. The
+  same peaks are visible when the 2D simulated diffraction data is radially integrate in the R-alkanes region,
+  (b) and (d) respectively.}~\label{fig:tail_packing}
+  \end{figure}
+
+  %BJC: old version of above figure v v v
+  %\begin{figure}[ht]
+  %\centering
+
+  %\begin{subfigure}{0.3\linewidth}
+  %      \centering
+  %      \includegraphics[width=\linewidth]{offset_tail_packing.png}
+  %      \caption{}~\label{fig:offset_tails}
+  %\end{subfigure}
+  %\begin{subfigure}{0.3\linewidth}
+  %      \centering
+  %      \includegraphics[width=\linewidth]{angles_traj_layered.png}
+  %      \caption{}~\label{fig:layered_tails}
+  %\end{subfigure}
+  %\begin{subfigure}{0.3\linewidth}
+  %      \centering
+  %      \includegraphics[width=\linewidth]{integrated_WAXS_ring.png}
+  %      \caption{}~\label{fig:rz_layered}
+  %\end{subfigure}
+  %\caption{The distribution of angles w.r.t. xy plane between alkane chain tail centroids and nearest
+  %neighbor centroids for equilibrated parallel displaced (a) and sandwiched (b) configurations both show
+  %distinct peaks at $\pm$ 33 $\degree$. (c) Integrated 2D WAXS data between $q_r$=1 and $q_r$=1.42 shows
+  %distinct peaks at with maxima at $\pm$ 37 $\degree$}~\label{fig:tail_packing}
+  %\end{figure}
+ 
   The disordered basin shares little in common with the ordered basin but 
   its long term stability suggests that it can exist under some conditions.  
   We observed that Basin B is the dominant configuration at higher temperatures.
   \begin{itemize}
         \item We linearly ramped the temperature of a system in Basin A
-        from 280K to 340K over 100 ns.
+        from 280K to 340K (just below the experimental isotropic transition temperature) over 100 ns.
         \item Visually, there is a distinct change in pore structure from one
-        characteristic of Basin A (Figure~\ref{fig:280K_pore}) to one characteristic of
-        Basin B (Figure~\ref{fig:340K_pore}).
+        characteristic of the OP Basin (Figure~\ref{fig:280K_pore}) to one characteristic of
+        the CP Basin (Figure~\ref{fig:340K_pore}).
         \item The slope of all order parameters changes between 315K and 325K
         (\Cref{fig:p2p_tramp,fig:thickness_tramp,fig:order_tramp}) indicating the
         possibility of an abrupt change in system ordering.
@@ -1158,7 +1299,7 @@
         to suffer from hysteresis.
   \end{itemize}
 
-  We can not immediately classify Basin A and Basin B as separate phases.
+  We can not immediately classify the OP Basin and the CP Basin as separate phases.
   \begin{itemize}
 	\item To prove the existence of two phases we need evidence of a
 	a first order phase transition.
@@ -1184,14 +1325,12 @@
         \centering
         \begin{subfigure}[b]{0.475\textwidth}
                 \centering
-                % these next 2 figures are REALLY big (12-18M). Likely could reduce to near 0.5-1.0 MB without loss of 
-                % necessary resolution.  A few other figures could have resolution reduced.
                 \includegraphics[width=\textwidth]{280K_tramp_close.png}
                 \caption{}\label{fig:280K_pore}
         \end{subfigure}
         \begin{subfigure}[b]{0.475\textwidth}
                 \centering
-                \includegraphics[width=\textwidth]{340K_tramp_close.png}
+                \includegraphics[width=\textwidth]{340K_tramp_close_full.png}
                 \caption{}\label{fig:340K_pore}
         \end{subfigure}
         \vskip\baselineskip
@@ -1212,9 +1351,9 @@
                 \caption{}\label{fig:order_tramp}
         \end{subfigure}
         \caption{(a) The open pore structure exhibited by a structure equilibrated
-        at 280K is characteristic of Basin A. (b) The closed pore structure with
+        at 280K is characteristic of the OP Basin. (b) The closed pore structure with
         a high degree of radial disorder exhibited when the structure in (a) is
-        heated to 340K is characteristic of Basin B. (c) A plot of distance between pores
+        heated to 340K is characteristic of the CP Basin. (c) A plot of distance between pores
         vs. temperature changes slope near 325K. (d) A plot of membrane thickness vs.
         temperature changes slope near 325K. (e) The plot of the ratio of pore radius to
         its uncertainty changes slope near 315K.}\label{fig:tramp}
@@ -1222,10 +1361,10 @@
 
   The CP and OP basins are two configurationally metastable basins.
   \begin{itemize}
-        \item There is litle change in disordered phase properties during the 
+        \item There is litle change in CP basin properties during the 
         temperature ramp.
 	\item We observed smooth changes in order parameters as temperature
-        of the Basin A system was increased implying that we cannot claim the
+        of the OP Basin system was increased implying that we cannot claim the
 	existence of two phases (Figure~\ref{fig:phase_transition}).
 	\item Qualitatively, the pore structure of the OP basin system becomes
         comparable to one characteristic of the CP basin as temperature is raised. (\Cref{fig:BasinA_280K_pore,fig:BasinB_340K_pore})
@@ -1242,7 +1381,7 @@
         %MRS: lower temperatures than experiment.  Though nobody has really done the experiments.  
         %MRS: can we conclude anything from some of the in-situ temperature measurements done by Xunda?  We talked about them, but I don't know they are referenced here.
 	%BJC: Not with what we have because it's in-situ SAXS data which only shows the pore spacing
-	because our model lacks sufficient $\pi$-$\pi$ iteractions necessary to 
+	than experiment because our model lacks sufficient $\pi$-$\pi$ iteractions necessary to 
 	stabilize the system into the OP basin. 
   \end{itemize} 
 
@@ -1261,7 +1400,7 @@
         \end{subfigure}
         \begin{subfigure}[b]{0.475\textwidth}
                 \centering
-                \includegraphics[width=\textwidth]{340K_tramp_close.png}
+                \includegraphics[width=\textwidth]{340K_tramp_close_full.png}
                 \caption{}\label{fig:BasinB_340K_pore}
         \end{subfigure}
 	\vskip\baselineskip
@@ -1281,11 +1420,6 @@
                 \includegraphics[width=\textwidth]{order_layered.png}
                 \caption{}\label{fig:order_step}
         \end{subfigure}
-        %MRS: Are (a) and (b) from the nonequilibrium short run?
-        %That's not clear. Not clear it's possible to state that it's
-        %the ``right'' disordered basin if from the end of a short heating run.
-	%BJC: They are from the short run, but as I comment above, I need to 
-	% replace them with the correct figures
 
 	\caption{In all cases, blue lines represent the measured value of
 	the order parameter, black lines are average values calculated from
@@ -1298,9 +1432,7 @@
 	exhibited by Basin B. (d) The thickness of Basin A increases smoothly with 
 	temperature but is far from the Basin B value. Longer equilibrations at 
 	each temperature are needed to allow the system to fully expand. 
-        %MRS: might need to explain this ratio better?
-        (e) The ratio 
-	of pore radius to uncertainty for Basin A changes smoothly with temperature,
+        (e) The ratio of pore radius to uncertainty for Basin A changes smoothly with temperature,
 	converging to a value below that exhibited by Basin B.}\label{fig:phase_transition}
   \end{figure}
 

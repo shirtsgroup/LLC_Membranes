@@ -65,9 +65,11 @@ def gyroid(x):
 def gridgen(surf, low, high, n, tol=0.05):
 
     # make a cubic grid
-    x = np.linspace(low, high, n)
-    y = np.linspace(low, high, n)
-    z = np.linspace(low, high, n)
+
+    bin_size = (high - low) / n
+    x = np.linspace(low, high - bin_size, n)
+    y = np.linspace(low, high - bin_size, n)
+    z = np.linspace(low, high - bin_size, n)
 
     if surf == 'Ia3d' or surf == 'gyroid' or surf == 'ia3d':
 
@@ -143,7 +145,6 @@ if __name__ == "__main__":
     period = args.dim  # length of one side of the unit cell
     grid = gridgen(args.phase, 0, args.dim, args.n)  # 3d grid of points from 0 to args.dim spaced by args.dim / args.n
 
-    file_rw.write_gro_pos(grid, 'test.gro')
     # figure out how many grid points we actually want to keep
     NA = 6.022 * 10 ** 23  # avogadros number
     mass = LC.MW / NA  # mass of a single monomer (g)

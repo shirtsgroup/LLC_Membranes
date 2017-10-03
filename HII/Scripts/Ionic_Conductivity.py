@@ -103,7 +103,7 @@ def initialize():
     parser.add_argument('-m', '--nMC', default=1000, help='Number of Monte Carlo trials to estimate error in D and Dq')
     parser.add_argument('-a', '--arrays', default='off', help='If positions, id array are already saved')
     parser.add_argument('-S', '--suffix', default='saved', help='Suffix to append to position and id arrays when saving')
-    parser.add_argument('-r', '--frontfrac', default=0.1, help='Where to start fitting line for diffusivity calc')
+    parser.add_argument('-r', '--frontfrac', default=0.1, type=float, help='Where to start fitting line for diffusivity calc')
     parser.add_argument('-F', '--fracshow', default=0.5, type=float, help='Percent of graph to show, also where to stop fitting line'
                                                              'during diffusivity calculation')
     parser.add_argument('--nTsub', default=20, type=int, help='Number of subtrajectories to break into for generating stats')
@@ -198,7 +198,6 @@ if __name__ == '__main__':
         D_tails = np.load('D_tails_%s.npy' % args.suffix)
         D_av = D_tails[0]
         D_std = D_tails[1]
-        print(D_av)
         no_comp = np.shape(pos)[1]
         nT = np.shape(pos)[0]
 

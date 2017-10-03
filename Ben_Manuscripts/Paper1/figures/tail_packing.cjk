@@ -8,25 +8,36 @@
 
 \begin{figure}[ht]
 \centering
-\begin{subfigure}{0.3\linewidth}
+\begin{subfigure}{\linewidth}
+\centering
+\begin{subfigure}{0.45\textwidth}
 	\centering
 	\includegraphics[width=\linewidth]{offset_tail_packing.png}
 	\caption{}~\label{fig:offset_tails}	
 \end{subfigure}
-\begin{subfigure}{0.3\linewidth}
+\begin{subfigure}{0.45\textwidth}
 	\centering
-	\includegraphics[width=\linewidth]{angles_traj_layered.png}
+	\includegraphics[width=\linewidth]{offset_angle_v_I.png}
 	\caption{}~\label{fig:layered_tails}
 \end{subfigure}
-\begin{subfigure}{0.3\linewidth}
+\end{subfigure}
+\begin{subfigure}{\linewidth}
+\centering
+\begin{subfigure}{0.45\textwidth}
 	\centering
-	\includegraphics[width=\linewidth]{integrated_WAXS_ring.png}
+	\includegraphics[width=\linewidth]{angles_traj_layered.png}
 	\caption{}~\label{fig:rz_layered}
 \end{subfigure}
+\begin{subfigure}{0.45\textwidth}
+	\centering
+	\includegraphics[width=\linewidth]{layered_angle_v_I.png}
+	\caption{}~\label{fig:test}
+\end{subfigure}
+\end{subfigure}
 \caption{The distribution of angles w.r.t. xy plane between alkane chain tail centroids and nearest 
-neighbor centroids for equilibrated parallel displaced (a) and sandwiched (b) configurations show 
-distinct peaks at $\pm$ blah $\degree$ and $\pm$ blah $\degree$ respectively. (c) Integrated 2D 
-WAXS data between $q_r$=1 and $q_r$=1.42 shows distinct peaks at with maxima at $\pm$ 37 $\degree$}~\label{fig:tail_packing}
+neighbor centroids for equilibrated parallel displaced (a) and sandwiched (b) configurations both show 
+distinct peaks at $\pm$ 33 $\degree$. (c) Integrated 2D WAXS data between $q_r$=1 and $q_r$=1.42 shows
+distinct peaks at with maxima at $\pm$ 37 $\degree$}~\label{fig:tail_packing}
 \end{figure}
 
 \end{document}
