@@ -52,6 +52,7 @@ def initialize():
                                          'restraints to the topology for other atoms', action="store_true")
     parser.add_argument('-i', '--input', type=str, default='dipole.itp', help='Name of topology file to be edited if '
                                                                               'you use the option --append')
+    parser.add_argument('--bcc', action="store_true", default='Use BCC topology')
 
     args = parser.parse_args()
 
@@ -375,7 +376,10 @@ if __name__ == "__main__":
 
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Location of this script
 
-    f = open("%s/../top/Monomer_Tops/%s" % (location, '%s.itp' % args.monomer), "r")
+    if args.bcc:
+        f = open("%s/../../BCC/top/topologies/%s" % (location, '%s.itp' % args.monomer), "r")
+    else:
+        f = open("%s/../top/Monomer_Tops/%s" % (location, '%s.itp' % args.monomer), "r")
 
     a = []
     for line in f:
@@ -384,7 +388,11 @@ if __name__ == "__main__":
     f.close()
 
     if args.novsites:
-        file_rw.write_assembly(args.monomer, 'off', args.out, rings)  # there will be an error if the second argument is 'on' with
+        if args.bcc:
+            file_rw.write_assembly(args.monomer, 'off', args.out, rings, bcc='yes')  # there will be an error if the second argument is 'on' with
+                                                            # no virtual sites
+        else:
+            file_rw.write_assembly(args.monomer, 'off', args.out, rings)  # there will be an error if the second argument is 'on' with
                                                             # no virtual sites
     else:
         if args.xlink or args.append:  # don't re-write the topology file if you are iteratively crosslinking

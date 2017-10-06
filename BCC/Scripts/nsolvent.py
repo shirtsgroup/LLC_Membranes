@@ -10,7 +10,7 @@ def initialize():
     parser.add_argument('-b', '--build_mon', default='Dibrpyr14.gro', type=str, help='Name of monomer to build with')
     parser.add_argument('-d', '--dim', default=10, type=float, help='Unit cell dimension (length of x, y and z vector)')
     parser.add_argument('-dens', '--density', default=1.1, type=float, help='Density of system (g/cm3)')
-    parser.add_argument('-wt', '--weight_percent', default=80.1, type=float, help='Weight %% of monomer in membrane')
+    parser.add_argument('-wt', '--weight_percent', default=77.1, type=float, help='Weight %% of monomer in membrane')
     parser.add_argument('-sol', '--solvent', default='glycerol', type=str, help='Name of solvent mixed with monomer')
 
     args = parser.parse_args()

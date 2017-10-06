@@ -25,7 +25,7 @@ def initialize():
     parser.add_argument('-dens', '--density', default=1.1, type=float, help='Density of system (g/cm3)')
     parser.add_argument('-c', '--curvature', default=-1, type=int,help='-1 : QI phase, 1, QII phase. Determines whether'
                         'the phase is normal or inverted')
-    parser.add_argument('-wt', '--weight_percent', default=80.1, type=float, help='Weight %% of monomer in membrane')
+    parser.add_argument('-wt', '--weight_percent', default=77.1, type=float, help='Weight %% of monomer in membrane')
     parser.add_argument('-sol', '--solvent', default='glycerol', type=str, help='Name of solvent mixed with monomer')
     parser.add_argument('-shift', '--shift', default=0.5, type=float, help='Shift position of head group shift units '
                         'in the direction opposite of the normal vector at that point')
@@ -208,7 +208,7 @@ if __name__ == "__main__":
 
     file_rw.write_gro_pos(bcc, 'initial.gro', res=LC.resid*grid.shape[0], ids=LC.names*grid.shape[0], box=[args.dim, args.dim, args.dim])
 
-    # solvate system
+    # solvate system - I can't do the following since I need to energy minimize the monomers first
     exit()
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     subprocess.call(["gmx", "insert-molecules", "-f", "initial.gro", "-ci", "%s/../top/structures/%s.gro" % (location, args.solvent), "-nmol", "%s" % nsol, "-o", "initial.gro"])

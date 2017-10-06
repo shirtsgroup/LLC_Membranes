@@ -41,7 +41,7 @@ if __name__ == "__main__":
             pos_ref[i, :] += ref_slice[0, i*nref + j, :]
 
     pos_ref /= (nref / args.factor)  # average coordinates and apply scaling factor
-    print(nref / args.factor)
+
     # Now translate all monomers to the new reference positions
     nres = int(t.n_atoms / LC.natoms)  # number of residues
     non_ion = LC.natoms - LC.no_ions  # number of atoms in residue not including ions. (Ions are grouped as a separate residues)

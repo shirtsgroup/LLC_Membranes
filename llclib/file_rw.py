@@ -65,7 +65,7 @@ def read_gro_coords(file):
     return xyz, identity, no_atoms, lines_of_text
 
 
-def write_assembly(b, xlink, output, no_mon):
+def write_assembly(b, xlink, output, no_mon, bcc='no'):
     # Formerly 'write_file'
     """
     :param b: Name of build monomer (string)
@@ -78,11 +78,19 @@ def write_assembly(b, xlink, output, no_mon):
 
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Location of this script
 
-    with open("%s/../HII/top/Monomer_Tops/%s" % (location, '%s.itp' % b), "r") as f:
+    if bcc == 'no':
+        with open("%s/../HII/top/Monomer_Tops/%s" % (location, '%s.itp' % b), "r") as f:
 
-        a = []
-        for line in f:
-            a.append(line)
+            a = []
+            for line in f:
+                a.append(line)
+
+    else:
+        with open("%s/../BCC/top/topologies/%s" % (location, '%s.itp' % b), "r") as f:
+
+            a = []
+            for line in f:
+                a.append(line)
 
     atoms_index, bonds_index, pairs_index, angles_index, dihedrals_p_index, \
     dihedrals_imp_index, vsite_index = get_indices(a, xlink)
@@ -121,7 +129,7 @@ def write_assembly(b, xlink, output, no_mon):
     for i in range(int(no_mon)):
         for k in range(0, nb):
             f.write('{:6d}{:7d}{:}'.format(i*nr + int(a[k + bonds_index + 2][0:6]), i*nr + int(a[k + bonds_index + 2][6:14]),
-                                         a[k + bonds_index + 2][14:len(a[k+ atoms_index + 2])]))
+                                         a[k + bonds_index + 2][14:]))
 
     f.write("\n")  # space in between sections
 
@@ -464,7 +472,7 @@ def write_water_ndx(keep, t):
             count += 1
 
 
-def write_gro_pos(pos, out, name='NA', box=[0, 0, 0], ids=[], res=[]):
+def write_gro_pos(pos, out, name='NA', box=[0, 0, 0], ids=[], res=[], vel=None):
     """
     write a .gro file from positions
     :param pos: xyz coordinates in
@@ -479,13 +487,21 @@ def write_gro_pos(pos, out, name='NA', box=[0, 0, 0], ids=[], res=[]):
         f.write('%s\n' % pos.shape[0])
 
         for i in range(pos.shape[0]):
+            if vel is not None:
+                if not ids:
+                    f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}{:8.4f}{:8.4f}{:8.4f}\n'.format((i + 1) % 100000, '%s' % name, '%s' % name,
+                                                                            (i + 1) % 100000, pos[i, 0], pos[i, 1], pos[i, 2], vel[i, 0], vel[i, 1], vel[i, 2]))
+                else:
+                    f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}{:8.4f}{:8.4f}{:8.4f}\n'.format((i + 1) % 100000, '%s' % res[i], '%s' % ids[i],
+                                                                            (i + 1) % 100000, pos[i, 0], pos[i, 1], pos[i, 2], vel[i, 0], vel[i, 1], vel[i, 2]))
 
-            if not ids:
-                f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format((i + 1) % 100000, '%s' % name, '%s' % name,
-                                                                        (i + 1) % 100000, pos[i, 0], pos[i, 1], pos[i, 2]))
             else:
-                f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format((i + 1) % 100000, '%s' % res[i], '%s' % ids[i],
-                                                                        (i + 1) % 100000, pos[i, 0], pos[i, 1], pos[i, 2]))
+                if not ids:
+                    f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format((i + 1) % 100000, '%s' % name, '%s' % name,
+                                                                            (i + 1) % 100000, pos[i, 0], pos[i, 1], pos[i, 2]))
+                else:
+                    f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format((i + 1) % 100000, '%s' % res[i], '%s' % ids[i],
+                                                                            (i + 1) % 100000, pos[i, 0], pos[i, 1], pos[i, 2]))
         for i in range(len(box)):
             f.write('{:10.5f}'.format(box[i]))
 

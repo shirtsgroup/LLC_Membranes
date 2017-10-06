@@ -144,6 +144,13 @@ mass['H73'] = 1.008
 mass['H74'] = 1.008
 mass['H75'] = 1.008
 mass['H76'] = 1.008
+mass['H77'] = 1.008
+mass['H78'] = 1.008
+mass['H79'] = 1.008
+mass['H80'] = 1.008
+mass['H81'] = 1.008
+mass['H82'] = 1.008
+mass['H83'] = 1.008
 mass['NA'] = 22.98977
 mass['CL'] = 35.453
 mass['OW'] = 15.99940
@@ -151,6 +158,9 @@ mass['HW1'] = 1.008
 mass['HW2'] = 1.008
 mass['BR'] = 79.90
 mass['N'] = 14.01
+mass['N1'] = 14.01
+mass['N2'] = 14.01
+mass['N3'] = 14.01
 
 # fill in charge dictionary (Used make_dict.py to generate the following list)
 
