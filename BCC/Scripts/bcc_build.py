@@ -87,7 +87,7 @@ def gridgen(surf, low, high, n, tol=0.05):
 
         grid = gyro_eval[:count_gyro, :]
 
-    elif surf == 'Pn3m' or surf == 'pn3m':
+    elif surf == 'Pn3m' or surf == 'pn3m' or surf == 'SchwarzD':
 
         schwarz = SchwarzD([x[:, None, None], y[None, :, None], z[None, None, :]])
         schwarz_eval = np.zeros([n**3, 3])
