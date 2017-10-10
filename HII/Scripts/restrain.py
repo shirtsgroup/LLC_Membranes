@@ -52,7 +52,7 @@ def initialize():
                                          'restraints to the topology for other atoms', action="store_true")
     parser.add_argument('-i', '--input', type=str, default='dipole.itp', help='Name of topology file to be edited if '
                                                                               'you use the option --append')
-    parser.add_argument('--bcc', action="store_true", default='Use BCC topology')
+    parser.add_argument('--bcc', action="store_true", help='Use BCC topology')
 
     args = parser.parse_args()
 
