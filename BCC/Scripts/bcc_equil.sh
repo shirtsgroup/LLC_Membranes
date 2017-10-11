@@ -52,7 +52,7 @@ ${GMX} mdrun -v -deffnm em
 n=$(awk '/Potential Energy/ {print $4}' em.log)  # gets the final value of potential energy from em.log (the 4th field on the line containing the string "Potential Energy"
 if [[ ${n:0:2} == *"."* ]]; then # check the first two characters of the potential energy value. If there is a decimal, then it is positive
     rm \#*
-    exec bcc_equil.sh -p ${phase} # restart this script
+    exec bcc_equil.sh -p ${phase} -n ${shift} -d ${dimension} # restart this script
 fi
 
 echo 0 | ${GMX} trjconv -f em.trr -s em.tpr -pbc nojump -o bcc.gro
