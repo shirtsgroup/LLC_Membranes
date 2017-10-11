@@ -120,7 +120,7 @@ def gradient(v, surf):
 
     n = 2*np.pi / period
 
-    if surf == 'Ia3d' or surf == 'gyroid' or surf == 'ia3d':
+    if surf == 'Ia3d' or surf == 'gyroid' or surf == 'ia3d' or surf == 'SchwarzD':
 
         a = n*np.cos(n*x)*np.cos(n*y) - n*np.sin(n*x)*np.sin(n*z)
         b = -n*np.sin(n*y)*np.sin(n*x) + n*np.cos(n*y)*np.cos(n*z)
