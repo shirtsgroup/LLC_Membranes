@@ -42,6 +42,7 @@ class LC(object):
         C2_ndx = []
         self.no_ions = 0
         self.ions = []
+        self.MW = 0
 
         if name.endswith('.gro'):
 
@@ -52,6 +53,7 @@ class LC(object):
             benzene_carbons = []
             for i in range(2, len(a) - 1):
                 res = str.strip(a[i][5:10])
+                self.MW += Atom_props.mass[(str.strip(a[2][10:15]))]
                 if res in residues:
                     res_count += 1
                 else:
