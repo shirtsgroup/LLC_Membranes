@@ -75,7 +75,7 @@ for i in $(seq 1.9 -0.1 1.0); do
             scale.py -g bcc.gro -o bcc.gro -f ${factor}
             gmx grompp -f em.mdp -p topol.top -c bcc.gro -o em
             ${GMX} mdrun -v -deffnm em
-            echo 0 | ${GMX} trjconv -f em.trr -s em.tpr -pbc nojump -o bcc.gro
+            echo 0 | gmx trjconv -f em.trr -s em.tpr -pbc nojump -o bcc.gro
             cp bcc.gro bcc_${j}.gro
         done
     fi
