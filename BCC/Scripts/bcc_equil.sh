@@ -4,7 +4,7 @@ build_mon="Dibrpyr14"  # monomer to build system with
 phase="gyroid"  # bcc phase to build
 dimension=10  # length of cubic unitcell box vector
 density=1.1  # density g/cm^3
-shift=0  # shift head group position along normal
+SHIFT=0  # shift head group position along normal (lowercase 'shift' is bash built-in command)
 ion="BR"
 wt_percent=77.1  # weight percent of monomer
 solvent='glycerol'  # name of solvent with bcc monomer
@@ -21,7 +21,7 @@ while getopts "b:p:d:r:n:I:w:S:T:R:c:P" opt; do
     p) phase=$OPTARG;;
     d) dimension=$OPTARG;;
     r) density=$OPTARG;;
-    n) shift=$OPTARG;;
+    n) SHIFT=$OPTARG;;
     I) ion=$OPTARG;;
     w) wt_percent=$OPTARG;;
     S) solvent=$OPTARG;;
@@ -38,7 +38,7 @@ else
     GMX="gmx"
 fi
 
-bcc_build.py -b ${build_mon}.gro -p ${phase} -d ${dimension} -dens ${density} -shift ${shift} -o initial.gro -wt ${wt_percent} -sol ${solvent}
+bcc_build.py -b ${build_mon}.gro -p ${phase} -d ${dimension} -dens ${density} -shift ${SHIFT} -o initial.gro -wt ${wt_percent} -sol ${solvent}
 reorder_gro.py -i initial.gro -o bcc.gro -I ${ion}
 echo "Initial unit cell built"
 input.py --bcc -b ${build_mon} -s 5000 # only care about em.mdp and topol.top at this step
@@ -52,7 +52,7 @@ ${GMX} mdrun -v -deffnm em
 n=$(awk '/Potential Energy/ {print $4}' em.log)  # gets the final value of potential energy from em.log (the 4th field on the line containing the string "Potential Energy"
 if [[ ${n:0:2} == *"."* ]]; then # check the first two characters of the potential energy value. If there is a decimal, then it is positive
     rm \#*
-    exec bcc_equil.sh -p ${phase} -n ${shift} -d ${dimension} -c ${cluster} -P ${NP} -b ${build_mon} -r ${density} -I ${ion} -w ${wt_percent} -S ${solvent} -T ${temp} -R ${restraint_atoms} # restart this script
+    exec bcc_equil.sh -p ${phase} -n ${SHIFT} -d ${dimension} -c ${cluster} -P ${NP} -b ${build_mon} -r ${density} -I ${ion} -w ${wt_percent} -S ${solvent} -T ${temp} -R ${restraint_atoms} # restart this script
 fi
 
 echo 0 | gmx trjconv -f em.trr -s em.tpr -pbc nojump -o bcc.gro
