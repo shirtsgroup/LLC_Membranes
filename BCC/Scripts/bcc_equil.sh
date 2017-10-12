@@ -45,7 +45,7 @@ input.py --bcc -b ${build_mon} -s 5000 # only care about em.mdp and topol.top at
 
 # really spread the monomers apart
 scale.py -g bcc.gro -o bcc.gro -f 2  # triple each dimension of the unit cell and isotropically scale all head group positions
-${GMX} grompp -f em.mdp -p topol.top -c bcc.gro -o em
+gmx grompp -f em.mdp -p topol.top -c bcc.gro -o em
 ${GMX} mdrun -v -deffnm em
 
 # Try again if the simulation doesn't energy minimize properly
@@ -55,14 +55,14 @@ if [[ ${n:0:2} == *"."* ]]; then # check the first two characters of the potenti
     exec bcc_equil.sh -p ${phase} -n ${shift} -d ${dimension} -c ${cluster} -P ${NP} -b ${build_mon} -r ${density} -I ${ion} -w ${wt_percent} -S ${solvent} -T ${temp} -R ${restraint_atoms} # restart this script
 fi
 
-echo 0 | ${GMX} trjconv -f em.trr -s em.tpr -pbc nojump -o bcc.gro
+echo 0 | gmx trjconv -f em.trr -s em.tpr -pbc nojump -o bcc.gro
 cp bcc.gro bcc_2.0.gro
 
 for i in $(seq 1.9 -0.1 1.0); do
 
     factor=$(echo "${i} / (${i} + 0.1)" | bc -l)
     scale.py -g bcc.gro -o bcc.gro -f ${factor}
-    ${GMX} grompp -f em.mdp -p topol.top -c bcc.gro -o em
+    gmx grompp -f em.mdp -p topol.top -c bcc.gro -o em
     ${GMX} mdrun -v -deffnm em
 
     # in case of more energy minimization problems
@@ -73,13 +73,13 @@ for i in $(seq 1.9 -0.1 1.0); do
         for j in $(seq $(echo "${i} + 0.08" |bc -l) -0.02 ${i}); do
             factor=$(echo "${j} / (${j} + 0.02)" | bc -l)
             scale.py -g bcc.gro -o bcc.gro -f ${factor}
-            ${GMX} grompp -f em.mdp -p topol.top -c bcc.gro -o em
+            gmx grompp -f em.mdp -p topol.top -c bcc.gro -o em
             ${GMX} mdrun -v -deffnm em
             echo 0 | ${GMX} trjconv -f em.trr -s em.tpr -pbc nojump -o bcc.gro
             cp bcc.gro bcc_${j}.gro
         done
     fi
-    echo 0 | ${GMX} trjconv -f em.trr -s em.tpr -pbc nojump -o bcc.gro
+    echo 0 | gmx trjconv -f em.trr -s em.tpr -pbc nojump -o bcc.gro
     cp bcc.gro bcc_${i}.gro
 
 done
@@ -90,7 +90,7 @@ nsol=$(nsolvent.py -b ${build_mon}.gro -d ${dimension} -dens ${density} -wt ${wt
 ntot=0
 
 echo "Inserting ${nsol} ${solvent} molecules"
-${GMX} insert-molecules -f bcc.gro -ci ${LOC}/../top/structures/${solvent}.gro -nmol ${nsol} -o initial.gro &> placement.txt
+gmx insert-molecules -f bcc.gro -ci ${LOC}/../top/structures/${solvent}.gro -nmol ${nsol} -o initial.gro &> placement.txt
 nadded=$(awk '/Added/ {print $2}' placement.txt)  # the actual amount of molecules gromacs was able to place
 ntot=$((nadded + ntot))
 
@@ -98,30 +98,30 @@ input.py --bcc -b ${build_mon} -l 50 --temp ${temp} -f 50 --genvel yes -e nvt -S
 restrain.py -a ${restraint_atoms} -f 100 -m ${build_mon} -g em.gro -r on -A xyz --novsites --bcc
 echo "${sol_res}         ${nadded}" >> topol.top
 
-${GMX} grompp -f em.mdp -p topol.top -c initial.gro -o em
+gmx grompp -f em.mdp -p topol.top -c initial.gro -o em
 ${GMX} mdrun -v -deffnm em
-echo 0 | ${GMX} trjconv -f em.trr -s em.tpr -pbc nojump -o em.gro -b 50
+echo 0 | gmx trjconv -f em.trr -s em.tpr -pbc nojump -o em.gro -b 50
 
-${GMX} grompp -f nvt.mdp -p topol.top -c em.gro -o nvt
+gmx grompp -f nvt.mdp -p topol.top -c em.gro -o nvt
 ${GMX} mdrun -v -deffnm nvt
-echo 0 | ${GMX} trjconv -f nvt.trr -s nvt.tpr -pbc nojump -o nvt.gro -b 50
+echo 0 | gmx trjconv -f nvt.trr -s nvt.tpr -pbc nojump -o nvt.gro -b 50
 
 while [[ ${ntot} -lt ${nsol} ]]; do
 
     gly2add=$((nsol - ntot))  # amount of glycerol to add in order to reach nsol
-    ${GMX} insert-molecules -f nvt.gro -ci ${LOC}/../top/structures/${solvent}.gro -nmol ${gly2add} -o initial.gro -scale 0.4 &> placement.txt
+    gmx insert-molecules -f nvt.gro -ci ${LOC}/../top/structures/${solvent}.gro -nmol ${gly2add} -o initial.gro -scale 0.4 &> placement.txt
     nadded=$(awk '/Added/ {print $2}' placement.txt)  # the actual amount of molecules gromacs was able to place
     if [[ ${nadded} -lt 10 ]]; then  # if an insignificant amount (10) of glycerol is added, stop trying to add more
         break
     fi
     echo "${sol_res}         ${nadded}" >> topol.top
     ntot=$((nadded + ntot))
-    ${GMX} grompp -f em.mdp -p topol.top -c initial.gro -o em
+    gmx grompp -f em.mdp -p topol.top -c initial.gro -o em
     ${GMX} mdrun -v -deffnm em
-    echo 0 | ${GMX} trjconv -f em.trr -s em.tpr -pbc nojump -o em.gro
-    ${GMX} grompp -f nvt.mdp -p topol.top -c em.gro -o nvt
+    echo 0 | gmx trjconv -f em.trr -s em.tpr -pbc nojump -o em.gro
+    gmx grompp -f nvt.mdp -p topol.top -c em.gro -o nvt
     ${GMX} mdrun -v -deffnm nvt
-    echo 0 | ${GMX} trjconv -f nvt.trr -s nvt.tpr -pbc nojump -o nvt.gro -b 50
+    echo 0 | gmx trjconv -f nvt.trr -s nvt.tpr -pbc nojump -o nvt.gro -b 50
     cp nvt.gro nvt_${ntot}.gro
 
 done
@@ -133,33 +133,33 @@ echo "${sol_res}              ${ntot}" >> topol.top
 # restrain the head groups and tails during nvt equilibration
 restrain.py -a ${restraint_atoms} -f 100 -m ${build_mon} -g em.gro -r on -A xyz --novsites --bcc
 
-${GMX} grompp -f nvt.mdp -p topol.top -c nvt.gro -o nvt
+gmx grompp -f nvt.mdp -p topol.top -c nvt.gro -o nvt
 ${GMX} mdrun -v -deffnm nvt
-echo 0 | ${GMX} trjconv -f nvt.trr -s nvt.tpr -pbc nojump -o nvt.gro -b 5000
+echo 0 | gmx trjconv -f nvt.trr -s nvt.tpr -pbc nojump -o nvt.gro -b 5000
 
 # switching to npt ensemble
 input.py --bcc -b ${build_mon} -l 50 --temp ${temp} -f 50 --genvel no -e npt -S --solvent glycerol
 echo "${sol_res}              ${ntot}" >> topol.top
 
-${GMX} grompp -f npt.mdp -p topol.top -c nvt.gro -o npt
+gmx grompp -f npt.mdp -p topol.top -c nvt.gro -o npt
 ${GMX} mdrun -v -deffnm npt
 
 while [[ ${ntot} -lt ${nsol} ]]; do
 
     gly2add=$((nsol - ntot))  # amount of glycerol to add in order to reach nsol
-    ${GMX} insert-molecules -f npt.gro -ci ${LOC}/../top/structures/${solvent}.gro -nmol ${gly2add} -o initial.gro -scale 0.4 &> placement.txt
+    gmx insert-molecules -f npt.gro -ci ${LOC}/../top/structures/${solvent}.gro -nmol ${gly2add} -o initial.gro -scale 0.4 &> placement.txt
     nadded=$(awk '/Added/ {print $2}' placement.txt)  # the actual amount of molecules gromacs was able to place
     if [[ ${nadded} -lt 10 ]]; then  # if an insignificant amount (10) of glycerol is added, stop trying to add more
         break
     fi
     echo "${sol_res}         ${nadded}" >> topol.top
     ntot=$((nadded + ntot))
-    ${GMX} grompp -f em.mdp -p topol.top -c initial.gro -o em
+    gmx grompp -f em.mdp -p topol.top -c initial.gro -o em
     ${GMX} mdrun -v -deffnm em
-    echo 0 | ${GMX} trjconv -f em.trr -s em.tpr -pbc nojump -o em.gro
-    ${GMX} grompp -f npt.mdp -p topol.top -c em.gro -o nvt
+    echo 0 | gmx trjconv -f em.trr -s em.tpr -pbc nojump -o em.gro
+    gmx grompp -f npt.mdp -p topol.top -c em.gro -o nvt
     ${GMX} mdrun -v -deffnm npt
-    echo 0 | ${GMX} trjconv -f npt.trr -s npt.tpr -pbc nojump -o npt.gro -b 50
+    echo 0 | gmx trjconv -f npt.trr -s npt.tpr -pbc nojump -o npt.gro -b 50
     cp npt.gro npt_${ntot}.gro
 
 done
@@ -168,5 +168,5 @@ done
 input.py --bcc -b ${build_mon} -l 5000 --temp ${temp} -f 50 --genvel no -e npt -S --solvent glycerol
 echo "${sol_res}              ${ntot}" >> topol.top
 
-${GMX} grompp -f npt.mdp -p topol.top -c npt.gro -o npt
+gmx grompp -f npt.mdp -p topol.top -c npt.gro -o npt
 ${GMX} mdrun -v -deffnm npt
