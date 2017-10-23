@@ -38,13 +38,14 @@ for i in range(23):
 
 fig, ax = plt.subplots()
 waxs /= np.amax(waxs)  # normalize with respect to highest intensity in pi-stacking reflection
-# plt.imshow(waxs, cmap='jet', extent=[-qmax, qmax, -qmax, qmax])
-# plt.xlabel('$q_r$', fontsize=14)
-# plt.ylabel('$q_z$', fontsize=14)
-# plt.gcf().get_axes()[0].tick_params(labelsize=14)
-# plt.tight_layout()
-# plt.show()
-
+plt.imshow(waxs, cmap='jet', extent=[-qmax, qmax, -qmax, qmax])
+plt.xlabel('$q_r$', fontsize=14)
+plt.ylabel('$q_z$', fontsize=14)
+plt.gcf().get_axes()[0].tick_params(labelsize=14)
+plt.tight_layout()
+plt.show()
+np.save('waxs.npy', waxs)
+exit()
 # fig.savefig('raw_WAXS.png')
 # fig.clf()
 # #plt.show()
