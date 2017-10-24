@@ -45,7 +45,7 @@ if [ ${ITERATION} != 0 ]; then
     ITERATION=$((ITERATION+1))
 fi
 
-input.py -b ${MONOMER} -S -c ${GRO} -x -l ${SIM_LENGTH} -f ${FRAMES} --genvel no -d ${TIMESTEP}
+input.py -b ${MONOMER} -c ${GRO} -x -l ${SIM_LENGTH} -f ${FRAMES} --genvel yes -d ${TIMESTEP}
 
 while [ ${STOP} -eq 0 ]; do
     if [ ${ITERATION} == 0 ]; then
@@ -65,7 +65,7 @@ while [ ${STOP} -eq 0 ]; do
     gmx mdrun -v -deffnm em
     gmx grompp -f ${MDP} -p topol.top -c em.gro -o wiggle
     gmx mdrun -v -deffnm wiggle
-    echo 0 | gmx trjconv -f wiggle.gro -s wiggled.gro -pbc atom -o wiggle.gro -ur tric
+#    echo 0 | gmx trjconv -f wiggle.gro -s wiggle.gro -pbc atom -o wiggle.gro -ur tric
     XLINKS=$(tail xlink_${ITERATION}.log -n 2 | head -n 1 | cut -c 19-22)
     TERM=$(tail -n 6 xlink_${ITERATION}.log | head -n 1 | cut -c 26-29)
     STOP=$(tail -n 1 xlink_${ITERATION}.log | cut -c 26)
