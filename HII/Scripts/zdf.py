@@ -284,9 +284,9 @@ if __name__ == "__main__":
         bin_width = (z[1] - z[0])
         ps, freqs, max = power_spectrum(zdf_avg, bin_width)
         print(freqs.shape)
-        dbwl, amp = spacing(z, zdf_avg)
+        # dbwl, amp = spacing(z, zdf_avg)
         print('Fourier distance between layers: %s nm' % (1/max))
-        print('Amplitude of first peak : %2.2f %% of mean' % (100*(amp/np.mean(zdf_avg[:z.shape[0]]))))
+        # print('Amplitude of first peak : %2.2f %% of mean' % (100*(amp/np.mean(zdf_avg[:z.shape[0]]))))
         plt.figure()
         positive = 0
         while freqs[positive] < 0:
@@ -297,7 +297,7 @@ if __name__ == "__main__":
         plt.axes().tick_params(labelsize=14)
         plt.tight_layout()
         plt.savefig('ps.png')
-        plot_zdf(z[:-5], zdf_avg[:z.shape[0] - 5])
+        plot_zdf(z[:len(zdf_avg)], zdf_avg[:z.shape[0] - 5])
 
     else:
 
@@ -311,8 +311,8 @@ if __name__ == "__main__":
             z, d = zdf(periodic, 4, args.apl, box)
             d = np.trim_zeros(d, trim='b')
             plot_zdf(z[:-2], d[:z.shape[0] - 2])
-            dbwl = spacing(z, d)
-            print('Distance between layers: %s' % dbwl)
+            # dbwl = spacing(z, d)
+            # print('Distance between layers: %s' % dbwl)
             exit()
 
         if args.avg:
@@ -350,7 +350,7 @@ if __name__ == "__main__":
             print('Fourier distance between layers: %s nm' % (1/max))
             plt.figure()
             plt.plot(freqs, ps)
-            dbwl = spacing(z, zdf_avg)
+            # dbwl = spacing(z, zdf_avg)
             plot_zdf(z, zdf_avg[:z.shape[0]])
-            dbwl = spacing(z, zdf_avg)
-            print('Distance between layers: %s' % dbwl)
+            # dbwl = spacing(z, zdf_avg)
+            # print('Distance between layers: %s' % dbwl)
