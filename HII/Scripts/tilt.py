@@ -142,6 +142,19 @@ if __name__ == "__main__":
         print("Average Angle: %s +/- %s degrees" % (np.mean(all_tilt_angles[0, :]), np.std(all_tilt_angles[0, :])))
     else:
         nT = all_tilt_angles.shape[0]
+        plt.hist(all_tilt_angles.flatten(), bins=50, normed=True)
+        # plt.plot([np.mean(all_tilt_angles.flatten())]*2, [0, 1], '--', color='black')
+        print(np.mean(all_tilt_angles.flatten()))
+        plt.gcf().get_axes()[0].tick_params(labelsize=14)
+        plt.ylim(0, 0.035)
+        plt.xlabel('Tilt angle with respect to xy plane', fontsize=14)
+        plt.ylabel('Probability', fontsize=14)
+        plt.tight_layout()
+        plt.savefig('tilt_dist.png')
+        plt.show()
+        exit()
+        print(all_tilt_angles.shape)
+        exit()
         avgs = np.zeros([nT])
         stds = np.zeros([nT])
 
