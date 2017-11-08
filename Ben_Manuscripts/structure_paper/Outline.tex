@@ -98,19 +98,36 @@
     packed, uniform size, cylinders with hydrophilic groups oriented inward
     towards the pore center and hydrophobic groups facing outward.
     \item H\textsubscript{II} and Col\textsubscript{h} phase systems created by
-    the monomer named Na-GA3C11 has been extensively studied experimentally \cite{smith_ordered_1997, %BJC: IUPAC chemical name here?
+    the monomer named Na-GA3C11 have been extensively studied experimentally \cite{smith_ordered_1997, %BJC: IUPAC chemical name here?
     zhou_supported_2005,resel_h2-phase_2000,feng_scalable_2014,feng_thin_2016}. 
+    % BJC: New paragraph?
     \item Until recently, mesophases formed by Na-GA3C11 could not be macroscopically
-    aligned, resulting in a low flux membrane, slowing research in the field.
+    aligned, resulting in low flux membranes, slowing research in the field.
     \item In 2014, Feng et al. showed that the mesophases could be aligned 
     using a magnetic field with subsequent crosslinking to lock the structure
     in place \cite{feng_scalable_2014}
     \item In 2016, Feng et al. showed that the same result could be obtained 
     using a technique termed soft confinement \cite{feng_thin_2016}.
     \item Following this breakthrough, research into LLC membranes has been
-    reinvigorated
+    reinvigorated.
   \end{itemize}
  
+  % BJC: Not sure this figure needs to be in the paper
+  \begin{figure}
+	\centering
+	\includegraphics[width=\linewidth]{soft_confinement.png}
+	\caption{The wedge shaped liquid crystal monomer (a) self assembles into 
+	mesophases with hexagonally packed pores (b). The pores are made of 
+	stacked monomer disks. A sub-micron-thick film is created by casting a 
+	dilute solution of Na-GA3C11/THF solution onto a silicon substrate and 
+	and allowing the solvent to evaporate. The thin film contains nanoporous 
+	columns which lie parallel to the film plane. (d) When a soft PDMS pad is 
+	imposed to the thin film, with subsequent thermal annealing, the columns
+	align perpendicular to the film plane. (e) Photo-cross-linking of the
+	aligned film creates a mechanically stable thin film with vertically 
+	aligned nanopores}~\label{fig:soft}
+  \end{figure}
+
   A molecular level understanding of LLC membrane structure, enabled by molecular
   dynamics simulations, will provide guidelines to reduce the large chemical space
   available to design monomers for creation of separation-specific membranes.
@@ -127,7 +144,7 @@
     desalination or small organic molecule separations.
     \item It will be challenging to efficiently narrow down the large design space in 
     a laboratory setting without a robust model.
-    \item The only source of predictive modeling has been macroscopic models 
+    \item The only source of predictive modeling for LLC systems have been macroscopic models 
     which likely do not adequately describe transport at these length scales. % BJC: Reference. I think it is just w.r.t. bicontinuous cubic
     \item Choice of head group may play a role in the rejection of charged or uncharged solutes.
     \item Choice of counterion may influence the establishment of a Donnan potential
@@ -137,6 +154,25 @@
     membrane design.
     \item Molecular dynamics simulations will provide the required level of detail
   \end{itemize}
+
+  %BJC: Figure here showing previous level of detail compared to atomistic level of detail
+  \begin{figure}[ht]
+  \centering
+	\begin{subfigure}{0.45\linewidth}
+		\centering
+		\includegraphics[width=\textwidth]{nanopore_undetailed.jpg}
+		\caption{}~\label{fig:undetailed_pore}
+	\end{subfigure}
+	\begin{subfigure}{0.45\linewidth}
+		\centering
+		\includegraphics[width=\textwidth]{nanopore.png}
+		\caption{}~\label{fig:detailed_pore}
+	\end{subfigure}
+  \caption{(a) Our previous understanding of the pore structure allows us to speculate
+	   about separation behavior. (b) A detailed molecular model will allow us to
+	   directly observe solute transport}~\label{fig:detail}
+  \end{figure} 
+	
   
   Our approach to constructing a general model will follow the development of a
   model of a specific LLC membrane with sufficient experimental characterization.
@@ -253,7 +289,7 @@
 	\item The hydrogen bonding network formed by the water may play a role 
         in structuring the pore.
 	\item We can use simulated X-ray diffraction patterns to see if there is
-        any meaningful structural difference between a dry and "wet" system
+        any meaningful structural difference between a "dry" and "wet" system
    \end{itemize}
     
 %     \item While we might be able to provide answers to these questions using a 
@@ -327,7 +363,7 @@
     \item We attempted atomistic self-assembly by packing monomers into a box 
     using Packmol \cite{martinez_packmol:_2009}.
     \item Simulations of greater than 100 ns show no indicators of progress 
-    towards an ordered system.  %BJC: include more details in supplment?
+    towards an ordered system.  %BJC: include more details in supplment
     \item To bypass the slow self-assembly process, python scripts are used
     to assemble monomers into a structure close to one of a number of 
     hypothesized equilibrium configurations (Figure~\ref{fig:python}).
@@ -387,7 +423,7 @@
         will be called R-spots. All are located $\approx 40$ degrees from the $q_z$ axis
         in their respective quadrants. In many liquid crystal systems this can be
         explained by the tilt angle of the alkane chains with respect to the xy plane. % BJC: References
-        \item The first corresponds to the spacing and symmetry of
+        \item The final feature corresponds to the spacing and symmetry of
         the d\textsubscript{100} plane which can be related to the distance between
         pores. The feature, which will be called R-pores, is characterized by dots
         along $q_z$ = 0. The spacing between dots is indicative of the hexagonal
@@ -407,13 +443,13 @@
         \begin{subfigure}[t]{0.47\linewidth}
                 \centering
                 \raisebox{.2\textwidth}{%
-                \includegraphics[width=\linewidth]{WAXS_soft_confined.png}
+                \includegraphics[width=\linewidth]{WAXS_annotated.png}
                 }
                 \caption{}\label{fig:WAXS}
         \end{subfigure}
-        \caption{(a) 2D wide angle X-ray scattering gives details about repeating
-        features less than 1 nanometer apart. (b) 1D small angle X-ray scattering
-        indicates hexagonal packing of pores as well as the spacing between pores.}\label{fig:SWAXS}
+        \caption{(a) 1D small angle X-ray scattering indicates hexagonal packing of
+	pores as well as the spacing between pores (b) 2D wide angle X-ray scattering 
+	gives details about repeating features less than 1 nanometer apart}\label{fig:SWAXS}
   \end{figure}
 
 %  We chose an initial layer spacing based on experimental 2D WAXS data.
@@ -494,7 +530,7 @@
     of the nanoscopic pore environment.
     \item When constructing pores, we chose the carboxylate carbon from the monomer
     head group as a reference atom, and placed it a distance r from the pore center,
-    where r is the pore radius. (See Supplemental Information) %BJC: figure making that clear
+    where r is the pore radius (~\ref{fig:pore_radius_illustration}). % BJC: Figure in Supplemental Information?
     \item We will not make direct comparisons of pore radius between our model 
     and experiment to avoid the ambiguity, however, we do define a pore radius  
     for our own purposes.
@@ -502,6 +538,13 @@
     %the center of mass of each aromatic ring and the center of mass of all aromatic rings
     %in their respective pores.
   \end{itemize}
+
+  \begin{figure}[ht]
+ 	\centering
+ 	\includegraphics[width=\textwidth]{pore_radius_illustration.png}
+	\caption{The pore radius of the initial configuration is defined using the 
+        carboxylate carbon as a reference}~\label{fig:pore_radius_illustration}
+  \end{figure}
   
   The relative interlayer orientation was chosen based on clues from 
   diffraction data as well as the various known stacking modes of benzene 
@@ -546,14 +589,16 @@
           previous value, starting from 1e6 KJ mol$^-1$ nm$^-2$.
           \item Once the force constant is below 10 KJ mol$^-1$ nm$^-2$, the restraints are
           slowly released until there is no more restraining potential.
-          \item The resulting unrestrained structure is allowed to equilibrate further in the NPT
-          ensemble for at least 400 ns.
+          \item The resulting unrestrained structure is allowed to equilibrate for 5 ns 
+	  in the NPT ensemble with pressure controlled by the berendsen barostat.
+	  \item Long, NPT equilibration simulations are run for at least 400 ns using the 
+          Parrinello-Rahman barostat with a time consant of 10 ps.
       \end{itemize}
       \item Wet equilibration scheme: 
       \begin{itemize}
 	  % BJC: the following three bullet points ended up not being the case since I used significantly less water
           %\item We obtained an estimate of equilibrium pore water content by solvating
-          %an initial configuration with water baths above and below the membrane. 
+          % an initial configuration with water baths above and below the membrane. 
 	  %\item We ran the solvated system according to Scheme A but with a 1000 ns equilibration
           %\item Using that number we added water to the pores of an initial 
 	  %configuration and equilibrated according to scheme B. 
@@ -672,6 +717,7 @@
     % start fitting. I suppose I could minimize R^2 but that seems like overkill
     \item We looked at the MSD plot to determine where to begin and end a linear fit
     \item Ion concentration was measured with respect to the entire unit cell. 
+    % new paragraph
     \item The second method, termed the 'Collective Diffusion' model, measures 
     the movement of the collective variable, Q, which is defined as the amount
     of charge transfer through the system and can be thought to represent
@@ -789,10 +835,9 @@
   To discern the composition of the monomer layers, addressing (1), we ran
   simulations of systems created with 4 - 8 monomers per layer.  % BJC: can't figure out how to word this : should be 'with between 4 and 8 monomers' or 'with from 4 to 8 monomers'?
   \begin{itemize}
-        \item Both the sandwiched and parallel displaced configurations were tested.
-        \item All systems are stable after 400 ns of simulation.  % BJC: edited this for clarity
-        %MRS: you only ran for 50 ns, or after 50 ns some of them started to destabilize?  Is the point you are making that they are ALL pretty stable, or all at least a little stable.   
-        %BJC: Working on getting them all run out to 400 ns
+        \item We created systems in both the parallel displaced and sandwiched configurations
+	\item All systems were prepared according to the dry equilibration procedure
+        \item All systems are stable after 400 ns of simulation.  
         \item Table ~\ref{table:p2p} shows the pore spacing for all systems tested.
         \item Systems built with 5 monomers in each layer equilibrate to a pore spacing
         that is most consistent with the experimental value of 4.12 nm derived from
@@ -801,15 +846,24 @@
         built with 5 monomers per layer.
   \end{itemize}
 
-
+  %BJC: maybe split into 2 paragraphs
   To answer (2), we verified that the system stays partitioned into layers by
-  plotting the pair correlation function, $g(z)$ calculated between aromatic rings along
+  plotting the pair correlation function, $g(z)$ calculated between atoms along
   the length of the pores (Fig~\ref{fig:zdf}).
   \begin{itemize}
-        \item Sandwiched configuration layers stack 4.29 \angstrom apart while
-        parallel displaced configuration layers stack 4.37 \angstrom apart.
-        The power spectrums used to calculate the reported layer spacing are given in the 
-        Supplemental Information.  %BJC: "Power spectrum" and okay description here?
+	\item We measured $g(z)$ with respect to aromatic rings in the head groups
+	and, separately, with respect to carbon atoms on the alkane chains.
+	\item In both cases, we see a degree of layer partitioning
+        \item Using the head groups as reference, we see that sandwiched configuration
+	layers stack 4.29 \angstrom apart while parallel displaced configuration layers
+	stack 4.37 \angstrom apart.
+	\item Using the alkane chain carbons as reference we see a layer spacing of 4.39 \angstrom
+	and 4.38 \angstrom in the sandwiched and parallel displaced configurations respectively.
+        \item The power spectrums used to calculate the reported layer spacings are given in the 
+        Supplemental Information.  %BJC: "Power spectrum" an okay description here?
+	\item We see a difference in the spacing in the head group versus tail region
+	because there is more volume to fill with less densely packed carbon chains in the tail region. 
+	% BJC: vvv Need to get the same information for the tail zdfs.
 	\item Even though the layer spacing is similar, the sandwiched configuration
 	exhibits more defined layers with its first peak deviating from the mean 
         number density by 61 \%. %BJC: I mention how I do this calculation in the methods. Is it clear that I'm doing that here?
@@ -1073,15 +1127,12 @@
   %We created systems using three distinct initial configurations and examined
   %their structure by simulating X-ray diffraction patterns produced from equilibrated MD trajectories.
   \begin{itemize}
-	\item We created configurations in both the parallel displaced and sandwiched
-	configurations
-        \item The systems were assembled and equilibrated according to our dry equilibration procedure
-        \item Simulated diffration patterns were generated using portions of the
+	\item Systems of 5 monomers per layer in the parallel displaced and sandwiched
+	configurations were tested.
+        \item Simulated patterns were generated using portions of simulation
         trajectory after equilibration.
-        \item We assume the simulation has equilibrated when the distance between
-        pores and the membrane thickness stopped changing. %BJC: might be better placed in methods
-        \item Simulated diffraction patterns for both structures are shown and 
-	compared to experimenta in Figure ~\ref{fig:XRDsim}.
+        \item The patterns for both structures are shown and compared to experiment
+	in Figure ~\ref{fig:XRDsim}.
   \end{itemize}
 %
 
@@ -1158,50 +1209,80 @@
 %	equilibrated disordered phase}\label{fig:XRDsim}
  % \end{figure}
 
-  \begin{figure}[ht]
-  \begin{subfigure}{.83\linewidth}
+%  \begin{figure}[ht]
+%  \begin{subfigure}{.83\linewidth}
+%        \centering
+%        \begin{subfigure}{0.4\linewidth}
+%                \centering
+%                \includegraphics[width=\linewidth, trim={2.5cm 0 4cm 2cm}, clip]{WAXS_raw.png}%
+%                \caption{}~\label{fig:raw_waxs}
+%        \end{subfigure}%
+%        \begin{subfigure}{0.4\linewidth}
+%                \centering
+%                \includegraphics[width=\linewidth, trim={2cm 0 2.5cm 1.25cm}, clip]{rzplot_offset.png}
+%                \caption{}~\label{fig:rz_offset}
+%        \end{subfigure}
+%        \begin{subfigure}{0.4\linewidth}
+%                \centering
+%                \includegraphics[width=\linewidth, trim={2cm 0 2.5cm 1.25cm}, clip]{rzplot_layered.png}
+%                \caption{}~\label{fig:rz_layered}
+%        \end{subfigure}%
+%        \begin{subfigure}{0.4\linewidth}
+%                \centering
+%                \includegraphics[width=\linewidth, trim={2cm 0 2.5cm 1.25cm}, clip]{rzplot_disordered.png}
+%                \caption{}~\label{fig:rz_disordered}
+%        \end{subfigure}
+%  \end{subfigure}%
+%  \begin{subfigure}{0.14\linewidth}
+%        \centering
+%        \vspace{-1cm}
+%        \includegraphics[width=\linewidth]{colorbar_jet.png}
+%  \end{subfigure}
+%  \caption{(a) Experimental 2D WAXS data contains 5 major reflections which we aim to match. The remaining
+%  three images are diffraction patterns simulated from MD trajectories. (b) The parallel displaced
+%  configuration gives rise to all reflections of interest. (c) The sandwiched configurations gives rise to a
+%  pattern with all major reflections except R-helix. R-spots is strong relative to R-alkanes in comparison
+%  to the parallel displaced configuration. (d) The disordered pore configuration creates a pattern with only
+%  R-alkanes and R-pores in common with experiment}~\label{fig:xrd}
+%  \end{figure}
+
+
+  \begin{figure}
+  \begin{subfigure}{0.3\linewidth}
         \centering
-        \begin{subfigure}{0.4\linewidth}
-                \centering
-                \includegraphics[width=\linewidth, trim={2.5cm 0 4cm 2cm}, clip]{WAXS_raw.png}%
-                \caption{}~\label{fig:raw_waxs}
-        \end{subfigure}%
-        \begin{subfigure}{0.4\linewidth}
-                \centering
-                \includegraphics[width=\linewidth, trim={2cm 0 2.5cm 1.25cm}, clip]{rzplot_offset.png}
-                \caption{}~\label{fig:rz_offset}
-        \end{subfigure}
-        \begin{subfigure}{0.4\linewidth}
-                \centering
-                \includegraphics[width=\linewidth, trim={2cm 0 2.5cm 1.25cm}, clip]{rzplot_layered.png}
-                \caption{}~\label{fig:rz_layered}
-        \end{subfigure}%
-        \begin{subfigure}{0.4\linewidth}
-                \centering
-                \includegraphics[width=\linewidth, trim={2cm 0 2.5cm 1.25cm}, clip]{rzplot_disordered.png}
-                \caption{}~\label{fig:rz_disordered}
-        \end{subfigure}
-  \end{subfigure}%
-  \begin{subfigure}{0.14\linewidth}
+        \vspace{-0.2em}
+        \includegraphics[width=1.018\linewidth]{layered_rzplot.png}
+        \caption{}~\label{fig:rz_layered}
+  \end{subfigure}
+  \begin{subfigure}{0.3\linewidth}
         \centering
-        \vspace{-1cm}
+        \vspace{0.25em}
+        \includegraphics[scale=0.0987]{WAXS_raw.png}
+        \caption{}~\label{fig:raw_waxs}
+  \end{subfigure}
+  \begin{subfigure}{0.3\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{offset_rzplot.png}
+        \caption{}~\label{fig:rz_offset}
+  \end{subfigure}
+  \begin{subfigure}{0.0544\linewidth}
+        \centering
+        \vspace{-3.30em}
         \includegraphics[width=\linewidth]{colorbar_jet.png}
   \end{subfigure}
-  \caption{(a) Experimental 2D WAXS data contains 5 major reflections which we aim to match. The remaining
-  three images are diffraction patterns simulated from MD trajectories. (b) The parallel displaced
-  configuration gives rise to all reflections of interest. (c) The sandwiched configurations gives rise to a
-  pattern with all major reflections except R-helix. R-spots is strong relative to R-alkanes in comparison
-  to the parallel displaced configuration. (d) The disordered pore configuration creates a pattern with only
-  R-alkanes and R-pores in common with experiment}~\label{fig:xrd}
+  \caption{The simulated X-ray diffraction patterns for simulations run in the
+  sandwiched (a) and parallel-displaced (c) configurations are compared to experiment (b). 
+  The parallel displaced configuration is the only one that exhibits all major
+  reflections of interest to some degree}
   \end{figure}
 
   R-spots, which appears in both simulated XRD patterns, is a result of the way 
   alkane tails pack together.
   \begin{itemize}
   	\item Previously, the spots in the diffraction pattern had been explained 
-	as the product of tilted alkane chains. % BJC: reference
+	as the product of tilted alkane chains. % BJC: reference 2014 ACS nano paper
 	\item We measured the tilt angle of the alkane chains and showed that our 
-	system equilibrates to an average tilt angle close to zero degrees (See Supplemental Information). 
+	system equilibrates to an average tilt angle close to zero degrees ~\ref{fig:tilt} % Could belong in supplemental. Leaving here for now 
 	\item To understand the origin of the spots, we determined which atoms gave rise to the feature
 	\item Since R-spots is present as higher intensity spots within R-alkanes, it is likely
         that the spots arise as a consequence of the tails. 
@@ -1213,7 +1294,15 @@
 	\item We see distinct peaks in the distribution of these angles (Figure~\ref{fig:tail_packing})
   \end{itemize}
 
-  The peaks in the tail angle distribution are consistent with the location of R-spots.
+  \begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.5\linewidth]{tilt_dist.png}
+  \caption{The tilt angle distribution of alkane chain tails with respect to the membrane plane
+  indicates an average tilt angle near 7\degree which is far from the 37\degree tilt angle 
+  previously used to explain R-spots}~\label{fig:tilt}
+  \end{figure}
+
+  The peaks in the tilt angle distribution are consistent with the location of R-spots.
   \begin{itemize}
 	\item The peaks of interest in Figures~\ref{fig:offset_tails}~and~\ref{fig:layered_tails}
 	are located at $\pm$ 33 $\degree$ which is the same location where the highest intensity
@@ -1279,12 +1368,50 @@
   sandwiched configurations according to the wet equilibration procedure.
   \begin{itemize}
 	\item We do not have an experimental measurement of water in the pores
-	\item We decided the number of waters to put in each pore by estimating
-        the number of hydrogen bonds in which pore entities could participate.
-	\item In solution, each headgroup has a charge of -1
-	\item We estimate there to be about 4 water molecules per layer based 
-	on various packing configurations and geometric constraints
-	\item 4 water molecules per layer translates to about 1.6 wt \%
+	\item We tested a range of water concentrations from 0.5 to 5 percent % working on a 0.5 wt % sytstem now just to see
+	\item Our lower bound represents a system with on average 2 water 
+	molecules for each monomer layer.
+	\item Figure ~\ref{fig:solvation} shows results for each configuration.
+%	\item Initially, we decided the number of waters to put in each pore by
+%	estimating the number of hydrogen bonds in which pore entities could participate.
+%	\item In solution, each headgroup has a charge of -1
+%	\item We estimate there to be at least 2 water molecules per layer based 
+%	on various packing configurations and geometric constraints
+%	\item 4 water molecules per layer translates to about 1.6 wt \%
+  \end{itemize}
+
+  \begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{solvation.png}  % still working on formatting so this is a screenshot of a doctored latex figure
+	\label{fig:solvation}
+  \end{figure}
+
+  In all cases, water disrupts structuring of the model.
+  \begin{itemize}
+	\item The plots in Figure ~\ref{fig:solvation} are normalized 
+	to have the same colorbar as the dry systems. 
+	\item The intensity of the reflections decrease when water is 
+	added to the system.
+	\item In systems built with 5 weight percent water, R-$\pi$ and
+	R-spots become nearly indistinguishable from R-alkanes.
+  \end{itemize}
+
+  Water is not needed to obtain and simulate the correct equilibrium 
+  membrane structure.
+  \begin{itemize}
+	\item We note that water absorbed during membrane synthesis may
+        be present in far lower concentrations than those 
+        tested here.
+	\item We do not eliminate the possibility that water is necessary
+        in order to drive self-assembly. Studying the mechanisms of self assembly is
+	beyond the scope of this work.
+	\item However, once the system has formed the Col\textsubscript{h} 
+	phase, adding water only creates disorder in the structure
+	\item In the equilibrium configuration, if water exists, it is confined
+	to the pore region where there is no driving force for aggregation of 
+	water molecules. 
+	\item The packing of water molecules will be too sparse to form a 
+	hydrogen bonding network.
   \end{itemize}
 
   %BJC: old version of above figure v v v
@@ -1468,59 +1595,88 @@
 
   \subsection*{Ionic conductivity calculation}
 
-  We use the equilibrated offset system in the OP basin to calculate ionic 
+  We use the equilibrated parallel displaced system to calculate ionic 
   conductivity since its structure is the closest match to experiment.
   The model gives reasonable estimates of ionic conductivity when compared to 
   experiment.
   \begin{itemize}
   	\item Calculated values of ionic conductivity obtained using the Nernst 
 	Einstein relation and Collective Diffusion model are compared in 
-	Table~\ref{table:conductivity}.
+	Figure~\ref{fig:conductivity}.
 	\item The two methods agree with each other within error, although the 
 	uncertainty obtained using the Collective Diffusion model is much higher.
-	\item Much longer simulations are needed to lower the uncertainty. % TODO: Run Basin B out longer at same conditions as A
-	\item Collective diffusion calculations were generated from 
-	500 ns simulations.
-	\item Our calculated values would benefit from longer simulations. 
+	\item Much longer simulations are needed to lower the uncertainty, however it
+	is unfeasible to do so with large model. 
 	\item For this reason we will likely only use the Nernst Einstein relation
 	in future calculations of this type. 
   \end{itemize}
 
-  The CP basin has a higher ionic conductivity than the OP basin.
+  The calculated values of ionic conductivity are higher than experiment by an
+  order of magnitude. 
   \begin{itemize}
-	\item We hypothesize that conductivity is enhanced in Basin B due to a 
-	higher sodium ion diffusivity.
-	\item Transport of sodium is likely facilitated by the homogeneity of Basin B.
-	Sodium ions have less nearby sites to move to in Basin A.
-	\item There is currently no experimental evidence of this trend. Maybe Xunda will find something
-	\item In both cases, our calculated values for Basin A are higher than the 
-	experimental values, as expected. 
-	\item Some of the discrepancy is likely a result of using an imperfect forcefield. 
-	\item However, the real system, although mostly aligned and straight, has a 
-	distribution of azimuthal angles, meaning that the pores have a degree of 
-	tortuosity which lowers the effective ionic conductivity of the bulk membrane. 
-	\item The ordering from isotropic to mostly aligned mesophases showed an 85 
-	fold increase in ionic conductivity. We would expect additional gains in a 
-	perfectly aligned system.
+	\item One can justify the reason for this result by considering the 
+	real system studied experimentally
+	\item The ionic conductivity measurement to which we are comparing was done
+	on a \SI{80}{\micro\metre} thick film, nearly 10,000 times thicker than 
+        our simulated system. 
+	\item The thick film likely has defects leading to non-continuous pores and
+	imperfect alignment.
+	\item The 2D SAXS pattern highlights the small degree of tortuosity present
+	in the system  % BJC: insert 2D SAXS data -- maybe azimuthal distribution
+	\item It has been shown that there is a large dependence of Ionic conductivity
+	on the alignment of the pores
+	\item The ionic conductivity of an unaligned film is 85 times lower than that
+	of a nearly aligned film referenced here  % BJC: reproduce figure from 2014
+	\item It is not unreasonable that a thin, perfectly aligned film would have 
+	a value of ionic conductivity in agreement with our model
   \end{itemize}
-	
-  \begin{table}[h]
-  \centering
-  \begin{tabular}{ccc}
-  \toprule
-  \multicolumn{3}{c}{Calculated Ionic Conductivity \si{\siemens\per\meter}} \\
-  \hline
-  Method & Basin A & Basin B \\
-  \midrule
-  Nernst Einstein & \num{1.23e-4} (0.01) & \num{1.76e-4} (0.02) \\
-  Collective Diffusion & \num{1.40e-4} (0.32) & \num{4.6e-4}(2.4) \\
-  Experiment & \num{1.33e-5} (0.10) & -- \\
-  \bottomrule
-  \end{tabular}
-  \caption{Calculated ionic conductivity using Nernst-Einsten and Collective Diffusion 
-  agree within error. Both methods give calculated values of ionic conductivity which
-  are an order of magnitude higher than experimental values~\label{table:conductivity}}.
-  \end{table}
+
+%  The CP basin has a higher ionic conductivity than the OP basin.
+%  \begin{itemize}
+%	\item We hypothesize that conductivity is enhanced in Basin B due to a 
+%	higher sodium ion diffusivity.
+%	\item Transport of sodium is likely facilitated by the homogeneity of Basin B.
+%	Sodium ions have less nearby sites to move to in Basin A.
+%	\item There is currently no experimental evidence of this trend. Maybe Xunda will find something
+%	\item In both cases, our calculated values for Basin A are higher than the 
+%	experimental values, as expected. 
+%	\item Some of the discrepancy is likely a result of using an imperfect forcefield. 
+%	\item However, the real system, although mostly aligned and straight, has a 
+%	distribution of azimuthal angles, meaning that the pores have a degree of 
+%	tortuosity which lowers the effective ionic conductivity of the bulk membrane. 
+%	\item The ordering from isotropic to mostly aligned mesophases showed an 85 
+%	fold increase in ionic conductivity. We would expect additional gains in a 
+%	perfectly aligned system.
+%  \end{itemize}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\linewidth]{IC_offset.png}
+	\caption{Calculated ionic conductivity using the Nernst-Einstein relation
+	and Collective Diffusion model agree with error. Both methods give calculated
+	values of ionic conductivity an order of magnitude higher than the experimental
+	value}
+	\label{fig:conductivity}
+\end{figure}	
+
+%BJC: vvv replaced by bar plot above
+%  \begin{table}[h]
+%  \centering
+%  \begin{tabular}{ccc}
+%  \toprule
+%  \multicolumn{3}{c}{Calculated Ionic Conductivity \si{\siemens\per\meter}} \\
+%  \hline
+%  Method & Basin A & Basin B \\
+%  \midrule
+%  Nernst Einstein & \num{1.23e-4} (0.01) & \num{1.76e-4} (0.02) \\
+%  Collective Diffusion & \num{1.40e-4} (0.32) & \num{4.6e-4}(2.4) \\
+%  Experiment & \num{1.33e-5} (0.10) & -- \\
+%  \bottomrule
+%  \end{tabular}
+%  \caption{Calculated ionic conductivity using Nernst-Einsten and Collective Diffusion 
+%  agree within error. Both methods give calculated values of ionic conductivity which
+%  are an order of magnitude higher than experimental values~\label{table:conductivity}}.
+%  \end{table}
 
   %MRS: the next sections maybe should be supporting?
   %MRS: you say ``the distance decreases by 1 A'' but is that true

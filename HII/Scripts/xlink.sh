@@ -2,7 +2,7 @@
 set -e
 # A script to iteratively crosslink a LLC system
 
-CUTOFF=5  # percent of distribution that will be labeled close enough to bond
+CUTOFF=2.5  # percent of distribution that will be labeled close enough to bond
 TERM_PROB=5  # probability of termination of carbons meeting bonding criteria
 GRO='wiggle.gro'  # initial .gro file to be crosslinked
 CUTOFF_RAD=20  # percent of distribution that are labeled close enough to bond in the context of reactive radicals
@@ -87,7 +87,7 @@ find ${TOP} -type f -exec sed -i 's/crosslinked_new.itp/crosslinked.itp/g' {} \;
 
 gmx grompp -f em.mdp -p ${TOP} -c wiggle_no_dummies.gro -o em
 gmx mdrun -v -deffnm em
-gmx grompp -f ${NPT} -p ${TOP} -c em.gro -o wiggle
+gmx grompp -f npt.mdp -p ${TOP} -c em.gro -o wiggle
 gmx mdrun -v -deffnm wiggle
 
 mail -s "Crosslinking Done" -a xlink.log benjamin.coscia@colorado.edu <<< "The crosslinking has terminated, woo!"

@@ -67,9 +67,12 @@ def gridgen(surf, low, high, n, tol=0.05):
     # make a cubic grid
 
     bin_size = (high - low) / n
-    x = np.linspace(low, high - bin_size, n)
-    y = np.linspace(low, high - bin_size, n)
-    z = np.linspace(low, high - bin_size, n)
+    # x = np.linspace(low, high - bin_size, n)
+    # y = np.linspace(low, high - bin_size, n)
+    # z = np.linspace(low, high - bin_size, n)
+    x = np.linspace(low, high, n)
+    y = np.linspace(low, high, n)
+    z = np.linspace(low, high, n)
 
     if surf == 'Ia3d' or surf == 'gyroid' or surf == 'ia3d':
 

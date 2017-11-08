@@ -32,19 +32,20 @@ while getopts "b:p:d:r:n:I:w:S:T:R:c:P" opt; do
     esac
 done
 
-#if [[ ${cluster} -eq 1 ]]; then
-#    GMX="mpirun -np ${NP} gmx_mpi"
-#else
-#    GMX="gmx"
-#fi
-#
-#bcc_build.py -b ${build_mon}.gro -p ${phase} -d ${dimension} -dens ${density} -shift ${SHIFT} -o initial.gro -wt ${wt_percent} -sol ${solvent}
-#reorder_gro.py -i initial.gro -o bcc.gro -I ${ion}
-#echo "Initial unit cell built"
-#input.py --bcc -b ${build_mon} -s 5000 # only care about em.mdp and topol.top at this step
-#
-## really spread the monomers apart
-#scale.py -g bcc.gro -o bcc.gro -f 2  # triple each dimension of the unit cell and isotropically scale all head group positions
+if [[ ${cluster} -eq 1 ]]; then
+    GMX="mpirun -np ${NP} gmx_mpi"
+else
+    GMX="gmx"
+fi
+
+bcc_build.py -b ${build_mon}.gro -p ${phase} -d ${dimension} -dens ${density} -shift ${SHIFT} -o initial.gro -wt ${wt_percent} -sol ${solvent}
+reorder_gro.py -i initial.gro -o bcc.gro -I ${ion}
+echo "Initial unit cell built"
+input.py --bcc -b ${build_mon} -s 5000 # only care about em.mdp and topol.top at this step
+
+# really spread the monomers apart
+scale.py -g bcc.gro -o bcc.gro -f 2  # triple each dimension of the unit cell and isotropically scale all head group positions
+exit
 #gmx grompp -f em.mdp -p topol.top -c bcc.gro -o em
 #${GMX} mdrun -v -deffnm em
 #
