@@ -838,7 +838,7 @@
         \item We created systems in both the parallel displaced and sandwiched configurations
 	\item All systems were prepared according to the dry equilibration procedure
         \item All systems are stable after 400 ns of simulation.  
-        \item Table ~\ref{table:p2p} shows the pore spacing for all systems tested.
+        \item Table ~\ref{fig:p2p} shows the pore spacing for all systems tested.
         \item Systems built with 5 monomers in each layer equilibrate to a pore spacing
         that is most consistent with the experimental value of 4.12 nm derived from
         SAXS measurements (Figure~\ref{fig:SAXS}).
@@ -894,30 +894,41 @@
 
   % BJC: Even though I will shift focus to only 5 monomers per layer, I will put other data
   % such as XRD of 4, 6, 7, 8 mon/layer in supplemental information 
+
+  \begin{figure}
+	\centering
+	\includegraphics[width=0.5\linewidth]{p2p.png}
+	\caption{The pore spacing (given in nm) of the model increases as
+	number of monomers in each layer increases. The pore spacing of a system
+	starting in the sandwiched configuration is systematically lower than 
+	that started in an offset configuration. Systems built with 5 monomers
+	per layer in a parallel displaced configuration result in a pore spacing
+	closest to the experimental 4.12 nm}~\label{fig:p2p}
+  \end{figure}
   
-  \begin{table}[h]
-  \centering
-  \begin{tabular}{ccc}
-  \toprule
-  		   & \multicolumn{2}{c}{Starting Configuration} \\
-  \hline
-  Monomers per layer & Sandwiched & Parallel Displaced \\
-  \midrule
-  4 & $3.72 \pm 0.04$ & $3.84 \pm 0.02$ \\  % done
-  5 & $4.20 \pm 0.04$ & $4.23 \pm 0.04$ \\
-  6 & $4.69 \pm 0.04$ & $4.72 \pm 0.03$ \\
-  7 & $4.66 \pm 0.02$ & $4.82 \pm 0.03$ \\  % done
-  8 & $5.00 \pm 0.04$ & $5.33 \pm 0.02$ \\
-  \bottomrule
-  \end{tabular}
-  \caption{The pore spacing (given in nm) of the model increases as
-  number of monomers in each layer increases. The pore spacing of a system
-  starting in the sandwiched configuration is systematically lower than 
-  that started in an offset configuration. Systems built with 5 monomers
-  per layer in a parallel displaced configuration result in a pore spacing
-  closest to the experimental 4.12 nm}
-  \label{table:p2p} 
-  \end{table}
+%  \begin{table}[h]
+%  \centering
+%  \begin{tabular}{ccc}
+%  \toprule
+%  		   & \multicolumn{2}{c}{Starting Configuration} \\
+%  \hline
+%  Monomers per layer & Sandwiched & Parallel Displaced \\
+%  \midrule
+%  4 & $3.72 \pm 0.04$ & $3.84 \pm 0.02$ \\  % done
+%  5 & $4.20 \pm 0.04$ & $4.23 \pm 0.04$ \\
+%  6 & $4.69 \pm 0.04$ & $4.72 \pm 0.03$ \\
+%  7 & $4.66 \pm 0.02$ & $4.82 \pm 0.03$ \\  % done
+%  8 & $5.00 \pm 0.04$ & $5.33 \pm 0.02$ \\
+%  \bottomrule
+%  \end{tabular}
+%  \caption{The pore spacing (given in nm) of the model increases as
+%  number of monomers in each layer increases. The pore spacing of a system
+%  starting in the sandwiched configuration is systematically lower than 
+%  that started in an offset configuration. Systems built with 5 monomers
+%  per layer in a parallel displaced configuration result in a pore spacing
+%  closest to the experimental 4.12 nm}
+%  \label{table:p2p} 
+%  \end{table}
   
 %  To answer question (3) we require high resolution experimental evidence which we 
 %  can match to our simulations. Experimental WAXS measurements encode all structural
@@ -1619,10 +1630,10 @@
 	\item The ionic conductivity measurement to which we are comparing was done
 	on a \SI{80}{\micro\metre} thick film, nearly 10,000 times thicker than 
         our simulated system. 
-	\item The thick film likely has defects leading to non-continuous pores and
+	\item The thick film likely has defects leading to non-contiguous pores and
 	imperfect alignment.
-	\item The 2D SAXS pattern highlights the small degree of tortuosity present
-	in the system  % BJC: insert 2D SAXS data -- maybe azimuthal distribution
+	\item The 2D SAXS pattern shows the small degree of tortuosity present
+	in the system (~\ref{fig:2DSAXS})  % BJC: insert 2D SAXS data -- maybe azimuthal distribution
 	\item It has been shown that there is a large dependence of Ionic conductivity
 	on the alignment of the pores
 	\item The ionic conductivity of an unaligned film is 85 times lower than that
@@ -1630,6 +1641,28 @@
 	\item It is not unreasonable that a thin, perfectly aligned film would have 
 	a value of ionic conductivity in agreement with our model
   \end{itemize}
+
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\linewidth]{2D-SAXS_cropped.png}
+  % BJC: I will add axes with q values if this ends up in the final draft
+  % BJC: I'll also see what I can do about all the white speckles
+  \caption{The experimental two dimensional SAXS pattern exhibits reflections
+  resulting from highly aligned pore regions. A perfectly aligned system 
+  would exhibit sharp dots at the same locations of the refelctions shown. 
+  An isotropically aligned system the refelctions would appear as 
+  rings centered about the origin}~\label{fig:2DSAXS}
+  \end{figure}
+
+\begin{figure}
+        \centering
+        \includegraphics[width=0.5\linewidth]{IC_offset.png}
+        \caption{Calculated ionic conductivity using the Nernst-Einstein relation
+        and Collective Diffusion model agree with error. Both methods give calculated
+        values of ionic conductivity an order of magnitude higher than the experimental
+        value}
+        \label{fig:conductivity}
+\end{figure}
 
 %  The CP basin has a higher ionic conductivity than the OP basin.
 %  \begin{itemize}
@@ -1648,16 +1681,6 @@
 %	fold increase in ionic conductivity. We would expect additional gains in a 
 %	perfectly aligned system.
 %  \end{itemize}
-
-\begin{figure}
-	\centering
-	\includegraphics[width=0.5\linewidth]{IC_offset.png}
-	\caption{Calculated ionic conductivity using the Nernst-Einstein relation
-	and Collective Diffusion model agree with error. Both methods give calculated
-	values of ionic conductivity an order of magnitude higher than the experimental
-	value}
-	\label{fig:conductivity}
-\end{figure}	
 
 %BJC: vvv replaced by bar plot above
 %  \begin{table}[h]
@@ -1686,44 +1709,63 @@
   %MRS: you don't otherwise discuss clearly what effect crosslinking would have. 
   \subsection*{Implementation of the crosslinking algorithm}
 
-  We applied the crosslinking algorithm to the equilibrated sandwiched structure in 
-  the OP basin.
+  We applied the crosslinking algorithm to the equilibrated parallel-displaced  
+  configuration with 5 monomers per layer.
   \begin{itemize}  %BJC: working on the following. The following is what I expect
   	\item There is an even distribution of crosslinks between same monomer tails, 
 	between monomers in the same pore and between monomers in different pores 
-	including periodic boundaries.
-	\item We reach 95 \% conversion of terminal vinyl groups
+	including periodic boundaries.  % BJC: might leave this detail in the supplemental
+	\item We reach 95 \% conversion of terminal vinyl groups % BJC: we'll see
 	\item The distance between pores shrinks by 1 \angstrom~ after the system is 
-	crosslinked
-	\item Major features are still present in the X-ray diffraction
-	\item The ionic conductivity is higher/lower in the crosslinked system
+	crosslinked  % probably smaller
+	\item We simulated the crosslinked simulations in the NPT ensemble for 100 ns
+	\item Major features are still present in the X-ray diffraction ~\ref{fig:rzplot_xlink} % BJC: maybe
+	\item The ionic conductivity is higher/lower in the crosslinked system ~\ref{fig:ic_xlink} % BJC: Nernst-Einstein is lower. Need a longer simulation to check Collective-Diffusion 
   \end{itemize}
-  %BJC: THe following figure will be replaced with one representative of the new
-  % data I am  collecting above.
+ 
+
   \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
 	\centering
-	\begin{subfigure}{0.31\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{p2p_diagram.PNG}
-		\caption{}\label{fig:p2p_diagram}
-	\end{subfigure}
-		\begin{subfigure}{0.31\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{no_xlink_p2p.png}
-		\caption{}\label{fig:no_xlink_p2p}
-	\end{subfigure}
-		\begin{subfigure}{0.31\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{xlink_p2p.png}
-		\caption{}\label{fig:xlink_p2p}
-	\end{subfigure}
-	\caption{(a) The legends of the plots in (b) and (c) refer to the numbers shown.
-	Each numbered circle represents a pore. Distances are measured along each of the 
-	lines shown in addition to the distance from pore 1 to pore 4. (b) The positions
-	of individual pores fluctuate in an uncrosslinked system. (c) The positions of
-	individual pores in the crosslinked system are stable relative to the uncrosslinked
-	system}\label{fig:xlink}
+	\includegraphics[width=\textwidth]{rzplot_xlink.png}
+	\caption{}~\label{fig:rzplot_xlink}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+	\centering
+	\includegraphics[width=\textwidth]{ic_xlink.png}
+	\caption{}~\label{fig:ic_xlink}
+  \end{subfigure}
+  \caption{(a) Reflections produced by the crosslinked configuration fade relative
+  to the uncrosslinked system. The colorbar shown is the same used for the uncrosslinked
+  system. (b) The ionic conductivity is smaller relative to the uncrosslinked system, but
+  still much larger than the experimental value}~\label{fig:xlink}
   \end{figure}
+ 
+%  \begin{figure}
+%	\centering
+%	\begin{subfigure}{0.31\textwidth}
+%		\centering
+%		\includegraphics[width=\textwidth]{p2p_diagram.PNG}
+%		\caption{}\label{fig:p2p_diagram}
+%	\end{subfigure}
+%		\begin{subfigure}{0.31\textwidth}
+%		\centering
+%		\includegraphics[width=\textwidth]{no_xlink_p2p.png}
+%		\caption{}\label{fig:no_xlink_p2p}
+%	\end{subfigure}
+%		\begin{subfigure}{0.31\textwidth}
+%		\centering
+%		\includegraphics[width=\textwidth]{xlink_p2p.png}
+%		\caption{}\label{fig:xlink_p2p}
+%	\end{subfigure}
+%	\caption{(a) The legends of the plots in (b) and (c) refer to the numbers shown.
+%	Each numbered circle represents a pore. Distances are measured along each of the 
+%	lines shown in addition to the distance from pore 1 to pore 4. (b) The positions
+%	of individual pores fluctuate in an uncrosslinked system. (c) The positions of
+%	individual pores in the crosslinked system are stable relative to the uncrosslinked
+%	system}\label{fig:xlink}
+%  \end{figure}
   
   \section*{Conclusion}
   
@@ -1733,18 +1775,21 @@
   	\item While there have been efforts to model formation of various liquid crystalline 
 	phases with molecular dynamics, to our knowledge there have been no studies which 
 	attempt to examine their structure with the same level of detail presented here.
-	\item We have confirmed that monomers stay partitioned in layers.
-	\item We were able to deduce that layers are composed of 5 monomers.
-	\item We have identified two metastable basins which each consist of a set of 
-	similar monomer configurations characterized by the degree of order in the pore region.
-	\item We verified that the basins are not separate phases.
+	\item We were able to deduce that layers are composed of 5 monomers 
+        \item We have confirmed that monomers stay partitioned in layers.
 	\item We have explored the affect of two different $\pi$-$\pi$ stacking modes on the equilibrated
 	membrane strucure. 
 	\item Simulated diffration patterns generated from MD trajectories suggest that
-	the offset configuration produces a structure with the closest match to experiment. 
-	\item Even though our model only answers these questions for a system created by 
-	NA-GA3C11, it can be adapted to other study systems formed by other LCs with 
-	little extra effort. 
+	the parallel-displaced configuration produces a structure with the closest match to experiment.
+	\item Finally, water is not needed to maintain membrane structure 
+	\item Now that we have a good idea of what the membrane structure should look like, we will
+	evaluate transport of various solutes within the system. 
+	\item We will apply the knowledge gained from this study in order to 
+        suggest improvements to the existing system as well as to evaluate new
+	unsynthesized LLC systems.
+%	\item Even though our model only answers these questions for a system created by 
+%	NA-GA3C11, it can be adapted to other study systems formed by other LCs with 
+%	little extra effort. 
   \end{itemize}
   
 \clearpage
