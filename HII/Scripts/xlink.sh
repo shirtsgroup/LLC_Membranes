@@ -18,8 +18,9 @@ TOP='topol.top'
 MDP='npt.mdp'
 INIT_CONFIG='initial.gro'
 TIMESTEP=0.001
+EMSTEPS=5000
 
-while getopts "c:t:g:d:s:x:f:m:C:p:M:i:S:" opt; do
+while getopts "c:t:g:d:s:x:f:m:C:p:M:i:S:E:" opt; do
     case $opt in
     c) CUTOFF=$OPTARG;;
     t) TERM_PROB=$OPTARG;;
@@ -34,6 +35,7 @@ while getopts "c:t:g:d:s:x:f:m:C:p:M:i:S:" opt; do
     M) MDP=$OPTARG;;
     i) INIT_CONFIG=$OPTARG;;
     S) TIMESTEP=$OPTARG;;
+    E) EMSTEPS=$OPTARG;;
     esac
 done
 
@@ -45,7 +47,7 @@ if [ ${ITERATION} != 0 ]; then
     ITERATION=$((ITERATION+1))
 fi
 
-input.py -b ${MONOMER} -c ${GRO} -x -l ${SIM_LENGTH} -f ${FRAMES} --genvel yes -d ${TIMESTEP}
+input.py -b ${MONOMER} -c ${GRO} -x -l ${SIM_LENGTH} -f ${FRAMES} --genvel yes -d ${TIMESTEP} -s ${EMSTEPS}
 
 while [ ${STOP} -eq 0 ]; do
     if [ ${ITERATION} == 0 ]; then
