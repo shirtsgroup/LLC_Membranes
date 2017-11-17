@@ -242,14 +242,13 @@ def translate(xyz, before, after):
     """
 
     pos = np.copy(xyz)
-
     direction = after - before
 
     translation = np.matrix([[1, 0, 0, direction[0]], [0, 1, 0, direction[1]],
                          [0, 0, 1, direction[2]], [0, 0, 0, 1]])
 
     b = np.ones([1])
-    for i in range(np.shape(pos)[0]):
+    for i in range(pos.shape[0]):
         coord = np.concatenate((pos[i, :], b))
         x = np.dot(translation, coord)
         pos[i, :] = x[0, :3]
@@ -346,7 +345,7 @@ def rotate_vector(xyz, v1, v2):
 
 def rotate_coords_z(xyz, angle):
     """
-    :param xyz: xyz coordinates of atoms to be rotated
+    :param xyz: xyz coordinates of atoms to be rotated, degrees
     :param angle: angle to rotate them by w.r.t origin
     :return:
     """

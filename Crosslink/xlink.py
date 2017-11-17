@@ -471,12 +471,14 @@ if __name__ == "__main__":
         c2_rad_ndx_prev = c2_rad_ndx
 
     tp = args.term_prob  # termination probability
-
-    # indices = random.sample(list(range(0, int(100/tp))), 1)
-    term_prob_array = np.zeros([int(100/tp)])  # make an array with a a percentage of 1's equal to the termination probability
-    # for i in indices:
-    #     term_prob_array[i] = 1
-    term_prob_array[random.randint(0, int(100/tp) - 1)] = 1
+    if tp == 0:
+        term_prob_array = np.zeros([1])
+    else:
+        # indices = random.sample(list(range(0, int(100/tp))), 1)
+        term_prob_array = np.zeros([int(100/tp)])  # make an array with a a percentage of 1's equal to the termination probability
+        # for i in indices:
+        #     term_prob_array[i] = 1
+        term_prob_array[random.randint(0, int(100/tp) - 1)] = 1
 
     # Termination occurs at C2
     # Move termination carbons to a new list

@@ -9,23 +9,25 @@ name='monomer' # name of molecule. This name will carry through to output
 nc=0  # net charge
 res='MON' # name of residue being made, NOTE: This must match the residue in the .pdb file or you will get errors
 anneal='no'  # change to 'yes' if you want a thermal annealing process carried out after energy minimization
+input_path='.'
 
-while getopts "n:c:r:a:" opt; do
+while getopts "n:c:r:a:p:" opt; do
     case $opt in
     n) name=$OPTARG;;
     c) nc=$OPTARG;;
     r) res=$OPTARG;;
     a) anneal=$OPTARG;;
+    p) input_path=$OPTARG;;
     esac
 done
 
-antechamber -i ${name}.pdb -fi pdb -o ${name}.mol2 -fo mol2 -c bcc -s 2 -nc ${nc}
+antechamber -i ${name}.pdb -fi pdb -o ${name}.mol2 -fo mol2 -c bcc -s 2 -nc ${nc}  # The .pdb must have connectivity info!
 # -c bcc tells antechamber to use AM1-BCC charge model
 # -s flag just defines verbosity of output
 parmchk -i ${name}.mol2 -f mol2 -o ${name}.frcmod
 
 # Create input to tleap
-echo "source leaprc.ff99SB" > tleap.in 
+echo "source oldff/leaprc.ff99SB" > tleap.in
 echo "source leaprc.gaff" >> tleap.in  # make sure tleap knows about GAFF forcefield
 echo "${res} = loadmol2 ${name}.mol2" >> tleap.in  # load monomer
 echo "check ${res}" >> tleap.in  # checks for missing parameters
@@ -39,8 +41,10 @@ tleap -f tleap.in  # run the previous block in tleap
 #sed -i -e "s/${res: -3}/${res}/g" ${name}.prmtop
 #sed -i -e "s/${res: -3}/${res}/g" ${name}.inpcrd
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # the directory where this script is located.
-${DIR}/acpype.py -p ${name}.prmtop -x ${name}.inpcrd
+#DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # the directory where this script is located.
+DIR=${input_path}
+
+acpype.py -p ${name}.prmtop -x ${name}.inpcrd
 
 # Rename. I prefer to get rid of the GMX part. Copy them though so we have backup
 cp ${res}_GMX.gro ${res}.gro
@@ -70,3 +74,5 @@ gmx grompp -f ${DIR}/em.mdp -p ${res}.top -c ${res}_new.pdb -o em
 gmx mdrun -v -deffnm em
 
 cp em.gro ${res}.gro
+cp ${res}.gro ${name}.gro
+cp ${res}.top ${name}.top

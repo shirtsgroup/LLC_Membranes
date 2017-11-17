@@ -26,6 +26,8 @@
  cc       6           12.0100  0.00000   A     3.39967e-01   3.59824e-01 ; 1.9080 0.0860
  h4       1           1.00800  0.00000   A     2.51055e-01   6.27600e-02 ; 1.4090 0.0150
  h5       1           1.00800  0.00000   A     2.42146e-01   6.27600e-02 ; 1.3590 0.0150
+ cg       6           12.0100  0.00000   A     0.000000000   0.000000000 ; Carbon atom used when adding gap to crosslinked system
+
 ; * paramters are from gaff.dat and converted to gromacs units (sigma [=] nm,
 ; epsilon [=] kJ/mol) from A and kcal/mol 
 ; You can find the LJ pararmeters in gaff.dat by searching for the section

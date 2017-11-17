@@ -528,21 +528,27 @@ if __name__ == '__main__':
     # plt.legend(loc=1, fontsize=18)
     equil = 0
     density, r, bin_width = compdensity(pos, p_centers, equil, n_pores, buffer=0)
-
-    for i in range(density.shape[-1]):
-        if density[i] == 0:
-            stop = i
-            break
-
+    print(density)
+    print(r)
+    #for i in range(density.shape[-1]):
+    #    if density[i] == 0:
+    #        stop = i
+    #        break
+    stop = len(np.trim_zeros(density, 'b'))
     # popt, pcov = curve_fit(gaus, r[:stop], density[:stop], p0=[density[0], 0.4])
     # # parameters, cov_matrix = curve_fit(poisson, r[:stop]/bin_width, density[:stop], p0=[1])
-    # plt.figure(2)
-    # plt.plot(r[:stop], gaus(r[:stop],*popt), 'ro:', label='fit')
+    plt.figure(2)
+    #plt.plot(r[:stop], gaus(r[:stop],*popt), 'ro:', label='fit')
     # # plt.plot(r[:stop], poisson(r[:stop]/bin_width, *parameters), 'r-', lw=2)
-    # plt.title('Component Density Around Pore Center')
-    # plt.xlabel('Distance from Pore Center (nm)')
-    # plt.ylabel('Relative Component Density')
-    # plt.bar(r[:stop], density[:stop], bin_width)
+    #plt.title('Component Density Around Pore Center')
+    #plt.xlabel('Distance from Pore Center (nm)')
+    #plt.ylabel('Relative Component Density')
+    plt.rcParams["patch.force_edgecolor"] = True
+    plt.bar(r[:stop], density[:stop], bin_width, color='blue')
+    plt.xlim(0, plt.xlim()[1])
+    #plt.rcParams["patch.force_edgecolor"] = True
+    plt.xlabel('Distance from pore center (nm)')
+    plt.ylabel('Probability of finding atom at distance x')
     if args.save:
         plt.savefig('p2p.png')
     if not args.noshow:
