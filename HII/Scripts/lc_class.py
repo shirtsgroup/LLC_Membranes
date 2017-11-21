@@ -34,6 +34,7 @@ class LC(object):
             for line in f:
                 a.append(line)
 
+        self.full = a
         P = []
         L = []
         C1 = []
@@ -53,7 +54,7 @@ class LC(object):
             benzene_carbons = []
             for i in range(2, len(a) - 1):
                 res = str.strip(a[i][5:10])
-                self.MW += Atom_props.mass[(str.strip(a[2][10:15]))]
+                self.MW += Atom_props.mass[(str.strip(a[i][10:15]))]
                 if res in residues:
                     res_count += 1
                 else:
@@ -141,6 +142,19 @@ class LC(object):
         self.c2_index = C2_ndx
         self.benzene_carbons = benzene_carbons
 
+    def get_index(self, name):
+        """
+        Name of atoms whose index you want
+        :param name: name listed in .gro file in 3rd column
+        :return: index (serial) of the atom you want
+        """
+        ndx = -2
+        for i in self.full:
+            ndx += 1
+            if str.strip(i[10:15]) == name:
+                break
+
+        return ndx
 
 # test = LC('NAcarb11V.pdb')
 # print test.natoms

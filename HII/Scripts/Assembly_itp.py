@@ -12,7 +12,7 @@ location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__))
 
 
 def initialize():
-    parser = argparse.ArgumentParser(description = 'Build LLC Structure')
+    parser = argparse.ArgumentParser(description='Build LLC Structure')
 
     parser.add_argument('-t', '--type', default='LLC', help = 'Type of monomer being used')
     parser.add_argument('-l', '--layers', default=20, help = 'Number of layers')

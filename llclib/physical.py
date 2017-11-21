@@ -69,10 +69,16 @@ def thickness(filename, ref_atoms, grid, *traj, **kwargs):
 
         if grid:
 
-            pos = md.load(filename).xyz[0, :, :]  # positions of all atoms
+            t = md.load(filename)
+            pos = t.xyz[0, :, :]  # positions of all atoms
+
+            if kwargs['exclude']:
+                keep = [a.index for a in t.topology.atoms if a.residue.name != kwargs['exclude']]
+                pos = t.atom_slice(keep).xyz[0, :, :]
 
             # define boundaries of each grid area
             grid_res = kwargs['grid_res']
+
             nregions = (grid_res - 1) ** 2
             g = np.zeros([2, grid_res, grid_res])
             dims = a[-1].split()

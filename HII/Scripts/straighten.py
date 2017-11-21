@@ -3,6 +3,7 @@
 import argparse
 import mdtraj as md
 import numpy as np
+import lc_class
 import matplotlib.pyplot as plt
 import matplotlib.path as path
 import math
@@ -15,9 +16,10 @@ from scipy import spatial
 
 def initialize():
 
-    parser = argparse.ArgumentParser(description='Place solutes in the pores')
+    parser = argparse.ArgumentParser(description='Straighten the pores of a solvates system')
 
     parser.add_argument('-g', '--gro', default='wiggle.gro', help='Coordinate file where solutes will be placed')
+    parser.add_argument('-b', '--build_monomer', default='NAcarb11Vd.gro', help='Name of monomer used to build system')
     parser.add_argument('-r', '--ref', nargs='+', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='Reference atom (s)'
                         ' used to locate pores')
     parser.add_argument('-n', '--number', default=1, type=int, help='Number of solutes to place in each pore')
@@ -56,7 +58,7 @@ def put_in_box(pt, x_box, y_box, m, angle):
     return pt
 
 
-def trace_pores(pos, box, layers):
+def shift_pores(pos, box, layers):
     """
     Find the line which traces through the center of the pores
     :param pos: positions of atoms used to define pore location (args.ref) [natoms, 3]
@@ -102,110 +104,13 @@ def trace_pores(pos, box, layers):
 
     return centers
 
-
-def placement(z, pts):
-    """
-    :param z: z location where solute should be placed
-    :param pts: points which run through the pore
-    :return: location to place solute
-    """
-
-    lower = 0
-    while pts[lower, 2] < z:
-        lower += 1
-
-    upper = pts.shape[0] - 1
-    while pts[upper, 2] > z:
-        upper -= 1
-
-    # Use parametric representation of line between upper and lower points to find the xy value where z is satsified
-
-    v = pts[upper, :] - pts[lower, :]  # direction vector
-    t = (z - pts[lower, 2]) / v[2]  # solve for t since we know z
-    x = pts[lower, 0] + t*v[0]
-    y = pts[lower, 1] + t*v[1]
-
-    return [x, y, z]
-
-
 if __name__ == "__main__":
 
     args = initialize()
 
-    t = md.load(args.gro)  # load trajectory
-    xyz = t.xyz[0, :, :]
+    t = md.load('%s' % args.gro)
+    mon = lc_class.LC('%s' % args.build_monomer)
 
-    names = [a.name for a in t.topology.atoms]
-    res = [a.residue.name for a in t.topology.atoms]
-
-    # change names and residues back to be consistent with tip3p water model. idk mdtraj does this to me D':
-    for i, name in enumerate(res):
-        if name == "HOH":
-            res[i] = 'SOL'
-            if names[i] == 'O':
-                names[i] = 'OW'
-            elif names[i] == 'H1':
-                names[i] = 'HW1'
-            elif names[i] == 'H2':
-                names[i] = 'HW2'
-
-    full_box = t.unitcell_vectors
-    box = t.unitcell_vectors[0, :2, :2]  # get xy box vectors
-    zmax, zmin = physical.thickness(args.gro, args.ref, grid=False)[1:3]  # find limits for solute placement
-    z_placement = np.linspace(zmin, zmax, args.number + 2)[1:-1]  # points along z axis where solutes will be placed (exclude end points ... for now)
-
-    angle = np.arccos(box[1, 1]/box[0, 0])
-    if box[1, 0] < 0:
-        angle += np.pi / 2
-
-    keep = [a.index for a in t.topology.atoms if a.name in args.ref]  # keep reference atoms
-
-    pos = t.atom_slice(keep).xyz[0, :, :]  # get positions of reference atoms
-
-    # Now find the xy locations where solutes should be placed (i.e. find the pores)
-    centers = trace_pores(pos, box, args.layers)
-
-    # Place solutes molecules by their center of mass
-    solute = md.load('%s/%s.gro' % (args.solute_path, args.solute))
-
-    solute_atom_names = [a.name for a in solute.topology.atoms]
-    solute_resnames = [a.residue.name for a in solute.topology.atoms]
-
-    com = np.zeros([3])  # center of mass of solute
-    for i in range(solute.xyz.shape[1]):
-        com += solute.xyz[0, i, :]
-
-    com /= solute.xyz.shape[1]
-    pores = int(centers.shape[0] / args.layers)
-    for i in range(pores):
-        for j in range(args.number):
-            place = placement(z_placement[j], centers[i*args.layers:(i+1)*args.layers, :])
-            xyz = np.concatenate((xyz, transform.translate(solute.xyz[0, :, :], com, place)))
-
-    box_gromacs = [full_box[0, 0, 0], full_box[0, 1, 1], full_box[0, 2, 2], full_box[0, 0, 1], full_box[0, 2, 0],
-                   full_box[0, 1, 0], full_box[0, 0, 2], full_box[0, 1, 2], full_box[0, 2, 0]]
-
-    ids = names + solute_atom_names*args.number*4
-    res_names = res + solute_resnames*args.number*4
-
-    file_rw.write_gro_pos(xyz, 'solutes.gro', box=box_gromacs, ids=ids, res=res_names)
-
-    # update topology
-
-    topology = []
-    with open('%s' % args.top, 'r') as f:
-        for line in f:
-            topology.append(line)
-
-    system_index = 0
-    while topology[system_index].count('[ system ]') == 0:
-        system_index += 1
-
-    topology.insert(system_index, ';%s Topology\n' % args.solute)
-    topology.insert(system_index + 1, '#include "%s/%s.itp"\n' % (args.solute_path, args.solute))
-    topology.insert(system_index + 2, '\n')
-    topology.append('%s                 %s' % (solute_resnames[0], args.number*4))
-
-    with open('solute.top', 'w') as f:
-        for line in topology:
-            f.write(line)
+    monomer = [a.index for a in t.topology.atoms if a.residue.name != 'HOH']
+    nmon = len(monomer) // (mon.natoms + mon.no_ions)
+    mon_per_pore = nmon / 4
