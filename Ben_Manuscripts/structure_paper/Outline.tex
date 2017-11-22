@@ -1301,7 +1301,7 @@
 	pattern, we were able to isolate the cause of the spots to the tails (Figure~\ref{fig:tails}).
 	\item Since the tails stay nearly flat, we plotted the centroids of the 
 	tails and measured the angle between each centroid and its nearest neighbors
-	with respect to the plane of the membrane (Figure~\ref{fig:centroids}).
+	with respect to the plane of the membrane (Figure~\ref{fig:centroids}).  %BJC: at one point Matt mention doing a correlation function instead of just measuring the angles
 	\item We see distinct peaks in the distribution of these angles (Figure~\ref{fig:tail_packing})
   \end{itemize}
 
@@ -1317,10 +1317,15 @@
   \begin{itemize}
 	\item The peaks of interest in Figures~\ref{fig:offset_tails}~and~\ref{fig:layered_tails}
 	are located at $\pm$ 33 $\degree$ which is the same location where the highest intensity
-	of spots are located on the simulated patterns (See Supplemental Information for quantitative proof)
-	\item We integrated the raw experimental 2D WAXS data in the region bounding R-alkanes 
-        and found the angle at which R-spots reaches its highest intensity to be $\pm$ 37 $\degree$ which 
-        is a reconcilable difference with our simulated results.  
+	of spots are located on the simulated patterns
+	\item We confirmed this conclusion by radially integrating the 2D WAXS pattern for q values
+	between 1.57 and 1.4 (real space between 4 and 4.5 \AA) 
+	\item We observe that distinct peaks appear c.a. 30 $\degree$, in close agreement with the
+	previously measured angle distribution (~\ref{fig:offset_integration}~\ref{fig:layered_integration})
+%	\item We integrated the raw experimental 2D WAXS data in the region bounding R-alkanes 
+	\item We performed the same integration on the raw experimental data and found the angle
+	at which R-spots reaches its highest intensity to be $\pm$ 37 $\degree$ which is a 
+	reconcilable difference with our simulated results.  
   \end{itemize}
 
   \begin{figure}
@@ -1353,7 +1358,7 @@
 		\begin{subfigure}{0.45\textwidth}
 		\centering
 	        	\includegraphics[width=\linewidth]{offset_angle_v_I.png}
-		        \caption{}~\label{fig:layered_tails}
+		        \caption{}~\label{fig:offset_integration}
 		\end{subfigure}
 	\end{subfigure}
 	\begin{subfigure}{\linewidth}
@@ -1366,12 +1371,12 @@
 		\begin{subfigure}{0.45\textwidth}
         	\centering
 		        \includegraphics[width=\linewidth]{layered_angle_v_I.png}
-		        \caption{}~\label{fig:test}
+		        \caption{}~\label{fig:layered_integration}
 		\end{subfigure}
 	\end{subfigure}
   \caption{The distribution of angles w.r.t. the xy plane between alkane chain tail centroids and nearest
   neighbor centroids for equilibrated parallel displaced (a) and sandwiched (c) configurations. The
-  same peaks are visible when the 2D simulated diffraction data is radially integrate in the R-alkanes region,
+  same peaks are visible when the 2D simulated diffraction data is radially integrated in the R-alkanes region,
   (b) and (d) respectively.}~\label{fig:tail_packing}
   \end{figure}
 
@@ -1417,12 +1422,12 @@
         in order to drive self-assembly. Studying the mechanisms of self assembly is
 	beyond the scope of this work.
 	\item However, once the system has formed the Col\textsubscript{h} 
-	phase, adding water only creates disorder in the structure
+	phase, adding water only drives disorder in the structure
 	\item In the equilibrium configuration, if water exists, it is confined
 	to the pore region where there is no driving force for aggregation of 
 	water molecules. 
-	\item The packing of water molecules will be too sparse to form a 
-	hydrogen bonding network.
+	\item In the case of trace water, water molecules will be too sparse to
+	form a hydrogen bonding network.
   \end{itemize}
 
   %BJC: old version of above figure v v v
@@ -1617,7 +1622,7 @@
 	\item The two methods agree with each other within error, although the 
 	uncertainty obtained using the Collective Diffusion model is much higher.
 	\item Much longer simulations are needed to lower the uncertainty, however it
-	is unfeasible to do so with large model. 
+	is not feasible to do so with a large model. 
 	\item For this reason we will likely only use the Nernst Einstein relation
 	in future calculations of this type. 
   \end{itemize}
@@ -1712,15 +1717,15 @@
   We applied the crosslinking algorithm to the equilibrated parallel-displaced  
   configuration with 5 monomers per layer.
   \begin{itemize}  %BJC: working on the following. The following is what I expect
-  	\item There is an even distribution of crosslinks between same monomer tails, 
-	between monomers in the same pore and between monomers in different pores 
-	including periodic boundaries.  % BJC: might leave this detail in the supplemental
+%  	\item There is an even distribution of crosslinks between same monomer tails, 
+%	between monomers in the same pore and between monomers in different pores 
+%	including periodic boundaries.  % BJC: might leave this detail in the supplemental
 	\item We reach 95 \% conversion of terminal vinyl groups % BJC: we'll see
-	\item The distance between pores shrinks by 1 \angstrom~ after the system is 
-	crosslinked  % probably smaller
-	\item We simulated the crosslinked simulations in the NPT ensemble for 100 ns
-	\item Major features are still present in the X-ray diffraction ~\ref{fig:rzplot_xlink} % BJC: maybe
-	\item The ionic conductivity is higher/lower in the crosslinked system ~\ref{fig:ic_xlink} % BJC: Nernst-Einstein is lower. Need a longer simulation to check Collective-Diffusion 
+	\item The distance between pores shrinks by 0.4\angstrom~ after the system is 
+	crosslinked  
+	\item We simulated the crosslinked system in the NPT ensemble for 100 ns
+	\item Major features are still present in the X-ray diffraction, however at lower intensities ~\ref{fig:rzplot_xlink} 
+	\item The ionic conductivity is lower in the crosslinked system ~\ref{fig:ic_xlink} % BJC: Nernst-Einstein is lower. Need a longer simulation to check Collective-Diffusion - I can probably avoid that by saying that we will be sticking with the Nernst-Einstein method
   \end{itemize}
  
 
