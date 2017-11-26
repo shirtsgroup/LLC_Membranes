@@ -147,6 +147,7 @@ mass['CL'] = 35.453
 mass['OW'] = 15.99940
 mass['HW1'] = 1.008
 mass['HW2'] = 1.008
+mass['HW'] = 1.008
 
 # fill in charge dictionary (Used make_dict.py to generate the following list)
 

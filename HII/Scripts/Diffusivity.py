@@ -1,35 +1,40 @@
+#! /usr/bin/env python
+
 from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
-#!/usr/bin/bash
-
 from builtins import range
 from past.utils import old_div
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import Poly_fit
+import mdtraj as md
+import top
+import time
 
 
 def initialize():
 
-    parser = argparse.ArgumentParser(description = 'Run Cylindricity script')
-    parser.add_argument('-i', '--input', default='wiggle_traj.gro', help = 'Path to input file')
-    parser.add_argument('-c', '--comp', default='NA', help='Name of ion(s) being used to calculate ionic conductivity')
+    parser = argparse.ArgumentParser(description='Calculate diffusion coefficient')
+    parser.add_argument('-t', '--trajectory', default='wiggle.trr', help='Path to input file')
+    parser.add_argument('-g', '--gro', default='wiggle.gro', help='Name of .gro coordinate file')
+    parser.add_argument('-r', '--residue', default='SOL', help='Name of residue whose diffusivity we want')
+    parser.add_argument('--itp', default='/usr/local/gromacs/share/gromacs/top/amber99.ff/tip4pew.itp', help='Name of itp'
+                        'describing topology of residue')
     parser.add_argument('-b', '--nboot', default=200, help='Number of bootstrap trials to be run')
-    parser.add_argument('-f', '--frontfrac', default=0.05, help='Where to start fitting line for diffusivity calc')
-    parser.add_argument('-F', '--fracshow', default=.2, help='Percent of graph to show, also where to stop fitting line'
-                                                             'during diffusivity calculation')
-    parser.add_argument('-d', '--dim', default=1, help='Number of dimensions in which diffusion is being calculated')
-    parser.add_argument('-l', '--LC_type', default='HII', help='Type of liquid crystal being studied')
-    parser.add_argument('-s', '--solv', default='no', help='Is the system solvated or not?')
-    parser.add_argument('-m', '--nMC', default=1000, help='Number of Monte Carlo trials to estimate error in D')
+    parser.add_argument('-f', '--frontfrac', default=0.05, type=float, help='Where to start fitting line on msd curve')
+    parser.add_argument('-F', '--fracshow', default=.2, type=float, help='Percent of graph to show, also where to stop '
+                        'fitting line during diffusivity calculation')
+    parser.add_argument('-a', '--axis', default='xyz', type=str, help='Which axis to compute msd along')
+
     args = parser.parse_args()
 
     return args
 
 
 def autocorrFFT(x):
+
     N = len(x)
     F = np.fft.fft(x, n=2*N)  # 2*N because of zero-padding
     PSD = F * F.conjugate()
@@ -55,7 +60,7 @@ def msd_fft(r):
     return S1-2*S2
 
 
-def msd(x):
+def msd2(x):
 
     nT = x.shape[0]
     no_comp = x.shape[1]
@@ -70,9 +75,31 @@ def msd(x):
     return MSD, MSDs
 
 
+def msd(x, ndx):
+    """
+    Straightforward way to calculte msd
+    :param x: positions of centers of mass of all particles for each frame, numpy array [nframes, natoms, dim]
+    :param ndx: list of indices to include in msd calculation (x = 0, y = 1, z = 2)
+    :return: Average MSD and individual particle MSDs
+    """
+    n = x.shape[1]  # number of atoms
+    N = x.shape[0]  # number of frames
+
+    MSD = np.zeros([N])
+    MSDs = np.zeros([N, n])
+
+    for m in range(N):  # there nT different length intervals we can look at
+        for k in range(N - m - 1):  # there are N - m - 1 independent intervals of length m
+            MSDs[m, :] += np.linalg.norm(x[k + m, :, ndx] - x[k, :, ndx], axis=0)**2  # mean square displacement of all particles summed over all intervals of length m
+        MSDs[m, :] /= (N - m)  # divide by the number of intervals to get an average msd over length m
+        MSD[m] = np.mean(MSDs[m, :])
+
+    return MSD, MSDs
+
+
 def bootstrap(nT, Nbootstraps, no_comp, MSDs, MSD):
 
-    eMSDs = np.zeros([nT, Nbootstraps], dtype=float)  # a set of MSDs per particle (time step?)
+    eMSDs = np.zeros([nT, Nbootstraps], dtype=float)  # a set of MSDs per particle
     # Now, bootstrap over number of particles, assuming that the particles are sufficiently independent
     for b in range(0, Nbootstraps):
         indices = np.random.randint(0, no_comp, no_comp)  # randomly select N of the particles with replacement
@@ -92,22 +119,9 @@ def bootstrap(nT, Nbootstraps, no_comp, MSDs, MSD):
     return limits
 
 
-def d_error(nMC, startfit, endMSD, nT, limits, times, MSD, d):
+def d_error(startfit, endMSD, nT, limits, times, MSD, d):
 
-    # Monte Carlo Method
-    # nMC = 1000  # number of Monte Carlo trajectories
     tot_pts = (int(endMSD) - int(startfit))
-    # pts = np.zeros([nMC, tot_pts])
-    # for i in range(nMC):
-    #     pts[i, :] = limits[0, startfit:endMSD]*np.random.randn(1, tot_pts) + MSD[startfit:endMSD]
-    #
-    # slopes = np.zeros([nMC])
-    # for i in range(nMC):
-    #     slopes[i] = Poly_fit.poly_fit(times[startfit:endMSD], pts[i, :], 1)[4][1]
-    #
-    # avg_D = np.mean(slopes)/(2*d*1000000)  # take average and convert to m^2/s
-    # std_D = np.std(slopes)/(2*d*1000000)
-    # print 'Error in slope calculated'
 
     # Weight least squares -- first generate a weight matrix
     W = np.zeros((tot_pts, tot_pts))
@@ -116,56 +130,72 @@ def d_error(nMC, startfit, endMSD, nT, limits, times, MSD, d):
 
     y_fit, _, slope_error, _, A = Poly_fit.poly_fit(times[startfit:endMSD], MSD[startfit:endMSD], 1, W)
 
-    return old_div(A[1],(2*d*1000000)), old_div(slope_error,(2*d*1000000))
+    return A[1]/(2*d*1000000), slope_error/(2*d*1000000)
 
 
-def dconst(x, nT, Nbootstraps, frontfrac, fracshow, d, dt, nMC):
+def dconst(x, nT, Nbootstraps, frontfrac, fracshow, d, dt, ndx):
 
-    MSD, MSDs = msd(x)
-    print('MSDs done')
+    start = time.time()
+    MSD, MSDs = msd(x, ndx)
+    end = time.time()
+    print('MSDs done in %1.2f seconds' % (end - start))
+
     limits = bootstrap(nT, Nbootstraps, x.shape[1], MSDs, MSD)
     print('Bootstrapping Done')
-    endMSD = int(np.floor(nT*fracshow))
-    startMSD = int(np.floor(nT*frontfrac))
 
-    # coeff = Poly_fit.poly_fit(dt*np.array(range(startMSD, endMSD)), MSD[startMSD:endMSD], 1)[3]
-    # D = coeff[1]/(2*d*1000000)  # slope of MSD plot equals 2 D. Divide by 1 million to go from nm^2/ps to m^2/s
-    times = dt*np.array(list(range(0,endMSD)))
+    endMSD = int(nT*fracshow)
+    startMSD = int(nT*frontfrac)
 
-    # plt.plot(times, MSD[:endMSD])
-    # plt.show()
-    # exit()
+    times = dt*np.array(list(range(0, endMSD)))
 
-    avg_D, std_D = d_error(nMC, startMSD, endMSD, nT, limits, times, MSD, d)
+    avg_D, std_D = d_error(startMSD, endMSD, nT, limits, times, MSD, d)
 
     return MSD, endMSD, limits, avg_D, std_D
 
 
 if __name__ == '__main__':
 
-    args = initialize()
+    args = initialize()  # initialize variables passed to the script
 
-    # pos, _, trj_times, _ = gp('%s' % args.input, '%s' % args.comp, '%s' % args.LC_type, '%s' % args.solv)
-    # f = open('d_pos', 'w')
-    # np.save(f, pos)
-    # f.close()
-    # f = open('d_traj', 'w')
-    # np.save(f, trj_times)
-    # f.close()
-    trj_times = np.load('d_traj')
-    pos = np.load('d_pos')
-    print('got positions')
-    nT = len(trj_times)
-    Nbootstraps = args.nboot
-    frontfrac = args.frontfrac
-    fracshow = args.fracshow
-    d = args.dim
-    dt = old_div((trj_times[len(trj_times) - 1] - trj_times[0]),(len(trj_times) - 1))
-    print('Getting the D ...')
-    MSD, endMSD, limits, D_av, D_std = dconst(pos, nT, Nbootstraps, frontfrac, fracshow, d, dt, args.nMC)
-    errorevery = int(np.ceil(fracshow*nT/100.0))  # plot only 100 bars total
-    plt.errorbar(dt*np.array(list(range(0,endMSD))),MSD[:endMSD],yerr=[limits[0,:endMSD],limits[1,:endMSD]],errorevery=errorevery)
-    plt.ylabel('MSD (nm^2)')
-    plt.xlabel('time (ps)')
-    plt.title('D = %s $\pm$ %s m$^2$/s' % (D_av, D_std))
+    t = md.load(args.trajectory, top=args.gro)  # load trajectory
+    nT = t.n_frames  # number of frames
+
+    res = args.residue
+    if res == 'SOL':  # mdtraj changes the name from SOL to HOH
+        res = 'HOH'
+
+    selection = [a.index for a in t.topology.atoms if a.residue.name == res]
+
+    pos = t.xyz[:, selection, :]  # positions of all atoms of interest
+    topology = top.Top(args.itp)  # read topology
+    atoms_per_residue = topology.natoms  # number atoms in a single residue
+    matoms = topology.atom_masses  # mass of the atoms in residue
+    mres = np.sum(matoms)  # total mass of residue
+
+    dimension = len(args.axis)  # number of dimensions in which msd is being computed
+    ndx = []
+    if 'x' in args.axis:
+        ndx.append(0)
+    if 'y' in args.axis:
+        ndx.append(1)
+    if 'z' in args.axis:
+        ndx.append(2)
+
+    com = np.zeros([nT, pos.shape[1]//atoms_per_residue, 3])  # track the center of mass of each residue
+    for f in range(nT):
+        for i in range(com.shape[0]):
+            w = (pos[f, i*atoms_per_residue:(i+1)*atoms_per_residue, :].T * matoms).T  # weight each atom in the residue by its mass
+            com[f, i, :] = np.sum(w, axis=0) / mres  # sum the coordinates and divide by the mass of the residue
+
+    dt = t.time[-1] - t.time[-2]  # time step (assuming equispaced time points)
+
+    MSD, endMSD, limits, D_av, D_std = dconst(com, nT, args.nboot, args.frontfrac, args.fracshow, dimension, dt, ndx)
+    errorevery = int(np.ceil(args.fracshow*nT/100.0))  # plot only 100 bars total
+    plt.errorbar(dt*np.array(list(range(0, endMSD))), MSD[:endMSD], yerr=[limits[0, :endMSD], limits[1, :endMSD]],
+                 errorevery=errorevery, label='Calculated MSD')
+    plt.ylabel('MSD ($nm^2$)', fontsize=14)
+    plt.xlabel('time (ps)', fontsize=14)
+    plt.gcf().get_axes()[0].tick_params(labelsize=14)
+    plt.title('D = %1.2e $\pm$ %1.2e $m^{2}/s$' % (D_av, D_std))
+    plt.legend()
     plt.show()

@@ -101,7 +101,6 @@ def initialize():
     parser.add_argument('-T', '--temp', default=300, help='System Temperature, Kelvin')
     parser.add_argument('-B', '--nboot', default=200, help='Number of bootstrap trials to be run')
     parser.add_argument('-m', '--nMC', default=1000, help='Number of Monte Carlo trials to estimate error in D and Dq')
-    parser.add_argument('-a', '--arrays', default='off', help='If positions, id array are already saved')
     parser.add_argument('-S', '--suffix', default='saved', help='Suffix to append to position and id arrays when saving')
     parser.add_argument('-r', '--frontfrac', default=0.1, type=float, help='Where to start fitting line for diffusivity calc')
     parser.add_argument('-F', '--fracshow', default=0.5, type=float, help='Percent of graph to show, also where to stop fitting line'
@@ -115,6 +114,7 @@ def initialize():
     parser.add_argument('--discard', type=int, help='Specify the number of nanoseconds to discard starting'
                                                                'from the beginning of the simulation')
     parser.add_argument('--noshow', action="store_true", help='Specify this to not show any plots')
+    parser.add_argument('-a', '--axis', default='xyz', type=str, help='Which axis to compute msd along')
 
     args = parser.parse_args()
 
@@ -254,7 +254,15 @@ if __name__ == '__main__':
     q = Atom_props.charge[args.ion] * e  # elementary charge (1.602e-19 C) * charge of ion
     frontfrac = args.frontfrac
     fracshow = args.fracshow
-    d = 3  # dimensionality
+
+    d = len(args.axis)  # number of dimensions in which msd is being computed
+    ndx = []
+    if 'x' in args.axis:
+        ndx.append(0)
+    if 'y' in args.axis:
+        ndx.append(1)
+    if 'z' in args.axis:
+        ndx.append(2)
 
     if args.method == 'NE' or args.method == 'B':
 
@@ -263,7 +271,7 @@ if __name__ == '__main__':
             print('Calculating Diffusivity')
             # Calculate diffusivity (m^2/s)
 
-            _, _, _, D_av, D_std = Diffusivity.dconst(pos_ion, nT, args.nboot, frontfrac, fracshow, d, dt, args.nMC)
+            _, _, _, D_av, D_std = Diffusivity.dconst(pos_ion, nT, args.nboot, frontfrac, fracshow, d, dt, ndx)
             D_tails = [D_av, D_std]  # Get it? D_tails, i.e. details about D
 
             if args.save:

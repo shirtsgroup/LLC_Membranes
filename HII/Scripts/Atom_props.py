@@ -156,11 +156,16 @@ mass['CL'] = 35.453
 mass['OW'] = 15.99940
 mass['HW1'] = 1.008
 mass['HW2'] = 1.008
+mass['HW'] = 1.008
 mass['BR'] = 79.90
 mass['N'] = 14.01
 mass['N1'] = 14.01
 mass['N2'] = 14.01
 mass['N3'] = 14.01
+mass['OW_tip4pew'] = 16.00000
+mass['HW_tip4pew'] = 1.008
+mass['HW_tip4pew'] = 1.008
+mass['MW'] = 0.0
 
 # fill in charge dictionary (Used make_dict.py to generate the following list)
 
@@ -170,7 +175,6 @@ def charges(monomer):
     c = make_dict.mk_dict(monomer)
 
     return c
-
 
 charge['C'] = -0.0946
 charge['C1'] = -0.1495

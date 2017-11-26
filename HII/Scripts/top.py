@@ -1,5 +1,8 @@
 #! /usr/bin/env python
 
+import Atom_props
+import numpy as np
+
 
 def get_indices(a, vsites):
     # find the indices of all fields that need to be modified
@@ -14,25 +17,37 @@ def get_indices(a, vsites):
     pairs_index = 0  # find index where [ pairs ] section begins
     while a[pairs_index].count('[ pairs ]') == 0:
         pairs_index += 1
+        if pairs_index == len(a):
+            pairs_index = None
+            break
 
     angles_index = 0  # find index where [ angles ] section begins
     while a[angles_index].count('[ angles ]') == 0:
         angles_index += 1
+        if angles_index == len(a):
+            angles_index = None
+            break
 
     dihedrals_p_index = 0  # find index where [ dihedrals ] section begins (propers)
     while a[dihedrals_p_index].count('[ dihedrals ] ; propers') == 0:
         dihedrals_p_index += 1
+        if dihedrals_p_index == len(a):
+            dihedrals_p_index = None
+            break
 
     dihedrals_imp_index = 0  # find index where [ dihedrals ] section begins (impropers)
     while a[dihedrals_imp_index].count('[ dihedrals ] ; impropers') == 0:
         dihedrals_imp_index += 1
+        if dihedrals_imp_index == len(a):
+            dihedrals_imp_index = None
+            break
 
     if vsites:
         vsite_index = 0  # find index where [ dihedrals ] section begins (propers)
         while a[vsite_index].count('[ virtual_sites4 ]') == 0:
             vsite_index += 1
     else:
-        vsite_index = 0
+        vsite_index = None
 
         return atoms_index, bonds_index, pairs_index, angles_index, dihedrals_p_index, dihedrals_imp_index, vsite_index
 
@@ -50,8 +65,14 @@ class Top(object):
         self.dihedrals_imp_index, self.vsite_index = get_indices(self.full, vsites)
 
         self.natoms = 0
+        self.atoms = []
+        self.atom_masses = []
         while self.full[self.atoms_index + self.natoms + 2] != '\n':
+            self.atoms.append(str.strip(self.full[self.atoms_index + self.natoms + 2][5:17]))
+            self.atom_masses.append(Atom_props.mass[str.strip(self.full[self.atoms_index + self.natoms + 2][5:17])])
             self.natoms += 1
+
+        self.atom_masses = np.array(self.atom_masses)
 
         self.nbonds = 0
         while self.full[self.bonds_index + self.nbonds + 2] != '\n':
