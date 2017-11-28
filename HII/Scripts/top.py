@@ -69,7 +69,8 @@ class Top(object):
         self.atom_masses = []
         while self.full[self.atoms_index + self.natoms + 2] != '\n':
             self.atoms.append(str.strip(self.full[self.atoms_index + self.natoms + 2][5:17]))
-            self.atom_masses.append(Atom_props.mass[str.strip(self.full[self.atoms_index + self.natoms + 2][5:17])])
+            # self.atom_masses.append(Atom_props.mass[str.strip(self.full[self.atoms_index + self.natoms + 2][5:17])])
+            self.atom_masses.append(Atom_props.mass[self.full[self.atoms_index + self.natoms + 2].split()[4]])
             self.natoms += 1
 
         self.atom_masses = np.array(self.atom_masses)

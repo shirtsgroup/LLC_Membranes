@@ -1,5 +1,24 @@
 #! /usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+
+from builtins import range
+from past.utils import old_div
+import argparse
+import Atom_props
+import matplotlib.pyplot as plt
+import time
+import Poly_fit
+import numpy as np
+import Diffusivity
+import Concentration
+import subprocess
+import mdtraj as md
+from llclib import physical
+import tqdm
+
 """
 The purpose of this script is to calculate the ionic conductivity of a given LLC membrane using the Nernst Einstein
 relation (Method 1) and the Collective Diffusion model (Method 2), the latter being described in the following paper:
@@ -67,52 +86,39 @@ across the membrane (which can be found using gmx potential with a careful look 
 One can also employ the Computational Electrophysiology Module included with GROMACS to create a double layer membrane
 system which maintains a concentration gradient across the membrane, inducing a current.
 """
-from __future__ import division
-from __future__ import print_function
-from __future__ import absolute_import
-
-from builtins import range
-from past.utils import old_div
-import argparse
-import Atom_props
-import matplotlib.pyplot as plt
-import time
-import Poly_fit
-import numpy as np
-import Diffusivity
-import Concentration
-import subprocess
-import mdtraj as md
-from llclib import physical
 
 
 def initialize():
 
-    parser = argparse.ArgumentParser(description = 'Calculate Ionic Conductivity using the Nernst Einstein relation or'
-                                                   'the Collective Diffusion Model')
+    parser = argparse.ArgumentParser(description='Calculate Ionic Conductivity using the Nernst Einstein relation or'
+                                                 'the Collective Diffusion Model')
 
     parser.add_argument('-t', '--traj', default='wiggle.trr', type=str, help='Trajectory file (.xtc or .trr)'
-                                                   'IMPORTANT: Pre-process the trajectory with gmx trjconv -pbc nojump')
+                                                                             'IMPORTANT: Pre-process the trajectory with gmx trjconv -pbc nojump')
     parser.add_argument('-g', '--gro', default='wiggle.gro', type=str, help='Coordinate file')
-    parser.add_argument('-d', '--build_mon', default='NAcarb11V', type=str, help='Monomer with which the system was built')
+    parser.add_argument('-d', '--build_mon', default='NAcarb11V', type=str, help='Monomer with which the system was '
+                                                                                 'built')
     parser.add_argument('-i', '--ion', default='NA', help='Name of ion(s) being used to calculate ionic conductivity')
-    parser.add_argument('-b', '--buffer', default=0, type=float, help='Distance into membrane from min and max where current '
-                                                            'measurements will be made')
+    parser.add_argument('-b', '--buffer', default=0, type=float, help='Distance into membrane from min and max where '
+                                                                      'current measurements will be made')
     parser.add_argument('-T', '--temp', default=300, help='System Temperature, Kelvin')
-    parser.add_argument('-B', '--nboot', default=200, help='Number of bootstrap trials to be run')
+    parser.add_argument('-B', '--nboot', default=200, type=int, help='Number of bootstrap trials to be run')
     parser.add_argument('-m', '--nMC', default=1000, help='Number of Monte Carlo trials to estimate error in D and Dq')
-    parser.add_argument('-S', '--suffix', default='saved', help='Suffix to append to position and id arrays when saving')
-    parser.add_argument('-r', '--frontfrac', default=0.1, type=float, help='Where to start fitting line for diffusivity calc')
-    parser.add_argument('-F', '--fracshow', default=0.5, type=float, help='Percent of graph to show, also where to stop fitting line'
-                                                             'during diffusivity calculation')
-    parser.add_argument('--nTsub', default=20, type=int, help='Number of subtrajectories to break into for generating stats')
+    parser.add_argument('-S', '--suffix', default='saved',
+                        help='Suffix to append to position and id arrays when saving')
+    parser.add_argument('-r', '--frontfrac', default=0.16, type=float, help='Where to start fitting line for diffusivity'
+                                                                           'calc')
+    parser.add_argument('-F', '--fracshow', default=0.5, type=float, help='Percent of graph to show, also where to stop'
+                                                                          'fitting line during diffusivity calculation')
+    parser.add_argument('--nTsub', default=5, type=int, help='Number of subtrajectories to break into for generating '
+                                                              'stats')
     parser.add_argument('-M', '--method', default='NE', help='Which method to use to calculate Ionic Conductivity: CD ='
                                                              'Collective Diffusion, NE = Nernst Einstein, B = both')
     parser.add_argument('-l', '--load', help='Load arrays if they were saved from a previous calculation',
                         action="store_true")
     parser.add_argument('-s', '--save', help='Save arrays generated for future use', action="store_true")
     parser.add_argument('--discard', type=int, help='Specify the number of nanoseconds to discard starting'
-                                                               'from the beginning of the simulation')
+                                                    'from the beginning of the simulation')
     parser.add_argument('--noshow', action="store_true", help='Specify this to not show any plots')
     parser.add_argument('-a', '--axis', default='xyz', type=str, help='Which axis to compute msd along')
 
@@ -131,8 +137,8 @@ def nernst_einstein(D, D_std, C, C_std, T):
     :return: Ionic Conductivity as calculated by the nernst einsten relation
     """
 
-    NE_av = q**2*C*D/(kb*float(T))
-    NE_error = NE_av*np.sqrt((old_div(D_std, D))**2 + (old_div(C_std, C))**2)
+    NE_av = q ** 2 * C * D / (kb * float(T))
+    NE_error = NE_av * np.sqrt((old_div(D_std, D)) ** 2 + (old_div(C_std, C)) ** 2)
 
     return NE_av, NE_error
 
@@ -140,8 +146,8 @@ def nernst_einstein(D, D_std, C, C_std, T):
 def dQ(frame, positions, channel_length, zmax, zmin, charges, id):
 
     q = 0
-    natoms = positions.shape[1]
-    for i in range(natoms):  # find out how far each ion has moved in the z direction this frame
+
+    for i in range(positions.shape[1]):  # find out how far each ion has moved in the z direction this frame
         curr = positions[frame, i, 2]  # current z position
         prev = positions[frame - 1, i, 2]  # previous z position
         if zmin <= curr <= zmax:  # check that the ion is in the channel over which we are measuring
@@ -156,100 +162,20 @@ def dQ(frame, positions, channel_length, zmax, zmin, charges, id):
             prev_frame = zmax
         elif prev < zmin:
             prev_frame = zmin
-        if prev_frame == zmin and current_frame == zmin:
-            pass
-        if prev_frame == zmax and current_frame == zmax:
-            pass
         displacement = current_frame - prev_frame
-        q += e*(charges[id[i]])*displacement/channel_length
+        q += e * (charges[id[i]]) * displacement / channel_length
 
     return q
+
 
 if __name__ == '__main__':
 
     start = time.time()
     args = initialize()
 
-    if args.load:
-
-        data = np.load("conductivity_%s.npz" % args.suffix)
-        # If we are just looking at different trajectories or fitting different parts of msd curves, we can just load what
-        # has already been calculated
-        pos = data['pos']
-        pos_ion = data['pos_ion']
-        id = data['id']
-        Conc_props = data['Conc_props']
-        dt = data['dt']
-
-        # pos = np.load('pos_%s' % args.suffix)
-        #
-        # id = np.load('identity_%s' % args.suffix)
-        #
-        # dt = np.load('dt_%s' % args.suffix)
-
-        # Conc_props = np.load('C_props_%s' % args.suffix)
-        C = Conc_props[0]
-        C_std = Conc_props[1]
-        Lc = Conc_props[2]
-        conv = Conc_props[3]
-        z_2 = Conc_props[4]
-        z_1 = Conc_props[5]
-
-        D_tails = np.load('D_tails_%s.npy' % args.suffix)
-        D_av = D_tails[0]
-        D_std = D_tails[1]
-        no_comp = np.shape(pos)[1]
-        nT = np.shape(pos)[0]
-
-        print('All arrays/properties loaded')
-
-    else:
-
-        t = md.load(args.traj, top=args.gro)
-
-        keep = [a.index for a in t.topology.atoms if a.name == args.ion]
-        t_ion = t.atom_slice(keep)
-        pos = t.xyz
-        pos_ion = t_ion.xyz
-        time = t.time
-
-        C, C_std, cross, Lc, z_2, z_1 = physical.conc(t, args.ion, args.buffer)
-
-        factor = 1*10**9  # number of nm in a m
-        conv = old_div((old_div(Lc,factor)),(old_div(cross,(factor**2))))
-
-        Conc_props = np.array([C, C_std, Lc, conv, z_1, z_2])
-
-        no_comp = np.shape(pos)[1]
-        nT = np.shape(pos)[0]
-
-        dt = time[1] - time[0]
-
-        id = np.array([a.name for a in t.topology.atoms])
-
-        if args.save:
-
-            np.savez_compressed('conductivity_%s' % args.suffix, pos=pos, pos_ion=pos_ion, id=id, Conc_props=Conc_props, dt=dt)
-            # with open('pos_%s' % args.suffix, 'w') as f: # Save the positions for running the script again
-            #     np.save(f, pos)
-            #
-            # with open('%spos_%s' % (args.ion, args.suffix), 'w') as f:  # Save the positions for running the script again
-            #     np.save(f, pos_ion)
-            #
-            # with open('identity_%s' % args.suffix, 'w') as f:
-            #     np.save(f, id)
-            #
-            # with open('C_props_%s' % args.suffix, 'w') as f:
-            #     np.save(f, Conc_props)
-            #
-            # with open('dt_%s' % args.suffix, 'w') as f:
-            #     np.save(f, dt)
-
-            print('All arrays/properties saved')
-
     # Constants
 
-    kb = 1.38*10**-23  # Boltzmann constant [=] J/K
+    kb = 1.38 * 10 ** -23  # Boltzmann constant [=] J/K
     e = 1.602 * 10 ** -19  # elementary charge (C)
     q = Atom_props.charge[args.ion] * e  # elementary charge (1.602e-19 C) * charge of ion
     frontfrac = args.frontfrac
@@ -264,38 +190,78 @@ if __name__ == '__main__':
     if 'z' in args.axis:
         ndx.append(2)
 
+    t = md.load(args.traj, top=args.gro)
+
+    keep = [a.index for a in t.topology.atoms if a.name == args.ion]
+
+    pos = t.xyz
+    pos_ion = t.xyz[:, keep, :]
+    time = t.time
+
+    C, C_std, cross, Lc, z_2, z_1 = physical.conc(t, args.ion, args.buffer)
+
+    factor = 1 * 10 ** 9  # number of nm in a m
+    conv = old_div((old_div(Lc, factor)), (old_div(cross, (factor ** 2))))
+
+    no_comp = pos.shape[1]  # np.shape(pos)[1]
+    nT = t.n_frames  # np.shape(pos)[0]
+
+    dt = t.timestep  # time[1] - time[0]
+
+    id = np.array([a.name for a in t.topology.atoms])
+
     if args.method == 'NE' or args.method == 'B':
 
-        if not args.load:
+        # if not args.load:
 
-            print('Calculating Diffusivity')
-            # Calculate diffusivity (m^2/s)
+        print('Calculating Diffusivity')
 
-            _, _, _, D_av, D_std = Diffusivity.dconst(pos_ion, nT, args.nboot, frontfrac, fracshow, d, dt, ndx)
-            D_tails = [D_av, D_std]  # Get it? D_tails, i.e. details about D
+        MSD, endMSD, limits, D_avg, D_std = Diffusivity.dconst(pos_ion, nT, args.nboot, frontfrac, fracshow, d, dt, ndx)
 
-            if args.save:
-                np.save('D_tails_%s' % args.suffix, D_tails)
+        fit = 0
+        while fit == 0:
 
-        IC_NE, IC_NE_std = nernst_einstein(D_av, D_std, C, C_std, '%s' % args.temp)
-        print('Nernst Einstein Ionic Conductivity: %s +/- %s S/m' % (IC_NE, IC_NE_std))
+            endMSD = int(nT*fracshow)
+            startMSD = int(nT*frontfrac)
+            D_avg, D_std = Diffusivity.d_error(startMSD, endMSD, nT, limits, t.time, MSD, d)
+            errorevery = int(np.ceil(nT / 100.0))  # plot only 100 bars total
+            plt.errorbar(dt * np.array(list(range(0, nT - 1))), MSD[:-1], yerr=[limits[0, :-1], limits[1, :-1]],
+                         errorevery=errorevery, label='Calculated MSD')
+            plt.ylabel('MSD ($nm^2$)', fontsize=14)
+            plt.xlabel('time (ps)', fontsize=14)
+            plt.gcf().get_axes()[0].tick_params(labelsize=14)
+            plt.title('D = %1.2e $\pm$ %1.2e $m^{2}/s$' % (D_avg, D_std))
+            plt.legend(loc=2)
+            plt.tight_layout()
+            plt.savefig('Diffusivity_%s.png' % args.axis)
+            plt.ion()
+            plt.show()
+            fit = int(input("Type '1' if the fit looks good: "))
+            if fit != 1:
+                print('Press enter to following prompts to leave as is')
+                frontfrac = float(input("Fraction into simulation to start fit: ") or frontfrac)
+                fracshow = float(input("Fraction into simulation to stop fit: ") or fracshow)
+            plt.clf()
+
+        IC_NE, IC_NE_std = nernst_einstein(D_avg, D_std, C, C_std, '%s' % args.temp)
+        print('Nernst Einstein Ionic Conductivity: {:1.2e} +/- {:1.2e} S/m'.format(IC_NE, IC_NE_std))
 
         if args.method == 'NE':
             exit()
 
-    nT -= 1
+    # nT -= 1
 
     if not args.load:
 
         charge = Atom_props.charges(args.build_mon)
         charge['NA'] = 1.00
+
         print('Calculating q')
-        dq_all = np.zeros([nT])
-        for i in range(nT):
-            dq_all[i] = dQ(i, pos, Lc, z_2, z_1, charge, id)
+        dq_all = np.zeros([nT - 1])
+        for i in tqdm.tqdm(range(nT - 1)):
+            dq_all[i] = dQ(i + 1, pos, Lc, z_2, z_1, charge, id)
 
         if args.save:
-
             np.save('dq_%s' % args.suffix, dq_all)
             print('q saved')
 
@@ -305,14 +271,15 @@ if __name__ == '__main__':
         print('q loaded')
 
     if args.discard:
-        discarded_frames = int(old_div(args.discard, (old_div(dt,1000))))  # convert nanoseconds to frames of discarded simulation
-        print('First %s frames discarded (%s ns)' %(discarded_frames, args.discard))
+        discarded_frames = int(
+            old_div(args.discard, (old_div(dt, 1000))))  # convert nanoseconds to frames of discarded simulation
+        print('First %s frames discarded (%s ns)' % (discarded_frames, args.discard))
         nT -= discarded_frames
     else:
         discarded_frames = 0
 
     n_sub = args.nTsub  # number of sub-trajectories to used for error analysis
-    nT_sub = old_div(nT,n_sub)  # number of points in that subinterval
+    nT_sub = old_div((nT - 1), n_sub)  # number of points in that subinterval
     l_sub = dt * nT_sub / 1000  # ns in the subinterval
 
     # Break dq_all into sub-trajectories
@@ -326,17 +293,11 @@ if __name__ == '__main__':
     for i in range(nT_sub):
         dq_cum[:, i] = dq[:, i] + dq_cum[:, i - 1]
 
-    # for i in range(n_sub):
-    #     plt.plot(np.arange(0,nT_sub), dq_cum[i, :])
-    #
-    # plt.show()
-    # exit()
-
     msd = np.zeros([n_sub, nT_sub])
     itau = 0  # counts up to the number of trajectory frames
     while itau < nT_sub:
-        ncount = (nT_sub-itau)
-        for t in range(nT_sub-itau):  # run for total number of time points from itau to nT
+        ncount = (nT_sub - itau)
+        for t in range(nT_sub - itau):  # run for total number of time points from itau to nT
             for i in range(n_sub):
                 xo = dq_cum[i, t + itau] - dq_cum[i, t]
                 msd[i, itau] += np.dot(xo, xo)  # Should there be a division by 't' in here?
@@ -348,28 +309,52 @@ if __name__ == '__main__':
         avg_std[0, i] = np.mean(msd[:, i])
         avg_std[1, i] = np.std(msd[:, i])
 
-    times = np.linspace(0, (nT_sub - 1)*dt, nT_sub)
+    times = np.linspace(0, (nT_sub - 1) * dt, nT_sub)
 
-    startfit = int(np.floor(nT_sub*frontfrac))
-    endMSD = int(np.floor(nT_sub*fracshow))
+    plt.figure(1)
 
+    avg = np.mean(msd, axis=0)
+    std = np.std(msd, axis=0)
 
-    plt.figure()
-    plt.title('%s MSD trajectories' % n_sub)
-    plt.xlabel('Time (ps)')
-    plt.ylabel('MSD (e$^2$)')
-    
+    startfit = int(np.floor(nT_sub * frontfrac))
+    endMSD = int(np.floor(nT_sub * fracshow))
+    start = startfit*dt/1000
+    end = endMSD*dt/1000
+
+    fit = 0
+    while fit == 0:
+
+        y_fit = Poly_fit.poly_fit(times[startfit:endMSD], avg[startfit:endMSD], 1, 'none')[0]
+        plt.plot(times[startfit:endMSD], y_fit, '--', color='black')
+        plt.errorbar(times[:nT_sub], avg, yerr=std, label='Calculated MSD')
+        plt.xlabel('Time (ps)', fontsize=14)
+        plt.ylabel('MSD (e$^2$)', fontsize=14)
+        plt.gcf().get_axes()[0].tick_params(labelsize=14)
+        plt.title('%s MSD trajectories' % n_sub)
+        plt.legend(loc=2)
+        plt.tight_layout()
+        plt.savefig('MSD_CD.png')
+        plt.ion()
+        plt.show()
+        fit = int(input("Type '1' if the fit looks good: "))
+        if fit != 1:
+            print('Press enter to following prompts to leave as is')
+            start = float(input("Time (ns) into simulation to start fit: ") or start)
+            startfit = int(1000*start/dt)
+            end = float(input("Time (ns) into simulation to stop fit: ") or end)
+            endMSD = int(1000*end/dt)
+            plt.cla()
+
+    # fit slopes to all sub-trajectories for error estimation
     tot_pts = endMSD - startfit
     slopes = np.zeros([n_sub])
     for i in range(n_sub):
-        plt.plot(times[:endMSD], msd[i, :endMSD])
         y_fit, _, slope_error, _, A = Poly_fit.poly_fit(times[startfit:endMSD], msd[i, startfit:endMSD], 1, 'none')
-        # plt.plot(times[startfit:endMSD], y_fit)
         slopes[i] = A[1]
 
-    ic_cd_avg = old_div((np.mean(slopes)*(1*10**12)*conv),(2*kb*float(args.temp)))
-    ic_cd_std = old_div((np.std(slopes)*(1*10**12)*conv),(2*kb*float(args.temp)))
-    ic_cds = slopes*((1*10**12)*conv/(2*kb*float(args.temp)))
+    ic_cd_avg = old_div((np.mean(slopes) * (1 * 10 ** 12) * conv), (2 * kb * float(args.temp)))
+    ic_cd_std = old_div((np.std(slopes) * (1 * 10 ** 12) * conv), (2 * kb * float(args.temp)))
+    ic_cds = slopes * ((1 * 10 ** 12) * conv / (2 * kb * float(args.temp)))
 
     # Bootstrap the slopes
     from random import randint
@@ -382,17 +367,17 @@ if __name__ == '__main__':
             index = randint(0, n_sub - 1)
             sum += slopes[index]
         means[i] = old_div(sum, n_sub)
-    means *= old_div(((1*10**12)*conv),(2*kb*float(args.temp)))
+    means *= old_div(((1 * 10 ** 12) * conv), (2 * kb * float(args.temp)))
     bootstrap_mean = np.mean(means)
     bootstrap_std = np.std(means)
 
-    plt.figure()
+    plt.figure(2)
     plt.ylabel('Count')
     plt.xlabel('')
     plt.hist(means, bins=100)
-    # print "Ionic Conductivity: %s +/- %s S/m" % (ic_cd_avg, ic_cd_std)
-    print("Slope fit from %1.0f ns to %1.0f ns of each subtrajectory" % (args.frontfrac*l_sub, args.fracshow*l_sub))
-    print("Bootstrapped Ionic Conductivity: %s +/- %s S/m" % (bootstrap_mean, bootstrap_std))
+
+    print("Slope fit from %1.0f ns to %1.0f ns of each subtrajectory" % (start, end))
+    print('Bootstrapped Ionic Conductivity: {:1.2e} +/- {:1.2e} S/m'.format(bootstrap_mean, bootstrap_std))
 
     if not args.noshow:
         plt.show()

@@ -27,6 +27,7 @@ def initialize():
     parser.add_argument('-apl', default=5, type=float, help='Atoms or monomers per layer')
     parser.add_argument('-l', '--load', type=str, help='Load compressed numpy array')
     parser.add_argument('-com', '--com', action="store_true", help='Calculate zdf based on com of atoms')
+    parser.add_argument('-r', '--res', type=str, help='Residue name to calculate zdf of')
 
     args = parser.parse_args()
 
@@ -66,6 +67,7 @@ def z_periodic(positions, unitcell_vectors, images=1):
     :return: new positions with n images in the +/- z direction where n=images
     """
 
+    # use cKDTree to make this way faster
     nT = positions.shape[0]
     natoms = positions.shape[1]
     nimages = images*2 + 1
@@ -270,6 +272,7 @@ if __name__ == "__main__":
 
     t = md.load(args.traj, top=args.gro)[args.begin:args.end:args.skip]
     frame = t.slice(0)
+
     # from llclib import file_rw
     # file_rw.write_gro(frame, 'first.gro')
     # exit()
@@ -283,7 +286,6 @@ if __name__ == "__main__":
         z = zdf["z"]
         bin_width = (z[1] - z[0])
         ps, freqs, max = power_spectrum(zdf_avg, bin_width)
-        print(freqs.shape)
         # dbwl, amp = spacing(z, zdf_avg)
         print('Fourier distance between layers: %s nm' % (1/max))
         # print('Amplitude of first peak : %2.2f %% of mean' % (100*(amp/np.mean(zdf_avg[:z.shape[0]]))))
@@ -321,9 +323,13 @@ if __name__ == "__main__":
 
         for atom in args.atoms:
 
-            keep = [a.index for a in t.topology.atoms if a.name == atom]
+            if args.res:
+                keep = [a.index for a in t.topology.atoms if a.name == atom and a.residue.name == args.res]
+            else:
+                keep = [a.index for a in t.topology.atoms if a.name == atom]
 
-            pos = t.atom_slice(keep).xyz
+            # pos = t.atom_slice(keep).xyz
+            pos = t.xyz[:, keep, :]
 
             periodic = z_periodic(pos, box)
 

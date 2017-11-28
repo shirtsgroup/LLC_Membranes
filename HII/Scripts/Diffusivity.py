@@ -20,7 +20,7 @@ def initialize():
     parser.add_argument('-t', '--trajectory', default='wiggle.trr', help='Path to input file')
     parser.add_argument('-g', '--gro', default='wiggle.gro', help='Name of .gro coordinate file')
     parser.add_argument('-r', '--residue', default='SOL', help='Name of residue whose diffusivity we want')
-    parser.add_argument('--itp', default='/usr/local/gromacs/share/gromacs/top/amber99.ff/tip4pew.itp', help='Name of itp'
+    parser.add_argument('--itp', default='/usr/local/gromacs/share/gromacs/top/amber99.ff/tip3p.itp', help='Name of itp'
                         'describing topology of residue')
     parser.add_argument('-b', '--nboot', default=200, help='Number of bootstrap trials to be run')
     parser.add_argument('-f', '--frontfrac', default=0.05, type=float, help='Where to start fitting line on msd curve')
@@ -129,6 +129,7 @@ def d_error(startfit, endMSD, nT, limits, times, MSD, d):
         W[i, i] = old_div(1,((limits[0, i + startfit])**2))
 
     y_fit, _, slope_error, _, A = Poly_fit.poly_fit(times[startfit:endMSD], MSD[startfit:endMSD], 1, W)
+    plt.plot(times[startfit:endMSD], y_fit, '--', color='black', label='Linear Fit')
 
     return A[1]/(2*d*1000000), slope_error/(2*d*1000000)
 
@@ -167,6 +168,7 @@ if __name__ == '__main__':
     selection = [a.index for a in t.topology.atoms if a.residue.name == res]
 
     pos = t.xyz[:, selection, :]  # positions of all atoms of interest
+
     topology = top.Top(args.itp)  # read topology
     atoms_per_residue = topology.natoms  # number atoms in a single residue
     matoms = topology.atom_masses  # mass of the atoms in residue
@@ -182,20 +184,26 @@ if __name__ == '__main__':
         ndx.append(2)
 
     com = np.zeros([nT, pos.shape[1]//atoms_per_residue, 3])  # track the center of mass of each residue
+
     for f in range(nT):
-        for i in range(com.shape[0]):
+        for i in range(com.shape[1]):
             w = (pos[f, i*atoms_per_residue:(i+1)*atoms_per_residue, :].T * matoms).T  # weight each atom in the residue by its mass
             com[f, i, :] = np.sum(w, axis=0) / mres  # sum the coordinates and divide by the mass of the residue
 
     dt = t.time[-1] - t.time[-2]  # time step (assuming equispaced time points)
 
     MSD, endMSD, limits, D_av, D_std = dconst(com, nT, args.nboot, args.frontfrac, args.fracshow, dimension, dt, ndx)
-    errorevery = int(np.ceil(args.fracshow*nT/100.0))  # plot only 100 bars total
-    plt.errorbar(dt*np.array(list(range(0, endMSD))), MSD[:endMSD], yerr=[limits[0, :endMSD], limits[1, :endMSD]],
-                 errorevery=errorevery, label='Calculated MSD')
+    # errorevery = int(np.ceil(args.fracshow*nT/100.0))  # plot only 100 bars total
+    errorevery = int(np.ceil(nT/100.0))  # plot only 100 bars total
+    # plt.errorbar(dt*np.array(list(range(0, endMSD))), MSD[:endMSD], yerr=[limits[0, :endMSD], limits[1, :endMSD]],
+    #              errorevery=errorevery, label='Calculated MSD')
+    plt.errorbar(dt*np.array(list(range(0, nT-1))), MSD[:-1], yerr=[limits[0, :-1], limits[1, :-1]],
+             errorevery=errorevery, label='Calculated MSD')
     plt.ylabel('MSD ($nm^2$)', fontsize=14)
     plt.xlabel('time (ps)', fontsize=14)
     plt.gcf().get_axes()[0].tick_params(labelsize=14)
     plt.title('D = %1.2e $\pm$ %1.2e $m^{2}/s$' % (D_av, D_std))
-    plt.legend()
+    plt.legend(loc=2)
+    plt.tight_layout()
+    plt.savefig('Diffusivity_%s.png' % args.axis)
     plt.show()
