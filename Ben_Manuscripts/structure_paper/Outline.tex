@@ -40,6 +40,7 @@
     drive up energy requirements which strains developing regions and
     contributes strongly to CO\textsubscript{2} emissions. \cite{mcginnis_global_2008}
     \item Separation based on differences in solubility and diffusivity:
+%MRS2: couldn't you argue that the fact that they diffuse and dissolve at different rates means that it makes it possible to  design targeted separations?
     Moreover, designing RO membranes to achieve targeted separations of 
     specific solutes is nearly impossible because various solutes dissolve
     into and diffuse through the polymer matrix at different rates. \cite{wijmans_solution-diffusion_1995}
@@ -49,6 +50,7 @@
     \item NF was introduced as an intermediate between RO and ultrafiltration,
     having the ability to separate organic matter and salts on the order of 
     one nanometer in size.
+%MRS2: is ``well-defined'' the right word if there is a ``pore size distribution''?
     \item Larger and well-defined pores drive down energy requirements while
     still affording separation of solutes as small as ions to some degree \cite{van_der_bruggen_review_2003}
     \item NF is often used as a precursor to reverse osmosis
@@ -62,7 +64,7 @@
     \item Tune size and functionality of building blocks to control pore
     size and shape: One can accomplish targeted separations with high 
     selectivity by tuning shape, size and functionality of the molecular
-    building blocks which form these materials. % BJC: "these materials" --> "nanostructured membranes", or is that redundant?
+    building blocks which form these materials. % BJC: "these materials" --> "nanostructured membranes", or is that redundant? %MRS2: seems fine for now, we can tweak this later. 
     \item As a result, solute rejecting pores can have their sizes tuned
     uniformly, resulting in strict size cut-offs.
     \item Entirely different mechanisms may govern transport in a given
@@ -101,8 +103,10 @@
     the monomer named Na-GA3C11 have been extensively studied experimentally \cite{smith_ordered_1997, %BJC: IUPAC chemical name here?
     zhou_supported_2005,resel_h2-phase_2000,feng_scalable_2014,feng_thin_2016}. 
     % BJC: New paragraph?
+    %MRS2: shorter paragraphs generally good.
     \item Until recently, mesophases formed by Na-GA3C11 could not be macroscopically
     aligned, resulting in low flux membranes, slowing research in the field.
+%MRS2: slowed research because it wasn't clear there was a route to scaleable filtration.
     \item In 2014, Feng et al. showed that the mesophases could be aligned 
     using a magnetic field with subsequent crosslinking to lock the structure
     in place \cite{feng_scalable_2014}
@@ -110,9 +114,12 @@
     using a technique termed soft confinement \cite{feng_thin_2016}.
     \item Following this breakthrough, research into LLC membranes has been
     reinvigorated.
+%MRS2: not THAT many people are doing it, so hard to say reinvigorated quite yet. Pick other verb.
   \end{itemize}
  
-  % BJC: Not sure this figure needs to be in the paper
+  % BJC: Not sure this figure needs to be in the paper. 
+  %MRS2: good question.  It helps give people context, which is necessary to move forward.  Perhaps 
+  %leave it in for now, though may need to get permission to reprint it.
   \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{soft_confinement.png}
@@ -136,16 +143,21 @@
 %     space} available for membrane design  %BJC: redundant
     \item Over the past 20 years, H\textsubscript{II} phase LLC membrane studies have been limited primarily
     to Na-GA3C11 with some characterization done after minor structural modifications
+%MRs: specify what type of modification.
     \cite{resel_structural_2000}.
     \item Rejection studies show that this membrane can not perform separations of
     solutes less than 1.2 nm in diameter because the pores are too large \cite{zhou_supported_2005}.
-    \item  We do not yet understand how to reduce the effective pore size or 
+    \item  We do not yet understand how to reduce the effective pore size 
+%MRS2: controllably
+      or 
     how to tune the chemical environment in the nanopores for effective water
     desalination or small organic molecule separations.
     \item It will be challenging to efficiently narrow down the large design space in 
     a laboratory setting without a robust model.
     \item The only source of predictive modeling for LLC systems have been macroscopic models 
     which likely do not adequately describe transport at these length scales. % BJC: Reference. I think it is just w.r.t. bicontinuous cubic
+%MRS2: not quite sure of the phrasing here on next two points. Something more a long the lines of the choice of head group 
+may allow tuning rejection of solutes based on size?
     \item Choice of head group may play a role in the rejection of charged or uncharged solutes.
     \item Choice of counterion may influence the establishment of a Donnan potential
     affecting the degree to which the membrane can exclude charged species.
@@ -156,6 +168,7 @@
   \end{itemize}
 
   %BJC: Figure here showing previous level of detail compared to atomistic level of detail
+  %MRS2: provenance of the atomistic figure could be explained better in the caption. It also looks disordered. Will eventually need a higher resolution figure for the previous understanding pore.
   \begin{figure}
   \centering
 	\begin{subfigure}{0.45\linewidth}
@@ -183,8 +196,10 @@
 	    \item Compared to the H\textsubscript{II} phase, the Col\textsubscript{h}
 	    phase is a simpler starting point, due to the absence of water, and has
 	    more detailed experimental structural data.  % BJC: More detailed because of WAXS. HII doesn't have any (that I know of) WAXS
+%MRS2: explicitly state the presence of WAXS data.
 	    \item Despite having structural data, there is still information which 
 	    experiment cannot definitively answer.
+            %MRS2: such as?
     \end{itemize}
 
 %BJC: the following just seems like filler now that I've reorganized
@@ -238,7 +253,9 @@
   Monomers in the Col\textsubscript{h} system are theorized to be partitioned
   into stacked layers which form columnar pores. There has been no definitive
   answer in literature regarding the number of monomers in each layer. We want to
-  know (1) If layers do exist, how many monomers constitute a single layer?
+  know 
+\begin{enumerate}
+\item If layers do exist, how many monomers constitute a single layer? \label{point:monomernum}
   \begin{itemize}
     \item A simple molecular simulation study of a similar molecule suggested
     that there are 4 monomers in each layer. Their estimation is based on a
@@ -251,8 +268,8 @@
     \item We can directly change the layer composition and note its effect on membrane structure.
   \end{itemize}
 
-  (2) Does our model support the existence of layers and if so, how well defined
-  are the layers?
+ \item Does our model support the existence of layers and if so, how well defined
+  are the layers? \label{point:layers}
   \begin{itemize}
        \item Experimentally, their existence is supported by evidence of strong 
        $\pi$-$\pi$ stacking interactions in the direction perpendicular to the
@@ -263,8 +280,8 @@
        among headgroups. 
   \end{itemize}  
   
-   (3) How do monomers in each layer position themselves with respect to surrounding 
-   layers?
+   \item How do monomers in each layer position themselves with respect to surrounding 
+   layers? \label{point:orientation}
 %     Even if we knew the number of monomers in each layer, we still would not know how 
 %     monomers in each layer are positioned with respect to other layers. 
    \begin{itemize}
@@ -281,8 +298,8 @@
       stacking configurations. 
    \end{itemize}
 
-   (4) Is it necessary to include any water in order to appropriately model the 
-   Col\textsubscript{h} phase?
+   \item Is it necessary to include any water in order to appropriately model the 
+   Col\textsubscript{h} phase? \label{point:water}
    \begin{itemize}
 	\item While the Col\textsubscript{h} phase is described as dry, it is 
 	possible that small amounts of ambient water may be leached into the system.
@@ -291,7 +308,10 @@
 	\item We can use simulated X-ray diffraction patterns to see if there is
         any meaningful structural difference between a "dry" and "wet" system
    \end{itemize}
-    
+    \end{enumerate}
+%MRS2: size and how well well defined the pore is (how suddenly the RDF changes in the pore) is also a question.
+
+%MRS2: hmm.  This last point still seems somewhat relevant.  Why left out?
 %     \item While we might be able to provide answers to these questions using a 
 %     molecular model, there remains the possibility that there is more than one 
 %     metastable state associated with a given LLC system.
@@ -331,14 +351,16 @@
     \item The structure-building approach and analysis used in this paper can be readily extended
     to the H\textsubscript{II} phase and other similar LC systems.
   \end{itemize}
-  
+%MRS2: and potentially used to help design membranes.  
   \section*{Methods}
   
   Liquid crystal monomers were parameterized using the Generalized AMBER Forcefield
   \cite{wang_development_2004} with the Antechamber package \cite{wang_automatic_2006}
   provided with AmberTools16 \cite{case_ambertools16_2016}. Atomic charges were
-  assigned using tools from Openeye Scientific Software. All molecular dynamics 
-  simulations were run using the latest version of Gromacs 2016. 
+  assigned using tools from Openeye Scientific Software. 
+%MRS2: be specific what tools
+All molecular dynamics 
+  simulations were run using the latest version of Gromacs 2016. %MRS2: give specific version, since latest may be different when this is published.
   \cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008}
   
   An ensemble of characteristic, low-energy vacuum monomer configurations
@@ -348,7 +370,7 @@
     \item Monomers were cooled from 1000K to 50K over 10 nanoseconds.
     \item A low energy configuration was randomly pulled from the trajectory
     and charges were reassigned using the am1bccsym method of molcharge
-    shipped with Openeye Scientific software's QUACPAC % BJC: how to cite?
+    shipped with Openeye Scientific software's QUACPAC % BJC: how to cite? %MRS2: webpage if no publication, 
     \item Using the new charges, the monomer system was annealed again and monomer
     configurations were pulled from the trajectory to be used for full
     system construction (Figure~\ref{fig:python}a).
@@ -392,6 +414,7 @@
     This point will be explained in more detail later.
     %MRS: you should give the reasons in the same place you describe the choice, but the supporting data would probably be better in supporting information
     %BJC: so refer to supporting info here? Then put plots of diffraction data with different sized system there. I did not explain the resolution point here because I haven't talked about simulated X-ray diffraction yet and it wouldn't make sense. And it doesn't make sense to talk about XRD this early in the methods but I need to justify the number of layers.
+    %MRS2: I was referring to the data choice of 20 vs 10.  Yes, you can refer to it here, because the expectation is that peple will only look at it after reading the whole paper.
     \item We chose initial guesses for the remaining structural parameters based on
     experimental data and treated them as variables during model development.
   \end{itemize}
@@ -403,7 +426,7 @@
   \begin{itemize}
         \item There are five major features of interest present in the 2D experimental
         pattern shown in Figure~\ref{fig:WAXS}.
-        \item The first is located at $q_z$ = 1.7 \angstrom$^-1$,
+        \item The first is located at $q_z$ = 1.7 \angstrom$^{-1}$,
         corresponding to a real spacing of 3.7 \angstrom~. The reflection is
         attributed to $\pi$-$\pi$ stacking between aromatic rings in the direction
         perpendicular to the membrane plane, or z-axis \cite{feng_scalable_2014}. For simplicity, this
@@ -462,10 +485,13 @@
 %    spacings greater than 4 \angstrom~.
 %  \end{itemize}
 
+%MRS2: make it clear these choices are for INITIAL spacing, and that this adjusted based on MD.  Also want to make
+sure the dependence of the initial choices is described in supporting information, as the results shouldn't be TOO dependnt on thesechoices.
   We chose the initial layer spacing based on R-$\pi$.
   \begin{itemize}  
     \item Each monomer was rotated so the plane of the aromatic head groups would
     be parallel to the xy plane.
+%MRS2: seems like the choice of separation distance here should be detailed in the supporting information, and how it changes  the structures formed.  Also, not quite clear. 
     \item The layers are placed so aromatic rings are stacked 3.7 \angstrom~
     apart in the z-direction.
     \item To quantify the degree of layering in our system, we calculated
@@ -497,8 +523,10 @@
     respective pores.
     \item Statistics were generated using the bootstrapping technique (See Supplemental Information)
     %BJC: Do bootstrapping details go in supplemental?
+    %MRS2: yes.
     	% Supplemental vvvv
 	\begin{itemize}
+        %MRS2: make clear sampling what? 
     	\item For each bootstrap trial, we recreate an equilibrium trajectory by randomly 
     	sampling from the original trajectory
     	\item Each pore spacing has its own trajectory with its own average value
@@ -508,6 +536,7 @@
     	% BJC: The following will go in supplemental
         \item We are interested in 5 pore-to-pore distances which should all be equal in 
         a perfect hexagonal array. Only 4 are independent  
+        % MRS: need to deal with the fact only 4 are independent in the bootstrapping?  How did we do that?
         % Supplemental ^^^^
 	\end{itemize}
   \end{itemize}
@@ -519,6 +548,8 @@
   
 %  We based the pore radii of our initial configuration on past TEM and size exclusion 
 %  rejection data
+%MRS2: maybe this fits somewhere else, since it's not really used in the same way - it's more descriptive.  In fact, maybe better to say it WASN'T used at all to constrain initial choice, and we simply looked at it after to understand how the pore size is affected by other choices.  Or maybe I'm still misunderstanding.
+
   We used experimental Transmission electron microscopy (TEM) and size exclusion rejection
   data \cite{feng_scalable_2014,feng_thin_2016,zhou_supported_2005} to inform our definition
   of pore radius in the initial configuration.
@@ -539,6 +570,7 @@
     %in their respective pores.
   \end{itemize}
 
+%MRS2: is the pore radius of the initial configuration really relevant? Does it need to be defined?  Seems like what radius means in the final equilibrated one is more important.
   \begin{figure}
  	\centering
  	\includegraphics[width=\textwidth]{pore_radius_illustration.png}
@@ -572,6 +604,8 @@
 %     \item This difference may explain, in part, which stacking mode is more favorable.
   \end{itemize}
 
+%MRS2: seems like the number per layer might be listed here, since that was adjusted during the fitting process?  Hmm.  I see it's later in the results. It's a bit confusing what variables are listed here (initial geometry settings), and what is discussed in the results section. (like number per layer)  We should discuss.
+
   %We tested a number of equilibration schemes of increasing complexity in an effort
   %to match experiment while overcoming kinetic limitations that might trap the system 
   %in a metastable states. All start from an initial configuration generated with 
@@ -581,6 +615,7 @@
   \begin{itemize}
       \item Dry equilibration scheme:
       \begin{itemize}
+        %MRS2: what initial force constant, and does it matter (that can be in supplemental) 
           \item Restraints fix monomer head groups in the sandwiched or parallel-displaced
           configurations while allowing monomer tails to settle.
           \item Doing so also mitigates system dependence on initial monomer configuration.
@@ -588,7 +623,9 @@
           \item Every 50 ps, we reduce the force constants by the square root of its
           previous value, starting from 1e6 KJ mol$^-1$ nm$^-2$.
           \item Once the force constant is below 10 KJ mol$^-1$ nm$^-2$, the restraints are
-          slowly released until there is no more restraining potential.
+          slowly released 
+          %MRS2: be more quantitative about what ``slowly'' means.
+          until there is no more restraining potential.
           \item The resulting unrestrained structure is allowed to equilibrate for 5 ns 
 	  in the NPT ensemble with pressure controlled by the berendsen barostat.
 	  \item Long, NPT equilibration simulations are run for at least 400 ns using the 
@@ -608,7 +645,8 @@
 	  of water in the pores is reached. 
 	  \item The remainder of the equilibration is the same as the dry system
       \end{itemize}
-      \item In all cases, the v-rescale thermostat was used with tau-t = 0.1 % BJC: supplemental?
+      \item In all cases, %MRS2: for system equilibration?
+the v-rescale thermostat was used with tau-t = 0.1 % BJC: supplemental? %MRS2: probably here.
   \end{itemize}
 
 %  An equilibration scheme with position restraints placed on aromatic rings
@@ -667,7 +705,8 @@
     z axis to generate a 2D cross section close to what one would see 
     experimentally.
     \item We matched experimental 2D WAXS patterns by iterative improvement
-    of our choice of initial structure and equilibration procedure.
+%MRS2: The phrase ``iterative improvement'' isn't enough for someone to repeat the procedure.  Adjusted initial distances between layers?  
+     of our choice of initial structure and equilibration procedure.
   \end{itemize}
   
   \begin{figure}
@@ -817,8 +856,8 @@
 %  \end{figure}
 
 
-%  To discern the composition of the monomer layers, addressing (2), we ran 
-%  simulations of systems created with 4 - 8 monomers per layer.  % BJC: can't figure out how to word this : should be 'with between 4 and 8 monomers' or 'with from 4 to 8 monomers'?
+%  To discern the composition of the monomer layers, addressing \ref{point:layers}, we ran 
+%  simulations of systems created with 4 - 8 monomers per layer.  % BJC: can't figure out how to word this : should be 'with between 4 and 8 monomers' or 'with from 4 to 8 monomers'?  %MRS2: ``with between'', I'd say.
   %\begin{itemize}
 %  	\item Both the sandwiched and parallel displaced configurations were tested.
 %	\item All systems are stable after 400 ns of simulation.  % BJC: edited this for clarity
@@ -832,7 +871,9 @@
 %	built with 5 monomers per layer. 
 %  \end{itemize}
 
-  To discern the composition of the monomer layers, addressing (1), we ran
+%MRS2: suggest starting with conclusion.  Something like ``The simulations best support the model of 5 monomers per layer based on the pore-to-pore distances.'' Then provide evidence. Suggest for all points.
+
+  To discern the composition of the monomer layers, addressing (\ref{point:monomernum}), we ran
   simulations of systems created with 4 - 8 monomers per layer.  % BJC: can't figure out how to word this : should be 'with between 4 and 8 monomers' or 'with from 4 to 8 monomers'?
   \begin{itemize}
         \item We created systems in both the parallel displaced and sandwiched configurations
@@ -847,13 +888,16 @@
   \end{itemize}
 
   %BJC: maybe split into 2 paragraphs
-  To answer (2), we verified that the system stays partitioned into layers by
+  %MRS2: usually good instinct.  Lead with the conclusions of the research you are trying to convince readers. Rather than phrasing as a question. Something like: ``Layers are well defined and persistent''. 
+  To answer (\ref{point:layers}), we verified that the system stays partitioned into layers by
   plotting the pair correlation function, $g(z)$ calculated between atoms along
   the length of the pores (Fig~\ref{fig:zdf}).
   \begin{itemize}
 	\item We measured $g(z)$ with respect to aromatic rings in the head groups
 	and, separately, with respect to carbon atoms on the alkane chains.
-	\item In both cases, we see a degree of layer partitioning
+	\item In both cases, we see 
+%MRS2: more precise than ``a degree''?
+a degree of layer partitioning
         \item Using the head groups as reference, we see that sandwiched configuration
 	layers stack 4.29 \angstrom apart while parallel displaced configuration layers
 	stack 4.37 \angstrom apart.
@@ -861,14 +905,17 @@
 	and 4.38 \angstrom in the sandwiched and parallel displaced configurations respectively.
         \item The power spectrums used to calculate the reported layer spacings are given in the 
         Supplemental Information.  %BJC: "Power spectrum" an okay description here?
+        %MRS2: repore more precisely what finding is interesting. What does that difference mean?
 	\item We see a difference in the spacing in the head group versus tail region
 	because there is more volume to fill with less densely packed carbon chains in the tail region. 
 	% BJC: vvv Need to get the same information for the tail zdfs.
 	\item Even though the layer spacing is similar, the sandwiched configuration
 	exhibits more defined layers with its first peak deviating from the mean 
         number density by 61 \%. %BJC: I mention how I do this calculation in the methods. Is it clear that I'm doing that here?
+%MRS2: fine for description for now.          
 	\item The parallel displaced configuration deviates from the mean by only 
 	12 \% in comparison.
+%MRS2: is this that unexpected, since parallel displaces should have layers that alternate anyway?
   \end{itemize}
 
   \begin{figure}
@@ -894,7 +941,7 @@
 
   % BJC: Even though I will shift focus to only 5 monomers per layer, I will put other data
   % such as XRD of 4, 6, 7, 8 mon/layer in supplemental information 
-
+  %MRS2: good.
   \begin{figure}
 	\centering
 	\includegraphics[width=0.5\linewidth]{p2p.png}
@@ -1133,7 +1180,7 @@
 %  \end{itemize}
 
 
-  We answer question (3) by simulating X-ray diffraction patterns produced from
+  We answer question (\ref{point:orientation}) by simulating X-ray diffraction patterns produced from
   equilibrated MD trajectories.
   %We created systems using three distinct initial configurations and examined
   %their structure by simulating X-ray diffraction patterns produced from equilibrated MD trajectories.
@@ -1343,6 +1390,7 @@
 	\caption{(a) All atoms except carbon atoms making up the tails are removed from the 
 	trajectory. (b) The simulated diffraction pattern of the tail-only trajectory still 
         shows R-spots}\label{fig:tails}
+        %MRS2: might need to say how the dynamic range is adjusted here with only tails, since otherwise people will be confused with the R-spots being more intense. 
   \end{figure}
  
 
@@ -1378,9 +1426,10 @@
   neighbor centroids for equilibrated parallel displaced (a) and sandwiched (c) configurations. The
   same peaks are visible when the 2D simulated diffraction data is radially integrated in the R-alkanes region,
   (b) and (d) respectively.}~\label{fig:tail_packing}
+%MRS2: not clear what the difference is between right and left side figures.
   \end{figure}
 
-  We answer (4) and further support (3) by preparing parallel displaced and
+  We answer (\ref{point:water}) and further support (\ref{point:orientation}) by preparing parallel displaced and
   sandwiched configurations according to the wet equilibration procedure.
   \begin{itemize}
 	\item We do not have an experimental measurement of water in the pores
@@ -1399,6 +1448,7 @@
   \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{solvation.png}  % still working on formatting so this is a screenshot of a doctored latex figure
+        %MRS2: include 0% as well? Maybe leave off 5% if not relevant in the end?
 	\label{fig:solvation}
   \end{figure}
 
@@ -1622,7 +1672,7 @@
 	\item The two methods agree with each other within error, although the 
 	uncertainty obtained using the Collective Diffusion model is much higher.
 	\item Much longer simulations are needed to lower the uncertainty, however it
-	is not feasible to do so with a large model. 
+	is not feasible to do so with a large model. %MRS2: large system. 
 	\item For this reason we will likely only use the Nernst Einstein relation
 	in future calculations of this type. 
   \end{itemize}
@@ -1652,10 +1702,11 @@
   \includegraphics[width=0.5\linewidth]{2D-SAXS_cropped.png}
   % BJC: I will add axes with q values if this ends up in the final draft
   % BJC: I'll also see what I can do about all the white speckles
+%MRS2: I'm not sure what the point of this figure is?
   \caption{The experimental two dimensional SAXS pattern exhibits reflections
   resulting from highly aligned pore regions. A perfectly aligned system 
   would exhibit sharp dots at the same locations of the refelctions shown. 
-  An isotropically aligned system the refelctions would appear as 
+  An isotropically aligned system the reflections would appear as 
   rings centered about the origin}~\label{fig:2DSAXS}
   \end{figure}
 
@@ -1781,15 +1832,18 @@
 	phases with molecular dynamics, to our knowledge there have been no studies which 
 	attempt to examine their structure with the same level of detail presented here.
 	\item We were able to deduce that layers are composed of 5 monomers 
+          %MRS2: be more precise about conclusions: evidence strongly supports 5 monomers / layer.
         \item We have confirmed that monomers stay partitioned in layers.
 	\item We have explored the affect of two different $\pi$-$\pi$ stacking modes on the equilibrated
 	membrane strucure. 
 	\item Simulated diffration patterns generated from MD trajectories suggest that
 	the parallel-displaced configuration produces a structure with the closest match to experiment.
 	\item Finally, water is not needed to maintain membrane structure 
+          %MRS2: Maybe ``water disorders the pore'' (some thought it might order it).
 	\item Now that we have a good idea of what the membrane structure should look like, we will
 	evaluate transport of various solutes within the system. 
-	\item We will apply the knowledge gained from this study in order to 
+         %MRS2: I'd like to see a bit more information about ``pore size'', and the RDF's of the constituents.  What FITS through a pore is another paper.
+        \item We will apply the knowledge gained from this study in order to 
         suggest improvements to the existing system as well as to evaluate new
 	unsynthesized LLC systems.
 %	\item Even though our model only answers these questions for a system created by 
