@@ -168,6 +168,36 @@ def dQ(frame, positions, channel_length, zmax, zmin, charges, id):
     return q
 
 
+def dQ2(z, zmax, zmin, charges, id):
+    """
+    Calculate the displacement of all positions from frame to frame
+    :param z: trajectory of positions [nframes, npoints, 1]  --> z-direction only
+    :return: a trajectory n(t) describing the delta n at each time step
+    """
+    q = np.zeros(z.shape[0])
+
+    for t in tqdm.tqdm(range(1, q.shape[0])):
+        for i in range(z.shape[1]):
+            current = z[t, i]
+            previous = z[t - 1, i]
+            if zmax >= current >= zmin:
+                if zmax >= previous >= zmin:
+                    q[t] += (current - previous)*charges[id[i]]
+                elif previous > zmax:
+                    q[t] += (current - zmax)*charges[id[i]]
+                elif previous < zmin:
+                    q[t] += (current - zmin)*charges[id[i]]
+            elif current > zmax:
+                if zmax >= previous >= zmin:
+                    q[t] += (zmax - previous)*charges[id[i]]
+            elif current < zmin:
+                if zmax >= previous >= zmin:
+                    q[t] += (zmin - previous)*charges[id[i]]
+
+    q *= (e / (zmax - zmin))
+
+    return q
+
 if __name__ == '__main__':
 
     start = time.time()
@@ -257,9 +287,10 @@ if __name__ == '__main__':
         charge['NA'] = 1.00
 
         print('Calculating q')
-        dq_all = np.zeros([nT - 1])
-        for i in tqdm.tqdm(range(nT - 1)):
-            dq_all[i] = dQ(i + 1, pos, Lc, z_2, z_1, charge, id)
+        # dq_all = np.zeros([nT - 1])
+        # for i in tqdm.tqdm(range(nT - 1)):
+        #     dq_all[i] = dQ(i + 1, pos, Lc, z_2, z_1, charge, id)
+        dq_all = dQ2(pos[:, :, 2], z_2, z_1, charge, id)
 
         if args.save:
             np.save('dq_%s' % args.suffix, dq_all)
