@@ -12,7 +12,7 @@ forces="3162 56 8 3 2 1 0"
 MPI="off"
 NP=4
 T=300
-equil_length=100000  # equilibrium simulation length
+equil_length=1000000  # equilibrium simulation length
 solvate=0
 
 while getopts "b:x:y:z:r:m:t:p:f:e:s:S:" opt; do
@@ -56,7 +56,7 @@ fi
 
 cp npt.gro 1000000.gro
 cp npt.trr 1000000.trr
-exit
+
 input.py --mdp -b ${BUILD_MON} -l 50 --restraints --temp ${T} -f 50 --genvel no  -c ${start_config} # use velocities from previous sim
 
 for f in ${forces}; do
@@ -71,14 +71,14 @@ for f in ${forces}; do
 	cp npt.gro ${f}.gro
 	cp npt.trr ${f}.trr
 done
-exit
+
 #input.py --mdp -b ${BUILD_MON} -l 20000 --restraints --temp ${T} -f 50 --genvel no  # use velocities from previous sim
 #gmx grompp -f npt.mdp -p topol.top -c npt.gro -o wiggle
 input.py -b ${BUILD_MON} -l 5000 --temp ${T} -f 50 --barostat berendsen --genvel no # put pressure control back on
 gmx grompp -f npt.mdp -p topol.top -c 0.gro -o wiggle # run it out for a bit
 gmx mdrun -v -deffnm wiggle
 
-input.py -b ${BUILD_MON} -l ${equil_length} --temp ${T} -f 100 --barostat Parrinello-Rahman --genvel no
+input.py -b ${BUILD_MON} -l ${equil_length} --temp ${T} -f 1000 --barostat Parrinello-Rahman --genvel no
 gmx grompp -f npt.mdp -p topol.top -c wiggle.gro -o wiggle
 #analysis.sh # get pore spacing, thickness, pore size, convert the trajectory to be used in XrayDiffraction.exe
 
