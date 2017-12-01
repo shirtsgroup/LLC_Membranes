@@ -17,6 +17,8 @@ from pymbar import timeseries
 import random as ran
 import mdtraj as md
 from scipy.optimize import curve_fit
+from scipy import spatial
+import tqdm
 
 
 def initialize():
@@ -66,25 +68,30 @@ def initialize():
 def restrict_atoms(t, component):
 
     # Check for certain special arguments
-    if component == 'tails':
+    if component == 'tails' or component == 'Tails':
         atoms = ['C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C21', 'C22',
                  'C23', 'C24', 'C25', 'C26', 'C27', 'C28', 'C29', 'C30', 'C31', 'C32', 'C33', 'C34', 'C35', 'C36', 'C37',
                  'C38', 'C39', 'C40', 'C41', 'C42', 'C43', 'C44', 'C45', 'C46', 'C47', 'C48']
-    elif component == 'benzene':
+    elif component == 'benzene' or component == 'Benzene':
         atoms = ['C', 'C1', 'C2', 'C3', 'C4', 'C5']
+    elif component == 'Head Groups':
+        atoms = ['C', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'O', 'O1', 'O2', 'O3', 'O4']
     elif component == 'tail_ends':
         atoms = ['C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C24', 'C25', 'C26', 'C27',
                  'C28', 'C29', 'C30', 'C31', 'C32', 'C33', 'C34', 'C38', 'C39', 'C40', 'C41', 'C42', 'C43', 'C44', 'C45',
                  'C46', 'C47', 'C48']
     elif component == 'tail_fronts':
         atoms = ['C7', 'C8', 'C9', 'C21', 'C22', 'C23', 'C35', 'C36', 'C37']
+    elif component == 'Sodium':
+        atoms = ['NA']
     else:
         atoms = component
 
     if component != 'sys':
+
         atoms_to_keep = [a.index for a in t.topology.atoms if a.name in atoms]
-        t.restrict_atoms(atoms_to_keep)
-        pos = t.xyz
+        pos = t.xyz[:, atoms_to_keep, :]
+
     else:
         # NOTE: if you use 'sys', use gmx trjconv -f *.trr -s *.tpr -pbc atom
         #                        then gmx trjconv -f *.trr -s *.tpr -pbc whole
@@ -273,14 +280,14 @@ def p2p_stats(p2ps, exclude, nboot, equil):
     return ensemble_avg, p2p_std, t
 
 
-def compdensity(component, pore_centers, start, tot_atoms, pores=4, bin_width=0.05, rmax=3.5, buffer=0.0):
+def compdensity(component, pore_centers, start, box, cut=2, pores=4, nbins=50, rmax=3.5, buffer=0.0):
 
     """
     :param component: the coordinates of the component(s) which you want a radial distribution of at each frame
                       (numpy array with dimensions: [3 (xyz coordinates), no components, no frames])
     :param pore_centers: a numpy array of the locations of each pore center at each trajectory frame
     :param start: the frame number at which to start calculations (should be after equilibration)
-    :param step: the size of the step to take in the radial direction when measuring density (float)
+    :param cut: cutoff distance for calculatins. Will not count anything further than cut from the pore center
     :param pores: number of pores (int) default=4
     :param bin_width: width of the bins which will show up when you plot this (float), default = 0.1 nm
     :param rmax: maximum distance from pore center to calculate density for, default = 3.5 nm
@@ -291,14 +298,15 @@ def compdensity(component, pore_centers, start, tot_atoms, pores=4, bin_width=0.
     """
 
     # Extract basic system information. It's important to follow the format of the component array to get it right
-    n_atoms = np.shape(component)[1]  # the total number of components in a single frame
-    n_ppore = old_div(tot_atoms, pores)  # the total number of components in each pore
-    nT = np.shape(component)[0]
+
+    tot_atoms = component.shape[1]  # the total number of components in a single frame
+    n_ppore = tot_atoms // pores  # the total number of components in each pore
+
+    nT = component.shape[0]
 
     # Find the approximate max and minimum z values of the components based on the last frame
 
     zmax = np.max(component[-1, :, 2])
-
     zmin = np.min(component[-1, :, 2])
     thickness = zmax - zmin  # approximate membrane thickness
 
@@ -307,40 +315,66 @@ def compdensity(component, pore_centers, start, tot_atoms, pores=4, bin_width=0.
     zmin_buff = zmin + thickness * buffer
 
     dist_from_center = []
-    # Now find the distance from the center of every atom in every frame
-    for k in range(start, nT):
-        for i in range(pores):
-            for j in range(n_ppore):
-                if zmin_buff < component[k, i * n_ppore + j, 2] < zmax_buff:
-                    dist = np.linalg.norm(component[k, i * n_ppore + j, :2] - pore_centers[:, i, k])
-                    dist_from_center.append(dist)
+    # # Now find the distance from the center of every atom in every frame
+    # for k in range(start, nT):
+    #     for i in range(pores):
+    #         for j in range(n_ppore):
+    #             if zmin_buff < component[k, i * n_ppore + j, 2] < zmax_buff:
+    #                 dist = np.linalg.norm(component[k, i * n_ppore + j, :2] - pore_centers[:, i, k])
+    #                 dist_from_center.append(dist)
 
-    dist_from_center = np.array(dist_from_center)
+    density = np.zeros([nbins])
+    for t in tqdm.tqdm(range(start, nT)):
+        for p in range(pores):
+            # narrow down the positions to those that are with 'cut' of at least one pore
+            distances = np.linalg.norm(component[t, :, :2] - pore_centers[:, p, t], axis=1)
+            d_sorted = np.sort(distances)
+            # find where the distances exceed the cutoff
+            stop = 0
+            while d_sorted[stop] < cut:
+                stop += 1
 
-    # Start setting up parameters necessary for binning
-    bins = int(old_div(rmax,bin_width))  # the total number of bins
-    r = np.linspace(0, rmax, int(bins))  # each discrete radius at which we will measure densities
+            hist, bin_edges = np.histogram(d_sorted[:stop], bins=nbins, range=(0, cut))  # the range option is necessary
+            #  to make sure we have equal sized bins on every iteration
 
-    # Now bin the distances calculated above
-    count = 0
-    bin_contents_tails = np.zeros([int(bins) + 1])
-    for i in range(len(dist_from_center)):
-        distance = dist_from_center[i]
-        if distance <= rmax:
-            count += 1
-            bin = int(np.floor((old_div(distance,rmax))*bins))
-            bin_contents_tails[bin] += 1
+            density += hist / box[t, 2, 2]
 
-    # calculate the density of ions in the area of the annulus defined by the inner and outer radii between which
-    # components were calculated
-    density = np.zeros([bins])
-    for i in range(bins):
-        density[i] = old_div(bin_contents_tails[i], (math.pi*(((i + 1)*bin_width)**2 - (i*bin_width)**2)))
+    density /= (tot_atoms*pores*(nT - start))  # take average
+    bin_width = cut / (nbins)
 
-    # normalize
-    n = sum(density)
-    for i in range(bins):
-        density[i] /= n
+    # normalize based on area of anulus where bin is located
+    r = np.zeros([nbins])
+    for i in range(nbins):
+        density[i] /= np.pi*(bin_edges[i+1] - bin_edges[i])**2
+        r[i] = (bin_edges[i + 1] + bin_edges[i])/2
+
+    # dist_from_center = np.array(dist_from_center)
+    #
+    # # Start setting up parameters necessary for binning
+    # bins = int(rmax / bin_width) #int(old_div(rmax,bin_width))  # the total number of bins
+    # r = np.linspace(0, rmax, int(bins))  # each discrete radius at which we will measure densities
+    # bin_width = rmax / (bins - 1)
+    #
+    # # Now bin the distances calculated above
+    # count = 0
+    # bin_contents_tails = np.zeros([int(bins) + 1])
+    # for i in range(len(dist_from_center)):
+    #     distance = dist_from_center[i]
+    #     if distance <= rmax:
+    #         count += 1
+    #         bin = int(np.floor((old_div(distance,rmax))*bins))
+    #         bin_contents_tails[bin] += 1
+    #
+    # # calculate the density of ions in the area of the annulus defined by the inner and outer radii between which
+    # # components were calculated
+    # density = np.zeros([bins])
+    # for i in range(bins):
+    #     density[i] = old_div(bin_contents_tails[i], (math.pi*(((i + 1)*bin_width)**2 - (i*bin_width)**2)))
+    #
+    # # normalize
+    # n = sum(density)
+    # for i in range(bins):
+    #     density[i] /= n
 
     return density, r, bin_width
 

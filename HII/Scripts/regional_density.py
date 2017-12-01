@@ -5,7 +5,6 @@ import argparse
 import Structure_char
 import numpy as np
 from llclib import physical
-import copy
 import matplotlib.pyplot as plt
 
 
@@ -16,55 +15,74 @@ def initialize():
     parser.add_argument('-g', '--gro', default='wiggle.gro', help='Name of coordinate file')
     parser.add_argument('-t', '--traj', default='wiggle.trr', help='Trajectory file (.trr, .xtc should work)')
     parser.add_argument('-b', '--begin', default=0, type=int, help='Frame to begin calculations')
-    parser.add_argument('-e', '--end', type=int, help='Frame to stop doing calculations')
+    parser.add_argument('-e', '--end', default=-1, type=int, help='Frame to stop doing calculations')
+    parser.add_argument('-bins', default=100, type=int, help='Number of bins to use')
 
     args = parser.parse_args()
 
     return args
 
+
+def duplicate(pos, box):
+    """
+    Duplicate a set of positions periodically once in the +/- xy directions
+    :param pos: xyz positions of a set of coordinates to be duplicated periodically
+    :param box: box vectors in mdtraj format (t.unitcell_vectors : [nframes, 3, 3]) for every frame
+    :return: Periodically duplicated system
+    """
+
+    n = pos.shape[1]  # number atoms in original unit cell
+
+    p = np.zeros([pos.shape[0], n*9, 3])  # will hold periodically duplicated system
+    p[:, :n, :] = pos
+
+    # x-direction
+    for t in range(pos.shape[0]):
+        p[t, n:2*n, :] = pos[t, :, :] + box[t, 0, :]
+        p[t, 2*n:3*n, :] = pos[t, :, :] - box[t, 0, :]
+
+    # y-direction
+    n *= 3
+    for t in range(pos.shape[0]):
+        p[t, n:2*n, :] = p[t, :n, :] + box[t, 1, :]
+        p[t, 2*n:3*n, :] = p[t, :n, :] - box[t, 1, :]
+
+    return p
+
 if __name__ == "__main__":
-
+    
     args = initialize()  # parse the args
+    
+    print('Loading trajectory...', end="")
+    t = md.load('%s' % args.traj, top='%s' % args.gro)[args.begin:args.end]
+    print('done')
 
-    if args.end:
-        t = md.load('%s' % args.traj, top='%s' % args.gro)[args.begin:args.end]
-    else:
-        t = md.load('%s' % args.traj, top='%s' % args.gro)[args.begin:]
-
-    # Check for certain special arguments
-    regions = ['tails', 'benzene', 'NA']
+    regions = ['Tails', 'Head Groups', 'Sodium']
     colors = ['red', 'green', 'blue']
     nT = t.n_frames
+    npores = 4
 
     r_max = 0
 
-    for i in range(len(regions)):
+    for i, reg in enumerate(regions):
 
-        traj = copy.deepcopy(t)  # preserve original trajectory
-        pos = Structure_char.restrict_atoms(t, regions[i])  # restrict trajectory to region
+        print('Calculating number density of %s region' % reg)
 
-        tot_atoms = np.shape(pos)[1]  # number of atoms in the restricted trajectory
-        n_pores = 4  # number of pores
-        comp_ppore = tot_atoms/n_pores  # number of components in each pore
+        pos = Structure_char.restrict_atoms(t, reg)  # restrict trajectory to region
 
-        p_centers = physical.avg_pore_loc(n_pores, pos)
+        p = duplicate(pos, t.unitcell_vectors)  # duplicate things periodically
+
+        p_centers = physical.avg_pore_loc(npores, pos)
 
         equil = 0
-        density, r, bin_width = Structure_char.compdensity(pos, p_centers, equil, t.n_atoms, n_pores, buffer=0)
-        t = traj
+        density, r, bin_width = Structure_char.compdensity(pos, p_centers, equil, t.unitcell_vectors, pores=npores, buffer=0, nbins=args.bins)
 
-        nonzero = np.trim_zeros(density, trim='b')
-
-        if r[len(nonzero) - 1] > r_max:
-            r_max = r[len(nonzero) - 1]
-
-        # plt.bar(r[:stop], density[:stop], bin_width, color=colors[i], alpha=0.5)
-        plt.bar(r, density, bin_width, color=colors[i], alpha=0.5, label=regions[i])
-
-        print '%s region calculated' % regions[i]
+        plt.bar(r, density, bin_width, color=colors[i], alpha=0.5, label=reg)
 
     plt.legend()
-    plt.xlabel('Density')
-    plt.ylabel('Distance from pore center (nm)')
-    plt.xlim([0, r_max])
+    plt.ylabel('Component Number Density (number/nm$^2$)')
+    plt.xlabel('Distance from pore center (nm)')
+    plt.ylim([0, 1.3])
+    plt.tight_layout()
+    plt.savefig("regional_density.png")
     plt.show()
