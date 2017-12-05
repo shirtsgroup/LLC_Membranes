@@ -55,6 +55,7 @@
 %MRS2: is ``well-defined'' the right word if there is a ``pore size distribution''?
 %BJC: By well-defined, I'm thinking of cylinders versus polymer matrix. One is definitely more
 % defined than the other. What is the right word for that? unambiguous? explicit?
+%MRS3: hmm.  Maybe look and see what other people call them when describing NF membranes.
     \item Larger and well-defined pores drive down energy requirements while
     still affording separation of solutes as small as ions to some degree \cite{van_der_bruggen_review_2003}
     \item NF is often used as a precursor to reverse osmosis
@@ -159,6 +160,7 @@
 %may allow tuning rejection of solutes based on size?
 %BJC: okay tried again
     \item The choice of head group may allow us to tune pore size for size exclusion driven separations
+%MRS3: choice of counterion also affects size.  Counterion type probably doesn't affect Donnan potential that much IRCC, more the total amount of counterion.
     \item Choice of counterion may influence the establishment of a Donnan potential
     affecting the degree to which the membrane can exclude charged species.
     \item A good molecular model should incorporate a detailed picture of the nanoscopic pore 
@@ -170,6 +172,7 @@
   %BJC: Figure here showing previous level of detail compared to atomistic level of detail
   %MRS2: provenance of the atomistic figure could be explained better in the caption. It also looks disordered. Will eventually need a higher resolution figure for the previous understanding pore.
   %BJC: Okay. The picture here is of the "ordered pore" phase. It looks disorderd from this angle. I could use a different slice of the membrane to see if it looks any better
+%MRS: if this is ordered, OK.  Maybe could try to rotate it a bit more towards the reader.
   \begin{figure}
   \centering
 	\begin{subfigure}{0.45\linewidth}
@@ -203,7 +206,9 @@
 
   Despite having structural data, there is still information which
   experiment cannot definitively answer. There are several key
-  questions that we intend to answer which will be laid out and numbered
+  questions that we intend to answer 
+%MRS3: we can't ``answer'' for sure, since it's a model, and may omit things. Could put ``several key questions we will investigate'' or ``hope to provide evidence for or against'', or something like that.
+which will be laid out and numbered
   in subsequent paragraphs.
 
 %BJC: the following just seems like filler now that I've reorganized
@@ -217,7 +222,6 @@
 
 %MRS: break this down into more hierarchy - there are 11 separate points.  Can they be grouped at all for clearer understanding? elucidate what the aspects are we need a clearer picture. 
 %BJC: I moved the logic for choice of monomer to system to model to a separate paragraph (above this). I then moved the other three things I talk about into their own paragraphs to keep the ideas separate (following paragraphs).
-
 %MRS: since the questions we answer in the paper have a lot to do with the structure of the membranes, somewhere relatively early in the paper we need to lay out the facts that 1) these membranes could be really good (I think you do establish this) 2) we really would need to know the structure better to really do useful things with these, and 3) MD is a very helpful way to gain more information about the structure, because of the limited range of experiments we can do with these systems. That is the main rationale, and it should be made clear fairly early in the introduction.  Very important to make your story absolutely as clear as possible.
 %BJC: I moved and edited a paragraph that was originally later on to be 2 above this one. I think it does a better job addressing points 2 and 3. And now it addresses those points earlier in the intro (as early as it could go where I think it still makes sense in context)
 
@@ -251,7 +255,9 @@
 
   Monomers in the Col\textsubscript{h} system are theorized to be partitioned
   into stacked layers which form columnar pores. There has been no definitive
-  answer in literature regarding the number of monomers in each layer. We want to
+  answer in literature regarding the number of monomers in each layer. 
+%MRS3: the intro to the list talks about only ``numbers of monomers in each layer'', whereas the list below talks about several questions relating to layers. Can you rephrase so it's more general? Maybe just take out that sentence above.
+We want to
   know 
 \begin{enumerate}
 \item If layers do exist, how many monomers constitute a single layer? \label{point:monomernum}
@@ -323,6 +329,7 @@
   Col\textsubscript{h} phase? \label{point:water}
   \begin{itemize}
 	\item While the Col\textsubscript{h} phase is described as dry, it is 
+          %MRS3: ``possible'' -> likely, and give some explanations why we think likely?
 	possible that small amounts of ambient water may be leached into the system.
 	\item The hydrogen bonding network formed by the water may play a role 
         in structuring the pore.
@@ -527,7 +534,8 @@
     \item The first is exactly equal to R-$\pi$ with layers placed so aromatic
     rings are stacked 3.7 \angstrom~ apart in the z-direction.
     \item A second system is explored with an initial layer spacing of 5 \angstrom
-    \item A third system with an initial layer spacing of 10 \angstrom was briefly
+%MRS3: at least state in the main body what went wrong with it in a sentence or so, with details in supplemental. 
+   \item A third system with an initial layer spacing of 10 \angstrom was briefly
     explored and the reader can learn more about it in the Supplemental Information.
 % BJC: Move all this lower down to be with the rest of the equilibrium calculations
 %    \item To quantify the degree of layering in our system, we calculated
@@ -660,6 +668,7 @@
       \begin{itemize}
         %MRS2: what initial force constant, and does it matter (that can be in supplemental) 
 	%BJC: I've never explored whether there is any dependence on initial force constant. It probably doesn't matter unless it starts really low
+        %MRS3: then just state what you did, so it could be repeated. 
           \item Restraints fix monomer head groups in the sandwiched or parallel-displaced
           configurations while allowing monomer tails to settle.
           \item Doing so also mitigates system dependence on initial monomer configuration.
@@ -798,6 +807,8 @@
 	        sampling pore spacings from the sub-trajectories
 	        \item We get an average value for each pore spacing by finding the mean of the bootstrapped data
 	        \item We calculate the overall average as the mean of all bootstrapped pore spacings
+                  %MRS3: this sounds a little convoluted below.  Should just be the standard error in the boostrap estimates of the pore spacing?
+                  %MRS3: this can be fixed in the draft not outline.
 	        \item The uncertainty for each pore spacing is calculated as $\dfrac{<x> - x}{4}$ where $<x>$ is the
 	        average spacing from the bootstrap trial and $x$ is the average value of one of the pore spacings.
 	        \item We report the mean of these uncertainties
@@ -1431,12 +1442,15 @@
 		        \caption{}~\label{fig:layered_integration}
 		\end{subfigure}
 	\end{subfigure}
+%MRS: 
   \caption{The distribution of angles w.r.t. the xy plane between alkane chain tail centroids and nearest
   neighbor centroids for equilibrated parallel displaced (a) and sandwiched (c) configurations. The
   same peaks are visible when the 2D simulated diffraction data is radially integrated in the R-alkanes region,
   (b) and (d) respectively.}~\label{fig:tail_packing}
 %MRS2: not clear what the difference is between right and left side figures.
 %BJC: That's good! One is angles measured between tail centroids and the other is radial integration of the simulated xrd patterns. I'll try make that more clear in the caption.
+%MRS3: sorry, I meant to say not clear what the SOURCE of the data is in right vs. left.  Make sure colors and labels are consistent in final 
+%MRS: not clear why some are angles with x axis, and some are angles w neighbors?  Shouldn't it be the same thing plotted in both graphs?
   \end{figure}
 
   The $z$-direction correlation functions show that layers in our model prefer
@@ -1456,11 +1470,12 @@
         \angstrom~ apart results in a pore structure characterized by high radial
         disorder, while still maintaining partitioning between hydrophobic and
         hydrophilic regions.
+ %MRS3: need to address the similar RDFs.  What data can show they are different? Or maybe they HAVE rdfs, but not good layering? Have you done the fourier transform on them? We can still rule them out based on the XRD, of course.  But surprising the same RDFs.
         \item This will be called the disordered pore basin (Figure~\ref{fig:DPbasin}).
         \item This LLC membrane may exist in at least two metastable states.
         \item The distinct difference in pore structure exhibited by each phase will
         likely lead to different transport mechanisms.
-        \item Because the pore structure will vary between each Basin, understanding
+        \item Because the pore structure will vary between each basin, understanding
         which phase exists experimentally is necessary in order to ensure we are
         studying the system which actually dominates.
   \end{itemize}
@@ -1480,6 +1495,7 @@
         \caption{From a qualitative standpoint, the ordered pore basin (a) is characterized by a
         hollow cylindrical pore while pores in the disorder pore basin (b) are characterized by a
         higher degree of radial disorder}\label{fig:basins}
+%MRS3: see note on RDF.
   \end{figure}
 
   % INSERT XRD of disordered basin
@@ -1495,6 +1511,8 @@
 
   % BJC: I'm not sure what to make of this figure right now. The parallel-displaced configuration shares
   % more with the disordered pore phase
+  % MRS3: yeah, see my notes on this.  wE need to understand how it can be visually open, and still have this structure.  
+  % doesn't this structur have a different pore-to-pore distance.
   \begin{figure}
   \centering
   \begin{subfigure}{0.55\textwidth}
@@ -1512,8 +1530,10 @@
         \caption{}
         \label{fig:offset_density}
   \end{subfigure}
-  \caption{(a) Parallel Displaced (b) Sandwiched (c) "Disordered"}~\label{fig:densities}
+  \caption{(a) Parallel Displaced (b) Sandwiched (c) ``Disordered''}~\label{fig:densities}
   \end{figure}
+
+%MRS3: this needs a caption, and need to write some text analyzing it.  The thing that throws me off is that the RDF's look about the same for parallel displaced and disordered!  That's pretty hard to rationalize with the idea that the pores are open vs. closed. What am I missing? Very interesting regardless!
 
   We answer (\ref{point:water}) and further support (\ref{point:orientation}) by preparing parallel displaced and
   sandwiched configurations according to the wet equilibration procedure.
@@ -1548,6 +1568,8 @@
 	R-spots become nearly indistinguishable from R-alkanes.
   \end{itemize}
 
+%MRS3: is this point the right ``main'' thesis to make? I thought it was a more simple statement of being interested as to how water affected the structure.  FYI, would be interesting to see the RDF's of the pores with and without water, BUT I think that's not necessary for this paper, that's more a 2nd paper thing.
+%MRS3: we didn't really test if water is  needed to obtain the structures; clearly, w/o water it's metastable for a long time.  We don't need the water simulations to prove this.  
   Water is not needed to obtain and simulate the correct equilibrium 
   membrane structure.
   \begin{itemize}
@@ -1793,6 +1815,7 @@
 % that the pores in the real system are somewhat tortuous, in place of showing
 % the Azimuthal distribution which is just an integration of this data. I thought
 % it'd be clearer that way since but maybe it's not?
+%MRS3: state more clearly in the caption why you are showing it. i.e. ``this data shows that pores in the system are somewhat tortuous'', then explain how the figure shows that.
   \caption{The experimental two dimensional SAXS pattern exhibits reflections
   resulting from highly aligned pore regions. A perfectly aligned system 
   would exhibit sharp dots at the same locations of the refelctions shown. 
@@ -1927,6 +1950,7 @@
 	membrane strucure. 
 	\item Simulated diffration patterns generated from MD trajectories suggest that
 	the parallel-displaced configuration produces a structure with the closest match to experiment.
+%MRS3: water is not needed to create well-defined pore structures?  I'm not sure ``maintain'' is the right word, and ``membrane structure'' may be too vague.
 	\item Finally, water is not needed to maintain membrane structure our data 
 	shows that it actually disorders the pore
 	\item Now that we have a good idea of what the membrane structure should look like, we will
