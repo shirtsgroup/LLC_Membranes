@@ -30,6 +30,9 @@ if __name__ == "__main__":
     args = initialize()
 
     subprocess.call(['gmx', 'solvate', '-cs', 'spc216.gro', '-cp', '%s' % args.gro, '-o', 'solv.gro'])
+    echo = subprocess.Popen(['echo', '0'], stdout=subprocess.PIPE)
+    subprocess.Popen(['gmx', 'trjconv', '-f', 'solv.gro', '-o', 'solv.gro', '-s', 'solv.gro', '-ur', 'tric', '-pbc',
+                     'atom'], stdin=echo.stdout)
 
     t = md.load('solv.gro')  # load solvated structure
 

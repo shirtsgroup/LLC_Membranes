@@ -206,7 +206,7 @@
 
   Despite having structural data, there is still information which
   experiment cannot definitively answer. There are several key
-  questions that we intend to answer 
+  questions that we will investigate  
 %MRS3: we can't ``answer'' for sure, since it's a model, and may omit things. Could put ``several key questions we will investigate'' or ``hope to provide evidence for or against'', or something like that.
 which will be laid out and numbered
   in subsequent paragraphs.
@@ -254,11 +254,10 @@ which will be laid out and numbered
 %  \end{itemize}
 
   Monomers in the Col\textsubscript{h} system are theorized to be partitioned
-  into stacked layers which form columnar pores. There has been no definitive
-  answer in literature regarding the number of monomers in each layer. 
+  into stacked layers which form columnar pores. 
+%BJC: commenting out :There has been no definitive answer in literature regarding the number of monomers in each layer. 
 %MRS3: the intro to the list talks about only ``numbers of monomers in each layer'', whereas the list below talks about several questions relating to layers. Can you rephrase so it's more general? Maybe just take out that sentence above.
-We want to
-  know 
+We want to know 
 \begin{enumerate}
 \item If layers do exist, how many monomers constitute a single layer? \label{point:monomernum}
   \begin{itemize}
@@ -329,8 +328,8 @@ We want to
   Col\textsubscript{h} phase? \label{point:water}
   \begin{itemize}
 	\item While the Col\textsubscript{h} phase is described as dry, it is 
-          %MRS3: ``possible'' -> likely, and give some explanations why we think likely?
-	possible that small amounts of ambient water may be leached into the system.
+          %MRS3: ``possible'' -> likely, and give some explanations why we think likely? 
+	likely that small amounts of ambient water may be leached into the system.
 	\item The hydrogen bonding network formed by the water may play a role 
         in structuring the pore.
 	\item We can use simulated X-ray diffraction patterns to see if there is
@@ -536,7 +535,11 @@ We want to
     \item A second system is explored with an initial layer spacing of 5 \angstrom
 %MRS3: at least state in the main body what went wrong with it in a sentence or so, with details in supplemental. 
    \item A third system with an initial layer spacing of 10 \angstrom was briefly
-    explored and the reader can learn more about it in the Supplemental Information.
+    explored
+   \item When layers are spaced out sufficiently, they tend to collapse on each other 
+   while simultaneously slipping in between layers of other pores which lead to an
+   artificially thick membrane with pores spaced closely together.
+   \item The intereseted reader can learn more about it in the Supplemental Information.
 % BJC: Move all this lower down to be with the rest of the equilibrium calculations
 %    \item To quantify the degree of layering in our system, we calculated
 %    a spatial correlation function, $g(z)$, measured along the z-axis 
@@ -669,12 +672,13 @@ We want to
         %MRS2: what initial force constant, and does it matter (that can be in supplemental) 
 	%BJC: I've never explored whether there is any dependence on initial force constant. It probably doesn't matter unless it starts really low
         %MRS3: then just state what you did, so it could be repeated. 
-          \item Restraints fix monomer head groups in the sandwiched or parallel-displaced
-          configurations while allowing monomer tails to settle.
+          \item Restraints with a force constant of 1e6 KJ mol$^-1$ nm$^-2$, fix monomer 
+	  head groups in the sandwiched or parallel-displaced configurations while 
+          allowing monomer tails to settle.
           \item Doing so also mitigates system dependence on initial monomer configuration.
           \item The restrained portion of the equilibration scheme is run in the NVT ensemble.
           \item Every 50 ps, we reduce the force constants by the square root of its
-          previous value, starting from 1e6 KJ mol$^-1$ nm$^-2$.
+          previous value %, starting from 1e6 KJ mol$^-1$ nm$^-2$. <-- stated in first bullet
           \item Once the force constant is below 10 KJ mol$^-1$ nm$^-2$, the restraints are
           released linearly until there is no more restraining potential.
           \item The resulting unrestrained structure is allowed to equilibrate for 5 ns 
@@ -1411,6 +1415,7 @@ We want to
         shows R-spots}\label{fig:tails}
         %MRS2: might need to say how the dynamic range is adjusted here with only tails, since otherwise people will be confused with the R-spots being more intense. 
 	%BJC: what do you mean by dynamic range?
+	%BJC: Explain how colorbar is adjusted
   \end{figure}
  
 
@@ -1451,6 +1456,7 @@ We want to
 %BJC: That's good! One is angles measured between tail centroids and the other is radial integration of the simulated xrd patterns. I'll try make that more clear in the caption.
 %MRS3: sorry, I meant to say not clear what the SOURCE of the data is in right vs. left.  Make sure colors and labels are consistent in final 
 %MRS: not clear why some are angles with x axis, and some are angles w neighbors?  Shouldn't it be the same thing plotted in both graphs?
+%BJC: I just need to get the labels right, they are the same thing technically
   \end{figure}
 
   The $z$-direction correlation functions show that layers in our model prefer

@@ -82,7 +82,7 @@ if __name__ == "__main__":
     plt.legend()
     plt.ylabel('Component Number Density (number/nm$^2$)')
     plt.xlabel('Distance from pore center (nm)')
-    plt.ylim([0, 1.3])
+    plt.ylim([0, 0.6])
     plt.tight_layout()
     plt.savefig("regional_density.png")
     plt.show()

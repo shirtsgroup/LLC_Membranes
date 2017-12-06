@@ -547,7 +547,7 @@ if __name__ == '__main__':
             if i not in exclude:
                 plt.plot(t.time[::args.plot_every], p2ps[i, ::args.plot_every], label='%s' % labels[i])
 
-    ax1.set_xlabel('Time (ps)')
+    # ax1.set_xlabel('Time (ps)')
     # new_tick_locations = np.linspace(0, t.time[-1], 7)
     # new_tick_labels = [int(280 + 60*(x/t.time[-1])) for x in new_tick_locations]
     # ax2.set_xlim(ax1.get_xlim())
@@ -555,34 +555,34 @@ if __name__ == '__main__':
     # ax2.set_xticklabels(new_tick_labels)
     # ax2.set_xlabel("Temperature (K)", fontsize=14)
     # plt.title('Pore to Pore Distance Equilibration')
-    ax1.set_ylabel('Distance between pores (nm)', fontsize=14)
-    ax1.set_xlabel('Time (ns)', fontsize=14)
-    ax1.tick_params(labelsize=14)
-    # ax2.tick_params(labelsize=14)
-    # plt.legend(loc=1, fontsize=18)
-    equil = 0
-    density, r, bin_width = compdensity(pos, p_centers, equil, n_pores, buffer=0)
-    print(density)
-    print(r)
-    #for i in range(density.shape[-1]):
-    #    if density[i] == 0:
-    #        stop = i
-    #        break
-    stop = len(np.trim_zeros(density, 'b'))
-    # popt, pcov = curve_fit(gaus, r[:stop], density[:stop], p0=[density[0], 0.4])
-    # # parameters, cov_matrix = curve_fit(poisson, r[:stop]/bin_width, density[:stop], p0=[1])
-    plt.figure(2)
-    #plt.plot(r[:stop], gaus(r[:stop],*popt), 'ro:', label='fit')
-    # # plt.plot(r[:stop], poisson(r[:stop]/bin_width, *parameters), 'r-', lw=2)
-    #plt.title('Component Density Around Pore Center')
-    #plt.xlabel('Distance from Pore Center (nm)')
-    #plt.ylabel('Relative Component Density')
-    plt.rcParams["patch.force_edgecolor"] = True
-    plt.bar(r[:stop], density[:stop], bin_width, color='blue')
-    plt.xlim(0, plt.xlim()[1])
-    #plt.rcParams["patch.force_edgecolor"] = True
-    plt.xlabel('Distance from pore center (nm)')
-    plt.ylabel('Probability of finding atom at distance x')
+    # ax1.set_ylabel('Distance between pores (nm)', fontsize=14)
+    # ax1.set_xlabel('Time (ns)', fontsize=14)
+    # ax1.tick_params(labelsize=14)
+    # # ax2.tick_params(labelsize=14)
+    # # plt.legend(loc=1, fontsize=18)
+    # equil = 0
+    # density, r, bin_width = compdensity(pos, p_centers, equil, n_pores, buffer=0)
+    # print(density)
+    # print(r)
+    # #for i in range(density.shape[-1]):
+    # #    if density[i] == 0:
+    # #        stop = i
+    # #        break
+    # stop = len(np.trim_zeros(density, 'b'))
+    # # popt, pcov = curve_fit(gaus, r[:stop], density[:stop], p0=[density[0], 0.4])
+    # # # parameters, cov_matrix = curve_fit(poisson, r[:stop]/bin_width, density[:stop], p0=[1])
+    # plt.figure(2)
+    # #plt.plot(r[:stop], gaus(r[:stop],*popt), 'ro:', label='fit')
+    # # # plt.plot(r[:stop], poisson(r[:stop]/bin_width, *parameters), 'r-', lw=2)
+    # #plt.title('Component Density Around Pore Center')
+    # #plt.xlabel('Distance from Pore Center (nm)')
+    # #plt.ylabel('Relative Component Density')
+    # plt.rcParams["patch.force_edgecolor"] = True
+    # plt.bar(r[:stop], density[:stop], bin_width, color='blue')
+    # plt.xlim(0, plt.xlim()[1])
+    # #plt.rcParams["patch.force_edgecolor"] = True
+    # plt.xlabel('Distance from pore center (nm)')
+    # plt.ylabel('Probability of finding atom at distance x')
     if args.save:
         plt.savefig('p2p.png')
     if not args.noshow:
