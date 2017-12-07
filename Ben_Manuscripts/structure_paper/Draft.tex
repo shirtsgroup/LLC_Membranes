@@ -274,13 +274,17 @@ Shirts}
   \item Is it necessary to include any water in order to appropriately model
   the Col\textsubscript{h} phase? \label{point:water}
 
-  While the Col\textsubscript{h} phase is described as dry, it is 
-  %MRS3: ``possible'' -> likely, and give some explanations why we think
-  %likely? 
-  likely that small amounts of ambient water may be leached into the system. The
-  hydrogen bonding network formed by the water may play a role in structuring the
-  pore.  We can use simulated X-ray diffraction patterns to see if there is any
-  meaningful structural difference between a "dry" and "wet" system
+  While the Col\textsubscript{h} phase is described as dry, it is has been
+  suggested by experimentalists in unpublished communications that it is likely
+  that small amounts of ambient water are leached into neat monomer.
+  Experimentally, achieving a hexagonal phase with a completely dry system has
+  proven difficult. If neat monomer is allowed to sit in ambient conditions, its
+  color turns from transparent to slightly opaque and a hexagonal phase forms.
+  Although we will not explore whether water is necessary for self assembly, we
+  hypothesize that the hydrogen bonding network formed by the water may play a
+  role in structuring the pores and holding together the hexagonal phase. We can
+  use simulated X-ray diffraction patterns to see if there is any meaningful
+  structural difference between a "dry" and "wet" system.
 
   \end{enumerate}
   
@@ -289,52 +293,47 @@ Shirts}
   %can rely on conclusions drawn about structural features characteristic of 
   %the system.
  
-  In this study, we build a significantly more realistic atomistic model of LLC membranes
-  than has ever previously been done, and explore what new structural information can be gained
-  and what structure hypotheses are supported by this model.
+  In this study, we build a significantly more realistic atomistic model of LLC
+  membranes than, to our knowledge, has ever previously been done, and explore
+  what new structural information can be gained and what structure hypotheses are
+  supported by this model. We validate the model using as much experimental
+  information as possible. We are most interested in reproducing the conclusions
+  about structure which have been drawn from X-ray diffraction (XRD) experiments
+  and in matching ionic conductivity measurements \cite{feng_thin_2016}.
 
-  \begin{itemize}
-    \item We validate the model using as much experimental information as possible.
-    \item We are most interested in reproducing the conclusions about structure
-    which have been made from X-ray diffraction (XRD) experiments and in matching ionic
-    conductivity measurements~\cite{feng_thin_2016}.
-  \end{itemize}
-
-  We used experimental wide angle X-ray scattering (WAXS) data (produced as described
-  in~\cite{feng_scalable_2014}) and small angle X-ray scattering (SAXS) data from~\cite{feng_thin_2016}
-  to inform our choices of some initial structural parameters (Figure~\ref{fig:SWAXS}). We rely primarily
-  on the 2D WAXS data since it encodes all structural details down to the sub-nm scale.
-  \begin{itemize}
-        \item There are five major features of interest present in the 2D experimental
-        pattern shown in Figure~\ref{fig:WAXS}.
-        \item The first is located at $q_z$ = 1.7 \angstrom$^{-1}$,
-        corresponding to a real spacing of 3.7 \angstrom~. The reflection is
-        attributed to $\pi$-$\pi$ stacking between aromatic rings in the direction
-        perpendicular to the membrane plane, or z-axis \cite{feng_scalable_2014}. For simplicity, this
-        reflection will be referred to as R-$\pi$.
-        \item A weak intensity line is located at exactly half the $q_z$ value of
-        R-$\pi$ ($q_z$ = 0.85 \angstrom$^-1$), corresponding to a
-        real space periodic spacing of 7.4 \angstrom~. This reflection has been
-        interpreted  as 2\textsubscript{1} helical ordering of aromatic rings
-        along the z axis meaning if the positions of the aromatic rings can
-        be traced by a helix, then for each turn in the helix, there should be
-        two aromatic rings. For this reason it will be referred to as R-helix.
-        \item A third major reflection is marked by a low intensity ring located
-        at r = 1.4 \angstrom$^-1$. The real space separation
-        corresponds to 4.5 \angstrom~ which is characteristic of the average
-        spacing between packed alkane chains. This reflection will be called R-alkanes.
-        \item Within R-alkanes, are four spots of higher relative intensity which
-        will be called R-spots. All are located $\approx 40$ degrees from the $q_z$ axis
-        in their respective quadrants. In many liquid crystal systems this can be
-        explained by the tilt angle of the alkane chains with respect to the xy plane. % BJC: References
-        \item The final feature corresponds to the spacing and symmetry of
-        the d\textsubscript{100} plane which can be related to the distance between
-        pores. The feature, which will be called R-pores, is characterized by dots
-        along $q_z$ = 0. The spacing between dots is indicative of the hexagonal
-        symmetry of the packed pores. The same information at higher resolution is obtained using a SAXS
-        setup. By radially integrating the 2D data one gets a 1D curve which is
-        shown in Figure~\ref{fig:SAXS}.  % BJC: I also have 2D SAXS data
-  \end{itemize}
+  %BJC: Would it be better to describe each reflection as a numbered list (like with the questions above?)
+  We used experimental wide angle X-ray scattering (WAXS) data (produced as 
+  described in \cite{feng_scalable_2014}) and small-angle X-ray scattering (SAXS)
+  data from \cite{feng_thin_2016} to inform our choices of some initial
+  structural parameters (Figure~\ref{fig:SWAXS}). We rely primarily on the 2D
+  WAXS data since it encodes all structural details down to the sub-nm scale.
+  There are five major features of interest present in the 2D experimental
+  pattern shown in Figure \ref{fig:WAXS}. The first is located at $q_z$ = 1.7
+  \angstrom$^{-1}$, corresponding to a real space separation of 3.7 \angstrom~.
+  The reflection is attributed to $\pi$-$\pi$ stacking between aromatic rings in
+  the direction perpendicular to the membrane plane, or z-axis
+  \cite{feng_scalable_2014}. For simplicity, this reflection will be referred to
+  as R-$\pi$. A weak intensity line is located at exactly half the $q_z$ value of
+  R-$\pi$ ($q_z$ = 0.85 \angstrom$^-1$), corresponding to a real space periodic
+  spacing of 7.4 \angstrom~. This reflection has been interpreted as
+  2\textsubscript{1} helical ordering of aromatic rings along the z axis meaning
+  if the positions of the aromatic rings can be traced by a helix, then for each
+  turn in the helix, there should be two aromatic rings. For this reason it will
+  be referred to as R-helix. A third major reflection is marked by a low
+  intensity ring located at r = 1.4 \angstrom$^-1$. The real space separation
+  corresponds to 4.5 \angstrom~ which is characteristic of the average spacing
+  between packed alkane chains. This reflection will be called R-alkanes. Within
+  R-alkanes, are four spots of higher relative intensity which will be called
+  R-spots. All are located $\approx 40$ degrees from the $q_z$ axis in their
+  respective quadrants. In many liquid crystal systems this can be explained by
+  the tilt angle of the alkane chains with respect to the xy plane.  The final
+  feature corresponds to the spacing and symmetry of the d\textsubscript{100}
+  plane which can be related to the distance between pores.  The feature, which
+  will be called R-pores, is characterized by dots along $q_z$ = 0. The spacing
+  between dots is indicative of the hexagonal symmetry of the packed pores. The
+  same information at higher resolution is obtained using a SAXS setup. By
+  radially integrating the 2D data one gets a 1D curve which is shown in
+  Figure~\ref{fig:SAXS}.
 
   \begin{figure}
         \centering
@@ -356,17 +355,6 @@ Shirts}
         gives details about repeating features less than 1 nanometer apart}\label{fig:SWAXS}
   \end{figure}
 
-%    \begin{itemize}
-%            \item We have compared simulated X-ray diffraction patterns to experiment in
-%            order to match major features present in the 2D patterns.
-%            \item We calculated ionic conductivity using two agreeing methods.
-%            \item We examined the the influence of crosslinking on membrane structure.
-%    \end{itemize}
-%    \item The structure-building approach and analysis used in this paper can be readily extended
-%    to the H\textsubscript{II} phase, other similar LC systems and ultimately to help design
-%    real membranes.
-%  \end{itemize}
-  
   \section*{Methods}
  
   %BJC: The Methods sections has four main topics which will be separated by an appropriate header
