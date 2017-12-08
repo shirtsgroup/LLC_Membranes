@@ -21,6 +21,28 @@
 \graphicspath{{./figures/}}  % put all the figures here
 \maketitle
 
+n{itemize}
+                %MRS2: make clear sampling what?
+                \item We are interested in 5 pore-to-pore distances which should all be equal in
+                a perfect hexagonal array, however only 4 distances are independent % can visualize this in supplemental material. Will make a lot of things more clear below.
+                \item Each pore spacing has its own trajectory of spacing vs. time. Using data collected after
+                the system is equilibrated, we calculate how long it takes for the data in each of the 5
+                trajetories to become uncorrelated using pymbar.timeseries.integratedAutocorrelationTime() % reference
+                \item We break the full trajectories down into sub-trajectories based on the
+                maximum autocorrelation time of those found in the previous step.
+                \item For each bootstrap trial, we recreate an equilibrium trajectory by randomly
+                sampling pore spacings from the sub-trajectories
+                \item We get an average value for each pore spacing by finding the mean of the bootstrapped data
+                \item We calculate the overall average as the mean of all bootstrapped pore spacings
+                  %MRS3: this sounds a little convoluted below.  Should just be the standard error in the boostrap estimates of the pore spacing?
+                  %MRS3: this can be fixed in the draft not outline.
+                \item The uncertainty for each pore spacing is calculated as $\dfrac{<x> - x}{4}$ where $<x>$ is the
+                average spacing from the bootstrap trial and $x$ is the average value of one of the pore spacings.
+                \item We report the mean of these uncertainties
+                % MRS: need to deal with the fact only 4 are independent in the bootstrapping?  How did we do that?
+                % BJC: Updated
+        \end{itemize}
+
 \begin{wrapfigure}{R}{0.4\textwidth}
       \centering
       \includegraphics[width=0.4\textwidth]{tilt.png}
