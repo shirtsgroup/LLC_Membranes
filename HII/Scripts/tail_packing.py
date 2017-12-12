@@ -180,7 +180,7 @@ if __name__ == "__main__":
         angles = arrays['angles']
         centroids = arrays['centroids']
         atoms_per_frame = int(angles.shape[0] / centroids.shape[0])
-        angles = angles[args.start * atoms_per_frame : args.end * atoms_per_frame]
+        angles = angles[args.start * atoms_per_frame:args.end * atoms_per_frame]
         ld = arrays['ld']
         nlist = arrays['nlist']
 
@@ -189,7 +189,7 @@ if __name__ == "__main__":
 
     angles = [value for value in angles if not math.isnan(value)]
 
-    nbins = 180
+    nbins = 45
     (counts, bins) = np.histogram(angles, bins=nbins)
     # plt.hist(angles, bins=nbins)
     # plt.show()
@@ -202,10 +202,6 @@ if __name__ == "__main__":
 
     max1 = np.max(avg[int((-bins[0] - 40)/db):int((-bins[0] - 20)/db)])
     max2 = np.max(avg[int((-bins[0] + 25)/db):int((-bins[0] + 50)/db)])
-    print(np.where(avg == max2))
-    print(90 - np.where(avg == max1)[0][0]*db)
-    print(-90 + np.where(avg == max2)[0][1]*db)
-    print(max1, max2)
 
     plt.figure()
     bin_centers = [bins[i - 1] + ((bins[i] - bins[i - 1]) / 2) for i in range(1, len(bins))]
