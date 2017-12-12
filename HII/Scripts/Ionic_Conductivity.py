@@ -246,20 +246,14 @@ if __name__ == '__main__':
 
         print('Calculating Diffusivity')
 
-        endMSD = int(nT*fracshow)
-        startMSD = int(nT*frontfrac)
-
-        MSD, MSDs = Diffusivity.msd(pos_ion, ndx)
-
-        limits, D_avg, D_std = Diffusivity.bootstrap(nT, args.nboot, pos_ion.shape[1], MSDs, MSD, d, time, startMSD, endMSD)
+        MSD, endMSD, limits, D_avg, D_std = Diffusivity.dconst(pos_ion, nT, args.nboot, frontfrac, fracshow, d, dt, ndx)
 
         fit = 0
         while fit == 0:
 
             endMSD = int(nT*fracshow)
             startMSD = int(nT*frontfrac)
-            limits, D_avg, D_std = Diffusivity.bootstrap(nT, args.nboot, pos_ion.shape[1], MSDs, MSD, d, time, startMSD, endMSD)
-            # D_avg, D_std = Diffusivity.d_error(startMSD, endMSD, nT, limits, t.time, MSD, d)
+            D_avg, D_std = Diffusivity.d_error(startMSD, endMSD, nT, limits, t.time, MSD, d)
             errorevery = int(np.ceil(nT / 100.0))  # plot only 100 bars total
             plt.errorbar(dt * np.array(list(range(0, nT - 1))), MSD[:-1], yerr=[limits[0, :-1], limits[1, :-1]],
                          errorevery=errorevery, label='Calculated MSD')

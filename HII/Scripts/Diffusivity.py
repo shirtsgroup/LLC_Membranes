@@ -13,6 +13,7 @@ import mdtraj as md
 import top
 import time
 
+
 def initialize():
 
     parser = argparse.ArgumentParser(description='Calculate diffusion coefficient')
@@ -96,15 +97,14 @@ def msd(x, ndx):
     return MSD, MSDs
 
 
-def bootstrap(nT, Nbootstraps, no_comp, MSDs, MSD, d, times, start, end):
+def bootstrap(nT, Nbootstraps, no_comp, MSDs, MSD):
 
     eMSDs = np.zeros([nT, Nbootstraps], dtype=float)  # a set of MSDs per particle
-
     # Now, bootstrap over number of particles, assuming that the particles are sufficiently independent
-    for b in range(Nbootstraps):
+    for b in range(0, Nbootstraps):
         indices = np.random.randint(0, no_comp, no_comp)  # randomly select N of the particles with replacement
         # ^ makes a list of length Nparticles each with a random number from 0 to  Nparticles
-        for n in range(no_comp):
+        for n in range(0, no_comp):
             eMSDs[:, b] += MSDs[:, indices[n]]  # for this bootstrap trial b, add the MSDs of a randomly selected particle
             # to the particle at each time step
         eMSDs[:, b] /= no_comp  # Divide every timestep by Nparticles -- average the MSDs
@@ -116,22 +116,7 @@ def bootstrap(nT, Nbootstraps, no_comp, MSDs, MSD, d, times, start, end):
         limits[0, t] = np.abs(np.percentile(eMSDs[t, :], 2.5) - MSD[t])
         limits[1, t] = np.abs(np.percentile(eMSDs[t, :], 97.5) - MSD[t])
 
-    # generate error in slope
-    tot_pts = int(end - start)
-    # Weight least squares -- first generate a weight matrix
-    W = np.zeros((tot_pts, tot_pts))
-    for i in range(tot_pts):
-        W[i, i] = old_div(1,((limits[0, i + start])**2))
-
-    slopes = []
-    for i in range(Nbootstraps):
-        y_fit, _, slope_error, _, A = Poly_fit.poly_fit(times[start:end], eMSDs[start:end, i], 1, W)
-        slopes.append(A[1])
-
-    y_fit = Poly_fit.poly_fit(times[start:end], MSD[start:end], 1, W)[0]
-    plt.plot(times[start:end], y_fit, '--', color='black', label='Linear Fit')
-
-    return limits, np.mean(slopes)/(2*d*1000000), np.std(slopes)/(2*d*1000000)
+    return limits
 
 
 def d_error(startfit, endMSD, nT, limits, times, MSD, d):
@@ -156,15 +141,15 @@ def dconst(x, nT, Nbootstraps, frontfrac, fracshow, d, dt, ndx):
     end = time.time()
     print('MSDs done in %1.2f seconds' % (end - start))
 
+    limits = bootstrap(nT, Nbootstraps, x.shape[1], MSDs, MSD)
+    print('Bootstrapping Done')
+
     endMSD = int(nT*fracshow)
     startMSD = int(nT*frontfrac)
 
     times = dt*np.array(list(range(0, endMSD)))
 
-    limits, avg_D, std_D = bootstrap(nT, Nbootstraps, x.shape[1], MSDs, MSD, d, times, startMSD, endMSD)
-    print('Bootstrapping Done')
-
-    # avg_D, std_D = d_error(startMSD, endMSD, nT, limits, times, MSD, d)
+    avg_D, std_D = d_error(startMSD, endMSD, nT, limits, times, MSD, d)
 
     return MSD, endMSD, limits, avg_D, std_D
 
@@ -207,11 +192,7 @@ if __name__ == '__main__':
 
     dt = t.time[-1] - t.time[-2]  # time step (assuming equispaced time points)
 
-    MSD, MSDs = msd(pos, ndx)
-    startMSD = int(nT*args.frontfrac)
-    endMSD = int(nT*args.fracshow)
-    limits, D_avg, D_std = bootstrap(nT, args.nboot, pos.shape[1], MSDs, MSD, len(ndx), t.time, startMSD, endMSD)
-    # MSD, endMSD, limits, D_av, D_std = dconst(com, nT, args.nboot, args.frontfrac, args.fracshow, dimension, dt, ndx)
+    MSD, endMSD, limits, D_av, D_std = dconst(com, nT, args.nboot, args.frontfrac, args.fracshow, dimension, dt, ndx)
     # errorevery = int(np.ceil(args.fracshow*nT/100.0))  # plot only 100 bars total
     errorevery = int(np.ceil(nT/100.0))  # plot only 100 bars total
     # plt.errorbar(dt*np.array(list(range(0, endMSD))), MSD[:endMSD], yerr=[limits[0, :endMSD], limits[1, :endMSD]],
@@ -221,7 +202,7 @@ if __name__ == '__main__':
     plt.ylabel('MSD ($nm^2$)', fontsize=14)
     plt.xlabel('time (ps)', fontsize=14)
     plt.gcf().get_axes()[0].tick_params(labelsize=14)
-    plt.title('D = %1.2e $\pm$ %1.2e $m^{2}/s$' % (D_avg, D_std))
+    plt.title('D = %1.2e $\pm$ %1.2e $m^{2}/s$' % (D_av, D_std))
     plt.legend(loc=2)
     plt.tight_layout()
     plt.savefig('Diffusivity_%s.png' % args.axis)
