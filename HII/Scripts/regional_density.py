@@ -6,6 +6,7 @@ import Structure_char
 import numpy as np
 from llclib import physical
 import matplotlib.pyplot as plt
+import os.path as path
 
 
 def initialize():
@@ -17,6 +18,8 @@ def initialize():
     parser.add_argument('-b', '--begin', default=0, type=int, help='Frame to begin calculations')
     parser.add_argument('-e', '--end', default=-1, type=int, help='Frame to stop doing calculations')
     parser.add_argument('-bins', default=100, type=int, help='Number of bins to use')
+    parser.add_argument('-m', '--multi', nargs='+', help='Overlay the density of each region with the results from '
+                                                         'other trajectories')
 
     args = parser.parse_args()
 
@@ -52,17 +55,57 @@ def duplicate(pos, box):
 if __name__ == "__main__":
     
     args = initialize()  # parse the args
-    
+
+    regions = ['Tails', 'Head Groups', 'Sodium']
+
+    if args.multi:
+
+        colors = ['red', 'green', 'orange', 'blue']
+
+        n = len(args.multi)
+        system = np.load(args.multi[0])
+
+        # It is assumed that all of the data uses the same number of bins with the same bin width
+        r = system['r']
+        bin_width = system['bw']
+
+        results = np.zeros([n, len(regions), len(r)])
+
+        results[0, :, :] = system['results']
+
+        for i in range(1, n):
+
+            system = np.load(args.multi[i])
+            results[i, :, :] = system['results']
+
+        for i in range(len(regions)):
+            plt.figure(i)
+            for j in range(n):
+                plt.bar(r, results[j, i, :], bin_width, color=colors[j], alpha=0.6, label=path.splitext(args.multi[j])[0])
+
+            plt.title(regions[i])
+            plt.legend()
+            plt.ylabel('Component Number Density (number/nm$^2$)')
+            plt.xlabel('Distance from pore center (nm)')
+            # plt.ylim([0, 0.6])
+            plt.tight_layout()
+            plt.savefig("%s_density.png" % regions[i])
+
+        plt.show()
+
+        exit()
+
+    colors = ['red', 'green', 'blue']
     print('Loading trajectory...', end="")
     t = md.load('%s' % args.traj, top='%s' % args.gro)[args.begin:args.end]
     print('done')
 
-    regions = ['Tails', 'Head Groups', 'Sodium']
-    colors = ['red', 'green', 'blue']
     nT = t.n_frames
     npores = 4
 
     r_max = 0
+
+    results = np.zeros([len(regions), args.bins])
 
     for i, reg in enumerate(regions):
 
@@ -77,7 +120,11 @@ if __name__ == "__main__":
         equil = 0
         density, r, bin_width = Structure_char.compdensity(pos, p_centers, equil, t.unitcell_vectors, pores=npores, buffer=0, nbins=args.bins)
 
+        results[i, :] = density
+
         plt.bar(r, density, bin_width, color=colors[i], alpha=0.5, label=reg)
+
+    np.savez_compressed("density", results=results, r=r, bw=bin_width)
 
     plt.legend()
     plt.ylabel('Component Number Density (number/nm$^2$)')

@@ -59,10 +59,10 @@ def centroids(x, n):
     return centers
 
 
-def z_periodic(positions, unitcell_vectors, images=1):
+def z_periodic(positions, box, images=1):
     """
     :param positions: xyz positions of atoms in original box
-    :param unitcell_vectors: the unitcell vectors at each frame so we can calculate z height
+    :param box: the unitcell vectors at each frame so we can calculate z height
     :param images: number of images in the +/- z direction
     :return: new positions with n images in the +/- z direction where n=images
     """
@@ -97,7 +97,7 @@ def z_periodic(positions, unitcell_vectors, images=1):
     return periodic
 
 
-def zdf(positions, npores, atoms_per_layer, box, images=1, tol=0.01):
+def zdf(positions, npores, atoms_per_layer, box, bins, name, images=1, tol=0.01):
     """
     :param positions: xyz positions of atoms expanded periodically in the +/- z direction
     :param npores: number of pores
@@ -112,7 +112,7 @@ def zdf(positions, npores, atoms_per_layer, box, images=1, tol=0.01):
     z = np.zeros([nT, natoms, natoms])  # distance b/w each atom and all other atoms at each frame
     atoms_ppore = old_div(natoms, npores)
 
-    print('Calculating z distribution function of atom %s' % atom)
+    print('Calculating z distribution function of atom %s' % name)
     for t in tqdm.tqdm(list(range(nT))):
         for p in range(npores):
 
@@ -142,7 +142,7 @@ def zdf(positions, npores, atoms_per_layer, box, images=1, tol=0.01):
     # is calculated between an atom and itself (i.e. i = j above) or if atoms are in the same layer or different pores
 
     # bin everything
-    bins, edges = np.histogram(z.compressed(), bins=args.bins)
+    bins, edges = np.histogram(z.compressed(), bins=bins)
 
     end = 0
     while edges[end] < L:
@@ -163,7 +163,7 @@ def zdf(positions, npores, atoms_per_layer, box, images=1, tol=0.01):
     return edges[:int(end)], bins[:int(end)]
 
 
-def plot_zdf(z, d, end=-1):
+def plot_zdf(z, d, out, end=-1):
     """
     :param z: distance along membrane z dimension ([nbins])
     :param d: density at each z location
@@ -177,7 +177,7 @@ def plot_zdf(z, d, end=-1):
     plt.ylabel('Count', fontsize=14)
     plt.axes().tick_params(labelsize=14)
     plt.tight_layout()
-    plt.savefig('zdf.png')
+    plt.savefig('%s' % out)
     plt.show()
 
 
@@ -310,9 +310,9 @@ if __name__ == "__main__":
             centers = centroids(pos, args.apl)
             periodic = z_periodic(centers, box)
             atom = 'center of mass'
-            z, d = zdf(periodic, 4, args.apl, box)
+            z, d = zdf(periodic, 4, args.apl, box, args.bins, atom)
             d = np.trim_zeros(d, trim='b')
-            plot_zdf(z[:-2], d[:z.shape[0] - 2])
+            plot_zdf(z[:-2], d[:z.shape[0] - 2], 'zdf.png')
             # dbwl = spacing(z, d)
             # print('Distance between layers: %s' % dbwl)
             exit()
@@ -337,7 +337,7 @@ if __name__ == "__main__":
             # file_rw.write_gro_pos(periodic[0, :, :], 'first')
             # exit()
 
-            z, d = zdf(periodic, 4, args.apl, box)
+            z, d = zdf(periodic, 4, args.apl, box, args.bins, atom)
 
             if args.avg:
 
@@ -357,6 +357,6 @@ if __name__ == "__main__":
             plt.figure()
             plt.plot(freqs, ps)
             # dbwl = spacing(z, zdf_avg)
-            plot_zdf(z, zdf_avg[:z.shape[0]])
+            plot_zdf(z, zdf_avg[:z.shape[0]], 'zdf.png')
             # dbwl = spacing(z, zdf_avg)
             # print('Distance between layers: %s' % dbwl)
