@@ -556,7 +556,7 @@ Shirts}
   Our implementation requires long simulation times to achieve high degrees
   of crosslinking. For that reason we did not crosslink all systems tested, but only the most
   promising structure. We show that crosslinking does not significantly 
-  change any of our drawn conclusions in Section ~\ref{section:xlink}.
+  change any of our drawn conclusions in Section 3.6.
 
   \subsection{Equilibrium Calculations}
 
@@ -624,31 +624,29 @@ Shirts}
   \end{figure}
   
   We explored the pore composition by measuring the average number densities of
-  various monomer components as a function of distance from the pore centers. The
-  centers of the pores were located using the same method used to calculate the
-  equilibrium pore spacing. We looked at the average number density of sodium
-  ions, aromatic rings and carbon atoms making up the monomer tails. The radial
-  distance of all atoms in each group from the pore centers are binned, then
-  normalized by the volume of the annulus defined by the bin edges and z box
-  vector.
+  various monomer components as a function of distance from the pore centers.  We
+  looked at the average number density of sodium ions, aromatic rings and carbon
+  atoms making up the monomer tails. The radial distance of all atoms in each
+  group from the pore centers are binned, then normalized by the volume of the
+  annulus defined by the bin edges and z box vector.
   %BJC: Maybe write an equation here? It's hard to say precisely how I did it
   %in words without it sounding confusing 
 
   We calculated ionic conductivity using two different methods for robustness.
   The Nernst-Einstein relation relates the DC ionic conductivity to ion
   diffusivity, $D$, concentration, $C$, ion charge, $q$, the boltzmann constant,
-  $k_b$, and temperature, $T$: $$\sigma = \dfrac{q^2CD}{k_b T}$$. 
+  $k_b$, and temperature, $T$: $$\sigma = \dfrac{q^2CD}{k_b T}$$ 
   Sodium ion diffusion coefficients were found by calculating the slope
   of the linear region of the z-direction mean square displacement curve as
-  indicated by the einstein relation \cite{einstein_investigations_1956}.] We
-  looked at the MSD plot to determine where to begin and end a linear fit. Ion
+  indicated by the einstein relation \cite{einstein_investigations_1956}. We
+  visualized the MSD plot to determine where to begin and end a linear fit. Ion
   concentration was measured with respect to the volume of the entire unit cell. 
 
-  The second method, termed the 'Collective Diffusion' model, measures the
+  The second method, termed the Collective Diffusion model, measures the
   movement of the collective variable, Q, which is defined as the amount of
   charge transfer through the system and can be thought to represent the center
   of charge of the system. The conductance, $\gamma$ of the system can be
-  calculated as: $$ \gamma = \dfrac{D_Q}{k_b T} $$. Conversion to ionic
+  calculated as: $$ \gamma = \dfrac{D_Q}{k_b T} $$ Conversion to ionic
   conductivity is achieved by multiplying by channel length and dividing by the
   membrane cross sectional area.  $D_Q$ is the diffusion coefficient of the
   collective variable Q. It can be calculated using the einstein relation.  A
@@ -661,11 +659,11 @@ Shirts}
   \subsection{Determining the Spatial Configuration of Monomers}
 
   Our simulations best support a model built with 5 monomers per layer based on
-  the measured equlibrated pore-to-pore distances. To discern the composition of
+  the measured equilibrated pore-to-pore distances. To discern the composition of
   the monomer layers, addressing (\ref{point:monomernum}), we ran simulations of
   systems created with 4 - 8 monomers per layer. Systems were built in both the
   parallel displaced and sandwiched configurations with layers initially spaced
-  3.7 \AA~ apart. Equilibrated configurations were prepared according to the dry
+  3.7 \AA~apart. Equilibrated configurations were prepared according to the dry
   equilibration procedure. All systems are stable after 400 ns of simulation. In
   a sense, all systems are at least metastable, addressing
   (\ref{point:metastable}), however not all will make physical sense or fit the
@@ -676,25 +674,25 @@ Shirts}
   (Figure~\ref{fig:SAXS}). The remainder of this discussion will focus on the
   analysis of systems built with 5 monomers per layer.
 
-  We learned that layers are well-defined and persistent, answering
-  (\ref{point:layers}). We established our conclusion by plotting the pair
-  correlation function, $g(z)$ calculated between atoms along the length of the
-  pores (Fig.~\ref{fig:zdf}). We measured $g(z)$ with respect to aromatic rings in
-  the head groups and, separately, with respect to carbon atoms in the alkane
-  chains. Using a fourier transform of $g(z)$, we see that sandwiched
-  configuration layers stack 4.39 \angstrom apart while parallel displaced
-  configuration layers stack 4.38 \angstrom apart.
-
   \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{p2p.png}
-	\caption{The pore spacing (given in nm) of the model increases as
-	number of monomers in each layer increases. The pore spacing of a system
-	starting in the sandwiched configuration is systematically lower than 
-	that started in an offset configuration. Systems built with 5 monomers
-	per layer in a parallel displaced configuration result in a pore spacing
-	closest to the experimental value of 4.12 nm}~\label{fig:p2p}
+	\caption{Systems built with 5 monomers per layer in a parallel
+		displaced configuration result in a pore spacing closest to the experimental
+		value of 4.12 nm. The pore spacing of the model increases as number of monomers
+		in each layer increases. The pore spacing of a system starting in the
+		sandwiched configuration is systematically lower than that started in an offset
+		configuration. }~\label{fig:p2p}
   \end{figure}  
+
+  We learned that layers are well-defined and persistent, answering
+  (\ref{point:layers}). We established our conclusion by plotting the pair
+  correlation function, $g(z)$, calculated between atoms along the length of the
+  pores (Fig.~\ref{fig:zdf}). We measured $g(z)$ with respect to aromatic rings in
+  the head groups and, separately, with respect to carbon atoms in the alkane
+  chains. Using a fourier transform of $g(z)$, we see that sandwiched
+  configuration layers stack 4.39 \angstrom~ apart while parallel displaced
+  configuration layers stack 4.38 \angstrom~ apart.
 
   \begin{figure}
         \centering
@@ -722,12 +720,12 @@ Shirts}
   with 5 monomers per layer in the parallel displaced and sandwiched
   configurations. Simulated patterns were generated using portions of simulation
   trajectory after equilibration. The patterns for both structures are shown and
-  compared to experiment in Figure ~\ref{fig:XRDsim}.
+  compared to experiment in Figure \ref{fig:XRDsim}.
 
   Simulated XRD of the sandwiched configuration contains all experimental
   features except for R-helix. R-alkanes, R-spots and R-pores appear close to their
   expected locations. R-$\pi$ is also present, however it intersects R-alkanes at
-  a q value lower than experiment meaning the head groups in our model prefer 
+  a $q_z$ value lower than experiment meaning the head groups in our model prefer 
   to stack farther apart. 
 
   The parallel displaced configuration results in a simulated XRD pattern with
@@ -737,7 +735,7 @@ Shirts}
   relative to R-alkanes when compared to the sandwiched configuration. R-helix
   appears due to the parallel displaced aromatic rings. It is a subharmonic
   of R-$\pi$ since the nearest vertically stacked head group to any given head
-  group is 7.4 \AA away. 
+  group is 7.4 \AA~ away. 
 
   \begin{figure}
   \begin{subfigure}{0.3\linewidth}
@@ -812,18 +810,18 @@ Shirts}
   previously used to explain R-spots}~\label{fig:tilt}
   \end{figure}
 
-  The peaks in the tilt angle distribution are consistent with the location of
-  R-spots. The peaks of interest in Figures \ref{fig:offset_tails} and
-  \ref{fig:layered_tails} are located at $\pm$ 33 $\degree$ which is the same
+  The peaks in the nearest neighbor angle distribution are consistent with the
+  location of R-spots. The peaks of interest in Figures \ref{fig:offset_tails}
+  and \ref{fig:layered_tails} are located at $\pm$ 33 $\degree$ which is the same
   location where the highest intensity of spots are located on the simulated
   patterns. We confirmed this conclusion by radially integrating the 2D WAXS
-  pattern for $\left|\mathbf{q}\right|$ values between 1.57 and 1.4 (real space between 4 and 4.5 \AA). We
-  observe that distinct peaks appear ca. 30 $\degree$, in close agreement with
-  the previously measured angle distribution
-  (Figs.~\ref{fig:offset_integration}~and~\ref{fig:layered_integration}). We performed the
-  same integration on the raw experimental data and found the angle at which
-  R-spots reaches its highest intensity to be $\pm$ 37 $\degree$ which is a
-  reconcilable difference with our simulated results.  
+  pattern for $\left|\mathbf{q}\right|$ values between 1.4 and 1.57 (between 4
+  and 4.5 \AA~ in real space). We observe that distinct peaks appear ca. 30
+  $\degree$, in close agreement with the previously measured angle distribution
+  (Figs.~\ref{fig:offset_integration}~and~\ref{fig:layered_integration}). We
+  performed the same integration on the raw experimental data and found the angle
+  at which R-spots reaches its highest intensity to be $\pm$ 37 $\degree$ which
+  is a reconcilable difference with our simulated results.  
 
   \begin{figure}
 	\centering
@@ -870,8 +868,7 @@ Shirts}
 		        \includegraphics[width=\linewidth]{layered_angle_v_I.png}
 		        \caption{}~\label{fig:layered_integration}
 		\end{subfigure}
-	\end{subfigure}
-%MRS: 
+	\end{subfigure} 
   \caption{The distribution of angles w.r.t. the xy plane between alkane chain tail centroids and nearest
   neighbor centroids for equilibrated parallel displaced (a) and sandwiched (c) configurations. The
   same peaks are visible when the 2D simulated diffraction data is radially integrated in the R-alkanes region,
@@ -882,7 +879,7 @@ Shirts}
 
 %  The $z$-direction correlation functions show that layers in our model prefer
 %  to stack further apart than 3.7 \angstrom as suggested by experiment.
-  When systems are built with layers stacked 5.0 \AA~ apart then
+  When systems are built with layers stacked 5.0 \AA~apart then
   equilibrated, we observe long-term stability of a qualitatively different
   configuration suggesting that we have found another metastable free energy
   basin, further corroborating (\ref{point:metastable}). We studied this type of
@@ -941,7 +938,7 @@ Shirts}
   and the sodium ions (Figure~\ref{fig:densities}). For the head group region,
   we used the carbon atoms making up the aromatic ring. For the tail region we
   used only carbon atoms of the monomer tails (See Supplemental Information for
-  diagram). Histograms are average over at least 50 ns of equilibrated trajectory.
+  diagram). Histograms are averaged over at least 50 ns of equilibrated trajectory.
 
   In all cases, the space in the pore region is filled with sodium ions and
   head groups. There is a clear partition between the hydrophobic and hydrophilic
@@ -949,7 +946,7 @@ Shirts}
   water is introduced to the system, water molecules will occupy the hydrophilic region
   and open up the pores for aqueous solute transport. 
 
-  The sandwiched configuration (Fig.~\ref{fig:layered_density}) shows a relatively
+  The sandwiched configuration (Fig. \ref{fig:layered_density}) shows a relatively
   ordered pore structure. The number densities of components in all other
   configurations are comparable. In contrast, sodium ions and head groups in the
   sandwiched configuration are highly concentrated away from the pore center
@@ -1026,7 +1023,7 @@ Shirts}
   In systems built with 5 wt~\% water, the pore region becomes filled with
   water. We plotted the number density of components in this system and see that
   the pores become a soup of water molecules and sodium ions (Fig.
-  \ref{fig:water_density}. This system is a closer representation of the
+  \ref{fig:water_density}). This system is a closer representation of the
   H\textsubscript{II} phase which is typically synthesized with ca. 8 wt \%
   water. We believe that the hydrated membrane pores will be valuable for aqueous
   separations. Further analysis of and transport within the H\textsubscript{II}
@@ -1072,8 +1069,8 @@ Shirts}
   shown that there is a large dependence of ionic conductivity on the alignment
   of the pores. The ionic conductivity of an unaligned film is ca. 85 times lower
   than that of a nearly aligned film referenced here. We hypothesize that a thin,
-  perfectly aligned film would have a value of ionic conductivity in agreement
-  with our model.
+  perfectly aligned film would have a value of ionic conductivity in close 
+  agreement with our model.
 
   \begin{figure}
         \centering
@@ -1081,7 +1078,7 @@ Shirts}
         \caption{Calculated ionic conductivity using the Nernst-Einstein relation
         and Collective Diffusion model agree with error. Both methods give calculated
         values of ionic conductivity an order of magnitude higher than the experimental
-        value}
+        value.}
         \label{fig:conductivity}
   \end{figure}
 
@@ -1091,11 +1088,12 @@ Shirts}
   significantly when we applied the crosslinking algorithm to the equilibrated
   parallel-displaced configuration built with 5 monomers per layer. We simulated
   the crosslinked system in the NPT ensemble for 100 ns. The distance between
-  pores shrinks by 0.4 \angstrom~ after the system is crosslinked. All major
-  features are still present in the X-ray diffraction, however at lower
-  intensities (Fig.~\ref{fig:rzplot_xlink}). We calculated the ionic conductivity using
-  the Nernst-Einstein relation and found that it is lower in the crosslinked
-  system (Fig.~\ref{fig:IC_xlink}).
+  pores shrinks by 0.4 \angstrom~ and the distance between layers increases by
+  0.04 \AA~ after the system is crosslinked. All major features are still present
+  in the simulated XRD patterns, however at lower intensities
+  (Fig.~\ref{fig:rzplot_xlink}). We calculated the ionic conductivity using the
+  Nernst-Einstein relation and found that it is lower in the crosslinked system
+  (Fig.~\ref{fig:IC_xlink}).
 
   \begin{figure}
   \centering
@@ -1131,17 +1129,19 @@ Shirts}
   
   % add stuff about pore structure and 'disordered' basin once there are concrete results 
   We have used a detailed molecular model of the Col\textsubscript{h} phase
-  formed by NA-GA3C11 in order to study its nanoscopic structure. While there
+  formed by Na-GA3C11 in order to study its nanoscopic structure. While there
   have been efforts to model formation of various liquid crystalline phases with
   molecular dynamics, to our knowledge there have been no studies which attempt
   to examine their structure with the same level of detail presented here.
-  Evidence strongly supports that layers are composed of 5 monomers. We have
-  confirmed that monomers stay partitioned into layers. We have explored the
-  affect of two different $\pi$-$\pi$ stacking modes on the equilibrated membrane
-  strucure. Simulated diffration patterns generated from MD trajectories suggest
-  that the parallel-displaced configuration produces a structure with the closest
-  match to experiment. Finally, water is not needed to create well-definied pore
-  structures. Now that we have a good idea of what the membrane structure should
+  Evidence strongly supports that monomers stay partitioned into layers and that
+  each layer contains 5 monomers. We have explored the affect of two different
+  $\pi$-$\pi$ stacking modes on the equilibrated membrane strucure. Simulated
+  diffration patterns generated from MD trajectories suggest that the
+  parallel-displaced configuration produces a structure with the closest match to
+  experiment. Finally, water is not needed to create well-definied pore
+  structures. 
+
+  Now that we have a good idea of what the membrane structure should
   look like, we will evaluate transport of various solutes within the system. We
   will apply the knowledge gained from this study in order to suggest
   improvements to the existing system as well as to evaluate new unsynthesized
