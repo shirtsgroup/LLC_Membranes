@@ -37,7 +37,7 @@ def initialize():
                                                                                                 '[x y z] ')
     parser.add_argument('-angles', '--angles', nargs='+', default=[90, 90, 60], type=float, help='angles between box'
                         'vectors (yz, xz, xy) -- the order of these is inspired by the gromacs tool "editconf"')
-    parser.add_argument('-n', '--npoints', default=10000, type=int, help='number of points to place in each frame')
+    parser.add_argument('-n', '--npoints', default=55200, type=int, help='number of points to place in each frame')
     parser.add_argument('-f', '--nframes', default=100, type=int, help='number of frames')
     parser.add_argument('-particle', default='NA', type=str, help='name of atom/particle to place in space')
     parser.add_argument('--gaussian', action="store_true", help='Allow points inside features with gaussian probability')

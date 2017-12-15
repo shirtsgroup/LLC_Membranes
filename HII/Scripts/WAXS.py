@@ -37,7 +37,9 @@ for i in range(23):
     waxs[x, y] = 0
 
 fig, ax = plt.subplots()
-
+# plt.imshow(waxs, cmap='jet')
+# plt.show()
+# exit()
 ####### Isolate to a ring bounded by outer and inner #######
 waxs2 = np.zeros_like(waxs)
 
@@ -78,12 +80,12 @@ print('Average intensity in alkane region: %s' % (intensity/count))
 #     counts[inds[i]] += 1
 
 # plt.imshow(waxs2, cmap='jet')
-#################################
+# #################################
 # plt.show()
 
 #waxs /= np.amax(waxs)  # normalize with respect to highest intensity in pi-stacking reflection
 # waxs /= (intensity/count)
-plt.imshow(waxs, cmap='jet', vmax=2.25*(intensity/count), extent=[-qmax, qmax, -qmax, qmax])
+plt.imshow(waxs, cmap='jet', vmax=2.5*(intensity/count), extent=[-qmax, qmax, -qmax, qmax])
 plt.xlabel('$q_r$', fontsize=14)
 plt.ylabel('$q_z$', fontsize=14)
 plt.gcf().get_axes()[0].tick_params(labelsize=14)

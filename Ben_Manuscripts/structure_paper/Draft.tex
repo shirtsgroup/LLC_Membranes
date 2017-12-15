@@ -144,11 +144,14 @@ Shirts}
 
   %BJC: Made my own version of the above, leaving out alignment details since it'
 
+  %BJC: TODO: Scalable vector graphic for monomer structure, make bigger. Convert .svg to .eps
+  %           Thicken slabs
+  %           Make pore region on slab (blue) bigger
+  %           Bump up atom sizes in atomistic render
   \begin{figure}
 	\centering
 	\begin{subfigure}{.3\textwidth}
 		\centering
-		%\includegraphics[width=\linewidth, trim={2.5cm 0 4cm 1.25cm}, clip]{WAXS_raw.png}
 		\includegraphics[width=\textwidth]{NaGA3C11.png}
 		\caption{}~\label{fig:monomer}
 	\end{subfigure}
@@ -202,14 +205,15 @@ Shirts}
   membranes. A good molecular model should incorporate a detailed picture of the
   nanoscopic pore structure which will be crucial to understanding the role of
   monomer structure in solute transport and membrane design. Models resulting
-  from molecular dynamics simulations will provide the required level of detail.
+  from molecular dynamics simulations will provide the required level of detail (Fig. \ref{fig:detail}).
   We can directly observe solute transport and suggest governing mechanisms. We
   can observe how the choice of head group may influence pore size for size
   exclusion driven separations. We can interchange counterions which may
   influence both the pore size and the strength of the Donnan potential which
   affects the degree to which the membrane can exclude charged species. 
 
-  % BJC: improve this figure
+  % BJC: TODO: Make new rendering of wedges
+  %            Change color scheme 
   \begin{figure}
   \centering
 	\begin{subfigure}{0.45\linewidth}
@@ -375,6 +379,7 @@ Shirts}
   about structure which have been drawn from X-ray diffraction (XRD) experiments
   and in matching ionic conductivity measurements \cite{feng_thin_2016}.
 
+  %BJC: TODO: update colorbar
   \begin{figure}
         \centering
         \begin{subfigure}[t]{0.43\linewidth}
@@ -435,6 +440,7 @@ Shirts}
   structure close to one of a number of hypothesized equilibrium configurations
   (Figure~\ref{fig:python}).
 
+  %BJC: TODO: reproduce figure in latex (or gimp?) with higher resolution arrows
   \begin{figure}
 	\centering
 	\includegraphics[width=0.75\linewidth]{build.PNG} %BJC: put an xyz axis with the unit cell
@@ -588,6 +594,16 @@ Shirts}
   experimental 2D WAXS patterns by adjusting the initial spacing between layers
   and the orientation of the head groups with respect to adjacent layers.
 
+  The colorbars on all diffraction patterns are normalized relative to
+  R-alkanes. We calculated the average intensity within R-alkanes of the
+  experimental pattern, $I_{avg}$.  We exclude intensities within $\pm$
+  30\degree~of the $q_r=0$ axis, since the simulated patterns differ from
+  experiment in those regions (See Fig. \ref{fig:XRDsim}).  We multiplied $I_{avg}$
+  by a scaling factor of 2.5.  Intensities that appear in the experimental
+  pattern $\geq$ 2.5$*I_{avg}$ receive colorbar values of 1. The result of this
+  colorbar scaling method is shown in Figure \ref{fig:WAXS}. We apply the same
+  scaling method to the simulated patterns.  
+
   % BJC: I think this figure belongs somewhere else
   \begin{figure}
 	\centering
@@ -694,6 +710,7 @@ Shirts}
   configuration layers stack 4.39 \angstrom~ apart while parallel displaced
   configuration layers stack 4.38 \angstrom~ apart.
 
+  %BJC: TODO: increase font size on legends
   \begin{figure}
         \centering
         \begin{subfigure}{0.45\textwidth}
@@ -729,14 +746,14 @@ Shirts}
   to stack farther apart. 
 
   The parallel displaced configuration results in a simulated XRD pattern with
-  the closest match to experiment. It produces the only pattern that exhibits
-  all major reflections. R-alkanes, R-pores and R-$\pi$ appear as they do in the
-  sandwiched configuration. R-spots appears, however with a lower intensity
-  relative to R-alkanes when compared to the sandwiched configuration. R-helix
-  appears due to the parallel displaced aromatic rings. It is a subharmonic
-  of R-$\pi$ since the nearest vertically stacked head group to any given head
-  group is 7.4 \AA~ away. 
+  the closest match to experiment. It produces the only pattern that exhibits all
+  major reflections. R-alkanes and R-pores appear as they do in the
+  sandwiched configuration. R-spots and R-$\pi$ appears, however with a lower intensity relative to
+  R-alkanes when compared to the sandwiched configuration. R-helix appears due to
+  the parallel displaced aromatic rings. It is a subharmonic of R-$\pi$ since the
+  nearest vertically stacked head group to any given head group is 7.4 \AA~ away. 
 
+  %BJC: adjust figure size and alignment -- probably easiest to set figure size in matplotlib
   \begin{figure}
   \begin{subfigure}{0.3\linewidth}
         \centering
@@ -746,8 +763,8 @@ Shirts}
   \end{subfigure}
   \begin{subfigure}{0.3\linewidth}
         \centering
-        \vspace{0.25em}
-        \includegraphics[scale=0.0987]{WAXS_raw.png}
+%        \vspace{0.25em}
+        \includegraphics[scale=0.29]{WAXS_raw.png}
         \caption{}~\label{fig:raw_waxs}
   \end{subfigure}
   \begin{subfigure}{0.3\linewidth}
@@ -806,8 +823,8 @@ Shirts}
   \centering
   \includegraphics[width=0.5\linewidth]{tilt_dist.png}
   \caption{The tilt angle distribution of alkane chain tails with respect to the membrane plane
-  indicates an average tilt angle near 7\degree which is far from the 37\degree tilt angle 
-  previously used to explain R-spots}~\label{fig:tilt}
+  indicates an average tilt angle near 7\degree~which is far from the 37\degree~tilt angle 
+  previously used to explain R-spots.}~\label{fig:tilt}
   \end{figure}
 
   The peaks in the nearest neighbor angle distribution are consistent with the
@@ -835,11 +852,10 @@ Shirts}
 		\includegraphics[width=\textwidth]{tails_rzplot.png}
 		\caption{}\label{fig:tails_rzplot}
 	\end{subfigure}
-	\caption{(a) All atoms except carbon atoms making up the tails are removed from the 
-	trajectory. (b) The simulated diffraction pattern of the tail-only trajectory still 
-        shows R-spots}\label{fig:tails}
+	\caption{(a) All atoms except carbon atoms making up the tails are removed from a 
+	sandwiched configuration trajectory. (b) The simulated diffraction pattern of the
+        tail-only trajectory still shows R-spots}\label{fig:tails}
   \end{figure}
- 
 
   \begin{figure}[!htb]
   \centering
@@ -890,9 +906,9 @@ Shirts}
   (Fig.~\ref{fig:p2p_disordered}) and a corresponding increase in the equilibrated
   distance between layers (Fig.~\ref{fig:dbwl_disordered}). The simulated X-ray
   diffraction patterns indicate further structural differences. In the parallel
-  displaced configuration, R-spots fades to the point that it is indistinguisable
-  from R-alkanes (Fig. ~\ref{fig:offset_disordered_xrd}). In the sandwiched
-  configuration, R-spots is present in different locations, showing higher
+  displaced configuration, almost all contrast between R-spots and R-alkanes is faded
+  (Fig. ~\ref{fig:offset_disordered_xrd}). In the sandwiched
+  configuration, R-spots is weakly present, but in different locations, showing higher
   intensity at the top and bottom of the pattern as well as at the intersection
   of R-alkanes with q$_z$ = 0 (Fig. ~\ref{fig:layered_disordered_xrd}). 
 
@@ -923,10 +939,10 @@ Shirts}
                 \includegraphics[width=\linewidth]{layered_disordered_rzplot.png}
                 \caption{}~\label{fig:layered_disordered_xrd}
         \end{subfigure}
-	\caption{In comparison to systems built with 3.7 \AA initial layer spacing,  
+	\caption{In comparison to systems built with 3.7 \AA~ initial layer spacing,  
                 the simulated X-ray diffraction patterns of the parrallel displaced (a) and 
  		sandwiched (b) configurations are different when systems are built with 
- 		a 5 \AA initial layer spacing, most notably in the region bounded by R-alkanes.
+ 		a 5 \AA~ initial layer spacing, most notably in the region bounded by R-alkanes.
       		When layers are stacked further apart, the distance between layers increases (c)
                 and the pore spacing decreases (d).}
   \end{figure}
@@ -954,6 +970,8 @@ Shirts}
   to be unstable in a real system, further supporting the physical realism of the
   parallel displaced configuration. 
 
+  % BJC: TODO: Increase font size
+  %            Put insets in the figures that make it clear what configuration each represents
   \begin{figure}
   \centering
   \begin{subfigure}{0.45\textwidth}
@@ -995,6 +1013,8 @@ Shirts}
   molecules for each monomer layer. Figure ~\ref{fig:solvation} shows the
   simulated diffraction patterns resulting from each configuration.
 
+  % BJC: TODO: reformat
+  %            adjust colorbar
   \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{solvation.png}  % still working on formatting so this is a screenshot of a doctored latex figure
@@ -1029,6 +1049,7 @@ Shirts}
   separations. Further analysis of and transport within the H\textsubscript{II}
   phase are left for future studies.
 
+  %BJC: TODO: Bigger fonts
   \begin{figure}
   \centering 
   \begin{subfigure}{0.45\textwidth}
@@ -1071,7 +1092,7 @@ Shirts}
   than that of a nearly aligned film referenced here. We hypothesize that a thin,
   perfectly aligned film would have a value of ionic conductivity in close 
   agreement with our model.
-
+ 
   \begin{figure}
         \centering
         \includegraphics[width=0.5\linewidth]{IC_offset.png}
@@ -1095,6 +1116,7 @@ Shirts}
   Nernst-Einstein relation and found that it is lower in the crosslinked system
   (Fig.~\ref{fig:IC_xlink}).
 
+  %BJC: add units
   \begin{figure}
   \centering
   \begin{subfigure}{0.45\textwidth}
