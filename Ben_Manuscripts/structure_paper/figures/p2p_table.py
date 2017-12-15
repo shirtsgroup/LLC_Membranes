@@ -21,7 +21,7 @@ plt.bar([p + width for p in pos], df['offset'], width, label=df['nmon'][1], yerr
 
 ax.set_xticks([p + .5*width for p in pos])
 ax.set_xticklabels(df['nmon'], fontsize=14)
-ax.set_ylabel('Pore-to-Pore Distance', fontsize=14)
+ax.set_ylabel('Pore-to-Pore Distance (nm)', fontsize=14)
 ax.set_xlabel('Number of monomers per layer', fontsize=14)
 plt.legend(['Sandwiched', 'Parallel Displaced'],fontsize=14)
 plt.tick_params(axis='both', labelsize=14)

@@ -34,6 +34,7 @@ sf = np.load('out_wiggle_sf.npz')
 
 D = sf['kgridplt']
 
+
 # R = (D[:, :, :, 0]**2).astype(np.float16) + (D[:, :, :, 1]**2).astype(np.float16) + (D[:, :, :, 2]**2).astype(np.float16)
 
 x = D.shape[0]

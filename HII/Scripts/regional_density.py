@@ -20,6 +20,8 @@ def initialize():
     parser.add_argument('-bins', default=100, type=int, help='Number of bins to use')
     parser.add_argument('-m', '--multi', nargs='+', help='Overlay the density of each region with the results from '
                                                          'other trajectories')
+    parser.add_argument('-s', '--solvate', action="store_true",
+                        help='If the system is solvated, plot the number density of water as well')
 
     args = parser.parse_args()
 
@@ -107,6 +109,20 @@ if __name__ == "__main__":
 
     results = np.zeros([len(regions), args.bins])
 
+    keep = [a.index for a in t.topology.atoms if a.residue.name != 'HOH']  # everything kept if system not solvated
+
+    p_centers = physical.avg_pore_loc(npores, t.xyz[:, keep, :])
+
+    if args.solvate:
+
+        print('Calculating number density of solvent')
+        keep = [a.index for a in t.topology.atoms if a.residue.name == 'HOH' and a.name == 'O']
+        pos = t.xyz[:, keep, :]
+        p = duplicate(pos, t.unitcell_vectors)
+        equil = 0
+        density, r, bin_width = Structure_char.compdensity(pos, p_centers, equil, t.unitcell_vectors, pores=npores, buffer=0, nbins=args.bins)
+        plt.bar(r, density, bin_width, color='orange', alpha=0.5, label='Water')
+
     for i, reg in enumerate(regions):
 
         print('Calculating number density of %s region' % reg)
@@ -114,8 +130,6 @@ if __name__ == "__main__":
         pos = Structure_char.restrict_atoms(t, reg)  # restrict trajectory to region
 
         p = duplicate(pos, t.unitcell_vectors)  # duplicate things periodically
-
-        p_centers = physical.avg_pore_loc(npores, pos)
 
         equil = 0
         density, r, bin_width = Structure_char.compdensity(pos, p_centers, equil, t.unitcell_vectors, pores=npores, buffer=0, nbins=args.bins)
@@ -129,7 +143,7 @@ if __name__ == "__main__":
     plt.legend()
     plt.ylabel('Component Number Density (number/nm$^2$)')
     plt.xlabel('Distance from pore center (nm)')
-    plt.ylim([0, 0.6])
+    plt.ylim([0, 1.3])
     plt.tight_layout()
     plt.savefig("regional_density.png")
     plt.show()

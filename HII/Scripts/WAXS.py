@@ -37,8 +37,53 @@ for i in range(23):
     waxs[x, y] = 0
 
 fig, ax = plt.subplots()
-waxs /= np.amax(waxs)  # normalize with respect to highest intensity in pi-stacking reflection
-plt.imshow(waxs, cmap='jet', extent=[-qmax, qmax, -qmax, qmax])
+
+####### Isolate to a ring bounded by outer and inner #######
+waxs2 = np.zeros_like(waxs)
+
+outer = 235
+inner = 180
+
+nbins = 45
+bins = np.linspace(-90, 90, nbins)
+
+angles = []
+intensity = 0
+count = 0
+center = waxs2.shape[0] / 2
+for i in range(waxs.shape[0]):
+    for j in range(waxs.shape[1]):
+        if inner < np.linalg.norm([abs(i - center), abs(j - center)]) < outer:
+            intensity += waxs[i, j]
+            waxs2[i, j] = waxs[i, j]
+            count += 1
+            # if (j - center) == 0:
+            #     waxs2[i, j] = waxs[i, j]
+            #     # angles.append((180/np.pi)*np.arctan((i - center)/(j - center)))
+            #     # angles.append(90)
+            #     # intensity.append(waxs[i, j])
+            # elif -60 < (180/np.pi)*np.arctan((i - center)/(j - center)) < 60:
+            #     waxs2[i, j] = waxs[i, j]
+            #     angles.append((180/np.pi)*np.arctan((i - center)/(j - center)))
+            #     intensity.append(waxs[i, j])
+
+print('Average intensity in alkane region: %s' % (intensity/count))
+
+# print(np.min(angles))
+# inds = np.digitize(angles, bins)
+# I = np.zeros([nbins])
+# counts = np.zeros([nbins])
+# for i in range(len(inds)):
+#     I[inds[i]] += intensity[i]
+#     counts[inds[i]] += 1
+
+# plt.imshow(waxs2, cmap='jet')
+#################################
+# plt.show()
+
+#waxs /= np.amax(waxs)  # normalize with respect to highest intensity in pi-stacking reflection
+# waxs /= (intensity/count)
+plt.imshow(waxs, cmap='jet', vmax=2.25*(intensity/count), extent=[-qmax, qmax, -qmax, qmax])
 plt.xlabel('$q_r$', fontsize=14)
 plt.ylabel('$q_z$', fontsize=14)
 plt.gcf().get_axes()[0].tick_params(labelsize=14)

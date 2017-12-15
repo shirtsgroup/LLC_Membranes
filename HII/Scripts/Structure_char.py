@@ -89,7 +89,7 @@ def restrict_atoms(t, component):
 
     if component != 'sys':
 
-        atoms_to_keep = [a.index for a in t.topology.atoms if a.name in atoms]
+        atoms_to_keep = [a.index for a in t.topology.atoms if a.name in atoms and a.residue.name != 'HOH']
         pos = t.xyz[:, atoms_to_keep, :]
 
     else:
