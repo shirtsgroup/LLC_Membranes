@@ -19,6 +19,7 @@ import math
 # x = [1.01, 1.27, 1.85, 2.38, 2.83, 3.13, 3.96, 4.91]
 # y = [0.00, 0.19, 0.58, 0.96, 1.26, 1.47, 2.07, 2.75]
 
+
 def z_matrix(degree, t):
     Z = np.zeros((len(t), degree + 1))
     for i in range(0, degree + 1):

@@ -4,8 +4,8 @@ set -e  # exit immediately after error
 
 BUILD_MON="NAcarb11V"
 start_config="initial.gro"
-x=9
-y=9
+x=9.5
+y=9.5
 z=7.4
 ring_restraints="C C1 C2 C3 C4 C5"
 forces="3162 56 8 3 2 1 0"
@@ -75,8 +75,9 @@ done
 #input.py --mdp -b ${BUILD_MON} -l 20000 --restraints --temp ${T} -f 50 --genvel no  # use velocities from previous sim
 #gmx grompp -f npt.mdp -p topol.top -c npt.gro -o wiggle
 input.py -b ${BUILD_MON} -l 5000 --temp ${T} -f 50 --barostat berendsen --genvel no # put pressure control back on
-gmx grompp -f npt.mdp -p topol.top -c 0.gro -o wiggle # run it out for a bit
-gmx mdrun -v -deffnm wiggle
+gmx grompp -f npt.mdp -p topol.top -c 0.gro -o berendsen # run it out for a bit
+#gmx mdrun -v -deffnm wiggle
+exit
 
 input.py -b ${BUILD_MON} -l ${equil_length} --temp ${T} -f 1000 --barostat Parrinello-Rahman --genvel no
 gmx grompp -f npt.mdp -p topol.top -c wiggle.gro -o wiggle

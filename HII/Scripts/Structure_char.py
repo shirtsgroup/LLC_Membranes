@@ -280,7 +280,7 @@ def p2p_stats(p2ps, exclude, nboot, equil):
     return ensemble_avg, p2p_std, t
 
 
-def compdensity(component, pore_centers, start, box, cut=2, pores=4, nbins=50, rmax=3.5, buffer=0.0):
+def compdensity(component, pore_centers, start, box, cut=1.5, pores=4, nbins=50, rmax=3.5, buffer=0.0):
 
     """
     :param component: the coordinates of the component(s) which you want a radial distribution of at each frame
@@ -303,7 +303,7 @@ def compdensity(component, pore_centers, start, box, cut=2, pores=4, nbins=50, r
     n_ppore = tot_atoms // pores  # the total number of components in each pore
 
     nT = component.shape[0]
-
+    zbox = np.mean(box[:, 2, 2])
     # Find the approximate max and minimum z values of the components based on the last frame
 
     zmax = np.max(component[-1, :, 2])
@@ -323,7 +323,7 @@ def compdensity(component, pore_centers, start, box, cut=2, pores=4, nbins=50, r
     #                 dist = np.linalg.norm(component[k, i * n_ppore + j, :2] - pore_centers[:, i, k])
     #                 dist_from_center.append(dist)
 
-    density = np.zeros([nbins])
+    density = np.zeros([nbins])  # number / nm^3
     for t in tqdm.tqdm(range(start, nT)):
         for p in range(pores):
             # narrow down the positions to those that are with 'cut' of at least one pore
@@ -337,15 +337,17 @@ def compdensity(component, pore_centers, start, box, cut=2, pores=4, nbins=50, r
             hist, bin_edges = np.histogram(d_sorted[:stop], bins=nbins, range=(0, cut))  # the range option is necessary
             #  to make sure we have equal sized bins on every iteration
 
-            density += hist / box[t, 2, 2]
+            density += hist
 
-    density /= (tot_atoms*pores*(nT - start))  # take average
-    bin_width = cut / (nbins)
+    density /= zbox*(nT - start)  # take average
+    bin_width = cut / nbins
 
     # normalize based on area of anulus where bin is located
     r = np.zeros([nbins])
+    normalization = []
     for i in range(nbins):
-        density[i] /= np.pi*(bin_edges[i+1] - bin_edges[i])**2
+        normalization.append(np.pi*(bin_edges[i+1]**2 - bin_edges[i]**2))
+        density[i] /= np.pi*(bin_edges[i+1]**2 - bin_edges[i]**2)
         r[i] = (bin_edges[i + 1] + bin_edges[i])/2
 
     # dist_from_center = np.array(dist_from_center)

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.9.22)  22 SEP 2017 15:58
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.9.22)  18 DEC 2017 11:54
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -581,7 +581,56 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \@float@everytoks=\toks26
 \@floatcapt=\box55
 )
-No file supplemental.aux.
+(./supplemental.aux
+
+LaTeX Warning: Label `fig:zdf_layered_4' multiply defined.
+
+
+LaTeX Warning: Label `fig:zdf_layered_4@cref' multiply defined.
+
+
+LaTeX Warning: Label `sub@fig:zdf_layered_4' multiply defined.
+
+
+LaTeX Warning: Label `sub@fig:zdf_layered_4@cref' multiply defined.
+
+
+LaTeX Warning: Label `fig:zdf_layered_6' multiply defined.
+
+
+LaTeX Warning: Label `fig:zdf_layered_6@cref' multiply defined.
+
+
+LaTeX Warning: Label `sub@fig:zdf_layered_6' multiply defined.
+
+
+LaTeX Warning: Label `sub@fig:zdf_layered_6@cref' multiply defined.
+
+
+LaTeX Warning: Label `fig:zdf_layered_7' multiply defined.
+
+
+LaTeX Warning: Label `fig:zdf_layered_7@cref' multiply defined.
+
+
+LaTeX Warning: Label `sub@fig:zdf_layered_7' multiply defined.
+
+
+LaTeX Warning: Label `sub@fig:zdf_layered_7@cref' multiply defined.
+
+
+LaTeX Warning: Label `fig:zdf_layered_8' multiply defined.
+
+
+LaTeX Warning: Label `fig:zdf_layered_8@cref' multiply defined.
+
+
+LaTeX Warning: Label `sub@fig:zdf_layered_8' multiply defined.
+
+
+LaTeX Warning: Label `sub@fig:zdf_layered_8@cref' multiply defined.
+
+)
 \openout1 = `supplemental.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 19.
@@ -596,7 +645,7 @@ LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 19.
 LaTeX Font Info:    ... okay on input line 19.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 19.
 LaTeX Font Info:    ... okay on input line 19.
-(/usr/local/texlive/2017/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+ (/usr/local/texlive/2017/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count286
 \scratchdimen=\dimen199
@@ -721,68 +770,200 @@ Package gensymb Warning: Not defining \micro.
 
 \c__siunitx_mathsf_int=\count292
 \c__siunitx_mathtt_int=\count293
-<./figures/tilt.png, id=1, 586.19pt x 429.605pt>
-File: ./figures/tilt.png Graphic file (type png)
-<use ./figures/tilt.png>
-Package pdftex.def Info: ./figures/tilt.png  used on input line 26. on input li
-ne 26.
-Package pdftex.def Info: Requested size: 187.89914pt x 137.70584pt on input lin
+<./figures/monomer.png, id=1, 1227.58624pt x 759.83875pt>
+File: ./figures/monomer.png Graphic file (type png)
+<use ./figures/monomer.png>
+Package pdftex.def Info: ./figures/monomer.png  used on input line 26. on input
+ line 26.
+Package pdftex.def Info: Requested size: 422.77664pt x 261.68088pt on input lin
 e 26.
-<./figures/tails_topview.png, id=3, 3852.3925pt x 2813.51125pt>
-File: ./figures/tails_topview.png Graphic file (type png)
-<use ./figures/tails_topview.png>
-Package pdftex.def Info: ./figures/tails_topview.png  used on input line 36. on
- input line 36.
-Package pdftex.def Info: Requested size: 7704.7663pt x 5627.00882pt on input li
-ne 36.
-<./figures/tails_rzplot.png, id=4, 1307.88625pt x 1307.88625pt>
-File: ./figures/tails_rzplot.png Graphic file (type png)
-<use ./figures/tails_rzplot.png>
-Package pdftex.def Info: ./figures/tails_rzplot.png  used on input line 41. on 
-input line 41.
-Package pdftex.def Info: Requested size: 211.38832pt x 211.38148pt on input lin
-e 41.
-<./figures/centroids_box.png, id=5, 3709.86pt x 3337.46875pt>
+<./figures/monomer_color_coded.png, id=2, 1229.59375pt x 759.83875pt>
+File: ./figures/monomer_color_coded.png Graphic file (type png)
+<use ./figures/monomer_color_coded.png>
+Package pdftex.def Info: ./figures/monomer_color_coded.png  used on input line 
+34. on input line 34.
+Package pdftex.def Info: Requested size: 422.77664pt x 261.26349pt on input lin
+e 34.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 41.
+(/usr/local/texlive/2017/texmf-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 41.
+<./figures/zdf_layered_4.png, id=3, 462.528pt x 346.896pt>
+File: ./figures/zdf_layered_4.png Graphic file (type png)
+<use ./figures/zdf_layered_4.png>
+Package pdftex.def Info: ./figures/zdf_layered_4.png  used on input line 67. on
+ input line 67.
+Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
+e 67.
+<./figures/zdf_offset_4.png, id=5, 462.528pt x 346.896pt>
+File: ./figures/zdf_offset_4.png Graphic file (type png)
+<use ./figures/zdf_offset_4.png>
+Package pdftex.def Info: ./figures/zdf_offset_4.png  used on input line 72. on 
+input line 72.
+Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
+e 72.
+<./figures/zdf_layered_6.png, id=6, 462.528pt x 346.896pt>
+File: ./figures/zdf_layered_6.png Graphic file (type png)
+<use ./figures/zdf_layered_6.png>
+Package pdftex.def Info: ./figures/zdf_layered_6.png  used on input line 77. on
+ input line 77.
+Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
+e 77.
+<./figures/zdf_offset_6.png, id=7, 462.528pt x 346.896pt>
+File: ./figures/zdf_offset_6.png Graphic file (type png)
+<use ./figures/zdf_offset_6.png>
+Package pdftex.def Info: ./figures/zdf_offset_6.png  used on input line 82. on 
+input line 82.
+Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
+e 82.
+<./figures/zdf_layered_7.png, id=8, 462.528pt x 346.896pt>
+File: ./figures/zdf_layered_7.png Graphic file (type png)
+<use ./figures/zdf_layered_7.png>
+Package pdftex.def Info: ./figures/zdf_layered_7.png  used on input line 87. on
+ input line 87.
+Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
+e 87.
+<./figures/zdf_offset_7.png, id=9, 462.528pt x 346.896pt>
+File: ./figures/zdf_offset_7.png Graphic file (type png)
+<use ./figures/zdf_offset_7.png>
+Package pdftex.def Info: ./figures/zdf_offset_7.png  used on input line 92. on 
+input line 92.
+Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
+e 92.
+<./figures/zdf_layered_8.png, id=10, 462.528pt x 346.896pt>
+File: ./figures/zdf_layered_8.png Graphic file (type png)
+<use ./figures/zdf_layered_8.png>
+Package pdftex.def Info: ./figures/zdf_layered_8.png  used on input line 97. on
+ input line 97.
+Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
+e 97.
+<./figures/zdf_offset_8.png, id=11, 462.528pt x 346.896pt>
+File: ./figures/zdf_offset_8.png Graphic file (type png)
+<use ./figures/zdf_offset_8.png>
+Package pdftex.def Info: ./figures/zdf_offset_8.png  used on input line 102. on
+ input line 102.
+Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
+e 102.
+
+
+LaTeX Warning: Float too large for page by 6.58711pt on input line 106.
+
+<./figures/rzplot_layered_4.png, id=12, 462.528pt x 346.896pt>
+File: ./figures/rzplot_layered_4.png Graphic file (type png)
+<use ./figures/rzplot_layered_4.png>
+Package pdftex.def Info: ./figures/rzplot_layered_4.png  used on input line 112
+. on input line 112.
+Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
+e 112.
+<./figures/rzplot_offset_4.png, id=13, 462.528pt x 346.896pt>
+File: ./figures/rzplot_offset_4.png Graphic file (type png)
+<use ./figures/rzplot_offset_4.png>
+Package pdftex.def Info: ./figures/rzplot_offset_4.png  used on input line 117.
+ on input line 117.
+Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
+e 117.
+<./figures/rzplot_layered_6.png, id=14, 462.528pt x 346.896pt>
+File: ./figures/rzplot_layered_6.png Graphic file (type png)
+<use ./figures/rzplot_layered_6.png>
+Package pdftex.def Info: ./figures/rzplot_layered_6.png  used on input line 122
+. on input line 122.
+Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
+e 122.
+<./figures/rzplot_offset_6.png, id=15, 462.528pt x 346.896pt>
+File: ./figures/rzplot_offset_6.png Graphic file (type png)
+<use ./figures/rzplot_offset_6.png>
+Package pdftex.def Info: ./figures/rzplot_offset_6.png  used on input line 127.
+ on input line 127.
+Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
+e 127.
+<./figures/rzplot_layered_7.png, id=16, 462.528pt x 346.896pt>
+File: ./figures/rzplot_layered_7.png Graphic file (type png)
+<use ./figures/rzplot_layered_7.png>
+Package pdftex.def Info: ./figures/rzplot_layered_7.png  used on input line 132
+. on input line 132.
+Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
+e 132.
+<./figures/rzplot_offset_7.png, id=17, 462.528pt x 346.896pt>
+File: ./figures/rzplot_offset_7.png Graphic file (type png)
+<use ./figures/rzplot_offset_7.png>
+Package pdftex.def Info: ./figures/rzplot_offset_7.png  used on input line 137.
+ on input line 137.
+Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
+e 137.
+<./figures/rzplot_layered_8.png, id=18, 462.528pt x 346.896pt>
+File: ./figures/rzplot_layered_8.png Graphic file (type png)
+<use ./figures/rzplot_layered_8.png>
+Package pdftex.def Info: ./figures/rzplot_layered_8.png  used on input line 142
+. on input line 142.
+Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
+e 142.
+<./figures/rzplot_offset_8.png, id=19, 462.528pt x 346.896pt>
+File: ./figures/rzplot_offset_8.png Graphic file (type png)
+<use ./figures/rzplot_offset_8.png>
+Package pdftex.def Info: ./figures/rzplot_offset_8.png  used on input line 147.
+ on input line 147.
+Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
+e 147.
+
+LaTeX Warning: Float too large for page by 6.58711pt on input line 152.
+
+<./figures/centroids_box.png, id=20, 3709.86pt x 3337.46875pt>
 File: ./figures/centroids_box.png Graphic file (type png)
 <use ./figures/centroids_box.png>
-Package pdftex.def Info: ./figures/centroids_box.png  used on input line 46. on
- input line 46.
-Package pdftex.def Info: Requested size: 211.38832pt x 190.15622pt on input lin
-e 46.
-<./figures/angles_traj_layered.png, id=6, 462.528pt x 346.896pt>
-File: ./figures/angles_traj_layered.png Graphic file (type png)
-<use ./figures/angles_traj_layered.png>
-Package pdftex.def Info: ./figures/angles_traj_layered.png  used on input line 
-51. on input line 51.
-Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
-e 51.
+Package pdftex.def Info: ./figures/centroids_box.png  used on input line 191. o
+n input line 191.
+Package pdftex.def Info: Requested size: 234.8775pt x 211.29034pt on input line
+ 191.
+<./figures/water_filled_pore.png, id=21, 739.76375pt x 739.76375pt>
+File: ./figures/water_filled_pore.png Graphic file (type png)
+<use ./figures/water_filled_pore.png>
+Package pdftex.def Info: ./figures/water_filled_pore.png  used on input line 21
+6. on input line 216.
+Package pdftex.def Info: Requested size: 211.38832pt x 211.38795pt on input lin
+e 216.
+<./figures/water_removed.png, id=22, 664.4825pt x 665.48625pt>
+File: ./figures/water_removed.png Graphic file (type png)
+<use ./figures/water_removed.png>
+Package pdftex.def Info: ./figures/water_removed.png  used on input line 220. o
+n input line 220.
+Package pdftex.def Info: Requested size: 211.38832pt x 211.71094pt on input lin
+e 220.
 [1
 
-{/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./figur
-es/tilt.png>] [2 <./figures/tails_topview.png> <./figures/tails_rzplot.png> <./
-figures/centroids_box.png> <./figures/angles_traj_layered.png>]
-(./supplemental.aux)
+{/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+[2 <./figures/monomer.png> <./figures/monomer_color_coded.png>] [3 <./figures/z
+df_layered_4.png> <./figures/zdf_offset_4.png> <./figures/zdf_layered_6.png> <.
+/figures/zdf_offset_6.png> <./figures/zdf_layered_7.png> <./figures/zdf_offset_
+7.png> <./figures/zdf_layered_8.png> <./figures/zdf_offset_8.png>] [4 <./figure
+s/rzplot_layered_4.png> <./figures/rzplot_offset_4.png> <./figures/rzplot_layer
+ed_6.png> <./figures/rzplot_offset_6.png> <./figures/rzplot_layered_7.png> <./f
+igures/rzplot_offset_7.png> <./figures/rzplot_layered_8.png> <./figures/rzplot_
+offset_8.png>] [5 <./figures/centroids_box.png> <./figures/water_filled_pore.pn
+g> <./figures/water_removed.png>] (./supplemental.aux)
 
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 16447 strings out of 492990
- 337001 string characters out of 6132621
- 370484 words of memory out of 5000000
- 19867 multiletter control sequences out of 15000+600000
+ 16594 strings out of 492990
+ 340940 string characters out of 6132621
+ 378484 words of memory out of 5000000
+ 19993 multiletter control sequences out of 15000+600000
  537555 words of font info for 50 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 42i,8n,77p,10384b,549s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb>
-</usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></
-usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></us
-r/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/l
-ocal/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb>
-Output written on supplemental.pdf (2 pages, 5720433 bytes).
+ 42i,7n,77p,10384b,541s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
+></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><
+/usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></u
+sr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr
+/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/lo
+cal/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
+Output written on supplemental.pdf (5 pages, 6866216 bytes).
 PDF statistics:
- 41 PDF objects out of 1000 (max. 8388607)
- 22 compressed objects within 1 object stream
+ 82 PDF objects out of 1000 (max. 8388607)
+ 31 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 26 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 106 words of extra memory for PDF output out of 10000 (max. 10000000)
 

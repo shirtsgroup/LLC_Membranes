@@ -285,6 +285,15 @@ def shift_matrices(images, angle, xbox, ybox):
 
 
 def pbcs(pts, images, angle, box, frame, nogap=False):
+    """
+    :param pts:
+    :param images:
+    :param angle:
+    :param box:
+    :param frame:
+    :param nogap:
+    :return:
+    """
 
     xbox = np.linalg.norm(box[0, 0, :])
     ybox = np.linalg.norm(box[0, 1, :])

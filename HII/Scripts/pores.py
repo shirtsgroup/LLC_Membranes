@@ -2,6 +2,8 @@
 
 import numpy as np
 import argparse
+from llclib import physical
+import mdtraj as md
 
 
 def initialize():
@@ -18,16 +20,12 @@ if __name__ == '__main__':
 
     args = initialize()
 
-    f = open(args.input, 'r')
+    t = md.load(args.input)
 
-    a = []
-    for line in f:
-        a.append(line)
-
-    f.close()
-
-    pos = np.zeros([len(a) - 3, 3])
-
+    p_centers = physical.avg_pore_loc(t.xyz)
+    print(p_centers)
+    exit()
+    
     count = 0
     for i in range(2, len(a) - 1):
         if str.strip(a[i][5:10]) == 'NA':

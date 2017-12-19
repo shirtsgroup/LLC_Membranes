@@ -14,7 +14,7 @@ def initialize():
     parser = argparse.ArgumentParser(description='Calculate the number density of selected groups along axis')
 
     parser.add_argument('-g', '--gro', default='wiggle.gro', help='Name of coordinate file')
-    parser.add_argument('-t', '--traj', default='wiggle.trr', help='Trajectory file (.trr, .xtc should work)')
+    parser.add_argument('-t', '--traj', default='traj_whole.xtc', help='Trajectory file (.trr, .xtc should work)')
     parser.add_argument('-b', '--begin', default=0, type=int, help='Frame to begin calculations')
     parser.add_argument('-e', '--end', default=-1, type=int, help='Frame to stop doing calculations')
     parser.add_argument('-bins', default=100, type=int, help='Number of bins to use')
@@ -22,6 +22,7 @@ def initialize():
                                                          'other trajectories')
     parser.add_argument('-s', '--solvate', action="store_true",
                         help='If the system is solvated, plot the number density of water as well')
+    parser.add_argument('-l', '--load', help='Name of compressed .npz to load')
 
     args = parser.parse_args()
 
@@ -97,53 +98,119 @@ if __name__ == "__main__":
 
         exit()
 
-    colors = ['red', 'green', 'blue']
-    print('Loading trajectory...', end="")
-    t = md.load('%s' % args.traj, top='%s' % args.gro)[args.begin:args.end]
-    print('done')
-
-    nT = t.n_frames
-    npores = 4
-
-    r_max = 0
-
-    results = np.zeros([len(regions), args.bins])
-
-    keep = [a.index for a in t.topology.atoms if a.residue.name != 'HOH']  # everything kept if system not solvated
-
-    p_centers = physical.avg_pore_loc(npores, t.xyz[:, keep, :])
-
     if args.solvate:
+        colors = ['red', 'green', 'blue', 'orange']
+    else:
+        colors = ['red', 'green', 'blue']
 
-        print('Calculating number density of solvent')
-        keep = [a.index for a in t.topology.atoms if a.residue.name == 'HOH' and a.name == 'O']
-        pos = t.xyz[:, keep, :]
-        p = duplicate(pos, t.unitcell_vectors)
-        equil = 0
-        density, r, bin_width = Structure_char.compdensity(pos, p_centers, equil, t.unitcell_vectors, pores=npores, buffer=0, nbins=args.bins)
-        plt.bar(r, density, bin_width, color='orange', alpha=0.5, label='Water')
+    if not args.load:
 
-    for i, reg in enumerate(regions):
+        print('Loading trajectory...', end="")
+        t = md.load('%s' % args.traj, top='%s' % args.gro)[args.begin:args.end]
+        print('done')
 
-        print('Calculating number density of %s region' % reg)
+        box = t.unitcell_vectors
+        nT = t.n_frames
+        npores = 4
+        r_max = 0
 
-        pos = Structure_char.restrict_atoms(t, reg)  # restrict trajectory to region
+        if args.solvate:
+            results = np.zeros([len(regions) + 1, args.bins])
+        else:
+            results = np.zeros([len(regions), args.bins])
 
-        p = duplicate(pos, t.unitcell_vectors)  # duplicate things periodically
+        keep = [a.index for a in t.topology.atoms if a.residue.name != 'HOH']  # everything kept if system not solvated
 
-        equil = 0
-        density, r, bin_width = Structure_char.compdensity(pos, p_centers, equil, t.unitcell_vectors, pores=npores, buffer=0, nbins=args.bins)
+        p_centers = physical.avg_pore_loc(npores, t.xyz[:, keep, :])
 
-        results[i, :] = density
+        if args.solvate:
 
-        plt.bar(r, density, bin_width, color=colors[i], alpha=0.5, label=reg)
+            print('Calculating number density of solvent')
+            keep = [a.index for a in t.topology.atoms if a.residue.name == 'HOH' and a.name == 'O']
+            pos = t.xyz[:, keep, :]
+            p = duplicate(pos, t.unitcell_vectors)
+            equil = 0
+            density, r, bin_width = Structure_char.compdensity(pos, p_centers, equil, t.unitcell_vectors, pores=npores, buffer=0, nbins=args.bins)
+            results[-1, :] = density
+            plt.bar(r, density, bin_width, color='orange', alpha=0.5, label='Water')
 
-    np.savez_compressed("density", results=results, r=r, bw=bin_width)
+        for i, reg in enumerate(regions):
 
-    plt.legend()
-    plt.ylabel('Component Number Density (number/nm$^2$)')
-    plt.xlabel('Distance from pore center (nm)')
-    plt.ylim([0, 1.3])
+            print('Calculating number density of %s region' % reg)
+
+            pos = Structure_char.restrict_atoms(t, reg)  # restrict trajectory to region
+
+            p = duplicate(pos, t.unitcell_vectors)  # duplicate things periodically
+
+            equil = 0
+            density, r, bin_width = Structure_char.compdensity(pos, p_centers, equil, box, pores=npores, buffer=0, nbins=args.bins)
+
+            results[i, :] = density
+
+            plt.bar(r, density, bin_width, color=colors[i], alpha=0.5, label=reg)
+
+        np.savez_compressed("density", results=results, r=r, bw=bin_width, box=t.unitcell_vectors)
+        print('Arrays saved as density.npz')
+
+    else:
+
+        d = np.load(args.load)
+
+        bw = d['bw']
+        r = d['r']
+        results = d['results']
+        box = d['box']
+
+        if args.solvate:
+            regions.append('Water')
+
+        for i in range(results.shape[0]):
+            plt.bar(r, results[i, :], bw, color=colors[i], alpha=0.5, label=regions[i])
+
+    un_normalize = np.zeros_like(results)
+
+    annulus_area = []
+    dr = r[-1] - r[-2]  # width of annulus
+    # r from above is calculated as the average of the edges of the bins. So I need to reverse that here
+    for i in r:
+        inner_r = i - (dr/2)
+        outer_r = i + (dr/2)
+        annulus_area.append(np.pi*(outer_r**2 - inner_r**2))
+
+    for i in range(results.shape[0]):
+        un_normalize[i, :] = results[i, :] * annulus_area
+
+    r_cut = 0.6
+    cut_index = 0
+    while r[cut_index] < r_cut:
+        cut_index += 1
+
+    print('Percentage of sodium within %s nm of pore center: %2.2f %%' % (r_cut, 100*(sum(un_normalize[2, :cut_index])/sum(un_normalize[2, :]))))
+
+    r_cut = 0.6
+    cut_index = len(r) - 1
+    while r[cut_index] > r_cut:
+        cut_index -= 1
+
+    print('Percentage of tails within %s nm of pore center: %2.2f %%' % (r_cut, 100*(sum(un_normalize[0, :cut_index])/sum(un_normalize[0, :]))))
+
+    r_cut_pore = r_cut
+    pore_cut_index = cut_index
+
+    r_cut = 1
+    cut_index = len(r) - 1
+    while r[cut_index] > r_cut:
+        cut_index -= 1
+
+    print('Percentage of tails between %s and %s nm of pore center: %2.2f %%' % (r_cut_pore, r_cut,
+        100*(sum(un_normalize[0, pore_cut_index:cut_index])/sum(un_normalize[0, :]))))
+
+    print('Maximum of Head group region: r = %s' % r[np.argmax(results[1, :])])
+
+    plt.legend(prop={'size':14}, loc=1)
+    plt.ylabel('Component number density (count/nm$^3$)', fontsize=14)
+    plt.xlabel('Distance from pore center (nm)', fontsize=14)
+    plt.axes().tick_params(labelsize=14)
     plt.tight_layout()
     plt.savefig("regional_density.png")
     plt.show()
