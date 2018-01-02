@@ -523,6 +523,10 @@ if __name__ == '__main__':
     if args.plot_avg:
         fig = plt.figure(1)
         ax1 = fig.add_subplot(111)
+        plt.xlabel('Time (ns)', fontsize=14)
+        plt.ylabel('Distance between pores (nm)', fontsize=14)
+        ax1.tick_params(axis='both', labelsize=14)
+
         # ax2 = ax1.twiny()
 
         avg = np.zeros(p2ps[0, :].shape)
@@ -534,20 +538,28 @@ if __name__ == '__main__':
 
         avg /= n
 
-        ax1.plot(t.time[::args.plot_every]/1000, avg[::args.plot_every])
+        ax1.plot(t.time[::args.plot_every]/1000, avg[::args.plot_every], linewidth=2)
 
         if args.T:
             xbounds, ybounds = parse_txt(args.T, avg[::args.plot_every], t.time[::args.plot_every]/1000, std=args.plot_std)
             plt.ylim(ybounds)
             plt.xlim(xbounds)
 
+        plt.tight_layout()
+
     else:
         fig = plt.figure(1)
         ax1 = fig.add_subplot(111)
 
+        plt.xlabel('Time (ns)', fontsize=14)
+        plt.ylabel('Distance between pores (nm)', fontsize=14)
+        ax1.tick_params(axis='both', labelsize=14)
+
         for i in range(distances):
             if i not in exclude:
                 plt.plot(t.time[::args.plot_every], p2ps[i, ::args.plot_every], label='%s' % labels[i])
+
+        plt.tight_layout()
 
     # ax1.set_xlabel('Time (ps)')
     # new_tick_locations = np.linspace(0, t.time[-1], 7)
