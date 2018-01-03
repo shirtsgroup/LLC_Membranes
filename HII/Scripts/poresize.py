@@ -137,8 +137,8 @@ if __name__ == "__main__":
 
     t = md.load(args.traj, top=args.gro)  # load gromacs trajectory
     keep = [a.index for a in t.topology.atoms if a.name in args.components]   # get the index of all atoms in components
-    pore_components = t.atom_slice(keep)  # create a new trajectory object only describing those atoms
-    pos = pore_components.xyz
+    # pore_components = t.atom_slice(keep)  # create a new trajectory object only describing those atoms
+    pos = t.xyz[:, keep, :]
 
     pcenters = physical.avg_pore_loc(4, pos)  # find the pore centers
 
@@ -153,7 +153,7 @@ if __name__ == "__main__":
         order /= max(order)
 
     print('Pore size equilibrated after %d ns' % (old_div(t.time[poresize_equil], 1000)))
-    print('Average Pore Size: %.2f +/- %.2f nm' %(np.mean(r[poresize_equil:]), np.mean(r_std[poresize_equil:])))
+    print('Average Pore Size: %.3f +/- %.3f nm' %(np.mean(r[poresize_equil:]), np.std(r[poresize_equil:])))
     print('Order parameter equilibrated after %d ns' % (old_div(t.time[order_equil], 1000)))
     if args.normalize:
         print('Average Order Parameter: %.2f' % np.mean(order[order_equil:]))

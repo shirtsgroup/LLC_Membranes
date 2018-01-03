@@ -21,6 +21,30 @@
   \graphicspath{{./figures/}}  % put all the figures here
   \maketitle
 
+  \begingroup
+	\fontsize{14pt}{12pt}\selectfont
+	\textbf{Further details regarding monomer parameterization}
+  \endgroup
+
+  Monomers were parameterized according to the following procedure:
+  %BJC: need references
+  \begin{enumerate}
+	\item Create monomer structure file with connectivity : We drew atomistic
+        structures using MarvinSketch 17.13. We optimized the 3D geometry of
+	the structure using the 'Clean in 3D' function of MarvinSketch 17.13. 
+        We saved the structure as a .mol file, then converted it to .pdb
+	format using Open Babel 2.4.1. 
+	\item Assign GAFF atomtypes using \texttt{antechamber} : Using the .pdb
+	structure file as input, we ran \texttt{antechamber} using the AM1-BCC charge
+	model. The net charge on the monomer is input as -1 since the sodium ion will
+	be kept as a separate residue. The output of \texttt{antechamber} is used to
+	create Amber topology files with \texttt{LEaP}. A detailed tutorial can be
+	accessed elsewhere (http://ambermd.org/tutorials/basic/tutorial4b/) 
+	\item Create gromacs topologies from Amber output : The output from \texttt{LEaP}
+	is a .inpcrd and a .prmtop file. Using acepype.py, we convert the \texttt{LEaP}
+	output into GROMACS .gro and .top file. 
+  \end{enumerate} 
+
   \begin{figure}
         \centering
         \begin{subfigure}[b]{0.32\textwidth}
@@ -79,46 +103,194 @@
 	\label{fig:pore_radius_illustration}
   \end{figure}
 
-  \textbf{TODO} : These are things I am working on / need to do
-
-  \begin{itemize}
-  \item Initial configuration dependence
-	\begin{itemize}
-		\item Initial pore-to-pore spacing
-		\item Initial pore radius
-		\item I have simulations running to support the claims that
-		these are not significant factors if chosen within reason
-	\end{itemize}
-  \item Description of parameterization process
-  \item Feel free to suggest anything else that might be useful
-  \end{itemize}
- 
-
   \textbf{Calculation of pore-to-pore spacing statistics}
   
   \color{red}{This is an outline of this section and will be reworded for clarity}
   \begin{itemize}
-  \item We are interested in 5 pore-to-pore distances which should all be equal
-  in a perfect hexagonal array, however only 4 distances are independent % can
-  visualize this in supplemental material. Will make a lot of things more clear
-  below.
-  \item Each pore spacing has its own trajectory of spacing vs. time. Using
-  data collected after the system is equilibrated, we calculate how long it takes
-  for the data in each of the 5 trajetories to become uncorrelated using
-  pymbar.timeseries.integratedAutocorrelationTime() % reference
-  \item We break the full trajectories down into sub-trajectories based on the
-  maximum autocorrelation time of those found in the previous step.
-  \item For each bootstrap trial, we recreate an equilibrium trajectory by
-  randomly sampling pore spacings from the sub-trajectories 
-  \item We get an average value for each pore spacing by finding the mean of
-  the bootstrapped data
-  \item We calculate the overall average as the mean of all bootstrapped pore
-  spacings
-  \item The uncertainty for each pore spacing is calculated as $\dfrac{<x> -
-  x}{4}$ where $<x>$ is the average spacing from the bootstrap trial and $x$ is
-  the average value of one of the pore spacings.
-  \item We report the mean of these uncertainties
+  	\item We are interested in 5 pore-to-pore distances which should all
+	be equal in a perfect hexagonal array, however only 4 distances are independent
+	% can visualize this in supplemental material. Will make a lot of things more
+	clear below.
+	\item Each pore spacing has its own trajectory of spacing vs. time.
+	Using data collected after the system is equilibrated, we calculate how long it
+	takes for the data in each of the 5 trajetories to become uncorrelated using
+	pymbar.timeseries.integratedAutocorrelationTime() % reference
+	\item We break the full trajectories down into sub-trajectories based
+	on the maximum autocorrelation time of those found in the previous step.
+	\item For each bootstrap trial, we recreate an equilibrium trajectory
+	by randomly sampling pore spacings from the sub-trajectories 
+	\item We get an average value for each pore spacing by finding the
+	mean of the bootstrapped data
+	\item We calculate the overall average as the mean of all
+	bootstrapped pore spacings
+	\item The uncertainty for each pore spacing is calculated as
+	$\dfrac{<x> - x}{4}$ where $<x>$ is the average spacing from the bootstrap
+	trial and $x$ is the average value of one of the pore spacings.
+	\item We report the mean of these uncertainties
   \end{itemize}
+
+  \begingroup
+	\fontsize{14pt}{12pt}\selectfont
+	\textbf{Initial Configuration Dependence}
+  \endgroup
+
+  Any major dependence on initial configuration is addressed in the main text.
+  There we showed that systems are stable when made with 4, 5, 6, 7, and 8
+  monomers per layer. We also showed that systems are stable when monomer head
+  groups are oriented in the parallel displaced and sandwiched configurations
+  (See Figure~\ref{fig:stacking}). Our model best supports a system built with 5
+  monomers per layer in the sandwiched configuration. 
+
+  There are three other parameters whose choice may influence the equilibrium
+  structure: initial pore spacing, initial pore radius and initial distance
+  between layers. Here we show the results of a sensitivity analysis performed
+  on the three parameters. To reduce the size of the sensitivity analysis, we
+  only tested systems built with 5 monomers per layer with layers stacked in 
+  the parallel displaced configuration. All systems were equilibrated according
+  to the dry equilibration procedure.
+
+  %Our model is insensitive to initial configuration if monomer placement is chosen within reason. 
+
+  \begin{enumerate}
+
+	  \item \underline{Initial pore spacing}
+
+	  We tested five different initial pore spacings, defined as the
+	  distance between the central axis of each pore with all others. To reduce the
+	  number of variables, we held the pore radius constant, at 5 \AA~and the
+	  distance between layers at 3.7 \AA~since those were the values used in our
+	  optimal system in the main text. If the initial pore spacing is chosen to be
+	  too small, pore columns abruptly repel each other as soon as they are able to
+	  overcome the restraining potential present as part of the dry equilibration
+	  procedure. We avoided using systems that exhibit this behavior since the
+	  behavior increases the chances of a system to become kinetically trapped in an
+	  undesired metastable free energy basin.  
+
+	  \begin{enumerate}
+
+	  	\item 39 \AA~: A pore spacing of 39 \AA~is used in order to have a test system
+		started with a spacing below the experimental value. As soon as the restraining
+		potential switches to 56 KJ mol$^{-1}$ nm$^{-2}$, the columns are able to
+		separate resulting in a large jump in pore spacing (Figure~\ref{fig:p2p_39}). 
+
+		\item 41 \AA~: A pore spacing of 41 \AA~is chosen since it closely matches the
+		experimental pore spacing.  Again, we observe abrupt repulsion of columns once
+		the restraining potential is switched to 56 KJ mol$^{-1}$ nm$^{-2}$
+		(Figure~\ref{fig:p2p_41}).
+
+		\item 45 \AA~: A pore spacing of 45 \AA~is about 10 \% larger than the
+		experimental value. We observe relatively stable pore spacing during the
+		restrained portion of the dry equilibration procedure
+		(Figure~\ref{fig:p2p_45}). We chose to use this value for all our simulations
+		in the main text. 
+
+		\item 50 \AA~: We tested a pore spacing of 50 \AA, about 20 \% larger than the
+		experimental value. Once the restraining potential reaches 56 KJ mol$^{-1}$
+		nm$^{-2}$, the pore spacing begins to decrease linearly (Figure~\ref{fig:p2p_50}).
+
+		\item 55 \AA~: We tested a pore spacing of 55 \AA~ which is at
+		a distance where monomers in each pore no longer intersect adjacent pores. Once
+		the restraining potential reaches 56 KJ mol$^{-1}$ nm$^{-2}$, the pore spacing
+		changes erratically until it begins to settle once the force constants are
+		below 3 KJ mol$^{-1}$ nm$^{-2}$ (Figure~\ref{fig:p2p_55}). We reccomend
+		avoiding a system such as this where vacuum gaps are introduced unnecessarily.
+
+	  \end{enumerate} 
+
+	  %BJC: Could put vertical lines to indicate where position restraint values are reduced
+  	  \begin{figure}[htp]
+		\centering
+		\begin{subfigure}{0.3\textwidth}
+			\includegraphics[width=\textwidth]{p2p_39.png}\quad
+			\vspace{-1.25em}
+			\caption{39 \AA~initial pore spacing}~\label{fig:p2p_39}
+		\end{subfigure}
+		\begin{subfigure}{0.3\textwidth}
+			\includegraphics[width=\textwidth]{p2p_41.png}\quad
+			\vspace{-1.25em}
+			\caption{41 \AA~initial pore spacing}~\label{fig:p2p_41}
+		\end{subfigure}
+		\begin{subfigure}{0.3\textwidth}
+			\includegraphics[width=\textwidth]{p2p_45.png}
+			\vspace{-1.25em}
+			\caption{45 \AA~initial pore spacing}~\label{fig:p2p_45}
+		\end{subfigure}
+		\begin{subfigure}{0.3\textwidth}
+			\includegraphics[width=\textwidth]{p2p_50.png}\quad	
+			\vspace{-1.25em}
+			\caption{50 \AA~initial pore spacing}~\label{fig:p2p_50}
+		\end{subfigure}
+		\begin{subfigure}{0.3\textwidth}
+			\includegraphics[width=\textwidth]{p2p_55.png}
+			\vspace{-1.25em}
+			\caption{55 \AA~initial pore spacing}~\label{fig:p2p_55}
+		\end{subfigure}
+
+		\caption{The pore spacing during the restrained portion of the
+			dry equilibration procedure is shown. Every 50 ps (0.05 ns) position restraints
+			are reduced according to the sequence: 1000000, 3162, 56, 8, 3, 2, 1, 0 KJ
+			mol$^{-1}$ nm$^{-2}$. When the initial pore spacing is chosen below the
+			experimental value (a) or at the experimental value (b), there is an abrupt
+			change in pore spacing when the position restraints are reduced to 56 KJ
+			mol$^{-1}$ nm$^{-2}$. When pores are started 45 \AA apart (c) the pore spacing
+			remains relatively stable. When pores are spaced 50 \AA apart (d), the pore
+			spacing decreases nearly linearly once the restraints are reduced to 56 KJ
+			mol$^{-1}$ nm$^{-2}$. When pores are spaced 55 \AA apart (e), so that monomers
+			do not intersect with adjacent pores, and position restraints are reduced to 56
+			KJ mol$^{-1}$ nm$^{-2}$, pore spacing changes erratically before stabilizing
+			when force constants are reduced to 3 KJ mol$^{-1}$ nm$^{-2}$.} 
+		\label{fig:p2p}
+	  \end{figure}
+
+	  \item \underline{Initial pore radius}
+
+	  We tested 3 different pore radii, defined as shown in
+	  Figure~\ref{fig:pore_radius_illustration}. For each system, we held the initial
+	  pore spacing constant at 45 \AA~ and the distance between layers constant at
+	  3.7 \AA. Equilibrated values of pore radii are presented in
+	  Table~\ref{table:radii}. The pore radius in each frame is calculated as the
+	  average distance of all carbonyl carbons (See
+	  Figure~\ref{fig:pore_radius_illustration}) from their associated pore center.
+	  Statistics for the pore radii reported were generated from the timeseries
+	  representing the average pore radius at each frame.  Equilibration was detected
+	  using \texttt{pymbar.timeseries.detectEquilibration}. The average and standard
+	  deviation of pore radii were calculated using only data points collected after
+	  equilibration was detected.
+
+	  \begin{enumerate}
+
+		\item 2.5 \AA~: The smallest pore radius that we can achieve before energy 
+		minimization becomes problematic is 2.5 \AA.
+
+		\item 5 \AA~: 
+
+		\item 8 \AA~: The largest pore radius that can achieve before energy minimization
+		becomes problematic is 8 \AA.
+	  \end{enumerate}
+
+	  \begin{table}[h]
+	  \centering
+	  \begin{tabular}{cc}
+	  \toprule
+	  Initial Pore Radius & Equilibrated Pore Radius \\
+	  \midrule
+	  % BJC: to be updated once simulations are run out long enough
+	  2.5 \AA & $0.394 \pm 0.002$ \AA \\
+	  5 \AA   & $0.423 \pm 0.002$ \AA \\ % final result
+	  8 \AA   & $0.721 \pm 0.002$ \AA \\
+	  \bottomrule
+	  \end{tabular}
+	  \caption{Caption of the future!}~\label{table:radii}
+	  \end{table}
+
+	  \item Initial distance between layers
+
+          We tested 3 different initial layer spacings, defined as the distance between the planes of 
+          aromatic rings in each layer. Systems built with layers stacked 3.7 \AA and 5 \AA apart
+	  are discussed extensively in the main text. We will focus the discussion here on systems
+	  built with layers stacked 10 \AA apart. 
+
+  \end{enumerate}
 
   \begin{figure}
 	\centering
