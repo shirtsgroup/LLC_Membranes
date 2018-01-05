@@ -18,32 +18,55 @@
 
 \begin{document}
 
+  \bibliographystyle{ieeetr}
   \graphicspath{{./figures/}}  % put all the figures here
   \maketitle
 
+  \noindent
   \begingroup
-	\fontsize{14pt}{12pt}\selectfont
-	\textbf{Further details regarding monomer parameterization}
+	\fontsize{14pt}{14pt}\selectfont
+	\textbf{Further details regarding monomer parameterization} 
   \endgroup
-
+ 
+  \vspace{1em}
   Monomers were parameterized according to the following procedure:
-  %BJC: need references
   \begin{enumerate}
-	\item Create monomer structure file with connectivity : We drew atomistic
-        structures using MarvinSketch 17.13. We optimized the 3D geometry of
-	the structure using the 'Clean in 3D' function of MarvinSketch 17.13. 
-        We saved the structure as a .mol file, then converted it to .pdb
-	format using Open Babel 2.4.1. 
-	\item Assign GAFF atomtypes using \texttt{antechamber} : Using the .pdb
-	structure file as input, we ran \texttt{antechamber} using the AM1-BCC charge
-	model. The net charge on the monomer is input as -1 since the sodium ion will
-	be kept as a separate residue. The output of \texttt{antechamber} is used to
-	create Amber topology files with \texttt{LEaP}. A detailed tutorial can be
-	accessed elsewhere (http://ambermd.org/tutorials/basic/tutorial4b/) 
-	\item Create gromacs topologies from Amber output : \texttt{LEaP}
-	outputs a .inpcrd and a .prmtop file which are Amber topologies. Using
-	acpype.py, we convert the \texttt{LEaP} output into GROMACS .gro and .top
-	files. 
+	\item \textit{Create monomer structure file with connectivity} : We
+	drew atomistic structures using MarvinSketch 17.13 with all hydrogen atoms
+	drawn out explicitly. We optimized the 3D geometry of the structure using the
+	'Clean in 3D' function of MarvinSketch 17.13~\cite{chemaxon_marvinsketch_2017}.
+	We saved the structure as a .mol file, then converted it to .pdb format using
+	Open Babel 2.4.1 \cite{oboyle_open_2011,noauthor_open_nodate}. 
+	\item \textit{Assign GAFF atomtypes using \texttt{antechamber}} : Using the .pdb
+	structure file as input, we ran \texttt{antechamber}~\cite{wang_automatic_2006}
+	using the AM1-BCC charge model. The net charge on the monomer is input as -1
+	since the sodium ion will be kept as a separate residue. The output of
+	\texttt{antechamber} is used to create Amber topology files with
+	\texttt{LEaP}~\cite{case_ambertools16_2016}. A detailed tutorial can be accessed
+	elsewhere \cite{walker_antechamber_nodate}.
+	\item \textit{Create gromacs topologies from Amber output} : \texttt{LEaP}
+	outputs a .inpcrd and a .prmtop file which are Amber topology files. Using
+	acpype.py \cite{sousa_da_silva_acpype_2012}, we convert the \texttt{LEaP}
+	output into GROMACS .gro and .top files. 
+	\item \textit{Perform a simulated annealing procedure on the monomer} :
+	We created a cubic box around the monomer using the GROMACS command \texttt{gmx
+	editconf}. The monomer was centered in the monomer in the box with edges of the
+	box at least 3 nm from the monomer on all sides. We ran an energy minimzation
+	on the system with the steepest descent algorithm.  Next we performed an NVT
+	simulated annealing procedure. We linearly decreased the temperature of the
+	system from 1000K to 50K over the course of 10 ns. We randomly chose a monomer
+	configuration from the last 10 \% of the trajectory. 
+	\item \textit{Reassign charges with \texttt{molcharge}}: With the monomer
+	configuration taken from the annealed trajectory, we reassigned charges using
+	\texttt{molcharge} using the am1bccsym method in order to ensure charges 
+	are symmetric. This condition is not guaranteed with \texttt{antechamber}. 
+	The charges in the gromacs topology file (.top) were replaced with the 
+	new charges calculated by \texttt{molcharge}. 
+	\item \textit{Anneal again to get final structure} : The same simulated
+	annealing process was repeated using the monomer topology with
+	\texttt{molcharge} charges. A random monomer configuration was pulled from
+	the last 10 \% of the trajectory and was used to build all assemblies
+	reported (Figure~\ref{fig:monomer}).
   \end{enumerate} 
 
   \begin{figure}
@@ -459,4 +482,5 @@
 	  pore region leaving an aqeuous solution of water and sodium ions.}\label{fig:water_pores}
   \end{figure}
 
+\bibliography{llc.bib}
 \end{document}
