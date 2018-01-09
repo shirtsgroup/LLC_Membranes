@@ -62,6 +62,7 @@ def trace_pores(pos, box, layers):
     Find the line which traces through the center of the pores
     :param pos: positions of atoms used to define pore location (args.ref) [natoms, 3]
     :param box: xy box vectors, [2, 2], mdtraj format
+    :param layers: number of layers
     :return: points which trace the pore center
     """
 

@@ -1197,20 +1197,24 @@ Shirts}
   	\settoheight{\tempdima}{\includegraphics[width=.32\linewidth]{solvated_offset_rzplot_1.png}}%
   	\centering\begin{tabular}{@{}c@{ }c@{ }c@{ }c@{}}
   	&\textbf{1 wt\%} & \textbf{\hspace{2em}2.5 wt\%} & \textbf{5 wt\%} \\
-  	\rowname{parallel displaced}&
+  	\rowname{Parallel Displaced}&
   	\includegraphics[width=.28\linewidth]{solvated_offset_rzplot_1.png}&
   	\includegraphics[width=.28\linewidth]{solvated_offset_rzplot_25.png}&
   	\includegraphics[width=.325\linewidth]{solvated_offset_rzplot_5.png}\\[-1ex]
   	%&\mycaption{0.2} & \mycaption{0.2} & \mycaption{0.3}\\
-  	\rowname{sandwiched}&
+  	\rowname{Sandwiched}&
   	\includegraphics[width=.28\linewidth]{solvated_layered_rzplot_1.png}&
   	\includegraphics[width=.28\linewidth]{solvated_layered_rzplot_25.png}&
   	\includegraphics[width=.325\linewidth]{solvated_layered_rzplot_5.png}\\[-1ex]
   	%\mycaption{0.5} & \mycaption{0.6} & \mycaption{0.7} \\
   	\end{tabular}
-  	\caption{Simulated diffraction patterns generated from trajectories of systems 
-  	built in the parallel displaced and sandwiched configurations as a function
-  	of water content shows weaker reflections than the dry system.}%
+	\caption{Simulated XRD patterns indicate that systems with added water
+		are not as structured as the dry systems. As increasing amounts of water are 
+		added to both systems, R-$\pi$ fades. When 2.5 wt\% water is added to the
+		sandwiched system, R-$\pi$ gains back some intensity, but its magnitude is not
+		greater than the dry system. R-spots also disappears as water is added. It is
+		absent in all parallel displaced simulations, but fades gradually as water is
+		added to the sandwiched configuration.}%
   \label{fig:solvation}
 
   \end{figure}
@@ -1251,7 +1255,6 @@ Shirts}
   hydrated systems can help unravel the mechanisms for selective transport in
   separations of aqueous solutions. 
 
-  %BJC: TODO: Bigger fonts
   \begin{figure}
   \centering 
   \begin{subfigure}{0.45\textwidth}
@@ -1264,9 +1267,11 @@ Shirts}
         \caption{Sandwiched}
         \label{fig:layered_solvated_density}
   \end{subfigure}
-  \caption{Water fills the membrane pores in the parallel displaced (a) and 
-  sandwiched (b) configurations. Sodium ions are distributed fairly uniformly
-  within the pore region, defined by a radius of 0.6 nm.}
+  \caption{Water fills the membrane pores in the parallel displaced (a) and
+	  sandwiched (b) configurations. We define the pore region to be within 0.6 nm of
+	  the pore center. Head groups in the sandwiched configuration sit closer to the
+	  pore center than they do in the parallel displaced configuration. The parallel
+	  displaced pores are composed primarily of water close to the pore center.}
   \label{fig:water_density}
   \end{figure}
   %MRS4: weird there's a head group peak in the center. Not enough statistics, so shot noise from the r^2 dr weighting?
@@ -1301,8 +1306,8 @@ Shirts}
   \begin{figure}
         \centering
         \includegraphics[width=0.5\linewidth]{IC_offset.png}
-        \caption{Calculated ionic conductivity using the Nernst-Einstein relation
-        and Collective Diffusion model agree with error. Both methods give calculated
+        \caption{The collective diffusion model and the nernst-einstein relation yield
+        agreeing values of ionic conductivity. Both methods give calculated
         values of ionic conductivity an order of magnitude higher than the experimental
         value.}
         \label{fig:conductivity}
@@ -1344,12 +1349,13 @@ Shirts}
 	\includegraphics[width=\textwidth]{p2p_xlink.png}
 	\caption{}~\label{fig:p2p_xlink}
   \end{subfigure}
-  \caption{(a) Reflections produced by the cross-linked configuration fade
-	  relative to the uncross-linked system. The colorbar shown is the same used for
-	  the uncross-linked system. (b) The ionic conductivity is smaller relative to the
-	  uncross-linked system, but still much larger than the experimental value. When
-	  the system is cross-linked, The distance between layers increases (c) and the
-	  pore spacing decreases (d)}~\label{fig:xlink}
+  \caption{Applying our simulated crosslinking mechanism to an equilibrium
+	  configuration causes slight changes to the system's physical and structural
+	  properties. (a) Reflections produced by the cross-linked configuration are
+	  faded relative to the uncross-linked system. (b) The ionic conductivity is
+	  smaller relative to the uncross-linked system, but still much larger than the
+	  experimental value. When the system is cross-linked, the distance between
+	  layers increases (c) and the pore spacing decreases (d)}~\label{fig:xlink}
   \end{figure}
  
   \section{Conclusion}

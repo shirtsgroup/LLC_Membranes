@@ -119,9 +119,11 @@ if __name__ == "__main__":
         else:
             results = np.zeros([len(regions), args.bins])
 
-        keep = [a.index for a in t.topology.atoms if a.residue.name != 'HOH']  # everything kept if system not solvated
+        #keep = [a.index for a in t.topology.atoms if a.residue.name != 'HOH']  # everything kept if system not solvated
+        components = ['C', 'C1', 'C2', 'C3', 'C4', 'C5']
+        comp = [a.index for a in t.topology.atoms if a.name in components]
 
-        p_centers = physical.avg_pore_loc(npores, t.xyz[:, keep, :])
+        p_centers = physical.avg_pore_loc(npores, t.xyz[:, comp, :])
 
         if args.solvate:
 

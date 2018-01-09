@@ -158,6 +158,7 @@
 	\textbf{Initial Configuration Dependence}
   \endgroup
 
+  \vspace{1em}
   Any major dependence on initial configuration is addressed in the main text.
   There we showed that systems are stable when made with 4, 5, 6, 7, and 8
   monomers per layer. We also showed that systems are stable when monomer head
@@ -217,7 +218,8 @@
 		the restraining potential reaches 56 KJ mol$^{-1}$ nm$^{-2}$, the pore spacing
 		changes erratically until it begins to settle once the force constants are
 		below 3 KJ mol$^{-1}$ nm$^{-2}$ (Figure~\ref{fig:p2p_55}). We reccomend
-		avoiding a system such as this where vacuum gaps are introduced unnecessarily.
+		avoiding a system such as this where vacuum gaps are introduced unnecessarily. 
+		The system equilibrates to a pore spacing of 4.27 $\pm$ 0.06 nm. 
 
 	  \end{enumerate} 
 
@@ -499,5 +501,6 @@
 	  pore region leaving an aqeuous solution of water and sodium ions.}\label{fig:water_pores}
   \end{figure}
 
+\clearpage
 \bibliography{llc.bib}
 \end{document}
