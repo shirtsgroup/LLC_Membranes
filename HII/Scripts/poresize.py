@@ -141,11 +141,28 @@ if __name__ == "__main__":
     pos = t.xyz[:, keep, :]
 
     pcenters = physical.avg_pore_loc(4, pos)  # find the pore centers
-
-    r, r_std = physical.limits(pos, pcenters)
+    radii = physical.limits(pos, pcenters)  # find the average radius of each pore in each frame
+    r = np.zeros(radii.shape[0])  # find average pore radius at each frame
+    r_std = np.zeros(radii.shape[0])  # standard deviation at each frame
+    for i in range(radii.shape[0]):
+        r[i] = np.mean(radii[i, :])
+        r_std[i] = np.std(radii[i, :])
 
     poresize_equil = timeseries.detectEquilibration(r)[0]
-    order_equil = timeseries.detectEquilibration(old_div(r,r_std))[0]
+    order_equil = timeseries.detectEquilibration(old_div(r, r_std))[0]
+
+    # Calculate standard deviation in poresize after equilibration based on standard deviation at each frame
+    # Ref: https://stats.stackexchange.com/questions/25848/how-to-sum-a-standard-deviation
+    # std_poresize_equil = 0
+    # for i in range(r_std[poresize_equil:].shape[0]):
+    #     std_poresize_equil += r_std[i] ** 2  # sum the variance
+    #
+    # std_poresize_equil /= r_std[poresize_equil:].shape[0]  # divide by number of frames to get average variance
+    # std_poresize_equil = np.sqrt(std_poresize_equil)  # take square root to get standard deviation
+
+    requil = np.reshape(radii[poresize_equil:, :], (4*(t.n_frames - poresize_equil)))  # poresize of each pore in each frame after equilibration
+    avg_poresize_equil = np.mean(requil)
+    std_poresize_equil = np.std(requil)
 
     if args.normalize:
         order = old_div(r, r_std)
@@ -153,7 +170,7 @@ if __name__ == "__main__":
         order /= max(order)
 
     print('Pore size equilibrated after %d ns' % (old_div(t.time[poresize_equil], 1000)))
-    print('Average Pore Size: %.3f +/- %.3f nm' %(np.mean(r[poresize_equil:]), np.std(r[poresize_equil:])))
+    print('Average Pore Size: %.3f +/- %.3f nm' %(avg_poresize_equil, std_poresize_equil))
     print('Order parameter equilibrated after %d ns' % (old_div(t.time[order_equil], 1000)))
     if args.normalize:
         print('Average Order Parameter: %.2f' % np.mean(order[order_equil:]))

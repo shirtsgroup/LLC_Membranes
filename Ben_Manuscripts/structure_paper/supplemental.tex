@@ -287,13 +287,25 @@
 
 	  \begin{enumerate}
 
-		\item 2.5 \AA~: The smallest pore radius that we can achieve before energy 
-		minimization becomes problematic is 2.5 \AA.
+		\item 2.5 \AA~: The smallest pore radius that we can achieve
+		before energy minimization becomes problematic is 2.5 \AA. After being run
+		through the full dry equilibration procedure, the average pore radius is 0.40
+		$\pm$ 0.01 \AA.
 
-		\item 5 \AA~: 
+		\item 5 \AA~: We tested a pore radius of 5 \AA~because it is
+		slightly larger than the equilibrated pore radius of the system simulated with
+		an intial pore radius of 2.5 \AA. After being run through the full dry
+		equilibration procedure, the average pore radius is 0.42 $\pm$ 0.01 \AA, which
+		agrees with the 2.5 \AA~ configuration within error. 
 
-		\item 8 \AA~: The largest pore radius that can achieve before energy minimization
-		becomes problematic is 8 \AA.
+		\item 8 \AA~: The largest pore radius that can achieved before
+		energy minimization becomes problematic is 8 \AA. One should use caution with
+		such a structure because of the relatively large vacuum space that is created
+		in the pore region of the initial configuration. After being run through the
+		full dry equilibration procedure, we see a combination of cylindrical and
+		slit-like pores (Figure~\ref{fig:slits}). We are wary of such a non-symmetric
+		structure and choose not to use a pore radius of 8 \AA for our starting configurations. 
+	  
 	  \end{enumerate}
 
 	  \begin{table}[h]
@@ -303,13 +315,25 @@
 	  Initial Pore Radius & Equilibrated Pore Radius \\
 	  \midrule
 	  % BJC: to be updated once simulations are run out long enough
-	  2.5 \AA & $0.394 \pm 0.002$ \AA \\
-	  5 \AA   & $0.423 \pm 0.002$ \AA \\ % final result
-	  8 \AA   & $0.721 \pm 0.002$ \AA \\
+	  2.5 \AA & $0.40 \pm 0.01$ \AA \\
+	  5 \AA   & $0.42 \pm 0.01$ \AA \\ % final result
+	  8 \AA   & $0.69 \pm 0.01$ \AA \\
 	  \bottomrule
 	  \end{tabular}
-	  \caption{Caption of the future!}~\label{table:radii}
+	  \caption{The average pore radii of systems built with an initial pore
+		  radius of 2.5 \AA~and 5 \AA~equilibrate to values that agree within error. If
+		  the pore radius is too large, slit pores may form.}~\label{table:radii}
 	  \end{table}
+
+	  \begin{figure}
+	  \centering
+          \includegraphics[width=\textwidth]{slit_pores.png}
+	  \caption{A system that was built with an initial pore radius of 8
+		  \AA~equilibrates to a structure that exhibits both cylindrical and slit-like
+		  pores. As pictured here, sodium ions are colored blue, carbon atoms in the
+		  aromatic ring of the head group are colored orange and all else is colored
+		  cyan.}~\label{fig:slits}
+	  \end{figure}
 
 	  \item Initial distance between layers
 

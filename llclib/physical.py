@@ -10,6 +10,7 @@ import matplotlib.path as mplPath
 import mdtraj as md
 from random import randint
 from pymbar import timeseries
+import tqdm
 
 
 class region:
@@ -278,21 +279,28 @@ def limits(pos, pcenters):
 
     nT = pcenters.shape[2]
     npores = pcenters.shape[1]
-    natoms= pos.shape[1]
+    natoms = pos.shape[1]
     atom_ppore = old_div(natoms, npores)
 
     deviation = np.zeros([nT, npores, atom_ppore])
-    for f in range(nT):
+    for f in tqdm.tqdm(range(nT)):
         for i in range(atom_ppore):
             for j in range(npores):
-                deviation[f, j, i] = np.linalg.norm(pos[f, j*atom_ppore + i, :2] - pcenters[:, j, f])  # left off here
+                deviation[f, j, i] = np.linalg.norm(pos[f, j*atom_ppore + i, :2] - pcenters[:, j, f])
 
-    deviation = np.reshape(deviation, (nT, natoms))
+    #deviation = np.reshape(deviation, (nT, natoms))
+
     fr = np.zeros([nT])
     frstd = np.zeros([nT])
+    #
+    # for i in range(nT):
+    #     fr[i] = np.mean(deviation[i, :])  # + np.std(deviation[i, :]) # maybe?
+    #     frstd[i] = np.std(deviation[i, :])
 
-    for i in range(nT):
-        fr[i] = np.mean(deviation[i, :])  # + np.std(deviation[i, :]) # maybe?
-        frstd[i] = np.std(deviation[i, :])
+    radii = np.zeros([nT, npores])
 
-    return fr, frstd
+    for t in range(nT):
+        for p in range(npores):
+            radii[t, p] = np.mean(deviation[t, p, :])
+
+    return radii

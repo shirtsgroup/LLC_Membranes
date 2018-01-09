@@ -29,44 +29,45 @@
   \endgroup
  
   \vspace{1em}
-  Monomers were parameterized according to the following procedure:
+  We parameterized monomers according to the following procedure:
   \begin{enumerate}
 	\item \textit{Create monomer structure file with connectivity} : We
-	drew atomistic structures using MarvinSketch 17.13 with all hydrogen atoms
-	drawn out explicitly. We optimized the 3D geometry of the structure using the
-	'Clean in 3D' function of MarvinSketch 17.13~\cite{chemaxon_marvinsketch_2017}.
-	We saved the structure as a .mol file, then converted it to .pdb format using
-	Open Babel 2.4.1 \cite{oboyle_open_2011,noauthor_open_nodate}. 
-	\item \textit{Assign GAFF atomtypes using \texttt{antechamber}} : Using the .pdb
-	structure file as input, we ran \texttt{antechamber}~\cite{wang_automatic_2006}
-	using the AM1-BCC charge model. The net charge on the monomer is input as -1
-	since the sodium ion will be kept as a separate residue. The output of
-	\texttt{antechamber} is used to create Amber topology files with
-	\texttt{LEaP}~\cite{case_ambertools16_2016}. A detailed tutorial can be accessed
-	elsewhere \cite{walker_antechamber_nodate}.
-	\item \textit{Create gromacs topologies from Amber output} : \texttt{LEaP}
-	outputs a .inpcrd and a .prmtop file which are Amber topology files. Using
-	acpype.py \cite{sousa_da_silva_acpype_2012}, we convert the \texttt{LEaP}
-	output into GROMACS .gro and .top files. 
+	drew atomistic structures using MarvinSketch
+	17.13~\cite{chemaxon_marvinsketch_2017} with all hydrogen atoms drawn out
+	explicitly. We optimized the 3D geometry of the structure using the 'Clean in
+	3D' function of MarvinSketch.  We saved the structure as a .mol file, then
+	converted it to .pdb format using Open Babel 2.4.1
+	\cite{oboyle_open_2011,noauthor_open_nodate}. 
+	\item \textit{Assign GAFF atomtypes using \texttt{antechamber}} : Using
+	the .pdb structure file as input, we ran
+	\texttt{antechamber}~\cite{wang_automatic_2006} using the AM1-BCC charge model.
+	The net charge on the monomer is input as -1 since the sodium ion we keep it as
+	a separate residue. We use \texttt{LEaP}~\cite{case_ambertools_nodate} and the
+	output of \texttt{antechamber} to create Amber topology files. A detailed
+	tutorial can be accessed elsewhere \cite{walker_antechamber_nodate}.
+	\item \textit{Create gromacs topologies from Amber output} : The output
+	of \texttt{LEaP} is a .inpcrd and a .prmtop file which are Amber topology
+	files. Using acpype.py \cite{sousa_da_silva_acpype_2012}, we converted the
+	\texttt{LEaP} output into GROMACS .gro and .top files. 
 	\item \textit{Perform a simulated annealing procedure on the monomer} :
 	We created a cubic box around the monomer using the GROMACS command \texttt{gmx
-	editconf}. The monomer was centered in the monomer in the box with edges of the
-	box at least 3 nm from the monomer on all sides. We ran an energy minimzation
-	on the system with the steepest descent algorithm.  Next we performed an NVT
+	editconf}. The monomer was centered in the box with edges of the
+	box spaced at least 3 nm from the monomer on all sides. We ran an energy minimzation
+	on the system with the steepest descent algorithm. Next we performed an NVT
 	simulated annealing procedure. We linearly decreased the temperature of the
 	system from 1000K to 50K over the course of 10 ns. We randomly chose a monomer
 	configuration from the last 10 \% of the trajectory. 
 	\item \textit{Reassign charges with \texttt{molcharge}}: With the monomer
 	configuration taken from the annealed trajectory, we reassigned charges using
-	\texttt{molcharge} using the am1bccsym method in order to ensure charges 
+	\texttt{molcharge} with the am1bccsym method in order to ensure charges 
 	are symmetric. This condition is not guaranteed with \texttt{antechamber}. 
-	The charges in the gromacs topology file (.top) were replaced with the 
+	The charges in the GROMACS topology file (.top) were replaced with the 
 	new charges calculated by \texttt{molcharge}. 
-	\item \textit{Anneal again to get final structure} : The same simulated
-	annealing process was repeated using the monomer topology with
-	\texttt{molcharge} charges. A random monomer configuration was pulled from
-	the last 10 \% of the trajectory and was used to build all assemblies
-	reported (Figure~\ref{fig:monomer}).
+	\item \textit{Anneal again to get final structure} : We repeated the
+	same simulated annealing procedure using the monomer topology with
+	\texttt{molcharge} charges. A random monomer configuration was pulled from the
+	last 10 \% of the trajectory and was used to build all assemblies reported
+	(Figure~\ref{fig:monomer}).
   \end{enumerate} 
 
   \begin{figure}
@@ -159,7 +160,7 @@
   \endgroup
 
   \vspace{1em}
-  Any major dependence on initial configuration is addressed in the main text.
+  We addressed any major dependence on initial configuration in the main text.
   There we showed that systems are stable when made with 4, 5, 6, 7, and 8
   monomers per layer. We also showed that systems are stable when monomer head
   groups are oriented in the parallel displaced and sandwiched configurations
@@ -171,7 +172,7 @@
   between layers. Here we show the results of a sensitivity analysis performed
   on the three parameters. To reduce the size of the sensitivity analysis, we
   only tested systems built with 5 monomers per layer with layers stacked in 
-  the parallel displaced configuration. All systems were equilibrated according
+  the parallel displaced configuration. We equilibrated all systems according
   to the dry equilibration procedure.
 
   %Our model is insensitive to initial configuration if monomer placement is chosen within reason. 
@@ -182,7 +183,7 @@
 
 	  We tested five different initial pore spacings, defined as the
 	  distance between the central axis of each pore with all others. To reduce the
-	  number of variables, we held the pore radius constant, at 5 \AA~and the
+	  number of variables, we held the pore radius constant, at 6 \AA~and the
 	  distance between layers at 3.7 \AA~since those were the values used in our
 	  optimal system in the main text. If the initial pore spacing is chosen to be
 	  too small, pore columns abruptly repel each other as soon as they are able to
@@ -193,15 +194,15 @@
 
 	  \begin{enumerate}
 
-	  	\item 39 \AA~: A pore spacing of 39 \AA~is used in order to have a test system
-		started with a spacing below the experimental value. As soon as the restraining
+	  	\item 39 \AA~: We tested a pore spacing of 39 \AA~in order to have a test system
+		with an intial spacing below the experimental value. As soon as the restraining
 		potential switches to 56 KJ mol$^{-1}$ nm$^{-2}$, the columns are able to
 		separate resulting in a large jump in pore spacing (Figure~\ref{fig:p2p_39}). 
 
-		\item 41 \AA~: A pore spacing of 41 \AA~is chosen since it closely matches the
-		experimental pore spacing.  Again, we observe abrupt repulsion of columns once
-		the restraining potential is switched to 56 KJ mol$^{-1}$ nm$^{-2}$
-		(Figure~\ref{fig:p2p_41}).
+		\item 41 \AA~: We chose to test a pore spacing of 41 \AA~since
+		it closely matches the experimental pore spacing. Again, we observe abrupt
+		repulsion of columns once the restraining potential is switched to 56 KJ
+		mol$^{-1}$ nm$^{-2}$ (Figure~\ref{fig:p2p_41}).
 
 		\item 45 \AA~: A pore spacing of 45 \AA~is about 10 \% larger than the
 		experimental value. We observe relatively stable pore spacing during the
@@ -216,10 +217,11 @@
 		\item 55 \AA~: We tested a pore spacing of 55 \AA~ which is at
 		a distance where monomers in each pore no longer intersect adjacent pores. Once
 		the restraining potential reaches 56 KJ mol$^{-1}$ nm$^{-2}$, the pore spacing
-		changes erratically until it begins to settle once the force constants are
+		changes erratically until it begins to settle when the force constants are
 		below 3 KJ mol$^{-1}$ nm$^{-2}$ (Figure~\ref{fig:p2p_55}). We reccomend
-		avoiding a system such as this where vacuum gaps are introduced unnecessarily. 
-		The system equilibrates to a pore spacing of 4.27 $\pm$ 0.06 nm. 
+		avoiding a system such as this where vacuum gaps between pore columns are
+		introduced unnecessarily.  The system equilibrates to a pore spacing of 4.27
+		$\pm$ 0.06 nm. 
 
 	  \end{enumerate} 
 
@@ -258,13 +260,13 @@
 			mol$^{-1}$ nm$^{-2}$. When the initial pore spacing is chosen below the
 			experimental value (a) or at the experimental value (b), there is an abrupt
 			change in pore spacing when the position restraints are reduced to 56 KJ
-			mol$^{-1}$ nm$^{-2}$. When pores are started 45 \AA apart (c) the pore spacing
-			remains relatively stable. When pores are spaced 50 \AA apart (d), the pore
+			mol$^{-1}$ nm$^{-2}$. When pores are started 45 \AA~apart (c) the pore spacing
+			remains relatively stable. When pores are spaced 50 \AA~apart (d), the pore
 			spacing decreases nearly linearly once the restraints are reduced to 56 KJ
-			mol$^{-1}$ nm$^{-2}$. When pores are spaced 55 \AA apart (e), so that monomers
+			mol$^{-1}$ nm$^{-2}$. When pores are spaced 55 \AA~apart (e), so that monomers
 			do not intersect with adjacent pores, and position restraints are reduced to 56
-			KJ mol$^{-1}$ nm$^{-2}$, pore spacing changes erratically before stabilizing
-			when force constants are reduced to 3 KJ mol$^{-1}$ nm$^{-2}$.} 
+			KJ mol$^{-1}$ nm$^{-2}$, the pore spacing changes erratically before stabilizing
+			when force constants are reduced below 3 KJ mol$^{-1}$ nm$^{-2}$.} 
 		\label{fig:p2p}
 	  \end{figure}
 
@@ -274,24 +276,36 @@
 	  Figure~\ref{fig:pore_radius_illustration}. For each system, we held the initial
 	  pore spacing constant at 45 \AA~ and the distance between layers constant at
 	  3.7 \AA. Equilibrated values of pore radii are presented in
-	  Table~\ref{table:radii}. The pore radius in each frame is calculated as the
+	  Table~\ref{table:radii}. The pore radius in each simulation frame is calculated as the
 	  average distance of all carbonyl carbons (See
 	  Figure~\ref{fig:pore_radius_illustration}) from their associated pore center.
 	  Statistics for the pore radii reported were generated from the timeseries
-	  representing the average pore radius at each frame.  Equilibration was detected
-	  using \texttt{pymbar.timeseries.detectEquilibration}. The average and standard
-	  deviation of pore radii were calculated using only data points collected after
+	  representing the average pore radius at each frame.  We detected equilibration 
+	  using \texttt{pymbar.timeseries.detectEquilibration}. We calculated the average
+	  and standard deviation of pore radii using only data points collected after
 	  equilibration was detected.
 
 	  \begin{enumerate}
 
-		\item 2.5 \AA~: The smallest pore radius that we can achieve before energy 
-		minimization becomes problematic is 2.5 \AA.
+		\item 2.5 \AA~: The smallest pore radius that we can achieve
+		before energy minimization becomes problematic is 2.5 \AA. After being run
+		through the full dry equilibration procedure, the average pore radius is 0.40
+		$\pm$ 0.01 \AA.
 
-		\item 5 \AA~: 
+		\item 5 \AA~: We tested a pore radius of 5 \AA~because it is
+		slightly larger than the equilibrated pore radius of the system simulated with
+		an intial pore radius of 2.5 \AA. After being run through the full dry
+		equilibration procedure, the average pore radius is 0.42 $\pm$ 0.01 \AA, which
+		agrees with the 2.5 \AA~ configuration within error. 
 
-		\item 8 \AA~: The largest pore radius that can achieve before energy minimization
-		becomes problematic is 8 \AA.
+		\item 8 \AA~: The largest pore radius that can achieved before
+		energy minimization becomes problematic is 8 \AA. One should use caution with
+		such a structure because of the relatively large vacuum space that is created
+		in the pore region of the initial configuration. After being run through the
+		full dry equilibration procedure, we see a combination of cylindrical and
+		slit-like pores (Figure~\ref{fig:slits}). We are wary of such a non-symmetric
+		structure and choose not to use a pore radius of 8 \AA for our starting configurations. 
+	  
 	  \end{enumerate}
 
 	  \begin{table}[h]
@@ -301,36 +315,50 @@
 	  Initial Pore Radius & Equilibrated Pore Radius \\
 	  \midrule
 	  % BJC: to be updated once simulations are run out long enough
-	  2.5 \AA & $0.394 \pm 0.002$ \AA \\
-	  5 \AA   & $0.423 \pm 0.002$ \AA \\ % final result
-	  8 \AA   & $0.721 \pm 0.002$ \AA \\
+	  2.5 \AA & $0.40 \pm 0.01$ \AA \\
+	  5 \AA   & $0.42 \pm 0.01$ \AA \\ % final result
+	  8 \AA   & $0.69 \pm 0.01$ \AA \\
 	  \bottomrule
 	  \end{tabular}
-	  \caption{Caption of the future!}~\label{table:radii}
+	  \caption{The average pore radii of systems built with an initial pore
+		  radius of 2.5 \AA~and 5 \AA~equilibrate to values that agree within error. If
+		  the pore radius is too large, slit pores may form.}~\label{table:radii}
 	  \end{table}
+
+	  \begin{figure}
+	  \centering
+          \includegraphics[width=\textwidth]{slit_pores.png}
+	  \caption{A system that was built with an initial pore radius of 8
+		  \AA~equilibrates to a structure that exhibits both cylindrical and slit-like
+		  pores. As pictured here, sodium ions are colored blue, carbon atoms in the
+		  aromatic ring of the head group are colored orange and all else is colored
+		  cyan.}~\label{fig:slits}
+	  \end{figure}
 
 	  \item Initial distance between layers
 
 	  We tested 3 different initial layer spacings, defined as the distance
 	  between the planes of aromatic rings in each layer. Systems built with layers
-	  stacked 3.7 \AA and 5 \AA apart are discussed extensively in the main text. We
-	  will focus the discussion here on systems built with layers stacked 10 \AA
+	  stacked 3.7 \AA~and 5 \AA~apart are discussed extensively in the main text. We
+	  will focus the discussion here on systems built with layers stacked 10~\AA
 	  apart.
 
-	  Figure ~\ref{fig:dbwl_10} shows the structure of an assembly built
-	  with an initial layer spacing of 10 \AA immediately after the restrained
-	  portion of the equilibration procedure. Since position restraints, the
-	  simulations are run in the NVT ensemble. When layer spacing is large, such as
+	  Figure~\ref{fig:dbwl_10} shows the structure of an assembly built
+	  with an initial layer spacing of 10 \AA~immediately after the restrained
+	  portion of the equilibration procedure. Since we used position restraints, the
+	  simulations were run in the NVT ensemble. When layer spacing is large, such as
 	  this situation, there is a significant amount of vacuum space which the monomer
-	  attempts to fill.  Even if turning pressure control on allows the system to
+	  attempts to fill. Even if turning pressure control on allows the system to
 	  recover the geometry of the hexagonal phase, we would likely need much longer
-	  equilibration times, and it will almost certainly remain trapped in metastable
-	  configurations that bear no resemblence to experimental profiles. 
+	  equilibration times, and it will almost certainly get trapped in a metastable
+	  configuration that bears no resemblence to the experimental profile. 
  
 	  \begin{figure}
 		\centering
 		\includegraphics[width=0.5\textwidth]{dbwl_10.png}
-		\caption{}\label{fig:dbwl_10} 
+		\caption{When layers are initially stacked 10 \AA~apart and the system
+                is equilibrated using the dry equlibration procedure, large vacuum gaps
+		form as the monomers attempt to fill space.}\label{fig:dbwl_10} 
 	  \end{figure}
 
   \end{enumerate}
