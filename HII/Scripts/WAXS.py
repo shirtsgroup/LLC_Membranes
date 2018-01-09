@@ -36,7 +36,7 @@ for i in range(23):
     y = np.where(waxs == m)[1][0]
     waxs[x, y] = 0
 
-fig, ax = plt.subplots()
+# fig, ax = plt.subplots()
 # plt.imshow(waxs, cmap='jet')
 # plt.show()
 # exit()
@@ -85,7 +85,36 @@ print('Average intensity in alkane region: %s' % (intensity/count))
 
 #waxs /= np.amax(waxs)  # normalize with respect to highest intensity in pi-stacking reflection
 # waxs /= (intensity/count)
-plt.imshow(waxs, cmap='jet', vmax=2.5*(intensity/count), extent=[-qmax, qmax, -qmax, qmax])
+fig = plt.figure()
+ax = fig.add_subplot(111)
+heatmap = plt.imshow(waxs, cmap='jet', vmax=2.5*(intensity/count), extent=[-qmax, qmax, -qmax, qmax])
+
+size = 12
+txt1 = ax.annotate('R-$\pi$', xy=(0, 1.9), color='w', size=size, weight='bold', ha='center', va='center')
+txt2 = ax.annotate('R-helix', xy=(0, -0.6), color='w', size=size, weight='bold', ha='center', va='center')
+txt3 = ax.annotate('R-alkanes', xy=(0, -1.3), color='w', size=size, weight='bold', ha='center', va='center')
+txt4 = ax.annotate('R-spots', xy=(-1, 1), color='w', size=size, weight='bold', ha='center', va='center')
+txt5 = ax.annotate('R-pores', xy=(0, 0.25), color='w', size=size, weight='bold', ha='center', va='center')
+txt6 = ax.annotate("", xy=(1, 0.25), xytext=(0.5, 0.25), arrowprops=dict(arrowstyle="simple", connectionstyle="arc3", fc='w'))
+txt7 = ax.annotate("", xy=(-1, 0.25), xytext=(-0.5, 0.25), arrowprops=dict(arrowstyle="simple", connectionstyle="arc3", fc='w'))
+txt6 = ax.annotate("", xy=(1.3, -0.4), xytext=(0.7, -1.15), arrowprops=dict(arrowstyle="simple", connectionstyle="arc3,rad=0.2", fc='w'))
+txt7 = ax.annotate("",  xy=(-1.3, -0.4), xytext=(-0.7, -1.15), arrowprops=dict(arrowstyle="simple", connectionstyle="arc3,rad=-0.2", fc='w'))
+import matplotlib.patheffects as PathEffects
+
+lw = 1.5
+txt1.set_path_effects([PathEffects.withStroke(linewidth=lw, foreground='black')])
+txt2.set_path_effects([PathEffects.withStroke(linewidth=lw, foreground='black')])
+txt3.set_path_effects([PathEffects.withStroke(linewidth=lw, foreground='black')])
+txt4.set_path_effects([PathEffects.withStroke(linewidth=lw, foreground='black')])
+txt5.set_path_effects([PathEffects.withStroke(linewidth=lw, foreground='black')])
+
+cbar = plt.colorbar(heatmap)
+from matplotlib import ticker
+tick_locator = ticker.MaxNLocator(nbins=5)
+cbar.locator = tick_locator
+cbar.update_ticks()
+cbar.ax.set_yticklabels(['0', '0.2', '0.4', '0.6', '0.8', '1'])
+
 plt.xlabel('$q_r$', fontsize=14)
 plt.ylabel('$q_z$', fontsize=14)
 plt.gcf().get_axes()[0].tick_params(labelsize=14)
