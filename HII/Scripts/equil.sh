@@ -74,7 +74,12 @@ done
 
 #input.py --mdp -b ${BUILD_MON} -l 20000 --restraints --temp ${T} -f 50 --genvel no  # use velocities from previous sim
 #gmx grompp -f npt.mdp -p topol.top -c npt.gro -o wiggle
-input.py -b ${BUILD_MON} -l 5000 --temp ${T} -f 50 --barostat berendsen --genvel no # put pressure control back on
+if [[ $solvate -eq 1 ]]; then
+    input.py -b ${BUILD_MON} -l 5000 --temp ${T} -f 50 --barostat berendsen --genvel no -S -c ${start_config}
+else
+    input.py -b ${BUILD_MON} -l 5000 --temp ${T} -f 50 --barostat berendsen --genvel no -c ${start_config}
+fi
+
 gmx grompp -f npt.mdp -p topol.top -c 0.gro -o berendsen # run it out for a bit
 #gmx mdrun -v -deffnm wiggle
 exit

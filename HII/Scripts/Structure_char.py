@@ -235,6 +235,7 @@ def p2p_stats(p2ps, exclude, nboot, equil):
         tau = 1
 
     ind_trajectories = old_div((nT - t), tau)  # the number of independent trajectories
+    print('%s Independent Trajectories' % ind_trajectories)
 
     trajectories = np.zeros([ndist, ind_trajectories, tau])  # Create a new array to hold all the trajectories
 
@@ -245,14 +246,46 @@ def p2p_stats(p2ps, exclude, nboot, equil):
             trajectories[i, j, :] = p2ps[i, (t + j*tau):(t + (j + 1)*tau)]
 
     # bootstrap to get statistics
-    p2p_boot = np.zeros([ndist, nboot])
+    p2p_boot = np.zeros([nboot, ndist, ind_trajectories*tau])  # a bunch of full trajectories assembled from independent trajectories
+    avg_trials = np.zeros([nboot, ndist])
     for i in range(nboot):
-        for j in range(ndist):
-            for k in range(nT - t):
-                T = ran.randrange(0, ind_trajectories)  # pick a random trajectory from all the independent trajectories
-                P = ran.randrange(0, tau)  # choose a random point in that trajectory
-                p2p_boot[j, i] += trajectories[j, T, P]
-            p2p_boot[j, i] /= (nT - t)
+        for k in range(ind_trajectories):
+            T = ran.randrange(0, ind_trajectories)  # pick a random trajectory from all the independent trajectories
+            p2p_boot[i, :, k*tau:(k+1)*tau] = trajectories[:, T, :]
+        avg_trials[i, :] = np.mean(p2p_boot[i, :, :], axis=1)  # Average value of each pore for each trial
+
+    average_distances = np.mean(avg_trials, axis=0)
+    avg = np.mean(average_distances)
+
+    var = 0
+    for i in average_distances:
+        var += (i - avg)**2
+
+    var /= 4  # number of independent distances
+    std = var ** 0.5  # take square root to get std from variance
+
+    # p2p_boot = np.zeros([ndist, nboot])
+    # for i in range(nboot):
+    #     for j in range(ndist):
+    #         for k in range(nT - t):
+    #             T = ran.randrange(0, ind_trajectories)  # pick a random trajectory from all the independent trajectories
+    #             P = ran.randrange(0, tau)  # choose a random point in that trajectory
+    #             p2p_boot[j, i] += trajectories[j, T, P]
+    #         p2p_boot[j, i] /= (nT - t)
+
+    # avg = np.zeros([ndist])  # find the average of each trajectory
+    # for i in range(ndist):
+    #     avg[i] = np.mean(p2p_boot[i, :])
+    #
+    # ensemble_avg = np.mean(avg)  # the ensemble average, <x>, is the average p2p of all the trajectories
+    #
+    # stds = np.zeros([ndist])  # find the standard deviation for each pore : s = sqrt((<x> - x)^2) where x is the avg[i]
+    # for i in range(ndist):
+    #     stds[i] = np.sqrt((ensemble_avg - avg[i])**2) / np.sqrt(ndist - 1)
+    #
+    # p2p_std = np.mean(stds)   # report the average of the standard deviations
+    #
+    # ensemble_avg = np.mean(p2p_boot)
 
     # Old way of doing things:
     # p2p_boot = np.zeros([ndist, nboot*ind_trajectories])  # Recreate the dataset
@@ -263,21 +296,7 @@ def p2p_stats(p2ps, exclude, nboot, equil):
     #             P = ran.randrange(0, tau)  # choose a random point in that trajectory
     #             p2p_boot[j, i*ind_trajectories + k] = trajectories[j, T, P]
 
-    avg = np.zeros([ndist])  # find the average of each trajectory
-    for i in range(ndist):
-        avg[i] = np.mean(p2p_boot[i, :])
-
-    ensemble_avg = np.mean(avg)  # the ensemble average, <x>, is the average p2p of all the trajectories
-
-    stds = np.zeros([ndist])  # find the standard deviation for each pore : s = sqrt((<x> - x)^2) where x is the avg[i]
-    for i in range(ndist):
-        stds[i] = np.sqrt((ensemble_avg - avg[i])**2) / np.sqrt(ndist - 1)
-
-    p2p_std = np.mean(stds)   # report the average of the standard deviations
-
-    ensemble_avg = np.mean(p2p_boot)
-
-    return ensemble_avg, p2p_std, t
+    return avg, std, t
 
 
 def compdensity(component, pore_centers, start, box, cut=1.5, pores=4, nbins=50, rmax=3.5, buffer=0.0):
@@ -326,7 +345,7 @@ def compdensity(component, pore_centers, start, box, cut=1.5, pores=4, nbins=50,
     density = np.zeros([nbins])  # number / nm^3
     for t in tqdm.tqdm(range(start, nT)):
         for p in range(pores):
-            # narrow down the positions to those that are with 'cut' of at least one pore
+            # narrow down the positions to those that are within 'cut' of at least one pore
             distances = np.linalg.norm(component[t, :, :2] - pore_centers[:, p, t], axis=1)
             d_sorted = np.sort(distances)
             # find where the distances exceed the cutoff

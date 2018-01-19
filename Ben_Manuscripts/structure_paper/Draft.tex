@@ -28,6 +28,27 @@ Shirts}
   \graphicspath{{./figures/}}
   \maketitle
 
+  \begin{abstract}
+
+  Nanostructured porous membranes made from the cross-linked hexagonal phase of
+  self-assembled lyotropic liquid crystals (LLCs) are a promising material for
+  selective separations. To date, their separation performance has only been
+  characterized with membranes made from a small set of LLC monomers. There
+  remains a large design space that we can likely exploit to design membranes for
+  solute specific separations. In this work, we develop an atomistic molecular
+  model of an LLC membrane. We show that our model is maximally consistent with
+  experimental observations by comparing simulated X-ray Diffraction (XRD)
+  patterns and calculated ionic conductivity to their experimental counterparts.
+  We explore, in depth, the composition and structure of the nanopores in order
+  to give insights that are not easily accessible to experimentalists. With the
+  clear picture of the nanoscopic structure of these membranes gained from this
+  work, we will be able to use the model to understand the mechanisms of small
+  charged and uncharged solute transport within the nanopores, and eventually we
+  will be able to screen large sets of modified monomers with their separation
+  properties in mind.  
+
+  \end{abstract}
+
   \section{Introduction}
   
   Nanostructured porous membrane materials have become increasingly popular for
@@ -384,7 +405,8 @@ Shirts}
   trapped in a metastable free energy basin. We must be able to identify which
   state is produced experimentally.
 
-  \item What constitutes a pore, and how well-defined are the pore regions? \label{point:poredefinition}
+  %\item What constitutes a pore, and how well-defined are the pore regions? \label{point:poredefinition}
+  \item What constitutes a pore, and what does the pore architecture look like? \label{point:poredefinition}
 
   The limited picture that experiment provides tells us that there are
   hexagonally packed, hydrophilic regions where transport is likely to occur.
@@ -814,16 +836,37 @@ Shirts}
 		lower than those started in the parallel displaced configuration.}~\label{fig:p2p}
   \end{figure}  
 
-  \subsection{Determining Definition of Layers}
+  \subsection{Layer partitioning}
 
   We learned that layers are well-defined and persistent, answering
-  (\ref{point:layers}). We established our conclusion by plotting the pair
-  correlation function, $g(z)$, calculated between atoms along the length of the
+  (\ref{point:layers}). We established our conclusion by plotting the one dimensional pair
+  distribution function, $g(z)$, calculated between atoms along the length of the
   pores (Fig.~\ref{fig:zdf}). We measured $g(z)$ with respect to aromatic rings in
   the head groups and, separately, with respect to carbon atoms in the alkane
   chains. Using a Fourier transform of $g(z)$, we see that sandwiched
   configuration layers stack 4.39 \angstrom~apart while parallel displaced
   configuration layers stack 4.38 \angstrom~apart.
+
+  Insert paragraph about 2D pair distribution function (yz cross section). 
+
+  We measured the correlation length, L, by fitting a function of the form:
+  $$1 + Asin(Bx + C)e^{-z/L}$$ where z is the independent variable and all
+  other variables are fitting parameters. The correlation length for each
+  system is given in Table~\ref{fig:correlation_length}.
+
+  \begin{table}[h]
+  \centering
+  \begin{tabular}{ccc}
+  \toprule
+  System & Layer Separation & Correlation Length \\
+  \midrule
+  Sandwiched & 4.39 \AA & 41 $\pm$ 3 \AA \\
+  Parallel Displaced & 4.38 \AA & 86 $\pm$ 14 \AA \\
+  Experiment* & 3.7 \AA & 32 $\pm$ 1 \AA \\  
+  \bottomrule
+  \end{tabular}
+  \caption{*See supplemental information for derivation of experimental correlation length}~\label{fig:correlation_length}
+  \end{table} 
 
   %BJC: TODO: increase font size on legends
   \begin{figure}
@@ -1042,22 +1085,77 @@ Shirts}
   When we build systems with layers stacked 5.0 \AA~apart and then let them
   equilibrate, we observe long-term stability of a qualitatively different
   configuration, suggesting that we have found another metastable free energy
-  basin, further corroborating (\ref{point:metastable}). For reasons to become
-  apparent later, we will refer to this class of systems as the disordered pore
-  basin. Systems which we build with layers initially stacked 3.7 \AA~apart will
-  be referred to as the ordered basin. We studied each basin in both the parallel
-  displaced and sandwiched configurations. 
+  basin, further corroborating (\ref{point:metastable}). The basins are
+  differentiated by their relative degrees of ordering resulting from different
+  spatial arrangements. 
 
-%  Structural properties are different when layers are initially spaced 5 \AA~
-%  apart. 
-  Structural properties are different in the disordered pore basin.  In both
-  configurations, we observe a decrease in pore spacing
-  (Fig.~\ref{fig:p2p_disordered}) and a corresponding increase in the
-  equilibrated distance between layers (Fig.~\ref{fig:dbwl_disordered}). The
-  simulated X-ray diffraction patterns indicate further structural differences.
-  In the parallel displaced configuration, almost all contrast between R-spots
-  and R-alkanes fades (Fig.~\ref{fig:offset_disordered_xrd}). In the
-  sandwiched configuration, R-spots is weakly present, but in different
+  We expect that the head groups in more ordered systems will be predominantly
+  coplanar with the xy plane. We defined a director vector, \textbf{n}, as the
+  vector normal to the plane of the monomer's aromatic head group, then measured
+  the distribution of angles between it and the z-axis. We used the resulting
+  distibution of angles to calculate the nematic order parameter, S. The values
+  of S for systems resulting from each initial configuration are presented in
+  Table \ref{table:nematic}. The full distributions of angles between \textbf{n}
+  and the z-axis are presented in the supplemental material. In general, systems
+  started with layers spaced 3.7 \AA apart are more nematically ordered than
+  those initially spaced 5 \AA apart. We will refer to systems built with layers
+  initially spaced 3.7 \AA apart and 5.0 \AA apart as the ordered and disordered
+  pore basins respectively. We studied each basin in both the parallel displaced
+  and sandwiched configurations.  
+
+  \begin{table}[h]
+  \centering
+  \begin{tabular}{cc}
+  \toprule
+  System & Nematic Order Parameter (S) \\
+  \midrule
+  Sandwiched, Ordered & 0.659 $\pm$ 0.003 \\
+  Parallel Displaced, Ordered & 0.601 $\pm$ 0.003 \\
+  Sandwiched, Disordered & 0.565 $\pm$ 0.002 \\
+  Parallel Displaced, Disordered & 0.503 $\pm$ 0.002 \\
+  \bottomrule
+  \end{tabular}
+  \caption{The nematic order parameter is higher when layers are initially spaced
+  3.7 \AA apart. A perfectly stacked system with aromatic rings coplanar with the
+  xy plane would have a nematic order parameter of 1, while isotropically aligned
+  director vectors would have a nematic order parameter of 0.}~\label{table:nematic}
+  \end{table}
+
+  We observe more evidence of disorder in the disordered pore basin when we 
+  plot the two dimensional pair distribution function between the centers of 
+  mass of monomer head groups. ADD MORE ANALYSIS ONCE CODE IS WORKING HOW I WANT IT
+
+  \begin{figure}
+  \begin{subfigure}{1\linewidth}
+        \centering
+        \begin{subfigure}{0.45\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{layered_xy_rings.png}
+                \caption{}~\label{fig:sandwich_xy}
+        \end{subfigure}%
+        \begin{subfigure}{0.45\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{offset_xy_rings.png}
+                \caption{}~\label{fig:offset_xy}
+        \end{subfigure}
+        \begin{subfigure}{0.45\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{disorder_sandwich_xy_rings.png}
+                \caption{}~\label{fig:disorder_sandwich_xy}
+        \end{subfigure}%
+        \begin{subfigure}{0.45\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{disorder_offset_xy_rings.png}
+                \caption{}~\label{fig:disorder_offset_xy}
+        \end{subfigure}
+  \end{subfigure}
+  \caption{}\label{fig:xy_correlation}
+  \end{figure}
+
+  The simulated X-ray diffraction patterns indicate further structural
+  differences. In the parallel displaced configuration, almost all contrast
+  between R-spots and R-alkanes fades (Fig.~\ref{fig:offset_disordered_xrd}). In
+  the sandwiched configuration, R-spots is weakly present, but in different
   locations, showing higher intensity at the top and bottom of the pattern as
   well as at the intersection of R-alkanes with q$_z$ = 0 (Fig.
   ~\ref{fig:layered_disordered_xrd}). 
@@ -1067,6 +1165,12 @@ Shirts}
   parallel displaced configuration and is absent in the sandwiched simulated
   diffraction pattern. The spectroscopic signatures are unique to the two
   different head group configurations.
+
+  The equilibrated pore spacing and distance between layers are different in
+  the disordered pore basin. For both head group stacking arrangements, we
+  observe a decrease in pore spacing (Fig.~\ref{fig:p2p_disordered}) and a
+  corresponding increase in the equilibrated distance between layers
+  (Fig.~\ref{fig:dbwl_disordered}). 
 
   \begin{figure}[!hbt]
         \centering
@@ -1104,7 +1208,7 @@ Shirts}
 		motif.}
   \end{figure}
 
-  \subsection{Pore Structure Depends on Initial Configuration}  % Addresses pore definition
+  \subsection{Pore Composition Depends on Initial Configuration}
 
   In order to address (\ref{point:poredefinition}), we plotted the number
   densities of heavy atoms in the head group, carbon atoms in the tail region
@@ -1115,7 +1219,7 @@ Shirts}
 
   In all cases, the space in the pore region is filled with sodium ions and
   head groups. In the ordered pore systems, there is less density in the center of
-  the pore indicating a more ordered pore structure. In both the sandwich and
+  the pore indicating a more ordered pore structure. In both the sandwiched and
   parallel displaced configurations, we see the density of head groups and sodium
   ions fall to less than 50\% of its maximum at r = 0
   (Fig.~\ref{fig:layered_density}). The situation is most pronounced in the
@@ -1130,7 +1234,7 @@ Shirts}
   it is a gradient in composition, rather than an abrupt division. The system
   does not confine sodium ions and head groups to just within the pore region.
   Assuming a pore radius of 0.6 nm, we see in all cases, that 19\% of sodium ions
-  exist outside the pore region (except sandwiched, ordered pore , where 16\%
+  exist outside the pore region (except sandwiched, ordered pore, where 16\%
   are outside the pore). Additionally, we see that in all cases, about 3\% of the
   plotted tail density is located within the pore region (except sandwiched,
   ordered pore, where 1.5\% are within the pore region). These observations bring

@@ -12,6 +12,7 @@ import Poly_fit
 import mdtraj as md
 import top
 import time
+import Atom_props
 
 
 def initialize():
@@ -19,7 +20,8 @@ def initialize():
     parser = argparse.ArgumentParser(description='Calculate diffusion coefficient')
     parser.add_argument('-t', '--trajectory', default='wiggle.trr', help='Path to input file')
     parser.add_argument('-g', '--gro', default='wiggle.gro', help='Name of .gro coordinate file')
-    parser.add_argument('-r', '--residue', default='SOL', help='Name of residue whose diffusivity we want')
+    parser.add_argument('-r', '--residue', type=str, help='Name of residue whose diffusivity we want')
+    parser.add_argument('-atoms', nargs='+', help='Name of atoms whose collective diffusivity is desired')
     parser.add_argument('--itp', default='/usr/local/gromacs/share/gromacs/top/amber99.ff/tip3p.itp', help='Name of itp'
                         'describing topology of residue')
     parser.add_argument('-b', '--nboot', default=200, help='Number of bootstrap trials to be run')
@@ -157,22 +159,36 @@ def dconst(x, nT, Nbootstraps, frontfrac, fracshow, d, dt, ndx):
 if __name__ == '__main__':
 
     args = initialize()  # initialize variables passed to the script
+    frontfrac = args.frontfrac
+    fracshow = args.fracshow
 
     t = md.load(args.trajectory, top=args.gro)  # load trajectory
     nT = t.n_frames  # number of frames
 
-    res = args.residue
-    if res == 'SOL':  # mdtraj changes the name from SOL to HOH
-        res = 'HOH'
+    if args.residue:
 
-    selection = [a.index for a in t.topology.atoms if a.residue.name == res]
+        res = args.residue
+        if res == 'SOL':  # mdtraj changes the name from SOL to HOH
+            res = 'HOH'
+
+        selection = [a.index for a in t.topology.atoms if a.residue.name == res]
+
+        topology = top.Top(args.itp)  # read topology
+        atoms_per_residue = topology.natoms  # number atoms in a single residue
+        matoms = topology.atom_masses  # mass of the atoms in residue
+        mres = np.sum(matoms)  # total mass of residue
+
+    elif args.atoms:
+
+        selection = [a.index for a in t.topology.atoms if a.name in args.atoms]
+
+        atoms_per_residue = len(args.atoms)
+        matoms = np.array([Atom_props.mass[x] for x in args.atoms])
+        mres = np.sum(matoms)
+    else:
+        print('Error: No valid group of atoms or residues')
 
     pos = t.xyz[:, selection, :]  # positions of all atoms of interest
-
-    topology = top.Top(args.itp)  # read topology
-    atoms_per_residue = topology.natoms  # number atoms in a single residue
-    matoms = topology.atom_masses  # mass of the atoms in residue
-    mres = np.sum(matoms)  # total mass of residue
 
     dimension = len(args.axis)  # number of dimensions in which msd is being computed
     ndx = []
@@ -192,7 +208,35 @@ if __name__ == '__main__':
 
     dt = t.time[-1] - t.time[-2]  # time step (assuming equispaced time points)
 
-    MSD, endMSD, limits, D_av, D_std = dconst(com, nT, args.nboot, args.frontfrac, args.fracshow, dimension, dt, ndx)
+    MSD, endMSD, limits, D_avg, D_std = dconst(com, nT, args.nboot, args.frontfrac, args.fracshow, dimension, dt, ndx)
+    fit = 0
+
+    while fit == 0:
+
+        endMSD = int(nT*fracshow)
+        startMSD = int(nT*frontfrac)
+        D_avg, D_std = d_error(startMSD, endMSD, nT, limits, t.time, MSD, len(ndx))
+        errorevery = int(np.ceil(nT / 100.0))  # plot only 100 bars total
+        plt.errorbar(dt * np.array(list(range(0, nT - 1))), MSD[:-1], yerr=[limits[0, :-1], limits[1, :-1]],
+                     errorevery=errorevery, label='Calculated MSD')
+        plt.ylabel('MSD ($nm^2$)', fontsize=14)
+        plt.xlabel('time (ps)', fontsize=14)
+        plt.gcf().get_axes()[0].tick_params(labelsize=14)
+        plt.title('D = %1.2e $\pm$ %1.2e $m^{2}/s$' % (D_avg, D_std))
+        plt.legend(loc=2)
+        plt.tight_layout()
+        plt.savefig('Diffusivity_%s.png' % args.axis)
+        plt.ion()
+        plt.show()
+        fit = int(input("Type '1' if the fit looks good: "))
+        if fit != 1:
+            print('Press enter to following prompts to leave as is')
+            frontfrac = float(input("Fraction into simulation to start fit: ") or frontfrac)
+            fracshow = float(input("Fraction into simulation to stop fit: ") or fracshow)
+        plt.clf()
+
+    print(('D = %1.2e +/- %1.2e m^2/s' % (D_avg, D_std)))
+    plt.figure()
     # errorevery = int(np.ceil(args.fracshow*nT/100.0))  # plot only 100 bars total
     errorevery = int(np.ceil(nT/100.0))  # plot only 100 bars total
     # plt.errorbar(dt*np.array(list(range(0, endMSD))), MSD[:endMSD], yerr=[limits[0, :endMSD], limits[1, :endMSD]],
@@ -202,7 +246,7 @@ if __name__ == '__main__':
     plt.ylabel('MSD ($nm^2$)', fontsize=14)
     plt.xlabel('time (ps)', fontsize=14)
     plt.gcf().get_axes()[0].tick_params(labelsize=14)
-    plt.title('D = %1.2e $\pm$ %1.2e $m^{2}/s$' % (D_av, D_std))
+    plt.title('D = %1.2e $\pm$ %1.2e $m^{2}/s$' % (D_avg, D_std))
     plt.legend(loc=2)
     plt.tight_layout()
     plt.savefig('Diffusivity_%s.png' % args.axis)

@@ -9,6 +9,7 @@ import argparse
 import mdtraj as md
 import tqdm
 import matplotlib.pyplot as plt
+from scipy.optimize import leastsq
 
 
 def initialize():
@@ -28,6 +29,7 @@ def initialize():
     parser.add_argument('-l', '--load', type=str, help='Load compressed numpy array')
     parser.add_argument('-com', '--com', action="store_true", help='Calculate zdf based on com of atoms')
     parser.add_argument('-r', '--res', type=str, help='Residue name to calculate zdf of')
+    parser.add_argument('-fit', '--fit', action='store_true', help='Fit a function to the zdf')
 
     args = parser.parse_args()
 
@@ -97,7 +99,7 @@ def z_periodic(positions, box, images=1):
     return periodic
 
 
-def zdf(positions, npores, atoms_per_layer, box, bins, name, images=1, tol=0.01):
+def zdf(positions, npores, atoms_per_layer, box, bins, name, images=1, tol=0.01, fit=False):
     """
     :param positions: xyz positions of atoms expanded periodically in the +/- z direction
     :param npores: number of pores
@@ -109,13 +111,13 @@ def zdf(positions, npores, atoms_per_layer, box, bins, name, images=1, tol=0.01)
     nimages = images*2 + 1
     natoms = positions.shape[1]
 
-    z = np.zeros([nT, natoms, natoms])  # distance b/w each atom and all other atoms at each frame
+    # This implementation needs some work
+    z = np.zeros([nT, npores, natoms, natoms])  # distance b/w each atom and all other atoms at each frame
     atoms_ppore = old_div(natoms, npores)
 
     print('Calculating z distribution function of atom %s' % name)
     for t in tqdm.tqdm(list(range(nT))):
         for p in range(npores):
-
             # ensure we are only looking at pores from the original unit cell (the middle image in the periodic cell created by z_periodic)
             start = p*atoms_ppore + (old_div(atoms_ppore, nimages))
             end = start + (old_div(atoms_ppore, nimages))
@@ -129,20 +131,19 @@ def zdf(positions, npores, atoms_per_layer, box, bins, name, images=1, tol=0.01)
                     if int(old_div(i,atoms_per_layer)) != int(old_div(j,atoms_per_layer)): # and int(i / atoms_ppore) == int(j / atoms_ppore):
                         # ^ if the atoms aren't in the same layer but they are in the same pore ^
                         d = positions[t, i, 2] - positions[t, j, 2]
-                        z[t, i, j] = d
+                        z[t, p, i, j] = d
 
     L = np.mean(box[:, 2, 2])  # average z length of unit cell
-
     p = old_div(atoms_ppore, ((images*2 + 1)*L))  # average number density of atoms [particles / nm]
 
     # in periodic cell. Atoms in same layer are not counted (particles / nm)
 
-    z = np.absolute(z).flatten()  # make sure everything is positive and turn it into a 1 dimensional array
-    z = np.ma.masked_equal(z, 0)  # mask the array so all 0 values are not considered. Zero values exist when the z dist
+    z_flat = np.absolute(z).flatten()  # make sure everything is positive and turn it into a 1 dimensional array
+    z_flat = np.ma.masked_equal(z_flat, 0)  # mask the array so all 0 values are not considered. Zero values exist when the z dist
     # is calculated between an atom and itself (i.e. i = j above) or if atoms are in the same layer or different pores
 
     # bin everything
-    bins, edges = np.histogram(z.compressed(), bins=bins)
+    bins, edges = np.histogram(z_flat.compressed(), bins=bins)
 
     end = 0
     while edges[end] < L:
@@ -152,15 +153,12 @@ def zdf(positions, npores, atoms_per_layer, box, bins, name, images=1, tol=0.01)
 
     bins = [old_div(i, (2 * nT * p * dx * L * npores)) for i in bins]  # normalize by number density
 
-    # control = np.zeros([len(bins)]) + np.mean(bins[:end])
-
     end /= 2
-    # print(edges, bins)
-    # exit()
-    # if not args.avg:
-    #     plot_zdf(edges, bins, end=end)
 
-    return edges[:int(end)], bins[:int(end)]
+    if fit:
+        return z, L, p
+    else:
+        return edges[:int(end)], bins[:int(end)]
 
 
 def plot_zdf(z, d, out, end=-1):
@@ -177,7 +175,7 @@ def plot_zdf(z, d, out, end=-1):
     plt.ylabel('Count', fontsize=14)
     plt.axes().tick_params(labelsize=14)
     plt.tight_layout()
-    plt.savefig('%s' % out)
+    # plt.savefig('%s' % out)
     plt.show()
 
 
@@ -266,40 +264,93 @@ def power_spectrum(data, bin):
     return ps, freqs, max
 
 
+def decay(p, x):
+    """
+    :param p: parameters: [period of oscillations, correlation time, amplitude, phase shift]
+    :param x: x axis values
+    :return: exponential function that sinusoidially decaying to one
+    """
+    return 1 + p[2]*np.sin(p[0]*x + p[3])*np.exp(-x/p[1])
+
+
+def errorfunc(p, x, z):
+
+    return decay(p, x) - z
+
+
+def zdf_fit(zdf_avg, centers, z_avg):
+
+    p_fit = np.zeros([4, 4])
+
+    start = 0
+    while centers[start] < 0.4:
+        start += 1
+
+    for i in range(4):
+
+        period = 0.438
+        p = np.array([2*np.pi/period, 2, 2, 1])  # initial guess
+
+        solp, jac = leastsq(errorfunc, p, args=(centers[start:], zdf_avg[i, start:]/z_avg), maxfev=100000)
+
+        p_fit[i, :] = solp
+        plt.plot(centers, zdf_avg[i, :]/z_avg)
+        plt.show()
+
+    print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*np.mean(p_fit[:, 1]), 10*np.std(p_fit[:, 1])))
+    print('Oscillation Period = %1.3f +/- %1.3f nm' % (2*np.pi / np.mean(p_fit[:, 0]), 2*np.pi / np.std(p_fit[:, 0])))
+
+    plt.plot(centers, np.mean(zdf_avg, axis=0)/z_avg, label='Simulation')
+    plt.plot(centers[start:], decay(np.mean(p_fit, axis=0), centers[start:]), '--', color='black', label='Least squares fit')
+    plt.legend()
+    plt.xlabel('Z distance separation (nm)', fontsize=14)
+    plt.ylabel('Normalized number density', fontsize=14)
+    plt.axes().tick_params(labelsize=14)
+    plt.tight_layout()
+    plt.savefig('zdf_fit.png')
+    plt.show()
+
+
 if __name__ == "__main__":
 
     args = initialize()
 
     t = md.load(args.traj, top=args.gro)[args.begin:args.end:args.skip]
-    frame = t.slice(0)
 
-    # from llclib import file_rw
-    # file_rw.write_gro(frame, 'first.gro')
-    # exit()
     box = t.unitcell_vectors
     L = np.mean(box[:, 2, 2])  # average z length of unit cell
 
     if args.load:
 
-        zdf = np.load(args.load)
-        zdf_avg = zdf["zdf_avg"]
-        z = zdf["z"]
-        bin_width = (z[1] - z[0])
-        ps, freqs, max = power_spectrum(zdf_avg, bin_width)
-        # dbwl, amp = spacing(z, zdf_avg)
-        print('Fourier distance between layers: %s nm' % (1/max))
-        # print('Amplitude of first peak : %2.2f %% of mean' % (100*(amp/np.mean(zdf_avg[:z.shape[0]]))))
-        plt.figure()
-        positive = 0
-        while freqs[positive] < 0:
-            positive += 1
-        plt.plot(freqs[positive:], ps[positive:] / np.max(ps))
-        plt.xlabel('Frequency (cycle/nm)', fontsize=14)
-        plt.ylabel('Normalized Intensity', fontsize=14)
-        plt.axes().tick_params(labelsize=14)
-        plt.tight_layout()
-        plt.savefig('ps.png')
-        plot_zdf(z[:len(zdf_avg)], zdf_avg[:z.shape[0] - 5])
+        if args.fit:
+
+            zdf = np.load(args.load)
+            zdf_avg = zdf["zdf_avg"]
+            centers = zdf["centers"]
+            z_avg = zdf["z_avg"]
+
+            zdf_fit(zdf_avg, centers, z_avg)
+
+        else:
+            zdf = np.load(args.load)
+            zdf_avg = zdf["zdf_avg"]
+            z = zdf["z"]
+            bin_width = (z[1] - z[0])
+            ps, freqs, max = power_spectrum(zdf_avg, bin_width)
+            # dbwl, amp = spacing(z, zdf_avg)
+            print('Fourier distance between layers: %s nm' % (1/max))
+            # print('Amplitude of first peak : %2.2f %% of mean' % (100*(amp/np.mean(zdf_avg[:z.shape[0]]))))
+            plt.figure()
+            positive = 0
+            while freqs[positive] < 0:
+                positive += 1
+            plt.plot(freqs[positive:], ps[positive:] / np.max(ps))
+            plt.xlabel('Frequency (cycle/nm)', fontsize=14)
+            plt.ylabel('Normalized Intensity', fontsize=14)
+            plt.axes().tick_params(labelsize=14)
+            plt.tight_layout()
+            plt.savefig('ps.png')
+            plot_zdf(z[:len(zdf_avg)], zdf_avg[:z.shape[0] - 5])
 
     else:
 
@@ -319,7 +370,10 @@ if __name__ == "__main__":
 
         if args.avg:
 
-            zdf_avg = np.zeros([args.bins])
+            if args.fit:
+                zdf_avg = np.zeros([4, args.bins])
+            else:
+                zdf_avg = np.zeros([args.bins])
 
         for atom in args.atoms:
 
@@ -328,35 +382,66 @@ if __name__ == "__main__":
             else:
                 keep = [a.index for a in t.topology.atoms if a.name == atom]
 
-            # pos = t.atom_slice(keep).xyz
+            z_avg = len(keep)/(4*L)  # divide by 4 since there are 4 pores
+
             pos = t.xyz[:, keep, :]
 
             periodic = z_periodic(pos, box)
 
-            # from llclib import file_rw
-            # file_rw.write_gro_pos(periodic[0, :, :], 'first')
-            # exit()
+            if args.fit:
 
-            z, d = zdf(periodic, 4, args.apl, box, args.bins, atom)
+                z, L, p = zdf(periodic, 4, args.apl, box, args.bins, atom, fit=args.fit)
 
-            if args.avg:
+                for pore in range(4):
 
-                zdf_avg[:len(d)] += d
+                    z_flat = np.absolute(z[:, pore, :, :]).flatten()  # make sure everything is positive and turn it into a 1 dimensional array
+                    z_flat = np.ma.masked_equal(z_flat, 0)  # mask the array so all 0 values are not considered. Zero values exist when the z dist
+                    # is calculated between an atom and itself (i.e. i = j above) or if atoms are in the same layer or different pores
+
+                    # bin everything
+                    bins, edges = np.histogram(z_flat.compressed(), bins=args.bins, range=(0, L/2))
+                    centers = np.array([edges[i] + ((edges[i + 1] - edges[i])/2) for i in range(args.bins)])
+
+                    dx = edges[-1] - edges[-2]
+
+                    bins = [old_div(i, (2 * t.n_frames * p * dx * L)) for i in bins]  # normalize by number density
+
+                    zdf_avg[pore, :] += bins
+
+            else:
+
+                z, d = zdf(periodic, 4, args.apl, box, args.bins, atom)
+
+                if args.avg:
+
+                    zdf_avg[:len(d)] += d
 
         if args.avg:
 
-            zdf_avg /= len(args.atoms)  # average of all zdfs
+            if args.fit:
 
-            zdf_avg = np.trim_zeros(zdf_avg, trim='b')
+                p_fit = np.zeros([4, 4])
 
-            np.savez_compressed("zdf", zdf_avg=zdf_avg, z=z)
+                zdf_avg /= len(args.atoms)
 
-            bin_width = (z[1] - z[0])
-            ps, freqs, max = power_spectrum(zdf_avg, bin_width)
-            print('Fourier distance between layers: %s nm' % (1/max))
-            plt.figure()
-            plt.plot(freqs, ps)
-            # dbwl = spacing(z, zdf_avg)
-            plot_zdf(z, zdf_avg[:z.shape[0]], 'zdf.png')
-            # dbwl = spacing(z, zdf_avg)
-            # print('Distance between layers: %s' % dbwl)
+                np.savez_compressed("zdf_fit", zdf_avg=zdf_avg, centers=centers, z_avg=z_avg)
+
+                zdf_fit(zdf_avg, centers, z_avg)
+
+            else:
+
+                zdf_avg /= len(args.atoms)  # average of all zdfs
+
+                zdf_avg = np.trim_zeros(zdf_avg, trim='b')
+
+                np.savez_compressed("zdf", zdf_avg=zdf_avg, z=z)
+
+                bin_width = (z[1] - z[0])
+                ps, freqs, max = power_spectrum(zdf_avg, bin_width)
+                print('Fourier distance between layers: %s nm' % (1/max))
+                plt.figure()
+                plt.plot(freqs, ps)
+                # dbwl = spacing(z, zdf_avg)
+                plot_zdf(z, zdf_avg[:z.shape[0]], 'zdf.png')
+                # dbwl = spacing(z, zdf_avg)
+                # print('Distance between layers: %s' % dbwl)

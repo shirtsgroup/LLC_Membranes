@@ -268,7 +268,7 @@ if __name__ == "__main__":
     # generate random points inside box
     for t in tqdm.tqdm(range(frames)):
         for i in tqdm.tqdm(range(npts)):
-            u, v, w = np.random.rand(3)  # generate 3 random numbers between 0 and 1
+            u, v, w = np.round(np.random.rand(3), decimals=4)  # generate 3 random numbers between 0 and 1
             pt = O + u * A + v * B + w * C  # places point inside 3D box defined by box vector A, B and C
             # if --pores, --layers or --disks is specified, check to make the random point is not in the region. If it
             # is, keep generating random points until the point is outside the region
