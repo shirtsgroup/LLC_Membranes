@@ -32,7 +32,6 @@ from builtins import range
 from past.utils import old_div
 import argparse
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 def initialize():
