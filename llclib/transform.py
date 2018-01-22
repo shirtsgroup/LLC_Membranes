@@ -7,7 +7,6 @@ from __future__ import division
 from __future__ import print_function
 
 from builtins import range
-from past.utils import old_div
 import numpy as np
 import math
 
@@ -29,7 +28,7 @@ def layer_dist(layers, nopores, distribution, monomers, alt_1, alt_2):
 
 
 def slope(pt1, pt2):
-    m = old_div((pt1[1] - pt2[1]),(pt1[0] - pt2[0]))  # slope
+    m = (pt1[1] - pt2[1]) / (pt1[0] - pt2[0])  # slope
     return m
 
 
@@ -58,10 +57,10 @@ def rotateplane(plane, angle=0):
 
         RotationAxis = np.cross(N, N_desired)
 
-        theta = math.acos(old_div(np.dot(N, N_desired),(np.linalg.norm(N)*np.linalg.norm(N_desired))))  #  Rotation Angle (radians)
+        theta = math.acos(np.dot(N, N_desired) / (np.linalg.norm(N)*np.linalg.norm(N_desired)))  #  Rotation Angle (radians)
 
-        L = [old_div(RotationAxis[0],np.linalg.norm(RotationAxis)), old_div(RotationAxis[1],np.linalg.norm(RotationAxis)),
-                           old_div(RotationAxis[2],np.linalg.norm(RotationAxis))]  # normalized Rotation Axis
+        L = [RotationAxis[0] / np.linalg.norm(RotationAxis), RotationAxis[1] / np.linalg.norm(RotationAxis),
+                           RotationAxis[2] / np.linalg.norm(RotationAxis)]  # normalized Rotation Axis
         # ^ see: http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/
 
         u, v, w = L[0], L[1], L[2]
@@ -216,7 +215,7 @@ def reposition(xyz, R, ref_index, lineatoms, pore_radius):
 
     # find angle between lines
 
-    theta = -math.atan(old_div((m1 - m2),(1 + m1*m2)))
+    theta = -math.atan((m1 - m2) / (1 + m1*m2))
 
     vx, vy = transdir(pt1)
 
@@ -323,9 +322,9 @@ def pbcs(pts, images, angle, box, frame, nogap=False):
         for p in range(tot_pts):
             for i in range(mat_dim):
                 for j in range(mat_dim):
-                    translated_pts[0, i*mat_dim + j, p] = x_shift[i, j] + old_div(pts[p, 0],10)
-                    translated_pts[1, i*mat_dim + j, p] = y_shift[i, j] + old_div(pts[p, 1],10)
-                    translated_pts[2, i*mat_dim + j, p] = old_div(pts[p, 2],10)  # z position unchanged
+                    translated_pts[0, i*mat_dim + j, p] = x_shift[i, j] + pts[p, 0] / 10
+                    translated_pts[1, i*mat_dim + j, p] = y_shift[i, j] + pts[p, 1] / 10
+                    translated_pts[2, i*mat_dim + j, p] = pts[p, 2] / 10  # z position unchanged
 
     return translated_pts
 
@@ -342,7 +341,7 @@ def rotate_vector(xyz, v1, v2):
 
     num = np.dot(v1, v2)
     denom = np.linalg.norm(v1) * np.linalg.norm(v2)
-    theta = np.arccos(old_div(num, denom))
+    theta = np.arccos(num / denom)
 
     Rz = rotate_z(-theta)
 
@@ -359,7 +358,7 @@ def rotate_coords_z(xyz, angle):
     :return:
     """
 
-    angle *= (old_div(np.pi, 180))  # convert to radians
+    angle *= (np.pi / 180)  # convert to radians
 
     R = rotate_z(angle)
 
