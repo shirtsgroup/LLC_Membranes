@@ -9,7 +9,6 @@ from __future__ import absolute_import
 
 from builtins import str
 from builtins import range
-from past.utils import old_div
 import numpy as np
 import copy
 import math
@@ -277,7 +276,7 @@ def write_initial_config(positions, identity, name, no_layers, layer_distributio
     sys_atoms = sum(layer_distribution)*positions.shape[1]
     f.write('%s\n' % sys_atoms)
 
-    rot *= (old_div(np.pi,180))  # convert input (degrees) to radians
+    rot *= np.pi / 180  # convert input (degrees) to radians
 
     grid = Periodic_Images.shift_matrices(1, 60, p2p, p2p)
     grid = np.reshape(grid, (2, 9))
@@ -320,22 +319,22 @@ def write_initial_config(positions, identity, name, no_layers, layer_distributio
             layer_mons = layer_distribution[l*no_layers + k]
             for j in range(layer_mons):  # iterates over each monomer to create coordinates
                 monomer_count += 1
-                theta = j * math.pi / (old_div(layer_mons, 2.0)) + rot
-                theta += k * math.pi * (old_div(offset_angle,180))
+                theta = j * math.pi / (layer_mons / 2.0) + rot
+                theta += k * math.pi * (offset_angle / 180)
                 if offset:
-                    theta += (k % 2) * (old_div(math.pi, layer_mons))
+                    theta += (k % 2) * (math.pi / layer_mons)
                 Rx = transform.rotate_z(theta)
                 xyz = np.zeros(positions.shape)
                 for i in range(positions.shape[1] - no_ions):
                     if helix:
-                        xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist + (old_div(dist,float(layer_mons)))*j]
-                        hundreds = int(math.floor(old_div(atom_count,100000)))
+                        xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist + (dist / float(layer_mons))*j]
+                        hundreds = int(math.floor(atom_count / 100000))
                     else:
                         xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist]
                         # xyz[:, i] = np.dot(Rx, positions[:, i]) + [b, c, k*dist]
-                        hundreds = int(math.floor(old_div(atom_count,100000)))
+                        hundreds = int(math.floor(atom_count / 100000))
                     f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(monomer_count, name, identity[i],
-                        atom_count - hundreds*100000, old_div(xyz[0, i],10.0), old_div(xyz[1, i],10.0), old_div(xyz[2, i],10.0)) + "\n")
+                        atom_count - hundreds*100000, xyz[0, i] / 10.0, xyz[1, i] / 10.0, xyz[2, i] / 10.0) + "\n")
                     atom_count += 1
 
     # Ions:
@@ -359,23 +358,23 @@ def write_initial_config(positions, identity, name, no_layers, layer_distributio
         for k in range(no_layers):
             layer_mons = layer_distribution[l*no_layers + k]
             for j in range(layer_mons):  # iterates over each monomer to create coordinates
-                theta = j * math.pi / (old_div(layer_mons, 2.0)) + rot
+                theta = j * math.pi / (layer_mons / 2.0) + rot
                 if offset:
-                    theta += (k % 2) * (old_div(math.pi, layer_mons)) + rot
+                    theta += (k % 2) * (math.pi / layer_mons) + rot
                 Rx = transform.rotate_z(theta)
                 xyz = np.zeros([3, no_ions])
                 for i in range(0, no_ions):
                     monomer_count += 1
                     if helix:
-                        xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b*p2p, c*p2p, k*dist + (old_div(dist,float(layer_mons)))*j]
-                        hundreds = int(math.floor(old_div(atom_count,100000)))
+                        xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b*p2p, c*p2p, k*dist + (dist / float(layer_mons))*j]
+                        hundreds = int(math.floor(atom_count / 100000))
                     else:
                         xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b*p2p, c*p2p, k*dist]
                         # xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b, c, k*dist]
-                        hundreds = int(math.floor(old_div(atom_count,100000)))
+                        hundreds = int(math.floor(atom_count / 100000))
                     f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(monomer_count, identity[no_atoms - (i + 1)],
-                        identity[no_atoms - (i + 1)], atom_count - hundreds*100000, old_div(xyz[0, i],10.0), old_div(xyz[1, i],10.0),
-                        old_div(xyz[2, i],10.0)) + "\n")
+                        identity[no_atoms - (i + 1)], atom_count - hundreds*100000, xyz[0, i] / 10.0, xyz[1, i] / 10.0,
+                        xyz[2, i] / 10.0) + "\n")
                     atom_count += 1
 
     f.write('   0.00000   0.00000  0.00000\n')
