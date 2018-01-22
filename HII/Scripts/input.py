@@ -6,10 +6,8 @@ Write input files. Default settings are not included. Add an argument if you nee
 from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
-
 from builtins import str
 from builtins import range
-from past.utils import old_div
 import os
 import argparse
 import lc_class
@@ -87,15 +85,15 @@ if __name__ == "__main__":
         # a.append(['cutoff-scheme = verlet'])  # I think verlet is default
         a.append(['integrator = md\n'])  # this also might be default
         a.append(['dt = %s\n' % args.dt])
-        a.append(['nsteps = %s\n' % int(old_div(args.length, args.dt))])
+        a.append(['nsteps = %s\n' % int(args.length / args.dt)])
         a.append(['continuation = no\n'])
         a.append(['constraints = h-bonds\n'])
         a.append(['constraint-algorithm = lincs\n'])
         a.append(['cutoff-scheme = Verlet\n'])
-        a.append(['nstxout = %s\n' % int(old_div(args.length, (args.dt * args.frames)))])
-        a.append(['nstvout = %s\n' % int(old_div(args.length, (args.dt * args.frames)))])
-        a.append(['nstfout = %s\n' % int(old_div(args.length, (args.dt * args.frames)))])
-        a.append(['nstenergy = %s\n' % int(old_div(args.length, (args.dt * args.frames)))])
+        a.append(['nstxout = %s\n' % int(args.length / (args.dt * args.frames))])
+        a.append(['nstvout = %s\n' % int(args.length / (args.dt * args.frames))])
+        a.append(['nstfout = %s\n' % int(args.length / (args.dt * args.frames))])
+        a.append(['nstenergy = %s\n' % int(args.length / (args.dt * args.frames))])
         a.append(['nstlist = 40\n'])
         a.append(['nstype = grid\n'])
         a.append(['vdwtype = PME\n'])
@@ -141,14 +139,14 @@ if __name__ == "__main__":
         # a.append(['cutoff-scheme = verlet'])  # I think verlet is default
         a.append(['integrator = md\n'])  # this also might be default
         a.append(['dt = %s\n' % args.dt])
-        a.append(['nsteps = %s\n' % int(old_div(args.length, args.dt))])
+        a.append(['nsteps = %s\n' % int(args.length / args.dt)])
         a.append(['continuation = no\n'])
         a.append(['constraints = h-bonds\n'])
         a.append(['constraint-algorithm = lincs\n'])
-        a.append(['nstxout = %s\n' % int(old_div(args.length, (args.dt * args.frames)))])
-        a.append(['nstvout = %s\n' % int(old_div(args.length, (args.dt * args.frames)))])
-        a.append(['nstfout = %s\n' % int(old_div(args.length, (args.dt * args.frames)))])
-        a.append(['nstenergy = %s\n' % int(old_div(args.length, (args.dt * args.frames)))])
+        a.append(['nstxout = %s\n' % int(args.length / (args.dt * args.frames))])
+        a.append(['nstvout = %s\n' % int(args.length / (args.dt * args.frames))])
+        a.append(['nstfout = %s\n' % int(args.length / (args.dt * args.frames))])
+        a.append(['nstenergy = %s\n' % int(args.length / (args.dt * args.frames))])
         a.append(['nstlist = 40\n'])
         a.append(['nstype = grid\n'])
         a.append(['vdwtype = PME\n'])
@@ -221,9 +219,9 @@ if __name__ == "__main__":
                 nion += 1
 
     if args.bcc:
-        nmon = int(old_div(nres, props.natoms - props.no_ions))
+        nmon = int(nres / (props.natoms - props.no_ions))
     else:
-        nmon = int(old_div(nres, props.natoms))
+        nmon = int(nres / props.natoms)
 
     if args.restraints:
         a.append('%s                1\n' % mon_name)
