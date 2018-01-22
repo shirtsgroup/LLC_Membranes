@@ -104,7 +104,7 @@ def ring_center(coords, atoms):
     positions will be corrected within the first few steps of the simulation
     """
     no_atoms = len(atoms)
-    rings = np.shape(coords)[1] / no_atoms
+    rings = int(np.shape(coords)[1] / no_atoms)
 
     centers = np.zeros([3, rings])
 
