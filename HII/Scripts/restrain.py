@@ -11,17 +11,12 @@
 from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
-
 from builtins import range
-from past.utils import old_div
 import argparse
-import Get_Positions
 import numpy as np
 import math
 import warnings
-import subprocess
 import os
-import Assembly_itp
 from llclib import file_rw
 
 
@@ -109,7 +104,7 @@ def ring_center(coords, atoms):
     positions will be corrected within the first few steps of the simulation
     """
     no_atoms = len(atoms)
-    rings = old_div(np.shape(coords)[1], no_atoms)
+    rings = np.shape(coords)[1] / no_atoms
 
     centers = np.zeros([3, rings])
 
@@ -117,7 +112,7 @@ def ring_center(coords, atoms):
         sum = np.array([0.0, 0.0, 0.0])
         for j in range(no_atoms):
             sum += coords[:, i*no_atoms + j]
-        centers[:, i] = old_div(sum, float(no_atoms))
+        centers[:, i] = sum / float(no_atoms)
 
     return centers
 
@@ -132,14 +127,14 @@ def perpendicular_vectors(coords, atoms):
     positions will be corrected within the first few steps of the simulation
     """
     no_atoms = len(atoms)
-    rings = old_div(np.shape(coords)[1], no_atoms)
+    rings = np.shape(coords)[1] / no_atoms
     perp_vectors = np.zeros([3, rings])
 
     for i in range(rings):
         pts = np.zeros([3, 3])  # need 3 points from the benzene ring plane
         for j in range(no_atoms):
             if j % 2 == 0:  # only need 3 atoms so let's take every other - this is important in the vsite construction
-                pts[:, old_div(j, 2)] = coords[:, i*no_atoms + j]
+                pts[:, int(j / 2)] = coords[:, i*no_atoms + j]
         v1 = pts[:, 0] - pts[:, 1]
         v2 = pts[:, 0] - pts[:, 2]
         perp_vectors[:, i] = np.cross(v1, v2)
@@ -167,7 +162,7 @@ def dipole_points(centers, perp_vectors, distance):
         center = centers[:, i]
         try:  # this is the reason warnings are filtered. Numpy encounters a divide by zero if the plane is perfectly
               # in the x-y plane as it is when making an initial configuration
-            norm = old_div(perp_vect, math.sqrt(np.dot(perp_vect, perp_vect)))
+            norm = perp_vect / math.sqrt(np.dot(perp_vect, perp_vect))
         except RuntimeWarning:
             norm = np.array([0.0, 0.0, 1.0])
         if norm[2] < 0:
@@ -226,7 +221,7 @@ def write_gro(top_poles, bot_poles, b, rings, toplines, valence):
 
     atoms = len(b) - 1 - toplines
     count = rings + 1  # count for the number of residues (first column of numbers in .gro file)
-    count1 = atoms - (old_div(1,valence)) * rings + 1  # count for total atoms (fourth column in .gro file
+    count1 = atoms - (1 / valence) * rings + 1  # count for total atoms (fourth column in .gro file
 
     for i in range(toplines):  # delete all irrelevant lines
         del b[0]
@@ -250,7 +245,7 @@ def write_gro(top_poles, bot_poles, b, rings, toplines, valence):
 
     index = count1 + toplines - 1
     count = 2
-    for i in range((old_div(1,valence))*rings):
+    for i in range((1 / valence)*rings):
         b[index] = '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(count, str.strip(b[index][5:10]), str.strip(b[index][10:15]),
                                                                        count1, float(b[index][20:28]),
                                                                            float(b[index][28:36]), float(b[index][36:44]))
@@ -268,8 +263,8 @@ def write_gro(top_poles, bot_poles, b, rings, toplines, valence):
 
 def virtual_sites(all_coords, monomers, valence, a, b, c, funct):
 
-    n_atoms = np.shape(all_coords)[1] - (old_div(1,valence)) * monomers
-    atoms_per_molecule = old_div(n_atoms, monomers)  # subtract valence to exclude counterion
+    n_atoms = np.shape(all_coords)[1] - (1 / valence) * monomers
+    atoms_per_molecule = n_atoms / monomers  # subtract valence to exclude counterion
 
     n_vsites = monomers * 2  # number of virtual sites need to create a dipole (2 per ring)
     vsites = np.zeros([8, n_vsites])
@@ -296,8 +291,8 @@ def exclusions(coord_file, monomers, valence, toplines, atoms, n_atoms, vsites):
     :param n_atoms: the number of atoms total
     :return: a list of exclusions
     """
-    n_atoms = np.shape(all_coords)[1] - (old_div(1,valence)) * monomers
-    atoms_per_molecule = old_div(n_atoms, monomers)  # subtract valence to exclude counterion (includes new PI atoms)
+    n_atoms = np.shape(all_coords)[1] - (1 / valence) * monomers
+    atoms_per_molecule = n_atoms / monomers  # subtract valence to exclude counterion (includes new PI atoms)
 
     n_excluded = len(atoms) + 1  # number of atoms excluded. +1 because it will be excluded from it complementary vsite
 
@@ -404,7 +399,7 @@ if __name__ == "__main__":
 
         perp_vectors = perpendicular_vectors(coords, args.atoms)
 
-        top_poles, bot_poles = dipole_points(centers, perp_vectors, old_div(float(args.distance),10)) #convert distance to nanometers
+        top_poles, bot_poles = dipole_points(centers, perp_vectors, float(args.distance) / 10) #convert distance to nanometers
 
         valence = int(args.valence)
 
@@ -419,8 +414,8 @@ if __name__ == "__main__":
         # Using every other carbon in the benzene rings makes the above triangle equilateral which corresponds to the
         # following parameters
 
-        a = old_div(1.0, 3.0)  # distance along vector rij to reach the same 'height' as C
-        b = old_div(1.0, 3.0)  # distance along vector rik to reach the same 'height' as C
+        a = 1.0 / 3.0  # distance along vector rij to reach the same 'height' as C
+        b = 1.0 / 3.0  # distance along vector rik to reach the same 'height' as C
         c = float(args.distance)  # The distance out of the plane to place a virtual site
         funct = 4  # this specifies the 3out type of virtual site
         vsites = virtual_sites(all_coords, np.shape(centers)[1], valence, a, b, c, funct)
@@ -444,7 +439,7 @@ if __name__ == "__main__":
 
         charge = float(args.charge)
         for i in range(rings*2):
-            atom_no = atoms + i + 1 - (old_div(1,valence))*rings
+            atom_no = atoms + i + 1 - (1 / valence)*rings
             a.insert(atoms_count, '{:5d}{:>5s}{:6d}{:>6s}{:>6s}{:7d}{:5s}{:>1.6f}{:5s}{:2.5f}'.format(atom_no,
                                     'PI', 1, 'HII', 'PI', atom_no,'', (-1)**i * charge,'', 0.00000) + "\n")
             atoms_count += 1

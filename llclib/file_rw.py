@@ -6,7 +6,6 @@ This library has all routines involving reading and writing files
 from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
-
 from builtins import str
 from builtins import range
 import numpy as np
@@ -14,7 +13,6 @@ import copy
 import math
 import Periodic_Images
 from . import transform
-import mdtraj as md
 import os
 
 
@@ -382,6 +380,8 @@ def write_initial_config(positions, identity, name, no_layers, layer_distributio
 
 
 def last_frame(trr, gro):
+
+    import mdtraj as md
 
     if trr.endswith('.trr') or trr.endswith('.xtc'):
 
