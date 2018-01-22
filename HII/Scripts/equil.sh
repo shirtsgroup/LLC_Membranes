@@ -80,11 +80,20 @@ else
     input.py -b ${BUILD_MON} -l 5000 --temp ${T} -f 50 --barostat berendsen --genvel no -c ${start_config}
 fi
 
-gmx grompp -f npt.mdp -p topol.top -c 0.gro -o berendsen # run it out for a bit
-#gmx mdrun -v -deffnm wiggle
-exit
+if [ ${MPI} == 'on' ]; then
+    gmx_mpi grompp -f npt.mdp -p topol.top -c npt.gro -o berendsen
+    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm berendsen
+    input.py -b ${BUILD_MON} -l ${equil_length} --temp ${T} -f 1000 --barostat Parrinello-Rahman --genvel no
+    gmx_mpi grompp -f npt.mdp -p topol.top -c berendsen.gro -o PR
+else
+    gmx grompp -f npt.mdp -p topol.top -c 0.gro -o berendsen # run it out for a bit
+    gmx mdrun -v -deffnm berendsen
+    input.py -b ${BUILD_MON} -l ${equil_length} --temp ${T} -f 1000 --barostat Parrinello-Rahman --genvel no
+    gmx grompp -f npt.mdp -p topol.top -c berendsen.gro -o PR
+fi
 
-input.py -b ${BUILD_MON} -l ${equil_length} --temp ${T} -f 1000 --barostat Parrinello-Rahman --genvel no
-gmx grompp -f npt.mdp -p topol.top -c wiggle.gro -o wiggle
+#input.py -b ${BUILD_MON} -l ${equil_length} --temp ${T} -f 1000 --barostat Parrinello-Rahman --genvel no
+#gmx grompp -f npt.mdp -p topol.top -c wiggle.gro -o wiggle
+
 #analysis.sh # get pore spacing, thickness, pore size, convert the trajectory to be used in XrayDiffraction.exe
 
