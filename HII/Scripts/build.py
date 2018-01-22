@@ -4,7 +4,6 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 from builtins import range
-from past.utils import old_div
 import numpy as np
 import math
 import os
@@ -364,114 +363,114 @@ def initialize():
 #     f.close()
 #
 #
-def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions, rot, *flipped):
-
-    f = open('%s' % args.out, 'w')
-
-    f.write('This is a .gro file\n')
-    f.write('%s\n' % sys_atoms)
-
-    rot *= (old_div(np.pi,180))  # convert input (degrees) to radians
-
-    grid = Periodic_Images.shift_matrices(1, 60, p2p, p2p)
-    grid = np.reshape(grid, (2, 9))
-
-    if flipped:
-        flipped = np.asarray(flipped)
-        flipped = np.reshape(flipped, positions.shape)
-        flip = 'yes'
-        unflipped = copy.deepcopy(positions)
-    else:
-        flip = 'no'
-
-    # main monomer
-    atom_count = 1
-    monomer_count = 0
-    for l in range(0, no_pores):  # loop to create multiple pores
-        # b = grid[0, l]
-        # c = grid[1, l]
-        theta = 30  # angle which will be used to do hexagonal packing
-        if l == 0:  # unmodified coordinates
-            b = 0
-            c = 0
-        elif l == 1:  # move a pore directly down
-            b = -1
-            c = 0
-            if flip == 'yes':
-                positions[:, :] = flipped
-        elif l == 2:  # moves pore up and to the right
-            b = -math.sin(math.radians(theta))
-            c = -math.cos(math.radians(theta))
-            if flip == 'yes':
-                positions[:, :] = unflipped
-        elif l == 3:  # moves a pore down and to the right
-            b = math.cos(math.radians(90 - theta))
-            c = -math.sin(math.radians(90 - theta))
-            if flip == 'yes':
-                positions[:, :] = flipped
-        for k in range(no_layers):
-            layer_mons = layer_distribution[l*no_layers + k]
-            for j in range(layer_mons):  # iterates over each monomer to create coordinates
-                monomer_count += 1
-                theta = j * math.pi / (old_div(layer_mons, 2.0)) + rot
-                if args.offset:
-                    theta += (k % 2) * (old_div(math.pi, layer_mons))
-                Rx = rotate(theta)
-                xyz = np.zeros(positions.shape)
-                for i in range(no_atoms - no_ions):
-                    if args.helix:
-                        xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist + (old_div(dist,float(layer_mons)))*j]
-                        hundreds = int(math.floor(old_div(atom_count,100000)))
-                    else:
-                        xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist]
-                        # xyz[:, i] = np.dot(Rx, positions[:, i]) + [b, c, k*dist]
-                        hundreds = int(math.floor(old_div(atom_count,100000)))
-                    f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(monomer_count, name, identity[i],
-                        atom_count - hundreds*100000, old_div(xyz[0, i],10.0), old_div(xyz[1, i],10.0), old_div(xyz[2, i],10.0)) + "\n")
-                    atom_count += 1
-
-    # Ions:
-
-    for l in range(no_pores):  # loop to create multiple pores
-        # b = grid[0, l]
-        # c = grid[1, l]
-        theta = 30  # angle which will be used to do hexagonal packing
-        if l == 0:  # unmodified coordinates
-            b = 0
-            c = 0
-        elif l == 1:  # move a pore directly down
-            b = - 1
-            c = 0
-        elif l == 2:  # moves pore up and to the right
-            b = math.cos(math.radians(90 - theta))
-            c = -math.sin(math.radians(90 - theta))
-        elif l == 3:  # moves a pore down and to the right
-            b = -math.sin(math.radians(theta))
-            c = -math.cos(math.radians(theta))
-        for k in range(no_layers):
-            layer_mons = layer_distribution[l*no_layers + k]
-            for j in range(layer_mons):  # iterates over each monomer to create coordinates
-                theta = j * math.pi / (old_div(layer_mons, 2.0))
-                if args.offset:
-                    theta += (k % 2) * (old_div(math.pi, layer_mons))
-                Rx = rotate(theta)
-                xyz = np.zeros([3, no_ions])
-                for i in range(0, no_ions):
-                    monomer_count += 1
-                    if args.helix:
-                        xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b*p2p, c*p2p, k*dist + (old_div(dist,float(layer_mons)))*j]
-                        hundreds = int(math.floor(old_div(atom_count,100000)))
-                    else:
-                        xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b*p2p, c*p2p, k*dist]
-                        # xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b, c, k*dist]
-                        hundreds = int(math.floor(old_div(atom_count,100000)))
-                    f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(monomer_count, identity[no_atoms - (i + 1)],
-                        identity[no_atoms - (i + 1)], atom_count - hundreds*100000, old_div(xyz[0, i],10.0), old_div(xyz[1, i],10.0),
-                        old_div(xyz[2, i],10.0)) + "\n")
-                    atom_count += 1
-
-    f.write('   0.00000   0.00000  0.00000\n')
-    f.close()
+# def write_gro(positions, identity, no_layers, layer_distribution, dist, no_pores, p2p, no_ions, rot, *flipped):
+#
+#     f = open('%s' % args.out, 'w')
+#
+#     f.write('This is a .gro file\n')
+#     f.write('%s\n' % sys_atoms)
+#
+#     rot *= np.pi / 180  # convert input (degrees) to radians
+#
+#     grid = Periodic_Images.shift_matrices(1, 60, p2p, p2p)
+#     grid = np.reshape(grid, (2, 9))
+#
+#     if flipped:
+#         flipped = np.asarray(flipped)
+#         flipped = np.reshape(flipped, positions.shape)
+#         flip = 'yes'
+#         unflipped = copy.deepcopy(positions)
+#     else:
+#         flip = 'no'
+#
+#     # main monomer
+#     atom_count = 1
+#     monomer_count = 0
+#     for l in range(0, no_pores):  # loop to create multiple pores
+#         # b = grid[0, l]
+#         # c = grid[1, l]
+#         theta = 30  # angle which will be used to do hexagonal packing
+#         if l == 0:  # unmodified coordinates
+#             b = 0
+#             c = 0
+#         elif l == 1:  # move a pore directly down
+#             b = -1
+#             c = 0
+#             if flip == 'yes':
+#                 positions[:, :] = flipped
+#         elif l == 2:  # moves pore up and to the right
+#             b = -math.sin(math.radians(theta))
+#             c = -math.cos(math.radians(theta))
+#             if flip == 'yes':
+#                 positions[:, :] = unflipped
+#         elif l == 3:  # moves a pore down and to the right
+#             b = math.cos(math.radians(90 - theta))
+#             c = -math.sin(math.radians(90 - theta))
+#             if flip == 'yes':
+#                 positions[:, :] = flipped
+#         for k in range(no_layers):
+#             layer_mons = layer_distribution[l*no_layers + k]
+#             for j in range(layer_mons):  # iterates over each monomer to create coordinates
+#                 monomer_count += 1
+#                 theta = j * math.pi / (old_div(layer_mons, 2.0)) + rot
+#                 if args.offset:
+#                     theta += (k % 2) * (old_div(math.pi, layer_mons))
+#                 Rx = rotate(theta)
+#                 xyz = np.zeros(positions.shape)
+#                 for i in range(no_atoms - no_ions):
+#                     if args.helix:
+#                         xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist + (old_div(dist,float(layer_mons)))*j]
+#                         hundreds = int(math.floor(old_div(atom_count,100000)))
+#                     else:
+#                         xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist]
+#                         # xyz[:, i] = np.dot(Rx, positions[:, i]) + [b, c, k*dist]
+#                         hundreds = int(math.floor(old_div(atom_count,100000)))
+#                     f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(monomer_count, name, identity[i],
+#                         atom_count - hundreds*100000, old_div(xyz[0, i],10.0), old_div(xyz[1, i],10.0), old_div(xyz[2, i],10.0)) + "\n")
+#                     atom_count += 1
+#
+#     # Ions:
+#
+#     for l in range(no_pores):  # loop to create multiple pores
+#         # b = grid[0, l]
+#         # c = grid[1, l]
+#         theta = 30  # angle which will be used to do hexagonal packing
+#         if l == 0:  # unmodified coordinates
+#             b = 0
+#             c = 0
+#         elif l == 1:  # move a pore directly down
+#             b = - 1
+#             c = 0
+#         elif l == 2:  # moves pore up and to the right
+#             b = math.cos(math.radians(90 - theta))
+#             c = -math.sin(math.radians(90 - theta))
+#         elif l == 3:  # moves a pore down and to the right
+#             b = -math.sin(math.radians(theta))
+#             c = -math.cos(math.radians(theta))
+#         for k in range(no_layers):
+#             layer_mons = layer_distribution[l*no_layers + k]
+#             for j in range(layer_mons):  # iterates over each monomer to create coordinates
+#                 theta = j * math.pi / (old_div(layer_mons, 2.0))
+#                 if args.offset:
+#                     theta += (k % 2) * (old_div(math.pi, layer_mons))
+#                 Rx = rotate(theta)
+#                 xyz = np.zeros([3, no_ions])
+#                 for i in range(0, no_ions):
+#                     monomer_count += 1
+#                     if args.helix:
+#                         xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b*p2p, c*p2p, k*dist + (old_div(dist,float(layer_mons)))*j]
+#                         hundreds = int(math.floor(old_div(atom_count,100000)))
+#                     else:
+#                         xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b*p2p, c*p2p, k*dist]
+#                         # xyz[:, i] = np.dot(Rx, positions[:, no_atoms - (i + 1)]) + [b, c, k*dist]
+#                         hundreds = int(math.floor(old_div(atom_count,100000)))
+#                     f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(monomer_count, identity[no_atoms - (i + 1)],
+#                         identity[no_atoms - (i + 1)], atom_count - hundreds*100000, old_div(xyz[0, i],10.0), old_div(xyz[1, i],10.0),
+#                         old_div(xyz[2, i],10.0)) + "\n")
+#                     atom_count += 1
+#
+#     f.write('   0.00000   0.00000  0.00000\n')
+#     f.close()
 
 if __name__ == "__main__":
 
