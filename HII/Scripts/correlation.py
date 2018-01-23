@@ -213,8 +213,8 @@ if __name__ == "__main__":
 
     Imax = np.amax(z)
 
-    heatmap = plt.imshow(z.T/Imax, extent=[xcenters[0], xcenters[-1], ycenters[0], ycenters[-1]])
-    plt.imshow(z.T/729.0, extent=[xcenters[0], xcenters[-1], ycenters[0], ycenters[-1]])
+    heatmap = plt.imshow(z.T/(2*Imax), extent=[xcenters[0], xcenters[-1], ycenters[0], ycenters[-1]])
+    # plt.imshow(z.T/Imax, extent=[xcenters[0], xcenters[-1], ycenters[0], ycenters[-1]])
 
     cbar = plt.colorbar(heatmap)
     tick_locator = ticker.MaxNLocator(nbins=5)
