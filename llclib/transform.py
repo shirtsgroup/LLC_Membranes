@@ -337,18 +337,22 @@ def rotate_vector(xyz, v1, v2):
     :return: rotated coordinates
     """
 
+    quad = quadrant(v1)
     # first find the angle between v1 and v2
     num = np.dot(v1, v2)
     denom = np.linalg.norm(v1) * np.linalg.norm(v2)
     theta = np.arccos(num / denom)
 
-    Rz = rotate_z(-theta)
+    if quad == 1 or quad == 2:
+        Rz = rotate_z(-theta)
+    else:
+        Rz = rotate_z(theta)
 
-    # xyz = np.tensordot(Rz, xyz, axes=1)
+    pos = np.zeros_like(xyz)
     for i in range(np.shape(xyz)[0]):
-        xyz[i, :] = np.dot(Rz, xyz[i, :])
+        pos[i, :] = np.dot(Rz, xyz[i, :])
 
-    return xyz
+    return pos
 
 
 def rotate_coords_z(xyz, angle):

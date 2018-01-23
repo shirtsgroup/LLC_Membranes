@@ -14,6 +14,7 @@ NP=4
 T=300
 equil_length=1000000  # equilibrium simulation length
 solvate=0
+python="python3"
 
 while getopts "b:x:y:z:r:m:t:p:f:e:s:S:" opt; do
     case $opt in
@@ -32,13 +33,15 @@ while getopts "b:x:y:z:r:m:t:p:f:e:s:S:" opt; do
     esac
 done
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 if [[ $solvate -eq 1 ]]; then
-    input.py -b ${BUILD_MON} -l 50 --restraints --temp ${T} -f 50 --genvel yes -S -c ${start_config}
+    ${python} ${DIR}/input.py -b ${BUILD_MON} -l 50 --restraints --temp ${T} -f 50 --genvel yes -S -c ${start_config}
 else
-    input.py -b ${BUILD_MON} -l 50 --restraints --temp ${T} -f 50 --genvel yes -c ${start_config}
+    ${python} ${DIR}/input.py -b ${BUILD_MON} -l 50 --restraints --temp ${T} -f 50 --genvel yes -c ${start_config}
 fi
 
-restrain.py -f 1000000 -A xyz -r on -D off -w off -g ${start_config} --novsites -m ${BUILD_MON} -a ${ring_restraints}
+${python} ${DIR}/restrain.py -f 1000000 -A xyz -r on -D off -w off -g ${start_config} --novsites -m ${BUILD_MON} -a ${ring_restraints}
 
 if [ "${MPI}" == "on" ]; then
     gmx_mpi editconf -f ${start_config} -o box.gro -c -bt triclinic -box ${x} ${y} ${z} -angles 90 90 120
@@ -57,10 +60,10 @@ fi
 cp npt.gro 1000000.gro
 cp npt.trr 1000000.trr
 
-input.py --mdp -b ${BUILD_MON} -l 50 --restraints --temp ${T} -f 50 --genvel no  -c ${start_config} # use velocities from previous sim
+${python} ${DIR}/input.py --mdp -b ${BUILD_MON} -l 50 --restraints --temp ${T} -f 50 --genvel no  -c ${start_config} # use velocities from previous sim
 
 for f in ${forces}; do
-	restrain.py -f ${f} -A xyz -r on -D off -w off --novsites -m ${BUILD_MON} -a ${ring_restraints} -g ${start_config}
+	${python} ${DIR}/restrain.py -f ${f} -A xyz -r on -D off -w off --novsites -m ${BUILD_MON} -a ${ring_restraints} -g ${start_config}
 	if [ ${MPI} == 'on' ]; then
         gmx_mpi grompp -f npt.mdp -p topol.top -c npt.gro -o npt
 	    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm npt
@@ -75,20 +78,20 @@ done
 #input.py --mdp -b ${BUILD_MON} -l 20000 --restraints --temp ${T} -f 50 --genvel no  # use velocities from previous sim
 #gmx grompp -f npt.mdp -p topol.top -c npt.gro -o wiggle
 if [[ $solvate -eq 1 ]]; then
-    input.py -b ${BUILD_MON} -l 5000 --temp ${T} -f 50 --barostat berendsen --genvel no -S -c ${start_config}
+    ${python} ${DIR}/input.py -b ${BUILD_MON} -l 5000 --temp ${T} -f 50 --barostat berendsen --genvel no -S -c ${start_config}
 else
-    input.py -b ${BUILD_MON} -l 5000 --temp ${T} -f 50 --barostat berendsen --genvel no -c ${start_config}
+    ${python} ${DIR}/input.py -b ${BUILD_MON} -l 5000 --temp ${T} -f 50 --barostat berendsen --genvel no -c ${start_config}
 fi
 
 if [ ${MPI} == 'on' ]; then
     gmx_mpi grompp -f npt.mdp -p topol.top -c npt.gro -o berendsen
     mpirun -np ${NP} gmx_mpi mdrun -v -deffnm berendsen
-    input.py -b ${BUILD_MON} -l ${equil_length} --temp ${T} -f 10000 --barostat Parrinello-Rahman --genvel no
+    ${python} ${DIR}/input.py -b ${BUILD_MON} -l ${equil_length} --temp ${T} -f 10000 --barostat Parrinello-Rahman --genvel no
     gmx_mpi grompp -f npt.mdp -p topol.top -c berendsen.gro -o PR
 else
     gmx grompp -f npt.mdp -p topol.top -c 0.gro -o berendsen # run it out for a bit
     gmx mdrun -v -deffnm berendsen
-    input.py -b ${BUILD_MON} -l ${equil_length} --temp ${T} -f 10000 --barostat Parrinello-Rahman --genvel no
+    ${python} ${DIR}/input.py -b ${BUILD_MON} -l ${equil_length} --temp ${T} -f 10000 --barostat Parrinello-Rahman --genvel no
     gmx grompp -f npt.mdp -p topol.top -c berendsen.gro -o PR
 fi
 

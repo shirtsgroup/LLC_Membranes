@@ -24,13 +24,16 @@ def initialize():
                         'correlation function with respect to. The center of mass will be used')
     parser.add_argument('--itp', default='/home/bcoscia/PycharmProjects/GitHub/HII/top/Monomer_Tops/NAcarb11V.itp')
     parser.add_argument('-b', '--begin', default=0, type=int, help='Start frame')
-    parser.add_argument('-bins', default=100, type=int, help='Number of bins in histogram')
+    parser.add_argument('-bins', nargs='+', default=100, type=int, help='Integer or array of bin values. If more than'
+                        'one value is used, order the inputs according to the order given in args.axis')
     parser.add_argument('-m', '--monomers_per_layer', default=5, type=int, help='Number of monomers per layer')
     parser.add_argument('-ax', '--axis', default='xy', help='Slice to be visualized')
     parser.add_argument('--layers', default=20, type=int, help='Number of layers')
     parser.add_argument('--range', nargs='+', help='Range for histogram plot. A list of the form:'
                         '[dimension 1 lower, dimension 1 upper, dimension 2 lower, dimension 2 upper ...]')
     parser.add_argument('--save', type=str, help='Follow flag with filename to save plot by')
+    parser.add_argument('--scale', type=float, default=1, help='Scale color bar by this factor')
+    parser.add_argument('-br', '--block_radius', default=0.25, type=float, help='radius of circle around origin to zero out')
 
     args = parser.parse_args()
 
@@ -111,6 +114,14 @@ if __name__ == "__main__":
 
     ndimensions = len(dimensions)
 
+    if type(args.bins) is list:
+        if len(args.bins) > 1:
+            bins = np.array(args.bins)
+        else:
+            bins = np.array([args.bins[0]]*ndimensions)
+    else:
+        bins = np.array([args.bins]*ndimensions)
+
     t = md.load(args.traj, top=args.gro)[args.begin:]
     print('Trajectory loaded')
 
@@ -168,53 +179,60 @@ if __name__ == "__main__":
     monomers_per_layer = int(len(keep) / args.layers / npores / len(args.atoms))  # divide by len(args.atoms) because of com
 
     center_of_mass = com(t.xyz[:, keep, :], mass)  # calculate centers of mass of atom groups
+
     com_per_pore = int(center_of_mass.shape[1] / npores)
 
     periodic_pts = duplicate_periodically(center_of_mass, t.unitcell_vectors)
 
-    z = np.zeros([args.bins, args.bins])
+    z = np.zeros(bins)
 
-    # for frame in tqdm.tqdm(range(t.n_frames)):
-    #     for p in range(4*args.layers):
-    #         # H, xedges, yedges = np.histogram2d(periodic_pts[frame, i, 0] - periodic_pts[frame, :, 0],
-    #         #                         periodic_pts[frame, i, 1] - periodic_pts[frame, :, 1],
-    #         #                         bins=args.bins, range=[[-L[0], L[0]], [-L[1], L[1]]])
-    #         # H, xedges, yedges = np.histogram2d(pore_spline[frame, p, frame] - periodic_pts[frame, :, dimensions[0]],
-    #         #         pore_centers[dimensions[1], p, frame] - periodic_pts[frame, :, dimensions[1]],
-    #         #         bins=args.bins, range=[[-L[dimensions[0]], L[dimensions[0]]], [-L[dimensions[1]], L[dimensions[1]]]])
-    #         H, xedges, yedges = np.histogram2d(pore_spline[frame, p, dimensions[0]] - periodic_pts[frame, :, dimensions[0]],
-    #                 pore_spline[frame, p, dimensions[1]] - periodic_pts[frame, :, dimensions[1]],
-    #                 bins=args.bins, range=hist_range)
-    #         # H, edges = np.histogramdd(center_of_mass[i, :, :], bins=bins)
-    #         z += H
     x = np.array([1, 0, 0])
     xnorm = np.linalg.norm(x)
 
-    for frame in tqdm.tqdm(range(t.n_frames)):
-        for p in range(npores):
-            for l in range(args.layers):
-                for a in range(monomers_per_layer):
-                    pt = p*com_per_pore + l*monomers_per_layer + a  # index of center of mass reference point
-                    point = periodic_pts[frame, pt, :]  # coordinates of center of mass reference point
-                    v = point - pore_spline[frame, p*args.layers + l, :]  # vector from point to pore center
-                    #angle = (180/np.pi)*np.arccos(np.dot(x[:2], v[:2])/(xnorm*np.linalg.norm(v[:2])))  # angle between vector and x-axis
-                    rot = transform.rotate_vector(periodic_pts[frame, :, :], v, x) # rotate all points by angle
-                    trans = rot - rot[pt, :]  # translate all point so reference point is at the center
-                    # H, xedges, yedges = np.histogram2d(pore_spline[frame, p, dimensions[0]] - periodic_pts[frame, :, dimensions[0]],
-                    #         pore_spline[frame, p, dimensions[1]] - periodic_pts[frame, :, dimensions[1]],
-                    #         bins=args.bins, range=hist_range)
+    if args.axis == 'xy' or args.axis == 'yx':
 
-                    H, xedges, yedges = np.histogram2d(trans[:, 0], trans[:, 1], bins=args.bins, range=hist_range)
-                    # H, edges = np.histogramdd(center_of_mass[i, :, :], bins=bins)
-                    z += H
+        for frame in tqdm.tqdm(range(t.n_frames)):
+            for p in range(npores):
+                for l in range(args.layers):
+                    for a in range(monomers_per_layer):
 
-    xcenters = [xedges[i] + ((xedges[i + 1] - xedges[i])/2) for i in range(args.bins)]
-    ycenters = [yedges[i] + ((yedges[i + 1] - yedges[i])/2) for i in range(args.bins)]
+                        pt = p*com_per_pore + l*monomers_per_layer + a  # index of center of mass reference point
+                        point = periodic_pts[frame, pt, :]  # coordinates of center of mass reference point
+                        v = pore_spline[frame, p*args.layers + l, :] - point  # vector from point to pore center
+                        rot = transform.rotate_vector(periodic_pts[frame, :, :], v, x)  # rotate all points by angle
+                        trans = rot - rot[pt, :]  # translate all point so reference point is at the center
+                        H, xedges, yedges = np.histogram2d(trans[:, 0], trans[:, 1], bins=bins, range=hist_range)
+                        z += H
+    else:
+
+        for frame in tqdm.tqdm(range(t.n_frames)):
+            for p in range(npores):
+                for l in range(args.layers):
+                    for a in range(monomers_per_layer):
+
+                        pt = p*com_per_pore + l*monomers_per_layer + a  # index of center of mass reference point
+                        translated = periodic_pts[frame, :, :] - periodic_pts[frame, pt, :]  # make pt the center
+                        H, xedges, yedges = np.histogram2d(translated[:, dimensions[0]], translated[:, dimensions[1]],
+                                                           bins=bins, range=hist_range)
+                        z += H
+
+    z /= (t.n_frames*npores*args.layers*monomers_per_layer)  # normalize although this does nothing to the visualization
+
+    xcenters = [xedges[i] + ((xedges[i + 1] - xedges[i])/2) for i in range(bins[0])]
+    ycenters = [yedges[i] + ((yedges[i + 1] - yedges[i])/2) for i in range(bins[1])]
+
+    # remove center region of 2D histogram since it is brightest and contains no useful information
+    # first find the center bins (index)
+
+    for x in range(len(xcenters)):
+        for y in range(len(ycenters)):
+            if np.linalg.norm([xcenters[x], ycenters[y]]) < args.block_radius:
+                z[x, y] = 0
 
     Imax = np.amax(z)
 
-    heatmap = plt.imshow(z.T/(2*Imax), extent=[xcenters[0], xcenters[-1], ycenters[0], ycenters[-1]])
-    # plt.imshow(z.T/Imax, extent=[xcenters[0], xcenters[-1], ycenters[0], ycenters[-1]])
+    heatmap = plt.imshow(z.T/(args.scale*Imax), extent=[xcenters[0], xcenters[-1], ycenters[0], ycenters[-1]], cmap='jet')
+    plt.imshow(z.T/Imax, extent=[xcenters[0], xcenters[-1], ycenters[0], ycenters[-1]], cmap='jet')
 
     cbar = plt.colorbar(heatmap)
     tick_locator = ticker.MaxNLocator(nbins=5)
@@ -226,7 +244,8 @@ if __name__ == "__main__":
 
     # plt.plot(centers, z)
     plt.tight_layout()
-    plt.savefig('%s' % args.save)
+    if args.save:
+        plt.savefig('%s' % args.save)
     plt.show()
     exit()
     #####################################################################
