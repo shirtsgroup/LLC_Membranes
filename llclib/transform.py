@@ -338,13 +338,13 @@ def rotate_vector(xyz, v1, v2):
     """
 
     # first find the angle between v1 and v2
-
     num = np.dot(v1, v2)
     denom = np.linalg.norm(v1) * np.linalg.norm(v2)
     theta = np.arccos(num / denom)
 
     Rz = rotate_z(-theta)
 
+    # xyz = np.tensordot(Rz, xyz, axes=1)
     for i in range(np.shape(xyz)[0]):
         xyz[i, :] = np.dot(Rz, xyz[i, :])
 

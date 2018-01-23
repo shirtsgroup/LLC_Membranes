@@ -8,7 +8,9 @@ import tqdm
 import matplotlib.pyplot as plt
 from matplotlib import ticker
 from llclib import physical
+from llclib import transform
 from place_solutes import trace_pores
+from scipy import ndimage
 
 
 def initialize():
@@ -96,6 +98,8 @@ if __name__ == "__main__":
 
     args = initialize()
 
+    npores = 4
+
     dimensions = []
     for i in args.axis:
         if i == 'x':
@@ -108,6 +112,7 @@ if __name__ == "__main__":
     ndimensions = len(dimensions)
 
     t = md.load(args.traj, top=args.gro)[args.begin:]
+    print('Trajectory loaded')
 
     mass = [Atom_props.mass[i] for i in args.atoms]  # mass of reference atoms
 
@@ -126,45 +131,49 @@ if __name__ == "__main__":
 
     keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep
 
-    pore_spline = np.zeros([t.n_frames, 4*args.layers, 3])
-
+    pore_spline = np.zeros([t.n_frames, npores*args.layers, 3])
     for frame in range(t.n_frames):
         pore_spline[frame, :, :] += trace_pores(t.xyz[frame, keep, :], t.unitcell_vectors[frame, :2, :2], args.layers)
 
-    pore_centers = physical.avg_pore_loc(4, t.xyz[:, [a.index for a in t.topology.atoms if a.name in args.atoms], :])  # can be further improved with a pore center spline
+    #print('Calculating pore-centers like a bitch..')
+    #pore_centers = physical.avg_pore_loc(npores, t.xyz[:, [a.index for a in t.topology.atoms if a.name in args.atoms], :])  # can be further improved with a pore center spline
 
     ################### 1D Center of mass method ###################
-    keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep
-
-    center_of_mass = com(t.xyz[:, keep, :], mass)  # calculate centers of mass of atom groups
-
-    periodic_pts = duplicate_periodically(center_of_mass, t.unitcell_vectors)
-
-    z = np.zeros([args.bins])
-
-    for frame in tqdm.tqdm(range(t.n_frames)):
-        for i in range(400):
-            H, edges = np.histogram(periodic_pts[frame, i, 2] - periodic_pts[frame, :, 2], bins=args.bins, range=(0, 4))
-            # H, edges = np.histogramdd(center_of_mass[i, :, :], bins=bins)
-            z += H
-
-    centers = [edges[i] + ((edges[i + 1] - edges[i])/2) for i in range(args.bins)]
-
-    plt.plot(centers, z)
-    plt.show()
-    exit()
-    ##################################################################
-
-    ###################### 2D center of mass #########################
-    ######## specialized for rings surrounding pore center ###########
     # keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep
     #
     # center_of_mass = com(t.xyz[:, keep, :], mass)  # calculate centers of mass of atom groups
     #
     # periodic_pts = duplicate_periodically(center_of_mass, t.unitcell_vectors)
     #
-    # z = np.zeros([args.bins, args.bins])
+    # z = np.zeros([args.bins])
     #
+    # for frame in tqdm.tqdm(range(t.n_frames)):
+    #     for i in range(400):
+    #         H, edges = np.histogram(periodic_pts[frame, i, 2] - periodic_pts[frame, :, 2], bins=args.bins, range=(0, 4))
+    #         # H, edges = np.histogramdd(center_of_mass[i, :, :], bins=bins)
+    #         z += H
+    #
+    # centers = [edges[i] + ((edges[i + 1] - edges[i])/2) for i in range(args.bins)]
+    #
+    # plt.plot(centers, z)
+    # plt.show()
+
+    ##################################################################
+
+    ###################### 2D center of mass #########################
+    ######## specialized for rings surrounding pore center ###########
+    keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep
+
+    natoms = len(args.atoms)
+    monomers_per_layer = int(len(keep) / args.layers / npores / len(args.atoms))  # divide by len(args.atoms) because of com
+
+    center_of_mass = com(t.xyz[:, keep, :], mass)  # calculate centers of mass of atom groups
+    com_per_pore = int(center_of_mass.shape[1] / npores)
+
+    periodic_pts = duplicate_periodically(center_of_mass, t.unitcell_vectors)
+
+    z = np.zeros([args.bins, args.bins])
+
     # for frame in tqdm.tqdm(range(t.n_frames)):
     #     for p in range(4*args.layers):
     #         # H, xedges, yedges = np.histogram2d(periodic_pts[frame, i, 0] - periodic_pts[frame, :, 0],
@@ -178,28 +187,48 @@ if __name__ == "__main__":
     #                 bins=args.bins, range=hist_range)
     #         # H, edges = np.histogramdd(center_of_mass[i, :, :], bins=bins)
     #         z += H
-    #
-    # xcenters = [xedges[i] + ((xedges[i + 1] - xedges[i])/2) for i in range(args.bins)]
-    # ycenters = [yedges[i] + ((yedges[i + 1] - yedges[i])/2) for i in range(args.bins)]
-    #
-    # Imax = np.amax(z)
-    #
-    # heatmap = plt.imshow(z.T/Imax, extent=[xcenters[0], xcenters[-1], ycenters[0], ycenters[-1]])
-    # plt.imshow(z.T/729.0, extent=[xcenters[0], xcenters[-1], ycenters[0], ycenters[-1]])
-    #
-    # cbar = plt.colorbar(heatmap)
-    # tick_locator = ticker.MaxNLocator(nbins=5)
-    # cbar.locator = tick_locator
-    # cbar.update_ticks()
-    # cbar.ax.set_yticklabels(['0', '0.2', '0.4', '0.6', '0.8', '1'])
-    # plt.xlabel('%s dimension (nm)' % args.axis[0])
-    # plt.ylabel('%s dimension (nm)' % args.axis[1])
-    #
-    # # plt.plot(centers, z)
-    # plt.tight_layout()
-    # plt.savefig('%s' % args.save)
-    # plt.show()
-    # exit()
+    x = np.array([1, 0, 0])
+    xnorm = np.linalg.norm(x)
+
+    for frame in tqdm.tqdm(range(t.n_frames)):
+        for p in range(npores):
+            for l in range(args.layers):
+                for a in range(monomers_per_layer):
+                    pt = p*com_per_pore + l*monomers_per_layer + a  # index of center of mass reference point
+                    point = periodic_pts[frame, pt, :]  # coordinates of center of mass reference point
+                    v = point - pore_spline[frame, p*args.layers + l, :]  # vector from point to pore center
+                    #angle = (180/np.pi)*np.arccos(np.dot(x[:2], v[:2])/(xnorm*np.linalg.norm(v[:2])))  # angle between vector and x-axis
+                    rot = transform.rotate_vector(periodic_pts[frame, :, :], v, x) # rotate all points by angle
+                    trans = rot - rot[pt, :]  # translate all point so reference point is at the center
+                    # H, xedges, yedges = np.histogram2d(pore_spline[frame, p, dimensions[0]] - periodic_pts[frame, :, dimensions[0]],
+                    #         pore_spline[frame, p, dimensions[1]] - periodic_pts[frame, :, dimensions[1]],
+                    #         bins=args.bins, range=hist_range)
+
+                    H, xedges, yedges = np.histogram2d(trans[:, 0], trans[:, 1], bins=args.bins, range=hist_range)
+                    # H, edges = np.histogramdd(center_of_mass[i, :, :], bins=bins)
+                    z += H
+
+    xcenters = [xedges[i] + ((xedges[i + 1] - xedges[i])/2) for i in range(args.bins)]
+    ycenters = [yedges[i] + ((yedges[i + 1] - yedges[i])/2) for i in range(args.bins)]
+
+    Imax = np.amax(z)
+
+    heatmap = plt.imshow(z.T/Imax, extent=[xcenters[0], xcenters[-1], ycenters[0], ycenters[-1]])
+    plt.imshow(z.T/729.0, extent=[xcenters[0], xcenters[-1], ycenters[0], ycenters[-1]])
+
+    cbar = plt.colorbar(heatmap)
+    tick_locator = ticker.MaxNLocator(nbins=5)
+    cbar.locator = tick_locator
+    cbar.update_ticks()
+    cbar.ax.set_yticklabels(['0', '0.2', '0.4', '0.6', '0.8', '1'])
+    plt.xlabel('%s dimension (nm)' % args.axis[0])
+    plt.ylabel('%s dimension (nm)' % args.axis[1])
+
+    # plt.plot(centers, z)
+    plt.tight_layout()
+    plt.savefig('%s' % args.save)
+    plt.show()
+    exit()
     #####################################################################
 
     ################### 1D Averaging Method ##########################
