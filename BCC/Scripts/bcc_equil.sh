@@ -45,68 +45,68 @@ input.py --bcc -b ${build_mon} -s 5000 # only care about em.mdp and topol.top at
 
 # really spread the monomers apart
 scale.py -g bcc.gro -o bcc.gro -f 2  # triple each dimension of the unit cell and isotropically scale all head group positions
-exit
-#gmx grompp -f em.mdp -p topol.top -c bcc.gro -o em
-#${GMX} mdrun -v -deffnm em
-#
-## Try again if the simulation doesn't energy minimize properly
-#n=$(awk '/Potential Energy/ {print $4}' em.log)  # gets the final value of potential energy from em.log (the 4th field on the line containing the string "Potential Energy"
-#if [[ ${n:0:2} == *"."* ]]; then # check the first two characters of the potential energy value. If there is a decimal, then it is positive
-#    rm \#*
-#    exec bcc_equil.sh -p ${phase} -n ${SHIFT} -d ${dimension} -c ${cluster} -P ${NP} -b ${build_mon} -r ${density} -I ${ion} -w ${wt_percent} -S ${solvent} -T ${temp} -R ${restraint_atoms} # restart this script
-#fi
-#
-#echo 0 | gmx trjconv -f em.trr -s em.tpr -pbc nojump -o bcc.gro
-#cp bcc.gro bcc_2.0.gro
-#
-#for i in $(seq 1.9 -0.1 1.0); do
-#
-#    factor=$(echo "${i} / (${i} + 0.1)" | bc -l)
-#    scale.py -g bcc.gro -o bcc.gro -f ${factor}
-#    gmx grompp -f em.mdp -p topol.top -c bcc.gro -o em
-#    ${GMX} mdrun -v -deffnm em
-#
-#    # in case of more energy minimization problems
-#    n=$(awk '/Potential Energy/ {print $4}' em.log)
-#    if [[ ${n:0:2} == *"."* ]]; then
-#        step=$(echo "${i} + 0.1" | bc -l)
-#        cp bcc_${step}.gro bcc.gro
-#        for j in $(seq $(echo "${i} + 0.08" |bc -l) -0.02 ${i}); do
-#            factor=$(echo "${j} / (${j} + 0.02)" | bc -l)
-#            scale.py -g bcc.gro -o bcc.gro -f ${factor}
-#            gmx grompp -f em.mdp -p topol.top -c bcc.gro -o em
-#            ${GMX} mdrun -v -deffnm em
-#            echo 0 | gmx trjconv -f em.trr -s em.tpr -pbc nojump -o bcc.gro
-#            cp bcc.gro bcc_${j}.gro
-#        done
-#    fi
-#    echo 0 | gmx trjconv -f em.trr -s em.tpr -pbc nojump -o bcc.gro
-#    cp bcc.gro bcc_${i}.gro
-#
-#done
+
+gmx grompp -f em.mdp -p topol.top -c bcc.gro -o em
+gmx mdrun -v -deffnm em
+
+# Try again if the simulation doesn't energy minimize properly
+n=$(awk '/Potential Energy/ {print $4}' em.log)  # gets the final value of potential energy from em.log (the 4th field on the line containing the string "Potential Energy"
+if [[ ${n:0:2} == *"."* ]]; then # check the first two characters of the potential energy value. If there is a decimal, then it is positive
+    rm \#*
+    exec bcc_equil.sh -p ${phase} -n ${SHIFT} -d ${dimension} -c ${cluster} -P ${NP} -b ${build_mon} -r ${density} -I ${ion} -w ${wt_percent} -S ${solvent} -T ${temp} -R ${restraint_atoms} # restart this script
+fi
+
+echo 0 | gmx trjconv -f em.trr -s em.tpr -pbc nojump -o bcc.gro
+cp bcc.gro bcc_2.0.gro
+
+for i in $(seq 1.9 -0.1 1.0); do
+
+    factor=$(echo "${i} / (${i} + 0.1)" | bc -l)
+    scale.py -g bcc.gro -o bcc.gro -f ${factor}
+    gmx grompp -f em.mdp -p topol.top -c bcc.gro -o em
+    ${GMX} mdrun -v -deffnm em
+
+    # in case of more energy minimization problems
+    n=$(awk '/Potential Energy/ {print $4}' em.log)
+    if [[ ${n:0:2} == *"."* ]]; then
+        step=$(echo "${i} + 0.1" | bc -l)
+        cp bcc_${step}.gro bcc.gro
+        for j in $(seq $(echo "${i} + 0.08" |bc -l) -0.02 ${i}); do
+            factor=$(echo "${j} / (${j} + 0.02)" | bc -l)
+            scale.py -g bcc.gro -o bcc.gro -f ${factor}
+            gmx grompp -f em.mdp -p topol.top -c bcc.gro -o em
+            ${GMX} mdrun -v -deffnm em
+            echo 0 | gmx trjconv -f em.trr -s em.tpr -pbc nojump -o bcc.gro
+            cp bcc.gro bcc_${j}.gro
+        done
+    fi
+    echo 0 | gmx trjconv -f em.trr -s em.tpr -pbc nojump -o bcc.gro
+    cp bcc.gro bcc_${i}.gro
+
+done
 
 LOC="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-#
+
 nsol=$(nsolvent.py -b ${build_mon}.gro -d ${dimension} -dens ${density} -wt ${wt_percent} -sol ${solvent})
-#ntot=0
-#
-#echo "Inserting ${nsol} ${solvent} molecules"
-#gmx insert-molecules -f bcc.gro -ci ${LOC}/../top/structures/${solvent}.gro -nmol ${nsol} -o initial.gro &> placement.txt
-#nadded=$(awk '/Added/ {print $2}' placement.txt)  # the actual amount of molecules gromacs was able to place
-#ntot=$((nadded + ntot))
-#
-#input.py --bcc -b ${build_mon} -l 50 --temp ${temp} -f 50 --genvel yes -e nvt -S --solvent glycerol --restraints
-#restrain.py -a ${restraint_atoms} -f 100 -m ${build_mon} -g em.gro -r on -A xyz --novsites --bcc
-#echo "${sol_res}         ${nadded}" >> topol.top
-#
-#gmx grompp -f em.mdp -p topol.top -c initial.gro -o em
-#${GMX} mdrun -v -deffnm em
-#echo 0 | gmx trjconv -f em.trr -s em.tpr -pbc nojump -o em.gro -b 50
-#
-#gmx grompp -f nvt.mdp -p topol.top -c em.gro -o nvt
-#${GMX} mdrun -v -deffnm nvt
-#echo 0 | gmx trjconv -f nvt.trr -s nvt.tpr -pbc nojump -o nvt.gro -b 50
-ntot=1185
+ntot=0
+
+echo "Inserting ${nsol} ${solvent} molecules"
+gmx insert-molecules -f bcc.gro -ci ${LOC}/../top/structures/${solvent}.gro -nmol ${nsol} -o initial.gro &> placement.txt
+nadded=$(awk '/Added/ {print $2}' placement.txt)  # the actual amount of molecules gromacs was able to place
+ntot=$((nadded + ntot))
+
+input.py --bcc -b ${build_mon} -l 50 --temp ${temp} -f 50 --genvel yes -e nvt -S --solvent glycerol --restraints
+restrain.py -a ${restraint_atoms} -f 100 -m ${build_mon} -g em.gro -r on -A xyz --novsites --bcc
+echo "${sol_res}         ${nadded}" >> topol.top
+
+gmx grompp -f em.mdp -p topol.top -c initial.gro -o em
+${GMX} mdrun -v -deffnm em
+echo 0 | gmx trjconv -f em.trr -s em.tpr -pbc nojump -o em.gro -b 50
+
+gmx grompp -f nvt.mdp -p topol.top -c em.gro -o nvt
+${GMX} mdrun -v -deffnm nvt
+echo 0 | gmx trjconv -f nvt.trr -s nvt.tpr -pbc nojump -o nvt.gro -b 50
+tot=1185
 
 while [[ ${ntot} -lt ${nsol} ]]; do
 
