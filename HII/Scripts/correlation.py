@@ -245,7 +245,7 @@ if __name__ == "__main__":
     # plt.plot(centers, z)
     plt.tight_layout()
     if args.save:
-        plt.savefig('%s' % args.save)
+        plt.savefig('%s.png' % args.save)
     plt.show()
     exit()
     #####################################################################

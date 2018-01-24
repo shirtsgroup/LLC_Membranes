@@ -16,7 +16,7 @@ equil_length=1000000  # equilibrium simulation length
 solvate=0
 python="python3"
 
-while getopts "b:x:y:z:r:m:t:p:f:e:s:S:" opt; do
+while getopts "b:x:y:z:r:m:t:p:f:e:s:S:P:" opt; do
     case $opt in
     b) BUILD_MON=$OPTARG;;
     x) x=$OPTARG;;
@@ -30,6 +30,7 @@ while getopts "b:x:y:z:r:m:t:p:f:e:s:S:" opt; do
     e) equil_length=$OPTARG;;
     s) solvate=$OPTARG;;
     S) start_config=$OPTARG;;
+    P) python=$OPTARG;;
     esac
 done
 
@@ -88,11 +89,13 @@ if [ ${MPI} == 'on' ]; then
     mpirun -np ${NP} gmx_mpi mdrun -v -deffnm berendsen
     ${python} ${DIR}/input.py -b ${BUILD_MON} -l ${equil_length} --temp ${T} -f 10000 --barostat Parrinello-Rahman --genvel no
     gmx grompp -f npt.mdp -p topol.top -c berendsen.gro -o PR
+    mpirun -np 4 gmx_mpi mdrun -v -deffnm PR
 else
     gmx grompp -f npt.mdp -p topol.top -c 0.gro -o berendsen # run it out for a bit
     gmx mdrun -v -deffnm berendsen
     ${python} ${DIR}/input.py -b ${BUILD_MON} -l ${equil_length} --temp ${T} -f 10000 --barostat Parrinello-Rahman --genvel no
     gmx grompp -f npt.mdp -p topol.top -c berendsen.gro -o PR
+    gmx mdrun -v -deffnm PR
 fi
 
 #input.py -b ${BUILD_MON} -l ${equil_length} --temp ${T} -f 1000 --barostat Parrinello-Rahman --genvel no
