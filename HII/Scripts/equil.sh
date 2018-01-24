@@ -44,10 +44,10 @@ fi
 ${python} ${DIR}/restrain.py -f 1000000 -A xyz -r on -D off -w off -g ${start_config} --novsites -m ${BUILD_MON} -a ${ring_restraints}
 
 if [ "${MPI}" == "on" ]; then
-    gmx_mpi editconf -f ${start_config} -o box.gro -c -bt triclinic -box ${x} ${y} ${z} -angles 90 90 120
-    gmx_mpi grompp -f em.mdp -p topol.top -c box.gro -o em
+    gmx editconf -f ${start_config} -o box.gro -c -bt triclinic -box ${x} ${y} ${z} -angles 90 90 120
+    gmx grompp -f em.mdp -p topol.top -c box.gro -o em
     mpirun -np ${NP} gmx_mpi mdrun -v -deffnm em
-    gmx_mpi grompp -f npt.mdp -p topol.top -c em.gro -o npt
+    gmx grompp -f npt.mdp -p topol.top -c em.gro -o npt
     mpirun -np ${NP} gmx_mpi mdrun -v -deffnm npt
 else
     gmx editconf -f ${start_config} -o box.gro -c -bt triclinic -box ${x} ${y} ${z} -angles 90 90 120
@@ -65,7 +65,7 @@ ${python} ${DIR}/input.py --mdp -b ${BUILD_MON} -l 50 --restraints --temp ${T} -
 for f in ${forces}; do
 	${python} ${DIR}/restrain.py -f ${f} -A xyz -r on -D off -w off --novsites -m ${BUILD_MON} -a ${ring_restraints} -g ${start_config}
 	if [ ${MPI} == 'on' ]; then
-        gmx_mpi grompp -f npt.mdp -p topol.top -c npt.gro -o npt
+            gmx grompp -f npt.mdp -p topol.top -c npt.gro -o npt
 	    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm npt
 	else
 	    gmx grompp -f npt.mdp -p topol.top -c npt.gro -o npt
@@ -84,10 +84,10 @@ else
 fi
 
 if [ ${MPI} == 'on' ]; then
-    gmx_mpi grompp -f npt.mdp -p topol.top -c npt.gro -o berendsen
+    gmx grompp -f npt.mdp -p topol.top -c npt.gro -o berendsen
     mpirun -np ${NP} gmx_mpi mdrun -v -deffnm berendsen
     ${python} ${DIR}/input.py -b ${BUILD_MON} -l ${equil_length} --temp ${T} -f 10000 --barostat Parrinello-Rahman --genvel no
-    gmx_mpi grompp -f npt.mdp -p topol.top -c berendsen.gro -o PR
+    gmx grompp -f npt.mdp -p topol.top -c berendsen.gro -o PR
 else
     gmx grompp -f npt.mdp -p topol.top -c 0.gro -o berendsen # run it out for a bit
     gmx mdrun -v -deffnm berendsen
