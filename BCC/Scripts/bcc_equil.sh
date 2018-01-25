@@ -47,7 +47,7 @@ input.py --bcc -b ${build_mon} -s 5000 # only care about em.mdp and topol.top at
 scale.py -g bcc.gro -o bcc.gro -f 2  # triple each dimension of the unit cell and isotropically scale all head group positions
 
 gmx grompp -f em.mdp -p topol.top -c bcc.gro -o em
-gmx mdrun -v -deffnm em
+${GMX} mdrun -v -deffnm em
 
 # Try again if the simulation doesn't energy minimize properly
 n=$(awk '/Potential Energy/ {print $4}' em.log)  # gets the final value of potential energy from em.log (the 4th field on the line containing the string "Potential Energy"
