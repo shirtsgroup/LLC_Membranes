@@ -1,32 +1,34 @@
-\documentclass{article}
+\documentclass[journal=jpcbfk,manusciprt=article]{achemso}
+
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage{subcaption}
-\usepackage[margin=1in]{geometry}
-\usepackage{amsmath} % or simply amstext
+\usepackage{amsmath} 
 \usepackage{siunitx}
 \usepackage{booktabs}
-\usepackage[export]{adjustbox}
-\newcommand{\angstrom}{\textup{\AA}}
-\usepackage{cleveref}
-\usepackage{booktabs}
 \usepackage{gensymb}
-\usepackage{float}
-\usepackage{setspace}
-\usepackage{color}
-\doublespacing
 
-\title{Understanding the nanoscale structure of hexagonal phase
-lyotropic liquid crystal membranes}
-\author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble
-\and Joe Yelk \and Matthew Glaser \and Xunda Feng \and Michael R.
-Shirts} 
+\title{Understanding the nanoscale structure of hexagonal phase lyotropic
+liquid crystal membranes}
+\author{Benjamin J. Coscia}
+\author{Michael R. Shirts}
+\email{michael.shirts@colorado.edu}
+\author{Richard D. Noble}
+\author{Douglas L. Gin}
+\affiliation{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, CO 80309, USA}
+\alsoaffiliation{Department of Chemistry and Biochemistry, University of Colorado Boulder, Boulder CO 80309, USA}
+\author{Joe Yelk}
+\author{Matthew Glaser}
+\affiliation{Department of Physics, University of Colorado Boulder, Boulder CO, 80309, USA}
+\author{Xunda Feng}
+\affiliation{Department of Chemical and Environmental Engineering, Yale University, New Haven, Connecticut 06511, USA}
 
 \begin{document}
 
-  \bibliographystyle{ieeetr}
   \graphicspath{{./figures/}}
-  \maketitle
+
+  \begin{tocentry}
+  \end{tocentry}
 
   \begin{abstract}
 
@@ -51,17 +53,25 @@ Shirts}
 
   \section{Introduction}
   
-  Reverse osmosis (RO) and nanofiltration (NF) are membrane based separation
+  Reverse osmosis (RO) and nanofiltration (NF) are membrane-based separation
   processes widely used to create potable or reusable water by removing salts and
   other dissolved compounds from water sources. RO membranes are typically thin
   film composite (TFC) membranes with a porous support layer and a dense
-  crosslinked polymer active layer which near indiscriminately separates all solutes.
-  NF membranes are porous with pores on the order of 1 $\nm$ in size which separate 
-  primarily based on solute size.   
+  crosslinked polymer active layer which near indiscriminately separates all
+  solutes. NF membranes have porous architectures with pores on the order of 1 nm
+  in size which separate primarily based on solute size
+  \cite{van_der_bruggen_review_2003}. 
 
   RO and NF are finding applications beyond primarily water-based
-  separation. Recovery of valued products from complex aqueous and organic waste
-  is of increasing interest. This requires highly selective membranes.
+  purifications. Recovery of valued products from complex aqueous and organic
+  waste is of increasing interest. For example, flowback water (FW) produced
+  during hydraulic fracturing is a complex wastewater full of potentially
+  valuable dissolved organic compounds \cite{dischinger_application_2017}. There
+  is increasing pressure to reuse hydraulic fracturing water rather than dispose
+  of it in order to reduce social and envrionmental impacts as well as cost
+  \cite{theodori_hydraulic_2014}. Rather than dispose of the wastestream
+  generated in the recycling process, we can instead use highly selective
+  membranes in order to successfully recover the useful compounds. 
 
 %  The permeability-selectivity tradeoff is a well-known problem in the membrane
 %  separations community. It is difficult to increase the permeability of a 
@@ -76,25 +86,96 @@ Shirts}
 %  an undesired species \cite{werber_materials_2016}. 
  
   Selective separation by a semipermeable membrane barrier is governed by two
-  steps : barrier entry and transport through the barrier. A solute's ability to
-  enter a membrane barrier is decided by its size, solubility and charge. A solute's
-  size, shape and polarity affect its ability to travel across the barrier. Undesired
-  solutes may still be able to enter the membrane making their diffusion rates
-  relative to desired solutes important. It is important to design the membrane in response
-  to desired and undesired solutes is thus important. 
+  steps: barrier entry and transport through the barrier. A solute's ability to
+  enter a given membrane barrier is decided by its size, shape, charge, polarity
+  and how those factors combine to interact with the membrane material. The same
+  properties affect the rate at which a solute travels across the barrier. Since
+  undesired solutes may still enter the membrane, their diffusion rates relative
+  to desired solutes are important
+  \cite{gin_polymerized_2008,wijmans_solution-diffusion_1995}. To achieve optimum
+  selectivity, it is necessary to design membranes in a way that one can tune the
+  relative diffusivities of desired and undesired solutes. 
 
-  NF -- pore polydispersity
-  RO -- r0andom walk through polymer voids
+  Lyotropic liquid crystals (LLCs) are amphiphilic molecules that have the
+  ability to self-assemble into porous nanostructures \cite{smith_ordered_1997}
+  which can be crosslinked to create mechanically strong membrane films with
+  pores on the order of 1 nm in diameter \cite{zhou_supported_2005}. Unlike
+  commercial NF membranes, LLC membrane pores are uniform in size. Since LLC
+  membranes lack a pore size distribution, they inherently exhibit high
+  selectivity due to their strict molecular weight cut-off (MWCO).  Additionally,
+  the LLCs chosen to make membranes for this application are salts.  The membrane
+  gains a net surface charge when counterions from head groups that line the pore
+  walls escape into the feed solution in order to balance the gradients of
+  concentration and electric potential. This effect, which causes the membrane to
+  repel incoming charged species, is called Donnan exclusion
+  \cite{donnan_theory_1995}.    
+ 
+  The feasiblity of LLC membranes has been demonstrated using LLCs that form
+  the type 1 bicontinuous cubic (Q\textsubscript{I})
+  \cite{hatakeyama_water_2011,hatakeyama_nanoporous_2010,carter_glycerol-based_2012},
+  and the inverted hexagonal (H\textsubscript{II}) \cite{zhou_supported_2005}
+  phases (See Figure~\ref{fig:bcc_v_hII}). When separating organic solutes from
+  NaCl, Q\textsubscript{I} phase membrane filtration experiments have shown
+  selectivity 2-3 times higher than commercial RO and 6-12 times higher than
+  commercial NF membranes \cite{dischinger_application_2017}.  When separating a
+  series of various sized dyes, the H\textsubscript{II} phase membrane showed
+  complete rejection of dyes bigger than 1.2 nm in size
+  \cite{zhou_supported_2005}. 
 
-  Nanostructured porous membrane materials have become increasingly popular for
-  aqueous separations applications such as desalination and biorefinement because
-  they offer the ability to control pore architecture at the molecular scale,
-  thereby permitting the design of solute-specific separation membranes
-  \cite{humplik_nanostructured_2011}. One can acheive most membrane-based aqueous separations of
-  small molecules using reverse osmosis (RO) or nanofiltration
-  (NF) \cite{van_der_bruggen_review_2003}. While RO and NF have seen many
-  advances in the past few decades, they are far from perfect separation
-  technologies. 
+  We will focus our current efforts around the H\textsubscript{II} phase since
+  its geometry should give optimal transport performance compared to the
+  Q\textsubscript{I} phase. The H\textsubscript{II} phase forms at room
+  temperature in the presence of c.a.~10 wt\% water and consists of hexagonally
+  packed, straight, hydrophilic pore columns\cite{smith_ordered_1997}. In the
+  absence of water, neat monomer will form the same hexagonal columnar structure
+  which, in literature, has been referred to as the Col\textsubscript{h}
+  thermotropic phase\cite{feng_scalable_2014} (See Figure~\ref{fig:hII_phase}).
+  These hexagonal columnar phases represent the ideal geometry for membrane
+  transport. The most promising Q\textsubscript{I} phase for membrane
+  applications forms at 70\degree C when monomer is mixed with c.a.~20 wt\%
+  glycerol\cite{carter_glycerol-based_2012}. The Q\textsubscript{I} phase
+  consists of a network of three dimensionally interconnected pores (See
+  Figure~\ref{fig:bcc_phases}). This complex geometry effectively adds a degree
+  of tortuosity to the membrane which prevents optimal through-plane transport.
+  Despite the geometric differences between the Q\textsubscript{I} and
+  H\textsubscript{II} phase, the chemical environment within the pores is
+  expected to be similar, and either membrane should be highly selective. 
+
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[trim=-2cm 0 0 0, clip, height=4.5cm]{Dibrpyr14.eps}
+        \includegraphics[height=4.5cm]{bcc_phases.png}
+        \caption{}\label{fig:bcc_phases}
+  \end{subfigure}
+  \hspace{1cm}
+  \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[trim=0 -0.5cm 0 -0.5cm, clip, height=4.5cm]{NaGA3C11.eps}
+        \includegraphics[height=4.5cm]{hexagonal_packing.png}
+        \caption{}\label{fig:hII_phase}
+  \end{subfigure}
+  \caption{The choice of LLC monomer leads to different favorable liquid
+        crystalline phases. The monomer shown in (a) forms the Q\textsubscript{I} phase
+        in either the Ia3d (left) or Pn3m (right) space group. The surfaces shown
+        represent the interface between the hydrophilic and hydrophobic regions of unit
+        cell. As pictured, we assume that each region occupies an equal volume. The
+        monomer shown in (b) will form the hexagonal columnar phase
+        (H\textsubscript{II} in the presence of water or Col\textsubscript{h} when no
+         water is present).}\label{fig:bcc_v_hII}
+  \end{figure}
+
+
+  %Nanostructured porous membrane materials have become increasingly popular for
+  %aqueous separations applications such as desalination and biorefinement because
+  %they offer the ability to control pore architecture at the molecular scale,
+  %thereby permitting the design of solute-specific separation membranes
+  %\cite{humplik_nanostructured_2011}. One can acheive most membrane-based aqueous separations of
+  %small molecules using reverse osmosis (RO) or nanofiltration
+  %(NF) \cite{van_der_bruggen_review_2003}. While RO and NF have seen many
+  %advances in the past few decades, they are far from perfect separation
+ 
 
    %MRS4: these two paragraphs are perhaps not ideal.  They describe the process
   %of making the membranes, but that is not what we need as the introduction to
@@ -105,14 +186,14 @@ Shirts}
   % that, or give a little background on the processes to make the point more
   % tangible
 
-  Commercial RO membranes are typically dense thin-film composite (TFC)
-  membranes with a porous support layer and an active layer made of a polymer
-  matrix formed through interfacial polymerization \cite{jeong_interfacial_2007}.
-  During interfacial polymerization, a step-growth polymerization reaction occurs
-  at the interface of an aqueous monomer solution that has been soaked into the
-  support layer, and an organic solution of a second monomer. The polymer matrix
-  is dense and highly cross-linked which gives high rejections but low
-  permeability. 
+  %Commercial RO membranes are typically dense thin-film composite (TFC)
+  %membranes with a porous support layer and an active layer made of a polymer
+  %matrix formed through interfacial polymerization \cite{jeong_interfacial_2007}.
+  %During interfacial polymerization, a step-growth polymerization reaction occurs
+  %at the interface of an aqueous monomer solution that has been soaked into the
+  %support layer, and an organic solution of a second monomer. The polymer matrix
+  %is dense and highly cross-linked which gives high rejections but low
+  %permeability. 
 
   %During membrane fabrication,
   %aqueous diamine solution is allowed to penetrate into the polysulfone support
@@ -125,17 +206,18 @@ Shirts}
 %  phase is formed. A membrane is created as the polymer-poor phase forms pores in
 %  the polymer-rich phase. 
 %  During phase inversion, a thin polymer film is precipitated out of a polymer
-  NF membranes are typically porous membranes made by a phase-inversion
-  process. The most widely used phase-inversion process is immersion
-  precipitation, during which one submerges a polymer, dissolved in a solvent, in
-  a non-solvent. A solid, porous polymer membrane is all that remains once all
-  solvent has been removed by non-solvent exchange
-  \cite{smolders_microstructures_1992}.  The resultant pores are polydisperse in
-  size, which hurts membrane selectivity. A second technique used to create NF
-  membranes is call track-etching in which a polymer film is bombarded with
-  charged particles, then chemically etched to create pores
-  \cite{apel_track_2001}. The pores are uniform, which benefits selectivity;
-  however, the membranes have a low porosity and subsequently low permeability. 
+
+%  NF membranes are typically porous membranes made by a phase-inversion
+%  process. The most widely used phase-inversion process is immersion
+%  precipitation, during which one submerges a polymer, dissolved in a solvent, in
+%  a non-solvent. A solid, porous polymer membrane is all that remains once all
+%  solvent has been removed by non-solvent exchange
+%  \cite{smolders_microstructures_1992}.  The resultant pores are polydisperse in
+%  size, which hurts membrane selectivity. A second technique used to create NF
+%  membranes is call track-etching in which a polymer film is bombarded with
+%  charged particles, then chemically etched to create pores
+%  \cite{apel_track_2001}. The pores are uniform, which benefits selectivity;
+%  however, the membranes have a low porosity and subsequently low permeability. 
  
 %MRS3: this is a little disconnected to the contents as well.  You want
 %the paper to explain the why of doing this research.  Paragraph gives background, but doesn't motivate. 
@@ -180,11 +262,11 @@ Shirts}
   %distribution which limits their ability to perform precise separations
   %\cite{bowen_modelling_2002}. 
 
-  The permeability-selectivity tradeoff has the potential to be overcome by
-  designing membranes at the molecular level. Next-generation nanoporous
-  membranes with high selectivity, permitted by a precisely controlled pore size,
-  and high permeability, allowed by its porous architecture, have the potential to
-  replace traditional RO and NF membrane technologies. 
+%  The permeability-selectivity tradeoff has the potential to be overcome by
+%  designing membranes at the molecular level. Next-generation nanoporous
+%  membranes with high selectivity, permitted by a precisely controlled pore size,
+%  and high permeability, allowed by its porous architecture, have the potential to
+%  replace traditional RO and NF membrane technologies. 
 
 %MRS3: I think that this paragraph probably should be couched in terms of what they COULD do, since are not widely used yet.
 %MRS3: if talking about existing membranes, should cite performance.
@@ -196,49 +278,54 @@ Shirts}
 %  Entirely different mechanisms may govern transport in a given nanostructured
 %  material which can inspire novel separation techniques.
 
-  Development of nanostructured porous materials has been limited by the
-  ability to synthesize and scale various fundamentally sound technologies.
-  Graphene sheets are atomically thick which results in excellent water
-  permeability but defects during manufacturing severely impact selectivity
-  \cite{cohen-tanugi_multilayer_2016}. Molecular dynamics (MD) simulations of
-  carbon nanotubes show promise \cite{humplik_nanostructured_2011}, but synthetic
-  techniques are unable to achieve scalable alignment and pore monodispersity
-  \cite{hata_water-assisted_2004,maruyama_growth_2005}. Zeolites have sub-nm
-  pores with a narrow pore size distribution, and MD simulations of these
-  materials show that they exhibit complete rejection of solvated ions
-  \cite{murad_molecular_1998}- however, experimental rejection was low and
-  attributed to interstitial defects formed during membrane synthesis
-  \cite{li_desalination_2004}. Consequently, there is a need for a scalable
-  nanostructured porous membrane. 
+%  Development of nanostructured porous materials has been limited by the
+%  ability to synthesize and scale various fundamentally sound technologies.
+%  Graphene sheets are atomically thick which results in excellent water
+%  permeability but defects during manufacturing severely impact selectivity
+%  \cite{cohen-tanugi_multilayer_2016}. Molecular dynamics (MD) simulations of
+%  carbon nanotubes show promise \cite{humplik_nanostructured_2011}, but synthetic
+%  techniques are unable to achieve scalable alignment and pore monodispersity
+%  \cite{hata_water-assisted_2004,maruyama_growth_2005}. Zeolites have sub-nm
+%  pores with a narrow pore size distribution, and MD simulations of these
+%  materials show that they exhibit complete rejection of solvated ions
+%  \cite{murad_molecular_1998}- however, experimental rejection was low and
+%  attributed to interstitial defects formed during membrane synthesis
+%  \cite{li_desalination_2004}. Consequently, there is a need for a scalable
+%  nanostructured porous membrane. 
 
-  Polymeric membranes based on self-assembling lyotropic liquid crystals (LLCs)
-  are suitable candidates for aqueous separation applications. LLCs are
-  amphiphilic molecules that share the characteristic ability of nanostructured
-  porous membrane materials to create highly ordered nanostructures with the
-  added benefits of low cost and synthetic techniques feasible for large-scale
-  production \cite{feng_scalable_2014}. LLC systems created by the monomer
-  Na-GA3C11 (Fig.~\ref{fig:monomer}) have been extensively studied experimentally
-  \cite{feng_scalable_2014,smith_ordered_1997,zhou_supported_2005,resel_h2-phase_2000,feng_thin_2016}.
-  The neat Na-GA3C11 monomer forms the thermotropic liquid crystalline (TLC)
-  Col\textsubscript{h} phase (Fig.\ref{fig:assembly}). The presence of ca. 10
-  wt\% added water results in formation of the lyotropic H\textsubscript{II}
-  phase. In both cases, Na-GA3C11 monomers assembles into mesophases made of
-  hexagonally packed, uniform size, cylinders with hydrophilic head groups
-  oriented inward towards the cylinder center. This LLC assembly is then
-  polymerized in situ to form a cross-linked polymer network to stabilize the
-  structure. The hydrophilic region can act as a pore for aqueous separations
-  \cite{zhou_supported_2005}.  One can envision tailoring the pore region for
-  specific separations by changing the monomer chemistry
-  \cite{resel_h2-phase_2000}.
+%  Polymeric membranes based on self-assembling lyotropic liquid crystals (LLCs)
+%  are suitable candidates for aqueous separation applications. LLCs are
+%  amphiphilic molecules that share the characteristic ability of nanostructured
+%  porous membrane materials to create highly ordered nanostructures with the
+%  added benefits of low cost and synthetic techniques feasible for large-scale
+%  production \cite{feng_scalable_2014}. LLC systems created by the monomer
+%  Na-GA3C11 (Fig.~\ref{fig:monomer}) have been extensively studied experimentally
+%  \cite{feng_scalable_2014,smith_ordered_1997,zhou_supported_2005,resel_h2-phase_2000,feng_thin_2016}.
+%  The neat Na-GA3C11 monomer forms the thermotropic liquid crystalline (TLC)
+%  Col\textsubscript{h} phase (Fig.\ref{fig:assembly}). The presence of ca. 10
+%  wt\% added water results in formation of the lyotropic H\textsubscript{II}
+%  phase. In both cases, Na-GA3C11 monomers assembles into mesophases made of
+%  hexagonally packed, uniform size, cylinders with hydrophilic head groups
+%  oriented inward towards the cylinder center. This LLC assembly is then
+%  polymerized in situ to form a cross-linked polymer network to stabilize the
+%  structure. The hydrophilic region can act as a pore for aqueous separations
+%  \cite{zhou_supported_2005}.  One can envision tailoring the pore region for
+%  specific separations by changing the monomer chemistry
+%  \cite{resel_h2-phase_2000}.
 
-  Research into polymerized LLC membranes has been revived in recent years.
-  During early stages of exploration, mesophases formed by Na-GA3C11 could not be
+  Research into the H\textsubscript{II} phase of polymerized LLC membranes has
+  been revived in recent years. During early stages of exploration, hexagonal
+  mesophases formed by Na-GA3C11 (Figure~\ref{fig:assembly}) could not be
   macroscopically aligned, resulting in low flux membranes, and no clear route
-  towards scalable and economical filtration. In 2014, Feng et al.~showed that
-  one can align the mesophases using a magnetic field with subsequent
-  cross-linking to lock the structure in place \cite{feng_scalable_2014}. In 2016,
-  Feng et al. showed that one could obtain the same result using a second
-  technique termed soft confinement \cite{feng_thin_2016}.
+  towards scalable and economical filtration. For this reason, research efforts
+  focused on the Q\textsubscript{I} phase, whose geometry does not require
+  alignment. In 2014, Feng et al.~showed that one can align 
+  Col\textsubscript{h} mesophases using a magnetic field with subsequent
+  cross-linking to lock the structure in place \cite{feng_scalable_2014}. In
+  2016, Feng et al. showed that one could obtain the same result using a second
+  technique termed soft confinement \cite{feng_thin_2016}. Current efforts are
+  focused on extending the method to the H\textsubscript{II} phase and 
+  characterizing the performance of these newly aligned systems.
 
   % BJC: Not sure this figure needs to be in the paper. 
   %MRS2: good question.  It helps give people context, which is necessary to
@@ -301,26 +388,17 @@ Shirts}
   primarily to Na-GA3C11 with some characterization done after minor structural
   modifications. Resel et al.~varied the length of the monomer tails and the
   counterion used and observed its affect on pore spacing
-  \cite{resel_structural_2000}. In a later study of rejection performance, it
-  was shown that membranes formed by cross-linked Na-GA3C11 in the
-  H\textsubscript{II} phase cannot separate solutes less than 1.2 nm in
-  diameter because the pores are too large \cite{zhou_supported_2005}. We do not
-  yet understand how to controllably reduce the effective pore size or how to
-  tune the chemical environment in the nanopores of this or related materials for
-  effective water desalination and small organic molecule separations. The only
-  source of predictive modeling for LLC systems have been macroscopic models that
-  likely do not adequately describe transport at these length scales
-  \cite{hatakeyama_water_2011}. It will be challenging to efficiently narrow down
-  the large design space in a laboratory setting without a robust model.
-
-  In this study, we build a significantly more realistic atomistic model of LLC
-  membranes than, to our knowledge, has ever previously been done, and explore
-  what new structural information can be gained and what structure hypotheses are
-  supported by this model. We validate the model using as much experimental
-  information as possible. We are most interested in reproducing the conclusions
-  about structure drawn from small angle X-ray scattering (SAXS)
-  and wide angle X-ray scattering (WAXS) experiments as well as in matching ionic
-  conductivity measurements \cite{feng_thin_2016}.
+  \cite{resel_structural_2000}. In a later study of rejection performance, it was
+  shown that membranes formed by cross-linked Na-GA3C11 in the
+  H\textsubscript{II} phase cannot separate solutes less than 1.2 nm in diameter
+  because the pores are too large \cite{zhou_supported_2005}. We do not yet
+  understand how to controllably reduce the effective pore size or how to tune
+  the chemical environment in the nanopores of this or related materials for
+  small molecule separations. The only source of predictive modeling for
+  LLC systems have been macroscopic models that likely do not adequately describe
+  transport at these length scales \cite{hatakeyama_water_2011}. It will be
+  challenging to efficiently narrow down the large design space in a laboratory
+  setting without a robust model.
 
   A molecular-level understanding of LLC polymer membrane structure, enabled by
   molecular dynamics simulations, can provide guidelines to reduce the large
@@ -332,10 +410,19 @@ Shirts}
   (Fig. \ref{fig:detail}), assuming the force fields are sufficiently accurate.
   With such an atomistic model, we can directly observe molecular-level solute
   transport and suggest governing mechanisms. We can observe how the choice of
-  head group may influence pore size for size exclusion driven separations. We
-  can interchange counterions which may influence both the pore size and the
-  strength of the Donnan potential which affects the degree to which the membrane
-  can exclude charged species. 
+  head group interacts with solutes of interest. We can interchange
+  counterions which may influence both the pore size and the strength of the
+  Donnan potential which affects the degree to which the membrane can exclude
+  charged species at the membrane surface. 
+
+  In this study, we build a significantly more realistic atomistic model of LLC
+  membranes than, to our knowledge, has ever previously been created, and explore
+  what new structural information can be gained and what structure hypotheses are
+  supported by this model. We validate the model using as much experimental
+  information as possible. We are most interested in reproducing the conclusions
+  about structure drawn from small angle X-ray scattering (SAXS)
+  and wide angle X-ray scattering (WAXS) experiments as well as in matching ionic
+  conductivity measurements \cite{feng_thin_2016}.
 
   \begin{figure}
   \centering
@@ -384,44 +471,39 @@ Shirts}
   \item If layers do exist, how many monomers constitute a single layer? \label{point:monomernum}
   
   A simple molecular simulation study of a similar molecule suggested that
-  there are 4 monomers in each layer \cite{zhu_methacrylated_2006}. Their 
-  model likely does not sufficiently model the chemical environment present
-  in the real system since it only contains 16 total monomers.
-%BJC3: rephrased
-%  However, their estimate is based on a simulated system that contains 16 total
-%  monomers which likely does not sufficiently model the chemical environment
-%  present in the real system
-  A separate calculation based on the estimated volume of the liquid crystal
-  monomers proposes that each layer consists of seven monomers
-  \cite{resel_structural_2000}. Our best chance to answer this question is by
-  using a molecular model orders of magnitude larger than any other reported
-  atomistic liquid crystal membrane simulation, as we present here. We will
-  directly change the layer composition and note its effect on membrane
-  structure.
+  there are 4 monomers in each layer \cite{zhu_methacrylated_2006}. Their model
+  likely does not sufficiently model the chemical environment present in the real
+  system since it only contains 16 total monomers. A separate calculation based
+  on the estimated volume of the liquid crystal monomers proposes that each layer
+  consists of seven monomers\cite{resel_structural_2000}. Our best chance to
+  answer this question is by using a molecular model orders of magnitude larger
+  than any other reported atomistic liquid crystal membrane simulation, as we
+  present here. We will directly change the layer composition and note its effect
+  on membrane structure.
 
   \item Does our model support the existence of layers and if so, how well
   defined are the layers? \label{point:layers} 
 
-  Strong $\pi$-$\pi$ stacking interactions in the direction perpendicular to
-  the membrane plane support the existence of layers experimentally. $\pi$-$\pi$
-  stacking will only occur between the aromatic monomer head groups which leaves
-  no description of what is happening in the monomer tail region. The tails may
-  entangle isotropically while maintaing stacking order among headgroups. 
+  Indications of strong $\pi$-$\pi$ stacking interactions in the direction
+  perpendicular to the membrane plane support the existence of layers
+  experimentally. $\pi$-$\pi$ stacking will only occur between the aromatic
+  monomer head groups which leaves no description of what is happening in the
+  monomer tail region. The tails may entangle isotropically while maintaining
+  stacking order among headgroups. 
 
   \item How do monomers in each layer position themselves with respect to
   surrounding layers? \label{point:orientation}
 
   The $\pi$-$\pi$ stacking interactions may be a driving force of self-assembly
-  in this system \cite{gazit_possible_2002}. Gas phase ab initio studies of
-  benzene dimers have shown a clear energetic advantage for parallel displaced
-  and T-shaped $\pi$-$\pi$ stacking conformations over a sandwiched
-  conformation \cite{sinnokrot_estimates_2002}. Substituted benzene rings
-  exhibit an even stronger $\pi$-$\pi$ stacking attraction which favors the
-  parallel displaced configuration in all cases except where the substitutions
-  are extremely electron withdrawing.
-  \cite{waller_hybrid_2006,ringer_effect_2006} In this study, we compare
-  simulated X-ray diffraction patterns to experiment in order to deduce which
-  stacking configuration is most likely. 
+  in this system \cite{gazit_possible_2002}. Gas phase \textit{ab initio} studies
+  of benzene dimers have shown a clear energetic advantage for parallel displaced
+  and T-shaped $\pi$-$\pi$ stacking conformations over a sandwiched conformation
+  \cite{sinnokrot_estimates_2002}. Substituted benzene rings exhibit an even
+  stronger $\pi$-$\pi$ stacking attraction which favors the parallel displaced
+  configuration in all cases except where the substitutions are extremely
+  electron withdrawing\cite{waller_hybrid_2006,ringer_effect_2006}. In this
+  study, we compare simulated X-ray diffraction patterns to experiment in order
+  to deduce which stacking configuration is most likely. 
 
   \item Can the system exist in other metastable states or phases that are not
   accessed during experiments? \label{point:metastable}
@@ -433,8 +515,7 @@ Shirts}
   trapped in a metastable free energy basin. We must be able to identify which
   state is produced experimentally.
 
-  %\item What constitutes a pore, and how well-defined are the pore regions? \label{point:poredefinition}
-  \item What constitutes a pore, and what does the pore architecture look like? \label{point:poredefinition}
+  \item What constitutes a pore, and what are the details of its pore architecture? \label{point:poredefinition}
 
   The limited picture that experiment provides tells us that there are
   hexagonally packed, hydrophilic regions where transport is likely to occur.
@@ -454,9 +535,9 @@ Shirts}
   phase forms. Although we will not explore whether water is necessary for
   self-assembly, we hypothesize that the hydrogen bonding network formed by the
   water may play a role in structuring the pores and holding together the
-  hexagonal phase. We can use simulated X-ray diffraction patterns to see if
-  there is any meaningful structural difference between a ``dry'' and ``wet''
-  system.
+  hexagonal phase. We can look at correlation functions and use simulated X-ray
+  diffraction patterns to see if there is any meaningful structural difference
+  between a ``dry'' and ``wet'' system.
 
   \end{enumerate}
   
@@ -475,44 +556,45 @@ Shirts}
 
   \begin{enumerate} 
   
-	\item The location of the first is at $q_z$ = 1.7 \angstrom$^{-1}$,
-	corresponding to a real space separation of 3.7 \angstrom~. Previous
+	\item \textit{R-$\pi$}: The location of the first is at $q_z$ = 1.7
+	\AA$^{-1}$, corresponding to a real space separation of 3.7 \AA~. Previous
 	work~\cite{feng_scalable_2014} attributes this reflection to $\pi$-$\pi$
 	stacking between aromatic rings in the direction perpendicular to the membrane
 	plane, or z-axis \cite{feng_scalable_2014}. For simplicity, we will refer to
 	this reflection as R-$\pi$.
  
-	\item A weak intensity line, located at exactly half the $q_z$ value of
-	R-$\pi$ ($q_z$ = 0.85 \angstrom$^{-1}$), corresponds to a real space periodic
-	spacing of 7.4 \angstrom~. This reflection has been interpreted as
+	\item \textit{R-helix}: A weak intensity line, located at exactly half
+	the $q_z$ value of R-$\pi$ ($q_z$ = 0.85 \AA$^{-1}$), corresponds to a real
+	space periodic spacing of 7.4 \AA~. This reflection has been interpreted as
 	2\textsubscript{1} helical ordering of aromatic rings along the z axis
 	\cite{feng_scalable_2014}, meaning that if one traces the positions of the
 	aromatic rings with a helical curve, then for each full turn in the helix, one
 	will encounter two aromatic rings. For this reason we will refer to reflection
 	as R-helix. 
 
-	\item A low intensity ring located at r = 1.4 \angstrom$^{-1}$ marks
-	the third major reflection of interest. The real space separation corresponds
-	to 4.5 \angstrom~ which is characteristic of the average spacing between packed
-	alkane chains \cite{mcintosh_organization_1980}. We will call this reflection
-	R-alkanes.
+	\item \textit{R-alkanes}: A low intensity ring located at r = 1.4
+	\AA$^{-1}$ marks the third major reflection of interest. The real space
+	separation corresponds to 4.5 \AA~ which is characteristic of the average
+	spacing between packed alkane chains \cite{mcintosh_organization_1980}. We will
+	call this reflection R-alkanes.
 
-	\item Within R-alkanes, are four spots of higher relative intensity.
-	Accordingly, we name these reflection R-spots. The location of all spots is $\sim 37$
-	degrees from the $q_z$ axis in their respective quadrants. In many liquid
-	crystal systems one can explain the spots by the tilt angle of the alkane chains
-	with respect to the membrane plane \cite{govind_simple_2001}.
+	\item \textit{R-spots}: Within R-alkanes, are four spots of higher
+	relative intensity.  Accordingly, we name these reflection R-spots. The
+	location of all spots is $\sim 37$ degrees from the $q_z$ axis in their
+	respective quadrants. In many liquid crystal systems one can explain the spots
+	by the tilt angle of the alkane chains with respect to the membrane 
+	plane\cite{govind_simple_2001}.
  
-	\item The final feature corresponds to the spacing and symmetry of the
-	d\textsubscript{100} plane. This plane is geometrically related the distance
-	between pores. The feature, which we named R-pores, is characterized by dots
-	along the equatorial axis defined when $q_z$ = 0. The spacing between dots is
-	indicative of the hexagonal symmetry of the packed pores. We observe the same
-	information with higher resolution using SAXS (Fig.~\ref{fig:SAXS}). 
+	\item \textit{R-pores}: The final feature corresponds to the spacing
+	and symmetry of the d\textsubscript{100} plane. This plane is geometrically
+	related the distance between pores. The feature, which we named R-pores, is
+	characterized by dots along the equatorial axis defined when $q_z$ = 0. The
+	spacing between dots is indicative of the hexagonal symmetry of the packed
+	pores. We observe the same information with higher resolution using SAXS
+	(Fig.~\ref{fig:SAXS}). 
 
   \end{enumerate}
 
-  %BJC: TODO: update colorbar
   \begin{figure}
         \centering
         \begin{subfigure}[t]{0.43\linewidth}
@@ -564,22 +646,15 @@ Shirts}
   construction (Figure~\ref{fig:python}a). See supplemental information for
   further detail.
 
-% Note: we should put scripts and starting configurations (not all that were
-% done but the important ones) in a public repository by the time of
-% submission. 
-%MRS4: I would give a ``plain text'' version of the script in supplementary. BJC: referring to parameterization script
-%MRS4: somewhere would need to specify things like time step tau_t, tau_p, etc., so that people could in theory replicate 
-
   \subsection{Unit Cell Preparation}
 
-%MRS4: check grammar additions in this paragraph.
   The timescale for self-assembly of monomers into the hexagonal phase is
   unknown and likely outside of a reasonable length for an atomistic simulation,
   calling for a more efficient way to build the system. Previous work has shown
   a coarse-grained model self assemble into the H\textsubscript{II} phase
   configuration in $\sim$1000 ns \cite{mondal_self-assembly_2013}.  We
   attempted atomistic self-assembly by packing monomers into a box using Packmol
-  \cite{martinez_packmol:_2009}.  Simulations of greater than 100 ns show no
+  \cite{martinez_packmol:_2009}. Simulations of greater than 100 ns show no
   indicators of progress towards an ordered system. To bypass the slow
   self-assembly process, we use Python scripts to assemble monomers into a
   structure close to one of a number of hypothesized equilibrium configurations
@@ -592,7 +667,7 @@ Shirts}
 	\caption{(a) We parameterized a single monomer and annealed it to produce a low energy
 		configuration. (b) A python script rotates and assembles monomers into layers with 
 		hydrophilic centers. (c) We chose to stack twenty layers on top of each other to create
-		pores. (d) The pores are duplicated and placed into a monoclinic unit cell}\label{fig:python}
+		pores. (d) The pores are duplicated and placed into a monoclinic unit cell.}\label{fig:python}
   \end{figure}
   
   A typical simulation volume contains four pores in a monoclinic unit cell,
@@ -618,13 +693,13 @@ Shirts}
   pore's central axis, does not influence the equilibrium structure if one choses
   a reasonable value (See Supplemental Information). The pore radius is chosen to
   be 0.5 nm in our initial configurations. The initial distance between pores
-  also has little effect on the the equilibrated structure (See supplemental
-  information). However, one should not start them too close or there will be
+  also has little effect on the the equilibrated structure (See Supplemental
+  Information). However, one should not start them too close or there will be
   high energy repulsions during early equilibration. We chose an initial pore
   spacing of 4.5 nm, $\sim$10\% larger than the experimental value of 4.12 nm.
   The distance between layers, the rotation of the layers with respect to
   adjacent layers, and the number of monomers per layer do influence the
-  equilibrium structure and require further justification for their choices.  We
+  equilibrium structure and require further justification for their choices. We
   rely on experimental data to inform them. 
 
   We chose the layer spacing for the initial configuration based on R-$\pi$ and
@@ -634,27 +709,31 @@ Shirts}
   equal to R-$\pi$ with layers placed so aromatic rings stack 3.7 \AA~apart in
   the z-direction. We explore a second system with an initial layer spacing of 5
   \AA. We briefly explored a third system with an initial layer spacing of 10
-  \AA. If we initially space layers too far apart, they will collapse on each
-  other while simultaneously slipping in between layers of adjacent pores, which
-  leads to an artificially thick membrane with pores spaced closely together.
-  Further details of simulations with layer stacked 10 \AA apart are in the supplemental
-  information.
+  \AA, however it shows non-physical behavior which is detailed in the 
+  Supplemental Information. 
+
+% This is true if initial equilibration is performed with pressure control
+%  If we initially space layers too far apart, they will collapse on each
+%  other while simultaneously slipping in between layers of adjacent pores, which
+%  leads to an artificially thick membrane with pores spaced closely together.
+%  Further details of simulations with layer stacked 10 \AA apart are in the supplemental
+%  information.
 
   We chose the relative interlayer orientation based on clues from diffraction
   data as well as the various known stacking modes of benzene and substituted
   benzene rings: sandwiched, parallel-displaced and T-shaped
-  \cite{sinnokrot_estimates_2002} (Fig. \ref{fig:sandwiched} and
-  \ref{fig:pd,fig:tshaped}).  We ruled out the T-shaped configuration because its
-  $\sim$5 \angstrom~ equilibrium stacking distance
+  \cite{sinnokrot_estimates_2002}. We ruled out the T-shaped configuration
+  because its $\sim$5 \AA~ equilibrium stacking distance
   \cite{sinnokrot_estimates_2002} is inconsistent with R-$\pi$. It is also
   infeasible for the monomers to orient in the T-shaped conformation because of
   the bulky tail groups. We will explore the system's preference towards the
   sandwiched vs. parallel displaced stacking modes in some detail. Both have
-  reported stacking distances near the R-$\pi$ value of 3.7 \angstrom. Headgroups
-  in our sandwiched initial configuration stack directly on top of each other
-  while headgroups in the parallel displaced initial configuration stack
-  with an offset of $180/nmon$ degrees where $nmon$ equals the number of monomers
-  per layer.
+  reported stacking distances near the R-$\pi$ value of 3.7 \AA. Headgroups in
+  our sandwiched initial configuration stack directly on top of each other while
+  headgroups in the parallel displaced initial configuration stack with an offset
+  of $180/nmon$ degrees where $nmon$ equals the number of monomers per layer. See
+  the Supplemental Information for a detailed illustration of the initial
+  configurations in each mode.
 
   The number of monomers in each layer is unknown, as stated in
   (\ref{point:monomernum}). We tested configurations constructed with a varied
@@ -718,6 +797,8 @@ Shirts}
 
   \subsection{Equilibrium Calculations}
 
+  \subsubsection{\textit{Determining equilibration time}}
+
   Using equilibrated structures, we carry out various calculations to
   characterize the system. We define the point at which a system is equilibrated
   based on when the distance between pores stops changing.  We determined when
@@ -726,20 +807,41 @@ Shirts}
   \cite{chodera_simple_2016,shirts_statistically_2008}. Simulations of 400 ns
   give at least 50 ns of equilibrated simulation trajectory.
 
+  \subsubsection{\textit{Calculation of pore spacing}}
+
   To calculate the equilibrated pore spacing, we measured the distance between
   pore centers. We located the pore centers by averaging the coordinates of sodium
   ions in their respective pores. We generated pore spacing statistics 
   using the bootstrapping technique (See Supplemental Information).
 
-  To quantify the degree of layering and the equilibrium distance between layers
-  in our system, we calculate a spatial correlation function, $g(z)$, measured
-  along the z-axis (perpendicular to the membrane plane). To calculate $g(z)$,
-  we binned the z-component distances between the center of mass of each
-  component and all others of the same pore over at least 50 ns of equilibrated
-  trajectory and then normalized by the average number density. To extract the
-  average distance between layers we applied a discrete Fourier transform to
-  $g(z)$ and extracted the highest intensity frequency.
+  \subsubsection{\textit{Pair distribution functions}}
 
+  The normalized pair distribution function, $g(\mathbf{r})$, describes
+  the probability of finding a pair of particles separated by $\mathbf{r}$,
+  \begin{equation}
+	g(\mathbf{r})= \frac{1}{\rho N} \Bigg \langle \sum_{i=1}^{N}\sum_{j\neq i}^{N} \delta(\mathbf{r}+\mathbf{r_j}-\mathbf{r_i}) \Bigg \rangle
+	\label{eqn:correlation}
+  \end{equation}
+  where $\rho$ is the average number density of particles and $\delta(\mathbf{r})$
+  is the Dirac delta function\cite{kuriabova_linear_2010}. We applied equation 
+  \ref{eqn:correlation} in one and two dimensions to learn about various spatial
+  correlation functions.
+
+  In the 1D case, we measured the pair correlation function between centers of
+  masses of aromatic head group rings, $g(z)$, along the z-axis (perpendicular to
+  the membrane plane). To extract the average distance between layers we applied
+  a discrete Fourier transform to $g(z)$ and extracted the highest intensity
+  frequency.
+
+  We looked at the xy and xz pair distribution functions based on the center of
+  masses of the aromatic head group rings. We gave special consideration to the
+  xy cross-sections since there are multiple rings in the same plane at different
+  vertices of a polygon. We used a rotated frame of reference to avoid
+  ambiguities in the final pair distribution functions. For a given center of
+  mass, we rotated the coordinates so that the vector created from the center of
+  mass to the pore center was in line with the positive x axis. 
+   
+  \subsubsection{\textit{Simulated structure factor calculations}}
   % BJC: To be replaced by Joe's description
   {\color{red}This section replaced by Yelk/Glaser text}. 
   Simulated X-ray diffraction patterns are generated based on atomic
@@ -872,8 +974,8 @@ Shirts}
   pores (Fig.~\ref{fig:zdf}). We measured $g(z)$ with respect to aromatic rings in
   the head groups and, separately, with respect to carbon atoms in the alkane
   chains. Using a Fourier transform of $g(z)$, we see that sandwiched
-  configuration layers stack 4.39 \angstrom~apart while parallel displaced
-  configuration layers stack 4.38 \angstrom~apart.
+  configuration layers stack 4.39 \AA~apart while parallel displaced
+  configuration layers stack 4.38 \AA~apart.
 
   Insert paragraph about 2D pair distribution function (yz cross section). 
 

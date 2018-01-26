@@ -41,11 +41,11 @@
 	\item \textit{Assign GAFF atomtypes using \texttt{antechamber}} : Using
 	the .pdb structure file as input, we ran
 	\texttt{antechamber}~\cite{wang_automatic_2006} using the AM1-BCC charge model.
-	The net charge on the monomer is input as -1 since the sodium ion we keep it as
+	The net charge on the monomer is input as -1 since the sodium ion is kept as 
 	a separate residue. We use \texttt{LEaP}~\cite{case_ambertools_nodate} and the
 	output of \texttt{antechamber} to create Amber topology files. A detailed
 	tutorial can be accessed elsewhere \cite{walker_antechamber_nodate}.
-	\item \textit{Create gromacs topologies from Amber output} : The output
+	\item \textit{Create GROMACS topologies from Amber output} : The output
 	of \texttt{LEaP} is a .inpcrd and a .prmtop file which are Amber topology
 	files. Using acpype.py \cite{sousa_da_silva_acpype_2012}, we converted the
 	\texttt{LEaP} output into GROMACS .gro and .top files. 
@@ -55,7 +55,7 @@
 	box spaced at least 3 nm from the monomer on all sides. We ran an energy minimzation
 	on the system with the steepest descent algorithm. Next we performed an NVT
 	simulated annealing procedure. We linearly decreased the temperature of the
-	system from 1000K to 50K over the course of 10 ns. We randomly chose a monomer
+	system from 1000 K to 50 K over the course of 10 ns. We randomly chose a monomer
 	configuration from the last 10 \% of the trajectory. 
 	\item \textit{Reassign charges with \texttt{molcharge}}: With the monomer
 	configuration taken from the annealed trajectory, we reassigned charges using
@@ -69,6 +69,22 @@
 	last 10 \% of the trajectory and was used to build all assemblies reported
 	(Figure~\ref{fig:monomer}).
   \end{enumerate} 
+
+  \begin{figure}
+	\centering
+        \includegraphics[width=0.9\textwidth]{monomer.png}
+	\caption{Atomistic representation of the monomer Na-GA3C11. White atoms
+		represent hydrogen, cyan atoms represent carbon, red atoms represent oxygen and
+		the blue atom is sodium.}\label{fig:monomer}
+  \end{figure}
+
+  \begin{figure}
+	\centering
+        \includegraphics[width=0.9\textwidth]{monomer_color_coded.png}
+	\caption{The groups used for $g(z)$ calculations. Red atoms are in the
+		tails group. Green atoms are in the head group region. The blue atom is sodium. 
+		}\label{fig:monomer_color_coded}
+  \end{figure}
 
   \begin{figure}
         \centering
@@ -106,30 +122,19 @@
 
   \begin{figure}
 	\centering
-        \includegraphics[width=0.9\textwidth]{monomer.png}
-	\caption{Atomistic representation of the monomer Na-GA3C11. White atoms
-		represent hydrogen, cyan atoms represent carbon, red atoms represent oxygen and
-		the blue atom is sodium.}\label{fig:monomer}
-  \end{figure}
-
-  \begin{figure}
-	\centering
-        \includegraphics[width=0.9\textwidth]{monomer_color_coded.png}
-	\caption{The groups used for $g(z)$ calculations. Red atoms are in the
-		tails group. Green atoms are in the head group region. The blue atom is sodium. 
-		}\label{fig:monomer_color_coded}
-  \end{figure}
-
-  \begin{figure}
-	\centering
 	\includegraphics[width=0.8\textwidth]{pore_radius_illustration.png}
 	\caption{When creating an initial configuration, the pore radius is defined based
 	on the distance of the carbonyl carbon from the pore's central axis}
 	\label{fig:pore_radius_illustration}
   \end{figure}
 
-  \textbf{Calculation of pore-to-pore spacing statistics}
-  
+  \noindent
+  \begingroup
+        \fontsize{14pt}{14pt}\selectfont
+	\textbf{Calculation of pore-to-pore spacing statistics}
+  \endgroup
+ 
+  \vspace{1em} 
   We are interested in 5 pore-to-pore distances which should all be
   equal in a perfect hexagonal array (Figure~\ref{fig:p2p_diagram}). Only 4 of
   the 5 distances are independent. We can calculate a trajectory of spacing

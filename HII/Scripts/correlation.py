@@ -31,9 +31,10 @@ def initialize():
     parser.add_argument('--layers', default=20, type=int, help='Number of layers')
     parser.add_argument('--range', nargs='+', help='Range for histogram plot. A list of the form:'
                         '[dimension 1 lower, dimension 1 upper, dimension 2 lower, dimension 2 upper ...]')
-    parser.add_argument('--save', type=str, help='Follow flag with filename to save plot by')
+    parser.add_argument('--save', type=str, help='Follow flag with name to save plot by (Not including file extension)')
     parser.add_argument('--scale', type=float, default=1, help='Scale color bar by this factor')
     parser.add_argument('-br', '--block_radius', default=0.25, type=float, help='radius of circle around origin to zero out')
+    parser.add_argument('--noshow', action="store_true", help='If this flag is entered, plots will not be shown')
 
     args = parser.parse_args()
 
@@ -246,7 +247,8 @@ if __name__ == "__main__":
     plt.tight_layout()
     if args.save:
         plt.savefig('%s.png' % args.save)
-    plt.show()
+    if not args.noshow:
+        plt.show()
     exit()
     #####################################################################
 
