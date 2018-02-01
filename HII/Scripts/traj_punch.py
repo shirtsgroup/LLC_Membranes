@@ -32,8 +32,8 @@ if __name__ == "__main__":
 
     t = md.load(args.traj, top=args.gro)
 
-    #keep = [a.index for a in t.topology.atoms if 'C' in a.name and a.name not in args.atoms]
-    keep = [a.index for a in t.topology.atoms if a.name in args.atoms]
+    keep = [a.index for a in t.topology.atoms if a.residue.name not in args.atoms]
+    # keep = [a.index for a in t.topology.atoms if a.name in args.atoms]
 
     new = t.atom_slice(keep)
 

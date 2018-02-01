@@ -660,7 +660,6 @@ liquid crystal membranes}
   structure close to one of a number of hypothesized equilibrium configurations
   (Figure~\ref{fig:python}).
 
-  %BJC: TODO: reproduce figure in latex (or gimp?) with higher resolution arrows
   \begin{figure}
 	\centering
 	\includegraphics[width=0.75\linewidth]{build.PNG} %BJC: put an xyz axis with the unit cell
@@ -814,6 +813,28 @@ liquid crystal membranes}
   ions in their respective pores. We generated pore spacing statistics 
   using the bootstrapping technique (See Supplemental Information).
 
+  \subsubsection{\textit{The nematic order parameter}}
+
+  We calculated the nematic order parameter for our system in order to
+  understand the degree of ordering among monomer head groups. Typically, the
+  nematic order parameter is calculated for nematic liquid crystal systems which
+  are characterized by unidirectional ordering of liquid crystal monomers. The
+  preferred direction of monomers is defined by the unit director vector,
+  $\mathbf{n}$. Assuming a single preferred direction of alignment, the nematic
+  order parameter, $S$, is defined as:
+  \begin{equation}
+	 S = \frac{1}{2} \langle(3cos^2\theta -1)\rangle
+	\label{eqn:nematic_order_parameter}
+  \end{equation}
+  where $\theta$ is the angle between the molecular long axis and $\mathbf{n}$.
+  In a perfectly ordered system, the molecular axis should be aligned with
+  $\mathbf{n}$ and give an order parameter of $S=1$. We are interested in
+  quantifying the degree of monomer head group alignment between systems. We use
+  Equation~\ref{eqn:nematic_order_parameter} to accomplish this by defining
+  $\mathbf{n}$ as the z-axis, or pore axis, and then measuring the angles,
+  $\theta$, between $\mathbf{n}$ and the vectors perpendicular to the plane of
+  the aromatic head groups. See the supplemental information for a diagram.  
+  
   \subsubsection{\textit{Pair distribution functions}}
 
   The normalized pair distribution function, $g(\mathbf{r})$, describes
@@ -822,25 +843,36 @@ liquid crystal membranes}
 	g(\mathbf{r})= \frac{1}{\rho N} \Bigg \langle \sum_{i=1}^{N}\sum_{j\neq i}^{N} \delta(\mathbf{r}+\mathbf{r_j}-\mathbf{r_i}) \Bigg \rangle
 	\label{eqn:correlation}
   \end{equation}
-  where $\rho$ is the average number density of particles and $\delta(\mathbf{r})$
-  is the Dirac delta function\cite{kuriabova_linear_2010}. We applied equation 
-  \ref{eqn:correlation} in one and two dimensions to learn about various spatial
-  correlation functions.
+  where $\rho$ is the average number density of particles and
+  $\delta(\mathbf{r})$ is the Dirac delta function\cite{kuriabova_linear_2010}.
+  We applied equation \ref{eqn:correlation} in three dimensions and then
+  extracted one and two dimensional distribution functions by collapsing the grid
+  along the appropropriate axes.
 
-  In the 1D case, we measured the pair correlation function between centers of
+  In the 1D case, we measured the pair distribution function between centers of
   masses of aromatic head group rings, $g(z)$, along the z-axis (perpendicular to
   the membrane plane). To extract the average distance between layers we applied
   a discrete Fourier transform to $g(z)$ and extracted the highest intensity
   frequency.
 
-  We looked at the xy and xz pair distribution functions based on the center of
-  masses of the aromatic head group rings. We gave special consideration to the
-  xy cross-sections since there are multiple rings in the same plane at different
-  vertices of a polygon. We used a rotated frame of reference to avoid
-  ambiguities in the final pair distribution functions. For a given center of
-  mass, we rotated the coordinates so that the vector created from the center of
-  mass to the pore center was in line with the positive x axis. 
-   
+  In two dimensions, we observed xy and xz pair distribution functions based on
+  the center of masses of the aromatic head group rings. We gave special
+  consideration to the xy cross-sections since multiple rings exist in the same
+  plane located at different vertices of a polygon. We used a rotated frame of
+  reference to avoid ambiguity in the final pair distribution functions. For a
+  given center of mass, we rotated the coordinates so that the vector created
+  from the center of mass to the pore center was in line with the positive
+  x-axis. 
+
+  \subsubsection{\textit{Radial distribution functions}}
+  Closely related to the spatial correlation functions, we explored the pores'
+  compositions by measuring the average number densities of various monomer
+  components as a function of distance from the pore centers. We looked at the
+  average number density of sodium ions, aromatic rings and carbon atoms making
+  up the monomer tails. We binned the radial distance of all atoms in each group
+  from the pore centers, then normalized by the volume of the annulus defined by
+  the bin edges and the z box vector.
+
   \subsubsection{\textit{Simulated structure factor calculations}}
   % BJC: To be replaced by Joe's description
   {\color{red}This section replaced by Yelk/Glaser text}. 
@@ -870,55 +902,16 @@ liquid crystal membranes}
   to allow us to compare the relative intensities of features between simulated
   and experimental diffraction patterns.
 
-  % BJC: I think this figure belongs somewhere else 
-%MRS4: yeah, probably. Possibly supplemental information.
-%  \begin{figure}
-%	\centering
-%	\begin{subfigure}[b]{0.32\textwidth}
-%		\centering
-%		\includegraphics[width=\textwidth]{sandwiched.png}
-%		\caption{}\label{fig:sandwiched}
-%	\end{subfigure}
-%	\begin{subfigure}[b]{0.32\textwidth}
-%		\centering
-%		\includegraphics[width=\textwidth]{PD.png}
-%		\caption{}\label{fig:pd}
-%	\end{subfigure}
-%	\begin{subfigure}[b]{0.32\textwidth}
-%		\centering
-%		\includegraphics[width=\textwidth]{Tshaped.png}
-%		\caption{}\label{fig:tshaped}
-%	\end{subfigure}
-%	\vskip\baselineskip
-%	\begin{subfigure}[b]{0.475\textwidth}
-%		\centering
-%		\includegraphics[width=\textwidth]{sandwichedlayers.png}
-%		\caption{}\label{fig:sandwichedlayers}
-%	\end{subfigure}
-%	\begin{subfigure}[b]{0.475\textwidth}
-%		\centering
-%		\includegraphics[width=\textwidth]{offsetlayers.png}
-%		\caption{}\label{fig:offsetlayers}
-%	\end{subfigure}
-%	\caption{(a) Sandwiched benzene dimers stack 3.8 \angstrom~apart. (b) Parallel-Displaced benzene dimers stack
-%	3.4 \angstrom~vertically and 1.6 \angstrom~horizontally apart. (c) T-shaped benzene dimers stack 5.0 \angstrom~apart. 
-%	(d) Two monomer layers stacked in the sandwiched configuration (e) Two monomer layers stacked in the parallel-displaced
-%	configuration }\label{fig:stacking}
-%  \end{figure}
-  
-  We explored the pore composition by measuring the average number densities of
-  various monomer components as a function of distance from the pore centers. We
-  looked at the average number density of sodium ions, aromatic rings and carbon
-  atoms making up the monomer tails. We binned the radial distance of all atoms
-  in each group from the pore centers, then normalized by the volume of the
-  annulus defined by the bin edges and z box vector.
-  %BJC: Maybe write an equation here? It's hard to say precisely how I did it
-  %in words without it sounding confusing 
+  \subsubsection{\textit{Ionic conductivity calculations}}
 
   We calculated ionic conductivity using two different methods for robustness.
-  The Nernst-Einstein relation relates the DC ionic conductivity to ion
+  The Nernst-Einstein relation, relates the DC ionic conductivity, $\sigma$, to ion
   diffusivity, $D$, concentration, $C$, ion charge, $q$, the Boltzmann constant,
-  $k_b$, and temperature, $T$: $$\sigma = \dfrac{q^2CD}{k_b T}$$ 
+  $k_b$, and temperature, $T$: 
+  \begin{equation}
+	\sigma = \dfrac{q^2CD}{k_b T} 
+	\label{eqn:nernst_einstein}
+  \end{equation}
   We measured sodium ion diffusion coefficients by calculating the slope
   of the linear region of the z-direction mean square displacement curve as
   indicated by the Einstein relation \cite{einstein_investigations_1956}. We
@@ -929,28 +922,34 @@ liquid crystal membranes}
   movement of the collective variable, Q, which is defined as the amount of
   charge transfer through the system and can be thought to represent the center
   of charge of the system. The conductance, $\gamma$, of the system can be
-  calculated as: $$ \gamma = \dfrac{D_Q}{k_b T} $$ We convert the resulting value
-  to ionic conductivity by multiplying by channel length and dividing by the
-  membrane cross sectional area. $D_Q$ is the diffusion coefficient of the
-  collective variable Q. It is calculated using the Einstein relation. One can
-  access a full derivation of the model elsewhere \cite{liu_collective_2013}.
+  calculated as:
+  \begin{equation}
+	 \gamma = \dfrac{D_Q}{k_b T} 
+	\label{eqn:collective_diffusion}
+  \end{equation}
+  We convert the resulting value to ionic conductivity by multiplying by
+  channel length and dividing by the membrane cross sectional area. $D_Q$ is the
+  diffusion coefficient of the collective variable Q. It is calculated using the
+  Einstein relation. One can access a detailed derivation of the model elsewhere
+  \cite{liu_collective_2013}.
 
   \section{Results and Discussion}
   
-  \subsection{Determining the Number of Monomers per Layer}
+  \subsection{Structural Characterization}
+  \subsubsection{Number of monomer per layer}
 
   Our simulations best support a model built with 5 monomers per layer based on
   the measured equilibrated pore-to-pore distances. To discern the composition of
-  the monomer layers, addressing (\ref{point:monomernum}), we ran simulations of
-  systems created with 4 - 8 monomers per layer. We built systems in both the
-  parallel displaced and sandwiched configurations with layers initially spaced
-  3.7 \AA~apart. We prepared equilibrated configurations according to the dry
-  equilibration procedure. All systems are stable after 400 ns of simulation. In
-  a sense, all systems are at least metastable, addressing
-  (\ref{point:metastable}), however not all will make physical sense or fit the
-  experimental profile that we are looking to match. Figure~\ref{fig:p2p} shows
-  the pore spacing for all systems tested. Systems built with 5 monomers in each
-  layer equilibrate to a pore spacing that is most consistent with the
+  the monomer layers, addressing Question (\ref{point:monomernum}), we ran
+  simulations of systems created with 4 - 8 monomers per layer. We built systems
+  in both the parallel displaced and sandwiched configurations with layers
+  initially spaced 3.7 \AA~apart. We prepared equilibrated configurations
+  according to the dry equilibration procedure. All systems are stable after 400
+  ns of simulation. In a sense, all systems are at least metastable, addressing
+  Question (\ref{point:metastable}), however not all will make physical sense or fit
+  the experimental profile that we are looking to match. Figure~\ref{fig:p2p}
+  shows the pore spacing for all systems tested. Systems built with 5 monomers in
+  each layer equilibrate to a pore spacing that is most consistent with the
   experimental value of 4.12 nm derived from SAXS measurements
   (Figure~\ref{fig:SAXS}). The remainder of this discussion will focus on the
   analysis of systems built with 5 monomers per layer.
@@ -962,70 +961,13 @@ liquid crystal membranes}
 		parallel displaced configuration, the equilibrated pore spacing is closest to
 		the experimental value of 4.12 nm. The equilibrated pore spacing of the model
 		increases as the number of monomers in each layer increases. The pore spacing
-		of systems starting in the sandwiched configuration is systematically slightly
+		of systems starting in the sandwiched configuration is systematically 
 		lower than those started in the parallel displaced configuration.}~\label{fig:p2p}
   \end{figure}  
 
-  \subsection{Layer partitioning}
+  \subsubsection{Relative interlayer head group orientation}
 
-  We learned that layers are well-defined and persistent, answering
-  (\ref{point:layers}). We established our conclusion by plotting the one dimensional pair
-  distribution function, $g(z)$, calculated between atoms along the length of the
-  pores (Fig.~\ref{fig:zdf}). We measured $g(z)$ with respect to aromatic rings in
-  the head groups and, separately, with respect to carbon atoms in the alkane
-  chains. Using a Fourier transform of $g(z)$, we see that sandwiched
-  configuration layers stack 4.39 \AA~apart while parallel displaced
-  configuration layers stack 4.38 \AA~apart.
-
-  Insert paragraph about 2D pair distribution function (yz cross section). 
-
-  We measured the correlation length, L, by fitting a function of the form:
-  $$1 + Asin(Bx + C)e^{-z/L}$$ where z is the independent variable and all
-  other variables are fitting parameters. The correlation length for each
-  system is given in Table~\ref{fig:correlation_length}.
-
-  \begin{table}[h]
-  \centering
-  \begin{tabular}{ccc}
-  \toprule
-  System & Layer Separation & Correlation Length \\
-  \midrule
-  Sandwiched & 4.39 \AA & 41 $\pm$ 3 \AA \\
-  Parallel Displaced & 4.38 \AA & 86 $\pm$ 14 \AA \\
-  Experiment* & 3.7 \AA & 32 $\pm$ 1 \AA \\  
-  \bottomrule
-  \end{tabular}
-  \caption{*See supplemental information for derivation of experimental correlation length}~\label{fig:correlation_length}
-  \end{table} 
-
-  %BJC: TODO: increase font size on legends
-  \begin{figure}
-        \centering
-        \begin{subfigure}{0.45\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{zdf_overlay_layered.png}
-                \caption{}\label{fig:zdf_layered}
-        \end{subfigure}
-        \begin{subfigure}{0.45\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{zdf_overlay_offset.png}
-                \caption{}\label{fig:zdf_offset}
-        \end{subfigure}
-	\caption{We support the existence of layers with the observance of
-		clear periodic maxima in the $z$-direction pair distribution functions of the
-		(a) 5 monomer per layer, sandwiched and (b) 5 monomer per layer, parallel
-		displaced configurations. The extent to which we consider a system to be
-		layered is based on the magnitude of the deviation of the periodic maxima from
-		the average number density. The sandwiched configuration possesses a higher
-		degree of layering than the parallel displaced configuration and, in both
-		cases, the head group region has a higher degree of layer partitioning than the
-		tail region. (See supplemental information for detailed definitions of the head
-		group and tail regions)}\label{fig:zdf}
-  \end{figure}
-
-  \subsection{Determination of Relative Interlayer Head Group Orientation}
-
-  We answer question (\ref{point:orientation}) by simulating X-ray diffraction
+  We answer Question (\ref{point:orientation}) by simulating X-ray diffraction
   patterns produced from equilibrated MD trajectories. We tested systems built
   with 5 monomers per layer in the parallel displaced and sandwiched
   configurations. We generated simulated patterns using portions of simulation
@@ -1120,9 +1062,9 @@ liquid crystal membranes}
   \begin{figure}
   \centering
   \includegraphics[width=0.5\linewidth]{tilt_dist.png}
-  \caption{We measured the angle made between each monomer alkane tail and the membrane plane. 
-  The average tilt angle is near 7\degree~which is far from the 37\degree~tilt angle 
-  previously used to explain R-spots.}~\label{fig:tilt}
+  \caption{We measured the angle made between each monomer alkane tail and the
+	  membrane plane. The average tilt angle is near 7\degree~which is far from the
+	  37\degree~tilt angle previously used to explain R-spots.}~\label{fig:tilt}
   \end{figure}
 
   The peaks in the nearest neighbor angle distribution are consistent with the
@@ -1206,101 +1148,109 @@ liquid crystal membranes}
 	  reflections.}~\label{fig:tail_packing}
   \end{figure}
 
-  \subsection{Initial Layer Spacing Affects System Equilibration}
+  \subsubsection{Layer partitioning}
 
-%MRS4: can we come up with another name?  I still think disordered pores is a decent name, since there is no pi-stacking layering.  ``structures that form when layers are 5 AA apart'' is not so good.  or ``more disordered''?
-%BJC3: agreed, I'll stick with disordered pores
-%  The $z$-direction correlation functions show that layers in our model prefer
-%  to stack further apart than 3.7 \angstrom~as suggested by experiment.
+  We learned that layers are well-defined and persistent, answering Question
+  (\ref{point:layers}). We established our conclusion by plotting the two
+  dimensional pair distribution function, $g(y,z)$ of head group phenyl rings
+  using Equation~\ref{eqn:correlation} (Figure \ref{fig:yz_correlation}). In both
+  configurations, the phenyl rings stack in the z-direction, along $y=0$, and
+  clear layers are formed. The layers in the sandwiched configuration are more
+  defined than those in the parallel displaced configuration and are strongly
+  correlated with adjacent layers. We also observe correlation of layers between
+  pores indicated by the non uniformity in $g(y,z)$ in adjacent columns (along $y
+  = \pm 3.65$).Parallel displaced layers display weaker correlations but do not
+  decay in their intensity as z increases. We do not see correlation between
+  pores, however correlations within pores are strong throughout the length of
+  the unit cell since there is no noticeable decay in layer intensity. 
+
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+	\centering
+	\includegraphics[width=\textwidth]{layered_yz_correlation.png}
+	\caption{}\label{fig:layered_yz_correlation}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{offset_yz_correlation.png}
+        \caption{}\label{fig:offset_yz_correlation}
+  \end{subfigure}
+  \caption{2D pair distribution functions generated from systems built in the 
+	   sandwiched (a) and parallel displaced (b) configurations, provide
+           a more detailed picture of the pore structure in each. The sandwiched
+	   configuration}\label{fig:yz_correlation}
+  \end{figure} 
+
+  We plotted the one-dimensional pair distribution function, $g(z)$, for the
+  phenyl rings and for carbon atoms that make up the monomer tails (Figure
+  \ref{fig:zdf}). The plots show clear periodic maxima where layers are present.
+  Layering is most pronounced in the head group region, however there is still a
+  degree of layering that persists into the tail region. Using a Fourier
+  transform on $g(z)$ from the head groups, we see that sandwiched configuration
+  layers stack 4.39 \AA~apart while parallel displaced configuration layers stack
+  4.38 \AA~apart. Both stacking distances are in agreement with those observed
+  in the simulated XRD patterns.
+
+  \begin{figure}
+        \centering
+        \begin{subfigure}{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{zdf_overlay_layered.png}
+                \caption{}\label{fig:zdf_layered}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{zdf_overlay_offset.png}
+                \caption{}\label{fig:zdf_offset}
+        \end{subfigure}
+	\caption{We support the existence of layers with the observance of
+		clear periodic maxima in the $z$-direction pair distribution functions of the
+		(a) 5 monomer per layer, sandwiched and (b) 5 monomer per layer, parallel
+		displaced configurations. The extent to which we consider a system to be
+		layered is based on the magnitude of the deviation of the periodic maxima from
+		the average number density. The sandwiched configuration possesses a higher
+		degree of layering than the parallel displaced configuration and, in both
+		cases, the head group region has a higher degree of layer partitioning than the
+		tail region. (See supplemental information for detailed definitions of the head
+		group and tail regions)}\label{fig:zdf}
+  \end{figure}
+
+  \subsubsection{Initial Layer Spacing Affects System Equilibration}
+
+  All systems up to this point were built with layers stacked 3.7 \AA~apart.
   When we build systems with layers stacked 5.0 \AA~apart and then let them
   equilibrate, we observe long-term stability of a qualitatively different
   configuration, suggesting that we have found another metastable free energy
-  basin, further corroborating (\ref{point:metastable}). The basins are
-  differentiated by their relative degrees of ordering resulting from different
-  spatial arrangements. 
-
-  We expect that the head groups in more ordered systems will be predominantly
-  coplanar with the xy plane. We defined a director vector, \textbf{n}, as the
-  vector normal to the plane of the monomer's aromatic head group, then measured
-  the distribution of angles between it and the z-axis. We used the resulting
-  distibution of angles to calculate the nematic order parameter, S. The values
-  of S for systems resulting from each initial configuration are presented in
-  Table \ref{table:nematic}. The full distributions of angles between \textbf{n}
-  and the z-axis are presented in the supplemental material. In general, systems
-  started with layers spaced 3.7 \AA apart are more nematically ordered than
-  those initially spaced 5 \AA apart. We will refer to systems built with layers
-  initially spaced 3.7 \AA apart and 5.0 \AA apart as the ordered and disordered
-  pore basins respectively. We studied each basin in both the parallel displaced
-  and sandwiched configurations.  
-
-  \begin{table}[h]
-  \centering
-  \begin{tabular}{cc}
-  \toprule
-  System & Nematic Order Parameter (S) \\
-  \midrule
-  Sandwiched, Ordered & 0.659 $\pm$ 0.003 \\
-  Parallel Displaced, Ordered & 0.601 $\pm$ 0.003 \\
-  Sandwiched, Disordered & 0.565 $\pm$ 0.002 \\
-  Parallel Displaced, Disordered & 0.503 $\pm$ 0.002 \\
-  \bottomrule
-  \end{tabular}
-  \caption{The nematic order parameter is higher when layers are initially spaced
-  3.7 \AA apart. A perfectly stacked system with aromatic rings coplanar with the
-  xy plane would have a nematic order parameter of 1, while isotropically aligned
-  director vectors would have a nematic order parameter of 0.}~\label{table:nematic}
-  \end{table}
-
-  We observe more evidence of disorder in the disordered pore basin when we 
-  plot the two dimensional pair distribution function between the centers of 
-  mass of monomer head groups. ADD MORE ANALYSIS ONCE CODE IS WORKING HOW I WANT IT
-
-  \begin{figure}
-  \begin{subfigure}{1\linewidth}
-        \centering
-        \begin{subfigure}{0.45\linewidth}
-                \centering
-                \includegraphics[width=\linewidth]{layered_xy_rings.png}
-                \caption{}~\label{fig:sandwich_xy}
-        \end{subfigure}%
-        \begin{subfigure}{0.45\linewidth}
-                \centering
-                \includegraphics[width=\linewidth]{offset_xy_rings.png}
-                \caption{}~\label{fig:offset_xy}
-        \end{subfigure}
-        \begin{subfigure}{0.45\linewidth}
-                \centering
-                \includegraphics[width=\linewidth]{disorder_sandwich_xy_rings.png}
-                \caption{}~\label{fig:disorder_sandwich_xy}
-        \end{subfigure}%
-        \begin{subfigure}{0.45\linewidth}
-                \centering
-                \includegraphics[width=\linewidth]{disorder_offset_xy_rings.png}
-                \caption{}~\label{fig:disorder_offset_xy}
-        \end{subfigure}
-  \end{subfigure}
-  \caption{}\label{fig:xy_correlation}
-  \end{figure}
-
-  The simulated X-ray diffraction patterns indicate further structural
-  differences. In the parallel displaced configuration, almost all contrast
-  between R-spots and R-alkanes fades (Fig.~\ref{fig:offset_disordered_xrd}). In
-  the sandwiched configuration, R-spots is weakly present, but in different
-  locations, showing higher intensity at the top and bottom of the pattern as
-  well as at the intersection of R-alkanes with q$_z$ = 0 (Fig.
-  ~\ref{fig:layered_disordered_xrd}). 
-
-  The sandwiched and parallel displaced assemblies do not deviate from their
-  initial head group arrangement. R-helix is still faintly visible in the
-  parallel displaced configuration and is absent in the sandwiched simulated
-  diffraction pattern. The spectroscopic signatures are unique to the two
-  different head group configurations.
+  basin, further corroborating Question (\ref{point:metastable}). 
+  %The basins are
+  %differentiated by their relative degrees of ordering resulting from different
+  %spatial arrangements. 
+  For reasons we will develop in the next segment of our
+  discussion, configurations intially built with layers stacked 5.0 \AA~apart 
+  will be grouped into the disordered pore basin, while those built with layers
+  initially stacked 3.7 \AA~apart will be grouped into the ordered basin.
 
   The equilibrated pore spacing and distance between layers are different in
   the disordered pore basin. For both head group stacking arrangements, we
-  observe a decrease in pore spacing (Fig.~\ref{fig:p2p_disordered}) and a
-  corresponding increase in the equilibrated distance between layers
-  (Fig.~\ref{fig:dbwl_disordered}). 
+  observe an increase in the equilibrated distance between layers
+  (Fig.~\ref{fig:dbwl_disordered}) and a corresponding decrease in pore spacing
+  (Fig.~\ref{fig:p2p_disordered}).
+
+  The simulated X-ray diffraction patterns indicate further structural
+  differences. In the parallel displaced configuration, almost all contrast
+  between R-spots and R-alkanes fades (Figure~\ref{fig:offset_disordered_xrd}).
+  In the sandwiched configuration, R-spots is weakly present, but in different
+  locations, showing higher intensity at the top and bottom of the pattern as
+  well as at the intersection of R-alkanes with q$_z$ = 0
+  (Figure~\ref{fig:layered_disordered_xrd}). 
+
+% BJC: in the interest of being concise, I leave this out for now.
+%  The sandwiched and parallel displaced assemblies do not deviate from their
+%  initial head group arrangement. R-helix is still faintly visible in the
+%  parallel displaced configuration and is absent in the sandwiched simulated
+%  diffraction pattern. The spectroscopic signatures are unique to the two
+%  different head group configurations.
 
   \begin{figure}[!hbt]
         \centering
@@ -1338,7 +1288,122 @@ liquid crystal membranes}
 		motif.}
   \end{figure}
 
-  \subsection{Pore Composition Depends on Initial Configuration}
+  %BJC: this may belong in methods, but I think it might fit here because it
+  % gives context for the choice of functional form to fit
+
+  We quantified order in the z-direction by measuring the correlation lengths
+  of all configurations. We measured the correlation length, L, by fitting $g(z)$
+  using a non-linear least squares algorithm subject to a function of the form:
+  \begin{equation}
+  	1 + Asin(Bx + C)e^{-z/L}
+        \label{eqn:correlation_fit}
+  \end{equation}
+  where z is the independent variable and all other variables are fitting
+  parameters. The correlation length for each system is given in
+  Table~\ref{table:nematic}.
+
+  Correlation lengths are shorter in the disordered pore basin than in the
+  ordered pore basin. Layers in the ordered pore basin are strongly correlated
+  with neighboring layers up to more than 10 layers away. This behavior deviates
+  from experimental evidence. The experimental correlation length suggests that
+  layers are correlated with about 3 neighboring layers which is closer to the
+  values exhibited by the disordered pore basin. We may need to simulate a system
+  with many more layers in order to reduce the correlation contributed by
+  periodic copies of the system. 
+
+% BJC: below is summarized in methods
+%  We expect that the head groups in more ordered systems will be predominantly
+%  coplanar with the xy plane. We defined a director vector, \textbf{n}, as the
+%  vector normal to the plane of the monomer's aromatic head group, then measured
+%  the distribution of angles between it and the z-axis. We used the resulting
+%  distibution of angles to calculate the nematic order parameter, S. 
+  We calculated the nematic order parameter for each system using Equation
+  \ref{eqn:nematic_order_parameter}. The calculated values of S are presented in
+  Table \ref{table:nematic}. The full distributions of angles between director
+  \textbf{n} and vectors orthogonal to monomer phenyl rings are presented in the
+  supplemental material. In general, ordered pore basin systems are more
+  nematically ordered than disordered pore basin systems. The head groups of the
+  disordered pore basin have more rotational freedom about the xy plane likely
+  due to the larger separation between layers. 
+
+  \begin{table}[h]
+  \centering
+  \begin{tabular}{ccc}
+  \toprule
+  System & Correlation Length (\AA) & Nematic Order Parameter (S) \\
+  \midrule
+  Sandwiched, Ordered & 41 $\pm$ 3 & 0.659 $\pm$ 0.003 \\
+  Parallel Displaced, Ordered & 86 $\pm$ 14 & 0.601 $\pm$ 0.003 \\
+  Sandwiched, Disordered & 17 $\pm$ 3 & 0.565 $\pm$ 0.002 \\
+  Parallel Displaced, Disordered & 9 $\pm$ 1 & 0.503 $\pm$ 0.002 \\
+  Experiment & 10 $\pm$ 1 & -- \\
+  \bottomrule
+  \end{tabular}
+  \caption{The nematic order parameter, S, is higher when layers are initially spaced
+  3.7 \AA apart. In general, the sandwiched configuration has higher nematic order
+  than the parallel displaced configuration. Correlation lengths are higher in
+  the ordered pore basin. Correlation lengths in the disordered pore basin are
+  in closer agreement with experiment.}~\label{table:nematic}
+  \end{table}
+
+%  \begin{table}[h]
+%  \centering
+%  \begin{tabular}{ccc}
+%  \toprule
+%  System & Layer Separation & Correlation Length \\
+%  \midrule
+%  Sandwiched & 4.39 \AA & 41 $\pm$ 3 \AA \\
+%  Parallel Displaced & 4.38 \AA & 86 $\pm$ 14 \AA \\
+%  Experiment* & 3.7 \AA & 10 $\pm$ 1 \AA \\  
+%  \bottomrule
+%  \end{tabular}
+%  \caption{Uncertainties are derived from the diagonal entries in the
+%	  covariance matrix calculated from a non-linear least squares fit to the data.
+%	  *See supplemental information for derivation of experimental correlation
+%	  length}~\label{table:correlation_length}
+%  \end{table}
+
+  We observe evidence of disorder in the xy plane of the disordered pore basin when
+  we plot the two dimensional pair distribution function, $g(x,y)$, between the
+  centers of mass of monomer phenyl rings (Figure \ref{fig:xy_correlation}). The
+  difference is most apparent in the plots of the sandwiched configurations. In
+  the ordered pore basin, head groups primarily stay stacked on top of each other
+  while in the disordered pore basin, head groups exhibit more motion about the pore
+  center and even drift into the middle of the pore. $g(x,y)$ for the parallel displaced
+  configuration is less informative since adjacent layers are displaced in a way that
+  occupies the gaps that are seen in $g(x,y)$ for the sandwiched configuration 
+
+  \begin{figure}
+  \begin{subfigure}{1\linewidth}
+        \centering
+        \begin{subfigure}{0.47\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{layered_xy_correlation.png}
+                \caption{Sandwiched, Ordered Pore Basin}~\label{fig:sandwich_xy}
+        \end{subfigure}%
+        \begin{subfigure}{0.47\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{offset_xy_correlation.png}
+                \caption{Parallel Displaced, Ordered Pore Basin}~\label{fig:offset_xy}
+        \end{subfigure}
+        \begin{subfigure}{0.47\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{disorder_xy_correlation.png}
+                \caption{Sandwiched, Disordered Pore Basin}~\label{fig:disorder_sandwich_xy_correlation}
+        \end{subfigure}%
+        \begin{subfigure}{0.47\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{disorder_offset_xy_correlation.png}
+                \caption{Parallel Displaced, Disordered Pore Basin}~\label{fig:disorder_offset_xy_correlation}
+        \end{subfigure}
+  \end{subfigure}
+  \caption{$g(x,y)$ for sandwiched and parallel displaced configurations in the
+	  ordered and disordered pore basins illustrate disorder present in the xy plane
+	  when initial configuration layers are stacked 5\AA
+	  apart.}\label{fig:xy_correlation}
+  \end{figure}
+
+  \subsubsection{Chemical composition of pore columns}
 
   In order to address (\ref{point:poredefinition}), we plotted the number
   densities of heavy atoms in the head group, carbon atoms in the tail region
@@ -1348,16 +1413,16 @@ liquid crystal membranes}
   diagram). We average the histograms over at least 50 ns of equilibrated trajectory.
 
   In all cases, the space in the pore region is filled with sodium ions and
-  head groups. In the ordered pore systems, there is less density in the center of
-  the pore indicating a more ordered pore structure. In both the sandwiched and
-  parallel displaced configurations, we see the density of head groups and sodium
-  ions fall to less than 50\% of its maximum at r = 0
-  (Fig.~\ref{fig:layered_density}). The situation is most pronounced in the
-  sandwiched configuration where the maximum head group density occurs 0.44 nm
-  from the pore center. The parallel displaced configuration reaches its maximum
-  0.35 nm from the pore center. In contrast, both disordered pore systems show
-  very little difference in density from its maximum. This implies a more uniform
-  distribution of head groups within the pore center. 
+  head groups. Systems in the ordered pore basin are less dense in
+  the center of the pore. In both the sandwiched and parallel displaced
+  configurations, we see the density of head groups and sodium ions fall to less
+  than 50\% of its maximum at r = 0 (Fig.~\ref{fig:layered_density}). The
+  situation is most pronounced in the sandwiched configuration where the maximum
+  head group density occurs 0.44 nm from the pore center. The parallel displaced
+  configuration reaches its maximum 0.35 nm from the pore center. In contrast,
+  both disordered pore systems show very little difference in density from its
+  maximum. This implies a more uniform distribution of head groups within the
+  pore center. 
   % High vacancy is less likely to be stable in the real system
 
   There is a partition between the hydrophobic and hydrophilic regions, however
@@ -1376,24 +1441,24 @@ liquid crystal membranes}
 
   \begin{figure}
   \centering
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.47\textwidth}
         \includegraphics[width=1\linewidth]{offset_density.png}
-        \caption{Parallel displaced, 3.7 \AA~initial layer spacing}
+        \caption{Parallel Displaced, Ordered Pore Basin}
         \label{fig:offset_density}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.47\textwidth}
         \includegraphics[width=1\linewidth]{layered_density.png}
-        \caption{Sandwiched, 3.7 \AA~initial layer spacing}
+        \caption{Sandwiched, Ordered Pore Basin}
         \label{fig:layered_density}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.47\textwidth}
         \includegraphics[width=1\linewidth]{disordered_offset_density.png}
-        \caption{Parallel displaced, 5 \AA~initial layer spacing}
+        \caption{Parallel Displaced, Disorderd Pore Basin}
         \label{fig:disordered_offset_density}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.47\textwidth}
         \includegraphics[width=1\linewidth]{disordered_density.png}
-        \caption{Sandwiched, 5 \AA~initial layer spacing}
+        \caption{Sandwiched, Disordered Pore Basin}
         \label{fig:disorder_layered_density}
   \end{subfigure}
   \caption{In all cases, the component radial distribution functions exhibit a
@@ -1452,21 +1517,9 @@ liquid crystal membranes}
 
   \end{figure}
  
-  In all cases, water disrupts structuring of the model \ref{fig:solvation}.
-  When we add water to the system, the intensity of the reflections decrease. In
-  systems built with 5 wt\% water, R-$\pi$ and R-spots become nearly
-  indistinguishable from R-alkanes.
-
-  % BJC: unsure where or if this paragraph fits
-  Water is not necessary to maintain an ordered pore structure. We do not
-  eliminate the possibility that water is necessary in order to drive
-  self-assembly, but studying the mechanisms of self-assembly is beyond the
-  scope of this work. According to our model, once the system has formed the
-  Col\textsubscript{h} phase, adding water only drives disorder of the pore
-  structure. In the true equilibrium configuration, if water exists, it is
-  primarily confined to the pore region where there is no driving force for
-  aggregation of water molecules. In the case of trace water, water molecules
-  will be too sparse to form a hydrogen bonding network.
+  In all cases, water disrupts structuring of the model.  When we add water to
+  the system, the intensity of the reflections decrease. In systems built with 5
+  wt\% water, R-$\pi$ and R-spots become nearly indistinguishable from R-alkanes.
 
   In systems built with 5 wt\% water, the pore region becomes filled with
   water. We plotted the number density of components in this system. As with the 
@@ -1481,12 +1534,23 @@ liquid crystal membranes}
   however in the hydrated system, the head groups drift beyond 1.5 \AA~from the
   pore center. In the dry systems, head groups did not wander beyond 1.4 \AA~from
   the pore center. Both observations suggest that water pushes all components
-  radially outward from the pore center, characteristic of a swelling process. 
-   
+  radially outward from the pore center, characteristic of a swelling process.  
   This system is a closer representation of the H\textsubscript{II} phase which
   is typically synthesized with ca. 8 wt\% water. Further investigation of
   hydrated systems can help unravel the mechanisms for selective transport in
   separations of aqueous solutions. 
+
+  % BJC: unsure where or if this paragraph fits
+  % BJC: Probably as the last paragraph of this section
+  Water is not necessary to maintain an ordered pore structure. We do not
+  eliminate the possibility that water is necessary in order to drive
+  self-assembly, but studying the mechanisms of self-assembly is beyond the
+  scope of this work. According to our model, once the system has formed the
+  Col\textsubscript{h} phase, adding water only drives disorder of the pore
+  structure. In the true equilibrium configuration, if water exists, it is
+  primarily confined to the pore region where there is no driving force for
+  aggregation of water molecules. In the case of trace water, water molecules
+  will be too sparse to form a hydrogen bonding network.
 
   \begin{figure}
   \centering 
@@ -1511,9 +1575,34 @@ liquid crystal membranes}
   %BJC3: Yea, I'm not sure exactly. I'll look more into it. It might one or two head groups that just get stuck there.
   % The pore I picture in the supplemental info is completely cleared of any head groups. 
 
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.47\textwidth}
+        \includegraphics[width=1\linewidth]{layered_xy_correlation.png}
+        \caption{Parallel Displaced, Ordered Pore Basin}
+        \label{fig:layered_xy_correlation_comparison}
+  \end{subfigure}
+  \begin{subfigure}{0.47\textwidth}
+        \includegraphics[width=1\linewidth]{layered_solvated_xy_correlation.png}
+        \caption{Sandwiched, Ordered Pore Basin}
+        \label{fig:layered_solvated_xy_correlation}
+  \end{subfigure}
+  \begin{subfigure}{0.47\textwidth}
+        \includegraphics[width=1\linewidth]{offset_xy_correlation.png}
+        \caption{Parallel Displaced, Disorderd Pore Basin}
+        \label{fig:offset_xy_correlation_comparison}
+  \end{subfigure}
+  \begin{subfigure}{0.47\textwidth}
+        \includegraphics[width=1\linewidth]{offset_solvated_xy_correlation.png}
+        \caption{Sandwiched, Disordered Pore Basin}
+        \label{fig:offset_solvated_xy_correlation}
+  \end{subfigure}
+  \caption{}~\label{fig:solvated_correlation}
+  \end{figure}
+
   \subsection{Model Ionic Conductivity Measurements}
 
-  We used the equilibrated parallel displaced system to calculate ionic
+  We used the equilibrated ordered parallel displaced system to calculate ionic
   conductivity since its structure is the closest match to experiment. The model
   gives reasonable estimates of ionic conductivity when compared to experiment.
   We compare calculated values of ionic conductivity obtained using the
