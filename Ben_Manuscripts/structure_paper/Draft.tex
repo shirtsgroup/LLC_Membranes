@@ -29,39 +29,56 @@ liquid crystal membranes}
 
   \begin{tocentry}
   \end{tocentry}
-
+  
   \begin{abstract}
-
+  %MRS5: Abstract can contain a little less introduction material. Suggest the following cuts  
   Nanostructured porous membranes made from the cross-linked hexagonal phase of
   self-assembled lyotropic liquid crystals (LLCs) are a promising material for
-  selective separations. To date, their separation performance has only been
-  characterized with membranes made from a small set of LLC monomers. There
-  remains a large design space that we can likely exploit to design membranes for
-  solute specific separations. In this work, we develop an atomistic molecular
+  selective separations. 
+  %To date, their separation performance has only been
+  %characterized with membranes made from a small set of LLC monomers. There
+  %remains a large design space that we can likely exploit to design membranes for
+  %solute specific separations. 
+  In this work, we develop an atomistic molecular
   model of an LLC membrane. We show that our model is maximally consistent with
   experimental observations by comparing simulated X-ray Diffraction (XRD)
   patterns and calculated ionic conductivity to their experimental counterparts.
   We explore, in depth, the composition and structure of the nanopores in order
-  to give insights that are not easily accessible to experimentalists. With the
-  clear picture of the nanoscopic structure of these membranes gained from this
-  work, we will be able to use the model to understand the mechanisms of small
-  charged and uncharged solute transport within the nanopores, and eventually we
-  will be able to screen large sets of modified monomers with their separation
-  properties in mind.  
+  to give insights that are not easily accessible to experimentalists. 
+  %MRS5: suggest:
+  %With the
+  %clear picture of the nanoscopic structure of these membranes gained from this
+  %work, we will be able to use the model to understand the mechanisms of small
+  %charged and uncharged solute transport within the nanopores, and eventually we
+  %will be able to screen large sets of modified monomers with their separation
+  %properties in mind.  
+  The clearer picture of the nanoscopic structure of these membranes provided in this study will enable better understanding of the mechanisms of small molecule transport within these nanopores.
 
   \end{abstract}
 
   \section{Introduction}
-  
+ 
+%MRS5: want to get people engaged from the beginning. The first
+%paragraph should describe a problem to be solved. Then you can get
+%into the motivating details (like background of the alternatives, and
+%why we need something different).  I feel like this is an
+%introduction into different types of membranes, though it should be
+%an introduction to the problem that this paper takes steps towards
+%solving.
+
   Reverse osmosis (RO) and nanofiltration (NF) are membrane-based separation
   processes widely used to create potable or reusable water by removing salts and
   other dissolved compounds from water sources. RO membranes are typically thin
   film composite (TFC) membranes with a porous support layer and a dense
-  crosslinked polymer active layer which near indiscriminately separates all
-  solutes. NF membranes have porous architectures with pores on the order of 1 nm
+  crosslinked polymer active layer which near indiscriminately 
+%MRS5: 
+%  Maybe ``impermeable to all solutes?'' or ``separates all solutes from water.''  As written, it's not stated what the solutes are separated from.
+  separates all solutes. 
+NF membranes have porous architectures with pores on the order of 1 nm
   in size which separate primarily based on solute size
   \cite{van_der_bruggen_review_2003}. 
 
+%MRS5: a more compelling thesis is that we need membranes that are more selective than RO and NF.  
   RO and NF are finding applications beyond primarily water-based
   purifications. Recovery of valued products from complex aqueous and organic
   waste is of increasing interest. For example, flowback water (FW) produced
@@ -84,7 +101,8 @@ liquid crystal membranes}
 %  tradeoff a challenge. Namely, it is difficult to increase the permeability of
 %  a desired molecular or atomic species, while maintaining the same retention of
 %  an undesired species \cite{werber_materials_2016}. 
- 
+
+%MRS5: under solution-diffusion, then the free energy to partition into the membrane is important as well, correct?
   Selective separation by a semipermeable membrane barrier is governed by two
   steps: barrier entry and transport through the barrier. A solute's ability to
   enter a given membrane barrier is decided by its size, shape, charge, polarity
@@ -96,18 +114,25 @@ liquid crystal membranes}
   selectivity, it is necessary to design membranes in a way that one can tune the
   relative diffusivities of desired and undesired solutes. 
 
+%MRS5: maybe a more compelling thesis would be that LLC might have the capabilility to serve as selective membranes?
   Lyotropic liquid crystals (LLCs) are amphiphilic molecules that have the
   ability to self-assemble into porous nanostructures \cite{smith_ordered_1997}
   which can be crosslinked to create mechanically strong membrane films with
   pores on the order of 1 nm in diameter \cite{zhou_supported_2005}. Unlike
   commercial NF membranes, LLC membrane pores are uniform in size. Since LLC
   membranes lack a pore size distribution, they inherently exhibit high
-  selectivity due to their strict molecular weight cut-off (MWCO).  Additionally,
-  the LLCs chosen to make membranes for this application are salts.  The membrane
+  selectivity due to their strict molecular weight cut-off (MWCO). 
+%MRS5: is there a citation for the strict MWCO? 
+%MRS5: suggested change.
+ Additionally, the LLCs chosen to make membranes for this application are salts, and therefore lead to 
+Donnan exclusion of ions in solution.
+ The membrane
   gains a net surface charge when counterions from head groups that line the pore
   walls escape into the feed solution in order to balance the gradients of
-  concentration and electric potential. This effect, which causes the membrane to
-  repel incoming charged species, is called Donnan exclusion
+  concentration and electric potential. 
+%This effect, which causes the membrane to
+%  repel incoming charged species, is called Donnan exclusion
+
   \cite{donnan_theory_1995}.    
  
   The feasiblity of LLC membranes has been demonstrated using LLCs that form
@@ -116,22 +141,30 @@ liquid crystal membranes}
   and the inverted hexagonal (H\textsubscript{II}) \cite{zhou_supported_2005}
   phases (See Figure~\ref{fig:bcc_v_hII}). When separating organic solutes from
   NaCl, Q\textsubscript{I} phase membrane filtration experiments have shown
-  selectivity 2-3 times higher than commercial RO and 6-12 times higher than
+%MRS5: for dashes between two numbers, use double -- for the correct length in the file. 
+  selectivity 2--3 times higher than commercial RO and 6--12 times higher than
   commercial NF membranes \cite{dischinger_application_2017}.  When separating a
   series of various sized dyes, the H\textsubscript{II} phase membrane showed
   complete rejection of dyes bigger than 1.2 nm in size
   \cite{zhou_supported_2005}. 
 
+%MRS5: be more explicit about current efforts. Also use the
+%opportunity of a thesis statement to convince the readership of
+%something.  what do you want to convince them?
   We will focus our current efforts around the H\textsubscript{II} phase since
   its geometry should give optimal transport performance compared to the
-  Q\textsubscript{I} phase. The H\textsubscript{II} phase forms at room
+  Q\textsubscript{I} phase. 
+%MRS5: citation on this above?
+  The H\textsubscript{II} phase forms at room
   temperature in the presence of c.a.~10 wt\% water and consists of hexagonally
   packed, straight, hydrophilic pore columns\cite{smith_ordered_1997}. In the
   absence of water, neat monomer will form the same hexagonal columnar structure
   which, in literature, has been referred to as the Col\textsubscript{h}
   thermotropic phase\cite{feng_scalable_2014} (See Figure~\ref{fig:hII_phase}).
   These hexagonal columnar phases represent the ideal geometry for membrane
-  transport. The most promising Q\textsubscript{I} phase for membrane
+  transport. 
+%MRS5: maybe less about Q_I since it's not in this paper?  The introduction should be an introduction to the paper.
+The most promising Q\textsubscript{I} phase for membrane
   applications forms at 70\degree C when monomer is mixed with c.a.~20 wt\%
   glycerol\cite{carter_glycerol-based_2012}. The Q\textsubscript{I} phase
   consists of a network of three dimensionally interconnected pores (See
@@ -156,6 +189,7 @@ liquid crystal membranes}
         \includegraphics[height=4.5cm]{hexagonal_packing.png}
         \caption{}\label{fig:hII_phase}
   \end{subfigure}
+%MRS5: not sure Q should be in here.
   \caption{The choice of LLC monomer leads to different favorable liquid
         crystalline phases. The monomer shown in (a) forms the Q\textsubscript{I} phase
         in either the Ia3d (left) or Pn3m (right) space group. The surfaces shown
@@ -313,6 +347,7 @@ liquid crystal membranes}
 %  specific separations by changing the monomer chemistry
 %  \cite{resel_h2-phase_2000}.
 
+%MRS5: not a strong thesis.  Why has it been revived?  The reasons for that would be a better thesis.
   Research into the H\textsubscript{II} phase of polymerized LLC membranes has
   been revived in recent years. During early stages of exploration, hexagonal
   mesophases formed by Na-GA3C11 (Figure~\ref{fig:assembly}) could not be
@@ -382,6 +417,7 @@ liquid crystal membranes}
 	assemble into hexagonally packed columnar mesophases (e).}~\label{fig:assembly}
   \end{figure}
 
+%MRS5: this is a better thesis. This sentence sets out a problem to the solved.
   Our current understanding of LLC systems is not rich enough to be able to
   precisely design membranes for specific separations. Over the past 20 years,
   H\textsubscript{II}-phase LLC polymer membrane studies have been limited
@@ -448,9 +484,13 @@ liquid crystal membranes}
   %necessary to put somewhere, but maybe not in this spot exactly
   In order to appropriately model transport in these ordered, nanoporous
   organic systems, we must first gain a thorough understanding of the nanoscopic
-  structure of LLC polymer membranes. Our approach to constructing a general
+  structure of LLC polymer membranes. 
+%MRS5: repeated use of model below, both constructing and developing?
+Our approach to constructing a general
   model will follow the development of a model of the assembly formed by
-  Na-GA3C11 since it has sufficient experimental characterization. We have also
+  Na-GA3C11 since it has sufficient experimental characterization. 
+%MRS5: maybe clean up/motivate abit more about why Col_h is worth starting with.
+We have also
   narrowed our scope to the development of a model of the Col\textsubscript{h}
   phase membrane. Compared to the H\textsubscript{II} phase, the
   Col\textsubscript{h} phase is a simpler starting point, due to the absence of
@@ -460,7 +500,9 @@ liquid crystal membranes}
   are in close agreement \cite{feng_thin_2016,resel_structural_2000}.
 
   Despite having structural data, there is still information which experiment
-  cannot definitively answer. Our current level of understanding suggests that
+  cannot definitively answer. 
+%MRS5: does a level of understanding suggest, or just is the level of understanding those facts?  and are there citations for these? are they inferred by the existing x-ray data.
+Our current level of understanding suggests that
   monomers partition into layers with head groups facing towards the center, then 
   stack on top of each other to create pores that pack together hexagonally.
   There are several key questions that we will investigate in order to
@@ -526,8 +568,8 @@ liquid crystal membranes}
   \item Is it necessary to include any water in order to appropriately model
   the Col\textsubscript{h} phase? \label{point:water}
 
-  While past work describes the Col\textsubscript{h} phase as dry
-  ~\cite{feng_scalable_2014}, it has been suggested by experimentalists, in
+  While past work describes the Col\textsubscript{h} phase as dry~\cite{feng_scalable_2014}, 
+  it has been suggested by experimentalists, in
   unpublished communications, that it is likely that neat monomer leaches small
   amounts of ambient water. Experimentally, achieving a hexagonal phase with a
   completely dry system has proven difficult. If neat monomer sits in ambient
