@@ -6,8 +6,6 @@ This library has all routines involving reading and writing files
 from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
-from builtins import str
-from builtins import range
 import numpy as np
 import copy
 import math
