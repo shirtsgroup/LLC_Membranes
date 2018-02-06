@@ -28,6 +28,7 @@ if __name__ == "__main__":
     # The following works, looks cleaner, but is annoyingly slow
     # ions = [a.index for a in t.topology.atoms if a.name != args.ion]
     # residue = [a for a in range(t.n_atoms) if a not in ions]
+    exit()
 
     with open(args.input, 'r') as f:
 

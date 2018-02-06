@@ -23,6 +23,8 @@ def initialize():
     parser.add_argument('-g', '--gro', default='wiggle.gro', type=str, help='Name of coordinate file')
     parser.add_argument('-a', '--atoms', nargs='+', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='Name of atoms to calculate'
                         'correlation function with respect to. The center of mass will be used')
+    parser.add_argument('-r', '--res', help='Residue to create correlation function with respect to. Will use center of'
+                                            'mass. Will override atoms. NOT IMPLEMENTED YET')
     parser.add_argument('--itp', default='/home/bcoscia/PycharmProjects/GitHub/HII/top/Monomer_Tops/NAcarb11V.itp')
     parser.add_argument('-b', '--begin', default=0, type=int, help='Start frame')
     parser.add_argument('-bins', nargs='+', default=100, type=int, help='Integer or array of bin values. If more than'
@@ -155,7 +157,8 @@ if __name__ == "__main__":
 
     ###################### 3D center of mass #########################
 
-    keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep
+    #keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep
+    keep = [a.index for a in t.topology.atoms if a.residue.name == 'HOH' and a.name == 'O']  # indices of atoms to keep
 
     natoms = len(args.atoms)
     monomers_per_layer = int(len(keep) / args.layers / npores / len(args.atoms))  # divide by len(args.atoms) because of com
@@ -207,7 +210,7 @@ if __name__ == "__main__":
                             H, edges = np.histogramdd(translated, bins=bins, range=hist_range)
                             correlation += H
 
-        np.savez_compressed('correlation_%s%s' %(args.slice[0], args.slice[1]), correlation=correlation, edges=edges, frames=frames)
+        np.savez_compressed('correlation_%s%s' % (args.slice[0], args.slice[1]), correlation=correlation, edges=edges, frames=frames)
 
     normalization = frames * center_of_mass.shape[1]**2 / np.prod(bins)
     correlation /= normalization

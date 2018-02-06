@@ -3,7 +3,6 @@
 import argparse
 import numpy as np
 import mdtraj as md
-import MDAnalysis as mda
 import matplotlib.pyplot as plt
 import math
 from pymbar import timeseries
@@ -365,7 +364,7 @@ if __name__ == '__main__':
 
         ps, freqs, max_freq = power_spectrum(d, args.bin)
 
-        print 'Maximum frequency: %s cycles/nm' % max_freq
+        print('Maximum frequency: %s cycles/nm' % max_freq)
 
         plt.figure(nfig)
         plt.plot(freqs, ps)
@@ -389,11 +388,11 @@ if __name__ == '__main__':
 
             H_diff /= max(H_diff)
             equil = timeseries.detectEquilibration(H_diff)[0]
-            print "Equilibration after %d ns" % (t.time[equil] / 1000)
+            print("Equilibration after %d ns" % (t.time[equil] / 1000))
             avg_order = np.mean(H_diff[equil:])
 
         else:
-            print 'Entropy difference from uniform distribution : %s' % (H_uniform - H_real)
+            print('Entropy difference from uniform distribution : %s' % (H_uniform - H_real))
 
     if args.kb:
         # Calculate Kullback-Leibler divergence
@@ -406,8 +405,8 @@ if __name__ == '__main__':
             kb_fwd = kullback_leiblier(np.ones(bins) / bins, d)
             kb_bwd = kullback_leiblier(d, np.ones(bins) / bins)
 
-        print 'kb_fwd = %.3f' % kb_fwd
-        print 'kb_bwd = %.3f' % kb_bwd
+        print('kb_fwd = %.3f' % kb_fwd)
+        print('kb_bwd = %.3f' % kb_bwd)
 
     if not args.noshow:
 

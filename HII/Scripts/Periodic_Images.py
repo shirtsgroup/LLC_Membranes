@@ -31,6 +31,8 @@ from builtins import str
 from builtins import range
 import argparse
 import numpy as np
+import mdtraj as md
+from llclib import file_rw
 
 
 def initialize():
@@ -75,6 +77,41 @@ def shift_matrices(images, angle, xbox, ybox):
     return x_shift, y_shift
 
 
+def duplicate_periodically(pts, box):
+    """
+    Duplicate points periodically in the +/- xyz directions. Assumes y box vector is angled with respect to x and
+    the z vector points straight up
+    :param pts: pts to be duplicated
+    :param box: unitcell vectors in mdtraj format (use t.unitcell_vectors)
+    :return: periodically extended system
+    """
+
+    nT = pts.shape[0]
+    npts = pts.shape[1]
+    p = np.zeros([nT, npts*27, 3])
+
+    p[:, :npts, :] = pts
+
+    for t in range(nT):
+
+        p[t, npts:2*npts, :] = pts[t, :, :] + box[t, 2, :]
+        p[t, 2*npts:3*npts, :] = pts[t, :, :] - box[t, 2, :]
+
+        for i in range(3, 6):
+            p[t, i*npts:(i+1)*npts, :] = p[t, (i-3)*npts:(i-2)*npts] + box[t, 0, :]
+
+        for i in range(6, 9):
+            p[t, i*npts:(i+1)*npts, :] = p[t, (i-6)*npts:(i-5)*npts] - box[t, 0, :]
+
+        for i in range(9, 18):
+            p[t, i*npts:(i+1)*npts, :] = p[t, (i-9)*npts:(i-8)*npts] + box[t, 1, :]
+
+        for i in range(18, 27):
+            p[t, i*npts:(i+1)*npts, :] = p[t, (i-18)*npts:(i-17)*npts] - box[t, 1, :]
+
+    return p
+
+
 def pbcs(pts, images, angle, xbox, ybox, frame):
 
     x_shift, y_shift = shift_matrices(images, angle, xbox, ybox)
@@ -109,36 +146,27 @@ if __name__ == "__main__":
     angle = float(args.angle)
     frame = 0
 
-    gro = md.coordinates.core.reader('%s' % args.file)
-    pos = gro.ts._pos
-    box = gro.ts._unitcell
-    xbox = box[0] / 10
-    ybox = box[1] / 10
-    zbox = box[2] / 10
+    gro = md.load(args.file)
+    pos = gro.xyz
+    full_box = gro.unitcell_vectors
 
-    print('positions got')
+    box_gromacs = [full_box[0, 0, 0], full_box[0, 1, 1], full_box[0, 2, 2], full_box[0, 0, 1], full_box[0, 2, 0],
+                   full_box[0, 1, 0], full_box[0, 0, 2], full_box[0, 1, 2], full_box[0, 2, 0]]
 
-    no_comp = np.shape(pos)[0]
+    periodic_box = [3*float(i) for i in box_gromacs]
 
-    id = np.zeros([1, no_comp], dtype=object)
+    id = [a.name for a in gro.topology.atoms]*27
+    res = [a.residue.name for a in gro.topology.atoms]*27
 
-    count = 2
-    f = open('%s' % args.file, 'r')
-    a = []
-    for line in f:
-        a.append(line)
-    f.close()
+    pt_periodic = duplicate_periodically(pos, full_box)
+    pt_periodic[0, :, :] += [box_gromacs[0] + box_gromacs[5], box_gromacs[1], box_gromacs[2]]
 
-    for j in range(no_comp):
-        atom = str.strip(a[count][10:15])
-        id[0, j] = atom
-        count += 1
+    file_rw.write_gro_pos(pt_periodic[0, :, :], 'periodic.gro', box=periodic_box, ids=id, res=res)
 
-    pt_periodic = pbcs(pos, images, angle, xbox, ybox, frame)
+    exit()
 
     pts = np.shape(pt_periodic)[2]
     duplicates = np.shape(pt_periodic)[1]
-    print(duplicates)
 
     all_positions = np.zeros([3, pts*duplicates])
     for i in range(duplicates):
@@ -157,16 +185,16 @@ if __name__ == "__main__":
             row = str(pt_periodic[:, j, i])
 
             # for full system
-            if id[0, i] == 'NA':
+            if id[i] == 'NA':
                 res = 'NA'
                 count += 1
             else:
                 res = 'HII'
-                if id[0, i - 1] == 'NA':
+                if id[i - 1] == 'NA':
                     count += 1
                 if i != 0 and i % 137 == 0:
                     count += 1
-            f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(count, '%s' % res, '%s' % id[0, i], count1, pt_periodic[0, j, i],
+            f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(count, '%s' % res, '%s' % id[i], count1, pt_periodic[0, j, i],
                                                                        pt_periodic[1, j, i], pt_periodic[2, j, i]) + "\n")
 
             # f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:9.3f}'.format(count, 'NA' , 'NA', count, pt_periodic[0, j, i],

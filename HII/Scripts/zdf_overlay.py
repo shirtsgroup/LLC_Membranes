@@ -27,6 +27,7 @@ def initialize():
     parser.add_argument('-com', '--com', action="store_true", help='Calculate zdf based on com of atoms')
     parser.add_argument('-r', '--res', type=str, help='Residue name to calculate zdf of')
     parser.add_argument('-cl', type=float, help='Correlation time measured from experiment')
+    parser.add_argument('--plot_fit', action="store_true", help='Plot the fit for correlation length')
 
     args = parser.parse_args()
 
@@ -140,7 +141,8 @@ if __name__ == "__main__":
 
     solp, cov_x = curve_fit(decay, z[start:end], zdf_avg[0, start:len(z) + end]/z_avg, p)
 
-    plt.plot(z[start:], decay(z[start:], solp[0], solp[1], solp[2], solp[3]), '--', color='black', label='Least squares fit')
+    if args.plot_fit:
+        plt.plot(z[start:], decay(z[start:], solp[0], solp[1], solp[2], solp[3]), '--', color='black', label='Least squares fit')
 
     print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*solp[1], 10*np.sqrt(cov_x[1, 1])))
     print('Oscillation Period = %1.3f nm' % (10*(2*np.pi)/solp[0]))

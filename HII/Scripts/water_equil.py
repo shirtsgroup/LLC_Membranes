@@ -6,20 +6,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 import numdensity
 from matplotlib import animation
+from llclib import physical
 
 
 def initialize():
 
     parser = argparse.ArgumentParser(description='See where the water is at during equilibration')
 
-    parser.add_argument('-f', '--file', default='wiggle_solv.trr', help='Trajectory file (.xtc or .trr should work)')
-    parser.add_argument('-c', '--coord', default='wiggle_solv.gro', help='A coordinate file needed by MD traj')
+    parser.add_argument('-t', '--traj', default='wiggle_solv.trr', help='Trajectory file (.xtc or .trr should work)')
+    parser.add_argument('-g', '--gro', default='wiggle_solv.gro', help='A coordinate file needed by MD traj')
+    parser.add_argument('-a', '--atoms', nargs='+', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='Atoms to based'
+                        'membrane thickness on')
     parser.add_argument('-r', '--radius', default=.6, type=float, help='Radius of cylinder defining pore (nm)')
     parser.add_argument('-b', '--buffer', default=0.1, type=float, help='Percent into membrane to start calculations')
     parser.add_argument('-s', '--save', help='Save the arrays or not', action="store_true")
     parser.add_argument('-l', '--load', help='If youve already save the arrays, load them for speedup', action="store_true")
-    parser.add_argument('-B', '--bin', default=0.1, type=float, help='bin size for calculating density')
-    parser.add_argument('-g', '--gif', help='Save output as .gif', action="store_true")
+    parser.add_argument('-B', '--bins', default=50, type=int, help='bin size for calculating density')
+    parser.add_argument('--gif', help='Save output as .gif', action="store_true")
     parser.add_argument('-S', '--smooth_factor', type=int, default=5, help='Record measurements every x frames')
 
     args = parser.parse_args()
@@ -85,95 +88,63 @@ if __name__ == "__main__":
 
     args = initialize()
 
-    if args.load:
-        zmax = np.load('zmax')
-        zmin = np.load('zmin')
-        pos = np.load('pos')
-        time = np.load('time')
-        box = np.load('box')
-    else:
+    t = md.load(args.traj, top=args.gro)
+    time = t.time
+    nT = t.n_frames
+    natoms = t.xyz.shape[1]
 
-        t = md.load('%s' % args.file, top='%s' % args.coord)
-        time = t.time
-        nT = t.xyz.shape[0]
-        natoms = t.xyz.shape[1]
-        zmax = np.zeros([nT])
-        zmin = np.zeros([nT])
-        benz_carbs = ['C', 'C1', 'C2', 'C3', 'C4', 'C5']
-        resnames = np.zeros([natoms])
+    keep = [a.index for a in t.topology.atoms if a.name in args.atoms]
+    atoms = t.xyz[:, keep, :]
+    percent = 5
+    n_samples = int(len(keep)*(percent/100))
 
-        # find the thickness of the membrane at each frame
-        for i in range(nT):
-            z = []
-            for a in t.topology.atoms:
-                if a.name in benz_carbs:
-                    z.append(t.xyz[i, a.index, 2])
-            buff = (max(z) - min(z))*args.buffer
-            zmax[i] = max(z) - buff
-            zmin[i] = min(z) + buff
+    # find the thickness of the membrane at last frame
+    z = np.sort(atoms[-1, :, 2])
+    zmax = np.mean(z[-n_samples:])  # average of the top 'percent' % of z positions in order to suppress outliers
+    zmin = np.min(z[:n_samples])
+    buff = (zmax - zmin)*args.buffer
+    zmax -= buff
+    zmin += buff
 
-        box = t.unitcell_lengths  # get the unit cell lengths
-        atoms = ['NA']
-        atoms_to_keep = [a.index for a in t.topology.atoms if a.name in atoms or a.name == 'O' and 'HOH' in str(a.residue)]  # SOL is stored as HOH in the traj
-        t.restrict_atoms(atoms_to_keep)
-        pos = t.xyz
+    water = [a.index for a in t.topology.atoms if a.residue.name == 'HOH' and a.name == 'O']
 
-        if args.save:
-            f = open('zmax', 'w')
-            np.save(f, zmax)
-            f.close()
-            f = open('zmin', 'w')
-            np.save(f, zmin)
-            f.close()
-            f = open('pos', 'w')
-            np.save(f, pos)
-            f.close()
-            f = open('time', 'w')
-            np.save(f, time)
-            f.close()
-            f = open('box', 'w')
-            np.save(f, box)
+    hist = np.zeros([nT, args.bins])
+    for n in range(nT):
+        hist[n, :], edges = np.histogram(t.xyz[n, water, 2], args.bins, range=[zmin, zmax])
 
-    nT = pos.shape[0]
-    NA = pos[:, :480, :]
-    water = pos[:, 480:, :]
+    hist /= (zmax - zmin)
 
-    filtered_NA = np.zeros([nT, 480, 3])
-    for i in range(nT):
-        for j in range(480):
-            if zmin[i] <= NA[i, j, 2] <= zmax[i]:
-                filtered_NA[i, j, :] = NA[i, j, :]
-            else:
-                filtered_NA[i, j, :] = [1000, 1000, 1000]
+    centers = [edges[i] + ((edges[i + 1] - edges[i])/2) for i in range(args.bins)]
 
-    pcenters = avg_pore_loc(4, filtered_NA)
-    water_counts = cylinder_region(water, zmin, zmax, args.radius, pcenters)
-    x, density = numdensity.density(water, 2, args.bin, box, sum='no', smooth_factor=args.smooth_factor)
-    plt.figure(1)
-    plt.ylabel('Count of waters in pore regions')
-    plt.xlabel('Time (ps)')
-    plt.plot(time, water_counts)
+    bin_width = centers[1] - centers[0]
+
+    # nT = pos.shape[0]
+    # NA = pos[:, :480, :]
+    # water = pos[:, 480:, :]
+    #
+    # filtered_NA = np.zeros([nT, 480, 3])
+    # for i in range(nT):
+    #     for j in range(480):
+    #         if zmin[i] <= NA[i, j, 2] <= zmax[i]:
+    #             filtered_NA[i, j, :] = NA[i, j, :]
+    #         else:
+    #             filtered_NA[i, j, :] = [1000, 1000, 1000]
+    #
+    # pcenters = avg_pore_loc(4, filtered_NA)
+    # water_counts = cylinder_region(water, zmin, zmax, args.radius, pcenters)
+    # x, density = numdensity.density(water, 2, args.bin, box, sum='no', smooth_factor=args.smooth_factor)
+    # plt.figure(1)
+    # plt.ylabel('Count of waters in pore regions')
+    # plt.xlabel('Time (ps)')
+    # plt.plot(time, water_counts)
 
     # Watch density of water in the z direction evolve over time
     # Use the last frame to determine reasonable bounds on the x and y axes of the following plot
 
-    end = 0
-    begin = 0
-    while x[-1, begin] < zmin[-1]:
-        begin += 1
-    while x[-1, end] < zmax[-1]:
-        end += 1
-    end += 1
-
-    bar_width = x[-1, 1] - x[-1, 0]
-
     fig = plt.figure(2)
-    ax = plt.axes(xlim=(zmin[-1], zmax[-1]), ylim=(0, max(density[-1, begin:end])))
+    ax = plt.axes(xlim=(zmin, zmax), ylim=(0, 1.1*max(hist[-1, :])))
 
-    rects = plt.bar(x[0, :], density[0, :], bar_width, color='c')
-
-    # annotate = ax.annotate('Time: %s ns' % (time[0]/1000), xy=((zmin[-1] + zmax[-1]) / 2, density[-1, end]*2/3))
-    # annotate.set_animated(True)
+    rects = plt.bar(centers, hist[0, :], bin_width, color='c')
 
     def init():
         return rects,
@@ -182,7 +153,7 @@ if __name__ == "__main__":
         """
         http://stackoverflow.com/questions/34372021/python-matplotlib-animate-bar-and-plot-in-one-picture
         """
-        for rect, yi in zip(rects, density[i, :]):
+        for rect, yi in zip(rects, hist[i, :]):
             rect.set_height(yi)
             #annotate = ax.annotate('Time: %s ns' % (time[i]/1000.0), xy=((zmin[-1] + zmax[-1]) / 2, density[-1, end]*2/3))
         return rects  #, annotate

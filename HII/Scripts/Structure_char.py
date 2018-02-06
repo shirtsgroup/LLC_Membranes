@@ -517,6 +517,16 @@ if __name__ == '__main__':
     comp_ppore = old_div(tot_atoms,n_pores)
 
     p_centers = avg_pore_loc(n_pores, pos, args.buffer)
+    # print(p_centers[:, :, -1])
+    # plt.scatter(p_centers[0, :, -1], p_centers[1, :, -1])
+    # print(np.linalg.norm(p_centers[:, 0, -1] - p_centers[:, 1, -1]))
+    # print(np.linalg.norm(p_centers[:, 0, -1] - p_centers[:, 2, -1]))
+    # print(np.linalg.norm(p_centers[:, 0, -1] - p_centers[:, 3, -1]))
+    # print(np.linalg.norm(p_centers[:, 1, -1] - p_centers[:, 2, -1]))
+    # print(np.linalg.norm(p_centers[:, 1, -1] - p_centers[:, 3, -1]))
+    # print(np.linalg.norm(p_centers[:, 2, -1] - p_centers[:, 3, -1]))
+    # plt.show()
+    # exit()
 
     distances = 6  # number of p2p distances to calculate. My algorithm isn't smart enough for anything but six yet
     # distances = 16  # for 9 pore system
