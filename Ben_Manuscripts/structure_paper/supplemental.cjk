@@ -177,43 +177,23 @@
 	\label{fig:p2p_diagram}
   \end{figure}
 
-  \begingroup
-	\fontsize{14pt}{12pt}\selectfont
-	\textbf{Initial Configuration Dependence}
-  \endgroup
-
-  \vspace{1em}
-  We addressed any major dependence on initial configuration in the main text.
-  There we showed that systems are stable when made with 4, 5, 6, 7, and 8
-  monomers per layer. We also showed that systems are stable when monomer head
-  groups are oriented in the parallel displaced and sandwiched configurations
-  (See Figure~\ref{fig:stacking}). Our model best supports a system built with 5
-  monomers per layer in the sandwiched configuration. 
-
-  There are three other parameters whose choice may influence the equilibrium
-  structure: initial pore spacing, initial pore radius and initial distance
-  between layers. Here we show the results of a sensitivity analysis performed
-  on the three parameters. To reduce the size of the sensitivity analysis, we
-  only tested systems built with 5 monomers per layer with layers stacked in 
-  the parallel displaced configuration. We equilibrated all systems according
-  to the dry equilibration procedure.
-
   \vspace{1em}
   \begingroup
 	\fontsize{14pt}{12pt}\selectfont
-	\textbf{Experimental correlation length of Ri-$\pi$}
+	\textbf{\noindent Experimental correlation length of R-$\pi$}
   \endgroup
   
   \vspace{1em}
-  Experimentalists did not measure the correlation length, so we estimated it from
-  the raw data. We took a slice of the 2D WAXS data along the dashed line in Figure
-  ~\ref{fig:waxs_dashed}. We removed background noise by subtracting
-  the intensity far from the pattern (high $q$) uniformly. We used a least squares
-  algorithm to fit a lorentzian curve to the data. Only values recorded above $q_z$ = 1.6 were considered for 
-  the fit in order to mitigate interference from R-alkanes (Figure~\ref{fig:correlation_length_exp}).
-  The full width at half maximum (FWHM) is related to the correlation length, L, by
-  the relationship: $ L = \frac{\pi}{FWHM} $. The error in the value is calculated
-  as the square root of the diagonal entry of the covariance matrix calculated 
+  Experimentalists did not measure the correlation length, so we estimated it
+  from the raw data. We took a slice of the 2D WAXS data along the dashed line in
+  Figure ~\ref{fig:waxs_dashed}. We removed background noise by subtracting the
+  intensity far from the pattern (high $q$) uniformly. We used a least squares
+  algorithm to fit a lorentzian curve to the data. Only values recorded above
+  $q_z$ = 1.6 were considered for the fit in order to mitigate interference from
+  R-alkanes (Figure~\ref{fig:correlation_length_exp}). The full width at half
+  maximum (FWHM) is related to the correlation length, L, by the relationship: $
+  L = \frac{1}{FWHM} $. The error in the value is calculated as the square root
+  of the diagonal entry of the covariance matrix calculated 
   % need citations and more on lorentzian parameters
   \begin{figure}[h]
   \centering
@@ -227,56 +207,111 @@
   \end{subfigure}
   \caption{}~\label{fig:correlation}
   \end{figure}
-
+  \vspace{1em} \\
   %Our model is insensitive to initial configuration if monomer placement is chosen within reason. 
+  \begingroup
+	\fontsize{14pt}{12pt}\selectfont
+	\textbf{Initial Configuration Dependence}
+  \endgroup
+
+  \vspace{1em}
+  We addressed any major dependence on initial configuration in the main text.
+  There we showed that systems are stable when made with 4, 5, 6, 7, and 8
+  monomers per layer. We also showed that systems are stable when monomer head
+  groups are oriented in the parallel displaced and sandwiched configurations
+  (See Figure~\ref{fig:stacking}). Our model is most consistent with experiment
+  when built with 5 monomers per layer, with layers stacked 3.7 \AA~apart in 
+  the parallel displaced configuration. 
+
+  There are three other parameters whose choice may influence the equilibrium
+  structure: initial pore spacing, initial pore radius and initial distance
+  between layers. Here we show the results of a sensitivity analysis performed
+  on the three parameters. To reduce the size of the sensitivity analysis, we
+  only tested systems built with 5 monomers per layer with layers stacked in 
+  the parallel displaced configuration. We equilibrated all systems according
+  to the dry equilibration procedure.
 
   \begin{enumerate}
 
 	  \item \underline{Initial pore spacing}
 
 	  We tested five different initial pore spacings, defined as the
-	  distance between the central axis of each pore with all others. To reduce the
-	  number of variables, we held the pore radius constant, at 6 \AA~and the
-	  distance between layers at 3.7 \AA~since those were the values used in our
-	  optimal system in the main text. If the initial pore spacing is chosen to be
-	  too small, pore columns abruptly repel each other as soon as they are able to
-	  overcome the restraining potential present as part of the dry equilibration
-	  procedure. We avoided using systems that exhibit this behavior since the
-	  behavior increases the chances of a system to become kinetically trapped in an
-	  undesired metastable free energy basin.  
+	  distance between the central axis of each pore with all others
+	  (Figure~\ref{fig:p2p_diagram}). To reduce the number of variables, we held the
+	  pore radius constant, at 6 \AA~and the distance between layers at 3.7 \AA~since
+	  those were the values used in our optimal system in the main text. We
+	  prioritized ensuring that resulting configurations maintain the expected
+	  hexagonal symmetry. If initial pore spacing is too small, we observe repulsion
+	  between columns which disrupts equilibration. If the pore spacing is too large
+	  the pores squeeze together, but in a distorted hexagonal array because the xy
+	  translation of the pores is somewhat erratic. 
+
+%	  If the initial pore spacing is chosen to be
+%	  too small, pore columns abruptly repel each other as soon as they are able to
+%	  overcome the restraining potential present as part of the dry equilibration
+%	  procedure. We avoided using systems that exhibit this behavior since the
+%	  behavior increases the chances of a system to become kinetically trapped in an
+%	  undesired metastable free energy basin.  
 
 	  \begin{enumerate}
 
-	  	\item 39 \AA~: We tested a pore spacing of 39 \AA~in order to have a test system
-		with an intial spacing below the experimental value. As soon as the restraining
-		potential switches to 56 KJ mol$^{-1}$ nm$^{-2}$, the columns are able to
-		separate resulting in a large jump in pore spacing (Figure~\ref{fig:p2p_39}). 
+		\item 39 \AA~: We tested a pore spacing of 39 \AA~in order to
+		have a test system with an intial spacing below the experimental value. As soon
+		as the restraining potential switches to 56 KJ mol$^{-1}$ nm$^{-2}$, the
+		columns are able to repel resulting in a large jump in pore spacing
+		(Figure~\ref{fig:p2p_39}). After 400 ns, the pore spacing is 4.05 $\pm$ 0.17 nm.
+		There is a large uncertainty in this value because the 1-4 pore spacing
+		(Figure~\ref{fig:p2p_diagram}) deviates significantly from all other pore
+		spacings. The 1-4 pore spacing is 4.31 nm while the average of all other pore
+		spacings is 3.96 nm. The system deviates from hexagonal geometry and is trending
+                towards cubic packing.
 
 		\item 41 \AA~: We chose to test a pore spacing of 41 \AA~since
 		it closely matches the experimental pore spacing. Again, we observe abrupt
 		repulsion of columns once the restraining potential is switched to 56 KJ
-		mol$^{-1}$ nm$^{-2}$ (Figure~\ref{fig:p2p_41}).
+		mol$^{-1}$ nm$^{-2}$ (Figure~\ref{fig:p2p_41}). After 400 ns, the
+		average pore spacing settles below the experimental value at 4.07 $\pm$ 0.21
+		nm. Again, a large uncertainty in this value occurs because the 1-4 pore spacing
+		(Figure~\ref{fig:p2p_diagram}) deviates significantly from all other pore
+		spacings. The 1-4 pore spacing is 4.44 nm while the average of all other pore
+		spacings is 3.96 nm. 
 
-		\item 45 \AA~: A pore spacing of 45 \AA~is about 10 \% larger than the
-		experimental value. We observe relatively stable pore spacing during the
-		restrained portion of the dry equilibration procedure
-		(Figure~\ref{fig:p2p_45}). We chose to use this value for all our simulations
-		in the main text. 
+		\item 45 \AA~: A pore spacing of 45 \AA~is about 10 \% larger
+		than the experimental value. We observe relatively stable pore spacing during
+		the restrained portion of the dry equilibration procedure
+		(Figure~\ref{fig:p2p_45}). The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
+		The system maintains hexagonal symmetry and exhibits the lowest uncertainty in
+		pore spacing. We chose to use this value for all our simulations in the main
+		text. 
 
 		\item 50 \AA~: We tested a pore spacing of 50 \AA, about 20 \% larger than the
 		experimental value. Once the restraining potential reaches 56 KJ mol$^{-1}$
 		nm$^{-2}$, the pore spacing begins to decrease linearly (Figure~\ref{fig:p2p_50}).
-
-		\item 55 \AA~: We tested a pore spacing of 55 \AA~ which is at
+		After 400 ns, the average pore spacing is 4.37 $\pm$ 0.13 nm. There is a large
+                uncertainty with this value because, again, the array of pores deviates from 
+                hexagonal character. Using Figure ~\ref{fig:p2p_diagram} as a reference, pore 
+                2 drifts outward from the array and forces the 1-4 distance to shrink in 
+                response.
+                
+		\item 55 \AA~: We tested a pore spacing of 55 \AA~which is at
 		a distance where monomers in each pore no longer intersect adjacent pores. Once
 		the restraining potential reaches 56 KJ mol$^{-1}$ nm$^{-2}$, the pore spacing
 		changes erratically until it begins to settle when the force constants are
 		below 3 KJ mol$^{-1}$ nm$^{-2}$ (Figure~\ref{fig:p2p_55}). We reccomend
 		avoiding a system such as this where vacuum gaps between pore columns are
-		introduced unnecessarily.  The system equilibrates to a pore spacing of 4.27
-		$\pm$ 0.06 nm. 
+		introduced unnecessarily. The system equilibrates to a pore spacing of 4.27
+		$\pm$ 0.18 nm. The 1-2 pore spacing is the outlier in this case with a pore
+                spacing of 3.99 \AA~ which distorts the hexagonal array. 
 
 	  \end{enumerate} 
+
+	  \begin{figure}
+		\centering
+		\includegraphics[width=0.4\textwidth]{p2p_diagram.png}
+		\caption{In a perfect hexagonal, there are 5 distances that should be exactly
+		equal. As pictured in this diagram the distance from 1-2, 1-3, 1-4, 2-4, and 3-4
+		are the same.}~\label{fig:p2p_diagram}
+	  \end{figure} 
 
 	  %BJC: Could put vertical lines to indicate where position restraint values are reduced
   	  \begin{figure}[htp]
@@ -327,13 +362,13 @@
 
 	  We tested 3 different pore radii, defined as shown in
 	  Figure~\ref{fig:pore_radius_illustration}. For each system, we held the initial
-	  pore spacing constant at 45 \AA~ and the distance between layers constant at
-	  3.7 \AA. Equilibrated values of pore radii are presented in
-	  Table~\ref{table:radii}. The pore radius in each simulation frame is calculated as the
-	  average distance of all carbonyl carbons (See
+	  pore spacing constant at 45 \AA~and the initial distance between layers
+	  constant at 3.7 \AA. Equilibrated values of pore radii are presented in
+	  Table~\ref{table:radii}. The pore radius in each simulation frame is calculated
+	  as the average distance of all carbonyl carbons (See
 	  Figure~\ref{fig:pore_radius_illustration}) from their associated pore center.
 	  Statistics for the pore radii reported were generated from the timeseries
-	  representing the average pore radius at each frame.  We detected equilibration 
+	  representing the average pore radius at each frame. We detected equilibration
 	  using \texttt{pymbar.timeseries.detectEquilibration}. We calculated the average
 	  and standard deviation of pore radii using only data points collected after
 	  equilibration was detected.
@@ -349,15 +384,18 @@
 		slightly larger than the equilibrated pore radius of the system simulated with
 		an intial pore radius of 2.5 \AA. After being run through the full dry
 		equilibration procedure, the average pore radius is 0.42 $\pm$ 0.01 \AA, which
-		agrees with the 2.5 \AA~ configuration within error. 
+		agrees with the 2.5 \AA~configuration within error. 
 
 		\item 8 \AA~: The largest pore radius that can achieved before
 		energy minimization becomes problematic is 8 \AA. One should use caution with
 		such a structure because of the relatively large vacuum space that is created
 		in the pore region of the initial configuration. After being run through the
 		full dry equilibration procedure, we see a combination of cylindrical and
-		slit-like pores (Figure~\ref{fig:slits}). We are wary of such a non-symmetric
-		structure and choose not to use a pore radius of 8 \AA for our starting configurations. 
+		slit-like pores (Figure~\ref{fig:slits}). Measuring the pore radius of this
+		system does not have a concrete meaning since slits do not have a single
+		radius, but its calculated value is reported in Table ~\ref{table:radii}. We
+		are wary of such a non-symmetric structure and choose not to use a pore radius
+		of 8 \AA~for our starting configurations. 
 	  
 	  \end{enumerate}
 
@@ -393,7 +431,7 @@
 	  We tested 3 different initial layer spacings, defined as the distance
 	  between the planes of aromatic rings in each layer. Systems built with layers
 	  stacked 3.7 \AA~and 5 \AA~apart are discussed extensively in the main text. We
-	  will focus the discussion here on systems built with layers stacked 10~\AA
+	  will focus the discussion here on systems built with layers stacked 10 \AA~
 	  apart.
 
 	  Figure~\ref{fig:dbwl_10} shows the structure of an assembly built
@@ -616,6 +654,7 @@
         \textbf{Crosslinking Mechanism}
   \endgroup
 
+  \vspace{1em}
   Crosslinking of the the monomer Na-GA3C11 occurs by a UV initiated free
   radical polymerization (Figure~\ref{fig:xlink_mech}).  Head-to-tail addition
   takes place between terminal vinyl groups on each of the monomer tails.  We

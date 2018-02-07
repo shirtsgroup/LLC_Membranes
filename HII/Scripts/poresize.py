@@ -142,6 +142,7 @@ if __name__ == "__main__":
 
     pcenters = physical.avg_pore_loc(4, pos)  # find the pore centers
     radii = physical.limits(pos, pcenters)  # find the average radius of each pore in each frame
+
     r = np.zeros(radii.shape[0])  # find average pore radius at each frame
     r_std = np.zeros(radii.shape[0])  # standard deviation at each frame
     for i in range(radii.shape[0]):

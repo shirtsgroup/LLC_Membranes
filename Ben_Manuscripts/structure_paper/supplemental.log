@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.9.22)  5 FEB 2018 10:45
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.9.22)  6 FEB 2018 16:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -583,6 +583,12 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 )
 (./supplemental.aux
 
+LaTeX Warning: Label `fig:p2p_diagram' multiply defined.
+
+
+LaTeX Warning: Label `fig:p2p_diagram@cref' multiply defined.
+
+
 LaTeX Warning: Label `fig:zdf_layered_4' multiply defined.
 
 
@@ -874,246 +880,256 @@ Package pdftex.def Info: ./figures/p2p_diagram.png  used on input line 170. on
 input line 170.
 Package pdftex.def Info: Requested size: 117.43875pt x 100.45831pt on input lin
 e 170.
-LaTeX Font Info:    Calculating math sizes for size <14> on input line 204.
+LaTeX Font Info:    Calculating math sizes for size <14> on input line 183.
 <./figures/waxs_dashed.png, id=36, 462.528pt x 346.896pt>
 File: ./figures/waxs_dashed.png Graphic file (type png)
 <use ./figures/waxs_dashed.png>
-Package pdftex.def Info: ./figures/waxs_dashed.png  used on input line 221. on 
-input line 221.
+Package pdftex.def Info: ./figures/waxs_dashed.png  used on input line 201. on 
+input line 201.
 Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
-e 221.
+e 201.
 <./figures/Correlation_length_exp.png, id=37, 462.528pt x 346.896pt>
 File: ./figures/Correlation_length_exp.png Graphic file (type png)
 <use ./figures/Correlation_length_exp.png>
 Package pdftex.def Info: ./figures/Correlation_length_exp.png  used on input li
-ne 225. on input line 225.
+ne 205. on input line 205.
 Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
-e 225.
+e 205.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[5 <./figures/p2p_diagram.png>]
-<./figures/p2p_39.png, id=47, 462.528pt x 346.896pt>
+[5 <./figures/p2p_diagram.png>] [6 <./figures/waxs_dashed.png> <./figures/Corre
+lation_length_exp.png>]
+File: ./figures/p2p_diagram.png Graphic file (type png)
+<use ./figures/p2p_diagram.png>
+Package pdftex.def Info: ./figures/p2p_diagram.png  used on input line 310. on 
+input line 310.
+Package pdftex.def Info: Requested size: 187.89914pt x 160.73462pt on input lin
+e 310.
+<./figures/p2p_39.png, id=53, 462.528pt x 346.896pt>
 File: ./figures/p2p_39.png Graphic file (type png)
 <use ./figures/p2p_39.png>
-Package pdftex.def Info: ./figures/p2p_39.png  used on input line 285. on input
- line 285.
+Package pdftex.def Info: ./figures/p2p_39.png  used on input line 320. on input
+ line 320.
 Package pdftex.def Info: Requested size: 140.92793pt x 105.69461pt on input lin
-e 285.
-<./figures/p2p_41.png, id=48, 462.528pt x 346.896pt>
+e 320.
+<./figures/p2p_41.png, id=54, 462.528pt x 346.896pt>
 File: ./figures/p2p_41.png Graphic file (type png)
 <use ./figures/p2p_41.png>
-Package pdftex.def Info: ./figures/p2p_41.png  used on input line 290. on input
- line 290.
+Package pdftex.def Info: ./figures/p2p_41.png  used on input line 325. on input
+ line 325.
 Package pdftex.def Info: Requested size: 140.92793pt x 105.69461pt on input lin
-e 290.
-<./figures/p2p_45.png, id=49, 462.528pt x 346.896pt>
+e 325.
+<./figures/p2p_45.png, id=55, 462.528pt x 346.896pt>
 File: ./figures/p2p_45.png Graphic file (type png)
 <use ./figures/p2p_45.png>
-Package pdftex.def Info: ./figures/p2p_45.png  used on input line 295. on input
- line 295.
+Package pdftex.def Info: ./figures/p2p_45.png  used on input line 330. on input
+ line 330.
 Package pdftex.def Info: Requested size: 140.92793pt x 105.69461pt on input lin
-e 295.
-<./figures/p2p_50.png, id=50, 462.528pt x 346.896pt>
+e 330.
+<./figures/p2p_50.png, id=56, 462.528pt x 346.896pt>
 File: ./figures/p2p_50.png Graphic file (type png)
 <use ./figures/p2p_50.png>
-Package pdftex.def Info: ./figures/p2p_50.png  used on input line 300. on input
- line 300.
+Package pdftex.def Info: ./figures/p2p_50.png  used on input line 335. on input
+ line 335.
 Package pdftex.def Info: Requested size: 140.92793pt x 105.69461pt on input lin
-e 300.
-<./figures/p2p_55.png, id=51, 462.528pt x 346.896pt>
+e 335.
+<./figures/p2p_55.png, id=57, 462.528pt x 346.896pt>
 File: ./figures/p2p_55.png Graphic file (type png)
 <use ./figures/p2p_55.png>
-Package pdftex.def Info: ./figures/p2p_55.png  used on input line 305. on input
- line 305.
+Package pdftex.def Info: ./figures/p2p_55.png  used on input line 340. on input
+ line 340.
 Package pdftex.def Info: Requested size: 140.92793pt x 105.69461pt on input lin
-e 305.
- [6 <./figures/waxs_dashed.png> <./figures/Correlation_length_exp.png>] [7 <./f
-igures/p2p_39.png> <./figures/p2p_41.png> <./figures/p2p_45.png> <./figures/p2p
-_50.png> <./figures/p2p_55.png>]
-<./figures/slit_pores.png, id=67, 2668.97125pt x 2469.225pt>
+e 340.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<./figures/slit_pores.png, id=58, 2668.97125pt x 2469.225pt>
 File: ./figures/slit_pores.png Graphic file (type png)
 <use ./figures/slit_pores.png>
-Package pdftex.def Info: ./figures/slit_pores.png  used on input line 383. on i
-nput line 383.
+Package pdftex.def Info: ./figures/slit_pores.png  used on input line 421. on i
+nput line 421.
 Package pdftex.def Info: Requested size: 469.75502pt x 434.56989pt on input lin
-e 383.
-<./figures/dbwl_10.png, id=68, 671.50874pt x 837.1275pt>
+e 421.
+[7] [8 <./figures/p2p_39.png> <./figures/p2p_41.png> <./figures/p2p_45.png> <./
+figures/p2p_50.png> <./figures/p2p_55.png>] [9 <./figures/slit_pores.png>]
+<./figures/dbwl_10.png, id=74, 671.50874pt x 837.1275pt>
 File: ./figures/dbwl_10.png Graphic file (type png)
 <use ./figures/dbwl_10.png>
-Package pdftex.def Info: ./figures/dbwl_10.png  used on input line 411. on inpu
-t line 411.
+Package pdftex.def Info: ./figures/dbwl_10.png  used on input line 449. on inpu
+t line 449.
 Package pdftex.def Info: Requested size: 234.8775pt x 292.8074pt on input line 
-411.
-<./figures/zdf_layered_4.png, id=69, 462.528pt x 346.896pt>
+449.
+<./figures/zdf_layered_4.png, id=75, 462.528pt x 346.896pt>
 File: ./figures/zdf_layered_4.png Graphic file (type png)
 <use ./figures/zdf_layered_4.png>
-Package pdftex.def Info: ./figures/zdf_layered_4.png  used on input line 423. o
-n input line 423.
+Package pdftex.def Info: ./figures/zdf_layered_4.png  used on input line 461. o
+n input line 461.
 Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
-e 423.
-<./figures/zdf_offset_4.png, id=70, 462.528pt x 346.896pt>
+e 461.
+<./figures/zdf_offset_4.png, id=76, 462.528pt x 346.896pt>
 File: ./figures/zdf_offset_4.png Graphic file (type png)
 <use ./figures/zdf_offset_4.png>
-Package pdftex.def Info: ./figures/zdf_offset_4.png  used on input line 428. on
- input line 428.
+Package pdftex.def Info: ./figures/zdf_offset_4.png  used on input line 466. on
+ input line 466.
 Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
-e 428.
-<./figures/zdf_layered_6.png, id=71, 462.528pt x 346.896pt>
+e 466.
+<./figures/zdf_layered_6.png, id=77, 462.528pt x 346.896pt>
 File: ./figures/zdf_layered_6.png Graphic file (type png)
 <use ./figures/zdf_layered_6.png>
-Package pdftex.def Info: ./figures/zdf_layered_6.png  used on input line 433. o
-n input line 433.
+Package pdftex.def Info: ./figures/zdf_layered_6.png  used on input line 471. o
+n input line 471.
 Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
-e 433.
-<./figures/zdf_offset_6.png, id=72, 462.528pt x 346.896pt>
+e 471.
+<./figures/zdf_offset_6.png, id=78, 462.528pt x 346.896pt>
 File: ./figures/zdf_offset_6.png Graphic file (type png)
 <use ./figures/zdf_offset_6.png>
-Package pdftex.def Info: ./figures/zdf_offset_6.png  used on input line 438. on
- input line 438.
+Package pdftex.def Info: ./figures/zdf_offset_6.png  used on input line 476. on
+ input line 476.
 Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
-e 438.
-<./figures/zdf_layered_7.png, id=73, 462.528pt x 346.896pt>
+e 476.
+<./figures/zdf_layered_7.png, id=79, 462.528pt x 346.896pt>
 File: ./figures/zdf_layered_7.png Graphic file (type png)
 <use ./figures/zdf_layered_7.png>
-Package pdftex.def Info: ./figures/zdf_layered_7.png  used on input line 443. o
-n input line 443.
+Package pdftex.def Info: ./figures/zdf_layered_7.png  used on input line 481. o
+n input line 481.
 Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
-e 443.
-<./figures/zdf_offset_7.png, id=74, 462.528pt x 346.896pt>
+e 481.
+<./figures/zdf_offset_7.png, id=80, 462.528pt x 346.896pt>
 File: ./figures/zdf_offset_7.png Graphic file (type png)
 <use ./figures/zdf_offset_7.png>
-Package pdftex.def Info: ./figures/zdf_offset_7.png  used on input line 448. on
- input line 448.
+Package pdftex.def Info: ./figures/zdf_offset_7.png  used on input line 486. on
+ input line 486.
 Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
-e 448.
-<./figures/zdf_layered_8.png, id=75, 462.528pt x 346.896pt>
+e 486.
+<./figures/zdf_layered_8.png, id=81, 462.528pt x 346.896pt>
 File: ./figures/zdf_layered_8.png Graphic file (type png)
 <use ./figures/zdf_layered_8.png>
-Package pdftex.def Info: ./figures/zdf_layered_8.png  used on input line 453. o
-n input line 453.
+Package pdftex.def Info: ./figures/zdf_layered_8.png  used on input line 491. o
+n input line 491.
 Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
-e 453.
-<./figures/zdf_offset_8.png, id=76, 462.528pt x 346.896pt>
+e 491.
+<./figures/zdf_offset_8.png, id=82, 462.528pt x 346.896pt>
 File: ./figures/zdf_offset_8.png Graphic file (type png)
 <use ./figures/zdf_offset_8.png>
-Package pdftex.def Info: ./figures/zdf_offset_8.png  used on input line 458. on
- input line 458.
+Package pdftex.def Info: ./figures/zdf_offset_8.png  used on input line 496. on
+ input line 496.
 Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
-e 458.
+e 496.
 
 
-LaTeX Warning: Float too large for page by 6.58711pt on input line 462.
+LaTeX Warning: Float too large for page by 6.58711pt on input line 500.
 
-<./figures/rzplot_layered_4.png, id=77, 462.528pt x 346.896pt>
+<./figures/rzplot_layered_4.png, id=83, 462.528pt x 346.896pt>
 File: ./figures/rzplot_layered_4.png Graphic file (type png)
 <use ./figures/rzplot_layered_4.png>
-Package pdftex.def Info: ./figures/rzplot_layered_4.png  used on input line 468
-. on input line 468.
+Package pdftex.def Info: ./figures/rzplot_layered_4.png  used on input line 506
+. on input line 506.
 Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
-e 468.
-<./figures/rzplot_offset_4.png, id=78, 462.528pt x 346.896pt>
+e 506.
+<./figures/rzplot_offset_4.png, id=84, 462.528pt x 346.896pt>
 File: ./figures/rzplot_offset_4.png Graphic file (type png)
 <use ./figures/rzplot_offset_4.png>
-Package pdftex.def Info: ./figures/rzplot_offset_4.png  used on input line 473.
- on input line 473.
+Package pdftex.def Info: ./figures/rzplot_offset_4.png  used on input line 511.
+ on input line 511.
 Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
-e 473.
-<./figures/rzplot_layered_6.png, id=79, 462.528pt x 346.896pt>
+e 511.
+<./figures/rzplot_layered_6.png, id=85, 462.528pt x 346.896pt>
 File: ./figures/rzplot_layered_6.png Graphic file (type png)
 <use ./figures/rzplot_layered_6.png>
-Package pdftex.def Info: ./figures/rzplot_layered_6.png  used on input line 478
-. on input line 478.
+Package pdftex.def Info: ./figures/rzplot_layered_6.png  used on input line 516
+. on input line 516.
 Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
-e 478.
-<./figures/rzplot_offset_6.png, id=80, 462.528pt x 346.896pt>
+e 516.
+<./figures/rzplot_offset_6.png, id=86, 462.528pt x 346.896pt>
 File: ./figures/rzplot_offset_6.png Graphic file (type png)
 <use ./figures/rzplot_offset_6.png>
-Package pdftex.def Info: ./figures/rzplot_offset_6.png  used on input line 483.
- on input line 483.
+Package pdftex.def Info: ./figures/rzplot_offset_6.png  used on input line 521.
+ on input line 521.
 Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
-e 483.
-<./figures/rzplot_layered_7.png, id=81, 462.528pt x 346.896pt>
+e 521.
+<./figures/rzplot_layered_7.png, id=87, 462.528pt x 346.896pt>
 File: ./figures/rzplot_layered_7.png Graphic file (type png)
 <use ./figures/rzplot_layered_7.png>
-Package pdftex.def Info: ./figures/rzplot_layered_7.png  used on input line 488
-. on input line 488.
+Package pdftex.def Info: ./figures/rzplot_layered_7.png  used on input line 526
+. on input line 526.
 Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
-e 488.
-<./figures/rzplot_offset_7.png, id=82, 462.528pt x 346.896pt>
+e 526.
+<./figures/rzplot_offset_7.png, id=88, 462.528pt x 346.896pt>
 File: ./figures/rzplot_offset_7.png Graphic file (type png)
 <use ./figures/rzplot_offset_7.png>
-Package pdftex.def Info: ./figures/rzplot_offset_7.png  used on input line 493.
- on input line 493.
+Package pdftex.def Info: ./figures/rzplot_offset_7.png  used on input line 531.
+ on input line 531.
 Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
-e 493.
-<./figures/rzplot_layered_8.png, id=83, 462.528pt x 346.896pt>
+e 531.
+<./figures/rzplot_layered_8.png, id=89, 462.528pt x 346.896pt>
 File: ./figures/rzplot_layered_8.png Graphic file (type png)
 <use ./figures/rzplot_layered_8.png>
-Package pdftex.def Info: ./figures/rzplot_layered_8.png  used on input line 498
-. on input line 498.
+Package pdftex.def Info: ./figures/rzplot_layered_8.png  used on input line 536
+. on input line 536.
 Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
-e 498.
-<./figures/rzplot_offset_8.png, id=84, 462.528pt x 346.896pt>
+e 536.
+<./figures/rzplot_offset_8.png, id=90, 462.528pt x 346.896pt>
 File: ./figures/rzplot_offset_8.png Graphic file (type png)
 <use ./figures/rzplot_offset_8.png>
-Package pdftex.def Info: ./figures/rzplot_offset_8.png  used on input line 503.
- on input line 503.
+Package pdftex.def Info: ./figures/rzplot_offset_8.png  used on input line 541.
+ on input line 541.
 Package pdftex.def Info: Requested size: 187.89914pt x 140.92615pt on input lin
-e 503.
+e 541.
 
-LaTeX Warning: Float too large for page by 6.58711pt on input line 508.
+LaTeX Warning: Float too large for page by 6.58711pt on input line 546.
 
-<./figures/layered_nematic_order.png, id=85, 462.528pt x 346.896pt>
+<./figures/layered_nematic_order.png, id=91, 462.528pt x 346.896pt>
 File: ./figures/layered_nematic_order.png Graphic file (type png)
 <use ./figures/layered_nematic_order.png>
 Package pdftex.def Info: ./figures/layered_nematic_order.png  used on input lin
-e 537. on input line 537.
+e 575. on input line 575.
 Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
-e 537.
-<./figures/offset_nematic_order.png, id=86, 462.528pt x 346.896pt>
+e 575.
+<./figures/offset_nematic_order.png, id=92, 462.528pt x 346.896pt>
 File: ./figures/offset_nematic_order.png Graphic file (type png)
 <use ./figures/offset_nematic_order.png>
 Package pdftex.def Info: ./figures/offset_nematic_order.png  used on input line
- 542. on input line 542.
+ 580. on input line 580.
 Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
-e 542.
-<./figures/disorder_sandwich_nematic_order.png, id=87, 462.528pt x 346.896pt>
+e 580.
+<./figures/disorder_sandwich_nematic_order.png, id=93, 462.528pt x 346.896pt>
 File: ./figures/disorder_sandwich_nematic_order.png Graphic file (type png)
 <use ./figures/disorder_sandwich_nematic_order.png>
 Package pdftex.def Info: ./figures/disorder_sandwich_nematic_order.png  used on
- input line 547. on input line 547.
+ input line 585. on input line 585.
 Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
-e 547.
-<./figures/disorder_offset_nematic_order.png, id=88, 462.528pt x 346.896pt>
+e 585.
+<./figures/disorder_offset_nematic_order.png, id=94, 462.528pt x 346.896pt>
 File: ./figures/disorder_offset_nematic_order.png Graphic file (type png)
 <use ./figures/disorder_offset_nematic_order.png>
 Package pdftex.def Info: ./figures/disorder_offset_nematic_order.png  used on i
-nput line 552. on input line 552.
+nput line 590. on input line 590.
 Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
-e 552.
-<./figures/centroids_box.png, id=89, 3709.86pt x 3337.46875pt>
+e 590.
+<./figures/centroids_box.png, id=95, 3709.86pt x 3337.46875pt>
 File: ./figures/centroids_box.png Graphic file (type png)
 <use ./figures/centroids_box.png>
-Package pdftex.def Info: ./figures/centroids_box.png  used on input line 575. o
-n input line 575.
+Package pdftex.def Info: ./figures/centroids_box.png  used on input line 613. o
+n input line 613.
 Package pdftex.def Info: Requested size: 234.8775pt x 211.29034pt on input line
- 575.
-<./figures/water_filled_pore.png, id=90, 739.76375pt x 739.76375pt>
+ 613.
+<./figures/water_filled_pore.png, id=96, 739.76375pt x 739.76375pt>
 File: ./figures/water_filled_pore.png Graphic file (type png)
 <use ./figures/water_filled_pore.png>
-Package pdftex.def Info: ./figures/water_filled_pore.png  used on input line 60
-0. on input line 600.
+Package pdftex.def Info: ./figures/water_filled_pore.png  used on input line 63
+8. on input line 638.
 Package pdftex.def Info: Requested size: 211.38832pt x 211.38795pt on input lin
-e 600.
-<./figures/water_removed.png, id=91, 664.4825pt x 665.48625pt>
+e 638.
+<./figures/water_removed.png, id=97, 664.4825pt x 665.48625pt>
 File: ./figures/water_removed.png Graphic file (type png)
 <use ./figures/water_removed.png>
-Package pdftex.def Info: ./figures/water_removed.png  used on input line 604. o
-n input line 604.
+Package pdftex.def Info: ./figures/water_removed.png  used on input line 642. o
+n input line 642.
 Package pdftex.def Info: Requested size: 211.38832pt x 211.71094pt on input lin
-e 604.
+e 642.
 Package epstopdf Info: Source file: <./figures/Crosslink_mechanism.eps>
 (epstopdf)                    date: 2018-01-29 12:36:16
 (epstopdf)                    size: 22243 bytes
@@ -1123,29 +1139,29 @@ d-to.pdf>
 (epstopdf)                    size: 5972 bytes
 (epstopdf)             Command: <repstopdf --outfile=./figures/Crosslink_mechan
 ism-eps-converted-to.pdf ./figures/Crosslink_mechanism.eps>
-(epstopdf)             \includegraphics on input line 627.
+(epstopdf)             \includegraphics on input line 666.
 Package epstopdf Info: Output file is already uptodate.
-<./figures/Crosslink_mechanism-eps-converted-to.pdf, id=92, pagebox=cropbox, 47
+<./figures/Crosslink_mechanism-eps-converted-to.pdf, id=98, pagebox=cropbox, 47
 8.78876pt x 232.87pt>
 File: ./figures/Crosslink_mechanism-eps-converted-to.pdf Graphic file (type pdf
 )
 <use ./figures/Crosslink_mechanism-eps-converted-to.pdf>
 Package pdftex.def Info: ./figures/Crosslink_mechanism-eps-converted-to.pdf  us
-ed on input line 627. on input line 627.
+ed on input line 666. on input line 666.
 Package pdftex.def Info: Requested size: 469.75502pt x 228.47752pt on input lin
-e 627.
-[8] [9 <./figures/slit_pores.png>] [10 <./figures/dbwl_10.png>] [11 <./figures/
-zdf_layered_4.png> <./figures/zdf_offset_4.png> <./figures/zdf_layered_6.png> <
-./figures/zdf_offset_6.png> <./figures/zdf_layered_7.png> <./figures/zdf_offset
-_7.png> <./figures/zdf_layered_8.png> <./figures/zdf_offset_8.png>] [12 <./figu
-res/rzplot_layered_4.png> <./figures/rzplot_offset_4.png> <./figures/rzplot_lay
-ered_6.png> <./figures/rzplot_offset_6.png> <./figures/rzplot_layered_7.png> <.
-/figures/rzplot_offset_7.png> <./figures/rzplot_layered_8.png> <./figures/rzplo
-t_offset_8.png>] [13 <./figures/layered_nematic_order.png> <./figures/offset_ne
-matic_order.png> <./figures/disorder_sandwich_nematic_order.png> <./figures/dis
-order_offset_nematic_order.png>] [14 <./figures/centroids_box.png> <./figures/w
-ater_filled_pore.png> <./figures/water_removed.png>] [15 <./figures/Crosslink_m
-echanism-eps-converted-to.pdf>] (./supplemental.bbl) [16
+e 666.
+[10 <./figures/dbwl_10.png>] [11 <./figures/zdf_layered_4.png> <./figures/zdf_o
+ffset_4.png> <./figures/zdf_layered_6.png> <./figures/zdf_offset_6.png> <./figu
+res/zdf_layered_7.png> <./figures/zdf_offset_7.png> <./figures/zdf_layered_8.pn
+g> <./figures/zdf_offset_8.png>] [12 <./figures/rzplot_layered_4.png> <./figure
+s/rzplot_offset_4.png> <./figures/rzplot_layered_6.png> <./figures/rzplot_offse
+t_6.png> <./figures/rzplot_layered_7.png> <./figures/rzplot_offset_7.png> <./fi
+gures/rzplot_layered_8.png> <./figures/rzplot_offset_8.png>] [13 <./figures/lay
+ered_nematic_order.png> <./figures/offset_nematic_order.png> <./figures/disorde
+r_sandwich_nematic_order.png> <./figures/disorder_offset_nematic_order.png>]
+[14 <./figures/centroids_box.png> <./figures/water_filled_pore.png> <./figures/
+water_removed.png>] [15 <./figures/Crosslink_mechanism-eps-converted-to.pdf>]
+(./supplemental.bbl) [16
 
 ] (./supplemental.aux)
 
@@ -1158,11 +1174,11 @@ LaTeX Warning: There were multiply-defined labels.
 Here is how much of TeX's memory you used:
  16812 strings out of 492990
  346367 string characters out of 6132621
- 383484 words of memory out of 5000000
+ 380484 words of memory out of 5000000
  20185 multiletter control sequences out of 15000+600000
  540297 words of font info for 60 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 42i,9n,77p,10384b,631s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 42i,9n,77p,10384b,629s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
 </usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><
@@ -1179,7 +1195,7 @@ ve/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texliv
 e/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/
 2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2
 017/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on supplemental.pdf (16 pages, 21602236 bytes).
+Output written on supplemental.pdf (16 pages, 21603549 bytes).
 PDF statistics:
  200 PDF objects out of 1000 (max. 8388607)
  92 compressed objects within 1 object stream

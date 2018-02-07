@@ -180,7 +180,7 @@
   \vspace{1em}
   \begingroup
 	\fontsize{14pt}{12pt}\selectfont
-	\textbf{Experimental correlation length of R-$\pi$}
+	\textbf{\noindent Experimental correlation length of R-$\pi$}
   \endgroup
   
   \vspace{1em}
@@ -190,9 +190,9 @@
   intensity far from the pattern (high $q$) uniformly. We used a least squares
   algorithm to fit a lorentzian curve to the data. Only values recorded above
   $q_z$ = 1.6 were considered for the fit in order to mitigate interference from
-  R-alkanes (Figure~\ref{fig:correlation_length_exp}).  The full width at half
+  R-alkanes (Figure~\ref{fig:correlation_length_exp}). The full width at half
   maximum (FWHM) is related to the correlation length, L, by the relationship: $
-  L = \frac{\pi}{FWHM} $. The error in the value is calculated as the square root
+  L = \frac{1}{FWHM} $. The error in the value is calculated as the square root
   of the diagonal entry of the covariance matrix calculated 
   % need citations and more on lorentzian parameters
   \begin{figure}[h]
@@ -207,7 +207,7 @@
   \end{subfigure}
   \caption{}~\label{fig:correlation}
   \end{figure}
-
+  \vspace{1em} \\
   %Our model is insensitive to initial configuration if monomer placement is chosen within reason. 
   \begingroup
 	\fontsize{14pt}{12pt}\selectfont
@@ -293,7 +293,7 @@
                 2 drifts outward from the array and forces the 1-4 distance to shrink in 
                 response.
                 
-		\item 55 \AA~: We tested a pore spacing of 55 \AA~ which is at
+		\item 55 \AA~: We tested a pore spacing of 55 \AA~which is at
 		a distance where monomers in each pore no longer intersect adjacent pores. Once
 		the restraining potential reaches 56 KJ mol$^{-1}$ nm$^{-2}$, the pore spacing
 		changes erratically until it begins to settle when the force constants are
@@ -362,13 +362,13 @@
 
 	  We tested 3 different pore radii, defined as shown in
 	  Figure~\ref{fig:pore_radius_illustration}. For each system, we held the initial
-	  pore spacing constant at 45 \AA~ and the distance between layers constant at
-	  3.7 \AA. Equilibrated values of pore radii are presented in
-	  Table~\ref{table:radii}. The pore radius in each simulation frame is calculated as the
-	  average distance of all carbonyl carbons (See
+	  pore spacing constant at 45 \AA~and the initial distance between layers
+	  constant at 3.7 \AA. Equilibrated values of pore radii are presented in
+	  Table~\ref{table:radii}. The pore radius in each simulation frame is calculated
+	  as the average distance of all carbonyl carbons (See
 	  Figure~\ref{fig:pore_radius_illustration}) from their associated pore center.
 	  Statistics for the pore radii reported were generated from the timeseries
-	  representing the average pore radius at each frame.  We detected equilibration 
+	  representing the average pore radius at each frame. We detected equilibration
 	  using \texttt{pymbar.timeseries.detectEquilibration}. We calculated the average
 	  and standard deviation of pore radii using only data points collected after
 	  equilibration was detected.
@@ -384,15 +384,18 @@
 		slightly larger than the equilibrated pore radius of the system simulated with
 		an intial pore radius of 2.5 \AA. After being run through the full dry
 		equilibration procedure, the average pore radius is 0.42 $\pm$ 0.01 \AA, which
-		agrees with the 2.5 \AA~ configuration within error. 
+		agrees with the 2.5 \AA~configuration within error. 
 
 		\item 8 \AA~: The largest pore radius that can achieved before
 		energy minimization becomes problematic is 8 \AA. One should use caution with
 		such a structure because of the relatively large vacuum space that is created
 		in the pore region of the initial configuration. After being run through the
 		full dry equilibration procedure, we see a combination of cylindrical and
-		slit-like pores (Figure~\ref{fig:slits}). We are wary of such a non-symmetric
-		structure and choose not to use a pore radius of 8 \AA for our starting configurations. 
+		slit-like pores (Figure~\ref{fig:slits}). Measuring the pore radius of this
+		system does not have a concrete meaning since slits do not have a single
+		radius, but its calculated value is reported in Table ~\ref{table:radii}. We
+		are wary of such a non-symmetric structure and choose not to use a pore radius
+		of 8 \AA~for our starting configurations. 
 	  
 	  \end{enumerate}
 
@@ -428,7 +431,7 @@
 	  We tested 3 different initial layer spacings, defined as the distance
 	  between the planes of aromatic rings in each layer. Systems built with layers
 	  stacked 3.7 \AA~and 5 \AA~apart are discussed extensively in the main text. We
-	  will focus the discussion here on systems built with layers stacked 10~\AA
+	  will focus the discussion here on systems built with layers stacked 10 \AA~
 	  apart.
 
 	  Figure~\ref{fig:dbwl_10} shows the structure of an assembly built
@@ -651,6 +654,7 @@
         \textbf{Crosslinking Mechanism}
   \endgroup
 
+  \vspace{1em}
   Crosslinking of the the monomer Na-GA3C11 occurs by a UV initiated free
   radical polymerization (Figure~\ref{fig:xlink_mech}).  Head-to-tail addition
   takes place between terminal vinyl groups on each of the monomer tails.  We
