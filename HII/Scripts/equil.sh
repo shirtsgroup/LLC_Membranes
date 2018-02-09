@@ -60,7 +60,7 @@ fi
 
 cp npt.gro 1000000.gro
 cp npt.trr 1000000.trr
-
+exit
 ${python} ${DIR}/input.py --mdp -b ${BUILD_MON} -l 50 --restraints --temp ${T} -f 50 --genvel no  -c ${start_config} # use velocities from previous sim
 
 for f in ${forces}; do
