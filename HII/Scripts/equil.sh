@@ -4,8 +4,8 @@ set -e  # exit immediately after error
 
 BUILD_MON="NAcarb11V"
 start_config="initial.gro"
-x=9.5
-y=9.5
+x=9
+y=9
 z=7.4
 ring_restraints="C C1 C2 C3 C4 C5"
 forces="3162 56 8 3 2 1 0"
@@ -15,8 +15,9 @@ T=300
 equil_length=1000000  # equilibrium simulation length
 solvate=0
 python="python3"
+quit_early=0
 
-while getopts "b:x:y:z:r:m:t:p:f:e:s:S:P:" opt; do
+while getopts "b:x:y:z:r:m:t:p:f:e:s:S:P:q:" opt; do
     case $opt in
     b) BUILD_MON=$OPTARG;;
     x) x=$OPTARG;;
@@ -31,6 +32,7 @@ while getopts "b:x:y:z:r:m:t:p:f:e:s:S:P:" opt; do
     s) solvate=$OPTARG;;
     S) start_config=$OPTARG;;
     P) python=$OPTARG;;
+    q) quit_early=$OPTARG;;
     esac
 done
 
@@ -51,7 +53,7 @@ if [ "${MPI}" == "on" ]; then
     gmx grompp -f npt.mdp -p topol.top -c em.gro -o npt
     mpirun -np ${NP} gmx_mpi mdrun -v -deffnm npt
 else
-    gmx editconf -f ${start_config} -o box.gro -c -bt triclinic -box ${x} ${y} ${z} -angles 90 90 120
+    gmx editconf -f ${start_config} -o box.gro -c -bt triclinic -box ${x} ${y} ${z} -angles 90 90 60
     gmx grompp -f em.mdp -p topol.top -c box.gro -o em
     gmx mdrun -v -deffnm em
     gmx grompp -f npt.mdp -p topol.top -c em.gro -o npt
@@ -60,7 +62,11 @@ fi
 
 cp npt.gro 1000000.gro
 cp npt.trr 1000000.trr
-exit
+
+if [[ ${quit_early} -eq 1 ]]; then
+    exit
+fi
+
 ${python} ${DIR}/input.py --mdp -b ${BUILD_MON} -l 50 --restraints --temp ${T} -f 50 --genvel no  -c ${start_config} # use velocities from previous sim
 
 for f in ${forces}; do
