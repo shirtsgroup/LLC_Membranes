@@ -106,7 +106,6 @@ echo 0 | gmx trjconv -f em.trr -s em.tpr -pbc nojump -o em.gro -b 50
 gmx grompp -f nvt.mdp -p topol.top -c em.gro -o nvt
 ${GMX} mdrun -v -deffnm nvt
 echo 0 | gmx trjconv -f nvt.trr -s nvt.tpr -pbc nojump -o nvt.gro -b 50
-tot=1185
 
 while [[ ${ntot} -lt ${nsol} ]]; do
 

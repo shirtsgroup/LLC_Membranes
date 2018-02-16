@@ -307,7 +307,7 @@ def write_initial_config(positions, identity, name, no_layers, layer_distributio
             if flip == 'yes':
                 positions[:, :] = unflipped
         elif l == 3:  # moves a pore down and to the right
-            b = -1 - math.cos(math.radians(90 - theta))  # changed
+            b = math.cos(math.radians(90 - theta))
             c = -math.sin(math.radians(90 - theta))
             if flip == 'yes':
                 positions[:, :] = flipped
@@ -346,7 +346,7 @@ def write_initial_config(positions, identity, name, no_layers, layer_distributio
             b = - 1
             c = 0
         elif l == 2:  # moves pore up and to the right
-            b = -1 - math.cos(math.radians(90 - theta))  # changed
+            b = math.cos(math.radians(90 - theta))
             c = -math.sin(math.radians(90 - theta))
         elif l == 3:  # moves a pore down and to the right
             b = -math.sin(math.radians(theta))

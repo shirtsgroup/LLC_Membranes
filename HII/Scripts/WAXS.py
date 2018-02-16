@@ -41,35 +41,76 @@ for i in range(23):
 # plt.show()
 
 ####### Isolate to a ring bounded by outer and inner #######
-waxs2 = np.zeros_like(waxs)
+# waxs2 = np.zeros_like(waxs)
+#
+# outer = 235
+# inner = 180
+#
+# nbins = 45
+# bins = np.linspace(-90, 90, nbins)
+#
+# angles = []
+# intensity = 0
+# count = 0
+# center = waxs2.shape[0] / 2
+# for i in range(waxs.shape[0]):
+#     for j in range(waxs.shape[1]):
+#         if inner < np.linalg.norm([abs(i - center), abs(j - center)]) < outer:
+#             intensity += waxs[i, j]
+#             waxs2[i, j] = waxs[i, j]
+#             count += 1
+#             # if (j - center) == 0:
+#             #     waxs2[i, j] = waxs[i, j]
+#             #     # angles.append((180/np.pi)*np.arctan((i - center)/(j - center)))
+#             #     # angles.append(90)
+#             #     # intensity.append(waxs[i, j])
+#             # elif -60 < (180/np.pi)*np.arctan((i - center)/(j - center)) < 60:
+#             #     waxs2[i, j] = waxs[i, j]
+#             #     angles.append((180/np.pi)*np.arctan((i - center)/(j - center)))
+#             #     intensity.append(waxs[i, j])
 
-outer = 235
-inner = 180
+#
 
+X = np.linspace(-qmax, qmax, waxs.shape[0])
+Y = np.linspace(-qmax, qmax, waxs.shape[1])
+
+inner = 1.1
+outer = 1.6
+
+angle = 120
 nbins = 45
 bins = np.linspace(-90, 90, nbins)
 
+bw = 180 / (nbins - 1)
+
 angles = []
-intensity = 0
-count = 0
-center = waxs2.shape[0] / 2
+intensity = []
 for i in range(waxs.shape[0]):
     for j in range(waxs.shape[1]):
-        if inner < np.linalg.norm([abs(i - center), abs(j - center)]) < outer:
-            intensity += waxs[i, j]
-            waxs2[i, j] = waxs[i, j]
-            count += 1
-            # if (j - center) == 0:
-            #     waxs2[i, j] = waxs[i, j]
-            #     # angles.append((180/np.pi)*np.arctan((i - center)/(j - center)))
-            #     # angles.append(90)
-            #     # intensity.append(waxs[i, j])
-            # elif -60 < (180/np.pi)*np.arctan((i - center)/(j - center)) < 60:
-            #     waxs2[i, j] = waxs[i, j]
-            #     angles.append((180/np.pi)*np.arctan((i - center)/(j - center)))
-            #     intensity.append(waxs[i, j])
+        if inner < np.linalg.norm([X[i], Y[j]]) < outer:
+            angles.append((180/np.pi)*np.arctan(Y[j]/X[i]))
+            intensity.append(waxs[i, j])
 
-print('Average intensity in alkane region: %s' % (intensity/count))
+inds = np.digitize(angles, bins)
+
+I = np.zeros([nbins])
+counts = np.zeros([nbins])
+for i in range(len(inds)):
+    I[inds[i] - 1] += intensity[i]
+    counts[inds[i] - 1] += 1
+
+#Get average intensity in ring excluding 60 degree slice around top and bottom #######
+
+bin_range = 180 / nbins  # degrees which a single bin covers
+
+start = int((angle/2) / bin_range)  # start at the bin which covers -60 degrees and above
+end = nbins - start  # because of symmetry
+
+total_intensity = np.sum(I[start:end])
+
+avg_intensity = total_intensity / np.sum(counts[start:end])
+
+print('New Average Intensity in alkane chain region : %s' % avg_intensity)
 
 # print(np.min(angles))
 # inds = np.digitize(angles, bins)
@@ -85,9 +126,89 @@ print('Average intensity in alkane region: %s' % (intensity/count))
 
 #waxs /= np.amax(waxs)  # normalize with respect to highest intensity in pi-stacking reflection
 # waxs /= (intensity/count)
+
 fig = plt.figure()
 ax = fig.add_subplot(111)
+X = np.linspace(-qmax, qmax, waxs.shape[0])
+Y = np.linspace(-qmax, qmax, waxs.shape[1])
+
+factor = 3.0
+cbar = 'seismic'
+levels = np.linspace(0, factor, 200)
+waxs /= avg_intensity
+
+background = 0.5
+
+# restricted = np.zeros_like(waxs)
+# for i in range(waxs.shape[0]):
+#     for j in range(waxs.shape[1]):
+#         if 1.9 < X[i] < 2 and -0.4 < Y[j] < 0.4:
+#             # angle = (180/np.pi)*np.arctan(Y[j]/X[i])
+#             # if -30 < angle < 30:
+#             restricted[i, j] = waxs[i, j]
+#
+# print(np.mean(restricted))
+
+binarea = (X[1] - X[0]) * (Y[1] - Y[0])
+# print('Bin area: %s' % binarea)
+# print(np.amax(restricted))
+# print(np.count_nonzero(restricted))
+# print(np.sum(restricted))
+# plt.imshow(restricted)
+# plt.show()
+# exit()
+
+####################### Move pi-stacking reflections downward ##########################
+## Top reflection ##
+# qz_lower = 1.5
+# qz_upper = 1.85
+# qr_lower = -0.75
+# qr_upper = 0.75
+#
+# X_step = X[1] - X[0]
+# Y_step = Y[1] - Y[0]
+# qz_lower_ndx = len(X) // 2 + int(qz_lower / X_step)
+# qz_upper_ndx = len(X) // 2 + int(qz_upper / X_step)
+# qr_lower_ndx = len(Y) // 2 - int(qr_upper / Y_step)
+# qr_upper_ndx = len(Y) // 2 + int(qr_upper / Y_step)
+#
+# diff = waxs[qz_lower_ndx:qz_upper_ndx, qr_lower_ndx:qr_upper_ndx] - background
+# waxs[qz_lower_ndx:qz_upper_ndx, qr_lower_ndx:qr_upper_ndx] = background
+#
+# shift = 0.4
+# qz_upper -= shift
+# qz_lower -= shift
+# qz_lower_ndx = len(X) // 2 + int(qz_lower / X_step)
+# qz_upper_ndx = len(X) // 2 + int(qz_upper / X_step)
+#
+# waxs[qz_lower_ndx:qz_upper_ndx, qr_lower_ndx:qr_upper_ndx] += diff
+# ## Bottom section ##
+# qz_lower = -1.85
+# qz_upper = -1.5
+#
+# X_step = X[1] - X[0]
+# Y_step = Y[1] - Y[0]
+# qz_lower_ndx = len(X) // 2 + int(qz_lower / X_step)
+# qz_upper_ndx = len(X) // 2 + int(qz_upper / X_step)
+#
+# diff = waxs[qz_lower_ndx:qz_upper_ndx, qr_lower_ndx:qr_upper_ndx] - background
+# waxs[qz_lower_ndx:qz_upper_ndx, qr_lower_ndx:qr_upper_ndx] = background
+#
+# shift = 0.4
+# qz_upper += shift
+# qz_lower += shift
+# qz_lower_ndx = len(X) // 2 + int(qz_lower / X_step)
+# qz_upper_ndx = len(X) // 2 + int(qz_upper / X_step)
+#
+# waxs[qz_lower_ndx:qz_upper_ndx, qr_lower_ndx:qr_upper_ndx] += diff
+
+heatmap = plt.contourf(X, Y, waxs, cmap=cbar, levels=levels, extend='max')
+cbar = plt.colorbar(format='%.2f')
+plt.savefig('waxs_%s_%.1f.png' % (cbar, factor))
+plt.show()
+exit()
 heatmap = plt.imshow(waxs, cmap='jet', vmax=2.5*(intensity/count), extent=[-qmax, qmax, -qmax, qmax])
+
 # plt.plot(np.zeros([100]), np.linspace(-qmax, qmax, 100), '--', color='black')
 
 # plt.gcf().get_axes()[0].tick_params(labelsize=14)
