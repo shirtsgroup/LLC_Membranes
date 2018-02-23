@@ -109,6 +109,8 @@ end = nbins - start  # because of symmetry
 total_intensity = np.sum(I[start:end])
 
 avg_intensity = total_intensity / np.sum(counts[start:end])
+# avg_intensity = waxs[-1, -1]
+# print(avg_intensity)
 
 print('New Average Intensity in alkane chain region : %s' % avg_intensity)
 
@@ -132,7 +134,7 @@ ax = fig.add_subplot(111)
 X = np.linspace(-qmax, qmax, waxs.shape[0])
 Y = np.linspace(-qmax, qmax, waxs.shape[1])
 
-factor = 3.0
+factor = 3.1
 cbar = 'seismic'
 levels = np.linspace(0, factor, 200)
 waxs /= avg_intensity
@@ -203,8 +205,13 @@ binarea = (X[1] - X[0]) * (Y[1] - Y[0])
 # waxs[qz_lower_ndx:qz_upper_ndx, qr_lower_ndx:qr_upper_ndx] += diff
 
 heatmap = plt.contourf(X, Y, waxs, cmap=cbar, levels=levels, extend='max')
-cbar = plt.colorbar(format='%.2f')
-plt.savefig('waxs_%s_%.1f.png' % (cbar, factor))
+# cbar = plt.colorbar(format='%.2f')
+plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=14)
+plt.ylabel('$q_z\ (\AA^{-1}$)', fontsize=14)
+plt.gcf().get_axes()[0].tick_params(labelsize=14)
+plt.tight_layout()
+plt.gcf().get_axes()[0].set_aspect('equal')
+plt.savefig('WAXS_raw.png')
 plt.show()
 exit()
 heatmap = plt.imshow(waxs, cmap='jet', vmax=2.5*(intensity/count), extent=[-qmax, qmax, -qmax, qmax])

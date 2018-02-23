@@ -42,7 +42,7 @@
 	the .pdb structure file as input, we ran
 	\texttt{antechamber}~\cite{wang_automatic_2006} using the AM1-BCC charge model.
 	The net charge on the monomer is input as -1 since the sodium ion is kept as 
-	a separate residue. We use \texttt{LEaP}~\cite{case_ambertools_nodate} and the
+	a separate residue. We use \texttt{LEaP}~\cite{case_ambertools16_2016} and the
 	output of \texttt{antechamber} to create Amber topology files. A detailed
 	tutorial can be accessed elsewhere \cite{walker_antechamber_nodate}.
 	\item \textit{Create GROMACS topologies from Amber output} : The output
@@ -142,7 +142,7 @@
   spacing and its uncertainty according to the following procedure:
    \begin{enumerate}
 	\item We calculated the time when each of the pore-to-pore distances
-	were equilibrated using \texttt{pymbar.timeseries.detectEquilibration()} \\
+	were equilibrated using \\ \texttt{pymbar.timeseries.detectEquilibration()}
 	\cite{chodera_simple_2016,shirts_statistically_2008}. We began calculations
 	after the largest of the five values.
 	\item We calculated how long it takes for the data in each of the 5
@@ -169,7 +169,7 @@
 	\centering
 	\includegraphics[width=0.25\textwidth]{p2p_diagram.png}
 	\caption{There are five pore-to-pore distances that are equal in a perfect
-		hexagonal. If each number in the diagram represents the center of a
+		hexagon. If each number in the diagram represents the center of a
 		pore in a hexagonal unit cell, then the distance from 1 to 2, 2 to 4, 
 		4 to 3, 3 to 1 and 1 to 4 should be equal. Only 4 of the distances
 		are independent. For example, the distance from 1 to 4 is defined by
@@ -180,7 +180,7 @@
   \vspace{1em}
   \begingroup
 	\fontsize{14pt}{12pt}\selectfont
-	\textbf{\noindent Experimental correlation length of R-$\pi$}
+	\noindent \textbf{Experimental correlation length of R-$\pi$}
   \endgroup
   
   \vspace{1em}
@@ -193,7 +193,7 @@
   R-alkanes (Figure~\ref{fig:correlation_length_exp}). The full width at half
   maximum (FWHM) is related to the correlation length, L, by the relationship: $
   L = \frac{1}{FWHM} $. The error in the value is calculated as the square root
-  of the diagonal entry of the covariance matrix calculated 
+  of the diagonal entry of the covariance matrix of optimized fit paramaters. 
   % need citations and more on lorentzian parameters
   \begin{figure}[h]
   \centering
@@ -244,7 +244,7 @@
 	  hexagonal symmetry. If initial pore spacing is too small, we observe repulsion
 	  between columns which disrupts equilibration. If the pore spacing is too large
 	  the pores squeeze together, but in a distorted hexagonal array because the xy
-	  translation of the pores is somewhat erratic. 
+	  initial translation of the pores is somewhat erratic. 
 
 %	  If the initial pore spacing is chosen to be
 %	  too small, pore columns abruptly repel each other as soon as they are able to
@@ -426,7 +426,7 @@
 		  cyan.}~\label{fig:slits}
 	  \end{figure}
 
-	  \item Initial distance between layers
+	  \item \underline{Initial distance between layers}
 
 	  We tested 3 different initial layer spacings, defined as the distance
 	  between the planes of aromatic rings in each layer. Systems built with layers
@@ -566,6 +566,13 @@
 %	\end{subfigure}
 %  \end{figure}
 
+  \begin{figure}
+	\centering
+	\includegraphics[width=0.75\linewidth]{nematic_director.png}
+	\caption{We define the nematic director vector, $\mathbf{n}$, as the vector
+	perpendicular to the plane of the aromatic head group.}~\label{fig:director}
+  \end{figure}
+
   \begin{figure}[ht]
 
   \begin{subfigure}{\linewidth}
@@ -592,7 +599,9 @@
         \end{subfigure}
 
   \end{subfigure}
-  \caption{}~\label{fig:nematic_distribution}
+  \caption{The distribution of angles between nematic director vector (See
+	  Figure~\ref{fig:director}) and the z-axis averaged over the equilibrated portion
+	  of each trajectory}~\label{fig:nematic_distribution}
   \end{figure}
 
   \begin{figure}[!ht]
@@ -630,6 +639,21 @@
 %        in (c)) and its neareset neighbors (e.g. green in (c)) with respect to the xy
 %        plane has distinct spikes near 30\degree, which is consistent with the location
 %        of R-spots}\label{fig:tail_packing}
+  \end{figure}
+
+  \begin{figure}
+	\centering
+	\includegraphics[width=0.75\linewidth]{radial_distribution_annulus.png}
+	\caption{Looking down onto the plane of membrane, this diagram
+		illustrates how we calculated radial distribution
+		functions. We binned the radial distance of all atoms in 
+                chosen groups from pore centers. The pore centers are 
+                defined as the average coordinates of sodium ions in each
+                pore. The bins are defined by the annulus bounded by concentric
+		circles centered at the pore centers, as shown. To normalize, we
+		divide the count of atoms within the bin annulus by the volume of
+                the annulus where the volume is the area of the annulus times the
+                height of the membrane in the z-direction.}~\label{fig:rdf_diagram}
   \end{figure}
 
   \begin{figure}
@@ -671,5 +695,5 @@
   \end{figure}
 
 \clearpage
-\bibliography{llc.bib}
+\bibliography{llc}
 \end{document}

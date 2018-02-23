@@ -16,16 +16,17 @@ width = 0.2
 
 fig, ax = plt.subplots(figsize=(10,5))
 
-plt.bar(pos, df['layered'], width, label=df['nmon'][0], yerr=df['layered_err'])
-plt.bar([p + width for p in pos], df['offset'], width, label=df['nmon'][1], yerr=df['offset_err'])
+plt.bar(pos, df['layered'], width, label='Sandwiched', yerr=df['layered_err'])
+plt.bar([p + width for p in pos], df['offset'], width, label='Parallel Displaced', yerr=df['offset_err'])
 
 ax.set_xticks([p + .5*width for p in pos])
 ax.set_xticklabels(df['nmon'], fontsize=14)
 ax.set_ylabel('Pore-to-Pore Distance (nm)', fontsize=14)
 ax.set_xlabel('Number of monomers per layer', fontsize=14)
-plt.legend(['Sandwiched', 'Parallel Displaced'],fontsize=14)
 plt.tick_params(axis='both', labelsize=14)
-ax.plot([-0.20, 2.4], [4.12, 4.12], "k--")
+ax.plot([-0.20, 2.4], [4.12, 4.12], "k--", label='Experiment')
+#plt.legend(['Sandwiched', 'Parallel Displaced', 'Experiment'],fontsize=14)
+plt.legend(fontsize=14)
 plt.ylim(3.5, 5.5)
 plt.xlim(-0.2, 2.4)
 plt.tight_layout()
