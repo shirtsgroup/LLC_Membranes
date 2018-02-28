@@ -702,7 +702,7 @@ sufficient
   trajectory then reassigned charges using \texttt{molcharge}. Using the new
   charges, we annealed the monomer system again and pulled a random monomer
   configuration from the trajectory which we used for full system
-  construction (Figure~\ref{fig:python}a). See supplemental information for
+  construction (Figure~\ref{fig:python}a). See Supporting Information for
   further detail.
 
   \subsection{Unit Cell Preparation}
@@ -719,6 +719,7 @@ sufficient
   structure close to one of a number of hypothesized equilibrium configurations
   (Figure~\ref{fig:python}).
   %MRS6: question; we would like to make these releasable in GitHub.
+  %BJC2: yes .. what is the question?
   \begin{figure}
 	\centering
 	\includegraphics[width=0.75\linewidth]{build.PNG} %BJC: put an xyz axis with the unit cell
@@ -759,7 +760,8 @@ sufficient
   of 4.12 nm.  A sensitivity analysis of both parameters is presented in
   the 
   %MRS6: check for J phys chem B to see if its supporting or supplemental information or material.
-  supplemental information.  The distance between layers, the rotation of the
+  %BJC2: good point. It is 'supporting information'
+  Supporting information.  The distance between layers, the rotation of the
   layers with respect to adjacent layers, and the number of monomers per layer do
   influence the equilibrium structure and require further justification for their
   choices. We rely on experimental data to inform them. 
@@ -772,7 +774,7 @@ sufficient
   the z-direction. We explore a second system with an initial layer spacing of 5
   \AA. We briefly explored a third system with an initial layer spacing of 10
   \AA, however it shows non-physical behavior which is detailed in the 
-  Supplemental Information. 
+  Supporting Information. 
 
 % This is true if initial equilibration is performed with pressure control
 %  If we initially space layers too far apart, they will collapse on each
@@ -794,7 +796,7 @@ sufficient
   our sandwiched initial configuration stack directly on top of each other while
   headgroups in the parallel displaced initial configuration stack with an offset
   of $180^\circ/nmon$ where $nmon$ is the number of monomers per layer. See
-  the Supplemental Information for a detailed illustration of the initial
+  the Supporting Information for a detailed illustration of the initial
   configurations in each mode.
 
   The number of monomers in each layer is unknown, as stated in question
@@ -822,6 +824,7 @@ sufficient
 
   %MRS6: some parameters missing here (time run between insertions, etc). 
   %I assume they are in supporting information?
+  %BJC2: Not there yet but will add
   In order to create a ``wet'' system, we solvated an initial configuration with
   water using \texttt{gmx solvate}. We remove all water molecules placed outside
   the pore region. Then we randomly remove water molecules inside the pore region
@@ -876,7 +879,7 @@ sufficient
   To calculate the equilibrated pore spacing, we measured the distance between
   pore centers. We located the pore centers by averaging the coordinates of sodium
   ions in their respective pores. We generated pore spacing statistics 
-  using the bootstrapping technique (See Supplemental Information).
+  using the bootstrapping technique (See Supporting Information).
 
   \subsubsection{\textit{The nematic order parameter}}
 
@@ -898,7 +901,7 @@ sufficient
   Eq.~\ref{eqn:nematic_order_parameter} to accomplish this by defining
   $\mathbf{n}$ as the z-axis (or pore axis), and then measuring the angles,
   $\theta$, between $\mathbf{n}$ and the vectors perpendicular to the plane of
-  the aromatic head groups. See the supplemental information for a diagram.  
+  the aromatic head groups. See the Supporting Information for a diagram.  
   
   \subsubsection{\textit{Pair distribution functions}}
 
@@ -941,7 +944,7 @@ sufficient
   average number density of sodium ions, aromatic rings and carbon atoms making
   up the monomer tails. We binned the radial distance of all atoms in each group
   from the pore centers, then normalized by the volume of the annulus defined by
-  the bin edges and the z box vector (See supplemental information for a 
+  the bin edges and the z box vector (See Supporting Information for a 
   diagram). 
 
   \subsubsection{\textit{Simulated structure factor calculations}}
@@ -1018,6 +1021,7 @@ sufficient
   according to the dry equilibration procedure. All systems are stable after 400
   ns of simulation. 
   %MRS6: Above, probably need to be a bit more clear what you mean by stable (no noticable drift in pore-to-pore), and if you are only using data after the point of stability.
+  %BJC2: I believe this is included in methods. I can restate if that's not clear
 In a sense, all systems are at least metastable, addressing
   question (\ref{point:metastable}), however not all will make physical sense or fit
   the experimental profile that we are trying to match. Figure~\ref{fig:p2p}
@@ -1096,6 +1100,7 @@ The remainder of this discussion will focus on the
   \end{subfigure}
 %MRS6: question: the SAXS region looks different between sandwiched and parallel displaced. Any thoughts why? We can discuss in person.  And seems like have to comment on the difference in intensity between Sandwich and parallel displaced in the pi-pi region.
 %MRS6: I wonder to what extent showing the reflections of tails removed would make it clearer pi-pi is really there.  Maybe in supporting info?
+%BJC2: Sure, I'll add that to supporting info
   \caption{The simulated XRD pattern generated from the equilibrated trajectory
 	  of the parallel displaced configuration (a) exhibits all major reflections
 	  present in the experimental WAXS pattern (b). The simulated XRD pattern
@@ -1141,14 +1146,16 @@ The remainder of this discussion will focus on the
   pattern is 3.1, while the maximum intensity within R-$\pi$ of the normalized
   parallel displaced simulated pattern is 32.9. 
   %MRS2 10x is really big.  That seems hard to actually manage . . . I didn't realize it was that big. For some reason, I thought it was around 3x.  If it's that big, how come the 7.4 A reflection isn't big?  It's not clear to me how this is possible. Not clear how the angle averaging obscured this before?
+  %BJC2 From plots of raw structure factor, it doesn't seem like a normalization issue. It was probably obscured in the orginal angle averaging because it 
+  % was averaged with neighboring bins
   While direct numerical
   comparisons between simulation and experiment aren't necessarily precise due to
   underlying assumptions, an order of magnitude difference suggests some
   significance. We believe that we see such a high maximum for two reasons: (1)
   We are simulating a perfectly aligned system so all X-rays reflected along the
   pore axis would add constructively. The crystalline domains in the real system
-  are not perfectly aligned (See azimuthal distribution in supplemental
-  information) which would lead to an overall decrease in the intensity of
+  are not perfectly aligned (See azimuthal distribution in Supporting
+  Information) which would lead to an overall decrease in the intensity of
   R-$\pi$. (2) Our system is more ordered with high correlation between layers.
   We will come back to this point further in ensuing discussions.
 
@@ -1186,6 +1193,7 @@ If our system met the definition of a
 	  membrane plane. The average tilt angle is near 7\degree~which is far from the
 	  37\degree~tilt angle previously used to explain R-spots.}~\label{fig:tilt}
   %MRS6: might want to add some discussion about how the angles are also very spread out, so there should be little signal due to tilt anywhere.
+  %BJC2: good idea
   \end{figure}
 
   The peaks in the nearest neighbor angle distribution are consistent with the
@@ -1293,7 +1301,7 @@ If our system met the definition of a
   \subsubsection{Layer partitioning}
 
 %MRS6: should probably be present tense.  Maybe phrase ``in our simulations, layers are'' 
-  We learned that layers are well-defined and persistent, answering question
+  In our simulations, layers are well-defined and persistent, answering question
   (\ref{point:layers}). We established our conclusion by plotting the two
   dimensional pair distribution function, $g(y,z)$ of head group phenyl rings
   using Equation~\ref{eqn:correlation} (Figure \ref{fig:yz_correlation}). In both
@@ -1359,7 +1367,7 @@ If our system met the definition of a
 		the average number density. The sandwiched configuration possesses a higher
 		degree of layering than the parallel displaced configuration and, in both
 		cases, the head group region has a higher degree of layer partitioning than the
-		tail region. (See supplemental information for detailed definitions of the head
+		tail region. (See Supporting information for detailed definitions of the head
 		group and tail regions)}\label{fig:zdf}
   \end{figure}
 
@@ -1452,19 +1460,20 @@ If our system met the definition of a
   ordered pore basin. Layers in the ordered pore basin are strongly correlated
   with neighboring layers up to more than 10 layers away. This behavior deviates
   from experimental evidence. The experimental correlation length (See
-  supplemental information for details its derivation) suggests that layers are
+  Suppporting Information for details its derivation) suggests that layers are
   correlated with about 3 neighboring layers which is closer to the values
   exhibited by the disordered pore basin. We may need to simulate a system with
   many more layers in order to reduce the correlation contributed by periodic
   copies of the system. 
 
 %MRS6: not sure if we WANT to do this, but could do a simulation with 2x as many layers and see if the correlation changes.
+%BJC2: have one that is 3x going right now
 
   We calculated the nematic order parameter for each system using Equation
   \ref{eqn:nematic_order_parameter}. The calculated values of S are presented in
   Table \ref{table:nematic}. The full distributions of angles between director
   \textbf{n} and vectors orthogonal to monomer phenyl rings are presented in the
-  supplemental material. In general, ordered pore basin systems are more
+  Supporting Information. In general, ordered pore basin systems are more
   nematically ordered than disordered pore basin systems and sandwiched
   configuration systems are more nematically ordered than parallel displaced
   configuration systems. The head groups of the disordered pore basin have more
@@ -1603,7 +1612,7 @@ If our system met the definition of a
   number densities of heavy atoms in the head group, carbon atoms in the tail
   region and all sodium ions (Figure~\ref{fig:densities}). For the head group
   region, we used the carbon atoms making up the aromatic ring. For the tail
-  region we used only carbon atoms of the monomer tails (See Supplemental
+  region we used only carbon atoms of the monomer tails (See Supporting
   Information for diagram). We average the histograms over at least 50 ns of
   equilibrated trajectory.
   
