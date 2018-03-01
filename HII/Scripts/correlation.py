@@ -157,12 +157,11 @@ if __name__ == "__main__":
 
     ###################### 3D center of mass #########################
 
-    #keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep
-    keep = [a.index for a in t.topology.atoms if a.residue.name == 'HOH' and a.name == 'O']  # indices of atoms to keep
+    keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep
+    #keep = [a.index for a in t.topology.atoms if a.residue.name == 'HOH' and a.name == 'O']  # indices of atoms to keep
 
     natoms = len(args.atoms)
     monomers_per_layer = int(len(keep) / args.layers / npores / len(args.atoms))  # divide by len(args.atoms) because of com
-
     center_of_mass = com(t.xyz[:, keep, :], mass)  # calculate centers of mass of atom groups
 
     com_per_pore = int(center_of_mass.shape[1] / npores)
@@ -185,7 +184,6 @@ if __name__ == "__main__":
         frames = t.n_frames
 
         if args.slice == 'xy' or args.slice == 'yx':
-
             for frame in tqdm.tqdm(range(frames)):
                 for p in range(npores):
                     for l in range(args.layers):
@@ -199,12 +197,10 @@ if __name__ == "__main__":
                             H, edges = np.histogramdd(trans, bins=bins, range=hist_range)
                             correlation += H
         else:
-
             for frame in tqdm.tqdm(range(frames)):
                 for p in range(npores):
                     for l in range(args.layers):
                         for a in range(monomers_per_layer):
-
                             pt = p*com_per_pore + l*monomers_per_layer + a  # index of center of mass reference point
                             translated = periodic_pts[frame, :, :] - periodic_pts[frame, pt, :]  # make pt the origin
                             H, edges = np.histogramdd(translated, bins=bins, range=hist_range)

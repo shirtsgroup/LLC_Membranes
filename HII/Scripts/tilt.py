@@ -35,6 +35,8 @@ def initialize():
     parser.add_argument('--single_frame', help='Specify this for a single frame', action="store_true")
     parser.add_argument('--noshow', help='Specify this flag if you do not want to see the output plot', action="store_true")
     parser.add_argument('--plot_every', default=1, type=int, help='Plot every n frames')
+    parser.add_argument('-b', '--begin', default=0, type=int, help='Start frame')
+    parser.add_argument('--skip', default=1, type=int, help='Only look at every nth frame')
 
     args = parser.parse_args()
 
@@ -113,7 +115,7 @@ if __name__ == "__main__":
         if args.single_frame:
             traj = md.load('%s' % args.gro)
         else:
-            traj = md.load('%s' % args.traj, top='%s' % args.gro)
+            traj = md.load('%s' % args.traj, top='%s' % args.gro)[args.begin::args.skip]
         times = traj.time
         nT = times.shape[0]
         for i in range(ngrps):
@@ -151,10 +153,10 @@ if __name__ == "__main__":
         plt.ylabel('Probability', fontsize=14)
         plt.tight_layout()
         plt.savefig('tilt_dist.png')
-        plt.show()
-        exit()
-        print(all_tilt_angles.shape)
-        exit()
+        # plt.show()
+        # exit()
+        # print(all_tilt_angles.shape)
+        # exit()
         avgs = np.zeros([nT])
         stds = np.zeros([nT])
 
