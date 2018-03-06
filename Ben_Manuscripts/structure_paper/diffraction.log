@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.9.22)  1 MAR 2018 16:00
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.9.22)  5 MAR 2018 16:22
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -784,6 +784,9 @@ Package pdftex.def Info: ./figures/WAXS_raw.png  used on input line 60. on inpu
 t line 60.
 Package pdftex.def Info: Requested size: 155.02pt x 153.05045pt on input line 6
 0.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
 <./figures/layered_rzplot.png, id=7, 462.528pt x 346.896pt>
 File: ./figures/layered_rzplot.png Graphic file (type png)
 <use ./figures/layered_rzplot.png>
@@ -798,6 +801,9 @@ Package pdftex.def Info: ./figures/offset_rzplot.png  used on input line 74. on
  input line 74.
 Package pdftex.def Info: Requested size: 223.13649pt x 167.35509pt on input lin
 e 74.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
 <./figures/real_delta_1d_highres.png, id=9, 462.528pt x 346.896pt>
 File: ./figures/real_delta_1d_highres.png Graphic file (type png)
 <use ./figures/real_delta_1d_highres.png>
@@ -841,45 +847,56 @@ ine 119. on input line 119.
 Package pdftex.def Info: Requested size: 155.02pt x 116.26512pt on input line 1
 19.
 
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
 LaTeX Warning: Reference `fig:1D_fourier_sigma' on page 1 undefined on input li
 ne 128.
 
-<./figures/real_gauss_1d_highsig.png, id=15, 462.528pt x 346.896pt>
+
+LaTeX Warning: Reference `fig:1D_deltas' on page 1 undefined on input line 129.
+
+
+[1
+
+{/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./figur
+es/sandwichedlayers.png> <./figures/offsetlayers.png>]
+<./figures/real_gauss_1d_highsig.png, id=27, 462.528pt x 346.896pt>
 File: ./figures/real_gauss_1d_highsig.png Graphic file (type png)
 <use ./figures/real_gauss_1d_highsig.png>
 Package pdftex.def Info: ./figures/real_gauss_1d_highsig.png  used on input lin
 e 149. on input line 149.
 Package pdftex.def Info: Requested size: 155.02pt x 116.26512pt on input line 1
 49.
-<./figures/real_gauss_1d_medsig.png, id=16, 462.528pt x 346.896pt>
+<./figures/real_gauss_1d_medsig.png, id=28, 462.528pt x 346.896pt>
 File: ./figures/real_gauss_1d_medsig.png Graphic file (type png)
 <use ./figures/real_gauss_1d_medsig.png>
 Package pdftex.def Info: ./figures/real_gauss_1d_medsig.png  used on input line
  154. on input line 154.
 Package pdftex.def Info: Requested size: 155.02pt x 116.26512pt on input line 1
 54.
-<./figures/real_gauss_1d_lowsig.png, id=17, 462.528pt x 346.896pt>
+<./figures/real_gauss_1d_lowsig.png, id=29, 462.528pt x 346.896pt>
 File: ./figures/real_gauss_1d_lowsig.png Graphic file (type png)
 <use ./figures/real_gauss_1d_lowsig.png>
 Package pdftex.def Info: ./figures/real_gauss_1d_lowsig.png  used on input line
  159. on input line 159.
 Package pdftex.def Info: Requested size: 155.02pt x 116.26512pt on input line 1
 59.
-<./figures/fourier_gauss_1d_highsig.png, id=18, 462.528pt x 346.896pt>
+<./figures/fourier_gauss_1d_highsig.png, id=30, 462.528pt x 346.896pt>
 File: ./figures/fourier_gauss_1d_highsig.png Graphic file (type png)
 <use ./figures/fourier_gauss_1d_highsig.png>
 Package pdftex.def Info: ./figures/fourier_gauss_1d_highsig.png  used on input 
 line 164. on input line 164.
 Package pdftex.def Info: Requested size: 155.02pt x 116.26512pt on input line 1
 64.
-<./figures/fourier_gauss_1d_medsig.png, id=19, 462.528pt x 346.896pt>
+<./figures/fourier_gauss_1d_medsig.png, id=31, 462.528pt x 346.896pt>
 File: ./figures/fourier_gauss_1d_medsig.png Graphic file (type png)
 <use ./figures/fourier_gauss_1d_medsig.png>
 Package pdftex.def Info: ./figures/fourier_gauss_1d_medsig.png  used on input l
 ine 169. on input line 169.
 Package pdftex.def Info: Requested size: 155.02pt x 116.26512pt on input line 1
 69.
-<./figures/fourier_gauss_1d_lowsig.png, id=20, 462.528pt x 346.896pt>
+<./figures/fourier_gauss_1d_lowsig.png, id=32, 462.528pt x 346.896pt>
 File: ./figures/fourier_gauss_1d_lowsig.png Graphic file (type png)
 <use ./figures/fourier_gauss_1d_lowsig.png>
 Package pdftex.def Info: ./figures/fourier_gauss_1d_lowsig.png  used on input l
@@ -887,33 +904,41 @@ ine 174. on input line 174.
 Package pdftex.def Info: Requested size: 155.02pt x 116.26512pt on input line 1
 74.
 
-LaTeX Warning: Reference `1D_deltas' on page 1 undefined on input line 181.
+
+LaTeX Warning: Reference `1D_deltas' on page 2 undefined on input line 181.
 
 
-LaTeX Warning: Reference `1D_deltas' on page 1 undefined on input line 181.
+LaTeX Warning: Reference `1D_deltas' on page 2 undefined on input line 181.
 
-<./figures/real_2d_1column.png, id=21, 462.528pt x 346.896pt>
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: Reference `fig:2d_columns_simple' on page 2 undefined on input l
+ine 186.
+
+<./figures/real_2d_1column.png, id=33, 462.528pt x 346.896pt>
 File: ./figures/real_2d_1column.png Graphic file (type png)
 <use ./figures/real_2d_1column.png>
 Package pdftex.def Info: ./figures/real_2d_1column.png  used on input line 192.
  on input line 192.
 Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
 e 192.
-<./figures/real_2d_2column.png, id=22, 462.528pt x 346.896pt>
+<./figures/real_2d_2column.png, id=34, 462.528pt x 346.896pt>
 File: ./figures/real_2d_2column.png Graphic file (type png)
 <use ./figures/real_2d_2column.png>
 Package pdftex.def Info: ./figures/real_2d_2column.png  used on input line 197.
  on input line 197.
 Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
 e 197.
-<./figures/fourier_2d_1column.png, id=23, 462.528pt x 346.896pt>
+<./figures/fourier_2d_1column.png, id=35, 462.528pt x 346.896pt>
 File: ./figures/fourier_2d_1column.png Graphic file (type png)
 <use ./figures/fourier_2d_1column.png>
 Package pdftex.def Info: ./figures/fourier_2d_1column.png  used on input line 2
 02. on input line 202.
 Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
 e 202.
-<./figures/fourier_2d_2column.png, id=24, 462.528pt x 346.896pt>
+<./figures/fourier_2d_2column.png, id=36, 462.528pt x 346.896pt>
 File: ./figures/fourier_2d_2column.png Graphic file (type png)
 <use ./figures/fourier_2d_2column.png>
 Package pdftex.def Info: ./figures/fourier_2d_2column.png  used on input line 2
@@ -926,45 +951,56 @@ Underfull \hbox (badness 10000) in paragraph at lines 190--214
  []
 
 
-LaTeX Warning: Reference `fig:fourier_2d_74_1column_highxysig' on page 1 undefi
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: Reference `fig:2d_columns_offset' on page 2 undefined on input l
+ine 218.
+
+
+LaTeX Warning: Reference `fig:fourier_2d_74_1column' on page 2 undefined on inp
+ut line 219.
+
+
+LaTeX Warning: Reference `fig:fourier_2d_74_1column_highxysig' on page 2 undefi
 ned on input line 227.
 
-<./figures/real_2d_74_1column.png, id=25, 462.528pt x 346.896pt>
+<./figures/real_2d_74_1column.png, id=37, 462.528pt x 346.896pt>
 File: ./figures/real_2d_74_1column.png Graphic file (type png)
 <use ./figures/real_2d_74_1column.png>
 Package pdftex.def Info: ./figures/real_2d_74_1column.png  used on input line 2
 32. on input line 232.
 Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
 e 232.
-<./figures/fourier_2d_74_1column.png, id=26, 462.528pt x 346.896pt>
+<./figures/fourier_2d_74_1column.png, id=38, 462.528pt x 346.896pt>
 File: ./figures/fourier_2d_74_1column.png Graphic file (type png)
 <use ./figures/fourier_2d_74_1column.png>
 Package pdftex.def Info: ./figures/fourier_2d_74_1column.png  used on input lin
 e 237. on input line 237.
 Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
 e 237.
-<./figures/real_2d_74_1column_highysig.png, id=27, 462.528pt x 346.896pt>
+<./figures/real_2d_74_1column_highysig.png, id=39, 462.528pt x 346.896pt>
 File: ./figures/real_2d_74_1column_highysig.png Graphic file (type png)
 <use ./figures/real_2d_74_1column_highysig.png>
 Package pdftex.def Info: ./figures/real_2d_74_1column_highysig.png  used on inp
 ut line 242. on input line 242.
 Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
 e 242.
-<./figures/fourier_2d_74_1column_highysig.png, id=28, 462.528pt x 346.896pt>
+<./figures/fourier_2d_74_1column_highysig.png, id=40, 462.528pt x 346.896pt>
 File: ./figures/fourier_2d_74_1column_highysig.png Graphic file (type png)
 <use ./figures/fourier_2d_74_1column_highysig.png>
 Package pdftex.def Info: ./figures/fourier_2d_74_1column_highysig.png  used on 
 input line 247. on input line 247.
 Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
 e 247.
-<./figures/real_2d_1column_74_highxysig.png, id=29, 462.528pt x 346.896pt>
+<./figures/real_2d_1column_74_highxysig.png, id=41, 462.528pt x 346.896pt>
 File: ./figures/real_2d_1column_74_highxysig.png Graphic file (type png)
 <use ./figures/real_2d_1column_74_highxysig.png>
 Package pdftex.def Info: ./figures/real_2d_1column_74_highxysig.png  used on in
 put line 252. on input line 252.
 Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
 e 252.
-<./figures/fourier_2d_1column_74_highxysig.png, id=30, 462.528pt x 346.896pt>
+<./figures/fourier_2d_1column_74_highxysig.png, id=42, 462.528pt x 346.896pt>
 File: ./figures/fourier_2d_1column_74_highxysig.png Graphic file (type png)
 <use ./figures/fourier_2d_1column_74_highxysig.png>
 Package pdftex.def Info: ./figures/fourier_2d_1column_74_highxysig.png  used on
@@ -972,33 +1008,156 @@ Package pdftex.def Info: ./figures/fourier_2d_1column_74_highxysig.png  used on
 Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
 e 257.
 
-Underfull \hbox (badness 10000) in paragraph at lines 230--260
+Underfull \hbox (badness 10000) in paragraph at lines 230--264
 []$[]$ $[]$
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 230--260
+Underfull \hbox (badness 10000) in paragraph at lines 230--264
 []$ $[]$
  []
 
-[1
 
-{/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-[2 <./figures/sandwichedlayers.png> <./figures/offsetlayers.png> <./figures/rzp
-lot_layered_300K.png> <./figures/rzplot_offset_300K.png> <./figures/WAXS_raw.pn
-g>] [3 <./figures/layered_rzplot.png> <./figures/offset_rzplot.png> <./figures/
-real_delta_1d_highres.png> <./figures/real_delta_1d_medres.png> <./figures/real
-_delta_1d_lowres.png> <./figures/fourier_delta_1d_highres.png> <./figures/fouri
-er_delta_1d_medres.png> <./figures/fourier_delta_1d_lowres.png>] [4 <./figures/
-real_gauss_1d_highsig.png> <./figures/real_gauss_1d_medsig.png> <./figures/real
-_gauss_1d_lowsig.png> <./figures/fourier_gauss_1d_highsig.png> <./figures/fouri
-er_gauss_1d_medsig.png> <./figures/fourier_gauss_1d_lowsig.png>] [5 <./figures/
-real_2d_1column.png> <./figures/real_2d_2column.png> <./figures/fourier_2d_1col
-umn.png> <./figures/fourier_2d_2column.png>] [6 <./figures/real_2d_74_1column.p
-ng> <./figures/fourier_2d_74_1column.png> <./figures/real_2d_74_1column_highysi
-g.png> <./figures/fourier_2d_74_1column_highysig.png> <./figures/real_2d_1colum
-n_74_highxysig.png> <./figures/fourier_2d_1column_74_highxysig.png>]
-(./diffraction.aux)
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: Reference `fig:fourier_3d_lowdig' on page 2 undefined on input l
+ine 271.
+
+
+LaTeX Warning: Reference `fig:fourier_3d_highzsig' on page 2 undefined on input
+ line 273.
+
+
+LaTeX Warning: Reference `fig:fourier_3d_highysig' on page 2 undefined on input
+ line 275.
+
+[2 <./figures/rzplot_layered_300K.png> <./figures/rzplot_offset_300K.png> <./fi
+gures/WAXS_raw.png> <./figures/layered_rzplot.png> <./figures/offset_rzplot.png
+>]
+<./figures/real_3d_lowsig.png, id=52, 462.528pt x 346.896pt>
+File: ./figures/real_3d_lowsig.png Graphic file (type png)
+<use ./figures/real_3d_lowsig.png>
+Package pdftex.def Info: ./figures/real_3d_lowsig.png  used on input line 281. 
+on input line 281.
+Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
+e 281.
+<./figures/fourier_3d_lowsig.png, id=53, 462.528pt x 346.896pt>
+File: ./figures/fourier_3d_lowsig.png Graphic file (type png)
+<use ./figures/fourier_3d_lowsig.png>
+Package pdftex.def Info: ./figures/fourier_3d_lowsig.png  used on input line 28
+6. on input line 286.
+Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
+e 286.
+<./figures/real_3d_highzsig.png, id=54, 462.528pt x 346.896pt>
+File: ./figures/real_3d_highzsig.png Graphic file (type png)
+<use ./figures/real_3d_highzsig.png>
+Package pdftex.def Info: ./figures/real_3d_highzsig.png  used on input line 291
+. on input line 291.
+Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
+e 291.
+<./figures/fourier_3d_highzsig.png, id=55, 462.528pt x 346.896pt>
+File: ./figures/fourier_3d_highzsig.png Graphic file (type png)
+<use ./figures/fourier_3d_highzsig.png>
+Package pdftex.def Info: ./figures/fourier_3d_highzsig.png  used on input line 
+296. on input line 296.
+Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
+e 296.
+<./figures/real_3d_highysig.png, id=56, 462.528pt x 346.896pt>
+File: ./figures/real_3d_highysig.png Graphic file (type png)
+<use ./figures/real_3d_highysig.png>
+Package pdftex.def Info: ./figures/real_3d_highysig.png  used on input line 301
+. on input line 301.
+Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
+e 301.
+<./figures/fourier_3d_highysig.png, id=57, 462.528pt x 346.896pt>
+File: ./figures/fourier_3d_highysig.png Graphic file (type png)
+<use ./figures/fourier_3d_highysig.png>
+Package pdftex.def Info: ./figures/fourier_3d_highysig.png  used on input line 
+306. on input line 306.
+Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
+e 306.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: Reference `fig:hex_simple' on page 3 undefined on input line 323
+.
+
+
+LaTeX Warning: Reference `fig:fourier_3d_hex_lowsig' on page 3 undefined on inp
+ut line 324.
+
+
+LaTeX Warning: Reference `fig:fourier_3d_highysig' on page 3 undefined on input
+ line 328.
+
+File: ./figures/real_3d_lowsig.png Graphic file (type png)
+<use ./figures/real_3d_lowsig.png>
+Package pdftex.def Info: ./figures/real_3d_lowsig.png  used on input line 337. 
+on input line 337.
+Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
+e 337.
+<./figures/fourier_3d_hex_lowsig.png, id=58, 462.528pt x 346.896pt>
+File: ./figures/fourier_3d_hex_lowsig.png Graphic file (type png)
+<use ./figures/fourier_3d_hex_lowsig.png>
+Package pdftex.def Info: ./figures/fourier_3d_hex_lowsig.png  used on input lin
+e 342. on input line 342.
+Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
+e 342.
+<./figures/real_3d_hex_highsig.png, id=59, 462.528pt x 346.896pt>
+File: ./figures/real_3d_hex_highsig.png Graphic file (type png)
+<use ./figures/real_3d_hex_highsig.png>
+Package pdftex.def Info: ./figures/real_3d_hex_highsig.png  used on input line 
+347. on input line 347.
+Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
+e 347.
+<./figures/fourier_3d_hex_highsig.png, id=60, 462.528pt x 346.896pt>
+File: ./figures/fourier_3d_hex_highsig.png Graphic file (type png)
+<use ./figures/fourier_3d_hex_highsig.png>
+Package pdftex.def Info: ./figures/fourier_3d_hex_highsig.png  used on input li
+ne 352. on input line 352.
+Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
+e 352.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: Reference `fig:angle_averaged' on page 3 undefined on input line
+ 362.
+
+<./figures/fourier_hex_angle_average.png, id=61, 462.528pt x 346.896pt>
+File: ./figures/fourier_hex_angle_average.png Graphic file (type png)
+<use ./figures/fourier_hex_angle_average.png>
+Package pdftex.def Info: ./figures/fourier_hex_angle_average.png  used on input
+ line 368. on input line 368.
+Package pdftex.def Info: Requested size: 211.38832pt x 158.54192pt on input lin
+e 368.
+
+LaTeX Warning: Reference `fig:fourier_3d_hex_highsig' on page 3 undefined on in
+put line 372.
+
+
+LaTeX Warning: Reference `fig:fourier_3d_hex_highsig' on page 3 undefined on in
+put line 372.
+
+[3 <./figures/real_delta_1d_highres.png> <./figures/real_delta_1d_medres.png> <
+./figures/real_delta_1d_lowres.png> <./figures/fourier_delta_1d_highres.png> <.
+/figures/fourier_delta_1d_medres.png> <./figures/fourier_delta_1d_lowres.png>]
+[4 <./figures/real_gauss_1d_highsig.png> <./figures/real_gauss_1d_medsig.png> <
+./figures/real_gauss_1d_lowsig.png> <./figures/fourier_gauss_1d_highsig.png> <.
+/figures/fourier_gauss_1d_medsig.png> <./figures/fourier_gauss_1d_lowsig.png>]
+[5 <./figures/real_2d_1column.png> <./figures/real_2d_2column.png> <./figures/f
+ourier_2d_1column.png> <./figures/fourier_2d_2column.png>] [6 <./figures/real_2
+d_74_1column.png> <./figures/fourier_2d_74_1column.png> <./figures/real_2d_74_1
+column_highysig.png> <./figures/fourier_2d_74_1column_highysig.png> <./figures/
+real_2d_1column_74_highxysig.png> <./figures/fourier_2d_1column_74_highxysig.pn
+g>] [7 <./figures/real_3d_lowsig.png> <./figures/fourier_3d_lowsig.png> <./figu
+res/real_3d_highzsig.png> <./figures/fourier_3d_highzsig.png> <./figures/real_3
+d_highysig.png> <./figures/fourier_3d_highysig.png>] [8 <./figures/fourier_3d_h
+ex_lowsig.png> <./figures/real_3d_hex_highsig.png> <./figures/fourier_3d_hex_hi
+ghsig.png> <./figures/fourier_hex_angle_average.png>] (./diffraction.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -1007,10 +1166,10 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 16683 strings out of 492990
- 344668 string characters out of 6132621
- 384480 words of memory out of 5000000
- 20071 multiletter control sequences out of 15000+600000
+ 16780 strings out of 492990
+ 347682 string characters out of 6132621
+ 383480 words of memory out of 5000000
+ 20158 multiletter control sequences out of 15000+600000
  539174 words of font info for 56 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  42i,7n,77p,10383b,572s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1022,11 +1181,12 @@ r/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/
 local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/lo
 cal/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/loca
 l/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/
-texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb>
-Output written on diffraction.pdf (6 pages, 6566815 bytes).
+texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/tex
+live/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on diffraction.pdf (8 pages, 6962977 bytes).
 PDF statistics:
- 116 PDF objects out of 1000 (max. 8388607)
- 42 compressed objects within 1 object stream
+ 148 PDF objects out of 1000 (max. 8388607)
+ 51 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 146 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 196 words of extra memory for PDF output out of 10000 (max. 10000000)
 

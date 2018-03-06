@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import tqdm
 from scipy import spatial
 import Atom_props
+from pymbar import timeseries
 
 
 def initialize():
@@ -32,6 +33,7 @@ def initialize():
     parser.add_argument('-l', '--layers', default=20, type=int, help='Number of layers')
     parser.add_argument('--load', action="store_true")
     parser.add_argument('--save', action="store_true")
+    parser.add_argument('-boot', '--nboot', default=200, type=int, help='Number of bootstrap trials')
 
     args = parser.parse_args()
 
@@ -114,6 +116,38 @@ def water_content(pos, ref_pos, r):
     return n
 
 
+def bootstrap(data, tau, nboot):
+    """
+    :param data: equilibrated data from a timeseries
+    :param tau: autocorrelation time (number of points in timeseries between uncorrelated samples)
+    :param nboot: number of bootstrap trials
+    :return: average and standard deviation
+    """
+
+    tau = int(tau)
+    nsub = data.shape[0] // tau  # number of uncorrelated subtrajectories to break data into
+    print(nsub)
+
+    # divide data into independent subtrajectories
+    subtrajectories = np.zeros([nsub, tau])
+    for i in range(nsub):
+        if i == 0:
+            subtrajectories[i, :] = data[-tau:]
+        else:
+            subtrajectories[i, :] = data[-(i+1)*tau:-i*tau]
+
+    choices = np.linspace(0, tau - 1, tau, dtype=int)  # indices of each subtrajectory
+    boot = np.zeros([nboot])
+    for b in range(nboot):
+        trial = np.zeros([nsub])  # the statistic will be the average of each independent subtrajectory
+        for s in range(nsub):
+            ndx = np.random.choice(choices, size=tau, replace=True)
+            trial[s] = np.mean(subtrajectories[s, choices])
+        boot[b] = np.mean(trial)
+
+    return np.mean(boot), np.std(boot)
+
+
 if __name__ == "__main__":
 
     args = initialize()
@@ -168,6 +202,24 @@ if __name__ == "__main__":
         wt_tails[f] = n_water_tail*mwater / mass
         combined[f] = wt_pores[f] + wt_tails[f]
         wt_tot[f] = len(water)*mwater / mass
+
+    # generate statistics via bootstrapping
+    pore_equil = timeseries.detectEquilibration(wt_pores)[0]
+    pore_autocorrelation = timeseries.integratedAutocorrelationTime(wt_pores)
+    tails_equil = timeseries.detectEquilibration(wt_tails)[0]
+    tails_autocorrelation = timeseries.integratedAutocorrelationTime(wt_tails)
+
+    if (wt_pores.shape[0] - pore_equil) / pore_autocorrelation < 5:
+        pore_autocorrelation = (wt_pores.shape[0] - pore_equil) // 5
+
+    if (wt_pores.shape[0] - pore_equil) / tails_autocorrelation < 5:
+        tails_autocorrelation = (wt_pores.shape[0] - pore_equil) // 5
+
+    mean_pores, std_pores = bootstrap(wt_pores[pore_equil:], pore_autocorrelation, args.nboot)
+    mean_tails, std_tails = bootstrap(wt_tails[tails_equil:], tails_autocorrelation, args.nboot)
+
+    print('Pore water content: %2.2f +/- %2.2f' % (100*mean_pores, 100*std_pores))
+    print('Tail water content: %2.2f +/- %2.2f' % (100*mean_tails, 100*std_tails))
 
     plt.plot(t.time, 100*wt_pores, label='Pores')
     plt.plot(t.time, 100*wt_tails, label='Tails')

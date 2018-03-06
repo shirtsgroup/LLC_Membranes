@@ -26,11 +26,11 @@ equilibrated systems started in each configuration at 300 K are shown in Figure
 ~\ref{fig:xrd}. We observe stronger features in the alkane chain region when
 the temperature is lowered to 280K (Figure~\ref{fig:xrd_280}). At both
 temperatures we are missing what appears to be a subharmonic located at
-($q_r=0$,$q_z=0.85$) in the experimental pattern. We would like to know 
+($q_r=0$, $q_z=0.85$) in the experimental pattern. We would like to know 
 why it doesn't appear -- whether it has something to do with our system
 or the math behind the simulated structure factor itself. 
 
-\begin{figure}
+\begin{figure}[h]
         \begin{subfigure}{0.475\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{sandwichedlayers.png}
@@ -44,7 +44,7 @@ or the math behind the simulated structure factor itself.
 	\caption{}\label{fig:initial_configs}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h]
         \begin{subfigure}{0.33\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{rzplot_layered_300K.png}
@@ -63,7 +63,7 @@ or the math behind the simulated structure factor itself.
 	\caption{}\label{fig:xrd}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h]
         \begin{subfigure}{0.475\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{layered_rzplot.png}
@@ -78,7 +78,7 @@ or the math behind the simulated structure factor itself.
 \end{figure}
 
 The hypothesis is that the subharmonic appears due to the reflection located at
-($q_r=0,q_z$=1.7) in the experimental pattern. This reflection likely appears
+($q_r=0, q_z$=1.7) in the experimental pattern. This reflection likely appears
 because aromatic rings of monomer head groups pi-stack on top of each other
 3.7~\AA apart. The subharmonic does not appear in our simulated patterns and
 we need a good explanation for why that is the case. I explored fourier
@@ -88,7 +88,7 @@ I first looked at the 1D case. I spaced delta functions 3.7 units (I'll call
 the units angstroms for simplicity) apart. I adjusted the real space resolution
 by increasing the number of points between delta functions. 
 
-\begin{figure}
+\begin{figure}[h]
         \begin{subfigure}{0.33\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{real_delta_1d_highres.png}
@@ -143,7 +143,7 @@ subharmonics are always weaker in intensity than the fundamental frequency.
 So the question remains, why is the $\pi$-stacking reflection stronger than
 the 7.4 \AA reflection? 
 
-\begin{figure}
+\begin{figure}[h]
         \begin{subfigure}{0.33\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{real_gauss_1d_highsig.png}
@@ -186,7 +186,7 @@ the LLC system. I created parallel columns of points spaced 3.7\AA~apart. Each
 point is represented as a 2-dimensional gaussian function. In Figure~\ref{fig:2d_columns_simple}
 I show examples of simple configurations made up of one and two columns. 
 
-\begin{figure}
+\begin{figure}[h]
 	\begin{subfigure}{0.45\textwidth}
 	        \centering
                 \includegraphics[width=\textwidth]{real_2d_1column.png}
@@ -226,7 +226,7 @@ way we would observe the $\pi$-stacking reflection as more intense than the
 7.4\AA reflection. It is also important that $\sigma_x$ stays low, otherwise, the
 reflection disappears from the middle (Figure~\ref{fig:fourier_2d_74_1column_highxysig}). 
 
-\begin{figure}
+\begin{figure}[h]
 	\begin{subfigure}{0.45\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{real_2d_74_1column.png}
@@ -257,7 +257,6 @@ reflection disappears from the middle (Figure~\ref{fig:fourier_2d_74_1column_hig
                 \includegraphics[width=\textwidth]{fourier_2d_1column_74_highxysig.png}
                 \caption{Fourier space}\label{fig:fourier_2d_74_1column_highxysig}
         \end{subfigure}
-
         \caption{A single column of scatterers spaced 7.4 \AA apart shows up as horizontal lines
                  with spacing equal to the inverse of the distance between scatters. One of the
                  subharmonics corresponds to a real spacing distance of 3.7 \AA. If we adjust the 
@@ -265,5 +264,121 @@ reflection disappears from the middle (Figure~\ref{fig:fourier_2d_74_1column_hig
                  horizontal line in fourier space.}~\label{fig:2d_columns_offset}
 \end{figure}
 
- 
+And now I move into 3D. The only difference in its calculation is that I use
+\texttt{numpy.fft.fftn} instead of the 2D version. I come to the same
+conclusion as in the 2D case. Lines appear that are spaced apart by a distance
+equal to the inverse of the distance between points in the z direction
+(Figure~\ref{fig:fourier_3d_lowdig}).  If there is disorder in the z-direction
+(high $\sigma$) then lines at low z frequency fade
+(Figure~\ref{fig:fourier_3d_highzsig}). If there is disorder in the x (or y)
+direction, then intensity at low x frequencies fade
+(Figure~\ref{fig:fourier_3d_highysig}).
+
+\begin{figure}[h]
+	\centering
+        \begin{subfigure}{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{real_3d_lowsig.png}
+                \caption{Real space - $\sigma_z$=$\sigma_x$=$\sigma_y$=0.001}\label{fig:real_3d_lowsig}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{fourier_3d_lowsig.png}
+                \caption{Fourier space}\label{fig:fourier_3d_lowsig}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{real_3d_highzsig.png}
+                \caption{Real space - $\sigma_z$=0.5, $\sigma_x$=$sigma_y$=0.001}\label{fig:real_3d_highzsig}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{fourier_3d_highzsig.png}
+                \caption{Fourier space}\label{fig:fourier_3d_highzsig}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{real_3d_highysig.png}
+                \caption{Real space - $\sigma_z$=$sigma_y$=0.001, $\sigma_x$=0.5}\label{fig:real_3d_highysig}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{fourier_3d_highysig.png}
+                \caption{Fourier space}\label{fig:fourier_3d_highysig}
+        \end{subfigure}
+        \caption{A single column of scatterers spaced 7.4 \AA apart in 3D space shows up as horizontal lines
+                 with spacing equal to the inverse of the distance between scatters. One of the
+                 subharmonics corresponds to a real spacing distance of 3.7 \AA. If we adjust the
+                 sigmas of the scattering, we can change the relative intensity of each
+                 horizontal line in fourier space.}~\label{fig:3d_simple}
+\end{figure}
+
+The patterns are interesting, but they still don't fully explain the features.
+The main problem is that the lines fade starting from the center (0 frequency)
+of the fourier transform. They are quite strong at high frequency and very low
+at zero. We see the opposite in the experimental pattern. 
+
+To address the problem, we need to make a more complicated system. So I'll
+start by adding more columns and packing them hexagonally
+(Figure~\ref{fig:hex_simple}). The dots of the dashed lines in the fourier
+transform (Figure~\ref{fig:fourier_3d_hex_lowsig}) are spaced apart by the
+inverse of distance between columns. If we add some uncertainty to the 
+locations of the points in the columns, we see fading of low frequencies
+as before. Interestingly, the pattern at x=0 does not fade despite the 
+x/y uncertainties being as high as in Figure~\ref{fig:fourier_3d_highysig}. 
+I'd need to do more to verify this, but it appears that the center does
+not fade in the x direction as long as the uncertainty in the xy directions
+is larger than the z direction.
+
+\begin{figure}[h]
+        \centering
+        \begin{subfigure}{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{real_3d_lowsig.png}
+                \caption{Real space - $\sigma_z$=$\sigma_x$=$\sigma_y$=0.001}\label{fig:real_3d_hex_lowsig}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{fourier_3d_hex_lowsig.png}
+                \caption{Fourier space}\label{fig:fourier_3d_hex_lowsig}
+        \end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{real_3d_hex_highsig.png}
+                \caption{Real space - $\sigma_x$=$sigma_z$=0.5, $\sigma_z$=0.8}\label{fig:real_3d_hex_highsig}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{fourier_3d_hex_highsig.png}
+                \caption{Fourier space}\label{fig:fourier_3d_hex_highsig}
+        \end{subfigure}
+
+	\caption{}\label{fig:hex_simple}
+\end{figure}  
+
+The original problem still persists after putting in more columns. That is, the
+intensity of the horizontal lines at high frequencies is never lower than the
+value at low frequency. Angle averaging helps resolve this
+(Figure~\ref{fig:fourier_hex_angle_average}). With a little parameter tweaking,
+it looks even better (Figure~\ref{fig:fourier_hex_angle_average_better}). There 
+are still some high intensity areas at high frequency values. It is possible 
+those would go away in more complicated systems.
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{fourier_hex_angle_average.png}
+		\caption{Fourier space - $\sigma_x$=$\sigma_z$=0.5, $\sigma_z$=0.8}\label{fig:fourier_hex_angle_average}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{fourier_hex_angle_average_better.png}
+		\caption{Fourier space - $\sigma_x$=$\sigma_z$=0.5, $\sigma_z$=0.8}\label{fig:fourier_hex_angle_average_better}
+	\end{subfigure}
+
+	\caption{Angle averaging the same pattern shown in Figure~\ref{fig:fourier_3d_hex_highsig} 
+	yields a pattern with the highest intensity concentrated at the center.}\label{fig:angle_averaged}
+\end{figure}
+
 \end{document}
