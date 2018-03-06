@@ -9,7 +9,6 @@ from __future__ import absolute_import
 import numpy as np
 import copy
 import math
-import Periodic_Images
 from . import transform
 import os
 
@@ -273,9 +272,6 @@ def write_initial_config(positions, identity, name, no_layers, layer_distributio
     f.write('%s\n' % sys_atoms)
 
     rot *= np.pi / 180  # convert input (degrees) to radians
-
-    grid = Periodic_Images.shift_matrices(1, 60, p2p, p2p)
-    grid = np.reshape(grid, (2, 9))
 
     if flipped:
         flipped = np.asarray(flipped)
