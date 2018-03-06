@@ -5,6 +5,7 @@ import mdtraj as md
 import argparse
 import scipy.stats
 import tqdm
+from scipy import spatial
 
 """
 Create an arbitrarily shapped triclinic box uniformly filled with particles. The particles are sodium ions by default.
@@ -55,6 +56,8 @@ def initialize():
                         'by the -r flag. The number of disks in each layer is specified with the -dpl flag')
     parser.add_argument('-dpl', '--disks_per_layer', default=5, help='Number of disks in each layer')
     parser.add_argument('-rdisk', '--disk_radius', default=0.1, help='Radius of disks')
+    parser.add_argument('-cr', '--constrain_radius', action="store_true", help='Dp not allow point with rcon of each other')
+    parser.add_argument('-rcon', '--con_rad', default=0.2, type=float, help='The closest a point can be to another point')
 
     args = parser.parse_args()
 
@@ -146,6 +149,26 @@ def check_layers(pt, layers, width):
             else:
                 contained = True
             break
+
+    return contained
+
+
+def check_r(pt, all_points, r):
+    """
+    make sure newly placed point is at least 'r' away from all other points
+    :param: pt: point to be checked
+    :param: all_points: all points currently placed
+    :param: r: distance particles are allowed to be away from each other
+    :return: True or False
+    """
+
+    contained = True
+
+    tree = spatial.cKDTree(all_points)
+    d, i = tree.query(pt)
+
+    if d < r:
+        contained = False
 
     return contained
 
@@ -284,7 +307,11 @@ if __name__ == "__main__":
                 while check_disks(pt, disk_locations, args.layer_width, disk_radius):
                     u, v, w = np.random.rand(3)
                     pt = O + u * A + v * B + w * C
-
+            if args.constrain_radius:
+                if i > 0:
+                    while spatial.cKDTree(points[t, :i, :]).query(pt)[0] < args.con_rad:
+                        u, v, w = np.random.rand(3)
+                        pt = O + u * A + v * B + w * C
             points[t, i, :] = pt
 
     # Now write the trajectory in GROMACS format

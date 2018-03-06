@@ -19,7 +19,8 @@ import tqdm
 
 def initialize():
 
-    parser = argparse.ArgumentParser(description='Measure Membrane Thickness')
+    parser = argparse.ArgumentParser(description='Measure distribution of angles between tail centroids and nearest'
+                                                 'neighbor tail centroids')
 
     parser.add_argument('-g', '--gro', type=str, default='wiggle.gro', help='Path to input file')
     parser.add_argument('-t', '--traj', type=str, default='traj_whole.xtc', help='Trajectory file (.xtc or .trr)')
