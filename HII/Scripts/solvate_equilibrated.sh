@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # the directory where this script is located.
+
 # To get this going, all you need is an equilibrated configuration (produce using equil.sh)
 
 GRO="wiggle.gro"  # initial dry equilibrated configuration
@@ -39,7 +41,7 @@ for i in $(seq 1 ${n}); do
 
     echo "Adding water molecule # ${i}"
     # place water molecule in structure
-    solvate_equilibrated.py -g npt.gro -t topol_dry.top -p ${p} --emsteps ${emsteps}
+    ${python} ${DIR}/solvate_equilibrated.py -g npt.gro -t topol_dry.top -p ${p} --emsteps ${emsteps}
 
     # create run files. Use berendsen barostat since the system was minimized and new molecules have been added
     input.py -S -l ${t} -f 5 --barostat berendsen --genvel 'yes' -c em.gro
