@@ -54,7 +54,7 @@ def add_water_placeholder(top):
             system_ndx += 1
 
         top.insert(system_ndx, '; Water Topology\n')
-        top.insert(system_ndx + 1, '#include "/home/bcoscia/PycharmProjects/GitHub/HII/top/Forcefields/gaff/tip3p.itp"\n')
+        top.insert(system_ndx + 1, '#include "%s/../top/Forcefields/gaff/tip3p.itp"\n' % location)
         top.insert(system_ndx + 2, '\n')
 
     top.append('SOL                PLACEHOLDER')
