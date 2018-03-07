@@ -104,7 +104,7 @@ if __name__ == "__main__":
             a.append(['Pcoupl = %s\n' % args.barostat])
             a.append(['Pcoupltype = %s\n' % args.pcoupltype])
             if args.barostat == 'Parrinello-Rahman':
-                a.append(['tau-p = 10\n'])  # tau-p should be at least  20 times larger than nstpcouple*dt. nstpcoupl defaults to the value of nstlist (40)
+                a.append(['tau-p = 20\n'])  # tau-p should be at least  20 times larger than nstpcouple*dt. nstpcoupl defaults to the value of nstlist (40)
             if args.pcoupltype == 'Isotropic':
                 a.append(['ref-p = 1\n'])
                 a.append(['compressibility = 4.5e-5\n'])

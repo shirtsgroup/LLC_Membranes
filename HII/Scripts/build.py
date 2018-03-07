@@ -9,8 +9,6 @@ import math
 import os
 import argparse
 import lc_class
-import LC_class
-import Periodic_Images
 import copy
 from llclib import file_rw, transform
 
