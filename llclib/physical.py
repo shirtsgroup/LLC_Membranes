@@ -2,7 +2,6 @@
 
 from __future__ import division
 from builtins import range
-from past.utils import old_div
 from llclib import file_rw
 import mdtraj as md
 import numpy as np
@@ -195,10 +194,10 @@ def conc(t, comp, b):
             cross[t] = x_dim*y_dim
             box_vol[t] = x_dim*y_dim*thick
 
-    factor = old_div(1, (1*10**-27))  # convert from ions/nm^3 to ions/m^3
+    factor = 1 / (1*10**-27)  # convert from ions/nm^3 to ions/m^3
     conc = np.zeros([nT])
     for c in range(nT):
-        conc[c] = (old_div(count[c], box_vol[c])) * factor
+        conc[c] = (count[c] / box_vol[c]) * factor
 
     avg_conc = np.mean(conc)
     std = np.std(conc)
@@ -221,7 +220,7 @@ def avg_pore_loc(npores, pos):
     if len(pos.shape) == 3:  # multiple frames
 
         nT = np.shape(pos)[0]
-        comp_ppore = old_div(np.shape(pos)[1], npores)
+        comp_ppore = np.shape(pos)[1] // npores
 
         p_center = np.zeros([2, npores, nT])
 
@@ -233,7 +232,7 @@ def avg_pore_loc(npores, pos):
 
     elif len(pos.shape) == 2:  # single frame
 
-        comp_ppore = old_div(pos.shape[0], npores)
+        comp_ppore = pos.shape[0] // npores
 
         p_center = np.zeros([2, npores])
 
@@ -280,7 +279,7 @@ def limits(pos, pcenters):
     nT = pcenters.shape[2]
     npores = pcenters.shape[1]
     natoms = pos.shape[1]
-    atom_ppore = old_div(natoms, npores)
+    atom_ppore = natoms // npores
 
     deviation = np.zeros([nT, npores, atom_ppore])
     for f in tqdm.tqdm(range(nT)):

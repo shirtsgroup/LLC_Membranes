@@ -9,6 +9,7 @@ p=0.6  # probability of finding a water molecule in the pore vs. tail region. e.
 emsteps=50  # number of steps to take during energy minimization directly after adding water
 MPI=0
 proc=4 # number of processes
+python='python3'
 
 while getopts "g:t:n:e:m:p:" opt; do
     case $opt in
