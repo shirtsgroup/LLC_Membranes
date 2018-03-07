@@ -13,7 +13,7 @@ MPI=0
 proc=4 # number of processes
 python='python3'
 
-while getopts "g:t:n:e:m:p:" opt; do
+while getopts "g:t:n:e:m:p:r:" opt; do
     case $opt in
         g) GRO=$OPTARG;;
         t) t=$OPTARG;;
