@@ -12,6 +12,8 @@ import os, glob
 import sys
 import time
 
+location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in
+
 
 def initialize():
 
@@ -212,7 +214,7 @@ if __name__ == "__main__":
     box_gromacs = [full_box[0, 0, 0], full_box[0, 1, 1], full_box[0, 2, 2], full_box[0, 0, 1], full_box[0, 2, 0],
                     full_box[0, 1, 0], full_box[0, 0, 2], full_box[0, 1, 2], full_box[0, 2, 0]]  # convert to .gro format
 
-    water = md.load('/home/bcoscia/PycharmProjects/GitHub/HII/top/solutes/water.gro')  # load water structure
+    water = md.load('%s/../top/solutes/water.gro')  # load water structure
     water_xyz = water.xyz[0, :, :]  # get water coordinates
     water_centroid = np.mean(water_xyz, axis=0)  # get centroid of water
     water_alignment_vector = water_xyz[0, :] - water_centroid  # vector around which water molecule can be rotated

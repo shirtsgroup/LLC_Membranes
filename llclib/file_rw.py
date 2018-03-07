@@ -500,3 +500,19 @@ def write_gro_pos(pos, out, name='NA', box=[0, 0, 0], ids=[], res=[], vel=None):
 
         f.write('\n')
         # f.write('{:10f}{:10f}{:10f}\n'.format(0, 0, 0))
+
+
+def write_em_mdp(steps):
+    """
+    Write energy minimization .mdp file
+    :param steps: number of steps to take using steepest descents algorithm
+    :return: Directly writes an energy minimization .mdp file
+    """
+
+    with open('em.mdp', 'w') as f:
+
+        f.write("title = Energy Minimization\n")
+        f.write("integrator = steep\n")
+        f.write("nsteps = %s\n" % steps)
+        f.write("cutoff-scheme = verlet\n")
+        f.write("nstlist = 40\n")
