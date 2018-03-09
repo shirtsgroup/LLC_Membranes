@@ -502,7 +502,7 @@ def write_gro_pos(pos, out, name='NA', box=[0, 0, 0], ids=[], res=[], vel=None):
         # f.write('{:10f}{:10f}{:10f}\n'.format(0, 0, 0))
 
 
-def write_em_mdp(steps):
+def write_em_mdp(steps, freeze=False, freeze_group='', freeze_dim='xyz'):
     """
     Write energy minimization .mdp file
     :param steps: number of steps to take using steepest descents algorithm
@@ -516,3 +516,20 @@ def write_em_mdp(steps):
         f.write("nsteps = %s\n" % steps)
         f.write("cutoff-scheme = verlet\n")
         f.write("nstlist = 40\n")
+
+        if freeze:
+            f.write('freezegrps = %s\n' % freeze_group)
+            dim = []
+            if 'x' in freeze_dim:
+                dim.append('Y')
+            else:
+                dim.append('N')
+            if 'y' in freeze_dim:
+                dim.append('Y')
+            else:
+                dim.append('N')
+            if 'z' in freeze_dim:
+                dim.append('Y')
+            else:
+                dim.append('N')
+            f.write('freezedim = %s %s %s' %(dim[0], dim[1], dim[2]))

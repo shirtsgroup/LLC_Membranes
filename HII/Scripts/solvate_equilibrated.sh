@@ -9,7 +9,7 @@ n=1038  # number of water molecules to insert
 t=1000 # picoseconds of simulation time between insertions
 p=0.6  # probability of finding a water molecule in the pore vs. tail region. e.g. 3:2 ratio corresponds to p = 0.6
 emsteps=50  # number of steps to take during energy minimization directly after adding water
-MPI=0
+MPI=0  # set to 1 if you are running MPI
 proc=4 # number of processes
 python='python3'
 

@@ -8,6 +8,7 @@ from llclib import physical
 from llclib import file_rw
 import solvate_tails
 import subprocess
+from scipy import spatial
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in
 
@@ -32,6 +33,8 @@ def initialize():
                         'water molecules')
     parser.add_argument('-rmax', default=0.4, type=float, help='Maximum distance away from reference atom to place'
                         'water molecules')
+    parser.add_argument('-rem', default=1, type=float, help='Atoms within this radius of placed water molecules will'
+                        'be energy minimized. All others will be frozen (nm)')
 
     args = parser.parse_args()
 
@@ -87,29 +90,58 @@ def water_parameters(water):
     return water_xyz, water_centroid, water_alignment_vector, water_ids, water_res
 
 
-def energy_minimize(steps, nwater):
+def freeze(water_placement_point, rem):
+    """
+    Write an index file for atoms to be frozen
+    :param water_placement_point: xyz position of where water molecule was placed
+    :param rem: spherical radius measured from water molecule placement point outside which all atoms will be frozen
+    :return: index file with indices of atoms to be frozen
+    """
+
+    t = md.load('water.gro')
+    pos = t.xyz
+
+    pts = spatial.cKDTree(pos[0, :, :]).query_ball_point(water_placement_point, rem)
+
+    freeze_indices = [a.index for a in t.topology.atoms if a.index not in pts]
+
+    with open('freeze_index.ndx', 'w') as f:
+
+        f.write('[ Freeze ]\n')
+        for i, entry in enumerate(freeze_indices):
+            if (i + 1) % 15 == 0:
+                f.write('{:5d}\n'.format(entry + 1))
+            else:
+                f.write('{:5d} '.format(entry + 1))
+
+
+def energy_minimize(steps, nwater, rem, water_placement_point):
     """
     Energy minimize a configuration
     :param steps: number of steepest descent energy minimization steps to take
     :param nwater: number of water molecules in the system
+    :param rem: spherical radius measured from water molecule place point inside which all atoms will be energy minimized
+    :param water_placement_point: xyz coordinates where water molecule centroid was placed
     :return: coordinates of energy minimized structure, updated coordinates of reference atoms
     """
 
-    file_rw.write_em_mdp(steps)  # write em.mdp with a given number of steps. Should move this function to file_rw
+    freeze(water_placement_point, rem)  # write index file with group specifiying atoms to be frozen
+
+    file_rw.write_em_mdp(steps, freeze=True, freeze_group='Freeze', freeze_dim='xyz')  # write em.mdp with a given number of steps. Should move this function to file_rw
 
     p1 = subprocess.Popen(["cp", "placeholder_top.top", "top_intermediate.top"])  # make a copy of placeholder_top.top
     p1.wait()
     p2 = subprocess.Popen(["sed", "-i", "-e", "s/PLACEHOLDER/%s/g" % (nwater), "top_intermediate.top"])  # replace PLACEHOLDER with nwater
     p2.wait()
-    p3 = subprocess.Popen(["gmx", "grompp", "-p", "top_intermediate.top", "-f", "em.mdp", "-o", "em", "-c",
-                           "water.gro"], stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
+    p3 = subprocess.Popen(["gmx", "grompp", "-p", "top_intermediate.top", "-f", "em.mdp", "-o", "em", "-c", "water.gro",
+                           "-n", "freeze_index.ndx"], stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
     p3.wait()
     p4 = subprocess.Popen(["gmx", "mdrun", "-deffnm", "em"], stdout=open(os.devnull, 'w'),
                           stderr=subprocess.STDOUT)  # run energy minimization
     p4.wait()
 
 
-def place_water(xyz, water_placement_point, ids, res, box, emsteps):
+def place_water(xyz, water_placement_point, ids, res, box, emsteps, rem):
 
     water = md.load('%s/../top/solutes/water.gro' % location)  # load water structure
     water_xyz, water_centroid, water_alignment_vector, water_ids, water_res = water_parameters(water)
@@ -120,7 +152,7 @@ def place_water(xyz, water_placement_point, ids, res, box, emsteps):
     names = ids + water_ids  # add water to ids
     residues = res + water_res  # add water residue to res
     file_rw.write_gro_pos(new_coordinates, 'water.gro', ids=names, res=residues, box=box)  # write out config with new water
-    energy_minimize(emsteps, nwater + 1)  # energy minimzed system
+    energy_minimize(emsteps, nwater + 1, rem, water_placement_point)  # energy minimzed system
     nrg = subprocess.check_output(["awk", "/Potential Energy/ {print $4}", "em.log"])  # get Potential energy from em.log
 
     return float(nrg.decode("utf-8"))
@@ -165,7 +197,7 @@ if __name__ == "__main__":
         # place point within spherical shell centered at placement_atom with inner radius=rmin and outside radius=rmax
         water_placement_point = solvate_tails.random_pt_spherical_shell(t.xyz[0, placement_atom, :], args.rmin, args.rmax)
 
-    nrg = place_water(t.xyz[0, :, :], water_placement_point, ids, res, box_gromacs, args.emsteps)
+    nrg = place_water(t.xyz[0, :, :], water_placement_point, ids, res, box_gromacs, args.emsteps, args.rem)
 
     while nrg > -50000:  # make sure the system is somewhat stable by checking potential energy after minimization
-        nrg = place_water(t.xyz[0, :, :], water_placement_point, ids, res, box_gromacs, args.emsteps)
+        nrg = place_water(t.xyz[0, :, :], water_placement_point, ids, res, box_gromacs, args.emsteps, args.rem)
