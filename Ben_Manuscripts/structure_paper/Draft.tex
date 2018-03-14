@@ -7,6 +7,23 @@
 \usepackage{siunitx}
 \usepackage{booktabs}
 \usepackage{gensymb}
+\usepackage{xr}
+
+\makeatletter
+\newcommand*{\addFileDependency}[1]{% argument=file name and extension
+  \typeout{(#1)}
+  \@addtofilelist{#1}
+  \IfFileExists{#1}{}{\typeout{No file #1.}}
+}
+\makeatother
+ 
+\newcommand*{\myexternaldocument}[1]{%
+    \externaldocument{#1}%
+    \addFileDependency{#1.tex}%
+    \addFileDependency{#1.aux}%
+}
+
+\externaldocument[S-]{supplemental}
 
 %MRS5: could be punchier. I will keep thinking.  I should be the last author.  Chen the names that Joe and Matt wanttu use (presumably with some middle initial?
 \title{Understanding the nanoscale structure of hexagonal phase lyotropic 
@@ -17,7 +34,7 @@ liquid crystal membranes}
 \affiliation{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, CO 80309, USA}
 \alsoaffiliation{Department of Chemistry and Biochemistry, University of Colorado Boulder, Boulder CO 80309, USA}
 \author{Joe Yelk}
-\author{Matthew Glaser}
+\author{Matthew A. Glaser}
 \affiliation{Department of Physics, University of Colorado Boulder, Boulder CO, 80309, USA}
 \author{Xunda Feng}
 \affiliation{Department of Chemical and Environmental Engineering, Yale University, New Haven, Connecticut 06511, USA}
@@ -48,13 +65,15 @@ liquid crystal membranes}
   \end{abstract}
 
   \section{Introduction}
- 
+  
   %MRS5: want to get people engaged from the beginning. The first paragraph
   %should describe a problem to be solved. Then you can get into the motivating
   %details (like background of the alternatives, and why we need something
   %different).  I feel like this is an introduction into different types of
   %membranes, though it should be an introduction to the problem that this paper
   %takes steps towards solving.
+  
+  Figure S~\ref{S-fig:monomer_color_coded}
   
   A highly selective membrane would be useful for the recovery of valuable
   products from complex aqueous and organic solutions.  For example, flowback

@@ -289,30 +289,44 @@ if __name__ == "__main__":
     points = np.zeros([frames, npts, 3])  # will contain all positions for all frames
 
     # generate random points inside box
-    for t in tqdm.tqdm(range(frames)):
-        for i in tqdm.tqdm(range(npts)):
-            u, v, w = np.round(np.random.rand(3), decimals=4)  # generate 3 random numbers between 0 and 1
-            pt = O + u * A + v * B + w * C  # places point inside 3D box defined by box vector A, B and C
-            # if --pores, --layers or --disks is specified, check to make the random point is not in the region. If it
-            # is, keep generating random points until the point is outside the region
-            if args.pores:
-                while check_pores(pt, pore_locations, pore_radius):  # force all points outside the pore region
-                    u, v, w = np.random.rand(3)
-                    pt = O + u * A + v * B + w * C
-            if args.layers:  # force all points outside layer region
-                while check_layers(pt, layer_locations, args.layer_width):
-                    u, v, w = np.random.rand(3)
-                    pt = O + u * A + v * B + w * C
-            if args.disks:
-                while check_disks(pt, disk_locations, args.layer_width, disk_radius):
-                    u, v, w = np.random.rand(3)
-                    pt = O + u * A + v * B + w * C
-            if args.constrain_radius:
-                if i > 0:
-                    while spatial.cKDTree(points[t, :i, :]).query(pt)[0] < args.con_rad:
-                        u, v, w = np.random.rand(3)
-                        pt = O + u * A + v * B + w * C
-            points[t, i, :] = pt
+    # for t in tqdm.tqdm(range(frames)):
+    #     for i in tqdm.tqdm(range(npts)):
+    #         u, v, w = np.round(np.random.rand(3), decimals=4)  # generate 3 random numbers between 0 and 1
+    #         pt = O + u * A + v * B + w * C  # places point inside 3D box defined by box vector A, B and C
+    #         # if --pores, --layers or --disks is specified, check to make the random point is not in the region. If it
+    #         # is, keep generating random points until the point is outside the region
+    #         if args.pores:
+    #             while check_pores(pt, pore_locations, pore_radius):  # force all points outside the pore region
+    #                 u, v, w = np.random.rand(3)
+    #                 pt = O + u * A + v * B + w * C
+    #         if args.layers:  # force all points outside layer region
+    #             while check_layers(pt, layer_locations, args.layer_width):
+    #                 u, v, w = np.random.rand(3)
+    #                 pt = O + u * A + v * B + w * C
+    #         if args.disks:
+    #             while check_disks(pt, disk_locations, args.layer_width, disk_radius):
+    #                 u, v, w = np.random.rand(3)
+    #                 pt = O + u * A + v * B + w * C
+    #         if args.constrain_radius:
+    #             if i > 0:
+    #                 while spatial.cKDTree(points[t, :i, :]).query(pt)[0] < args.con_rad:
+    #                     u, v, w = np.random.rand(3)
+    #                     pt = O + u * A + v * B + w * C
+    #         points[t, i, :] = pt
+
+    pore_centers = np.zeros([4, 2])
+    p2p = args.box_lengths[0] / 2
+    theta = np.pi * args.angles[2] / 180
+
+    pore_centers[0, :] = [p2p/2, p2p/2]
+    pore_centers[1, :] = [p2p/2, 3*p2p/2]
+    pore_centers[2, :] = [3*p2p/2, 3*p2p/2]
+    pore_centers[3, :] = [3*p2p/2, p2p/2]
+
+    pore_centers[..., 1] = pore_centers[..., 1] * np.sin(theta)
+    pore_centers[..., 0] = pore_centers[..., 0] + pore_centers[..., 1]*np.cos(theta)
+
+    points[:, :4, :2] = pore_centers
 
     # Now write the trajectory in GROMACS format
 
