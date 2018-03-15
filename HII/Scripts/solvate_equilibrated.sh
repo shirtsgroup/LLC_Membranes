@@ -37,15 +37,15 @@ if [[ ${continue} -eq 1 ]]; then
     top=$(tail topol.top -n 1)
     set $top
     start=$2
+    start=$((start + 1))
 else
     start=1
+    # generate topology to be modified
+    ${python} ${DIR}/input.py -c ${GRO}
+
+    cp ${GRO} npt.gro
+    mv topol.top topol_dry.top
 fi
-
-# generate topology to be modified
-${python} ${DIR}/input.py -c ${GRO}
-
-cp ${GRO} npt.gro
-mv topol.top topol_dry.top
 
 for i in $(seq ${start} ${n}); do
 
