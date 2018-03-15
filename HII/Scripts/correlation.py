@@ -41,6 +41,8 @@ def initialize():
     parser.add_argument('--load', action="store_true", help='load previously calculated correlation function')
     parser.add_argument('-pr', '--plot_range', nargs='+', help='range to plot. A list of the form: '
                         '[dimension 1 lower, dimension 1 upper, dimension 2 lower, dimension 2 upper ...]')
+    parser.add_argument('-com', '--center_of_mass', action="store_true", help='Calculate based on center of mass of'
+                                                                               'args.atoms')
 
     args = parser.parse_args()
 
@@ -119,7 +121,7 @@ if __name__ == "__main__":
         elif i == 'z':
             dimensions.append(2)
 
-    ndimensions = 3
+    ndimensions = 3  # always do full 3d correlation function
 
     if type(args.bins) is list:
         if len(args.bins) > 1:
@@ -162,7 +164,11 @@ if __name__ == "__main__":
 
     natoms = len(args.atoms)
     monomers_per_layer = int(len(keep) / args.layers / npores / len(args.atoms))  # divide by len(args.atoms) because of com
-    center_of_mass = com(t.xyz[:, keep, :], mass)  # calculate centers of mass of atom groups
+
+    if args.center_of_mass:
+        center_of_mass = com(t.xyz[:, keep, :], mass)  # calculate centers of mass of atom groups
+    else:
+        center_of_mass = t.xyz[:, keep, :]
 
     com_per_pore = int(center_of_mass.shape[1] / npores)
 
@@ -175,7 +181,11 @@ if __name__ == "__main__":
 
     if args.load:
 
-        corr = np.load('correlation_%s%s.npz' %(args.slice[0], args.slice[1]))
+        if len(args.slice) == 2:
+            corr = np.load('correlation_%s%s.npz' %(args.slice[0], args.slice[1]))
+        else:
+            corr = np.load('correlation_%s.npz' %(args.slice[0]))
+
         correlation = corr['correlation']
         edges = corr['edges']
         frames = corr['frames']
@@ -184,7 +194,7 @@ if __name__ == "__main__":
         frames = t.n_frames
 
         if args.slice == 'xy' or args.slice == 'yx':
-            for frame in tqdm.tqdm(range(frames)):
+            for frame in tqdm.tqdm(range(frames), unit='Frame'):
                 for p in range(npores):
                     for l in range(args.layers):
                         for a in range(monomers_per_layer):
@@ -193,11 +203,16 @@ if __name__ == "__main__":
                             point = periodic_pts[frame, pt, :]  # coordinates of center of mass reference point
                             v = pore_spline[frame, p*args.layers + l, :] - point  # vector from point to pore center
                             rot = fast_rotate.rotate_vector(periodic_pts[frame, :, :], v, x)  # rotate all points by angle
-                            trans = rot - rot[pt, :]  # translate all point so reference point is at the center
+                            trans = rot - rot[pt, :]  # translate all point so reference point is at the origin
                             H, edges = np.histogramdd(trans, bins=bins, range=hist_range)
                             correlation += H
+                            # middle_x = bins[0] // 2
+                            # middle_y = bins[1] // 2
+                            # plt.plot(correlation[middle_x, middle_y, :])
+                            # plt.show()
+
         else:
-            for frame in tqdm.tqdm(range(frames)):
+            for frame in tqdm.tqdm(range(frames), unit='Frame'):
                 for p in range(npores):
                     for l in range(args.layers):
                         for a in range(monomers_per_layer):
@@ -205,70 +220,111 @@ if __name__ == "__main__":
                             translated = periodic_pts[frame, :, :] - periodic_pts[frame, pt, :]  # make pt the origin
                             H, edges = np.histogramdd(translated, bins=bins, range=hist_range)
                             correlation += H
+                            # middle_x = bins[0] // 2
+                            # middle_y = bins[1] // 2
+                            # #plt.plot(H[middle_x, middle_y, :])
+                            # plt.plot(correlation[middle_x, middle_y, :])
+                            # plt.show()
 
-        np.savez_compressed('correlation_%s%s' % (args.slice[0], args.slice[1]), correlation=correlation, edges=edges, frames=frames)
+        if len(args.slice) > 1:
+            np.savez_compressed('correlation_%s%s' % (args.slice[0], args.slice[1]), correlation=correlation, edges=edges, frames=frames)
+        else:
+            np.savez_compressed('correlation_%s' % (args.slice[0]), correlation=correlation, edges=edges, frames=frames)
 
+    # Normalize 3D correlation function
     normalization = frames * center_of_mass.shape[1]**2 / np.prod(bins)
     correlation /= normalization
 
-    centers1 = [edges[dimensions[0]][i] + ((edges[dimensions[0]][i + 1] - edges[dimensions[0]][i])/2) for i in range(bins[0])]
-    centers2 = [edges[1][i] + ((edges[dimensions[1]][i + 1] - edges[dimensions[1]][i])/2) for i in range(bins[1])]
+    centers1 = [edges[dimensions[0]][i] + ((edges[dimensions[0]][i + 1] - edges[dimensions[0]][i])/2) for i in range(bins[dimensions[0]])]
 
-    ax = sum(range(0, 3)) - sum(dimensions)  # see which axis is missing out of [0 1 2]. E.g. if we are looking at the
-    # yz cross sections, then dimensions will equal [1 2]. We want to sum cross sections along the x-axis which is
-    # also the 0 axis. So ax will equal 0
-    twoD = np.mean(correlation, axis=ax)
+    if len(dimensions) == 1:
+        # only works for z slice currently
+        centers_x = [edges[0][i] + ((edges[0][i + 1] - edges[0][i])/2) for i in range(bins[0])]
+        centers_y = [edges[1][i] + ((edges[1][i + 1] - edges[1][i])/2) for i in range(bins[1])]
+        middle_x = bins[0] // 2
+        middle_y = bins[1] // 2
+        r = 0.14
+        avg = []
+        for i, ix in enumerate(centers_x):
+            for j, jy in enumerate(centers_y):
+                if np.linalg.norm([ix, jy]) < r:
+                    avg.append([i, j])
 
-    # remove center region of 2D histogram since it is brightest and contains no useful information
-    # first find the center bins (index)
+        zdf = np.zeros_like(centers1)
+        for i in range(len(avg)):
+            zdf += correlation[avg[i][0], avg[i][1], :]
 
-    for x in range(len(centers1)):
-        for y in range(len(centers2)):
-            if np.linalg.norm([centers1[x], centers2[y]]) < args.block_radius:
-                twoD[x, y] = 0
+        shift = 0
+        while centers1[shift] < 0.2:
+            shift += 1
 
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
+        plt.figure()
+        plt.plot(centers1[shift:], zdf[shift:]/np.mean(zdf[shift:]))
+        plt.ylabel('Normalized Count')
+        plt.xlabel('Distance (nm)')
 
-    if args.plot_range:
-
-        extent = [float(i) for i in args.plot_range]
-        dim_1_start = 0
-        while centers1[dim_1_start] < extent[0]:
-            dim_1_start += 1
-        dim_1_end = 0
-        while centers1[dim_1_end] < extent[1]:
-            dim_1_end += 1
-        dim_2_start = 0
-        while centers1[dim_2_start] < extent[2]:
-            dim_2_start += 1
-        dim_2_end = 0
-        while centers1[dim_2_end] < extent[3]:
-            dim_2_end += 1
-
-        twoD = twoD[dim_1_start:dim_1_end, dim_2_start:dim_2_end]
-    else:
-        extent = [centers1[0], centers1[-1], centers2[0], centers2[-1]]
-
-    heatmap = ax1.imshow(twoD.T, extent=extent, cmap='jet', interpolation='gaussian')
-    cbar = plt.colorbar(heatmap)
-    cbar.ax.tick_params(labelsize=14)
-    plt.xlabel('%s (nm)' % args.slice[0], fontsize=14)
-    plt.ylabel('%s (nm)' % args.slice[1], fontsize=14)
-    plt.gcf().get_axes()[0].tick_params(labelsize=14)
-    ax = plt.axes()
-    ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
-    ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.5))
-    ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
-    ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))
-    plt.tight_layout()
-
-    if args.save:
-        plt.savefig('%s.png' % args.save)
-    if not args.noshow:
+        plt.figure()
+        plt.plot(centers1[shift:], correlation[middle_x, middle_y, shift:]/np.mean(correlation[middle_x, middle_y, shift:]))
+        plt.ylabel('Normalized Count')
+        plt.xlabel('Distance (nm)')
         plt.show()
 
-    exit()
+    if len(dimensions) > 1:
+
+        centers2 = [edges[1][i] + ((edges[dimensions[1]][i + 1] - edges[dimensions[1]][i])/2) for i in range(bins[1])]
+        ax = sum(range(0, 3)) - sum(dimensions)  # see which axis is missing out of [0 1 2]. E.g. if we are looking at the
+        # yz cross sections, then dimensions will equal [1 2]. We want to sum cross sections along the x-axis which is
+        # also the 0 axis. So ax will equal 0
+        twoD = np.mean(correlation, axis=ax)
+
+        # remove center region of 2D histogram since it is brightest and contains no useful information
+        # first find the center bins (index)
+
+        for x in range(len(centers1)):
+            for y in range(len(centers2)):
+                if np.linalg.norm([centers1[x], centers2[y]]) < args.block_radius:
+                    twoD[x, y] = 0
+
+        fig = plt.figure()
+        ax1 = fig.add_subplot(111)
+
+        if args.plot_range:
+
+            extent = [float(i) for i in args.plot_range]
+            dim_1_start = 0
+            while centers1[dim_1_start] < extent[0]:
+                dim_1_start += 1
+            dim_1_end = 0
+            while centers1[dim_1_end] < extent[1]:
+                dim_1_end += 1
+            dim_2_start = 0
+            while centers1[dim_2_start] < extent[2]:
+                dim_2_start += 1
+            dim_2_end = 0
+            while centers1[dim_2_end] < extent[3]:
+                dim_2_end += 1
+
+            twoD = twoD[dim_1_start:dim_1_end, dim_2_start:dim_2_end]
+        else:
+            extent = [centers1[0], centers1[-1], centers2[0], centers2[-1]]
+
+        heatmap = ax1.imshow(twoD.T, extent=extent, cmap='jet', interpolation='gaussian')
+        cbar = plt.colorbar(heatmap)
+        cbar.ax.tick_params(labelsize=14)
+        plt.xlabel('%s (nm)' % args.slice[0], fontsize=14)
+        plt.ylabel('%s (nm)' % args.slice[1], fontsize=14)
+        plt.gcf().get_axes()[0].tick_params(labelsize=14)
+        ax = plt.axes()
+        ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+        ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.5))
+        ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
+        ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))
+        plt.tight_layout()
+
+        if args.save:
+            plt.savefig('%s.png' % args.save)
+        if not args.noshow:
+            plt.show()
 
     ################### 1D Center of mass method ###################
     # keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep

@@ -6,6 +6,7 @@ import Structure_char
 import numpy as np
 from llclib import physical
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import os.path as path
 
 
@@ -59,6 +60,8 @@ if __name__ == "__main__":
     
     args = initialize()  # parse the args
 
+    # mpl.style.use('seaborn')
+
     regions = ['Tails', 'Head Groups', 'Sodium']
 
     if args.multi:
@@ -99,7 +102,7 @@ if __name__ == "__main__":
         exit()
 
     if args.solvate:
-        colors = ['red', 'green', 'blue', 'orange']
+        colors = ['xkcd:red', 'xkcd:green', 'blue', 'xkcd:red']
     else:
         colors = ['red', 'green', 'blue']
 
@@ -134,7 +137,7 @@ if __name__ == "__main__":
             equil = 0
             density, r, bin_width = Structure_char.compdensity(pos, p_centers, equil, t.unitcell_vectors, pores=npores, buffer=0, nbins=args.bins)
             results[-1, :] = density
-            plt.bar(r, density, bin_width, color='orange', alpha=0.5, label='Water')
+            plt.bar(r, density, bin_width, color='xkcd:gold', alpha=0.75, label='Water')
 
         for i, reg in enumerate(regions):
 
@@ -149,7 +152,7 @@ if __name__ == "__main__":
 
             results[i, :] = density
 
-            plt.bar(r, density, bin_width, color=colors[i], alpha=0.5, label=reg)
+            plt.bar(r, density, bin_width, color=colors[i], alpha=0.75, label=reg)
 
         np.savez_compressed("density", results=results, r=r, bw=bin_width, box=t.unitcell_vectors)
         print('Arrays saved as density.npz')
@@ -167,7 +170,7 @@ if __name__ == "__main__":
             regions.append('Water')
 
         for i in range(results.shape[0]):
-            plt.bar(r, results[i, :], bw, color=colors[i], alpha=0.5, label=regions[i])
+            plt.bar(r, results[i, :], bw, color=colors[i], alpha=0.75, label=regions[i])
 
     un_normalize = np.zeros_like(results)
 
@@ -213,6 +216,7 @@ if __name__ == "__main__":
     plt.ylabel('Component number density (count/nm$^3$)', fontsize=14)
     plt.xlabel('Distance from pore center (nm)', fontsize=14)
     plt.axes().tick_params(labelsize=14)
+    plt.xlim(0, 1.5)
     plt.tight_layout()
     plt.savefig("regional_density.png")
     plt.show()

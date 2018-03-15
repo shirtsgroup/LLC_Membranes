@@ -286,7 +286,7 @@ if __name__ == "__main__":
                     pore = np.append(pore_locations[i, :], layer_locations[j])
                     disk_locations[i*nlayers*disks_per_layer + j*disks_per_layer + k, :] = translate(pt, pore)
 
-    points = np.zeros([frames, npts, 3])  # will contain all positions for all frames
+    #points = np.zeros([frames, npts, 3])  # will contain all positions for all frames
 
     # generate random points inside box
     # for t in tqdm.tqdm(range(frames)):
@@ -314,6 +314,27 @@ if __name__ == "__main__":
     #                     pt = O + u * A + v * B + w * C
     #         points[t, i, :] = pt
 
+    dbwl = .37
+    layers = 20
+    nmon = 5
+    points = np.zeros([frames, 6*nmon*layers*4, 3])
+    cc_bond_length = .140  # carbon-carbon bond length in benzene
+    offset = False
+    radial_displaced = False
+    angular_displaced = False
+    alt_radii = True
+    rd = 0.25  # distance to radially displace layers
+
+    benzene = np.zeros([6, 3])
+    rotated_benzene = np.zeros([6, 3])
+    theta = np.pi / 3
+    for i in range(6):
+        benzene[i, :2] = [cc_bond_length*np.cos(i*theta), cc_bond_length*np.sin(i*theta)]
+        rotated_benzene[i, :2] = [cc_bond_length*np.cos(i*theta + theta/2), cc_bond_length*np.sin(i*theta + theta/2)]
+
+    center = np.mean(benzene, axis=0)  # automatically centered at origin, but just in case
+
+    z = np.linspace(0, (layers - 1)*dbwl, layers)
     pore_centers = np.zeros([4, 2])
     p2p = args.box_lengths[0] / 2
     theta = np.pi * args.angles[2] / 180
@@ -326,7 +347,46 @@ if __name__ == "__main__":
     pore_centers[..., 1] = pore_centers[..., 1] * np.sin(theta)
     pore_centers[..., 0] = pore_centers[..., 0] + pore_centers[..., 1]*np.cos(theta)
 
-    points[:, :4, :2] = pore_centers
+    points = np.zeros([frames, 4*len(z), 3])
+    for t in range(frames):
+        for p in range(4):
+            for zi in range(z.shape[0]):
+                points[t, p*z.shape[0] + zi, :] = [pore_centers[p, 0], pore_centers[p, 1], z[zi]]
+
+    # theta = 2*np.pi / nmon
+    # r = 0.5  # pore radius angstroms
+    # r_inner = 0.4
+    # r_outer = 0.6
+    #
+    # for f in range(frames):
+    #     for i in range(4):
+    #         for l in range(layers):
+    #             for n in range(nmon):
+    #                 placement = i*layers*nmon + l*nmon + n
+    #                 if offset:
+    #                     rand_theta = (theta - (theta/4)) + (theta/2)*np.random.rand()
+    #                     if l % 2 == 0:
+    #                         benz = benzene + [r*np.cos(n*theta + rand_theta) + pore_centers[i, 0], r*np.sin(n*theta + rand_theta) + pore_centers[i, 1], z[l]]
+    #                     else:
+    #                         benz = benzene + [r*np.cos(n*theta + rand_theta + theta/2) + pore_centers[i, 0], r*np.sin(n*theta + rand_theta + theta/2) + pore_centers[i, 1], z[l]]
+    #                 elif angular_displaced:
+    #                     if l % 2 == 0:
+    #                         benz = rotated_benzene + [r*np.cos(n*theta) + pore_centers[i, 0], r*np.sin(n*theta) + pore_centers[i, 1], z[l]]
+    #                     else:
+    #                         benz = benzene + [r*np.cos(n*theta) + pore_centers[i, 0], r*np.sin(n*theta) + pore_centers[i, 1], z[l]]
+    #                 else:
+    #                     benz = benzene + [r*np.cos(n*theta) + pore_centers[i, 0], r*np.sin(n*theta) + pore_centers[i, 1], z[l]]
+    #                 if alt_radii:
+    #                     rand_theta = (theta - (theta/8)) + (theta/4)*np.random.rand()
+    #                     if l % 2 == 0:
+    #                         benz = benzene + [r_inner*np.cos(n*theta + rand_theta + theta/2) + pore_centers[i, 0], r_inner*np.sin(n*theta + rand_theta + theta/2) + pore_centers[i, 1], z[l]]
+    #                     else:
+    #                         benz = benzene + [r_outer*np.cos(n*theta + rand_theta) + pore_centers[i, 0], r_outer*np.sin(n*theta + rand_theta) + pore_centers[i, 1], z[l]]
+    #                 if radial_displaced:
+    #                     if l % 2 == 0:
+    #                         benz += [rd, 0, 0]
+    #
+    #                 points[f, 6 * placement: 6*(placement + 1), :] = benz
 
     # Now write the trajectory in GROMACS format
 

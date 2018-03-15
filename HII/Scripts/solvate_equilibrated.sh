@@ -12,8 +12,9 @@ emsteps=50  # number of steps to take during energy minimization directly after 
 MPI=0  # set to 1 if you are running MPI
 proc=4 # number of processes
 python='python3'
+continue=0
 
-while getopts "g:t:n:e:m:p:r:" opt; do
+while getopts "g:t:n:e:m:p:r:c:" opt; do
     case $opt in
         g) GRO=$OPTARG;;
         t) t=$OPTARG;;
@@ -22,6 +23,7 @@ while getopts "g:t:n:e:m:p:r:" opt; do
         m) MPI=$OPTARG;;
         p) p=$OPTARG;;
         r) proc=$OPTARG;;
+        c) continue=$OPTARG;;
     esac
 done
 
@@ -31,13 +33,21 @@ else
     GMX="gmx"
 fi
 
+if [[ ${continue} -eq 1 ]]; then
+    top=$(tail topol.top -n 1)
+    set $top
+    start=$2
+else
+    start=1
+fi
+
 # generate topology to be modified
 ${python} ${DIR}/input.py -c ${GRO}
 
 cp ${GRO} npt.gro
 mv topol.top topol_dry.top
 
-for i in $(seq 1 ${n}); do
+for i in $(seq ${start} ${n}); do
 
     echo "Adding water molecule # ${i}"
     # place water molecule in structure
