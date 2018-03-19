@@ -141,6 +141,29 @@ def energy_minimize(steps, nwater, rem, water_placement_point):
     p4.wait()
 
 
+def placement(placement_region):
+
+    if placement_region == 'pores':
+
+        # find the pore centers
+        pore_atom_indices = [a.index for a in t.topology.atoms if a.name in args.pore_atoms]
+        pore_centers = physical.avg_pore_loc(4, t.xyz[0, pore_atom_indices, :])
+
+        # randomly choose a pore from a uniform distribution
+        pore = np.random.choice([0, 1, 2, 3])
+        random_cylinder_point = random_pt_cylinder(args.radius_pore, t.unitcell_vectors[0, 2, 2])  # height is z-box vector
+        water_placement_point = random_cylinder_point + [pore_centers[0, pore], pore_centers[1, pore], 0]  # shift so cylinder is centered at chosen pore center
+
+    else:
+
+        tail_atom_indices = [a.index for a in t.topology.atoms if a.name in args.tail_atoms]  # indices of oxygens in tails
+        placement_atom = np.random.choice(tail_atom_indices)  # randomly choose which atom to place water molecule near
+        # place point within spherical shell centered at placement_atom with inner radius=rmin and outside radius=rmax
+        water_placement_point = solvate_tails.random_pt_spherical_shell(t.xyz[0, placement_atom, :], args.rmin, args.rmax)
+
+    return water_placement_point
+
+
 def place_water(xyz, water_placement_point, ids, res, box, emsteps, rem):
 
     water = md.load('%s/../top/solutes/water.gro' % location)  # load water structure
@@ -160,6 +183,7 @@ def place_water(xyz, water_placement_point, ids, res, box, emsteps, rem):
     except ValueError:
         return 0    # If the system did not energy minimize, the above statement will not work because nrg will be an
                     # empty string. Make nrg=0 so placement gets attempted again
+
 
 if __name__ == "__main__":
 
@@ -183,25 +207,9 @@ if __name__ == "__main__":
     # choose whether we will place a water in the pores or in the tails
     placement_region = np.random.choice(['tails', 'pores'], p=[1 - args.probability, args.probability])
 
-    if placement_region == 'pores':
-
-        # find the pore centers
-        pore_atom_indices = [a.index for a in t.topology.atoms if a.name in args.pore_atoms]
-        pore_centers = physical.avg_pore_loc(4, t.xyz[0, pore_atom_indices, :])
-
-        # randomly choose a pore from a uniform distribution
-        pore = np.random.choice([0, 1, 2, 3])
-        random_cylinder_point = random_pt_cylinder(args.radius_pore, t.unitcell_vectors[0, 2, 2])  # height is z-box vector
-        water_placement_point = random_cylinder_point + [pore_centers[0, pore], pore_centers[1, pore], 0]  # shift so cylinder is centered at chosen pore center
-
-    else:
-
-        tail_atom_indices = [a.index for a in t.topology.atoms if a.name in args.tail_atoms]  # indices of oxygens in tails
-        placement_atom = np.random.choice(tail_atom_indices)  # randomly choose which atom to place water molecule near
-        # place point within spherical shell centered at placement_atom with inner radius=rmin and outside radius=rmax
-        water_placement_point = solvate_tails.random_pt_spherical_shell(t.xyz[0, placement_atom, :], args.rmin, args.rmax)
-
+    water_placement_point = placement(placement_region)
     nrg = place_water(t.xyz[0, :, :], water_placement_point, ids, res, box_gromacs, args.emsteps, args.rem)
 
     while nrg > -50000:  # make sure the system is somewhat stable by checking potential energy after minimization
+        water_placement_point = placement(placement_region)  # try placing the water somewhere else
         nrg = place_water(t.xyz[0, :, :], water_placement_point, ids, res, box_gromacs, args.emsteps, args.rem)
