@@ -13,8 +13,9 @@ MPI=0  # set to 1 if you are running MPI
 proc=4 # number of processes
 python='python3'
 continue=0
+equil_time=400000  # time to equilibrate after solvation (ps)
 
-while getopts "g:t:n:e:m:p:r:c:" opt; do
+while getopts "g:t:n:e:m:p:r:c:q:" opt; do
     case $opt in
         g) GRO=$OPTARG;;
         t) t=$OPTARG;;
@@ -24,6 +25,7 @@ while getopts "g:t:n:e:m:p:r:c:" opt; do
         p) p=$OPTARG;;
         r) proc=$OPTARG;;
         c) continue=$OPTARG;;
+        q) equil_time=$OPTARG;;
     esac
 done
 
@@ -61,3 +63,11 @@ for i in $(seq ${start} ${n}); do
     ${GMX} mdrun -v -deffnm npt
 
 done
+
+${python} ${DIR}/input.py -S -l 5000 -f 50 --barostat berendsen --genvel 'no', -c npt.gro
+${GMX} grompp -f npt.mdp -p topol.top -c npt.gro -o berendsen
+${GMX} mdrun -v -deffnm berendsen
+
+${python} ${DIR}/input.py -S -l ${q} -f 1000 --barostat Parrinello-Rahman --genvel 'no', -c berendsen.gro
+${GMX} grompp -f npt.mdp -p topol.top -c npt.gro -o berendsen
+${GMX} mdrun -v -deffnm berendsen
