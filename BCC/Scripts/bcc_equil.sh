@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # the directory where this script is located.
+DIR2="${DIR}/../../HII/Scripts"  # some scripts aren't located in the same directory as $DIR
+
 build_mon="Dibrpyr14"  # monomer to build system with
 phase="gyroid"  # bcc phase to build
 dimension=10  # length of cubic unitcell box vector
@@ -14,6 +17,7 @@ restraint_atoms="C23 C17 C28"
 sol_res=GLY # solvent residue name
 cluster=0  # 0 if run without mpi, 1 if run with mpi (regular MPI or with GPU)
 NP=4  # number of MPI processes
+python='python3'
 
 while getopts "b:p:d:r:n:I:w:S:T:R:c:P" opt; do
     case $opt in
@@ -38,13 +42,13 @@ else
     GMX="gmx"
 fi
 
-bcc_build.py -b ${build_mon}.gro -p ${phase} -d ${dimension} -dens ${density} -shift ${SHIFT} -o initial.gro -wt ${wt_percent} -sol ${solvent}
-reorder_gro.py -i initial.gro -o bcc.gro -I ${ion}
+${python} ${DIR}/bcc_build.py -b ${build_mon}.gro -p ${phase} -d ${dimension} -dens ${density} -shift ${SHIFT} -o initial.gro -wt ${wt_percent} -sol ${solvent}
+${python} ${DIR2}/reorder_gro.py -i initial.gro -o bcc.gro -I ${ion}
 echo "Initial unit cell built"
-input.py --bcc -b ${build_mon} -s 5000 # only care about em.mdp and topol.top at this step
+${python} ${DIR2}/input.py --bcc -b ${build_mon} -s 5000 # only care about em.mdp and topol.top at this step
 
 # really spread the monomers apart
-scale.py -g bcc.gro -o bcc.gro -f 2  # triple each dimension of the unit cell and isotropically scale all head group positions
+${python} ${DIR}/scale.py -g bcc.gro -o bcc.gro -f 2  # triple each dimension of the unit cell and isotropically scale all head group positions
 
 gmx grompp -f em.mdp -p topol.top -c bcc.gro -o em
 ${GMX} mdrun -v -deffnm em
@@ -62,7 +66,7 @@ cp bcc.gro bcc_2.0.gro
 for i in $(seq 1.9 -0.1 1.0); do
 
     factor=$(echo "${i} / (${i} + 0.1)" | bc -l)
-    scale.py -g bcc.gro -o bcc.gro -f ${factor}
+    ${python} ${DIR}/scale.py -g bcc.gro -o bcc.gro -f ${factor}
     gmx grompp -f em.mdp -p topol.top -c bcc.gro -o em
     ${GMX} mdrun -v -deffnm em
 
@@ -73,7 +77,7 @@ for i in $(seq 1.9 -0.1 1.0); do
         cp bcc_${step}.gro bcc.gro
         for j in $(seq $(echo "${i} + 0.08" |bc -l) -0.02 ${i}); do
             factor=$(echo "${j} / (${j} + 0.02)" | bc -l)
-            scale.py -g bcc.gro -o bcc.gro -f ${factor}
+            ${python} ${DIR}/scale.py -g bcc.gro -o bcc.gro -f ${factor}
             gmx grompp -f em.mdp -p topol.top -c bcc.gro -o em
             ${GMX} mdrun -v -deffnm em
             echo 0 | gmx trjconv -f em.trr -s em.tpr -pbc nojump -o bcc.gro
@@ -87,7 +91,7 @@ done
 
 LOC="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-nsol=$(nsolvent.py -b ${build_mon}.gro -d ${dimension} -dens ${density} -wt ${wt_percent} -sol ${solvent})
+nsol=$(${python} ${DIR}/nsolvent.py -b ${build_mon}.gro -d ${dimension} -dens ${density} -wt ${wt_percent} -sol ${solvent})
 ntot=0
 
 echo "Inserting ${nsol} ${solvent} molecules"
@@ -95,8 +99,8 @@ gmx insert-molecules -f bcc.gro -ci ${LOC}/../top/structures/${solvent}.gro -nmo
 nadded=$(awk '/Added/ {print $2}' placement.txt)  # the actual amount of molecules gromacs was able to place
 ntot=$((nadded + ntot))
 
-input.py --bcc -b ${build_mon} -l 50 --temp ${temp} -f 50 --genvel yes -e nvt -S --solvent glycerol --restraints
-restrain.py -a ${restraint_atoms} -f 100 -m ${build_mon} -g em.gro -r on -A xyz --novsites --bcc
+${python} ${DIR2}/input.py --bcc -b ${build_mon} -l 50 --temp ${temp} -f 50 --genvel yes -e nvt -S --solvent glycerol --restraints
+${python} ${DIR2}/restrain.py -a ${restraint_atoms} -f 100 -m ${build_mon} -g em.gro -r on -A xyz --novsites --bcc
 echo "${sol_res}         ${nadded}" >> topol.top
 
 gmx grompp -f em.mdp -p topol.top -c initial.gro -o em
@@ -128,18 +132,18 @@ while [[ ${ntot} -lt ${nsol} ]]; do
 done
 
 # a 'long' nvt equilibration
-input.py --bcc -b ${build_mon} -l 5000 --temp ${temp} -f 50 --genvel yes -e nvt -S --solvent glycerol --restraints
+${python} ${DIR2}/input.py --bcc -b ${build_mon} -l 5000 --temp ${temp} -f 50 --genvel yes -e nvt -S --solvent glycerol --restraints
 echo "${sol_res}              ${ntot}" >> topol.top
 
 # restrain the head groups and tails during nvt equilibration
-restrain.py -a ${restraint_atoms} -f 100 -m ${build_mon} -g em.gro -r on -A xyz --novsites --bcc
+${python} ${DIR2}/restrain.py -a ${restraint_atoms} -f 100 -m ${build_mon} -g em.gro -r on -A xyz --novsites --bcc
 
 gmx grompp -f nvt.mdp -p topol.top -c nvt.gro -o nvt
 ${GMX} mdrun -v -deffnm nvt
 echo 0 | gmx trjconv -f nvt.trr -s nvt.tpr -pbc nojump -o nvt.gro -b 5000
 
 # switching to npt ensemble
-input.py --bcc -b ${build_mon} -l 50 --temp ${temp} -f 50 --genvel no -e npt -S --solvent glycerol
+${python} ${DIR2}/input.py --bcc -b ${build_mon} -l 50 --temp ${temp} -f 50 --genvel no -e npt -S --solvent glycerol
 echo "${sol_res}              ${ntot}" >> topol.top
 
 gmx grompp -f npt.mdp -p topol.top -c nvt.gro -o npt
@@ -166,7 +170,7 @@ while [[ ${ntot} -lt ${nsol} ]]; do
 done
 
 # long npt simulation
-input.py --bcc -b ${build_mon} -l 5000 --temp ${temp} -f 50 --genvel no -e npt -S --solvent glycerol
+${python} ${DIR2}/input.py --bcc -b ${build_mon} -l 5000 --temp ${temp} -f 50 --genvel no -e npt -S --solvent glycerol
 echo "${sol_res}              ${ntot}" >> topol.top
 
 gmx grompp -f npt.mdp -p topol.top -c npt.gro -o npt
