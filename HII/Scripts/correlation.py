@@ -243,7 +243,7 @@ if __name__ == "__main__":
         centers_y = [edges[1][i] + ((edges[1][i + 1] - edges[1][i])/2) for i in range(bins[1])]
         middle_x = bins[0] // 2
         middle_y = bins[1] // 2
-        r = 0.14
+        r = 0.42
         avg = []
         for i, ix in enumerate(centers_x):
             for j, jy in enumerate(centers_y):

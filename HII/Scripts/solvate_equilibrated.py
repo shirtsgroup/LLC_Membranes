@@ -155,7 +155,11 @@ def place_water(xyz, water_placement_point, ids, res, box, emsteps, rem):
     energy_minimize(emsteps, nwater + 1, rem, water_placement_point)  # energy minimzed system
     nrg = subprocess.check_output(["awk", "/Potential Energy/ {print $4}", "em.log"])  # get Potential energy from em.log
 
-    return float(nrg.decode("utf-8"))
+    try:
+        return float(nrg.decode("utf-8"))
+    except ValueError:
+        return 0    # If the system did not energy minimize, the above statement will not work because nrg will be an
+                    # empty string. Make nrg=0 so placement gets attempted again
 
 if __name__ == "__main__":
 

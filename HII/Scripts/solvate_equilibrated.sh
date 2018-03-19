@@ -60,6 +60,4 @@ for i in $(seq ${start} ${n}); do
     ${GMX} grompp -f npt.mdp -p top_intermediate -c em.gro -o npt > /dev/null 2>&1
     ${GMX} mdrun -v -deffnm npt
 
-    rm \#*
-
 done
