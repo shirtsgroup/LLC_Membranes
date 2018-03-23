@@ -36,11 +36,13 @@ class LC(object):
 
         self.full = a
         P = []
+        P_ndx = []
         L = []
         C1 = []
         C2 = []
         C1_ndx = []
         C2_ndx = []
+        I_ndx = []
         self.no_ions = 0
         self.ions = []
         self.MW = 0
@@ -66,6 +68,7 @@ class LC(object):
                     annotations = fields[1].split()
                     if 'P' in annotations:
                         P.append(str.strip(a[i][10:15]))
+                        P_ndx.append(i - 2)
                     if 'L' in annotations:
                         L.append(i - 2)  # adjust for top lines and index (count from 0 rather than 1)
                     if 'R' in annotations:
@@ -82,6 +85,7 @@ class LC(object):
                         self.valence = Atom_props.charge[ion]
                         if ion not in self.ions:
                             self.ions.append(ion)
+                        I_ndx.append(i - 2)
                     if 'B' in annotations:
                         benzene_carbons.append(str.strip(a[i][10:15]))
 
@@ -133,6 +137,7 @@ class LC(object):
 
         self.natoms = sum(nres) - self.no_ions
         self.planeatoms = P
+        self.plane_indices = P_ndx
         self.lineatoms = L
         self.residues = residues
         self.nresidues = nres
@@ -141,6 +146,7 @@ class LC(object):
         self.c1_index = C1_ndx
         self.c2_index = C2_ndx
         self.benzene_carbons = benzene_carbons
+        self.ion_indices = I_ndx
 
     def get_index(self, name):
         """

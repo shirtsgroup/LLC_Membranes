@@ -68,6 +68,6 @@ ${python} ${DIR}/input.py -S -l 5000 -f 50 --barostat berendsen --genvel 'no', -
 ${GMX} grompp -f npt.mdp -p topol.top -c npt.gro -o berendsen
 ${GMX} mdrun -v -deffnm berendsen
 
-${python} ${DIR}/input.py -S -l ${q} -f 1000 --barostat Parrinello-Rahman --genvel 'no', -c berendsen.gro
-${GMX} grompp -f npt.mdp -p topol.top -c npt.gro -o berendsen
-${GMX} mdrun -v -deffnm berendsen
+${python} ${DIR}/input.py -S -l ${equil_time} -f 1000 --barostat Parrinello-Rahman --genvel 'no', -c berendsen.gro
+${GMX} grompp -f npt.mdp -p topol.top -c berendsen.gro -o PR
+${GMX} mdrun -v -deffnm PR

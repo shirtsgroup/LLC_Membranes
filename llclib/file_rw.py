@@ -265,6 +265,8 @@ def get_indices(a, xlink):
 def write_initial_config(positions, identity, name, no_layers, layer_distribution, dist, no_pores, p2p, no_ions, rot, out,
               offset, helix, offset_angle, *flipped):
 
+    write_gro_pos(positions.T / 10, 'test.gro')
+
     f = open('%s' % out, 'w')
 
     f.write('This is a .gro file\n')
@@ -322,7 +324,10 @@ def write_initial_config(positions, identity, name, no_layers, layer_distributio
                         xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist + (dist / float(layer_mons))*j]
                         hundreds = int(math.floor(atom_count / 100000))
                     else:
-                        xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist]
+                        if k % 2 == 0:
+                            xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist - 0.5*dist]
+                        else:
+                            xyz[:, i] = np.dot(Rx, positions[:, i]) + [b*p2p, c*p2p, k*dist]
                         # xyz[:, i] = np.dot(Rx, positions[:, i]) + [b, c, k*dist]
                         hundreds = int(math.floor(atom_count / 100000))
                     f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(monomer_count, name, identity[i],

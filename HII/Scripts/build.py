@@ -508,7 +508,8 @@ if __name__ == "__main__":
         if identity[i] in props.planeatoms:
             plane[count, :] = pos[:, i]
             count += 1
-
+    print(plane)
+    exit()
     if args.flip:
         tilt = 0
         R_down = transform.rotateplane(plane, angle=math.pi)

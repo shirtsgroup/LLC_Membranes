@@ -354,13 +354,14 @@ def rotate_vector(xyz, v1, v2):
     return pos
 
 
-def rotate_coords_z(xyz, angle):
+def rotate_coords_z(pos, angle):
     """
     :param xyz: xyz coordinates of atoms to be rotated, degrees
     :param angle: angle to rotate them by w.r.t origin
     :return:
     """
 
+    xyz = np.copy(pos)
     angle *= (np.pi / 180)  # convert to radians
 
     R = rotate_z(angle)

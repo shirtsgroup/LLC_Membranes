@@ -7,11 +7,10 @@ import Atom_props
 import tqdm
 import matplotlib.pyplot as plt
 from matplotlib import ticker
-from llclib import physical
-from llclib import transform
 from llclib import fast_rotate
 from place_solutes import trace_pores
-from scipy import ndimage
+from scipy.optimize import curve_fit
+import detect_peaks
 
 
 def initialize():
@@ -43,6 +42,8 @@ def initialize():
                         '[dimension 1 lower, dimension 1 upper, dimension 2 lower, dimension 2 upper ...]')
     parser.add_argument('-com', '--center_of_mass', action="store_true", help='Calculate based on center of mass of'
                                                                                'args.atoms')
+    parser.add_argument('-offset', action="store_true", help='If system is in offset configuration, correlation length'
+                                                             'will be calculated using every other peak')
 
     args = parser.parse_args()
 
@@ -106,6 +107,29 @@ def duplicate_periodically(pts, box):
 
     return p
 
+
+def sinusoidal_decay(x, a, b, c, d):
+    """
+    :param p: parameters: [period of oscillations, correlation time, amplitude, phase shift]
+    :param x: x axis values
+    :return: exponential function that sinusoidially decays to one
+    """
+
+    return 1 + c*np.sin(a*x + d)*np.exp(-x/b)
+
+
+def exponential_decay(x, L):
+
+    return 1 + np.exp(-x / L)
+
+
+def locate_peaks(y):
+    """
+    :param y: y data (numpy array)
+    :return: ndx : indices of peak locations
+    """
+
+
 if __name__ == "__main__":
 
     args = initialize()
@@ -123,61 +147,65 @@ if __name__ == "__main__":
 
     ndimensions = 3  # always do full 3d correlation function
 
-    if type(args.bins) is list:
-        if len(args.bins) > 1:
-            bins = np.array(args.bins)
+    if not args.load:
+
+        if type(args.bins) is list:
+            if len(args.bins) > 1:
+                bins = np.array(args.bins)
+            else:
+                bins = np.array([args.bins[0]]*ndimensions)
         else:
-            bins = np.array([args.bins[0]]*ndimensions)
-    else:
-        bins = np.array([args.bins]*ndimensions)
+            bins = np.array([args.bins]*ndimensions)
 
-    t = md.load(args.traj, top=args.gro)[args.begin:]
-    print('Trajectory loaded')
+        t = md.load(args.traj, top=args.gro)[args.begin:]
+        print('Trajectory loaded')
 
-    mass = [Atom_props.mass[i] for i in args.atoms]  # mass of reference atoms
+        mass = [Atom_props.mass[i] for i in args.atoms]  # mass of reference atoms
 
-    L = np.zeros([3])  # average box vectors in each dimension
-    for i in range(3):
-        L[i] = np.mean(np.linalg.norm(t.unitcell_vectors[:, i, :], axis=1))
+        L = np.zeros([3])  # average box vectors in each dimension
+        for i in range(3):
+            L[i] = np.mean(np.linalg.norm(t.unitcell_vectors[:, i, :], axis=1))
 
-    if args.range:
-        hist_range = []
-        for i in range(ndimensions):
-            hist_range.append([])
-            hist_range[i].append(float(args.range[i*2]))
-            hist_range[i].append(float(args.range[i*2 + 1]))
-    else:
-        hist_range = []
-        for i in range(ndimensions):
-            hist_range.append([-L[i]/2, L[i]/2])
+        if args.range:
+            hist_range = []
+            for i in range(ndimensions):
+                hist_range.append([])
+                hist_range[i].append(float(args.range[i*2]))
+                hist_range[i].append(float(args.range[i*2 + 1]))
+        else:
+            hist_range = []
+            for i in range(ndimensions):
+                hist_range.append([-L[i]/2, L[i]/2])
 
-    keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep
+        keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep
 
-    pore_spline = np.zeros([t.n_frames, npores*args.layers, 3])
-    for frame in range(t.n_frames):
-        pore_spline[frame, :, :] += trace_pores(t.xyz[frame, keep, :], t.unitcell_vectors[frame, :2, :2], args.layers)
+        pore_spline = np.zeros([t.n_frames, npores*args.layers, 3])
+        for frame in range(t.n_frames):
+            pore_spline[frame, :, :] += trace_pores(t.xyz[frame, keep, :], t.unitcell_vectors[frame, :2, :2], args.layers)
 
-    ###################### 3D center of mass #########################
+        ###################### 3D center of mass #########################
 
-    keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep
-    #keep = [a.index for a in t.topology.atoms if a.residue.name == 'HOH' and a.name == 'O']  # indices of atoms to keep
+        keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep
+        #keep = [a.index for a in t.topology.atoms if a.residue.name == 'HOH' and a.name == 'O']  # indices of atoms to keep
 
-    natoms = len(args.atoms)
-    monomers_per_layer = int(len(keep) / args.layers / npores / len(args.atoms))  # divide by len(args.atoms) because of com
+        natoms = len(args.atoms)
+        monomers_per_layer = int(len(keep) / args.layers / npores / len(args.atoms))  # divide by len(args.atoms) because of com
 
-    if args.center_of_mass:
-        center_of_mass = com(t.xyz[:, keep, :], mass)  # calculate centers of mass of atom groups
-    else:
-        center_of_mass = t.xyz[:, keep, :]
+        if args.center_of_mass:
+            center_of_mass = com(t.xyz[:, keep, :], mass)  # calculate centers of mass of atom groups
+        else:
+            center_of_mass = t.xyz[:, keep, :]
 
-    com_per_pore = int(center_of_mass.shape[1] / npores)
+        ncom = center_of_mass.shape[1]
 
-    periodic_pts = duplicate_periodically(center_of_mass, t.unitcell_vectors)
+        com_per_pore = int(center_of_mass.shape[1] / npores)
 
-    correlation = np.zeros(bins)
+        periodic_pts = duplicate_periodically(center_of_mass, t.unitcell_vectors)
 
-    x = np.array([1, 0, 0])
-    xnorm = np.linalg.norm(x)
+        correlation = np.zeros(bins)
+
+        x = np.array([1, 0, 0])
+        xnorm = np.linalg.norm(x)
 
     if args.load:
 
@@ -189,6 +217,7 @@ if __name__ == "__main__":
         correlation = corr['correlation']
         edges = corr['edges']
         frames = corr['frames']
+        ncom = corr['ncom']
 
     else:
         frames = t.n_frames
@@ -227,22 +256,22 @@ if __name__ == "__main__":
                             # plt.show()
 
         if len(args.slice) > 1:
-            np.savez_compressed('correlation_%s%s' % (args.slice[0], args.slice[1]), correlation=correlation, edges=edges, frames=frames)
+            np.savez_compressed('correlation_%s%s' % (args.slice[0], args.slice[1]), correlation=correlation, edges=edges, frames=frames, ncom=ncom)
         else:
-            np.savez_compressed('correlation_%s' % (args.slice[0]), correlation=correlation, edges=edges, frames=frames)
+            np.savez_compressed('correlation_%s' % (args.slice[0]), correlation=correlation, edges=edges, frames=frames, ncom=ncom)
 
     # Normalize 3D correlation function
-    normalization = frames * center_of_mass.shape[1]**2 / np.prod(bins)
+    normalization = frames * ncom**2 / np.prod(correlation.shape)
     correlation /= normalization
 
-    centers1 = [edges[dimensions[0]][i] + ((edges[dimensions[0]][i + 1] - edges[dimensions[0]][i])/2) for i in range(bins[dimensions[0]])]
+    centers1 = [edges[dimensions[0]][i] + ((edges[dimensions[0]][i + 1] - edges[dimensions[0]][i])/2) for i in range(correlation.shape[dimensions[0]])]
 
     if len(dimensions) == 1:
         # only works for z slice currently
-        centers_x = [edges[0][i] + ((edges[0][i + 1] - edges[0][i])/2) for i in range(bins[0])]
-        centers_y = [edges[1][i] + ((edges[1][i + 1] - edges[1][i])/2) for i in range(bins[1])]
-        middle_x = bins[0] // 2
-        middle_y = bins[1] // 2
+        centers_x = [edges[0][i] + ((edges[0][i + 1] - edges[0][i])/2) for i in range(correlation.shape[0])]
+        centers_y = [edges[1][i] + ((edges[1][i + 1] - edges[1][i])/2) for i in range(correlation.shape[1])]
+        middle_x = correlation.shape[0] // 2
+        middle_y = correlation.shape[1] // 2
         r = 0.42
         avg = []
         for i, ix in enumerate(centers_x):
@@ -258,15 +287,53 @@ if __name__ == "__main__":
         while centers1[shift] < 0.2:
             shift += 1
 
-        plt.figure()
-        plt.plot(centers1[shift:], zdf[shift:]/np.mean(zdf[shift:]))
-        plt.ylabel('Normalized Count')
-        plt.xlabel('Distance (nm)')
+        # plt.figure()
+        # ft = np.abs(np.fft.fft(zdf[shift:] - np.mean(zdf[shift:])))**2
+        # freq = np.fft.fftfreq(zdf[shift:].size, centers1[1] - centers1[0])
+        # ndx = np.argsort(freq)
+        # freq = freq[ndx]
+        # ft = ft[ndx]
+        # plt.plot(freq, ft)
+
+        zdf /= np.mean(zdf)
+        zdf = zdf[shift:]
+        centers1 = np.array(centers1[shift:])
+
+        peaks = detect_peaks.detect_peaks(zdf, mpd=12, show=False)  # adjust mpd if number of peaks comes out wrong
+
+        if args.offset:
+            peaks = peaks[1::2]  # every other peak starting at the second peak
 
         plt.figure()
-        plt.plot(centers1[shift:], correlation[middle_x, middle_y, shift:]/np.mean(correlation[middle_x, middle_y, shift:]))
-        plt.ylabel('Normalized Count')
-        plt.xlabel('Distance (nm)')
+        plt.plot(centers1, zdf, label='Raw data')
+        plt.scatter(centers1[peaks], zdf[peaks], marker='+', c='r', s=200, label='Peak locations')
+
+        # period = 0.438
+        p = np.array([0.1])  # initial guess at parameters
+
+        solp, cov_x = curve_fit(exponential_decay, centers1[peaks], zdf[peaks], p)
+
+        # if args.plot_fit:
+        #plt.plot(centers1[shift:], decay(np.array(centers1[shift:]), solp[0], solp[1], solp[2], solp[3]), '--', color='black', label='Least squares fit')
+        plt.plot(centers1, exponential_decay(centers1, solp[0]), '--', c='black', label='Least squares fit')
+
+        print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*solp[0], 10*np.sqrt(cov_x[0, 0])))
+        # print('Oscillation Period = %1.3f nm' % (10*(2*np.pi)/solp[0]))
+
+        plt.xlabel('Z distance separation (nm)', fontsize=14)
+        plt.ylabel('Count', fontsize=14)
+        plt.axes().tick_params(labelsize=14)
+        plt.tight_layout()
+        plt.legend(loc=1, prop={'size': 16})
+        plt.ylim(0, 1.2*np.amax(zdf))
+        plt.tight_layout()
+        # plt.savefig('zdf_overlay.png')
+        plt.show()
+
+        # plt.figure()
+        # plt.plot(centers1[shift:], correlation[middle_x, middle_y, shift:]/np.mean(correlation[middle_x, middle_y, shift:]))
+        # plt.ylabel('Normalized Count')
+        # plt.xlabel('Distance (nm)')
         plt.show()
 
     if len(dimensions) > 1:

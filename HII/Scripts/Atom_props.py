@@ -6,6 +6,7 @@ import make_dict
 
 mass = {}
 charge = {}
+radius = {}
 
 mass['C'] = 12.01
 mass['C1'] = 12.01
@@ -326,3 +327,8 @@ charge['OW'] = -0.834
 charge['HW1'] = .417
 charge['HW2'] = .417
 charge['BR'] = -1.00000
+
+radius['C'] = 170  # angstroms
+radius['O'] = 152
+radius['H'] = 120
+radius['NA'] = 227
