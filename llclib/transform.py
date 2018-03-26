@@ -164,20 +164,36 @@ def transdir(pt, origin=[0, 0]):
     return vx, vy
 
 
+def rotate_x(theta):
+    """
+    formerly 'rotate'
+    :param: angle by which to rotate the monomer
+    :return: Rotation matrix to rotate input vector about x-axis
+    """
+    Rx = np.zeros([3, 3])  # makes a 3 x 3 zero matrix
+    Rx[0, 0] = 1
+    Rx[2, 1] = math.sin(theta)
+    Rx[1, 2] = -math.sin(theta)
+    Rx[1, 1] = math.cos(theta)
+    Rx[2, 2] = math.cos(theta)
+
+    return Rx
+
+
 def rotate_z(theta):
     """
     formerly 'rotate'
     :param: angle by which to rotate the monomer
     :return: Rotation matrix to rotate input vector about z-axis
     """
-    Rx = np.zeros([3, 3])  # makes a 3 x 3 zero matrix
-    Rx[0, 0] = math.cos(theta)
-    Rx[1, 0] = math.sin(theta)
-    Rx[0, 1] = -math.sin(theta)
-    Rx[1, 1] = math.cos(theta)
-    Rx[2, 2] = 1
+    Rz = np.zeros([3, 3])  # makes a 3 x 3 zero matrix
+    Rz[0, 0] = math.cos(theta)
+    Rz[1, 0] = math.sin(theta)
+    Rz[0, 1] = -math.sin(theta)
+    Rz[1, 1] = math.cos(theta)
+    Rz[2, 2] = 1
 
-    return Rx
+    return Rz
 
 
 def reposition(xyz, R, ref_index, lineatoms, pore_radius):
@@ -352,6 +368,24 @@ def rotate_vector(xyz, v1, v2):
         pos[i, :] = np.dot(Rz, xyz[i, :])
 
     return pos
+
+
+def rotate_coords_x(pos, angle):
+    """
+    :param xyz: xyz coordinates of atoms to be rotated, degrees
+    :param angle: angle to rotate them by w.r.t origin
+    :return:
+    """
+
+    xyz = np.copy(pos)
+    angle *= (np.pi / 180)  # convert to radians
+
+    R = rotate_x(angle)
+
+    for i in range(np.shape(xyz)[0]):
+        xyz[i, :] = np.dot(R, xyz[i, :])
+
+    return xyz
 
 
 def rotate_coords_z(pos, angle):

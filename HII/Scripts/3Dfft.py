@@ -517,7 +517,7 @@ if __name__ == "__main__":
             fft = np.abs(np.fft.fftn(H))**2
     else:
         fft = np.abs(np.fft.fftn(fgrid))**2
-    print(zbin)
+
     freq_x = np.fft.fftfreq(x.size - 1, d=xbin)
     ndx = np.argsort(freq_x)
     freq_x = freq_x[ndx]
