@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+vi #!/usr/bin/env python
 
 import argparse
 import mdtraj as md
