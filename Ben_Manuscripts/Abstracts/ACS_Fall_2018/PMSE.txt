@@ -1,5 +1,7 @@
 # Division of Polymeric Science and Engineering
 
+
+Understanding the nanoscopic pore structure of a hexagonal phase lyotropic liquid crystal membrane
 %MRS: title? Make it clear what you are looking at. 
 
 %MRS: Talk about structural details at the nanoscale.  I think what
@@ -18,34 +20,27 @@ separations such as desalination and biorefinement.
 %MRS: maybe emphasize use of XRAY and MD together to understand the
  nanopore structure.
 
-We use atomistic molecular dynamics simulations in order to understand
-the mechanisms of solute transport in these complex self-assembled
-systems so that we can design these membranes to achieve specific
-separations goals.
+We've matched X-ray diffraction (XRD) patterns generated from equilibrated atomistic molecular 
+dynamics simulation trajectories to experimental 2D wide angle X-ray scattering (WAXS)
+patterns in order to gain a detailed picture of the LLC membrane nanopores. Using this approach, we created
+a structural model that is maximally consistent with experimental WAXS by matching reciprocal space motifs
+to real space configurations. We learned the
+density of monomers that pack around pore cylinders. We have evidence to support that aromatic monomer head
+groups pi-pi stack on top of each other in a sandwiched, rather than parallel displaced, configuration. We show that
+the long alkane tails of each monomer pack into hexagonal arrays with short range order. 
+We also observed alternate metastable configurations, stable for 100s of nanoseconds, but whose simulated XRD patterns are distinct from experiment. 
+By studying the system in real space, we observe
+that the pores are not idealistic cylinders, but rather consist of a gradient in
+composition transitioning from hydrophilic cores to hydrophobic tail regions.
+We use cross-sections of 3D correlation functions to assess the degree of ordering in our system and to
+compare it to experimentally measured values. We calculate the nematic order parameter and the correlation
+length of monomer columns in order to quantify the degree of ordering along the system's pore axis.
+Using our detailed model of the membrane pores we will be able to study the transport of
+small charged and uncharged molecules within them with confidence that the 
+chemical environment is a close match to the real system.
 
 %MRS: this stuff is not that interesting; more introduction than
  abstract. Doesn't really describe problems or findings.
-
-Our preliminary results have shown that atomistic simulation produces
-metastable structures dependent on one's choice of initial
-configuration. It is clear that without an understanding of the
-nanoscopic structure of these membranes, we will not be able to
-appropriately model the chemical environment present in the real
-system. 
-
-%MRS: talk more about using XRAY and MD together.
-Fortunately, experimentalists have provided us with detailed
-1D and 2D small angle X-ray scattering (SAXS) and wide angle X-ray
-scattering (WAXS) data. We calculated the structure factor of various
-metastable molecular dynamics configurations as well as simplified
-models in order to understand what real space structural features are
-responsible for the reciprocal space features that we see in the X-ray
-diffraction patterns. We have also examined correlation functions in
-real space to assess the degree of ordering in our system and to
-compare it to experimentally measured values. Using our approach, we
-have been able to construct a model that is maximally consistent with
-experimental results and is therefore suitable to be studied in order
-to gain insights about solute transport mechanisms.
 
 %MRS: talk about the nature of the pore, how there is not a CLEAN
  pore, I think that will be interesting to them.  Right now, there are
