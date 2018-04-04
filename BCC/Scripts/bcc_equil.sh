@@ -53,7 +53,7 @@ ${python} ${DIR}/scale.py -g bcc.gro -o bcc.gro -f 2  # triple each dimension of
 gmx grompp -f em.mdp -p topol.top -c bcc.gro -o em
 
 #if [[ ${cluster} -eq 1 ]]; then
-mpirun -np 4 gmx_mpi mdrun -v -deffnm em
+mpirun -np 20 gmx_mpi mdrun -v -deffnm em
 #else
 #    gmx mdrun -v -deffnm em
 #fi
