@@ -11,6 +11,7 @@ from llclib import fast_rotate
 from place_solutes import trace_pores
 from scipy.optimize import curve_fit
 import detect_peaks
+from scipy.interpolate import RegularGridInterpolator
 
 
 def initialize():
@@ -44,6 +45,12 @@ def initialize():
                                                                                'args.atoms')
     parser.add_argument('-offset', action="store_true", help='If system is in offset configuration, correlation length'
                                                              'will be calculated using every other peak')
+    parser.add_argument('-aa', '--angle_average', action="store_true", help='Angle average the 3D correlation function'
+                                                                            'about z-axis')
+    parser.add_argument('-notraj', action="store_true", help='Calculate correlation function based on single frame.'
+                                                             'Useful for test configurations..maybe')
+    parser.add_argument('-invert', action="store_true", help='Invert correlation function at end to get structure'
+                                                             'factor')
 
     args = parser.parse_args()
 
@@ -123,11 +130,70 @@ def exponential_decay(x, L):
     return 1 + np.exp(-x / L)
 
 
-def locate_peaks(y):
-    """
-    :param y: y data (numpy array)
-    :return: ndx : indices of peak locations
-    """
+def angle_average(X, Y, Z, SF, ucell=None):
+
+    ES = RegularGridInterpolator((X, Y, Z), SF, bounds_error=False)
+
+    THETA_BINS_PER_INV_ANG = 20.
+    MIN_THETA_BINS = 10  # minimum allowed bins
+    RBINS = 100
+
+    if ucell is not None:
+
+        a1 = ucell[0]
+        a2 = ucell[1]
+        a3 = ucell[2]
+
+        b1 = (np.cross(a2, a3)) / (np.dot(a1, np.cross(a2, a3)))
+        b2 = (np.cross(a3, a1)) / (np.dot(a2, np.cross(a3, a1)))
+        b3 = (np.cross(a1, a2)) / (np.dot(a3, np.cross(a1, a2)))
+
+        b_inv = np.linalg.inv(np.vstack((b1, b2, b3)))
+
+    ZBINS = Z.shape[0]  # 400
+
+    XR = (X[-1] - X[0])
+    YR = (Y[-1] - Y[0])
+
+    Rmax = min(XR, YR) / 2.0
+    Rmax *= 0.95
+
+    rarr, rspace = np.linspace(0.0, Rmax, RBINS, retstep=True)
+    zar = np.linspace(Z[0], Z[-1], ZBINS)
+
+    oa = np.zeros((rarr.shape[0], zar.shape[0]))
+    circ = 2.*np.pi*rarr  # circumference
+
+    for ir in tqdm.tqdm(range(rarr.shape[0])):
+
+        NTHETABINS = max(int(THETA_BINS_PER_INV_ANG*circ[ir]), MIN_THETA_BINS)  #calculate number of bins at this r
+        thetas = np.linspace(0.0, np.pi*2.0, NTHETABINS, endpoint=False)  # generate theta array
+
+        t, r, z = np.meshgrid(thetas, rarr[ir], zar)  # generate grid of cylindrical points
+
+        xar = r*np.cos(t)  # set up x,y coords
+        yar = r*np.sin(t)
+
+        pts = np.vstack((xar.ravel(), yar.ravel(), z.ravel())).T  # reshape for interpolation
+
+        if ucell is not None:
+            # pts = mc_inv(pts, ucell)
+            pts = np.matmul(pts, b_inv)
+
+        oa[ir, :] = np.average(ES(pts).reshape(r.shape), axis=1)  # store average values in final array
+
+    mn = np.nanmin(oa)
+    oa = np.where(np.isnan(oa), mn, oa)
+
+    rad_avg = np.average(oa)  # ???
+    oa /= rad_avg  # normalize
+
+    # set up data for contourf plot by making it symmetrical
+    final = np.append(oa[::-1, :], oa[1:], axis=0)  # SF
+    rfin = np.append(-rarr[::-1], rarr[1:])  # R
+    zfin = np.append(z[:, 0, :], z[1:, 0, :], axis=0)  # Z
+
+    return final, rfin, zfin
 
 
 if __name__ == "__main__":
@@ -157,10 +223,17 @@ if __name__ == "__main__":
         else:
             bins = np.array([args.bins]*ndimensions)
 
-        t = md.load(args.traj, top=args.gro)[args.begin:]
-        print('Trajectory loaded')
+        if args.notraj:
+            t = md.load(args.gro)
+            print('Configuration loaded')
+        else:
+            t = md.load(args.traj, top=args.gro)[args.begin:]
+            print('Trajectory loaded')
 
-        mass = [Atom_props.mass[i] for i in args.atoms]  # mass of reference atoms
+        if args.atoms[0] == 'all':
+            mass = [Atom_props.mass[a.name] for a in t.topology.atoms]
+        else:
+            mass = [Atom_props.mass[i] for i in args.atoms]  # mass of reference atoms
 
         L = np.zeros([3])  # average box vectors in each dimension
         for i in range(3):
@@ -177,19 +250,21 @@ if __name__ == "__main__":
             for i in range(ndimensions):
                 hist_range.append([-L[i]/2, L[i]/2])
 
-        keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep
+        ###################### 3D center of mass #########################
+
+        if args.atoms[0] == 'all':
+            keep = [a.index for a in t.topology.atoms]
+        else:
+            keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep
+            # keep = [a.index for a in t.topology.atoms if a.residue.name == 'HOH' and a.name == 'O']  # indices of atoms to keep
 
         pore_spline = np.zeros([t.n_frames, npores*args.layers, 3])
         for frame in range(t.n_frames):
             pore_spline[frame, :, :] += trace_pores(t.xyz[frame, keep, :], t.unitcell_vectors[frame, :2, :2], args.layers)
 
-        ###################### 3D center of mass #########################
-
-        keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep
-        #keep = [a.index for a in t.topology.atoms if a.residue.name == 'HOH' and a.name == 'O']  # indices of atoms to keep
-
-        natoms = len(args.atoms)
-        monomers_per_layer = int(len(keep) / args.layers / npores / len(args.atoms))  # divide by len(args.atoms) because of com
+        # natoms = len(args.atoms)
+        # monomers_per_layer = int(len(keep) / args.layers / npores / len(args.atoms))  # divide by len(args.atoms) because of com
+        monomers_per_layer = args.monomers_per_layer
 
         if args.center_of_mass:
             center_of_mass = com(t.xyz[:, keep, :], mass)  # calculate centers of mass of atom groups
@@ -338,59 +413,158 @@ if __name__ == "__main__":
 
     if len(dimensions) > 1:
 
-        centers2 = [edges[1][i] + ((edges[dimensions[1]][i + 1] - edges[dimensions[1]][i])/2) for i in range(bins[1])]
-        ax = sum(range(0, 3)) - sum(dimensions)  # see which axis is missing out of [0 1 2]. E.g. if we are looking at the
-        # yz cross sections, then dimensions will equal [1 2]. We want to sum cross sections along the x-axis which is
-        # also the 0 axis. So ax will equal 0
-        twoD = np.mean(correlation, axis=ax)
+        if not args.angle_average:
 
-        # remove center region of 2D histogram since it is brightest and contains no useful information
-        # first find the center bins (index)
+            centers2 = [edges[1][i] + ((edges[dimensions[1]][i + 1] - edges[dimensions[1]][i])/2) for i in range(bins[1])]
+            ax = sum(range(0, 3)) - sum(dimensions)  # see which axis is missing out of [0 1 2]. E.g. if we are looking at the
+            # yz cross sections, then dimensions will equal [1 2]. We want to sum cross sections along the x-axis which is
+            # also the 0 axis. So ax will equal 0
+            twoD = np.mean(correlation, axis=ax)
 
-        for x in range(len(centers1)):
-            for y in range(len(centers2)):
-                if np.linalg.norm([centers1[x], centers2[y]]) < args.block_radius:
-                    twoD[x, y] = 0
+            # remove center region of 2D histogram since it is brightest and contains no useful information
+            # first find the center bins (index)
 
-        fig = plt.figure()
-        ax1 = fig.add_subplot(111)
+            for x in range(len(centers1)):
+                for y in range(len(centers2)):
+                    if np.linalg.norm([centers1[x], centers2[y]]) < args.block_radius:
+                        twoD[x, y] = 0
 
-        if args.plot_range:
+            fig = plt.figure()
+            ax1 = fig.add_subplot(111)
 
-            extent = [float(i) for i in args.plot_range]
-            dim_1_start = 0
-            while centers1[dim_1_start] < extent[0]:
-                dim_1_start += 1
-            dim_1_end = 0
-            while centers1[dim_1_end] < extent[1]:
-                dim_1_end += 1
-            dim_2_start = 0
-            while centers1[dim_2_start] < extent[2]:
-                dim_2_start += 1
-            dim_2_end = 0
-            while centers1[dim_2_end] < extent[3]:
-                dim_2_end += 1
+            if args.plot_range:
 
-            twoD = twoD[dim_1_start:dim_1_end, dim_2_start:dim_2_end]
+                extent = [float(i) for i in args.plot_range]
+                dim_1_start = 0
+                while centers1[dim_1_start] < extent[0]:
+                    dim_1_start += 1
+                dim_1_end = 0
+                while centers1[dim_1_end] < extent[1]:
+                    dim_1_end += 1
+                dim_2_start = 0
+                while centers1[dim_2_start] < extent[2]:
+                    dim_2_start += 1
+                dim_2_end = 0
+                while centers1[dim_2_end] < extent[3]:
+                    dim_2_end += 1
+
+                twoD = twoD[dim_1_start:dim_1_end, dim_2_start:dim_2_end]
+            else:
+                extent = [centers1[0], centers1[-1], centers2[0], centers2[-1]]
+
+            heatmap = ax1.imshow(twoD.T, extent=extent, cmap='jet', interpolation='gaussian')
+            cbar = plt.colorbar(heatmap)
+            cbar.ax.tick_params(labelsize=14)
+            plt.xlabel('%s (nm)' % args.slice[0], fontsize=14)
+            plt.ylabel('%s (nm)' % args.slice[1], fontsize=14)
+            plt.gcf().get_axes()[0].tick_params(labelsize=14)
+            ax = plt.axes()
+            ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+            ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.5))
+            ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
+            ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))
+            plt.tight_layout()
+
+            if args.save:
+                plt.savefig('%s.png' % args.save)
+            if not args.noshow:
+                plt.show()
+
         else:
-            extent = [centers1[0], centers1[-1], centers2[0], centers2[-1]]
 
-        heatmap = ax1.imshow(twoD.T, extent=extent, cmap='jet', interpolation='gaussian')
-        cbar = plt.colorbar(heatmap)
-        cbar.ax.tick_params(labelsize=14)
-        plt.xlabel('%s (nm)' % args.slice[0], fontsize=14)
-        plt.ylabel('%s (nm)' % args.slice[1], fontsize=14)
-        plt.gcf().get_axes()[0].tick_params(labelsize=14)
-        ax = plt.axes()
-        ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
-        ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.5))
-        ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
-        ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))
-        plt.tight_layout()
+            x_centers = np.array([edges[0][i] + ((edges[0][i + 1] - edges[0][i])/2) for i in range(len(edges[0]) - 1)])
+            y_centers = np.array([edges[1][i] + ((edges[1][i + 1] - edges[1][i])/2) for i in range(len(edges[1]) - 1)])
+            z_centers = np.array([edges[2][i] + ((edges[2][i + 1] - edges[2][i])/2) for i in range(len(edges[2]) - 1)])
 
-        if args.save:
-            plt.savefig('%s.png' % args.save)
-        if not args.noshow:
+            # Fourier transform of 3d correlation function with angle averaging
+            # fft = np.abs(np.fft.fftn(correlation))**2
+            #
+            # xbin = x_centers[1] - x_centers[0]
+            # ybin = y_centers[1] - y_centers[0]
+            # zbin = z_centers[1] - z_centers[0]
+            #
+            # freq_x = np.fft.fftfreq(x_centers.size - 1, d=xbin)
+            # ndx = np.argsort(freq_x)
+            # freq_x = freq_x[ndx]
+            #
+            # freq_y = np.fft.fftfreq(y_centers.size - 1, d=ybin)
+            # ndy = np.argsort(freq_y)
+            # freq_y = freq_y[ndy]
+            #
+            # freq_z = np.fft.fftfreq(z_centers.size - 1, d=zbin)
+            # ndz = np.argsort(freq_z)
+            # freq_z = freq_z[ndz]
+            #
+            # fft = fft[ndx, :, :]
+            # fft = fft[:, ndy, :]
+            # fft = fft[:, :, ndz]
+            #
+            # averaged, rfin, zfin = angle_average(freq_x, freq_y, freq_z, fft)
+            #
+            # # xlim = 0.4
+            # # zlim = 0.4
+            #
+            # MAX = 0.001
+            # MIN = 0
+            #
+            # NLEVELS = 200
+            # lvls = np.linspace(MIN, MAX, NLEVELS)  # contour levels
+            #
+            # plt.figure()
+            # cs = plt.contourf(rfin, zfin[0], averaged.T, levels=lvls, cmap='jet', extend='max')
+            # plt.xlabel('$q_r$ ($\AA^{-1}$)')
+            # plt.ylabel('$q_z$ ($\AA^{-1}$)')
+            # # plt.gcf().get_axes()[0].set_ylim(-zlim, zlim)
+            # # plt.gcf().get_axes()[0].set_xlim(-xlim, xlim)
+            # plt.colorbar(format='%.1f')
+            # plt.tight_layout()
+            # plt.show()
+            # exit()
+            final, rfin, zfin = angle_average(x_centers, y_centers, z_centers, correlation)
+
+            # convert to angstroms
+            rfin *= 10
+            zfin *= 10
+
+            xlim = 15
+            zlim = 15
+
+            NLEVELS = 200
+
+            lvls = np.linspace(np.amin(final), 0.35*np.amax(final), NLEVELS)  # contour levels
+
+            plt.figure()
+            cs = plt.contourf(rfin, zfin[0], final.T, levels=lvls, cmap='seismic', extend='max')
+            plt.xlabel('$r$ ($\AA$)')
+            plt.ylabel('$z$ ($\AA$)')
+            plt.gcf().get_axes()[0].set_ylim(-zlim, zlim)
+            plt.gcf().get_axes()[0].set_xlim(-xlim, xlim)
+            plt.colorbar(format='%.1f')
+            plt.tight_layout()
+            plt.savefig('angle_averaged_correlation.png')
+
+            if args.invert:
+
+                # Fourier transform 2D angle averaged correlation function
+                FT = np.abs(np.fft.fftn(final.T)) ** 2
+
+                rbin = rfin[1] - rfin[0]
+                freq_r = np.fft.fftfreq(rfin.size - 1, d=rbin)
+                ndr = np.argsort(freq_r)
+                freq_r = freq_r[ndr]
+
+                zbin = zfin[0, 1] - zfin[0, 0]
+                freq_z = np.fft.fftfreq(zfin[0].size - 1, d=zbin)
+                ndz = np.argsort(freq_z)
+                freq_z = freq_z[ndz]
+
+                FT = FT[ndz, :]
+                FT = FT[:, ndr]
+                plt.figure()
+
+                levels = np.linspace(0, 1000, 200)
+                plt.contourf(freq_r, freq_z, FT, levels=levels, cmap='jet', extend='both')
+
             plt.show()
 
     ################### 1D Center of mass method ###################

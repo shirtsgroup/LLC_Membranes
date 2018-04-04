@@ -69,10 +69,105 @@ for i in range(23):
 #             #     angles.append((180/np.pi)*np.arctan((i - center)/(j - center)))
 #             #     intensity.append(waxs[i, j])
 
-#
+X = np.linspace(-qmax, qmax, waxs.shape[0]-1)
+Y = np.linspace(-qmax, qmax, waxs.shape[1]-1)
 
-X = np.linspace(-qmax, qmax, waxs.shape[0])
-Y = np.linspace(-qmax, qmax, waxs.shape[1])
+background_intensity = waxs[350, 300]
+#
+for i in range(X.size):
+    for j in range(Y.size):
+        if 1.1 < np.linalg.norm([X[i], Y[j]]) < 1.6:
+            waxs[i, j] = background_intensity
+
+# plt.imshow(waxs)
+# plt.show()
+# exit()
+
+# Inverse FT
+fbin = X[1] - X[0]  # size of bins in fourier space
+system_size = 2*np.pi / fbin  # fourier_bin = 2*pi / system size therefore system size = 2*pi / fourier_bin
+rbin = system_size / X.shape[0]  # real space bin
+
+# reorder lists so they conform to numpy (https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.ifft2.html#numpy.fft.ifft2)
+start = list(X).index(0)
+X_reordered = np.concatenate((X[start:], X[:start]))
+ndx_x = [list(X).index(i) for i in X_reordered]
+
+start = list(Y).index(0)
+Y_reordered = np.concatenate((Y[start:], Y[:start]))
+ndx_y = [list(Y).index(i) for i in Y_reordered]
+
+waxs_reordered = waxs[ndx_x, :]
+waxs_reordered = waxs_reordered[:, ndx_y]
+
+# inverse fourier transform
+inverse_fft = np.fft.ifft2(waxs_reordered)
+
+inverse_fft = inverse_fft[ndx_x, :]
+inverse_fft = inverse_fft[:, ndx_y]
+
+# fourier transform of inversion as a test
+# ft = np.abs(np.fft.fftn(inverse_fft))**2
+# ft = ft[ndx_x, :]
+# ft = ft[:, ndx_y]
+# plt.imshow(ft)
+# plt.show()
+
+inverse_fft = inverse_fft.real / np.amax(inverse_fft.real)
+
+r = np.linspace(-system_size/2, system_size/2, inverse_fft.shape[0])
+
+plt.plot(r[start:], inverse_fft[start:, start])  # z-distribution function
+plt.show()
+
+
+def exponential_decay(x, L):
+
+    return np.exp(-(x -rbin) / L)
+
+# find peaks to fit exponential to
+# import detect_peaks
+# mpd = 100
+# peaks = detect_peaks.detect_peaks(r[start:start + 30], mpd=mpd, show=False)  # adjust mpd if all peaks aren't found
+peaks = np.array([5, 13, 20, 36]) + start
+
+# if centers[peaks[0]] < spacing / 2:  # sometimes a peak is found where it shouldn't
+#     peaks = peaks[1:]
+
+# plot locations of peaks
+# plt.scatter(r[peaks], inverse_fft[peaks, start], marker='+', c='r', s=200, label='Peak locations')
+
+L = 100
+# fit decaying exponential to peaks
+p = np.array([L])  # initial guess at parameters
+from scipy.optimize import curve_fit
+solp, cov_x = curve_fit(exponential_decay, r[peaks], inverse_fft[peaks, start], p)
+
+# plot decaying exponential fit and decaying exponential with L that we were trying to match
+#plt.plot(r, exponential_decay(r, solp[0]), '--', c='black', label='Least squares fit')
+# plt.plot(centers, exponential_decay(centers, L), '--', c='blue', label='Theoretical')
+# plt.show()
+
+bound1 = 0
+bound2 = 0
+while r[bound1] < -15:
+    bound1 += 1
+while r[bound2] < 15:
+    bound2 += 1
+
+levels = np.linspace(np.amin(inverse_fft), 0.05*np.amax(inverse_fft), 200)
+plt.contourf(r[bound1:bound2], r[bound1:bound2], inverse_fft[bound1+1:bound2+1, bound1+1:bound2+1], levels=levels, cmap='jet')
+plt.colorbar()
+plt.xlabel('r ($\AA$)')
+plt.ylabel('z ($\AA$)')
+plt.show()
+exit()
+plt.plot(z, inverse_fft.real[start:, start])
+plt.show()
+plt.imshow(inverse_fft.real/np.amax(inverse_fft.real), vmin=np.amin(inverse_fft.real), vmax=0.5*np.amax(inverse_fft.real))
+plt.colorbar()
+plt.show()
+exit()
 
 inner = 1.1
 outer = 1.6
@@ -133,9 +228,12 @@ print('New Average Intensity in alkane chain region : %s' % avg_intensity)
 # ax = fig.add_subplot(111)
 X = np.linspace(-qmax, qmax, waxs.shape[0])
 Y = np.linspace(-qmax, qmax, waxs.shape[1])
+# np.save('qx', X)
+# np.save('qy', Y)
+# exit()
 
 factor = 3.1
-colorbar = 'seismic'
+colorbar = 'jet'
 levels = np.linspace(0, factor, 200)
 waxs /= avg_intensity
 
@@ -208,22 +306,22 @@ binarea = (X[1] - X[0]) * (Y[1] - Y[0])
 #
 # waxs[qz_lower_ndx:qz_upper_ndx, qr_lower_ndx:qr_upper_ndx] += diff
 
-plt.figure()
-plt.contourf(X, Y, np.log10(np.ma.masked_where(waxs==0, waxs)), cmap=colorbar, levels=levels_log)
-plt.colorbar()
-plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=14)
-plt.ylabel('$q_z\ (\AA^{-1}$)', fontsize=14)
-plt.gcf().get_axes()[0].tick_params(labelsize=14)
-plt.tight_layout()
-plt.gcf().get_axes()[0].set_aspect('equal')
-plt.savefig('WAXS_log10exp.png')
-plt.show()
-exit()
+# plt.figure()
+# plt.contourf(X, Y, np.log10(np.ma.masked_where(waxs==0, waxs)), cmap=colorbar, levels=levels_log)
+# plt.colorbar()
+# plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=14)
+# plt.ylabel('$q_z\ (\AA^{-1}$)', fontsize=14)
+# plt.gcf().get_axes()[0].tick_params(labelsize=14)
+# plt.tight_layout()
+# plt.gcf().get_axes()[0].set_aspect('equal')
+# plt.savefig('WAXS_log10exp.png')
+# plt.show()
+# exit()
 plt.figure()
 heatmap = plt.contourf(X, Y, waxs, cmap=colorbar, levels=levels, extend='max')
 # cbar = plt.colorbar(format='%.2f')
-plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=14)
-plt.ylabel('$q_z\ (\AA^{-1}$)', fontsize=14)
+plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=18)
+plt.ylabel('$q_z\ (\AA^{-1}$)', fontsize=18)
 plt.gcf().get_axes()[0].tick_params(labelsize=14)
 plt.tight_layout()
 plt.gcf().get_axes()[0].set_aspect('equal')

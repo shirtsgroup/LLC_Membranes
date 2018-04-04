@@ -332,3 +332,4 @@ radius['C'] = 170  # angstroms
 radius['O'] = 152
 radius['H'] = 120
 radius['NA'] = 227
+radius['Na'] = 227

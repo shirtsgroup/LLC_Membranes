@@ -63,13 +63,13 @@ def gaussian3D(x, y, z, sigma_x, sigma_y, sigma_z, mu_x, mu_y, mu_z):
     return (1/c)*np.exp(-(x-mu_x)**2/(2*sigma_x**2))*np.exp(-(y-mu_y)**2/(2*sigma_y**2))*np.exp(-(z-mu_z)**2/(2*sigma_z**2))
 
 
-def angle_average(X, Y, Z, SF, ucell=None):
+def angle_average(X, Y, Z, SF, ucell=None, NBR=80, rmax=-1, zbins=-1, zmax=-1):
 
     ES = RegularGridInterpolator((X, Y, Z), SF, bounds_error=False)
 
     THETA_BINS_PER_INV_ANG = 20.
     MIN_THETA_BINS = 10  # minimum allowed bins
-    RBINS = 400
+    RBINS = NBR
 
     if ucell is not None:
 
@@ -83,21 +83,34 @@ def angle_average(X, Y, Z, SF, ucell=None):
 
         b_inv = np.linalg.inv(np.vstack((b1, b2, b3)))
 
-    ZBINS = Z.shape[0]  # 400
+    if zbins == -1:
+        ZBINS = Z.shape[0]  # 400
+    else:
+        ZBINS = zbins
+
+    if zmax == -1:
+        ZMAX = Z[-1]
+    else:
+        ZMAX = zmax
 
     XR = (X[-1] - X[0])
     YR = (Y[-1] - Y[0])
 
-    Rmax = min(XR, YR) / 2.0
-    Rmax *= 0.95
+    if rmax == -1:
+        Rmax = min(XR, YR) / 2.0
+        Rmax *= 0.95
+    else:
+        Rmax = rmax
 
     rarr, rspace = np.linspace(0.0, Rmax, RBINS, retstep=True)
-    zar = np.linspace(Z[0], Z[-1], ZBINS)
+    #zar = np.linspace(Z[0], Z[-1], ZBINS)
+    zar = np.linspace(-ZMAX, ZMAX, ZBINS)
 
     oa = np.zeros((rarr.shape[0], zar.shape[0]))
+
     circ = 2.*np.pi*rarr  # circumference
 
-    for ir in tqdm.tqdm(range(rarr.shape[0])):
+    for ir in range(rarr.shape[0]):
 
         NTHETABINS = max(int(THETA_BINS_PER_INV_ANG*circ[ir]), MIN_THETA_BINS)  #calculate number of bins at this r
         thetas = np.linspace(0.0, np.pi*2.0, NTHETABINS, endpoint=False)  # generate theta array
