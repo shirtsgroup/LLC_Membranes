@@ -19,7 +19,7 @@ cluster=0  # 0 if run without mpi, 1 if run with mpi (regular MPI or with GPU)
 NP=4  # number of MPI processes
 python='python3'
 
-while getopts "b:p:d:r:n:I:w:S:T:R:c:P" opt; do
+while getopts "b:p:d:r:n:I:w:S:T:R:c:P:" opt; do
     case $opt in
     b) build_mon=$OPTARG;;
     p) phase=$OPTARG;;
@@ -51,12 +51,7 @@ ${python} ${DIR2}/input.py --bcc -b ${build_mon} -s 5000 # only care about em.md
 ${python} ${DIR}/scale.py -g bcc.gro -o bcc.gro -f 2  # triple each dimension of the unit cell and isotropically scale all head group positions
 
 gmx grompp -f em.mdp -p topol.top -c bcc.gro -o em
-
-#if [[ ${cluster} -eq 1 ]]; then
-mpirun -np 4 gmx_mpi mdrun -v -deffnm em
-#else
-#    gmx mdrun -v -deffnm em
-#fi
+${GMX} mdrun -v -deffnm em
 
 # Try again if the simulation doesn't energy minimize properly
 n=$(awk '/Potential Energy/ {print $4}' em.log)  # gets the final value of potential energy from em.log (the 4th field on the line containing the string "Potential Energy"
