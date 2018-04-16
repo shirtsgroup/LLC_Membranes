@@ -164,6 +164,7 @@ if __name__ == "__main__":
     if args.columns:
 
         mean_z = np.linspace(0, (args.layers - 1) * args.dbwl, args.layers) / 10  # mean z-positions of monomer heads
+        mean_z[::2] -= 0.15
         rotated_carboxylate = np.copy(pos)
 
         rotated_carboxylate[props.carboxylate_indices, :] = transform.rotate_coords_x(
@@ -179,7 +180,8 @@ if __name__ == "__main__":
                 parallel = transform.rotate_coords_z(rotated_carboxylate, theta*180/np.pi)
                 shift = np.random.uniform(-args.dbwl/20, args.dbwl/20)
                 #z = z_correlation(mean_z, args.correlation_length, args.Lvar)
-                z = mean_z + shift
+                # z = mean_z + shift
+                z = mean_z
                 for l in range(z.shape[0]):
                     ndx = p*args.layers*args.monomers*pos.shape[0] + m*args.layers*pos.shape[0] + l*pos.shape[0]
                     if l % 2 == 0:

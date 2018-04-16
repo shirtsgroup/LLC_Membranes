@@ -38,13 +38,13 @@ done
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-if [[ $solvate -eq 1 ]]; then
-    ${python} ${DIR}/input.py -b ${BUILD_MON} -l 50 --restraints --temp ${T} -f 50 --genvel yes -S -c ${start_config}
-else
-    ${python} ${DIR}/input.py -b ${BUILD_MON} -l 5 --restraints --temp ${T} -f 50 --genvel yes -c ${start_config}
-fi
-
-${python} ${DIR}/restrain.py -f 1000000 -A xyz -r on -D off -w off -g ${start_config} --novsites -m ${BUILD_MON} -a ${ring_restraints}
+#if [[ $solvate -eq 1 ]]; then
+#    ${python} ${DIR}/input.py -b ${BUILD_MON} -l 50 --restraints --temp ${T} -f 50 --genvel yes -S -c ${start_config}
+#else
+#    ${python} ${DIR}/input.py -b ${BUILD_MON} -l 5 --restraints --temp ${T} -f 50 --genvel yes -c ${start_config}
+#fi
+#
+#${python} ${DIR}/restrain.py -f 1000000 -A xyz -r on -D off -w off -g ${start_config} --novsites -m ${BUILD_MON} -a ${ring_restraints}
 
 if [ "${MPI}" == "on" ]; then
     gmx editconf -f ${start_config} -o box.gro -c -bt triclinic -box ${x} ${y} ${z} -angles 90 90 120

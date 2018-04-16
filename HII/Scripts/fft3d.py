@@ -268,8 +268,8 @@ def scatter3d(data, colorbar=False, show=True):
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(data[:, 0], data[:, 1], data[:, 2])
     plt.xlabel('x')
-    plt.xlabel('y')
-    plt.xlabel('z')
+    plt.ylabel('y')
+    ax.set_zlabel('z')
 
     if show:
         plt.show()
@@ -517,7 +517,10 @@ if __name__ == "__main__":
             xy_window = 3*rpore
             ax.set_xlim3d(xycenter[0] - xy_window, xycenter[0] + xy_window)
             ax.set_ylim3d(xycenter[1] - xy_window, xycenter[1] + xy_window)
-            fig.colorbar(cmap)
+            ax.set_xlabel('x ($\AA$)')
+            ax.set_ylabel('y ($\AA$)')
+            ax.set_zlabel('z ($\AA$)')
+            # fig.colorbar(cmap)
 
     if args.gro:
 
@@ -568,12 +571,12 @@ if __name__ == "__main__":
             averaged, rfin, zfin = angle_average(freq_x, freq_y, freq_z, fft, ucell=ucell)
             alkane_intensity = normalize_alkanes(rfin, zfin[0], averaged, 2.23, 2.25, 120)
             MAX = 3.1 * alkane_intensity
-            xlim = 4.0
-            zlim = 4.0
+            xlim = 2.5
+            zlim = 2.5
         else:
             averaged, rfin, zfin = angle_average(freq_x, freq_y, freq_z, fft)
-            xlim = 0.4
-            zlim = 0.4
+            xlim = 2.5
+            zlim = 2.5
             if rfin[-1] > xlim:
                 r_lower_limit = np.where(freq_x < -xlim)[0][-1] + 1
                 r_upper_limit = np.where(freq_x > xlim)[0][0] - 1
@@ -589,6 +592,8 @@ if __name__ == "__main__":
         lvls = np.linspace(MIN, MAX, NLEVELS)  # contour levels
 
         plt.figure()
+        rfin *= 2*np.pi
+        zfin[0] *= 2*np.pi
         cs = plt.contourf(rfin, zfin[0], averaged.T, levels=lvls, cmap='jet', extend='max')
         plt.xlabel('$q_r$ ($\AA^{-1}$)')
         plt.ylabel('$q_z$ ($\AA^{-1}$)')

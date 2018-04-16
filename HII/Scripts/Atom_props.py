@@ -167,6 +167,9 @@ mass['OW_tip4pew'] = 16.00000
 mass['HW_tip4pew'] = 1.008
 mass['HW_tip4pew'] = 1.008
 mass['MW'] = 0.0
+mass['OXT'] = 15.99940
+mass['CA'] = 40.08
+mass['S'] = 32.06
 
 # fill in charge dictionary (Used make_dict.py to generate the following list)
 
@@ -327,6 +330,7 @@ charge['OW'] = -0.834
 charge['HW1'] = .417
 charge['HW2'] = .417
 charge['BR'] = -1.00000
+charge['CA'] = 2.00000
 
 radius['C'] = 170  # angstroms
 radius['O'] = 152

@@ -8,7 +8,7 @@ import tqdm
 import matplotlib.pyplot as plt
 from matplotlib import ticker
 from llclib import fast_rotate
-from place_solutes import trace_pores
+from place_solutes_pores import trace_pores
 from scipy.optimize import curve_fit
 import detect_peaks
 from scipy.interpolate import RegularGridInterpolator
@@ -379,6 +379,11 @@ if __name__ == "__main__":
         if args.offset:
             peaks = peaks[1::2]  # every other peak starting at the second peak
 
+        #peaks = [32, 78, 123, 159] # offset
+        print(peaks)
+        # if len(peaks) > 4:
+        #     peaks = peaks[:4]
+
         plt.figure()
         plt.plot(centers1, zdf, label='Raw data')
         plt.scatter(centers1[peaks], zdf[peaks], marker='+', c='r', s=200, label='Peak locations')
@@ -531,8 +536,8 @@ if __name__ == "__main__":
 
             NLEVELS = 200
 
-            lvls = np.linspace(np.amin(final), 0.35*np.amax(final), NLEVELS)  # contour levels
-
+            lvls = np.linspace(np.amin(final), 0.27*np.amax(final), NLEVELS)  # contour levels
+            #lvls = np.linspace(, 0.35*np.amax(final))
             plt.figure()
             cs = plt.contourf(rfin, zfin[0], final.T, levels=lvls, cmap='seismic', extend='max')
             plt.xlabel('$r$ ($\AA$)')
