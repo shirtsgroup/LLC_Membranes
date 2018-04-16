@@ -27,8 +27,7 @@ def initialize():
     parser.add_argument('-l', '--length', default=1000, type=float, help='simulation length (ps)')
     parser.add_argument('-f', '--frames', default=500, type=int, help='number of frames')
     parser.add_argument('-p', '--pcoupltype', default='semiisotropic', type=str, help='Pressure Couple Type')
-    parser.add_argument('--restraints', help='If restraints are on, another mdp option needs to be turned on, so specify '
-                                             'this flag', action="store_true")
+    parser.add_argument('--restraints', nargs='+', help='Specify residue for which restraints are specified')
     parser.add_argument('-x', '--xlink', help='Turn this to "on" if the the system is crosslinked', action="store_true")
     parser.add_argument('-c', '--coord', default='initial.gro', type=str, help='coordinate file of system to be simulated')
     parser.add_argument('-S', '--solvate', help='Specify this if the system has water so an extra line can be added to the '
@@ -64,5 +63,5 @@ if __name__ == "__main__":
     elif args.ensemble == 'nvt':
         mdp.write_nvt_mdp()
 
-    top = SystemTopology(args.coord)
+    top = SystemTopology(args.coord, restraints=args.restraints)
     top.write_top()

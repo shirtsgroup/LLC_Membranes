@@ -570,7 +570,7 @@ if __name__ == "__main__":
         if args.gro:
             averaged, rfin, zfin = angle_average(freq_x, freq_y, freq_z, fft, ucell=ucell)
             alkane_intensity = normalize_alkanes(rfin, zfin[0], averaged, 2.23, 2.25, 120)
-            MAX = 3.1 * alkane_intensity
+            MAX = 3.1 * alkane_intensity * 100
             xlim = 2.5
             zlim = 2.5
         else:

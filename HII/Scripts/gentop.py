@@ -23,7 +23,7 @@ def initialize():
 
 class SystemTopology(object):
 
-    def __init__(self, gro, ff='gaff'):
+    def __init__(self, gro, ff='gaff', restraints=False):
         """
         :param gro: (str) coordinate file for which to create topology
         :param ff: (str) forcefield to use (default=gaff)
@@ -35,6 +35,14 @@ class SystemTopology(object):
         self.top_location = "%s/../top/topologies" % self.script_location  # topology location
         self.ff_location = "%s/../top/Forcefields" % self.script_location  # forcefield location
         self.forcefield = ff  # which forcefield to use
+
+        if restraints:
+            if restraints is list:
+                self.restraints = [a for a in restraints]
+            else:
+                self.restraints = restraints
+        else:
+            self.restraints = False
 
         with open('%s/ions.txt' % self.top_location) as f:
             self.ions = []
@@ -65,7 +73,7 @@ class SystemTopology(object):
 
         top = []
         top.append(';Forcefield\n')
-        top.append('#include "%s/%s/%s.itp"\n' %(self.ff_location, self.forcefield, self.forcefield))
+        top.append('#include "%s/%s/%s.itp"\n' % (self.ff_location, self.forcefield, self.forcefield))
         top.append('\n')
 
         ion_count = 0
@@ -77,7 +85,10 @@ class SystemTopology(object):
                     top.append('\n')
             else:
                 top.append(';%s Topology\n' % r)
-                top.append('#include "%s/%s.itp"\n' % (self.top_location, r))
+                if r in self.restraints:
+                    top.append('#include "dipole.itp"\n')
+                else:
+                    top.append('#include "%s/%s.itp"\n' % (self.top_location, r))
                 top.append('\n')
 
         top.append('[ system ]\n')
@@ -88,7 +99,10 @@ class SystemTopology(object):
         top.append(';Compounds     nmols\n')
 
         for r in self.residues:
-            top.append('{:10s}{:>10d}\n'.format(r, self.residue_count[r]))
+            if r in self.restraints:
+                top.append('{:10s}{:>10d}\n'.format(r, 1))
+            else:
+                top.append('{:10s}{:>10d}\n'.format(r, self.residue_count[r]))
 
         with open(name, 'w') as f:
             for line in top:

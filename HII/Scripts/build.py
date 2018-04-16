@@ -164,7 +164,7 @@ if __name__ == "__main__":
     if args.columns:
 
         mean_z = np.linspace(0, (args.layers - 1) * args.dbwl, args.layers) / 10  # mean z-positions of monomer heads
-        mean_z[::2] -= 0.15
+        # mean_z[::2] -= 0.15 # for staggered configurations
         rotated_carboxylate = np.copy(pos)
 
         rotated_carboxylate[props.carboxylate_indices, :] = transform.rotate_coords_x(
@@ -175,9 +175,11 @@ if __name__ == "__main__":
             py = pore_centers[p, 1]
             for m in range(no_monomers):
                 theta = m * wedge_angle + args.rot * np.pi / 180
-                #offset_theta = theta + wedge_angle/4
+                offset_theta = theta + wedge_angle/2
                 antiparallel = transform.rotate_coords_z(pos, theta*180/np.pi)
                 parallel = transform.rotate_coords_z(rotated_carboxylate, theta*180/np.pi)
+                if args.offset:
+                    parallel_offset = transform.rotate_coords_z(rotated_carboxylate, offset_theta*180/np.pi)
                 shift = np.random.uniform(-args.dbwl/20, args.dbwl/20)
                 #z = z_correlation(mean_z, args.correlation_length, args.Lvar)
                 # z = mean_z + shift
@@ -185,7 +187,11 @@ if __name__ == "__main__":
                 for l in range(z.shape[0]):
                     ndx = p*args.layers*args.monomers*pos.shape[0] + m*args.layers*pos.shape[0] + l*pos.shape[0]
                     if l % 2 == 0:
-                        assembly[ndx:(ndx + pos.shape[0]), :] = transform.translate(parallel,
+                        if args.offset:
+                            assembly[ndx:(ndx + pos.shape[0]), :] = transform.translate(parallel_offset,
+                                    pos[props.ref_atom_index, :], [px + r*np.cos(offset_theta), py + r*np.sin(offset_theta), z[l]])
+                        else:
+                            assembly[ndx:(ndx + pos.shape[0]), :] = transform.translate(parallel,
                                     pos[props.ref_atom_index, :], [px + r*np.cos(theta), py + r*np.sin(theta), z[l]])
                     else:
                         assembly[ndx:(ndx + pos.shape[0]), :] = transform.translate(antiparallel,
