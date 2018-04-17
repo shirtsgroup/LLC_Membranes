@@ -1,278 +1,346 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 
 import argparse
 import mdtraj as md
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.path as path
-import math
-from llclib import physical
-from llclib import transform
+import Atom_props
 from llclib import file_rw
+from llclib import transform
+import subprocess
 import os
-from scipy import spatial
+from gentop import SystemTopology
+import tqdm
+
+
+script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
 def initialize():
 
-    parser = argparse.ArgumentParser(description='Place solutes in the pores')
+    parser = argparse.ArgumentParser(description='Add specified amount of solvent to box')
 
-    parser.add_argument('-g', '--gro', default='wiggle.gro', help='Coordinate file where solutes will be placed')
-    parser.add_argument('-r', '--ref', nargs='+', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='Reference atom (s)'
-                        ' used to locate pores')
-    parser.add_argument('-n', '--number', default=1, type=int, help='Number of solutes to place in each pore')
-    parser.add_argument('-p', '--top', default='topol.top', help='Name of topology to modify')
-    parser.add_argument('--ngrid', default=3, type=float, help='Number of grid points in one dimension')
-    parser.add_argument('-s', '--solute', default='ethanol', help='Name of solute coordinate file to '
-                        'place')
-    parser.add_argument('--solute_path', default='/home/bcoscia/PycharmProjects/GitHub/HII/top/solutes', help='path to '
-                        'where solute coordinate files are held')
-    parser.add_argument('-l', '--layers', default=20, type=int, help='Number of layers')
-    parser.add_argument('-nn', '--neighbors', default=3, type=int, help='Number of nearest neighbor water molecules to remove')
+    parser.add_argument('-g', '--gro', default='wiggle.gro', help='Coordinate file to add solutes to')
+    parser.add_argument('-c', '--concentration', nargs='+', type=float, help='Concentration of solute (M)')
+    parser.add_argument('-n', '--n_solute', nargs='+', help='Number of solute molecules to add (overrides '
+                                                            'concentration')
+    parser.add_argument('-s', '--solutes', nargs='+', help='.gro file for solute molecules')
 
     args = parser.parse_args()
 
     return args
 
 
-def put_in_box(pt, x_box, y_box, m, angle):
+def concentration_to_nsolute(conc, box_vectors, solute):
     """
-    :param pt: The point to place back in the box
-    :param x_box: length of box in x dimension
-    :param y_box: length of box in y dimension
-    :param m: slope of box vector
-    :param angle: angle between x axis and y box vector
-    :return: coordinate shifted into box
+    :param conc: (float) desired solute concentration (M)
+    :param box_vectors: (numpy array, (3, 3)) box vectors. Each row represents a box vector.
+    :param solute: mdtraj trajectory object generated from solute configuration file (.gro)
+    :return: (int) number of solute molecules to add to box to achieve desired concentration
     """
 
-    if pt[1] < m*pt[0]:  # if the point is on the left side of the box
-        pt[0] += x_box
-    if pt[1] > m*(pt[0] - x_box):  # if the point is on the right side of the box
-        pt[0] -= x_box
-    if pt[1] < 0:
-        pt[:2] += [np.cos(angle)*x_box, np.sin(angle)*x_box]  # if the point is under the box
-    if pt[1] > y_box:
-        pt[:2] -= [np.cos(angle)*x_box, np.sin(angle)*x_box]
+    V = np.dot(box_vectors[2, :], np.cross(box_vectors[0, :], box_vectors[1, :]))  # box volume (nm^3)
+    V *= 1 * 10 ** -24  # convert to L
+    mols_solute = conc * V  # number of mols of solvent to add
 
-    return pt
+    # mw = 0  # molecular weight (grams)
+    # for a in solute.topology.atoms:
+    #     mw += Atom_props.mass[a.name]
+
+    mass_to_add = solute.mw * mols_solute
+
+    NA = 6.022 * 10 ** 23  # avogadro's number
+    mass_solute = solute.mw / NA  # mass of a single solutes (grams)
+
+    nsolute = int(mass_to_add / mass_solute)  # number of solute molecules to add
+
+    actual_concentration = nsolute / (NA*V)  # mol/L
+
+    return nsolute, actual_concentration
 
 
-def trace_pores(pos, box, layers):
+def random_orientation(xyz, alignment_vector, placement):
     """
-    Find the line which traces through the center of the pores
-    :param pos: positions of atoms used to define pore location (args.ref) [natoms, 3]
-    :param box: xy box vectors, [2, 2], mdtraj format
-    :param layers: number of layers
-    :return: points which trace the pore center
-    """
-
-    atoms_p_pore = int(pos.shape[0] / 4)  # atoms in each pore
-    atoms_p_layer = int(atoms_p_pore / layers)  # atom per layer
-
-    v = np.zeros([4, 2])  # vertices of unitcell box
-    v[0, :] = [0, 0]
-    v[1, :] = [box[0, 0], 0]
-    v[3, :] = [box[1, 0], box[1, 1]]
-    v[2, :] = v[3, :] + [box[0, 0], 0]
-    center = [np.mean(v[:, 0]), np.mean(v[:, 1]), 0]  # geometric center of box
-    bounds = path.Path(v)  # create a path tracing the vertices, v
-
-    angle = np.arccos(box[1, 1]/box[0, 0])  # angle of monoclinic box
-    if box[1, 0] < 0:  # the case of an obtuse angle
-        angle += np.pi / 2
-
-    m = (v[3, 1] - v[0, 1]) / (v[3, 0] - v[0, 0])  # slope from points connecting first and third vertices
-
-    centers = np.zeros([4*layers, 3])
-
-    for p in range(4):
-        pore = pos[p*atoms_p_pore:(p+1)*atoms_p_pore, :]  # coordinates for atoms belonging to a single pore
-        for l in range(layers):
-            before = pore[l*atoms_p_layer, :]  # choose the first atom as a reference
-            shift = transform.translate(pore[l*atoms_p_layer:(l+1)*atoms_p_layer, :], before, center)  # shift everything to towards the center
-
-            for i in range(shift.shape[0]):  # check if the points are within the bounds of the unitcell
-                if not bounds.contains_point(shift[i, :2]):
-                    shift[i, :] = put_in_box(shift[i, :], box[0, 0], box[1, 1], m, angle)  # if its not in the unitcell, shift it so it is
-
-            c = np.zeros([1, 3])
-            c[0, :] = [np.mean(shift[:, 0]), np.mean(shift[:, 1]), np.mean(shift[:, 2])]  # geometric center of reference atoms in this layer
-            centers[p*layers + l, :] = transform.translate(c, center, before)  # move everything back to where it was
-
-            if not bounds.contains_point(centers[p*layers, :]):  # make sure everything is in the box again
-                centers[p*layers + l, :] = put_in_box(centers[p*layers, :], box[0, 0], box[1, 1], m, angle)
-
-    return centers
-
-
-def placement(z, pts, box):
-    """
-    :param z: z location where solute should be placed
-    :param pts: points which run through the pore
-    :return: location to place solute
+    Randomly orient a water molecule and then place it a desired location
+    :param water_xyz: 3d coordinates of a water molecule
+    :param water_alignment_vector: A reference vector to rotate the water molecule about
+    :param placement: where to place final water configuration in space
+    :return: coordinates of oriented and translated water molecule
     """
 
-    v = np.zeros([4, 2])  # vertices of unitcell box
-    v[0, :] = [0, 0]
-    v[1, :] = [box[0, 0], 0]
-    v[3, :] = [box[1, 0], box[1, 1]]
-    v[2, :] = v[3, :] + [box[0, 0], 0]
-    center = [np.mean(v[:, 0]), np.mean(v[:, 1]), 0]  # geometric center of box
-    bounds = path.Path(v)  # create a path tracing the vertices, v
+    u = np.random.normal(size=3)  # random vector. From normal distribution since sphere
+    u /= np.linalg.norm(u)  # normalize
 
-    angle = np.arccos(box[1, 1]/box[0, 0])  # angle of monoclinic box
-    if box[1, 0] < 0:  # the case of an obtuse angle
-        angle += np.pi / 2
+    R = transform.Rvect2vect(alignment_vector, u)  # rotation matrix to align water_alignment_vector with u
 
-    m = (v[3, 1] - v[0, 1]) / (v[3, 0] - v[0, 0])  # slope from points connecting first and third vertices
+    xyz -= xyz[0, :]  # center at origin
 
-    # shift = transform.translate(z, before, center)
-    #
-    # put_in_box(pt, box[0, 0], box[1, 1], m, angle)
-    lower = 0
-    while pts[lower, 2] < z:
-        lower += 1
+    rotated = np.zeros([xyz.shape[1], 3])
+    for i in range(xyz.shape[1]):
+        rotated[i, :] = np.dot(R, xyz[i, :])
 
-    upper = pts.shape[0] - 1
-    while pts[upper, 2] > z:
-        upper -= 1
+    rotated += placement  # translate to deisred location
 
-    limits = np.zeros([2, 3])
-    limits[0, :] = pts[lower, :]
-    limits[1, :] = pts[upper, :]
-    shift = transform.translate(limits, limits[0, :], center)
-    for i in range(shift.shape[0]):  # check if the points are within the bounds of the unitcell
-        if not bounds.contains_point(shift[i, :2]):
-            shift[i, :] = put_in_box(shift[i, :], box[0, 0], box[1, 1], m, angle)
+    return rotated
 
-    # Use parametric representation of line between upper and lower points to find the xy value where z is satsified
-    v = shift[1, :] - shift[0, :]  # direction vector
-    t = (0 - shift[0, 2]) / v[2]  # solve for t since we know z
-    x = shift[0, 0] + t*v[0]
-    y = shift[0, 1] + t*v[1]
 
-    place = np.zeros([1, 3])
-    place[0, :] = [x, y, 0]
-    place = transform.translate(place, center, limits[0, :])
+def net_charge(nsolute, solutes):
+    """
+    :param nsolute: list of number of solutes to be added
+    :param solutes: list of solute objects
+    :return: net charge of system after addition of nsolute
+    """
 
-    if not bounds.contains_point(place[0, :]):  # make sure everything is in the box again
-        place[0, :] = put_in_box(place[0, :], box[0, 0], box[1, 1], m, angle)
+    net_charge = 0
+    for i, n in enumerate(nsolute):
+        net_charge += n*solutes[i].charge
 
-    return place
+    return net_charge
+
+
+class Solvent(object):
+
+    def __init__(self, gro, intermediate_fname='solvate.gro', em_steps=100, p_coupling='isotropic'):
+        """
+        :param gro: configuration of solvent
+        :param intermediate_fname : name of intermediate .gro files if placing solute in box
+        :param em_steps : number of energy minimization steps if placing solute in box
+        """
+
+        t = md.load(gro)
+        self.box_vectors = t.unitcell_vectors[0, :, :]  # box vectors
+
+        self.box_gromacs = [self.box_vectors[0, 0], self.box_vectors[1, 1], self.box_vectors[2, 2],
+                            self.box_vectors[0, 1], self.box_vectors[2, 0], self.box_vectors[1, 0],
+                            self.box_vectors[0, 2], self.box_vectors[1, 2], self.box_vectors[2, 0]]  # box in gromacs format
+
+        self.positions = t.xyz[0, :, :]  # positions of all atoms
+        self.residues = []
+        self.names = []
+        self.top = SystemTopology(gro)
+        self.intermediate_fname = intermediate_fname
+        self.em_steps = em_steps
+
+        # because mdtraj changes the names
+        for a in t.topology.atoms:
+            if a.residue.name == 'HOH':
+                self.residues.append('SOL')
+                if a.name == 'O':
+                    self.names.append('OW')
+                elif a.name == 'H1':
+                    self.names.append('HW1')
+                elif a.name == 'H2':
+                    self.names.append('HW2')
+            else:
+                self.residues.append(a.residue.name)
+                self.names.append(a.name)
+
+    def place_solute(self, solute):
+        """
+        :param solute: Solute object generated from solute configuration file (.gro)
+        """
+        placement_point = self.random_point_box()  # where to place solute
+        solute_positions = transform.translate(solute.xyz[0, :, :], solute.xyz[0, 0, :], placement_point)  # translate solute to placement point
+        self.positions = np.concatenate((self.positions, solute_positions))  # add to array of positions
+        self.residues += solute.residues  # add solute residues to list of all residues
+        self.names += solute.names  # add solute atom names to list of all names
+        self.top.add_residue(solute, write=True)  # add 1 solute to topology
+
+        # write new .gro file
+        file_rw.write_gro_pos(self.positions, self.intermediate_fname, box=self.box_gromacs, ids=self.names, res=self.residues)
+        nrg = self.energy_minimize(self.em_steps)
+
+        if nrg >= 0:
+            self.revert(solute)
+            self.place_solute(solute)
+
+    def energy_minimize(self, steps):
+        """
+        Energy minimize a configuration
+        :param steps: number of steepest descent energy minimization steps to take
+        :return: coordinates of energy minimized structure, updated coordinates of reference atoms
+        """
+
+        file_rw.write_em_mdp(steps)  # write em.mdp with a given number of steps
+
+        p1 = subprocess.Popen(
+            ["gmx", "grompp", "-p", "topol.top", "-f", "em.mdp", "-o", "em", "-c", "%s" % self.intermediate_fname],
+            stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
+        p1.wait()
+        p2 = subprocess.Popen(["gmx", "mdrun", "-deffnm", "em"], stdout=open(os.devnull, 'w'),
+                              stderr=subprocess.STDOUT)  # run energy minimization
+        p2.wait()
+
+        nrg = subprocess.check_output(
+            ["awk", "/Potential Energy/ {print $4}", "em.log"])  # get Potential energy from em.log
+
+        try:
+            return float(nrg.decode("utf-8"))
+        except ValueError:
+            return 0  # If the system did not energy minimize, the above statement will not work because nrg will be an
+            # empty string. Make nrg=0 so placement gets attempted again
+
+    def random_point_box(self):
+        """
+        :param box_vectors: (numpy array, (3, 3)) box vectors. Each row represents a box vector.
+        :return: (numpy array, (3)) coordinates of a randomly chosen point that lies in box
+        """
+
+        A = self.box_vectors[0, :]  # x box vector
+        B = self.box_vectors[1, :]  # y box vector
+        C = self.box_vectors[2, :]  # z box vector
+        u, v, w = np.random.rand(3)  # generate 3 random numbers between 0 and 1
+        pt = np.array([0, 0, 0]) + u * A + v * B + w * C  # places point inside 3D box defined by box vector A, B and C
+
+        return pt
+
+    def revert(self, solute):
+        """
+        Revert system to how it was before solute addition
+        :return:
+        """
+        n = -solute.natoms
+        self.positions = self.positions[:n, :]
+        self.residues = self.residues[:n]
+        self.names = self.names[:n]
+        self.top.add_residue(solute, n=-1, write=False)  # subtract a solute from the topology
+
+
+class Solute(object):
+
+    def __init__(self, name):
+
+        self.is_ion = False
+        # check if residue is an ion
+        with open('%s/../top/topologies/ions.txt' % script_location) as f:
+            ions = []
+            for line in f:
+                if line[0] != '#':
+                    ions.append(str.strip(line))
+
+        if name in ions:
+            self.is_ion = True
+            self.residues = [name]
+            self.names = [name]
+            self.xyz = np.zeros([1, 1, 3])
+            self.xyz[0, 0, :] = [0, 0, 0]
+            self.natoms = 1
+            self.mw = Atom_props.mass[name]
+            self.charge = Atom_props.charge[name]
+            self.resname = name
+        else:
+            try:
+                t = md.load('%s.pdb' % name, standard_names=False)  # see if there is a solute configuration in this directory
+            except OSError:
+                try:
+                    t = md.load('%s/../top/topologies/%s.pdb' % (script_location, name), standard_names=False)  # check if the configuration is
+                    # located with all of the other topologies
+                except OSError:
+                    print('No residue %s found' % name)
+                    exit()
+
+            try:
+                f = open('%s.itp' % name, 'r')
+            except FileNotFoundError:
+                try:
+                    f = open('%s/../top/topologies/%s.itp' % (script_location, name), 'r')
+                except FileNotFoundError:
+                    print('No topology %s.itp found' % name)
+
+            itp = []
+            for line in f:
+                itp.append(line)
+
+            f.close()
+
+            self.natoms = t.n_atoms
+
+            atoms_index = 0
+            while itp[atoms_index].count('[ atoms ]') == 0:
+                atoms_index += 1
+
+            atoms_index += 2
+            self.charge = 0
+            for i in range(self.natoms):
+                self.charge += float(itp[atoms_index + i].split()[6])
+
+            self.residues = [a.residue.name for a in t.topology.atoms]
+            self.resname = self.residues[0]
+            self.names = [a.name for a in t.topology.atoms]
+            self.xyz = t.xyz
+
+            self.mw = 0  # molecular weight (grams)
+            for a in t.topology.atoms:
+                self.mw += Atom_props.mass[a.name]
 
 
 if __name__ == "__main__":
 
     args = initialize()
 
-    t = md.load(args.gro)  # load trajectory
-    xyz = t.xyz[0, :, :]  # positions of all atoms
+    os.environ["GMX_MAXBACKUP"] = "-1"  # stop GROMACS from making backups
 
-    full_box = t.unitcell_vectors
-    box = t.unitcell_vectors[0, :2, :2]  # get xy box vectors
-    zmax, zmin = physical.thickness(args.gro, args.ref, grid=False)[1:3]  # find limits for solute placement
+    solvent = Solvent(args.gro)
+    if args.concentration:
+        concentration = [float(i) for i in args.concentration]
+    elif args.n_solute:
+        n = [int(i) for i in args.n_solute]
 
-    angle = np.arccos(box[1, 1]/box[0, 0])
-    if box[1, 0] < 0:
-        angle += np.pi / 2
+    solutes = []
+    nsolute = []
 
-    keep = [a.index for a in t.topology.atoms if a.name in args.ref]  # keep reference atoms
+    for i, s in enumerate(args.solutes):
 
-    pos = t.atom_slice(keep).xyz[0, :, :]  # get positions of reference atoms
+        solutes.append(Solute(s))
 
-    # Now find the xy locations where solutes should be placed (i.e. find the pores)
-    centers = trace_pores(pos, box, args.layers)
+        if args.concentration:
+            n, actual_concentration = concentration_to_nsolute(concentration[i], solvent.box_vectors, solutes[i])
+            nsolute.append(n)
+            print("Actual Concentration of %s : %.2f mol/L" % (s, actual_concentration))
+        elif args.n_solute:
+            nsolute[i] = n[i]
+        else:
+            print("You must specify a concentration or number of solute molecules")
+            exit()
 
-    # Place solutes molecules by their center of mass
-    solute = md.load('%s/%s.gro' % (args.solute_path, args.solute))
+    # system_charge = net_charge(nsolute, solutes)
+    # solute_charges = np.array([int(a.charge) for a in solutes])
+    #
+    # # ensure charge neutrality
+    # while -0.0001 > system_charge or system_charge > 0.0001:
+    #     if system_charge < 0:
+    #         nsolute[np.random.choice(np.where(solute_charges > 0.0)[0])] += 1
+    #     elif system_charge > 0:
+    #         nsolute[np.random.choice(np.where(solute_charges < 0.0)[0])] += 1
+    #     system_charge = net_charge(nsolute, solutes)
 
-    solute_atom_names = [a.name for a in solute.topology.atoms]
-    solute_resnames = [a.residue.name for a in solute.topology.atoms]
+    # a "smarter" way to add solutes that keeps things relatively neutral - has bugs
+    # while sum(nsolute) > 0:
+    #     print(sum(nsolute))
+    #     solute_to_add = np.random.choice(np.where(nsolute != 0)[0])  # randomly choose a solute to add
+    #     nsolute[solute_to_add] -= 1  # subtract from solutes that need to be added
+    #     solvent.place_solute(solutes[solute_to_add])  # place the solute
+    #     if solutes[solute_to_add].charge > 0:  # if it is a cation, neutralize with anion(s)
+    #         # choose anion such that its charge is positive but not greater in magnitude than the cation already added
+    #         anion = np.random.choice(np.where(solute_charges < 0.0)[0])
+    #         nadd = int(solutes[anion].charge / solutes[solute_to_add].charge)  # if charge on cation is +2 and charge on anion is -1, add two anions
+    #         for i in range(nadd):
+    #             solvent.place_solute(solutes[anion])
+    #             nsolute[anion] -= 1
+    #     elif solutes[solute_to_add].charge < 0:  # if it is an anion, neutralize with cation(s)
+    #         # choose cation such that its charge is positive but not greater in magnitude than the anion already added
+    #         cation = np.random.choice(np.where(solute_charges > 0.0)[0])
+    #         nadd = int(solutes[cation].charge / solutes[solute_to_add].charge)  # if charge on cation is +2 and charge on anion is -1, add two anions
+    #         for i in range(nadd):
+    #             solvent.place_solute(solutes[cation])
+    #             nsolute[cation] -= 1
 
-    com = np.zeros([3])  # center of mass of solute
-    for i in range(solute.xyz.shape[1]):
-        com += solute.xyz[0, i, :]
-    com /= solute.xyz.shape[1]
+    # print(int(solutes[i].charge))
+    # print("Adding %d %s molecules" % (nsolute, s))
 
-    pores = int(centers.shape[0] / args.layers)
-    solute_locations = np.zeros([pores*args.number, 3])
-    solute_coords = np.zeros([solute.xyz.shape[1]*args.number*pores, 3])
-    for i in range(pores):
-        zmin = np.min(centers[i*args.layers:(i+1)*args.layers, 2])
-        zmax = np.max(centers[i*args.layers:(i+1)*args.layers, 2])
-        z_placement = np.linspace(zmin, zmax, args.number + 2)[1:-1]  # points along z axis where solutes will be placed (exclude end points ... for now)
-        for j in range(args.number):
-            place = placement(z_placement[j], centers[i*args.layers:(i+1)*args.layers, :], box)
-            solute_locations[i*args.number + j, :] = place
-            solute_coords[(i*args.number + j)*solute.xyz.shape[1]:(i*args.number + j + 1)*solute.xyz.shape[1], :] = \
-                transform.translate(solute.xyz[0, :, :], com, place[0, :])
-            # xyz = np.concatenate((xyz, transform.translate(solute.xyz[0, :, :], com, place[0, :])))
+    for n in tqdm.tqdm(range(len(nsolute))):
+        solvent.place_solute(solutes[n])
 
-    # remove waters close to inserted solutes
-    water = [a.index for a in t.topology.atoms if a.residue.name == 'HOH' and a.name == 'O']
+    from pathlib import Path
 
-    tree = spatial.cKDTree(xyz[water, :])
-    rm = []
-    for i in range(solute_locations.shape[0]):
-        for j in tree.query(solute_locations[i, :], k=args.neighbors)[1]:
-            rm.append(water[j])
-            rm.append(water[j] + 1)
-            rm.append(water[j] + 2)
-
-    keep = [a.index for a in t.topology.atoms if a.residue.name != 'HOH']
-    for i in water:
-        if i not in rm:
-            keep.append(i)
-            keep.append(i + 1)
-            keep.append(i + 2)
-
-    pos = np.concatenate((xyz[keep, :], solute_coords))
-
-    names = [a.name for a in t.topology.atoms if a.index not in rm]  # names of all atoms
-    res = [a.residue.name for a in t.topology.atoms if a.index not in rm]  # residue names of all atoms
-
-    # change names and residues back to be consistent with tip3p water model. idk why mdtraj does this to me D':
-    for i, name in enumerate(res):
-        if name == "HOH":
-            res[i] = 'SOL'
-            if names[i] == 'O':
-                names[i] = 'OW'
-            elif names[i] == 'H1':
-                names[i] = 'HW1'
-            elif names[i] == 'H2':
-                names[i] = 'HW2'
-
-    ids = names + solute_atom_names*args.number*4
-    res_names = res + solute_resnames*args.number*4
-
-    box_gromacs = [full_box[0, 0, 0], full_box[0, 1, 1], full_box[0, 2, 2], full_box[0, 0, 1], full_box[0, 2, 0],
-                   full_box[0, 1, 0], full_box[0, 0, 2], full_box[0, 1, 2], full_box[0, 2, 0]]
-    print(pos.shape)
-    print(len(res_names))
-    file_rw.write_gro_pos(pos, 'solutes.gro', box=box_gromacs, ids=ids, res=res_names)
-
-    # update topology
-    topology = []
-    with open('%s' % args.top, 'r') as f:
-        for line in f:
-            topology.append(line)
-
-    system_index = 0
-    while topology[system_index].count('[ system ]') == 0:
-        system_index += 1
-
-    topology.insert(system_index, ';%s Topology\n' % args.solute)
-    topology.insert(system_index + 1, '#include "%s/%s.itp"\n' % (args.solute_path, args.solute))
-    topology.insert(system_index + 2, '\n')
-
-    # modify number of water molecules since some were removed
-    sol = 0
-    while topology[sol].count('SOL') == 0:
-        sol += 1
-
-    topology[sol] = '%s                 %d\n' %('SOL', int(int(topology[sol].split()[1]) - args.neighbors*args.number*pores))
-    topology.append('%s                 %s' % (solute_resnames[0], args.number*4))
-
-    with open('solute.top', 'w') as f:
-        for line in topology:
-            f.write(line)
+    for p in Path(".").glob("step*"):
+        p.unlink()

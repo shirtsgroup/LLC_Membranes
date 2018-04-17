@@ -47,10 +47,17 @@ def initialize():
     parser.add_argument('-i', '--input', type=str, default='dipole.itp', help='Name of topology file to be edited if '
                                                                               'you use the option --append')
     parser.add_argument('--bcc', action="store_true", help='Use BCC topology')
+    parser.add_argument('-dr', '--dihedral_restraints', action='append', nargs='+',
+                        help='Specify atom names of dihedral to be restrained, followed by angle at which to restrain'
+                             'them, the deviation from that angle allowed and the force constant to apply. For example:'
+                             '"restrain.py -dr C1 C C6 O4 90 0 1000" means to keep the angle between the planes formed'
+                             'by C1-C-C6 and C-C6-O4 90 degrees apart with 0 degrees of leeway and a force constant of '
+                             '1000')
 
     args = parser.parse_args()
 
     return args
+
 
 warnings.filterwarnings("error")  # This makes it so numpy warnings are treated as real errors
 
@@ -352,6 +359,39 @@ def position_restraints(file, atoms, axis):
 
     return restraints
 
+
+def dihedral_restraints(file, atoms):
+
+    ndihedrals = len(atoms)
+
+    all_restraints = np.zeros([0, 8])
+    for n in range(ndihedrals):
+
+        atom_numbers = []
+        d = np.zeros([4])
+        count = 0
+        for line in file:
+            atom = str.strip(line[10:15])  # name of atom at that line
+            if atom in atoms[n]:
+                d[atoms[n].index(atom)] = int(line[15:20])  # atom number placed in d in order that dihedral was passed
+                if np.count_nonzero(d) == 4:  # and len(atom_numbers) % 8 == 0:
+                    if count % 2 == 1:
+                        for i in range(4):
+                            atom_numbers.append(d[i])
+                    d = np.zeros([4])
+                    count += 1
+
+        restraints = np.zeros([len(atom_numbers)//4, 8])
+        for i in range(len(atom_numbers)//4):
+            d = 4 * i
+            restraints[i, :] = [atom_numbers[d], atom_numbers[d + 1], atom_numbers[d + 2], atom_numbers[d + 3], 1, atoms[n][4],
+                                atoms[n][5], atoms[n][6]]
+
+        all_restraints = np.concatenate((all_restraints, restraints))
+
+    return all_restraints
+
+
 if __name__ == "__main__":
 
     args = initialize()
@@ -477,5 +517,16 @@ if __name__ == "__main__":
                                                         restraints[2, i], '', restraints[3, i], '', restraints[4, i]))
 
         f.close()
+
+    if args.dihedral_restraints:
+
+        restraints = dihedral_restraints(gro, args.dihedral_restraints)
+
+        with open(args.input, 'a') as f:
+            f.write("\n[ dihedral_restraints ]\n")
+            for i in range(restraints.shape[0]):
+                f.write('{:6d}{:6d}{:6d}{:6d}{:6d}{:1s}{:9f}{:1s}{:9f}{:1s}{:9f}\n'.format(int(restraints[i, 0]),
+                        int(restraints[i, 1]), int(restraints[i, 2]), int(restraints[i, 3]), int(restraints[i, 4]), '',
+                            restraints[i, 5], '', restraints[i, 6], '', restraints[i, 7]))
 
     print('dipole.itp file written :)')

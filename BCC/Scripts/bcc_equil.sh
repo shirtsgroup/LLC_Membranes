@@ -19,7 +19,7 @@ cluster=0  # 0 if run without mpi, 1 if run with mpi (regular MPI or with GPU)
 NP=4  # number of MPI processes
 python='python3'
 
-while getopts "b:p:d:r:n:I:w:S:T:R:c:P" opt; do
+while getopts "b:p:d:r:n:I:w:S:T:R:c:P:" opt; do
     case $opt in
     b) build_mon=$OPTARG;;
     p) phase=$OPTARG;;
