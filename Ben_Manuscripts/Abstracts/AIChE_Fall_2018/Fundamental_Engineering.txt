@@ -7,6 +7,7 @@ processes. Both experimental and theoretical investigations are welcome.
 Special consideration is given to work on coupled transport processes that may
 not be adequately served by other, more focused sessions
 
+%MRS: probably overspecalized.  "in pores of nanostructured lyotropic liquid crystal membrane" is specific enough a title.
 Title : Understanding transport of small solutes in the pores of a
 crosslinked hexagonal phase lyotropic liquid crystal membrane
 
@@ -18,15 +19,38 @@ geometry is ideal for transport in aqueous membrane separation processes. With a
 complete understanding of the mechanisms that govern transport of small
 solutes within these nanopores, we can modify LLC monomers in order to tune
 the size and chemical environment of the pores for solute-specific separations.
-Previously, we have used molecular dynamics simulations in order to form a
+
+%MRS: suggest paragraph break here.
+%MRS suggest cut this word - better to let work stand on itself than give timeline.
+%Previously,
+We have used molecular dynamics simulations in order to form a
 detailed atomistic model of this system by maximizing its consistency with
 experimental observables such as 2D wide angle X-ray scattering patterns and
-ionic conductivity measurements. Using our detailed model we study the
-transport mechanisms of a range of neutral solutes within the pores. We measure
+ionic conductivity measurements. Using our 
+%MRS: added word
+atomistically 
+detailed model, we study the
+transport mechanisms of a range of neutral solutes within the pores. 
+%MRS: I'd just say we calculate the diffusion constant along the pore, and examine the mechanism for changes in rates of diffusion.
+We measure
 the mean square displacement (MSD) of each molecule in order to understand each
-solute's diffusive behavior in the pores versus in bulk. We run potential of
-mean force (PMF) simulations in conjuction with umbrella sampling in order to
-construct free energy profiles as we pull each solute through the pores. We use
-this information to identify bottlenecks in membrane design that limit its
+solute's diffusive behavior in the pores versus in bulk. We 
+%MRS: add
+also
+%run 
+calculate the 
+potential of
+mean force (PMF) 
+%simulations 
+%in conjuction with 
+using umbrella sampling 
+%in order 
+to construct free energy profiles
+along the pore
+%MRS: if done correctly, it is independent of the way it passes through the pore, i.e. not really pulling. 
+%as we pull each solute through the pores. 
+We use this information to identify bottlenecks in membrane design 
+%MRS: maybe just to understand selectivity based on both size and chemical details of the solute?
+that limit its
 permeance and selectivity towards solutes so that we can suggest new LLC monomer
 structures to be tested experimentally. 
