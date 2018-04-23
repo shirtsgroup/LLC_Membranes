@@ -42,6 +42,7 @@ def initialize():
     parser.add_argument('-nv', '--nstvout', type=int, help='Frequency to output velocities to trajectory file')
     parser.add_argument('-nf', '--nstfout', type=int, help='Frequency to output forces to trajectory file')
     parser.add_argument('-ne', '--nstenergy', type=int, help='Frequency to output energy to energy file')
+    parser.add_argument('-mpi', action="store_true", help='Specify this flag if the system will be run in parallel')
 
     args = parser.parse_args()
 
@@ -52,11 +53,16 @@ class System(object):
     """
     A class to keep track of the system and run various simulations
     """
-    def __init__(self, mdp):
+    def __init__(self, mdp, mpi=False, np=4):
         """
         :param mdp: SimulationMdp object
+        :param mpi: Specify if you are running GROMACS in parallel
+        :param np: Number of processes. Only has meaning if mpi=True
         """
         self.mdp = mdp
+        self.gmx = "gmx"
+        if mpi:
+            self.gmx = "mpirun -np %d gmx_mpi" % np
         self.top = mdp.top
         self.density = 0
         self.density_equilibration = 0
@@ -77,7 +83,7 @@ class System(object):
         p1 = subprocess.Popen(['gmx', 'grompp', '-f', '%s' % mdp_file, '-p', '%s' % self.mdp.top.name, '-o',
                               '%s' % out, '-c', '%s' % configuration])  # will make ensemble.trr, ensemble.gro etc.
         p1.wait()
-        p2 = subprocess.Popen(['gmx', 'mdrun', '-v', '-deffnm', '%s' % out])
+        p2 = subprocess.Popen(['%s' % self.gmx, 'mdrun', '-v', '-deffnm', '%s' % out])
         p2.wait()
 
     def run_simulation(self, ensemble, configuration):
@@ -100,7 +106,7 @@ class System(object):
         p1 = subprocess.Popen(['gmx', 'grompp', '-f', '%s' % mdp_file, '-p', '%s' % self.mdp.top.name, '-o',
                               '%s' % ensemble, '-c', '%s' % configuration])  # will make ensemble.trr, ensemble.gro etc.
         p1.wait()
-        p2 = subprocess.Popen(['gmx', 'mdrun', '-v', '-deffnm', '%s' % ensemble])
+        p2 = subprocess.Popen(['%s' % self.gmx, 'mdrun', '-v', '-deffnm', '%s' % ensemble])
         p2.wait()
 
     def average_density(self, ensemble):
