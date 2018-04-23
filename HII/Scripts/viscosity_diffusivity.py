@@ -43,6 +43,7 @@ def initialize():
     parser.add_argument('-nf', '--nstfout', type=int, help='Frequency to output forces to trajectory file')
     parser.add_argument('-ne', '--nstenergy', type=int, help='Frequency to output energy to energy file')
     parser.add_argument('-mpi', action="store_true", help='Specify this flag if the system will be run in parallel')
+    parser.add_argument('-np', default=4, type=int, help='Number of processes to run in parallel')
 
     args = parser.parse_args()
 
@@ -236,7 +237,7 @@ if __name__ == "__main__":
     mdp.nstenergy = int(np.ceil(5 / (args.dt*1000)))  # save every 6 femptoseconds (3 timesteps!)
     mdp.write_nve_mdp()  # write .mdp for nve simulation
 
-    sys = System(mdp)  # system object to keep track of all relevant data
+    sys = System(mdp, mpi=args.mpi, np=args.np)  # system object to keep track of all relevant data
 
     # Run NPT equilibraton simulation
     sys.run_simulation('npt', args.gro)
