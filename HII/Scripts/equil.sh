@@ -40,13 +40,13 @@ done
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-#if [[ $solvate -eq 1 ]]; then
-#    ${python} ${DIR}/input.py -b ${BUILD_MON} -l 50 --restraints ${restraint_residue} --temp ${T} -f 50 --genvel yes -S -c ${start_config}
-#else
-#    ${python} ${DIR}/input.py -b ${BUILD_MON} -l 50 --restraints ${restraint_residue} --temp ${T} -f 50 --genvel yes -c ${start_config}
-#fi
+if [[ $solvate -eq 1 ]]; then
+    ${python} ${DIR}/input.py -b ${BUILD_MON} -l 50 --restraints ${restraint_residue} --temp ${T} -f 50 --genvel yes -S -c ${start_config}
+else
+    ${python} ${DIR}/input.py -b ${BUILD_MON} -l 50 --restraints ${restraint_residue} --temp ${T} -f 50 --genvel yes -c ${start_config}
+fi
 
-${python} ${DIR}/restrain.py -f 1000000 -A xyz -r on -D off -w off -g ${start_config} --novsites -m ${BUILD_MON} -a ${ring_restraints}
+${python} ${DIR}/restrain_old.py -f 1000000 -A xyz -r on -D off -w off -g ${start_config} --novsites -m ${BUILD_MON} -a ${ring_restraints}
 
 if [ "${MPI}" == "on" ]; then
     gmx editconf -f ${start_config} -o box.gro -c -bt triclinic -box ${x} ${y} ${z} -angles 90 90 120
@@ -72,7 +72,7 @@ fi
 ${python} ${DIR}/input.py --mdp -b ${BUILD_MON} -l 50 --restraints --temp ${T} -f 50 --genvel no  -c ${start_config} # use velocities from previous sim
 
 for f in ${forces}; do
-	${python} ${DIR}/restrain.py -f ${f} -A xyz -r on -D off -w off --novsites -m ${BUILD_MON} -a ${ring_restraints} -g ${start_config}
+	${python} ${DIR}/restrain_old.py -f ${f} -A xyz -r on -D off -w off --novsites -m ${BUILD_MON} -a ${ring_restraints} -g ${start_config}
 	if [ ${MPI} == 'on' ]; then
             gmx grompp -f npt.mdp -p topol.top -c npt.gro -o npt
 	    mpirun -np ${NP} gmx_mpi mdrun -v -deffnm npt

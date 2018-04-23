@@ -163,6 +163,14 @@ if __name__ == "__main__":
 
     if args.columns:
 
+        ref_position = pos[props.ref_atom_index, :]
+
+        # If you want to place monomers based on center of mass of phenyl rings
+        com_phenyls = np.mean(pos[props.plane_indices, :], axis=0)  # center of mass of phenyl rings
+        r += np.linalg.norm(com_phenyls)  # compensate for change in radius caused by switching reference atoms
+        pos = transform.translate(pos, com_phenyls, [0, 0, 0])
+        ref_position = np.mean(pos[props.plane_indices, :], axis=0)  # center of mass of phenyl rings
+
         mean_z = np.linspace(0, (args.layers - 1) * args.dbwl, args.layers) / 10  # mean z-positions of monomer heads
         # mean_z[::2] -= 0.15 # for staggered configurations
         rotated_carboxylate = np.copy(pos)
@@ -180,6 +188,8 @@ if __name__ == "__main__":
                 parallel = transform.rotate_coords_z(rotated_carboxylate, theta*180/np.pi)
                 if args.offset:
                     parallel_offset = transform.rotate_coords_z(rotated_carboxylate, offset_theta*180/np.pi)
+                rotated_monomer_fwd = transform.rotate_coords_z(pos, theta*180/np.pi + 15)
+                rotated_monomer_bwd = transform.rotate_coords_z(pos, theta * 180 / np.pi - 15)
                 shift = np.random.uniform(-args.dbwl/20, args.dbwl/20)
                 #z = z_correlation(mean_z, args.correlation_length, args.Lvar)
                 # z = mean_z + shift
@@ -189,13 +199,19 @@ if __name__ == "__main__":
                     if l % 2 == 0:
                         if args.offset:
                             assembly[ndx:(ndx + pos.shape[0]), :] = transform.translate(parallel_offset,
-                                    pos[props.ref_atom_index, :], [px + r*np.cos(offset_theta), py + r*np.sin(offset_theta), z[l]])
+                                    ref_position, [px + r*np.cos(offset_theta), py + r*np.sin(offset_theta), z[l]])
                         else:
                             assembly[ndx:(ndx + pos.shape[0]), :] = transform.translate(parallel,
                                     pos[props.ref_atom_index, :], [px + r*np.cos(theta), py + r*np.sin(theta), z[l]])
+                            # assembly[ndx:(ndx + pos.shape[0]), :] = transform.translate(rotated_monomer_fwd,
+                            #         ref_position, [px + r*np.cos(theta), py + r*np.sin(theta), z[l]])
                     else:
                         assembly[ndx:(ndx + pos.shape[0]), :] = transform.translate(antiparallel,
-                                    pos[props.ref_atom_index, :], [px + r*np.cos(theta), py + r*np.sin(theta), z[l]])
+                                   ref_position, [px + r*np.cos(theta), py + r*np.sin(theta), z[l]])
+                        # assembly[ndx:(ndx + pos.shape[0]), :] = transform.translate(rotated_monomer_bwd,
+                        #                                                             ref_position,
+                        #                                                             [px + r * np.cos(theta),
+                        #                                                              py + r * np.sin(theta), z[l]])
 
     else:
 

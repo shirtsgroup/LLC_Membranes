@@ -13,10 +13,13 @@ from __future__ import print_function
 from __future__ import absolute_import
 import argparse
 import numpy as np
-import math
 import warnings
 import os
 from llclib import file_rw
+import mdtraj as md
+import lc_class
+
+location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Location of this script
 
 
 def initialize():
@@ -29,12 +32,11 @@ def initialize():
     parser.add_argument('-D', '--dipoles', default='off', help='Put "on" if you want to create dipoles')
     parser.add_argument('-w', '--write_gro', default='off', help='Put "on" if you want to create a .gro with dipoles '
                                                                  'placed in the right spots')
-    parser.add_argument('-f', '--f_const', default=1000, type=float, help='Force constant')
+    parser.add_argument('-f', '--f_const', nargs='+', default=[1000, 1000, 1000], type=float, help='Force constant')
     parser.add_argument('-a', '--atoms', nargs='+', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], type=str, help='Name of carbons in ring')
     parser.add_argument('-d', '--distance', default=0.1, help='Distance to offset dipole from ring (Angstroms)')
     parser.add_argument('-m', '--monomer', default='NAcarb11V', help='Which monomer topology is being used')
     parser.add_argument('-t', '--toplines', default=2, help='Number of lines at the top of the .gro file to ignore')
-    parser.add_argument('-v', '--valence', default=1, help = 'Valence of counterion')
     parser.add_argument('-c', '--charge', default=10, help= 'Charge on dipoles')
 
     parser.add_argument('-A', '--axis', default='xy', help='Axis to restrain along with position restraints')
@@ -53,6 +55,15 @@ def initialize():
                              '"restrain.py -dr C1 C C6 O4 90 0 1000" means to keep the angle between the planes formed'
                              'by C1-C-C6 and C-C6-O4 90 degrees apart with 0 degrees of leeway and a force constant of '
                              '1000')
+    parser.add_argument('-com', '--center_of_mass', action="store_true", help="Add position restraints at the center of"
+                                                                              "mass of args.atoms")
+    parser.add_argument('-v', '--virtual_site_parameters', nargs='+', default=['3fd', 'C', 'C2', 'C4', '.5', '.14'],
+                        help='A list in the following order : virtual site construction type, atoms to use to build '
+                             'virtual site, required length parameters (i.e. a, b, c or d) in the order specified in'
+                             'GROMACS documentation')
+    parser.add_argument('-b', '--bond_restraints', default=[.37, 1000], nargs='+', help='Bond restraint pararmeters. A'
+                        'list where the first entry is the equilibrium distance (nm) and the second entry is the force'
+                        'constant for a harmonic potential (kJ/mol/nm^2)')
 
     args = parser.parse_args()
 
@@ -60,211 +71,6 @@ def initialize():
 
 
 warnings.filterwarnings("error")  # This makes it so numpy warnings are treated as real errors
-
-
-def get_coordinates(file, top_lines, atoms):
-    """
-    Get the coordinates of all atoms and atoms of interest from a .gro file
-    :param file: a list with each entry containing a line from the .gro file
-    :param top_lines: the number of lines at the top of the .gro file to skip
-    :param atoms: A list containing residue names of atoms in benzene rings, user input
-    :return: Coordinates of all benzene carbons (numpy array), the total number of atoms in the system (int),
-    the coordinates of all atoms (numpy array)
-    """
-
-    n_atoms = len(file) - top_lines - 1  # subtract 1 more for the box at the bottom
-
-    count = 0
-    for i in range(top_lines, n_atoms + top_lines):
-        if str.strip(file[i][10:15]) in atoms:
-            count += 1
-
-    coords = np.zeros([3, count])
-    all_coords = np.zeros([3, n_atoms])
-    ids = np.zeros([n_atoms], dtype=object)
-    res = np.zeros([n_atoms], dtype=object)
-
-    count = 0
-    for i in range(top_lines, n_atoms + top_lines):
-        all_coords[0, i - top_lines] = float(file[i][20:28])
-        all_coords[1, i - top_lines] = float(file[i][28:36])
-        all_coords[2, i - top_lines] = float(file[i][36:44])
-        ids[i - top_lines] = str.strip(file[i][10:15])
-        res[i - top_lines] = str.strip(file[i][5:10])
-        if str.strip(file[i][10:15]) in atoms:
-            coords[0, count] = float(file[i][20:28])
-            coords[1, count] = float(file[i][28:36])
-            coords[2, count] = float(file[i][36:44])
-            count += 1
-
-    return coords, n_atoms, all_coords, ids, res
-
-
-def ring_center(coords, atoms):
-    """
-    :param coords: coordinates of all benzene atoms, numpy array [xyz positions, number of benzene atoms]
-    :param atoms: A list containing residue names of atoms in benzene rings, user input
-    :return: The center coordinates of each benzene ring, numpy array
-        NOTE: This is actually unnecessary to construct a virtual site in gromacs. Setting up the virtual site properly will
-    take care of the placement of the virtual site. You can initially place the virtual site 'atoms' anywhere and their
-    positions will be corrected within the first few steps of the simulation
-    """
-    no_atoms = len(atoms)
-    rings = int(np.shape(coords)[1] / no_atoms)
-
-    centers = np.zeros([3, rings])
-
-    for i in range(rings):
-        sum = np.array([0.0, 0.0, 0.0])
-        for j in range(no_atoms):
-            sum += coords[:, i*no_atoms + j]
-        centers[:, i] = sum / float(no_atoms)
-
-    return centers
-
-
-def perpendicular_vectors(coords, atoms):
-    """
-    :param coords: The coordinates of all benzene carbons in the system, numpy array [xyz positions, no benzene atoms]
-    :param atoms: A list containing residue names of atoms in benzene rings, user input
-    :return: Perpendicular vectors to the plane of atoms in the benzene rings
-        NOTE: This is actually unnecessary to construct a virtual site in gromacs. Setting up the virtual site properly will
-    take care of the placement of the virtual site. You can initially place the virtual site 'atoms' anywhere and their
-    positions will be corrected within the first few steps of the simulation
-    """
-    no_atoms = len(atoms)
-    rings = np.shape(coords)[1] / no_atoms
-    perp_vectors = np.zeros([3, rings])
-
-    for i in range(rings):
-        pts = np.zeros([3, 3])  # need 3 points from the benzene ring plane
-        for j in range(no_atoms):
-            if j % 2 == 0:  # only need 3 atoms so let's take every other - this is important in the vsite construction
-                pts[:, int(j / 2)] = coords[:, i*no_atoms + j]
-        v1 = pts[:, 0] - pts[:, 1]
-        v2 = pts[:, 0] - pts[:, 2]
-        perp_vectors[:, i] = np.cross(v1, v2)
-
-    return perp_vectors
-
-
-def dipole_points(centers, perp_vectors, distance):
-    """
-    This function sets the location of the virtual sites with respect to the plane formed by chosen atoms
-    :param centers: coordinates of the centers of the benzene rings, numpy array [xyz position, number of rings]
-    :param perp_vectors: vectors perpendicular to each plans, numpy array [xyz vector, number of rings]
-    :param distance: the distance to offset virtual sites from the plane of atoms, user input
-    :return: The coordinates of the locations of all dipoles, numpy array
-        NOTE: This is actually unnecessary to construct a virtual site in gromacs. Setting up the virtual site properly will
-    take care of the placement of the virtual site. You can initially place the virtual site 'atoms' anywhere and their
-    positions will be corrected within the first few steps of the simulation
-    """
-    rings = np.shape(centers)[1]
-    top_pole = np.zeros([3, rings])
-    bot_pole = np.zeros([3, rings])
-
-    for i in range(rings):
-        perp_vect = perp_vectors[:, i]
-        center = centers[:, i]
-        try:  # this is the reason warnings are filtered. Numpy encounters a divide by zero if the plane is perfectly
-              # in the x-y plane as it is when making an initial configuration
-            norm = perp_vect / math.sqrt(np.dot(perp_vect, perp_vect))
-        except RuntimeWarning:
-            norm = np.array([0.0, 0.0, 1.0])
-        if norm[2] < 0:
-            top_pole[:, i] = center - distance*norm
-            bot_pole[:, i] = center + distance*norm
-        else:
-            top_pole[:, i] = center + distance*norm
-            bot_pole[:, i] = center - distance*norm
-
-    return top_pole, bot_pole
-
-
-def write_gro_bak(top_poles, bot_poles, b, rings):
-    """
-    :param top_poles: The coordinates of the dipoles on the top side of the ring, numpy array [xyz coords, no rings]
-    :param bot_poles: The coordinates of the dipoles on the bottom side of the ring, numpy array [xyz coords, no rings]
-    :param b: A list containing each line of the original .gro file
-    :param rings: the number of benzene rings
-    :return: Writes .gro file with new dipole locations
-    """
-
-    f = open('dipoles.gro', 'w')  # open a new file for writing
-
-    box = b[len(b) - 1]  # extract the box dimensions
-    del b[len(b) - 1]  # delete the box dimensions from the file
-
-    for line in b:  # write everything back to dipoles.gro (except the box dimension)
-        f.write(line)
-
-    count = rings * 2 + 1  # count for the number of residues (first column of numbers in .gro file)
-    count1 = atoms + 1  # count for total atoms (fourth column in .gro file
-    for i in range(rings):
-        f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(count, 'PI', 'PI', count1, top_poles[0, i],
-                                                    top_poles[1, i], top_poles[2, i]) + "\n")
-
-        count += 1  # treat all virtual sites as separate residues
-        count1 += 1
-        f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(count, 'PI', 'NA', count1, bot_poles[0, i],
-                                            bot_poles[1, i], bot_poles[2, i]) + "\n")
-        count += 1
-        count1 += 1
-    f.write(box)
-    f.close()
-
-
-def write_gro(top_poles, bot_poles, b, rings, toplines, valence):
-    """
-    :param top_poles: The coordinates of the dipoles on the top side of the ring, numpy array [xyz coords, no rings]
-    :param bot_poles: The coordinates of the dipoles on the bottom side of the ring, numpy array [xyz coords, no rings]
-    :param b: A list containing each line of the original .gro file
-    :param rings: the number of benzene rings
-    :param toplines: number of lines at top of .gro file to ignore
-    :param valence: the valence of the counter-ion used. Needed to get the counting right
-    :return: Writes .gro file with new dipole locations
-    """
-
-    atoms = len(b) - 1 - toplines
-    count = rings + 1  # count for the number of residues (first column of numbers in .gro file)
-    count1 = atoms - (1 / valence) * rings + 1  # count for total atoms (fourth column in .gro file
-
-    for i in range(toplines):  # delete all irrelevant lines
-        del b[0]
-
-    b.insert(0, '%d\n' % (atoms + rings * 2))  # write new lines at the top of the file
-    b.insert(0, 'This is a .gro file\n')
-
-    toplines = 2
-
-    for i in range(toplines, atoms + toplines):
-        b[i] = b[i][0:5].replace(b[i][0:5], '    1') + b[i][5:len(b[i])]
-
-    for i in range(rings):
-        b.insert(count1 + toplines - 1, '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(1, 'HII', 'PI', count1, top_poles[0, i],
-                                                    top_poles[1, i], top_poles[2, i]) + "\n")
-
-        count1 += 1
-        b.insert(count1 + toplines - 1, '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}'.format(1, 'HII', 'PI', count1, bot_poles[0, i],
-                                            bot_poles[1, i], bot_poles[2, i]) + "\n")
-        count1 += 1
-
-    index = count1 + toplines - 1
-    count = 2
-    for i in range((1 / valence)*rings):
-        b[index] = '{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(count, str.strip(b[index][5:10]), str.strip(b[index][10:15]),
-                                                                       count1, float(b[index][20:28]),
-                                                                           float(b[index][28:36]), float(b[index][36:44]))
-        index += 1
-        count += 1
-        count1 += 1
-
-    f = open('dipoles.gro', 'w')  # open a new file for writing
-
-    for line in b:  # write everything back to dipoles.gro (except the box dimension)
-        f.write(line)
-
-    f.close()
 
 
 def virtual_sites(all_coords, monomers, valence, a, b, c, funct):
@@ -328,38 +134,6 @@ def exclusions(coord_file, monomers, valence, toplines, atoms, n_atoms, vsites):
     return exclusions
 
 
-def position_restraints(file, atoms, axis):
-    """
-    Restrain the selected atoms in desired directions
-    :param file: a list where each entry is a line from a coordinate file (.gro)
-    :param atoms: the atoms to positions restrain
-    :param axis: which direction to restrain
-    :return: an array of position restraints formatted for easy writing into the topology (.itp)
-    """
-
-    # define force constants in their respective directions
-    fcx = 0
-    fcy = 0
-    fcz = 0
-    if 'x' in axis:
-        fcx = args.f_const  # a large enough restraint to cause a large movement penalty
-    if 'y' in axis:
-        fcy = args.f_const
-    if 'z' in axis:
-        fcz = args.f_const
-
-    atom_numbers = []  # find the numbers of the atoms which we are restraining
-    for line in file:
-        if str.strip(line[10:15]) in atoms:
-            atom_numbers.append(int(line[15:20]))
-
-    restraints = np.zeros([5, len(atom_numbers)])  # organize them into a list which can be translated to a topology
-    for i in range(len(atom_numbers)):
-        restraints[:, i] = [atom_numbers[i], 1, fcx, fcy, fcz]  # See: http://www.gromacs.org/Documentation/How-tos/Position_Restraints
-
-    return restraints
-
-
 def dihedral_restraints(file, atoms):
 
     ndihedrals = len(atoms)
@@ -392,116 +166,179 @@ def dihedral_restraints(file, atoms):
     return all_restraints
 
 
+class RestrainedTopology(object):
+
+    def __init__(self, gro, res, atoms, bcc=False, name='restrained', com=False, xlink=False,
+                 vparams=None):
+        """
+        :param gro: coordinate file where restraints will be placed
+        :param res: name of residue where position restraints are being added
+        :param atoms: name of atoms to be restrained in res
+        :param bcc: whether or not this system is bicontinuous cubic (affects where topology is found)
+        :param name: name of output topology file
+        :param com: restrain center of mass of atoms instead of individual atoms
+        :param xlink : whether or not the system is in the process of being crosslinked
+        :param vparams: A list in the following order : virtual site construction type, atoms to use to build virtual
+               site, required length parameters (i.e. a, b, c or d) in the order specified in GROMACS documentation
+        """
+
+        t = md.load(gro)
+
+        self.all_coords = t.xyz[0, :, :]  # all coordinates for system
+        self.atom_numbers = np.array([a.index + 1 for a in t.topology.atoms if a.name in atoms])
+        self.atoms = t.n_atoms  # number of atoms in full system
+        self.nmon = len(self.atom_numbers) // len(atoms)  # number of monomer residues
+        self.name = name  # name of output files (.itp, .gro if you are using centers of masses)
+        self.residue = res  # name of residue to which position restraints are being applied
+        self.LC = lc_class.LC('%s.gro' % self.residue)  # everything we can know about the residue
+        self.com = com
+
+        # self.keep = np.array([a.index for a in t.topology.atoms if a.name in atoms])  # atoms to keep
+        # self.atom_numbers = self.keep + 1  # numbers (not indices) of atoms to keep
+        # self.coords = self.all_coords[self.keep, :]  # coordinates of atoms in keep
+
+        if self.com:  # add center of mass virtual site
+
+            # These things are only needed for center of mass virtual site construction
+            self.ids = [a.name for a in t.topology.atoms]  # names of all atoms in system
+            self.res = [a.residue.name for a in t.topology.atoms]  # residue names of all atoms in system
+            self.vparams = vparams
+            self.vatoms_numbers = [a.index + 1 for a in t.topology.atoms if a.name in vparams]
+            self.box = t.unitcell_vectors[0, :, :]  # box vectors in mdtraj formate
+            self.box_gromacs = [self.box[0, 0], self.box[1, 1], self.box[2, 2], self.box[0, 1], self.box[2, 0],
+                                self.box[1, 0], self.box[0, 2], self.box[1, 2],
+                                self.box[2, 0]]  # gromacs format box vects
+
+            with open('%s/../top/Monomer_Tops/%s.itp' % (location, self.residue), 'r') as f:
+                residue_top = []
+                for line in f:
+                    residue_top.append(line)
+
+            atoms_index = 0
+            while residue_top[atoms_index].count('[ atoms ]') == 0:
+                atoms_index += 1
+
+            while residue_top[atoms_index] != '\n':
+                atoms_index += 1
+
+            residue_top.insert(atoms_index, '{:>6d}{:>5s}{:>6d}{:>6s}{:>6s}{:>5d}{:>13.6f}{:>13.6f}\n'.format(
+                self.LC.natoms + 1, 'hc_d', 1, self.LC.residues[0], 'HD', self.LC.natoms + 1, 0, 0))
+
+            if self.vparams[0] == '3fd':
+                # 'a' = 0.5 and 'b' = 0.14 (aromatic carbon bond length (nm)) puts a vsite in the middle of benzene
+                # if the constructor atoms are 3 non-adjacent carbons from the ring
+                residue_top.append('[ virtual_sites3 ]\n')
+                residue_top.append('{:<6d}{:<6d}{:<6d}{:<6d}{:<6d}{:<8.4f}{:<8.4f}\n'.format(self.LC.natoms + 1,
+                                    self.vatoms_numbers[0], self.vatoms_numbers[1], self.vatoms_numbers[2], 2,
+                                    float(self.vparams[-2]), float(self.vparams[-1])))
+            else:
+                print('Your choice of virtual site has not yet been implemented')
+                exit()
+
+            # groups = np.reshape(self.coords, (len(self.keep) // len(atoms), len(atoms), 3))
+            # centers_of_mass = np.mean(groups, axis=1)
+            # self.coords = centers_of_mass  # redefine coordinates as centers of mass
+
+            file_rw.write_assembly(residue_top, '%s.itp' % self.name, self.nmon, bcc=bcc, xlink=xlink)
+
+            # now the dummies need to be added to the .gro file. They are placed at the end of the residue section
+            # This loop works for a single virtual site per monomer. It will need to be modified if multiple sites
+            # are to be constructed.
+            insert_ndx = self.LC.natoms
+            self.atom_numbers = []  # redefine this since everything is renumbered
+            for i in range(self.nmon):
+                ndx = (i + 1)*insert_ndx + i
+                self.ids.insert(ndx, 'HD')
+                self.res.insert(ndx, 'HII')  # should make this more general
+                self.all_coords = np.insert(self.all_coords, ndx, np.array([0, 0, 0]), axis=0)
+                self.atom_numbers.append(ndx + 1)
+
+            file_rw.write_gro_pos(self.all_coords, '%s.gro' % self.name, ids=self.ids, res=self.res, box=self.box_gromacs)
+        else:
+            file_rw.write_assembly(res, '%s.itp' % self.name, self.nmon, bcc=bcc, xlink=xlink)
+
+        with open('%s.itp' % self.name, 'r') as f:
+            self.topology = []
+            for line in f:
+                self.topology.append(line)
+
+    def add_position_restraints(self, axis, f_const):
+        """
+        Restrain the selected atoms in desired directions
+        :param axis: which direction to restrain (xyz, xy, z, xz .. etc.)
+        :param f_const: force constant in each direction. Order of force constants matches that of axis argument
+        :return: an array of position restraints formatted for easy writing into the topology (.itp)
+        """
+
+        self.topology.append("\n[ position_restraints ]\n")
+
+        fc = np.zeros([3])
+        for i, a in enumerate(axis):
+            if a == 'x':
+                fc[0] = f_const[i]
+            if a == 'y':
+                fc[1] = f_const[i]
+            if a == 'z':
+                fc[2] = f_const[i]
+
+        restraints = np.zeros([5, len(self.atom_numbers)])  # organize them into a list which can be translated to a topology
+        for i in range(len(self.atom_numbers)):
+            restraints[:, i] = [self.atom_numbers[i], 1, fc[0], fc[1], fc[2]]  # See: http://www.gromacs.org/Documentation/How-tos/Position_Restraints
+            self.topology.append('{:6d}{:6d}{:1s}{:9f}{:1s}{:9f}{:1s}{:9f}\n'.format(int(restraints[0, i]),
+                                int(restraints[1, i]),'', restraints[2, i], '', restraints[3, i], '', restraints[4, i]))
+
+    def add_distance_restraint_columns(self, b0, kb, layers=20, pores=4):
+        """
+        Add distance constraints to centers of mass of monomer head groups. This is a function specialized for an
+        HII system built with build.py (without the flag -columns).
+        :param b0 : equilibrium distance
+        :param kb : force constant for harmonic potential
+        :param layers : layers per pore
+        :param pores : number of pore columns
+        """
+
+        self.topology.append("\n[ bonds ]\n")
+        mpl = int(self.nmon / 4 / layers)  # monomers per layer
+
+        for p in range(pores):
+            for l in range(layers):
+                for m in range(mpl):
+                    if l == (layers - 1):  # handles periodicity
+                        self.topology.append('{:<6d}{:<6d}{:<6d}{:<6.1f}{:<6.1f}\n'.format(self.atom_numbers[layers*mpl*p
+                                             + l*mpl + m], self.atom_numbers[layers*mpl*p + m], 6, b0, kb))
+                    else:
+                        self.topology.append('{:<6d}{:<6d}{:<6d}{:<6.1f}{:<6.1f}\n'.format(self.atom_numbers[layers*mpl*p
+                                             + l*mpl + m], self.atom_numbers[layers*mpl*p + (l + 1)*mpl + m], 6, b0, kb))
+
+        # Tether together columns (this is temporary so variables are hard coded)
+        b0 = 2*0.6*np.sin(36*np.pi/180)
+        kb = 1000
+        for p in range(pores):
+            for l in range(layers):
+                for m in range(mpl):
+                    if m == (mpl - 1):  # handles periodicity
+                        self.topology.append('{:<6d}{:<6d}{:<6d}{:<6.3f}{:<6.1f}\n'.format(self.atom_numbers[layers*mpl*p
+                                             + l*mpl + m], self.atom_numbers[layers*mpl*p + l*mpl], 6, b0, kb))
+                    else:
+                        self.topology.append('{:<6d}{:<6d}{:<6d}{:<6.3f}{:<6.1f}\n'.format(self.atom_numbers[layers*mpl*p
+                                             + l*mpl + m], self.atom_numbers[layers*mpl*p + l*mpl + m + 1], 6, b0, kb))
+
+    def write_topology(self):
+        with open('%s.itp' % self.name, 'w') as f:
+            for line in self.topology:
+                f.write(line)
+
+
 if __name__ == "__main__":
 
     args = initialize()
 
-    f = open(args.gro, 'r')
-    gro = []
-    for line in f:
-        gro.append(line)
-    f.close()
-
-    coords, atoms, all_coords = get_coordinates(gro, 2, args.atoms)[:3]
-
-    centers = ring_center(coords, args.atoms)
-
-    rings = np.shape(centers)[1]
-
-    location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Location of this script
-
-    if args.bcc:
-        f = open("%s/../../BCC/top/topologies/%s" % (location, '%s.itp' % args.monomer), "r")
-    else:
-        f = open("%s/../top/Monomer_Tops/%s" % (location, '%s.itp' % args.monomer), "r")
-
-    a = []
-    for line in f:
-        a.append(line)
-
-    f.close()
-
-    if args.novsites:
-        if args.bcc:
-            file_rw.write_assembly(args.monomer, 'off', args.out, rings, bcc='yes')  # there will be an error if the second argument is 'on' with
-                                                            # no virtual sites
-        else:
-            file_rw.write_assembly(args.monomer, 'off', args.out, rings)  # there will be an error if the second argument is 'on' with
-                                                            # no virtual sites
-    else:
-        if args.xlink or args.append:  # don't re-write the topology file if you are iteratively crosslinking
-            pass
-        else:
-            file_rw.write_assembly(args.monomer, 'on', args.out, rings)
-
-    if args.dipoles == 'on':
-
-        perp_vectors = perpendicular_vectors(coords, args.atoms)
-
-        top_poles, bot_poles = dipole_points(centers, perp_vectors, float(args.distance) / 10) #convert distance to nanometers
-
-        valence = int(args.valence)
-
-        if args.write_gro == 'on':
-            write_gro(top_poles, bot_poles, gro, rings, 2, valence)
-
-        # Parameters for virtual site :
-        #      /i\        i, j and k are the points from the plane chosen
-        #     /   \
-        #    /  C  \
-        #  j/______ \k
-        # Using every other carbon in the benzene rings makes the above triangle equilateral which corresponds to the
-        # following parameters
-
-        a = 1.0 / 3.0  # distance along vector rij to reach the same 'height' as C
-        b = 1.0 / 3.0  # distance along vector rik to reach the same 'height' as C
-        c = float(args.distance)  # The distance out of the plane to place a virtual site
-        funct = 4  # this specifies the 3out type of virtual site
-        vsites = virtual_sites(all_coords, np.shape(centers)[1], valence, a, b, c, funct)
-        excluded_atoms = ['C', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'O', 'O1', 'O2', 'C7', 'C21', 'C35', 'H', 'H1', 'H2',
-                          'H3', 'H27', 'H28', 'H52', 'H53', 'C8', 'C22', 'C36']
-        exclusions = exclusions(gro, np.shape(centers)[1], valence, 2, excluded_atoms, atoms, vsites)
-
-        f = open(args.out, 'r')
-        a = []
-        atoms_count = 0
-        for line in f:
-            a.append(line)
-
-        f.close()
-        for i in range(len(a) - 1):
-            if a[i].count('[ atoms ]') == 1:
-                while a[atoms_count] != '\n':
-                    atoms_count += 1
-                break
-            atoms_count += 1
-
-        charge = float(args.charge)
-        for i in range(rings*2):
-            atom_no = atoms + i + 1 - (1 / valence)*rings
-            a.insert(atoms_count, '{:5d}{:>5s}{:6d}{:>6s}{:>6s}{:7d}{:5s}{:>1.6f}{:5s}{:2.5f}'.format(atom_no,
-                                    'PI', 1, 'HII', 'PI', atom_no,'', (-1)**i * charge,'', 0.00000) + "\n")
-            atoms_count += 1
-
-        f = open(args.out, 'w')
-
-        for line in a:
-            f.write(line)
-
-        f.write("\n[ virtual_sites3 ]\n")
-        f.write("; Site   from                  funct         a             b             c" + "\n")
-        for i in range(rings*2):
-            f.write('{:<9d}{:<9d}{:<9d}{:<9d}{:<9d}{:<1.9f}{:5s}{:<1.9f}{:5s}{:<1.9f}'.format(int(vsites[0, i]), int(vsites[1, i]),
-                                                                    int(vsites[2, i]), int(vsites[3, i]), int(vsites[4, i]),
-                                                                    vsites[5, i],'', vsites[6, i],'', vsites[7, i]) + "\n")
-
-        f.write("\n[ exclusions ]\n")
-        for i in range(rings*2):
-            for j in range(np.shape(exclusions)[0]):
-                f.write('{:<8d}'.format(int(exclusions[j, i])))
-            f.write("\n")
-
-        f.close()
+    top = RestrainedTopology(args.gro, args.monomer, args.atoms, bcc=args.bcc, com=args.center_of_mass,
+                             vparams=args.virtual_site_parameters)
+    top.add_distance_restraint_columns(float(args.bond_restraints[0]), float(args.bond_restraints[1]))
+    #top.add_position_restraints(args.axis, args.f_const)
+    top.write_topology()
+    exit()
 
     if args.restraints == 'on':
 

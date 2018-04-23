@@ -41,6 +41,10 @@ def initialize():
     parser.add_argument('--solvent', default='water', help='Name of solvent')
     parser.add_argument('--tau_t', default=0.1, type=float, help='Temperature coupling time constant')
     parser.add_argument('--tau_p', default=20, type=float, help='Pressure coupling time constant')
+    parser.add_argument('-nx', '--nstxout', type=int, help='Frequency to output coordinates to trajectory file')
+    parser.add_argument('-nv', '--nstvout', type=int, help='Frequency to output velocities to trajectory file')
+    parser.add_argument('-nf', '--nstfout', type=int, help='Frequency to output forces to trajectory file')
+    parser.add_argument('-ne', '--nstenergy', type=int, help='Frequency to output energy to energy file')
 
     args = parser.parse_args()
 
@@ -51,10 +55,32 @@ if __name__ == "__main__":
 
     args = initialize()
 
-    mdp = SimulationMdp(args.coord, title=args.title, T=args.temp, em_steps=args.em_steps, ensemble=args.ensemble,
-                        time_step=args.dt, length=args.length, frames=args.frames, p_coupling=args.pcoupltype,
+    # get output frequencies (important for controlling size of trajectory)
+    if args.nstxout:
+        nstxout = args.nstxout
+    else:
+        nstxout = int(args.length / (args.dt * args.frames))
+
+    if args.nstvout:
+        nstvout = args.nstvout
+    else:
+        nstvout = int(args.length / (args.dt * args.frames))
+
+    if args.nstfout:
+        nstfout = args.nstfout
+    else:
+        nstfout = int(args.length / (args.dt * args.frames))
+
+    if args.nstenergy:
+        nstenergy = args.nstenergy
+    else:
+        nstenergy = int(args.length / (args.dt * args.frames))  # output frequency
+
+    mdp = SimulationMdp(args.coord, title=args.title, T=args.temp, em_steps=args.em_steps,
+                        time_step=args.dt, length=args.length, p_coupling=args.pcoupltype,
                         barostat=args.barostat, genvel=args.genvel, restraints=args.restraints, xlink=args.xlink,
-                        bcc=args.bcc, tau_p=args.tau_p, tau_t=args.tau_t)
+                        bcc=args.bcc, tau_p=args.tau_p, tau_t=args.tau_t, nstxout=nstxout, nstvout=nstvout,
+                        nstfout=nstfout, nstenergy=nstenergy)
 
     mdp.write_em_mdp()  # write energy minimization .mdp without asking
 

@@ -59,35 +59,35 @@ def read_gro_coords(file):
     return xyz, identity, no_atoms, lines_of_text
 
 
-def write_assembly(b, xlink, output, no_mon, bcc='no'):
-    # Formerly 'write_file'
+def write_assembly(b, output, no_mon, bcc=False, xlink=False):
     """
     :param b: Name of build monomer (string)
-    :param xlink: specify 'on' if the system will be crosslinked
     :param output: name of output file
     :param no_mon: number of monomers in the assembly
+    :param bcc: whether this is a bicontinuous cubic system. In the future, can use try/except to look for topologies
+    :param xlink : whether the system is being cross-linked
     :return:
     """
     # print up to ' [ atoms ] ' since everything before it does not need to be modified
 
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Location of this script
 
-    if bcc == 'no':
-        with open("%s/../HII/top/Monomer_Tops/%s" % (location, '%s.itp' % b), "r") as f:
-
-            a = []
-            for line in f:
-                a.append(line)
-
+    if type(b) is list:  # restrain.py might pass in an already modified topology that isn't in the below folders
+        a = b
     else:
-        with open("%s/../BCC/top/topologies/%s" % (location, '%s.itp' % b), "r") as f:
-
-            a = []
-            for line in f:
-                a.append(line)
+        if not bcc:
+            with open("%s/../HII/top/Monomer_Tops/%s" % (location, '%s.itp' % b), "r") as f:
+                a = []
+                for line in f:
+                    a.append(line)
+        else:
+            with open("%s/../BCC/top/topologies/%s" % (location, '%s.itp' % b), "r") as f:
+                a = []
+                for line in f:
+                    a.append(line)
 
     atoms_index, bonds_index, pairs_index, angles_index, dihedrals_p_index, \
-    dihedrals_imp_index, vsite_index = get_indices(a, xlink)
+    dihedrals_imp_index, vsite_index, vtype = get_indices(a, xlink)
 
     f = open('%s' % output, 'w')
 
@@ -203,26 +203,38 @@ def write_assembly(b, xlink, output, no_mon, bcc='no'):
     f.write("\n")  # space in between sections
 
     # [ virtual_sites4 ]
-    if xlink == 'on':
-        f.write(a[vsite_index] + a[vsite_index + 1]),
+
+    if vsite_index is not None:
+        f.write(a[vsite_index])# + a[vsite_index + 1]),
         nv = 0
-        vsite_count = vsite_index + 2
+        vsite_count = vsite_index + 1
 
         for i in range(vsite_count, len(a)):  # This is the last section in the input .itp file
             vsite_count += 1
             nv += 1
 
+        if vtype == '3fd':
+            for i in range(int(no_mon)):
+                for k in range(nv):
+                    f.write('{:<6d}{:<6d}{:<6d}{:<6d}{:<6d}{:<8.4f}{:<8.4f}\n'.format(i*nr + int(a[k + vsite_index + 1][0:6]),
+                                                           i*nr + int(a[k + vsite_index + 1][6:12]),
+                                                           i*nr + int(a[k + vsite_index + 1][12:18]),
+                                                           i*nr + int(a[k + vsite_index + 1][18:24]),
+                                                           int(a[k + vsite_index + 1][24:30]),
+                                                           float(a[k + vsite_index + 1][30:38]),
+                                                           float(a[k + vsite_index + 1][38:])))
+
         # Make sure there is no space at the bottom of the topology if you are getting errors
-        for i in range(int(no_mon)):
-            for k in range(0, nv):
-                f.write('{:<8d}{:<6d}{:<6d}{:<6d}{:<8d}{:<8d}{:<11}{:<11}{:}'.format(i*nr + int(a[k + vsite_index + 2][0:8]),
-                                                       i*nr + int(a[k + vsite_index + 2][8:14]),
-                                                       i*nr + int(a[k + vsite_index + 2][14:20]),
-                                                       i*nr + int(a[k + vsite_index + 2][20:26]),
-                                                       i*nr + int(a[k + vsite_index + 2][26:34]),
-                                                       int(a[k + vsite_index + 2][34:42]), a[k + vsite_index + 2][42:53],
-                                                       a[k + vsite_index + 2][53:64],
-                                                       a[k + vsite_index + 2][64:len(a[k + vsite_index + 2])]))
+        # for i in range(int(no_mon)):
+        #     for k in range(0, nv):
+        #         f.write('{:<8d}{:<6d}{:<6d}{:<6d}{:<8d}{:<8d}{:<11}{:<11}{:}'.format(i*nr + int(a[k + vsite_index + 2][0:8]),
+        #                                                i*nr + int(a[k + vsite_index + 2][8:14]),
+        #                                                i*nr + int(a[k + vsite_index + 2][14:20]),
+        #                                                i*nr + int(a[k + vsite_index + 2][20:26]),
+        #                                                i*nr + int(a[k + vsite_index + 2][26:34]),
+        #                                                int(a[k + vsite_index + 2][34:42]), a[k + vsite_index + 2][42:53],
+        #                                                a[k + vsite_index + 2][53:64],
+        #                                                a[k + vsite_index + 2][64:len(a[k + vsite_index + 2])]))
     f.close()
 
 
@@ -252,14 +264,22 @@ def get_indices(a, xlink):
     while a[dihedrals_imp_index].count('[ dihedrals ] ; impropers') == 0:
         dihedrals_imp_index += 1
 
-    if xlink == 'on':
+    # if xlink == 'on':
+    try:
         vsite_index = 0  # find index where [ dihedrals ] section begins (propers)
-        while a[vsite_index].count('[ virtual_sites4 ]') == 0:
+        while a[vsite_index].count('[ virtual_sites') == 0:
             vsite_index += 1
-    else:
-        vsite_index = 0
+        vtype = a[vsite_index].split('virtual_sites')[1].split()[0]
+        vfunc = a[vsite_index + 1].split()[4]
+        if vtype == '3' and vfunc == '2':
+            vtype = vtype + 'fd'
+    except IndexError:
+        vsite_index = None
+        vtype = None
+    # else:
+    #     vsite_index = 0
 
-    return atoms_index, bonds_index, pairs_index, angles_index, dihedrals_p_index, dihedrals_imp_index, vsite_index
+    return atoms_index, bonds_index, pairs_index, angles_index, dihedrals_p_index, dihedrals_imp_index, vsite_index, vtype
 
 
 def write_initial_config(positions, identity, name, no_layers, layer_distribution, dist, no_pores, p2p, no_ions, rot, out,

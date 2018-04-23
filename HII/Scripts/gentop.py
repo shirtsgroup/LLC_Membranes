@@ -3,6 +3,7 @@
 import argparse
 import mdtraj as md
 import os
+import Atom_props
 
 
 def initialize():
@@ -35,6 +36,10 @@ class SystemTopology(object):
         self.top_location = "%s/../top/topologies" % self.script_location  # topology location
         self.ff_location = "%s/../top/Forcefields" % self.script_location  # forcefield location
         self.forcefield = ff  # which forcefield to use
+        self.name = None
+        self.atoms = [a.name for a in t.topology.atoms]  # all atom names
+        self.atom_masses = [Atom_props.mass[a.name] for a in t.topology.atoms]
+        self.system_mass = sum(self.atom_masses)
 
         if restraints:
             if restraints is list:
@@ -56,7 +61,11 @@ class SystemTopology(object):
             if r == 'HOH':
                 residues[i] = 'SOL'
 
-        unique_residues = list(set(residues))
+        # unique_residues = list(set(residues)) # this does not preserve order which is necessary for topology writing
+        unique_residues = []
+        for x in residues:
+            if x not in unique_residues:
+                unique_residues.append(x)
 
         residue_count = {}
         for i in unique_residues:
@@ -70,6 +79,8 @@ class SystemTopology(object):
         self.residue_count = residue_count
 
     def write_top(self, name='topol.top', description='Simulation Box'):
+
+        self.name = name
 
         top = []
         top.append(';Forcefield\n')
@@ -85,8 +96,11 @@ class SystemTopology(object):
                     top.append('\n')
             else:
                 top.append(';%s Topology\n' % r)
-                if r in self.restraints:
-                    top.append('#include "dipole.itp"\n')
+                if self.restraints:
+                    if r in self.restraints:
+                        top.append('#include "restrained.itp"\n')  # need to modify so this is not hardcoded.
+                    else:
+                        top.append('#include "%s/%s.itp"\n' % (self.top_location, r))
                 else:
                     top.append('#include "%s/%s.itp"\n' % (self.top_location, r))
                 top.append('\n')
@@ -99,12 +113,15 @@ class SystemTopology(object):
         top.append(';Compounds     nmols\n')
 
         for r in self.residues:
-            if r in self.restraints:
-                top.append('{:10s}{:>10d}\n'.format(r, 1))
+            if self.restraints:
+                if r in self.restraints:
+                    top.append('{:10s}{:>10d}\n'.format(r, 1))
+                else:
+                    top.append('{:10s}{:>10d}\n'.format(r, self.residue_count[r]))
             else:
                 top.append('{:10s}{:>10d}\n'.format(r, self.residue_count[r]))
 
-        with open(name, 'w') as f:
+        with open(self.name, 'w') as f:
             for line in top:
                 f.write(line)
 

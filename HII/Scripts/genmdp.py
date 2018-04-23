@@ -31,6 +31,10 @@ def initialize():
     parser.add_argument('--solvent', default='water', help='Name of solvent')
     parser.add_argument('--tau_t', default=0.1, type=float, help='Temperature coupling time constant')
     parser.add_argument('--tau_p', default=20, type=float, help='Pressure coupling time constant')
+    parser.add_argument('-nx', '--nstxout', type=int, help='Frequency to output coordinates to trajectory file')
+    parser.add_argument('-nv', '--nstvout', type=int, help='Frequency to output velocities to trajectory file')
+    parser.add_argument('-nf', '--nstfout', type=int, help='Frequency to output forces to trajectory file')
+    parser.add_argument('-ne', '--nstenergy', type=int, help='Frequency to output energy to energy file')
 
     args = parser.parse_args()
 
@@ -39,9 +43,9 @@ def initialize():
 
 class SimulationMdp(object):
 
-    def __init__(self, gro, title='MD Simulation', T=300, em_steps=5000, ensemble='npt', time_step=0.002, length=1000,
-                 frames=500, p_coupling='semiisotropic', barostat='berendsen', genvel='yes', restraints=False,
-                 xlink=False, bcc=False, tau_p=20, tau_t=0.1):
+    def __init__(self, gro, title='MD Simulation', T=300, em_steps=5000, time_step=0.002, length=1000,
+                 p_coupling='semiisotropic', barostat='berendsen', genvel='yes', restraints=False,
+                 xlink=False, bcc=False, tau_p=20, tau_t=0.1, nstxout=5000, nstvout=5000, nstfout=5000, nstenergy=5000):
         """
         :param gro: (str) coordinate file which will be simulated
         :param title: (str) name of simulation
@@ -50,7 +54,6 @@ class SimulationMdp(object):
         :param ensemble: (str) thermodynamic ensemble to simulate system in
         :param time_step: (float) simulation time step (fs)
         :param length: (int) simulation length, picoseconds
-        :param frames: (int) frequency (number of steps) of recording positions, velocity, energy etc.
         :param p_coupling: (str) type of pressure coupling (None, semiisotropic, isotropic etc.)
         :param barostat: (str) barostat to use for pressure control
         :param genvel: (str) 'yes' if velocities should be generated for initial configuration. 'No' (or anything else)
@@ -61,6 +64,10 @@ class SimulationMdp(object):
         :param bcc: (bool) if we are simulating the bicontinous cubic system
         :param tau_p: (int) time constant for pressure coupling
         :param tau_t: (int) time constant for temperature coupling
+        :param nstxout: frequency of outputting coordinates to trajectory file
+        :param nstvout: frequency of outputting velocity to trajectory file
+        :param nstfout: frequency of outputting forces to trajectory file
+        :param nstenergy: frequency of outputting energy to energy file
         """
 
         # initialize variables
@@ -69,10 +76,8 @@ class SimulationMdp(object):
         self.title = title
         self.temperature = float(T)
         self.em_steps = int(em_steps)
-        self.ensemble = ensemble
         self.time_step = float(time_step)
         self.length = int(length)
-        self.frames = int(frames)
         self.p_coupling = p_coupling
         self.barostat = barostat
         self.genvel = genvel
@@ -81,8 +86,16 @@ class SimulationMdp(object):
         self.bcc = bcc
         self.tau_p = tau_p
         self.tau_t = tau_t
+        self.em_mdp_name = None
+        self.npt_mdp_name = None
+        self.nvt_mdp_name = None
+        self.nve_mdp_name = None
+        self.nstxout = nstxout
+        self.nstvout = nstvout
+        self.nstfout = nstfout
+        self.nstenergy = nstenergy
 
-    def write_em_mdp(self, out='em.mdp'):
+    def write_em_mdp(self, out='em'):
         """
         :param out: (str) name of output file
         """
@@ -93,10 +106,14 @@ class SimulationMdp(object):
         cutoff_scheme = 'cutoff-scheme = verlet'
         nstlist = 'nstlist = 40'
 
-        f = open('%s' % out, 'w')
+        f = open('%s.mdp' % out, 'w')
         f.writelines([title + '\n', integrator + '\n', nsteps + '\n', cutoff_scheme + '\n', nstlist + '\n'])
+        self.em_mdp_name = out
 
-    def write_npt_mdp(self):
+    def write_npt_mdp(self, out='npt'):
+        """
+        :param out: (str) name of output file
+        """
 
         a = []
         a.append(['title = NPT simulation of %s at %s K\n' % (self.gro, self.temperature)])
@@ -108,11 +125,10 @@ class SimulationMdp(object):
         a.append(['constraints = h-bonds\n'])
         a.append(['constraint-algorithm = lincs\n'])
         a.append(['cutoff-scheme = Verlet\n'])
-        nstx = int(self.length / (self.time_step * self.frames))  # output frequency
-        a.append(['nstxout = %s\n' % nstx])
-        a.append(['nstvout = %s\n' % nstx])
-        a.append(['nstfout = %s\n' % nstx])
-        a.append(['nstenergy = %s\n' % nstx])
+        a.append(['nstxout = %s\n' % self.nstxout])
+        a.append(['nstvout = %s\n' % self.nstvout])
+        a.append(['nstfout = %s\n' % self.nstfout])
+        a.append(['nstenergy = %s\n' % self.nstenergy])
         a.append(['nstlist = 40\n'])  # potential inputs in the future vvv
         a.append(['nstype = grid\n'])
         a.append(['vdwtype = PME\n'])
@@ -145,12 +161,16 @@ class SimulationMdp(object):
         if self.restraints:
             a.append(['refcoord-scaling = all\n'])
 
-        with open('%s.mdp' % self.ensemble, 'w') as f:
+        with open('%s.mdp' % out, 'w') as f:
             for line in a:
                 f.write(line[0])
 
-    def write_nvt_mdp(self):
+        self.npt_mdp_name = "%s.mdp" % out
 
+    def write_nvt_mdp(self, out='nvt'):
+        """
+        :param out: (str) name of output file
+        """
         a = []
         a.append(['title = NVT simulation of %s\n' % self.gro])
         # a.append(['cutoff-scheme = verlet'])  # I think verlet is default
@@ -160,11 +180,10 @@ class SimulationMdp(object):
         a.append(['continuation = no\n'])
         a.append(['constraints = h-bonds\n'])
         a.append(['constraint-algorithm = lincs\n'])
-        nstx = int(self.length / (self.time_step * self.frames))  # output frequency
-        a.append(['nstxout = %s\n' % nstx])
-        a.append(['nstvout = %s\n' % nstx])
-        a.append(['nstfout = %s\n' % nstx])
-        a.append(['nstenergy = %s\n' % nstx])
+        a.append(['nstxout = %s\n' % self.nstxout])
+        a.append(['nstvout = %s\n' % self.nstvout])
+        a.append(['nstfout = %s\n' % self.nstfout])
+        a.append(['nstenergy = %s\n' % self.nstenergy])
         a.append(['nstlist = 40\n'])
         a.append(['nstype = grid\n'])
         a.append(['vdwtype = PME\n'])
@@ -173,7 +192,11 @@ class SimulationMdp(object):
         a.append(['tc_grps = system\n'])
         a.append(['tau_t = %s\n' % self.tau_t])
         a.append(['ref_t = %s\n' % self.temperature])
-        a.append(['gen_vel = yes\n'])
+        if self.genvel == 'yes':
+            a.append(['gen-vel = yes\n'])
+            a.append(['gen-temp = %s\n' % self.temperature])
+        else:
+            a.append(['gen-vel = no\n'])
         a.append(['pbc = xyz\n'])
         a.append(['DispCorr = EnerPres\n'])
         if self.xlink:
@@ -181,19 +204,82 @@ class SimulationMdp(object):
         if self.restraints:
             a.append(['refcoord_scaling = all\n'])
 
-        with open('%s.mdp' % self.ensemble, 'w') as f:
+        with open('%s.mdp' % out, 'w') as f:
             for line in a:
                 f.write(line[0])
+
+        self.nvt_mdp_name = "%s.mdp" % out
+
+    def write_nve_mdp(self, out='nve'):
+        """
+        :param out: (str) name of output file
+        """
+        a = []
+        a.append(['title = NVE simulation of %s\n' % self.gro])
+        # a.append(['cutoff-scheme = verlet'])  # I think verlet is default
+        a.append(['integrator = md\n'])  # this also might be default
+        a.append(['dt = %s\n' % self.time_step])
+        a.append(['nsteps = %s\n' % int(self.length / self.time_step)])
+        a.append(['continuation = no\n'])
+        a.append(['constraints = h-bonds\n'])
+        a.append(['constraint-algorithm = lincs\n'])
+        a.append(['nstxout = %s\n' % self.nstxout])
+        a.append(['nstvout = %s\n' % self.nstvout])
+        a.append(['nstfout = %s\n' % self.nstfout])
+        a.append(['nstenergy = %s\n' % self.nstenergy])
+        a.append(['nstlist = 40\n'])
+        a.append(['nstype = grid\n'])
+        a.append(['vdwtype = PME\n'])
+        a.append(['coulombtype = PME\n'])
+        if self.genvel == 'yes':
+            a.append(['gen-vel = yes\n'])
+            a.append(['gen-temp = %s\n' % self.temperature])
+        else:
+            a.append(['gen-vel = no\n'])
+        a.append(['pbc = xyz\n'])
+        a.append(['DispCorr = EnerPres\n'])
+        if self.xlink:
+            a.append('periodic-molecules = yes\n')
+        if self.restraints:
+            a.append(['refcoord_scaling = all\n'])
+
+        with open('%s.mdp' % out, 'w') as f:
+            for line in a:
+                f.write(line[0])
+
+        self.nve_mdp_name = "%s.mdp" % out
 
 
 if __name__ == "__main__":
 
     args = initialize()
 
-    mdp = SimulationMdp(args.gro, title=args.title, T=args.temp, em_steps=args.em_steps, ensemble=args.ensemble,
-                        time_step=args.dt, length=args.length, frames=args.frames, p_coupling=args.pcoupltype,
+    # get output frequencies (important for controlling size of trajectory)
+    if args.nstxout:
+        nstxout = args.nstxout
+    else:
+        nstxout = int(args.length / (args.dt * args.frames))
+
+    if args.nstvout:
+        nstvout = args.nstvout
+    else:
+        nstvout = int(args.length / (args.dt * args.frames))
+
+    if args.nstfout:
+        nstfout = args.nstfout
+    else:
+        nstfout = int(args.length / (args.dt * args.frames))
+
+    if args.nstenergy:
+        nstenergy = args.nstenergy
+    else:
+        nstenergy = int(args.length / (args.dt * args.frames))  # output frequency
+
+    mdp = SimulationMdp(args.gro, title=args.title, T=args.temp, em_steps=args.em_steps,
+                        time_step=args.dt, length=args.length, p_coupling=args.pcoupltype,
                         barostat=args.barostat, genvel=args.genvel, restraints=args.restraints, xlink=args.xlink,
-                        bcc=args.bcc, tau_p=args.tau_p, tau_t=args.tau_t)
+                        bcc=args.bcc, tau_p=args.tau_p, tau_t=args.tau_t, nstxout=nstxout, nstvout=nstvout,
+                        nstfout=nstfout, nstenergy=nstenergy)
 
     mdp.write_em_mdp()  # write energy minimization .mdp without asking
 

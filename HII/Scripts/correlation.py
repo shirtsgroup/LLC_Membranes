@@ -249,7 +249,6 @@ if __name__ == "__main__":
             hist_range = []
             for i in range(ndimensions):
                 hist_range.append([-L[i]/2, L[i]/2])
-
         ###################### 3D center of mass #########################
 
         if args.atoms[0] == 'all':
@@ -347,12 +346,16 @@ if __name__ == "__main__":
         centers_y = [edges[1][i] + ((edges[1][i + 1] - edges[1][i])/2) for i in range(correlation.shape[1])]
         middle_x = correlation.shape[0] // 2
         middle_y = correlation.shape[1] // 2
+        r = 0.225
         r = 0.42
         avg = []
+        n = 0
         for i, ix in enumerate(centers_x):
             for j, jy in enumerate(centers_y):
                 if np.linalg.norm([ix, jy]) < r:
                     avg.append([i, j])
+                    n += 1
+        print(n)
 
         zdf = np.zeros_like(centers1)
         for i in range(len(avg)):

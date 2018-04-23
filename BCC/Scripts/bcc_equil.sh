@@ -45,7 +45,7 @@ fi
 ${python} ${DIR}/bcc_build.py -b ${build_mon}.gro -p ${phase} -d ${dimension} -dens ${density} -shift ${SHIFT} -o initial.gro -wt ${wt_percent} -sol ${solvent}
 ${python} ${DIR2}/reorder_gro.py -i initial.gro -o bcc.gro -I ${ion}
 echo "Initial unit cell built"
-${python} ${DIR2}/input.py --bcc -b ${build_mon} -s 5000 # only care about em.mdp and topol.top at this step
+#${python} ${DIR2}/input.py --bcc -b ${build_mon} -s 5000 # only care about em.mdp and topol.top at this step
 
 # really spread the monomers apart
 ${python} ${DIR}/scale.py -g bcc.gro -o bcc.gro -f 2  # triple each dimension of the unit cell and isotropically scale all head group positions
