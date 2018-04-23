@@ -84,7 +84,9 @@ class System(object):
         p1 = subprocess.Popen(['gmx', 'grompp', '-f', '%s' % mdp_file, '-p', '%s' % self.mdp.top.name, '-o',
                               '%s' % out, '-c', '%s' % configuration])  # will make ensemble.trr, ensemble.gro etc.
         p1.wait()
-        p2 = subprocess.Popen(['%s' % self.gmx, 'mdrun', '-v', '-deffnm', '%s' % out])
+        run_string = "%s mdrun -v -deffnm %s" % (self.gmx, out)
+        p2 = subprocess.Popen(run_string, shell=True)
+        # p2 = subprocess.Popen(['%s' % self.gmx, 'mdrun', '-v', '-deffnm', '%s' % out])
         p2.wait()
 
     def run_simulation(self, ensemble, configuration):
@@ -107,7 +109,10 @@ class System(object):
         p1 = subprocess.Popen(['gmx', 'grompp', '-f', '%s' % mdp_file, '-p', '%s' % self.mdp.top.name, '-o',
                               '%s' % ensemble, '-c', '%s' % configuration])  # will make ensemble.trr, ensemble.gro etc.
         p1.wait()
-        p2 = subprocess.Popen(['%s' % self.gmx, 'mdrun', '-v', '-deffnm', '%s' % ensemble])
+
+        run_string = "%s mdrun -v -deffnm %s" % (self.gmx, ensemble)
+        p2 = subprocess.Popen(run_string, shell=True)
+        # p2 = subprocess.Popen(['%s' % self.gmx, 'mdrun', '-v', '-deffnm', '%s' % ensemble])
         p2.wait()
 
     def average_density(self, ensemble):
