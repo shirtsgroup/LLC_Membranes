@@ -253,3 +253,5 @@ if __name__ == "__main__":
     #sys.energy_minimize('replicate.gro', out='replicate_em')
     sys.run_simulation('nvt', 'replicate.gro')
     sys.run_simulation('nve', 'nvt.gro')  # run nve simulation using last frame of nvt simulation
+
+    # Now calculate diffusivity and viscosity

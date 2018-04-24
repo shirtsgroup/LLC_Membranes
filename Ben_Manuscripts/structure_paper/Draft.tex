@@ -237,7 +237,7 @@ for transport than the
   %of making the membranes, but that is not what we need as the introduction to
   %THIS paper.  Instead, you need to focus on the strength/issues with RO and
   %NF that motivate this research.
-  % BJC3: The point I am trying to make is that the way the membranes are made 
+  % BJC2: The point I am trying to make is that the way the membranes are made 
   % results in either low selectivity or low permeability. I could just state
   % that, or give a little background on the processes to make the point more
   % tangible
@@ -543,64 +543,82 @@ sufficient
 
   \begin{enumerate}
 
+%BJC3: reworded a lot of these to be more in line with Matt's way of thinking about LC systems
 %MRS6: formatting suggestion
-  \item \textit{If layers do exist, how many monomers constitute a single layer? \label{point:monomernum}} 
+%  \item \textit{If layers do exist, how many monomers constitute a single layer? \label{point:monomernum}} 
+  \item \textit{How many monomers pack around a single pore column?\label{point:monomernum}} 
   A simple molecular simulation study of a similar molecule suggested that
-  there are 4 monomers in each layer \cite{zhu_methacrylated_2006}. Their model
-  likely does not sufficiently imitate the chemical environment present in the
-  real system since it only contains 16 total monomers. A separate calculation
+  4 monomers radially pack around hydrophilic pore columns \cite{zhu_methacrylated_2006}.
+  Their model likely does not sufficiently imitate the chemical environment present
+  in the real system since it only contains 16 total monomers. A separate calculation
   for NA-GA3C11, based on the estimated volume of the liquid crystal monomers,
-  proposes that each layer consists of seven
+  proposes that each pore is surrounded by seven
   monomers\cite{resel_structural_2000}. Our best chance to answer this question
   is by using a molecular model orders of magnitude larger than any other
   reported atomistic liquid crystal membrane simulation, as we present here. We
-  will directly change the layer composition and note its effect on membrane
-  structure.
+  will directly change the density of monomers in each pore and note its effect
+  on membrane structure.
 
-  \item \textit{How do monomers in each layer position themselves with respect to
-  surrounding layers? \label{point:orientation}}
+%  \item \textit{How do monomers in each layer position themselves with respect to
+%  surrounding layers? \label{point:orientation}}
+  \item \textit{In what orientation do monomer head groups stack on top of each
+  other \label{point:orientation} 
   $\pi$-$\pi$ stacking interactions between aromatic monomer head groups may be
   a driving force of self-assembly in this system \cite{gazit_possible_2002}. Gas
   phase \textit{ab initio} studies of benzene dimers have shown a clear energetic
   advantage for parallel displaced and T-shaped $\pi$-$\pi$ stacking
   conformations over a sandwiched conformation \cite{sinnokrot_estimates_2002}.
   Substituted benzene rings exhibit an even stronger $\pi$-$\pi$ stacking
-  attraction which favors the parallel displaced configuration in all cases
-  except where the substitutions are extremely electron
-  withdrawing\cite{waller_hybrid_2006,ringer_effect_2006}. In this study, we
-  compare simulated X-ray diffraction patterns to experiment in order to deduce
-  which stacking configuration is most likely. We also dive deeper into the
-  origin of features present in the 2D diffraction patterns.  
+  attraction which favors the parallel displaced configuration in all cases except
+  where the substitutions are extremely electron withdrawing  
+  \cite{waller_hybrid_2006,ringer_effect_2006}. We did not consider the T-shaped 
+  configuration due to its geometric incompatibility with a hexagonal columnar phase.
+  The entropic contribution of the long alkane tails should overwhelm any attraction
+  between aromatic head groups in the T orientation. We limit our studies to
+  comparison of systems built in the parallel displaced and sandwiched configurations.  
 
-  \item \textit{Does our model support the existence of layers and if so, how well
-  defined are the layers? \label{point:layers}} 
-  %BJC: Reordered, so changing the wording here.
-  Indications of strong $\pi$-$\pi$ stacking interactions in the direction
-  perpendicular to the membrane plane, combined with the wedge-like character of
-  the LLC monomers, suggests that monomers should arrange into disks that stack in
-  layers. $\pi$-$\pi$ stacking will only occur between the aromatic
-  monomer head groups which leaves no description of what is happening in the
-  monomer tail region. The tails may entangle isotropically while maintaining
-  stacking order among headgroups. 
+% BJC3: I don't want to limit X-ray diffraction patterns just to deciding between
+% parallel displaced and sandwiched. Since it doesn't actually decide either way.  
+%  In this study, we
+%  compare simulated X-ray diffraction patterns to experiment in order to deduce
+%  which stacking configuration is most likely. We also dive deeper into the
+%  origin of features present in the 2D diffraction patterns.  
 
-  \item \textit{Can the system exist in other metastable states or phases that are not
-  accessed during experiments? \label{point:metastable}}
-  There remains the possibility that there is more than one metastable state
-  associated with a given LLC phase. Simulating a membrane atomistically
-  requires many atoms which limits the timescales acessible with MD. It is
-  reasonable to expect that we will generate configurations which are kinetically
-  trapped in a metastable free energy basin. We must be able to identify which
-  states 
+%  \item \textit{Does our model support the existence of layers and if so, how well
+%  defined are the layers? \label{point:layers}}
+%  Indications of strong $\pi$-$\pi$ stacking interactions in the direction
+%  perpendicular to the membrane plane, combined with the wedge-like character of
+%  the LLC monomers, suggests that monomers should arrange into disks that stack in
+%  layers. $\pi$-$\pi$ stacking will only occur between the aromatic
+%  monomer head groups which leaves no description of what is happening in the
+%  monomer tail region. The tails may entangle isotropically while maintaining
+%  stacking order among headgroups.  
+% BJC3:rephrasing everything about the above question. 
+  \item \textit{How strong are stacking correlations between monomer head groups?
+  \label{point:layers}}
+  
+
+%BJC3: Going to talk about temperature rather than ordered/disordered states
+%  \item \textit{Can the system exist in other metastable states or phases that are not
+%  accessed during experiments? \label{point:metastable}}
+%  There remains the possibility that there is more than one metastable state
+%  associated with a given LLC phase. Simulating a membrane atomistically
+%  requires many atoms which limits the timescales acessible with MD. It is
+%  reasonable to expect that we will generate configurations which are kinetically
+%  trapped in a metastable free energy basin. We must be able to identify which
+%  states 
   %MRS6: best not to set up too high expectations
   %is produced experimentally.
-  are most consistent with experiment.
+%  are most consistent with experiment.
 
-  \item \textit{What constitutes a pore, and what are the details of its pore architecture? \label{point:poredefinition}}
+  \item \textit{What constitutes a pore, and what are the details of its composition?
+  \label{point:poredefinition}}
   The limited picture that experiment provides tells us that there are
   hexagonally packed, hydrophilic regions where transport is likely to occur.
   One may instinctively assume that these regions are hollow tube-like pathways.
   We will explore the composition of the pores and the partition between the
   hydrophilic and hydrophobic regions. 
+ 
 
   \item \textit{Is it necessary to include any water in order to appropriately model
   the Col\textsubscript{h} phase? \label{point:water}}
@@ -1029,7 +1047,7 @@ sufficient
   
   \subsection{Structural Characterization}
   
-  \subsubsection{Number of monomer per layer}
+  \subsubsection{Density of monomers around pores}
 
   Our simulations best support a model built with 5 monomers per layer based on
   the measured equilibrated pore-to-pore distances. To discern the composition of
@@ -1037,47 +1055,54 @@ sufficient
   simulations of systems created with 4--8 monomers per layer. We built systems
   in both the parallel displaced and sandwiched configurations with layers
   initially spaced 3.7 \AA~apart. We prepared equilibrated configurations
-  according to the dry equilibration procedure. All systems are stable after 400
-  ns of simulation. 
-  %MRS6: Above, probably need to be a bit more clear what you mean by stable (no noticable drift in pore-to-pore), and if you are only using data after the point of stability.
-  %BJC2: I believe this is included in methods. I can restate if that's not clear
-In a sense, all systems are at least metastable, addressing
-  question (\ref{point:metastable}), however not all will make physical sense or fit
-  the experimental profile that we are trying to match. Figure~\ref{fig:p2p}
-  shows 
-%MRS6:
-%the pore spacing 
-the equilibrated pore-to-pore distances 
-for all systems tested. 
-Systems built with 5 monomers in
-  each layer equilibrate to a pore spacing that is most consistent with the
-  experimental value of 4.12 nm derived from SAXS measurements
-  (Figure~\ref{fig:SAXS}). 
-%MRS6: discuss very briefly how far off 4 and 6 are to motivate selecting 5 exclusively.
-The remainder of this discussion will focus on the
-  analysis of systems built with 5 monomers per layer.
+  according to the dry equilibration procedure. The pore-to-pore spacing is stable
+  in all systems are stable after 400 ns of simulation. Figure~\ref{fig:p2p} shows
+  the equilibrated pore-to-pore distances for all systems tested. Systems built 
+  with 5 monomers in each layer equilibrate to a pore spacing that is most consistent
+  with the experimental value of 4.12 nm derived from SAXS measurements 
+  (Figure~\ref{fig:SAXS}).
+  
+  The remainder of this discussion will focus on the analysis of systems built with
+  5 monomers per layer. Systems built with 6 monomers per layer have an equilibrated
+  pore spacing c.a. 0.50 nm higher than experiment. Systems built with 4 monomers per 
+  layer equilibrate to a pore spacing 0.25 nm lower than experiment. In a sense, all
+  systems tested are at least metastable, however not all will make physical
+  sense or fit the experimental profile that we are trying to match. In the limit of
+  infinite time, all simulations will converge to a single density. It is our 
+  intention to choose an initial configuration which quickly reaches a monomer density
+  close to experiment.   
 
   \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{p2p.png}
         %MRS6: should there be a grapical demonstration of sandwiched vs. parallel displaced, especially equilbrated?
-        %MRS6: some tweaks below.
-	\caption{Systems with 5 monomers per layer have
-		equilibrated pore spacing closest to the experimental value of 4.12 nm. The
-			equilibrated pore spacing of the model increases as the number of monomers in
-			each layer increases. The pore spacing of systems starting in the sandwiched
-			configuration is systematically lower than those started in the parallel
-			displaced configuration.}~\label{fig:p2p}
+        % BJC3: I have that in the supplemental information. I could move it into the main
+        % body. I think it would be best in the intro where I pose the question of parallel 
+        % displaced v. sandwiched.
+	\caption{Systems with 5 monomers per layer have equilibrated pore spacings closest to
+			 the experimental value of 4.12 nm. The equilibrated pore spacing of the model 	
+			 increases as the number of monomers in each layer increases. The pore spacing
+			 of systems starting in the sandwiched configuration are systematically lower
+			 than those started in the parallel displaced configuration.}~\label{fig:p2p}
   \end{figure}  
 
-  \subsubsection{Relative interlayer head group orientation}
+%  \subsubsection{Relative interlayer head group orientation}
+  \subsubsection{Structural refinement}
 
-  We answer question (\ref{point:orientation}) by simulating X-ray diffraction
-  patterns produced from equilibrated MD trajectories. We tested systems built
-  with 5 monomers per layer in the parallel displaced and sandwiched
-  configurations. We generated simulated patterns using portions of simulation
-  trajectory after equilibration. The patterns for both structures are shown and
-  compared to experiment in Figure \ref{fig:XRDsim}.
+  We further refined our structural understanding of the system by simulating X-ray 
+  diffraction patterns produced from equilibrated MD trajectories and comparing them
+  to experiment. We tested systems built with 5 monomers per layer in the parallel 
+  displaced and sandwiched configurations at 300K. We generated simulated patterns using 
+  portions of simulation trajectory after equilibration. The patterns for both 
+  structures are shown and compared to experiment in Figure~\ref{fig:XRDsim}.
+
+  Simulated XRD of the sandwiched configuration shows most all experimental features 
+  except R-helix and R-spots. R-pores and R-alkanes appear in their expected locations. 
+  R-pores is more intense than experiment, likely because we are simulating a perfect,
+  infinite hexagonal array. The real system has defects and domain misalignment
+  which decreases the overall intensity. R-$\pi$ appears with very high intensity and
+  is shifted down to a lower value of $q_z$ meaning monomers in our model prefer to 
+  stack farther apart.   
 
   Simulated XRD of the sandwiched configuration contains all experimental
   features except for R-helix. R-alkanes, R-spots and R-pores appear close to their
@@ -1085,10 +1110,10 @@ The remainder of this discussion will focus on the
   a $q_z$ value lower than experiment meaning the head groups in our model prefer 
   to stack farther apart. 
 
-  The parallel displaced configuration results in a simulated XRD pattern with
-  the closest match to experiment. It produces the only pattern that exhibits all
-  major reflections. R-alkanes and R-pores appear as they do in the sandwiched
-  configuration. R-spots and R-$\pi$ appear, however with a lower intensity
+  Like the sandwiched configuration, the parallel displaced configuration creates
+  a simulated XRD pattern with all major experimental reflections except for R-helix.
+  R-alkanes and R-pores appear as they do in the sandwiched configuration. R-spots
+  and R-$\pi$ appear, however with a lower intensity
   relative to R-alkanes when compared to the sandwiched configuration. R-helix
   appears due to the parallel displaced aromatic rings. It is a subharmonic of
   R-$\pi$ since the nearest vertically stacked head group to any given head group

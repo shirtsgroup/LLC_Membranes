@@ -41,6 +41,9 @@ def initialize():
     parser.add_argument('-traj', help='Name of trajectory file to fourier transform')
     parser.add_argument('-avg', action="store_true", help='Valid when -traj is specified. Average histograms of atomic'
                         'positions over trajectory and then take fourier transform once of averaged array')
+    parser.add_argument('-begin', default=0, type=int, help='Frame to begin calculations at')
+    parser.add_argument('-end', default=-1, type=int, help='Frame to end calculations at')
+
 
     args = parser.parse_args()
 
@@ -293,11 +296,18 @@ def normalize_alkanes(R, Z, Raw_Intensity, inner, outer, angle):
 
     angles = []
     intensity = []
+
+    test = np.zeros_like(Raw_Intensity)
     for i in range(R.shape[0]):
         for j in range(Z.shape[0]):
             if inner < np.linalg.norm([R[i], Z[j]]) < outer:
                 angles.append((180/np.pi)*np.arctan(Z[j]/R[i]))
                 intensity.append(Raw_Intensity[i, j])
+                test[i, j] = Raw_Intensity[i, j]
+
+    # plt.imshow(test.T)
+    # plt.show()
+    # exit()
 
     inds = np.digitize(angles, bins)
 
@@ -381,7 +391,7 @@ if __name__ == "__main__":
             # compute structure factor of structural input
 
             if args.traj:
-                t = md.load(args.traj, top=args.gro)
+                t = md.load(args.traj, top=args.gro)[args.begin:]
             else:
                 t = md.load(args.gro)
 
@@ -569,8 +579,9 @@ if __name__ == "__main__":
 
         if args.gro:
             averaged, rfin, zfin = angle_average(freq_x, freq_y, freq_z, fft, ucell=ucell)
-            alkane_intensity = normalize_alkanes(rfin, zfin[0], averaged, 2.23, 2.25, 120)
-            MAX = 3.1 * alkane_intensity * 100
+            alkane_intensity = normalize_alkanes(rfin, zfin[0], averaged, 2.2, 2.5, 120)
+            averaged /= alkane_intensity
+            MAX = 3.1
             xlim = 2.5
             zlim = 2.5
         else:
@@ -590,10 +601,11 @@ if __name__ == "__main__":
 
         NLEVELS = 200
         lvls = np.linspace(MIN, MAX, NLEVELS)  # contour levels
+        print(MIN, MAX)
 
         plt.figure()
-        rfin *= 2*np.pi
-        zfin[0] *= 2*np.pi
+        rfin *= 2*np.pi / 10
+        zfin[0] *= 2*np.pi / 10
         cs = plt.contourf(rfin, zfin[0], averaged.T, levels=lvls, cmap='jet', extend='max')
         plt.xlabel('$q_r$ ($\AA^{-1}$)')
         plt.ylabel('$q_z$ ($\AA^{-1}$)')
