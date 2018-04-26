@@ -1000,11 +1000,13 @@ We want to know
 
   %BJC3: Feel free to suggest different words
   \subsection{Density of monomers around pores}
+  %MRS4: Perhaps instead of talking about ``layers'', we can talk about axial density correlations.  You can say that for the simulated systems, they appear to stay in highly ordered layers, but that the density correlations are low enough that layering is likely not a clear enough description.  
   Our simulations best support a model built with 5 monomers per layer based on
   the measured equilibrated pore-to-pore distances. To discern the composition of
   the monomer layers, addressing question (\ref{point:monomernum}), we ran
   simulations of systems created with 4--8 monomers per layer. 
   \begin{itemize}  
+  %MRS4: somewhere you need to talk about the range of systems that were built, as that indicates the range of behaviors that are observed.
   		\item We built systems in both the parallel displaced and sandwiched configurations 			with layers initially spaced 3.7 \AA~apart according to the dry equilibration 
   		procedure.
   		\item The pore-to-pore spacing is stable in all systems are stable after 400 ns of 
@@ -1150,17 +1152,22 @@ We want to know
   agreement with experiment. 
   \begin{itemize}
   		\item R-alkanes and R-pores appear in the expected location
-		\item R-pores is more intense than experiment, likely because we are simulating a 
+    %MRS4: we will need to provide more details: more intense is just qualiatative.
+  		\item R-pores is more intense than experiment, likely because we are simulating a 
 		perfect, infinite hexagonal array. The real system has defects and domain misalignment
 	    which decreases the overall intensity.
-	    \item R-$\pi$ appears at a lower $q_z$ value than experiment. In both systems, the
+    %MRS4: comments from Matt suggest that domain misaligment shouldn't alone be responsible for the difference in intensity ratio. Some of the experiments should help explain it better. Let's talk!
+	  \item R-$\pi$ appears at a lower $q_z$ value than experiment. In both systems, the
 	    reflection reaches its maximum at c.a. $q_z=1.4$ which means that monomers prefer 
 	    to stack c.a. 4.5 \AA apart rather than 3.7 \AA. This behavior is not surprising since
 	    GAFF models atoms as point charges and does not appropriately model the aromatic
 	    $\pi-\pi$ interactions which would cause the monomers to stack closer together.
 	    \item R-spots is missing in both places, at least visually. The tails in our model
 	    are more disordered than the experimental system at 300K.  
+            %MRS4: are they really missing?  If Fig 7 is 300K, sandwiched seems to have it, and parallel displaced is hard to tell because it's covered by the main pi-pi-stacking
+            %MRS4: interesting that the main pi-pi stacking follows the isotropc alkane curve so significantly.
 	    \item R-helix does not appear in either case.
+            %MRS4: is r-helix a good name, when a helix would appear on either side of the center, not the center itself?
   \end{itemize}
   
   The simulated XRD pattern of the parallel displaced configuration shows an additional
@@ -1370,6 +1377,7 @@ We want to know
 		        \caption{}~\label{fig:layered_integration}
 		\end{subfigure}
 	\end{subfigure} 
+    %MRS4: caption is probably too long.
     \caption{We hypothesize that R-spots is the result of ordered tail packing.
 	  Defining the membrane plane to be 0\degree, we measured the angles between each
 	  alkane chain tail centroid and its nearest neighbor centroids for the
@@ -1592,6 +1600,7 @@ We want to know
   		restraints are applied to heavy atoms of the phenyl rings.
   		\item Many \textit{ab initio} studies have measured the equilibrium distance between
   		dimers of benzene and substituted benzene.
+%MRS: don't need to include this point.
   		\item Tauer and Sherrill explored the binding energies of tetramers of benzene, but
   		did not explore the report the equilibrium distance between benzene rings. 
   		\item Even if there have been other studies of the equilibrium distance between 
@@ -1601,8 +1610,9 @@ We want to know
   \end{itemize}
   
   Our final hypothesized configuration which produces R-helix focus on the orientation of the
-  tails. 
-  \begin{itemize}
+   tails. 
+  %MRS4: we will need to wait to see the results for this come out to really discuss this well.
+   \begin{itemize}
   		\item In this configuration, monomers are rotated so that the vector created by the  
   		bond extending from the carboxylate carbon to the phenyl ring is oriented $\pm 15 	
   		\degree$ with respect to the vector extending from the carboxylate carbon to the pore
