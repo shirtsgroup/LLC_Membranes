@@ -8,12 +8,11 @@ See : https://github.com/ejmaginn/TransportCheckList/
 import argparse
 import os
 import subprocess
-import mdtraj as md
 import numpy as np
-from gentop import SystemTopology
 from genmdp import SimulationMdp
-import matplotlib.pyplot as plt
 from pymbar.timeseries import detectEquilibration
+import viscosity
+import Diffusivity
 
 
 def initialize():
@@ -44,6 +43,10 @@ def initialize():
     parser.add_argument('-ne', '--nstenergy', type=int, help='Frequency to output energy to energy file')
     parser.add_argument('-mpi', action="store_true", help='Specify this flag if the system will be run in parallel')
     parser.add_argument('-np', default=4, type=int, help='Number of processes to run in parallel')
+    parser.add_argument('-analyze', action="store_true", help='Calculate viscosity and diffusivity only. Do not run'
+                                                              'simulations')
+    parser.add_argument('-simulate', action="store_true", help='Run simulations only. Do not analyze. This may be good'
+                        'to use since the MSD and viscosity calculations will require some manual intervention.')
 
     args = parser.parse_args()
 
@@ -201,57 +204,63 @@ if __name__ == "__main__":
 
     args = initialize()
 
-    # get output frequencies (important for controlling size of trajectory)
-    if args.nstxout:
-        nstxout = args.nstxout
-    else:
-        nstxout = int(args.length_npt*1000 / (args.dt * args.frames))
+    if not args.analyze:
 
-    if args.nstvout:
-        nstvout = args.nstvout
-    else:
-        nstvout = int(args.length_npt*1000 / (args.dt * args.frames))
+        # get output frequencies (important for controlling size of trajectory)
+        if args.nstxout:
+            nstxout = args.nstxout
+        else:
+            nstxout = int(args.length_npt*1000 / (args.dt * args.frames))
 
-    if args.nstfout:
-        nstfout = args.nstfout
-    else:
-        nstfout = int(args.length_npt*1000 / (args.dt * args.frames))
+        if args.nstvout:
+            nstvout = args.nstvout
+        else:
+            nstvout = int(args.length_npt*1000 / (args.dt * args.frames))
 
-    if args.nstenergy:
-        nstenergy = args.nstenergy
-    else:
-        nstenergy = int(args.length_npt*1000 / (args.dt * args.frames))  # output frequency
+        if args.nstfout:
+            nstfout = args.nstfout
+        else:
+            nstfout = int(args.length_npt*1000 / (args.dt * args.frames))
 
-    mdp = SimulationMdp(args.gro, title=args.title, T=args.temp, em_steps=args.em_steps,
-                        time_step=args.dt, length=args.length_npt*1000, p_coupling=args.pcoupltype,
-                        barostat=args.barostat, genvel=args.genvel, tau_p=args.tau_p,
-                        tau_t=args.tau_t, nstxout=nstxout, nstenergy=nstenergy, nstvout=nstvout, nstfout=nstfout)
+        if args.nstenergy:
+            nstenergy = args.nstenergy
+        else:
+            nstenergy = int(args.length_npt*1000 / (args.dt * args.frames))  # output frequency
 
-    top = mdp.top  # SimulationMdp calls to SystemTopology. Redefined simply as top for readability
-    top.write_top()  # write system topology
+        mdp = SimulationMdp(args.gro, title=args.title, T=args.temp, em_steps=args.em_steps,
+                            time_step=args.dt, length=args.length_npt*1000, p_coupling=args.pcoupltype,
+                            barostat=args.barostat, genvel=args.genvel, tau_p=args.tau_p,
+                            tau_t=args.tau_t, nstxout=nstxout, nstenergy=nstenergy, nstvout=nstvout, nstfout=nstfout)
 
-    mdp.write_em_mdp()  # write energy minimization .mdp
+        top = mdp.top  # SimulationMdp calls to SystemTopology. Redefined simply as top for readability
+        top.write_top()  # write system topology
 
-    mdp.nstenergy = int(args.length_npt * 1000 / (args.dt * 1000))  # let's get 1000 energy outputs for density calculation
-    mdp.write_npt_mdp()  # write .mdp for npt simulation  -- PARRINELLO-RAHMAN?? TEST STABILITY
+        mdp.write_em_mdp()  # write energy minimization .mdp
 
-    mdp.length = args.length_nvt * 1000  # convert to picoseconds
-    mdp.write_nvt_mdp()  # write .mdp for nvt simulation
+        mdp.nstenergy = int(args.length_npt * 1000 / (args.dt * 1000))  # let's get 1000 energy outputs for density calculation
+        mdp.write_npt_mdp()  # write .mdp for npt simulation  -- PARRINELLO-RAHMAN?? TEST STABILITY
 
-    mdp.length = args.length_nve * 1000  # convert to picoseconds
-    mdp.nstenergy = int(np.ceil(5 / (args.dt*1000)))  # save every 6 femptoseconds (3 timesteps!)
-    mdp.write_nve_mdp()  # write .mdp for nve simulation
+        mdp.length = args.length_nvt * 1000  # convert to picoseconds
+        mdp.write_nvt_mdp()  # write .mdp for nvt simulation
 
-    sys = System(mdp, mpi=args.mpi, np=args.np)  # system object to keep track of all relevant data
+        mdp.length = args.length_nve * 1000  # convert to picoseconds
+        mdp.nstenergy = int(np.ceil(5 / (args.dt*1000)))  # save every 6 femptoseconds (3 timesteps!)
+        mdp.write_nve_mdp()  # write .mdp for nve simulation
 
-    # Run NPT equilibraton simulation
-    sys.run_simulation('npt', args.gro)
-    average_density = sys.average_density('npt')
-    sys.npt_replicates(args.nreplicates)  # decide which frames to use as starting points for replicate simulations
-    sys.generate_replicate_gro(0)  # create .gro with average density from npt equilibration
+        sys = System(mdp, mpi=args.mpi, np=args.np)  # system object to keep track of all relevant data
 
-    #sys.energy_minimize('replicate.gro', out='replicate_em')
-    sys.run_simulation('nvt', 'replicate.gro')
-    sys.run_simulation('nve', 'nvt.gro')  # run nve simulation using last frame of nvt simulation
+        # Run NPT equilibraton simulation
+        sys.run_simulation('npt', args.gro)
+        average_density = sys.average_density('npt')
+        sys.npt_replicates(args.nreplicates)  # decide which frames to use as starting points for replicate simulations
+        sys.generate_replicate_gro(0)  # create .gro with average density from npt equilibration
+
+        #sys.energy_minimize('replicate.gro', out='replicate_em')
+        sys.run_simulation('nvt', 'replicate.gro')
+        sys.run_simulation('nve', 'nvt.gro')  # run nve simulation using last frame of nvt simulation
 
     # Now calculate diffusivity and viscosity
+    if not args.simulate:
+
+        V = viscosity.Viscosity(args.edr, args.gro)
+        V.plot_all()

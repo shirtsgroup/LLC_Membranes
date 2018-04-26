@@ -28,26 +28,19 @@ def initialize():
 
     parser.add_argument('-g', '--gro', default='initial.gro', type=str, help='Coordinate file')
     parser.add_argument('-o', '--out', default='dipole.itp', type=str, help='Name of output topology file')
-    parser.add_argument('-r', '--restraints', default='on', help='Put "on" if you want position restraint on atoms')
-    parser.add_argument('-D', '--dipoles', default='off', help='Put "on" if you want to create dipoles')
-    parser.add_argument('-w', '--write_gro', default='off', help='Put "on" if you want to create a .gro with dipoles '
-                                                                 'placed in the right spots')
     parser.add_argument('-f', '--f_const', nargs='+', default=[1000, 1000, 1000], type=float, help='Force constant')
     parser.add_argument('-a', '--atoms', nargs='+', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], type=str, help='Name of carbons in ring')
     parser.add_argument('-d', '--distance', default=0.1, help='Distance to offset dipole from ring (Angstroms)')
     parser.add_argument('-m', '--monomer', default='NAcarb11V', help='Which monomer topology is being used')
-    parser.add_argument('-t', '--toplines', default=2, help='Number of lines at the top of the .gro file to ignore')
-    parser.add_argument('-c', '--charge', default=10, help= 'Charge on dipoles')
-
     parser.add_argument('-A', '--axis', default='xy', help='Axis to restrain along with position restraints')
-    parser.add_argument('--novsites', help='Specify this if the system will not be crosslinked or there are no '
-                                          'virtual sites in the system', action="store_true")
+    ######## These parameters are not implemented yet but left here since they will have some use in the future ########
     parser.add_argument('--xlink', help='Specify this flag if the system is being crosslinked while restrained',
                         action="store_true")
     parser.add_argument('--append', help='Specify this to prevent the topology from being re-written, and instead, add '
                                          'restraints to the topology for other atoms', action="store_true")
     parser.add_argument('-i', '--input', type=str, default='dipole.itp', help='Name of topology file to be edited if '
                                                                               'you use the option --append')
+    ####################################################################################################################
     parser.add_argument('--bcc', action="store_true", help='Use BCC topology')
     parser.add_argument('-dr', '--dihedral_restraints', action='append', nargs='+',
                         help='Specify atom names of dihedral to be restrained, followed by angle at which to restrain'
@@ -135,6 +128,9 @@ def exclusions(coord_file, monomers, valence, toplines, atoms, n_atoms, vsites):
 
 
 def dihedral_restraints(file, atoms):
+    """
+    This function needs to be moved into the class
+    """
 
     ndihedrals = len(atoms)
 
@@ -335,35 +331,6 @@ if __name__ == "__main__":
 
     top = RestrainedTopology(args.gro, args.monomer, args.atoms, bcc=args.bcc, com=args.center_of_mass,
                              vparams=args.virtual_site_parameters)
-    top.add_distance_restraint_columns(float(args.bond_restraints[0]), float(args.bond_restraints[1]))
-    #top.add_position_restraints(args.axis, args.f_const)
+    # top.add_distance_restraint_columns(float(args.bond_restraints[0]), float(args.bond_restraints[1]))
+    top.add_position_restraints(args.axis, args.f_const)
     top.write_topology()
-    exit()
-
-    if args.restraints == 'on':
-
-        restraints = position_restraints(gro, args.atoms, '%s' % args.axis)
-
-        f = open(args.input, 'a')  # 'a' means append
-
-        if not args.append:
-            f.write("\n[ position_restraints ]\n")
-
-        for i in range(restraints.shape[1]):
-            f.write('{:6d}{:6d}{:1s}{:9f}{:1s}{:9f}{:1s}{:9f}\n'.format(int(restraints[0, i]), int(restraints[1, i]),'',
-                                                        restraints[2, i], '', restraints[3, i], '', restraints[4, i]))
-
-        f.close()
-
-    if args.dihedral_restraints:
-
-        restraints = dihedral_restraints(gro, args.dihedral_restraints)
-
-        with open(args.input, 'a') as f:
-            f.write("\n[ dihedral_restraints ]\n")
-            for i in range(restraints.shape[0]):
-                f.write('{:6d}{:6d}{:6d}{:6d}{:6d}{:1s}{:9f}{:1s}{:9f}{:1s}{:9f}\n'.format(int(restraints[i, 0]),
-                        int(restraints[i, 1]), int(restraints[i, 2]), int(restraints[i, 3]), int(restraints[i, 4]), '',
-                            restraints[i, 5], '', restraints[i, 6], '', restraints[i, 7]))
-
-    print('dipole.itp file written :)')

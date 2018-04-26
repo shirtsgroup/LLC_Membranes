@@ -202,11 +202,18 @@ class Viscosity(object):
         :return:
         """
 
-        plt.figure()
-        plt.plot(self.time[:self.nintervals], self.autocorr[:self.nintervals])
-        plt.xlabel('Time (ps)', fontsize=14)
-        plt.ylabel('Autocorrelation', fontsize=14)
-        plt.tight_layout()
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+        ax.plot(self.time[:10*self.nintervals], self.autocorr[:10*self.nintervals])
+        left, bottom, width, height = [0.45, 0.4, 0.42, 0.42]
+        ax2 = fig.add_axes([left, bottom, width, height])
+        ax2.plot(self.time[:self.nintervals], self.autocorr[:self.nintervals])
+        ax.set_xlabel('Time (ps)', fontsize=14)
+        ax.set_ylabel('Autocorrelation', fontsize=14)
+        ax2.set_ylim(-0.01, 0.025)
+        ax2.set_xlim(0, 10)
+        ax.set_xscale('log')
+        # plt.tight_layout() # not compatible with inset plot
         if save:
             plt.savefig('autocorrelation_function.py')
 
@@ -215,7 +222,8 @@ class Viscosity(object):
                  self.fit_params[1], self.fit_params[2], self.fit_params[3]), '--', label='Double Exponential Fit')
         plt.plot(self.time[:self.nintervals], self.runningintegral[:self.nintervals], label='Running Integral')
         plt.xlabel('Time (ps)', fontsize=14)
-        plt.ylabel('Running integral of autocorrelation function', fontsize=14)
+        plt.ylabel('$\eta(t)$')
+        #plt.ylabel('Running integral of autocorrelation function', fontsize=14)
         plt.legend()
         plt.tight_layout()
         if save:

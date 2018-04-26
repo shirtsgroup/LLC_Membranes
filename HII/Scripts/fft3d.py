@@ -402,8 +402,8 @@ if __name__ == "__main__":
                     names[i] = 'NA'
 
             import Atom_props
-            weights = [Atom_props.radius['%s' % a] for a in names]  # give atoms weights based on atomic radius
-
+            # weights = [Atom_props.radius['%s' % a] for a in names]  # give atoms weights based on atomic radius
+            weights = [Atom_props.mass['%s' % a] for a in names]
             locations = t.xyz
 
             # convert unit cell -- can be made more general

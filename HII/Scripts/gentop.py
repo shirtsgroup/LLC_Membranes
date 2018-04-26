@@ -78,7 +78,7 @@ class SystemTopology(object):
         self.residues = unique_residues
         self.residue_count = residue_count
 
-    def write_top(self, name='topol.top', description='Simulation Box'):
+    def write_top(self, name='topol.top', description='Simulation Box', restrained_top_name='restrained.itp'):
 
         self.name = name
 
@@ -98,7 +98,7 @@ class SystemTopology(object):
                 top.append(';%s Topology\n' % r)
                 if self.restraints:
                     if r in self.restraints:
-                        top.append('#include "restrained.itp"\n')  # need to modify so this is not hardcoded.
+                        top.append('#include "%s"\n' % restrained_top_name)  # need to modify so this is not hardcoded.
                     else:
                         top.append('#include "%s/%s.itp"\n' % (self.top_location, r))
                 else:
