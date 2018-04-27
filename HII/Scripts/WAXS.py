@@ -173,43 +173,100 @@ Y = np.linspace(-qmax, qmax, waxs.shape[1])
 # # exit()
 ########################### END Inverse FT ###################################
 
-inner = 1.1
-outer = 1.6
-
-angle = 120
-nbins = 45
-bins = np.linspace(-90, 90, nbins)
-
-bw = 180 / (nbins - 1)
-
-angles = []
-intensity = []
-for i in range(waxs.shape[0]):
-    for j in range(waxs.shape[1]):
-        if inner < np.linalg.norm([X[i], Y[j]]) < outer:
-            angles.append((180/np.pi)*np.arctan(Y[j]/X[i]))
-            intensity.append(waxs[i, j])
-
-inds = np.digitize(angles, bins)
-
-I = np.zeros([nbins])
-counts = np.zeros([nbins])
-for i in range(len(inds)):
-    I[inds[i] - 1] += intensity[i]
-    counts[inds[i] - 1] += 1
-
-#Get average intensity in ring excluding 60 degree slice around top and bottom #######
-
-bin_range = 180 / nbins  # degrees which a single bin covers
-
-start = int((angle/2) / bin_range)  # start at the bin which covers -60 degrees and above
-end = nbins - start  # because of symmetry
-
-total_intensity = np.sum(I[start:end])
-
-avg_intensity = total_intensity / np.sum(counts[start:end])
+# inner = 1.1
+# outer = 1.6
+#
+# angle = 120
+# nbins = 45
+# bins = np.linspace(-90, 90, nbins)
+#
+# bw = 180 / (nbins - 1)
+#
+# angles = []
+# intensity = []
+# for i in range(waxs.shape[0]):
+#     for j in range(waxs.shape[1]):
+#         if inner < np.linalg.norm([X[i], Y[j]]) < outer:
+#             angles.append((180/np.pi)*np.arctan(Y[j]/X[i]))
+#             intensity.append(waxs[i, j])
+#
+# inds = np.digitize(angles, bins)
+#
+# I = np.zeros([nbins])
+# counts = np.zeros([nbins])
+# for i in range(len(inds)):
+#     I[inds[i] - 1] += intensity[i]
+#     counts[inds[i] - 1] += 1
+#
+# #Get average intensity in ring excluding 60 degree slice around top and bottom #######
+#
+# bin_range = 180 / nbins  # degrees which a single bin covers
+#
+# start = int((angle/2) / bin_range)  # start at the bin which covers -60 degrees and above
+# end = nbins - start  # because of symmetry
+#
+# total_intensity = np.sum(I[start:end])
+#
+# avg_intensity = total_intensity / np.sum(counts[start:end])
 # avg_intensity = waxs[-1, -1]
 # print(avg_intensity)
+
+
+def normalize_alkanes(R, Z, Raw_Intensity, inner, outer, angle):
+    """
+    Plot angular integration of 2D WAXS data bounded by a circle defined by radii 'inner' and 'outer'
+    :param R: points in r direction
+    :param Z: points in z direction
+    :param Raw_Intensity: values at all (R, Z) points on grid
+    :param inner: inside radius of region bounding alkane reflections
+    :param outer: outside radius of region bounding alkane reflections
+    :return: Intensity values normalized by average intensity inside alkane region
+    """
+
+    nbins = 45
+    bins = np.linspace(-90, 90, nbins)
+
+    bw = 180 / (nbins - 1)
+
+    angles = []
+    intensity = []
+
+    test = np.zeros_like(Raw_Intensity)
+    for i in range(R.shape[0]):
+        for j in range(Z.shape[0]):
+            if inner < np.linalg.norm([R[i], Z[j]]) < outer:
+                angles.append((180/np.pi)*np.arctan(Z[j]/R[i]))
+                intensity.append(Raw_Intensity[i, j])
+                test[i, j] = Raw_Intensity[i, j]
+
+    # plt.imshow(test.T)
+    # plt.show()
+    # exit()
+
+    inds = np.digitize(angles, bins)
+
+    I = np.zeros([nbins])
+    counts = np.zeros([nbins])
+    for i in range(len(inds)):
+        I[inds[i] - 1] += intensity[i]
+        counts[inds[i] - 1] += 1
+
+    # Get average intensity in ring excluding 60 degree slice around top and bottom #######
+
+    bin_range = 180 / nbins  # degrees which a single bin covers
+
+    start = int((angle/2) / bin_range)  # start at the bin which covers -60 degrees and above
+    end = nbins - start  # because of symmetry
+
+    total_intensity = np.sum(I[start:end])
+    avg_intensity = total_intensity / np.sum(counts[start:end])
+
+    print('Average Intensity in alkane chain region : %s' % avg_intensity)
+
+    return avg_intensity
+
+
+avg_intensity = normalize_alkanes(X, Y, waxs, 1.256, 1.57, 120)
 
 print('New Average Intensity in alkane chain region : %s' % avg_intensity)
 
@@ -237,7 +294,7 @@ Y = np.linspace(-qmax, qmax, waxs.shape[1])
 # exit()
 
 factor = 3.1
-colorbar = 'jet'
+colorbar = 'seismic'
 levels = np.linspace(0, factor, 200)
 waxs /= avg_intensity
 
@@ -337,8 +394,61 @@ def onclick(event):
     # print(Y[yd], event.ydata)
     print(waxs[yd, xd])  # it seems that the transpose is plotted
 
-plt.plot(Y, waxs[:, waxs.shape[0]//2])
-plt.show()
+
+def Rspots(R, Z, waxs, theta=37, theta_sigma=(7, 5), bounds=(1.256, 1.57)):
+
+    spots = np.copy(waxs)
+    inner = bounds[0]
+    outer = bounds[1]
+    I = []
+
+    for i in range(R.shape[0]):
+        for j in range(Z.shape[0]):
+            if inner < np.linalg.norm([R[i], Z[j]]) < outer:
+                angle = (180 / np.pi) * np.arctan(Z[j] / R[i])
+                if (theta - theta_sigma[0]) < angle < (theta + theta_sigma[1]) or \
+                        (theta - theta_sigma[0]) < (angle - 2*angle) < (theta + theta_sigma[1]):
+                    spots[i, j] = 100
+                    I.append(waxs[i, j])
+
+    average_intensity = np.mean(I)
+
+    plt.figure()
+    levels = np.linspace(0, 3.1, 200)
+    plt.contourf(R, Z, spots, cmap=colorbar, levels=levels, extend='max')
+
+    plt.figure()
+    plt.hist(I, bins=25)
+    plt.title('Average intensity of R-spots: %.2f' % average_intensity)
+    plt.show()
+
+    return average_intensity
+
+R_double_top = 0
+R_double_bottom = 0
+while Y[R_double_bottom] < -1.0:
+    R_double_bottom += 1
+
+while Y[R_double_top] < 0:  # The bottom part of the plot is noisier (change 0 to 1.0 to see what I mean)
+    R_double_top += 1
+
+# # plot z-slices
+# for i in range(-10, 10):
+#     plt.plot(Y[R_double_bottom:R_double_top], waxs[R_double_bottom:R_double_top, waxs.shape[0]//2 + i])
+#
+# plt.show()
+# exit()
+
+# plot maximum intensity of each z-slice
+#plt.plot(np.linspace(-100, 99, 200), np.amax(waxs[:, waxs.shape[0]//2 - 100:waxs.shape[0]//2 + 100], axis=0))
+# plt.plot(np.linspace(-10, 9, 20), np.amax(waxs[R_double_bottom:R_double_top,
+#                                           waxs.shape[0]//2 - 10:waxs.shape[0]//2 + 10], axis=0))
+# plt.show()
+print('Average R-pi intensity: %.2f' % np.mean(np.amax(waxs[:, waxs.shape[0]//2 - 10:waxs.shape[0]//2 + 10], axis=0)))
+print('Average R-double intensity: %.2f' % np.mean(np.amax(waxs[R_double_bottom:R_double_top,
+                                                           waxs.shape[0]//2 - 10:waxs.shape[0]//2 + 10], axis=0)))
+print('Average R-spots intensity : %.2f' % Rspots(X, Y, waxs, theta=50, theta_sigma=(3, 2), bounds=(1.3, 1.45)))
+exit()
 
 fig, ax = plt.subplots()
 heatmap = plt.contourf(X, Y, waxs, cmap=colorbar, levels=levels, extend='max')
@@ -347,8 +457,8 @@ cbar = plt.colorbar(format='%.2f')
 plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=18)
 plt.ylabel('$q_z\ (\AA^{-1}$)', fontsize=18)
 plt.gcf().get_axes()[0].tick_params(labelsize=14)
-plt.tight_layout()
 plt.gcf().get_axes()[0].set_aspect('equal')
+plt.tight_layout()
 plt.savefig('WAXS_raw.png')
 plt.show()
 exit()

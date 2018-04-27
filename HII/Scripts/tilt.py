@@ -145,8 +145,8 @@ if __name__ == "__main__":
     else:
         nT = all_tilt_angles.shape[0]
         plt.hist(all_tilt_angles.flatten(), bins=50, normed=True)
-        # plt.plot([np.mean(all_tilt_angles.flatten())]*2, [0, 1], '--', color='black')
-        print(np.mean(all_tilt_angles.flatten()))
+        avg = np.mean(all_tilt_angles)
+        plt.plot([avg, avg], [0, 0.035], '--', color='black')
         plt.gcf().get_axes()[0].tick_params(labelsize=14)
         plt.ylim(0, 0.035)
         plt.xlabel('Tilt angle with respect to xy plane', fontsize=14)

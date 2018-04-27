@@ -51,6 +51,7 @@ def initialize():
                                                              'Useful for test configurations..maybe')
     parser.add_argument('-invert', action="store_true", help='Invert correlation function at end to get structure'
                                                              'factor')
+    parser.add_argument('-fit', action="store_true", help='Fit decaying exponential function to correlation function')
 
     args = parser.parse_args()
 
@@ -348,6 +349,7 @@ if __name__ == "__main__":
         middle_y = correlation.shape[1] // 2
         r = 0.225
         r = 0.42
+
         avg = []
         n = 0
         for i, ix in enumerate(centers_x):
@@ -355,7 +357,6 @@ if __name__ == "__main__":
                 if np.linalg.norm([ix, jy]) < r:
                     avg.append([i, j])
                     n += 1
-        print(n)
 
         zdf = np.zeros_like(centers1)
         for i in range(len(avg)):
@@ -377,31 +378,33 @@ if __name__ == "__main__":
         zdf = zdf[shift:]
         centers1 = np.array(centers1[shift:])
 
-        peaks = detect_peaks.detect_peaks(zdf, mpd=12, show=False)  # adjust mpd if number of peaks comes out wrong
-
-        if args.offset:
-            peaks = peaks[1::2]  # every other peak starting at the second peak
-
-        #peaks = [32, 78, 123, 159] # offset
-        print(peaks)
-        # if len(peaks) > 4:
-        #     peaks = peaks[:4]
-
         plt.figure()
         plt.plot(centers1, zdf, label='Raw data')
-        plt.scatter(centers1[peaks], zdf[peaks], marker='+', c='r', s=200, label='Peak locations')
 
-        # period = 0.438
-        p = np.array([0.1])  # initial guess at parameters
+        if args.fit:
+            peaks = detect_peaks.detect_peaks(zdf, mpd=12, show=False)  # adjust mpd if number of peaks comes out wrong
 
-        solp, cov_x = curve_fit(exponential_decay, centers1[peaks], zdf[peaks], p)
+            if args.offset:
+                peaks = peaks[1::2]  # every other peak starting at the second peak
 
-        # if args.plot_fit:
-        #plt.plot(centers1[shift:], decay(np.array(centers1[shift:]), solp[0], solp[1], solp[2], solp[3]), '--', color='black', label='Least squares fit')
-        plt.plot(centers1, exponential_decay(centers1, solp[0]), '--', c='black', label='Least squares fit')
+            # peaks = [32, 78, 123, 159] # offset
+            print(peaks)
+            # if len(peaks) > 4:
+            #     peaks = peaks[:4]
 
-        print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*solp[0], 10*np.sqrt(cov_x[0, 0])))
-        # print('Oscillation Period = %1.3f nm' % (10*(2*np.pi)/solp[0]))
+            plt.scatter(centers1[peaks], zdf[peaks], marker='+', c='r', s=200, label='Peak locations')
+
+            # period = 0.438
+            p = np.array([0.1])  # initial guess at parameters
+
+            solp, cov_x = curve_fit(exponential_decay, centers1[peaks], zdf[peaks], p)
+
+            # if args.plot_fit:
+            #plt.plot(centers1[shift:], decay(np.array(centers1[shift:]), solp[0], solp[1], solp[2], solp[3]), '--', color='black', label='Least squares fit')
+            plt.plot(centers1, exponential_decay(centers1, solp[0]), '--', c='black', label='Least squares fit')
+
+            print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*solp[0], 10*np.sqrt(cov_x[0, 0])))
+            # print('Oscillation Period = %1.3f nm' % (10*(2*np.pi)/solp[0]))
 
         plt.xlabel('Z distance separation (nm)', fontsize=14)
         plt.ylabel('Count', fontsize=14)
@@ -410,7 +413,7 @@ if __name__ == "__main__":
         plt.legend(loc=1, prop={'size': 16})
         plt.ylim(0, 1.2*np.amax(zdf))
         plt.tight_layout()
-        # plt.savefig('zdf_overlay.png')
+        plt.savefig('z_correlation.png')
         plt.show()
 
         # plt.figure()

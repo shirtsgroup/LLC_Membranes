@@ -603,9 +603,11 @@ if __name__ == "__main__":
         lvls = np.linspace(MIN, MAX, NLEVELS)  # contour levels
         print(MIN, MAX)
 
-        plt.figure()
         rfin *= 2*np.pi / 10
         zfin[0] *= 2*np.pi / 10
+        plt.figure()
+        plt.plot(zfin[0], averaged[rfin.size // 2, :])
+        plt.figure()
         cs = plt.contourf(rfin, zfin[0], averaged.T, levels=lvls, cmap='jet', extend='max')
         plt.xlabel('$q_r$ ($\AA^{-1}$)')
         plt.ylabel('$q_z$ ($\AA^{-1}$)')

@@ -8,6 +8,7 @@
 \usepackage{booktabs}
 \usepackage[export]{adjustbox}
 \newcommand{\angstrom}{\textup{\AA}}
+\newcommand{\colormap}{jet}  % colorbar to use
 \usepackage{cleveref}
 \usepackage{booktabs}
 \usepackage{gensymb}
@@ -371,7 +372,7 @@ We want to know
         interpreted  as 2\textsubscript{1} helical ordering of aromatic rings
         along the z axis meaning if the positions of the aromatic rings can
         be traced by a helix, then for each turn in the helix, there should be
-        two aromatic rings. For this reason it will be referred to as R-helix.
+        two aromatic rings. For this reason it will be referred to as R-double.
         \item A third major reflection is marked by a low intensity ring located
         at r = 1.4 \angstrom$^-1$. The real space separation
         corresponds to 4.5 \angstrom~ which is characteristic of the average
@@ -1007,14 +1008,18 @@ We want to know
   simulations of systems created with 4--8 monomers per layer. 
   \begin{itemize}  
   %MRS4: somewhere you need to talk about the range of systems that were built, as that indicates the range of behaviors that are observed.
-  		\item We built systems in both the parallel displaced and sandwiched configurations 			with layers initially spaced 3.7 \AA~apart according to the dry equilibration 
-  		procedure.
-  		\item The pore-to-pore spacing is stable in all systems are stable after 400 ns of 
-  		simulation. Figure~\ref{fig:p2p} shows the equilibrated pore-to-pore distances for all 
-  		systems tested. 
+  		\item We built systems in both the parallel displaced and sandwiched configurations and
+  		equilibrated them according to the dry equilibration procedure.
+  		\item We test all systems with an initial layer spacing, l, of 3.7 \AA.
+  		\item We tested 4 additional systems with layers initially spaced 5 \AA~apart (See 
+  		supporting info for more details on sensitivity to initial layer spacing)
+  		\item The pore-to-pore spacing is stable in all systems after 400 ns of simulation. 
+  		Figure~\ref{fig:p2p} shows the equilibrated pore-to-pore distances for all systems 
+  		tested. 
   		\item Systems built with 5 monomers in each layer equilibrate to a pore spacing that is 
   		most consistent with the experimental value of 4.12 nm derived from SAXS measurements 
 	    (Figure~\ref{fig:SAXS}).
+	    \item comment about disordered systems
   \end{itemize}
   
   %  The simulations best support a model built with 5 monomers per layer based on 
@@ -1048,14 +1053,16 @@ We want to know
   		monomer density close to experiment.
   \end{itemize} 
 
+  % BJC4: I will add 6 mon/layer disordered data once I have it.
   \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{p2p.png}
 	\caption{Systems with 5 monomers per layer have equilibrated pore spacings closest to
-			 the experimental value of 4.12 nm. The equilibrated pore spacing of the model 	
-			 increases as the number of monomers in each layer increases. The pore spacing
-			 of systems starting in the sandwiched configuration are systematically lower
-			 than those started in the parallel displaced configuration.}~\label{fig:p2p}
+			 the experimental value of 4.12 nm, regardless of initial layer spacing, l. The 
+			 equilibrated pore spacing of the model increases as the number of monomers 
+			 in each layer increases. The pore spacing of systems starting in the sandwiched 	
+			 configuration are systematically lower than those started in the parallel 
+			 displaced configuration.}~\label{fig:p2p}
   \end{figure}
 
 % BJC3: replaced by plot above.
@@ -1090,84 +1097,99 @@ We want to know
   to experiment. 
   \begin{itemize}
 	  	\item We tested systems built with 5 monomers per layer in the parallel 
-		displaced and sandwiched configurations at 300K.
+		displaced and sandwiched configurations at 300 K with layers initially spaced
+		3.7 \AA and 5.0 \AA apart.
 		\item We generated simulated patterns using portions of simulation trajectory
 		after equilibration.
-		\item The patterns for both structures are shown and compared to experiment
+		\item The patterns for all structures are shown and compared to experiment
 		in Figure~\ref{fig:XRDsim}.
   \end{itemize}
 
 %  Simulated XRD of the sandwiched configuration contains all experimental
-%  features except for R-helix. R-alkanes, R-spots and R-pores appear close to their
+%  features except for R-double. R-alkanes, R-spots and R-pores appear close to their
 %  expected locations. R-$\pi$ is also present, however it intersects R-alkanes at
 %  a $q_z$ value lower than experiment meaning the head groups in our model prefer 
 %  to stack farther apart. 
 
 %  Like the sandwiched configuration, the parallel displaced configuration creates
-%  a simulated XRD pattern with all major experimental reflections except for R-helix.
+%  a simulated XRD pattern with all major experimental reflections except for R-double.
 %  R-alkanes and R-pores appear as they do in the sandwiched configuration. R-spots
 %  and R-$\pi$ appear, however with a lower intensity
-%  relative to R-alkanes when compared to the sandwiched configuration. R-helix
+%  relative to R-alkanes when compared to the sandwiched configuration. R-double
 %  appears due to the parallel displaced aromatic rings. It is a subharmonic of
 %  R-$\pi$ since the nearest vertically stacked head group to any given head group
 %  is $2\times$R-$\pi$~away. 
 % BJC: adjust figure size and alignment -- probably easiest to set figure size in matplotlib
-
-% BJC3: update with 300K pics. Presented separately from 280K for now. 
-  \begin{figure}
-  \begin{subfigure}{0.3\linewidth}
-        \centering
-        \vspace{-0.2em}
-        \includegraphics[width=1.1\linewidth,trim={1cm 0 1.3cm 0},clip]{rzplot_offset_300K.png}
-        \caption{}~\label{fig:rz_offset}
-  \end{subfigure}
-  \begin{subfigure}{0.3\linewidth}
-        \centering
-%        \vspace{0.25em}
-        \includegraphics[scale=0.285]{WAXS_raw.png}
-        \caption{}~\label{fig:raw_waxs}
-  \end{subfigure}
-  \begin{subfigure}{0.3\linewidth}
-        \centering
-        \includegraphics[width=1.1\linewidth,trim={1cm 0 1.3cm 0},clip]{rzplot_layered_300K.png}
-        \caption{}~\label{fig:rz_layered}
-  \end{subfigure}
-  \begin{subfigure}{0.0544\linewidth}
-        \centering
-        \vspace{-4.00em}
-        \includegraphics[width=\linewidth]{colorbar_seismic.png}
-  \end{subfigure}
-%MRS6: question: the SAXS region looks different between sandwiched and parallel displaced. Any thoughts why? We can discuss in person.  And seems like have to comment on the difference in intensity between Sandwich and parallel displaced in the pi-pi region.
-%MRS6: I wonder to what extent showing the reflections of tails removed would make it clearer pi-pi is really there.  Maybe in supporting info?
-%BJC2: Sure, I'll add that to supporting info
-  \caption{The simulated XRD pattern generated from the equilibrated trajectory
-	  of the parallel displaced configuration (a) exhibits all major reflections
-	  present in the experimental WAXS pattern (b). The simulated XRD pattern
-	  generated from the equilibrated trajectory in the sandwiched configuration (c) shows
-	  all major reflections except R-helix.}
-  \label{fig:XRDsim}
-  \end{figure}
   
+%BJC4: I'm not sure what the best way to set up this figure is yet.
+  \begin{figure}[htb]
+	\centering
+	\begin{subfigure}{0.4\linewidth}
+	\centering
+			\begin{subfigure}{\textwidth}
+		       		\centering
+	        		\includegraphics[width=\linewidth]{WAXS_raw_jet.png}
+	        		\caption{Experimental WAXS}~\label{fig:offset_tails}
+			\end{subfigure}
+	\end{subfigure}
+	\begin{subfigure}{0.28\linewidth}
+			\begin{subfigure}{\textwidth}
+			\centering
+		        	\includegraphics[width=\linewidth]{rzplot_layered_300K_jet.png}
+			        \caption{Sanwiched}~\label{fig:rzplot_layered_300K}
+			\end{subfigure}
+			
+			\begin{subfigure}{\textwidth}
+		       		\centering
+	        		\includegraphics[width=\linewidth]{rzplot_layered_300K_disorder_jet.png}
+	        		\caption{Disordered sandwiched}~\label{fig:rzplot_layered_300K}
+			\end{subfigure}
+	\end{subfigure}
+	\begin{subfigure}{0.28\linewidth}
+	\centering
+			\begin{subfigure}{\textwidth}
+			\centering
+		        	\includegraphics[width=\linewidth]{rzplot_offset_300K_jet.png}
+			        \caption{Parallel displaced}~\label{fig:rzplot_offset_300K}
+			\end{subfigure}
+			
+			\begin{subfigure}{\textwidth}
+			\centering
+		        	\includegraphics[width=\linewidth]{rzplot_offset_300K_disorder_jet.png}
+			        \caption{Disordered parallel displaced}~\label{fig:rzplot_offset_300K_disordered}
+			\end{subfigure}
+	\end{subfigure}
+	\caption{Very descriptive caption}~\label{fig:XRDsim} 
+	\end{figure}
+
   The simulated XRD patterns produced from both systems show moderate qualitative 
   agreement with experiment. 
   \begin{itemize}
   		\item R-alkanes and R-pores appear in the expected location
     %MRS4: we will need to provide more details: more intense is just qualiatative.
+    %BJC4: I can include the intensity of the first peak of R-pores in the tables that 
+    % show relative intensities.
   		\item R-pores is more intense than experiment, likely because we are simulating a 
 		perfect, infinite hexagonal array. The real system has defects and domain misalignment
 	    which decreases the overall intensity.
     %MRS4: comments from Matt suggest that domain misaligment shouldn't alone be responsible for the difference in intensity ratio. Some of the experiments should help explain it better. Let's talk!
-	  \item R-$\pi$ appears at a lower $q_z$ value than experiment. In both systems, the
-	    reflection reaches its maximum at c.a. $q_z=1.4$ which means that monomers prefer 
-	    to stack c.a. 4.5 \AA apart rather than 3.7 \AA. This behavior is not surprising since
-	    GAFF models atoms as point charges and does not appropriately model the aromatic
-	    $\pi-\pi$ interactions which would cause the monomers to stack closer together.
-	    \item R-spots is missing in both places, at least visually. The tails in our model
-	    are more disordered than the experimental system at 300K.  
-            %MRS4: are they really missing?  If Fig 7 is 300K, sandwiched seems to have it, and parallel displaced is hard to tell because it's covered by the main pi-pi-stacking
+    %BJC4: So a combo of: domain misalignment, slow dynamics of simulated system, only 4 pores
+    % in unit cell, tortuosity (?)
+    	\item R-spots appears to be weaker in the simulated patterns. They are also partially 
+	    engulfed by the wide R-$\pi$ reflection.
+	    \item We further explore R-spots in Section~\ref{section:rspots}  
+        \item R-$\pi$ appears at a lower $q_z$ value than experiment. In all systems, the
+	    reflection reaches its maximum at $q_z < 1.5 \AA^{-1}$ which means that monomers
+	    prefer stack greater than 4.2 \AA apart rather than 3.7 \AA. This behavior is not
+	    surprising since GAFF models atoms as point charges and does not appropriately model 
+	    the aromatic $\pi-\pi$ interactions which would cause the monomers to stack closer
+	    together.
+	    \item We will explore R-$\pi$ in more detail in Section~\ref{section:rpi}.
             %MRS4: interesting that the main pi-pi stacking follows the isotropc alkane curve so significantly.
-	    \item R-helix does not appear in either case.
-            %MRS4: is r-helix a good name, when a helix would appear on either side of the center, not the center itself?
+			%BJC: Might have something to do with the distibution of tilt angles in the tails
+	    \item R-double does not appear in any of the patterns
+	    \item We will explore its possible origins and reasons that it does not appear in our
+	    simulated patterns in Section~\ref{section:rdouble}.
   \end{itemize}
   
   The simulated XRD pattern of the parallel displaced configuration shows an additional
@@ -1176,42 +1198,56 @@ We want to know
   		\item There are horizontal reflections at $|q_z|= 0.7 \AA^{-1}$, exactly half of 
   		the $q_z$ value of R-$\pi$. 
   		\item The reflection does not cross through $q_r = 0 \AA^{-1}$ so it does not
-  		appear for the same reason as R-helix. 
+  		appear for the same reason as R-double. 
+  		\item This type of pattern is characteristic of a helix (reference something)
   		\item It is possible that these reflections contribute to the continuation of
-  		R-helix into R-alkanes, as seen in the experimental pattern. 
+  		R-double into R-alkanes, as seen in the experimental pattern. 
   \end{itemize}
   
-  There are numerical discrepancies between the relative intensities of each reflection when
-  comparing experimental and simulated patterns.
+  We quantified the numerical discrepancies present when comparing the relative intensities
+  of each reflection of interest between experimental and simulated patterns. 
   \begin{itemize}
   		\item Table~\ref{table:relative_inensities_300K} quantifies the relative intensity
-  		of each reflection.
-  		\item The intensity of R-spots is much lower than experiment (need to update the numbers in that table with 300K results)
-  		\item There is no R-helix intensity
-  		\item R-$\pi$ is nearly an order of magnitude higher in our simulations
-  		compared to experiment.
+  		of each reflection for each system tested.
+  		\item The patterns are normalized so that the average intensity of R-alkanes equals 1. 
+  		% BJC4: I need to explain how I calculated these intensities somewhere. Is this the right
+  		% place to do it? I think it would just be confusing in the methods. I could also move it
+  		% to supplemental.
+  		\item We measured the approximate intensity of R-$\pi$ by measuring the intensity of 
+  		the peak of the cross-section at $q_r=0$. 
+  		\item The relative intensity of R-$\pi$ is significantly higher than experiment in our
+  		simulations.
+  		\item R-spots is measured as the average intensity within the region bounded by a 'spot'.
+  		Spots are identified based on visual inspection. If there is no easily discernable spot,
+  		then the intensity is taken as that of the intersection of R-alkanes at half the $q_z$
+  		value of R-$\pi$, since that is where it appears experimentally. 
+  		\item The intensity of R-spots is slightly lower than experiment in all cases.
+  		\item There is no R-double intensity to be measured.
   \end{itemize} 
 
   \begin{table}[h]
   \centering
-  \begin{tabular}{cccc}
+  \begin{tabular}{cccccc}
   \toprule
-  		   & \multicolumn{3}{c}{Configuration} \\
+  		   & \multicolumn{5}{c}{Configuration} \\
   \hline
-  Reflection & Experiment & Sandwiched & Parallel Displaced \\
+  Reflection & Experiment & Sandwiched & Parallel Displaced & Disordered Sandwiched & Disordered Parallel Displaced \\
   \midrule
-  R-alkanes & 1.0 &  1.0 &  1.0  \\  
-  R-$\pi$   & 2.8 & 18.0 & 14.0  \\
-  R-spots   & 1.5 &  1.6 &  1.2  \\  % Need to get these actual data points
-  R-helix   & 0.9 &  --  & --    \\ 
+  R-alkanes & 1.0 &  1.0 &  1.0 & 1.0 & 1.0  \\  
+  R-spots   & 1.3 &  1.2 &  1.2 & 1.2 & 1.2  \\
+  R-$\pi$   & 2.8 & 18.1 & 14.2 & 7.8 & 10.0 \\
+  R-double  & 0.9 &  --  & --   &  -- & --   \\ 
   \bottomrule
   \end{tabular}
-  \caption{The relative intensities of reflections of interest}
+  \caption{The simulated XRD patterns of the systems tested, normalized so that the average 
+  intensity of R-alkanes equals 1, show R-$\pi$ reflections that are significantly higher 
+  than experiment and R-spots reflections that are slightly lower than experiment. R-double
+  does not appear in any patterns, and thus has no measurable intensity.}
   \label{table:relative_inensities_300K} 
   \end{table}
 
 %  The simulated XRD pattern produced from the sandwiched configuration is missing
-%  R-helix and R-spots. 
+%  R-double and R-spots. 
 %  \begin{itemize}
 %		\item R-pores and R-alkanes appear in their expected locations. 
 %		\item R-pores is more intense than experiment, likely because we are simulating a 
@@ -1226,13 +1262,13 @@ We want to know
   %BJC: discussed parallel displaced and sandwiched configs in separate paragraphs to 
   % avoid confusion. Need to make thesis less dry. 
 %  The simulated XRD pattern generated from the parallel displaced configuration is also
-%  missing R-helix and R-spots.
+%  missing R-double and R-spots.
 %  \begin{itemize}
 %  		\item R-pores and R-alkanes appear in the expected location again
 %  		\item R-$\pi$ is present in the same location as the sandwiched configuration with
 %  		high intensity. 
-%  		\item R-helix is not present, however off-axis reflections appear at the same value 
-%  		of $q_z$ where we expect to see R-helix. These appear since there is a helical 
+%  		\item R-double is not present, however off-axis reflections appear at the same value 
+%  		of $q_z$ where we expect to see R-double. These appear since there is a helical 
 %  		arrangement of monomers in the parallel displaced configuration. A helix alone will
 %  		not give rise to a reflection at $q_r = 0$ (See supporting info for demonstration)
 %  		\item There is elevated intensity where we expect to see R-spots, however it cannot
@@ -1240,78 +1276,139 @@ We want to know
 %  		bottom of R-alkanes.
 %  \end{itemize}
 
-%  The simulated diffraction patterns indicate that there is something going wrong
-%  with the way the system is modeled. We must address all of these issues and justify
-%  their occurrence.
   There are clear differences between our simulated results and experimental results
   that must be addressed and justified. We will explore the origin of each experimental 
-  reflection and hypothesize why they do not appear in our simulated patterns. Specifically,
-  we want answer:  
-  %BJC: I could number these and answer them individually
+  reflection and form structural hypotheses related to their appearance in our simulated 
+  patterns. Specifically, we want answer:  
   \begin{enumerate}
 	\item What is the origin of R-spots?
   	\item Why is the intensity of R-$\pi$ so much greater than experiment?
-  	\item What is the origin of R-helix?
+  	\item What is the origin of R-double?
   \end{enumerate}
 
-  \subsubsection{Origin of R-spots}
+  \subsubsection{Origin of R-spots}\label{section:rspots}
 
-  We observed R-spots when we ran simulations of each system at 280K. (figure to be added - include with 300K patterns or keep separate??)
+  We observe an increase in the intensity of R-spots when we simulate systems at 280K. 
   \begin{itemize}
   		\item R-spots is most intense in the sandwiched configuration
-  		\item Still no R-helix
+  		(Figure~\ref{fig:sandwiched280K}).
+  		\item The relative intensity of R-spots is higher than in experiment (1.5 vs. 1.3) 
+  		\item Still no R-double
+  		\item We can use this configuration to more thoroughly explore the origin of R-spots.
   \end{itemize}
   
+  \begin{figure}
+	  \begin{subfigure}{0.45\linewidth}
+	  	\centering
+	  	\includegraphics[width=\linewidth]{WAXS_raw_jet.png}
+	  	\caption{}
+	  \end{subfigure}
+	  \begin{subfigure}{0.45\linewidth}
+	  	\centering
+	  	\includegraphics[width=\linewidth]{rzplot_layered_280K_jet.png}
+	  	\caption{}\label{fig:sandwiched280K}
+	  \end{subfigure}
+  \caption{R-spots increases in intensity when the temperature of the system is lowered to 280K.
+  In this case, the simulated R-spots is more intense than experiment.}
+  \end{figure}
+  
+  % %BJC3: update with 300K pics. Presented separately from 280K for now. 
+%  \begin{figure}
+%  \begin{subfigure}{0.3\linewidth}
+%        \centering
+%        \vspace{-0.2em}
+%        \includegraphics[width=1.1\linewidth,trim={1cm 0 1.3cm 0},clip]{rzplot_offset_300K.png}
+%        \caption{}~\label{fig:rz_offset}
+%  \end{subfigure}
+%  \begin{subfigure}{0.3\linewidth}
+%        \centering
+%        \vspace{0.25em}
+%        \includegraphics[scale=0.285]{WAXS_raw.png}
+%        \caption{}~\label{fig:raw_waxs}
+%  \end{subfigure}
+%  \begin{subfigure}{0.3\linewidth}
+%        \centering
+%        \includegraphics[width=1.1\linewidth,trim={1cm 0 1.3cm 0},clip]{rzplot_layered_300K.png}
+%        \caption{}~\label{fig:rz_layered}
+%  \end{subfigure}
+%  \begin{subfigure}{0.0544\linewidth}
+%        \centering
+%        \vspace{-4.00em}
+%        \includegraphics[width=\linewidth]{colorbar_seismic.png}
+%  \end{subfigure}
+%%MRS6: question: the SAXS region looks different between sandwiched and parallel displaced. Any thoughts why? We can discuss in person.  And seems like have to comment on the difference in intensity between Sandwich and parallel displaced in the pi-pi region.
+%%MRS6: I wonder to what extent showing the reflections of tails removed would make it clearer pi-pi is really there.  Maybe in supporting info?
+%%BJC2: Sure, I'll add that to supporting info
+%%  \caption{The simulated XRD pattern generated from the equilibrated trajectory
+%%	  of the parallel displaced configuration (a) exhibits all major reflections
+%%	  present in the experimental WAXS pattern (b). The simulated XRD pattern
+%%	  generated from the equilibrated trajectory in the sandwiched configuration (c) shows
+%%	  all major reflections except R-double.}
+%  \label{fig:XRDsim}
+%  \end{figure}
+
   %BJC: might be able to combine with other table
-  \begin{table}[h]
-  \centering
-  \begin{tabular}{cccc}
-  \toprule
-  		   & \multicolumn{3}{c}{Configuration} \\
-  \hline
-  Reflection & Experiment & Sandwiched & Parallel Displaced \\
-  \midrule
-  R-alkanes & 1.0 &  1.0 &  1.0  \\  
-  R-$\pi$   & 2.8 & 27.0 & 119.0  \\
-  R-spots   & 1.5 &  1.6 &  1.2  \\  
-  R-helix   & 0.9 &  --  & --    \\ 
-  \bottomrule
-  \end{tabular}
-  \caption{The relative intensities of reflections of interest}
-  \label{table:relative_inensities_300K} 
-  \end{table}
+%  \begin{table}[h]
+%  \centering
+%  \begin{tabular}{cccc}
+%  \toprule
+%  		   & \multicolumn{3}{c}{Configuration} \\
+%  \hline
+%  Reflection & Experiment & Sandwiched & Parallel Displaced \\
+%  \midrule
+%  R-alkanes & 1.0 &  1.0 &   1.0  \\  
+%  R-$\pi$   & 2.8 & 27.1 & 119.3  \\
+%  R-spots   & 1.3 &  1.6 &   1.2  \\  
+%  R-double  & 0.9 &  --  &   --   \\ 
+%  \bottomrule
+%  \end{tabular}
+%  \caption{The relative intensities of reflections of interest}
+%  \label{table:relative_inensities_280K} 
+%  \end{table}
   
   %BJC3: following taken from draft.tex
-  The R-spots signal, which appears in both simulated XRD patterns, is not a
-  result of alkane chain tilt. Previous literature has attributed the spots in
-  this particular WAXS pattern as the product of tilted alkane
+  The R-spots signal is not a result of alkane chain tilt. Previous literature
+  has attributed the spots in this particular WAXS pattern as the product of tilted alkane
   chains~\cite{feng_scalable_2014}. We looked closer at the sandwiched
-  configuration since R-spots appears with the most strength in its simulated XRD
-  pattern. We measured the tilt angle of the alkane chains and showed that our
-  system equilibrates to an average tilt angle close to zero degrees
+  configuration simulated at 280K since R-spots appears with the most strength in 
+  its simulated XRD pattern. We measured the tilt angle of the alkane chains and 
+  showed that our system equilibrates to an average tilt angle close to zero degrees
   (Fig.~\ref{fig:tilt}). 
-
-  %BJC3: from draft.tex  
-  To understand the origin of R-spots, we determined which
-  atoms gave rise to the feature. Since R-spots is present as higher intensity
-  spots within R-alkanes, it is likely that the spots arise as a consequence of
-  the tails. By removing all non-tail atoms from the trajectory and simulating a
-  diffraction pattern, we were able to isolate the cause of the spots to the
-  tails (Figure~\ref{fig:tails}). Since the tails stay nearly flat, we plotted
-  the centroids of the tails and measured the angle between each centroid and its
-  nearest neighbors with respect to the plane of the membrane.  We see distinct
-  peaks in the distribution of these angles (Figure~\ref{fig:tail_packing}).
-
+  
+   %BJC4: include dashed line at mean. 
   \begin{figure}
   \centering
   \includegraphics[width=0.5\linewidth]{tilt_dist.png}
   \caption{We measured the angle made between each monomer alkane tail and the
 	  membrane plane. The average tilt angle is near 7\degree~which is far from the
 	  37\degree~tilt angle previously used to explain R-spots.}~\label{fig:tilt}
-  %MRS6: might want to add some discussion about how the angles are also very spread out, so there should be little signal due to tilt anywhere.
-  %BJC2: good idea
   \end{figure}
 
+  %BJC3: from draft.tex  
+  To understand the origin of R-spots, we determined which
+  atoms gave rise to the feature. Since R-spots is present as higher intensity
+  spots within R-alkanes, it is likely that the spots arise as a consequence of
+  the tails. By removing all non-tail atoms from the trajectory and simulating a
+  diffraction pattern with the remaining atoms, we were able to isolate the cause of the spots to the
+  tails (Figure~\ref{fig:tails}). Since the tails stay nearly flat, we plotted
+  the centroids of the tails and measured the angle between each centroid and its
+  nearest neighbors with respect to the plane of the membrane.  We see distinct
+  peaks in the distribution of these angles (Figure~\ref{fig:tail_packing}).
+
+%  The peaks in the nearest neighbor angle distribution are consistent with the
+%  location of R-spots. The peaks of interest in Figures \ref{fig:offset_tails}
+%  and \ref{fig:layered_tails} are located at $\pm 33 \degree$ which is the same
+%  location where the highest intensity of spots are located on the simulated
+%  patterns. We confirmed this conclusion by radially integrating the 2D WAXS
+%  pattern for $\left|\mathbf{q}\right|$ values between 1.4 and 1.57 (between 4
+%  and 4.5 \AA~in real space). We observe that distinct peaks appear ca. $30
+%  \degree$, in close agreement with the previously measured angle distribution
+%  (Figs.~\ref{fig:offset_integration}~and~\ref{fig:layered_integration}). We
+%  performed the same integration on the raw experimental data and found the angle
+%  at which R-spots reaches its highest intensity to be $\pm 37 \degree$ which
+%  is a reconcilable difference with our simulated results.
+  
+  %BJC: modification of above paragraph to only include 280K sandwiched data
   The peaks in the nearest neighbor angle distribution are consistent with the
   location of R-spots. The peaks of interest in Figures \ref{fig:offset_tails}
   and \ref{fig:layered_tails} are located at $\pm 33 \degree$ which is the same
@@ -1341,7 +1438,7 @@ We want to know
 	\end{subfigure}
 	\begin{subfigure}{0.45\linewidth}
 		\centering
-		\includegraphics[width=\textwidth]{tails_rzplot.png}
+		\includegraphics[width=\textwidth]{tails_rzplot_jet.png}
 		\caption{}\label{fig:tails_rzplot}
 	\end{subfigure}
 	\caption{(a) We removed all atoms except carbon atoms that constitute the tails from a 
@@ -1349,21 +1446,56 @@ We want to know
         tail-only trajectory still shows R-spots}\label{fig:tails}
   \end{figure}
 
+%  \begin{figure}[!htb]
+%  \centering
+%  	\begin{subfigure}{\linewidth}
+%	\centering
+%		\begin{subfigure}{0.45\textwidth}
+%        		\centering
+%        		\includegraphics[width=\linewidth]{offset_tail_packing.png}
+%        		\caption{}~\label{fig:offset_tails}
+%		\end{subfigure}
+%		\begin{subfigure}{0.45\textwidth}
+%		\centering
+%	        	\includegraphics[width=\linewidth]{offset_angle_v_I.png}
+%		        \caption{}~\label{fig:offset_integration}
+%		\end{subfigure}
+%	\end{subfigure}
+%	\begin{subfigure}{\linewidth}
+%	\centering
+%		\begin{subfigure}{0.45\textwidth}
+%	        \centering
+%		        \includegraphics[width=\linewidth]{angles_traj_layered.png}
+%		        \caption{}~\label{fig:layered_tails}
+%		\end{subfigure}
+%		\begin{subfigure}{0.45\textwidth}
+%        	\centering
+%		        \includegraphics[width=\linewidth]{layered_angle_v_I.png}
+%		        \caption{}~\label{fig:layered_integration}
+%		\end{subfigure}
+%	\end{subfigure} 
+%    %MRS4: caption is probably too long.
+%    \caption{We hypothesize that R-spots is the result of ordered tail packing.
+%	  Defining the membrane plane to be 0\degree, we measured the angles between each
+%	  alkane chain tail centroid and its nearest neighbor centroids for the
+%	  equilibrated parallel displaced (a) and sandwiched (c) configurations. Peaks
+%	  that appear in each distribution are centered near $\pm~33\degree$. We radially
+%	  integrated the simulated XRD patterns of the parallel displaced and sandwiched
+%	  configuration within the region bounding R-alkanes ((b) and (d) respectively).
+%	  Peaks appear in the same location as the angle distributions which corroborates
+%	  our hypothesis. Further, we note that the peaks are strongest in both plots
+%	  associated with the sandwiched configuration. As shown in Figure
+%	  \ref{fig:rz_layered}, systems simulated in the sandwiched configuration exhibit
+%	  more intense R-spots reflections. Note that plots of integrated intensity are
+%	  normalized so the average alkane intensity (excluding reflections $\pm
+%	  30\degree$ from the $q_z$ axis) is set to 1.  Plots are cut off for intensities
+%	  greater than 2 so peaks are more visible.}~\label{fig:tail_packing}
+%  \end{figure}   		
+
+  % BJC4: modification of above figure to only included sandwiched data. The rest can go
+  % in supporting info.
   \begin{figure}[!htb]
   \centering
-  	\begin{subfigure}{\linewidth}
-	\centering
-		\begin{subfigure}{0.45\textwidth}
-        		\centering
-        		\includegraphics[width=\linewidth]{offset_tail_packing.png}
-        		\caption{}~\label{fig:offset_tails}
-		\end{subfigure}
-		\begin{subfigure}{0.45\textwidth}
-		\centering
-	        	\includegraphics[width=\linewidth]{offset_angle_v_I.png}
-		        \caption{}~\label{fig:offset_integration}
-		\end{subfigure}
-	\end{subfigure}
 	\begin{subfigure}{\linewidth}
 	\centering
 		\begin{subfigure}{0.45\textwidth}
@@ -1377,25 +1509,18 @@ We want to know
 		        \caption{}~\label{fig:layered_integration}
 		\end{subfigure}
 	\end{subfigure} 
-    %MRS4: caption is probably too long.
     \caption{We hypothesize that R-spots is the result of ordered tail packing.
 	  Defining the membrane plane to be 0\degree, we measured the angles between each
 	  alkane chain tail centroid and its nearest neighbor centroids for the
-	  equilibrated parallel displaced (a) and sandwiched (c) configurations. Peaks
+	  equilibrated sandwiched configuration simulated at 280K. Peaks
 	  that appear in each distribution are centered near $\pm~33\degree$. We radially
 	  integrated the simulated XRD patterns of the parallel displaced and sandwiched
-	  configuration within the region bounding R-alkanes ((b) and (d) respectively).
+	  configuration within the region bounding R-alkanes.
 	  Peaks appear in the same location as the angle distributions which corroborates
-	  our hypothesis. Further, we note that the peaks are strongest in both plots
-	  associated with the sandwiched configuration. As shown in Figure
-	  \ref{fig:rz_layered}, systems simulated in the sandwiched configuration exhibit
-	  more intense R-spots reflections. Note that plots of integrated intensity are
-	  normalized so the average alkane intensity (excluding reflections $\pm
-	  30\degree$ from the $q_z$ axis) is set to 1.  Plots are cut off for intensities
-	  greater than 2 so peaks are more visible.}~\label{fig:tail_packing}
-  \end{figure}   		
-  		
-  There are a couple reasons why we see ordered chain packing at 280 K and not at the
+	  our hypothesis.}~\label{fig:tail_packing}
+  \end{figure}  
+  
+  There are a couple reasons why we see stronger ordered chain packing at 280 K compared to
   experimental conditions of 300 K.
   \begin{itemize}
   		\item (1) The difference between 280K and 300K is small. Our forcefield parameters
@@ -1510,7 +1635,7 @@ We want to know
 %%BJC: I just need to get the labels right, they are the same thing technically
 %  \end{figure}
 
-  \subsubsection{Discrepancies between R-$\pi$}
+  \subsubsection{Discrepancies between R-$\pi$}\label{section:rpi}
   
   We plotted the one-dimensional pair distribution function, $g(z)$, for the centers
   of mass of monomer phenyl rings (Figure reference).
@@ -1523,8 +1648,35 @@ We want to know
   		ring (2.8 \AA) and two times the carbon atom radius (0.7 \AA).
   \end{itemize}
   
+  %BJC4: the correlation functions of disordered systems are confusing me.
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{z_correlation_sandwich.png}
+  \caption{}\label{fig:z_correlation_sandwich}
+  \end{subfigure}  
+  \begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{z_correlation_offset.png}
+  \caption{}\label{fig:z_correlation_offset}
+  \end{subfigure}  
+  \begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{z_correlation_sandwich_disordered.png}
+  \caption{}\label{fig:z_correlation_sandwich_disordered}
+  \end{subfigure}  
+  \begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{z_correlation_offset_disordered.png}
+  \caption{}\label{fig:z_correlation_offset_disordered}
+  \end{subfigure}  
+  \caption{}\label{fig:correlation}
+  \end{figure}
+  
   The correlation length between stacked monomer head groups shows the best agreement with
-  experiment for systems simulated at 300K.
+  experimental for systems simulated at 300K.
   %BJC3: explanation of correlation length calculation in methods section. 
   \begin{itemize}
   		\item Correlation length was calculated by fitting a decaying exponential function
@@ -1550,14 +1702,14 @@ We want to know
   		of R-$\pi$. 
   \end{itemize}
   
-  \subsubsection{Origin of R-helix}
+  \subsubsection{Origin of R-double}\label{section:rdouble}
   
-  R-helix will not show up in any of the models tested so far.
+  R-double will not show up in any of the models tested so far.
   \begin{itemize}
         \item All monomers used to build initial configurations are identical. There is no way 	
-        to produce R-helix without a more complex initial configuration 
+        to produce R-double without a more complex initial configuration 
         \item We calculated the structure factor of simple systems that mimic the parallel
-        displaced and sandwiched configurations. Neither give rise to R-helix.
+        displaced and sandwiched configurations. Neither give rise to R-double.
         (See Figure "fourier transforms of simple systems").
         \item The reflection implies a vertical modulation in electron density every 7.4 \AA.                
         \item This modulation can occur in either the head or the tails
@@ -1565,7 +1717,7 @@ We want to know
         on what makes the most physical sense.
   \end{itemize}
   
-  We can produce R-helix if our initial configuration contains alternating parallel and
+  We can produce R-double if our initial configuration contains alternating parallel and
   antiparallel carboxylate groups relative to the plane of the monomer's phenyl ring.
   (Figure reference).  
   \begin{itemize}
@@ -1589,7 +1741,7 @@ We want to know
   		hindered. 
   \end{itemize}
   
-  We can also produce R-helix if layers are not uniformly spaced. Rather, monomers might form 
+  We can also produce R-double if layers are not uniformly spaced. Rather, monomers might form 
   pairs that stack less than 3.7 \AA apart, and whose center of masses are spaced 7.4 \AA 
   from the next pair of monomers.(Figure reference)
   \begin{itemize}
@@ -1598,20 +1750,19 @@ We want to know
   		\item Our forcefield causes our system to tend towards uniformly spaced layers. 
   		\item As expected, simulations of this type of system are only stable if position
   		restraints are applied to heavy atoms of the phenyl rings.
-  		\item Many \textit{ab initio} studies have measured the equilibrium distance between
-  		dimers of benzene and substituted benzene.
-%MRS: don't need to include this point.
-  		\item Tauer and Sherrill explored the binding energies of tetramers of benzene, but
-  		did not explore the report the equilibrium distance between benzene rings. 
-  		\item Even if there have been other studies of the equilibrium distance between 
-  		stacks of benzene rings, it still does not model our system which has many 
-  		electron-withdrawing groups and bulky substituents that would likely affect stacking
-  		preferences. 
+%  		\item Many \textit{ab initio} studies have measured the equilibrium distance between
+%  		dimers of benzene and substituted benzene.
+%%MRS: don't need to include this point.
+%  		\item Tauer and Sherrill explored the binding energies of tetramers of benzene, but
+%  		did not explore the report the equilibrium distance between benzene rings. 
+%  		\item Even if there have been other studies of the equilibrium distance between 
+%  		stacks of benzene rings, it still does not model our system which has many 
+%  		electron-withdrawing groups and bulky substituents that would likely affect stacking
+%  		preferences. 
   \end{itemize}
   
-  Our final hypothesized configuration which produces R-helix focus on the orientation of the
+   Our final hypothesized configuration which produces R-double focus on the orientation of the
    tails. 
-  %MRS4: we will need to wait to see the results for this come out to really discuss this well.
    \begin{itemize}
   		\item In this configuration, monomers are rotated so that the vector created by the  
   		bond extending from the carboxylate carbon to the phenyl ring is oriented $\pm 15 	
@@ -1622,7 +1773,7 @@ We want to know
   		\item This configuration allows monomer tails to sit between adjacent monomer tails 
   		which may be the most favorable way for them to pack. 
   		\item This configuration is stable short-term while unrestrained.
-  		\item This may be the most reasonable explanation for the appearance of R-helix. The
+  		\item This may be the most reasonable explanation for the appearance of R-double. The
   		long-term stability of a configuration similar to this may be feasible if monomers
   		stay stacked 3.7 \AA apart. 
   \end{itemize}
@@ -1722,17 +1873,17 @@ We want to know
   %	simulation is likely a result of the inability of GAFF to properly handle
   %	aromatic interactions. %MRS: provide citations, some mechanistic reasoning.
   %	\item The sandwiched configuration shows R-spots in the expected location.
-  %	\item A faint reflection is present in the location of R-helix %BJC: but it fades upon further simulation.
+  %	\item A faint reflection is present in the location of R-double %BJC: but it fades upon further simulation.
   %	\item The parallel displaced configuration contains two lines of high 
   %	intensity with maximum intensity occurring where they intersect the alkane
   %	chain region due to constructive interference between the two features.
-  %	\item The lines are located where one would expect to see R-helix and, 
+  %	\item The lines are located where one would expect to see R-double and, 
   %	perhaps coincidentally, the intersection with R-alkanes occurs where one 
   %	would expect to see R-spots.
 	%BJC: might save the following sentence for equilibrium trajectories
   %	\item As the simulation is progressed, the full line begins to fade 
   %	(Figure~\ref{fig:XRDsim}). Most significantly, the line is no longer present
-  %	where R-helix exists.
+  %	where R-double exists.
   %\end{itemize}
 
   %\begin{figure}[!ht]
@@ -1756,7 +1907,7 @@ We want to know
   %	restrained parallel displaced configuration may also contain all
   %	major experimental WAXS features. One can argue that R-spots is not present
   %	but it is difficult to distinguish because of its intersection with the solid
-  %	R-helix line. 
+  %	R-double line. 
         %MRS: Longer simulations are necessary to determine which structure
 	% is the best match to experiment
         %MRS: we probably want to avoid saying this (above) if we can.
@@ -1815,7 +1966,7 @@ We want to know
 %  Simulated diffraction of the disordered pore structure in the both the sandwiched
 %  and parallel displaced configurations does not match the experimental pattern.
 %  \begin{itemize}
-%        \item The disordered pore structure exhibits R-alkanes and R-pores but R-helix,
+%        \item The disordered pore structure exhibits R-alkanes and R-pores but R-double,
 %	R-$\pi$ and R-spots are not present. 
 %        \item Due to low resolution, making out the individual spots of R-pores is
 %        challenging and can be validated with slightly better resolution upon full
@@ -1835,13 +1986,13 @@ We want to know
 %        \item R-alkanes, R-pores and R-$\pi$ appear as they do in the sandwiched configuration.
 %        \item R-spots appears, however with a lower intensity relative to R-alkanes
 %        when compared to the sandwiched configuration.
-%        \item R-helix appears apparently due to the parallel displaced aromatic rings
+%        \item R-double appears apparently due to the parallel displaced aromatic rings
         %BJC: Maybe a figure to explain why this happens
 %  \end{itemize}
 
   %BJC: Put this paragraph second so people understand why it is wrong and don't fixate on how nice the spots are
 %  Simulated XRD of the sandwiched configuration contains all experimental features
-%  except for R-helix.
+%  except for R-double.
 %  \begin{itemize}
 %        \item R-alkanes and R-pores appear in the expected locations.
 %        \item R-$\pi$ is also present, intersecting R-alkanes at a lower q value than
@@ -1873,12 +2024,12 @@ We want to know
 %		\includegraphics[width=\textwidth]{disorder_rzplot.png}
 %		\caption{}\label{fig:disorder_rzplot.png}
 %	\end{subfigure}
-%	\caption{(a) All major features except R-helix are present in
+%	\caption{(a) All major features except R-double are present in
 %	XRD patterns resulting from an equilibrated sandwiched configuration 
-%	in Basin A. R-$\pi$ intersescts R-alkanes. R-helix faded during equilbration.
+%	in Basin A. R-$\pi$ intersescts R-alkanes. R-double faded during equilbration.
 %	(b) All major features execpt R-spots are present in XRD patterns 
 %	resulting from an equilibrated parallel displaced configuration in Basin A.
-%	R-helix exists faintly in the expected location. (c) R-pores and R-alkanes
+%	R-double exists faintly in the expected location. (c) R-pores and R-alkanes
 %	are the only major features present in XRD patterns resulting from an 
 %	equilibrated disordered phase}\label{fig:XRDsim}
  % \end{figure}
@@ -1915,7 +2066,7 @@ We want to know
 %  \caption{(a) Experimental 2D WAXS data contains 5 major reflections which we aim to match. The remaining
 %  three images are diffraction patterns simulated from MD trajectories. (b) The parallel displaced
 %  configuration gives rise to all reflections of interest. (c) The sandwiched configurations gives rise to a
-%  pattern with all major reflections except R-helix. R-spots is strong relative to R-alkanes in comparison
+%  pattern with all major reflections except R-double. R-spots is strong relative to R-alkanes in comparison
 %  to the parallel displaced configuration. (d) The disordered pore configuration creates a pattern with only
 %  R-alkanes and R-pores in common with experiment}~\label{fig:xrd}
 %  \end{figure}
@@ -2032,60 +2183,134 @@ We want to know
 
   \subsection{Pore composition}
   
-  STOP HERE!!
+  We plotted the number densities of heavy atoms in the head group, carbon atoms in the tail
+  region and all sodium ions (Figure~\ref{fig:densities}). For the head group
+  region, we used the carbon atoms making up the aromatic ring. For the tail
+  region we used only carbon atoms of the monomer tails (See Supporting
+  Information for diagram). We average the histograms over at least 50 ns of
+  equilibrated trajectory.
+  
+  In all cases, the space in the pore region is filled with sodium ions and
+  head groups. Systems in the ordered pore basin are less dense in
+  the center of the pore. In both the sandwiched and parallel displaced
+  configurations, we see the density of head groups and sodium ions fall to less
+  than 50\% of its maximum at r = 0 (Fig.~\ref{fig:layered_density}). The
+  situation is most pronounced in the sandwiched configuration where the maximum
+  head group density occurs 0.44 nm from the pore center. The parallel displaced
+  configuration reaches its maximum 0.35 nm from the pore center. In contrast,
+  both disordered pore systems show very little difference in density from its
+  maximum. This implies a more uniform distribution of head groups within the
+  pore center. This is the same conclusion drawn from the plots of $g(x,y)$ 
+  (Figure~\ref{fig:xy_correlation}). 
+  % High vacancy is less likely to be stable in the real system
 
-  We answer (\ref{point:water}) and further support (\ref{point:orientation}) by preparing parallel displaced and
-  sandwiched configurations according to the wet equilibration procedure.
+  There is a partition between the hydrophobic and hydrophilic regions, however
+  it is a gradient in composition, rather than an abrupt division. The system
+  does not confine sodium ions and head groups to just within the pore region.
+  Assuming a pore radius of 0.6 nm, we see in all cases, that 19\% of sodium ions
+  exist outside the pore region (except sandwiched, ordered pore, where 16\%
+  are outside the pore). Additionally, we see that in all cases, about 3\% of the
+  plotted tail density is located within the pore region (except sandwiched,
+  ordered pore, where 1.5\% are within the pore region). These observations bring
+  into question how one should define a pore in these types of systems. One
+  usually measures a membrane's pore radius based on the size of a molecule it
+  can reject, however it is not clear where the edges of the pores are and what
+  size molecule would fit through. We leave these investigations for a future
+  study.
+  
+  In general, the composition of the pores is similar between all systems. 
   \begin{itemize}
-	\item We do not have an experimental measurement of water in the pores
-	\item We tested a range of water concentrations from 0.5 to 5 percent % working on a 0.5 wt % sytstem now just to see
-	\item Our lower bound represents a system with on average 2 water 
-	molecules for each monomer layer.
-	\item Figure ~\ref{fig:solvation} shows results for each configuration.
-%	\item Initially, we decided the number of waters to put in each pore by
-%	estimating the number of hydrogen bonds in which pore entities could participate.
-%	\item In solution, each headgroup has a charge of -1
-%	\item We estimate there to be at least 2 water molecules per layer based 
-%	on various packing configurations and geometric constraints
-%	\item 4 water molecules per layer translates to about 1.6 wt \%
-  \end{itemize}
+  	\item We believe we can study transport in any of the systems presented here and
+  	still extract valuable information.
+  	\item We will need to verify that this assumption is true.
+  \end{itemize}  
 
   \begin{figure}
-	\centering
-	\includegraphics[width=\textwidth]{solvation.png}  % still working on formatting so this is a screenshot of a doctored latex figure
-        %MRS2: include 0% as well? Maybe leave off 5% if not relevant in the end?
-	\label{fig:solvation}
+  \centering
+  \begin{subfigure}{0.47\textwidth}
+        \includegraphics[width=1\linewidth]{offset_density.png}
+        \caption{Parallel Displaced, Ordered Pore Basin}
+        \label{fig:offset_density}
+  \end{subfigure}
+  \begin{subfigure}{0.47\textwidth}
+        \includegraphics[width=1\linewidth]{layered_density.png}
+        \caption{Sandwiched, Ordered Pore Basin}
+        \label{fig:layered_density}
+  \end{subfigure}
+  \begin{subfigure}{0.47\textwidth}
+        \includegraphics[width=1\linewidth]{disordered_offset_density.png}
+        \caption{Parallel Displaced, Disorderd Pore Basin}
+        \label{fig:disordered_offset_density}
+  \end{subfigure}
+  \begin{subfigure}{0.47\textwidth}
+        \includegraphics[width=1\linewidth]{disordered_density.png}
+        \caption{Sandwiched, Disordered Pore Basin}
+        \label{fig:disorder_layered_density}
+  \end{subfigure}
+  \caption{In all cases, the component radial distribution functions exhibit a
+	  composition gradient transitioning from the hydrophilic to the hydrophobic
+	  regions. Systems with layers initially spaced 3.7 \AA~apart in the  parallel
+	  displaced (a), and sandwiched (b) configurations both show the highest
+	  concentrations of ions and head groups away from the pore center. Systems with
+	  layers initially spaced 5 \AA~apart (c) and (d), both show the highest
+	  concentrations of ions and head groups near the pore center, implying a more
+	  uniform, disordered pore.}~\label{fig:densities}
   \end{figure}
 
-  In all cases, water disrupts structuring of the model.
-  \begin{itemize}
-	\item The plots in Figure ~\ref{fig:solvation} are normalized 
-	to have the same colorbar as the dry systems. 
-	\item The intensity of the reflections decrease when water is 
-	added to the system.
-	\item In systems built with 5 weight percent water, R-$\pi$ and
-	R-spots become nearly indistinguishable from R-alkanes.
-  \end{itemize}
+  END
+  
+%  We answer (\ref{point:water}) and further support (\ref{point:orientation}) by preparing parallel displaced and
+%  sandwiched configurations according to the wet equilibration procedure.
+%  \begin{itemize}
+%	\item We do not have an experimental measurement of water in the pores
+%	\item We tested a range of water concentrations from 0.5 to 5 percent % working on a 0.5 wt % sytstem now just to see
+%	\item Our lower bound represents a system with on average 2 water 
+%	molecules for each monomer layer.
+%	\item Figure ~\ref{fig:solvation} shows results for each configuration.
+%%	\item Initially, we decided the number of waters to put in each pore by
+%%	estimating the number of hydrogen bonds in which pore entities could participate.
+%%	\item In solution, each headgroup has a charge of -1
+%%	\item We estimate there to be at least 2 water molecules per layer based 
+%%	on various packing configurations and geometric constraints
+%%	\item 4 water molecules per layer translates to about 1.6 wt \%
+%  \end{itemize}
+%
+%  \begin{figure}
+%	\centering
+%	\includegraphics[width=\textwidth]{solvation.png}  % still working on formatting so this is a screenshot of a doctored latex figure
+%        %MRS2: include 0% as well? Maybe leave off 5% if not relevant in the end?
+%	\label{fig:solvation}
+%  \end{figure}
+%
+%  In all cases, water disrupts structuring of the model.
+%  \begin{itemize}
+%	\item The plots in Figure ~\ref{fig:solvation} are normalized 
+%	to have the same colorbar as the dry systems. 
+%	\item The intensity of the reflections decrease when water is 
+%	added to the system.
+%	\item In systems built with 5 weight percent water, R-$\pi$ and
+%	R-spots become nearly indistinguishable from R-alkanes.
+%  \end{itemize}
 
 %MRS3: is this point the right ``main'' thesis to make? I thought it was a more simple statement of being interested as to how water affected the structure.  FYI, would be interesting to see the RDF's of the pores with and without water, BUT I think that's not necessary for this paper, that's more a 2nd paper thing.
 %MRS3: we didn't really test if water is  needed to obtain the structures; clearly, w/o water it's metastable for a long time.  We don't need the water simulations to prove this.  
-  Water is not needed to obtain and simulate the correct equilibrium 
-  membrane structure.
-  \begin{itemize}
-	\item We note that water absorbed during membrane synthesis may
-        be present in far lower concentrations than those 
-        tested here.
-	\item We do not eliminate the possibility that water is necessary
-        in order to drive self-assembly. Studying the mechanisms of self assembly is
-	beyond the scope of this work.
-	\item However, once the system has formed the Col\textsubscript{h} 
-	phase, adding water only drives disorder in the structure
-	\item In the equilibrium configuration, if water exists, it is confined
-	to the pore region where there is no driving force for aggregation of 
-	water molecules. 
-	\item In the case of trace water, water molecules will be too sparse to
-	form a hydrogen bonding network.
-  \end{itemize}
+%  Water is not needed to obtain and simulate the correct equilibrium 
+%  membrane structure.
+%  \begin{itemize}
+%	\item We note that water absorbed during membrane synthesis may
+%        be present in far lower concentrations than those 
+%        tested here.
+%	\item We do not eliminate the possibility that water is necessary
+%        in order to drive self-assembly. Studying the mechanisms of self assembly is
+%	beyond the scope of this work.
+%	\item However, once the system has formed the Col\textsubscript{h} 
+%	phase, adding water only drives disorder in the structure
+%	\item In the equilibrium configuration, if water exists, it is confined
+%	to the pore region where there is no driving force for aggregation of 
+%	water molecules. 
+%	\item In the case of trace water, water molecules will be too sparse to
+%	form a hydrogen bonding network.
+%  \end{itemize}
 
   %BJC: old version of above figure v v v
   %\begin{figure}[ht]
