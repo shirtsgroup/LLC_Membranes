@@ -8,6 +8,7 @@ import subprocess
 import os
 from pymbar import timeseries
 from scipy.optimize import curve_fit
+import tqdm
 
 
 def initialize():
@@ -24,17 +25,66 @@ def initialize():
     return args
 
 
-def autocorrelation(x):
-    """ FFT based autocorrelation function, which is faster than numpy.correlate
-    :param numpy array of y values of an equispaced timeseries
+def largest_prime_factor(n):
+    i = 2
+    while i * i <= n:
+        if n % i:
+            i += 1
+        else:
+            n //= i
+    return n
+
+
+def prime_factors(n):
+    i = 2
+    factors = []
+    while i * i <= n:
+        if n % i:
+            i += 1
+        else:
+            n //= i
+            factors.append(i)
+    if n > 1:
+        factors.append(n)
+    return factors
+
+
+def autocorrelation(x, largest_prime=500):
+    """ FFT based autocorrelation function, which is faster than numpy.correlate. Efficiency is key in order to avoid
+    headaches.
+    :param x : numpy array of y values of an equispaced timeseries
+    :param largest_prime : the largest prime factor of array length allowed. The smaller the faster. 1.6M points takes
+    about 5 seconds with largest_prime=1000. Just be aware that you are losing data by truncating. But 5-6 data points
+    isn't a big deal usually.
     """
 
+    # Force length of array to be power of 2
+    # powers = np.array([2 ** i for i in range(25)])
+    # closest = np.argmin(np.abs(powers - (2*x.size - 1)))
+    # nzeros = (powers[closest] // 2) - x.size
+    # if nzeros < 0:
+    #     closest += 1
+    #     nzeros = (powers[closest] // 2) - x.size
+    # v = np.concatenate((x, np.zeros([nzeros])))
+
+    # Just don't allow a prime factor larger than 'largest_prime'. Truncate data until that condition is met
+    l = 2*x.size - 1
+
+    while largest_prime_factor(l) >= largest_prime or l % 2 == 0:
+        l -= 1
+
+    x = x[:(l + 1) // 2]
     length = x.size*2 - 1
+
     fftx = np.fft.fft(x, n=length)
     ret = np.fft.ifft(fftx * np.conjugate(fftx))
     ret = np.fft.fftshift(ret)
 
-    return ret[length // 2:] / np.amax(ret[length//2:])
+    auto = ret[length // 2:]  # used to return this, not sure if the following should happen
+    n = ret[length // 2:].shape[0]
+    average = [n - i for i in range(n)]
+
+    return auto / average  # / np.amax(ret[length//2:])  # don't normalize
 
 
 def estimated_autocorrelation(x):
@@ -122,8 +172,9 @@ class Viscosity(object):
             P[i - data_start, :] = [float(d) for d in data[2:]]
             T[i - data_start] = float(data[1])
 
-        P *= 100000  # convert from bar to pascal
+        self.time = np.array(self.time)
 
+        P *= 100000  # convert from bar to pascal
         # T_equil = timeseries.detectEquilibration(T)  # super slow for large number of data points
         self.Tavg = np.mean(T)
         self.prefactor = self.volume / (kb * self.Tavg)
@@ -132,12 +183,18 @@ class Viscosity(object):
         while self.time[self.nintervals] < self.max_lag:
             self.nintervals += 1
 
-        autocorr = np.zeros_like(P)
-        for i in range(6):
-            autocorr[:, i] = autocorrelation(P[:, 0]).real  # calculate autocorrelation function w/FFT
+        # autocorr = np.zeros_like(P)  # [=] Pa**2 * ps
+        print('Calculating autocorrelation function for all 6 off-diagonals')
+        # for i in tqdm.tqdm(range(6)):
+        #     autocorr[:, i] = autocorrelation(P[:, i]).real
 
-        self.autocorr = np.mean(autocorr, axis=1)  # average
-        self.runningintegral = running_integral(self.autocorr) * self.prefactor
+        self.autocorr = autocorrelation(P[:, 0]).real
+        for i in tqdm.tqdm(range(1, 6)):
+            self.autocorr += autocorrelation(P[:, i]).real  # calculate autocorrelation function w/FFT
+
+        self.autocorr /= 6
+        # self.autocorr = np.mean(autocorr, axis=1)  # average
+        self.runningintegral = 1*10**-12 * running_integral(self.autocorr[:self.nintervals]) * self.prefactor
 
         bounds = ([-np.inf, 0, 0, 0], [np.inf, 1, np.inf, np.inf])  # bounds on parameters that will be fit
 
@@ -147,55 +204,6 @@ class Viscosity(object):
 
         print('Infinite time viscosity: %.7f Pa-s' % viscosity_fit(np.inf, solp[0], solp[1], solp[2], solp[3]))
 
-        # # This one could take days
-        # start = time.time()
-        # autocorr = np.zeros([len(self.time)])
-        # for l in range(len(self.time)):
-        #     N = len(self.time) - l
-        #     for n in range(N):
-        #         autocorr[l] += P[n, 0]*P[n + l, 0]
-        #     autocorr[l] /= N
-        # print('Simple Autocorrelation function calcuating in %.2f seconds' % (time.time() - start))
-        # plt.plot(self.time, autocorr, label='slow')
-
-        # About 5x slower than fft method
-        # start = time.time()
-        # autocorr = estimated_autocorrelation(P[:, 0])
-        # print('Autocorrelation using np.correlate calcuated in %.2f seconds' %(time.time() - start))
-        # plt.plot(self.time, autocorr, label='np.correlate')
-        # plt.show()
-
-        # average all self.max_lag trajectories (break into len(self.time) / self.nintervals trajectories)
-        # n_trajectories = int(len(self.time) / self.nintervals)  # number of 'independent trajectories'
-        # upper_limit = n_trajectories * self.nintervals
-        # autocorrelation = np.zeros([6, n_trajectories, self.nintervals])
-        # for i in range(6):
-        #     autocorrelation[i, :, 0] = np.square(P[:upper_limit:self.nintervals, i])
-        #     for n in range(1, self.nintervals):
-        #         autocorrelation[i, :, n] = P[:upper_limit:self.nintervals, i]*P[n:upper_limit:self.nintervals, i]
-        #     plt.plot(self.time[:self.nintervals], autocorrelation[i, 0, :])
-        #     plt.show()
-        #     exit()
-        #
-        # average_autocorrelation = np.mean(autocorrelation, axis=(0, 1))
-        # plt.plot(self.time[1:self.nintervals], average_autocorrelation[1:])
-        # plt.show()
-        # autocorrelation[:, 0] = np.flatten(P)
-        # print(np.mean(np.square(P), axis=1).shape)
-
-        # full autocorrelation function (adjust nintervals to be equal to the number of data points) with msd-like stats
-        # autocorrelation[:, 0] = np.mean(np.square(P))
-        # for n in range(1, self.nintervals):
-        #     for t in range(self.nintervals - n):
-        #         for j in range(6):
-        #             autocorrelation[n] += (P[t, j]*P[t + n, j])
-        #     autocorrelation[n] /= 6*(self.nintervals - n)  # average
-
-        # for i in range(6):
-        #     plt.plot(self.time, P[:, i])
-        #
-        # plt.show()
-
     def plot_all(self, save=False):
         """
         Plot all relevant data
@@ -204,10 +212,10 @@ class Viscosity(object):
 
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
-        ax.plot(self.time[:10*self.nintervals], self.autocorr[:10*self.nintervals])
+        ax.plot(self.time[:10*self.nintervals], self.autocorr[:10*self.nintervals]/np.amax(self.autocorr[:10*self.nintervals]))
         left, bottom, width, height = [0.45, 0.4, 0.42, 0.42]
         ax2 = fig.add_axes([left, bottom, width, height])
-        ax2.plot(self.time[:self.nintervals], self.autocorr[:self.nintervals])
+        ax2.plot(self.time[:self.nintervals], self.autocorr[:self.nintervals]/np.amax(self.autocorr[:self.nintervals]))
         ax.set_xlabel('Time (ps)', fontsize=14)
         ax.set_ylabel('Autocorrelation', fontsize=14)
         ax2.set_ylim(-0.01, 0.025)

@@ -254,95 +254,148 @@ which will be laid out and numbered
 %    liquid crystal membrane simulations has the best chance of directly answering this question.
 %  \end{itemize}
 
-  Monomers in the Col\textsubscript{h} system are theorized to be partitioned
-  into stacked layers which form columnar pores. 
+%  Monomers in the Col\textsubscript{h} system are theorized to be partitioned
+%  into stacked layers which form columnar pores. 
 %BJC: commenting out :There has been no definitive answer in literature regarding the number of monomers in each layer. 
 %MRS3: the intro to the list talks about only ``numbers of monomers in each layer'', whereas the list below talks about several questions relating to layers. Can you rephrase so it's more general? Maybe just take out that sentence above.
-We want to know 
-\begin{enumerate}
-\item If layers do exist, how many monomers constitute a single layer? \label{point:monomernum}
-  \begin{itemize}
-    \item A simple molecular simulation study of a similar molecule suggested
-    that there are 4 monomers in each layer. Their estimation is based on a
-    simulated system containing only 16 total monomers which likely does not sufficiently
-    model the chemical environment present in the real system.~\cite{zhu_methacrylated_2006}. 
-    \item A separate calculation based on the volume of the liquid crystal monomers proposes
-    that there are seven monomers in each layer~\cite{resel_structural_2000}. 
-    \item A molecular model orders of magnitude larger than any other reported atomistic 
-    liquid crystal membrane simulations has the best chance of directly answering this question.
-    \item We can directly change the layer composition and note its effect on membrane structure.
-  \end{itemize}
-
- \item Does our model support the existence of layers and if so, how well defined
-  are the layers? \label{point:layers}
-  \begin{itemize}
-       \item Experimentally, their existence is supported by evidence of strong 
-       $\pi$-$\pi$ stacking interactions in the direction perpendicular to the
-       membrane plane.
-       \item $\pi$-$\pi$ stacking will only occur between the aromatic monomer head groups which
-       leaves no description of what is happening in the monomer tail region
-       \item The tails may entangle isotropically while stacking order is maintained
-       among headgroups. 
-  \end{itemize}  
-  
-   \item How do monomers in each layer position themselves with respect to surrounding 
-   layers? \label{point:orientation}
-%     Even if we knew the number of monomers in each layer, we still would not know how 
-%     monomers in each layer are positioned with respect to other layers. 
-   \begin{itemize}
-      \item The $\pi$-$\pi$ stacking interactions may be a driving force of self assembly 
-      in this system\cite{gazit_possible_2002} %is thought to be $\pi$-$\pi$ stacking interactions between aromatic headgroups \cite{gazit_possible_2002}. 
-      \item Gas phase ab initio studies of benzene dimers have shown a clear energetic
-      advantage for parallel displaced and T-shaped $\pi$-$\pi$ stacking conformations versus a
-      sandwiched conformation ~\cite{sinnokrot_estimates_2002}.
-      \item Substituted benzene rings exhibit an even stronger $\pi$-$\pi$ stacking 
-      attraction which favors the parallel displaced configuration in all cases
-      except where the substitutions are extremely electron withdrawing
-      \cite{waller_hybrid_2006,ringer_effect_2006}.
-      \item We can use simulated X-ray diffration patterns to compare the two 
-      stacking configurations. 
-   \end{itemize}
-
-  \item Can the system exist in other metastable states or phases that are not
-  accessed during experiments? \label{point:metastable}
-  There remains the possibility that there is more than one metastable state 
-  associated with a given LLC system.
-  \begin{itemize}
-    \item Simulating a membrane atomistically will require many atoms which further
-    limits the timescales acessible with MD
-    \item It is reasonable to expect that we will generate configurations which 
-    are kinetically trapped in a metastable free energy basin
-    \item We must be able to identify which state is produced experimentally and 
-    why others are not.
-  \end{itemize}
-
-  \item What constitutes a pore and how well-defined are the pore regions? \label{point:poredefinition}
-  \begin{itemize}
-	\item The limited picture that experiment provides tells us that there are
-        hexagonally packed, hydrophilic regions where transport is likely to occur
-	\item One may instinctively assume that these regions are tube-like pathways
-	\item We will explore the composition of the pores and the partition
-	between the hydrophilic and hydrophobic regions. 
-  \end{itemize}
-
-  \item Is it necessary to include any water in order to appropriately model the 
-  Col\textsubscript{h} phase? \label{point:water}
-  \begin{itemize}
-	\item While the Col\textsubscript{h} phase is described as dry, it is 
-          %MRS3: ``possible'' -> likely, and give some explanations why we think likely? 
-	likely that small amounts of ambient water may be leached into the system.
-	\item The hydrogen bonding network formed by the water may play a role 
-        in structuring the pore.
-	\item We can use simulated X-ray diffraction patterns to see if there is
-        any meaningful structural difference between a "dry" and "wet" system
-  \end{itemize}
-  \end{enumerate}
-  
+%We want to know 
+%\begin{enumerate}
+%\item If layers do exist, how many monomers constitute a single layer? \label{point:monomernum}
+%  \begin{itemize}
+%    \item A simple molecular simulation study of a similar molecule suggested
+%    that there are 4 monomers in each layer. Their estimation is based on a
+%    simulated system containing only 16 total monomers which likely does not sufficiently
+%    model the chemical environment present in the real system.~\cite{zhu_methacrylated_2006}. 
+%    \item A separate calculation based on the volume of the liquid crystal monomers proposes
+%    that there are seven monomers in each layer~\cite{resel_structural_2000}. 
+%    \item A molecular model orders of magnitude larger than any other reported atomistic 
+%    liquid crystal membrane simulations has the best chance of directly answering this question.
+%    \item We can directly change the layer composition and note its effect on membrane structure.
+%  \end{itemize}
+%
+% \item Does our model support the existence of layers and if so, how well defined
+%  are the layers? \label{point:layers}
+%  \begin{itemize}
+%       \item Experimentally, their existence is supported by evidence of strong 
+%       $\pi$-$\pi$ stacking interactions in the direction perpendicular to the
+%       membrane plane.
+%       \item $\pi$-$\pi$ stacking will only occur between the aromatic monomer head groups which
+%       leaves no description of what is happening in the monomer tail region
+%       \item The tails may entangle isotropically while stacking order is maintained
+%       among headgroups. 
+%  \end{itemize}  
+%  
+%   \item How do monomers in each layer position themselves with respect to surrounding 
+%   layers? \label{point:orientation}
+%%     Even if we knew the number of monomers in each layer, we still would not know how 
+%%     monomers in each layer are positioned with respect to other layers. 
+%   \begin{itemize}
+%      \item The $\pi$-$\pi$ stacking interactions may be a driving force of self assembly 
+%      in this system\cite{gazit_possible_2002} %is thought to be $\pi$-$\pi$ stacking interactions between aromatic headgroups \cite{gazit_possible_2002}. 
+%      \item Gas phase ab initio studies of benzene dimers have shown a clear energetic
+%      advantage for parallel displaced and T-shaped $\pi$-$\pi$ stacking conformations versus a
+%      sandwiched conformation ~\cite{sinnokrot_estimates_2002}.
+%      \item Substituted benzene rings exhibit an even stronger $\pi$-$\pi$ stacking 
+%      attraction which favors the parallel displaced configuration in all cases
+%      except where the substitutions are extremely electron withdrawing
+%      \cite{waller_hybrid_2006,ringer_effect_2006}.
+%      \item We can use simulated X-ray diffration patterns to compare the two 
+%      stacking configurations. 
+%   \end{itemize}
+%
+%  \item Can the system exist in other metastable states or phases that are not
+%  accessed during experiments? \label{point:metastable}
+%  There remains the possibility that there is more than one metastable state 
+%  associated with a given LLC system.
+%  \begin{itemize}
+%    \item Simulating a membrane atomistically will require many atoms which further
+%    limits the timescales acessible with MD
+%    \item It is reasonable to expect that we will generate configurations which 
+%    are kinetically trapped in a metastable free energy basin
+%    \item We must be able to identify which state is produced experimentally and 
+%    why others are not.
+%  \end{itemize}
+%
+%  \item What constitutes a pore and how well-defined are the pore regions? \label{point:poredefinition}
+%  \begin{itemize}
+%	\item The limited picture that experiment provides tells us that there are
+%        hexagonally packed, hydrophilic regions where transport is likely to occur
+%	\item One may instinctively assume that these regions are tube-like pathways
+%	\item We will explore the composition of the pores and the partition
+%	between the hydrophilic and hydrophobic regions. 
+%  \end{itemize}
+%
+%  \item Is it necessary to include any water in order to appropriately model the 
+%  Col\textsubscript{h} phase? \label{point:water}
+%  \begin{itemize}
+%	\item While the Col\textsubscript{h} phase is described as dry, it is 
+%          %MRS3: ``possible'' -> likely, and give some explanations why we think likely? 
+%	likely that small amounts of ambient water may be leached into the system.
+%	\item The hydrogen bonding network formed by the water may play a role 
+%        in structuring the pore.
+%	\item We can use simulated X-ray diffraction patterns to see if there is
+%        any meaningful structural difference between a "dry" and "wet" system
+%  \end{itemize}
+%  \end{enumerate}
+%  
   %Once we have addressed all of the above questions, we must show that the 
   %developed molecular model is consistent with physical observations so that we
   %can rely on conclusions drawn about structural features characteristic of 
   %the system.
  
+  %BJC4: Consolidation of points into 4 main questions to answer
+  There are a number of structural questions we wish to answer in this article. We
+  want to know:
+  \begin{enumerate}
+    \item What is the density of monomers that pack around each hydrophilic core? 
+    \label{point:monomernum}
+ 	\begin{itemize}
+ 		\item Authors often describe this and similar systems as being made up of layers.
+ 		\item A simple molecular simulation study of a similar molecule suggested
+	    that there are 4 monomers in each layer. Their estimation is based on a
+	    simulated system containing only 16 total monomers which likely does not sufficiently
+	    model the chemical environment present in the real system.~\cite{zhu_methacrylated_2006}. 
+	    \item A separate calculation based on the volume of the liquid crystal monomers proposes
+	    that there are seven monomers in each layer~\cite{resel_structural_2000}. 
+ 		\item We are careful to avoid the term 'layers' since a liquid crystalline system has,
+ 		by definition, long range order in 1 or 2 spatial dimensions and short range order in 	
+ 		the other dimensions.~\cite{chaikin_principles_1995}  % page 58
+ 		\item In the system we are studying, there are long-range 2D correlations in the 
+ 		hexagonal array of pores and short range correlations in the z-direction.
+		\item We will use our atomistic molecular model to study how the system's structure is
+		effected by the density of monomers surrounding each pore's hydrophilic core. 
+	\end{itemize}
+	\item What structural motif best matches experimental 2D WAXS patterns?\label{point:xrdmatch}
+	\begin{itemize}
+		\item On the short timescales accessible to MD, we observe distinct metastable 
+		configurations which are dependent on starting configuration.
+		\item We simulate XRD patterns of our system and compare them to experimental 2D WAXS 
+		patterns so that we ensure our model creates a nanoscopic chemical environment maximally
+		consistent with experiment within the constraints of our forcefield.
+		\item We are able to confirm and refute previous interpretations of the WAXS pattern.  
+	\end{itemize}
+	\item What is the chemical composition of the pores?\label{point:composition}
+	\begin{itemize}
+		\item The limited picture that experiment provides tells us that there are
+        hexagonally packed, hydrophilic regions where transport is likely to occur
+		\item One may instinctively assume that these regions are tube-like pathways with 
+		well-defined boundaries.
+		\item We will explore the composition of the pores, the partition
+		between the hydrophilic and hydrophobic regions, and its sensitivity to initial
+		configuration. 
+	\end{itemize}
+    \item Is it necessary to include any water in order to appropriately model the 
+    Col\textsubscript{h} phase? \label{point:water}
+    \begin{itemize}
+		\item While the Col\textsubscript{h} phase is described as dry, it is likely that small 
+		amounts of ambient water may be leached into the system.
+		\item The hydrogen bonding network formed by the water may play a role in structuring the
+		pore.
+		\item We can use simulated X-ray diffraction patterns to see if there is any meaningful 
+		structural difference between a "dry" and "wet" system
+    \end{itemize}
+  \end{enumerate}
+
   In this study, we build a significantly more realistic atomistic model of LLC membranes
   than has ever previously been done, and explore what new structural information can be gained
   and what structure hypotheses are supported by this model.
@@ -999,15 +1052,14 @@ We want to know
 
 %MRS2: suggest starting with conclusion.  Something like ``The simulations best support the model of 5 monomers per layer based on the pore-to-pore distances.'' Then provide evidence. Suggest for all points.
 
-  %BJC3: Feel free to suggest different words
   \subsection{Density of monomers around pores}
   %MRS4: Perhaps instead of talking about ``layers'', we can talk about axial density correlations.  You can say that for the simulated systems, they appear to stay in highly ordered layers, but that the density correlations are low enough that layering is likely not a clear enough description.  
+  %BJC4: Can I support this by plotting the density of head groups axially and show that the peaks are wide/noisy?
   Our simulations best support a model built with 5 monomers per layer based on
   the measured equilibrated pore-to-pore distances. To discern the composition of
   the monomer layers, addressing question (\ref{point:monomernum}), we ran
   simulations of systems created with 4--8 monomers per layer. 
   \begin{itemize}  
-  %MRS4: somewhere you need to talk about the range of systems that were built, as that indicates the range of behaviors that are observed.
   		\item We built systems in both the parallel displaced and sandwiched configurations and
   		equilibrated them according to the dry equilibration procedure.
   		\item We test all systems with an initial layer spacing, l, of 3.7 \AA.
@@ -1053,7 +1105,10 @@ We want to know
   		monomer density close to experiment.
   \end{itemize} 
 
-  % BJC4: I will add 6 mon/layer disordered data once I have it.
+  % BJC4: I will add 6 mon/layer disordered data once I have it. The 6 mon/layer I have was
+  % equilibrated differently (layers initially spaced 10 \AA apart and jumped straight into
+  % npt), and only for sandwiched config. I have parallel displaced and sandwiched 6mon/layer
+  % running currently.
   \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{p2p.png}
@@ -1098,7 +1153,7 @@ We want to know
   \begin{itemize}
 	  	\item We tested systems built with 5 monomers per layer in the parallel 
 		displaced and sandwiched configurations at 300 K with layers initially spaced
-		3.7 \AA and 5.0 \AA apart.
+		3.7 \AA~and 5.0 \AA~apart.
 		\item We generated simulated patterns using portions of simulation trajectory
 		after equilibration.
 		\item The patterns for all structures are shown and compared to experiment
@@ -1136,7 +1191,7 @@ We want to know
 			\begin{subfigure}{\textwidth}
 			\centering
 		        	\includegraphics[width=\linewidth]{rzplot_layered_300K_jet.png}
-			        \caption{Sanwiched}~\label{fig:rzplot_layered_300K}
+			        \caption{Sandwiched}~\label{fig:rzplot_layered_300K}
 			\end{subfigure}
 			
 			\begin{subfigure}{\textwidth}
@@ -1173,20 +1228,20 @@ We want to know
 		perfect, infinite hexagonal array. The real system has defects and domain misalignment
 	    which decreases the overall intensity.
     %MRS4: comments from Matt suggest that domain misaligment shouldn't alone be responsible for the difference in intensity ratio. Some of the experiments should help explain it better. Let's talk!
-    %BJC4: So a combo of: domain misalignment, slow dynamics of simulated system, only 4 pores
-    % in unit cell, tortuosity (?)
+    %BJC4: So a combo of: domain misalignment, defects, slow dynamics of simulated system, only 4 
+    %pores in unit cell, tortuosity (?)
     	\item R-spots appears to be weaker in the simulated patterns. They are also partially 
 	    engulfed by the wide R-$\pi$ reflection.
 	    \item We further explore R-spots in Section~\ref{section:rspots}  
         \item R-$\pi$ appears at a lower $q_z$ value than experiment. In all systems, the
 	    reflection reaches its maximum at $q_z < 1.5 \AA^{-1}$ which means that monomers
-	    prefer stack greater than 4.2 \AA apart rather than 3.7 \AA. This behavior is not
+	    prefer stack greater than 4.2 \AA~apart rather than 3.7 \AA. This behavior is not
 	    surprising since GAFF models atoms as point charges and does not appropriately model 
 	    the aromatic $\pi-\pi$ interactions which would cause the monomers to stack closer
 	    together.
 	    \item We will explore R-$\pi$ in more detail in Section~\ref{section:rpi}.
             %MRS4: interesting that the main pi-pi stacking follows the isotropc alkane curve so significantly.
-			%BJC: Might have something to do with the distibution of tilt angles in the tails
+			%BJC4: Might have something to do with the distibution of tilt angles in the tails
 	    \item R-double does not appear in any of the patterns
 	    \item We will explore its possible origins and reasons that it does not appear in our
 	    simulated patterns in Section~\ref{section:rdouble}.
@@ -1195,15 +1250,16 @@ We want to know
   The simulated XRD pattern of the parallel displaced configuration shows an additional
   reflection due to its helical structure. 
   \begin{itemize}
-  		\item There are horizontal reflections at $|q_z|= 0.7 \AA^{-1}$, exactly half of 
+  		\item There are horizontal reflections at $|q_z|= 0.7~\AA^{-1}$, exactly half of 
   		the $q_z$ value of R-$\pi$. 
-  		\item The reflection does not cross through $q_r = 0 \AA^{-1}$ so it does not
+  		\item The reflection does not cross through $q_r = 0~\AA^{-1}$ so it does not
   		appear for the same reason as R-double. 
   		\item This type of pattern is characteristic of a helix (reference something)
   		\item It is possible that these reflections contribute to the continuation of
   		R-double into R-alkanes, as seen in the experimental pattern. 
   \end{itemize}
   
+  %BJC4: This paragraph might fit better before qualitative description
   We quantified the numerical discrepancies present when comparing the relative intensities
   of each reflection of interest between experimental and simulated patterns. 
   \begin{itemize}
@@ -1294,6 +1350,9 @@ We want to know
   		(Figure~\ref{fig:sandwiched280K}).
   		\item The relative intensity of R-spots is higher than in experiment (1.5 vs. 1.3) 
   		\item Still no R-double
+  		%BJC4: I think the following is a reasonable thing to do. Use a configuration that really
+  		% exhibits R-spots so we can definitively (as best as possible anyways) prove its origin. 
+  		% Otherwise, we will have to go off the 300K data which isn't as clear cut. 
   		\item We can use this configuration to more thoroughly explore the origin of R-spots.
   \end{itemize}
   
@@ -1380,8 +1439,8 @@ We want to know
   \centering
   \includegraphics[width=0.5\linewidth]{tilt_dist.png}
   \caption{We measured the angle made between each monomer alkane tail and the
-	  membrane plane. The average tilt angle is near 7\degree~which is far from the
-	  37\degree~tilt angle previously used to explain R-spots.}~\label{fig:tilt}
+	  membrane plane. The average tilt angle (dashed line) is near -2\degree~which is far from 
+	  the 37\degree~tilt angle previously used to explain R-spots.}~\label{fig:tilt}
   \end{figure}
 
   %BJC3: from draft.tex  
@@ -1389,10 +1448,10 @@ We want to know
   atoms gave rise to the feature. Since R-spots is present as higher intensity
   spots within R-alkanes, it is likely that the spots arise as a consequence of
   the tails. By removing all non-tail atoms from the trajectory and simulating a
-  diffraction pattern with the remaining atoms, we were able to isolate the cause of the spots to the
-  tails (Figure~\ref{fig:tails}). Since the tails stay nearly flat, we plotted
+  diffraction pattern with the remaining atoms, we were able to isolate the cause of 
+  the spots to the tails (Figure~\ref{fig:tails}). Since the tails stay nearly flat, we plotted
   the centroids of the tails and measured the angle between each centroid and its
-  nearest neighbors with respect to the plane of the membrane.  We see distinct
+  nearest neighbors with respect to the plane of the membrane. We see distinct
   peaks in the distribution of these angles (Figure~\ref{fig:tail_packing}).
 
 %  The peaks in the nearest neighbor angle distribution are consistent with the
@@ -1410,14 +1469,14 @@ We want to know
   
   %BJC: modification of above paragraph to only include 280K sandwiched data
   The peaks in the nearest neighbor angle distribution are consistent with the
-  location of R-spots. The peaks of interest in Figures \ref{fig:offset_tails}
-  and \ref{fig:layered_tails} are located at $\pm 33 \degree$ which is the same
+  location of R-spots. The peaks of interest in Figure \ref{fig:layered_tails} 
+  are located at $\pm 33 \degree$ which is the same
   location where the highest intensity of spots are located on the simulated
   patterns. We confirmed this conclusion by radially integrating the 2D WAXS
   pattern for $\left|\mathbf{q}\right|$ values between 1.4 and 1.57 (between 4
-  and 4.5 \AA~in real space). We observe that distinct peaks appear ca. $30
+  and 4.5 \AA~in real space). We observe that distinct peaks appear c.a. $30
   \degree$, in close agreement with the previously measured angle distribution
-  (Figs.~\ref{fig:offset_integration}~and~\ref{fig:layered_integration}). We
+  (Figure~\ref{fig:layered_integration}). We
   performed the same integration on the raw experimental data and found the angle
   at which R-spots reaches its highest intensity to be $\pm 37 \degree$ which
   is a reconcilable difference with our simulated results.
@@ -1522,15 +1581,15 @@ We want to know
   
   There are a couple reasons why we see stronger ordered chain packing at 280 K compared to
   experimental conditions of 300 K.
-  \begin{itemize}
-  		\item (1) The difference between 280K and 300K is small. Our forcefield parameters
+  \begin{enumerate}
+  		\item The difference between 280K and 300K is small. Our forcefield parameters
   		may not correctly model the behavior of the tails at 300K (citation?).
-  		\item (2) Monomers aren't as confined at 300 K in our simulations versus experiment.
+  		\item Monomers aren't as confined at 300 K in our simulations versus experiment.
   		If the head groups packed 3.7 \AA apart, the tails would be more confined and forced
   		to pack between vertically adjacent monomer tails. In our case, the tail region is
   		less dense than experiment which gives the tails freedom to organize in a more
   		entropically favored disordered state. 
-  \end{itemize}
+  \end{enumerate}
 
 % BJC3 : old outline
 % R-spots, which appears in both simulated XRD patterns, is a result of the way 
@@ -1638,7 +1697,7 @@ We want to know
   \subsubsection{Discrepancies between R-$\pi$}\label{section:rpi}
   
   We plotted the one-dimensional pair distribution function, $g(z)$, for the centers
-  of mass of monomer phenyl rings (Figure reference).
+  of mass of monomer phenyl rings (Figure~\ref{fig:correlation}).
   \begin{itemize}
   		\item We averaged all 1D slices in the z-direction of the full 3D correlation function
   		within 2.1 \AA of $(x, y)=(0, 0)$. (full description will be in methods)
@@ -1649,7 +1708,6 @@ We want to know
   \end{itemize}
   
   %BJC4: the correlation functions of disordered systems are confusing me.
-  
   \begin{figure}
   \centering
   \begin{subfigure}{0.45\textwidth}
@@ -1664,43 +1722,69 @@ We want to know
   \end{subfigure}  
   \begin{subfigure}{0.45\textwidth}
   \centering
+  %BJC4: This is noisier than l=3.7 angstrom, but I can still pick out peaks. I'm unsure
+  % how to quantify the difference. The correlation length is very similar to the more
+  % ordered configuration.
   \includegraphics[width=\textwidth]{z_correlation_sandwich_disordered.png}
   \caption{}\label{fig:z_correlation_sandwich_disordered}
   \end{subfigure}  
   \begin{subfigure}{0.45\textwidth}
   \centering
+  %BJC4: There really aren't any good peaks here. 
   \includegraphics[width=\textwidth]{z_correlation_offset_disordered.png}
   \caption{}\label{fig:z_correlation_offset_disordered}
   \end{subfigure}  
   \caption{}\label{fig:correlation}
   \end{figure}
   
+%  The correlation length between stacked monomer head groups shows the best agreement with
+%  experimental for systems simulated in the ordered basin.
+%  %BJC3: explanation of correlation length calculation in methods section. 
+%  \begin{itemize}
+%  		\item Correlation length was calculated by fitting a decaying exponential function
+%  		to all peaks of $g(z)$ for the sandwiched configuration and to every other peak of
+%  		$g(z)$ for the parallel displaced configuration. 
+%%  		\item The correlation length of systems simulated at 280K were 27.7 \AA and 25.2 \AA
+%%  		for the parallel displaced and sandwiched configurations respectively. 
+%  		\item The correlation length of systems simulated in the ordered basin were 11.2 \AA and 
+%  		14.9 \AA  		for the parallel displaced and sandwiched configurations respectively. 
+%  		\item Systems simulated at 300K show correlation closest to the experimental 
+%  		correlation length of 10.1 \AA. They are still slightly more correlated than 
+%  		experiment which would lead to an increase in constructive X-ray scattering. 
+%  \end{itemize}
+  
   The correlation length between stacked monomer head groups shows the best agreement with
-  experimental for systems simulated at 300K.
-  %BJC3: explanation of correlation length calculation in methods section. 
+  experimental for systems simulated in the ordered basin.
+  %BJC4: explanation of correlation function calculation in methods section. 
   \begin{itemize}
   		\item Correlation length was calculated by fitting a decaying exponential function
   		to all peaks of $g(z)$ for the sandwiched configuration and to every other peak of
   		$g(z)$ for the parallel displaced configuration. 
-  		\item The correlation length of systems simulated at 280K were 27.7 \AA and 25.2 \AA
-  		for the parallel displaced and sandwiched configurations respectively. 
-  		\item The correlation length of systems simulated at 300K were 11.2 \AA and 14.9 \AA
-  		for the parallel displaced and sandwiched configurations respectively. 
-  		\item Systems simulated at 300K show correlation closest to the experimental 
+  		\item The correlation length of systems simulated in the ordered basin were 11.2 \AA and 
+  		14.9 \AA  		for the parallel displaced and sandwiched configurations respectively. 
+  		\item Something about disordered systems.
+  		\item Systems simulated in the ordered basin show correlation closest to the experimental 
   		correlation length of 10.1 \AA. They are still slightly more correlated than 
   		experiment which would lead to an increase in constructive X-ray scattering. 
-  \end{itemize}
+  \end{itemize}  
   
   Additionally, our system models near-perfectly straight pores with no defects which will
   lead to higher intensity vertical stacking reflections. 
   \begin{itemize}
   		\item Nearly all of the intensity in R-$\pi$ of our simulated patterns is concentrated
-  		at a single point. Figure Something shows the same simulated patterns with the upper 
-  		boundary on the colorbar adjusted to be 10x higher. The only visible reflections are
-  		those of R-$\pi$.
+  		at a single point. Figure ~\ref{fig:intense_rpi} shows the same simulated patterns with
+  		the upper boundary on the colorbar adjusted to be 6x higher. The only distinguishable 
+  		reflections are	those of R-$\pi$ and R-pores.
   		\item In the experimental pattern, the intensity is more evenly spread out over all
   		of R-$\pi$. 
   \end{itemize}
+  
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.4\textwidth]{sandwich_rzplot_highlimit_cbar.png}
+  \caption{R-$\pi$ and R-pores are far more intense than the other major reflections. Here, the 
+  colorbar was scaled so that the max is 6x higher than all other plots.}\label{fig:intense_rpi}
+  \end{figure}
   
   \subsubsection{Origin of R-double}\label{section:rdouble}
   
@@ -1719,7 +1803,7 @@ We want to know
   
   We can produce R-double if our initial configuration contains alternating parallel and
   antiparallel carboxylate groups relative to the plane of the monomer's phenyl ring.
-  (Figure reference).  
+  (Figure ~\ref{fig:rotated_carboxylate_rzplot_norestraints}).  
   \begin{itemize}
   		\item It is difficult to physically justify this system. 
   		\item Systems built this way are only stable if position restraints are placed on 
@@ -1727,8 +1811,8 @@ We want to know
   		position as restraints are released.
   		\item There is an appreciable energy barrier that prevents rotation
   		of carboxylate groups attached to phenyl rings since the group extends the system's 
-  		$\pi$ conjugation. (citation)
-  		\item There are instances where carboxylates in other systems rotate out of plane.
+  		$\pi$ conjugation. (citation) (See figure in supporting info with energy barrier plots)
+  		\item There are instances where carboxylate groups in other systems rotate out of plane.
   		\item Bushey et al. showed that bulky carbonyl-containing substituents of stacked arene
   		molecules tended to tilt 45$\degree$ in order to relieve steric strain, thus allowing 
   		$\pi$-stacking between molecules, and to hydrogen bond with neighboring molecules. 
@@ -1743,7 +1827,7 @@ We want to know
   
   We can also produce R-double if layers are not uniformly spaced. Rather, monomers might form 
   pairs that stack less than 3.7 \AA apart, and whose center of masses are spaced 7.4 \AA 
-  from the next pair of monomers.(Figure reference)
+  from the next pair of monomers.(Figure ~\ref{fig:staggered_rzplot_norestraints})
   \begin{itemize}
   		\item To our knowledge, there have been no studies that specifically address the 
   		possibility of a configuration like this. 
@@ -1767,7 +1851,7 @@ We want to know
   		\item In this configuration, monomers are rotated so that the vector created by the  
   		bond extending from the carboxylate carbon to the phenyl ring is oriented $\pm 15 	
   		\degree$ with respect to the vector extending from the carboxylate carbon to the pore
-  		center.
+  		center (Figure ~\ref{fig:rotated_monomers_rzplot_norestraints})
   		\item Every other monomer layer is rotated $+15 \degree$ and those in between are
   		rotated $-15 \degree$.
   		\item This configuration allows monomer tails to sit between adjacent monomer tails 
@@ -1778,8 +1862,61 @@ We want to know
   		stay stacked 3.7 \AA apart. 
   \end{itemize}
   
-   %BJC3: 6 panel figure. Top 3 show each real space configuration in 3D. Bottom 3 show their
-   % simulated XRD patterns.  
+  \begin{figure}[htb]
+  \centering
+  %BJC4: I could cut out the tails in the three real space configurations
+  %BJC4: I can remove some of the colorbars and state that they all follow the same color bar. 
+  \begin{subfigure}{0.3\linewidth}
+  	\centering
+  	\includegraphics[width=\textwidth]{rotated_carboxylate.png}
+	\label{fig:rotated_carboxylate}
+  \end{subfigure}
+  \begin{subfigure}{0.3\linewidth}
+  	\centering
+  	\includegraphics[width=\textwidth]{staggered.png}
+	\label{fig:staggered}
+  \end{subfigure}
+  \begin{subfigure}{0.3\linewidth}
+  	\centering
+  	\includegraphics[width=\textwidth]{rotated_monomers.png}
+  	\label{fig:rotated_monomers}
+  \end{subfigure}
+  \begin{subfigure}{0.3\linewidth}
+  	\centering
+  	\includegraphics[width=\textwidth]{rotated_carboxylate_rzplot_restrained.png}
+  	\label{fig:rotated_carboxylate_rzplot_restrained}
+  \end{subfigure}
+  \begin{subfigure}{0.3\linewidth}
+  	\centering
+  	\includegraphics[width=\textwidth]{staggered_rzplot_restrained.png}
+  	\label{fig:staggered_rzplot_restrained}
+  \end{subfigure}
+  \begin{subfigure}{0.3\linewidth}
+  	\centering
+  	\includegraphics[width=\textwidth]{rotated_monomers_rzplot_restrained.png}
+  	\label{fig:rotated_monomers_rzplot_restrained}
+  \end{subfigure}
+  \begin{subfigure}{0.3\linewidth}
+  	\centering
+  	\includegraphics[width=\textwidth]{rotated_carboxylate_rzplot_norestraints.png}
+  	\caption{}\label{fig:rotated_carboxylate_rzplot_norestraints}
+  	%BJC4: needs to run longer
+  \end{subfigure}
+  \begin{subfigure}{0.3\linewidth}
+  	\centering
+  	\includegraphics[width=\textwidth]{staggered_rzplot_norestraints.png}
+  	\caption{}\label{fig:staggered_rzplot_norestraints}
+  	%BJC4: needs to be done
+  \end{subfigure}
+  \begin{subfigure}{0.3\linewidth}
+  	\centering
+  	\includegraphics[width=\textwidth]{rotated_monomers_rzplot_norestraints.png}
+  	\caption{}\label{fig:rotated_monomers_rzplot_norestraints}
+  \end{subfigure}
+  \caption{R-double is present in all three inital configurations tested while the heavy atoms
+  in the headgroup are held in place with position restraints. R-double fades once 
+  the position restriants are released.}\label{fig:rdouble}
+  \end{figure}
   
   
   %BJC: maybe split into 2 paragraphs
@@ -2190,6 +2327,13 @@ We want to know
   Information for diagram). We average the histograms over at least 50 ns of
   equilibrated trajectory.
   
+  In general, the composition of the pores is similar between all systems. 
+  \begin{itemize}
+  	\item We believe we can study transport in any of the systems presented here and
+  	still extract valuable information.
+  	\item We will need to verify that this assumption is true.
+  \end{itemize}  
+  
   In all cases, the space in the pore region is filled with sodium ions and
   head groups. Systems in the ordered pore basin are less dense in
   the center of the pore. In both the sandwiched and parallel displaced
@@ -2202,7 +2346,6 @@ We want to know
   maximum. This implies a more uniform distribution of head groups within the
   pore center. This is the same conclusion drawn from the plots of $g(x,y)$ 
   (Figure~\ref{fig:xy_correlation}). 
-  % High vacancy is less likely to be stable in the real system
 
   There is a partition between the hydrophobic and hydrophilic regions, however
   it is a gradient in composition, rather than an abrupt division. The system
@@ -2217,13 +2360,6 @@ We want to know
   can reject, however it is not clear where the edges of the pores are and what
   size molecule would fit through. We leave these investigations for a future
   study.
-  
-  In general, the composition of the pores is similar between all systems. 
-  \begin{itemize}
-  	\item We believe we can study transport in any of the systems presented here and
-  	still extract valuable information.
-  	\item We will need to verify that this assumption is true.
-  \end{itemize}  
 
   \begin{figure}
   \centering
@@ -2257,7 +2393,7 @@ We want to know
 	  uniform, disordered pore.}~\label{fig:densities}
   \end{figure}
 
-  END
+  END!!
   
 %  We answer (\ref{point:water}) and further support (\ref{point:orientation}) by preparing parallel displaced and
 %  sandwiched configurations according to the wet equilibration procedure.
