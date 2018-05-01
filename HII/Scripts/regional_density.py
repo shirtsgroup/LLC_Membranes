@@ -56,6 +56,7 @@ def duplicate(pos, box):
 
     return p
 
+
 if __name__ == "__main__":
     
     args = initialize()  # parse the args
@@ -66,7 +67,8 @@ if __name__ == "__main__":
 
     if args.multi:
 
-        colors = ['red', 'green', 'orange', 'blue']
+        colors = ['blue', 'red', 'green', 'xkcd:orange']
+        # colors = ['xkcd:red', 'xkcd:green', 'blue', 'xkcd:yellow']
 
         n = len(args.multi)
         system = np.load(args.multi[0])
@@ -87,7 +89,7 @@ if __name__ == "__main__":
         for i in range(len(regions)):
             plt.figure(i)
             for j in range(n):
-                plt.bar(r, results[j, i, :], bin_width, color=colors[j], alpha=0.6, label=path.splitext(args.multi[j])[0])
+                plt.bar(r, results[j, i, :], bin_width, color=colors[j], alpha=0.9, label=path.splitext(args.multi[j])[0])
 
             plt.title(regions[i])
             plt.legend()
@@ -152,9 +154,9 @@ if __name__ == "__main__":
 
             results[i, :] = density
 
-            plt.bar(r, density, bin_width, color=colors[i], alpha=0.75, label=reg)
+            plt.bar(r, density, bin_width, color=colors[i], alpha=0.6, label=reg)
 
-        np.savez_compressed("density", results=results, r=r, bw=bin_width, box=t.unitcell_vectors)
+        np.savez_compressed("regional_density", results=results, r=r, bw=bin_width, box=t.unitcell_vectors)
         print('Arrays saved as density.npz')
 
     else:
