@@ -372,7 +372,9 @@ which will be laid out and numbered
 		\item We simulate XRD patterns of our system and compare them to experimental 2D WAXS 
 		patterns so that we ensure our model creates a nanoscopic chemical environment maximally
 		consistent with experiment within the constraints of our forcefield.
-		\item We are able to confirm and refute previous interpretations of the WAXS pattern.  
+                %MRS5: suggestion
+		%\item We are able to confirm and refute previous interpretations of the WAXS pattern.  
+		\item We are able to confirm some previous interpretations of the WAXS pattern and refute others.  
 	\end{itemize}
 	\item What is the chemical composition of the pores?\label{point:composition}
 	\begin{itemize}
@@ -461,7 +463,8 @@ which will be laid out and numbered
         \caption{(a) 1D small angle X-ray scattering indicates hexagonal packing of
         pores as well as the spacing between pores (b) 2D wide angle X-ray scattering
         gives details about repeating features less than 1 nanometer apart}\label{fig:SWAXS}
-  \end{figure}
+        %MRS5: eventually will need to put the roman numerals with the names here in the caption. 
+ \end{figure}
 
 %    \begin{itemize}
 %            \item We have compared simulated X-ray diffraction patterns to experiment in
@@ -490,6 +493,7 @@ which will be laid out and numbered
   An ensemble of characteristic, low-energy vacuum monomer configurations
   were constructed by applying a simulated annealing process to a
   parameterized monomer.
+  %MRS5: probably want to give more details in supporting information.
   \begin{itemize}
     \item Monomers were cooled from 1000K to 50K over 10 nanoseconds.
     \item A low energy configuration was randomly pulled from the trajectory
@@ -739,6 +743,7 @@ which will be laid out and numbered
 	  in the NPT ensemble with pressure controlled by the berendsen barostat.
 	  \item Long, NPT equilibration simulations are run for at least 400 ns using the 
           Parrinello-Rahman barostat with a time consant of 10 ps.
+          %MRS5: did you ever look at isotropic vs. semiisotropic? If using isotropic, you should look at the pressure tensor - if the Z is very different than the X and Y and has opposite sign, the membrane could be under strain in some way despite being at 1 atm.
       \end{itemize}
       \item Wet equilibration scheme: 
       \begin{itemize}
@@ -826,6 +831,7 @@ which will be laid out and numbered
     its dominance in the real system.
     \item Direction of attack was not considered because the resultant mixture
     is racemic.
+    %MRS5: if this is not that important to the results, some of these details could potentially be in the supporting information.
     %BJC: The following items belongs in results/discussion
     %MRS: probably. 
     %\item The resulting crosslinked structure has an even distribution of
@@ -1230,6 +1236,7 @@ which will be laid out and numbered
     %MRS4: comments from Matt suggest that domain misaligment shouldn't alone be responsible for the difference in intensity ratio. Some of the experiments should help explain it better. Let's talk!
     %BJC4: So a combo of: domain misalignment, defects, slow dynamics of simulated system, only 4 
     %pores in unit cell, tortuosity (?)
+    %MRS5: maybe, there's a question of how we can demonstrate the magnitude of any of these effects.
     	\item R-spots appears to be weaker in the simulated patterns. They are also partially 
 	    engulfed by the wide R-$\pi$ reflection.
 	    \item We further explore R-spots in Section~\ref{section:rspots}  
@@ -1301,6 +1308,7 @@ which will be laid out and numbered
   does not appear in any patterns, and thus has no measurable intensity.}
   \label{table:relative_inensities_300K} 
   \end{table}
+%MRS5: just numberwise, the disordered seem to match better. If we don't think those are right, will have to provide some additional reasoning.
 
 %  The simulated XRD pattern produced from the sandwiched configuration is missing
 %  R-double and R-spots. 
@@ -1756,6 +1764,7 @@ which will be laid out and numbered
   The correlation length between stacked monomer head groups shows the best agreement with
   experimental for systems simulated in the ordered basin.
   %BJC4: explanation of correlation function calculation in methods section. 
+  %MRS5: the correlation length doesn't look like that great a fit, since it misses the first point by so much.  We may need to reevaluate a litle how this is done. 
   \begin{itemize}
   		\item Correlation length was calculated by fitting a decaying exponential function
   		to all peaks of $g(z)$ for the sandwiched configuration and to every other peak of
@@ -1916,6 +1925,7 @@ which will be laid out and numbered
   \caption{R-double is present in all three inital configurations tested while the heavy atoms
   in the headgroup are held in place with position restraints. R-double fades once 
   the position restriants are released.}\label{fig:rdouble}
+%MRS5: the conclusion seems like it actually may be ``this doesn't work either''.  How do they line up? Do they go to either parallel displaced or sandwiched?
   \end{figure}
   
   
@@ -2320,6 +2330,7 @@ which will be laid out and numbered
 
   \subsection{Pore composition}
   
+%MRS5: put a little more of the rational for looking at this here. Why should they care?
   We plotted the number densities of heavy atoms in the head group, carbon atoms in the tail
   region and all sodium ions (Figure~\ref{fig:densities}). For the head group
   region, we used the carbon atoms making up the aromatic ring. For the tail
