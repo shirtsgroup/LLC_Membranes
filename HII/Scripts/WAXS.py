@@ -294,7 +294,7 @@ Y = np.linspace(-qmax, qmax, waxs.shape[1])
 # exit()
 
 factor = 3.1
-colorbar = 'seismic'
+colorbar = 'jet'
 levels = np.linspace(0, factor, 200)
 waxs /= avg_intensity
 
@@ -444,16 +444,15 @@ while Y[R_double_top] < 0:  # The bottom part of the plot is noisier (change 0 t
 # plt.plot(np.linspace(-10, 9, 20), np.amax(waxs[R_double_bottom:R_double_top,
 #                                           waxs.shape[0]//2 - 10:waxs.shape[0]//2 + 10], axis=0))
 # plt.show()
-print('Average R-pi intensity: %.2f' % np.mean(np.amax(waxs[:, waxs.shape[0]//2 - 10:waxs.shape[0]//2 + 10], axis=0)))
-print('Average R-double intensity: %.2f' % np.mean(np.amax(waxs[R_double_bottom:R_double_top,
-                                                           waxs.shape[0]//2 - 10:waxs.shape[0]//2 + 10], axis=0)))
-print('Average R-spots intensity : %.2f' % Rspots(X, Y, waxs, theta=50, theta_sigma=(3, 2), bounds=(1.3, 1.45)))
-exit()
+# print('Average R-pi intensity: %.2f' % np.mean(np.amax(waxs[:, waxs.shape[0]//2 - 10:waxs.shape[0]//2 + 10], axis=0)))
+# print('Average R-double intensity: %.2f' % np.mean(np.amax(waxs[R_double_bottom:R_double_top,
+#                                                            waxs.shape[0]//2 - 10:waxs.shape[0]//2 + 10], axis=0)))
+# print('Average R-spots intensity : %.2f' % Rspots(X, Y, waxs, theta=50, theta_sigma=(3, 2), bounds=(1.3, 1.45)))
 
 fig, ax = plt.subplots()
 heatmap = plt.contourf(X, Y, waxs, cmap=colorbar, levels=levels, extend='max')
 cid = fig.canvas.mpl_connect('button_press_event', onclick)
-cbar = plt.colorbar(format='%.2f')
+# cbar = plt.colorbar(format='%.2f')
 plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=18)
 plt.ylabel('$q_z\ (\AA^{-1}$)', fontsize=18)
 plt.gcf().get_axes()[0].tick_params(labelsize=14)

@@ -133,6 +133,48 @@ def ryckaert_belleman(theta, C, mode='degree', normalize=False):
     return V
 
 
+def largest_prime_factor(n):
+    i = 2
+    while i * i <= n:
+        if n % i:
+            i += 1
+        else:
+            n //= i
+    return n
+
+
+def estimated_autocorrelation(x):
+
+    n = len(x)
+    variance = x.var()
+    # x = x - x.mean()
+    r = np.correlate(x, x, mode='full')[-n:]
+    result = r / (variance * (np.arange(n, 0, -1)))
+    # result = r / np.arange(n, 0, -1)
+    return result / np.amax(result[:10])
+
+
+def autocorrelation_slow(d):
+    """
+    :param d: numpy array with dihedral angle vs. time
+    :return: autocorrelation
+    """
+
+    # Subtract mean
+    # d -= d.mean(axis=0)
+
+    autocorr = np.zeros([len(d)])
+    for l in range(d.shape[0]):
+        N = d.shape[0] - l
+        for n in range(N):
+            autocorr[l] += d[n] * d[n + l]
+        autocorr[l] /= N
+
+    autocorr /= d.var()
+
+    return autocorr
+
+
 class Dihedral(object):
 
     def __init__(self, gro, traj, top, d, resname, exclusions=[]):
@@ -146,8 +188,13 @@ class Dihedral(object):
         any dihedrals that is a part of will not be counted.
         """
 
+        print('Loading trajectory...', end='', flush=True)
         t = md.load(traj, top=gro)
+        print('Done!')
+
         self.pos = t.xyz
+        self.time = t.time
+        self.autocorr_fxn = None
 
         monomer_topology = load_topology(top)
 
@@ -201,7 +248,7 @@ class Dihedral(object):
         res = [a.residue.name for a in t.topology.atoms]
         nres = res.count(resname) // natoms_residue
 
-        self.all_dihedral_angles = np.zeros([self.ndihedrals, t.n_frames, nres])
+        self.all_dihedral_angles = np.zeros([self.ndihedrals, t.n_frames, nres])  # weird way to set this up but oh well
 
         for i in range(self.ndihedrals):
             indices = np.zeros([nres, 4], dtype=int)
@@ -209,7 +256,7 @@ class Dihedral(object):
                 indices[j, :] = dihedrals[i]*(j + 1)
             self.all_dihedral_angles[i, ...] = calculate_dihedral(self.pos, indices)
 
-    def plot_histogram(self, bins=100, rb=False, ff='gaff', save=False, out='Dihedral.png'):
+    def plot_histogram(self, bins=100, rb=False, ff='gaff', save=False, out='Dihedral.png', show=False):
 
         hist, bin_edges = np.histogram(self.all_dihedral_angles, bins=bins)
         bin_width = bin_edges[1] - bin_edges[0]
@@ -249,7 +296,64 @@ class Dihedral(object):
         plt.tight_layout()
         if save:
             plt.savefig('%s.png' % out)
-        plt.show()
+        if show:
+            plt.show()
+
+    def autocorrelation(self, largest_prime=500, cos=False):
+        """ FFT based autocorrelation function, which is faster than numpy.correlate. Efficiency is key in order to avoid
+        headaches.
+        :param largest_prime : the largest prime factor of array length allowed. The smaller the faster. 1.6M points takes
+        about 5 seconds with largest_prime=1000. Just be aware that you are losing data by truncating. But 5-6 data points
+        isn't a big deal for large arrays.
+        """
+
+        shape = self.all_dihedral_angles.shape
+        # np.reshape won't quite work how I need it to. This way is ~50x slower than reshape but still fast enough
+
+        dihedrals = np.zeros([shape[1], shape[0]*shape[2]])  # of size [nframes, ndihedrals]
+
+        for i in range(shape[0]):
+            dihedrals[:, i*shape[2]:(i+1)*shape[2]] = self.all_dihedral_angles[i, ...]
+
+        if cos:
+            dihedrals *= (np.pi/180)
+            dihedrals = np.cos(dihedrals)
+
+        # Don't allow a prime factor larger than 'largest_prime'. Truncate data until that condition is met
+        l = 2 * dihedrals.shape[0] - 1
+
+        while largest_prime_factor(l) >= largest_prime or l % 2 == 0:
+            l -= 1
+
+        dihedrals = dihedrals[:(l + 1) // 2, :]
+        length = dihedrals.shape[0] * 2 - 1
+
+        dihedrals -= np.mean(dihedrals, axis=0)
+
+        fftx = np.fft.fft(dihedrals, n=length, axis=0)
+        ret = np.fft.ifft(fftx * np.conjugate(fftx), axis=0)
+        ret = np.fft.fftshift(ret, axes=(0,))
+
+        self.autocorr_fxn = ret[length // 2:].real
+        self.autocorr_fxn /= np.arange(dihedrals.shape[0], 0, -1)[:, None]
+        self.autocorr_fxn /= np.var(dihedrals, axis=0)
+
+        self.autocorr_fxn = np.mean(self.autocorr_fxn, axis=1)
+
+        return self.autocorr_fxn  # normalized
+
+    def plot_autocorrelation(self, show=False, save=True, savename='dihedral_autocorrelation'):
+
+        plt.figure()
+        plt.plot(self.time/1000, self.autocorr_fxn, linewidth=2)
+        plt.plot([self.time[0]/1000, self.time[-1]/1000], [0, 0], '--', color='black')
+        plt.xlabel('Time (ns)', fontsize=14)
+        plt.ylabel('Autocorrelation', fontsize=14)
+        plt.tight_layout()
+        if save:
+            plt.savefig('%s.png' % savename)
+        if show:
+            plt.show()
 
 
 if __name__ == "__main__":
@@ -257,4 +361,6 @@ if __name__ == "__main__":
     args = initialize()
 
     dihedrals = Dihedral(args.gro, args.traj, args.topology, args.dihedral, args.residue, exclusions=args.exclude)
-    dihedrals.plot_histogram(rb=True, save=True)
+    #dihedrals.plot_histogram(rb=True, save=True, show=False)
+    dihedrals.autocorrelation(cos=True)
+    dihedrals.plot_autocorrelation(show=True)

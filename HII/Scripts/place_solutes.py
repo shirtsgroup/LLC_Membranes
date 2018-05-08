@@ -78,7 +78,7 @@ def random_orientation(xyz, alignment_vector, placement):
     for i in range(xyz.shape[1]):
         rotated[i, :] = np.dot(R, xyz[i, :])
 
-    rotated += placement  # translate to deisred location
+    rotated += placement  # translate to desired location
 
     return rotated
 
@@ -139,6 +139,7 @@ class Solvent(object):
         :param solute: Solute object generated from solute configuration file (.gro)
         """
         placement_point = self.random_point_box()  # where to place solute
+        #solute_positions = random_orientation(solute.xyz[0, ...], solute.xyz[0, 0, :] - solute.xyz[0, 1, :], placement_point)  # to be fixed in THE FUTURE
         solute_positions = transform.translate(solute.xyz[0, :, :], solute.xyz[0, 0, :], placement_point)  # translate solute to placement point
         self.positions = np.concatenate((self.positions, solute_positions))  # add to array of positions
         self.residues += solute.residues  # add solute residues to list of all residues
@@ -297,7 +298,7 @@ if __name__ == "__main__":
             nsolute.append(n)
             print("Actual Concentration of %s : %.2f mol/L" % (s, actual_concentration))
         elif args.n_solute:
-            nsolute[i] = n[i]
+            nsolute.append(n[i])
         else:
             print("You must specify a concentration or number of solute molecules")
             exit()
@@ -337,8 +338,12 @@ if __name__ == "__main__":
     # print(int(solutes[i].charge))
     # print("Adding %d %s molecules" % (nsolute, s))
 
-    for n in tqdm.tqdm(range(len(nsolute))):
-        solvent.place_solute(solutes[n])
+    # for n in tqdm.tqdm(range(len(nsolute))):
+    #     solvent.place_solute(solutes[n])
+
+    for i in range(len(nsolute)):
+        for sol in tqdm.tqdm(range(nsolute[i])):
+            solvent.place_solute(solutes[i])
 
     from pathlib import Path
 

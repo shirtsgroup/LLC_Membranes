@@ -21,15 +21,15 @@ pos[2:] += 2*width
 
 fig, ax = plt.subplots(figsize=(10,5))
 
-plt.bar(pos, df['layered'], width, label='Sandwiched (l=3.7)', yerr=df['layered_err'])
-plt.bar([p + width for p in pos], df['offset'], width, label='Parallel Displaced (l=3.7)', yerr=df['offset_err'])
-plt.bar([p + 2*width for p in pos][1], layered_disordered, width, label='Sandwiched (l=5)', yerr=layered_disordered_err)
-plt.bar([p + 3*width for p in pos][1], offset_disordered, width, label='Parallel Displaced (l=5)', yerr=offset_disordered_err)
+plt.bar(pos, df['layered'], width, label='Sandwiched (d=3.7)', yerr=df['layered_err'])
+plt.bar([p + width for p in pos], df['offset'], width, label='Parallel Displaced (d=3.7)', yerr=df['offset_err'])
+plt.bar([p + 2*width for p in pos][1], layered_disordered, width, label='Sandwiched (d=5)', yerr=layered_disordered_err)
+plt.bar([p + 3*width for p in pos][1], offset_disordered, width, label='Parallel Displaced (d=5)', yerr=offset_disordered_err)
 
 ax.set_xticks([p + .5*width for p in pos])
 ax.set_xticklabels(df['nmon'], fontsize=14)
 ax.set_ylabel('Pore-to-Pore Distance (nm)', fontsize=14)
-ax.set_xlabel('Number of monomers per layer', fontsize=14)
+ax.set_xlabel('Number of columns per pore', fontsize=14)
 plt.tick_params(axis='both', labelsize=14)
 ax.plot([-0.20, 2.8], [4.12, 4.12], "k--", label='Experiment')
 #plt.legend(['Sandwiched', 'Parallel Displaced', 'Experiment'],fontsize=14)

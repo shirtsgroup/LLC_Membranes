@@ -217,7 +217,7 @@ if __name__ == "__main__":
 
         # calculate locations of layers in z-direction
         z = np.linspace(0, args.dbwl*(args.layers - 1)/10, args.layers)
-        z[::2] -= 0.1  # staggered configurations
+        # z[::2] -= 0.1  # staggered configurations
 
         for p in range(args.nopores):
             for l in range(args.layers):

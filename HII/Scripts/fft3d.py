@@ -44,7 +44,6 @@ def initialize():
     parser.add_argument('-begin', default=0, type=int, help='Frame to begin calculations at')
     parser.add_argument('-end', default=-1, type=int, help='Frame to end calculations at')
 
-
     args = parser.parse_args()
 
     return args
@@ -207,6 +206,9 @@ def pore(nmon_per_layer, r, layers, dbwl, center, offset=True, offset_angle=0, r
     """
 
     locations = np.zeros([nmon_per_layer*layers, 3])
+    noise_sigma = 1
+    noise = np.random.normal(scale=noise_sigma, size=(locations.shape[0], 2))  # random xy noise
+    #noise = np.random.normal(scale=noise_sigma, size=locations.shape[0])  # random z noise
 
     theta = 2*np.pi / nmon_per_layer  # theta between rings
 
@@ -232,6 +234,9 @@ def pore(nmon_per_layer, r, layers, dbwl, center, offset=True, offset_angle=0, r
                     displacement.append(l*nmon_per_layer + i)
 
     locations[:, :2] += center
+    # locations[1:-1, 2] += noise[1:-1]
+
+    locations[:, :2] += noise
 
     if radial_displacement:
         theta = rd_angle
@@ -366,7 +371,7 @@ if __name__ == "__main__":
     xsigma = float(args.sigmas[0])
     if args.dim > 1:
         y_pts = int(args.grid[1])
-        ysigma = args.sigmas[1]
+        ysigma = float(args.sigmas[1])
         # y = np.linspace(0, nspikes*dbwl, y_pts + 1)
         y = np.linspace(0, float(args.box[1]), y_pts + 1)
         ybin = y[1] - y[0]
@@ -375,7 +380,7 @@ if __name__ == "__main__":
             X, Y = np.meshgrid(x[:-1], y[:-1])
         if args.dim > 2:
             z_pts = int(args.grid[2])
-            zsigma = args.sigmas[2]
+            zsigma = float(args.sigmas[2])
             z = np.linspace(0, nspikes*dbwl, z_pts + 1)
             zbin = z[1] - z[0]
             X, Y, Z = np.meshgrid(x[:-1], y[:-1], z[:-1])
@@ -524,7 +529,10 @@ if __name__ == "__main__":
 
             ax.scatter(grid_flat[0, :, 0], grid_flat[0, :, 1], grid_flat[0, :, 2], c=cm.hsv(I/max(I)))
             plt.title('Real space points')
-            xy_window = 3*rpore
+            if rpore > 0:
+                xy_window = 3*rpore
+            else:
+                xy_window = 5
             ax.set_xlim3d(xycenter[0] - xy_window, xycenter[0] + xy_window)
             ax.set_ylim3d(xycenter[1] - xy_window, xycenter[1] + xy_window)
             ax.set_xlabel('x ($\AA$)')
@@ -586,8 +594,8 @@ if __name__ == "__main__":
             zlim = 2.5
         else:
             averaged, rfin, zfin = angle_average(freq_x, freq_y, freq_z, fft)
-            xlim = 2.5
-            zlim = 2.5
+            xlim = 0.5
+            zlim = 0.5
             if rfin[-1] > xlim:
                 r_lower_limit = np.where(freq_x < -xlim)[0][-1] + 1
                 r_upper_limit = np.where(freq_x > xlim)[0][0] - 1
@@ -601,7 +609,6 @@ if __name__ == "__main__":
 
         NLEVELS = 200
         lvls = np.linspace(MIN, MAX, NLEVELS)  # contour levels
-        print(MIN, MAX)
 
         rfin *= 2*np.pi / 10
         zfin[0] *= 2*np.pi / 10

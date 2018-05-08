@@ -6,8 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import subprocess
 import os
-from pymbar import timeseries
 from scipy.optimize import curve_fit
+from scipy.integrate import cumtrapz
 import tqdm
 
 
@@ -19,6 +19,8 @@ def initialize():
     parser.add_argument('-g', '--gro', default='wiggle.gro', type=str, help='Name of coordinate file')
     parser.add_argument('-e', '--edr', default='wiggle.edr', type=str, help='Gromacs portable energy file')
     parser.add_argument('-T', '--temperature', default=300, type=float, help='Temperature of simulation')
+    parser.add_argument('-n', '--nsub', default=5, type=int, help='Number of subtrajectories to break simulation'
+                        'into. Viscosity is calculated for each subtrajectory and used to generate statistics')
 
     args = parser.parse_args()
 
@@ -52,39 +54,35 @@ def prime_factors(n):
 def autocorrelation(x, largest_prime=500):
     """ FFT based autocorrelation function, which is faster than numpy.correlate. Efficiency is key in order to avoid
     headaches.
-    :param x : numpy array of y values of an equispaced timeseries
+    :param x : multidimensional numpy array of y values of an equispaced timeseries. [npoints, ntrajectories]
     :param largest_prime : the largest prime factor of array length allowed. The smaller the faster. 1.6M points takes
     about 5 seconds with largest_prime=1000. Just be aware that you are losing data by truncating. But 5-6 data points
     isn't a big deal usually.
     """
 
-    # Force length of array to be power of 2
-    # powers = np.array([2 ** i for i in range(25)])
-    # closest = np.argmin(np.abs(powers - (2*x.size - 1)))
-    # nzeros = (powers[closest] // 2) - x.size
-    # if nzeros < 0:
-    #     closest += 1
-    #     nzeros = (powers[closest] // 2) - x.size
-    # v = np.concatenate((x, np.zeros([nzeros])))
+    # x -= np.mean(x, axis=0)  # subtract the mean (alternate, but not equivalent way of calculating autocorrelation)
 
-    # Just don't allow a prime factor larger than 'largest_prime'. Truncate data until that condition is met
-    l = 2*x.size - 1
+    l = 2*x.shape[0] - 1
 
     while largest_prime_factor(l) >= largest_prime or l % 2 == 0:
         l -= 1
 
-    x = x[:(l + 1) // 2]
-    length = x.size*2 - 1
+    x = x[:(l + 1) // 2, :]
+    length = x.shape[0]*2 - 1
 
-    fftx = np.fft.fft(x, n=length)
-    ret = np.fft.ifft(fftx * np.conjugate(fftx))
+    fftx = np.fft.fft(x, n=length, axis=0)
+    ret = np.fft.ifft(fftx * np.conjugate(fftx), axis=0)
     ret = np.fft.fftshift(ret)
 
-    auto = ret[length // 2:]  # used to return this, not sure if the following should happen
-    n = ret[length // 2:].shape[0]
-    average = [n - i for i in range(n)]
+    # divide each point in the autocorrelation function by the number of counts
+    auto = ret[length // 2:].real
+    auto = np.mean(auto, axis=1)
 
-    return auto / average  # / np.amax(ret[length//2:])  # don't normalize
+    n = auto.shape[0]
+
+    # return auto / (x.var()*np.arange(n, 0, -1))  # if subtracting mean, this is right thing to return
+
+    return auto / np.arange(n, 0, -1)
 
 
 def estimated_autocorrelation(x):
@@ -98,19 +96,6 @@ def estimated_autocorrelation(x):
     result = r / (variance * (np.arange(n, 0, -1)))
 
     return result
-
-
-def running_integral(x):
-    """
-    :param x: numpy array of values at each time point
-    :return: running integral of x.
-    """
-
-    integral = np.zeros_like(x)
-    for i in range(x.shape[0]):
-        integral[i] = np.sum(x[:i])
-
-    return integral
 
 
 def viscosity_fit(t, A, a, tau1, tau2):
@@ -135,12 +120,18 @@ class Viscosity(object):
         :param max_lag : maximum time lag to for calculation of autocorrelation function (ps)
         """
 
-        kb = 1.38064852 * 10 ** -23  # boltzmann constant
+        kb = 1.38064852 * 10 ** -23  # boltzmann constant [=] m**2 * kg * s**-2 * K**- 1
         t = md.load(gro)
         box = t.unitcell_vectors[0, :, :]
-        self.volume = np.dot(box[2, :], np.cross(box[0, :], box[1, :]))  # volume of unit cell nm3
+        self.volume = np.dot(box[2, :], np.cross(box[0, :], box[1, :]))  # volume of unit cell [=] nm3
         self.volume *= 1 * 10 ** -27  # convert to m3
         self.max_lag = max_lag
+        self.autocorr = []
+        self.runningintegral = []
+        self.fit_params = None
+        self.viscosity = []
+        self.average_viscosity = 0
+        self.std_viscosity = 0
 
         # get all off diagonal elements of the pressure tensor vs. time using gmx energy
         print('Extracting off-diagonal elements of the pressure tensor and Temperature from %s' % edr)
@@ -163,53 +154,83 @@ class Viscosity(object):
             data_start += 1
         data_start += 1
 
-        P = np.zeros([len(xvg) - data_start, 6])
-        T = np.zeros([len(xvg) - data_start])
-        self.time = []
+        self.P = np.zeros([len(xvg) - data_start, 6])
+        self.T = np.zeros([len(xvg) - data_start])
+        self.time = np.zeros([len(xvg) - data_start])
         for i in range(data_start, len(xvg)):
             data = xvg[i].split()
-            self.time.append(float(data[0]))
-            P[i - data_start, :] = [float(d) for d in data[2:]]
-            T[i - data_start] = float(data[1])
+            self.time[i - data_start] = float(data[0])
+            self.P[i - data_start, :] = [float(d) for d in data[2:]]
+            self.T[i - data_start] = float(data[1])
 
-        self.time = np.array(self.time)
+        self.dt = self.time[1] - self.time[0]  # [=] ps
+        self.P *= 100000  # convert from bar to pascal
 
-        P *= 100000  # convert from bar to pascal
-        # T_equil = timeseries.detectEquilibration(T)  # super slow for large number of data points
-        self.Tavg = np.mean(T)
-        self.prefactor = self.volume / (kb * self.Tavg)
+        self.Tavg = np.mean(self.T)  # [=] K
+        self.prefactor = self.volume / (kb * self.Tavg)  # [=] m * s**2 * kg**-1 [=] Pa**-1
 
         self.nintervals = 0
         while self.time[self.nintervals] < self.max_lag:
             self.nintervals += 1
 
-        # autocorr = np.zeros_like(P)  # [=] Pa**2 * ps
-        print('Calculating autocorrelation function for all 6 off-diagonals')
-        # for i in tqdm.tqdm(range(6)):
-        #     autocorr[:, i] = autocorrelation(P[:, i]).real
+    def break_apart_trajectory(self, nsub):
+        """
+        Break the trajectory into n equal length trajectories
+        :param n: number of subtrajectories to break trajectory into
+        """
 
-        self.autocorr = autocorrelation(P[:, 0]).real
-        for i in tqdm.tqdm(range(1, 6)):
-            self.autocorr += autocorrelation(P[:, i]).real  # calculate autocorrelation function w/FFT
+        total_length = self.P.shape[0]  # total number of frames
+        length_sub = total_length // nsub  # number of frames per subtrajectory
+        self.P = self.P[:int(nsub*length_sub), :]  # get rid of extra frames (if any)
+        self.P = np.reshape(self.P, (nsub, length_sub, self.P.shape[1]))
+        print('Trajectory broken into %d sub-trajectories of length %.1f ps' % (nsub, self.dt*length_sub))
 
-        self.autocorr /= 6
-        # self.autocorr = np.mean(autocorr, axis=1)  # average
-        self.runningintegral = 1*10**-12 * running_integral(self.autocorr[:self.nintervals]) * self.prefactor
+    def calculate(self, nboot=1000):
+        """
+        Calculate viscosity
+        """
 
+        nsub = self.P.shape[0]
         bounds = ([-np.inf, 0, 0, 0], [np.inf, 1, np.inf, np.inf])  # bounds on parameters that will be fit
 
-        solp, pcov = curve_fit(viscosity_fit, self.time[:self.nintervals], self.runningintegral[:self.nintervals],
-                               bounds=bounds)
-        self.fit_params = solp
+        for i in range(nsub):
 
-        print('Infinite time viscosity: %.7f Pa-s' % viscosity_fit(np.inf, solp[0], solp[1], solp[2], solp[3]))
+            print('Calculating viscosity for trajectory # %d' % (i + 1), end='\r', flush=True)
+            self.autocorr.append(autocorrelation(self.P[i, ...]).real)
+
+            # calculate running integral of autocorrelation function
+            ps_to_s = 1*10**-12  # conversion of picoseconds to seconds
+            self.runningintegral.append(ps_to_s * cumtrapz(self.autocorr[i][:self.nintervals], dx=self.dt, initial=0)
+                                        * self.prefactor)
+
+            # fit double exponential function to running integral
+            solp, pcov = curve_fit(viscosity_fit, self.time[:self.nintervals],
+                                   self.runningintegral[i][:self.nintervals], bounds=bounds)
+
+            self.viscosity.append(viscosity_fit(np.inf, solp[0], solp[1], solp[2], solp[3]))
+
+        self.autocorr = np.mean(np.array(self.autocorr), axis=0)  # The mean autocorrelation function will be plotted
+        self.runningintegral = np.mean(np.array(self.runningintegral), axis=0)  # plot mean running integral
+
+        solp, pcov = curve_fit(viscosity_fit, self.time[:self.nintervals],
+                               self.runningintegral[:self.nintervals], bounds=bounds)
+        self.fit_params = solp
+        self.average_viscosity, self.std_viscosity = self.bootstrap(nboot)
+        # multiply by 1000 to convert from Pa-s to cP
+        print('\nAverage Viscosity : %.3g +/- %.3g cP' % (1000*self.average_viscosity, 1000*self.std_viscosity))
+
+    def bootstrap(self, n):
+
+        ndx = np.random.randint(0, len(self.viscosity), size=n)
+        trials = [self.viscosity[ndx[i]] for i in range(n)]
+
+        return np.mean(trials), np.std(trials)
 
     def plot_all(self, save=False):
         """
         Plot all relevant data
         :return:
         """
-
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         ax.plot(self.time[:10*self.nintervals], self.autocorr[:10*self.nintervals]/np.amax(self.autocorr[:10*self.nintervals]))
@@ -231,7 +252,6 @@ class Viscosity(object):
         plt.plot(self.time[:self.nintervals], self.runningintegral[:self.nintervals], label='Running Integral')
         plt.xlabel('Time (ps)', fontsize=14)
         plt.ylabel('$\eta(t)$')
-        #plt.ylabel('Running integral of autocorrelation function', fontsize=14)
         plt.legend()
         plt.tight_layout()
         if save:
@@ -240,16 +260,11 @@ class Viscosity(object):
         plt.show()
 
 
-def autocorr(x):
-
-    result = np.correlate(x, x, mode='full')
-
-    return result[result.size//2:]
-
-
 if __name__ == "__main__":
 
     args = initialize()
 
     V = Viscosity(args.edr, args.gro)
+    V.break_apart_trajectory(args.nsub)
+    V.calculate()  # calculate viscosity
     V.plot_all()

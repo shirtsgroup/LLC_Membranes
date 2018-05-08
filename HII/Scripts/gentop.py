@@ -94,6 +94,7 @@ class SystemTopology(object):
                     top.append(';Ion Topology\n')
                     top.append('#include "%s/ions.itp"\n' % self.top_location)
                     top.append('\n')
+                ion_count += 1
             else:
                 top.append(';%s Topology\n' % r)
                 if self.restraints:
