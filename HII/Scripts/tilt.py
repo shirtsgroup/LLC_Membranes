@@ -98,6 +98,19 @@ def angles(pos, atoms, normal=[0, 0, 1]):
     return w
 
 
+def bootstrap(angles, nboot):
+
+    angles = angles.flatten()
+    bootstrap = np.zeros([nboot, angles.size])
+    print('Boostrapping...', end='\r', flush=True)
+    for i in tqdm.tqdm(range(nboot)):
+        indices = np.random.randint(0, angles.size)
+        bootstrap[i, :] = angles[indices]
+    print('Done!')
+
+    return bootstrap
+
+
 if __name__ == "__main__":
 
     args = initialize()
@@ -143,8 +156,12 @@ if __name__ == "__main__":
         # print b
         print("Average Angle: %s +/- %s degrees" % (np.mean(all_tilt_angles[0, :]), np.std(all_tilt_angles[0, :])))
     else:
+
+        #bootstrapped = bootstrap(all_tilt_angles, nboot=1000) needs work.
+
         nT = all_tilt_angles.shape[0]
         plt.hist(all_tilt_angles.flatten(), bins=50, normed=True)
+        # plt.hist(bootstrapped.flatten(), bins=50, normed=True)
         avg = np.mean(all_tilt_angles)
         plt.plot([avg, avg], [0, 0.035], '--', color='black')
         plt.gcf().get_axes()[0].tick_params(labelsize=14)

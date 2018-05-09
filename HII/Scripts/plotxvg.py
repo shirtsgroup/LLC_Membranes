@@ -3,6 +3,7 @@
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
+from pymbar.timeseries import detectEquilibration
 
 
 def initialize():
@@ -49,6 +50,10 @@ if __name__ == "__main__":
         linedata = [float(d) for d in xvg[i].split()]
         data[i - start, :] = linedata
 
+    equil = np.zeros([data.shape[1] - 1])  # equilibration time for each timeseries
+    for i in range(1, data.shape[1]):
+        equil[i - 1] = detectEquilibration(data[:, i])[0]
+
     if args.units == 'ns':
         data[:, 0] /= 1000
 
@@ -62,4 +67,8 @@ if __name__ == "__main__":
     plt.tight_layout()
     if args.save:
         plt.savefig(args.out)
+
+    for i in range(equil.size):
+        print('Average %s: %.2f +\- %.2f' % (columns_labels[i + 1], np.mean(data[int(equil[i]):, i + 1]), np.std(data[int(equil[i]):, i + 1])))
+
     plt.show()

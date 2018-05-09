@@ -414,100 +414,102 @@ if __name__ == "__main__":
         zdf /= np.mean(zdf)
         zdf = zdf[shift:]
         centers1 = np.array(centers1[shift:])
+        print(zdf)
 
         plt.figure()
-        #plt.plot(centers1, zdf, label='Raw data')
+        plt.plot(centers1, zdf, label='Raw data')
 
         if args.fit:
-            # start = 5
-            # #Fit decaying exponential to peaks of oscillating correlation function
-            # peaks = detect_peaks.detect_peaks(zdf, mpd=12, show=False)  # adjust mpd if number of peaks comes out wrong
-            # if args.offset:
-            #     peaks = peaks[1::2]  # every other peak starting at the second peak
-            #
-            # # peaks = [32, 78, 123, 159]  # offset 300K
-            # # peaks = [31, 77, 119, 162]  # offset 280K
-            # # peaks = [10, 30, 58, 80, 100, 118, 138, 157]  # layered 300K disordered
-            # #peaks = [33, 82, 115, 148]  # offset 300K disordered
+            start = 5
+            #Fit decaying exponential to peaks of oscillating correlation function
+            peaks = detect_peaks.detect_peaks(zdf, mpd=12, show=False)  # adjust mpd if number of peaks comes out wrong
+            if args.offset:
+                peaks = peaks[1::2]  # every other peak starting at the second peak
+
+            # peaks = [32, 78, 123, 159]  # offset 300K
+            # peaks = [31, 77, 119, 162]  # offset 280K
+            # peaks = [10, 30, 58, 80, 100, 118, 138, 157]  # layered 300K disordered
+            #peaks = [33, 82, 115, 148]  # offset 300K disordered
             # peaks = [32, 82, 133]  # disorder offset
-            # print(peaks)
-            # # if len(peaks) > 4:
-            # #     peaks = peaks[:4]
-            #
-            # plt.scatter(centers1[peaks], zdf[peaks], marker='+', c='r', s=200, label='Peak locations')
-            #
-            # period = 0.438
-            # p = np.array([2, 10])  # initial guess at parameters
-            # bounds = ([0, 0], [np.inf, np.inf])
-            # solp, cov_x = curve_fit(exponential_decay, centers1[peaks], zdf[peaks], p, bounds=bounds)
-            # print(solp)
-            #
-            # plt.plot(centers1[start:], exponential_decay(np.array(centers1[start:]), solp[0], solp[1]), '--',
-            #          color='black', label='Least squares fit')
-            # print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*solp[1], 10*np.sqrt(cov_x[1, 1])))
-            # # print('Oscillation Period = %1.3f nm' % (10*(2*np.pi)/solp[0]))
+            print(peaks)
+            # if len(peaks) > 4:
+            #     peaks = peaks[:4]
+
+            plt.scatter(centers1[peaks], zdf[peaks], marker='+', c='r', s=200, label='Peak locations')
+
+            period = 0.438
+            p = np.array([2, 10])  # initial guess at parameters
+            bounds = ([0, 0], [np.inf, np.inf])
+            solp, cov_x = curve_fit(exponential_decay, centers1[peaks], zdf[peaks], p, bounds=bounds)
+            print(solp)
+            plt.plot(centers1[start:], 1 + solp[0]*np.exp(-centers1[start:]/solp[1]))
+
+            plt.plot(centers1[start:], exponential_decay(np.array(centers1[start:]), solp[0], solp[1]), '--',
+                     color='black', label='Least squares fit')
+            print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*solp[1], 10*np.sqrt(cov_x[1, 1])))
+            # print('Oscillation Period = %1.3f nm' % (10*(2*np.pi)/solp[0]))
             # plt.legend()
             # plt.show()
             # exit()
 
-            # Calculate fundamental frequency of oscillating correlation function
-            n = 10000
-            FT = np.abs(np.fft.fft(zdf - np.mean(zdf), n=n))**2
-            # FT = np.abs(np.fft.fft(zdf - np.mean(zdf)))**2
-
-            binsize = (centers1[-1] - centers1[0]) / n
-            binsize = centers1[1] - centers1[0]
-            print(binsize)
-            freqs = np.fft.fftfreq(len(centers1), d=binsize)
-            freqs = np.fft.fftfreq(n, d=binsize)
-            idx = np.argsort(freqs)  # reorder frequencies so they go from [-max_freq, max_freq]
-            FT = FT[idx]  # reorder fourier transform
-            freqs = freqs[idx]
-            plt.plot(freqs, FT)
-            plt.show()
-            exit()
-
-            ff = np.abs(1 / freqs[np.argmax(FT)])  # real space max freq [=] nm
-            # ff = np.abs(freqs[np.argsort(FT)[-3]])  # offset configuration
-
-            # indices = []
-            # for i in range(len(centers1)):
-            #     if (centers1[i] / ff) - int(centers1[i]/ ff) < 0.25:
-            #         indices.append(i)
-
-            # indices.append(0)
-            # indices.append(1)
-            # for i in range(25, 45):
-            #     indices.append(i)
+            # # Calculate fundamental frequency of oscillating correlation function
+            # n = 10000
+            # FT = np.abs(np.fft.fft(zdf - np.mean(zdf), n=n))**2
+            # # FT = np.abs(np.fft.fft(zdf - np.mean(zdf)))**2
             #
-            # for i in range(68, 90):
-            #     indices.append(i)
-            #
-            # for i in range(113, 133):
-            #     indices.append(i)
-            #
-            # for i in range(153, 174):
-            #     indices.append(i)
-
-            # plt.plot(centers1[indices], zdf[indices])
+            # binsize = (centers1[-1] - centers1[0]) / n
+            # binsize = centers1[1] - centers1[0]
+            # print(binsize)
+            # freqs = np.fft.fftfreq(len(centers1), d=binsize)
+            # freqs = np.fft.fftfreq(n, d=binsize)
+            # idx = np.argsort(freqs)  # reorder frequencies so they go from [-max_freq, max_freq]
+            # FT = FT[idx]  # reorder fourier transform
+            # freqs = freqs[idx]
+            # plt.plot(freqs, FT)
             # plt.show()
             # exit()
-            period = 2 * np.pi / ff  # period of sine function
-
-            # fit decaying sinusoidal function to data
-            p = [5, np.pi, 100]  # amplitude, phase shift, correlation length. Pick values above what is expected
-            bounds = ([0, 0, 0], [np.inf, np.inf, np.inf])  # bounds on fit parameters
-            start = 5  # discard data points up to start.
-            solp, pcov = curve_fit(make_sinusoidal_decay(period), centers1[start:], zdf[start:], p, bounds=bounds)
-            # solp, pcov = curve_fit(make_sinusoidal_decay(period), centers1[indices], zdf[indices], p, bounds=bounds)
-            print(solp)
-            # plot fit
-            func = make_sinusoidal_decay(period)
-            plt.plot(centers1[start:], func(centers1[start:], solp[0], solp[1], solp[2]), '--', c='black', label='Least squares fit')
-            plt.plot(centers1[start:], 1 + solp[0]*np.exp(-centers1[start:]))
-
-            print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*solp[2], 10*np.sqrt(pcov[2, 2])))
-            print('Oscillation Period = %1.3f nm' % (2*np.pi / period))
+            #
+            # ff = np.abs(1 / freqs[np.argmax(FT)])  # real space max freq [=] nm
+            # # ff = np.abs(freqs[np.argsort(FT)[-3]])  # offset configuration
+            #
+            # # indices = []
+            # # for i in range(len(centers1)):
+            # #     if (centers1[i] / ff) - int(centers1[i]/ ff) < 0.25:
+            # #         indices.append(i)
+            #
+            # # indices.append(0)
+            # # indices.append(1)
+            # # for i in range(25, 45):
+            # #     indices.append(i)
+            # #
+            # # for i in range(68, 90):
+            # #     indices.append(i)
+            # #
+            # # for i in range(113, 133):
+            # #     indices.append(i)
+            # #
+            # # for i in range(153, 174):
+            # #     indices.append(i)
+            #
+            # # plt.plot(centers1[indices], zdf[indices])
+            # # plt.show()
+            # # exit()
+            # period = 2 * np.pi / ff  # period of sine function
+            #
+            # # fit decaying sinusoidal function to data
+            # p = [5, np.pi, 100]  # amplitude, phase shift, correlation length. Pick values above what is expected
+            # bounds = ([0, 0, 0], [np.inf, np.inf, np.inf])  # bounds on fit parameters
+            # start = 5  # discard data points up to start.
+            # solp, pcov = curve_fit(make_sinusoidal_decay(period), centers1[start:], zdf[start:], p, bounds=bounds)
+            # # solp, pcov = curve_fit(make_sinusoidal_decay(period), centers1[indices], zdf[indices], p, bounds=bounds)
+            # print(solp)
+            # # plot fit
+            # func = make_sinusoidal_decay(period)
+            # plt.plot(centers1[start:], func(centers1[start:], solp[0], solp[1], solp[2]), '--', c='black', label='Least squares fit')
+            # plt.plot(centers1[start:], 1 + solp[0]*np.exp(-centers1[start:]))
+            #
+            # print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*solp[2], 10*np.sqrt(pcov[2, 2])))
+            # print('Oscillation Period = %1.3f nm' % (2*np.pi / period))
 
         plt.xlabel('Z distance separation (nm)', fontsize=14)
         plt.ylabel('Count', fontsize=14)
@@ -523,7 +525,7 @@ if __name__ == "__main__":
         # plt.plot(centers1[shift:], correlation[middle_x, middle_y, shift:]/np.mean(correlation[middle_x, middle_y, shift:]))
         # plt.ylabel('Normalized Count')
         # plt.xlabel('Distance (nm)')
-        plt.show()
+        # plt.show()
 
     if len(dimensions) > 1:
 

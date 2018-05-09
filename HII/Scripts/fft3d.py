@@ -43,6 +43,8 @@ def initialize():
                         'positions over trajectory and then take fourier transform once of averaged array')
     parser.add_argument('-begin', default=0, type=int, help='Frame to begin calculations at')
     parser.add_argument('-end', default=-1, type=int, help='Frame to end calculations at')
+    parser.add_argument('-noise', default=1, type=float, help='Frame to end calculations at')
+
 
     args = parser.parse_args()
 
@@ -206,9 +208,9 @@ def pore(nmon_per_layer, r, layers, dbwl, center, offset=True, offset_angle=0, r
     """
 
     locations = np.zeros([nmon_per_layer*layers, 3])
-    noise_sigma = 1
-    noise = np.random.normal(scale=noise_sigma, size=(locations.shape[0], 2))  # random xy noise
-    #noise = np.random.normal(scale=noise_sigma, size=locations.shape[0])  # random z noise
+    noise_sigma = args.noise
+    # noise = np.random.normal(scale=noise_sigma, size=(locations.shape[0], 2))  # random xy noise
+    noise = np.random.normal(scale=noise_sigma, size=locations.shape[0])  # random z noise
 
     theta = 2*np.pi / nmon_per_layer  # theta between rings
 
@@ -234,9 +236,13 @@ def pore(nmon_per_layer, r, layers, dbwl, center, offset=True, offset_angle=0, r
                     displacement.append(l*nmon_per_layer + i)
 
     locations[:, :2] += center
-    # locations[1:-1, 2] += noise[1:-1]
-
-    locations[:, :2] += noise
+    locations[1:, 2] += noise[1:]
+    # locations[:, :2] += noise
+    # pitch = 1
+    # zig = np.linspace(0, pitch, layers//2)
+    # zag = np.linspace(pitch, 0, layers//2)
+    # locations[:layers//2, 0] += zig
+    # locations[layers//2:, 0] += zag
 
     if radial_displacement:
         theta = rd_angle
@@ -566,7 +572,7 @@ if __name__ == "__main__":
             freq_z = freq_z[ndz]
 
     fourier_bin = freq_x[1] - freq_x[0]
-    print('Fourier spacing : %s' % np.abs(fourier_bin))
+    #print('Fourier spacing : %s' % np.abs(fourier_bin))
 
     if args.dim == 1:
 
@@ -634,6 +640,14 @@ if __name__ == "__main__":
         plt.contourf(freq_x, freq_z, fft[fft_center, :, :].T)
         plt.colorbar()
         plt.title('xz cross-section of 3D ft')
+
+        peak = 0
+        while freq_z[peak] < 0.27:
+            peak += 1
+
+        intensities = fft[fft_center, fft_center, :]
+        intensities[fft.shape[2]//2] = 0
+        print(np.amax(intensities))
 
     if not args.noshow:
         plt.show()

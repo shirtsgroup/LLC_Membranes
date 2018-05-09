@@ -9,21 +9,23 @@
 \usepackage{gensymb}
 \usepackage{xr}
 
-\makeatletter
-\newcommand*{\addFileDependency}[1]{% argument=file name and extension
-  \typeout{(#1)}
-  \@addtofilelist{#1}
-  \IfFileExists{#1}{}{\typeout{No file #1.}}
-}
-\makeatother
- 
-\newcommand*{\myexternaldocument}[1]{%
-    \externaldocument{#1}%
-    \addFileDependency{#1.tex}%
-    \addFileDependency{#1.aux}%
-}
+\SectionNumbersOn
 
-\externaldocument[S-]{supplemental}
+%\makeatletter
+%\newcommand*{\addFileDependency}[1]{% argument=file name and extension
+%  \typeout{(#1)}
+%  \@addtofilelist{#1}
+%  \IfFileExists{#1}{}{\typeout{No file #1.}}
+%}
+%\makeatother
+% 
+%\newcommand*{\myexternaldocument}[1]{%
+%    \externaldocument{#1}%
+%    \addFileDependency{#1.tex}%
+%    \addFileDependency{#1.aux}%
+%}
+
+\externaldocument[S-]{supporting_information}
 
 %MRS5: could be punchier. I will keep thinking.  I should be the last author.  Chen the names that Joe and Matt wanttu use (presumably with some middle initial?
 \title{Understanding the nanoscale structure of hexagonal phase lyotropic 
@@ -1109,41 +1111,56 @@ liquid crystal membranes}
   the measured equilibrated pore-to-pore distances. To discern the composition of
   the monomer layers, addressing question (\ref{point:monomernum}), we ran
   simulations of systems created with 4--8 columns per pore. We built systems in both
-  %BJC5: need to make parallel displaced and sandwiched configurations clear in methods
   the parallel displaced and sandwiched configurations and equilibrated them according
-  to the dry equilibration procedure. We test all systems with an initial vertical monomer 
-  spacing, \textit{d}, of 3.7~\AA in accordance with R-$\pi$. We tested 4 additional systems with
-  monomers initially spaced 5 \AA~apart vertically (See supporting info for more details on       
-  %BJC5: integrate supplemental section labels into main paper.
-  sensitivity to initial layer spacing). The pore-to-pore spacing is equilibrated, as defined in
-  section~\ref{method:equil_time} in all systems after 400 ns of simulation.
-  Figure~\ref{fig:p2p} shows the equilibrated pore-to-pore distances for all systems tested. 
-  Systems built with 5 columns in each pore equilibrate to a pore spacing that is most
-  %BJC5: New paragraph? 
+  to the dry equilibration procedure. We tested all systems with an initial vertical monomer 
+  spacing, \textit{d}, of 3.7 \AA~in accordance with R-$\pi$. We tested 4 additional systems with
+  monomers initially spaced 5 \AA~apart vertically (See section~\ref{S-section:initial_pore_spacing}
+  of the supporting info for more details on sensitivity to initial layer spacing). 
+  The pore-to-pore spacing is equilibrated, as defined in section~\ref{method:equil_time},
+  % BJC5: this achemso format does not have section numbers so I can't reference sections
+  % within this document.
+  in all systems after 400 ns of simulation. Figure~\ref{fig:p2p} shows the equilibrated
+  pore-to-pore distances for all systems tested. 
+  
+  Systems built with 5 columns in each pore equilibrate to a pore spacing that is most 
   consistent with the experimental value of 4.12 nm derived from SAXS measurements 
-  (Figure~\ref{fig:SAXS}).
-  %BJC5: comment about disordered systems
-
-  The remainder of this discussion will focus on the analysis of systems built with
-  5 columns per pore. Systems built with 6 columns per pore have an equilibrated
-  pore spacing c.a. 0.50 nm higher than experiment. Systems built with 4 columns per pore
-  %BJC5: edit above with consciencenous of new 6 mon/layer sim data
-  equilibrate to a pore spacing 0.25 nm lower than experiment. All systems tested are at least
-  metastable on the timescales studied here, however not all make physical sense or
-  fit the experimental profile that we are trying to match. In the limit of infinite simulation
-  time, all simulations will converge to a single density. It is our intention to choose an
-  initial configuration which quickly reaches a monomer density close to experiment. We believe
-  systems built with 5 columns per pore achieve this goal.
+  (Figure~\ref{fig:SAXS}). The remainder of this discussion will focus on the analysis of
+  systems built with 5 columns per pore. Systems built with 6 columns per pore, and 
+  $\mathit{d}=3.7~\AA~$, have an equilibrated pore spacing c.a. 0.50 nm higher than experiment.
+  Systems built with 4 columns per pore equilibrate to an average pore spacing 0.25 nm lower
+  than experiment. 
+  
+  %BJC5: thesis needs rewording.
+  Systems built with 6 columns-per-pore and $\mathit{d}=5~\AA~$ are not compact
+  in the z-direction. The final pore spacing is close to experiment within its uncertainty.
+  Relative to 6 column-per-pore systems started with $\textit{d}=3.7~\AA~$, the unit cell
+  is elongated in its z dimension and contracted in its x and y dimensions, however the
+  box volume stays nearly constant in all cases (Figure~\ref{fig:box_dimensions}). The system
+  is likely not fully equilibrated and may eventually rearrange into something that resembles
+  a 5 column-per-pore system. Further investigations into this are beyond the scope of this
+  paper.
+  
+  \begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{box_dimensions.png}
+  \caption{When monomers are initially stacked 5 \AA~apart ($\textit{d}=5 \AA~$), the unit cell
+  expands in the z direction and contracts in its x and y dimensions. The volume remain nearly
+  constant across all cases. The y dimension box vectors are not included since we use 
+  semiisotropic pressure coupling which requires that the x and y box vectors change uniformly.}\label{fig:box_dimensions}
+  \end{figure}  
+  
+  All systems tested are at least metastable on the timescales studied here, however not all 
+  make physical sense or fit the experimental profile that we are trying to match. In the limit
+  of infinite simulation time, all simulations will converge to a single density. It is our 
+  intention to choose an initial configuration which quickly reaches a monomer density close 
+  to experiment. We believe systems built with 5 columns per pore achieve this goal.
 
   \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{p2p.png}
 	\caption{Systems with 5 columns per pore have equilibrated pore spacings closest to
 			 the experimental value of 4.12 nm. The equilibrated pore spacing of the model 	
-			 increases as the number of columns in each pore increases. The pore spacing
-			 of systems starting in the sandwiched configuration are systematically lower
-			 %BJC5: double check this statement once all data is present
-			 than those started in the parallel displaced configuration.}~\label{fig:p2p}
+			 increases as the number of columns in each pore increases.}~\label{fig:p2p}
   \end{figure}  
 
   \subsection{Structural refinement with 2D WAXS data}
@@ -1209,8 +1226,8 @@ liquid crystal membranes}
   
   The simulated XRD patterns show moderate qualitative agreement with experiment. R-alkanes and
   R-pores appear in the expected location. R-pores is more intense than experiment, likely
-  because we are simulating a perfect, infinite hexagonal array. The real system has defects and
-  domain misalignment which decreases the overall intensity.
+  because we are simulating a near perfect, infinite hexagonal array. The real system has 
+  defects and domain misalignment which decreases the overall intensity.
   % MRS4: comments from Matt suggest that domain misaligment shouldn't alone be responsible for 
   % the difference in intensity ratio. Some of the experiments should help explain it better. 	
   % Let's talk!
@@ -1219,15 +1236,15 @@ liquid crystal membranes}
   % MRS5: maybe, there's a question of how we can demonstrate the magnitude of any of these 
   % effects.
   R-spots appears to be weaker in the simulated patterns. They are also partially engulfed by
-  the wide R-$\pi$ reflection. We further explore R-spots in Section~\ref{section:rspots}.  
-  R-$\pi$ appears at a lower $q_z$ value than experiment. In all systems, the reflection 
-  reaches its maximum at $q_z < 1.5 \AA^{-1}$ which means that monomers prefer to stack 
-  at least 4.2 \AA~apart rather than 3.7 \AA. This behavior is not surprising since GAFF models
-  atoms as point charges and does not appropriately model the aromatic $\pi-\pi$ interactions 
-  which would cause the monomers to stack closer together. We will explore R-$\pi$ in more detail
-  in Section~\ref{section:rpi}. R-double does not appear in any of the patterns. We will explore
-  its possible origins and reasons that it does not appear in our simulated patterns in
-  Section~\ref{section:rdouble}.
+  the wide R-$\pi$ reflection. R-$\pi$ appears at a lower $q_z$ value than experiment. In all
+  systems, the reflection reaches its maximum at $q_z < 1.5 \AA^{-1}$ which means that monomers 
+  prefer to stack at least 4.2 \AA~apart rather than 3.7 \AA. This behavior is not surprising 
+  since GAFF models atoms as point charges and does not appropriately model the aromatic
+  $\pi-\pi$ interactions which would cause the monomers to stack closer together. R-double 
+  does not appear in any of the patterns. 
+  
+%  We will explore its possible origins and reasons
+%  that it does not appear in our simulated patterns in Section~\ref{section:rdouble}.
   
   The simulated XRD pattern of the parallel displaced configuration shows an additional
   reflection due to its helical structure. There are horizontal reflections near $|q_z|= 
@@ -1237,19 +1254,14 @@ liquid crystal membranes}
   %BJC5: reference something like a dna diffraction paper
   It is possible that these reflections contribute to the continuation of R-double into R-
   alkanes, as seen in the experimental pattern.
+  %BJC5: not sure above sentence is clear (or necessary to say)
 
-  %BJC4: This paragraph might fit better before qualitative description
-  %BJC5: This could potentially supplement parts of the qualitative descriptions.
   We quantified the numerical discrepancies present when comparing the relative intensities
   of each reflection of interest between experimental and simulated patterns. Table 
   ~\ref{table:relative_inensities_300K} quantifies the relative intensity of each reflection for 
   all systems tested. The patterns are normalized so that the average intensity of R-alkanes 
-  equals 1.
-  % BJC5: above is stated in methods. Not sure if it needs to be restated.  
-  % BJC5: I need to explain how I calculated these intensities somewhere. Is this the right
-  % place to do it? I think it would just be confusing in the methods. I could also move it
-  % to supplemental.
-  % BJC5: Definitely need demonstrative figures in supporting info.
+  must equal 1.
+  % BJC5: show how intensities are measured in supporting info
   We measured the approximate intensity of R-$\pi$ by measuring the intensity of the peak shown
   by the cross-section of the 2D pattern at $q_r=0$. The relative intensity of R-$\pi$ is 
   significantly higher than experiment in our simulations. R-spots is measured as the average
@@ -1257,7 +1269,8 @@ liquid crystal membranes}
   inspection. If the spots were not easily discernable, then the intensity was taken as that of
   the intersection of R-alkanes at half the $q_z$ value of R-$\pi$, since that is where it 
   appears experimentally. The intensity of R-spots is slightly lower than experiment in all 
-  cases. There is no R-double intensity to be measured.
+  cases. There is no R-double intensity to be measured. Descriptive figures are provided in the
+  supporting information to make these measurements clear.
 
   \begin{table}[h]
   \centering
@@ -1265,7 +1278,8 @@ liquid crystal membranes}
   \toprule
  		   & \multicolumn{5}{c}{Configuration} \\
   \hline
-  Reflection & Experiment & Sandwiched & Parallel Displaced & Disordered Sandwiched & Disordered Parallel Displaced \\
+             &            &            & Parallel  & Disordered & Disordered         \\
+  Reflection & Experiment & Sandwiched & Displaced & Sandwiched & Parallel Displaced \\
   \midrule
   R-alkanes & 1.0 &  1.0 &  1.0 & 1.0 & 1.0  \\  
   R-spots   & 1.3 &  1.2 &  1.2 & 1.2 & 1.2  \\
@@ -2105,6 +2119,9 @@ liquid crystal membranes}
   \subsection{Chemical composition of pore columns}
 
 %MRS5: put a little more of the rational for looking at this here. Why should they care?
+  We are most interested in the pore architecture. What's happening in the tails is unimportant.
+
+
   We plotted the number densities of heavy atoms in the head group, carbon atoms in the tail
   region and all sodium ions (Figure~\ref{fig:densities}). For the head group
   region, we used the carbon atoms making up the aromatic ring. For the tail
