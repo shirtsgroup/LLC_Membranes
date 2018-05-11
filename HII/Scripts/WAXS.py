@@ -293,7 +293,7 @@ Y = np.linspace(-qmax, qmax, waxs.shape[1])
 # np.save('qy', Y)
 # exit()
 
-factor = 3.1
+factor = 3.1 * 6
 colorbar = 'jet'
 levels = np.linspace(0, factor, 200)
 waxs /= avg_intensity
@@ -452,7 +452,7 @@ while Y[R_double_top] < 0:  # The bottom part of the plot is noisier (change 0 t
 fig, ax = plt.subplots()
 heatmap = plt.contourf(X, Y, waxs, cmap=colorbar, levels=levels, extend='max')
 cid = fig.canvas.mpl_connect('button_press_event', onclick)
-# cbar = plt.colorbar(format='%.2f')
+cbar = plt.colorbar(format='%.2f')
 plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=18)
 plt.ylabel('$q_z\ (\AA^{-1}$)', fontsize=18)
 plt.gcf().get_axes()[0].tick_params(labelsize=14)

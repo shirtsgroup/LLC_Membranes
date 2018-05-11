@@ -1,4 +1,6 @@
 \documentclass[journal=jpcbfk,manusciprt=article]{achemso}
+%\documentclass{article}
+%jpcbfk
 
 \usepackage{graphicx}
 \usepackage{wrapfig}
@@ -955,11 +957,30 @@ liquid crystal membranes}
   to a decaying exponential function of the form:
   \begin{equation}
   	Ae^{-z/L}
+  	\label{eqn:decaying_exponential}
   \end{equation}
   where A is a fitting parameter for amplitude, z is the independent variable of $g(z)$ 
   and L is the fit correlation length. The error in the estimated value of L is 
   calculated as the square root of the diagonal entry of the covariance matrix of 
   optimized fit parameters.
+  
+  We also used $g(z)$ to calculate the equilibrated vertical stacking distance between
+  monomers, $\mathit{d}_equil$. 
+  %BJC5: in case there is an criticism of this method
+  %The simplest way to do so, would be to fourier transform
+  %$g(z)$ and extract the highest amplitude frequency of the resulting fourier series. 
+  %However, the size of our system limits the width of the bins in fourier space. The bins
+  %are too large to extract a precise value of $\mathit{d}_equil$. Instead, 
+  We fit a decaying sinusoidal function to $g(z)$ of the form:
+  \begin{equation}
+  	1 - Acos(\frac{2\pi}{\mathit{d}_{equil}}z + B)e^{-z/L}
+  	\label{eqn:decaying_sinusoid}
+  \end{equation}
+  where A and B are fit parameters for the function's amplitude and phase shift respectively.
+  This function could be used in place of Equation~\ref{eqn:decaying_exponential}, however
+  it does not fit the peaks of $g(z)$ from parallel displaced configurations well enough
+  to extract a reliable value of L.
+  %BJC5: maybe include plots of these fits in supporting info
 
 % BJC5: I don't plan on showing any 2D correlation functions -- maybe to show swelling
 % of solvated systems.
@@ -1113,32 +1134,44 @@ liquid crystal membranes}
   simulations of systems created with 4--8 columns per pore. We built systems in both
   the parallel displaced and sandwiched configurations and equilibrated them according
   to the dry equilibration procedure. We tested all systems with an initial vertical monomer 
-  spacing, \textit{d}, of 3.7 \AA~in accordance with R-$\pi$. We tested 4 additional systems with
+  spacing, $\mathit{d}$, of 3.7 \AA~in accordance with R-$\pi$. We tested 4 additional systems with
   monomers initially spaced 5 \AA~apart vertically (See section~\ref{S-section:initial_pore_spacing}
   of the supporting info for more details on sensitivity to initial layer spacing). 
-  The pore-to-pore spacing is equilibrated, as defined in section~\ref{method:equil_time},
+  The pore-to-pore spacing was considered equilibrated, as defined in section~\ref{method:equil_time},
   % BJC5: this achemso format does not have section numbers so I can't reference sections
   % within this document.
   in all systems after 400 ns of simulation. Figure~\ref{fig:p2p} shows the equilibrated
   pore-to-pore distances for all systems tested. 
   
+  All systems tested, although equilibrated from the perspective of the metrics used here, are
+  frozen in metastable basins. Not all make physical sense or fit the experimental profile that 
+  we are trying to match. In the limit of infinite simulation time, all systems will converge to
+  a single equilibrium configuration. For simplicity, we will group the systems studied here into
+  the ordered and disordered basins. Any system where $\mathit{d}=3.7$ \AA~will be included in the
+  ordered basin and any system where $\mathit{d}=5.0$ \AA will be included in the disordered basin.
+  The reason for these names will become clearer as we progress through our analysis.
+  
+%    All systems tested are at least metastable on the timescales studied here, however not all 
+%  make physical sense or fit the experimental profile that we are trying to match. In the limit
+%  of infinite simulation time, all simulations will converge to a single density. It is our 
+%  intention to choose an initial configuration which quickly reaches a monomer density close 
+%  to experiment. We believe systems built with 5 columns per pore achieve this goal.
+  
   Systems built with 5 columns in each pore equilibrate to a pore spacing that is most 
   consistent with the experimental value of 4.12 nm derived from SAXS measurements 
   (Figure~\ref{fig:SAXS}). The remainder of this discussion will focus on the analysis of
-  systems built with 5 columns per pore. Systems built with 6 columns per pore, and 
-  $\mathit{d}=3.7~\AA~$, have an equilibrated pore spacing c.a. 0.50 nm higher than experiment.
-  Systems built with 4 columns per pore equilibrate to an average pore spacing 0.25 nm lower
-  than experiment. 
+  systems built with 5 columns per pore. Ordered basin systems built with 6 columns per pore,
+  have an equilibrated pore spacing c.a. 0.50 nm higher than experiment. Ordered basin systems
+  built with 4 columns per pore equilibrate to an average pore spacing 0.25 nm lower than experiment. 
   
   %BJC5: thesis needs rewording.
-  Systems built with 6 columns-per-pore and $\mathit{d}=5~\AA~$ are not compact
-  in the z-direction. The final pore spacing is close to experiment within its uncertainty.
-  Relative to 6 column-per-pore systems started with $\textit{d}=3.7~\AA~$, the unit cell
-  is elongated in its z dimension and contracted in its x and y dimensions, however the
-  box volume stays nearly constant in all cases (Figure~\ref{fig:box_dimensions}). The system
-  is likely not fully equilibrated and may eventually rearrange into something that resembles
-  a 5 column-per-pore system. Further investigations into this are beyond the scope of this
-  paper.
+  Disordered basin systems built with 6 columns-per-pore are not compact in the z-direction.
+  The final pore spacing is close to experiment within its uncertainty. Relative to ordered basin 
+  6 column-per-pore systems, the unit cell is elongated in its z dimension and contracted in its
+  x and y dimensions, however the box volume stays nearly constant in all cases 
+  (Figure~\ref{fig:box_dimensions}). The system is likely not fully equilibrated and may eventually
+  rearrange into something that resembles a 5 column-per-pore system. Further investigations 
+  into this are beyond the scope of this paper.
   
   \begin{figure}[htb]
   \centering
@@ -1148,12 +1181,6 @@ liquid crystal membranes}
   constant across all cases. The y dimension box vectors are not included since we use 
   semiisotropic pressure coupling which requires that the x and y box vectors change uniformly.}\label{fig:box_dimensions}
   \end{figure}  
-  
-  All systems tested are at least metastable on the timescales studied here, however not all 
-  make physical sense or fit the experimental profile that we are trying to match. In the limit
-  of infinite simulation time, all simulations will converge to a single density. It is our 
-  intention to choose an initial configuration which quickly reaches a monomer density close 
-  to experiment. We believe systems built with 5 columns per pore achieve this goal.
 
   \begin{figure}
 	\centering
@@ -1168,10 +1195,10 @@ liquid crystal membranes}
   We further refined our structural understanding of the system by simulating X-ray 
   diffraction patterns produced from equilibrated MD trajectories and comparing them
   to experiment. We tested systems built with 5 columns per pore in the parallel 
-  displaced and sandwiched configurations at 300 K with monomers initially stacked
-  3.7 \AA~and 5.0 \AA~apart. We generated simulated patterns using portions
-  of simulation trajectory after equilibration. The patterns for all structures are
-  shown and compared to experiment in Figure~\ref{fig:XRDsim}.
+  displaced and sandwiched configurations at 300 K in the ordered and disordered
+  basins. We generated simulated patterns using portions of simulation trajectory after
+  equilibration. The patterns for all structures are shown and compared to experiment
+  in Figure~\ref{fig:XRDsim}.
 
   %BJC5: put figure letters in upper left hand corner of each pattern.
   \begin{figure}[htb]
@@ -1217,8 +1244,8 @@ liquid crystal membranes}
 		\includegraphics[width=\linewidth]{colorbar_jet.png}
 	\end{subfigure}	
 	\caption{Simulated X-ray diffraction patterns show some qualitative agreement with 
-	experiment. Shown is a comparison of the (a) Sandwiched, d=3.7~\AA~ (b) Sandwiched,
-	d=5~\AA~(d) Parallel Displaced, d=3.7~\AA~ and (e) Parallel Displaced, d=5~\AA~ 
+	experiment. Shown is a comparison of the (a) Sandwiched, ordered basin (b) Sandwiched,
+	disordered basin (d) Parallel Displaced, ordered basin and (e) Parallel Displaced, disordered basin 
 	configurations with (c) experimental WAXS. Quantitative comparisons of the relative 
 	intensities of reflections of interest are present in Table~\ref{table:relative_inensities_300K}. 
 	In all cases, R-double is not present.}~\label{fig:XRDsim} 
@@ -1238,16 +1265,14 @@ liquid crystal membranes}
   R-spots appears to be weaker in the simulated patterns. They are also partially engulfed by
   the wide R-$\pi$ reflection. R-$\pi$ appears at a lower $q_z$ value than experiment. In all
   systems, the reflection reaches its maximum at $q_z < 1.5 \AA^{-1}$ which means that monomers 
-  prefer to stack at least 4.2 \AA~apart rather than 3.7 \AA. This behavior is not surprising 
-  since GAFF models atoms as point charges and does not appropriately model the aromatic
-  $\pi-\pi$ interactions which would cause the monomers to stack closer together. R-double 
-  does not appear in any of the patterns. 
+  prefer to stack at least 4.2 \AA~apart rather than 3.7 \AA. R-double does not appear in any
+  of the patterns. 
   
 %  We will explore its possible origins and reasons
 %  that it does not appear in our simulated patterns in Section~\ref{section:rdouble}.
   
-  The simulated XRD pattern of the parallel displaced configuration shows an additional
-  reflection due to its helical structure. There are horizontal reflections near $|q_z|= 
+  The simulated XRD patterns of the parallel displaced configurations show an additional
+  reflection due to their helical structure. There are horizontal reflections near $|q_z|= 
   0.7~\AA^{-1}$, half of the $q_z$ value of R-$\pi$. The reflection does not cross through
   $q_r = 0~\AA^{-1}$ so it does not appear for the same reason as R-double. This type of pattern
   is characteristic of a helix (reference something).
@@ -1274,7 +1299,7 @@ liquid crystal membranes}
 
   \begin{table}[h]
   \centering
-  \begin{tabular}{cccccc}
+  \begin{tabular}{c|ccccc}
   \toprule
  		   & \multicolumn{5}{c}{Configuration} \\
   \hline
@@ -1293,6 +1318,14 @@ liquid crystal membranes}
   does not appear in any patterns, and thus has no measurable intensity.}
   \label{table:relative_inensities_300K} 
   \end{table}
+  
+  %BJC5: I think something like this has to go somewhere.
+  The diffraction patterns show some noise, especially along the $q_z$ axis where $q_r$=0. This
+  noise can be suppressed by sampling more uncorrelated equilibrium configurations. Unfortunately,
+  our simulations are not long enough to sample enough independent configurations. Increasing the
+  number of trajectory frames used to simulate the structure factor within a given interval of time
+  does not offer any improvement.
+  %BJC5: maybe show in supplemental?
   
   There are clear differences between simulated and experimental results that must be addressed
   and justified. We will explore the origin of each experimental reflection and form structural
@@ -1425,9 +1458,9 @@ liquid crystal membranes}
   \subsubsection{Origin of R-spots}\label{section:rspots}
 
   We observe an increase in the intensity of R-spots when we simulate systems at 280K. R-spots
-  is most intense in the sandwiched configuration (Figure~\ref{fig:sandwiched280K}). The relative 
-  intensity of R-spots is higher than in experiment (1.5 vs. 1.3). R-double is still not present.  
-  We will use this configuration to more thoroughly explore the origin of R-spots.
+  is most intense in the ordered basin sandwiched configuration (Figure~\ref{fig:sandwiched280K}). 
+  The relative intensity of R-spots is higher than in experiment (1.5 vs. 1.3). R-double is still
+  not present. We will use this configuration to more thoroughly explore the origin of R-spots.
   
   \begin{figure}
 	  \begin{subfigure}{0.45\linewidth}
@@ -1446,12 +1479,10 @@ liquid crystal membranes}
   
   The R-spots signal is not a result of alkane chain tilt. Previous literature
   has attributed the spots in this particular WAXS pattern as the product of tilted alkane
-  chains~\cite{feng_scalable_2014}. We looked closer at the sandwiched
-  configuration simulated at 280K. We measured the tilt angle of the alkane chains and 
-  showed that our system equilibrates to an average tilt angle close to zero degrees
-  (Fig.~\ref{fig:tilt}). 
+  chains~\cite{feng_scalable_2014}. We looked closer at the sandwiched configuration simulated
+  at 280K. We measured the tilt angle of the alkane chains and showed that our system 
+  equilibrates to an average tilt angle of -2\degree (Fig.~\ref{fig:tilt}). 
   
-   %BJC5: bootstrap this data to make it smoother.
   \begin{figure}
   \centering
   \includegraphics[width=0.5\linewidth]{tilt_dist.png}
@@ -1471,17 +1502,17 @@ liquid crystal membranes}
   peaks in the distribution of these angles (Figure~\ref{fig:tail_packing}).
 
   The peaks in the nearest neighbor angle distribution are consistent with the
-  location of R-spots. The peaks of interest in Figures \ref{fig:offset_tails}
-  and \ref{fig:layered_tails} are located at $\pm 33 \degree$ which is the same
-  location where the highest intensity of spots are located on the simulated
-  patterns. We confirmed this conclusion by radially integrating the 2D WAXS
-  pattern for $\left|\mathbf{q}\right|$ values between 1.4 and 1.57 (between 4
-  and 4.5 \AA~in real space). We observe that distinct peaks appear ca. $30
+  location of R-spots. The peaks of interest in Figure \ref{fig:layered_tails}
+  are located at $\pm 33 \degree$ which is the same location where the highest
+  intensity of spots are located on the simulated patterns. We confirmed this 
+  conclusion by radially integrating the 2D WAXS pattern for 
+  $\left|\mathbf{q}\right|$ values between 1.4 and 1.57 (between 4
+  and 4.5 \AA~in real space). We observe distinct peaks ca. $30
   \degree$, in close agreement with the previously measured angle distribution
-  (Figs.~\ref{fig:offset_integration}~and~\ref{fig:layered_integration}). We
-  performed the same integration on the raw experimental data and found the angle
-  at which R-spots reaches its highest intensity to be $\pm 37 \degree$ which
-  is a reconcilable difference with our simulated results.
+  (Figure~\ref{fig:layered_integration}). We performed the same integration on
+  the raw experimental data and found the angle at which R-spots reaches its
+  highest intensity to be $\pm 37 \degree$ which is a reconcilable difference
+  with our simulated results.
 
 % BJC5: omit for now
 %  The evidence supports the hypothesis that alkane chain tails pack in a
@@ -1596,10 +1627,10 @@ liquid crystal membranes}
   There are a couple reasons why we see stronger ordered chain packing at 280 K compared to
   experimental conditions of 300 K.
   \begin{enumerate}
-  		\item The difference between 280K and 300K is small. Our forcefield parameters
-  		may not correctly model the behavior of the tails at 300K (citation?).
+  		\item The difference between 280 K and 300 K is relatively small. Our forcefield parameters
+  		may not correctly model the behavior of the tails at 300 K (citation?).
   		\item Monomers aren't as confined at 300 K in our simulations versus experiment.
-  		If the head groups packed 3.7 \AA apart, the tails would be more confined and forced
+  		If the head groups packed 3.7 \AA~apart, the tails would be more confined and forced
   		to pack between vertically adjacent monomer tails. In our case, the tail region is
   		less dense than experiment which gives the tails freedom to organize in a more
   		entropically favored disordered state. 
@@ -1608,67 +1639,118 @@ liquid crystal membranes}
   \subsubsection{Discrepancies between R-$\pi$}\label{section:rpi}
   
   We plotted the one-dimensional pair distribution function, $g(z)$, for the centers
-  of mass of monomer phenyl rings (Figure~\ref{fig:correlation}).
+  of mass of monomer phenyl rings (Figure~\ref{fig:correlation}). We used this 
+  information to understand how far apart monomers stack within monomer columns and
+  the degree to which they are correlated.
   
-  %BJC5: redo after discussing with Michael
   \begin{figure}
   \centering
   \begin{subfigure}{0.45\textwidth}
   \centering
   \includegraphics[width=\textwidth]{z_correlation_sandwich.png}
-  \caption{}\label{fig:z_correlation_sandwich}
+  \caption{Sandwiched, Ordered Basin}\label{fig:z_correlation_sandwich}
   \end{subfigure}  
   \begin{subfigure}{0.45\textwidth}
   \centering
   \includegraphics[width=\textwidth]{z_correlation_offset.png}
-  \caption{}\label{fig:z_correlation_offset}
+  \caption{Parallel Displaced, Ordered Basin}\label{fig:z_correlation_offset}
   \end{subfigure}  
   \begin{subfigure}{0.45\textwidth}
   \centering
-  %BJC4: This is noisier than l=3.7 angstrom, but I can still pick out peaks. I'm unsure
-  % how to quantify the difference. The correlation length is very similar to the more
-  % ordered configuration.
   \includegraphics[width=\textwidth]{z_correlation_sandwich_disordered.png}
-  \caption{}\label{fig:z_correlation_sandwich_disordered}
+  \caption{Sandwiched, Disordered Basin}\label{fig:z_correlation_sandwich_disordered}
   \end{subfigure}  
   \begin{subfigure}{0.45\textwidth}
   \centering
-  %BJC4: There really aren't any good peaks here. 
   \includegraphics[width=\textwidth]{z_correlation_offset_disordered.png}
-  \caption{}\label{fig:z_correlation_offset_disordered}
+  \caption{Parallel Displaced, Disordered Basin}\label{fig:z_correlation_offset_disordered}
   \end{subfigure}  
-  \caption{}\label{fig:correlation}
+  \caption{1D correlation functions of the center of masses of aromatic head groups, $g(z)$, show
+  decaying oscillatory behavior. We calculated the correlation length by fitting a decaying exponential
+  function (Equation~\ref{eqn:decaying_exponential}) to the peaks of $g(z)$. The correlation length is
+  longer for ordered basin systems (Table~\ref{table:correlation_length}).
+  We did not attempt to calculate the correlation length for (d) because there are no clear peaks. We 
+  assume that its correlation is less than the vertical distance between monomers.}\label{fig:correlation}
   \end{figure}
   
-  %BJC5: conclusions here will need modification
-  The correlation length between stacked monomer head groups shows the best agreement with
-  experimental for systems simulated in the ordered basin.
-  %BJC4: explanation of correlation function calculation in methods section. 
-  %MRS5: the correlation length doesn't look like that great a fit, since it misses the first point by so much.  We may need to reevaluate a litle how this is done. 
-  %BJC5: forgot an amplitude on exponential fit. New results show lower correlation length
-  We calculated correlation length by fitting a decaying exponential function to all peaks of
-  $g(z)$ for the sandwiched configuration and to every other peak of $g(z)$ for the parallel
-  displaced configuration. The correlation length of systems simulated in the ordered basin are
-  11.2 \AA and 14.9 \AA	for the parallel displaced and sandwiched configurations respectively. 
-  %BJC5: Something about disordered systems.
-  Systems simulated in the ordered basin show correlation closest to the experimental correlation
-  length of 10.1 \AA. They are still slightly more correlated than experiment which would lead to
-  an increase in constructive X-ray scattering. 
-  %BJC5: this statement might not be true anymore. 
+  \begin{table}[h]
+  \centering
+  \begin{tabular}{cccc}
+  \toprule
+  System             & $\mathit{d}$ (\AA) & $\mathit{d}_{equil}$ (\AA) & Correlation Length (\AA) \\
+  \midrule
+  Sandwiched         & 3.7                &    4.27 $\pm$ 0.03         & 4.5 $\pm$ 0.4            \\
+  Parallel Displaced & 3.7                &    4.33 $\pm$ 0.04         & 15.5 $\pm$ 1.9           \\ 
+  Sandwiched         & 5.0                &    4.48 $\pm$ 0.07         & 3.2 $\pm$ 0.9            \\
+  Parallel Displaced & 5.0                &    4.60 $\pm$ 0.08         & $<$ $\mathit{d}_{equil}$ \\ 
+  Experiment         & --                 &    3.70                    & 10 $\pm$ 1               \\
+  \bottomrule
+  \end{tabular}
+  \caption{The correlation length is larger for systems in the ordered basin. The equilibrated vertical
+  stacking distance, $\mathit{d}_{equil}$, is also smaller.}
+  \label{table:correlation_length}
+  \end{table}
   
-  Additionally, our system models near-perfectly straight pores with no defects which will
-  lead to higher intensity vertical stacking reflections. Nearly all of the intensity in R-$\pi$
-  of our simulated patterns is concentrated at a single point. Figure ~\ref{fig:intense_rpi}
-  shows the same simulated patterns with the upper boundary on the colorbar adjusted to be 6x
-  higher. The only distinguishable reflections are those of R-$\pi$ and R-pores. In the 
-  experimental pattern, the intensity is more evenly spread out over all of R-$\pi$. 
+  Monomers in the ordered basin stack closer together than those in the disordered basin
+  (Table~\ref{table:correlation_length}). We calculated the equilibrated vertical distance,
+  $\mathit{d}_{equil}$, between monomers using Equation~\ref{eqn:decaying_sinusoid}. 
+  Monomers in the ordered basin stack ca. 0.2 and 0.3 \AA~closer than those built in the 
+  disordered basin in the sandwiched and parallel displaced configurations respectively. 
+  The distance between stacked monomers is greater than experiment by 0.5 - 0.9 \AA~across all 
+  cases. This behavior is not surprising since GAFF models atoms as point charges and does not 
+  appropriately model the aromatic $\pi-\pi$ interactions which would cause the monomers to 
+  stack closer together. Ordered basin systems are likely the best choice for transport studies.
+  
+  The correlation length between stacked monomer head groups of the ordered systems also show
+  closer agreement with experiment (Table~\ref{table:correlation_length}). We calculated the 
+  correlation length of each system using Equation~\ref{eqn:decaying_exponential}. We could
+  not extract a reliable correlation length from the disordered parallel displaced configuration.
+  The amount of noise in the correlation function and the lack of an initial peak suggests that 
+  the correlation length is less than $\mathit{d}_{equil}$. In general, we see that correlation
+  length increases as monomers stack closer together. The same trend has been seen in molecular
+  dynamics studies of polymer fluids~\cite{koshy_density_2003}. We hypothesize that the correlation
+  length of the sandwiched configuration would increase to a value near experiment if monomers
+  packed closer together. 
+  
+  The persistent oscillatory behavior of the correlation function may in part explain the high
+  intensity of R-$\pi$ relative to experiment. The way we calculate correlation length is
+  unique to the rate of decay of $g(z)$ but not its exact shape. $g(z)$ for our 
+  simulated systems, especially the sandwiched configurations, shows peaks which persist across
+  the entire correlation function. If the peaks at large values of z instead decay to 1 uniformly,
+  the correlation length could remain nearly the same, but R-$\pi$ would have a reduced intensity. 
+  The monomer head groups in our simulations do not move enough to create the noise which would 
+  cause such behavior. See Section TBD of the supporting information for illustrative examples. 
+  % BJC5: Trying using inverted fourier transform of 2D experimental waxs. See what z-cross-section
+  % looks like (does it oscillate more or less?) Then take FT of that and compare its intensity
+  % to simulated intensity
+  
+  The simulated intensity of R-$\pi$ is also more intense than experiment because our system
+  models near-perfectly straight pores with no defects. Nearly all of the intensity in 
+  R-$\pi$ of our simulated patterns is concentrated at a single point. Figure~\ref{fig:simulated_adjusted_colorbar}
+  shows the simulated pattern of the ordered sandwiched configuration with the upper boundary
+  on the colorbar adjusted to be 6x higher than those shown in Figure~\ref{fig:XRDsim}. The only
+  distinguishable reflections are those of R-$\pi$ and R-pores. In the experimental pattern 
+  (Figure~\ref{fig:experimental_adjusted_colorbar}, the intensity is more evenly spread out
+  over all of R-$\pi$. 
+  % BJC5: I'm not sure how well supported the above paragraph is by the below figure. Need to figure 
+  % out what to do about it
+  % BJC5: Could it also be related to noise in xy direction?
+  % BJC5 : I think my original intent was to explain it as tortuosity. But it's not clear if the
+  % reflection is arced
   
   \begin{figure}
   \centering
-  \includegraphics[width=0.4\textwidth]{sandwich_rzplot_highlimit_cbar.png}
-  \caption{R-$\pi$ and R-pores are far more intense than the other major reflections. Here, the 
-  colorbar was scaled so that the max is 6x higher than all other plots.}\label{fig:intense_rpi}
-  % BJC5: could benefit from an adjusted colorbar experimental pattern.
+  \begin{subfigure}{0.4\textwidth}
+	  \includegraphics[width=\linewidth]{sandwich_rzplot_highlimit_cbar.png}
+	  \caption{}\label{fig:simulated_adjusted_colorbar}
+  \end{subfigure}
+  \begin{subfigure}{0.4\textwidth}
+	  \includegraphics[width=\linewidth]{WAXS_raw_adjusted_colorbar.png}
+	  \caption{}\label{fig:experimental_adjusted_colorbar}
+  \end{subfigure}
+  \caption{R-$\pi$ and R-pores are far more intense than the other major reflections in 
+  simulated diffraction patterns (a). Here, the colorbar was scaled so that the max is 6x
+  higher than all other plots.}\label{fig:intense_rpi}
   \end{figure}
 
 % BJC5: this is no longer a section after reorganization
@@ -1831,7 +1913,7 @@ liquid crystal membranes}
 %
 %  Correlation lengths are shorter in the disordered pore basin than in the
 %  ordered pore basin. Layers in the ordered pore basin are strongly correlated
-%  with neighboring layers up to more than 10 layers away. This behavior deviates
+%  with neighboring layers up to more than 10 layers away. This behavior deviatbecomes smalleres
 %  from experimental evidence. The experimental correlation length (See
 %  Suppporting Information for details its derivation) suggests that layers are
 %  correlated with about 3 neighboring layers which is closer to the values
@@ -1958,7 +2040,7 @@ liquid crystal membranes}
   %BJC5: add figure reference and figure to supporting info
   There are instances where carboxylate groups in other systems rotate out of plane. Bushey et
   al. showed that bulky carbonyl-containing substituents of stacked arene molecules tended to
-  tilt 45$\degree$ in order to relieve steric strain, thus allowing $\pi$-stacking between 
+  tilt 45$\degree$ in order to relieve steric strain, thus allowing $\pi$-$\pi$ stacking between 
   molecules, and to hydrogen bond with neighboring molecules. Lorenzo and Gra\~{n}a found 3
   stable dimers of gallic acid (from which the monomer, Na-GA3C11 is derived) with adenine. In
   all cases, the carboxylate group remained planar, even with evidence of hydrogen bonding
@@ -1967,7 +2049,7 @@ liquid crystal membranes}
   carboxylate bond would be sterically hindered. 
   
   We can also produce R-double if layers are not uniformly spaced. Rather, monomers might form 
-  pairs that stack less than 3.7~\AA~apart, and whose center of masses are spaced 7.4 \AA 
+  pairs that stack less than 3.7~\AA~apart, and whose center of masses are spaced 7.4 \AA~ 
   from the next pair of monomers (Figure ~\ref{fig:staggered_rzplot_norestraints}). To our 
   knowledge, there have been no studies that specifically address the possibility of a
   configuration like this. Our forcefield causes our system to tend towards uniformly spaced
@@ -1984,7 +2066,7 @@ liquid crystal membranes}
   pack. This configuration is stable short-term while unrestrained however R-double quickly 
   fades after a few nanoseconds of simulation. Still, this may be the most reasonable
   explanation for the appearance of R-double. The long-term stability of a configuration
-  similar to this may be feasible if monomers stay stacked 3.7 \AA apart. 
+  similar to this may be feasible if monomers stay stacked 3.7 \AA~apart. 
   
   \begin{figure}[htb]
   \centering
@@ -2040,16 +2122,13 @@ liquid crystal membranes}
   \caption{R-double is present in all three inital configurations tested while the heavy atoms
   in the headgroup are held in place with position restraints. R-double fades once 
   the position restriants are released.}\label{fig:rdouble}
-%MRS5: the conclusion seems like it actually may be ``this doesn't work either''.  How do they line up? Do they go to either parallel displaced or sandwiched?
   \end{figure}
   
-  
-% BJC5 : Matt wants  a section like this somewhere.
   \subsection{Slow dynamics}
 
-  We observe unusually slow dynamics in our system. Typical diffusion constants
-  for columnar liquid crystals have been reported to be on the order of
-  $10^{-11}~ m^2/s$ \cite{dong_translational_1984}. We measured the diffusion
+  We observe unusually slow dynamics in our system relative to other liquid crysal
+  systems. Typical diffusion constants for columnar liquid crystals have been reported
+  to be on the order of $10^{-11}~ m^2/s$ \cite{dong_translational_1984}. We measured the diffusion
   constants of monomers in each of the systems we studied (See Table~\ref{S-table:msd}
   in Supporting Information) and learned that they are all on the order of $10^{-14}~m^2/s$.
   Our systems may be frozen in a glassy state. It is also possible that we are simply 
@@ -2118,71 +2197,67 @@ liquid crystal membranes}
 
   \subsection{Chemical composition of pore columns}
 
-%MRS5: put a little more of the rational for looking at this here. Why should they care?
-  We are most interested in the pore architecture. What's happening in the tails is unimportant.
-
+  We are most interested in the composition of the pores since we would like to study
+  transport mechanisms within them. We have shown that the tails possess a certain degree of order
+  which is necessary in order to create the complex WAXS pattern shown experimentally, but
+  they will not be involved in a separation process. We aim to further understand the pore
+  architecture and observe the differences, if any, between the different equilibrated
+  configurations studied so far.
 
   We plotted the number densities of heavy atoms in the head group, carbon atoms in the tail
-  region and all sodium ions (Figure~\ref{fig:densities}). For the head group
-  region, we used the carbon atoms making up the aromatic ring. For the tail
-  region we used only carbon atoms of the monomer tails (See Supporting
-  Information for diagram). We average the histograms over at least 50 ns of
-  equilibrated trajectory.
+  region and all sodium ions (Figure~\ref{fig:overlaid_densities}). For the head group
+  region, we used heavy atoms making up the aromatic rings and carboxylate groups. For the tail
+  region we used carbon atoms of the monomer tails (See Figure S\ref{S-fig:monomer_color_coded}
+  for a diagram). We averaged the histograms over at least 50 ns of equilibrated trajectory.
   
-  In general, the composition of the pores is similar between all systems. We believe we can
-  study transport in any of the systems presented here and still extract valuable information.
-  We will need to verify that this assumption is true.  
-  
-  %BJC5: redo the numbers in this section.
-  In all cases, the space in the pore region is filled with sodium ions and
-  head groups. Systems in the ordered pore basin are less dense in
-  the center of the pore. In both the sandwiched and parallel displaced
-  configurations, we see the density of head groups and sodium ions fall to less
-  than 50\% of its maximum at r = 0 (Fig.~\ref{fig:layered_density}). The
-  situation is most pronounced in the sandwiched configuration where the maximum
-  head group density occurs 0.44 nm from the pore center. The parallel displaced
-  configuration reaches its maximum 0.35 nm from the pore center. In contrast,
-  both disordered pore systems show very little difference in density from its
-  maximum. This implies a more uniform distribution of head groups within the
-  pore center. This is the same conclusion drawn from the plots of $g(x,y)$ 
-  (Figure~\ref{fig:xy_correlation}). 
-
   There is a partition between the hydrophobic and hydrophilic regions, however
   it is a gradient in composition, rather than an abrupt division. The system
   does not confine sodium ions and head groups to just within the pore region.
-  Assuming a pore radius of 0.6 nm, we see in all cases, that 19\% of sodium ions
-  exist outside the pore region (except sandwiched, ordered pore, where 16\%
+  Based on size-exclusion experiments, we define the pore radius to be 0.6 nm
+  %BJC5 : Add vertical line to plots for 'pore radius'? Might be too busy.
+  ~\cite{zhou_supported_2005}. We see in all cases, that 19\% of sodium ions
+  exist outside the pore region (except sandwiched, ordered basin, where 16\%
   are outside the pore). Additionally, we see that in all cases, about 3\% of the
-  plotted tail density is located within the pore region (except sandwiched,
-  ordered pore, where 1.5\% are within the pore region). These observations bring
-  into question how one should define a pore in these types of systems. One
-  usually measures a membrane's pore radius based on the size of a molecule it
-  can reject, however it is not clear where the edges of the pores are and what
-  size molecule would fit through. We leave these investigations for a future
-  study.
-
-% BJC5 : Move this figure to supporting
+  plotted tail density is located within the pore region (except ordered sandwiched,
+  where 1.5\% are within the pore region). These observations bring into question how
+  one should define a pore in these types of systems. One usually measures a 
+  membrane's pore radius based on the size of a molecule it can reject, however
+  it is not clear where the edges of the pores are and what size molecule would
+  fit through. We leave these investigations for a future study.
+  
+  In all cases, the space in the pore region is filled with a mixture of 
+  sodium ions and head groups. The ordered parallel displaced configuration has
+  the highest density of sodium ions at the pore centers. Both the ordered and 
+  disordered parallel displaced configurations have higher concentrations
+  of head groups in the center. This observation highlights that the pore region
+  is dense, not hollow, and may impede transport of solvent and solutes. We 
+  observe how this changes when water is added to the system.
+  
+  In general, the composition of each region, particulary the pore region, is 
+  similar between all systems. We believe we can study transport in any of the
+  systems presented here and extract similar transport mechanisms. We will need
+  to verify that this assumption is true. 
+  
+% BJC5 : I think this is making progress towards a better representation of these plots. I
+% outlined the tops of the bars on the histograms so the individual rdf don't get covered.
+% I think it helps. I also varied the thickness of the outlines so that the farthest back 
+% line is thickest. That way, when the outlines overlap, you can see the ones in front.
   \begin{figure}
   \centering
-  \begin{subfigure}{0.47\textwidth}
-        \includegraphics[width=1\linewidth]{offset_density.png}
-        \caption{Parallel Displaced, Ordered Pore Basin}
-        \label{fig:offset_density}
+  \begin{subfigure}{0.5\textwidth}
+        \includegraphics[width=1\linewidth]{sodium_density.png}
+        \caption{Sodium Ions}
+        \label{fig:sodium_regional_density}
   \end{subfigure}
-  \begin{subfigure}{0.47\textwidth}
-        \includegraphics[width=1\linewidth]{layered_density.png}
-        \caption{Sandwiched, Ordered Pore Basin}
-        \label{fig:layered_density}
+  \begin{subfigure}{0.5\textwidth}
+        \includegraphics[width=1\linewidth]{head_group_density.png}
+        \caption{Head Groups}
+        \label{fig:head_groups_regional_density}
   \end{subfigure}
-  \begin{subfigure}{0.47\textwidth}
-        \includegraphics[width=1\linewidth]{disordered_offset_density.png}
-        \caption{Parallel Displaced, Disorderd Pore Basin}
-        \label{fig:disordered_offset_density}
-  \end{subfigure}
-  \begin{subfigure}{0.47\textwidth}
-        \includegraphics[width=1\linewidth]{disordered_density.png}
-        \caption{Sandwiched, Disordered Pore Basin}
-        \label{fig:disorder_layered_density}
+  \begin{subfigure}{0.5\textwidth}
+        \includegraphics[width=1\linewidth]{tails_density.png}
+        \caption{Tails}
+        \label{fig:tails_regional_density}
   \end{subfigure}
   \caption{In all cases, the component radial distribution functions exhibit a
 	  composition gradient transitioning from the hydrophilic to the hydrophobic
@@ -2191,119 +2266,22 @@ liquid crystal membranes}
 	  concentrations of ions and head groups away from the pore center. Systems with
 	  layers initially spaced 5 \AA~apart (c) and (d), both show the highest
 	  concentrations of ions and head groups near the pore center, implying a more
-	  uniform, disordered pore.}~\label{fig:densities}
-  \end{figure}
-  
-%BJC5 : play with color scheme to make this viable
-  \begin{figure}
-  \centering
-  \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=1\linewidth]{sodium_density.png}
-        \caption{Sodium Ions}
-        \label{fig:sodium_regional_density}
-  \end{subfigure}
-  \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=1\linewidth]{head_group_density.png}
-        \caption{Head Groups}
-        \label{fig:head_groups_regional_density}
-  \end{subfigure}
-  \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=1\linewidth]{tails_density.png}
-        \caption{Tails}
-        \label{fig:tails_regional_density}
-  \end{subfigure}
-  \caption{Alternate figure : In all cases, the component radial distribution functions exhibit a
-	  composition gradient transitioning from the hydrophilic to the hydrophobic
-	  regions. Systems with layers initially spaced 3.7 \AA~apart in the  parallel
-	  displaced (a), and sandwiched (b) configurations both show the highest
-	  concentrations of ions and head groups away from the pore center. Systems with
-	  layers initially spaced 5 \AA~apart (c) and (d), both show the highest
-	  concentrations of ions and head groups near the pore center, implying a more
 	  uniform, disordered pore.}~\label{fig:overlaid_densities}
   \end{figure}
-  
-% BJC5: old section
-%%MRS: I think you will need to refer back to names of the questions (or at least shortened versions of the names): people skimming the paper will not remember what the numbers are.
-%  In order to address question (\ref{point:poredefinition}), we plotted the
-%  number densities of heavy atoms in the head group, carbon atoms in the tail
-%  region and all sodium ions (Figure~\ref{fig:densities}). For the head group
-%  region, we used the carbon atoms making up the aromatic ring. For the tail
-%  region we used only carbon atoms of the monomer tails (See Supporting
-%  Information for diagram). We average the histograms over at least 50 ns of
-%  equilibrated trajectory.
-%  
-%  In all cases, the space in the pore region is filled with sodium ions and
-%  head groups. Systems in the ordered pore basin are less dense in
-%  the center of the pore. In both the sandwiched and parallel displaced
-%  configurations, we see the density of head groups and sodium ions fall to less
-%  than 50\% of its maximum at r = 0 (Fig.~\ref{fig:layered_density}). The
-%  situation is most pronounced in the sandwiched configuration where the maximum
-%  head group density occurs 0.44 nm from the pore center. The parallel displaced
-%  configuration reaches its maximum 0.35 nm from the pore center. In contrast,
-%  both disordered pore systems show very little difference in density from its
-%  maximum. This implies a more uniform distribution of head groups within the
-%  pore center. This is the same conclusion drawn from the plots of $g(x,y)$ 
-%  (Figure~\ref{fig:xy_correlation}). 
-%  % High vacancy is less likely to be stable in the real system
-%
-%  There is a partition between the hydrophobic and hydrophilic regions, however
-%  it is a gradient in composition, rather than an abrupt division. The system
-%  does not confine sodium ions and head groups to just within the pore region.
-%  Assuming a pore radius of 0.6 nm, we see in all cases, that 19\% of sodium ions
-%  exist outside the pore region (except sandwiched, ordered pore, where 16\%
-%  are outside the pore). Additionally, we see that in all cases, about 3\% of the
-%  plotted tail density is located within the pore region (except sandwiched,
-%  ordered pore, where 1.5\% are within the pore region). These observations bring
-%  into question how one should define a pore in these types of systems. One
-%  usually measures a membrane's pore radius based on the size of a molecule it
-%  can reject, however it is not clear where the edges of the pores are and what
-%  size molecule would fit through. We leave these investigations for a future
-%  study.
-%
-%  \begin{figure}
-%  \centering
-%  \begin{subfigure}{0.47\textwidth}
-%        \includegraphics[width=1\linewidth]{offset_density.png}
-%        \caption{Parallel Displaced, Ordered Pore Basin}
-%        \label{fig:offset_density}
-%  \end{subfigure}
-%  \begin{subfigure}{0.47\textwidth}
-%        \includegraphics[width=1\linewidth]{layered_density.png}
-%        \caption{Sandwiched, Ordered Pore Basin}
-%        \label{fig:layered_density}
-%  \end{subfigure}
-%  \begin{subfigure}{0.47\textwidth}
-%        \includegraphics[width=1\linewidth]{disordered_offset_density.png}
-%        \caption{Parallel Displaced, Disorderd Pore Basin}
-%        \label{fig:disordered_offset_density}
-%  \end{subfigure}
-%  \begin{subfigure}{0.47\textwidth}
-%        \includegraphics[width=1\linewidth]{disordered_density.png}
-%        \caption{Sandwiched, Disordered Pore Basin}
-%        \label{fig:disorder_layered_density}
-%  \end{subfigure}
-%  \caption{In all cases, the component radial distribution functions exhibit a
-%	  composition gradient transitioning from the hydrophilic to the hydrophobic
-%	  regions. Systems with layers initially spaced 3.7 \AA~apart in the  parallel
-%	  displaced (a), and sandwiched (b) configurations both show the highest
-%	  concentrations of ions and head groups away from the pore center. Systems with
-%	  layers initially spaced 5 \AA~apart (c) and (d), both show the highest
-%	  concentrations of ions and head groups near the pore center, implying a more
-%	  uniform, disordered pore.}~\label{fig:densities}
-%  \end{figure}
 
-  \subsection{Effect of Water on Structure}
+  \subsection{Effect of Water on Structure}\label{section:water}
 
   We explored the affect of water on pore structure, addressing question
   (\ref{point:water}), by preparing parallel displaced and sandwiched
-  configurations according to the wet equilibration procedure. There is no
-  experimental measurement of trace water concentration in the pores so we tested
-  a range of water concentrations from 1 to 5 percent. Our lower bound models a
-  system with on average 2 water molecules for each monomer layer.
-  % BJC: double check this^ calculation or omit
-  Figure~\ref{fig:solvation} shows the simulated diffraction patterns resulting
-  from each configuration.
-
+  configurations according to the wet equilibration procedure. We limit
+  the discussion to the ordered pore basin since it produces equilibrated 
+  configurations closest to experiment. There is no experimental measurement
+  of trace water concentration in these membranes so we tested
+  a range of water concentrations from 1 to 5 percent. Figure~\ref{fig:solvation}
+  shows the simulated diffraction patterns resulting from each configuration.
+  
+  % BJC5: maybe move this to supplemental. I think rdf and g(x,y) should be 
+  % enough to comment on the effect of water
   % formatting taken from : https://tex.stackexchange.com/questions/239715/add-titles-for-rows-and-columns-in-a-subfloat
   \newlength{\tempdima}
   \newcommand{\rowname}[1]% #1 = text
@@ -2339,15 +2317,15 @@ liquid crystal membranes}
 
   \end{figure}
  
-  In all cases, water disrupts structuring of the model.  When we add water to
+  In all cases, water disrupts structuring of the model. When we add water to
   the system, the intensity of the reflections decrease. In systems built with 5
   wt\% water, R-$\pi$ and R-spots become nearly indistinguishable from R-alkanes.
-
   In systems built with 5 wt\% water, the pore region becomes filled with
   water. We plotted the number density of components in this system. As with the 
   dry systems, we see a gradual compositional transition from hydrophilic to hydrophobic.  
   We see that the pores become a mixture of water molecules and sodium ions (Fig.
-  \ref{fig:water_density}). 
+  \ref{fig:water_density}). We also see that water exists in the tail region which 
+  may decrease the tail ordering and explain the decrease in intensity of R-spots.
   
   The membrane swells when we introduce water. The location of maximum head
   group density shifts from 0.35 to 0.62 nm and from 0.44 to 0.61 nm in the
@@ -2364,8 +2342,6 @@ liquid crystal membranes}
   water. Further investigation of hydrated systems can help unravel the
   mechanisms for selective transport in separations of aqueous solutions. 
 
-  % BJC: unsure where or if this paragraph fits
-  % BJC: Probably as the last paragraph of this section
   Water is not necessary to maintain an ordered pore structure. We do not
   eliminate the possibility that water is necessary in order to drive
   self-assembly, but studying the mechanisms of self-assembly is beyond the

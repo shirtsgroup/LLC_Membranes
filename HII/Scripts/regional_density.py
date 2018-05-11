@@ -67,8 +67,11 @@ if __name__ == "__main__":
 
     if args.multi:
 
-        colors = ['blue', 'red', 'green', 'xkcd:orange']
+        # colors = ['blue', 'red', 'green', 'xkcd:orange']
         # colors = ['xkcd:red', 'xkcd:green', 'blue', 'xkcd:yellow']
+        colors = ['xkcd:blue', 'xkcd:olive', 'xkcd:orangered', 'xkcd:magenta']
+        names = ['Ordered Parallel Displaced', 'Ordered Sandwiched', 'Disordered Sandwiched',
+                 'Disordered Parallel Displaced']
 
         n = len(args.multi)
         system = np.load(args.multi[0])
@@ -89,12 +92,23 @@ if __name__ == "__main__":
         for i in range(len(regions)):
             plt.figure(i)
             for j in range(n):
-                plt.bar(r, results[j, i, :], bin_width, color=colors[j], alpha=0.9, label=path.splitext(args.multi[j])[0])
+                plt.bar(r, results[j, i, :], bin_width, color=colors[j], alpha=0.75, label=names[j])
 
-            plt.title(regions[i])
-            plt.legend()
-            plt.ylabel('Component Number Density (number/nm$^2$)')
-            plt.xlabel('Distance from pore center (nm)')
+                half_width = bin_width / 2
+                outline = np.zeros([r.shape[0]*2 + 2, 2])
+                outline[0, 0] = r[0] - half_width
+                outline[-1, 0] = r[-1] + half_width
+                outline[1:-1:2, 0] = r - half_width
+                outline[2:-1:2, 0] = r + half_width
+                outline[1:-1:2, 1] = results[j, i, :]
+                outline[2:-1:2, 1] = results[j, i, :]
+                plt.plot(outline[:, 0], outline[:, 1], color=colors[j], linewidth=4/(j+1))
+
+            # plt.title(regions[i], fontsize=14)
+            plt.legend(fontsize=11)
+            plt.ylabel('Component Number Density (number/nm$^2$)', fontsize=14)
+            plt.xlabel('Distance from pore center (nm)', fontsize=14)
+            plt.axes().tick_params(labelsize=14)
             # plt.ylim([0, 0.6])
             plt.tight_layout()
             plt.savefig("%s_density.png" % regions[i])

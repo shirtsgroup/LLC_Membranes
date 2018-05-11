@@ -210,7 +210,10 @@ def pore(nmon_per_layer, r, layers, dbwl, center, offset=True, offset_angle=0, r
     locations = np.zeros([nmon_per_layer*layers, 3])
     noise_sigma = args.noise
     # noise = np.random.normal(scale=noise_sigma, size=(locations.shape[0], 2))  # random xy noise
-    noise = np.random.normal(scale=noise_sigma, size=locations.shape[0])  # random z noise
+    # noise = np.random.normal(scale=noise_sigma, size=locations.shape[0])  # random z noise
+    z = np.linspace(0, dbwl*layers, locations.shape[0])
+    cycles = 1
+    noise = np.sin(cycles*(2*np.pi/dbwl*layers)*z)
 
     theta = 2*np.pi / nmon_per_layer  # theta between rings
 
@@ -236,7 +239,10 @@ def pore(nmon_per_layer, r, layers, dbwl, center, offset=True, offset_angle=0, r
                     displacement.append(l*nmon_per_layer + i)
 
     locations[:, :2] += center
-    locations[1:, 2] += noise[1:]
+
+    # locations[1:, 2] += noise[1:]
+    locations[:, 0] += noise
+
     # locations[:, :2] += noise
     # pitch = 1
     # zig = np.linspace(0, pitch, layers//2)
@@ -247,6 +253,24 @@ def pore(nmon_per_layer, r, layers, dbwl, center, offset=True, offset_angle=0, r
     if radial_displacement:
         theta = rd_angle
         locations[displacement, :2] += [radial_displacement*np.cos(theta), radial_displacement*np.sin(theta)]
+
+    n = 1000
+    x = np.linspace(0, layers*dbwl, n)
+    pts = [0]
+    y = np.sin(0.1*x)
+
+
+    arc = 0
+    for i in range(1, n):
+        arc += np.linalg.norm(np.array([x[i - 1], y[i - 1]]) - np.array([x[i], y[i]]))
+        if (arc % dbwl) <= 0.11:
+            pts.append(i)
+
+    locations = np.zeros([len(pts), 3])
+    locations[:, 0] = y[pts]
+    locations[:, 2] = x[pts]
+    locations[:, :2] += center
+    print(locations)
 
     return locations
 
@@ -477,6 +501,7 @@ if __name__ == "__main__":
         nonzeros = np.nonzero(H)  # find the indices of nonzero values
 
         pts = np.zeros_like(locations)  # array of points that sit on bin locations
+        pts = np.zeros([locations.shape[0] - 9, locations.shape[1]])
         if args.dim == 1:
             pts = x[nonzeros[0]]
         if args.dim > 1:
@@ -610,6 +635,7 @@ if __name__ == "__main__":
                 MAX = np.amax(averaged[r_lower_limit:r_upper_limit, z_lower_limit:z_upper_limit])
             else:
                 MAX = np.amax(averaged)
+        #MAX = np.amax(averaged)
 
         MIN = np.amin(averaged)
 
