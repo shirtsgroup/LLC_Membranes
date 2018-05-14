@@ -32,7 +32,7 @@ def initialize():
     parser.add_argument('--solvent', default='water', help='Name of solvent')
     parser.add_argument('--tau_t', default=0.1, type=float, help='Temperature coupling time constant')
     parser.add_argument('--tau_p', default=20, type=float, help='Pressure coupling time constant')
-    parser.add_argument('-nr', '--nreplicates', default=1, type=float, help='Number of replicate simulations to run')
+    parser.add_argument('-nr', '--nreplicates', default=1, type=int, help='Number of replicate simulations to run')
     parser.add_argument('-f', '--frames', default=50, type=int, help='Number of frames to record. If nstxout, nstvout, '
                         'nstfout, nstenergy are not specified those parameters will be output every frame')
     parser.add_argument('-nx', '--nstxout', type=int, help='Frequency to output coordinates to trajectory file')
