@@ -11,8 +11,6 @@ import subprocess
 import numpy as np
 from genmdp import SimulationMdp
 from pymbar.timeseries import detectEquilibration
-import viscosity
-import Diffusivity
 
 
 def initialize():
