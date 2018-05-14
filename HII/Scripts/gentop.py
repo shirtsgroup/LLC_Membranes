@@ -24,7 +24,7 @@ def initialize():
 
 class SystemTopology(object):
 
-    def __init__(self, gro, ff='gaff', restraints=False):
+    def __init__(self, gro, ff='gaff', restraints=False, xlink=False):
         """
         :param gro: (str) coordinate file for which to create topology
         :param ff: (str) forcefield to use (default=gaff)
@@ -40,6 +40,7 @@ class SystemTopology(object):
         self.atoms = [a.name for a in t.topology.atoms]  # all atom names
         self.atom_masses = [Atom_props.mass[a.name] for a in t.topology.atoms]
         self.system_mass = sum(self.atom_masses)
+        self.xlink = xlink
 
         if restraints:
             if restraints is list:
@@ -78,7 +79,8 @@ class SystemTopology(object):
         self.residues = unique_residues
         self.residue_count = residue_count
 
-    def write_top(self, name='topol.top', description='Simulation Box', restrained_top_name='restrained.itp'):
+    def write_top(self, name='topol.top', description='Simulation Box', restrained_top_name='restrained.itp',
+                  crosslinked_top_name='crosslinked_new.itp'):
 
         self.name = name
 
@@ -102,6 +104,8 @@ class SystemTopology(object):
                         top.append('#include "%s"\n' % restrained_top_name)  # need to modify so this is not hardcoded.
                     else:
                         top.append('#include "%s/%s.itp"\n' % (self.top_location, r))
+                elif self.xlink:
+                    top.append('#include "%s"\n' % crosslinked_top_name)  # need to modify so this is not hardcoded.
                 else:
                     top.append('#include "%s/%s.itp"\n' % (self.top_location, r))
                 top.append('\n')
@@ -119,6 +123,8 @@ class SystemTopology(object):
                     top.append('{:10s}{:>10d}\n'.format(r, 1))
                 else:
                     top.append('{:10s}{:>10d}\n'.format(r, self.residue_count[r]))
+            if self.xlink and r not in self.ions:
+                top.append('{:10s}{:>10d}\n'.format(r, 1))
             else:
                 top.append('{:10s}{:>10d}\n'.format(r, self.residue_count[r]))
 

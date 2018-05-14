@@ -13,8 +13,6 @@ import time
 import Poly_fit
 import numpy as np
 import Diffusivity
-import Concentration
-import subprocess
 import mdtraj as md
 from llclib import physical
 import tqdm
@@ -116,7 +114,6 @@ def initialize():
                                                              'Collective Diffusion, NE = Nernst Einstein, B = both')
     parser.add_argument('-l', '--load', help='Load arrays if they were saved from a previous calculation',
                         action="store_true")
-    parser.add_argument('-s', '--save', help='Save arrays generated for future use', action="store_true")
     parser.add_argument('--discard', type=int, help='Specify the number of nanoseconds to discard starting'
                                                     'from the beginning of the simulation')
     parser.add_argument('--noshow', action="store_true", help='Specify this to not show any plots')
@@ -280,8 +277,6 @@ if __name__ == '__main__':
         if args.method == 'NE':
             exit()
 
-    # nT -= 1
-
     if not args.load:
 
         charge = Atom_props.charges(args.build_mon)
@@ -293,9 +288,8 @@ if __name__ == '__main__':
         #     dq_all[i] = dQ(i + 1, pos, Lc, z_2, z_1, charge, id)
         dq_all = dQ2(pos[:, :, 2], z_2, z_1, charge, id)
 
-        if args.save:
-            np.save('dq_%s' % args.suffix, dq_all)
-            print('q saved')
+        np.save('dq_%s' % args.suffix, dq_all)
+        print('q saved')
 
     else:
 

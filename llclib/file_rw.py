@@ -205,9 +205,9 @@ def write_assembly(b, output, no_mon, bcc=False, xlink=False):
     # [ virtual_sites4 ]
 
     if vsite_index is not None:
-        f.write(a[vsite_index])# + a[vsite_index + 1]),
+        f.write(a[vsite_index] + a[vsite_index + 1]),
         nv = 0
-        vsite_count = vsite_index + 1
+        vsite_count = vsite_index + 2
 
         for i in range(vsite_count, len(a)):  # This is the last section in the input .itp file
             vsite_count += 1
@@ -223,18 +223,20 @@ def write_assembly(b, output, no_mon, bcc=False, xlink=False):
                                                            int(a[k + vsite_index + 1][24:30]),
                                                            float(a[k + vsite_index + 1][30:38]),
                                                            float(a[k + vsite_index + 1][38:])))
+        elif xlink:
 
-        # Make sure there is no space at the bottom of the topology if you are getting errors
-        # for i in range(int(no_mon)):
-        #     for k in range(0, nv):
-        #         f.write('{:<8d}{:<6d}{:<6d}{:<6d}{:<8d}{:<8d}{:<11}{:<11}{:}'.format(i*nr + int(a[k + vsite_index + 2][0:8]),
-        #                                                i*nr + int(a[k + vsite_index + 2][8:14]),
-        #                                                i*nr + int(a[k + vsite_index + 2][14:20]),
-        #                                                i*nr + int(a[k + vsite_index + 2][20:26]),
-        #                                                i*nr + int(a[k + vsite_index + 2][26:34]),
-        #                                                int(a[k + vsite_index + 2][34:42]), a[k + vsite_index + 2][42:53],
-        #                                                a[k + vsite_index + 2][53:64],
-        #                                                a[k + vsite_index + 2][64:len(a[k + vsite_index + 2])]))
+            # Make sure there is no space at the bottom of the topology if you are getting errors
+            for i in range(int(no_mon)):
+                print(i)
+                for k in range(0, nv):
+                    f.write('{:<8d}{:<6d}{:<6d}{:<6d}{:<8d}{:<8d}{:<11}{:<11}{:}'.format(i*nr + int(a[k + vsite_index + 2][0:8]),
+                                                           i*nr + int(a[k + vsite_index + 2][8:14]),
+                                                           i*nr + int(a[k + vsite_index + 2][14:20]),
+                                                           i*nr + int(a[k + vsite_index + 2][20:26]),
+                                                           i*nr + int(a[k + vsite_index + 2][26:34]),
+                                                           int(a[k + vsite_index + 2][34:42]), a[k + vsite_index + 2][42:53],
+                                                           a[k + vsite_index + 2][53:64],
+                                                           a[k + vsite_index + 2][64:len(a[k + vsite_index + 2])]))
     f.close()
 
 

@@ -89,5 +89,5 @@ if __name__ == "__main__":
     elif args.ensemble == 'nvt':
         mdp.write_nvt_mdp()
 
-    top = SystemTopology(args.coord, restraints=args.restraints)
+    top = SystemTopology(args.coord, restraints=args.restraints, xlink=args.xlink)
     top.write_top()

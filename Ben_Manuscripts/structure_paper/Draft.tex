@@ -2400,11 +2400,12 @@ liquid crystal membranes}
 
   \subsection{Model Ionic Conductivity Measurements}
 
-  We used the equilibrated parallel displaced system in the ordered pore basin
-  to calculate ionic conductivity since its structure is the closest match to
-  experiment. The model gives reasonable estimates of ionic conductivity when
-  compared to experiment.  We compare calculated values of ionic conductivity
+  We used equilibrated systems in the ordered pore basin to calculate ionic 
+  conductivity since we believe its structure is the closest match to
+  experiment. Our models give reasonable estimates of ionic conductivity when
+  compared to experiment. We compare calculated values of ionic conductivity
   obtained using the Nernst-Einstein relation and Collective Diffusion model in
+  % names of equations capitalized?
   Figure~\ref{fig:conductivity}. The two methods agree with each other within
   error, although the uncertainty obtained using the Collective Diffusion model
   is much higher. We require much longer simulations to lower the uncertainty,
@@ -2426,11 +2427,11 @@ liquid crystal membranes}
    
   \begin{figure}
         \centering
-        \includegraphics[width=0.5\linewidth]{IC_offset.png}
-        \caption{The collective diffusion model and the nernst-einstein relation yield
-        agreeing values of ionic conductivity. Both methods give calculated
-        values of ionic conductivity an order of magnitude higher than the experimental
-        value.}
+        \includegraphics[width=0.5\linewidth]{Ionic_conductivity.png}
+        \caption{The Collective Diffusion model and the nernst-einstein relation yield
+        agreeing values of ionic conductivity for both systems simulated. Both methods
+        estimate the value of the ionic conductivity to be an order of magnitude higher 
+        than the experimental value.}
         \label{fig:conductivity}
   \end{figure}
 
@@ -2488,38 +2489,42 @@ liquid crystal membranes}
   have been efforts to model formation of various liquid crystalline phases with
   molecular dynamics, to our knowledge there have been no studies which attempt
   to examine their structure with the same level of detail presented here.
+  
+  We observed a number of metastable configurations, stable for hundreds of 
+  nanoseconds, which do not fit the experimental profile we have tried to match. 
+  We explored two classes of metastable basins which are dependent on the initial
+  vertical stacking distance between monomers : the ordered and disordered pore basins.
+  We expect that these metastable configurations will eventually rearrange and converge
+  to a single equilibrium structure. We conducted extensive analysis in order to 
+  isolate structures which most closely resembles the true equilibrium structure.
 
-  Evidence strongly supports that monomers stay partitioned into layers which
-  stack to create pores and that each layer contains 5 monomers. We see periodic
-  spacing of layers based on the z-direction correlation function, $g(z)$, of
-  atoms in the tails and separately of atoms in the head groups. Systems not
-  built with 5 monomers per layer result in assemblies whose pore-to-pore spacing
-  is inconsistent with experiment. 
-
-  We have explored the affect of two different $\pi$-$\pi$ stacking modes on
-  the equilibrated membrane structure. Simulated diffraction patterns generated
-  from MD trajectories suggest that the parallel-displaced configuration produces
-  a structure with the closest match to experiment.
-
-  We have observed a number of metastable configurations. We witnessed
-  long-term stability of systems built with a varied number of monomers per layer
-  as well as in different $\pi$-$\pi$ stacking configurations. We also examined
-  how the structure changes based on the initial distance between layers and
-  showed how systems differ when built with layers spaced 5~\AA~versus
-  3.7~\AA~apart. The configuration that showed the greatest agreement with
-  experiment was built in the parallel-displaced configuration, with 5 monomers
-  per layer and an initial layer spacing of 3.7 \AA.  
+  The system's pore spacing is most consistent with experiment when systems
+  are built with 5 columns per pore. The distance between pores increases with the 
+  number of columns per pore. Pores pack closer together in the disordered pore 
+  basin. Systems built with 6 columns per pore in the disordered basin expand in 
+  the z-direction which suggest that it may rearrange to 5 columns per pore long term.
+  
+  We have maximized our model's consistency with the experimental WAXS pattern. We show
+  that R-alkanes and R-pores appear where expected. We learned that R-spots is likely 
+  due to ordered alkane chain packing. R-$\pi$ appears at lower q values than experiment
+  because monomer stack too far apart. We found that our model cannot reproduce R-double, 
+  however we have come up with a three different mechanisms that lead to the reflection's
+  appearance. The most likely explanation is that monomers within each column rotate ca.
+  15\degree with respect to their vertically adjacent neighbors so that tails can pack 
+  together more tightly.  
 
   We characterized the environment centered around the membrane pores and
-  learned that the pores are generally filled by monomer head groups and sodium
-  ions. Membranes prepared in the sandwiched configuration have lower density 
-  pores. We also observed that there is not a hard partition between hydrophlic
-  and hydrophilic regions, rather there is a gradient.  This finding has raised
-  questions about the nature of any size-exclusion separations.  
+  learned that the pores are generally filled with monomer head groups and sodium
+  ions. All systems studied showed a similar distribution of sodium, head groups 
+  and tails, which means we can study solute transport in any of the systems here
+  and extract similar transport mechanisms. We also observed that there is not a 
+  hard partition between hydrophlic and hydrophilic regions, rather there is a 
+  gradient. This finding has raised questions about the nature of size-exclusion separations.  
 
   We learned that we do not need water to create well-defined pore structures.
   Systems whose pores were filled with varying amounts of water showed a decrease
-  in structuring relative to dry systems. 
+  in structuring relative to dry systems. At higher water concentrations, the pores
+  begin to swell, which may be more conducive to transport.
 
   We justified that our system can reasonably estimate ionic conductivity.  Our
   calculations are about 1 order of magnitude higher than experiment, however
@@ -2533,13 +2538,13 @@ liquid crystal membranes}
   the membrane becomes thicker. 
 
 %MRS6'' isn't it 1-3 orders of magnitude lower? You cite some slower statistics, and there might be differences between lyotrpic and thermotropic, if the hydrophilic/hydrophobic effect is stronger than the effects in thermotropic fluids.
-  We acknowledge that our simulated system exhibits glassy dynamics. The
-  measured diffusion constants of monomers are three orders of magnitude lower
-  than expected. It is possible that our equilibration procedure induces these
-  types of metastable phases. It is also possible that the observed dynamics are
-  characteristic of the real system. We took great care to overcome the potential
-  limitations of our equilibration procedure and have come up with a structure
-  that is in good agreement with experimental data.
+%  We acknowledge that our simulated system exhibits glassy dynamics. The
+%  measured diffusion constants of monomers are one to three orders of magnitude lower
+%  than expected. It is possible that our equilibration procedure induces these
+%  types of metastable phases. It is also possible that the observed dynamics are
+%  characteristic of the real system. We took great care to overcome the potential
+%  limitations of our equilibration procedure and have come up with a structure
+%  that is in good agreement with experimental data.
 
   With the structural understanding gained by these simulations, we will
   evaluate transport of various solutes within the system. We will apply the

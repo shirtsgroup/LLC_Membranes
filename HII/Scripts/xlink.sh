@@ -56,11 +56,11 @@ input.py -b ${MONOMER} -c ${GRO} -x -l ${SIM_LENGTH} -f ${FRAMES} --genvel yes -
 
 while [ ${STOP} -eq 0 ]; do
     if [ ${ITERATION} == 0 ]; then
-        xlink.py -i ${GRO} -c ${CUTOFF}  -e ${TERM_PROB} -r ${ITERATION} -d ${CUTOFF_RAD} -x ${XLINKS} -m ${MONOMER}
+        xlink.py -i ${GRO} -c ${CUTOFF}  -e ${TERM_PROB} -r ${ITERATION} -d ${CUTOFF_RAD} -x ${XLINKS} -m ${MONOMER} --nogap
     else
-        xlink.py -i ${GRO} -c ${CUTOFF}  -e ${TERM_PROB} -r ${ITERATION} -d ${CUTOFF_RAD} -y crosslinked_new.itp -x ${XLINKS}
+        xlink.py -i ${GRO} -c ${CUTOFF}  -e ${TERM_PROB} -r ${ITERATION} -d ${CUTOFF_RAD} -y crosslinked_new.itp -x ${XLINKS} --nogap
     fi
-    # restrain.py -r on -g wiggle.gro -o crosslinked_new.itp -f 100000 -A xyz -D off -w off  -m NAcarb11V_dummy --xlink  # this should just add the restraints section to the .itp
+
     cp crosslinked_new.itp crosslinked_${ITERATION}.itp
     mv xlink.log xlink_${ITERATION}.log
 
@@ -84,7 +84,7 @@ while [ ${STOP} -eq 0 ]; do
     fi
 done
 
-xlink.py -i ${GRO} -c ${CUTOFF}  -e ${TERM_PROB} -r ${ITERATION} -d ${CUTOFF_RAD} -y crosslinked_new.itp -x ${XLINKS} -S 'yes'
+xlink.py -i ${GRO} -c ${CUTOFF}  -e ${TERM_PROB} -r ${ITERATION} -d ${CUTOFF_RAD} -y crosslinked_new.itp -x ${XLINKS} -S 'yes' --nogap
 # Put all the atoms back in the unit cell
 #gmx trjconv -f wiggle.gro -o unitcell.gro -ur tric -pbc atom -s ${INIT_CONFIG}  # good for visualization, bad for simulation (inconsistent shifts)
 

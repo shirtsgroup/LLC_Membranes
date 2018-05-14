@@ -9,15 +9,14 @@ from past.utils import old_div
 import os
 import argparse
 import numpy as np
-import math
 import time
 import genpairs
 import copy
 import mdtraj as md
 from llclib import transform
 from matplotlib import path
-import LC_class
 import random
+import lc_class
 
 start = time.time()  # For informational purposes
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in
@@ -25,7 +24,7 @@ location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__))
 
 def initialize():
 
-    parser = argparse.ArgumentParser(description = 'Crosslink LLC structure')  # allow input from user
+    parser = argparse.ArgumentParser(description='Crosslink LLC structure')  # allow input from user
 
     parser.add_argument('-i', '--input', default='wiggle_init.gro', help = 'Name of input file')
     parser.add_argument('-b', '--build_mon', default='NAcarb11Vd', type=str, help='Type of monomer the system is built with')
@@ -165,39 +164,31 @@ def uniq(input1, input2):
             output2.append(input2[i])
     return output1, output2
 
+
 if __name__ == "__main__":
 
     args = initialize()
 
-    # Read in coordinate file from simulation
-
-    # f = open(args.input, 'r')  #open the file which has just finished being simulated and copy in all of the information
-    # a = []
-    # lines = 0
-    # for line in f:
-    #     a.append(line)
-    #     lines += 1  # count number of lines in the file
+    # constants -- hard coded for now.
+    images = 9  # total periodic images used for distance calculations
+    tails = 3  # tails on monomer
 
     t = md.load(args.input)  # load in .gro file using mdtraj
     pos = t.xyz  # the positions from the .gro file
     box = t.unitcell_vectors
 
-    # get all of this information from the class defining the specified build monomer
-    exec("atoms = LC_class.%s.atoms" % args.build_mon)
-    exec("c1_atoms = LC_class.%s.c1_atoms" % args.build_mon)
-    exec("c2_atoms = LC_class.%s.c2_atoms" % args.build_mon)
+    LC = lc_class.LC('%s.gro' % args.build_mon)
+    atoms = LC.natoms
+    c1_atoms = LC.c1_atoms
+    c2_atoms = LC.c2_atoms
+
     topology = "%s.itp" % args.build_mon
-    exec("xlink_atoms = LC_class.%s.no_vsites" % args.build_mon)
-    exec("no_dummies = LC_class.%s.no_vsites" % args.build_mon)
-    exec("images = LC_class.%s.images" % args.build_mon)  # total periodic images used for distance calculations
-    exec("tails = LC_class.%s.tails" % args.build_mon)
 
     if args.nogap:
         images *= 3
 
     tot_atoms = atoms*args.layers*args.no_monomers*args.pores
     tot_monomers = args.layers*args.no_monomers*args.pores
-
 
     # Coordinates of carbon 1 (the carbon on the end of the chain) and 2 (the second carbon from the end of the chains)
     C1 = np.zeros([tot_monomers*tails, 3])
@@ -552,7 +543,7 @@ if __name__ == "__main__":
         # # open and read that new file
         from llclib import file_rw
 
-        file_rw.write_assembly(args.build_mon, 'on', "crosslinked.itp", ncarb1/tails/images)
+        file_rw.write_assembly(args.build_mon, "crosslinked.itp", ncarb1/tails/images, xlink=True)
         print('Crosslinked.itp file written')
 
         f = open('crosslinked.itp', 'r')

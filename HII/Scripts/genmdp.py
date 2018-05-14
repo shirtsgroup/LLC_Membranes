@@ -71,7 +71,7 @@ class SimulationMdp(object):
         """
 
         # initialize variables
-        self.top = SystemTopology(gro, restraints=restraints)
+        self.top = SystemTopology(gro, restraints=restraints, xlink=xlink)
         self.gro = gro
         self.title = title
         self.temperature = float(T)

@@ -3,17 +3,15 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
-#datas =	[{'label':'Aligned\n Experiment', 'color':'b', 'height':1.3*10**-5, 'error':0.1*10**-5}, 
-#        {'label':'Nernst\n Einstein', 'color':'g', 'height':1.33*10**-4, 'error':0.04444*10**-4},
-#        {'label':'Collective\n Diffusion','color':'r', 'height': 1.37*10**-4, 'error':0.45*10**-4}]
-
+# method comparison
 datas =	[{'label':'Aligned\n Experiment', 'color':'b', 'height':1.3*10**-5, 'error':0.1*10**-5}, 
-        {'label':'Simulated \n Crosslinked', 'color':'g', 'height':0.89*10**-4, 'error':0.03*10**-4},
-        {'label':'Simulated \n Uncrosslinked','color':'r', 'height':1.33*10**-4, 'error':0.0444*10**-4}]
+        {'label':'Nernst\n Einstein', 'color':'g', 'height':1.33*10**-4, 'error':0.04444*10**-4},
+        {'label':'Collective\n Diffusion','color':'r', 'height': 1.37*10**-4, 'error':0.45*10**-4}]
 
-#datas = [{'label':'Aligned\n Experiment', 'color':'b', 'height':1.3*10**-5, 'error':0.1*10**-5},
-#        {'label':'Simulated\n Crosslinked', 'color':'g', 'height':1.09*10**-4, 'error':2.6*10**-6},
-#        {'label':'Simulated\n Uncrosslinked','color':'r', 'height':1.7*10**-4, 'error':2.6*10**-6}]
+# crosslink comparison
+#datas =	[{'label':'Aligned\n Experiment', 'color':'b', 'height':1.3*10**-5, 'error':0.1*10**-5}, 
+#        {'label':'Simulated \n Crosslinked', 'color':'g', 'height':0.89*10**-4, 'error':0.03*10**-4},
+#        {'label':'Simulated \n Uncrosslinked','color':'r', 'height':1.33*10**-4, 'error':0.0444*10**-4}]
 
 width=0.9
 
