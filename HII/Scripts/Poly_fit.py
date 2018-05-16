@@ -81,13 +81,5 @@ def poly_fit(x, y, degree, weight='none'):
     slope_error = s * np.sqrt(n/(n*sum(x_square) - (sum(x))**2))
     intercept_error = s * np.sqrt(sum(x_square)/(n*sum(x_square) - (sum(x))**2))
     R_squared = 1 - (Sr/St)
-    return y_val, R_squared, slope_error, intercept_error, A
 
-# y_fit, r, slope_error, intercept_error, A = poly_fit(x, y, 1, 2)
-# print slope_error
-# print intercept_error
-# print np.std([1, 1.1, 0.9])
-# print np.std([0.1, 0.2, 0.1])
-# plt.plot(x, y)
-# plt.plot(x, y_fit)
-# plt.show()
+    return y_val, R_squared, slope_error, intercept_error, A

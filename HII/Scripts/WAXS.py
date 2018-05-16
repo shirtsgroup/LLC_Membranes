@@ -69,8 +69,8 @@ for i in range(23):
 #             #     angles.append((180/np.pi)*np.arctan((i - center)/(j - center)))
 #             #     intensity.append(waxs[i, j])
 
-X = np.linspace(-qmax, qmax, waxs.shape[0])
-Y = np.linspace(-qmax, qmax, waxs.shape[1])
+X = np.linspace(-qmax, qmax, waxs.shape[0] - 1)
+Y = np.linspace(-qmax, qmax, waxs.shape[1] - 1)
 
 # background_intensity = waxs[350, 300]
 # #
@@ -84,71 +84,84 @@ Y = np.linspace(-qmax, qmax, waxs.shape[1])
 # exit()
 
 # ######################## Inverse FT ###############################
-# X = X[:-1]
-# Y = Y[:-1]
-# fbin = X[1] - X[0]  # size of bins in fourier space
-# system_size = 2*np.pi / fbin  # fourier_bin = 2*pi / system size therefore system size = 2*pi / fourier_bin
-# rbin = system_size / X.shape[0]  # real space bin
-#
-# # reorder lists so they conform to numpy (https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.ifft2.html#numpy.fft.ifft2)
-# start = list(X).index(0)
-# X_reordered = np.concatenate((X[start:], X[:start]))
-# ndx_x = [list(X).index(i) for i in X_reordered]
-#
-# start = list(Y).index(0)
-# Y_reordered = np.concatenate((Y[start:], Y[:start]))
-# ndx_y = [list(Y).index(i) for i in Y_reordered]
-#
-# waxs_reordered = waxs[ndx_x, :]
-# waxs_reordered = waxs_reordered[:, ndx_y]
-#
-# # inverse fourier transform
-# inverse_fft = np.fft.ifft2(waxs_reordered)
-#
-# inverse_fft = inverse_fft[ndx_x, :]
-# inverse_fft = inverse_fft[:, ndx_y]
-#
-# # fourier transform of inversion as a test
-# # ft = np.abs(np.fft.fftn(inverse_fft))**2
-# # ft = ft[ndx_x, :]
-# # ft = ft[:, ndx_y]
-# # plt.imshow(ft)
-# # plt.show()
-#
-# inverse_fft = inverse_fft.real / np.amax(inverse_fft.real)
-#
-# r = np.linspace(-system_size/2, system_size/2, inverse_fft.shape[0])
-#
-# plt.plot(r[start:], inverse_fft[start:, start])  # z-distribution function
+X = X[:-1]
+Y = Y[:-1]
+fbin = X[1] - X[0]  # size of bins in fourier space
+system_size = 2*np.pi / fbin  # fourier_bin = 2*pi / system size therefore system size = 2*pi / fourier_bin
+rbin = system_size / X.shape[0]  # real space bin
+
+# reorder lists so they conform to numpy (https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.ifft2.html#numpy.fft.ifft2)
+start = list(X).index(0)
+X_reordered = np.concatenate((X[start:], X[:start]))
+ndx_x = [list(X).index(i) for i in X_reordered]
+
+start = list(Y).index(0)
+Y_reordered = np.concatenate((Y[start:], Y[:start]))
+ndx_y = [list(Y).index(i) for i in Y_reordered]
+
+waxs_reordered = waxs[ndx_x, :]
+waxs_reordered = waxs_reordered[:, ndx_y]
+
+# inverse fourier transform
+inverse_fft = np.fft.ifft2(waxs_reordered)
+
+inverse_fft = inverse_fft[ndx_x, :]
+inverse_fft = inverse_fft[:, ndx_y]
+
+# fourier transform of inversion as a test
+# ft = np.abs(np.fft.fftn(inverse_fft))**2
+# ft = ft[ndx_x, :]
+# ft = ft[:, ndx_y]
+# plt.imshow(ft)
 # plt.show()
-#
-#
-# def exponential_decay(x, L):
-#
-#     return np.exp(-(x -rbin) / L)
-#
-# # find peaks to fit exponential to
-# # import detect_peaks
-# # mpd = 100
-# # peaks = detect_peaks.detect_peaks(r[start:start + 30], mpd=mpd, show=False)  # adjust mpd if all peaks aren't found
-# peaks = np.array([5, 13, 20, 36]) + start
-#
-# # if centers[peaks[0]] < spacing / 2:  # sometimes a peak is found where it shouldn't
-# #     peaks = peaks[1:]
-#
-# # plot locations of peaks
-# # plt.scatter(r[peaks], inverse_fft[peaks, start], marker='+', c='r', s=200, label='Peak locations')
-#
-# L = 100
-# # fit decaying exponential to peaks
-# p = np.array([L])  # initial guess at parameters
-# from scipy.optimize import curve_fit
-# solp, cov_x = curve_fit(exponential_decay, r[peaks], inverse_fft[peaks, start], p)
-#
-# # plot decaying exponential fit and decaying exponential with L that we were trying to match
-# #plt.plot(r, exponential_decay(r, solp[0]), '--', c='black', label='Least squares fit')
-# # plt.plot(centers, exponential_decay(centers, L), '--', c='blue', label='Theoretical')
-# # plt.show()
+
+inverse_fft = inverse_fft.real / np.amax(inverse_fft.real)
+
+r = np.linspace(-system_size/2, system_size/2, inverse_fft.shape[0])
+
+plt.plot(r[start:], inverse_fft[start:, start])  # z-distribution function
+
+
+def exponential_decay(x, A, L):
+
+    # return A*np.exp(-(x -rbin) / L)
+    return A*np.exp(-x / L)
+
+# find peaks to fit exponential to
+# import detect_peaks
+# mpd = 100
+# peaks = detect_peaks.detect_peaks(r[start:start + 30], mpd=mpd, show=False)  # adjust mpd if all peaks aren't found
+
+peaks = np.array([0, 6, 12, 19, 25, 41]) + start
+
+# if centers[peaks[0]] < spacing / 2:  # sometimes a peak is found where it shouldn't
+#     peaks = peaks[1:]
+
+# plot locations of peaks
+plt.scatter(r[peaks], inverse_fft[peaks, start], marker='+', c='r', s=200, label='Peak locations')
+
+
+L = 100
+A = 1
+# fit decaying exponential to peaks
+p = np.array([A, L])  # initial guess at parameters
+from scipy.optimize import curve_fit
+solp, cov_x = curve_fit(exponential_decay, r[peaks], inverse_fft[peaks, start], p)
+print(solp)
+# plot decaying exponential fit and decaying exponential with L that we were trying to match
+plt.plot(r[start:], exponential_decay(r[start:], solp[0], solp[1]), '--', c='black', label='Least squares fit')
+# plt.plot(centers, exponential_decay(centers, L), '--', c='blue', label='Theoretical')
+plt.xlim(0, 100)
+plt.ylim(-0.1, 0.2)
+print(r[start:])
+ft = np.abs(np.fft.fft(inverse_fft[start:, start]))
+freq_x = np.fft.fftfreq(r[start:].size, d=rbin)
+ndx = np.argsort(freq_x)
+ft = ft[ndx]
+plt.figure()
+plt.plot(freq_x, ft)
+plt.show()
+exit()
 #
 # bound1 = 0
 # bound2 = 0
