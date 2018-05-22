@@ -771,7 +771,7 @@ liquid crystal membranes}
   configuration in $\sim$1000 ns \cite{mondal_self-assembly_2013}.  We
   attempted atomistic self-assembly by packing monomers into a box using Packmol
   \cite{martinez_packmol:_2009}. Simulations of greater than 100 ns show no
-  indicators of progress towards an ordered system (See supporting information). 
+  indicators of progress towards an ordered system (See section S~\ref{S-section:self_assembly}). 
   %BJC5: section showing self-assembly set up to be added
   To bypass the slow self-assembly process, we use Python scripts to assemble monomers
   into a structure close to one of a number of hypothesized equilibrium configurations
@@ -1080,6 +1080,7 @@ liquid crystal membranes}
   We developed the algorithm based on the known reaction mechanism.
   Cross-linking of this system is a free radical polymerization (FRP) taking
   place between terminal vinyl groups present on each of the three monomer tails.
+  The reaction mechanism is drawn out in Figure S-\ref{S-fig:xlink_mech}.
   FRPs require an initiator which bonds to the system, meaning new atoms are
   introduced into the system. For simplicity, we simulated the initiator as
   hydrogen and made it present in the simulation by including them as dummy atoms
@@ -1096,7 +1097,7 @@ liquid crystal membranes}
   order to collect equilibrated data, further NPT simulation is necessary. We
   typically run a cross-linked system for an additional 100 ns to allow the system
   to readjust. For those reasons we did not cross-link all systems tested, but only
-  the most promising structure. We show that cross-linking does not significantly
+  the most promising structures. We show that cross-linking does not significantly
   change any of our drawn conclusions in Section 3.6.
 
   \section{Results and Discussion}
@@ -1148,7 +1149,7 @@ liquid crystal membranes}
   we are trying to match. In the limit of infinite simulation time, all systems will converge to
   a single equilibrium configuration. For simplicity, we will group the systems studied here into
   the ordered and disordered basins. Any system where $\mathit{d}=3.7$ \AA~will be included in the
-  ordered basin and any system where $\mathit{d}=5.0$ \AA will be included in the disordered basin.
+  ordered basin and any system where $\mathit{d}=5.0$ \AA~will be included in the disordered basin.
   The reason for these names will become clearer as we progress through our analysis.
   
 %    All systems tested are at least metastable on the timescales studied here, however not all 
@@ -1196,9 +1197,9 @@ liquid crystal membranes}
   diffraction patterns produced from equilibrated MD trajectories and comparing them
   to experiment. We tested systems built with 5 columns per pore in the parallel 
   displaced and sandwiched configurations at 300 K in the ordered and disordered
-  basins. We generated simulated patterns using portions of simulation trajectory after
-  equilibration. The patterns for all structures are shown and compared to experiment
-  in Figure~\ref{fig:XRDsim}.
+  basins. We extended each simulation by 100 ns in order to get more equilibrated 
+  data. We generated simulated patterns using the extended of simulation trajectories
+  The patterns for all structures are shown and compared to experiment in Figure~\ref{fig:XRDsim}.
 
   %BJC5: put figure letters in upper left hand corner of each pattern.
   \begin{figure}[htb]
@@ -1262,11 +1263,11 @@ liquid crystal membranes}
   % pores in unit cell, tortuosity (?)
   % MRS5: maybe, there's a question of how we can demonstrate the magnitude of any of these 
   % effects.
-  R-spots appears to be weaker in the simulated patterns. They are also partially engulfed by
-  the wide R-$\pi$ reflection. R-$\pi$ appears at a lower $q_z$ value than experiment. In all
-  systems, the reflection reaches its maximum at $q_z < 1.5 \AA^{-1}$ which means that monomers 
-  prefer to stack at least 4.2 \AA~apart rather than 3.7 \AA. R-double does not appear in any
-  of the patterns. 
+  R-spots appears to be weaker, except for the ordered basin sandwiched configuration, in the 
+  simulated patterns. They are also partially engulfed by the wide R-$\pi$ reflection. R-$\pi$
+  appears at a lower $q_z$ value than experiment. In all systems, the reflection reaches its 
+  maximum at $q_z < 1.5 \AA^{-1}$ which means that monomers prefer to stack at least 4.2 \AA~apart
+  rather than 3.7 \AA. R-double does not appear in any of the patterns. 
   
 %  We will explore its possible origins and reasons
 %  that it does not appear in our simulated patterns in Section~\ref{section:rdouble}.
@@ -1283,7 +1284,7 @@ liquid crystal membranes}
 
   We quantified the numerical discrepancies present when comparing the relative intensities
   of each reflection of interest between experimental and simulated patterns. Table 
-  ~\ref{table:relative_inensities_300K} quantifies the relative intensity of each reflection for 
+  ~\ref{table:relative_inensities_300K} shows the relative intensities of each reflection for 
   all systems tested. The patterns are normalized so that the average intensity of R-alkanes 
   must equal 1.
   % BJC5: show how intensities are measured in supporting info
@@ -1294,8 +1295,8 @@ liquid crystal membranes}
   inspection. If the spots were not easily discernable, then the intensity was taken as that of
   the intersection of R-alkanes at half the $q_z$ value of R-$\pi$, since that is where it 
   appears experimentally. The intensity of R-spots is slightly lower than experiment in all 
-  cases. There is no R-double intensity to be measured. Descriptive figures are provided in the
-  supporting information to make these measurements clear.
+  cases. There is no R-double intensity to be measured. Figures are provided in 
+  section S\ref{S-section:xrd_intensities} to make these measurements clear.
 
   \begin{table}[h]
   \centering
@@ -1306,10 +1307,10 @@ liquid crystal membranes}
              &            &            & Parallel  & Disordered & Disordered         \\
   Reflection & Experiment & Sandwiched & Displaced & Sandwiched & Parallel Displaced \\
   \midrule
-  R-alkanes & 1.0 &  1.0 &  1.0 & 1.0 & 1.0  \\  
-  R-spots   & 1.3 &  1.2 &  1.2 & 1.2 & 1.2  \\
-  R-$\pi$   & 2.8 & 18.1 & 14.2 & 7.8 & 10.0 \\
-  R-double  & 0.9 &  --  & --   &  -- & --   \\ 
+  R-alkanes  & 1.0        &  1.0       &  1.0      & 1.0        & 1.0                \\  
+  R-spots    & 1.3        &  1.3       &  1.2      & 1.1        & 1.2                \\
+  R-$\pi$    & 2.8        & 44.0       &  7.7      & 8.4        & 10.1               \\
+  R-double   & 0.9        &  --        & --        &  --        & --                 \\ 
   \bottomrule
   \end{tabular}
   \caption{The simulated XRD patterns of the systems tested, normalized so that the average 
@@ -1320,12 +1321,12 @@ liquid crystal membranes}
   \end{table}
   
   %BJC5: I think something like this has to go somewhere.
-  The diffraction patterns show some noise, especially along the $q_z$ axis where $q_r$=0. This
-  noise can be suppressed by sampling more uncorrelated equilibrium configurations. Unfortunately,
-  our simulations are not long enough to sample enough independent configurations. Increasing the
-  number of trajectory frames used to simulate the structure factor within a given interval of time
-  does not offer any improvement.
-  %BJC5: maybe show in supplemental?
+  The diffraction patterns show some noise, especially along the axis where $q_r$=0. This
+  noise can be suppressed by sampling more uncorrelated equilibrium configurations (See 
+  section S\ref{S-section:xrd_noise}). Unfortunately, our simulations are not long enough
+  to sample enough independent configurations. Increasing the number of trajectory frames
+  used to simulate the structure factor within a given interval of time does not offer 
+  any improvement.
   
   There are clear differences between simulated and experimental results that must be addressed
   and justified. We will explore the origin of each experimental reflection and form structural
@@ -1497,9 +1498,10 @@ liquid crystal membranes}
   the tails. By removing all non-tail atoms from the trajectory and simulating a
   diffraction pattern with the remaining atoms, we were able to isolate the cause of 
   the spots to the tails (Figure~\ref{fig:tails}). Since the tails stay nearly flat, we plotted
-  the centroids of the tails and measured the angle between each centroid and its
-  nearest neighbors with respect to the plane of the membrane. We see distinct
-  peaks in the distribution of these angles (Figure~\ref{fig:tail_packing}).
+  the centroids of the tails (Figure S-\ref{S-fig:centroids}) and measured the angle
+  between each centroid and its nearest neighbors with respect to the plane of the 
+  membrane. We see distinct peaks in the distribution of these angles 
+  (Figure~\ref{fig:tail_packing}).
 
   The peaks in the nearest neighbor angle distribution are consistent with the
   location of R-spots. The peaks of interest in Figure \ref{fig:layered_tails}
@@ -1719,10 +1721,14 @@ liquid crystal membranes}
   the entire correlation function. If the peaks at large values of z instead decay to 1 uniformly,
   the correlation length could remain nearly the same, but R-$\pi$ would have a reduced intensity. 
   The monomer head groups in our simulations do not move enough to create the noise which would 
-  cause such behavior. See Section TBD of the supporting information for illustrative examples. 
-  % BJC5: Trying using inverted fourier transform of 2D experimental waxs. See what z-cross-section
-  % looks like (does it oscillate more or less?) Then take FT of that and compare its intensity
-  % to simulated intensity
+  cause such behavior. See Section S\ref{S-section:rpi_ft} of the supporting information for
+  illustrative examples. 
+  
+  The system size does not significantly alter the intensity of R-$\pi$. We equilibrated a 
+  sandwiched system with twice as many monomers per column so that the system size doubled in 
+  the z-direction. The correlation length increases modestly from 4.5 $\pm$ 0.4 to 7.3 $\pm$ 1.2 \AA, 
+  and the intensity of R-$\pi$ decreases from 44.0 to 39.4. Visually, the correlation functions
+  are nearly identical (See Figure~\ref{S-fig:z_correlation_overlay}). 
   
   The simulated intensity of R-$\pi$ is also more intense than experiment because our system
   models near-perfectly straight pores with no defects. Nearly all of the intensity in 
@@ -2129,8 +2135,8 @@ liquid crystal membranes}
   We observe unusually slow dynamics in our system relative to other liquid crysal
   systems. Typical diffusion constants for columnar liquid crystals have been reported
   to be on the order of $10^{-11}~ m^2/s$ \cite{dong_translational_1984}. We measured the diffusion
-  constants of monomers in each of the systems we studied (See Table~\ref{S-table:msd}
-  in Supporting Information) and learned that they are all on the order of $10^{-14}~m^2/s$.
+  constants of monomers in each of the systems we studied (See Table S-\ref{S-table:msd}) 
+  and learned that they are all on the order of $10^{-14}~m^2/s$.
   Our systems may be frozen in a glassy state. It is also possible that we are simply 
   observing characteristics of the experimental system. There has been no experimental work
   done to study diffusion of Na-GA3C11 monomers in the Col\textsubscript{h}
@@ -2160,10 +2166,10 @@ liquid crystal membranes}
   
   We quantified the movement of the tails during our simulations by calculating the 
   autocorrelation function of the dihedral angle formed around the bond between the 
-  head groups and the ether oxygens which attach the tails to the head group. 
-  %BJC5: add diagram of which oxygens I'm talking about to the supporting info.
-  We exclude the dihedral from the middle tail since it is fundamentally different
-  than the two symmetric outside tails. 
+  head groups and the ether oxygens which attach the tails to the head group 
+  (See Figure S\ref{S-fig:dihedrals}). We exclude the dihedral from the middle tail 
+  since it is fundamentally different than the two symmetric outside tails. We 
+  limited these studies to the sandwiched configuration for simplicity.
   
   The ether dihedrals become decorrelated on a reasonable timescale when the temperature
   is raised. At 300K (Figure~\ref{fig:dihedrals_300K}), the autocorrelation function does
@@ -2171,15 +2177,27 @@ liquid crystal membranes}
   4 times over the course of the 400 ns that we studied. Additionally, the correlation 
   function plateau's near a value of -0.2 which indicates that the tails are starting in 
   an unfavorable configuration. We implemented distance restraints between the centers of 
-  mass of monomer head groups to preserve the hexagonal phase (see Supporting Information
-  %BJC5: supporting info section on this doesn't exist yet.
-  for further detail), then rose the temperature of the equilibrated 300 K system to 500 K.
-  We witnessed decorrelation of tails after $\approx$ 11 ns with a plateau at 0, 
-  (Figure~\ref{fig:dihedrals_500K}) indicating a complete loss of memory. We annealed the 
-  resultant configuration back down to 300 K to see if the increased rotational freedom 
-  might allow the system to relax into to a more tightly packed configuration.
-  %BJC5: more to come.
+  mass of monomer head groups to preserve the hexagonal phase, then rose the temperature 
+  of the equilibrated 300 K ordered basin sandwiched system to 500 K. We witnessed 
+  decorrelation of ether dihedrals after $\approx$ 11 ns with a plateau at 0, 
+  (Figure~\ref{fig:dihedrals_500K}) indicating a complete loss of memory. We annealed
+  the resultant configuration back down to 300 K over 200 ns to see if the increased rotational
+  freedom might allow the system to relax into to a more tightly packed configuration.
   
+  Decorrelating the ether dihedrals at high temperature, followed by thermal annealing
+  does not improve packing in our model. In the ideal case, if all monomers stacked 
+  3.7 \AA~ apart, the z-dimension of our unit cell should be 7.4 nm. In the ordered basin, 
+  sandwiched system studied in this paper, the z-dimension of the unit cell equilibrated 
+  to 8.87 nm, which is roughly consistent with the stacking distance reported in 
+  Table~\ref{table:correlation_length}. After 200 ns of annealing from 500K to 300K, the 
+  z-dimension of the unit cell was 9.22 nm. We repeated the annealing procedure over the 
+  course of 400 ns and the final z-dimension of the unit cell was 9.20 nm. Much longer
+  annealing simulations may get the system to the correct density, but we do not have
+  the resources to further explore this approach. 
+  % 800K simulations are worse. Over 400 ns, the z box dimension goes to 9.8. I think this
+  % is because the initial box z-box dimension is ~10.9. In the 500K system, the initial
+  % z-box dimension is ~9.7
+
   \begin{figure}
   \centering
   \begin{subfigure}{0.45\textwidth}
@@ -2271,7 +2289,7 @@ liquid crystal membranes}
 
   \subsection{Effect of Water on Structure}\label{section:water}
 
-  We explored the affect of water on pore structure, addressing question
+  We explored the effect of water on pore structure, addressing question
   (\ref{point:water}), by preparing parallel displaced and sandwiched
   configurations according to the wet equilibration procedure. We limit
   the discussion to the ordered pore basin since it produces equilibrated 
@@ -2401,7 +2419,7 @@ liquid crystal membranes}
   \subsection{Model Ionic Conductivity Measurements}
 
   We used equilibrated systems in the ordered pore basin to calculate ionic 
-  conductivity since we believe its structure is the closest match to
+  conductivity since we believe their structures are the closest match to
   experiment. Our models give reasonable estimates of ionic conductivity when
   compared to experiment. We compare calculated values of ionic conductivity
   obtained using the Nernst-Einstein relation and Collective Diffusion model in
@@ -2437,49 +2455,77 @@ liquid crystal membranes}
 
   \subsection{Effect of Crosslinking}\label{section:xlink}
 
-  The system's structure and physical characteristics did not change
-  significantly when we applied the cross-linking algorithm to the equilibrated
-  parallel-displaced configuration in the ordered pore basin. We simulated
-  the cross-linked system in the NPT ensemble for 100 ns. After the system is
-  cross-linked, the distance between pores shrinks by 0.4 \AA~and the distance
-  between layers increases by 0.04 \AA. All major features are still present in
-  the simulated XRD patterns, however at lower intensities
-  (Fig.~\ref{fig:rzplot_xlink}). We calculated the ionic conductivity using the
-  Nernst-Einstein relation and found that it is lower in the cross-linked system
-  (Fig.~\ref{fig:IC_xlink}).
-  %BJC: The current XRD pattern is from a 100 ns simulation. I am running it out
-  % longer to get more statistics
+  We applied our crosslinking algorithm to equilibrated sandwiched and parallel
+  displaced configurations in the ordered pore basin. We allowed the crosslinking
+  algorithm to propagate until greater than 90 \% of vinyl groups were either involved
+  in a crosslinking reaction or were terminated. See section S\ref{S-section:xlink}
+  for further details on the crosslinking algorithm. We allowed the crosslinked
+  configurations to simulate for 100 ns further in the NPT ensemble. 
 
+  % BJC5: Is it worth including the distance between layers and the correlation length?   
+  There are minor changes to the physical characteristics of these systems when 
+  they are crosslinked (See Figure ~\ref{fig:xlink}). The ionic conductivity of 
+  the sandwiched configuration decreases while that of the parallel displaced 
+  configuration stays the same. The pore spacing decreases in both systems by
+  0.07 nm. The vertical monomer stacking distance increases in the sandwiched
+  configuration and decreases in the parallel displaced configuration, however the 
+  values of crosslinked configurations fall within uncertainty of their un-crosslinked
+  counterparts. The correlation length decreases in both systems, but is most 
+  pronounced in the parallel displaced system.  
+  
   \begin{figure}
   \centering
-  \begin{subfigure}{0.45\textwidth}
-	\centering
-	\includegraphics[width=\textwidth]{rzplot_xlink.png}
-	\caption{}~\label{fig:rzplot_xlink}
-  \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-	\centering
-	\includegraphics[width=\textwidth]{IC_xlink.png}
-	\caption{}~\label{fig:IC_xlink}
-  \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-	\centering
-	\includegraphics[width=\textwidth]{dbwl_xlink.png}
-	\caption{}~\label{fig:dbwl_xlink}
-  \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-	\centering
-	\includegraphics[width=\textwidth]{p2p_xlink.png}
-	\caption{}~\label{fig:p2p_xlink}
-  \end{subfigure}
-  \caption{Applying our simulated crosslinking mechanism to an equilibrium
-	  configuration causes slight changes to the system's physical and structural
-	  properties. (a) Reflections produced by the cross-linked configuration are
-	  faded relative to the uncross-linked system. (b) The ionic conductivity is
-	  smaller relative to the uncross-linked system, but still much larger than the
-	  experimental value. When the system is cross-linked, the distance between
-	  layers increases (c) and the pore spacing decreases (d)}~\label{fig:xlink}
+  \includegraphics[width=\textwidth]{xlink_charts.eps}
+  \caption{There are minor differences between the physical properties of a
+  crosslinked (xlink) system versus an uncrosslinked system. The sandwiched configuration (S)
+  exhibits a smaller decrease in its ionic conductivity, while the parallel displaced (PD)
+  configuration remains constant. The pore spacing of both systems decreases upon crosslinking.
+  The vertical distance between stacked monomers increases in the sandwiched configuration
+  and decreases in the parallel displaced configuration. The correlation length decreases
+  in both configurations.}\label{fig:xlink}
   \end{figure}
+
+%  The system's structure and physical characteristics did not change
+%  significantly when we applied the cross-linking algorithm to the equilibrated
+%  parallel-displaced configuration in the ordered pore basin. We simulated
+%  the cross-linked system in the NPT ensemble for 100 ns. After the system is
+%  cross-linked, the distance between pores shrinks by 0.4 \AA~and the distance
+%  between layers increases by 0.04 \AA. All major features are still present in
+%  the simulated XRD patterns, however at lower intensities
+%  (Fig.~\ref{fig:rzplot_xlink}). We calculated the ionic conductivity using the
+%  Nernst-Einstein relation and found that it is lower in the cross-linked system
+%  (Fig.~\ref{fig:IC_xlink}).
+
+%  \begin{figure}
+%  \centering
+%  \begin{subfigure}{0.45\textwidth}
+%	\centering
+%	\includegraphics[width=\textwidth]{rzplot_xlink.png}
+%	\caption{}~\label{fig:rzplot_xlink}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%	\centering
+%	\includegraphics[width=\textwidth]{IC_xlink.png}
+%	\caption{}~\label{fig:IC_xlink}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%	\centering
+%	\includegraphics[width=\textwidth]{dbwl_xlink.png}
+%	\caption{}~\label{fig:dbwl_xlink}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%	\centering
+%	\includegraphics[width=\textwidth]{p2p_xlink.png}
+%	\caption{}~\label{fig:p2p_xlink}
+%  \end{subfigure}
+%  \caption{Applying our simulated crosslinking mechanism to an equilibrium
+%	  configuration causes slight changes to the system's physical and structural
+%	  properties. (a) Reflections produced by the cross-linked configuration are
+%	  faded relative to the uncross-linked system. (b) The ionic conductivity is
+%	  smaller relative to the uncross-linked system, but still much larger than the
+%	  experimental value. When the system is cross-linked, the distance between
+%	  layers increases (c) and the pore spacing decreases (d)}~\label{fig:xlink}
+%  \end{figure}
  
   \section{Conclusion}
   

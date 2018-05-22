@@ -1,4 +1,4 @@
-vi #!/usr/bin/env python
+#!/usr/bin/env python
 
 import argparse
 import mdtraj as md
@@ -6,19 +6,20 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 import pymbar
+import tqdm
 
 
 def initialize():
 
-    parser = argparse.ArgumentParser(description='Run Cylindricity script')
+    parser = argparse.ArgumentParser(description='Calculate nematic order parameter')
 
     parser.add_argument('-t', '--traj', default='traj_whole.xtc', type=str, help='Trajectory file. Make sure to '
                                                                             'preprocess with gmx trjconv -pbc whole')
     parser.add_argument('-g', '--gro', default='wiggle.gro', type=str, help='Coordinate file')
     parser.add_argument('-p', '--plane', default=['C', 'C2', 'C4'], help='Names of atoms making up planes whose normal'
                                                                          'we are interested in')
-    parser.add_argument('-b', '--begin', default=0, help='Start frame')
-    parser.add_argument('-e', '--end', default=-1, help='End frame')
+    parser.add_argument('-b', '--begin', default=0, type=int, help='Start frame')
+    parser.add_argument('-e', '--end', default=-1, type=int, help='End frame')
     parser.add_argument('-bins', default=50, type=int, help='Number of bins in final histogram')
     parser.add_argument('-blocks', type=int, help='Number of blocks for block averaging')
     parser.add_argument('-nboot', default=200, type=int, help='Number of bootstrap trials')
@@ -75,10 +76,19 @@ def angles(vector, plane=None):
     nT = vector.shape[0]
     costheta = np.zeros_like(vector[:, :, 0])
     pn = np.linalg.norm(plane)  # norm of normal vector to plane
+    lim = np.cos(np.pi / 2)
+    # print(lim)
+    # exit()
 
     # start = time.time()
     for i in range(nT):
         costheta[i, :] = np.dot(vector[i, :, :], plane) / (np.linalg.norm(vector[i, :, :], axis=1)*pn)
+        # for j in tqdm.tqdm(range(costheta.shape[1])):  # for symmetric molecules (can turn over and molecule is the same)
+        #     if lim < costheta[i, j]:
+        #         costheta[i, j] -= 1
+        #     elif -lim > costheta[i, j]:
+        #         costheta[i, j] += 1
+
     # print(time.time() - start)
 
     # slower loop
@@ -103,11 +113,12 @@ def nematic(costheta):
 
     S = np.zeros([costheta.shape[0]])  # calculate S for each frame
     for i in range(costheta.shape[0]):
-        S[i] = np.sum(1.5*a[i, :]**2 - 0.5)
+        S[i] = 0.5*np.sum(3*a[i, :]**2 - 1)
 
     S /= costheta.shape[1]
 
     return S
+
 
 if __name__ == "__main__":
 
@@ -121,6 +132,12 @@ if __name__ == "__main__":
     a = angles(n, [0, 0, 1])
 
     S = nematic(a)
+
+    plt.figure()
+    plt.plot(t.time/1000, S, linewidth=2)
+    plt.ylabel('Nematic Order Parameter', fontsize=14)
+    plt.xlabel('Time (ns)', fontsize=14)
+    plt.ylim(-0.1, 1)
 
     equil = pymbar.timeseries.detectEquilibration(S)[0]  # frame at which S is considered to be equilibrated
 

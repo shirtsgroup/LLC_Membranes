@@ -26,11 +26,11 @@ def initialize():
     parser.add_argument('-r', '--res', help='Residue to create correlation function with respect to. Will use center of'
                                             'mass. Will override atoms. NOT IMPLEMENTED YET')
     parser.add_argument('--itp', default='/home/bcoscia/PycharmProjects/GitHub/HII/top/Monomer_Tops/NAcarb11V.itp')
-    parser.add_argument('-b', '--begin', default=0, type=int, help='Start frame')
+    parser.add_argument('-b', '--begin', default=-50, type=int, help='Start frame')
     parser.add_argument('-bins', nargs='+', default=100, type=int, help='Integer or array of bin values. If more than'
                         'one value is used, order the inputs according to the order given in args.axis')
     parser.add_argument('-m', '--monomers_per_layer', default=5, type=int, help='Number of monomers per layer')
-    parser.add_argument('-s', '--slice', default='xy', help='Slice to be visualized')
+    parser.add_argument('-s', '--slice', default='z', help='Slice to be visualized')
     parser.add_argument('--layers', default=20, type=int, help='Number of layers')
     parser.add_argument('--range', nargs='+', help='Range for histogram plot. A list of the form:'
                         '[dimension 1 lower, dimension 1 upper, dimension 2 lower, dimension 2 upper ...]')
@@ -284,7 +284,8 @@ if __name__ == "__main__":
         else:
             hist_range = []
             for i in range(ndimensions):
-                hist_range.append([-L[i]/2, L[i]/2])
+                # hist_range.append([-L[i]/2, L[i]/2])
+                hist_range.append([-L[i], L[i]])
         ###################### 3D center of mass #########################
 
         if args.atoms[0] == 'all':
@@ -401,18 +402,18 @@ if __name__ == "__main__":
         while centers1[shift] < 0.2:
             shift += 1
 
-        # plt.figure()
-        # ft = np.abs(np.fft.fft(zdf[shift:] - np.mean(zdf[shift:])))**2
-        # freq = np.fft.fftfreq(zdf[shift:].size, centers1[1] - centers1[0])
-        # ndx = np.argsort(freq)
-        # freq = freq[ndx]
-        # ft = ft[ndx]
-        # plt.plot(freq, ft)
+        plt.figure()
+        ft = np.abs(np.fft.fft(zdf[shift:] - np.mean(zdf[shift:])))**2
+        freq = np.fft.fftfreq(zdf[shift:].size, centers1[1] - centers1[0])
+        ndx = np.argsort(freq)
+        freq = freq[ndx]
+        ft = ft[ndx]
+        plt.plot(freq, ft)
 
         zdf /= np.mean(zdf)
         zdf = zdf[shift:]
         centers1 = np.array(centers1[shift:])
-        print(zdf)
+        np.savez_compressed('zdf.npz', zdf=zdf, centers=centers1)
 
         plt.figure()
         plt.plot(centers1, zdf, label='Raw data')
@@ -439,7 +440,7 @@ if __name__ == "__main__":
             # p = np.array([2, 10])  # initial guess at parameters
             # bounds = ([0, 0], [np.inf, np.inf])
             # solp, cov_x = curve_fit(exponential_decay, centers1[peaks], zdf[peaks], p, bounds=bounds)
-            # print(solp)
+            #
             # # plt.plot(centers1[start:], 1 + solp[0]*np.exp(-centers1[start:]/solp[1]))
             #
             # plt.plot(centers1[start:], exponential_decay(np.array(centers1[start:]), solp[0], solp[1]), '--',
@@ -447,8 +448,8 @@ if __name__ == "__main__":
             # print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*solp[1], 10*np.sqrt(cov_x[1, 1])))
 
             # fit decaying sinusoidal function to data
-            p = [2.5, 0.42, np.pi, 0.5]  # amplitude, period, phase shift, correlation length. Pick values above what is expected
-            bounds = ([0, 0, 0, 0.4], [np.inf, 0.5, np.inf, np.inf])  # bounds on fit parameters
+            p = [2.5, 0.45, np.pi, 0.5]  # amplitude, period, phase shift, correlation length. Pick values above what is expected
+            bounds = ([0, 0.4, 0, 0.4], [np.inf, 0.5, np.inf, np.inf])  # bounds on fit parameters
 
             solp, pcov = curve_fit(sinusoidal_decay, centers1[start:], zdf[start:], p, bounds=bounds)
             print(solp)

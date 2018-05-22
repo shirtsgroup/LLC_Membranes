@@ -1,9 +1,8 @@
-\documentclass{article}
+\documentclass[journal=jpcbfk,manusciprt=article]{achemso}
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage{subcaption}
-\usepackage[margin=1in]{geometry}
-\usepackage{amsmath} % or simply amstext
+%\usepackage[margin=1in]{geometry}\usepackage{amsmath} % or simply amstext
 \usepackage{siunitx}
 \usepackage{booktabs}
 \usepackage[export]{adjustbox}
@@ -12,6 +11,12 @@
 \usepackage{booktabs}
 \usepackage{gensymb}
 \usepackage{float}
+\usepackage{listings}
+\usepackage{xr}
+
+\SectionNumbersOn
+
+\externaldocument[M-]{draft}
 
 \title{Supporting Information : Understanding the nanoscale structure of hexagonal phase lyotropic liquid crystal membranes}
 \author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble \and Joe Yelk \and Matthew Glaser \and Xunda Feng \and Michael R. Shirts}
@@ -22,11 +27,33 @@
   \graphicspath{{./figures/}}  % put all the figures here
   \maketitle
 
-%  \noindent
-%  \begingroup
-%	\fontsize{14pt}{14pt}\selectfont
-%	\textbf{Further details regarding monomer parameterization} 
-%  \endgroup
+  \section{Attempted Self-assembly}\label{section:self_assembly}
+  
+  We attempted self assembly of Na-GA3C11 monomers by using an isotropic configuration
+  generated using Packmol (\cite{martinez_packmol:_2009}). The input file given to 
+  Packmol is shown below.
+  \lstset{language=bash}
+  \begin{lstlisting}
+  tolerance 2.0
+  output packed.pdb
+  filetype pdb
+  structure monomer.pdb
+  		number 400
+  		inside box 0. 0. 0. 84.3 84.3 84.3
+  end structure
+  \end{lstlisting}
+
+  We used the same number of monomers (400) that we used in all other simulations. 
+  Since Packmol does not have the capability to create monoclinic boxes, we used a cubic
+  box with a volume of 660 $nm^3$, 25 \% larger than those used to create ordered unit
+  cells we studied. 
+  
+  We use the nematic order paramter as defined in section~\ref{method:nematic_order} to 
+  observe any progress towards an system ordering.
+  
+  %BJC: picture of isotropic box (before and after?)
+  %BJC: plot of nematic order parameter vs. time 
+
   \section{Further details regarding monomer parameterization}\label{section:parameterization}
  
   \vspace{1em}
@@ -71,7 +98,7 @@
 	(Figure~\ref{fig:monomer}).
   \end{enumerate} 
 
-  \begin{figure}
+  \begin{figure}[!htb]
 	\centering
         \includegraphics[width=0.9\textwidth]{monomer.png}
 	\caption{Atomistic representation of the monomer Na-GA3C11. White atoms
@@ -79,15 +106,24 @@
 		the blue atom is sodium.}\label{fig:monomer}
   \end{figure}
 
-  \begin{figure}
+  \begin{figure}[!htb]
 	\centering
         \includegraphics[width=0.9\textwidth]{monomer_color_coded.png}
 	\caption{The groups used for radial distribution calculations. Red atoms are in the
 		tails group. Green atoms are in the head group region. The blue atom is sodium. 
 		}\label{fig:monomer_color_coded}
   \end{figure}
+  
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.5\textwidth]{monomer_dihedrals.png}
+  \caption{We measured the autocorrelation functions of the dihedrals highlighted in
+  black. We only included dihedrals associated with the outer tails in our calculation
+  since the position of the center tail leads to fundamentally different interactions and
+  dynamics.}\label{fig:dihedrals}
+  \end{figure}
 
-  \begin{figure}
+  \begin{figure}[!htb]
         \centering
         \begin{subfigure}[b]{0.32\textwidth}
                 \centering
@@ -121,13 +157,52 @@
         configuration }\label{fig:stacking}
   \end{figure}
 
-  \begin{figure}
+  \begin{figure}[!htb]
 	\centering
 	\includegraphics[width=0.8\textwidth]{pore_radius_illustration.png}
 	\caption{When creating an initial configuration, the pore radius is defined based
 	on the distance of the carbonyl carbon from the pore's central axis}
 	\label{fig:pore_radius_illustration}
   \end{figure}
+
+  \section{Calculation of pore-to-pore spacing statistics}\label{section:p2p_stats}
+ 
+ %BJC: is it really necessary to explain this if I release the code? I don't explain
+ %any of the other stats I calculate.
+  \vspace{1em} 
+  We are interested in 5 pore-to-pore distances which should all be
+  equal in a perfect hexagonal array (Figure~\ref{fig:p2p_diagram}). Only 4 of
+  the 5 distances are independent. We can calculate a trajectory of spacing
+  versus time for each of the 5 distances. We calculated the average pore-to-pore
+  spacing and its uncertainty according to the following procedure:
+   \begin{enumerate}
+	\item We calculated the time when each of the pore-to-pore distances
+	were equilibrated using \\ \texttt{pymbar.timeseries.detectEquilibration()}
+	\cite{chodera_simple_2016,shirts_statistically_2008}. We began calculations
+	after the largest of the five values.
+	\item We calculated how long it takes for the data in each of the 5
+	trajectories to become uncorrelated using \texttt{pymbar.timeseries.integratedAutocorrelationTime()}
+	\cite{chodera_simple_2016,shirts_statistically_2008}. 
+	\item We broke the full equilibrated trajectory into blocks of length $\tau$, where
+	$\tau$ is the maximum of the five autocorrelation times calculated. Each block contains
+	five sub-trajectories of pore-to-pore spacings.   
+	\item We generate statistics using the bootstrapping technique. For
+	each bootstrap trial, we reconstruct an equilibrium trajectory by randomly
+	sampling from the trajectory blocks. 
+	\item The average pore-to-pore distance is the mean of all pore
+	spacings among all bootstrap trials.
+	\item To calculate the uncertainty in pore-to-pore distance, we calculate the average 
+	pore spacing for each pore over all bootstrap trials. Using the 5 average 
+	pore-to-pore distances, we calculate the spread with:
+	\begin{equation}
+	s = \sqrt{\frac{1}{4} \sum_{i=1}^5 (x_i - \overline{x})^2} 
+	\label{equation:p2p_stats}
+	\end{equation}
+	where $\overline{x}$ is the average pore-to-pore distance. We divided the sum in 
+	equation~\ref{equation:p2p_stats} by 4 since there are only 4 independent pore
+	spacings.
+	
+  \end{enumerate}
 
   %Our model is insensitive to initial configuration if monomer placement is chosen within reason. 
 
@@ -203,8 +278,8 @@
 		\item 45 \AA~: A pore spacing of 45 \AA~is about 10 \% larger
 		than the experimental value. This systems exhibits the smallest response to our 
  		equilibration procedure (Figure~\ref{fig:p2p_45}) and we chose to use this
-                value for all our simulations in the main text.
-f		%The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
+        value for all our simulations in the main text.
+        %The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
 		%The system maintains hexagonal symmetry and exhibits the lowest uncertainty in
 		%pore spacing. We chose to use this value for all our simulations in the main
 		%text. 
@@ -221,7 +296,7 @@ f		%The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
    %             response.
                 
 		\item 55 \AA~: We tested a pore spacing of 55 \AA~which is at
-		a distance where monomers in each pore no longer intersect adjacent pores. Once
+		a distance where monomers in each pore no longer intersect those of adjacent pores. Once
 		the restraining potential reaches 56 KJ mol$^{-1}$ nm$^{-2}$, the pore spacing
 		changes erratically until it begins to settle when the force constants are
 		below 3 KJ mol$^{-1}$ nm$^{-2}$ (Figure~\ref{fig:p2p_55}). We reccomend
@@ -232,7 +307,7 @@ f		%The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
 
 	  \end{enumerate} 
 
-	  \begin{figure}
+	  \begin{figure}[!htb]
 		\centering
 		\includegraphics[width=0.4\textwidth]{p2p_diagram.png}
 		\caption{In a perfect hexagonal, there are 5 distances that should be exactly
@@ -241,7 +316,7 @@ f		%The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
 	  \end{figure} 
 
 	  %BJC: Could put vertical lines to indicate where position restraint values are reduced
-  	  \begin{figure}[htp]
+  	  \begin{figure}[!htb]
 		\centering
 		\begin{subfigure}{0.3\textwidth}
 			\includegraphics[width=\textwidth]{p2p_39.png}\quad
@@ -312,7 +387,7 @@ f		%The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
 		slightly larger than the equilibrated pore radius of the system simulated with
 		an intial pore radius of 2.5 \AA. After being run through the full dry
 		equilibration procedure, the average pore radius is 0.42 $\pm$ 0.01 \AA, which
-		agrees with the 2.5 \AA~configuration within error. 
+		agrees with the 2.5 \AA~configuration within uncertainty. 
 
 		\item 8 \AA~: The largest pore radius that can achieved before
 		energy minimization becomes problematic is 8 \AA. One should use caution with
@@ -344,7 +419,7 @@ f		%The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
 		  the pore radius is too large, slit pores may form.}~\label{table:radii}
 	  \end{table}
 
-	  \begin{figure}
+	  \begin{figure}[!htb]
 	  \centering
           \includegraphics[width=\textwidth]{slit_pores.png}
 	  \caption{A system that was built with an initial pore radius of 8
@@ -360,8 +435,7 @@ f		%The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
 	  We tested 3 different initial layer spacings, defined as the distance
 	  between the planes of aromatic rings in each layer. Systems built with layers
 	  stacked 3.7 \AA~and 5 \AA~apart are discussed extensively in the main text. We
-	  will focus the discussion here on systems built with layers stacked 10 \AA~
-	  apart.
+	  also tested a system built with layers stacked 10 \AA~ apart.
 
 	  Figure~\ref{fig:dbwl_10} shows the structure of an assembly built
 	  with an initial layer spacing of 10 \AA~immediately after the restrained
@@ -373,7 +447,7 @@ f		%The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
 	  equilibration times, and it will almost certainly get trapped in a metastable
 	  configuration that bears no resemblence to the experimental profile. 
  
-	  \begin{figure}
+	  \begin{figure}[!htb]
 		\centering
 		\includegraphics[width=0.5\textwidth]{dbwl_10.png}
 		\caption{When layers are initially stacked 10 \AA~apart and the system
@@ -388,40 +462,8 @@ f		%The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
 %        \fontsize{14pt}{14pt}\selectfont
 %	\textbf{Calculation of pore-to-pore spacing statistics}
 %  \endgroup
-  \section{Calculation of pore-to-pore spacing statistics}\label{section:p2p_stats}
- 
-  \vspace{1em} 
-  We are interested in 5 pore-to-pore distances which should all be
-  equal in a perfect hexagonal array (Figure~\ref{fig:p2p_diagram}). Only 4 of
-  the 5 distances are independent. We can calculate a trajectory of spacing
-  versus time for each of the 5 distances. We calculated the average pore-to-pore
-  spacing and its uncertainty according to the following procedure:
-   \begin{enumerate}
-	\item We calculated the time when each of the pore-to-pore distances
-	were equilibrated using \\ \texttt{pymbar.timeseries.detectEquilibration()}
-	\cite{chodera_simple_2016,shirts_statistically_2008}. We began calculations
-	after the largest of the five values.
-	\item We calculated how long it takes for the data in each of the 5
-	trajectories to become uncorrelated using \texttt{pymbar.timeseries.integratedAutocorrelationTime()}
-	\cite{chodera_simple_2016,shirts_statistically_2008}. 
-	\item We broke the full equilibrated trajectory into blocks of length $\tau$, where
-	$\tau$ is the maximum of the five autocorrelation times calculated. Each block contains
-	five sub-trajectories of pore-to-pore spacings.   
-	\item We generate statistics using the bootstrapping technique. For
-	each bootstrap trial, we reconstruct an equilibrium trajectory by randomly
-	sampling from the trajectory blocks. 
-	\item The average pore-to-pore distance is the mean of all pore
-	spacings among all bootstrap trials.
-	\item To calculate the uncertainty in pore-to-pore distance, we calculate the average 
-	pore spacing for each pore over all bootstrap trials. Using the 5 average 
-	pore-to-pore distances, we calculate the spread with:
-	\begin{align}
-	s = \sqrt{\frac{1}{4} \sum_{i=1}^5 (x_i - \overline{x})^2} 
-	\end{align}
-	where $\overline{x}$ is the average pore-to-pore distance.
-  \end{enumerate}
 
-  \begin{figure}
+  \begin{figure}[!htb]
 	\centering
 	\includegraphics[width=0.25\textwidth]{p2p_diagram.png}
 	\caption{There are five pore-to-pore distances that are equal in a perfect
@@ -433,13 +475,7 @@ f		%The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
 	\label{fig:p2p_diagram}
   \end{figure}
 
-%  \vspace{1em}
-%  \begingroup
-%	\fontsize{14pt}{12pt}\selectfont
-%	\noindent \textbf{Experimental correlation length of R-$\pi$}\label{section:correlation_length}
-%  \endgroup
-
-  \subsubsection{\textit{The nematic order parameter}}\label{method:nematic_order}
+  \section{The nematic order parameter}\label{method:nematic_order}
 
   We calculated the nematic order parameter for our system in order to
   understand the degree of ordering among monomer head groups. Typically, the
@@ -453,13 +489,147 @@ f		%The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
 	\label{eqn:nematic_order_parameter}
   \end{equation}
   where $\theta$ is the angle between the molecular long axis and $\mathbf{n}$.
-  In a perfectly ordered system, the molecular axis should be aligned with
-  $\mathbf{n}$ and give an order parameter of $S=1$. We are interested in
-  quantifying the degree of monomer head group alignment between systems. We use
-  Eq.~\ref{eqn:nematic_order_parameter} to accomplish this by defining
-  $\mathbf{n}$ as the z-axis (or pore axis), and then measuring the angles,
+  In a perfectly ordered nematic liquid crystal system, the molecular axis of each
+  monomer should be aligned with $\mathbf{n}$ and give an order parameter of $S=1$. 
+  We are interested in quantifying the degree of monomer head group alignment 
+  between systems. We use Eq.~\ref{eqn:nematic_order_parameter} to accomplish this
+  by defining $\mathbf{n}$ as the z-axis (or pore axis), and then measuring the angles,
   $\theta$, between $\mathbf{n}$ and the vectors perpendicular to the plane of
-  the aromatic head groups.
+  the aromatic head groups ($\mathbf{v}$ in Figure~\ref{fig:director}). 
+  
+  %BJC: change n to v in picture.
+  \begin{figure}[!htb]
+	\centering
+	\includegraphics[width=0.75\linewidth]{nematic_director.png}
+	\caption{We calculate the nematic order parameter by measuring the angle
+	between $\mathbf{v}$ and the z-axis.}~\label{fig:director}
+  \end{figure}
+
+  The nematic order parameter is highest in sandwiched systems. 
+  Figure~\ref{fig:nematic_distribution} shows the distribution of angles between
+  the nematic director and the vector perpendicular to the monomer head groups. 
+  Systems in the ordered basin have higher nematic order parameters than their
+  disordered basin counterparts. Both sandwiched system have higher nematic order
+  parameters than both parallel displaced systems. This may occur because monomers
+  in the sandwiched configuration have their motion restricted by vertically adjacent
+  monomers, while those in the parallel displaced configuration have more room to 
+  rotate.
+
+  \begin{figure}[!htb]
+
+  \begin{subfigure}{\linewidth}
+        \centering
+        \begin{subfigure}{0.45\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{layered_nematic_order.png}
+                \caption{Sandwiched, Ordered}~\label{fig:sandwich_nematic}
+        \end{subfigure}%
+        \begin{subfigure}{0.45\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{offset_nematic_order.png}
+                \caption{Parallel Displaced, Ordered}~\label{fig:offset_nematic}
+        \end{subfigure}
+        \begin{subfigure}{0.45\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{disorder_sandwich_nematic_order.png}
+                \caption{Sandwiched, Disordered}~\label{fig:disorder_sandwich_nematic}
+        \end{subfigure}%
+        \begin{subfigure}{0.45\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{disorder_offset_nematic_order.png}
+                \caption{Parallel Displaced, Disordered}~\label{fig:disorder_offset_nematic}
+        \end{subfigure}
+
+  \end{subfigure}
+  \caption{The distribution of angles between nematic director vector (See
+	  Figure~\ref{fig:director}) and the z-axis averaged over the equilibrated portion
+	  of each trajectory}~\label{fig:nematic_distribution}
+  \end{figure}
+ 
+  \section{Measurement of intensities of experimental and simulated XRD patterns}\label{section:xrd_intensities}
+  
+  We developed standardized methods of measuring the intensity of reflections of interest
+  in the experimental and simulated X-ray diffraction patterns presented in this work. Here,
+  we graphically illustrate the methods used for measuring these intensities. 
+  
+  All diffraction patterns are normalized according to R-alkanes and the intensities
+  of all reflections are reported relative to the intensity of R-alkanes. The region
+  used to calculate the average intensity of R-alkanes is shown in 
+  Figure~\ref{fig:ralkanes}. The top region is excluded because, in the simulated
+  patterns, R-$\pi$ intersects with R-alkanes.
+  
+  R-$\pi$ and R-double are reported as the maximum values of the peaks of the 
+  $q_z$ cross-section of the experimental pattern at $q_r=0$ (Figure~\ref{fig:rpi_rdouble}).
+  In the case of the experimental pattern, the peak heights are not symmetrical,
+  so we report the average of the two heights.
+  
+  We measured R-spots by calculating the average intensity within a region 
+  selected by visual inspection. We report the average intensity within the regions 
+  highlighted in red in Figure~\ref{fig:rspots}. If there are no easily discernable
+  spots, we report the average intensity at the intersection of R-alkanes with
+  the $q_z$ value of R-double since that is where we expect it to appear based on
+  experiment. Since R-double does not appear in our simulated patterns, we 
+  estimate where it should appear as half of the $q_z$ value of R-$\pi$.
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{WAXS_raw.png}
+  \caption{Unaltered experimental WAXS pattern}\label{fig:unaltered}
+  \end{subfigure}
+  \begin{subfigure}{0.45\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{ralkanes.png}
+  \caption{R-alkanes}\label{fig:ralkanes}
+  \end{subfigure}
+  \begin{subfigure}{0.45\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{rpi_rdouble.png}
+  \caption{$q_z|_{r=0}$}\label{fig:rpi_rdouble}
+  \end{subfigure}
+  \begin{subfigure}{0.45\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{rspots.png}
+  \caption{R-spots}\label{fig:rspots}
+  \end{subfigure}
+  \caption{}\label{fig:xrd_intensities}
+  \end{figure}
+ 
+  \section{Noise in simulated diffraction patterns}\label{section:xrd_noise}
+  
+  The magnitude of noise in the simulated diffraction patterns decrease as 
+  the number of independent configurations increases. We simulated the structure
+  factor of 100 randomly placed particles and varied the number of independent 
+  configurations (N). It is expected that the structure factor should resemble
+  a two-dimsional gaussian. We cannot sample enough independent configurations
+  of our system to completely eliminate noise.
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{xrd_1frame.png}
+  \caption{N=1}
+  \end{subfigure}
+  \begin{subfigure}{0.45\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{xrd_10frame.png}
+  \caption{N=10}
+  \end{subfigure}
+  \begin{subfigure}{0.45\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{xrd_100frame.png}
+  \caption{N=100}
+  \end{subfigure}
+  \begin{subfigure}{0.45\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{xrd_10000frame.png}
+  \caption{N=10000}
+  \end{subfigure}
+  \caption{The magnitude of noise, especially along $q_r$=0, decreases
+  as the number of independent configurations (N) increases.}\label{fig:xrd_noise}
+  \end{figure}
  
   \section{Experimental correlation length of R-$\pi$}\label{section:correlation_length}
  
@@ -479,7 +649,7 @@ f		%The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
   instrumental broadening in addition to finite size broadening, the value 
   calculated here is really only an upper bound on the correlation length. 
   % need citations and more on lorentzian parameters
-  \begin{figure}[h]
+  \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.45\textwidth}	
   	\includegraphics[width=\textwidth]{waxs_dashed.png}
@@ -489,12 +659,14 @@ f		%The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
 	\includegraphics[width=\textwidth]{Correlation_length_exp.png}
 	\caption{}~\label{fig:correlation_length_exp}
   \end{subfigure}
-  \caption{}~\label{fig:correlation}
+  \caption{(a) We estimated the system's experimental correlation length using a 
+  1D slice of the 2D WAXS patterns along $q_r$=0. (b) We fit a lorentzian curve 
+  to the 1D slice. One of the fit parameters is the full width at half maximum (FWHM).
+  The correlation length is 1/FWHM.}~\label{fig:correlation}
   \end{figure}
   \vspace{1em} \\
 
-% BJC5 : Move this figure to supporting
-  \begin{figure}
+  \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.47\textwidth}
         \includegraphics[width=1\linewidth]{offset_density.png}
@@ -526,96 +698,98 @@ f		%The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
 	  uniform, disordered pore.}~\label{fig:densities}
   \end{figure}
 
-  \begin{figure}
-	\centering
-        \begin{subfigure}{0.40\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{zdf_layered_4.png}
-                \caption{4 mon/layer, Sandwiched}\label{fig:zdf_layered_4}
-        \end{subfigure}
-        \begin{subfigure}{0.40\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{zdf_offset_4.png}
-                \caption{4 mon/layer, Parallel Displaced}\label{fig:zdf_layered_4}
-        \end{subfigure}
-	\begin{subfigure}{0.40\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{zdf_layered_6.png}
-                \caption{6 mon/layer, Sandwiched}\label{fig:zdf_layered_6}
-        \end{subfigure}
-        \begin{subfigure}{0.40\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{zdf_offset_6.png}
-                \caption{6 mon/layer, Parallel Displaced}\label{fig:zdf_layered_6}
-        \end{subfigure}
-        \begin{subfigure}{0.40\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{zdf_layered_7.png}
-                \caption{7 mon/layer, Sandwiched}\label{fig:zdf_layered_7}
-        \end{subfigure}
-        \begin{subfigure}{0.40\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{zdf_offset_7.png}
-                \caption{7 mon/layer, Parallel Displaced}\label{fig:zdf_layered_7}
-        \end{subfigure}
-	\begin{subfigure}{0.40\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{zdf_layered_8.png}
-                \caption{8 mon/layer, Sandwiched}\label{fig:zdf_layered_8}
-        \end{subfigure}
-        \begin{subfigure}{0.40\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{zdf_offset_8.png}
-                \caption{8 mon/layer, Parallel Displaced}\label{fig:zdf_layered_8}
-        \end{subfigure}
-	\caption{$g(z)$ for all other configurations built with layers stacked 3.7 \AA~apart}\label{fig:zdf}
-  \end{figure}
+% BJC: Unnecessary, supporting info already long
+%  \begin{figure}
+%	\centering
+%        \begin{subfigure}{0.40\textwidth}
+%                \centering
+%                \includegraphics[width=\textwidth]{zdf_layered_4.png}
+%                \caption{4 mon/layer, Sandwiched}\label{fig:zdf_layered_4}
+%        \end{subfigure}
+%        \begin{subfigure}{0.40\textwidth}
+%                \centering
+%                \includegraphics[width=\textwidth]{zdf_offset_4.png}
+%                \caption{4 mon/layer, Parallel Displaced}\label{fig:zdf_layered_4}
+%        \end{subfigure}
+%	\begin{subfigure}{0.40\textwidth}
+%                \centering
+%                \includegraphics[width=\textwidth]{zdf_layered_6.png}
+%                \caption{6 mon/layer, Sandwiched}\label{fig:zdf_layered_6}
+%        \end{subfigure}
+%        \begin{subfigure}{0.40\textwidth}
+%                \centering
+%                \includegraphics[width=\textwidth]{zdf_offset_6.png}
+%                \caption{6 mon/layer, Parallel Displaced}\label{fig:zdf_layered_6}
+%        \end{subfigure}
+%        \begin{subfigure}{0.40\textwidth}
+%                \centering
+%                \includegraphics[width=\textwidth]{zdf_layered_7.png}
+%                \caption{7 mon/layer, Sandwiched}\label{fig:zdf_layered_7}
+%        \end{subfigure}
+%        \begin{subfigure}{0.40\textwidth}
+%                \centering
+%                \includegraphics[width=\textwidth]{zdf_offset_7.png}
+%                \caption{7 mon/layer, Parallel Displaced}\label{fig:zdf_layered_7}
+%        \end{subfigure}
+%	\begin{subfigure}{0.40\textwidth}
+%                \centering
+%                \includegraphics[width=\textwidth]{zdf_layered_8.png}
+%                \caption{8 mon/layer, Sandwiched}\label{fig:zdf_layered_8}
+%        \end{subfigure}
+%        \begin{subfigure}{0.40\textwidth}
+%                \centering
+%                \includegraphics[width=\textwidth]{zdf_offset_8.png}
+%                \caption{8 mon/layer, Parallel Displaced}\label{fig:zdf_layered_8}
+%        \end{subfigure}
+%	\caption{$g(z)$ for all other configurations built with layers stacked 3.7 \AA~apart}\label{fig:zdf}
+%  \end{figure}
 
-  \begin{figure}
-	\centering
-        \begin{subfigure}{0.40\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{rzplot_layered_4.png}
-                \caption{4 mon/layer, Sandwiched}\label{fig:rzplot_layered_4}
-        \end{subfigure}
-        \begin{subfigure}{0.40\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{rzplot_offset_4.png}
-                \caption{4 mon/layer, Parallel Displaced}\label{fig:rzplot_offset_4}
-        \end{subfigure}
-        \begin{subfigure}{0.40\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{rzplot_layered_6.png}
-                \caption{6 mon/layer, Sandwiched}\label{fig:rzplot_layered_6}
-        \end{subfigure}
-        \begin{subfigure}{0.40\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{rzplot_offset_6.png}
-                \caption{6 mon/layer, Parallel Displaced}\label{fig:rzplot_offset_6}
-        \end{subfigure}
-        \begin{subfigure}{0.40\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{rzplot_layered_7.png}
-                \caption{7 mon/layer, Sandwiched}\label{fig:rzplot_layered_7}
-        \end{subfigure}
-        \begin{subfigure}{0.40\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{rzplot_offset_7.png}
-                \caption{7 mon/layer, Parallel Displaced}\label{fig:rzplot_offset_7}
-        \end{subfigure}
-        \begin{subfigure}{0.40\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{rzplot_layered_8.png}
-                \caption{8 mon/layer, Sandwiched}\label{fig:rzplot_layered_8}
-        \end{subfigure}
-        \begin{subfigure}{0.40\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{rzplot_offset_8.png}
-                \caption{8 mon/layer, Parallel Displaced}\label{fig:rzplot_offset_8}
-        \end{subfigure}
-	\caption{Simulated XRD patterns for all other configurations built with
-		 layers stacked 3.7 \AA~apart}\label{fig:XRDsim}
-  \end{figure}
+%BJC: unnecessary. Supporting info already long..and more is coming
+%  \begin{figure}
+%	\centering
+%        \begin{subfigure}{0.40\textwidth}
+%                \centering
+%                \includegraphics[width=\textwidth]{rzplot_layered_4.png}
+%                \caption{4 mon/layer, Sandwiched}\label{fig:rzplot_layered_4}
+%        \end{subfigure}
+%        \begin{subfigure}{0.40\textwidth}
+%                \centering
+%                \includegraphics[width=\textwidth]{rzplot_offset_4.png}
+%                \caption{4 mon/layer, Parallel Displaced}\label{fig:rzplot_offset_4}
+%        \end{subfigure}
+%        \begin{subfigure}{0.40\textwidth}
+%                \centering
+%                \includegraphics[width=\textwidth]{rzplot_layered_6.png}
+%                \caption{6 mon/layer, Sandwiched}\label{fig:rzplot_layered_6}
+%        \end{subfigure}
+%        \begin{subfigure}{0.40\textwidth}
+%                \centering
+%                \includegraphics[width=\textwidth]{rzplot_offset_6.png}
+%                \caption{6 mon/layer, Parallel Displaced}\label{fig:rzplot_offset_6}
+%        \end{subfigure}
+%        \begin{subfigure}{0.40\textwidth}
+%                \centering
+%                \includegraphics[width=\textwidth]{rzplot_layered_7.png}
+%                \caption{7 mon/layer, Sandwiched}\label{fig:rzplot_layered_7}
+%        \end{subfigure}
+%        \begin{subfigure}{0.40\textwidth}
+%                \centering
+%                \includegraphics[width=\textwidth]{rzplot_offset_7.png}
+%                \caption{7 mon/layer, Parallel Displaced}\label{fig:rzplot_offset_7}
+%        \end{subfigure}
+%        \begin{subfigure}{0.40\textwidth}
+%                \centering
+%                \includegraphics[width=\textwidth]{rzplot_layered_8.png}
+%                \caption{8 mon/layer, Sandwiched}\label{fig:rzplot_layered_8}
+%        \end{subfigure}
+%        \begin{subfigure}{0.40\textwidth}
+%                \centering
+%                \includegraphics[width=\textwidth]{rzplot_offset_8.png}
+%                \caption{8 mon/layer, Parallel Displaced}\label{fig:rzplot_offset_8}
+%        \end{subfigure}
+%	\caption{Simulated XRD patterns for all other configurations built with
+%		 layers stacked 3.7 \AA~apart}\label{fig:XRDsim}
+%  \end{figure}
 
 %  \begin{wrapfigure}{R}{0.4\textwidth}
 %      \centering
@@ -638,45 +812,7 @@ f		%The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
 %	\end{subfigure}
 %  \end{figure}
 
-  \begin{figure}
-	\centering
-	\includegraphics[width=0.75\linewidth]{nematic_director.png}
-	\caption{We define the nematic director vector, $\mathbf{n}$, as the vector
-	perpendicular to the plane of the aromatic head group.}~\label{fig:director}
-  \end{figure}
-
-  \begin{figure}[ht]
-
-  \begin{subfigure}{\linewidth}
-        \centering
-        \begin{subfigure}{0.45\linewidth}
-                \centering
-                \includegraphics[width=\linewidth]{layered_nematic_order.png}
-                \caption{Sandwiched, Ordered}~\label{fig:sandwich_nematic}
-        \end{subfigure}%
-        \begin{subfigure}{0.45\linewidth}
-                \centering
-                \includegraphics[width=\linewidth]{offset_nematic_order.png}
-                \caption{Parallel Displaced, Ordered}~\label{fig:offset_nematic}
-        \end{subfigure}
-        \begin{subfigure}{0.45\linewidth}
-                \centering
-                \includegraphics[width=\linewidth]{disorder_sandwich_nematic_order.png}
-                \caption{Sandwiched, Disordered}~\label{fig:disorder_sandwich_nematic}
-        \end{subfigure}%
-        \begin{subfigure}{0.45\linewidth}
-                \centering
-                \includegraphics[width=\linewidth]{disorder_offset_nematic_order.png}
-                \caption{Parallel Displaced, Disordered}~\label{fig:disorder_offset_nematic}
-        \end{subfigure}
-
-  \end{subfigure}
-  \caption{The distribution of angles between nematic director vector (See
-	  Figure~\ref{fig:director}) and the z-axis averaged over the equilibrated portion
-	  of each trajectory}~\label{fig:nematic_distribution}
-  \end{figure}
-
-  \begin{figure}[!ht]
+  \begin{figure}[!htb]
         \centering
 %        \begin{subfigure}{0.45\textwidth}
 %                \centering
@@ -713,7 +849,7 @@ f		%The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
 %        of R-spots}\label{fig:tail_packing}
   \end{figure}
 
-  \begin{figure}
+  \begin{figure}[!htb]
 	\centering
 	\includegraphics[width=0.75\linewidth]{radial_distribution_annulus.png}
 	\caption{Looking down onto the plane of membrane, this diagram
@@ -744,7 +880,7 @@ f		%The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
   which is three orders of magnitude lower than literature values.}~\label{table:msd}
   \end{table}
 
-  \begin{figure}
+  \begin{figure}[!htb]
   \centering
         \begin{subfigure}{0.45\textwidth}
                 \includegraphics[width=\textwidth]{water_filled_pore.png}
@@ -759,27 +895,125 @@ f		%The equilibrated pore spacing is 4.23 $\pm$ 0.03 nm.
 	  visualized with water molecules and sodium ions removed. Head groups vacate the
 	  pore region leaving an aqeuous solution of water and sodium ions.}\label{fig:water_pores}
   \end{figure}
+  
+  \section{Demonstrative fourier transforms}\label{section:fourier}
+  
+  Here we use Fourier transforms to demonstrate some of the arguments made in 
+  the main text. Interpretation of real and simulated X-ray diffraction patterns
+  is non-trivial and requires careful thought. They are a function of the positions
+  of all atoms in space, and suffer from the phase problem. Namely, there are multiple
+  solutions that could explain a single diffraction pattern. Using simplified models, 
+  we can hypothesize about the effect of various configurations on the simulated patterns.
+  
+  \subsection{Magnitude of R-$\pi$}\label{section:rpi_ft}
+  
+  In all cases, the magnitude of R-$\pi$ in our system is larger than that in experiment.
+  Some of the discrepancy can be explained by defects and imperfect pore alignment. 
+  However, there are significant effects resulting from the ordered states that we simulate.
+  
+  Persistent oscillations in the z-correlation function, $g(z)$, increase the intensity of R-$\pi$. 
+  In Figure~\ref{fig:z_correlation}, we fit a decaying sinusoidal function 
+  (equation~\ref{M-eqn:decaying_sinusoid} of the main text) to $g(z)$ calculated from the
+  sandwiched configuration in the ordered basin. While the sinusoidal decay fit decays to one
+  rather quickly, $g(z)$ continues to oscillate with nearly the same amplitude as its third peak. 
+  In Figure~\ref{fig:theoretical_correlation_functions}, we overlay the same decaying sinusoidal
+  fit with a function that continues to oscillate with the same amplitude as the third peak of
+  the fit to $g(z)$. In Figure~\ref{fig:power_spectrum_comparison}, we plot the power spectrum
+  generated from the discrete Fourier transform of the plots in Figure~\ref{fig:theoretical_correlation_functions}. 
+  The maximum intensity of the power spectrum increases by nearly 60 \% when the correlation 
+  function does not decay to one. This explains, in part, the large simulated value of the
+  intensity of R-$\pi$.
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.32\textwidth}
+  \includegraphics[width=\textwidth]{z_correlation_layered_sinefit.png}
+  \caption{}\label{fig:z_correlation}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+  \includegraphics[width=\textwidth]{theoretical_correlation_functions.png}
+  \caption{}\label{fig:theoretical_correlation_functions}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+  \includegraphics[width=\textwidth]{power_spectrum_comparison.png}
+  \caption{}\label{fig:power_spectrum_comparison}
+  \end{subfigure}
+  \caption{(a) We fit a decaying sinusoidal function to the z-correlation function, $g(z)$, 
+  calculated from the ordered basin sandwiched system. The oscillations in $g(z)$ continue
+  to oscillate at nearly the same amplitude as its third peak. (b) We overlaid a plot of the
+  fit to $g(z)$ with a similar function that continues to oscillate with the same amplitude
+  as its third peak. (c) The power spectrum of each plot in (b) exhibits a 60 \% increase in
+  intensity of the peaks when the function does not decay to 1.}\label{fig:rpi_ft}
+  \end{figure}
+  
+  \subsection{Simplified assemblies}\label{section:simplified_assemblies}
+  
+  We explored the sandwiched and parallel displaced configurations as potential ways for
+  aromatic head groups to stack. We used copies of the same monomer to build each system.
+  We were unable to create any assemblies which exhibited R-double using this technique. 
+  We simulated diffraction patterns of simplified configurations to understand why. We 
+  placed points in array that resemble the sandwiched and parallel displaced configurations.
+  Points are space 3.7 $\AA$ apart so it is easy to relate them to LLC membrane system.
+  5 columns of points are placed 5 $\AA$ from a defined "pore center".
+  
+  When points are stacked in either configuration, R-double cannot appear. In the case
+  of the sandwiched configuration, the fundamental frequency is set at 1.7 $\AA^{-1}$,
+  the same location as R-$\pi$. Subharmonics appear at integer multiples of this frequency.
+  The parallel displaced configuration exhibits reflections at half the $q_z$ value of
+  R-$\pi$, which is where we expect to see R-double. However, just like the LLC membrane
+  system, the reflections appear away from $q_r=0$ and are caused by the helical stacking
+  arrangement. 
+  
+  From these observations, it is clear that, in order to make R-double appear in our simulated
+  diffraction patterns, we must create systems with asymmetries along the z-axis which lead to
+  a fundamental frequency of $0.85 \AA^{-1}$. This requires a modulation in electron density 
+  every 7.4 $\AA$. This line of thought gave rise to the systems studied in 
+  section~\ref{M-section:rdouble} of the main text.
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{simple_sandwich_realspace.png}
+  \caption{}\label{fig:simple_sandwich_realspace}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{simple_sandwich_rzplot.png}
+  \caption{}\label{fig:simple_sandwich_rzplot}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{simple_offset_realspace.png}
+  \caption{}\label{fig:simple_offset_realspace}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{simple_offset_rzplot.png}
+  \caption{}\label{fig:simple_offset_rzplot}
+  \end{subfigure}
+  \caption{}\label{fig:simple_FTs}
+  \end{figure}
 
-  \noindent
-  \begingroup
-        \fontsize{14pt}{14pt}\selectfont
-        \textbf{Crosslinking Mechanism}
-  \endgroup
+  \section{Crosslinking algorithm details}\label{section:xlink}
 
-  \vspace{1em}
   Crosslinking of the the monomer Na-GA3C11 occurs by a UV initiated free
   radical polymerization (Figure~\ref{fig:xlink_mech}).  Head-to-tail addition
   takes place between terminal vinyl groups on each of the monomer tails.  We
   only considered head-to-tail addition since it is the dominant propagation mode
   in the real system.   
 
-  \begin{figure}
+  \begin{figure}[!htb]
   \centering
   \includegraphics[width=\textwidth]{Crosslink_mechanism.eps}
   \caption{Terminal vinyl groups present on each monomer tail react with free
 	  radical initiators to create monomers with terminal vinyl radicals.  Vinyl
 	  radicals react with the vinyl groups of other monomers in to propagate
 	  crosslinking.}\label{fig:xlink_mech}
+  \end{figure}
+
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.5\textwidth]{z_correlation_overlay.png}
+  \caption{The correlation functions generated from ordered basin sandwiched configurations
+  with different z-dimensions. The correlation function is nearly the same when the z-dimension
+  of the system is doubled.}\label{fig:z_correlation_overlay}
   \end{figure}
 
 \clearpage

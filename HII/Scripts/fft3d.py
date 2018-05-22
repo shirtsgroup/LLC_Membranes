@@ -208,12 +208,12 @@ def pore(nmon_per_layer, r, layers, dbwl, center, offset=True, offset_angle=0, r
     """
 
     locations = np.zeros([nmon_per_layer*layers, 3])
-    noise_sigma = args.noise
-    # noise = np.random.normal(scale=noise_sigma, size=(locations.shape[0], 2))  # random xy noise
+    # noise_sigma = args.noise
+    # # noise = np.random.normal(scale=noise_sigma, size=(locations.shape[0], 2))  # random xy noise
     # noise = np.random.normal(scale=noise_sigma, size=locations.shape[0])  # random z noise
     z = np.linspace(0, dbwl*layers, locations.shape[0])
     cycles = 1
-    noise = np.sin(cycles*(2*np.pi/dbwl*layers)*z)
+    # noise = np.sin(cycles*(2*np.pi/dbwl*layers)*z)
 
     theta = 2*np.pi / nmon_per_layer  # theta between rings
 
@@ -241,7 +241,7 @@ def pore(nmon_per_layer, r, layers, dbwl, center, offset=True, offset_angle=0, r
     locations[:, :2] += center
 
     # locations[1:, 2] += noise[1:]
-    locations[:, 0] += noise
+    # locations[:, 0] += noise
 
     # locations[:, :2] += noise
     # pitch = 1
@@ -254,23 +254,23 @@ def pore(nmon_per_layer, r, layers, dbwl, center, offset=True, offset_angle=0, r
         theta = rd_angle
         locations[displacement, :2] += [radial_displacement*np.cos(theta), radial_displacement*np.sin(theta)]
 
-    n = 1000
-    x = np.linspace(0, layers*dbwl, n)
-    pts = [0]
-    y = np.sin(0.1*x)
-
-
-    arc = 0
-    for i in range(1, n):
-        arc += np.linalg.norm(np.array([x[i - 1], y[i - 1]]) - np.array([x[i], y[i]]))
-        if (arc % dbwl) <= 0.11:
-            pts.append(i)
-
-    locations = np.zeros([len(pts), 3])
-    locations[:, 0] = y[pts]
-    locations[:, 2] = x[pts]
-    locations[:, :2] += center
-    print(locations)
+    # n = 1000
+    # x = np.linspace(0, layers*dbwl, n)
+    # pts = [0]
+    # y = np.sin(0.1*x)
+    #
+    #
+    # arc = 0
+    # for i in range(1, n):
+    #     arc += np.linalg.norm(np.array([x[i - 1], y[i - 1]]) - np.array([x[i], y[i]]))
+    #     if (arc % dbwl) <= 0.11:
+    #         pts.append(i)
+    #
+    # locations = np.zeros([len(pts), 3])
+    # locations[:, 0] = y[pts]
+    # locations[:, 2] = x[pts]
+    # locations[:, :2] += center
+    # print(locations)
 
     return locations
 
@@ -501,7 +501,7 @@ if __name__ == "__main__":
         nonzeros = np.nonzero(H)  # find the indices of nonzero values
 
         pts = np.zeros_like(locations)  # array of points that sit on bin locations
-        pts = np.zeros([locations.shape[0] - 9, locations.shape[1]])
+        pts = np.zeros([locations.shape[0], locations.shape[1]])
         if args.dim == 1:
             pts = x[nonzeros[0]]
         if args.dim > 1:
@@ -559,16 +559,16 @@ if __name__ == "__main__":
             cmap.set_array(I)
 
             ax.scatter(grid_flat[0, :, 0], grid_flat[0, :, 1], grid_flat[0, :, 2], c=cm.hsv(I/max(I)))
-            plt.title('Real space points')
+            # plt.title('Real space points')
             if rpore > 0:
                 xy_window = 3*rpore
             else:
                 xy_window = 5
             ax.set_xlim3d(xycenter[0] - xy_window, xycenter[0] + xy_window)
             ax.set_ylim3d(xycenter[1] - xy_window, xycenter[1] + xy_window)
-            ax.set_xlabel('x ($\AA$)')
-            ax.set_ylabel('y ($\AA$)')
-            ax.set_zlabel('z ($\AA$)')
+            ax.set_xlabel('x ($\AA$)', fontsize=14)
+            ax.set_ylabel('y ($\AA$)', fontsize=14)
+            ax.set_zlabel('z ($\AA$)', fontsize=14)
             # fig.colorbar(cmap)
 
     if args.gro:
@@ -625,33 +625,34 @@ if __name__ == "__main__":
             zlim = 2.5
         else:
             averaged, rfin, zfin = angle_average(freq_x, freq_y, freq_z, fft)
-            xlim = 0.5
-            zlim = 0.5
-            if rfin[-1] > xlim:
-                r_lower_limit = np.where(freq_x < -xlim)[0][-1] + 1
-                r_upper_limit = np.where(freq_x > xlim)[0][0] - 1
-                z_lower_limit = np.where(freq_z < - zlim)[0][-1] + 1
-                z_upper_limit = np.where(freq_z > zlim)[0][-1] - 1
-                MAX = np.amax(averaged[r_lower_limit:r_upper_limit, z_lower_limit:z_upper_limit])
-            else:
-                MAX = np.amax(averaged)
-        #MAX = np.amax(averaged)
+            xlim = 4
+            zlim = 4
+            # if rfin[-1] > xlim:
+            #     r_lower_limit = np.where(freq_x < -xlim)[0][-1] + 1
+            #     r_upper_limit = np.where(freq_x > xlim)[0][0] - 1
+            #     z_lower_limit = np.where(freq_z < - zlim)[0][-1] + 1
+            #     z_upper_limit = np.where(freq_z > zlim)[0][-1] - 1
+            #     MAX = np.amax(averaged[r_lower_limit:r_upper_limit, z_lower_limit:z_upper_limit])
+            # else:
+            #     MAX = np.amax(averaged)
+        MAX = np.amax(averaged)
 
         MIN = np.amin(averaged)
 
         NLEVELS = 200
         lvls = np.linspace(MIN, MAX, NLEVELS)  # contour levels
 
-        rfin *= 2*np.pi / 10
-        zfin[0] *= 2*np.pi / 10
+        rfin *= 2*np.pi
+        zfin[0] *= 2*np.pi
         plt.figure()
         plt.plot(zfin[0], averaged[rfin.size // 2, :])
         plt.figure()
         cs = plt.contourf(rfin, zfin[0], averaged.T, levels=lvls, cmap='jet', extend='max')
-        plt.xlabel('$q_r$ ($\AA^{-1}$)')
-        plt.ylabel('$q_z$ ($\AA^{-1}$)')
+        plt.xlabel('$q_r$ ($\AA^{-1}$)', fontsize=14)
+        plt.ylabel('$q_z$ ($\AA^{-1}$)', fontsize=14)
         plt.gcf().get_axes()[0].set_ylim(-zlim, zlim)
         plt.gcf().get_axes()[0].set_xlim(-xlim, xlim)
+        plt.axes().tick_params(labelsize=14)
         plt.colorbar(format='%.1f')
         plt.tight_layout()
         plt.savefig('%s.png' % args.output)
@@ -667,13 +668,13 @@ if __name__ == "__main__":
         plt.colorbar()
         plt.title('xz cross-section of 3D ft')
 
-        peak = 0
-        while freq_z[peak] < 0.27:
-            peak += 1
-
-        intensities = fft[fft_center, fft_center, :]
-        intensities[fft.shape[2]//2] = 0
-        print(np.amax(intensities))
+        # peak = 0
+        # while freq_z[peak] < 0.27:
+        #     peak += 1
+        #
+        # intensities = fft[fft_center, fft_center, :]
+        # intensities[fft.shape[2]//2] = 0
+        # print(np.amax(intensities))
 
     if not args.noshow:
         plt.show()

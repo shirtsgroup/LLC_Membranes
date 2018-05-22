@@ -6,14 +6,15 @@ import detect_peaks
 from scipy.optimize import curve_fit
 
 
-def exponential_decay(x, L):
+def exponential_decay(x, L, A, s):
 
-    return 1 + np.exp(-x / L)
+    return s + A*np.exp(-x / L)
 
 
 n = 20  # number of "layers"
 spacing = 3.7  # distance between layers
 L = 10  # correlation length
+A = 2  # guess at amplitude of decay function
 trials = 1000
 nbins = 200
 mpd = 10  # used for peak locating. Adjust if the wrong peaks are found. (higher for noisier data)
@@ -28,6 +29,9 @@ decay = np.exp(-z/L)  # decay of covariance
 for i in range(z.shape[0]):
     cov[i, i:] = decay[:(n - i)]
     cov[i:, i] = decay[:(n - i)]
+
+# print(cov[0, :])
+# exit()
 
 x = np.random.multivariate_normal(z, cov, trials)
 
@@ -66,17 +70,17 @@ if centers[peaks[0]] < spacing / 2:  # sometimes a peak is found where it should
     peaks = peaks[1:]
 
 # plot averaged histogram
-plt.bar(centers, h, centers[1] - centers[0])
+plt.plot(centers, h)#, centers[1] - centers[0])
 # plot locations of peaks
 plt.scatter(centers[peaks], h[peaks], marker='+', c='r', s=200, label='Peak locations')
 
 # fit decaying exponential to peaks
-p = np.array([L])  # initial guess at parameters
+p = np.array([L, A, 1])  # initial guess at parameters
 solp, cov_x = curve_fit(exponential_decay, centers[peaks], h[peaks], p)
 
 # plot decaying exponential fit and decaying exponential with L that we were trying to match
-plt.plot(centers, exponential_decay(centers, solp[0]), '--', c='black', label='Least squares fit')
-plt.plot(centers, exponential_decay(centers, L), '--', c='blue', label='Theoretical')
+plt.plot(centers, exponential_decay(centers, solp[0], solp[1], solp[2]), '--', c='black', label='Least squares fit')
+# plt.plot(centers, exponential_decay(centers, L, A), '--', c='blue', label='Theoretical')
 
 print('Correlation length = %1.2f +/- %1.2f angstroms' % (solp[0], np.sqrt(cov_x[0, 0])))
 plt.xlabel('Z distance separation (nm)', fontsize=14)

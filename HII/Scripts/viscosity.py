@@ -133,9 +133,11 @@ class Viscosity(object):
         :param max_lag : maximum time lag to for calculation of autocorrelation function (ps)
         """
 
-        kb = 1.38064852 * 10 ** -23  # boltzmann constant [=] m**2 * kg * s**-2 * K**- 1
+        self.kb = 1.38064852 * 10 ** -23  # boltzmann constant [=] m**2 * kg * s**-2 * K**- 1
+        self.ksi = 2.837297  # unitless.
         t = md.load(gro)
         box = t.unitcell_vectors[0, :, :]
+        self.box_length = box[0, 0]  # all sides the same
         self.volume = np.dot(box[2, :], np.cross(box[0, :], box[1, :]))  # volume of unit cell [=] nm3
         self.volume *= 1 * 10 ** -27  # convert to m3
         self.max_lag = max_lag
@@ -146,6 +148,7 @@ class Viscosity(object):
         self.average_viscosity = 0
         self.std_viscosity = 0
         self.load = load
+        self.correction = 0
 
         if not self.load:
 
@@ -153,12 +156,11 @@ class Viscosity(object):
             print('Extracting off-diagonal elements of the pressure tensor and Temperature from %s using gmx_energy ...'
                   % edr, end=' ', flush=True)
             ps = subprocess.Popen(('echo', 'Pres-XY', '\n', 'Pres-XZ', '\n', 'Pres-YX', '\n', 'Pres-YZ', '\n', 'Pres-ZX',
-                                   '\n', 'Pres-ZY', '\n', 'Temperature', '\n'), stdout=subprocess.PIPE)
+                                   '\n', 'Pres-ZY', '\n', 'Temperature', '\n', 'Pressure', '\n'), stdout=subprocess.PIPE)
             ps.wait()
             p = subprocess.Popen(('gmx', 'energy', '-f', '%s' % edr), stdin=ps.stdout,
                                  stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
             p.wait()
-            print('Done!')
 
             print('Reading energy.xvg')
             with open('energy.xvg', 'r') as f:
@@ -175,18 +177,21 @@ class Viscosity(object):
 
             self.P = np.zeros([len(xvg) - data_start, 6])
             self.T = np.zeros([len(xvg) - data_start])
+            self.total_pressure = np.zeros([len(xvg) - data_start])
             self.time = np.zeros([len(xvg) - data_start])
             for i in range(data_start, len(xvg)):
                 data = xvg[i].split()
                 self.time[i - data_start] = float(data[0])
-                self.P[i - data_start, :] = [float(d) for d in data[2:]]
+                self.P[i - data_start, :] = [float(d) for d in data[3:]]
                 self.T[i - data_start] = float(data[1])
+                self.total_pressure[i - data_start] = float(data[2])
 
+            self.Tavg = np.mean(self.T)  # [=] K
+            self.Pavg = np.mean(self.total_pressure)
             self.dt = self.time[1] - self.time[0]  # [=] ps
             self.P *= 100000  # convert from bar to pascal
             self.P_full = np.copy(self.P)  # save a copy before this gets modified. This will be saved later
-            self.Tavg = np.mean(self.T)  # [=] K
-            self.prefactor = self.volume / (kb * self.Tavg)  # [=] m * s**2 * kg**-1 [=] Pa**-1
+            self.prefactor = self.volume / (self.kb * self.Tavg)  # [=] m * s**2 * kg**-1 [=] Pa**-1
 
             self.nintervals = 0
             while self.time[self.nintervals] < self.max_lag:
@@ -200,6 +205,8 @@ class Viscosity(object):
             self.prefactor = self.zip['prefactor']
             self.time = self.zip['time']
             self.dt = self.zip['dt']
+            self.T = self.zip['T']
+            self.total_pressure = self.zip['total_P']
 
     def break_apart_trajectory(self, nsub):
         """
@@ -252,6 +259,10 @@ class Viscosity(object):
                                    self.runningintegral[:self.nintervals], bounds=bounds)
             self.fit_params = solp
             self.average_viscosity, self.std_viscosity = self.bootstrap(nboot)
+            self.correction = np.mean(self.T) * self.kb * self.ksi / (6 * np.pi * self.average_viscosity * self.box_length)
+            self.correction *= 10**9  # convert box_length from nm to m
+            self.correction_error = self.correction * (self.std_viscosity / self.average_viscosity)  # propagate viscosity error
+
         else:
             self.viscosity = self.zip['viscosity']
             self.autocorr = self.zip['autocorr']
@@ -259,9 +270,15 @@ class Viscosity(object):
             self.runningintegral = self.zip['running_integral']
             self.average_viscosity = self.zip['average_viscosity']  # outliers should have already been taken care of
             self.std_viscosity = self.zip['std_viscosity']
+            self.correction = self.zip['correction']
+            self.correction_error = self.zip['correction_error']
 
         # multiply by 1000 to convert from Pa-s to cP
-        print('\nAverage Viscosity : %.3g +/- %.3g cP' % (1000*self.average_viscosity, 1000*self.std_viscosity))
+
+        print('\nAverage Temperature: %.1f +/- %.1f K' % (np.mean(self.T), np.std(self.T)))
+        print('Average Pressure: %.2f +/- %.2f bar' % (np.mean(self.total_pressure), np.std(self.total_pressure)))
+        print('Average Viscosity : %.3g +/- %.3g cP' % (1000*self.average_viscosity, 1000*self.std_viscosity))
+        print('Correction to Diffusivity = %.2e m^2/s +/- %.2e m^2/s' % (self.correction, self.correction_error))
 
     def outliers(self, alpha):
         """
@@ -340,7 +357,10 @@ class Viscosity(object):
         np.savez_compressed('viscosity.npz', nintervals=self.nintervals, P=self.P_full, prefactor=self.prefactor,
                             time=self.time, dt=self.dt, viscosity=self.viscosity, autocorr=self.autocorr,
                             fit_params=self.fit_params, running_integral=self.runningintegral,
-                            average_viscosity=self.average_viscosity, std_viscosity=self.std_viscosity)
+                            average_viscosity=self.average_viscosity, std_viscosity=self.std_viscosity,
+                            correction=self.correction, correction_error=self.correction_error, T=self.T,
+                            total_P=self.total_pressure)
+
 
 if __name__ == "__main__":
 
@@ -351,4 +371,4 @@ if __name__ == "__main__":
     V.calculate()  # calculate viscosity
     if not args.load:
         V.save()  # save everything necessary to quickly reload data
-    V.plot_all()
+    # V.plot_all()

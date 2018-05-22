@@ -156,10 +156,10 @@ class Diffusivity(object):
 
         elif atoms:
 
-            selection = [a.index for a in t.topology.atoms if a.name in args.atoms]
+            selection = [a.index for a in t.topology.atoms if a.name in atoms]
 
-            atoms_per_residue = len(args.atoms)
-            matoms = np.array([Atom_props.mass[x] for x in args.atoms])
+            atoms_per_residue = len(atoms)
+            matoms = np.array([Atom_props.mass[x] for x in atoms])
             self.mres = np.sum(matoms)
         else:
             print('Error: No valid group of atoms or residues selected')
@@ -292,3 +292,4 @@ if __name__ == "__main__":
     D.ensure_fit()  # make sure diffusivity is being measured from the linear region of the MSD curve
     D.bootstrap(args.nboot)
     D.plot(args.axis)
+    print('D = %1.2e +/- %1.2e m^2/s' % (D.Davg, np.abs(D.Davg - D.confidence_interval[0])))

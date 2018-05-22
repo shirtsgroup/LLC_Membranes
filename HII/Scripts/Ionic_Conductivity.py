@@ -92,14 +92,14 @@ def initialize():
                                                  'the Collective Diffusion Model')
 
     parser.add_argument('-t', '--traj', default='wiggle.trr', type=str, help='Trajectory file (.xtc or .trr)'
-                                                                             'IMPORTANT: Pre-process the trajectory with gmx trjconv -pbc nojump')
+                                                                             'IMPORTANT: Pre-process the trajectory with gmx trjconv -pbc nojump for NE')
     parser.add_argument('-g', '--gro', default='wiggle.gro', type=str, help='Coordinate file')
     parser.add_argument('-d', '--build_mon', default='NAcarb11V', type=str, help='Monomer with which the system was '
                                                                                  'built')
     parser.add_argument('-i', '--ion', default='NA', help='Name of ion(s) being used to calculate ionic conductivity')
     parser.add_argument('-b', '--buffer', default=0, type=float, help='Distance into membrane from min and max where '
                                                                       'current measurements will be made')
-    parser.add_argument('-T', '--temp', default=300, help='System Temperature, Kelvin')
+    parser.add_argument('-T', '--temp', default=300, type=float, help='System Temperature, Kelvin')
     parser.add_argument('-B', '--nboot', default=200, type=int, help='Number of bootstrap trials to be run')
     parser.add_argument('-m', '--nMC', default=1000, help='Number of Monte Carlo trials to estimate error in D and Dq')
     parser.add_argument('-S', '--suffix', default='saved',
@@ -130,11 +130,11 @@ def nernst_einstein(D, D_std, C, C_std, T):
     :param D_std: error in calculated diffusivity
     :param C: concentration of ions in membrane
     :param C_std: error in concentration
-    :param T: temperature simulation is run at
+    :param T: temperature simulation is run at, float
     :return: Ionic Conductivity as calculated by the nernst einsten relation
     """
 
-    NE_av = q ** 2 * C * D / (kb * float(T))
+    NE_av = q ** 2 * C * D / (kb * T)
     NE_error = NE_av * np.sqrt((old_div(D_std, D)) ** 2 + (old_div(C_std, C)) ** 2)
 
     return NE_av, NE_error
@@ -244,34 +244,14 @@ if __name__ == '__main__':
 
         print('Calculating Diffusivity')
 
-        MSD, endMSD, limits, D_avg, D_std = Diffusivity.dconst(pos_ion, nT, args.nboot, frontfrac, fracshow, d, dt, ndx)
+        D = Diffusivity.Diffusivity(args.traj, args.gro, args.axis, atoms=[args.ion])
+        D.calculate()
+        D.ensure_fit()
+        D.bootstrap(args.nboot)
 
-        fit = 0
-        while fit == 0:
+        D_error = D.Davg - D.confidence_interval[0]
 
-            endMSD = int(nT*fracshow)
-            startMSD = int(nT*frontfrac)
-            D_avg, D_std = Diffusivity.d_error(startMSD, endMSD, nT, limits, t.time, MSD, d)
-            errorevery = int(np.ceil(nT / 100.0))  # plot only 100 bars total
-            plt.errorbar(dt * np.array(list(range(0, nT - 1))), MSD[:-1], yerr=[limits[0, :-1], limits[1, :-1]],
-                         errorevery=errorevery, label='Calculated MSD')
-            plt.ylabel('MSD ($nm^2$)', fontsize=14)
-            plt.xlabel('time (ps)', fontsize=14)
-            plt.gcf().get_axes()[0].tick_params(labelsize=14)
-            plt.title('D = %1.2e $\pm$ %1.2e $m^{2}/s$' % (D_avg, D_std))
-            plt.legend(loc=2)
-            plt.tight_layout()
-            plt.savefig('Diffusivity_%s.png' % args.axis)
-            plt.ion()
-            plt.show()
-            fit = int(input("Type '1' if the fit looks good: "))
-            if fit != 1:
-                print('Press enter to following prompts to leave as is')
-                frontfrac = float(input("Fraction into simulation to start fit: ") or frontfrac)
-                fracshow = float(input("Fraction into simulation to stop fit: ") or fracshow)
-            plt.clf()
-
-        IC_NE, IC_NE_std = nernst_einstein(D_avg, D_std, C, C_std, '%s' % args.temp)
+        IC_NE, IC_NE_std = nernst_einstein(D.Davg, D_error, C, C_std, args.temp)
         print('Nernst Einstein Ionic Conductivity: {:1.2e} +/- {:1.2e} S/m'.format(IC_NE, IC_NE_std))
 
         if args.method == 'NE':
