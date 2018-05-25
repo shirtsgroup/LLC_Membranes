@@ -25,19 +25,38 @@ if __name__ == "__main__":
     pos = t.xyz  # get positions
     v = t.unitcell_vectors
 
+    # solvated = False
+    residues = [a.residue.name for a in t.topology.atoms]
+    c = 0
+    if 'HOH' in residues:
+        for a in t.topology.atoms:
+            if a.residue.name == 'HOH':
+                if a.name == 'O':
+                    a.name = 'OW'
+                elif a.name == 'H1':
+                    a.name = 'HW1'
+                elif a.name == 'H2':
+                    a.name = 'HW2'
+        for a in t.topology.atoms:   # if you change residue name before changing names, this won't work
+            if a.residue.name == 'HOH':
+                a.residue.name = 'SOL'
+
+    #     solvated = True
+
+    nsol = residues.count('HOH')
+    natoms = pos.shape[1] - nsol
+
     ntails = 3
     ndummies = 6
     nmonomers = 400
     Hd = ['H77', 'H78', 'H79', 'H80', 'H81', 'H82']
 
-    atomspmon = pos.shape[1] / nmonomers
-
-    # new_pos = np.zeros([(atomspmon + ndummies)*nmonomers, 3])
+    atomspmon = int(natoms / nmonomers)
 
     with open(args.out, 'w') as f:
 
         f.write('This is a .gro file\n')
-        f.write('%s\n' % (int((atomspmon + ndummies)*nmonomers)))
+        f.write('%s\n' % (int((atomspmon + ndummies)*nmonomers) + nsol))
 
         count = 1
         count2 = 0

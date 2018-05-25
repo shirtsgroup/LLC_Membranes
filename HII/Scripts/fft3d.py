@@ -426,7 +426,7 @@ if __name__ == "__main__":
             # compute structure factor of structural input
 
             if args.traj:
-                t = md.load(args.traj, top=args.gro)[args.begin:]
+                t = md.load(args.traj, top=args.gro)[args.begin:args.end]
             else:
                 t = md.load(args.gro)
 
@@ -619,6 +619,7 @@ if __name__ == "__main__":
         if args.gro:
             averaged, rfin, zfin = angle_average(freq_x, freq_y, freq_z, fft, ucell=ucell)
             alkane_intensity = normalize_alkanes(rfin, zfin[0], averaged, 2.2, 2.5, 120)
+            alkane_intensity = 0.279778355183
             averaged /= alkane_intensity
             MAX = 3.1
             xlim = 2.5
@@ -635,15 +636,15 @@ if __name__ == "__main__":
             #     MAX = np.amax(averaged[r_lower_limit:r_upper_limit, z_lower_limit:z_upper_limit])
             # else:
             #     MAX = np.amax(averaged)
-        MAX = np.amax(averaged)
+        # MAX = np.amax(averaged)
 
         MIN = np.amin(averaged)
 
         NLEVELS = 200
         lvls = np.linspace(MIN, MAX, NLEVELS)  # contour levels
 
-        rfin *= 2*np.pi
-        zfin[0] *= 2*np.pi
+        rfin *= 2*np.pi / 10
+        zfin[0] *= 2*np.pi / 10
         plt.figure()
         plt.plot(zfin[0], averaged[rfin.size // 2, :])
         plt.figure()
@@ -660,13 +661,17 @@ if __name__ == "__main__":
         fft_center = fft.shape[0] // 2
 
         plt.figure()
-        plt.plot(freq_z, fft[fft_center, fft_center, :])
-        plt.title('z-cross-section of 3D ft')
 
-        plt.figure()
-        plt.contourf(freq_x, freq_z, fft[fft_center, :, :].T)
-        plt.colorbar()
-        plt.title('xz cross-section of 3D ft')
+        fft[fft_center, fft_center, fft_center] = 0
+        # fft[fft_center, fft_center, :] /= np.amax(fft[fft_center, fft_center, 40:55])
+        plt.plot(freq_z * 2*np.pi/10, fft[fft_center, fft_center, :])
+        # plt.xlim(-1, 1)
+        plt.title('z-cross-section of 3D FT')
+
+        # plt.figure()
+        # plt.contourf(freq_x, freq_z, fft[fft_center, :, :].T)
+        # plt.colorbar()
+        # plt.title('xz cross-section of 3D ft')
 
         # peak = 0
         # while freq_z[peak] < 0.27:

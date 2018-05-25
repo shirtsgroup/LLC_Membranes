@@ -20,12 +20,14 @@ def initialize():
                                                    'C21', 'C22', 'C23', 'C24', 'C25', 'C26', 'C27', 'C28', 'C29', 'C30', 'C31', 'C32', 'C33', 'C34',
                                                    'C35', 'C36', 'C37', 'C38', 'C39', 'C40', 'C41', 'C42', 'C43', 'C44', 'C45', 'C46', 'C47', 'C48'])
     #parser.add_argument('-a', '--atoms', nargs='+')
-    parser.add_argument('-discard', nargs='+', help='Atoms to not keep')
-    parser.add_argument('-o', '--output', type=str, default='out')
+    parser.add_argument('-discard', action="store_true", help='Dont keep atoms or residue selected')
+    parser.add_argument('-o', '--output', type=str, default='PUNCHED')
+    parser.add_argument('-r', '--residues', type=str, help='Punch out or keep residues')
 
     args = parser.parse_args()
 
     return args
+
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -45,9 +47,15 @@ if __name__ == "__main__":
     print("Trajectory Loaded")
 
     if args.discard:
-        keep = [a.index for a in t.topology.atoms if a.name not in args.discard]
+        if args.residues:
+            keep = [a.index for a in t.topology.atoms if a.residue.name not in args.residues]
+        else:
+            keep = [a.index for a in t.topology.atoms if a.name not in args.atoms]
     else:
-        keep = [a.index for a in t.topology.atoms if a.name in args.atoms]
+        if args.residues:
+            keep = [a.index for a in t.topology.atoms if a.residue.name in args.residues]
+        else:
+            keep = [a.index for a in t.topology.atoms if a.name in args.atoms]
 
     new = t.atom_slice(keep)
     print("Trajectory PUNCHED!!!!!!!!!")

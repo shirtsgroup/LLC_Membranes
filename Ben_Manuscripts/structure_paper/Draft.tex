@@ -468,7 +468,7 @@ liquid crystal membranes}
   and wide angle X-ray scattering (WAXS) experiments as well as in matching ionic
   conductivity measurements \cite{feng_thin_2016}.
 
-  \begin{figure}
+  \begin{figure}[!htb]
   \centering
 	\begin{subfigure}{0.45\linewidth}
 		\centering
@@ -550,7 +550,7 @@ liquid crystal membranes}
 
   \end{enumerate}
 
-  \begin{figure}
+  \begin{figure}[!htb]
         \centering
         \begin{subfigure}[t]{0.43\linewidth}
                 \centering
@@ -1162,7 +1162,7 @@ liquid crystal membranes}
   consistent with the experimental value of 4.12 nm derived from SAXS measurements 
   (Figure~\ref{fig:SAXS}). The remainder of this discussion will focus on the analysis of
   systems built with 5 columns per pore. Ordered basin systems built with 6 columns per pore,
-  have an equilibrated pore spacing c.a. 0.50 nm higher than experiment. Ordered basin systems
+  have an equilibrated pore spacing ca. 0.50 nm higher than experiment. Ordered basin systems
   built with 4 columns per pore equilibrate to an average pore spacing 0.25 nm lower than experiment. 
   
   %BJC5: thesis needs rewording.
@@ -1173,17 +1173,8 @@ liquid crystal membranes}
   (Figure~\ref{fig:box_dimensions}). The system is likely not fully equilibrated and may eventually
   rearrange into something that resembles a 5 column-per-pore system. Further investigations 
   into this are beyond the scope of this paper.
-  
-  \begin{figure}[htb]
-  \centering
-  \includegraphics[width=\textwidth]{box_dimensions.png}
-  \caption{When monomers are initially stacked 5 \AA~apart ($\textit{d}=5 \AA~$), the unit cell
-  expands in the z direction and contracts in its x and y dimensions. The volume remain nearly
-  constant across all cases. The y dimension box vectors are not included since we use 
-  semiisotropic pressure coupling which requires that the x and y box vectors change uniformly.}\label{fig:box_dimensions}
-  \end{figure}  
 
-  \begin{figure}
+  \begin{figure}[!htb]
 	\centering
 	\includegraphics[width=\linewidth]{p2p.png}
 	\caption{Systems with 5 columns per pore have equilibrated pore spacings closest to
@@ -1191,6 +1182,15 @@ liquid crystal membranes}
 			 increases as the number of columns in each pore increases.}~\label{fig:p2p}
   \end{figure}  
 
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=\textwidth]{box_dimensions.png}
+  \caption{When monomers are initially stacked 5 \AA~apart ($\textit{d}=5~\AA~$), the unit cell
+  expands in the z direction and contracts in its x and y dimensions. The volume remain nearly
+  constant across all cases. The y dimension box vectors are not included since we use 
+  semiisotropic pressure coupling which requires that the x and y box vectors change uniformly.}\label{fig:box_dimensions}
+  \end{figure}  
+  
   \subsection{Structural refinement with 2D WAXS data}
   
   We further refined our structural understanding of the system by simulating X-ray 
@@ -1198,11 +1198,19 @@ liquid crystal membranes}
   to experiment. We tested systems built with 5 columns per pore in the parallel 
   displaced and sandwiched configurations at 300 K in the ordered and disordered
   basins. We extended each simulation by 100 ns in order to get more equilibrated 
-  data. We generated simulated patterns using the extended of simulation trajectories
+  data. We generated simulated patterns using the extended simulation trajectories.
   The patterns for all structures are shown and compared to experiment in Figure~\ref{fig:XRDsim}.
+  
+  % BJC5: I think something like this has to go somewhere.
+  The diffraction patterns show some noise, especially along the axis where $q_r$=0. This
+  noise can be suppressed by sampling more uncorrelated equilibrium configurations (See 
+  section S\ref{S-section:xrd_noise}). Unfortunately, our simulations are not long enough
+  to sample enough independent configurations. Increasing the number of trajectory frames
+  used to simulate the structure factor within a given interval of time does not offer 
+  any improvement.
 
   %BJC5: put figure letters in upper left hand corner of each pattern.
-  \begin{figure}[htb]
+  \begin{figure}[!htb]
 	\centering
 	\begin{subfigure}{0.88\textwidth}
 	\begin{subfigure}{0.28\linewidth}
@@ -1264,7 +1272,7 @@ liquid crystal membranes}
   % MRS5: maybe, there's a question of how we can demonstrate the magnitude of any of these 
   % effects.
   R-spots appears to be weaker, except for the ordered basin sandwiched configuration, in the 
-  simulated patterns. They are also partially engulfed by the wide R-$\pi$ reflection. R-$\pi$
+  simulated patterns. R-spots is also partially engulfed by the wide R-$\pi$ reflection. R-$\pi$
   appears at a lower $q_z$ value than experiment. In all systems, the reflection reaches its 
   maximum at $q_z < 1.5 \AA^{-1}$ which means that monomers prefer to stack at least 4.2 \AA~apart
   rather than 3.7 \AA. R-double does not appear in any of the patterns. 
@@ -1275,28 +1283,25 @@ liquid crystal membranes}
   The simulated XRD patterns of the parallel displaced configurations show an additional
   reflection due to their helical structure. There are horizontal reflections near $|q_z|= 
   0.7~\AA^{-1}$, half of the $q_z$ value of R-$\pi$. The reflection does not cross through
-  $q_r = 0~\AA^{-1}$ so it does not appear for the same reason as R-double. This type of pattern
-  is characteristic of a helix (reference something).
+  $q_r = 0~\AA^{-1}$ so it does not necessarily appear for the same reason as R-double. 
+  This type of pattern is characteristic of a helix (reference something).
   %BJC5: reference something like a dna diffraction paper
-  It is possible that these reflections contribute to the continuation of R-double into R-
-  alkanes, as seen in the experimental pattern.
-  %BJC5: not sure above sentence is clear (or necessary to say)
+  It is possible that these reflections contribute to the diffuse reflections that connect
+  R-spots and R-double in the experimental pattern.
 
   We quantified the numerical discrepancies present when comparing the relative intensities
-  of each reflection of interest between experimental and simulated patterns. Table 
-  ~\ref{table:relative_inensities_300K} shows the relative intensities of each reflection for 
+  of each reflection of interest between experimental and simulated patterns. 
+  Table~\ref{table:relative_inensities_300K} shows the relative intensities of each reflection for 
   all systems tested. The patterns are normalized so that the average intensity of R-alkanes 
-  must equal 1.
-  % BJC5: show how intensities are measured in supporting info
-  We measured the approximate intensity of R-$\pi$ by measuring the intensity of the peak shown
-  by the cross-section of the 2D pattern at $q_r=0$. The relative intensity of R-$\pi$ is 
-  significantly higher than experiment in our simulations. R-spots is measured as the average
-  intensity within the region bounded by a 'spot'. Spots are identified based on visual 
-  inspection. If the spots were not easily discernable, then the intensity was taken as that of
-  the intersection of R-alkanes at half the $q_z$ value of R-$\pi$, since that is where it 
-  appears experimentally. The intensity of R-spots is slightly lower than experiment in all 
-  cases. There is no R-double intensity to be measured. Figures are provided in 
-  section S\ref{S-section:xrd_intensities} to make these measurements clear.
+  must equal 1. We measured the approximate intensity of R-$\pi$ and R-double by measuring the
+  intensity of the appropriate peaks of the cross-section of the 2D pattern at $q_r=0$. The 
+  relative intensity of R-$\pi$ is significantly higher than experiment in our simulations. 
+  R-spots is measured as the average intensity within the region bounded by a 'spot'. We 
+  identified spots based on visual inspection. If the spots were not easily discernible, then the 
+  intensity was taken as that of the intersection of R-alkanes at half the $q_z$ value of
+  R-$\pi$, since that is where it appears experimentally. The intensity of R-spots is slightly
+  lower than experiment in all cases. There is no R-double intensity to be measured. Figures
+  are provided in section S\ref{S-section:xrd_intensities} to make these measurements clear.
 
   \begin{table}[h]
   \centering
@@ -1319,14 +1324,7 @@ liquid crystal membranes}
   does not appear in any patterns, and thus has no measurable intensity.}
   \label{table:relative_inensities_300K} 
   \end{table}
-  
-  %BJC5: I think something like this has to go somewhere.
-  The diffraction patterns show some noise, especially along the axis where $q_r$=0. This
-  noise can be suppressed by sampling more uncorrelated equilibrium configurations (See 
-  section S\ref{S-section:xrd_noise}). Unfortunately, our simulations are not long enough
-  to sample enough independent configurations. Increasing the number of trajectory frames
-  used to simulate the structure factor within a given interval of time does not offer 
-  any improvement.
+  %BJC5: Bold font is caused by achemso document type
   
   There are clear differences between simulated and experimental results that must be addressed
   and justified. We will explore the origin of each experimental reflection and form structural
@@ -1463,7 +1461,7 @@ liquid crystal membranes}
   The relative intensity of R-spots is higher than in experiment (1.5 vs. 1.3). R-double is still
   not present. We will use this configuration to more thoroughly explore the origin of R-spots.
   
-  \begin{figure}
+  \begin{figure}[!htb]
 	  \begin{subfigure}{0.45\linewidth}
 	  	\centering
 	  	\includegraphics[width=\linewidth]{WAXS_raw_jet.png}
@@ -1484,7 +1482,7 @@ liquid crystal membranes}
   at 280K. We measured the tilt angle of the alkane chains and showed that our system 
   equilibrates to an average tilt angle of -2\degree (Fig.~\ref{fig:tilt}). 
   
-  \begin{figure}
+  \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.5\linewidth]{tilt_dist.png}
   \caption{We measured the angle made between each monomer alkane tail and the
@@ -1498,7 +1496,7 @@ liquid crystal membranes}
   the tails. By removing all non-tail atoms from the trajectory and simulating a
   diffraction pattern with the remaining atoms, we were able to isolate the cause of 
   the spots to the tails (Figure~\ref{fig:tails}). Since the tails stay nearly flat, we plotted
-  the centroids of the tails (Figure S-\ref{S-fig:centroids}) and measured the angle
+  the centroids of the tails (Figure S\ref{S-fig:centroids}) and measured the angle
   between each centroid and its nearest neighbors with respect to the plane of the 
   membrane. We see distinct peaks in the distribution of these angles 
   (Figure~\ref{fig:tail_packing}).
@@ -1507,7 +1505,7 @@ liquid crystal membranes}
   location of R-spots. The peaks of interest in Figure \ref{fig:layered_tails}
   are located at $\pm 33 \degree$ which is the same location where the highest
   intensity of spots are located on the simulated patterns. We confirmed this 
-  conclusion by radially integrating the 2D WAXS pattern for 
+  by radially integrating the 2D WAXS pattern for 
   $\left|\mathbf{q}\right|$ values between 1.4 and 1.57 (between 4
   and 4.5 \AA~in real space). We observe distinct peaks ca. $30
   \degree$, in close agreement with the previously measured angle distribution
@@ -1523,7 +1521,7 @@ liquid crystal membranes}
 %  on top of them (Figure~\ref{fig:hex_tails}). This type of packing has been seen
 %  before in XRD studies of hydrocarbon chains~\cite{small_lateral_1984}.
 
-  \begin{figure}
+  \begin{figure}[!htb]
 	\centering
 	\begin{subfigure}{0.45\linewidth}
 		\centering
@@ -1645,7 +1643,7 @@ liquid crystal membranes}
   information to understand how far apart monomers stack within monomer columns and
   the degree to which they are correlated.
   
-  \begin{figure}
+  \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.45\textwidth}
   \centering
@@ -1681,8 +1679,8 @@ liquid crystal membranes}
   \toprule
   System             & $\mathit{d}$ (\AA) & $\mathit{d}_{equil}$ (\AA) & Correlation Length (\AA) \\
   \midrule
-  Sandwiched         & 3.7                &    4.27 $\pm$ 0.03         & 4.5 $\pm$ 0.4            \\
-  Parallel Displaced & 3.7                &    4.33 $\pm$ 0.04         & 15.5 $\pm$ 1.9           \\ 
+  Sandwiched         & 3.7                &    4.27 $\pm$ 0.03         & 4.2 $\pm$ 0.8            \\
+  Parallel Displaced & 3.7                &    4.33 $\pm$ 0.04         & 14.5 $\pm$ 1.3           \\ 
   Sandwiched         & 5.0                &    4.48 $\pm$ 0.07         & 3.2 $\pm$ 0.9            \\
   Parallel Displaced & 5.0                &    4.60 $\pm$ 0.08         & $<$ $\mathit{d}_{equil}$ \\ 
   Experiment         & --                 &    3.70                    & 10 $\pm$ 1               \\
@@ -1706,19 +1704,20 @@ liquid crystal membranes}
   The correlation length between stacked monomer head groups of the ordered systems also show
   closer agreement with experiment (Table~\ref{table:correlation_length}). We calculated the 
   correlation length of each system using Equation~\ref{eqn:decaying_exponential}. We could
-  not extract a reliable correlation length from the disordered parallel displaced configuration.
-  The amount of noise in the correlation function and the lack of an initial peak suggests that 
-  the correlation length is less than $\mathit{d}_{equil}$. In general, we see that correlation
-  length increases as monomers stack closer together. The same trend has been seen in molecular
-  dynamics studies of polymer fluids~\cite{koshy_density_2003}. We hypothesize that the correlation
-  length of the sandwiched configuration would increase to a value near experiment if monomers
-  packed closer together. 
+  not extract a reliable correlation length from the disordered parallel displaced configuration
+  since the peak heights do not decay significantly. 
+  %The amount of noise in the correlation function and the lack of an initial peak suggests that 
+  %the correlation length is less than $\mathit{d}_{equil}$.
+  In general, we see that correlation length increases as monomers stack closer together. The same
+  trend has been seen in molecular dynamics studies of polymer fluids~\cite{koshy_density_2003}.
+  We hypothesize that the correlation length of the sandwiched configuration would increase to a
+  value near experiment if monomers packed closer together. 
   
   The persistent oscillatory behavior of the correlation function may in part explain the high
   intensity of R-$\pi$ relative to experiment. The way we calculate correlation length is
   unique to the rate of decay of $g(z)$ but not its exact shape. $g(z)$ for our 
   simulated systems, especially the sandwiched configurations, shows peaks which persist across
-  the entire correlation function. If the peaks at large values of z instead decay to 1 uniformly,
+  the entire correlation function. If the peaks, at large values of z, instead decay to 1 uniformly,
   the correlation length could remain nearly the same, but R-$\pi$ would have a reduced intensity. 
   The monomer head groups in our simulations do not move enough to create the noise which would 
   cause such behavior. See Section S\ref{S-section:rpi_ft} of the supporting information for
@@ -1736,7 +1735,7 @@ liquid crystal membranes}
   shows the simulated pattern of the ordered sandwiched configuration with the upper boundary
   on the colorbar adjusted to be 6x higher than those shown in Figure~\ref{fig:XRDsim}. The only
   distinguishable reflections are those of R-$\pi$ and R-pores. In the experimental pattern 
-  (Figure~\ref{fig:experimental_adjusted_colorbar}, the intensity is more evenly spread out
+  (Figure~\ref{fig:experimental_adjusted_colorbar}), the intensity is more evenly spread out
   over all of R-$\pi$. 
   % BJC5: I'm not sure how well supported the above paragraph is by the below figure. Need to figure 
   % out what to do about it
@@ -2028,11 +2027,13 @@ liquid crystal membranes}
   
   There is no way to produce R-double without a more complex initial configuration. We 
   calculated the structure factor of simple systems that mimic the parallel
-  displaced and sandwiched configurations. Neither give rise to R-double. (See Figure "fourier
-  transforms of simple systems" in supporting info). The appearance of R-double implies a
+  displaced and sandwiched configurations. Neither give rise to R-double. 
+  (See section S~\ref{S-section:simplified_assemblies}). The appearance of R-double implies a
   vertical modulation in electron density every 7.4 \AA. It is possible that this modulation 
-  occurs in either the head or the tails. There is a not a unique solution to this problem,
-  however we can speculate based on what makes the most physical sense.
+  occurs in either the head or the tails. It is also possible that R-double does not appear in
+  a completely dry system. We will address this point in section~\ref{section:water}. There is
+  a not a unique solution to this problem, however we can speculate based on what makes the most
+  physical sense.
   
   We can produce R-double if our initial configuration contains alternating parallel and
   antiparallel carboxylate groups relative to the plane of the monomer's phenyl ring.
@@ -2041,9 +2042,8 @@ liquid crystal membranes}
   on all head group heavy atoms. Carboxylate groups quickly revert to the parallel position as 
   restraints are released. There is an appreciable energy barrier that prevents rotation
   of carboxylate groups attached to phenyl rings since the group extends the system's 
-  $\pi$ conjugation. (citation) (See figure in supporting info with energy barrier plots)
+  $\pi$ conjugation (citation) (See Figure S\ref{S-fig:carboxylate_dihedral_rb}).
   %BJC5: add citation for extended pi conjugation
-  %BJC5: add figure reference and figure to supporting info
   There are instances where carboxylate groups in other systems rotate out of plane. Bushey et
   al. showed that bulky carbonyl-containing substituents of stacked arene molecules tended to
   tilt 45$\degree$ in order to relieve steric strain, thus allowing $\pi$-$\pi$ stacking between 
@@ -2071,10 +2071,10 @@ liquid crystal membranes}
   tails to sit between adjacent monomer tails which may be the most favorable way for them to
   pack. This configuration is stable short-term while unrestrained however R-double quickly 
   fades after a few nanoseconds of simulation. Still, this may be the most reasonable
-  explanation for the appearance of R-double. The long-term stability of a configuration
+  way for R-double to appear in a dry system. The long-term stability of a configuration
   similar to this may be feasible if monomers stay stacked 3.7 \AA~apart. 
   
-  \begin{figure}[htb]
+  \begin{figure}[!htb]
   \centering
   %BJC4: I could cut out the tails in the three real space configurations
   %BJC4: I can remove some of the colorbars and state that they all follow the same color bar. 
@@ -2132,6 +2132,8 @@ liquid crystal membranes}
   
   \subsection{Slow dynamics}
 
+  %BJC5: this section may fit better after the next one?
+
   We observe unusually slow dynamics in our system relative to other liquid crysal
   systems. Typical diffusion constants for columnar liquid crystals have been reported
   to be on the order of $10^{-11}~ m^2/s$ \cite{dong_translational_1984}. We measured the diffusion
@@ -2156,13 +2158,13 @@ liquid crystal membranes}
 %  techniques, so we are left to find out which initial configuration results in a
 %  model with the closest match to experimental data.
 
-  There is not enough movement on the timescales we simulated for the system to 
+  Consequently, there is not enough movement on the timescales we simulated for the system to 
   consistently reach a structure equivalent to experiment. In all cases our monomers
   equilibrate to a stacking distance that is too large compared to experiment. 
   While this may be in large part due to the forcefield's inability to model aromatic
-  interactions, it is also possible that the monomer tails do not pack as tightly as 
-  they could. More densely packed tails could allow the monomers to stack closer 
-  together. 
+  interactions, it is also possible that the monomer tails do have enough time to pack 
+  as tightly as they could. More densely packed tails could allow the monomers to stack
+  closer together. 
   
   We quantified the movement of the tails during our simulations by calculating the 
   autocorrelation function of the dihedral angle formed around the bond between the 
@@ -2179,7 +2181,7 @@ liquid crystal membranes}
   an unfavorable configuration. We implemented distance restraints between the centers of 
   mass of monomer head groups to preserve the hexagonal phase, then rose the temperature 
   of the equilibrated 300 K ordered basin sandwiched system to 500 K. We witnessed 
-  decorrelation of ether dihedrals after $\approx$ 11 ns with a plateau at 0, 
+  decorrelation of the ether dihedrals after $\approx$ 11 ns with a plateau at 0, 
   (Figure~\ref{fig:dihedrals_500K}) indicating a complete loss of memory. We annealed
   the resultant configuration back down to 300 K over 200 ns to see if the increased rotational
   freedom might allow the system to relax into to a more tightly packed configuration.
@@ -2198,7 +2200,7 @@ liquid crystal membranes}
   % is because the initial box z-box dimension is ~10.9. In the 500K system, the initial
   % z-box dimension is ~9.7
 
-  \begin{figure}
+  \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.45\textwidth}
   	\centering
@@ -2252,15 +2254,15 @@ liquid crystal membranes}
   observe how this changes when water is added to the system.
   
   In general, the composition of each region, particulary the pore region, is 
-  similar between all systems. We believe we can study transport in any of the
-  systems presented here and extract similar transport mechanisms. We will need
-  to verify that this assumption is true. 
+  similar between all systems. We believe we can solvate and study transport in any
+  of the systems presented here and extract similar transport mechanisms. We will 
+  need to verify that this assumption is true. 
   
 % BJC5 : I think this is making progress towards a better representation of these plots. I
 % outlined the tops of the bars on the histograms so the individual rdf don't get covered.
 % I think it helps. I also varied the thickness of the outlines so that the farthest back 
 % line is thickest. That way, when the outlines overlap, you can see the ones in front.
-  \begin{figure}
+  \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.5\textwidth}
         \includegraphics[width=1\linewidth]{sodium_density.png}
@@ -2287,19 +2289,17 @@ liquid crystal membranes}
 	  uniform, disordered pore.}~\label{fig:overlaid_densities}
   \end{figure}
 
-  \subsection{Effect of Water on Structure}\label{section:water}
+  \subsection{The Effect of Water on Structure}\label{section:water}
 
   We explored the effect of water on pore structure, addressing question
   (\ref{point:water}), by preparing parallel displaced and sandwiched
   configurations according to the wet equilibration procedure. We limit
-  the discussion to the ordered pore basin since it produces equilibrated 
-  configurations closest to experiment. There is no experimental measurement
-  of trace water concentration in these membranes so we tested
-  a range of water concentrations from 1 to 5 percent. Figure~\ref{fig:solvation}
-  shows the simulated diffraction patterns resulting from each configuration.
+  the discussion to the ordered pore basin since it produces the most experimentally
+  consistent equilibrated configurations. There is no experimental measurement
+  of trace water concentration in these membranes so we tested a range of water
+  concentrations from 1 to 5 percent. Figure~\ref{fig:solvation} shows the simulated
+  diffraction patterns resulting from each configuration.
   
-  % BJC5: maybe move this to supplemental. I think rdf and g(x,y) should be 
-  % enough to comment on the effect of water
   % formatting taken from : https://tex.stackexchange.com/questions/239715/add-titles-for-rows-and-columns-in-a-subfloat
   \newlength{\tempdima}
   \newcommand{\rowname}[1]% #1 = text
@@ -2309,115 +2309,192 @@ liquid crystal membranes}
   \newcommand{\mycaption}[1]% #1 = caption
   {\refstepcounter{subfigure}\textbf{(\thesubfigure) }{\ignorespaces #1}}
   
-  \begin{figure}
+  \begin{figure}[!htb]
+  \begin{subfigure}{0.915\textwidth}
   	\settoheight{\tempdima}{\includegraphics[width=.32\linewidth]{solvated_offset_rzplot_1.png}}%
   	\centering\begin{tabular}{@{}c@{ }c@{ }c@{ }c@{}}
   	&\textbf{1 wt\%} & \textbf{\hspace{2em}2.5 wt\%} & \textbf{5 wt\%} \\
   	\rowname{Parallel Displaced}&
   	\includegraphics[width=.28\linewidth,trim={1cm 0 1.3cm 0},clip]{solvated_offset_rzplot_1.png}&
-  	\includegraphics[width=.28\linewidth,trim={1cm0 0 1.3cm 0},clip]{solvated_offset_rzplot_25.png}&
-  	\includegraphics[width=.325\linewidth]{solvated_offset_rzplot_5.png}\\[-1ex]
+  	\includegraphics[width=.28\linewidth,trim={1cm 0 1.3cm 0},clip]{solvated_offset_rzplot_25.png}&
+  	\includegraphics[width=.28\linewidth,trim={1cm 0 1.3cm 0},clip]{solvated_offset_rzplot_5.png}\\[-1ex]
   	%&\mycaption{0.2} & \mycaption{0.2} & \mycaption{0.3}\\
   	\rowname{Sandwiched}&
   	\includegraphics[width=.28\linewidth,trim={1cm 0 1.3cm 0},clip]{solvated_layered_rzplot_1.png}&
   	\includegraphics[width=.28\linewidth,trim={1cm 0 1.3cm 0},clip]{solvated_layered_rzplot_25.png}&
-  	\includegraphics[width=.325\linewidth]{solvated_layered_rzplot_5.png}\\[-1ex]
+  	\includegraphics[width=.28\linewidth,trim={1cm 0 1.3cm 0},clip]{solvated_layered_rzplot_5.png}\\[-1ex]
   	%\mycaption{0.5} & \mycaption{0.6} & \mycaption{0.7} \\
   	\end{tabular}
-	\caption{Simulated XRD patterns indicate that systems with added water
-		are not as structured as the dry systems. As increasing amounts of water are 
-		added to both systems, R-$\pi$ fades. When 2.5 wt\% water is added to the
-		sandwiched system, R-$\pi$ gains back some intensity, but its magnitude is not
-		greater than the dry system. R-spots also disappears as water is added. It is
-		absent in all parallel displaced simulations, but fades gradually as water is
-		added to the sandwiched configuration.}%
+  \end{subfigure}
+  \begin{subfigure}{0.075\textwidth}
+  	\includegraphics[width=\textwidth]{colorbar_jet.png}
+  \end{subfigure}
+	\caption{Adding 1 wt \% water to the ordered basin dry systems causes an increase in the intensity
+	R-spots. R-double becomes visible in the parallel displaced configuration. Additional amounts
+	of water only increase discrepancies with experiment.}%
   \label{fig:solvation}
 
   \end{figure}
  
-  In all cases, water disrupts structuring of the model. When we add water to
-  the system, the intensity of the reflections decrease. In systems built with 5
-  wt\% water, R-$\pi$ and R-spots become nearly indistinguishable from R-alkanes.
-  In systems built with 5 wt\% water, the pore region becomes filled with
-  water. We plotted the number density of components in this system. As with the 
-  dry systems, we see a gradual compositional transition from hydrophilic to hydrophobic.  
-  We see that the pores become a mixture of water molecules and sodium ions (Fig.
-  \ref{fig:water_density}). We also see that water exists in the tail region which 
-  may decrease the tail ordering and explain the decrease in intensity of R-spots.
+  The addition of water allows R-double to appear. When we add 1 wt\% water to the 
+  parallel displaced configuration, R-double becomes visible (Figure~\ref{fig:rdouble_offset}). 
+  When 2.5 wt\% water is added, R-double disappears, but the helical reflections characteristic
+  of the parallel displaced configuration become more diffuse, which is a closer match to 
+  experiment. If water is truly responsible for R-double, then the there is likely
+  between 1 and 2.5 wt\% water absorbed into the membrane. This does not exclude 
+  possible contributions from the motifs discussed in section~\ref{section:rdouble}. Water
+  may facilitate the stability of such motifs. 
+%  However, given the long-term stability of this configuration, it is most likely that small
+%  amounts of water are responsible for the existence of R-double.  
   
-  The membrane swells when we introduce water. The location of maximum head
-  group density shifts from 0.35 to 0.62 nm and from 0.44 to 0.61 nm in the
-  parallel displaced and sandwiched configurations respectively. Again, we
-  observe the existence of ions, head groups and water outside the pore region,
-  however in the hydrated system, the head groups drift beyond 1.5 nm from the
-  pore center. In the dry systems, head groups did not wander beyond 1.4 nm from
-  the pore center. Both observations suggest that water pushes all components
-  radially outward from the pore center, characteristic of a swelling process.
-  The plots of $g(x,y)$ for dry and wet systems are compared in
-  Figure~\ref{fig:solvated_correlation}. They further illustrate how the system
-  swells in the presence of water. This system is a closer representation
-  of the H\textsubscript{II} phase which is typically synthesized with ca. 8 wt\%
-  water. Further investigation of hydrated systems can help unravel the
-  mechanisms for selective transport in separations of aqueous solutions. 
-
-  Water is not necessary to maintain an ordered pore structure. We do not
-  eliminate the possibility that water is necessary in order to drive
-  self-assembly, but studying the mechanisms of self-assembly is beyond the
-  scope of this work. According to our model, once the system has formed the
-  Col\textsubscript{h} phase, adding water only drives disorder of the pore
-  structure. In the true equilibrium configuration, if water exists, it is
-  primarily confined to the pore region where there is no driving force for
-  aggregation of water molecules. In the case of trace water, water molecules
-  will be too sparse to form a hydrogen bonding network.
-
-  \begin{figure}
-  \centering 
-  \begin{subfigure}{0.45\textwidth}
-        \includegraphics[width=1\linewidth]{offset_solvated_density.png}
-        \caption{Parallel Displaced}
-        \label{fig:offset_solvated_density}
-  \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-        \includegraphics[width=1\linewidth]{layered_solvated_density.png}
-        \caption{Sandwiched}
-        \label{fig:layered_solvated_density}
-  \end{subfigure}
-  \caption{Water fills the membrane pores in the parallel displaced (a) and
-	  sandwiched (b) configurations. Head groups in the sandwiched configuration sit
-	  closer to the pore center than they do in the parallel displaced configuration.
-	  Both systems are composed primarily of water close to the pore center.}
-  \label{fig:water_density}
-  \end{figure}
-
-  %BJC: this may be okay to push to supplemental
-  \begin{figure}
+  The systems studied by Feng et al.\cite{feng_scalable_2014,feng_thin_2016} were not truly
+  thermotropic Col\textsubscript{h} phases. Rather, they were very low water content 
+  H\textsubscript{II} phases unintentionally created due to the neat monomers' hydroscopicity.
+  This detail may be important for reproducing the results of Feng et al.
+  
+  Water causes the monomer head groups to restructure. We confirmed that the reflection is 
+  not caused by the water itself. We removed all water molecules from the trajectory and 
+  showed that R-double is still present in the simulated diffraction pattern 
+  (Figure~\ref{fig:rdouble_nowater}). We also confirmed that the tails are not responsible for
+  R-double. R-double is not present when we remove all atoms except carbon atoms that make
+  up the tails (Figure~\ref{fig:rdouble_tails}). It is clear that interactions between water
+  and head groups causes them to restructure in a way that leads to R-double.
+  
+  \begin{figure}[!htb]
   \centering
-  \begin{subfigure}{0.47\textwidth}
-        \includegraphics[width=1\linewidth]{layered_xy_correlation.png}
-        \caption{Sandwiched, Dry}
-        \label{fig:layered_xy_correlation_comparison}
+  \begin{subfigure}{0.32\textwidth}
+  \includegraphics[width=\textwidth]{rdouble_offset_solvated_rzplot.png}
+  \caption{Full system}\label{fig:rdouble_offset}
   \end{subfigure}
-  \begin{subfigure}{0.47\textwidth}
-        \includegraphics[width=1\linewidth]{layered_solvated_xy_correlation.png}
-        \caption{Sandwiched, Solvated}
-        \label{fig:layered_solvated_xy_correlation}
+  \begin{subfigure}{0.32\textwidth}
+  \includegraphics[width=\textwidth]{rdouble_nowater_rzplot.png}
+  \caption{Water removed}\label{fig:rdouble_nowater}
   \end{subfigure}
-  \begin{subfigure}{0.47\textwidth}
-        \includegraphics[width=1\linewidth]{offset_xy_correlation.png}
-        \caption{Parallel Displaced, Dry}
-        \label{fig:offset_xy_correlation_comparison}
+  \begin{subfigure}{0.32\textwidth}
+  \includegraphics[width=\textwidth]{rdouble_tails_only_rzplot.png}
+  \caption{Tails only}\label{fig:rdouble_tails}
   \end{subfigure}
-  \begin{subfigure}{0.47\textwidth}
-        \includegraphics[width=1\linewidth]{offset_solvated_xy_correlation.png}
-        \caption{Sandwiched, Solvated}
-        \label{fig:offset_solvated_xy_correlation}
-  \end{subfigure}
-  \caption{$g(x,y)$ of monomer head groups illustrates how the pores
-	  swell in the presence of water.}~\label{fig:solvated_correlation}
+  \caption{The structure of the head groups is responsible for the appearance of
+  R-double in (a). Removing water from the trajectory (b) results in a simulated 
+  diffraction pattern nearly identical to that in (a). R-double is not present
+  when we simulate the diffraction pattern of system where only tails are present. 
+  (c)}\label{fig:rdouble_origin}
   \end{figure}
+
+  The appearance of R-double may be due to increased order of the pores. The first
+  peak of the correlation function, $g(z)$, is approximately 30 \% larger in the 
+  solvated versus dry configuration (Figure~\ref{fig:solvated_correlation_overlay}).
+  Based on the peak locations, it is evident that the head groups stack closer 
+  together in the solvated configuration which may play a role in enforcing order.
+  This may be in part due to swelling of the pores. In 
+  Figure~\ref{fig:head_group_density_overlay} there is a clear decrease in 
+  head group density within 0.4 nm of the pore center. Water molecules may swell 
+  the pores and hydrogen bond with monomer head groups, tethering the monomers 
+  closer together. If this is the case, then it implies that R-double has always
+  been at least weakly present in the simulated diffraction patterns, but may 
+  have been buried by noise.
+ 
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{solvated_correlation_overlay.png}
+  \caption{}\label{fig:solvated_correlation_overlay}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{head_group_density_overlay.png}
+  \caption{}\label{fig:head_group_density_overlay}
+  \end{subfigure}
+  \caption{}\label{fig:rdouble_structuring}
+  \end{figure}
+  
+%  In all cases, water disrupts structuring of the model. When we add water to
+%  the system, the intensity of the reflections decrease. In systems built with 5
+%  wt\% water, R-$\pi$ and R-spots become nearly indistinguishable from R-alkanes.
+%  In systems built with 5 wt\% water, the pore region becomes filled with
+%  water. We plotted the number density of components in this system. As with the 
+%  dry systems, we see a gradual compositional transition from hydrophilic to hydrophobic.  
+%  We see that the pores become a mixture of water molecules and sodium ions (Fig.
+%  \ref{fig:water_density}). We also see that water exists in the tail region which 
+%  may decrease the tail ordering and explain the decrease in intensity of R-spots.
+%  
+%  The membrane swells when we introduce water. The location of maximum head
+%  group density shifts from 0.35 to 0.62 nm and from 0.44 to 0.61 nm in the
+%  parallel displaced and sandwiched configurations respectively. Again, we
+%  observe the existence of ions, head groups and water outside the pore region,
+%  however in the hydrated system, the head groups drift beyond 1.5 nm from the
+%  pore center. In the dry systems, head groups did not wander beyond 1.4 nm from
+%  the pore center. Both observations suggest that water pushes all components
+%  radially outward from the pore center, characteristic of a swelling process.
+%  The plots of $g(x,y)$ for dry and wet systems are compared in
+%  Figure~\ref{fig:solvated_correlation}. They further illustrate how the system
+%  swells in the presence of water. This system is a closer representation
+%  of the H\textsubscript{II} phase which is typically synthesized with ca. 8 wt\%
+%  water. Further investigation of hydrated systems can help unravel the
+%  mechanisms for selective transport in separations of aqueous solutions. 
+%
+%  Water is not necessary to maintain an ordered pore structure. We do not
+%  eliminate the possibility that water is necessary in order to drive
+%  self-assembly, but studying the mechanisms of self-assembly is beyond the
+%  scope of this work. According to our model, once the system has formed the
+%  Col\textsubscript{h} phase, adding water only drives disorder of the pore
+%  structure. In the true equilibrium configuration, if water exists, it is
+%  primarily confined to the pore region where there is no driving force for
+%  aggregation of water molecules. In the case of trace water, water molecules
+%  will be too sparse to form a hydrogen bonding network.
+%
+%  \begin{figure}
+%  \centering 
+%  \begin{subfigure}{0.45\textwidth}
+%        \includegraphics[width=1\linewidth]{offset_solvated_density.png}
+%        \caption{Parallel Displaced}
+%        \label{fig:offset_solvated_density}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%        \includegraphics[width=1\linewidth]{layered_solvated_density.png}
+%        \caption{Sandwiched}
+%        \label{fig:layered_solvated_density}
+%  \end{subfigure}
+%  \caption{Water fills the membrane pores in the parallel displaced (a) and
+%	  sandwiched (b) configurations. Head groups in the sandwiched configuration sit
+%	  closer to the pore center than they do in the parallel displaced configuration.
+%	  Both systems are composed primarily of water close to the pore center.}
+%  \label{fig:water_density}
+%  \end{figure}
+%
+%  %BJC: this may be okay to push to supplemental
+%  \begin{figure}
+%  \centering
+%  \begin{subfigure}{0.47\textwidth}
+%        \includegraphics[width=1\linewidth]{layered_xy_correlation.png}
+%        \caption{Sandwiched, Dry}
+%        \label{fig:layered_xy_correlation_comparison}
+%  \end{subfigure}
+%  \begin{subfigure}{0.47\textwidth}
+%        \includegraphics[width=1\linewidth]{layered_solvated_xy_correlation.png}
+%        \caption{Sandwiched, Solvated}
+%        \label{fig:layered_solvated_xy_correlation}
+%  \end{subfigure}
+%  \begin{subfigure}{0.47\textwidth}
+%        \includegraphics[width=1\linewidth]{offset_xy_correlation.png}
+%        \caption{Parallel Displaced, Dry}
+%        \label{fig:offset_xy_correlation_comparison}
+%  \end{subfigure}
+%  \begin{subfigure}{0.47\textwidth}
+%        \includegraphics[width=1\linewidth]{offset_solvated_xy_correlation.png}
+%        \caption{Sandwiched, Solvated}
+%        \label{fig:offset_solvated_xy_correlation}
+%  \end{subfigure}
+%  \caption{$g(x,y)$ of monomer head groups illustrates how the pores
+%	  swell in the presence of water.}~\label{fig:solvated_correlation}
+%  \end{figure}
 
   \subsection{Model Ionic Conductivity Measurements}
-
+ 
+  %BJC5: probably should show solvated system measurements
+  % 1 wt % water, parallel displaced, ordered basin
+  % Nernst Einstein : (6.52 +/- 0.04) e-05 S/m
+  % Collective Diffusion : (20.6 +/- 9.8) e-05 S/m
+   
   We used equilibrated systems in the ordered pore basin to calculate ionic 
   conductivity since we believe their structures are the closest match to
   experiment. Our models give reasonable estimates of ionic conductivity when
@@ -2443,7 +2520,7 @@ liquid crystal membranes}
   film would have a value of ionic conductivity in closer agreement with our
   model.
    
-  \begin{figure}
+  \begin{figure}[!htb]
         \centering
         \includegraphics[width=0.5\linewidth]{Ionic_conductivity.png}
         \caption{The Collective Diffusion model and the nernst-einstein relation yield
@@ -2473,7 +2550,7 @@ liquid crystal membranes}
   counterparts. The correlation length decreases in both systems, but is most 
   pronounced in the parallel displaced system.  
   
-  \begin{figure}
+  \begin{figure}[!htb]
   \centering
   \includegraphics[width=\textwidth]{xlink_charts.eps}
   \caption{There are minor differences between the physical properties of a
@@ -2544,33 +2621,41 @@ liquid crystal membranes}
   to a single equilibrium structure. We conducted extensive analysis in order to 
   isolate structures which most closely resembles the true equilibrium structure.
 
-  The system's pore spacing is most consistent with experiment when systems
-  are built with 5 columns per pore. The distance between pores increases with the 
-  number of columns per pore. Pores pack closer together in the disordered pore 
-  basin. Systems built with 6 columns per pore in the disordered basin expand in 
-  the z-direction which suggest that it may rearrange to 5 columns per pore long term.
+  We achieve maximum structural consistency with experiment, as determined by simulated
+  2D structure factors, when we build our model in the ordered basin parallel displaced
+  configuration with 5 monomer columns per pore and 1 wt\% water. R-alkanes and R-pores
+  appear where expected for the reasons originally predicted. We learned that R-spots
+  is likely due to ordered alkane chain packing. R-$\pi$ appears at lower q values than
+  experiment because monomer stack too far apart. Finally, we observed that our model
+  reproduces R-double only when we add 1 wt\% water to the system. This observation has
+  important implications for the reproducibility of the experimental results from Feng 
+  et al since they claim that their membrane is completely dry. 
+
+%  The system's pore spacing is most consistent with experiment when systems
+%  are built with 5 columns per pore. The distance between pores increases with the 
+%  number of columns per pore. Pores pack closer together in the disordered pore 
+%  basin. Systems built with 6 columns per pore in the disordered basin expand in 
+%  the z-direction which suggest that it may rearrange to 5 columns per pore long term.
   
-  We have maximized our model's consistency with the experimental WAXS pattern. We show
-  that R-alkanes and R-pores appear where expected. We learned that R-spots is likely 
-  due to ordered alkane chain packing. R-$\pi$ appears at lower q values than experiment
-  because monomer stack too far apart. We found that our model cannot reproduce R-double, 
-  however we have come up with a three different mechanisms that lead to the reflection's
-  appearance. The most likely explanation is that monomers within each column rotate ca.
-  15\degree with respect to their vertically adjacent neighbors so that tails can pack 
-  together more tightly.  
+%  We have maximized our model's consistency with the experimental WAXS pattern. We show
+%  that R-alkanes and R-pores appear where expected. We learned that R-spots is likely 
+%  due to ordered alkane chain packing. R-$\pi$ appears at lower q values than experiment
+%  because monomer stack too far apart. We learned that our model reproduces R-double when
+%  we add 1 wt\% water to the system.  
 
   We characterized the environment centered around the membrane pores and
   learned that the pores are generally filled with monomer head groups and sodium
-  ions. All systems studied showed a similar distribution of sodium, head groups 
-  and tails, which means we can study solute transport in any of the systems here
-  and extract similar transport mechanisms. We also observed that there is not a 
-  hard partition between hydrophlic and hydrophilic regions, rather there is a 
-  gradient. This finding has raised questions about the nature of size-exclusion separations.  
+  ions. All dry systems studied showed a similar distribution of sodium, head groups 
+  and tails while the wet system shows evidence of swelling due to the presence of 
+  water molecules. We also observed that there is not a hard partition between hydrophlic
+  and hydrophobic regions, rather there is a gradient. This finding has raised questions
+  about the nature of size-exclusion separations in systems without a well-defined pore 
+  size.  
 
-  We learned that we do not need water to create well-defined pore structures.
-  Systems whose pores were filled with varying amounts of water showed a decrease
-  in structuring relative to dry systems. At higher water concentrations, the pores
-  begin to swell, which may be more conducive to transport.
+%  We learned that we do not need water to create well-defined pore structures.
+%  Systems whose pores were filled with varying amounts of water showed a decrease
+%  in structuring relative to dry systems. At higher water concentrations, the pores
+%  begin to swell, which may be more conducive to transport.
 
   We justified that our system can reasonably estimate ionic conductivity.  Our
   calculations are about 1 order of magnitude higher than experiment, however

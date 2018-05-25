@@ -361,6 +361,6 @@ if __name__ == "__main__":
     args = initialize()
 
     dihedrals = Dihedral(args.gro, args.traj, args.topology, args.dihedral, args.residue, exclusions=args.exclude)
-    #dihedrals.plot_histogram(rb=True, save=True, show=False)
+    dihedrals.plot_histogram(rb=True, save=True, show=True)
     dihedrals.autocorrelation(cos=True)
-    dihedrals.plot_autocorrelation(show=True)
+    # dihedrals.plot_autocorrelation(show=True)

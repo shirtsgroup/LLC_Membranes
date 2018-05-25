@@ -104,7 +104,7 @@ class SystemTopology(object):
                         top.append('#include "%s"\n' % restrained_top_name)  # need to modify so this is not hardcoded.
                     else:
                         top.append('#include "%s/%s.itp"\n' % (self.top_location, r))
-                elif self.xlink:
+                elif self.xlink and r not in self.ions and r != 'SOL':
                     top.append('#include "%s"\n' % crosslinked_top_name)  # need to modify so this is not hardcoded.
                 else:
                     top.append('#include "%s/%s.itp"\n' % (self.top_location, r))
@@ -123,7 +123,7 @@ class SystemTopology(object):
                     top.append('{:10s}{:>10d}\n'.format(r, 1))
                 else:
                     top.append('{:10s}{:>10d}\n'.format(r, self.residue_count[r]))
-            if self.xlink and r not in self.ions:
+            elif self.xlink and r not in self.ions and r != 'SOL':
                 top.append('{:10s}{:>10d}\n'.format(r, 1))
             else:
                 top.append('{:10s}{:>10d}\n'.format(r, self.residue_count[r]))

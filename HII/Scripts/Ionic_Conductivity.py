@@ -108,7 +108,7 @@ def initialize():
                                                                            'calc')
     parser.add_argument('-F', '--fracshow', default=0.5, type=float, help='Percent of graph to show, also where to stop'
                                                                           'fitting line during diffusivity calculation')
-    parser.add_argument('--nTsub', default=5, type=int, help='Number of subtrajectories to break into for generating '
+    parser.add_argument('--nTsub', default=20, type=int, help='Number of subtrajectories to break into for generating '
                                                               'stats')
     parser.add_argument('-M', '--method', default='NE', help='Which method to use to calculate Ionic Conductivity: CD ='
                                                              'Collective Diffusion, NE = Nernst Einstein, B = both')
@@ -116,6 +116,7 @@ def initialize():
                         action="store_true")
     parser.add_argument('--discard', type=int, help='Specify the number of nanoseconds to discard starting'
                                                     'from the beginning of the simulation')
+    parser.add_argument('-begin', default=0, type=int, help='Frame to begin using data')
     parser.add_argument('--noshow', action="store_true", help='Specify this to not show any plots')
     parser.add_argument('-a', '--axis', default='xyz', type=str, help='Which axis to compute msd along')
 
@@ -218,7 +219,7 @@ if __name__ == '__main__':
     if 'z' in args.axis:
         ndx.append(2)
 
-    t = md.load(args.traj, top=args.gro)
+    t = md.load(args.traj, top=args.gro)[args.begin:]
 
     keep = [a.index for a in t.topology.atoms if a.name == args.ion]
 
@@ -244,7 +245,7 @@ if __name__ == '__main__':
 
         print('Calculating Diffusivity')
 
-        D = Diffusivity.Diffusivity(args.traj, args.gro, args.axis, atoms=[args.ion])
+        D = Diffusivity.Diffusivity(args.traj, args.gro, args.axis, atoms=[args.ion], begin=args.begin)
         D.calculate()
         D.ensure_fit()
         D.bootstrap(args.nboot)
@@ -274,6 +275,7 @@ if __name__ == '__main__':
     else:
 
         dq_all = np.load('dq_%s.npy' % args.suffix)
+        nT = dq_all.size
         print('q loaded')
 
     if args.discard:

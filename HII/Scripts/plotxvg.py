@@ -67,7 +67,7 @@ if __name__ == "__main__":
     plt.tight_layout()
     if args.save:
         plt.savefig(args.out)
-    print(data[-1, :])
+
     for i in range(equil.size):
         print('Average %s: %.2f +\- %.2f' % (columns_labels[i + 1], np.mean(data[int(equil[i]):, i + 1]), np.std(data[int(equil[i]):, i + 1])))
 

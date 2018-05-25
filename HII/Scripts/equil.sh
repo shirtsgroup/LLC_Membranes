@@ -41,6 +41,7 @@ fi
 # make input files
 ${python} ${DIR}/input.py -b ${BUILD_MON} -l 50 --restraints ${restraint_residue} --temp ${T} -f 50 --genvel yes -c ${start_config}
 # create restrained topology
+
 ${python} ${DIR}/restrain.py -f 1000000 1000000 1000000 -A xyz -g ${start_config} -m ${BUILD_MON} -a ${ring_restraints}
 
 gmx grompp -f em.mdp -p topol.top -c ${start_config} -o em

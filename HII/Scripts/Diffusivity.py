@@ -105,7 +105,7 @@ def msd_straightforward(x, ndx):
 
 class Diffusivity(object):
 
-    def __init__(self, traj, gro, axis, startfit=0.05, endfit=0.2, residue=False, atoms=[]):
+    def __init__(self, traj, gro, axis, begin=0, startfit=0.05, endfit=0.2, residue=False, atoms=[]):
         """
         Calculate diffusivity from trajectory
         :param traj: unwrapped trajectory (i.e. gmx trjconv with -pbc nojump)
@@ -121,7 +121,7 @@ class Diffusivity(object):
         self.top_location = "%s/../top/topologies" % self.script_location
 
         print('Loading trajectory...', end='', flush=True)
-        t = md.load(traj, top=gro)  # load trajectory
+        t = md.load(traj, top=gro)[begin:]  # load trajectory
         print('Done!')
         self.nT = t.n_frames  # number of frames
         self.time = t.time  # time stamp on each frame
@@ -204,6 +204,7 @@ class Diffusivity(object):
 
             self.yfit, _, self.slope_error, _, A = Poly_fit.poly_fit(self.time[self.startfit:self.endfit],
                                                   self.MSD_average[self.startfit:self.endfit], 1, self.W)
+
             plt.plot(self.time[self.startfit:self.endfit], self.yfit, '--', color='black', label='Linear Fit')
 
             # plt.errorbar(self.time, self.MSD_average, yerr=[self.limits[0, :], self.limits[1, :]],
@@ -222,7 +223,7 @@ class Diffusivity(object):
                 print('Press enter to following prompts to leave as is')
                 self.startfit = float(input("Time to start fit (ns): ") or self.startfit)
                 self.endfit = float(input("Time to stop fit (ns): ") or self.endfit)
-                self.startfit = int(self.startfit / (self.dt/1000.0)) # convert time to index in t.time
+                self.startfit = int(self.startfit / (self.dt/1000.0))  # convert time to index in t.time
                 self.endfit = int(self.endfit / (self.dt/1000.0))
             plt.clf()
 

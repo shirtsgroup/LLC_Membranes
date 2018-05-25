@@ -63,7 +63,8 @@ if __name__ == "__main__":
 
     # mpl.style.use('seaborn')
 
-    regions = ['Tails', 'Head Groups', 'Sodium']
+    # regions = ['Tails', 'Head Groups', 'Sodium']
+    regions = ['Tails', 'Head Groups', 'Sodium', 'Water']
 
     if args.multi:
 
@@ -72,6 +73,8 @@ if __name__ == "__main__":
         colors = ['xkcd:blue', 'xkcd:olive', 'xkcd:orangered', 'xkcd:magenta']
         names = ['Ordered Parallel Displaced', 'Ordered Sandwiched', 'Disordered Sandwiched',
                  'Disordered Parallel Displaced']
+        names = ['Dry', 'Solvated']
+        colors = ['xkcd:orange', 'xkcd:blue', 'xkcd:orange']
 
         n = len(args.multi)
         system = np.load(args.multi[0])
@@ -80,29 +83,32 @@ if __name__ == "__main__":
         r = system['r']
         bin_width = system['bw']
 
-        results = np.zeros([n, len(regions), len(r)])
+        # results = np.zeros([n, len(regions), len(r)])
+        results = np.zeros([n, 4, len(r)])
 
-        results[0, :, :] = system['results']
+        results[0, :3, :] = system['results']
 
         for i in range(1, n):
 
             system = np.load(args.multi[i])
             results[i, :, :] = system['results']
 
+        outline = np.zeros([4, n, r.shape[0]*2 + 2, 2])
         for i in range(len(regions)):
             plt.figure(i)
             for j in range(n):
-                plt.bar(r, results[j, i, :], bin_width, color=colors[j], alpha=0.75, label=names[j])
+                plt.bar(r, results[j, i, :], bin_width, color=colors[j], alpha=1, label=names[j])
 
                 half_width = bin_width / 2
-                outline = np.zeros([r.shape[0]*2 + 2, 2])
-                outline[0, 0] = r[0] - half_width
-                outline[-1, 0] = r[-1] + half_width
-                outline[1:-1:2, 0] = r - half_width
-                outline[2:-1:2, 0] = r + half_width
-                outline[1:-1:2, 1] = results[j, i, :]
-                outline[2:-1:2, 1] = results[j, i, :]
-                plt.plot(outline[:, 0], outline[:, 1], color=colors[j], linewidth=4/(j+1))
+                # outline = np.zeros([r.shape[0]*2 + 2, 2])
+                outline[i, j, 0, 0] = r[0] - half_width
+                outline[i, j, -1, 0] = r[-1] + half_width
+                outline[i, j, 1:-1:2, 0] = r - half_width
+                outline[i, j, 2:-1:2, 0] = r + half_width
+                outline[i, j, 1:-1:2, 1] = results[j, i, :]
+                outline[i, j, 2:-1:2, 1] = results[j, i, :]
+                if j == 0:
+                    plt.plot(outline[i, j, :, 0], outline[i, j, :, 1], color=colors[j], linewidth=4)#/(j+1))
 
             # plt.title(regions[i], fontsize=14)
             plt.legend(fontsize=11)
@@ -144,17 +150,6 @@ if __name__ == "__main__":
 
         p_centers = physical.avg_pore_loc(npores, t.xyz[:, comp, :])
 
-        if args.solvate:
-
-            print('Calculating number density of solvent')
-            keep = [a.index for a in t.topology.atoms if a.residue.name == 'HOH' and a.name == 'O']
-            pos = t.xyz[:, keep, :]
-            p = duplicate(pos, t.unitcell_vectors)
-            equil = 0
-            density, r, bin_width = Structure_char.compdensity(pos, p_centers, equil, t.unitcell_vectors, pores=npores, buffer=0, nbins=args.bins)
-            results[-1, :] = density
-            plt.bar(r, density, bin_width, color='xkcd:gold', alpha=0.75, label='Water')
-
         for i, reg in enumerate(regions):
 
             print('Calculating number density of %s region' % reg)
@@ -172,6 +167,17 @@ if __name__ == "__main__":
 
         np.savez_compressed("regional_density", results=results, r=r, bw=bin_width, box=t.unitcell_vectors)
         print('Arrays saved as density.npz')
+
+        if args.solvate:
+
+            print('Calculating number density of solvent')
+            keep = [a.index for a in t.topology.atoms if a.residue.name == 'HOH' and a.name == 'O']
+            pos = t.xyz[:, keep, :]
+            p = duplicate(pos, t.unitcell_vectors)
+            equil = 0
+            density, r, bin_width = Structure_char.compdensity(pos, p_centers, equil, t.unitcell_vectors, pores=npores, buffer=0, nbins=args.bins)
+            results[-1, :] = density
+            plt.bar(r, density, bin_width, color='xkcd:gold', alpha=0.75, label='Water')
 
     else:
 

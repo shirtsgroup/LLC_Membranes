@@ -30,8 +30,9 @@
   \section{Attempted Self-assembly}\label{section:self_assembly}
   
   We attempted self assembly of Na-GA3C11 monomers by using an isotropic configuration
-  generated using Packmol (\cite{martinez_packmol:_2009}). The input file given to 
-  Packmol is shown below.
+  generated using Packmol \cite{martinez_packmol:_2009} (Figure~\ref{fig:isotropic_box}).
+  The input file given to Packmol is shown below.
+  
   \lstset{language=bash}
   \begin{lstlisting}
   tolerance 2.0
@@ -46,13 +47,34 @@
   We used the same number of monomers (400) that we used in all other simulations. 
   Since Packmol does not have the capability to create monoclinic boxes, we used a cubic
   box with a volume of 660 $nm^3$, 25 \% larger than those used to create ordered unit
-  cells we studied. 
+  cells we studied. We tested systems with semiisotropic and anisotropic pressure 
+  coupling since the shape of the unit cell will likely need to change in order to 
+  accomodate hexagonally packed pores.
   
   We use the nematic order paramter as defined in section~\ref{method:nematic_order} to 
-  observe any progress towards an system ordering.
+  observe any progress towards system ordering. In both cases, we see that the nematic
+  order parameter stays close to zero for the duration of the simulation time, indicating
+  an isotropic arrangement of head groups (Figure~\ref{fig:nematic_isotropic}). The values
+  are slightly negative since there are only 400 monomers. 
+  Equation~\ref{eqn:nematic_order_parameter} is bounded between -1 and 1, however, with a
+  proper choice of nematic director, measured values will range between 0 and 1. With a 
+  large number of samples, an isotropic system would have an order parameter of 0.
   
-  %BJC: picture of isotropic box (before and after?)
-  %BJC: plot of nematic order parameter vs. time 
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{isotropic_box.png}
+  \caption{}\label{fig:isotropic_box}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{nematic_isotropic.png}
+  \caption{}\label{fig:nematic_isotropic}
+  \end{subfigure}
+  \caption{(a) We created a box of isotropically packed monomers and allowed it to simulate
+  for 100 ns using isotropic and anisotropic pressure coupling. (b) The nematic order 
+  parameter hovers close to zero for the duration of the simulation meaning the system
+  maintains its isotropic alignment.}\label{fig:self_assembly}
+  \end{figure}
 
   \section{Further details regarding monomer parameterization}\label{section:parameterization}
  
@@ -1015,6 +1037,17 @@
   with different z-dimensions. The correlation function is nearly the same when the z-dimension
   of the system is doubled.}\label{fig:z_correlation_overlay}
   \end{figure}
+  
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.5\textwidth]{carboxylate_dihedral_rb.png}
+  \caption{A potential energy diagram for the dihedral angle about the carbon-carbon bond of
+  a carboxylate group attached to an aromatic ring, using parameters from the generalized amber 
+  forcefield. It is energetically favorable for the carboxylate group to stay in plane with 
+  the aromatic ring. There is a large energy penalty as the dihedral becomes antiparallel to 
+  the plane of the aromatic ring.}\label{fig:carboxylate_dihedral_rb}
+  \end{figure}
+  
 
 \clearpage
 \bibliography{llc}

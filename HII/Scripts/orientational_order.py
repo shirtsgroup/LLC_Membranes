@@ -131,8 +131,12 @@ if __name__ == "__main__":
 
     a = angles(n, [0, 0, 1])
 
-    S = nematic(a)
+    plt.hist(a.flatten(), bins=100)
+    plt.show()
+    exit()
 
+    S = nematic(a)
+    np.savez_compressed('nematic.npz', time=t.time/1000, S=S)
     plt.figure()
     plt.plot(t.time/1000, S, linewidth=2)
     plt.ylabel('Nematic Order Parameter', fontsize=14)

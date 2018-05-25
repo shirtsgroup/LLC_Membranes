@@ -371,4 +371,4 @@ if __name__ == "__main__":
     V.calculate()  # calculate viscosity
     if not args.load:
         V.save()  # save everything necessary to quickly reload data
-    # V.plot_all()
+    V.plot_all()
