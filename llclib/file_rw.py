@@ -492,7 +492,7 @@ def write_water_ndx(keep, t):
             count += 1
 
 
-def write_gro_pos(pos, out, name='NA', box=[0, 0, 0], ids=[], res=[], vel=None):
+def write_gro_pos(pos, out, name='NA', box=[0, 0, 0], ids=None, res=None, vel=None):
     """
     write a .gro file from positions
     :param pos: xyz coordinates in

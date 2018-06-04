@@ -10,6 +10,8 @@ import subprocess
 import os
 from gentop import SystemTopology
 import tqdm
+import matplotlib.path as path
+from scipy import spatial
 
 
 script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -97,6 +99,144 @@ def net_charge(nsolute, solutes):
     return net_charge
 
 
+def put_in_box(pt, x_box, y_box, m, angle):
+    """
+    :param pt: The point to place back in the box
+    :param x_box: length of box in x dimension
+    :param y_box: length of box in y dimension
+    :param m: slope of box vector
+    :param angle: angle between x axis and y box vector
+    :return: coordinate shifted into box
+    """
+
+    b = - m * x_box  # y intercept of box vector that does not pass through origin (right side of box)
+    if pt[1] < 0:
+        pt[:2] += [np.cos(angle)*x_box, np.sin(angle)*x_box]  # if the point is under the box
+    if pt[1] > y_box:
+        pt[:2] -= [np.cos(angle)*x_box, np.sin(angle)*x_box]
+    if pt[1] > m*pt[0]:  # if the point is on the left side of the box
+        pt[0] += x_box
+    if pt[1] < m*(pt[0] - b):  # if the point is on the right side of the box
+        pt[0] -= x_box
+
+    return pt
+
+
+def trace_pores(pos, box, layers):
+    """
+    Find the line which traces through the center of the pores
+    :param pos: positions of atoms used to define pore location (args.ref) [natoms, 3]
+    :param box: xy box vectors, [2, 2], mdtraj format
+    :param layers: number of layers
+    :return: points which trace the pore center
+    """
+
+    atoms_p_pore = int(pos.shape[0] / 4)  # atoms in each pore
+    atoms_p_layer = int(atoms_p_pore / layers)  # atom per layer
+
+    v = np.zeros([4, 2])  # vertices of unitcell box
+    v[0, :] = [0, 0]
+    v[1, :] = [box[0, 0], 0]
+    v[3, :] = [box[1, 0], box[1, 1]]
+    v[2, :] = v[3, :] + [box[0, 0], 0]
+
+    center = [np.mean(v[:, 0]), np.mean(v[:, 1]), 0]  # geometric center of box
+    bounds = path.Path(v)  # create a path tracing the vertices, v
+
+    angle = np.arccos(box[1, 1]/box[0, 0])  # angle of monoclinic box
+    if box[1, 0] < 0:  # the case of an obtuse angle
+        angle += np.pi / 2
+
+    m = (v[3, 1] - v[0, 1]) / (v[3, 0] - v[0, 0])  # slope from points connecting first and third vertices
+
+    centers = np.zeros([4*layers, 3])
+
+    for p in range(4):
+        pore = pos[p*atoms_p_pore:(p+1)*atoms_p_pore, :]  # coordinates for atoms belonging to a single pore
+        for l in range(layers):
+            before = pore[l*atoms_p_layer, :]  # choose the first atom as a reference
+
+            shift = transform.translate(pore[l*atoms_p_layer:(l+1)*atoms_p_layer, :], before, center)  # shift everything to towards the center
+
+            for i in range(shift.shape[0]):  # check if the points are within the bounds of the unitcell
+                if not bounds.contains_point(shift[i, :2]):
+                    shift[i, :] = put_in_box(shift[i, :], box[0, 0], box[1, 1], m, angle)  # if its not in the unitcell, shift it so it is
+
+            c = np.zeros([1, 3])
+            c[0, :] = [np.mean(shift[:, 0]), np.mean(shift[:, 1]), np.mean(shift[:, 2])]  # geometric center of reference atoms in this layer
+
+            centers[p*layers + l, :] = transform.translate(c, center, before)  # move everything back to where it was
+
+            if not bounds.contains_point(centers[p*layers, :]):  # make sure everything is in the box again
+                centers[p*layers + l, :] = put_in_box(centers[p*layers + l, :], box[0, 0], box[1, 1], m, angle)
+
+    return centers
+
+
+def placement(z, pts, box):
+    """
+    :param z: z location where solute should be placed
+    :param pts: points which run through the pore
+    :return: location to place solute
+    """
+
+    v = np.zeros([4, 2])  # vertices of unitcell box
+    v[0, :] = [0, 0]
+    v[1, :] = [box[0, 0], 0]
+    v[3, :] = [box[1, 0], box[1, 1]]
+    v[2, :] = v[3, :] + [box[0, 0], 0]
+    center = [np.mean(v[:, 0]), np.mean(v[:, 1]), 0]  # geometric center of box
+
+    bounds = path.Path(v)  # create a path tracing the vertices, v
+
+    angle = np.arccos(box[1, 1]/box[0, 0])  # angle of monoclinic box
+    if box[1, 0] < 0:  # the case of an obtuse angle
+        angle += np.pi / 2
+
+    m = (v[3, 1] - v[0, 1]) / (v[3, 0] - v[0, 0])  # slope from points connecting first and fourth vertices
+
+    # shift = transform.translate(z, before, center)
+    #
+    # put_in_box(pt, box[0, 0], box[1, 1], m, angle)
+
+    # find z positions, in between which solute will be placed
+    lower = 0
+    while pts[lower, 2] < z:
+        lower += 1
+
+    upper = pts.shape[0] - 1
+    while pts[upper, 2] > z:
+        upper -= 1
+
+    limits = np.zeros([2, 3])
+    limits[0, :] = pts[lower, :]
+    limits[1, :] = pts[upper, :]
+
+    shift = transform.translate(limits, limits[0, :], center)  # shift limits to geometric center of unit cell
+    shift[:, 2] = [limits[0, 2], limits[1, 2]]  # keep z positions the same
+
+    for i in range(shift.shape[0]):  # check if the points are within the bounds of the unitcell
+        if not bounds.contains_point(shift[i, :2]):
+            shift[i, :] = put_in_box(shift[i, :], box[0, 0], box[1, 1], m, angle)
+
+    # Use parametric representation of line between upper and lower points to find the xy value where z is satsified
+    v = shift[1, :] - shift[0, :]  # direction vector
+
+    t = (z - shift[0, 2]) / v[2]  # solve for t since we know z
+    x = shift[0, 0] + t*v[0]
+    y = shift[0, 1] + t*v[1]
+
+    place = np.zeros([1, 3])
+    place[0, :] = [x, y, 0]
+    place = transform.translate(place, center, limits[0, :])  # put xy coordinate back
+    place[0, 2] = z
+
+    if not bounds.contains_point(place[0, :]):  # make sure everything is in the box again
+        place[0, :] = put_in_box(place[0, :], box[0, 0], box[1, 1], m, angle)
+
+    return place[0, :]
+
+
 class Solvent(object):
 
     def __init__(self, gro, intermediate_fname='solvate.gro', em_steps=100, p_coupling='isotropic'):
@@ -106,22 +246,27 @@ class Solvent(object):
         :param em_steps : number of energy minimization steps if placing solute in box
         """
 
-        t = md.load(gro)
-        self.box_vectors = t.unitcell_vectors[0, :, :]  # box vectors
+        self.t = md.load(gro)
+        self.box_vectors = self.t.unitcell_vectors[0, :, :]  # box vectors
 
         self.box_gromacs = [self.box_vectors[0, 0], self.box_vectors[1, 1], self.box_vectors[2, 2],
                             self.box_vectors[0, 1], self.box_vectors[2, 0], self.box_vectors[1, 0],
                             self.box_vectors[0, 2], self.box_vectors[1, 2], self.box_vectors[2, 0]]  # box in gromacs format
 
-        self.positions = t.xyz[0, :, :]  # positions of all atoms
+        self.positions = self.t.xyz[0, :, :]  # positions of all atoms
         self.residues = []
         self.names = []
         self.top = SystemTopology(gro)
         self.intermediate_fname = intermediate_fname
         self.em_steps = em_steps
 
+        # data specifically required for adding solutes to pores
+        self.pore_spline = None
+        self.water = [a.index for a in self.t.topology.atoms if a.residue.name == 'HOH' and a.name == 'O']
+        self.water_top = Solute('SOL')
+
         # because mdtraj changes the names
-        for a in t.topology.atoms:
+        for a in self.t.topology.atoms:
             if a.residue.name == 'HOH':
                 self.residues.append('SOL')
                 if a.name == 'O':
@@ -134,11 +279,18 @@ class Solvent(object):
                 self.residues.append(a.residue.name)
                 self.names.append(a.name)
 
-    def place_solute(self, solute):
+    def place_solute(self, solute, placement_point, random=False, freeze=False, rem=.5):
+
         """
-        :param solute: Solute object generated from solute configuration file (.gro)
+        Place solute at desired point and energy minimze the system
+        :param solute: name of solute object (str)
+        :param placement_point: point to place solute (np.array([3])
+        :param random: place solute at random point in box (bool)
+        :param freeze: freeze all atoms outside rem during energy minimization (bool)
+        :param rem: radius from placement_point within which atoms will NOT be frozen (float, nm)
+        :return:
         """
-        placement_point = self.random_point_box()  # where to place solute
+
         #solute_positions = random_orientation(solute.xyz[0, ...], solute.xyz[0, 0, :] - solute.xyz[0, 1, :], placement_point)  # to be fixed in THE FUTURE
         solute_positions = transform.translate(solute.xyz[0, :, :], solute.xyz[0, 0, :], placement_point)  # translate solute to placement point
         self.positions = np.concatenate((self.positions, solute_positions))  # add to array of positions
@@ -148,25 +300,68 @@ class Solvent(object):
 
         # write new .gro file
         file_rw.write_gro_pos(self.positions, self.intermediate_fname, box=self.box_gromacs, ids=self.names, res=self.residues)
-        nrg = self.energy_minimize(self.em_steps)
+
+        if freeze:
+            self.freeze_ndx(placement_point, rem)
+
+        nrg = self.energy_minimize(self.em_steps, freeze=freeze)
 
         if nrg >= 0:
             self.revert(solute)
-            self.place_solute(solute)
+            if random:
+                self.place_solute_random(solute)
+            else:
+                #self.remove_water(placement_point, 3)
+                self.place_solute(solute, placement_point, freeze=False)
 
-    def energy_minimize(self, steps):
+    def place_solute_random(self, solute):
+        """
+        :param solute: Solute object generated from solute configuration file (.gro)
+        """
+        placement_point = self.random_point_box()  # where to place solute
+        self.place_solute(solute, placement_point, random=True)
+
+    def place_solute_pores(self, solute, z=None, layers=20, pores=4, ref=['C', 'C1', 'C2', 'C3', 'C4', 'C5']):
+        """
+        Place solute in middle of pores at given z location
+        :param solute: solute object
+        :param z: z location of solute center of mass (float)
+        :param layers: number of layers in system (when initial configuration was set up) (int)
+        :param pores: number of pores in which to place solutes (int)
+        :param ref: reference atoms used to define pore center
+        :return:
+        """
+
+        if not self.pore_spline:
+            ref = [a.index for a in self.t.topology.atoms if a.name in ref]
+            self.pore_spline = trace_pores(self.positions[ref, :], self.box_vectors[:2, :2], layers)
+
+        for i in tqdm.tqdm(range(pores)):
+            placement_point = placement(z, self.pore_spline[i * layers: (i + 1) * layers, :], self.box_vectors[:2, :2])
+            self.place_solute(solute, placement_point, freeze=True)
+
+    def energy_minimize(self, steps, freeze=False, freeze_group='Freeze', freeze_dim='xyz'):
         """
         Energy minimize a configuration
         :param steps: number of steepest descent energy minimization steps to take
         :return: coordinates of energy minimized structure, updated coordinates of reference atoms
         """
 
-        file_rw.write_em_mdp(steps)  # write em.mdp with a given number of steps
+        # write em.mdp with a given number of steps
+        file_rw.write_em_mdp(steps, freeze=freeze, freeze_group='Freeze', freeze_dim='xyz')
 
-        p1 = subprocess.Popen(
-            ["gmx", "grompp", "-p", "topol.top", "-f", "em.mdp", "-o", "em", "-c", "%s" % self.intermediate_fname],
-            stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
-        p1.wait()
+        if freeze:
+            p1 = subprocess.Popen(
+                ["gmx", "grompp", "-p", "topol.top", "-f", "em.mdp", "-o", "em", "-c", "%s" % self.intermediate_fname,
+                 "-n", "freeze_index.ndx"],
+                stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
+            p1.wait()
+        else:
+            p1 = subprocess.Popen(
+                ["gmx", "grompp", "-p", "topol.top", "-f", "em.mdp", "-o", "em", "-c", "%s" % self.intermediate_fname],
+                stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
+            p1.wait()
+
         p2 = subprocess.Popen(["gmx", "mdrun", "-deffnm", "em"], stdout=open(os.devnull, 'w'),
                               stderr=subprocess.STDOUT)  # run energy minimization
         p2.wait()
@@ -179,6 +374,27 @@ class Solvent(object):
         except ValueError:
             return 0  # If the system did not energy minimize, the above statement will not work because nrg will be an
             # empty string. Make nrg=0 so placement gets attempted again
+
+    def freeze_ndx(self, solute_placement_point, rem):
+        """
+        Write an index file for atoms to be frozen
+        :param solute_placement_point: xyz position of where water molecule was placed
+        :param rem: spherical radius measured from water molecule placement point outside which all atoms will be frozen
+        :return: index file with indices of atoms to be frozen
+        """
+
+        pts = spatial.cKDTree(self.positions).query_ball_point(solute_placement_point, rem)
+
+        freeze_indices = [a.index for a in self.t.topology.atoms if a.index not in pts]
+
+        with open('freeze_index.ndx', 'w') as f:
+
+            f.write('[ Freeze ]\n')
+            for i, entry in enumerate(freeze_indices):
+                if (i + 1) % 15 == 0:
+                    f.write('{:5d}\n'.format(entry + 1))
+                else:
+                    f.write('{:5d} '.format(entry + 1))
 
     def random_point_box(self):
         """
@@ -197,13 +413,43 @@ class Solvent(object):
     def revert(self, solute):
         """
         Revert system to how it was before solute addition
-        :return:
         """
         n = -solute.natoms
         self.positions = self.positions[:n, :]
         self.residues = self.residues[:n]
         self.names = self.names[:n]
         self.top.add_residue(solute, n=-1, write=False)  # subtract a solute from the topology
+
+    def write_config(self, name='out.gro'):
+        """
+        Write .gro coordinate file from current positions
+        :param name: name of coordinate file to write (str)
+        """
+        # write new .gro file
+        file_rw.write_gro_pos(self.positions, name, box=self.box_gromacs, ids=self.names, res=self.residues)
+
+    def remove_water(self, point, n):
+
+        """
+        remove n water molecules closest to point
+        """
+
+        tree = spatial.cKDTree(self.positions[self.water, :])
+        rm = []
+
+        nn = tree.query(point, k=n)[1]
+        for j in nn:
+            rm.append(self.water[j])
+            rm.append(self.water[j] + 1)
+            rm.append(self.water[j] + 2)
+
+        # update relevant arrays
+        self.positions = np.delete(self.positions, rm, axis=0)
+        self.residues = [self.residues[x] for x in range(len(self.residues)) if x not in rm]
+        self.names = [self.names[x] for x in range(len(self.names)) if x not in rm]
+        self.water = [i for i, x in enumerate(self.residues) if x == 'SOL' and self.names[i] == 'OW']
+
+        self.top.remove_residue(self.water_top, n, write=True)
 
 
 class Solute(object):
@@ -268,6 +514,11 @@ class Solute(object):
             self.resname = self.residues[0]
             self.names = [a.name for a in t.topology.atoms]
             self.xyz = t.xyz
+
+            self.com = np.zeros([3])  # center of mass of solute
+            for i in range(self.xyz.shape[1]):
+                self.com += self.xyz[0, i, :]
+            self.com /= self.xyz.shape[1]
 
             self.mw = 0  # molecular weight (grams)
             for a in t.topology.atoms:
@@ -343,7 +594,7 @@ if __name__ == "__main__":
 
     for i in range(len(nsolute)):
         for sol in tqdm.tqdm(range(nsolute[i])):
-            solvent.place_solute(solutes[i])
+            solvent.place_solute_random(solutes[i])
 
     from pathlib import Path
 

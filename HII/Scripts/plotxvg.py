@@ -29,6 +29,15 @@ if __name__ == "__main__":
         for line in f:
             xvg.append(line)
 
+    wham = False
+    if xvg[2].count('wham') != 0:
+        wham = True
+
+    if wham:
+        start_string = '@TYPE'
+    else:
+        start_string = '@ s'
+
     start = 0
     while xvg[start].count('@') == 0:
         start += 1
@@ -37,13 +46,20 @@ if __name__ == "__main__":
     xlabel = xvg[start + 1].split('"')[1]
     ylabel = xvg[start + 2].split('"')[1]
 
-    while xvg[start].count('@ s') == 0:
+    while xvg[start].count(start_string) == 0:
         start += 1
 
-    columns_labels = [xlabel]
-    while xvg[start].count('@ s') == 1:
-        columns_labels.append(xvg[start].split('"')[1])
+    if not wham:
+        columns_labels = [xlabel]
+        while xvg[start].count(start_string) == 1:
+            columns_labels.append(xvg[start].split('"')[1])
         start += 1
+
+    if wham:
+        start += 1
+        columns_labels = []
+        for i in range(len(xvg[start].split())):
+            columns_labels.append('Column %s' % (i + 1))
 
     data = np.zeros([len(xvg) - start, len(columns_labels)])
     for i in range(start, len(xvg)):
@@ -60,7 +76,8 @@ if __name__ == "__main__":
     plt.figure()
     for i in range(1, len(columns_labels)):
         plt.plot(data[:, 0], data[:, i], label=columns_labels[i], linewidth=2)
-    plt.legend()
+    if not wham:
+        plt.legend()
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)

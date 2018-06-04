@@ -319,7 +319,7 @@ class Viscosity(object):
 
         return np.mean(trials), np.std(trials)
 
-    def plot_all(self, save=False):
+    def plot_all(self, save=False, show=True):
         """
         Plot all relevant data
         :return:
@@ -337,7 +337,7 @@ class Viscosity(object):
         ax.set_xscale('log')
         # plt.tight_layout() # not compatible with inset plot
         if save:
-            plt.savefig('autocorrelation_function.py')
+            plt.savefig('autocorrelation_function.png')
 
         plt.figure()
         plt.plot(self.time[:self.nintervals], viscosity_fit(np.array(self.time[:self.nintervals]), self.fit_params[0],
@@ -350,7 +350,8 @@ class Viscosity(object):
         if save:
             plt.savefig('running_integral.png')
 
-        plt.show()
+        if show:
+            plt.show()
 
     def save(self):
 
@@ -371,4 +372,4 @@ if __name__ == "__main__":
     V.calculate()  # calculate viscosity
     if not args.load:
         V.save()  # save everything necessary to quickly reload data
-    V.plot_all()
+    V.plot_all(show=False, save=True)

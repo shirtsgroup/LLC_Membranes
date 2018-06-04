@@ -155,6 +155,14 @@ class SystemTopology(object):
         if write:
             self.write_top(name=topname, description=top_description)
 
+    def remove_residue(self, residue, n=1, write=False, topname='topol.top', top_description='Simulation Box'):
+
+        resname = residue.resname
+        self.residue_count[resname] -= n
+
+        if write:
+            self.write_top(name=topname, description=top_description)
+
 
 if __name__ == "__main__":
 
