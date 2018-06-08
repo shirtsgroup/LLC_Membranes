@@ -146,7 +146,7 @@ class SimulationMdp(object):
                 a.append(['ref-p = 1\n'])
                 a.append(['compressibility = 4.5e-5\n'])
             else:
-                a.append(['ref-p = %s\n' % ' '.join([str(1) for i in self.top.residues])])
+                a.append(['ref-p = %s\n' % ' '.join(['1', '1'])])
                 a.append(['compressibility = 4.5e-5 4.5e-5\n'])
         if self.genvel == 'yes':
             a.append(['gen-vel = yes\n'])
@@ -248,6 +248,49 @@ class SimulationMdp(object):
                 f.write(line[0])
 
         self.nve_mdp_name = "%s.mdp" % out
+
+    def add_pull_groups(self, ref_groups, coord_groups, k, rate, mdp, geometry='distance', type='umbrella', dim='z'):
+        """
+        :param ref_groups: name of groups used as reference com
+        :param coord_groups: name of groups which will be used with a pull coordinate
+        :param k: force constant (kJ / mol / nm^2)
+        :param rate: pull rate (nm/ps)
+        :param mdp: name of .mdp file to add pull parameters to
+        :param geometry: how to pull (see http://manual.gromacs.org/documentation/2018/user-guide/mdp-options.html)
+        :param type: see http://manual.gromacs.org/documentation/2018/user-guide/mdp-options.html
+        :param dim: axis a long which to pull
+
+        NOTE: This assumes all options apply to all pull coords (for now)
+
+        """
+
+        n = len(coord_groups)
+        pulldim = ['N', 'N', 'N']
+        if 'x' in dim:
+            pulldim[0] = 'Y'
+        if 'y' in dim:
+            pulldim[1] = 'Y'
+        if 'z' in dim:
+            pulldim[2] = 'Y'
+        dim = " ".join(pulldim)
+
+        with open(mdp, "a") as f:
+            f.write('\n; Pull code\n')
+            f.write('pull = yes\n')
+            f.write('pull-ngroups = %d\n' % (len(ref_groups) + len(coord_groups)))
+            f.write('pull-ncoords = %d\n' % len(coord_groups))
+            for i, x in enumerate(coord_groups):
+                num = i + 1
+                f.write('pull-group%d-name = %s\n' % (num, x))
+                f.write('pull-coord%d-type = %s\n' % (num, type))
+                f.write('pull-coord%d-geometry = %s\n' % (num, geometry))
+                f.write('pull-coord%d-dim = %s\n' % (num, dim))
+                f.write('pull-coord%d-groups = %d %d\n' % (num, n + i + 1, num))
+                f.write('pull-coord%d-rate = %.1f\n' % (num, rate))
+                f.write('pull-coord%d-k = %.1f\n' % (num, k))
+            for i, x in enumerate(ref_groups):
+                f.write('pull-group%d-name = %s\n' % (n + i + 1, x))
+
 
 
 if __name__ == "__main__":

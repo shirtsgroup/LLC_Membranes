@@ -2116,9 +2116,8 @@ liquid crystal membranes}
   \end{subfigure}
   \begin{subfigure}{0.3\linewidth}
   	\centering
-  	\includegraphics[width=\textwidth]{staggered_rzplot_norestraints.png}
-  	\caption{}\label{fig:staggered_rzplot_norestraints}
-  	%BJC4: needs to be done
+  	\includegraphics[width=\textwidth]{staggered_rzplot_norestraints.png} %BJC5: this needs to be updated
+  	\caption{}\label{fig:staggered_rzplot_norestraints} 
   \end{subfigure}
   \begin{subfigure}{0.3\linewidth}
   	\centering
@@ -2340,7 +2339,7 @@ liquid crystal membranes}
   parallel displaced configuration, R-double becomes visible (Figure~\ref{fig:rdouble_offset}). 
   When 2.5 wt\% water is added, R-double disappears, but the helical reflections characteristic
   of the parallel displaced configuration become more diffuse, which is a closer match to 
-  experiment. If water is truly responsible for R-double, then the there is likely
+  experiment. If water is truly responsible for R-double, then there is likely
   between 1 and 2.5 wt\% water absorbed into the membrane. This does not exclude 
   possible contributions from the motifs discussed in section~\ref{section:rdouble}. Water
   may facilitate the stability of such motifs. 
@@ -2352,60 +2351,109 @@ liquid crystal membranes}
   H\textsubscript{II} phases unintentionally created due to the neat monomers' hydroscopicity.
   This detail may be important for reproducing the results of Feng et al.
   
-  Water causes the monomer head groups to restructure. We confirmed that the reflection is 
-  not caused by the water itself. We removed all water molecules from the trajectory and 
-  showed that R-double is still present in the simulated diffraction pattern 
-  (Figure~\ref{fig:rdouble_nowater}). We also confirmed that the tails are not responsible for
-  R-double. R-double is not present when we remove all atoms except carbon atoms that make
-  up the tails (Figure~\ref{fig:rdouble_tails}). It is clear that interactions between water
-  and head groups causes them to restructure in a way that leads to R-double.
+  R-double appears due to the structure of the head groups. We removed the head groups from the
+  trajectory used to produce Figure~\ref{fig:solvation}a in order to produce that shown
+  in Figure~\ref{fig:rdouble_nophenyls}. R-double does not appear without the influence of the
+  head groups. Water molecules must play a role in the structuring of the head groups since 
+  R-double does not appear in any dry simulations.
   
+%  Water causes the monomer head groups to restructure.   
+%  We confirmed that the reflection is 
+%  not caused by the water itself. We removed all water molecules from the trajectory and 
+%  showed that R-double is still present in the simulated diffraction pattern 
+%  (Figure~\ref{fig:rdouble_nowater}). We also confirmed that the tails are not responsible for
+%  R-double. R-double is not present when we remove all atoms except carbon atoms that make
+%  up the tails (Figure~\ref{fig:rdouble_tails}). It is clear that interactions between water
+%  and head groups causes them to restructure in a way that leads to R-double.
+  
+  
+  % BJC5: This figure may belong in supplemental
   \begin{figure}[!htb]
   \centering
-  \begin{subfigure}{0.32\textwidth}
+  \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{rdouble_offset_solvated_rzplot.png}
   \caption{Full system}\label{fig:rdouble_offset}
   \end{subfigure}
-  \begin{subfigure}{0.32\textwidth}
-  \includegraphics[width=\textwidth]{rdouble_nowater_rzplot.png}
-  \caption{Water removed}\label{fig:rdouble_nowater}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{nophenyls_rzplot.png}
+  \caption{Head groups removed}\label{fig:rdouble_nophenyls}
   \end{subfigure}
-  \begin{subfigure}{0.32\textwidth}
-  \includegraphics[width=\textwidth]{rdouble_tails_only_rzplot.png}
-  \caption{Tails only}\label{fig:rdouble_tails}
-  \end{subfigure}
+%  \begin{subfigure}{0.32\textwidth}
+%  \includegraphics[width=\textwidth]{rdouble_tails_only_rzplot.png}
+%  \caption{Tails only}\label{fig:rdouble_tails}
+%  \end{subfigure}
   \caption{The structure of the head groups is responsible for the appearance of
-  R-double in (a). Removing water from the trajectory (b) results in a simulated 
-  diffraction pattern nearly identical to that in (a). R-double is not present
-  when we simulate the diffraction pattern of system where only tails are present. 
-  (c)}\label{fig:rdouble_origin}
+  R-double in (a). Removing head groups from the trajectory results in a simulated 
+  diffraction pattern that does not show R-double (b)}\label{fig:rdouble_origin}
   \end{figure}
 
-  The appearance of R-double may be due to increased order of the pores. The first
-  peak of the correlation function, $g(z)$, is approximately 30 \% larger in the 
-  solvated versus dry configuration (Figure~\ref{fig:solvated_correlation_overlay}).
-  Based on the peak locations, it is evident that the head groups stack closer 
-  together in the solvated configuration which may play a role in enforcing order.
-  This may be in part due to swelling of the pores. In 
-  Figure~\ref{fig:head_group_density_overlay} there is a clear decrease in 
-  head group density within 0.4 nm of the pore center. Water molecules may swell 
-  the pores and hydrogen bond with monomer head groups, tethering the monomers 
-  closer together. If this is the case, then it implies that R-double has always
-  been at least weakly present in the simulated diffraction patterns, but may 
-  have been buried by noise.
- 
+  When two vertically stacked monomer head groups hydrogen bond with a shared water 
+  molecule, the monomers are drawn closer together (as illustrated in 
+  Figure~\ref{fig:hbond_visualization}), which creates an asymmetry that allows 
+  R-double to appear. If a monomer head group shares a hydrogen bonded water molecule
+  with a head group below itself, it will be less likely to share a water molecule 
+  with a head group above it due to steric constraints. The monomer head group above
+  can just as easily share a water molecule with a head group above itself. In this scenario,
+  the centers of each group are 2 times the $\pi$-stacking distance apart which would
+  lead to R-double (much like the configuration in Figure~\ref{fig:staggered}). There are
+  a modest number of occurences of this scenario, shown in Figure~\ref{fig:pore_hbonds}. 
+  Peaks in the distributions represent the scenario where a monomer head group shares a 
+  water molecule with a head group vertically above it. In Figure~\ref{fig:pore_hbonds_ft},
+  we calculated the discrete fourier transform of the distributions which we used as a rough 
+  indicator of whether the head group arrangement will lead to R-double. We see the 
+  strongest indicator of asymmetric monomer stacking in Pore 1 where the peaks at 0.5
+  layers$^{-1}$ are clearly distinguished, meaning there is periodicity every two layers.
+  
+  \begin{figure}[!htb]
+  \centering
+  % BJC5: alt figure : hbonds_tails.png (a little more crowded, but gives more context
+  % to the floating head groups)
+  \includegraphics[width=0.5\textwidth]{hbonds_notails.png}
+  \caption{Monomer head groups that hydrogen bond with a shared water molecule are 
+  drawn closer together. Head groups with blue bonds were stacked above those 
+  with orange bonds in the initial configuration.}\label{fig:hbond_visualization}
+  \end{figure}
+  
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{solvated_correlation_overlay.png}
-  \caption{}\label{fig:solvated_correlation_overlay}
+  \includegraphics[width=\textwidth]{pore_hbonds.png}
+  \caption{}\label{fig:pore_hbonds}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{head_group_density_overlay.png}
-  \caption{}\label{fig:head_group_density_overlay}
+  \includegraphics[width=\textwidth]{pore_hbonds_ft.png}
+  \caption{}\label{fig:pore_hbonds_ft}
   \end{subfigure}
-  \caption{}\label{fig:rdouble_structuring}
+  \caption{(a) The average number of interlayer hydrogen bonds. Peaks indicate a 
+  shared hydrogen bonded water molecule between a monomer head group and that stacked
+  vertically above it. (b) }\label{fig:hbond_quantification}
   \end{figure}
+
+%  The appearance of R-double may be due to increased order of the pores. The first
+%  peak of the correlation function, $g(z)$, is approximately 30 \% larger in the 
+%  solvated versus dry configuration (Figure~\ref{fig:solvated_correlation_overlay}).
+%  Based on the peak locations, it is evident that the head groups stack closer 
+%  together in the solvated configuration which may play a role in enforcing order.
+%  This may be in part due to swelling of the pores. In 
+%  Figure~\ref{fig:head_group_density_overlay} there is a clear decrease in 
+%  head group density within 0.4 nm of the pore center. Water molecules may swell 
+%  the pores and hydrogen bond with monomer head groups, tethering the monomers 
+%  closer together. If this is the case, then it implies that R-double has always
+%  been at least weakly present in the simulated diffraction patterns, but may 
+%  have been buried by noise.
+% 
+%  \begin{figure}[!htb]
+%  \centering
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\textwidth]{solvated_correlation_overlay.png}
+%  \caption{}\label{fig:solvated_correlation_overlay}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\textwidth]{head_group_density_overlay.png}
+%  \caption{}\label{fig:head_group_density_overlay}
+%  \end{subfigure}
+%  \caption{}\label{fig:rdouble_structuring}
+%  \end{figure}
   
 %  In all cases, water disrupts structuring of the model. When we add water to
 %  the system, the intensity of the reflections decrease. In systems built with 5
@@ -2490,10 +2538,9 @@ liquid crystal membranes}
 
   \subsection{Model Ionic Conductivity Measurements}
  
-  %BJC5: probably should show solvated system measurements
-  % 1 wt % water, parallel displaced, ordered basin
-  % Nernst Einstein : (6.52 +/- 0.04) e-05 S/m
-  % Collective Diffusion : (20.6 +/- 9.8) e-05 S/m
+  %BJC5: which system should I study here? I wrote this before the solvated
+  % system showed R-double. It might make sense to study the solvated system for ionic
+  % conductivity and cross-linking.
    
   We used equilibrated systems in the ordered pore basin to calculate ionic 
   conductivity since we believe their structures are the closest match to

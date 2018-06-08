@@ -74,10 +74,11 @@ def extract_last_trr(filename, tpr):
     else:
         print('Incompatible Filetype')
 
+
 if __name__ == "__main__":
     args = initialize()
     # last = file_rw.last_frame('%s' % args.traj, '%s' % args.gro)
     t = md.load('%s' % args.traj, top='%s' % args.gro)
-    last = t.slice(-2)
+    last = t.slice(842)
     file_rw.write_gro(last, args.out)
     # need gro writing function

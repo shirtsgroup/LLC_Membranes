@@ -626,8 +626,8 @@ if __name__ == "__main__":
             zlim = 2.5
         else:
             averaged, rfin, zfin = angle_average(freq_x, freq_y, freq_z, fft)
-            xlim = 4
-            zlim = 4
+            xlim = .4
+            zlim = .4
             # if rfin[-1] > xlim:
             #     r_lower_limit = np.where(freq_x < -xlim)[0][-1] + 1
             #     r_upper_limit = np.where(freq_x > xlim)[0][0] - 1
@@ -636,7 +636,7 @@ if __name__ == "__main__":
             #     MAX = np.amax(averaged[r_lower_limit:r_upper_limit, z_lower_limit:z_upper_limit])
             # else:
             #     MAX = np.amax(averaged)
-        # MAX = np.amax(averaged)
+            MAX = np.amax(averaged)
 
         MIN = np.amin(averaged)
 

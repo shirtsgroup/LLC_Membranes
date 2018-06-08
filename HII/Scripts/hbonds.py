@@ -63,6 +63,12 @@ class System(object):
         self.pos = self.t.xyz  # positions of all atoms
         self.hbonds = []  # will hold h-bonds for each frame [D, H, A, angle]
 
+        # for hbond_pairing
+        # self.nwater = 0
+        # self.nres = 0
+        # self.water_numbers = None
+        # self.residue_numbers = None
+
         # system definitions
         self.names = []
         for a in self.t.topology.atoms:
@@ -146,12 +152,13 @@ class System(object):
 
             Aindex = np.array(self.A)[distance_eligible % L]  # indices of distance eligible acceptor atoms
             Dindex = np.array(self.D)[distance_eligible // L]  # indices of distance eligible donor atoms
-            Hindex = np.array(self.H)[distance_eligible // L]  # H atoms attached to eligibe donors
+            Hindex = np.array(self.H)[distance_eligible // L]  # H atoms attached to eligible donors
 
             self.hbonds.append(np.reshape(np.concatenate((Dindex, Hindex, Aindex)), (3, len(Aindex))))
 
             # calculate vectors
             v = np.zeros([2, len(Aindex), 3])
+
             v[0, ...] = self.pos[i, self.hbonds[i][1, :], :] - self.pos[i, self.hbonds[i][0, :], :]  # D-H vectors
             v[0, ...] /= np.linalg.norm(v[0, ...], axis=1)[:, np.newaxis]  # normalize (need to, to get correct angle)
             v[1, :] = self.pos[i, self.hbonds[i][2, :], :] - self.pos[i, self.hbonds[i][1, :], :]  # H-A vectors
@@ -179,6 +186,40 @@ class System(object):
             plt.savefig(savename)
         if show:
             plt.show()
+
+    def number_water_molecules(self):
+        """
+        A specific form of number_residues funtion (below)
+        :return:
+        """
+        water_numbers = {}
+        nwater = 0
+
+        atoms = 1
+        for a in self.t.topology.atoms:
+            if a.residue.name == 'HOH':
+                water_numbers[a.index] = nwater
+                if atoms % 3 == 0:
+                    nwater += 1
+                atoms += 1
+
+        return water_numbers
+
+    def number_residues(self, res):
+
+        residue_numbers = {}
+        nres = 0
+
+        residue = Residue(res)
+        atoms = 1
+        for a in self.t.topology.atoms:
+            if a.residue.name == 'HII':
+                residue_numbers[a.index] = nres
+            if atoms % residue.natoms == 0:
+                nres += 1
+            atoms += 1
+
+        return residue_numbers, nres
 
 
 class Residue(object):

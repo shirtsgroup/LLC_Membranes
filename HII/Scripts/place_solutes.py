@@ -291,8 +291,9 @@ class Solvent(object):
         :return:
         """
 
+        # p = placement_point - (solute.com - solute.xyz[0, 0, :])  # want to move com to placement point
         #solute_positions = random_orientation(solute.xyz[0, ...], solute.xyz[0, 0, :] - solute.xyz[0, 1, :], placement_point)  # to be fixed in THE FUTURE
-        solute_positions = transform.translate(solute.xyz[0, :, :], solute.xyz[0, 0, :], placement_point)  # translate solute to placement point
+        solute_positions = transform.translate(solute.xyz[0, :, :], solute.com, placement_point)  # translate solute to placement point
         self.positions = np.concatenate((self.positions, solute_positions))  # add to array of positions
         self.residues += solute.residues  # add solute residues to list of all residues
         self.names += solute.names  # add solute atom names to list of all names
@@ -302,7 +303,7 @@ class Solvent(object):
         file_rw.write_gro_pos(self.positions, self.intermediate_fname, box=self.box_gromacs, ids=self.names, res=self.residues)
 
         if freeze:
-            self.freeze_ndx(placement_point, rem)
+            self.freeze_ndx(solute_placement_point=placement_point, res=solute.resname)
 
         nrg = self.energy_minimize(self.em_steps, freeze=freeze)
 
@@ -334,7 +335,8 @@ class Solvent(object):
 
         if not self.pore_spline:
             ref = [a.index for a in self.t.topology.atoms if a.name in ref]
-            self.pore_spline = trace_pores(self.positions[ref, :], self.box_vectors[:2, :2], layers)
+        # redo each time because positions change slightly upon energy minimization
+        self.pore_spline = trace_pores(self.positions[ref, :], self.box_vectors[:2, :2], layers)
 
         for i in tqdm.tqdm(range(pores)):
             placement_point = placement(z, self.pore_spline[i * layers: (i + 1) * layers, :], self.box_vectors[:2, :2])
@@ -366,6 +368,12 @@ class Solvent(object):
                               stderr=subprocess.STDOUT)  # run energy minimization
         p2.wait()
 
+        p3 = subprocess.Popen(["cp", "em.gro", "%s" % self.intermediate_fname])
+        p3.wait()
+
+        # update positions
+        self.positions = md.load('%s' % self.intermediate_fname).xyz[0, :, :]
+
         nrg = subprocess.check_output(
             ["awk", "/Potential Energy/ {print $4}", "em.log"])  # get Potential energy from em.log
 
@@ -375,17 +383,23 @@ class Solvent(object):
             return 0  # If the system did not energy minimize, the above statement will not work because nrg will be an
             # empty string. Make nrg=0 so placement gets attempted again
 
-    def freeze_ndx(self, solute_placement_point, rem):
+    def freeze_ndx(self, solute_placement_point=None, rem=None, res=None):
         """
         Write an index file for atoms to be frozen
         :param solute_placement_point: xyz position of where water molecule was placed
         :param rem: spherical radius measured from water molecule placement point outside which all atoms will be frozen
+        :param res: freeze this residue and no other atoms (can be combined with rem option)
         :return: index file with indices of atoms to be frozen
         """
 
-        pts = spatial.cKDTree(self.positions).query_ball_point(solute_placement_point, rem)
-
-        freeze_indices = [a.index for a in self.t.topology.atoms if a.index not in pts]
+        freeze_indices = []
+        if rem:
+            pts = spatial.cKDTree(self.positions).query_ball_point(solute_placement_point, rem)
+            freeze_indices = [a.index for a in self.t.topology.atoms if a.index not in pts]
+        elif res:
+            freeze_indices += [a for a in range(len(self.residues)) if self.residues[a] == res]
+        else:
+            print('WARNING: No valid options supplied in order to determine freeze indices. Specify rem or res.')
 
         with open('freeze_index.ndx', 'w') as f:
 
@@ -515,14 +529,14 @@ class Solute(object):
             self.names = [a.name for a in t.topology.atoms]
             self.xyz = t.xyz
 
-            self.com = np.zeros([3])  # center of mass of solute
-            for i in range(self.xyz.shape[1]):
-                self.com += self.xyz[0, i, :]
-            self.com /= self.xyz.shape[1]
-
             self.mw = 0  # molecular weight (grams)
             for a in t.topology.atoms:
                 self.mw += Atom_props.mass[a.name]
+
+            self.com = np.zeros([3])  # center of mass of solute
+            for i in range(self.xyz.shape[1]):
+                self.com += self.xyz[0, i, :] * Atom_props.mass[self.names[i]]
+            self.com /= self.mw
 
 
 if __name__ == "__main__":

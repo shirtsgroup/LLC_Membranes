@@ -50,7 +50,7 @@ if __name__ == "__main__":
         if args.residues:
             keep = [a.index for a in t.topology.atoms if a.residue.name not in args.residues]
         else:
-            keep = [a.index for a in t.topology.atoms if a.name not in args.atoms]
+            keep = [a.index for a in t.topology.atoms if a.name not in args.atoms or a.index < 13700]
     else:
         if args.residues:
             keep = [a.index for a in t.topology.atoms if a.residue.name in args.residues]
