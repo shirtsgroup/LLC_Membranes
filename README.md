@@ -5,3 +5,4 @@ Make sure to set your PYTHONPATH so that it includes the 'Scripts' and 'top' dir
 
 Other modules no included with anaconda that are needed:
 - mdtraj
+- tqdm
