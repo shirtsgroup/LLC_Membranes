@@ -175,14 +175,21 @@ class Umbrellas(object):
                 self.com_dist[i, :, j] = pullx[j].split()[1:]
         print('Done!')
 
+        colors = ['aqua', 'blue', 'coral', 'crimson', 'darkgreen', 'gold', 'lavender', 'magenta', 'orangered', 'plum',
+                  'teal', 'violet']
         self.centers = self.com_dist[:, :, 0]
-        for i in range(self.K):
-            plt.hist(self.com_dist[i, 0, :], bins=50)
-            plt.plot([self.centers[i, 0], self.centers[i, 0]], [0, 10000], '--', color='black')
-            print(np.mean(self.com_dist[i, 0, :]))
-            print(np.std(self.com_dist[i, 0, :]))
+        # for i in range(self.K):
+        #     plt.hist(self.com_dist[i, 0, :], bins=50, color=colors[i])
+        #     plt.plot([self.centers[i, 0], self.centers[i, 0]], [0, 20000], '--', color=colors[i])
+        #     # print(np.mean(self.com_dist[i, 0, :]))
+        #     # print(np.std(self.com_dist[i, 0, :]))
+
+        plt.hist(self.com_dist[3, 0, :], bins=50, color=colors[3])
+        plt.plot([self.centers[3, 0], self.centers[3, 0]], [0, 20000], '--', color=colors[3])
+        plt.title('k = 62.4')
+        print(np.std(self.com_dist[3, 0, :]))
         plt.show()
-        exit()
+
         self.N = np.zeros([self.K, self.nres], dtype=int)  # number of uncorrelated frames for each trajectory
         self.u_kn = np.zeros_like(self.com_dist)
         self.u_kln = np.zeros([self.nres, self.K, self.K, len(pullx)])

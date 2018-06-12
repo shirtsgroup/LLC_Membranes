@@ -27,13 +27,16 @@ def initialize():
     parser.add_argument('-f', '--frames', default=100, type=int, help='Number of simulation frames to record. Will '
                         'determine nstxout, nstvout, and nstfout. Which means they will have the same value')
     parser.add_argument('-dt', default=0.002, type=float, help='Simulation time step (ps)')
+    parser.add_argument('--mdp', action="store_true", help='Only write .mdp file. Do not create any configurations')
+    parser.add_argument('-k', '--force_constant', type=float, help='Override force constant calculation and manually set force '
+                                                       'constant (kJ / mol / nm^2)')
 
     args = parser.parse_args()
 
     return args
 
 
-def create_pull_groups(system, solute, layer, nlayers, pores, ref_resname='HII', out='index.ndx'):
+def create_pull_groups(system, solute, layer, nlayers, pores, ref_resname='HII', out='index.ndx', write=True):
     """
     :param system: object created by place_solutes.Solvent(). Will be used to make reference com groups
     :param solute: object created by place_solutes.Solute(). Will become a pull group
@@ -61,30 +64,31 @@ def create_pull_groups(system, solute, layer, nlayers, pores, ref_resname='HII',
     atoms_per_pore = len(ref_res) // pores
     atoms_per_layer = atoms_per_pore // nlayers
 
-    with open('%s' % out, 'a') as f:
-        for i in range(pores):
-            if i == 0:
-                f.write('[ %s ]\n' % ref_groups[i])
-            else:
-                f.write('\n[ %s ]\n' % ref_groups[i])
-            n = i * atoms_per_pore + (layer - 1)*atoms_per_layer
-            for j in range(n, n + atoms_per_layer):
-                if (j - n) % 10 == 0 and (j - n) != 0:
-                    f.write('%d\n' % (ref_res[j] + 1))  # GROMACS indexing starts at 1
+    if write:
+        with open('%s' % out, 'a') as f:
+            for i in range(pores):
+                if i == 0:
+                    f.write('[ %s ]\n' % ref_groups[i])
                 else:
-                    f.write('%d ' % (ref_res[j] + 1))
-            f.write('\n')  # space between sections
+                    f.write('\n[ %s ]\n' % ref_groups[i])
+                n = i * atoms_per_pore + (layer - 1)*atoms_per_layer
+                for j in range(n, n + atoms_per_layer):
+                    if (j - n) % 10 == 0 and (j - n) != 0:
+                        f.write('%d\n' % (ref_res[j] + 1))  # GROMACS indexing starts at 1
+                    else:
+                        f.write('%d ' % (ref_res[j] + 1))
+                f.write('\n')  # space between sections
 
-        # written as a separate loop purely for readability in the index file
-        for i in range(pores):
-            f.write('\n[ %s ]\n' % res_groups[i])
-            n = i * solute.natoms
-            for j in range(n, n + solute.natoms):
-                if (j - n) % 10 == 0 and (j - n) != 0:
-                    f.write('%d\n' % (system.positions.shape[0] + j + 1))  # GROMACS indexing starts at 1
-                else:
-                    f.write('%d ' % (system.positions.shape[0] + j + 1))
-            f.write('\n')
+            # written as a separate loop purely for readability in the index file
+            for i in range(pores):
+                f.write('\n[ %s ]\n' % res_groups[i])
+                n = i * solute.natoms
+                for j in range(n, n + solute.natoms):
+                    if (j - n) % 10 == 0 and (j - n) != 0:
+                        f.write('%d\n' % (system.positions.shape[0] + j + 1))  # GROMACS indexing starts at 1
+                    else:
+                        f.write('%d ' % (system.positions.shape[0] + j + 1))
+                f.write('\n')
 
     return ref_groups, res_groups
 
@@ -95,15 +99,21 @@ if __name__ == "__main__":
 
     os.environ["GMX_MAXBACKUP"] = "-1"
 
-    kb = 1.381e-23 * 6.022e23 / 1000  # boltzmann constant kJ/(mol*K)
-    beta = 1 / (kb * args.temp)  # mol / kJ
-    force_constant = 1 / (beta * args.spacing ** 2)  # kJ / (mol*nm^2) -- force constant given a desired RMSD
+    if args.force_constant:
+        force_constant = args.force_constant
+    else:
+        kb = 1.381e-23 * 6.022e23 / 1000  # boltzmann constant kJ/(mol*K)
+        beta = 1 / (kb * args.temp)  # mol / kJ
+        force_constant = 1 / (beta * args.spacing ** 2)  # kJ / (mol*nm^2) -- force constant given a desired RMSD
 
     system = place_solutes.Solvent(args.gro)  # system to which to add solute
     solute = place_solutes.Solute(args.solute)  # object with all relevant solute properties
 
-    # create index groups
-    ref_groups, res_groups = create_pull_groups(system, solute, args.ref, args.layers, args.pores)  # create index file with pull groups
+    # create index file with pull groups
+    write = True
+    if args.mdp:
+        write = False
+    ref_groups, res_groups = create_pull_groups(system, solute, args.ref, args.layers, args.pores, write=write)
 
     # create .mdp file
     nst = int((args.sim_length / args.dt) / args.frames)
@@ -111,7 +121,10 @@ if __name__ == "__main__":
                                nstfout=nst)
     mdp.write_npt_mdp(out='pull')  # will write pull.mdp for an npt simulation (no pull parameters added yet)
     mdp.add_pull_groups(ref_groups, res_groups, force_constant, 0, 'pull.mdp')  # add pull parameters to pull.mdp
-    exit()
+
+    if args.mdp:
+        exit()
+
     # place solutes
     zbox = system.box_vectors[2, 2]
     z = np.linspace(zbox * args.frac, zbox*args.frac + args.n_configs*args.spacing - args.spacing, args.n_configs)

@@ -420,47 +420,47 @@ if __name__ == "__main__":
 
         if args.fit:
             start = 5  # discard data points up to start.
-            #Fit decaying exponential to peaks of oscillating correlation function
-            peaks = detect_peaks.detect_peaks(zdf, mpd=12, show=False)  # adjust mpd if number of peaks comes out wrong
-            if args.offset:
-                peaks = peaks[1::2]  # every other peak starting at the second peak
-            peaks = [  9,  29,  51,  73,  101, 125, 143, 173]  # layered 300K ordered
-            # peaks = [32, 78, 125, 165]  # offset 300K
-            # peaks = [31, 77, 119, 162]  # offset 280K
-            # peaks = [10, 30, 58, 80, 100, 118, 138, 157]  # layered 300K disordered
-            #peaks = [33, 82, 115, 148]  # offset 300K disordered
-            # peaks = [32, 82, 133]  # disorder offset
-            print(peaks)
-            # if len(peaks) > 4:
-            #     peaks = peaks[:4]
-
-            plt.scatter(centers1[peaks], zdf[peaks], marker='+', c='r', s=200, label='Peak locations')
-
-            period = 0.438
-            p = np.array([2, 10])  # initial guess at parameters
-            bounds = ([0, 0], [np.inf, np.inf])
-            solp, cov_x = curve_fit(exponential_decay, centers1[peaks], zdf[peaks], p, bounds=bounds)
-
-            # plt.plot(centers1[start:], 1 + solp[0]*np.exp(-centers1[start:]/solp[1]))
-
-            plt.plot(centers1[start:], exponential_decay(np.array(centers1[start:]), solp[0], solp[1]), '--',
-                     color='black', label='Least squares fit')
-            print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*solp[1], 10*np.sqrt(cov_x[1, 1])))
+            # #Fit decaying exponential to peaks of oscillating correlation function
+            # peaks = detect_peaks.detect_peaks(zdf, mpd=12, show=False)  # adjust mpd if number of peaks comes out wrong
+            # if args.offset:
+            #     peaks = peaks[1::2]  # every other peak starting at the second peak
+            # peaks = [  9,  29,  51,  73,  101, 125, 143, 173]  # layered 300K ordered
+            # # peaks = [32, 78, 125, 165]  # offset 300K
+            # # peaks = [31, 77, 119, 162]  # offset 280K
+            # # peaks = [10, 30, 58, 80, 100, 118, 138, 157]  # layered 300K disordered
+            # #peaks = [33, 82, 115, 148]  # offset 300K disordered
+            # # peaks = [32, 82, 133]  # disorder offset
+            # print(peaks)
+            # # if len(peaks) > 4:
+            # #     peaks = peaks[:4]
+            #
+            # plt.scatter(centers1[peaks], zdf[peaks], marker='+', c='r', s=200, label='Peak locations')
+            #
+            # period = 0.438
+            # p = np.array([2, 10])  # initial guess at parameters
+            # bounds = ([0, 0], [np.inf, np.inf])
+            # solp, cov_x = curve_fit(exponential_decay, centers1[peaks], zdf[peaks], p, bounds=bounds)
+            #
+            # # plt.plot(centers1[start:], 1 + solp[0]*np.exp(-centers1[start:]/solp[1]))
+            #
+            # plt.plot(centers1[start:], exponential_decay(np.array(centers1[start:]), solp[0], solp[1]), '--',
+            #          color='black', label='Least squares fit')
+            # print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*solp[1], 10*np.sqrt(cov_x[1, 1])))
 
             # # fit decaying sinusoidal function to data
-            # p = [2.5, 0.45, np.pi, 0.5]  # amplitude, period, phase shift, correlation length. Pick values above what is expected
-            # bounds = ([0, 0.4, 0, 0.4], [np.inf, 0.5, np.inf, np.inf])  # bounds on fit parameters
-            #
-            # solp, pcov = curve_fit(sinusoidal_decay, centers1[start:], zdf[start:], p, bounds=bounds)
-            # print(solp)
-            # # plot fit
-            # plt.plot(centers1[start:], sinusoidal_decay(centers1[start:], solp[0], solp[1], solp[2], solp[3]), '--',
-            #          c='black', label='Least squares fit')
-            #
-            # # plt.plot(centers1[start:], 1 + solp[0]*np.exp(-centers1[start:]))
-            #
-            # print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*solp[3], 10*np.sqrt(pcov[3, 3])))
-            # print('Oscillation Period = %1.3f +/- %1.3f angstroms' % (10*solp[1], 10*np.sqrt(pcov[1, 1])))
+            p = [2.5, 0.45, np.pi, 0.5]  # amplitude, period, phase shift, correlation length. Pick values above what is expected
+            bounds = ([0, 0.45, 0, 0.4], [np.inf, 0.6, np.inf, np.inf])  # bounds on fit parameters
+
+            solp, pcov = curve_fit(sinusoidal_decay, centers1[start:], zdf[start:], p, bounds=bounds)
+            print(solp)
+            # plot fit
+            plt.plot(centers1[start:], sinusoidal_decay(centers1[start:], solp[0], solp[1], solp[2], solp[3]), '--',
+                     c='black', label='Least squares fit')
+
+            # plt.plot(centers1[start:], 1 + solp[0]*np.exp(-centers1[start:]))
+
+            print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*solp[3], 10*np.sqrt(pcov[3, 3])))
+            print('Oscillation Period = %1.3f +/- %1.3f angstroms' % (10*solp[1], 10*np.sqrt(pcov[1, 1])))
 
         plt.xlabel('Z distance separation (nm)', fontsize=14)
         plt.ylabel('Count', fontsize=14)

@@ -40,6 +40,8 @@ while getopts "c:t:g:d:s:x:f:m:C:p:M:i:S:E:T:" opt; do
     esac
 done
 
+export GMX_MAX_BACKUP=-1
+
 if [ ${ITERATION} != 0 ]; then
     ITERATION=$((ITERATION-1))
     XLINKS=$(tail xlink_${ITERATION}.log -n 2 | head -n 1 | cut -c 19-22)
@@ -78,10 +80,10 @@ while [ ${STOP} -eq 0 ]; do
     STOP=$(tail -n 1 xlink_${ITERATION}.log | cut -c 26)
     ITERATION=$((ITERATION+1))
     echo ${TERM}
-    files=$(ls ./\#*.cache 2> /dev/null | wc -l)
-    if [ **"$files" != "0"** ]; then
-        rm \#*
-    fi
+#    files=$(ls ./\#*.cache 2> /dev/null | wc -l)
+#    if [ **"$files" != "0"** ]; then
+#        rm \#*
+#    fi
 done
 
 xlink.py -i ${GRO} -c ${CUTOFF}  -e ${TERM_PROB} -r ${ITERATION} -d ${CUTOFF_RAD} -y crosslinked_new.itp -x ${XLINKS} -S 'yes' --nogap

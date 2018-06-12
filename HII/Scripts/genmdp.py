@@ -286,8 +286,10 @@ class SimulationMdp(object):
                 f.write('pull-coord%d-geometry = %s\n' % (num, geometry))
                 f.write('pull-coord%d-dim = %s\n' % (num, dim))
                 f.write('pull-coord%d-groups = %d %d\n' % (num, n + i + 1, num))
-                f.write('pull-coord%d-rate = %.1f\n' % (num, rate))
-                f.write('pull-coord%d-k = %.1f\n' % (num, k))
+                f.write('pull-coord%d-rate = %.1f\n' % (num, rate))  # pull rate
+                f.write('pull-coord%d-k = %.1f\n' % (num, k))  # set harmonic force constant
+                f.write('pull-coord%d-start = yes\n' % num)  # important so that com distance is maintained
+                f.write('\n')  # space between groups for clarity
             for i, x in enumerate(ref_groups):
                 f.write('pull-group%d-name = %s\n' % (n + i + 1, x))
 
