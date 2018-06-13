@@ -127,14 +127,14 @@ if __name__ == "__main__":
     fig1, ax1 = plt.subplots(2, 2)
     for i in range(2):
         for j in range(2):
-            ax1[i, j].plot(np.linspace(0, nlayers - 1, nlayers), np.mean(inter[(2*i + j)*nlayers:(2*i + j + 1)*nlayers, :], axis=1), linewidth=2)
+            ax1[i, j].plot(np.linspace(1, nlayers, nlayers), np.mean(inter[(2*i + j)*nlayers:(2*i + j + 1)*nlayers, :], axis=1), linewidth=2)
             ax1[i, j].text(.5, .85, 'Pore %d' % (1 + j + 2 * i), horizontalalignment='center', transform=ax1[i, j].transAxes, fontsize=14)
             ax1[i, j].set_ylim(0, 1)
 
     ax1[1, 0].set_xlabel('Layer', fontsize=14)
     ax1[1, 1].set_xlabel('Layer', fontsize=14)
-    ax1[0, 0].set_ylabel('Average interlayer\n hbonds', fontsize=14)
-    ax1[1, 0].set_ylabel('Average interlayer\n hbonds', fontsize=14)
+    ax1[0, 0].set_ylabel('Average shared\n hbonds', fontsize=14)
+    ax1[1, 0].set_ylabel('Average shared\n hbonds', fontsize=14)
 
     plt.tight_layout()
     plt.savefig('pore_hbonds.png')

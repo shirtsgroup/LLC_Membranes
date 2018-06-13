@@ -1282,6 +1282,7 @@ We generated simulated patterns using the extended simulation trajectories.
 	In all cases, R-double is not present.}~\label{fig:XRDsim} 
         %MRS7: may need to make clearer the differences between the simulated structures. I think its worth pointing out
         %that although rdouble isn't there, for the more structured ones, there is a 7.4 band, even if it disappears at q=0.
+        %BJC6: 7.4 band is any parallel displaced configuration, not more structured systems.
   \end{figure}
   
   The simulated XRD patterns show moderate qualitative agreement with experiment. R-alkanes and
@@ -1350,6 +1351,7 @@ We generated simulated patterns using the extended simulation trajectories.
   \end{table}
   %BJC5: Bold font is caused by achemso document type
   %MRS7: huh.
+  %BJC6: yea, specifically the one for j phys chem B. I compiled with a different document type and the captions looked normal
   There are clear differences between simulated and experimental results that must be addressed
   and justified. We will explore the possible origin of each experimental reflection and form 
   structural hypotheses related to their appearance in our simulated patterns. Specifically, we 
@@ -1481,6 +1483,13 @@ We generated simulated patterns using the extended simulation trajectories.
 
   \subsubsection{Origin of R-spots}\label{section:rspots}
 
+  In order to more clearly study R-spots, we equilibrated an ordered basin sandwiched 
+  configuration at 280K. Obtaining an equilibrium structure at a precise temperature is
+  a challenge that force fields often fail to overcome. Wang et al. highlighted the 
+  shortcoming of some of the most popular protein force field in predicting the temperature
+  dependence of protein structural ensembles \cite{wang_building_2017}. It is possible that   % page 12
+  our membrane system, simulated at 300K, does not fully represent the true structure at 300K.
+  
   We observe an increase in the intensity of R-spots when we simulate systems at 280K. R-spots
   is most intense in the ordered basin sandwiched configuration (Figure~\ref{fig:sandwiched280K}). 
   The relative intensity of R-spots is slightly higher than in experiment (1.5 vs. 1.3). R-double 
@@ -1548,6 +1557,22 @@ We generated simulated patterns using the extended simulation trajectories.
 %  sit between tails of vertically stacked monomers rather than stacking directly
 %  on top of them (Figure~\ref{fig:hex_tails}). This type of packing has been seen
 %  before in XRD studies of hydrocarbon chains~\cite{small_lateral_1984}.
+
+% BJC6 : added better justification to beginning of section
+%  %MRS7: couple -> ``two main''?
+%%MRS7: what is the purpose of this paragraph?  I think most people would know why a lower T simulation would be more ordered (though the degree is not known).
+%  There are two reasons why we see stronger ordered chain packing at 280 K compared to
+%  experimental conditions of 300 K.
+%  \begin{enumerate}
+%  		\item The difference between 280 K and 300 K is relatively small. Our forcefield parameters
+%  		may not correctly model the behavior of the tails at 300 K (citation?).
+%                % look for papers on protien folding temperature dependence: see Lee-Ping Wang's AMBER-15fb paper
+%  		\item Monomers aren't as confined at 300 K in our simulations versus experiment.
+%  		If the head groups packed 3.7 \AA~apart, the tails would be more confined and forced
+%  		to pack between vertically adjacent monomer tails. In our case, the tail region is
+%  		less dense than experiment which gives the tails freedom to organize in a more
+%  		entropically favored disordered state. 
+%  \end{enumerate}
 
 %MRS7: a thought - moving some of figures 10,11,12 together with some subfigures, since they all communicate the same idea.
 %11a is probably unneeded.
@@ -1655,28 +1680,25 @@ We generated simulated patterns using the extended simulation trajectories.
 %		layers.}~\label{fig:hex_tails}
 %  \end{figure}
 
-%MRS7: couple -> ``two main''?
-%MRS7: what is the purpose of this paragraph?  I think most people would know why a lower T simulation would be more ordered (though the degree is not known).
-  There are two reasons why we see stronger ordered chain packing at 280 K compared to
-  experimental conditions of 300 K.
-  \begin{enumerate}
-  		\item The difference between 280 K and 300 K is relatively small. Our forcefield parameters
-  		may not correctly model the behavior of the tails at 300 K (citation?).
-                % look for papers on protien folding temperature dependence: see Lee-Ping Wang's AMBER-15fb paper
-  		\item Monomers aren't as confined at 300 K in our simulations versus experiment.
-  		If the head groups packed 3.7 \AA~apart, the tails would be more confined and forced
-  		to pack between vertically adjacent monomer tails. In our case, the tail region is
-  		less dense than experiment which gives the tails freedom to organize in a more
-  		entropically favored disordered state. 
-  \end{enumerate}
-
   \subsubsection{Discrepancies between experimental and simulated R-$\pi$}\label{section:rpi}
   
-%MRS7: not a strong thesis sentence. 
-  We plotted the one-dimensional pair distribution function, $g(z)$, for the centers
-  of mass of monomer phenyl rings (Figure~\ref{fig:correlation}). We used this 
-  information to understand how far apart monomers stack within monomer columns and
-  the degree to which they are correlated.
+  There is not a single reason for the high intensity of R-$\pi$ in our simulations.
+  We used one-dimensional pair distribution functions of the centers of masses of monomer
+  phenyl groups, $g(z)$, to help us understand how far apart monomers stack within monomer 
+  columns and the degree to which they are correlated. These metrics helped us disect the 
+  various contributions to R-$\pi$. Figure ~\ref{fig:correlation} shows $g(z)$ for all 
+  systems tested. 
+  
+%  The first peak of $g(z)$ is larger in the ordered
+%  basin systems compared to those in the disordered basin. This observation is indicative
+%  of a higher degree of local ordering in the ordered basin systems which causes an
+%  increase in the intensity of R-$\pi$.
+  
+  %MRS7: not a strong thesis sentence.
+%  We plotted the one-dimensional pair distribution function, $g(z)$, for the centers
+%  of mass of monomer phenyl rings (Figure~\ref{fig:correlation}). We used this 
+%  information to understand how far apart monomers stack within monomer columns and
+%  the degree to which they are correlated.
   
   \begin{figure}[!htb]
   \centering
@@ -1737,23 +1759,37 @@ We generated simulated patterns using the extended simulation trajectories.
   stack closer together. Additionally, it is possible that the tails prevent close stacking of
   monomer head groups and we do not achieve the timescales necessary for them to rearrange into
   a necessarily more tightly packed configuration. Ordered basin systems are likely the best 
-  choice for transport studies.
+  choice for transport studies. 
+  
+  %We expect that when monomers stack closer together, steric clashes
+  %force head groups to orient in a more ordered fashion. If head groups in our model stayed 3.7 \AA
+  %apart, we may actually see higher values of R-$\pi$ due to enhance order.
   
 %MRS7: other hypothesis about stacking that comes from Matt's implications is that it may have to do with
 %tail entropy, and for some reason ours is frozen in a configuration that is a bit too far apart. I see you talk about this later, but might need to be brought up again.
 %BJC6: tried to work that in a bit. But as you say, there is more about this point later. I could reference it here.
 
-  The correlation length between stacked monomer head groups of the ordered systems also show
-  closer agreement with experiment (Table~\ref{table:correlation_length}). We calculated the 
+  The correlation length of the parallel displaced, ordered basin system shows
+  the closest agreement with experiment (Table~\ref{table:correlation_length}). We calculated the 
   correlation length of each system using Equation~\ref{eqn:decaying_exponential}. We could
   not extract a reliable correlation length from the disordered parallel displaced configuration
-  since the peaks do not show clear patterns than can easily be fit to exponential decay.
+  since the peaks do not show clear patterns that can easily be fit to exponential decay. The 
+  correlation length of both sandwiched systems is relatively low because the height of the first
+  peak of $g(z)$ is so high. The peak height indicates the degree of local ordering and influences
+  the intensity of R-$pi$. If vertically adjacent sandwiched head groups were less ordered, which
+  might be achieved with much longer simulations, then the leading peak intensity should decrease and
+  the correlation length would increase. We expect that the leading peak would only get more intense 
+  if monomers stacked 3.7 \AA apart. Conversely, parallel displaced head groups are not as confined
+  by their vertically adjacent neighbors. This z-direction translational freedom may still be 
+  feasible if monomers stack 3.7 \AA apart in a parallel displaced configuration.
+  
   %The amount of noise in the correlation function and the lack of an initial peak suggests that 
   %the correlation length is less than $\mathit{d}_{equil}$.
-  In general, we see that correlation length increases as monomers stack closer together. The same
-  trend has been seen in molecular dynamics studies of polymer fluids~\cite{koshy_density_2003}.
-  We hypothesize that the correlation length of the sandwiched configuration would increase to a
-  value near experiment if monomers packed closer together. 
+  %BJC6: not supported by data vv
+%  In general, we see that correlation length increases as monomers stack closer together. The same
+%  trend has been seen in molecular dynamics studies of polymer fluids~\cite{koshy_density_2003}.
+%  We hypothesize that the correlation length of the sandwiched configuration would increase to a
+%  value near experiment if monomers packed closer together. 
   
   The persistent oscillatory behavior of the correlation function may in part explain the high
   intensity of R-$\pi$ relative to experiment. The way we calculate correlation length is
@@ -1763,7 +1799,7 @@ We generated simulated patterns using the extended simulation trajectories.
   the correlation length could remain nearly the same, but R-$\pi$ would have a reduced intensity. 
   The monomer head groups in our simulations do not move enough to create the noise which would 
   cause such behavior. See Section S\ref{S-section:rpi_ft} of the supporting information for
-  illustrative examples. 
+  illustrative examples.
   
   The system size does not significantly alter the intensity of R-$\pi$. We equilibrated a 
   sandwiched system with twice as many monomers per column so that the system size doubled in 
@@ -1774,34 +1810,37 @@ We generated simulated patterns using the extended simulation trajectories.
   %MRS7: question - pushing Matt on this, he seemed to imply that the high value of the peaks indicated large
   %LOCAL ordering, and that defects/misaligned pores would give rise to BROADENING, but wouldn't change the 
   %intensity of the peaks that much.  If so, this isn't a great explanation. 
-  The simulated intensity of R-$\pi$ is also more intense than experiment because our system
-  models near-perfectly straight pores with no defects. Nearly all of the intensity in 
-  R-$\pi$ of our simulated patterns is concentrated at a single point. Figure~\ref{fig:simulated_adjusted_colorbar}
-  shows the simulated pattern of the ordered sandwiched configuration with the upper boundary
-  on the colorbar adjusted to be 6x higher than those shown in Figure~\ref{fig:XRDsim}. The only
-  distinguishable reflections are those of R-$\pi$ and R-pores. In the experimental pattern 
-  (Figure~\ref{fig:experimental_adjusted_colorbar}), the intensity is more evenly spread out
-  over all of R-$\pi$. 
+  %BJC6: worked this into other paragraphs. I find this paragraph awkward and the figure unnecessary.
+%  The simulated intensity of R-$\pi$ is also more intense than experiment due to strong local
+%  ordering. Nearly all of the intensity in R-$\pi$ of our simulated patterns is concentrated 
+%  at a single point. Figure~\ref{fig:simulated_adjusted_colorbar} shows the simulated pattern
+%  of the ordered sandwiched configuration with the upper boundary on the colorbar adjusted to
+%  be 6x higher than those shown in Figure~\ref{fig:XRDsim}. The only distinguishable reflections
+%  are those of R-$\pi$ and R-pores. In the experimental pattern 
+%  (Figure~\ref{fig:experimental_adjusted_colorbar}), the intensity is more evenly spread out
+%  over all of R-$\pi$. 
   % BJC5: I'm not sure how well supported the above paragraph is by the below figure. Need to figure 
   % out what to do about it
   % BJC5: Could it also be related to noise in xy direction?
   % BJC5 : I think my original intent was to explain it as tortuosity. But it's not clear if the
   % reflection is arced
   
-  \begin{figure}
-  \centering
-  \begin{subfigure}{0.4\textwidth}
-	  \includegraphics[width=\linewidth]{sandwich_rzplot_highlimit_cbar.png}
-	  \caption{}\label{fig:simulated_adjusted_colorbar}
-  \end{subfigure}
-  \begin{subfigure}{0.4\textwidth}
-	  \includegraphics[width=\linewidth]{WAXS_raw_adjusted_colorbar.png}
-	  \caption{}\label{fig:experimental_adjusted_colorbar}
-  \end{subfigure}
-  \caption{R-$\pi$ and R-pores are far more intense than the other major reflections in 
-  simulated diffraction patterns (a). Here, the colorbar was scaled so that the max is 6x
-  higher than all other plots.}\label{fig:intense_rpi}
-  \end{figure}
+  
+  %BJC6: not sure if this should go in supplemental
+%  \begin{figure}
+%  \centering
+%  \begin{subfigure}{0.4\textwidth}
+%	  \includegraphics[width=\linewidth]{sandwich_rzplot_highlimit_cbar.png}
+%	  \caption{}\label{fig:simulated_adjusted_colorbar}
+%  \end{subfigure}
+%  \begin{subfigure}{0.4\textwidth}
+%	  \includegraphics[width=\linewidth]{WAXS_raw_adjusted_colorbar.png}
+%	  \caption{}\label{fig:experimental_adjusted_colorbar}
+%  \end{subfigure}
+%  \caption{R-$\pi$ and R-pores are far more intense than the other major reflections in 
+%  the simulated diffraction patterns (a). Here, the colorbar was scaled so that the max is 6x
+%  higher than all other plots.}\label{fig:intense_rpi}
+%  \end{figure}
 
 % BJC5: this is no longer a section after reorganization
 %  \subsubsection{Layer partitioning}
@@ -2163,7 +2202,7 @@ We generated simulated patterns using the extended simulation trajectories.
   \end{subfigure}
   \begin{subfigure}{0.3\linewidth}
   	\centering
-  	\includegraphics[width=\textwidth]{solvated_pore_cross_section.png}
+  	\includegraphics[width=\textwidth]{solvated_pore_cross_section.png}  %BJC6: I can simplify this more (stacked monomers on each side with a few water molecules in between.
   	\label{fig:solvated_pore}
   \end{subfigure}
 %  \begin{subfigure}{0.3\linewidth}
@@ -2183,7 +2222,7 @@ We generated simulated patterns using the extended simulation trajectories.
   \end{subfigure}
   \begin{subfigure}{0.3\linewidth}
   	\centering
-  	\includegraphics[width=\textwidth]{rotated_monomers_rzplot_restrained.png}
+  	\includegraphics[width=\textwidth]{solvated_pore_rzplot_restrained.png}
   	\label{fig:solvated_pore_rzplot_restrained}
   \end{subfigure}
 %  \begin{subfigure}{0.3\linewidth}
@@ -2207,13 +2246,18 @@ We generated simulated patterns using the extended simulation trajectories.
   	\includegraphics[width=\textwidth]{solvated_offset_rzplot_1.png}
   	\caption{}\label{fig:solvated_pore_rzplot_norestraints}
   \end{subfigure}
-  \caption{R-double is present in all three initial configurations tested while the heavy atoms
-  in the headgroup are held in place with position restraints. R-double fades once 
-  the position restriants are released.}\label{fig:rdouble}
+  \caption{(a) When monomers are non-uniformly spaced (top), R-double appears if all heavy atoms
+  of the head groups are held in place with position restraints (middle). R-double quickly fades once 
+  the position restraints are released (bottom). (b) When monomer head groups are rotated with respect
+  to vertically adjacent monomers (top), R-double is visible while the heavy atoms of the head groups
+  are held in place with position restraints (middle). Again, R-double fades once the position 
+  restraints are released. (c) When we add 1 wt\% water to the parallel displaced configuration in the
+  ordered basin (top) R-double is not initially present during the restrained portion of equilibration (middle).
+  After 200 ns of equilibration, R-double becomes visible and persists for another 200 ns (bottom).}\label{fig:rdouble}
   \end{figure}
 
   R-double appears in the solvated system due to the structure of the head groups. To prove this,
-  we removed the head groups from the trajectory used to produce Figure~\ref{fig:solvation}a 
+  we removed the head groups from the trajectory used to produce Figure~\ref{fig:solvated_pore_rzplot_norestraints}
   in order to produce that shown in Figure~\ref{fig:rdouble_nophenyls}. R-double does not appear
   without the influence of the head groups. Water molecules must play a role in the structuring
   of the head groups since R-double does not appear in any dry simulations.
@@ -2222,11 +2266,11 @@ We generated simulated patterns using the extended simulation trajectories.
   molecule, the monomers are drawn closer together (as illustrated in 
   Figure~\ref{fig:hbond_visualization}), which creates an asymmetry that allows 
   R-double to appear. If a monomer head group shares a hydrogen bonded water molecule
-  with a head group below itself, it will be less likely to share a water molecule 
-  with a head group above it due to steric constraints. The monomer head group above
-  can just as easily share a water molecule with a head group above itself. In this scenario,
-  the centers of each group are 2 times the $\pi$-stacking distance apart which would
-  lead to R-double (much like the configuration in Figure~\ref{fig:staggered}). There are
+  with a head group above itself, it will be less likely to share a water molecule 
+  with a head group below it due to steric constraints. The monomer head group below
+  can just as easily share a water molecule with a head group below itself. In this scenario,
+  the centers of each pair are 2 times the $\pi$-stacking distance apart which would
+  lead to R-double (much like the configuration in Figure~\ref{fig:staggered_rzplot_norestraints}). There are
   a modest number of occurences of this scenario, shown in Figure~\ref{fig:pore_hbonds}. 
   Peaks in the distributions represent the scenario where a monomer head group shares a 
   water molecule with a head group vertically above it. In Figure~\ref{fig:pore_hbonds_ft},
@@ -2235,82 +2279,33 @@ We generated simulated patterns using the extended simulation trajectories.
   strongest indicator of asymmetric monomer stacking in Pore 1 where the peaks at 0.5
   layers$^{-1}$ are clearly distinguished, meaning there is periodicity every two layers.
   
-  The systems studied by Feng et al.\cite{feng_scalable_2014,feng_thin_2016} were not truly
-  thermotropic Col\textsubscript{h} phases. Rather, they were very low water content 
-  H\textsubscript{II} phases unintentionally created due to the neat monomers' hydroscopicity.
-  This detail may be important for reproducing the results of Feng et al.
+  It is likely that R-double originates from water molecules as described above and it is the 
+  only mechanism that occurred without using position restraints. The extent of the hydrogen
+  bonding network that forms is largely determined by the accuracy of the forcefield. It is 
+  possible that a more realistic forcefield would make the effect stronger or weaker. If 
+  this is truly the mechanism, it implies that the systems studied by Feng et 
+  al.\cite{feng_scalable_2014,feng_thin_2016} were not truly thermotropic Col\textsubscript{h}
+  phases. Rather, they were very low water content H\textsubscript{II} phases unintentionally
+  created due to the neat monomers' hydroscopicity. This detail may be important for reproducing
+  the results of Feng et al.
 
-%MRS7: probably want to say that this is a likely mechanism, if it can
-%occur with the given forcefield, since we had a hard time identifying any others. A more realistic forcefield
-% may make the effect stronger.
-
-  % Combine all of these figures
-%  \begin{figure}[!htb]
-%  \centering
-%  \begin{subfigure}{0.45\textwidth}
-%  \includegraphics[width=\textwidth]{rdouble_offset_solvated_rzplot.png}
-%  \caption{Full system}\label{fig:rdouble_offset}
-%  \end{subfigure}
-%  \begin{subfigure}{0.45\textwidth}
-%  \includegraphics[width=\textwidth]{nophenyls_rzplot.png}
-%  \caption{Head groups removed}\label{fig:rdouble_nophenyls}
-%  \end{subfigure}
-%  \caption{The structure of the head groups is responsible for the appearance of
-%  R-double in (a). Removing head groups from the trajectory results in a simulated 
-%  diffraction pattern that does not show R-double (b)}\label{fig:rdouble_origin}
-%  \end{figure}
-%  
-%  \begin{figure}[!htb]
-%  \centering
-%  % BJC5: alt figure : hbonds_tails.png (a little more crowded, but gives more context
-%  % to the floating head groups)
-%  \includegraphics[width=0.5\textwidth]{hbonds_notails.png}
-%  \caption{Monomer head groups that hydrogen bond with a shared water molecule are 
-%  drawn closer together. Head groups with blue bonds were stacked above those 
-%  with orange bonds in the initial configuration.}\label{fig:hbond_visualization}
-%  \end{figure}
-%  
-%  \begin{figure}[!htb]
-%  \centering
-%  \begin{subfigure}{0.45\textwidth}
-%  \includegraphics[width=\textwidth]{pore_hbonds.png}
-%  \caption{}\label{fig:pore_hbonds}
-%  \end{subfigure}
-%  \begin{subfigure}{0.45\textwidth}
-%  \includegraphics[width=\textwidth]{pore_hbonds_ft.png}
-%  \caption{}\label{fig:pore_hbonds_ft}
-%  \end{subfigure}
-%  %MRS7: add a bit more explanation - no description of discrete FT.
-%  \caption{(a) The average number of interlayer hydrogen bonds. Peaks indicate a 
-%  shared hydrogen bonded water molecule between a monomer head group and that stacked
-%  vertically above it. (b) }\label{fig:hbond_quantification}
-%  \end{figure}
-  
   \begin{figure}[!htb]
   \begin{subfigure}{0.45\textwidth}
   \centering
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{rdouble_offset_solvated_rzplot.png}
-  \caption{Full system}\label{fig:rdouble_offset}
-  \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
+  % BJC6 : below is the simulated diffraction pattern of the full system. I removed it since showing both
+  % makes both patterns small. You can see the full pattern in a separate figure.
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\textwidth]{rdouble_offset_solvated_rzplot.png}  
+%  \end{subfigure}
+  \begin{subfigure}{\textwidth}
   \includegraphics[width=\textwidth]{nophenyls_rzplot.png}
-  \caption{Head groups removed}\label{fig:rdouble_nophenyls}
   \end{subfigure}
-  \caption{}\label{fig:rdouble_origin}
-%  \caption{The structure of the head groups is responsible for the appearance of
-%  R-double in (a). Removing head groups from the trajectory results in a simulated 
-%  diffraction pattern that does not show R-double (b)}\label{fig:rdouble_origin}
+  \caption{}\label{fig:rdouble_nophenyls}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
   \centering
-  % BJC5: alt figure : hbonds_tails.png (a little more crowded, but gives more context
-  % to the floating head groups)
-  \includegraphics[width=0.5\textwidth]{hbonds_notails.png}
+  \includegraphics[width=\textwidth]{hbonds_tails.png}
   \caption{}\label{fig:hbond_visualization}
-%  \caption{Monomer head groups that hydrogen bond with a shared water molecule are 
-%  drawn closer together. Head groups with blue bonds were stacked above those 
-%  with orange bonds in the initial configuration.}\label{fig:hbond_visualization}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{pore_hbonds.png}
@@ -2320,12 +2315,23 @@ We generated simulated patterns using the extended simulation trajectories.
   \includegraphics[width=\textwidth]{pore_hbonds_ft.png}
   \caption{}\label{fig:pore_hbonds_ft}
   \end{subfigure}
-  \caption{}\label{fig:hbond_quantification}
-  %MRS7: add a bit more explanation - no description of discrete FT.
-%  \caption{(a) The average number of interlayer hydrogen bonds. Peaks indicate a 
-%  shared hydrogen bonded water molecule between a monomer head group and that stacked
-%  vertically above it. (b) }\label{fig:hbond_quantification}
-  \caption{}\label{fig:figure}
+  \caption{(a) The structure of the head groups is responsible for the appearance of
+  R-double. When we remove head groups from the trajectory, the simulated 
+  diffraction pattern no longer shows R-double. (b) Monomer head groups above or below
+  each other that hydrogen bond with a shared water molecule are drawn closer
+  together. Blue monomers were stacked above orange monomers in the initial configuration.
+  (c) Monomers in each column are numbered from 1--20. For simplicity, we define a layer to
+  be composed of all same-number monomers. Peaks in the distributions indicate
+  a shared hydrogen bonded water molecule between a monomer head group and one in the layer
+  vertically above it. For example, in Pore 1, monomer 7 shares a hydrogen bond with
+  a monomer in layer 8 (pictured in (b)). In this scenario, monomers are no longer evenly
+  spaced in the z-direction since they are pulled closer together by hydrogen bonds. 
+  (d) We performed discrete fourier transforms on each distribution in (c). In all cases,
+  the strongest peak represents periodicity every layer. In Pore 1, there is also periodicity
+  every other layer as indicated by the strong peak at 0.5 layers$^{-1}$. In this case, the
+  center of mass of two adjacent pairs is separated by twice the average monomer stacking 
+  distance, while the four monomers involved are unequally spaced. These conditions may
+  give rise to R-double.}\label{fig:hbonds}
   \end{figure}
   
   \subsection{Chemical composition of pore columns}
@@ -2337,54 +2343,48 @@ We generated simulated patterns using the extended simulation trajectories.
   architecture and observe the differences, if any, between the different equilibrated
   configurations studied so far.
 
+  %BJC6: moved this paragraph up to make the section more idea-focused
+  In general, the composition of each region, particulary within our definition of 
+  the pore region, is similar between all systems. We believe we can solvate and study transport
+  in any of the systems presented here and extract similar transport mechanisms. We will 
+  need to verify that this assumption is true. 
+  
   We plotted the number densities of heavy atoms in the head group, carbon atoms in the tail
   region and all sodium ions (Figure~\ref{fig:overlaid_densities}). For the head group
   region, we used heavy atoms making up the aromatic rings and carboxylate groups. For the tail
   region we used carbon atoms of the monomer tails (See Figure S\ref{S-fig:monomer_color_coded}
   for a diagram). We averaged the histograms over at least 50 ns of equilibrated trajectory.
-  
-  %MRS7: this section reads a little bit as ``and then, and
-  %then''. Think how to make it more focused on core ideas to communicate. Thes is they are all about the same. Perhaps should be the beginning of the section?
 
-  %MRS7: rephrase? Partition implies more abrupt.
-  There is a partition between the hydrophobic and hydrophilic regions, however
-  it is a gradient in composition, rather than an abrupt division. The system
-  does not confine sodium ions and head groups to just within the pore region.
-  Based on size-exclusion experiments, we define the pore radius to be 0.6 nm
+  There is a gradient in pore composition transitioning radially from the hydrophilic 
+  to the hydrophobic region, rather than an abrupt division. Based on size-exclusion 
+  experiments, we define the pore radius to be 0.6 nm
   %BJC5 : Add vertical line to plots for 'pore radius'? Might be too busy.
-  ~\cite{zhou_supported_2005}. We see in all cases, that 19\% of sodium ions
-  exist outside the pore region (except sandwiched, ordered basin, where 16\%
-  are outside the pore). Additionally, we see that in all cases, about 3\% of the
-  plotted tail density is located within the pore region (except ordered sandwiched,
-  where 1.5\% are within the pore region). These observations bring into question how
-  one should define a pore in these types of systems. One usually measures a 
-  membrane's pore radius based on the size of a molecule it can reject, however
-  it is not clear where the edges of the pores are and what size molecule would
-  fit through. We leave these investigations for a future study.
+  ~\cite{zhou_supported_2005}. The system does not confine
+  sodium ions and head groups to just within the pore region. For dry systems,
+  19\% of sodium ions exist outside the pore region (except sandwiched, ordered basin,
+  where 16\% are outside the pore). Additionally, we see that in all cases, about 
+  3\% of the plotted tail density is located within the pore region (except ordered sandwiched,
+  where 1.5\% are within the pore region). For the solvated system, the results are similar,
+  however the head group density is shifted slightly radially outward. This is likely due to
+  swelling of the pore by water. 
+  
+%  These observations bring into question how
+%  one should define a pore in these types of systems. One usually measures a 
+%  membrane's pore radius based on the size of a molecule it can reject, however
+%  it is not clear where the edges of the pores are and what size molecule would
+%  fit through. We leave these investigations for a future study.
   %MRS7: or could say that the size could be different depending on the the nature of the molecle. Could bring up
   %Sarah's results with different selectivity of molecules about the same size.
 
-  In all cases, the space in the pore region is filled with a mixture of 
-  sodium ions and head groups. The ordered parallel displaced configuration has
-  the highest density of sodium ions at the pore centers. Both the ordered and 
-  disordered parallel displaced configurations have higher concentrations
-  of head groups in the center. This observation highlights that the pore region
-  is dense, not hollow, and may impede transport of solvent and solutes. We 
-  observe how this changes when water is added to the system.
-  %MRS7: above: may impede compared to what?
-
-  %BJC6: lead with this vvv
-  In general, the composition of each region, particulary the pore region, is 
-  similar between all systems. We believe we can solvate and study transport in any
-  of the systems presented here and extract similar transport mechanisms. We will 
-  need to verify that this assumption is true. 
+  The space in the pore region is filled with a mixture of sodium ions
+  and head groups. The distributions appear somewhat different near r=0, but that noise 
+  is expected since there is significantly less sampling as r approaches 0. Regardless, 
+  all systems, including the solvated system, have a significant number of head groups 
+  and sodium ions occupying the pore center. This observation highlights that the pore
+  region is dense, not hollow, and may impede transport of solvent and solutes when
+  compared to the previous idealized picture of a hollow tube conducive to transport.
   
-% BJC5 : I think this is making progress towards a better representation of these plots. I
-% outlined the tops of the bars on the histograms so the individual rdf don't get covered.
-% I think it helps. I also varied the thickness of the outlines so that the farthest back 
-% line is thickest. That way, when the outlines overlap, you can see the ones in front.
-%MRS7: looks weird, though - we should discuss more. Maybe just draw the tops of the histograms, and don't fill them in?
-%MRS7: maybe do as three figures across?
+  %BJC6: redone with only tops of histograms plotted, and water added
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.32\textwidth}
@@ -2402,15 +2402,14 @@ We generated simulated patterns using the extended simulation trajectories.
         \caption{Tails}
         \label{fig:tails_regional_density}
   \end{subfigure}
-  %MRS7: lead with ``pretty much the same''
-  \caption{In all cases, the component radial distribution functions exhibit a
-	  composition gradient transitioning from the hydrophilic to the hydrophobic
-	  regions. Systems with layers initially spaced 3.7 \AA~apart in the  parallel
-	  displaced (a), and sandwiched (b) configurations both show the highest
-	  concentrations of ions and head groups away from the pore center. Systems with
-	  layers initially spaced 5 \AA~apart (c) and (d), both show the highest
-	  concentrations of ions and head groups near the pore center, implying a more
-	  uniform, disordered pore.}~\label{fig:overlaid_densities}
+  \caption{In all cases, the component radial distribution functions are similar. 
+      They exhibit a composition gradient transitioning from the hydrophilic to the hydrophobic
+	  regions. The biggest differences are at r=0 where noise is expected to be high due to 
+	  decreased sampling. The center of the pore is not hollow, but contains sodium ions and 
+	  head groups, even when the system is solvated. This architecture may impede transport in 
+	  the real system. The solvated system has a lower density of head groups near the 
+	  pore center which is likely due to the swelling that is necessary in order to fit water
+	  molecules in the pore region.}~\label{fig:overlaid_densities}
   \end{figure}
 
 %  \subsection{The Effect of Water on Structure}\label{section:water}
@@ -2674,21 +2673,23 @@ We generated simulated patterns using the extended simulation trajectories.
 
   \subsection{Slow dynamics}
 
-  We observe unusually slow dynamics in our system relative to other liquid crysal
-  %MRS7: are columnar liquid crystals the right comparison? Are these stickier? One could imagine that 
-  % energetic considerations in the LLCs smush them tighter together, which makes it harder for them to reorient. 
-  % in which case ours aren't atypical, but just not simulated long enough. 
-  systems. Typical diffusion constants for columnar liquid crystals have been reported
-  to be on the order of $10^{-11}~ m^2/s$ \cite{dong_translational_1984}. We measured the diffusion
-  constants of monomers in each of the systems we studied (See Table S-\ref{S-table:msd}) 
-  and learned that they are all on the order of $10^{-14}~m^2/s$.
-  Our systems may be frozen in a glassy state. It is also possible that we are simply 
-  observing characteristics of the experimental system. There has been no experimental work
-  done to study diffusion of Na-GA3C11 monomers in the Col\textsubscript{h}
-  system and no measurement of the glass transition temperature. Such a low
-  diffusion constant is not unheard of. A more recent study reported a diffusion
-  constant of $1.2\times10^{-14}~m^2/s$ for a different liquid crystal that
-  formed a hexagonal columnar phase \cite{dvinskikh_molecular_2002}. 
+  % BJC6: edited to reduce comparison to other columnar LCs (and shortened)
+  We observe slow dynamics in our system. Typical diffusion constants for columnar
+  liquid crystals have been reported to be between $10^{-11}~ m^2/s$ 
+  \cite{dong_translational_1984} and $10^{-14}~m^2/s$ \cite{dvinskikh_molecular_2002}. 
+  We measured the diffusion constants of monomers in each of the systems we studied 
+  (See Table S-\ref{S-table:msd}) and learned that they are all on the order of 
+  $10^{-14}~m^2/s$. This is not entirely surprising considering how densely the 
+  monomers are packed as implied by diffraction experiments. The entangled tails 
+  likely restrict both vertical and lateral movement.
+  
+%  Our systems may be frozen in a glassy state. It is also possible that we are simply 
+%  observing characteristics of the experimental system. There has been no experimental work
+%  done to study diffusion of Na-GA3C11 monomers in the Col\textsubscript{h}
+%  system and no measurement of the glass transition temperature. Such a low
+%  diffusion constant is not unheard of. A more recent study reported a diffusion
+%  constant of $1.2\times10^{-14}~m^2/s$ for a different liquid crystal that
+%  formed a hexagonal columnar phase \cite{dvinskikh_molecular_2002}. 
 
 %MRS6: I don't know that the equilibration procedure induces it; I doubt a metastable state would have slower kinetics than the real state. It might be the force field is too stable. 
 %  It is possible that our equilibration procedure may induce glassy phase
@@ -2744,6 +2745,8 @@ We generated simulated patterns using the extended simulation trajectories.
   % z-box dimension is ~9.7
 
 %MRS5: let's talk about the implications of this (above); might want to move some of this into the SI.
+%BJC6: Which could be moved to supplemental? Theoretically, I could move most of the dihedral
+% stuff to SI and summarize briefly. But it I think it makes what we did more abstract.
 
   \begin{figure}[!htb]
   \centering
@@ -2800,12 +2803,9 @@ We generated simulated patterns using the extended simulation trajectories.
   \end{figure}
 
   The calculate value of ionic conductivity is 5x higher than experiment because 
-  we simulated infinitely long, aligned pores.
-%  The calculated values of ionic conductivity are higher than experiment by an
-%  order of magnitude. One can justify the reason for this result by considering
-%  the real system studied experimentally. 
-  The ionic conductivity measurement to which we are comparing was done with a
-  \SI{80}{\micro\metre} thick film, nearly 10,000 times thicker than our simulated
+  we simulated infinitely long, aligned pores. The ionic conductivity measurement 
+  to which we are comparing was done with a \SI{80}{\micro\metre} thick film, 
+  nearly 10,000 times thicker than our simulated
   system. The thick film is likely imperfectly aligned and has defects leading to
   non-contiguous pores. It has been shown that there is a large dependence of 
   ionic conductivity on the alignment of the pores. The ionic conductivity of an
@@ -2814,25 +2814,28 @@ We generated simulated patterns using the extended simulation trajectories.
   thin, perfectly aligned film would have a value of ionic conductivity in closer
   agreement with our model.
 
-  \subsection{Effect of Crosslinking}\label{section:xlink}
+  \subsection{Effect of Cross-linking}\label{section:xlink}
 
-  We applied our crosslinking algorithm to equilibrated sandwiched and parallel
-  displaced configurations in the ordered pore basin. We allowed the crosslinking
+  We applied our cross-linking algorithm to equilibrated sandwiched and parallel
+  displaced configurations in the ordered pore basin. We allowed the cross-linking
   algorithm to propagate until greater than 90\% of vinyl groups were either involved
-  in a crosslinking reaction or were terminated. See section S\ref{S-section:xlink}
-  for further details on the crosslinking algorithm. We allowed the crosslinked
+  in a cross-linking reaction or were terminated. See section S\ref{S-section:xlink}
+  for further details on the cross-linking algorithm. We allowed the cross-linked
   configurations to simulate for 100 ns further in the NPT ensemble. 
 
   % BJC5: Is it worth including the distance between layers and the correlation length?   
   There are minor changes to the physical characteristics of these systems when 
-  they are crosslinked (See Figure ~\ref{fig:xlink}). The ionic conductivity of 
+  they are cross-linked (See Figure ~\ref{fig:xlink}). The ionic conductivity of 
   the sandwiched configuration decreases while that of the parallel displaced 
   configuration stays the same. The pore spacing decreases in both systems by
   0.07 nm. The vertical monomer stacking distance increases in the sandwiched
   configuration and decreases in the parallel displaced configuration, however the 
-  values of crosslinked configurations fall within uncertainty of their un-crosslinked
+  values of cross-linked configurations fall within uncertainty of their un-crosslinked
   counterparts. The correlation length decreases in both systems, 
   %MRS7: from what to what?
+  %BJC6: If I say that, then shouldn't I say it for all metrics? That sounds
+  % a bit clunky especially when they are plotted in the figure and I just want to make
+  % somewhat general comments on the effect of cross-linking.
 but is most pronounced in the parallel displaced system.  
   
   \begin{figure}[!htb]

@@ -61,20 +61,23 @@ if __name__ == "__main__":
     
     args = initialize()  # parse the args
 
+    # run : regional_density.py - m offset_disordered_regional_density.npz offset_regional_density.npz
+    # layered_disordered_regional_density.npz layered_regional_density.npz solvated_regional_density.npz
+
     # mpl.style.use('seaborn')
 
     # regions = ['Tails', 'Head Groups', 'Sodium']
-    regions = ['Tails', 'Head Groups', 'Sodium', 'Water']
+    regions = ['Tails', 'Head Groups', 'Sodium']
 
     if args.multi:
 
         # colors = ['blue', 'red', 'green', 'xkcd:orange']
         # colors = ['xkcd:red', 'xkcd:green', 'blue', 'xkcd:yellow']
-        colors = ['xkcd:blue', 'xkcd:olive', 'xkcd:orangered', 'xkcd:magenta']
+        colors = ['xkcd:blue', 'xkcd:olive', 'xkcd:orangered', 'xkcd:magenta', 'xkcd:gold']
         names = ['Ordered Parallel Displaced', 'Ordered Sandwiched', 'Disordered Sandwiched',
-                 'Disordered Parallel Displaced']
-        names = ['Dry', 'Solvated']
-        colors = ['xkcd:orange', 'xkcd:blue', 'xkcd:orange']
+                 'Disordered Parallel Displaced', 'Solvated Parallel Displaced']
+        # names = ['Dry', 'Solvated']
+        # colors = ['xkcd:orange', 'xkcd:blue', 'xkcd:orange']
 
         n = len(args.multi)
         system = np.load(args.multi[0])
@@ -83,21 +86,23 @@ if __name__ == "__main__":
         r = system['r']
         bin_width = system['bw']
 
-        # results = np.zeros([n, len(regions), len(r)])
-        results = np.zeros([n, 4, len(r)])
+        results = np.zeros([n, len(regions), len(r)])
+        # results = np.zeros([n, 4, len(r)])
 
-        results[0, :3, :] = system['results']
+        # results[0, :3, :] = system['results']
 
-        for i in range(1, n):
-
+        for i in range(n - 1):
             system = np.load(args.multi[i])
             results[i, :, :] = system['results']
+
+        system = np.load(args.multi[-1])
+        results[-1, :, :] = system['results'][:3, :]
 
         outline = np.zeros([4, n, r.shape[0]*2 + 2, 2])
         for i in range(len(regions)):
             plt.figure(i)
             for j in range(n):
-                plt.bar(r, results[j, i, :], bin_width, color=colors[j], alpha=1, label=names[j])
+                #plt.bar(r, results[j, i, :], bin_width, color=colors[j], alpha=1, label=names[j])
 
                 half_width = bin_width / 2
                 # outline = np.zeros([r.shape[0]*2 + 2, 2])
@@ -107,13 +112,15 @@ if __name__ == "__main__":
                 outline[i, j, 2:-1:2, 0] = r + half_width
                 outline[i, j, 1:-1:2, 1] = results[j, i, :]
                 outline[i, j, 2:-1:2, 1] = results[j, i, :]
-                if j == 0:
-                    plt.plot(outline[i, j, :, 0], outline[i, j, :, 1], color=colors[j], linewidth=4)#/(j+1))
-
+                if i == 0:
+                    plt.plot(outline[i, j, :-1, 0], outline[i, j, :-1, 1], color=colors[j], linewidth=2, label=names[j])
+                else:
+                    plt.plot(outline[i, j, 1:, 0], outline[i, j, 1:, 1], color=colors[j], linewidth=2,
+                             label=names[j])
             # plt.title(regions[i], fontsize=14)
             plt.legend(fontsize=11)
             plt.ylabel('Component Number Density (number/nm$^2$)', fontsize=14)
-            plt.xlabel('Distance from pore center (nm)', fontsize=14)
+            plt.xlabel('Distance from pore center, r (nm)', fontsize=14)
             plt.axes().tick_params(labelsize=14)
             # plt.ylim([0, 0.6])
             plt.tight_layout()
@@ -124,7 +131,7 @@ if __name__ == "__main__":
         exit()
 
     if args.solvate:
-        colors = ['xkcd:red', 'xkcd:green', 'blue', 'xkcd:red']
+        colors = ['xkcd:red', 'xkcd:green', 'blue', 'xkcd:yellow']
     else:
         colors = ['red', 'green', 'blue']
 
