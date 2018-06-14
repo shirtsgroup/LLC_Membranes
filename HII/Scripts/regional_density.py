@@ -119,7 +119,7 @@ if __name__ == "__main__":
                              label=names[j])
             # plt.title(regions[i], fontsize=14)
             plt.legend(fontsize=11)
-            plt.ylabel('Component Number Density (number/nm$^2$)', fontsize=14)
+            plt.ylabel('Component Number Density (number/nm$^3$)', fontsize=14)
             plt.xlabel('Distance from pore center, r (nm)', fontsize=14)
             plt.axes().tick_params(labelsize=14)
             # plt.ylim([0, 0.6])

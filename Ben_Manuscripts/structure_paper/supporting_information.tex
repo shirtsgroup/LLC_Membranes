@@ -1,7 +1,9 @@
 \documentclass[journal=jpcbfk,manusciprt=article]{achemso}
+
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage{subcaption}
+\usepackage{amsmath} 
 %\usepackage[margin=1in]{geometry}\usepackage{amsmath} % or simply amstext
 \usepackage{siunitx}
 \usepackage{booktabs}
@@ -23,7 +25,7 @@
 
 \begin{document}
 
-  \bibliographystyle{ieeetr}
+%  \bibliographystyle{ieeetr}
   \graphicspath{{./figures/}}  % put all the figures here
   \maketitle
 
@@ -187,46 +189,40 @@
 	\label{fig:pore_radius_illustration}
   \end{figure}
 
-  \section{Calculation of pore-to-pore spacing statistics}\label{section:p2p_stats}
- 
- %BJC: is it really necessary to explain this if I release the code? I don't explain
- %any of the other stats I calculate.
-  \vspace{1em} 
-  We are interested in 5 pore-to-pore distances which should all be
-  equal in a perfect hexagonal array (Figure~\ref{fig:p2p_diagram}). Only 4 of
-  the 5 distances are independent. We can calculate a trajectory of spacing
-  versus time for each of the 5 distances. We calculated the average pore-to-pore
-  spacing and its uncertainty according to the following procedure:
-   \begin{enumerate}
-	\item We calculated the time when each of the pore-to-pore distances
-	were equilibrated using \\ \texttt{pymbar.timeseries.detectEquilibration()}
-	\cite{chodera_simple_2016,shirts_statistically_2008}. We began calculations
-	after the largest of the five values.
-	\item We calculated how long it takes for the data in each of the 5
-	trajectories to become uncorrelated using \texttt{pymbar.timeseries.integratedAutocorrelationTime()}
-	\cite{chodera_simple_2016,shirts_statistically_2008}. 
-	\item We broke the full equilibrated trajectory into blocks of length $\tau$, where
-	$\tau$ is the maximum of the five autocorrelation times calculated. Each block contains
-	five sub-trajectories of pore-to-pore spacings.   
-	\item We generate statistics using the bootstrapping technique. For
-	each bootstrap trial, we reconstruct an equilibrium trajectory by randomly
-	sampling from the trajectory blocks. 
-	\item The average pore-to-pore distance is the mean of all pore
-	spacings among all bootstrap trials.
-	\item To calculate the uncertainty in pore-to-pore distance, we calculate the average 
-	pore spacing for each pore over all bootstrap trials. Using the 5 average 
-	pore-to-pore distances, we calculate the spread with:
-	\begin{equation}
-	s = \sqrt{\frac{1}{4} \sum_{i=1}^5 (x_i - \overline{x})^2} 
-	\label{equation:p2p_stats}
-	\end{equation}
-	where $\overline{x}$ is the average pore-to-pore distance. We divided the sum in 
-	equation~\ref{equation:p2p_stats} by 4 since there are only 4 independent pore
-	spacings.
-	
-  \end{enumerate}
-
   %Our model is insensitive to initial configuration if monomer placement is chosen within reason. 
+  
+  \section{Number of monomers per column}\label{section:monomers_per_column}
+  
+  We chose to build all systems using 20 monomers per column. We made this choice
+  by considering a number of factors that directly affect the quality of our results. 
+  Clearly, choosing a small number of layers will cause the system to suffer from 
+  finite size effects. Even in our 20 monomer-per-column system, axial correlations
+  between stacked monomers persist throughout the entire correlation function (See
+  Figure ~\ref{M-fig:correlation}). The correlation function of the system which we
+  built with 40 monomers per column continues to oscillate for its full length
+  (Figure~\ref{fig:tall_correlation_full}). If we continue adding monomers, the 
+  correlation function will eventually fully decay but it is not worth the 
+  computational expense. Regardless, the correlation lengths calculated from 20
+  monomer per column simulations are in sufficient agreement with experiment. 
+  
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{tall_correlation_full.png}
+  \caption{Oscillations persist throughout the length of the correlation 
+  function for the sandwiched system in the ordered basin built with 40 monomers
+  per column. The full system is ca. 17 nm tall so the full correlation function
+  covers half this length since periodicity forces the remaining length to be its
+  mirror image.}\label{fig:tall_correlation_full}
+  \end{figure}
+  
+  We may be able to simulate systems using less than 20 monomers per column, but chose
+  to use 20 since it gives fairly good resolution when simulating X-ray diffraction 
+  patterns. The size of the fourier space bin in each dimension is determined by 
+  $dfrac{2\pi}{L}$ where L is the length of a given box vector. The z-box vector 
+  for 20 monomer-per-column systems is $\approx$ 85 \AA which means we will see 
+  a reciprocal space resolution of 0.074 \AA$^{-1}$ in the z direction. Further decreasing
+  the resolution would increase the noise in the simulated patterns and make it more
+  difficult to measure the intensity of reflections of interest.
 
   \section{Initial Configuration Dependence}\label{section:initial_config_dependence}
 %  \begingroup
@@ -496,6 +492,73 @@
 		the location of all other pore centers.}
 	\label{fig:p2p_diagram}
   \end{figure}
+
+  \section{Equilibration Details}\label{section:equilibration}
+  
+  We developed equilibration schemes to create dry and wet configurations. Both
+  schemes start with an initial configuration generated according to the previous
+  guidelines. To create a dry configuration, we fix monomer head groups in the
+  sandwiched or parallel-displaced configuration using position restraints with a
+  force constant of 10$^6$ kJ mol$^{-1}$ nm$^{-2}$. We run a 50 ps simulation in
+  the NVT ensemble which allows the monomer tails to settle without disrupting
+  the ordering of the head groups. Doing so also mitigates system dependence on
+  initial monomer configuration. Every 50 ps, we reduce the force constants by
+  the square root of its previous value. Once the force constant is below 10 KJ
+  mol$^{-1}$ nm$^{-2}$, we reduce the restraints in a sequence with values of
+  8, 3, 2, 1, and 0 KJ mol$^{-1}$ nm$^{-2}$ respectively. We allow the resulting
+  unrestrained structure to equilibrate for 5 ns in the NPT ensemble
+  with pressure controlled by the berendsen barostat. Next, we run long NPT
+  equilibration simulations for at least 400 ns using the Parrinello-Rahman
+  barostat with a time constant of 10 ps.
+
+  % MRS6: some parameters missing here (time run between insertions, etc). 
+  % I assume they are in supporting information?
+  % BJC5: all water is present in initial configuration. This did not follow the more
+  % complex procedures that I've come up with since then. 
+  In order to create a ``wet'' system, we solvated an initial configuration with
+  water using \texttt{gmx solvate}. We remove all water molecules placed outside
+  the pore region. Then we randomly remove water molecules inside the pore region
+  until the pores reach the desired concentration of water. The remainder of the
+  equilibration follows the same procedure as the dry system. 
+
+  \section{Calculation of pore-to-pore spacing statistics}\label{section:p2p_stats}
+ 
+ %BJC: is it really necessary to explain this if I release the code? I don't explain
+ %any of the other stats I calculate.
+  \vspace{1em} 
+  We are interested in 5 pore-to-pore distances which should all be
+  equal in a perfect hexagonal array (Figure~\ref{fig:p2p_diagram}). Only 4 of
+  the 5 distances are independent. We can calculate a trajectory of spacing
+  versus time for each of the 5 distances. We calculated the average pore-to-pore
+  spacing and its uncertainty according to the following procedure:
+   \begin{enumerate}
+	\item We calculated the time when each of the pore-to-pore distances
+	were equilibrated using \\ \texttt{pymbar.timeseries.detectEquilibration()}
+	\cite{chodera_simple_2016,shirts_statistically_2008}. We began calculations
+	after the largest of the five values.
+	\item We calculated how long it takes for the data in each of the 5
+	trajectories to become uncorrelated using \texttt{pymbar.timeseries.integratedAutocorrelationTime()}
+	\cite{chodera_simple_2016,shirts_statistically_2008}. 
+	\item We broke the full equilibrated trajectory into blocks of length $\tau$, where
+	$\tau$ is the maximum of the five autocorrelation times calculated. Each block contains
+	five sub-trajectories of pore-to-pore spacings.   
+	\item We generate statistics using the bootstrapping technique. For
+	each bootstrap trial, we reconstruct an equilibrium trajectory by randomly
+	sampling from the trajectory blocks. 
+	\item The average pore-to-pore distance is the mean of all pore
+	spacings among all bootstrap trials.
+	\item To calculate the uncertainty in pore-to-pore distance, we calculate the average 
+	pore spacing for each pore over all bootstrap trials. Using the 5 average 
+	pore-to-pore distances, we calculate the spread with:
+	\begin{equation}
+	s = \sqrt{\frac{1}{4} \sum_{i=1}^5 (x_i - \overline{x})^2} 
+	\label{equation:p2p_stats}
+	\end{equation}
+	where $\overline{x}$ is the average pore-to-pore distance. We divided the sum in 
+	equation~\ref{equation:p2p_stats} by 4 since there are only 4 independent pore
+	spacings.
+	
+  \end{enumerate}
 
   \section{The nematic order parameter}\label{method:nematic_order}
 
@@ -1012,12 +1075,50 @@
   \end{subfigure}
   \caption{}\label{fig:simple_FTs}
   \end{figure}
+  
+  \section{Solvation}\label{section:solvation}
+  
+  % formatting taken from : https://tex.stackexchange.com/questions/239715/add-titles-for-rows-and-columns-in-a-subfloat
+  \newlength{\tempdima}
+  \newcommand{\rowname}[1]% #1 = text
+  {\rotatebox{90}{\makebox[\tempdima][c]{\textbf{#1}}}}
+  
+  \renewcommand{\thesubfigure}{\alph{subfigure}}
+  \newcommand{\mycaption}[1]% #1 = caption
+  {\refstepcounter{subfigure}\textbf{(\thesubfigure) }{\ignorespaces #1}}  
+  
+  \begin{figure}[!htb]
+  \begin{subfigure}{0.915\textwidth}
+  	\settoheight{\tempdima}{\includegraphics[width=.32\linewidth]{solvated_offset_rzplot_1.png}}%
+  	\centering\begin{tabular}{@{}c@{ }c@{ }c@{ }c@{}}
+  	&\textbf{1 wt\%} & \textbf{\hspace{2em}2.5 wt\%} & \textbf{5 wt\%} \\
+  	\rowname{Parallel Displaced}&
+  	\includegraphics[width=.28\linewidth,trim={1cm 0 1.3cm 0},clip]{solvated_offset_rzplot_1.png}&
+  	\includegraphics[width=.28\linewidth,trim={1cm 0 1.3cm 0},clip]{solvated_offset_rzplot_25.png}&
+  	\includegraphics[width=.28\linewidth,trim={1cm 0 1.3cm 0},clip]{solvated_offset_rzplot_5.png}\\[-1ex]
+  	%&\mycaption{0.2} & \mycaption{0.2} & \mycaption{0.3}\\
+  	\rowname{Sandwiched}&
+  	\includegraphics[width=.28\linewidth,trim={1cm 0 1.3cm 0},clip]{solvated_layered_rzplot_1.png}&
+  	\includegraphics[width=.28\linewidth,trim={1cm 0 1.3cm 0},clip]{solvated_layered_rzplot_25.png}&
+  	\includegraphics[width=.28\linewidth,trim={1cm 0 1.3cm 0},clip]{solvated_layered_rzplot_5.png}\\[-1ex]
+  	%\mycaption{0.5} & \mycaption{0.6} & \mycaption{0.7} \\
+  	\end{tabular}
+  \end{subfigure}
+  \begin{subfigure}{0.075\textwidth}
+  	\includegraphics[width=\textwidth]{colorbar_jet.png}
+  \end{subfigure}
+	\caption{Adding 1 wt \% water to the ordered basin dry systems causes an increase in the intensity
+	R-spots. R-double becomes visible in the parallel displaced configuration. Additional amounts
+	of water increase discrepancies with experiment} %MRS7:by increasing disorder?
+  \label{fig:solvation}
+
+  \end{figure}
 
   \section{Crosslinking algorithm details}\label{section:xlink}
 
   Crosslinking of the the monomer Na-GA3C11 occurs by a UV initiated free
-  radical polymerization (Figure~\ref{fig:xlink_mech}).  Head-to-tail addition
-  takes place between terminal vinyl groups on each of the monomer tails.  We
+  radical polymerization (FRP) (Figure~\ref{fig:xlink_mech}). Head-to-tail addition
+  takes place between terminal vinyl groups on each of the monomer tails. We
   only considered head-to-tail addition since it is the dominant propagation mode
   in the real system.   
 
@@ -1028,6 +1129,56 @@
 	  radical initiators to create monomers with terminal vinyl radicals.  Vinyl
 	  radicals react with the vinyl groups of other monomers in to propagate
 	  crosslinking.}\label{fig:xlink_mech}
+  \end{figure}
+  
+  We based our cross-linking algorithm on the known reaction mechanism.
+  FRPs require an initiator which bonds to the system, meaning new atoms are
+  introduced into the system. For simplicity, we simulated the initiator as
+  hydrogen and made it present in the simulation by including them as dummy atoms
+  in all possible locations where an addition could occur. We carry out the
+  cross-linking procedure iteratively. During each iteration, the algorithm
+  selects eligible bonding carbon atoms based on a distance cut-off. The algorithm
+  then updates the topology with new bonds and changes dummy hydrogen atoms to appropriate
+  hydrogen atom types. We only considered head-to-tail addition
+  due to its dominance in the real system \cite{young_introduction_2011}. We did
+  not consider direction of attack because the resultant mixture is racemic.
+
+  Our implementation requires long simulation times to achieve high cross-link 
+  densities. A typical cross-linking procedure can take up to 24 hours. In
+  order to collect equilibrated data, further NPT simulation is necessary. We
+  typically run a cross-linked system for an additional 100 ns to allow the system
+  to readjust. For those reasons we did not cross-link all systems tested.
+  
+  \section{Ionic Conductivity}\label{section:ionic_conductivity}
+  
+  In the main text, we calculated ionic conductivity using the Nernst Einstein 
+  relationship. We also measured ionic conductivity using a second method, 
+  termed the Collective Diffusion model, for robustness. The collective 
+  diffusion model measures the movement of the collective variable, Q, which
+  is defined as the amount of charge transfer through the system and can be 
+  thought to represent the center of charge of the system. The conductance, 
+  $\gamma$, of the system can be calculated as:
+  \begin{equation}
+	 \gamma = \dfrac{D_Q}{k_b T} 
+	\label{eqn:collective_diffusion}
+  \end{equation}
+  $D_Q$ is the diffusion coefficient of the collective variable Q and is 
+  calculated using the Einstein relation. We convert the resulting value
+  to ionic conductivity by multiplying by channel length and dividing by
+  the membrane cross sectional area. One can access a detailed derivation of 
+  the model elsewhere\cite{liu_collective_2013}.
+  
+  \begin{figure}[!htb]
+        \centering
+        \includegraphics[width=0.5\linewidth]{Ionic_conductivity.png}
+        \caption{The Collective Diffusion model and the nernst-einstein relation yield
+        agreeing values of ionic conductivity for both types of ordered basin systems 
+        simulated. Both methods estimate the value of the ionic conductivity to be an 
+        order of magnitude higher than the experimental value. There is more noise in
+        the collective diffusion model because there is inherently less data that 
+        can be used for its calculation. For that reason, we use only the Nernst 
+        Einstein relationship in the main text.}
+        \label{fig:conductivity}
   \end{figure}
 
   \begin{figure}[!htb]
