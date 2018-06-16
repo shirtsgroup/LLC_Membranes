@@ -41,12 +41,16 @@ liquid crystal membranes}
  
   Nanostructured porous membranes made from the cross-linked hexagonal phase of
   self-assembled lyotropic liquid crystals (LLCs) are a promising material for
-  selective separations. In this work, we develop an atomistic molecular model
-  of an experimentally characterized LLC membrane. While it is relatively 
-  straightforward to create a stable hexagonal phase model, we demonstrate that 
-  closely reproducing the experimental pore structure requires a carefully 
-  constructed initial configuration in order to avoid falling into metastable
-  basins. We use simulated X-ray Diffraction (XRD) patterns in order to ensure 
+  selective separations. In this work, we investigate an experimentally characterized 
+  LLC membrane using an atomistic molecular model. 
+  %MRS8: I think this is a little too subtle a point to be making for the abstract. 
+  %I added a bit different spin on this at the end of the abstract to gesture towards the idea. Thoughts?
+  %While it is relatively 
+  %straightforward to create a stable hexagonal phase using atomistic modeling, we demonstrate that 
+  %closely reproducing the experimental pore structure requires a carefully 
+  %constructed initial configuration in order to avoid falling into metastable
+  %basins. 
+  We use simulated X-ray diffraction (XRD) patterns in order to ensure 
   maximum consistency between our structures and experiment. We show that pores 
   are likely composed of 5 columns of stacked LLC monomers which surround each
   hydrophilic core. Although this system has been reported as dry, we show that
@@ -54,16 +58,24 @@ liquid crystal membranes}
   pattern due to asymmetries introduced by hydrogen bonds between monomer head
   groups and water molecules. We explore the composition and structure of the 
   nanopores and reveal that there exists a composition gradient rather than a 
-  hard partition between the hydrophilic and hydrophobic regions. The clearer 
-  picture of the nanoscopic structure of these membranes provided in
+  abrupt partition between the hydrophilic and hydrophobic regions. A caveat is 
+  that the time scales of the dynamics are extremely long for this system, 
+  requiring starting from a range of alternative initial configurations and 
+  careful examination of the metastable states observed.
+  The clearer picture of the nanoscopic structure of these membranes provided in
   this study will enable a better understanding of the mechanisms of small 
   molecule transport within these nanopores.
-
   \end{abstract}
 
   \section{Introduction}
   
   % BJC5: Note to self -- how to use latex xr : Figure S~\ref{S-fig:monomer_color_coded}
+
+  % MRS8: intro still seems a bit limited, describe more generally
+  % (and briefly!) other things selective membranes are good for. The
+  % paper is primarily about selective membranes, not fracking
+  % water. See elimalech paper for reviews, and add a number of more
+  % citations.
   
   More highly selective membranes would be extremely useful for the recovery of 
   dissolved species in complex aqueous and organic solutions. For example, selective
@@ -85,10 +97,6 @@ liquid crystal membranes}
 %  process, we can instead use highly selective membranes in order to successfully
 %  recover useful compounds. 
 
-  % MRS: abstract seems a bit limited, describe more generally (and
-  % briefly!) other things selective membranes are good for. The paper is primarily about selective membranes, not fracking water.  
-  % It seems out of       balance to be talking about only one application.
-
 %  The permeability-selectivity tradeoff is a well-known problem in the membrane
 %  separations community. It is difficult to increase the permeability of a 
 %  desired molecular or atomic species, while maintaining the same retention of
@@ -98,6 +106,7 @@ liquid crystal membranes}
 % work for this purpose. But one paragraph is enough.
 % BJC5: added back below paragraph.  
 % MRS7: Do a pass for clarity at the sentence level.  For example ``degree of stochasticity'' is vague.
+% MRS8: ``because they are unstructured'' lacks detail.  NF has some structure, since there are irregular pores. Check some other reviews and see the points they cover?
   Current commercial RO and NF membranes suffer limitations to their selectivity
   because they are unstructured. Although scalable, their fabrication involves the 
   spontaneous assembly of polymers into disordered structures which offer separation 
@@ -137,6 +146,7 @@ liquid crystal membranes}
 %  which separate primarily based on solute size
 %  \cite{van_der_bruggen_review_2003}. 
 
+%MRS8: preliminary evidence has shown they may be?  It's more than a guess.
   Crosslinked lyotropic liquid crystal (LLC) membranes may be capable of
   performing highly selective separations. LLCs are amphiphilic molecules that
   have the ability to self-assemble into porous nanostructures
@@ -147,7 +157,7 @@ liquid crystal membranes}
   Since LLC membranes lack a pore size distribution, they
   inherently exhibit high selectivity due to their strict molecular weight
   cut-off (MWCO)~\cite{zhou_supported_2005}. Additionally, the LLC monomers
-  described in this paper are salts, and therefore lead to Donnan exclusion of ions
+  examined in this paper are salts, and therefore lead to Donnan exclusion of ions
   in solution. The membrane gains a net surface charge when counterions from the head
   groups that line the pore walls escape into the feed solution in an effort to balance 
   the gradients of concentration and electric potential \cite{donnan_theory_1995}.    
@@ -228,7 +238,7 @@ liquid crystal membranes}
   %aqueous separations applications such as desalination and biorefinement because
   %they offer the ability to control pore architecture at the molecular scale,
   %thereby permitting the design of solute-specific separation membranes
-  %\cite{humplik_nanostructured_2011}. One can acheive most membrane-based aqueous separations of
+  %\cite{humplik_nanostructured_2011}. One can achieve most membrane-based aqueous separations of
   %small molecules using reverse osmosis (RO) or nanofiltration
   %(NF) \cite{van_der_bruggen_review_2003}. While RO and NF have seen many
   %advances in the past few decades, they are far from perfect separation 
@@ -385,6 +395,7 @@ liquid crystal membranes}
   using a magnetic field with subsequent cross-linking to lock the structure in 
   place\cite{feng_scalable_2014}. In 2016, Feng et al. showed that one could obtain
   the same result using a second technique termed soft confinement\cite{feng_thin_2016}.
+  %MRS8: maybe say what it is, not just what it's named? 
   Current experimental efforts are focused on extending the method to the 
   H\textsubscript{II} phase and characterizing the performance of these newly aligned systems.
 
@@ -409,6 +420,7 @@ liquid crystal membranes}
 % columns instead?
 % BJC6 : I will get to redo-ing this. Just takes some time to refamiliarize myself with
 % the software I used to create it
+%MRS8: sound good.
   \begin{figure}
 	\centering
 	\begin{subfigure}{.3\textwidth}
@@ -462,10 +474,10 @@ liquid crystal membranes}
   A molecular-level understanding of LLC membrane structure, enabled by
   molecular dynamics (MD) simulations, can provide guidelines to reduce the large
   chemical space available to design monomers for creation of separation-specific
-  membranes. A good molecular model should incorporate a detailed picture of the
+  membranes. Useful molecular-level modeling should incorporate a detailed picture of the
   nanoscopic pore structure which is crucial to understanding the role of
-  monomer structure in solute transport and membrane design. Models resulting
-  from molecular dynamics simulations can provide the required level of detail
+  monomer structure in solute transport and membrane design. 
+Atomistic molecular dynamics simulations can provide the required level of detail
   (Figure \ref{fig:detail}), assuming the force fields are sufficiently accurate.
   With such an atomistic model, we can directly observe molecular-level solute
   transport and suggest governing mechanisms. We can observe how the choice of
@@ -476,10 +488,12 @@ liquid crystal membranes}
   %charged species at the membrane surface. 
 
   %BJC6: is this too bold considering the work done at University of Wisconsin?
-  In this study, we build a significantly more realistic atomistic model of LLC
+  %MRS8: Maybe take out significantly
+  In this study, we achieve a %significantly 
+  more realistic atomistic description of LLC
   membranes than, to our knowledge, has ever previously been created, and explore
   what new structural information can be gained and what structure hypotheses are
-  supported by this model. We validate the model using as much experimental
+  supported by this model. We validate the results using as much experimental
   information as possible. We are most interested in reproducing the conclusions
   about structure drawn from small angle X-ray scattering (SAXS)
   and wide angle X-ray scattering (WAXS) experiments as well as in matching ionic
@@ -498,20 +512,25 @@ liquid crystal membranes}
 		\caption{}~\label{fig:detailed_pore}
 	\end{subfigure}
     \caption{(a) Previous understanding of the pores are essentially speculations 
-    based on limited chemical and experimental data. (b) We use a detailed molecular 
-    model in this paper in order to appropriately model the pore's complex architecture
+    based on limited chemical and experimental data. (b) We use detailed molecular 
+    modeling in this paper in order to appropriately model the pore's complex architecture
     which is crucial to understanding the mechanism of solute transport. In both 
     pictures, the head group region is colored blue and the tail region is colored cyan.}~\label{fig:detail}
   \end{figure}
  
-  In this paper, we develop a molecular model of the Col\textsubscript{h} assembly 
+  In this paper, we perform molecular modeling of the Col\textsubscript{h} assembly 
   formed by Na-GA3C11. Compared to the H\textsubscript{II} phase, the Col\textsubscript{h}
-  phase is a simpler starting point. The system has no water which allowed us
-  to simulate longer timescales, and there exists detailed experimental
+  phase is a simpler starting point. The system 
+  %MRS8: check rephrasing on this, since we do say later it does have some water
+  %has no water 
+  is not assembled in aqueous phase
+  which allowed us to simulate longer timescales, and there exists detailed experimental
   characterization of the fully aligned state, including 2D wide-angle X-ray
   scattering (WAXS) patterns (Figure~\ref{fig:WAXS}) which are useful for reconstructing 
-  structural data. We will use this Col\textsubscript{h} model in order to build an 
-  H\textsubscript{II} model in the future.
+  structural data. 
+  %MRS8: I started tweaking the below, but it might be better just to eliminate.
+  % Modeling of Col\textsubscript{h} will help in modeling 
+  %H\textsubscript{II} in the future.
   %The two phases appear to share similar structural characteristics since the
   %pore spacings in each system are in close agreement
   %\cite{feng_thin_2016,resel_structural_2000}.
@@ -538,7 +557,7 @@ liquid crystal membranes}
 	space periodicity of 7.4 \AA. Since this reflection corresponds to double
 	the spacing of R-$\pi$ in real space, we will refer to this reflection as R-double. 
 	R-double has been interpreted as 2\textsubscript{1} helical ordering of aromatic
-	rings along the z axis\cite{feng_scalable_2014}, meaning that if one traces the 
+	rings along the $z$ axis\cite{feng_scalable_2014}, meaning that if one traces the 
 	positions of the aromatic rings with a helical curve, then for each full turn 
 	in the helix, one will encounter two aromatic rings.
 
@@ -592,8 +611,10 @@ liquid crystal membranes}
  \end{figure}
   
   Despite having structural data, there is still information which experiment cannot
-  definitively answer. There are a number of structural questions we wish to answer in this 
-  article. We want to know:
+  definitively answer. 
+  %MRS8: grammatically a bit redundant.
+  %There are a number of structural questions we wish to answer in this article. 
+  Specifically, we want to know:
   \begin{enumerate}
     \item What is the density of monomers that pack around each hydrophilic core? 
     \label{point:monomernum}
@@ -614,21 +635,21 @@ liquid crystal membranes}
  	the other dimensions.~\cite{chaikin_principles_1995}  % page 58
  	In the system we are studying, there are long-range 2D correlations in the 
  	hexagonal array of pores (xy plane) and short range z-direction correlations between 
-        stacked columns of monomers. In this study, we use our atomistic molecular model
+        stacked columns of monomers. In this study, we use atomistic molecular modeling
         to study how the system's structure is affected by the density of these monomer columns
         that surround each pore's hydrophilic core. 
 
 	\item What structural motif best matches experimental 2D WAXS patterns?\label{point:xrdmatch}
 
 	On the short timescales accessible to MD (even the 100's of nanoseconds of simulation 
-	peformed here are short compared to experimental timescales), we observe distinct metastable
+	performed here are short compared to experimental timescales), we observe distinct metastable
 	configurations which depend on starting configuration. We simulated XRD patterns of our system and 
 	compared them to experimental 2D WAXS patterns (Figure~\ref{fig:WAXS}) so that we ensure our
 	model creates a nanoscopic chemical environment maximally consistent with experiment within 
 	the constraints	of our forcefield. Using this approach, we are able to confirm some previous
 	interpretations	of the WAXS pattern and refute others. 
 	
-	%BJC5: I could add brief references to other LLC studies which look at hexagnoal phase, but
+	%BJC5: I could add brief references to other LLC studies which look at hexagonal phase, but
 	% without scrutinizing the structural details. In other words, other authors have gotten 
 	% hexagonal phases with self-assembly, but they can't prove that their structure is the same
 	% as experiment. The best there are, are 1D structure factors in the small angle regime.
@@ -637,11 +658,17 @@ liquid crystal membranes}
         Col\textsubscript{h} phase? \label{point:water}
 
 	While the Col\textsubscript{h} phase is described as dry, it is likely that small amounts of
-	ambient water are leached into the system. The hydrogen bonding network formed by the 
+	ambient water are 
+        %leached 
+        absorbed
+        into the system. The hydrogen bonding network formed by the 
 	water may play a role in structuring the pore. We used simulated X-ray diffraction (XRD) patterns
 	to see if there is any meaningful structural difference between a "dry" and a "wet" system.
 
-	\item What is the chemical composition of the pores?\label{point:composition}
+	\item What is the 
+          %MR8: chemical composition is a bit ambiguous; implies mole fractions, which isn't what we mean
+          %chemical composition 
+          detailed atomistic structure of the pores?\label{point:composition}
 
 	The limited picture that experiment provides tells us that there are hexagonally packed, 
 	hydrophilic regions where transport is likely to occur. One may instinctively imagine these 
@@ -780,8 +807,8 @@ liquid crystal membranes}
   trajectory then reassigned charges using \texttt{molcharge}. Using the new
   charges, we annealed the monomer system again and pulled a random monomer
   configuration from the trajectory which we used for full system
-  construction (Figure~\ref{fig:python}a). See section S\ref{S-section:parameterization} 
-  for further detail.
+  construction (Figure~\ref{fig:python}a). See section S-\ref{S-section:parameterization} 
+  for further detail of the parameterization process.
 
   \subsection{Unit Cell Preparation}
 
@@ -792,7 +819,7 @@ liquid crystal membranes}
   configuration in $\sim$1000 ns \cite{mondal_self-assembly_2013}.  We
   attempted atomistic self-assembly by packing monomers into a box using Packmol
   \cite{martinez_packmol:_2009}. Simulations of greater than 100 ns show no
-  indicators of progress towards an ordered system (See section S\ref{S-section:self_assembly}). 
+  indicators of progress towards an ordered system (see section S-\ref{S-section:self_assembly}). 
   To bypass the slow self-assembly process, we use Python scripts to assemble monomers
   into a structure close to one of a number of hypothesized equilibrium configurations
   (Figure~\ref{fig:python}).
@@ -816,22 +843,22 @@ liquid crystal membranes}
   longer timescales. Ultimately, we chose to build a system with 20 monomers
   per column in order to minimize finite size effects with reasonable computational expense 
   and to obtain sufficient resolution when simulating XRD patterns (see further discussion
-  in section S\ref{S-section:monomers_per_column}).
+  in section S-\ref{S-section:monomers_per_column}).
  
   \subsection{Monomer Placement} 
 
   When constructing an initial configuration, there are a number of variables
   which require careful consideration while placing monomers. The equilibrium
-  configuration is sensitive to some while insensitive to others. The starting
+  configuration is sensitive to some while insensitive to others. We find the starting
   pore radius, defined as the distance of a chosen head group carbon from the
-  pore's central axis, does not influence the equilibrium structure if one choses
+  pore's central axis, does not influence the equilibrium structure if one chooses
   a reasonable value. The pore radius is chosen to be 0.5 nm in our initial
   configurations. The initial distance between pores, within a wide range, also has 
   little effect on the the equilibrated structure. However, one should not start them
   too close or there will be high energy repulsions during early equilibration. We 
   chose an initial pore spacing of 4.5 nm, $\sim$10\% larger than the experimental value
   of 4.12 nm. A sensitivity analysis of both parameters is presented in the 
-  Supporting information, section S\ref{S-section:initial_config_dependence}. The 
+  Supporting information, section S-\ref{S-section:initial_config_dependence}. The 
   distance between vertically stacked monomers, the xy position of monomers with respect 
   to vertically adjacent monomers, and the number of columns per pore do influence the 
   equilibrated structure and require further justification for their choices. We rely on 
@@ -845,7 +872,7 @@ liquid crystal membranes}
   the z-direction. We explore a second system with an initial spacing of 5
   \AA. We briefly explored a third system with an initial spacing of 10
   \AA. However this spacing yields non-physical behavior which is detailed in the 
-  Supporting Information, section S\ref{S-section:initial_dbwl}. 
+  Supporting Information, section S-\ref{S-section:initial_dbwl}. 
 
 %  This is true if initial equilibration is performed with pressure control
 %  If we initially space layers too far apart, they will collapse on each
@@ -866,7 +893,7 @@ liquid crystal membranes}
   our sandwiched initial configuration stack directly on top of each other while
   head groups in the parallel displaced initial configuration stack with an offset
   of $180^\circ/ncol$ where $ncol$ is the number of columns per pore. See Figure 
-  S~\ref{S-fig:stacking} for a detailed illustration of the initial configurations in each mode.
+  S-\ref{S-fig:stacking} for a detailed illustration of the initial configurations in each mode.
   
   % BJC5: figure here illustrating parallel displaced vs. sandwiched?
 
@@ -888,8 +915,11 @@ liquid crystal membranes}
   of NVT simulations. We allowed the resulting unrestrained structure to equilibrate for
   5 ns in the NPT ensemble with pressure controlled by the berendsen barostat 
   followed by NPT equilibration simulations run for at least 400 ns using the 
-  Parrinello-Rahman barostat. More precise details are available in 
-  section S~\ref{S-section:equilibration}.
+  Parrinello-Rahman barostat. 
+  %More precise details are 
+  More equilibration details are 
+  available in 
+  section S-\ref{S-section:equilibration}.
 
   \subsection{Equilibrium Calculations}
 
@@ -915,7 +945,8 @@ liquid crystal membranes}
   %BJC5: moved to supporting info
   %BJC6: Do you think I should add this back since I used nematic order parameter to
   % differentiate between ordered/disordered basins?
-%  \subsubsection{\textit{The nematic order parameter}}\label{method:nematic_order}
+  %MRS8: I think this is fine, since it's a relatively standard measure. 
+% \subsubsection{\textit{The nematic order parameter}}\label{method:nematic_order}
 %
 %  We calculated the nematic order parameter for our system in order to
 %  understand the degree of ordering among monomer head groups. Typically, the
@@ -963,7 +994,7 @@ liquid crystal membranes}
   
   Here, $g(z)$ is characterized by an oscillatory function with a period equal to the
   average distance between stacked monomers, and an amplitude that decays exponentially
-  (See Figure~\ref{fig:correlation}). The rate of decay is related to the correlation 
+  (see Figure~\ref{fig:correlation}). The rate of decay is related to the correlation 
   length, L, between monomer head groups. We estimated L by fitting the peaks of $g(z)$
   to a decaying exponential function of the form:
   \begin{equation}
@@ -978,9 +1009,9 @@ liquid crystal membranes}
   We also used $g(z)$ to calculate the equilibrated vertical stacking distance between
   monomers, $d_{equil}$. 
   %BJC5: in case there is an criticism of this method
-  %The simplest way to do so, would be to fourier transform
-  %$g(z)$ and extract the highest amplitude frequency of the resulting fourier series. 
-  %However, the size of our system limits the width of the bins in fourier space. The bins
+  %The simplest way to do so, would be to Fourier transform
+  %$g(z)$ and extract the highest amplitude frequency of the resulting Fourier series. 
+  %However, the size of our system limits the width of the bins in Fourier space. The bins
   %are too large to extract a precise value of $\mathit{d}_equil$. Instead, 
   We fit a decaying sinusoidal function to $g(z)$ of the form:
   \begin{equation}
@@ -1015,12 +1046,14 @@ liquid crystal membranes}
   We looked at the average number density of sodium ions, aromatic rings and 
   carbon atoms making up the monomer tails. We binned the radial distance of all
   atoms in each group from the pore centers, then normalized by the volume of the
-  annulus defined by the bin edges and the z box vector (See Figure~S\ref{S-fig:rdf_diagram}). 
+  annulus defined by the bin edges and the z box vector (See Figure~S-\ref{S-fig:rdf_diagram}). 
 
   \subsubsection{\textit{Simulated structure factor calculations}}\label{method:xrd}
   
+  %MRS8: we should ask Matt see if we can give the github repository
+  %for the XRD determination in the paper for reproducibility. I will do that. 
   We generated simulated XRD patterns based on atomic coordinates in order to make
-  a direct experimental comparison. We modelled all atomic coordinates as Gaussian
+  a direct experimental comparison. We modeled all atomic coordinates as Gaussian
   spheres of electron density corresponding to each atom's electronic radius. A 
   three dimensional Fourier transform (FT) of the array of electron density results in a three dimensional
   structure factor which represents the unit cell in reciprocal space. The
@@ -1033,7 +1066,8 @@ liquid crystal membranes}
 
   We normalized all diffraction patterns relative to R-alkanes. We believe that the
   alkane-alkane density, averaged over all angles, is the feature most likely to be
-  replicated between experiment and simulation. Other features are dependent on 
+  replicated between experiment and simulation, as atomistic alkane parameters are 
+  relatively well studied. Other features are dependent on 
   system ordering which is likely to have some dependence on initial configuration. 
   We calculated the average intensity within R-alkanes of the experimental pattern,
   $I_{avg}$ and divided all intensities by this value. In this way, the average intensity
@@ -1062,7 +1096,8 @@ liquid crystal membranes}
   indicated by the Einstein relation \cite{einstein_investigations_1956}. We
   visualized the MSD plot to determine where to begin and end a linear fit. We
   measured ion concentration with respect to the volume of the entire unit cell. 
-  
+  More details are provided in the Supporting Information, Section~S-\ref{section:ionic_conductivity}.
+
   \subsection{Cross-linking}
   
   In order to maximally match the experimental membrane synthesis process,
@@ -1073,7 +1108,7 @@ liquid crystal membranes}
   the system's structure.
 
   We based our cross-linking algorithm on the known reaction mechanism 
-  (Figure S\ref{S-fig:xlink_mech}). The reaction takes place at the terminal vinyl groups
+  (Figure S-\ref{S-fig:xlink_mech}). The reaction takes place at the terminal vinyl groups
   on each alkane tail. The procedure is carried out iteratively. Each iteration, the
   algorithm chooses carbons to cross-link based on the distance between eligible 
   carbon pairs. The algorithm then updates the topology with the new bonds and atom
@@ -1111,13 +1146,13 @@ liquid crystal membranes}
   % BJC5: trying things out with 'columns per pore' instead of 'monomers per layer'.
   Our simulations best support a model built with 5 monomer columns per pore based on
   the measured equilibrated pore-to-pore distances. To discern the composition of
-  the monomer layers, addressing question \ref{point:monomernum}, we ran
+  the monomer layers, addressing question \ref{point:monomernum} above, we ran
   simulations of systems created with 4--8 columns per pore. We built systems in both
   the parallel displaced and sandwiched configurations and equilibrated them according
   to the dry equilibration procedure. We tested all systems with an initial vertical monomer 
   spacing, $\mathit{d}$, of 3.7 \AA~in accordance with R-$\pi$. We tested 4 additional 
-  systems with monomers initially spaced 5 \AA~apart vertically (See section~\ref{S-section:initial_pore_spacing}
-  of the supporting info for more details on sensitivity to initial layer spacing). 
+  systems with monomers initially spaced 5 \AA~apart vertically (see section~\ref{S-section:initial_pore_spacing}
+  of the Supporting Information for more details on sensitivity to initial layer spacing). 
   We considered the pore-to-pore spacing to be equilibrated as defined in section~\ref{method:equil_time}.
   Figure~\ref{fig:p2p} shows the equilibrated pore-to-pore distances for all systems tested. 
   
@@ -1134,12 +1169,14 @@ liquid crystal membranes}
   we are trying to match. In the limit of infinite simulation time, all systems will in theory 
   converge to a single equilibrium configuration, but that time is far beyond the 100's of 
   nanosecond simulated here. For simplicity, we group the systems studied here into the ordered
-  and disordered basins. Any system where $\mathit{d}=3.7$ \AA~will be included in the
-  ordered basin and any system where $\mathit{d}=5.0$ \AA~will be included in the disordered basin.
+  and disordered basins. What we find is that any system where $\mathit{d}=3.7$ \AA~can generally 
+  be characterized as being in an
+  more ordered basin, and any system where $\mathit{d}=5.0$ \AA~can be characterized as a more the disordered basin.
   Generally, when monomers are started further apart, they stay further apart than systems where
   monomers are started closer together (see Table~\ref{table:correlation_length}). Because of the
   extra space between stacked monomers, monomer head groups have more rotational freedom. We
-  quantified the ordering of the head groups using the nematic order parameter (See section S~\ref{method:nematic_order}). 
+  quantified the ordering of the head groups using the nematic order parameter (see section S~\ref{method:nematic_order} for details of calculation). 
+  %MRS8: the reference above isn't appearing. I'm not sure why after quick check.
   Disordered basin systems have a lower nematic order parameter (meaning they are more disordered) 
   than ordered basin systems.
 
@@ -1155,16 +1192,16 @@ liquid crystal membranes}
   (Figure~\ref{fig:SAXS}). Ordered basin systems built with 4 columns per pore equilibrate
   to an average pore spacing 0.25 nm lower than experiment. Ordered basin systems built with
   6 columns per pore, have an equilibrated pore spacing ca. 0.50 nm higher than experiment.
-  Monomers in disordered basin systems built with 6 columns-per-pore agree with experiment 
+  Monomers in disordered basin systems built with 6 columns-per-pore agree with experimental pore-to-pore distances 
   within error, but stack too far apart. Those in the disordered sandwiched and disordered
-  parallel displaced configurations stack $\approx$ 4.87 and 4.94 \AA~apart respectively, 
+  parallel displaced configurations stack $\sim$4.87 and 4.94 \AA~apart respectively, 
   which is ca. 1.2~\AA further apart than suggested by experiment. 5 column-per-pore systems
   stack, at a maximum, 0.9 \AA~further apart than experiment (see Table~\ref{table:correlation_length}). 
   The remainder of this discussion will focus on the analysis of systems built with 5 columns per pore. 
 
 % BJC6: I don't think I need to say the following in above paragraph since its all in the methods.
 % Our methodology for calculating equilibrium stacking distance is fully explained in section~\ref{section:rpi}.
-  
+% MRS8: sounds good.  
 %  Relative to ordered basin 
 %  6 column-per-pore systems, the unit cell is elongated in its z dimension and contracted in its
 %  x and y dimensions, however the box volume stays nearly constant in all cases 
@@ -1197,7 +1234,7 @@ liquid crystal membranes}
   (see section~\ref{method:xrd}) which inherently gives less data as $q_r$ approaches 0. Second, 
   our simulations are not long enough to sample enough truly independent configurations within
   their respective metastable basins. By sampling more uncorrelated equilibrium configurations,
-  we can suppress some of the noise (See section S\ref{S-section:xrd_noise}).
+  we can suppress some of the noise (See section S-\ref{S-section:xrd_noise}).
 
   \begin{figure}[!htb]
 	\centering
@@ -1243,7 +1280,7 @@ liquid crystal membranes}
 	present to some degree. R-spots is also present, however it is generally partially covered by the
 	broad R-$\pi$ reflection. Quantitative comparisons of the relative intensities of reflections of
 	interest are presented in Table~\ref{table:relative_inensities_300K}. In both XRD patterns generated
-	from parallel displaced patterns, there is a faint line across $q_z \approx 0.7~$\AA$^{-1}$, half
+	from parallel displaced patterns, there is a faint line across $q_z \sim 0.7~$\AA$^{-1}$, half
 	the simulated value of R-$\pi$. Although it does not cross through $q_r = 0$~\AA$^{-1}$, it is at 
 	the same $q_z$ value where we expect R-double to be present. Still, R-double is not fully reproduced
 	in any of the simulated patterns.}~\label{fig:XRDsim} 
@@ -1253,7 +1290,7 @@ liquid crystal membranes}
   R-pores appear in the expected location. R-pores is more intense than experiment, likely
   because we are simulating a near perfect, infinite hexagonal array. The real system has 
   defects and domain misalignment which decreases the overall intensity.
-  % MRS4: comments from Matt suggest that domain misaligment shouldn't alone be responsible for 
+  % MRS4: comments from Matt suggest that domain misalignment shouldn't alone be responsible for 
   % the difference in intensity ratio. Some of the experiments should help explain it better. 	
   % Let's talk!
   % BJC4: So a combo of: domain misalignment, defects, slow dynamics of simulated system, only 4 
@@ -1273,7 +1310,7 @@ liquid crystal membranes}
   reflection due to their helical structure. There are weak horizontal reflections near $|q_z|= 
   0.7~\AA^{-1}$, half of the $q_z$ value of R-$\pi$. The reflection does not cross through
   $q_r = 0~\AA^{-1}$ so it does not necessarily appear for the same reason as R-double. 
-  This type of pattern is characteristic of a helix ~\cite{watson_structure_1953}. The 
+  This type of pattern is characteristic of a helix~\cite{watson_structure_1953}, as the 
   head groups in the parallel displaced configuration are arranged in a helix.
   It is possible that these reflections contribute to the diffuse reflections that connect
   R-spots and R-double in the experimental pattern.
@@ -1291,7 +1328,7 @@ liquid crystal membranes}
   R-$\pi$, since that is where it appears experimentally. The intensity of R-spots is slightly
   lower than experiment in all cases except for the ordered basin sandwiched configuration which 
   agrees with experiment. There is no R-double intensity to be measured. Figures
-  are provided in section S\ref{S-section:xrd_intensities} to make these measurements clear.
+  are provided in section S-\ref{S-section:xrd_intensities} to make these measurements clear.
 
   \begin{table}[h]
   \centering
@@ -1416,13 +1453,13 @@ liquid crystal membranes}
 %  In addition to R-$\pi$ being shifted to lower $\mathbf{q}$ values, a few
 %  factors combine to make the simulated R-$\pi$ reflection visibly more intense
 %  than in the experimental pattern. The simplest reason is that R-$\pi$ and
-%  R-alkanes add together to boost the overall signal at interesecting values of
+%  R-alkanes add together to boost the overall signal at intersecting values of
 %  $\mathbf{q}$. In addition, we observe a much higher maximum intensity within
 %  R-$\pi$. The maximum intensity within R-$\pi$ of the normalized experimental
 %  pattern is 3.1, while the maximum intensity within R-$\pi$ of the normalized
 %  parallel displaced simulated pattern is 32.9. 
 %  %MRS2 10x is really big.  That seems hard to actually manage . . . I didn't realize it was that big. For some reason, I thought it was around 3x.  If it's that big, how come the 7.4 A reflection isn't big?  It's not clear to me how this is possible. Not clear how the angle averaging obscured this before?
-%  %BJC2 From plots of raw structure factor, it doesn't seem like a normalization issue. It was probably obscured in the orginal angle averaging because it 
+%  %BJC2 From plots of raw structure factor, it doesn't seem like a normalization issue. It was probably obscured in the original angle averaging because it 
 %  % was averaged with neighboring bins
 %  While direct numerical
 %  comparisons between simulation and experiment aren't necessarily precise due to
@@ -1470,9 +1507,13 @@ liquid crystal membranes}
   alkane chains of the 280K system and showed that it equilibrates to an average tilt angle of
   -2\degree (Fig.~\ref{fig:tilt}), far from the 37\degree tilt angle previously used to 
   explain R-spots. 
+  %MRS8: did you do a few different things here as sensitivity analysis to show that the finding was robust?  If so, putting some of that in would be useful.
 
-  To understand the true origin of R-spots, we determined which atoms gave rise to the 
-  feature. Since R-spots is present as higher intensity spots within R-alkanes, it is
+  To understand the %true 
+  more likely origin of R-spots, we determined which atoms gave rise to the 
+  feature. 
+  %MRS8: next two sentences repetitive; could you revise? 
+  Since R-spots is present as higher intensity spots within R-alkanes, it is
   likely that the spots arise as a consequence of the tails. By removing all non-tail atoms
   from the trajectory and simulating a diffraction pattern with the remaining atoms, we were
   able to isolate the cause of the spots to the tails (Figure~\ref{fig:tails_rzplot}). Since the 
@@ -1509,7 +1550,7 @@ liquid crystal membranes}
 %  \begin{enumerate}
 %  		\item The difference between 280 K and 300 K is relatively small. Our forcefield parameters
 %  		may not correctly model the behavior of the tails at 300 K (citation?).
-%                % look for papers on protien folding temperature dependence: see Lee-Ping Wang's AMBER-15fb paper
+%                % look for papers on protein folding temperature dependence: see Lee-Ping Wang's AMBER-15fb paper
 %  		\item Monomers aren't as confined at 300 K in our simulations versus experiment.
 %  		If the head groups packed 3.7 \AA~apart, the tails would be more confined and forced
 %  		to pack between vertically adjacent monomer tails. In our case, the tail region is
@@ -1549,6 +1590,8 @@ liquid crystal membranes}
 	        \includegraphics[width=\linewidth]{layered_angle_v_I.png}
 	        \caption{}~\label{fig:layered_integration}
   \end{subfigure}
+  %MRS8: nicely organized figure! I think in (c), you do want the red/green dots showing hexagonal symmetry to be bigger; 
+  %when the figure is reduced they are hard to see.
   \caption{(a) R-spots increases in intensity when the temperature of the system is 
       lowered to 280K. (b) We measured the average angle made between each monomer 
       alkane tail and the membrane plane. The average tilt angle (dashed line) is 
@@ -1571,10 +1614,10 @@ liquid crystal membranes}
   
   \subsubsection{Discrepancies between experimental and simulated R-$\pi$}\label{section:rpi}
   
-  There is not a single reason for the high intensity of R-$\pi$ in our simulations.
+  There is not a single reason we can clearly identify for the high intensity of R-$\pi$ in our simulations.
   We used one-dimensional pair distribution functions of the centers of masses of monomer
   phenyl groups, $g(z)$, to help us understand how far apart monomers stack within monomer 
-  columns and the degree to which they are correlated. These metrics helped us disect the 
+  columns and the degree to which they are correlated. These metrics helped us dissect the 
   various contributions to R-$\pi$. Figure~\ref{fig:correlation} shows $g(z)$ for all 
   systems tested. 
   
@@ -1642,7 +1685,7 @@ liquid crystal membranes}
   $\mathit{d}_{equil}$, between monomers using Equation~\ref{eqn:decaying_sinusoid}. 
   Monomers in the ordered basin stack ca. 0.2 and 0.3 \AA~closer than those built in the 
   disordered basin in the sandwiched and parallel displaced configurations respectively. 
-  The distance between stacked monomers is greater than experiment by 0.5 - 0.9 \AA~across all 
+  The distance between stacked monomers is greater than experiment by 0.5--0.9 \AA~across all 
   cases. This behavior is not surprising since GAFF models atoms as point charges and does not 
   appropriately model the aromatic $\pi-\pi$ interactions which would make it more energetically
   favorable for the monomers to stack closer together. Additionally, it is possible that the 
@@ -1670,7 +1713,7 @@ liquid crystal membranes}
   the correlation length would increase. We expect that the leading peak would only get more intense 
   if monomers stacked 3.7 \AA~apart. Conversely, parallel displaced head groups are not as confined
   by their vertically adjacent neighbors. This z-direction translational freedom may still be 
-  feasible if monomers stack 3.7 \AA~apart in a parallel displaced configuration meaning the system
+  feasible if monomers stack 3.7 \AA~apart in a parallel displaced configuration, meaning the system
   would maintain a correlation length and R-$\pi$ intensity in relative agreement with experiment.
   
   %The amount of noise in the correlation function and the lack of an initial peak suggests that 
@@ -1688,14 +1731,14 @@ liquid crystal membranes}
   the entire correlation function. If the peaks, at large values of z, instead decay to 1 uniformly,
   the correlation length could remain nearly the same, but R-$\pi$ would have a reduced intensity. 
   The monomer head groups in our simulations do not move enough on the timescales simulated to 
-  create the noise which would cause such behavior. See Section S\ref{S-section:rpi_ft} of the
+  create the noise which would cause such behavior. See Section S-\ref{S-section:rpi_ft} of the
   supporting information for illustrative examples.
   
   The system size does not significantly alter the intensity of R-$\pi$. We equilibrated a 
   sandwiched system with twice as many monomers per column so that the system size doubled in 
   the z-direction. The correlation length increases modestly from 4.5 $\pm$ 0.4 to 7.3 $\pm$ 1.2 \AA, 
   and the intensity of R-$\pi$ decreases from 44.0 to 39.4. Visually, the correlation functions
-  are nearly identical (See Figure~S\ref{S-fig:z_correlation_overlay}). 
+  are nearly identical (See Figure~S-\ref{S-fig:z_correlation_overlay}). 
   
   %MRS7: question - pushing Matt on this, he seemed to imply that the high value of the peaks indicated large
   %LOCAL ordering, and that defects/misaligned pores would give rise to BROADENING, but wouldn't change the 
@@ -1816,7 +1859,7 @@ liquid crystal membranes}
 %  %differentiated by their relative degrees of ordering resulting from different
 %  %spatial arrangements. 
 %  For reasons we will develop in the next segment of our
-%  discussion, configurations intially built with layers stacked 5.0 \AA~apart 
+%  discussion, configurations initially built with layers stacked 5.0 \AA~apart 
 %  will be grouped into the disordered pore basin, while those built with layers
 %  initially stacked 3.7 \AA~apart will be grouped into the ordered pore basin.
 %
@@ -1868,7 +1911,7 @@ liquid crystal membranes}
 %		the ordered pore systems. The simulated
 %		XRD patterns of disordered pore systems are also appreciably different, most 
 %		notably in the region bounded by R-alkanes. The disordered pore
-%		systems started in the parallel displaced configuariton (c) does not show R-spots
+%		systems started in the parallel displaced configuration (c) does not show R-spots
 %		or R-$\pi$ which suggests that head groups are not associating with each other
 %		and tails are distributed nearly isotropically. The disordered pore system
 %		started in the sandwiched configuration (d) does not show R-$\pi$ but R-spots 
@@ -1894,7 +1937,7 @@ liquid crystal membranes}
 %  ordered pore basin. Layers in the ordered pore basin are strongly correlated
 %  with neighboring layers up to more than 10 layers away. This behavior deviatbecomes smalleres
 %  from experimental evidence. The experimental correlation length (See
-%  Suppporting Information for details its derivation) suggests that layers are
+%  Supporting Information for details its derivation) suggests that layers are
 %  correlated with about 3 neighboring layers which is closer to the values
 %  exhibited by the disordered pore basin. We may need to simulate a system with
 %  many more layers in order to reduce the correlation contributed by periodic
@@ -2021,13 +2064,13 @@ liquid crystal membranes}
  
 % BJC6: removed to cut down on amount of material. This one is the biggest stretch in my opinion.
 %  We can produce R-double if our initial configuration contains alternating parallel and
-%  antiparallel carboxylate groups relative to the plane of the monomer's phenyl ring.
+%  anti-parallel carboxylate groups relative to the plane of the monomer's phenyl ring.
 %  (Figure ~\ref{fig:rotated_carboxylate_rzplot_norestraints}). It is difficult to physically
 %  justify this system. Systems built this way are only stable if position restraints are placed
 %  on all head group heavy atoms. Carboxylate groups quickly revert to the parallel position as 
 %  restraints are released. There is an appreciable energy barrier that prevents rotation
 %  of carboxylate groups attached to phenyl rings since the group extends the system's 
-%  $\pi$ conjugation (citation) (See Figure S\ref{S-fig:carboxylate_dihedral_rb}).
+%  $\pi$ conjugation (citation) (See Figure S-\ref{S-fig:carboxylate_dihedral_rb}).
 %  
 %  %BJC5: add citation for extended pi conjugation
 %  There are instances where carboxylate groups in other systems rotate out of plane. Bushey et
@@ -2058,11 +2101,22 @@ liquid crystal membranes}
   pairs that stack less than 3.7~\AA~apart, and whose center of masses are spaced 7.4 \AA~ 
   from the next pair of monomers (Figure ~\ref{fig:staggered_rzplot_norestraints}). To our 
   knowledge, there have been no studies that specifically address the possibility of a
-  configuration like this. Our forcefield causes our system to tend towards uniformly spaced
-  layers. Simulations of unevenly spaced systems are only stable if position restraints
+  configuration like this. 
+  %MRS8: above: be more precise, for example, QM studies or crystallographic investigation of stacked pi-pi system, 
+  % can cite the reference found.
+  Our force field causes our system to tend towards uniformly spaced
+  layers.   Simulations of unevenly spaced systems are only stable if position restraints
   are applied to heavy atoms of the phenyl rings.
+  %MRS8: added below.
+  There is little evidence from QM studies of stacked $\pi-\pi$ systems that this behavior is incorrect.~\ref{???} 
   
-  Adding water to the system facilitates the appearance of R-double. We added water to the 
+  Adding water to the system 
+  %facilitates 
+  appears to facilitate 
+  the appearance of R-double,
+  %MRS8: added above. I realize the H-bonding isn't brought up until later paragraphs, but I don't want to leave people in suspense; it serves as essentially a thesis of the next few paragraphs, which do group together.
+  through the creation of hydrogen bonding of water to carboxylate groups of consecutive layers.
+  We added water to the 
   parallel displaced and sandwiched configurations in the ordered basin and equilibrated them
   according to the wet equilibration procedure. There is no experimental measurement of 
   water concentration in these membranes so we tested a range of water concentrations from
@@ -2146,7 +2200,10 @@ liquid crystal membranes}
   After 200 ns of equilibration, R-double becomes visible and persists for another 200 ns (bottom).}\label{fig:rdouble}
   \end{figure}
 
-  R-double appears in the solvated system due to the structure of the head groups. To prove this,
+  R-double appears in the solvated system due to the structure of the head groups. To 
+  %prove 
+  demonstrate
+  this,
   we removed the head groups from the trajectory used to produce Figure~\ref{fig:solvated_pore_rzplot_norestraints}
   in order to produce that shown in Figure~\ref{fig:rdouble_nophenyls}. R-double does not appear
   without the influence of the head groups. Water molecules must play a role in the structuring
@@ -2161,22 +2218,22 @@ liquid crystal membranes}
   can just as easily share a water molecule with a head group below itself. In this scenario,
   the centers of each pair are 2 times the $\pi$-stacking distance apart which would
   lead to R-double (much like the configuration in Figure~\ref{fig:staggered_rzplot_norestraints}). There are
-  a modest number of occurences of this scenario, shown in Figure~\ref{fig:pore_hbonds}. 
+  a modest number of occurrences of this scenario, shown in Figure~\ref{fig:pore_hbonds}. 
   Peaks in the distributions represent the scenario where a monomer head group shares a 
   water molecule with a head group vertically above it. In Figure~\ref{fig:pore_hbonds_ft},
-  we calculated the discrete fourier transform of the distributions which we used as a rough 
+  we calculated the discrete Fourier transform of the distributions which we used as a rough 
   indicator of whether the head group arrangement will lead to R-double. We see the 
   strongest indicator of asymmetric monomer stacking in Pore 1 where the peaks at 0.5
   layers$^{-1}$ are clearly distinguished, meaning there is periodicity every two layers.
   
-  It is likely that R-double originates from water molecules as described above and it is the 
-  only mechanism that occurred without using position restraints. The extent of the hydrogen
+  It is thus most likely that R-double originates from water molecules as described above, as it is the 
+  only mechanism that can be observed without externally restraining positions. The extent of the hydrogen
   bonding network that forms is largely determined by the accuracy of the forcefield. It is 
   possible that a more realistic forcefield would make the effect stronger or weaker. If 
   this is truly the mechanism, it implies that the system studied by Feng et 
   al.\cite{feng_scalable_2014,feng_thin_2016} was not truly a thermotropic Col\textsubscript{h}
   phase. Rather, they were very low water content H\textsubscript{II} phases unintentionally
-  created due to the neat monomers' hydroscopicity. This detail may be important for reproducing
+  created due to the neat monomers' hydroscopicity. This detail may therefore be important for reproducing
   the results of Feng et al.
 
   \begin{figure}[!htb]
@@ -2216,7 +2273,7 @@ liquid crystal membranes}
   vertically above it. For example, in Pore 1, monomer 7 shares a hydrogen bond with
   a monomer in layer 8 (pictured in (b)). In this scenario, monomers are no longer evenly
   spaced in the z-direction since they are pulled closer together by hydrogen bonds. 
-  (d) We performed discrete fourier transforms on each distribution in (c). In all cases,
+  (d) We performed discrete Fourier transforms on each distribution in (c). In all cases,
   the strongest peak represents periodicity every layer. In Pore 1, there is also periodicity
   every other layer as indicated by the strong peak at 0.5 layers$^{-1}$. In this case, the
   center of mass of two adjacent pairs is separated by twice the average monomer stacking 
@@ -2224,7 +2281,7 @@ liquid crystal membranes}
   give rise to R-double.}\label{fig:hbonds}
   \end{figure}
   
-  \subsection{Chemical composition of pore columns}
+  \subsection{Atomistic structure of pore columns}
 
   We are most interested in the structure and composition of the pores since we would like to study
   transport mechanisms within them. We have shown that the tails possess a certain degree of order
@@ -2234,22 +2291,27 @@ liquid crystal membranes}
   configurations studied so far.
 
   %BJC6: moved this paragraph up to make the section more idea-focused
-  In general, the composition of each region, particulary within our definition of 
-  the pore region, is similar between all systems. We believe we can solvate and study transport
-  in any of the systems presented here and extract similar transport mechanisms. We will 
-  need to verify that this assumption is true. 
+  In general, the composition of each region, particularly within our definition of 
+  the pore region, is similar between all systems. 
+  %MRS8: weakened a bit
+  This suggest that the details of transport may be relatively independent of the structural differences between
+  different possible structures studied here.
+  %We believe we can solvate and study transport
+  %in any of the systems presented here and extract similar transport mechanisms. We will 
+  %need to verify that this assumption is true. 
   
   We plotted the number densities of heavy atoms in the head group, carbon atoms in the tail
   region and all sodium ions (Figure~\ref{fig:overlaid_densities}). For the head group
   region, we used heavy atoms making up the aromatic rings and carboxylate groups. For the tail
-  region we used carbon atoms of the monomer tails (See Figure S\ref{S-fig:monomer_color_coded}
+  region we used carbon atoms of the monomer tails (See Figure S-\ref{S-fig:monomer_color_coded}
   for a diagram). We averaged the histograms over at least 50 ns of equilibrated trajectory.
 
   There is a gradient in pore composition transitioning radially from the hydrophilic 
   to the hydrophobic region, rather than an abrupt division. Based on size-exclusion 
-  experiments, we define the pore radius to be 0.6 nm
+  experiments, we define the pore radius to be 0.6 nm~\cite{zhou_supported_2005}. 
   %BJC5 : Add vertical line to plots for 'pore radius'? Might be too busy.
-  ~\cite{zhou_supported_2005}. The system does not confine
+  %MRS8: I actually think it might add understanding  I would label it as ``experimentally estimated size-exclusion radius''.
+  The system does not confine
   sodium ions and head groups to just within the pore region. For dry systems,
   19\% of sodium ions exist outside the pore region (except sandwiched, ordered basin,
   where 16\% are outside the pore). Additionally, we see that in all cases, about 
@@ -2263,7 +2325,7 @@ liquid crystal membranes}
 %  membrane's pore radius based on the size of a molecule it can reject, however
 %  it is not clear where the edges of the pores are and what size molecule would
 %  fit through. We leave these investigations for a future study.
-  %MRS7: or could say that the size could be different depending on the the nature of the molecle. Could bring up
+  %MRS7: or could say that the size could be different depending on the the nature of the molecule. Could bring up
   %Sarah's results with different selectivity of molecules about the same size.
 
   The space in the pore region is filled with a mixture of sodium ions
@@ -2275,6 +2337,7 @@ liquid crystal membranes}
   compared to the previous idealized picture of a hollow tube conducive to transport.
   
   %BJC6: redone with only tops of histograms plotted, and water added
+  %MRS8: this is good at showing most structures are the same.  It would be nice to also see how different components relate to each other spatially. Perhaps you can add a picture (can pick just one, since they are so similar) and plot the different components on one plot to show how the gradients intersect.
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.32\textwidth}
@@ -2297,7 +2360,8 @@ liquid crystal membranes}
 	  regions. The biggest differences are at r=0 where noise is expected to be high due to 
 	  decreased sampling. The center of the pore is not hollow, but contains sodium ions and 
 	  head groups, even when the system is solvated. This architecture may impede transport in 
-	  the real system. The solvated system has a lower density of head groups near the 
+	  the real system in a chemically-dependent manner. 
+          The solvated system has a lower density of head groups near the 
 	  pore center which is likely due to the swelling that is necessary in order to fit water
 	  molecules in the pore region.}~\label{fig:overlaid_densities}
   \end{figure}
@@ -2416,10 +2480,10 @@ liquid crystal membranes}
 %  can just as easily share a water molecule with a head group above itself. In this scenario,
 %  the centers of each group are 2 times the $\pi$-stacking distance apart which would
 %  lead to R-double (much like the configuration in Figure~\ref{fig:staggered}). There are
-%  a modest number of occurences of this scenario, shown in Figure~\ref{fig:pore_hbonds}. 
+%  a modest number of occurrences of this scenario, shown in Figure~\ref{fig:pore_hbonds}. 
 %  Peaks in the distributions represent the scenario where a monomer head group shares a 
 %  water molecule with a head group vertically above it. In Figure~\ref{fig:pore_hbonds_ft},
-%  we calculated the discrete fourier transform of the distributions which we used as a rough 
+%  we calculated the discrete Fourier transform of the distributions which we used as a rough 
 %  indicator of whether the head group arrangement will lead to R-double. We see the 
 %  strongest indicator of asymmetric monomer stacking in Pore 1 where the peaks at 0.5
 %  layers$^{-1}$ are clearly distinguished, meaning there is periodicity every two layers.
@@ -2603,19 +2667,19 @@ liquid crystal membranes}
   We quantified the movement of the tails during our simulations by calculating the 
   autocorrelation function of the dihedral angle formed around the bond between the 
   head groups and the ether oxygens which attach the tails to the head group 
-  (See Figure S\ref{S-fig:dihedrals}). We exclude the dihedral from the middle tail 
+  (See Figure S-\ref{S-fig:dihedrals}). We exclude the dihedral from the middle tail 
   since it is fundamentally different than the two symmetric outside tails. We 
   limited these studies to the sandwiched configuration for simplicity.
   
   The ether dihedrals become decorrelated on a reasonable timescale when the temperature
   is raised. At 300K (Figure~\ref{fig:dihedrals_300K}), the autocorrelation function does
-  not cross the x-axis until $\approx$ 105 ns meaning that tails might only fully rotate
-  4 times over the course of the 400 ns that we studied. Additionally, the correlation 
+  not cross the x-axis until $\sim$105 ns meaning that tails fully rotate on average about 
+  times over the course of the 400 ns that we studied. Additionally, the correlation 
   function plateau's near a value of -0.2 which indicates that the tails are starting in 
   an unfavorable configuration. We implemented distance restraints between the centers of 
-  mass of monomer head groups to preserve the hexagonal phase, then rose the temperature 
+  mass of monomer head groups to preserve the hexagonal phase, then raised the temperature 
   of the equilibrated 300 K ordered basin sandwiched system to 500 K. We witnessed 
-  decorrelation of the ether dihedrals after $\approx$ 11 ns with a plateau at 0, 
+  decorrelation of the ether dihedrals after $\sim$11 ns with a plateau at 0, 
   (Figure~\ref{fig:dihedrals_500K}) indicating a complete loss of memory. We annealed
   the resultant configuration back down to 300 K over 200 ns to see if the increased rotational
   freedom might allow the system to relax into to a more tightly packed configuration.
@@ -2637,6 +2701,7 @@ liquid crystal membranes}
 %MRS5: let's talk about the implications of this (above); might want to move some of this into the SI.
 %BJC6: Which could be moved to supplemental? Theoretically, I could move most of the dihedral
 % stuff to SI and summarize briefly. But it I think it makes what we did more abstract.
+%MRS8: I think that you can just give the numbers  in the text, and move the figures to SI? Figures don't add a lot.
 
   \begin{figure}[!htb]
   \centering
@@ -2653,13 +2718,13 @@ liquid crystal membranes}
   \caption{}\label{fig:dihedrals}
   \end{figure}
   
-  \subsection{Model Ionic Conductivity Measurements}
+  \subsection{Ionic Conductivity Measurements}
  
   %BJC5: which system should I study here? I wrote this before the solvated
   % system showed R-double. It might make sense to study the solvated system for ionic
   % conductivity and cross-linking.
 
-  %MRS7: hmm. Good question. Probably, as long as it's pretty straightforward. For diffusion, you can do just one calculation, and put the alternate method in SI (you can mention you did it, i.e. we did X, it was noiser, but agreed within data (see SI). 
+  %MRS7: hmm. Good question. Probably, as long as it's pretty straightforward. For diffusion, you can do just one calculation, and put the alternate method in SI (you can mention you did it, i.e. we did X, it was noisier, but agreed within data (see SI). 
   
   %BJC6: shifted to solvated system only. Moved Collective diffusion to supporting info.
   
@@ -2671,9 +2736,10 @@ liquid crystal membranes}
   the ordered basin with 1 wt \% water since we believe its structure is the 
   closest match to experiment. Our model estimates the ionic conductivity within
   one order of magnitude of experiment (Figure~\ref{fig:ionic_conductivity}). We
-  verified the value calculated by the Nernst-Einstein relationship using a 
-  second method called the collective diffusion model\cite{liu_collective_2013} 
+  verified the value calculated by the Nernst-Einstein relationship using 
+  the collective diffusion model\cite{liu_collective_2013} 
   (See section S~\ref{s-fig:conductivity}). The values calculated by the 
+  %MRS8: this section reference not working either.
   collective diffusion model agree with Nernst-Einstein  values within error, 
   however there is a much higher uncertainty that would require much longer 
   simulations to lower.
@@ -2706,15 +2772,17 @@ liquid crystal membranes}
 
   \subsection{Effect of Cross-linking}\label{section:xlink}
 
-  We applied our cross-linking algorithm to equilibrated sandwiched and parallel
+  Experimentally, membranes are crosslinked for mechanical stability before use. We applied 
+  our cross-linking algorithm to equilibrated sandwiched and parallel
   displaced configurations in the ordered pore basin. We allowed the cross-linking
   algorithm to propagate until greater than 90\% of vinyl groups were either involved
-  in a cross-linking reaction or were terminated. See section S\ref{S-section:xlink}
-  for further details on the cross-linking algorithm. We allowed the cross-linked
+  in a cross-linking reaction or were terminated (see section S-\ref{S-section:xlink}
+  for further details of the cross-linking algorithm). We allowed the cross-linked
   configurations to simulate for 100 ns further in the NPT ensemble. 
 
-  % BJC5: Is it worth including the distance between layers and the correlation length?   
-  There are minor changes to the physical characteristics of these systems when 
+  % BJC5: Is it worth including the distance between layers and the correlation length? 
+  % MRS8: probably very briefly discuss the changes, to justify the use of the word ``minor''
+  There are only minor changes to the physical characteristics of these systems when 
   they are cross-linked (See Figure~\ref{fig:xlink}). The ionic conductivity of 
   the sandwiched configuration decreases while that of the parallel displaced 
   configuration stays the same. The pore spacing decreases in both systems by
@@ -2782,10 +2850,10 @@ but is most pronounced in the parallel displaced system.
 %	  layers increases (c) and the pore spacing decreases (d)}~\label{fig:xlink}
 %  \end{figure}
  
-  \section{Conclusion}
+  \section{Conclusions}
   
 %MRS6: I think we should remove the ``we learned'', and express it more in terms of the observed facts: rather than ``we learned statement X'', you can just say ``statement X''. Or ``observation Y in the simulations supports the conclusion Y''.  
-  We have used a detailed molecular model of the Col\textsubscript{h} phase
+  We have used detailed molecular modeling of the Col\textsubscript{h} phase
   formed by Na-GA3C11 in order to study its nanoscopic structure. While there
   have been efforts to model formation of various liquid crystalline phases with
   molecular dynamics, to our knowledge there have been no studies which attempt
@@ -2794,7 +2862,7 @@ but is most pronounced in the parallel displaced system.
   We observed a number of metastable configurations, stable for hundreds of 
   nanoseconds, which do not fit the experimental profile we have tried to match. 
   We explored two classes of metastable basins which are dependent on the initial
-  vertical stacking distance between monomers : the ordered and disordered pore basins.
+  vertical stacking distance between monomers: the ordered and disordered pore basins.
   We expect that these metastable configurations will eventually rearrange and converge
   to a single equilibrium structure. We conducted extensive analysis in order to 
   isolate structures which most closely resemble the true equilibrium structure.
@@ -2802,11 +2870,15 @@ but is most pronounced in the parallel displaced system.
   We achieve maximum structural consistency with experiment, as determined by simulated
   2D XRD patterns, when we build our model in the ordered basin parallel displaced
   configuration with 5 monomer columns per pore and 1 wt\% water. R-alkanes and R-pores
-  appear where expected for the reasons originally predicted. We learned that R-spots
+  appear where expected for the reasons originally predicted. We find that R-spots
   is likely due to ordered alkane chain packing. R-$\pi$ appears at lower q values than
   experiment because monomer stack too far apart. Finally, we observed that our model
-  reproduces R-double only when we add 1 wt\% water to the system. This observation has
-  important implications for the reproducibility of the experimental results from Feng 
+  can only produce
+  %reproduces 
+  R-double when we add 1 wt\% water to the system. This observation has
+  %important 
+  possible
+  implications for the reproducibility of the experimental results from Feng 
   et al since they claim that their membrane is completely dry. 
 
 %  The system's pore spacing is most consistent with experiment when systems
@@ -2824,18 +2896,22 @@ but is most pronounced in the parallel displaced system.
   We characterized the environment centered around the membrane pores and
   learned that the pores are generally filled with monomer head groups and sodium
   ions. All dry systems studied showed a similar distribution of sodium, head groups 
-  and tails while the wet system shows evidence of swelling due to the presence of 
-  water molecules. We also observed that there is not a hard partition between hydrophlic
+  and tails while the wet system shows evidence of 
+  %MRS8: modified; water isn't changing things very much.
+  slight
+  swelling, with minor changes in the distributions due to the presence of 
+  water molecules. We also observed that there is not a hard partition between hydrophilic
   and hydrophobic regions, rather there is a gradient. This finding has raised questions
   about the nature of size-exclusion separations in systems without a well-defined pore 
-  size.  
+  size, which potentially could give rise to separations that vary with chemical identity as well as size. 
 
 %  We learned that we do not need water to create well-defined pore structures.
 %  Systems whose pores were filled with varying amounts of water showed a decrease
 %  in structuring relative to dry systems. At higher water concentrations, the pores
 %  begin to swell, which may be more conducive to transport.
 
-  We justified that our system can reasonably estimate ionic conductivity.  Our
+  %We justified that 
+  Our system can reasonably estimate ionic conductivity.  Our
   calculations are about 1 order of magnitude higher than experiment, however
   that is to be expected since we are simulating a perfectly straight and
   defect-free membrane. 
@@ -2844,9 +2920,11 @@ but is most pronounced in the parallel displaced system.
   cross-linked by the algorithm we implemented. The diffraction pattern weakens
   relative to the uncross-linked system, the ionic conductivity drops by a factor
   of ca. 1.5, in closer agreement with experiment, the pore spacing decreases and
-  the membrane becomes thicker. 
+  the membrane becomes thicker; 
+  %MRS8: added some.
+  however, all changes are relatively minor, preserving most of the features well.
 
-%MRS6'' isn't it 1-3 orders of magnitude lower? You cite some slower statistics, and there might be differences between lyotrpic and thermotropic, if the hydrophilic/hydrophobic effect is stronger than the effects in thermotropic fluids.
+%MRS6'' isn't it 1-3 orders of magnitude lower? You cite some slower statistics, and there might be differences between lyotropic and thermotropic, if the hydrophilic/hydrophobic effect is stronger than the effects in thermotropic fluids.
 %  We acknowledge that our simulated system exhibits glassy dynamics. The
 %  measured diffusion constants of monomers are one to three orders of magnitude lower
 %  than expected. It is possible that our equilibration procedure induces these
@@ -2855,8 +2933,11 @@ but is most pronounced in the parallel displaced system.
 %  limitations of our equilibration procedure and have come up with a structure
 %  that is in good agreement with experimental data.
 
-  With the structural understanding gained by these simulations, we will
-  evaluate transport of various solutes within the system. We will apply the
+  %MRS8: better to rephrase what can be done (which is a present thing) instead of what we will do (which is future and undetermined).
+  With the structural understanding gained by these simulations, 
+  %we will
+  it becomes possible
+  evaluate transport of various solutes within the system, and apply the
   knowledge gained from this study in order to suggest improvements to the
   existing system as well as to evaluate new unsynthesized LLC systems.
 
@@ -2881,4 +2962,14 @@ but is most pronounced in the parallel displaced system.
 % LocalWords:  Donnan modelling nanotubes monodispersity maruyama Zeolites Col
 % LocalWords:  lyotropic thermotropic png kinetically colorbar gromacs hess dr
 % LocalWords:  gimp disassociate pore's barostat racemic colorbars Nernst LLCs
-% LocalWords:  entropic rzplot transitioning spoel github pymbar Yelk Glaser
+% LocalWords:  entropic rzplot transitioning spoel github pymbar Yelk Glaser xr
+% LocalWords:  flowback FW wastewaters wastestream fracking semipermeable TFC
+% LocalWords:  solute's polymerized wijmans diffusivities amphiphilic MWCO Ia
+% LocalWords:  nanostructures bicontinuous hatakeyama tortuosity Pn hII TLC ing
+% LocalWords:  microstructures multilayer Xunda's refamiliarize nanostructure
+% LocalWords:  nanoscale TEM LC methacrylated Eq scipy equil xz meridional phys
+% LocalWords:  semiisotropic nocbar chem waxs ish fb entropically steric vv rpi
+% LocalWords:  highlimit yz nematically carboxylate norestraints rb Bushey cyan
+% LocalWords:  dihedrals cbar adenine carboxyl sterically QM hydroscopicity LCs
+% LocalWords:  nophenyls nowater hbonds notails decorrelated Decorrelating SI
+% LocalWords:  xlink uncross
