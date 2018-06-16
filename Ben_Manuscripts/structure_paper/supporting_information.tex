@@ -197,7 +197,7 @@
   by considering a number of factors that directly affect the quality of our results. 
   Clearly, choosing a small number of layers will cause the system to suffer from 
   finite size effects. Even in our 20 monomer-per-column system, axial correlations
-  between stacked monomers persist throughout the entire correlation function (See
+  between stacked monomers persist throughout the entire correlation function (see
   Figure ~\ref{M-fig:correlation}). The correlation function of the system which we
   built with 40 monomers per column continues to oscillate for its full length
   (Figure~\ref{fig:tall_correlation_full}). If we continue adding monomers, the 
@@ -235,7 +235,7 @@
   There we showed that systems are stable when made with 4, 5, 6, 7, and 8
   monomers per layer. We also showed that systems are stable when monomer head
   groups are oriented in the parallel displaced and sandwiched configurations
-  (See Figure~\ref{fig:stacking}). Our model is most consistent with experiment
+  (see Figure~\ref{fig:stacking}). Our model is most consistent with experiment
   when built with 5 monomers per layer, with layers stacked 3.7 \AA~apart in 
   the parallel displaced configuration. 
 
@@ -285,7 +285,7 @@
 
 		\item 41 \AA~: We chose to test a pore spacing of 41 \AA~since
 		it closely matches the experimental pore spacing. Again, we observe abrupt
-		repulsion of columns once the restraining potential is switched to 56 KJ
+		repulsion of columns once the restraining potential is switched to 56 kJ
 		mol$^{-1}$ nm$^{-2}$ (Figure~\ref{fig:p2p_41}). %After 400 ns, the
 %		average pore spacing settles below the experimental value at 4.07 $\pm$ 0.21
 %		nm. Again, a large uncertainty in this value occurs because the 1-4 pore spacing
@@ -304,7 +304,7 @@
 
 		\item 50 \AA~: We tested a pore spacing of 50 \AA, about 20 \%
 		larger than the experimental value. Once the restraining potential reaches 56
-		KJ mol$^{-1}$ nm$^{-2}$, the pore spacing begins to decrease rapidly, following
+		kJ mol$^{-1}$ nm$^{-2}$, the pore spacing begins to decrease rapidly, following
 		a linear trend (Figure~\ref{fig:p2p_50}).
 %		After 400 ns, the average pore spacing is 4.37 $\pm$ 0.13 nm.
 %		There is a large
@@ -315,9 +315,9 @@
                 
 		\item 55 \AA~: We tested a pore spacing of 55 \AA~which is at
 		a distance where monomers in each pore no longer intersect those of adjacent pores. Once
-		the restraining potential reaches 56 KJ mol$^{-1}$ nm$^{-2}$, the pore spacing
+		the restraining potential reaches 56 kJ mol$^{-1}$ nm$^{-2}$, the pore spacing
 		changes erratically until it begins to settle when the force constants are
-		below 3 KJ mol$^{-1}$ nm$^{-2}$ (Figure~\ref{fig:p2p_55}). We recommend
+		below 3 kJ mol$^{-1}$ nm$^{-2}$ (Figure~\ref{fig:p2p_55}). We recommend
 		avoiding a system such as this where vacuum gaps between pore columns are
 		introduced unnecessarily. %The system equilibrates to a pore spacing of 4.27
 %		$\pm$ 0.18 nm. The 1-2 pore spacing is the outlier in this case with a pore
@@ -364,17 +364,17 @@
 
 		\caption{The pore spacing during the restrained portion of the
 			dry equilibration procedure is shown. Every 50 ps (0.05 ns) position restraints
-			are reduced according to the sequence: 1000000, 3162, 56, 8, 3, 2, 1, 0 KJ
+			are reduced according to the sequence: 1000000, 3162, 56, 8, 3, 2, 1, 0 kJ
 			mol$^{-1}$ nm$^{-2}$. When the initial pore spacing is chosen below the
 			experimental value (a) or at the experimental value (b), there is an abrupt
-			change in pore spacing when the position restraints are reduced to 56 KJ
+			change in pore spacing when the position restraints are reduced to 56 kJ
 			mol$^{-1}$ nm$^{-2}$. When pores are started 45 \AA~apart (c) the pore spacing
 			remains relatively stable. When pores are spaced 50 \AA~apart (d), the pore
-			spacing decreases nearly linearly once the restraints are reduced to 56 KJ
+			spacing decreases nearly linearly once the restraints are reduced to 56 kJ
 			mol$^{-1}$ nm$^{-2}$. When pores are spaced 55 \AA~apart (e), so that monomers
 			do not intersect with adjacent pores, and position restraints are reduced to 56
-			KJ mol$^{-1}$ nm$^{-2}$, the pore spacing changes erratically before stabilizing
-			when force constants are reduced below 3 KJ mol$^{-1}$ nm$^{-2}$.} 
+			kJ mol$^{-1}$ nm$^{-2}$, the pore spacing changes erratically before stabilizing
+			when force constants are reduced below 3 kJ mol$^{-1}$ nm$^{-2}$.} 
 		\label{fig:p2p}
 	  \end{figure}
 
@@ -386,7 +386,7 @@
 	  pore spacing constant at 45 \AA~and the initial distance between layers
 	  constant at 3.7 \AA. Equilibrated values of pore radii are presented in
 	  Table~\ref{table:radii}. The pore radius in each simulation frame is calculated
-	  as the average distance of all carbonyl carbons (See
+	  as the average distance of all carbonyl carbons (see
 	  Figure~\ref{fig:pore_radius_illustration}) from their associated pore center.
 	  Statistics for the pore radii reported were generated from the time series
 	  representing the average pore radius at each frame. We detected equilibration
@@ -424,6 +424,7 @@
 	  \centering
 	  \begin{tabular}{cc}
 	  \toprule
+          %MRS8: nm to aa conversion error?
 	  Initial Pore Radius & Equilibrated Pore Radius \\
 	  \midrule
 	  % BJC: to be updated once simulations are run out long enough
@@ -503,9 +504,9 @@
   the NVT ensemble which allows the monomer tails to settle without disrupting
   the ordering of the head groups. Doing so also mitigates system dependence on
   initial monomer configuration. Every 50 ps, we reduce the force constants by
-  the square root of its previous value. Once the force constant is below 10 KJ
+  the square root of its previous value. Once the force constant is below 10 kJ
   mol$^{-1}$ nm$^{-2}$, we reduce the restraints in a sequence with values of
-  8, 3, 2, 1, and 0 KJ mol$^{-1}$ nm$^{-2}$ respectively. We allow the resulting
+  8, 3, 2, 1, and 0 kJ mol$^{-1}$ nm$^{-2}$ respectively. We allow the resulting
   unrestrained structure to equilibrate for 5 ns in the NPT ensemble
   with pressure controlled by the Berendsen barostat. Next, we run long NPT
   equilibration simulations for at least 400 ns using the Parrinello-Rahman
@@ -626,7 +627,7 @@
         \end{subfigure}
 
   \end{subfigure}
-  \caption{The distribution of angles between nematic director vector (See
+  \caption{The distribution of angles between nematic director vector (see
 	  Figure~\ref{fig:director}) and the z-axis averaged over the equilibrated portion
 	  of each trajectory}~\label{fig:nematic_distribution}
   \end{figure}
@@ -719,8 +720,8 @@
   \section{Experimental correlation length of R-$\pi$}\label{section:correlation_length}
  
   \vspace{1em}
-  Experimentalists did not measure the correlation length, so we estimated it
-  from the raw data. We took a slice of the 2D WAXS data along the dashed line in
+  Previous experimental studies of these systems did not calculate the correlation length, so we estimated it
+  from the raw 2D WAXS data. We took a slice of the 2D WAXS data along the dashed line in
   Figure ~\ref{fig:waxs_dashed}. We removed background noise by subtracting the
   intensity far from the pattern (high $q$) uniformly. We used a least squares
   algorithm to fit a Lorentzian curve to the data. Only values recorded above
@@ -773,6 +774,7 @@
         \caption{Sandwiched, Disordered Pore Basin}
         \label{fig:disorder_layered_density}
   \end{subfigure}
+  %MRS8: at least one of these would be good to put in the main paper.
   \caption{In all cases, the component radial distribution functions exhibit a
 	  composition gradient transitioning from the hydrophilic to the hydrophobic
 	  regions. Systems with layers initially spaced 3.7 \AA~apart in the  parallel
@@ -955,10 +957,10 @@
   \toprule
   System & Diffusion Constant ($m^2/s$) \\ 
   \midrule
-  Sandwiched, Ordered & $1.4\mathrm{e}{-14}$ \\
-  Parallel Displaced, Ordered & $2.0\mathrm{e}{-14}$ \\
-  Sandwiched, Disordered & $2.0\mathrm{e}{-14}$ \\
-  Parallel Displaced, Disordered & $3.5\mathrm{e}{-14}$ \\
+  Sandwiched, Ordered & $1.4 \times 10^{-14}$ \\
+  Parallel Displaced, Ordered & $2.0 \times 10^{-14}$ \\
+  Sandwiched, Disordered & $2.0 \times 10^{-14}$ \\
+  Parallel Displaced, Disordered & $3.5 \times 10^{-14}$ \\
   \bottomrule
   \end{tabular}
   \caption{The diffusion constants for all systems are on the order of $10^{-14} m^2/s$ 
@@ -1005,7 +1007,7 @@
   fit with a function that continues to oscillate with the same amplitude as the third peak of
   the fit to $g(z)$. In Figure~\ref{fig:power_spectrum_comparison}, we plot the power spectrum
   generated from the discrete Fourier transform of the plots in Figure~\ref{fig:theoretical_correlation_functions}. 
-  The maximum intensity of the power spectrum increases by nearly 60 \% when the correlation 
+  The maximum intensity of the power spectrum increases by nearly 60\% when the correlation 
   function does not decay to one. This explains, in part, the large simulated value of the
   intensity of R-$\pi$.
   
@@ -1027,7 +1029,7 @@
   calculated from the ordered basin sandwiched system. The oscillations in $g(z)$ continue
   to oscillate at nearly the same amplitude as its third peak. (b) We overlaid a plot of the
   fit to $g(z)$ with a similar function that continues to oscillate with the same amplitude
-  as its third peak. (c) The power spectrum of each plot in (b) exhibits a 60 \% increase in
+  as its third peak. (c) The power spectrum of each plot in (b) exhibits a 60\% increase in
   intensity of the peaks when the function does not decay to 1.}\label{fig:rpi_ft}
   \end{figure}
   
@@ -1107,7 +1109,7 @@
   \begin{subfigure}{0.075\textwidth}
   	\includegraphics[width=\textwidth]{colorbar_jet.png}
   \end{subfigure}
-	\caption{Adding 1 wt \% water to the ordered basin dry systems causes an increase in the intensity
+	\caption{Adding 1 wt\% water to the ordered basin dry systems causes an increase in the intensity
 	R-spots. R-double becomes visible in the parallel displaced configuration. Additional amounts
 	of water increase discrepancies with experiment} %MRS7:by increasing disorder?
   \label{fig:solvation}
@@ -1151,7 +1153,7 @@
   
   \section{Ionic Conductivity}\label{section:ionic_conductivity}
   
-  In the main text, we calculated ionic conductivity using the Nernst Einstein 
+  In the main text, we calculated ionic conductivity using the Nernst-Einstein 
   relationship. We also measured ionic conductivity using a second method, 
   termed the Collective Diffusion model, for robustness. The collective 
   diffusion model measures the movement of the collective variable, Q, which
@@ -1176,8 +1178,7 @@
         simulated. Both methods estimate the value of the ionic conductivity to be an 
         order of magnitude higher than the experimental value. There is more noise in
         the collective diffusion model because there is inherently less data that 
-        can be used for its calculation. For that reason, we use only the Nernst 
-        Einstein relationship in the main text.}
+        can be used for its calculation. For that reason, we use only the Nernst-Einstein relationship in the main text.}
         \label{fig:conductivity}
   \end{figure}
 
