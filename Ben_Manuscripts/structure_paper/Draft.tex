@@ -41,30 +41,23 @@ liquid crystal membranes}
  
   Nanostructured porous membranes made from the cross-linked hexagonal phase of
   self-assembled lyotropic liquid crystals (LLCs) are a promising material for
-  selective separations. In this work, we investigate an experimentally characterized 
-  LLC membrane using an atomistic molecular model. 
-  %MRS8: I think this is a little too subtle a point to be making for the abstract. 
-  %I added a bit different spin on this at the end of the abstract to gesture towards the idea. Thoughts?
-  %While it is relatively 
-  %straightforward to create a stable hexagonal phase using atomistic modeling, we demonstrate that 
-  %closely reproducing the experimental pore structure requires a carefully 
-  %constructed initial configuration in order to avoid falling into metastable
-  %basins. 
-  We use simulated X-ray diffraction (XRD) patterns in order to ensure 
-  maximum consistency between our structures and experiment. We show that pores 
-  are likely composed of 5 columns of stacked LLC monomers which surround each
+  selective separations. In this work, we investigate an experimentally
+  characterized LLC membrane using an atomistic molecular model. We use
+  simulated X-ray diffraction (XRD) patterns in order to ensure maximum
+  consistency between our structures and experiment. We show that pores are
+  likely composed of 5 columns of stacked LLC monomers which surround each
   hydrophilic core. Although this system has been reported as dry, we show that
   small amounts of water are necessary to fully reproduce the experimental XRD
   pattern due to asymmetries introduced by hydrogen bonds between monomer head
-  groups and water molecules. We explore the composition and structure of the 
-  nanopores and reveal that there exists a composition gradient rather than a 
-  abrupt partition between the hydrophilic and hydrophobic regions. A caveat is 
-  that the time scales of the dynamics are extremely long for this system, 
-  requiring starting from a range of alternative initial configurations and 
-  careful examination of the metastable states observed.
-  The clearer picture of the nanoscopic structure of these membranes provided in
-  this study will enable a better understanding of the mechanisms of small 
-  molecule transport within these nanopores.
+  groups and water molecules. We explore the composition and structure of the
+  nanopores and reveal that there exists a composition gradient rather than a
+  abrupt partition between the hydrophilic and hydrophobic regions. A caveat is
+  that the time scales of the dynamics are extremely long for this system,
+  requiring starting from a range of alternative initial configurations and
+  careful examination of the metastable states observed. The clearer picture of
+  the nanoscopic structure of these membranes provided in this study will enable
+  a better understanding of the mechanisms of small molecule transport within
+  these nanopores.
   \end{abstract}
 
   \section{Introduction}
@@ -77,17 +70,19 @@ liquid crystal membranes}
   % water. See elimalech paper for reviews, and add a number of more
   % citations.
   
-  More highly selective membranes would be extremely useful for the recovery of 
-  dissolved species in complex aqueous and organic solutions. For example, selective
-  membranes can further progress forward osmosis processes by reducing the cost of 
-  separating potable water from draw solutions~\cite{mccutcheon_novel_2005}. Additionally, 
-  flowback water (FW) produced during hydraulic fracturing is a complex wastewater full
-  of potentially valuable dissolved organic compounds such as acetate 
-  that can be recovered using highly selective membranes \cite{dischinger_application_2017}.
-  Finally, a significant amount of nitrogen and phosphorus from fertilizer is found in 
-  wastewater. Selective membranes offer a route towards low energy nutrient recovery 
-  from these wastewaters which can help sustain fertilizer production and subsequently
-  food production into the future \cite{xie_membrane-based_2016}.
+  More highly selective membranes would be extremely useful for the recovery of
+  dissolved species in complex aqueous and organic solutions. For example,
+  selective membranes can further progress forward osmosis processes by reducing
+  the cost of separating potable water from draw
+  solutions~\cite{mccutcheon_novel_2005}. Additionally, flowback water (FW)
+  produced during hydraulic fracturing is a complex wastewater full of
+  potentially valuable dissolved organic compounds such as acetate that can be
+  recovered using highly selective membranes \cite{dischinger_application_2017}.
+  Finally, a significant amount of nitrogen and phosphorus from fertilizer is
+  found in wastewater. Selective membranes offer a route towards low energy
+  nutrient recovery from these wastewaters which can help sustain fertilizer
+  production and subsequently food production into the future
+  \cite{xie_membrane-based_2016}.
   % as we near peak production of minable phosphorus rock .
   
 %  There is increasing pressure to reuse
@@ -105,7 +100,6 @@ liquid crystal membranes}
 % MRS6: I would keep a paragraph about here how current membranes DON'T
 % work for this purpose. But one paragraph is enough.
 % BJC5: added back below paragraph.  
-% MRS7: Do a pass for clarity at the sentence level.  For example ``degree of stochasticity'' is vague.
 % MRS8: ``because they are unstructured'' lacks detail.  NF has some structure, since there are irregular pores. Check some other reviews and see the points they cover?
   Current commercial RO and NF membranes suffer limitations to their selectivity
   because they are unstructured. Although scalable, their fabrication involves the 
@@ -147,20 +141,20 @@ liquid crystal membranes}
 %  \cite{van_der_bruggen_review_2003}. 
 
 %MRS8: preliminary evidence has shown they may be?  It's more than a guess.
-  Crosslinked lyotropic liquid crystal (LLC) membranes may be capable of
-  performing highly selective separations. LLCs are amphiphilic molecules that
-  have the ability to self-assemble into porous nanostructures
-  \cite{smith_ordered_1997} and can be crosslinked to create mechanically
-  strong membrane films with pores on the order of 1 nm in diameter
-  \cite{zhou_supported_2005}. Unlike most commercial NF membranes, LLC membrane pores
-  are uniform in size because they are self-assembled. 
-  Since LLC membranes lack a pore size distribution, they
-  inherently exhibit high selectivity due to their strict molecular weight
-  cut-off (MWCO)~\cite{zhou_supported_2005}. Additionally, the LLC monomers
-  examined in this paper are salts, and therefore lead to Donnan exclusion of ions
-  in solution. The membrane gains a net surface charge when counterions from the head
-  groups that line the pore walls escape into the feed solution in an effort to balance 
-  the gradients of concentration and electric potential \cite{donnan_theory_1995}.    
+  Preliminary evidence has shown that crosslinked lyotropic liquid crystal
+  (LLC) membranes may be capable of performing highly selective separations. LLCs
+  are amphiphilic molecules that have the ability to self-assemble into porous
+  nanostructures \cite{smith_ordered_1997} and can be crosslinked to create
+  mechanically strong membrane films with pores on the order of 1 nm in diameter
+  \cite{zhou_supported_2005}. Unlike most commercial NF membranes, LLC membrane
+  pores are uniform in size because they are self-assembled.  Since LLC membranes
+  lack a pore size distribution, they inherently exhibit high selectivity due to
+  their strict molecular weight cut-off (MWCO)~\cite{zhou_supported_2005}.
+  Additionally, the LLC monomers examined in this paper are salts, and therefore
+  lead to Donnan exclusion of ions in solution. The membrane gains a net surface
+  charge when counterions from the head groups that line the pore walls escape
+  into the feed solution in an effort to balance the gradients of concentration
+  and electric potential \cite{donnan_theory_1995}.    
 
   The feasibility of nanostructured LLC membranes for selective separations has been
   demonstrated using LLCs that form the type 1 bicontinuous cubic (Q\textsubscript{I})
@@ -394,7 +388,9 @@ liquid crystal membranes}
   can align Col\textsubscript{h} hexagonal domains, created by the monomer Na-GA3C11,
   using a magnetic field with subsequent cross-linking to lock the structure in 
   place\cite{feng_scalable_2014}. In 2016, Feng et al. showed that one could obtain
-  the same result using a second technique termed soft confinement\cite{feng_thin_2016}.
+  the same result by confining neat monomer between PDMS or glass substrates since 
+  hexagonal mesophases preferentially anchor perpendicular to both surfaces\cite{feng_thin_2016}.
+%  the same result using a second technique termed soft confinement\cite{feng_thin_2016}.
   %MRS8: maybe say what it is, not just what it's named? 
   Current experimental efforts are focused on extending the method to the 
   H\textsubscript{II} phase and characterizing the performance of these newly aligned systems.
@@ -477,7 +473,7 @@ liquid crystal membranes}
   membranes. Useful molecular-level modeling should incorporate a detailed picture of the
   nanoscopic pore structure which is crucial to understanding the role of
   monomer structure in solute transport and membrane design. 
-Atomistic molecular dynamics simulations can provide the required level of detail
+  Atomistic molecular dynamics simulations can provide the required level of detail
   (Figure \ref{fig:detail}), assuming the force fields are sufficiently accurate.
   With such an atomistic model, we can directly observe molecular-level solute
   transport and suggest governing mechanisms. We can observe how the choice of
@@ -487,17 +483,14 @@ Atomistic molecular dynamics simulations can provide the required level of detai
   %which affects the degree to which the membrane can exclude
   %charged species at the membrane surface. 
 
-  %BJC6: is this too bold considering the work done at University of Wisconsin?
-  %MRS8: Maybe take out significantly
-  In this study, we achieve a %significantly 
-  more realistic atomistic description of LLC
+  In this study, we achieve a  more realistic atomistic description of LLC
   membranes than, to our knowledge, has ever previously been created, and explore
   what new structural information can be gained and what structure hypotheses are
   supported by this model. We validate the results using as much experimental
   information as possible. We are most interested in reproducing the conclusions
-  about structure drawn from small angle X-ray scattering (SAXS)
-  and wide angle X-ray scattering (WAXS) experiments as well as in matching ionic
-  conductivity measurements \cite{feng_thin_2016}.
+  about structure drawn from small angle X-ray scattering (SAXS) and wide angle
+  X-ray scattering (WAXS) experiments as well as in matching ionic conductivity
+  measurements \cite{feng_thin_2016}.
 
   \begin{figure}[!htb]
   \centering
@@ -518,16 +511,14 @@ Atomistic molecular dynamics simulations can provide the required level of detai
     pictures, the head group region is colored blue and the tail region is colored cyan.}~\label{fig:detail}
   \end{figure}
  
-  In this paper, we perform molecular modeling of the Col\textsubscript{h} assembly 
-  formed by Na-GA3C11. Compared to the H\textsubscript{II} phase, the Col\textsubscript{h}
-  phase is a simpler starting point. The system 
-  %MRS8: check rephrasing on this, since we do say later it does have some water
-  %has no water 
-  is not assembled in aqueous phase
-  which allowed us to simulate longer timescales, and there exists detailed experimental
-  characterization of the fully aligned state, including 2D wide-angle X-ray
-  scattering (WAXS) patterns (Figure~\ref{fig:WAXS}) which are useful for reconstructing 
-  structural data. 
+  In this paper, we perform molecular modeling of the Col\textsubscript{h}
+  assembly formed by Na-GA3C11. Compared to the H\textsubscript{II} phase, the
+  Col\textsubscript{h} phase is a simpler starting point. The system is not
+  assembled in aqueous phase which allowed us to simulate longer timescales, and
+  there exists detailed experimental characterization of the fully aligned state,
+  including 2D wide-angle X-ray scattering (WAXS) patterns
+  (Figure~\ref{fig:WAXS}) which are useful for reconstructing structural data. 
+  
   %MRS8: I started tweaking the below, but it might be better just to eliminate.
   % Modeling of Col\textsubscript{h} will help in modeling 
   %H\textsubscript{II} in the future.
@@ -610,12 +601,9 @@ Atomistic molecular dynamics simulations can provide the required level of detai
 	\label{fig:SWAXS}
  \end{figure}
   
-  Despite having structural data, there is still information which experiment cannot
-  definitively answer. 
-  %MRS8: grammatically a bit redundant.
-  %There are a number of structural questions we wish to answer in this article. 
-  Specifically, we want to know:
-  \begin{enumerate}
+ Despite having structural data, there is still information which experiment
+ cannot definitively answer. Specifically, we want to know:
+ \begin{enumerate}
     \item What is the density of monomers that pack around each hydrophilic core? 
     \label{point:monomernum}
 
@@ -627,10 +615,7 @@ Atomistic molecular dynamics simulations can provide the required level of detai
  	volume of the liquid crystal monomers proposes that there are seven monomers in each 
  	layer~\cite{resel_structural_2000}. 
 
-    %MRS7: is this really a liquid crystalline system, even if it is made of liquid crystal monomers? Should we say
-    % in many liquid crystal systems?
-    %BJC5: changed to 'many liquid crystalline systems'
- 	We are careful to avoid the term 'layers' since many liquid crystalline systems
+  	We are careful to avoid the term 'layers' since many liquid crystalline systems
  	have long range order in 1 or 2 spatial dimensions and short range order in 	
  	the other dimensions.~\cite{chaikin_principles_1995}  % page 58
  	In the system we are studying, there are long-range 2D correlations in the 
@@ -657,25 +642,19 @@ Atomistic molecular dynamics simulations can provide the required level of detai
         \item Is it necessary to include any water in order to appropriately model the 
         Col\textsubscript{h} phase? \label{point:water}
 
-	While the Col\textsubscript{h} phase is described as dry, it is likely that small amounts of
-	ambient water are 
-        %leached 
-        absorbed
-        into the system. The hydrogen bonding network formed by the 
-	water may play a role in structuring the pore. We used simulated X-ray diffraction (XRD) patterns
-	to see if there is any meaningful structural difference between a "dry" and a "wet" system.
+	While the Col\textsubscript{h} phase is described as dry, it is likely
+	that small amounts of ambient water are absorbed into the system. The hydrogen
+	bonding network formed by the water may play a role in structuring the pore. We
+	used simulated X-ray diffraction (XRD) patterns to see if there is any
+	meaningful structural difference between a "dry" and a "wet" system.
 
-	\item What is the 
-          %MR8: chemical composition is a bit ambiguous; implies mole fractions, which isn't what we mean
-          %chemical composition 
-          detailed atomistic structure of the pores?\label{point:composition}
+	\item What is the detailed atomistic structure of the pores?\label{point:composition}
 
 	The limited picture that experiment provides tells us that there are hexagonally packed, 
 	hydrophilic regions where transport is likely to occur. One may instinctively imagine these 
 	regions as tube-like pathways with well-defined boundaries. We explored the composition
 	of the pores, the partition between the hydrophilic and hydrophobic regions, and its 
 	sensitivity to initial configuration, including both dry and wet systems. 
-	
 
   \end{enumerate}
   
@@ -903,23 +882,19 @@ Atomistic molecular dynamics simulations can provide the required level of detai
   displaced configurations with 4, 5, 6, 7 and 8 monomers per layer.
 
   \subsection{Equilibration}
-  %MRS7: could put this mostly in supporting. 
-  %BJC6: cut in half
-  We developed equilibration schemes for creating dry and wet configurations. Both
-  schemes start with an initial configuration generated according to the previous
-  guidelines. For wet systems, we added the desired concentration of water to 
-  the initial configuration and carried out equilibration in the same way
-  as the dry systems. First, we fixed monomer head groups in place using position
-  restraints with a force constant of 10$^6$ kJ mol$^{-1}$ nm$^{-2}$. We gradually
-  released the position restraints by decreasing the force constants over a series
-  of NVT simulations. We allowed the resulting unrestrained structure to equilibrate for
-  5 ns in the NPT ensemble with pressure controlled by the berendsen barostat 
-  followed by NPT equilibration simulations run for at least 400 ns using the 
-  Parrinello-Rahman barostat. 
-  %More precise details are 
-  More equilibration details are 
-  available in 
-  section S-\ref{S-section:equilibration}.
+  
+  We developed equilibration schemes for creating dry and wet configurations.
+  Both schemes start with an initial configuration generated according to the
+  previous guidelines. For wet systems, we added the desired concentration of
+  water to the initial configuration and carried out equilibration in the same
+  way as the dry systems. First, we fixed monomer head groups in place using
+  position restraints with a force constant of 10$^6$ kJ mol$^{-1}$ nm$^{-2}$. We
+  gradually released the position restraints by decreasing the force constants
+  over a series of NVT simulations. We allowed the resulting unrestrained
+  structure to equilibrate for 5 ns in the NPT ensemble with pressure controlled
+  by the berendsen barostat followed by NPT equilibration simulations run for at
+  least 400 ns using the Parrinello-Rahman barostat. More equilibration details
+  are available in section S-\ref{S-section:equilibration}.
 
   \subsection{Equilibrium Calculations}
 
@@ -1143,7 +1118,6 @@ Atomistic molecular dynamics simulations can provide the required level of detai
 %  intention to choose an initial configuration which quickly reaches a monomer density
 %  close to experiment.   
   
-  % BJC5: trying things out with 'columns per pore' instead of 'monomers per layer'.
   Our simulations best support a model built with 5 monomer columns per pore based on
   the measured equilibrated pore-to-pore distances. To discern the composition of
   the monomer layers, addressing question \ref{point:monomernum} above, we ran
@@ -1175,8 +1149,7 @@ Atomistic molecular dynamics simulations can provide the required level of detai
   Generally, when monomers are started further apart, they stay further apart than systems where
   monomers are started closer together (see Table~\ref{table:correlation_length}). Because of the
   extra space between stacked monomers, monomer head groups have more rotational freedom. We
-  quantified the ordering of the head groups using the nematic order parameter (see section S~\ref{method:nematic_order} for details of calculation). 
-  %MRS8: the reference above isn't appearing. I'm not sure why after quick check.
+  quantified the ordering of the head groups using the nematic order parameter (see section S-\ref{S-method:nematic_order} for details of calculation). 
   Disordered basin systems have a lower nematic order parameter (meaning they are more disordered) 
   than ordered basin systems.
 
@@ -1187,17 +1160,20 @@ Atomistic molecular dynamics simulations can provide the required level of detai
 %  intention to choose an initial configuration which quickly reaches a monomer density close 
 %  to experiment. We believe systems built with 5 columns per pore achieve this goal.
   
-  Systems built with 5 columns in each pore equilibrate to a pore spacing that is most 
-  consistent with the experimental value of 4.12 nm derived from SAXS measurements 
-  (Figure~\ref{fig:SAXS}). Ordered basin systems built with 4 columns per pore equilibrate
-  to an average pore spacing 0.25 nm lower than experiment. Ordered basin systems built with
-  6 columns per pore, have an equilibrated pore spacing ca. 0.50 nm higher than experiment.
-  Monomers in disordered basin systems built with 6 columns-per-pore agree with experimental pore-to-pore distances 
-  within error, but stack too far apart. Those in the disordered sandwiched and disordered
-  parallel displaced configurations stack $\sim$4.87 and 4.94 \AA~apart respectively, 
-  which is ca. 1.2~\AA further apart than suggested by experiment. 5 column-per-pore systems
-  stack, at a maximum, 0.9 \AA~further apart than experiment (see Table~\ref{table:correlation_length}). 
-  The remainder of this discussion will focus on the analysis of systems built with 5 columns per pore. 
+  Systems built with 5 columns in each pore equilibrate to a pore spacing that
+  is most consistent with the experimental value of 4.12 nm derived from SAXS
+  measurements (Figure~\ref{fig:SAXS}). Ordered basin systems built with 4
+  columns per pore equilibrate to an average pore spacing 0.25 nm lower than
+  experiment. Ordered basin systems built with 6 columns per pore, have an
+  equilibrated pore spacing ca. 0.50 nm higher than experiment.  Monomers in
+  disordered basin systems built with 6 columns-per-pore agree with experimental
+  pore-to-pore distances within error, but stack too far apart. Those in the
+  disordered sandwiched and disordered parallel displaced configurations stack
+  $\sim$4.87 and 4.94 \AA~apart respectively, which is ca. 1.2~\AA further apart
+  than suggested by experiment. 5 column-per-pore systems stack, at a maximum,
+  0.9 \AA~further apart than experiment (see 
+  Table~\ref{table:correlation_length}).  The remainder of this discussion will
+  focus on the analysis of systems built with 5 columns per pore. 
 
 % BJC6: I don't think I need to say the following in above paragraph since its all in the methods.
 % Our methodology for calculating equilibrium stacking distance is fully explained in section~\ref{section:rpi}.
@@ -1509,18 +1485,18 @@ Atomistic molecular dynamics simulations can provide the required level of detai
   explain R-spots. 
   %MRS8: did you do a few different things here as sensitivity analysis to show that the finding was robust?  If so, putting some of that in would be useful.
 
-  To understand the %true 
-  more likely origin of R-spots, we determined which atoms gave rise to the 
-  feature. 
+  To understand the most likely origin of R-spots, we determined which atoms
+  gave rise to the feature. 
   %MRS8: next two sentences repetitive; could you revise? 
-  Since R-spots is present as higher intensity spots within R-alkanes, it is
-  likely that the spots arise as a consequence of the tails. By removing all non-tail atoms
-  from the trajectory and simulating a diffraction pattern with the remaining atoms, we were
-  able to isolate the cause of the spots to the tails (Figure~\ref{fig:tails_rzplot}). Since the 
-  tails stay nearly flat, we plotted their centroids (Figure \ref{fig:centroids})
-  and measured the angle between each centroid and its nearest neighbors with respect to the 
-  plane of the membrane. We see distinct peaks in the distribution of these angles 
-  (Figure~\ref{fig:tail_packing}).
+%  Since R-spots is present as higher intensity spots within R-alkanes, it is
+%  likely that the spots arise as a consequence of the tails. 
+  By removing all non-tail atoms from the trajectory and simulating a
+  diffraction pattern with the remaining atoms, we were able to isolate the cause
+  of the spots to the tails (Figure~\ref{fig:tails_rzplot}). Since the tails stay
+  nearly flat, we plotted their centroids (Figure \ref{fig:centroids}) and
+  measured the angle between each centroid and its nearest neighbors with respect
+  to the plane of the membrane. We see distinct peaks in the distribution of
+  these angles (Figure~\ref{fig:tail_packing}).
 
   The peaks in the nearest neighbor angle distribution are consistent with the
   location of R-spots. The peaks of interest in Figure \ref{fig:layered_tails}
@@ -1558,7 +1534,6 @@ Atomistic molecular dynamics simulations can provide the required level of detai
 %  		entropically favored disordered state. 
 %  \end{enumerate}
 
-%BJC6: figures are in order that they are talked about in text.
   \begin{figure}[!htb]
   \begin{subfigure}{0.32\linewidth}
   	\centering
@@ -1574,7 +1549,6 @@ Atomistic molecular dynamics simulations can provide the required level of detai
 	\includegraphics[width=\textwidth]{tails_rzplot_jet.png}
 	\caption{}\label{fig:tails_rzplot}
   \end{subfigure}
-  %BJC6: Brought this back to make 6 figures.
   \begin{subfigure}[t]{0.32\linewidth}
     \centering
 	\includegraphics[width=\textwidth]{centroids_box.png}
@@ -1590,8 +1564,6 @@ Atomistic molecular dynamics simulations can provide the required level of detai
 	        \includegraphics[width=\linewidth]{layered_angle_v_I.png}
 	        \caption{}~\label{fig:layered_integration}
   \end{subfigure}
-  %MRS8: nicely organized figure! I think in (c), you do want the red/green dots showing hexagonal symmetry to be bigger; 
-  %when the figure is reduced they are hard to see.
   \caption{(a) R-spots increases in intensity when the temperature of the system is 
       lowered to 280K. (b) We measured the average angle made between each monomer 
       alkane tail and the membrane plane. The average tilt angle (dashed line) is 
@@ -2097,35 +2069,30 @@ Atomistic molecular dynamics simulations can provide the required level of detai
   The long-term stability of a configuration similar to this may be feasible if monomers stay
   stacked 3.7 \AA~apart.   
   
-  We can also produce R-double if layers are not uniformly spaced. Rather, monomers might form 
-  pairs that stack less than 3.7~\AA~apart, and whose center of masses are spaced 7.4 \AA~ 
-  from the next pair of monomers (Figure ~\ref{fig:staggered_rzplot_norestraints}). To our 
-  knowledge, there have been no studies that specifically address the possibility of a
-  configuration like this. 
-  %MRS8: above: be more precise, for example, QM studies or crystallographic investigation of stacked pi-pi system, 
-  % can cite the reference found.
-  Our force field causes our system to tend towards uniformly spaced
-  layers.   Simulations of unevenly spaced systems are only stable if position restraints
-  are applied to heavy atoms of the phenyl rings.
-  %MRS8: added below.
-  There is little evidence from QM studies of stacked $\pi-\pi$ systems that this behavior is incorrect.~\ref{???} 
+  We can also produce R-double if layers are not uniformly spaced. Rather,
+  monomers might form pairs that stack less than 3.7~\AA~apart, and whose center
+  of masses are spaced 7.4 \AA~ from the next pair of monomers (Figure
+  ~\ref{fig:staggered_rzplot_norestraints}). To our knowledge, there have been no
+  studies that specifically address the possibility of a configuration like this.
+  Our force field causes our system to tend towards uniformly spaced layers.
+  Simulations of unevenly spaced systems are only stable if position restraints
+  are applied to heavy atoms of the phenyl rings.  There is little evidence from
+  QM studies of stacked $\pi-\pi$ systems that this behavior is
+  incorrect.~\ref{tauer_beyond_2005} 
   
-  Adding water to the system 
-  %facilitates 
-  appears to facilitate 
-  the appearance of R-double,
-  %MRS8: added above. I realize the H-bonding isn't brought up until later paragraphs, but I don't want to leave people in suspense; it serves as essentially a thesis of the next few paragraphs, which do group together.
-  through the creation of hydrogen bonding of water to carboxylate groups of consecutive layers.
-  We added water to the 
-  parallel displaced and sandwiched configurations in the ordered basin and equilibrated them
-  according to the wet equilibration procedure. There is no experimental measurement of 
-  water concentration in these membranes so we tested a range of water concentrations from
-  1\% to 5\%. R-double appears transiently in the simulated XRD pattern of the parallel 
-  displaced configuration with 1 wt\% water (Figure \ref{fig:solvated_pore_rzplot_norestraints}). It is
-  not initially present, but appears after 200 ns of simulation time. After 450 ns, it 
-  disappears again. Simulated XRD patterns of all other solvated systems tested are shown 
-  in Figure S~\ref{S-fig:solvation}, however R-double is not present.
-  
+  Adding water to the system appears to facilitate the appearance of R-double,
+  through the creation of hydrogen bonding of water to carboxylate groups of
+  consecutive layers. We added water to the parallel displaced and sandwiched
+  configurations in the ordered basin and equilibrated them according to the wet
+  equilibration procedure. There is no experimental measurement of water
+  concentration in these membranes so we tested a range of water concentrations
+  from 1\% to 5\%. R-double appears transiently in the simulated XRD pattern of
+  the parallel displaced configuration with 1 wt\% water (Figure
+  \ref{fig:solvated_pore_rzplot_norestraints}). It is not initially present, but
+  appears after 200 ns of simulation time. After 450 ns, it disappears again.
+  Simulated XRD patterns of all other solvated systems tested are shown in Figure
+  S~\ref{S-fig:solvation}, however R-double is not present.
+
   
   \begin{figure}[!htb]
   \centering
@@ -2200,14 +2167,13 @@ Atomistic molecular dynamics simulations can provide the required level of detai
   After 200 ns of equilibration, R-double becomes visible and persists for another 200 ns (bottom).}\label{fig:rdouble}
   \end{figure}
 
-  R-double appears in the solvated system due to the structure of the head groups. To 
-  %prove 
-  demonstrate
-  this,
-  we removed the head groups from the trajectory used to produce Figure~\ref{fig:solvated_pore_rzplot_norestraints}
-  in order to produce that shown in Figure~\ref{fig:rdouble_nophenyls}. R-double does not appear
-  without the influence of the head groups. Water molecules must play a role in the structuring
-  of the head groups since R-double does not appear in any dry simulations.
+  R-double appears in the solvated system due to the structure of the head
+  groups. To demonstrate this, we removed the head groups from the trajectory
+  used to produce Figure~\ref{fig:solvated_pore_rzplot_norestraints} in order to
+  produce that shown in Figure~\ref{fig:rdouble_nophenyls}. R-double does not
+  appear without the influence of the head groups. Water molecules must play a
+  role in the structuring of the head groups since R-double does not appear in
+  any dry simulations.
 
   When two vertically stacked monomer head groups hydrogen bond with a shared water 
   molecule, the monomers are drawn closer together (as illustrated in 
@@ -2291,11 +2257,10 @@ Atomistic molecular dynamics simulations can provide the required level of detai
   configurations studied so far.
 
   %BJC6: moved this paragraph up to make the section more idea-focused
-  In general, the composition of each region, particularly within our definition of 
-  the pore region, is similar between all systems. 
-  %MRS8: weakened a bit
-  This suggest that the details of transport may be relatively independent of the structural differences between
-  different possible structures studied here.
+  In general, the composition of each region, particularly within our
+  definition of the pore region, is similar between all systems.  This suggests
+  that the details of transport may be relatively independent of the structural
+  differences between different possible structures studied here.
   %We believe we can solvate and study transport
   %in any of the systems presented here and extract similar transport mechanisms. We will 
   %need to verify that this assumption is true. 
@@ -2738,8 +2703,7 @@ Atomistic molecular dynamics simulations can provide the required level of detai
   one order of magnitude of experiment (Figure~\ref{fig:ionic_conductivity}). We
   verified the value calculated by the Nernst-Einstein relationship using 
   the collective diffusion model\cite{liu_collective_2013} 
-  (See section S~\ref{s-fig:conductivity}). The values calculated by the 
-  %MRS8: this section reference not working either.
+  (See section S~\ref{S-fig:conductivity}). The values calculated by the 
   collective diffusion model agree with Nernst-Einstein  values within error, 
   however there is a much higher uncertainty that would require much longer 
   simulations to lower.
@@ -2790,11 +2754,7 @@ Atomistic molecular dynamics simulations can provide the required level of detai
   configuration and decreases in the parallel displaced configuration, however the 
   values of cross-linked configurations fall within uncertainty of their un-crosslinked
   counterparts. The correlation length decreases in both systems, 
-  %MRS7: from what to what?
-  %BJC6: If I say that, then shouldn't I say it for all metrics? That sounds
-  % a bit clunky especially when they are plotted in the figure and I just want to make
-  % somewhat general comments on the effect of cross-linking.
-but is most pronounced in the parallel displaced system.  
+  but is most pronounced in the parallel displaced system.  
   
   \begin{figure}[!htb]
   \centering
@@ -2873,13 +2833,9 @@ but is most pronounced in the parallel displaced system.
   appear where expected for the reasons originally predicted. We find that R-spots
   is likely due to ordered alkane chain packing. R-$\pi$ appears at lower q values than
   experiment because monomer stack too far apart. Finally, we observed that our model
-  can only produce
-  %reproduces 
-  R-double when we add 1 wt\% water to the system. This observation has
-  %important 
-  possible
-  implications for the reproducibility of the experimental results from Feng 
-  et al since they claim that their membrane is completely dry. 
+  can only produce R-double when we add 1 wt\% water to the system. This observation has
+  possible implications for the reproducibility of the experimental results from Feng 
+  et al. since they claim that their membrane is completely dry. 
 
 %  The system's pore spacing is most consistent with experiment when systems
 %  are built with 5 columns per pore. The distance between pores increases with the 
@@ -2895,23 +2851,21 @@ but is most pronounced in the parallel displaced system.
 
   We characterized the environment centered around the membrane pores and
   learned that the pores are generally filled with monomer head groups and sodium
-  ions. All dry systems studied showed a similar distribution of sodium, head groups 
-  and tails while the wet system shows evidence of 
-  %MRS8: modified; water isn't changing things very much.
-  slight
-  swelling, with minor changes in the distributions due to the presence of 
-  water molecules. We also observed that there is not a hard partition between hydrophilic
-  and hydrophobic regions, rather there is a gradient. This finding has raised questions
-  about the nature of size-exclusion separations in systems without a well-defined pore 
-  size, which potentially could give rise to separations that vary with chemical identity as well as size. 
+  ions. All dry systems studied showed a similar distribution of sodium, head
+  groups and tails while the wet system shows evidence of slight swelling, with
+  minor changes in the distributions due to the presence of water molecules. We
+  also observed that there is not a hard partition between hydrophilic and
+  hydrophobic regions, rather there is a gradient. This finding has raised
+  questions about the nature of size-exclusion separations in systems without a
+  well-defined pore size, which potentially could give rise to separations that
+  vary with chemical identity as well as size. 
 
 %  We learned that we do not need water to create well-defined pore structures.
 %  Systems whose pores were filled with varying amounts of water showed a decrease
 %  in structuring relative to dry systems. At higher water concentrations, the pores
 %  begin to swell, which may be more conducive to transport.
 
-  %We justified that 
-  Our system can reasonably estimate ionic conductivity.  Our
+  Our system can reasonably estimate ionic conductivity. Our
   calculations are about 1 order of magnitude higher than experiment, however
   that is to be expected since we are simulating a perfectly straight and
   defect-free membrane. 
@@ -2920,9 +2874,8 @@ but is most pronounced in the parallel displaced system.
   cross-linked by the algorithm we implemented. The diffraction pattern weakens
   relative to the uncross-linked system, the ionic conductivity drops by a factor
   of ca. 1.5, in closer agreement with experiment, the pore spacing decreases and
-  the membrane becomes thicker; 
-  %MRS8: added some.
-  however, all changes are relatively minor, preserving most of the features well.
+  the membrane becomes thicker; however, all changes are relatively minor, 
+  preserving most of the features well.
 
 %MRS6'' isn't it 1-3 orders of magnitude lower? You cite some slower statistics, and there might be differences between lyotropic and thermotropic, if the hydrophilic/hydrophobic effect is stronger than the effects in thermotropic fluids.
 %  We acknowledge that our simulated system exhibits glassy dynamics. The
@@ -2933,11 +2886,8 @@ but is most pronounced in the parallel displaced system.
 %  limitations of our equilibration procedure and have come up with a structure
 %  that is in good agreement with experimental data.
 
-  %MRS8: better to rephrase what can be done (which is a present thing) instead of what we will do (which is future and undetermined).
-  With the structural understanding gained by these simulations, 
-  %we will
-  it becomes possible
-  evaluate transport of various solutes within the system, and apply the
+  With the structural understanding gained by these simulations, it becomes
+  possible evaluate transport of various solutes within the system, and apply the
   knowledge gained from this study in order to suggest improvements to the
   existing system as well as to evaluate new unsynthesized LLC systems.
 
