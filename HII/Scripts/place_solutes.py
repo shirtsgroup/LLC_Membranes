@@ -180,61 +180,69 @@ def placement(z, pts, box):
     :return: location to place solute
     """
 
-    v = np.zeros([4, 2])  # vertices of unitcell box
-    v[0, :] = [0, 0]
-    v[1, :] = [box[0, 0], 0]
-    v[3, :] = [box[1, 0], box[1, 1]]
-    v[2, :] = v[3, :] + [box[0, 0], 0]
-    center = [np.mean(v[:, 0]), np.mean(v[:, 1]), 0]  # geometric center of box
+    # check if point is already in the spline
+    if z in pts[:, 2]:
 
-    bounds = path.Path(v)  # create a path tracing the vertices, v
+        ndx = np.where(pts[:, 2] == z)[0][0]
 
-    angle = np.arccos(box[1, 1]/box[0, 0])  # angle of monoclinic box
-    if box[1, 0] < 0:  # the case of an obtuse angle
-        angle += np.pi / 2
+        return pts[ndx, :]
+    # otherwise interpolate between closest spline points
+    else:
+        v = np.zeros([4, 2])  # vertices of unitcell box
+        v[0, :] = [0, 0]
+        v[1, :] = [box[0, 0], 0]
+        v[3, :] = [box[1, 0], box[1, 1]]
+        v[2, :] = v[3, :] + [box[0, 0], 0]
+        center = [np.mean(v[:, 0]), np.mean(v[:, 1]), 0]  # geometric center of box
 
-    m = (v[3, 1] - v[0, 1]) / (v[3, 0] - v[0, 0])  # slope from points connecting first and fourth vertices
+        bounds = path.Path(v)  # create a path tracing the vertices, v
 
-    # shift = transform.translate(z, before, center)
-    #
-    # put_in_box(pt, box[0, 0], box[1, 1], m, angle)
+        angle = np.arccos(box[1, 1]/box[0, 0])  # angle of monoclinic box
+        if box[1, 0] < 0:  # the case of an obtuse angle
+            angle += np.pi / 2
 
-    # find z positions, in between which solute will be placed
-    lower = 0
-    while pts[lower, 2] < z:
-        lower += 1
+        m = (v[3, 1] - v[0, 1]) / (v[3, 0] - v[0, 0])  # slope from points connecting first and fourth vertices
 
-    upper = pts.shape[0] - 1
-    while pts[upper, 2] > z:
-        upper -= 1
+        # shift = transform.translate(z, before, center)
+        #
+        # put_in_box(pt, box[0, 0], box[1, 1], m, angle)
 
-    limits = np.zeros([2, 3])
-    limits[0, :] = pts[lower, :]
-    limits[1, :] = pts[upper, :]
+        # find z positions, in between which solute will be placed
+        lower = 0
+        while pts[lower, 2] < z:
+            lower += 1
 
-    shift = transform.translate(limits, limits[0, :], center)  # shift limits to geometric center of unit cell
-    shift[:, 2] = [limits[0, 2], limits[1, 2]]  # keep z positions the same
+        upper = pts.shape[0] - 1
+        while pts[upper, 2] > z:
+            upper -= 1
 
-    for i in range(shift.shape[0]):  # check if the points are within the bounds of the unitcell
-        if not bounds.contains_point(shift[i, :2]):
-            shift[i, :] = put_in_box(shift[i, :], box[0, 0], box[1, 1], m, angle)
+        limits = np.zeros([2, 3])
+        limits[0, :] = pts[lower, :]
+        limits[1, :] = pts[upper, :]
 
-    # Use parametric representation of line between upper and lower points to find the xy value where z is satsified
-    v = shift[1, :] - shift[0, :]  # direction vector
+        shift = transform.translate(limits, limits[0, :], center)  # shift limits to geometric center of unit cell
+        shift[:, 2] = [limits[0, 2], limits[1, 2]]  # keep z positions the same
 
-    t = (z - shift[0, 2]) / v[2]  # solve for t since we know z
-    x = shift[0, 0] + t*v[0]
-    y = shift[0, 1] + t*v[1]
+        for i in range(shift.shape[0]):  # check if the points are within the bounds of the unitcell
+            if not bounds.contains_point(shift[i, :2]):
+                shift[i, :] = put_in_box(shift[i, :], box[0, 0], box[1, 1], m, angle)
 
-    place = np.zeros([1, 3])
-    place[0, :] = [x, y, 0]
-    place = transform.translate(place, center, limits[0, :])  # put xy coordinate back
-    place[0, 2] = z
+        # Use parametric representation of line between upper and lower points to find the xy value where z is satsified
+        v = shift[1, :] - shift[0, :]  # direction vector
 
-    if not bounds.contains_point(place[0, :]):  # make sure everything is in the box again
-        place[0, :] = put_in_box(place[0, :], box[0, 0], box[1, 1], m, angle)
+        t = (z - shift[0, 2]) / v[2]  # solve for t since we know z
+        x = shift[0, 0] + t*v[0]
+        y = shift[0, 1] + t*v[1]
 
-    return place[0, :]
+        place = np.zeros([1, 3])
+        place[0, :] = [x, y, 0]
+        place = transform.translate(place, center, limits[0, :])  # put xy coordinate back
+        place[0, 2] = z
+
+        if not bounds.contains_point(place[0, :]):  # make sure everything is in the box again
+            place[0, :] = put_in_box(place[0, :], box[0, 0], box[1, 1], m, angle)
+
+        return place[0, :]
 
 
 class Solvent(object):
@@ -338,8 +346,12 @@ class Solvent(object):
         # redo each time because positions change slightly upon energy minimization
         self.pore_spline = trace_pores(self.positions[ref, :], self.box_vectors[:2, :2], layers)
 
+        # format z so that it is an array
+        if type(z) is float or type(z) is np.float64:
+            z = np.array([z for i in range(pores)])
+
         for i in tqdm.tqdm(range(pores)):
-            placement_point = placement(z, self.pore_spline[i * layers: (i + 1) * layers, :], self.box_vectors[:2, :2])
+            placement_point = placement(z[i], self.pore_spline[i * layers: (i + 1) * layers, :], self.box_vectors[:2, :2])
             self.place_solute(solute, placement_point, freeze=True)
 
     def energy_minimize(self, steps, freeze=False, freeze_group='Freeze', freeze_dim='xyz'):

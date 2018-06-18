@@ -1,10 +1,11 @@
-\documentclass[journal=jpcbfk,manusciprt=article]{achemso}
+%\documentclass[journal=jpcbfk,manuscript=article]{achemso}
+\documentclass{article}
 
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage{subcaption}
 \usepackage{amsmath} 
-%\usepackage[margin=1in]{geometry}\usepackage{amsmath} % or simply amstext
+\usepackage[margin=1in]{geometry}\usepackage{amsmath} % or simply amstext
 \usepackage{siunitx}
 \usepackage{booktabs}
 \usepackage[export]{adjustbox}
@@ -16,16 +17,15 @@
 \usepackage{listings}
 \usepackage{xr}
 
-\SectionNumbersOn
+%\SectionNumbersOn
 
 \externaldocument[M-]{draft}
-%MRS8: can use document class here - looks weird with title/authors as written.
 \title{Supporting Information : Understanding the nanoscale structure of hexagonal phase lyotropic liquid crystal membranes}
 \author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble \and Joe Yelk \and Matthew Glaser \and Xunda Feng \and Michael R. Shirts}
 
 \begin{document}
 
-%  \bibliographystyle{ieeetr}
+  \bibliographystyle{ieeetr}
   \graphicspath{{./figures/}}  % put all the figures here
   \maketitle
 
@@ -424,13 +424,11 @@
 	  \centering
 	  \begin{tabular}{cc}
 	  \toprule
-          %MRS8: nm to aa conversion error?
 	  Initial Pore Radius & Equilibrated Pore Radius \\
 	  \midrule
-	  % BJC: to be updated once simulations are run out long enough
-	  2.5 \AA & $0.40 \pm 0.01$ \AA \\
-	  5 \AA   & $0.42 \pm 0.01$ \AA \\ % final result
-	  8 \AA   & $0.69 \pm 0.01$ \AA \\
+	  2.5 \AA & $4.0 \pm 0.1$ \AA \\
+	  5 \AA   & $4.2 \pm 0.1$ \AA \\
+	  8 \AA   & $6.9 \pm 0.1$ \AA \\
 	  \bottomrule
 	  \end{tabular}
 	  \caption{The average pore radii of systems built with an initial pore

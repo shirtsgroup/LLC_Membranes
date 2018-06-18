@@ -411,12 +411,6 @@ liquid crystal membranes}
 %		  Photo-cross-linking of the aligned film creates a mechanically stable thin film
 %		  with vertically aligned nanopores}~\label{fig:soft} \end{figure}
 
-% BJC5 : This is how it is described in Xunda's papers. Should I shift to something
-% that doesn't rely on stacked disks? Maybe illustrate monomers stacked into
-% columns instead?
-% BJC6 : I will get to redo-ing this. Just takes some time to refamiliarize myself with
-% the software I used to create it
-%MRS8: sound good.
   \begin{figure}
 	\centering
 	\begin{subfigure}{.3\textwidth}
@@ -436,7 +430,7 @@ liquid crystal membranes}
 	\end{subfigure}
 		\begin{subfigure}{0.4\linewidth}
 		\centering
-		\includegraphics[width=\textwidth]{layer_thick.png}
+		\includegraphics[width=\textwidth]{columns.png}
 		\caption{}~\label{fig:wedge_layer}
 	\end{subfigure}
 	\begin{subfigure}{0.4\linewidth}
@@ -444,10 +438,11 @@ liquid crystal membranes}
 		\includegraphics[width=\textwidth]{hexagonal_packing.png}
 		\caption{}~\label{fig:hex_packing_simple}
 	\end{subfigure}
-	\caption{The LLC monomer Na-GA3C11 (a) rendered atomistically (b)
-	exhibits wedge-like character (c). Monomer wedges assemble into disks (d) with
-	hydrophilic head groups (blue) facing towards the disk center. The disks
-	assemble into hexagonally packed columnar mesophases (e).}~\label{fig:assembly}
+	\caption{(a) The LLC monomer Na-GA3C11 (b) rendered atomistically (c)
+	exhibits wedge-like character. (d) Monomers stack on top of each other with
+	short range order and assemble into pores. (e) The hydrophilic head groups 
+	(blue) facing towards the pore center. The pores assemble into hexagonally
+	packed columnar mesophases.}~\label{fig:assembly}
   \end{figure}
 
   Our current understanding of the molecular details of LLC membranes' nanostructure
@@ -577,12 +572,12 @@ liquid crystal membranes}
 
   \begin{figure}[!htb]
         \centering
-        \begin{subfigure}[t]{0.43\linewidth}
+        \begin{subfigure}[t]{0.405\linewidth}
                 \centering
                 \includegraphics[width=\linewidth]{SAXS.png}
                 \caption{}\label{fig:SAXS}
         \end{subfigure}
-        \begin{subfigure}[t]{0.47\linewidth}
+        \begin{subfigure}[t]{0.495\linewidth}
                 \centering
                 \includegraphics[width=\linewidth]{WAXS_annotated_words.png} 
                 \caption{}\label{fig:WAXS}
@@ -786,7 +781,7 @@ liquid crystal membranes}
   trajectory then reassigned charges using \texttt{molcharge}. Using the new
   charges, we annealed the monomer system again and pulled a random monomer
   configuration from the trajectory which we used for full system
-  construction (Figure~\ref{fig:python}a). See section S-\ref{S-section:parameterization} 
+  construction (Figure~\ref{fig:build_procedure}a). See section S-\ref{S-section:parameterization} 
   for further detail of the parameterization process.
 
   \subsection{Unit Cell Preparation}
@@ -801,17 +796,43 @@ liquid crystal membranes}
   indicators of progress towards an ordered system (see section S-\ref{S-section:self_assembly}). 
   To bypass the slow self-assembly process, we use Python scripts to assemble monomers
   into a structure close to one of a number of hypothesized equilibrium configurations
-  (Figure~\ref{fig:python}).
+  (Figure~\ref{fig:build_procedure}).
   
   % BJC5: This needs to be modified to reflect columnar build procedure
-  \begin{figure}
-	\centering
-	\includegraphics[width=0.75\linewidth]{build.PNG} %BJC: put an xyz axis with the unit cell
-	\caption{(a) We parameterized a single monomer and annealed it to produce a low energy
-		configuration. (b) A Python script assembles monomers into columns which are duplicated 
-		and rotated to surround hydrophilic pore centers. (c) We chose to stack twenty monomers
-		into each column. (d) The pores are duplicated and placed into a monoclinic unit cell.}\label{fig:python}
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}[t]{0.45\textwidth}
+  \includegraphics[width=\linewidth]{monomer_diagonal.png}
+  \caption{}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.42\textwidth}
+  \includegraphics[width=\linewidth]{stacked_monomers.png}
+  \caption{}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.35\textwidth}
+  \includegraphics[width=\linewidth]{initial_pore.png}
+  \caption{}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.45\textwidth}
+  \includegraphics[width=\linewidth]{initial_unit_cell.png}
+  \caption{}
+  \end{subfigure}
+  \caption{(a) We parameterized a single monomer and annealed it to produce a low energy
+		configuration. (b) We assembled monomers into columns by stacking them on top of each 
+		other. (c) We duplicated each column and rotated them to create hydrophilic pore centers.
+		We chose to stack twenty monomers into each column. (d) We duplicated the pores and 
+		placed them into a monoclinic unit cell.}\label{fig:build_procedure}
   \end{figure}
+  
+  %BJC7: old
+%  \begin{figure}
+%	\centering
+%	\includegraphics[width=0.75\linewidth]{build.PNG} %BJC: put an xyz axis with the unit cell
+%	\caption{(a) We parameterized a single monomer and annealed it to produce a low energy
+%		configuration. (b) A Python script assembles monomers into columns which are duplicated 
+%		and rotated to surround hydrophilic pore centers. (c) We chose to stack twenty monomers
+%		into each column. (d) The pores are duplicated and placed into a monoclinic unit cell.}\label{fig:python}
+%  \end{figure}
   
   A typical simulation volume contains four pores in a monoclinic unit cell,
   the smallest unit cell that maintains hexagonal symmetry when extended
@@ -1071,7 +1092,7 @@ liquid crystal membranes}
   indicated by the Einstein relation \cite{einstein_investigations_1956}. We
   visualized the MSD plot to determine where to begin and end a linear fit. We
   measured ion concentration with respect to the volume of the entire unit cell. 
-  More details are provided in the Supporting Information, Section~S-\ref{section:ionic_conductivity}.
+  More details are provided in the Supporting Information, Section~S-\ref{S-section:ionic_conductivity}.
 
   \subsection{Cross-linking}
   

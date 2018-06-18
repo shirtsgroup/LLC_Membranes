@@ -175,19 +175,31 @@ class Umbrellas(object):
                 self.com_dist[i, :, j] = pullx[j].split()[1:]
         print('Done!')
 
+        layers = np.array([0.2827, 0.6453, 1.12610003, 1.62843333, 1.98863332, 2.46396668, 2.86146666, 3.25720001,
+                           3.72156667, 4.17230001, 4.75486663, 5.17436667, 5.6058, 6.07550001, 6.48299999, 6.98549995,
+                           7.4425333, 7.75879997, 8.14633336, 7.5983333])
+        between = np.array([(layers[i] + layers[i - 1])/2 for i in range(1, layers.size)])
+
         colors = ['aqua', 'blue', 'coral', 'crimson', 'darkgreen', 'gold', 'lavender', 'magenta', 'orangered', 'plum',
                   'teal', 'violet']
         self.centers = self.com_dist[:, :, 0]
-        # for i in range(self.K):
-        #     plt.hist(self.com_dist[i, 0, :], bins=50, color=colors[i])
-        #     plt.plot([self.centers[i, 0], self.centers[i, 0]], [0, 20000], '--', color=colors[i])
-        #     # print(np.mean(self.com_dist[i, 0, :]))
-        #     # print(np.std(self.com_dist[i, 0, :]))
+        for i in range(self.K):
+            plt.hist(self.com_dist[i, 0, :], bins=50, color=colors[i])
+            #plt.plot([self.centers[i, 0], self.centers[i, 0]], [0, 20000], '--', color=colors[i])
+            # print(np.mean(self.com_dist[i, 0, :]))
+            # print(np.std(self.com_dist[i, 0, :]))
 
-        plt.hist(self.com_dist[3, 0, :], bins=50, color=colors[3])
-        plt.plot([self.centers[3, 0], self.centers[3, 0]], [0, 20000], '--', color=colors[3])
-        plt.title('k = 62.4')
-        print(np.std(self.com_dist[3, 0, :]))
+        for i in range(layers.size):
+            plt.plot([layers[i], layers[i]], [0, 20000], color='black')
+
+        for i in range(between.size):
+            plt.plot([between[i], between[i]], [0, 20000], '--', color='black')
+
+
+        # plt.hist(self.com_dist[3, 0, :], bins=50, color=colors[3])
+        # plt.plot([self.centers[3, 0], self.centers[3, 0]], [0, 20000], '--', color=colors[3])
+        # plt.title('k = 62.4')
+        # print(np.std(self.com_dist[3, 0, :]))
         plt.show()
 
         self.N = np.zeros([self.K, self.nres], dtype=int)  # number of uncorrelated frames for each trajectory

@@ -294,7 +294,6 @@ class SimulationMdp(object):
                 f.write('pull-group%d-name = %s\n' % (n + i + 1, x))
 
 
-
 if __name__ == "__main__":
 
     args = initialize()
