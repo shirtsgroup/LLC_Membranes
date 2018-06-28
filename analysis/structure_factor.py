@@ -123,18 +123,16 @@ class Trajectory(object):
         y = np.linspace(0, self.box[1], grid[1] + 1)
         z = np.linspace(0, self.box[2], grid[2] + 1)
 
-        print('Histogramming...', end='', flush=True)
+        print('Histogramming...')
         H = np.zeros([self.nframes, grid[0], grid[1], grid[2]])
         for f in tqdm.tqdm(range(self.nframes)):
             H[f, ...] = np.histogramdd(self.locations[f, ...], bins=(x, y, z))[0]
-        print('Done!')
 
         # fourier transform
-        print('Computing Fourier Transforms', end='', flush=True)
+        print('Computing Fourier Transforms')
         fft = np.zeros([grid[0], grid[1], grid[2]])
         for f in tqdm.tqdm(range(self.nframes)):
             fft += np.abs(np.fft.fftn(H[f, ...] - H[f, ...].mean()))**2
-        print('Done!')
 
         fft /= self.nframes
 
