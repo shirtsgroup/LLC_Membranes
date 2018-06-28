@@ -1,9 +1,12 @@
-#!/bin/bash/python
+#! /usr/bin/env python
+
+from LLC_Membranes.analysis import make_dict
 
 # Dictionary of atomic masses associated with various atom types
 
 mass = {}
 charge = {}
+radius = {}
 
 mass['C'] = 12.01
 mass['C1'] = 12.01
@@ -142,14 +145,40 @@ mass['H73'] = 1.008
 mass['H74'] = 1.008
 mass['H75'] = 1.008
 mass['H76'] = 1.008
+mass['H77'] = 1.008
+mass['H78'] = 1.008
+mass['H79'] = 1.008
+mass['H80'] = 1.008
+mass['H81'] = 1.008
+mass['H82'] = 1.008
+mass['H83'] = 1.008
 mass['NA'] = 22.98977
 mass['CL'] = 35.453
 mass['OW'] = 15.99940
 mass['HW1'] = 1.008
 mass['HW2'] = 1.008
 mass['HW'] = 1.008
+mass['BR'] = 79.90
+mass['N'] = 14.01
+mass['N1'] = 14.01
+mass['N2'] = 14.01
+mass['N3'] = 14.01
+mass['OW_tip4pew'] = 16.00000
+mass['HW_tip4pew'] = 1.008
+mass['HW_tip4pew'] = 1.008
+mass['MW'] = 0.0
+mass['OXT'] = 15.99940
+mass['CA'] = 40.08
+mass['S'] = 32.06
 
 # fill in charge dictionary (Used make_dict.py to generate the following list)
+
+
+def charges(monomer):
+
+    c = make_dict.mk_dict(monomer)
+
+    return c
 
 charge['C'] = -0.0946
 charge['C1'] = -0.1495
@@ -288,8 +317,23 @@ charge['H73'] = 0.0622
 charge['H74'] = 0.1685
 charge['H75'] = 0.12675
 charge['H76'] = 0.12675
+charge['H77'] = 0.00000
+charge['H78'] = 0.00000
+charge['H79'] = 0.00000
+charge['H80'] = 0.00000
+charge['H81'] = 0.00000
+charge['H82'] = 0.00000
+charge['H83'] = 0.00000
 charge['NA'] = 1.00000
 charge['CL'] = -1.00000
 charge['OW'] = -0.834
 charge['HW1'] = .417
 charge['HW2'] = .417
+charge['BR'] = -1.00000
+charge['CA'] = 2.00000
+
+radius['C'] = 170  # angstroms
+radius['O'] = 152
+radius['H'] = 120
+radius['NA'] = 227
+radius['Na'] = 227

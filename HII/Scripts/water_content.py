@@ -2,12 +2,12 @@
 
 import argparse
 import mdtraj as md
-from place_solutes import trace_pores
+from LLC_Membranes.setup.place_solutes import trace_pores
+from LLC_Membranes.analysis import Atom_props
 import numpy as np
 import matplotlib.pyplot as plt
 import tqdm
 from scipy import spatial
-import Atom_props
 from pymbar import timeseries
 
 
@@ -39,6 +39,9 @@ def initialize():
     parser.add_argument('-begin', default=0, type=int, help='Start Frame')
     parser.add_argument('--single_frame', action='store_true', help='Specify this flag in order to analyze a single'
                                                                     '.gro file. No statistics will be generated')
+    parser.add_argument('--tcl', action='store_true', help='Create .tcl file that create representation of water within'
+                                                           'pore region. Use vmd *.gro -e *.tcl. Only designed for use'
+                                                           'with a single frame')
 
     args = parser.parse_args()
 
@@ -102,7 +105,7 @@ def restrict_spline(full_spline, bounds):
     return np.array(restricted)
 
 
-def water_content(pos, ref_pos, r):
+def water_content(pos, ref_pos, r, write=False):
     """
     Find number of water molecules in region
     :param pos: positions of all water molecules (excluding those outside boundaries defined by args.bounds)
@@ -112,13 +115,18 @@ def water_content(pos, ref_pos, r):
     """
 
     n = 0
+    ndx = []
     tree = spatial.cKDTree(ref_pos)
     for i in range(pos.shape[0]):
         d = tree.query(pos[i, :])[0]
         if d < r:
             n += 1
+            ndx.append(i)
 
-    return n
+    if write:
+        return n, ndx
+    else:
+        return n
 
 
 def bootstrap(data, tau, nboot):
@@ -131,7 +139,6 @@ def bootstrap(data, tau, nboot):
 
     tau = int(tau)
     nsub = data.shape[0] // tau  # number of uncorrelated subtrajectories to break data into
-    print(nsub)
 
     # divide data into independent subtrajectories
     subtrajectories = np.zeros([nsub, tau])
@@ -157,12 +164,13 @@ if __name__ == "__main__":
 
     args = initialize()
 
-    print('Loading trajectory...')
+    print('Loading trajectory...', flush=True, end='')
     if args.single_frame:
         t = md.load(args.gro)
     else:
         t = md.load(args.traj, top=args.gro)[args.begin:]
     print('Done!')
+
     pos = t.xyz
     box = t.unitcell_vectors
     res = np.array([a.residue.name for a in t.topology.atoms])
@@ -200,7 +208,15 @@ if __name__ == "__main__":
         # file_rw.write_gro_pos(positions, 'test.gro', ids=ids, res=res, box=box_gromacs)
         # exit()
 
-        n_water_pore = water_content(pos[f, water, :], spline, args.pore_radius)
+        if args.single_frame and args.tcl:
+            n_water_pore, water_indices = water_content(pos[f, water, :], spline, args.pore_radius, write=True)
+
+            with open('vis.tcl', 'w') as f:
+                f.write('mol modselect 0 0 serial ')
+                for i in water[water_indices]:
+                    f.write('%d' % i)
+        else:
+            n_water_pore = water_content(pos[f, water, :], spline, args.pore_radius)
         #n_water_tail = water_content(pos[f, water, :], pos[f, all_tail_atoms, :], args.tail_radius)
 
         # if n_water_pore + n_water_tail > len(water):

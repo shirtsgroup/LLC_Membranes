@@ -2,7 +2,7 @@
 
 from __future__ import division
 from builtins import range
-from llclib import file_rw
+from LLC_Membranes.llclib import file_rw
 import mdtraj as md
 import numpy as np
 import matplotlib.path as mplPath

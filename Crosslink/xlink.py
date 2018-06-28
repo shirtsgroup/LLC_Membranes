@@ -13,10 +13,10 @@ import time
 import genpairs
 import copy
 import mdtraj as md
-from llclib import transform
+from LLC_Membranes.llclib import transform
+from LLC_Membranes.setup import lc_class
 from matplotlib import path
 import random
-import lc_class
 
 start = time.time()  # For informational purposes
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in

@@ -45,10 +45,7 @@ def initialize():
     parser.add_argument('-end', default=-1, type=int, help='Frame to end calculations at')
     parser.add_argument('-noise', default=1, type=float, help='Frame to end calculations at')
 
-
-    args = parser.parse_args()
-
-    return args
+    return parser
 
 
 def gaussian1D(x, sigma_x, mu_x):
@@ -192,6 +189,46 @@ def rescale(coords, dims):
     # dr = old_div(avgdims,Nspatialgrid)
 
     return rc, avgdims
+
+
+def random_column_displacement(ncolumns, npoints, z_separation=3.7, xy_separation=1, bounds=None):
+    """
+    :param ncolumns: Number of columns in 1 direction. There will be ncolumns**2 total columns
+    :param npoints: Number of points in column array
+    :param z_separation: distance between points in columns
+    :param xy_separation: distance between columns in xy directions (same in both)
+    :param bounds: bounds of histogram in each dimension
+    :return: grid of locations
+    """
+
+    locations = np.zeros([ncolumns**2*npoints, 3])
+
+    if bounds:
+        z_separation = bounds[2][1] / npoints
+        xy_separation = bounds[0][1] / ncolumns  # assume x and y have equal dimensions (for now)
+
+    x = np.linspace(0, (ncolumns - 1) * xy_separation, ncolumns)
+    X, Y = np.meshgrid(x, x)
+    column = np.linspace(0, z_separation * (npoints - 1), npoints)
+
+    print('z spacing: %.1f' % z_separation)
+    print('xy spacing: %.1f' % xy_separation)
+
+    for c in range(ncolumns**2):
+        shift = (z_separation / 2) * np.random.uniform(-1, 1)  # shift column vertically by a random amount
+        # shift = 0
+        locations[c*npoints:(c+1)*npoints, 2] = column + shift
+        locations[c*npoints:(c+1)*npoints, :2] = [X[c % ncolumns, c // ncolumns], Y[c % ncolumns, c // ncolumns]]
+
+    # make sure everything is within 'box'
+    if bounds:
+        for i, z in enumerate(locations[:, 2]):
+            if z < bounds[2][0]:
+                locations[i, 2] += bounds[2][1]
+            elif z > bounds[2][1]:
+                locations[i, 2] -= bounds[2][1]
+
+    return locations
 
 
 def pore(nmon_per_layer, r, layers, dbwl, center, offset=True, offset_angle=0, radial_displacement=False, rd_angle=0, stagger=False):
@@ -370,7 +407,7 @@ def normalize_alkanes(R, Z, Raw_Intensity, inner, outer, angle):
 if __name__ == "__main__":
 
     # initialize variable based on user inputs
-    args = initialize()
+    args = initialize().parse_args()
 
     nspikes = args.layers
     dbwl = args.dbwl
@@ -411,7 +448,8 @@ if __name__ == "__main__":
         if args.dim > 2:
             z_pts = int(args.grid[2])
             zsigma = float(args.sigmas[2])
-            z = np.linspace(0, nspikes*dbwl, z_pts + 1)
+            #z = np.linspace(0, nspikes*dbwl, z_pts + 1)
+            z = np.linspace(0, float(args.box[2]), z_pts + 1)
             zbin = z[1] - z[0]
             X, Y, Z = np.meshgrid(x[:-1], y[:-1], z[:-1])
 
@@ -452,7 +490,7 @@ if __name__ == "__main__":
 
             L = np.linalg.norm(t.unitcell_vectors, axis=2)
 
-            locations, L = rescale(locations, L)  # make unit cell constant size -- not sure if this is right to do
+            locations, L = rescale(locations, L)  # make unit cell constant size
 
             # redefine xyz values of grid
             box = t.unitcell_vectors
@@ -477,8 +515,14 @@ if __name__ == "__main__":
             # exit()
         else:
             # test configurations
-            locations = pore(nmon_per_layer, rpore, nspikes, dbwl, xycenter, offset=offset, offset_angle=offset_angle,
-                             radial_displacement=rd, rd_angle=rd_angle, stagger=stagger)  # define points exactly
+            #locations = pore(nmon_per_layer, rpore, nspikes, dbwl, xycenter, offset=offset, offset_angle=offset_angle,
+            #                 radial_displacement=rd, rd_angle=rd_angle, stagger=stagger)  # define points exactly
+
+            bounds = [[0, float(args.box[0])], [0, float(args.box[1])], [0, float(args.box[2])]]
+            locations = random_column_displacement(int(float(args.box[0]) / 2), int(float(args.box[2]) / 3.7), bounds=bounds)
+
+            from LLC_Membranes.llclib import file_rw
+            file_rw.write_gro_pos(locations, 'test.gro', box=[float(x) for x in args.box])
 
         if args.gro:
             if args.traj:
@@ -537,38 +581,40 @@ if __name__ == "__main__":
                     for k in range(z_pts):
                         grid[i, j, k, :3] = [x[i], y[j], z[k]]
 
-            for i in tqdm.tqdm(range(pts.shape[0]), unit='points'):
-                gauss = gaussian3D(X, Y, Z, xsigma, ysigma, zsigma, pts[i, 0], pts[i, 1], pts[i, 2])
-                grid[..., 3] += gauss
-                fgrid += gauss
+            # add gaussians to points to give them an effective radius
+            # for i in tqdm.tqdm(range(pts.shape[0]), unit='points'):
+            #     gauss = gaussian3D(X, Y, Z, xsigma, ysigma, zsigma, pts[i, 0], pts[i, 1], pts[i, 2])
+            #     grid[..., 3] += gauss
+            #     fgrid += gauss
 
-        if args.dim == 1:
-            plt.plot(x[:-1], fgrid)
-
-        if args.dim == 2:
-            plt.contourf(x[:-1], y[:-1], fgrid)
-
-        if args.dim == 3:
-
-            grid_flat = grid.reshape(x_pts*y_pts*z_pts, 4)
-            grid_flat = grid_flat[np.where(grid_flat[:, 3] > 0.01), :]
-            fig = plt.figure()
-            ax = fig.add_subplot(111, projection='3d')
-            cmap = cm.ScalarMappable(cmap=cm.hsv)
-            I = grid_flat[0, :, 3]
-            cmap.set_array(I)
-
-            ax.scatter(grid_flat[0, :, 0], grid_flat[0, :, 1], grid_flat[0, :, 2], c=cm.hsv(I/max(I)))
-            # plt.title('Real space points')
-            if rpore > 0:
-                xy_window = 3*rpore
-            else:
-                xy_window = 5
-            ax.set_xlim3d(xycenter[0] - xy_window, xycenter[0] + xy_window)
-            ax.set_ylim3d(xycenter[1] - xy_window, xycenter[1] + xy_window)
-            ax.set_xlabel('x ($\AA$)', fontsize=14)
-            ax.set_ylabel('y ($\AA$)', fontsize=14)
-            ax.set_zlabel('z ($\AA$)', fontsize=14)
+        # plot
+        # if args.dim == 1:
+        #     plt.plot(x[:-1], fgrid)
+        #
+        # if args.dim == 2:
+        #     plt.contourf(x[:-1], y[:-1], fgrid)
+        #
+        # if args.dim == 3:
+        #
+        #     grid_flat = grid.reshape(x_pts*y_pts*z_pts, 4)
+        #     grid_flat = grid_flat[np.where(grid_flat[:, 3] > 0.01), :]
+        #     fig = plt.figure()
+        #     ax = fig.add_subplot(111, projection='3d')
+        #     cmap = cm.ScalarMappable(cmap=cm.hsv)
+        #     I = grid_flat[0, :, 3]
+        #     cmap.set_array(I)
+        #
+        #     ax.scatter(grid_flat[0, :, 0], grid_flat[0, :, 1], grid_flat[0, :, 2], c=cm.hsv(I/max(I)))
+        #     # plt.title('Real space points')
+        #     if rpore > 0:
+        #         xy_window = 3*rpore
+        #     else:
+        #         xy_window = 5
+        #     ax.set_xlim3d(xycenter[0] - xy_window, xycenter[0] + xy_window)
+        #     ax.set_ylim3d(xycenter[1] - xy_window, xycenter[1] + xy_window)
+        #     ax.set_xlabel('x ($\AA$)', fontsize=14)
+        #     ax.set_ylabel('y ($\AA$)', fontsize=14)
+        #     ax.set_zlabel('z ($\AA$)', fontsize=14)
             # fig.colorbar(cmap)
 
     if args.gro:
@@ -581,7 +627,8 @@ if __name__ == "__main__":
         else:
             fft = np.abs(np.fft.fftn(H))**2
     else:
-        fft = np.abs(np.fft.fftn(fgrid))**2
+        # fft = np.abs(np.fft.fftn(fgrid))**2
+        fft = np.abs(np.fft.fftn(H - H.mean()))**2
 
     freq_x = np.fft.fftfreq(x.size - 1, d=xbin)
     ndx = np.argsort(freq_x)

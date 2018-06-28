@@ -1,0 +1,49 @@
+[ atomtypes ]
+;name   atom_no        mass     charge   ptype   sigma*        epsilon*   Amber Parameters
+ ca       6           12.0100  0.00000   A     3.39967e-01   3.59824e-01 ; 1.91  0.0860
+ os       8           16.0000  0.00000   A     3.00001e-01   7.11280e-01 ; 1.68  0.1700
+ c        6           12.0100  0.00000   A     3.39967e-01   3.59824e-01 ; 1.91  0.0860
+ o        8           16.0000  0.00000   A     2.95992e-01   8.78640e-01 ; 1.66  0.2100
+ c3       6           12.0100  0.00000   A     3.39967e-01   4.57730e-01 ; 1.91  0.1094
+ ce       6           12.0100  0.00000   A     3.39967e-01   3.59824e-01 ; 1.91  0.0860
+ c2       6           12.0100  0.00000   A     3.39967e-01   3.59824e-01 ; 1.91  0.0860
+ ha       1           1.00800  0.00000   A     2.59964e-01   6.27600e-02 ; 1.46  0.0150
+ h1       1           1.00800  0.00000   A     2.47135e-01   6.56888e-02 ; 1.39  0.0157
+ hc       1           1.00800  0.00000   A     2.64953e-01   6.56888e-02 ; 1.49  0.0157
+ h2       1           1.00800  0.00000   A     2.29852e-01   6.56888e-02 ; 1.29  0.0157 
+ hc_d     1           1.00800  0.00000   D     0.0           0.0
+ PI       0           1.00800  0.00000   D     0.0           0.0 
+ Na       11          22.9900  0.00000   A     3.32840e-01   1.15897e-02  
+ Cl       17          35.4500  0.00000   A     3.47094e-01   1.10876e+00 ; 1.948 0.2650
+ K        19          39.1000  0.00000   A     4.93463e-01   1.37235e-03 ; from OPLS                         
+ Rb       37          85.4700  0.00000   A     5.62177e-01   7.15464e-04 ; from OPLS
+ Cs       55          132.900  0.00000   A     6.71600e-01   3.38904e-04 ; from OPLS
+ F        9           19.0000  0.00000   A     2.73295e-01   3.01248e+00 ; from OPLS
+ I        53          126.900  0.00000   A     5.40000e-01   2.92880e-01 ; from OPLS
+ Mg       12           24.310  0.00000   A     1.64447e-01   3.66118e+00 ; from OPLS
+ Ca       20           40.080  0.00000   A     2.41203e-01   1.88136e+00 ; from OPLS
+ Li       3            6.9400  0.00000   A     2.12645e-01   7.64793e-02 ; from OPLS
+ OW       8           16.0000  0.00000   A     3.15061e-01   6.36386e-01
+ HW       1            1.0080  0.00000   A     0.00000e+00   0.00000e+00
+ n        7           14.0100  0.00000   A     3.24999e-01   7.11280e-01 ; 1.8240 0.1700
+ hn       1            1.0080  0.00000   A     1.06907e-01   6.56888e-02 ; 0.60 0.0157 
+ oh       8           16.0000  0.00000   A     3.06647e-01   8.80313e-01 ; 1.7210 0.2104
+ ho       1            1.0080  0.00000   A     0.00000e+00   0.00000e+00 ; 0.0 0.0
+ Br       35          79.9000  0.00000   A     3.59923e-01   1.75728e+00 ; 2.02 0.420
+ cd       6           12.0100  0.00000   A     3.39967e-01   3.59824e-01 ; 1.9080 0.0860
+ na       7           14.0100  0.00000   A     3.24999e-01   7.11280e-01 ; 1.8240 0.1700
+ cc       6           12.0100  0.00000   A     3.39967e-01   3.59824e-01 ; 1.9080 0.0860
+ h4       1           1.00800  0.00000   A     2.51055e-01   6.27600e-02 ; 1.4090 0.0150
+ h5       1           1.00800  0.00000   A     2.42146e-01   6.27600e-02 ; 1.3590 0.0150
+ cg       6           12.0100  0.00000   A     0.000000000   0.000000000 ; Carbon atom used when adding gap to crosslinked system
+  v       1           1.00800  0.00000   A     0.0           0.0         ; virtual site for sticking layers together
+; * paramters are from gaff.dat and converted to gromacs units (sigma [=] nm,
+; epsilon [=] kJ/mol) from A and kcal/mol 
+; You can find the LJ pararmeters in gaff.dat by searching for the section
+; beginning with 'MOD4'
+; 1 kcal = 4.184 kJ -- multiply second column number (epsilon) in gaff.dat to get proper units
+; convert sigma like this:(2 / 10) * (sigma / (2^(1/6)))
+; the number given as the 'sigma' parameter is actually Rmin / 2 so you multiply by 2
+; convert to nanometers by dividing by 10
+; divide by 2^(1/6) to get sigma since that is the conversion between Rmin and sigma
+; More here : https://www.researchgate.net/post/Where_are_the_charge_sigma_epsilon_parameters_in_GAFF

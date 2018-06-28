@@ -332,8 +332,9 @@ colorbar = 'jet'
 levels = np.linspace(0, factor, 200)
 waxs /= avg_intensity
 
-
-levels_log = np.linspace(np.log10(waxs[-1, -1]), np.log10(np.amax(waxs)), 1000)
+MIN = waxs[-1, -1]
+MIN = 0.4
+levels_log = np.linspace(np.log10(MIN), np.log10(np.amax(waxs)), 1000)
 #levels_log = np.linspace(np.log10(waxs[-1, -1]), np.log10(np.amax(waxs)) - np.log10(avg_intensity), 1000)
 
 background = 0.5
@@ -482,10 +483,10 @@ while Y[R_double_top] < 0:  # The bottom part of the plot is noisier (change 0 t
 # exit()
 
 # plot maximum intensity of each z-slice
-# plt.plot(np.linspace(-100, 99, 200), np.amax(waxs[:, waxs.shape[0]//2 - 100:waxs.shape[0]//2 + 100], axis=0))
+plt.plot(np.linspace(-100, 99, 200), np.amax(waxs[:, waxs.shape[0]//2 - 100:waxs.shape[0]//2 + 100], axis=0))
 # plt.plot(np.linspace(-10, 9, 20), np.amax(waxs[R_double_bottom:R_double_top,
 #                                           waxs.shape[0]//2 - 10:waxs.shape[0]//2 + 10], axis=0))
-# plt.show()
+plt.show()
 
 # R-pi / R-double intensity measurement illustration
 # fig = plt.figure()
@@ -505,20 +506,26 @@ while Y[R_double_top] < 0:  # The bottom part of the plot is noisier (change 0 t
 # plt.show()
 
 
+zsection = waxs[:, waxs.shape[0]//2]
+plt.plot(Y, zsection)
+plt.show()
+np.savez_compressed('z_section.npz', x=Y, y=zsection)
+exit()
 # print('Average R-pi intensity: %.2f' % np.mean(np.amax(waxs[:, waxs.shape[0]//2 - 10:waxs.shape[0]//2 + 10], axis=0)))
 # print('Average R-double intensity: %.2f' % np.mean(np.amax(waxs[R_double_bottom:R_double_top,
 #                                                            waxs.shape[0]//2 - 10:waxs.shape[0]//2 + 10], axis=0)))
 # print('Average R-spots intensity : %.2f' % Rspots(X, Y, waxs, theta=50, theta_sigma=(3, 2), bounds=(1.3, 1.45)))
 # exit()
 fig, ax = plt.subplots()
-heatmap = plt.contourf(X, Y, waxs, cmap=colorbar, levels=levels)#, extend='max')
+#heatmap = plt.contourf(X, Y, waxs, cmap=colorbar, levels=levels)#, extend='max')
+heatmap = plt.contourf(X, Y, np.log10(waxs), levels=levels_log, cmap='jet', extend='min')
 # cid = fig.canvas.mpl_connect('button_press_event', onclick)
-# cbar = plt.colorbar(format='%.2f')
+cbar = plt.colorbar(format='%.2f')
 plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=18)
 plt.ylabel('$q_z\ (\AA^{-1}$)', fontsize=18)
 plt.gcf().get_axes()[0].tick_params(labelsize=14)
 plt.gcf().get_axes()[0].set_aspect('equal')
-plt.text(-2.2, 2.2, "(c)", fontsize=24, color='white', verticalalignment='center', horizontalalignment='center')
+#plt.text(-2.2, 2.2, "(c)", fontsize=24, color='white', verticalalignment='center', horizontalalignment='center')
 plt.tight_layout()
 plt.savefig('WAXS_raw.png')
 plt.show()
