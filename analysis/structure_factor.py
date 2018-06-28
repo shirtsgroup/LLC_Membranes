@@ -30,7 +30,7 @@ def initialize():
     parser.add_argument('-noise', default=1, type=float, help='Frame to end calculations at')
 
     # Options for custom trajectories
-    parser.add_argument('-box', nargs='+', default=[20, 20, 74], help='length of box vectors. Only orthorhombic boxes'
+    parser.add_argument('-box', nargs='+', default=[20, 20, 37], help='length of box vectors. Only orthorhombic boxes'
                                                                       'are implemented')
     parser.add_argument('-nframes', default=100, type=int, help='Number of frames to create')
     parser.add_argument('--random_columns', action="store_true", help='Create a trajectory with columns made of'
@@ -211,9 +211,11 @@ class Trajectory(object):
 if __name__ == "__main__":
 
     args = initialize().parse_args()
+
     tol = 0.0001
     box = [float(x) for x in args.box]
     grid = [int(x) for x in args.grid]
+
     t = Trajectory()
 
     bounds = [[0, box[0]], [0, box[1]], [0, box[2]]]
@@ -229,7 +231,7 @@ if __name__ == "__main__":
     if args.random_columns:
 
         t.box = box
-        t.column_grid(args.ncolumns, int(float(args.box[2]) / dbwl), frames=args.nframes, bounds=bounds, noise=False)
+        t.column_grid(args.ncolumns, int(float(args.box[2]) / dbwl), frames=args.nframes, bounds=bounds, noise=True)
 
     else:
 
@@ -240,7 +242,8 @@ if __name__ == "__main__":
     t.compute_structure_factor(grid)
     t.plot_sf_slice('z', [0, 0], show=True)
 
-    t.scatter3d()
+    # plot points in 3D
+    # t.scatter3d()
 
-    rpi_index = np.argmin(np.abs(t.freq_z + (1/3.7)))
+    rpi_index = np.argmin(np.abs(t.freq_z + (1/dbwl)))
     print('R-pi intensity: %.2f' % np.amax(t.slice[(rpi_index - 1): (rpi_index + 1)]))
