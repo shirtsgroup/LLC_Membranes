@@ -2,9 +2,7 @@
 
 """ Calculate structure factor of single 3D configurations or trajectories of configurations """
 
-from pylab import *
 import tqdm
-from scipy.interpolate import RegularGridInterpolator
 import argparse
 import mdtraj as md
 import matplotlib.pyplot as plt
