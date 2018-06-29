@@ -491,7 +491,7 @@ def write_water_ndx(keep, t):
             count += 1
 
 
-def write_gro_pos(pos, out, name='NA', box=[0, 0, 0], ids=None, res=None, vel=None):
+def write_gro_pos(pos, out, name='NA', box=[0, 0, 0], ids=None, res=None, vel=None, ucell=None):
     """
     write a .gro file from positions
     :param pos: xyz coordinates in
@@ -499,6 +499,10 @@ def write_gro_pos(pos, out, name='NA', box=[0, 0, 0], ids=None, res=None, vel=No
     :param name: name to give atoms being put in the .gro
     :return: A .gro file
     """
+
+    if ucell is not None:
+        box = [ucell[0, 0], ucell[1, 1], ucell[2, 2], ucell[0, 1], ucell[2, 0], ucell[1, 0], ucell[0, 2], ucell[1, 2],
+               ucell[2, 0]]
 
     with open(out, 'w') as f:
 

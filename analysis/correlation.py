@@ -564,7 +564,7 @@ if __name__ == "__main__":
 
             plt.plot(centers_z[1:], zdf, linewidth=2)
             # plt.plot(centers_z[1:], zdf_full, linewidth=2)
-            # plt.xlim(0, 4)
+            plt.xlim(0, 4)
             # plt.ylim(0, 2)
 
             start = 13

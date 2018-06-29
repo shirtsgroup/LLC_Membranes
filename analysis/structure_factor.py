@@ -35,8 +35,18 @@ def initialize():
     parser.add_argument('--random_columns', action="store_true", help='Create a trajectory with columns made of'
                         'equispaced points but are randomly displaced in the z-diretion with respect to other columns')
     parser.add_argument('-ncol', '--ncolumns', default=10, type=int, help='The number of columns in the x and y '
-                        'dimensions. The total number of columns in the unit cell will be ncol^2')
+                        'dimensions. The total number of columns in the unit cell will be ncol^2. In the case of '
+                        'hexagonal columns, this defines the number of pore centers.')
     parser.add_argument('-dbwl', default=3.7, type=float, help='Distance between layers (float, angstroms)')
+    parser.add_argument('-nonoise', action="store_false", help='Turn off random column displacement')
+    # hexagonally packed columns (combined with --random_columns flag)
+    parser.add_argument('--hexagonal', action="store_true", help='Create a hexagonal packed columns that mimic the HII'
+                                                                 'phase')
+    parser.add_argument('--ncol_per_pore', default=5, type=int, help='Number of columns surrounding each pore center')
+    parser.add_argument('--pore_radius', default=0.5, type=float, help='Distance to place each column from pore center')
+    parser.add_argument('--cell_theta', default=120, type=float, help='Angle between vectors defining xy plane of'
+                                                                      'monoclinic box')
+    parser.add_argument('-npores', default=4, type=int, help='Number of pores in each dimension, similar to ncol')
 
     # The following are meant for custom trajectories but are not implemented. See fft3d.py for their implementation
     parser.add_argument('-l', '--layers', default=20, type=int, help='Number of layers in z direction (int)')
@@ -72,8 +82,10 @@ class Trajectory(object):
         self.freq_y = None
         self.freq_z = None
         self.slice = None
+        self.unit_cell = None
+        self.theta = 0
 
-    def column_grid(self, ncolumns, npoints, frames=1, z_separation=3.7, xy_separation=1, bounds=None, noise=True):
+    def square_column_grid(self, ncolumns, npoints, frames=1, z_separation=3.7, xy_separation=1, bounds=None, noise=True):
         """
         :param ncolumns: Number of columns in 1 direction. There will be ncolumns**2 total columns
         :param npoints: Number of points in column array
@@ -86,6 +98,7 @@ class Trajectory(object):
         self.nframes = frames
         self.locations = np.zeros([self.nframes, ncolumns ** 2 * npoints, 3])
 
+        # can use self.box if assumed that one corner of the box is at the origin
         if bounds:
             z_separation = bounds[2][1] / npoints
             xy_separation = bounds[0][1] / ncolumns  # assume x and y have equal dimensions (for now)
@@ -108,14 +121,74 @@ class Trajectory(object):
                                                                 Y[c % ncolumns, c // ncolumns]]
 
             # make sure everything is within 'box'
-            if bounds:
-                for i, z in enumerate(self.locations[t, :, 2]):
-                    if z < bounds[2][0]:
-                        self.locations[t, i, 2] += bounds[2][1]
-                    elif z > bounds[2][1]:
-                        self.locations[t, i, 2] -= bounds[2][1]
+            # if bounds:
+            #     for i, z in enumerate(self.locations[t, :, 2]):
+            #         if z < bounds[2][0]:
+            #             self.locations[t, i, 2] += bounds[2][1]
+            #         elif z > bounds[2][1]:
+            #             self.locations[t, i, 2] -= bounds[2][1]
+        self.put_in_box()
 
-    def compute_structure_factor(self, grid, weights=None):
+    def hexagonal_column_grid(self, npores, ncol_per_pore, r, npoints, frames=1, noise=True):
+
+        self.nframes = frames
+        self.locations = np.zeros([self.nframes, npores ** 2 * npoints * ncol_per_pore, 3])
+
+        xy_pore_centers = np.zeros([npores**2, 2])
+        dx = self.box[0] / npores  # distance between pores in x direction
+
+        if r > (dx / 2):
+            print('WARNING: The pore radius is such that pores intersect and  columns will be placed outside of the '
+                  'unit cell which will disrupt periodicity. \nSetting r to %.2f. \nEither change the radius, change '
+                  'the box dimensions, or change the number of pores in the unit cell.' % (dx/2))
+
+        for i in range(npores):
+            row_x = i*self.unit_cell[1, 0]*dx + np.linspace(dx/2, self.box[0] - (dx/2), npores)
+            row_y = i*self.unit_cell[1, 1]*dx + (dx/2)*self.unit_cell[1, 1]
+            xy_pore_centers[i*npores:(i + 1)*npores, 0] = row_x
+            xy_pore_centers[i*npores:(i + 1)*npores, 1] = row_y
+
+        z_separation = self.box[2] / npoints
+        column = np.linspace(0, z_separation * (npoints - 1), npoints)
+
+        print('z-spacing: %.2f' % z_separation)
+        print('Pore center spacing: %.2f' % dx)
+
+        for t in range(self.nframes):
+            for c in range(npores**2):
+                # for each column, choose a random point on the circle with radius, r, centered at the pore center
+                # place a column on that point. Equally space remaining columns on circle with reference to that point
+                start_theta = np.random.uniform(0, 360) * (np.pi / 180)  # random angle
+                theta = 2 * np.pi / ncol_per_pore  # angle between columns
+                for a in range(ncol_per_pore):
+                    x = r*np.cos(start_theta + a*theta)
+                    y = r*np.sin(start_theta + a*theta)
+                    start = ncol_per_pore * c * npoints + a * npoints
+                    end = ncol_per_pore * c * npoints + (a + 1) * npoints
+                    self.locations[t, start:end, :2] = xy_pore_centers[c, :] + [x, y]
+                    if noise:
+                        shift = (z_separation / 2) * np.random.uniform(-1, 1)  # shift column by a random amount
+                    else:
+                        shift = 0
+                    self.locations[t, start:end, 2] = column + shift
+
+        self.put_in_box()
+
+    def put_in_box(self):
+
+        for t in range(self.nframes):
+            for i, z in enumerate(self.locations[t, :, 2]):
+                if z < 0:
+                    self.locations[t, i, 2] += self.box[2]
+                elif z > self.box[2]:
+                    self.locations[t, i, 2] -= self.box[2]
+
+    def compute_structure_factor(self, grid, hexagonal=False, weights=None):
+
+        if hexagonal:
+            print("Transforming coordinates to cubic cell")
+            self.locations[..., 1] /= np.sin(self.theta)
+            self.locations[..., 0] -= self.locations[..., 1] * np.cos(self.theta)
 
         # put locations into discrete bins
         # define bin edges in each dimension
@@ -154,6 +227,27 @@ class Trajectory(object):
         fft = fft[:, ndy, :]
         self.fft = fft[:, :, ndz]
 
+        # if hexagonal:
+        #
+        #     a1 = self.unit_cell[0, :]
+        #     a2 = self.unit_cell[1, :]
+        #     a3 = self.unit_cell[2, :]
+        #
+        #     b1 = (np.cross(a2, a3)) / (np.dot(a1, np.cross(a2, a3)))
+        #     b2 = (np.cross(a3, a1)) / (np.dot(a2, np.cross(a3, a1)))
+        #     b3 = (np.cross(a1, a2)) / (np.dot(a3, np.cross(a1, a2)))
+        #
+        #     b_inv = np.linalg.inv(np.vstack((b1, b2, b3)))
+        #
+        #     freq_X, freq_Y, freq_Z = np.meshgrid(self.freq_x, self.freq_y, self.freq_z)
+        #     freqs = np.array([freq_X.flatten(), freq_Y.flatten(), freq_Z.flatten(), self.fft.flatten()]).T
+        #     freqs[:, :3] = np.matmul(freqs[:, :3], b_inv)
+        #     self.fft, edges = np.histogramdd(freqs[:, :3], bins=grid, weights=freqs[:, -1])
+        #
+        #     self.freq_x = np.array([(edges[0][i - 1] + edges[0][i])/2 for i in range(1, len(edges[0]))])
+        #     self.freq_y = np.array([(edges[1][i - 1] + edges[1][i])/2 for i in range(1, len(edges[1]))])
+        #     self.freq_z = np.array([(edges[2][i - 1] + edges[2][i])/2 for i in range(1, len(edges[2]))])
+
     def plot_sf_slice(self, axis, loc, show=False):
         """ Plot 1D slice of structure factor
         :param axis : x, y or z
@@ -162,6 +256,7 @@ class Trajectory(object):
         a slice through y, pass in qx then qz. If you want x then qy then qz etc.
         """
 
+        plt.figure()
         axes = {'x': 0, 'y': 1, 'z': 2}
 
         if axis == 'x':
@@ -228,7 +323,22 @@ if __name__ == "__main__":
     if args.random_columns:
 
         t.box = box
-        t.column_grid(args.ncolumns, int(float(args.box[2]) / dbwl), frames=args.nframes, bounds=bounds, noise=True)
+
+        if args.hexagonal:
+
+            if t.box[0] != t.box[1]:
+                print('WARNING: The x and y box lengths must be equal for this script to properly implement hexagonal '
+                      'periodicity. Setting y box length equal to x box length.')
+                t.box[1] = t.box[0]
+
+            t.theta = args.cell_theta * np.pi / 180.0  # theta for monoclinic unit cell
+            t.unit_cell = np.array([[1, 0, 0], [np.cos(t.theta), np.sin(t.theta), 0], [0, 0, 1]])
+            t.hexagonal_column_grid(args.npores, args.ncol_per_pore, args.pore_radius, int(float(args.box[2]) / dbwl),
+                                    frames=args.nframes, noise=args.nonoise)
+        else:
+
+            t.square_column_grid(args.ncolumns, int(float(args.box[2]) / dbwl), frames=args.nframes, bounds=bounds,
+                                 noise=args.nonoise)
 
     else:
 
@@ -236,11 +346,13 @@ if __name__ == "__main__":
               'using arguments or pass in a GROMACS .gro or trajectory file (.xtc or .trr).')
         exit()
 
-    t.compute_structure_factor(grid)
-    t.plot_sf_slice('z', [0, 0], show=True)
+    # plot points in 3D before any modification
+    t.scatter3d(show=False)
 
-    # plot points in 3D
-    # t.scatter3d()
+    t.compute_structure_factor(grid, hexagonal=args.hexagonal)
+    t.plot_sf_slice('z', [0, 0], show=False)
 
     rpi_index = np.argmin(np.abs(t.freq_z + (1/dbwl)))
     print('R-pi intensity: %.2f' % np.amax(t.slice[(rpi_index - 1): (rpi_index + 1)]))
+
+    plt.show()
