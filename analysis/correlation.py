@@ -20,8 +20,8 @@ def initialize():
     parser.add_argument('-t', '--traj', default='traj_whole.xtc', type=str, help='Trajectory file. Make sure to '
                                                                             'preprocess with gmx trjconv -pbc whole')
     parser.add_argument('-g', '--gro', default='wiggle.gro', type=str, help='Name of coordinate file')
-    parser.add_argument('-a', '--atoms', nargs='+', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='Name of atoms to calculate'
-                        'correlation function with respect to. The center of mass will be used')
+    parser.add_argument('-a', '--atoms', nargs='+', action='append', help='Name of atoms to calculate correlation '
+                        'function with respect to. The center of mass will be used')
     parser.add_argument('-r', '--res', help='Residue to create correlation function with respect to. Will use center of'
                                             'mass. Will override atoms. NOT IMPLEMENTED YET')
     parser.add_argument('--itp', default='/home/bcoscia/PycharmProjects/GitHub/HII/top/Monomer_Tops/NAcarb11V.itp')
@@ -52,9 +52,7 @@ def initialize():
                                                              'factor')
     parser.add_argument('-fit', action="store_true", help='Fit decaying exponential function to correlation function')
 
-    args = parser.parse_args()
-
-    return args
+    return parser
 
 
 def com(pos, mass):
@@ -65,17 +63,18 @@ def com(pos, mass):
     :return: trajectory of center of mass coordinates
     """
 
-    n = len(mass)  # number of atoms
-    nT = pos.shape[0]  # number of frames
-    ncom = int(pos.shape[1]/n)  # number of centers of mass to calculate at each frame
-    mres = np.sum(mass)
+    ngrps = len(mass)
+    n = [len(i) for i in mass]
+    ndx = [sum(n[:i]) for i in range(len(n))]
 
-    centers = np.zeros([pos.shape[0], ncom, 3])  # will hold positions of all centers of masses
+    nmon = pos.shape[1] // sum(n)  # number of monomers
+    centers = np.zeros([pos.shape[0], nmon*ngrps, 3])  # total number of center of masses
 
-    for f in range(pos.shape[0]):  # loop through all trajectory frames
-        for i in range(ncom):
-            w = (pos[f, i*n:(i+1)*n, :].T * mass).T  # weight each atom in the residue by its mass
-            centers[f, i, :] = np.sum(w, axis=0) / mres  # sum the coordinates and divide by the mass of the residue
+    for f in range(pos.shape[0]):
+        for i in range(nmon):
+            for g in range(ngrps):
+                w = (pos[f, i*sum(n) + ndx[g]:i*sum(n) + ndx[g] + n[g], :].T * mass[g]).T
+                centers[f, ngrps*i + g, :] = np.sum(w, axis=0) / sum(mass[g])
 
     return centers
 
@@ -360,7 +359,10 @@ def rescale(coords, dims):
 
 if __name__ == "__main__":
 
-    args = initialize()
+    args = initialize().parse_args()
+
+    if args.atoms is None:
+        args.atoms = [['C', 'C1', 'C2', 'C3', 'C4', 'C5']]
 
     npores = 4
 
@@ -392,10 +394,14 @@ if __name__ == "__main__":
             t = md.load(args.traj, top=args.gro)[args.begin:]
             print('Trajectory loaded')
 
-        if args.atoms[0] == 'all':
+        if args.atoms[0][0] == 'all':
             mass = [Atom_props.mass[a.name] for a in t.topology.atoms]
         else:
-            mass = [Atom_props.mass[i] for i in args.atoms]  # mass of reference atoms
+            mass = []
+            for i, grp in enumerate(args.atoms):
+                mass.append([])
+                for x in grp:
+                    mass[i].append(Atom_props.mass[x])
 
         L = np.zeros([3])  # average box vectors in each dimension
         for i in range(3):
@@ -414,10 +420,15 @@ if __name__ == "__main__":
                 hist_range.append([-L[i], L[i]])
         ###################### 3D center of mass #########################
 
-        if args.atoms[0] == 'all':
+        if args.atoms[0][0] == 'all':
             keep = [a.index for a in t.topology.atoms]
         else:
-            keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep
+            keep = []
+            for grp in args.atoms:
+                for a in t.topology.atoms:
+                    if a.name in grp:
+                        keep.append(a.index)
+            # keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep
             # keep = [a.index for a in t.topology.atoms if a.residue.name == 'HOH' and a.name == 'O']  # indices of atoms to keep
 
         pore_spline = np.zeros([t.n_frames, npores*args.layers, 3])
@@ -543,7 +554,7 @@ if __name__ == "__main__":
             # middle_y = fft_inverse.shape[1] // 2
 
             # restricted zdf
-            r = 1
+            r = 5
             avg = []
             n = 0
             for i, ix in enumerate(centers_x):
@@ -562,7 +573,7 @@ if __name__ == "__main__":
             zdf_full = np.mean(fft_inverse, axis=(0, 1))[1:]
             zdf_full /= zdf_full.mean()
 
-            plt.plot(centers_z[1:], zdf, linewidth=2)
+            plt.plot(centers_z[1:], zdf_full, linewidth=2)
             # plt.plot(centers_z[1:], zdf_full, linewidth=2)
             plt.xlim(0, 4)
             # plt.ylim(0, 2)
@@ -571,11 +582,11 @@ if __name__ == "__main__":
             end = np.argmin(np.abs(np.array(centers_z) - 4))
 
             #Fit decaying exponential to peaks of oscillating correlation function
-            peaks = detect_peaks.detect_peaks(zdf[start:end], mpd=12, show=False)  # adjust mpd if number of peaks comes out wrong
+            peaks = detect_peaks.detect_peaks(zdf_full[start:end], mpd=12, show=False)  # adjust mpd if number of peaks comes out wrong
             if args.offset:
                 peaks = peaks[1::2]  # every other peak starting at the second peak
             # peaks = [17, 34, 54, 74, 159] # full
-            peaks = [17, 35, 54, 163]
+            # peaks = [17, 35, 54, 163]
 
             # peaks = [9,  29,  51,  73,  101, 125, 143, 173]  # layered 300K ordered
             # peaks = [32, 78, 125, 165]  # offset 300K
@@ -587,12 +598,12 @@ if __name__ == "__main__":
             # if len(peaks) > 4:
             #     peaks = peaks[:4]
             peaks = np.array(peaks)
-            plt.scatter(centers_z[peaks + 1], zdf[peaks], marker='+', c='r', s=200, label='Peak locations')
+            plt.scatter(centers_z[peaks + 1], zdf_full[peaks], marker='+', c='r', s=200, label='Peak locations')
 
             period = 0.438
             p = np.array([2, 10])  # initial guess at parameters
             bounds = ([0, 0], [np.inf, np.inf])
-            solp, cov_x = curve_fit(exponential_decay, centers_z[peaks], zdf[peaks], p, bounds=bounds)
+            solp, cov_x = curve_fit(exponential_decay, centers_z[peaks], zdf_full[peaks], p, bounds=bounds)
 
             # plt.plot(centers1[start:], 1 + solp[0]*np.exp(-centers1[start:]/solp[1]))
 

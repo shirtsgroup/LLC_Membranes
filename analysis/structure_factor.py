@@ -8,6 +8,8 @@ import mdtraj as md
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
+from scipy.interpolate import RegularGridInterpolator
+from scipy.optimize import curve_fit
 
 
 def initialize():
@@ -34,6 +36,8 @@ def initialize():
     parser.add_argument('-nframes', default=100, type=int, help='Number of frames to create')
     parser.add_argument('--random_columns', action="store_true", help='Create a trajectory with columns made of'
                         'equispaced points but are randomly displaced in the z-diretion with respect to other columns')
+    parser.add_argument('--random_layers', action="store_true", help='Create hexagonally packed pores with layers '
+                        'that are randomly rotated about the z-axis')
     parser.add_argument('-ncol', '--ncolumns', default=10, type=int, help='The number of columns in the x and y '
                         'dimensions. The total number of columns in the unit cell will be ncol^2. In the case of '
                         'hexagonal columns, this defines the number of pore centers.')
@@ -47,6 +51,8 @@ def initialize():
     parser.add_argument('--cell_theta', default=120, type=float, help='Angle between vectors defining xy plane of'
                                                                       'monoclinic box')
     parser.add_argument('-npores', default=4, type=int, help='Number of pores in each dimension, similar to ncol')
+    parser.add_argument('-thermal_disorder', default=[0, 0, 0], nargs='+', type=float, help='Degree of thermal noise in' 
+                        ' each dimension expressed as a fraction of the distance between layers.')
 
     # The following are meant for custom trajectories but are not implemented. See fft3d.py for their implementation
     parser.add_argument('-l', '--layers', default=20, type=int, help='Number of layers in z direction (int)')
@@ -69,6 +75,89 @@ def initialize():
     return parser
 
 
+def rotate_about_z(theta, xyz):
+
+    origin = np.array([0, 0, 0])
+    pos = np.copy(xyz)
+    R = np.zeros([3, 3])
+    R[0, :] = [np.cos(theta), -np.sin(theta), 0]
+    R[1, :] = [np.sin(theta), np.cos(theta), 0]
+    R[2, :] = [0, 0, 1]
+
+    # translate points to origin
+    center = np.mean(pos, axis=0)
+    pos = translate(pos, center, origin)
+
+    for i in range(np.shape(pos)[0]):
+        pos[i, :] = np.dot(R, pos[i, :])
+
+    return translate(pos, origin, center)
+
+
+def translate(xyz, before, after):
+    """
+    :param xyz: coordinates of set of points to be translated [npts, 3]
+    :param before: reference coordinate location before [3]
+    :param after: reference coordinate location after [3]
+    :return: translated points with respect to reference coordinate before/after locations [npts, 3]
+    """
+
+    pos = np.copy(xyz)
+    direction = after - before
+
+    translation = np.matrix([[1, 0, 0, direction[0]], [0, 1, 0, direction[1]],
+                             [0, 0, 1, direction[2]], [0, 0, 0, 1]])
+
+    b = np.ones([1])
+    for i in range(pos.shape[0]):
+        coord = np.concatenate((pos[i, :], b))
+        x = np.dot(translation, coord)
+        pos[i, :] = x[0, :3]
+
+    return pos
+
+
+def find_peaks(x, y, tol):
+    """
+    :param x: x values
+    :param y: y values
+    :param tol: determines what is considered a peak. The difference in height between a point and its neighbors must be
+    at least "tol" times higher in order to be returned as a peak.
+    :return:
+    """
+
+    peaks = []
+    for i in range(1, x.size - 1):
+        if y[i] > y[i - 1] and y[i] > y[i + 1]:
+            if np.abs(y[i] - y[i - 1]) / y[i - 1] > tol and np.abs(y[i] - y[i + 1]) > tol:
+                peaks.append(i)
+
+    return np.array(peaks)
+
+
+def lorentz(points, a, b, c):
+    """
+    :param p: lorentzian parameters : [full width half max (FWHM), position of maximum, maximum heigth]
+    :param p: position
+    :return:
+    """
+
+    w = a / 2
+
+    x = (b - points) / w
+
+    return (c / (np.pi*w)) / (1 + x ** 2)
+
+
+def gaussian(points, mean, sigma, amplitude):
+
+    return (amplitude / np.sqrt(2*np.pi*sigma**2)) * np.exp(-(points - mean)**2/(2*sigma**2))
+
+
+def errorfunc(p, points, z):
+    return lorentz(p, points) - z
+
+
 class Trajectory(object):
 
     def __init__(self):
@@ -77,13 +166,17 @@ class Trajectory(object):
         self.locations = None
         self.box = None
         self.nframes = 0
-        self.fft = None
+        self.sf = None
         self.freq_x = None
         self.freq_y = None
         self.freq_z = None
         self.slice = None
         self.unit_cell = None
         self.theta = 0
+        self.atomic_form_factor = 0
+        self.r_angle_averaged = 0
+        self.z_angle_averaged = 0
+        self.angle_averaged = 0
 
     def square_column_grid(self, ncolumns, npoints, frames=1, z_separation=3.7, xy_separation=1, bounds=None, noise=True):
         """
@@ -120,16 +213,17 @@ class Trajectory(object):
                 self.locations[t, c * npoints:(c + 1) * npoints, :2] = [X[c % ncolumns, c // ncolumns],
                                                                 Y[c % ncolumns, c // ncolumns]]
 
-            # make sure everything is within 'box'
-            # if bounds:
-            #     for i, z in enumerate(self.locations[t, :, 2]):
-            #         if z < bounds[2][0]:
-            #             self.locations[t, i, 2] += bounds[2][1]
-            #         elif z > bounds[2][1]:
-            #             self.locations[t, i, 2] -= bounds[2][1]
-        self.put_in_box()
+    def set_up_hexagonal(self, cell_theta):
 
-    def hexagonal_column_grid(self, npores, ncol_per_pore, r, npoints, frames=1, noise=True):
+        if self.box[0] != self.box[1]:
+            print('WARNING: The x and y box lengths must be equal for this script to properly implement hexagonal '
+                  'periodicity. Setting y box length equal to x box length.')
+            self.box[1] = self.box[0]
+
+        self.theta = cell_theta * np.pi / 180.0  # theta for monoclinic unit cell
+        self.unit_cell = np.array([[1, 0, 0], [np.cos(self.theta), np.sin(self.theta), 0], [0, 0, 1]])
+
+    def hexagonal_column_grid(self, npores, ncol_per_pore, r, npoints, frames=1, noise=True, thermal_disorder=[0, 0, 0]):
 
         self.nframes = frames
         self.locations = np.zeros([self.nframes, npores ** 2 * npoints * ncol_per_pore, 3])
@@ -154,11 +248,14 @@ class Trajectory(object):
         print('z-spacing: %.2f' % z_separation)
         print('Pore center spacing: %.2f' % dx)
 
+        thetas = np.random.uniform(0, 2*np.pi, size=npores**2)  # randomly rotate each pore about the z-axis
+
         for t in range(self.nframes):
             for c in range(npores**2):
                 # for each column, choose a random point on the circle with radius, r, centered at the pore center
                 # place a column on that point. Equally space remaining columns on circle with reference to that point
-                start_theta = np.random.uniform(0, 360) * (np.pi / 180)  # random angle
+                #start_theta = np.random.uniform(0, 360) * (np.pi / 180)  # random angle
+                start_theta = thetas[c]
                 theta = 2 * np.pi / ncol_per_pore  # angle between columns
                 for a in range(ncol_per_pore):
                     x = r*np.cos(start_theta + a*theta)
@@ -170,18 +267,50 @@ class Trajectory(object):
                         shift = (z_separation / 2) * np.random.uniform(-1, 1)  # shift column by a random amount
                     else:
                         shift = 0
-                    self.locations[t, start:end, 2] = column + shift
 
-        self.put_in_box()
+                    x_disorder = r*np.random.normal(scale=thermal_disorder[0], size=(end - start))
+                    y_disorder = r*np.random.normal(scale=thermal_disorder[1], size=(end - start))
+                    z_disorder = z_separation*np.random.normal(scale=thermal_disorder[2], size=(end - start))
+
+                    disorder = np.vstack((x_disorder, y_disorder, z_disorder)).T
+                    self.locations[t, start:end, 2] = column + shift
+                    self.locations[t, start:end, :] += disorder
+
+    def random_layer_rotations(self, npores, ncol_per_pore, r, nlayers, frames=1, thermal_disorder=[0, 0, 0]):
+
+        # create columns
+        self.hexagonal_column_grid(npores, ncol_per_pore, r, nlayers, frames=frames, noise=False,
+                                   thermal_disorder=thermal_disorder)
+
+        pts_per_pore = nlayers*ncol_per_pore
+
+        for f in range(frames):
+            for p in range(npores**2):  # there are npores x npores total pores in the unit cell
+                for i in range(nlayers):
+                    theta = np.random.uniform(0, 360) * (np.pi / 180)  # random angle by which to rotate layer
+                    start = p*(ncol_per_pore*nlayers) + i
+                    end = (p + 1) * (ncol_per_pore * nlayers)
+                    layer = self.locations[f, start:end:nlayers, :]
+                    self.locations[f, start:end:nlayers, :] = rotate_about_z(theta, layer)
 
     def put_in_box(self):
 
-        for t in range(self.nframes):
-            for i, z in enumerate(self.locations[t, :, 2]):
-                if z < 0:
-                    self.locations[t, i, 2] += self.box[2]
-                elif z > self.box[2]:
-                    self.locations[t, i, 2] -= self.box[2]
+        zv = [0.0, 0.0, 0.0]  # zero vector
+        L = self.box
+
+        # put all atoms inside box - works for single frame and multiframe
+        for it in range(self.locations.shape[0]):  # looped to save memory
+            self.locations[it, ...] = np.where(self.locations[it, ...] < L, self.locations[it, ...],
+                                          self.locations[it, ...] - L)  # get positions in periodic cell
+            self.locations[it, ...] = np.where(self.locations[it, ...] > zv, self.locations[it, ...],
+                                               self.locations[it, ...] + L)
+        #
+        # for t in range(self.nframes):
+        #     for i, z in enumerate(self.locations[t, :, 2]):
+        #         if z < 0:
+        #             self.locations[t, i, 2] += self.box[2]
+        #         elif z > self.box[2]:
+        #             self.locations[t, i, 2] -= self.box[2]
 
     def compute_structure_factor(self, grid, hexagonal=False, weights=None):
 
@@ -189,6 +318,8 @@ class Trajectory(object):
             print("Transforming coordinates to cubic cell")
             self.locations[..., 1] /= np.sin(self.theta)
             self.locations[..., 0] -= self.locations[..., 1] * np.cos(self.theta)
+
+        self.put_in_box()
 
         # put locations into discrete bins
         # define bin edges in each dimension
@@ -203,29 +334,31 @@ class Trajectory(object):
 
         # fourier transform
         print('Computing Fourier Transforms')
-        fft = np.zeros([grid[0], grid[1], grid[2]])
+        sf = np.zeros([grid[0], grid[1], grid[2]])
+        rpi = np.zeros([self.nframes])
         for f in tqdm.tqdm(range(self.nframes)):
-            fft += np.abs(np.fft.fftn(H[f, ...] - H[f, ...].mean()))**2
+            fft = np.fft.fftn(H[f, ...] - H[f, ...].mean())
+            sf += (fft * fft.conjugate()).real
 
-        fft /= self.nframes
+        sf /= (self.nframes * self.locations.shape[1])
 
-        # reorganize FT so 0 frequency is at the center in all dimensions
+        # fft frequencies organized so 0 frequency is at the center in all dimensions
         freq_x = np.fft.fftfreq(grid[0], d=x[1]-x[0])
         ndx = np.argsort(freq_x)
-        self.freq_x = freq_x[ndx]
+        self.freq_x = freq_x[ndx] * 2 * np.pi
 
         freq_y = np.fft.fftfreq(grid[1], d=y[1]-y[0])
         ndy = np.argsort(freq_y)
-        self.freq_y = freq_y[ndy]
+        self.freq_y = freq_y[ndy] * 2 * np.pi
 
         freq_z = np.fft.fftfreq(grid[2], d=z[1]-z[0])
         ndz = np.argsort(freq_z)
-        self.freq_z = freq_z[ndz]
+        self.freq_z = freq_z[ndz] * 2 * np.pi
 
         # reorganize grid
-        fft = fft[ndx, :, :]
-        fft = fft[:, ndy, :]
-        self.fft = fft[:, :, ndz]
+        sf = sf[ndx, :, :]
+        sf = sf[:, ndy, :]
+        self.sf = sf[:, :, ndz]
 
         # if hexagonal:
         #
@@ -262,17 +395,17 @@ class Trajectory(object):
         if axis == 'x':
             ndx_ax1 = np.argmin(np.abs(self.freq_y - loc[0]))
             ndx_ax2 = np.argmin(np.abs(self.freq_z - loc[1]))
-            self.slice = self.fft[:, ndx_ax1, ndx_ax2]
+            self.slice = self.sf[:, ndx_ax1, ndx_ax2]
             plt.plot(self.freq_x, self.slice)
         elif axis == 'y':
             ndx_ax1 = np.argmin(np.abs(self.freq_x - loc[0]))
             ndx_ax2 = np.argmin(np.abs(self.freq_z - loc[1]))
-            self.slice = self.fft[ndx_ax1, :, ndx_ax2]
+            self.slice = self.sf[ndx_ax1, :, ndx_ax2]
             plt.plot(self.freq_y, self.slice)
         elif axis == 'z':
             ndx_ax1 = np.argmin(np.abs(self.freq_x - loc[0]))
             ndx_ax2 = np.argmin(np.abs(self.freq_y - loc[1]))
-            self.slice = self.fft[ndx_ax1, ndx_ax2, :]
+            self.slice = self.sf[ndx_ax1, ndx_ax2, :]
             plt.plot(self.freq_z, self.slice)
         else:
             print('invalid axis chosen for slice of structure factor')
@@ -299,6 +432,92 @@ class Trajectory(object):
         if show:
             plt.show()
 
+    def angle_average(self, ucell=None, NBR=80, rmax=-1, zbins=-1, zmax=-1, plot=True, show=False, save=False):
+
+        ES = RegularGridInterpolator((self.freq_x, self.freq_y, self.freq_z), self.sf, bounds_error=False)
+
+        THETA_BINS_PER_INV_ANG = 20.
+        MIN_THETA_BINS = 10  # minimum allowed bins
+        RBINS = NBR
+
+        a1 = self.unit_cell[0]
+        a2 = self.unit_cell[1]
+        a3 = self.unit_cell[2]
+
+        b1 = (np.cross(a2, a3)) / (np.dot(a1, np.cross(a2, a3)))
+        b2 = (np.cross(a3, a1)) / (np.dot(a2, np.cross(a3, a1)))
+        b3 = (np.cross(a1, a2)) / (np.dot(a3, np.cross(a1, a2)))
+
+        b_inv = np.linalg.inv(np.vstack((b1, b2, b3)))
+
+        if zbins == -1:
+            ZBINS = self.freq_z.shape[0]  # 400
+        else:
+            ZBINS = zbins
+
+        if zmax == -1:
+            ZMAX = self.freq_z[-1]
+        else:
+            ZMAX = zmax
+
+        XR = (self.freq_x[-1] - self.freq_x[0])
+        YR = (self.freq_y[-1] - self.freq_y[0])
+
+        if rmax == -1:
+            Rmax = min(XR, YR) / 2.0
+            Rmax *= 0.95
+        else:
+            Rmax = rmax
+
+        rarr, rspace = np.linspace(0.0, Rmax, RBINS, retstep=True)
+        zar = np.linspace(-ZMAX, ZMAX, ZBINS)
+
+        oa = np.zeros((rarr.shape[0], zar.shape[0]))
+
+        circ = 2. * np.pi * rarr  # circumference
+
+        for ir in range(rarr.shape[0]):
+
+            NTHETABINS = max(int(THETA_BINS_PER_INV_ANG * circ[ir]),
+                             MIN_THETA_BINS)  # calculate number of bins at this r
+            thetas = np.linspace(0.0, np.pi * 2.0, NTHETABINS, endpoint=False)  # generate theta array
+
+            t, r, z = np.meshgrid(thetas, rarr[ir], zar)  # generate grid of cylindrical points
+
+            xar = r * np.cos(t)  # set up x,y coords
+            yar = r * np.sin(t)
+
+            pts = np.vstack((xar.ravel(), yar.ravel(), z.ravel())).T  # reshape for interpolation
+
+            if ucell is not None:
+                pts = np.matmul(pts, b_inv)
+
+            oa[ir, :] = np.average(ES(pts).reshape(r.shape), axis=1)  # store average values in final array
+
+        mn = np.nanmin(oa)
+        oa = np.where(np.isnan(oa), mn, oa)
+
+        rad_avg = np.average(oa)
+        oa /= rad_avg  # normalize
+
+        # set up data for contourf plot by making it symmetrical
+        self.angle_averaged = np.append(oa[::-1, :], oa[1:], axis=0)  # SF
+        self.r_angle_averaged = np.append(-rarr[::-1], rarr[1:])  # R
+        self.z_angle_averaged = np.append(z[:, 0, :], z[1:, 0, :], axis=0)[0]  # Z
+
+        if plot:
+            fig, ax = plt.subplots()
+            lvls = np.linspace(np.amin(self.angle_averaged), np.amax(self.angle_averaged), 200)
+            ax.contourf(self.r_angle_averaged, self.z_angle_averaged, self.angle_averaged.T, levels=lvls, cmap='jet',
+                            extend='max')
+            plt.xlabel('$q_r (\AA^{-1})$')
+            plt.ylabel('$q_z (\AA^{-1})$')
+
+        if save:
+            plt.savefig('rzplot.png')
+        if show:
+            plt.show()
+
 
 if __name__ == "__main__":
 
@@ -307,6 +526,7 @@ if __name__ == "__main__":
     tol = 0.0001
     box = [float(x) for x in args.box]
     grid = [int(x) for x in args.grid]
+    thermal_disorder = [float(x) for x in args.thermal_disorder]
 
     t = Trajectory()
 
@@ -326,20 +546,21 @@ if __name__ == "__main__":
 
         if args.hexagonal:
 
-            if t.box[0] != t.box[1]:
-                print('WARNING: The x and y box lengths must be equal for this script to properly implement hexagonal '
-                      'periodicity. Setting y box length equal to x box length.')
-                t.box[1] = t.box[0]
-
-            t.theta = args.cell_theta * np.pi / 180.0  # theta for monoclinic unit cell
-            t.unit_cell = np.array([[1, 0, 0], [np.cos(t.theta), np.sin(t.theta), 0], [0, 0, 1]])
+            t.set_up_hexagonal(args.cell_theta)
             t.hexagonal_column_grid(args.npores, args.ncol_per_pore, args.pore_radius, int(float(args.box[2]) / dbwl),
-                                    frames=args.nframes, noise=args.nonoise)
+                                    frames=args.nframes, noise=args.nonoise, thermal_disorder=thermal_disorder)
+            t.atomic_form_factor = np.ones(t.locations.shape[1])
         else:
 
             t.square_column_grid(args.ncolumns, int(float(args.box[2]) / dbwl), frames=args.nframes, bounds=bounds,
                                  noise=args.nonoise)
 
+    elif args.random_layers:
+
+            t.box = box
+            t.set_up_hexagonal(args.cell_theta)
+            t.random_layer_rotations(args.npores, args.ncol_per_pore, args.pore_radius, int(float(args.box[2]) / dbwl),
+                                     frames=args.nframes, thermal_disorder=thermal_disorder)
     else:
 
         print('There is no structure of which to calculate the structure factor. Please create a custom configuration'
@@ -351,8 +572,46 @@ if __name__ == "__main__":
 
     t.compute_structure_factor(grid, hexagonal=args.hexagonal)
     t.plot_sf_slice('z', [0, 0], show=False)
+    t.angle_average(plot=True, show=False)
 
-    rpi_index = np.argmin(np.abs(t.freq_z + (1/dbwl)))
+    rpi_index = np.argmin(np.abs(t.freq_z + (2*np.pi/dbwl)))
     print('R-pi intensity: %.2f' % np.amax(t.slice[(rpi_index - 1): (rpi_index + 1)]))
+
+    # fit lorentzian to R-pi
+    t.plot_sf_slice('y', [0, 1.7], show=False)
+
+    qbound = 0.4  # distance from qz axis to check for peaks
+    lower = np.argmin(np.abs(t.freq_y + qbound))
+    upper = np.argmin(np.abs(t.freq_y - qbound))
+    upper += 1
+
+    peaks = find_peaks(t.freq_y[lower:upper], t.sf[np.argmin(np.abs(t.freq_x)), lower:upper, rpi_index], tol=1)
+    peaks += lower
+
+    plt.scatter(t.freq_y[peaks], t.sf[np.argmin(np.abs(t.freq_x)), peaks, rpi_index])
+
+    p = np.array([0.1, 0, t.locations.shape[1]])
+    solp_lorentz, cov_x = curve_fit(lorentz, t.freq_y[peaks], t.sf[np.argmin(np.abs(t.freq_x)), peaks, rpi_index], p,
+                            bounds=[[0, -np.inf, 0], [np.inf, np.inf, np.inf]])
+
+    plt.plot(t.freq_y, lorentz(t.freq_y, solp_lorentz[0], solp_lorentz[1], solp_lorentz[2]), '--', color='red',
+             label='Lorentzian', linewidth=2)
+
+    print("Lorentzian FWHM = %.2f A^-1" % solp_lorentz[0])
+
+    p = np.array([0, 0.3, t.locations.shape[1]])
+    solp, cov_x = curve_fit(gaussian, t.freq_y[peaks], t.sf[np.argmin(np.abs(t.freq_x)), peaks, rpi_index], p,
+                            bounds=([-np.inf, 0, 0], [np.inf, np.inf, np.inf]))
+
+    plt.plot(t.freq_y, gaussian(t.freq_y, solp[0], solp[1], solp[2]), '--', color='green', label='Gaussian',
+             linewidth=2)
+
+    print("Gaussian FWHM = %.3f +/- %.3f A^-1" % (2*np.sqrt(2*np.log(2))*solp[1],
+                                                  2 * np.sqrt(2 * np.log(2)) * cov_x[1, 1] ** 0.5))
+    plt.legend()
+    plt.xlabel('$q_y (\AA^{-1}$)')
+    plt.ylabel('Intensity')
+    plt.tight_layout()
+    # plt.savefig('./figures/random_columns_qy.png')
 
     plt.show()
