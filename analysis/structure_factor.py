@@ -149,9 +149,9 @@ def lorentz(points, a, b, c):
     return (c / (np.pi*w)) / (1 + x ** 2)
 
 
-def gaussian(points, mean, sigma, amplitude):
+def gaussian(points, mean, sigma, amplitude, yshift):
 
-    return (amplitude / np.sqrt(2*np.pi*sigma**2)) * np.exp(-(points - mean)**2/(2*sigma**2))
+    return yshift + (amplitude / np.sqrt(2*np.pi*sigma**2)) * np.exp(-(points - mean)**2/(2*sigma**2))
 
 
 def errorfunc(p, points, z):
@@ -580,7 +580,7 @@ if __name__ == "__main__":
     # fit lorentzian to R-pi
     t.plot_sf_slice('y', [0, 1.7], show=False)
 
-    qbound = 0.4  # distance from qz axis to check for peaks
+    qbound = 0.6  # distance from qz axis to check for peaks
     lower = np.argmin(np.abs(t.freq_y + qbound))
     upper = np.argmin(np.abs(t.freq_y - qbound))
     upper += 1
@@ -588,30 +588,32 @@ if __name__ == "__main__":
     peaks = find_peaks(t.freq_y[lower:upper], t.sf[np.argmin(np.abs(t.freq_x)), lower:upper, rpi_index], tol=1)
     peaks += lower
 
+    #peaks = np.linspace(0, t.freq_y.size - 1, t.freq_y.size, dtype=int)  # for disordered columns
+
     plt.scatter(t.freq_y[peaks], t.sf[np.argmin(np.abs(t.freq_x)), peaks, rpi_index])
 
-    p = np.array([0.1, 0, t.locations.shape[1]])
-    solp_lorentz, cov_x = curve_fit(lorentz, t.freq_y[peaks], t.sf[np.argmin(np.abs(t.freq_x)), peaks, rpi_index], p,
-                            bounds=[[0, -np.inf, 0], [np.inf, np.inf, np.inf]])
+    # Lorentzian fit (not as good as gaussian)
+    # p = np.array([0.1, 0, t.locations.shape[1]])
+    # solp_lorentz, cov_x = curve_fit(lorentz, t.freq_y[peaks], t.sf[np.argmin(np.abs(t.freq_x)), peaks, rpi_index], p,
+    #                         bounds=[[0, -np.inf, 0], [np.inf, np.inf, np.inf]])
+    #
+    # plt.plot(t.freq_y, lorentz(t.freq_y, solp_lorentz[0], solp_lorentz[1], solp_lorentz[2]), '--', color='red',
+    #          label='Lorentzian', linewidth=2)
+    #
+    # print("Lorentzian FWHM = %.2f A^-1" % solp_lorentz[0])
 
-    plt.plot(t.freq_y, lorentz(t.freq_y, solp_lorentz[0], solp_lorentz[1], solp_lorentz[2]), '--', color='red',
-             label='Lorentzian', linewidth=2)
-
-    print("Lorentzian FWHM = %.2f A^-1" % solp_lorentz[0])
-
-    p = np.array([0, 0.3, t.locations.shape[1]])
+    p = np.array([0, 0.3, t.locations.shape[1], 1])
     solp, cov_x = curve_fit(gaussian, t.freq_y[peaks], t.sf[np.argmin(np.abs(t.freq_x)), peaks, rpi_index], p,
-                            bounds=([-np.inf, 0, 0], [np.inf, np.inf, np.inf]))
+                            bounds=([-np.inf, 0, 0, 0], [np.inf, np.inf, np.inf, np.inf]))
 
-    plt.plot(t.freq_y, gaussian(t.freq_y, solp[0], solp[1], solp[2]), '--', color='green', label='Gaussian',
+    plt.plot(t.freq_y, gaussian(t.freq_y, solp[0], solp[1], solp[2], solp[3]), '--', color='green', label='Gaussian',
              linewidth=2)
 
     print("Gaussian FWHM = %.3f +/- %.3f A^-1" % (2*np.sqrt(2*np.log(2))*solp[1],
-                                                  2 * np.sqrt(2 * np.log(2)) * cov_x[1, 1] ** 0.5))
+                                           2 * np.sqrt(2 * np.log(2)) * cov_x[1, 1] ** 0.5))
     plt.legend()
     plt.xlabel('$q_y (\AA^{-1}$)')
     plt.ylabel('Intensity')
     plt.tight_layout()
-    # plt.savefig('./figures/random_columns_qy.png')
 
     plt.show()

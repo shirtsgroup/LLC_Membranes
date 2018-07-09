@@ -117,7 +117,7 @@
   to the number of atoms in the unit cell. The intensity will approach infinity as
   the system size increases.  
 
-  \begin{figure}
+  \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.5\textwidth]{perfect_crystal_xyz.png}
   \caption{}\label{fig:perfect_crystal_xyz}
@@ -158,7 +158,7 @@
   frequency appears where expected, based on d. Subharmonics follow the
   fundamental frequency at equally spaced intervals of width $2\pi / d$. 
 
-  \begin{figure}
+  \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.45\textwidth]{constant_p2p.png}
   \includegraphics[width=0.45\textwidth]{constant_npores.png}
@@ -180,7 +180,7 @@
   calculated all of FWHMs in ~\ref{table:perfect_size_dependence} using gaussian
   fits.
 
-  \begin{figure}
+  \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.5\textwidth]{fwhm_fits.png}
   \caption{The gaussian functional form more closely matches the data than the Lorentzian
@@ -198,7 +198,7 @@
   of FWHM in Table~\ref{fig:perfect_size_dependence} are calculated using model
   systems with 4 pores and the same box dimensions used here. 
 
-  \begin{table}
+  \begin{table}[!htb]
   \centering
   \begin{tabular}{c c c c c}
   \toprule
@@ -224,7 +224,7 @@
   only one column at each pore center, the FWHM becomes infinite (See
   Figure~\ref{fig:infinite_FWHM})
 
-  \begin{figure}
+  \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.5\textwidth]{one_column_per_pore.png}
   \caption{We placed one column of scatterers at each of 4 pore centers, spaced apart by
@@ -262,7 +262,7 @@
   intensity because the intensity of each configuration in the trajectory
   fluctuates so much. 
 
-  \begin{table}
+  \begin{table}[!htb]
   \centering
   \begin{tabular}{c c c c c}
   \toprule
@@ -291,7 +291,7 @@
   angle averaged pattern (Figure~\ref{fig:random_columns_rzplot}) further illustrates
   the diffraction lines which characterize this type of system.
 
-  \begin{figure}
+  \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{random_columns_qy.png}
@@ -313,7 +313,7 @@
   vectors extending from the pore center to two adajacent scatterers in a single layer
   is 72 $\degree$ with respect to the xy plane.  
 
-  \begin{table}
+  \begin{table}[!htb]
   \centering
   \begin{tabular}{c c c c c c}
   \toprule
@@ -339,8 +339,65 @@
   The max intensity of R-$\pi$ and the FWHM of the $q_y$ structure factor
   cross-section at R-$\pi$ are exactly the same as those of the perfect crystal. 
  
-  \subsection{Influence of noise}
-
   \subsection{Influence of Pore Radius}
+
+  The pore radius is inversely proportional to the FWHM of systems made with
+  randomly rotated layers (See Figure~\ref{fig:pore_radius}). This result is
+  not extremely surprsing, although the limits of the relationship suggest 
+  that a pore radius of 0 should give an infinite FWHM (supported by Figure
+  ~\ref{fig:infinite_FWHM}) and an infinitely large pore radius should have 
+  a zero FWHM. This result is also interesting because it suggests that one
+  can measure relative pore radii using X-ray diffraction. The difficulty,
+  which is associated with the phase problem, is deconvoluting the electron
+  density associated with just pore entities.   
+
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.5\textwidth]{pore_radius_FWHM.png}
+  \caption{The FWHM decays with increasing pore radius.}\label{fig:pore_radius}
+  \end{figure}
+
+%  \begin{table}
+%  \centering
+%  \begin{tabular}{c c c c c c}
+%  \toprule
+%  $L_z$ (\AA) &   Pore Radius ($\AA^{-1}$) & FWHM ($\AA^{-1}$)  \\
+%  \midrule
+%  37          &      1                     &     1.770          \\
+%  37          &      2                     &     0.999          \\
+%  37          &      3                     &     0.642          \\
+%  37          &      4                     &     0.465          \\
+%  37          &      5                     &     0.372          \\
+%  37          &      7	                   &     0.264          \\
+%  37          &      10                    &     0.186          \\
+%  37          &      15                    &     0.123          \\
+%  \bottomrule
+%  \end{tabular}
+%  \caption{All systems contain four pores with 5 columns per pore and a unit cell
+%  size of 42.5x42.5x3.7 nm. 
+%  }\label{table:pore_radius}
+%  \end{table}
+
+  \subsection{The influence of thermal disorder}
+
+  We added gaussian noise in each dimension to observe its influence on the intensity
+  of R-$\pi$ and the FWHM. For the z-direction, the standard deviation of the 
+  gaussian distribution is equal to a fraction of the average distance between scatterers
+  in columns. In the xy-directions, the standard deviation is equal to a fraction 
+  of the pore radius.
+
+  \subsubsection{Randomly displaced columns}
+
+  When we add noise in the z direction, the intensity of R-$\pi$ decays while the
+  FWHM remains infinite.
+
+  When we add noise in the x and y directions, R-$\pi$ has a finite peak width in its 
+  $q_y$ dimension. We fit a Gaussian function to the  
+
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{random_columns_gaussian.png}
+  \caption{}\label{fig:FWHM_columns}
+  \end{figure}
 
 \end{document}
