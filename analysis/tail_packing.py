@@ -212,6 +212,7 @@ if __name__ == "__main__":
     plt.ylabel('Normalized frequency', fontsize=14)
     plt.axes().tick_params(labelsize=14)
     plt.tight_layout()
+    plt.savefig('hexagonal_tail_packing.png')
     plt.show()
     exit()
     if args.fit:
