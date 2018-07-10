@@ -3,7 +3,7 @@
 \usepackage{wrapfig}
 \usepackage{subcaption}
 \usepackage[margin=1in]{geometry}
-\usepackage{amsmath} % or simply amstext
+\usepackage{amsmath,amssymb} 
 \usepackage{siunitx}
 \usepackage{booktabs}
 \usepackage[export]{adjustbox}
@@ -17,7 +17,6 @@
 \title{Simulated Structure Factors}
 \author{Benjamin J. Coscia}
 \begin{document}
-  \bibliographystyle{ieeetr}
   \graphicspath{{./figures/}}
   \maketitle
 
@@ -28,7 +27,7 @@
   on a material have a wave vector, $K_i$, whose length is
   $\dfrac{2\pi}{\lambda}$, where $\lambda$ is the wavelength. The diffracted wave
   vector, $K_f$, has the same length as $K_i$ if the diffraction process is 
-  elastic. We will assume elasticity going forward. The scattering vector, $\mathbf{q}$
+  elastic. We will assume elasticity going forward. The scattering vector, $\mathbf{q}$,
   is defined as $K_f - K_i$. Since $K_f$ and $K_i$ are the same length, the scattering
   vector must lie on the surface of a sphere of radius $\dfrac{2\pi}{\lambda}$. This
   sphere is called the Ewald Sphere and diffraction will only occur for reciprocal
@@ -36,37 +35,38 @@
 
   The amplitude and phase of the scattered waves is the vector sum of all scattered 
   waves from all atoms:
-  \begin{equation}
-  \Psi_s(\mathbf{q}) = \sum_{j=1}^{N}f_je^{-i\mathbf{q}\boldsymbol{\cdot}\mathbf{R_j}}\label{eqn:dft}
-  \end{equation}
-  where $f_j$ is the atomic form factor of atom $j$ and $\mathbf{R_j}$ is the position of
-  the atom in real space. Note that Equation \ref{eqn:dft} is the definition of the 
-  discrete fourier transform.
 
-  The scattered intensity is obtained by multiplying Equation \ref{eqn:dft} by its 
-  complex conjugate:
-  \begin{equation}
+  \begin{equation}\label{eq:dft}
+  \Psi_s(\mathbf{q}) = \sum_{j=1}^{N}f_je^{-i\mathbf{q}\boldsymbol{\cdot}\mathbf{R_j}}
+  \end{equation}
+
+  where $f_j$ is the atomic form factor of atom $j$ and $\mathbf{R_j}$ is the position of
+  the atom in real space. Note that Equation 1 %\eqref{eq:dft} %equation reference not working for some reason
+  is the definition of the discrete fourier transform.
+
+  The scattered intensity is obtained by multiplying Equation 1%\eqref{eq:dft} 
+  by its complex conjugate:
+  \begin{equation}\label{eqn:conjugate}
   I(\mathbf{q}) = \Psi_s(\mathbf{q})\cdot\overline{\Psi_s}(\mathbf{q}) = \sum_{j=1}^{N}f_je^{-i\mathbf{q}\boldsymbol{\cdot}\mathbf{R_j}} \times \sum_{k=1}^{N}f_ke^{-i\mathbf{q}\boldsymbol{\cdot}\mathbf{R_k}} = \sum_{j=1}^{N}\sum_{j=k}^{N}f_jf_ke^{-i\mathbf{q}\boldsymbol{\cdot}(\mathbf{R_j}- \mathbf{R_k})}
-  \label{eqn:conjugate}
   \end{equation}
   Computationally, one should calculate the fourier transform of the atomic
   coordinates with a fast fourier transform, calculate its complex conjugate and 
   multiply them together. The structure factor is typically normalized as 
   $ 1 / {\sum_{j=1}^{N} {f_j}^2}$ so that it is independent of system size, and
   the general equation for the structure factor becomes:
-  \begin{equation}
+  \begin{equation}\label{eqn:general_sf}
   S(\mathbf{q})= \dfrac{1}{\sum_{j=1}^{N} {f_j}^2}\sum_{j=1}^{N}\sum_{j=k}^{N}f_jf_ke^{-i\mathbf{q}\boldsymbol{\cdot}(\mathbf{R_j}- \mathbf{R_k})}
-  \label{eqn:general_sf}
   \end{equation}
  
-  If all atoms are identical, equation \ref{eqn:general_sf} simplifies to:
-  \begin{equation}
+  If all atoms are identical, Equation 2 %\ref{eqn:general_sf} 
+  simplifies to:
+  \begin{equation}\label{eqn:simplified_sf}
   S(\mathbf{q})= \dfrac{1}{N}\sum_{j=1}^{N}\sum_{j=k}^{N}e^{-i\mathbf{q}\boldsymbol{\cdot}(\mathbf{R_j}- \mathbf{R_k})}
-  \label{eqn:simplified_sf}
   \end{equation}
 
   The atomic form factor, $f_j$ is more complicated than how it is represented
-  in Equation \ref{eqn:dft}. The atomic form factor is the scattering
+  in Equation 1 %\ref{eqn:dft}. 
+  The atomic form factor is the scattering
   contribution from a single isolated atom. They are calculated as the fourier
   transform of the electron density, $\rho({\mathbf{r}})$,  which is typically
   calculated using quantum techniques. Since $\rho({\mathbf{r}})$ is a spatially
@@ -79,7 +79,8 @@
   The resolution in each dimension of reciprocal space is determined by the
   size of the unit cell studied. In order to calculate the structure factor, the
   system's 3D coordinates must be discretized into regularly sampled points using
-  a histogramming method. Applying equation~\ref{eqn:general_sf} to the histogram
+  a histogramming method. Applying equation 2 %~\ref{eqn:general_sf}
+  to the histogram
   will yield a grid with Fourier bin sizes of $\dfrac{2\pi}{L_i}$ (i = (x,y,z)).
   The fourier transform of an array of values returns a same length array of
   frequencies. Increasing the number of bins in the histogram will not change the
@@ -93,14 +94,15 @@
   meant to enhance our understanding of the structure factor of a fully atomistic
   model of the same material. We are primarily interested in the diffraction
   patterns produced by the head groups so we model each monomer as a point placed
-  at the center of mass of its head group. The hexagonal phase is made up
+  at the center of mass of its head group. The hexagonal phase is made of
   straight pore columns. Each pore column is composed of columns of stacked
   monomers which surround the pore's hydrophilic core. Based on simulation, there
   are likely 5 monomer columns making up each pore, and the pore radius is ca. 1
   nm. Experimental WAXS suggests that monomers stack 3.7 \AA apart, and SAXS
-  measurements have shown that pores are spaced ca. 4.1 nm apart. Here we took the 
-  pore spacing to be 4.25 nm for no good reason. For consistency with simulation,
-  we will look at 4 pores in a monoclinic unit cell with 5 monomer columns per pore. 
+  measurements have shown that pores are spaced ca. 4.1 nm apart. Here, unless
+  otherwise noted we took the pore spacing to be 4.25 nm for no good reason. For
+  consistency with simulation, we will look at 4 pores in a monoclinic unit cell
+  with 5 monomer columns per pore, unless specified otherwise. 
 
   We are interested in the intensity and dimensions of the R-$\pi$ reflection,
   which is a consequence of monomers stacked on top of each other in the
@@ -110,12 +112,12 @@
 
   For a perfect, infinite crystal, the intensity of R-$\pi$ is infinitely sharp. We
   created a model with perfectly aligned columns. Each columns originates at z=0
-  and all other points in the column are equally spaced 3.7 \AA apart in the
+  and all other points in the column are equally spaced 3.7 \AA~apart in the
   z-direction (Figure~\ref{fig:perfect_crystal_xyz}). This essentially creates
   layers of atoms. The intensity of R-$\pi$ for systems of various size are shown
   in Table~\ref{table:perfect_size_dependence}. The intensity of R-$\pi$ is equal
   to the number of atoms in the unit cell. The intensity will approach infinity as
-  the system size increases.  
+  the system size becomes infinitely large.  
 
   \begin{figure}[!htb]
   \centering
@@ -125,60 +127,71 @@
 
   \begin{table}
   \centering
-  \begin{tabular}{c c c c c c}
+  \begin{tabular}{c c c c c}
   \toprule
-  $L_z$ (\AA) & Points per column & Number of Pores &  Number of Atoms & R-$\pi$ Intensity & FWHM ($\AA^{-1}$) \\
+  $L_z$ (\AA) & Points per column & Number of Pores &  Number of Atoms & R-$\pi$ Intensity\\ %& FWHM ($\AA^{-1}$) \\
   \midrule
-  14.8        &      4            &       4          & 80               & 80               & 0.34  \\
-  18.5        &      5            &       4          & 100              & 100              & 0.34  \\
-  37          &      10           &       4          & 200              & 200              & 0.34  \\
-  14.8        &      4            &       9          & 180              & 180              & 0.36  \\
-  18.5        &      5            &       9          & 225              & 225              & 0.36  \\
-  37          &      10           &       9          & 450              & 450              & 0.36  \\
-  14.8        &      4            &       16         & 320              & 320              & 0.43  \\
-  18.5        &      5            &       16         & 400              & 400              & 0.43  \\
-  37          &      10           &       16         & 800              & 800              & 0.43  \\
+  14.8        &      4            &       4          & 80               & 80              \\ %& 0.34  \\
+  18.5        &      5            &       4          & 100              & 100             \\ %& 0.34  \\
+  37          &      10           &       4          & 200              & 200             \\ %& 0.34  \\
+  14.8        &      4            &       9          & 180              & 180             \\ %& 0.36  \\
+  18.5        &      5            &       9          & 225              & 225             \\ %& 0.36  \\
+  37          &      10           &       9          & 450              & 450             \\ %& 0.36  \\
+  14.8        &      4            &       16         & 320              & 320             \\ %& 0.43  \\
+  18.5        &      5            &       16         & 400              & 400             \\ %& 0.43  \\
+  37          &      10           &       16         & 800              & 800             \\ %& 0.43  \\
   \bottomrule
   \end{tabular}
   \caption{The intensity of R-$\pi$ in a perfect crystal is equal to the number of
-  scatterers in the unit cell.}\label{table:perfect_size_dependence}
+  scatterers in the unit cell. Here, $L_z$ is the length of the unit cell in the z direction which
+  corresponds to number of points per column $\times$ 3.7.}\label{table:perfect_size_dependence}
   \end{table}
 
   We measured the peak width of R-$\pi$ in the $q_r$ direction using the
   appropriate slice of the structure factor. Ideally, one should use the angle
   averaged structure factor for this calculation, but since the angle averaging
   procedure interpolates between bins, the averaged intensities are lower than
-  expected which slightly changes the shape of the peak. This reflection is
-  radially symmetric about the z-axis, so we fit peak widths to cross-sections at
-  (0, y, 1.7)$^{-1}$ \AA. 
+  expected which slightly changes the shape of the peak and gives misleading
+  results. This reflection is radially symmetric about the z-axis, so we fit peak
+  widths to cross-sections at (0, y, 1.7)$^{-1}$ \AA (See Figure~\ref{fig:p2p_rpi}). 
 
   The distance, d, between peaks in the $q_y$ cross-sections of the structure
   factor is equal to $2\pi / d$ (Figure~\ref{fig:p2p_rpi}). We looked at systems
   with pores spaced 42.5 nm and 212.5 nm apart respectively.  The fundamental
-  frequency appears where expected, based on d. Subharmonics follow the
-  fundamental frequency at equally spaced intervals of width $2\pi / d$. 
+  frequency appears at $q_y=0$ with magnitude equal to the number of atoms in the
+  unit cell (Note that each system has a different number of atoms). Subharmonics
+  follow the fundamental frequency at equally spaced intervals of width $2\pi /
+  d$. 
 
   \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.45\textwidth]{constant_p2p.png}
   \includegraphics[width=0.45\textwidth]{constant_npores.png}
   \caption{The distance between peaks of the structure factor cross-section at
-  (0, y, 1.7) is equal to the distance between pores in q-space. The first off-center
-  peak of each distribution shows the fundamental frequency. The peaks that follow at 
-  higher |$\mathbf{q}$| values are subharmonics. Both systems shown are in unit cells 
-  with dimensions of 42.5 x 42.5 x 3.7 nm. (a) The pore-to-pore spacing was held at 
-  42.5 nm. The unit cell consists of 100 total pores. The first peak is located at 
-  $q_y = .148 \AA^{-1}$ which corresponds to $2\pi / .148 = 42.5 \AA$ in real space. (b)
-  We placed four pores in a unit cell spaced 21.25 nm apart. The first peak appears where
-  expected at $q_y = 0.0296 \AA^{-1}$ and all other peaks are separated by the same distance.
+  (0, y, 1.7) is equal to the distance between pores in q-space. The center 
+  peak of each distribution shows the fundamental frequency. The peaks
+  that follow at higher $\left|\mathbf{q}\right|$ values are subharmonics. Both systems
+  shown are in unit cells with dimensions of 42.5 x 42.5 x 3.7 nm. (a) We held
+  the pore-to-pore spacing constant at 42.5 \AA. The unit cell consists of 100
+  total pores. The first peak off-center peak is located at $q_y = .148 \AA^{-1}$
+  which corresponds to $2\pi / .148 = 42.5 \AA$ in real space. (b) We placed four
+  pores in a unit cell spaced 212.5 \AA~apart. The first peak appears where
+  expected at $q_y = 0.0296 \AA^{-1}$ ($2\pi / 212.5 \AA$) and all other peaks
+  are separated by that same distance.
   }\label{fig:p2p_rpi}
   \end{figure}
 
   We quantified the peak width by fitting gaussian curves to the R-$\pi$ peak
   cross-sections and measuring ther full width at half maximum. Gaussian profiles
   appear to give the closest fit to the data (see Figure~\ref{fig:fwhm_fits}). We
-  calculated all of FWHMs in ~\ref{table:perfect_size_dependence} using gaussian
+  calculated all of FWHMs in Table~\ref{table:perfect_size_dependence} using gaussian
   fits.
+
+  \textbf{IMPORTANT}: Note that these 'peak widths' are not the same peak widths that are seen 
+  experimentally. If these showed up experimentally, they would appear as dots 
+  parallel to the $q_r$ axis, crossing through R-$\pi$ and in line with R-pores.
+  There is some evidence of this occuring in some of the simulations (ordered parallel 
+  displaced for example).
 
   \begin{figure}[!htb]
   \centering
@@ -188,15 +201,20 @@
   per column.}\label{fig:fwhm_fits}
   \end{figure}
 
-  The distance between pores does not affect the FWHM of the R-$\pi$ peak in
+  The distance between pores does not affect the FWHM of the R-$\pi$ 'peak' in
   the $q_y$ direction.  We held the size of the unit cell constant at 42.5 x 42.5
   x 3.7 nm and varied the number of pores (and consequently, the distance between
   pores). We generated error bars for the fits based on the covariance of the
   optimized fit parameters. There is no statistical difference between the
-  calculated values of each FWHM. The uncertainty is lower for systems with less
-  pores since there are more subharmonics available for curve fitting. The values
-  of FWHM in Table~\ref{fig:perfect_size_dependence} are calculated using model
-  systems with 4 pores and the same box dimensions used here. 
+  calculated values of each FWHM (Table~\ref{table:randomly_displaced_columns}).
+  The uncertainty is lower for systems with less pores since there are more
+  subharmonics available for curve fitting. 
+
+%BJC: i'm not sure about these results at the moment. I'd prefer to redo them with finer
+% grids. Not sure they add much value anyways. 
+%  The values of FWHM in
+%  Table~\ref{table:perfect_size_dependence} are calculated using model systems
+%  with 4 pores and the same box dimensions used here. 
 
   \begin{table}[!htb]
   \centering
@@ -228,12 +246,10 @@
   \centering
   \includegraphics[width=0.5\textwidth]{one_column_per_pore.png}
   \caption{We placed one column of scatterers at each of 4 pore centers, spaced apart by
-  212.5 nm. Since the y-component of the distance between all scatteres is the same in 
+  212.5 nm. Since the y-component of the distance between all scatterers is the same in 
   all cases, subharmonics appear just as strongly as the fundamental frequency. Since the 
   intensity doesn't decay, the FWHM is infinite.}\label{fig:infinite_FWHM}
   \end{figure}
-
-  % peaks may artifically broaden upon angle-averaging.
 
   The real system is far from a perfect crystal. Here we explore the influence
   of 4 sources of disorder on the intensity of R-$\pi$:
@@ -250,14 +266,14 @@
   to each column of points. This simulates a system in which columns are
   uncorrelated.  We shifted coordinates where necessary so that all atoms stayed
   within the unit cell. We held the spacing between each point within each column
-  remained at exactly 3.7 \AA. We created  trajectories of 1000 independent
+  at 3.7 \AA. We created trajectories of 1000 independent
   configurations in order to calculate the average intensity of R-$\pi$. 1000
   independent configurations gives a reasonably converged average, enough to
   observe trends.
 
   The intensity of R-$\pi$ is equal to the number of scatterers per
   column when we randomly displace columns with respect to each other (See
-  Table~\ref{fig:randomly_displaced_columns}).  It is independent of the
+  Table~\ref{table:randomly_displaced_columns}).  It is independent of the
   number of pores (and hence number of columns) in the system. The error 
   in the calculated intensities are comparable to the magnitude of the 
   intensity because the intensity of each configuration in the trajectory
@@ -309,7 +325,7 @@
 
   We observed the influence of correlation between layers by randomly rotating layers
   of scatterers about the z-axis. We held constant the angle, with respect to the pore
-  center, between scatterers for any given layer. For examples, since there are 5 
+  center, between scatterers for any given layer. For example, since there are 5 
   columns per pore, each layer is made of 5 monomers. The angle made between the two 
   vectors extending from the pore center to two adajacent scatterers in a single layer
   is 72 $\degree$ with respect to the xy plane.  
@@ -337,26 +353,34 @@
    misleading answers.}\label{table:randomly_displaced_columns}
   \end{table}
 
-  The max intensity of R-$\pi$ and the FWHM of the $q_y$ structure factor
-  cross-section at R-$\pi$ are exactly the same as those of the perfect crystal. 
+  In all cases, the maximum intensity of R-$\pi$ is equal to the number of
+  scatterers in the system and the FWHM of the $q_y$ cross-section of the
+  structure factor at R-$\pi$ is 0.37 $\AA^{-1}$, just as the perfect crystal. 
  
-  \subsection{Influence of Pore Radius}
+%  \subsection{Influence of Pore Radius}
 
-  The pore radius is inversely proportional to the FWHM of systems made with
-  randomly rotated layers (See Figure~\ref{fig:pore_radius}). This result is
-  not extremely surprsing, although the limits of the relationship suggest 
-  that a pore radius of 0 should give an infinite FWHM (supported by Figure
-  ~\ref{fig:infinite_FWHM}) and an infinitely large pore radius should have 
-  a zero FWHM. This result is also interesting because it suggests that one
-  can measure relative pore radii using X-ray diffraction. The difficulty,
-  which is associated with the phase problem, is deconvoluting the electron
-  density associated with just pore entities.   
+%  The pore radius is inversely proportional to the FWHM of systems made with
+%  randomly rotated layers (See Figure~\ref{fig:pore_radius}). This result is not
+%  extremely surprsing, although the limits of the relationship suggest that a
+%  pore radius of 0 should give an infinite FWHM (supported by Figure
+%  ~\ref{fig:infinite_FWHM}) and an infinitely large pore radius should have a
+%  zero FWHM (of course the pore radius is limited by proximity to other pores).
 
-  \begin{figure}[!htb]
-  \centering
-  \includegraphics[width=0.5\textwidth]{pore_radius_FWHM.png}
-  \caption{The FWHM decays with increasing pore radius.}\label{fig:pore_radius}
-  \end{figure}
+%  This result is also interesting because it suggests that one can measure
+%  relative pore radii using X-ray diffraction. The difficulty, which is
+%  associated with the phase problem, is deconvoluting the electron density
+%  associated with just pore entities.  
+  
+%  Since the maximum intensity of R-$\pi$ in a randomly rotated layer system
+%  does not change with pore radius (it only depends on the total number of
+%  scatterers), the FWHM is really just a measure of the decay of the subharmonics
+%  surrounding $q_y=0$.
+
+%  \begin{figure}[!htb]
+%  \centering
+%  \includegraphics[width=0.5\textwidth]{pore_radius_FWHM.png}
+%  \caption{The FWHM decays with increasing pore radius.}\label{fig:pore_radius}
+%  \end{figure}
 
 %  \begin{table}
 %  \centering
@@ -384,18 +408,19 @@
   We added gaussian noise in each dimension to observe its influence on the intensity
   of R-$\pi$ and the FWHM. For the z-direction, the standard deviation of the 
   gaussian distribution is equal to a fraction of the average distance between scatterers
-  in columns. In the xy-directions, the standard deviation is equal to a fraction 
-  of the pore radius.
+  in columns (d). In the xy-directions, the standard deviation is equal to a fraction 
+  of the pore radius (r).
 
   \subsubsection{Randomly displaced columns}
 
   When we add noise in the z direction, the intensity of R-$\pi$ decays while the
-  FWHM remains infinite.
+  FWHM remains infinite (Figure~\ref{fig:z_noise_columns}).
 
-  When we add noise in the x and y directions, R-$\pi$ has a finite peak width in its 
-  $q_y$ dimension, and the intensity stays constant. We fit a Gaussian function to the 
-  the $q_y$ cross-section in order to determine its FWHM. The FWHM decay is inversely
-  proportional to the amount of noise added.  
+  When we add noise in the x and y directions, R-$\pi$ has a finite peak width
+  in its $q_y$ dimension (Figure~\ref{fig:FWHM_fit_columns}), and the intensity
+  stays constant. We fit a Gaussian function to the the $q_y$ cross-section in
+  order to determine its FWHM. The FWHM decay is inversely proportional to the
+  amount of noise added (Figure~\ref{fig:FWHM_columns}). 
 
   \begin{figure}[!htb]
   \centering
@@ -418,6 +443,9 @@
    noise added.}\label{fig:columns_noise}
   \end{figure}
 
+  This mode of broadening of R-$\pi$ is more consistent with the experimental
+  pattern, where the $q_y$ cross-section of R-$\pi$ is a continuous, broad peak. 
+
   \subsubsection{Randomly rotated layers}
 
   When we add noise in the z direction, the intensity of R-$\pi$ decays to 1
@@ -426,8 +454,10 @@
   infinity when the intensity of R-$\pi$ is comparable to the background
   intensity.
 
-  When we add noise in the x and y directions, the intensity of R-$\pi$ does not change.
-  The FWHM slowly decays as shown in Figure~\ref{fig:random_layers_xy_noise}
+  When we add noise in the x and y directions, the intensity of R-$\pi$ does
+  not change. The FWHM slowly decays as shown in
+  Figure~\ref{fig:random_layers_xy_noise}. Importantly, the peak is defined by
+  spikes like those shown in Figure~\ref{fig:p2p_rpi}.
 
   \begin{figure}
   \centering
@@ -440,13 +470,21 @@
   \caption{}\label{fig:random_layers_xy_noise}
   \end{subfigure}
   \caption{(a) As we add noise in the z-direction, the intensity of R-$\pi$ decreases
-   rapidly to 1. The FWHM goes to infinity when the intensity of R-$\pi$ equals 1.}\label{fig:layers_noise}
+   rapidly to 1. The FWHM decays slowly and then jumps goes to infinity (not pictured) 
+   when the intensity of R-$\pi$ becomes equal to the background intensity. However one 
+   could argue there is no peak at that point. (b) When we add noise in the x and y 
+   directions, the intensity of R-$\pi$ does not change, but the FWHM decays slowly.}\label{fig:layers_noise}
   \end{figure}
 
   \subsection{Finite z-correlations}
 
-  The z-cross-section of the R-$\pi$ peaks are delta functions in all of the above systems 
-  (See Figure~\ref{fig:deltas}). 
+  The z-cross-section of the R-$\pi$ peaks are delta functions in all of the
+  above systems (See Figure~\ref{fig:deltas}). None of the routes explored so far
+  show how R-$\pi$ might broaden in the $q_z$ direction. The delta-function
+  behavior does not change when the system is made taller so as to increase the
+  resolution in z. We built a system 10x taller (37 nm), added random column
+  displacement and some noise in the z-direction. R-$\pi$ is still a sharp delta
+  function (Figure~\ref{fig:tall_rpi}). 
 
   \begin{figure}
   \centering
@@ -471,4 +509,64 @@
   the z-cross-section of R-$\pi$.}\label{fig:deltas}
   \end{figure}
 
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.5\textwidth]{tall_rpi.png}
+  \caption{R-$\pi$ still appears to be a delta function even with higher resolution and
+  noise in the z-positions of the scatterers}\label{fig:tall_rpi}
+  \end{figure}
+
+  (Please let me know if there is a more correct way of doing this)
+  We added a correlation length to scatterers in z-direction. To do so, we
+  define a covariance matrix to describe the correlation between all pairs of
+  scatterers. The variance is defined so that the covariance in position of
+  a scatterer with itself is the same for all scatterers. The covariance in
+  position between scatterers decays exponentially from v according to the
+  equation $ve^{-z/L}$ where L is the correlation length. Note that in its
+  current implementation, it does not take periodicity into account, so a
+  correlation length shorter than the box is necessary. A visualization of a
+  typical covariance matrix for a column containing 20 scatterers is shown in
+  Figure~\ref{fig:covariance}. Next, we drew random samples from a multivariate
+  normal distribution defined using the covariance matrix, and applied these
+  shifts to the columns of scatterers.
+
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.5\textwidth]{covariance.png}
+  \caption{}\label{fig:covariance}
+  \end{figure}
+
+  Adding a finite correlation length between scatterers causes R-$\pi$ to
+  broaden in the $q_z$ direction. We simulated a system with dimensions of 8.5 x
+  8.5 x 37 nm, so that there would be 100 scatterers in the z-direction and a
+  fourier bin size of $1/370=0.0027 \AA^{-1}$. There is a clear broadening of
+  R-$\pi$ when scatterers are correlated
+  (Figure~\ref{fig:correlation_comparison}). The maximum intensity of R-$\pi$
+  decreases as the variance in scatterer position increases
+  (Figure~\ref{fig:correlation_decay}), however the intensity of R-$\pi$ does not
+  change when we vary the correlation length while holding the variance constant. 
+
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{correlation.png}
+  \caption{}\label{fig:correlation_comparison}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{correlation_decay.png}
+  \caption{}\label{fig:correlation_decay}
+  \end{subfigure}
+  \caption{(a) R-$\pi$ broadens in the $q_z$ direction when scatterers are correlated.
+  (b) The intensity of R-$\pi$ as the variance in scatterer position increases.}\label{fig:correlation}
+  \end{figure}
+
+  \section{Conclusion}
+  
+  A number of factors influence the shape and intensity of the R-$\pi$
+  reflection. The maximum intensity of the reflection is most strongly influence
+  by thermal disorder in the z-direction. The peak is broadened in the $q_y$ ($q_r$)
+  direction when there is xy-direction thermal disorder in systems with randomly displaced 
+  columns. The peak is broadened in the $q_z$ direction when there is a finite (non-zero)
+  correlation length between scatterers.
+ 
 \end{document}
