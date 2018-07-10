@@ -151,11 +151,49 @@ def lorentz(points, a, b, c):
 
 def gaussian(points, mean, sigma, amplitude, yshift):
 
-    return yshift + (amplitude / np.sqrt(2*np.pi*sigma**2)) * np.exp(-(points - mean)**2/(2*sigma**2))
+    return 1 + yshift + (amplitude / np.sqrt(2*np.pi*sigma**2)) * np.exp(-(points - mean)**2/(2*sigma**2))
 
 
 def errorfunc(p, points, z):
     return lorentz(p, points) - z
+
+
+def z_correlation(z, L, v=0.1):
+    """
+    Calculate where to place monomers on the z-axis so that a given correlation length is obtained
+    :param z: mean z-positions where monomers will be placed with gaussian probability np.array([n_layers])
+    :param L: desired correlation length [float]
+    :param v: variance in z position of monomer head groups
+    :return: locations [np.array[nlayers])
+    """
+
+    n = z.shape[0]
+    cov = np.zeros([n, n])  # initialize covariance matrix
+
+    decay = v*np.exp(-z / L)  # decay of covariance
+
+    # decay[1:] += np.exp(-z[::-1][:-1]/L) # for periodicity (?)
+
+    for i in range(z.shape[0]):
+        cov[i, i:] = decay[:(n - i)]
+        cov[i:, i] = decay[:(n - i)]
+
+    # plt.imshow(cov, extent=[1, 20, 1, 20])
+    # cbar = plt.colorbar()
+    # cbar.set_ticks([0.02, 0.04, 0.06, 0.08, 0.1])
+    # cbar.set_ticklabels([0.02, 0.04, 0.06, 0.08, 0.1])
+    # ax = plt.gca()
+    #
+    # ticks = np.linspace(1, z.size - 1, z.size // 2, dtype=int)
+    # ax.xaxis.set_ticks(ticks)
+    # ax.yaxis.set_ticks(ticks)
+    # plt.xlabel('Scatterer Number')
+    # plt.ylabel('Scatterer Number')
+    # plt.show()
+    # exit()
+    locations = np.random.multivariate_normal(z, cov)
+
+    return locations
 
 
 class Trajectory(object):
@@ -273,6 +311,7 @@ class Trajectory(object):
                     z_disorder = z_separation*np.random.normal(scale=thermal_disorder[2], size=(end - start))
 
                     disorder = np.vstack((x_disorder, y_disorder, z_disorder)).T
+                    #self.locations[t, start:end, 2] = z_correlation(column, 10, v=0.5) + shift
                     self.locations[t, start:end, 2] = column + shift
                     self.locations[t, start:end, :] += disorder
 
@@ -409,6 +448,8 @@ class Trajectory(object):
             plt.plot(self.freq_z, self.slice)
         else:
             print('invalid axis chosen for slice of structure factor')
+
+        np.savez_compressed('no_correlation.npz', freq_z=self.freq_z, slice=self.slice)
 
         if show:
             plt.show()
@@ -585,12 +626,12 @@ if __name__ == "__main__":
     upper = np.argmin(np.abs(t.freq_y - qbound))
     upper += 1
 
-    peaks = find_peaks(t.freq_y[lower:upper], t.sf[np.argmin(np.abs(t.freq_x)), lower:upper, rpi_index], tol=1)
-    peaks += lower
+    # peaks = find_peaks(t.freq_y[lower:upper], t.sf[np.argmin(np.abs(t.freq_x)), lower:upper, rpi_index], tol=1)
+    # peaks += lower
 
     #peaks = np.linspace(0, t.freq_y.size - 1, t.freq_y.size, dtype=int)  # for disordered columns
 
-    plt.scatter(t.freq_y[peaks], t.sf[np.argmin(np.abs(t.freq_x)), peaks, rpi_index])
+    # plt.scatter(t.freq_y[peaks], t.sf[np.argmin(np.abs(t.freq_x)), peaks, rpi_index])
 
     # Lorentzian fit (not as good as gaussian)
     # p = np.array([0.1, 0, t.locations.shape[1]])
@@ -602,16 +643,16 @@ if __name__ == "__main__":
     #
     # print("Lorentzian FWHM = %.2f A^-1" % solp_lorentz[0])
 
-    p = np.array([0, 0.3, t.locations.shape[1], 1])
-    solp, cov_x = curve_fit(gaussian, t.freq_y[peaks], t.sf[np.argmin(np.abs(t.freq_x)), peaks, rpi_index], p,
-                            bounds=([-np.inf, 0, 0, 0], [np.inf, np.inf, np.inf, np.inf]))
-
-    plt.plot(t.freq_y, gaussian(t.freq_y, solp[0], solp[1], solp[2], solp[3]), '--', color='green', label='Gaussian',
-             linewidth=2)
-
-    print("Gaussian FWHM = %.3f +/- %.3f A^-1" % (2*np.sqrt(2*np.log(2))*solp[1],
-                                           2 * np.sqrt(2 * np.log(2)) * cov_x[1, 1] ** 0.5))
-    plt.legend()
+    # p = np.array([0, 0.3, t.locations.shape[1], 1])
+    # solp, cov_x = curve_fit(gaussian, t.freq_y[peaks], t.sf[np.argmin(np.abs(t.freq_x)), peaks, rpi_index], p,
+    #                         bounds=([-np.inf, 0, 0, 0], [np.inf, np.inf, np.inf, np.inf]))
+    #
+    # plt.plot(t.freq_y, gaussian(t.freq_y, solp[0], solp[1], solp[2], solp[3]), '--', color='green', label='Gaussian',
+    #          linewidth=2)
+    #
+    # print("Gaussian FWHM = %.3f +/- %.3f A^-1" % (2*np.sqrt(2*np.log(2))*solp[1],
+    #                                        2 * np.sqrt(2 * np.log(2)) * cov_x[1, 1] ** 0.5))
+    # plt.legend()
     plt.xlabel('$q_y (\AA^{-1}$)')
     plt.ylabel('Intensity')
     plt.tight_layout()

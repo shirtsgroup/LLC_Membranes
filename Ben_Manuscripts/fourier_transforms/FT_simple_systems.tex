@@ -236,11 +236,12 @@
   % peaks may artifically broaden upon angle-averaging.
 
   The real system is far from a perfect crystal. Here we explore the influence
-  of 3 sources of disorder on the intensity of R-$\pi$:
+  of 4 sources of disorder on the intensity of R-$\pi$:
   \begin{enumerate}
   \item Random z-displacement of columns with respect to all other columns
   \item Random rotation of layers about the z-axis
   \item Thermal noise
+  \item Finite correlation between scatterers in the z-direction
   \end{enumerate}
 
   \subsection{Imperfectly aligned columns}
@@ -392,12 +393,118 @@
   FWHM remains infinite.
 
   When we add noise in the x and y directions, R-$\pi$ has a finite peak width in its 
-  $q_y$ dimension. We fit a Gaussian function to the  
+  $q_y$ dimension, and the intensity stays constant. We fit a Gaussian function to the 
+  the $q_y$ cross-section in order to determine its FWHM. The FWHM decay is inversely
+  proportional to the amount of noise added.  
+
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.32\textwidth}
+  \includegraphics[width=\textwidth]{random_columns_z_noise.png}
+  \caption{}\label{fig:z_noise_columns}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+  \includegraphics[width=\textwidth]{random_columns_gaussian.png}
+  \caption{}\label{fig:FWHM_fit_columns}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+  \includegraphics[width=\textwidth]{random_columns_xy_noise.png}
+  \caption{}\label{fig:FWHM_columns}
+  \end{subfigure}
+  \caption{(a) The intensity of R-$\pi$ decays to 1 rapidly as gaussian noise is 
+   added to the system. (b) When we add noise in the x and y directions, R-$\pi$
+   broaden in the y-direction with a continuous intensity distribution that can be
+   fit to a gaussian. (c) This FWHM decreases as the inverse of the amount of 
+   noise added.}\label{fig:columns_noise}
+  \end{figure}
+
+  \subsubsection{Randomly rotated layers}
+
+  When we add noise in the z direction, the intensity of R-$\pi$ decays to 1
+  rapidly (Figure~\ref{fig:random_layers_z_noise}), much like the decay shown in
+  Figure ~\ref{fig:z_noise_columns}. The FWHM slowly increases until it jumps to
+  infinity when the intensity of R-$\pi$ is comparable to the background
+  intensity.
+
+  When we add noise in the x and y directions, the intensity of R-$\pi$ does not change.
+  The FWHM slowly decays as shown in Figure~\ref{fig:random_layers_xy_noise}
 
   \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{random_columns_gaussian.png}
-  \caption{}\label{fig:FWHM_columns}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{random_layers_z_noise.png}
+  \caption{}\label{fig:random_layers_z_noise}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{random_layers_xy_noise.png}
+  \caption{}\label{fig:random_layers_xy_noise}
+  \end{subfigure}
+  \caption{(a) As we add noise in the z-direction, the intensity of R-$\pi$ decreases
+   rapidly to 1. The FWHM goes to infinity when the intensity of R-$\pi$ equals 1.}\label{fig:layers_noise}
   \end{figure}
+
+  \subsection{Finite z-correlations}
+
+  The z-cross-section of the R-$\pi$ peaks are delta functions in all of the
+  above systems (See Figure~\ref{fig:deltas}). None of the routes explored so far
+  show how R-$\pi$ might broaden. The delta-function behavior does not change
+  when the system is made taller so as to increase the resolution in z. We built
+  a system 10x taller (37 nm), added random column displacement and some noise in
+  the z-direction. R-$\pi$ is still a sharp delta function
+  (Figure~\ref{fig:tall_rpi}). 
+
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{perfect_rpi.png}
+  \caption{Perfect Crystal}\label{fig:perfect_rpi}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{displace_columns_rpi.png}
+  \caption{Randomly displaced columns}\label{fig:displaced_columns_rpi}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{displaced_columns_z_noise_rpi.png}
+  \caption{Randomly displaced columns w/ z-noise}\label{fig:displaced_columns_z_noise_rpi}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{rotated_layers_rpi_xy_noise.png}
+  \caption{Randomly rotated layers w/ xy-noise}\label{fig:rotated_layers_rpi_xy_noise}
+  \end{subfigure}
+  \caption{Several examples of the delta-like behavior of R-$\pi$. Randomly displacing
+  columns, randomly rotating layers, and adding thermal disorder do not broaden 
+  the z-cross-section of R-$\pi$.}\label{fig:deltas}
+  \end{figure}
+
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{tall_rpi.png}
+  \caption{R-$\pi$ still appears to be a delta function even with higher resolution and
+  noise in the z-positions of the scatterers}
+  \end{figure}
+
+  (Please let me know if there is a more correct way of doing this)
+  We added a correlation length to scatterers in z-direction. To do so, we
+  define a covariance matrix to describe the correlation between all pairs of
+  scatterers.  The variance, v, is defined so that the covariance in position of
+  a scatterer with itself is the same for all scatterers. The covariance in
+  position between scatterers decays exponentially from v according to the
+  equation $ve^{-z/L}$ where L is the correlation length. Note that in its
+  current implementation, it does not take periodicity into account, so a
+  correlation length shorter than the box is necessary. A visualization of a
+  typical covariance matrix for a column containing 20 scatterers is shown in
+  Figure~\ref{fig:covariance}. Next, we drew random sample from a multivariate
+  normal distribution defined using the covariance matrix.
+
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{covariance.png}
+  \caption{}\label{fig:covariance}
+  \end{figure}
+
+  Adding a finite correlation length between scatterers causes R-$\pi$ to
+  broaden. We simulated a system with dimensions of 8.5 x 8.5 x 37 nm, so that
+  there would be 100 scatterers in the z-direction and a fourier bin size of
+  $1/370=0.0027 \\A^{-1}$.
 
 \end{document}

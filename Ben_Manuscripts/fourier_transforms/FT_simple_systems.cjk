@@ -236,11 +236,12 @@
   % peaks may artifically broaden upon angle-averaging.
 
   The real system is far from a perfect crystal. Here we explore the influence
-  of 3 sources of disorder on the intensity of R-$\pi$:
+  of 4 sources of disorder on the intensity of R-$\pi$:
   \begin{enumerate}
   \item Random z-displacement of columns with respect to all other columns
   \item Random rotation of layers about the z-axis
   \item Thermal noise
+  \item Finite correlation between scatterers in the z-direction
   \end{enumerate}
 
   \subsection{Imperfectly aligned columns}
@@ -378,6 +379,96 @@
 %  }\label{table:pore_radius}
 %  \end{table}
 
-  \subsection{Influence of noise}
+  \subsection{The influence of thermal disorder}
+
+  We added gaussian noise in each dimension to observe its influence on the intensity
+  of R-$\pi$ and the FWHM. For the z-direction, the standard deviation of the 
+  gaussian distribution is equal to a fraction of the average distance between scatterers
+  in columns. In the xy-directions, the standard deviation is equal to a fraction 
+  of the pore radius.
+
+  \subsubsection{Randomly displaced columns}
+
+  When we add noise in the z direction, the intensity of R-$\pi$ decays while the
+  FWHM remains infinite.
+
+  When we add noise in the x and y directions, R-$\pi$ has a finite peak width in its 
+  $q_y$ dimension, and the intensity stays constant. We fit a Gaussian function to the 
+  the $q_y$ cross-section in order to determine its FWHM. The FWHM decay is inversely
+  proportional to the amount of noise added.  
+
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.32\textwidth}
+  \includegraphics[width=\textwidth]{random_columns_z_noise.png}
+  \caption{}\label{fig:z_noise_columns}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+  \includegraphics[width=\textwidth]{random_columns_gaussian.png}
+  \caption{}\label{fig:FWHM_fit_columns}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+  \includegraphics[width=\textwidth]{random_columns_xy_noise.png}
+  \caption{}\label{fig:FWHM_columns}
+  \end{subfigure}
+  \caption{(a) The intensity of R-$\pi$ decays to 1 rapidly as gaussian noise is 
+   added to the system. (b) When we add noise in the x and y directions, R-$\pi$
+   broaden in the y-direction with a continuous intensity distribution that can be
+   fit to a gaussian. (c) This FWHM decreases as the inverse of the amount of 
+   noise added.}\label{fig:columns_noise}
+  \end{figure}
+
+  \subsubsection{Randomly rotated layers}
+
+  When we add noise in the z direction, the intensity of R-$\pi$ decays to 1
+  rapidly (Figure~\ref{fig:random_layers_z_noise}), much like the decay shown in
+  Figure ~\ref{fig:z_noise_columns}. The FWHM slowly increases until it jumps to
+  infinity when the intensity of R-$\pi$ is comparable to the background
+  intensity.
+
+  When we add noise in the x and y directions, the intensity of R-$\pi$ does not change.
+  The FWHM slowly decays as shown in Figure~\ref{fig:random_layers_xy_noise}
+
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{random_layers_z_noise.png}
+  \caption{}\label{fig:random_layers_z_noise}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{random_layers_xy_noise.png}
+  \caption{}\label{fig:random_layers_xy_noise}
+  \end{subfigure}
+  \caption{(a) As we add noise in the z-direction, the intensity of R-$\pi$ decreases
+   rapidly to 1. The FWHM goes to infinity when the intensity of R-$\pi$ equals 1.}\label{fig:layers_noise}
+  \end{figure}
+
+  \subsection{Finite z-correlations}
+
+  The z-cross-section of the R-$\pi$ peaks are delta functions in all of the above systems 
+  (See Figure~\ref{fig:deltas}). 
+
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{perfect_rpi.png}
+  \caption{Perfect Crystal}\label{fig:perfect_rpi}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{displace_columns_rpi.png}
+  \caption{Randomly displaced columns}\label{fig:displaced_columns_rpi}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{displaced_columns_z_noise_rpi.png}
+  \caption{Randomly displaced columns w/ z-noise}\label{fig:displaced_columns_z_noise_rpi}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{rotated_layers_rpi_xy_noise.png}
+  \caption{Randomly rotated layers w/ xy-noise}\label{fig:rotated_layers_rpi_xy_noise}
+  \end{subfigure}
+  \caption{Several examples of the delta-like behavior of R-$\pi$. Randomly displacing
+  columns, randomly rotating layers, and adding thermal disorder do not broaden 
+  the z-cross-section of R-$\pi$.}\label{fig:deltas}
+  \end{figure}
 
 \end{document}
