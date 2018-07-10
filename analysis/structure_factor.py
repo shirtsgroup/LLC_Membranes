@@ -311,8 +311,8 @@ class Trajectory(object):
                     z_disorder = z_separation*np.random.normal(scale=thermal_disorder[2], size=(end - start))
 
                     disorder = np.vstack((x_disorder, y_disorder, z_disorder)).T
-                    #self.locations[t, start:end, 2] = z_correlation(column, 10, v=0.5) + shift
-                    self.locations[t, start:end, 2] = column + shift
+                    self.locations[t, start:end, 2] = z_correlation(column, 10, v=0.5) + shift
+                    #self.locations[t, start:end, 2] = column + shift
                     self.locations[t, start:end, :] += disorder
 
     def random_layer_rotations(self, npores, ncol_per_pore, r, nlayers, frames=1, thermal_disorder=[0, 0, 0]):
@@ -449,7 +449,7 @@ class Trajectory(object):
         else:
             print('invalid axis chosen for slice of structure factor')
 
-        np.savez_compressed('no_correlation.npz', freq_z=self.freq_z, slice=self.slice)
+        np.savez_compressed('correlation.npz', freq_z=self.freq_z, slice=self.slice)
 
         if show:
             plt.show()
@@ -619,12 +619,12 @@ if __name__ == "__main__":
     print('R-pi intensity: %.2f' % np.amax(t.slice[(rpi_index - 1): (rpi_index + 1)]))
 
     # fit lorentzian to R-pi
-    t.plot_sf_slice('y', [0, 1.7], show=False)
+    # t.plot_sf_slice('y', [0, 1.7], show=False)
 
-    qbound = 0.6  # distance from qz axis to check for peaks
-    lower = np.argmin(np.abs(t.freq_y + qbound))
-    upper = np.argmin(np.abs(t.freq_y - qbound))
-    upper += 1
+    # qbound = 0.6  # distance from qz axis to check for peaks
+    # lower = np.argmin(np.abs(t.freq_y + qbound))
+    # upper = np.argmin(np.abs(t.freq_y - qbound))
+    # upper += 1
 
     # peaks = find_peaks(t.freq_y[lower:upper], t.sf[np.argmin(np.abs(t.freq_x)), lower:upper, rpi_index], tol=1)
     # peaks += lower
