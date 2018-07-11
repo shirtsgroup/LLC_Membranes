@@ -102,7 +102,7 @@ def msd_straightforward(x, ndx):
 
 class Diffusivity(object):
 
-    def __init__(self, traj, gro, axis, begin=0, startfit=0.05, endfit=0.2, residue=False, atoms=[]):
+    def __init__(self, traj, gro, axis, begin=0, startfit=0.05, endfit=0.2, residue=False, atoms=[], restrict=[]):
         """
         Calculate diffusivity from trajectory
         :param traj: unwrapped trajectory (i.e. gmx trjconv with -pbc nojump)
@@ -112,6 +112,8 @@ class Diffusivity(object):
         :param endfit: end linear fit to MSD endfit % into trajectory
         :param residue: if specified, the residue whose center of mass MSD will be measured
         :param atoms: if specified, group of atoms whose center of mass MSD will be measured
+        :param restrict: restrict selection to certain indices. For example, if you want to calculate MSD of a certain
+        residue, but only include a fraction of the total residues in the system.
         """
 
         self.script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -144,7 +146,10 @@ class Diffusivity(object):
 
             self.itp = "%s/%s.itp" % (self.top_location, res)
 
-            selection = [a.index for a in t.topology.atoms if a.residue.name == res]
+            if restrict:
+                selection = [a.index for a in t.topology.atoms if a.residue.name == res and a.index in restrict]
+            else:
+                selection = [a.index for a in t.topology.atoms if a.residue.name == res]
 
             topology = top.Top(self.itp)  # read topology
             atoms_per_residue = topology.natoms  # number atoms in a single residue
@@ -202,14 +207,14 @@ class Diffusivity(object):
             self.yfit, _, self.slope_error, _, A = Poly_fit.poly_fit(self.time[self.startfit:self.endfit],
                                                   self.MSD_average[self.startfit:self.endfit], 1, self.W)
 
-            plt.plot(self.time[self.startfit:self.endfit], self.yfit, '--', color='black', label='Linear Fit')
+            plt.plot(self.time[self.startfit:self.endfit]/1000, self.yfit, '--', color='black', label='Linear Fit')
 
             # plt.errorbar(self.time, self.MSD_average, yerr=[self.limits[0, :], self.limits[1, :]],
             #              errorevery=self.errorevery, label='MSD')
-            plt.plot(self.time, self.MSD_average, label='MSD')
+            plt.plot(self.time/1000, self.MSD_average, label='MSD')
 
             plt.ylabel('MSD ($nm^2$)', fontsize=14)
-            plt.xlabel('time (ps)', fontsize=14)
+            plt.xlabel('time (ns)', fontsize=14)
             plt.gcf().get_axes()[0].tick_params(labelsize=14)
             plt.legend(loc=2)
             plt.tight_layout()
@@ -267,12 +272,12 @@ class Diffusivity(object):
 
     def plot(self, axis):
 
-        plt.plot(self.time[self.startfit:self.endfit], self.yfit, '--', color='black', label='Linear Fit')
-        plt.errorbar(self.time, self.MSD_average, yerr=[self.limits[0, :], self.limits[1, :]],
+        plt.plot(self.time[self.startfit:self.endfit]/1000, self.yfit, '--', color='black', label='Linear Fit')
+        plt.errorbar(self.time/1000, self.MSD_average, yerr=[self.limits[0, :], self.limits[1, :]],
                      errorevery=self.errorevery, label='MSD')
 
         plt.ylabel('MSD ($nm^2$)', fontsize=14)
-        plt.xlabel('time (ps)', fontsize=14)
+        plt.xlabel('time (ns)', fontsize=14)
         plt.gcf().get_axes()[0].tick_params(labelsize=14)
         plt.title('D = %1.2e $\pm$ %1.2e $m^{2}/s$' % (self.Davg, np.abs(self.Davg - self.confidence_interval[0])))
         plt.legend(loc=2)

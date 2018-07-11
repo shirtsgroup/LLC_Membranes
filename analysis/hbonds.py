@@ -39,7 +39,8 @@ def initialize():
     parser.add_argument('-b', '--begin', default=0, type=int, help='End frame')
     parser.add_argument('-e', '--end', default=-1, type=int, help='Start frame')
     parser.add_argument('-x', '--exclude_water', action='store_true', help='Exclude water while searching for hbonds')
-    parser.add_argument('-r', '--residues', nargs='+', default=['HII'], help='Residues to include in h-bond search')
+    parser.add_argument('-r', '--residues', nargs='+', default=['HII'], help='Residues to include in h-bond search. '
+                        'Water is automatically included if you do not specify the -x option')
     parser.add_argument('-a', '--atoms', action='append', nargs='+', help='Atoms for to include for each '
                         'residue. Each list of atoms must be passed with a separate -a flag for each residue in'
                         'args.residues')
@@ -124,17 +125,18 @@ class System(object):
     def identify_hbonds(self, cut, angle):
 
         # narrow list by doing a distance search
+
         Dlen = len(self.D)
         Alen = len(self.A)
         d = np.zeros([self.pos.shape[0], Dlen * Alen])
 
         # distance search can be sped up with cKDtree
-        if Dlen > Alen:
+        if Dlen >= Alen:
             L = Dlen
             print('Calculating distances...')
             for t in tqdm.tqdm(range(d.shape[0]), unit='frames'):
                 for i in range(len(self.A)):
-                    d[t, i*Dlen:(i + 1) * Dlen] = np.linalg.norm(self.pos[t, self.D, :] - self.pos[t, self.D[i], np.newaxis, :], axis=1)
+                    d[t, i*Dlen:(i + 1) * Dlen] = np.linalg.norm(self.pos[t, self.D, :] - self.pos[t, self.A[i], np.newaxis, :], axis=1)
         else:
             L = Alen
             print('Calculating distances...')
@@ -150,9 +152,14 @@ class System(object):
 
             distance_eligible = indices[np.nonzero(d[i, indices])]  # narrow to only nonzero values
 
-            Aindex = np.array(self.A)[distance_eligible % L]  # indices of distance eligible acceptor atoms
-            Dindex = np.array(self.D)[distance_eligible // L]  # indices of distance eligible donor atoms
-            Hindex = np.array(self.H)[distance_eligible // L]  # H atoms attached to eligible donors
+            if Dlen >= Alen:
+                Aindex = np.array(self.A)[distance_eligible // L]  # indices of distance eligible acceptor atoms
+                Dindex = np.array(self.D)[distance_eligible % L]  # indices of distance eligible donor atoms
+                Hindex = np.array(self.H)[distance_eligible % L]  # H atoms attached to eligible donors
+            else:
+                Aindex = np.array(self.A)[distance_eligible % L]  # indices of distance eligible acceptor atoms
+                Dindex = np.array(self.D)[distance_eligible // L]  # indices of distance eligible donor atoms
+                Hindex = np.array(self.H)[distance_eligible // L]  # H atoms attached to eligible donors
 
             self.hbonds.append(np.reshape(np.concatenate((Dindex, Hindex, Aindex)), (3, len(Aindex))))
 
@@ -345,9 +352,9 @@ if __name__ == "__main__":
 
     # workaround for argparse. If default value is set, it is always included in the list with action='append'
     if not args.atoms:
-        args.atoms = ['O3', 'O4']  # a default value
+        args.atoms = [['O3', 'O4']]  # a default value
 
-    sys = System(args.traj, args.gro, args.top, begin=args.begin, end=args.end)
+    sys = System(args.traj, args.gro, args.top, begin=args.begin, end=args.end, exclude_water=args.exclude_water)
 
     for i, r in enumerate(args.residues):
         sys.set_eligible(r, args.atoms[i])
