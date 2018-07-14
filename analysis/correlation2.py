@@ -133,7 +133,7 @@ class Correlation(object):
                     self.mass[i].append(Atom_props.mass[x])
 
         if com:
-            self.com()  # this works
+            self.com()
         else:
             # Use atomic positions rather than center of mass
             keep = []

@@ -110,6 +110,29 @@
 
   \subsection{Crystalline liquid crystals}
 
+  \textbf{NEW} There are two ways to set up the pores for this system. The
+  first is to make all pores exactly the same; just copies that are translated to
+  different pore locations (Figure~\ref{fig:same_rotation}). It is not clear
+  whether a perfect crystal of this material would be arranged in this way. The
+  second way is to randomly rotate each pore
+  (Figure~\ref{fig:different_rotation}). In this work we use the latter.  
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{same_rotation.png}
+  \caption{}\label{fig:same_rotation}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{different_rotation.png}
+  \caption{}\label{fig:different_rotation}
+  \end{subfigure}
+  \caption{A top-down (xy) view of the pore columns. (a) The right pore is an
+  exact duplicate of the left including rotation about the z-axis. (b) The right
+  pore is a duplicate of the left pore but rotated a random amount about the 
+  z-axis.}\label{fig:initial_rotations}
+  \end{figure}
+
   For a perfect, infinite crystal, the intensity of R-$\pi$ is infinitely sharp. We
   created a model with perfectly aligned columns. Each columns originates at z=0
   and all other points in the column are equally spaced 3.7 \AA~apart in the
@@ -264,19 +287,24 @@
 
   We randomly aligned columns along the z-axis by adding a random displacement
   to each column of points. This simulates a system in which columns are
-  uncorrelated.  We shifted coordinates where necessary so that all atoms stayed
+  uncorrelated.  We wrapped coordinates where necessary so that all atoms stayed
   within the unit cell. We held the spacing between each point within each column
   at 3.7 \AA. We created trajectories of 1000 independent
   configurations in order to calculate the average intensity of R-$\pi$. 1000
   independent configurations gives a reasonably converged average, enough to
   observe trends.
+ 
+  \textbf{NEW} We varied the degree to which we shifted each column with
+  respect to other columns. The most we allowed the columns to shift was one full
+  layer. To choose the position of the column, we chose a random displacement
+  between 0 and d, where d is the maximum allowed displacement. We varied d
+  between 0 and 3.7 \AA.  
 
-  The intensity of R-$\pi$ is equal to the number of scatterers per
-  column when we randomly displace columns with respect to each other (See
-  Table~\ref{table:randomly_displaced_columns}).  It is independent of the
-  number of pores (and hence number of columns) in the system. The error 
-  in the calculated intensities are comparable to the magnitude of the 
-  intensity because the intensity of each configuration in the trajectory
+  When d = 3.7 \AA, the intensity of R-$\pi$ is equal to the number of
+  scatterers per column (See Table~\ref{table:randomly_displaced_columns}).  It
+  is independent of the number of pores (and hence number of columns) in the
+  system. The error in the calculated intensities are comparable to the magnitude
+  of the intensity because the intensity of each configuration in the trajectory
   fluctuates so much. 
 
   \begin{table}[!htb]
@@ -299,6 +327,19 @@
   \caption{The intensity of R-$\pi$ is equal to the number of scatters in 
    each column when columns are uncorrelated.}\label{table:randomly_displaced_columns}
   \end{table}
+
+  \textbf{NEW} As we allow the columns to displace less (lower values of d),
+  the intensity of R-$\pi$ increases (See Figure~\ref{fig:column_displacement}).
+  Once there is no displacement, the intensity of R-$\pi$ matches that of a
+  perfect crystal. The intensity of R-$\pi$ in our system is likely boosted by
+  correlation between columns.
+
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.5\textwidth]{column_displacement.png}
+  \caption{As we increase the amount that columns are allowed to displaced relative
+  to each other, the intensity of R-$\pi$ decreases.}\label{fig:column_displacement}
+  \end{figure} 
 
   The $q_y$ width of R-$\pi$ is infinite when columns are randomly displaced in
   the z-direction. We attempted to measure the FWHM of the system with randomly
@@ -355,8 +396,59 @@
 
   In all cases, the maximum intensity of R-$\pi$ is equal to the number of
   scatterers in the system and the FWHM of the $q_y$ cross-section of the
-  structure factor at R-$\pi$ is 0.37 $\AA^{-1}$, just as the perfect crystal. 
- 
+  structure factor at R-$\pi$ is 0.37 $\AA^{-1}$, just as the perfect crystal.
+
+  \textbf{NEW} There is no major difference in the intensity of R-$\pi$ between
+  a perfect crystal and a system with randomly rotated layers. In the z
+  direction, R-$\pi$ remains constant since the z components of the points are
+  spaced exactly 3.7 \AA apart. The maximum intensity of R-$\pi$ is at ($q_x,
+  q_y, q_z$) = (0, 0, 1.7) so there is no contribution from the x or y
+  components. Figure~\ref{fig:perfect_v_random_layers} shows a comparison of the
+  cross-section of R-$\pi$ along $q_y=0$. On the surface it appears that there is
+  a difference between them at high values of $q_y$. However, this is dependent
+  on the initial configuration of the perfect crystal system. The system with
+  randomly rotated layers will always look as it does if a sufficient number of
+  configurations are included in the calculation of the structure factor. The
+  perfect system is in agreement with the randomly rotated layer system at low
+  values of $q_y$, corresponding to scatteres spaced far apart, however it begins
+  to deviate at large $q_y$, where it describes the spatial relationship between
+  scatterers in a single pore. In the perfect system, pores are randomly rotated
+  with respect to each other (See Figure~\ref{fig:same_rotation}), so the spatial
+  relationship changes each time a system is set up. It will not average out since
+  each frame is exactly the same, but if enough pores are added, the 2 
+  cross-sections will match (See Figure~\ref{fig:perfect_v_random_100pores}). 
+  If we create a perfect crystal system where pores are duplicated and translated, but
+  not rotated (See Figure~\ref{fig:same_rotation}), the subharmonics
+  at large $q_y$ are quite pronounced (Figure~\ref{fig:perfect_crystal_same_rotation})
+  due to the increase in ordering in the $q_y$ direction. The peaks are likely
+  geometrically related to the spacing between points within pores, but it is 
+  not important to get to the bottom of that here.  
+
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.3\textwidth}
+  \includegraphics[width=\textwidth]{perfect_v_random_layers.png} 
+  \caption{}\label{fig:perfect_v_random_layers}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+  \includegraphics[width=\textwidth]{perfect_v_random_100pores.png} 
+  \caption{}\label{fig:perfect_v_random_100pores}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+  \includegraphics[width=\textwidth]{perfect_crystal_same_rotation_qy.png} 
+  \caption{}\label{fig:perfect_crystal_same_rotation}
+  \end{subfigure}
+  \caption{\textbf{NEW} Shown are cross-sections of the 3D structure factor
+  along $q_y$ at the $q_z$ value of R-$\pi$. We compare the cross-section for 
+  a perfect crystal system and a system where layers are randomly rotated with
+  respect to vertically adjacent layers. (a) When systems are made with 4 pores,
+  the cross-sections agree at low $q_y$ values, however they diverge at higher
+  values of $q_y$. (b) When we build the systems with 100 pores, the cross-sections
+  are in close agreement. (c) If we do not rotate the pores in the perfect crystal
+  system, there are large spikes at high values of $q_y$ due to order within pores.}\label{fig:perfect_v_layers}
+  \end{figure}
+
+
 %  \subsection{Influence of Pore Radius}
 
 %  The pore radius is inversely proportional to the FWHM of systems made with
@@ -411,10 +503,36 @@
   in columns (d). In the xy-directions, the standard deviation is equal to a fraction 
   of the pore radius (r).
 
+  \subsubsection{\textbf{NEW} Perfect Crystal}
+
+  When we add z-direction gaussian noise to the lattice sites in the perfect
+  crystal, the intensity of R-$\pi$ drops precipitously as noise is increased
+  (Figure~\ref{fig:z_noise_perfect}).  However, the FWHM in the $q_y$ direction
+  is not affected by this noise.
+
+  When we add gaussian noise in the x and y directions, the intensity of
+  R-$\pi$ does not change, however the FWHM sharpens with increasing noise
+  (Figure~\ref{fig:xy_noise_perfect}). 
+
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{z_noise_perfect.png}
+  \caption{}\label{fig:z_noise_perfect}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{xy_noise_perfect.png}
+  \caption{}\label{fig:xy_noise_perfect}
+  \end{subfigure}
+  \caption{(a) The intensity of R-$\pi$ decreases as the amount of z-direction
+  noise increases. (b) The FWHM decreases as noise in the x and y directions
+  increases.}\label{fig:perfect_noise}
+  \end{figure}
+
   \subsubsection{Randomly displaced columns}
 
-  When we add noise in the z direction, the intensity of R-$\pi$ decays while the
-  FWHM remains infinite (Figure~\ref{fig:z_noise_columns}).
+  When we add noise in the z direction, the intensity of R-$\pi$ decays
+  (Figure~\ref{fig:z_noise_columns}).
 
   When we add noise in the x and y directions, R-$\pi$ has a finite peak width
   in its $q_y$ dimension (Figure~\ref{fig:FWHM_fit_columns}), and the intensity
@@ -476,7 +594,7 @@
    directions, the intensity of R-$\pi$ does not change, but the FWHM decays slowly.}\label{fig:layers_noise}
   \end{figure}
 
-  \subsection{Finite z-correlations}
+  \subsubsection{Finite z-correlations}
 
   The z-cross-section of the R-$\pi$ peaks are delta functions in all of the
   above systems (See Figure~\ref{fig:deltas}). None of the routes explored so far
@@ -559,6 +677,187 @@
   \caption{(a) R-$\pi$ broadens in the $q_z$ direction when scatterers are correlated.
   (b) The intensity of R-$\pi$ as the variance in scatterer position increases.}\label{fig:correlation}
   \end{figure}
+
+  \subsubsection{\textbf{NEW} Systems with the "right" amount of noise}
+
+  For a better understanding of the reasons why R-$\pi$ appears as it does in
+  our simulated systems, we added a similar amount of noise to the model system
+  as that seen in our simulations. Table ~\ref{table:simulation_noise} shows the
+  amount of thermal noise in each dimension of the simulated system. We obtained
+  those values by calculating the standard deviation in each dimension of the
+  center of mass head group location from reference locations. We took the
+  reference locations as the average center of mass of each head group. The
+  standard deviations reported are only for frames over which we calculated the
+  simulated diffraction patterns. 
+
+  \begin{table}
+  \centering
+  \begin{tabular}{c c c c}
+  \toprule
+  System                         &   $\sigma_x$ ($\AA$) &   $\sigma_y$ ($\AA$) & $\sigma_z$ ($\AA$) \\
+  \midrule
+  Sandwiched, Ordered            &      0.31            &     0.33             &     0.34           \\
+  Parallel Displaced, Ordered    &      0.51            &     0.52             &     0.30           \\
+  Sandwiched, Disordered         &      0.41            &     0.57             &     0.32           \\
+  Parallel Displaced, Disordered &      0.39            &     0.31             &     0.33           \\
+  \bottomrule
+  \end{tabular}
+  \caption{Thermal noise in each dimension of the center of mass of monomer head groups for 
+  simulated LLC systems}\label{table:simulation_noise}
+  \end{table}
+
+  Although the head groups do not move much in the equilibrated portion of the
+  simulation, they are not arranged perfectly into columns. There is quenched
+  disorder present from early in the simulation. To account for this noise, we
+  measured the deviation of the center of masses from idealized positions. To
+  calculate deviations in the x and y dimensions, we calculated the distance
+  between each center of mass and the pore center. The distribution of the radial
+  distance between each center of mass and the pore center, for the ordered
+  sandwiched configuration, is shown in Figure~\ref{fig:xy_com_distribution}. To
+  calculate deviations in the z dimension, we estimated the distance between
+  layers to be the average z-box dimension divided by the number of scatterers
+  per column (20 in the simulated system). Then we measured the deviation between
+  the z position of each center of mass and its corresponding average z-layer
+  position. Histograms of the deviations, for the ordered sandwiched
+  configuration, are in Figure~\ref{fig:z_com_distribution}. We use the standard
+  deviation of each distribution in Figure~\ref{fig:com_distribution} in order to
+  place points in our model systems. The standard deviations for all systems
+  are given in Table~\ref{table:com_sigmas}.  
+
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{xy_com_distribution.png}
+  \caption{}\label{fig:xy_com_distribution}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{z_com_distribution.png}
+  \caption{}\label{fig:z_com_distribution}
+  \end{subfigure}
+  \caption{}\label{fig:com_distribution}
+  \end{figure}
+
+  \begin{table}[!htb]
+  \centering
+  \begin{tabular}{c c c}
+  \toprule
+  System                         &   $\sigma_r$ ($\AA$) &   $\sigma_z$ ($\AA$) \\
+  \midrule
+  Sandwiched, Ordered            &      2.30            &     1.48             \\
+  Parallel Displaced, Ordered    &      2.28            &     1.45             \\
+  Sandwiched, Disordered         &      2.93            &     1.58             \\
+  Parallel Displaced, Disordered &      2.63            &     1.65             \\
+  \bottomrule
+  \end{tabular}
+  \caption{Thermal noise in each dimension of the center of mass of monomer
+  head groups for simulated LLC systems}\label{table:com_sigmas}
+  \end{table}
+
+  For a good structural comparison, we set up a model system that mimics the
+  ordered sandwiched configuration. We stacked scatterers 4.4 \AA apart and
+  created pores with a radius of 6.6 \AA in order to be consistent with the
+  values used to calculate the deviations in Table~\ref{table:com_sigmas}. We
+  created an initial configuration with noise in the placement of points based on
+  the values in Table~\ref{table:com_sigmas}. We made the scatterers correlated
+  in the z-direction with a correlation length equal to 20 \AA which is about
+  what we've measured in the simulations. Using the initial configuration, we
+  created 1000 frames to which we added thermal noise in accordance with that
+  measured and recorded in Table~\ref{table:simulation_noise}. The result is a
+  center-of-mass trajectory that is configured and behaves similarly to the
+  simulation trajectory. We can use that model to tune the various influences
+  on R-$\pi$.
+
+  The intensity of R-$\pi$ is strongly dependent on the initial configuration.
+  Each time a model system is generated, the initial configuration is different
+  than the previous model system. The thermal noise added does not compensate
+  for these differences. We ran 40 different model systems with the only 
+  difference being the initial randomization. The average R-$\pi$ intensity of the 
+  40 trials was 25.7 $\pm$ 9.4. This spread has important implications for the
+  reproducibility of our data since there is velocity randomization during the
+  initial equilibration. Also, this initial configuration dependence is not 
+  very useful for analyzing trends. 
+
+  We observe the same R-$\pi$ intensity when each frame of the trajectory is
+  randomized. We created a trajectory of 1000 frames. We set up each frame as
+  described in the paragraph before last, however with each frame independent. The
+  average R-$\pi$ intensity over 1000 frames was 25.4, in close agreement with
+  that calculated for the 40 trials of 100 dependent configurations in the
+  previous paragraph. We can use this type of setup to analyze trends.  
+
+  Allowing columns to displace further with respect to each other causes the
+  intensity of R-$\pi$ to decrease (Figure~\ref{fig:ld}). In all of the above
+  systems, we placed columns at exactly the same z displacement. Here we allowed
+  them to displace from their initial centers as a function of the fraction of
+  the distance between layers.
+
+  Qualitatively, we can make R-$\pi$ look the most like experiment when columns
+  move independently (See Figure~\ref{fig:rzplots}). As we decrease the
+  dependence between columns, the intensity of R-$\pi$ decreases and the
+  reflection spreads out in the $q_r$ direction. With any amount of dependence
+  between columns, R-$\pi$ sharpens at the center of the reflection. 
+
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth} 
+  \includegraphics[width=\textwidth]{rzplot_ld0.png}
+  \caption{}\label{fig:rzplot_ld0}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth} 
+  \includegraphics[width=\textwidth]{rzplot_ld33.png}
+  \caption{}\label{fig:rzplot_ld33}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth} 
+  \includegraphics[width=\textwidth]{rzplot_ld66.png}
+  \caption{}\label{fig:rzplot_ld66}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth} 
+  \includegraphics[width=\textwidth]{rzplot_ld1.png}
+  \caption{}\label{fig:rzplot_ld1}
+  \end{subfigure}
+  \caption{As we allow layers to move more independently, the intensity of
+  R-$\pi$ decreases and spreads out in the $q_r$ direction.}\label{fig:rzplots}
+  \end{figure}
+
+  Again, R-$\pi$ decreases in response to thermal noise (See 
+  Figure~\ref{fig:td}). We varied the amount of thermal noise from a 100 \%
+  decrease to a 100 \% increase in noise in each dimension.
+
+  An increased correlation length causes a modest, linear increase in the
+  intensity of R-$\pi$ (Figure~\ref{fig:cl}). The effect is not nearly as
+  pronounced as z-directional noise and column displacement.
+
+  As we increase the amount of noise in the initial, quenched disordered
+  configuration, the intensity of R-$\pi$ decreases (Figure~\ref{fig:IC}).  We
+  changed the amount of order in the initial configuration by scaling the noise
+  used during placement from -100 \% to 100 \%. We scaled noise in all three
+  dimensions, however we know that the maximum intensity of R-$\pi$ will only be
+  influenced by noise in the z direction.
+
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth} 
+  \includegraphics[width=\textwidth]{ld.png}
+  \caption{}\label{fig:ld}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth} 
+  \includegraphics[width=\textwidth]{td.png}
+  \caption{}\label{fig:td}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth} 
+  \includegraphics[width=\textwidth]{cl.png}
+  \caption{}\label{fig:cl}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth} 
+  \includegraphics[width=\textwidth]{IC.png}
+  \caption{}\label{fig:IC}
+  \end{subfigure}
+  \caption{(a) The intensity of R-$\pi$ decreases as the layers become more
+  independent. (b) The intensity of R-$\pi$ decreases when thermal disorder
+  decreases. (c) The intensity of R-$\pi$ increases with the correlation length.
+  (d) The intensity of R-$\pi$ decreases as more noise is added to the initial
+  configuration.}\label{fig:sim_comp}
+  \end{figure}
+
 
   \section{Conclusion}
   

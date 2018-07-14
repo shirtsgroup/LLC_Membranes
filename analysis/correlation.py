@@ -594,25 +594,25 @@ if __name__ == "__main__":
             # peaks = [10, 30, 58, 80, 100, 118, 138, 157]  # layered 300K disordered
             #peaks = [33, 82, 115, 148]  # offset 300K disordered
             # peaks = [32, 82, 133]  # disorder offset
-            print(peaks)
+            #print(peaks)
             # if len(peaks) > 4:
             #     peaks = peaks[:4]
-            peaks = np.array(peaks)
-            plt.scatter(centers_z[peaks + 1], zdf_full[peaks], marker='+', c='r', s=200, label='Peak locations')
+            #peaks = np.array(peaks)
+            #plt.scatter(centers_z[peaks + 1], zdf_full[peaks], marker='+', c='r', s=200, label='Peak locations')
 
-            period = 0.438
-            p = np.array([2, 10])  # initial guess at parameters
-            bounds = ([0, 0], [np.inf, np.inf])
-            solp, cov_x = curve_fit(exponential_decay, centers_z[peaks], zdf_full[peaks], p, bounds=bounds)
+            #period = 0.438
+            #p = np.array([2, 10])  # initial guess at parameters
+            #bounds = ([0, 0], [np.inf, np.inf])
+            #solp, cov_x = curve_fit(exponential_decay, centers_z[peaks], zdf_full[peaks], p, bounds=bounds)
 
             # plt.plot(centers1[start:], 1 + solp[0]*np.exp(-centers1[start:]/solp[1]))
 
-            plt.plot(centers_z[start:end], exponential_decay(np.array(centers_z[start:end]), solp[0], solp[1]), '--',
-                     color='black', label='Least squares fit')
-            print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*solp[1], 10*np.sqrt(cov_x[1, 1])))
+            #plt.plot(centers_z[start:end], exponential_decay(np.array(centers_z[start:end]), solp[0], solp[1]), '--',
+             #        color='black', label='Least squares fit')
+            #print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*solp[1], 10*np.sqrt(cov_x[1, 1])))
 
-            p = [2.5, 0.4, np.pi, 0.5]  # amplitude, period, phase shift, correlation length. Pick values above what is expected
-            bounds = ([0, 0.4, 0, 0.4], [np.inf, 0.6, np.inf, np.inf])  # bounds on fit parameters
+            #p = [2.5, 0.4, np.pi, 0.5]  # amplitude, period, phase shift, correlation length. Pick values above what is expected
+            #bounds = ([0, 0.4, 0, 0.4], [np.inf, 0.6, np.inf, np.inf])  # bounds on fit parameters
             #
             # solp, pcov = curve_fit(sinusoidal_decay, centers_z[start:end], zdf_full[(start - 1):(end-1)], p, bounds=bounds)
             # print(solp)
