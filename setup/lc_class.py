@@ -2,6 +2,7 @@
 
 import os
 from LLC_Membranes.analysis import Atom_props
+import mdtraj as md
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -33,6 +34,11 @@ class LC(object):
         with open('%s/../top/topologies/%s' % (location, name)) as f:
             for line in f:
                 a.append(line)
+
+        t = md.load("%s/../top/topologies/%s" % (location, name))
+        self.LC_positions = t.xyz[0, :, :]
+        self.LC_names = [a.name for a in t.topology.atoms]
+        self.LC_residues = [a.residue.name for a in t.topology.atoms]
 
         self.full = a
         P = []

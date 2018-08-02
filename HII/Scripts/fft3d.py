@@ -668,7 +668,7 @@ if __name__ == "__main__":
             alkane_intensity = normalize_alkanes(rfin, zfin[0], averaged, 2.2, 2.5, 120)
             alkane_intensity = 0.279778355183
             averaged /= alkane_intensity
-            MAX = 3.1
+            MAX = 5
             xlim = 2.5
             zlim = 2.5
         else:
@@ -692,6 +692,8 @@ if __name__ == "__main__":
 
         rfin *= 2*np.pi / 10
         zfin[0] *= 2*np.pi / 10
+
+        print('Average R-pi intensity: %.2f' % np.amax(averaged[rfin.size // 2, (zfin[0].size // 2) + 1:]))
         plt.figure()
         plt.plot(zfin[0], averaged[rfin.size // 2, :])
         plt.figure()

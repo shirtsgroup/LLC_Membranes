@@ -53,6 +53,8 @@ def initialize():
     parser.add_argument('-npores', default=2, type=int, help='Number of pores in each dimension, similar to ncol')
     parser.add_argument('-thermal_disorder', default=[0, 0, 0], nargs='+', type=float, help='Degree of thermal noise in' 
                         ' each dimension expressed as a fraction of the distance between layers.')
+    parser.add_argument('-sr', '--shift_range', type=float, default=0, help='Amount columns are allowed to displace'
+                                                                            'relative to each other.')
 
     # The following are meant for custom trajectories but are not implemented. See fft3d.py for their implementation
     parser.add_argument('-l', '--layers', default=20, type=int, help='Number of layers in z direction (int)')
@@ -261,7 +263,8 @@ class Trajectory(object):
         self.theta = cell_theta * np.pi / 180.0  # theta for monoclinic unit cell
         self.unit_cell = np.array([[1, 0, 0], [np.cos(self.theta), np.sin(self.theta), 0], [0, 0, 1]])
 
-    def hexagonal_column_grid(self, npores, ncol_per_pore, r, npoints, frames=1, noise=True, thermal_disorder=[0, 0, 0]):
+    def hexagonal_column_grid(self, npores, ncol_per_pore, r, npoints, frames=1, noise=True, thermal_disorder=[0, 0, 0],
+                              shift_range=0):
 
         self.nframes = frames
         self.locations = np.zeros([self.nframes, npores ** 2 * npoints * ncol_per_pore, 3])
@@ -284,27 +287,27 @@ class Trajectory(object):
         column = np.linspace(0, z_separation * (npoints - 1), npoints)
 
         # For adding noise to quenched disordered configuration
-        # columns = np.zeros([npores**2*ncol_per_pore, column.size])
-        # xy_noise = np.zeros([npores**2*ncol_per_pore, column.size, 2])
-        # shifts = np.zeros([npores**2*ncol_per_pore])
-        # shift_range = 0  # fraction of layer to allow random displacement
-        # thetas = np.random.uniform(0, 2*np.pi, size=npores**2)  # randomly rotate each pore about the z-axis
-        # for i in range(npores**2*ncol_per_pore):
-        #     columns[i, :] = z_correlation(column, 20, v=1.2)
-        #     xy_noise[i, :, :] = np.random.normal(scale=2.3, size=(column.size, 2))
-        #     shifts[i] = shift_range * (z_separation / 2) * np.random.uniform(-1, 1)  # shift column by a random amount
+        columns = np.zeros([npores**2*ncol_per_pore, column.size])
+        xy_noise = np.zeros([npores**2*ncol_per_pore, column.size, 2])
+        shifts = np.zeros([npores**2*ncol_per_pore])
+        shift_range = 0  # fraction of layer to allow random displacement
+        thetas = np.random.uniform(0, 2*np.pi, size=npores**2)  # randomly rotate each pore about the z-axis
+        for i in range(npores**2*ncol_per_pore):
+            columns[i, :] = z_correlation(column, 10, v=1.2)
+            xy_noise[i, :, :] = np.random.normal(scale=2.3, size=(column.size, 2))
+            shifts[i] = shift_range * (z_separation / 2) * np.random.uniform(-1, 1)  # shift column by a random amount
 
         print('z-spacing: %.2f' % z_separation)
         print('Pore center spacing: %.2f' % dx)
 
-        #thetas = np.random.uniform(0, 2*np.pi, size=npores**2)  # randomly rotate each pore about the z-axis
+        thetas = np.random.uniform(0, 2*np.pi, size=npores**2)  # randomly rotate each pore about the z-axis
 
         for t in range(self.nframes):
             for c in range(npores**2):
                 # for each column, choose a random point on the circle with radius, r, centered at the pore center
                 # place a column on that point. Equally space remaining columns on circle with reference to that point
                 start_theta = np.random.uniform(0, 360) * (np.pi / 180)  # random angle
-                # start_theta = thetas[c]
+                start_theta = thetas[c]
                 # start_theta = 0
                 theta = 2 * np.pi / ncol_per_pore  # angle between columns
                 for a in range(ncol_per_pore):
@@ -314,7 +317,6 @@ class Trajectory(object):
                     end = ncol_per_pore * c * npoints + (a + 1) * npoints
                     self.locations[t, start:end, :2] = xy_pore_centers[c, :] + [x, y]
                     if noise:
-                        shift_range = .66  # fraction of layer to allow random displacements
                         shift = shift_range * (z_separation / 2) * np.random.uniform(-1, 1)  # shift column by a random amount
                     else:
                         shift = 0
@@ -324,13 +326,13 @@ class Trajectory(object):
                     z_disorder = z_separation*np.random.normal(scale=thermal_disorder[2], size=(end - start))
 
                     disorder = np.vstack((x_disorder, y_disorder, z_disorder)).T
-                    self.locations[t, start:end, 2] = z_correlation(column, 20, v=1.2) + shift
-                    self.locations[t, start:end, :2] += np.random.normal(scale=2.3, size=(column.size, 2))
+                    # self.locations[t, start:end, 2] = z_correlation(column, 10, v=1.2) + shift
+                    # self.locations[t, start:end, :2] += np.random.normal(scale=2.3, size=(column.size, 2))
                     # self.locations[t, start:end, 2] = column + shift
 
                     # for noise about initial configuration
-                    # self.locations[t, start:end, 2] = columns[c*ncol_per_pore + a] + shifts[c*ncol_per_pore + a]
-                    # self.locations[t, start:end, :2] += xy_noise[c*ncol_per_pore + a, ...]
+                    self.locations[t, start:end, 2] = columns[c*ncol_per_pore + a] + shifts[c*ncol_per_pore + a]
+                    self.locations[t, start:end, :2] += xy_noise[c*ncol_per_pore + a, ...]
 
                     self.locations[t, start:end, :] += disorder
 
@@ -590,10 +592,11 @@ class Trajectory(object):
         if plot:
             fig, ax = plt.subplots()
             MIN = np.amin(self.angle_averaged)
-            MAX = np.amax(self.angle_averaged)*.5
+            MAX = np.amax(self.angle_averaged)*.25
             lvls = np.linspace(MIN, MAX, 200)
-            ax.contourf(self.r_angle_averaged, self.z_angle_averaged, self.angle_averaged.T, levels=lvls, cmap='jet',
+            heatmap = ax.contourf(self.r_angle_averaged, self.z_angle_averaged, self.angle_averaged.T, levels=lvls, cmap='jet',
                             extend='max')
+            plt.colorbar(heatmap)
             plt.xlabel('$q_r (\AA^{-1})$')
             plt.ylabel('$q_z (\AA^{-1})$')
 
@@ -632,7 +635,8 @@ if __name__ == "__main__":
 
             t.set_up_hexagonal(args.cell_theta)
             t.hexagonal_column_grid(args.npores, args.ncol_per_pore, args.pore_radius, int(float(args.box[2]) / dbwl),
-                                    frames=args.nframes, noise=args.nonoise, thermal_disorder=thermal_disorder)
+                                    frames=args.nframes, noise=args.nonoise, thermal_disorder=thermal_disorder,
+                                    shift_range=args.shift_range)
             t.atomic_form_factor = np.ones(t.locations.shape[1])
         else:
 
@@ -662,7 +666,7 @@ if __name__ == "__main__":
     print('R-pi intensity: %.2f' % np.amax(t.slice[(rpi_index - 1): (rpi_index + 1)]))
 
     # fit lorentzian to R-pi
-    t.plot_sf_slice('y', [0, 1.7], show=False)
+    t.plot_sf_slice('y', [0, 2*np.pi / dbwl], show=False)
 
     #np.savez_compressed('perfect_100pores.npz', freq_y=t.freq_y, slice=t.slice)
 
@@ -674,29 +678,30 @@ if __name__ == "__main__":
     # peaks = find_peaks(t.freq_y[lower:upper], t.sf[np.argmin(np.abs(t.freq_x)), lower:upper, rpi_index], tol=5)
     # peaks += lower
     #
-    # #peaks = np.linspace(0, t.freq_y.size - 1, t.freq_y.size, dtype=int)  # for disordered columns
+    peaks = np.linspace(0, t.freq_y.size - 1, t.freq_y.size, dtype=int)  # for disordered columns
     #
     # plt.scatter(t.freq_y[peaks], t.sf[np.argmin(np.abs(t.freq_x)), peaks, rpi_index])
     #
-    # # Lorentzian fit (not as good as gaussian)
-    # # p = np.array([0.1, 0, t.locations.shape[1]])
-    # # solp_lorentz, cov_x = curve_fit(lorentz, t.freq_y[peaks], t.sf[np.argmin(np.abs(t.freq_x)), peaks, rpi_index], p,
-    # #                         bounds=[[0, -np.inf, 0], [np.inf, np.inf, np.inf]])
-    # #
-    # # plt.plot(t.freq_y, lorentz(t.freq_y, solp_lorentz[0], solp_lorentz[1], solp_lorentz[2]), '--', color='red',
-    # #          label='Lorentzian', linewidth=2)
-    # #
-    # # print("Lorentzian FWHM = %.2f A^-1" % solp_lorentz[0])
+    #Lorentzian fit (not as good as gaussian)
+    # p = np.array([0.1, 0, t.locations.shape[1]])
+    # solp_lorentz, cov_x = curve_fit(lorentz, t.freq_y[peaks], t.sf[np.argmin(np.abs(t.freq_x)), peaks, rpi_index], p,
+    #                         bounds=[[0, -np.inf, 0], [np.inf, np.inf, np.inf]])
     #
-    # p = np.array([0, 0.3, t.locations.shape[1], 1])
-    # solp, cov_x = curve_fit(gaussian, t.freq_y[peaks], t.sf[np.argmin(np.abs(t.freq_x)), peaks, rpi_index], p,
-    #                         bounds=([-np.inf, 0, 0, 0], [np.inf, np.inf, np.inf, np.inf]))
+    # plt.plot(t.freq_y, lorentz(t.freq_y, solp_lorentz[0], solp_lorentz[1], solp_lorentz[2]), '--', color='red',
+    #          label='Lorentzian', linewidth=2)
     #
-    # plt.plot(t.freq_y, gaussian(t.freq_y, solp[0], solp[1], solp[2], solp[3]), '--', color='green', label='Gaussian',
-    #          linewidth=2)
-    #
-    # print("Gaussian FWHM = %.3f +/- %.3f A^-1" % (2*np.sqrt(2*np.log(2))*solp[1],
-    #                                        2 * np.sqrt(2 * np.log(2)) * cov_x[1, 1] ** 0.5))
+    # print("Lorentzian FWHM = %.2f A^-1" % solp_lorentz[0])
+
+    p = np.array([0, 0.3, t.locations.shape[1], 1])
+    solp, cov_x = curve_fit(gaussian, t.freq_y[peaks], t.sf[np.argmin(np.abs(t.freq_x)), peaks, rpi_index], p,
+                            bounds=([-np.inf, 0, 0, 0], [np.inf, np.inf, np.inf, np.inf]))
+
+    plt.plot(t.freq_y, gaussian(t.freq_y, solp[0], solp[1], solp[2], solp[3]), '--', color='green', label='Gaussian',
+             linewidth=2)
+
+    print("Gaussian FWHM = %.3f +/- %.3f A^-1" % (2*np.sqrt(2*np.log(2))*solp[1],
+                                           2 * np.sqrt(2 * np.log(2)) * cov_x[1, 1] ** 0.5))
+
     plt.legend()
     plt.xlabel('$q_y (\AA^{-1}$)')
     plt.ylabel('Intensity')

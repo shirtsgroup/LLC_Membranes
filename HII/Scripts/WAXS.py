@@ -331,6 +331,7 @@ factor = 3.1
 colorbar = 'jet'
 levels = np.linspace(0, factor, 200)
 waxs /= avg_intensity
+#waxs /= waxs[0, 0]
 
 MIN = waxs[-1, -1]
 MIN = 0.4
@@ -483,10 +484,9 @@ while Y[R_double_top] < 0:  # The bottom part of the plot is noisier (change 0 t
 # exit()
 
 # plot maximum intensity of each z-slice
-plt.plot(np.linspace(-100, 99, 200), np.amax(waxs[:, waxs.shape[0]//2 - 100:waxs.shape[0]//2 + 100], axis=0))
+#plt.plot(np.linspace(-100, 99, 200), np.amax(waxs[:, waxs.shape[0]//2 - 100:waxs.shape[0]//2 + 100], axis=0))
 # plt.plot(np.linspace(-10, 9, 20), np.amax(waxs[R_double_bottom:R_double_top,
 #                                           waxs.shape[0]//2 - 10:waxs.shape[0]//2 + 10], axis=0))
-plt.show()
 
 # R-pi / R-double intensity measurement illustration
 # fig = plt.figure()
@@ -505,20 +505,57 @@ plt.show()
 # plt.savefig('rpi_rdouble.pdf')
 # plt.show()
 
+from scipy.optimize import curve_fit
+
+def gaussian(points, mean, sigma, amplitude, yshift):
+
+    return yshift + (amplitude / np.sqrt(2*np.pi*sigma**2)) * np.exp(-(points - mean)**2/(2*sigma**2))
+
+def lorentz(points, a, b, c):
+    """
+    :param p: lorentzian parameters : [full width half max (FWHM), position of maximum, maximum heigth]
+    :param p: position
+    :return:
+    """
+
+    w = a / 2
+
+    x = (b - points) / w
+
+    return (c / (np.pi*w)) / (1 + x ** 2)
+
+
+p = [0, 0.3, 2.5, 0]
+solp_gaussian, cov_x_gaussian = curve_fit(gaussian, X, waxs[np.argmax(waxs[:, waxs.shape[0]//2])], p)
+p = np.array([0.1, 0, 1])
+solp_lorentz, cov_x_lorentz = curve_fit(lorentz, X, waxs[np.argmax(waxs[:, waxs.shape[0]//2])], p)
+
+plt.plot(X, waxs[np.argmax(waxs[:, waxs.shape[0]//2])], linewidth=2)
+plt.plot(X, gaussian(X, solp_gaussian[0], solp_gaussian[1], solp_gaussian[2], solp_gaussian[3]), label='Gaussian Fit', linewidth=2)
+plt.plot(X, lorentz(X, solp_lorentz[0], solp_lorentz[1], solp_lorentz[2]), label='Lorentzian Fit', linewidth=2)
+plt.xlabel('$q_r  (\AA^{-1}$)', fontsize=14)
+plt.ylabel('Intensity', fontsize=14)
+
+print("Lorentzian FWHM = %.2f A^-1" % solp_lorentz[0])
+print("Gaussian FWHM = %.3f +/- %.3f A^-1" % (2*np.sqrt(2*np.log(2))*solp_gaussian[1],
+                                       2 * np.sqrt(2 * np.log(2)) * cov_x_gaussian[1, 1] ** 0.5))
+plt.legend()
+plt.tight_layout()
+
 
 zsection = waxs[:, waxs.shape[0]//2]
 plt.plot(Y, zsection)
-plt.show()
 np.savez_compressed('z_section.npz', x=Y, y=zsection)
-exit()
+
 # print('Average R-pi intensity: %.2f' % np.mean(np.amax(waxs[:, waxs.shape[0]//2 - 10:waxs.shape[0]//2 + 10], axis=0)))
 # print('Average R-double intensity: %.2f' % np.mean(np.amax(waxs[R_double_bottom:R_double_top,
 #                                                            waxs.shape[0]//2 - 10:waxs.shape[0]//2 + 10], axis=0)))
 # print('Average R-spots intensity : %.2f' % Rspots(X, Y, waxs, theta=50, theta_sigma=(3, 2), bounds=(1.3, 1.45)))
 # exit()
 fig, ax = plt.subplots()
-#heatmap = plt.contourf(X, Y, waxs, cmap=colorbar, levels=levels)#, extend='max')
-heatmap = plt.contourf(X, Y, np.log10(waxs), levels=levels_log, cmap='jet', extend='min')
+heatmap = plt.contourf(X, Y, waxs, cmap=colorbar, levels=levels)#, extend='max')
+#heatmap = plt.contourf(X, Y, np.log10(waxs), levels=levels, cmap='jet', extend='min')
+plt.plot(np.linspace(-qmax, qmax, 100), np.ones([100])*1.65, '--', color='black')
 # cid = fig.canvas.mpl_connect('button_press_event', onclick)
 cbar = plt.colorbar(format='%.2f')
 plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=18)
@@ -538,7 +575,7 @@ plt.gcf().get_axes()[0].tick_params(labelsize=14)
 plt.xlabel('$q_r\ (\AA^{-1})$', fontsize=14)
 plt.ylabel('$q_z\ (\AA^{-1})$', fontsize=14)
 plt.tight_layout()
-plt.savefig('waxs_dashed.png')
+#plt.savefig('waxs_dashed.png')
 plt.show()
 exit()
 size = 12
