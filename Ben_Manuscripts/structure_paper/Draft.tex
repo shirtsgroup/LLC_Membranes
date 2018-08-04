@@ -1615,22 +1615,30 @@ liquid crystal membranes}
   % is probably less exagerated. 
   % BJC8: that said, if we go with just focusing on parallel displaced, then I can move the R-double section
   % up before this one.
+  % MRS9: I think we should start with larger differences rather than smaller, and arguably the greater intensity of R-pi is 
+  % a bigger difference.  So it's OK ti put R-double after -- (and it could be that sliding sandwiched columns could still give water h-bonding, since they have carboxyl groups that are on average closer together than sandwiched layered ones).
   R-$\pi$ is more intense relative to the experimental system. In this section, we use the parallel displaced
-  configuration in the ordered basin as an example, however all systems display this behavior.
+  configuration in the ordered basin as an example, however 
+%MRS9: should be a little more clear why you mean by ``all systems''.  In some sense the problem is more that the best explanation might be unaligned columns, which is easier with sandwiched, which are 15 times as much.  So here it would make more sense to focus on both types of columns, so you can explain how unaligned (sliding) columns also have a mechanism for reduction.  Note that I don't think the columns have to be dynamically sliding (Which would be hard with all the tails entangled) but can be just off-register statically.
+all systems display this behavior.
   %since it is the most experimentally consistent system we've studied so far. 
   The intensity of R-$\pi$ in the ordered parallel displaced system is approximately 3 times
   larger than experiment (Table~\ref{table:relative_inensities_300K}). 
   
   The full width at half maximums (FWHM) of the $q_r$ and $q_z$ cross-sections of R-$\pi$ 
   are in moderate agreement with experiment (Figure~\ref{fig:rpi_exp_comparison}). Each FWHM
-  is larger than experiment. Note that the experimental data is best fit with a Lorentzian 
+  is larger than experiment. 
+  %MRS9: state how much larger they are than experiment in the sentence before - big difference beween 30% bigger and 300% bigger.
+Note that the experimental data is best fit with a Lorentzian 
   function while the simulated patterns are best fit using a Gaussian function. The experimental
   pattern also has additional sources of broadening which, if deconvoluted, would increase the discrepancy with
   simulation.
+  %MRS9: State explicitly in what way the discrepancy would increase, i.e. experimental FWHM are broadened by other source (doppler pressure, insttrument broadening) that do no affect the simulated spectra, the experimental spectra may be even narrower than spectra generated from simulations are.  
+  %MRS9: one question, do any of the approximations used in the simulation actually lead to broadening that would not be in experiment (gaussian scatterers, etc.  Also, (semi-related) do Gaussian scatters lead to Gaussian peaks? Fourier transforms of Gaussians are Gaussians) 
   % BJC8: Can add more detail about different types of broadening - instrument / finite resolution broadening (for
   % experimental case), doppler (gaussian shaped) and pressure broadening (Lorentzian shaped)
   % See: https://www.nist.gov/pml/atomic-spectroscopy-compendium-basic-ideas-notation-data-and-formulas/atomic-spectroscopy-7
-  
+  %MRS 9: it is a little problematic to use two different types of fit, as the FWHM is a little different for each of then. Would lead to slight discrepancies from that.  FWHM is a natural scale parameter for Lorenzians, but not really for Gaussian.  
   \begin{figure}
   \centering
   \begin{subfigure}{0.45\textwidth}
@@ -1649,7 +1657,11 @@ liquid crystal membranes}
   \includegraphics[width=\textwidth]{sim_rsection_fit.png}
   \caption{FWHM = 0.962 $\pm$ 0.010 $\AA^{-1}$}\label{fig:sim_rsection_fit}
   \end{subfigure}
-  \caption{(a) Experimentally, R-$\pi$ broadens in the $q_z$ direction with a FWHM of 0.110 $\pm$ 0.003 $\AA^{-1}$ when
+  \caption{
+   %MRS9: suggest something like this to make crystal clear A and B are from the experiments.
+  In experiments ((a) and (b)), 
+%Experimentally,  (a) 
+  (a), R-$\pi$ broadens in the $q_z$ direction with a FWHM of 0.110 $\pm$ 0.003 $\AA^{-1}$ when
   fit with a Lorentzian function. (b) R-$\pi$ broadens in the $q_r$ direction with a FWHM of 0.792 
   $\pm$ 0.009 $\AA^{-1}$ when fit with a Lorentzian function. (c) In our simulations, the FWHM of R-$\pi$ in
   the $q_z$ direction is 0.194 $\pm$ 0.013 $\AA^{-1}$ when fit with a Gaussian function, nearly twice the width
@@ -1658,26 +1670,34 @@ liquid crystal membranes}
   in the fit.}\label{fig:rpi_exp_comparison}
   \end{figure}
   
-  Here we present our understanding of what factors influence the intensity of R-$\pi$ 
-  as well its FWHM in the $q_z$ and $q_r$ directions. We have identified a number of 
-  potential contributions which can be modified in our model by adjusting the simulation
-  conditions, forcefield or initial configuration. We assessed each using a simplified 
+%MRS9: Could be stronger thesis.  Suggest
+We have identified a number of potential ways that simulations conditions, forcefield and initial configurations could affect the intensity of R-$\pi$ as well its FWHM in the $q_z$ and $q_r$ directions
+%Here we present our understanding of what factors influence the intensity of R-$\pi$ 
+%  as well its FWHM in the $q_z$ and $q_r$ directions. We have identified a number of 
+%  potential contributions which can be modified in our model by adjusting the simulation
+%  conditions, forcefield or initial configuration. 
+We assessed each using a simplified 
   model. Our simplified model represents each monomer head group as a single point and
   places them in either a parallel displaced or sandwiched configuration. We apply 
   various transformations in order to study its simulated diffraction pattern. 
-  
+  %MRS9: probably best to focus on the variables that we think could cause a problem (i.e. hypotheses to test) first, then talk about how the experiments tested these hypotheses.
   As a baseline, we created a simplified model using the same amount of disorder present
   in our atomistic simulations. There are two sources of disorder to consider: thermal motion of
   atoms and quenched disorder which is created by rapid structural rearrangement during
   early equilibration and is locked into place for the remainder of the simulation time. The
   latter has important implications for the reproducibility of this work since velocity
   randomization at the beginning of equilibration will result in different quenched 
-  configurations. We measured thermal disorder by measuring the standard deviation in
+  configurations. 
+  %MRS9: could be that initial starting configurations would ALSO give rise to different quenched configurations.
+We measured thermal disorder by measuring the standard deviation in
   the distribution of head group center of mass positions from their average positions.
   We measured quenched disorder by calculating the standard deviation of the distribution 
-  of head group center of masses from their ideal positions. In the z-direction, we measured
+  of head group center of masses from their 
+%ideal positions. 
+idealized average positions.
+In the $z$-direction, we measured
   the deviation of the head group center of masses from an equally spaced column of head groups.
-  In the xy plane, we calculated the deviation in radial position from the pore center and 
+  In the $xy$ plane, we calculated the deviation in radial position from the pore center and 
   the angular deviation from equally spaced points surrounding the pore center. The values
   measured for each system are given in Table~\ref{table:quenched_disorder}. We built a simple
   system consisting of 1000 independent configurations using these parameters. We also made
@@ -1698,14 +1718,16 @@ liquid crystal membranes}
   Disordered Parallel Displaced &        1.65        &     0.43              &     2.63           \\
   \bottomrule
   \end{tabular}
-  \caption{We measured the deviation of the positions of the center of mass of head groups from
-  idealized positions so that we could incorporate the same disorder into our model system.}
+  %MRS9: tweaked
+  \caption{Deviation of the positions of the center of mass of head groups from
+  idealized positions to use as simulated disorder into our model system.}
   \label{table:quenched_disorder} 
   \end{table}
 
   %BJC8: Create parallel displaced configuration: create sandwiched system. Apply uniform rotation to every other layer
   %BJC8: I'd like to make the point somewhere that the real configuration is somewhere between sandwiched and the
   % parallel displaced configuration shown here.
+  %MRS9: better to say ``data is most consistent with the idea that the real configuration is somewhere between''
 %  There is no major difference between R-$\pi$ of a parallel displaced system and a 
 %  sandwiched system.
 %  \begin{itemize}
@@ -1713,6 +1735,7 @@ liquid crystal membranes}
 %  	\item 
 %  \begin{itemize}
   
+%MRS9: sorry, I keep reading ``no correlation'' as ``no collusion'' :)
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.3\textwidth}
@@ -1729,19 +1752,26 @@ liquid crystal membranes}
   \end{subfigure}   
   \caption{We generated X-ray diffraction patterns for simplified systems consisting of 
   points meant to represent monomer head groups. We added a similar amount of noise to 
-  that seen in our simulations. (a) We added Gaussian noise to each particle in the z, 
-  $\theta$ and r directions. The $q_y$ cross-section of R-$\pi$ contains three sharp
+  that seen in our simulations. (a) We added Gaussian noise to each particle in the $z$, 
+  $\theta$ and $r$ directions. The $q_y$ cross-section of R-$\pi$ contains three sharp
   peaks. (b) When we make points in each column correlated, the intensity of R-$\pi$ 
   increases but the sharp peaks remain with the same ratio of intensity between the
-  center and outer peaks. (c) Correlation between scatterers in the z-direction causes
+  center and outer peaks. (c) 
+  %MRS9: I'm not sure what you mean by ``correlation'' broadening peaks here.  Do you mean replacing exact periodicity by 
+  %correlated random points  Because that reduces correlation (from 100% to less than 100%).
+Correlation between scatterers in the $z$-direction causes
   R-$\pi$ to broaden in the $q_z$ direction.}\label{fig:sf_correlation}
+  %MRS9: in c, weird that the orange peaks are broader, but taller. Not sure I understand. 
   \end{figure}
   
   Scatterers in each column are correlated with each other. In the simplified 
   system described above, we added uncorrelated Gaussian noise in the 
   z-direction which ignores any interaction head groups might have with each
   other. To remedy this, we randomly sampled a multivariate normal distribution
-  with the same variance, v, implied by Table~\ref{table:quenched_disorder}. We 
+  with the same 
+  %variance, v, 
+  standard deviation, $\sigma$.
+  implied by Table~\ref{table:quenched_disorder}. We 
   defined the distribution using a covariance matrix such that the covariance
   in position, z, between scatterers decays exponentially from v according to the
   equation $ve^{-z/L}$, where L is the correlation length. Experimentally, the
@@ -1818,12 +1848,18 @@ liquid crystal membranes}
   Monomers in the ordered basin stack ca. 0.2 and 0.3 \AA~closer than those built in the 
   disordered basin in the sandwiched and parallel displaced configurations respectively. 
   The distance between stacked monomers is greater than experiment by 0.5--0.9 \AA~across all 
-  cases. This behavior is not surprising since GAFF models atoms as point charges and does not 
+  cases,
+  %MRS9: added
+  with disordered basins at the high part of that range 0.2 and 0.3 \AA~more distant.
+  %MRS9: GAFF could OVER predict pi-pi stacking, best to include citations here that it does indeed overpredict.
+This behavior is not surprising since GAFF models atoms as point charges and does not 
   appropriately model the aromatic $\pi-\pi$ interactions which would make it more energetically
-  favorable for the monomers to stack closer together. Additionally, it is possible that the 
+  favorable for the monomers to stack closer together. 
+Additionally, it is possible that the 
   tails prevent close stacking of monomer head groups and we do not achieve the timescales 
   necessary for them to rearrange into a necessarily more tightly packed configuration. Ordered
   basin systems are likely the best choice for transport studies. 
+%MRS9: make it clearer if the last sentence is a conclusion based on the other evidence in the paragraph.
   
   %We expect that when monomers stack closer together, steric clashes
   %force head groups to orient in a more ordered fashion. If head groups in our model stayed 3.7 \AA
@@ -1867,19 +1903,20 @@ liquid crystal membranes}
   	\item R-$\pi$ intensity decreases by up to 10x
   	\item Can put R-$\pi$ intensity vs. column independence in supporting info.
   	\item Predict level of independence in simulation (what amount of displacement cause the 
-  	R-$\pi$ profile to look like that shown in Figure 8d).
+  	R-$\pi$ profile to look like that shown in Figure 8d). %MRS9: this is a bit complicated, since it could be a combination of factors.
   	\item Figure: (a) x \% column displacement give Figure 8d (b) Independent columns give a smooth
-  	curve
+  	curve %MRS9: not quite sure what you are talking about in this figure.  Could you give more information?
   \end{itemize} 
   
   Increasing thermal noise in the x and y directions causes R-$\pi$ to sharpen in the 
-  $q_r$ direction.
+  $q_r$ direction. %MRS9: this is unanticiated (noise creating sharpening) so will have to make it clear.
   \begin{itemize}
     \item $q_r$ cross-section still too broad
     \item Adding more thermal noise sharpens it
     \item Figure: Overlay thinner FWHM plot on top of wider FWHM 
   \end{itemize}
   
+%MRS9: the statement below is pretty strong, need to back it up.  We know that we have quenched noise, which is a type of over-ordering - is that taken into account?  
   We have nearly the right amount of disorder / noise in our system, but correlation 
   between columns really messes up R-$\pi$.  
   
@@ -1919,7 +1956,10 @@ liquid crystal membranes}
 %  create the noise which would cause such behavior. See Section S-\ref{S-section:rpi_ft} of the
 %  supporting information for illustrative examples.
   
-  The system size does not significantly alter the intensity of R-$\pi$. We equilibrated a 
+  The system size 
+  %MRS9: added
+  in the $z$-direction.
+  does not significantly alter the intensity of R-$\pi$. We equilibrated a 
   sandwiched system with twice as many monomers per column so that the system size doubled in 
   the z-direction. The correlation length increases modestly from 4.5 $\pm$ 0.4 to 7.3 $\pm$ 1.2 \AA, 
   and the intensity of R-$\pi$ decreases from 44.0 to 39.4. Visually, the correlation functions
