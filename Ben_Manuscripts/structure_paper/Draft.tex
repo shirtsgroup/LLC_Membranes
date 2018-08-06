@@ -1617,22 +1617,23 @@ liquid crystal membranes}
   % up before this one.
   % MRS9: I think we should start with larger differences rather than smaller, and arguably the greater intensity of R-pi is 
   % a bigger difference.  So it's OK ti put R-double after -- (and it could be that sliding sandwiched columns could still give water h-bonding, since they have carboxyl groups that are on average closer together than sandwiched layered ones).
-  R-$\pi$ is more intense relative to the experimental system. In this section, we use the parallel displaced
-  configuration in the ordered basin as an example, however 
-%MRS9: should be a little more clear why you mean by ``all systems''.  In some sense the problem is more that the best explanation might be unaligned columns, which is easier with sandwiched, which are 15 times as much.  So here it would make more sense to focus on both types of columns, so you can explain how unaligned (sliding) columns also have a mechanism for reduction.  Note that I don't think the columns have to be dynamically sliding (Which would be hard with all the tails entangled) but can be just off-register statically.
-all systems display this behavior.
-  %since it is the most experimentally consistent system we've studied so far. 
-  The intensity of R-$\pi$ in the ordered parallel displaced system is approximately 3 times
-  larger than experiment (Table~\ref{table:relative_inensities_300K}). 
+  %BJC9: keeping above comments for reference
+  
+  R-$\pi$ is more intense relative to the experimental system. The difference in intensity
+  ranges from 3 times too high in the ordered parallel displaced system to 15 times too 
+  high in the ordered sandwiched configuration (Table~\ref{table:relative_inensities_300K}).
+%BJC9: keeping below comment for reference  
+%MRS9: should be a little more clear why you mean by ``all systems''. In some sense the problem is more that the best explanation might be unaligned columns, which is easier with sandwiched, which are 15 times as much. So here it would make more sense to focus on both types of columns, so you can explain how unaligned (sliding) columns also have a mechanism for reduction. Note that I don't think the columns have to be dynamically sliding (Which would be hard with all the tails entangled) but can be just off-register statically.
   
   The full width at half maximums (FWHM) of the $q_r$ and $q_z$ cross-sections of R-$\pi$ 
-  are in moderate agreement with experiment (Figure~\ref{fig:rpi_exp_comparison}). Each FWHM
-  is larger than experiment. 
-  %MRS9: state how much larger they are than experiment in the sentence before - big difference beween 30% bigger and 300% bigger.
-Note that the experimental data is best fit with a Lorentzian 
-  function while the simulated patterns are best fit using a Gaussian function. The experimental
-  pattern also has additional sources of broadening which, if deconvoluted, would increase the discrepancy with
-  simulation.
+  are in moderate agreement with experiment (Figure~\ref{fig:rpi_exp_comparison}). The
+  FWHM of the $q_z$ cross-section is 76 \% larger than experiment and the $q_r$ cross-section
+  FWHM is 21\% larger than experiment. Note that the experimental data is best fit with a Lorentzian 
+  function while the simulated patterns are best fit using a Gaussian function. The simulated
+  spectra do not incorporate the effects of pressure broadening and instrumental broadening
+  which would alter the peak shape. In the absence of these and other peak broadening effects,
+  the experimental peak would actually be narrower, further increasing the discrepancy with simulation.
+  
   %MRS9: State explicitly in what way the discrepancy would increase, i.e. experimental FWHM are broadened by other source (doppler pressure, insttrument broadening) that do no affect the simulated spectra, the experimental spectra may be even narrower than spectra generated from simulations are.  
   %MRS9: one question, do any of the approximations used in the simulation actually lead to broadening that would not be in experiment (gaussian scatterers, etc.  Also, (semi-related) do Gaussian scatters lead to Gaussian peaks? Fourier transforms of Gaussians are Gaussians) 
   % BJC8: Can add more detail about different types of broadening - instrument / finite resolution broadening (for
@@ -1658,69 +1659,62 @@ Note that the experimental data is best fit with a Lorentzian
   \caption{FWHM = 0.962 $\pm$ 0.010 $\AA^{-1}$}\label{fig:sim_rsection_fit}
   \end{subfigure}
   \caption{
-   %MRS9: suggest something like this to make crystal clear A and B are from the experiments.
-  In experiments ((a) and (b)), 
-%Experimentally,  (a) 
-  (a), R-$\pi$ broadens in the $q_z$ direction with a FWHM of 0.110 $\pm$ 0.003 $\AA^{-1}$ when
-  fit with a Lorentzian function. (b) R-$\pi$ broadens in the $q_r$ direction with a FWHM of 0.792 
-  $\pm$ 0.009 $\AA^{-1}$ when fit with a Lorentzian function. (c) In our simulations, the FWHM of R-$\pi$ in
+  In experiments ((a) and (b)), (a), R-$\pi$ broadens in the $q_z$ direction with a FWHM of 
+  0.110 $\pm$ 0.003 $\AA^{-1}$ when fit with a Lorentzian function. (b) R-$\pi$ broadens in the $q_r$ direction with a FWHM of 0.792 
+  $\pm$ 0.009 $\AA^{-1}$ when fit with a Lorentzian function. In our simulations ((c) and (d)), (c) the FWHM of R-$\pi$ in
   the $q_z$ direction is 0.194 $\pm$ 0.013 $\AA^{-1}$ when fit with a Gaussian function, nearly twice the width
   of experiment. (d) The simulated FWHM in the $q_r$ direction is 0.962 $\pm$ 0.01 $\AA^{-1}$ when fit with
   a Gaussian function, about 20 \% larger than experiment. Note that the large spike in the center is not included
   in the fit.}\label{fig:rpi_exp_comparison}
   \end{figure}
   
-%MRS9: Could be stronger thesis.  Suggest
-We have identified a number of potential ways that simulations conditions, forcefield and initial configurations could affect the intensity of R-$\pi$ as well its FWHM in the $q_z$ and $q_r$ directions
-%Here we present our understanding of what factors influence the intensity of R-$\pi$ 
-%  as well its FWHM in the $q_z$ and $q_r$ directions. We have identified a number of 
-%  potential contributions which can be modified in our model by adjusting the simulation
-%  conditions, forcefield or initial configuration. 
-We assessed each using a simplified 
-  model. Our simplified model represents each monomer head group as a single point and
-  places them in either a parallel displaced or sandwiched configuration. We apply 
-  various transformations in order to study its simulated diffraction pattern. 
+  %MRS9: Could be stronger thesis.  Suggest
+  We have identified a number of potential ways that simulation conditions, forcefield 
+  and initial configurations could affect the intensity of R-$\pi$ as well its FWHM in 
+  the $q_z$ and $q_r$ directions. We assessed each using a simplified model. Our 
+  simplified model represents each monomer head group as a single point and places them
+  in either a parallel displaced or sandwiched configuration. We chose to explore
+  the influence of thermal noise in each dimension, correlation between scatterers within
+  columns, as well as correlation between columns since these are the variables we 
+  believe have the largest influence on peak shape.
   %MRS9: probably best to focus on the variables that we think could cause a problem (i.e. hypotheses to test) first, then talk about how the experiments tested these hypotheses.
+  
   As a baseline, we created a simplified model using the same amount of disorder present
   in our atomistic simulations. There are two sources of disorder to consider: thermal motion of
   atoms and quenched disorder which is created by rapid structural rearrangement during
   early equilibration and is locked into place for the remainder of the simulation time. The
-  latter has important implications for the reproducibility of this work since velocity
-  randomization at the beginning of equilibration will result in different quenched 
-  configurations. 
-  %MRS9: could be that initial starting configurations would ALSO give rise to different quenched configurations.
-We measured thermal disorder by measuring the standard deviation in
-  the distribution of head group center of mass positions from their average positions.
-  We measured quenched disorder by calculating the standard deviation of the distribution 
-  of head group center of masses from their 
-%ideal positions. 
-idealized average positions.
-In the $z$-direction, we measured
-  the deviation of the head group center of masses from an equally spaced column of head groups.
-  In the $xy$ plane, we calculated the deviation in radial position from the pore center and 
-  the angular deviation from equally spaced points surrounding the pore center. The values
-  measured for each system are given in Table~\ref{table:quenched_disorder}. We built a simple
-  system consisting of 1000 independent configurations using these parameters. We also made
-  the simple system 4 times taller in order to get better resolution in the $q_z$ direction. 
-  Figure~\ref{fig:sf_qy_nocorrelation} shows the $q_y$ cross-section of R-$\pi$ generated by
-  simulating the structure factor of the trajectory.
+  latter has important implications for the reproducibility of this work since both initial
+  configurations and velocity randomization at the beginning of equilibration can lead to
+  different quenched configurations. We measured thermal disorder by measuring the standard 
+  deviation in the distribution of head group center of mass positions from their average 
+  positions. We measured quenched disorder by calculating the standard deviation of the 
+  distribution of head group center of masses from their idealized average positions. In the
+  $z$-direction, we measured the deviation of the head group center of masses from an equally
+  spaced column of head groups. In the $xy$ plane, we calculated the deviation in radial 
+  position from the pore center and the angular deviation from equally spaced points surrounding
+  the pore center. The values measured for each system are given in Table~\ref{table:quenched_disorder}.
+  Using these parameters, we built a trajectory consisting of 1000 independent configurations. 
+  We also made the simple system 4 times taller in order to get better resolution in the $q_z$ 
+  direction. Figure~\ref{fig:sf_qy_nocorrelation} shows the $q_y$ cross-section of R-$\pi$ 
+  generated by simulating the structure factor of the trajectory.
 
-  %BJC8: Need to add thermal noise to this table
   \begin{table}[h]
   \centering
-  \begin{tabular}{c|ccc}
+  \begin{tabular}{c|ccc|ccc}
   \toprule
-  System                        & $\sigma_z$ ($\AA$) & $\sigma_\theta$ (rad) & $\sigma_r$ ($\AA$) \\
+   		                        &           \multicolumn{3}{c}{Thermal Disorder}             &             \multicolumn{3}{c}{Quenched Disorder}               \\
   \midrule
-  Ordered Sandwiched            &        1.48        &     0.43              &     2.30           \\
-  Ordered Parallel Displaced    &        1.45        &     0.43              &     2.28           \\ 
-  Disordered Sandwiched         &        1.58        &     0.43              &     2.93           \\
-  Disordered Parallel Displaced &        1.65        &     0.43              &     2.63           \\
+  System                        & $\sigma_x$ ($\AA$) & $\sigma_y$ (rad) & $\sigma_z$ ($\AA$) & $\sigma_z$ ($\AA$) & $\sigma_\theta$ (rad) & $\sigma_r$ ($\AA$) \\
+  \midrule
+  Ordered Sandwiched            &         0.31       &       0.33       &        0.34        &        1.48        &     0.43              &     2.30           \\
+  Ordered Parallel Displaced    &         0.51       &       0.52       &        0.30        &        1.45        &     0.43              &     2.28           \\ 
+  Disordered Sandwiched         &         0.41       &       0.57       &        0.32        &        1.58        &     0.43              &     2.93           \\
+  Disordered Parallel Displaced &         0.39       &       0.31       &        0.33        &        1.65        &     0.43              &     2.63           \\
   \bottomrule
   \end{tabular}
-  %MRS9: tweaked
-  \caption{Deviation of the positions of the center of mass of head groups from
-  idealized positions to use as simulated disorder into our model system.}
+  \caption{Deviation of the positions of the center of mass of head groups from their average
+  positions (Thermal Disorder) as well as their idealized positions (Quenched Disorder) to use 
+  as simulated disorder into our model system.}
   \label{table:quenched_disorder} 
   \end{table}
 
@@ -1728,14 +1722,10 @@ In the $z$-direction, we measured
   %BJC8: I'd like to make the point somewhere that the real configuration is somewhere between sandwiched and the
   % parallel displaced configuration shown here.
   %MRS9: better to say ``data is most consistent with the idea that the real configuration is somewhere between''
-%  There is no major difference between R-$\pi$ of a parallel displaced system and a 
-%  sandwiched system.
-%  \begin{itemize}
-%  	\item Intensity does not change
-%  	\item 
-%  \begin{itemize}
   
 %MRS9: sorry, I keep reading ``no correlation'' as ``no collusion'' :)
+%BJC9: haha^
+%BJC9: I could probably get rid of qy cross-sections and inset in (c)
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.3\textwidth}
@@ -1761,18 +1751,20 @@ In the $z$-direction, we measured
   %correlated random points  Because that reduces correlation (from 100% to less than 100%).
 Correlation between scatterers in the $z$-direction causes
   R-$\pi$ to broaden in the $q_z$ direction.}\label{fig:sf_correlation}
-  %MRS9: in c, weird that the orange peaks are broader, but taller. Not sure I understand. 
+  % MRS9: in c, weird that the orange peaks are broader, but taller. Not sure I understand.
+  % BJC9: Good catch, not sure why I didn't question that. Was inputting square root of standard deviation 
+  % rather than square of standard deviation as variance, so there was less noise. Fixed now.
+  % BJC9: Heights are still slightly different after 1000 independent configurations
+  % BJC9: Shape is also different. Looks like the points are more evenly spaced in correlated
+  % system so there are less points at high and low q.
   \end{figure}
   
   Scatterers in each column are correlated with each other. In the simplified 
   system described above, we added uncorrelated Gaussian noise in the 
   z-direction which ignores any interaction head groups might have with each
   other. To remedy this, we randomly sampled a multivariate normal distribution
-  with the same 
-  %variance, v, 
-  standard deviation, $\sigma$.
-  implied by Table~\ref{table:quenched_disorder}. We 
-  defined the distribution using a covariance matrix such that the covariance
+  with the same standard deviation, $\sigma$ shown in by Table~\ref{table:quenched_disorder}. We 
+  defined the distribution using a covariance matrix such that the covariance, v,
   in position, z, between scatterers decays exponentially from v according to the
   equation $ve^{-z/L}$, where L is the correlation length. Experimentally, the
   correlation length can be estimated as the inverse of the FWHM of the $q_z$
@@ -1822,7 +1814,7 @@ Correlation between scatterers in the $z$-direction causes
   assume that its correlation is less than the vertical distance between monomers.}\label{fig:correlation}
   \end{figure}  
   
-    \begin{table}[h]
+  \begin{table}[h]
   \centering
   \begin{tabular}{cccc}
   \toprule
@@ -1848,18 +1840,17 @@ Correlation between scatterers in the $z$-direction causes
   Monomers in the ordered basin stack ca. 0.2 and 0.3 \AA~closer than those built in the 
   disordered basin in the sandwiched and parallel displaced configurations respectively. 
   The distance between stacked monomers is greater than experiment by 0.5--0.9 \AA~across all 
-  cases,
-  %MRS9: added
-  with disordered basins at the high part of that range 0.2 and 0.3 \AA~more distant.
+  cases, with disordered basins at the high part of that range, 0.2 and 0.3 \AA~more distant.
   %MRS9: GAFF could OVER predict pi-pi stacking, best to include citations here that it does indeed overpredict.
-This behavior is not surprising since GAFF models atoms as point charges and does not 
+  %BJC9: Turns out the Jankowski group was using oplsaa, not GAFF (they said GAFF to me). Will search for other
+  % references.
+  This behavior is not surprising since GAFF models atoms as point charges and does not 
   appropriately model the aromatic $\pi-\pi$ interactions which would make it more energetically
-  favorable for the monomers to stack closer together. 
-Additionally, it is possible that the 
+  favorable for the monomers to stack closer together. Additionally, it is possible that the 
   tails prevent close stacking of monomer head groups and we do not achieve the timescales 
-  necessary for them to rearrange into a necessarily more tightly packed configuration. Ordered
-  basin systems are likely the best choice for transport studies. 
-%MRS9: make it clearer if the last sentence is a conclusion based on the other evidence in the paragraph.
+  necessary for them to rearrange into a necessarily more tightly packed configuration. Since 
+  ordered basin systems pack closest together, they are likely the best choice for transport 
+  studies. 
   
   %We expect that when monomers stack closer together, steric clashes
   %force head groups to orient in a more ordered fashion. If head groups in our model stayed 3.7 \AA
@@ -1884,37 +1875,88 @@ Additionally, it is possible that the
   feasible if monomers stack 3.7 \AA~apart in a parallel displaced configuration, meaning the system
   would maintain a correlation length and R-$\pi$ intensity in relative agreement with experiment.
   
-  Increased thermal noise in the z-direction causes a drop in the intensity of R-$\pi$, however 
-  the $q_r$ profile remains unchanged. 
-  \begin{itemize}
-  	\item Show how I can decrease the intensity by a factor of 3-15 x by just increasing z-direction
-  	thermal noise
-  	\item Can put thermal noise vs. intensity in supporting info.
-  	\item The peaks are still sharp though
-  	\item 3 panel figure : regular intensity, 3x decrease, 15x decrease. Peak shapes all the same
-  \end{itemize}
+  Increased thermal noise in the $z$-direction causes a drop in the intensity of R-$\pi$, however 
+  the $q_r$ profile remains unchanged. When we increase the thermal noise in the $z$-direction by
+  11\% and 28\%, we see a 3 and 15 fold decrease in the intensity of R-$\pi$ respectively (Figure
+  ~\ref{fig:znoise}). Despite the decrease in intensity, the 3 cross-sections have the same shape,
+  whose sharp Bragg-like peaks are not consistent with experiment. The peaks are spaced apart
+  according to the pore spacing, and line up with R-alkanes. The center of mass of all columns in
+  our initial configuration are situated at the z coordinate. 
+  
+  % BJC9: could overlay these plots, but might look messy. Maybe there is a more compact representation
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.3\textwidth}
+  \includegraphics[width=\textwidth]{sf_qy_correlation.png}  %BJC9: z_variance = 2.074 angstroms
+  \caption{}\label{fig:sf_znoise_control}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+  \includegraphics[width=\textwidth]{sf_qy_3xdecrease.png}  %BJC9: z_variance = 2.55 angstroms
+  \caption{}\label{fig:3xdecrease}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+  \includegraphics[width=\textwidth]{sf_qy_15xdecrease.png}  %BJC9: z_variance = 3.4 angstroms
+  \caption{}\label{fig:15xdecrease}
+  \end{subfigure}
+  \caption{We can decrease the maximum intensity of R-$\pi$ by increasing thermal noise in the z-direction,
+  however the $q_r$ cross-section profile does not change. (a) The maximum intensity of R-$\pi$ is ca. 20 
+  when we use the same level of noise present in the atomistic simulation. (b) The intensity of R-$\pi$ 
+  decreases by a factor of 3, relative to the background intensity, if we increase thermal noise by 11\% 
+  in the $z$-direction. (c) The intensity of R-$\pi$ decreases by a factor of 15, relative to the background
+  intensity, when we increase thermal noise by 28\% in the $z$-direction.}\label{fig:znoise}
+  \end{figure}
   
   When we allow monomer columns to move independently in the z-direction, the intensity
   of R-$\pi$ drops and the $q_r$ cross-section of the simulated diffraction patterns 
-  smooths out.
-  \begin{itemize}
-  	\item Allowing columns to move independently smooths out the $q_r$ cross-section. Any amount
-  	of dependence results in sharp peaks.
-  	\item R-$\pi$ intensity decreases by up to 10x
-  	\item Can put R-$\pi$ intensity vs. column independence in supporting info.
-  	\item Predict level of independence in simulation (what amount of displacement cause the 
-  	R-$\pi$ profile to look like that shown in Figure 8d). %MRS9: this is a bit complicated, since it could be a combination of factors.
-  	\item Figure: (a) x \% column displacement give Figure 8d (b) Independent columns give a smooth
-  	curve %MRS9: not quite sure what you are talking about in this figure.  Could you give more information?
-  \end{itemize} 
+  smooths out. We created simple systems with varying amounts of association between columns. 
+  In the low limit, the center of mass of columns are situated at the same z coordinate. 
+  This is how all simple systems have been created up to this point. We allow increasing 
+  independence of columns by randomly shifting each column in the $z$-direction using a uniform
+  distribution bounded by (0, $f \times \mathit{d}_{equil}$) where $f$ is between 0 and 1. We
+  limit this discussion to configurations close to a sandwiched configuration since it is not
+  feasible for columns in the parallel displaced configuration, as we have set them up, to move
+  past each other. Allowing columns to move independently smooths out the $q_r$ cross-section
+  (Figure~\ref{fig:column_displacement}). Any amount of dependence results in sharp peaks. The
+  intensity of R-$\pi$ decreases with increasing column independence. We see an 8 fold decrease
+  in the intensity of R-$\pi$ when $f=1$ versus when $f=0$.
   
-  Increasing thermal noise in the x and y directions causes R-$\pi$ to sharpen in the 
-  $q_r$ direction. %MRS9: this is unanticiated (noise creating sharpening) so will have to make it clear.
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.3\textwidth}
+  \includegraphics[width=\textwidth]{sf_qy_sr0.png}
+  \caption{$f$ = 0}\label{fig:sf_qy_sr0}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+  \includegraphics[width=\textwidth]{sf_qy_sr75.png}
+  \caption{$f$ = 0.75}\label{fig:sf_qy_sr75}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+  \includegraphics[width=\textwidth]{sf_qy_sr100.png}
+  \caption{$f$ = 1}\label{fig:sf_qy_sr100}
+  \end{subfigure}
+  \caption{As we increase column independence using the $f$ parameter, the intensity of R-$\pi$
+  decreases and the $q_r$ cross-section of the simulated diffraction pattern becomes more smooth.
+  (a) When we place all columns at the same z coordinate, $f$ = 0, the intensity of R-$\pi$ is
+  18.3 and is characterized by sharp Bragg-like peaks. (b) When columns have a moderate amount of
+  independence, $f$ = 0.75, the intensity of R-$\pi$ decreases 5-fold to 3.7. The edges of the
+  peak are beginning to smooth out, but sharp peaks still exist. (c) When columns are completely
+  independent, $f$ = 1, the intensity of R-$\pi$ decreases 8-fold to 2.3 and the cross-section is
+  relatively smooth.}\label{fig:column_displacement}
+  \end{figure}
+  
+  Increasing thermal noise in the $xy$ plane causes the FWHM of the $q_r$ cross-section of R-$\pi$
+  to decrease.
   \begin{itemize}
     \item $q_r$ cross-section still too broad
     \item Adding more thermal noise sharpens it
     \item Figure: Overlay thinner FWHM plot on top of wider FWHM 
   \end{itemize}
+  
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{qy_fwhm.png}
+  \caption{}\label{fig:qy_fwhm}
+  \end{figure}
   
 %MRS9: the statement below is pretty strong, need to back it up.  We know that we have quenched noise, which is a type of over-ordering - is that taken into account?  
   We have nearly the right amount of disorder / noise in our system, but correlation 
@@ -1956,10 +1998,7 @@ Additionally, it is possible that the
 %  create the noise which would cause such behavior. See Section S-\ref{S-section:rpi_ft} of the
 %  supporting information for illustrative examples.
   
-  The system size 
-  %MRS9: added
-  in the $z$-direction.
-  does not significantly alter the intensity of R-$\pi$. We equilibrated a 
+  The system size in the $z$-direction does not significantly alter the intensity of R-$\pi$. We equilibrated a 
   sandwiched system with twice as many monomers per column so that the system size doubled in 
   the z-direction. The correlation length increases modestly from 4.5 $\pm$ 0.4 to 7.3 $\pm$ 1.2 \AA, 
   and the intensity of R-$\pi$ decreases from 44.0 to 39.4. Visually, the correlation functions

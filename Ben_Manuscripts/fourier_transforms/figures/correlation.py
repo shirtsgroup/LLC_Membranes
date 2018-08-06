@@ -23,7 +23,7 @@ fig = plt.figure()
 ax = fig.add_subplot(1, 1, 1)
 ax.plot(no_correlation['freq_z'], no_correlation['slice'], label='No Correlation', linewidth=2)
 ax.plot(correlation['freq_z'], correlation['slice'], label='Correlation', linewidth=2)
-left, bottom, width, height = [0.38, 0.4, 0.35, 0.35]
+left, bottom, width, height = [0.39, 0.4, 0.35, 0.35]
 ax2 = fig.add_axes([left, bottom, width, height])
 ax2.plot(no_correlation['freq_z'], no_correlation['slice'], label='No Correlation', linewidth=2)
 ax2.plot(correlation['freq_z'], correlation['slice'], label='Correlated', linewidth=2)

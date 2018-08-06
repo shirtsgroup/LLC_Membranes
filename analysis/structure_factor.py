@@ -337,7 +337,7 @@ class Trajectory(object):
                     z_disorder = z_separation*np.random.normal(scale=thermal_disorder[2], size=(end - start))
 
                     #disorder = np.vstack((x_disorder, y_disorder, z_disorder)).T
-                    self.locations[t, start:end, 2] = z_correlation(column, 30, v=1.2) + shift
+                    self.locations[t, start:end, 2] = z_correlation(column, 10, v=2.074) + shift
                     # self.locations[t, start:end, :2] += np.random.normal(scale=2.3, size=(column.size, 2))
                     #self.locations[t, start:end, 2] = column + shift
 
@@ -348,25 +348,25 @@ class Trajectory(object):
                     #self.locations[t, start:end, :] += disorder
                     self.locations[t, start:end, 2] += z_disorder
 
-        from LLC_Membranes.llclib import file_rw
-
-        gamma = 2 * np.pi / 3
-        a, b, c = self.box
-        A = np.array([a/10, 0, 0])  # vector in x direction
-        B = np.array([b/10 * np.cos(gamma), b/10 * np.sin(gamma), 0])  # vector in y direction
-        C = np.array([0, 0, c/10])
-
-        unitcell_vectors = np.zeros([self.nframes, 3, 3])
-        for i in range(frames):
-            # vectors don't change but need them as a trajectory
-            unitcell_vectors[i, 0, :] = A
-            unitcell_vectors[i, 1, :] = B
-            unitcell_vectors[i, 2, :] = C
-
-        file_rw.write_gro_pos(self.locations[-1, ...]/10, 'test.gro', ucell=unitcell_vectors[-1, ...])
-        traj = md.formats.TRRTrajectoryFile('test.trr', mode='w', force_overwrite=True)  # create mdtraj TRR trajectory object
-        time = np.linspace(0, 1000, self.nframes)  # arbitrary times. Times are required by mdtraj
-        traj.write(self.locations/10, time=time, box=unitcell_vectors)  # write the trajectory in .trr format
+        # from LLC_Membranes.llclib import file_rw
+        #
+        # gamma = 2 * np.pi / 3
+        # a, b, c = self.box
+        # A = np.array([a/10, 0, 0])  # vector in x direction
+        # B = np.array([b/10 * np.cos(gamma), b/10 * np.sin(gamma), 0])  # vector in y direction
+        # C = np.array([0, 0, c/10])
+        #
+        # unitcell_vectors = np.zeros([self.nframes, 3, 3])
+        # for i in range(frames):
+        #     # vectors don't change but need them as a trajectory
+        #     unitcell_vectors[i, 0, :] = A
+        #     unitcell_vectors[i, 1, :] = B
+        #     unitcell_vectors[i, 2, :] = C
+        #
+        # file_rw.write_gro_pos(self.locations[-1, ...]/10, 'test.gro', ucell=unitcell_vectors[-1, ...])
+        # traj = md.formats.TRRTrajectoryFile('test.trr', mode='w', force_overwrite=True)  # create mdtraj TRR trajectory object
+        # time = np.linspace(0, 1000, self.nframes)  # arbitrary times. Times are required by mdtraj
+        # traj.write(self.locations/10, time=time, box=unitcell_vectors)  # write the trajectory in .trr format
 
     def random_layer_rotations(self, npores, ncol_per_pore, r, nlayers, frames=1, thermal_disorder=[0, 0, 0], shift_range=0):
 
@@ -677,7 +677,7 @@ if __name__ == "__main__":
     t.plot_sf_slice('z', [0, 0], show=False)
 
     plt.xlim(-2.5, 2.5)
-    np.savez_compressed('correlation.npz', freq_z=t.freq_z, slice=t.slice)
+    #np.savez_compressed('nocorrelation.npz', freq_z=t.freq_z, slice=t.slice)
 
     t.angle_average(plot=True, show=False, save=True)
 
@@ -686,6 +686,8 @@ if __name__ == "__main__":
 
     # fit lorentzian to R-pi
     t.plot_sf_slice('y', [0, 2*np.pi / dbwl], show=False)
+    #np.savez_compressed('freq_y.npz', freq_y=t.freq_y)
+    #np.savez_compressed('yslice_1.npz', freq_z=t.freq_y, slice=t.slice)
 
     #np.savez_compressed('perfect_100pores.npz', freq_y=t.freq_y, slice=t.slice)
 
@@ -711,15 +713,15 @@ if __name__ == "__main__":
     #
     # print("Lorentzian FWHM = %.2f A^-1" % solp_lorentz[0])
 
-    # p = np.array([0, 0.3, t.locations.shape[1], 1])
-    # solp, cov_x = curve_fit(gaussian, t.freq_y[peaks], t.sf[np.argmin(np.abs(t.freq_x)), peaks, rpi_index], p,
-    #                         bounds=([-np.inf, 0, 0, 0], [np.inf, np.inf, np.inf, np.inf]))
-    #
-    # plt.plot(t.freq_y, gaussian(t.freq_y, solp[0], solp[1], solp[2], solp[3]), '--', color='green', label='Gaussian',
-    #          linewidth=2)
-    #
-    # print("Gaussian FWHM = %.3f +/- %.3f A^-1" % (2*np.sqrt(2*np.log(2))*solp[1],
-    #                                        2 * np.sqrt(2 * np.log(2)) * cov_x[1, 1] ** 0.5))
+    p = np.array([0, 0.3, t.locations.shape[1], 1])
+    solp, cov_x = curve_fit(gaussian, t.freq_y[peaks], t.sf[np.argmin(np.abs(t.freq_x)), peaks, rpi_index], p,
+                            bounds=([-np.inf, 0, 0, 0], [np.inf, np.inf, np.inf, np.inf]))
+
+    #plt.plot(t.freq_y, gaussian(t.freq_y, solp[0], solp[1], solp[2], solp[3]), '--', color='green', label='Gaussian',
+    #         linewidth=2)
+
+    print("Gaussian FWHM = %.3f +/- %.3f A^-1" % (2*np.sqrt(2*np.log(2))*solp[1],
+                                           2 * np.sqrt(2 * np.log(2)) * cov_x[1, 1] ** 0.5))
 
     plt.legend()
     plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=14)
