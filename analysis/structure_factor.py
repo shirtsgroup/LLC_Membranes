@@ -287,7 +287,7 @@ class Trajectory(object):
         column = np.linspace(0, z_separation * (npoints - 1), npoints)
 
         # For adding noise to quenched disordered configuration
-        # columns = np.zeros([npores**2*ncol_per_pore, column.size])
+        columns = np.zeros([npores**2*ncol_per_pore, column.size])
         # radii_noise = np.zeros([npores**2*ncol_per_pore, column.size])
         # theta_noise = np.zeros([npores**2*ncol_per_pore, column.size])
         # #xy_noise = np.zeros([npores**2*ncol_per_pore, column.size, 2])
@@ -296,7 +296,7 @@ class Trajectory(object):
         # #thetas = np.random.uniform(0, 2*np.pi, size=npores**2)  # randomly rotate each pore about the z-axis
         # for i in range(npores**2*ncol_per_pore):
         #     #columns[i, :] = z_correlation(column, 10, v=2.074)
-        #     columns[i, :] = column + z_separation*np.random.normal(scale=0.33, size=column.size)
+        #     columns[i, :] = column + z_separation*np.random.normal(scale=0.322, size=column.size)
         #     radii_noise[i, :] = np.random.normal(loc=r, scale=2.2, size=column.size)
         #     theta_noise[i, :] = np.random.normal(loc=0, scale=.43, size=column.size)
         #     #xy_noise[i, :, :] = np.random.normal(scale=2.3, size=(column.size, 2))
@@ -351,10 +351,10 @@ class Trajectory(object):
                     # self.locations[t, start:end, 2] = column + shift
 
                     # for noise about initial configuration
-                    # self.locations[t, start:end, 2] = columns[c*ncol_per_pore + a] + shifts[c*ncol_per_pore + a]
+                    #self.locations[t, start:end, 2] = columns[c*ncol_per_pore + a] + shifts[c*ncol_per_pore + a]
                     #self.locations[t, start:end, :2] += xy_noise[c*ncol_per_pore + a, ...]
 
-                    # self.locations[t, start:end, :] += disorder
+                    #self.locations[t, start:end, :] += disorder
                     # self.locations[t, start:end, 2] += z_disorder
 
         from LLC_Membranes.llclib import file_rw
@@ -739,4 +739,4 @@ if __name__ == "__main__":
     plt.xlim(-2.5, 2.5)
     plt.tight_layout()
 
-    # plt.show()
+    plt.show()

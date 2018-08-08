@@ -1480,7 +1480,7 @@ liquid crystal membranes}
 %  z-directional correlation within columns, with no correlation between
 %  columns\cite{chaikin_principles_1995}. 
 
-  \subsubsection{Origin of R-spots}\label{section:rspots}
+  \subsubsection{The origin of R-spots}\label{section:rspots}
 
   In order to more clearly study R-spots, we equilibrated an ordered basin sandwiched 
   configuration at 280K. Obtaining an equilibrium structure at a precise temperature is
@@ -1488,7 +1488,7 @@ liquid crystal membranes}
   shortcoming of some of the most popular protein force field in predicting the temperature
   dependence of protein structural ensembles \cite{wang_building_2017}. It is possible that   % page 12
   our membrane system, simulated at 300K, does not fully represent the true structure at 300K.
-  Lowering the temperature to 280K helped us to better resolve R-spots. 
+  Lowering the temperature to 280K helped us to better resolve R-spots (Figure~\ref{fig:sandwiched280K}). 
 %  The relative intensity 
 %  of R-spots in this system is slightly higher than experiment (1.5 vs. 1.3) 
   
@@ -1499,7 +1499,7 @@ liquid crystal membranes}
 %  origin of R-spots.
  
   Evidence strongly suggests that the R-spots signal is not a result of alkane
-  chain tilt.  Previous literature has attributed the spots in this particular
+  chain tilt. Previous literature has attributed the spots in this particular
   WAXS pattern as the product of tilted alkane chains~\cite{feng_scalable_2014}.
   We measured the tilt angle of the alkane chains of the 280K system and showed
   that it equilibrates to an average tilt angle of
@@ -1508,32 +1508,29 @@ liquid crystal membranes}
   %MRS8: did you do a few different things here as sensitivity analysis to show that the finding was robust?  If so, putting some of that in would be useful.
   %BJC7: make it clear that it is the 280K. Reference all configurations where tilt angles were calculated.
 
-  R-spots originates from the monomer tails.
   %To understand the most likely origin of R-spots, we determined which atoms
   %gave rise to the feature. 
-  By removing all non-tail atoms from the trajectory
-  and simulating a diffraction pattern with the remaining atoms, we were able to
-  isolate the cause of the spots to the tails (Figure~\ref{fig:tails_rzplot}).
+  R-spots originates from the monomer tails. By removing all non-tail atoms from 
+  the trajectory and simulating a diffraction pattern with the remaining atoms, 
+  we were able to isolate the cause of the spots to the tails 
+  (Figure~\ref{fig:tails_rzplot}).
 
-  The tails pack together hexagonally. Since the tails stay nearly flat, we plotted
-  their centroids (Figure \ref{fig:centroids}) and measured the angle between
-  each centroid and its nearest neighbors with respect to the plane of the
-  membrane. We see distinct peaks in the distribution of these angles which are
-  consistent with a hexagonally packed configuration
-  (Figure~\ref{fig:tail_packing}).
+  The tails pack together hexagonally. We plotted the center of mass of the 
+  first four tail atoms of each tail originating from each head group 
+  (Figure \ref{fig:centroids}). We measured the angle between each center of
+  mass and its nearest neighbors with respect to the $xy$ plane of the membrane. 
+  We see distinct peaks in the distribution of these angles located ca. 
+  $-60\degree$, $0\degree$, and $60\degree$ which is consistent with a 
+  hexagonally packed configuration (Figure~\ref{fig:layered_tails}). This 
+  ordering dies off at the tail ends, where there is more space to fill 
+  causing them to pack nearly isotropically (See supporting information). 
 
   The peaks in the nearest neighbor angle distribution are consistent with the
-  location of R-spots. The peaks of interest in Figure \ref{fig:layered_tails}
-  are located at $\pm 33 \degree$ which is the same location where the highest
-  intensity of spots are located in the simulated patterns. We confirmed this 
-  by radially integrating the 2D WAXS pattern for 
-  $\left|\mathbf{q}\right|$ values between 1.4 and 1.57 (between 4
-  and 4.5 \AA~in real space). We observe distinct peaks ca. $30
-  \degree$, in close agreement with the previously measured angle distribution
-  (Figure~\ref{fig:layered_integration}). We performed the same integration on
-  the raw experimental data and found the angle at which R-spots reaches its
-  highest intensity to be $\pm 37 \degree$ which is a reconcilable difference
-  with our simulated results.
+  location of R-spots. The 2D Fourier transform of a simple hexagonal array 
+  constructed based on the peak angles in Figure~\ref{fig:layered_tails}
+  shows reflections in the same locations as R-spots, in addition to vertical 
+  stacking reflections along the $q_z$ axis that would intersect with R-$\pi$
+  (Figure~\ref{fig:hexagonal_ft}). 
 
 % BJC5: omit for now
 %  The evidence supports the hypothesis that alkane chain tails pack in a
@@ -1575,7 +1572,7 @@ liquid crystal membranes}
   \end{subfigure}
   \begin{subfigure}[t]{0.32\linewidth}
     \centering
-	\includegraphics[width=\textwidth]{centroids_box.png}
+	\includegraphics[scale=0.2]{centroids.png}
   \caption{}\label{fig:centroids}
   \end{subfigure}
   \begin{subfigure}[t]{0.32\linewidth}
@@ -1585,8 +1582,8 @@ liquid crystal membranes}
   \end{subfigure}
   \begin{subfigure}[t]{0.32\textwidth}
         	\centering
-	        \includegraphics[width=\linewidth]{layered_angle_v_I.png}
-	        \caption{}~\label{fig:layered_integration}
+	        \includegraphics[width=\linewidth]{hexagonal_ft.png}  % generated from hexagonal_packing.py
+	        \caption{}~\label{fig:hexagonal_ft}
   \end{subfigure}
   \caption{(a) R-spots increases in intensity when the temperature of the system is 
       lowered to 280K. (b) We measured the average angle made between each monomer 
@@ -1595,38 +1592,27 @@ liquid crystal membranes}
       explain R-spots. (c) To isolate the main cause of R-spots, we removed all atoms
       from the trajectory except for carbon atoms that constitute the tails. The
       simulated XRD pattern of the tails-only trajectory still shows R-spots. (d)
-      Since the tails stay relatively flat, we plotted the centroid of each tail 
-      and observed that they pack hexagonally (for example, green colored centroids
-      in the plot surround the red centroid in hexagonal fashion). (e) We hypothesize
+      Since the tails stay relatively flat, we plotted the center of mass of the first
+      four carbon atoms of each tail originating from the head groups (for example,
+      green colored centroids in the plot surround the red centroid in hexagonal fashion).
+      Visually, the packing looks hexagonal. (e) We hypothesize
       that R-spots is the result of ordered tail packing. Defining
-      the membrane plane to be 0\degree, we measured the angles between each alkane 
-      chain tail centroid and its nearest neighbor centroids for the equilibrated 
-      sandwiched configuration simulated at 280K. Peaks that appear in each distribution
-      are centered near $\pm~33\degree$. (f) We radially integrated the simulated XRD
-      patterns of the parallel displaced and sandwiched configuration within the region
-      bounding R-alkanes. Peaks appear in the same location as the angle distributions
-      which corroborates our hypothesis.}~\label{fig:tail_packing}
+      the membrane plane to be 0\degree, we measured the angles between each center of 
+      mass and its nearest neighbor center of masses for the equilibrated 
+      sandwiched configuration simulated at 280K. Peaks appear in the distribution at 
+      $-60\degree$, $0\degree$ and $60\degree$. (f) The Fourier transform of a hexagonally
+      packed grid of points defined by the angles in (e) shows intensity at the same
+      locations where we expect to see R-spots, as well as intensity along the $q_z$ axis
+      where R-$\pi$ would appear.}~\label{fig:tail_packing}
   \end{figure}  
   
   \subsubsection{Discrepancies between experimental and simulated R-$\pi$}\label{section:rpi}
   
-  % BJC8: Is it necessary to focus in on the parallel displaced system for this section? At this
-  % point in the story, I haven't shown that it gives rise to R-double. I think the simple systems
-  % are conceptually easier to grasp with sandwiched columns. Sliding parallel displaced columns
-  % is harder to imagine, and probably not really how the columns are stacked. The parallel displacement
-  % is probably less exagerated. 
-  % BJC8: that said, if we go with just focusing on parallel displaced, then I can move the R-double section
-  % up before this one.
-  % MRS9: I think we should start with larger differences rather than smaller, and arguably the greater intensity of R-pi is 
-  % a bigger difference.  So it's OK ti put R-double after -- (and it could be that sliding sandwiched columns could still give water h-bonding, since they have carboxyl groups that are on average closer together than sandwiched layered ones).
-  %BJC9: keeping above comments for reference
-  
   R-$\pi$ is more intense relative to the experimental system. The difference in intensity
   ranges from 3 times too high in the ordered parallel displaced system to 15 times too 
   high in the ordered sandwiched configuration (Table~\ref{table:relative_inensities_300K}).
-%BJC9: keeping below comment for reference  
-%MRS9: should be a little more clear why you mean by ``all systems''. In some sense the problem is more that the best explanation might be unaligned columns, which is easier with sandwiched, which are 15 times as much. So here it would make more sense to focus on both types of columns, so you can explain how unaligned (sliding) columns also have a mechanism for reduction. Note that I don't think the columns have to be dynamically sliding (Which would be hard with all the tails entangled) but can be just off-register statically.
   
+  % BJC9: This still needs to be worked out. Rest of section should still hold up
   The full width at half maximums (FWHM) of the $q_r$ and $q_z$ cross-sections
   of R-$\pi$ are broader than experiment (Figure~\ref{fig:rpi_exp_comparison}).
   The FWHM of the $q_z$ cross-section is 76 \% larger than experiment and the
@@ -1677,8 +1663,8 @@ liquid crystal membranes}
   \end{figure}
   
   We have identified a number of potential ways that simulation conditions,
-  forcefield and initial configurations could affect the intensity of R-$\pi$ as
-  well as its FWHM in the $q_z$ and $q_r$ directions. We assessed each using a
+  forcefield and initial configurations could affect the intensity and shape of
+  R-$\pi$. We assessed each using a
   simplified model. Our simplified model represents each monomer head group as a
   single point and places them in either a parallel displaced or sandwiched
   configuration. We chose to explore the influence of thermal noise in each
@@ -1693,7 +1679,7 @@ liquid crystal membranes}
   created by rapid structural rearrangement during early equilibration and is
   largely locked into place for the remainder of the simulation. The latter has
   important implications for the reproducibility of this work since both initial
-  configurations and velocity randomization at the beginning of equilibration can
+  configurations and initial velocity randomization can
   lead to different quenched configurations. We measured thermal disorder by
   calculating the standard deviation of the distribution of head group center of
   mass positions from their average positions. We measured quenched disorder by
@@ -1702,26 +1688,34 @@ liquid crystal membranes}
   measured the deviation of the head group center of masses from an equally
   spaced column of head groups. In the $xy$ plane, we calculated the deviation in
   radial position from the pore center and the angular deviation from equally
-  spaced points surrounding the pore center. The values measured for each system
-  and type of disorder are given in Table~\ref{table:quenched_disorder}.
+  spaced points surrounding the pore center. This method for calculating 
+  quenched order inherently includes thermal disorder. The values measured for
+  each system and type of disorder are given in Table~\ref{table:quenched_disorder}.
 
   The intensity of R-$\pi$ can be calculated from a single trajectory of
   uncorrelated configurations rather than from the average of multiple correlated
   trajectories. Theoretically, in order to mimic the simulated system, we should
   build an initial configuration which has the same amount of quenched disorder
   as our simulations and then create a trajectory to which we add thermal
-  disorder to the initial configuration in order to create each frame.
-  %BJC9 : The following numbers need to be updated: I want to do 40 trajectories with 1000 frames each for both types of trajectories and compare their mean and uncertainty
-  The average R-$\pi$ intensity of 40, 100 frame trajectories created in this
-  way was 16.0 $\pm$ 4.9. If instead we create a single trajectory from 1000
-  initial configurations, the intensity of R-$\pi$ is 16.42, in close agreement
-  with the mean of 40 simulations.  We use the latter method for the remainder of
-  this work since we can extract the trends we need using a single trajectory at
-  a fraction of the computational cost.
+  noise to each subsequent frame. In this scenario, the positions of each scatterer
+  will not change in a way that significantly affects the intensity of R-$\pi$
+  since most of its character is defined by the far more disordered initial configuration.
+  To uncover the expected intensity of R-$\pi$, we would need to average over many
+  such trajectories. To bypass this expensive calculation, we instead calculate the
+  R-$\pi$ intensity from a trajectory consisting of many independent initial 
+  configurations. This simulates the long time scales over which we expect columns
+  to sample many configurational states. %We use the latter method for the remainder of
+%  this section since we can extract the trends we need using a single trajectory at
+%  a fraction of the computational cost.
+ 
+ %BJC9 : Could show some number like the following
+%  The average R-$\pi$ intensity of 40, 100 frame trajectories created in this (1st way mentioned above)
+%  way was 16.0 $\pm$ 4.9. If instead we create a single trajectory from 1000
+% initial configurations, the intensity of R-$\pi$ is 16.42, in close agreement
+%  with the mean of 40 simulations.  
   
   When we simulated the diffraction pattern of a parallel displaced simple
-  system trajectory of 1000 independent configurations, each created using the
-  parameters for thermal and quenched disorder in order to place points, the
+  system trajectory of 1000 independent configurations, the
   $q_r$ and $q_z$ profiles of R-$\pi$ are characterized by sharp peaks. We made
   this simple system, and all to follow, 4 times taller in the $z$-direction in
   order to access higher $q_z$ resolution. Figure~\ref{fig:sf_qy_nocorrelation}
@@ -1782,10 +1776,10 @@ liquid crystal membranes}
   interaction head groups might have with each other. To remedy this, we drew
   random samples from a multivariate normal distribution defined by the mean
   positions of an equally spaced column of points. We gave the distribution at
-  each point along the column the same standard deviation, $\sigma_z$, shown  in
-  by Table~\ref{table:quenched_disorder}. We defined a covariance matrix such
+  each point along the column the same standard deviation, $\sigma_z$, shown in
+  Table~\ref{table:quenched_disorder}. We defined a covariance matrix such
   that the covariance, $v$, of the distance, $d$, between scatterers decays
-  exponentially from $v$ according to the equation $ve^{-z/L}$, where $L$ is the
+  exponentially from $v$ according to the equation $ve^{-d/L}$, where $L$ is the
   correlation length. Experimentally, the correlation length can be estimated as
   the inverse of the FWHM of the $q_z$ cross-section of R-$\pi$. Accordingly,
   the correlation length of the experimental system is $\geq$ 9 $\AA$. The value
@@ -1901,6 +1895,18 @@ liquid crystal membranes}
   the peaks do not show clear patterns that can easily be fit to an exponential
   decay. The correlation length of both sandwiched systems is relatively low
   because the height of the first peak of $g(z)$ is so high. 
+  
+  % BJC9: Got rid of references to R-pi intensity in following paragraph because
+  % I can't directly compare R-pi between two simulations starting from different
+  % initial configs w/ different velocity randomizations.
+  The system size, in the $z$-direction, does not significantly alter $g(z)$. 
+  In Figure~\ref{fig:correlation}, oscillations do not fully decay, so a taller
+  system may be necessary to fully capture the correlation function. We 
+  equilibrated a sandwiched system with twice as many monomers per column 
+  so that the system size doubled in the $z$-direction. The correlation length 
+  increases modestly from 4.5 $\pm$ 0.4 to 7.3 $\pm$ 1.2 \AA. Visually, the
+  correlation functions are nearly identical and oscillatory behavior persists
+  throughout $g(z)$ in both cases (See Figure~S-\ref{S-fig:z_correlation_overlay}).
 
 % BJC9: omitted because these are not strong points
 %  The peak height
@@ -1917,11 +1923,12 @@ liquid crystal membranes}
   
   Increased thermal noise in the $z$-direction causes a drop in the intensity
   of R-$\pi$, however the $q_r$ profile remains unchanged. When we increase the
-  thermal noise in the $z$-direction by 12\% and 27\%, we see a 3 and 15-fold
-  decrease in the maximum intensity of R-$\pi$ respectively (Figure
-  ~\ref{fig:znoise}). Despite the decrease in intensity, the 3 cross-sections
-  have the same shape (Figure~\ref{fig:rpi_xsection_vs_zsigma}, whose sharp
-  Bragg-like peaks are not consistent with experiment. 
+  thermal noise of our parallel displaced simple system in the $z$-direction by
+  12\% and 27\%, we see a 3 and 15-fold decrease in the maximum intensity of 
+  R-$\pi$ respectively (Figure~\ref{fig:znoise}). Despite the decrease in 
+  intensity, the 3 cross-sections have the same shape 
+  (Figure~\ref{fig:rpi_xsection_vs_zsigma}, whose sharp Bragg-like peaks are
+  not consistent with experiment. 
   
   \begin{figure}[!htb]
   \centering
@@ -1934,7 +1941,7 @@ liquid crystal membranes}
   \caption{}\label{fig:rpi_xsection_vs_zsigma}
   \end{subfigure}
   \caption{We can decrease the maximum intensity of R-$\pi$ by increasing
-  thermal noise in the z-direction, however the $q_r$ cross-section profile does
+  thermal noise in the $z$-direction, however the $q_r$ cross-section profile does
   not change. (a) The intensity of R-$\pi$ drops precipitously as we increase
   $\sigma_z$. We can decrease the intensity of R-$\pi$, relative to the
   background intensity, as seen in our simulation (blue) by a factor of 3 when we
@@ -1949,18 +1956,20 @@ liquid crystal membranes}
   amounts of association between columns. In the low limit, the center of mass
   of columns are situated at the same $z$-coordinate. This is how all simple
   systems have been created up to this point. We allow increasing independence of
-  columns by randomly shifting each column in the $z$-direction using a uniform
+  columns by randomly shifting each column in the $z$-direction according to a uniform
   distribution bounded by (0, $f \times \mathit{d}_{equil}$) where $f$ ranges
   between 0 and 1. We limit this discussion to the sandwiched configuration since
   it is not feasible for columns in the parallel displaced configuration, as we
   have set them up, to move past each other. The trends seen above apply to both
-  the sandwiched and parallel displaced systems. Allowing columns to move
+  the sandwiched and parallel displaced systems. 
+  %BJC9: ^need to prove that in supplemental?  
+  Allowing columns to move
   independently smooths out the $q_r$ cross-section
   (Figure~\ref{fig:column_displacement}). Any amount of dependence results in
   sharp peaks. The intensity of R-$\pi$ decreases with increasing column
   independence. We see an 8-fold decrease in the intensity of R-$\pi$ when $f=1$
   versus when $f=0$. It is likely that the discrepancy between the intensity of 
-  R-$\pi$ generated from our simulations versus experiment is due
+  R-$\pi$ generated from our simulations versus experiment is primarily due
   to highly correlated columns in our initial configurations.
   
   \begin{figure}
@@ -2006,6 +2015,16 @@ liquid crystal membranes}
 	  51\%.}\label{fig:qy_fwhm}
   \end{figure}
   
+  The architecture of each column is likely in between sandwiched and parallel
+  displaced. The parallel displaced configuration that we have simulated in this
+  paper is an exaggerated manifestation of the parallel displaced $\pi-\pi$
+  stacking mode. The experimental WAXS pattern shows faint off-axis features at the
+  same $q_r$ value as R-double which is only present in simulated patterns generated from
+  parallel displaced configurations. The monomers may prefer to be parallel displaced, but
+  their displacement is likely only slightly shifted, on the $xy$ plane, from the
+  center of mass of their vertically adjacent neighbors. In this way, columns can
+  more easily act independently while maintaining a parallel displaced structure.   
+  
   We can use what we learned above in order to construct a better model,
   however there will still be shortcomings. We can decrease the intensity of
   R-$\pi$ if we incorporate more $z$-directional noise, which may come from
@@ -2016,40 +2035,10 @@ liquid crystal membranes}
   $q_y$ cross-section by creating initial configurations whose columns are
   displaced randomly in the $z$-direction. We can achieve better averages if we
   create systems with more pores in the unit cell. In order to make head groups
-  stack closer together, we can adjust the parameters for aromatic carbons so
-  that head groups stack more closely together. Ultimately, we will need
-  extremely long simulation times so that monomers within columns can rearrange
-  and sample enough independent configurations to generate a robust simulated XRD
-  pattern.
-
-  The architecture of each column is likely in between sandwiched and parallel
-  displaced. The parallel displaced configuration that we have simulated in this
-  paper is an exaggerated manifestation of the parallel displaced $\pi-\pi$
-  stacking mode. The simulated XRD pattern shows faint off-axis features at the
-  same $q_r$ value as R-double which is only present in patterns generated from
-  parallel displaced configurations. The same feature is present in the
-  experimental pattern. The monomers may prefer to be parallel displaced, but
-  their displacement is likely only slightly shifted, on the $xy$ plane, from the
-  center of mass of their vertically adjacent neighbors. In this way, columns can
-  more easily act independently while maintaining a parallel displaced structure.
-
-  % BJC9: Does it still make sense to have this in here? I think we thought that
-  % making the system taller might result in a more disordered structure, leading
-  % to weaker distance correlations between stacked monomers and a reduced R-pi. 
-  % But I've shown that the intensity of R-pi is only weakly dependent on correlation
-  % length (20 % difference between correlation length of 0 and 30) and even if there
-  % is additional xy noise (for some reason), it will not not decrease R-pi max 
-  % intensity. Also, we are getting near the right correlation length (from g(z)
-  % and kind of from XRD), which is less than the length of the box. I could
-  % just move this to supplemental.   
-  The system size in the $z$-direction does not significantly alter the
-  intensity of R-$\pi$. We equilibrated a sandwiched system with twice as many
-  monomers per column so that the system size doubled in the z-direction. The
-  correlation length increases modestly from 4.5 $\pm$ 0.4 to 7.3 $\pm$ 1.2 \AA,
-  and the intensity of R-$\pi$ decreases from 44.0 to 39.4. Visually, the
-  correlation functions are nearly identical (See
-  Figure~S-\ref{S-fig:z_correlation_overlay}). 
-  
+  stack closer together, we can adjust the force field parameters for aromatic 
+  carbons. Ultimately, we will need extremely long simulation times, or enhanced
+  sampling techniques so that monomers within columns can rearrange and sample
+  enough independent configurations to generate a robust simulated XRD pattern. 
  
   %BJC6: not sure if this should go in supplemental
 %  \begin{figure}
@@ -2066,63 +2055,6 @@ liquid crystal membranes}
 %  the simulated diffraction patterns (a). Here, the colorbar was scaled so that the max is 6x
 %  higher than all other plots.}\label{fig:intense_rpi}
 %  \end{figure}
-
-
-%  \begin{figure}
-%  \centering
-%  \begin{subfigure}{0.45\textwidth}
-%	\centering
-%	\includegraphics[width=\textwidth]{layered_yz_correlation.png}
-%	\caption{}\label{fig:layered_yz_correlation}
-%  \end{subfigure}
-%  \begin{subfigure}{0.45\textwidth}
-%        \centering
-%        \includegraphics[width=\textwidth]{offset_yz_correlation.png}
-%        \caption{}\label{fig:offset_yz_correlation}
-%  \end{subfigure}
-%  %MRS6: have the same color scale in both figures to compare them?
-%  \caption{2D pair distribution functions generated from systems built in the 
-%	   sandwiched (a) and parallel displaced (b) configurations, provide
-%           a more detailed picture of the pore structure in each. The sandwiched
-%	   configuration}\label{fig:yz_correlation}
-%%MRS6: caption not finished?
-%  \end{figure} 
-%
-%  We plotted the one-dimensional pair distribution function, $g(z)$, for the
-%  phenyl rings and for carbon atoms that make up the monomer tails (Figure
-%  \ref{fig:zdf}). The plots show clear periodic maxima where layers are present.
-%  Layering is most pronounced in the head group region, however there is still a
-%  degree of layering that persists into the tail region. Using a Fourier
-%  transform on $g(z)$ from the head groups, we see that sandwiched configuration
-%  layers stack 4.39 \AA~apart while parallel displaced configuration layers stack
-%  4.38 \AA~apart. Both stacking distances are in agreement with those observed
-%  in the simulated XRD patterns.
-%
-%  %MRS6: do you need both the 2D and 1D correlation functions?
-%  \begin{figure}
-%        \centering
-%        \begin{subfigure}{0.45\textwidth}
-%                \centering
-%                \includegraphics[width=\textwidth]{zdf_overlay_layered.png}
-%                \caption{}\label{fig:zdf_layered}
-%        \end{subfigure}
-%        \begin{subfigure}{0.45\textwidth}
-%                \centering
-%                \includegraphics[width=\textwidth]{zdf_overlay_offset.png}
-%                \caption{}\label{fig:zdf_offset}
-%        \end{subfigure}
-%	\caption{We support the existence of layers with the observance of
-%		clear periodic maxima in the $z$-direction pair distribution functions of the
-%		(a) 5 monomer per layer, sandwiched and (b) 5 monomer per layer, parallel
-%		displaced configurations. The extent to which we consider a system to be
-%		layered is based on the magnitude of the deviation of the periodic maxima from
-%		the average number density. The sandwiched configuration possesses a higher
-%		degree of layering than the parallel displaced configuration and, in both
-%		cases, the head group region has a higher degree of layer partitioning than the
-%		tail region. (See Supporting information for detailed definitions of the head
-%		group and tail regions)}\label{fig:zdf}
-%  \end{figure}
-
 
   \subsubsection{Origin of R-double}\label{section:rdouble}
   

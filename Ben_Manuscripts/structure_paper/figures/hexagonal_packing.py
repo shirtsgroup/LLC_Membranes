@@ -103,12 +103,14 @@ freq_y = freq_y[ndx_y]
 ft = ft[ndx_x, :]
 ft = ft[:, ndx_y]
 
-plt.contourf(freq_x, freq_y, ft, cmap='Greys')
-plt.xlim(-.35, .35)
-plt.ylim(-.35, .35)
+plt.contourf(freq_x*2*np.pi, freq_y*2*np.pi, ft, cmap='Greys')
+plt.xlim(-2.2, 2.2)
+plt.ylim(-2.2, 2.2)
 plt.xlabel('$q_x$', fontsize=18)
-plt.ylabel('$q_y$', fontsize=18)
+plt.ylabel('$q_z$', fontsize=18)
 plt.gcf().get_axes()[0].set_aspect('equal')
+plt.gcf().get_axes()[0].tick_params(labelsize=18)
+plt.tight_layout()
 plt.savefig('hexagonal_ft.png')
 plt.show()
 

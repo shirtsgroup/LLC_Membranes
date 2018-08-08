@@ -132,7 +132,7 @@ class Assembly(LC):
         angle = np.arctan(v[0, 1] / v[0, 0])
         self.LC_positions = transform.rotate_coords_z(self.LC_positions, - angle * 180 / np.pi)
 
-    def build_column(self, pore, z, theta, correlation=True, var=0, correlation_length=0, pd=0):
+    def build_column(self, pore, z, theta, correlation=True, var=0, correlation_length=0, pd=0, random_shift=True):
         """ Place a column at angle theta on xy plane with respect to a pore center
 
         Keyword Arguments:
@@ -148,6 +148,12 @@ class Assembly(LC):
 
         if correlation:
             z = z_correlation(z, correlation_length, v=var)
+            if random_shift:
+                dbwl = z[1] - z[0]  # distance between stacked monomers
+                z += np.random.uniform(0, dbwl)
+        elif random_shift:
+            dbwl = z[1] - z[0]  # distance between stacked monomers
+            z += np.random.uniform(0, dbwl)
 
         displaced_theta = (180 / np.pi) * (2 * np.arcsin(pd / (2 * self.pore_radius)))
 
@@ -190,7 +196,6 @@ class Assembly(LC):
         self.all_residues = [self.all_residues[i] for i in ordered]
         self.names = [self.names[i] for i in ordered]
 
-
     def write_gro(self, out, ucell):
 
         file_rw.write_gro_pos(self.xyz, out, ids=self.names, res=self.all_residues, ucell=ucell)
@@ -217,7 +222,7 @@ if __name__ == "__main__":
         for j in range(args.ncolumns):
             z = np.linspace(0, args.dbwl*args.monomers_per_column - args.dbwl, args.monomers_per_column)
             system.build_column(i, z, thetas[j], correlation=correlation, var=args.Lvar,
-                                correlation_length=args.correlation_length, pd=args.parallel_displaced)
+                                correlation_length=args.correlation_length, pd=args.parallel_displaced, random_shift=True)
 
     system.reorder()
 

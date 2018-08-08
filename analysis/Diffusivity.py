@@ -11,6 +11,7 @@ import mdtraj as md
 import time
 from scipy import stats
 
+
 def initialize():
 
     parser = argparse.ArgumentParser(description='Calculate diffusion coefficient')
