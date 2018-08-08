@@ -288,15 +288,20 @@ class Trajectory(object):
 
         # For adding noise to quenched disordered configuration
         # columns = np.zeros([npores**2*ncol_per_pore, column.size])
-        # xy_noise = np.zeros([npores**2*ncol_per_pore, column.size, 2])
+        # radii_noise = np.zeros([npores**2*ncol_per_pore, column.size])
+        # theta_noise = np.zeros([npores**2*ncol_per_pore, column.size])
+        # #xy_noise = np.zeros([npores**2*ncol_per_pore, column.size, 2])
         # shifts = np.zeros([npores**2*ncol_per_pore])
         # shift_range = 0  # fraction of layer to allow random displacement
-        # thetas = np.random.uniform(0, 2*np.pi, size=npores**2)  # randomly rotate each pore about the z-axis
+        # #thetas = np.random.uniform(0, 2*np.pi, size=npores**2)  # randomly rotate each pore about the z-axis
         # for i in range(npores**2*ncol_per_pore):
-        #     columns[i, :] = z_correlation(column, 10, v=1.2)
-        #     xy_noise[i, :, :] = np.random.normal(scale=2.3, size=(column.size, 2))
+        #     #columns[i, :] = z_correlation(column, 10, v=2.074)
+        #     columns[i, :] = column + z_separation*np.random.normal(scale=0.33, size=column.size)
+        #     radii_noise[i, :] = np.random.normal(loc=r, scale=2.2, size=column.size)
+        #     theta_noise[i, :] = np.random.normal(loc=0, scale=.43, size=column.size)
+        #     #xy_noise[i, :, :] = np.random.normal(scale=2.3, size=(column.size, 2))
         #     shifts[i] = shift_range * (z_separation / 2) * np.random.uniform(-1, 1)  # shift column by a random amount
-        #thetas = np.random.uniform(0, 2*np.pi, size=npores**2)  # randomly rotate each pore about the z-axis
+        # thetas = np.random.uniform(0, 2*np.pi, size=npores**2)  # randomly rotate each pore about the z-axis
 
         print('z-spacing: %.2f' % z_separation)
         print('Pore center spacing: %.2f' % dx)
@@ -308,7 +313,7 @@ class Trajectory(object):
                 start_theta = np.random.uniform(0, 360) * (np.pi / 180)  # random angle
 
                 # For adding noise to quenched disordered configuration
-                #start_theta = thetas[c]
+                # start_theta = thetas[c]
 
                 # start_theta = 0
                 theta = 2 * np.pi / ncol_per_pore  # angle between columns
@@ -318,10 +323,13 @@ class Trajectory(object):
                     end = ncol_per_pore * c * npoints + (a + 1) * npoints
 
                     radii = np.random.normal(loc=r, scale=thermal_disorder[0], size=(end - start))
-                    thetas = np.random.normal(loc=(start_theta + a*theta), scale=thermal_disorder[1], size=(end - start))
+                    theta_col = np.random.normal(loc=(start_theta + a*theta), scale=thermal_disorder[1], size=(end - start))
+                    # For adding noise to quenched disordered configuration
+                    # radii = radii_noise[c*ncol_per_pore + a, :]
+                    # theta_col = theta_noise[c*ncol_per_pore + a, :] + start_theta + a*theta
 
-                    x = radii * np.cos(thetas)
-                    y = radii * np.sin(thetas)
+                    x = radii * np.cos(theta_col)
+                    y = radii * np.sin(theta_col)
                     # x = r*np.cos(start_theta + a*theta)
                     # y = r*np.sin(start_theta + a*theta)
 
@@ -332,41 +340,42 @@ class Trajectory(object):
                     else:
                         shift = 0
 
-                    #x_disorder = r*np.random.normal(scale=thermal_disorder[0], size=(end - start))
-                    #y_disorder = r*np.random.normal(scale=thermal_disorder[1], size=(end - start))
-                    z_disorder = z_separation*np.random.normal(scale=thermal_disorder[2], size=(end - start))
+                    # x_disorder = r*np.random.normal(scale=thermal_disorder[0], size=(end - start))
+                    # y_disorder = r*np.random.normal(scale=thermal_disorder[1], size=(end - start))
+                    # z_disorder = z_separation*np.random.normal(scale=thermal_disorder[2], size=(end - start))
 
-                    #disorder = np.vstack((x_disorder, y_disorder, z_disorder)).T
-                    self.locations[t, start:end, 2] = z_correlation(column, 10, v=2.074) + shift
+                    # disorder = np.vstack((x_disorder, y_disorder, z_disorder)).T
+
+                    self.locations[t, start:end, 2] = z_correlation(column, 10, v=thermal_disorder[2]**2) + shift
                     # self.locations[t, start:end, :2] += np.random.normal(scale=2.3, size=(column.size, 2))
-                    #self.locations[t, start:end, 2] = column + shift
+                    # self.locations[t, start:end, 2] = column + shift
 
                     # for noise about initial configuration
                     # self.locations[t, start:end, 2] = columns[c*ncol_per_pore + a] + shifts[c*ncol_per_pore + a]
-                    # self.locations[t, start:end, :2] += xy_noise[c*ncol_per_pore + a, ...]
+                    #self.locations[t, start:end, :2] += xy_noise[c*ncol_per_pore + a, ...]
 
-                    #self.locations[t, start:end, :] += disorder
-                    self.locations[t, start:end, 2] += z_disorder
+                    # self.locations[t, start:end, :] += disorder
+                    # self.locations[t, start:end, 2] += z_disorder
 
-        # from LLC_Membranes.llclib import file_rw
-        #
-        # gamma = 2 * np.pi / 3
-        # a, b, c = self.box
-        # A = np.array([a/10, 0, 0])  # vector in x direction
-        # B = np.array([b/10 * np.cos(gamma), b/10 * np.sin(gamma), 0])  # vector in y direction
-        # C = np.array([0, 0, c/10])
-        #
-        # unitcell_vectors = np.zeros([self.nframes, 3, 3])
-        # for i in range(frames):
-        #     # vectors don't change but need them as a trajectory
-        #     unitcell_vectors[i, 0, :] = A
-        #     unitcell_vectors[i, 1, :] = B
-        #     unitcell_vectors[i, 2, :] = C
-        #
-        # file_rw.write_gro_pos(self.locations[-1, ...]/10, 'test.gro', ucell=unitcell_vectors[-1, ...])
-        # traj = md.formats.TRRTrajectoryFile('test.trr', mode='w', force_overwrite=True)  # create mdtraj TRR trajectory object
-        # time = np.linspace(0, 1000, self.nframes)  # arbitrary times. Times are required by mdtraj
-        # traj.write(self.locations/10, time=time, box=unitcell_vectors)  # write the trajectory in .trr format
+        from LLC_Membranes.llclib import file_rw
+
+        gamma = 2 * np.pi / 3
+        a, b, c = self.box
+        A = np.array([a/10, 0, 0])  # vector in x direction
+        B = np.array([b/10 * np.cos(gamma), b/10 * np.sin(gamma), 0])  # vector in y direction
+        C = np.array([0, 0, c/10])
+
+        unitcell_vectors = np.zeros([self.nframes, 3, 3])
+        for i in range(frames):
+            # vectors don't change but need them as a trajectory
+            unitcell_vectors[i, 0, :] = A
+            unitcell_vectors[i, 1, :] = B
+            unitcell_vectors[i, 2, :] = C
+
+        file_rw.write_gro_pos(self.locations[-1, ...]/10, 'test.gro', ucell=unitcell_vectors[-1, ...])
+        traj = md.formats.TRRTrajectoryFile('test.trr', mode='w', force_overwrite=True)  # create mdtraj TRR trajectory object
+        time = np.linspace(0, 1000, self.nframes)  # arbitrary times. Times are required by mdtraj
+        traj.write(self.locations/10, time=time, box=unitcell_vectors)  # write the trajectory in .trr format
 
     def random_layer_rotations(self, npores, ncol_per_pore, r, nlayers, frames=1, thermal_disorder=[0, 0, 0], shift_range=0):
 
@@ -687,7 +696,7 @@ if __name__ == "__main__":
     # fit lorentzian to R-pi
     t.plot_sf_slice('y', [0, 2*np.pi / dbwl], show=False)
     #np.savez_compressed('freq_y.npz', freq_y=t.freq_y)
-    #np.savez_compressed('yslice_1.npz', freq_z=t.freq_y, slice=t.slice)
+    #np.savez_compressed('yslice_3xdecrease.npz', freq_z=t.freq_y, slice=t.slice)
 
     #np.savez_compressed('perfect_100pores.npz', freq_y=t.freq_y, slice=t.slice)
 
@@ -730,4 +739,4 @@ if __name__ == "__main__":
     plt.xlim(-2.5, 2.5)
     plt.tight_layout()
 
-    plt.show()
+    # plt.show()
