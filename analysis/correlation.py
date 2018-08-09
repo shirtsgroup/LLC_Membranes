@@ -554,7 +554,7 @@ if __name__ == "__main__":
             # middle_y = fft_inverse.shape[1] // 2
 
             # restricted zdf
-            r = 5
+            r = 0.225
             avg = []
             n = 0
             for i, ix in enumerate(centers_x):
@@ -573,8 +573,8 @@ if __name__ == "__main__":
             zdf_full = np.mean(fft_inverse, axis=(0, 1))[1:]
             zdf_full /= zdf_full.mean()
 
-            plt.plot(centers_z[1:], zdf_full, linewidth=2)
-            # plt.plot(centers_z[1:], zdf_full, linewidth=2)
+            #plt.plot(centers_z[1:], zdf, linewidth=2)
+            plt.plot(centers_z[1:], zdf_full, linewidth=2, label='Raw data')
             plt.xlim(0, 4)
             # plt.ylim(0, 2)
 
@@ -583,12 +583,12 @@ if __name__ == "__main__":
 
             #Fit decaying exponential to peaks of oscillating correlation function
             peaks = detect_peaks.detect_peaks(zdf_full[start:end], mpd=12, show=False)  # adjust mpd if number of peaks comes out wrong
-            if args.offset:
-                peaks = peaks[1::2]  # every other peak starting at the second peak
+            # if args.offset:
+            #     peaks = peaks[1::2]  # every other peak starting at the second peak
             # peaks = [17, 34, 54, 74, 159] # full
             # peaks = [17, 35, 54, 163]
 
-            # peaks = [9,  29,  51,  73,  101, 125, 143, 173]  # layered 300K ordered
+            peaks = [17,  37,  56,  77,  94, 115, 129, 139]  # layered 300K ordered
             # peaks = [32, 78, 125, 165]  # offset 300K
             # peaks = [31, 77, 119, 162]  # offset 280K
             # peaks = [10, 30, 58, 80, 100, 118, 138, 157]  # layered 300K disordered
@@ -597,19 +597,19 @@ if __name__ == "__main__":
             #print(peaks)
             # if len(peaks) > 4:
             #     peaks = peaks[:4]
-            #peaks = np.array(peaks)
-            #plt.scatter(centers_z[peaks + 1], zdf_full[peaks], marker='+', c='r', s=200, label='Peak locations')
+            peaks = np.array(peaks)
+            plt.scatter(centers_z[peaks + 1], zdf_full[peaks], marker='+', c='r', s=200, label='Peak locations')
 
-            #period = 0.438
-            #p = np.array([2, 10])  # initial guess at parameters
-            #bounds = ([0, 0], [np.inf, np.inf])
-            #solp, cov_x = curve_fit(exponential_decay, centers_z[peaks], zdf_full[peaks], p, bounds=bounds)
+            period = 0.438
+            p = np.array([2, 10])  # initial guess at parameters
+            bounds = ([0, 0], [np.inf, np.inf])
+            solp, cov_x = curve_fit(exponential_decay, centers_z[peaks], zdf_full[peaks], p, bounds=bounds)
 
-            # plt.plot(centers1[start:], 1 + solp[0]*np.exp(-centers1[start:]/solp[1]))
+            #plt.plot(centers_z[start:], 1 + solp[0]*np.exp(-centers_z[start:]/solp[1]))
 
-            #plt.plot(centers_z[start:end], exponential_decay(np.array(centers_z[start:end]), solp[0], solp[1]), '--',
-             #        color='black', label='Least squares fit')
-            #print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*solp[1], 10*np.sqrt(cov_x[1, 1])))
+            plt.plot(centers_z[start:end], exponential_decay(np.array(centers_z[start:end]), solp[0], solp[1]), '--',
+                    color='black', label='Least squares fit')
+            print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*solp[1], 10*np.sqrt(cov_x[1, 1])))
 
             #p = [2.5, 0.4, np.pi, 0.5]  # amplitude, period, phase shift, correlation length. Pick values above what is expected
             #bounds = ([0, 0.4, 0, 0.4], [np.inf, 0.6, np.inf, np.inf])  # bounds on fit parameters
@@ -625,9 +625,13 @@ if __name__ == "__main__":
             # print('Correlation length = %1.2f +/- %1.2f angstroms' % (10*solp[3], 10*np.sqrt(pcov[3, 3])))
             # print('Oscillation Period = %1.3f +/- %1.3f angstroms' % (10*solp[1], 10*np.sqrt(pcov[1, 1])))
 
-            plt.xlabel('z (nm)')
-            plt.ylabel('Frequency')
-            plt.savefig('r1.png')
+            plt.xlabel('Z distance separation (nm)', fontsize=14)
+            plt.ylabel('Count', fontsize=14)
+            plt.axes().tick_params(labelsize=14)
+            plt.tight_layout()
+            plt.legend(loc=1, prop={'size': 16})
+            # plt.ylim(0, 1.2 * np.amax(zdf_full))
+            plt.tight_layout()
             plt.show()
             exit()
         if len(args.slice) > 1:

@@ -896,42 +896,65 @@
 %		\caption{}\label{fig:ps5offset}
 %	\end{subfigure}
 %  \end{figure}
+  \section{Tail organization}
+  
+  In order to understand the origin of R-spots, we looked for ordering among
+  the tails. We divided the tail into three sections: tail fronts, tail 
+  middles and tail ends. The sections are illustrated in 
+  Figure~\ref{fig:tail_sections}.
+  
+  We plotted the center of masses of each tail section and measured the angle 
+  between each center of mass and its nearest neighbor center of masses of the
+  same tail section. For example, Figure~\ref{fig:centroids} shows a 3D plot of
+  the center of masses of each tail front. We wanted to know average location
+  of nearest neighbors to each center of mass. The red bead in 
+  Figure~\ref{fig:centroids} is a randomly selected center of mass. The
+  green beads are the nearest neighbor center of masses to the red bead. We
+  measured the angle between the red bead and each green bead with respect to
+  the $xy$ plane. We repeated the same calculation for each center of mass at
+  each simulation frame and were able to plot the average distribution shown
+  in Figure~\ref{fig:tail_fronts}. We repeated the calculation for the tail
+  middles (Figure~\ref{fig:tail_middles}) and the tail ends 
+  (Figure~\ref{fig:tail_ends}). The amount of order decreases as we explore
+  packing of tails farther from the head group.
+  
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.5\textwidth]{tail_sections}
+  \caption{We divided the tail into three regions: tail-fronts (blue), 
+  tail-middles (green) and tail-backs (red).}\label{fig:tail_sections}
+  \end{figure}
 
   \begin{figure}[!htb]
         \centering
-%        \begin{subfigure}{0.45\textwidth}
-%                \centering
-%                \hspace{-1cm}
-%                \vspace{1cm}
-%                \includegraphics[width=\textwidth,scale=2]{tails_topview.png}
-%                \caption{}\label{fig:tails_topview}
-%        \end{subfigure}
-%        \begin{subfigure}{0.45\textwidth}
-%                \centering
-%                \includegraphics[width=\textwidth]{tails_rzplot.png}
-%                \caption{}\label{fig:tails_rzplot}
-%        \end{subfigure}
-%        \begin{subfigure}{0.45\textwidth}
-                \includegraphics[width=0.5\textwidth]{centroids_box.png}
-		\caption{Monomer tails pack together hexagonally. The centroid
-			of each tail is visualized as a blue sphere. The centroids are calculated based
-			on the red atoms in Figure~\ref{fig:monomer_color_coded}. The red sphere
-			highlights an example of an alkane tail centroid with its nearest neighbors
-			(green spheres) surrounding it in a hexagonal pattern.}\label{fig:centroids}
-%        \end{subfigure}
-%        \begin{subfigure}{0.45\textwidth}
-%                \centering
-%                \includegraphics[width=\textwidth]{angles_traj_layered.png}
-%                \caption{}\label{fig:angle_distribution}
-%        \end{subfigure}
-%        \caption{(a) The trajectory can be stripped of all atoms except carbon
-%        atoms in monomer tails. (b) Simulated diffraction of the tail-only trajectory
-%        still gives rise to R-spots. (c) Finding the center of mass and visualizing
-%        their coordinates reveals the hexagonal-like packing of the tails. (d) The
-%        distribution created by measuring the angle between each centroid (e.g. red
-%        in (c)) and its nearest neighbors (e.g. green in (c)) with respect to the xy
-%        plane has distinct spikes near 30\degree, which is consistent with the location
-%        of R-spots}\label{fig:tail_packing}
+        \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\textwidth]{centroids.png}
+		\caption{}\label{fig:centroids}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\textwidth]{hexagonal_tail_packing.png}
+        \caption{}\label{fig:tail_fronts}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\textwidth]{hexagonal_tail_packing_middles.png}
+        \caption{}\label{fig:tail_middles}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\textwidth]{hexagonal_tail_packing_ends.png}
+        \caption{}\label{fig:tail_ends}
+        \end{subfigure}
+        \caption{Monomer tails pack together hexagonally. (a) The center of mass
+        of each tail-front (See Figure~\ref{fig:tail_sections}) is visualized as
+        a blue sphere. The red sphere highlights an example of a tail-front 
+        center of mass with its nearest neighbors (green spheres) surrounding it
+        in a hexagonal pattern. (b) We calculated the angle between each tail-front
+        center of mass and its nearest neighbor tail-front center of masses and 
+        plotted the distribution. There are distinct peaks ca. $-60\degree$, $0\degree$ and
+        $60\degree$ which is indicitive of hexagonal packing. (c) We repeated the 
+        same procedure outlined in (a) and (b) with the tail-middles. There is still 
+        a high degree of order. (d) We repeated the procedure again with the tail-ends.
+        There is far less order at the ends of the tails where there is more
+        space to fill.}\label{fig:tail_packing}
   \end{figure}
 
   \begin{figure}[!htb]

@@ -1165,14 +1165,14 @@ liquid crystal membranes}
   converge to a single equilibrium configuration, but that time is far beyond the 100's of 
   nanosecond simulated here. For simplicity, we group the systems studied here into the ordered
   and disordered basins. What we find is that any system where $\mathit{d}=3.7$ \AA~can generally 
-  be characterized as being in an
-  more ordered basin, and any system where $\mathit{d}=5.0$ \AA~can be characterized as a more the disordered basin.
-  Generally, when monomers are started further apart, they stay further apart than systems where
-  monomers are started closer together (see Table~\ref{table:correlation_length}). Because of the
-  extra space between stacked monomers, monomer head groups have more rotational freedom. We
-  quantified the ordering of the head groups using the nematic order parameter (see section S-\ref{S-method:nematic_order} for details of calculation). 
-  Disordered basin systems have a lower nematic order parameter (meaning they are more disordered) 
-  than ordered basin systems.
+  be characterized as being in a more ordered basin, and any system where $\mathit{d}=5.0$ \AA~can
+  be characterized as a more the disordered basin. Generally, when monomers are started further 
+  apart, they stay further apart than systems where monomers are started closer together 
+  (see Table~\ref{table:correlation_length}). Because of the extra space between stacked 
+  monomers, monomer head groups have more rotational freedom. We quantified the ordering of
+  the head groups using the nematic order parameter (see section S-\ref{S-method:nematic_order}
+  for details of calculation). Disordered basin systems have a lower nematic order parameter 
+  (meaning they are more disordered) than ordered basin systems.
 
   %MRS7: maybe above say where (i.e. what section) it will become clear?  Or possibly describe them here by order parameter instead of by starting distance, and state the correlation between starting distance and order parameter.
 %    All systems tested are at least metastable on the timescales studied here, however not all 
@@ -1190,7 +1190,7 @@ liquid crystal membranes}
   disordered basin systems built with 6 columns-per-pore agree with experimental
   pore-to-pore distances within error, but stack too far apart. Those in the
   disordered sandwiched and disordered parallel displaced configurations stack
-  $\sim$4.87 and 4.94 \AA~apart respectively, which is ca. 1.2~\AA further apart
+  $\sim$~4.87 and 4.94 \AA~apart respectively, which is ca. 1.2~\AA~further apart
   than suggested by experiment. 5 column-per-pore systems stack, at a maximum,
   0.9 \AA~further apart than experiment (see 
   Table~\ref{table:correlation_length}).  The remainder of this discussion will
@@ -1303,14 +1303,14 @@ liquid crystal membranes}
 %  We will explore its possible origins and reasons
 %  that it does not appear in our simulated patterns in Section~\ref{section:rdouble}.
   
-  The simulated XRD patterns of the parallel displaced configurations show an additional
-  reflection due to their helical structure. There are weak horizontal reflections near $|q_z|= 
-  0.7~\AA^{-1}$, half of the $q_z$ value of R-$\pi$. The reflection does not cross through
-  $q_r = 0~\AA^{-1}$ so it does not necessarily appear for the same reason as R-double. 
-  This type of pattern is characteristic of a helix~\cite{watson_structure_1953}, as the 
-  head groups in the parallel displaced configuration are arranged in a helix.
-  It is possible that these reflections contribute to the diffuse reflections that connect
-  R-spots and R-double in the experimental pattern.
+  The simulated XRD patterns of the parallel displaced configurations show additional
+  weak horizontal reflections near $|q_z|= 0.7~\AA^{-1}$, half of the $q_z$ value of R-$\pi$.
+  The reflection does not cross through $q_r = 0~\AA^{-1}$ so it does not necessarily appear
+  for the same reason as R-double. It is possible that parallel displaced monomers contribute
+  to the diffuse reflections that connect R-spots and R-double in the experimental pattern.
+  
+  %  This type of pattern is characteristic of a helix~\cite{watson_structure_1953}, as the 
+  %  head groups in the parallel displaced configuration are arranged in a helix.
 
   We quantified the numerical discrepancies present when comparing the relative intensities
   of each reflection of interest between experimental and simulated patterns. 
@@ -1325,7 +1325,7 @@ liquid crystal membranes}
   R-$\pi$, since that is where it appears experimentally. The intensity of R-spots is slightly
   lower than experiment in all cases except for the ordered basin sandwiched configuration which 
   agrees with experiment. There is no R-double intensity to be measured. Figures
-  are provided in section S-\ref{S-section:xrd_intensities} to make these measurements clear.
+  are provided in section S-\ref{S-section:xrd_intensities} to further clarify these measurements.
 
   \begin{table}[h]
   \centering
@@ -1510,20 +1510,26 @@ liquid crystal membranes}
 
   %To understand the most likely origin of R-spots, we determined which atoms
   %gave rise to the feature. 
-  R-spots originates from the monomer tails. By removing all non-tail atoms from 
-  the trajectory and simulating a diffraction pattern with the remaining atoms, 
-  we were able to isolate the cause of the spots to the tails 
-  (Figure~\ref{fig:tails_rzplot}).
+  Although the monomer tails do not tilt, R-spots still originates from the 
+  them. By removing all non-tail atoms from the trajectory and simulating a
+  diffraction pattern with the remaining atoms, we were able to isolate the
+  cause of the spots to the tails (Figure~\ref{fig:tails_rzplot}).
 
-  The tails pack together hexagonally. We plotted the center of mass of the 
+  %BJC9: I think Matt gets confused here. I put a more detailed explanation in 
+  % the supplemental information. Do you think that's enough, or should I add
+  % to this figure?
+  The tails pack together hexagonally. We plotted the center of masses of the 
   first four tail atoms of each tail originating from each head group 
   (Figure \ref{fig:centroids}). We measured the angle between each center of
-  mass and its nearest neighbors with respect to the $xy$ plane of the membrane. 
-  We see distinct peaks in the distribution of these angles located ca. 
-  $-60\degree$, $0\degree$, and $60\degree$ which is consistent with a 
-  hexagonally packed configuration (Figure~\ref{fig:layered_tails}). This 
-  ordering dies off at the tail ends, where there is more space to fill 
-  causing them to pack nearly isotropically (See supporting information). 
+  mass and its nearest neighbor center of masses with respect to the $xy$ 
+  plane of the membrane. We see distinct peaks in the distribution of these 
+  angles located ca. $-60\degree$, $0\degree$, and $60\degree$ which is 
+  consistent with a hexagonally packed configuration 
+  (Figure~\ref{fig:layered_tails}). This ordering dies off at the tail ends,
+  where there is more space to fill causing them to pack nearly isotropically.
+  See Section~S-\ref{S-tail_packing} for a more detailed explanation of the 
+  calculation and packing distributions generated from different sections of
+  the tails.
 
   The peaks in the nearest neighbor angle distribution are consistent with the
   location of R-spots. The 2D Fourier transform of a simple hexagonal array 
@@ -1612,17 +1618,40 @@ liquid crystal membranes}
   ranges from 3 times too high in the ordered parallel displaced system to 15 times too 
   high in the ordered sandwiched configuration (Table~\ref{table:relative_inensities_300K}).
   
-  % BJC9: This still needs to be worked out. Rest of section should still hold up
-  The full width at half maximums (FWHM) of the $q_r$ and $q_z$ cross-sections
-  of R-$\pi$ are broader than experiment (Figure~\ref{fig:rpi_exp_comparison}).
-  The FWHM of the $q_z$ cross-section is 76 \% larger than experiment and the
-  $q_r$ cross-section FWHM is 21\% larger than experiment. Note that the
-  experimental data is best fit with a Lorentzian function while the simulated
-  patterns are best fit using a Gaussian function. The simulated spectra do not
-  incorporate the effects of finite domain sizes, pressure broadening and
-  instrumental broadening which would alter the peak shape. In the absence of
-  these and other peak broadening effects, the experimental peak would actually
-  be narrower, further increasing the discrepancy with simulation.
+  The peak shape of the $q_r$ cross-section of R-$\pi$ is qualitatively different
+  from experiment (Figures~\ref{fig:exp_rsection_fit} and~\ref{fig:sim_rsection_fit}).
+  We use simulated XRD generated from the ordered parallel displaced configuration
+  as an example in Figure~\ref{fig:rpi_exp_comparison}. The $q_z$ cross-section 
+  fits a Lorentzian profile relatively well, although its full width at half maximum
+  (FWHM) is 48 \% broader than the experimental cross-section 
+  (Figures~\ref{fig:exp_zsection_fit} and ~\ref{fig:sim_zsection_fit}). We attempted
+  to fit a Lorentzian profile to the $q_r$ cross-section and although the FWHM agrees
+  with experiment within error, the fit is not optimal due to the three sharp peaks
+  that appear near $q_r$ = 0. 
+  
+  An exact quantitative comparison between experiment and simulation is not feasible. 
+  Experimental peaks broaden due to effects that we can not easily simulate such
+  as finite size crystalline domains and instrumental resolution. In our simulated
+  XRD patterns, the system size imposes limitations on the resolution, which makes
+  it difficult to reliably fit peaks. This is especially problematic when comparing
+  the FWHM of the $q_z$ cross-section of R-$\pi$, where the experimental FWHM 
+  (0.11 $\AA^{-1}$) is similar to the bin size in the $q_z$ direction (ca. 0.07 $\AA^{-1}$).
+  Additionally, we model each atom with a Gaussian sphere of electron density. 
+  The true electronic structure is likely much more complicated. The subsequent
+  discussion primarily serves to demonstrate how we can qualitatively change the
+  peak shapes to be in better agreement with experiment.
+  
+% BJC9: old version of above paragraph
+%  The full width at half maximums (FWHM) of the $q_r$ and $q_z$ cross-sections
+%  of R-$\pi$ are broader than experiment (Figure~\ref{fig:rpi_exp_comparison}).
+%  The FWHM of the $q_z$ cross-section is 76 \% larger than experiment and the
+%  $q_r$ cross-section FWHM is 21\% larger than experiment. Note that the
+%  experimental data is best fit with a Lorentzian function while the simulated
+%  patterns are best fit using a Gaussian function. The simulated spectra do not
+%  incorporate the effects of finite domain sizes, pressure broadening and
+%  instrumental broadening which would alter the peak shape. In the absence of
+%  these and other peak broadening effects, the experimental peak would actually
+%  be narrower, further increasing the discrepancy with simulation.
   
   %MRS9: State explicitly in what way the discrepancy would increase, i.e. experimental FWHM are broadened by other source (doppler pressure, insttrument broadening) that do no affect the simulated spectra, the experimental spectra may be even narrower than spectra generated from simulations are.  
   %MRS9: one question, do any of the approximations used in the simulation actually lead to broadening that would not be in experiment (gaussian scatterers, etc.  Also, (semi-related) do Gaussian scatters lead to Gaussian peaks? Fourier transforms of Gaussians are Gaussians) 
@@ -1634,79 +1663,83 @@ liquid crystal membranes}
   \begin{figure}
   \centering
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{exp_zsection_fit.png}
-  \caption{FWHM = 0.110 $\pm$ 0.003 $\AA^{-1}$}\label{fig:exp_zsection_fit}
-  \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{exp_rsection_fit.png}
   \caption{FWHM = 0.792 $\pm$ 0.009 $\AA^{-1}$}\label{fig:exp_rsection_fit}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{sim_zsection_fit.png}
-  \caption{FWHM = 0.194 $\pm$ 0.013 $\AA^{-1}$}\label{fig:sim_zsection_fit}
+  \includegraphics[width=\textwidth]{sim_rsection_fit.png}
+  \caption{FWHM = 0.796 $\pm$ 0.011 $\AA^{-1}$}\label{fig:sim_rsection_fit}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{sim_rsection_fit.png}
-  \caption{FWHM = 0.962 $\pm$ 0.010 $\AA^{-1}$}\label{fig:sim_rsection_fit}
+  \includegraphics[width=\textwidth]{exp_zsection_fit.png}
+  \caption{FWHM = 0.110 $\pm$ 0.003 $\AA^{-1}$}\label{fig:exp_zsection_fit}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{sim_zsection_fit.png}
+  \caption{FWHM = 0.163 $\pm$ 0.011 $\AA^{-1}$}\label{fig:sim_zsection_fit}
   \end{subfigure}
   \caption{
-  In experiments ((a) and (b)), (a), R-$\pi$ broadens in the $q_z$ direction
-  with a FWHM of 0.110 $\pm$ 0.003 $\AA^{-1}$ when fit with a Lorentzian
-  function. (b) R-$\pi$ broadens in the $q_r$ direction with a FWHM of 0.792
-  $\pm$ 0.009 $\AA^{-1}$ when fit with a Lorentzian function. In our simulations
-  ((c) and (d)), (c) the FWHM of R-$\pi$ in the $q_z$ direction is 0.194 $\pm$
-  0.013 $\AA^{-1}$ when fit with a Gaussian function, nearly twice the width of
-  experiment. (d) The simulated FWHM in the $q_r$ direction is 0.962 $\pm$ 0.01
-  $\AA^{-1}$ when fit with a Gaussian function, about 20 \% larger than
-  experiment. Note that the large spike in the center is not included in the
-  fit.}\label{fig:rpi_exp_comparison}
+%  There are clear qualitative differences between the experimental WAXS pattern 
+%  ((a) and (c)) and the simulated XRD pattern resulting from simulations 
+%  of the ordered parallel displaced configuration ((b) and (d)). 
+  We compared the experimental WAXS pattern ((a) and (c)) to the simulated XRD
+  pattern resulting from simulations of the ordered parallel displaced 
+  configuration ((b) and (d)). The $q_r$ cross-section of R-$\pi$ ((a) and (b))
+  is qualitatively different between experiment (a) and simulation (b). We fit
+  Lorentzian profiles to each peak and the FWHM of the simulated pattern agrees
+  with experiment within error, however the fit to the simulated data is 
+  obscured by the three sharp peaks which appear near $q_r$ = 0. The $q_z$ 
+  cross-sections of R-$\pi$ ((c) and (d)) are qualitatively similar. Each fits
+  a Lorentzian profile well, however the FWHM of the simulated cross-section (d)
+  is 48 \% larger than the experimental cross-section.}\label{fig:rpi_exp_comparison}
   \end{figure}
   
   We have identified a number of potential ways that simulation conditions,
   forcefield and initial configurations could affect the intensity and shape of
-  R-$\pi$. We assessed each using a
-  simplified model. Our simplified model represents each monomer head group as a
-  single point and places them in either a parallel displaced or sandwiched
-  configuration. We chose to explore the influence of thermal noise in each
-  dimension, the effect of $z$-direction distance correlations between scatterers
-  within columns, as well as correlation between columns since these are the
-  variables we believe have the largest influence on peak shape and intensity.
-  %MRS9: probably best to focus on the variables that we think could cause a problem (i.e. hypotheses to test) first, then talk about how the experiments tested these hypotheses.
+  R-$\pi$. We assessed each using a simplified model. Our simplified model 
+  epresents each monomer head group as a single point and places them in either
+  a parallel displaced or sandwiched configuration. We chose to explore the 
+  influence of thermal noise in each dimension, the effect of $z$-direction 
+  distance correlations between scatterers within columns, as well as correlation
+  between columns since these are the variables we believe have the largest 
+  influence on peak shape and intensity.
   
   As a baseline, we created a simplified model using the same amount of
   disorder present in our atomistic simulations. There are two sources of
   disorder to consider: thermal motion of atoms and quenched disorder which is
-  created by rapid structural rearrangement during early equilibration and is
-  largely locked into place for the remainder of the simulation. The latter has
-  important implications for the reproducibility of this work since both initial
-  configurations and initial velocity randomization can
-  lead to different quenched configurations. We measured thermal disorder by
-  calculating the standard deviation of the distribution of head group center of
-  mass positions from their average positions. We measured quenched disorder by
-  calculating the standard deviation of the distribution of head group center of
-  masses from their idealized average positions. In the $z$-direction, we
-  measured the deviation of the head group center of masses from an equally
-  spaced column of head groups. In the $xy$ plane, we calculated the deviation in
-  radial position from the pore center and the angular deviation from equally
-  spaced points surrounding the pore center. This method for calculating 
-  quenched order inherently includes thermal disorder. The values measured for
-  each system and type of disorder are given in Table~\ref{table:quenched_disorder}.
+  created by rapid structural rearrangement during early equilibration and 
+  is largely locked into place for the remainder of the simulation. The latter
+  has important implications for the reproducibility of this work since both 
+  initial configuration and initial velocity randomization can lead to 
+  different quenched configurations. We measured thermal disorder by
+  calculating the standard deviation of the distribution of head group center 
+  of mass positions from their average positions. We measured quenched 
+  disorder by calculating the standard deviation of the distribution of head
+  group center of masses from their idealized average positions. In the 
+  $z$-direction, we measured the deviation of the head group center of masses
+  from an equally spaced column of head groups. In the $xy$ plane, we 
+  calculated the deviation in radial position from the pore center and the
+  angular deviation from equally spaced points surrounding the pore center.
+  This method for calculating quenched order inherently includes thermal 
+  disorder. The values measured for each system and type of disorder are given
+  in Table~\ref{table:quenched_disorder}.
 
-  The intensity of R-$\pi$ can be calculated from a single trajectory of
-  uncorrelated configurations rather than from the average of multiple correlated
-  trajectories. Theoretically, in order to mimic the simulated system, we should
-  build an initial configuration which has the same amount of quenched disorder
-  as our simulations and then create a trajectory to which we add thermal
-  noise to each subsequent frame. In this scenario, the positions of each scatterer
-  will not change in a way that significantly affects the intensity of R-$\pi$
-  since most of its character is defined by the far more disordered initial configuration.
-  To uncover the expected intensity of R-$\pi$, we would need to average over many
-  such trajectories. To bypass this expensive calculation, we instead calculate the
+  The expected maximum intensity of R-$\pi$ can be calculated from a single
+  trajectory of uncorrelated configurations rather than from the average of 
+  multiple trajectories of correlated frames. Theoretically, in order to
+  mimic the simulated system, we should build an initial configuration which 
+  has the same amount of quenched disorder as our simulations and then create
+  a trajectory to which we add thermal noise to each subsequent frame. In this
+  scenario, the positions of each scatterer will not change in a way that 
+  significantly affects the intensity of R-$\pi$ since most of its character 
+  is defined by the far more disordered initial configuration. To uncover the
+  expected intensity of R-$\pi$, we would need to average over many such 
+  trajectories. To bypass this expensive calculation, we instead calculate the
   R-$\pi$ intensity from a trajectory consisting of many independent initial 
-  configurations. This simulates the long time scales over which we expect columns
-  to sample many configurational states. %We use the latter method for the remainder of
-%  this section since we can extract the trends we need using a single trajectory at
-%  a fraction of the computational cost.
+  configurations. This simulates the long time scales over which we expect 
+  columns to sample many configurational states. %We use the latter method 
+  %for the remainder of this section since we can extract the trends we 
+  %need using a single trajectory at a fraction of the computational cost.
   
   When we simulated the diffraction pattern of a parallel displaced simple
   system trajectory of 1000 independent configurations, the
@@ -1789,13 +1822,15 @@ liquid crystal membranes}
 
   %BJC8: Can show correlation effect on intensity in supporting info
 
-  The correlation length of vertically stacked scatterers in our simulations
+  The correlation length of vertically stacked scatterers in our atomistic simulations
   are in reasonable agreement with experiment. Since it is not feasible for us to
   simulate membranes with much taller columns for increased $q_z$ resolution, and
   because the peak shape is convoluted by the extremely intense maximum of
   R-$\pi$, we measured correlation length by plotting the one-dimensional pair
   distribution function, $g(z)$, for the centers of mass of monomer phenyl rings
-  (Figure~\ref{fig:correlation}). 
+  (Figure~\ref{fig:correlation}). In order to calculate $g(z)$, we averaged all
+  $z$-slices of the 3D correlation function within 2.1 \AA of $g(0, 0, z)$. In this
+  way we are trying measure correlation between head groups within the same column.
   %We used this 
   %information to understand how far apart monomers stack within monomer columns and
   %the degree to which they are correlated.
@@ -1883,8 +1918,13 @@ liquid crystal membranes}
 
   The correlation length of the parallel displaced, ordered basin system shows
   the closest agreement with experiment (Table~\ref{table:correlation_length}).
-  We calculated the correlation length of each system using
-  Equation~\ref{eqn:decaying_exponential}. We could not extract a reliable
+  Note that its correlation length ($L$ = 14.5 \AA) is larger than what we would 
+  expect by inverting the FWHM of the $q_z$ cross-section of R-$\pi$ shown in 
+  Figure~\ref{fig:sim_zsection_fit} ($L$ = 1 / 0.163 = 6.1 \AA). The reason is
+  likely a combination of artificial broadening caused by the overlap of 
+  R-alkanes and R-$\pi$ as well as errors in the fit due to low simulated 
+  XRD resolution. We calculated the correlation length of each system using 
+  Equation~\ref{eqn:decaying_exponential}. We could not extract a reliable 
   correlation length from the disordered parallel displaced configuration since
   the peaks do not show clear patterns that can easily be fit to an exponential
   decay. The correlation length of both sandwiched systems is relatively low
@@ -1915,9 +1955,9 @@ liquid crystal membranes}
 %  system would maintain a correlation length and R-$\pi$ intensity in relative
 %  agreement with experiment.
   
-  Increased thermal noise in the $z$-direction causes a drop in the intensity
+  Increased thermal noise in the $z$-direction will reduce the intensity
   of R-$\pi$, however the $q_r$ profile remains unchanged. When we increase the
-  thermal noise of our parallel displaced simple system in the $z$-direction by
+  thermal noise of our simple parallel displaced system in the $z$-direction by
   12\% and 27\%, we see a 3 and 15-fold decrease in the maximum intensity of 
   R-$\pi$ respectively (Figure~\ref{fig:znoise}). Despite the decrease in 
   intensity, the 3 cross-sections have the same shape 
@@ -1954,17 +1994,14 @@ liquid crystal membranes}
   distribution bounded by (0, $f \times \mathit{d}_{equil}$) where $f$ ranges
   between 0 and 1. We limit this discussion to the sandwiched configuration since
   it is not feasible for columns in the parallel displaced configuration, as we
-  have set them up, to move past each other. The trends seen above apply to both
-  the sandwiched and parallel displaced systems. 
-  %BJC9: ^need to prove that in supplemental?  
-  Allowing columns to move
-  independently smooths out the $q_r$ cross-section
-  (Figure~\ref{fig:column_displacement}). Any amount of dependence results in
-  sharp peaks. The intensity of R-$\pi$ decreases with increasing column
-  independence. We see an 8-fold decrease in the intensity of R-$\pi$ when $f=1$
-  versus when $f=0$. It is likely that the discrepancy between the intensity of 
-  R-$\pi$ generated from our simulations versus experiment is primarily due
-  to highly correlated columns in our initial configurations.
+  have set them up, to move past each other. When $f = 1$, the columns move 
+  independently and the $q_r$ cross-section smooths out 
+  (Figure~\ref{fig:column_displacement}). Any amount of dependence results in sharp
+  peaks. The intensity of R-$\pi$ decreases with increasing column independence.
+  We see an 8-fold decrease in the intensity of R-$\pi$ when $f=1$ versus when
+  $f=0$. It is likely that the discrepancy between the intensity of R-$\pi$ 
+  generated from our simulations versus experiment is primarily due to highly 
+  correlated columns in our initial configurations.
   
   \begin{figure}
   \centering
@@ -1990,6 +2027,27 @@ liquid crystal membranes}
 	  still exist. (c) When columns are completely independent, $f$ = 1, the
 	  intensity of R-$\pi$ decreases 8-fold to 2.3 and the cross-section is
           relatively smooth.}\label{fig:column_displacement}
+  \end{figure}
+  
+  The columns in the simulated system are highly correlated. If the columns were
+  uncorrelated, $g(z)$ of the ordered sandwiched system would very closely resemble 
+  Figure~\ref{fig:z_correlation_sandwich} when we average all $z$-slices of the
+  3D correlation function. When we include all $z$-slices in $g(z)$ for our system,
+  the function shows oscillatory behavior and the correlation length nearly triples
+  to 12.41 $\pm$ 0.69 \AA. (Figure~\ref{fig:z_correlation_fullbox}). Since all 
+  columns in our initial configuration are started at the same $z$-coordinate, 
+  $g(z)$ on average exhibits correlation of head groups with other head groups
+  within the same column, with head groups in other columns within the same pore, 
+  and with head groups in different pores.
+  
+  %BJC9: Note that the magnitude of the correlation function is much lower than 
+  % in figure 10a. That's because many of the z-slices are zero when you include
+  % all of them.
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{z_correlation_fullbox.png}
+  \caption{When we average all $z$-slices of the 3D correlation function, the 
+  correlation length of the ordered sandwich configuration nearly triples.}\label{fig:z_correlation_fullbox}
   \end{figure}
   
   Increasing thermal noise in the $xy$ plane causes the FWHM of the $q_r$

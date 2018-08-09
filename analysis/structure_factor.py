@@ -303,6 +303,9 @@ class Trajectory(object):
         #     shifts[i] = shift_range * (z_separation / 2) * np.random.uniform(-1, 1)  # shift column by a random amount
         # thetas = np.random.uniform(0, 2*np.pi, size=npores**2)  # randomly rotate each pore about the z-axis
 
+        # for uncorrelated pores
+        # shifts = shift_range * (z_separation / 2) * np.random.uniform(-1, 1, size=npores**2)
+
         print('z-spacing: %.2f' % z_separation)
         print('Pore center spacing: %.2f' % dx)
 
@@ -337,9 +340,9 @@ class Trajectory(object):
                     self.locations[t, start:end, 1] = xy_pore_centers[c, 1] + y
                     if noise:
                         shift = shift_range * (z_separation / 2) * np.random.uniform(-1, 1)  # shift column by a random amount
+                        #shift = shifts[c]
                     else:
                         shift = 0
-
                     # x_disorder = r*np.random.normal(scale=thermal_disorder[0], size=(end - start))
                     # y_disorder = r*np.random.normal(scale=thermal_disorder[1], size=(end - start))
                     # z_disorder = z_separation*np.random.normal(scale=thermal_disorder[2], size=(end - start))
