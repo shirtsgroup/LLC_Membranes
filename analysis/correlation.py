@@ -391,7 +391,7 @@ if __name__ == "__main__":
             t = md.load(args.gro)
             print('Configuration loaded')
         else:
-            t = md.load(args.traj, top=args.gro)[args.begin:]
+            t = md.load(args.traj, top=args.gro)[args.begin:-1]
             print('Trajectory loaded')
 
         if args.atoms[0][0] == 'all':
@@ -533,7 +533,8 @@ if __name__ == "__main__":
             for it in range(locations.shape[0]):  # looped to save memory
                 locations[it, ...] = np.where(locations[it, ...] < L, locations[it, ...], locations[it, ...] - L)  # get positions in periodic cell
                 locations[it, ...] = np.where(locations[it, ...] > zv, locations[it, ...], locations[it, ...] + L)
-
+            from LLC_Membranes.llclib import file_rw
+            file_rw.write_gro_pos(center_of_mass[-1, ...], "test1.gro")
             # fourier transform loop
             fft = np.zeros([x.size - 1, y.size - 1, z.size - 1])
             for frame in tqdm.tqdm(range(frames), unit='Frames'):
@@ -575,6 +576,7 @@ if __name__ == "__main__":
 
             #plt.plot(centers_z[1:], zdf, linewidth=2)
             plt.plot(centers_z[1:], zdf_full, linewidth=2, label='Raw data')
+
             plt.xlim(0, 4)
             # plt.ylim(0, 2)
 

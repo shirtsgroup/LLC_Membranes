@@ -24,13 +24,17 @@ def initialize():
                         'function with respect to. The center of mass will be used')
     parser.add_argument('-r', '--res', nargs='+', help='Residue to create correlation function with '
                         'respect to. Will use center of mass. Will override atoms')
-    parser.add_argument('--itp', default='/home/bcoscia/PycharmProjects/GitHub/HII/top/Monomer_Tops/NAcarb11V.itp')
     parser.add_argument('-b', '--begin', default=-50, type=int, help='Start frame')
     parser.add_argument('-e', '--end', default=-1, type=int, help='End frame')
     parser.add_argument('-bins', nargs='+', default=100, type=int, help='Integer or array of bin values. If more than'
                         'one value is used, order the inputs according to the order given in args.axis')
+    parser.add_argument('-com', '--center_of_mass', action="store_true", help='Calculate based on center of mass of'
+                                                                               'args.atoms')
+    parser.add_argument('-s', '--slice', help='Slice to be visualized')
+
+    parser.add_argument('--itp', default='/home/bcoscia/PycharmProjects/GitHub/HII/top/Monomer_Tops/NAcarb11V.itp')
     parser.add_argument('-m', '--monomers_per_layer', default=5, type=int, help='Number of monomers per layer')
-    parser.add_argument('-s', '--slice', default='z', help='Slice to be visualized')
+
     parser.add_argument('--layers', default=20, type=int, help='Number of layers')
     parser.add_argument('--range', nargs='+', help='Range for histogram plot. A list of the form:'
                         '[dimension 1 lower, dimension 1 upper, dimension 2 lower, dimension 2 upper ...]')
@@ -41,8 +45,7 @@ def initialize():
     parser.add_argument('--load', action="store_true", help='load previously calculated correlation function')
     parser.add_argument('-pr', '--plot_range', nargs='+', help='range to plot. A list of the form: '
                         '[dimension 1 lower, dimension 1 upper, dimension 2 lower, dimension 2 upper ...]')
-    parser.add_argument('-com', '--center_of_mass', action="store_true", help='Calculate based on center of mass of'
-                                                                               'args.atoms')
+
     parser.add_argument('-offset', action="store_true", help='If system is in offset configuration, correlation length'
                                                              'will be calculated using every other peak')
     parser.add_argument('-aa', '--angle_average', action="store_true", help='Angle average the 3D correlation function'
@@ -71,7 +74,8 @@ def exponential_decay(x, a, L):
 
 class Correlation(object):
 
-    def __init__(self, gro, trajectory=None, atoms='all', res='all', com=True, bins=[100, 100, 100], begin=0, end=-1):
+    def __init__(self, gro, trajectory=None, atoms='all', res='all', com=True, bins=[100, 100, 100], begin=0, end=-1,
+                 theta=120):
         """
         :param gro: GROMACS coordinate file
         :param trajectory: GROMACS trajectory file (.xtc or .trr)
@@ -84,10 +88,15 @@ class Correlation(object):
         :param bins: number of bins in each dimension for histogramming
         :param begin: First frame of coordinates to use
         :param end: last frame of coordinates to use
+        :param theta: angle between xy box vectors
         """
 
         # Initialize certain variables
         self.positions = None
+        self.box = None
+        self.bins = bins
+        self.slice = None
+        self.theta = theta
 
         # Load coordinates
         if trajectory is None:
@@ -99,16 +108,11 @@ class Correlation(object):
             self.t = md.load(trajectory, top=gro)[begin:end]
             print('Trajectory loaded')
 
-        # get average box vectors in each dimension
-        self.box = np.zeros([3])
-        for i in range(3):
-            self.box[i] = np.mean(np.linalg.norm(self.t.unitcell_vectors[:, i, :], axis=1))
-
         if res is None:
             print('No residue names are attached to the atom groups provided, guessing at residue names instead. This '
                   'is probably a bad idea unless there is only one residue.')
             residues = [a.residue.name for a in self.t.topology.atoms]
-            res = set(residues)
+            res = list(set(residues))
             print('Guessed residues: %s' % res)
 
         # get indices of atoms to be included in calculation, separated into groups if specified
@@ -141,6 +145,23 @@ class Correlation(object):
                 keep += self.keep[i]
             self.positions = self.t.xyz[:, keep, :]
 
+        if self.theta != 90:
+
+            self.theta *= (np.pi / 180)
+            # convert monoclinic cell to cubic cell
+            print("Transforming coordinates from monoclinic to cubic unit cell")
+            self.positions[..., 1] /= np.sin(self.theta)
+            self.positions[..., 0] -= self.positions[..., 1]*np.cos(self.theta)
+
+        self.rescale()  # scale coordinates so box dimensions are the same for each frame
+        self.wrap_coordinates()  # put all atoms in the box
+        self.correlation3d, self.edges = self.calculate_correlation_function()
+
+        self.bin_centers = []
+        for d in range(3):
+            self.bin_centers.append(np.array([self.edges[d][i] + ((self.edges[d][i + 1] - self.edges[d][i]) / 2)
+                                              for i in range(self.correlation3d.shape[d])]))
+
     def com(self):
         """
         Calculate center of mass of groups of atoms. Assumes groups are sequentially numbered.
@@ -161,40 +182,222 @@ class Correlation(object):
                         w = (self.t.xyz[f, self.keep[g][start:end], :].T * self.mass[g]).T
                         self.positions[f, ndx[g] + i, :] = np.sum(w, axis=0) / sum(self.mass[g])
 
+    def rescale(self):
+        """
+        rescale coordinates so that cell dimensions are constant over the simulation
+        returns rescaled coordinates and average length
+        """
 
-def duplicate_periodically(pts, box):
-    """
-    Duplicate points periodically in the +/- xyz directions. Assumes y box vector is angled with respect to x and
-    the z vector points straight up
-    :param pts: pts to be duplicated
-    :param box: unitcell vectors in mdtraj format (use t.unitcell_vectors)
-    :return: periodically extended system
-    """
+        dims = np.linalg.norm(self.t.unitcell_vectors, axis=2)  # magnitude of unitcell vectors at each frame
+        self.box = np.average(dims, axis=0)
+        a = self.box / dims
 
-    nT = pts.shape[0]
-    npts = pts.shape[1]
-    p = np.zeros([nT, npts*27, 3])
+        for f in range(self.positions.shape[0]):
+            for i in range(3):
+                self.positions[f, :, i] *= a[f, i]
 
-    p[:, :npts, :] = pts
+    def wrap_coordinates(self):
 
-    for t in range(nT):
+        zv = [0.0, 0.0, 0.0]  # zero vector
 
-        p[t, npts:2*npts, :] = pts[t, :, :] + box[t, 2, :]
-        p[t, 2*npts:3*npts, :] = pts[t, :, :] - box[t, 2, :]
+        # put all atoms inside box - works for single frame and multiframe
+        for it in range(self.positions.shape[0]):  # looped to save memory
+            self.positions[it, ...] = np.where(self.positions[it, ...] < self.box, self.positions[it, ...],
+                                               self.positions[it, ...] - self.box)  # get positions in periodic cell
+            self.positions[it, ...] = np.where(self.positions[it, ...] > zv, self.positions[it, ...],
+                                               self.positions[it, ...] + self.box)
 
-        for i in range(3, 6):
-            p[t, i*npts:(i+1)*npts, :] = p[t, (i-3)*npts:(i-2)*npts] + box[t, 0, :]
+    def calculate_correlation_function(self):
 
-        for i in range(6, 9):
-            p[t, i*npts:(i+1)*npts, :] = p[t, (i-6)*npts:(i-5)*npts] - box[t, 0, :]
+        # define bin edges
+        x = np.linspace(0, self.box[0], int(self.bins[0]))
+        y = np.linspace(0, self.box[1], int(self.bins[1]))  # for converted square box, y box length is same as x
+        z = np.linspace(0, self.box[2], int(self.bins[2]))
 
-        for i in range(9, 18):
-            p[t, i*npts:(i+1)*npts, :] = p[t, (i-9)*npts:(i-8)*npts] + box[t, 1, :]
+        # calculate structure factor loop (Histograms then fourier transforms)
+        sf = np.zeros([x.size - 1, y.size - 1, z.size - 1])
+        for frame in tqdm.tqdm(range(self.positions.shape[0]), unit='Frames'):
+            H, edges = np.histogramdd(self.positions[frame, ...], bins=(x, y, z))
+            fft = np.fft.fftn(H)  # fourier transform grid after subtracting mean
+            sf += (fft * fft.conjugate()).real
 
-        for i in range(18, 27):
-            p[t, i*npts:(i+1)*npts, :] = p[t, (i-18)*npts:(i-17)*npts] - box[t, 1, :]
+        sf /= self.positions.shape[0]  # average over all frames
 
-    return p
+        # invert structure factor back to real space
+        return np.fft.ifftn(sf), edges
+
+    def make_slice(self, axis, radius=0, plot=True, show=False, fit=True):
+        """
+        Take a slice of the 3d correlation function along a specified axis
+        :param axis: axis along which to take slice, int chosen from (0, 1, 2)
+        :param radius: average all off-center slices within this radius of the center
+        :return:
+        """
+
+        other_dimensions = [i for i in range(3) if i != axis]
+        avg = []
+        n = 0
+        for i, ix in enumerate(self.bin_centers[other_dimensions[0]]):
+            for j, jy in enumerate(self.bin_centers[other_dimensions[1]]):
+                if np.linalg.norm([ix - np.cos(self.theta)*jy, jy*np.sin(self.theta)]) < radius:  # only works for z-slice
+                    avg.append([i, j])
+                    n += 1
+
+        g = np.zeros_like(self.bin_centers[axis])
+        for i in range(len(avg)):
+            g += self.correlation3d[avg[i][0], avg[i][1], :].real
+
+        g = g[1:]  # get rid of giant spike at zero
+        self.slice = g / g.mean()
+        if plot:
+            self.plot_slice(axis, show=show, fit=fit)
+
+    def plot_slice(self, axis, show=False, fit=True, peak_locations=[], limits=None):
+        """
+        Plot slice generated by self.make_slice().
+        :param axis: axis along which slice was taken
+        :param show: show plot at the end
+        :param fit: fit a decaying exponential function to the peaks
+        :param peak_locations: locations of peaks to be fit
+        :param limits: x and y limits of plot of form : ([x_lower, x_upper], [y_lower, y_upper]). If you want matplotlib
+        to choose a specific axis limit for you, leave the list for that axis blank. If you want matplotlib to
+        automatically choose both axes, don't specify anything for this option
+        :return:
+        """
+
+        x = self.bin_centers[axis]
+        plt.plot(self.bin_centers[axis][1:], self.slice, linewidth=2, label='Raw Data')
+
+        if limits:
+            xlim = limits[0]
+            ylim = limits[1]
+            if xlim:
+                plt.xlim(xlim[0], xlim[1])
+            if ylim:
+                plt.ylim(ylim[0], ylim[1])
+
+        if fit:
+
+            if not peak_locations:
+                peaks = np.array(detect_peaks.detect_peaks(self.slice, mpd=12, show=False))
+            else:
+                peaks = np.array(peak_locations)
+
+            if limits:
+                peaks = [i for i in peaks if x[i] <= xlim[1]]
+
+            print("Peak Indices: %s" % peaks)
+
+            p = np.array([2, 10])  # initial guess at fit parameters [amplitude, correlation length]
+            bounds = ([0, 0], [np.inf, np.inf])  # constrain parameters so they are positive
+            solp, cov_x = curve_fit(exponential_decay, x[peaks], self.slice[peaks], p, bounds=bounds)
+
+            print('Correlation length = %1.2f +/- %1.2f angstroms' % (10 * solp[1], 10 * np.sqrt(cov_x[1, 1])))
+
+            plt.scatter(x[peaks], self.slice[peaks], marker='+', c='r', s=200, label='Peak locations')
+            plt.plot(x, exponential_decay(x, solp[0], solp[1]), '--', color='black', label='Least square fit')
+
+        plt.xlabel('Z distance separation (nm)', fontsize=14)
+        plt.ylabel('Count', fontsize=14)
+        plt.axes().tick_params(labelsize=14)
+        plt.legend(loc=1, prop={'size': 16})
+        plt.tight_layout()
+        plt.tight_layout()
+
+        if show:
+            plt.show()
+
+    def angle_average(self, ucell=None, NBR=80, rmax=-1, zbins=-1, zmax=-1, plot=True, show=False, save=False):
+
+        # a work in progress
+
+        ES = RegularGridInterpolator((self.bin_centers[0], self.bin_centers[1], self.bin_centers[2]), self.sf,
+                                     bounds_error=False)
+
+        THETA_BINS_PER_INV_ANG = 20.
+        MIN_THETA_BINS = 10  # minimum allowed bins
+        RBINS = NBR
+
+        a1 = self.unit_cell[0]
+        a2 = self.unit_cell[1]
+        a3 = self.unit_cell[2]
+
+        b1 = (np.cross(a2, a3)) / (np.dot(a1, np.cross(a2, a3)))
+        b2 = (np.cross(a3, a1)) / (np.dot(a2, np.cross(a3, a1)))
+        b3 = (np.cross(a1, a2)) / (np.dot(a3, np.cross(a1, a2)))
+
+        b_inv = np.linalg.inv(np.vstack((b1, b2, b3)))
+
+        if zbins == -1:
+            ZBINS = self.freq_z.shape[0]  # 400
+        else:
+            ZBINS = zbins
+
+        if zmax == -1:
+            ZMAX = self.freq_z[-1]
+        else:
+            ZMAX = zmax
+
+        XR = (self.freq_x[-1] - self.freq_x[0])
+        YR = (self.freq_y[-1] - self.freq_y[0])
+
+        if rmax == -1:
+            Rmax = min(XR, YR) / 2.0
+            Rmax *= 0.95
+        else:
+            Rmax = rmax
+
+        rarr, rspace = np.linspace(0.0, Rmax, RBINS, retstep=True)
+        zar = np.linspace(-ZMAX, ZMAX, ZBINS)
+
+        oa = np.zeros((rarr.shape[0], zar.shape[0]))
+
+        circ = 2. * np.pi * rarr  # circumference
+
+        for ir in range(rarr.shape[0]):
+
+            NTHETABINS = max(int(THETA_BINS_PER_INV_ANG * circ[ir]),
+                             MIN_THETA_BINS)  # calculate number of bins at this r
+            thetas = np.linspace(0.0, np.pi * 2.0, NTHETABINS, endpoint=False)  # generate theta array
+
+            t, r, z = np.meshgrid(thetas, rarr[ir], zar)  # generate grid of cylindrical points
+
+            xar = r * np.cos(t)  # set up x,y coords
+            yar = r * np.sin(t)
+
+            pts = np.vstack((xar.ravel(), yar.ravel(), z.ravel())).T  # reshape for interpolation
+
+            if ucell is not None:
+                pts = np.matmul(pts, b_inv)
+
+            oa[ir, :] = np.average(ES(pts).reshape(r.shape), axis=1)  # store average values in final array
+
+        mn = np.nanmin(oa)
+        oa = np.where(np.isnan(oa), mn, oa)
+
+        rad_avg = np.average(oa)
+        oa /= rad_avg  # normalize
+
+        # set up data for contourf plot by making it symmetrical
+        self.angle_averaged = np.append(oa[::-1, :], oa[1:], axis=0)  # SF
+        self.r_angle_averaged = np.append(-rarr[::-1], rarr[1:])  # R
+        self.z_angle_averaged = np.append(z[:, 0, :], z[1:, 0, :], axis=0)[0]  # Z
+
+        if plot:
+            fig, ax = plt.subplots()
+            MIN = np.amin(self.angle_averaged)
+            MAX = np.amax(self.angle_averaged)*.25
+            lvls = np.linspace(MIN, MAX, 200)
+            heatmap = ax.contourf(self.r_angle_averaged, self.z_angle_averaged, self.angle_averaged.T, levels=lvls, cmap='jet',
+                            extend='max')
+            plt.colorbar(heatmap)
+            plt.xlabel('$q_r (\AA^{-1})$')
+            plt.ylabel('$q_z (\AA^{-1})$')
+
+        if save:
+            plt.savefig('rzplot.png')
+        if show:
+            plt.show()
 
 
 def autocorrelation(x, largest_prime=500):
@@ -232,85 +435,6 @@ def autocorrelation(x, largest_prime=500):
     return auto / np.arange(n, 0, -1)
 
 
-def angle_average(X, Y, Z, SF, ucell=None, NBR=80, rmax=-1, zbins=-1, zmax=-1):
-
-    ES = RegularGridInterpolator((X, Y, Z), SF, bounds_error=False)
-
-    THETA_BINS_PER_INV_ANG = 20.
-    MIN_THETA_BINS = 10  # minimum allowed bins
-    RBINS = NBR
-
-    if ucell is not None:
-
-        a1 = ucell[0]
-        a2 = ucell[1]
-        a3 = ucell[2]
-
-        b1 = (np.cross(a2, a3)) / (np.dot(a1, np.cross(a2, a3)))
-        b2 = (np.cross(a3, a1)) / (np.dot(a2, np.cross(a3, a1)))
-        b3 = (np.cross(a1, a2)) / (np.dot(a3, np.cross(a1, a2)))
-
-        b_inv = np.linalg.inv(np.vstack((b1, b2, b3)))
-
-    if zbins == -1:
-        ZBINS = Z.shape[0]  # 400
-    else:
-        ZBINS = zbins
-
-    if zmax == -1:
-        ZMAX = Z[-1]
-    else:
-        ZMAX = zmax
-
-    XR = (X[-1] - X[0])
-    YR = (Y[-1] - Y[0])
-
-    if rmax == -1:
-        Rmax = min(XR, YR) / 2.0
-        Rmax *= 0.95
-    else:
-        Rmax = rmax
-
-    rarr, rspace = np.linspace(0.0, Rmax, RBINS, retstep=True)
-    #zar = np.linspace(Z[0], Z[-1], ZBINS)
-    zar = np.linspace(-ZMAX, ZMAX, ZBINS)
-
-    oa = np.zeros((rarr.shape[0], zar.shape[0]))
-
-    circ = 2.*np.pi*rarr  # circumference
-
-    for ir in range(rarr.shape[0]):
-
-        NTHETABINS = max(int(THETA_BINS_PER_INV_ANG*circ[ir]), MIN_THETA_BINS)  #calculate number of bins at this r
-        thetas = np.linspace(0.0, np.pi*2.0, NTHETABINS, endpoint=False)  # generate theta array
-
-        t, r, z = np.meshgrid(thetas, rarr[ir], zar)  # generate grid of cylindrical points
-
-        xar = r*np.cos(t)  # set up x,y coords
-        yar = r*np.sin(t)
-
-        pts = np.vstack((xar.ravel(), yar.ravel(), z.ravel())).T  # reshape for interpolation
-
-        if ucell is not None:
-            # pts = mc_inv(pts, ucell)
-            pts = np.matmul(pts, b_inv)
-
-        oa[ir, :] = np.average(ES(pts).reshape(r.shape), axis=1)  # store average values in final array
-
-    mn = np.nanmin(oa)
-    oa = np.where(np.isnan(oa), mn, oa)
-
-    rad_avg = np.average(oa)  # ???
-    oa /= rad_avg  # normalize
-
-    # set up data for contourf plot by making it symmetrical
-    final = np.append(oa[::-1, :], oa[1:], axis=0)  # SF
-    rfin = np.append(-rarr[::-1], rarr[1:])  # R
-    zfin = np.append(z[:, 0, :], z[1:, 0, :], axis=0)  # Z
-
-    return final, rfin, zfin
-
-
 def mc_inv(D, ucell):
 
     a1 = ucell[0]
@@ -340,25 +464,6 @@ def mc_inv(D, ucell):
     return Dnew
 
 
-def rescale(coords, dims):
-    """
-    rescale coordinates so that cell dimensions are constant over the simulation
-    returns rescaled coordinates and average length
-    """
-
-    avgdims = np.average(dims, axis=0)
-    a = avgdims / dims
-    rc = coords
-
-    for it in range(rc.shape[0]):
-        for i in range(3):
-            rc[it, :, i] *= a[it, i]
-
-    # dr = old_div(avgdims,Nspatialgrid)
-
-    return rc, avgdims
-
-
 if __name__ == "__main__":
 
     ndimensions = 3  # always do full 3d correlation function
@@ -373,44 +478,28 @@ if __name__ == "__main__":
                 bins = np.array([args.bins[0]]*ndimensions)
         else:
             bins = np.array([args.bins]*ndimensions)
-        correlation_function = Correlation(args.gro, args.traj, atoms=args.atoms, res=args.res, com=True,
-                                           bins=bins, begin=args.begin, end=args.end)
-        exit()
+
         if args.atoms is None and args.res is None:
             args.atoms = [['C', 'C1', 'C2', 'C3', 'C4', 'C5']]
 
-        npores = 4
+        g = Correlation(args.gro, args.traj, atoms=args.atoms, res=args.res, com=args.center_of_mass,
+                                           bins=bins, begin=args.begin, end=args.end)
 
-        dimensions = []
-        for i in args.slice:
-            if i == 'x':
-                dimensions.append(0)
-            elif i == 'y':
-                dimensions.append(1)
-            elif i == 'z':
-                dimensions.append(2)
+        if args.slice:
+            axes = {'x': 0, 'y':1, 'z':2, 'X':0, 'Y':1, 'Z':2}
+            g.make_slice(axes[args.slice], radius=.225, plot=False)  # slice along z axis
 
-            # keep = [a.index for a in t.topology.atoms if a.name in args.atoms]  # indices of atoms to keep
-            # keep = [a.index for a in t.topology.atoms if a.residue.name == 'HOH' and a.name == 'O']  # indices of atoms to keep
 
-        pore_spline = np.zeros([t.n_frames, npores*args.layers, 3])
-        for frame in range(t.n_frames):
-            pore_spline[frame, :, :] += trace_pores(t.xyz[frame, keep, :], t.unitcell_vectors[frame, :2, :2], args.layers)
+            plt.imshow(g.correlation3d[0, :, :].real)
+            plt.show()
+            exit()
 
-        # natoms = len(args.atoms)
-        # monomers_per_layer = int(len(keep) / args.layers / npores / len(args.atoms))  # divide by len(args.atoms) because of com
-        monomers_per_layer = args.monomers_per_layer
+            g.plot_slice(axes[args.slice], show=True, fit=False,
+                         limits=([0, g.bin_centers[axes[args.slice]][g.bin_centers[axes[args.slice]].size // 2]], []))
 
-        if args.center_of_mass:
-            center_of_mass = com(t.xyz[:, keep, :], mass)  # calculate centers of mass of atom groups
-        else:
-            center_of_mass = t.xyz[:, keep, :]
 
-        ncom = center_of_mass.shape[1]
 
-        com_per_pore = int(center_of_mass.shape[1] / npores)
-
-        periodic_pts = duplicate_periodically(center_of_mass, t.unitcell_vectors)
+        exit()
 
         correlation = np.zeros(bins)
 

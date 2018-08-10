@@ -339,8 +339,7 @@ class Solvent(object):
         :return:
         """
 
-        if not self.pore_spline:
-            ref = [a.index for a in self.t.topology.atoms if a.name in ref]
+        ref = [a.index for a in self.t.topology.atoms if a.name in ref]
         # redo each time because positions change slightly upon energy minimization
         self.pore_spline = trace_pores(self.positions[ref, :], self.box_vectors[:2, :2], layers)
 

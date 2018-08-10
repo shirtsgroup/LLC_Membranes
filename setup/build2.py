@@ -218,6 +218,7 @@ if __name__ == "__main__":
     wedge_theta = 360 / args.ncolumns  # rotation between laterally adjacent monomers (angle defining slice)
     for i in range(args.nopores):
         start_theta = np.random.uniform(0, 360)
+        start_theta = 0
         thetas = [start_theta + x*wedge_theta for x in range(args.ncolumns)]
         for j in range(args.ncolumns):
             z = np.linspace(0, args.dbwl*args.monomers_per_column - args.dbwl, args.monomers_per_column)
