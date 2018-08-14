@@ -1225,7 +1225,7 @@ liquid crystal membranes}
   basins. We generated simulated patterns using the equilibrated portion of each 
   simulation trajectory. The patterns for all structures are shown and compared to
   experiment in Figure~\ref{fig:XRDsim}.
-  
+  %MRS10: Would be btter to lead with something describing what we found, not a caveat, just for clarity. Might belong better in the previous paragraph if left here, since it is a clarifying point that should be communicated, not an actual finding.
   The diffraction patterns show some noise, especially along the axis where $q_r$=0. There are
   two main reasons for this noise. First is that we angle averaged the 3D structure factor 
   (see section~\ref{method:xrd}) which inherently gives less data as $q_r$ approaches 0. Second, 
@@ -1287,6 +1287,8 @@ liquid crystal membranes}
   R-pores appear in the expected location. R-pores is more intense than experiment, likely
   because we are simulating a near perfect, infinite hexagonal array. The real system has 
   defects and domain misalignment which decreases the overall intensity.
+  %MRS10: would domain misalignment make a difference in itensity?  I though we decided it wouldnt (it would more broaden?).
+  %You can talk about how you WILL analyze the intensity diffence later on, that it doesn't need to be analyzed here.
   % MRS4: comments from Matt suggest that domain misalignment shouldn't alone be responsible for 
   % the difference in intensity ratio. Some of the experiments should help explain it better. 	
   % Let's talk!
@@ -1319,13 +1321,16 @@ liquid crystal membranes}
   must equal 1. We measured the approximate intensity of R-$\pi$ and R-double by measuring the
   intensity of the appropriate peaks of the cross-section of the 2D pattern at $q_r=0$. The 
   relative intensity of R-$\pi$ is significantly higher than experiment in our simulations. 
+  %MRS10: weird transition between these two; it's a result that interrupts the discussion of methods.
   R-spots is measured as the average intensity within the region bounded by a 'spot'. We 
-  identified spots based on visual inspection. If the spots were not easily discernible, then the 
+  identified spots based on visual inspection. 
+  %MRS10: what criteria were used?  Need to provide what was used to make the decision.
+If the spots were not easily discernible, then the 
   intensity was taken as that of the intersection of R-alkanes at half the $q_z$ value of
-  R-$\pi$, since that is where it appears experimentally. The intensity of R-spots is slightly
+  R-$\pi$, as that is where it appears experimentally. The intensity of R-spots is slightly
   lower than experiment in all cases except for the ordered basin sandwiched configuration which 
-  agrees with experiment. There is no R-double intensity to be measured. Figures
-  are provided in section S-\ref{S-section:xrd_intensities} to further clarify these measurements.
+  agrees with experiment. There is no R-double intensity to be measured. %MRS10: specific where no R-double intensity was measured. None of the simulations, correct?
+Figures are provided in section S-\ref{S-section:xrd_intensities} to further clarify these measurements. %MRS10: Specify what figures clarify what things.  Also, use active voice in this section.
 
   \begin{table}[h]
   \centering
@@ -1355,6 +1360,7 @@ liquid crystal membranes}
   and justified. We will explore the possible origin of select experimental reflections and form 
   structural hypotheses related to their appearance in our simulated patterns. Specifically, we 
   want answer:  
+  %MRS10: should the ``why is R-pi in not quite the right place'' be here, to have those sorts of questions more centralized?
   \begin{enumerate}
 	\item What is the origin of R-spots?
   	\item Why is the intensity of R-$\pi$ so much greater than experiment?
@@ -1481,14 +1487,13 @@ liquid crystal membranes}
 %  columns\cite{chaikin_principles_1995}. 
 
   \subsubsection{The origin of R-spots}\label{section:rspots}
-
+%MRS10: I rephrased the below, check the diffs.
   In order to more clearly study R-spots, we equilibrated an ordered basin sandwiched 
-  configuration at 280K. Obtaining an equilibrium structure at a precise temperature is
-  a challenge that force fields often fail to overcome. Wang et al. highlighted the 
+  configuration at 280K. Many force fields do not obtain the correct equilibrium structure at precisely the experimental temperature. Wang et al. highlighted the 
   shortcoming of some of the most popular protein force field in predicting the temperature
-  dependence of protein structural ensembles \cite{wang_building_2017}. It is possible that   % page 12
-  our membrane system, simulated at 300K, does not fully represent the true structure at 300K.
-  Lowering the temperature to 280K helped us to better resolve R-spots (Figure~\ref{fig:sandwiched280K}). 
+  dependence of protein structural ensembles \cite{wang_building_2017}. It is therefore possible that   % page 12
+  our membrane system, simulated at 300K, is overly structured compared to the experimental structure at 300K.
+  We found that lowering the temperature better resolved the R-spots (Figure~\ref{fig:sandwiched280K}), suggesting that our 'effective' temperature might indeed be too high, overstabilizing structure. 
 %  The relative intensity 
 %  of R-spots in this system is slightly higher than experiment (1.5 vs. 1.3) 
   
@@ -1498,9 +1503,16 @@ liquid crystal membranes}
 %  is still not present. We will use the system simulated at 280K to more thoroughly explore the 
 %  origin of R-spots.
  
-  Evidence strongly suggests that the R-spots signal is not a result of alkane
+  Evidence 
+%MRS10: added
+from the simulations
+  strongly suggests that the R-spots signal is not a result of alkane
   chain tilt. Previous literature has attributed the spots in this particular
-  WAXS pattern as the product of tilted alkane chains~\cite{feng_scalable_2014}.
+%MRS10: clarified that it was THIS exact data, and not similiar images. Correct if wrong.
+WAXS 
+%pattern 
+dataset
+as the product of tilted alkane chains~\cite{feng_scalable_2014}.
   We measured the tilt angle of the alkane chains of the 280K system and showed
   that it equilibrates to an average tilt angle of
   -2\degree~(Fig.~\ref{fig:tilt}), far from the 37\degree~tilt angle previously
@@ -1518,20 +1530,24 @@ liquid crystal membranes}
   %BJC9: I think Matt gets confused here. I put a more detailed explanation in 
   % the supplemental information. Do you think that's enough, or should I add
   % to this figure?
-  The tails pack together hexagonally. We plotted the center of masses of the 
+  %MRS10: rephrased.
+  The evidence strongly suggests that R-spot pattern occurs because tails pack together hexagonally. 
+  We plotted the center of masses of the 
   first four tail atoms of each tail originating from each head group 
   (Figure \ref{fig:centroids}). We measured the angle between each center of
   mass and its nearest neighbor center of masses with respect to the $xy$ 
   plane of the membrane. We see distinct peaks in the distribution of these 
   angles located ca. $-60\degree$, $0\degree$, and $60\degree$ which is 
   consistent with a hexagonally packed configuration 
-  (Figure~\ref{fig:layered_tails}). This ordering dies off at the tail ends,
+  (Figure~\ref{fig:layered_tails}). 
+  %MRS10: is it importat that the ordering dies off? IF there is ordering, it will show in the spectra, and it doesn't matter that it dies off in other parts of the spectra.
+This ordering dies off at the tail ends,
   where there is more space to fill causing them to pack nearly isotropically.
   See Section~S-\ref{S-tail_packing} for a more detailed explanation of the 
   calculation and packing distributions generated from different sections of
   the tails.
 
-  The peaks in the nearest neighbor angle distribution are consistent with the
+  The peaks in the nearest neighbor angle distribution due to the hexagonal packing are consistent with the
   location of R-spots. The 2D Fourier transform of a simple hexagonal array 
   constructed based on the peak angles in Figure~\ref{fig:layered_tails}
   shows reflections in the same locations as R-spots, in addition to vertical 
@@ -1613,23 +1629,24 @@ liquid crystal membranes}
   \end{figure}  
   
   \subsubsection{Discrepancies between experimental and simulated R-$\pi$}\label{section:rpi}
-  
-  R-$\pi$ is more intense relative to the experimental system. The difference in intensity
+  %MRS10: in the list of questions above, you just talk about intensity, but this title talks about more discrepnacies. It could go either way (as I mention before, there's the issue of R-pi placement, too), but it should be consistent.
+  The experimentally measured R-$\pi$ is more intense relative to the experimental system. The difference in intensity
   ranges from 3 times too high in the ordered parallel displaced system to 15 times too 
   high in the ordered sandwiched configuration (Table~\ref{table:relative_inensities_300K}).
-  
-  The peak shape of the $q_r$ cross-section of R-$\pi$ is qualitatively different
+  %MRS10: should specify this is in the 300 K simulations.
+
+  The peak shape of the $q_r$ cross-section of R-$\pi$ in the simulated XRD is qualitatively different
   from experiment (Figures~\ref{fig:exp_rsection_fit} and~\ref{fig:sim_rsection_fit}).
   We use simulated XRD generated from the ordered parallel displaced configuration
   as an example in Figure~\ref{fig:rpi_exp_comparison}. The $q_z$ cross-section 
   fits a Lorentzian profile relatively well, although its full width at half maximum
-  (FWHM) is 48 \% broader than the experimental cross-section 
+  (FWHM) is 48\% broader than the experimental cross-section 
   (Figures~\ref{fig:exp_zsection_fit} and ~\ref{fig:sim_zsection_fit}). We attempted
   to fit a Lorentzian profile to the $q_r$ cross-section and although the FWHM agrees
   with experiment within error, the fit is not optimal due to the three sharp peaks
   that appear near $q_r$ = 0. 
   
-  An exact quantitative comparison between experiment and simulation is not feasible. 
+  An exact quantitative comparison between experiment and simulation is not feasible for several reasons. 
   Experimental peaks broaden due to effects that we can not easily simulate such
   as finite size crystalline domains and instrumental resolution. In our simulated
   XRD patterns, the system size imposes limitations on the resolution, which makes
@@ -1637,14 +1654,14 @@ liquid crystal membranes}
   the FWHM of the $q_z$ cross-section of R-$\pi$, where the experimental FWHM 
   (0.11 $\AA^{-1}$) is similar to the bin size in the $q_z$ direction (ca. 0.07 $\AA^{-1}$).
   Additionally, we model each atom with a Gaussian sphere of electron density. 
-  The true electronic structure is likely much more complicated. The subsequent
-  discussion primarily serves to demonstrate how we can qualitatively change the
-  peak shapes to be in better agreement with experiment.
+  The true electronic structure is likely much more complicated. 
+  %MRS10: modified
+  However, we can explore reasons for which differences in the simulation structure could changes the peak shapes to be in better agreement with experiment.
   
 % BJC9: old version of above paragraph
 %  The full width at half maximums (FWHM) of the $q_r$ and $q_z$ cross-sections
 %  of R-$\pi$ are broader than experiment (Figure~\ref{fig:rpi_exp_comparison}).
-%  The FWHM of the $q_z$ cross-section is 76 \% larger than experiment and the
+%  The FWHM of the $q_z$ cross-section is 76\% larger than experiment and the
 %  $q_r$ cross-section FWHM is 21\% larger than experiment. Note that the
 %  experimental data is best fit with a Lorentzian function while the simulated
 %  patterns are best fit using a Gaussian function. The simulated spectra do not
@@ -1682,6 +1699,7 @@ liquid crystal membranes}
 %  There are clear qualitative differences between the experimental WAXS pattern 
 %  ((a) and (c)) and the simulated XRD pattern resulting from simulations 
 %  of the ordered parallel displaced configuration ((b) and (d)). 
+    %MRS10: don't make the thesis what was done, but what the reader should know. 
   We compared the experimental WAXS pattern ((a) and (c)) to the simulated XRD
   pattern resulting from simulations of the ordered parallel displaced 
   configuration ((b) and (d)). The $q_r$ cross-section of R-$\pi$ ((a) and (b))
@@ -1691,25 +1709,30 @@ liquid crystal membranes}
   obscured by the three sharp peaks which appear near $q_r$ = 0. The $q_z$ 
   cross-sections of R-$\pi$ ((c) and (d)) are qualitatively similar. Each fits
   a Lorentzian profile well, however the FWHM of the simulated cross-section (d)
-  is 48 \% larger than the experimental cross-section.}\label{fig:rpi_exp_comparison}
+  is 48\% larger than the experimental cross-section.}\label{fig:rpi_exp_comparison}
   \end{figure}
   
   We have identified a number of potential ways that simulation conditions,
   forcefield and initial configurations could affect the intensity and shape of
-  R-$\pi$. We assessed each using a simplified model. Our simplified model 
-  epresents each monomer head group as a single point and places them in either
+  R-$\pi$, and assess each using a simplified model of the pore. Our simplified model 
+  represents each monomer head group as a single point and places them in either
   a parallel displaced or sandwiched configuration. We chose to explore the 
   influence of thermal noise in each dimension, the effect of $z$-direction 
   distance correlations between scatterers within columns, as well as correlation
   between columns since these are the variables we believe have the largest 
   influence on peak shape and intensity.
   
-  As a baseline, we created a simplified model using the same amount of
+  %MRS10: somewhere in here, we need to address whether quenched and static disorder are 
+  % the same experimentally. If not the same, then it's glassy, if they are the same, then 
+  % we are making the assumption that the the timescales of motion of that noice are > 1 microsecond but < 1 second.
+  We created a simplified baseline model using the same amount of
   disorder present in our atomistic simulations. There are two sources of
   disorder to consider: thermal motion of atoms and quenched disorder which is
   created by rapid structural rearrangement during early equilibration and 
   is largely locked into place for the remainder of the simulation. The latter
-  has important implications for the reproducibility of this work since both 
+  has important implications 
+  %MRS10: which are the important implications?
+for the reproducibility of this work since both 
   initial configuration and initial velocity randomization can lead to 
   different quenched configurations. We measured thermal disorder by
   calculating the standard deviation of the distribution of head group center 
@@ -1724,6 +1747,7 @@ liquid crystal membranes}
   disorder. The values measured for each system and type of disorder are given
   in Table~\ref{table:quenched_disorder}.
 
+  %MRS10: this is more of a methodological thesis than is ideal. Can you make it more about what we are learning, or at least what was done and the reasoning?
   The expected maximum intensity of R-$\pi$ can be calculated from a single
   trajectory of uncorrelated configurations rather than from the average of 
   multiple trajectories of correlated frames. Theoretically, in order to
@@ -1741,6 +1765,9 @@ liquid crystal membranes}
   %for the remainder of this section since we can extract the trends we 
   %need using a single trajectory at a fraction of the computational cost.
   
+  %MRS10: again, more of a methodolgical thesis.  Will not be clear to the reader what they are 
+  % expecting to learn, which is the difference in the simulation that could explain the differences in the spectra.
+  % I'm thinking some of this should be in the supporting info.  Maybe not, if key enough, but it should still be in support of the conclusion. 
   When we simulated the diffraction pattern of a parallel displaced simple
   system trajectory of 1000 independent configurations, the
   $q_r$ and $q_z$ profiles of R-$\pi$ are characterized by sharp peaks. We made
@@ -1817,7 +1844,7 @@ liquid crystal membranes}
   done with a correlation length of 9 $\AA$. The shape of the $q_y$ cross-section
   (Figure~\ref{fig:sf_qy_correlation}) remains the same while the the $q_z$
   cross-section (Figure~\ref{fig:sf_qz_correlation}) broadens, as seen in
-  experiment. Additionally, there is a near 20 \% increase in the maximum
+  experiment. Additionally, there is a near 20\% increase in the maximum
   intensity of R-$\pi$ when the distances between scatterers are correlated.
 
   %BJC8: Can show correlation effect on intensity in supporting info
@@ -1829,7 +1856,7 @@ liquid crystal membranes}
   R-$\pi$, we measured correlation length by plotting the one-dimensional pair
   distribution function, $g(z)$, for the centers of mass of monomer phenyl rings
   (Figure~\ref{fig:correlation}). In order to calculate $g(z)$, we averaged all
-  $z$-slices of the 3D correlation function within 2.1 \AA of $g(0, 0, z)$. In this
+  $z$-slices of the 3D correlation function within 2.1 \AA~of $g(0, 0, z)$. In this
   way we are trying measure correlation between head groups within the same column.
   %We used this 
   %information to understand how far apart monomers stack within monomer columns and
@@ -1857,6 +1884,8 @@ liquid crystal membranes}
   \includegraphics[width=\textwidth]{z_correlation_offset_disordered.png}
   \caption{Parallel Displaced, Disordered Basin}\label{fig:z_correlation_offset_disordered}
   \end{subfigure}  
+  %MRS10: should say something here about whether this is consistent or not with experiement (and why/why not)
+  %MRS10: maybe include correlation lengths as well calculated from these, and compare to experiment?  I know it's in the table as well, but seems missing here.  1D correlation functions are given, but not how that data proves central points.
   \caption{1D correlation functions of the center of masses of aromatic head
 	  groups, $g(z)$, show decaying oscillatory behavior. We calculated the
 	  correlation length by fitting a decaying exponential function
@@ -1891,6 +1920,7 @@ liquid crystal membranes}
   Equation~\ref{eqn:decaying_sinusoid}. Monomers in the ordered basin stack ca.
   0.2 and 0.3 \AA~closer than those built in the disordered basin in the
   sandwiched and parallel displaced configurations respectively. The distance
+  %MRS10: OK this is finally addressed here, but it it's sort of buried in the middle of a paragraph, and not laid out as an outlined point, whereas most readers would ask about it early.
   between stacked monomers is greater than experiment by 0.5--0.9 \AA~across all
   cases, with disordered basins at the high part of that range, 0.2 and 0.3
   \AA~more distant.
@@ -1980,15 +2010,21 @@ liquid crystal membranes}
   $\sigma_z$. We can decrease the intensity of R-$\pi$, relative to the
   background intensity, as seen in our simulation (blue) by a factor of 3 when we
   increase $\sigma_z$ by 12\% (green) and by a factor of 15 when we increase
-  $\sigma_z$ by 27 \% (red). (b) Although the maximum intensity of R-$\pi$
+  $\sigma_z$ by 27\% (red). (b) Although the maximum intensity of R-$\pi$
   decreases with increasing $\sigma_z$, the peak shape remains the same.}\label{fig:znoise}
   \end{figure}
   
   When we allow monomer columns to move independently in the $z$-direction, the
   intensity of R-$\pi$ drops and the $q_r$ cross-section of the simulated
-  diffraction patterns smooths out. We created simple systems with varying
+  diffraction patterns smooths out. 
+  This is shown by creating 
+  simple systems 
+  %MRS10: simple systems is not very exact. Point scatters that represent the head groups?
+  with varying
   amounts of association between columns. In the low limit, the center of mass
-  of columns are situated at the same $z$-coordinate. This is how all simple
+  of columns are situated at the same $z$-coordinate. 
+  %MRS10: unnecessary line?
+  This is how all simple
   systems have been created up to this point. We allow increasing independence of
   columns by randomly shifting each column in the $z$-direction according to a uniform
   distribution bounded by (0, $f \times \mathit{d}_{equil}$) where $f$ ranges
@@ -2051,11 +2087,11 @@ liquid crystal membranes}
   \end{figure}
   
   Increasing thermal noise in the $xy$ plane causes the FWHM of the $q_r$
-  cross-section of R-$\pi$ to decrease. Using a system with uncorrelated columns,
+  cross-section of R-$\pi$ to, somewhat counterintuitively, to decrease. Using a system with uncorrelated columns,
   we modified the disorder in both the $r$ and $\theta$ directions by multiplying
   their values by a factor of 0.5 and 2 (Figure~\ref{fig:qy_fwhm}). When we cut
-  the noise in half, the FWHM increases by 88 \%. When we double the noise, the
-  FWHM decreases by 51 \%.
+  the noise in half, the FWHM increases by 88\%. When we double the noise, the
+  FWHM decreases by 51\%.
   
   \begin{figure}
   \centering
@@ -2077,6 +2113,8 @@ liquid crystal membranes}
   center of mass of their vertically adjacent neighbors. In this way, columns can
   more easily act independently while maintaining a parallel displaced structure.   
   
+  %MRS10: Maybe rephrases; rather than talking about building a better
+  %model, you can summarize the differences that could explain the discrepancy between experiment and simulation.
   We can use what we learned above in order to construct a better model,
   however there will still be shortcomings. We can decrease the intensity of
   R-$\pi$ if we incorporate more $z$-directional noise, which may come from
@@ -2150,7 +2188,8 @@ liquid crystal membranes}
 %  between the carboxyl group and nitrogen atoms of adenine. The monomers which we are studying
 %  have no opportunities to hydrogen bond and are confined so that any rotation about the phenyl--
 %  carboxylate bond would be sterically hindered. 
-  
+
+%MRS10: I wonder if it would be better to lead with what we think IS the answer, and then rule out other effects.  
   We can produce R-double if we rotate monomers with respect to vertically adjacent monomers.
 %  Our final hypothesized dry configuration which produces R-double focuses on the orientation of the tails. 
   In this configuration, monomers are rotated so that the vector created by the  
@@ -2469,7 +2508,7 @@ liquid crystal membranes}
 %  \begin{subfigure}{0.075\textwidth}
 %  	\includegraphics[width=\textwidth]{colorbar_jet.png}
 %  \end{subfigure}
-%	\caption{Adding 1 wt \% water to the ordered basin dry systems causes an increase in the intensity
+%	\caption{Adding 1 wt\% water to the ordered basin dry systems causes an increase in the intensity
 %	R-spots. R-double becomes visible in the parallel displaced configuration. Additional amounts
 %	of water increase discrepancies with experiment} %MRS7:by increasing disorder?
 %  \label{fig:solvation}
@@ -2580,7 +2619,7 @@ liquid crystal membranes}
 %  \end{figure}
 
 %  The appearance of R-double may be due to increased order of the pores. The first
-%  peak of the correlation function, $g(z)$, is approximately 30 \% larger in the 
+%  peak of the correlation function, $g(z)$, is approximately 30\% larger in the 
 %  solvated versus dry configuration (Figure~\ref{fig:solvated_correlation_overlay}).
 %  Based on the peak locations, it is evident that the head groups stack closer 
 %  together in the solvated configuration which may play a role in enforcing order.
@@ -2794,7 +2833,7 @@ liquid crystal membranes}
 %  experiment. 
   
   We calculated the ionic conductivity of the parallel displaced configuration in
-  the ordered basin with 1 wt \% water since we believe its structure is the 
+  the ordered basin with 1 wt\% water since we believe its structure is the 
   closest match to experiment. Our model estimates the ionic conductivity within
   one order of magnitude of experiment (Figure~\ref{fig:ionic_conductivity}). We
   verified the value calculated by the Nernst-Einstein relationship using 
