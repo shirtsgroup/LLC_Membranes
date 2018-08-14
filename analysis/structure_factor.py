@@ -333,8 +333,8 @@ class Trajectory(object):
 
                     x = radii * np.cos(theta_col)
                     y = radii * np.sin(theta_col)
-                    # x = r*np.cos(start_theta + a*theta)
-                    # y = r*np.sin(start_theta + a*theta)
+                    x = r*np.cos(start_theta + a*theta)
+                    y = r*np.sin(start_theta + a*theta)
 
                     self.locations[t, start:end, 0] = xy_pore_centers[c, 0] + x
                     self.locations[t, start:end, 1] = xy_pore_centers[c, 1] + y
@@ -343,15 +343,16 @@ class Trajectory(object):
                         #shift = shifts[c]
                     else:
                         shift = 0
-                    # x_disorder = r*np.random.normal(scale=thermal_disorder[0], size=(end - start))
-                    # y_disorder = r*np.random.normal(scale=thermal_disorder[1], size=(end - start))
-                    # z_disorder = z_separation*np.random.normal(scale=thermal_disorder[2], size=(end - start))
 
-                    # disorder = np.vstack((x_disorder, y_disorder, z_disorder)).T
+                    x_disorder = r*np.random.normal(scale=thermal_disorder[0], size=(end - start))
+                    y_disorder = r*np.random.normal(scale=thermal_disorder[1], size=(end - start))
+                    z_disorder = z_separation*np.random.normal(scale=thermal_disorder[2], size=(end - start))
+
+                    disorder = np.vstack((x_disorder, y_disorder, z_disorder)).T
 
                     self.locations[t, start:end, 2] = z_correlation(column, 10, v=thermal_disorder[2]**2) + shift
-                    # self.locations[t, start:end, :2] += np.random.normal(scale=2.3, size=(column.size, 2))
-                    # self.locations[t, start:end, 2] = column + shift
+                    self.locations[t, start:end, :2] += np.random.normal(scale=2.3, size=(column.size, 2))
+                    #self.locations[t, start:end, 2] = column + shift
 
                     # for noise about initial configuration
                     #self.locations[t, start:end, 2] = columns[c*ncol_per_pore + a] + shifts[c*ncol_per_pore + a]
@@ -689,7 +690,7 @@ if __name__ == "__main__":
     t.plot_sf_slice('z', [0, 0], show=False)
 
     plt.xlim(-2.5, 2.5)
-    #np.savez_compressed('nocorrelation.npz', freq_z=t.freq_z, slice=t.slice)
+    #np.savez_compressed('correlation_qz.npz', freq_z=t.freq_z, slice=t.slice)
 
     t.angle_average(plot=True, show=False, save=True)
 
@@ -699,7 +700,7 @@ if __name__ == "__main__":
     # fit lorentzian to R-pi
     t.plot_sf_slice('y', [0, 2*np.pi / dbwl], show=False)
     #np.savez_compressed('freq_y.npz', freq_y=t.freq_y)
-    #np.savez_compressed('yslice_3xdecrease.npz', freq_z=t.freq_y, slice=t.slice)
+    np.savez_compressed('correlation_qy.npz', freq_z=t.freq_y, slice=t.slice)
 
     #np.savez_compressed('perfect_100pores.npz', freq_y=t.freq_y, slice=t.slice)
 

@@ -71,7 +71,7 @@ if __name__ == "__main__":
     if not args.atoms:
         args.atoms = ['O3', 'O4']  # a default value
 
-    sys = hbonds.System(args.traj, args.gro, args.top, begin=args.begin, end=args.end)
+    sys = hbonds.System(args.traj, args.gro, args.top, begin=args.begin, end=args.end, exclude_water=args.exclude_water)
 
     for i, r in enumerate(args.residues):
         sys.set_eligible(r, args.atoms[i])

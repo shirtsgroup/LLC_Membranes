@@ -534,28 +534,29 @@ solp_lorentz, cov_x_lorentz = curve_fit(lorentz, X, rsection, p)
 plt.plot(X, rsection, linewidth=2, color='xkcd:blue')
 #plt.plot(X, gaussian(X, solp_gaussian[0], solp_gaussian[1], solp_gaussian[2], solp_gaussian[3]), '--', label='Gaussian Fit', linewidth=2)
 plt.plot(X, lorentz(X, solp_lorentz[0], solp_lorentz[1], solp_lorentz[2], solp_lorentz[3]), '--', color='xkcd:orange', label='Lorentzian Fit', linewidth=2)
-plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=14)
-plt.ylabel('Intensity', fontsize=14)
+plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=18)
+plt.ylabel('Intensity', fontsize=18)
 
 #print("Lorentzian FWHM = %.2f A^-1" % solp_lorentz[0])
 print("Lorentzian FWHM = %.3f +/- %.3f A^-1" % (solp_lorentz[0], cov_x_lorentz[0, 0] ** 0.5))
 print("Gaussian FWHM = %.3f +/- %.3f A^-1" % (2*np.sqrt(2*np.log(2))*solp_gaussian[1],
                                        2 * np.sqrt(2 * np.log(2)) * cov_x_gaussian[1, 1] ** 0.5))
-plt.gcf().get_axes()[0].tick_params(labelsize=14)
-plt.legend()
+plt.gcf().get_axes()[0].tick_params(labelsize=18)
+plt.legend(fontsize=17)
 plt.tight_layout()
 plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/exp_rsection_fit.png')
 
 plt.figure()
 start = np.argmin(np.abs(Y - 1.6))
+plot_start = Y.size // 2
 zsection = waxs[start:, waxs.shape[0]//2]
 # zsection -= zsection[-1]
 p = [1.7, 0.3, 2.5, 0]
 solp_gaussian, cov_x_gaussian = curve_fit(gaussian, Y[start:], zsection, p)
 p = np.array([0.1, 1.7, 1, 0.1])
 solp_lorentz, cov_x_lorentz = curve_fit(lorentz, Y[start:], zsection, p)
-plt.plot(Y[start:], zsection, linewidth=2, color='xkcd:blue')
-#plt.plot(Y[start:], gaussian(Y[start:], solp_gaussian[0], solp_gaussian[1], solp_gaussian[2], solp_gaussian[3]), '--', label='Gaussian Fit', linewidth=2)
+plt.plot(Y[plot_start:], waxs[plot_start:, waxs.shape[0]//2], linewidth=2, color='xkcd:blue')
+plt.plot(Y[start:], gaussian(Y[start:], solp_gaussian[0], solp_gaussian[1], solp_gaussian[2], solp_gaussian[3]), '--', label='Gaussian Fit', linewidth=2)
 plt.plot(Y[start:], lorentz(Y[start:], solp_lorentz[0], solp_lorentz[1], solp_lorentz[2], solp_lorentz[3]), '--', color='xkcd:orange', label='Lorentzian Fit', linewidth=2)
 
 # print("Lorentzian FWHM = %.2f A^-1" % solp_lorentz[0])
@@ -563,12 +564,12 @@ print("Lorentzian FWHM = %.3f +/- %.3f A^-1" % (solp_lorentz[0], cov_x_lorentz[0
 print("Gaussian FWHM = %.3f +/- %.3f A^-1" % (2*np.sqrt(2*np.log(2))*solp_gaussian[1],
                                        2 * np.sqrt(2 * np.log(2)) * cov_x_gaussian[1, 1] ** 0.5))
 #np.savez_compressed('z_section.npz', x=Y, y=zsection)
-plt.xlabel('$q_z\ (\AA^{-1}$)', fontsize=14)
-plt.ylabel('Intensity', fontsize=14)
-plt.gcf().get_axes()[0].tick_params(labelsize=14)
-plt.legend()
+plt.xlabel('$q_z\ (\AA^{-1}$)', fontsize=18)
+plt.ylabel('Intensity', fontsize=18)
+plt.gcf().get_axes()[0].tick_params(labelsize=18)
+plt.legend(fontsize=18)
 plt.tight_layout()
-plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/exp_zsection_fit.png')
+#plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/exp_zsection_fit.png')
 plt.show()
 exit()
 

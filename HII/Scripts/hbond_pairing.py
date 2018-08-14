@@ -21,7 +21,8 @@ def initialize():
     parser.add_argument('-b', '--begin', default=0, type=int, help='End frame')
     parser.add_argument('-e', '--end', default=-1, type=int, help='Start frame')
     parser.add_argument('-x', '--exclude_water', action='store_true', help='Exclude water while searching for hbonds')
-    parser.add_argument('-r', '--residues', nargs='+', default=['HII'], help='Residues to include in h-bond search')
+    parser.add_argument('-r', '--residues', nargs='+', default=['HII'], help='Residues to include in h-bond search.'
+                                                                             'Water is already included.)
     parser.add_argument('-a', '--atoms', action='append', nargs='+', help='Atoms for to include for each '
                         'residue. Each list of atoms must be passed with a separate -a flag for each residue in'
                         'args.residues')
