@@ -524,6 +524,19 @@ def lorentz(points, a, b, c, yshift):
 
     return yshift + (c / (np.pi*w)) / (1 + x ** 2)
 
+start = X.size // 2 + 175
+end = X.size - 150
+p = np.array([1.4, 0.3, 1, 0])
+solp, cov_x = curve_fit(gaussian, X[start:end], waxs[start:end, Y.size // 2], p,
+                        bounds=([-np.inf, 0, 0, 0], [np.inf, np.inf, np.inf, np.inf]))
+
+plt.plot(X[start:end], gaussian(X[start:end], solp[0], solp[1], solp[2], solp[3]), '--', color='xkcd:orange', label='Gaussian Fit',
+         linewidth=2)
+
+plt.plot(X, waxs[:, Y.size // 2])
+plt.show()
+exit()
+
 rsection = waxs[np.argmax(waxs[:, waxs.shape[0]//2])]
 #rsection -= rsection[-1]
 p = [0, 0.3, 2.5, 0]

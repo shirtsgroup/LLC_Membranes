@@ -1113,7 +1113,7 @@ liquid crystal membranes}
 
   \section{Results and Discussion}
   
-  \subsection{Density of monomers around pores}
+  \subsection{Density of monomers around pores}\label{section:mon_per_pore}
 
 % BJC5: old
 %  Our simulations best support a model built with 5 monomers per layer based on
@@ -1223,16 +1223,19 @@ liquid crystal membranes}
   to experiment. We tested systems built with 5 columns per pore in the parallel 
   displaced and sandwiched configurations at 300 K in the ordered and disordered
   basins. We generated simulated patterns using the equilibrated portion of each 
-  simulation trajectory. The patterns for all structures are shown and compared to
-  experiment in Figure~\ref{fig:XRDsim}.
-  %MRS10: Would be btter to lead with something describing what we found, not a caveat, just for clarity. Might belong better in the previous paragraph if left here, since it is a clarifying point that should be communicated, not an actual finding.
-  The diffraction patterns show some noise, especially along the axis where $q_r$=0. There are
-  two main reasons for this noise. First is that we angle averaged the 3D structure factor 
-  (see section~\ref{method:xrd}) which inherently gives less data as $q_r$ approaches 0. Second, 
-  our simulations are not long enough to sample enough truly independent configurations within
-  their respective metastable basins. By sampling more uncorrelated equilibrium configurations,
-  we can suppress some of the noise (See section S-\ref{S-section:xrd_noise}).
+  simulation trajectory. The simulated diffraction patterns have some noise, especially
+  along the $q_z$ axis at $q_r$=0. There are two main reasons for this noise. First
+  is that we angle averaged the 3D structure factor (see section~\ref{method:xrd})
+  which inherently gives less data as $q_r$ approaches 0. Second, we hypothesize that 
+  the more important issue is that our simulations are not long enough to sample 
+  enough truly independent configurations within their respective metastable basins
+  (See section~\ref{section:slow_dynamics}). By sampling more uncorrelated equilibrium
+  configurations, we can suppress some of the noise (See section S-\ref{S-section:xrd_noise}
+  for a detailed example of this effect). The simulated patterns generated for all systems
+  studied are shown and compared to experiment in Figure~\ref{fig:XRDsim}.
 
+  % BJC10: to be reformatted : add captions. Maybe shift experimental pattern to (a)
+  % BJC10: be more terse in main caption. Add references to sections
   \begin{figure}[!htb]
 	\centering
 	\begin{subfigure}{0.88\textwidth}
@@ -1283,10 +1286,106 @@ liquid crystal membranes}
 	in any of the simulated patterns.}~\label{fig:XRDsim} 
   \end{figure}
   
-  The simulated XRD patterns show moderate qualitative agreement with experiment. R-alkanes and
-  R-pores appear in the expected location. R-pores is more intense than experiment, likely
-  because we are simulating a near perfect, infinite hexagonal array. The real system has 
-  defects and domain misalignment which decreases the overall intensity.
+  The simulated XRD patterns show moderate agreement with experiment. There 
+  are key qualitative and quantitative differences between the experimental and simulated
+  locations and intensities of each major reflection. We measured the intensity and location
+   of each simulated reflection relative to its experimental counterpart 
+  (Table~\ref{table:relative_inensities_300K}). Our methods for measuring the intensity of
+  each reflection are presented in section S-\ref{S-section:xrd_intensities}. We have
+  devoted individual subsections to explain each major reflection. We start with relatively 
+  uncomplicated analyses of experimentally-similar reflections:
+  %BJC10: Could make the following more descriptive. For example : "The location of R-alkanes", "The intensity of R-pores", "The origin of R-spots", "The shape and intensity of R-pi", "The origin of R-double". 
+  \begin{itemize}
+  	\item R-alkanes (section~\ref{section:ralkanes})
+  	\item R-pores (section~\ref{section:rpores})
+  \end{itemize}
+  and then move onto more complicated explanations of those reflections whose characteristics
+  do not match, or have not been fully explained by experiment:
+  \begin{itemize}
+  	\item R-spots (section~\ref{section:rspots})
+  	\item R-$\pi$ (section~\ref{section:rpi})
+  	\item R-double (section~\ref{section:rdouble})
+  \end{itemize}
+  
+%  \begin{table}[h]
+%  \centering
+%  \begin{tabular}{c|cccccccccc}
+%  \toprule
+% 		   & \multicolumn{5}{c}{Configuration} \\
+%  \hline
+%           &\multicolumn{2}{c}{}            & \multicolumn{2}{c}{}          & \multicolumn{2}{c}{Parallel} & \multicolumn{2}{c}{Disordered} & \multicolumn{2}{c}{Disordered}         \\
+%           & \multicolumn{2}{c}{Experiment} & \multicolumn{2}{c}{Sandwiched} & \multicolumn{2}{c}{Displaced} & \multicolumn{2}{c}{Sandwiched}  & \multicolumn{2}{c}{Parallel Displaced} \\
+%  Reflection & Intensity & Location ($\AA^{-1}$) & Intensity & Location ($\AA^{-1}$) & Intensity & Location ($\AA^{-1}$) & Intensity & Location ($\AA^{-1}$) & Intensity & Location ($\AA^{-1}$) \\
+%  \midrule
+%  R-alkanes  & 1.0  & 1.4  & 1.0  & 1.4 & 1.0 & 1.4 & 1.0 & 1.4 & 1.0 & 1.4  \\  
+%  R-spots    & 1.3  & 1.4  & 1.3  & 1.4 & 1.2 & 1.4 & 1.1 & 1.4 & 1.2 & 1.4  \\
+%  R-$\pi$    & 2.8  & 1.7  & 44.0 & 1.4 & 7.7 & 1.4 & 8.4 & 1.4 & 10.1& 1.4  \\
+%  R-double   & 0.9  & 0.85 & --   &  -- & --  & --  & --  & --  &  -- & --   \\ 
+%  \bottomrule
+%  \end{tabular}
+%  \caption{The simulated XRD patterns of the systems tested, normalized so that the average 
+%  intensity of R-alkanes equals 1, show R-$\pi$ reflections that are significantly higher 
+%  than experiment and R-spots reflections that are slightly lower than experiment. R-double
+%  does not appear in any patterns, and thus has no measurable intensity.}
+%  \label{table:relative_inensities_300K} 
+%  \end{table}
+  
+  \begin{table}[h]
+  \centering
+  \begin{tabular}{c|ccccc}
+  \toprule
+ 		     & \multicolumn{5}{c}{Normalized Reflection Intensity}                   \\
+  \hline
+             &            &            & Parallel  & Disordered & Disordered         \\
+  Reflection & Experiment & Sandwiched & Displaced & Sandwiched & Parallel Displaced \\
+  \midrule
+  R-alkanes  & 1.0        &  1.0       &  1.0      & 1.0        & 1.0                \\
+  R-pores    & 12.3       &  49.5      &  54.0     & 50.8       & 53.4               \\
+  R-spots    & 1.3        &  1.3       &  1.2      & 1.1        & 1.2                \\
+  R-$\pi$    & 2.8        & 44.0       &  7.7      & 8.4        & 10.1               \\
+  R-double   & 0.9        &  --        & --        &  --        & --                 \\ 
+  \hline
+   		     & \multicolumn{5}{c}{Reflection Location ($|\mathbf{q}|~\AA^{-1}$)}     \\
+  \hline
+             &            &            & Parallel  & Disordered & Disordered         \\
+  Reflection & Experiment & Sandwiched & Displaced & Sandwiched & Parallel Displaced \\
+  \midrule
+  R-alkanes  & 1.39       &  1.44      &  1.44     & 1.42       & 1.43               \\  
+  R-pores    & 0.176      &  0.170     &  0.170    & 0.173      & 0.172              \\
+  R-spots    & 1.39       &  1.44      &  1.44     & 1.42       & 1.43               \\
+  R-$\pi$    & 1.70       &  1.41      &  1.42     & 1.40       & 1.40               \\
+  R-double   & 0.85       &  --        & --        &  --        & --                 \\ 
+  \bottomrule
+  \end{tabular}
+  \caption{The simulated XRD patterns of the systems tested, normalized so that the average 
+  intensity of R-alkanes equals 1, show R-$\pi$ reflections that are significantly higher 
+  than experiment and R-spots reflections that are slightly lower than experiment. R-double
+  does not appear in any patterns, and thus has no measurable intensity.}
+  \label{table:relative_inensities_300K} 
+  \end{table}  
+  
+%    \begin{table}[h]
+%  \centering
+%  \begin{tabular}{c|ccccc}
+%  \toprule
+% 		   & \multicolumn{5}{c}{Configuration} \\
+%  \hline
+%             &\multicolumn{2}{c}{}     &            & Parallel  & Disordered & Disordered         \\
+%  Reflection & \multicolumnExperiment & Sandwiched & Displaced & Sandwiched & Parallel Displaced \\
+%  \midrule
+%  R-alkanes  & 1.0        &  1.0       &  1.0      & 1.0        & 1.0                \\  
+%  R-spots    & 1.3        &  1.3       &  1.2      & 1.1        & 1.2                \\
+%  R-$\pi$    & 2.8        & 44.0       &  7.7      & 8.4        & 10.1               \\
+%  R-double   & 0.9        &  --        & --        &  --        & --                 \\ 
+%  \bottomrule
+%  \end{tabular}
+%  \caption{The simulated XRD patterns of the systems tested, normalized so that the average 
+%  intensity of R-alkanes equals 1, show R-$\pi$ reflections that are significantly higher 
+%  than experiment and R-spots reflections that are slightly lower than experiment. R-double
+%  does not appear in any patterns, and thus has no measurable intensity.}
+%  \label{table:relative_inensities_300K} 
+%  \end{table}
+  
   %MRS10: would domain misalignment make a difference in itensity?  I though we decided it wouldnt (it would more broaden?).
   %You can talk about how you WILL analyze the intensity diffence later on, that it doesn't need to be analyzed here.
   % MRS4: comments from Matt suggest that domain misalignment shouldn't alone be responsible for 
@@ -1296,76 +1395,46 @@ liquid crystal membranes}
   % pores in unit cell, tortuosity (?)
   % MRS5: maybe, there's a question of how we can demonstrate the magnitude of any of these 
   % effects.
-  R-spots appears to be weaker, except for the ordered basin sandwiched configuration, in the 
-  simulated patterns. R-spots is also partially engulfed by the wide R-$\pi$ reflection. R-$\pi$
-  appears at a lower $q_z$ value than experiment. In all systems, the reflection reaches its 
-  maximum at $q_z < 1.5~\AA^{-1}$ which means that monomers prefer to stack at least 4.2 \AA~apart
-  rather than 3.7 \AA. R-double does not appear in any of the patterns. 
+%  R-spots appears to be weaker, except for the ordered basin sandwiched configuration, in the 
+%  simulated patterns. R-spots is also partially engulfed by the wide R-$\pi$ reflection. R-$\pi$
+%  appears at a lower $q_z$ value than experiment. In all systems, the reflection reaches its 
+%  maximum at $q_z < 1.5~\AA^{-1}$ which means that monomers prefer to stack at least 4.2 \AA~apart
+%  rather than 3.7 \AA. R-double does not appear in any of the patterns. 
   
 %  We will explore its possible origins and reasons
 %  that it does not appear in our simulated patterns in Section~\ref{section:rdouble}.
   
-  The simulated XRD patterns of the parallel displaced configurations show additional
-  weak horizontal reflections near $|q_z|= 0.7~\AA^{-1}$, half of the $q_z$ value of R-$\pi$.
-  The reflection does not cross through $q_r = 0~\AA^{-1}$ so it does not necessarily appear
-  for the same reason as R-double. It is possible that parallel displaced monomers contribute
-  to the diffuse reflections that connect R-spots and R-double in the experimental pattern.
-  
   %  This type of pattern is characteristic of a helix~\cite{watson_structure_1953}, as the 
   %  head groups in the parallel displaced configuration are arranged in a helix.
 
-  We quantified the numerical discrepancies present when comparing the relative intensities
-  of each reflection of interest between experimental and simulated patterns. 
-  Table~\ref{table:relative_inensities_300K} shows the relative intensities of each reflection for 
-  all systems tested. The patterns are normalized so that the average intensity of R-alkanes 
-  must equal 1. We measured the approximate intensity of R-$\pi$ and R-double by measuring the
-  intensity of the appropriate peaks of the cross-section of the 2D pattern at $q_r=0$. The 
-  relative intensity of R-$\pi$ is significantly higher than experiment in our simulations. 
-  %MRS10: weird transition between these two; it's a result that interrupts the discussion of methods.
-  R-spots is measured as the average intensity within the region bounded by a 'spot'. We 
-  identified spots based on visual inspection. 
-  %MRS10: what criteria were used?  Need to provide what was used to make the decision.
-If the spots were not easily discernible, then the 
-  intensity was taken as that of the intersection of R-alkanes at half the $q_z$ value of
-  R-$\pi$, as that is where it appears experimentally. The intensity of R-spots is slightly
-  lower than experiment in all cases except for the ordered basin sandwiched configuration which 
-  agrees with experiment. There is no R-double intensity to be measured. %MRS10: specific where no R-double intensity was measured. None of the simulations, correct?
-Figures are provided in section S-\ref{S-section:xrd_intensities} to further clarify these measurements. %MRS10: Specify what figures clarify what things.  Also, use active voice in this section.
+%  We quantified the numerical discrepancies present when comparing the relative intensities
+%  of each reflection of interest between experimental and simulated patterns. 
+%  Table~\ref{table:relative_inensities_300K} shows the relative intensities of each reflection for 
+%  all systems tested. The patterns are normalized so that the average intensity of R-alkanes 
+%  must equal 1. We measured the approximate intensity of R-$\pi$ and R-double by measuring the
+%  intensity of the appropriate peaks of the cross-section of the 2D pattern at $q_r=0$. The 
+%  relative intensity of R-$\pi$ is significantly higher than experiment in our simulations. 
+%  %MRS10: weird transition between these two; it's a result that interrupts the discussion of methods.
+%  R-spots is measured as the average intensity within the region bounded by a 'spot'. We 
+%  identified spots based on visual inspection. 
+%  %MRS10: what criteria were used?  Need to provide what was used to make the decision.
+%If the spots were not easily discernible, then the 
+%  intensity was taken as that of the intersection of R-alkanes at half the $q_z$ value of
+%  R-$\pi$, as that is where it appears experimentally. The intensity of R-spots is slightly
+%  lower than experiment in all cases except for the ordered basin sandwiched configuration which 
+%  agrees with experiment. There is no R-double intensity to be measured. %MRS10: specific where no R-double intensity was measured. None of the simulations, correct?
+%Figures are provided in section S-\ref{S-section:xrd_intensities} to further clarify these measurements. %MRS10: Specify what figures clarify what things.  Also, use active voice in this section.
 
-  \begin{table}[h]
-  \centering
-  \begin{tabular}{c|ccccc}
-  \toprule
- 		   & \multicolumn{5}{c}{Configuration} \\
-  \hline
-             &            &            & Parallel  & Disordered & Disordered         \\
-  Reflection & Experiment & Sandwiched & Displaced & Sandwiched & Parallel Displaced \\
-  \midrule
-  R-alkanes  & 1.0        &  1.0       &  1.0      & 1.0        & 1.0                \\  
-  R-spots    & 1.3        &  1.3       &  1.2      & 1.1        & 1.2                \\
-  R-$\pi$    & 2.8        & 44.0       &  7.7      & 8.4        & 10.1               \\
-  R-double   & 0.9        &  --        & --        &  --        & --                 \\ 
-  \bottomrule
-  \end{tabular}
-  \caption{The simulated XRD patterns of the systems tested, normalized so that the average 
-  intensity of R-alkanes equals 1, show R-$\pi$ reflections that are significantly higher 
-  than experiment and R-spots reflections that are slightly lower than experiment. R-double
-  does not appear in any patterns, and thus has no measurable intensity.}
-  \label{table:relative_inensities_300K} 
-  \end{table}
-  %BJC5: Bold font is caused by achemso document type
-  %MRS7: huh.
-  %BJC6: yea, specifically the one for j phys chem B. I compiled with a different document type and the captions looked normal
-  There are clear differences between simulated and experimental results that must be addressed
-  and justified. We will explore the possible origin of select experimental reflections and form 
-  structural hypotheses related to their appearance in our simulated patterns. Specifically, we 
-  want answer:  
-  %MRS10: should the ``why is R-pi in not quite the right place'' be here, to have those sorts of questions more centralized?
-  \begin{enumerate}
-	\item What is the origin of R-spots?
-  	\item Why is the intensity of R-$\pi$ so much greater than experiment?
-  	\item What is the origin of R-double?
-  \end{enumerate}
+%  There are clear differences between simulated and experimental results that must be addressed
+%  and justified. We will explore the possible origin of select experimental reflections and form 
+%  structural hypotheses related to their appearance in our simulated patterns. Specifically, we 
+%  want answer:  
+%  %MRS10: should the ``why is R-pi in not quite the right place'' be here, to have those sorts of questions more centralized?
+%  \begin{enumerate}
+%	\item What is the origin of R-spots?
+%	\item How can we modify our simulations to account for the discrepancies between the experimental and simulated R-$\pi$ peak.
+%  	\item What is the origin of R-double?
+%  \end{enumerate}
   
 % BJC5: old version
 %  Simulated XRD of the sandwiched configuration shows most all experimental features 
@@ -1486,14 +1555,43 @@ Figures are provided in section S-\ref{S-section:xrd_intensities} to further cla
 %  z-directional correlation within columns, with no correlation between
 %  columns\cite{chaikin_principles_1995}. 
 
+  \subsubsection{R-alkanes}\label{section:ralkanes}
+  
+  R-alkanes appears close to its expected location. In all cases, the maximum intensity
+  of R-alkanes appears at a $|\mathbf{q}|$ value slightly higher than experiment. 
+  We expect that the exact location of R-alkanes will not be perfect in our simulations
+  since the simulated diffraction patterns are interpolated between a finite number of
+  bins in each frequency dimension. We can achieve higher resolution with a larger
+  system size, however we are satisfied with the packing distances shown by our simulations.
+  %BJC10: I could integrate a 3D correlation function to get a better value
+  
+  We believe that R-alkanes is the experimental feature most likely to be reproduced by
+  our simulations. For this reason we normalized the experimental and simulated diffraction
+  patterns so that the average intensity within the R-alkanes is equal to 1. 
+
+  \subsubsection{R-pores}\label{section:rpores}
+  
+   R-pores is about 4 times more intense than experiment in all simulated systems. 
+   %BJC10: trying to come up with a good explanation.   
+    
+   We are not concerned with exactly reproducing the intensity of R-pores since it is a 
+   product of long distance correlation between pores. We are primarily concerned with
+   the structure within pores which is better described by reflections at higher 
+   $|\mathbf{q}|$ values. The location of R-pores \textit{is} important because we can 
+   use it to learn the number of monomer columns within each pore as we did in 
+   section~\ref{section:mon_per_pore}
+
   \subsubsection{The origin of R-spots}\label{section:rspots}
 %MRS10: I rephrased the below, check the diffs.
   In order to more clearly study R-spots, we equilibrated an ordered basin sandwiched 
-  configuration at 280K. Many force fields do not obtain the correct equilibrium structure at precisely the experimental temperature. Wang et al. highlighted the 
-  shortcoming of some of the most popular protein force field in predicting the temperature
-  dependence of protein structural ensembles \cite{wang_building_2017}. It is therefore possible that   % page 12
-  our membrane system, simulated at 300K, is overly structured compared to the experimental structure at 300K.
-  We found that lowering the temperature better resolved the R-spots (Figure~\ref{fig:sandwiched280K}), suggesting that our 'effective' temperature might indeed be too high, overstabilizing structure. 
+  configuration at 280K. Many force fields do not obtain the correct equilibrium structure
+  at precisely the experimental temperature. Wang et al. highlighted the shortcoming of 
+  some of the most popular protein force field in predicting the temperature dependence 
+  of protein structural ensembles \cite{wang_building_2017}. It is therefore possible that   % page 12
+  our membrane system, simulated at 300K, is overly structured compared to the experimental
+  structure at 300K. We found that lowering the temperature better resolved R-spots 
+  (Figure~\ref{fig:sandwiched280K}), suggesting that our 'effective' temperature might 
+  indeed be too high, overstabilizing structure. 
 %  The relative intensity 
 %  of R-spots in this system is slightly higher than experiment (1.5 vs. 1.3) 
   
@@ -1503,22 +1601,12 @@ Figures are provided in section S-\ref{S-section:xrd_intensities} to further cla
 %  is still not present. We will use the system simulated at 280K to more thoroughly explore the 
 %  origin of R-spots.
  
-  Evidence 
-%MRS10: added
-from the simulations
-  strongly suggests that the R-spots signal is not a result of alkane
-  chain tilt. Previous literature has attributed the spots in this particular
-%MRS10: clarified that it was THIS exact data, and not similiar images. Correct if wrong.
-WAXS 
-%pattern 
-dataset
-as the product of tilted alkane chains~\cite{feng_scalable_2014}.
+  Evidence from the simulations strongly suggests that the R-spots signal is not a 
+  result of alkane chain tilt. Previous literature has attributed the spots in 
+  this particular WAXS dataset as the product of tilted alkane chains~\cite{feng_scalable_2014}.
   We measured the tilt angle of the alkane chains of the 280K system and showed
-  that it equilibrates to an average tilt angle of
-  -2\degree~(Fig.~\ref{fig:tilt}), far from the 37\degree~tilt angle previously
-  used to explain R-spots. 
-  %MRS8: did you do a few different things here as sensitivity analysis to show that the finding was robust?  If so, putting some of that in would be useful.
-  %BJC7: make it clear that it is the 280K. Reference all configurations where tilt angles were calculated.
+  that it equilibrates to an average tilt angle of -2\degree~(Fig.~\ref{fig:tilt}),
+  far from the 37\degree~tilt angle previously used to explain R-spots. 
 
   %To understand the most likely origin of R-spots, we determined which atoms
   %gave rise to the feature. 
@@ -1531,16 +1619,16 @@ as the product of tilted alkane chains~\cite{feng_scalable_2014}.
   % the supplemental information. Do you think that's enough, or should I add
   % to this figure?
   %MRS10: rephrased.
-  The evidence strongly suggests that R-spot pattern occurs because tails pack together hexagonally. 
-  We plotted the center of masses of the 
-  first four tail atoms of each tail originating from each head group 
-  (Figure \ref{fig:centroids}). We measured the angle between each center of
-  mass and its nearest neighbor center of masses with respect to the $xy$ 
-  plane of the membrane. We see distinct peaks in the distribution of these 
-  angles located ca. $-60\degree$, $0\degree$, and $60\degree$ which is 
-  consistent with a hexagonally packed configuration 
+  The evidence strongly suggests that R-spot pattern occurs because tails pack 
+  together hexagonally. We plotted the center of masses of the first four tail 
+  atoms of each tail originating from each head group (Figure \ref{fig:centroids}).
+  We measured the angle between each center of mass and its nearest neighbor 
+  center of masses with respect to the $xy$ plane of the membrane. We see distinct
+  peaks in the distribution of these angles located ca. $-60\degree$, $0\degree$,
+  and $60\degree$ which is consistent with a hexagonally packed configuration 
   (Figure~\ref{fig:layered_tails}). 
   %MRS10: is it importat that the ordering dies off? IF there is ordering, it will show in the spectra, and it doesn't matter that it dies off in other parts of the spectra.
+  %BJC10: I only addressed this because Matt wanted a more thorough characterization of tail order 
 This ordering dies off at the tail ends,
   where there is more space to fill causing them to pack nearly isotropically.
   See Section~S-\ref{S-tail_packing} for a more detailed explanation of the 
@@ -1630,9 +1718,10 @@ This ordering dies off at the tail ends,
   
   \subsubsection{Discrepancies between experimental and simulated R-$\pi$}\label{section:rpi}
   %MRS10: in the list of questions above, you just talk about intensity, but this title talks about more discrepnacies. It could go either way (as I mention before, there's the issue of R-pi placement, too), but it should be consistent.
-  The experimentally measured R-$\pi$ is more intense relative to the experimental system. The difference in intensity
-  ranges from 3 times too high in the ordered parallel displaced system to 15 times too 
-  high in the ordered sandwiched configuration (Table~\ref{table:relative_inensities_300K}).
+  The simulated intensity of R-$\pi$ at 300K is more intense relative to the experimental 
+  system. The difference in intensity ranges from 3 times too high in the ordered parallel
+  displaced system to 15 times too high in the ordered sandwiched configuration 
+  (Table~\ref{table:relative_inensities_300K}).
   %MRS10: should specify this is in the 300 K simulations.
 
   The peak shape of the $q_r$ cross-section of R-$\pi$ in the simulated XRD is qualitatively different
@@ -1654,9 +1743,9 @@ This ordering dies off at the tail ends,
   the FWHM of the $q_z$ cross-section of R-$\pi$, where the experimental FWHM 
   (0.11 $\AA^{-1}$) is similar to the bin size in the $q_z$ direction (ca. 0.07 $\AA^{-1}$).
   Additionally, we model each atom with a Gaussian sphere of electron density. 
-  The true electronic structure is likely much more complicated. 
-  %MRS10: modified
-  However, we can explore reasons for which differences in the simulation structure could changes the peak shapes to be in better agreement with experiment.
+  The true electronic structure is likely much more complicated. However, we can
+  explore reasons for which differences in the simulation structure could change
+  the peak shapes to be in better agreement with experiment.
   
 % BJC9: old version of above paragraph
 %  The full width at half maximums (FWHM) of the $q_r$ and $q_z$ cross-sections
@@ -1797,9 +1886,7 @@ for the reproducibility of this work since both
   as simulated disorder into our model system.}
   \label{table:quenched_disorder} 
   \end{table}
-
-%MRS9: sorry, I keep reading ``no correlation'' as ``no collusion'' :)
-%BJC9: hahaha^
+  
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.3\textwidth}
@@ -2147,6 +2234,13 @@ for the reproducibility of this work since both
 %  \end{figure}
 
   \subsubsection{Origin of R-double}\label{section:rdouble}
+  
+  %BJC10: I think this belongs somewhere in this section.
+  The simulated XRD patterns of the parallel displaced configurations show additional
+  weak horizontal reflections near $|q_z|= 0.7~\AA^{-1}$, half of the $q_z$ value of R-$\pi$.
+  The reflection does not cross through $q_r = 0~\AA^{-1}$ so it does not necessarily appear
+  for the same reason as R-double. It is possible that parallel displaced monomers contribute
+  to the diffuse reflections that connect R-spots and R-double in the experimental pattern.
   
 %  There is no way to produce R-double without a more complex initial configuration. We 
 %  calculated the structure factor of simple idealize systems with points representing monomer
@@ -2725,7 +2819,7 @@ for the reproducibility of this work since both
 %	  swell in the presence of water.}~\label{fig:solvated_correlation}
 %  \end{figure}
 
-  \subsection{Slow dynamics}
+  \subsection{Slow dynamics}\label{section:slow_dynamics}
 
   % BJC6: edited to reduce comparison to other columnar LCs (and shortened)
   We observe slow dynamics in our system. Typical diffusion constants for columnar
