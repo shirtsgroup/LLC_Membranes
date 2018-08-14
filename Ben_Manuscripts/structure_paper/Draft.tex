@@ -1223,15 +1223,19 @@ liquid crystal membranes}
   to experiment. We tested systems built with 5 columns per pore in the parallel 
   displaced and sandwiched configurations at 300 K in the ordered and disordered
   basins. We generated simulated patterns using the equilibrated portion of each 
-  simulation trajectory. The simulated diffraction patterns have some noise, especially
-  along the $q_z$ axis at $q_r$=0. There are two main reasons for this noise. First
-  is that we angle averaged the 3D structure factor (see section~\ref{method:xrd})
-  which inherently gives less data as $q_r$ approaches 0. Second, we hypothesize that 
-  the more important issue is that our simulations are not long enough to sample 
-  enough truly independent configurations within their respective metastable basins
-  (See section~\ref{section:slow_dynamics}). By sampling more uncorrelated equilibrium
-  configurations, we can suppress some of the noise (See section S-\ref{S-section:xrd_noise}
-  for a detailed example of this effect). The simulated patterns generated for all systems
+  simulation trajectory. 
+  %MRS11: probably want to say about about HOW they were generated (Could refer back to methods?)
+  %MRS11: my pass below.
+  There are two important factor to take into account when looking at differences between experimental XRD and simulated XRD.  First, the 
+  simulated diffraction patterns have some noise, especially
+  along the $q_z$ axis at $q_r$=0, which is where several of the more interesting features are located.
+  This is due to the angle averaging the 3D structure factor around the $q_z$-axis (see section~\ref{method:xrd}), meaning there are fewer samples as  $q_r$ approaches 0. The amount of samples to converge along the $q_z$ axis is analyzed in Supporting Information section S-\ref{S-section:xrd_noise}. 
+  More importantly, are simulations do not appear to be long 
+  enough to sample 
+  truly independent configurations within their respective metastable basins
+  (See section~\ref{section:slow_dynamics}), meaning we must take care in interpreting the results of the XRD. 
+  %MRS11: the fact that they are not within their metastable basis DOESN'T just affect the noise it affects everything else.  If we had 100 times longer, it would reduce the noise along the z axis a lot, but the peaks would likely still be too intense, as we would have a lot of data long the z, but still be in the timescales that are too slow to reduce the peak intensity. Did a pass above.
+The simulated patterns generated for all systems
   studied are shown and compared to experiment in Figure~\ref{fig:XRDsim}.
 
   % BJC10: to be reformatted : add captions. Maybe shift experimental pattern to (a)
@@ -1291,10 +1295,12 @@ liquid crystal membranes}
   locations and intensities of each major reflection. We measured the intensity and location
    of each simulated reflection relative to its experimental counterpart 
   (Table~\ref{table:relative_inensities_300K}). Our methods for measuring the intensity of
-  each reflection are presented in section S-\ref{S-section:xrd_intensities}. We have
-  devoted individual subsections to explain each major reflection. We start with relatively 
-  uncomplicated analyses of experimentally-similar reflections:
-  %BJC10: Could make the following more descriptive. For example : "The location of R-alkanes", "The intensity of R-pores", "The origin of R-spots", "The shape and intensity of R-pi", "The origin of R-double". 
+  each reflection are presented in section S-\ref{S-section:xrd_intensities}. 
+
+  In the next few subsections, we have individually address each major reflection, and the similarities and differences between simulation and experiment. We start with relatively 
+  uncomplicated analyses of reflection that are very similar between experiment and simulation:
+  %BJC10: Could make the following more descriptive. For example : "The location of R-alkanes", "The intensity of R-pores", "The origin of R-spots", "The shape and intensity of R-pi", "The origin of R-double".
+  %MRS11: that sounds good.
   \begin{itemize}
   	\item R-alkanes (section~\ref{section:ralkanes})
   	\item R-pores (section~\ref{section:rpores})
