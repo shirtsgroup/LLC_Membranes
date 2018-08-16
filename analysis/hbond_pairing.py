@@ -124,17 +124,26 @@ if __name__ == "__main__":
         # single[i] = n
         # above_and_below[i] = N
 
+    z_avg = np.mean(sys.t.unitcell_vectors[:, 2, 2])
+    print(z_avg)
+    z = np.linspace(0, z_avg, 20)*10 # angstroms
+
     fig1, ax1 = plt.subplots(2, 2)
     for i in range(2):
         for j in range(2):
-            ax1[i, j].plot(np.linspace(1, nlayers, nlayers), np.mean(inter[(2*i + j)*nlayers:(2*i + j + 1)*nlayers, :], axis=1), linewidth=2)
+            ax1[i, j].plot(z, np.mean(inter[(2*i + j)*nlayers:(2*i + j + 1)*nlayers, :], axis=1), linewidth=2)
             ax1[i, j].text(.5, .85, 'Pore %d' % (1 + j + 2 * i), horizontalalignment='center', transform=ax1[i, j].transAxes, fontsize=14)
             ax1[i, j].set_ylim(0, 1)
 
-    ax1[1, 0].set_xlabel('Layer', fontsize=14)
-    ax1[1, 1].set_xlabel('Layer', fontsize=14)
+    ax1[1, 0].set_xlabel('$z$-coordinate ($\AA$)', fontsize=14)
+    ax1[1, 1].set_xlabel('$z$-coordinate ($\AA$)', fontsize=14)
     ax1[0, 0].set_ylabel('Average shared\n hbonds', fontsize=14)
     ax1[1, 0].set_ylabel('Average shared\n hbonds', fontsize=14)
+
+    ax1[0, 0].annotate('', xy=(30.5, 0.5), xytext=(30.5, 0.8),
+                arrowprops=dict(facecolor='black', width=1, headwidth=6,shrink=0.2, headlength=6), fontsize=14)
+    ax1[0, 0].annotate('', xy=(39.25, 0.46), xytext=(39.25, 0.76),
+                arrowprops=dict(facecolor='black', width=1, headwidth=6,shrink=0.2, headlength=6), fontsize=14)
 
     plt.tight_layout()
     plt.savefig('pore_hbonds.png')
@@ -143,6 +152,7 @@ if __name__ == "__main__":
     block_length = 2  # insert this many zeros after each entry in layers
     pores = 4
     layers = np.linspace(0, pores*nlayers - 1, pores*nlayers*(block_length + 1) - block_length)
+
     binsize = (layers[1] - layers[0])
 
     ft = np.zeros([pores, int(nlayers*(block_length + 1) - block_length), sys.t.n_frames])
@@ -173,17 +183,19 @@ if __name__ == "__main__":
             freq_x = freq_x[ndx]
             ft[k, :, j] += fft[ndx]
 
+    f = freq_x * 2*np.pi / (10 * z_avg / nlayers)
+
     # plt.plot(np.linspace(0, pores*nlayers - 1, pores*nlayers), np.mean(inter, axis=1))
     fig, ax = plt.subplots(2, 2)
     for i in range(2):
         for j in range(2):
-            ax[i, j].plot(freq_x, np.mean(ft[2*i + j, :, :], axis=1), linewidth=2)
+            ax[i, j].plot(f, np.mean(ft[2*i + j, :, :], axis=1), linewidth=2)
             ax[i, j].text(.5, .85, 'Pore %d' % (1 + j + 2 * i), horizontalalignment='center', transform=ax[i, j].transAxes, fontsize=14)
             ax[i, j].set_ylim(0, 7)
-            ax[i, j].set_xlim(-1.2, 1.2)
+            ax[i, j].set_xlim(-2, 2)
 
-    ax[1, 0].set_xlabel('Frequency (layers$^{-1}$)', fontsize=14)
-    ax[1, 1].set_xlabel('Frequency (layers$^{-1}$)', fontsize=14)
+    ax[1, 0].set_xlabel('Frequency ($\AA^{-1}$)', fontsize=14)
+    ax[1, 1].set_xlabel('Frequency ($\AA^{-1}$)', fontsize=14)
     ax[0, 0].set_ylabel('Intensity', fontsize=14)
     ax[1, 0].set_ylabel('Intensity', fontsize=14)
 

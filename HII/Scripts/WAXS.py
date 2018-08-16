@@ -298,6 +298,19 @@ def normalize_alkanes(R, Z, Raw_Intensity, inner, outer, angle):
 
     print('Average Intensity in alkane chain region : %s' % avg_intensity)
 
+    I /= (counts*avg_intensity)
+
+    plt.bar(bins, I, bw, color='#1f77b4')
+
+    plt.xlabel('Angle with respect to $q_z=0$', fontsize=14)
+    plt.ylabel('Normalized integrated intensity', fontsize=14)
+    plt.gcf().get_axes()[0].tick_params(labelsize=14)
+    # plt.ylim(0,2)
+    plt.xlim(-90, 90)
+    plt.tight_layout()
+    plt.savefig('angular_integration.png')
+    plt.show()
+
     return avg_intensity
 
 avg_intensity = normalize_alkanes(X, Y, waxs, 1.256, 1.57, 120)

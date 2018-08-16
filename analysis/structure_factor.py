@@ -320,6 +320,8 @@ class Trajectory(object):
 
                 # start_theta = 0
                 theta = 2 * np.pi / ncol_per_pore  # angle between columns
+                pore_shift_x = np.random.normal(scale=10)
+                pore_shift_y = np.random.normal(scale=10)
                 for a in range(ncol_per_pore):
 
                     start = ncol_per_pore * c * npoints + a * npoints
@@ -336,29 +338,29 @@ class Trajectory(object):
                     x = r*np.cos(start_theta + a*theta)
                     y = r*np.sin(start_theta + a*theta)
 
-                    self.locations[t, start:end, 0] = xy_pore_centers[c, 0] + x
-                    self.locations[t, start:end, 1] = xy_pore_centers[c, 1] + y
+                    self.locations[t, start:end, 0] = xy_pore_centers[c, 0] + x + pore_shift_x
+                    self.locations[t, start:end, 1] = xy_pore_centers[c, 1] + y + pore_shift_y
                     if noise:
                         shift = shift_range * (z_separation / 2) * np.random.uniform(-1, 1)  # shift column by a random amount
                         #shift = shifts[c]
                     else:
                         shift = 0
 
-                    x_disorder = r*np.random.normal(scale=thermal_disorder[0], size=(end - start))
-                    y_disorder = r*np.random.normal(scale=thermal_disorder[1], size=(end - start))
-                    z_disorder = z_separation*np.random.normal(scale=thermal_disorder[2], size=(end - start))
+                    # x_disorder = r*np.random.normal(scale=thermal_disorder[0], size=(end - start))
+                    # y_disorder = r*np.random.normal(scale=thermal_disorder[1], size=(end - start))
+                    # z_disorder = z_separation*np.random.normal(scale=thermal_disorder[2], size=(end - start))
 
-                    disorder = np.vstack((x_disorder, y_disorder, z_disorder)).T
+                    # disorder = np.vstack((x_disorder, y_disorder, z_disorder)).T
 
                     self.locations[t, start:end, 2] = z_correlation(column, 10, v=thermal_disorder[2]**2) + shift
                     self.locations[t, start:end, :2] += np.random.normal(scale=2.3, size=(column.size, 2))
-                    #self.locations[t, start:end, 2] = column + shift
+                    self.locations[t, start:end, 2] = column + shift
 
                     # for noise about initial configuration
                     #self.locations[t, start:end, 2] = columns[c*ncol_per_pore + a] + shifts[c*ncol_per_pore + a]
                     #self.locations[t, start:end, :2] += xy_noise[c*ncol_per_pore + a, ...]
 
-                    #self.locations[t, start:end, :] += disorder
+                    # self.locations[t, start:end, :] += disorder
                     # self.locations[t, start:end, 2] += z_disorder
 
         from LLC_Membranes.llclib import file_rw
@@ -687,6 +689,8 @@ if __name__ == "__main__":
     t.scatter3d(show=False)
 
     t.compute_structure_factor(grid, hexagonal=args.hexagonal)
+    t.plot_sf_slice('y', [0, 0], show=True)
+    exit()
     t.plot_sf_slice('z', [0, 0], show=False)
 
     plt.xlim(-2.5, 2.5)
