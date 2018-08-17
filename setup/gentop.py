@@ -16,6 +16,8 @@ def initialize():
     parser.add_argument('-d', '--description', default='Simulation box', help='Description of system to put under '
                                                                               '[ system ] directive')
     parser.add_argument('-ff', '--forcefield', default='gaff', help='Name of forcefield to use')
+    parser.add_argument('-xlink', action="store_true", help='Create topology for cross-linked system')
+    parser.add_argument('-xlink_topname', default='assembly.itp', help='Name of cross-linked topology')
 
     args = parser.parse_args()
 
@@ -167,5 +169,5 @@ class SystemTopology(object):
 if __name__ == "__main__":
 
     args = initialize()
-    t = SystemTopology(args.gro, ff=args.forcefield)
+    t = SystemTopology(args.gro, ff=args.forcefield, xlink=True)
     t.write_top(name=args.output, description=args.description)
