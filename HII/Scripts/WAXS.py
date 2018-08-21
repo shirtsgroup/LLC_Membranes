@@ -299,18 +299,22 @@ def normalize_alkanes(R, Z, Raw_Intensity, inner, outer, angle):
     print('Average Intensity in alkane chain region : %s' % avg_intensity)
 
     I /= (counts*avg_intensity)
-
-    plt.bar(bins, I, bw, color='#1f77b4')
-
-    plt.xlabel('Angle with respect to $q_z=0$', fontsize=14)
+    bins -= 90
+    plt.plot(bins, I, linewidth=2)
+    #x = plt.bar(bins, I, bw, color='#1f77b4')
+    #centers = [i.xy[0] + bw/2 for i in x.patches]
+    #intensities = [j.height for j in x.patches]
+    #plt.figure()
+    #plt.plot(centers, intensities)
+    plt.xlabel('Angle with respect to $q_r=0$', fontsize=14)
     plt.ylabel('Normalized integrated intensity', fontsize=14)
     plt.gcf().get_axes()[0].tick_params(labelsize=14)
     # plt.ylim(0,2)
-    plt.xlim(-90, 90)
+    #plt.xlim(-90, 90)
     plt.tight_layout()
     plt.savefig('angular_integration.png')
-    plt.show()
-
+    #plt.show()
+    
     return avg_intensity
 
 avg_intensity = normalize_alkanes(X, Y, waxs, 1.256, 1.57, 120)
@@ -548,9 +552,10 @@ plt.plot(X[start:end], gaussian(X[start:end], solp[0], solp[1], solp[2], solp[3]
 
 plt.plot(X, waxs[:, Y.size // 2])
 plt.show()
-exit()
 
+plt.figure()
 rsection = waxs[np.argmax(waxs[:, waxs.shape[0]//2])]
+rsection = waxs[waxs.shape[0] // 2]
 #rsection -= rsection[-1]
 p = [0, 0.3, 2.5, 0]
 solp_gaussian, cov_x_gaussian = curve_fit(gaussian, X, rsection, p)
@@ -558,6 +563,8 @@ p = np.array([0.1, 0, 1, .1])
 solp_lorentz, cov_x_lorentz = curve_fit(lorentz, X, rsection, p)
 
 plt.plot(X, rsection, linewidth=2, color='xkcd:blue')
+plt.show()
+exit()
 #plt.plot(X, gaussian(X, solp_gaussian[0], solp_gaussian[1], solp_gaussian[2], solp_gaussian[3]), '--', label='Gaussian Fit', linewidth=2)
 plt.plot(X, lorentz(X, solp_lorentz[0], solp_lorentz[1], solp_lorentz[2], solp_lorentz[3]), '--', color='xkcd:orange', label='Lorentzian Fit', linewidth=2)
 plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=18)
