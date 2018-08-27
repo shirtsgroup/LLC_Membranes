@@ -338,7 +338,39 @@ class System(Topology):
 
         # calculate minimum image distance between c1 and c2 atoms
         dim = self.t.unitcell_lengths[0]
-        diff = self.t.xyz[0, self.c1_atoms, :] - self.t.xyz[0, self.c2_atoms, :]
+        # dim_components = [dim[0], ]
+
+        # shift so box is cubic temporarily
+        theta = np.pi / 3
+        self.t.xyz[..., 1] /= np.sin(theta)
+        self.t.xyz[..., 0] = self.t.xyz[..., 0] - self.t.xyz[..., 1]*np.cos(theta)
+
+        c1_len = len(self.c1_atoms)
+        c2_len = len(self.c2_atoms)
+
+        diff = np.zeros([c1_len*c2_len, 3])
+        for i in range(c1_len):
+            diff[i*c2_len: (i + 1)*c2_len] = self.t.xyz[0, self.c1_atoms[i], :] - self.t.xyz[0, self.c2_atoms, :]
+
+        # np.where(condition, if True, else)
+        # diff[:, 0] = np.where(diff[:, 0] > 0.5*dim[0], diff[:, 0] - dim[0], diff[:, 0])
+        # diff[:, 1] = np.where(diff[:, 1] > 0.5*dim[1], diff[:, :2] - [dim[0]*np.cos(np.pi/2), dim[1]*np.sin(np.pi/2)],
+        #                       diff[:, 1])
+        # diff[:, 2] = np.where(diff[:, 2] > 0.5*dim[2], diff[:, 2] - dim[2], diff[:, 2])
+        diff = np.where(diff > 0.5*dim, diff - dim, diff)
+
+        # self.t.xyz[..., 1] *= np.sin(theta)
+        # self.t.xyz[..., 0] = self.t.xyz[..., 0] + self.t.xyz[..., 1]*np.cos(theta)
+
+        distance = np.linalg.norm(diff, axis=1)
+
+        distance = distance[np.where(distance < 0.3)[0]]
+        print(distance.shape)
+
+        exit()
+
+        xdiff = diff[:, 0]
+        diff[:, 0] = np.where(xdiff[:, 0] > 0.5*dim[0], diff[:, 0])
         # may need to do the following in each dimension. First, verify that the following doesn't work by writing out
         # .gro files of qualifying c1 and c2 atoms. See if any are paired up that are across pbcs.
         diff = np.where(diff > 0.5*dim, diff - dim, diff)

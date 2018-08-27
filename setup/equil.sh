@@ -38,14 +38,23 @@ else
     GMX="gmx"
 fi
 
+${python} ${DIR}/build2.py
+
 # make input files
-${python} ${DIR}/input.py -b ${BUILD_MON} -l 50 --restraints ${restraint_residue} --temp ${T} -f 50 --genvel yes -c ${start_config}
+${python} ${DIR}/input.py -b ${BUILD_MON} -l 50 --restraints ${restraint_residue} --temp ${T} -f 50 --genvel yes -c ${start_config} -s 50000
 # create restrained topology
 
 ${python} ${DIR}/restrain.py -f 1000000 1000000 1000000 -A xyz -g ${start_config} -m ${BUILD_MON} -a ${ring_restraints}
 
 gmx grompp -f em.mdp -p topol.top -c ${start_config} -o em -r ${start_config}
 ${GMX} mdrun -v -deffnm em
+
+n=$(awk '/Potential Energy/ {print $4}' em.log)
+echo $n
+if [[ ${n:0:2} == *"."* ]]; then
+	exec equil.sh
+fi
+
 gmx grompp -f npt.mdp -p topol.top -c em.gro -o npt -r em.gro
 ${GMX} mdrun -v -deffnm npt
 
