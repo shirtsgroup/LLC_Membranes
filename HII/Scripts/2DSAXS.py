@@ -60,6 +60,13 @@ qmax = qbin *float(pixels.shape[0] // 2)
 qx = np.linspace(-qmax, qmax, pixels.shape[0])
 qy = np.linspace(-qmax, qmax, pixels.shape[1])
 
+plt.imshow(pixels, extent=[-qmax, qmax, -qmax, qmax], cmap='jet')
+plt.colorbar()
+plt.xlabel('$q_r\ (\AA^{-1})$', fontsize=16)
+plt.ylabel('$q_z\ (\AA^{-1})$', fontsize=16)
+plt.tight_layout()
+plt.savefig('2DSAXS_axes.png')
+plt.show()
 third_peak_left = 0
 while qy[third_peak_left] < -0.38:
 	third_peak_left += 1
