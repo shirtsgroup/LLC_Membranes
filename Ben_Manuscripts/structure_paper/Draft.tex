@@ -38,31 +38,34 @@
   
   \begin{abstract}
 
-  %MRS13: I tweaked this a bit.  Probably could add another sentence to add some of the other important findings.
-  Nanostructured porous membranes made from the cross-linked hexagonal phase of
-  self-assembled lyotropic liquid crystals (LLCs) are a promising material for
-  selective separations. In this work, we investigate an experimentally
-  characterized LLC membrane using atomistic molecular modeling. In particular, we compare
-  simulated X-ray diffraction (XRD) patterns with experimental XRD to quantify and understand 
-  differences between simulation and experiment.
-  We find that pores are
-  likely composed of 5 columns of stacked LLC monomers which surround each
-  hydrophilic core.  We also find that some of the structure previously attributed to 
-  monomer tail tilt is likely instead due to ordered tail packing.  
-  Although this system has been reported as dry, we show that
-  small amounts of water are necessary to fully reproduce the experimental XRD
-  pattern due to asymmetries introduced by hydrogen bonds between monomer head
-  groups and water molecules. We explore the composition and structure of the
-  nanopores and reveal that there exists a composition gradient rather than a
-  abrupt partition between the hydrophilic and hydrophobic regions. A caveat is
-  that the time scales of the dynamics are extremely long for this system, resulting in 
-  simulated structures that appear too ordered, 
-  %MRS13: I left out starting from alternative structures since we didn't actually do it.
-  %requiring starting from a range of alternative initial configurations and
-  and requiring careful examination of the metastable states observed for any conclusions. The clearer picture of
-  the nanoscopic structure of these membranes provided in this study will enable
-  a better understanding of the mechanisms of small molecule transport within
-  these nanopores.
+  Nanostructured porous membranes made from the cross-linked hexagonal phase
+  of self-assembled lyotropic liquid crystals (LLCs) are a promising material
+  for selective separations. In this work, we investigate an experimentally
+  characterized LLC membrane using atomistic molecular modeling. In particular,
+  we compare simulated X-ray diffraction (XRD) patterns with experimental XRD
+  to quantify and understand the differences between simulation and experiment.
+  We find that pores are likely composed of 5 columns of stacked LLC monomers
+  which surround each hydrophilic core. We learned that these columns likely 
+  move independently of each other over time scales which we can not simulate.
+  We find that some of the structure previously attributed to monomer tail 
+  tilt is likely instead due to ordered tail packing. Although this system
+  has been reported as dry, we show that small amounts of water are necessary
+  to fully reproduce all features from the experimental XRD pattern due to
+  asymmetries introduced by hydrogen bonds between monomer head groups and
+  water molecules. We explore the composition and structure of the nanopores
+  and reveal that there exists a composition gradient rather than an abrupt
+  partition between the hydrophilic and hydrophobic regions. 
+  % BJC13: If this is to be included here, it needs some rewording. I allude to
+  % this when talking about the independently moving columns above. 
+  %A caveat is
+  %that the time scales of the dynamics are extremely long for this system, 
+  %resulting in simulated structures that appear too ordered which requires
+  %careful examination of the metastable states observed in order to draw any
+  %conclusions. 
+  The clearer picture of the nanoscopic structure of these membranes provided
+  in this study will enable a better understanding of the mechanisms of small
+  molecule transport within these nanopores.
+  
   \end{abstract}
 
   \section{Introduction}
@@ -75,19 +78,96 @@
   % water. See elimalech paper for reviews, and add a number of more
   % citations.
   
-  More highly selective membranes would be extremely useful for the recovery of
-  dissolved species in complex aqueous and organic solutions. For example,
-  selective membranes can further progress forward osmosis processes by reducing
-  the cost of separating potable water from draw
-  solutions~\cite{mccutcheon_novel_2005}. Additionally, flowback water (FW)
-  produced during hydraulic fracturing is a complex wastewater full of
-  potentially valuable dissolved organic compounds such as acetate that can be
-  recovered using highly selective membranes \cite{dischinger_application_2017}.
-  Finally, a significant amount of nitrogen and phosphorus from fertilizer is
-  found in wastewater. Selective membranes offer a route towards low energy
-  nutrient recovery from these wastewaters which can help sustain fertilizer
-  production and subsequently food production into the future
-  \cite{xie_membrane-based_2016}.
+  More highly selective membranes would be extremely useful for both the
+  recovery of valuable dissolved species from and the purification of complex
+  aqueous solutions. The supply of fresh water is being increasingly strained
+  by population growth, industrialization and climate change
+  \cite{elimelech_future_2011}. Consequently, people are turning towards
+  treatment of unconventional water sources such as seawater and wastewater. 
+  In addition to obtaining fresh water from them, these water sources, 
+  particularly municipal and industrial wastewater, have been found to contain 
+  valuable resources which can be separated using highly selective membranes~\cite{sales_resource_2015}.
+  
+  Reverse osmosis (RO) and nanofiltration (NF) are two prevailing membrane 
+  filtration processes that can be used to separate solutes on the order of 1 
+  nm in size and smaller, as well as ions. Both apply hydraulic pressure to 
+  the feed solution in order to overcome osmotic pressure and force water
+  and unfiltered components through the membrane. RO membranes typically have
+  a thin film composite architecture which, at minimum, consists of a porous
+  support layer and a dense polymer active layer. Separation occurs based on the differences in
+  solubility and diffusivity of feed solution constituents with respect to the
+  active layer. Nanofiltration membranes have explicit pores on the order of 1
+  nm in diameter which are typically tortuous and polydisperse in size. They 
+  separate primarily based on size exclusion as well as Donnan exclusion if the
+  membrane has a surface charge~\cite{van_der_bruggen_review_2003}.
+  
+  The energy consumed during the purification of seawater and wastewater 
+  using RO and NF membranes can be reduced by increasing their selectivity 
+  towards water \cite{werber_materials_2016}. While researchers often focus on
+  improving membrane permeability, the flux of water through a given membrane,
+  it has been shown that increased water permeability only slightly decreases
+  energy requirements \cite{cohen-tanugi_quantifying_2014}.
+%  since the main energy requirement for a membrane separation is that needed
+%  to create the hydraulic pressure necessary in order to overcome the 
+%  osmotic pressure of the feed solution\cite{cohen-tanugi_quantifying_2014}. 
+  Often times, multiple membrane passes are required in order to sufficiently
+  reduce contaminant levels. For example, boric acid is toxic to humans and 
+  is present in seawater at levels well above acceptable drinking standards.
+  It is difficult to sufficiently separate boric acid in a single pass, meaning
+  multiple passes are needed and energy requirements nearly double \cite{fritzmann_state---art_2007}.
+%  This is necessary in the case where high-purity water
+%  is needed \cite{singh_production_2009}, when separating small neutral solutes \cite{ozaki_rejection_2002} or
+%  when removing boric acid from seawater \cite{fritzmann_state---art_2007}.  
+  The most effective way to reduce energy consumption
+  would be to reduce the number of membrane passes for a given system using 
+  more selective membranes. 
+%   More highly selective membranes have the potential
+%  to reduce the number of membrane passes in addition to eliminating the need 
+%  for other post-treatment steps necessitated by incomplete separations.
+  %dissolved species which negatively
+%  affect human health.
+  
+  Not only will increased selectivity reduce the energy consumption of membrane
+  processes, but it offers a way to recover valuable resources from the feed 
+  streams. Municipal and industrial wastewaters are contaminated by harmful
+  micropollutants, but also contain valuable dissolved solutes. Micropollutants include
+  pharmaceutical and personal care products, hormones, pesticides and industrial
+  chemicals, all of which have adverse effects on human health even at low 
+  concentrations\cite{schwarzenbach_challenge_2006}. A selective membrane has the % There is a need for membranes
+  potential to reject these components while still allowing the passage of valuable 
+  resources for further processing and recovery. 
+  
+  Municipal wastewaters are rich in carbon, nitrogen and phosphorus-containing 
+  compounds. The recovery of such products, which can be achieved using a 
+  selective membrane, has numerous potential uses \cite{sales_resource_2015}. 
+  For example, nitrogen and phosphorus recovery can help sustain fertilizer 
+  production which will help meet global food demand as population continues
+  to increase \cite{xie_membrane-based_2016}. 
+  
+  Industrial waste-waters are often quite complex with up to six times more 
+  total dissolved solids than seawater\cite{werber_materials_2016}. For example, flowback water, produced
+  during hydraulic fracturing of shale formations consists of relatively high
+  concentrations of salts, metals, and soluble organic compounds. The majority
+  of this water is disposed through deep well injection, however there is a growing public concern about
+  its management which has prompted the use of separation technologies such as 
+  RO and NF in order to reduce the volume of contaminated water~\cite{gregory_water_2011}.
+  Some of the dissolved organic compounds in flowback water, such as acetate, 
+  are potentially valuable and can be recovered with highly selective membranes
+  ~\cite{dischinger_application_2017}.
+  
+%  More highly selective membranes would be extremely useful for the recovery of
+%  dissolved species in complex aqueous and organic solutions. For example,
+%  selective membranes can further progress forward osmosis processes by reducing
+%  the cost of separating potable water from draw
+%  solutions~\cite{mccutcheon_novel_2005}. Additionally, flowback water (FW)
+%  produced during hydraulic fracturing is a complex wastewater full of
+%  potentially valuable dissolved organic compounds such as acetate that can be
+%  recovered using highly selective membranes \cite{dischinger_application_2017}.
+%  Finally, a significant amount of nitrogen and phosphorus from fertilizer is
+%  found in wastewater. Selective membranes offer a route towards low energy
+%  nutrient recovery from these wastewaters which can help sustain fertilizer
+%  production and subsequently food production into the future
+%  \cite{xie_membrane-based_2016}.
   % as we near peak production of minable phosphorus rock .
   
 %  There is increasing pressure to reuse
@@ -102,17 +182,19 @@
 %  desired molecular or atomic species, while maintaining the same retention of
 %  an undesired species.
 
-% MRS6: I would keep a paragraph about here how current membranes DON'T
-% work for this purpose. But one paragraph is enough.
-% BJC5: added back below paragraph.  
-% MRS8: ``because they are unstructured'' lacks detail.  NF has some structure, since there are irregular pores. Check some other reviews and see the points they cover?
   Current commercial RO and NF membranes suffer limitations to their selectivity
-  because they are unstructured. Although scalable, their fabrication involves the 
-  spontaneous assembly of polymers into disordered structures which offer separation 
-  pathways that are tortuous and polydisperse in size. This makes overcoming the well-known 
-  permeability-selectivity tradeoff a challenge. Namely, it is difficult to increase
-  the permeability of a desired molecular or atomic species, while maintaining the 
-  same retention of an undesired species \cite{werber_materials_2016}. 
+  because their structures incorporate some degree of randomness. Although scalable, their 
+  fabrication involves the spontaneous assembly of polymers into disordered structures
+  which offer separation pathways that are tortuous and polydisperse in size 
+  \cite{werber_materials_2016}. Tortuosity increases the effective length that a 
+  solute must travel, while polydispersity limits membrane selectivity.
+  
+%BJC13: You can stop here, I haven't changed anything below.
+
+%  This makes overcoming the well-known 
+%  permeability-selectivity tradeoff a challenge. Namely, it is difficult to increase
+%  the permeability of a desired molecular or atomic species, while maintaining the 
+%  same retention of an undesired species \cite{werber_materials_2016}. 
 
 %MRS5: under solution-diffusion, then the free energy to partition into the membrane is important as well, correct?
 %  Selective separation by a semipermeable membrane barrier can be broken into two
@@ -1045,11 +1127,10 @@
   beamstop covers most of the small angle reflections in the experimental 2D WAXS
   pattern. In order to compare the simulated intensity of R-pores to experiment,
   we used the $q_r$ cross-section of 2D SAXS which was generated from the same
-  sample (Figure S-TBD). Since the d\textsubscript{110} peak is
-  %BJC12: verify which crystal plane it is.  
+  sample (Figure S-\ref{S-fig:2DSAXS}). Since the d\textsubscript{200} peak is
   partially exposed in the experimental 2D WAXS pattern, we normalized the
   experimental 2D SAXS cross-section by matching the intensity of the
-  d\textsubscript{110} peak between it and the experimental 2D WAXS
+  d\textsubscript{200} peak between it and the experimental 2D WAXS
   cross-section. It is possible that the peak is not fully captured in the 2D
   WAXS pattern and that we have underestimated the intensity of R-pores in the
   experimental pattern.     
@@ -2685,7 +2766,7 @@
   $\pi$-stacking distance apart which would lead to R-double (much like the
   configuration in Figure~\ref{fig:staggered_rzplot_norestraints}). There are a
   modest number of occurrences of this scenario, which we quantify in further
-  detail in the Supporting Information, Section S-TBD.  
+  detail in the Supporting Information, Section S-\ref{S-section:rdouble}.  
 
 %BJC12: move to supplemental
 %  shown in Figure~\ref{fig:pore_hbonds}. 
