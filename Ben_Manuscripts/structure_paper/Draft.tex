@@ -83,101 +83,143 @@
   
   %MRS14: I feel this introduction spends a bit too much time talking at too general a level.  The paper introduction to the problem tackled in the paper.  One simple way to tighten it up would be to improve the connection between the thesis and the data.  You say that highly selective membranes would be useful, but then don't provide evidence that they are the solution to the problems listed. 
 
-  % In order to perform complex separations x, y and z at reduced costs, we need highly selective membrane 
+  % In order to perform complex separations x, y and z at reduced costs, we need highly selective membranes 
   % include all descriptions of separation processes into this paragraph 
-  More highly selective membranes would be extremely useful for both the
-  recovery of valuable dissolved species from and the purification of complex
-  aqueous solutions. The supply of fresh water is being increasingly strained
-  by population growth, industrialization and climate change
-  \cite{elimelech_future_2011}. Consequently, people are turning towards
-  treatment of unconventional water sources such as seawater and wastewater. 
-  In addition to obtaining fresh water from them, these water sources, 
-  particularly municipal and industrial wastewater, have been found to contain 
-  valuable resources which can be separated using highly selective membranes~\cite{sales_resource_2015}.
-  % make possible with selectively permeable membranes -- better than thermal distillation
-  
-  % (2) existing nanoporous membranes + drawbacks
 
+  More highly selective nanoporous membranes would be extremely useful in order
+  to perform complex aqeuous separations with seawater and various sources of
+  wastewater. Sodium chloride and boron in seawater, and organic micropollutants
+  found in municipal and industrial wastewaters are a few examples of the
+  diversity of components that make up various water sources. By efficiently
+  separating contaminants from feed solutions with highly selective membranes,
+  one can reduce the number of required membrane passes and post-treatment steps,
+  thus lowering the energy requirements of the separation processes.
+  Additionally, one can extract valuable resources from the feed streams. For
+  example, flowback water produced during hydraulic fracturing of shale
+  formations contains dissolved species such as acetate whose extraction could be
+  economically valuable.  
+
+% More highly selective membranes would be extremely useful for both the
+% recovery of valuable dissolved species from and the purification of complex
+%  aqueous solutions. The supply of fresh water is being increasingly strained
+%  by population growth, industrialization and climate change
+%  \cite{elimelech_future_2011}. Consequently, people are turning towards
+%  treatment of unconventional water sources such as seawater and wastewater. 
+%  In addition to obtaining fresh water from them, these water sources, 
+%  particularly municipal and industrial wastewater, have been found to contain 
+%  valuable resources which can be separated using highly selective membranes~\cite{sales_resource_2015}.
+  % make possible with selectively permeable membranes -- better than thermal distillation
+
+ % (2) existing nanoporous membranes + drawbacks
+
+  Reverse osmosis (RO) and nanofiltration (NF) are two prevailing membrane
+  filtration processes that can be used to separate solutes on the order of 1 nm
+  in size and smaller, as well as ions, however the porous architecture of
+  commercially dominant membranes lack uniformity which severely impacts their
+  selectivity. Although scalable, their fabrication involves the spontaneous
+  assembly of polymers into disordered structures which offer separation pathways
+  that are tortuous and polydisperse in size \cite{werber_materials_2016}.
+  Tortuosity increases the effective length that a solute must travel, while
+  polydispersity limits membrane selectivity.
+ 
   % (3) justification for why nanostructured membranes are a good idea for this
   % long-term route towards highly selective membranes are those that are nanostructured
+  Nanostructured porous membrane materials have become increasingly popular for
+  aqueous separations applications because they offer the ability to control pore
+  architecture at the molecular scale, thereby permitting the design of
+  solute-specific separation membranes \cite{humplik_nanostructured_2011},
+  however their development has been limited by the ability to synthesize and
+  scale various fundamentally sound technologies. Graphene sheets are atomically
+  thick which results in excellent water permeability but defects during
+  manufacturing severely impact selectivity \cite{cohen-tanugi_multilayer_2016}.
+  Molecular dynamics (MD) simulations of carbon nanotubes show promise
+  \cite{humplik_nanostructured_2011}, but synthetic techniques are unable to
+  achieve scalable alignment and pore monodispersity
+  \cite{hata_water-assisted_2004,maruyama_growth_2005}. Consequently, there is a
+  need for a scalable nanostructured porous membrane. 
+
+%BJC14: zeolites aren't really nanostructured
+% Zeolites have sub-nm
+%  pores with a narrow pore size distribution, and MD simulations of these
+%  materials show that they exhibit complete rejection of solvated ions
+%  \cite{murad_molecular_1998}- however, experimental rejection was low and
+%  attributed to interstitial defects formed during membrane synthesis
+%  \cite{li_desalination_2004}. 
 
   % (4) justify LLCs
 
   % (5) justify need for simulations
 
-  Reverse osmosis (RO) and nanofiltration (NF) are two prevailing membrane 
-  filtration processes that can be used to separate solutes on the order of 1 
-  nm in size and smaller, as well as ions. Both apply hydraulic pressure to 
-  the feed solution in order to overcome osmotic pressure and force water
-  and unfiltered components through the membrane. RO membranes typically have
-  a thin film composite architecture which, at minimum, consists of a porous
-  support layer and a dense polymer active layer. Separation occurs based on the differences in
-  solubility and diffusivity of feed solution constituents 
-  %MRS14:
-  %with respect to the
-  in the 
-  active layer. Nanofiltration membranes have explicit pores on the order of 1
-  nm in diameter which are typically tortuous and polydisperse in size. They 
-  separate primarily based on size exclusion as well as Donnan exclusion if the
-  membrane has a surface charge~\cite{van_der_bruggen_review_2003}.
+%  Reverse osmosis (RO) and nanofiltration (NF) are two prevailing membrane
+%  filtration processes that can be used to separate solutes on the order of 1 nm
+%  in size and smaller, as well as ions. Both apply hydraulic pressure to the feed
+%  solution in order to overcome osmotic pressure and force water and unfiltered
+%  components through the membrane. RO membranes typically have a thin film
+%  composite architecture which, at minimum, consists of a porous support layer
+%  and a dense polymer active layer. Separation occurs based on the differences in
+%  solubility and diffusivity of feed solution constituents in the active layer.
+%  Nanofiltration membranes have explicit pores on the order of 1 nm in diameter
+%  which are typically tortuous and polydisperse in size. They separate primarily
+%  based on size exclusion as well as Donnan exclusion if the membrane has a
+%  surface charge~\cite{van_der_bruggen_review_2003}.
   
   %MRS14: is selectivity towards water important, or selectivity against what one wants filtered out?
-  The energy consumed during the purification of seawater and wastewater 
-  using RO and NF membranes can be reduced by increasing their selectivity 
-  towards water \cite{werber_materials_2016}. While researchers often focus on
-  improving membrane permeability, the flux of water through a given membrane,
-  it has been shown that increased water permeability only slightly decreases
-  energy requirements \cite{cohen-tanugi_quantifying_2014}.
+%  The energy consumed during the purification of seawater and wastewater 
+%  using RO and NF membranes can be reduced by increasing their selectivity 
+%  towards water \cite{werber_materials_2016}. While researchers often focus on
+%  improving membrane permeability, the flux of water through a given membrane,
+%  it has been shown that increased water permeability only slightly decreases
+%  energy requirements \cite{cohen-tanugi_quantifying_2014}.
 %  since the main energy requirement for a membrane separation is that needed
 %  to create the hydraulic pressure necessary in order to overcome the 
 %  osmotic pressure of the feed solution\cite{cohen-tanugi_quantifying_2014}. 
-  Often times, multiple membrane passes are required in order to sufficiently
+%  Often times, multiple membrane passes are required in order to sufficiently
   %MRS14: not sure the boric acid part is that relevant, since we don't really talk about 
   %that in the rest of the paper.
-  reduce contaminant levels. For example, boric acid is toxic to humans and 
-  is present in seawater at levels well above acceptable drinking standards.
-  It is difficult to sufficiently separate boric acid in a single pass, meaning
-  multiple passes are needed and energy requirements nearly double \cite{fritzmann_state---art_2007}.
+%  reduce contaminant levels. For example, boric acid is toxic to humans and 
+%  is present in seawater at levels well above acceptable drinking standards.
+%  It is difficult to sufficiently separate boric acid in a single pass, meaning
+%  multiple passes are needed and energy requirements nearly double \cite{fritzmann_state---art_2007}.
 %  This is necessary in the case where high-purity water
 %  is needed \cite{singh_production_2009}, when separating small neutral solutes \cite{ozaki_rejection_2002} or
 %  when removing boric acid from seawater \cite{fritzmann_state---art_2007}.  
-  The most effective way to reduce energy consumption
-  would be to reduce the number of membrane passes for a given system using 
-  more selective membranes. 
+%  The most effective way to reduce energy consumption
+%  would be to reduce the number of membrane passes for a given system using 
+%  more selective membranes. 
 %   More highly selective membranes have the potential
 %  to reduce the number of membrane passes in addition to eliminating the need 
 %  for other post-treatment steps necessitated by incomplete separations.
   %dissolved species which negatively
 %  affect human health.
   
-  Not only will increased selectivity reduce the energy consumption of membrane
-  processes, but it offers a way to recover valuable resources from the feed 
-  streams. Municipal and industrial wastewaters are contaminated by harmful
-  micropollutants, but also contain valuable dissolved solutes. Micropollutants include
-  pharmaceutical and personal care products, hormones, pesticides and industrial
-  chemicals, all of which have adverse effects on human health even at low 
-  concentrations\cite{schwarzenbach_challenge_2006}. A selective membrane has the % There is a need for membranes
-  potential to reject these components while still allowing the passage of valuable 
-  resources for further processing and recovery. 
+%  Not only will increased selectivity reduce the energy consumption of membrane
+%  processes, but it offers a way to recover valuable resources from the feed 
+%  streams. Municipal and industrial wastewaters are contaminated by harmful
+%  micropollutants, but also contain valuable dissolved solutes. Micropollutants include
+%  pharmaceutical and personal care products, hormones, pesticides and industrial
+%  chemicals, all of which have adverse effects on human health even at low 
+%  concentrations\cite{schwarzenbach_challenge_2006}. A selective membrane has the % There is a need for membranes
+%  potential to reject these components while still allowing the passage of valuable 
+%  resources for further processing and recovery. 
   
-  Municipal wastewaters are rich in carbon, nitrogen and phosphorus-containing 
-  compounds. The recovery of such products, which can be achieved using a 
-  selective membrane, has numerous potential uses \cite{sales_resource_2015}. 
-  For example, nitrogen and phosphorus recovery can help sustain fertilizer 
-  production which will help meet global food demand as population continues
-  to increase \cite{xie_membrane-based_2016}. 
+%  Municipal wastewaters are rich in carbon, nitrogen and phosphorus-containing 
+%  compounds. The recovery of such products, which can be achieved using a 
+%  selective membrane, has numerous potential uses \cite{sales_resource_2015}. 
+%  For example, nitrogen and phosphorus recovery can help sustain fertilizer 
+%  production which will help meet global food demand as population continues
+%  to increase \cite{xie_membrane-based_2016}. 
   
   %MRS14: could possibly be food details, if selective membranes are the key to purifying industrial waste waters. 
-  Industrial waste-waters are often quite complex with up to six times more 
-  total dissolved solids than seawater\cite{werber_materials_2016}. For example, flowback water, produced
-  during hydraulic fracturing of shale formations consists of relatively high
-  concentrations of salts, metals, and soluble organic compounds. The majority
-  of this water is disposed through deep well injection, however there is a growing public concern about
-  its management which has prompted the use of separation technologies such as 
-  RO and NF in order to reduce the volume of contaminated water~\cite{gregory_water_2011}.
-  Some of the dissolved organic compounds in flowback water, such as acetate, 
-  are potentially valuable and can be recovered with highly selective membranes
-  ~\cite{dischinger_application_2017}.
+%  Industrial waste-waters are often quite complex with up to six times more 
+%  total dissolved solids than seawater\cite{werber_materials_2016}. For example, flowback water, produced
+%  during hydraulic fracturing of shale formations consists of relatively high
+%  concentrations of salts, metals, and soluble organic compounds. The majority
+%  of this water is disposed through deep well injection, however there is a growing public concern about
+%  its management which has prompted the use of separation technologies such as 
+%  RO and NF in order to reduce the volume of contaminated water~\cite{gregory_water_2011}.
+%  Some of the dissolved organic compounds in flowback water, such as acetate, 
+%  are potentially valuable and can be recovered with highly selective membranes
+%  ~\cite{dischinger_application_2017}.
   
 %  More highly selective membranes would be extremely useful for the recovery of
 %  dissolved species in complex aqueous and organic solutions. For example,
@@ -206,12 +248,12 @@
 %  desired molecular or atomic species, while maintaining the same retention of
 %  an undesired species.
 
-  Current commercial RO and NF membranes suffer limitations to their selectivity
-  because their structures incorporate some degree of randomness. Although scalable, their 
-  fabrication involves the spontaneous assembly of polymers into disordered structures
-  which offer separation pathways that are tortuous and polydisperse in size 
-  \cite{werber_materials_2016}. Tortuosity increases the effective length that a 
-  solute must travel, while polydispersity limits membrane selectivity.
+%  Current commercial RO and NF membranes suffer limitations to their selectivity
+%  because their structures incorporate some degree of randomness. Although scalable, their 
+%  fabrication involves the spontaneous assembly of polymers into disordered structures
+%  which offer separation pathways that are tortuous and polydisperse in size 
+%  \cite{werber_materials_2016}. Tortuosity increases the effective length that a 
+%  solute must travel, while polydispersity limits membrane selectivity.
   
 %BJC13: You can stop here, I haven't changed anything below.
 
@@ -233,13 +275,14 @@
 %  selectivity, it is necessary to design membranes in a way that one can tune the
 %  relative diffusivities of desired and undesired solutes.
 
-  Selective separation by a semipermeable membrane barrier is a function of the
-  geometric and chemical interactions of solutes with the membrane material. A
-  molecule's size, shape, charge and polarity combine to determine the degree to
-  which a solute partitions into a membrane and how fast it travels through the
-  membrane. To separate a component from a mixture, one must understand how to
-  design membranes in order to tune the relative transport rates of desired and
-  undesired solutes\cite{gin_polymerized_2008,wijmans_solution-diffusion_1995}. 
+%BJC14: probably unnecessary?
+%  Selective separation by a semipermeable membrane barrier is a function of the
+%  geometric and chemical interactions of solutes with the membrane material. A
+%  molecule's size, shape, charge and polarity combine to determine the degree to
+%  which a solute partitions into a membrane and how fast it travels through the
+%  membrane. To separate a component from a mixture, one must understand how to
+%  design membranes in order to tune the relative transport rates of desired and
+%  undesired solutes\cite{gin_polymerized_2008,wijmans_solution-diffusion_1995}. 
 
 % BJC: Maybe I don't even need to dive into explaining RO and NF.
 %  Reverse osmosis (RO) and nanofiltration (NF) are membrane-based separation
@@ -258,7 +301,7 @@
   nanostructures \cite{smith_ordered_1997} and can be crosslinked to create
   mechanically strong membrane films with pores on the order of 1 nm in diameter
   \cite{zhou_supported_2005}. Unlike most commercial NF membranes, LLC membrane
-  pores are uniform in size because they are self-assembled.  Since LLC membranes
+  pores are uniform in size because they are self-assembled. Since LLC membranes
   lack a pore size distribution, they inherently exhibit high selectivity due to
   their strict molecular weight cut-off (MWCO)~\cite{zhou_supported_2005}.
   Additionally, the LLC monomers examined in this paper are salts, and therefore
@@ -267,16 +310,17 @@
   into the feed solution in an effort to balance the gradients of concentration
   and electric potential \cite{donnan_theory_1995}.    
 
-  The feasibility of nanostructured LLC membranes for selective separations has been
-  demonstrated using LLCs that form the type 1 bicontinuous cubic (Q\textsubscript{I})
+  The feasibility of nanostructured LLC membranes for selective separations has
+  been demonstrated using LLCs that form the type 1 bicontinuous cubic
+  (Q\textsubscript{I})
   \cite{hatakeyama_water_2011,hatakeyama_nanoporous_2010,carter_glycerol-based_2012},
   and the inverted hexagonal (H\textsubscript{II}) \cite{zhou_supported_2005}
-  phases. When 
-  separating organic solutes from NaCl, Q\textsubscript{I} phase membrane filtration
-  experiments have shown selectivity 2--3 times higher than commercial RO and
-  6--12 times higher than commercial NF membranes \cite{dischinger_application_2017}.
-  When separating a series of various sized dyes, the H\textsubscript{II} phase membrane
-  showed complete rejection of dyes bigger than 1.2 nm in size \cite{zhou_supported_2005}. 
+  phases. When separating organic solutes from NaCl, Q\textsubscript{I} phase
+  membrane filtration experiments have shown selectivity 2--3 times higher than
+  commercial RO and 6--12 times higher than commercial NF membranes
+  \cite{dischinger_application_2017}. When separating a series of various sized
+  dyes, the H\textsubscript{II} phase membrane showed complete rejection of dyes
+  bigger than 1.2 nm in size \cite{zhou_supported_2005}. 
 
   The H\textsubscript{II} phase pore geometry (Figure~\ref{fig:assembly}) has a
   higher theoretical capacity for transport than the Q\textsubscript{I} phase.
@@ -290,15 +334,17 @@
 %  The most
 %  promising Q\textsubscript{I} phase for membrane applications forms at 70\degree
 %  C when monomer is mixed with c.a.~20 wt\% glycerol\cite{carter_glycerol-based_2012}.
-  Q\textsubscript{I} phase membranes consist of a tortuous network of three dimensionally 
-  interconnected pores that prevent optimal through-plane transport. In contrast, the densely packed, 
-  non-tortuous and uniform sized pores of H\textsubscript{II} phase membranes represent
-  the ideal geometry for achieving high solute flux\cite{matyka_tortuosity-porosity_2008}.
-  However, the hexagonally packed liquid crystalline domains of the H\textsubscript{II} phase generally 
-  form isotropically oriented and therefore mutually unaligned domains which are detrimental to membrane 
-  permeability. This domain scale misalignment has inhibited further development of the this technology, and 
-  research efforts were focused on the Q\textsubscript{I} phase, whose geometry does not require alignment~\cite{dischinger_papers}. 
-
+  Q\textsubscript{I} phase membranes consist of a tortuous network of three
+  dimensionally interconnected pores that prevent optimal through-plane
+  transport. In contrast, the densely packed, non-tortuous and uniform sized
+  pores of H\textsubscript{II} phase membranes represent the ideal geometry for
+  achieving high solute flux\cite{matyka_tortuosity-porosity_2008}.  However, the
+  hexagonally packed liquid crystalline domains of the H\textsubscript{II} phase
+  generally form isotropically oriented and therefore mutually unaligned domains
+  which are detrimental to membrane permeability. This domain scale misalignment
+  has inhibited further development of the this technology, and research efforts
+  were focused on the Q\textsubscript{I} phase, whose geometry does not require
+  alignment~\cite{dischinger_papers}. 
 
 %MRS5: maybe less about Q_I since it's not in this paper?  The introduction should be an introduction to the paper.
 %  The most promising Q\textsubscript{I} phase for membrane
@@ -495,18 +541,20 @@
 %  towards scalable and economical filtration. 
 %  For this reason, research efforts
 
-  However, recently researchers have learned how to macroscopically align the hexagonal
-  domains which has revived research into H\textsubscript{II} phase LLC membranes.
-  In 2014, Feng et al.~showed that one
-  can align Col\textsubscript{h} hexagonal domains, created by the monomer Na-GA3C11,
-  using a magnetic field with subsequent cross-linking to lock the structure in 
-  place\cite{feng_scalable_2014}. In 2016, Feng et al. showed that one could obtain
-  the same result by confining neat monomer between PDMS or glass substrates since 
-  hexagonal mesophases preferentially anchor perpendicular to both surfaces\cite{feng_thin_2016}.
+  However, recently researchers have learned how to macroscopically align the
+  hexagonal domains which has revived research into H\textsubscript{II} phase LLC
+  membranes. In 2014, Feng et al.~showed that one can align Col\textsubscript{h}
+  hexagonal domains, created by the monomer Na-GA3C11, using a magnetic field
+  with subsequent cross-linking to lock the structure in
+  place\cite{feng_scalable_2014}. In 2016, Feng et al. showed that one could
+  obtain the same result by confining neat monomer between PDMS or glass
+  substrates since hexagonal mesophases preferentially anchor perpendicular to
+  both surfaces\cite{feng_thin_2016}.
 %  the same result using a second technique termed soft confinement\cite{feng_thin_2016}.
   %MRS8: maybe say what it is, not just what it's named? 
-  Current experimental efforts are focused on extending the method to the 
-  H\textsubscript{II} phase and characterizing the performance of these newly aligned systems.
+  Current experimental efforts are focused on extending the method to the
+  H\textsubscript{II} phase and characterizing the performance of these newly
+  aligned systems.
 
   % BJC: Not sure this figure needs to be in the paper. 
   %MRS2: good question.  It helps give people context, which is necessary to
@@ -558,22 +606,24 @@
 	packed columnar mesophases.}~\label{fig:assembly}
   \end{figure}
 
-  Our current understanding of the molecular details of LLC membranes' nanostructure
-  is not sufficient to be able to precisely design them for specific separations. 
-  Over the past 20 years, H\textsubscript{II}-phase LLC polymer membrane studies have
-  been limited primarily to Na-GA3C11 with some characterization done after minor 
-  structural modifications. Resel et al.~varied the length of the monomer tails and the
-  counterion used and observed its effect on pore spacing \cite{resel_structural_2000}.
-  In a later study of rejection performance, it was shown that membranes formed by cross-
-  linked Na-GA3C11 in the H\textsubscript{II} phase cannot separate solutes less than 1.2 
-  nm in diameter because the pores are too large \cite{zhou_supported_2005}. We do not
-  yet understand how to controllably reduce the effective pore size or how to tune
-  the chemical environment in the nanopores of this or related materials for
+  Our current understanding of the molecular details of LLC membranes'
+  nanostructure is not sufficient to be able to precisely design them for
+  specific separations. Over the past 20 years, H\textsubscript{II}-phase LLC
+  polymer membrane studies have been limited primarily to Na-GA3C11 with some
+  characterization done after minor structural modifications. Resel et al.~varied
+  the length of the monomer tails and the counterion used and observed its effect
+  on pore spacing \cite{resel_structural_2000}.  In a later study of rejection
+  performance, it was shown that membranes formed by cross- linked Na-GA3C11 in
+  the H\textsubscript{II} phase cannot separate solutes less than 1.2 nm in
+  diameter because the pores are too large \cite{zhou_supported_2005}. We do not
+  yet understand how to controllably reduce the effective pore size or how to
+  tune the chemical environment in the nanopores of this or related materials for
   small molecule separations. The only source of predictive modeling for LLC
   systems have been macroscopic models that likely do not adequately describe
-  transport at these length scales \cite{hatakeyama_water_2011}. Modeling with molecular
-  detail could provide sufficient information about the mechanisms and chemical features
-  to better inform experimental design of similar nanostructured membranes. 
+  transport at these length scales \cite{hatakeyama_water_2011}. Modeling with
+  molecular detail could provide sufficient information about the mechanisms and
+  chemical features to better inform experimental design of similar
+  nanostructured membranes. 
 
   A molecular-level understanding of LLC membrane structure, enabled by
   molecular dynamics (MD) simulations, can provide guidelines to reduce the large
