@@ -38,7 +38,7 @@ else
     GMX="gmx"
 fi
 
-${python} ${DIR}/build2.py
+${python} ${DIR}/build2.py -pd 0.35
 
 # make input files
 ${python} ${DIR}/input.py -b ${BUILD_MON} -l 50 --restraints ${restraint_residue} --temp ${T} -f 50 --genvel yes -c ${start_config} -s 50000
