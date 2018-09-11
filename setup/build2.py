@@ -24,6 +24,7 @@ def initialize():
     parser.add_argument('-O', '--offset', help="Specify this flag to build the system in an offset configuration",
                         action="store_true")
     parser.add_argument('-L', '--correlation_length', type=float, help='Desired correlation length')
+    parser.add_argument('--no_column_shift', action="store_false", help="Do not randomly shift columns")
     parser.add_argument('-Lvar', default=0.1, type=float, help='variance in z position of monomer heads')
     parser.add_argument('-pd', '--parallel_displaced', default=0, type=float, help='Distance between center of mass '
                         'of vertically stacked monomers on the xy plane. A distance of 0 is the same as sandwiched.')
@@ -39,7 +40,6 @@ def initialize():
     parser.add_argument('-ad', '--angularly_displaced', action="store_true", help='rotate phenyl groups'
                         'with respect to those in adjacent layers')
     parser.add_argument('-columns', action="store_true", help='build column-wise')
-
 
     return parser
 
@@ -223,7 +223,7 @@ if __name__ == "__main__":
         for j in range(args.ncolumns):
             z = np.linspace(0, args.dbwl*args.monomers_per_column - args.dbwl, args.monomers_per_column)
             system.build_column(i, z, thetas[j], correlation=correlation, var=args.Lvar,
-                                correlation_length=args.correlation_length, pd=args.parallel_displaced, random_shift=True)
+                                correlation_length=args.correlation_length, pd=args.parallel_displaced, random_shift=args.no_column_shift)
 
     system.reorder()
 

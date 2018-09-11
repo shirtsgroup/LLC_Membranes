@@ -1,6 +1,5 @@
 \documentclass[journal=jpcbfk,manuscript=article]{achemso}
 
-
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage{subcaption}
@@ -944,13 +943,13 @@
  
   \subsection{Monomer Parameterization}
 
-  We parameterized the liquid crystal monomer Na-GA3C11 using the Generalized AMBER
-  Force Field (GAFF) \cite{wang_development_2004} with the Antechamber package
-  \cite{wang_automatic_2006} provided with AmberTools16
-  \cite{case_ambertools16_2016}. We assigned atomic charges using the am1bccsym
-  method of \texttt{molcharge} shipped with QUACPAC from Openeye Scientific
-  Software. We ran all molecular dynamics simulations using GROMACS 2016
-  \cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008}.
+  We parameterized the interaction potential for the liquid crystal monomer 
+  Na-GA3C11 using the Generalized AMBER Force Field (GAFF) 
+  \cite{wang_development_2004} with the Antechamber package \cite{wang_automatic_2006} 
+  provided with AmberTools16 \cite{case_ambertools16_2016}. We assigned atomic
+  charges using the am1bccsym method of \texttt{molcharge} shipped with QUACPAC
+  from Openeye Scientific Software. We ran all molecular dynamics simulations 
+  using GROMACS 2016 \cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008}.
 
   We generated an ensemble of characteristic, low-energy vacuum monomer
   configurations by applying a simulated annealing process to a
@@ -1114,7 +1113,12 @@
   pore centers. We located the pore centers by averaging the coordinates of sodium
   ions in their respective pores. We generated pore spacing statistics 
   using the bootstrapping technique (See section S-\ref{S-section:p2p_stats} of the
-  Supporting Information).
+  Supporting Information). 
+  % BJC15: added to address Matt's concern
+  The pore spacings calculated in this way are consistent
+  with one half of the $x$ and $y$ box vectors (See, Table S-\ref{S-table:p2p}). However
+  our method for their calculation does a better job capturing the spread of 
+  pore-to-pore distances.
 
   %BJC5: moved to supporting info
   %BJC6: Do you think I should add this back since I used nematic order parameter to
@@ -2588,14 +2592,17 @@
   We can explain the discrepancies between R-$\pi$ seen experimentally
   and in simulation using what we have shown in this section. The stacking
   distance between monomer head groups is too large, likely due to failures
-  of the forcefield to appropriately model $\pi-\pi$ interactions. The intensity
+  of the force field to appropriately model $\pi-\pi$ interactions. The intensity
   of the simulated R-$\pi$ is too high, which may be a consequence of too much short-range
   ordering in the $z$-direction in addition to high degrees of correlation 
   between columns. Finally, the $q_r$ cross-section of R-$\pi$ is not smooth, 
   which is also likely a consequence of columns that are too highly correlated. 
   
-  The architecture of each column is therefore likely in between sandwiched and parallel
-  displaced. The parallel displaced configuration that we have simulated in this
+  % BJC15 : Matt comment: "I found the discussion of pore structure in the first 
+  % full paragraph on page 38 is a bit hard to follow. Maybe a schematic of what 
+  % “in between sandwiched and parallel displaced” looks like would be helpful"
+  The architecture of each column is therefore likely in between our sandwiched and parallel
+  displaced configurations. The parallel displaced configuration that we have simulated in this
   paper is an exaggerated manifestation of the parallel displaced $\pi-\pi$
   stacking mode. The experimental WAXS pattern shows faint off-axis features at the
   same $q_r$ value as R-double which is only present in simulated patterns generated from
@@ -2604,19 +2611,157 @@
   center of mass of their vertically adjacent neighbors. In this way, columns can
   more easily act independently while maintaining a parallel displaced structure. 
   
-  Because disorder among head groups in the simulated atomistic systems is largely
-  determined by each system's quenched configuration, one would need to average an
-  ensemble of simulations in order to optimally match the experimental WAXS pattern. 
-  Both the initial configuration and initial velocity randomization lead to 
-  different quenched configurations every time we run an equilibration simulation.
-  Although the simulated XRD pattern changes dynamically as we simulate the system
-  due to thermal fluctuations, its features are largely determined by the initial 
-  quenched configuration. Here we assume that the timescales for large scale 
-  rearrangements of the system are much longer than what we can feasibly simulate. 
-  %MRS12: I don't think this is necessary.  They should reproduce the same findings, if they use a similar quenched configuration. 
-  %As a result, it will be difficult to exactly reproduce the work here, but we are
-  %confident that one can draw the same conclusions using our methodology. 
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{pd_36.eps}
+  \caption{}\label{fig:pd_36}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{pd_lt36.eps}
+  \caption{}\label{fig:pd_lt36}
+  \end{subfigure}
+  \caption{Head groups are likely stack in a configuration between sandwiched and
+  parallel displaced. (a) In our parallel displaced configurations with 5 monomers 
+  per columns, we placed head groups so the angle, $\theta$, between vectors extending
+  from vertically stacked head groups to the pore center equals 36$\degree$ 
+  ((360$\degree$ / $ncol$) / 2 where $ncol$ is the number of columns per pore). 
+  (b) In the true configuration, $\theta$ is likely between 0$\degree$ and 36 $\degree$.
+  When $\theta$=0$\degree$, the system architecture is the same as a sandwiched 
+  configuration.}\label{fig:between_pd}
+  \end{figure}
   
+% BJC15: this paragraph reframed and expanded below
+%  Because disorder among head groups in the simulated 
+%  atomistic systems is largely determined by each system's quenched configuration,
+%  one would need to average an ensemble of simulations in order to optimally match the experimental WAXS pattern. 
+%  Both the initial configuration and initial velocity randomization lead to 
+%  different quenched configurations every time we run an equilibration simulation.
+%  Although the simulated XRD pattern changes dynamically as we simulate the system
+%  due to thermal fluctuations, its features are largely determined by the initial 
+%  quenched configuration. Here we assume that the timescales for large scale 
+%  rearrangements of the system are much longer than what we can feasibly simulate.   
+  
+  Since the dynamics of this system appear to be quite slow, we can learn more about
+  their time-averaged structure by studying ensembles of simulations.
+  Disorder among head groups in the simulated atomistic systems is largely determined
+  by each system's quenched configuration. We observe rapid reorganization of our 
+  initial configurations into configurations with quenched disorder that does not
+  vary significantly for the remainder of the % BJC15: I could quantify this more and put in supporting info
+  simulation time. For that reason, we created ensembles of 40 simulations in both
+  the parallel displaced and sandwiched configurations. We used the same equilibration
+  technique as above (see section~\ref{section:equilibration}), however we stopped 
+  the equilibration after 5 ns of unrestrained simulation. We simulated XRD patterns
+  from the 40 concatenated trajectories. The $q_r$ cross-sections generated from the 
+  two concatenated trajectories are shown in Figure~\ref{fig:ensemble_XRD}. 
+  Qualitatively, the $q_r$ cross-sections of R-$\pi$ are nearly smooth, with small
+  spikes near $q_r$=0. The data suggests that the average
+  intensity of R-$\pi$ in sandwiched systems is about 3$\times$ higher than that in the
+  parallel displaced configuration. Overall, the intensity of R-$\pi$ generated from the
+  parallel displaced ensemble shows the best agreement with experiment so far. For
+  simplicity, we will limit the following discussion to the parallel displaced 
+  configuration. Equivalent data is available for the sandwiched configuration in the
+  supporting information.
+  %BJC15: limiting discussion to parallel displaced since it seems most consistent with experiment
+  % However, I can switch it sandwiched very easily. 
+  
+  %BJC15: This figure might not be necessary. Do the comparisons of emperical
+  % cumulative distribution functions make the same point? 
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{sandwiched_ensemble_rsection.png}
+  \caption{Sandwiched}\label{fig:sandwiched_ensemble_rsection}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{offset_ensemble_rsection.png}
+  \caption{Parallel Displaced}\label{fig:offset_ensemble_rsection}
+  \end{subfigure}
+  \caption{The $q_r$ section of R-$\pi$ is much smoother when simulated XRD patterns
+  		   are generated from an ensemble of 40 independent simulations. The maximum 
+  		   intensity of R-$\pi$ is 3$\times$ higher in the sandwiched configuration (a)
+  		   than in the parallel displaced configuration (b).}\label{fig:ensemble_XRD}
+  \end{figure}
+  
+  Independent simulations exhibit similar amounts of quenched disorder. For 
+  each, we measured the deviation of the head group centers of mass from their
+  idealized positions (see section~\ref{method:simple_systems}). 
+  We created histograms of the standard deviations of each distribution which
+  are shown in Figure~\ref{fig:ensemble_stds}. The distributions of standard deviations
+  are fairly tight with ($\sigma_\sigma_z$, $\sigma_\sigma_r$, $\sigma_\sigma_\theta$) = (0.011 nm, 
+  0.007 nm , 0.022 radians). We pooled the deviations from idealized positions 
+  from all independent simulations in order to create the distributions shown in 
+  Figure~\ref{fig:offset_ensemble_pooled}. The distributions appear 
+  symmetric meaning that there is an equal chance for a head group to displace
+  in the positive or negative $z$, $r$ or $\theta$-direction. We verified that
+  this is the case for individual center of masses. 
+  % For a given system, there are 400 head groups. 
+  If we consider the center of mass of the first head group, we expect that the
+  distribution of its deviation from its idealized position among all the 
+  independent simulations
+%  the $z$, $r$, and $\theta$ directions 
+  should be symmetric about its idealized position. We can calculate the 
+  empirical cumulative distribution function (ECDF) 
+  of this distribution of deviations. 
+  % Each ECDF contains 40 data points, one from each independent simulation.
+  The ECDFs of 5 randomly selected centers of 
+  mass are shown in Figure~\ref{fig:offset_ecdfs} (colored lines). We also calculated 
+  the ECDF from the full distributions in Figure~\ref{fig:offset_ensemble_pooled}
+  (black line with error bars). We generated error bars that represent the 95\% 
+  confidence intervals, by randomly sampling 40 values (the same as the number 
+  of independent simulations) from the distributions in 
+  Figure~\ref{fig:offset_ensemble_pooled}, then measuring the deviation between
+  the sampled ECDF and the full ECDF. The center of mass ECDFs lie between the
+  error bars of the full ECDF within reason. This provides further evidence that
+  each center of mass moves independently, in random directions when systems
+  quench.
+  
+% Sandwiched: (0.019 nm, 0.007 nm, 0.023 radians)
+  
+  \begin{figure}[!htb]
+  \centering
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\textwidth]{sandwiched_ensemble_stds.png}
+%  \caption{Sandwiched}\label{fig:sandwiched_ensemble_stds.png}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=0.45\textwidth]{offset_ensemble_stds.png}
+%  \caption{Parallel Displaced}\label{fig:offset_ensemble_stds.png}
+%  \end{subfigure}
+  \caption{There is a narrow spread in the standard deviation of
+  quenched disorder for each independent configuration.}\label{fig:ensemble_stds}
+  \end{figure}
+  
+  %BJC15: will not waste much time formatting until we converge on a figure 
+  \begin{figure}[!htb]
+  \centering
+%  \begin{subfigure}{\textwidth}
+%  \includegraphics[width=\textwidth]{sandwiched_ensemble_pooled.png}
+%  \caption{Sandwiched}\label{fig:sandwiched_ensemble_pooled.png}
+%  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+  \includegraphics[width=\textwidth]{offset_ensemble_pooled.png}
+  \caption{Distributions of deviations from ideal positions generated with data
+  from all independent simulations}\label{fig:offset_ensemble_pooled}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+  \includegraphics[width=\textwidth]{offset_ecdfs.png}
+  \caption{Emperical cumulative distribution functions generated from (a) and
+  from simulation ensembles.}\label{fig:offset_ecdfs}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+  \includegraphics[width=\textwidth]{offset_ensemble_regional_density.png}
+  \caption{Radial density of select monomer components.}\label{fig:offset_ensemble_regional_density}
+  \end{subfigure}
+  \caption{The distributions of the deviations of head group center of masses
+  from their idealized positions generated using pooled data from all
+  frames of each independent configuration is symmetric. This implies that 
+  there is equal probability for a head group to displace in the positive
+  or negative $z$, $r$ or $\theta$-direction.}\label{fig:full_ensemble_distributions}
+  \end{figure}
+
   %MRS10: Maybe rephrases; rather than talking about building a better
   %model, you can summarize the differences that could explain the discrepancy between experiment and simulation.
   %BJC11: tried above.
@@ -3391,12 +3536,12 @@
   
   We calculated the ionic conductivity of the parallel displaced configuration in
   the ordered basin with 1 wt\% water since we believe its structure is the 
-  closest match to experiment. Our model estimates the ionic conductivity within
-  one order of magnitude of experiment (Figure~\ref{fig:ionic_conductivity}). We
-  verified the value calculated by the Nernst-Einstein relationship using 
-  the collective diffusion model\cite{liu_collective_2013} 
+  closest match to experiment. Our model estimates the ionic conductivity to be
+  $(5.92 \pm 0.05)\times$\num{e-5}~S/m, about 5 times higher than the experimental value of 
+  $(1.3 \pm 0.1)\times$\num{e-5}~S/m. We verified the value calculated by the Nernst-Einstein
+  relationship using the collective diffusion model\cite{liu_collective_2013} 
   (See section S~\ref{S-fig:conductivity}). The values calculated by the 
-  collective diffusion model agree with Nernst-Einstein  values within error, 
+  collective diffusion model agree with Nernst-Einstein values within error, 
   however there is a much higher uncertainty that would require much longer 
   simulations to lower.
   
@@ -3407,12 +3552,13 @@
 %  however it is not feasible to do so with a large system. We will only use the
 %  Nernst-Einstein relation in future calculations of this type. 
 
-  \begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{IC_nernst.png}
-  \caption{The calculated ionic conductivity of the simulated system is approximately
-  one order of magnitude higher than experiment.}\label{fig:ionic_conductivity}
-  \end{figure}
+% BJC15: removed figure
+%  \begin{figure}
+%  \centering
+%  \includegraphics[width=0.5\textwidth]{IC_nernst.png}
+%  \caption{The calculated ionic conductivity of the simulated system is approximately
+%  one order of magnitude higher than experiment.}\label{fig:ionic_conductivity}
+%  \end{figure}
 
   The calculated value of ionic conductivity is 5x higher than experiment because 
   we simulated infinitely long, aligned pores. The ionic conductivity measurement 
@@ -3527,12 +3673,10 @@
   R-$\pi$ appears at lower q values than experiment because monomer stack too far
   apart, and its intensity is far too high, likely because our initial
   configurations contain a high level of dependence between monomer columns.
-  Finally, we observed that our model can only produce R-double when we add small amounts of
-  % I removed the specific details, since it implied that 2% wouldn't do it, which we don't know.
-  %1 wt\% 
-water to the system. This observation has possible implications for the
-  reproducibility of the experimental results from Feng et al. since they claim
-  that their membrane is completely dry. 
+  Finally, we observed that our model can only produce R-double when we add 
+  small amounts of water to the system. This observation has possible implications
+  for the reproducibility of the experimental results from Feng et al. since they
+  claim that their membrane is completely dry. 
 
 %  The system's pore spacing is most consistent with experiment when systems
 %  are built with 5 columns per pore. The distance between pores increases with the 
@@ -3584,6 +3728,16 @@ water to the system. This observation has possible implications for the
 %  characteristic of the real system. We took great care to overcome the potential
 %  limitations of our equilibration procedure and have come up with a structure
 %  that is in good agreement with experimental data.
+
+  % BJC15: first pass at a brief future work paragraph
+  Future work, based on what has been learned in this study, may help further improve the 
+  structural agreement between experiment and simulation. We may be able to 
+  modify the GAFF force field or use a different force field in order to better
+  capture the $\pi-\pi$ interactions which draw stacked monomers closer together. 
+  We can study ensembles of long simulations in order to observe more averaged 
+  structure and to create more experimentally consistent XRD patterns. Finally, we can
+  run extremely long simulations (on the order of \SI{}{\micro s}) in order to better 
+  quantify the time scales for large scale rearrangements to occur. 
 
   With the structural understanding gained by these simulations, it will becomes
   possible to evaluate transport of various solutes within the system, and apply the

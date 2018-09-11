@@ -204,7 +204,7 @@ if __name__ == "__main__":
 
         for i in range(results.shape[0]):
             plt.bar(r, results[i, :], bw, color=colors[i], alpha=0.75, label=regions[i])
-
+    exit()
     un_normalize = np.zeros_like(results)
 
     annulus_area = []

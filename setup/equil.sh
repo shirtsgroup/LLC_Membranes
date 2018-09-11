@@ -38,7 +38,7 @@ else
     GMX="gmx"
 fi
 
-${python} ${DIR}/build2.py -pd 0.35
+${python} ${DIR}/build2.py --no_column_shift #-pd 0.35
 
 # make input files
 ${python} ${DIR}/input.py -b ${BUILD_MON} -l 50 --restraints ${restraint_residue} --temp ${T} -f 50 --genvel yes -c ${start_config} -s 50000
@@ -81,8 +81,8 @@ done
 ${python} ${DIR}/input.py -b ${BUILD_MON} -l 5000 --temp ${T} -f 50 --genvel no -c ${start_config} --barostat berendsen
 
 gmx grompp -f npt.mdp -p topol.top -c npt.gro -o berendsen
-exit
 ${GMX} mdrun -v -deffnm berendsen
-${python} ${DIR}/input.py -b ${BUILD_MON} -l ${equil_length} --temp ${T} -f 10000 --barostat Parrinello-Rahman --genvel no -c berendsen.gro
+
+#${python} ${DIR}/input.py -b ${BUILD_MON} -l ${equil_length} --temp ${T} -f 10000 --barostat Parrinello-Rahman --genvel no -c berendsen.gro
 gmx grompp -f npt.mdp -p topol.top -c berendsen.gro -o PR
 ${GMX} mdrun -v -deffnm PR

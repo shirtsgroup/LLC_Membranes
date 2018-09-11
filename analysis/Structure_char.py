@@ -140,7 +140,7 @@ def avg_pore_loc(npores, pos, buffer):
 
         for j in range(npores):
             for k in range(comp_ppore*j, comp_ppore*(j + 1)):
-                p_center[:, j] += pos[:2, k]
+                p_center[:, j] += pos[k, :2]
             p_center[:, j] /= comp_ppore
 
     else:

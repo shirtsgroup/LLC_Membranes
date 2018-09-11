@@ -499,54 +499,78 @@
   until the pores reach the desired concentration of water. The remainder of the
   equilibration follows the same procedure as the dry system. 
 
-%  \section{Calculation of pore-to-pore spacing statistics}\label{section:p2p_stats}
-% 
-% %BJC: is it really necessary to explain this if I release the code? I don't explain
-% %any of the other stats I calculate. 
-%  We are interested in 5 pore-to-pore distances which should all be
-%  equal in a perfect hexagonal array (Figure~\ref{fig:p2p_diagram}). Only 4 of
-%  the 5 distances are independent. We can calculate a trajectory of spacing
-%  versus time for each of the 5 distances. We calculated the average pore-to-pore
-%  spacing and its uncertainty according to the following procedure:
-%   \begin{enumerate}
-%	\item We calculated the time when each of the pore-to-pore distances
-%	were equilibrated using \\ \texttt{pymbar.timeseries.detectEquilibration()}
-%	\cite{chodera_simple_2016,shirts_statistically_2008}. We began calculations
-%	after the largest of the five values.
-%	\item We calculated how long it takes for the data in each of the 5
-%	trajectories to become uncorrelated using \texttt{pymbar.timeseries.integratedAutocorrelationTime()}
-%	\cite{chodera_simple_2016,shirts_statistically_2008}. 
-%	\item We broke the full equilibrated trajectory into blocks of length $\tau$, where
-%	$\tau$ is the maximum of the five autocorrelation times calculated. Each block contains
-%	five sub-trajectories of pore-to-pore spacings.   
-%	\item We generate statistics using the bootstrapping technique. For
-%	each bootstrap trial, we reconstruct an equilibrium trajectory by randomly
-%	sampling from the trajectory blocks. 
-%	\item The average pore-to-pore distance is the mean of all pore
-%	spacings among all bootstrap trials.
-%	\item To calculate the uncertainty in pore-to-pore distance, we calculate the average 
-%	pore spacing for each pore over all bootstrap trials. Using the 5 average 
-%	pore-to-pore distances, we calculate the spread with:
-%	\begin{equation}
-%	s = \sqrt{\frac{1}{4} \sum_{i=1}^5 (x_i - \overline{x})^2} 
-%	\label{equation:p2p_stats}
-%	\end{equation}
-%	where $\overline{x}$ is the average pore-to-pore distance. We divided the sum in 
-%	equation~\ref{equation:p2p_stats} by 4 since there are only 4 independent pore
-%	spacings.
-%	
-%  \end{enumerate}
-%  \begin{figure}[!htb]
-%	\centering
-%	\includegraphics[width=0.25\textwidth]{p2p_diagram.png}
-%	\caption{There are five pore-to-pore distances that are equal in a perfect
-%		hexagon. If each number in the diagram represents the center of a
-%		pore in a hexagonal unit cell, then the distance from 1 to 2, 2 to 4, 
-%		4 to 3, 3 to 1 and 1 to 4 should be equal. Only 4 of the distances
-%		are independent. For example, the distance from 1 to 4 is defined by
-%		the location of all other pore centers.}
-%	\label{fig:p2p_diagram}
-%  \end{figure}
+  \section{Calculation of pore-to-pore spacing statistics}\label{section:p2p_stats}
+ 
+ %BJC: is it really necessary to explain this if I release the code? I don't explain
+ %any of the other stats I calculate. 
+  We are interested in 5 pore-to-pore distances which should all be
+  equal in a perfect hexagonal array (Figure~\ref{fig:p2p_diagram}). Only 4 of
+  the 5 distances are independent. We can calculate a trajectory of spacing
+  versus time for each of the 5 distances. We calculated the average pore-to-pore
+  spacing and its uncertainty according to the following procedure:
+   \begin{enumerate}
+	\item We calculated the time when each of the pore-to-pore distances
+	were equilibrated using \\ \texttt{pymbar.timeseries.detectEquilibration()}
+	\cite{chodera_simple_2016,shirts_statistically_2008}. We began calculations
+	after the largest of the five values.
+	\item We calculated how long it takes for the data in each of the 5
+	trajectories to become uncorrelated using \texttt{pymbar.timeseries.integratedAutocorrelationTime()}
+	\cite{chodera_simple_2016,shirts_statistically_2008}. 
+	\item We broke the full equilibrated trajectory into blocks of length $\tau$, where
+	$\tau$ is the maximum of the five autocorrelation times calculated. Each block contains
+	five sub-trajectories of pore-to-pore spacings.   
+	\item We generate statistics using the bootstrapping technique. For
+	each bootstrap trial, we reconstruct an equilibrium trajectory by randomly
+	sampling from the trajectory blocks. 
+	\item The average pore-to-pore distance is the mean of all pore
+	spacings among all bootstrap trials.
+	\item To calculate the uncertainty in pore-to-pore distance, we calculate the average 
+	pore spacing for each pore over all bootstrap trials. Using the 5 average 
+	pore-to-pore distances, we calculate the spread with:
+	\begin{equation}
+	s = \sqrt{\frac{1}{4} \sum_{i=1}^5 (x_i - \overline{x})^2} 
+	\label{equation:p2p_stats}
+	\end{equation}
+	where $\overline{x}$ is the average pore-to-pore distance. We divided the sum in 
+	equation~\ref{equation:p2p_stats} by 4 since there are only 4 independent pore
+	spacings.
+	
+  \end{enumerate}
+  \begin{figure}[!htb]
+	\centering
+	\includegraphics[width=0.25\textwidth]{p2p_diagram.png}
+	\caption{There are five pore-to-pore distances that are equal in a perfect
+		hexagon. If each number in the diagram represents the center of a
+		pore in a hexagonal unit cell, then the distance from 1 to 2, 2 to 4, 
+		4 to 3, 3 to 1 and 1 to 4 should be equal. Only 4 of the distances
+		are independent. For example, the distance from 1 to 4 is defined by
+		the location of all other pore centers.}
+	\label{fig:p2p_diagram}
+  \end{figure}
+  
+  Alternatively, one can calculate the pore spacing as half of the $x$ and $y$
+  box vectors, however this technique does not fully capture the uncertainty
+  in the pore-to-pore distances. 
+  
+  \begin{table}[h]
+  \centering
+  \begin{tabular}{cc}
+  \toprule
+  System                         & Pore Spacing ($nm$) & Pore Spacing ($nm$)              \\
+                                 & Pore centers        & $\dfrac{x-box vector}{2}$ ($nm$) \\ 
+  \midrule
+  Sandwiched, Ordered            & 4.18 $\pm$ 0.13     & 4.16 $\pm$ 0.01                  \\
+  Parallel Displaced, Ordered    & 4.17 $\pm$ 0.12     & 4.18 $\pm$ 0.01                  \\
+  Sandwiched, Disordered         & 4.05 $\pm$ 0.14     & 4.01 $\pm$ 0.01                  \\
+  Parallel Displaced, Disordered & 4.03 $\pm$ 0.07     & 4.01 $\pm$ 0.01                  \\
+  \bottomrule
+  \end{tabular}
+  \caption{The pore spacing measured in two ways agree within uncertainty. In the main
+  text, we report values calculated by measuring the average distance between pore centers. 
+  Alternatively, one can estimate the pore spacing as half of the $x$ and $y$ box vectors.
+  Both methods agree within uncertainty, but measuring the distance between pore centers
+  does a better job of showing the spread of pore-to-pore distances.}~\label{table:p2p}
+  \end{table}
 
   \section{The nematic order parameter}\label{method:nematic_order}
 
