@@ -86,14 +86,17 @@ if __name__ == "__main__":
     full_distribution = [[], [], []]  # z, r, theta
     sigmas = np.zeros([len(independent_trajectories), 3])
     for i in range(len(independent_trajectories)):
-        # full_distribution[0] += independent_trajectories[i].z_values.flatten().tolist()
-        # full_distribution[1] += independent_trajectories[i].r_values.flatten().tolist()
-        # full_distribution[2] += independent_trajectories[i].theta_values.flatten().tolist()
-        full_distribution[0] += independent_trajectories[i].z_values[-1, :].tolist()
-        full_distribution[1] += independent_trajectories[i].r_values[-1, :].tolist()
-        full_distribution[2] += independent_trajectories[i].theta_values[-1, ...].tolist()
+        full_distribution[0] += independent_trajectories[i].z_values.flatten().tolist()
+        full_distribution[1] += independent_trajectories[i].r_values.flatten().tolist()
+        full_distribution[2] += independent_trajectories[i].theta_values.flatten().tolist()
+        # full_distribution[0] += independent_trajectories[i].z_values[-1, :].tolist()
+        # full_distribution[1] += independent_trajectories[i].r_values[-1, :].tolist()
+        # full_distribution[2] += independent_trajectories[i].theta_values[-1, ...].flatten().tolist()
         sigmas[i, :] = [independent_trajectories[i].dz, independent_trajectories[i].dr,
                         independent_trajectories[i].dtheta]
+
+    full_distribution = [np.array(full_distribution[i]) for i in range(len(full_distribution))]
+    full_distribution[2] -= full_distribution[2].mean()
 
     full_sigmas = [np.std(i) for i in full_distribution]  # standard deviation of full distribution
 
@@ -103,68 +106,71 @@ if __name__ == "__main__":
         means[i, 1] = independent_trajectories[i].r_values.mean()
         means[i, 2] = independent_trajectories[i].theta_values.mean()
 
+    means[:, 2] -= means[:, 2].mean()
+
     # For saving figures
     name = 'sandwiched'
     if args.parallel_displaced:
         name = 'offset'
 
     # Histograms of means of distributions
-    # fig, axmean = plt.subplots(1, 3, sharey=True)
-    #
-    # print(np.mean(means[:, 1]))
-    # print(np.std(means[:, 1]))
-    # bins = 10
-    # axmean[0].hist(means[:, 0], bins=bins)
-    # axmean[0].set_xlabel('$\mu_z$ (nm)', fontsize=16)
-    # axmean[0].set_ylabel('Count', fontsize=16)
-    # axmean[0].xaxis.set_tick_params(labelsize=12)
-    # axmean[0].yaxis.set_tick_params(labelsize=12)
-    #
-    # axmean[1].hist(means[:, 1], bins=bins)
-    # axmean[1].set_xlabel('$\mu_r$ (nm)', fontsize=16)
-    # axmean[1].xaxis.set_tick_params(labelsize=12)
-    #
-    # axmean[2].hist(means[:, 2], bins=bins)
-    # axmean[2].set_xlabel('$\mu_\Theta$ (radians)', fontsize=16)
-    # axmean[2].xaxis.set_tick_params(labelsize=12)
-    #
-    # # plt.ylim(0, 11.5)
-    # plt.tick_params(labelsize=14)
-    # plt.tight_layout()
-    #
-    # # Histograms of standard deviations of distributions
-    # fig, ax0 = plt.subplots(1, 3, sharey=True)
-    #
-    # print('Standard Deviation of standard deviations:')
-    # print('Sigma_z = %.3f' % np.std(sigmas[:, 0]))
-    # print('Sigma_r = %.3f' % np.std(sigmas[:, 1]))
-    # print('Sigma_theta = %.3f' % np.std(sigmas[:, 2]))
-    #
-    # bins = 10
-    # ax0[0].hist(sigmas[:, 0], bins=bins)
-    # ax0[0].plot([0.16, 0.16], [0, 12], '--', color='black', linewidth=2)
-    # ax0[0].set_xlabel('$\sigma_z$ (nm)', fontsize=16)
-    # ax0[0].set_ylabel('Count', fontsize=16)
-    # ax0[0].xaxis.set_tick_params(labelsize=12)
-    # ax0[0].yaxis.set_tick_params(labelsize=12)
-    #
-    # ax0[1].hist(sigmas[:, 1], bins=bins)
-    # ax0[1].plot([0.2053, 0.2053], [0, 12], '--', color='black', linewidth=2)
-    # ax0[1].set_xlabel('$\sigma_r$ (nm)', fontsize=16)
-    # ax0[1].xaxis.set_tick_params(labelsize=12)
-    #
-    # ax0[2].hist(sigmas[:, 2], bins=bins)
-    # ax0[2].plot([0.2380, 0.2380], [0, 12], '--', color='black', linewidth=2)
-    # ax0[2].set_xlabel('$\sigma_\Theta$ (radians)', fontsize=16)
-    # ax0[2].xaxis.set_tick_params(labelsize=12)
-    #
+    fig, axmean = plt.subplots(1, 3, sharey=True)
+
+    bins = 10
+    axmean[0].hist(means[:, 0], bins=bins)
+    axmean[0].plot([2.09e-17, 2.09e-17], [0, 13], '--', color='black', linewidth=2)  # parallel displaced
+    axmean[0].set_xlabel('$\mu_z$ (nm)', fontsize=16)
+    axmean[0].set_ylabel('Count', fontsize=16)
+    axmean[0].xaxis.set_tick_params(labelsize=12)
+    axmean[0].yaxis.set_tick_params(labelsize=12)
+
+    axmean[1].hist(means[:, 1], bins=bins)
+    axmean[1].plot([0.71, 0.71], [0, 13], '--', color='black', linewidth=2)  # parallel displaced
+    axmean[1].set_xlabel('$\mu_r$ (nm)', fontsize=16)
+    axmean[1].xaxis.set_tick_params(labelsize=12)
+
+    axmean[2].hist(means[:, 2], bins=bins)
+    axmean[2].plot([-0.04, -0.04], [0, 12], '--', color='black', linewidth=2)  # parallel displaced
+    axmean[2].set_xlabel('$\mu_\Theta$ (radians)', fontsize=16)
+    axmean[2].xaxis.set_tick_params(labelsize=12)
+
     # plt.ylim(0, 11.5)
-    # plt.tick_params(labelsize=14)
-    # plt.tight_layout()
-    #
-    # plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/%s_ensemble_stds.png' % name)
-    # plt.show()
-    # exit()
+    plt.tick_params(labelsize=14)
+    plt.tight_layout()
+    plt.savefig(
+        '/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/%s_ensemble_means.png' % name)
+
+    # Histograms of standard deviations of distributions
+    fig, ax0 = plt.subplots(1, 3, sharey=True)
+
+    print('Standard Deviation of standard deviations:')
+    print('Sigma_z = %.3f' % np.std(sigmas[:, 0]))
+    print('Sigma_r = %.3f' % np.std(sigmas[:, 1]))
+    print('Sigma_theta = %.3f' % np.std(sigmas[:, 2]))
+
+    bins = 10
+    ax0[0].hist(sigmas[:, 0], bins=bins)
+    ax0[0].plot([0.1628, 0.1628], [0, 12], '--', color='black', linewidth=2)
+    ax0[0].set_xlabel('$\sigma_z$ (nm)', fontsize=16)
+    ax0[0].set_ylabel('Count', fontsize=16)
+    ax0[0].xaxis.set_tick_params(labelsize=12)
+    ax0[0].yaxis.set_tick_params(labelsize=12)
+
+    ax0[1].hist(sigmas[:, 1], bins=bins)
+    ax0[1].plot([0.2060, 0.2060], [0, 12], '--', color='black', linewidth=2)
+    ax0[1].set_xlabel('$\sigma_r$ (nm)', fontsize=16)
+    ax0[1].xaxis.set_tick_params(labelsize=12)
+
+    ax0[2].hist(sigmas[:, 2], bins=bins)
+    ax0[2].plot([0.2429, 0.2429], [0, 12], '--', color='black', linewidth=2)
+    ax0[2].set_xlabel('$\sigma_\Theta$ (radians)', fontsize=16)
+    ax0[2].xaxis.set_tick_params(labelsize=12)
+
+    plt.ylim(0, 11.5)
+    plt.tick_params(labelsize=14)
+    plt.tight_layout()
+
+    plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/%s_ensemble_stds.png' % name)
 
     # TEST INDIVIDUAL CENTER OF MASSES
     z_cdf = Cdf(full_distribution[0])
@@ -181,7 +187,7 @@ if __name__ == "__main__":
         r[i, :] = independent_trajectories[i].r_values[-1, :]  # value at last frame for each center of mass
         theta[i, :] = independent_trajectories[i].theta_values[-1, ...].flatten()  # value at last frame for each center of mass
 
-    N = 40
+    N = len(independent_trajectories)
     trials = 1000
     boot = np.zeros([trials, N, 3])
     x_ecdf = np.zeros([N, 3])
@@ -192,11 +198,20 @@ if __name__ == "__main__":
 
     all_ecdfs = np.zeros([400, N, 3])
     for i in range(all_ecdfs.shape[0]):
-        all_ecdfs[i, :, 0] = np.array(sorted(z[:, i]))[:N]
-        all_ecdfs[i, :, 1] = np.array(sorted(r[:, i]))[:N]
-        all_ecdfs[i, :, 2] = np.array(sorted(theta[:, i]))[:N]
+        all_ecdfs[i, :, 0] = np.array(sorted(z[:, i]))
+        all_ecdfs[i, :, 1] = np.array(sorted(r[:, i]))
+        all_ecdfs[i, :, 2] = np.array(sorted(theta[:, i]))
 
-    mean_ecdf = all_ecdfs.mean(axis=0)
+    # plt.hist(all_ecdfs.mean(axis=1)[:, 1], bins=50)
+    # plt.show()
+    # ys = np.arange(1, N + 1) / N
+    # choices = np.random.choice(all_ecdfs.shape[0], size=10)
+    # print(choices)
+    # for i in range(len(choices)):
+    #     plt.plot(all_ecdfs[choices[i], :, 0], ys)
+    # plt.show()
+    # exit()
+
     # print([np.mean(full_distribution[i]) for i in range(3)])
     # print(mean_ecdf.mean(axis=0))
     #
@@ -204,13 +219,19 @@ if __name__ == "__main__":
     # print(mean_ecdf.std(axis=0))
     # exit()
 
+    confidence = 95  # percent confidence interval
+    lower_confidence = (100 - confidence) / 2
+    upper_confidence = 100 - lower_confidence
+
+    mean_ecdf = all_ecdfs.mean(axis=0)
+
     error_ecdf = np.zeros([2, N, 3])
-    error_ecdf[0, :, 0] = np.abs(np.percentile(all_ecdfs[..., 0], 2.5, axis=0) - mean_ecdf[:, 0])  # 2.5 percent of data below this value
-    error_ecdf[1, :, 0] = np.percentile(all_ecdfs[..., 0], 97.5, axis=0) - mean_ecdf[:, 0]  # 97.5 percent of data below this value
-    error_ecdf[0, :, 1] = np.abs(np.percentile(all_ecdfs[..., 1], 2.5, axis=0) - mean_ecdf[:, 1])
-    error_ecdf[1, :, 1] = np.percentile(all_ecdfs[..., 1], 97.5, axis=0) - mean_ecdf[:, 1]
-    error_ecdf[0, :, 2] = np.abs(np.percentile(all_ecdfs[..., 2], 2.5, axis=0) - mean_ecdf[:, 2])
-    error_ecdf[1, :, 2] = np.percentile(all_ecdfs[..., 2], 97.5, axis=0) - mean_ecdf[:, 2]
+    error_ecdf[0, :, 0] = np.abs(np.percentile(all_ecdfs[..., 0], lower_confidence, axis=0) - mean_ecdf[:, 0])  # 2.5 percent of data below this value
+    error_ecdf[1, :, 0] = np.percentile(all_ecdfs[..., 0], upper_confidence, axis=0) - mean_ecdf[:, 0]  # 97.5 percent of data below this value
+    error_ecdf[0, :, 1] = np.abs(np.percentile(all_ecdfs[..., 1], lower_confidence, axis=0) - mean_ecdf[:, 1])
+    error_ecdf[1, :, 1] = np.percentile(all_ecdfs[..., 1], upper_confidence, axis=0) - mean_ecdf[:, 1]
+    error_ecdf[0, :, 2] = np.abs(np.percentile(all_ecdfs[..., 2], lower_confidence, axis=0) - mean_ecdf[:, 2])
+    error_ecdf[1, :, 2] = np.percentile(all_ecdfs[..., 2], upper_confidence, axis=0) - mean_ecdf[:, 2]
 
     ys = np.arange(1, N + 1) / N
     shift = 0.0025
@@ -227,17 +248,17 @@ if __name__ == "__main__":
         boot[i, :, 2] = np.array(sorted(theta_cdf.random_sample(N)))
 
     error = np.zeros([2, N, 3])
-    error[0, :, 0] = np.abs(np.percentile(boot[..., 0], 2.5, axis=0) - x_ecdf[:, 0])  # 2.5 percent of data below this value
-    error[1, :, 0] = np.percentile(boot[..., 0], 97.5, axis=0) - x_ecdf[:, 0]  # 97.5 percent of data below this value
-    error[0, :, 1] = np.abs(np.percentile(boot[..., 1], 2.5, axis=0) - x_ecdf[:, 1])
-    error[1, :, 1] = np.percentile(boot[..., 1], 97.5, axis=0) - x_ecdf[:, 1]
-    error[0, :, 2] = np.abs(np.percentile(boot[..., 2], 2.5, axis=0) - x_ecdf[:, 2])
-    error[1, :, 2] = np.percentile(boot[..., 2], 97.5, axis=0) - x_ecdf[:, 2]
+    error[0, :, 0] = np.abs(np.percentile(boot[..., 0], lower_confidence, axis=0) - x_ecdf[:, 0])  # 2.5 percent of data below this value
+    error[1, :, 0] = np.percentile(boot[..., 0], upper_confidence, axis=0) - x_ecdf[:, 0]  # 97.5 percent of data below this value
+    error[0, :, 1] = np.abs(np.percentile(boot[..., 1], lower_confidence, axis=0) - x_ecdf[:, 1])
+    error[1, :, 1] = np.percentile(boot[..., 1], upper_confidence, axis=0) - x_ecdf[:, 1]
+    error[0, :, 2] = np.abs(np.percentile(boot[..., 2], lower_confidence, axis=0) - x_ecdf[:, 2])
+    error[1, :, 2] = np.percentile(boot[..., 2], upper_confidence, axis=0) - x_ecdf[:, 2]
 
-    fig, axboot = plt.subplots(1, 3, figsize=(11, 4), sharey=True)
+    fig, axboot = plt.subplots(1, 3, figsize=(11, 4), sharey=False)
     axboot[0].errorbar(x_ecdf[:, 0], z_cdf.cdf(x_ecdf[:, 0]) - shift, xerr=error[..., 0], ecolor='black', elinewidth=1,
                        color='black', linewidth=0)
-    axboot[0].errorbar(mean_ecdf[:, 0], ys + shift, xerr=error_ecdf[..., 0], ecolor='red', linewidth=1, elinewidth=1, color='red')
+    axboot[0].errorbar(mean_ecdf[:, 0], ys + shift, xerr=error_ecdf[..., 0], ecolor='red', linewidth=2, elinewidth=1, color='red')
     axboot[0].plot(z_cdf.xs, z_cdf.ys, linewidth=2, color='black')
     axboot[0].set_ylabel('Cumulative Probability', fontsize=14)
     axboot[0].set_xlim(-0.65, 0.65)
@@ -247,22 +268,24 @@ if __name__ == "__main__":
 
     axboot[1].errorbar(x_ecdf[:, 1], r_cdf.cdf(x_ecdf[:, 1]) - shift, xerr=error[..., 1], ecolor='black', elinewidth=1,
                        color='black', linewidth=0)
-    axboot[1].errorbar(mean_ecdf[:, 1], ys + shift, xerr=error_ecdf[..., 1], ecolor='red', linewidth=1, elinewidth=1, color='red')
+    axboot[1].errorbar(mean_ecdf[:, 1], ys + shift, xerr=error_ecdf[..., 1], ecolor='red', linewidth=2, elinewidth=1, color='red')
     axboot[1].plot(r_cdf.xs, r_cdf.ys, linewidth=2, color='black')
     axboot[1].set_xlim(0, 1.25)
     axboot[1].set_xlabel('r-deviation (nm)', fontsize=14)
     axboot[1].xaxis.set_tick_params(labelsize=12)
+    axboot[1].yaxis.set_tick_params(labelsize=12)
 
     axboot[2].errorbar(x_ecdf[:, 2], theta_cdf.cdf(x_ecdf[:, 2]) - shift, xerr=error[..., 2], ecolor='black', elinewidth=1,
                        color='black', linewidth=0)
-    axboot[2].errorbar(mean_ecdf[:, 2], ys + shift, xerr=error_ecdf[..., 2], ecolor='red', linewidth=1, elinewidth=1, color='red')
+    axboot[2].errorbar(mean_ecdf[:, 2], ys + shift, xerr=error_ecdf[..., 2], ecolor='red', linewidth=2, elinewidth=1, color='red')
     axboot[2].plot(theta_cdf.xs, theta_cdf.ys, linewidth=2, color='black')
     axboot[2].set_xlim(-np.pi/2, np.pi/2)
     axboot[2].set_xlabel('$\Theta$-deviation (radians)', fontsize=14)
     axboot[2].xaxis.set_tick_params(labelsize=12)
+    axboot[2].yaxis.set_tick_params(labelsize=12)
     axboot[2].set_xticklabels(['-$\pi$/2', '-$\pi$/4', '0', '$\pi$/4', '$\pi$/2'])
 
-    nplot = 5  # number of ecdf's to plot
+    nplot = 3  # number of ecdf's to plot
     random_ecdfs = np.random.choice(400, size=(nplot, 3))
     print(random_ecdfs)
 
@@ -277,31 +300,34 @@ if __name__ == "__main__":
         theta_ecdfs = [140, 39, 107, 157, 287]
 
     # for i in z_ecdfs:
-    # # i = np.random.choice(400)
-    # # print(i)
-    #     x_emp = np.array(sorted(z[:, i]))
-    #     n = float(len(x_emp))
-    #     ys = np.arange(1, n + 1) / n
-    #     axboot[0].plot(x_emp, ys, linewidth=2)
-    #
-    # for i in r_ecdfs:
-    # # i = np.random.choice(400)
-    # # print(i)
-    #     x_emp = np.array(sorted(r[:, i]))
-    #     n = float(len(x_emp))
-    #     ys = np.arange(1, n + 1) / n
-    #     axboot[1].plot(x_emp, ys, linewidth=2)
-    #
-    # for i in theta_ecdfs:
-    #     x_emp = np.array(sorted(theta[:, i]))
-    #     n = float(len(x_emp))
-    #     ys = np.arange(1, n + 1) / n
-    #     axboot[2].plot(x_emp, ys, linewidth=2)
+    for i in random_ecdfs[:, 0]:
+    # i = np.random.choice(400)
+    # print(i)
+        x_emp = np.array(sorted(z[:, i]))
+        n = float(len(x_emp))
+        ys = np.arange(1, n + 1) / n
+        axboot[0].plot(x_emp, ys, linewidth=2)
+
+    #for i in r_ecdfs:
+    for i in random_ecdfs[:, 1]:
+    # i = np.random.choice(400)
+    # print(i)
+        x_emp = np.array(sorted(r[:, i]))
+        n = float(len(x_emp))
+        ys = np.arange(1, n + 1) / n
+        axboot[1].plot(x_emp, ys, linewidth=2)
+
+    #for i in theta_ecdfs:
+    for i in random_ecdfs[:, 2]:
+        x_emp = np.array(sorted(theta[:, i]))
+        n = float(len(x_emp))
+        ys = np.arange(1, n + 1) / n
+        axboot[2].plot(x_emp, ys, linewidth=2)
 
     plt.tight_layout()
-    #plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/%s_ecdfs.png' % name)
-    plt.show()
-    exit()
+    plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/%s_ecdfs.png' % name)
+    # plt.show()
+    # exit()
 
     # pz = []
     # pr = []
@@ -397,26 +423,30 @@ if __name__ == "__main__":
     #                                           independent_trajectories[j].theta_values.tolist())[1]
 
     # PLOT FULL DISTRIBUTIONS
-    fig, ax = plt.subplots(1, 3, figsize=(12, 5), sharey=True)
+    fig, ax = plt.subplots(1, 3, figsize=(11, 4), sharey=False)
 
     bins = 50
     ax[0].hist(full_distribution[0], bins=bins, normed=True, range=(-0.6, 0.6))
     #ax[0].set_title('$\sigma=%.4f nm$' % np.std(full_distribution[0]))
-    ax[0].set_xlabel('z-deviation from ideal layer position \n(nm)', fontsize=14)
+    ax[0].set_xlabel('z-deviation (nm)', fontsize=14)
     ax[0].set_ylabel('Frequency', fontsize=14)
     ax[0].xaxis.set_tick_params(labelsize=12)
     ax[0].yaxis.set_tick_params(labelsize=12)
 
     ax[1].hist(full_distribution[1], bins=bins, normed=True)
     #ax[1].set_title('$\sigma=%.4f nm$' % np.std(full_distribution[1]))
-    ax[1].set_xlabel('r-deviation from pore center \n(nm)', fontsize=14)
+    ax[1].set_xlabel('r-deviation (nm)', fontsize=14)
     ax[1].xaxis.set_tick_params(labelsize=12)
+    ax[1].yaxis.set_tick_params(labelsize=12)
+    ax[1].yaxis.set_ticks(np.linspace(0, 2, 5))
 
     ax[2].hist(full_distribution[2], bins=bins, normed=True, range=(-np.pi/2, np.pi/2))
     #ax[2].set_title('$\sigma=%.4f nm$' % np.std(full_distribution[2]))
-    ax[2].set_xlabel('$\Theta$-deviation from ideal position \n(radians)', fontsize=14)
+    ax[2].set_xlabel('$\Theta$-deviation (radians)', fontsize=14)
     ax[2].xaxis.set_tick_params(labelsize=12)
+    ax[2].yaxis.set_tick_params(labelsize=12)
     ax[2].set_xticklabels(['-$\pi$/2', '-$\pi$/4', '0', '$\pi$/4', '$\pi$/2'])
+    ax[2].yaxis.set_ticks(np.linspace(0, 1.5, 4))
 
     plt.tight_layout()
     plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/%s_ensemble_pooled.png' % name)

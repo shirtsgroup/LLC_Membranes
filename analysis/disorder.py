@@ -48,7 +48,7 @@ def minimize_deviation(ideal_pore, angle, com, p_center):
 
 class System(object):
 
-    def __init__(self, traj, top, ref_atoms, begin=0, pores=4, layers=20, nrotations=1080):
+    def __init__(self, traj, top, ref_atoms, begin=0, pores=4, layers=20, nrotations=360):
 
         # initialize what will be the main properties of interest
         self.dz = None
@@ -96,18 +96,18 @@ class System(object):
         z = np.zeros([self.t.n_frames, self.com.shape[1]])  # leave out top and bottom layers which are across pbc's
         for f in range(self.t.n_frames):
             for p in range(self.npores):
-                # for c in range(self.ncol):
-                #     start = p * self.ncol * self.nlayers + c * self.nlayers
-                #     end = p * self.ncol * self.nlayers + (c + 1) * self.nlayers
-                #     z[f, start:end] = self.com[f, start:end, 2] - layer_locations
-                for l in range(1, self.nlayers - 1):
-                    start = p * 100 + l * 5
-                    end = p * 100 + (l + 1) * 5
-                    z[f, start:end] = self.com[f, start:end, 2] - layer_locations[l]
+                for c in range(self.ncol):
+                    start = p * self.ncol * self.nlayers + c * self.nlayers
+                    end = p * self.ncol * self.nlayers + (c + 1) * self.nlayers
+                    z[f, start:end] = self.com[f, start:end, 2] - layer_locations
+                # for l in range(1, self.nlayers - 1):
+                #     start = p * 100 + l * 5
+                #     end = p * 100 + (l + 1) * 5
+                #     z[f, start:end] = self.com[f, start:end, 2] - layer_locations[l]
 
         z = np.where(z >= 0.5*zbox, z-zbox, z)
         z = np.where(z <= -0.5*zbox, z+zbox, z)
-        self.z_values = z.flatten()[np.nonzero(z.flatten())]
+        self.z_values = z #.flatten()[np.nonzero(z.flatten())]
         self.z_values -= self.z_values.mean()  # set mean to zero (needed to compare distributions)
         self.dz = np.std(self.z_values)
 
@@ -121,7 +121,7 @@ class System(object):
                                                              self.p_centers[:, p, f], axis=1)
 
         self.pore_radius = np.mean(r.flatten())
-        self.r_values = r#.flatten()
+        self.r_values = r #.flatten()
         self.dr = np.std(self.r_values)
 
     def theta_deviation(self, pd=False):
@@ -130,7 +130,7 @@ class System(object):
         starting_position = np.array([self.pore_radius, 0, 0])
         ideal_column[:, :] = starting_position
         if pd:
-            ideal_column[1::2, :] = transform.rotate_coords_z(starting_position[np.newaxis, :], self.angle / 2)
+            ideal_column[1::2, :] = transform.rotate_coords_z(starting_position[np.newaxis, :], 33.9155266) #self.angle / 2)
         ideal_pore = np.zeros([ideal_column.shape[0] * self.ncol, 3])
         ideal_pore[:self.nlayers, :] = ideal_column
         for i in range(1, self.ncol):
@@ -138,18 +138,18 @@ class System(object):
                 ideal_column, i * self.angle)
 
         # layer based systems
-        ideal_layer = np.zeros([5, 3])
-        ideal_layer[0, :] = [self.pore_radius, 0, 0]
-        for i in range(1, 5):
-            ideal_layer[i, :] = transform.rotate_coords_z(ideal_layer[np.newaxis, 0, :], i * self.angle)
-
-        ideal_pore = np.zeros([ideal_layer.shape[0] * self.nlayers, 3])
-        for i in range(self.nlayers):
-            if pd and i % 2 == 1:
-                ideal_pore[i * ideal_layer.shape[0]: (i + 1) * ideal_layer.shape[0], :] = transform.rotate_coords_z(
-                                        ideal_layer, self.angle / 2)
-            else:
-                ideal_pore[i * ideal_layer.shape[0]: (i + 1) * ideal_layer.shape[0], :] = ideal_layer
+        # ideal_layer = np.zeros([5, 3])
+        # ideal_layer[0, :] = [self.pore_radius, 0, 0]
+        # for i in range(1, 5):
+        #     ideal_layer[i, :] = transform.rotate_coords_z(ideal_layer[np.newaxis, 0, :], i * self.angle)
+        #
+        # ideal_pore = np.zeros([ideal_layer.shape[0] * self.nlayers, 3])
+        # for i in range(self.nlayers):
+        #     if pd and i % 2 == 1:
+        #         ideal_pore[i * ideal_layer.shape[0]: (i + 1) * ideal_layer.shape[0], :] = transform.rotate_coords_z(
+        #                                 ideal_layer, self.angle / 2)
+        #     else:
+        #         ideal_pore[i * ideal_layer.shape[0]: (i + 1) * ideal_layer.shape[0], :] = ideal_layer
 
         print('Calculating angles needed to minimize angular deviation')
         #angles = np.zeros([self.t.n_frames, self.npores])
@@ -162,15 +162,13 @@ class System(object):
                 center = self.p_centers[:, p, f]
                 for i, x in enumerate(angles):
                     deviations[i] = minimize_deviation(ideal_pore, x, pos, center)  # , com, ideal_pore, p_centers)
-                # plt.plot(np.linspace(0, 360, self.nrotations), deviations)
-                # print(deviations[np.argmin(deviations)])
-                # print(angles[np.argmin(deviations)])
                 ideal = transform.rotate_coords_z(ideal_pore, angles[np.argmin(deviations)])
                 angular_deviations[f, p, :] = angular_deviation(pos, center, ideal)
 
         self.theta_values = angular_deviations
         self.theta_values[np.where(self.theta_values < 3)] += 2 * np.pi
         self.theta_values[np.where(self.theta_values > 3)] -= 2 * np.pi
+        self.theta_values -= self.theta_values.mean()
 
         self.dtheta = np.std(self.theta_values)
 

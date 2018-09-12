@@ -1348,6 +1348,15 @@
   %consideration to the xy cross-sections since multiple rings exist in the same
   %plane located at different vertices of a polygon. We used a rotated frame of
   %reference to avoid ambiguity in the final pair distribution functions. i
+  
+  \subsubsection{\textit{Radial distribution functions}}
+
+  We explored the pores' compositions by measuring the average number densities
+  of various monomer components as a function of distance from the pore centers.
+  We looked at the average number density of sodium ions, aromatic rings and 
+  carbon atoms making up the monomer tails. We binned the radial distance of all
+  atoms in each group from the pore centers, then normalized by the volume of the
+  annulus defined by the bin edges and the z box vector (See Figure~S-\ref{S-fig:rdf_diagram}). 
 
   \subsection{Simplified Systems}\label{method:simple_systems}
   
@@ -1394,16 +1403,7 @@
   This method assumes that the timescales for large scale rearrangements of the
   system are much longer than what we can feasibly simulate.
 
-  \subsubsection{\textit{Radial distribution functions}}
-
-  We explored the pores' compositions by measuring the average number densities
-  of various monomer components as a function of distance from the pore centers.
-  We looked at the average number density of sodium ions, aromatic rings and 
-  carbon atoms making up the monomer tails. We binned the radial distance of all
-  atoms in each group from the pore centers, then normalized by the volume of the
-  annulus defined by the bin edges and the z box vector (See Figure~S-\ref{S-fig:rdf_diagram}). 
-
-  \subsubsection{\textit{Ionic conductivity calculations}}
+  \subsection{\textit{Ionic conductivity calculations}}
 
   We calculated ionic conductivity using the Nernst-Einstein relationship, which 
   relates the DC ionic conductivity, $\sigma$, to ion diffusivity, $D$, 
@@ -2165,7 +2165,7 @@
   and we do not achieve the timescales necessary for them to rearrange into a
   necessarily more tightly packed configuration. However, we equilibrated the
   system at 500 K then annealed it to 300 K in an attempt to coerce the tails into
-  a more tightly packed configuration, however we saw no improvement in packing
+  a more tightly packed configuration, but we saw no improvement in packing
   distance over our 300 K models. See section S-TBD for details.
 
   The system size, in the $z$-direction, does not significantly alter $g(z)$.
@@ -2599,9 +2599,177 @@
   \includegraphics[width=0.5\textwidth]{qy_fwhm.png}
   \caption{Increasing the amount of disorder in the $xy$ plane decreases the
 	  FWHM of the $q_y$ cross-section of R-$\pi$. When we cut the amount of $r$ and
-	  $theta$ disorder in half (Noise factor = 0.5), the FWHM increases by 88\%. When
+	  $\theta$ disorder in half (Noise factor = 0.5), the FWHM increases by 88\%. When
 	  we double the disorder (Noise factor = 2), the FWHM decreases by
 	  51\%.}\label{fig:qy_fwhm}
+  \end{figure}
+  
+% BJC15: this paragraph reframed and expanded below
+%  Because disorder among head groups in the simulated 
+%  atomistic systems is largely determined by each system's quenched configuration,
+%  one would need to average an ensemble of simulations in order to optimally match the experimental WAXS pattern. 
+%  Both the initial configuration and initial velocity randomization lead to 
+%  different quenched configurations every time we run an equilibration simulation.
+%  Although the simulated XRD pattern changes dynamically as we simulate the system
+%  due to thermal fluctuations, its features are largely determined by the initial 
+%  quenched configuration. Here we assume that the timescales for large scale 
+%  rearrangements of the system are much longer than what we can feasibly simulate.   
+  
+  Since the dynamics of this system appear to be quite slow, and consequently most of
+  our analysis has been focused on a small set of quenched configurations whose 
+  structures do not vary significantly with time, we attempted
+  to learn more about their time-averaged structures by studying ensembles of simulations.
+%  Disorder among head groups in the simulated atomistic systems is largely determined
+%  by each system's quenched configuration. We observe rapid reorganization of our 
+%  initial configurations into configurations with quenched disorder that does not
+%  vary significantly for the remainder of the
+%  simulation time. For that reason, 
+  We created ensembles of 40 simulations in both the parallel displaced and 
+  sandwiched configurations. We used the same equilibration technique as above 
+  (see section~\ref{section:equilibration}), however we built the initial
+  configurations with randomly displaced columns in the $z$-direction and
+  then stopped their equilibration after 5 ns of unrestrained simulation. We 
+  simulated XRD patterns from the 40 concatenated trajectories. The $q_r$ 
+  cross-sections of R-$\pi$ generated from the two concatenated trajectories are shown
+  in Figure~\ref{fig:ensemble_XRD}. Qualitatively, the cross-sections
+  of are nearly smooth, with small spikes near $q_r$=0. The data 
+  suggests that the average intensity of R-$\pi$ in sandwiched systems is 
+  about 3$\times$ higher than that in the parallel displaced configuration. 
+  Overall, the intensity of R-$\pi$ generated from the parallel displaced 
+  ensemble shows the best agreement with experiment so far. For simplicity, 
+  we will limit the following discussion to the parallel displaced configuration.
+  Equivalent data is available for the sandwiched configuration in the
+  supporting information. %BJC15: to be added
+  %BJC15: limiting discussion to parallel displaced since it seems most consistent with experiment
+  % However, I can switch it to sandwiched very easily. The discussion below will remain the same
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{sandwiched_ensemble_rsection.png}
+  \caption{Sandwiched}\label{fig:sandwiched_ensemble_rsection}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{offset_ensemble_rsection.png}
+  \caption{Parallel Displaced}\label{fig:offset_ensemble_rsection}
+  \end{subfigure}
+  \caption{The $q_r$ section of R-$\pi$ is much smoother when we generate simulated XRD
+  		   patterns from an ensemble of 40 independent simulations. The maximum 
+  		   intensity of R-$\pi$ is 3$\times$ higher in the sandwiched configuration (a)
+  		   than in the parallel displaced configuration (b).}\label{fig:ensemble_XRD}
+  \end{figure}
+  
+  Independent simulations exhibit similar amounts of quenched disorder. 
+  We pooled the deviations of each head group COM from idealized positions
+  from all independent simulations in order to create the distributions shown in 
+  Figure~\ref{fig:offset_ensemble_pooled} 
+  (see section~\ref{method:simple_systems}). The distributions appear 
+  symmetric meaning that there is an equal chance for a head group to displace
+  in the positive or negative $z$, $r$ or $\theta$-direction. We verified that
+  this is the case for individual COMs. 
+  % For a given system, there are 400 head groups. 
+  If we consider the COM of a given head group, we expect that the
+  distribution of its deviations from its idealized position among all the 
+  independent simulations
+%  the $z$, $r$, and $\theta$ directions 
+  should be symmetric about its idealized position. We can calculate the 
+  empirical cumulative distribution function (ECDF) 
+  of these distributions of deviations. 
+  % Each ECDF contains 40 data points, one from each independent simulation.
+  The ECDFs of 3 randomly selected COMs
+  are shown in Figure~\ref{fig:offset_ecdfs} (colored lines). The average 
+  of all COM ECDFs is represented by the red line with the 95 \% confidence
+  interval represented by the red error bars. We also calculated 
+  the ECDF from the full distributions in Figure~\ref{fig:offset_ensemble_pooled}
+  (black line with error bars). We generated error bars that represent the 95\% 
+  confidence intervals, by performing 1000 trials where we randomly sampled 40
+  values (the same as the number of independent simulations) from the distributions in 
+  Figure~\ref{fig:offset_ensemble_pooled}, then measured the deviation between
+  the sampled ECDF and the full ECDF. These error bars are generally smaller than
+  those generated from the 400 COM ECDFs. This is because there is a wider
+  distribution of mean COM deviations than the mean deviations from distributions
+  sampled from the full distribution. The above evidence supports that each quenched
+  configuration is random and mostly independent.
+  
+  %BJC15: will not waste much time formatting until we converge on a figure 
+  \begin{figure}[!htb]
+  \centering
+%  \begin{subfigure}{\textwidth}
+%  \includegraphics[width=\textwidth]{sandwiched_ensemble_pooled.png}
+%  \caption{Sandwiched}\label{fig:sandwiched_ensemble_pooled.png}
+%  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+  \includegraphics[width=\textwidth]{offset_ensemble_pooled.png}
+  \caption{Distributions of deviations from ideal positions generated with data
+  from all independent simulations}\label{fig:offset_ensemble_pooled}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+  % BJC15: I don't think it's necessary to put the 3 randomly selected ECDFs in since it
+  % doesn't provide extra information and clutters the figure. Left there for now.
+  % BJC15: Also, do you have a preference for 1-sigma or 95 % confidence intervals? I think the 95 % is fine as is
+  \includegraphics[width=\textwidth]{offset_ecdfs.png}
+  \caption{Empirical cumulative distribution functions generated from (a) and
+  from simulation ensembles.}\label{fig:offset_ecdfs}
+  \end{subfigure}
+  \caption{(a) The distributions of the head group COM deviations
+  from their idealized positions generated using pooled data from all
+  frames of each independent configuration is symmetric. This implies that 
+  there is equal probability for a head group to displace in the positive
+  or negative $z$, $r$ or $\theta$-direction. (b) The COM position of a 
+  given head group is displaced randomly upon quenching. The ECDF generated from
+  the pooled distributions (black) in (a) agree with the means of the 
+  ECDFs generated from each COM (red). The red error bars are larger than
+  the black error bars since there is a wider distribution of mean COM
+  deviations than the mean deviations of distributions sampled from the full
+  distribution.}\label{fig:full_ensemble_distributions}
+  \end{figure}
+  
+  % BJC15: How important is it to prove in the main text (rather than supporting)
+  % that the long systems sample the same distribution as above. Since they were
+  % generated using the same procedure, why should the reader question it? 
+  
+  The systems that we ran for 400 ns and used for most of our analysis are
+  representative of the long term simulation behavior of any system chosen from the 
+  ensemble. The distributions of standard deviations generated from each of
+  the ensemble trajectories (Figures~\ref{fig:offset_ensemble_stds} 
+  and~\ref{fig:offset_ensemble_means}) are fairly tight with ($\sigma_{\sigma_z}$,
+  $\sigma_{\sigma_r}$, $\sigma_{\sigma_\theta}$) = (0.011 nm, 0.007 nm , 0.022 radians).
+  We analyzed the first 5 ns of the 400 ns ordered parallel displaced
+  configuration and observe the same amount of disorder (based on the $\sigma$ values
+  in Figure~\ref{fig:offset_ensemble_stds}) with indistinguishable 
+  mean values. Additionally, we calculated the radial density of monomer components as a 
+  function of their distance from the pore centers (Figure~\ref{fig:offset_ensemble_regional_density}).
+  All simulations have similar profiles. The distribution of sodium ions near the
+  pore center is relatively noisy since the sodium ions are have much more 
+  translational freedom than the head groups. 
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{offset_ensemble_stds.png}
+  \caption{}\label{fig:offset_ensemble_stds}
+  \end{subfigure}
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{offset_ensemble_means.png}
+  \caption{}\label{fig:offset_ensemble_means}
+  % BJC15: The mean z-value seems a little silly since it is basically zero except for numerical error I presume
+  % The mean is required to be zero for the calculation to work since columns are randomly displaced.
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+  \includegraphics[width=\textwidth]{offset_ensemble_regional_density.png}
+  %BJC15: I can explicitly define the colors for each system since all the ugly colors come out on top
+  \caption{}\label{fig:offset_ensemble_regional_density}
+  \end{subfigure}
+  \caption{(a) The standard deviation of the distribution of quenched disorder
+  from the first 5 ns of the main ordered parallel displaced system studied in
+  this paper (black dashed line) is in agreement with the distribution of quenched disorder 
+  standard deviations calculated from the ensemble of simulations (histogram). 
+  (b) The mean values of $z$, $r$ and $\theta$ from the first 5 ns of the main
+  system (black dashed line) is in agreement with the distribution of mean values
+  calculated from each simulation in the ensemble. (c) The radial densities of tail
+  atoms, head group atoms and sodium atoms calculated from the first 5 ns of the
+  main system simulation trajectory (black lines) and from the ensemble of 
+  trajectories (all other lines) look qualitatively similar.}\label{fig:ensemble_stds}
   \end{figure}
   
   We can explain the discrepancies between R-$\pi$ seen experimentally
@@ -2611,21 +2779,36 @@
   of the simulated R-$\pi$ is too high, which may be a consequence of too much short-range
   ordering in the $z$-direction in addition to high degrees of correlation 
   between columns. Finally, the $q_r$ cross-section of R-$\pi$ is not smooth, 
-  which is also likely a consequence of columns that are too highly correlated. 
+  which is also likely a consequence of columns that are too highly correlated.
+  If we limit ourselves to standard simulation techniques, it is necessary to 
+  average data generated from ensembles of independent simulation trajectories
+  in order to begin converging on time-averaged descriptions of the system's
+  molecular structure. 
   
   % BJC15 : Matt comment: "I found the discussion of pore structure in the first 
   % full paragraph on page 38 is a bit hard to follow. Maybe a schematic of what 
   % “in between sandwiched and parallel displaced” looks like would be helpful"
-  The architecture of each column is therefore likely in between our sandwiched and parallel
-  displaced configurations. The parallel displaced configuration that we have simulated in this
-  paper is an exaggerated manifestation of the parallel displaced $\pi-\pi$
-  stacking mode. The experimental WAXS pattern shows faint off-axis features at the
-  same $q_r$ value as R-double which is only present in simulated patterns generated from
-  parallel displaced configurations. The monomers may prefer to be parallel displaced, but
-  their displacement is likely only slightly shifted, on the $xy$ plane, from the
-  center of mass of their vertically adjacent neighbors. In this way, columns can
-  more easily act independently while maintaining a parallel displaced structure. 
+  % BJC15: could move figure to supplemental to save space
+  % BJC15: Added a transition type clause to the beginning of this first sentence
+  % to help with flow. It might be too much though.
+  A secondary conclusion that we've drawn from the evidence in this section is 
+  that the architecture of each column is likely in between our sandwiched
+  and parallel displaced configurations. The parallel displaced configuration 
+  that we have simulated in this paper is an exaggerated manifestation of the 
+  parallel displaced $\pi-\pi$ stacking mode. Not only is the intensity of R-$\pi$
+  calculated from the ensemble of parallel displaced simulations in close agreement
+  with experiment, but the experimental WAXS pattern shows faint off-axis features
+  at the same $q_r$ value as R-double which are only present in simulated patterns
+  generated from parallel displaced configurations. The monomers may prefer to be
+  parallel displaced, but their displacement is likely only slightly shifted, on 
+  the $xy$ plane, from the center of mass of their vertically adjacent neighbors 
+  (See Figure~\ref{fig:between_pd}). In this way, columns can more easily act 
+  independently while maintaining a parallel displaced structure. It is hard to
+  imagine parallel displaced columns, as we have set them up, acting independently 
+  unless we force them to be that way, as we did to create the ensemble of parallel
+  displaced simulations. 
   
+  %BJC15: figure in response to Matt
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.45\textwidth}
@@ -2647,135 +2830,6 @@
   When $\theta$=0$\degree$, the system architecture is the same as a sandwiched 
   configuration.}\label{fig:between_pd}
   \end{figure}
-  
-% BJC15: this paragraph reframed and expanded below
-%  Because disorder among head groups in the simulated 
-%  atomistic systems is largely determined by each system's quenched configuration,
-%  one would need to average an ensemble of simulations in order to optimally match the experimental WAXS pattern. 
-%  Both the initial configuration and initial velocity randomization lead to 
-%  different quenched configurations every time we run an equilibration simulation.
-%  Although the simulated XRD pattern changes dynamically as we simulate the system
-%  due to thermal fluctuations, its features are largely determined by the initial 
-%  quenched configuration. Here we assume that the timescales for large scale 
-%  rearrangements of the system are much longer than what we can feasibly simulate.   
-  
-  Since the dynamics of this system appear to be quite slow, we can learn more about
-  their time-averaged structure by studying ensembles of simulations.
-  Disorder among head groups in the simulated atomistic systems is largely determined
-  by each system's quenched configuration. We observe rapid reorganization of our 
-  initial configurations into configurations with quenched disorder that does not
-  vary significantly for the remainder of the % BJC15: I could quantify this more and put in supporting info
-  simulation time. For that reason, we created ensembles of 40 simulations in both
-  the parallel displaced and sandwiched configurations. We used the same equilibration
-  technique as above (see section~\ref{section:equilibration}), however we stopped 
-  the equilibration after 5 ns of unrestrained simulation. We simulated XRD patterns
-  from the 40 concatenated trajectories. The $q_r$ cross-sections generated from the 
-  two concatenated trajectories are shown in Figure~\ref{fig:ensemble_XRD}. 
-  Qualitatively, the $q_r$ cross-sections of R-$\pi$ are nearly smooth, with small
-  spikes near $q_r$=0. The data suggests that the average
-  intensity of R-$\pi$ in sandwiched systems is about 3$\times$ higher than that in the
-  parallel displaced configuration. Overall, the intensity of R-$\pi$ generated from the
-  parallel displaced ensemble shows the best agreement with experiment so far. For
-  simplicity, we will limit the following discussion to the parallel displaced 
-  configuration. Equivalent data is available for the sandwiched configuration in the
-  supporting information.
-  %BJC15: limiting discussion to parallel displaced since it seems most consistent with experiment
-  % However, I can switch it sandwiched very easily. 
-  
-  %BJC15: This figure might not be necessary. Do the comparisons of emperical
-  % cumulative distribution functions make the same point? 
-  \begin{figure}[!htb]
-  \centering
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{sandwiched_ensemble_rsection.png}
-  \caption{Sandwiched}\label{fig:sandwiched_ensemble_rsection}
-  \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{offset_ensemble_rsection.png}
-  \caption{Parallel Displaced}\label{fig:offset_ensemble_rsection}
-  \end{subfigure}
-  \caption{The $q_r$ section of R-$\pi$ is much smoother when simulated XRD patterns
-  		   are generated from an ensemble of 40 independent simulations. The maximum 
-  		   intensity of R-$\pi$ is 3$\times$ higher in the sandwiched configuration (a)
-  		   than in the parallel displaced configuration (b).}\label{fig:ensemble_XRD}
-  \end{figure}
-  
-  Independent simulations exhibit similar amounts of quenched disorder. For 
-  each, we measured the deviation of the head group centers of mass from their
-  idealized positions (see section~\ref{method:simple_systems}). 
-  We created histograms of the standard deviations of each distribution which
-  are shown in Figure~\ref{fig:ensemble_stds}. The distributions of standard deviations
-  are fairly tight with ($\sigma_\sigma_z$, $\sigma_\sigma_r$, $\sigma_\sigma_\theta$) = (0.011 nm, 
-  0.007 nm , 0.022 radians). We pooled the deviations from idealized positions 
-  from all independent simulations in order to create the distributions shown in 
-  Figure~\ref{fig:offset_ensemble_pooled}. The distributions appear 
-  symmetric meaning that there is an equal chance for a head group to displace
-  in the positive or negative $z$, $r$ or $\theta$-direction. We verified that
-  this is the case for individual center of masses. 
-  % For a given system, there are 400 head groups. 
-  If we consider the center of mass of the first head group, we expect that the
-  distribution of its deviation from its idealized position among all the 
-  independent simulations
-%  the $z$, $r$, and $\theta$ directions 
-  should be symmetric about its idealized position. We can calculate the 
-  empirical cumulative distribution function (ECDF) 
-  of this distribution of deviations. 
-  % Each ECDF contains 40 data points, one from each independent simulation.
-  The ECDFs of 5 randomly selected centers of 
-  mass are shown in Figure~\ref{fig:offset_ecdfs} (colored lines). We also calculated 
-  the ECDF from the full distributions in Figure~\ref{fig:offset_ensemble_pooled}
-  (black line with error bars). We generated error bars that represent the 95\% 
-  confidence intervals, by randomly sampling 40 values (the same as the number 
-  of independent simulations) from the distributions in 
-  Figure~\ref{fig:offset_ensemble_pooled}, then measuring the deviation between
-  the sampled ECDF and the full ECDF. The center of mass ECDFs lie between the
-  error bars of the full ECDF within reason. This provides further evidence that
-  each center of mass moves independently, in random directions when systems
-  quench.
-  
-% Sandwiched: (0.019 nm, 0.007 nm, 0.023 radians)
-  
-  \begin{figure}[!htb]
-  \centering
-%  \begin{subfigure}{0.45\textwidth}
-%  \includegraphics[width=\textwidth]{sandwiched_ensemble_stds.png}
-%  \caption{Sandwiched}\label{fig:sandwiched_ensemble_stds.png}
-%  \end{subfigure}
-%  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=0.45\textwidth]{offset_ensemble_stds.png}
-%  \caption{Parallel Displaced}\label{fig:offset_ensemble_stds.png}
-%  \end{subfigure}
-  \caption{There is a narrow spread in the standard deviation of
-  quenched disorder for each independent configuration.}\label{fig:ensemble_stds}
-  \end{figure}
-  
-  %BJC15: will not waste much time formatting until we converge on a figure 
-  \begin{figure}[!htb]
-  \centering
-%  \begin{subfigure}{\textwidth}
-%  \includegraphics[width=\textwidth]{sandwiched_ensemble_pooled.png}
-%  \caption{Sandwiched}\label{fig:sandwiched_ensemble_pooled.png}
-%  \end{subfigure}
-  \begin{subfigure}{\textwidth}
-  \includegraphics[width=\textwidth]{offset_ensemble_pooled.png}
-  \caption{Distributions of deviations from ideal positions generated with data
-  from all independent simulations}\label{fig:offset_ensemble_pooled}
-  \end{subfigure}
-  \begin{subfigure}{\textwidth}
-  \includegraphics[width=\textwidth]{offset_ecdfs.png}
-  \caption{Emperical cumulative distribution functions generated from (a) and
-  from simulation ensembles.}\label{fig:offset_ecdfs}
-  \end{subfigure}
-  \begin{subfigure}{\textwidth}
-  \includegraphics[width=\textwidth]{offset_ensemble_regional_density.png}
-  \caption{Radial density of select monomer components.}\label{fig:offset_ensemble_regional_density}
-  \end{subfigure}
-  \caption{The distributions of the deviations of head group center of masses
-  from their idealized positions generated using pooled data from all
-  frames of each independent configuration is symmetric. This implies that 
-  there is equal probability for a head group to displace in the positive
-  or negative $z$, $r$ or $\theta$-direction.}\label{fig:full_ensemble_distributions}
-  \end{figure}
 
   %MRS10: Maybe rephrases; rather than talking about building a better
   %model, you can summarize the differences that could explain the discrepancy between experiment and simulation.
@@ -2794,22 +2848,6 @@
 %  long simulation times, or enhanced sampling techniques so that monomers within
 %  columns can rearrange and sample enough independent configurations to generate
 %  a robust simulated XRD pattern. 
- 
-  %BJC6: not sure if this should go in supplemental
-%  \begin{figure}
-%  \centering
-%  \begin{subfigure}{0.4\textwidth}
-%	  \includegraphics[width=\linewidth]{sandwich_rzplot_highlimit_cbar.png}
-%	  \caption{}\label{fig:simulated_adjusted_colorbar}
-%  \end{subfigure}
-%  \begin{subfigure}{0.4\textwidth}
-%	  \includegraphics[width=\linewidth]{WAXS_raw_adjusted_colorbar.png}
-%	  \caption{}\label{fig:experimental_adjusted_colorbar}
-%  \end{subfigure}
-%  \caption{R-$\pi$ and R-pores are far more intense than the other major reflections in 
-%  the simulated diffraction patterns (a). Here, the colorbar was scaled so that the max is 6x
-%  higher than all other plots.}\label{fig:intense_rpi}
-%  \end{figure}
 
   \subsubsection{Origin of R-double}\label{section:rdouble}
   

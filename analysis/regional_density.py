@@ -177,7 +177,7 @@ if __name__ == "__main__":
             plt.bar(r, density, bin_width, color=colors[i], alpha=0.6, label=reg)
 
         np.savez_compressed("regional_density", results=results, r=r, bw=bin_width, box=t.unitcell_vectors)
-        print('Arrays saved as density.npz')
+        print('Arrays saved as regional_density.npz')
 
         if args.solvate:
 
