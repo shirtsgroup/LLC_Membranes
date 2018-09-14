@@ -202,6 +202,9 @@ class Topology():
 
         self.define_topology()
 
+        self.initiators = []  # indices of new initiator atoms which need to switched from virtual sites
+        self.radicals = []  # indices of carbon atoms that are now radicals
+
     def define_topology(self):
 
         start = time.time()
@@ -271,10 +274,11 @@ class Topology():
             vsites = self.residues[self.res_ndx].virtual_sites
             for i in range(nres):
                 for j in range(len(vsites)):
-                    f.write('{:<8d}{:<6d}{:<6d}{:<6d}{:<8d}{:<8s}{:<11s}{:<11s}{:<11s}\n'.format(int(vsites[j][0]) +
-                            i * natoms, int(vsites[j][1]) + i * natoms, int(vsites[j][2]) + i * natoms,
-                            int(vsites[j][3]) + i * natoms, int(vsites[j][4]) + i * natoms, vsites[j][5], vsites[j][6],
-                            vsites[j][7], vsites[j][8]))
+                    if (int(vsites[j][0]) + i * natoms) not in self.initiators:
+                        f.write('{:<8d}{:<6d}{:<6d}{:<6d}{:<8d}{:<8s}{:<11s}{:<11s}{:<11s}\n'.format(int(vsites[j][0]) +
+                                i * natoms, int(vsites[j][1]) + i * natoms, int(vsites[j][2]) + i * natoms,
+                                int(vsites[j][3]) + i * natoms, int(vsites[j][4]) + i * natoms, vsites[j][5], vsites[j][6],
+                                vsites[j][7], vsites[j][8]))
 
     def create_adjacency_matrix(self):
 
@@ -332,9 +336,6 @@ class System(Topology):
 
         self.bond_c1 = None
         self.bond_c2 = None
-
-        self.new_initiators = None  # indices of new initiator atoms which need to switched from virtual sites
-        self.new_radicals = None  # indices of carbon atoms that are now radicals
 
     def energy_minimize(self, configuration, mdp='em.mdp', top='topol.top', out='em'):
         """
@@ -409,16 +410,16 @@ class System(Topology):
 
         # This loop can probably be made better if I set up the virtual site list differently
         # Get indices of hydrogen atoms to make real
-        self.new_initiators = []
         for i, ndx in enumerate(c1 % self.xlink_residue.natoms):
             j = 0
             # the following assumes that index 1 contains the index of the atom to which hydrogen will be bonded
+            # It is the index of the atom bonded to the virtual site hydrogen
             while int(self.xlink_residue.virtual_sites[j][1]) != ndx:
                 j += 1
 
             H_serial = int(self.xlink_residue.virtual_sites[j][0]) + self.xlink_residue.natoms * \
                        (c1[i] // self.xlink_residue.natoms)
-            self.new_initiators.append(H_serial)
+            self.initiators.append(H_serial)
 
             # TODO: This doesn't work since topology only describes a single monomer. So this will need to be written
             # into the topology writer based on all of the new hydrogens
@@ -427,26 +428,25 @@ class System(Topology):
 
         # add bonds
         for i, x in enumerate(c1):
-            self.all_bonds.append([x, self.new_initiators[i]])
+            self.all_bonds.append([x, self.initiators[i]])
 
-    def identify_radicals(self):
+    def identify_new_radicals(self):
 
         # c2 next to c1 that just bonded to a different c2 is now a radical
         diff = np.array(self.xlink_residue.c1_atom_indices) - np.array(self.xlink_residue.c2_atom_indices)
         tails = self.bond_c1 % len(self.xlink_residue.c1_atoms)  # define which tail each c2 atom is part of
-        self.new_initiators = self.bond_c1 - diff[tails]  # indices of c1 atoms which gain a hydrogen atom
+        for i in self.bond_c1 - diff[tails]:  # indices of c1 atoms which gain a hydrogen atom
+            self.radicals.append(i)
 
     def bond(self):
 
-        sys.make_initiators_real()
-        sys.identify_radicals()
-        exit()
+        self.make_initiators_real()  # turn dummy atoms into real atoms
+        self.identify_new_radicals()  # get indices of the latest radicals
+
         for i, x in enumerate(self.bond_c1):
             self.all_bonds.append([x, self.bond_c2[i]])
 
-        print(self.xlink_residue.virtual_sites[0][0])
-        exit()
-        self.define_topology()
+        self.define_topology()  # make new angles, pairs and dihedrals lists
 
 
 if __name__ == "__main__":
@@ -470,8 +470,9 @@ if __name__ == "__main__":
     sys = System(args.initial, 'HII', 'HIId', dummy_name=dummy_name)
     sys.select_eligible_carbons(percent=args.cutoff)
     sys.bond()
-    exit()
     sys.write_assembly_topology()
+    # exit()
+    # sys.write_assembly_topology()
     full_top = SystemTopology(dummy_name, ff='gaff', xlink=True)  # topology with other residues and forcefield
     full_top.write_top(name=topname, crosslinked_top_name=xlink_top_name)
     # generate input files that will be used throughtout process
