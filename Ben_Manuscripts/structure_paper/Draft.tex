@@ -2615,26 +2615,31 @@
 %  quenched configuration. Here we assume that the timescales for large scale 
 %  rearrangements of the system are much longer than what we can feasibly simulate.   
   
-  Since the dynamics of this system appear to be quite slow, and consequently most of
-  our analysis has been focused on a small set of quenched configurations whose 
-  structures do not vary significantly with time, we attempted
-  to learn more about their time-averaged structures by studying ensembles of simulations.
+  Since the dynamics of this system are slow, and consequently most of
+  our analysis has been focused on a set of quenched configurations with some structural characteristics that do not 
+  vary significantly with time, we attempted
+  to learn more about their time-averaged structures by studying ensembles of shorter simulations started
+  from more independent initial configurations.
 %  Disorder among head groups in the simulated atomistic systems is largely determined
 %  by each system's quenched configuration. We observe rapid reorganization of our 
 %  initial configurations into configurations with quenched disorder that does not
 %  vary significantly for the remainder of the
 %  simulation time. For that reason, 
   We created ensembles of 40 simulations in both the parallel displaced and 
-  sandwiched configurations. We used the same equilibration technique as above 
-  (see section~\ref{section:equilibration}), however we built the initial
+  sandwiched configurations. We used the same equilibration scheme as above 
+  (see section~\ref{section:equilibration}). However, we built the initial
   configurations with randomly displaced columns in the $z$-direction and
-  then stopped their equilibration after 5 ns of unrestrained simulation. We 
-  simulated XRD patterns from the 40 concatenated trajectories. The $q_r$ 
+  looked at the results after 5 ns of unrestrained simulation, which should capture any quenched disorder built in 
+  from the initial configurations. We 
+  then simulated XRD patterns from the 40 trajectories, concatenated together. The $q_r$ 
   cross-sections of R-$\pi$ generated from the two concatenated trajectories are shown
   in Figure~\ref{fig:ensemble_XRD}. Qualitatively, the cross-sections
-  of are nearly smooth, with small spikes near $q_r$=0. The data 
-  suggests that the average intensity of R-$\pi$ in sandwiched systems is 
+  of are nearly smooth, with only small spikes near $q_r$=0. These data 
+  %MRS15: for sentence below - qualify about the ensemble?
+  suggest that the average intensity of R-$\pi$ in sandwiched systems is 
   about 3$\times$ higher than that in the parallel displaced configuration. 
+  %MRS16: probably don't want to talk about which combination BEST agrees with the ensemble,
+  %but present the different things that in combination would explain most of the differences.
   Overall, the intensity of R-$\pi$ generated from the parallel displaced 
   ensemble shows the best agreement with experiment so far. For simplicity, 
   we will limit the following discussion to the parallel displaced configuration.
@@ -2642,7 +2647,7 @@
   supporting information. %BJC15: to be added
   %BJC15: limiting discussion to parallel displaced since it seems most consistent with experiment
   % However, I can switch it to sandwiched very easily. The discussion below will remain the same
-  
+  %MRS15: I think better to just talk about how much things can be reduced in height.  If there are OTHER features that look more characteristic of the experiment in parallel displaced, you can talk about those.
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.45\textwidth}
@@ -2654,12 +2659,12 @@
   \caption{Parallel Displaced}\label{fig:offset_ensemble_rsection}
   \end{subfigure}
   \caption{The $q_r$ section of R-$\pi$ is much smoother when we generate simulated XRD
-  		   patterns from an ensemble of 40 independent simulations. The maximum 
+  		   patterns from an ensemble of 40 independent simulations, suggesting that much of the extra initial intensity may be due to the starting conditions. The maximum 
   		   intensity of R-$\pi$ is 3$\times$ higher in the sandwiched configuration (a)
   		   than in the parallel displaced configuration (b).}\label{fig:ensemble_XRD}
   \end{figure}
   
-  Independent simulations exhibit similar amounts of quenched disorder. 
+  These short independent simulations exhibit similar amounts of quenched disorder. 
   We pooled the deviations of each head group COM from idealized positions
   from all independent simulations in order to create the distributions shown in 
   Figure~\ref{fig:offset_ensemble_pooled} 
@@ -2677,7 +2682,7 @@
   of these distributions of deviations. 
   % Each ECDF contains 40 data points, one from each independent simulation.
   The ECDFs of 3 randomly selected COMs
-  are shown in Figure~\ref{fig:offset_ecdfs} (colored lines). The average 
+  are shown in Figure~\ref{fig:offset_ecdfs} to guide the eye (colored lines). The average 
   of all COM ECDFs is represented by the red line with the 95 \% confidence
   interval represented by the red error bars. We also calculated 
   the ECDF from the full distributions in Figure~\ref{fig:offset_ensemble_pooled}
@@ -2686,10 +2691,9 @@
   values (the same as the number of independent simulations) from the distributions in 
   Figure~\ref{fig:offset_ensemble_pooled}, then measured the deviation between
   the sampled ECDF and the full ECDF. These error bars are generally smaller than
-  those generated from the 400 COM ECDFs. This is because there is a wider
+  those generated from the 400 COM ECDFs, as there is a wider
   distribution of mean COM deviations than the mean deviations from distributions
-  sampled from the full distribution. The above evidence supports that each quenched
-  configuration is random and mostly independent.
+  sampled from the full distribution. The similarity between entirely indepdently sampled CDFs and the CDFs from individual independent simulations supports the that each quenched configuration is random and mostly independent.
   
   %BJC15: will not waste much time formatting until we converge on a figure 
   \begin{figure}[!htb]
@@ -2706,14 +2710,16 @@
   \begin{subfigure}{\textwidth}
   % BJC15: I don't think it's necessary to put the 3 randomly selected ECDFs in since it
   % doesn't provide extra information and clutters the figure. Left there for now.
+  % MRS15: kind of nice to guide the eye?
   % BJC15: Also, do you have a preference for 1-sigma or 95 % confidence intervals? I think the 95 % is fine as is
+  %MRS15: 95% is fine.
   \includegraphics[width=\textwidth]{offset_ecdfs.png}
   \caption{Empirical cumulative distribution functions generated from (a) and
   from simulation ensembles.}\label{fig:offset_ecdfs}
   \end{subfigure}
   \caption{(a) The distributions of the head group COM deviations
   from their idealized positions generated using pooled data from all
-  frames of each independent configuration is symmetric. This implies that 
+  frames of each independent configuration is symmetric, implying that 
   there is equal probability for a head group to displace in the positive
   or negative $z$, $r$ or $\theta$-direction. (b) The COM position of a 
   given head group is displaced randomly upon quenching. The ECDF generated from
@@ -2727,8 +2733,10 @@
   % BJC15: How important is it to prove in the main text (rather than supporting)
   % that the long systems sample the same distribution as above. Since they were
   % generated using the same procedure, why should the reader question it? 
+  % MRS15: because they could all collapse to the SAME (or similar) quenched disorder, rather than 
+  % different, mostly independent ones.
   
-  The systems that we ran for 400 ns and used for most of our analysis are
+  The systems run for 400 ns and used for most of our analysis are
   representative of the long term simulation behavior of any system chosen from the 
   ensemble. The distributions of standard deviations generated from each of
   the ensemble trajectories (Figures~\ref{fig:offset_ensemble_stds} 
@@ -2754,10 +2762,12 @@
   \caption{}\label{fig:offset_ensemble_means}
   % BJC15: The mean z-value seems a little silly since it is basically zero except for numerical error I presume
   % The mean is required to be zero for the calculation to work since columns are randomly displaced.
+  %MRS15: good point.  Probably can leave that off. 
   \end{subfigure}
   \begin{subfigure}{\textwidth}
   \includegraphics[width=\textwidth]{offset_ensemble_regional_density.png}
   %BJC15: I can explicitly define the colors for each system since all the ugly colors come out on top
+  %MRS15: sounds good.  Maybe a bit narrower lines?
   \caption{}\label{fig:offset_ensemble_regional_density}
   \end{subfigure}
   \caption{(a) The standard deviation of the distribution of quenched disorder
@@ -2771,7 +2781,9 @@
   main system simulation trajectory (black lines) and from the ensemble of 
   trajectories (all other lines) look qualitatively similar.}\label{fig:ensemble_stds}
   \end{figure}
-  
+
+  %MRS15: make it more clear that you are now summing up this section.  Perhaps put
+  %subheadings in this section, as I discussed.
   We can explain the discrepancies between R-$\pi$ seen experimentally
   and in simulation using what we have shown in this section. The stacking
   distance between monomer head groups is too large, likely due to failures
@@ -2791,7 +2803,7 @@
   % BJC15: could move figure to supplemental to save space
   % BJC15: Added a transition type clause to the beginning of this first sentence
   % to help with flow. It might be too much though.
-  A secondary conclusion that we've drawn from the evidence in this section is 
+  A secondary conclusion drawn from the evidence in this section is 
   that the architecture of each column is likely in between our sandwiched
   and parallel displaced configurations. The parallel displaced configuration 
   that we have simulated in this paper is an exaggerated manifestation of the 
@@ -2803,12 +2815,11 @@
   parallel displaced, but their displacement is likely only slightly shifted, on 
   the $xy$ plane, from the center of mass of their vertically adjacent neighbors 
   (See Figure~\ref{fig:between_pd}). In this way, columns can more easily act 
-  independently while maintaining a parallel displaced structure. It is hard to
-  imagine parallel displaced columns, as we have set them up, acting independently 
-  unless we force them to be that way, as we did to create the ensemble of parallel
-  displaced simulations. 
-  
-  %BJC15: figure in response to Matt
+  independently while maintaining some features of parallel displaced structure. 
+  %MRS15: yeah, cut the last bit.
+
+  %BJC15: figure in response to Matt.  
+  %MRS15: This seems like something for supporting information.
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.45\textwidth}
@@ -3783,19 +3794,21 @@
 %  that is in good agreement with experimental data.
 
   % BJC15: first pass at a brief future work paragraph
+  %MRS15: tweaked.
   Future work, based on what has been learned in this study, may help further improve the 
-  structural agreement between experiment and simulation. We may be able to 
-  modify the GAFF force field or use a different force field in order to better
-  capture the $\pi-\pi$ interactions which draw stacked monomers closer together. 
+  structural agreement between experiment and simulation. 
+  %We may be able to 
+  %modify the GAFF force field or use
+  Force fields explicitly including $\pi-\pi$ interactions may be able to draw stacked monomers closer together. 
   We can study ensembles of long simulations in order to observe more averaged 
-  structure and to create more experimentally consistent XRD patterns. Finally, we can
-  run extremely long simulations (on the order of \SI{}{\micro s}) in order to better 
-  quantify the time scales for large scale rearrangements to occur. 
+  structure and to create more experimentally consistent XRD patterns. Extremely long simulations 
+  (on the order of \SI{}{\micro s}) may be necessary to better 
+  quantify the time scales for large scale rearrangements, and the precise arrangements themselves.
 
-  With the structural understanding gained by these simulations, it will becomes
+  With the structural understanding gained by these simulations, it will be
   possible to evaluate transport of various solutes within the system, and apply the
   knowledge gained from this study in order to suggest improvements to the
-  existing system as well as to evaluate new unsynthesized LLC systems.
+  existing system, as well as to evaluate new unsynthesized LLC systems.
 
   \clearpage
   \bibliography{llc}
