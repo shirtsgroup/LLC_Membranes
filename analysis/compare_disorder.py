@@ -114,27 +114,28 @@ if __name__ == "__main__":
         name = 'offset'
 
     # Histograms of means of distributions
-    fig, axmean = plt.subplots(1, 3, sharey=True)
+    fig, axmean = plt.subplots(1, 2, sharey=True)
 
     bins = 10
-    axmean[0].hist(means[:, 0], bins=bins)
-    axmean[0].plot([2.09e-17, 2.09e-17], [0, 13], '--', color='black', linewidth=2)  # parallel displaced
-    axmean[0].set_xlabel('$\mu_z$ (nm)', fontsize=16)
-    axmean[0].set_ylabel('Count', fontsize=16)
-    axmean[0].xaxis.set_tick_params(labelsize=12)
-    axmean[0].yaxis.set_tick_params(labelsize=12)
+    # axmean[0].hist(means[:, 0], bins=bins)
+    # axmean[0].plot([2.09e-17, 2.09e-17], [0, 13], '--', color='black', linewidth=2)  # parallel displaced
+    # axmean[0].set_xlabel('$\mu_z$ (nm)', fontsize=16)
+    # axmean[0].set_ylabel('Count', fontsize=16)
+    # axmean[0].xaxis.set_tick_params(labelsize=12)
+    # axmean[0].yaxis.set_tick_params(labelsize=12)
 
-    axmean[1].hist(means[:, 1], bins=bins)
-    axmean[1].plot([0.71, 0.71], [0, 13], '--', color='black', linewidth=2)  # parallel displaced
-    axmean[1].set_xlabel('$\mu_r$ (nm)', fontsize=16)
+    axmean[0].hist(means[:, 1], bins=bins)
+    axmean[0].plot([0.71, 0.71], [0, 13], '--', color='black', linewidth=2)  # parallel displaced
+    axmean[0].set_xlabel('$\mu_r$ (nm)', fontsize=16)
+    axmean[0].xaxis.set_tick_params(labelsize=12)
+    axmean[0].yaxis.set_ticks(np.linspace(0, 8, 5))
+
+    axmean[1].hist(means[:, 2], bins=bins)
+    axmean[1].plot([-0.04, -0.04], [0, 12], '--', color='black', linewidth=2)  # parallel displaced
+    axmean[1].set_xlabel('$\mu_\Theta$ (radians)', fontsize=16)
     axmean[1].xaxis.set_tick_params(labelsize=12)
 
-    axmean[2].hist(means[:, 2], bins=bins)
-    axmean[2].plot([-0.04, -0.04], [0, 12], '--', color='black', linewidth=2)  # parallel displaced
-    axmean[2].set_xlabel('$\mu_\Theta$ (radians)', fontsize=16)
-    axmean[2].xaxis.set_tick_params(labelsize=12)
-
-    # plt.ylim(0, 11.5)
+    plt.ylim(0, 9)
     plt.tick_params(labelsize=14)
     plt.tight_layout()
     plt.savefig(

@@ -19,7 +19,7 @@
 
 %\SectionNumbersOn
 
-\externaldocument[M-]{draft}
+\externaldocument[M-]{Draft}
 \title{Supporting Information : Understanding the nanoscale structure of hexagonal phase lyotropic liquid crystal membranes}
 \author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble \and Joe Yelk \and Matthew Glaser \and Xunda Feng \and Michael R. Shirts}
 
@@ -33,13 +33,15 @@
  
   We parameterized monomers according to the following procedure:
   \begin{enumerate}
+  
 	\item \textit{Create monomer structure file with connectivity} : We
 	drew atomistic structures using MarvinSketch
 	17.13~\cite{chemaxon_marvinsketch_2017} with all hydrogen atoms drawn out
-	explicitly. We optimized the 3D geometry of the structure using the 'Clean in
+	explicitly. We optimized the 3D geometry of the structure using the `Clean in
 	3D' function of MarvinSketch.  We saved the structure as a .mol file, then
 	converted it to .pdb format using Open Babel 2.4.1
 	\cite{oboyle_open_2011,noauthor_open_nodate}. 
+	
 	\item \textit{Assign GAFF atomtypes using \texttt{antechamber}} : Using
 	the .pdb structure file as input, we ran
 	\texttt{antechamber}~\cite{wang_automatic_2006} using the AM1-BCC charge model.
@@ -47,10 +49,12 @@
 	a separate residue. We use \texttt{LEaP}~\cite{case_ambertools16_2016} and the
 	output of \texttt{antechamber} to create Amber topology files. A detailed
 	tutorial can be accessed elsewhere \cite{walker_antechamber_nodate}.
+
 	\item \textit{Create GROMACS topologies from Amber output} : The output
 	of \texttt{LEaP} is a .inpcrd and a .prmtop file which are Amber topology
 	files. Using acpype.py \cite{sousa_da_silva_acpype_2012}, we converted the
 	\texttt{LEaP} output into GROMACS .gro and .top files. 
+
 	\item \textit{Perform a simulated annealing procedure on the monomer} :
 	We created a cubic box around the monomer using the GROMACS command \texttt{gmx
 	editconf}. The monomer was centered in the box with edges of the
@@ -59,17 +63,20 @@
 	simulated annealing procedure. We linearly decreased the temperature of the
 	system from 1000 K to 50 K over the course of 10 ns. We randomly chose a monomer
 	configuration from the last 10 \% of the trajectory. 
+
 	\item \textit{Reassign charges with \texttt{molcharge}}: With the monomer
 	configuration taken from the annealed trajectory, we reassigned charges using
 	\texttt{molcharge} with the am1bccsym method in order to ensure charges 
 	are symmetric. This condition is not guaranteed with \texttt{antechamber}. 
 	The charges in the GROMACS topology file (.top) were replaced with the 
 	new charges calculated by \texttt{molcharge}. 
+
 	\item \textit{Anneal again to get final structure} : We repeated the
 	same simulated annealing procedure using the monomer topology with
 	\texttt{molcharge} charges. A random monomer configuration was pulled from the
 	last 10 \% of the trajectory and was used to build all assemblies reported
 	(Figure~\ref{fig:monomer}).
+
   \end{enumerate} 
   \clearpage
   \begin{figure}[!htb]
@@ -104,7 +111,7 @@
   coupling since the shape of the unit cell will likely need to change in order to 
   accommodate hexagonally packed pores.
   
-  We use the nematic order parameter as defined in section~\ref{method:nematic_order} to 
+  We use the nematic order parameter as defined in Section~\ref{method:nematic_order} to 
   observe any progress towards system ordering. In both cases, we see that the nematic
   order parameter stays close to zero for the duration of the simulation time, indicating
   an isotropic arrangement of head groups (Figure~\ref{fig:nematic_isotropic}). The values
@@ -128,6 +135,48 @@
   parameter hovers close to zero for the duration of the simulation meaning the system
   maintains its isotropic alignment.}\label{fig:self_assembly}
   \end{figure}
+
+  \section{Number of monomers per column}\label{section:monomers_per_column}
+  
+  We chose to build all systems using 20 monomers per column. We made this choice
+  by considering a number of factors that directly affect the quality of our results. 
+  Clearly, choosing a small number of layers will cause the system to suffer from 
+  finite size effects. Even in our 20 monomer-per-column system, axial correlations
+  between stacked monomers persist throughout the entire correlation function (see
+  Figure~\ref{M-fig:correlation} of the main text). The correlation function of the system which we
+  built with 40 monomers per column is very similar to that created with 20 monomers
+  per columns (continues to oscillate for its full length
+  (Figure~\ref{fig:tall_correlation_full})). If we continue adding monomers, the 
+  correlation function will eventually fully decay but it is not worth the 
+  computational expense. Regardless, the correlation lengths calculated from 20
+  monomer per column simulations are in sufficient agreement with experiment. 
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{z_correlation_overlay.png}
+  \caption{}\label{fig:z_correlation_overlay}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{tall_correlation_full.png}
+  \caption{}\label{fig:tall_correlation_full}
+  \end{subfigure}
+  \caption{(a) The correlation functions generated from ordered basin sandwiched 
+  configurations are nearly the same when the $z$-dimension of the system is doubled.
+  (b) Oscillations persist throughout the length of the correlation function for the
+  sandwiched system in the ordered basin built with 40 monomers per column. The full
+  system is ca. 17 nm tall so the full correlation function covers half this length
+  since periodicity forces the remaining length to be its mirror image.}\label{fig:correlation_functions}
+  \end{figure}
+  
+  We may be able to simulate systems using less than 20 monomers per column, but chose
+  to use 20 since it gives fairly good resolution when simulating X-ray diffraction 
+  patterns. The size of the Fourier space bin in each dimension is determined by 
+  $\dfrac{2\pi}{L}$ where L is the length of a given box vector. The $z$-box vector 
+  for 20 monomer-per-column systems is $\approx$ 85 \AA which means we will see 
+  a reciprocal space resolution of 0.074 \AA$^{-1}$ in the z direction. Further decreasing
+  the resolution would increase the noise in the simulated patterns and make it more
+  difficult to measure the intensity of reflections of interest.
 
   \section{Initial Configuration Dependence}\label{section:initial_config_dependence}
 
@@ -227,6 +276,13 @@
   	\begin{figure}[!htb]
 	\centering
 	\begin{subfigure}{0.3\textwidth}
+	\includegraphics[width=\textwidth]{p2p_diagram.png}
+	\caption{}~\label{fig:p2p_diagram}
+%		\caption{In a perfect hexagonal, there are 5 distances that should be exactly
+%		equal. As pictured in this diagram the distance from 1-2, 1-3, 1-4, 2-4, and 3-4
+%		are the same.}~\label{fig:p2p_diagram}
+  	\end{subfigure} 
+	\begin{subfigure}{0.3\textwidth}
 		\includegraphics[width=\textwidth]{p2p_39.png}\quad
 		\vspace{-1.25em}
 		\caption{39 \AA~initial pore spacing}~\label{fig:p2p_39}
@@ -251,29 +307,21 @@
 		\vspace{-1.25em}
 		\caption{55 \AA~initial pore spacing}~\label{fig:p2p_55}
 	\end{subfigure}
-	\begin{subfigure}{0.3\textwidth}
-	\includegraphics[width=\textwidth]{p2p_diagram.png}
-	\caption{}~\label{fig:p2p_diagram}
-%		\caption{In a perfect hexagonal, there are 5 distances that should be exactly
-%		equal. As pictured in this diagram the distance from 1-2, 1-3, 1-4, 2-4, and 3-4
-%		are the same.}~\label{fig:p2p_diagram}
-  	\end{subfigure} 
-	\caption{The pore spacing during the restrained portion of the
-	dry equilibration procedure is shown. Every 50 ps (0.05 ns) we reduce the 
-	force constant on the position restraints according to the sequence: 1000000,
+	\caption{(a) In a perfect hexagonal, there are 5 distances that should be exactly
+	equal. As pictured in this diagram the distance from 1-2, 1-3, 1-4, 2-4, and 3-4
+	are the same. All plots in (b)--(f) are the average of these distances and represent
+	the pore spacing during the restrained portion of the dry equilibration procedure.
+	Every 50 ps (0.05 ns) we reduce the force constant on the position restraints according to the sequence: 1000000,
 	3162, 56, 8, 3, 2, 1, 0 kJ mol$^{-1}$ nm$^{-2}$. When we chose an initial pore
-	spacing below experimental value (a) or at the experimental value (b), there
+	spacing below experimental value (b) or at the experimental value (c), there
 	is an abrupt change in pore spacing when the position restraints are reduced to 56 kJ
-	mol$^{-1}$ nm$^{-2}$. When we initially position pores 45 \AA~apart (c) the pore spacing
-	remains relatively stable. When we initially place pores 50 \AA~apart (d), the pore
+	mol$^{-1}$ nm$^{-2}$. When we initially position pores 45 \AA~apart (d) the pore spacing
+	remains relatively stable. When we initially place pores 50 \AA~apart (e), the pore
 	spacing decreases nearly linearly once the restraints are reduced to 56 kJ
-	mol$^{-1}$ nm$^{-2}$. When we initially place pores 55 \AA~apart (e), so that monomers
+	mol$^{-1}$ nm$^{-2}$. When we initially place pores 55 \AA~apart (f), so that monomers
 	do not intersect with adjacent pores, and position restraints are reduced to 56
 	kJ mol$^{-1}$ nm$^{-2}$, the pore spacing changes erratically before stabilizing
-	when force constants are reduced below 3 kJ mol$^{-1}$ nm$^{-2}$. (f)
-	In a perfect hexagonal, there are 5 distances that should be exactly
-	equal. As pictured in this diagram the distance from 1-2, 1-3, 1-4, 2-4, and 3-4
-	are the same. All plots in (a)--(e) are the average of these distances.} 
+	when force constants are reduced below 3 kJ mol$^{-1}$ nm$^{-2}$. } 
 	\label{fig:p2p}
   \end{figure}
 
@@ -427,49 +475,31 @@
         configuration.}\label{fig:stacking}
   \end{figure}
 
-  %Our model is insensitive to initial configuration if monomer placement is chosen within reason. 
-  
-  \section{Number of monomers per column}\label{section:monomers_per_column}
-  
-  We chose to build all systems using 20 monomers per column. We made this choice
-  by considering a number of factors that directly affect the quality of our results. 
-  Clearly, choosing a small number of layers will cause the system to suffer from 
-  finite size effects. Even in our 20 monomer-per-column system, axial correlations
-  between stacked monomers persist throughout the entire correlation function (see
-  Figure ~\ref{M-fig:correlation}). The correlation function of the system which we
-  built with 40 monomers per column is very similar to that created with 20 monomers
-  per columns (continues to oscillate for its full length
-  (Figure~\ref{fig:tall_correlation_full}). If we continue adding monomers, the 
-  correlation function will eventually fully decay but it is not worth the 
-  computational expense. Regardless, the correlation lengths calculated from 20
-  monomer per column simulations are in sufficient agreement with experiment. 
-  
+  Based on evidence from section~\ref{M-section:rpi} of the main text, we
+  believe it is most likely that the head groups stack somewhere between
+  the sandwiched and parallel displaced modes which we studied (Figure~\ref{fig:between_pd}).
+
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{z_correlation_overlay.png}
-  \caption{}\label{fig:z_correlation_overlay}
+  \centering
+  \includegraphics[width=\textwidth]{pd_36.eps}
+  \caption{}\label{fig:pd_36}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{tall_correlation_full.png}
-  \caption{}\label{fig:tall_correlation_full}
+  \centering
+  \includegraphics[width=\textwidth]{pd_lt36.eps}
+  \caption{}\label{fig:pd_lt36}
   \end{subfigure}
-  \caption{(a) The correlation functions generated from ordered basin sandwiched 
-  configurations are nearly the same when the $z$-dimension of the system is doubled.
-  (b) Oscillations persist throughout the length of the correlation function for the
-  sandwiched system in the ordered basin built with 40 monomers per column. The full
-  system is ca. 17 nm tall so the full correlation function covers half this length
-  since periodicity forces the remaining length to be its mirror image.}\label{fig:correlation_functions}
+  \caption{Head groups are likely stacked in a configuration between sandwiched and
+  parallel displaced. (a) In our parallel displaced configurations with 5 columns 
+  per pore, we placed head groups so the angle, $\theta$, between vectors extending
+  from vertically stacked head groups to the pore center equals 36$\degree$ 
+  ((360$\degree$ / $ncol$) / 2 , where $ncol$ is the number of columns per pore). 
+  (b) In the true configuration, $\theta$ is likely distributed between 0$\degree$
+  and 36 $\degree$. When $\theta$=0$\degree$, the system architecture is the same
+  as a sandwiched configuration.}\label{fig:between_pd}
   \end{figure}
-  
-  We may be able to simulate systems using less than 20 monomers per column, but chose
-  to use 20 since it gives fairly good resolution when simulating X-ray diffraction 
-  patterns. The size of the Fourier space bin in each dimension is determined by 
-  $\dfrac{2\pi}{L}$ where L is the length of a given box vector. The $z$-box vector 
-  for 20 monomer-per-column systems is $\approx$ 85 \AA which means we will see 
-  a reciprocal space resolution of 0.074 \AA$^{-1}$ in the z direction. Further decreasing
-  the resolution would increase the noise in the simulated patterns and make it more
-  difficult to measure the intensity of reflections of interest.
 
   \section{Equilibration Details}\label{section:equilibration}
   
@@ -554,10 +584,10 @@
   
   \begin{table}[h]
   \centering
-  \begin{tabular}{cc}
+  \begin{tabular}{ccc}
   \toprule
   System                         & Pore Spacing ($nm$) & Pore Spacing ($nm$)              \\
-                                 & Pore centers        & $\dfrac{x-box vector}{2}$ ($nm$) \\ 
+                                 & Pore centers        & $\dfrac{x\ box\ vector}{2}$ ($nm$) \\ 
   \midrule
   Sandwiched, Ordered            & 4.18 $\pm$ 0.13     & 4.16 $\pm$ 0.01                  \\
   Parallel Displaced, Ordered    & 4.17 $\pm$ 0.12     & 4.18 $\pm$ 0.01                  \\
@@ -571,199 +601,6 @@
   Both methods agree within uncertainty, but measuring the distance between pore centers
   does a better job of showing the spread of pore-to-pore distances.}~\label{table:p2p}
   \end{table}
-
-  \section{The nematic order parameter}\label{method:nematic_order}
-
-  We calculated the nematic order parameter for our system in order to
-  understand the degree of ordering among monomer head groups. Typically, the
-  nematic order parameter is calculated for nematic liquid crystal systems which
-  are characterized by unidirectional ordering of liquid crystal monomers. The
-  preferred direction of monomers is defined by the unit director vector,
-  $\mathbf{n}$. Assuming a single preferred direction of alignment, the nematic
-  order parameter, $S$, is defined as:
-  \begin{equation}
-	 S = \frac{1}{2} \langle(3\cos^2\theta -1)\rangle
-	\label{eqn:nematic_order_parameter}
-  \end{equation}
-  where $\theta$ is the angle between the molecular long axis and $\mathbf{n}$.
-  In a perfectly ordered nematic liquid crystal system, the molecular axis of each
-  monomer should be aligned with $\mathbf{n}$ and give an order parameter of $S=1$. 
-  We are interested in quantifying the degree of monomer head group alignment 
-  between systems. We use Eq.~\ref{eqn:nematic_order_parameter} to accomplish this
-  by defining $\mathbf{n}$ as the z-axis (or pore axis), and then measuring the angles,
-  $\theta$, between $\mathbf{n}$ and the vectors perpendicular to the plane of
-  the aromatic head groups ($\mathbf{v}$ in Figure~\ref{fig:director}). 
-  
-  %BJC: change n to v in picture.
-  \begin{figure}[!htb]
-  \centering
-  \includegraphics[width=0.75\linewidth]{nematic_director.png}
-  \caption{We calculate the nematic order parameter by measuring the angle
-  between $\mathbf{v}$ and the z-axis.}~\label{fig:director}
-  \end{figure}
-
-  The nematic order parameter is highest in sandwiched systems. 
-  Figure~\ref{fig:nematic_distribution} shows the distribution of angles between
-  the nematic director and the vector perpendicular to the monomer head groups. 
-  Systems in the ordered basin have higher nematic order parameters than their
-  disordered basin counterparts. Both sandwiched system have higher nematic order
-  parameters than both parallel displaced systems. This may occur because monomers
-  in the sandwiched configuration have their motion restricted by vertically adjacent
-  monomers, while those in the parallel displaced configuration have more room to 
-  rotate.
-  
-  \clearpage
-
-  \begin{figure}[!htb]
-  \begin{subfigure}{\linewidth}
-        \centering
-        \begin{subfigure}{0.45\linewidth}
-                \centering
-                \includegraphics[width=\linewidth]{layered_nematic_order.png}
-                \caption{Sandwiched, Ordered}~\label{fig:sandwich_nematic}
-        \end{subfigure}%
-        \begin{subfigure}{0.45\linewidth}
-                \centering
-                \includegraphics[width=\linewidth]{offset_nematic_order.png}
-                \caption{Parallel Displaced, Ordered}~\label{fig:offset_nematic}
-        \end{subfigure}
-        \begin{subfigure}{0.45\linewidth}
-                \centering
-                \includegraphics[width=\linewidth]{disorder_sandwich_nematic_order.png}
-                \caption{Sandwiched, Disordered}~\label{fig:disorder_sandwich_nematic}
-        \end{subfigure}%
-        \begin{subfigure}{0.45\linewidth}
-                \centering
-                \includegraphics[width=\linewidth]{disorder_offset_nematic_order.png}
-                \caption{Parallel Displaced, Disordered}~\label{fig:disorder_offset_nematic}
-        \end{subfigure}
-  \end{subfigure}
-  \caption{The distribution of angles between nematic director vector (see
-	  Figure~\ref{fig:director}) and the z-axis averaged over the equilibrated portion
-	  of each trajectory}~\label{fig:nematic_distribution}
-  \end{figure}
-
-%BJC: now in main text
-%  \section{Measurement of intensities of experimental and simulated XRD patterns}\label{section:xrd_intensities}
-%  
-%  We developed standardized methods of measuring the intensity of reflections of interest
-%  in the experimental and simulated X-ray diffraction patterns presented in this work. Here,
-%  we graphically illustrate the methods used for measuring these intensities. 
-%  
-%  All diffraction patterns are normalized according to R-alkanes and the intensities
-%  of all reflections are reported relative to the intensity of R-alkanes. The region
-%  used to calculate the average intensity of R-alkanes is shown in 
-%  Figure~\ref{fig:ralkanes}. The top region is excluded because, in the simulated
-%  patterns, R-$\pi$ intersects with R-alkanes.
-%  
-%  R-$\pi$ and R-double are reported as the maximum values of the peaks of the 
-%  $q_z$ cross-section of the experimental pattern at $q_r=0$ (Figure~\ref{fig:rpi_rdouble}).
-%  In the case of the experimental pattern, the peak heights are not symmetrical,
-%  so we report the average of the two heights.
-%  
-%  We measured R-spots by calculating the average intensity within a region 
-%  selected by visual inspection. We report the average intensity within the regions 
-%  highlighted in red in Figure~\ref{fig:rspots}. If there are no easily discernible
-%  spots, we report the average intensity at the intersection of R-alkanes with
-%  the $q_z$ value of R-double since that is where we expect it to appear based on
-%  experiment. Since R-double does not appear in our simulated patterns, we 
-%  estimate where it should appear as half of the $q_z$ value of R-$\pi$.
-%  
-%  \begin{figure}[!htb]
-%  \centering
-%  \begin{subfigure}{0.45\linewidth}
-%  \centering
-%  \includegraphics[width=\textwidth]{WAXS_raw.png}
-%  \caption{Unaltered experimental WAXS pattern}\label{fig:unaltered}
-%  \end{subfigure}
-%  \begin{subfigure}{0.45\linewidth}
-%  \centering
-%  \includegraphics[width=\textwidth]{ralkanes.png}
-%  \caption{R-alkanes}\label{fig:ralkanes}
-%  \end{subfigure}
-%  \begin{subfigure}{0.45\linewidth}
-%  \centering
-%  \includegraphics[width=\textwidth]{rpi_rdouble.png}
-%  \caption{$q_z|_{r=0}$}\label{fig:rpi_rdouble}
-%  \end{subfigure}
-%  \begin{subfigure}{0.45\linewidth}
-%  \centering
-%  \includegraphics[width=\textwidth]{rspots.png}
-%  \caption{R-spots}\label{fig:rspots}
-%  \end{subfigure}
-%  \caption{}\label{fig:xrd_intensities}
-%  \end{figure}
- 
-  \section{Noise in simulated diffraction patterns}\label{section:xrd_noise}
-  
-  The magnitude of noise in the simulated diffraction patterns decreases as 
-  the number of independent configurations increases (Figure~\ref{fig:xrd_noise}).
-  We simulated the structure factor of 100 randomly placed particles and varied 
-  the number of independent configurations (N). It is expected that the structure
-  factor should resemble a two-dimensional Gaussian. We cannot sample enough 
-  independent configurations of our system to completely eliminate noise.
-  
-  \begin{figure}[!htb]
-  \centering
-  \begin{subfigure}{0.45\linewidth}
-  \centering
-  \includegraphics[width=\textwidth]{xrd_1frame.png}
-  \caption{N=1}
-  \end{subfigure}
-  \begin{subfigure}{0.45\linewidth}
-  \centering
-  \includegraphics[width=\textwidth]{xrd_10frame.png}
-  \caption{N=10}
-  \end{subfigure}
-  \begin{subfigure}{0.45\linewidth}
-  \centering
-  \includegraphics[width=\textwidth]{xrd_100frame.png}
-  \caption{N=100}
-  \end{subfigure}
-  \begin{subfigure}{0.45\linewidth}
-  \centering
-  \includegraphics[width=\textwidth]{xrd_10000frame.png}
-  \caption{N=10000}
-  \end{subfigure}
-  \caption{The magnitude of noise, especially along $q_r$=0, decreases
-  as the number of independent configurations (N) increases.}\label{fig:xrd_noise}
-  \end{figure}
-  
-  \clearpage
-%  \section{Experimental correlation length of R-$\pi$}\label{section:correlation_length}
-% 
-%  \vspace{1em}
-%  Previous experimental studies of these systems did not calculate the correlation length, so we estimated it
-%  from the raw 2D WAXS data. We took a slice of the 2D WAXS data along the dashed line in
-%  Figure ~\ref{fig:waxs_dashed}. We removed background noise by subtracting the
-%  intensity far from the pattern (high $q$) uniformly. We used a least squares
-%  algorithm to fit a Lorentzian curve to the data. Only values recorded above
-%  $q_z$ = 1.6 were considered for the fit in order to mitigate interference from
-%  R-alkanes (Figure~\ref{fig:correlation_length_exp}). The full width at half
-%  maximum (FWHM) is related to the correlation length, L, by the relationship: $
-%  L = \frac{1}{FWHM} $. The error in the value is calculated as the square root
-%  of the diagonal entry of the covariance matrix of optimized fit parameters.
-%  We estimate the value of the correlation length to be 10 $\pm$ 1 using this 
-%  method. Since the experimental peak width is also influenced by strain and 
-%  instrumental broadening in addition to finite size broadening, the value 
-%  calculated here is really only an upper bound on the correlation length. 
-%  % need citations and more on Lorentzian parameters
-%  \begin{figure}[!htb]
-%  \centering
-%  \begin{subfigure}{0.45\textwidth}	
-%  	\includegraphics[width=\textwidth]{waxs_dashed.png}
-%	\caption{}~\label{fig:waxs_dashed}
-%  \end{subfigure}
-%  \begin{subfigure}{0.45\textwidth}
-%	\includegraphics[width=\textwidth]{Correlation_length_exp.png}
-%	\caption{}~\label{fig:correlation_length_exp}
-%  \end{subfigure}
-%  \caption{(a) We estimated the system's experimental correlation length using a 
-%  1D slice of the 2D WAXS patterns along $q_r$=0. (b) We fit a Lorentzian curve 
-%  to the 1D slice. One of the fit parameters is the full width at half maximum (FWHM).
-%  The correlation length is 1/FWHM.}~\label{fig:correlation}
-%  \end{figure}
-%  \vspace{1em} \\
 
   \section{Component radial density functions}\label{section:radial_density}
   
@@ -937,27 +774,328 @@
 %	\begin{subfigure}
 %		\centering
 %		\includegraphics[width=\textwidth]{ps5offset.png}
-%		\caption{}\label{fig:ps5offset}
+%		\caption{}\label{fig:ps5offset} 
 %	\end{subfigure}
 %  \end{figure}
-  \section{Tail organization}
+
+  \section{2D Small Angle X-ray Scattering Data}  
+  
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.5\textwidth]{2DSAXS_axes.png}
+  \caption{Two dimensional small angle X-ray scattering experiments show
+  reflections along the $q_r$ axis at $q_z$=0. The spacing between the reflections
+  is characteristic of a hexagonal phase and is directly related to the distance
+  between pores. The reflections are arced because the pores are not perfectly
+  aligned. A perfectly aligned system would show dots at each peak location. An
+  isotropically aligned system would show concentric rings about the origin which
+  pass through each peak location. The d\textsubscript{100} and d\textsubscript{110} 
+  peaks (the first two pairs of reflections from origin located at $|\mathbf{q}| 
+  \approx 0.18~\AA^{-1}$ and $|\mathbf{q}| \approx 0.31~\AA^{-1}$) are not visible
+  in the 2D WAXS pattern. The edges of the d\textsubscript{200} reflection (the third
+  pair of reflections located at $|\mathbf{q}| \approx 0.36~\AA^{-1}$) are slightly
+  visible in the 2D WAXS pattern, so we used them to approximate the experimental
+  intensity of R-pores.}\label{fig:2DSAXS}
+  \end{figure}
+  
+  \section{Ionic Conductivity}\label{section:ionic_conductivity}
+  
+  In the main text, we calculated ionic conductivity using the Nernst-Einstein 
+  relationship. We also measured ionic conductivity using a second method, 
+  termed the Collective Diffusion model, for robustness. The collective 
+  diffusion model measures the movement of the collective variable, Q, which
+  is defined as the amount of charge transfer through the system and can be 
+  thought to represent the center of charge of the system. The conductance, 
+  $\gamma$, of the system can be calculated as:
+  \begin{equation}
+	 \gamma = \dfrac{D_Q}{k_b T} 
+	\label{eqn:collective_diffusion}
+  \end{equation}
+  $D_Q$ is the diffusion coefficient of the collective variable Q and is 
+  calculated using the Einstein relation. We convert the resulting value
+  to ionic conductivity by multiplying by channel length and dividing by
+  the membrane cross sectional area. One can access a detailed derivation of 
+  the model elsewhere\cite{liu_collective_2013}.
+  
+  \begin{figure}[!htb]
+        \centering
+        \includegraphics[width=0.5\linewidth]{Ionic_conductivity.png}
+        \caption{The Collective Diffusion model and the Nernst-Einstein relation yield
+        agreeing values of ionic conductivity for both types of ordered basin systems 
+        simulated. Both methods estimate the value of the ionic conductivity to be an 
+        order of magnitude higher than the experimental value. There is more noise in
+        the collective diffusion model because there is inherently less data that 
+        can be used for its calculation. For that reason, we use only the Nernst-Einstein relationship in the main text.}
+        \label{fig:conductivity}
+  \end{figure}
+  
+  \section{Crosslinking algorithm details}\label{section:xlink}
+
+  Crosslinking of the the monomer Na-GA3C11 occurs via a UV initiated free
+  radical polymerization (FRP) (Figure~\ref{fig:xlink_mech}). Head-to-tail addition
+  takes place between terminal vinyl groups on each of the monomer tails. We
+  only considered head-to-tail addition since it is the dominant propagation mode
+  in the real system.   
+
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=\textwidth]{Crosslink_mechanism.eps}
+  \caption{Terminal vinyl groups present on each monomer tail react with free
+	  radical initiators to create monomers with terminal vinyl radicals.  Vinyl
+	  radicals react with the vinyl groups of other monomers in order to propagate
+	  crosslinking.}\label{fig:xlink_mech}
+  \end{figure}
+  
+  We based our cross-linking algorithm on the known reaction mechanism.
+  FRPs require an initiator which bonds to the system, meaning new atoms are
+  introduced into the system. For simplicity, we simulated the initiator as
+  hydrogen and made it present in the simulation by including them as dummy atoms
+  in all possible locations where an addition could occur. We carry out the
+  cross-linking procedure iteratively. During each iteration, the algorithm
+  selects eligible bonding carbon atoms based on a distance cut-off. The algorithm
+  then updates the topology with new bonds and changes dummy hydrogen atoms to appropriate
+  hydrogen atom types. We only considered head-to-tail addition
+  due to its dominance in the real system \cite{young_introduction_2011}. We did
+  not consider direction of attack because the resultant mixture is racemic.
+
+  Our implementation requires long simulation times to achieve high cross-link 
+  densities. A typical cross-linking procedure can take up to 24 hours. In
+  order to collect equilibrated data, further NPT simulation is necessary. We
+  typically run a cross-linked system for an additional 100 ns to allow the system
+  to readjust. For those reasons we did not cross-link all systems tested.
+  
+  \clearpage
+  \section{The nematic order parameter}\label{method:nematic_order}
+
+  We calculated the nematic order parameter for our system in order to
+  understand the degree of ordering among monomer head groups. Typically, the
+  nematic order parameter is calculated for nematic liquid crystal systems which
+  are characterized by unidirectional ordering of liquid crystal monomers. The
+  preferred direction of monomers is defined by the unit director vector,
+  $\mathbf{n}$. Assuming a single preferred direction of alignment, the nematic
+  order parameter, $S$, is defined as:~\cite{chaikin_principles_1995}
+  \begin{equation}
+	 S = \frac{1}{2} \langle(3\cos^2\theta -1)\rangle
+	\label{eqn:nematic_order_parameter}
+  \end{equation}
+  where $\theta$ is the angle between the molecular long axis and $\mathbf{n}$.
+  In a perfectly ordered nematic liquid crystal system, the molecular axis of each
+  monomer should be aligned with $\mathbf{n}$ and give an order parameter of $S=1$. 
+  We are interested in quantifying the degree of monomer head group alignment 
+  between systems. We use Equation~\ref{eqn:nematic_order_parameter} to accomplish this
+  by defining $\mathbf{n}$ as the $z$-axis (or pore axis), and then measuring the angles,
+  $\theta$, between $\mathbf{n}$ and the vectors perpendicular to the plane of
+  the aromatic head groups ($\mathbf{v}$ in Figure~\ref{fig:director}). 
+  
+  %BJC: change n to v in picture.
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.75\linewidth]{nematic_director.png}
+  \caption{We calculate the nematic order parameter by measuring the angle
+  between $\mathbf{v}$ and the $z$-axis.}~\label{fig:director}
+  \end{figure}
+
+  The nematic order parameter is highest in sandwiched systems. 
+  Figure~\ref{fig:nematic_distribution} shows the distribution of angles between
+  the nematic director and the vector perpendicular to the monomer head groups. 
+  Systems in the ordered basin have higher nematic order parameters than their
+  disordered basin counterparts. Both sandwiched system have higher nematic order
+  parameters than both parallel displaced systems. This may occur because monomers
+  in the sandwiched configuration have their motion restricted by vertically adjacent
+  monomers, while those in the parallel displaced configuration have more room to 
+  rotate.
+  
+  \clearpage
+
+  \begin{figure}[!htb]
+  \begin{subfigure}{\linewidth}
+        \centering
+        \begin{subfigure}{0.45\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{layered_nematic_order.png}
+                \caption{Sandwiched, Ordered}~\label{fig:sandwich_nematic}
+        \end{subfigure}%
+        \begin{subfigure}{0.45\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{offset_nematic_order.png}
+                \caption{Parallel Displaced, Ordered}~\label{fig:offset_nematic}
+        \end{subfigure}
+        \begin{subfigure}{0.45\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{disorder_sandwich_nematic_order.png}
+                \caption{Sandwiched, Disordered}~\label{fig:disorder_sandwich_nematic}
+        \end{subfigure}%
+        \begin{subfigure}{0.45\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{disorder_offset_nematic_order.png}
+                \caption{Parallel Displaced, Disordered}~\label{fig:disorder_offset_nematic}
+        \end{subfigure}
+  \end{subfigure}
+  \caption{The distribution of angles between nematic director vector (see
+	  Figure~\ref{fig:director}) and the $z$-axis averaged over the equilibrated portion
+	  of each trajectory. The ordered sandwiched configuration has a higher nematic order
+	  parameter than the ordered parallel displaced configuration. The disordered
+	  sandwiched configuration has a higher nematic order parameter than the 
+	  disordered parallel displaced configuration.}~\label{fig:nematic_distribution}
+  \end{figure}
+
+%BJC: now in main text
+%  \section{Measurement of intensities of experimental and simulated XRD patterns}\label{section:xrd_intensities}
+%  
+%  We developed standardized methods of measuring the intensity of reflections of interest
+%  in the experimental and simulated X-ray diffraction patterns presented in this work. Here,
+%  we graphically illustrate the methods used for measuring these intensities. 
+%  
+%  All diffraction patterns are normalized according to R-alkanes and the intensities
+%  of all reflections are reported relative to the intensity of R-alkanes. The region
+%  used to calculate the average intensity of R-alkanes is shown in 
+%  Figure~\ref{fig:ralkanes}. The top region is excluded because, in the simulated
+%  patterns, R-$\pi$ intersects with R-alkanes.
+%  
+%  R-$\pi$ and R-double are reported as the maximum values of the peaks of the 
+%  $q_z$ cross-section of the experimental pattern at $q_r=0$ (Figure~\ref{fig:rpi_rdouble}).
+%  In the case of the experimental pattern, the peak heights are not symmetrical,
+%  so we report the average of the two heights.
+%  
+%  We measured R-spots by calculating the average intensity within a region 
+%  selected by visual inspection. We report the average intensity within the regions 
+%  highlighted in red in Figure~\ref{fig:rspots}. If there are no easily discernible
+%  spots, we report the average intensity at the intersection of R-alkanes with
+%  the $q_z$ value of R-double since that is where we expect it to appear based on
+%  experiment. Since R-double does not appear in our simulated patterns, we 
+%  estimate where it should appear as half of the $q_z$ value of R-$\pi$.
+%  
+%  \begin{figure}[!htb]
+%  \centering
+%  \begin{subfigure}{0.45\linewidth}
+%  \centering
+%  \includegraphics[width=\textwidth]{WAXS_raw.png}
+%  \caption{Unaltered experimental WAXS pattern}\label{fig:unaltered}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\linewidth}
+%  \centering
+%  \includegraphics[width=\textwidth]{ralkanes.png}
+%  \caption{R-alkanes}\label{fig:ralkanes}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\linewidth}
+%  \centering
+%  \includegraphics[width=\textwidth]{rpi_rdouble.png}
+%  \caption{$q_z|_{r=0}$}\label{fig:rpi_rdouble}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\linewidth}
+%  \centering
+%  \includegraphics[width=\textwidth]{rspots.png}
+%  \caption{R-spots}\label{fig:rspots}
+%  \end{subfigure}
+%  \caption{}\label{fig:xrd_intensities}
+%  \end{figure}
+ 
+  \section{Noise in simulated diffraction patterns}\label{section:xrd_noise}
+  
+  The magnitude of noise in the simulated diffraction patterns decreases as 
+  the number of independent configurations increases (Figure~\ref{fig:xrd_noise}).
+  We simulated the structure factor of 100 randomly placed particles and varied 
+  the number of independent configurations (N). It is expected that the structure
+  factor should resemble a two-dimensional Gaussian. We cannot sample enough 
+  independent configurations of our system to completely eliminate noise.
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{xrd_1frame.png}
+  \caption{N=1}
+  \end{subfigure}
+  \begin{subfigure}{0.45\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{xrd_10frame.png}
+  \caption{N=10}
+  \end{subfigure}
+  \begin{subfigure}{0.45\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{xrd_100frame.png}
+  \caption{N=100}
+  \end{subfigure}
+  \begin{subfigure}{0.45\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{xrd_10000frame.png}
+  \caption{N=10000}
+  \end{subfigure}
+  \caption{The magnitude of noise, especially along $q_r$=0, decreases
+  as the number of independent configurations (N) increases.}\label{fig:xrd_noise}
+  \end{figure}
+  
+  \clearpage
+%  \section{Experimental correlation length of R-$\pi$}\label{section:correlation_length}
+% 
+%  \vspace{1em}
+%  Previous experimental studies of these systems did not calculate the correlation length, so we estimated it
+%  from the raw 2D WAXS data. We took a slice of the 2D WAXS data along the dashed line in
+%  Figure ~\ref{fig:waxs_dashed}. We removed background noise by subtracting the
+%  intensity far from the pattern (high $q$) uniformly. We used a least squares
+%  algorithm to fit a Lorentzian curve to the data. Only values recorded above
+%  $q_z$ = 1.6 were considered for the fit in order to mitigate interference from
+%  R-alkanes (Figure~\ref{fig:correlation_length_exp}). The full width at half
+%  maximum (FWHM) is related to the correlation length, L, by the relationship: $
+%  L = \frac{1}{FWHM} $. The error in the value is calculated as the square root
+%  of the diagonal entry of the covariance matrix of optimized fit parameters.
+%  We estimate the value of the correlation length to be 10 $\pm$ 1 using this 
+%  method. Since the experimental peak width is also influenced by strain and 
+%  instrumental broadening in addition to finite size broadening, the value 
+%  calculated here is really only an upper bound on the correlation length. 
+%  % need citations and more on Lorentzian parameters
+%  \begin{figure}[!htb]
+%  \centering
+%  \begin{subfigure}{0.45\textwidth}	
+%  	\includegraphics[width=\textwidth]{waxs_dashed.png}
+%	\caption{}~\label{fig:waxs_dashed}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%	\includegraphics[width=\textwidth]{Correlation_length_exp.png}
+%	\caption{}~\label{fig:correlation_length_exp}
+%  \end{subfigure}
+%  \caption{(a) We estimated the system's experimental correlation length using a 
+%  1D slice of the 2D WAXS patterns along $q_r$=0. (b) We fit a Lorentzian curve 
+%  to the 1D slice. One of the fit parameters is the full width at half maximum (FWHM).
+%  The correlation length is 1/FWHM.}~\label{fig:correlation}
+%  \end{figure}
+%  \vspace{1em} \\
+
+  \section{The effect of imposed tail tilt}\label{section:tail_tilt}
+  
+  Monomer tails prefer to lie flat rather than tilt with respect to the
+  membrane plane. We created a monomer whose tails tilted ca. 30$\degree$. 
+  We added position restraints to the ends of the monomer tails with the
+  same force constant as the head groups (see section~\ref{section:equilibration}).
+  As we slowly reduce the force constants, the tails begin to tend towards
+  a negligible tilt angle (Figure~\ref{fig:tail_tilt}).
+  
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.5\textwidth]{tilt_cat.png}
+  \caption{As we reduce the force constants applied to the end of each
+  tail of an initially tilted monomer configuration, the average tilt 
+  angle with respect to the membrane plane decreases until it is nearly
+  negligible.}\label{fig:tail_tilt}
+  \end{figure}
+
+  \section{Tail organization}\label{section:tail_packing}
   
   In order to understand the origin of R-spots, we looked for ordering among
-  the tails. We divided the tail into three sections: tail fronts, tail 
-  middles and tail ends. The sections are illustrated in 
-  Figure~\ref{fig:tail_sections}.
+  the tails. We divided the tail into three sections: tail-fronts, tail-middles
+  and tail-ends. The sections are illustrated in Figure~\ref{fig:tail_sections}.
   
   \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.5\textwidth]{tail_sections.png}
   \caption{We divided the tail into three regions: tail-fronts (blue), 
-  tail-middles (green) and tail-backs (red).}\label{fig:tail_sections}
+  tail-middles (green) and tail-ends (red).}\label{fig:tail_sections}
   \end{figure}
   
   We plotted the center of masses of each tail section and measured the angle 
   between each center of mass and its nearest neighbor center of masses of the
   same tail section. For example, Figure~\ref{fig:centroids} shows a 3D plot of
-  the center of masses of each tail front. We wanted to know average location
+  the center of masses of each tail front. We wanted to know the average location
   of nearest neighbors to each center of mass. The red bead in 
   Figure~\ref{fig:centroids} is a randomly selected center of mass. The
   green beads are the nearest neighbor center of masses to the red bead. We
@@ -1003,27 +1141,17 @@
   
   \clearpage
 
-  \section{Diffusion of monomers}
+  \section{Carboxylate Dihedrals}
 
-  We calculated the diffusion coefficient of the monomer head groups by measuring
-  the slope of the linear region of their mean squared displacement curves accumulated
-  over the length of the equilibration simulations (Table~\ref{table:msd}). 
-  
-  \begin{table}[h]
+  \begin{figure}[!htb]
   \centering
-  \begin{tabular}{cc}
-  \toprule
-  System & Diffusion Constant ($m^2/s$) \\ 
-  \midrule
-  Sandwiched, Ordered & $1.4 \times 10^{-14}$ \\
-  Parallel Displaced, Ordered & $2.0 \times 10^{-14}$ \\
-  Sandwiched, Disordered & $2.0 \times 10^{-14}$ \\
-  Parallel Displaced, Disordered & $3.5 \times 10^{-14}$ \\
-  \bottomrule
-  \end{tabular}
-  \caption{The diffusion constants for all systems are on the order of $10^{-14} m^2/s$ 
-  .}~\label{table:msd}
-  \end{table}
+  \includegraphics[width=0.5\textwidth]{carboxylate_dihedral_rb.png}
+  \caption{A potential energy diagram for the dihedral angle about the carbon-carbon bond of
+  a carboxylate group attached to an aromatic ring, using parameters from the generalized amber 
+  forcefield. It is energetically favorable for the carboxylate group to stay in plane with 
+  the aromatic ring. There is a large energy penalty as the dihedral becomes antiparallel to 
+  the plane of the aromatic ring.}\label{fig:carboxylate_dihedral_rb}
+  \end{figure}
 
 % BJC: not necessary
 %  \begin{figure}[!htb]
@@ -1216,83 +1344,42 @@
   involved are unequally spaced. These conditions seem likely to give rise to R-double.
   }\label{fig:hbonds}
   \end{figure}
+  
+  \section{Diffusion of monomers}
 
-  \section{Crosslinking algorithm details}\label{section:xlink}
-
-  Crosslinking of the the monomer Na-GA3C11 occurs via a UV initiated free
-  radical polymerization (FRP) (Figure~\ref{fig:xlink_mech}). Head-to-tail addition
-  takes place between terminal vinyl groups on each of the monomer tails. We
-  only considered head-to-tail addition since it is the dominant propagation mode
-  in the real system.   
-
-  \begin{figure}[!htb]
+  We calculated the diffusion coefficient of the monomer head groups by measuring
+  the slope of the linear region of their mean squared displacement curves accumulated
+  over the length of the equilibration simulations (Table~\ref{table:msd}). 
+  
+  \begin{table}[h]
   \centering
-  \includegraphics[width=\textwidth]{Crosslink_mechanism.eps}
-  \caption{Terminal vinyl groups present on each monomer tail react with free
-	  radical initiators to create monomers with terminal vinyl radicals.  Vinyl
-	  radicals react with the vinyl groups of other monomers in order to propagate
-	  crosslinking.}\label{fig:xlink_mech}
-  \end{figure}
+  \begin{tabular}{cc}
+  \toprule
+  System & Diffusion Constant ($m^2/s$) \\ 
+  \midrule
+  Sandwiched, Ordered & $1.4 \times 10^{-14}$ \\
+  Parallel Displaced, Ordered & $2.0 \times 10^{-14}$ \\
+  Sandwiched, Disordered & $2.0 \times 10^{-14}$ \\
+  Parallel Displaced, Disordered & $3.5 \times 10^{-14}$ \\
+  \bottomrule
+  \end{tabular}
+  \caption{The diffusion constants for all systems are on the order of $10^{-14} m^2/s$ 
+  .}~\label{table:msd}
+  \end{table}
   
-  We based our cross-linking algorithm on the known reaction mechanism.
-  FRPs require an initiator which bonds to the system, meaning new atoms are
-  introduced into the system. For simplicity, we simulated the initiator as
-  hydrogen and made it present in the simulation by including them as dummy atoms
-  in all possible locations where an addition could occur. We carry out the
-  cross-linking procedure iteratively. During each iteration, the algorithm
-  selects eligible bonding carbon atoms based on a distance cut-off. The algorithm
-  then updates the topology with new bonds and changes dummy hydrogen atoms to appropriate
-  hydrogen atom types. We only considered head-to-tail addition
-  due to its dominance in the real system \cite{young_introduction_2011}. We did
-  not consider direction of attack because the resultant mixture is racemic.
-
-  Our implementation requires long simulation times to achieve high cross-link 
-  densities. A typical cross-linking procedure can take up to 24 hours. In
-  order to collect equilibrated data, further NPT simulation is necessary. We
-  typically run a cross-linked system for an additional 100 ns to allow the system
-  to readjust. For those reasons we did not cross-link all systems tested.
+  \section{Autocorrelation of monomer dihedrals}
   
-  \clearpage
-  
-  \section{Ionic Conductivity}\label{section:ionic_conductivity}
-  
-  In the main text, we calculated ionic conductivity using the Nernst-Einstein 
-  relationship. We also measured ionic conductivity using a second method, 
-  termed the Collective Diffusion model, for robustness. The collective 
-  diffusion model measures the movement of the collective variable, Q, which
-  is defined as the amount of charge transfer through the system and can be 
-  thought to represent the center of charge of the system. The conductance, 
-  $\gamma$, of the system can be calculated as:
-  \begin{equation}
-	 \gamma = \dfrac{D_Q}{k_b T} 
-	\label{eqn:collective_diffusion}
-  \end{equation}
-  $D_Q$ is the diffusion coefficient of the collective variable Q and is 
-  calculated using the Einstein relation. We convert the resulting value
-  to ionic conductivity by multiplying by channel length and dividing by
-  the membrane cross sectional area. One can access a detailed derivation of 
-  the model elsewhere\cite{liu_collective_2013}.
-  
-  \begin{figure}[!htb]
-        \centering
-        \includegraphics[width=0.5\linewidth]{Ionic_conductivity.png}
-        \caption{The Collective Diffusion model and the Nernst-Einstein relation yield
-        agreeing values of ionic conductivity for both types of ordered basin systems 
-        simulated. Both methods estimate the value of the ionic conductivity to be an 
-        order of magnitude higher than the experimental value. There is more noise in
-        the collective diffusion model because there is inherently less data that 
-        can be used for its calculation. For that reason, we use only the Nernst-Einstein relationship in the main text.}
-        \label{fig:conductivity}
-  \end{figure}
+  In section~\ref{M-section:slow_dynamics} of the main text, we calculated the
+  autocorrelation function of the outer tail either dihedrals pictured
+  in Figure~\ref{fig:dihedrals}.
   
   \begin{figure}[!htb]
   \centering
-  \includegraphics[width=0.5\textwidth]{carboxylate_dihedral_rb.png}
-  \caption{A potential energy diagram for the dihedral angle about the carbon-carbon bond of
-  a carboxylate group attached to an aromatic ring, using parameters from the generalized amber 
-  forcefield. It is energetically favorable for the carboxylate group to stay in plane with 
-  the aromatic ring. There is a large energy penalty as the dihedral becomes antiparallel to 
-  the plane of the aromatic ring.}\label{fig:carboxylate_dihedral_rb}
+  \includegraphics[width=0.5\textwidth]{monomer_dihedrals.png}
+  \caption{We measured the autocorrelation functions of the dihedrals highlighted in
+  black. We only included dihedrals associated with the outer tails in our calculation
+  since the position of the center tail leads to fundamentally different interactions and
+  dynamics.}\label{fig:dihedrals}
   \end{figure}
   
 %  \begin{figure}[!htb]
@@ -1309,33 +1396,6 @@
 %  parallel displaced configuration with 1 wt\% water shows R-double at $mathbf{q}=(0, 0.7) \AA^{-1}$.
 %  (b) When we remove }\label{fig:pore1_removed}
 %  \end{figure}
-  
-  \begin{figure}[!htb]
-  \centering
-  \includegraphics[width=0.5\textwidth]{monomer_dihedrals.png}
-  \caption{We measured the autocorrelation functions of the dihedrals highlighted in
-  black. We only included dihedrals associated with the outer tails in our calculation
-  since the position of the center tail leads to fundamentally different interactions and
-  dynamics.}\label{fig:dihedrals}
-  \end{figure}
-  
-  \begin{figure}[!htb]
-  \centering
-  \includegraphics[width=0.5\textwidth]{2DSAXS_axes.png}
-  \caption{Two dimensional small angle X-ray scattering experiments show
-  reflections along the $q_r$ axis at $q_z$=0. The spacing between the reflections
-  is characteristic of a hexagonal phase and is directly related to the distance
-  between pores. The reflections are arced because the pores are not perfectly
-  aligned. A perfectly aligned system would show dots at each peak location. An
-  isotropically aligned system would show concentric rings about the origin which
-  pass through each peak location. The d\textsubscript{100} and d\textsubscript{110} 
-  peaks (the first two pairs of reflections from origin located at $|\mathbf{q}| 
-  \approx 0.18~\AA^{-1}$ and $|\mathbf{q}| \approx 0.31~\AA^{-1}$) are not visible
-  in the 2D WAXS pattern. The edges of the d\textsubscript{200} reflection (the third
-  pair of reflections located at $|\mathbf{q}| \approx 0.36~\AA^{-1}$) are slightly
-  visible in the 2D WAXS pattern, so we used them to approximate the experimental
-  intensity of R-pores.}\label{fig:2DSAXS}
-  \end{figure}
 
 \clearpage
 \bibliography{llc}
