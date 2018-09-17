@@ -259,7 +259,7 @@ def normalize_alkanes(R, Z, Raw_Intensity, inner, outer, angle):
                 if -60 < angles[count - 1] < 60:
                     test[i, j] = Raw_Intensity[i, j]
 
-    # fancy demo of r-alkanes normalization
+    # fancy demo of r-alkanes normalization - uncomment temporary override above.
     # test /= np.amax(Raw_Intensity)
     # test *= 3.1
     #
@@ -274,7 +274,7 @@ def normalize_alkanes(R, Z, Raw_Intensity, inner, outer, angle):
     # plt.gcf().get_axes()[0].tick_params(labelsize=14)
     # plt.gcf().get_axes()[0].set_aspect('equal')
     # plt.tight_layout()
-    # plt.savefig('ralkanes.pdf')
+    # plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/ralkanes.pdf')
     # plt.show()
     # exit()
 
@@ -298,24 +298,27 @@ def normalize_alkanes(R, Z, Raw_Intensity, inner, outer, angle):
 
     print('Average Intensity in alkane chain region : %s' % avg_intensity)
 
-    I /= (counts*avg_intensity)
-    bins -= 90
-    plt.plot(bins, I, linewidth=2)
-    #x = plt.bar(bins, I, bw, color='#1f77b4')
-    #centers = [i.xy[0] + bw/2 for i in x.patches]
-    #intensities = [j.height for j in x.patches]
-    #plt.figure()
-    #plt.plot(centers, intensities)
-    plt.xlabel('Angle with respect to $q_r=0$', fontsize=14)
-    plt.ylabel('Normalized integrated intensity', fontsize=14)
-    plt.gcf().get_axes()[0].tick_params(labelsize=14)
-    # plt.ylim(0,2)
-    #plt.xlim(-90, 90)
-    plt.tight_layout()
-    plt.savefig('angular_integration.png')
-    #plt.show()
+    # Plot R-spots integrated intensity curve
+
+    # I /= (counts*avg_intensity)
+    # bins -= 90
+    # plt.plot(np.abs(bins[::-1]), I[::-1], linewidth=2)
+    # #x = plt.bar(bins, I, bw, color='#1f77b4')
+    # #centers = [i.xy[0] + bw/2 for i in x.patches]
+    # #intensities = [j.height for j in x.patches]
+    # #plt.figure()
+    # #plt.plot(centers, intensities)
+    # plt.xlabel('Angle with respect to $q_r=0$', fontsize=14)
+    # plt.ylabel('Normalized integrated intensity', fontsize=14)
+    # plt.gcf().get_axes()[0].tick_params(labelsize=14)
+    # # plt.ylim(0,2)
+    # #plt.xlim(-90, 90)
+    # plt.tight_layout()
+    # plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/angular_integration.pdf')
+    # plt.show()
     
     return avg_intensity
+
 
 avg_intensity = normalize_alkanes(X, Y, waxs, 1.256, 1.57, 120)
 
@@ -485,6 +488,7 @@ def Rspots(R, Z, waxs, theta=37, theta_sigma=(7, 5), bounds=(1.256, 1.57)):
 
     return average_intensity
 
+
 R_double_top = 0
 R_double_bottom = 0
 while Y[R_double_bottom] < -1.0:
@@ -519,8 +523,9 @@ while Y[R_double_top] < 0:  # The bottom part of the plot is noisier (change 0 t
 # plt.xlabel('$q_z~(\AA)$', fontsize=14)
 # plt.ylabel('Normalized Intensity', fontsize=14)
 # plt.tight_layout()
-# plt.savefig('rpi_rdouble.pdf')
+# plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/rpi_rdouble.pdf')
 # plt.show()
+# exit()
 
 from scipy.optimize import curve_fit
 
@@ -541,70 +546,74 @@ def lorentz(points, a, b, c, yshift):
 
     return yshift + (c / (np.pi*w)) / (1 + x ** 2)
 
-start = X.size // 2 + 175
-end = X.size - 150
-p = np.array([1.4, 0.3, 1, 0])
-solp, cov_x = curve_fit(gaussian, X[start:end], waxs[start:end, Y.size // 2], p,
-                        bounds=([-np.inf, 0, 0, 0], [np.inf, np.inf, np.inf, np.inf]))
 
-plt.plot(X[start:end], gaussian(X[start:end], solp[0], solp[1], solp[2], solp[3]), '--', color='xkcd:orange', label='Gaussian Fit',
-         linewidth=2)
+# start = X.size // 2 + 175
+# end = X.size - 150
+# p = np.array([1.4, 0.3, 1, 0])
+# solp, cov_x = curve_fit(gaussian, X[start:end], waxs[start:end, Y.size // 2], p,
+#                         bounds=([-np.inf, 0, 0, 0], [np.inf, np.inf, np.inf, np.inf]))
 
-plt.plot(X, waxs[:, Y.size // 2])
-plt.show()
+#plt.plot(X[start:end], gaussian(X[start:end], solp[0], solp[1], solp[2], solp[3]), '--', color='xkcd:orange', label='Gaussian Fit',
+         #linewidth=2)
 
-plt.figure()
-rsection = waxs[np.argmax(waxs[:, waxs.shape[0]//2])]
-rsection = waxs[waxs.shape[0] // 2]
-#rsection -= rsection[-1]
-p = [0, 0.3, 2.5, 0]
-solp_gaussian, cov_x_gaussian = curve_fit(gaussian, X, rsection, p)
-p = np.array([0.1, 0, 1, .1])
-solp_lorentz, cov_x_lorentz = curve_fit(lorentz, X, rsection, p)
+#plt.plot(X, waxs[:, Y.size // 2])
 
-plt.plot(X, rsection, linewidth=2, color='xkcd:blue')
-plt.show()
-exit()
-#plt.plot(X, gaussian(X, solp_gaussian[0], solp_gaussian[1], solp_gaussian[2], solp_gaussian[3]), '--', label='Gaussian Fit', linewidth=2)
-plt.plot(X, lorentz(X, solp_lorentz[0], solp_lorentz[1], solp_lorentz[2], solp_lorentz[3]), '--', color='xkcd:orange', label='Lorentzian Fit', linewidth=2)
-plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=18)
-plt.ylabel('Intensity', fontsize=18)
+# plt.show()
 
-#print("Lorentzian FWHM = %.2f A^-1" % solp_lorentz[0])
-print("Lorentzian FWHM = %.3f +/- %.3f A^-1" % (solp_lorentz[0], cov_x_lorentz[0, 0] ** 0.5))
-print("Gaussian FWHM = %.3f +/- %.3f A^-1" % (2*np.sqrt(2*np.log(2))*solp_gaussian[1],
-                                       2 * np.sqrt(2 * np.log(2)) * cov_x_gaussian[1, 1] ** 0.5))
-plt.gcf().get_axes()[0].tick_params(labelsize=18)
-plt.legend(fontsize=17)
-plt.tight_layout()
-plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/exp_rsection_fit.png')
-
-plt.figure()
-start = np.argmin(np.abs(Y - 1.6))
-plot_start = Y.size // 2
-zsection = waxs[start:, waxs.shape[0]//2]
-# zsection -= zsection[-1]
-p = [1.7, 0.3, 2.5, 0]
-solp_gaussian, cov_x_gaussian = curve_fit(gaussian, Y[start:], zsection, p)
-p = np.array([0.1, 1.7, 1, 0.1])
-solp_lorentz, cov_x_lorentz = curve_fit(lorentz, Y[start:], zsection, p)
-plt.plot(Y[plot_start:], waxs[plot_start:, waxs.shape[0]//2], linewidth=2, color='xkcd:blue')
-#plt.plot(Y[start:], gaussian(Y[start:], solp_gaussian[0], solp_gaussian[1], solp_gaussian[2], solp_gaussian[3]), '--', label='Gaussian Fit', linewidth=2)
-plt.plot(Y[start:], lorentz(Y[start:], solp_lorentz[0], solp_lorentz[1], solp_lorentz[2], solp_lorentz[3]), '--', color='xkcd:orange', label='Lorentzian Fit', linewidth=2)
-
-# print("Lorentzian FWHM = %.2f A^-1" % solp_lorentz[0])
-print("Lorentzian FWHM = %.3f +/- %.3f A^-1" % (solp_lorentz[0], cov_x_lorentz[0, 0] ** 0.5))
-print("Gaussian FWHM = %.3f +/- %.3f A^-1" % (2*np.sqrt(2*np.log(2))*solp_gaussian[1],
-                                       2 * np.sqrt(2 * np.log(2)) * cov_x_gaussian[1, 1] ** 0.5))
-#np.savez_compressed('z_section.npz', x=Y, y=zsection)
-plt.xlabel('$q_z\ (\AA^{-1}$)', fontsize=18)
-plt.ylabel('Intensity', fontsize=18)
-plt.gcf().get_axes()[0].tick_params(labelsize=18)
-plt.legend(fontsize=18)
-plt.tight_layout()
-plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/exp_zsection_fit.png')
-plt.show()
-exit()
+# Experimental Cross-sections
+# plt.figure()
+# rsection = waxs[np.argmax(waxs[:, waxs.shape[0]//2])]
+# # rsection = waxs[waxs.shape[0] // 2]
+# # #rsection -= rsection[-1]
+# p = [0, 0.3, 2.5, 0]
+# solp_gaussian, cov_x_gaussian = curve_fit(gaussian, X, rsection, p)
+# p = np.array([0.1, 0, 1, .1])
+# solp_lorentz, cov_x_lorentz = curve_fit(lorentz, X, rsection, p)
+#
+# plt.plot(X, rsection, linewidth=2, color='xkcd:blue')
+# # plt.show()
+# # exit()
+#
+# #plt.plot(X, gaussian(X, solp_gaussian[0], solp_gaussian[1], solp_gaussian[2], solp_gaussian[3]), '--', label='Gaussian Fit', linewidth=2)
+# plt.plot(X, lorentz(X, solp_lorentz[0], solp_lorentz[1], solp_lorentz[2], solp_lorentz[3]), '--', color='xkcd:orange', label='Lorentzian Fit', linewidth=2)
+# plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=18)
+# plt.ylabel('Intensity', fontsize=18)
+#
+# #print("Lorentzian FWHM = %.2f A^-1" % solp_lorentz[0])
+# print("Lorentzian FWHM = %.3f +/- %.3f A^-1" % (solp_lorentz[0], cov_x_lorentz[0, 0] ** 0.5))
+# print("Gaussian FWHM = %.3f +/- %.3f A^-1" % (2*np.sqrt(2*np.log(2))*solp_gaussian[1],
+#                                        2 * np.sqrt(2 * np.log(2)) * cov_x_gaussian[1, 1] ** 0.5))
+# plt.gcf().get_axes()[0].tick_params(labelsize=18)
+# plt.legend(fontsize=17)
+# plt.tight_layout()
+# plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/exp_rsection_fit.pdf')
+#
+# plt.figure()
+# start = np.argmin(np.abs(Y - 1.6))
+# plot_start = Y.size // 2
+# zsection = waxs[start:, waxs.shape[0]//2]
+# # zsection -= zsection[-1]
+# p = [1.7, 0.3, 2.5, 0]
+# solp_gaussian, cov_x_gaussian = curve_fit(gaussian, Y[start:], zsection, p)
+# p = np.array([0.1, 1.7, 1, 0.1])
+# solp_lorentz, cov_x_lorentz = curve_fit(lorentz, Y[start:], zsection, p)
+# plt.plot(Y[plot_start:], waxs[plot_start:, waxs.shape[0]//2], linewidth=2, color='xkcd:blue')
+# #plt.plot(Y[start:], gaussian(Y[start:], solp_gaussian[0], solp_gaussian[1], solp_gaussian[2], solp_gaussian[3]), '--', label='Gaussian Fit', linewidth=2)
+# plt.plot(Y[start:], lorentz(Y[start:], solp_lorentz[0], solp_lorentz[1], solp_lorentz[2], solp_lorentz[3]), '--', color='xkcd:orange', label='Lorentzian Fit', linewidth=2)
+#
+# # print("Lorentzian FWHM = %.2f A^-1" % solp_lorentz[0])
+# print("Lorentzian FWHM = %.3f +/- %.3f A^-1" % (solp_lorentz[0], cov_x_lorentz[0, 0] ** 0.5))
+# print("Gaussian FWHM = %.3f +/- %.3f A^-1" % (2*np.sqrt(2*np.log(2))*solp_gaussian[1],
+#                                        2 * np.sqrt(2 * np.log(2)) * cov_x_gaussian[1, 1] ** 0.5))
+# #np.savez_compressed('z_section.npz', x=Y, y=zsection)
+# plt.xlabel('$q_z\ (\AA^{-1}$)', fontsize=18)
+# plt.ylabel('Intensity', fontsize=18)
+# plt.gcf().get_axes()[0].tick_params(labelsize=18)
+# plt.legend(fontsize=18)
+# plt.tight_layout()
+# plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/exp_zsection_fit.pdf')
+# plt.show()
+# exit()
 
 # print('Average R-pi intensity: %.2f' % np.mean(np.amax(waxs[:, waxs.shape[0]//2 - 10:waxs.shape[0]//2 + 10], axis=0)))
 # print('Average R-double intensity: %.2f' % np.mean(np.amax(waxs[R_double_bottom:R_double_top,
@@ -612,18 +621,19 @@ exit()
 # print('Average R-spots intensity : %.2f' % Rspots(X, Y, waxs, theta=50, theta_sigma=(3, 2), bounds=(1.3, 1.45)))
 # exit()
 fig, ax = plt.subplots()
-heatmap = plt.contourf(X, Y, waxs, cmap=colorbar, levels=levels)#, extend='max')
+heatmap = plt.contourf(X, Y, waxs, cmap=colorbar, levels=levels, rasterized=True)#, extend='max')
 #heatmap = plt.contourf(X, Y, np.log10(waxs), levels=levels, cmap='jet', extend='min')
-plt.plot(np.linspace(-qmax, qmax, 100), np.ones([100])*1.65, '--', color='black')
+#plt.plot(np.linspace(-qmax, qmax, 100), np.ones([100])*1.65, '--', color='black')
 # cid = fig.canvas.mpl_connect('button_press_event', onclick)
-cbar = plt.colorbar(format='%.2f')
+#cbar = plt.colorbar(format='%.2f')
 plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=18)
 plt.ylabel('$q_z\ (\AA^{-1}$)', fontsize=18)
 plt.gcf().get_axes()[0].tick_params(labelsize=14)
 plt.gcf().get_axes()[0].set_aspect('equal')
-#plt.text(-2.2, 2.2, "(c)", fontsize=24, color='white', verticalalignment='center', horizontalalignment='center')
+plt.text(-2.2, 2.2, "(c)", fontsize=24, color='white', verticalalignment='center', horizontalalignment='center')
 plt.tight_layout()
-plt.savefig('WAXS_raw.png')
+#plt.savefig('WAXS_raw.png')
+plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/WAXS_raw_jet_nocbar.pdf', dpi=300)
 plt.show()
 exit()
 # heatmap = plt.imshow(waxs, cmap='jet', vmax=2.5*(intensity/count), extent=[-qmax, qmax, -qmax, qmax])
