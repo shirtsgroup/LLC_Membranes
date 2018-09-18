@@ -346,12 +346,12 @@ class Dihedral(object):
 
         plt.figure()
         plt.plot(self.time/1000, self.autocorr_fxn, linewidth=2)
-        plt.plot([self.time[0]/1000, self.time[-1]/1000], [0, 0], '--', color='black')
+        #plt.plot([self.time[0]/1000, self.time[-1]/1000], [0, 0], '--', color='black')
         plt.xlabel('Time (ns)', fontsize=14)
         plt.ylabel('Autocorrelation', fontsize=14)
         plt.tight_layout()
         if save:
-            plt.savefig('%s.png' % savename)
+            plt.savefig('%s.pdf' % savename)
         if show:
             plt.show()
 
@@ -363,4 +363,4 @@ if __name__ == "__main__":
     dihedrals = Dihedral(args.gro, args.traj, args.topology, args.dihedral, args.residue, exclusions=args.exclude)
     dihedrals.plot_histogram(rb=True, save=True, show=True)
     dihedrals.autocorrelation(cos=True)
-    # dihedrals.plot_autocorrelation(show=True)
+    dihedrals.plot_autocorrelation(show=True)

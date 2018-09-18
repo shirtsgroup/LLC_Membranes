@@ -169,7 +169,7 @@ if __name__ == "__main__":
         plt.xlabel('Tilt angle with respect to xy plane', fontsize=14)
         plt.ylabel('Probability', fontsize=14)
         plt.tight_layout()
-        plt.savefig('tilt_dist.png')
+        plt.savefig('tilt_dist.pdf')
         # plt.show()
         # exit()
         # print(all_tilt_angles.shape)

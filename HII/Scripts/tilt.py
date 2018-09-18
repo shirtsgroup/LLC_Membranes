@@ -169,7 +169,8 @@ if __name__ == "__main__":
         plt.xlabel('Tilt angle with respect to xy plane', fontsize=14)
         plt.ylabel('Probability', fontsize=14)
         plt.tight_layout()
-        plt.savefig('tilt_dist.png')
+        plt.savefig('tilt_dist.pdf')
+        print('bloop')
         # plt.show()
         # exit()
         # print(all_tilt_angles.shape)
@@ -189,7 +190,7 @@ if __name__ == "__main__":
         plt.xlabel('Time (ps)', fontsize=14)
         plt.ylabel('Tilt angle w.r.t xy plane (degrees)', fontsize=14)
         plt.axes().tick_params(labelsize=14)
-        plt.savefig(args.output)
+        #plt.savefig(args.output)
 
         if not args.noshow:
             plt.show()

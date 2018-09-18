@@ -354,7 +354,7 @@ class Trajectory(object):
 
                     self.locations[t, start:end, 2] = z_correlation(column, 10, v=thermal_disorder[2]**2) + shift
                     #self.locations[t, start:end, :2] += np.random.normal(scale=2.3, size=(column.size, 2))
-                    self.locations[t, start:end, 2] = column + shift
+                    #self.locations[t, start:end, 2] = column + shift
 
                     # for noise about initial configuration
                     #self.locations[t, start:end, 2] = columns[c*ncol_per_pore + a] + shifts[c*ncol_per_pore + a]

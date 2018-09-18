@@ -139,7 +139,7 @@ if __name__ == "__main__":
     plt.tick_params(labelsize=14)
     plt.tight_layout()
     plt.savefig(
-        '/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/%s_ensemble_means.png' % name)
+        '/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/%s_ensemble_means.pdf' % name)
 
     # Histograms of standard deviations of distributions
     fig, ax0 = plt.subplots(1, 3, sharey=True)
@@ -171,7 +171,7 @@ if __name__ == "__main__":
     plt.tick_params(labelsize=14)
     plt.tight_layout()
 
-    plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/%s_ensemble_stds.png' % name)
+    plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/%s_ensemble_stds.pdf' % name)
 
     # TEST INDIVIDUAL CENTER OF MASSES
     z_cdf = Cdf(full_distribution[0])
@@ -326,7 +326,7 @@ if __name__ == "__main__":
         axboot[2].plot(x_emp, ys, linewidth=2)
 
     plt.tight_layout()
-    plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/%s_ecdfs.png' % name)
+    plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/%s_ecdfs.pdf' % name)
     # plt.show()
     # exit()
 
@@ -450,7 +450,7 @@ if __name__ == "__main__":
     ax[2].yaxis.set_ticks(np.linspace(0, 1.5, 4))
 
     plt.tight_layout()
-    plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/%s_ensemble_pooled.png' % name)
+    plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/structure_paper/figures/%s_ensemble_pooled.pdf' % name)
     plt.show()
     exit()
     fig, ax2 = plt.subplots(1, 3)

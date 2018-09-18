@@ -570,7 +570,7 @@ if __name__ == "__main__":
 
             zdf = zdf[1:]  # get rid of giant spike at zero
             zdf /= zdf.mean()
-
+            # zdf_full = zdf
             zdf_full = np.mean(fft_inverse, axis=(0, 1))[1:]
             zdf_full /= zdf_full.mean()
 

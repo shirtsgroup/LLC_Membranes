@@ -1635,7 +1635,7 @@
 %  \label{table:relative_intensities_300K} 
 %  \end{table}
   
-  \begin{table}[h]
+\begin{table}[h]
   \centering
   \begin{tabular}{c|ccccc}
   \toprule
@@ -1662,15 +1662,14 @@
   R-double   & 0.85       &  --        & --        &  --        & --                 \\ 
   \bottomrule
   \end{tabular}
-  \caption{The simulated XRD patterns of the systems tested, normalized so that
+    \caption{The simulated XRD patterns of the systems tested, normalized so that
 	  the average intensity of R-alkanes in each pattern equals 1, show R-pores and
 	  R-$\pi$ reflections that are significantly higher than experiment and R-spots
 	  reflections that are slightly lower than experiment. R-double does not appear
 	  in any simulated patterns, and thus has no measurable intensity. In terms of 
 	  the locations of the reflections, R-pores, R-alkanes and R-spots appear at $q$
-	  values that close to experiemnt, while R-$\pi$ appears at a significantly lower
-	  $q$ value than experiment.}
-  \label{table:relative_intensities_300K} 
+	  values that close to experiment, while R-$\pi$ appears at a significantly lower
+	  $q$ value than experiment.\label{table:relative_intensities_300K}}
   \end{table}  
   
 %    \begin{table}[h]
@@ -1971,31 +1970,31 @@
   \begin{figure}[!htb]
   \begin{subfigure}{0.32\linewidth}
   	\centering
-  	\includegraphics[width=\textwidth]{rzplot_layered_280K_jet.png}
+  	\includegraphics[width=\textwidth]{rzplot_layered_280K_jet.pdf}
   	\caption{}\label{fig:sandwiched280K}
   \end{subfigure}
   \begin{subfigure}{0.32\linewidth}
-    \includegraphics[width=\textwidth]{tilt_dist.png}
+    \includegraphics[width=\textwidth]{tilt_dist.pdf}
     \caption{}\label{fig:tilt}
   \end{subfigure}
   \begin{subfigure}{0.32\linewidth}
 	\centering
-	\includegraphics[width=\textwidth]{tails_rzplot_jet.png}
+	\includegraphics[width=\textwidth]{tails_rzplot_jet.pdf}
 	\caption{}\label{fig:tails_rzplot}
   \end{subfigure}
   \begin{subfigure}[t]{0.32\linewidth}
     \centering
-	\includegraphics[scale=0.2]{centroids.png}
+	\includegraphics[scale=0.2]{centroids.pdf}
   \caption{}\label{fig:centroids}
   \end{subfigure}
   \begin{subfigure}[t]{0.32\linewidth}
         \centering
-	        \includegraphics[width=\linewidth]{hexagonal_tail_packing.png}
+	        \includegraphics[width=\linewidth]{hexagonal_tail_packing.pdf}
 	        \caption{}~\label{fig:layered_tails}
   \end{subfigure}
   \begin{subfigure}[t]{0.32\textwidth}
         	\centering
-	        \includegraphics[width=\linewidth]{hexagonal_ft.png}  % generated from hexagonal_packing.py
+	        \includegraphics[width=\linewidth]{hexagonal_ft.pdf}  % generated from hexagonal_packing.py
 	        \caption{}~\label{fig:hexagonal_ft}
   \end{subfigure}
   \caption{(a) R-spots increases in intensity when the temperature of the system is 
@@ -2044,7 +2043,7 @@
   \caption{FWHM = 0.792 $\pm$ 0.009 $\AA^{-1}$}\label{fig:exp_rsection_fit}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{sim_rsection_fit.png}
+  \includegraphics[width=\textwidth]{sim_rsection_fit.pdf}
   \caption{FWHM = 0.796 $\pm$ 0.011 $\AA^{-1}$}\label{fig:sim_rsection_fit}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
@@ -2052,7 +2051,7 @@
   \caption{FWHM = 0.110 $\pm$ 0.003 $\AA^{-1}$}\label{fig:exp_zsection_fit}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{sim_zsection_fit.png}
+  \includegraphics[width=\textwidth]{sim_zsection_fit.pdf}
   \caption{FWHM = 0.163 $\pm$ 0.011 $\AA^{-1}$}\label{fig:sim_zsection_fit}
   \end{subfigure}
   \caption{
@@ -2162,26 +2161,24 @@
   \centering
   \begin{subfigure}{0.45\textwidth}
   \centering
-  \includegraphics[width=\textwidth]{z_correlation_sandwich.png}
+  \includegraphics[width=\textwidth]{z_correlation_sandwich.pdf}
   \caption{Sandwiched, Ordered Basin}\label{fig:z_correlation_sandwich}
   \end{subfigure}  
   \begin{subfigure}{0.45\textwidth}
   \centering
-  \includegraphics[width=\textwidth]{z_correlation_offset.png}
+  \includegraphics[width=\textwidth]{z_correlation_offset.pdf}
   \caption{Parallel Displaced, Ordered Basin}\label{fig:z_correlation_offset}
   \end{subfigure}  
   \begin{subfigure}{0.45\textwidth}
   \centering
-  \includegraphics[width=\textwidth]{z_correlation_sandwich_disordered.png}
+  \includegraphics[width=\textwidth]{z_correlation_sandwich_disordered.pdf}
   \caption{Sandwiched, Disordered Basin}\label{fig:z_correlation_sandwich_disordered}
   \end{subfigure}  
   \begin{subfigure}{0.45\textwidth}
   \centering
-  \includegraphics[width=\textwidth]{z_correlation_offset_disordered.png}
+  \includegraphics[width=\textwidth]{z_correlation_offset_disordered.pdf}
   \caption{Parallel Displaced, Disordered Basin}\label{fig:z_correlation_offset_disordered}
   \end{subfigure}  
-  %MRS10: should say something here about whether this is consistent or not with experiement (and why/why not)
-  %MRS10: maybe include correlation lengths as well calculated from these, and compare to experiment?  I know it's in the table as well, but seems missing here.  1D correlation functions are given, but not how that data proves central points.
   \caption{1D correlation functions of the center of masses of aromatic head
 	  groups, $g(z)$, show decaying oscillatory behavior and have consistent correlation lengths with experiment. We calculated the
 	  correlation length by fitting a decaying exponential function
@@ -2422,11 +2419,11 @@
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{intensity_vs_zsigma.png}
+  \includegraphics[width=\textwidth]{intensity_vs_zsigma.pdf}
   \caption{}\label{fig:intensity_vs_zsigma}
   \end{subfigure}
   \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{rpi_xsection_vs_zsigma.png}
+  \includegraphics[width=\textwidth]{rpi_xsection_vs_zsigma.pdf}
   \caption{}\label{fig:rpi_xsection_vs_zsigma}
   \end{subfigure}
   \caption{We can decrease the maximum intensity of R-$\pi$ by increasing
@@ -2463,20 +2460,21 @@
   decreases with increasing column independence. We see an 8-fold decrease in the
   intensity of R-$\pi$ when $f=1$ versus when $f=0$ for our simplified model
   systems.
-  %MRS12: somewhere will have to talk about stability and relative free energy of the more disordered initial configurations.
-  %MRS12: we MIGHT have to look at more disordered initial configurations. I think this can likely be done with just equilibration, where we see how different the quenched disorder when starting from an ensemble of structures, and putting off actually calculating scattring from a large number of simulations. 
+
+  % produce figures with: structure_factor.py --random_columns -nframes 1000 --hexagonal -g 86 86 256 -thermal_disorder 2.30 0.43 1.48 -dbwl 4.4 --pore_radius 6.6 -box 85 85 352 -sr 0
+  % Adjust sr from 0 to .75 to 1
   \begin{figure}
   \centering
   \begin{subfigure}{0.3\textwidth}
-  \includegraphics[width=\textwidth]{sf_qy_sr0.png}
+  \includegraphics[width=\textwidth]{sf_qy_sr0.pdf}
   \caption{$f$ = 0}\label{fig:sf_qy_sr0}
   \end{subfigure}
   \begin{subfigure}{0.3\textwidth}
-  \includegraphics[width=\textwidth]{sf_qy_sr75.png}
+  \includegraphics[width=\textwidth]{sf_qy_sr75.pdf}
   \caption{$f$ = 0.75}\label{fig:sf_qy_sr75}
   \end{subfigure}
   \begin{subfigure}{0.3\textwidth}
-  \includegraphics[width=\textwidth]{sf_qy_sr100.png}
+  \includegraphics[width=\textwidth]{sf_qy_sr100.pdf}
   \caption{$f$ = 1}\label{fig:sf_qy_sr100}
   \end{subfigure}
   \caption{As we increase column independence using the $f$ parameter, the
@@ -2512,7 +2510,7 @@
   % all of them.
   \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{z_correlation_fullbox.png}
+  \includegraphics[width=0.5\textwidth]{z_correlation_fullbox.pdf}
   \caption{When we average all $z$-slices of the 3D correlation function, the 
   correlation length of the ordered sandwich configuration nearly triples.}\label{fig:z_correlation_fullbox}
   \end{figure}
@@ -2540,7 +2538,7 @@
 
   \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{qy_fwhm.png}
+  \includegraphics[width=0.5\textwidth]{qy_fwhm.pdf}
   \caption{Increasing the amount of disorder in the $xy$ plane decreases the
 	  FWHM of the $q_y$ cross-section of R-$\pi$. When we cut the amount of $r$ and
 	  $\theta$ disorder in half (Noise factor = 0.5), the FWHM increases by 88\%. When
@@ -2598,11 +2596,11 @@
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{sandwiched_ensemble_rsection.png}
+  \includegraphics[width=\textwidth]{sandwiched_ensemble_rsection.pdf}
   \caption{Sandwiched}\label{fig:sandwiched_ensemble_rsection}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{offset_ensemble_rsection.png}
+  \includegraphics[width=\textwidth]{offset_ensemble_rsection.pdf}
   \caption{Parallel Displaced}\label{fig:offset_ensemble_rsection}
   \end{subfigure}
   \caption{The $q_r$ section of R-$\pi$ is much smoother when we generate simulated XRD
@@ -2648,14 +2646,14 @@
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{\textwidth}
-  \includegraphics[width=\textwidth]{offset_ensemble_pooled.png}
+  \includegraphics[width=\textwidth]{offset_ensemble_pooled.pdf}
   \caption{Distributions of deviations from ideal positions generated with data
   from all independent simulations}\label{fig:offset_ensemble_pooled}
   \end{subfigure}
   \begin{subfigure}{\textwidth}
   % BJC15: Also, do you have a preference for 1-sigma or 95 % confidence intervals? I think the 95 % is fine as is
   %MRS15: 95% is fine.
-  \includegraphics[width=\textwidth]{offset_ecdfs.png}
+  \includegraphics[width=\textwidth]{offset_ecdfs.pdf}
   \caption{Empirical cumulative distribution functions generated from (a) and
   from simulation ensembles.}\label{fig:offset_ecdfs}
   \end{subfigure}
@@ -2692,11 +2690,11 @@
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{offset_ensemble_stds.png}
+  \includegraphics[width=\textwidth]{offset_ensemble_stds.pdf}
   \caption{}\label{fig:offset_ensemble_stds}
   \end{subfigure}
   \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{offset_ensemble_means.png}
+  \includegraphics[width=\textwidth]{offset_ensemble_means.pdf}
   \caption{}\label{fig:offset_ensemble_means}
   \end{subfigure}
   \begin{subfigure}{\textwidth}
@@ -2878,17 +2876,17 @@
 %  \end{subfigure}
   \begin{subfigure}{0.3\linewidth}
   	\centering
-  	\includegraphics[width=\textwidth]{rotated_monomers.png}
+  	\includegraphics[width=\textwidth]{rotated_monomers.pdf}
   	\label{fig:rotated_monomers}
   \end{subfigure}
   \begin{subfigure}{0.3\linewidth}
   	\centering
-  	\includegraphics[width=\textwidth]{staggered.png}
+  	\includegraphics[width=\textwidth]{staggered.pdf}
 	\label{fig:staggered}
   \end{subfigure}
   \begin{subfigure}{0.3\linewidth}
   	\centering
-  	\includegraphics[width=\textwidth]{solvated_pore_cross_section.png}  %BJC6: I can simplify this more (stacked monomers on each side with a few water molecules in between.
+  	\includegraphics[width=\textwidth]{solvated_pore_cross_section.pdf}  %BJC6: I can simplify this more (stacked monomers on each side with a few water molecules in between.
   	\label{fig:solvated_pore}
   \end{subfigure}
 %  \begin{subfigure}{0.3\linewidth}
@@ -2898,17 +2896,17 @@
 %  \end{subfigure}
   \begin{subfigure}{0.3\linewidth}
   	\centering
-  	\includegraphics[width=\textwidth]{rotated_monomers_rzplot_restrained.png}
+  	\includegraphics[width=\textwidth]{rotated_monomers_rzplot_restrained.pdf}
   	\label{fig:rotated_monomers_rzplot_restrained}
   \end{subfigure}
   \begin{subfigure}{0.3\linewidth}
   	\centering
-  	\includegraphics[width=\textwidth]{staggered_rzplot_restrained.png}
+  	\includegraphics[width=\textwidth]{staggered_rzplot_restrained.pdf}
   	\label{fig:staggered_rzplot_restrained}
   \end{subfigure}
   \begin{subfigure}{0.3\linewidth}
   	\centering
-  	\includegraphics[width=\textwidth]{solvated_pore_rzplot_restrained.png}
+  	\includegraphics[width=\textwidth]{solvated_pore_rzplot_restrained.pdf}
   	\label{fig:solvated_pore_rzplot_restrained}
   \end{subfigure}
 %  \begin{subfigure}{0.3\linewidth}
@@ -2919,17 +2917,17 @@
 %  \end{subfigure}
   \begin{subfigure}{0.3\linewidth}
   	\centering
-  	\includegraphics[width=\textwidth]{rotated_monomers_rzplot_norestraints.png}
+  	\includegraphics[width=\textwidth]{rotated_monomers_rzplot_norestraints.pdf}
   	\caption{}\label{fig:rotated_monomers_rzplot_norestraints}
   \end{subfigure}
   \begin{subfigure}{0.3\linewidth}
   	\centering
-  	\includegraphics[width=\textwidth]{staggered_rzplot_norestraints.png} %BJC5: this needs to be updated
+  	\includegraphics[width=\textwidth]{staggered_rzplot_norestraints.pdf}
   	\caption{}\label{fig:staggered_rzplot_norestraints} 
   \end{subfigure}
   \begin{subfigure}{0.3\linewidth}
   	\centering
-  	\includegraphics[width=\textwidth]{solvated_offset_rzplot_1.png}
+  	\includegraphics[width=\textwidth]{solvated_offset_rzplot_1.pdf}
   	\caption{}\label{fig:solvated_pore_rzplot_norestraints}
   \end{subfigure}
   \caption{(a) When monomer head groups are rotated with respect to vertically
@@ -3003,13 +3001,13 @@
 %  \includegraphics[width=\textwidth]{rdouble_offset_solvated_rzplot.png}  
 %  \end{subfigure}
   \begin{subfigure}{\textwidth}
-  \includegraphics[width=\textwidth]{nophenyls_rzplot.png}
+  \includegraphics[width=\textwidth]{nophenyls_rzplot.pdf}
   \end{subfigure}
   \caption{}\label{fig:rdouble_nophenyls}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
   \centering
-  \includegraphics[width=\textwidth]{hbonds_tails.png}
+  \includegraphics[width=\textwidth]{hbonds_tails.pdf}
   \caption{}\label{fig:hbond_visualization}
   \end{subfigure}
 %  \begin{subfigure}{0.45\textwidth}
@@ -3102,18 +3100,21 @@
   %MRS8: this is good at showing most structures are the same.  It would be nice to also see how different components relate to each other spatially. Perhaps you can add a picture (can pick just one, since they are so similar) and plot the different components on one plot to show how the gradients intersect.
   \begin{figure}[!htb]
   \centering
+  \begin{subfigure}{\textwidth}
+  \includegraphics[width=\textwidth]{regional_density_legend.pdf}
+  \end{subfigure}
   \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=1\linewidth]{sodium_density.png}
+        \includegraphics[width=1\linewidth]{sodium_density.pdf}
         \caption{Sodium Ions}
         \label{fig:sodium_regional_density}
   \end{subfigure}
   \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=1\linewidth]{head_group_density.png}
+        \includegraphics[width=1\linewidth]{head_group_density.pdf}
         \caption{Head Groups}
         \label{fig:head_groups_regional_density}
   \end{subfigure}
   \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=1\linewidth]{tails_density.png}
+        \includegraphics[width=1\linewidth]{tails_density.pdf}
         \caption{Tails}
         \label{fig:tails_regional_density}
   \end{subfigure}
@@ -3476,13 +3477,13 @@
   \centering
   \begin{subfigure}{0.45\textwidth}
   	\centering
-  	\includegraphics[width=\textwidth]{dihedral_autocorrelation_300K.png}
+  	\includegraphics[width=\textwidth]{dihedral_autocorrelation_300K.pdf}
   	\caption{300K}\label{fig:dihedrals_300K}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
   	\centering
-  	\includegraphics[width=\textwidth]{dihedral_autocorrelation_500K.png}
-  	\caption{300K}\label{fig:dihedrals_500K}
+  	\includegraphics[width=\textwidth]{dihedral_autocorrelation_500K.pdf} % Run : torsions.py -t tethered_columns.xtc -g tethered_columns.gro (the appropriate dihedral is the default)
+  	\caption{500K}\label{fig:dihedrals_500K}
   \end{subfigure}
   \caption{The outer tail ether dihedrals become decorrelated on a reasonable
   timescale when we raise the system temperature. (a) The dihedrals do not
@@ -3567,7 +3568,7 @@
   
   \begin{figure}[!htb]
   \centering
-  \includegraphics[width=\textwidth]{xlink_charts.eps}
+  \includegraphics[width=\textwidth]{xlink_charts.pdf}
   \caption{There are minor differences between the physical properties of a
   crosslinked (xlink) system versus an uncrosslinked system. The sandwiched configuration (S)
   exhibits a smaller decrease in its ionic conductivity, while the parallel displaced (PD)

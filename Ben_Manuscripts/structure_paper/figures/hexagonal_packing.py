@@ -111,7 +111,7 @@ plt.ylabel('$q_z$', fontsize=18)
 plt.gcf().get_axes()[0].set_aspect('equal')
 plt.gcf().get_axes()[0].tick_params(labelsize=18)
 plt.tight_layout()
-plt.savefig('hexagonal_ft.png')
+plt.savefig('hexagonal_ft.pdf')
 plt.show()
 
 #fig, ax = plt.subplots()
