@@ -65,8 +65,8 @@ plt.colorbar()
 plt.xlabel('$q_r\ (\AA^{-1})$', fontsize=16)
 plt.ylabel('$q_z\ (\AA^{-1})$', fontsize=16)
 plt.tight_layout()
-plt.savefig('2DSAXS_axes.png')
-plt.show()
+#plt.savefig('2DSAXS_axes.png')
+
 third_peak_left = 0
 while qy[third_peak_left] < -0.38:
 	third_peak_left += 1
@@ -77,33 +77,24 @@ while qy[third_peak_right] < 0.38:
 
 third_peak_left_I = xsection[np.argmax(xsection[:third_peak_left])]
 third_peak_right_I = xsection[np.argmax(xsection[third_peak_right:]) + third_peak_right]
-print('Third peak intensity (left) = %.2f' % third_peak_left_I)
-print('Third peak intensity (right) = %.2f' % third_peak_right_I)
+#print('Third peak intensity (left) = %.2f' % third_peak_left_I)
+#print('Third peak intensity (right) = %.2f' % third_peak_right_I)
 
 avg_third_peak = (third_peak_left_I + third_peak_right_I) / 2
-print('Average Intensity of 3rd peak : %.2f' % avg_third_peak)
+#print('Average Intensity of 3rd peak : %.2f' % avg_third_peak)
 
-waxs_third_peak = 2.7033
+waxs_third_peak = 2.7033  # taken from 2D WAXS pattern
 
 norm = avg_third_peak / waxs_third_peak
 
 print('Average R-pores Intensity = %.2f' % (xsection[np.argmax(xsection)]/norm))
+
+plt.figure()
+
 plt.plot(qy, xsection / norm, linewidth=2)
 plt.ylabel('Intensity', fontsize=14)
 plt.xlabel('$q_r (\AA^{-1})$', fontsize=14)
 plt.gcf().get_axes()[0].tick_params(labelsize=14)
 plt.tight_layout()
-plt.savefig('saxs_xsection.png')
-plt.show()
-exit()
-plt.figure()
-
-levels = np.linspace(100, np.amax(pixels), 200)
-plt.contourf(qy, qx, pixels, levels=levels, cmap='jet', extend='both')
-plt.colorbar()
-plt.xlabel('$q_r (\AA^{-1})$')
-plt.ylabel('$q_z (\AA^{-1})$')
-plt.title('2D small angle X-ray scattering pattern')
-#plt.plot([0, 700], [pixels.shape[0] //2, pixels.shape[0]//2])
-#plt.plot([pixels.shape[1] //2, pixels.shape[1]//2], [0, 700])
+plt.savefig('saxs_xsection.pdf')
 plt.show()
