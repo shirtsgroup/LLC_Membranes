@@ -6,11 +6,12 @@ Based on Chapter 3 of Time Series Analysis by James Hamilton
 
 A process is "weakly stationary" or "covariance-stationary" if:
 E(Y_t) = mu     for all t
-E(Y_t - mu)(Y_(t-j) - mu) = gamma_j
+E(Y_t - mu)(Y_(t-j) - mu) = gamma_j = 0 for j != 0 and sigma^2 for j = 0
 
 j : number of observations
 mu : mean
 gamma_j : covariance
+sigma^2 : variance
 """
 
 import numpy as np
@@ -18,17 +19,24 @@ import matplotlib.pyplot as plt
 from statsmodels.tsa.stattools import adfuller
 
 
-def autocovariance(yt, ytlag):
+def autocovariance(joint_distribution):
 
     """
     E(yt)(ytlag)
     In words: expected value of yt times ytlag. They are not independent so you can't assume it equals E(yt)*E(ytlag)
     """
 
-    yt_expected_value = yt - yt.mean()
-    ytlag_expected_value = ytlag - ytlag.mean()
+    observations = joint_distribution.shape[1]
+    autocov = np.zeros([observations])
 
-    return (yt_expected_value * ytlag_expected_value).mean()
+    for j in range(observations):
+
+        yt_expected_value = joint_distribution[:, -1] - joint_distribution[:, -1].mean()
+        ytlag_expected_value = joint_distribution[:, -j] - joint_distribution[:, -j].mean()
+
+        autocov[j] = (yt_expected_value * ytlag_expected_value).mean()
+
+    return autocov
 
 
 # Generate data
@@ -42,21 +50,24 @@ joint_distribution = np.zeros([nrealizations, observations])
 for i in range(nrealizations):
     joint_distribution[i, :] = np.random.normal(loc=mean, scale=standard_deviation, size=observations)
 
-autocov = np.zeros([observations])
+autocov = autocovariance(joint_distribution)
+
 means = np.zeros([observations])
 
 for j in range(observations):
-    autocov[j] = autocovariance(joint_distribution[:, 0], joint_distribution[:, j])
     means[j] = np.mean(joint_distribution[:, j])
 
 fig, ax = plt.subplots(1, 2)
 t = np.linspace(0, observations, observations)
 ax[0].plot(t, autocov)
-ax[0].set_xlabel('t')
+ax[0].set_xlabel('time (ps)')
+ax[0].set_title('$\gamma_j$')
 ax[1].plot(t, means)
-ax[1].set_xlabel('t')
+ax[1].set_title('$\mu$')
+ax[1].set_xlabel('time (ps)')
 
 result = adfuller(joint_distribution[0, :])  # want p-value as low as possible if stationary
+print(joint_distribution[0, :])
 print('ADF Statistic: %f' % result[0])
 print('p-value: %f' % result[1])
 print('Critical Values:')

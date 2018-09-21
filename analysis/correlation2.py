@@ -15,7 +15,7 @@ from scipy.interpolate import RegularGridInterpolator
 
 def initialize():
 
-    parser = argparse.ArgumentParser(description='Run Cylindricity script')
+    parser = argparse.ArgumentParser(description='Calculate and plot slice of full 3D correlation function')
 
     parser.add_argument('-t', '--traj', default='traj_whole.xtc', type=str, help='Trajectory file. Make sure to '
                                                                             'preprocess with gmx trjconv -pbc whole')
