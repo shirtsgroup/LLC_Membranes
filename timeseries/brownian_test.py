@@ -124,34 +124,78 @@ if __name__ == "__main__":
     for i in range(args.lag, nframes):
             deviation[i - args.lag, ...] = com[i, ...] - com[i - args.lag, ...]
 
-    adf = []
-    for i in range(deviation.shape[1]):
-        adf.append(adfuller(deviation[:, i, 2])[1])
+    # adf = []
+    # for i in range(com.shape[1]):
+    #     adf.append(adfuller(com[:, i, 2])[1])
+    #
+    # for i in range(com.shape[1]):
+    #     fig, ax = plt.subplots(1, 2)
+    #     ax[0].plot(t.time, com[:, i, 2])
+    #     ax[0].set_xlabel('Time (ps)')
+    #     ax[0].set_title('Time Series')
+    #     ax[1].plot(t.time[::40], correlation.acf(com[::40, i, 2]))
+    #     ax[1].set_label('Lag (ps)')
+    #     ax[1].set_title('Autocorrelation Function')
+    #     plt.show()
+    # exit()
 
-    for i in range(com.shape[1]):
-        fig, ax = plt.subplots(1, 2)
-        ax[0].plot(t.time, com[:, i, 2])
-        ax[0].set_xlabel('Time (ps)')
-        ax[0].set_title('Time Series')
-        ax[1].plot(t.time[::40], correlation.acf(com[::40, i, 2]))
-        ax[1].set_label('Lag (ps)')
-        ax[1].set_title('Autocorrelation Function')
-        plt.show()
-    exit()
+    # plt.hist(adf, bins=20)
+    # plt.ylabel('Count')
+    # plt.xlabel('$p$-value')
+    # plt.tight_layout()
+    # plt.savefig('6ppore_p_hist.pdf')
+    # plt.show()
+    # exit()
 
-    plt.hist(adf)
-    plt.ylabel('Count')
-    plt.xlabel('p-value')
-    plt.show()
-    exit()
+    # result = adfuller(com[..., 2].flatten())  # want p-value as low as possible if stationary
+    # print('ADF Statistic: %f' % result[0])
+    # print('p-value: %f' % result[1])
+    # print('Critical Values:')
+    # for key, value in result[4].items():
+    #     print('\t%s: %.3f' % (key, value))
+    # exit()
 
-    fig, ax = plt.subplots(1, 2)
-    ax[0].plot(t.time[:-args.lag], correlation.autocov(deviation[..., 2].T))
-    ax[0].set_xlabel('time (ps)')
-    ax[0].set_title('$\gamma_j$')
-    ax[1].plot(t.time[:-args.lag], np.mean(deviation[..., 2], axis=1))
-    ax[1].set_title('$\mu$')
-    ax[1].set_xlabel('time (ps)')
+    # fig, ax = plt.subplots(1, 3, figsize=(12, 5))
+    # ax[0].plot(t.time/1000, com[:, 1, 2])
+    # ax[0].set_xlabel('time (ns)')
+    # ax[0].set_title('$z$-coordinate vs. time')
+    # ax[1].plot(t.time[:-args.lag]/1000, correlation.autocov(deviation[..., 2].T))
+    # ax[1].set_xlabel('time (ns)')
+    # ax[1].set_title('$\gamma_j$')
+    # ax[2].plot(t.time[:-args.lag]/1000, np.mean(deviation[..., 2], axis=1))
+    # ax[2].set_title('$\mu$')
+    # ax[2].set_xlabel('time (ns)')
+    # plt.tight_layout()
+    # plt.savefig('autocov_eth.pdf')
+    # plt.show()
+    # exit()
+
+    fig, ax = plt.subplots()
+
+    nframes = com.shape[0]
+    nmolecules = com.shape[1]
+    acfs = np.zeros([nframes, nmolecules])  # autocorrelation function for each molecule
+    for i in range(nmolecules):
+        acfs[:, i] = correlation.acf(com[:, i, 2])
+
+    nboot = 20000
+    acf_boot = np.zeros([nboot, nframes])
+
+    for i in range(nframes):
+        acf_boot[:, i] = acfs[i, np.random.choice(nmolecules, size=nboot, replace=True)]
+
+    error_boot = np.zeros([2, nframes])
+    error_boot[0, :] = np.abs(np.percentile(acf_boot, 2.5, axis=0) - np.mean(acf_boot, axis=0)) # 2.5 percent of data below this value
+    error_boot[1, :] = np.percentile(acf_boot, 97.5, axis=0) - np.mean(acf_boot, axis=0) # 97.5 percent of data below this value
+
+    bootstrapped = np.mean(acf_boot, axis=0)
+
+    show = int(0.5 * t.time.size)
+    ax.errorbar(t.time[:show] / 1000, bootstrapped[:show], yerr=error_boot[:, :show], ecolor='black', elinewidth=1,
+                color='blue', linewidth=2, errorevery=5)
+    ax.set_xlabel('time (ns)')
+    plt.tight_layout()
+    plt.savefig('acf_eth_HII.pdf')
     plt.show()
     exit()
 
