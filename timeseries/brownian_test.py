@@ -172,13 +172,21 @@ if __name__ == "__main__":
 
     fig, ax = plt.subplots()
 
-    nframes = com.shape[0]
+    nframes = int(com.shape[0] / args.lag) + 1
     nmolecules = com.shape[1]
     acfs = np.zeros([nframes, nmolecules])  # autocorrelation function for each molecule
     for i in range(nmolecules):
-        acfs[:, i] = correlation.acf(com[:, i, 2])
+        acfs[:, i] = correlation.acf(com[::args.lag, i, 2])
 
-    nboot = 20000
+    # plot a bunch of ACFs
+    show = int(0.5 * nframes)
+    for i in range(50):
+        plt.plot(t.time[:int(0.5*t.time.size):args.lag], acfs[:show, i])
+
+    plt.show()
+    exit()
+
+    nboot = 200
     acf_boot = np.zeros([nboot, nframes])
 
     for i in range(nframes):
