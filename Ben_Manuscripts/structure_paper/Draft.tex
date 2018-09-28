@@ -1929,23 +1929,23 @@
 
   In order to more clearly identify the structural reasons for R-spots, we
   equilibrated an ordered basin sandwiched configuration at 280 K to moderately
-  increase the order and therefore intensity.  Many force fields do not obtain
+  increase the order and therefore intensity. Many force fields do not obtain
   the correct equilibrium structure at precisely the experimental temperature.
   Wang et al. highlighted the shortcoming of some of the most popular protein
-  force field in predicting the temperature dependence of protein structural
+  force fields in predicting the temperature dependence of protein structural
   ensembles \cite{wang_building_2017}. It is therefore possible that   % page 12
   our membrane system, simulated at 300 K, is under-structured in the tail region
   compared to the experimental structure at 300 K. We found that lowering the
-  temperature indeed better resolved R-spots (Figure~\ref{fig:sandwiched280K}),
+  temperature better resolved R-spots (Figure~\ref{fig:sandwiched280K}),
   suggesting that our `effective' temperature might indeed be too high,
   understabilizing structure. 
 
   The evidence from simulations strongly suggest that the source of
   the R-spots reflection is packing of the tails in a hexagonal array.
-  First, we demonstrate R-spots comes primarily from the tails, by
+  First, we demonstrated that R-spots comes primarily from the tails by
   removing all non-tail atoms from the trajectory and simulating the
-  XRD diffraction pattern with the remaining atoms, which preserves
-  R-spots (Figure~\ref{fig:tails_rzplot}).  Next, we plotted the center
+  XRD pattern with the remaining atoms, which preserves
+  R-spots (Figure~\ref{fig:tails_rzplot}). Next, we plotted the center
   of masses of the first four tail atoms of all tails (Figure
   \ref{fig:centroids}). We measured the angle between each COM
   and its nearest neighbor COMs with respect to the
@@ -2004,14 +2004,14 @@
       explain R-spots. (c) To isolate the main cause of R-spots, we removed all atoms
       from the trajectory except for carbon atoms that constitute the tails. The
       simulated XRD pattern of the tails-only trajectory still shows R-spots. (d)
-      Since the tails stay relatively flat, we plotted the center of mass of the first
+      Since the tails stay relatively flat, we plotted the COM of the first
       four carbon atoms of each tail originating from the head groups (for example,
-      green colored centroids in the plot surround the red centroid in hexagonal fashion).
+      green colored COMs in the plot surround the red COM in hexagonal fashion).
       Visually, the packing looks hexagonal. (e) We hypothesize
       that R-spots is the result of ordered tail packing. Defining
       the membrane plane to be 0\degree, we measured the angles between each center of 
       mass and its nearest neighbor center of masses for the equilibrated 
-      sandwiched configuration simulated at 280K. Peaks appear in the distribution at 
+      sandwiched configuration simulated at 280 K. Peaks appear in the distribution at 
       $-60\degree$, $0\degree$ and $60\degree$. (f) The Fourier transform of a hexagonally
       packed grid of points defined by the angles in (e) shows intensity at the same
       locations where we expect to see R-spots, as well as intensity along the $q_z$ axis
@@ -2095,7 +2095,7 @@
   basins at the high end of that range.% and are on average 0.2 and 0.3 \AA~more distant.
   This behavior is not surprising since GAFF models atoms as point charges and
   does not appropriately model the aromatic $\pi-\pi$ interactions, which would make
-  it more energetically favorable for the monomers to stack closer together ~\cite{wang_development_2004}.
+  it more energetically favorable for the monomers to stack closer together~\cite{wang_development_2004}.
   It is also possible that the tails prevent close stacking of monomer head groups
   and we do not achieve the timescales necessary for them to rearrange into a
   necessarily more tightly packed configuration. We equilibrated the
@@ -2115,7 +2115,7 @@
   modestly from 4.5 $\pm$ 0.4 to 7.3 $\pm$ 1.2 \AA. However, visually, the
   correlation functions are nearly identical and oscillatory behavior persists
   throughout $g(z)$ in both cases (See
-  Figure~S-\ref{S-fig:z_correlation_overlay}).
+  Figure~S-\ref{S-fig:z_correlation_overlay} in the Supporting Information).
 
   The broadening of the $q_z$ cross-section of R-$\pi$ is related to
   $z$-directional correlation between scatters within monomer columns. The
@@ -2199,7 +2199,7 @@
   Parallel Displaced & 3.7                &    4.33 $\pm$ 0.04         & 14.5 $\pm$ 1.3           \\ 
   Sandwiched         & 5.0                &    4.48 $\pm$ 0.07         & 3.2 $\pm$ 0.9            \\
   Parallel Displaced & 5.0                &    4.60 $\pm$ 0.08         & $<$ $d_{equil}$ \\ 
-  Experiment         & --                 &    3.70                    & 10 $\pm$ 1               \\
+  Experiment         & --                 &    3.70                    & 9 $\pm$ 1               \\
   \bottomrule
   \end{tabular}
   \caption{The correlation length is larger for systems in the ordered basin. The equilibrated vertical
@@ -2482,9 +2482,9 @@
 	  same reference $z$ coordinate, $f$ = 0, the intensity of R-$\pi$ is 18.3 and is
 	  characterized by sharp Bragg-like peaks. (b) When columns have a moderate
 	  amount of independence, $f$ = 0.75, the intensity of R-$\pi$ decreases 5-fold
-	  to 3.7. The edges of the peak are beginning to smooth out, but sharp peaks
+	  to 3.2. The edges of the peak are beginning to smooth out, but sharp peaks
 	  still exist. (c) When columns are completely independent, $f$ = 1, the
-	  intensity of R-$\pi$ decreases 8-fold to 2.3 and the cross-section is
+	  intensity of R-$\pi$ decreases 8-fold to 2.1 and the cross-section is
           relatively smooth.}\label{fig:column_displacement}
   \end{figure}
 
@@ -2495,10 +2495,10 @@
   $g(z)$ of the ordered sandwiched system would very closely resemble
   Figure~\ref{fig:z_correlation_sandwich} when we average all $z$-slices of the
   3D correlation function. When we include all $z$-slices in $g(z)$ for our
-  system, rather than restricting it to those $z$-slices within 2.1 \AA of the
+  system, rather than restricting it to those $z$-slices within 2.1 \AA~of the
   center of the correlation function (Section~\ref{section:correlation_length}),
   the function shows oscillatory behavior and the correlation length
-  nearly triples to 12.4 $\pm$ 0.7 \AA. (Figure~\ref{fig:z_correlation_fullbox}).
+  nearly triples to 12.4 $\pm$ 0.7 \AA~(Figure~\ref{fig:z_correlation_fullbox}).
   Since all columns in our initial configuration are started at the same
   $z$-coordinate, $g(z)$ on average exhibits correlation of head groups with
   other head groups within the same column, with head groups in other columns
@@ -2539,7 +2539,7 @@
   \centering
   \includegraphics[width=0.5\textwidth]{qy_fwhm.pdf}
   \caption{Increasing the amount of disorder in the $xy$ plane decreases the
-	  FWHM of the $q_y$ cross-section of R-$\pi$. When we cut the amount of $r$ and
+	  FWHM of the $q_r$ cross-section of R-$\pi$. When we cut the amount of $r$ and
 	  $\theta$ disorder in half (Noise factor = 0.5), the FWHM increases by 88\%. When
 	  we double the disorder (Noise factor = 2), the FWHM decreases by
 	  51\%.}\label{fig:qy_fwhm}
@@ -2701,16 +2701,17 @@
   \caption{}\label{fig:offset_ensemble_regional_density}
   \end{subfigure}
   \caption{(a) The standard deviation of the distribution of quenched disorder
-  from the first 5 ns of the main ordered parallel displaced system studied in
+  from the first 5 ns of the main (400 ns) ordered parallel displaced system studied in
   this paper (black dashed line) is in agreement with the distribution of quenched disorder 
   standard deviations calculated from the ensemble of simulations (histogram). 
   (b) The mean values of $r$ and $\theta$ from the first 5 ns of the main
   system trajectory (black dashed line) is in agreement with the distribution of mean values
   calculated from each simulation in the ensemble (histogram). The mean values of $z$
   are necessarily 0 so they are not plotted. (c) The radial densities of tail
-  atoms, head group atoms and sodium atoms calculated from the first 5 ns of the
-  main system simulation trajectory (black lines) and from the ensemble of 
-  trajectories (all other lines) look qualitatively similar.}\label{fig:ensemble_stds}
+  atoms, head group atoms and sodium atoms, as a function of distance from the pore center,
+  calculated from the first 5 ns of the main system simulation trajectory (black lines) 
+  and from the ensemble of trajectories (purple) look qualitatively similar. The 95 \%
+  confidence interval generated based on the ensemble of simulations is shaded in purple.}\label{fig:ensemble_stds}
   \end{figure}
 
   \subsubsection*{The implications of the new-found understanding of R-$\pi$}
@@ -2720,7 +2721,7 @@
   distance between monomer head groups is too large, likely due to failures
   of the force field to appropriately model $\pi-\pi$ interactions. The intensity
   of the simulated R-$\pi$ is too high, which may be a consequence of too much short-range
-  ordering in the $z$-direction in addition to high degrees of correlation 
+  ordering in the $z$-direction in addition to a high degree of correlation 
   between columns. Finally, the $q_r$ cross-section of R-$\pi$ is not smooth, 
   which is also likely a consequence of columns that are too highly correlated.
   If we limit ourselves to standard simulation techniques, it is necessary to 
@@ -2738,7 +2739,7 @@
   at the same $q_r$ value as R-double which are only present in simulated patterns
   generated from parallel displaced configurations. The monomers may prefer to be
   parallel displaced, but their displacement is likely only slightly shifted, on 
-  the $xy$ plane, from the center of mass of their vertically adjacent neighbors 
+  the $xy$ plane, from the COM of their vertically adjacent neighbors 
   (see Figure~S-\ref{S-fig:between_pd} of the Supporting Information). In this way,
   columns can more easily act 
   independently while maintaining some features of parallel displaced structure. 
@@ -2789,9 +2790,12 @@
   pattern and its real space configuration is well-known as the phase
   problem~\cite{taylor_phase_2003}. We have proposed configurations that
   result in the appearance of R-double below, and we can speculate which makes
-  the most physical sense. It appears that we cannot achieve a long-term stable
-  system that exhibits R-double without the inclusion of small amounts of water
-  in the pores.
+  the most physical sense. 
+
+% Following is in previous paragraph
+%It appears that we cannot achieve a long-term stable
+%  system that exhibits R-double without the inclusion of small amounts of water
+%  in the pores.
   
     %BJC10: I think this belongs somewhere in this section.
     %BJC11: might be covered well enough in above 
@@ -2805,14 +2809,15 @@
 %MRS12: I think it is useful to put in just to show we've been thinking about them.  Can omit the figure in the main text.
   One way to produce R-double is if our initial configuration contains
   alternating parallel and anti-parallel carboxylate groups relative to the plane
-  of the monomer's phenyl ring.  It is difficult to physically justify this
+  of the monomer's phenyl ring. It is difficult to physically justify this
   system. Systems built this way are only stable if position restraints are
   placed on all head group heavy atoms.  Carboxylate groups quickly revert to the
   parallel position as restraints are released. There is an appreciable energy
   barrier that prevents rotation of carboxylate groups attached to phenyl rings
-  since the group extends the system's $\pi$ conjugation ~\cite{carey_organic_2011} (see Figure
-  S-\ref{S-fig:carboxylate_dihedral_rb} of the Supporting Information), which is significant even considering
-  possible overestimates of the barrier height in the classical force field. 
+  since the group extends the system's $\pi$
+  conjugation~\cite{carey_organic_2011}, which is significant even considering
+  possible overestimates of the barrier height in the classical force field (see
+  Figure S-\ref{S-fig:carboxylate_dihedral_rb} of the Supporting Information). 
 %  
 %  %BJC5: add citation for extended pi conjugation
 %  There are instances where carboxylate groups in other systems rotate out of plane. Bushey et
@@ -2826,15 +2831,15 @@
 %  carboxylate bond would be sterically hindered. 
 
   Another way to produce R-double is if we rotate monomers with respect to
-  vertically adjacent monomers. In this configuration, the LLC monomers are rotated so
-  that the vector created by the bond extending from the carboxylate carbon to
-  the phenyl ring is oriented $\pm 15 \degree$ with respect to the vector
-  extending from the head group COM to the pore center (Figure
+  vertically adjacent monomers on the $xy$ plane. In this configuration, the LLC
+  monomers are rotated so that the vector created by the bond extending from the
+  carboxylate carbon to the phenyl ring is oriented $\pm 15 \degree$ with respect
+  to the vector extending from the head group COM to the pore center (Figure
   ~\ref{fig:rotated_monomers_rzplot_norestraints}). Every other monomer layer is
   rotated $+15 \degree$ and those in between are rotated $-15 \degree$. This
   configuration allows monomer tails to sit between adjacent monomer tails which
   may be the most favorable way for them to pack. This configuration is only
-  stable for a few nanoseconds but R-double quickly fades. 
+  stable for a few nanoseconds before R-double quickly fades. 
   %MRS12: seems like unnecssary speculation below, since there are a lot of cancelling affects. 
   %The long-term stability of a configuration similar to this may be feasible if monomers stay
   %stacked 3.7 \AA~apart.   
@@ -2849,7 +2854,7 @@
   Our force field causes our system to tend towards uniformly spaced layers.
   Simulations of unevenly spaced systems are only stable if position restraints
   are applied to heavy atoms of the phenyl rings.  Additionally, there is little
-  evidence from QM studies of stacked $\pi-\pi$ systems that such uneven stacking
+  evidence from QM studies of stacked $\pi-\pi$ systems that suggest uneven stacking
   could be energetically stable.~\cite{tauer_beyond_2005} 
   
   The addition of water to the system promotes the appearance of R-double, providing
@@ -2932,14 +2937,14 @@
   \end{subfigure}
   \caption{(a) When monomer head groups are rotated with respect to vertically
 	  adjacent monomers (top), R-double is visible while the heavy atoms of the head
-	  groups are held in place with position restraints (middle). Again, R-double
-	  fades once the position restraints are released. (b) When monomers are
+	  groups are held in place with position restraints (middle). R-double
+	  fades once the position restraints are released (bottom). (b) When monomers are
 	  non-uniformly spaced (top), R-double appears if all heavy atoms of the head
-	  groups are held in place with position restraints (middle). R-double quickly
+	  groups are held in place with position restraints (middle). Again, R-double quickly
 	  fades once the position restraints are released (bottom). (c) When we add 1
 	  wt\% water to the parallel displaced configuration in the ordered basin (top)
 	  R-double is not initially present during the restrained portion of
-	  equilibration (middle).  After 200 ns of equilibration, R-double becomes
+	  equilibration (middle). After 200 ns of equilibration, R-double becomes
 	  visible and persists for another 200 ns (bottom).}\label{fig:rdouble}
   \end{figure}
 
@@ -2986,8 +2991,8 @@
   Feng et al.\cite{feng_scalable_2014,feng_thin_2016} was not truly a
   thermotropic Col\textsubscript{h} phase. Rather, they were very low water
   content H\textsubscript{II} phases unintentionally created due to the neat
-  monomers' hydroscopicity.  Anecdotal evidence from other researchers suggests
-  that membranes are less likely to assemble under completely dry
+  monomers' hydroscopicity. Anecdotal evidence from other researchers suggests
+  that these membranes are less likely to assemble under completely dry
   conditions, supporting the idea %~\cite{personal_communication_with_mike_mcgrath} <- BJC16: what do I do with this?
   that the ``dry'' structures do absorb some water. This detail may therefore be
   important for reproducing the results of Feng et al.
@@ -3399,6 +3404,7 @@
   We measured the diffusion constants of monomers in each of the systems we
   studied (see Table S-\ref{S-table:msd} of the Supporting Information) and learned that they are all on the order of
   $10^{-14}~m^2/s$. However, since on this timescale, no monomers move
+%BJC16: is it an overestimate or underestimate? 
   a full `level` above or below, this may be an overestimate. This slow speed is
   not entirely surprising considering how densely the monomers are
   packed as implied by diffraction experiments. The entangled tails
@@ -3446,8 +3452,8 @@
   not cross the $x$-axis until $\sim$105 ns meaning that tails fully rotate on average about 
   4 times over the course of the 400 ns that we studied. Additionally, the correlation 
   function plateau's near a value of -0.2 which indicates that the tails are starting in 
-  an unfavorable configuration. We implemented distance restraints between the centers of 
-  mass of monomer head groups to preserve the hexagonal phase, then raised the temperature 
+  an unfavorable configuration. We implemented distance restraints between the COMs 
+  of monomer head groups to preserve the hexagonal phase, then raised the temperature 
   of the equilibrated 300 K ordered basin sandwiched system to 500 K. We witnessed 
   decorrelation of the ether dihedrals after $\sim$11 ns with a plateau at 0, 
   (Figure~\ref{fig:dihedrals_500K}) indicating a complete loss of memory. We annealed
@@ -3551,7 +3557,7 @@
   displaced configurations in the ordered pore basin. We allowed the cross-linking
   algorithm to propagate until greater than 90\% of the vinyl groups on the tails of the 
   monomers were either involved in a cross-linking reaction or were terminated 
-  (see Section S-\ref{S-section:xlink} of the Supporting Information)
+  (see Section S-\ref{S-section:xlink} of the Supporting Information
   for further details of the cross-linking algorithm). We allowed the cross-linked
   configurations to simulate for 100 ns further in the NPT ensemble. 
 
@@ -3643,7 +3649,7 @@
   parallel displaced configuration with 5 monomer columns per pore and 1 wt\%
   water. R-alkanes and R-pores appear where expected for the reasons originally
   predicted. We find that R-spots is likely due to ordered alkane chain packing.
-  R-$\pi$ appears at lower q values than experiment because monomer stack too far
+  R-$\pi$ appears at lower $q$ values than experiment because monomer stack too far
   apart, and its intensity is far too high, likely because our initial
   configurations contain a high level of dependence between monomer columns.
   We can learn more about the time averaged structure of these systems by studying
