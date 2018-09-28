@@ -602,6 +602,28 @@
   does a better job of showing the spread of pore-to-pore distances.}~\label{table:p2p}
   \end{table}
 
+  \section{2D Small Angle X-ray Scattering Data}  
+  
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.5\textwidth]{2DSAXS_axes.png}
+  \caption{Two dimensional small angle X-ray scattering experiments show
+  reflections along the $q_r$ axis at $q_z$=0. The spacing between the reflections
+  is characteristic of a hexagonal phase and is directly related to the distance
+  between pores. The reflections are arced because the pores are not perfectly
+  aligned. A perfectly aligned system would show dots at each peak location. An
+  isotropically aligned system would show concentric rings about the origin which
+  pass through each peak location. The d\textsubscript{100} and d\textsubscript{110} 
+  peaks (the first two pairs of reflections from origin located at $|\mathbf{q}| 
+  \approx 0.18~\AA^{-1}$ and $|\mathbf{q}| \approx 0.31~\AA^{-1}$) are not visible
+  in the 2D WAXS pattern. The edges of the d\textsubscript{200} reflection (the third
+  pair of reflections located at $|\mathbf{q}| \approx 0.36~\AA^{-1}$) are slightly
+  visible in the 2D WAXS pattern, so we used them to approximate the experimental
+  intensity of R-pores.}\label{fig:2DSAXS}
+  \end{figure}
+
+  \newpage
+
   \section{Component radial density functions}\label{section:radial_density}
   
   \begin{figure}[!htb]
@@ -776,27 +798,7 @@
 %		\includegraphics[width=\textwidth]{ps5offset.png}
 %		\caption{}\label{fig:ps5offset} 
 %	\end{subfigure}
-%  \end{figure}
-
-  \section{2D Small Angle X-ray Scattering Data}  
-  
-  \begin{figure}[!htb]
-  \centering
-  \includegraphics[width=0.5\textwidth]{2DSAXS_axes.png}
-  \caption{Two dimensional small angle X-ray scattering experiments show
-  reflections along the $q_r$ axis at $q_z$=0. The spacing between the reflections
-  is characteristic of a hexagonal phase and is directly related to the distance
-  between pores. The reflections are arced because the pores are not perfectly
-  aligned. A perfectly aligned system would show dots at each peak location. An
-  isotropically aligned system would show concentric rings about the origin which
-  pass through each peak location. The d\textsubscript{100} and d\textsubscript{110} 
-  peaks (the first two pairs of reflections from origin located at $|\mathbf{q}| 
-  \approx 0.18~\AA^{-1}$ and $|\mathbf{q}| \approx 0.31~\AA^{-1}$) are not visible
-  in the 2D WAXS pattern. The edges of the d\textsubscript{200} reflection (the third
-  pair of reflections located at $|\mathbf{q}| \approx 0.36~\AA^{-1}$) are slightly
-  visible in the 2D WAXS pattern, so we used them to approximate the experimental
-  intensity of R-pores.}\label{fig:2DSAXS}
-  \end{figure}
+%  \end{figure}  
   
   \section{Ionic Conductivity}\label{section:ionic_conductivity}
   
@@ -827,7 +829,7 @@
         the collective diffusion model because there is inherently less data that 
         can be used for its calculation. For that reason, we use only the Nernst-Einstein relationship in the main text.}
         \label{fig:conductivity}
-  \end{figure}
+  \end{figure}  
   
   \section{Crosslinking algorithm details}\label{section:xlink}
 
@@ -1137,6 +1139,66 @@
         a high degree of order. (d) We repeated the procedure again with the tail-ends.
         There is far less order at the ends of the tails where there is more
         space to fill.}\label{fig:tail_packing}
+  \end{figure}
+  
+  \clearpage
+  
+  \section{Ensemble of ordered sandwiched configurations}
+  
+  Here we show the results of the same analysis shown in Figures~\ref{M-fig:ensemble_XRD} 
+  and~\ref{M-fig:full_ensemble_distributions} of the main text for the 
+  ordered sandwiched ensemble of configurations.
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{\textwidth}
+  \includegraphics[width=\textwidth]{sandwiched_ensemble_pooled.pdf}
+  \caption{Distributions of deviations from ideal positions generated with data
+  from all independent simulations}\label{fig:offset_ensemble_pooled}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+  \includegraphics[width=\textwidth]{sandwiched_ecdfs.pdf}
+  \caption{Empirical cumulative distribution functions generated from (a) and
+  from simulation ensembles.}\label{fig:offset_ecdfs}
+  \end{subfigure}
+  \caption{(a) The distributions of the head group COM deviations
+  from their idealized positions generated using pooled data from all
+  frames of each independent configuration are symmetric, implying that 
+  there is equal probability for a head group to displace in the positive
+  or negative $z$, $r$ or $\theta$-direction. (b) The COM position of a 
+  given head group is displaced randomly upon quenching. The ECDF generated from
+  the pooled distributions (black) in (a) agree with the means of the 
+  ECDFs generated from each COM (red). The red error bars are larger than
+  the black error bars since there is a wider distribution of mean COM
+  deviations than the mean deviations of distributions sampled from the full
+  distribution.}\label{fig:full_ensemble_distributions}
+  \end{figure} 
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{sandwiched_ensemble_stds.pdf}
+  \caption{}\label{fig:offset_ensemble_stds}
+  \end{subfigure}
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{sandwiched_ensemble_means.pdf}
+  \caption{}\label{fig:offset_ensemble_means}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+  \includegraphics[width=\textwidth]{sandwiched_ensemble_regional_density.pdf}
+  \caption{}\label{fig:offset_ensemble_regional_density}
+  \end{subfigure}
+  \caption{(a) The standard deviation of the distribution of quenched disorder
+  from the first 5 ns of the main ordered sandwiched system studied in
+  this paper (black dashed line) is in agreement with the distribution of quenched disorder 
+  standard deviations calculated from the ensemble of simulations (histogram). 
+  (b) The mean values of $r$ and $\theta$ from the first 5 ns of the main
+  system trajectory (black dashed line) is in agreement with the distribution of mean values
+  calculated from each simulation in the ensemble (histogram). The mean values of $z$
+  are necessarily 0 so they are not plotted. (c) The radial densities of tail
+  atoms, head group atoms and sodium atoms calculated from the first 5 ns of the
+  main system simulation trajectory (black lines) and from the ensemble of 
+  trajectories (all other lines) look qualitatively similar.}\label{fig:ensemble_stds}
   \end{figure}
   
   \clearpage

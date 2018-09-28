@@ -125,13 +125,19 @@ if __name__ == "__main__":
     # axmean[0].yaxis.set_tick_params(labelsize=12)
 
     axmean[0].hist(means[:, 1], bins=bins)
-    axmean[0].plot([0.71, 0.71], [0, 13], '--', color='black', linewidth=2)  # parallel displaced
+    if name == 'offset':
+        axmean[0].plot([0.71, 0.71], [0, 13], '--', color='black', linewidth=2)  # parallel displaced
+    elif name == 'sandwiched':
+        axmean[0].plot([0.68, 0.68], [0, 13], '--', color='black', linewidth=2)  # parallel displaced
     axmean[0].set_xlabel('$\mu_r$ (nm)', fontsize=16)
     axmean[0].xaxis.set_tick_params(labelsize=12)
     axmean[0].yaxis.set_ticks(np.linspace(0, 8, 5))
 
     axmean[1].hist(means[:, 2], bins=bins)
-    axmean[1].plot([-0.04, -0.04], [0, 12], '--', color='black', linewidth=2)  # parallel displaced
+    if name == 'offset':
+        axmean[1].plot([-0.04, -0.04], [0, 12], '--', color='black', linewidth=2)  # parallel displaced
+    elif name == 'sandwiched':
+        axmean[1].plot([0, 0], [0, 12], '--', color='black', linewidth=2)  # parallel displaced
     axmean[1].set_xlabel('$\mu_\Theta$ (radians)', fontsize=16)
     axmean[1].xaxis.set_tick_params(labelsize=12)
 
@@ -151,19 +157,28 @@ if __name__ == "__main__":
 
     bins = 10
     ax0[0].hist(sigmas[:, 0], bins=bins)
-    ax0[0].plot([0.1628, 0.1628], [0, 12], '--', color='black', linewidth=2)
+    if name == 'offset':
+        ax0[0].plot([0.1628, 0.1628], [0, 12], '--', color='black', linewidth=2)
+    elif name == 'sandwiched':
+        ax0[0].plot([0.157, 0.157], [0, 12], '--', color='black', linewidth=2)
     ax0[0].set_xlabel('$\sigma_z$ (nm)', fontsize=16)
     ax0[0].set_ylabel('Count', fontsize=16)
     ax0[0].xaxis.set_tick_params(labelsize=12)
     ax0[0].yaxis.set_tick_params(labelsize=12)
 
     ax0[1].hist(sigmas[:, 1], bins=bins)
-    ax0[1].plot([0.2060, 0.2060], [0, 12], '--', color='black', linewidth=2)
+    if name == 'offset':
+        ax0[1].plot([0.2060, 0.2060], [0, 12], '--', color='black', linewidth=2)
+    elif name == 'sandwiched':
+        ax0[1].plot([0.1991, 0.1991], [0, 12], '--', color='black', linewidth=2)
     ax0[1].set_xlabel('$\sigma_r$ (nm)', fontsize=16)
     ax0[1].xaxis.set_tick_params(labelsize=12)
 
     ax0[2].hist(sigmas[:, 2], bins=bins)
-    ax0[2].plot([0.2429, 0.2429], [0, 12], '--', color='black', linewidth=2)
+    if name == 'offset':
+        ax0[2].plot([0.2429, 0.2429], [0, 12], '--', color='black', linewidth=2)
+    elif name == 'sandwiched':
+        ax0[2].plot([0.2917, 0.2917], [0, 12], '--', color='black', linewidth=2)
     ax0[2].set_xlabel('$\sigma_\Theta$ (radians)', fontsize=16)
     ax0[2].xaxis.set_tick_params(labelsize=12)
 
