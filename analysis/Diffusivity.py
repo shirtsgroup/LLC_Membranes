@@ -271,19 +271,20 @@ class Diffusivity(object):
         self.confidence_interval = stats.t.interval(0.95, N - 1, loc=slopes.mean(), scale=stats.sem(slopes))
         self.Davg = slopes.mean()
 
-    def plot(self, axis):
+    def plot(self, axis, fracshow=0.5):
 
-        plt.plot(self.time[self.startfit:self.endfit]/1000, self.yfit, '--', color='black', label='Linear Fit')
-        plt.errorbar(self.time/1000, self.MSD_average, yerr=[self.limits[0, :], self.limits[1, :]],
-                     errorevery=self.errorevery, label='MSD')
+        end_frame = int(fracshow * self.time.size)
+        #plt.plot(self.time[self.startfit:self.endfit]/1000, self.yfit, '--', color='black', label='Linear Fit')
+        plt.errorbar(self.time[:end_frame]/1000, self.MSD_average[:end_frame], yerr=[self.limits[0, :end_frame],
+                     self.limits[1, :end_frame]], errorevery=self.errorevery, label='MSD')
 
         plt.ylabel('MSD ($nm^2$)', fontsize=14)
         plt.xlabel('time (ns)', fontsize=14)
         plt.gcf().get_axes()[0].tick_params(labelsize=14)
-        plt.title('D = %1.2e $\pm$ %1.2e $m^{2}/s$' % (self.Davg, np.abs(self.Davg - self.confidence_interval[0])))
-        plt.legend(loc=2)
+        #plt.title('D = %1.2e $\pm$ %1.2e $m^{2}/s$' % (self.Davg, np.abs(self.Davg - self.confidence_interval[0])))
+        #plt.legend(loc=2)
         plt.tight_layout()
-        plt.savefig('Diffusivity_%s.png' % axis)
+        plt.savefig('Diffusivity_%s.pdf' % axis)
         plt.show()
 
 
@@ -295,5 +296,5 @@ if __name__ == "__main__":
     D.calculate()
     D.ensure_fit()  # make sure diffusivity is being measured from the linear region of the MSD curve
     D.bootstrap(args.nboot)
-    D.plot(args.axis)
+    D.plot(args.axis, fracshow=args.fracshow)
     print('D = %1.2e +/- %1.2e m^2/s' % (D.Davg, np.abs(D.Davg - D.confidence_interval[0])))

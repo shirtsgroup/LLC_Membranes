@@ -127,7 +127,7 @@ if __name__ == "__main__":
     # adf = []
     # for i in range(com.shape[1]):
     #     adf.append(adfuller(com[:, i, 2])[1])
-    #
+
     # for i in range(com.shape[1]):
     #     fig, ax = plt.subplots(1, 2)
     #     ax[0].plot(t.time, com[:, i, 2])
@@ -143,7 +143,7 @@ if __name__ == "__main__":
     # plt.ylabel('Count')
     # plt.xlabel('$p$-value')
     # plt.tight_layout()
-    # plt.savefig('6ppore_p_hist.pdf')
+    # plt.savefig('water_p_hist.pdf')
     # plt.show()
     # exit()
 
@@ -172,25 +172,31 @@ if __name__ == "__main__":
 
     fig, ax = plt.subplots()
 
-    nframes = int(com.shape[0] / args.lag) + 1
+    nframes = int(com.shape[0] / args.lag)
+    if args.lag > 1:
+        nframes += 1
     nmolecules = com.shape[1]
     acfs = np.zeros([nframes, nmolecules])  # autocorrelation function for each molecule
     for i in range(nmolecules):
         acfs[:, i] = correlation.acf(com[::args.lag, i, 2])
 
     # plot a bunch of ACFs
-    show = int(0.5 * nframes)
-    for i in range(50):
-        plt.plot(t.time[:int(0.5*t.time.size):args.lag], acfs[:show, i])
-
-    plt.show()
-    exit()
+    # show = int(0.5 * nframes)
+    # for i in range(50):
+    #     plt.plot(t.time[:int(0.5*t.time.size):args.lag], acfs[:show, i])
+    #
+    # plt.show()
+    # exit()
 
     nboot = 200
     acf_boot = np.zeros([nboot, nframes])
 
-    for i in range(nframes):
-        acf_boot[:, i] = acfs[i, np.random.choice(nmolecules, size=nboot, replace=True)]
+    # for i in range(nframes):
+    #     acf_boot[:, i] = acfs[i, np.random.choice(nmolecules, size=nboot, replace=True)]
+    print(nmolecules)
+    for i in range(nboot):
+        choices = np.random.choice(nmolecules, size=nmolecules, replace=True)  # randomly choose water trajectories with replacement
+        acf_boot[i, :] = acfs[:, choices].mean(axis=1)
 
     error_boot = np.zeros([2, nframes])
     error_boot[0, :] = np.abs(np.percentile(acf_boot, 2.5, axis=0) - np.mean(acf_boot, axis=0)) # 2.5 percent of data below this value

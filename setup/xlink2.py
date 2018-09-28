@@ -37,6 +37,27 @@ def initialize():
     return parser
 
 
+class Atoms(object):
+
+    def __init__(self, res, nres):
+        """
+
+        :param res: Residue() object
+        :param nres: number of residues (properties will be duplicated from res, nres times). All same-type residues in
+        .gro file are grouped together.
+        """
+
+        natoms = res.natoms
+        self.type = np.zeros([nres*natoms], dtype=object)
+        self.charge = np.zeros([nres*natoms])
+        self.mass = np.zeros([nres*natoms])
+
+        for i in range(len(res.atom_info)):
+            self.type[i::natoms] = str(res.atom_info[i][1])
+            self.charge[i::natoms] = float(res.atom_info[i][6])
+            self.mass[i::natoms] = float(res.atom_info[i][7])
+
+
 class Residue(object):
 
     def __init__(self, name):
@@ -177,22 +198,38 @@ class Topology():
 
     def __init__(self):
 
+        # create residue object for each residue in system
         self.residues = [Residue(a) for a in list(set([a.residue.name for a in self.t.topology.atoms]))]
 
+        # define which residue is going to be cross-linked
         self.res_ndx = [i.name for i in self.residues].index(self.xlink_residue_name)
         self.xlink_residue = self.residues[self.res_ndx]
-        self.xlink_residue.get_reactive_carbons()
+        self.xlink_residue.get_reactive_carbons()  # get names of carbon atoms that will bond
 
+        # number of atoms per residue
         self.nresidues = {}
         for r in self.residues:
             self.nresidues[r.name] = self.all_residues.count(r.name) // r.natoms
 
+        # get all information about atoms
+        self.xlink_residue_atoms = Atoms(self.xlink_residue, self.nresidues[self.xlink_residue_name])
+
+        # get all bonds
         self.all_bonds = []
         natoms = self.residues[self.res_ndx].natoms
         bonds = self.residues[self.res_ndx].bonds
         for i in range(self.nresidues[self.xlink_residue_name]):
             for j in range(len(bonds)):
                 self.all_bonds.append([int(bonds[j][0]) + i * natoms, int(bonds[j][1]) + i * natoms])
+
+        # number all vsites
+        nvsites = len(self.residues[self.res_ndx].virtual_sites)
+        nres = self.nresidues[self.xlink_residue_name]
+        self.vsites = np.zeros([nvsites*nres, 9], dtype=object)
+        for i in range(nres):
+            for k in range(nvsites):
+                self.vsites[i * nvsites + k, :] = [float(j) for j in self.residues[self.res_ndx].virtual_sites[k]]
+                self.vsites[i * nvsites + k, :5] += i * natoms
 
         # get pairs, angles, dihedrals
         self.pairs = None
@@ -234,9 +271,14 @@ class Topology():
             nres = self.nresidues[self.xlink_residue_name]
             for i in range(nres):
                 for j in range(len(atom_info)):
-                    f.write('{:>5d}{:>5s}{:>6s}{:>6s}{:>6s}{:>7s}{:>13s}{:>13s}\n'.format(int(atom_info[j][0]) + i*natoms,
-                            atom_info[j][1], atom_info[j][2], atom_info[j][3], atom_info[j][4], atom_info[j][5],
-                            atom_info[j][6], atom_info[j][7]))
+                    f.write('{:>5d}{:>5s}{:>6s}{:>6s}{:>6s}{:>7s}{:>13f}{:>13f}'.format(int(atom_info[j][0]) + i*natoms,
+                            self.xlink_residue_atoms.type[i*natoms + j], atom_info[j][2], atom_info[j][3],
+                            atom_info[j][4], atom_info[j][5], self.xlink_residue_atoms.charge[i*natoms + j],
+                            self.xlink_residue_atoms.mass[i * natoms + j]))
+                    if (i*natoms + j) in self.radicals:
+                        f.write('; *\n')
+                    else:
+                        f.write('\n')
 
             f.write('\n[ bonds ]\n')
             f.write(';   ai     aj funct\n')
@@ -271,14 +313,10 @@ class Topology():
 
             f.write('\n[ virtual_sites4 ]\n')
             f.write(';Site  from                         funct   a          b          d\n')
-            vsites = self.residues[self.res_ndx].virtual_sites
-            for i in range(nres):
-                for j in range(len(vsites)):
-                    if (int(vsites[j][0]) + i * natoms) not in self.initiators:
-                        f.write('{:<8d}{:<6d}{:<6d}{:<6d}{:<8d}{:<8s}{:<11s}{:<11s}{:<11s}\n'.format(int(vsites[j][0]) +
-                                i * natoms, int(vsites[j][1]) + i * natoms, int(vsites[j][2]) + i * natoms,
-                                int(vsites[j][3]) + i * natoms, int(vsites[j][4]) + i * natoms, vsites[j][5], vsites[j][6],
-                                vsites[j][7], vsites[j][8]))
+            for i in range(self.vsites.shape[0]):
+                f.write('{:<8d}{:<6d}{:<6d}{:<6d}{:<8d}{:<8s}{:<11s}{:<11s}{:<11s}\n'.format(int(self.vsites[i, 0]),
+                        int(self.vsites[i, 1]), int(self.vsites[i, 2]), int(self.vsites[j, 3]), int(self.vsites[j, 4]),
+                        self.vsites[j, 5], self.vsites[j, 6], self.vsites[j, 7], self.vsites[j, 8]))
 
     def create_adjacency_matrix(self):
 
@@ -337,7 +375,7 @@ class System(Topology):
         self.bond_c1 = None
         self.bond_c2 = None
 
-    def energy_minimize(self, configuration, mdp='em.mdp', top='topol.top', out='em'):
+    def simulate(self, configuration, mdp='em.mdp', top='topol.top', out='em'):
         """
         Energy minimize a configuration using existing .mdp files
         """
@@ -398,6 +436,21 @@ class System(Topology):
         self.bond_c1 = eligible_c1[:(int(percent * cut_ndx / 100))]
         self.bond_c2 = eligible_c2[:(int(percent * cut_ndx / 100))]
 
+        # ensure that a tail is not donating and recieving bonds at the same time
+        delete = []
+        for i, x in enumerate(self.bond_c1):
+            if x - 1 in self.bond_c2:
+                delete.append(i)
+
+        self.bond_c1 = np.delete(self.bond_c1, delete)
+        self.bond_c2 = np.delete(self.bond_c2, delete)
+
+        # TODO: there are duplicates in these lists -- weed them out. Then fix make_initiators_real by properly deleting
+        # virtual sites
+        print(self.bond_c1.shape)
+        print(self.bond_c2.shape)
+        exit()
+
     def make_initiators_real(self):
 
         # When c1 bonds to a c2 atom due to initiation, the c1 adjacent to c2 (not the c1 atom involved in bonding)
@@ -406,7 +459,7 @@ class System(Topology):
         # number of atoms between c1 and c2 (based on order that they are written in the coordinate file)
         diff = np.array(self.xlink_residue.c2_atom_indices) - np.array(self.xlink_residue.c1_atom_indices)
         tails = self.bond_c2 % len(self.xlink_residue.c2_atoms)  # define which tail each c2 atom is part of
-        c1 = self.bond_c2 - diff[tails]  # indices of c1 atoms which gain a hydrogen atom
+        c1 = list(set(self.bond_c2 - diff[tails]))  # indices of c1 atoms which gain a hydrogen atom
 
         # This loop can probably be made better if I set up the virtual site list differently
         # Get indices of hydrogen atoms to make real
@@ -421,22 +474,29 @@ class System(Topology):
                        (c1[i] // self.xlink_residue.natoms)
             self.initiators.append(H_serial)
 
-            # TODO: This doesn't work since topology only describes a single monomer. So this will need to be written
-            # into the topology writer based on all of the new hydrogens
-            # self.xlink_residue.atom_info[H_serial - 1][1] = 'hc'  # change atom type of hydrogen
-            # self.xlink_residue.atom_info[H_serial - 1][-1] = 1.008  # given atom mass
+        # remove virtual sites for atoms that became real
+        rm_vsite = []
+        for i in range(self.vsites.shape[0]):
+            if int(self.vsites[i, 0]) in self.initiators:
+                rm_vsite.append(i)
+        print(rm_vsite)
+        self.vsites = np.delete(self.vsites, rm_vsite, axis=0)  # delete vsite entries
 
         # add bonds
+        # This can be made more general
         for i, x in enumerate(c1):
             self.all_bonds.append([x, self.initiators[i]])
+            self.xlink_residue_atoms.type[self.initiators[i] - 1] = 'hc'  # change from dummy hydrogen to real hydrogen
+            self.xlink_residue_atoms.mass[self.initiators[i] - 1] = 1.008  # give mass to the former dummy atom
+            self.xlink_residue_atoms.type[x - 1] = 'c3'  # make carbon sp3 hybridized
 
     def identify_new_radicals(self):
 
         # c2 next to c1 that just bonded to a different c2 is now a radical
         diff = np.array(self.xlink_residue.c1_atom_indices) - np.array(self.xlink_residue.c2_atom_indices)
         tails = self.bond_c1 % len(self.xlink_residue.c1_atoms)  # define which tail each c2 atom is part of
-        for i in self.bond_c1 - diff[tails]:  # indices of c1 atoms which gain a hydrogen atom
-            self.radicals.append(i)
+        for i in self.bond_c1 - diff[tails]:  # indices of c2 atoms which become radicals
+            self.radicals.append(i - 1)
 
     def bond(self):
 
@@ -445,6 +505,10 @@ class System(Topology):
 
         for i, x in enumerate(self.bond_c1):
             self.all_bonds.append([x, self.bond_c2[i]])
+            # change atom types of newly bonded carbon atoms
+            self.xlink_residue_atoms.type[x - 1] = 'c3'
+            self.xlink_residue_atoms.type[self.bond_c2[i] - 1] = 'c3'
+            print(x, self.bond_c2[i])
 
         self.define_topology()  # make new angles, pairs and dihedrals lists
 
@@ -471,8 +535,7 @@ if __name__ == "__main__":
     sys.select_eligible_carbons(percent=args.cutoff)
     sys.bond()
     sys.write_assembly_topology()
-    # exit()
-    # sys.write_assembly_topology()
+
     full_top = SystemTopology(dummy_name, ff='gaff', xlink=True)  # topology with other residues and forcefield
     full_top.write_top(name=topname, crosslinked_top_name=xlink_top_name)
     # generate input files that will be used throughtout process
@@ -482,15 +545,5 @@ if __name__ == "__main__":
     mdp.write_nvt_mdp(out='%s' % mdp_nvt.split('.')[0])
 
     # energy minimize starting configuration
-    sys.energy_minimize(dummy_name, mdp=mdp_em, top=topname, out='em')
-
-    """
-    TODO: So far, this script will read in an initial configuration, add dummy atoms, create a topology by generating
-    dihedrals and then energy minimize it. I'm in the middle of working on calculating the distance between reactive
-    carbons. 
-    
-    After that, I'll need to create create new bonds, change atom-types where needed -- could probably build atom-types
-    into topology rather than replacing strings.
-    
-    I'll also implement radicals.
-    """
+    sys.simulate(dummy_name, mdp=mdp_em, top=topname, out='em')
+    sys.simulate('em.gro', mdp=mdp_nvt, top=topname, out='nvt')
