@@ -77,7 +77,7 @@ class SimulationMdp(object):
         self.temperature = float(T)
         self.em_steps = int(em_steps)
         self.time_step = float(time_step)
-        self.length = int(length)
+        self.length = float(length)
         self.p_coupling = p_coupling
         self.barostat = barostat
         self.genvel = genvel
@@ -156,8 +156,8 @@ class SimulationMdp(object):
         a.append(['pbc = xyz\n'])
         a.append(['DispCorr = EnerPres\n'])
         if self.xlink:
-            a.append('periodic-molecules = yes\n')
-            a.append('lincs-iter=4')
+            a.append(['periodic-molecules = yes\n'])
+            a.append(['lincs-iter=4'])
         if self.restraints:
             a.append(['refcoord-scaling = all\n'])
 
@@ -200,7 +200,7 @@ class SimulationMdp(object):
         a.append(['pbc = xyz\n'])
         a.append(['DispCorr = EnerPres\n'])
         if self.xlink:
-            a.append('periodic-molecules = yes\n')
+            a.append(['periodic-molecules = yes\n'])
         if self.restraints:
             a.append(['refcoord_scaling = all\n'])
 
