@@ -19,21 +19,27 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Crosslink LLC structure')  # allow input from user
 
-    parser.add_argument('-i', '--initial', default='wiggle_init.gro', help = 'Name of input file')
+    parser.add_argument('-i', '--initial', default='initial.gro', help='Name of input file')
     parser.add_argument('-b', '--build_mon', default='NAcarb11Vd', type=str, help='Monomer the system is built with')
-    parser.add_argument('-l', '--layers', default=20, help='Number of layers')
-    parser.add_argument('-p', '--pores', default=4, help='Number of pores')
-    parser.add_argument('-n', '--no_monomers', default=5, help='Number of monomers per layer')
     parser.add_argument('-c', '--cutoff', default=5, type=float, help='Cutoff percentage for cross-linking. Bottom x %'
                                                               ' of the distribution of distances will be cross-linked ')
     parser.add_argument('-e', '--term_prob', default=5, type=float, help='Termination probability (%)')
-    parser.add_argument('-y', '--topology', default='crosslinked_new.itp', help='Topology file to be analyzed and modified')
-    parser.add_argument('-r', '--iteration', default=0, type=int, help='Iteration number of crosslinking process')
-    parser.add_argument('-d', '--cutoff_rad', default=10, help='Cutoff Distance for radical reaction')
-    parser.add_argument('-x', '--xlinks', default=0, help='Total number of c1-c2 crosslinks')
-    parser.add_argument('-S', '--stop', default='no', help='Is crosslinking reaction finished')
-    parser.add_argument('-m', '--monomer', default='monomer2', help='Which monomer was the structure built with')
-    parser.add_argument('--nogap', help='System is prepared with no gap between membrane layers', action="store_true")
+    parser.add_argument('-d', '--dummy_name', default='dummies.gro', help='Name of initial .gro file after dummies are '
+                                                                          'added')
+    parser.add_argument('-itp', '--xlink_top_name', default='assemlby.itp', help='Name of .itp topology file describing'
+                        'assembly of cross-linked monomers.')
+    parser.add_argument('-top', '--topname', default='topol.top', help='Name of topology file')
+    parser.add_argument('-T', '--temperature', default=300, type=float, help='Temperature at which to run system (K)')
+    parser.add_argument('--emsteps', default=5000, type=int, help='Maximum number of steps to run during energy'
+                                                                  'minimization')
+    parser.add_argument('-dt', '--dt', default=0.002, type=float, help='Time step for NVT simulations (ps)')
+    parser.add_argument('-L', '--length', default=5, type=float, help='Length of NVT simulation (ps)')
+    parser.add_argument('-ff', '--forcefield', default='gaff', help='Name of forcefield used during simulation')
+    parser.add_argument('-mdp_em', '--mdp_em', default='em.mdp', help='Name of energy minimization .mdp file')
+    parser.add_argument('-mdp_nvt', '--mdp_nvt', default='nvt.mdp', help='Name of energy minimization .mdp file')
+    parser.add_argument('-res', '--residue', default='HII', help='Name of residue to be cross-linked')
+    parser.add_argument('-resd', '--dummy_residue', default='HIId', help='Name of residue to be cross-linked with '
+                                                                         'dummy atoms included in the topology')
 
     return parser
 
@@ -264,6 +270,7 @@ class Topology():
 
         self.initiators = []  # indices of new initiator atoms which need to switched from virtual sites
         self.radicals = []  # indices of carbon atoms that are now radicals
+        self.terminate = []
 
     def define_topology(self):
 
@@ -298,9 +305,10 @@ class Topology():
                             self.xlink_residue_atoms.type[i*natoms + j], atom_info[j][2], atom_info[j][3],
                             atom_info[j][4], atom_info[j][5], self.xlink_residue_atoms.charge[i*natoms + j],
                             self.xlink_residue_atoms.mass[i * natoms + j]))
+
                     if (i*natoms + j) in self.radicals:
                         f.write('; *\n')
-                    elif (i*natoms + j + 1) in self.bond_c1 or (i*natoms + j + 1) in self.bond_c2:
+                    elif (i*natoms + j + 1) in self.terminate:
                         f.write('; T\n')
                     else:
                         f.write('\n')
@@ -395,8 +403,10 @@ class System(Topology):
         self.c1_atoms = [a.index for a in self.t.topology.atoms if a.name in self.xlink_residue.c1_atoms]
         self.c2_atoms = [a.index for a in self.t.topology.atoms if a.name in self.xlink_residue.c2_atoms]
 
-        self.bond_c1 = None
-        self.bond_c2 = None
+        self.bond_c1 = []
+        self.bond_c2 = []
+
+        self.nxlinks = 0
 
     def simulate(self, configuration, mdp='em.mdp', top='topol.top', out='em'):
         """
@@ -406,7 +416,7 @@ class System(Topology):
         print('Running simulation specified by %s' % mdp)
 
         p1 = subprocess.Popen(
-            ["gmx", "grompp", "-p", "%s" % top, "-f", "%s" % mdp, "-o", "%s" %out, "-c", "%s" % configuration],
+            ["gmx", "grompp", "-p", "%s" % top, "-f", "%s" % mdp, "-o", "%s" % out, "-c", "%s" % configuration],
             stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
         p1.wait()
 
@@ -437,89 +447,77 @@ class System(Topology):
 
         return diff
 
-    def select_eligible_carbons(self, percent=1, cut=0.6):
+    def generate_ordered_distances(self, list1, list2, cut=0.6):
         """
+        Generate a list ordered sequentially based on pairwise distances between atom indices listed in list1 and list2
+        :param list1: list or numpy array
+        :param list2: list or numpy array
+        :param cut: maximum allowable pairwise distance to still be considered eligible for bonding (nm)
+        :return: 2 same-length numpy arrays ordered so each index is paired with the same index with the other array.
+        Pairwise distances are in increasing order.
+        """
+
+        diff = self.minimum_image_distances(list1, list2)
+        d = np.linalg.norm(diff, axis=1)
+
+        d_ndx = np.argsort(d)
+
+        # These lists may need post-modification to account for adjacent atoms
+        eligible_list1 = (d_ndx // len(list2))
+        eligible_list2 = (d_ndx % len(list2))
+
+        eligible_list1 = np.array(list1)[eligible_list1]
+        eligible_list2 = np.array(list2)[eligible_list2]
+
+        cut_ndx = np.argmin(np.abs(d[d_ndx] - cut))  # index where cut is exceeded
+
+        return eligible_list1[:cut_ndx], eligible_list2[:cut_ndx]
+
+    def select_eligible_carbons(self, percent=1, cut=0.6, percent_rad=20):
+        """
+        This whole function could be written better since generating radical list is same code as bonded carbon list
         - Calculate the distance between atoms of interest. Find out which pairs meet the distance cutoff criteria
         - Head-to-tail addition dominates due to sterics and radical stabilization
         :param percent: the bottom percentage of the distribution of distances (below cut) that will be chosen for cross-linking
         :param cut: any distance beyond 'cut' will not be accounted for when calculating percent
+        :param percent_rad: percentage of eligible radicals that will react
         """
 
         # calculate minimum image distance between c1 and c2 atoms
 
         # shift so box is cubic temporarily. The minimum image distances are just an approximation using this approach
         theta = np.pi / 3
+
         self.t.xyz[..., 1] /= np.sin(theta)
         self.t.xyz[..., 0] = self.t.xyz[..., 0] - self.t.xyz[..., 1]*np.cos(theta)
 
-        c1_len = len(self.c1_atoms)
-        c2_len = len(self.c2_atoms)
-        nc1 = len(self.xlink_residue.c1_atoms)
-        nc2 = len(self.xlink_residue.c2_atoms)
-
-        # do this if the list is non-empty
         if self.radicals:
 
-            # note: radicals are number from 0 (I think)
-            rad_diff = self.minimum_image_distances(self.c1_atoms, self.radicals)
-            d = np.linalg.norm(rad_diff, axis=1)
-            d_ndx = np.argsort(d)
+            eligible_c1_rad, eligible_rad = self.generate_ordered_distances(self.c1_atoms, self.radicals)
 
-            eligible_c1_rad = (d_ndx % c1_len)#[len(self.radicals):]
-            eligible_rad = (d_ndx // c1_len)#[len(self.radicals):]
+            stop = int((percent_rad / 100.) * len(eligible_rad))
+            self.bond_c1 += (eligible_c1_rad[:stop] + 1).tolist()  # convert to serial
+            self.bond_c2 += (eligible_rad[:stop] + 1).tolist()
 
-            eligible_c1_rad = (eligible_c1_rad // nc1) * self.xlink_residue.natoms + \
-                          np.array(self.xlink_residue.c1_atom_indices)[(eligible_c1_rad % nc1)]
+        eligible_c1, eligible_c2 = self.generate_ordered_distances(self.c1_atoms, self.c2_atoms)
 
-            eligible_rad = np.array(self.radicals)[eligible_rad]
+        # prevent adjacent carbon atoms from bonding
+        exclude = 0
+        while eligible_c1[exclude] == (eligible_c2[exclude] + 1):
+            exclude += 1
 
-            print(eligible_c1_rad[:10])
-            print(eligible_rad[:10])
-            exit()
+        eligible_c1 = eligible_c1[exclude:]
+        eligible_c2 = eligible_c2[exclude:]
 
+        # narrow list to bottom percent of distances
+        stop = int((percent / 100.) * len(eligible_c1))
+        self.bond_c1 += (eligible_c1[:stop] + 1).tolist()  # convert indices to serial
+        self.bond_c2 += (eligible_c2[:stop] + 1).tolist()
 
-        #TODO: make sure this works with self.minimum_image_distances()
-        dim = self.t.unitcell_lengths[0]
-        diff = np.zeros([c1_len*c2_len, 3])
-        for i in range(c1_len):
-            diff[i*c2_len: (i + 1)*c2_len] = self.t.xyz[0, self.c1_atoms[i], :] - self.t.xyz[0, self.c2_atoms, :]
-
-        # make sure we are looking at minimum image distance
-        diff = np.where(diff > 0.5 * dim, diff - dim, diff)
-        diff = np.where(diff < -0.5 * dim, diff + dim, diff)
-
-        # calculate distance between all relevant carbon atoms
-        distance = np.linalg.norm(diff, axis=1)
-        diff_ndx = np.argsort(distance)  # index of distances sorted from low to high
-
-        # eligible carbons numbered with respect to total carbon atoms
-        eligible_c1 = (diff_ndx // c1_len)[c1_len:]  # exclude c1 and c2 atoms that are bonded to each other
-        eligible_c2 = (diff_ndx % c1_len)[c2_len:]
-
-        # eligible carbons numbered with respect to entire system
-        eligible_c1 = (eligible_c1 // nc1) * self.xlink_residue.natoms + \
-                            np.array(self.xlink_residue.c1_atom_indices)[(eligible_c1 % nc1)]
-        eligible_c2 = (eligible_c2 // nc2) * self.xlink_residue.natoms + \
-                            np.array(self.xlink_residue.c2_atom_indices)[(eligible_c2 % nc2)]
-
-        # recalculate minimum image distances with eligible carbons
-        diff = self.t.xyz[-1, eligible_c1 - 1, :] - self.t.xyz[-1, eligible_c2 - 1, :]
-
-        diff = np.where(diff > 0.5 * dim, diff - dim, diff)
-        diff = np.where(diff < -0.5 * dim, diff + dim, diff)
-
-        d = np.linalg.norm(diff, axis=1)
-
-        cut_ndx = np.argmin(np.abs(d - cut))  # index where cut is exceeded
-
-        # lists of carbon atoms to be bonded
-        self.bond_c1 = eligible_c1[:(int(percent * cut_ndx / 100))]
-        self.bond_c2 = eligible_c2[:(int(percent * cut_ndx / 100))]
-
-        # do not allow a carbon to bond twice
+        # do not allow a carbon to bond twice (prioritizes radical reactions)
         keep_c1 = np.unique(self.bond_c1, return_index=True)[1]
-        self.bond_c1 = self.bond_c1[keep_c1]
-        self.bond_c2 = self.bond_c2[keep_c1]
+        self.bond_c1 = np.array(self.bond_c1)[keep_c1]
+        self.bond_c2 = np.array(self.bond_c2)[keep_c1]
 
         keep_c2 = np.unique(self.bond_c2, return_index=True)[1]
         self.bond_c1 = self.bond_c1[keep_c2]
@@ -538,24 +536,18 @@ class System(Topology):
 
         # When c1 bonds to a c2 atom due to initiation, the c1 adjacent to c2 (not the c1 atom involved in bonding)
         # gains an initiator which is just represented as a hydrogen
+        # If a radical c2 reacts, then there is no initiator that needs to be made real
 
         # number of atoms between c1 and c2 (based on order that they are written in the coordinate file)
         diff = np.array(self.xlink_residue.c2_atom_indices) - np.array(self.xlink_residue.c1_atom_indices)
-        tails = self.bond_c2 % len(self.xlink_residue.c2_atoms)  # define which tail each c2 atom is part of
-        c1 = self.bond_c2 - diff[tails]  # indices of c1 atoms which gain a hydrogen atom
+        bond_c2 = np.array([x for x in self.bond_c2 if (x - 1) not in self.radicals])  # don't include radicals
+        tails = bond_c2 % len(self.xlink_residue.c2_atoms)  # define which tail each c2 atom is part of
+        c1 = bond_c2 - diff[tails]  # indices of c1 atoms which gain a hydrogen atom
 
-        # This loop can probably be made better if I set up the virtual site list differently
-        # Get indices of hydrogen atoms to make real
-        for i, ndx in enumerate(c1 % self.xlink_residue.natoms):
-            j = 0
-            # the following assumes that index 1 contains the index of the atom to which hydrogen will be bonded
-            # It is the index of the atom bonded to the virtual site hydrogen
-            while int(self.xlink_residue.virtual_sites[j][1]) != ndx:
-                j += 1
-
-            H_serial = int(self.xlink_residue.virtual_sites[j][0]) + self.xlink_residue.natoms * \
-                       (c1[i] // self.xlink_residue.natoms)
-            self.initiators.append(H_serial)
+        # Get (serial) indices of hydrogen atoms to make real
+        for i in c1:
+            ndx = np.where(self.vsites[:, 1] == i)[0]  # index 1 contains serial carbon index used to construct vsite
+            self.initiators.append(int(self.vsites[ndx, 0]))  # index 0 contains serial index of dummy H atom
 
         # remove virtual sites for atoms that became real
         rm_vsite = []
@@ -573,6 +565,9 @@ class System(Topology):
             self.xlink_residue_atoms.type[x - 1] = 'c3'  # make carbon sp3 hybridized
 
     def identify_new_radicals(self):
+
+        # first remove reacted radicals
+        self.radicals = [x for x in self.radicals if x + 1 not in self.bond_c2]
 
         # c2 next to c1 that just bonded to a different c2 is now a radical
         diff = np.array(self.xlink_residue.c1_atom_indices) - np.array(self.xlink_residue.c2_atom_indices)
@@ -604,6 +599,15 @@ class System(Topology):
 
         self.impropers = np.delete(self.impropers, rm_imp, axis=0)
 
+    def identify_terminated(self):
+
+        for i in self.bond_c1:
+            self.terminate.append(i)
+        for i in self.bond_c2:
+            self.terminate.append(i)
+            if i not in self.radicals:
+                self.terminate.append(i + 1)  # terminate c1 adjacent to bonding c2 unless already terminated previously
+
     def bond(self):
 
         self.make_initiators_real()  # turn dummy atoms into real atoms
@@ -616,6 +620,9 @@ class System(Topology):
             self.xlink_residue_atoms.type[self.bond_c2[i] - 1] = 'c3'
             print(x, self.bond_c2[i])
 
+        self.nxlinks += len(self.bond_c1)  # update total number of cross-links in system
+
+        self.identify_terminated()
         self.remove_improper_dihedrals()
 
         self.define_topology()  # make new angles, pairs and dihedrals lists
@@ -627,64 +634,70 @@ class System(Topology):
     def update_lists(self):
 
         # reacted c1 and c2 atoms are no longer eligible for bonding
-        self.c1_atoms = [x for x in self.c1_atoms if x not in self.bond_c1]
-        self.c2_atoms = [x for x in self.c2_atoms if x not in self.bond_c2]
+        # self.c1_atoms is numbered by index, while self.bond_c1 is number serially
+
+        self.c1_atoms = [x for x in self.c1_atoms if (x + 1) not in self.terminate]
+        self.c2_atoms = [x for x in self.c2_atoms if (x + 1) not in self.terminate]
 
         # re-initialize bonding carbon lists
-        self.bond_c1 = None
-        self.bond_c2 = None
+        self.bond_c1 = []
+        self.bond_c2 = []
+
+        self.initiators = []
 
 
 if __name__ == "__main__":
 
     args = initialize().parse_args()
 
-    # TODO: put the following into initialize() so they can be parsed by argparse
-    dummy_name = 'dummies.gro'  # name of .gro file after dummy atoms are added
-    xlink_top_name = 'assembly.itp'  # name of .itp file used to describe xlinked assembly
-    topname = 'topol.top'  # name of full topology
-    T = 300  # temperature to run system at
-    em_steps = 5000  # number of steps for energy minimization
-    dt = 0.0005  # simulation time step (ps) (unstable if timestep is too large)
-    length_short = .05  # (integer for now, so this is as low as it goes) length of short nvt simulation in picoseconds
-    length_long = 5
-    forcefield = 'gaff'
-    mdp_em = 'em.mdp'
-    mdp_nvt = 'nvt.mdp'
+    # if needed
+    dt_short = 0.0005  # simulation time step (ps) (unstable if timestep is too large)
+    length_short = .025  # (integer for now, so this is as low as it goes) length of short nvt simulation in picoseconds
 
     # get the system ready for cross-linking
     # Add dummy atoms create topology for entire assembly
-    sys = System(args.initial, 'HII', 'HIId', dummy_name=dummy_name)
-    # sys.write_assembly_topology()
-    #
-    # # generate input files that will be used throughtout process
-    # full_top = SystemTopology(dummy_name, ff='gaff', xlink=True)  # topology with other residues and forcefield
-    # full_top.write_top(name=topname, crosslinked_top_name=xlink_top_name)
-    # mdpshort = SimulationMdp(dummy_name, T=T, em_steps=em_steps, time_step=dt, length=length_short,
-    #             p_coupling='semiisotropic', barostat='berendsen', genvel='yes', restraints=False, xlink=True, bcc=False)
-    # mdpshort.write_em_mdp(out='%s' % mdp_em.split('.')[0])
-    # mdpshort.write_nvt_mdp(out='%s' % mdp_nvt.split('.')[0])
-    #
-    # mdplong = SimulationMdp(dummy_name, T=T, em_steps=em_steps, time_step=0.002, length=length_long,
-    #             p_coupling='semiisotropic', barostat='berendsen', genvel='yes', restraints=False, xlink=True, bcc=False)
-    # mdplong.write_nvt_mdp(out='nvt_long')
-    #
-    # # energy minimize starting configuration to get dummies in the right place
-    # sys.simulate(dummy_name, mdp=mdp_em, top=topname, out='em')
+    sys = System(args.initial, args.residue, args.dummy_residue, dummy_name=args.dummy_name)
+    sys.write_assembly_topology()
+
+    # generate input files that will be used throughtout cross-linking process
+    full_top = SystemTopology(args.dummy_name, ff=args.forcefield, xlink=True)  # topology with other residues and forcefield
+    full_top.write_top(name=args.topname, crosslinked_top_name=args.xlink_top_name)
+    mdpshort = SimulationMdp(args.dummy_name, T=args.temperature, em_steps=args.em_steps, time_step=args.dt,
+            length=args.length, p_coupling='semiisotropic', barostat='berendsen', genvel='yes', restraints=False,
+                             xlink=True, bcc=False)
+    mdpshort.write_em_mdp(out='%s' % args.mdp_em.split('.')[0])
+    mdpshort.write_nvt_mdp(out='%s' % args.mdp_nvt.split('.')[0])
+
+    mdpshort = SimulationMdp(args.dummy_name, T=args.temperature, em_steps=args.em_steps, time_step=dt_short,
+        length=length_short, p_coupling='semiisotropic', barostat='berendsen', genvel='yes', restraints=False,
+                             xlink=True, bcc=False)
+    mdpshort.write_nvt_mdp(out='nvt_short')
+
+    # energy minimize starting configuration to get dummies in the right place
+    sys.simulate(args.dummy_name, mdp=args.mdp_em, top=args.topname, out='em_%s' % args.dummy_name.split('.')[0])
 
     # now select eligible bonding carbons and generate a new cross-linked topology
     sys.select_eligible_carbons(percent=args.cutoff)  # get all carbon pairs within a distance criteria
     sys.bond()  # bond them, make dummy atoms real, mark radicals, remove virtual sites and some improper dihedrals
     sys.write_assembly_topology()  # re-write assembly topology
-    # exit()
+
     # run a short simulation with small time step and then energy minimize again
-    # sys.simulate('em.gro', mdp=mdp_nvt, top=topname, out='nvt')
-    # sys.simulate('nvt.gro', mdp=mdp_em, top=topname, out='em')
-    # # now run a slightly longer simulation to allow the tails to move around randomly
-    # sys.simulate('em.gro', mdp='nvt_long.mdp', top=topname, out='nvt_long')
+    # sys.simulate('em.gro', mdp=mdp_nvt, top=topname, out='nvt')  # might not be necessary
+    sys.simulate('em_%s' % args.dummy_name.split('.')[0], mdp=args.mdp_em, top=args.topname, out='em')
+    # now run a slightly longer simulation to allow the tails to move around randomly
+    sys.simulate('em.gro', mdp=args.mdp_nvt, top=args.topname, out='nvt')
+    print(sys.nxlinks)
 
     ################### Second iteration ####################
     # update coordinates
-    sys.reload_coordinates('nvt_long.gro')
+    sys.reload_coordinates('nvt.gro')
     sys.update_lists()
     sys.select_eligible_carbons(percent=args.cutoff)
+    sys.bond()
+    sys.write_assembly_topology()  # re-write assembly topology
+
+    # energy minimize then run short NVT simulation
+    sys.simulate('nvt.gro', mdp=args.mdp_em, top=args.topname, out='em')
+    sys.simulate('em.gro', mdp=args.mdp_nvt, top=args.topname, out='nvt')
+
+    print(sys.nxlinks)
