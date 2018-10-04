@@ -11,6 +11,16 @@ class LC(object):
     """A Liquid Crystal monomer has the following attributes which are relevant to building and crosslinking:
 
     Attributes:
+
+        Description of annotations:
+        "R" : reference atom: This atom defines the pore radius, r. It will be placed r nm from pore center
+        "P" : plane atoms: 3 atoms defining a plane within the monomer which you want to be parallel to the xy plane
+        "L" : line atoms: 2 atoms used to rotate monomers on xy plane so that the line created by line atoms goes
+        through the pore center.
+        "C1" : terminal vinyl carbon on tails. (for cross-linking)
+        "C2" : second to last vinyl carbon on tails (for cross-linking)
+        "B" : carbon atoms making up benzene ring
+
         name: A string representing the monomer's name.
         natoms: An integer accounting for the number of atoms in a single monomer.
         build_mon: Monomer used to build the unit cell

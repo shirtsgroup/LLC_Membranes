@@ -5,7 +5,7 @@ set -e  # exit immediately after error
 # default values
 BUILD_MON="NAcarb11V"
 start_config="initial.gro"
-ring_restraints="C C1 C2 C3 C4 C5"
+ring_restraints="C C1 C2 C3 C4 C5"  # change these
 forces="3162 56 8 3 2 1 0"
 MPI="off"
 NP=4
@@ -43,7 +43,7 @@ else
 fi
 
 # assumes defaults in build.py are okay. Adjust them if needed
-${python} ${DIR}/build.py -pd ${pd}
+${python} ${DIR}/build.py -pd ${pd} -b ${BUILD_MON}
 
 # make input files
 ${python} ${DIR}/input.py -b ${BUILD_MON} -l 50 --restraints ${restraint_residue} --temp ${T} -f 50 --genvel yes -c ${start_config} -s 50000
