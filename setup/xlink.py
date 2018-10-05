@@ -46,6 +46,8 @@ def initialize():
     parser.add_argument('-rad_percent', default=20, type=float, help='Percent of radicals that react each iteration.'
                                                                      'Not stable above 50 %')
     parser.add_argument('-out', '--output_gro', default='xlinked.gro', help='Name of final cross-linked structure')
+    parser.add_argument('-rad_frac_term', default=0.5, type=float, help='Fraction of radicals that will be terminated'
+                                                                        'on each iteration.')
 
     return parser
 
@@ -416,7 +418,7 @@ class Topology():
 class System(Topology):
 
     def __init__(self, initial_configuration, residue, dummy_residue, dummy_name='dummies.gro',
-                 reaction_percentage=1, cutoff=0.6, radical_reaction_percentage=20):
+                 reaction_percentage=1, cutoff=0.6, radical_reaction_percentage=20, radical_termination_fraction=0.5):
 
         add_dummies(md.load(initial_configuration), residue, dummy_residue,
                     out=dummy_name)  # add dummy atoms to the initial configuration
@@ -447,6 +449,7 @@ class System(Topology):
         self.reaction_percentage = reaction_percentage / 100.
         self.cutoff = cutoff
         self.former_radicals = None
+        self.rad_frac_term = radical_termination_fraction
 
     def simulate(self, configuration, mdp='em.mdp', top='topol.top', out='em'):
         """
@@ -636,7 +639,7 @@ class System(Topology):
 
         self.impropers = np.delete(self.impropers, rm_imp, axis=0)
 
-    def identify_terminated(self, rad_term_frac=0.4):
+    def identify_terminated(self, rad_term_frac=0.5):
 
         if self.iteration > 1:  # don't do this on the first iteration
 
@@ -689,7 +692,7 @@ class System(Topology):
 
         self.nxlinks += len(self.bond_c1)  # update total number of cross-links in system
 
-        self.identify_terminated()
+        self.identify_terminated(rad_term_frac=self.rad_frac_term)
         self.remove_virtual_sites()
         self.remove_improper_dihedrals()
 
@@ -788,7 +791,8 @@ if __name__ == "__main__":
     # Add dummy atoms create topology for entire assembly
     print('Initializing system and adding dummy atoms...', end='', flush=True)
     sys = System(args.initial, args.residue, args.dummy_residue, dummy_name=args.dummy_name,
-                 radical_reaction_percentage=args.rad_percent, reaction_percentage=args.percent)
+                 radical_reaction_percentage=args.rad_percent, reaction_percentage=args.percent,
+                 radical_termination_fraction=args.rad_frac_term)
     print('Done! %s created' % args.dummy_name)
 
     print('Generating input files: %s, %s, %s and %s ...' % (args.xlink_top_name, args.topname, args.mdp_em,
