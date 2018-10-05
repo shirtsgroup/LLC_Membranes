@@ -511,7 +511,7 @@ def write_gro_pos(pos, out, name='NA', box=[0, 0, 0], ids=None, res=None, vel=No
 
         for i in range(pos.shape[0]):
             if vel is not None:
-                if not ids:
+                if ids is not None:
                     f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}{:8.4f}{:8.4f}{:8.4f}\n'.format((i + 1) % 100000, '%s' % name, '%s' % name,
                                                                             (i + 1) % 100000, pos[i, 0], pos[i, 1], pos[i, 2], vel[i, 0], vel[i, 1], vel[i, 2]))
                 else:
@@ -519,7 +519,7 @@ def write_gro_pos(pos, out, name='NA', box=[0, 0, 0], ids=None, res=None, vel=No
                                                                             (i + 1) % 100000, pos[i, 0], pos[i, 1], pos[i, 2], vel[i, 0], vel[i, 1], vel[i, 2]))
 
             else:
-                if not ids:
+                if ids is None:
                     f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format((i + 1) % 100000, '%s' % name, '%s' % name,
                                                                             (i + 1) % 100000, pos[i, 0], pos[i, 1], pos[i, 2]))
                 else:

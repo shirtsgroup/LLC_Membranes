@@ -9,8 +9,8 @@ import subprocess
 from LLC_Membranes.setup.add_dummies import add_dummies
 from LLC_Membranes.setup.gentop import SystemTopology
 from LLC_Membranes.setup.genmdp import SimulationMdp
+from LLC_Membranes.llclib import file_rw
 from scipy.sparse import lil_matrix
-import matplotlib.pyplot as plt
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in
 
@@ -45,6 +45,7 @@ def initialize():
     parser.add_argument('-p', '--percent', default=1, type=float, help='Percent of eligible carbons that will bond')
     parser.add_argument('-rad_percent', default=20, type=float, help='Percent of radicals that react each iteration.'
                                                                      'Not stable above 50 %')
+    parser.add_argument('-out', '--output_gro', default='xlinked.gro', help='Name of final cross-linked structure')
 
     return parser
 
@@ -279,18 +280,16 @@ class Topology():
 
     def define_topology(self):
 
-        # start = time.time()
-        # print("Creating adjacency matrix")
         self.create_adjacency_matrix()
-        # print("Finding angles")
         self.find_angles()
-        # print("Finding dihedrals")
         self.find_dihedrals()
-        # print("Getting Pairs")
         self.find_pairs()
-        # print('did that in %s seconds' % (time.time() - start))
 
-    def write_assembly_topology(self, out='assembly.itp'):
+    def write_assembly_topology(self, out='assembly.itp', virtual_sites=True, vsite_atom_name='hc_d'):
+
+        if not virtual_sites:
+            count = 0
+            new_numbers = {}  # everything will need to be renumbered
 
         with open(out, 'w') as f:
 
@@ -306,17 +305,38 @@ class Topology():
             nres = self.nresidues[self.xlink_residue_name]
             for i in range(nres):
                 for j in range(len(atom_info)):
-                    f.write('{:>5d}{:>5s}{:>6s}{:>6s}{:>6s}{:>7s}{:>13f}{:>13f}'.format(int(atom_info[j][0]) + i*natoms,
-                            self.xlink_residue_atoms.type[i*natoms + j], atom_info[j][2], atom_info[j][3],
-                            atom_info[j][4], atom_info[j][5], self.xlink_residue_atoms.charge[i*natoms + j],
-                            self.xlink_residue_atoms.mass[i * natoms + j]))
-
-                    if (i*natoms + j) in self.radicals:
-                        f.write('; *\n')
-                    elif (i*natoms + j + 1) in self.terminate:
-                        f.write('; T\n')
+                    if virtual_sites:
+                        f.write('{:>5d}{:>5s}{:>6s}{:>6s}{:>6s}{:>7s}{:>13f}{:>13f}'.format(int(atom_info[j][0]) + i*natoms,
+                                self.xlink_residue_atoms.type[i*natoms + j], atom_info[j][2], atom_info[j][3],
+                                atom_info[j][4], atom_info[j][5], self.xlink_residue_atoms.charge[i*natoms + j],
+                                self.xlink_residue_atoms.mass[i * natoms + j]))
+                        if (i * natoms + j) in self.radicals:
+                            f.write('; *\n')
+                        elif (i * natoms + j + 1) in self.terminate:
+                            f.write('; T\n')
+                        else:
+                            f.write('\n')
                     else:
-                        f.write('\n')
+                        if self.xlink_residue_atoms.type[i*natoms + j] != vsite_atom_name:
+                            count += 1
+                            f.write('{:>5d}{:>5s}{:>6s}{:>6s}{:>6s}{:>7s}{:>13f}{:>13f}\n'.format(count,
+                                    self.xlink_residue_atoms.type[i*natoms + j], atom_info[j][2], atom_info[j][3],
+                                    atom_info[j][4], atom_info[j][5], self.xlink_residue_atoms.charge[i*natoms + j],
+                                    self.xlink_residue_atoms.mass[i * natoms + j]))
+                            new_numbers[i*natoms + j + 1] = count
+
+            if not virtual_sites:  # renumber atoms
+
+                for i in range(len(self.all_bonds)):
+                    self.all_bonds[i] = [new_numbers[x] for x in self.all_bonds[i]]
+                for i in range(len(self.pairs)):
+                    self.pairs[i] = [new_numbers[x] for x in self.pairs[i]]
+                for i in range(len(self.angles)):
+                    self.angles[i] = [new_numbers[x] for x in self.angles[i]]
+                for i in range(len(self.dihedrals)):
+                    self.dihedrals[i] = [new_numbers[x] for x in self.dihedrals[i]]
+                for i in range(len(self.impropers)):
+                    self.impropers[i, :-1] = [new_numbers[x] for x in self.impropers[i, :-1]]
 
             f.write('\n[ bonds ]\n')
             f.write(';   ai     aj funct\n')
@@ -347,12 +367,13 @@ class Topology():
                 f.write('{:<6d}{:<7d}{:<7d}{:<7d}{:<7d}\n'.format(self.impropers[i, 0], self.impropers[i, 1],
                         self.impropers[i, 2], self.impropers[i, 3], self.impropers[i, 4]))
 
-            f.write('\n[ virtual_sites4 ]\n')
-            f.write(';Site  from                         funct   a          b          d\n')
-            for i in range(self.vsites.shape[0]):
-                f.write('{:<8d}{:<6d}{:<6d}{:<6d}{:<8d}{:<8s}{:<11f}{:<11f}{:<11f}\n'.format(int(self.vsites[i, 0]),
-                        int(self.vsites[i, 1]), int(self.vsites[i, 2]), int(self.vsites[i, 3]), int(self.vsites[i, 4]),
-                        str(self.vsites[i, 5]), self.vsites[i, 6], self.vsites[i, 7], self.vsites[i, 8]))
+            if virtual_sites:
+                f.write('\n[ virtual_sites4 ]\n')
+                f.write(';Site  from                         funct   a          b          d\n')
+                for i in range(self.vsites.shape[0]):
+                    f.write('{:<8d}{:<6d}{:<6d}{:<6d}{:<8d}{:<8s}{:<11f}{:<11f}{:<11f}\n'.format(int(self.vsites[i, 0]),
+                            int(self.vsites[i, 1]), int(self.vsites[i, 2]), int(self.vsites[i, 3]), int(self.vsites[i, 4]),
+                            str(self.vsites[i, 5]), self.vsites[i, 6], self.vsites[i, 7], self.vsites[i, 8]))
 
     def create_adjacency_matrix(self):
 
@@ -372,7 +393,7 @@ class Topology():
             nonzero = np.array(self.adjacency_matrix[bond[0] - 1].rows[0]) + 1
             for i in nonzero:
                 if i < bond[1] and i not in bond:
-                    self.angles.append((i, bond[0], bond[1]))
+                    self.angles.append([i, bond[0], bond[1]])
 
     def find_dihedrals(self):
 
@@ -383,13 +404,13 @@ class Topology():
             nonzero = np.array(self.adjacency_matrix[angle[0] - 1].rows[0]) + 1
             for i in nonzero:
                 if i < angle[2] and i not in angle:
-                    self.dihedrals.append((i, angle[0], angle[1], angle[2]))
+                    self.dihedrals.append([i, angle[0], angle[1], angle[2]])
 
     def find_pairs(self):
 
         self.pairs = []
         for i in self.dihedrals:
-            self.pairs.append((i[0], i[3]))
+            self.pairs.append([i[0], i[3]])
 
 
 class System(Topology):
@@ -400,6 +421,7 @@ class System(Topology):
         add_dummies(md.load(initial_configuration), residue, dummy_residue,
                     out=dummy_name)  # add dummy atoms to the initial configuration
 
+        self.original_residue_name = residue
         self.xlink_residue_name = dummy_residue
         self.t = md.load(dummy_name)
         self.all_residues = [a.residue.name for a in self.t.topology.atoms]
@@ -510,17 +532,21 @@ class System(Topology):
         if self.radicals:
 
             eligible_c1_rad, eligible_rad = self.generate_ordered_distances(self.c1_atoms, self.radicals)
-            stop = int(self.radical_reaction_percentage * len(eligible_rad))
-            self.bond_c1 += (eligible_c1_rad[:stop] + 1).tolist()  # convert to serial
-            self.bond_c2 += (eligible_rad[:stop] + 1).tolist()
-            # self.former_radicals = self.radicals[:stop]
-            # self.radicals = np.delete(self.radicals, np.arange(stop))  # delete radicals
+
+            nreact = int(self.radical_reaction_percentage * len(self.radicals))
+
+            for i, x in enumerate(eligible_c1_rad):
+                if len(self.bond_c1) < nreact and (x + 1) not in self.bond_c1 and (eligible_rad[i] + 1) not in self.bond_c2:
+                    self.bond_c1.append(x + 1)
+                    self.bond_c2.append(eligible_rad[i] + 1)
+                if len(self.bond_c1) >= nreact:
+                    break
 
         eligible_c1, eligible_c2 = self.generate_ordered_distances(self.c1_atoms, self.c2_atoms)
 
         # prevent adjacent carbon atoms from bonding
         exclude = 0
-        while eligible_c1[exclude] == (eligible_c2[exclude] + 1):
+        while eligible_c1[exclude] == (eligible_c2[exclude] + 1):  # This 1 is hard-coded. Could be made more general
             exclude += 1
 
         eligible_c1 = eligible_c1[exclude:]
@@ -532,22 +558,24 @@ class System(Topology):
         self.bond_c2 += (eligible_c2[:stop] + 1).tolist()
 
         # do not allow a carbon to bond twice (prioritizes radical reactions)
-        keep_c1 = np.unique(self.bond_c1, return_index=True)[1]
+        keep_c1 = np.sort(np.unique(self.bond_c1, return_index=True)[1])
         self.bond_c1 = np.array(self.bond_c1)[keep_c1]
         self.bond_c2 = np.array(self.bond_c2)[keep_c1]
 
-        keep_c2 = np.unique(self.bond_c2, return_index=True)[1]
+        keep_c2 = np.sort(np.unique(self.bond_c2, return_index=True)[1])
         self.bond_c1 = self.bond_c1[keep_c2]
         self.bond_c2 = self.bond_c2[keep_c2]
 
         # ensure that a tail is not donating and recieving bonds at the same time
         delete = []
-        for i, x in enumerate(self.bond_c1):
+        for i, x in enumerate(self.bond_c1[::-1]):  # go backwards to maintain radical prioritization
             if x - 1 in self.bond_c2:
-                delete.append(i)
+                delete.append(len(self.bond_c1) - i - 1)
 
         self.bond_c1 = np.delete(self.bond_c1, delete)
         self.bond_c2 = np.delete(self.bond_c2, delete)
+
+        print('Total new bonds: %d' % len(self.bond_c1))
 
     def make_initiators_real(self):
 
@@ -608,12 +636,12 @@ class System(Topology):
 
         self.impropers = np.delete(self.impropers, rm_imp, axis=0)
 
-    def identify_terminated(self):
+    def identify_terminated(self, rad_term_frac=0.4):
 
         if self.iteration > 1:  # don't do this on the first iteration
 
             # terminate enough radicals to keep the number of radicals stable
-            nterm = int(len(self.radicals)*(1 - (1 / (2*(1 - self.radical_reaction_percentage)))))
+            nterm = int(rad_term_frac * len(self.radicals))
             chosen_terminated_radicals = np.random.choice(len(self.radicals), size=nterm, replace=False)
             self.terminated_radicals = np.array(self.radicals)[chosen_terminated_radicals]
             self.radicals = np.delete(self.radicals, chosen_terminated_radicals).tolist()
@@ -709,11 +737,43 @@ class System(Topology):
             f.write('Percent terminated: %.2f %%\n' % (100 * len(self.terminate) / (self.total_possible_terminated)))
             f.write('%s\n' % (80*'-'))
 
+    def cleanup(self, out='xlinked.gro', dummy_atom_name='hc_d'):
+
+        """
+        Remove virtual sites in .gro and topology.
+        :param out: name of output .gro file to be written
+        :param dummy_atom_name: atom type of dummy atom
+        :return: A .gro file and an .itp topology file without dummy atoms
+        """
+
+        keep = [i for i, x in enumerate(self.xlink_residue_atoms.type) if x != dummy_atom_name]
+        keep += [a.index for a in self.t.topology.atoms if a.residue.name != self.original_residue_name]
+
+        ids = np.array([a.name for a in self.t.topology.atoms], dtype=object)[keep]
+        res = np.array([a.residue.name for a in self.t.topology.atoms], dtype=object)[keep]
+
+        # mdtraj workaround because SOL gets renamed to HOH, OW1 to O, HW1 to H1 and HW2 to H2
+        for i, x in enumerate(ids):
+            if res[i] == 'HOH':
+                if x == 'O':
+                    ids[i] = 'OW'
+                if x == 'H1':
+                    ids[i] = 'HW1'
+                if x == 'H2':
+                    ids[i] = 'HW2'
+                res[i] = 'SOL'
+
+        ucell = self.t.unitcell_vectors[-1, ...]
+
+        file_rw.write_gro_pos(self.t.xyz[-1, keep, :], out, ids=ids, res=res, ucell=ucell)
+
+        self.write_assembly_topology(virtual_sites=False, vsite_atom_name=dummy_atom_name)
+
 
 if __name__ == "__main__":
 
     args = initialize().parse_args()
-    import time
+
     start = time.time()
     initial_message = '# Cross-linking %s #' % args.initial
     print('#'*len(initial_message))
@@ -756,8 +816,8 @@ if __name__ == "__main__":
     print('Done!')
 
     # Rest of iterations
-    while (len(sys.terminate) / sys.total_possible_terminated) < (args.density / 100.):
-    # while sys.iteration < 3:
+    #while (len(sys.terminate) / sys.total_possible_terminated) < (args.density / 100.):
+    while sys.iteration < 3:
 
         print('-'*80)
         print('Iteration: %d' % sys.iteration)
@@ -796,4 +856,17 @@ if __name__ == "__main__":
         sys.update_log()
         sys.iteration += 1
 
-    print('Finished in %.2f seconds' % (time.time() - start))
+    print('Removing remaining dummy atoms from .gro and .itp files...', end='', flush=True)
+    sys.reload_coordinates('nvt.gro')
+    sys.update_lists()
+    sys.identify_terminated(rad_term_frac=1)  # terminate all radicals
+    sys.remove_virtual_sites()
+    sys.define_topology()
+    sys.cleanup(out=args.output_gro)
+    print('Done!')
+
+    print('Energy minimizing %s...' % args.output_gro, end='', flush=True)
+    sys.simulate(args.output_gro, mdp=args.mdp_em, top=args.topname, out=args.output_gro.split('.')[0])
+    print('Done!')
+
+    print('Finished cross-linking in %.2f seconds' % (time.time() - start))
