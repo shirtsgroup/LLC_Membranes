@@ -35,7 +35,7 @@
   We parameterized monomers according to the following procedure:
   \begin{enumerate}
   
-	\item \textit{Create monomer structure file with connectivity} : We
+	\item \textit{Create monomer structure file with connectivity}: We
 	drew atomistic structures using MarvinSketch
 	17.13~\cite{chemaxon_marvinsketch_2017} with all hydrogen atoms drawn out
 	explicitly. We optimized the 3D geometry of the structure using the `Clean in
@@ -43,27 +43,27 @@
 	converted it to .pdb format using Open Babel 2.4.1
 	\cite{oboyle_open_2011,noauthor_open_nodate}. 
 	
-	\item \textit{Assign GAFF atomtypes using \texttt{antechamber}} : Using
+	\item \textit{Assign GAFF atomtypes using \texttt{antechamber}}: Using
 	the .pdb structure file as input, we ran
 	\texttt{antechamber}~\cite{wang_automatic_2006} using the AM1-BCC charge model.
 	The net charge on the monomer is input as -1 since the sodium ion is kept as 
 	a separate residue. We use \texttt{LEaP}~\cite{case_ambertools16_2016} and the
 	output of \texttt{antechamber} to create Amber topology files. A detailed
-	tutorial can be accessed elsewhere \cite{walker_antechamber_nodate}.
+	tutorial for using \texttt{LEaP} for parameterizationcan be accessed elsewhere \cite{walker_antechamber_nodate}.
 
-	\item \textit{Create GROMACS topologies from Amber output} : The output
+	\item \textit{Create GROMACS topologies from Amber output}: The output
 	of \texttt{LEaP} is a .inpcrd and a .prmtop file which are Amber topology
 	files. Using acpype.py \cite{sousa_da_silva_acpype_2012}, we converted the
 	\texttt{LEaP} output into GROMACS .gro and .top files. 
 
-	\item \textit{Perform a simulated annealing procedure on the monomer} :
+	\item \textit{Perform a simulated annealing procedure on the monomer}:
 	We created a cubic box around the monomer using the GROMACS command \texttt{gmx
 	editconf}. The monomer was centered in the box with edges of the
 	box spaced at least 3 nm from the monomer on all sides. We ran an energy minimization
 	on the system with the steepest descent algorithm. Next we performed an NVT
 	simulated annealing procedure. We linearly decreased the temperature of the
 	system from 1000 K to 50 K over the course of 10 ns. We randomly chose a monomer
-	configuration from the last 10 \% of the trajectory. 
+	configuration from the last 10\% of the trajectory. 
 
 	\item \textit{Reassign charges with \texttt{molcharge}}: With the monomer
 	configuration taken from the annealed trajectory, we reassigned charges using
@@ -72,10 +72,10 @@
 	The charges in the GROMACS topology file (.top) were replaced with the 
 	new charges calculated by \texttt{molcharge}. 
 
-	\item \textit{Anneal again to get final structure} : We repeated the
+	\item \textit{Anneal again to get final structure}: We repeated the
 	same simulated annealing procedure using the monomer topology with
 	\texttt{molcharge} charges. A random monomer configuration was pulled from the
-	last 10 \% of the trajectory and was used to build all assemblies reported
+	last 10\% of the trajectory and was used to build all assemblies reported
 	(Figure~\ref{fig:monomer}).
 
   \end{enumerate} 
@@ -107,7 +107,7 @@
 
   We used the same number of monomers (400) that we used in all other simulations. 
   Since Packmol does not have the capability to create monoclinic boxes, we used a cubic
-  box with a volume of 660 $nm^3$, 25\% larger than those used to create ordered unit
+  box with a volume of 660 nm$^3$, 25\% larger than those used to create ordered unit
   cells we studied. We tested systems with semi-isotropic and anisotropic pressure 
   coupling since the shape of the unit cell will likely need to change in order to 
   accommodate hexagonally packed pores.
@@ -139,19 +139,19 @@
 
   \section{Number of monomers per column}\label{section:monomers_per_column}
   
-  We chose to build all systems using 20 monomers per column. We made this choice
+  We chose to build all systems using 20 monomers per column, i.e. for a simulation with 5 columns around each pore, there are 100 monomers per pore, and 400 monomers per simulation.  We made this choice
   by considering a number of factors that directly affect the quality of our results. 
-  Clearly, choosing a small number of layers will cause the system to suffer from 
-  finite size effects. Even in our 20 monomer-per-column system, axial correlations
+  Clearly, choosing a smaller number of layers will cause the system to suffer from 
+  larger finite size effects. Even in our 20 monomer-per-column system, axial correlations
   between stacked monomers persist throughout the entire correlation function (see
   Figure~\ref{M-fig:correlation} of the main text). The correlation function of the system which we
   built with 40 monomers per column is very similar to that created with 20 monomers
   per columns (continues to oscillate for its full length
   (Figure~\ref{fig:tall_correlation_full})). If we continue adding monomers, the 
   correlation function will eventually fully decay but it is not worth the 
-  computational expense. Regardless, the correlation lengths calculated from 20
+  computational expense. We do find that the correlation lengths calculated from 20
   monomer per column simulations are in sufficient agreement with experiment. 
-  
+  %MRSF: if 10 monomers per column gave inconsistent pores when tried, might as well mention that here. 
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.45\textwidth}
@@ -240,7 +240,7 @@
 %		spacings. The 1-4 pore spacing is 4.44 nm while the average of all other pore
 %		spacings is 3.96 nm. 
 
-		\item 45 \AA~: A pore spacing of 45 \AA~is about 10 \% larger
+		\item 45 \AA~: A pore spacing of 45 \AA~is about 10\% larger
 	than the experimental value. This systems exhibits the smallest response to our 
  		equilibration procedure (Figure~\ref{fig:p2p_45}) and we chose to use this
         value for all our simulations in the main text.
@@ -249,7 +249,7 @@
 	%pore spacing. We chose to use this value for all our simulations in the main
 	%text. 
 
-	\item 50 \AA~: We tested a pore spacing of 50 \AA, about 20 \%
+	\item 50 \AA~: We tested a pore spacing of 50 \AA, about 20\%
 	larger than the experimental value. Once the restraining potential reaches 56
 	kJ mol$^{-1}$ nm$^{-2}$, the pore spacing begins to decrease rapidly, following
 	a linear trend (Figure~\ref{fig:p2p_50}).
@@ -565,7 +565,7 @@
 	where $\overline{x}$ is the average pore-to-pore distance. We divided the sum in 
 	equation~\ref{equation:p2p_stats} by 4 since there are only 4 independent pore
 	spacings.
-	
+        %MRSF: I think this is the spread in a single pore, not the average pore.  Should probably make it clearer to readers which it is (i.e. uncertainty in one, not uncertainty in mean of the four).
   \end{enumerate}
   \begin{figure}[!htb]
 	\centering
@@ -576,19 +576,19 @@
 		4 to 3, 3 to 1 and 1 to 4 should be equal. Only 4 of the distances
 		are independent. For example, the distance from 1 to 4 is defined by
 		the location of all other pore centers.}
-	\label{fig:p2p_diagram}
+	\label{fig:p2p_diagram}  %MRSF: this label is multiply defined. 
   \end{figure}
   
   Alternatively, one can calculate the pore spacing as half of the $x$ and $y$
   box vectors, however this technique does not fully capture the uncertainty
-  in the pore-to-pore distances. 
+  in the individual pore-to-pore distances. 
   
   \begin{table}[h]
   \centering
   \begin{tabular}{ccc}
   \toprule
   System                         & Pore Spacing ($nm$) & Pore Spacing ($nm$)              \\
-                                 & Pore centers        & $\dfrac{x\ box\ vector}{2}$ ($nm$) \\ 
+                                 & Pore centers        & $\frac{1}{2}(x\ box\ vector)$ ($nm$) \\ 
   \midrule
   Sandwiched, Ordered            & 4.18 $\pm$ 0.13     & 4.16 $\pm$ 0.01                  \\
   Parallel Displaced, Ordered    & 4.17 $\pm$ 0.12     & 4.18 $\pm$ 0.01                  \\
@@ -805,6 +805,7 @@
   
   In the main text, we calculated ionic conductivity using the Nernst-Einstein 
   relationship. We also measured ionic conductivity using a second method, 
+  %MRSF: Don't capitalize Collective Diffusion. Also, add citation on first mention.
   termed the Collective Diffusion model, for robustness. The collective 
   diffusion model measures the movement of the collective variable, Q, which
   is defined as the amount of charge transfer through the system and can be 
@@ -1075,6 +1076,7 @@
   
   \begin{figure}[!htb]
   \centering
+  % seems to be missing in the repository? tilt_cat.png
   \includegraphics[width=0.5\textwidth]{tilt_cat.png}
   \caption{As we reduce the force constants applied to the end of each
   tail of an initially tilted monomer configuration, the average tilt 
@@ -1174,7 +1176,8 @@
   deviations than the mean deviations of distributions sampled from the full
   distribution.}\label{fig:full_ensemble_distributions}
   \end{figure} 
-  
+
+  %MRSF: isn't this picture the same in the main draft of the document. Probably wouldn't have occured.
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.49\textwidth}
@@ -1206,6 +1209,7 @@
 
   \section{Carboxylate Dihedrals}
 
+  %MRSF: probably needs some context, since this is for a force field, not for QM. Did you have plots for several different force fields, which all are presumably trying to capture the QM that all basically gave the same results? That would be better evidence.
   \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.5\textwidth]{carboxylate_dihedral_rb.png}
