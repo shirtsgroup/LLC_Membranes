@@ -26,7 +26,7 @@ import os
 import tqdm
 import matplotlib.pyplot as plt
 
-script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname("__file__")))
 
 
 def initialize():
@@ -47,9 +47,7 @@ def initialize():
     parser.add_argument('-d', '--distance', default=.3, help='Maximum distance between acceptor and donor atoms')
     parser.add_argument('-angle', '--angle_cut', default=20, help='Maximum DHA angle to be considered an H-bond')
 
-    args = parser.parse_args()
-
-    return args
+    return parser
 
 
 class System(object):
@@ -348,7 +346,7 @@ class Topology(object):
 
 if __name__ == "__main__":
 
-    args = initialize()
+    args = initialize().parse_args()
 
     # workaround for argparse. If default value is set, it is always included in the list with action='append'
     if not args.atoms:

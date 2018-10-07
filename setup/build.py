@@ -12,44 +12,43 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Build HII LLC unit cell')
 
-    parser.add_argument('-b', '--build_monomer', default='NAcarb11V.gro', type=str, help='Name of class of monomer using to build with')
-    parser.add_argument('-o', '--out', default='initial.gro', help='name of output file')
-    parser.add_argument('-m', '--monomers_per_column', default=20, type=int, help='Number of monomers per column')
-    parser.add_argument('-c', '--ncolumns', default=5, type=int, help='Number of columns per pore')
+    parser.add_argument('-b', '--build_monomer', default='NAcarb11V.gro', type=str, help='Name of single monomer'
+                        'structure file (.gro format) used to build full system')
+    parser.add_argument('-o', '--out', default='initial.gro', help='Name of output .gro file for full system')
+    parser.add_argument('-m', '--monomers_per_column', default=20, type=int, help='Number of monomers to stack in each'
+                                                                                  'column')
+    parser.add_argument('-c', '--ncolumns', default=5, type=int, help='Number of columns used to build each pore')
     parser.add_argument('-r', '--pore_radius', default=.6, type=float, help='Initial Pore Radius (nm)')
-    parser.add_argument('-p', '--p2p', default=4.5, type=float, help='Initial Pore to Pore Distance (nm)')
-    parser.add_argument('-n', '--nopores', default=4, type=int, help='Number of Pores')
-    parser.add_argument('-d', '--dbwl', default=.37, type=float, help='Distance between layers (nm)')
-    parser.add_argument('-t', '--tilt', default=0, type=float, help='Monomer tilt angle')
-    parser.add_argument('-O', '--offset', help="Specify this flag to build the system in an offset configuration",
-                        action="store_true")
-    parser.add_argument('-L', '--correlation_length', type=float, help='Desired correlation length')
+    parser.add_argument('-p', '--p2p', default=4.5, type=float, help='Initial pore-to-pore distance (nm)')
+    parser.add_argument('-n', '--nopores', default=4, type=int, help='Number of pores (only works with 4 currently)')
+    parser.add_argument('-d', '--dbwl', default=.37, type=float, help='Distance between vertically stacked monomers'
+                                                                      '(nm)')
+    parser.add_argument('-t', '--tilt', default=0, type=float, help='Tilt angle of monomer with respect to xy plane (degrees)')
+    parser.add_argument('-L', '--correlation_length', type=float, help='Length over which distance correlation between'
+                                                                       'stacked monomers persists (nm)')
     parser.add_argument('--no_column_shift', action="store_false", help="Do not randomly shift columns")
-    parser.add_argument('-Lvar', default=0.1, type=float, help='variance in z position of monomer heads')
+    parser.add_argument('-Lvar', default=0.1, type=float, help='Variance in z position of monomer heads (nm)')
     parser.add_argument('-pd', '--parallel_displaced', default=0, type=float, help='Distance between center of mass '
                         'of vertically stacked monomers on the xy plane. A distance of 0 is the same as sandwiched.')
-    parser.add_argument('--rot', default=45, type=float, help="Rotate pores by this amount (degrees)")
-    parser.add_argument('--offset_angle', default=0, type=float)
-    parser.add_argument('-box', '--box_lengths', nargs='+', type=float, help='box vector lengths [x y z]')
-    parser.add_argument('-angles', '--angles', nargs='+', default=[90, 90, 60], type=float, help='angles between box'
-                                                                                                  'box vectors')
-    parser.add_argument('-rd', '--radial_displacement', type=float, help='Shift pore center by this value for every'
-                                                                         'other layer')
-    parser.add_argument('-rdtheta', default=0, type=float, help='When radially displaced, the angle with respect'
-                        'to the x-axis defining the direction in which to shift the pore center')
-    parser.add_argument('-ad', '--angularly_displaced', action="store_true", help='rotate phenyl groups'
-                        'with respect to those in adjacent layers')
-    parser.add_argument('-columns', action="store_true", help='build column-wise')
+    parser.add_argument('-box', '--box_lengths', nargs='+', type=float, help='Length of box vectors [x y z]')
+    parser.add_argument('-angles', '--angles', nargs='+', default=[90, 90, 60], type=float, help='Angles between'
+                        'box vectors')
 
     return parser
 
 
 def z_correlation(z, L, v=0.1):
-    """
-    Calculate where to place monomers on the z-axis so that a given correlation length is obtained
-    :param z: mean z-positions where monomers will be placed with gaussian probability np.array([n_layers])
-    :param L: desired correlation length [float]
+
+    """ Calculate where to place monomers on the z-axis so that a given correlation length is obtained
+
+    :param z: mean z-positions where monomers will be placed with gaussian probability
+    :param L: desired correlation length
     :param v: variance in z position of monomer head groups
+
+    :type z: np.array
+    :type L: float
+    :type v: float
+
     :return: locations [np.array[nlayers])
     """
 
@@ -69,19 +68,24 @@ def z_correlation(z, L, v=0.1):
 
 class Assembly(LC):
 
+    """Initialize geometry of columnar pore structure
+
+    :param name: name of monomer with which the system will be built.
+    :param npores: number of pores in the system
+    :param p2p: absolute pore-to-pore distance
+    :param pore_alpha: angle between x and y box vector. For example if pore_alpha = 120 or 60, you'll get hexagonally packed pores
+    :param pore_radius: distance from pore center to place monomer head groups (nm)
+    :param tilt: tilt monomer head group with respect to xy plane
+
+    :type name: str
+    :type npores: int
+    :type p2p: float
+    :type pore_alpha: float
+    :type pore_radius: float
+    :type tilt: float
+    """
+
     def __init__(self, name, npores, p2p, pore_alpha, pore_radius, tilt=0):
-
-        """Initialize geometry of columnar pore structure
-
-        Keyword arguments:
-            name -- name of monomer with which the system will be built
-            npores -- number of pores in the system
-            p2p -- absolute pore-to-pore distance
-            pore_alpha -- angle between x and y box vector. For example if pore_alpha = 120 or 60, you'll get
-            hexagonally packed pores
-            ncolumns -- number of columns surrounding each pore
-            monomers_per_column -- number of monomers in each column
-        """
 
         super().__init__(name)
 
@@ -104,45 +108,28 @@ class Assembly(LC):
         self.pore_centers[:, 0] += (p2p / 2) * (1 + np.cos(pore_alpha_radians))
         self.pore_centers[:, 1] += (p2p / 2) * np.sin(pore_alpha_radians)
 
-    def align_plane(self):
-        """ Align the atoms defined by the plane_indices attribute of LC with the xy plane """
-
-        plane_atoms = np.zeros([3, 3])
-        for i in range(plane_atoms.shape[0]):
-            plane_atoms[i, :] = self.LC_positions[self.plane_indices[i], :]
-
-        R = transform.rotateplane(plane_atoms, angle=self.tilt)  # generate rotation matrix
-
-        b = np.ones([1])
-        for i in range(self.LC_positions.shape[0]):
-            coord = np.concatenate((self.LC_positions[i, :], b))
-            x = np.dot(R, coord)
-            self.LC_positions[i, :] = x[:3]
-
-    def translate_to_origin(self):
-        """ Translate molecule to the origin using the ref_atom_index attribute of LC """
-
-        self.LC_positions = transform.translate(self.LC_positions, self.LC_positions[self.ref_atom_index, :], [0, 0, 0])
-
-    def align_with_x(self):
-        """ Align vector defined by lineatoms in LC object with x axis """
-
-        v = np.array([self.LC_positions[self.lineatoms[0], :2] - self.LC_positions[self.lineatoms[1], :2]])
-        angle = np.arctan(v[0, 1] / v[0, 0])
-        self.LC_positions = transform.rotate_coords_z(self.LC_positions, - angle * 180 / np.pi)
-
     def build_column(self, pore, z, theta, correlation=True, var=0, correlation_length=0, pd=0, random_shift=True):
         """ Place a column at angle theta on xy plane with respect to a pore center
 
-        Keyword Arguments:
-            pore -- pore number (0 : npores - 1)
-            z -- mean z-positions of monomers in column
-            theta -- angle, with respect to pore center where column should be placed
-            correlation -- adjust z positions so there is a correlation length
-            var -- variance in multivariate normal distribution used to make correlated points
-            correlation_length -- length for which correlation between stacked monomers to persist
-            pd -- Specify a nonzero value to make a parallel displaced. The distance here (in nm) will be the distance
-            between the center of masses of two vertically stacked monomers.
+        :param pore: pore number (0 : npores - 1)
+        :param z: mean z-positions of monomers in column
+        :param theta: angle, with respect to pore center where column should be placed
+        :param correlation: adjust z positions so there is a correlation length
+        :param var: variance in multivariate normal distribution used to make correlated points
+        :param correlation_length: length for which correlation between stacked monomers to persist
+        :param pd: Specify a nonzero value to make a parallel displaced configuration. The distance here (in nm) will\
+         be the distance between the center of masses of two vertically stacked monomers.
+        :param random_shift: if True, randomly shift columns in z-direction by choosing a displacement from a uniform \
+        distribution bounded by (0, d), where d is the vertical distance between stacked monomers
+
+        :type pore: int
+        :type z: np.array
+        :type theta: float
+        :type correlation: bool
+        :type var: float
+        :type correlation_length: float
+        :type pd: float
+        :type random_shift: bool
         """
 
         if correlation:
@@ -179,6 +166,46 @@ class Assembly(LC):
 
         self.xyz = np.concatenate((self.xyz, column))
 
+    def write_gro(self, out, ucell):
+        """ Write coordinate file in .gro format
+
+        :param out: name of output .gro file
+        :param ucell: unitcell vectors
+
+        :type out: str
+        :type ucell: np.ndarray, shape(3,3)
+
+        """
+
+        file_rw.write_gro_pos(self.xyz, out, ids=self.names, res=self.all_residues, ucell=ucell)
+
+    def align_plane(self):
+        """ Align the atoms defined by the plane_indices attribute of LC with the xy plane """
+
+        plane_atoms = np.zeros([3, 3])
+        for i in range(plane_atoms.shape[0]):
+            plane_atoms[i, :] = self.LC_positions[self.plane_indices[i], :]
+
+        R = transform.rotateplane(plane_atoms, angle=self.tilt)  # generate rotation matrix
+
+        b = np.ones([1])
+        for i in range(self.LC_positions.shape[0]):
+            coord = np.concatenate((self.LC_positions[i, :], b))
+            x = np.dot(R, coord)
+            self.LC_positions[i, :] = x[:3]
+
+    def translate_to_origin(self):
+        """ Translate molecule to the origin using the ref_atom_index attribute of LC """
+
+        self.LC_positions = transform.translate(self.LC_positions, self.LC_positions[self.ref_atom_index, :], [0, 0, 0])
+
+    def align_with_x(self):
+        """ Align vector defined by lineatoms in LC object with x axis """
+
+        v = np.array([self.LC_positions[self.lineatoms[0], :2] - self.LC_positions[self.lineatoms[1], :2]])
+        angle = np.arctan(v[0, 1] / v[0, 0])
+        self.LC_positions = transform.rotate_coords_z(self.LC_positions, - angle * 180 / np.pi)
+
     def reorder(self):
         """ reorder coordinate, residues and atom names so that residues are separated """
 
@@ -194,10 +221,6 @@ class Assembly(LC):
         self.xyz = self.xyz[ordered, :]
         self.all_residues = [self.all_residues[i] for i in ordered]
         self.names = [self.names[i] for i in ordered]
-
-    def write_gro(self, out, ucell):
-
-        file_rw.write_gro_pos(self.xyz, out, ids=self.names, res=self.all_residues, ucell=ucell)
 
 
 if __name__ == "__main__":
