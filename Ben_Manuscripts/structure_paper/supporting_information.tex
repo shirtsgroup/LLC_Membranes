@@ -151,7 +151,7 @@
   correlation function will eventually fully decay but it is not worth the 
   computational expense. We do find that the correlation lengths calculated from 20
   monomer per column simulations are in sufficient agreement with experiment. 
-  %MRSF: if 10 monomers per column gave inconsistent pores when tried, might as well mention that here. 
+
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.45\textwidth}
@@ -557,7 +557,8 @@
 	spacings among all bootstrap trials.
 	\item To calculate the uncertainty in pore-to-pore distance, we calculate the average 
 	pore spacing for each pore over all bootstrap trials. Using the 5 average 
-	pore-to-pore distances, we calculate the spread with:
+	pore-to-pore distances, we calculate the spread in a single pore-to-pore distance 
+	with:
 	\begin{equation}
 	s = \sqrt{\frac{1}{4} \sum_{i=1}^5 (x_i - \overline{x})^2} 
 	\label{equation:p2p_stats}
@@ -565,19 +566,20 @@
 	where $\overline{x}$ is the average pore-to-pore distance. We divided the sum in 
 	equation~\ref{equation:p2p_stats} by 4 since there are only 4 independent pore
 	spacings.
-        %MRSF: I think this is the spread in a single pore, not the average pore.  Should probably make it clearer to readers which it is (i.e. uncertainty in one, not uncertainty in mean of the four).
   \end{enumerate}
-  \begin{figure}[!htb]
-	\centering
-	\includegraphics[width=0.25\textwidth]{p2p_diagram.png}
-	\caption{There are five pore-to-pore distances that are equal in a perfect
-		hexagon. If each number in the diagram represents the center of a
-		pore in a hexagonal unit cell, then the distance from 1 to 2, 2 to 4, 
-		4 to 3, 3 to 1 and 1 to 4 should be equal. Only 4 of the distances
-		are independent. For example, the distance from 1 to 4 is defined by
-		the location of all other pore centers.}
-	\label{fig:p2p_diagram}  %MRSF: this label is multiply defined. 
-  \end{figure}
+  
+%BJC: included in a figure above
+%  \begin{figure}[!htb]
+%	\centering
+%	\includegraphics[width=0.25\textwidth]{p2p_diagram.png}
+%	\caption{There are five pore-to-pore distances that are equal in a perfect
+%		hexagon. If each number in the diagram represents the center of a
+%		pore in a hexagonal unit cell, then the distance from 1 to 2, 2 to 4, 
+%		4 to 3, 3 to 1 and 1 to 4 should be equal. Only 4 of the distances
+%		are independent. For example, the distance from 1 to 4 is defined by
+%		the location of all other pore centers.}
+%	\label{fig:p2p_diagram}  
+%  \end{figure}
   
   Alternatively, one can calculate the pore spacing as half of the $x$ and $y$
   box vectors, however this technique does not fully capture the uncertainty
@@ -805,8 +807,7 @@
   
   In the main text, we calculated ionic conductivity using the Nernst-Einstein 
   relationship. We also measured ionic conductivity using a second method, 
-  %MRSF: Don't capitalize Collective Diffusion. Also, add citation on first mention.
-  termed the Collective Diffusion model, for robustness. The collective 
+  termed the collective diffusion model\cite{liu_collective_2013}, for robustness. The collective 
   diffusion model measures the movement of the collective variable, Q, which
   is defined as the amount of charge transfer through the system and can be 
   thought to represent the center of charge of the system. The conductance, 
@@ -1146,7 +1147,7 @@
   
   \clearpage
   
-  \section{Ensemble of ordered sandwiched configurations}
+  \section{Ensemble of ordered sandwiched configurations}\label{section:sandwiched_ensemble}
   
   Here we show the results of the same analysis shown in Figures~\ref{M-fig:ensemble_XRD} 
   and~\ref{M-fig:full_ensemble_distributions} of the main text for the 
@@ -1178,6 +1179,7 @@
   \end{figure} 
 
   %MRSF: isn't this picture the same in the main draft of the document. Probably wouldn't have occured.
+  %BJC: it's not identical. The main text uses the parallel displaced data.
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.49\textwidth}
@@ -1209,17 +1211,28 @@
 
   \section{Carboxylate Dihedrals}
 
-  %MRSF: probably needs some context, since this is for a force field, not for QM. Did you have plots for several different force fields, which all are presumably trying to capture the QM that all basically gave the same results? That would be better evidence.
+  It is most energetically favorable for the carboxylate group attached to the monomer
+  head groups to stay coplanar with the phenyl group to which it is attached
+  (Figure~\ref{fig:carboxylate_dihedral_rb}). Although GAFF may over-predict the penalty
+  for deviating from its minimum energy configuration relative to those calculated 
+  by Rakitin and Pack~\cite{rakitin_necessity_2005} and Nelson and
+  Borkman~\cite{nelson_internal_1998}, they all show that there is an appreciable barrier
+  to rotation about the carboxylate-phenyl bond. The potential energy reaches its maximum
+  at rotation angles corresponding to a carboxylate group that is antiparallel to the 
+  plane of the phenyl ring to which it is attached (90\degree and 270\degree).
+  
   \begin{figure}[!htb]
   \centering
-  \includegraphics[width=0.5\textwidth]{carboxylate_dihedral_rb.png}
+  \includegraphics[width=0.5\textwidth]{carboxylate_dihedrals.pdf}
   \caption{A potential energy diagram for the dihedral angle about the carbon-carbon bond of
-  a carboxylate group attached to an aromatic ring, using parameters from the generalized amber 
-  forcefield. It is energetically favorable for the carboxylate group to stay in plane with 
-  the aromatic ring. There is a large energy penalty as the dihedral becomes antiparallel to 
-  the plane of the aromatic ring.}\label{fig:carboxylate_dihedral_rb}
+  a carboxylate group attached to an aromatic ring, using parameters from GAFF (blue), 
+  Rakitin (orange) and Borkman (green). It is energetically favorable for the 
+  carboxylate group to stay in plane with the aromatic ring. There is a large energy 
+  penalty as the dihedral becomes antiparallel to the plane of the aromatic 
+  ring.}\label{fig:carboxylate_dihedral_rb}
   \end{figure}
 
+  \clearpage
 % BJC: not necessary
 %  \begin{figure}[!htb]
 %  \centering
@@ -1371,6 +1384,7 @@
 
   \end{figure}
   
+  \clearpage
   \section{The role of water in the appearance of R-double}\label{section:rdouble}
   
   The appearance of R-double is likely a consequence of structure induced when

@@ -53,14 +53,16 @@ def initialize():
 
 
 class Atoms(object):
+    """ Give all atoms in the system properties including atom type, charge and mass
+
+    :param res: Residue() object whose properties will be duplicated nres times
+    :param nres: number of residues in full system
+
+    :type res: Residue object
+    :type nres: int
+    """
 
     def __init__(self, res, nres):
-        """
-
-        :param res: Residue() object
-        :param nres: number of residues (properties will be duplicated from res, nres times). All same-type residues in
-        .gro file are grouped together.
-        """
 
         natoms = res.natoms
         self.type = np.zeros([nres*natoms], dtype=object)
@@ -74,6 +76,12 @@ class Atoms(object):
 
 
 class Residue(object):
+    """ Get topology information about a given residue
+
+    :param: name: name of residue. name.itp and name.gro should be stored in llcsim/top/topologies
+
+    :type: name: str
+    """
 
     def __init__(self, name):
 
@@ -106,6 +114,10 @@ class Residue(object):
             self.natoms = 1
 
     def check_ion(self):
+        """ Check whether the given residue is an ion. Return True its name is stored in ions.txt located in
+        llcsim/top/topologies
+
+        """
 
         with open('%s/../top/topologies/ions.txt' % location) as f:
             ions = []
@@ -117,6 +129,9 @@ class Residue(object):
             self.is_ion = True
 
     def get_atoms(self):
+        """ Store all information inside the "[ atoms ]" section of name.itp
+
+        """
 
         atoms_index = 0
         while self.itp[atoms_index].count('[ atoms ]') == 0:
@@ -134,6 +149,9 @@ class Residue(object):
         return atoms
 
     def get_bonds(self):
+        """ Store all information in the "[ bonds ]" section of name.itp
+
+        """
 
         bonds_index = 0
         while self.itp[bonds_index].count('[ bonds ]') == 0:
@@ -151,6 +169,9 @@ class Residue(object):
         return bonds
 
     def get_improper_dihedrals(self):
+        """ Store all information in the "[ dihedrals ] ; impropers" section of name.itp
+
+        """
 
         imp_ndx = 0
 
@@ -172,6 +193,9 @@ class Residue(object):
         return impropers
 
     def get_vsites(self):
+        """ Store all information in the "[ virtual_sites ]" section of name.itp
+
+        """
 
         vsite_index = 0
         while self.itp[vsite_index].count('[ virtual_sites4 ]') == 0:
@@ -192,6 +216,9 @@ class Residue(object):
         return vsites
 
     def get_reactive_carbons(self):
+        """ Read annotations in name.gro to determine which
+
+        """
 
         self.c1_atoms = []
         self.c2_atoms = []
@@ -820,8 +847,7 @@ if __name__ == "__main__":
     print('Done!')
 
     # Rest of iterations
-    #while (len(sys.terminate) / sys.total_possible_terminated) < (args.density / 100.):
-    while sys.iteration < 3:
+    while (len(sys.terminate) / sys.total_possible_terminated) < (args.density / 100.):
 
         print('-'*80)
         print('Iteration: %d' % sys.iteration)
