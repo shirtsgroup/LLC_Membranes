@@ -330,7 +330,7 @@
                 \includegraphics[width=\linewidth]{WAXS_annotated_words.pdf} 
                 \caption{}\label{fig:WAXS}
         \end{subfigure}
-	\begin{subfigure}[t]{0.405\linewidth}
+	\begin{subfigure}[t]{0.38\linewidth}
                 \centering
                 \includegraphics[width=\textwidth]{SAXS.pdf}
                 \caption{}\label{fig:SAXS}
@@ -403,6 +403,13 @@
 
   \section{Methods}
  
+  \subsection{Source code}
+
+  Python scripts used to conduct post-simulation trajectory analysis, are available online at \\ 
+  \texttt{https://github.com/bencoscia/llcsim}. The python scripts used to simulated XRD
+  patterns are publicly available online at \texttt{https://github.com/joeyelk/MD-Structure-Factor}. 
+  Additional details are available in Section \ref{S-section:python_scripts} of the SI.
+  
   \subsection{Monomer Parameterization}
 
   We parameterized the interaction potential for the liquid crystal monomer 
@@ -420,8 +427,8 @@
   trajectory then reassigned charges using \texttt{molcharge}. Using the new
   charges, we annealed the monomer system again and pulled a random monomer
   configuration from the trajectory which we used for full system
-  construction (Figure~\ref{fig:build_procedure}a). Section S-\ref{S-section:parameterization} 
-  of the Supporting Information provides further detail of the parameterization process.
+  construction. Section \ref{S-section:parameterization} 
+  of the Supporting Information (SI) provides further detail of the parameterization process.
 
   \subsection{Unit Cell Preparation}
 
@@ -432,41 +439,13 @@
   configuration in $\sim$1000 ns \cite{mondal_self-assembly_2013}.  We
   attempted atomistic self-assembly by packing monomers into a box using Packmol
   \cite{martinez_packmol:_2009}. Simulations of greater than 100 ns show no
-  indicators of progress towards an ordered system (see Section S-\ref{S-section:self_assembly} of the 
-  Supporting Information). 
-  To bypass the slow self-assembly process, we used a variety of automated procedures 
-  to assemble monomers into a structure close to one of a number of hypothesized equilibrium configurations
-  (Figure~\ref{fig:build_procedure}).
-  %MRSF: where's the reference for the build scripts repository?
-  %MRS13: Would be nice to say we put the scripts on GitHub.  Additional details about which scripts can be in supporting.
-  These initial structures may result in equilibration into slowly-intercoverting
-  metastable states, an issue we will address later in the paper. 
-  
-  \begin{figure}[!htb]
-  \centering
-  \begin{subfigure}[t]{0.45\textwidth}
-  \includegraphics[width=\linewidth]{monomer_diagonal.pdf}
-  \caption{}
-  \end{subfigure}
-  \begin{subfigure}[t]{0.42\textwidth}
-  \includegraphics[width=\linewidth]{stacked_monomers.pdf}
-  \caption{}
-  \end{subfigure}
-  \begin{subfigure}[t]{0.35\textwidth}
-  \includegraphics[width=\linewidth]{initial_pore.pdf}
-  \caption{}
-  \end{subfigure}
-  \begin{subfigure}[t]{0.45\textwidth}
-  \includegraphics[width=\linewidth]{initial_unit_cell.pdf}
-  \caption{}
-  \end{subfigure}
-  %MRSF: I think this can be put in Supporting Information (we will get pushback to make this paper shorter, this is a good candidate)
-  \caption{(a) We parameterized a single monomer and annealed it to produce a low-energy
-		configuration. (b) We assembled monomers into columns by stacking them on top of each 
-		other. (c) We duplicated each column and rotated them to create hydrophilic pore centers.
-		We chose to stack twenty monomers into each column. (d) We duplicated the pores and 
-		placed them into a monoclinic unit cell with hexagonal symmetry.}\label{fig:build_procedure}
-  \end{figure}
+  indicators of progress towards an ordered system (see Section \ref{S-section:self_assembly} of the 
+  SI). To bypass the slow self-assembly process, we used a 
+  variety of automated procedures to assemble monomers into a structure close to
+  one of a number of hypothesized equilibrium configurations (See Figure 
+  \ref{S-fig:build_procedure} of the SI). These initial structures may result
+  in equilibration into slowly-intercoverting metastable states, an issue we will
+  address later in the paper. 
   
   A typical simulation volume contains four pores in a monoclinic unit cell,
   the smallest unit cell that maintains hexagonal symmetry when extended
@@ -477,7 +456,7 @@
   longer timescales. Ultimately, we chose to build a system with 20 monomers
   per column in order to minimize finite size effects with reasonable computational expense 
   and to obtain sufficient resolution when simulating XRD patterns (see further discussion
-  in Section S-\ref{S-section:monomers_per_column} of the Supporting Information).
+  in Section \ref{S-section:monomers_per_column} of the SI).
  
   \subsection{Monomer Placement} 
 
@@ -491,7 +470,7 @@
   too close or there will be high energy repulsions during early equilibration. We chose a
   pore radius of 0.5 nm and an initial pore spacing of 4.5 nm, $\sim$10\% larger than the 
   experimental value of 4.12 nm for our initial configurations. A sensitivity analysis of 
-  both parameters is presented in the Supporting Information, Section S-\ref{S-section:initial_config_dependence}. The 
+  both parameters is presented in the SI, Section \ref{S-section:initial_config_dependence}. The 
   distance between vertically stacked monomers, the xy position of monomers with respect 
   to vertically adjacent monomers, and the number of columns per pore do influence the 
   equilibrated structure and require further justification for their choices. We rely on 
@@ -505,7 +484,7 @@
   the $z$-direction. We also extensively explored a second system with an initial spacing of 5
   \AA. We briefly explored a third system with an initial spacing of 10
   \AA. However this largest spacing yields non-physical behavior which is detailed in the 
-  Supporting Information, Section S-\ref{S-section:initial_dbwl}. 
+  SI, Section \ref{S-section:initial_dbwl}. 
 
   We chose the relative orientation between vertically adjacent monomers in each column 
   based on clues from diffraction data as well as the various known stacking modes of 
@@ -519,7 +498,7 @@
   our sandwiched initial configuration stack directly on top of each other while
   head groups in the parallel displaced initial configuration stack with an offset
   of $180^\circ/ncol$ where $ncol$ is the number of columns per pore. See Figure 
-  S-\ref{S-fig:stacking} of the Supporting Information for a detailed illustration 
+  \ref{S-fig:stacking} of the SI for a detailed illustration 
   of the initial configurations in each mode.
 
   The number of columns per pore is unknown, as stated in Question
@@ -541,7 +520,7 @@
   structure to equilibrate for 5 ns in the NPT ensemble with pressure controlled
   by the Berendsen barostat, followed by NPT equilibration simulations run for at
   least 400 ns using the Parrinello-Rahman barostat. More equilibration details
-  are given in Section S-\ref{S-section:equilibration} of the Supporting Information.
+  are given in Section \ref{S-section:equilibration} of the SI.
 
   \subsection{Equilibrium Calculations}
 
@@ -560,11 +539,11 @@
   To calculate the equilibrated pore spacing, we measured the distance between
   pore centers. We located the pore centers by averaging the coordinates of sodium
   ions in their respective pores. We generated pore spacing statistics 
-  using the bootstrapping technique (See Section S-\ref{S-section:p2p_stats} of the
-  Supporting Information). 
+  using the bootstrapping technique (See Section \ref{S-section:p2p_stats} of the
+  SI). 
   The pore spacings calculated in this way are consistent
-  with one half of the $x$ and $y$ box vectors (See, Table S-\ref{S-table:p2p} in the
-  Supporting Information). However, our method for their calculation does a better 
+  with one half of the $x$ and $y$ box vectors (See, Table \ref{S-table:p2p} in the
+  SI). However, our method for their calculation does a better 
   job capturing the spread of pore-to-pore distances.
 
   \subsubsection{\textit{Generation of simulated X-ray diffraction patterns}}\label{method:xrd}
@@ -620,7 +599,7 @@
   beamstop covers most of the small angle reflections in the experimental 2D-WAXS
   pattern. In order to compare the simulated intensity of R-pores to experiment,
   we used the $q_r$ cross-section of 2D-SAXS which was generated from the same
-  sample (Figure S-\ref{S-fig:2DSAXS} of the Supporting Information). Since the d\textsubscript{200} peak is
+  sample (Figure \ref{S-fig:2DSAXS} of the SI). Since the d\textsubscript{200} peak is
   partially exposed in the experimental 2D-WAXS pattern, we normalized the
   experimental 2D-SAXS cross-section by matching the intensity of the
   d\textsubscript{200} peak between it and the experimental 2D-WAXS
@@ -720,8 +699,8 @@
   We looked at the average number density of sodium ions, aromatic rings and 
   carbon atoms making up the monomer tails. We binned the radial distance of all
   atoms in each group from the pore centers, then normalized by the volume of the
-  annulus defined by the bin edges and the z box vector (See Figure~S-\ref{S-fig:rdf_diagram}
-  of the Supporting Information). 
+  annulus defined by the bin edges and the z box vector (See Figure \ref{S-fig:rdf_diagram}
+  of the SI). 
 
   \subsection{Simplified Systems}\label{method:simple_systems}
   
@@ -782,7 +761,7 @@
   indicated by the Einstein relation \cite{einstein_investigations_1956}. We
   visualized the MSD plot to determine where to begin and end a linear fit. We
   measured ion concentration with respect to the volume of the entire unit cell. 
-  More details are provided in the Supporting Information, Section~S-\ref{S-section:ionic_conductivity}.
+  More details are provided in the SI, Section \ref{S-section:ionic_conductivity}.
 
   \subsection{Cross-linking}
   
@@ -794,22 +773,13 @@
   the system's structure.
 
   We based our cross-linking algorithm on the known reaction mechanism 
-  (Figure S-\ref{S-fig:xlink_mech} of the Supporting Information). The reaction 
+  (Figure \ref{S-fig:xlink_mech} of the SI). The reaction 
   takes place at the terminal vinyl groups
   on each alkane tail. The procedure is carried out iteratively. Each iteration, the
   algorithm chooses carbons to cross-link based on the distance between eligible 
   carbon pairs. The algorithm then updates the topology with the new bonds and atom
   types, energy minimizes the system and runs a short simulation before selecting 
   the next group of eligible carbons atoms.
-  
-  \subsection{Source code}
-  %MRSF: Suggest moving these references to where each code is described instead of separately here.
-  %BJC: the hyperref package really messes up the labels
-  The python scripts used to simulated XRD patterns are publicly available online at \\
-  \texttt{https://github.com/joeyelk/MD-Structure-Factor}. Python scripts used to conduct
-  all other post-simulation trajectory analysis, are also available online at \\ 
-  \texttt{https://github.com/bencoscia/llcsim}.
-  %BJC: llcsim repository only contains necessary scripts. Should probably move to Shirts-group repo
   
   \section{Results and Discussion}
   
@@ -822,8 +792,8 @@
   the parallel displaced and sandwiched configurations and equilibrated them according
   to the dry equilibration procedure. We tested all systems with an initial vertical monomer 
   spacing, $\mathit{d}$, of 3.7 \AA~in accordance with R-$\pi$. We tested 4 additional 
-  systems with monomers initially spaced 5 \AA~apart vertically (see Section~\ref{S-section:initial_pore_spacing}
-  of the Supporting Information for more details on sensitivity to initial monomer spacing). 
+  systems with monomers initially spaced 5 \AA~apart vertically (see Section \ref{S-section:initial_pore_spacing}
+  of the SI for more details on sensitivity to initial monomer spacing). 
   We considered the pore-to-pore spacing to be equilibrated as defined in Section~\ref{method:equil_time}.
   Figure~\ref{fig:p2p} shows the equilibrated pore-to-pore distances for all systems tested. 
   
@@ -845,13 +815,13 @@
   be characterized as begin in a more disordered basin. The extra space between stacked monomers
   in the disordered basin systems gives the monomer head groups more rotational freedom. We 
   quantified the ordering of the head groups using the nematic order parameter (see Section 
-  S-\ref{S-method:nematic_order} for details of the calculation). Disordered basin systems have
+  \ref{S-method:nematic_order} for details of the calculation). Disordered basin systems have
   a lower nematic order parameter (meaning they are more disordered) than ordered basin systems. 
   Generally, when monomers are started further apart, they stay further apart than systems where
   monomers are started closer together (see Table~\ref{table:correlation_length}). This increased
   equilibrated stacking distance of monomers in disordered basin systems increases their discrepancy
   with experimental stacking distances derived from WAXS relative to ordered basin systems 
-  (See section~\ref{section:rpi}). 
+  (See Section~\ref{section:rpi}). 
   
   Systems built with 5 columns around each pore equilibrate to a pore spacing that
   is most consistent with the experimental value of 4.12 nm derived from SAXS
@@ -878,7 +848,7 @@
   in the parallel displaced and sandwiched configurations at
   300 K in the ordered and disordered basins, as those were the most consistent
   with the most unambiguous XRD features, the pore-to-pore spacing
-  and the stacking distance, as described in section~\ref{section:mon_per_pore}. 
+  and the stacking distance, as described in Section~\ref{section:mon_per_pore}. 
   We generated simulated patterns using the locally
   equilibrated portion of each simulation trajectory (see
   Section~\ref{method:equil_time}). There are two important factors to take into
@@ -889,15 +859,15 @@
   around the $q_z$-axis, meaning there are fewer samples as $q_r$ approaches 0.
   More importantly, our simulations do not appear to be long enough to sample truly
   independent configurations within their respective metastable basins (see
-  section~\ref{section:slow_dynamics}), meaning we must take care in interpreting
+  Section~\ref{section:slow_dynamics}), meaning we must take care in interpreting
   the results of the XRD. The amount of independent configurations required to 
-  converge along the $q_z$ axis is analyzed in Supporting Information, 
-  Section S-\ref{S-section:xrd_noise}. The simulated patterns generated for all
+  converge along the $q_z$ axis is analyzed in SI, 
+  Section \ref{S-section:xrd_noise}. The simulated patterns generated for all
   systems studied are shown and compared to experiment in Figure~\ref{fig:XRDsim}.
 
   \begin{figure}[!htb]
 	\centering
-	\begin{subfigure}{0.88\textwidth}
+	\begin{subfigure}{0.905\textwidth}
 	\begin{subfigure}{0.28\linewidth}
 			\begin{subfigure}{\textwidth}
 			\centering
@@ -928,7 +898,7 @@
 			\end{subfigure}
 	\end{subfigure}
 	\end{subfigure}
-	\begin{subfigure}{0.1\textwidth}
+	\begin{subfigure}{0.085\textwidth}
 		\centering
 		\includegraphics[width=\linewidth]{colorbar_jet.pdf}
 	\end{subfigure}	
@@ -960,8 +930,8 @@
   similarities and differences between simulation and experiment. We start with relatively 
   uncomplicated analyses of reflections that are very similar between experiment and simulation:
   \begin{itemize}
-  	\item The location of R-alkanes (section~\ref{section:ralkanes})
-  	\item The location and intensity of R-pores (section~\ref{section:rpores})
+  	\item The location of R-alkanes (Section~\ref{section:ralkanes})
+  	\item The location and intensity of R-pores (Section~\ref{section:rpores})
   \end{itemize}
   and then move onto more complicated explanations of those reflections whose characteristics
   do not match, or have not been fully explained by experiment:
@@ -1061,7 +1031,7 @@
   previously used to explain R-spots. Even when we placed position restraints on
   the monomers in a tilted initial configuration, monomers quickly reduced their
   tilt relative to the $xy$ plane to an angle statisically indistinguishable from
-  zero (see Section~S-\ref{S-section:tail_tilt} of the Supporting Information). 
+  zero (see Section \ref{S-section:tail_tilt} of the SI). 
 
   In order to more clearly identify the structural reasons for R-spots, we
   equilibrated an ordered basin sandwiched configuration at 280 K to moderately
@@ -1091,8 +1061,8 @@
   configuration (Figure~\ref{fig:layered_tails}).  This ordering is
   primarily in the parts of the tail proximal to the heads, and dies
   off at the tail ends, where there is more space to fill causing them
-  to pack nearly isotropically. See Section~S-\ref{S-section:tail_packing} 
-  of the Supporting Information for
+  to pack nearly isotropically. See Section \ref{S-section:tail_packing} 
+  of the SI for
   a more detailed explanation of the calculation and packing
   distributions generated from different sections of the tails.
 
@@ -1235,7 +1205,7 @@
   modestly from 4.5 $\pm$ 0.4 to 7.3 $\pm$ 1.2 \AA. However, visually, the
   correlation functions are nearly identical and oscillatory behavior persists
   throughout $g(z)$ in both cases (See
-  Figure~S-\ref{S-fig:z_correlation_overlay}).
+  Figure \ref{S-fig:z_correlation_overlay}).
 
   The broadening of the $q_z$ cross-section of R-$\pi$ is related to
   $z$-directional correlation between scatters within monomer columns. The
@@ -1492,11 +1462,12 @@
   the data in Figure~\ref{fig:sim_rsection_fit}, the FWHM of R-$\pi$ agrees
   well with experiment, meaning the quenched configuration contains about the
   right amount of disorder on the $xy$ plane. However, the relatively low quality
-  of the fit implies that the FWHM may actually be different from experiment, and
-
-  of a fixed lorentzian might not be the best comparison to experiment and some form of initial configuration dependence causes extra structure. 
-  %MRSF: what does optimization mean here? Better forcefield or longer time? Better fitting?
-  that the radial ordering of the head groups may benefit from further optimization.
+  of the fit implies that the FWHM of a fixed Lorentzian fit to data from a 
+  single simulation might not be the best comparison to experiment and that 
+  some form of initial configuration dependence causes extra structure.
+  %BJCF: new ending to this paragraph (above) 
+  %may actually be different from experiment, and
+  %that the radial ordering of the head groups may benefit from further optimization.
 
   \begin{figure}
   \centering
@@ -1510,6 +1481,7 @@
   
   \subsubsection*{Quenched disorder in ensembles of configurations}  
 
+  %BJCF: broke giant paragraph into 3 paragraphs, adjusted theses
   Since the dynamics of this system are slow, and consequently most of our analysis
   has been focused on a set of quenched configurations with some structural 
   characteristics that do not vary significantly with time, we attempted to learn
@@ -1537,7 +1509,7 @@
   ensemble shows the best agreement with experiment so far. For simplicity, 
   we will limit the following discussion to the parallel displaced configuration.
   Equivalent data for the sandwiched configuration is presented in Section 
-  S\ref{S-section:sandwiched_ensemble}.
+  \ref{S-section:sandwiched_ensemble}.
 
   \begin{figure}[!htb]
   \centering
@@ -1556,16 +1528,22 @@
   		   configuration (a) than in the parallel displaced configuration (b).}\label{fig:ensemble_XRD}
   \end{figure}
  
-% Remind people of randomly displaced columns. Structural collapse is random and symmetric.  
   %MRSF: is this the clearest thesis?  Similar to each other?  Similar to the amount of disordered viewed in the long simulations? Is the symmetric nature more useful?  I think also this paragraph should be split up more to emphasize findings. 
+  %BJCF: thesis changed, added reminder of initial randomization.
   These short independent simulations exhibit a symmetric distribution of quenched
-  disorder. We pooled the deviations of each head group COM from idealized positions
-  from all independent simulations in order to create the distributions shown in 
-  Figure~\ref{fig:offset_ensemble_pooled} (see Section~\ref{method:simple_systems}).
+  disorder providing evidence that the quenched disorder is randomized in each system. 
+  We remind the reader that the only difference between each independent initial configuration
+  is the random $z$-direction displacement that we apply to each column. The
+  quenched disorder is then a result of the initial structural collapse that is 
+  directed by the randomized velocity vectors of the system's atoms which are drawn from
+  a Maxwell-Boltzmann distribution. We pooled the deviations of each head group COM 
+  from idealized positions from all independent simulations in order to create the 
+  distributions shown in Figure~\ref{fig:offset_ensemble_pooled} (see Section~\ref{method:simple_systems}).
   The distributions appear symmetric meaning that there is an equal chance for a head
   group to displace in the positive or negative $z$, $r$, or $\theta$-direction.
   
-  We verified that this same symmetry exists when looking at individual COMs.
+  %BJCF: broke into separate paragraph
+  We verified that this same symmetry exists for individual COMs.
   If we consider the COM of a given head group, we expect that the distribution of
   its deviations from its idealized position among all the independent simulations
   should be symmetric about its idealized position. We can calculate the 
@@ -1681,7 +1659,7 @@
   generated from parallel displaced configurations. The monomers may prefer to be
   parallel displaced, but their displacement is likely only slightly shifted, on 
   the $xy$ plane, from the center of mass of their vertically adjacent neighbors 
-  (see Figure~S-\ref{S-fig:between_pd} of the Supporting Information). In this way,
+  (see Figure \ref{S-fig:between_pd} of the SI). In this way,
   columns can more easily act 
   independently while maintaining some features of parallel displaced structure. 
 
@@ -1715,7 +1693,7 @@
   parallel position as restraints are released. There is an appreciable energy
   barrier that prevents rotation of carboxylate groups attached to phenyl rings
   since the group extends the system's $\pi$ conjugation~\cite{carey_organic_2011} (see Figure
-  S-\ref{S-fig:carboxylate_dihedral_rb} of the Supporting Information), which is significant even considering
+  \ref{S-fig:carboxylate_dihedral_rb} of the SI), which is significant even considering
   possible overestimates of the barrier height in the classical force field. 
 
   Another way to produce R-double is if we rotate monomers with respect to
@@ -1750,7 +1728,7 @@
   \ref{fig:solvated_pore_rzplot_norestraints}). It is not initially present, but
   appears after 200 ns of simulation time. After 450 ns, it disappears again.
   Simulated XRD patterns of all other solvated systems tested are shown in Figure
-  S-\ref{S-fig:solvation}, however R-double is not present.
+  \ref{S-fig:solvation}, however R-double is not present.
 
   \begin{figure}[!htb]
   \centering
@@ -1847,7 +1825,7 @@
   $\pi$-stacking distance apart which would lead to R-double (much like the
   configuration in Figure~\ref{fig:staggered_rzplot_norestraints}). There are a
   modest number of occurrences of this scenario, which we quantify in further
-  detail in the Supporting Information, Section S-\ref{S-section:rdouble}.  
+  detail in the SI, Section \ref{S-section:rdouble}.  
   
   Of all the configurations tested, it is most likely that R-double is induced
   by water molecules as described above since it is the only mechanism that can
@@ -1905,8 +1883,8 @@
   We plotted the number densities of heavy atoms in the head group, carbon atoms in the tail
   region and all sodium ions (Figure~\ref{fig:overlaid_densities}). For the head group
   region, we used heavy atoms making up the aromatic rings and carboxylate groups. For the tail
-  region, we used carbon atoms of the monomer tails (See Figure S-\ref{S-fig:monomer_color_coded}
-  of the Supporting Information for a diagram). We averaged the histograms over the equilibrated
+  region, we used carbon atoms of the monomer tails (See Figure \ref{S-fig:monomer_color_coded}
+  of the SI for a diagram). We averaged the histograms over the equilibrated
   portion of the trajectory. 
   There is a gradient in pore composition transitioning radially from the hydrophilic 
   to the hydrophobic region, rather than an abrupt division. Based on size-exclusion 
@@ -1960,28 +1938,29 @@
   \end{figure}
 
   \subsection{Slow dynamics}\label{section:slow_dynamics}
-
-  % BJC6: edited to reduce comparison to other columnar LCs (and shortened)
+  
   We observe slow dynamics in our system. Typical diffusion constants for columnar
   liquid crystals have been reported to be between $10^{-11}~ \mathrm{m}^2/\mathrm{s}$ 
   \cite{dong_translational_1984} and $10^{-14}~\mathrm{m}^2/\mathrm{s}$ \cite{dvinskikh_molecular_2002}. 
   %MRSF: see below comment; if not LLC's we should qualify this (electrostatics would likely make slower, since larger
   %energies involved.
-  %MRS13: are these hydrophulic/hydrophopic LC?  Once with electrostatic driving forces are likely 
+  %MRS13: are these hydrophilic/hydrophopic LC?  Ones with electrostatic driving forces are likely 
   % to be even slower.  
-  % energy barriers are larger therefor they are different. Lyotroic has hydrogen bonds so it makes sense it could be slow
-  We measured the diffusion constants of monomers in each of the systems we
-  studied (see Table S-\ref{S-table:msd} of the Supporting Information) and find they are all on the order of
-  $10^{-14}~\mathrm{m}^2/\mathrm{s}$. However, since on this timescale, no monomers move
-  a full `level' above or below, this may be an overestimate. This slow speed is
-  not entirely surprising considering how densely the monomers are
-  packed as implied by diffraction experiments. The entangled tails
-  likely restrict both vertical and lateral movement.
+  %BJCF: new addtion
+  In the case of LLCs, we would expect a diffusion coefficient at the low end of this
+  range since hydrophilic regions of monomers can hydrogen bond, thus increasing the energy 
+  barrier for motion. We measured the diffusion constants of monomers in each of the main 
+  systems we studied (see Table \ref{S-table:msd} of the SI) and find they are all on the 
+  order of $10^{-14}~\mathrm{m}^2/\mathrm{s}$. However, since on this timescale, no monomers 
+  move a full `level' above or below, this may be an overestimate. This slow speed is
+  not entirely surprising considering how densely the monomers are packed as implied
+  by diffraction experiments. The entangled tails likely restrict both vertical and lateral
+  movement.
 
   Consequently, there is not enough movement on the timescales we simulated for the system to 
   consistently reach a definitive equilibrium structure. In all cases our monomers
   equilibrate to a stacking distance that is too large compared to experiment. 
-  As discussed in section~\ref{section:rpi}, while this may be in large part due to the 
+  As discussed in Section~\ref{section:rpi}, while this may be in large part due to the 
   force field's inability to model aromatic interactions, it is also possible that the
   monomer tails do have enough time to pack as tightly as they could. More densely packed
   tails could allow the monomers to stack closer together. 
@@ -1989,7 +1968,7 @@
   We quantified the movement of the tails during our simulations by calculating the 
   autocorrelation function of the dihedral angle formed around the bond between the 
   head groups and the ether oxygens which attach the tails to the head group 
-  (see Figure S-\ref{S-fig:dihedrals} of the Supporting Information). We exclude the dihedral from the middle tail 
+  (see Figure \ref{S-fig:dihedrals} of the SI). We exclude the dihedral from the middle tail 
   since it is fundamentally different than the two symmetric outside tails. We 
   limited these studies to the sandwiched configuration for simplicity.
   
@@ -2044,7 +2023,7 @@
   $(5.92 \pm 0.05)\times$\num{e-5}~S/m, about 5 times higher than the experimental value of 
   $(1.3 \pm 0.1)\times$\num{e-5}~S/m. We verified the value calculated by the Nernst-Einstein
   relationship using the collective diffusion model\cite{liu_collective_2013} 
-  (see section S-\ref{S-fig:conductivity} of the Supporting Information). The values calculated by the 
+  (see Section \ref{S-fig:conductivity} of the SI). The values calculated by the 
   collective diffusion model agree with Nernst-Einstein values within error, 
   however there is a much higher uncertainty that would require much longer 
   simulations to lower.
@@ -2068,7 +2047,7 @@
   displaced configurations in the ordered pore basin. We allowed the cross-linking
   algorithm to propagate until greater than 90\% of the vinyl groups on the tails of the 
   monomers were either involved in a cross-linking reaction or were terminated 
-  (see Section S-\ref{S-section:xlink} of the Supporting Information)
+  (see Section \ref{S-section:xlink} of the SI)
   for further details of the cross-linking algorithm). We allowed the cross-linked
   configurations to simulate for 100 ns further in the NPT ensemble. 
 

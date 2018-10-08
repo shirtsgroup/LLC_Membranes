@@ -208,9 +208,10 @@ if __name__ == "__main__":
     bin_centers = [bins[i - 1] + ((bins[i] - bins[i - 1]) / 2) for i in range(1, len(bins))]
     integrated_area = np.trapz(counts, bin_centers)  # integrated area of histogram for normalization
     plt.bar(bin_centers, bin_width*counts/integrated_area, width=bin_width)
-    plt.xlabel('Angle made with nearest neighbor (degrees)', fontsize=14)
-    plt.ylabel('Normalized frequency', fontsize=14)
-    plt.axes().tick_params(labelsize=14)
+    plt.xlabel('Angle made with nearest neighbor (degrees)', fontsize=18)
+    plt.ylabel('Normalized frequency', fontsize=18)
+    plt.axes().tick_params(labelsize=16)
+    plt.xticks([-60, -30, 0, 30, 60])
     plt.tight_layout()
     plt.savefig('hexagonal_tail_packing.pdf')
     plt.show()

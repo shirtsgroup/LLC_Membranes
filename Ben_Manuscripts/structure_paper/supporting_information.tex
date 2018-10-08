@@ -17,6 +17,9 @@
 \usepackage{listings}
 \usepackage{xr}
 
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thesection}{S\arabic{section}}   
+
 %\SectionNumbersOn
 
 \externaldocument[M-]{Draft}
@@ -29,6 +32,8 @@
   \bibliographystyle{ieeetr}
   \graphicspath{{./figures/}}  % put all the figures here
   \maketitle
+  
+  \section{Analysis scripts}\label{section:python_scripts}
 
   \section{Further details regarding monomer parameterization}\label{section:parameterization}
  
@@ -135,6 +140,34 @@
   for 100 ns using isotropic and anisotropic pressure coupling. (b) The nematic order 
   parameter hovers close to zero for the duration of the simulation meaning the system
   maintains its isotropic alignment.}\label{fig:self_assembly}
+  \end{figure}
+  
+  \section{Monomer build procedure}\label{section:monomer_build_procedure}
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}[t]{0.45\textwidth}
+  \includegraphics[width=\linewidth]{monomer_diagonal.pdf}
+  \caption{}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.42\textwidth}
+  \includegraphics[width=\linewidth]{stacked_monomers.pdf}
+  \caption{}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.35\textwidth}
+  \includegraphics[width=\linewidth]{initial_pore.pdf}
+  \caption{}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.45\textwidth}
+  \includegraphics[width=\linewidth]{initial_unit_cell.pdf}
+  \caption{}
+  \end{subfigure}
+  %MRSF: I think this can be put in Supporting Information (we will get pushback to make this paper shorter, this is a good candidate)
+  \caption{(a) We parameterized a single monomer and annealed it to produce a low-energy
+		configuration. (b) We assembled monomers into columns by stacking them on top of each 
+		other. (c) We duplicated each column and rotated them to create hydrophilic pore centers.
+		We chose to stack twenty monomers into each column. (d) We duplicated the pores and 
+		placed them into a monoclinic unit cell with hexagonal symmetry.}\label{fig:build_procedure}
   \end{figure}
 
   \section{Number of monomers per column}\label{section:monomers_per_column}
@@ -1442,6 +1475,7 @@
   Parallel Displaced, Ordered & $2.0 \times 10^{-14}$ \\
   Sandwiched, Disordered & $2.0 \times 10^{-14}$ \\
   Parallel Displaced, Disordered & $3.5 \times 10^{-14}$ \\
+  Parallel Displaced, 1 wt \% water & $7.1 \times 10^{-14}$ \\
   \bottomrule
   \end{tabular}
   \caption{The diffusion constants for all systems are on the order of $10^{-14} m^2/s$ 
