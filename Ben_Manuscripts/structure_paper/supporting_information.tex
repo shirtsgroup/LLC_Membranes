@@ -16,13 +16,15 @@
 \usepackage{float}
 \usepackage{listings}
 \usepackage{xr}
+\usepackage{array}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 
 \renewcommand{\thefigure}{S\arabic{figure}}
 \renewcommand{\thesection}{S\arabic{section}}   
 
 %\SectionNumbersOn
 
-\externaldocument[M-]{Draft}
+\externaldocument[M-]{Final_Draft}
 \title{Supporting Information : Understanding the Nanoscale Structure of Inverted Hexagonal Phase Lyotropic Liquid Crystal Polymer Membranes}
 \author{Benjamin J. Coscia \and Jospeh Yelk \and Matthew A. Glaser \and Douglas L. Gin \and Xunda Feng \and Michael R. Shirts}
 \date{}
@@ -33,7 +35,18 @@
   \graphicspath{{./figures/}}  % put all the figures here
   \maketitle
   
-  \section{Analysis scripts}\label{section:python_scripts}
+  \section{Setup and analysis scripts}\label{section:python_scripts}
+  
+  All python and bash scripts used to set up systems and conduct post-simulation trajectory
+  analysis, except for simulating X-ray diffraction (XRD) patterns, are available online at
+  \texttt{https://github.com/bencoscia/llcsim}. Table~\ref{table:python_scripts} provides more 
+  detail about specific scripts used for each type of analysis performed in the main text.
+  
+  The python scripts used to simulated XRD patterns are publicly available online at \\
+  \texttt{https://github.com/joeyelk/MD-Structure-Factor}. Given a GROMACS trajectory 
+  (.trr or .xtc) and a configuration file (.gro), simulate an XRD pattern using
+  \texttt{main\_gromacs.py}. Pass the flag \texttt{\-manuscript\_format} to generate patterns
+  and cross-sections with the same format as those presented in the main text.
 
   \section{Further details regarding monomer parameterization}\label{section:parameterization}
  
@@ -82,9 +95,9 @@
 	\texttt{molcharge} charges. A random monomer configuration was pulled from the
 	last 10\% of the trajectory and was used to build all assemblies reported
 	(Figure~\ref{fig:monomer}).
-
+	
   \end{enumerate} 
-  \clearpage
+
   \begin{figure}[!htb]
 	\centering
         \includegraphics[width=0.9\textwidth]{monomer.png}
@@ -92,6 +105,84 @@
 		represent hydrogen, cyan atoms represent carbon, red atoms represent oxygen and
 		the blue atom is sodium.}\label{fig:monomer}
   \end{figure}
+  
+  \clearpage
+
+  \begin{table}[htb!]
+  \centering
+  \newcolumntype{A}{ >{\centering\arraybackslash} m{2.25in} }
+  \newcolumntype{B}{ >{\centering\arraybackslash} m{0.75in} }
+  \newcolumntype{C}{m{3in}}
+  \begin{tabular}{|A|B|C|}
+  \hline
+  \textbf{Script Name} & \textbf{Section} & ~~~~~~~~~~~~~~~~~~~~~\textbf{Description} \\
+  \hline
+  \texttt{/setup/param.sh} & \ref{M-method:parameterization} & Automatically run the monomer
+  parameterization scheme outlined in Section~\ref{section:parameterization} given an initial
+  structure file in .pdb format. \\ \hline
+  
+  \texttt{/setup/build.py} & \ref{M-method:unitcell_build} \& \ref{M-method:monomer_placement} &
+  Build an initial configuration in the sandwiched or parallel displaced configuration with the 
+  desired initial vertical monomer spacing, monomers-per-column, and columns-per-pore. \\ \hline
+  
+  \texttt{/setup/equil.sh} & \ref{M-section:equilibration} & Wrapper script for running the GROMACS 
+  functions and python scripts needed in order to equilibrate an initial configuration. \\ \hline
+   
+  \texttt{/analysis/Structure\_char.py} & \ref{M-method:pore_spacing} & Calculate the distance 
+  between pores. \\ \hline
+  
+  \texttt{/analysis/correlation.py} & \ref{M-section:correlation_length} & Calculate the 3D 
+  correlation function from a trajectory and plot desired slices. \\ \hline
+  
+  \texttt{/analysis/regional\_density.py} & \ref{M-method:rdfs} & Calculate the density of a given
+  monomer component as a function of its distance from the pore center. \\ \hline
+  
+  \texttt{/analysis/structure\_factor.py} & \ref{M-method:simple_systems} & Generate customizable
+  trajectories of point scatterers, then calculate their structure factor and plot slices of it.
+  \\ \hline 
+  
+  \texttt{/analysis/disorder.py} & \ref{M-method:simple_systems} & Measure the magnitude of
+  quenched disorder. \\ \hline
+  
+  \texttt{/analysis/Ionic\_Conductivity.py} & \ref{M-method:ionic_conductivity} & Calculate the 
+  ionic conductivity using the Nernst-Einsten relationship and collective diffusion model. \\ \hline
+  
+  \texttt{/setup/xlink.py} & \ref{M-method:xlink} & Iteratively cross-link a system given an 
+  initial configuration. \\ \hline
+    
+  \texttt{/analysis/orientational\_order.py} & \ref{M-section:mon_per_pore} & Calculate the 
+  nematic order parameter. \\ \hline
+  
+  \texttt{/analysis/tilt.py} & \ref{M-section:rspots} & Calculate the angle between the xy plane
+  and the vector extending from the front to the back of each monomer tail. \\ \hline
+  
+  \texttt{/analysis/tail\_packing.py} & \ref{M-section:rspots} & Calculate the distribution of
+  angles between the center of mass of each monomer tail and its nearest neighbor monomer tails.
+  \\ \hline
+ 
+  \texttt{/analysis/compare\_disorder.py} & \ref{M-section:rpi} & Measure quenched disorder for
+  each trajectory in an ensemble of simulations, then plot distributions of quenched disorder.
+  \\ \hline
+  
+  \texttt{/analysis/hbonds\_pairing.py} & \ref{M-section:rdouble} & Identify all hydrogen bonds
+  then count the number of monomer pairs that share hydrogen bonds. \\ \hline
+  
+  \texttt{/analysis/torsions.py} & \ref{M-section:slow_dynamics} & Calculate the autocorrelation
+  function for a chosen dihedral. \\ \hline
+  
+  \end{tabular}
+  
+  \caption{The first column provides the names of the python scripts available in
+  the \texttt{llcsim} GitHub repository that were used for system setup and post-simulation 
+  trajectory analysis. Paths preceding script names are relative to the 
+  \texttt{llcsim} root directory. The second columns lists the section in the main
+  text where the output or usage of the script is first described. The third column
+  gives a brief description of the purpose of each script.
+  }~\label{table:python_scripts}
+  
+  \end{table}
+  
+  \clearpage
   
   \section{Attempted Self-assembly}\label{section:self_assembly}
   
@@ -142,7 +233,12 @@
   maintains its isotropic alignment.}\label{fig:self_assembly}
   \end{figure}
   
+  \clearpage  
+  
   \section{Monomer build procedure}\label{section:monomer_build_procedure}
+  
+  Figure~\ref{fig:build_procedure} illustrates the procedure carried out by 
+  \texttt{build.py} in order to build initial configurations.  
   
   \begin{figure}[!htb]
   \centering
@@ -563,6 +659,8 @@
   until the pores reach the desired concentration of water. The remainder of the
   equilibration follows the same procedure as the dry system. 
 
+  \clearpage
+
   \section{Calculation of pore-to-pore spacing statistics}\label{section:p2p_stats}
  
  %BJC: is it really necessary to explain this if I release the code? I don't explain
@@ -638,8 +736,10 @@
   does a better job of showing the spread of pore-to-pore distances.}~\label{table:p2p}
   \end{table}
 
+  \clearpage
+
   \section{2D Small Angle X-ray Scattering Data}  
-  
+ 
   \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.5\textwidth]{2DSAXS_axes.png}
@@ -867,7 +967,7 @@
         \label{fig:conductivity}
   \end{figure}  
   
-  \section{Crosslinking algorithm details}\label{section:xlink}
+  \section{Cross-linking algorithm details}\label{section:xlink}
 
   Crosslinking of the the monomer Na-GA3C11 occurs via a UV initiated free
   radical polymerization (FRP) (Figure~\ref{fig:xlink_mech}). Head-to-tail addition
@@ -1027,6 +1127,8 @@
 %  \end{subfigure}
 %  \caption{}\label{fig:xrd_intensities}
 %  \end{figure}
+ 
+  \clearpage
  
   \section{Noise in simulated diffraction patterns}\label{section:xrd_noise}
   

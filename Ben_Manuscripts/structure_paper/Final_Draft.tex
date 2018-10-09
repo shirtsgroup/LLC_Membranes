@@ -298,7 +298,6 @@
 	R-double has been previously interpreted as 2\textsubscript{1} helical ordering of aromatic
 	rings along the $z$-axis\cite{feng_scalable_2014}.
 
-
 	\item \textit{R-alkanes}: A low intensity ring located at $|\mathbf{q}|$ = 1.4
 	\AA$^{-1}$ marks the third major reflection of interest. The real space
 	separation corresponds to 4.5 \AA~which is characteristic of the average
@@ -405,12 +404,13 @@
  
   \subsection{Source code}
 
-  Python scripts used to conduct post-simulation trajectory analysis, are available online at \\ 
-  \texttt{https://github.com/bencoscia/llcsim}. The python scripts used to simulated XRD
-  patterns are publicly available online at \texttt{https://github.com/joeyelk/MD-Structure-Factor}. 
-  Additional details are available in Section \ref{S-section:python_scripts} of the SI.
+  Python scripts used to set up systems and conduct post-simulation trajectory analysis are
+  available online at \texttt{https://github.com/bencoscia/llcsim}. The python scripts used
+  to simulated XRD patterns are publicly available online at \\
+  \texttt{https://github.com/joeyelk/MD-Structure-Factor}. Additional details are available in 
+  Section \ref{S-section:python_scripts} of the SI.
   
-  \subsection{Monomer Parameterization}
+  \subsection{Monomer Parameterization}\label{method:parameterization}
 
   We parameterized the interaction potential for the liquid crystal monomer 
   Na-GA3C11 using the Generalized AMBER Force Field (GAFF) 
@@ -430,7 +430,7 @@
   construction. Section \ref{S-section:parameterization} 
   of the Supporting Information (SI) provides further detail of the parameterization process.
 
-  \subsection{Unit Cell Preparation}
+  \subsection{Unit Cell Preparation}\label{method:unitcell_build}
 
   The time scale for self-assembly of monomers into the hexagonal phase is
   unknown and likely outside of a reasonable length for an atomistic simulation,
@@ -458,7 +458,7 @@
   and to obtain sufficient resolution when simulating XRD patterns (see further discussion
   in Section \ref{S-section:monomers_per_column} of the SI).
  
-  \subsection{Monomer Placement} 
+  \subsection{Monomer Placement}\label{method:monomer_placement}
 
   When constructing an initial configuration, there are a number of variables
   which require careful consideration while placing monomers. We find that the equilibrium
@@ -692,7 +692,7 @@
   it does not consistently fit the peaks of $g(z)$ from parallel displaced configurations 
   well enough to extract a reliable value of L.
   
-  \subsubsection{\textit{Radial distribution functions}}
+  \subsubsection{\textit{Radial distribution functions}}\label{method:rdfs}
 
   We explored the pores' compositions by measuring the average number densities
   of various monomer components as a function of distance from the pore centers.
@@ -746,7 +746,7 @@
   assumes that the timescales for large scale rearrangements of the
   system are much longer than what we can feasibly simulate with MD.
 
-  \subsection{\textit{Ionic conductivity calculations}}
+  \subsection{\textit{Ionic conductivity calculations}}\label{method:ionic_conductivity}
 
   We calculated ionic conductivity using the Nernst-Einstein relationship, which 
   relates the DC ionic conductivity, $\sigma$, to ion diffusivity, $D$, 
@@ -763,7 +763,7 @@
   measured ion concentration with respect to the volume of the entire unit cell. 
   More details are provided in the SI, Section \ref{S-section:ionic_conductivity}.
 
-  \subsection{Cross-linking}
+  \subsection{Cross-linking}\label{method:xlink}
   
   In order to better match the experimental membrane synthesis process,
   we created a cross-linking algorithm that one can apply to equilibrated structures. 

@@ -1,15 +1,19 @@
 #! /bin/bash
 
-# Parameterize and energy minimize a monomer with GAFF using antechamber
 # given a .pdb file 
+# Parameterize a monomer with GAFF using antechamber
+# Convert to GROMACS topology
+# Thermally anneal monomer (optional)
+# Reassign charges with molcharge
 
 set -e # exit upon error
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"  # location of this script
 
 name='monomer' # name of molecule. This name will carry through to output
 nc=0  # net charge
 res='MON' # name of residue being made, NOTE: This must match the residue in the .pdb file or you will get errors
 anneal='no'  # change to 'yes' if you want a thermal annealing process carried out after energy minimization
-input_path='.'
+input_path="${SCRIPT_DIR}/../Parameterization/"  # location of em.mdp and anneal.mdp files
 
 while getopts "n:c:r:a:p:" opt; do
     case $opt in
@@ -20,6 +24,9 @@ while getopts "n:c:r:a:p:" opt; do
     p) input_path=$OPTARG;;
     esac
 done
+
+# atomtyping and initial charge assigment with antechamber and tleap roughly follow steps descrbed here:
+# http://ambermd.org/tutorials/basic/tutorial4b/
 
 antechamber -i ${name}.pdb -fi pdb -o ${name}.mol2 -fo mol2 -c bcc -s 2 -nc ${nc}  # The .pdb must have connectivity info!
 # -c bcc tells antechamber to use AM1-BCC charge model
@@ -40,8 +47,6 @@ tleap -f tleap.in  # run the previous block in tleap
 
 #sed -i -e "s/${res: -3}/${res}/g" ${name}.prmtop
 #sed -i -e "s/${res: -3}/${res}/g" ${name}.inpcrd
-
-#DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # the directory where this script is located.
 DIR=${input_path}
 
 acpype.py -p ${name}.prmtop -x ${name}.inpcrd
@@ -55,7 +60,7 @@ gmx grompp -f ${DIR}/em.mdp -p ${res}.top -c box.gro -o em  # create atomic leve
 gmx mdrun -v -deffnm em  # run energy minimization
 gmx editconf -f em.gro -o ${res}_new.pdb  # will need this for molcharge later
 
-if [ "${anneal}" == "on" ]; then  # anneal if necessary
+if [ "${anneal}" == "yes" ]; then  # anneal if necessary
 	gmx grompp -f ${DIR}/anneal.mdp -p ${res}.top -c em.gro -o anneal.tpr
 	gmx mdrun -v -deffnm anneal
 	gmx editconf -f anneal.gro -o ${res}_new.pdb  # will need this for molcharge later

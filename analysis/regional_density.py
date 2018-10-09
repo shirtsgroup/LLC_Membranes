@@ -4,8 +4,9 @@ import mdtraj as md
 import argparse
 import numpy as np
 from LLC_Membranes.llclib import physical
-from LLC_Membranes.analysis import Structure_char
+from LLC_Membranes.analysis import p2p
 import matplotlib.pyplot as plt
+import tqdm
 import matplotlib as mpl
 import os.path as path
 
@@ -55,6 +56,77 @@ def duplicate(pos, box):
         p[t, 2*n:3*n, :] = p[t, :n, :] - box[t, 1, :]
 
     return p
+
+
+def compdensity(component, pore_centers, start, box, cut=1.5, pores=4, nbins=50, rmax=3.5, buffer=0.0):
+    """ Measure the density of a component as a function of the distance from the pore centers
+
+    :param component: the coordinates of the component(s) which you want a radial distribution of at each frame
+    :param pore_centers: a numpy array of the locations of each pore center at each trajectory frame
+    :param start: the frame number at which to start calculations (should be after equilibration)
+    :param cut: cutoff distance for distance calculations. Will not count anything further than cut from the pore center
+    :param pores: number of pores (int) default=4
+    :param rmax: maximum distance from pore center to calculate density for, default = 3.5 nm
+    :param buffer: percentage used to define the location of z planes between which component density will be computed,
+           float, default = 0 (i.e. no buffer). Should be between 0 and 1. e.g. for 1 percent, use 0.01 as the buffer
+
+    :type component: numpy.ndarray
+    :type pore_centers: numpy.ndarray
+    :type start: int
+    :type cut: float
+    :type pores: int
+    :type rmax: float
+    :type buffer: float
+
+    :return: the density of "component" as a function the distance from the pore center. Also
+             returns the calculated bin width for plotting
+    """
+
+    # Extract basic system information. It's important to follow the format of the component array to get it right
+
+    tot_atoms = component.shape[1]  # the total number of components in a single frame
+    n_ppore = tot_atoms // pores  # the total number of components in each pore
+
+    nT = component.shape[0]
+    zbox = np.mean(box[:, 2, 2])
+    # Find the approximate max and minimum z values of the components based on the last frame
+
+    zmax = np.max(component[-1, :, 2])
+    zmin = np.min(component[-1, :, 2])
+    thickness = zmax - zmin  # approximate membrane thickness
+
+    # now find the maximum and minimum permissible z dimensions based on the buffer
+    zmax_buff = zmax - thickness * buffer  # Could use buffer/2 depending on how you interpret what buffer % means
+    zmin_buff = zmin + thickness * buffer
+
+    density = np.zeros([nbins])  # number / nm^3
+    for t in tqdm.tqdm(range(start, nT)):
+        for p in range(pores):
+            # narrow down the positions to those that are within 'cut' of at least one pore
+            distances = np.linalg.norm(component[t, :, :2] - pore_centers[:, p, t], axis=1)
+            d_sorted = np.sort(distances)
+            # find where the distances exceed the cutoff
+            stop = 0
+            while d_sorted[stop] < cut:
+                stop += 1
+
+            hist, bin_edges = np.histogram(d_sorted[:stop], bins=nbins, range=(0, cut))  # the range option is necessary
+            #  to make sure we have equal sized bins on every iteration
+
+            density += hist
+
+    density /= zbox * (nT - start)  # take average
+    bin_width = cut / nbins
+
+    # normalize based on area of anulus where bin is located
+    r = np.zeros([nbins])
+    normalization = []
+    for i in range(nbins):
+        normalization.append(np.pi * (bin_edges[i + 1] ** 2 - bin_edges[i] ** 2))
+        density[i] /= np.pi * (bin_edges[i + 1] ** 2 - bin_edges[i] ** 2)
+        r[i] = (bin_edges[i + 1] + bin_edges[i]) / 2
+
+    return density, r, bin_width
 
 
 if __name__ == "__main__":
@@ -152,8 +224,6 @@ if __name__ == "__main__":
 
         plt.show()
 
-        exit()
-
     if args.solvate:
         colors = ['xkcd:red', 'xkcd:green', 'blue', 'xkcd:yellow']
     else:
@@ -185,12 +255,12 @@ if __name__ == "__main__":
 
             print('Calculating number density of %s region' % reg)
 
-            pos = Structure_char.restrict_atoms(t, reg)  # restrict trajectory to region
+            pos = p2p.restrict_atoms(t, reg)  # restrict trajectory to region
 
             p = duplicate(pos, t.unitcell_vectors)  # duplicate things periodically
 
             equil = 0
-            density, r, bin_width = Structure_char.compdensity(pos, p_centers, equil, box, pores=npores, buffer=0, nbins=args.bins)
+            density, r, bin_width = compdensity(pos, p_centers, equil, box, pores=npores, nbins=args.bins)
 
             results[i, :] = density
 
@@ -224,7 +294,7 @@ if __name__ == "__main__":
 
         for i in range(results.shape[0]):
             plt.bar(r, results[i, :], bw, color=colors[i], alpha=0.75, label=regions[i])
-    exit()
+
     un_normalize = np.zeros_like(results)
 
     annulus_area = []
