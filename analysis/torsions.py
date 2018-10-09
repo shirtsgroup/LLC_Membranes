@@ -345,10 +345,11 @@ class Dihedral(object):
     def plot_autocorrelation(self, show=False, save=True, savename='dihedral_autocorrelation'):
 
         plt.figure()
-        plt.plot(self.time/1000, self.autocorr_fxn, linewidth=2)
+        plt.plot(self.time/1000, self.autocorr_fxn, linewidth=3)
         #plt.plot([self.time[0]/1000, self.time[-1]/1000], [0, 0], '--', color='black')
-        plt.xlabel('Time (ns)', fontsize=14)
-        plt.ylabel('Autocorrelation', fontsize=14)
+        plt.xlabel('Time (ns)', fontsize=18)
+        plt.ylabel('Autocorrelation', fontsize=18)
+        plt.gcf().get_axes()[0].tick_params(labelsize=18)
         plt.tight_layout()
         if save:
             plt.savefig('%s.pdf' % savename)

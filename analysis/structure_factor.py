@@ -704,7 +704,7 @@ if __name__ == "__main__":
     # fit lorentzian to R-pi
     t.plot_sf_slice('y', [0, 2*np.pi / dbwl], show=False)
     #np.savez_compressed('freq_y.npz', freq_y=t.freq_y)
-    np.savez_compressed('correlation_qy.npz', freq_z=t.freq_y, slice=t.slice)
+    np.savez_compressed('columns_sr%s.npz' % args.shift_range, freq_z=t.freq_y, slice=t.slice)
 
     #np.savez_compressed('perfect_100pores.npz', freq_y=t.freq_y, slice=t.slice)
 
@@ -741,9 +741,9 @@ if __name__ == "__main__":
                                            2 * np.sqrt(2 * np.log(2)) * cov_x[1, 1] ** 0.5))
 
     plt.legend()
-    plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=14)
-    plt.ylabel('Intensity', fontsize=14)
-    plt.gcf().get_axes()[0].tick_params(labelsize=14)
+    plt.xlabel('$q_r\ (\AA^{-1}$)', fontsize=18)
+    plt.ylabel('Intensity', fontsize=18)
+    plt.gcf().get_axes()[0].tick_params(labelsize=18)
     plt.xlim(-2.5, 2.5)
     plt.tight_layout()
 
