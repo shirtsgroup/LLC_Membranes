@@ -615,6 +615,7 @@ class System(Topology):
         diff = np.array(self.xlink_residue.c2_atom_indices) - np.array(self.xlink_residue.c1_atom_indices)
         bond_c2 = np.array([x for x in self.bond_c2 if (x - 1) not in self.radicals])  # don't include radicals
         tails = bond_c2 % len(self.xlink_residue.c2_atoms)  # define which tail each c2 atom is part of
+        print(tails)
         c1 = bond_c2 - diff[tails]  # indices of c1 atoms which gain a hydrogen atom
 
         # Get (serial) indices of hydrogen atoms to make real
