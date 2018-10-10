@@ -1426,6 +1426,7 @@
   It therefore seems likely that the discrepancy between the shape and intensity of
   R-$\pi$ generated from our simulations versus experiment is primarily due to
   highly correlated columns in our highly symmetric initial configurations.
+  %MRSF2: These next two sentences gets pretty confusing; too many clauses, if, when, since . . . make sentences shorter. 
   If the columns were uncorrelated, $g(z)$ of the ordered sandwiched system 
   would very closely resemble Figure~\ref{fig:z_correlation_sandwich} when we 
   average all $z$-slices of the 3D correlation function since contributions to
@@ -1482,14 +1483,15 @@
   \subsubsection*{Quenched disorder in ensembles of configurations}  
 
   %BJCF: broke giant paragraph into 3 paragraphs, adjusted theses
-  Since the dynamics of this system are slow, and consequently most of our analysis
+  %MRSF2: broke up the sentence, check to make sure it makes sense.
+  Since the dynamics of this system are slow, consequently most of our analysis
   has been focused on a set of quenched configurations with some structural 
-  characteristics that do not vary significantly with time, we attempted to learn
+  characteristics that do not vary significantly with time.  We therefore attempted to learn
   more about their time-averaged structures by studying ensembles of shorter 
-  simulations started from more independent initial configurations. We created
+  simulations started from more independent initial configurations. To do this, we created
   ensembles of 40 simulations in both the parallel displaced and sandwiched 
-  configurations. We used the same equilibration scheme as above 
-  (see Section~\ref{section:equilibration}). However, we built the initial 
+  configurations. We used the same equilibration scheme described in Section~\ref{section:equilibration}. 
+  However, we built the initial 
   configurations with columns randomly displaced in the $z$-direction and looked at
   the results after 5 ns of unrestrained simulation, which should capture any 
   quenched disorder built in from the initial configurations. We then simulated
@@ -1502,13 +1504,13 @@
   suggest that the average intensity of R-$\pi$ in the ensemble of sandwiched 
   systems is about 3$\times$ higher than that in the ensemble of parallel displaced
   configurations. Compared to our long simulations, the intensity of R-$\pi$
-  generated from ensembles of short simulations, decreases by a factor of 3
+  generated from ensembles of short simulations decreases by a factor of 3
   and by a factor of 2 for the sandwiched and parallel displaced configurations respectively. 
 
   Overall, the intensity of R-$\pi$ generated from the parallel displaced 
-  ensemble shows the best agreement with experiment so far. For simplicity, 
+  ensemble of short simulations shows the best agreement with experiment so far. For simplicity, 
   we will limit the following discussion to the parallel displaced configuration.
-  Equivalent data for the sandwiched configuration is presented in Section 
+  Data for the sandwiched configuration is presented in Section 
   \ref{S-section:sandwiched_ensemble}.
 
   \begin{figure}[!htb]
@@ -1532,10 +1534,10 @@
   %BJCF: thesis changed, added reminder of initial randomization.
   These short independent simulations exhibit a symmetric distribution of quenched
   disorder providing evidence that the quenched disorder is randomized in each system. 
-  We remind the reader that the only difference between each independent initial configuration
+  The only difference between each independent initial configuration
   is the random $z$-direction displacement that we apply to each column. The
   quenched disorder is then a result of the initial structural collapse that is 
-  directed by the randomized velocity vectors of the system's atoms which are drawn from
+  directed by the randomized velocity vectors of the system's atoms drawn from
   a Maxwell-Boltzmann distribution. We pooled the deviations of each head group COM 
   from idealized positions from all independent simulations in order to create the 
   distributions shown in Figure~\ref{fig:offset_ensemble_pooled} (see Section~\ref{method:simple_systems}).
@@ -1948,8 +1950,8 @@
   % to be even slower.  
   %BJCF: new addtion
   In the case of LLCs, we would expect a diffusion coefficient at the low end of this
-  range since hydrophilic regions of monomers can hydrogen bond, thus increasing the energy 
-  barrier for motion. We measured the diffusion constants of monomers in each of the main 
+  range since hydrophilic regions of monomers can hydrogen bond, thus increasing the energetic 
+  barriers for motion. We measured the diffusion constants of monomers in each of the main 
   systems we studied (see Table \ref{S-table:msd} of the SI) and find they are all on the 
   order of $10^{-14}~\mathrm{m}^2/\mathrm{s}$. However, since on this timescale, no monomers 
   move a full `level' above or below, this may be an overestimate. This slow speed is
