@@ -63,9 +63,7 @@ def initialize():
                         'membrane to exclude from p2p calculations. Useful if you solvate both sides with water and'
                         'ions float into solution.')
 
-    args = parser.parse_args()
-
-    return args
+    return parser
 
 
 def restrict_atoms(t, component):
@@ -380,7 +378,7 @@ def parse_txt(txt, points, times, std=False):
 
 if __name__ == '__main__':
 
-    args = initialize()  # parse the args
+    args = initialize().parse_args()  # parse the args
 
     t = md.load(args.input, top=args.gro)[args.begin:args.end:args.skip]
 

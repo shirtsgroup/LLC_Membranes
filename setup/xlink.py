@@ -12,8 +12,6 @@ from LLC_Membranes.setup.genmdp import SimulationMdp
 from LLC_Membranes.llclib import file_rw
 from scipy.sparse import lil_matrix
 
-location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in
-
 
 def initialize():
 
@@ -798,6 +796,9 @@ class System(Topology):
         file_rw.write_gro_pos(self.t.xyz[-1, keep, :], out, ids=ids, res=res, ucell=ucell)
 
         self.write_assembly_topology(virtual_sites=False, vsite_atom_name=dummy_atom_name)
+
+
+location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in
 
 
 if __name__ == "__main__":
