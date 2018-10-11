@@ -3,6 +3,7 @@
 import os
 from LLC_Membranes.analysis import Atom_props
 import mdtraj as md
+import numpy as np
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -53,7 +54,7 @@ class LC(object):
         self.full = a
         P = []
         P_ndx = []
-        L = []
+        L = np.zeros([2], dtype=int)
         C1 = []
         C2 = []
         C1_ndx = []
@@ -86,8 +87,10 @@ class LC(object):
                     if 'P' in annotations:
                         P.append(str.strip(a[i][10:15]))
                         P_ndx.append(i - 2)
-                    if 'L' in annotations:
-                        L.append(i - 2)  # adjust for top lines and index (count from 0 rather than 1)
+                    if 'L1' in annotations:
+                        L[1] = i - 2
+                    if 'L2' in annotations:
+                        L[0] = i - 2
                     if 'R' in annotations:
                         self.ref_atom_index = i - 2
                     if 'C1' in annotations:

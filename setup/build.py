@@ -203,7 +203,7 @@ class Assembly(LC):
         """ Align vector defined by lineatoms in LC object with x axis """
 
         v = np.array([self.LC_positions[self.lineatoms[0], :2] - self.LC_positions[self.lineatoms[1], :2]])
-        angle = np.arctan(v[0, 1] / v[0, 0])
+        angle = np.arctan2(v[0, 1], v[0, 0])
         self.LC_positions = transform.rotate_coords_z(self.LC_positions, - angle * 180 / np.pi)
 
     def reorder(self):
