@@ -35,48 +35,50 @@
   
   %NOTE: all deleted comments are still in Draft.tex 
   
-  Periodic, nanostructured porous polymer membranes made from the cross-linked 
-  inverted hexagonal phase
-  of self-assembled lyotropic liquid crystals (LLCs) are a promising class of materials
-  for selective separations. In this work, we investigate an experimentally
-  characterized LLC polymer membrane using atomistic molecular modeling. In particular,
-  we compare simulated X-ray diffraction (XRD) patterns with experimental XRD data
-  to quantify and understand the differences between simulation and experiment.
-  We find that the nanopores are likely composed of 5 columns of stacked LLC monomers
-  which surround each hydrophilic core. Evidence suggests that these columns likely 
-  move independently of each other over longer time scales than accessible via atomistic simulation.
-  We also find that WAXS structural features previously attributed to monomer tail 
-  tilt is likely instead due to ordered tail packing. Although this system
-  has been reported as dry, we show that small amounts of water are necessary
-  to reproduce all features from the experimental XRD pattern due to
-  asymmetries introduced by hydrogen bonds between the monomer head groups and
-  water molecules. Finally, we explore the composition and structure of the nanopores
-  and reveal that there exists a composition gradient rather than an abrupt
-  partition between the hydrophilic and hydrophobic regions. A caveat is
-  that the time scales of the dynamics are extremely long for this system, 
+  Periodic, nanostructured porous polymer membranes made from the cross-linked
+  inverted hexagonal phase of self-assembled lyotropic liquid crystals (LLCs) are
+  a promising class of materials for selective separations. In this work, we
+  investigate an experimentally characterized LLC polymer membrane using
+  atomistic molecular modeling. In particular, we compare simulated X-ray
+  diffraction (XRD) patterns with experimental XRD data to quantify and
+  understand the differences between simulation and experiment.  We find that the
+  nanopores are likely composed of 5 columns of stacked LLC monomers which
+  surround each hydrophilic core. Evidence suggests that these columns likely
+  move independently of each other over longer time scales than accessible via
+  atomistic simulation. We also find that WAXS structural features previously
+  attributed to monomer tail tilt is likely instead due to ordered tail packing.
+  Although this system has been reported as dry, we show that small amounts of
+  water are necessary to reproduce all features from the experimental XRD pattern
+  due to asymmetries introduced by hydrogen bonds between the monomer head groups
+  and water molecules. Finally, we explore the composition and structure of the
+  nanopores and reveal that there exists a composition gradient rather than an
+  abrupt partition between the hydrophilic and hydrophobic regions. A caveat is
+  that the time scales of the dynamics are extremely long for this system,
   resulting in simulated structures that appear too ordered, thus requiring
   careful examination of the metastable states observed in order to draw any
-  conclusions. The clearer picture of the nanoscopic structure of these 
-  membranes provided in this study will enable a better understanding of
-  the mechanisms of small molecule transport within these nanopores.
-  
+  conclusions. The clearer picture of the nanoscopic structure of these membranes
+  provided in this study will enable a better understanding of the mechanisms of
+  small molecule transport within these nanopores.
+
   \end{abstract}
 
   \section{Introduction}
 
-  More highly selective nanoporous membranes would be extremely useful 
-  in performing complex aqueous separations with seawater and various 
-  types of wastewater. For example, Sodium chloride and boron in seawater
+  More highly selective nanoporous membranes would be extremely useful for
+% BJC: in --> for
+  performing complex aqueous separations with seawater and various types of
+  wastewater. For example, Sodium chloride and boron in seawater
   \cite{fritzmann_state---art_2007} and organic micropollutants found in
-  municipal and industrial wastewaters \cite{schwarzenbach_challenge_2006} represent
-  just a few of the diverse contaminants of water sources. By efficiently
-  separating contaminants from feed solutions with highly selective membranes,
-  it is possible to reduce the number of required membrane passes and post-treatment steps
-  needed for a given filtration process \cite{werber_materials_2016}, thus
-  lowering energy requirements. Additionally, one can also extract valuable resources
-  from the feed streams. For example, flowback water produced during hydraulic
-  fracturing of shale formations contains dissolved species such as acetate whose
-  extraction has economic value \cite{dischinger_application_2017}.  
+  municipal and industrial wastewaters \cite{schwarzenbach_challenge_2006}
+  represent just a few of the diverse contaminants of water sources. By
+  efficiently separating contaminants from feed solutions with highly selective
+  membranes, it is possible to reduce the number of required membrane passes and
+  post-treatment steps needed for a given filtration process
+  \cite{werber_materials_2016}, thus lowering energy requirements. Additionally,
+  one can also extract valuable resources from the feed streams. For example,
+  flowback water produced during hydraulic fracturing of shale formations
+  contains dissolved species such as acetate whose extraction has economic value
+  \cite{dischinger_application_2017}.  
 
   Reverse osmosis (RO) and nanofiltration (NF) are two prevailing membrane
   filtration processes that can be used to separate solutes on the order of 1 nm
@@ -90,38 +92,41 @@
   selectivity.
 
   Ordered, nanostructured porous membrane materials have become an increasingly popular
-  research area for aqueous separations applications because they offer the 
-  ability to control pore architecture at the molecular scale, thereby 
-  permitting the design of solute-specific separation membranes 
-  \cite{humplik_nanostructured_2011}. However, their development has been 
-  limited by the ability to synthesize and scale various technologies. Graphene
-  sheets are atomically thick, which results in excellent water permeability but
-  defects during manufacturing severely impact selectivity \cite{cohen-tanugi_multilayer_2016}.
-  Molecular dynamics (MD) simulations of carbon nanotubes have shown promise
-  \cite{humplik_nanostructured_2011}, but synthetic techniques are unable to
-  achieve scalable alignment and pore monodispersity
-  \cite{hata_water-assisted_2004,maruyama_growth_2005}. Consequently, there is a
-  need for new materials that could provide scalable nanostructured porous membranes. 
+  research area for aqueous separation applications because they offer the
+  %BJC: separations --> separation 
+  ability to control pore architecture at the molecular scale, thereby
+  permitting the design of solute-specific separation membranes
+  \cite{humplik_nanostructured_2011}. However, their development has been limited
+  by the ability to synthesize and scale various technologies. Graphene sheets
+  are atomically thick, which results in excellent water permeability but defects
+  during manufacturing severely impact selectivity
+  \cite{cohen-tanugi_multilayer_2016}.  Molecular dynamics (MD) simulations of
+  carbon nanotubes have shown promise \cite{humplik_nanostructured_2011}, but
+  synthetic techniques are unable to achieve scalable alignment and pore
+  monodispersity \cite{hata_water-assisted_2004,maruyama_growth_2005}.
+  Consequently, there is a need for new materials that could provide scalable
+  nanostructured porous membranes. 
 
   Preliminary evidence has shown that cross-linked lyotropic liquid crystal
-  (LLC) membranes can be produced at moderate scale and may be capable of performing highly selective
-  separations. LLCs are amphiphilic molecules that have the ability to
-  self-assemble into porous nanostructures \cite{smith_ordered_1997} and can be
-  cross-linked to create mechanically strong membrane films with periodic pores on the
-  order of 1 nm in diameter \cite{zhou_supported_2005}. Unlike the pores in most commercial NF
-  membranes, polymeric LLC membrane pores are uniform in size because they are
-  formed by self-assembly. Since LLC polymer membranes lack an appreciable pore size distribution, they
-  inherently exhibit high selectivity due to their strict molecular weight
-  cut-off (MWCO)~\cite{zhou_supported_2005}. Additionally, the LLC monomers
-  examined in this paper are salts, and therefore lead to Donnan exclusion of
-  ions in solution. The membrane gains a net surface charge when counterions from
-  the head groups that line the pore walls escape into the feed solution in an
-  effort to balance the gradients of concentration and electric potential
-  \cite{donnan_theory_1995}.    
+  (LLC) membranes can be produced at moderate scale and may be capable of
+  performing highly selective separations. LLCs are amphiphilic molecules that
+  have the ability to self-assemble into porous nanostructures
+  \cite{smith_ordered_1997} and can be cross-linked to create mechanically strong
+  membrane films with periodic pores on the order of 1 nm in diameter
+  \cite{zhou_supported_2005}. Unlike the pores in most commercial NF membranes,
+  polymeric LLC membrane pores are uniform in size because they are formed by
+  self-assembly. Since LLC polymer membranes lack an appreciable pore size
+  distribution, they inherently exhibit high selectivity due to their strict
+  molecular weight cut-off (MWCO)~\cite{zhou_supported_2005}. Additionally, the
+  LLC monomers examined in this paper are salts, and therefore lead to Donnan
+  exclusion of ions in solution. The membrane gains a net surface charge when
+  counterions from the head groups that line the pore walls escape into the feed
+  solution in an effort to balance the gradients of concentration and electric
+  potential \cite{donnan_theory_1995}.    
 
-  The feasibility of nanostructured LLC polymer membranes for selective separations has
-  been demonstrated using LLC monomers that form the type 1 bicontinuous cubic
-  (Q\textsubscript{I})
+  The feasibility of nanostructured LLC polymer membranes for selective
+  separations has been demonstrated using LLC monomers that form the type 1
+  bicontinuous cubic (Q\textsubscript{I})
   \cite{hatakeyama_water_2011,hatakeyama_nanoporous_2010,carter_glycerol-based_2012}
   and the inverted hexagonal (H\textsubscript{II}) \cite{zhou_supported_2005}
   phases. When separating organic solutes from NaCl, Q\textsubscript{I}-phase
@@ -137,17 +142,18 @@
   ca.~10 wt\% water and consists of hexagonally packed, hydrophilic pore
   columns\cite{smith_ordered_1997}. In the absence of water, neat monomer will
   form the same hexagonal columnar structure which, in the literature, has been
-  referred to as the Col\textsubscript{h} thermotropic phase\cite{feng_scalable_2014}.
-  Q\textsubscript{I}-phase membranes consist of a tortuous network of three
-  dimensionally interconnected pores that prevent optimal through-plane
-  transport. In contrast, the densely packed, non-tortuous and uniform sized
-  pores of H\textsubscript{II}-phase membranes represent the ideal geometry for
-  achieving high solute flux\cite{matyka_tortuosity-porosity_2008}.  However, the
-  hexagonally packed LC domains of the H\textsubscript{II}-phase
-  generally form mutually unaligned domains, which hurts membrane permeability.
-  This domain scale misalignment had inhibited further development of this technology,
-  and research efforts were focused on the Q\textsubscript{I} phase, whose geometry
-  does not require alignment~\cite{zhou_new_2007}. 
+  referred to as the Col\textsubscript{h} thermotropic
+  phase\cite{feng_scalable_2014}. Q\textsubscript{I}-phase membranes consist of
+  a tortuous network of three dimensionally interconnected pores that prevent
+  optimal through-plane transport. In contrast, the densely packed, non-tortuous
+  and uniform sized pores of H\textsubscript{II}-phase membranes represent the
+  ideal geometry for achieving high solute
+  flux\cite{matyka_tortuosity-porosity_2008}. However, the hexagonally packed LC
+  domains of the H\textsubscript{II}-phase generally form mutually unaligned
+  domains, which hurts membrane permeability. This domain scale misalignment had
+  inhibited further development of this technology, and research efforts were
+  focused on the Q\textsubscript{I} phase, whose geometry does not require
+  alignment~\cite{zhou_new_2007}. 
 
   However, recently researchers have learned how to macroscopically align the
   hexagonal domains which has revived research into H\textsubscript{II}-phase LLC
@@ -190,7 +196,8 @@
 	\end{subfigure}
 	\caption{(a) The LLC monomer Na-GA3C11 (b) rendered atomistically (c)
 	exhibits wedge-like character. (d) Monomers stack on top of each other to
-	create columns with short range order then assemble into pores with  
+	create columns with short range order, then assemble into pores with 
+        %BJC: order --> order, (added comma) 
 	hydrophilic head groups (blue) facing towards the pore center. (e) The 
 	pores assemble into hexagonally packed columnar mesophases.}~\label{fig:assembly}
   \end{figure}
@@ -227,25 +234,26 @@
   A molecular-level understanding of LLC polymer membrane structure, enabled by
   molecular dynamics (MD) simulations, can provide guidelines to reduce the large
   chemical space available to design monomers for creation of separation-specific
-  membranes. Useful molecular-level modeling should incorporate a detailed picture of the
-  nanoscopic pore structure, which is crucial to understanding the role of
-  monomer structure in solute transport and membrane design. 
-  Atomistic molecular dynamics simulations can provide the required level of detail
-  (Figure \ref{fig:detail}), assuming the force fields are sufficiently accurate.
-  With such an atomistic model, we can directly observe molecular-level solute
-  transport and suggest governing mechanisms. We can also observe how the choice of
-  head group interacts with solutes of interest. In addition, we can interchange
-  counterions which may influence both the pore size and the strength of the
-  Donnan potential. 
+  membranes. Useful molecular-level modeling should incorporate a detailed
+  picture of the nanoscopic pore structure, which is crucial to understanding the
+  role of monomer structure in solute transport and membrane design.  Atomistic
+  MD simulations can provide the required level of detail (Figure
+  \ref{fig:detail}), assuming the force fields are sufficiently accurate.  With
+  such an atomistic model, we can directly observe molecular-level solute
+  transport and suggest governing mechanisms. We can also observe how the choice
+  of head group interacts with solutes of interest. In addition, we can
+  interchange counterions which may influence both the pore size and the strength
+  of the Donnan potential. 
 
-  In this study, we achieve a  more realistic atomistic description of hexagonal LLC
-  polymer membranes than, to our knowledge, has ever previously been created, and explore
-  what new structural information can be gained and what structure hypotheses are
-  supported by this model. We validate the results using as much experimental
-  information as possible. We are most interested in reproducing the conclusions
-  about structure drawn from small-angle X-ray scattering (SAXS) and wide-angle
-  X-ray scattering (WAXS) experiments, as well as in matching ionic conductivity
-  measurements \cite{feng_thin_2016}.
+  In this study, we achieve a more realistic atomistic description of a
+  %BJC: of --> of a
+  hexagonal LLC polymer membranes than, to our knowledge, has ever previously
+  been created, and explore what new structural information can be gained and
+  what structure hypotheses are supported by this model. We validate the results
+  using as much experimental information as possible. We are most interested in
+  reproducing the conclusions about structure drawn from small-angle X-ray
+  scattering (SAXS) and wide-angle X-ray scattering (WAXS) experiments, as well
+  as in matching ionic conductivity measurements \cite{feng_thin_2016}.
 
   \begin{figure}[!htb]
   \centering
@@ -267,17 +275,16 @@
   \end{figure}
  
   In this paper, we perform molecular modeling of the Col\textsubscript{h}
-  thermotropic (i.e., solvent-free) assembly formed by Na-GA3C11. Compared to 
-  the lyotropic (i.e, solvent-containing) H\textsubscript{II} phase, the
+  thermotropic (i.e., solvent-free) assembly formed by Na-GA3C11. Compared to the
+  lyotropic (i.e, solvent-containing) H\textsubscript{II} phase, the
   Col\textsubscript{h} phase is a simpler starting point. The system is not
-  assembled in aqueous phase which allowed us to simulate longer timescales
-  by omitting the solvent in the simulations,
-  and there exists detailed experimental characterization of the fully aligned state,
-  including 2D-WAXS patterns (Figure~\ref{fig:WAXS}) that are useful for 
-  reconstructing structural data. 
+  assembled in aqueous phase which allowed us to simulate longer timescales by
+  omitting the solvent in the simulations, and there exists detailed experimental
+  characterization of the fully aligned state, including 2D-WAXS patterns
+  (Figure~\ref{fig:WAXS}) that are useful for reconstructing structural data. 
   
   There are five major features of interest present in the 2D experimental
-  pattern shown in Figure~\ref{fig:WAXS}.
+  WAXS pattern shown in Figure~\ref{fig:WAXS}.
 
   \begin{enumerate} 
   
@@ -285,7 +292,7 @@
 	\AA$^{-1}$, corresponding to a real space separation of 3.7 {\AA}. Previous
 	work attributes this reflection to $\pi$-$\pi$
 	stacking between aromatic rings in the direction perpendicular to the membrane
-	plane, or z-axis \cite{feng_scalable_2014}. For simplicity, we will refer to
+	plane, or $z$-axis \cite{feng_scalable_2014}. For simplicity, we will refer to
 	this reflection as R-$\pi$.
  
 	\item \textit{R-double}: A weak intensity line, located at exactly half
@@ -303,7 +310,8 @@
 
 	\item \textit{R-spots}: Within R-alkanes, are four spots of higher
 	relative intensity.  Accordingly, we name these reflections R-spots. The
-	location of all spots is $\sim37^{\circ}$ from the $q_z$ axis in their
+	location of all spots is $\sim37^{\circ}$ from the $q_r$ axis in their
+	%BJC: q_z --> q_r
 	respective quadrants. In many liquid crystal systems, such spots are explained
 	as the result of alkane chains tilted with respect to the membrane
 	plane\cite{govind_simple_2001}.
@@ -351,41 +359,45 @@
     \item What is the density of monomers that pack around each hydrophilic core? 
     \label{point:monomernum}
 
- 	Authors often describe this and similar systems as being made up of stacked monomer layers. A simple
- 	molecular simulation study of a similar molecule suggested that there are 4 monomers
- 	in each layer. Their estimation is based on a simulated system containing only 16 total
- 	monomers which likely does not sufficiently model the chemical environment present in
- 	the real system.~\cite{zhu_methacrylated_2006}. A separate calculation based on the 
- 	volume of the liquid crystal monomers proposes that there are seven monomers in each 
- 	layer~\cite{resel_structural_2000}. 
+	Authors often describe this and similar systems as being made up of
+	stacked monomer layers. A simple molecular simulation study of a similar
+	molecule suggested that there are 4 monomers in each layer. Their estimation is
+	based on a simulated system containing only 16 total monomers which likely does
+	not sufficiently model the chemical environment present in the real
+	system.~\cite{zhu_methacrylated_2006}. A separate calculation based on the
+	volume of the liquid crystal monomers proposes that there are seven monomers in
+	each layer~\cite{resel_structural_2000}. 
 
-  	We are careful to avoid the term ``layers" since many liquid crystalline systems
- 	have long range order in 1 or 2 spatial dimensions and short range order in 	
- 	the other dimensions.~\cite{chaikin_principles_1995}  % page 58
- 	In the system we are studying, there are long-range 2D correlations in the 
- 	hexagonal array of pores (xy plane) and short range $z$-direction correlations within 
-    stacked columns of monomers. In this study, we use atomistic molecular modeling
-    to study how the system's structure is affected by the density of these monomer columns
-    that surround each pore's hydrophilic core. 
+	We are careful to avoid the term ``layers" since many liquid
+	crystalline systems have long range order in 1 or 2 spatial dimensions and
+	short range order in the other dimensions.~\cite{chaikin_principles_1995}  %
+	page 58 In the system we are studying, there are long-range 2D correlations in
+	the hexagonal array of pores ($xy$ plane) and short range $z$-direction
+	correlations within stacked columns of monomers. In this study, we use
+	atomistic molecular modeling to study how the system's structure is affected by
+	the density of these monomer columns that surround each pore's hydrophilic
+	core. 
 
 	\item What structural motif best matches experimental 2D-WAXS patterns?\label{point:xrdmatch}
 
-	On the short timescales accessible to MD (even the 100's of nanoseconds of simulation 
-	performed here are short compared to experimental timescales), we observe distinct metastable
-	configurations which depend on starting configuration. We simulated XRD patterns of our system and 
-	compared them to experimental 2D WAXS patterns (Figure~\ref{fig:WAXS}) so that we ensure our
-	model creates a nanoscopic chemical environment maximally consistent with experiment within 
-	the constraints	of our force field. Using this approach, we are able to confirm some previous
-	interpretations	of the WAXS pattern and refute others. 
+	On the short timescales accessible to MD (even the 100's of nanoseconds
+	of simulation performed here are short compared to experimental timescales), we
+	observe distinct metastable configurations which depend on starting
+	configuration. We simulated X-ray diffraction (XRD) patterns of our system and
+	compared them to experimental 2D WAXS patterns (Figure~\ref{fig:WAXS}) so that
+	we ensure our model creates a nanoscopic chemical environment maximally
+	consistent with experiment within the constraints of our force field. Using
+	this approach, we are able to confirm some previous interpretations	of the
+	WAXS pattern and refute others. 
 
-    \item Is it necessary to include any water in order to appropriately model the 
-    Col\textsubscript{h} phase? \label{point:water}
+        \item Is it necessary to include any water in order to appropriately model the 
+        Col\textsubscript{h} phase? \label{point:water}
 
 	While the Col\textsubscript{h} phase is described as dry, it is likely
-	that small amounts of ambient water are absorbed into the system. The 
-	hydrogen-bonding network formed by the water may play a role in structuring 
-	the pore. We used simulated X-ray diffraction (XRD) patterns to uncover any 
-	meaningful structural difference between a ``dry" and a ``wet" system.
+	that small amounts of ambient water are absorbed into the system. The
+	hydrogen-bonding network formed by the water may play a role in structuring the
+	pore. We used simulated XRD patterns to uncover any meaningful structural
+	difference between a ``dry" and a ``wet" system.
 
 	\item What is the detailed atomistic structure of the pores?\label{point:composition}
 
@@ -405,7 +417,7 @@
   available online at \texttt{https://github.com/bencoscia/llcsim}. The python scripts used
   to simulated XRD patterns are publicly available online at \\
   \texttt{https://github.com/joeyelk/MD-Structure-Factor}. Additional details are available in 
-  Section \ref{S-section:python_scripts} of the SI.
+  Section \ref{S-section:python_scripts} of the Supporting Information (SI).
   
   \subsection{Monomer Parameterization}\label{method:parameterization}
 
@@ -425,25 +437,27 @@
   charges, we annealed the monomer system again and pulled a random monomer
   configuration from the trajectory which we used for full system
   construction. Section \ref{S-section:parameterization} 
-  of the Supporting Information (SI) provides further detail of the parameterization process.
+  of the SI provides further detail of the parameterization process.
 
   \subsection{Unit Cell Preparation}\label{method:unitcell_build}
 
   The time scale for self-assembly of monomers into the hexagonal phase is
   unknown and likely outside of a reasonable length for an atomistic simulation,
   requiring a more efficient way to build the system. Previous work has shown
-  a united-atom model of LLC can self-assemble into the H\textsubscript{II} phase
-  configuration in $\sim$1000 ns \cite{mondal_self-assembly_2013}.  We
-  attempted atomistic self-assembly by packing monomers into a box using Packmol
-  \cite{martinez_packmol:_2009}. Simulations of greater than 100 ns show no
-  indicators of progress towards an ordered system (see Section \ref{S-section:self_assembly} of the 
-  SI). To bypass the slow self-assembly process, we used a 
-  variety of automated procedures to assemble monomers into a structure close to
-  one of a number of hypothesized equilibrium configurations (See Figure 
-  \ref{S-fig:build_procedure} of the SI). These initial structures may result
-  in equilibration into slowly-intercoverting metastable states, an issue we will
-  address later in the paper. 
-  
+  that a united-atom model of an LLC can self-assemble into the
+  %BJC: show a united-atom --> that a united-atom ; of LLC --> of an LLC
+  H\textsubscript{II} phase configuration in $\sim$1000 ns
+  \cite{mondal_self-assembly_2013}. We attempted atomistic self-assembly by
+  packing monomers into a box using Packmol \cite{martinez_packmol:_2009}.
+  Simulations of greater than 100 ns show no indicators of progress towards an
+  ordered system (see Section \ref{S-section:self_assembly} of the SI). To bypass
+  the slow self-assembly process, we used automated procedures to
+  %BJC: a variety of automated --> automated
+  assemble monomers into a structure close to one of a number of hypothesized
+  equilibrium configurations (See Figure \ref{S-fig:build_procedure} of the SI).
+  These initial structures may result in equilibration into slowly-intercoverting
+  metastable states, an issue we will address later in the paper. 
+
   A typical simulation volume contains four pores in a monoclinic unit cell,
   the smallest unit cell that maintains hexagonal symmetry when extended
   periodically. Each pore is made of columns of stacked monomers with periodic
@@ -458,34 +472,37 @@
   \subsection{Monomer Placement}\label{method:monomer_placement}
 
   When constructing an initial configuration, there are a number of variables
-  which require careful consideration while placing monomers. We find that the equilibrium
-  configuration is sensitive to some while insensitive to others. For example, we find the starting
-  pore radius, defined as the distance of a chosen head group carbon from the
-  pore's central axis, does not influence the equilibrium structure if one chooses
-  a reasonable value. The initial distance between pores, within a wide range, also has 
-  little effect on the equilibrated structure. However, one should not start them
-  too close or there will be high energy repulsions during early equilibration. We chose a
-  pore radius of 0.5 nm and an initial pore spacing of 4.5 nm, $\sim$10\% larger than the 
-  experimental value of 4.12 nm for our initial configurations. A sensitivity analysis of 
-  both parameters is presented in the SI, Section \ref{S-section:initial_config_dependence}. The 
-  distance between vertically stacked monomers, the xy position of monomers with respect 
-  to vertically adjacent monomers, and the number of columns per pore do influence the 
-  equilibrated structure and require further justification for their choices. We rely on 
-  experimental data to inform them. 
+  which require careful consideration while placing monomers. We find that the
+  equilibrium configuration is sensitive to some while insensitive to others. For
+  example, we find the starting pore radius, defined as the distance of a chosen
+  head group carbon from the pore's central axis, does not influence the
+  equilibrium structure if one chooses a reasonable value. The initial distance
+  between pores, within a wide range, also has little effect on the equilibrated
+  structure. However, one should not start them too close or there will be high
+  energy repulsions during early equilibration. We chose a pore radius of 0.5 nm
+  and an initial pore spacing of 4.5 nm, $\sim$10\% larger than the experimental
+  value of 4.12 nm for our initial configurations. A sensitivity analysis of both
+  parameters is presented in the SI, Section
+  \ref{S-section:initial_config_dependence}. The distance between vertically
+  stacked monomers, the $xy$ position of monomers with respect to vertically
+  adjacent monomers, and the number of columns per pore do influence the
+  equilibrated structure and require further justification for their choices. We
+  rely on experimental data to inform them. 
 
-  We chose the vertical spacing between monomers for the initial configuration based
-  on R-$\pi$ and then allowed the system to readjust during equilibration. We rotated 
-  each monomer so the plane of its aromatic head group would be coplanar with the xy plane. We
-  explored three different initial monomer spacings. The first is exactly
-  equal to R-$\pi$ with monomers placed so aromatic rings stack 3.7 \AA~apart in
-  the $z$-direction. We also extensively explored a second system with an initial spacing of 5
-  \AA. We briefly explored a third system with an initial spacing of 10
-  \AA. However this largest spacing yields non-physical behavior which is detailed in the 
-  SI, Section \ref{S-section:initial_dbwl}. 
+  We chose the vertical spacing between monomers for the initial configuration
+  based on R-$\pi$ and then allowed the system to readjust during equilibration.
+  We rotated each monomer so the plane of its aromatic head group would be
+  coplanar with the $xy$ plane. We explored three different initial monomer
+  spacings. The first is exactly equal to R-$\pi$ with monomers placed so
+  aromatic rings stack 3.7 \AA~apart in the $z$-direction. We also extensively
+  explored a second system with an initial spacing of 5 \AA. We briefly explored
+  a third system with an initial spacing of 10 \AA. However this largest spacing
+  yields non-physical behavior which is detailed in the SI, Section
+  \ref{S-section:initial_dbwl}. 
 
   We chose the relative orientation between vertically adjacent monomers in each column 
   based on clues from diffraction data as well as the various known stacking modes of 
-  benzene and substituted benzene rings: sandwiched, parallel-displaced and T-shaped
+  benzene and substituted benzene rings: sandwiched, parallel displaced and T-shaped
   \cite{sinnokrot_estimates_2002}. We ruled out the T-shaped configuration
   because its $\sim$5 \AA~equilibrium stacking distance \cite{sinnokrot_estimates_2002}
   is inconsistent with R-$\pi$. It is also infeasible for the monomers to orient in the 
@@ -534,14 +551,13 @@
   \subsubsection{\textit{Calculation of pore spacing}}\label{method:pore_spacing}
 
   To calculate the equilibrated pore spacing, we measured the distance between
-  pore centers. We located the pore centers by averaging the coordinates of sodium
-  ions in their respective pores. We generated pore spacing statistics 
+  pore centers. We located the pore centers by averaging the coordinates of
+  sodium ions in their respective pores. We generated pore spacing statistics
   using the bootstrapping technique (See Section \ref{S-section:p2p_stats} of the
-  SI). 
-  The pore spacings calculated in this way are consistent
-  with one half of the $x$ and $y$ box vectors (See, Table \ref{S-table:p2p} in the
-  SI). However, our method for their calculation does a better 
-  job capturing the spread of pore-to-pore distances.
+  SI). The pore spacings calculated in this way are consistent with one half of
+  the $x$ and $y$ box vectors (See Table \ref{S-table:p2p} in the SI). However,
+  our method for their calculation does a better job capturing the spread of
+  pore-to-pore distances.
 
   \subsubsection{\textit{Generation of simulated X-ray diffraction patterns}}\label{method:xrd}
   
@@ -559,22 +575,22 @@
 
   We normalized all diffraction patterns relative to R-alkanes. We believe that
   the alkane-alkane density, averaged over all angles, is the feature most likely
-  to be replicated between experiment and simulation, as atomistic alkane
-  force field parameters are relatively well-studied. Other features are dependent on system
-  ordering which is likely to have some dependence on initial configuration.  We
-  calculated the average intensity within R-alkanes of the experimental pattern,
-  $I_{avg}$ and divided all intensities by this value. In this way, the average
-  intensity of R-alkanes was set equal to 1. When calculating $I_{avg}$, we excluded
-  intensities within $\pm$30\degree~of the meridional axis defined by $q_r=0$,
-  since the simulated patterns differ from experiment in those regions in all
-  cases (See Figure~\ref{fig:ralkanes}). Specifically, in contrast to the
-  experimental WAXS pattern, R-$\pi$, as it appears in the simulated diffraction
-  patterns, intersects with R-alkanes (See Figure~\ref{fig:XRDsim}). We set an
-  upper bound on the colorbar by multiplying $I_{avg}$ by a scaling factor, $f$.
-  Intensities that appear in the patterns $\geq$ $f\times I_{avg}$ are colored
-  uniformly.  We applied the same scaling method to the simulated patterns. We
-  chose a scaling factor of $f=3.1$ in order to visibly display all
-  features in all patterns.
+  to be replicated between experiment and simulation, as atomistic alkane force
+  field parameters are relatively well-studied~\cite{wang_development_2004}.
+  Other features are dependent on system ordering which is likely to have some
+  dependence on initial configuration.  We calculated the average intensity
+  within R-alkanes of the experimental pattern, $I_{avg}$, and divided all
+  intensities by this value. In this way, the average intensity of R-alkanes was
+  set equal to 1. When calculating $I_{avg}$, we excluded intensities within
+  $\pm$30\degree~of the meridional axis defined by $q_r=0$, since the simulated
+  patterns differ from experiment in those regions in all cases (See
+  Figure~\ref{fig:ralkanes}). Specifically, in contrast to the experimental WAXS
+  pattern, R-$\pi$, as it appears in the simulated diffraction patterns,
+  intersects with R-alkanes (See Figure~\ref{fig:XRDsim}). We set an upper bound
+  on the colorbar by multiplying $I_{avg}$ by a scaling factor, $f$.  Intensities
+  that appear in the patterns $\geq$ $f\times I_{avg}$ are colored uniformly.  We
+  applied the same scaling method to the simulated patterns. We chose a scaling
+  factor of $f=3.1$ in order to visibly display all features in all patterns.
 
   We reported the intensities of R-$\pi$ and R-double by recording the maximum values
   of the peaks of the $q_z$ cross-section of the experimental pattern at $q_r=0$ 
@@ -635,7 +651,7 @@
   cross-section of the diffraction pattern. (c) We measured the intensity of R-spots
   by averaging the peak heights produced by radially integrating the patterns within 
   the R-alkanes region. We took the intensity of R-spots as the average of the 
-  peak intensities near -37 and -143$\degree$. (d) We measured the intensity of 
+  peak intensities near 37 and 143$\degree$. (d) We measured the intensity of 
   R-pores by measuring the height of the d\textsubscript{100} peak (the leading
   peak closest to $q_r$=0) of the cross-section of the diffraction patterns along
   the $q_r$ axis at $q_z$=0.} \label{fig:xrd_intensities}
@@ -656,7 +672,7 @@
   along the appropriate axis.
 
   We measured the one dimensional pair distribution function, $g(z)$, between centers 
-  of masses (COM) of aromatic head group rings along the $z$-axis (perpendicular to
+  of masses (COMs) of aromatic head group rings along the $z$-axis (perpendicular to
   the membrane plane). We averaged all 1D $z$-directional slices of the full 3D 
   correlation function within 2.1~\AA~of $(x, y)=(0, 0)$. We chose 2.1 \AA~as a crude 
   approximation of the radius of the phenyl ring plane. 
@@ -701,28 +717,31 @@
 
   \subsection{Simplified Systems}\label{method:simple_systems}
   
-  In order to gain a deeper understanding of discrepancies between the experimental and
-  simulated R-$\pi$ reflection, we used a simplified model where we 
-  represent each monomer as a single point scatterer located at the COM
-  of its head group. In order to make a system approximately similar to our equilibrated 
-  simulation geometries, we created 4 hexagonally packed pore regions spaced 42.5 \AA~
-  apart, each with 5 columns of scatterers spaced 4.4 \AA~apart in the $z$-direction. We
-  built the system 4 times taller in the $z$-direction (80 scatterers per column) in order
-  to access higher $q_z$ resolution.
+  In order to gain a deeper understanding of discrepancies between the
+  experimental and simulated R-$\pi$ reflection, we used a simplified model where
+  we represent each monomer as a single point scatterer located at the COM of its
+  head group. In order to make a system approximately similar to our equilibrated
+  simulation geometries, we created 4 hexagonally packed pore regions spaced 42.5
+  \AA~ apart, each with 5 columns of scatterers spaced 4.4 \AA~apart in the
+  $z$-direction. We built the system 4 times taller in the $z$-direction (80
+  scatterers per column) in order to access higher $q_z$ resolution.
   
-  We gave the simplified models the same amount of disorder present in the atomistic
-  simulations. We observe two sources of disorder in our atomistic simulations: thermal motion of atoms
-  during the simulation and quenched disorder created by rapid structural rearrangement during 
-  early equilibration and is largely locked into place for the remainder of the 
-  simulation, even at the 100 ns time scale. We measured thermal disorder by calculating the standard deviation of 
-  the distribution of head group COM positions from their average positions.
-  We measured quenched disorder by calculating the standard deviation of the distribution
-  of head group COMs from their idealized average positions. In the 
-  $z$-direction, we measured the deviation of the head group COMs from an
-  equally spaced column of head groups. In the $xy$ plane, we calculated the standard 
-  deviation in radial position from the pore center and the angular deviation from 
-  equally spaced points surrounding the pore center. This method for calculating 
-  quenched disorder inherently includes the convoluted thermal disorder. 
+  We gave the simplified models the same amount of disorder present in the
+  atomistic simulations. We observe two sources of disorder in our atomistic
+  simulations: thermal motion of atoms during the simulation and quenched
+  disorder created by rapid structural rearrangement during early equilibration
+  that is largely locked into place for the remainder of the simulation, even at
+  %BJC: and --> that
+  the 100 ns time scale. We measured thermal disorder by calculating the standard
+  deviation of the distribution of head group COM positions from their average
+  positions. We measured quenched disorder by calculating the standard deviation
+  of the distribution of head group COMs from their idealized average positions.
+  In the $z$-direction, we measured the deviation of the head group COMs from an
+  equally spaced column of head groups. In the $xy$ plane, we calculated the
+  standard deviation in radial position from the pore center and the angular
+  deviation from equally spaced points surrounding the pore center. This method
+  for calculating quenched disorder inherently includes the convoluted thermal
+  disorder. 
   
   We approximated interactions between particles by correlating the $z$-distance 
   between points within each column of point scatterers. We placed points in each
@@ -782,17 +801,20 @@
   
   \subsection{Density of monomers around pores}\label{section:mon_per_pore}
   
-  Our simulations best support a model built with 5 monomer columns per pore based on
-  the measured equilibrated pore-to-pore distances. To identify the density of
-  monomer columns around each pore, addressing question \ref{point:monomernum} in the introduction, we ran
-  simulations of systems created with 4--8 columns per pore. We built systems in both
-  the parallel displaced and sandwiched configurations and equilibrated them according
-  to the dry equilibration procedure. We tested all systems with an initial vertical monomer 
-  spacing, $\mathit{d}$, of 3.7 \AA~in accordance with R-$\pi$. We tested 4 additional 
-  systems with monomers initially spaced 5 \AA~apart vertically (see Section \ref{S-section:initial_pore_spacing}
-  of the SI for more details on sensitivity to initial monomer spacing). 
-  We considered the pore-to-pore spacing to be equilibrated as defined in Section~\ref{method:equil_time}.
-  Figure~\ref{fig:p2p} shows the equilibrated pore-to-pore distances for all systems tested. 
+  Our simulations best support a model built with 5 monomer columns per pore
+  based on the measured equilibrated pore-to-pore distances. To identify the
+  density of monomer columns around each pore, addressing Question
+  \ref{point:monomernum} in the introduction, we ran simulations of systems
+  created with 4--8 columns per pore. We built systems in both the parallel
+  displaced and sandwiched configurations and equilibrated them according to the
+  dry equilibration procedure. We tested all systems with an initial vertical
+  monomer spacing, $\mathit{d}$, of 3.7 \AA~in accordance with R-$\pi$. We tested
+  4 additional systems with monomers initially spaced 5 \AA~apart vertically (see
+  Section \ref{S-section:initial_pore_spacing} of the SI for more details on
+  sensitivity to initial monomer spacing). We considered the pore-to-pore
+  spacing to be equilibrated as defined in Section~\ref{method:equil_time}.
+  Figure~\ref{fig:p2p} shows the equilibrated pore-to-pore distances for all
+  systems tested. 
   
   \begin{figure}[!htb]
 	\centering
@@ -802,23 +824,27 @@
 			 increases as the number of columns in each pore increases.}~\label{fig:p2p}
   \end{figure}  
   
-  All systems tested, although equilibrated from the perspective of the metrics used here, are
-  frozen in metastable basins. Not all make physical sense or fit the experimental profile that 
-  we are trying to match. In the limit of infinite simulation time, all systems will in theory 
-  converge to a single equilibrium configuration, but that time is far beyond the 100's of 
-  nanosecond simulated here. For simplicity, we group the systems studied here into the ordered
-  and disordered basins. What we find is that any system equilibrated with $\mathit{d}=3.7$ \AA~can generally 
-  be characterized as being in a more ordered basin, and any system equilibrated with $\mathit{d}=5.0$ \AA~can
-  be characterized as begin in a more disordered basin. The extra space between stacked monomers
-  in the disordered basin systems gives the monomer head groups more rotational freedom. We 
-  quantified the ordering of the head groups using the nematic order parameter (see Section 
-  \ref{S-method:nematic_order} for details of the calculation). Disordered basin systems have
-  a lower nematic order parameter (meaning they are more disordered) than ordered basin systems. 
-  Generally, when monomers are started further apart, they stay further apart than systems where
-  monomers are started closer together (see Table~\ref{table:correlation_length}). This increased
-  equilibrated stacking distance of monomers in disordered basin systems increases their discrepancy
-  with experimental stacking distances derived from WAXS relative to ordered basin systems 
-  (See Section~\ref{section:rpi}). 
+  All systems tested, although equilibrated from the perspective of the metrics
+  used here, are frozen in metastable basins. Not all make physical sense or fit
+  the experimental profile that we are trying to match. In the limit of infinite
+  simulation time, all systems will in theory converge to a single equilibrium
+  configuration, but that time is far beyond the 100's of nanoseconds simulated
+  here. For simplicity, we group the systems studied here into the ordered and
+  disordered basins. What we find is that any system equilibrated with
+  $\mathit{d}=3.7$ \AA~can generally be characterized as being in a more ordered
+  basin, and any system equilibrated with $\mathit{d}=5.0$ \AA~can be
+  characterized as being in a more disordered basin. The extra space between
+  stacked monomers in the disordered basin systems gives the monomer head groups
+  more rotational freedom. We quantified the ordering of the head groups using
+  the nematic order parameter (see Section \ref{S-method:nematic_order} for
+  details of the calculation). Disordered basin systems have a lower nematic
+  order parameter (meaning they are more disordered) than ordered basin systems.
+  Generally, when monomers are started further apart, they stay further apart
+  than systems where monomers are started closer together (see
+  Table~\ref{table:correlation_length}). This increased equilibrated stacking
+  distance of monomers in disordered basin systems increases their discrepancy
+  with experimental stacking distances derived from WAXS relative to ordered
+  basin systems (See Section~\ref{section:rpi}). 
   
   Systems built with 5 columns around each pore equilibrate to a pore spacing
   that is most consistent with the experimental value of 4.12 nm derived from
@@ -827,8 +853,9 @@
   experiment. Ordered basin systems built with 6 columns per pore, have an
   equilibrated pore spacing ca. 0.50 nm higher than experiment. Monomers in
   disordered basin systems built with 6 columns-per-pore agree with experimental
-  pore-to-pore distances within error, but stack too far apart.  Monomers in 6
-  column-per-pore disordered sandwiched and disordered parallel displaced
+  pore-to-pore distances within error, but stack too far apart. 6
+  %BJC: Monomers in 6 --> 6
+  column per pore disordered sandwiched and disordered parallel displaced
   configurations stack $\sim$~4.87 and 4.94 \AA~apart respectively, which is
   $\sim$ 1.2~\AA~further apart than suggested by experiment. 5 column-per-pore
   systems stack, at a maximum, 0.9 \AA~further apart than experiment (see
@@ -839,27 +866,28 @@
 
   We can better understand the structure of the system by simulating XRD
   patterns produced from equilibrated MD trajectories (see
-  Section~\ref{method:xrd}) and comparing these simulated patters to experiment, addressing
-  question~\ref{point:xrdmatch} in the introduction. We tested systems built with 5 columns per pore
-  in the parallel displaced and sandwiched configurations at
-  300 K in the ordered and disordered basins, as those were the most consistent
-  with the most unambiguous XRD features, the pore-to-pore spacing
-  and the stacking distance, as described in Section~\ref{section:mon_per_pore}. 
-  We generated simulated patterns using the locally
-  equilibrated portion of each simulation trajectory (see
+  Section~\ref{method:xrd}) and comparing these simulated patterns to experiment,
+  addressing Question~\ref{point:xrdmatch} in the Introduction. We tested systems
+  built with 5 columns per pore in the parallel displaced and sandwiched
+  configurations at 300 K in the ordered and disordered basins, as those were the
+  most consistent with the most unambiguous XRD features, the pore-to-pore
+  spacing and the stacking distance, as described in
+  Section~\ref{section:mon_per_pore}.  We generated simulated patterns using the
+  locally equilibrated portion of each simulation trajectory (see
   Section~\ref{method:equil_time}). There are two important factors to take into
-  account when looking at differences between experimental and simulated XRD patterns.
-  First, the simulated diffraction patterns have some noise, especially along the
-  $q_z$ axis at $q_r$=0, which is where several of the more interesting features
-  are located. This is due to the angle averaging of the 3D structure factor
-  around the $q_z$-axis, meaning there are fewer samples as $q_r$ approaches 0.
-  More importantly, our simulations do not appear to be long enough to sample truly
-  independent configurations within their respective metastable basins (see
-  Section~\ref{section:slow_dynamics}), meaning we must take care in interpreting
-  the results of the XRD. The amount of independent configurations required to 
-  converge along the $q_z$ axis is analyzed in SI, 
+  account when looking at differences between experimental and simulated XRD
+  patterns.  First, the simulated diffraction patterns have some noise,
+  especially along the $q_z$ axis at $q_r$=0, which is where several of the more
+  interesting features are located. This is due to the angle averaging of the 3D
+  structure factor around the $q_z$-axis, meaning there are fewer samples as
+  $q_r$ approaches 0.  More importantly, our simulations do not appear to be long
+  enough to sample truly independent configurations within their respective
+  metastable basins (see Section~\ref{section:slow_dynamics}), meaning we must
+  take care in interpreting the results of the XRD. The amount of independent
+  configurations required to converge along the $q_z$ axis is analyzed in SI,
   Section \ref{S-section:xrd_noise}. The simulated patterns generated for all
-  systems studied are shown and compared to experiment in Figure~\ref{fig:XRDsim}.
+  systems studied are shown and compared to experiment in
+  Figure~\ref{fig:XRDsim}.
 
   \begin{figure}[!htb]
 	\centering
@@ -908,7 +936,7 @@
 		generally partially covered by the broad R-$\pi$ reflection. Quantitative
 		comparisons of the relative intensities and locations of reflections of
 		interest are presented in Table~\ref{table:relative_intensities_300K}. In both
-		XRD patterns generated from parallel displaced patterns, there is a faint line
+		XRD patterns generated from parallel displaced configurations, there is a faint line
 		across $q_z \sim 0.7~$\AA$^{-1}$, half the simulated value of R-$\pi$. Although
 		it does not cross through $q_r = 0$~\AA$^{-1}$, it is at the same $q_z$ value
 		where we expect R-double to be present. Still, R-double is not fully reproduced
@@ -979,15 +1007,16 @@
   We normalized the experimental and simulated diffraction patterns so that the
   average intensity within R-alkanes is equal to 1 because we believe that
   R-alkanes is the experimental feature most likely to be reproduced by our
-  simulations.  We reached this conclusion because alkane parameters in GAFF and
-  AMBER forcefields generally reproduce data well.~\cite{wang_development_2004,caleman_force_2012} 
+  simulations. We reached this conclusion because alkane parameters in GAFF and
+  AMBER forcefields generally reproduce data
+  well.~\cite{wang_development_2004,caleman_force_2012} 
 
   R-alkanes appears close to its expected location. In all cases, the maximum
   intensity of R-alkanes along the $q_r$ axis at $q_z$=0, which we use to
   estimate its location, appears at a $|\mathbf{q}|$ value that is, at most,
-  3.5\% higher than higher than experiment. The error in the simulated 
-  diffraction patterns is less than the error due binning in each frequency
-  direction, so was not further investigated. 
+  3.5\% higher than experiment. The error in the simulated diffraction patterns
+  is less than the error due binning in each frequency direction, so was not
+  further investigated. 
 
   \subsubsection{The location and intensity of R-pores}\label{section:rpores}
   
@@ -1018,6 +1047,19 @@
   The intensity of R-spots is close to experiment when generated from any of
   our simulated systems. We measured its intensity as outlined in Section~\ref{method:xrd}.
 
+  In order to more clearly identify the structural reasons for R-spots, we
+  equilibrated an ordered basin sandwiched configuration at 280 K to moderately
+  increase the order and therefore intensity. Many force fields do not obtain
+  the correct equilibrium structure at precisely the experimental temperature.
+  Wang et al. highlighted the shortcoming of some of the most popular protein
+  force fields in predicting the temperature dependence of protein structural
+  ensembles \cite{wang_building_2017}. It is therefore possible that   % page 12
+  our membrane system, simulated at 300 K, is under-structured in the tail region
+  compared to the experimental structure at 300 K. We found that lowering the
+  temperature indeed better resolved R-spots (Figure~\ref{fig:sandwiched280K}),
+  suggesting that our `effective' temperature might indeed be too high,
+  understabilizing structure. 
+
   Previous literature has attributed the R-spots reflection in this particular
   WAXS dataset as the result of tilted alkane chains~\cite{feng_scalable_2014}.
   We measured the tilt angle of the alkane chains of the 280 K system by measuring
@@ -1029,38 +1071,22 @@
   tilt relative to the $xy$ plane to an angle statisically indistinguishable from
   zero (see Section \ref{S-section:tail_tilt} of the SI). 
 
-  In order to more clearly identify the structural reasons for R-spots, we
-  equilibrated an ordered basin sandwiched configuration at 280 K to moderately
-  increase the order and therefore intensity.  Many force fields do not obtain
-  the correct equilibrium structure at precisely the experimental temperature.
-  Wang et al. highlighted the shortcoming of some of the most popular protein
-  force field in predicting the temperature dependence of protein structural
-  ensembles \cite{wang_building_2017}. It is therefore possible that   % page 12
-  our membrane system, simulated at 300 K, is under-structured in the tail region
-  compared to the experimental structure at 300 K. We found that lowering the
-  temperature indeed better resolved R-spots (Figure~\ref{fig:sandwiched280K}),
-  suggesting that our `effective' temperature might indeed be too high,
-  understabilizing structure. 
-
-  The evidence from simulations strongly suggest that the source of
-  the R-spots reflection is packing of the tails in a hexagonal array.
-  First, we demonstrate R-spots comes primarily from the tails, by
-  removing all non-tail atoms from the trajectory and simulating the
-  XRD diffraction pattern with the remaining atoms, which preserves
-  R-spots (Figure~\ref{fig:tails_rzplot}).  Next, we plotted the center
+  The evidence from simulations strongly suggest that the source of the R-spots
+  reflection is packing of the tails in a hexagonal array.  First, we demonstrate
+  R-spots comes primarily from the tails, by removing all non-tail atoms from the
+  trajectory and simulating the XRD pattern with the remaining atoms, which
+  preserves R-spots (Figure~\ref{fig:tails_rzplot}).  Next, we plotted the center
   of masses of the first four tail atoms of all tails (Figure
-  \ref{fig:centroids}). We measured the angle between each COM
-  and its nearest neighbor COMs with respect to the
-  $xy$ plane of the membrane. We see distinct peaks in the
-  distribution of these angles located ca. $-60\degree$, $0\degree$,
-  and $60\degree$, which is consistent with a hexagonally-packed
-  configuration (Figure~\ref{fig:layered_tails}).  This ordering is
-  primarily in the parts of the tail proximal to the heads, and dies
-  off at the tail ends, where there is more space to fill causing them
-  to pack nearly isotropically. See Section \ref{S-section:tail_packing} 
-  of the SI for
-  a more detailed explanation of the calculation and packing
-  distributions generated from different sections of the tails.
+  \ref{fig:centroids}). We measured the angle between each COM and its nearest
+  neighbor COMs with respect to the $xy$ plane of the membrane. We see distinct
+  peaks in the distribution of these angles located ca. $-60\degree$, $0\degree$,
+  and $60\degree$, which is consistent with a hexagonally-packed configuration
+  (Figure~\ref{fig:layered_tails}).  This ordering is primarily in the parts of
+  the tail proximal to the heads, and dies off at the tail ends, where there is
+  more space to fill causing them to pack nearly isotropically. See Section
+  \ref{S-section:tail_packing} of the SI for a more detailed explanation of the
+  calculation and packing distributions generated from different sections of the
+  tails.
 
   The peaks in the nearest neighbor angle distribution due to the hexagonal
   packing are consistent with the location of R-spots. The 2D-Fourier transform
@@ -1100,38 +1126,38 @@
 	        \caption{}~\label{fig:hexagonal_ft}
   \end{subfigure}
   \caption{(a) R-spots increases in intensity when the temperature of the system is 
-      lowered to 280K. (b) We measured the average angle made between each monomer 
-      alkane tail and the membrane plane. The average tilt angle (dashed line) is 
-      near -2\degree~which is far from the 37\degree~tilt angle previously used to
-      explain R-spots. (c) To isolate the main cause of R-spots, we removed all atoms
-      from the trajectory except for carbon atoms that constitute the tails. The
-      simulated XRD pattern of the tails-only trajectory still shows R-spots. (d)
-      Since the tails stay relatively flat, we plotted the center of mass of the first
-      four carbon atoms of each tail originating from the head groups (for example,
-      green colored centroids in the plot surround the red centroid in hexagonal fashion).
-      Visually, the packing looks hexagonal. (e) We hypothesize
-      that R-spots is the result of ordered tail packing. Defining
-      the membrane plane to be 0\degree, we measured the angles between each center of 
-      mass and its nearest neighbor center of masses for the equilibrated 
-      sandwiched configuration simulated at 280K. Peaks appear in the distribution at 
-      $-60\degree$, $0\degree$ and $60\degree$. (f) The Fourier transform of a hexagonally
-      packed grid of points defined by the angles in (e) shows intensity at the same
-      locations where we expect to see R-spots, as well as intensity along the $q_z$ axis
-      where R-$\pi$ would appear.}~\label{fig:tail_packing}
+	  lowered to 280 K. (b) We measured the average angle made between each
+	  monomer alkane tail and the membrane plane. The average tilt angle (dashed
+	  line) is near -2\degree~which is far from the 37\degree~tilt angle previously
+	  used to explain R-spots. (c) To isolate the main cause of R-spots, we removed
+	  all atoms from the trajectory except for carbon atoms that constitute the
+	  tails. The simulated XRD pattern of the tails-only trajectory still shows
+	  R-spots. (d) Since the tails stay relatively flat, we plotted the center of
+	  mass of the first four carbon atoms of each tail originating from the head
+	  groups (for example, green colored centroids in the plot surround the red
+	  centroid in hexagonal fashion).  Visually, the packing looks hexagonal. (e) We
+	  hypothesize that R-spots is the result of ordered tail packing. Defining the
+	  membrane plane to be 0\degree, we measured the angles between each COM and its
+	  nearest neighbor COMs for the equilibrated sandwiched configuration simulated
+	  at 280 K. Peaks appear in the distribution at $-60\degree$, $0\degree$ and
+	  $60\degree$. (f) The Fourier transform of a hexagonally packed grid of points
+	  defined by the angles in (e) shows intensity at the same locations where we
+	  expect to see R-spots, as well as intensity along the $q_z$ axis
+          where R-$\pi$ would appear.}~\label{fig:tail_packing}
   \end{figure}  
 
   \subsubsection{The position, shape, and intensity of R-$\pi$}\label{section:rpi}
 
   The position, shape, and intensity of R-$\pi$, generated from simulations at
-  300 K have qualitative and quantitative differences from experiment.
-  The reflections appear at lower $q_z$ values, they
-  are more intense, and the shape of its cross-sections, especially in the $q_r$
-  direction are different relative to the experimental system.  For comparison,
-  see Figure~\ref{fig:rpi_exp_comparison} where we used cross-sections of the
+  300 K have qualitative and quantitative differences from experiment. The
+  reflections appear at lower $q_z$ values, they are more intense, and the shape
+  of its cross-sections, especially in the $q_r$ direction are different relative
+  to the experimental system. For comparison, see
+  Figure~\ref{fig:rpi_exp_comparison} where we used cross-sections of the
   simulated XRD generated from the ordered parallel displaced configuration as an
   example. In this section, we explore the various contributions to these
   discrepancies, and use this information to speculate on what reasonable
-  differences in the simulations could explain the discrepancies.
+  differences in the simulations could explain them.
   
   \begin{figure}
   \centering
@@ -1152,46 +1178,48 @@
   \caption{FWHM = 0.163 $\pm$ 0.011 $\AA^{-1}$}\label{fig:sim_zsection_fit}
   \end{subfigure}
   \caption{
-  The maximum intensity of R-$\pi$ generated from simulations of the ordered
-  parallel displaced configuration is 3 times larger than experiment. The $q_r$
-  cross-section of R-$\pi$ ((a) and (b)) is qualitatively different between 
-  experiment (a) and simulation (b). We fit Lorentzian profiles to each peak and
-  the FWHM (full width at half maximum) of the simulated pattern agrees with experiment within error. However
-  the fit to the simulated data is affected by the three sharp peaks which appear
-  near $q_r$ = 0. The $q_z$ cross-sections of R-$\pi$ ((c) and (d)) are 
-  qualitatively similar. Each fits a Lorentzian profile well, however the FWHM
-  of the simulated cross-section (d) is 48\% larger than the experimental 
-  cross-section. Additionally, the peak of the simulated $q_z$ cross-section is 
-  located at a lower $q_z$ value than experiment.}\label{fig:rpi_exp_comparison}
+	  The maximum intensity of R-$\pi$ generated from simulations of the ordered
+	  parallel displaced configuration is 3 times larger than experiment. The $q_r$
+	  cross-section of R-$\pi$ ((a) and (b)) is qualitatively different between
+	  experiment (a) and simulation (b). We fit Lorentzian profiles to each peak and
+	  the FWHM (full width at half maximum) of the simulated pattern agrees with
+	  experiment within error. However the fit to the simulated data is affected by
+	  the three sharp peaks which appear near $q_r$ = 0. The $q_z$ cross-sections of
+	  R-$\pi$ ((c) and (d)) are qualitatively similar. Each fits a Lorentzian profile
+	  well, however the FWHM of the simulated cross-section (d) is 48\% larger than
+	  the experimental cross-section (c). Additionally, the peak of the simulated
+	  $q_z$ cross-section is located at a lower $q_z$ value than
+	  experiment.}\label{fig:rpi_exp_comparison}
   \end{figure}
 
   \subsubsection*{Distance and correlation between stacked monomer head groups}
 
-  R-$\pi$ appears at a lower $q_z$ value in our simulations versus experiment because
-  monomers in the simulated system stack further apart than those in the experimental
-  system (Table~\ref{table:correlation_length}). We calculated $z$-direction pair distribution
-  functions, $g(z)$, as described in Section~\ref{section:correlation_length}.
-  The resulting distributions are generally characterized by decaying
-  oscillatory behavior where the average distance between peaks corresponds to
-  the average distance between stacked monomer head groups
-  (Figure~\ref{fig:correlation}).  We calculated this equilibrated vertical
-  stacking distance, $\mathit{d}_{equil}$, between monomers using
-  Equation~\ref{eqn:decaying_sinusoid}. The distance between stacked monomers is
-  greater than experiment by 0.5--0.9 \AA~across all cases, with disordered
-  basins at the high end of that range.% and are on average 0.2 and 0.3 \AA~more distant. (wording confused Matt)
-  This behavior is not surprising since GAFF models atoms as point charges and
-  does not appropriately model the aromatic $\pi-\pi$ interactions, which would make
-  it more energetically favorable for the monomers to stack closer together ~\cite{wang_development_2004}.
-  It is also possible that the tails prevent close stacking of monomer head groups
-  and we do not achieve the timescales necessary for them to rearrange into a
-  necessarily more tightly packed configuration. To test the this chain-packing hypotheses, 
-  we equilibrated the system at 500 K and then annealed it to 300 K in an attempt to coerce the tails
+  R-$\pi$ appears at a lower $q_z$ value in our simulations versus experiment
+  because monomers in the simulated system stack further apart than those in the
+  experimental system (Table~\ref{table:correlation_length}). We calculated
+  $z$-direction pair distribution functions, $g(z)$, as described in
+  Section~\ref{section:correlation_length}.  The resulting distributions are
+  generally characterized by decaying oscillatory behavior where the average
+  distance between peaks corresponds to the average distance between stacked
+  monomer head groups (Figure~\ref{fig:correlation}).  We calculated this
+  equilibrated vertical stacking distance, $\mathit{d}_{equil}$, between monomers
+  using Equation~\ref{eqn:decaying_sinusoid}. The distance between stacked
+  monomers is greater than experiment by 0.5--0.9 \AA~across all cases, with
+  disordered basins at the high end of that range. This behavior is not
+  surprising since GAFF models atoms as point charges and does not appropriately
+  model the aromatic $\pi-\pi$ interactions, which would make it more
+  energetically favorable for the monomers to stack closer together
+  \cite{wang_development_2004}. It is also possible that the tails prevent
+  close stacking of monomer head groups and we do not achieve the timescales
+  necessary for them to rearrange into a necessarily more tightly packed
+  configuration. To test this chain-packing hypotheses, we equilibrated the
+  system at 500 K and then annealed it to 300 K in an attempt to coerce the tails
   into a more tightly packed configuration. Before annealing and in order to
-  stabilize the hexagonal phase at 500 K, we placed harmonic restraints with 
-  force constants of 1000 kJ mol$^{-1}$ nm$^{-2}$ between head group COMs
-  within each column as well as between head group COMs in
-  adjacent columns. We saw no improvement in packing distance over our 300 K
-  models (see further discussion in Section~\ref{section:slow_dynamics}). 
+  stabilize the hexagonal phase at 500 K, we placed harmonic restraints with
+  force constants of 1000 kJ mol$^{-1}$ nm$^{-2}$ between head group COMs within
+  each column as well as between head group COMs in adjacent columns. We saw no
+  improvement in packing distance over our 300 K models (see further discussion
+  in Section~\ref{section:slow_dynamics}). 
   
   The system size, in the $z$-direction, does not significantly alter $g(z)$.
   In Figure~\ref{fig:correlation}, oscillations do not fully decay, so a taller
@@ -1257,13 +1285,15 @@
   \caption{Parallel Displaced, Disordered Basin}\label{fig:z_correlation_offset_disordered}
   \end{subfigure}  
   \caption{1D correlation functions of the center of masses of aromatic head
-	  groups, $g(z)$, show decaying oscillatory behavior and have consistent correlation lengths with experiment. We calculated the
-	  correlation length by fitting a decaying exponential function
+	  groups, $g(z)$, show decaying oscillatory behavior and have consistent
+	  correlation lengths with experiment. We calculated the correlation length by
+	  fitting a decaying exponential function
 	  (Equation~\ref{eqn:decaying_exponential}) to the peaks of $g(z)$. The
 	  correlation length is longer for ordered basin systems
 	  (Table~\ref{table:correlation_length}). We did not attempt to calculate the
-	  correlation length for (d) because there are no clear peaks. We assume that this
-	  correlation length is less than the vertical distance between monomers.}\label{fig:correlation}
+	  correlation length for (d) because there are no clear peaks. We assume that
+	  this correlation length is less than the vertical distance between
+	  monomers.}\label{fig:correlation}
   \end{figure}  
   
   \begin{table}[h]
@@ -1279,8 +1309,9 @@
   Experiment         & --                 &    3.70                    & 9 $\pm$ 1               \\
   \bottomrule
   \end{tabular}
-  \caption{The correlation length is larger for systems in the ordered basin. The equilibrated vertical
-  stacking distance, $\mathit{d}_{equil}$, is also smaller.}
+  \caption{The correlation length is larger for systems in the ordered basin.
+	  The equilibrated vertical stacking distance, $\mathit{d}_{equil}$, is also
+	  smaller.}
   \label{table:correlation_length}
   \end{table}
 
@@ -1335,7 +1366,7 @@
   \end{tabular}
   \caption{Deviation of the positions of the center of mass of head groups from their average
   positions (thermal disorder) as well as their idealized positions (quenched disorder) to use 
-  as simulated disorder into our model system.}
+  as simulated disorder in our model system.}
   \label{table:quenched_disorder} 
   \end{table}
   
@@ -1371,22 +1402,23 @@
   However, when we allowed monomer columns to move independently in the
   $z$-direction, the intensity of R-$\pi$ drops and the $q_r$ cross-section of
   the simulated diffraction patterns smooths out. We can demostrate this by
-  creating a simplified sandwiched configuration (as described above), 
-  with varying amounts of statistical correlation between columns 
-  (see Figure~\ref{fig:column_displacement}). In the low independent motion limit
-  limit, the COM of columns are situated at the same $z$-coordinate.
-  We allow increasing independence of columns by randomly shifting each column in
-  the $z$-direction according to a uniform distribution bounded by (0, $f \times
-  \mathit{d}_{equil}$) where $f$ ranges between 0 and 1. We limit this discussion
-  to the sandwiched configuration since it is not feasible for columns in the
-  parallel displaced configuration, as we have set them up, to move past each
-  other. When $f = 1$, the columns move independently and the $q_r$ cross-section
-  smooths out completely (Figure~\ref{fig:sf_qy_sr100}). Any amount of
-  dependence results in some presence of independent sharp peaks, though
-  significantly attenuated at $f$ nearer 1. The intensity of R-$\pi$ also
-  decreases with increasing column independence. We see an 8-fold decrease in the
-  intensity of R-$\pi$ when $f=1$ versus when $f=0$ for our simplified model
-  systems.
+  creating a simplified sandwiched configuration (as described above), with
+  varying amounts of statistical correlation between columns (see
+  Figure~\ref{fig:column_displacement}). In the low independent motion limit, the
+  COM of columns are situated at the same $z$-coordinate.  We allow increasing
+  independence of columns by randomly shifting each column in the $z$-direction
+  according to a uniform distribution bounded by (0, $f \times \mathit{d}$) where
+  $f$ ranges between 0 and 1 and $d$ is the vertical distance between scatterers.
+  %BJC: removed this sentence since I do parallel displaced config in the ensemble
+  %We limit this discussion to the sandwiched configuration since it is not
+  %feasible for columns in the parallel displaced configuration, as we have set
+  %them up, to move past each other. 
+  When $f = 1$, the columns move independently and the $q_r$ cross-section
+  smooths out completely (Figure~\ref{fig:sf_qy_sr100}). Any amount of dependence
+  results in some presence of sharp peaks, though significantly attenuated at $f$
+  nearer 1. The intensity of R-$\pi$ also decreases with increasing column
+  independence. We see an 9-fold decrease in the intensity of R-$\pi$ when $f=1$
+  versus when $f=0$ for our simplified model systems.
 
   % produce figures with: structure_factor.py --random_columns -nframes 1000 --hexagonal -g 86 86 256 -thermal_disorder 2.30 0.43 1.48 -dbwl 4.4 --pore_radius 6.6 -box 85 85 352 -sr 0
   % Adjust sr from 0 to .75 to 1
@@ -1410,9 +1442,9 @@
 	  same reference $z$ coordinate, $f$ = 0, the intensity of R-$\pi$ is 18.3 and is
 	  characterized by sharp Bragg-like peaks. (b) When columns have a moderate
 	  amount of independence, $f$ = 0.75, the intensity of R-$\pi$ decreases 5-fold
-	  to 3.7. The edges of the peak are beginning to smooth out, but sharp peaks
+	  to 3.4. The edges of the peak are beginning to smooth out, but sharp peaks
 	  still exist. (c) When columns are completely independent, $f$ = 1, the
-	  intensity of R-$\pi$ decreases 8-fold to 2.3 and the cross-section is
+	  intensity of R-$\pi$ decreases 9-fold to 2.1 and the cross-section is
           relatively smooth.}\label{fig:column_displacement}
   \end{figure}
 
@@ -1425,7 +1457,7 @@
   $g(z)$ from head groups in other columns within the same pore, and with head
   groups in different pores would cancel out. However, when we include all 
   $z$-slices in $g(z)$ for our system, rather than restricting it to those 
-  $z$-slices within 2.1~\AA of the center of the correlation function 
+  $z$-slices within 2.1~\AA~of the center of the correlation function 
   (Section~\ref{section:correlation_length}), $g(z)$ shows oscillatory 
   behavior and its correlation length nearly triples to 12.4 $\pm$ 0.7 \AA.
   (Figure~\ref{fig:z_correlation_fullbox}). The peaks of $g(z)$ are actually 
@@ -1436,7 +1468,9 @@
   \centering
   \includegraphics[width=0.5\textwidth]{z_correlation_fullbox.pdf}
   \caption{When we average all $z$-slices of the 3D correlation function, the 
-  correlation length of the ordered sandwich configuration nearly triples.}\label{fig:z_correlation_fullbox}
+  correlation length of the ordered sandwich configuration nearly triples compared 
+  %BJC: added figure reference below. Check that it works
+  to that shown in Figure~\ref{fig:z_correlation_sandwich}.}\label{fig:z_correlation_fullbox}
   \end{figure}
  
   Increasing thermal noise in the $xy$ plane causes the FWHM of the $q_r$
@@ -1456,7 +1490,7 @@
   \centering
   \includegraphics[width=0.5\textwidth]{qy_fwhm.pdf}
   \caption{Increasing the amount of disorder in the $xy$ plane decreases the
-	  FWHM of the $q_y$ cross-section of R-$\pi$. When we cut the amount of $r$ and
+	  FWHM of the $q_r$ cross-section of R-$\pi$. When we cut the amount of $r$ and
 	  $\theta$ disorder in half (Noise factor = 0.5), the FWHM increases by 88\%. When
 	  we double the disorder (Noise factor = 2), the FWHM decreases by
 	  51\%.}\label{fig:qy_fwhm}
@@ -1504,7 +1538,7 @@
   \includegraphics[width=\textwidth]{offset_ensemble_rsection.pdf}
   \caption{Parallel Displaced}\label{fig:offset_ensemble_rsection}
   \end{subfigure}
-  \caption{The $q_r$ section of R-$\pi$ is much smoother than~\ref{fig:sim_rsection_fit} when
+  \caption{The $q_r$ section of R-$\pi$ is much smoother than Figure~\ref{fig:sim_rsection_fit} when
   		   we generate simulated XRD patterns from an ensemble of 40 independent simulations,
   		   suggesting that much of the extra initial intensity may be due to the starting 
   		   conditions. The maximum intensity of R-$\pi$ is 3$\times$ higher in the sandwiched
@@ -1648,7 +1682,7 @@
   \subsubsection{Origin of R-double}\label{section:rdouble}
   
   R-double does not appear in any of the simulated diffraction patterns
-  generated using the systems simulated up to this point. Here we hypothesize a
+  generated using the systems simulated up to this point. Here we hypothesize 
   several configurational arrangements which may lead to the appearance of R-double and
   show that we cannot achieve a long-term stable system that exhibits R-double
   without the inclusion of small amounts of water in the pores.
@@ -1663,9 +1697,11 @@
   pattern and its real space configuration is well-known as the phase
   problem~\cite{taylor_phase_2003}. We have proposed configurations that
   result in the appearance of R-double below, and we can speculate which makes
-  the most physical sense. It appears that we cannot achieve a long-term stable
-  system that exhibits R-double without the inclusion of small amounts of water
-  in the pores.
+  the most physical sense. 
+  %BJC: seems redundant from last sentence of above paragraph
+%It appears that we cannot achieve a long-term stable
+%  system that exhibits R-double without the inclusion of small amounts of water
+%  in the pores.
   
   One way to produce R-double is if our initial configuration contains
   alternating parallel and anti-parallel carboxylate groups relative to the plane
@@ -1700,7 +1736,7 @@
   could be energetically stable.~\cite{tauer_beyond_2005} 
   
   The addition of water to the system promotes the appearance of R-double, providing
-  an answer to question~\ref{point:water} posed in the introduction.
+  an answer to Question~\ref{point:water} posed in the introduction.
   We added water to the parallel displaced and sandwiched configurations in the
   ordered basin and equilibrated them according to the wet equilibration
   procedure. There is no experimental measurement of water concentration in these
@@ -1777,7 +1813,7 @@
   \end{subfigure}
   \caption{(a) When monomer head groups are rotated with respect to vertically
 	  adjacent monomers (top), R-double is visible while the heavy atoms of the head
-	  groups are held in place with position restraints (middle). Again, R-double
+	  groups are held in place with position restraints (middle). R-double
 	  fades once the position restraints are released. (b) When monomers are
 	  non-uniformly spaced (top), R-double appears if all heavy atoms of the head
 	  groups are held in place with position restraints (middle). R-double quickly
@@ -1852,7 +1888,7 @@
   tails possess a certain degree of order which is necessary in order to create
   the complex WAXS pattern shown experimentally, but they will not be involved in
   a separation process. We aim to further understand the pore architecture, in
-  order to address Question~\ref{point:composition} posted in the introduction, 
+  order to address Question~\ref{point:composition} posed in the Introduction, 
   and observe the differences, if any, between the different plausible equilibrated
   configurations studied so far. In general, the composition of each region, particularly within our
   definition of the pore region, is similar between all systems. This suggests
@@ -2019,13 +2055,13 @@
 
   \subsection{Effect of cross-linking}\label{section:xlink}
 
-  Experimentally, membranes are cross-linked for mechanical stability before use. We applied 
-  our cross-linking algorithm to equilibrated sandwiched and parallel
-  displaced configurations in the ordered pore basin. We allowed the cross-linking
-  algorithm to propagate until greater than 90\% of the vinyl groups on the tails of the 
-  monomers were either involved in a cross-linking reaction or were terminated 
-  (see Section \ref{S-section:xlink} of the SI)
-  for further details of the cross-linking algorithm). We allowed the cross-linked
+  Experimentally, membranes are cross-linked for mechanical stability before
+  use. We applied our cross-linking algorithm to equilibrated sandwiched and
+  parallel displaced configurations in the ordered pore basin. We allowed the
+  cross-linking algorithm to propagate until greater than 90\% of the vinyl
+  groups on the tails of the monomers were either involved in a cross-linking
+  reaction or were terminated (see Section \ref{S-section:xlink} of the SI for
+  further details of the cross-linking algorithm). We allowed the cross-linked
   configurations to simulate for 100 ns further in the NPT ensemble. 
 
   There are only minor changes to the physical characteristics of these systems when 
@@ -2044,7 +2080,7 @@
   \caption{There are minor differences between the physical properties of a
   crosslinked (xlink) system versus an uncrosslinked system. The sandwiched configuration (S)
   exhibits a smaller decrease in its ionic conductivity, while the parallel displaced (PD)
-  configuration remains constant. The pore spacing of both systems decreases upon crosslinking.
+  configuration remains constant. The pore spacing of both systems decreases upon cross-linking.
   The vertical distance between stacked monomers increases in the sandwiched configuration
   and decreases in the parallel displaced configuration. The correlation length decreases
   in both configurations.}\label{fig:xlink}
@@ -2071,7 +2107,7 @@
   parallel displaced configuration with 5 monomer columns per pore and 1 wt\%
   water. R-alkanes and R-pores appear where expected for the reasons originally
   predicted. We find that R-spots is likely due to ordered alkane chain packing.
-  R-$\pi$ appears at lower q values than experiment because monomer stack too far
+  R-$\pi$ appears at lower $q_z$ values than experiment because monomer stack too far
   apart, and its intensity is far too high, likely because our initial
   configurations contain a high level of dependence between monomer columns.
   We can learn more about the time averaged structure of these systems by studying
@@ -2132,13 +2168,16 @@
   J. Y. and M. A. G. were supported by the Soft Materials Research Center under NSF 
   MRSEC Grant DMR-1420736
 
-  Molecular simulations were performed using the Extreme Science and Engineering Discovery
-  Environment (XSEDE), which is supported by National Science Foundation grant number 
-  ACI-1548562. Specifically, it used the Bridges system, which is supported by NSF award
-  number ACI-1445606, at the Pittsburgh Supercomputing Center (PSC). Simulations were also
-  performed on Summit super computer, which is supported by the NSF grant OAC-1532235. 
-  This work was supported financially by NSF through the grant NSF-CBET 1351635.
-  
+  Molecular simulations were performed using the Extreme Science and
+  Engineering Discovery Environment (XSEDE), which is supported by National
+  Science Foundation grant number ACI-1548562. Specifically, it used the Bridges
+  system, which is supported by NSF award number ACI-1445606, at the Pittsburgh
+  Supercomputing Center (PSC). This work also utilized the RMACC Summit supercomputer,
+  which is supported by the National Science Foundation (awards ACI-1532235 and
+  ACI-1532236), the University of Colorado Boulder, and Colorado State
+  University. The Summit supercomputer is a joint effort of the University of
+  Colorado Boulder and Colorado State University.
+
   The authors thank Richard Noble, Michael McGrath, Gregory Dwulet and Sarah Dischinger
   for useful discussions that enhanced our understanding of these LC membrane systems. 
 
