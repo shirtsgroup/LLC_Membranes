@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 """
 Use this to take the charges out of a mol2 file and assign them in place of
