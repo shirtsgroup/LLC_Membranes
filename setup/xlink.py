@@ -614,21 +614,22 @@ class System(Topology):
         # number of atoms between c1 and c2 (based on order that they are written in the coordinate file)
         diff = np.array(self.xlink_residue.c2_atom_indices) - np.array(self.xlink_residue.c1_atom_indices)
         bond_c2 = np.array([x for x in self.bond_c2 if (x - 1) not in self.radicals])  # don't include radicals
-        tails = bond_c2 % len(self.xlink_residue.c2_atoms)  # define which tail each c2 atom is part of
-        print(tails)
-        c1 = bond_c2 - diff[tails]  # indices of c1 atoms which gain a hydrogen atom
 
-        # Get (serial) indices of hydrogen atoms to make real
-        for i in c1:
-            ndx = np.where(self.vsites[:, 1] == i)[0]  # index 1 contains serial carbon index used to construct vsite
-            self.initiators.append(int(self.vsites[ndx, 0]))  # index 0 contains serial index of dummy H atom
+        if len(bond_c2) > 0:
+            tails = bond_c2 % len(self.xlink_residue.c2_atoms)  # define which tail each c2 atom is part of
+            c1 = bond_c2 - diff[tails]  # indices of c1 atoms which gain a hydrogen atom
 
-        # add bonds -- this can be made more general
-        for i, x in enumerate(c1):
-            self.all_bonds.append([x, self.initiators[i]])
-            self.xlink_residue_atoms.type[self.initiators[i] - 1] = 'hc'  # change from dummy hydrogen to real hydrogen
-            self.xlink_residue_atoms.mass[self.initiators[i] - 1] = 1.008  # give mass to the former dummy atom
-            self.xlink_residue_atoms.type[x - 1] = 'c3'  # make carbon sp3 hybridized
+            # Get (serial) indices of hydrogen atoms to make real
+            for i in c1:
+                ndx = np.where(self.vsites[:, 1] == i)[0]  # index 1 contains serial carbon index used to construct vsite
+                self.initiators.append(int(self.vsites[ndx, 0]))  # index 0 contains serial index of dummy H atom
+
+            # add bonds -- this can be made more general
+            for i, x in enumerate(c1):
+                self.all_bonds.append([x, self.initiators[i]])
+                self.xlink_residue_atoms.type[self.initiators[i] - 1] = 'hc'  # change from dummy hydrogen to real hydrogen
+                self.xlink_residue_atoms.mass[self.initiators[i] - 1] = 1.008  # give mass to the former dummy atom
+                self.xlink_residue_atoms.type[x - 1] = 'c3'  # make carbon sp3 hybridized
 
     def identify_new_radicals(self):
 
