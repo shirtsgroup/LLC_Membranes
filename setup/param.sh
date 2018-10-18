@@ -28,7 +28,7 @@ done
 # atomtyping and initial charge assigment with antechamber and tleap roughly follow steps descrbed here:
 # http://ambermd.org/tutorials/basic/tutorial4b/
 
-antechamber -i ${name}.pdb -fi pdb -o ${name}.mol2 -fo mol2 -c bcc -s 2 -nc ${nc}  # The .pdb must have connectivity info!
+#antechamber -i ${name}.pdb -fi pdb -o ${name}.mol2 -fo mol2 -c bcc -s 2 -nc ${nc}  # The .pdb must have connectivity info!
 # -c bcc tells antechamber to use AM1-BCC charge model
 # -s flag just defines verbosity of output
 parmchk -i ${name}.mol2 -f mol2 -o ${name}.frcmod
