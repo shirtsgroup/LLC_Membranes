@@ -6,7 +6,7 @@ from past.utils import old_div
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
-from LLC_Membranes.analysis import Poly_fit, top, Atom_props
+from LLC_Membranes.analysis import Poly_fit, top, Atom_props, p2p
 import mdtraj as md
 import time
 from scipy import stats
@@ -25,7 +25,12 @@ def initialize():
                         'fitting line during diffusivity calculation')
     parser.add_argument('-a', '--axis', default='xyz', type=str, help='Which axis to compute msd along')
     parser.add_argument('-nboot', default=200, type=int, help='Number of bootstrap trials for error estimation')
-
+    # | not implemented |
+    # v                 v
+    parser.add_argument('--restrict_to_pores', action="store_true", help='Only look at residue within pores of HII'
+                                                                         'membrane')
+    parser.add_argument('-radius', default=1, type=float, help='Radius of pores. Anything greater than this distance'
+                        'from the pore center will not be included in calculation')
     args = parser.parse_args()
 
     return args
@@ -46,10 +51,15 @@ def msd_fft(x, ndx):
 
     r = np.copy(x)
     r = r[:, ndx]
+    print(r.shape)
     N = len(r)
+    print(N)
     D = np.square(r).sum(axis=1)
+    print(len(D))
     D = np.append(D, 0)
     S2 = sum([autocorrFFT(r[:, i]) for i in range(r.shape[1])])
+    print(len(S2))
+    exit()
     Q = 2*D.sum()
     S1 = np.zeros(N)
     for m in range(N):
@@ -271,12 +281,17 @@ class Diffusivity(object):
         self.confidence_interval = stats.t.interval(0.95, N - 1, loc=slopes.mean(), scale=stats.sem(slopes))
         self.Davg = slopes.mean()
 
-    def plot(self, axis, fracshow=0.5):
+    def plot(self, axis, fracshow=0.5, savedata=False):
 
         end_frame = int(fracshow * self.time.size)
         #plt.plot(self.time[self.startfit:self.endfit]/1000, self.yfit, '--', color='black', label='Linear Fit')
         plt.errorbar(self.time[:end_frame]/1000, self.MSD_average[:end_frame], yerr=[self.limits[0, :end_frame],
                      self.limits[1, :end_frame]], errorevery=self.errorevery, label='MSD')
+
+        if savedata:
+
+            np.savez_compressed('msd.npz', time=self.time[:end_frame]/1000, msd=self.MSD_average[:end_frame],
+                                yerr=[self.limits[0, :end_frame], self.limits[1, :end_frame]])
 
         plt.ylabel('MSD ($nm^2$)', fontsize=14)
         plt.xlabel('time (ns)', fontsize=14)

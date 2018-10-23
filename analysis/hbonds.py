@@ -26,7 +26,7 @@ import os
 import tqdm
 import matplotlib.pyplot as plt
 
-script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname("__file__")))
+script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
 def initialize():
@@ -41,7 +41,7 @@ def initialize():
     parser.add_argument('-x', '--exclude_water', action='store_true', help='Exclude water while searching for hbonds')
     parser.add_argument('-r', '--residues', nargs='+', default=['HII'], help='Residues to include in h-bond search. '
                         'Water is automatically included if you do not specify the -x option')
-    parser.add_argument('-a', '--atoms', action='append', nargs='+', help='Atoms for to include for each '
+    parser.add_argument('-a', '--atoms', action='append', nargs='+', help='Atoms to include for each '
                         'residue. Each list of atoms must be passed with a separate -a flag for each residue in'
                         'args.residues')
     parser.add_argument('-d', '--distance', default=.3, help='Maximum distance between acceptor and donor atoms')
@@ -57,7 +57,7 @@ class System(object):
         self.top = Topology(top)
 
         print('Loading trajectory...', end="", flush=True)
-        self.t = md.load(traj, top=gro)[begin:end]
+        self.t = md.load(traj, top=gro)[begin:end:3]
         print('Done!')
         self.pos = self.t.xyz  # positions of all atoms
         self.hbonds = []  # will hold h-bonds for each frame [D, H, A, angle]
@@ -358,4 +358,8 @@ if __name__ == "__main__":
         sys.set_eligible(r, args.atoms[i])
 
     sys.identify_hbonds(args.distance, args.angle_cut)
+    import pickle
+    with open("hbonds.pl", 'wb') as f:
+        pickle.dump(sys.hbonds, f)
+
     sys.plot_hbonds()

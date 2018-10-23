@@ -637,11 +637,12 @@ class System(Topology):
         self.radicals = [x for x in self.radicals if (x + 1) not in self.bond_c2]
 
         # c2 next to c1 that just bonded to a different c2 is now a radical
-        diff = np.array(self.xlink_residue.c1_atom_indices) - np.array(self.xlink_residue.c2_atom_indices)
-        tails = self.bond_c1 % len(self.xlink_residue.c1_atoms)  # define which tail each c2 atom is part of
-        for i in self.bond_c1 - diff[tails]:  # indices of c2 atoms which become radicals
-            self.radicals.append(i - 1)
-            self.xlink_residue_atoms.type[i - 1] = 'c2'  # change atom type from ce to c2
+        if len(self.bond_c1) > 0:
+            diff = np.array(self.xlink_residue.c1_atom_indices) - np.array(self.xlink_residue.c2_atom_indices)
+            tails = self.bond_c1 % len(self.xlink_residue.c1_atoms)  # define which tail each c2 atom is part of
+            for i in self.bond_c1 - diff[tails]:  # indices of c2 atoms which become radicals
+                self.radicals.append(i - 1)
+                self.xlink_residue_atoms.type[i - 1] = 'c2'  # change atom type from ce to c2
 
     def remove_improper_dihedrals(self):
 
