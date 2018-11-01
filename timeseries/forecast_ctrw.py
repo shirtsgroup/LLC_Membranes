@@ -8,6 +8,8 @@ import Atom_props
 import ruptures
 from scipy.optimize import curve_fit
 from LLC_Membranes.analysis.hbonds import Residue
+from LLC_Membranes.analysis import Poly_fit, p2p
+import tqdm
 
 
 def initialize():
@@ -21,6 +23,15 @@ def initialize():
     parser.add_argument('-e', '--end', default=-1, help='Last trajectory frame used for analysis.')
     parser.add_argument('-step', '--step', default=1, help='Include every "step" frames')
 
+    # restrict to pores parameters
+    parser.add_argument('-restrict', '--restrict_to_pores', action='store_true', help='Only look at residues which'
+                        'stay in the pore (based on last simulation frame)')
+    parser.add_argument('--pore_defining_atoms', nargs='+', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='Atoms'
+                        'used to define pore centers')
+    parser.add_argument('--pore_defining_residue', default='HII', type=str, help='residue to which pore_defining atoms '
+                                                                                 'belong')
+    parser.add_argument('-radius', '--pore_radius', default=1, type=float, help='Defined pore radius (nm)')
+
     parser.add_argument('-r', '--residue', default='ETH', type=str, help='Name of residue whose diffusivity we want')
     parser.add_argument('-atoms', nargs='+', help='Name of atoms whose collective diffusivity is desired')
     parser.add_argument('-nbins', default=25, type=int, help='Number of bins to bin hop and dwell distributions into')
@@ -29,7 +40,7 @@ def initialize():
     parser.add_argument('-n', '--nhops', default=10000, type=int, help='Number of hops to perform')
 
     # bootstrapping
-    # parser.add_argument('-b', '--nboot', default=200, help='Number of bootstrap trials to be run')
+    parser.add_argument('-nboot', '--nboot', default=200, type=int, help='Number of bootstrap trials to be run')
     # parser.add_argument('-f', '--frontfrac', default=0.05, type=float, help='Where to start fitting line on msd curve')
     # parser.add_argument('-F', '--fracshow', default=.2, type=float, help='Percent of graph to show, also where to stop '
     #                     'fitting line during diffusivity calculation')
@@ -97,9 +108,44 @@ def random_dwell_time(lam):
         return -np.log(1 - np.random.uniform()) / lam
 
 
+def confidence_interval(data, confidence):
+    """ Calculate confidence interval of data
+
+    :param confidence: % confidence
+    :return: error bars
+    """
+
+    lower_confidence = (100 - confidence) / 2
+    upper_confidence = 100 - lower_confidence
+
+    mean_data = data.mean(axis=0)
+
+    error = np.zeros([2, mean_data.size])  # [(lower,upper), number of data points
+    error[0, :] = np.abs(np.percentile(data, lower_confidence, axis=0) - mean_data)  # percent of data below this value
+    error[1, :] = np.percentile(data, upper_confidence, axis=0) - mean_data  # percent of data below this value
+
+    return error
+
+
 class System(object):
 
     def __init__(self, traj, gro, res, start=0, end=-1, step=1):
+        """ Using an MD trajectory, calculate fit parameters for the dwell time distribution and hop length distribution
+
+        :param traj: name of MD trajectory (GROMACS .xtc or .trr)
+        :param gro: name of .gro (or .pdb) coordinate file associated with same topology as traj
+        :param res: name of residue that is hopping around
+        :param start: first frame of trajectory to include
+        :param end: last frame of trajectory to include
+        :param step: include every step frames in calculations
+
+        :type traj: str
+        :type gro: str
+        :type res: str
+        :type start: int
+        :type end: int
+        :type step: int
+        """
 
         self.t = md.load(traj, top=gro)[start:end:step]
         self.t.time /= 1000  # convert to nanoseconds
@@ -125,7 +171,36 @@ class System(object):
         self.lambda_distribution = []  # distribution of lambda for poisson process
         self.hop_sigma_distribution = []  # distribution of standard deviation of hop lengths
 
-    def hops_and_dwells(self, penalty=1):
+    def restrict_to_pores(self, pore_defining_atoms, pore_defining_residue, r, npores=4):
+        """ Identify which centers of mass are still in the pore center
+
+        :param pore_defining_atoms: atoms used to locate pore center
+        :param pore_defining_residue: name of residue to which pore_defining_atoms belong
+        :param npores: number of pores in unit cell
+
+        :type pore_defining_atoms: list
+        :type npores: int
+
+        :return: modify center of mass array
+        """
+
+        keep = [a.index for a in self.t.topology.atoms if a.name in pore_defining_atoms and a.residue.name ==
+                pore_defining_residue]
+
+        pores = self.t.xyz[-1, keep, :]  # positions of pore-defining atoms in last frame
+
+        p_centers = p2p.avg_pore_loc(npores, pores)  # pore centers for last frame
+
+        inside_pore = []
+        for i in range(npores):
+            d = np.linalg.norm(self.com[-1, :, :2] - p_centers[:, i], axis=1)
+            inpore = np.where(d < r)[0]
+            for j in inpore:
+                inside_pore.append(j)
+
+        self.com = self.com[:, inside_pore, :]  # restrict COMs to just those within pore
+
+    def hops_and_dwells(self, penalty=3):
         """ Find breakpoints then assemble lists of dwell times and hop lengths. See documentation for Ruptures python
         package: http://ctruong.perso.math.cnrs.fr/ruptures-docs/build/html/index.html for more options that can be
         added
@@ -133,12 +208,16 @@ class System(object):
         :param penalty: penalty for cost function minimization
         :return:
         """
+        #
+        # for j in tqdm.tqdm(range(self.com.shape[1])):
+        for j in range(25):
 
-        for j in range(self.nres):
-
-            bp = ruptures.detection.Pelt().fit_predict(self.com[:, j, :], pen=penalty)
-
+            bp = ruptures.detection.Binseg(model='ar').fit_predict(self.com[:, j, :], pen=penalty)
+            # ruptures.display(self.com[:, j, :], bp, figsize=(10, 6))
+            # plt.show()
             for i in range(len(bp) - 2):  # exclude first and last segments
+                # could get rid of loop and do vector-wise self.t.time[bp + 1] - self.t.time[bp]
+                # just need to figure out hop_lengths
                 self.dwell_times.append(self.t.time[bp[i + 1]] - self.t.time[bp[i]])
                 if i > 0:
                     self.hop_lengths.append(np.mean(self.com[bp[i]:bp[i + 1], j, 2]) -
@@ -154,6 +233,11 @@ class System(object):
         hist_jump = np.zeros([nboot, nbins])
         bins_jump_centered = np.zeros([nboot, nbins])
 
+        dwell_bin_width = 0
+        hop_bin_width = 0
+        dwell_mean = 0
+        A_dwell = 0  # scaling factor for decaying expontential
+        A_hop = 0
         for i in range(nboot):
 
             # dwell times
@@ -175,29 +259,55 @@ class System(object):
 
             self.hop_sigma_distribution.append(np.abs(solp_hops[1]))  # sometime curve_fit finds negative answer
 
+            if np.abs(solp_hops[1]) > 2:
+                plt.hist(hist_jump[i, :], bins=25)
+                plt.show()
+
+            # Things for plotting
+            dwell_bin_width += bins_dwell_centered[i, 1] - bins_dwell_centered[i, 2]
+            hop_bin_width += bins_jump_centered[i, 1] - bins_jump_centered[i, 0]
+            A_dwell += solp_dwell[0]
+            dwell_mean += solp_hops[0]
+            A_hop += solp_hops[2]
+
+        dwell_bin_width /= nboot
+        hop_bin_width /= nboot
+        dwell_mean /= nboot
+        A_dwell /= nboot
+        A_hop /= nboot
+
         if plot:
-            # change so that solp's used below are from average parameters
+
             fig, ax = plt.subplots(2, 2, figsize=(12, 8))
 
             ax[0, 0].bar(bins_dwell_centered.mean(axis=0), hist_dwell.mean(axis=0),
-                         width=(bins_dwell[1] - bins_dwell[0]))
-            ax[0, 0].set_xlabel('Dwell Time (ns)')
-            ax[0, 0].set_ylabel('Frequency')
-            ax[0, 0].plot(bins_dwell_centered.mean(axis=0), wait_times(bins_dwell_centered.mean(axis=0), solp_dwell[0],
-                       solp_dwell[1]), '--', color='black', label='$\lambda_{fit}$ = %.3f' % solp_dwell[1])
-            ax[0, 0].legend()
+                         width=dwell_bin_width)
+            ax[0, 0].set_xlabel('Dwell Time (ns)', fontsize=14)
+            ax[0, 0].set_ylabel('Frequency', fontsize=14)
+            ax[0, 0].plot(bins_dwell_centered.mean(axis=0), wait_times(bins_dwell_centered.mean(axis=0), A_dwell,
+                    np.mean(self.lambda_distribution)), '--', color='black', label='$\lambda_{fit}$ = %.3f $\pm$ %.3f'
+                    'ns$^{-1}$' % (np.mean(self.lambda_distribution), np.std(self.lambda_distribution)))
+            ax[0, 0].legend(fontsize=12)
 
             ax[0, 1].hist(self.lambda_distribution, bins=nbins)
+            ax[0, 1].set_xlabel('Bootstrapped $\lambda$ (ns$^{-1}$)', fontsize=14)
+            ax[0, 1].set_ylabel('Frequency', fontsize=14)
 
-            ax[1, 0].bar(bins_jump_centered.mean(axis=0), hist_jump.mean(axis=0), width=(bins_jump[1] - bins_jump[0]))
-            ax[1, 0].plot(bins_jump_centered.mean(axis=0), gaussian(bins_jump_centered.mean(axis=0), solp_hops[0],
-                       solp_hops[1], solp_hops[2]), '--', label='Gaussian fit\n $\mu$=%.2f, $\sigma$=%.2f' %
-                                                                (solp_hops[0], solp_hops[1]), color='black')
-            ax[1, 0].set_xlabel('Hop Length ($z$-direction, nm)')
-            ax[1, 0].set_ylabel('Frequency')
-            ax[1, 0].legend()
+            ax[1, 0].bar(bins_jump_centered.mean(axis=0), hist_jump.mean(axis=0), width=hop_bin_width)
+            ax[1, 0].plot(bins_jump_centered.mean(axis=0), gaussian(bins_jump_centered.mean(axis=0), dwell_mean,
+                    np.mean(self.hop_sigma_distribution), A_hop), '--', label='Gaussian fit\n $\sigma$=%.2f $\pm$ %.2f '
+                    'nm' % (np.mean(self.hop_sigma_distribution), np.std(self.hop_sigma_distribution)), color='black')
+            ax[1, 0].set_xlabel('Hop Length ($z$-direction, nm)', fontsize=14)
+            ax[1, 0].set_ylabel('Frequency', fontsize=14)
+            ax[1, 0].legend(fontsize=12)
 
             ax[1, 1].hist(self.hop_sigma_distribution, bins=nbins)
+            ax[1, 1].set_xlabel('Bootstrapped $\sigma$ (nm)', fontsize=14)
+            ax[1, 1].set_ylabel('Frequency', fontsize=14)
+
+            plt.tight_layout()
+
+            plt.show()
 
 
 class CTRW(object):
@@ -207,32 +317,160 @@ class CTRW(object):
         self.dwell_lambdas = dwell_lambdas
         self.hop_sigmas = hop_sigmas
         self.nhops = nhops
-
-        self.trajectories = np.zeros([ntrials, nhops, 2])  # last dimension is [time, z_position]
         self.ntrials = ntrials
-        self.trial = 0
 
-        self.trajectory_hops = np.zeros([ntrials, 2*self.nhops - 1, 2])
+        self.trajectories = np.zeros([self.ntrials, self.nhops, 2])  # last dimension is [time, z_position]
+        self.trajectory_hops = np.zeros([self.ntrials, 2*self.nhops - 1, 2])
+        self.time_uniform = np.zeros([self.nhops])
+        self.z_interpolated = np.zeros([self.ntrials, self.nhops])  # separate from time_uniform to save memory
+        self.msd = np.zeros([self.ntrials, self.nhops])
+        self.bootstrapped_msd = None
+        self.yfit = None
+        self.startfit = 0
+        self.endfit = -1
+        self.D = 0
 
+    def generate_trajectories(self):
 
-    def generate_trajectory(self):
+        print('Generating Trajectories...')
+        for i in tqdm.tqdm(range(self.ntrials)):
+            # constrain mean of hop-length distribution to be zero
+            z_position = np.cumsum(np.random.normal(loc=0, scale=np.random.choice(self.hop_sigmas), size=self.nhops))
+            self.trajectories[i, :, 1] = z_position - z_position[0]  # make initial z equal to 0
 
-        # constrain mean to be zero
-        z_position = np.cumsum(np.random.normal(loc=0, scale=np.random.choice(self.hop_sigmas), size=self.nhops))
-        self.trajectories[self.trial, :, 1] = z_position - z_position[0]  # make initial z equal to 0
+            time = np.zeros([self.nhops])
+            lambda_trial = np.random.choice(self.dwell_lambdas)
+            for j in range(1, self.nhops):  # make initial time equal to 0
+                time[j] = random_dwell_time(lambda_trial)  # hop at random time intervals according to poisson process
+            time = np.cumsum(time)
+            self.trajectories[i, :, 0] = time
 
-        time = np.zeros([self.nhops])
-        lambda_trial = np.random.choice(self.dwell_lambdas)
-        for i in range(1, self.nhops):  # make initial time equal to 0
-            time[i] = random_dwell_time(lambda_trial)  # hop at random time intervals according to poisson process
-        self.trajectories[self.trial, :, 0] = np.cumsum(time)
+            self.trajectory_hops[i, 1::2, 0] = time[1:]
+            self.trajectory_hops[i, 2::2, 0] = time[1:]
 
-        self.trajectory_hops[self.trial, 1::2, 0] = time[1:]
-        self.trajectory_hops[self.trial, 2::2, 0] = time[1:]
+            self.trajectory_hops[i, ::2, 1] = self.trajectories[i, :, 1]
+            self.trajectory_hops[i, 1:-1:2, 1] = self.trajectories[i, :-1, 1]
+            self.trajectory_hops[i, -1, 1] = self.trajectories[i, -1, 1]
 
-        self.trajectory_hops[self.trial, ::2, 1] = z_position
-        self.trajectory_hops[self.trial, 1:-1:2, 1] = z_position[:-1]
-        self.trajectory_hops[self.trial, -1, 1] = z_position[-1]
+        print('Interpolating Trajectories...')
+        # make uniform time intervals with the same interval for each simulated trajectory
+        max_time = np.min(self.trajectories[:, -1, 0])
+        self.time_uniform = np.linspace(0, max_time, self.nhops)
+        for t in tqdm.tqdm(range(self.ntrials)):
+            for i, x in enumerate(self.time_uniform):
+                time_index = np.argmin(np.abs(x - self.trajectories[t, :, 0]))
+                if x - self.trajectories[t, time_index, 0] < 0:
+                    time_index -= 1
+                self.z_interpolated[t, i] = self.trajectories[t, time_index, 1]
+
+    def calculate_msd(self):
+        """ Calculate the mean squared displacement for each CTRW trajectory
+
+        """
+        print('Computing mean squared displacement of each simulated trajectory')
+        for t in tqdm.tqdm(range(self.ntrials)):
+            self.msd[t, :] = msd_fft(self.z_interpolated[t, :])
+
+    def plot_trajectory(self, n, show=False, save=True, savename='ctrw_trajectory.pdf'):
+        """ Plot a CTRW trajectory
+
+        :param n: Trajectory number
+        """
+
+        plt.figure()
+        # plt.plot(self.trajectory_hops[n, :, 0] / 1000000, self.trajectory_hops[n, :, 1], linewidth=2)
+        plt.plot(self.trajectories[n, :, 0] / 1000000, self.trajectories[n, :, 1], linewidth=2)
+        plt.gcf().get_axes()[0].tick_params(labelsize=14)
+        plt.xlabel('Time (ms)', fontsize=14)
+        plt.ylabel('$z$-coordinate (nm)', fontsize=14)
+        plt.tight_layout()
+
+        if show:
+            plt.show(block=True)
+        if save:
+            plt.savefig(savename)
+
+    def fit_msd(self, start=0, end=-1):
+        """Interactively fit a line to the mean squared displacement curve
+
+        """
+
+        self.startfit = start
+        self.endfit = end
+        dt = self.time_uniform[1] - self.time_uniform[0]
+
+        plt.figure(2)
+        fit = 0
+        while fit == 0:
+
+            self.yfit = Poly_fit.poly_fit(self.time_uniform[self.startfit:self.endfit],
+                                                      self.msd.mean(axis=0)[self.startfit:self.endfit], 1)[0]
+
+            plt.plot(self.time_uniform[self.startfit:self.endfit], self.yfit, '--', color='black', label='Linear Fit')
+            plt.plot(self.time_uniform, self.msd.mean(axis=0), label='MSD')
+
+            plt.ylabel('MSD ($nm^2$)', fontsize=14)
+            plt.xlabel('time (ns)', fontsize=14)
+            plt.gcf().get_axes()[0].tick_params(labelsize=14)
+            plt.legend(loc=2)
+            plt.tight_layout()
+            plt.ion()
+            plt.show()
+            fit = int(input("Type '1' if the fit looks good: "))
+            if fit != 1:
+                print('Press enter to following prompts to leave as is')
+                self.startfit = float(input("Time to start fit (ns): ") or self.startfit)
+                self.endfit = float(input("Time to stop fit (ns): ") or self.endfit)
+                self.startfit = int(self.startfit / dt)  # convert time to index in t.time
+                self.endfit = int(self.endfit / dt)
+                plt.clf()
+            else:
+                plt.close(2)
+
+    def bootstrap_msd(self, nboot=200):
+
+        # The average MSD is a collective property, so each bootstrap trial should be an average of self.ntrials
+        # ranodomly reconstructed simulated trajectories
+        self.bootstrapped_msd = np.zeros([nboot, self.msd.shape[1]])
+        for i in range(nboot):
+            indices = np.random.choice(self.msd.shape[0], size=self.msd.shape[0], replace=True)
+            self.bootstrapped_msd[i, :] = self.msd[indices, :].mean(axis=0)
+
+        slopes = []
+        for i in range(nboot):
+            A = Poly_fit.poly_fit(self.time_uniform[self.startfit:self.endfit],
+                                  self.bootstrapped_msd[i, self.startfit:self.endfit], 1)[-1]
+            slopes.append(A[1])
+
+        self.D = [np.mean(slopes) / (2*1*10**9), np.std(slopes) / (2*1*10**9)]  # divide by dimension and converted to m^2/s
+
+    def plot_msd(self, CI=95, nerrorbars=50, fracshow=0.5, save=True):
+        """ Plot averaged mean squared displacement with error bars
+
+        :param CI: confidence interval for error bars
+        :param nerrorbars: show this many error bars
+        :param fracshow: fraction of MSD to plot
+        :param save: save the figure and the msd raw data
+
+        :type CI: float
+        :type nerrorbars: int
+        :type fracshow: float between 0 and 1
+        :type save: bool
+
+        """
+
+        plt.figure()
+        error = confidence_interval(self.bootstrapped_msd, CI)
+        plt.errorbar(self.time_uniform, self.msd.mean(axis=0), yerr=error, errorevery=self.msd.shape[1] // nerrorbars,
+                     linewidth=2, elinewidth=2)
+        plt.title('Diffusivity: %1.2e $\pm$ %1.2e m$^2$/s' % (self.D[0], self.D[1]))
+        plt.xlabel('Time (ns)', fontsize=14)
+        plt.ylabel('Mean squared displacement (nm$^2$)', fontsize=14)
+        plt.gcf().get_axes()[0].tick_params(labelsize=14)
+        plt.tight_layout()
+        plt.savefig('msd_ctrw.pdf')
+        np.savez_compressed('msd.npz', msd=self.msd.mean(axis=0), error=error, time=self.time_uniform)
+        plt.show()
 
 
 if __name__ == "__main__":
@@ -240,33 +478,20 @@ if __name__ == "__main__":
     args = initialize().parse_args()
 
     sys = System(args.trajectory, args.gro, args.residue, start=args.begin, end=args.end, step=args.step)
+
+    if args.restrict_to_pores:
+        sys.restrict_to_pores(args.pore_defining_atoms, args.pore_defining_residue, args.pore_radius)
+
     sys.hops_and_dwells()
-    sys.fit_distributions(nbins=args.nbins)
+    sys.fit_distributions(nbins=args.nbins, nboot=args.nboot)
 
     random_walks = CTRW(args.nhops, sys.lambda_distribution, sys.hop_sigma_distribution, 200)
+    random_walks.generate_trajectories()
+    random_walks.calculate_msd()
+    random_walks.fit_msd()
+    random_walks.bootstrap_msd()
+    random_walks.plot_msd()
+    # for i in range(10):
+    #     random_walks.plot_trajectory(i, show=False, save=True, savename='ctrw_trajectory_%d.pdf' % i)
 
-    # make uniform time intervals
-    n_pts = int(0.1*nhops)
-    time_uniform = np.linspace(0, time[-1], n_pts)
-    z_interpolated = np.zeros([n_pts, 1])
-    for i, x in enumerate(time_uniform):
-        time_index = np.argmin(np.abs(x - time))
-        if x - time[time_index] < 0:
-            time_index -= 1
-        z_interpolated[i, 0] = z_position[time_index]
-    #	print(x, time[time_index], z_interpolated[i])
-
-
-    msd = msd_fft(z_interpolated[:, 0])
-
-    fig, ax = plt.subplots(1, 2, figsize=(12,5))
-    ax[0].plot(time, z_position, linewidth=2, label='Raw generated data')
-    ax[0].plot(time_plottable, z_positions_plottable, '--', color='black', linewidth=2, label='Data converted to hops')
-    ax[0].plot(time_uniform, z_interpolated[:, 0], label='Uniform time intervals')
-    ax[0].set_xlabel('Time (ns)', fontsize=16)
-    ax[0].set_ylabel('$z$-coordinate (nm)', fontsize=16)
-    ax[0].legend()
-
-    ax[1].plot(time_uniform, msd)
-    #ax[1].plot(time_uniform, msd2)
-    plt.show()
+    print('Diffusivity: %1.2e +/- %1.2e m$^2$/s' % (random_walks.D[0], random_walks.D[1]))

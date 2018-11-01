@@ -75,7 +75,7 @@ def write_assembly(b, output, no_mon, bcc=False, xlink=False):
         a = b
     else:
         if not bcc:
-            with open("%s/../HII/top/Monomer_Tops/%s" % (location, '%s.itp' % b), "r") as f:
+            with open("%s/../top/topologies/%s" % (location, '%s.itp' % b), "r") as f:
                 a = []
                 for line in f:
                     a.append(line)
@@ -173,11 +173,13 @@ def write_assembly(b, output, no_mon, bcc=False, xlink=False):
 
     for i in range(int(no_mon)):
         for k in range(0, ndp):
-            f.write('{:6d}{:7d}{:7d}{:7d}{:}'.format(i*nr + int(a[k + dihedrals_p_index + 3][0:6]),
-                                                   i*nr + int(a[k + dihedrals_p_index + 3][6:14]),
-                                                   i*nr + int(a[k + dihedrals_p_index + 3][14:22]),
-                                                   i*nr + int(a[k + dihedrals_p_index + 3][22:30]),
-                                                   a[k + dihedrals_p_index + 3][30:len(a[k + dihedrals_p_index + 3])]))
+            info = [int(x) for x in a[k + dihedrals_p_index + 3].split()]
+            # f.write('{:6d}{:7d}{:7d}{:7d}{:}'.format(i*nr + int(a[k + dihedrals_p_index + 3][0:6]),
+            #                                        i*nr + int(a[k + dihedrals_p_index + 3][6:14]),
+            #                                        i*nr + int(a[k + dihedrals_p_index + 3][14:22]),
+            #                                        i*nr + int(a[k + dihedrals_p_index + 3][22:30]),
+            #                                        a[k + dihedrals_p_index + 3][30:len(a[k + dihedrals_p_index + 3])]))
+            f.write('{:6d}{:7d}{:7d}{:7d}{:7d}\n'.format(info[0], info[1], info[2], info[3], info[4]))
 
     f.write("\n")  # space in between sections
 
@@ -187,18 +189,21 @@ def write_assembly(b, output, no_mon, bcc=False, xlink=False):
     ndimp = 0  # number of lines in the 'dihedrals ; impropers' section
     dihedrals_imp_count = dihedrals_imp_index + 3
 
-    while a[dihedrals_imp_count] != '\n':
+    while dihedrals_imp_count < len(a) and a[dihedrals_imp_count] != '\n':
         dihedrals_imp_count += 1
         ndimp += 1
 
     # Can't have any space at the bottom of the file for this loop to work
     for i in range(int(no_mon)):
         for k in range(0, ndimp):
-            f.write('{:6d}{:7d}{:7d}{:7d}{:}'.format(i*nr + int(a[k + dihedrals_imp_index + 3][0:6]),
-                                                   i*nr + int(a[k + dihedrals_imp_index + 3][6:14]),
-                                                   i*nr + int(a[k + dihedrals_imp_index + 3][14:22]),
-                                                   i*nr + int(a[k + dihedrals_imp_index + 3][22:30]),
-                                                   a[k + dihedrals_imp_index + 3][30:len(a[k + dihedrals_imp_index + 3])]))
+            info = [int(x) for x in a[k + dihedrals_p_index + 3].split()]
+            # f.write('{:6d}{:7d}{:7d}{:7d}{:}'.format(i*nr + int(a[k + dihedrals_imp_index + 3][0:6]),
+            #                                        i*nr + int(a[k + dihedrals_imp_index + 3][6:14]),
+            #                                        i*nr + int(a[k + dihedrals_imp_index + 3][14:22]),
+            #                                        i*nr + int(a[k + dihedrals_imp_index + 3][22:30]),
+            #                                        a[k + dihedrals_imp_index + 3][30:len(a[k + dihedrals_imp_index + 3])]))
+            f.write('{:6d}{:7d}{:7d}{:7d}{:7d}\n'.format(info[0], info[1], info[2], info[3], info[4]))
+
     f.write("\n")  # space in between sections
 
     # [ virtual_sites4 ]

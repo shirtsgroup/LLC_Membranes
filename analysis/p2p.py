@@ -150,7 +150,8 @@ def avg_pore_loc(npores, pos, buffer=0):
 
     elif len(pos.shape) == 2:  # single frame
 
-        comp_ppore = old_div(pos.shape[1], npores)
+        comp_ppore = pos.shape[0] // npores
+
         p_center = np.zeros([2, npores])
 
         for j in range(npores):

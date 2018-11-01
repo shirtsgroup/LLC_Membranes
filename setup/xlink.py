@@ -44,9 +44,8 @@ def initialize():
     parser.add_argument('-rad_percent', default=20, type=float, help='Percent of radicals that react each iteration.'
                                                                      'Not stable above 50 %')
     parser.add_argument('-out', '--output_gro', default='xlinked.gro', help='Name of final cross-linked structure')
-    parser.add_argument('-rad_frac_term', default=0.5, type=float, help='Fraction of radicals that will be terminated'
+    parser.add_argument('-rad_frac_term', default=50, type=float, help='Out of 100, how many radicals that will be terminated'
                                                                         'on each iteration.')
-
     return parser
 
 
@@ -443,7 +442,7 @@ class Topology():
 class System(Topology):
 
     def __init__(self, initial_configuration, residue, dummy_residue, dummy_name='dummies.gro',
-                 reaction_percentage=1, cutoff=0.6, radical_reaction_percentage=20, radical_termination_fraction=0.5):
+                 reaction_percentage=1, cutoff=0.6, radical_reaction_percentage=20, radical_termination_fraction=50):
 
         add_dummies(md.load(initial_configuration), residue, dummy_residue,
                     out=dummy_name)  # add dummy atoms to the initial configuration
@@ -474,7 +473,7 @@ class System(Topology):
         self.reaction_percentage = reaction_percentage / 100.
         self.cutoff = cutoff
         self.former_radicals = None
-        self.rad_frac_term = radical_termination_fraction
+        self.rad_frac_term = radical_termination_fraction / 100.
 
     def simulate(self, configuration, mdp='em.mdp', top='topol.top', out='em'):
         """
@@ -673,6 +672,7 @@ class System(Topology):
 
             # terminate enough radicals to keep the number of radicals stable
             nterm = int(rad_term_frac * len(self.radicals))
+            print(len(self.radicals), nterm)
             chosen_terminated_radicals = np.random.choice(len(self.radicals), size=nterm, replace=False)
             self.terminated_radicals = np.array(self.radicals)[chosen_terminated_radicals]
             self.radicals = np.delete(self.radicals, chosen_terminated_radicals).tolist()
@@ -802,7 +802,6 @@ class System(Topology):
 
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in
-
 
 if __name__ == "__main__":
 

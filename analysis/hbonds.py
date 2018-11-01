@@ -25,6 +25,7 @@ import numpy as np
 import os
 import tqdm
 import matplotlib.pyplot as plt
+import pickle
 
 script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -52,15 +53,16 @@ def initialize():
 
 class System(object):
 
-    def __init__(self, traj, gro, top, begin=0, end=-1, res='all', exclude_water=False):
+    def __init__(self, traj, gro, top, begin=0, end=-1, exclude_water=False):
 
         self.top = Topology(top)
 
         print('Loading trajectory...', end="", flush=True)
-        self.t = md.load(traj, top=gro)[begin:end:3]
+        self.t = md.load(traj, top=gro)[begin:end]
         print('Done!')
         self.pos = self.t.xyz  # positions of all atoms
         self.hbonds = []  # will hold h-bonds for each frame [D, H, A, angle]
+        self.dt = self.t.time[1] - self.t.time[0]
 
         # for hbond_pairing
         # self.nwater = 0
@@ -92,6 +94,10 @@ class System(object):
         self.D = []
         self.H = []
         self.A = []
+
+        self.donor_acceptor_matrix = None
+        self.atom_to_matrix_index = {}
+        self.matrix_to_atom_index = {}
 
         if not exclude_water:
 
@@ -194,7 +200,7 @@ class System(object):
 
     def number_water_molecules(self):
         """
-        A specific form of number_residues funtion (below)
+        A specific form of number_residues function (below)
         :return:
         """
         water_numbers = {}
@@ -225,6 +231,30 @@ class System(object):
             atoms += 1
 
         return residue_numbers, nres
+
+    def save_hbonds(self, name='hbonds.pl'):
+
+        with open(name, 'wb') as f:
+            pickle.dump(self.hbonds, f)
+
+    def hbond_matrix(self):
+
+        unique_atoms = []
+        for i in range(len(self.hbonds)):
+            unique_atoms.append(np.unique(self.hbonds[i][::2, :]))
+
+        unique = np.unique(np.concatenate(unique_atoms))
+
+        for i in range(unique.size):
+            self.atom_to_matrix_index[int(unique[i])] = i
+            self.matrix_to_atom_index[i] = int(unique[i])
+
+        self.donor_acceptor_matrix = np.zeros([len(self.hbonds), unique.size])
+
+        for t in range(len(self.hbonds)):
+            hbond_frame = self.hbonds[t]
+            for i in range(hbond_frame.shape[1]):
+                self.donor_acceptor_matrix[t, self.atom_to_matrix_index[hbond_frame[0, i]]] = hbond_frame[2, i]
 
 
 class Residue(object):
@@ -358,8 +388,5 @@ if __name__ == "__main__":
         sys.set_eligible(r, args.atoms[i])
 
     sys.identify_hbonds(args.distance, args.angle_cut)
-    import pickle
-    with open("hbonds.pl", 'wb') as f:
-        pickle.dump(sys.hbonds, f)
 
     sys.plot_hbonds()
