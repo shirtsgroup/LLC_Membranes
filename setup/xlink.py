@@ -49,6 +49,11 @@ def initialize():
     parser.add_argument('-stagnation', default=5, type=int, help='The number of iterations without generating a new'
                                                                  'cross-link before the algorithm forces termination')
 
+    # parallelization options
+    parser.add_argument('-mpi', '--parallelize', action="store_true", help='specify true if running with MPI or GPU')
+    parser.add_argument('-np', '--nproc', default=4, type=int, help='Number of processess to run in parallel (number'
+                                                                    'of GPUs on Bridges and Summit)')
+
     return parser
 
 
@@ -837,8 +842,8 @@ if __name__ == "__main__":
     sys.write_assembly_topology()
 
     # generate input files that will be used throughtout cross-linking process
-    full_top = SystemTopology(args.dummy_name, ff=args.forcefield, xlink=True)  # topology with other residues and forcefield
-    full_top.write_top(name=args.topname, crosslinked_top_name=args.xlink_top_name)
+    full_top = SystemTopology(args.dummy_name, ff=args.forcefield, xlink=True, xlinked_top_name=args.xlink_top_name)  # topology with other residues and forcefield
+    full_top.write_top(name=args.topname)
     mdpshort = SimulationMdp(args.dummy_name, T=args.temperature, em_steps=args.em_steps, time_step=args.dt,
         length=args.length, p_coupling='semiisotropic', barostat='berendsen', genvel='yes', restraints=False,
                              xlink=True, bcc=False)
@@ -853,7 +858,8 @@ if __name__ == "__main__":
 
     # energy minimize starting configuration to get dummies in the right place
     print('Energy minimizing %s...' % args.dummy_name, end='', flush=True)
-    sys.simulate(args.dummy_name, mdp=args.mdp_em, top=args.topname, out='em_%s' % args.dummy_name.split('.')[0])
+    sys.simulate(args.dummy_name, mdp=args.mdp_em, top=args.topname, out='em_%s' % args.dummy_name.split('.')[0],
+                 parallel=args.parallelize, np=args.nproc)
     print('Done!')
 
     # Rest of iterations
@@ -877,13 +883,15 @@ if __name__ == "__main__":
         # energy minimize then run short NVT simulation
         print('Energy minimizing new cross-links...', end='', flush=True)
         if sys.iteration == 1:
-            sys.simulate('em_%s' % args.dummy_name.split('.')[0], mdp=args.mdp_em, top=args.topname, out='em')
+            sys.simulate('em_%s' % args.dummy_name.split('.')[0], mdp=args.mdp_em, top=args.topname, out='em',
+                         parallel=args.parallelize, np=args.nproc)
         else:
-            sys.simulate('nvt.gro', mdp=args.mdp_em, top=args.topname, out='em')
+            sys.simulate('nvt.gro', mdp=args.mdp_em, top=args.topname, out='em', parallel=args.parallelize,
+                         np=args.nproc)
         print('Done!')
 
         print('Running %.1f ps NVT simulation...' % args.length, end='', flush=True)
-        sys.simulate('em.gro', mdp=args.mdp_nvt, top=args.topname, out='nvt')
+        sys.simulate('em.gro', mdp=args.mdp_nvt, top=args.topname, out='nvt', parallel=args.parallelize, np=args.nproc)
         print('Done!')
 
         print('\nTotal new cross-links: %d' % len(sys.bond_c1))
@@ -912,7 +920,8 @@ if __name__ == "__main__":
     print('Done!')
 
     print('Energy minimizing %s...' % args.output_gro, end='', flush=True)
-    sys.simulate(args.output_gro, mdp=args.mdp_em, top=args.topname, out=args.output_gro.split('.')[0])
+    sys.simulate(args.output_gro, mdp=args.mdp_em, top=args.topname, out=args.output_gro.split('.')[0],
+                 parallel=args.parallelize, np=args.nproc)
     print('Done!')
 
     print('Finished cross-linking in %.2f seconds' % (time.time() - start))
