@@ -819,6 +819,8 @@ if __name__ == "__main__":
 
     args = initialize().parse_args()
 
+    os.environ["GMX_MAXBACKUP"] = "-1"  # stop GROMACS from making backups
+
     start = time.time()
     initial_message = '# Cross-linking %s #' % args.initial
     print('#'*len(initial_message))
