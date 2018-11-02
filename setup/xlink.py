@@ -46,6 +46,9 @@ def initialize():
     parser.add_argument('-out', '--output_gro', default='xlinked.gro', help='Name of final cross-linked structure')
     parser.add_argument('-rad_frac_term', default=50, type=float, help='Out of 100, how many radicals that will be terminated'
                                                                         'on each iteration.')
+    parser.add_argument('-stagnation', default=5, type=int, help='The number of iterations without generating a new'
+                                                                 'cross-link before the algorithm forces termination')
+
     return parser
 
 
@@ -850,7 +853,8 @@ if __name__ == "__main__":
     print('Done!')
 
     # Rest of iterations
-    while (len(sys.terminate) / sys.total_possible_terminated) < (args.density / 100.):
+    stagnated_iterations = 0
+    while (len(sys.terminate) / sys.total_possible_terminated) < (args.density / 100.) and stagnated_iterations < args.stagnation:
 
         print('-'*80)
         print('Iteration: %d' % sys.iteration)
@@ -884,6 +888,11 @@ if __name__ == "__main__":
         print('Total radicals terminated: %.2d' % len(sys.terminated_radicals))
         print('Total radicals left in system: %d' % len(sys.radicals))
         print('Percent terminated: %.2f' % (100 * len(sys.terminate) / sys.total_possible_terminated))
+
+        if len(sys.bond_c1) > 0:
+            stagnated_iterations = 0
+        else:
+            stagnated_iterations += 1
 
         # update log
         sys.update_log()
