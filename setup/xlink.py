@@ -488,18 +488,17 @@ class System(Topology):
         Energy minimize a configuration using existing .mdp files
         """
 
-        if parallel:
-            gmx = "mpirun -np %s gmx_mpi" % np
-        else:
-            gmx = "gmx"
-
         p1 = subprocess.Popen(
             ["gmx", "grompp", "-p", "%s" % top, "-f", "%s" % mdp, "-o", "%s" % out, "-c", "%s" % configuration],
             stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
         p1.wait()
 
-        p2 = subprocess.Popen(["%s" % gmx, "mdrun", "-deffnm", "%s" % out], stdout=open(os.devnull, 'w'),
-                              stderr=subprocess.STDOUT)  # run energy minimization
+        if parallel:
+            p2 = subprocess.Popen(["mpirun", "-np", "%s" % np, "gmx_mpi", "mdrun", "-deffnm", "%s" % out],
+                                  stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
+        else:
+            p2 = subprocess.Popen(["gmx", "mdrun", "-deffnm", "%s" % out], stdout=open(os.devnull, 'w'),
+                                  stderr=subprocess.STDOUT)  # run energy minimization
         p2.wait()
 
     def minimum_image_distances(self, list1, list2):
