@@ -245,7 +245,8 @@ def placement(z, pts, box):
 
 class Solvent(object):
 
-    def __init__(self, gro, intermediate_fname='solvate.gro', em_steps=100, p_coupling='isotropic'):
+    def __init__(self, gro, intermediate_fname='solvate.gro', em_steps=100, p_coupling='isotropic', xlink=False,
+                 xlinked_topname='assembly.itp'):
         """
         :param gro: configuration of solvent
         :param intermediate_fname : name of intermediate .gro files if placing solute in box
@@ -262,7 +263,7 @@ class Solvent(object):
         self.positions = self.t.xyz[0, :, :]  # positions of all atoms
         self.residues = []
         self.names = []
-        self.top = SystemTopology(gro)
+        self.top = SystemTopology(gro, xlink=xlink, xlinked_top_name=xlinked_topname)
         self.intermediate_fname = intermediate_fname
         self.em_steps = em_steps
 

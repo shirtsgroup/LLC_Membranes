@@ -478,17 +478,22 @@ class System(Topology):
         self.former_radicals = None
         self.rad_frac_term = radical_termination_fraction / 100.
 
-    def simulate(self, configuration, mdp='em.mdp', top='topol.top', out='em'):
+    def simulate(self, configuration, mdp='em.mdp', top='topol.top', out='em', parallel=True, np=4):
         """
         Energy minimize a configuration using existing .mdp files
         """
+
+        if parallel:
+            gmx = "mpirun -np %s gmx_mpi" % np
+        else:
+            gmx = "gmx"
 
         p1 = subprocess.Popen(
             ["gmx", "grompp", "-p", "%s" % top, "-f", "%s" % mdp, "-o", "%s" % out, "-c", "%s" % configuration],
             stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
         p1.wait()
 
-        p2 = subprocess.Popen(["gmx", "mdrun", "-deffnm", "%s" % out], stdout=open(os.devnull, 'w'),
+        p2 = subprocess.Popen(["%s" % gmx, "mdrun", "-deffnm", "%s" % out], stdout=open(os.devnull, 'w'),
                               stderr=subprocess.STDOUT)  # run energy minimization
         p2.wait()
 
@@ -675,7 +680,6 @@ class System(Topology):
 
             # terminate enough radicals to keep the number of radicals stable
             nterm = int(rad_term_frac * len(self.radicals))
-            print(len(self.radicals), nterm)
             chosen_terminated_radicals = np.random.choice(len(self.radicals), size=nterm, replace=False)
             self.terminated_radicals = np.array(self.radicals)[chosen_terminated_radicals]
             self.radicals = np.delete(self.radicals, chosen_terminated_radicals).tolist()

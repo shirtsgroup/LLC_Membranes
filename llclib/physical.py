@@ -2,7 +2,7 @@
 
 from __future__ import division
 from builtins import range
-from LLC_Membranes.llclib import file_rw
+from LLC_Membranes.llclib import file_rw, transform
 import mdtraj as md
 import numpy as np
 import matplotlib.path as mplPath
@@ -206,12 +206,17 @@ def conc(t, comp, b):
     return avg_conc, std, avg_cross, thick, z_max, z_min
 
 
-def avg_pore_loc(npores, pos):
-    """
+def avg_pore_loc(npores, pos, buffer=0):
+    """ Calculate average pore location for each pore at each frame
+
     :param no_pores: the number of pores in the unit cell
     :param pos: the coordinates of the component(s) which you are using to locate the pore centers
-                      (numpy array with dimensions: [no frames, no components, xyz coordinates, ] or just
-                      [no components, xyz coordinates] for a single frame)
+    :param buffer: fraction (of membrane thickness) of top and bottom of membrane to exclude from p2p calculations
+
+    :type no_pores: int
+    :type pos: numpy.ndarray, shape(ncomponents, 3) or numpy.ndarray, shape(nframes, ncomponents, 3)
+    :type buffer: float
+
     :return: numpy array containing the x, y coordinates of the center of each pore at each frame
     """
 
@@ -222,24 +227,33 @@ def avg_pore_loc(npores, pos):
         nT = np.shape(pos)[0]
         comp_ppore = np.shape(pos)[1] // npores
 
-        p_center = np.zeros([2, npores, nT])
+        #p_center = np.zeros([2, npores, nT])
+        p_center = np.zeros([nT, npores, 2])
 
         for i in range(nT):
+            zmax = np.amax(pos[i, :, 2])  # maximum z value for this frame
+            zmin = np.amin(pos[i, :, 2])  # minimum z value for this frame
+            thick = zmax - zmin
+            zmax -= buffer*thick
+            zmin += buffer*thick
             for j in range(npores):
+                count = 0
                 for k in range(comp_ppore*j, comp_ppore*(j + 1)):
-                    p_center[:, j, i] += pos[i, k, :2]
-                p_center[:, j, i] /= comp_ppore  # take the average
+                    if zmax >= pos[i, k, 2] >= zmin:
+                        p_center[i, j, :] += pos[i, k, :2]
+                        count += 1
+                p_center[i, j, :] /= count  # take the average
 
     elif len(pos.shape) == 2:  # single frame
 
         comp_ppore = pos.shape[0] // npores
 
-        p_center = np.zeros([2, npores])
+        p_center = np.zeros([npores, 2])
 
         for j in range(npores):
             for k in range(comp_ppore*j, comp_ppore*(j + 1)):
-                p_center[:, j] += pos[k, :2]
-            p_center[:, j] /= comp_ppore
+                p_center[j, :] += pos[k, :2]
+            p_center[j, :] /= comp_ppore
 
     else:
         return 'Please use a position array with valid dimensions'
@@ -303,3 +317,118 @@ def limits(pos, pcenters):
             radii[t, p] = np.mean(deviation[t, p, :])
 
     return radii
+
+
+def put_in_box(pt, x_box, y_box, m, angle):
+    """
+    :param pt: The point to place back in the box
+    :param x_box: length of box in x dimension
+    :param y_box: length of box in y dimension
+    :param m: slope of box vector
+    :param angle: angle between x axis and y box vector
+    :return: coordinate shifted into box
+    """
+
+    b = - m * x_box  # y intercept of box vector that does not pass through origin (right side of box)
+    if pt[1] < 0:
+        pt[:2] += [np.cos(angle)*x_box, np.sin(angle)*x_box]  # if the point is under the box
+    if pt[1] > y_box:
+        pt[:2] -= [np.cos(angle)*x_box, np.sin(angle)*x_box]
+    if pt[1] > m*pt[0]:  # if the point is on the left side of the box
+        pt[0] += x_box
+    if pt[1] < m*(pt[0] - b):  # if the point is on the right side of the box
+        pt[0] -= x_box
+
+    return pt
+
+
+def trace_pores(pos, box, npoints, npores=4):
+    """
+    Find the line which traces through the center of the pores
+    :param pos: positions of atoms used to define pore location (args.ref) [natoms, 3]
+    :param box: xy box vectors, [2, 2], mdtraj format
+    :param npoints: number of points for spline in each pore
+    :param npores: number of pores in unit cell (assumed that atoms are number sequentially by pore. i.e. pore 1 atom
+    numbers all precede those in pore 2)
+    :return: points which trace the pore center
+    """
+
+    # assumes trajectory. Probably can add a new axis if a single frame is used
+    nframes = pos.shape[0]
+    atoms_p_pore = int(pos.shape[1] / npores)  # atoms in each pore
+
+    v = np.zeros([nframes, 4, 2])  # vertices of unitcell box
+    bounds = []
+
+    v[:, 0, :] = [0, 0]
+    v[:, 1, 0] = box[:, 0, 0]
+    v[:, 3, :] = np.vstack((box[:, 1, 0], box[:, 1, 1])).T
+    v[:, 2, :] = v[:, 3, :] + np.vstack((box[:, 0, 0], np.zeros([nframes]))).T
+    center = np.vstack((np.mean(v[..., 0], axis=1), np.mean(v[..., 1], axis=1), np.zeros(nframes))).T
+
+    for t in range(nframes):
+        bounds.append(mplPath.Path(v[t, ...]))  # create a path tracing the vertices, v
+
+    angle = np.arccos(box[:, 1, 1]/box[:, 0, 0])
+    angle = np.where(box[:, 1, 0] < 0, angle + np.pi / 2, angle)  # haven't tested this well yet
+
+    m = (v[:, 3, 1] - v[:, 0, 1]) / (v[:, 3, 0] - v[:, 0, 0])  # slope from points connecting first and third vertices
+
+    centers = np.zeros([nframes, npores, npoints, 3])
+    bin_centers = np.zeros([nframes, npores, npoints])
+
+    for t in tqdm.tqdm(range(nframes)):
+        for p in range(npores):
+
+            pore = pos[t, p*atoms_p_pore:(p+1)*atoms_p_pore, :]  # coordinates for atoms belonging to a single pore
+            _, bins = np.histogram(pore[:, 2], bins=npoints)  # bin z-positions
+            section_indices = np.digitize(pore[:, 2], bins)  # list that tells which bin each atom belongs to
+            bin_centers[t, p, :] = [(bins[i] + bins[i + 1])/2 for i in range(npoints)]
+
+            for l in range(1, npoints + 1):
+
+                atom_indices = np.where(section_indices == l)[0]
+
+                before = pore[atom_indices[0], :]  # choose the first atom as a reference
+
+                shift = transform.translate(pore[atom_indices, :], before, center[t, :])  # shift everything to towards the center
+
+                for i in range(shift.shape[0]):  # check if the points are within the bounds of the unitcell
+                    if not bounds[t].contains_point(shift[i, :2]):
+                        shift[i, :] = put_in_box(shift[i, :], box[0, 0], box[1, 1], m, angle)  # if its not in the unitcell, shift it so it is
+
+                c = [np.mean(shift, axis=0)]
+
+                centers[t, p, l - 1, :] = transform.translate(c, center[t, :], before)  # move everything back to where it was
+
+                if not bounds[t].contains_point(centers[t, p, l - 1, :]):  # make sure everything is in the box again
+                    centers[t, p, l - 1, :] = put_in_box(centers[t, p, l - 1, :], box[0, 0], box[1, 1], m, angle)
+
+    return centers, bin_centers
+
+
+def center_of_mass(pos, matoms):
+    """ Calculate center of mass of residues over a trajectory
+
+    :param pos: xyz coordinates of atoms
+    :param names: names of atoms in order they appear in pos
+    :param residue: residue object (llclib.topology.Residue())
+
+    :type pos: np.array (nframes, natoms, 3)
+    :type names: list
+    :type residue: llclib.topology.Residue() object
+
+    :return: center of mass of each residue at each frame
+    """
+
+    nframes = pos.shape[0]
+    natoms = len(matoms)
+
+    com = np.zeros([nframes, pos.shape[1] // natoms, 3])  # track the center of mass of each residue
+
+    for f in range(nframes):
+        for i in range(com.shape[1]):
+            w = (pos[f, i * natoms:(i + 1) * natoms, :].T * matoms).T  # weight each atom in the residue by its mass
+            com[f, i, :] = np.sum(w, axis=0) / sum(matoms)  # sum the coordinates and divide by the mass of the residue
+
+    return com

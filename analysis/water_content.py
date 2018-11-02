@@ -3,7 +3,7 @@
 import argparse
 import mdtraj as md
 from LLC_Membranes.setup.place_solutes import trace_pores
-from LLC_Membranes.analysis import Atom_props
+from LLC_Membranes.analysis import Atom_props, p2p
 import numpy as np
 import matplotlib.pyplot as plt
 import tqdm
@@ -15,16 +15,24 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Figure out the weight percent of water in the pores and tails')
 
-    parser.add_argument('-t', '--traj', default='PR.xtc', help='Name of GROMACS trajectory file. This file should be'
+    # trajectory control
+    parser.add_argument('-t', '--traj', default=False, help='Name of GROMACS trajectory file. This file should be'
                         'preprocessed so everything is the box. For example, use gmx trjconv -ur tric -pbc atom. In the'
-                        'event that a box vector crosses through a pore, use shift_box.py first to fix that.')
+                        'event that a box vector crosses through a pore, use shift_box.py first to fix that. Specify'
+                                                            'False (default) if you are only looking at a single frame')
     parser.add_argument('-g', '--gro', default='PR.gro', help='Name of GROMACS coordinate file')
+    parser.add_argument('-begin', default=0, type=int, help='First frame to read')
+    parser.add_argument('-end', default=-1, type=int, help='Last frame to read')
+    parser.add_argument('-skip', default=1, type=int, help='Skip every n frames')
+
+    # define system
+    parser.add_argument('-p', '--pore_atoms', nargs='+', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='Atoms that'
+                        'will be used to define the pore region')
     parser.add_argument('-ox', '--tail_oxygen', nargs='+', default=['O5', 'O6', 'O7', 'O8', 'O9', 'O10'], help='Oxygen'
                         'atoms that will be used to define the tail region')
     parser.add_argument('-tr', '--tail_radius', default=0.5, type=float, help='Max distance from tail oxygens a water '
                         'molecule can exist in order to be counted as inside the pore')
-    parser.add_argument('-p', '--pore_atoms', nargs='+', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='Atoms that'
-                        'will be used to define the pore region')
+
     parser.add_argument('-pr', '--pore_radius', default=0.5, type=float, help='Max distance from pore center a water '
                         'molecule can exist in order to be counted as inside the pore')
     parser.add_argument('-b', '--bounds', default=5, type=float, help='Distance from z-center up until which all atoms '
@@ -36,7 +44,6 @@ def initialize():
     parser.add_argument('--load', action="store_true")
     parser.add_argument('--save', action="store_true")
     parser.add_argument('-boot', '--nboot', default=200, type=int, help='Number of bootstrap trials')
-    parser.add_argument('-begin', default=0, type=int, help='Start Frame')
     parser.add_argument('--single_frame', action='store_true', help='Specify this flag in order to analyze a single'
                                                                     '.gro file. No statistics will be generated')
     parser.add_argument('--tcl', action='store_true', help='Create .tcl file that create representation of water within'
@@ -160,24 +167,60 @@ def bootstrap(data, tau, nboot):
     return np.mean(boot), np.std(boot)
 
 
+class System(object):
+
+    def __init__(self, gro, pore_atoms, residue, traj=False, begin=0, end=-1, skip=1):
+        """ Define the system and boundaries for pore and tail region
+
+        :param gro: coordinate file
+        :param pore_atoms: atoms used to define the pore locations
+        :param traj: trajectory file
+        :param begin: first frame to include
+        :param end: last frame to include
+        :param skip: skip every n frames
+        """
+
+        print('Loading trajectory...', flush=True, end='')
+        if traj:
+            self.t = md.load(traj, top=args.gro)[begin:end:skip]
+        else:
+            self.t = md.load(gro)
+        print('Done')
+
+        # coordinates and unit cell dimensions
+        self.pos = self.t.xyz
+        box = self.t.unitcell_vectors
+        self.box = [box[0, 0, 0], box[0, 1, 1], box[0, 2, 2], box[0, 0, 1], box[0, 2, 0],
+                   box[0, 1, 0], box[0, 0, 2], box[0, 1, 2], box[0, 2, 0]]  # gromacs format
+        self.res = np.array([a.residue.name for a in self.t.topology.atoms])  # all of the residues
+        self.ids = np.array([a.name for a in self.t.topology.atoms])  # all of the atom names
+
+        # find pore centers
+        pore_atoms = [a.index for a in self.t.topology.atoms if a.name in pore_atoms]
+        self.pore_centers = p2p.avg_pore_loc(4, self.pos[:, pore_atoms, :])
+
+
 if __name__ == "__main__":
 
     args = initialize()
 
-    print('Loading trajectory...', flush=True, end='')
-    if args.single_frame:
-        t = md.load(args.gro)
-    else:
-        t = md.load(args.traj, top=args.gro)[args.begin:]
-    print('Done!')
+    sys = System(args.gro, args.pore_atoms, traj=args.traj, begin=args.begin, end=args.end, skip=args.skip)
 
-    pos = t.xyz
-    box = t.unitcell_vectors
-    res = np.array([a.residue.name for a in t.topology.atoms])
-    ids = np.array([a.name for a in t.topology.atoms])
-    pores = [a.index for a in t.topology.atoms if a.name in args.pore_atoms]
-    box_gromacs = [box[0, 0, 0], box[0, 1, 1], box[0, 2, 2], box[0, 0, 1], box[0, 2, 0],
-                   box[0, 1, 0], box[0, 0, 2], box[0, 1, 2], box[0, 2, 0]]
+    # print('Loading trajectory...', flush=True, end='')
+    # if args.single_frame:
+    #     t = md.load(args.gro)
+    # else:
+    #     t = md.load(args.traj, top=args.gro)[args.begin:]
+    # print('Done!')
+    #
+    # pos = t.xyz
+    # box = t.unitcell_vectors
+    # res = np.array([a.residue.name for a in t.topology.atoms])
+    # ids = np.array([a.name for a in t.topology.atoms])
+    # pores = [a.index for a in t.topology.atoms if a.name in args.pore_atoms]
+    # box_gromacs = [box[0, 0, 0], box[0, 1, 1], box[0, 2, 2], box[0, 0, 1], box[0, 2, 0],
+    #                box[0, 1, 0], box[0, 0, 2], box[0, 1, 2], box[0, 2, 0]]
+
     mwater = 18.016
     disregard = False
 

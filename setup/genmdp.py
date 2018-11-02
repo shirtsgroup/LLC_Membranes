@@ -157,7 +157,7 @@ class SimulationMdp(object):
         a.append(['DispCorr = EnerPres\n'])
         if self.xlink:
             a.append(['periodic-molecules = yes\n'])
-            a.append(['lincs-iter=4'])
+            #a.append(['lincs-iter=4'])  # I don't think this is necessary
         if self.restraints:
             a.append(['refcoord-scaling = all\n'])
 

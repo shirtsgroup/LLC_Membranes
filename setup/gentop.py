@@ -26,7 +26,7 @@ def initialize():
 
 class SystemTopology(object):
 
-    def __init__(self, gro, ff='gaff', restraints=False, xlink=False):
+    def __init__(self, gro, ff='gaff', restraints=False, xlink=False, xlinked_top_name='assembly.itp'):
         """
         :param gro: (str) coordinate file for which to create topology
         :param ff: (str) forcefield to use (default=gaff)
@@ -43,6 +43,27 @@ class SystemTopology(object):
         self.atom_masses = [Atom_props.mass[a.name] for a in t.topology.atoms]
         self.system_mass = sum(self.atom_masses)
         self.xlink = xlink
+        self.xlinked_top_name = xlinked_top_name
+
+        if self.xlink:
+            with open(xlinked_top_name, 'r') as f:
+                a = []
+                for line in f:
+                    if line.count('[ atoms ]') == 1:
+                        break
+                    else:
+                        a.append(line)
+
+            molecule = 0
+            while a[molecule].count('[ moleculetype ]') == 0:
+                molecule += 1
+            molecule += 1
+            while a[molecule][0] == ';':
+                molecule += 1
+
+            self.xlink_residue = a[molecule].split()[0]
+        else:
+            self.xlink_residue = None
 
         if restraints:
             if restraints is list:
@@ -81,8 +102,7 @@ class SystemTopology(object):
         self.residues = unique_residues
         self.residue_count = residue_count
 
-    def write_top(self, name='topol.top', description='Simulation Box', restrained_top_name='restrained.itp',
-                  crosslinked_top_name='crosslinked_new.itp'):
+    def write_top(self, name='topol.top', description='Simulation Box', restrained_top_name='restrained.itp'):
 
         self.name = name
 
@@ -106,8 +126,8 @@ class SystemTopology(object):
                         top.append('#include "%s"\n' % restrained_top_name)  # need to modify so this is not hardcoded.
                     else:
                         top.append('#include "%s/%s.itp"\n' % (self.top_location, r))
-                elif self.xlink and r not in self.ions and r != 'SOL':
-                    top.append('#include "%s"\n' % crosslinked_top_name)  # need to modify so this is not hardcoded.
+                elif self.xlink and r == self.xlink_residue:
+                    top.append('#include "%s"\n' % self.xlinked_top_name)  # need to modify so this is not hardcoded.
                 else:
                     top.append('#include "%s/%s.itp"\n' % (self.top_location, r))
                 top.append('\n')
@@ -125,7 +145,7 @@ class SystemTopology(object):
                     top.append('{:10s}{:>10d}\n'.format(r, 1))
                 else:
                     top.append('{:10s}{:>10d}\n'.format(r, self.residue_count[r]))
-            elif self.xlink and r not in self.ions and r != 'SOL':
+            elif self.xlink and r == self.xlink_residue:
                 top.append('{:10s}{:>10d}\n'.format(r, 1))
             else:
                 top.append('{:10s}{:>10d}\n'.format(r, self.residue_count[r]))
