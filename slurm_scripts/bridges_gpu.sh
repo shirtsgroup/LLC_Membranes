@@ -4,6 +4,8 @@
 #SBATCH -N 1 --tasks-per-node=4
 #SBATCH -t 48:00:00
 
-module load gromacs
-module load gromacs/2018_gpu
-module load python/3.6.4_gcc5_np1.14.5
+module purge  # clear out modules or else mdtraj gets screwed up
+module load gromacs/2018_gpu  # GPU accelerated gromacs installed by Marcela Madrid
+module load python/3.6.4_gcc5_np1.14.5  # this is the only version where numpy works. Will need to install mdtraj (pip install --user mdtraj)
+export PYTHONPATH="$PYTHONPATH:/home/bjc/Gromacs"  # Bridges forgets what is written in your .bashrc
+source /usr/bjc/Programs/Gromacs/bin/GMXRC # User installed threaded version of Gromacs since running grompp in parallel probably isn't a good idea
