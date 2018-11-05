@@ -6,3 +6,4 @@
 
 module load gromacs
 module load gromacs/2018_gpu
+module load python/3.6.4_gcc5_np1.14.5
