@@ -17,6 +17,7 @@ restraint_residue='HII'
 pd=0
 ncol=5
 
+OPTINID=1
 while getopts "b:r:m:t:p:f:e:S:P:q:R:n:o:" opt; do
     case $opt in
     b) BUILD_MON=$OPTARG;;
@@ -34,6 +35,8 @@ while getopts "b:r:m:t:p:f:e:S:P:q:R:n:o:" opt; do
     o) pd=$OPTARG;;
     esac
 done
+
+export GMX_MAXBACKUP=-1  # don't save backup files
 
 # directory where this script is located
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -62,7 +65,8 @@ ${GMX} mdrun -v -deffnm em
 n=$(awk '/Potential Energy/ {print $4}' em.log)
 echo $n
 if [[ ${n:0:2} == *"."* ]]; then
-	exec equil.sh
+    #bash ${DIR}/equil.sh -b ${BUILD_MON} -r ${ring_restraints} -m ${MPI} -t ${T} -p ${NP} -f ${forces} -e ${equil_length} -S ${start_config} -P ${python} -q ${quit_early} -R ${restraint_residue} -n ${ncol} -o ${pd}
+    bash ${DIR}/equil.sh -m ${MPI} -p ${NP} -P ${python} -q ${quit_early} -n ${ncol} -o ${pd}
 fi
 
 # run 1st restrained equilibration

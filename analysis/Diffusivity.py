@@ -51,15 +51,10 @@ def msd_fft(x, ndx):
 
     r = np.copy(x)
     r = r[:, ndx]
-    print(r.shape)
     N = len(r)
-    print(N)
     D = np.square(r).sum(axis=1)
-    print(len(D))
     D = np.append(D, 0)
     S2 = sum([autocorrFFT(r[:, i]) for i in range(r.shape[1])])
-    print(len(S2))
-    exit()
     Q = 2*D.sum()
     S1 = np.zeros(N)
     for m in range(N):
