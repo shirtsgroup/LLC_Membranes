@@ -28,8 +28,11 @@ def initialize():
                                                                        'stacked monomers persists (nm)')
     parser.add_argument('--no_column_shift', action="store_false", help="Do not randomly shift columns")
     parser.add_argument('-Lvar', default=0.1, type=float, help='Variance in z position of monomer heads (nm)')
-    parser.add_argument('-pd', '--parallel_displaced', default=0, type=float, help='Distance between center of mass '
-                        'of vertically stacked monomers on the xy plane. A distance of 0 is the same as sandwiched.')
+    # parser.add_argument('-pd', '--parallel_displaced', default=0, type=float, help='Distance between center of mass '
+    #                     'of vertically stacked monomers on the xy plane. A distance of 0 is the same as sandwiched.')
+    parser.add_argument('-pd', '--parallel_displaced', default=0, type=float, help='Angle of wedge formed between line'
+                        'extending from pore center to monomer and line from pore center to vertically adjacent monomer'
+                                                                                   'head group.')
     parser.add_argument('-box', '--box_lengths', nargs='+', type=float, help='Length of box vectors [x y z]')
     parser.add_argument('-angles', '--angles', nargs='+', default=[90, 90, 60], type=float, help='Angles between'
                         'box vectors')
@@ -113,12 +116,12 @@ class Assembly(LC):
 
         :param pore: pore number (0 : npores - 1)
         :param z: mean z-positions of monomers in column
-        :param theta: angle, with respect to pore center where column should be placed
+        :param theta: angle, with respect to pore center where column should be placed (degrees)
         :param correlation: adjust z positions so there is a correlation length
         :param var: variance in multivariate normal distribution used to make correlated points
         :param correlation_length: length for which correlation between stacked monomers to persist
-        :param pd: Specify a nonzero value to make a parallel displaced configuration. The distance here (in nm) will\
-         be the distance between the center of masses of two vertically stacked monomers.
+        :param pd: Angle of wedge created between vertically adjacent monomers. Defined by angle between vectors
+        extending from pore center to monomer head groups.
         :param random_shift: if True, randomly shift columns in z-direction by choosing a displacement from a uniform \
         distribution bounded by (0, d), where d is the vertical distance between stacked monomers
 
@@ -141,7 +144,7 @@ class Assembly(LC):
             dbwl = z[1] - z[0]  # distance between stacked monomers
             z += np.random.uniform(0, dbwl)
 
-        displaced_theta = (180 / np.pi) * (2 * np.arcsin(pd / (2 * self.pore_radius)))
+        displaced_theta = pd
 
         natoms = self.LC_positions.shape[0]  # number of atoms including ions
         pos = np.copy(self.LC_positions)

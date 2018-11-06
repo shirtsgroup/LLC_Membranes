@@ -17,7 +17,7 @@ restraint_residue='HII'
 pd=0
 ncol=5
 
-while getopts "b:r:m:t:p:f:e:S:P:q:R:n:" opt; do
+while getopts "b:r:m:t:p:f:e:S:P:q:R:n:o:" opt; do
     case $opt in
     b) BUILD_MON=$OPTARG;;
     r) ring_restraints=$OPTARG;;
@@ -31,6 +31,7 @@ while getopts "b:r:m:t:p:f:e:S:P:q:R:n:" opt; do
     q) quit_early=$OPTARG;;
     R) restraint_residue=$OPTARG;;
     n) ncol=$OPTARG;;  # number of columns per pore
+    o) pd=$OPTARG;;
     esac
 done
 
