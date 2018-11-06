@@ -179,7 +179,8 @@ def write_assembly(b, output, no_mon, bcc=False, xlink=False):
             #                                        i*nr + int(a[k + dihedrals_p_index + 3][14:22]),
             #                                        i*nr + int(a[k + dihedrals_p_index + 3][22:30]),
             #                                        a[k + dihedrals_p_index + 3][30:len(a[k + dihedrals_p_index + 3])]))
-            f.write('{:6d}{:7d}{:7d}{:7d}{:7d}\n'.format(info[0], info[1], info[2], info[3], info[4]))
+            f.write('{:6d}{:7d}{:7d}{:7d}{:7d}\n'.format(i * nr + info[0], i * nr + info[1], i * nr + info[2],
+                                                         i * nr + info[3], info[4]))
 
     f.write("\n")  # space in between sections
 
@@ -202,7 +203,8 @@ def write_assembly(b, output, no_mon, bcc=False, xlink=False):
             #                                        i*nr + int(a[k + dihedrals_imp_index + 3][14:22]),
             #                                        i*nr + int(a[k + dihedrals_imp_index + 3][22:30]),
             #                                        a[k + dihedrals_imp_index + 3][30:len(a[k + dihedrals_imp_index + 3])]))
-            f.write('{:6d}{:7d}{:7d}{:7d}{:7d}\n'.format(info[0], info[1], info[2], info[3], info[4]))
+            f.write('{:6d}{:7d}{:7d}{:7d}{:7d}\n'.format(i * nr + info[0], i * nr + info[1], i * nr + info[2],
+                                                         i * nr + info[3], info[4]))
 
     f.write("\n")  # space in between sections
 
