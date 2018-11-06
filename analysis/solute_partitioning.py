@@ -280,7 +280,7 @@ if __name__ == "__main__":
 
     print('Calculating solute partition by frame')
     sys.partition(args.pore_radius)
-    sys.plot(resname='Ethanol')
+    sys.plot(resname='Water')
 
     # print('Loading trajectory...', flush=True, end='')
     # if args.single_frame:

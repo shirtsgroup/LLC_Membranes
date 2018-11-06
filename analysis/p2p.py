@@ -390,7 +390,7 @@ if __name__ == '__main__':
     n_pores = int(args.pores)  # number of pores
     comp_ppore = old_div(tot_atoms, n_pores)
 
-    p_centers = (n_pores, pos, args.buffer)
+    p_centers = avg_pore_loc(n_pores, pos, args.buffer)
 
     distances = 6  # number of p2p distances to calculate. The following algorithm isn't smart enough for >6 yet
     p2ps = p2p(p_centers, distances)

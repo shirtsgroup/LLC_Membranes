@@ -11,12 +11,13 @@ MPI="off"
 NP=4
 T=300
 equil_length=1000000  # equilibrium simulation length
-python="python3"
+python="python"
 quit_early=0
 restraint_residue='HII'
 pd=0
+ncol=5
 
-while getopts "b:r:m:t:p:f:e:S:P:q:R:" opt; do
+while getopts "b:r:m:t:p:f:e:S:P:q:R:n:" opt; do
     case $opt in
     b) BUILD_MON=$OPTARG;;
     r) ring_restraints=$OPTARG;;
@@ -29,6 +30,7 @@ while getopts "b:r:m:t:p:f:e:S:P:q:R:" opt; do
     P) python=$OPTARG;;
     q) quit_early=$OPTARG;;
     R) restraint_residue=$OPTARG;;
+    n) ncol=$OPTARG;;  # number of columns per pore
     esac
 done
 
@@ -43,7 +45,7 @@ else
 fi
 
 # assumes defaults in build.py are okay. Adjust them if needed
-${python} ${DIR}/build.py -pd ${pd} -b ${BUILD_MON}.gro
+${python} ${DIR}/build.py -pd ${pd} -b ${BUILD_MON}.gro -c ${ncol}
 
 # make input files
 ${python} ${DIR}/input.py -b ${BUILD_MON} -l 50 --restraints ${restraint_residue} --temp ${T} -f 50 --genvel yes -c ${start_config} -s 50000

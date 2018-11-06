@@ -19,7 +19,6 @@ def initialize():
 
     parser.add_argument('-T', '--title', default='Generic Molecular Dynamics Simulation', type=str, help='Simulation Title')
     parser.add_argument('-b', '--build_mon', default='NAcarb11V', type=str, help='Monomer structure used for build')
-    parser.add_argument('-t', '--itp', default='dipole.itp', type=str, help='Name of .itp describing monomers')
     parser.add_argument('-s', '--em_steps', default=5000, type=int, help='Steps to take during energy minimization')
     parser.add_argument('-e', '--ensemble', default='npt', type=str, help='Thermodynamic ensemble to put system in')
     parser.add_argument('-d', '--dt', default=0.002, type=float, help='time step (ps)')
