@@ -256,6 +256,10 @@ class Solvent(object):
         self.t = md.load(gro)
         self.box_vectors = self.t.unitcell_vectors[0, :, :]  # box vectors
 
+        # parallelization
+        self.mpi = False  # use mpi / gpu acceleration
+        self.np = 4  # number of parallel process
+
         self.box_gromacs = [self.box_vectors[0, 0], self.box_vectors[1, 1], self.box_vectors[2, 2],
                             self.box_vectors[0, 1], self.box_vectors[2, 0], self.box_vectors[1, 0],
                             self.box_vectors[0, 2], self.box_vectors[1, 2], self.box_vectors[2, 0]]  # box in gromacs format
@@ -374,9 +378,14 @@ class Solvent(object):
                 stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
             p1.wait()
 
-        p2 = subprocess.Popen(["gmx", "mdrun", "-deffnm", "em"], stdout=open(os.devnull, 'w'),
-                              stderr=subprocess.STDOUT)  # run energy minimization
-        p2.wait()
+        if self.mpi:
+            p2 = subprocess.Popen(["mpirun", "-np", "%s" % self.np, "gmx_mpi", "mdrun", "-deffnm", "em"],
+                                  stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # run energy minimization
+            p2.wait()
+        else:
+            p2 = subprocess.Popen(["gmx", "mdrun", "-deffnm", "em"], stdout=open(os.devnull, 'w'),
+                                  stderr=subprocess.STDOUT)  # run energy minimization
+            p2.wait()
 
         p3 = subprocess.Popen(["cp", "em.gro", "%s" % self.intermediate_fname])
         p3.wait()

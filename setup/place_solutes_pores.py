@@ -18,6 +18,7 @@ def initialize():
     parser.add_argument('-n', '--nsolutes', default=6, type=int, help='Number of solute molecules to add')
     parser.add_argument('-mdps', '--generate_mdps', action="store_true", help='Create input .mdp files')
     parser.add_argument('-noxlink', action="store_false", help='If the system is not cross-linked, add this flag')
+    parser.add_argument('-mpi', '--mpi', default=False, help="Specify number of MPI processes")
 
     return parser
 
@@ -30,6 +31,10 @@ if __name__ == "__main__":
 
     solvent = ps.Solvent('%s' % args.gro, xlink=args.noxlink)
     solute = ps.Solute('%s' % args.solute_resname)
+
+    if args.mpi:
+        solvent.mpi = True
+        solvent.np = int(args.mpi)
 
     zbox = solvent.box_vectors[2, 2]
     z = np.linspace(0, zbox, args.nsolutes*2 + 1)[1::2]  # equally space residues
