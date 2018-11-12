@@ -58,31 +58,6 @@ def concentration_to_nsolute(conc, box_vectors, solute):
     return nsolute, actual_concentration
 
 
-def random_orientation(xyz, alignment_vector, placement):
-    """
-    Randomly orient a water molecule and then place it a desired location
-    :param water_xyz: 3d coordinates of molecule
-    :param water_alignment_vector: A reference vector to rotate the water molecule about
-    :param placement: where to place final water configuration in space
-    :return: coordinates of oriented and translated water molecule
-    """
-
-    u = np.random.normal(size=3)  # random vector. From normal distribution since sphere
-    u /= np.linalg.norm(u)  # normalize
-
-    R = transform.Rvect2vect(alignment_vector, u)  # rotation matrix to align water_alignment_vector with u
-
-    xyz -= xyz[0, :]  # center at origin
-
-    rotated = np.zeros([xyz.shape[1], 3])
-    for i in range(xyz.shape[1]):
-        rotated[i, :] = np.dot(R, xyz[i, :])
-
-    rotated += placement  # translate to desired location
-
-    return rotated
-
-
 def net_charge(nsolute, solutes):
     """
     :param nsolute: list of number of solutes to be added

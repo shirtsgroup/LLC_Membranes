@@ -47,38 +47,40 @@ class Residue(object):
                     print('No topology %s.itp found' % name)
                     exit()
 
-            itp = []
+            self.itp = []
             for line in f:
-                itp.append(line)
+                self.itp.append(line)
 
             f.close()
 
             self.natoms = t.n_atoms
 
             atoms_index = 0
-            while itp[atoms_index].count('[ atoms ]') == 0:
+            while self.itp[atoms_index].count('[ atoms ]') == 0:
                 atoms_index += 1
 
             self.indices = {}  # key = atom name , value = index
             self.names = {}  # key = index, value = atom name
             self.mass = {}  # key = atom name, value = mass
+            self.charges = {}
 
             atoms_index += 2
             for i in range(self.natoms):
-                data = itp[i + atoms_index].split()
+                data = self.itp[i + atoms_index].split()
                 self.indices[data[4]] = int(data[0])
                 self.names[int(data[0])] = data[4]
                 self.mass[data[4]] = float(data[7])
+                self.charges[data[4]] = float(data[6])
 
             # find the bonds section
             bonds_index = 0
-            while itp[bonds_index].count('[ bonds ]') == 0:
+            while self.itp[bonds_index].count('[ bonds ]') == 0:
                 bonds_index += 1
             bonds_index += 2
 
             bonds = []
-            while itp[bonds_index] != '\n':
-                bond_data = str.split(itp[bonds_index])[:2]
+            while self.itp[bonds_index] != '\n':
+                bond_data = str.split(self.itp[bonds_index])[:2]
                 bonds.append([int(bond_data[0]), int(bond_data[1])])
                 bonds_index += 1
 
