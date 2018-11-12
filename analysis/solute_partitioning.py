@@ -38,6 +38,8 @@ def initialize():
                                                              'approximating each center as a single point.')
     parser.add_argument('-pr', '--pore_radius', default=0.5, type=float, help='Max distance from pore center a water '
                         'molecule can exist in order to be counted as inside the pore')
+    parser.add_argument('-b', '--buffer', default=0, type=float, help='z-distance (nm) to cut off from top and bottom '
+                                                                      'of unit cell when calculating COM locations')
 
     parser.add_argument('--load', action="store_true")
     parser.add_argument('--savename', default='solute_partitioning.pl')
@@ -226,23 +228,42 @@ class System(object):
         else:
             self.pore_centers = physical.avg_pore_loc(self.npores, self.pos[:, pore_atoms, :])
 
-    def partition(self, r):
+    def partition(self, r, buffer=0):
         """ Partition solute residue into tail and pore region
 
         :param r: pore radius, outside of which atoms will be considered in the tail region
+        :param buffer: z distance (nm) to cut out from top and bottom of membrane (in cases where there is a water gap)
 
         :type r: float
+        :type buffer: float
+
         """
 
-        for i in tqdm.tqdm(range(self.t.n_frames)):
-            self.pore_water.append([])
-            self.tail_water.append([])
-            for p in range(self.npores):
-                d = np.linalg.norm(self.com[i, :, :2] - self.pore_centers[i, p, :], axis=1)
-                for x in np.where(d <= r)[0]:
-                    self.pore_water[i].append(x)
+        # to help determine buffer
+        # plt.hist(self.com[0, :, 2], bins=50)
+        # plt.show()
 
-            self.tail_water[i] = [x for x in np.arange(0, self.com.shape[1]) if x not in self.pore_water[i]]
+        for i in tqdm.tqdm(range(self.t.n_frames)):
+            pore = []
+
+            if buffer > 0:
+                xy_positions = self.com[i, (self.com[i, :, 2] > buffer) & (self.com[i, :, 2] <
+                                        self.t.unitcell_vectors[i, 2, 2] - buffer), :2]
+            else:
+                xy_positions = self.com[i, :, :2]
+
+            for p in range(self.npores):
+                d = np.linalg.norm(xy_positions - self.pore_centers[i, p, :], axis=1)
+                pore += np.where(d <= r)[0].tolist()
+
+            self.pore_water.append(np.unique(pore).tolist())
+
+            tails = np.full(xy_positions.shape[0], True, dtype=bool)  # array of True. Booleans are fast
+            tails[self.pore_water[i]] = False  # set pore indices to False
+            self.tail_water.append(np.where(tails)[0])  # list of tail indices where tails = True
+
+            # vvv slow vvv
+            #self.tail_water.append([x for x in np.arange(0, self.com.shape) if x not in self.pore_water[i]])
 
     def plot(self, resname='Water'):
 
@@ -279,6 +300,6 @@ if __name__ == "__main__":
             sys = pickle.load(f)
 
     print('Calculating solute partition by frame')
-    sys.partition(args.pore_radius)
+    sys.partition(args.pore_radius, buffer=args.buffer)
     sys.plot(resname='Water')
 

@@ -4,7 +4,7 @@ import argparse
 import mdtraj as md
 import numpy as np
 from LLC_Membranes.analysis import Atom_props
-from LLC_Membranes.llclib import file_rw, transform
+from LLC_Membranes.llclib import file_rw, transform, physical
 from LLC_Membranes.setup.gentop import SystemTopology
 import subprocess
 import os
@@ -177,8 +177,7 @@ def placement(z, pts, box):
     :param pts: points which run through the pore
     :return: location to place solute
     """
-    print(z)
-    print(pts)
+
     # check if point is already in the spline
     if z in pts[:, 2]:
 
@@ -318,7 +317,7 @@ class Solvent(object):
             self.freeze_ndx(solute_placement_point=placement_point, res=solute.resname)
 
         nrg = self.energy_minimize(self.em_steps, freeze=freeze)
-        print(nrg)
+
         if nrg >= 0:
             self.revert(solute)
             if random:
@@ -347,14 +346,16 @@ class Solvent(object):
 
         ref = [a.index for a in self.t.topology.atoms if a.name in ref]
         # redo each time because positions change slightly upon energy minimization
-        self.pore_spline = trace_pores(self.positions[ref, :], self.box_vectors[:2, :2], layers)
+        #self.pore_spline = trace_pores(self.positions[ref, :], self.box_vectors[:2, :2], layers)
+
+        self.pore_spline = physical.trace_pores(self.positions[ref, :], self.box_vectors[:2, :2], layers)
 
         # format z so that it is an array
         if type(z) is float or type(z) is np.float64:
             z = np.array([z for i in range(pores)])
 
         for i in tqdm.tqdm(range(pores)):
-            placement_point = placement(z[i], self.pore_spline[i * layers: (i + 1) * layers, :], self.box_vectors[:2, :2])
+            placement_point = placement(z[i], self.pore_spline[i, ...], self.box_vectors[:2, :2])
             self.place_solute(solute, placement_point, freeze=True)
 
     def energy_minimize(self, steps, freeze=False, freeze_group='Freeze', freeze_dim='xyz'):

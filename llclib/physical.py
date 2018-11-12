@@ -342,7 +342,7 @@ def put_in_box(pt, x_box, y_box, m, angle):
     return pt
 
 
-def trace_pores(pos, box, npoints, npores=4):
+def trace_pores(pos, box, npoints, npores=4, progress=True):
     """
     Find the line which traces through the center of the pores
     :param pos: positions of atoms used to define pore location (args.ref) [natoms, 3]
@@ -350,10 +350,17 @@ def trace_pores(pos, box, npoints, npores=4):
     :param npoints: number of points for spline in each pore
     :param npores: number of pores in unit cell (assumed that atoms are number sequentially by pore. i.e. pore 1 atom
     numbers all precede those in pore 2)
+    :param progress: set to True if you want a progress bar to be shown
+
     :return: points which trace the pore center
     """
 
-    # assumes trajectory. Probably can add a new axis if a single frame is used
+    single_frame = False
+    if np.shape(pos.shape)[0] == 2:
+        pos = pos[np.newaxis, ...]  # add a new axis if we are looking at a single frame
+        box = box[np.newaxis, ...]
+        single_frame = True
+
     nframes = pos.shape[0]
     atoms_p_pore = int(pos.shape[1] / npores)  # atoms in each pore
 
@@ -377,7 +384,7 @@ def trace_pores(pos, box, npoints, npores=4):
     centers = np.zeros([nframes, npores, npoints, 3])
     bin_centers = np.zeros([nframes, npores, npoints])
 
-    for t in tqdm.tqdm(range(nframes)):
+    for t in tqdm.tqdm(range(nframes), disable=progress):
         for p in range(npores):
 
             pore = pos[t, p*atoms_p_pore:(p+1)*atoms_p_pore, :]  # coordinates for atoms belonging to a single pore
@@ -395,16 +402,19 @@ def trace_pores(pos, box, npoints, npores=4):
 
                 for i in range(shift.shape[0]):  # check if the points are within the bounds of the unitcell
                     if not bounds[t].contains_point(shift[i, :2]):
-                        shift[i, :] = put_in_box(shift[i, :], box[0, 0], box[1, 1], m, angle)  # if its not in the unitcell, shift it so it is
+                        shift[i, :] = put_in_box(shift[i, :], box[t, 0, 0], box[t, 1, 1], m, angle)  # if its not in the unitcell, shift it so it is
 
                 c = [np.mean(shift, axis=0)]
 
                 centers[t, p, l - 1, :] = transform.translate(c, center[t, :], before)  # move everything back to where it was
 
                 if not bounds[t].contains_point(centers[t, p, l - 1, :]):  # make sure everything is in the box again
-                    centers[t, p, l - 1, :] = put_in_box(centers[t, p, l - 1, :], box[0, 0], box[1, 1], m, angle)
+                    centers[t, p, l - 1, :] = put_in_box(centers[t, p, l - 1, :], box[t, 0, 0], box[t, 1, 1], m, angle)
 
-    return centers, bin_centers
+    if single_frame:
+        return centers[0, ...]  # doesn't return bin center yet
+    else:
+        return centers, bin_centers
 
 
 def center_of_mass(pos, matoms):
