@@ -38,7 +38,6 @@ if __name__ == "__main__":
 
     zbox = solvent.box_vectors[2, 2]
     z = np.linspace(0, zbox, args.nsolutes*2 + 1)[1::2]  # equally space residues
-
     for i in range(args.nsolutes):
             solvent.place_solute_pores(solute, z=z[i])
 

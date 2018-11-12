@@ -2,8 +2,8 @@
 
 import numpy as np
 import argparse
-from llclib import file_rw
-from llclib import transform
+from LLC_Membranes.llclib import file_rw
+from LLC_Membranes.llclib import transform
 import mdtraj as md
 import lc_class
 import os

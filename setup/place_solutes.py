@@ -177,7 +177,8 @@ def placement(z, pts, box):
     :param pts: points which run through the pore
     :return: location to place solute
     """
-
+    print(z)
+    print(pts)
     # check if point is already in the spline
     if z in pts[:, 2]:
 
@@ -317,7 +318,7 @@ class Solvent(object):
             self.freeze_ndx(solute_placement_point=placement_point, res=solute.resname)
 
         nrg = self.energy_minimize(self.em_steps, freeze=freeze)
-
+        print(nrg)
         if nrg >= 0:
             self.revert(solute)
             if random:
