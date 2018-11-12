@@ -61,7 +61,7 @@ def concentration_to_nsolute(conc, box_vectors, solute):
 def random_orientation(xyz, alignment_vector, placement):
     """
     Randomly orient a water molecule and then place it a desired location
-    :param water_xyz: 3d coordinates of a water molecule
+    :param water_xyz: 3d coordinates of molecule
     :param water_alignment_vector: A reference vector to rotate the water molecule about
     :param placement: where to place final water configuration in space
     :return: coordinates of oriented and translated water molecule
@@ -302,9 +302,9 @@ class Solvent(object):
         :return:
         """
 
-        # p = placement_point - (solute.com - solute.xyz[0, 0, :])  # want to move com to placement point
-        #solute_positions = random_orientation(solute.xyz[0, ...], solute.xyz[0, 0, :] - solute.xyz[0, 1, :], placement_point)  # to be fixed in THE FUTURE
-        solute_positions = transform.translate(solute.xyz[0, :, :], solute.com, placement_point)  # translate solute to placement point
+        # randomly rotate the molecule and then tranlate it to the placement point
+        solute_positions = transform.random_orientation(solute.xyz[0, ...], solute.xyz[0, 0, :] - solute.xyz[0, 1, :],
+                                                        placement_point)
         self.positions = np.concatenate((self.positions, solute_positions))  # add to array of positions
         self.residues += solute.residues  # add solute residues to list of all residues
         self.names += solute.names  # add solute atom names to list of all names
@@ -345,9 +345,8 @@ class Solvent(object):
         """
 
         ref = [a.index for a in self.t.topology.atoms if a.name in ref]
-        # redo each time because positions change slightly upon energy minimization
-        #self.pore_spline = trace_pores(self.positions[ref, :], self.box_vectors[:2, :2], layers)
 
+        # redo each time because positions change slightly upon energy minimization
         self.pore_spline = physical.trace_pores(self.positions[ref, :], self.box_vectors[:2, :2], layers)
 
         # format z so that it is an array
