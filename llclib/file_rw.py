@@ -539,7 +539,7 @@ def write_gro_pos(pos, out, name='NA', box=[0, 0, 0], ids=None, res=None, vel=No
         # f.write('{:10f}{:10f}{:10f}\n'.format(0, 0, 0))
 
 
-def write_em_mdp(steps, freeze=False, freeze_group='', freeze_dim='xyz'):
+def write_em_mdp(steps, freeze=False, freeze_group='', freeze_dim='xyz', xlink=False):
     """
     Write energy minimization .mdp file
     :param steps: number of steps to take using steepest descents algorithm
@@ -569,4 +569,7 @@ def write_em_mdp(steps, freeze=False, freeze_group='', freeze_dim='xyz'):
                 dim.append('Y')
             else:
                 dim.append('N')
-            f.write('freezedim = %s %s %s' %(dim[0], dim[1], dim[2]))
+            f.write('freezedim = %s %s %s\n' %(dim[0], dim[1], dim[2]))
+
+        if xlink:
+            f.write('periodic-molecules = yes\n')

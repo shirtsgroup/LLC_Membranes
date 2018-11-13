@@ -231,6 +231,8 @@ class Solvent(object):
         self.t = md.load(gro)
         self.box_vectors = self.t.unitcell_vectors[0, :, :]  # box vectors
 
+        self.xlink = xlink
+
         # parallelization
         self.mpi = False  # use mpi / gpu acceleration
         self.np = 1  # number of parallel process
@@ -242,7 +244,7 @@ class Solvent(object):
         self.positions = self.t.xyz[0, :, :]  # positions of all atoms
         self.residues = []
         self.names = []
-        self.top = SystemTopology(gro, xlink=xlink, xlinked_top_name=xlinked_topname)
+        self.top = SystemTopology(gro, xlink=self.xlink, xlinked_top_name=xlinked_topname)
         self.intermediate_fname = intermediate_fname
         self.em_steps = em_steps
 
@@ -341,7 +343,7 @@ class Solvent(object):
         """
 
         # write em.mdp with a given number of steps
-        file_rw.write_em_mdp(steps, freeze=freeze, freeze_group='Freeze', freeze_dim='xyz')
+        file_rw.write_em_mdp(steps, freeze=freeze, freeze_group='Freeze', freeze_dim='xyz', xlink=self.xlink)
 
         if freeze:
             p1 = subprocess.Popen(
