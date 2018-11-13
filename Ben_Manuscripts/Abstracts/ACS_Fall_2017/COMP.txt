@@ -1,0 +1,43 @@
+# Division of Computers in Chemistry
+
+For the first time, to our knowledge, a lyotropic liquid crystal (LLC)
+system is studied atomistically using molecular dynamics simulations.
+LLC's are a class of nanostructured materials that can be modified,
+assembled and crosslinked into stable membranes with uniform straight
+pores that can perform solute specific separations and offer the
+ability to control pore architecture at the atomic lengthscale.  Pore
+diameters on the order of 1 nm make LLC membranes well-suited for
+aqueous separations such as desalination and biorefinement.
+We have used an iterative approach of simulation and experiment to
+help characterize and reduce the large chemical design space available
+for LLC monomer design. A molecular model which is consistent with
+experimentally measured structural features and material properties
+can provide a link between monomer structure and macroscopic
+separation performance. With a clear understanding of mechanisms of
+transport in these complex self-assembled systems, one can choose
+monomers to achieve specific separation goals. In our model, we have
+developed a method to simulate the crosslinking mechanism, a key step
+during synthesis. We have also adopted and compared multiple methods
+for calculating ionic conductivity from atomistic simulations.
+Simulated X-ray diffraction patterns based on atomic coordinates
+generate 1D and 2D diffraction patterns containing all major features
+present experimentally.
+
+%BJC: GPU!
+To generate robust statistics for each type of calculation, long
+simulations, up to 1000 ns, must be run. Simulating the system of 66K 
+atoms is facilitated by the use of NVIDIA Tesla K80 GPU accelerators.
+Parallelization, with linear scaling up to 12 GPUs (6 K80 accelerators), 
+yields 125 ns/day of simulation time.    
+
+Using these methods to characterize the molecular model, we have
+discovered an additional metastable state which may form under certain
+experimental conditions. Each configuration gives different structural
+properties but persists for 100's of simulated nanoseconds.
+
+We have also studied the transport of a range of solutes with various
+charges and hydrodynamic radii. We can use this information to draw
+correlations between pore structure and selective preferences. These
+studies will help guide monomer choice for separation-specific
+objectives.  
+

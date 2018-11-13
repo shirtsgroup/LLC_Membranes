@@ -1,0 +1,7 @@
+source leaprc.gaff
+MON = loadmol2 monomer.mol2
+check MON
+loadamberparams monomer.frcmod
+saveoff MON mon.lib
+saveamberparm MON monomer.prmtop monomer.inpcrd
+quit

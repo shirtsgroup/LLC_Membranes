@@ -1,0 +1,54 @@
+%%%%%%%%% MASTER -- compiles the 4 sections
+
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{xr}
+\usepackage{subcaption}
+\def\baselinestretch{1}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                                   
+\newcommand{\required}[1]{\subsection*{\hfil #1\hfil}}          
+\renewcommand{\refname}{\hfil References Cited\hfil}         
+%\bibliographystyle{mrsnsf}
+%\bibliographystyle{acm}
+\bibliographystyle{apsrev}
+%   Use the command \bibpunct with one optional and 6 mandatory arguments: 
+%   1. the opening bracket symbol, default = (
+%   2. the closing bracket symbol, default = )
+%   3. the punctuation between multiple citations, default = ;
+%   4. the letter `n' for numerical style, or `s' for numerical superscript style, any other letter for author-year, default = author-year;
+%   5. the punctuation that comes between the author names and the year
+%   6. the punctuation that comes between years or numbers when common author lists are suppressed (default = ,);
+%\bibpunct{}{}{,}{s}{}{,}
+%\bibpunct{(}{)}{;}{a}{}{,}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%PUT YOUR MACROS HERE
+\usepackage[colorlinks=true,citecolor=blue,linkcolor=blue]{hyperref}
+
+%\includeonly{NSFsumm}
+\newcommand{\Var} [1]{\mathrm{var}{\left(#1\right)}}
+\newcommand{\Cov}[1]{\mathrm{Cov}{\left(#1\right)}}
+\newcommand{\ens}[1]{\left \langle #1 \right \rangle}
+\newcommand{\dhdl}{\frac{dH}{d\lambda}}
+\newcommand{\smallhead}[1]{\noindent {\em #1}:} 
+\newcommand{\vx}{\mathbf x}
+\begin{document}
+% The figures are in a figures/ subdirectory.
+\graphicspath{{figures/}}
+%%%%%%%%% PROPOSAL -- 10 pages maximum 
+
+% use letters for the subsections with this command
+\def\thesection{\Roman{section}.}
+\def\thesubsection{\alph{subsection}.} 
+\def\thesubsubsection{\alph{subsection}.\roman{subsubsection}}
+\include{proposed_work}
+
+\newpage
+%bibliography
+\bibliography{teragrid,ReweightingValidationPaper}{}
+\newpage
+\include{scaling}
+\newpage
+\include{progress}
+
+\end{document}

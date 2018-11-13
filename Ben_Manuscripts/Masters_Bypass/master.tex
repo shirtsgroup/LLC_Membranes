@@ -1,0 +1,34 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{subcaption}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath} % or simply amstext
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage[export]{adjustbox}
+\newcommand{\angstrom}{\textup{\AA}}
+\usepackage{cleveref}
+\usepackage{booktabs}
+\usepackage{gensymb}
+\usepackage{float}
+
+\title{Predicting Transport in Lyotropic Liquid Crystal Membranes with Molecular Dynamics Simulations}
+\author{Benjamin J. Coscia \and Xunda Feng \and Joe Yelk \and Matthew A. Glaser \and Douglas L. Gin \and Richard D. Noble \and Michael R. Shirts}
+
+\begin{document}
+
+\bibliographystyle{ieeetr}
+\graphicspath{{./figures/}}  % put all the figures here
+\maketitle
+
+\input{intro}
+\input{methods}
+\input{results}
+\input{conclusion}
+
+%\include{supp} supplementary info should be included as a separate document for ACSnano
+
+\newpage
+\bibliography{llc}
+\end{document}
