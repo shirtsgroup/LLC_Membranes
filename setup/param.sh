@@ -13,7 +13,7 @@ name='monomer' # name of molecule. This name will carry through to output
 nc=0  # net charge
 res='MON' # name of residue being made, NOTE: This must match the residue in the .pdb file or you will get errors
 anneal='no'  # change to 'yes' if you want a thermal annealing process carried out after energy minimization
-input_path="${SCRIPT_DIR}/../Paramaterization"  # location of em.mdp and anneal.mdp files
+input_path="${SCRIPT_DIR}/../Parameterization"  # location of em.mdp and anneal.mdp files
 
 while getopts "n:c:r:a:p:" opt; do
     case $opt in
