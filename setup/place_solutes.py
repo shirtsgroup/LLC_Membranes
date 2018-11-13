@@ -303,6 +303,10 @@ class Solvent(object):
             else:
                 #self.remove_water(placement_point, 3)
                 self.place_solute(solute, placement_point, freeze=True)
+        else:
+            p3 = subprocess.Popen(["cp", "em.gro", "%s" % self.intermediate_fname])
+            p3.wait()
+            self.positions = md.load('%s' % self.intermediate_fname).xyz[0, :, :]  # update positions
 
     def place_solute_random(self, solute):
         """
@@ -357,7 +361,6 @@ class Solvent(object):
                      "%s" % self.intermediate_fname,
                      "-n", "freeze_index.ndx"],
                     stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
-            p1.wait()
         else:
             if self.mpi:
                 p1 = subprocess.Popen(
@@ -368,22 +371,15 @@ class Solvent(object):
                 p1 = subprocess.Popen(
                     ["gmx", "grompp", "-p", "topol.top", "-f", "em.mdp", "-o", "em", "-c", "%s" % self.intermediate_fname],
                     stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
-                p1.wait()
+        p1.wait()
 
         if self.mpi:
             p2 = subprocess.Popen(["mpirun", "-np", "%s" % self.np, "gmx_mpi", "mdrun", "-deffnm", "em"],
                                   stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # run energy minimization
-            p2.wait()
         else:
             p2 = subprocess.Popen(["gmx", "mdrun", "-deffnm", "em"], stdout=open(os.devnull, 'w'),
                                   stderr=subprocess.STDOUT)  # run energy minimization
-            p2.wait()
-
-        p3 = subprocess.Popen(["cp", "em.gro", "%s" % self.intermediate_fname])
-        p3.wait()
-
-        # update positions
-        self.positions = md.load('%s' % self.intermediate_fname).xyz[0, :, :]
+        p2.wait()
 
         nrg = subprocess.check_output(
             ["awk", "/Potential Energy/ {print $4}", "em.log"])  # get Potential energy from em.log
