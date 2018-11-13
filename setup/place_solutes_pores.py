@@ -49,6 +49,7 @@ if __name__ == "__main__":
         mdp.write_em_mdp()
         mdp.write_npt_mdp(out='berendsen')
 
-        mdp = genmdp.SimulationMdp('%s' % args.out, length=400000, barostat='Parrinello-Rahman', xlink=args.noxlink)
+        mdp = genmdp.SimulationMdp('%s' % args.out, length=400000, barostat='Parrinello-Rahman', xlink=args.noxlink,
+                                   genvel='no')
         mdp.write_npt_mdp(out='PR')
 

@@ -286,7 +286,6 @@ class Solvent(object):
         self.top.add_residue(solute, write=True)  # add 1 solute to topology
 
         # write new .gro file
-        print(len(self.residues), len(self.names))
         file_rw.write_gro_pos(self.positions, self.intermediate_fname, box=self.box_gromacs, ids=self.names,
                               res=self.residues)
 
