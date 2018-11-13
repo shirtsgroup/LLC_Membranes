@@ -1,5 +1,18 @@
 ; MET_GMX.top created by acpype (Rev: 403) on Tue Nov 13 15:42:33 2018
 
+[ moleculetype ]
+;name            nrexcl
+ MET              3
+
+[ atoms ]
+;   nr  type  resi  res  atom  cgnr     charge      mass       ; qtot   bond_type
+     1   c3     1   MET     C    1     0.116883    12.010000
+     2   oh     1   MET     O    2    -0.598217    16.000000
+     3   h1     1   MET     H    3     0.028283     1.008000
+     4   h1     1   MET    H1    4     0.028283     1.008000
+     5   h1     1   MET    H2    5     0.028283     1.008000
+     6   ho     1   MET    H3    6     0.396483     1.008000
+
 [ bonds ]
 ;   ai     aj funct   r             k
      1      2   1    1.4260e-01    2.6284e+05 ;      C - O     
