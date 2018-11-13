@@ -346,16 +346,29 @@ class Solvent(object):
         file_rw.write_em_mdp(steps, freeze=freeze, freeze_group='Freeze', freeze_dim='xyz', xlink=self.xlink)
 
         if freeze:
-            p1 = subprocess.Popen(
-                ["gmx", "grompp", "-p", "topol.top", "-f", "em.mdp", "-o", "em", "-c", "%s" % self.intermediate_fname,
-                 "-n", "freeze_index.ndx"],
-                stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
+            if self.mpi:
+                p1 = subprocess.Popen(
+                    ["mpirun", "-np", "1", "gmx_mpi", "grompp", "-p", "topol.top", "-f", "em.mdp", "-o", "em", "-c",
+                     "%s" % self.intermediate_fname, "-n", "freeze_index.ndx"], stdout=open(os.devnull, 'w'),
+                    stderr=subprocess.STDOUT)  # generate atomic level input file
+            else:
+                p1 = subprocess.Popen(
+                    ["gmx", "grompp", "-p", "topol.top", "-f", "em.mdp", "-o", "em", "-c",
+                     "%s" % self.intermediate_fname,
+                     "-n", "freeze_index.ndx"],
+                    stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
             p1.wait()
         else:
-            p1 = subprocess.Popen(
-                ["gmx", "grompp", "-p", "topol.top", "-f", "em.mdp", "-o", "em", "-c", "%s" % self.intermediate_fname],
-                stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
-            p1.wait()
+            if self.mpi:
+                p1 = subprocess.Popen(
+                    ["mpirun", "-np", "1", "gmx_mpi", "grompp", "-p", "topol.top", "-f", "em.mdp", "-o", "em", "-c",
+                     "%s" % self.intermediate_fname], stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
+                p1.wait()
+            else:
+                p1 = subprocess.Popen(
+                    ["gmx", "grompp", "-p", "topol.top", "-f", "em.mdp", "-o", "em", "-c", "%s" % self.intermediate_fname],
+                    stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
+                p1.wait()
 
         if self.mpi:
             p2 = subprocess.Popen(["mpirun", "-np", "%s" % self.np, "gmx_mpi", "mdrun", "-deffnm", "em"],
