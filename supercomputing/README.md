@@ -13,7 +13,7 @@ pip install the following modules with the command:  `pip install --user module_
 
 Use bridges_slurm_gpu.sh as a guide for creating job submissions
 
-## Gromacs
+### GROMACS
 Bridges has pre-compiled versions of gromacs: \
 `gromacs/2018_cpu` -- compiled for use with MPI \
 `gromasc/2018_gpu` -- compiled for use with GPU and MPI
