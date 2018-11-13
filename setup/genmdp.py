@@ -108,6 +108,10 @@ class SimulationMdp(object):
 
         f = open('%s.mdp' % out, 'w')
         f.writelines([title + '\n', integrator + '\n', nsteps + '\n', cutoff_scheme + '\n', nstlist + '\n'])
+
+        if self.xlink:
+            f.write('periodic-molecules = yes\n')
+
         self.em_mdp_name = out
 
     def write_npt_mdp(self, out='npt'):
