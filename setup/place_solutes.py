@@ -233,7 +233,7 @@ class Solvent(object):
 
         # parallelization
         self.mpi = False  # use mpi / gpu acceleration
-        self.np = 4  # number of parallel process
+        self.np = 1  # number of parallel process
 
         self.box_gromacs = [self.box_vectors[0, 0], self.box_vectors[1, 1], self.box_vectors[2, 2],
                             self.box_vectors[0, 1], self.box_vectors[2, 0], self.box_vectors[1, 0],
@@ -286,7 +286,9 @@ class Solvent(object):
         self.top.add_residue(solute, write=True)  # add 1 solute to topology
 
         # write new .gro file
-        file_rw.write_gro_pos(self.positions, self.intermediate_fname, box=self.box_gromacs, ids=self.names, res=self.residues)
+        print(len(self.residues), len(self.names))
+        file_rw.write_gro_pos(self.positions, self.intermediate_fname, box=self.box_gromacs, ids=self.names,
+                              res=self.residues)
 
         if freeze:
             self.freeze_ndx(solute_placement_point=placement_point, res=solute.resname)
@@ -299,7 +301,7 @@ class Solvent(object):
                 self.place_solute_random(solute)
             else:
                 #self.remove_water(placement_point, 3)
-                self.place_solute(solute, placement_point, freeze=False)
+                self.place_solute(solute, placement_point, freeze=True)
 
     def place_solute_random(self, solute):
         """
