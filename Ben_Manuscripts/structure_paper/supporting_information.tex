@@ -17,22 +17,36 @@
 \usepackage{listings}
 \usepackage{xr}
 \usepackage{array}
+\usepackage{authblk}
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 
 \renewcommand{\thefigure}{S\arabic{figure}}
-\renewcommand{\thesection}{S\arabic{section}}   
+\renewcommand{\thesection}{S\arabic{section}}
+\renewcommand{\thepage}{S\arabic{page}}  
+\renewcommand{\thetable}{S\arabic{table}}   
 
 %\SectionNumbersOn
 
 \externaldocument[M-]{Final_Draft}
+
 \title{Supporting Information : Understanding the Nanoscale Structure of Inverted Hexagonal Phase Lyotropic Liquid Crystal Polymer Membranes}
-\author{Benjamin J. Coscia \and Jospeh Yelk \and Matthew A. Glaser \and Douglas L. Gin \and Xunda Feng \and Michael R. Shirts}
-\date{}
+\author[1]{Benjamin J. Coscia}
+\author[2]{Joseph Yelk}
+\author[2]{Matthew A. Glaser}
+\author[1,3]{Douglas L. Gin}
+\author[4]{Xunda Feng}
+\author[1]{Michael R. Shirts*}
+\date{E-mail: michael.shirts@colorado.edu}
+
+\affil[1]{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, CO 80309, USA}
+\affil[2]{Department of Physics, University of Colorado Boulder, Boulder CO, 80309, USA}
+\affil[3]{Department of Chemistry and Biochemistry, University of Colorado Boulder, Boulder CO 80309, USA}
+\affil[4]{Department of Chemical and Environmental Engineering, Yale University, New Haven, Connecticut 06511, USA}
 
 \begin{document}
 
   \bibliographystyle{ieeetr}
-  \graphicspath{{./supporting_figures/}}  % put all the figures here
+  \graphicspath{{./figures/supporting_figures/}}  % put all the figures here
   \maketitle
   
   \section{Setup and analysis scripts}\label{section:python_scripts}
@@ -605,7 +619,7 @@
         configuration.}\label{fig:stacking}
   \end{figure}
 
-  Based on evidence from section~\ref{M-section:rpi} of the main text, we
+  Based on evidence from Section~\ref{M-section:rpi} of the main text, we
   believe it is most likely that the head groups stack somewhere between
   the sandwiched and parallel displaced modes which we studied (Figure~\ref{fig:between_pd}).
 
@@ -1208,7 +1222,7 @@
   membrane plane. We created a monomer whose tails tilt ca. 30$\degree$ with
   respect to the $xy$ membrane plane.  We added position restraints to the ends
   of the monomer tails with the same force constant as the head groups (see
-  section~\ref{section:equilibration}).  As we slowly reduce the force constants,
+  Section~\ref{section:equilibration}).  As we slowly reduce the force constants,
   the tails begin to tend towards a negligible tilt angle
   (Figure~\ref{fig:tail_tilt}).
   
@@ -1589,7 +1603,7 @@
   
   \section{Autocorrelation of monomer dihedrals}
   
-  In section~\ref{M-section:slow_dynamics} of the main text, we calculated the
+  In Section~\ref{M-section:slow_dynamics} of the main text, we calculated the
   autocorrelation function of the outer tail either dihedrals pictured
   in Figure~\ref{fig:dihedrals}.
   

@@ -134,7 +134,7 @@
   dyes, the H\textsubscript{II}-phase membrane showed complete rejection of dyes
   bigger than 1.2 nm in size \cite{zhou_supported_2005}. 
 
-  The H\textsubscript{II}-phase pore geometry (Figure~\ref{fig:assembly}) has a
+  The H\textsubscript{II}-phase pore geometry (Figure~\ref{fig:hex_packing_simple}) has a
   higher theoretical capacity for transport than the Q\textsubscript{I} phase.
   The H\textsubscript{II} phase forms at room temperature in the presence of
   ca.~10 wt\% water and consists of hexagonally packed, hydrophilic pore
@@ -235,7 +235,7 @@
   picture of the nanoscopic pore structure, which is crucial to understanding the
   role of monomer structure in solute transport and membrane design.  Atomistic
   MD simulations can provide the required level of detail (Figure
-  \ref{fig:detail}), assuming the force fields are sufficiently accurate.  With
+  \ref{fig:detailed_pore}), assuming the force fields are sufficiently accurate.  With
   such an atomistic model, we can directly observe molecular-level solute
   transport and suggest governing mechanisms. We can also observe how the choice
   of head group interacts with solutes of interest. In addition, we can
@@ -365,8 +365,8 @@
 
 	We are careful to avoid the term ``layers" since many liquid
 	crystalline systems have long range order in 1 or 2 spatial dimensions and
-	short range order in the other dimensions.~\cite{chaikin_principles_1995}  %
-	page 58 In the system we are studying, there are long-range 2D correlations in
+	short range order in the other dimensions.~\cite{chaikin_principles_1995}  % page 58
+	In the system we are studying, there are long-range 2D correlations in
 	the hexagonal array of pores ($xy$ plane) and short range $z$-direction
 	correlations within stacked columns of monomers. In this study, we use
 	atomistic molecular modeling to study how the system's structure is affected by
@@ -579,7 +579,7 @@
   patterns differ from experiment in those regions in all cases (See
   Figure~\ref{fig:ralkanes}). Specifically, in contrast to the experimental WAXS
   pattern, R-$\pi$, as it appears in the simulated diffraction patterns,
-  intersects with R-alkanes (See Figure~\ref{fig:XRDsim}). We set an upper bound
+  intersects with R-alkanes (See Section~\ref{section:rpi}). We set an upper bound
   on the colorbar by multiplying $I_{avg}$ by a scaling factor, $f$.  Intensities
   that appear in the patterns $\geq$ $f\times I_{avg}$ are colored uniformly.  We
   applied the same scaling method to the simulated patterns. We chose a scaling
@@ -673,7 +673,7 @@
   ring (2.8~\AA) and two times the carbon atom electronic radius (0.7~\AA)~\cite{slater_atomic_1964}.
   In this study, $g(z)$ is characterized by an oscillatory function with a period equal to the
   average distance between stacked monomers, and an amplitude that decays exponentially
-  (see Figure~\ref{fig:correlation}). The rate of decay is related to the correlation 
+  (see Section~\ref{section:rpi}). The rate of decay is related to the correlation 
   length, L, between monomer head groups. We estimated L by fitting the peaks of $g(z)$,
   using the python package \texttt{scipy.optimize.curve\_fit}~\cite{oliphant_python_2007},
   to a decaying exponential function of the form:
@@ -921,7 +921,7 @@
 		experiment. Shown is a comparison of the (a) Sandwiched, ordered basin (b)
 		Sandwiched, disordered basin (d) Parallel displaced, ordered basin and (e)
 		Parallel displaced, disordered basin configurations with (c) experimental WAXS.
-		The major reflections of interest (See Figure~\ref{fig:SWAXS} for their
+		The major reflections of interest (See Figure~\ref{fig:WAXS} for their
 		definitions) are present at varying degrees. In all cases, R-pores, R-alkanes
 		and R-$\pi$ are present to some degree. R-spots is also present, however it is
 		generally partially covered by the broad R-$\pi$ reflection. Quantitative
@@ -1365,7 +1365,7 @@
   of R-$\pi$, however the $q_r$ profile remains unchanged. When we increased the
   thermal noise of the simplified parallel displaced system in the $z$-direction by
   12\% and 27\%, we saw a 3 and 15-fold decrease in the maximum intensity of 
-  R-$\pi$ respectively (Figure~\ref{fig:znoise}). Despite the decrease in 
+  R-$\pi$ respectively (Figure~\ref{fig:intensity_vs_zsigma}). Despite the decrease in 
   intensity, the 3 cross-sections have the same shape 
   (Figure~\ref{fig:rpi_xsection_vs_zsigma}), whose sharp Bragg-like peaks are
   not consistent with experiment. 
@@ -1877,10 +1877,12 @@
   that the details of transport may be relatively independent of the structural
   differences between different possible structures studied here.
 
-  We plotted the number densities of heavy atoms in the head group, carbon atoms in the tail
-  region and all sodium ions (Figure~\ref{fig:overlaid_densities}). For the head group
-  region, we used heavy atoms making up the aromatic rings and carboxylate groups. For the tail
-  region, we used carbon atoms of the monomer tails (See Figure \ref{S-fig:monomer_color_coded}
+  We plotted the number densities of heavy atoms in the head group 
+  (Figure~\ref{fig:head_groups_regional_density}), carbon atoms in the tail region 
+  (Figure~\ref{fig:tails_regional_density}) and all sodium ions 
+  (Figure~\ref{fig:sodium_regional_density}). For the head group region, we used heavy
+  atoms making up the aromatic rings and carboxylate groups. For the tail region, we
+  used carbon atoms of the monomer tails (See Figure \ref{S-fig:monomer_color_coded}
   of the SI for a diagram). We averaged the histograms over the equilibrated
   portion of the trajectory. 
   There is a gradient in pore composition transitioning radially from the hydrophilic 
@@ -1909,11 +1911,6 @@
   \includegraphics[width=\textwidth]{regional_density_legend.pdf}
   \end{subfigure}
   \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=1\linewidth]{sodium_density.pdf}
-        \caption{Sodium Ions}
-        \label{fig:sodium_regional_density}
-  \end{subfigure}
-  \begin{subfigure}{0.32\textwidth}
         \includegraphics[width=1\linewidth]{head_group_density.pdf}
         \caption{Head Groups}
         \label{fig:head_groups_regional_density}
@@ -1922,6 +1919,11 @@
         \includegraphics[width=1\linewidth]{tails_density.pdf}
         \caption{Tails}
         \label{fig:tails_regional_density}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=1\linewidth]{sodium_density.pdf}
+        \caption{Sodium Ions}
+        \label{fig:sodium_regional_density}
   \end{subfigure}
   \caption{In all cases, the component radial distribution functions are similar. 
       They exhibit a composition gradient transitioning from the hydrophilic to the hydrophobic
@@ -2096,7 +2098,8 @@
   ensembles of independent simulations. Finally, we observed that our model can 
   only produce R-double when we add small amounts of water to the system. This 
   observation has possible implications for the reproducibility of the experimental
-  results from Feng et al. since they specify that their membrane is synthesized dry.  
+  results of Feng et al.~\cite{feng_scalable_2014,feng_thin_2016} since they
+  specify that their membrane is synthesized dry.  
 
   We characterized the environment centered around the membrane pores and
   learned that the pores are generally filled with monomer head groups and sodium
@@ -2126,9 +2129,11 @@
   preserving most of the features well.
 
   Future work, based on what has been learned in this study, may help further
-  improve the structural agreement between experiment and simulation. Force 
-  fields explicitly including $\pi-\pi$ interactions may be able to draw stacked
-  monomers closer together. We can study ensembles of long simulations in order
+  improve the structural agreement between experiment and simulation. 
+  Polarizable force fields explicitly including $\pi-\pi$ interactions may be
+  able to draw stacked monomers closer together 
+  ~\cite{shi_polarizable_2013,kaminski_development_2004,lopes_polarizable_2007}. 
+  We can study ensembles of long simulations in order
   to observe more averaged structure and to create more experimentally consistent
   XRD patterns. Extremely long simulations (on the order of \SI{}{\micro s}) may
   be necessary to better quantify the time scales for large scale rearrangements,
@@ -2168,9 +2173,9 @@
   
   \newpage
   
-  \section*{Graphical TOC Entry}
+  \section*{TOC Graphic}
   \begin{figure}
-  \includegraphics[width=3.5in]{new_toc_graphic.pdf}
+  \includegraphics[width=3.25in]{new_toc_graphic.pdf}
 %  \includegraphics[width=4.5cm]{toc_image_final.pdf}
 %  \includegraphics[width=4.07cm]{toc_waxs.pdf}
  \end{figure}

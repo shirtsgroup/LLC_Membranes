@@ -1,0 +1,195 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+
+\title{Response to reviewers: Understanding the Nanoscale Structure of Inverted Hexagonal Phase Lyotropic Liquid Crystal Polymer Membranes}
+\author{Benjamin J. Coscia \and Joseph Yelk \and Matthew A. Glaser \and Douglas L. Gin \and Xunda Feng \and Michael R. Shirts}
+
+\begin{document}
+ 
+\maketitle
+
+We thank the reviewers for carefully reading over our manuscript and providing helpful comments. We have taken the suggestions into consideration and made appropriate revisions to the manuscript document. All changes to the text have been documented below. 
+
+\section{Response to Reviewer 1}
+
+\begin{enumerate}
+	
+	\item \begin{quote} \textit{This manuscript describes atomistic molecular dynamics simulations and
+	diffraction analysis of hexagonally-arranged pores, each of which is made of many columns of the 
+	monomer Na-GA3C11. This physical system is of interest because such nanopores have potential to 
+	transform filtration applications. This work is of potential interest to the JPC readership because
+	it provides atomistic insight into the origins of diffraction reflections observed in experiments, 
+	which could be used to resolve discrepancies about what the structure of these hexagonal arrays are,
+	or used to engineer better filters. Overall, the manuscript provides comprehensive descriptions of
+	metrics used to evaluate the simulated structures against experiments, but the number of things
+	described and length of these descriptions obscures whether significant new physical insight into
+	this system is made.} \end{quote}
+	
+	Author reply: We thank the reviewer for their constructive feedback and aim to address all of their concerns. 
+	
+	\item \begin{quote}
+	\textit{As written, it is not clear if the authors are presenting this study as a validation of 
+	GAFF and the present equilibration techniques, or whether this study is providing significant new
+	physical insight into these lyotropic liquid crystals. The paper reads a bit more like the former,
+	with a comprehensive discussion of the degree to which five scattering features expected in 
+	experiments are predicted in simulations. However, at the same time, the authors make arguments
+	including (1) pores are made from five columns of monomers, (2) that water is present in the "dry"
+	structures, and (3) that a scattering feature comes from tail packing, not tilt: These observations
+	*could* be new physical insight into lyotropic liquid crystal structure, but as presented seem more
+	like hypotheses than conclusions:}
+	
+	%BJC: want to convery that we want to reproduce all of the experimental features as best as possible
+	% using an out-of-the-box force field. That way we know we are approximating the chemical environment
+	% as close to the experimental system as possible. The goal is to eventually test large numbers of 
+	% monomers without the needing to dive into the excruciating detail shown here. 
+	
+	\end{quote}
+	
+	\item \begin{quote}
+    \textit{1. For the simulations performed here, the authors do make a strong case that 5 columns per
+    core gets the best pore-to-pore spacing (Figure 5). However, insufficient time is accessed to see 
+    whether the 4-, 5-, and 6-column initial conditions move towards or away from the expected pore 
+    spacing over many-microseconds trajectories. That said, for the quenches performed here, 5-columns
+    per core seems more plausible than 4. Is this significant physical insight? It is insight, but the
+    authors do not make a compelling case for how 5 columns would change how we think about these crystals,
+    or how it would impact membrane engineering (or more importantly, whether these 5-column structures
+    assemble in the solution phase, or are only locally stable).}
+    
+    %BJC: can't access microseconds with simulations. Pore spacing appears stable. In order to pack monomers
+    % 3.7 angstroms apart vertically, can't have 6 columns per pore. The pore spacing is always too small with 4.
+    % Physical insight: Density of functional groups that interact with solutes
+    
+    \end{quote}
+    
+    \item \begin{quote}
+    \textit{2. The authors make a pretty compelling case that water causes the R-double scattering feature
+    by showing its absence when water is added, but that the R-double appears and persists for 200ns after
+    the water makes its way into the crystal. However, the authors also show that nonuniformly spaced
+    monomers can give rise to the R-Double feature, a seeming counterexample to the necessity of water.
+    Is the R-double feature with water because the monomers are now irregularly spaced? What happens when
+    the waters are removed and the scattering re-performed in Fig 17c(bottom)?}
+    \end{quote}
+    
+    Author reply: The reviewer makes good points about R-double that need to be clarified in the main text.
+    R-double appears in a dry system with non-uniformly spaced monomers. However, such a system is only 
+    stable, as we've modeled it, if $z$-direction position restraints are applied to monomer head groups. As
+    soon as the restraints are released, R-double fades and the monomer spacing becomes uniform. We believe 
+    that water facilitates the appearance of R-double by stabilizing non-uniform spacing through hydrogen bonding,
+    as the reviewer suggests. We re-performed the scattering analysis on the same system with water molecules
+    removed, as suggested, and R-double is still present.
+    
+    % BJC: mention that this plot is added to supporting info and that the "head group removed" figure further
+    % supports this conclusion.
+    
+	\item \begin{quote}
+    \textit{3. The authors make the case that the R-spots feature comes from the structure of the hexagonal
+    tails, not their tilt. The authors should perform the scattering analysis to check if the R-spots are
+    present on the tilted-tails they constrain: This quick experiment would nail down their interpretation
+    here, or show that the tilted tails are also plausible (but not observed in this model).}
+    \end{quote}
+    
+    \item \begin{quote}
+    \textit{These arguments would be stronger if there weren't so many qualifications about simulation 
+    timescales and GAFF, in particular its ability to predict the shortest-scale feature (pi-stacking) for 
+    this system. How does everything else change if the force-field were tuned to get that feature correct?}
+    \end{quote}
+
+	\item \begin{quote}
+    \textit{The MD-Structure-Factor repository is not available at the provided github link, nor does it appear
+    to be online anywhere. So, the correctness of that code cannot be checked.}
+	\end{quote}
+    
+	Author reply: We thank the reviewer for pointing this out and apologize for this mistake. The referenced
+	GitHub repository was set to private by our collaborators but has now been made public. Please feel 
+	free to read through the code. 
+    
+    \item \begin{quote}
+    \textit{One might want to check that code based on Figure 7f, where presumably spherical scatterers 
+    generate reflections with anisotropy (diamonds instead of squares or circles). This kind of an artefact
+    is plausible if there are errors handling the non-cubic box, or with scattering angles that aren't parallel
+    to a box axis. llcsim/analysis/correlation.py looks like it has the machinery for doing the scattering analysis.}
+	\end{quote}
+	
+	Author reply: We thank the reviewer for their astute observation and the resulting improvements to 
+	our manuscript.	We generated Figure 7f by calculating the structure factor of a 2-dimensional array of 
+	hexagonally-packed scatterers. It is meant to be a simplified representation of the scattering exhibited
+	by hexagonally packed alkane tails so that we can qualitatively understand where we would expect R-spots to appear if 
+	tails indeed pack in that way. Since it is possible to generate a rectangular unit cell which contains 
+	hexagonally packed point scatterers, there are no artifacts due to improper treatment of periodicity. 
+	Although we believe our calculations are correct, we originally used only eight total scatterers in the 
+	2D unit cell and then plotted the structure factor with a contour plot (\texttt{matplotlib.pyplot.contourf})
+	which does not interpolate the data. We re-created Figure 7f by simulating the structure factor of 100 
+	hexagonally packed scatterers, in order to get higher fourier space resolution, and then plotting the
+	result with \texttt{matplotlib.pyplot.imshow} and Gaussian interpolation. We have added the code used to
+	generate this figure to the \texttt{llcsim} repository which can be accessed at 
+	\texttt{https://github.com/bencoscia/llcsim/blob/master/analysis/hexagonal\_packing.py}.
+	
+	% Add code and clarify main text
+
+	\item \begin{quote}	
+    \textit{Regarding the ion conductivities, how do the numbers presented here compare against ion conductivities
+    predicted with GAFF and other polarizable and nonpolarizable force fields? If GAFF is systematically too high
+    in other cases, it could help explain the order-of-magnitude discrepancy observed here.}
+    \end{quote}
+
+	\item \begin{quote}
+    \textit{If the authors either (a) strengthen the cases for their proposed structural insights being  highly 
+    likely (not just plausible), or (b) make a stronger case for why these particular insights have important 
+    ramifications for our understanding of LLC's (their significance), then it would be easier to publish this 
+    immediately. This reviewer's opinion is that this work would find a broader interested audience with a more
+    concise focus on these physical insights, which could be accomplished by moving more content 
+    (e.g., dihedral correlations) to the SI.}
+    \end{quote}
+	
+\end{enumerate}
+
+\section{Response to Reviewer 2}
+
+\begin{enumerate}
+	
+	\item \begin{quote} \textit{The authors report a computer simulation study of the detailed structure
+	of several systems, which are similar to the cross-linked inverted hexagonal phase of self-assembled
+	lyotropic liquid crystals (LLCs) used to develop porous polymer membranes for separations. Specifically,
+	the authors studied the Col-h thermotropic (solvent-free) phase formed by the assembly of the Na-GA3C11
+	monomer, which is similar to the LLC phases used in the development of polymeric membranes. The Col-h 
+	phase has been characterized experimentally using wide-angle X-ray scattering (WAXS), but nonetheless 
+	important gaps in its structure still remains. Using all-atom classical molecular dynamics simulations,
+	the authors performed a very careful and very detailed study of the structure of the Col-h phase formed
+	by Na-GA3C11. The authors compared their simulated X-ray diffraction (XRD) patterns with existing 2D-WAXS
+	experimental data, carefully discussed and explained the observed differences between simulations and 
+	experiments, and provided molecular-level details of the structure of this system that cannot be obtained
+	from experiments. This study is very detailed; all relevant information is provided for interested readers
+	to replicate results from this study (including links to Python scripts used to set up the simulations, 
+	analyze MD trajectories, and obtain simulated XRD patterns). The simulation results has been analyzed and
+	discussed comprehensively (perhaps too comprehensively, as this paper is 63 pages long, has 21 figures and
+	its Supporting Information file has 19 additional pages; however, I don’t think the authors should make any
+	efforts to shorten the paper, as I feel every presented component is required to fully understand the 
+	contributions of this study) Overall this is an extremely solid manuscript}\end{quote}
+	
+	Author reply: We thank the reviewer for the kind assessment of our work. We also acknowledge that this is a long article
+	
+	\item \begin{quote}
+	
+	\textit{I have no suggestions to further improve this paper, other than fixing a few small typos:}
+	
+    \textit{(1) Page 10, first paragraph: remove the ‘page 58’ associated with reference 25}
+
+    \textit{(2) Page 54: reference to the paper of Feng et al is missing}
+
+	\end{quote}
+    
+    Author reply: We thank the reviewer for pointing out these minor errors in our main text. These issues have been corrected in
+    the revised main text file. % need to add page numbers once finished
+    
+    \item \begin{quote} \textit{(3) Page 54: mention examples of force fields that explicitly include pi-pi interactions
+    } \end{quote}
+    
+    Author reply: We have adjusted our language in order to specifically mention and cite polarizable force fields as follows: 
+    
+    ``Polarizable force fields explicitly including $\pi-\pi$ interactions may be able to draw stacked
+    monomers closer together"
+
+\end{enumerate}
+
+\end{document}

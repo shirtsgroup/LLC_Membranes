@@ -34,7 +34,7 @@ def initialize():
                         'extending from pore center to monomer and line from pore center to vertically adjacent monomer'
                                                                                    'head group.')
     parser.add_argument('-box', '--box_lengths', nargs='+', type=float, help='Length of box vectors [x y z]')
-    parser.add_argument('-angles', '--angles', nargs='+', default=[90, 90, 60], type=float, help='Angles between'
+    parser.add_argument('-angles', '--angles', nargs='+', default=[90, 90, 60], help='Angles between'
                         'box vectors')
 
     return parser

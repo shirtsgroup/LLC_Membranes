@@ -5,6 +5,9 @@ import mdtraj as md
 
 script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
+ions_mw = {}
+ions_mw['NA'] = 22.99
+
 
 class Residue(object):
 
@@ -24,6 +27,7 @@ class Residue(object):
 
             self.is_ion = True
             self.natoms = 1
+            self.mw = ions_mw[name]
 
         else:
             try:
@@ -47,47 +51,58 @@ class Residue(object):
                     print('No topology %s.itp found' % name)
                     exit()
 
-            self.itp = []
-            for line in f:
-                self.itp.append(line)
+            res = set([a.residue.name for a in t.topology.atoms])
 
-            f.close()
+            if len(set(res)) > 1:
+                self.residues = []
+                for i in set(res):
+                    self.residues.append(Residue(i))
 
-            self.natoms = t.n_atoms
+            else:
 
-            atoms_index = 0
-            while self.itp[atoms_index].count('[ atoms ]') == 0:
-                atoms_index += 1
+                self.itp = []
+                for line in f:
+                    self.itp.append(line)
 
-            self.indices = {}  # key = atom name , value = index
-            self.names = {}  # key = index, value = atom name
-            self.mass = {}  # key = atom name, value = mass
-            self.charges = {}
+                f.close()
 
-            atoms_index += 2
-            for i in range(self.natoms):
-                data = self.itp[i + atoms_index].split()
-                self.indices[data[4]] = int(data[0])
-                self.names[int(data[0])] = data[4]
-                self.mass[data[4]] = float(data[7])
-                self.charges[data[4]] = float(data[6])
+                atoms_index = 0
+                while self.itp[atoms_index].count('[ atoms ]') == 0:
+                    atoms_index += 1
 
-            # find the bonds section
-            bonds_index = 0
-            while self.itp[bonds_index].count('[ bonds ]') == 0:
-                bonds_index += 1
-            bonds_index += 2
+                self.indices = {}  # key = atom name , value = index
+                self.names = {}  # key = index, value = atom name
+                self.mass = {}  # key = atom name, value = mass
+                self.charges = {}
 
-            bonds = []
-            while self.itp[bonds_index] != '\n':
-                bond_data = str.split(self.itp[bonds_index])[:2]
-                bonds.append([int(bond_data[0]), int(bond_data[1])])
-                bonds_index += 1
+                atoms_index += 2
+                self.natoms = 0
+                while self.itp[self.natoms + atoms_index] != '\n':
+                    data = self.itp[self.natoms + atoms_index].split()
+                    self.indices[data[4]] = int(data[0])
+                    self.names[int(data[0])] = data[4]
+                    self.mass[data[4]] = float(data[7])
+                    self.charges[data[4]] = float(data[6])
+                    self.natoms += 1
 
-            self.bonds = {}
-            for i in range(self.natoms):
-                self.bonds[i] = []
-                involvement = [x for x in bonds if i + 1 in x]
-                for pair in involvement:
-                    atom = [x - 1 for x in pair if x != (i + 1)][0]
-                    self.bonds[i].append(atom)
+                self.mw = sum(self.mass.values())
+
+                # find the bonds section
+                bonds_index = 0
+                while self.itp[bonds_index].count('[ bonds ]') == 0:
+                    bonds_index += 1
+                bonds_index += 2
+
+                bonds = []
+                while self.itp[bonds_index] != '\n':
+                    bond_data = str.split(self.itp[bonds_index])[:2]
+                    bonds.append([int(bond_data[0]), int(bond_data[1])])
+                    bonds_index += 1
+
+                self.bonds = {}
+                for i in range(self.natoms):
+                    self.bonds[i] = []
+                    involvement = [x for x in bonds if i + 1 in x]
+                    for pair in involvement:
+                        atom = [x - 1 for x in pair if x != (i + 1)][0]
+                        self.bonds[i].append(atom)
