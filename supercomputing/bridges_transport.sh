@@ -15,7 +15,7 @@ export GMX_MAXBACKUP=-1  # do not make back-ups
 place_solutes_pores.py -g xlinked.gro -o initial.gro -r ETH -n 6 -mdps -mpi 4  # will parallelize poorly but MPI mdoule messes up python
 
 module load mpi/intel_mpi  # loaded after python 
-gmx grompp -f berendsen.mdp -p topol.top -c initial.gro -o berendsen
+mpirun -np 1 gmx_mpi grompp -f berendsen.mdp -p topol.top -c initial.gro -o berendsen
 mpirun -np 4 gmx_mpi mdrun -v -deffnm berendsen
 
 mpirun -np 1 gmx_mpi grompp -f PR.mdp -p topol.top -c berendsen.gro -o PR
