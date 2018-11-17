@@ -852,6 +852,19 @@
   systems stack, at a maximum, 0.9 \AA~further apart than experiment (see
   Table~\ref{table:correlation_length}). The remainder of this discussion will
   therefore focus on the analysis of systems built with 5 columns per pore. 
+  
+  %BJC: added.
+  The number of columns per pore dictates the density of interaction sites within
+  each pore and the pore radius. A higher number of interaction sites will 
+  surely play a role in transport of molecules that have an affinity for the monomer
+  head groups. 
+  %We measured the pore radius as the average distance from the pore
+  %center to each head group COM. 
+  The pore radius increases with the number of 
+  columns per pore (See Figure~\ref{S-fig:pore_radius}. This radius is likely 
+  related to the size of the molecules which can be excluded by this type of 
+  membrane. We may be able to control LLC membrane pore size by selecting monomers
+  that are stable in configurations with more columns-per-pore.
 
   \subsection{Simulated XRD comparison to 2D-WAXS data}
 
@@ -1189,10 +1202,10 @@
   because monomers in the simulated system stack further apart than those in the
   experimental system (Table~\ref{table:correlation_length}). We calculated
   $z$-direction pair distribution functions, $g(z)$, as described in
-  Section~\ref{section:correlation_length}.  The resulting distributions are
+  Section~\ref{section:correlation_length}. The resulting distributions are
   generally characterized by decaying oscillatory behavior where the average
   distance between peaks corresponds to the average distance between stacked
-  monomer head groups (Figure~\ref{fig:correlation}).  We calculated this
+  monomer head groups (Figure~\ref{S-fig:correlation}). We calculated this
   equilibrated vertical stacking distance, $\mathit{d}_{equil}$, between monomers
   using Equation~\ref{eqn:decaying_sinusoid}. The distance between stacked
   monomers is greater than experiment by 0.5--0.9 \AA~across all cases, with
@@ -1212,8 +1225,9 @@
   improvement in packing distance over our 300 K models (see further discussion
   in Section~\ref{section:slow_dynamics}). 
   
+  %BJC: could move the following paragraph to supporting
   The system size, in the $z$-direction, does not significantly alter $g(z)$.
-  In Figure~\ref{fig:correlation}, oscillations do not fully decay, so a taller
+  In Figure~\ref{S-fig:correlation}, oscillations do not fully decay, so a taller
   system may be necessary to fully capture the correlation function. We therefore
   equilibrated a sandwiched system with twice as many monomers per column so that
   the system size doubled in the $z$-direction. The correlation length increases
@@ -1253,39 +1267,40 @@
   significant difference between the two cross-sections is their maximum intensity
   which we study in more detail below.
   
-  \begin{figure}[!htb]
-  \centering
-  \begin{subfigure}{0.45\textwidth}
-  \centering
-  \includegraphics[width=\textwidth]{z_correlation_sandwich.pdf}
-  \caption{Sandwiched, Ordered Basin}\label{fig:z_correlation_sandwich}
-  \end{subfigure}  
-  \begin{subfigure}{0.45\textwidth}
-  \centering
-  \includegraphics[width=\textwidth]{z_correlation_offset.pdf}
-  \caption{Parallel Displaced, Ordered Basin}\label{fig:z_correlation_offset}
-  \end{subfigure}  
-  \begin{subfigure}{0.45\textwidth}
-  \centering
-  \includegraphics[width=\textwidth]{z_correlation_sandwich_disordered.pdf}
-  \caption{Sandwiched, Disordered Basin}\label{fig:z_correlation_sandwich_disordered}
-  \end{subfigure}  
-  \begin{subfigure}{0.45\textwidth}
-  \centering
-  \includegraphics[width=\textwidth]{z_correlation_offset_disordered.pdf}
-  \caption{Parallel Displaced, Disordered Basin}\label{fig:z_correlation_offset_disordered}
-  \end{subfigure}  
-  \caption{1D correlation functions of the center of masses of aromatic head
-	  groups, $g(z)$, show decaying oscillatory behavior and have consistent
-	  correlation lengths with experiment. We calculated the correlation length by
-	  fitting a decaying exponential function
-	  (Equation~\ref{eqn:decaying_exponential}) to the peaks of $g(z)$. The
-	  correlation length is longer for ordered basin systems
-	  (Table~\ref{table:correlation_length}). We did not attempt to calculate the
-	  correlation length for (d) because there are no clear peaks. We assume that
-	  this correlation length is less than the vertical distance between
-	  monomers.}\label{fig:correlation}
-  \end{figure}  
+  % Moved to supporting info
+%  \begin{figure}[!htb]
+%  \centering
+%  \begin{subfigure}{0.45\textwidth}
+%  \centering
+%  \includegraphics[width=\textwidth]{z_correlation_sandwich.pdf}
+%  \caption{Sandwiched, Ordered Basin}\label{fig:z_correlation_sandwich}
+%  \end{subfigure}  
+%  \begin{subfigure}{0.45\textwidth}
+%  \centering
+%  \includegraphics[width=\textwidth]{z_correlation_offset.pdf}
+%  \caption{Parallel Displaced, Ordered Basin}\label{fig:z_correlation_offset}
+%  \end{subfigure}  
+%  \begin{subfigure}{0.45\textwidth}
+%  \centering
+%  \includegraphics[width=\textwidth]{z_correlation_sandwich_disordered.pdf}
+%  \caption{Sandwiched, Disordered Basin}\label{fig:z_correlation_sandwich_disordered}
+%  \end{subfigure}  
+%  \begin{subfigure}{0.45\textwidth}
+%  \centering
+%  \includegraphics[width=\textwidth]{z_correlation_offset_disordered.pdf}
+%  \caption{Parallel Displaced, Disordered Basin}\label{fig:z_correlation_offset_disordered}
+%  \end{subfigure}  
+%  \caption{1D correlation functions of the center of masses of aromatic head
+%	  groups, $g(z)$, show decaying oscillatory behavior and have consistent
+%	  correlation lengths with experiment. We calculated the correlation length by
+%	  fitting a decaying exponential function
+%	  (Equation~\ref{eqn:decaying_exponential}) to the peaks of $g(z)$. The
+%	  correlation length is longer for ordered basin systems
+%	  (Table~\ref{table:correlation_length}). We did not attempt to calculate the
+%	  correlation length for (d) because there are no clear peaks. We assume that
+%	  this correlation length is less than the vertical distance between
+%	  monomers.}\label{fig:correlation}
+%  \end{figure}  
   
   \begin{table}[h]
   \centering
@@ -1319,7 +1334,7 @@
   An exact quantitative comparison between the intensity and FWHM of the
   experimental and simulated cross-sections of R-$\pi$ is not feasible for
   several reasons. Experimental peaks broaden due to effects that we can not
-  easily simulate such as finite size crystalline domains and instrumental % reference needed
+  easily simulate such as finite size crystalline domains and instrumental
   resolution~\cite{girolami_x-ray_2016}. In our simulated XRD patterns, 
   the system size imposes limitations
   on the resolution, which makes it difficult to reliably fit peaks. This is
@@ -1361,38 +1376,38 @@
   \label{table:quenched_disorder} 
   \end{table}
   
-  Increasing thermal noise in the $z$-direction will reduce the intensity
-  of R-$\pi$, however the $q_r$ profile remains unchanged. When we increased the
-  thermal noise of the simplified parallel displaced system in the $z$-direction by
-  12\% and 27\%, we saw a 3 and 15-fold decrease in the maximum intensity of 
-  R-$\pi$ respectively (Figure~\ref{fig:intensity_vs_zsigma}). Despite the decrease in 
-  intensity, the 3 cross-sections have the same shape 
-  (Figure~\ref{fig:rpi_xsection_vs_zsigma}), whose sharp Bragg-like peaks are
-  not consistent with experiment. 
+%  Increasing thermal noise in the $z$-direction will reduce the intensity
+%  of R-$\pi$, however the $q_r$ profile remains unchanged. When we increased the
+%  thermal noise of the simplified parallel displaced system in the $z$-direction by
+%  12\% and 27\%, we saw a 3 and 15-fold decrease in the maximum intensity of 
+%  R-$\pi$ respectively (Figure~\ref{fig:intensity_vs_zsigma}). Despite the decrease in 
+%  intensity, the 3 cross-sections have the same shape 
+%  (Figure~\ref{fig:rpi_xsection_vs_zsigma}), whose sharp Bragg-like peaks are
+%  not consistent with experiment. 
+%  
+%  \begin{figure}[!htb]
+%  \centering
+%  \begin{subfigure}{0.49\textwidth}
+%  \includegraphics[width=\textwidth]{intensity_vs_zsigma.pdf}
+%  \caption{}\label{fig:intensity_vs_zsigma}
+%  \end{subfigure}
+%  \begin{subfigure}{0.49\textwidth}
+%  \includegraphics[width=\textwidth]{rpi_xsection_vs_zsigma.pdf}
+%  \caption{}\label{fig:rpi_xsection_vs_zsigma}
+%  \end{subfigure}
+%  \caption{We can decrease the maximum intensity of R-$\pi$ by increasing
+%  thermal noise in the $z$-direction; however, the $q_r$ cross-section profile does
+%  not change. (a) The intensity of R-$\pi$ drops precipitously as we increase
+%  $\sigma_z$. We can decrease the intensity of R-$\pi$, relative to the
+%  background intensity, relative to systems with simulation levels of disorder (blue)
+%  by a factor of 3 when we increase $\sigma_z$ by 12\% (green) and by a factor 
+%  of 15 when we increase $\sigma_z$ by 27\% (red). (b) Although the maximum intensity of R-$\pi$
+%  decreases with increasing $\sigma_z$, the peak shape remains the same.}\label{fig:znoise}
+%  \end{figure}
   
-  \begin{figure}[!htb]
-  \centering
-  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{intensity_vs_zsigma.pdf}
-  \caption{}\label{fig:intensity_vs_zsigma}
-  \end{subfigure}
-  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{rpi_xsection_vs_zsigma.pdf}
-  \caption{}\label{fig:rpi_xsection_vs_zsigma}
-  \end{subfigure}
-  \caption{We can decrease the maximum intensity of R-$\pi$ by increasing
-  thermal noise in the $z$-direction; however, the $q_r$ cross-section profile does
-  not change. (a) The intensity of R-$\pi$ drops precipitously as we increase
-  $\sigma_z$. We can decrease the intensity of R-$\pi$, relative to the
-  background intensity, relative to systems with simulation levels of disorder (blue)
-  by a factor of 3 when we increase $\sigma_z$ by 12\% (green) and by a factor 
-  of 15 when we increase $\sigma_z$ by 27\% (red). (b) Although the maximum intensity of R-$\pi$
-  decreases with increasing $\sigma_z$, the peak shape remains the same.}\label{fig:znoise}
-  \end{figure}
-  
-  However, when we allowed monomer columns to move independently in the
+  When we allow simplified monomer columns to move independently in the
   $z$-direction, the intensity of R-$\pi$ drops and the $q_r$ cross-section of
-  the simulated diffraction patterns smooths out. We can demostrate this by
+  the simulated diffraction patterns smooths out. We can demonstrate this by
   creating a simplified sandwiched configuration (as described above), with
   varying amounts of statistical correlation between columns (see
   Figure~\ref{fig:column_displacement}). In the low independent motion limit, the
@@ -1435,6 +1450,9 @@
           relatively smooth.}\label{fig:column_displacement}
   \end{figure}
 
+  %BJC: I could move the following paragraph to supporting information since it
+  % relies on a qualitative comparison between the following figure and the 
+  % the original correlation functions which I moved to supporting already.
   It therefore seems likely that the discrepancy between the shape and intensity of
   R-$\pi$ generated from our simulations versus experiment is primarily due to
   highly correlated columns in our highly symmetric initial configurations.
@@ -1459,28 +1477,36 @@
   to that shown in Figure~\ref{fig:z_correlation_sandwich}.}\label{fig:z_correlation_fullbox}
   \end{figure}
  
-  Increasing thermal noise in the $xy$ plane causes the FWHM of the $q_r$
-  cross-section of R-$\pi$ to, somewhat counterintuitively, decrease. Using a
-  system with uncorrelated columns, we modified the disorder in both the $r$ and
-  $\theta$ directions by multiplying their values by a factor of 0.5 and 2
-  (Figure~\ref{fig:qy_fwhm}). When we cut the noise in half, the FWHM increases
-  by 88\%. When we double the noise, the FWHM decreases by 51\%. As we have fit
-  the data in Figure~\ref{fig:sim_rsection_fit}, the FWHM of R-$\pi$ agrees well
-  with experiment, meaning the quenched configuration contains about the right
-  amount of disorder on the $xy$ plane. However, the relatively low quality of
-  the fit implies that the FWHM of a fixed Lorentzian fit to data from a single
-  simulation might not be the best comparison to experiment and that some form of
-  initial configuration dependence causes extra structure.
+  We also used our simplified systems in order to study the influence of increased
+  disorder in each dimension. Increasing $z$-directional disorder reduces the
+  intensity of R-$\pi$ without changing the shape of its $q_r$ cross-section.
+  Increasing disorder on the $xy$ plane, somewhat counterintuitively, reduces
+  the FWHM of the $q_r$ cross-section of R-$\pi$ with an insignificant effect
+  on its intensity. We explain these points in more depth in 
+  Section~\ref{S-section:simplified_sf}.
 
-  \begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{qy_fwhm.pdf}
-  \caption{Increasing the amount of disorder in the $xy$ plane decreases the
-	  FWHM of the $q_r$ cross-section of R-$\pi$. When we cut the amount of $r$ and
-	  $\theta$ disorder in half (Noise factor = 0.5), the FWHM increases by 88\%. When
-	  we double the disorder (Noise factor = 2), the FWHM decreases by
-	  51\%.}\label{fig:qy_fwhm}
-  \end{figure}
+%  Increasing thermal noise in the $xy$ plane causes the FWHM of the $q_r$
+%  cross-section of R-$\pi$ to, somewhat counterintuitively, decrease. Using a
+%  system with uncorrelated columns, we modified the disorder in both the $r$ and
+%  $\theta$ directions by multiplying their values by a factor of 0.5 and 2
+%  (Figure~\ref{fig:qy_fwhm}). When we cut the noise in half, the FWHM increases
+%  by 88\%. When we double the noise, the FWHM decreases by 51\%. As we have fit
+%  the data in Figure~\ref{fig:sim_rsection_fit}, the FWHM of R-$\pi$ agrees well
+%  with experiment, meaning the quenched configuration contains about the right
+%  amount of disorder on the $xy$ plane. However, the relatively low quality of
+%  the fit implies that the FWHM of a fixed Lorentzian fit to data from a single
+%  simulation might not be the best comparison to experiment and that some form of
+%  initial configuration dependence causes extra structure.
+%
+%  \begin{figure}
+%  \centering
+%  \includegraphics[width=0.5\textwidth]{qy_fwhm.pdf}
+%  \caption{Increasing the amount of disorder in the $xy$ plane decreases the
+%	  FWHM of the $q_r$ cross-section of R-$\pi$. When we cut the amount of $r$ and
+%	  $\theta$ disorder in half (Noise factor = 0.5), the FWHM increases by 88\%. When
+%	  we double the disorder (Noise factor = 2), the FWHM decreases by
+%	  51\%.}\label{fig:qy_fwhm}
+%  \end{figure}
   
   \subsubsection*{Quenched disorder in ensembles of configurations}  
 
@@ -1970,7 +1996,7 @@
   limited these studies to the sandwiched configuration for simplicity.
   
   The ether dihedrals become decorrelated on a reasonable timescale when we raise
-  the system temperature. At 300 K (Figure~\ref{fig:dihedrals_300K}), the autocorrelation function does
+  the system temperature. At 300 K (Figure~\ref{S-fig:dihedrals_300K}), the autocorrelation function does
   not cross the $x$-axis until $\sim$105 ns meaning that tails fully rotate on average about 
   4 times over the course of the 400 ns that we studied. Additionally, the correlation 
   function plateau's near a value of -0.2 which indicates that the tails are starting in 
@@ -1978,7 +2004,7 @@
   mass of monomer head groups to preserve the hexagonal phase, then raised the temperature 
   of the equilibrated 300 K ordered basin sandwiched system to 500 K. We witnessed 
   decorrelation of the ether dihedrals after $\sim$11 ns with a plateau at 0, 
-  (Figure~\ref{fig:dihedrals_500K}) indicating a complete loss of memory. We annealed
+  (Figure~\ref{S-fig:dihedrals_500K}) indicating a complete loss of memory. We annealed
   the resultant configuration back down to 300 K over 200 ns to see if the increased rotational
   freedom might allow the system to relax into to a more tightly packed configuration.
   
@@ -1993,24 +2019,25 @@
   annealing simulations may get the system to the correct density, but such simulations are beyond
   the scope of the current study.
 
-  \begin{figure}[!htb]
-  \centering
-  \begin{subfigure}{0.45\textwidth}
-  	\centering
-  	\includegraphics[width=\textwidth]{dihedral_autocorrelation_300K.pdf}
-  	\caption{300K}\label{fig:dihedrals_300K}
-  \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-  	\centering
-  	\includegraphics[width=\textwidth]{dihedral_autocorrelation_500K.pdf} % Run : torsions.py -t tethered_columns.xtc -g tethered_columns.gro (the appropriate dihedral is the default)
-  	\caption{500K}\label{fig:dihedrals_500K}
-  \end{subfigure}
-  \caption{The outer tail ether dihedrals become decorrelated on a reasonable
-  timescale when we raise the system temperature. (a) The dihedrals do not
-  become decorrelated for ca. 100 ns when the system is equilibrated at 300 K.
-  (b) The ether dihedrals become decorrelated after 11 ns when the temperature
-  of the system is increased to 500 K.}\label{fig:dihedrals}
-  \end{figure}
+  %BJC: moved to SI
+%  \begin{figure}[!htb]
+%  \centering
+%  \begin{subfigure}{0.45\textwidth}
+%  	\centering
+%  	\includegraphics[width=\textwidth]{dihedral_autocorrelation_300K.pdf}
+%  	\caption{300K}\label{fig:dihedrals_300K}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%  	\centering
+%  	\includegraphics[width=\textwidth]{dihedral_autocorrelation_500K.pdf} % Run : torsions.py -t tethered_columns.xtc -g tethered_columns.gro (the appropriate dihedral is the default)
+%  	\caption{500K}\label{fig:dihedrals_500K}
+%  \end{subfigure}
+%  \caption{The outer tail ether dihedrals become decorrelated on a reasonable
+%  timescale when we raise the system temperature. (a) The dihedrals do not
+%  become decorrelated for ca. 100 ns when the system is equilibrated at 300 K.
+%  (b) The ether dihedrals become decorrelated after 11 ns when the temperature
+%  of the system is increased to 500 K.}\label{fig:dihedrals}
+%  \end{figure}
   
   \subsection{Ionic Conductivity Measurements}
   

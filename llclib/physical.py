@@ -290,7 +290,7 @@ def limits(pos, pcenters):
     :return: an approximate pore radius. Beyond which, we have entered the alkane region
     """
 
-    nT = pcenters.shape[2]
+    nT = pcenters.shape[0]
     npores = pcenters.shape[1]
     natoms = pos.shape[1]
     atom_ppore = natoms // npores
@@ -299,7 +299,7 @@ def limits(pos, pcenters):
     for f in tqdm.tqdm(range(nT)):
         for i in range(atom_ppore):
             for j in range(npores):
-                deviation[f, j, i] = np.linalg.norm(pos[f, j*atom_ppore + i, :2] - pcenters[:, j, f])
+                deviation[f, j, i] = np.linalg.norm(pos[f, j*atom_ppore + i, :2] - pcenters[f, j, :])
 
     #deviation = np.reshape(deviation, (nT, natoms))
 

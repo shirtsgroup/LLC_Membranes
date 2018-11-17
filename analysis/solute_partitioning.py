@@ -193,6 +193,9 @@ class System(object):
         self.box = [box[0, 0, 0], box[0, 1, 1], box[0, 2, 2], box[0, 0, 1], box[0, 2, 0],
                    box[0, 1, 0], box[0, 0, 2], box[0, 1, 2], box[0, 2, 0]]  # gromacs format
 
+        self.ids = [a.name for a in self.t.topology.atoms]
+        self.res = [a.residue.name for a in self.t.topology.atoms]
+
         self.pore_atoms = pore_atoms
         self.npores = npores
         self.pore_centers = None
@@ -213,10 +216,10 @@ class System(object):
                     a.residue.name = 'SOL'
 
         self.residue = topology.Residue(residue)
-        residue_indices = np.array([a.index for a in self.t.topology.atoms if a.residue.name == residue])
+        self.residue_indices = np.array([a.index for a in self.t.topology.atoms if a.residue.name == residue])
         residue_atom_names = [a.name for a in self.t.topology.atoms if a.residue.name == residue]
         masses = [self.residue.mass[x] for x in residue_atom_names[:self.residue.natoms]]
-        self.com = physical.center_of_mass(self.pos[:, residue_indices, :], masses)
+        self.com = physical.center_of_mass(self.pos[:, self.residue_indices, :], masses)
 
     def locate_pore_centers(self, spline=False):
 
