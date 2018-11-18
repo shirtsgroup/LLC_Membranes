@@ -1066,14 +1066,20 @@
 
   Previous literature has attributed the R-spots reflection in this particular
   WAXS dataset as the result of tilted alkane chains~\cite{feng_scalable_2014}.
-  We measured the tilt angle of the alkane chains of the 280 K system by measuring
-  the angle made by the vector extending from top to bottom of each tail with
-  respect to the membrane plane. We found that it equilibrates to an average tilt
-  angle of -2 $\pm$ 13\degree~(Figure~\ref{fig:tilt}), far from the 37\degree~tilt angle
-  previously used to explain R-spots. Even when we placed position restraints on
-  the monomers in a tilted initial configuration, monomers quickly reduced their
-  tilt relative to the $xy$ plane to an angle statisically indistinguishable from
-  zero (see Section \ref{S-section:tail_tilt} of the SI). 
+  This explanation is not unfounded as there are examples in literature of
+  systems where tilted liquid crystals give rise to reflections that resemble
+  R-spots (Cite, Cite). We measured the tilt angle of the alkane chains of the
+  280 K system by measuring the angle made by the vector extending from top to
+  bottom of each tail with respect to the membrane plane. We found that it
+  equilibrates to an average tilt angle of -2 $\pm$
+  13\degree~(Figure~\ref{fig:tilt}), far from the 37\degree~tilt angle previously
+  used to explain R-spots. Even when we placed position restraints on the
+  monomers in a tilted initial configuration, monomers quickly reduced their tilt
+  relative to the $xy$ plane to an angle statisically indistinguishable from zero
+  (see Section \ref{S-section:tail_tilt} of the SI). While it is plausible that 
+  our forcefield may in part be responsible for the tendency of monomers to stay
+  nearly flat, the monomer tails lack the functional groups which are known to
+  facilitate tail tilting.   
 
   The evidence from simulations strongly suggest that the source of the R-spots
   reflection is packing of the tails in a hexagonal array.  First, we demonstrate
@@ -1713,9 +1719,9 @@
   
   One way to produce R-double is if our initial configuration contains
   alternating parallel and anti-parallel carboxylate groups relative to the plane
-  of the monomer's phenyl ring.  It is difficult to physically justify this
+  of the monomer's phenyl ring. It is difficult to physically justify this
   system. Systems built this way are only stable if position restraints are
-  placed on all head group heavy atoms.  Carboxylate groups quickly revert to the
+  placed on all head group heavy atoms. Carboxylate groups quickly revert to the
   parallel position as restraints are released. There is an appreciable energy
   barrier that prevents rotation of carboxylate groups attached to phenyl rings
   since the group extends the system's $\pi$ conjugation~\cite{carey_organic_2011} (see Figure
@@ -1733,18 +1739,18 @@
   may be the most favorable way for them to pack. This configuration is only
   stable for a few nanoseconds and R-double quickly fades.  
   
-  We can also produce R-double if the LLC monomers are not uniformly spaced in the
-  $z$-direction, but instead form pairs that stack less than 3.7~\AA~apart, with
-  COMs that are spaced 7.4 \AA~ from neighboring pairs of monomers 
-  (Figure~\ref{fig:staggered_rzplot_norestraints}). 
-  Our force field causes our system to tend towards uniformly spaced layers.
-  Simulations of unevenly spaced systems are only stable if position restraints
-  are applied to heavy atoms of the phenyl rings.  Additionally, there is little
-  evidence from QM studies of stacked $\pi-\pi$ systems that such uneven stacking
-  could be energetically stable.~\cite{tauer_beyond_2005} 
-  
-  The addition of water to the system promotes the appearance of R-double, providing
-  an answer to Question~\ref{point:water} posed in the introduction.
+  We can also produce R-double if the LLC monomers are not uniformly spaced in
+  the $z$-direction, but instead are placed in pairs that stack less than
+  3.7~\AA~apart, with COMs that are spaced 7.4 \AA~ from neighboring pairs of
+  monomers (Figure~\ref{fig:staggered_rzplot_norestraints}). Simulations of
+  unevenly spaced systems are only stable while position restraints are applied
+  to heavy atoms of the phenyl rings. There is little evidence from quantum
+  mechanical studies of stacked $\pi-\pi$ systems that such uneven stacking could
+  be energetically stable.~\cite{tauer_beyond_2005} As soon as we remove position
+  restraints, our system to tends towards uniformly spaced monomers. 
+ 
+  The addition of water to the system promotes the appearance of R-double,
+  providing an answer to Question~\ref{point:water} posed in the introduction.
   We added water to the parallel displaced and sandwiched configurations in the
   ordered basin and equilibrated them according to the wet equilibration
   procedure. There is no experimental measurement of water concentration in these
@@ -1836,23 +1842,37 @@
   groups. To demonstrate this, we removed the head groups from the trajectory
   used to produce Figure~\ref{fig:solvated_pore_rzplot_norestraints} in order to
   produce that shown in Figure~\ref{fig:rdouble_nophenyls}. R-double does not
-  appear without the presence of the head groups. Water molecules must therefore play a
-  role in the structuring of the head groups in these simulations since R-double does not appear in
-  any dry simulations.
+  appear without the presence of the head groups. Water molecules must therefore
+  play a role in the structuring of the head groups in these simulations since
+  R-double does not appear in any dry simulations.
 
-  When two vertically stacked monomer head groups hydrogen bond with a shared
-  water molecule, the monomers are drawn closer together (as illustrated in
-  Figure~\ref{fig:hbond_visualization}), which creates an asymmetry that allows
+  %BJC: old text:
+%  When two vertically stacked monomer head groups hydrogen bond with a shared
+%  water molecule, the monomers are drawn closer together (as illustrated in
+%  Figure~\ref{fig:hbond_visualization}), which creates an asymmetry that allows
+%  R-double to appear. If a monomer head group shares a hydrogen-bonded water
+%  molecule with a head group above itself, it will be less likely to share a
+%  water molecule with a head group below it due to geometric constraints. The
+%  monomer head group below can just as easily share a water molecule with a head
+%  group below itself. In this scenario, the COMs of each pair are 2 times the
+%  $\pi$-stacking distance apart which would lead to R-double (much like the
+%  configuration in Figure~\ref{fig:staggered_rzplot_norestraints}). There are a
+%  modest number of occurrences of this scenario, which we quantify in further
+%  detail in the SI, Section \ref{S-section:rdouble}.  
+
+  The addition of a small amount of water to the pores stabilizes non-uniform
+  stacking of head groups much like that shown in
+  Figure~\ref{fig:staggered_rzplot_norestraints}. When two vertically stacked
+  monomer head groups hydrogen bond with a shared water molecule, the monomers
+  are drawn closer together (as illustrated in
+  Figure~\ref{fig:hbond_visualization}), which creates the asymmetry that allows
   R-double to appear. If a monomer head group shares a hydrogen-bonded water
   molecule with a head group above itself, it will be less likely to share a
   water molecule with a head group below it due to geometric constraints. The
   monomer head group below can just as easily share a water molecule with a head
-  group below itself. In this scenario, the COMs of each pair are 2 times the
-  $\pi$-stacking distance apart which would lead to R-double (much like the
-  configuration in Figure~\ref{fig:staggered_rzplot_norestraints}). There are a
-  modest number of occurrences of this scenario, which we quantify in further
-  detail in the SI, Section \ref{S-section:rdouble}.  
-  
+  group below itself. There are a modest number of occurrences of this scenario,
+  which we quantify in further detail in the SI, Section \ref{S-section:rdouble}.  
+
   Of all the configurations tested, it is most likely that R-double is induced
   by water molecules as described above since it is the only mechanism that can
   be observed without position restraints. The extent of the hydrogen-bonded
