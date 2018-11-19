@@ -2,6 +2,9 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath}
 \usepackage{xr}
+\usepackage{xcolor}
+\usepackage{siunitx}
+\usepackage{gensymb}
 
 \externaldocument[S-]{supporting_information}
 \externaldocument[M-]{Final_Draft}
@@ -37,7 +40,8 @@ been documented below.
 	    is made.} 
     \end{quote}
 	
-    Author reply: We thank the reviewer for their constructive feedback and aim to address all of their concerns. 
+    Author reply: We thank the reviewer for their constructive feedback and aim to 
+    address all of their concerns. 
 	
     \item \begin{quote}
     \textit{As written, it is not clear if the authors are presenting this
@@ -47,7 +51,7 @@ been documented below.
 	    comprehensive discussion of the degree to which five scattering features
 	    expected in experiments are predicted in simulations. However, at the same
 	    time, the authors make arguments including (1) pores are made from five columns
-	    of monomers, (2) that water is present in the "dry" structures, and (3) that a
+	    of monomers, (2) that water is present in the ``dry" structures, and (3) that a
 	    scattering feature comes from tail packing, not tilt: These observations
 	    *could* be new physical insight into lyotropic liquid crystal structure, but as
 	    presented seem more like hypotheses than conclusions:}
@@ -56,13 +60,14 @@ been documented below.
 
     Author reply: We thank the reviewer for offering their interpretation of
     the purpose of our study, as it is important that we properly convey our
-    message. The main purpose our work is to give a detailed description of the
+    message. The main purpose of our work is to give a detailed description of the
     structure of a lyotropic liquid crystal membrane backed by experimental data.
     This work lays a foundation for future transport studies. By matching 2D-WAXS
     data, we have attempted to unveil the most experimentally-consistent structure
     possible. To clarify this purpose, we have modified and added text to the
-    paragraph on page \_ of the introduction, in which we state our perceived
-    importance of knowing the most experimentally-consistent structure:
+    paragraph on page~\pageref{M-rework:purpose} of the introduction, in which we
+    state our perceived importance of knowing the most experimentally-consistent
+    structure:
 
     Old text: ``A molecular-level understanding of LLC polymer membrane
     structure, enabled by molecular dynamics (MD) simulations, can provide
@@ -91,24 +96,31 @@ been documented below.
     force fields, however validation of this hypothesis is left for a future study.
     We chose GAFF because it is widely used to simulate organic molecules and there
     are no catch-all force fields built for liquid crystal systems. We are interested in
-    what information we can gain from a widely-used out-of-the-box force field and in future
+    what information we can gain from a widely-used `out-of-the-box' force field and in future
     work, we will validate whether GAFF is sufficient for reproducing trends in
     experimental separation properties. To clarify our use of GAFF, we have added
-    the following text to Secton~\ref{method:parameterization} of the Methods on
-    page ~\pageref{method:parameterization}.
+    the following text to Secton~\ref{M-method:parameterization} of the Methods on
+    page~\pageref{M-method:parameterization}.
 
     New text: ``We chose GAFF because it has been parameterized for use with
     organic molecules. Although researchers have optimized force fields, including
-    GAFF (cite), for use with liquid crystals, they are often tuned in order to
-    reproduce one or more experimental observables. Since liquid crystals exist in
-    a wide range of shapes and sizes, including candidate monomers which we may
-    study, we chose to stick with a widely used force field. If we
-    can reproduce experimental trends using a single 'out-of-the-box' force field,
-    then there will be no need to complicate our studies with customized parameter
-    sets."
+    GAFF, for use with liquid crystals, they are often tuned in order to
+    reproduce one or more experimental observables for specific types of liquid 
+    crystal molecules.$^{29,30}$ Since liquid crystals exist in a wide range of shapes and
+    sizes, including candidate monomers which we may study, we chose to stick with
+    a widely used force field. If we can reproduce experimental trends using a 
+    single `out-of-the-box' force field, then there will be no need to complicate
+    our studies with customized parameter sets."
 
-    We have added the following citation:
-    %cite1: liquid crystal gaff tuned to get phase transition temperature.
+    We have added the following citations:
+    \begin{itemize}
+    \item Cook, M. J.; Wilson, M. R. Development of an All-Atom Force Field for the Simulation
+    of Liquid Crystal Molecules in Condensed Phases (LCFF). Mol. Cryst. Liq. Cryst.
+    2001, 357, 149–165.
+    \item Boyd, N. J.; Wilson, M. R. Optimization of the Gaff Force Field to Describe Liquid
+    Crystal Molecules: The Path to a Dramatic Improvement in Transition Temperature
+    Predictions. Phys. Chem. Chem. Phys. 2015, 17, 24851–24865.
+    \end{itemize}
 
     Since our ultimate goal is to design new monomers for solute-specific
     separations, we will be employing the same techniques used in this work to
@@ -120,9 +132,9 @@ been documented below.
     transport results regardless of which configuration we use to conduct
     transport studies. This is an extremely important finding which may have
     been undersold in the original draft of the manuscript. We have added the
-    following concluding paragraph the end of
-    Section~\label{section:pore_composition} on
-    page~\pageref{addition:pore_composition} in order to drive the point home:
+    following concluding paragraph to the end of
+    Section~\ref{M-section:pore_composition} on
+    page~\pageref{M-addition:pore_composition} in order to drive the point home:
 
     New text: ``Our observations suggest that the details of transport may be
     relatively independent of the structural differences between different possible
@@ -135,8 +147,8 @@ been documented below.
     throughput simulations, achieving that goal becomes tractable without the need
     to optimize every system with an experimental dataset."
 	
-    We also modified a paragraph in our conclusion on page \_ to better
-    emphasize our point:
+    We also modified a paragraph in our conclusion on page~\pageref{M-rework:conclusion}
+    to better emphasize our point:
 
     Old text: ``We characterized the environment centered around the membrane
     pores and learned that the pores are generally filled with monomer head groups
@@ -159,8 +171,6 @@ been documented below.
     gradient itself raises questions about the nature of size-exclusion separations
     in systems without well-defined pore boundaries, which potentially could enable
     separations that vary with chemical identity as well as size."
-
-    \end{quote}
 	
     \item \begin{quote}
     \textit{1. For the simulations performed here, the authors do make a strong
@@ -181,9 +191,10 @@ been documented below.
     %BJC: The following might apply:
     Some confusion may have been generated by agreement of the disordered basin
     6 column-per-pore system with experimental pore spacing. As mentioned in the
-    text, the vertical stacking distance between monomers in that system is far too
-    large. The columns are `stretched' in the $z$-direction allowing the pores take
-    up less space on the $xy$ plane and thus pack closer together.  
+    text on page~\pageref{M-6colperpore}, the vertical stacking distance between 
+    monomers in that system is far too large. The columns are `stretched' in the
+    $z$-direction allowing the pores take up less space on the $xy$ plane and 
+    thus pack closer together.  
     
     \item \begin{quote}    
     \textit{Is this significant physical insight? It is insight, but the
@@ -196,19 +207,26 @@ been documented below.
     Author reply: We thank the reviewer for pushing us to provide more
     significant physical insight based on the number of monomers per column. The
     number of columns-per-pore influences the pore radius which is important for
-    determining the limits of size-exclusion-based separations. It also tells use
+    determining the limits of size-exclusion-based separations. It also tells us
     the density of interacting sites within the pore which may play a role in small
     molecule transport. We have added the following text to the main document at
-    the end of Section~\ref{M-section:mon_per_pore} on page \_:
+    the end of Section~\ref{M-section:mon_per_pore} on page~\pageref{M-addition:pore_radius}:
     
     ``The number of columns per pore dictates the density of interaction sites
     within each pore and the pore radius. A higher number of interaction sites will
     surely play a role in transport of molecules that have an affinity for the
     monomer head groups.  The pore radius increases with the number of columns per
-    pore (See Figure~\ref{S-fig:pore_radius}.  This radius is likely related to the
-    size of the molecules which can be excluded by this type of membrane. We may be
+    pore (See Figure~\ref{S-fig:pore_radius}). This radius is likely related to the
+    size of the molecules which can be excluded by this type of membrane. One may be
     able to control LLC membrane pore size by selecting monomers that are stable in
     configurations with more columns-per-pore."
+    
+    We are unable to definitively answer the question of whether the 5-column 
+    structures are most likely to assemble in solution phase. The system does
+    not self-assemble on a timescale reasonable for simulation. See 
+    Section~\ref{S-section:self_assembly} of the supporting information where
+    we attempted self-assembly. These sorts of predictions are left for 
+    a separate effort that will use coarse grain models.
     
     \item \begin{quote}
     \textit{2. The authors make a pretty compelling case that water causes the
@@ -226,39 +244,39 @@ been documented below.
     non-uniformly spaced monomers \textit{only} if $z$-direction position
     restraints are applied to monomer head groups in order to maintain unevenly
     spaced stacking. As soon as the restraints are released, R-double fades and the
-    monomer spacing becomes uniform. We modified the text on page \_ in order to more
-    clearly convey this message:
+    monomer spacing becomes uniform. We modified the text on page~\pageref{M-modification:rdouble}
+    in order to more clearly convey this message:
  
     Old text: ``We can also produce R-double if the LLC monomers are not
     uniformly spaced in the $z$-direction, but instead form pairs that stack less
     than 3.7~\AA~apart, with COMs that are spaced 7.4 \AA~ from neighboring pairs
-    of monomers (Figure~\ref{fig:staggered_rzplot_norestraints}).  Our force field
+    of monomers (Figure~\ref{M-fig:staggered_rzplot_norestraints}). Our force field
     causes our system to tend towards uniformly spaced layers. Simulations of
     unevenly spaced systems are only stable if position restraints are applied to
     heavy atoms of the phenyl rings. Additionally, there is little evidence from QM
     studies of stacked $\pi-\pi$ systems that such uneven stacking could be
-    energetically stable.~\cite{tauer_beyond_2005}"
+    energetically stable.$^{52}$%.~\cite{tauer_beyond_2005}"
 
-    New text: ``We can also produce R-double if the LLC monomers are not
+    Modified text: ``We can also produce R-double if the LLC monomers are not
     uniformly spaced in the $z$-direction, but instead are placed in pairs that
     stack less than 3.7~\AA~apart, with COMs that are spaced 7.4 \AA~ from
-    neighboring pairs of monomers (Figure~\ref{fig:staggered_rzplot_norestraints}).
+    neighboring pairs of monomers (Figure~\ref{M-fig:staggered_rzplot_norestraints}).
     Simulations of unevenly spaced systems are only stable while position
     restraints are applied to heavy atoms of the phenyl rings. There is little
     evidence from quantum mechanical studies of stacked $\pi-\pi$ systems that such
-    uneven stacking could be energetically stable.~\cite{tauer_beyond_2005} As soon
+    uneven stacking could be energetically stable.$^{52}$ As soon %~\cite{tauer_beyond_2005} As soon
     as we remove position restraints, our system to tends towards uniformly spaced
     monomers."
 
     R-double is only long-term stable without position restraints if a small
     amount of water is present. We believe that water facilitates the appearance
     of R-double by stabilizing non-uniform spacing through hydrogen bonding, as the
-    reviewer suggests. We clarified the text on page \_ in order to make this 
-    conclusion clear:
+    reviewer suggests. We clarified the text on page~\pageref{M-modification:rdouble2}
+    in order to make this conclusion clear:
 
     Old text: ``When two vertically stacked monomer head groups hydrogen bond
     with a shared water molecule, the monomers are drawn closer together (as
-    illustrated in Figure~\ref{fig:hbond_visualization}), which creates an
+    illustrated in Figure~\ref{M-fig:hbond_visualization}), which creates an
     asymmetry that allows R-double to appear. If a monomer head group shares a
     hydrogen-bonded water molecule with a head group above itself, it will be less
     likely to share a water molecule with a head group below it due to geometric
@@ -266,16 +284,16 @@ been documented below.
     molecule with a head group below itself. In this scenario, the COMs of each
     pair are 2 times the $\pi$-stacking distance apart which would lead to R-double
     (much like the configuration in
-     Figure~\ref{fig:staggered_rzplot_norestraints}). There are a modest number of
+     Figure~\ref{M-fig:staggered_rzplot_norestraints}). There are a modest number of
     occurrences of this scenario, which we quantify in further detail in the SI,
     Section \ref{S-section:rdouble}."
 
     New text: ``The addition of a small amount of water to the pores stabilizes
     non-uniform stacking of head groups much like that shown in
-    Figure~\ref{fig:staggered_rzplot_norestraints}. When two vertically stacked
+    Figure~\ref{M-fig:staggered_rzplot_norestraints}. When two vertically stacked
     monomer head groups hydrogen bond with a shared water molecule, the monomers
     are drawn closer together (as illustrated in
-    Figure~\ref{fig:hbond_visualization}), which creates the asymmetry that allows
+    Figure~\ref{M-fig:hbond_visualization}), which creates the asymmetry that allows
     R-double to appear. If a monomer head group shares a hydrogen-bonded water
     molecule with a head group above itself, it will be less likely to share a
     water molecule with a head group below it due to geometric constraints. The
@@ -295,13 +313,14 @@ been documented below.
     water molecules removed, as suggested by the reviewer, and R-double is still
     present. This is the expected result since the structure of water itself does
     not give rise to R-double. We've added the resulting simulated XRD pattern to
-    the Supporting Information, Figure~\ref{S-TBD}. 
+    the Supporting Information, Figure~\ref{S-fig:rdouble_water_removed}. 
    
     \item \begin{quote}
-    \textit{3. The authors make the case that the R-spots feature comes from the structure of the hexagonal
-    tails, not their tilt. The authors should perform the scattering analysis to check if the R-spots are
-    present on the tilted-tails they constrain: This quick experiment would nail down their interpretation
-    here, or show that the tilted tails are also plausible (but not observed in this model).}
+    \textit{3. The authors make the case that the R-spots feature comes from the 
+    structure of the hexagonal tails, not their tilt. The authors should perform the
+    scattering analysis to check if the R-spots are present on the tilted-tails they
+    constrain: This quick experiment would nail down their interpretation here, or 
+    show that the tilted tails are also plausible (but not observed in this model).}
     \end{quote}
 
     Author reply: We thank the reviewer for their suggestion. We do not deny
@@ -310,31 +329,32 @@ been documented below.
     While the reviewer's suggested experiment is a good idea, its results in this
     case are ambiguous for a couple reasons. First, the tails may still pack
     hexagonally in the tilted configuration which would independently give rise to
-    R-spots. Second, it is necessary to impose high force constant (>1000 kJ mol
+    R-spots. Second, it is necessary to impose high force constant ($>$ 1000 kJ mol$^-1$
     nm$^{-2}$) position restraints in order to maintain a tilt angle close to that
     implied by the 2D WAXS data. The resulting high degree of order in the system 
     gives way to reflections which are easily misinterpretted. We have added the
-    following text highlighted in red to the text shown on Page \_ in order to
-    acknowledge that tail tilt is a valid explanation of R-spot-like reflections 
-    and to offer a reason a molecular reason why our monomers in our system do not
-    tilt: 
+    following text highlighted in red to the text shown on page~\pageref{M-addition:rspots} in order to
+    acknowledge that tail tilt is a valid explanation of R-spot-like reflections: 
  
     Modified text: ``Previous literature has attributed the R-spots reflection
     in this particular WAXS dataset as the result of tilted alkane
-    chains~\cite{feng_scalable_2014}. {\color{red} This explanation is not
+    chains $^{16}$. {\color{red} This explanation is not  % feng_scalable_2014
     unfounded as there are examples in literature of systems where tilted liquid
-    crystals give rise to reflections that resemble R-spots (Cite, Cite).} We
-    measured the tilt angle of the alkane chains of the 280 K system by measuring
-    the angle made by the vector extending from top to bottom of each tail with
-    respect to the membrane plane.  We found that it equilibrates to an average
-    tilt angle of -2 $\pm$ 13\degree~(Figure~\ref{fig:tilt}), far from the
-    37\degree~tilt angle previously used to explain R-spots. Even when we placed
-    position restraints on the monomers in a tilted initial configuration, monomers
-    quickly reduced their tilt relative to the $xy$ plane to an angle statisically
-    indistinguishable from zero (see Section \ref{S-section:tail_tilt} of the SI).
-    {\color{red} While it is plausible that our force field may in part be
-    responsible for the tendency of monomers to stay nearly flat, the monomer tails
-    lack the functional groups which are known to facilitate tail tilting (cite).}"
+    crystals give rise to reflections that resemble R-spots.$^{45,46}$} We
+    measured the tilt angle of the alkane chains ..."
+    
+    We have added the following citations in support of the above statement:
+    \begin{itemize}
+    
+    \item Percec, V.; Imam, M. R.; Peterca, M.; Wilson, D. A.; Graf, R.; Spiess, H. W.; Balagu-
+    rusamy, V. S. K.; Heiney, P. A. Self-Assembly of Dendronized Triphenylenes into Helical
+    Pyramidal Columns and Chiral Spheres. J. Am. Chem. Soc. 2009, 131, 7662–7677.
+
+    \item Gearba, R. I.; Anokhin, D. V.; Bondar, A. I.; Bras, W.; Jahr, M.; Lehmann, M.;
+    Ivanov, D. A. Homeotropic Alignment of Columnar Liquid Crystals in Open Films by
+    Means of Surface Nanopatterning. Adv. Mater. 2007, 19, 815–820.
+    
+    \end{itemize}
 
     \item \begin{quote}
     \textit{These arguments would be stronger if there weren't so many
@@ -348,14 +368,15 @@ been documented below.
     of our findings may be relatively independent of the force fields used, but we
     feel that we should include these qualifications in order to not overstate our
     case. It is common for researchers to run simulations for an insufficient
-    length of time and to make bold claims. We acknowledge the shortcomings of our
+    length of time and to make bold claims. While we feel that we have run our 
+    simulations sufficiently long, we still acknowledge the shortcomings of our
     techniques in order to inspire other researchers to build on our initial work. 
 
     We agree with the reviewer that we could tune our force field in order to
     exactly reproduce the $\pi-\pi$ stacking distance seen experimentally. Surely
     there will be some structural differences. There are many ways to tune a force
     field in order to achieve this. As stated earlier, we prefer to work with an
-    "out-of-the-box" force field since they are widely used and can be applied to
+    `out-of-the-box' force field since they are widely used and can be applied to
     vast number of systems. The ultimate goal of our work is to create new monomers
     that can achieve specfic separations. If we can gain experimentally-consistent
     insights using our model simulated with GAFF, then we can have increased
@@ -365,14 +386,14 @@ been documented below.
     future study in order to comment on the signficance of any differences.
 
     We have modified the paragraph of our conclusion which describes future
-    work (page \_) in order to acknowledge the possibility that a more tuned force
-    field could influence our results:
+    work (page~\pageref{M-addition:forcefield-structure}) in order to acknowledge
+    the possibility that a more tuned force field could influence our results:
 
     Old text: ``Future work, based on what has been learned in this study, may
     help further improve the structural agreement between experiment and
     simulation"
 
-    New text: ``  Future work, based on what has been learned in this study,
+    New text: ``Future work, based on what has been learned in this study,
     may help further improve the structural agreement between experiment and
     simulation and test the sensitivity of our current conclusions to a more
     accurate structure." 
@@ -391,7 +412,7 @@ been documented below.
     example, we generated test trajectories containing thousands of frames made up
     of configurations of randomly placed point scatterers in a monoclinic unit cell.
     We expect that the simulated diffraction pattern will have a gaussian shape.
-    This exact result is shown in the Figure S-\_ of the supporting information.
+    This exact result is shown in the Figure~\ref{S-fig:xrd_noise} of the SI.
     With improper treatment of the monoclinic geometry, the gaussian shape is
     skewed into an elliptical shape. 
     
@@ -421,9 +442,9 @@ been documented below.
     plotting the result with \texttt{matplotlib.pyplot.imshow} and Gaussian
     interpolation. We have added the code used to generate this figure to the
     \texttt{llcsim} repository which can be accessed at
-    \texttt{https://github.com/bencoscia/llcsim/blob/master/analysis/hexagonal\_packing.py}.
-	
-    % Add code and clarify main text
+    \texttt{llcsim/analysis/hexagonal\_packing.py}.
+    Additionally, we have added an entry to Table~\ref{S-table:python_scripts} in 
+    order to make it clear where the code can be found.
 
     \item \begin{quote}	
     \textit{Regarding the ion conductivities, how do the numbers presented here
@@ -432,14 +453,121 @@ been documented below.
 	    cases, it could help explain the order-of-magnitude discrepancy observed here.}
     \end{quote}
 
+	Author reply: We thank the reviewer for bringing up a good point. There are few studies
+	with experimental comparisons of sodium ion conduction. Conduction of pottasium in 
+	ion channels is quite common. The ionic conductivity is directly related to the 
+	diffusivity of the ion of interest, so if the dynamics of sodium are overpredicted
+	in our model, this could give rise to the discrepancy between experiment and simulation.
+	The diffusivity of sodium ions has been overpredicted with multiple models, including AMBER
+	where the diffusivity is about 2x too high. We have modified the text on page
+	\pageref{M-modification:conductivity} to include additional reasoning for the 
+	discrepancy between the simulated and experimental ionic conductivity.  
+	
+	Old text: ``The calculated value of ionic conductivity is 5 times higher than experiment 
+    likely because we simulated infinitely long, aligned pores. The ionic conductivity 
+    measurement to which we are comparing was done with an \SI{80}{\micro\metre}-thick film, 
+    nearly 10,000 times thicker than our simulated system. The thick film is likely 
+    imperfectly aligned and has defects leading to non-contiguous pores. It has been shown
+    that there is a large dependence of ionic conductivity on the alignment of the pores.
+    The ionic conductivity of an isotropically aligned film is ca. 85 times lower than that
+    of the nearly aligned film to which we are comparing.$^{16}$ We 
+    hypothesize that a thin, perfectly aligned film would have a value of ionic conductivity
+    in closer agreement with our model."
+    
+    Revised text: ``The calculated value of ionic conductivity is 5 times higher than
+    experiment likely because we simulated infinitely long, aligned pores {\color{red} and
+    because our model over-predicts the diffusivity of sodium}. The ionic conductivity 
+    measurement to which we are comparing was done with an \SI{80}{\micro\metre}-thick film, 
+    nearly 10,000 times thicker than our simulated system. The thick film is likely 
+    imperfectly aligned and has defects leading to non-contiguous pores. It has been shown
+    that there is a large dependence of ionic conductivity on the alignment of the pores.
+    The ionic conductivity of an isotropically aligned film is ca. 85 times lower than that
+    of the nearly aligned film to which we are comparing$^{16}$. 
+    {\color{red} Additionally, sodium ions parameterized with AMBER parameters exhibit bulk
+    water diffusion coefficients that are two times greater than experiment.$^{56}$ We cannot 
+    definitively say how this ratio changes in the confined LLC pore environment, but
+    it is likely that sodium diffuses faster in our system which contributes to a higher 
+    ionic conductivity than experiment.}"
+	
+	% Amber parameters used for sodium
+	% most studies with conductivity look at potassium
+	% look at diffusivities
+
 	\item \begin{quote}
-    \textit{If the authors either (a) strengthen the cases for their proposed structural insights being  highly 
-    likely (not just plausible), or (b) make a stronger case for why these particular insights have important 
-    ramifications for our understanding of LLC's (their significance), then it would be easier to publish this 
-    immediately. This reviewer's opinion is that this work would find a broader interested audience with a more
-    concise focus on these physical insights, which could be accomplished by moving more content 
-    (e.g., dihedral correlations) to the SI.}
+    \textit{If the authors either (a) strengthen the cases for their proposed structural
+    insights being  highly likely (not just plausible), or (b) make a stronger case for
+    why these particular insights have important ramifications for our understanding of 
+    LLC's (their significance), then it would be easier to publish this immediately. This
+    reviewer's opinion is that this work would find a broader interested audience with a more
+    concise focus on these physical insights, which could be accomplished by moving more
+    content (e.g., dihedral correlations) to the SI.}
     \end{quote}
+    
+    Author reply: We feel that the additions and modifications to the sections cited above 
+    have made the intent of our work clearer and helped communicate the significance of 
+    our learned insights for future work on this topic. We have clarified the purpose of work
+    and what we expect to learn from it. We have commented on the significance of knowing the
+    number of columns-per-pore. We have emphasized the observation that the radial distribution
+    of monomer components is relatively independent of the system's initial configuration
+    which is important for future high-throughput work. We have clarified and strengthened our
+    reasoning for the existence of the R-double feature.
+    
+    We sympathize with the reviewer's desire for a more concise manuscript but feel that most 
+    of the information presented is necessary in order to come to a full understanding of the 
+    work we've performed (an opinion shared by Reviewer 2). As a compromise, we've made efforts 
+    to shorten the manuscript by moving figures and discussions which draw the reader's attention
+    from the important physical insights to the SI. Excluding additional citations (new citations
+    take up about a page in the new draft), we have reduced the total length of the manuscript 
+    by 3 pages (including any additions documented above). The following changes made this possible:
+    
+    \begin{itemize}
+    
+    \item We moved the plots of the 1D Correlation functions, $g(z)$, used to calculate 
+    correlation lengths from Section~\ref{M-section:rpi} to the SI, now Figure~\ref{S-fig:correlation}.
+    The most important information, the correlation lengths, is already presented in 
+    Table~\ref{M-table:correlation_length}.
+    
+    \item We moved the discussion of the influence of system size on $g(z)$ 
+    from Section~\ref{M-section:rpi} to the Supporting Information, 
+    Section~\ref{S-section:correlation_functions}. We supplemented that discussion in
+    the main text with the following text:    
+    
+    ``We show that the system size in the $z$-direction does not significantly 
+    alter $g(z)$ in Section~\ref{S-section:correlation_functions} of the SI."
+    
+    \item We removed the discussion of a system that we annealed from 500 K to 300 K
+    from Section~\ref{M-section:rpi} because it is described again (with better context)
+    in Section~\ref{M-section:slow_dynamics}.
+    
+	\item We moved the discussion of a correlation function, $g(z)$, that averages
+	all slices of the 3D correlation function and the associated figure from 
+	Section~\ref{M-section:rpi} to Section~\ref{S-section:correlation_functions}.
+    
+    \item We've supplemented the discussion of the influence of increased noise in the 
+    $z$-direction and in the $xy$ plane on the shape and intensity of R-$\pi$ with the
+    following paragraph:
+    
+    ``We also used our simplified systems in order to study the influence of increased
+    disorder in each dimension. Increasing $z$-directional disorder reduces the
+    intensity of R-$\pi$ without changing the shape of its $q_r$ cross-section.
+    Increasing disorder on the $xy$ plane, somewhat counterintuitively, reduces
+    the FWHM of the $q_r$ cross-section of R-$\pi$ with an insignificant effect
+    on its intensity. We explain these points in more depth in 
+    Section~\ref{S-section:simplified_sf}."
+    
+    The full discussion, with figures, has been moved from Section~\ref{M-section:rpi}
+    to Section~\ref{S-section:simplified_sf}. The subsection of Section~\ref{M-section:rpi}
+    starting on page~\pageref{M-section:rpi_xsection} of the main text now has a primary
+    focus on the relationship between R-$\pi$ and inter-column correlation.
+    
+    \item We moved the plots of dihedral autocorrelation functions to the SI, 
+    Figure~\ref{S-fig:dihedral}.
+    
+    \item We moved the figure associated with physical property changes after cross-linking
+    to the SI, Figure~\ref{S-fig:xlink}, since its main findings are summarized sufficiently
+    in the text.
+    
+    \end{itemize}
 	
 \end{enumerate}
 
@@ -486,8 +614,27 @@ been documented below.
     
     Author reply: We have adjusted our language in order to specifically mention and cite polarizable force fields as follows: 
     
-    ``Polarizable force fields explicitly including $\pi-\pi$ interactions may be able to draw stacked
-    monomers closer together"
+    ``Polarizable force fields such as AMOEBA which explicitly including $\pi-\pi$ interactions
+    between aromatic functional groups may be able to draw stacked monomers closer together. 
+    $^{57-59}$"
+     
+    We have added citations with relevant force field examples, including AMOEBA:
+     
+    \begin{itemize}
+     
+    \item Shi, Y.; Xia, Z.; Zhang, J.; Best, R.; Wu, C.; Ponder, J. W.; Ren, P. Polarizable Atomic
+    Multipole-Based AMOEBA Force Field for Proteins. J. Chem. Theory Comput. 2013,
+    9, 4046–4063.
+    
+    \item Kaminski, G. A.; Stern, H. A.; Berne, B. J.; Friesner, R. A. Development of an Accu-
+    rate and Robust Polarizable Molecular Mechanics Force Field from ab Initio Quantum
+    Chemistry. J. Phys. Chem. A 2004, 108, 621–627.
+    
+    \item Lopes, P. E. M.; Lamoureux, G.; Roux, B.; MacKerell, A. D. Polarizable Empirical
+    Force Field for Aromatic Compounds Based on the Classical Drude Oscillator. J. Phys.
+    Chem. B 2007, 111, 2873–2885.
+    
+    \end{itemize}
 
 \end{enumerate}
 
