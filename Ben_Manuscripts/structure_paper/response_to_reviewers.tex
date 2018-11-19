@@ -54,91 +54,171 @@ been documented below.
 
     \end{quote}
 
-    Author reply: We thank the reviewer for offering their interpretation
-    of the purpose of our study, as it is important that we properly convey our
+    Author reply: We thank the reviewer for offering their interpretation of
+    the purpose of our study, as it is important that we properly convey our
     message. The main purpose our work is to give a detailed description of the
     structure of a lyotropic liquid crystal membrane backed by experimental data.
     This work lays a foundation for future transport studies. By matching 2D-WAXS
     data, we have attempted to unveil the most experimentally-consistent structure
-    possible. This is unlikely to be achieved if one assembled these systems using
-    united atom or coarse grained models due to the large number of potential
-    metastable configurational basins which plague a system like ours which exhibts
-    such slow dynamics.
+    possible. To clarify this purpose, we have modified and added text to the
+    paragraph on page \_ of the introduction, in which we state our perceived
+    importance of knowing the most experimentally-consistent structure:
+
+    Old text: ``A molecular-level understanding of LLC polymer membrane
+    structure, enabled by molecular dynamics (MD) simulations, can provide
+    guidelines to reduce the large chemical space available to design monomers for
+    creation of separation-specific membranes. Useful molecular-level modeling
+    should incorporate a detailed picture of the nanoscopic pore structure, which
+    is crucial to understanding the role of monomer structure in solute transport
+    and membrane design. 
+
+    New text: ``A molecular-level understanding of LLC polymer membrane
+    structure, enabled by molecular dynamics (MD) simulations, will enhance our
+    comprehension of the role of monomer structure in solute transport and provide
+    guidelines to reduce the large chemical space available to design monomers for
+    creation of separation-specific membranes. It is important that we model the
+    system with a nanoscopic pore structure that is maximally consistent with
+    experimental data in order to best approximate the chemical environment experienced
+    by solutes in future simulated transport studies."
+
+%This is unlikely to be achieved if one assembled these systems using
+%    united atom or coarse grained models due to the large number of potential
+%    metastable configurational basins which plague a system like ours which exhibts
+%    such slow dynamics.
 
     We do not intend for this study to be a validation of GAFF for this
     particular system. We believe we would come to similar conclusions using other
     force fields, however validation of this hypothesis is left for a future study.
     We chose GAFF because it is widely used to simulate organic molecules and there
-    are no force fields specifically built for our system. We are interested in
-    what information we can gain from an out-of-the-box force field and in future
+    are no catch-all force fields built for liquid crystal systems. We are interested in
+    what information we can gain from a widely-used out-of-the-box force field and in future
     work, we will validate whether GAFF is sufficient for reproducing trends in
-    experimental separation properties. Since our ultimate goal is to design new
-    monomers for solute-specific separations, we will be employing the same 
-    techniques used in this work to unsynthesized monomers. In most cases, we will
-    not have an experimental dataset to use for comparison. Despite all of the 
-    structural intracacies which we have revealed in this study, one of our main
-    conclusions is that regardless of which system we study, the radial distribution
-    of monomer components stays consistent. From this, we can hypothesize that 
-    we will extract similar transport results regardless of which configuration
-    we use to conduct transport studies. This is an extremely important finding
-    which may have been undersold in the original draft of the manuscript. 
+    experimental separation properties. To clarify our use of GAFF, we have added
+    the following text to Secton~\ref{method:parameterization} of the Methods on
+    page ~\pageref{method:parameterization}.
+
+    New text: ``We chose GAFF because it has been parameterized for use with
+    organic molecules. Although researchers have optimized force fields, including
+    GAFF (cite), for use with liquid crystals, they are often tuned in order to
+    reproduce one or more experimental observables. Since liquid crystals exist in
+    a wide range of shapes and sizes, including candidate monomers which we may
+    study, we chose to stick with a widely used force field. If we
+    can reproduce experimental trends using a single 'out-of-the-box' force field,
+    then there will be no need to complicate our studies with customized parameter
+    sets."
+
+    We have added the following citation:
+    %cite1: liquid crystal gaff tuned to get phase transition temperature.
+
+    Since our ultimate goal is to design new monomers for solute-specific
+    separations, we will be employing the same techniques used in this work to
+    unsynthesized monomers. In most cases, we will not have an experimental dataset
+    to use for comparison. Despite all of the structural intricacies which we have
+    revealed in this study, one of our main conclusions is that regardless of which
+    system we study, the radial distribution of monomer components stays
+    consistent. From this, we can hypothesize that we will extract similar
+    transport results regardless of which configuration we use to conduct
+    transport studies. This is an extremely important finding which may have
+    been undersold in the original draft of the manuscript. We have added the
+    following concluding paragraph the end of
+    Section~\label{section:pore_composition} on
+    page~\pageref{addition:pore_composition} in order to drive the point home:
+
+    New text: ``Our observations suggest that the details of transport may be
+    relatively independent of the structural differences between different possible
+    structures studied here. Despite the structural intricacies that give rise to
+    differences between the various metastable basins, all pores are characterized
+    by dense, primarily hydrophilic cores with a gradient towards a primarily
+    hydrophobic tail region far from the pore center. This implies that we might
+    see the same trends in transport properties from any of the systems studied so
+    far. Since the ultimate goal of our work is to design new monomers using high
+    throughput simulations, achieving that goal becomes tractable without the need
+    to optimize every system with an experimental dataset."
 	
-    %BJC: want to convery that we want to reproduce all of the experimental features as best as possible
-	% using an out-of-the-box force field. That way we know we are approximating the chemical environment
-	% as close to the experimental system as possible. The goal is to eventually test large numbers of 
-	% monomers without the needing to dive into the excruciating detail shown here. 
-	
+    We also modified a paragraph in our conclusion on page \_ to better
+    emphasize our point:
+
+    Old text: ``We characterized the environment centered around the membrane
+    pores and learned that the pores are generally filled with monomer head groups
+    and sodium ions. All dry systems studied showed a similar distribution of
+    sodium, head groups and tails while the wet system shows evidence of slight
+    swelling, with minor changes in the distributions due to the presence of water
+    molecules. We also observed that there is not a hard partition between
+    hydrophilic and hydrophobic regions; instead, there is a gradient of chemical
+    constituents. This finding raises questions about the nature of size-exclusion
+    separations in systems without a well-defined pore size, which potentially
+    could enable separations that vary with chemical identity as well as size. 	
+
+    New text: ``Although exactly reproducing the experimental 2D-WAXS pattern
+    required attention to minute structural details, we found that all systems
+    showed similar radial distribution functions characterized by a gradual radial
+    transition from a dense hydrophlic core to hydrophobic tails. This observation
+    enables us to study new systems that have not been experimentally characterized
+    with the expectation that any additional structural optimization will not
+    greatly influence trends in transport property predictions. The compositional
+    gradient itself raises questions about the nature of size-exclusion separations
+    in systems without well-defined pore boundaries, which potentially could enable
+    separations that vary with chemical identity as well as size."
+
     \end{quote}
 	
     \item \begin{quote}
-    \textit{1. For the simulations performed here, the authors do make a strong case that 5 columns per
-    core gets the best pore-to-pore spacing (Figure 5). However, insufficient time is accessed to see 
-    whether the 4-, 5-, and 6-column initial conditions move towards or away from the expected pore 
-    spacing over many-microseconds trajectories. That said, for the quenches performed here, 5-columns
-    per core seems more plausible than 4.}
+    \textit{1. For the simulations performed here, the authors do make a strong
+	    case that 5 columns per core gets the best pore-to-pore spacing (Figure 5).
+	    However, insufficient time is accessed to see whether the 4-, 5-, and 6-column
+	    initial conditions move towards or away from the expected pore spacing over
+	    many-microseconds trajectories. That said, for the quenches performed here,
+	    5-columns per core seems more plausible than 4.}
     \end{quote}
 	
-    Author reply: We agree with the reviewer that 5 columns-per-core is more plausible than 4 and that much
-    longer simulations may provide further supporting evidence. However, there is very little motion on
-    the hundreds of nanoseconds timescale that we simulated which suggests that we will not gain any 
-    significant new insight by extending our simulations into the microsecond regime. It is not feasible 
-    for us to carry out these simulations as it would consume our computational resources with little reward.
+    Author reply: We agree with the reviewer that 5 columns-per-core is more
+    plausible than 4 and that much longer simulations may provide further
+    supporting evidence. However, there is very little motion on the hundreds of
+    nanoseconds timescale that we simulated which suggests that we will not gain
+    any significant new insight by extending our simulations into the microsecond
+    regime. It is not feasible for us to carry out these simulations as it would
+    consume our computational resources with little reward.
     %BJC: The following might apply:
-    Some confusion may have been generated by agreement of the disordered basin 6 column-per-pore system
-    with experimental pore spacing. As mentioned in the text, the vertical stacking distance between monomers
-    in that system is far too large. The columns are `stretched' in the $z$-direction allowing the pores take
+    Some confusion may have been generated by agreement of the disordered basin
+    6 column-per-pore system with experimental pore spacing. As mentioned in the
+    text, the vertical stacking distance between monomers in that system is far too
+    large. The columns are `stretched' in the $z$-direction allowing the pores take
     up less space on the $xy$ plane and thus pack closer together.  
     
     \item \begin{quote}    
     \textit{Is this significant physical insight? It is insight, but the
-    authors do not make a compelling case for how 5 columns would change how we think about these crystals,
-    or how it would impact membrane engineering (or more importantly, whether these 5-column structures
-    assemble in the solution phase, or are only locally stable).}
+	    authors do not make a compelling case for how 5 columns would change how we
+	    think about these crystals, or how it would impact membrane engineering (or
+	    more importantly, whether these 5-column structures assemble in the solution
+	    phase, or are only locally stable).}
     \end{quote}
     
-    Author reply: We thank the reviewer for pushing us to provide more significant physical insight based
-    on the number of monomers per column. The number of columns-per-pore influences the pore radius which
-    is important for determining the limits of size-exclusion-based separations. It also tells use the 
-    density of interacting sites within the pore which may play a role in small molecule transport. We have
-    added the following text to the main document at the end of Section~\ref{M-section:mon_per_pore} on 
-    page _:
+    Author reply: We thank the reviewer for pushing us to provide more
+    significant physical insight based on the number of monomers per column. The
+    number of columns-per-pore influences the pore radius which is important for
+    determining the limits of size-exclusion-based separations. It also tells use
+    the density of interacting sites within the pore which may play a role in small
+    molecule transport. We have added the following text to the main document at
+    the end of Section~\ref{M-section:mon_per_pore} on page \_:
     
-    ``The number of columns per pore dictates the density of interaction sites within each pore and the 
-    pore radius. A higher number of interaction sites will surely play a role in transport of molecules
-    that have an affinity for the monomer head groups. 
-    %We measured the pore radius as the average distance from the pore center to each head group COM. 
-    The pore radius increases with the number of columns per pore (See Figure~\ref{S-fig:pore_radius}. 
-    This radius is likely related to the size of the molecules which can be excluded by this type of 
-    membrane. We may be able to control LLC membrane pore size by selecting monomers that are stable
-    in configurations with more columns-per-pore."
+    ``The number of columns per pore dictates the density of interaction sites
+    within each pore and the pore radius. A higher number of interaction sites will
+    surely play a role in transport of molecules that have an affinity for the
+    monomer head groups.  The pore radius increases with the number of columns per
+    pore (See Figure~\ref{S-fig:pore_radius}.  This radius is likely related to the
+    size of the molecules which can be excluded by this type of membrane. We may be
+    able to control LLC membrane pore size by selecting monomers that are stable in
+    configurations with more columns-per-pore."
     
     \item \begin{quote}
-    \textit{2. The authors make a pretty compelling case that water causes the R-double scattering feature
-    by showing its absence when water is added, but that the R-double appears and persists for 200ns after
-    the water makes its way into the crystal. However, the authors also show that nonuniformly spaced
-    monomers can give rise to the R-Double feature, a seeming counterexample to the necessity of water.
-    Is the R-double feature with water because the monomers are now irregularly spaced? What happens when
-    the waters are removed and the scattering re-performed in Fig 17c(bottom)?}
+    \textit{2. The authors make a pretty compelling case that water causes the
+    R-double scattering feature by showing its absence when water is added, but
+    that the R-double appears and persists for 200ns after the water makes its way
+    into the crystal. However, the authors also show that nonuniformly spaced
+    monomers can give rise to the R-Double feature, a seeming counterexample to the
+    necessity of water.  Is the R-double feature with water because the monomers
+    are now irregularly spaced? What happens when the waters are removed and the
+    scattering re-performed in Fig 17c(bottom)?}
     \end{quote}
     
     Author reply: We thank the reviewer for exposing a potentially unclear
@@ -146,7 +226,7 @@ been documented below.
     non-uniformly spaced monomers \textit{only} if $z$-direction position
     restraints are applied to monomer head groups in order to maintain unevenly
     spaced stacking. As soon as the restraints are released, R-double fades and the
-    monomer spacing becomes uniform. We modified the text on page _ in order to more
+    monomer spacing becomes uniform. We modified the text on page \_ in order to more
     clearly convey this message:
  
     Old text: ``We can also produce R-double if the LLC monomers are not
@@ -173,7 +253,7 @@ been documented below.
     R-double is only long-term stable without position restraints if a small
     amount of water is present. We believe that water facilitates the appearance
     of R-double by stabilizing non-uniform spacing through hydrogen bonding, as the
-    reviewer suggests. We clarified the text on page _ in order to make this 
+    reviewer suggests. We clarified the text on page \_ in order to make this 
     conclusion clear:
 
     Old text: ``When two vertically stacked monomer head groups hydrogen bond
@@ -234,7 +314,7 @@ been documented below.
     nm$^{-2}$) position restraints in order to maintain a tilt angle close to that
     implied by the 2D WAXS data. The resulting high degree of order in the system 
     gives way to reflections which are easily misinterpretted. We have added the
-    following text highlighted in red to the text shown on Page _ in order to
+    following text highlighted in red to the text shown on Page \_ in order to
     acknowledge that tail tilt is a valid explanation of R-spot-like reflections 
     and to offer a reason a molecular reason why our monomers in our system do not
     tilt: 
@@ -274,19 +354,28 @@ been documented below.
     We agree with the reviewer that we could tune our force field in order to
     exactly reproduce the $\pi-\pi$ stacking distance seen experimentally. Surely
     there will be some structural differences. There are many ways to tune a force
-    field in order to achieve this. We prefer to work with an "out-of-the-box"
-    force field since they are widely used and can be applied to vast number of
-    systems. The ultimate goal of our work is to create new monomers that can
-    achieve specfic separations.  If we can gain experimentally-consistent insights
-    using our model simulated with GAFF, then we can have increased confidence in
-    future predictions generated from systems built with unsynthesized monomers.
-    With that said, we think that it would be interesting to repeat our analysis
-    using different and/or optimized force fields in a future study in order to
-    comment on the signficance of any differences.
+    field in order to achieve this. As stated earlier, we prefer to work with an
+    "out-of-the-box" force field since they are widely used and can be applied to
+    vast number of systems. The ultimate goal of our work is to create new monomers
+    that can achieve specfic separations. If we can gain experimentally-consistent
+    insights using our model simulated with GAFF, then we can have increased
+    confidence in future predictions generated from systems built with
+    unsynthesized monomers.  With that said, we think that it would be interesting
+    to repeat our analysis using different and/or optimized force fields in a
+    future study in order to comment on the signficance of any differences.
 
-    %BJC: Emphasize main goal in intro (or pull a quote that says it)
-    %BJC: add justification of gaff to methods?
-    %BJC: Add force field optimization to future work
+    We have modified the paragraph of our conclusion which describes future
+    work (page \_) in order to acknowledge the possibility that a more tuned force
+    field could influence our results:
+
+    Old text: ``Future work, based on what has been learned in this study, may
+    help further improve the structural agreement between experiment and
+    simulation"
+
+    New text: ``  Future work, based on what has been learned in this study,
+    may help further improve the structural agreement between experiment and
+    simulation and test the sensitivity of our current conclusions to a more
+    accurate structure." 
 
     \item \begin{quote}
     \textit{The MD-Structure-Factor repository is not available at the provided
@@ -302,7 +391,7 @@ been documented below.
     example, we generated test trajectories containing thousands of frames made up
     of configurations of randomly placed point scatterers in a monoclinic unit cell.
     We expect that the simulated diffraction pattern will have a gaussian shape.
-    This exact result is shown in the Figure S-thingy of the supporting information.
+    This exact result is shown in the Figure S-\_ of the supporting information.
     With improper treatment of the monoclinic geometry, the gaussian shape is
     skewed into an elliptical shape. 
     

@@ -230,26 +230,33 @@
 
   % reworking paragraph
   A molecular-level understanding of LLC polymer membrane structure, enabled by
-  molecular dynamics (MD) simulations, will enhance our understanding of the role
+  molecular dynamics (MD) simulations, will enhance our comprehension of the role
   of monomer structure in solute transport and provide guidelines to reduce the
   large chemical space available to design monomers for creation of
-  separation-specific membranes. It is important that we model the system with
-  a nanoscopic pore structure that is maximally consistent with experimental
-  data.
+  separation-specific membranes. It is important that we model the system with a
+  nanoscopic pore structure that is maximally consistent with experimental data
+  in order to approximate the chemical environment experienced by solutes in 
+  future transport studies. Atomistic MD simulations can provide the required
+  level of detail (Figure \ref{fig:detailed_pore}), assuming the force fields are
+  sufficiently accurate. With such an atomistic model, we can directly observe
+  molecular-level solute transport and suggest governing mechanisms. We can also
+  observe how the choice of head group interacts with solutes of interest. In
+  addition, we can interchange counterions which may influence both the pore size
+  and the strength of the Donnan potential. 
 
-  A molecular-level understanding of LLC polymer membrane structure, enabled by
-  molecular dynamics (MD) simulations, can provide guidelines to reduce the large
-  chemical space available to design monomers for creation of separation-specific
-  membranes. Useful molecular-level modeling should incorporate a detailed
-  picture of the nanoscopic pore structure, which is crucial to understanding the
-  role of monomer structure in solute transport and membrane design.  Atomistic
-  MD simulations can provide the required level of detail (Figure
-  \ref{fig:detailed_pore}), assuming the force fields are sufficiently accurate.  With
-  such an atomistic model, we can directly observe molecular-level solute
-  transport and suggest governing mechanisms. We can also observe how the choice
-  of head group interacts with solutes of interest. In addition, we can
-  interchange counterions which may influence both the pore size and the strength
-  of the Donnan potential. 
+%  A molecular-level understanding of LLC polymer membrane structure, enabled by
+%  molecular dynamics (MD) simulations, can provide guidelines to reduce the large
+%  chemical space available to design monomers for creation of separation-specific
+%  membranes. Useful molecular-level modeling should incorporate a detailed
+%  picture of the nanoscopic pore structure, which is crucial to understanding the
+%  role of monomer structure in solute transport and membrane design.  Atomistic
+%  MD simulations can provide the required level of detail (Figure
+%  \ref{fig:detailed_pore}), assuming the force fields are sufficiently accurate.  With
+%  such an atomistic model, we can directly observe molecular-level solute
+%  transport and suggest governing mechanisms. We can also observe how the choice
+%  of head group interacts with solutes of interest. In addition, we can
+%  interchange counterions which may influence both the pore size and the strength
+%  of the Donnan potential. 
 
   In this study, we achieve a more realistic atomistic description of
   hexagonal LLC polymer membranes than, to our knowledge, has ever previously
@@ -425,13 +432,22 @@
   
   \subsection{Monomer Parameterization}\label{method:parameterization}
 
-  We parameterized the interaction potential for the liquid crystal monomer 
-  Na-GA3C11 using the Generalized AMBER Force Field (GAFF) 
-  \cite{wang_development_2004} with the Antechamber package \cite{wang_automatic_2006} 
-  provided with AmberTools16 \cite{case_ambertools16_2016}. We assigned atomic
-  charges using the am1bccsym method of \texttt{molcharge} shipped with QUACPAC
-  from Openeye Scientific Software. We ran all molecular dynamics simulations 
-  using GROMACS 2016 \cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008}.
+  We parameterized the interaction potential for the liquid crystal monomer
+  Na-GA3C11 using the Generalized AMBER Force Field (GAFF)
+  \cite{wang_development_2004} with the Antechamber package
+  \cite{wang_automatic_2006} provided with AmberTools16
+  \cite{case_ambertools16_2016}. We chose GAFF because it has been parameterized
+  for use with organic molecules. Although researchers have optimized force
+  fields, including GAFF (cite), for use with liquid crystals, they are often
+  tuned in order to reproduce one or more experimental observables. Since liquid
+  crystals exist in a wide range of shapes and sizes, including candidate
+  monomers which we may study, we chose to stick with a widely used force field.
+  If we can reproduce experimental trends using a single 'out-of-the-box' force
+  field, then there will be no need to complicate our studies with customized
+  parameter sets. We assigned atomic charges using the am1bccsym method of
+  \texttt{molcharge} shipped with QUACPAC from Openeye Scientific Software. We
+  ran all molecular dynamics simulations using GROMACS 2016
+  \cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008}.
 
   We generated an ensemble of characteristic, low-energy vacuum monomer
   configurations by applying a simulated annealing process to a
@@ -1918,39 +1934,42 @@
   initial configuration.}\label{fig:hbonds}
   \end{figure}
   
-  \subsection{Atomistic structure of the pore columns}
+  \subsection{Atomistic structure of the pore columns}\label{section:pore_composition}
 
   We are most interested in the structure and composition of the pores since we
   would like to study transport mechanisms within them. We have shown that the
   tails possess a certain degree of order which is necessary in order to create
   the complex WAXS pattern shown experimentally, but they will not be involved in
   a separation process. We aim to further understand the pore architecture, in
-  order to address Question~\ref{point:composition} posed in the Introduction, 
-  and observe the differences, if any, between the different plausible equilibrated
-  configurations studied so far. In general, the composition of each region, particularly within our
-  definition of the pore region, is similar between all systems. This suggests
-  that the details of transport may be relatively independent of the structural
-  differences between different possible structures studied here.
+  order to address Question~\ref{point:composition} posed in the Introduction,
+  and observe the differences, if any, between the different plausible
+  equilibrated configurations studied so far. In general, the composition of each
+  region, particularly within our definition of the pore region, is similar
+  between all systems. 
 
-  We plotted the number densities of heavy atoms in the head group 
-  (Figure~\ref{fig:head_groups_regional_density}), carbon atoms in the tail region 
-  (Figure~\ref{fig:tails_regional_density}) and all sodium ions 
-  (Figure~\ref{fig:sodium_regional_density}). For the head group region, we used heavy
-  atoms making up the aromatic rings and carboxylate groups. For the tail region, we
-  used carbon atoms of the monomer tails (See Figure \ref{S-fig:monomer_color_coded}
-  of the SI for a diagram). We averaged the histograms over the equilibrated
-  portion of the trajectory. 
-  There is a gradient in pore composition transitioning radially from the hydrophilic 
-  to the hydrophobic region, rather than an abrupt division. Based on size-exclusion 
-  experiments, the pore radius was estimated to be 0.6 nm~\cite{zhou_supported_2005}. 
-  However, the simulations do not confine
-  sodium ions and head groups to just within this experimentally-defined pore region. For dry systems,
-  19\% of sodium ions exist outside the pore region (except sandwiched, ordered basin,
-  where 16\% are outside the pore). Additionally, in all cases, about 
-  3\% of the plotted tail density is located within the pore region (except ordered sandwiched,
-  where 1.5\% are within the pore region). For the solvated system, the results are similar,
-  however the head group density is shifted slightly radially outward, due to
-  swelling of the pore by water. 
+%  This suggests that the details of transport may be
+%  relatively independent of the structural differences between different possible
+%  structures studied here.
+
+  We plotted the number densities of heavy atoms in the head group
+  (Figure~\ref{fig:head_groups_regional_density}), carbon atoms in the tail
+  region (Figure~\ref{fig:tails_regional_density}) and all sodium ions
+  (Figure~\ref{fig:sodium_regional_density}). For the head group region, we used
+  heavy atoms making up the aromatic rings and carboxylate groups. For the tail
+  region, we used carbon atoms of the monomer tails (See Figure
+  \ref{S-fig:monomer_color_coded} of the SI for a diagram). We averaged the
+  histograms over the equilibrated portion of the trajectory.  There is a
+  gradient in pore composition transitioning radially from the hydrophilic to the
+  hydrophobic region, rather than an abrupt division. Based on size-exclusion
+  experiments, the pore radius was estimated to be 0.6
+  nm~\cite{zhou_supported_2005}.  However, the simulations do not confine sodium
+  ions and head groups to just within this experimentally-defined pore region.
+  For dry systems, 19\% of sodium ions exist outside the pore region (except
+  sandwiched, ordered basin, where 16\% are outside the pore). Additionally, in
+  all cases, about 3\% of the plotted tail density is located within the pore
+  region (except ordered sandwiched, where 1.5\% are within the pore region). For
+  the solvated system, the results are similar, however the head group density is
+  shifted slightly radially outward, due to swelling of the pore by water. 
 
   The space in the pore region is filled with a mixture of sodium ions
   and head groups. The distributions appear somewhat different near r=0, but noise 
@@ -1990,6 +2009,18 @@
 	  pore center which is likely due to the swelling that is necessary in order to fit water
 	  molecules in the pore region.}~\label{fig:overlaid_densities}
   \end{figure}
+
+  \label{addition:pore_composition}
+  Our observations suggest that the details of transport may be relatively
+  independent of the structural differences between different possible structures
+  studied here. Despite the structural intricacies that give rive to differences
+  between the various metastable basins, all pores are characterized by dense,
+  primarily hydrophilic cores with a gradient towards a primarily hydrophobic
+  tail region far from the pore center. This implies that we might see the same
+  trends in transport properties from any of the systems studied so far. Since
+  the ultimate goal of our work is to design new monomers using high throughput
+  simulations, achieving that goal becomes tractable without the need to optimize
+  every system with an experimental dataset. 
 
   \subsection{Slow dynamics}\label{section:slow_dynamics}
   
@@ -2157,21 +2188,30 @@
   results of Feng et al.~\cite{feng_scalable_2014,feng_thin_2016} since they
   specify that their membrane is synthesized dry.  
 
-  We characterized the environment centered around the membrane pores and
-  learned that the pores are generally filled with monomer head groups and sodium
-  ions. All dry systems studied showed a similar distribution of sodium, head
-  groups and tails while the wet system shows evidence of slight swelling, with
-  minor changes in the distributions due to the presence of water molecules. We
-  also observed that there is not a hard partition between hydrophilic and
-  hydrophobic regions; instead, there is a gradient of chemical constituents. This finding raises
-  questions about the nature of size-exclusion separations in systems without a
-  well-defined pore size, which potentially could enable separations that
-  vary with chemical identity as well as size. 
+% BJC: new text
+  Although exactly reproducing the experimental 2D-WAXS pattern required
+  attention to minute structural details, we found that all systems showed
+  similar radial distribution functions characterized by a gradual radial
+  transition from a dense hydrophlic core to hydrophobic tails. This observation
+  enables us to study new systems that have not been experimentally characterized
+  with the expectation that any additional structural optimization will not
+  greatly influence trends in transport property predictions. The compositional
+  gradient itself raises questions about the nature of size-exclusion separations
+  in systems without well-defined pore boundaries, which potentially could enable
+  separations that vary with chemical identity as well as size. 
 
-%  We learned that we do not need water to create well-defined pore structures.
-%  Systems whose pores were filled with varying amounts of water showed a decrease
-%  in structuring relative to dry systems. At higher water concentrations, the pores
-%  begin to swell, which may be more conducive to transport.
+
+% BJC: old text:
+%  We characterized the environment centered around the membrane pores and
+%  learned that the pores are generally filled with monomer head groups and sodium
+%  ions. All dry systems studied showed a similar distribution of sodium, head
+%  groups and tails while the wet system shows evidence of slight swelling, with
+%  minor changes in the distributions due to the presence of water molecules. We
+%  also observed that there is not a hard partition between hydrophilic and
+%  hydrophobic regions; instead, there is a gradient of chemical constituents. This finding raises
+%  questions about the nature of size-exclusion separations in systems without a
+%  well-defined pore size, which potentially could enable separations that
+%  vary with chemical identity as well as size. 
 
   Our system can reasonably estimate ionic conductivity. Our
   calculations are about 1 order of magnitude higher than experiment, however
@@ -2185,7 +2225,8 @@
   preserving most of the features well.
 
   Future work, based on what has been learned in this study, may help further
-  improve the structural agreement between experiment and simulation. 
+  improve the structural agreement between experiment and simulation and test
+  the sensitivity of our current conclusions to a more accurate structure. 
   Polarizable force fields explicitly including $\pi-\pi$ interactions may be
   able to draw stacked monomers closer together 
   ~\cite{shi_polarizable_2013,kaminski_development_2004,lopes_polarizable_2007}. 
