@@ -47,8 +47,6 @@ def initialize():
                                                                                    'head group.')
     parser.add_argument('-angles', '--angles', nargs='+', default=[90, 90, 60], type=float, help='Angles between'
                         'box vectors')
-    parser.add_argument('-seed', '--random_seed', default=1, type=int, help='Pass an integer to give a seed for '
-                                                                            'random column displacement')
 
     # flags unique to equil.py
     parser.add_argument('-ring_restraints', '--ring_restraints', default=["C", "C1", "C2", "C3", "C4", "C5"], nargs='+',
