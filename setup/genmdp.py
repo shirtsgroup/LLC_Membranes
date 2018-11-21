@@ -11,7 +11,8 @@ def initialize():
     parser.add_argument('-T', '--title', default='MD Simulation', type=str, help='Simulation Title')
     parser.add_argument('-g', '--gro', default='initial.gro', type=str, help='coordinate file of system to be simulated')
     parser.add_argument('-t', '--itp', default='dipole.itp', type=str, help='Name of .itp describing monomers')
-    parser.add_argument('-s', '--em_steps', default=5000, type=int, help='Steps to take during energy minimization')
+    parser.add_argument('-s', '--em_steps', default=-1, type=int, help='Steps to take during energy minimization.'
+                                                                       'Default is to go forever until convergence.')
     parser.add_argument('-e', '--ensemble', default='npt', type=str, help='Thermodynamic ensemble to put system in')
     parser.add_argument('-d', '--dt', default=0.002, type=float, help='time step (ps)')
     parser.add_argument('-l', '--length', default=1000, type=float, help='simulation length (ps)')
@@ -43,7 +44,7 @@ def initialize():
 
 class SimulationMdp(object):
 
-    def __init__(self, gro, title='MD Simulation', T=300, em_steps=5000, time_step=0.002, length=1000,
+    def __init__(self, gro, title='MD Simulation', T=300, em_steps=-1, time_step=0.002, length=1000,
                  p_coupling='semiisotropic', barostat='berendsen', genvel='yes', restraints=False,
                  xlink=False, bcc=False, tau_p=20, tau_t=0.1, nstxout=5000, nstvout=5000, nstfout=5000, nstenergy=5000):
         """

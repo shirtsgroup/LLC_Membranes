@@ -5,10 +5,9 @@ import subprocess
 import sqlite3 as sql
 from LLC_Membranes.llclib import topology, file_rw
 from LLC_Membranes.analysis import solute_partitioning
-from LLC_Membranes.setup import lc_class
+from LLC_Membranes.setup import lc_class, equil, solvate_tails
 import numpy as np
 import os
-import mdtraj as md
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in
 
@@ -17,8 +16,7 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Solvate system and adjust so there is a certain wt % of water')
 
-    parser.add_argument('-g', '--gro', default='wiggle.gro', help='Coordinate file to add water to')
-    parser.add_argument('-ratio', '--ratio', default=1.5, type=float, help='Ratio of water in pores to water in tails')
+    parser.add_argument('-ratio', '--ratio', default=2, type=float, help='Ratio of water in pores to water in tails')
     parser.add_argument('-wt', '--weight_percent', default=10, type=float, help='Total weight percent of water')
     parser.add_argument('-tol', '--tolerance', default=1, type=int, help='Number of water molecules')
     parser.add_argument('-guess_range', default=[.4, 1], nargs='+', help='If water_content.db has no entries for the '
@@ -26,7 +24,7 @@ def initialize():
     parser.add_argument('-guess_stride', default=0.2, type=float, help='How far above/below the highest/lowest value to'
                         'make the next guess at pore radius if you need more/less water than the bounds of the water '
                         'content database (nm)')
-    parser.add_argument('-o', '--output', default='solvated_final.gro', help='Name of output file')
+    parser.add_argument('-o', '--output', default='solvated_final.gro', help='Name of fully solvated output file')
 
     # parallelization
     parser.add_argument('-mpi', '--mpi', action="store_true", help='Run MD simulations in parallel')
@@ -49,9 +47,21 @@ def initialize():
     parser.add_argument('-angles', '--angles', nargs='+', default=[90, 90, 60], type=float, help='Angles between'
                         'box vectors')
 
-    # flags unique to equil.sh
+    # flags unique to equil.py
     parser.add_argument('-ring_restraints', '--ring_restraints', default=["C", "C1", "C2", "C3", "C4", "C5"], nargs='+',
                         help='Name of atoms used to restrain head groups during initial equilibration.')
+    parser.add_argument('-forces', default=[1000000, 3162, 56, 8, 3, 2, 1, 0], help='Sequence of force constants to'
+                                                                                    'apply to ring restraints')
+    parser.add_argument('--restraint_residue', default='HII', type=str, help='Name of residue to which ring_restraint'
+                                                                             'atoms belong')
+    parser.add_argument('--restraint_axis', default='xyz', type=str, help='Axes along which to apply position '
+                                                                          'restraints')
+    parser.add_argument('-l_nvt', '--length_nvt', default=50, type=int, help='Length of restrained NVT simulations '
+                                                                             '(ps)')
+    parser.add_argument('-lb', '--length_berendsen', default=5000, type=int, help='Length of simulation using berendsen'
+                                                                                  'pressure control')
+    parser.add_argument('-lpr', '--length_Parrinello_Rahman', default=400000, type=int, help='Length of simulation '
+                        'using Parrinello-Rahman pressure control')
 
     return parser
 
@@ -148,15 +158,42 @@ class System(object):
 
         connection.close()
 
-    def equilibrate(self):
+    def build(self):
 
-        subprocess.call(['build.py', '-b', '%s' % self.args.build_monomer, '-m', '%s' % self.args.monomers_per_column,
-                         '-c', '%s' % self.args.ncolumns, '-r', '%s' % self.r, '-p', '%s' % self.args.p2p, '-n', '%s'
-                         % self.args.nopores, '-d', '%s' % self.args.dbwl, '-pd', '%s' % self.args.parallel_displaced])
+        equil.build(self.args.build_monomer, 'initial.gro', self.args.monomers_per_column, self.args.ncolumns,
+                    self.r, self.args.p2p, self.args.dbwl, self.args.parallel_displaced,
+                    nopores=self.args.nopores)
 
-        subprocess.call(['equil.sh', '-q', '1', '-b', '%s' % self.args.build_monomer.split('.')[0], '-r',
-                         '%s' % ' '.join(self.args.ring_restraints), '-m', '%s' % self.args.mpi, '-p', '%s'
-                         % self.args.nproc])
+    def restrain(self, force):
+
+        equil.restrain('initial.gro', self.args.build_monomer, force, self.args.restraint_axis,
+                       self.args.ring_restraints)
+
+    def input_files(self, gro, ensemble):
+
+        equil.generate_input_files(gro, ensemble, self.args.length_nvt, restraints=self.args.restraint_residue)
+
+    def equilibrate(self, input_files=True):
+
+        self.build()
+
+        if input_files:  # doesn't need to be done every time
+            self.restrain(self.args.forces[0])
+            self.input_files('initial.gro', 'nvt')
+
+        nrg = 1
+        while nrg > 0:
+
+            self.build()
+
+            equil.simulate('em.mdp', 'topol.top', 'initial.gro', 'em', mpi=self.args.mpi, np=self.args.nproc,
+                           restrained=True)
+
+            nrg = equil.check_energy(logname='em.log')
+
+        cp = 'cp em.gro %s.gro' % self.args.forces[0]
+        p = subprocess.Popen(cp.split())
+        p.wait()
 
     def calculate_pore_water(self):
 
@@ -166,10 +203,11 @@ class System(object):
         else:
             gmx = "gmx"
 
-        cmd = "%s solvate -cp 1000000.gro -cs spc216.gro -o solvated.gro -p topol.top" % gmx
+        cmd = "%s solvate -cp %s.gro -cs spc216.gro -o solvated.gro -p topol.top" % (gmx, self.args.forces[0])
         subprocess.call(cmd.split())
 
         pore_defining_atoms = lc_class.LC(self.args.build_monomer).pore_defining_atoms
+
         self.solvated = solute_partitioning.System('solvated.gro', pore_defining_atoms, 'SOL')
         self.solvated.locate_pore_centers()
 
@@ -188,7 +226,7 @@ class System(object):
 
         crsr = connection.cursor()
 
-        sql_command = "insert into radii (monomer, radius, mon_per_col, nwater, pd_angle, dbwl) values ('%s', %.3f, %d," \
+        sql_command = "insert into radii (monomer, radius, mon_per_col, nwater, pd_angle, dbwl) values ('%s', %.6f, %d," \
                       "%d, %.2f, %.2f);" % (self.args.build_monomer.split('.')[0], self.r, self.args.monomers_per_column,
                         len(self.solvated.pore_water[0]), self.args.parallel_displaced, self.args.dbwl)
 
@@ -197,21 +235,73 @@ class System(object):
         connection.commit()
         connection.close()
 
-    def write_final_configuration(self):
+    def write_final_pore_configuration(self):
 
         # only do this if we have converged on the correct number of waters
         water_indices = []
+
         for i in self.solvated.tail_water[0]:  # tail_water indices are given as the center of mass of each water
             water_indices += self.solvated.residue_indices[(self.water.natoms * i): self.water.natoms * (i + 1)].tolist()
 
-        keep = np.full(self.solvated.pos[1], True, dtype=bool)  # array of True. Booleans are fast
+        keep = np.full(self.solvated.pos.shape[1], True, dtype=bool)  # array of True. Booleans are fast
         keep[water_indices] = False  # set pore indices to False
 
-        file_rw.write_gro_pos(self.solvated.pos[0, keep, :], self.args.output, ids=np.array(self.solvated.ids)[keep],
-                              res=np.array(self.solvated.res)[keep])
+        # change all 'HOH' to 'SOL' because mdtraj changed it
+        res = np.array(self.solvated.res)
+        res[np.where(np.array(self.solvated.res) == 'HOH')[0]] = 'SOL'
+
+        file_rw.write_gro_pos(self.solvated.pos[0, keep, :], 'solvated_pores.gro', ids=np.array(self.solvated.ids)[keep],
+                              res=res[keep], box=self.solvated.box)
+
+        # rewrite topology files
+        self.input_files('solvated_pores.gro', 'nvt')
+
+    def place_water_tails(self):
+
+        tails = solvate_tails.System('solvated_pores.gro', 'topol.top', self.args.build_monomer,
+                                     rbounds=[0.3, 1], restraints=True)
+
+        tails.insert_all_water(self.tail_water, output=self.args.output, final_topname='topol.top')
+
+    def full_equilibration(self):
+
+        equil.simulate('nvt.mdp', 'topol.top', '%s' % self.args.output, 'nvt', mpi=self.args.mpi, np=self.args.nproc,
+                       restrained=True)
+
+        cp = "cp nvt.gro em.gro"
+        subprocess.Popen(cp.split()).wait()
+
+        cp = "cp nvt.gro %s.gro" % self.args.forces[0]
+        subprocess.Popen(cp.split()).wait()
+
+        equil.generate_input_files('nvt.gro', 'nvt', args.length_nvt, genvel=False,
+                                   restraints=self.args.restraint_residue)
+
+        for f in self.args.forces[1:]:
+
+            equil.restrain(self.args.output, self.args.build_monomer, f, self.args.restraint_axis,
+                           self.args.ring_restraints)
+            equil.simulate('nvt.mdp', 'topol.top', 'em.gro', 'nvt', mpi=self.args.mpi, np=self.args.nproc,
+                           restrained=True)
+
+            cp = "cp nvt.gro %s.gro" % f
+            subprocess.Popen(cp.split()).wait()
+
+            cp = "cp nvt.trr %s.trr" % f
+            subprocess.Popen(cp.split()).wait()
+
+        equil.generate_input_files(self.args.output, 'npt', self.args.length_berendsen, genvel=False,
+                                   barostat='berendsen')
+        equil.simulate('npt.mdp', 'topol.top', 'nvt.gro', 'berendsen', mpi=args.mpi, np=args.nproc)
+
+        equil.generate_input_files('berendsen.gro', 'npt', self.args.length_Parrinello_Rahman, genvel=False,
+                                   barostat='Parrinello-Rahman')
+        equil.simulate('npt.mdp', 'topol.top', 'berendsen.gro', 'PR', mpi=args.mpi, np=args.nproc)
 
 
 if __name__ == "__main__":
+
+    os.environ["GMX_MAXBACKUP"] = "-1"  # stop GROMACS from making backups
 
     args = initialize().parse_args()
 
@@ -219,8 +309,9 @@ if __name__ == "__main__":
 
     while not sys.converged:
         sys.query_database()
-        print(sys.r)
         sys.equilibrate()
         sys.calculate_pore_water()
 
-    sys.write_final_configuration()
+    sys.write_final_pore_configuration()
+    sys.place_water_tails()
+    sys.full_equilibration()

@@ -231,13 +231,13 @@
   % BJC: reworked text
   \label{rework:purpose}
   A molecular-level understanding of LLC polymer membrane structure, enabled by
-  molecular dynamics (MD) simulations, will enhance our comprehension of the role
-  of monomer structure in solute transport and provide guidelines to reduce the
-  large chemical space available to design monomers for creation of
-  separation-specific membranes. It is important that we model the system with a
-  nanoscopic pore structure that is maximally consistent with experimental data
-  in order to approximate the chemical environment experienced by solutes in 
-  future transport studies. Atomistic MD simulations can provide the required
+  molecular dynamics (MD) simulations, will enhance our understanding of the role
+  of monomer structure in solute transport and provide guidelines to reduce the 
+  large chemical space available to design monomers for creation of 
+  separation-specific membranes. It is important that we model the system with
+  a nanoscopic pore structure that is maximally consistent with experimental data
+  in order to best approximate the chemical environment experienced by solutes
+  in future simulated transport studies. Atomistic MD simulations can provide the required
   level of detail (Figure \ref{fig:detailed_pore}), assuming the force fields are
   sufficiently accurate. With such an atomistic model, we can directly observe
   molecular-level solute transport and suggest governing mechanisms. We can also
@@ -442,8 +442,8 @@
   fields, including GAFF, for use with liquid crystals, they are often tuned in 
   order to reproduce one or more experimental observables for specific types of
   liquid crystal molecules~\cite{cook_development_2001,boyd_optimization_2015}.
-  Since liquid crystals exist in a wide range of shapes and sizes, including candidate
-  monomers which we may study, we chose to stick with a widely used force field.
+  Na-GA3C11 does not have a structure characteristic of more commonly studied 
+  liquid crystal monomers so we chose to stick with a widely used force field.
   If we can reproduce experimental trends using a single `out-of-the-box' force
   field, then there will be no need to complicate our studies with customized
   parameter sets. We assigned atomic charges using the am1bccsym method of
@@ -505,7 +505,7 @@
   parameters is presented in the SI, Section
   \ref{S-section:initial_config_dependence}. The distance between vertically
   stacked monomers, the $xy$ position of monomers with respect to vertically
-  adjacent monomers, and the number of columns per pore do influence the
+  adjacent monomers, and the number of columns-per-pore do influence the
   equilibrated structure and require further justification for their choices. We
   rely on experimental data to inform them. 
 
@@ -531,14 +531,14 @@
   Both have reported stacking distances near the R-$\pi$ value of 3.7 \AA. Head groups in
   our sandwiched initial configuration stack directly on top of each other while
   head groups in the parallel displaced initial configuration stack with an offset
-  of $180^\circ/ncol$ where $ncol$ is the number of columns per pore. See Figure 
+  of $180^\circ/ncol$ where $ncol$ is the number of columns-per-pore. See Figure 
   \ref{S-fig:stacking} of the SI for a detailed illustration 
   of the initial configurations in each mode.
 
-  The number of columns per pore is unknown, as stated in Question
+  The number of columns-per-pore is unknown, as stated in Question
   (\ref{point:monomernum}). We tested configurations constructed with a varied
-  number of columns per pore. We built systems in the sandwiched and parallel
-  displaced configurations with 4, 5, 6, 7 and 8 columns per pore.
+  number of columns-per-pore. We built systems in the sandwiched and parallel
+  displaced configurations with 4, 5, 6, 7 and 8 columns-per-pore.
 
   \subsection{Equilibration}\label{section:equilibration}
   
@@ -820,11 +820,11 @@
   
   \subsection{Density of Monomers Around Pores}\label{section:mon_per_pore}
   
-  Our simulations best support a model built with 5 monomer columns per pore
+  Our simulations best support a model built with 5 monomer columns-per-pore
   based on the measured equilibrated pore-to-pore distances. To identify the
   density of monomer columns around each pore, addressing Question
   \ref{point:monomernum} in the introduction, we ran simulations of systems
-  created with 4--8 columns per pore. We built systems in both the parallel
+  created with 4--8 columns-per-pore. We built systems in both the parallel
   displaced and sandwiched configurations and equilibrated them according to the
   dry equilibration procedure. We tested all systems with an initial vertical
   monomer spacing, $\mathit{d}$, of 3.7 \AA~in accordance with R-$\pi$. We tested
@@ -838,7 +838,7 @@
   \begin{figure}[!htb]
 	\centering
 	\includegraphics[width=\linewidth]{p2p.pdf}
-	\caption{Systems with 5 columns per pore have equilibrated pore spacings closest to
+	\caption{Systems with 5 columns-per-pore have equilibrated pore spacings closest to
 			 the experimental value of 4.12 nm. The equilibrated pore spacing of the model 	
 			 increases as the number of columns in each pore increases.}~\label{fig:p2p}
   \end{figure}  
@@ -869,28 +869,52 @@
   Systems built with 5 columns around each pore equilibrate to a pore spacing
   that is most consistent with the experimental value of 4.12 nm derived from
   SAXS measurements (Figure~\ref{fig:SAXS}). Ordered basin systems built with 4
-  columns per pore equilibrate to an average pore spacing 0.25 nm lower than
-  experiment. Ordered basin systems built with 6 columns per pore, have an
-  equilibrated pore spacing ca. 0.50 nm higher than experiment. Monomers in
-  disordered basin systems built with 6 columns-per-pore agree with experimental
-  pore-to-pore distances within error, but stack too far apart. 6
-  column per pore disordered sandwiched and disordered parallel displaced
-  configurations stack $\sim$~4.87 and 4.94 \AA~apart respectively, which is
-  $\sim$ 1.2~\AA~further apart than suggested by experiment. 5 column-per-pore
-  systems stack, at a maximum, 0.9 \AA~further apart than experiment (see
-  Table~\ref{table:correlation_length}). The remainder of this discussion will
-  therefore focus on the analysis of systems built with 5 columns per pore. 
+  columns-per-pore equilibrate to an average pore spacing 0.25 nm lower than
+  experiment. Ordered basin systems built with 6 columns-per-pore, have an
+  equilibrated pore spacing ca. 0.50 nm higher than experiment. Monomers in 
+  disordered basins systems stack too far apart, therefore they are not 
+  suitable candidate structures. Although their pore-to-pore spacing is in
+  close agreement with experiment, the 6 column-per-pore disordered 
+  sandwiched and disordered parallel displaced configurations stack 
+  $\sim$~4.87 and 4.94 \AA~apart respectively, which is $\sim$ 
+  1.2~\AA~further apart than suggested by experiment. The monomer columns in
+  these systems are effectively stretched in the $z$-direction which allows
+  them and the pores to pack closer together on the $xy$ plane. 5 column-per-pore
+  systems stack, at a maximum, 0.9 \AA~further apart than experiment 
+  (see Table~\ref{table:correlation_length}). The remainder of this discussion
+  will therefore focus on the analysis of systems built with 5 columns-per-pore. 
   
   %BJC: added.
   \label{addition:pore_radius}
-  The number of columns per pore dictates the density of interaction sites within
+  The number of columns-per-pore dictates the density of interaction sites within
   each pore and the pore radius. A higher number of interaction sites will 
   surely play a role in transport of molecules that have an affinity for the monomer
   head groups. The pore radius increases with the number of 
-  columns per pore (See Figure~\ref{S-fig:pore_radius}). This radius is likely 
+  columns-per-pore (See Figure~\ref{S-fig:pore_radius}). This radius is likely 
   related to the size of the molecules which can be excluded by this type of 
   membrane. One may be able to control LLC membrane pore size by selecting monomers
   that are stable in configurations with more columns-per-pore.
+  
+  \begin{table}[h]
+  \centering
+  \begin{tabular}{cccc}
+  \toprule
+  System             & $\mathit{d}$ (\AA) & $\mathit{d}_{equil}$ (\AA) & Correlation Length (\AA) \\
+  \midrule
+  Sandwiched         & 3.7                &    4.27 $\pm$ 0.03         & 4.2 $\pm$ 0.8            \\
+  Parallel Displaced & 3.7                &    4.33 $\pm$ 0.04         & 14.5 $\pm$ 1.3           \\ 
+  Sandwiched         & 5.0                &    4.48 $\pm$ 0.07         & 3.2 $\pm$ 0.9            \\
+  Parallel Displaced & 5.0                &    4.60 $\pm$ 0.08         & $<$ $d_{equil}$ \\ 
+  Experiment         & --                 &    3.70                    & 9 $\pm$ 1               \\
+  \bottomrule
+  \end{tabular}
+  \caption{For 5 column-per-pore systems, the equilibrated vertical stacking distance, 
+  $\mathit{d}_{equil}$, of monomers in the disordered basin is approximately 0.6 \AA higher than
+  their initial configuration stacking distance, $\mathit{d}$, while $\mathit{d}_{equil}$ is 
+  smaller than $\mathit{d}$ for disordered basin systems, but 0.9 \AA higher than experiment. 
+  The correlation length is larger for systems in the ordered basin.}
+  \label{table:correlation_length}
+  \end{table}
 
   \subsection{Simulated XRD Comparison to 2D-WAXS Data}
 
@@ -898,7 +922,7 @@
   patterns produced from equilibrated MD trajectories (see
   Section~\ref{method:xrd}) and comparing these simulated patterns to experiment,
   addressing Question~\ref{point:xrdmatch} in the Introduction. We tested systems
-  built with 5 columns per pore in the parallel displaced and sandwiched
+  built with 5 columns-per-pore in the parallel displaced and sandwiched
   configurations at 300 K in the ordered and disordered basins, as those were the
   most consistent with the most unambiguous XRD features, the pore-to-pore
   spacing and the stacking distance, as described in
@@ -1122,7 +1146,7 @@
   neighbor COMs with respect to the $xy$ plane of the membrane. We see distinct
   peaks in the distribution of these angles located ca. $-60\degree$, $0\degree$,
   and $60\degree$, which is consistent with a hexagonally-packed configuration
-  (Figure~\ref{fig:layered_tails}).  This ordering is primarily in the parts of
+  (Figure~\ref{fig:layered_tails}). This ordering is primarily in the parts of
   the tail proximal to the heads, and dies off at the tail ends, where there is
   more space to fill causing them to pack nearly isotropically. See Section
   \ref{S-section:tail_packing} of the SI for a more detailed explanation of the
@@ -1347,25 +1371,6 @@
 %	  this correlation length is less than the vertical distance between
 %	  monomers.}\label{fig:correlation}
 %  \end{figure}  
-  
-  \begin{table}[h]
-  \centering
-  \begin{tabular}{cccc}
-  \toprule
-  System             & $\mathit{d}$ (\AA) & $\mathit{d}_{equil}$ (\AA) & Correlation Length (\AA) \\
-  \midrule
-  Sandwiched         & 3.7                &    4.27 $\pm$ 0.03         & 4.2 $\pm$ 0.8            \\
-  Parallel Displaced & 3.7                &    4.33 $\pm$ 0.04         & 14.5 $\pm$ 1.3           \\ 
-  Sandwiched         & 5.0                &    4.48 $\pm$ 0.07         & 3.2 $\pm$ 0.9            \\
-  Parallel Displaced & 5.0                &    4.60 $\pm$ 0.08         & $<$ $d_{equil}$ \\ 
-  Experiment         & --                 &    3.70                    & 9 $\pm$ 1               \\
-  \bottomrule
-  \end{tabular}
-  \caption{The correlation length is larger for systems in the ordered basin.
-	  The equilibrated vertical stacking distance, $\mathit{d}_{equil}$, is also
-	  smaller.}
-  \label{table:correlation_length}
-  \end{table}
 
   \subsubsection*{Shape and Intensity of the $q_r$ Cross-section of R-$\pi$}\label{section:rpi_xsection}
 
@@ -1790,7 +1795,7 @@
   to heavy atoms of the phenyl rings. There is little evidence from quantum
   mechanical studies of stacked $\pi-\pi$ systems that such uneven stacking could
   be energetically stable.~\cite{tauer_beyond_2005} As soon as we remove position
-  restraints, our system to tends towards uniformly spaced monomers. 
+  restraints, our system immediately moves towards uniformly spaced monomers. 
  
   The addition of water to the system promotes the appearance of R-double,
   providing an answer to Question~\ref{point:water} posed in the introduction.
@@ -2030,16 +2035,16 @@
   \end{figure}
 
   \label{addition:pore_composition}
-  Our observations suggest that the details of transport may be relatively
+  Our observations suggest that the details of transport may be relatively 
   independent of the structural differences between different possible structures
-  studied here. Despite the structural intricacies that give rive to differences
-  between the various metastable basins, all pores are characterized by dense,
-  primarily hydrophilic cores with a gradient towards a primarily hydrophobic
+  studied here. Despite the structural intricacies that give rise to differences
+  between the various metastable basins, all pores are characterized by dense, 
+  primarily hydrophilic cores with a gradient towards a primarily hydrophobic 
   tail region far from the pore center. This implies that we might see the same
-  trends in transport properties from any of the systems studied so far. Since
-  the ultimate goal of our work is to design new monomers using high throughput
+  trends in transport properties from any of the systems studied so far. Since the
+  ultimate goal of our work is to design new monomers using high throughput 
   simulations, achieving that goal becomes tractable without the need to optimize
-  every system with an experimental dataset. 
+  every system with an experimental dataset.
 
   \subsection{Slow Dynamics}\label{section:slow_dynamics}
   
@@ -2203,7 +2208,7 @@
 
   We achieve maximum structural consistency with experiment, as determined by
   simulated 2D-XRD patterns, when we build our model in the ordered basin
-  parallel displaced configuration with 5 monomer columns per pore and 1 wt\%
+  parallel displaced configuration with 5 monomer columns-per-pore and 1 wt\%
   water. R-alkanes and R-pores appear where expected for the reasons originally
   predicted. We find that R-spots is likely due to ordered alkane chain packing.
   R-$\pi$ appears at lower $q_z$ values than experiment because monomer stack too far
@@ -2256,7 +2261,7 @@
   Future work, based on what has been learned in this study, may help further
   improve the structural agreement between experiment and simulation and test
   the sensitivity of our current conclusions to a more accurate structure. 
-  Polarizable force fields such as AMOEBA which explicitly including $\pi-\pi$ interactions
+  Polarizable force fields such as AMOEBA which explicitly include $\pi-\pi$ interactions
   between aromatic functional groups may be able to draw stacked monomers closer together 
   ~\cite{shi_polarizable_2013,kaminski_development_2004,lopes_polarizable_2007}. 
   We can study ensembles of long simulations in order

@@ -122,6 +122,16 @@ def simulate(mdp, top, config, out, restrained=False, mpi=False, np=4):
     p.wait()
 
 
+def check_energy(logname='em.log'):
+
+    with open('%s' % logname) as f:
+        for line in f:
+            if line.count("Potential Energy") == 1:
+                nrg = float(line.split()[3])
+
+    return nrg
+
+
 if __name__ == "__main__":
 
     args = initialize().parse_args()
@@ -138,11 +148,7 @@ if __name__ == "__main__":
 
     simulate('em.mdp', 'topol.top', '%s' % args.initial, 'em', mpi=args.mpi, np=args.nproc)
 
-    nrg = 1
-    with open('em.log') as f:
-        for line in f:
-            if line.count("Potential Energy") == 1:
-                nrg = float(line.split()[3])
+    nrg = check_energy(logname='em.log')
 
     # rebuild until energy minimization reaches a negative potential energy
     while nrg > 0:
@@ -152,10 +158,7 @@ if __name__ == "__main__":
 
         simulate('em.mdp', 'topol.top', '%s' % args.initial, 'em', mpi=args.mpi, np=args.nproc)
 
-        with open('em.log') as f:
-            for line in f:
-                if line.count("Potential Energy") == 1:
-                    nrg = float(line.split()[3])
+        nrg = check_energy(logname='em.log')
 
     simulate('nvt.mdp', 'topol.top', 'em.gro', 'nvt', mpi=args.mpi, np=args.nproc, restrained=True)
 
@@ -173,8 +176,11 @@ if __name__ == "__main__":
 
         copy = "cp nvt.gro %s.gro" % f
         p = subprocess.Popen(copy.split())
+        p.wait()
+
         copy = "cp nvt.trr %s.trr" % f
         p = subprocess.Popen(copy.split())
+        p.wait()
 
     generate_input_files(args.initial, 'npt', args.length_berendsen, genvel=False, barostat='berendsen')
     simulate('npt.mdp', 'topol.top', 'nvt.gro', 'berendsen', mpi=args.mpi, np=args.nproc)

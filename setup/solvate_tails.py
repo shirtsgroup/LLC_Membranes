@@ -10,6 +10,7 @@ import copy
 import os, glob
 import sys
 import time
+import tqdm
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in
 
@@ -21,13 +22,16 @@ def initialize():
     parser.add_argument('-g', '--gro', default='wiggle.gro', help='Name of structure file where water will be added')
     parser.add_argument('-p', '--top', default='topol.top', help='Name of topology that needs to be updated')
     parser.add_argument('-o', '--out', default='solv_tails.gro', help='Name of output file')
-    parser.add_argument('-r', '--ref', nargs='+', default=['O5', 'O6', 'O7', 'O8', 'O9', 'O10'], help='Names of atoms'
-                        'where water molecules will be placed in proximity to')
+    parser.add_argument('-m', '--monomer', default='NAcarb11V.gro', help='Name of monomer used to build system')
+    # ref now added to annotatd .gro file with 'T'
+    #parser.add_argument('-r', '--ref', nargs='+', default=['O5', 'O6', 'O7', 'O8', 'O9', 'O10'], help='Names of atoms'
+    #                    'where water molecules will be placed in proximity to')
     parser.add_argument('-rmin', default=0.2, type=float, help='Minimum distance away from reference atom to place'
                                                                'water molecules (nm)')
     parser.add_argument('-rmax', default=0.4, type=float, help='Maximum distance away from reference atom to place'
                                                                'water molecules (nm)')
     parser.add_argument('-n', '--nwater', default=600, type=int, help='Number of waters to add to the system')
+    parser.add_argument('--restrained', action="store_true", help='Add flag if system contains position restraints')
 
     args = parser.parse_args()
 
@@ -69,35 +73,35 @@ def random_pt_spherical_shell(pt, rmin, rmax):
 
     return random_pt
 
-
-def random_water_orientation(water_xyz, water_alignment_vector, placement):
-    """
-    Randomly orient a water molecule and then place it a desired location
-    :param water_xyz: 3d coordinates of a water molecule
-    :param water_alignment_vector: A reference vector to rotate the water molecule about
-    :param placement: where to place final water configuration in space
-    :return: coordinates of oriented and translated water molecule
-    """
-
-    u = np.random.normal(size=3)  # random vector. From normal distribution since sphere
-    u /= np.linalg.norm(u)  # normalize
-
-    R = transform.Rvect2vect(water_alignment_vector, u)  # rotation matrix to align water_alignment_vector with u
-
-    water_xyz -= water_xyz[0, :]  # center at origin
-
-    rotated = np.zeros([water_xyz.shape[1], 3])
-    for i in range(water_xyz.shape[1]):
-        rotated[i, :] = np.dot(R, water_xyz[i, :])
-
-    rotated += placement  # translate to deisred location
-
-    return rotated
+#
+# def random_water_orientation(water_xyz, water_alignment_vector, placement):
+#     """
+#     Randomly orient a water molecule and then place it a desired location
+#     :param water_xyz: 3d coordinates of a water molecule
+#     :param water_alignment_vector: A reference vector to rotate the water molecule about
+#     :param placement: where to place final water configuration in space
+#     :return: coordinates of oriented and translated water molecule
+#     """
+#
+#     u = np.random.normal(size=3)  # random vector. From normal distribution since sphere
+#     u /= np.linalg.norm(u)  # normalize
+#
+#     R = transform.Rvect2vect(water_alignment_vector, u)  # rotation matrix to align water_alignment_vector with u
+#
+#     water_xyz -= water_xyz[0, :]  # center at origin
+#
+#     rotated = np.zeros([water_xyz.shape[1], 3])
+#     for i in range(water_xyz.shape[1]):
+#         rotated[i, :] = np.dot(R, water_xyz[i, :])
+#
+#     rotated += placement  # translate to deisred location
+#
+#     return rotated
 
 
 class System(object):
 
-    def __init__(self, gro, top, nwater, ref, rbounds=[0.3, 1]):
+    def __init__(self, gro, top, monomer, rbounds=[0.3, 1], restraints=False, mpi=False, nproc=4):
         """Add set number of water molecules to the tail region of a given configuration
 
         :param gro: initial coordinate file to be solvated
@@ -118,6 +122,13 @@ class System(object):
         self.coordinates = self.t.xyz[0, :, :]  # initial coordinates
         self.natoms = self.t.n_atoms  # number of atoms in the system
         self.rmin, self.rmax = rbounds
+        self.restraints = restraints
+        self.mpi = mpi
+        self.np = nproc
+
+        self.gmx = "gmx"
+        if self.mpi:
+            self.gmx = "mpirun -np %s gmx_mpi" % self.np
 
         # handle mdtraj renaming SOL to HOH
         self.res = []
@@ -135,7 +146,7 @@ class System(object):
                 self.res.append(a.residue.name)
                 self.ids.append(a.name)
 
-        self.full_box = t.unitcell_vectors  # unitcell vectors
+        self.full_box = self.t.unitcell_vectors  # unitcell vectors
         self.box_gromacs = [self.full_box[0, 0, 0], self.full_box[0, 1, 1], self.full_box[0, 2, 2],
                             self.full_box[0, 0, 1], self.full_box[0, 2, 0], self.full_box[0, 1, 0],
                             self.full_box[0, 0, 2], self.full_box[0, 1, 2], self.full_box[0, 2, 0]]
@@ -143,7 +154,6 @@ class System(object):
         self.water = topology.Molecule('HOH').xyz[0, ...]
         self.water_alignment_vector = self.water[0, :] - np.mean(self.water, axis=0)  # vector around which water molecule can be rotated
 
-        self.nwater = nwater  # to be determined based on concentration needed
         self.topname = top
 
         with open(self.topname, 'r') as f:
@@ -153,7 +163,8 @@ class System(object):
 
         self.add_water_placeholder()
 
-        self.ref_atoms = [a.index for a in self.t.topology.atoms if a.name in ref]  # indices of reference atoms
+        self.monomer = topology.LC(monomer)
+        self.ref_atoms = [a.index for a in self.t.topology.atoms if a.name in self.monomer.tail_atoms]  # indices of reference atoms
         self.ref_atom_locations = self.t.xyz[0, self.ref_atoms, :]  # coordinates of reference atoms
 
         self.placement_options = [i for i in range(len(self.ref_atoms))]  # list of indices corresponding to atoms in ref_atom_locations
@@ -173,7 +184,7 @@ class System(object):
 
         solvated = False
         for i in range(len(self.top)):
-            if self.top[i].count('Water Topology') >= 1:
+            if self.top[i].count('Water Topology') >= 1 or self.top[i].count('SOL Topology') >= 1:
                 solvated = True
 
         if not solvated:
@@ -210,10 +221,9 @@ class System(object):
         """
 
         placement_atom = np.random.choice(self.placement_options)  # choose which atom to place water molecule near
-        water_placement_point = random_pt_spherical_shell(self.ref_atom_locations[placement_atom, :], self.rmin,
+        placement = random_pt_spherical_shell(self.ref_atom_locations[placement_atom, :], self.rmin,
                                                           self.rmax)  # point near placement atom
-        placed_water_coordinates = random_water_orientation(self.water, self.water_alignment_vector,
-                                                            water_placement_point)  # randomly orient water molecule and place at water_placement_point
+        placed_water_coordinates = transform.random_orientation(self.water, self.water_alignment_vector, placement)
         new_coordinates = np.concatenate((self.coordinates, placed_water_coordinates),
                                          axis=0)  # add to full list of coordinates
         names = self.ids + self.water_ids  # add water to ids
@@ -236,18 +246,22 @@ class System(object):
 
         write_em_mdp(steps)  # write em.mdp with a given number of steps
 
-        p1 = subprocess.Popen(
-            ["cp", "placeholder_top.top", "top_intermediate.top"])  # make a copy of placeholder_top.top
+        cp = "cp placeholder_top.top top_intermediate.top"
+        p1 = subprocess.Popen(cp.split())  # make a copy of placeholder_top.top
         p1.wait()
-        p2 = subprocess.Popen(["sed", "-i", "-e", "s/PLACEHOLDER/%s/g" % (nwater),
-                               "top_intermediate.top"])  # replace PLACEHOLDER with nwater
+
+        sed = "sed -i -e s/PLACEHOLDER/%s/g top_intermediate.top" % nwater
+        p2 = subprocess.Popen(sed.split())
         p2.wait()
-        p3 = subprocess.Popen(["gmx", "grompp", "-p", "top_intermediate.top", "-f", "em.mdp", "-o", "em", "-c",
-                               "water.gro"], stdout=open(os.devnull, 'w'),
-                              stderr=subprocess.STDOUT)  # generate atomic level input file
+
+        grompp = "%s grompp -f em.mdp -p top_intermediate.top -c water.gro -o em" % self.gmx
+        if self.restraints:
+            grompp += " -r water.gro"
+        p3 = subprocess.Popen(grompp.split(), stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
         p3.wait()
-        p4 = subprocess.Popen(["gmx", "mdrun", "-deffnm", "em"], stdout=open(os.devnull, 'w'),
-                              stderr=subprocess.STDOUT)  # run energy minimization
+
+        mdrun = "%s mdrun -deffnm em" % self.gmx
+        p4 = subprocess.Popen(mdrun.split(), stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
         p4.wait()
 
         t = md.load('em.gro')
@@ -256,12 +270,12 @@ class System(object):
 
         return minimized_coordinates, new_ref_atom_locations
 
-    def insert_all_water(self):
+    def insert_all_water(self, nwater, output='solvated.gro', final_topname='topol.top'):
 
         trials = 0  # number of water placement tries
-        start = time.time()
+        # start = time.time()
 
-        for i in range(self.nwater):
+        for i in tqdm.tqdm(range(nwater), unit='waters'):
             # randomly place water molecule and do short energy minimization
             energy, new_coordinates, placement_atom, new_ref_atom_locations = self.place_water(i, 5)
             trials += 1
@@ -281,17 +295,33 @@ class System(object):
                     count = 0
                     write_em_mdp(1)
 
-            success_rate = 100*((i + 1) / trials)
-            s = "Waters placed: %s/%s, Placement Success Rate : %3.2f, Potential Energy = %s\r" % (i, self.nwater,
-                                                                                                   success_rate, energy)
-            sys.stdout.write("\r"+s)
-            sys.stdout.flush()
+            # success_rate = 100*((i + 1) / trials)
+            # s = "Waters placed: %s/%s, Placement Success Rate : %3.2f, Potential Energy = %s\r" % (i, nwater,
+            #                                                                                        success_rate, energy)
+            # sys.stdout.write("\r"+s)
+            # sys.stdout.flush()
             self.ids += self.water_ids
             self.res += self.water_res
             self.coordinates = copy.deepcopy(new_coordinates)
             self.placement_options.remove(placement_atom)
             for filename in glob.glob("./#*"):
                 os.remove(filename)
+
+        cp = "cp top_intermediate.top %s" % final_topname
+        p = subprocess.Popen(cp.split())
+        p.wait()
+
+        # energy minimize final configuration until convergence
+        write_em_mdp(-1)
+        grompp = "%s grompp -f em.mdp -p %s -c water.gro -o %s" % (self.gmx, final_topname, output.split('.')[0])
+        if self.restraints:
+            grompp += " -r water.gro"
+        p = subprocess.Popen(grompp.split())
+        p.wait()
+
+        mdrun = "%s mdrun -v -deffnm %s" % (self.gmx, output.split('.')[0])
+        p = subprocess.Popen(mdrun.split())
+        p.wait()
 
 
 if __name__ == "__main__":
@@ -301,7 +331,8 @@ if __name__ == "__main__":
     if os.path.exists(args.out):  # Get rid of output file if it already exists since it can mess things up
         os.remove(args.out)
 
-    sys = System(args.gro, args.top, args.nwater, args.ref, rbounds=[args.rmin, args.rmax])
+    system = System(args.gro, args.top, args.monomer, rbounds=[args.rmin, args.rmax], restraints=args.restrained)
+    system.insert_all_water(args.nwater)
 
     # water = md.load('%s/../top/solutes/water.gro')  # load water structure
     # water_xyz = water.xyz[0, :, :]  # get water coordinates
@@ -357,5 +388,5 @@ if __name__ == "__main__":
     #     for filename in glob.glob("./#*"):
     #         os.remove(filename)
 
-    print("Waters placed in %4.2f seconds" % (time.time() - start))
-    file_rw.write_gro_pos(coordinates, args.out, box=box_gromacs, res=res, ids=ids)
+    # print("Waters placed in %4.2f seconds" % (time.time() - start))
+    # file_rw.write_gro_pos(coordinates, args.out, box=box_gromacs, res=res, ids=ids)
