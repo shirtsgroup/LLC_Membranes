@@ -368,17 +368,16 @@ class LC(object):
         return ndx
 
 
-class Solute(object):
+class Solute(Residue):
 
     def __init__(self, name):
+
+        super().__init__(name)
 
         self.gro = []
         with open('%s/../top/topologies/%s.gro' % (script_location, name), 'r') as f:
             for line in f:
                 self.gro.append(line)
-
-        self.natoms = int(str.strip(self.gro[1]))
-        self.name = name
 
         # vector defining the direction of solute. First entry is back of vector, second is front of vector
         self.direction_vector = [[], []]

@@ -27,9 +27,9 @@ def initialize():
     parser.add_argument('-L', '--correlation_length', type=float, help='Length over which distance correlation between'
                                                                        'stacked monomers persists (nm)')
     parser.add_argument('--no_column_shift', action="store_false", help="Do not randomly shift columns")
+    parser.add_argument('-seed', '--random_seed', default=False, type=int, help="Random seed for column shift. Set this to "
+                                                                      "reproduce results")
     parser.add_argument('-Lvar', default=0.1, type=float, help='Variance in z position of monomer heads (nm)')
-    # parser.add_argument('-pd', '--parallel_displaced', default=0, type=float, help='Distance between center of mass '
-    #                     'of vertically stacked monomers on the xy plane. A distance of 0 is the same as sandwiched.')
     parser.add_argument('-pd', '--parallel_displaced', default=0, type=float, help='Angle of wedge formed between line'
                         'extending from pore center to monomer and line from pore center to vertically adjacent monomer'
                                                                                    'head group.')
@@ -124,6 +124,7 @@ class Assembly(LC):
         extending from pore center to monomer head groups.
         :param random_shift: if True, randomly shift columns in z-direction by choosing a displacement from a uniform \
         distribution bounded by (0, d), where d is the vertical distance between stacked monomers
+        :param seed: random seed if you want to reproduce randomly displaced structures
 
         :type pore: int
         :type z: np.array
@@ -140,6 +141,7 @@ class Assembly(LC):
             if random_shift:
                 dbwl = z[1] - z[0]  # distance between stacked monomers
                 z += np.random.uniform(0, dbwl)
+
         elif random_shift:
             dbwl = z[1] - z[0]  # distance between stacked monomers
             z += np.random.uniform(0, dbwl)
@@ -234,6 +236,10 @@ if __name__ == "__main__":
     if args.correlation_length is not None:
         correlation = True
 
+    if args.random_seed:
+        np.random.seed(args.random_seed)
+        seeds = np.random.randint(0, 4294967295, size=int(args.nopores*args.ncolumns))  # upper bound limit for numpy randint: see https://stackoverflow.com/questions/30721703/generate-random-integer-without-an-upper-bound
+
     system = Assembly(args.build_monomer, args.nopores, args.p2p, args.angles[2], args.pore_radius)
 
     system.align_plane()  # align monomer head group with xy plane
@@ -246,6 +252,8 @@ if __name__ == "__main__":
         start_theta = 0
         thetas = [start_theta + x*wedge_theta for x in range(args.ncolumns)]
         for j in range(args.ncolumns):
+            if args.random_seed:
+                np.random.seed(seeds[i * args.ncolumns + j])
             z = np.linspace(0, args.dbwl*args.monomers_per_column - args.dbwl, args.monomers_per_column)
             system.build_column(i, z, thetas[j], correlation=correlation, var=args.Lvar,
                                 correlation_length=args.correlation_length, pd=args.parallel_displaced, random_shift=args.no_column_shift)

@@ -25,6 +25,7 @@ def initialize():
                         'make the next guess at pore radius if you need more/less water than the bounds of the water '
                         'content database (nm)')
     parser.add_argument('-o', '--output', default='solvated_final.gro', help='Name of fully solvated output file')
+    parser.add_argument('-seed', '--random_seed', default=0, help='Numpy random seed')
 
     # parallelization
     parser.add_argument('-mpi', '--mpi', action="store_true", help='Run MD simulations in parallel')
@@ -46,6 +47,8 @@ def initialize():
                                                                                    'head group.')
     parser.add_argument('-angles', '--angles', nargs='+', default=[90, 90, 60], type=float, help='Angles between'
                         'box vectors')
+    parser.add_argument('-seed', '--random_seed', default=1, type=int, help='Pass an integer to give a seed for '
+                                                                            'random column displacement')
 
     # flags unique to equil.py
     parser.add_argument('-ring_restraints', '--ring_restraints', default=["C", "C1", "C2", "C3", "C4", "C5"], nargs='+',
@@ -106,8 +109,9 @@ class System(object):
         connection = sql.connect("%s/%s" % (location, database))  # database created in this directory
         crsr = connection.cursor()
         sql_command = "select nwater, radius from radii where monomer = '%s' and pd_angle = %.2f and dbwl = %.2f and " \
-                      "mon_per_col = %d;" % (self.args.build_monomer.split('.')[0], self.args.parallel_displaced,
-                                             self.args.dbwl, self.args.monomers_per_column)
+                      "mon_per_col = %d and seed = %s;" % (self.args.build_monomer.split('.')[0],
+                                                           self.args.parallel_displaced, self.args.dbwl,
+                                                           self.args.monomers_per_column, self.args.random_seed)
 
         try:
             sql_output = crsr.execute(sql_command).fetchall()
@@ -162,7 +166,7 @@ class System(object):
 
         equil.build(self.args.build_monomer, 'initial.gro', self.args.monomers_per_column, self.args.ncolumns,
                     self.r, self.args.p2p, self.args.dbwl, self.args.parallel_displaced,
-                    nopores=self.args.nopores)
+                    nopores=self.args.nopores, seed=self.args.random_seed)
 
     def restrain(self, force):
 
@@ -226,9 +230,10 @@ class System(object):
 
         crsr = connection.cursor()
 
-        sql_command = "insert into radii (monomer, radius, mon_per_col, nwater, pd_angle, dbwl) values ('%s', %.6f, %d," \
-                      "%d, %.2f, %.2f);" % (self.args.build_monomer.split('.')[0], self.r, self.args.monomers_per_column,
-                        len(self.solvated.pore_water[0]), self.args.parallel_displaced, self.args.dbwl)
+        sql_command = "insert into radii (monomer, radius, mon_per_col, nwater, pd_angle, dbwl, seed) values ('%s'," \
+                      "%.6f, %d, %d, %.2f, %.2f, %d);" % (self.args.build_monomer.split('.')[0], self.r,
+                      self.args.monomers_per_column, len(self.solvated.pore_water[0]), self.args.parallel_displaced,
+                                                          self.args.dbwl, self.args.random_seed)
 
         crsr.execute(sql_command)
 

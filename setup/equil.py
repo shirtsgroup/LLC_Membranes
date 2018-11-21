@@ -44,6 +44,8 @@ def initialize():
                                                                                    'head group.')
     parser.add_argument('-angles', '--angles', nargs='+', default=[90, 90, 60], type=float, help='Angles between'
                         'box vectors')
+    parser.add_argument('-seed', '--random_seed', default=False, type=int, help='Pass an integer to give a seed for '
+                                                                                'random column displacement')
 
     # flags unique to equil.sh
     parser.add_argument('-ring_restraints', '--ring_restraints', default=["C", "C1", "C2", "C3", "C4", "C5"], nargs='+',
@@ -64,14 +66,16 @@ def initialize():
     return parser
 
 
-def build(build_monomer, out, mon_per_col, ncol, radius, p2p, dbwl, pd, nopores=4):
+def build(build_monomer, out, mon_per_col, ncol, radius, p2p, dbwl, pd, nopores=4, seed=False):
 
-    # update once build.py is class-based
+    # update once build.py is more class-based
 
-    p = subprocess.Popen(['build.py', '-b', '%s' % build_monomer, '-m', '%s' % mon_per_col, '-c', '%s' % ncol, '-r',
-                     '%s' % radius, '-p', '%s' % p2p, '-n', '%s' % nopores, '-d', '%s' % dbwl, '-pd', '%s' % pd,
-                     '-o', '%s' % out])
-    p.wait()
+    build = 'build.py -b %s -m %s -c %s -r %s -p %s -n %s -d %s -pd %s -o %s' % (build_monomer, mon_per_col, ncol,
+                                                                                 radius, p2p, nopores, dbwl, pd, out)
+    if seed:
+        build += ' -seed %s' % seed
+
+    subprocess.Popen(build.split()).wait()
 
 
 def generate_input_files(gro, ensemble, length, barostat='berendsen', genvel=True, xlink=False, restraints=False,
@@ -140,7 +144,7 @@ if __name__ == "__main__":
 
     # initial build
     build(args.build_monomer, args.initial, args.monomers_per_column, args.ncolumns, args.pore_radius, args.p2p,
-          args.dbwl, args.parallel_displaced, nopores=args.nopores)
+          args.dbwl, args.parallel_displaced, nopores=args.nopores, seed=args.random_seed)
 
     # generate input files once
     restrain(args.initial, args.build_monomer, args.forces[0], args.restraint_axis, args.ring_restraints)

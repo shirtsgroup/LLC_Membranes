@@ -3,7 +3,7 @@
 import argparse
 import numpy as np
 import mdtraj as md
-from LLC_Membranes.llclib import topology
+from LLC_Membranes.llclib import topology, physical
 
 
 def initialize():
@@ -22,30 +22,30 @@ def initialize():
 
 class System(object):
 
-    def __init__(self, solute, gro, traj, build_monomer):
+    def __init__(self, solute, gro, traj, build_monomer, spline=False):
 
         print('Loading trajectory...', end='', flush=True)
         self.t = md.load(traj, top=gro)
         print('Done!')
 
         self.solute = topology.Solute(solute)
-        self.nsolute = len([True for a in self.t.topology.atoms if a.residue.name == solute]) // self.solute.natoms
+        solutes_indices = [a.index for a in self.t.topology.atoms if a.residue.name == solute]
+        self.nsolute = len(solutes_indices) // self.solute.natoms
         self.solute_vectors = self.direction_vectors()
+        self.com = physical.center_of_mass(self.t.xyz[:, solutes_indices, :], [v for v in self.solute.mass.values()])
 
     def direction_vectors(self):
 
         v = np.zeros([self.t.n_frames, self.nsolute, 2])
-        print(self.solute.name, self.solute.direction_vector[0])
+
         back_atom = [a.index for a in self.t.topology.atoms if a.residue.name == self.solute.name and
                       a.name in self.solute.direction_vector[0]]
 
         front_atom = [a.index for a in self.t.topology.atoms if a.residue.name == self.solute.name and
                       a.name in self.solute.direction_vector[1]]
 
-        print(front_atom)
-        print(back_atom)
-        exit()
-        # for t in range(self.t.n_frames):
+        for t in range(self.t.n_frames):
+            v[t, ...] = self.t.xyz[t, front_atom, :2] - self.t.xyz[t, back_atom, :2]  # xy projection only
 
         return v
 
