@@ -259,7 +259,7 @@ class System(object):
     def place_water_tails(self):
 
         tails = solvate_tails.System('solvated_pores.gro', 'topol.top', self.args.build_monomer,
-                                     rbounds=[0.3, 1], restraints=True)
+                                     rbounds=[0.3, 1], restraints=True, mpi=self.args.mpi, nproc=self.args.nproc)
 
         tails.insert_all_water(self.tail_water, output=self.args.output, final_topname='topol.top')
 
