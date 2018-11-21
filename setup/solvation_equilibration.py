@@ -199,7 +199,7 @@ class System(object):
 
         # solvate the system
         if self.args.mpi:
-            gmx = "mpirun -np %s gmx_mpi" % self.args.np
+            gmx = "mpirun -np %s gmx_mpi" % self.args.nproc
         else:
             gmx = "gmx"
 
