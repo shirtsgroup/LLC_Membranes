@@ -25,7 +25,7 @@ def initialize():
                         'make the next guess at pore radius if you need more/less water than the bounds of the water '
                         'content database (nm)')
     parser.add_argument('-o', '--output', default='solvated_final.gro', help='Name of fully solvated output file')
-    parser.add_argument('-seed', '--random_seed', default=0, help='Numpy random seed')
+    parser.add_argument('-seed', '--random_seed', default=0, type=int, help='Numpy random seed')
 
     # parallelization
     parser.add_argument('-mpi', '--mpi', action="store_true", help='Run MD simulations in parallel')
