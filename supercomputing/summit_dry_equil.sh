@@ -8,4 +8,4 @@
 
 module load gromacs/2018_gpu
 
-equil.py -b monomer.gro -mpi -np 4
+equil.py -b monomer.gro -mpi -np 4 --ring_restraints C C1 C2 C3 C4 C5 --restraint_residue HII
