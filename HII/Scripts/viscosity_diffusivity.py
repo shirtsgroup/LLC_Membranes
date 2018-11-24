@@ -19,7 +19,7 @@ def initialize():
 
     parser.add_argument('-g', '--gro', default='initial.gro', type=str, help='Initial configuration coordinate file')
     parser.add_argument('-lnpt', '--length_npt', default=1, type=float, help='Length of NPT simulation (ns)')
-    parser.add_argument('-lnvt', '--length_nvt', default=1, type=float, help='Length of NVT simulation (ns)')
+    parser.add_argument('-lnvt', '--length_nvt', default=100, type=float, help='Length of NVT simulation (ns)')
     parser.add_argument('-lnve', '--length_nve', default=100, type=float, help='Length of NVE simulation (ns)')
     parser.add_argument('-T', '--title', default='Generic Molecular Dynamics Simulation', type=str, help='Simulation Title')
     parser.add_argument('-s', '--em_steps', default=5000, type=int, help='Steps to take during energy minimization')
@@ -30,7 +30,7 @@ def initialize():
     parser.add_argument('--genvel', default='yes', type=str, help='generate velocities according to a maxwell'
                                                                      'distribution')
     parser.add_argument('--solvent', default='water', help='Name of solvent')
-    parser.add_argument('--tau_t', default=0.1, type=float, help='Temperature coupling time constant')
+    parser.add_argument('--tau_t', default=1, type=float, help='Temperature coupling time constant')
     parser.add_argument('--tau_p', default=20, type=float, help='Pressure coupling time constant')
     parser.add_argument('-nr', '--nreplicates', default=1, type=int, help='Number of replicate simulations to run')
     parser.add_argument('-f', '--frames', default=50, type=int, help='Number of frames to record. If nstxout, nstvout, '
@@ -149,7 +149,8 @@ class System(object):
             d[i - data_start] = line_data[1]
 
         # detect when data decorrelates from itself
-        self.density_equilibration = detectEquilibration(d)[0]
+        self.density_equilibration = detectEquilibration(d[10:])[0]  # discard first few data points to avoid pymbar bug.
+        print('Density equilibrated after %d frames' % self.density_equilibration)
         self.density = np.mean(d[self.density_equilibration:])  # GROMACS outputs in kg / m^3
         self.density_vs_time = d  # save density vs. time data
 
@@ -239,6 +240,7 @@ if __name__ == "__main__":
         mdp.write_npt_mdp()  # write .mdp for npt simulation  -- PARRINELLO-RAHMAN?? TEST STABILITY
 
         mdp.length = args.length_nvt * 1000  # convert to picoseconds
+        mdp.nstenergy = int(np.ceil(5 / (args.dt*1000)))  # save every 6 femptoseconds (3 timesteps!)
         mdp.write_nvt_mdp()  # write .mdp for nvt simulation
 
         mdp.length = args.length_nve * 1000  # convert to picoseconds
@@ -257,7 +259,7 @@ if __name__ == "__main__":
 
             #sys.energy_minimize('replicate.gro', out='replicate_em')
             sys.run_simulation('nvt', 'replicate.gro')
-            sys.run_simulation('nve', 'nvt.gro')  # run nve simulation using last frame of nvt simulation
+            #sys.run_simulation('nve', 'nvt.gro')  # run nve simulation using last frame of nvt simulation
 
     # Now calculate diffusivity and viscosity
     # if not args.simulate:

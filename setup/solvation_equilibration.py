@@ -294,11 +294,11 @@ class System(object):
             subprocess.Popen(cp.split()).wait()
 
         equil.generate_input_files(self.args.output, 'npt', self.args.length_berendsen, genvel=False,
-                                   barostat='berendsen')
+                                   barostat='berendsen', frames=50)
         equil.simulate('npt.mdp', 'topol.top', 'nvt.gro', 'berendsen', mpi=args.mpi, np=args.nproc)
 
         equil.generate_input_files('berendsen.gro', 'npt', self.args.length_Parrinello_Rahman, genvel=False,
-                                   barostat='Parrinello-Rahman')
+                                   barostat='Parrinello-Rahman', frames=500)
         equil.simulate('npt.mdp', 'topol.top', 'berendsen.gro', 'PR', mpi=args.mpi, np=args.nproc)
 
 

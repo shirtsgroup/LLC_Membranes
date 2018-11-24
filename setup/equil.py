@@ -82,8 +82,9 @@ def generate_input_files(gro, ensemble, length, barostat='berendsen', genvel=Tru
                          frames=50, dt=0.002):
 
     # mostly uses defaults for now
+    nstout = int(length / (dt * frames))
     mdp = SimulationMdp(gro, length=length, barostat=barostat, genvel=genvel, restraints=restraints, xlink=xlink,
-                        nstxout=int(length / (dt * frames)))
+                        nstxout=nstout, nstvout=nstout, nstfout=nstout, nstenergy=nstout)
 
     mdp.write_em_mdp()  # write energy minimization .mdp without asking
 
