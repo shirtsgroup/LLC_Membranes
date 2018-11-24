@@ -151,7 +151,7 @@ if __name__ == "__main__":
     restrain(args.initial, args.build_monomer, args.forces[0], args.restraint_axis, args.ring_restraints)
     generate_input_files(args.initial, 'nvt', args.length_nvt, restraints=args.restraint_residue)
 
-    simulate('em.mdp', 'topol.top', '%s' % args.initial, 'em', mpi=args.mpi, np=args.nproc)
+    simulate('em.mdp', 'topol.top', '%s' % args.initial, 'em', mpi=args.mpi, np=args.nproc, restrained=True)
 
     nrg = check_energy(logname='em.log')
 
@@ -161,7 +161,7 @@ if __name__ == "__main__":
         build(args.build_monomer, args.initial, args.monomers_per_column, args.ncolumns, args.pore_radius, args.p2p,
                   args.dbwl, args.parallel_displaced, nopores=args.nopores)
 
-        simulate('em.mdp', 'topol.top', '%s' % args.initial, 'em', mpi=args.mpi, np=args.nproc)
+        simulate('em.mdp', 'topol.top', '%s' % args.initial, 'em', mpi=args.mpi, np=args.nproc, restrained=True)
 
         nrg = check_energy(logname='em.log')
 
