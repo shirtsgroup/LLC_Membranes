@@ -193,6 +193,9 @@ class System(object):
 
             nrg = equil.check_energy(logname='em.log')
 
+            if nrg > 0:
+                self.args.random_seed = np.random.randint(0, 4294967295) 
+
         cp = 'cp em.gro %s.gro' % self.args.forces[0]
         p = subprocess.Popen(cp.split())
         p.wait()
