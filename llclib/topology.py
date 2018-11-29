@@ -241,6 +241,7 @@ class LC(object):
         self.no_ions = 0
         self.ions = []
         self.MW = 0
+        self.dummies = []
 
         if name.endswith('.gro'):
 
@@ -291,6 +292,8 @@ class LC(object):
                         PDA.append(str.strip(a[i][10:15]))
                     if 'T' in annotations:
                         self.tail_atoms.append(str.strip(a[i][10:15]))
+                    if 'D' in annotations:
+                        self.dummies.append(str.strip(a[i][10:15]))
 
             nres.append(res_count)
 

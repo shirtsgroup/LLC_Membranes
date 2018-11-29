@@ -1,0 +1,188 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{subcaption}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath} % or simply amstext
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage[export]{adjustbox}
+\newcommand{\angstrom}{\textup{\AA}}
+\newcommand{\colormap}{jet}  % colorbar to use
+\usepackage{cleveref}
+\usepackage{booktabs}
+\usepackage{gensymb}
+\usepackage{float}
+
+\title{The Transport Mechanisms of Polar Solutes in a Cross-linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
+\author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble \and Joe Yelk \and Matthew Glaser \and Xunda Feng \and Michael R. Shirts} 
+
+\begin{document}
+%  \bibliographystyle{ieeetr}
+  \graphicspath{{./figures/}}
+  \maketitle
+  \section{Introduction}
+  
+  We need highly selective membranes in order to perform efficient separations.
+
+  H\textsubscript{II} phase lyotropic liquid crystals have densely packed, uniform
+  sized pores and have the potential to disrupt conventional membrane separation
+  techniques by being selective based not only on size and charge, but on chemical
+  functionality as well.
+
+
+  We can only learn so much from experiment. MD can give us mechanistic insights with
+  atomistic resolution so that we can intelligently design new membranes for 
+  solute-specific separations.
+
+  In previous work, we determined the most likely structure of the hexagonal phase 
+  formed by the monomer Na-GA3C11.
+  \begin{itemize}
+  	\item We developed techniques for equilibrating the hexagonal phase made by
+	neat monomer as well as with varying amounts of water in the pores.
+  \end{itemize} 
+
+  In this work, we have determined the transport mechanisms and macroscopic transport 
+  properties exhibited by a number of polar solutes with varying size, chemical 
+  functionality and hydrophilic character.
+  \begin{itemize}
+	\item Many of the separations we are interested in involve polar organic 
+	compounds.
+  \end{itemize} 
+
+  We have compared our calculated diffusion coefficients with experimental measurements
+  made using DOSY NMR. 
+
+  \section{Methods}
+
+  \subsection{Molecular Dynamics Simulations}
+  
+  \subsubsection*{System Setup}
+
+  There is a broad range of water concentrations which will form a stable 
+  H\textsubscript{II} phase with Na-GA3C11. 
+  \begin{itemize}
+	\item In the literature this system is typically synthesized with close
+	to 10 wt \% water
+        \item However, Resel et al. noted that the system is likely fully 
+	hydrated with less than 7 wt \% water.
+	\item We decided to test two different levels of water content: 5 and 10 wt \%
+  \end{itemize} 
+
+  We observed that water partitions into the tail region of our system and therefore
+  built our initial configurations with water in both regions close to the expected
+  equilibrium value.
+  \begin{itemize}
+	\item There is about 2:1 water in the pores versus in the tails for the 10 wt \% system.
+	\item We adjusted the pore radius in our systems so that the right amount of water
+	fits in the pores without any vacuum using \texttt{gmx solvate}.
+	\item We placed water molecules in the tail region one at a time in random locations
+	with short energy minimizations between insertions.
+  \end{itemize}
+
+%  We equilibrated the initial configuration using the `wet' equilibration procedure
+%  described in our previous work (reference to structure paper).
+  %BJC: not sure I need to go into any details describing that procedure
+%  \begin{itemize}
+%	\item Series of NVT simulations with force constants on carbon atoms of aromatic
+%	ring in head group
+%	\item Force constants reduced according to the sequence: 1000000, 3162,
+%	56, 8, 3, 2, 1, 0 kJ mol$^{-1}$ nm$^{-2}$ 
+%  \end{itemize}
+
+%  We cross-linked the equilibrated solvated configuration using the cross-linking procedure
+%  described in our previous work. 
+
+  We equilibrated our initial configuration before adding solutes.
+  \begin{itemize}
+	\item We equilibrated the initial configuration using the `wet'
+	equilibration procedure described in our previous work (reference to structure
+	paper).
+	\item We cross-linked the equilibrated solvated configuration using the
+	cross-linking procedure described in our previous work. 
+  \end{itemize}
+
+  We added 6 solute molecules to each pore of the equilibrated cross-linked
+  configuration.
+  \begin{itemize}
+	\item We equally spaced each solute in the pore
+	\item 6 solutes per pore provided a balance of a useful amount of data
+	for generating statistics and a low degree of interaction between solutes
+	\item At each insertion point we placed a randomly oriented solute molecule
+	then ran a short energy minimzation.
+	\item We allowed the solutes to equilibrate for 5 ns using berendsen 
+	pressure control
+	\item We collected transport data using long simulations, on the order of
+	1 microsecond, with pressure controlled by the Parrinello-Rahman barostat.
+  \end{itemize}
+  
+  \subsubsection*{Modeling the Continuous Time Random Walk}
+
+  A continuous time random walk (CTRW) is a stochastic process characterized by a 
+  distribution of hop lengths and dwell times.
+  \begin{itemize}
+	\item We use the \texttt{ruptures} python package in order to identify
+	breakpoints in solute trajectories. (See Supporting Information for more
+	details on chosen parameters. i.e. type of cost function, cost function penalty
+	tolerance, number of dimensions used)
+	\item We have limited data, so we attempted to approximate these distributions
+	with known continuous probability densities.
+	\item For solutes in our system the distribution of hop lengths is
+	well-represented by a Gaussian distribution while the distribution of dwell
+	times fits relatively well to an exponential distribution characteristic of a
+	Poisson process. (See supporting information)
+  \end{itemize}
+
+  \begin{equation}
+	Ae^{-x}
+  \end{equation}
+
+  We calculated macroscopic diffusion coefficients by simulating trajectories orders of
+  magnitude longer than our molecular simulations. 
+  \begin{itemize}
+	\item We constructed trajectories by generating sequences of dwell times 
+        and hop lengths randomly sampled from our fit distributions.
+	\item For time scales much greater than the characteristic time of our
+	exponential dwell time distribution, solutes exhibit Brownian motion. 
+	\item The MSD curve becomes linear
+	\item We fit a line to the MSD curve and used the Einstein relationship
+	to relate its slope to the macroscopic diffusion coefficient.
+	\item We found convergence of the value of the diffusion coefficient 
+	calculated in this way afer x steps (See Supporting Information)
+  \end{itemize}
+
+  \subsection{Experimental}
+  % BJC: For Greg to write if things work out
+   
+  \section{Results and Discussion}
+  
+ 
+  \section{Conclusion}
+  
+ 
+  \section*{Supporting Information}
+
+  Detailed explanations and expansions upon the results and procedures mentioned in
+  the main text are described in the Supporting Information. This information is
+  available free of charge via the Internet at http://pubs.acs.org.
+
+  \section*{Acknowledgements}
+
+  Molecular simulations were performed using the Extreme Science and
+  Engineering Discovery Environment (XSEDE), which is supported by National
+  Science Foundation grant number ACI-1548562. Specifically, it used the Bridges
+  system, which is supported by NSF award number ACI-1445606, at the Pittsburgh
+  Supercomputing Center (PSC). This work also utilized the RMACC Summit supercomputer,
+  which is supported by the National Science Foundation (awards ACI-1532235 and
+  ACI-1532236), the University of Colorado Boulder, and Colorado State
+  University. The Summit supercomputer is a joint effort of the University of
+  Colorado Boulder and Colorado State University.
+
+  \clearpage
+  \bibliography{llc}
+
+  \newpage
+
+  \section*{TOC Graphic}
+
+\end{document}

@@ -3,6 +3,7 @@
 import argparse
 import numpy as np
 import mdtraj as md
+from LLC_Membranes.llclib import topology
 
 
 def initialize():
@@ -25,6 +26,8 @@ def add_dummies(t, residue, dummy_residue, out='dummies.gro', nmon=400):
     :return:
     """
 
+    LC = topology.LC('%s.gro' % dummy_residue)
+
     residues = [a.residue.name for a in t.topology.atoms]
 
     if 'HOH' in residues:
@@ -42,11 +45,15 @@ def add_dummies(t, residue, dummy_residue, out='dummies.gro', nmon=400):
             if a.residue.name == residue:
                 a.residue.name = dummy_residue
 
-    nsol = residues.count('HOH')
-    natoms = t.xyz.shape[1] - nsol
+    nsol = 0
+    for i in set(residues):
+        if i != residue:
+            nsol += residues.count(i)
+
+    natoms = t.n_atoms - nsol
 
     nmonomers = nmon
-    Hd = ['H77', 'H78', 'H79', 'H80', 'H81', 'H82']
+    Hd = LC.dummies
     ndummies = len(Hd)
 
     atomspmon = int(natoms / nmonomers)
@@ -60,7 +67,7 @@ def add_dummies(t, residue, dummy_residue, out='dummies.gro', nmon=400):
         count = 1
         count2 = 0
         for a in t.topology.atoms:
-            if count2 != 0 and count2 % (atomspmon - 1) == 0 and count < (nmonomers * (atomspmon - 1 + ndummies)):
+            if count2 != 0 and count2 % atomspmon == 0 and count < (nmonomers * (atomspmon + ndummies)):
                 for j in range(ndummies):
                     f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(int(count / atomspmon), dummy_residue,
                                                                                   Hd[j], count, 0, 0, 0))

@@ -10,6 +10,7 @@ from scipy.optimize import curve_fit
 from LLC_Membranes.analysis.hbonds import Residue
 from LLC_Membranes.analysis import Poly_fit, p2p
 import tqdm
+from scipy.stats import expon
 
 
 def initialize():
@@ -22,6 +23,8 @@ def initialize():
     parser.add_argument('-b', '--begin', default=0, help='First trajectory frame used for analysis.')
     parser.add_argument('-e', '--end', default=-1, help='Last trajectory frame used for analysis.')
     parser.add_argument('-step', '--step', default=1, help='Include every "step" frames')
+    parser.add_argument('-ma', '--moving_average', default=False, type=int, help='Calculate a moving average of the '
+                        'center of mass coordinate')
 
     # restrict to pores parameters
     parser.add_argument('-restrict', '--restrict_to_pores', action='store_true', help='Only look at residues which'
@@ -30,7 +33,7 @@ def initialize():
                         'used to define pore centers')
     parser.add_argument('--pore_defining_residue', default='HII', type=str, help='residue to which pore_defining atoms '
                                                                                  'belong')
-    parser.add_argument('-radius', '--pore_radius', default=1, type=float, help='Defined pore radius (nm)')
+    parser.add_argument('-radius', '--pore_radius', default=1.48, type=float, help='Defined pore radius (nm)')
 
     parser.add_argument('-r', '--residue', default='ETH', type=str, help='Name of residue whose diffusivity we want')
     parser.add_argument('-atoms', nargs='+', help='Name of atoms whose collective diffusivity is desired')
@@ -63,7 +66,7 @@ def autocorrFFT(x):
     PSD = F * F.conjugate()
     res = np.fft.ifft(PSD)
     res = (res[:N]).real   # now we have the autocorrelation in convention B
-    n= N*np.ones(N)-np.arange(0, N)  # divide res(m) by (N-m)
+    n = N*np.ones(N)-np.arange(0, N)  # divide res(m) by (N-m)
 
     return res / n  # this is the autocorrelation in convention A
 
@@ -90,6 +93,9 @@ def gaussian(points, mean, sigma, amplitude):
 
 def wait_times(t, A, lam):
 
+    # calculate ecdf
+
+
     return A*np.exp(-lam * t)
 
 
@@ -106,6 +112,24 @@ def wait_times_cdf(t, lam):
 def random_dwell_time(lam):
 
         return -np.log(1 - np.random.uniform()) / lam
+
+
+def cdf(left, right, scale):
+    """ Calculate area under expnonential curve between two x locations """
+    return expon.cdf(right, scale=scale) - expon.cdf(left, scale=scale)
+
+
+def exponential(edges, A, B):
+
+    bin_width = edges[1] - edges[0]  # bin width
+
+    pdf = []
+    for i in range(len(edges) - 1):
+        pdf.append(cdf(edges[i], edges[i + 1], 1/float(B)))
+
+    pdf.append(1 - cdf(0, edges[-1], 1/float(B)))
+
+    return np.array(pdf) * (float(A) / bin_width)
 
 
 def confidence_interval(data, confidence):
@@ -129,7 +153,7 @@ def confidence_interval(data, confidence):
 
 class System(object):
 
-    def __init__(self, traj, gro, res, start=0, end=-1, step=1):
+    def __init__(self, traj, gro, res, start=0, end=-1, step=1, ma=False):
         """ Using an MD trajectory, calculate fit parameters for the dwell time distribution and hop length distribution
 
         :param traj: name of MD trajectory (GROMACS .xtc or .trr)
@@ -138,6 +162,7 @@ class System(object):
         :param start: first frame of trajectory to include
         :param end: last frame of trajectory to include
         :param step: include every step frames in calculations
+        :param ma: calculate a moving average on the center of mass coordinate traces
 
         :type traj: str
         :type gro: str
@@ -165,11 +190,36 @@ class System(object):
                 w = (self.pos[f, (i * self.residue.natoms):((i + 1)*self.residue.natoms), :].T * self.mass).T
                 self.com[f, i, :] = np.sum(w, axis=0) / sum(self.mass)
 
+        if ma:
+            self.calculate_moving_average(ma)
+
+        # np.random.seed(2)
+        # # plot 5 random z-traces
+        # for i in np.random.randint(0, self.nres, size=5):
+        #     plt.plot(self.com[:, i, 2])
+        # plt.show()
+        # exit()
+
         # initialize for later
+        # self.xs = np.zeros()
         self.dwell_times = []
+        self.tail_dwells = []
         self.hop_lengths = []
         self.lambda_distribution = []  # distribution of lambda for poisson process
         self.hop_sigma_distribution = []  # distribution of standard deviation of hop lengths
+
+    def calculate_moving_average(self, n):
+
+        nT = self.com.shape[0]
+        ma = np.zeros([nT - n + 1, self.com.shape[1], 3])
+
+        for i in range(self.com.shape[1]):
+            for d in range(3):
+                ret = np.cumsum(self.com[:, i, d], dtype=float)
+                ret[n:] = ret[n:] - ret[:-n]
+                ma[:, i, d] = ret[n - 1:] / n
+
+        self.com = ma
 
     def restrict_to_pores(self, pore_defining_atoms, pore_defining_residue, r, npores=4):
         """ Identify which centers of mass are still in the pore center
@@ -200,7 +250,7 @@ class System(object):
 
         self.com = self.com[:, inside_pore, :]  # restrict COMs to just those within pore
 
-    def hops_and_dwells(self, penalty=3):
+    def hops_and_dwells(self, penalty=1):
         """ Find breakpoints then assemble lists of dwell times and hop lengths. See documentation for Ruptures python
         package: http://ctruong.perso.math.cnrs.fr/ruptures-docs/build/html/index.html for more options that can be
         added
@@ -208,27 +258,44 @@ class System(object):
         :param penalty: penalty for cost function minimization
         :return:
         """
-        #
-        # for j in tqdm.tqdm(range(self.com.shape[1])):
-        for j in range(25):
+
+        initial_dwells = []
+        final_dwells = []
+        for j in tqdm.tqdm(range(self.com.shape[1])):
+        # for j in range(10):
+
+            # crude break point detection - could be worth formulating better once I understand cost functions better
+            # hops = self.com[1:, j, 0] - self.com[:-1, j, 0]
+            # std = np.std(hops)
+            # bp = np.where(np.abs(hops) > 3*std)[0]
 
             bp = ruptures.detection.Binseg(model='ar').fit_predict(self.com[:, j, :], pen=penalty)
-            # ruptures.display(self.com[:, j, :], bp, figsize=(10, 6))
-            # plt.show()
+
+            print(bp)
+            ruptures.display(self.com[:, j, :], bp, figsize=(10, 6))
+            plt.show()
+
+            initial_dwells.append(bp[0])
+            if len(bp) > 1:
+                final_dwells.append(bp[-1] - bp[-2])
+
             for i in range(len(bp) - 2):  # exclude first and last segments
                 # could get rid of loop and do vector-wise self.t.time[bp + 1] - self.t.time[bp]
                 # just need to figure out hop_lengths
                 self.dwell_times.append(self.t.time[bp[i + 1]] - self.t.time[bp[i]])
+
                 if i > 0:
                     self.hop_lengths.append(np.mean(self.com[bp[i]:bp[i + 1], j, 2]) -
                                             np.mean(self.com[bp[i - 1]:bp[i], j, 2]))
+
+        self.tail_dwells = np.array(initial_dwells + final_dwells)
 
     def fit_distributions(self, nbins=25, plot=True, nboot=200):
 
         # Reconstruct bootstrapped distributions by randomly sampling from data
         # keep all bootstrapping data to generate error bars
-        hist_dwell = np.zeros([nboot, nbins])
-        bins_dwell_centered = np.zeros([nboot, nbins])
+        hist_dwell = np.zeros([nboot, nbins + 1])
+        bins_dwell_centered = np.zeros([nboot, nbins + 1])
         p_dwell = [1, len(self.dwell_times) / (self.nres * self.t.time[-1])]
         hist_jump = np.zeros([nboot, nbins])
         bins_jump_centered = np.zeros([nboot, nbins])
@@ -238,37 +305,72 @@ class System(object):
         dwell_mean = 0
         A_dwell = 0  # scaling factor for decaying expontential
         A_hop = 0
-        for i in range(nboot):
+
+        i = 0
+        while i < nboot:
 
             # dwell times
-            dwell_times_boot = np.random.choice(self.dwell_times, size=len(self.dwell_times), replace=True)
-            hist_dwell[i, :], bins_dwell = np.histogram(dwell_times_boot, bins=nbins)
-            bins_dwell_centered[i, :] = np.array([(bins_dwell[i + 1] + bins_dwell[i])/2 for i in
-                                                  range(len(hist_dwell[i, :]))])
-            solp_dwell, cov_x = curve_fit(wait_times, bins_dwell_centered[i, :], hist_dwell[i, :], p_dwell)
+            try:
+                print('Bootstrapping ... Trial %s\r' % (i + 1), end='', flush=True)
 
-            self.lambda_distribution.append(solp_dwell[1])
+                # Recreate dwell time distribution by randomly choosing from all dwell times with replacement
+                dwell_times_boot = np.random.choice(self.dwell_times, size=len(self.dwell_times), replace=True)
+                # hist_dwell[i, :], bins_dwell = np.histogram(dwell_times_boot, bins=nbins)
 
-            # jump lengths
-            hop_lengths_boot = np.random.choice(self.hop_lengths, size=len(self.hop_lengths), replace=True)
-            hist_jump[i, :], bins_jump = np.histogram(hop_lengths_boot, bins=nbins)
-            bins_jump_centered[i, :] = np.array([(bins_jump[i + 1] + bins_jump[i])/2 for i in
-                                                 range(len(hist_jump[i, :]))])
-            p_hops = [np.mean(hist_jump[i, :]), np.std(hist_jump[i, :]), 1]
-            solp_hops, cov_x = curve_fit(gaussian, bins_jump_centered[i, :], hist_jump[i, :], p_hops)
+                # Define edges of histogram
+                edges = np.linspace(0, max(dwell_times_boot), nbins + 1)
 
-            self.hop_sigma_distribution.append(np.abs(solp_hops[1]))  # sometime curve_fit finds negative answer
+                # Add long dwell times randomly selected from beginning and end of trajectory
+                tail_dwells = self.tail_dwells[np.where(self.tail_dwells > max(dwell_times_boot))[0]]
+                dwell_times_boot = np.concatenate((np.random.choice(tail_dwells, size=len(tail_dwells), replace=True),
+                                                  dwell_times_boot))
 
-            if np.abs(solp_hops[1]) > 2:
-                plt.hist(hist_jump[i, :], bins=25)
-                plt.show()
+                # bin the bins
+                bins = np.digitize(dwell_times_boot, edges, right=True)  # there will never be a 0 dwell time
+                hist_dwell[i, :], bins_dwell = np.histogram(bins, nbins + 1)
 
-            # Things for plotting
-            dwell_bin_width += bins_dwell_centered[i, 1] - bins_dwell_centered[i, 2]
-            hop_bin_width += bins_jump_centered[i, 1] - bins_jump_centered[i, 0]
-            A_dwell += solp_dwell[0]
-            dwell_mean += solp_hops[0]
-            A_hop += solp_hops[2]
+                # bins_dwell_centered[i, :] = np.array([(bins_dwell[i + 1] + bins_dwell[i])/2 for i in
+                #                                       range(len(hist_dwell[i, :]))])
+                bin_width = edges[1] - edges[0]
+                bins_dwell_centered[i, :] = np.array([edges[i] + bin_width for i in range(len(edges))])
+
+                solp_dwell, cov_x = curve_fit(exponential, edges, hist_dwell[i, :], p_dwell)
+
+                # plot individual fit
+                # A, B = solp_dwell  # A*B*e^-Bx
+                # plt.bar(edges, hist_dwell[i, :], edges[1] - edges[0], align='edge')
+                # plt.plot(edges, A*B*np.exp(-B*edges))
+                # plt.show()
+                # exit()
+
+                self.lambda_distribution.append(solp_dwell[1])
+
+                # jump lengths
+                hop_lengths_boot = np.random.choice(self.hop_lengths, size=len(self.hop_lengths), replace=True)
+                hist_jump[i, :], bins_jump = np.histogram(hop_lengths_boot, bins=nbins)
+                bins_jump_centered[i, :] = np.array([(bins_jump[i + 1] + bins_jump[i])/2 for i in
+                                                     range(len(hist_jump[i, :]))])
+                p_hops = [np.mean(hist_jump[i, :]), np.std(hist_jump[i, :]), 1]
+                solp_hops, cov_x = curve_fit(gaussian, bins_jump_centered[i, :], hist_jump[i, :], p_hops)
+
+                self.hop_sigma_distribution.append(np.abs(solp_hops[1]))  # sometime curve_fit finds negative answer
+
+                # if np.abs(solp_hops[1]) > 2:
+                #     plt.hist(hist_jump[i, :], bins=25)
+                #     plt.show()
+
+                # Things for plotting
+
+                dwell_bin_width += bins_dwell_centered[i, 2] - bins_dwell_centered[i, 1]
+                hop_bin_width += bins_jump_centered[i, 1] - bins_jump_centered[i, 0]
+                A_dwell += solp_dwell[0]*solp_dwell[1]
+                dwell_mean += solp_hops[0]
+                A_hop += solp_hops[2]
+
+                i += 1
+
+            except RuntimeError:  # sometimes bootstrapping gives unfittable data - mechanism might not be hop-diffusion
+                continue
 
         dwell_bin_width /= nboot
         hop_bin_width /= nboot
@@ -281,7 +383,7 @@ class System(object):
             fig, ax = plt.subplots(2, 2, figsize=(12, 8))
 
             ax[0, 0].bar(bins_dwell_centered.mean(axis=0), hist_dwell.mean(axis=0),
-                         width=dwell_bin_width)
+                         width=dwell_bin_width, align='edge')
             ax[0, 0].set_xlabel('Dwell Time (ns)', fontsize=14)
             ax[0, 0].set_ylabel('Frequency', fontsize=14)
             ax[0, 0].plot(bins_dwell_centered.mean(axis=0), wait_times(bins_dwell_centered.mean(axis=0), A_dwell,
@@ -477,7 +579,8 @@ if __name__ == "__main__":
 
     args = initialize().parse_args()
 
-    sys = System(args.trajectory, args.gro, args.residue, start=args.begin, end=args.end, step=args.step)
+    sys = System(args.trajectory, args.gro, args.residue, start=args.begin, end=args.end, step=args.step,
+                 ma=args.moving_average)
 
     if args.restrict_to_pores:
         sys.restrict_to_pores(args.pore_defining_atoms, args.pore_defining_residue, args.pore_radius)
