@@ -44,8 +44,8 @@ def initialize():
     parser.add_argument('-rad_percent', default=20, type=float, help='Percent of radicals that react each iteration.'
                                                                      'Not stable above 50 %')
     parser.add_argument('-out', '--output_gro', default='xlinked.gro', help='Name of final cross-linked structure')
-    parser.add_argument('-rad_frac_term', default=50, type=float, help='Out of 100, how many radicals that will be terminated'
-                                                                        'on each iteration.')
+    parser.add_argument('-rad_frac_term', default=0, type=float, help='Out of 100, how many radicals that will be '
+                        'terminated on each iteration. Numbers greater than zero will decrease cross-link density')
     parser.add_argument('-stagnation', default=5, type=int, help='The number of iterations without generating a new'
                                                                  'cross-link before the algorithm forces termination')
 

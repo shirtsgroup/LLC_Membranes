@@ -36,7 +36,7 @@ def initialize():
                         'molecule can exist in order to be counted as inside the pore')
     parser.add_argument('-spline', action="store_true", help='Trace center of pore with a spline instead of'
                                                              'approximating each center as a single point.')
-    parser.add_argument('-pr', '--pore_radius', default=0.5, type=float, help='Max distance from pore center a water '
+    parser.add_argument('-pr', '--pore_radius', default=1.48, type=float, help='Max distance from pore center a water '
                         'molecule can exist in order to be counted as inside the pore')
     parser.add_argument('-b', '--buffer', default=0, type=float, help='z-distance (nm) to cut off from top and bottom '
                                                                       'of unit cell when calculating COM locations')
@@ -193,6 +193,9 @@ class System(object):
         self.box = [box[0, 0, 0], box[0, 1, 1], box[0, 2, 2], box[0, 0, 1], box[0, 2, 0],
                    box[0, 1, 0], box[0, 0, 2], box[0, 1, 2], box[0, 2, 0]]  # gromacs format
 
+        self.ids = [a.name for a in self.t.topology.atoms]
+        self.res = [a.residue.name for a in self.t.topology.atoms]
+
         self.pore_atoms = pore_atoms
         self.npores = npores
         self.pore_centers = None
@@ -213,10 +216,10 @@ class System(object):
                     a.residue.name = 'SOL'
 
         self.residue = topology.Residue(residue)
-        residue_indices = np.array([a.index for a in self.t.topology.atoms if a.residue.name == residue])
+        self.residue_indices = np.array([a.index for a in self.t.topology.atoms if a.residue.name == residue])
         residue_atom_names = [a.name for a in self.t.topology.atoms if a.residue.name == residue]
         masses = [self.residue.mass[x] for x in residue_atom_names[:self.residue.natoms]]
-        self.com = physical.center_of_mass(self.pos[:, residue_indices, :], masses)
+        self.com = physical.center_of_mass(self.pos[:, self.residue_indices, :], masses)
 
     def locate_pore_centers(self, spline=False):
 
@@ -272,9 +275,10 @@ class System(object):
 
         plt.plot(self.t.time/1000, ntail_water, color='xkcd:blue', label='Tail %s' % resname)
         plt.plot(self.t.time/1000, npore_water, color='xkcd:orange', label='Pore %s' % resname)
-        plt.xlabel('Time (ns)')
-        plt.ylabel('Number of water molecules')
+        plt.xlabel('Time (ns)', fontsize=14)
+        plt.ylabel('Number of water molecules', fontsize=14)
         plt.legend(fontsize=14)
+        plt.gcf().get_axes()[0].tick_params(labelsize=14)
 
         plt.tight_layout()
 
@@ -301,5 +305,10 @@ if __name__ == "__main__":
 
     print('Calculating solute partition by frame')
     sys.partition(args.pore_radius, buffer=args.buffer)
-    sys.plot(resname='Water')
+
+    name = '%s' % args.residue
+    if args.residue == 'SOL' or args.residue == 'HOH':
+        name = 'Water'
+
+    sys.plot(resname=name)
 

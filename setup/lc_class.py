@@ -61,6 +61,7 @@ class LC(object):
         C2_ndx = []
         I_ndx = []
         carb = []
+        PDA = []
         self.no_ions = 0
         self.ions = []
         self.MW = 0
@@ -110,6 +111,8 @@ class LC(object):
                         benzene_carbons.append(str.strip(a[i][10:15]))
                     if 'C' in annotations:
                         carb.append(i - 2)
+                    if 'PDA' in annotations:
+                        PDA.append(str.strip(a[i][10:15]))
 
             nres.append(res_count)
 
@@ -170,6 +173,7 @@ class LC(object):
         self.benzene_carbons = benzene_carbons
         self.ion_indices = I_ndx
         self.carboxylate_indices = carb
+        self.pore_defining_atoms = PDA
 
     def get_index(self, name):
         """

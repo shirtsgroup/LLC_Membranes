@@ -11,11 +11,12 @@ def initialize():
     parser.add_argument('-T', '--title', default='MD Simulation', type=str, help='Simulation Title')
     parser.add_argument('-g', '--gro', default='initial.gro', type=str, help='coordinate file of system to be simulated')
     parser.add_argument('-t', '--itp', default='dipole.itp', type=str, help='Name of .itp describing monomers')
-    parser.add_argument('-s', '--em_steps', default=5000, type=int, help='Steps to take during energy minimization')
+    parser.add_argument('-s', '--em_steps', default=-1, type=int, help='Steps to take during energy minimization.'
+                                                                       'Default is to go forever until convergence.')
     parser.add_argument('-e', '--ensemble', default='npt', type=str, help='Thermodynamic ensemble to put system in')
     parser.add_argument('-d', '--dt', default=0.002, type=float, help='time step (ps)')
     parser.add_argument('-l', '--length', default=1000, type=float, help='simulation length (ps)')
-    parser.add_argument('-f', '--frames', default=500, type=int, help='number of frames')
+    parser.add_argument('-f', '--frames', default=50, type=int, help='number of frames')
     parser.add_argument('-p', '--pcoupltype', default='semiisotropic', type=str, help='Pressure Couple Type')
     parser.add_argument('--restraints', help='If restraints are on, another mdp option needs to be turned on, so specify '
                                              'this flag', action="store_true")
@@ -25,7 +26,7 @@ def initialize():
     parser.add_argument('--temp', default=300, help='Specify temperature at which to run simulation')
     parser.add_argument('--mdp', action="store_true", help='Only the .mdp will be written if this option is specified')
     parser.add_argument('--barostat', default='berendsen', type=str, help='pressure coupling scheme to use')
-    parser.add_argument('--genvel', default='yes', type=str, help='generate velocities according to a maxwell'
+    parser.add_argument('--genvel', default=True, help='generate velocities according to a maxwell'
                                                                      'distribution')
     parser.add_argument('--bcc', action="store_true", help='Generate input files using bicontinuous cubic files')  # probably best to reorganize the repository
     parser.add_argument('--solvent', default='water', help='Name of solvent')
@@ -43,7 +44,7 @@ def initialize():
 
 class SimulationMdp(object):
 
-    def __init__(self, gro, title='MD Simulation', T=300, em_steps=5000, time_step=0.002, length=1000,
+    def __init__(self, gro, title='MD Simulation', T=300, em_steps=-1, time_step=0.002, length=1000,
                  p_coupling='semiisotropic', barostat='berendsen', genvel='yes', restraints=False,
                  xlink=False, bcc=False, tau_p=20, tau_t=0.1, nstxout=5000, nstvout=5000, nstfout=5000, nstenergy=5000):
         """
@@ -56,7 +57,7 @@ class SimulationMdp(object):
         :param length: (int) simulation length, picoseconds
         :param p_coupling: (str) type of pressure coupling (None, semiisotropic, isotropic etc.)
         :param barostat: (str) barostat to use for pressure control
-        :param genvel: (str) 'yes' if velocities should be generated for initial configuration. 'No' (or anything else)
+        :param genvel: (bool) True if velocities should be generated for initial configuration.
         if you want to use velocities already present in coordinate file
         :param restraints: (bool) whether or not the system has been restrained (meaning a special topology file has
         been created
@@ -108,6 +109,10 @@ class SimulationMdp(object):
 
         f = open('%s.mdp' % out, 'w')
         f.writelines([title + '\n', integrator + '\n', nsteps + '\n', cutoff_scheme + '\n', nstlist + '\n'])
+
+        if self.xlink:
+            f.write('periodic-molecules = yes\n')
+
         self.em_mdp_name = out
 
     def write_npt_mdp(self, out='npt'):
@@ -148,7 +153,7 @@ class SimulationMdp(object):
             else:
                 a.append(['ref-p = %s\n' % ' '.join(['1', '1'])])
                 a.append(['compressibility = 4.5e-5 4.5e-5\n'])
-        if self.genvel == 'yes':
+        if self.genvel:
             a.append(['gen-vel = yes\n'])
             a.append(['gen-temp = %s\n' % self.temperature])
         else:
@@ -192,7 +197,7 @@ class SimulationMdp(object):
         a.append(['tc_grps = system\n'])
         a.append(['tau_t = %s\n' % self.tau_t])
         a.append(['ref_t = %s\n' % self.temperature])
-        if self.genvel == 'yes':
+        if self.genvel:
             a.append(['gen-vel = yes\n'])
             a.append(['gen-temp = %s\n' % self.temperature])
         else:
@@ -231,7 +236,7 @@ class SimulationMdp(object):
         a.append(['nstype = grid\n'])
         a.append(['vdwtype = PME\n'])
         a.append(['coulombtype = PME\n'])
-        if self.genvel == 'yes':
+        if self.genvel:
             a.append(['gen-vel = yes\n'])
             a.append(['gen-temp = %s\n' % self.temperature])
         else:

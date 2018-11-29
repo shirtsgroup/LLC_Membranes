@@ -33,8 +33,7 @@ def initialize():
     parser.add_argument('--temp', default=300, help='Specify temperature at which to run simulation')
     parser.add_argument('--mdp', action="store_true", help='Only the .mdp will be written if this option is specified')
     parser.add_argument('--barostat', default='berendsen', type=str, help='pressure coupling scheme to use')
-    parser.add_argument('--genvel', default='yes', type=str, help='generate velocities according to a maxwell'
-                                                                     'distribution')
+    parser.add_argument('--genvel', default=True, help='generate velocities according to a maxwell distribution')
     parser.add_argument('--bcc', action="store_true", help='Generate input files using bicontinuous cubic files')  # probably best to reorganize the repository
     parser.add_argument('--solvent', default='water', help='Name of solvent')
     parser.add_argument('--tau_t', default=0.1, type=float, help='Temperature coupling time constant')

@@ -130,6 +130,7 @@ def parse_txt(txt, points, times, name, std=False):
 
     return xbounds, ybounds
 
+
 if __name__ == "__main__":
 
     args = initialize()

@@ -471,7 +471,8 @@ def random_orientation(xyz, alignment_vector, placement):
 
     R = Rvect2vect(alignment_vector, u)  # rotation matrix to align water_alignment_vector with u
 
-    xyz -= xyz[0, :]  # center at origin
+    pt = np.random.choice(xyz.shape[0])  # randomly choose reference atom
+    xyz -= xyz[pt, :]  # center at origin
 
     rotated = np.zeros([xyz.shape[0], 3])
     for i in range(xyz.shape[0]):

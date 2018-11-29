@@ -290,7 +290,7 @@ def limits(pos, pcenters):
     :return: an approximate pore radius. Beyond which, we have entered the alkane region
     """
 
-    nT = pcenters.shape[2]
+    nT = pcenters.shape[0]
     npores = pcenters.shape[1]
     natoms = pos.shape[1]
     atom_ppore = natoms // npores
@@ -299,7 +299,7 @@ def limits(pos, pcenters):
     for f in tqdm.tqdm(range(nT)):
         for i in range(atom_ppore):
             for j in range(npores):
-                deviation[f, j, i] = np.linalg.norm(pos[f, j*atom_ppore + i, :2] - pcenters[:, j, f])
+                deviation[f, j, i] = np.linalg.norm(pos[f, j*atom_ppore + i, :2] - pcenters[f, j, :])
 
     #deviation = np.reshape(deviation, (nT, natoms))
 
@@ -442,3 +442,55 @@ def center_of_mass(pos, matoms):
             com[f, i, :] = np.sum(w, axis=0) / sum(matoms)  # sum the coordinates and divide by the mass of the residue
 
     return com
+
+
+def compdensity(coord, pore_centers, box, cut=1.5, pores=4, nbins=50, rmax=3.5):
+    """ Measure the density of a component as a function of the distance from the pore centers
+
+    :param coord: the coordinates of the component(s) which you want a radial distribution of at each frame
+    :param pore_centers: a numpy array of the locations of each pore center at each trajectory frame
+    :param cut: cutoff distance for distance calculations. Will not count anything further than cut from the pore center
+    :param pores: number of pores (int) default=4
+    :param rmax: maximum distance from pore center to calculate density for, default = 3.5 nm
+    :param buffer: percentage used to define the location of z planes between which component density will be computed,
+           float, default = 0 (i.e. no buffer). Should be between 0 and 1. e.g. for 1 percent, use 0.01 as the buffer
+
+    :type component: numpy.ndarray
+    :type pore_centers: numpy.ndarray
+    :type cut: float
+    :type pores: int
+    :type rmax: float
+    :type buffer: float
+
+    :return: the density of "component" as a function the distance from the pore center. Also
+             returns the calculated bin width for plotting
+    """
+
+    nT = coord.shape[0]
+    zbox = np.mean(box[:, 2, 2])
+
+    density = np.zeros([nT, nbins])  # number / nm^3
+    for t in tqdm.tqdm(range(nT), unit=' Frames'):
+        for p in range(pores):
+            # narrow down the positions to those that are within 'cut' of at least one pore
+            distances = np.linalg.norm(coord[t, :, :2] - pore_centers[t, p, :], axis=1)
+            d_sorted = np.sort(distances)
+            # find where the distances exceed the cutoff
+            stop = 0
+            while d_sorted[stop] < cut:
+                stop += 1
+
+            hist, bin_edges = np.histogram(d_sorted[:stop], bins=nbins, range=(0, cut))  # the range option is necessary
+            #  to make sure we have equal sized bins on every iteration
+
+            density[t, :] += hist
+
+    # normalize based on volume of anulus where bin is located
+    r = np.zeros([nbins])
+    for i in range(nbins):
+        density[:, i] /= (np.pi * (bin_edges[i + 1] ** 2 - bin_edges[i] ** 2))
+        r[i] = (bin_edges[i + 1] + bin_edges[i]) / 2  # center of bins
+
+    density /= zbox   # take average
+
+    return r, density

@@ -231,6 +231,8 @@ class Solvent(object):
         self.t = md.load(gro)
         self.box_vectors = self.t.unitcell_vectors[0, :, :]  # box vectors
 
+        self.xlink = xlink
+
         # parallelization
         self.mpi = False  # use mpi / gpu acceleration
         self.np = 1  # number of parallel process
@@ -242,7 +244,7 @@ class Solvent(object):
         self.positions = self.t.xyz[0, :, :]  # positions of all atoms
         self.residues = []
         self.names = []
-        self.top = SystemTopology(gro, xlink=xlink, xlinked_top_name=xlinked_topname)
+        self.top = SystemTopology(gro, xlink=self.xlink, xlinked_top_name=xlinked_topname)
         self.intermediate_fname = intermediate_fname
         self.em_steps = em_steps
 
@@ -286,7 +288,6 @@ class Solvent(object):
         self.top.add_residue(solute, write=True)  # add 1 solute to topology
 
         # write new .gro file
-        print(len(self.residues), len(self.names))
         file_rw.write_gro_pos(self.positions, self.intermediate_fname, box=self.box_gromacs, ids=self.names,
                               res=self.residues)
 
@@ -302,6 +303,10 @@ class Solvent(object):
             else:
                 #self.remove_water(placement_point, 3)
                 self.place_solute(solute, placement_point, freeze=True)
+        else:
+            p3 = subprocess.Popen(["cp", "em.gro", "%s" % self.intermediate_fname])
+            p3.wait()
+            self.positions = md.load('%s' % self.intermediate_fname).xyz[0, :, :]  # update positions
 
     def place_solute_random(self, solute):
         """
@@ -342,34 +347,39 @@ class Solvent(object):
         """
 
         # write em.mdp with a given number of steps
-        file_rw.write_em_mdp(steps, freeze=freeze, freeze_group='Freeze', freeze_dim='xyz')
+        file_rw.write_em_mdp(steps, freeze=freeze, freeze_group='Freeze', freeze_dim='xyz', xlink=self.xlink)
 
         if freeze:
-            p1 = subprocess.Popen(
-                ["gmx", "grompp", "-p", "topol.top", "-f", "em.mdp", "-o", "em", "-c", "%s" % self.intermediate_fname,
-                 "-n", "freeze_index.ndx"],
-                stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
-            p1.wait()
+            if self.mpi:
+                p1 = subprocess.Popen(
+                    ["mpirun", "-np", "1", "gmx_mpi", "grompp", "-p", "topol.top", "-f", "em.mdp", "-o", "em", "-c",
+                     "%s" % self.intermediate_fname, "-n", "freeze_index.ndx"], stdout=open(os.devnull, 'w'),
+                    stderr=subprocess.STDOUT)  # generate atomic level input file
+            else:
+                p1 = subprocess.Popen(
+                    ["gmx", "grompp", "-p", "topol.top", "-f", "em.mdp", "-o", "em", "-c",
+                     "%s" % self.intermediate_fname,
+                     "-n", "freeze_index.ndx"],
+                    stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
         else:
-            p1 = subprocess.Popen(
-                ["gmx", "grompp", "-p", "topol.top", "-f", "em.mdp", "-o", "em", "-c", "%s" % self.intermediate_fname],
-                stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
-            p1.wait()
+            if self.mpi:
+                p1 = subprocess.Popen(
+                    ["mpirun", "-np", "1", "gmx_mpi", "grompp", "-p", "topol.top", "-f", "em.mdp", "-o", "em", "-c",
+                     "%s" % self.intermediate_fname], stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
+                p1.wait()
+            else:
+                p1 = subprocess.Popen(
+                    ["gmx", "grompp", "-p", "topol.top", "-f", "em.mdp", "-o", "em", "-c", "%s" % self.intermediate_fname],
+                    stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
+        p1.wait()
 
         if self.mpi:
             p2 = subprocess.Popen(["mpirun", "-np", "%s" % self.np, "gmx_mpi", "mdrun", "-deffnm", "em"],
                                   stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # run energy minimization
-            p2.wait()
         else:
             p2 = subprocess.Popen(["gmx", "mdrun", "-deffnm", "em"], stdout=open(os.devnull, 'w'),
                                   stderr=subprocess.STDOUT)  # run energy minimization
-            p2.wait()
-
-        p3 = subprocess.Popen(["cp", "em.gro", "%s" % self.intermediate_fname])
-        p3.wait()
-
-        # update positions
-        self.positions = md.load('%s' % self.intermediate_fname).xyz[0, :, :]
+        p2.wait()
 
         nrg = subprocess.check_output(
             ["awk", "/Potential Energy/ {print $4}", "em.log"])  # get Potential energy from em.log

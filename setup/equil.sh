@@ -49,7 +49,7 @@ else
 fi
 
 # assumes defaults in build.py are okay. Adjust them if needed
-${python} ${DIR}/build.py -pd ${pd} -b ${BUILD_MON}.gro -c ${ncol}
+#${python} ${DIR}/build.py -pd ${pd} -b ${BUILD_MON}.gro -c ${ncol}
 
 # make input files
 ${python} ${DIR}/input.py -b ${BUILD_MON} -l 50 --restraints ${restraint_residue} --temp ${T} -f 50 --genvel yes -c ${start_config} -s 50000

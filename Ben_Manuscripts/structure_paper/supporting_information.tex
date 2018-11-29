@@ -17,22 +17,37 @@
 \usepackage{listings}
 \usepackage{xr}
 \usepackage{array}
+\usepackage{authblk}
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 
 \renewcommand{\thefigure}{S\arabic{figure}}
-\renewcommand{\thesection}{S\arabic{section}}   
+\renewcommand{\thesection}{S\arabic{section}}
+\renewcommand{\thepage}{S\arabic{page}}  
+\renewcommand{\thetable}{S\arabic{table}}   
 
 %\SectionNumbersOn
 
 \externaldocument[M-]{Final_Draft}
+
 \title{Supporting Information : Understanding the Nanoscale Structure of Inverted Hexagonal Phase Lyotropic Liquid Crystal Polymer Membranes}
-\author{Benjamin J. Coscia \and Jospeh Yelk \and Matthew A. Glaser \and Douglas L. Gin \and Xunda Feng \and Michael R. Shirts}
-\date{}
+\author[1]{Benjamin J. Coscia}
+\author[2]{Joseph Yelk}
+\author[2]{Matthew A. Glaser}
+\author[1,3]{Douglas L. Gin}
+\author[4]{Xunda Feng}
+\author[1]{Michael R. Shirts*}
+\date{E-mail: michael.shirts@colorado.edu}
+
+\affil[1]{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, CO 80309, USA}
+\affil[2]{Department of Physics, University of Colorado Boulder, Boulder CO, 80309, USA}
+\affil[3]{Department of Chemistry and Biochemistry, University of Colorado Boulder, Boulder CO 80309, USA}
+\affil[4]{Department of Chemical and Environmental Engineering, Yale University, New Haven, Connecticut 06511, USA}
 
 \begin{document}
 
   \bibliographystyle{ieeetr}
   \graphicspath{{./supporting_figures/}}  % put all the figures here
+  %\graphicspath{{./figures/}}
   \maketitle
   
   \section{Setup and analysis scripts}\label{section:python_scripts}
@@ -160,6 +175,9 @@
   angles between the center of mass of each monomer tail and its nearest neighbor monomer tails.
   \\ \hline
  
+  \texttt{/analysis/hexagonal\_packing.py} & \ref{M-section:rspots} & Calculate Fourier transform of
+  2D array of hexagonal scatterers as shown in Figure~\ref{M-fig:hexagonal_ft} of the main text. \\ \hline
+ 
   \texttt{/analysis/compare\_disorder.py} & \ref{M-section:rpi} & Measure quenched disorder for
   each trajectory in an ensemble of simulations, then plot distributions of quenched disorder.
   \\ \hline
@@ -268,14 +286,15 @@
 
   \section{Number of monomers per column}\label{section:monomers_per_column}
   
-  We chose to build all systems using 20 monomers per column, i.e. for a simulation with 5 columns around each pore, there are 100 monomers per pore, and 400 monomers per simulation.  We made this choice
+  We chose to build all systems using 20 monomers per column, i.e. for a simulation with 5 
+  columns around each pore, there are 100 monomers per pore, and 400 monomers per simulation.  We made this choice
   by considering a number of factors that directly affect the quality of our results. 
   Clearly, choosing a smaller number of layers will cause the system to suffer from 
   larger finite size effects. Even in our 20 monomer-per-column system, axial correlations
   between stacked monomers persist throughout the entire correlation function (see
-  Figure~\ref{M-fig:correlation} of the main text). The correlation function of the system which we
+  Figure~\ref{fig:correlation}). The correlation function of the system which we
   built with 40 monomers per column is very similar to that created with 20 monomers
-  per columns (continues to oscillate for its full length
+  per column (it continues to oscillate for its full length
   (Figure~\ref{fig:tall_correlation_full})). If we continue adding monomers, the 
   correlation function will eventually fully decay but it is not worth the 
   computational expense. We do find that the correlation lengths calculated from 20
@@ -605,7 +624,7 @@
         configuration.}\label{fig:stacking}
   \end{figure}
 
-  Based on evidence from section~\ref{M-section:rpi} of the main text, we
+  Based on evidence from Section~\ref{M-section:rpi} of the main text, we
   believe it is most likely that the head groups stack somewhere between
   the sandwiched and parallel displaced modes which we studied (Figure~\ref{fig:between_pd}).
 
@@ -1131,6 +1150,17 @@
  
   \clearpage
  
+  \section{Pore radius as a function of monomers per column}\label{section:pore_radius} 
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{\linewidth}
+  \includegraphics[width=\textwidth]{pore_radius.pdf}
+  \end{subfigure}
+  \caption{The pore radius increases as we increase the number of columns per pore.}\label{fig:pore_radius}
+  \end{figure}
+ 
+  \clearpage
   \section{Noise in simulated diffraction patterns}\label{section:xrd_noise}
   
   The magnitude of noise in the simulated diffraction patterns decreases as 
@@ -1208,7 +1238,7 @@
   membrane plane. We created a monomer whose tails tilt ca. 30$\degree$ with
   respect to the $xy$ membrane plane.  We added position restraints to the ends
   of the monomer tails with the same force constant as the head groups (see
-  section~\ref{section:equilibration}).  As we slowly reduce the force constants,
+  Section~\ref{section:equilibration}).  As we slowly reduce the force constants,
   the tails begin to tend towards a negligible tilt angle
   (Figure~\ref{fig:tail_tilt}).
   
@@ -1284,6 +1314,137 @@
   
   \clearpage
   
+  \section{Correlation Functions}\label{section:correlation_functions}
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{z_correlation_sandwich.pdf}
+  \caption{Sandwiched, Ordered Basin}\label{fig:z_correlation_sandwich}
+  \end{subfigure}  
+  \begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{z_correlation_offset.pdf}
+  \caption{Parallel Displaced, Ordered Basin}\label{fig:z_correlation_offset}
+  \end{subfigure}  
+  \begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{z_correlation_sandwich_disordered.pdf}
+  \caption{Sandwiched, Disordered Basin}\label{fig:z_correlation_sandwich_disordered}
+  \end{subfigure}  
+  \begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{z_correlation_offset_disordered.pdf}
+  \caption{Parallel Displaced, Disordered Basin}\label{fig:z_correlation_offset_disordered}
+  \end{subfigure}  
+  \caption{1D correlation functions of the center of masses of aromatic head
+	  groups, $g(z)$, show decaying oscillatory behavior and have consistent
+	  correlation lengths with experiment. We calculated the correlation length by
+	  fitting a decaying exponential function
+	  (Equation~\ref{M-eqn:decaying_exponential} of the main text) to the peaks of $g(z)$. The
+	  correlation length is longer for ordered basin systems
+	  (Table~\ref{M-table:correlation_length} of the main text). We did not attempt to calculate the
+	  correlation length for (d) because there are no clear peaks. We assume that
+	  this correlation length is less than the vertical distance between
+	  monomers.}\label{fig:correlation}
+  \end{figure} 
+
+  The system size, in the $z$-direction, does not significantly alter $g(z)$.
+  In Figure~\ref{fig:correlation}, oscillations do not fully decay, so a taller
+  system may be necessary to fully capture the correlation function. We therefore
+  equilibrated a sandwiched system with twice as many monomers per column so that
+  the system size doubled in the $z$-direction. The correlation length increases
+  modestly from 4.5 $\pm$ 0.4 to 7.3 $\pm$ 1.2 \AA. However, visually, the
+  correlation functions are nearly identical and oscillatory behavior persists
+  throughout $g(z)$ in both cases (See Figure \ref{fig:z_correlation_overlay}).
+  
+  It seems likely that the discrepancy between the shape and intensity of
+  R-$\pi$ generated from our simulations versus experiment is primarily due to
+  highly correlated columns in our highly symmetric initial configurations.
+  If the columns were uncorrelated, $g(z)$ of the ordered sandwiched system 
+  would very closely resemble Figure~\ref{fig:z_correlation_sandwich} when we 
+  average all $z$-slices of the 3D correlation function. Contributions to
+  $g(z)$ from head groups in other columns within the same pore, and with head
+  groups in different pores would cancel out. However, when we include all 
+  $z$-slices in $g(z)$ for our system, rather than restricting it to those 
+  $z$-slices within 2.1~\AA~of the center of the correlation function 
+  (see Section~\ref{M-section:correlation_length}), $g(z)$ shows oscillatory 
+  behavior and its correlation length nearly triples to 12.4 $\pm$ 0.7 \AA.
+  (Figure~\ref{fig:z_correlation_fullbox}). The peaks of $g(z)$ are actually 
+  reinforced by head groups in neighboring columns which is not expected
+  in a system where columns act independently.
+
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{z_correlation_fullbox.pdf}
+  \caption{When we average all $z$-slices of the 3D correlation function, the 
+  correlation length of the ordered sandwich configuration nearly triples compared 
+  to that shown in Figure~\ref{fig:z_correlation_sandwich}.}\label{fig:z_correlation_fullbox}
+  \end{figure}
+  
+  \section{Structure factors of simplified systems}\label{section:simplified_sf} 
+  
+  In the Section~\ref{M-section:rpi} of the main text, we used simplified systems
+  made up of point scatterers in order to understand the main factors that influence
+  the cross-sections of R-$\pi$. We showed that both the shape and the intensity
+  of R-$\pi$ are strongly influenced by the degree of correlation between columns.
+  Here we show the influence of varied amounts of noise on the $xy$ plane and in
+  the $z$-direction for select cases.
+  
+  Increasing thermal noise in the $z$-direction will reduce the intensity
+  of R-$\pi$, however the $q_r$ profile remains unchanged. When we increased the
+  thermal noise of the simplified parallel displaced system with fully correlated
+  columns in the $z$-direction by 12\% and 27\%, we saw a 3 and 15-fold decrease in
+  the maximum intensity of R-$\pi$ respectively (Figure~\ref{fig:intensity_vs_zsigma}).
+  Despite the decrease in intensity, the 3 cross-sections have the same shape 
+  (Figure~\ref{fig:rpi_xsection_vs_zsigma}), whose sharp Bragg-like peaks are
+  not consistent with experiment. 
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{intensity_vs_zsigma.pdf}
+  \caption{}\label{fig:intensity_vs_zsigma}
+  \end{subfigure}
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{rpi_xsection_vs_zsigma.pdf}
+  \caption{}\label{fig:rpi_xsection_vs_zsigma}
+  \end{subfigure}
+  \caption{We can decrease the maximum intensity of R-$\pi$ by increasing
+  thermal noise in the $z$-direction; however, the $q_r$ cross-section profile does
+  not change. (a) The intensity of R-$\pi$ drops precipitously as we increase
+  $\sigma_z$. We can decrease the intensity of R-$\pi$, relative to the
+  background intensity, relative to systems with simulation levels of disorder (blue)
+  by a factor of 3 when we increase $\sigma_z$ by 12\% (green) and by a factor 
+  of 15 when we increase $\sigma_z$ by 27\% (red). (b) Although the maximum intensity of R-$\pi$
+  decreases with increasing $\sigma_z$, the peak shape remains the same.}\label{fig:znoise}
+  \end{figure}
+  
+  Increasing thermal noise in the $xy$ plane causes the FWHM of the $q_r$
+  cross-section of R-$\pi$ to, somewhat counterintuitively, decrease. Using a
+  system with uncorrelated columns, we modified the disorder in both the $r$ and
+  $\theta$ directions by multiplying their values by a factor of 0.5 and 2
+  (Figure~\ref{fig:qy_fwhm}). When we cut the noise in half, the FWHM increases
+  by 88\%. When we double the noise, the FWHM decreases by 51\%. As we have fit
+  the data in Figure~\ref{M-fig:sim_rsection_fit}, the FWHM of R-$\pi$ agrees well
+  with experiment, meaning the quenched configuration contains about the right
+  amount of disorder on the $xy$ plane. However, the relatively low quality of
+  the fit implies that the FWHM of a fixed Lorentzian fit to data from a single
+  simulation might not be the best comparison to experiment and that some form of
+  initial configuration dependence causes extra structure.
+
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{qy_fwhm.pdf}
+  \caption{Increasing the amount of disorder in the $xy$ plane decreases the
+	  FWHM of the $q_r$ cross-section of R-$\pi$. When we cut the amount of $r$ and
+	  $\theta$ disorder in half (Noise factor = 0.5), the FWHM increases by 88\%. When
+	  we double the disorder (Noise factor = 2), the FWHM decreases by
+	  51\%.}\label{fig:qy_fwhm}
+  \end{figure} 
+   
+  \clearpage
   \section{Ensemble of ordered sandwiched configurations}\label{section:sandwiched_ensemble}
   
   Here we show the results of the same analysis shown in Figures~\ref{M-fig:ensemble_XRD} 
@@ -1527,8 +1688,10 @@
   
   The appearance of R-double is likely a consequence of structure induced when
   vertically stacked monomer pairs share hydrogen bonds with a common water molecule (See
-  Section~\ref{M-section:rdouble} of the main text). We quantified the occurence of
-  these pairing interactions by binning the $z$-positions of the center of mass of 
+  Section~\ref{M-section:rdouble} of the main text). It is not a consequence of the 
+  structure of water itself because R-double still persists if we removed water from 
+  the trajectory which gives rise to the feature (Figure~\ref{fig:rdouble_water_removed}). 
+  We quantified the occurence of pairing interactions by binning the $z$-positions of the center of mass of 
   the monomer head groups into 20 bins, the same number as the monomers per column. 
   This works relatively well since there is a high degree of correlation between
   columns in our system. Peaks in the distributions represent the scenario where a monomer head group
@@ -1538,6 +1701,14 @@
   (Figure~\ref{fig:pore_hbonds_ft}). We see the strongest indicator of asymmetric monomer
   stacking in Pore 1 where the peaks at 0.76 $\AA^{-1}$ are clearly distinguishable, meaning
   there is periodicity at twice the $\pi$-stacking distance.
+  
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.45\textwidth]{water_removed_rdouble.png}
+  \caption{When water is removed from the trajectory which produces R-double,
+  R-double is still present since it is the result of uneven spacing between 
+  head groups.}\label{fig:rdouble_water_removed}
+  \end{figure}
   
   \begin{figure}[!htb]
   \centering
@@ -1564,6 +1735,8 @@
   }\label{fig:hbonds}
   \end{figure}
   
+  \clearpage
+  
   \section{Diffusion of monomers}
 
   We calculated the diffusion coefficient of the monomer head groups by measuring
@@ -1589,9 +1762,10 @@
   
   \section{Autocorrelation of monomer dihedrals}
   
-  In section~\ref{M-section:slow_dynamics} of the main text, we calculated the
+  In Section~\ref{M-section:slow_dynamics} of the main text, we calculated the
   autocorrelation function of the outer tail either dihedrals pictured
-  in Figure~\ref{fig:dihedrals}.
+  in Figure~\ref{fig:dihedral_illustration}. The plots of the autocorrelation
+  functions versus time lag are shown in Figure~\ref{fig:dihedral}.
   
   \begin{figure}[!htb]
   \centering
@@ -1599,7 +1773,26 @@
   \caption{We measured the autocorrelation functions of the dihedrals highlighted in
   black. We only included dihedrals associated with the outer tails in our calculation
   since the position of the center tail leads to fundamentally different interactions and
-  dynamics.}\label{fig:dihedrals}
+  dynamics.}\label{fig:dihedral_illustration}
+  \end{figure}
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  	\centering
+  	\includegraphics[width=\textwidth]{dihedral_autocorrelation_300K.pdf}
+  	\caption{300K}\label{fig:dihedrals_300K}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  	\centering
+  	\includegraphics[width=\textwidth]{dihedral_autocorrelation_500K.pdf} % Run : torsions.py -t tethered_columns.xtc -g tethered_columns.gro (the appropriate dihedral is the default)
+  	\caption{500K}\label{fig:dihedrals_500K}
+  \end{subfigure}
+  \caption{The outer tail ether dihedrals become decorrelated on a reasonable
+  timescale when we raise the system temperature. (a) The dihedrals do not
+  become decorrelated for ca. 100 ns when the system is equilibrated at 300 K.
+  (b) The ether dihedrals become decorrelated after 11 ns when the temperature
+  of the system is increased to 500 K.}\label{fig:dihedral}
   \end{figure}
   
 %  \begin{figure}[!htb]
@@ -1616,6 +1809,22 @@
 %  parallel displaced configuration with 1 wt\% water shows R-double at $mathbf{q}=(0, 0.7) \AA^{-1}$.
 %  (b) When we remove }\label{fig:pore1_removed}
 %  \end{figure}
+
+  \clearpage
+
+  \section{Influence of Cross-linking on physical properties}\label{section:xlink_physical}
+  
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=\textwidth]{xlink_charts.pdf}
+  \caption{There are minor differences between the physical properties of a
+  crosslinked (xlink) system versus an uncrosslinked system. The sandwiched configuration (S)
+  exhibits a smaller decrease in its ionic conductivity, while the parallel displaced (PD)
+  configuration remains constant. The pore spacing of both systems decreases upon cross-linking.
+  The vertical distance between stacked monomers increases in the sandwiched configuration
+  and decreases in the parallel displaced configuration. The correlation length decreases
+  in both configurations.}\label{fig:xlink}
+  \end{figure}
 
 \clearpage
 \bibliography{llc}
