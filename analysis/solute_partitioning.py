@@ -28,8 +28,9 @@ def initialize():
     parser.add_argument('-skip', default=1, type=int, help='Skip every n frames')
 
     # define system
-    parser.add_argument('-p', '--pore_atoms', nargs='+', default=['C', 'C1', 'C2', 'C3', 'C4', 'C5'], help='Atoms that'
-                        'will be used to define the pore region')
+    parser.add_argument('-b', '--build_monomer', default='NAcarb11V.gro', help='Name of annotated coordinate file '
+                        'describing monomer structure.')
+
     parser.add_argument('-ox', '--tail_oxygen', nargs='+', default=['O5', 'O6', 'O7', 'O8', 'O9', 'O10'], help='Oxygen'
                         'atoms that will be used to define the tail region')
     parser.add_argument('-tr', '--tail_radius', default=0.5, type=float, help='Max distance from tail oxygens a water '
@@ -38,7 +39,7 @@ def initialize():
                                                              'approximating each center as a single point.')
     parser.add_argument('-pr', '--pore_radius', default=1.48, type=float, help='Max distance from pore center a water '
                         'molecule can exist in order to be counted as inside the pore')
-    parser.add_argument('-b', '--buffer', default=0, type=float, help='z-distance (nm) to cut off from top and bottom '
+    parser.add_argument('-buffer', '--buffer', default=0, type=float, help='z-distance (nm) to cut off from top and bottom '
                                                                       'of unit cell when calculating COM locations')
 
     parser.add_argument('--load', action="store_true")
@@ -168,11 +169,11 @@ def bootstrap(data, tau, nboot):
 
 class System(object):
 
-    def __init__(self, gro, pore_atoms, residue, traj=False, begin=0, end=-1, skip=1, npores=4):
+    def __init__(self, gro, build_monomer, residue, traj=False, begin=0, end=-1, skip=1, npores=4):
         """ Define the system and boundaries for pore and tail region
 
         :param gro: coordinate file
-        :param pore_atoms: atoms used to define the pore locations
+        :param build_monomer: name of annotated monomer coordinate file
         :param traj: trajectory file
         :param begin: first frame to include
         :param end: last frame to include
@@ -182,7 +183,7 @@ class System(object):
 
         print('Loading trajectory...', flush=True, end='')
         if traj:
-            self.t = md.load(traj, top=args.gro)[begin:end:skip]
+            self.t = md.load(traj, top=gro)[begin:end:skip]
         else:
             self.t = md.load(gro)
         print('Done')
@@ -196,7 +197,7 @@ class System(object):
         self.ids = [a.name for a in self.t.topology.atoms]
         self.res = [a.residue.name for a in self.t.topology.atoms]
 
-        self.pore_atoms = pore_atoms
+        self.pore_atoms = topology.LC(build_monomer).pore_defining_atoms
         self.npores = npores
         self.pore_centers = None
         self.pore_water = []
@@ -267,11 +268,13 @@ class System(object):
 
             # vvv slow vvv
             #self.tail_water.append([x for x in np.arange(0, self.com.shape) if x not in self.pore_water[i]])
+    # def flux(self):
 
     def plot(self, resname='Water'):
 
         ntail_water = [len(x) for x in self.tail_water]
         npore_water = [len(x) for x in self.pore_water]
+        print(ntail_water, npore_water)
 
         plt.plot(self.t.time/1000, ntail_water, color='xkcd:blue', label='Tail %s' % resname)
         plt.plot(self.t.time/1000, npore_water, color='xkcd:orange', label='Pore %s' % resname)
@@ -291,7 +294,7 @@ if __name__ == "__main__":
 
     if not args.load:
         # heavy calcuations
-        sys = System(args.gro, args.pore_atoms, args.residue, traj=args.traj, begin=args.begin, end=args.end,
+        sys = System(args.gro, args.build_monomer, args.residue, traj=args.traj, begin=args.begin, end=args.end,
                      skip=args.skip)
 
         sys.locate_pore_centers(spline=args.spline)

@@ -250,7 +250,7 @@ class System(object):
 
         self.com = self.com[:, inside_pore, :]  # restrict COMs to just those within pore
 
-    def hops_and_dwells(self, penalty=1):
+    def hops_and_dwells(self, penalty=0.5):
         """ Find breakpoints then assemble lists of dwell times and hop lengths. See documentation for Ruptures python
         package: http://ctruong.perso.math.cnrs.fr/ruptures-docs/build/html/index.html for more options that can be
         added
@@ -269,10 +269,19 @@ class System(object):
             # std = np.std(hops)
             # bp = np.where(np.abs(hops) > 3*std)[0]
 
-            bp = ruptures.detection.Binseg(model='ar').fit_predict(self.com[:, j, :], pen=penalty)
-
+            bp_x = ruptures.detection.Binseg(model='l2').fit_predict(self.com[:, j, 0], pen=penalty)
+            bp_y = ruptures.detection.Binseg(model='l2').fit_predict(self.com[:, j, 1], pen=penalty)
+            bp_z = ruptures.detection.Binseg(model='l2').fit_predict(self.com[:, j, 2], pen=penalty)
+            # print(bp
+            print(bp_x, bp_y, bp_z)
+            bp = sorted(set(bp_x + bp_y + bp_z))
             print(bp)
+            bp2 = ruptures.detection.Binseg(model='l2').fit_predict(self.com[:, j, :], pen=penalty)
+            # ruptures.display(self.com[:, j, 0], bp_x, figsize=(10, 6))
+            # ruptures.display(self.com[:, j, 1], bp_y, figsize=(10, 6))
+            # ruptures.display(self.com[:, j, 2], bp_z, figsize=(10, 6))
             ruptures.display(self.com[:, j, :], bp, figsize=(10, 6))
+            ruptures.display(self.com[:, j, :], bp2, figsize=(10, 6))
             plt.show()
 
             initial_dwells.append(bp[0])

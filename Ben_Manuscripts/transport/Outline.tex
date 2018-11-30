@@ -93,7 +93,7 @@
 %  We cross-linked the equilibrated solvated configuration using the cross-linking procedure
 %  described in our previous work. 
 
-  We equilibrated our initial configuration before adding solutes.
+  We equilibrated an initial solvated configuration before adding solutes.
   \begin{itemize}
 	\item We equilibrated the initial configuration using the `wet'
 	equilibration procedure described in our previous work (reference to structure
@@ -116,7 +116,7 @@
 	1 microsecond, with pressure controlled by the Parrinello-Rahman barostat.
   \end{itemize}
   
-  \subsubsection*{Modeling the Continuous Time Random Walk}
+  \subsubsection*{Modeling the Continuous Time Random Walk}\label{method:CTRW}
 
   A continuous time random walk (CTRW) is a stochastic process characterized by a 
   distribution of hop lengths and dwell times.
@@ -155,9 +155,115 @@
   % BJC: For Greg to write if things work out
    
   \section{Results and Discussion}
-  
+
+  \subsection{Simulated Estimates of Macroscopic Diffusion Coefficients}\label{section:D_macro}
  
+  Polar molecules generally exhibit a hop diffusion mechanism. 
+  \begin{itemize}
+	\item Each trajectory is characterized by an exponential distribution of
+	dwell times between hops of random lengths from a Gaussian distribution.
+  \end{itemize}
+
+  We fit a CTRW model (see Section~\ref{method:CTRW}) to these 
+  trajectories and predicted macroscopic diffusion coefficients which are
+  presented in Table TBD.
+
+  % BJC: figure with selected trajectories for each molecule.
+
+  % BJC: table with finalized diffusion coefficients
+
+  \subsubsection*{The Influence of Water Content on Macroscopic Diffusion Coefficients}
+
+  \subsection{Transport Mechanisms}
+
+  In order to truly understand the molecular origins of the macroscopic diffusion
+  coefficients in Section~\ref{section:D_macro}, we studied the microscopic interactions
+  between solutes and the membrane that lead to the observed dwell and hop distributions.
+
+  \subsubsection*{Transport of Water}
+
+  All water molecules exhibit hop diffusion.
+
+  Even in the center of the pore, where the density of water molecules is 
+  highest, individual water molecules still exhibit hop diffusion as they
+  create a tight hydrogen bond network. 
+
+  In this confined environment, the diffusion constant is x times lower than
+  expected bulk diffusion coefficient of tip3p water.
+  
+  \subsubsection*{Transport of Alcohols}
+
+  The hydroxyl functional group of alcohol molecules is a hydrogen bond donor
+  and prefers to donate it's hydrogen to strongly polarized carboxylate head
+  groups.
+
+  As alcohol groups increase in hydrophobic character, they are more inclined
+  to stick to the outside edges of the pore. 
+  \begin{itemize}
+	\item The alkane tails prefer to stay at the edges of the pore. 
+	\item They tend to get trapped between monomers and closer to 
+	the tail region. 
+	\item The entrapment is further stabilized by hydrogen bonds with
+	ether oxygens connecting the monomer's alkane tails to the head groups.
+  \end{itemize}
+
+  The diffusion coefficient of simple alcohols increases as the length of 
+  the alkane chain increases.
+  \begin{itemize}
+	\item The dwell times increase as the oily tails become more
+	entrapped in monomer tails.
+  \end{itemize}
+
+  Ethylene glycol, a diol, has two hydrogen bond donor groups.
+  \begin{itemize}
+	\item Can hydrogen bond with same moeity.
+	\item Can hydrogen bond with different moeities in the same 
+	vicinity. 
+	\item Dwell times tend to be shorter. If one hydroxyl group is bound
+	with a hydrogen bond, the other unbound hydroxyl group may form a hydrogen bond
+	elsewhere and effectively pull the other bound hydroxyl group along with it. 
+  \end{itemize}
+
+  \subsubsection*{Transport of Acetone}
+
+  The carbonyl group of Acetone is a hydrogen bond acceptor and therefore only
+  form hydrogen bonds with water molecules in the pore. 
+
+  The hydrophobic character of the two methyl groups on acetone causes the methyl
+  groups to gravitate towards the outside of the pore, while the carbonyl group
+  reaches towards the pore center in order to 
+
+  \subsubsection*{Transport of Acetic Acid}
+
+  Acetic acid, since we modeled it solely in its protonated state, has hydrogen
+  bond donor and acceptor groups. 
+
+  \subsubsection*{Transport of Ions} % probably just sodium
+
+  \subsection{Experimental comparison of diffusion results}
+
+  % For Greg
+   
   \section{Conclusion}
+
+  We have examined the transport characteristics of a series of small polar
+  molecules in our model of the H\textsubscript{II} phase formed by 
+  Na-GA3C11.
+
+  We calculated the macroscopic diffusion coefficients of each solute as 
+  approximated by a CTRW model.
+
+  We have studied the influence of water content on the diffusion coefficients.
+
+  We have validated our results using experimental DOSY NMR measurements.
+
+  We can use this intuition in order to modify our monomers for a specific 
+  separation.
+  \begin{itemize}
+	\item Increase number of h-bond sites to increase selectivity towards water 
+	over polar molecules
+	\item Also separate acetone (things with only h-bond accepting groups) in this way
+  \end{itemize}
   
  
   \section*{Supporting Information}
