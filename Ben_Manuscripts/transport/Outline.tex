@@ -151,12 +151,34 @@
 	calculated in this way afer x steps (See Supporting Information)
   \end{itemize}
 
+  \subsubsection*{Radial Distribution Functions}
+
+  We measured the average radial distance of each solute of interest from the pore
+  centers.
+  \begin{itemize}
+	\item We binned the radial distances and then normalized by the volume
+	of the annulus defined by the bin edges.
+	\item Although the pores are often described as straight, they have a
+	small degree of tortuosity which disrupts the RDF calcuation 
+	\item We obtain the best RDF by constructing splines that run through the
+	pore centers.
+	\item We construct the splines by dividing the membrane into 20 slices
+	in the $z$-direction. Within each slice, we calculate the location of 
+	the pore centers based on the average location of the aromatic rings
+	that make up the monomer head groups.
+	\item When calculating the RDF, the radial distance from the pore center
+	is based on the distance between the solute center-of-mass and the ($x$, $y$)
+	coordinates of appropriate point on the spline.
+  \end{itemize}
+
   \subsection{Experimental}
   % BJC: For Greg to write if things work out
    
   \section{Results and Discussion}
 
-  \subsection{Simulated Estimates of Macroscopic Diffusion Coefficients}\label{section:D_macro}
+  \subsection{Macroscopoic Diffusion Coefficients}
+
+  \subsection{Simulated Predictions}\label{section:D_macro}
  
   Polar molecules generally exhibit a hop diffusion mechanism. 
   \begin{itemize}
@@ -174,37 +196,64 @@
 
   \subsubsection*{The Influence of Water Content on Macroscopic Diffusion Coefficients}
 
+  \subsection{Experimental Measurements}
+
+  % For Greg
+
   \subsection{Transport Mechanisms}
 
-  In order to truly understand the molecular origins of the macroscopic diffusion
-  coefficients in Section~\ref{section:D_macro}, we studied the microscopic interactions
-  between solutes and the membrane that lead to the observed dwell and hop distributions.
+  In order to truly understand the molecular origins of the macroscopic
+  diffusion coefficients in Section~\ref{section:D_macro}, we studied the
+  microscopic interactions between solutes and the membrane that lead to the
+  observed dwell time and hop distributions.
+  \begin{itemize}
+	\item We studied the radial distribution functions of solutes as a
+	function of distance from the pore center
+	\item We looked at hydrogen bonding patterns
+	\item Order parameters
+  \end{itemize}
+
+  The radial distribution function of each solute studied is shown in 
+  Figure TBD.
 
   \subsubsection*{Transport of Water}
 
   All water molecules exhibit hop diffusion.
 
-  Even in the center of the pore, where the density of water molecules is 
-  highest, individual water molecules still exhibit hop diffusion as they
-  create a tight hydrogen bond network. 
+  Even in the center of the pore, where the density of water molecules is
+  highest, individual water molecules exhibit hop diffusion as they create a
+  tight hydrogen bond network.
+  %TODO: the following is a hypothesis
+  \begin{itemize}
+	\item Water sticks to pore walls
+	\item Dwell times are short
+	\item Water tumbles across pore for a while until it sticks again. 
+	\item Water gets caught in h-bonds with other water molecules away
+	from pore center.
+  \end{itemize}
 
   In this confined environment, the diffusion constant is x times lower than
   expected bulk diffusion coefficient of tip3p water.
+
+  %TODO: study diffusion mechanism of water
   
   \subsubsection*{Transport of Alcohols}
 
   The hydroxyl functional group of alcohol molecules is a hydrogen bond donor
-  and prefers to donate it's hydrogen to strongly polarized carboxylate head
+  and prefers to donate it's hydrogen to more strongly polarized carboxylate head
   groups.
 
   As alcohol groups increase in hydrophobic character, they are more inclined
   to stick to the outside edges of the pore. 
   \begin{itemize}
-	\item The alkane tails prefer to stay at the edges of the pore. 
+	\item The alkane tails prefer to stay at the edges of the pore.
+	\item Radial distribution functions show peaks at pore edges, however
+	smaller alcohols have high densities near the pore center. 
 	\item They tend to get trapped between monomers and closer to 
 	the tail region. 
 	\item The entrapment is further stabilized by hydrogen bonds with
 	ether oxygens connecting the monomer's alkane tails to the head groups.
+	%TODO: quantify h-bonds with ether oxygens and carbonyl oxygens
   \end{itemize}
 
   The diffusion coefficient of simple alcohols increases as the length of 
@@ -231,7 +280,11 @@
 
   The hydrophobic character of the two methyl groups on acetone causes the methyl
   groups to gravitate towards the outside of the pore, while the carbonyl group
-  reaches towards the pore center in order to 
+  reaches towards the pore center in order to hydrogen bond with water molecules.
+  \begin{itemize}
+	\item Order parameter defined between vector along carbonyl and vector extending
+	from acetone COM to pore center is non-zero.
+  \end{itemize} 
 
   \subsubsection*{Transport of Acetic Acid}
 
@@ -240,9 +293,6 @@
 
   \subsubsection*{Transport of Ions} % probably just sodium
 
-  \subsection{Experimental comparison of diffusion results}
-
-  % For Greg
    
   \section{Conclusion}
 
@@ -251,11 +301,13 @@
   Na-GA3C11.
 
   We calculated the macroscopic diffusion coefficients of each solute as 
-  approximated by a CTRW model.
+  approximated by a CTRW model and validated our estimates using experimental
+  DOSY NMR measurements.
 
   We have studied the influence of water content on the diffusion coefficients.
 
-  We have validated our results using experimental DOSY NMR measurements.
+  We showed that hydrogen bonding between solutes and Na-GA3C11 monomers plays
+  a major role in mechanism by which molecules traverse the nanopores. 
 
   We can use this intuition in order to modify our monomers for a specific 
   separation.
