@@ -206,60 +206,83 @@ def conc(t, comp, b):
     return avg_conc, std, avg_cross, thick, z_max, z_min
 
 
-def avg_pore_loc(npores, pos, buffer=0):
+def avg_pore_loc(npores, pos, buffer=0, spline=False, box=None, npts=20, progress=False, bins=False):
     """ Calculate average pore location for each pore at each frame
 
     :param no_pores: the number of pores in the unit cell
     :param pos: the coordinates of the component(s) which you are using to locate the pore centers
     :param buffer: fraction (of membrane thickness) of top and bottom of membrane to exclude from p2p calculations
+    :param spline: trace pore centers with a spline
+    :param box: box vectors (t.unitcell_vectors when trajectory is load with mdtraj). Necessary when using spline.
+    :param npts: number of points making up the spline in each pore
+    :param progress: show progress bar while constructing splines
+    :param bins: return the bin centers of each spline for plotting purposes
 
     :type no_pores: int
     :type pos: numpy.ndarray, shape(ncomponents, 3) or numpy.ndarray, shape(nframes, ncomponents, 3)
     :type buffer: float
+    :type spline: bool
+    :type box: numpy.ndarray, shape(nframes, 3, 3)
+    :type npts: int
+    :type progress: bool
+    :type bins: bool
 
     :return: numpy array containing the x, y coordinates of the center of each pore at each frame
     """
 
     # Find the average location of the pores w.r.t. x and y
 
-    if len(pos.shape) == 3:  # multiple frames
+    if spline:
+        if box is None:
+            print('You must supply box vectors if you are to trace the pores with a spline')
+            exit()
+        else:
 
-        nT = np.shape(pos)[0]
-        comp_ppore = np.shape(pos)[1] // npores
+            centers, bin_centers = trace_pores(pos, box, npts, npores=4, progress=progress)
 
-        #p_center = np.zeros([2, npores, nT])
-        p_center = np.zeros([nT, npores, 2])
-
-        for i in range(nT):
-            zmax = np.amax(pos[i, :, 2])  # maximum z value for this frame
-            zmin = np.amin(pos[i, :, 2])  # minimum z value for this frame
-            thick = zmax - zmin
-            zmax -= buffer*thick
-            zmin += buffer*thick
-            for j in range(npores):
-                count = 0
-                for k in range(comp_ppore*j, comp_ppore*(j + 1)):
-                    if zmax >= pos[i, k, 2] >= zmin:
-                        p_center[i, j, :] += pos[i, k, :2]
-                        count += 1
-                p_center[i, j, :] /= count  # take the average
-
-    elif len(pos.shape) == 2:  # single frame
-
-        comp_ppore = pos.shape[0] // npores
-
-        p_center = np.zeros([npores, 2])
-
-        for j in range(npores):
-            for k in range(comp_ppore*j, comp_ppore*(j + 1)):
-                p_center[j, :] += pos[k, :2]
-            p_center[j, :] /= comp_ppore
-
+            if bins:
+                return centers, bin_centers
+            else:
+                return centers
     else:
-        return 'Please use a position array with valid dimensions'
-        exit()
 
-    return p_center
+        if len(pos.shape) == 3:  # multiple frames
+
+            nT = np.shape(pos)[0]
+            comp_ppore = np.shape(pos)[1] // npores
+
+            p_center = np.zeros([nT, npores, 2])
+
+            for i in range(nT):
+                zmax = np.amax(pos[i, :, 2])  # maximum z value for this frame
+                zmin = np.amin(pos[i, :, 2])  # minimum z value for this frame
+                thick = zmax - zmin
+                zmax -= buffer*thick
+                zmin += buffer*thick
+                for j in range(npores):
+                    count = 0
+                    for k in range(comp_ppore*j, comp_ppore*(j + 1)):
+                        if zmax >= pos[i, k, 2] >= zmin:
+                            p_center[i, j, :] += pos[i, k, :2]
+                            count += 1
+                    p_center[i, j, :] /= count  # take the average
+
+        elif len(pos.shape) == 2:  # single frame
+
+            comp_ppore = pos.shape[0] // npores
+
+            p_center = np.zeros([npores, 2])
+
+            for j in range(npores):
+                for k in range(comp_ppore*j, comp_ppore*(j + 1)):
+                    p_center[j, :] += pos[k, :2]
+                p_center[j, :] /= comp_ppore
+
+        else:
+            return 'Please use a position array with valid dimensions'
+            exit()
+
+        return p_center
 
 
 def p2p(p_centers, distances):
@@ -330,13 +353,14 @@ def put_in_box(pt, x_box, y_box, m, angle):
     """
 
     b = - m * x_box  # y intercept of box vector that does not pass through origin (right side of box)
+
     if pt[1] < 0:
         pt[:2] += [np.cos(angle)*x_box, np.sin(angle)*x_box]  # if the point is under the box
     if pt[1] > y_box:
         pt[:2] -= [np.cos(angle)*x_box, np.sin(angle)*x_box]
     if pt[1] > m*pt[0]:  # if the point is on the left side of the box
         pt[0] += x_box
-    if pt[1] < m*(pt[0] - b):  # if the point is on the right side of the box
+    if pt[1] < (m*pt[0] + b):  # if the point is on the right side of the box
         pt[0] -= x_box
 
     return pt
@@ -376,7 +400,7 @@ def trace_pores(pos, box, npoints, npores=4, progress=True):
     for t in range(nframes):
         bounds.append(mplPath.Path(v[t, ...]))  # create a path tracing the vertices, v
 
-    angle = np.arccos(box[:, 1, 1]/box[:, 0, 0])
+    angle = np.arcsin(box[:, 1, 1]/box[:, 0, 0])  # specific to case where magnitude of x and y box lengths are equal
     angle = np.where(box[:, 1, 0] < 0, angle + np.pi / 2, angle)  # haven't tested this well yet
 
     m = (v[:, 3, 1] - v[:, 0, 1]) / (v[:, 3, 0] - v[:, 0, 0])  # slope from points connecting first and third vertices
@@ -384,11 +408,18 @@ def trace_pores(pos, box, npoints, npores=4, progress=True):
     centers = np.zeros([nframes, npores, npoints, 3])
     bin_centers = np.zeros([nframes, npores, npoints])
 
-    for t in tqdm.tqdm(range(nframes), disable=progress):
+    for t in tqdm.tqdm(range(nframes), disable=(not progress)):
         for p in range(npores):
 
             pore = pos[t, p*atoms_p_pore:(p+1)*atoms_p_pore, :]  # coordinates for atoms belonging to a single pore
+
+            while np.min(pore[:, 2]) < 0 or np.max(pore[:, 2]) > box[t, 2, 2]:  # because cross-linked configurations can extend very far up and down
+
+                pore[:, 2] = np.where(pore[:, 2] < 0, pore[:, 2] + box[t, 2, 2], pore[:, 2])
+                pore[:, 2] = np.where(pore[:, 2] > box[t, 2, 2], pore[:, 2] - box[t, 2, 2], pore[:, 2])
+
             _, bins = np.histogram(pore[:, 2], bins=npoints)  # bin z-positions
+
             section_indices = np.digitize(pore[:, 2], bins)  # list that tells which bin each atom belongs to
             bin_centers[t, p, :] = [(bins[i] + bins[i + 1])/2 for i in range(npoints)]
 
@@ -402,14 +433,14 @@ def trace_pores(pos, box, npoints, npores=4, progress=True):
 
                 for i in range(shift.shape[0]):  # check if the points are within the bounds of the unitcell
                     if not bounds[t].contains_point(shift[i, :2]):
-                        shift[i, :] = put_in_box(shift[i, :], box[t, 0, 0], box[t, 1, 1], m, angle)  # if its not in the unitcell, shift it so it is
+                        shift[i, :] = put_in_box(shift[i, :], box[t, 0, 0], box[t, 1, 1], m[t], angle[t])  # if its not in the unitcell, shift it so it is
 
                 c = [np.mean(shift, axis=0)]
 
                 centers[t, p, l - 1, :] = transform.translate(c, center[t, :], before)  # move everything back to where it was
 
                 if not bounds[t].contains_point(centers[t, p, l - 1, :]):  # make sure everything is in the box again
-                    centers[t, p, l - 1, :] = put_in_box(centers[t, p, l - 1, :], box[t, 0, 0], box[t, 1, 1], m, angle)
+                    centers[t, p, l - 1, :] = put_in_box(centers[t, p, l - 1, :], box[t, 0, 0], box[t, 1, 1], m[t], angle[t])
 
     if single_frame:
         return centers[0, ...]  # doesn't return bin center yet
@@ -444,7 +475,7 @@ def center_of_mass(pos, matoms):
     return com
 
 
-def compdensity(coord, pore_centers, box, cut=1.5, pores=4, nbins=50, rmax=3.5):
+def compdensity(coord, pore_centers, box, cut=1.5, nbins=50, spline=False):
     """ Measure the density of a component as a function of the distance from the pore centers
 
     :param coord: the coordinates of the component(s) which you want a radial distribution of at each frame
@@ -468,22 +499,48 @@ def compdensity(coord, pore_centers, box, cut=1.5, pores=4, nbins=50, rmax=3.5):
 
     nT = coord.shape[0]
     zbox = np.mean(box[:, 2, 2])
-
+    pores = pore_centers.shape[1]
     density = np.zeros([nT, nbins])  # number / nm^3
-    for t in tqdm.tqdm(range(nT), unit=' Frames'):
-        for p in range(pores):
-            # narrow down the positions to those that are within 'cut' of at least one pore
-            distances = np.linalg.norm(coord[t, :, :2] - pore_centers[t, p, :], axis=1)
-            d_sorted = np.sort(distances)
-            # find where the distances exceed the cutoff
-            stop = 0
-            while d_sorted[stop] < cut:
-                stop += 1
 
-            hist, bin_edges = np.histogram(d_sorted[:stop], bins=nbins, range=(0, cut))  # the range option is necessary
-            #  to make sure we have equal sized bins on every iteration
+    if spline:
 
-            density[t, :] += hist
+        npts = pore_centers.shape[2]  # number of points making up the spline in each pore
+
+        edges = np.zeros([nT, pores, npts + 1])  # bin edges, where bin centers are defined by point in spline.
+        for t in tqdm.tqdm(range(nT), unit=' Frames'):
+            for p in range(pores):
+                edges[t, p, 1:-1] = ((pore_centers[t, p, 1:, 2] - pore_centers[t, p, :-1, 2]) / 2) + pore_centers[t, p, :-1, 2]
+                edges[t, p, -1] = box[t, 2, 2]
+
+                while np.min(coord[t, :, 2]) < 0 or np.max(coord[t, :, 2]) > box[t, 2, 2]:  # because cross-linked configurations can extend very far up and down
+                    coord[t, :, 2] = np.where(coord[t, :, 2] < 0, coord[t, :, 2] + box[t, 2, 2], coord[t, :, 2])
+                    coord[t, :, 2] = np.where(coord[t, :, 2] > box[t, 2, 2], coord[t, :, 2] - box[t, 2, 2], coord[t, :, 2])
+
+                zbins = np.digitize(coord[t, :, 2], edges[t, p, :])
+
+                # handle niche case where coordinate lies exactly on the upper or lower bound
+                zbins = np.where(zbins == 0, zbins + 1, zbins)
+                zbins = np.where(zbins == edges.shape[2], zbins - 1, zbins)
+
+                distances = np.linalg.norm(coord[t, :, :2] - pore_centers[t, p, zbins - 1, :2], axis=1)
+
+                indices = np.where(distances < cut)[0]
+
+                hist, bin_edges = np.histogram(distances[indices], bins=nbins, range=(0, cut))
+
+                density[t, :] += hist
+
+    else:
+
+        for t in tqdm.tqdm(range(nT), unit=' Frames'):
+            for p in range(pores):
+                # narrow down the positions to those that are within 'cut' of at least one pore
+                distances = np.linalg.norm(coord[t, :, :2] - pore_centers[t, p, :], axis=1)
+                indices = np.where(distances < cut)[0]
+                hist, bin_edges = np.histogram(distances[indices], bins=nbins, range=(0, cut))  # the range option is necessary
+                #  to make sure we have equal sized bins on every iteration
+
+                density[t, :] += hist
 
     # normalize based on volume of anulus where bin is located
     r = np.zeros([nbins])
@@ -491,6 +548,6 @@ def compdensity(coord, pore_centers, box, cut=1.5, pores=4, nbins=50, rmax=3.5):
         density[:, i] /= (np.pi * (bin_edges[i + 1] ** 2 - bin_edges[i] ** 2))
         r[i] = (bin_edges[i + 1] + bin_edges[i]) / 2  # center of bins
 
-    density /= zbox   # take average
+    density /= (zbox*pores)   # normalize by pore and z-dimension
 
     return r, density

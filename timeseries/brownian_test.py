@@ -20,13 +20,13 @@ def initialize():
     parser.add_argument('-t', '--traj', default='npt_nojump.xtc', type=str, help='Name of trajectory file (.xtc or '
                         '.trr). NOTE: Use unwrapped coordinates')
     parser.add_argument('-g', '--gro', default='initial.gro', type=str, help='Coordinate file')
-    parser.add_argument('-res', '--residue', default='HOH', type=str, help='Name of residue whose center of mass you want'
+    parser.add_argument('-r', '--residue', default='HOH', type=str, help='Name of residue whose center of mass you want'
                                                                      'to track')
     parser.add_argument('-l', '--lag', default=1, type=int, help='Number of increments between calculation of deviation'
                                                                 'from previous position')
     parser.add_argument('--restrict_to_pores', action="store_true", help='Only analyze water molecules that are '
                                                                          'within HII phase pores')
-    parser.add_argument('-r', '--radius', default=1, type=float, help='Pore radius (nm) when restricting COMs to pore'
+    parser.add_argument('-radius', '--radius', default=1, type=float, help='Pore radius (nm) when restricting COMs to pore'
                                                                       ' centers')
     parser.add_argument('-b', '--begin', default=0, type=int, help='Frame at which to start calculations')
     parser.add_argument('-e', '--end', default=-1, type=int, help='Last frame to include in calculations')
@@ -121,16 +121,16 @@ if __name__ == "__main__":
         com = restrict_to_pore(t, com, args.radius)
 
     # -- plot random molecule COM traces -- #
-    n_traces = 5
-    traj = np.random.choice(com.shape[1], size=n_traces, replace=False)
-    for i in range(n_traces):
-        plt.plot(t.time/1000, com[:, traj[i], 2], linewidth=2)
-    plt.xlabel('Time (ns)', fontsize=14)
-    plt.ylabel('$z$-coordinate (nm)', fontsize=14)
-    plt.gcf().get_axes()[0].tick_params(labelsize=14)
-    plt.tight_layout()
-    plt.show()
-    exit()
+    # n_traces = 5
+    # traj = np.random.choice(com.shape[1], size=n_traces, replace=False)
+    # for i in range(n_traces):
+    #     plt.plot(t.time/1000, com[:, traj[i], 2], linewidth=2)
+    # plt.xlabel('Time (ns)', fontsize=14)
+    # plt.ylabel('$z$-coordinate (nm)', fontsize=14)
+    # plt.gcf().get_axes()[0].tick_params(labelsize=14)
+    # plt.tight_layout()
+    # plt.show()
+    # exit()
 
     # calculate deviation in x, y and z at each frame including all residue molecules at each frame
     # in other words, cacluate the args.lag-th order difference equation
@@ -141,13 +141,19 @@ if __name__ == "__main__":
     # -- Augmented Dickey-Fuller for each individual molecule -- #
     # adf = []
     # for i in range(com.shape[1]):
-    #     adf.append(adfuller(com[:, i, 2])[1])
+    #     p = adfuller(com[:, i, 2])[1]
+    #     if p < 0.05:
+    #         plt.plot(t.time/1000, com[:, i, 2])
+    #         plt.show()
+    #     adf.append(p)
+    #
     # plt.hist(adf, bins=20)
     # plt.ylabel('Count')
     # plt.xlabel('$p$-value')
     # plt.tight_layout()
     # plt.savefig('water_p_hist.pdf')
     # plt.show()
+    # exit()
 
     # -- Augmented Dickey-Fuller test using all data -- #
     # result = adfuller(com[..., 2].flatten())  # want p-value as low as possible if stationary
@@ -158,15 +164,26 @@ if __name__ == "__main__":
     #     print('\t%s: %.3f' % (key, value))
 
     # -- Autocorrelation functions for each molecule -- #
-    # for i in range(com.shape[1]):
-    #     fig, ax = plt.subplots(1, 2)
-    #     ax[0].plot(t.time, com[:, i, 2])
-    #     ax[0].set_xlabel('Time (ps)')
-    #     ax[0].set_title('Time Series')
-    #     ax[1].plot(t.time[::40], correlation.acf(com[::40, i, 2]))
-    #     ax[1].set_label('Lag (ps)')
-    #     ax[1].set_title('Autocorrelation Function')
-    #     plt.show()
+    for i in range(com.shape[1]):
+        print(i)
+        fig, ax = plt.subplots(1, 2, figsize=(8, 4))
+        ax[0].plot(t.time/1000, com[:, i, 2], linewidth=2)
+        ax[0].set_xlabel('Time (ns)', fontsize=14)
+        ax[0].set_ylabel('$z$-coordinate (nm)', fontsize=14)
+        ax[0].set_title('Time Series', fontsize=14)
+        ax[0].xaxis.set_tick_params(labelsize=12)
+        ax[0].yaxis.set_tick_params(labelsize=12)
+
+        # ax[1].plot(t.time, correlation.acf(com[:, i, 2]))
+        ax[1].plot(t.time[:-(args.lag + 1)]/1000, correlation.acf(deviation[:, i, 2]), linewidth=2)
+        ax[1].set_xlabel('Lag (ns)', fontsize=14)
+        ax[1].set_title('Autocorrelation Function', fontsize=14)
+        plt.tight_layout()
+        if i == 6:
+            plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/transport/figures/eth_autocorrelation.pdf')
+        # ax[1].set_xlim(0, 200)
+        plt.show()
+    exit()
 
     # # -- Autocovariance using all increments -- #
     # fig, ax = plt.subplots(1, 3, figsize=(12, 5))

@@ -10,6 +10,7 @@ import tqdm
 from scipy import spatial
 from pymbar import timeseries
 import pickle
+import sys
 
 
 def initialize():
@@ -218,6 +219,10 @@ class System(object):
 
         self.residue = topology.Residue(residue)
         self.residue_indices = np.array([a.index for a in self.t.topology.atoms if a.residue.name == residue])
+
+        if self.residue_indices.size == 0:
+            sys.exit("No residue %s found" % residue)
+
         residue_atom_names = [a.name for a in self.t.topology.atoms if a.residue.name == residue]
         masses = [self.residue.mass[x] for x in residue_atom_names[:self.residue.natoms]]
         self.com = physical.center_of_mass(self.pos[:, self.residue_indices, :], masses)
@@ -274,7 +279,6 @@ class System(object):
 
         ntail_water = [len(x) for x in self.tail_water]
         npore_water = [len(x) for x in self.pore_water]
-        print(ntail_water, npore_water)
 
         plt.plot(self.t.time/1000, ntail_water, color='xkcd:blue', label='Tail %s' % resname)
         plt.plot(self.t.time/1000, npore_water, color='xkcd:orange', label='Pore %s' % resname)

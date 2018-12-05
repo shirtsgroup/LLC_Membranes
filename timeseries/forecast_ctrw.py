@@ -192,13 +192,14 @@ class System(object):
 
         if ma:
             self.calculate_moving_average(ma)
-
+        print(self.com.shape)
         # np.random.seed(2)
-        # # plot 5 random z-traces
-        # for i in np.random.randint(0, self.nres, size=5):
-        #     plt.plot(self.com[:, i, 2])
-        # plt.show()
-        # exit()
+        # plot 5 random z-traces
+        for i in np.random.randint(0, self.nres, size=5):
+            # print(54930 + i + 1)
+            plt.plot(self.com[:, i, 2])
+        plt.show()
+        exit()
 
         # initialize for later
         # self.xs = np.zeros()
