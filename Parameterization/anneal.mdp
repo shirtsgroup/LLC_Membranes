@@ -1,7 +1,7 @@
 title = Simulated Annealing 
 ; Run parameters
 integrator	= md		; leap-frog integrator
-dt		    = 0.002		; 2 fs
+dt		= 0.002		; 2 fs
 nsteps		= 250000	; 500 ps
 ; Bond parameters
 continuation	= no		    ; starting up
@@ -26,9 +26,9 @@ pme_order	= 4		    ; cubic interpolation
 fourierspacing  = 0.16		; grid spacing for FFT
 ; Temperature coupling is on in three groups
 Tcoupl	 	= Berendsen		        ; Weak coupling
-tc_grps		= MOL   NA	; three coupling groups - more accurate
-tau_t		= 0.1 	0.1     ; time constant, in ps
-ref_t		= 300 	300     ; reference temperature, one for each group, in K
+tc_grps		= system ; three coupling groups - more accurate
+tau_t		= 0.1 	 ; time constant, in ps
+ref_t		= 300 	 ; reference temperature, one for each group, in K
 ; Pressure coupling
 Pcoupl		= no		        ; Weak coupling
 ; Generate velocities is off
@@ -39,8 +39,8 @@ pbc		    = xyz			; 3-D PBC
 DispCorr	= Ener		; account for cut-off vdW scheme
 ; COM motion removal
 ; Simulated annealing
-annealing	= single single 	    ; single sequence of points for each T-coupling group
-annealing_npoints	= 2 2 		        ; two points - start and end temperatures
-annealing_time 	= 0 500 0 500 	    ; time frame of heating - heat over period of 500 ps
-annealing_temp	= 300 150 300 150 	    ; start and end temperatures
+annealing	  = single  	    ; single sequence of points for each T-coupling group
+annealing_npoints = 2  		        ; two points - start and end temperatures
+annealing_time 	  = 0 500  	    ; time frame of heating - heat over period of 500 ps
+annealing_temp	  = 1000 150  	    ; start and end temperatures
 
