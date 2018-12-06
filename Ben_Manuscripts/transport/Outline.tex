@@ -75,6 +75,7 @@
   equilibrium value.
   \begin{itemize}
 	\item There is about 2:1 water in the pores versus in the tails for the 10 wt \% system.
+	\item See supporting info for water equilibration simulation data.
 	\item We adjusted the pore radius in our systems so that the right amount of water
 	fits in the pores without any vacuum using \texttt{gmx solvate}.
 	\item We placed water molecules in the tail region one at a time in random locations
@@ -119,8 +120,19 @@
   
   \subsubsection*{Modeling the Continuous Time Random Walk}\label{method:CTRW}
 
-  A continuous time random walk (CTRW) is a stochastic process characterized by a 
-  distribution of hop lengths and dwell times.
+  A continuous time random walk (CTRW) is a stochastic anomalous diffusion
+  process characterized by a distribution of hop lengths and dwell times.
+  \begin{itemize}
+	\item The MSD for an anomalous diffusion process is of the form $$t^\alpha$$
+	\item A value of $\alpha < 1$ tells us that the molecules exhibits subdiffusion
+	\item Subdiffusive, non-ergodic processes with uncorrelated steps help distinguish 
+	a CTRW from other anomalous subdiffusive process such as fraction brownian motion 
+	and random walks on a fractal.
+	\item See supporting info for proof of the system's non-ergodicty and uncorrelated steps.
+  \end{itemize}
+
+  We fit our data to a CTRW model by using our data in order to construct 
+  dwell time and hop length distributions.
   \begin{itemize}
 	\item We use the \texttt{ruptures} python package in order to identify
 	breakpoints in solute trajectories. (See Supporting Information for more
@@ -130,13 +142,12 @@
 	with known continuous probability densities.
 	\item Incorporates effects of `aging' since it samples long dwell times
 	\item For solutes in our system the distribution of hop lengths is
-	well-represented by a Gaussian distribution while the distribution of dwell
-	times fits relatively well to an exponential distribution characteristic of a
-	Poisson process. (See supporting information)
+	well-represented by a Gaussian distribution 
+	\item The distribution of dwell	times is expected to fit a heavy tailed distribution: 
   \end{itemize}
 
   \begin{equation}
-	Ae^{-x}
+	Ax^{(-1 - \alpha)}
   \end{equation}
 
   We calculated macroscopic diffusion coefficients by simulating trajectories orders of
@@ -145,7 +156,7 @@
 	\item We constructed trajectories by generating sequences of dwell times 
         and hop lengths randomly sampled from our fit distributions.
 	\item For time scales much greater than the characteristic time of our
-	exponential dwell time distribution, solutes exhibit Brownian motion. 
+	dwell time distribution, solutes exhibit Brownian motion. 
 	\item The MSD curve becomes linear
 	\item We fit a line to the MSD curve and used the Einstein relationship
 	to relate its slope to the macroscopic diffusion coefficient.
@@ -173,32 +184,62 @@
 	coordinates of appropriate point on the spline.
   \end{itemize}
 
+  \subsubsection*{Coordination number}
+
+  We quantified the coordination of solutes with surrounding molecules and
+  functional groups in two ways.
+  \begin{itemize}
+	\item By counting the number of coordinated molecules to a given solute
+	based on a distance cut-off. Gives frame-by-frame information. 
+	\item By averaging 3D spherical radial distribution function calculated for
+	each solute.
+  \end{itemize}
+
   \subsection{Experimental}
   % BJC: For Greg to write if things work out
    
   \section{Results and Discussion}
 
-  \subsection{Macroscopoic Diffusion Coefficients}
+  \subsection{Macroscopic Diffusion Coefficients}
 
-  \subsection{Simulated Predictions}\label{section:D_macro}
+  \subsubsection{Simulated Predictions}\label{section:D_macro}
  
   Polar molecules generally exhibit a hop diffusion mechanism. 
   \begin{itemize}
-	\item Each trajectory is characterized by an exponential distribution of
+	\item Each trajectory is characterized by a power law distribution of
 	dwell times between hops of random lengths from a Gaussian distribution.
   \end{itemize}
+
+  % BJC: figure with selected trajectories for each molecule.
 
   We fit a CTRW model (see Section~\ref{method:CTRW}) to these 
   trajectories and predicted macroscopic diffusion coefficients which are
   presented in Table TBD.
-
-  % BJC: figure with selected trajectories for each molecule.
+  \begin{itemize}
+	\item We confirmed that our molecules exhibit anomalous diffusion
+	by fitting a power law to the MSD curve. The exponent is less than
+	1, indicative of anomalous subdiffusion.
+	\item We used the decision making process given by Meroz and Sokolov
+	in order to identify the appropriate subdiffusion model to use 
+	based on our time series (See Section S-TBD of the Supporting info for
+	more details).
+	\item The motion of the solutes is non-ergodic and the steps are
+	uncorrelated which tells us the system is likely well-described
+	by a CTRW. 
+  \end{itemize}
 
   % BJC: table with finalized diffusion coefficients
 
   \subsubsection*{The Influence of Water Content on Macroscopic Diffusion Coefficients}
 
-  \subsection{Experimental Measurements}
+  Solutes in systems with lower water content exhibit lower diffusion coefficients.
+  \begin{itemize}
+	\item Pores are more crowded when there is less water (show RDFs of each)
+	\item Not a linear function of pore size - radius increase by x, D increases by y
+	\item Larger influence on bigger molecules
+  \end{itemize}
+
+  \subsubsection{Experimental Measurements}
 
   % For Greg
 
@@ -212,6 +253,7 @@
 	\item We studied the radial distribution functions of solutes as a
 	function of distance from the pore center
 	\item We looked at hydrogen bonding patterns
+	\item Coordination numbers
 	\item Order parameters
   \end{itemize}
 
