@@ -1,13 +1,14 @@
 #! /usr/bin/env python
 
 """
-Coordinate transforms and related manipulations of positions
+Commonly used coordinate transforms and related manipulations of positions, including fourier transforms
 """
 from __future__ import division
 from __future__ import print_function
 
 import numpy as np
 import math
+import tqdm
 
 
 def layer_dist(layers, nopores, distribution, monomers, alt_1, alt_2):
@@ -481,3 +482,73 @@ def random_orientation(xyz, alignment_vector, placement):
     rotated += placement  # translate to desired location
 
     return rotated
+
+
+def rescale(coords, dims):
+    """
+    rescale coordinates so that cell dimensions are constant over the simulation
+    returns rescaled coordinates and average length
+    """
+
+    avgdims = np.average(dims, axis=0)
+    a = avgdims / dims
+    rc = coords
+
+    for it in range(rc.shape[0]):
+        for i in range(3):
+            rc[it, :, i] *= a[it, i]
+
+    return rc, avgdims
+
+
+def monoclinic_to_cubic(xyz, theta=60):
+    """Convert monoclinic cell to cubic cell"""
+
+    print("transforming coordinates to monoclinic cell (theta={:3.2f} deg)".format(theta*180.0/np.pi))
+
+    coordinates = np.copy(xyz)
+    coordinates[..., 1] /= np.sin(theta)
+    coordinates[..., 0] -= coordinates[..., 1]*np.cos(theta)
+
+    return coordinates
+
+
+def fft_3D_monoclinic(xyz, box_vectors, bins, angle=60, sf=False):
+    """ Calculate 3D discrete fourier transform for each frame of a trajectory of coordinates in monoclinic unit cell
+
+    :param xyz: frame-by-frames coordinates of atoms whose 3D DFT we want to calculate
+    :param box_vectors: matrix of box vectors of shape (nT, 3, 3)
+    :param bins: number of bins in each dimension
+    :return:
+    """
+
+    nT = xyz.shape[0]  # number of frames
+    L = np.linalg.norm(box_vectors, axis=2)
+
+    locations, L = rescale(xyz, L)  # make unit cell constant size
+
+    # define histograme bin edges
+    x = np.linspace(0, L[0], int(bins[0]))
+    y = np.linspace(0, L[1], int(bins[1]))
+    z = np.linspace(0, L[2], int(bins[2]))
+
+    zv = [0.0, 0.0, 0.0]  # zero vector
+
+    # put all atoms inside box - works for single frame and multiframe
+    for it in range(locations.shape[0]):  # looped to save memory
+        locations[it, ...] = np.where(locations[it, ...] < L, locations[it, ...], locations[it, ...] - L)  # get positions in periodic cell
+        locations[it, ...] = np.where(locations[it, ...] > zv, locations[it, ...], locations[it, ...] + L)
+
+    # fourier transform loop
+    sf = np.zeros([x.size - 1, y.size - 1, z.size - 1])
+    for frame in tqdm.tqdm(range(nT), unit=' Frames'):
+        H, edges = np.histogramdd(locations[frame, ...], bins=(x, y, z))
+        if sf:
+            fft = np.fft.fftn(H - H.mean())
+            sf += (fft * fft.conjugate()).real
+        else:
+            sf += np.abs(np.fft.fftn(H)) ** 2
+
+    sf /= nT  # average of all frames
+
+    return sf

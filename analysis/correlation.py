@@ -458,9 +458,9 @@ if __name__ == "__main__":
     if args.load:
 
         if len(args.slice) == 2:
-            corr = np.load('correlation_%s%s.npz' %(args.slice[0], args.slice[1]))
+            corr = np.load('correlation_%s%s.npz' % (args.slice[0], args.slice[1]))
         else:
-            corr = np.load('correlation_%s.npz' %(args.slice[0]))
+            corr = np.load('correlation_%s.npz' % (args.slice[0]))
 
         correlation = corr['correlation']
         edges = corr['edges']

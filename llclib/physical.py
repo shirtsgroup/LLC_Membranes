@@ -448,29 +448,27 @@ def trace_pores(pos, box, npoints, npores=4, progress=True):
         return centers, bin_centers
 
 
-def center_of_mass(pos, matoms):
+def center_of_mass(pos, mass_atoms):
     """ Calculate center of mass of residues over a trajectory
 
     :param pos: xyz coordinates of atoms
-    :param names: names of atoms in order they appear in pos
-    :param residue: residue object (llclib.topology.Residue())
+    :param mass_atoms : mass of atoms in order they appear in pos
 
     :type pos: np.array (nframes, natoms, 3)
-    :type names: list
-    :type residue: llclib.topology.Residue() object
+    :type mass_atoms: list
 
     :return: center of mass of each residue at each frame
     """
 
     nframes = pos.shape[0]
-    natoms = len(matoms)
+    natoms = len(mass_atoms)
 
     com = np.zeros([nframes, pos.shape[1] // natoms, 3])  # track the center of mass of each residue
 
     for f in range(nframes):
         for i in range(com.shape[1]):
-            w = (pos[f, i * natoms:(i + 1) * natoms, :].T * matoms).T  # weight each atom in the residue by its mass
-            com[f, i, :] = np.sum(w, axis=0) / sum(matoms)  # sum the coordinates and divide by the mass of the residue
+            w = (pos[f, i * natoms:(i + 1) * natoms, :].T * mass_atoms).T  # weight each atom in the residue by its mass
+            com[f, i, :] = np.sum(w, axis=0) / sum(mass_atoms)  # sum the coordinates and divide by the mass of the residue
 
     return com
 
@@ -551,3 +549,38 @@ def compdensity(coord, pore_centers, box, cut=1.5, nbins=50, spline=False):
     density /= (zbox*pores)   # normalize by pore and z-dimension
 
     return r, density
+
+
+def minimum_image_distance(dist, box):
+    """ Calculate minimum image distances from a vector of distances. This assumes a monoclinic unit cell where the x
+    box vector is fixed along the x-axis, the z-box vector is perpendicular to the xy plane, and the y-box vector makes
+    an angle, theta, with the x-axis.
+
+    :param d: a vector of distances (n, 3) where n is number of points
+    :param box: box vectors meant to enclose d, mdtraj format: (3, 3)
+
+    :return:
+    """
+
+    x_box = box[0, 0]  # length of x-box vector
+    y_box = box[1, 1]  # perpendicular distance from x-axis to top of box in y-direction
+    z_box = box[2, 2]  # length of z-box vector
+    d = np.copy(dist)
+    angle = np.arcsin(y_box / x_box)  # angle between y-box vector and x-box vector in radians
+
+    # check x coordinates
+    while np.max(np.abs(d[:, 0])) > 0.5*x_box:  # iterate in case subtracting/adding box vector length once isn't enough
+        d[:, 0] = np.where(d[:, 0] > 0.5*x_box, d[:, 0] - x_box, d[:, 0])
+        d[:, 0] = np.where(d[:, 0] < -0.5*x_box, d[:, 0] + x_box, d[:, 0])
+
+    # check y coordinates
+    while np.amax(np.abs(d[:, 1])) > 0.5*y_box:  # written differently because np.where didn't know how to handle 2 axes
+        d[np.where(d[:, 1] > 0.5*y_box)[0], :2] -= [x_box*np.cos(angle), y_box]
+        d[np.where(d[:, 1] < -0.5*y_box)[0], :2] += [x_box*np.cos(angle), y_box]
+
+    # check z coordinates
+    while np.max(np.abs(d[:, 2])) > 0.5*z_box:
+        d[:, 2] = np.where(d[:, 2] > 0.5*z_box, d[:, 2] - z_box, d[:, 2])
+        d[:, 2] = np.where(d[:, 2] < -0.5*z_box, d[:, 2] + z_box, d[:, 2])
+
+    return d
