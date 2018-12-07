@@ -49,9 +49,9 @@ def initialize():
     parser.add_argument('-boot', '--nboot', default=200, type=int, help='Number of bootstrap trials')
     parser.add_argument('--single_frame', action='store_true', help='Specify this flag in order to analyze a single'
                                                                     '.gro file. No statistics will be generated')
-    parser.add_argument('--tcl', action='store_true', help='Create .tcl file that create representation of water within'
-                                                           'pore region. Use vmd *.gro -e *.tcl. Only designed for use'
-                                                           'with a single frame')
+    parser.add_argument('--tcl', action='store_true', help='(NOT IMPLEMENTED. Create .tcl file that create '
+                        'representation of water within pore region. Use vmd *.gro -e *.tcl. Only designed for use with'
+                        ' a single frame')
 
     return parser
 
@@ -282,7 +282,8 @@ class System(object):
 
         ntail_water = [len(x) for x in self.tail_water]
         npore_water = [len(x) for x in self.pore_water]
-
+        print(ntail_water[-10:])
+        print(npore_water[-10:])
         plt.plot(self.t.time/1000, ntail_water, color='xkcd:blue', label='Tail %s' % resname)
         plt.plot(self.t.time/1000, npore_water, color='xkcd:orange', label='Pore %s' % resname)
         plt.xlabel('Time (ns)', fontsize=14)
@@ -291,7 +292,7 @@ class System(object):
         plt.gcf().get_axes()[0].tick_params(labelsize=14)
 
         plt.tight_layout()
-        plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/transport/supporting_figures/equilibrated_water_penetration.pdf')
+        plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/transport/supporting_figures/r6_gap.pdf')
         plt.show()
 
 

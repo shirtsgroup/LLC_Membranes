@@ -30,6 +30,8 @@ def initialize():
                         'are a part of residue whose radial distribution function we want to calculate.')
     parser.add_argument('-normalize', action="store_true", help='Make the maximum value of the RDFs equal to 1 for '
                                                                 'easier visual comparison (and a single y-axis)')
+    parser.add_argument('-cut', default=1.5, type=float, help='Largest distance from pore center to include in '
+                                                              'calculation')
 
     return parser
 
@@ -87,10 +89,11 @@ class System(object):
     def build_com(self, rep='K'):
         """ Build system with COM of residue plotted in order to confirm that this script is working
 
-        :param pore_centers: output of physical.avg_pore_loc() with spline=True
         :param rep: name of atom to use to represent spline
 
-        :return: 'spline.gro'
+        :type rep: str
+
+        :return: structure file, 'spline.gro'
         """
 
         pos = np.concatenate((self.t.xyz[-1, ...], self.com[-1, ...]))
@@ -102,7 +105,16 @@ class System(object):
 
         file_rw.write_gro_pos(pos, 'com.gro', ucell=self.box[-1, ...], ids=ids, res=res)
 
-    def radial_distribution_function(self, bins=50, spline=False, progress=True, npts_spline=10):
+    def radial_distribution_function(self, bins=50, cut=1.5, spline=False, progress=True, npts_spline=10):
+        """ Calculate the radial distribution function based on xy distance of solute center of mass from pore center
+
+        :param bins: number of bins in histogram of radial distances
+        :param cut: largest distance to include in radial distance histogram
+        :param spline: locate pore centers as a function of z. Recommended. Slower, but more accurate
+        :param progress: Show progress bar while generating spline
+        :param npts_spline: Number of points making up spline tr each pore
+        :return:
+        """
 
         self.r = np.zeros([bins])
         self.density = np.zeros([self.t.n_frames, bins])
@@ -121,7 +133,7 @@ class System(object):
             print('Calculating component density')
 
         self.r, self.density = physical.compdensity(self.com, pore_centers, self.t.unitcell_vectors,
-                                                    nbins=bins, spline=spline)
+                                                    nbins=bins, spline=spline, cut=cut)
 
     def build_spline(self, pore_centers, rep='K'):
         """ Build the spline into the last frame of the trajectory
@@ -171,7 +183,7 @@ class System(object):
             if normalize:
                 self.errorbars /= maximum
             plt.plot(self.r, mean, linewidth=2, label=self.residue.name)
-            np.savez_compressed('NA_rdf.npz', r=self.r, mean=mean)
+            #np.savez_compressed('NA_rdf.npz', r=self.r, mean=mean)
             plt.fill_between(self.r, self.errorbars[1, :] + mean, mean - self.errorbars[0, :], alpha=0.7)
         else:
             plt.plot(self.r, self.density.mean(axis=0), linewidth=2)
@@ -206,7 +218,8 @@ if __name__ == "__main__":
 
         rdfs.append(System(args.gro, args.traj, r[0], args.build_monomer_residue, begin=args.begin,
                            end=args.end, skip=args.skip, atoms=args.atoms[i]))
-        rdfs[i].radial_distribution_function(bins=args.bins, spline=args.spline, npts_spline=args.spline_pts)
+        rdfs[i].radial_distribution_function(bins=args.bins, spline=args.spline, npts_spline=args.spline_pts,
+                                             cut=args.cut)
         rdfs[i].bootstrap(args.nboot)
         rdfs[i].plot(show=False, normalize=True)
 
