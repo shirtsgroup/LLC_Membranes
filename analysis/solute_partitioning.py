@@ -225,7 +225,10 @@ class System(object):
 
         residue_atom_names = [a.name for a in self.t.topology.atoms if a.residue.name == residue]
         masses = [self.residue.mass[x] for x in residue_atom_names[:self.residue.natoms]]
+
+        print('Calculating centers of mass...', end='', flush=True)
         self.com = physical.center_of_mass(self.pos[:, self.residue_indices, :], masses)
+        print('Done!')
 
     def locate_pore_centers(self, spline=False):
 
@@ -288,7 +291,7 @@ class System(object):
         plt.gcf().get_axes()[0].tick_params(labelsize=14)
 
         plt.tight_layout()
-
+        plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/transport/supporting_figures/equilibrated_water_penetration.pdf')
         plt.show()
 
 

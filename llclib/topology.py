@@ -394,3 +394,24 @@ class Solute(Residue):
                     self.direction_vector[0].append(str.strip(self.gro[i][10:15]))
                 if annotations.count('Vfront') > 0:
                     self.direction_vector[1].append(str.strip(self.gro[i][10:15]))
+
+
+def map_atoms(indices, nres_atoms=1):
+    """ Map the indices in self.com and self.com_coordinated to indices of the full system
+
+    :param indices: indices of atoms to map with respect to full system
+    :param nres_atoms: number of atoms per residue
+
+    :type indices: list
+    :type nres_atoms: int
+
+    :return: dictionary of mapped indices
+    """
+
+    index_map = {}
+    nres = len(indices) // nres_atoms
+
+    for i in range(nres):
+        index_map[i] = indices[i*nres_atoms:(i + 1)*nres_atoms]
+
+    return index_map
