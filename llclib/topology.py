@@ -397,7 +397,7 @@ class Solute(Residue):
 
 
 def map_atoms(indices, nres_atoms=1):
-    """ Map the indices in self.com and self.com_coordinated to indices of the full system
+    """ Map the indices of a sub-system to indices of the full system
 
     :param indices: indices of atoms to map with respect to full system
     :param nres_atoms: number of atoms per residue

@@ -584,3 +584,48 @@ def minimum_image_distance(dist, box):
         d[:, 2] = np.where(d[:, 2] < -0.5*z_box, d[:, 2] + z_box, d[:, 2])
 
     return d
+
+
+def partition(com, pore_centers, r, buffer=0, unitcell=None, npores=4):
+    """ Partition residue center of masses into tail and pore region
+
+    :param com: positions of centers of mass of particle whose partition we are calculating
+    :param pore_centers: positions of pore centers
+    :param r: pore radius, outside of which atoms will be considered in the tail region
+    :param buffer: z distance (nm) to cut out from top and bottom of membrane (in cases where there is a water gap)
+    :param unitcell: unitcell vectors in mdtraj format (t.unitcell_vectors). Only needed if buffer is used
+    :param npores: number of pores
+
+    :type com: numpy.ndarray (nT, ncom, 3)
+    :type pore_centers: numpy.ndarray (nT, npores, 2) or (nT, npores, 3)
+    :type r: float
+    :type buffer: float
+    :type unitcell: numpy.ndarray (nT, 3, 3)
+    :type npores: int
+    """
+
+    pore_water = []
+    tail_water = []
+
+    nT = com.shape[0]
+
+    print('Calculating solute partition...')
+    for i in tqdm.tqdm(range(nT)):
+        pore = []
+
+        if buffer > 0:
+            xy_positions = com[i, (com[i, :, 2] > buffer) & (com[i, :, 2] < unitcell[i, 2, 2] - buffer), :2]
+        else:
+            xy_positions = com[i, :, :2]
+
+        for p in range(npores):
+            d = np.linalg.norm(xy_positions - pore_centers[i, p, :], axis=1)
+            pore += np.where(d <= r)[0].tolist()
+
+        pore_water.append(np.unique(pore).tolist())
+
+        tails = np.full(xy_positions.shape[0], True, dtype=bool)  # array of True. Booleans are fast
+        tails[pore_water[i]] = False  # set pore indices to False
+        tail_water.append(np.where(tails)[0])  # list of tail indices where tails = True
+
+    return pore_water, tail_water

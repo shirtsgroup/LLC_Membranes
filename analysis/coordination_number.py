@@ -268,8 +268,8 @@ if __name__ == "__main__":
         system = pickle.load(open(args.savename, "rb"))
         print('Done!')
 
-    system.plot(res=['HII', 'HII', 'HOH'], atom_groups=[['O3', 'O4'], ['O', 'O1', 'O2'], ['O']])
-    #system.plot()
+    #system.plot(res=['HII', 'HII', 'HOH'], atom_groups=[['O3', 'O4'], ['O', 'O1', 'O2'], ['O']])
+    system.plot()
 
     for i in np.nonzero(system.distances[-1][0, :])[1]:
         print('%s -- %s' % (system.com_map[0], system.com_coordinated_map[i]))

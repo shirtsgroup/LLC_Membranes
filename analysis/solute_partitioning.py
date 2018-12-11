@@ -255,6 +255,7 @@ class System(object):
         # plt.hist(self.com[0, :, 2], bins=50)
         # plt.show()
 
+        print('Calculating solute partition...')
         for i in tqdm.tqdm(range(self.t.n_frames)):
             pore = []
 
@@ -292,7 +293,7 @@ class System(object):
         plt.gcf().get_axes()[0].tick_params(labelsize=14)
 
         plt.tight_layout()
-        plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/transport/supporting_figures/r6_gap.pdf')
+        #plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/transport/supporting_figures/5wt_offset_xlinked_equil.pdf')
         plt.show()
 
 
