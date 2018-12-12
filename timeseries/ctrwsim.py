@@ -4,28 +4,30 @@ import argparse
 import numpy as np
 import tqdm
 import sys
-from LLC_Membranes.llclib import timeseries
+from LLC_Membranes.llclib import timeseries, fitting_functions
+from LLC_Membranes.analysis import Poly_fit
 import matplotlib.pyplot as plt
+from scipy.stats import powerlaw
 
 
 def initialize():
 
     parser = argparse.ArgumentParser(description='Simulate fractional brownian motion and calculate its MSD')
 
-    parser.add_argument('-h', '--hop_length_distribution', default='gaussian', help='Functional form of hop length'
+    parser.add_argument('-hop', '--hop_length_distribution', default='gaussian', help='Functional form of hop length'
                                                                                     'distribution')
     # if more distributions are included, this will need to be more complicated depending what parameters are needed
-    parser.add_argument('-hs', '--hop_sigma', default=1, help='Standard deviation of gaussian distribution used for'
-                                                              'drawing hop lengths')
-    parser.add_argument('-d', '--dwell_time_distribution', default='power', help='Functional form of dwell time'
+    parser.add_argument('-hs', '--hop_sigma', default=1, type=float, help='Standard deviation of gaussian distribution '
+                                                                          'used for drawing hop lengths')
+    parser.add_argument('-dwell', '--dwell_time_distribution', default='power', help='Functional form of dwell time'
                         'distribution (options: power, exponential')
     parser.add_argument('-steps', '--steps', default=1000, type=int, help='Number of steps to take for each'
                                                                           'independent trajectory')
-    parser.add_argument('-ntraj', '--traj', default=100, type=int, help='Number of independent ctrw trajectories.')
+    parser.add_argument('-ntraj', '--ntraj', default=100, type=int, help='Number of independent ctrw trajectories.')
     parser.add_argument('-ensemble', '--ensemble', action="store_true", help='Calculate MSD as ensemble average')
     parser.add_argument('-power_law', '--fit_power_law', action="store_true", help='Fit MSD to a power law')
-    parser.add_argument('-alpha', '--alpha', default=0.5, help='Anomalous exponent')
-    parser.add_argument('-lambda', '--lambda', default=0.5, help='Exponential decay rate')
+    parser.add_argument('-alpha', '--alpha', default=0.5, type=float, help='Anomalous exponent')
+    parser.add_argument('-lambda', '--lambda', default=0.5, type=float, help='Exponential decay rate')
 
     return parser
 
@@ -50,9 +52,10 @@ class CTRW(object):
         self.trajectories = np.zeros([self.ntraj, self.nsteps, 2])
         self.trajectory_hops = np.zeros([self.ntraj, 2 * self.nsteps - 1, 2])  # for visualization
         self.time_uniform = None
-        self.z_interpolated = np.zeros([self.ntraj, self.nsteps])  # separate from time_uniform to save memory
+        self.z_interpolated = np.zeros([self.ntraj, self.nsteps*10])  # separate from time_uniform to save memory
 
         self.msd = None
+        self.fit_parameters = None
 
     def generate_trajectories(self):
 
@@ -61,7 +64,7 @@ class CTRW(object):
             # constrain mean of hop-length distribution to be zero
             if self.hop_distribution == 'gaussian' or self.hop_distribution == 'Gaussian':
                 z_position = np.cumsum(
-                    np.random.normal(loc=0, scale=np.random.choice(self.hop_sigma), size=self.nsteps))
+                    np.random.normal(loc=0, scale=self.hop_sigma, size=self.nsteps))
             else:
                 sys.exit('Please enter a valid hop distance probability distribution')
 
@@ -72,6 +75,25 @@ class CTRW(object):
             if self.dwell_distribution == 'exponential':
                 for j in range(1, self.nsteps):  # make initial time equal to 0
                     time[j] = random_dwell_time(self.lamb)  # hop at random time intervals according to poisson process
+            elif self.dwell_distribution == 'power':
+                ll = 0.1  # lower limit
+                r = np.random.uniform(0, 1, size=self.nsteps)
+                for j in range(1, self.nsteps):
+                    r = np.random.uniform(0, 1)
+                    v = ll * (1 - r) ** (-1 / ((1 + self.alpha) - 1))
+                    while v > 800:
+                        r = np.random.uniform(0, 1)
+                        v = ll * (1 - r) ** (-1 / ((1 + self.alpha) - 1))
+                    time[j] = v
+                # Appendix D of https://epubs.siam.org/doi/abs/10.1137/070710111
+                #time = ll * (1 - r) ** (-1 / ((1 + self.alpha) - 1))
+                # hist = plt.hist(time, bins=50, range=(ll, 1), density=True)
+                # bins = hist[1]
+                # bin_width = bins[1] - bins[0]
+                # bin_centers = np.array([bins[i] + bin_width for i in range(50)])
+                # plt.plot(bin_centers, fitting_functions.power_law(bin_centers, hist[0][0], (-1 - self.alpha)))
+                # plt.show()
+                # exit()
             else:
                 sys.exit('Please enter a valid dwell time probability distribution')
 
@@ -89,13 +111,18 @@ class CTRW(object):
         print('Interpolating Trajectories...')
         # make uniform time intervals with the same interval for each simulated trajectory
         max_time = np.min(self.trajectories[:, -1, 0])
-        self.time_uniform = np.linspace(0, max_time, self.nsteps)
+        self.time_uniform = np.linspace(0, max_time, self.nsteps*10)
         for t in tqdm.tqdm(range(self.ntraj)):
             for i, x in enumerate(self.time_uniform):
                 time_index = np.argmin(np.abs(x - self.trajectories[t, :, 0]))
                 if x - self.trajectories[t, time_index, 0] < 0:
                     time_index -= 1
                 self.z_interpolated[t, i] = self.trajectories[t, time_index, 1]
+
+        # plt.plot(self.trajectory_hops[0, :, 0], self.trajectory_hops[0, :, 1])
+        # plt.plot(self.time_uniform, self.z_interpolated[0, :])
+        # plt.show()
+        # exit()
 
     def calculate_msd(self, ensemble=False):
         """ Calculate mean squared displacement of time series
@@ -106,7 +133,7 @@ class CTRW(object):
         """
 
         print('Calculating MSD...', end='', flush=True)
-        self.msd = timeseries.msd(self.z_interpolated.T[..., np.newaxis], 0, ensemble=ensemble)
+        self.msd = timeseries.msd(self.z_interpolated.T[..., np.newaxis], 0, ensemble=ensemble).T
         print('Done!')
 
     def plot_trajectory(self, n, show=False, save=True, savename='ctrw_trajectory.pdf'):
@@ -191,8 +218,21 @@ class CTRW(object):
     #
     #     self.D = [np.mean(slopes) / (2 * 1 * 10 ** 9),
     #               np.std(slopes) / (2 * 1 * 10 ** 9)]  # divide by dimension and converted to m^2/s
+    def fit_power_law(self, cut=0.01):
+        """ Fit power law to MSD curves
+        TODO: weighted fit (need to do error analysis first)
+        :return: Coefficient and exponent in power low of form [coefficient, power]
+        """
 
-    def plot_msd(self, CI=95, nerrorbars=50, fracshow=0.5, save=True):
+        end = int(cut * len(self.time_uniform))  # fit up until a fraction, cut, of the trajectory
+        print(end)
+
+        # fit line to linear log plot
+        A = Poly_fit.poly_fit(np.log(self.time_uniform[1:end]), np.log(self.msd.mean(axis=0)[1:end]), 1)[-1]
+
+        self.fit_parameters = [np.exp(A[0]), A[1]]
+
+    def plot_msd(self, CI=95, nerrorbars=50, fracshow=0.5, save=True, plot_power_law=True):
         """ Plot averaged mean squared displacement with error bars
 
         :param CI: confidence interval for error bars
@@ -213,6 +253,13 @@ class CTRW(object):
         #              errorevery=self.msd.shape[1] // nerrorbars,
         #              linewidth=2, elinewidth=2)
         plt.plot(self.time_uniform, self.msd.mean(axis=0))
+
+        if plot_power_law:
+            self.fit_power_law()
+            print('Estimated alpha parameter: %.2f' % (self.fit_parameters[1]))
+            plt.plot(self.time_uniform, fitting_functions.power_law(self.time_uniform, self.fit_parameters[0],
+                                                            self.fit_parameters[1]), '--')
+
         #plt.title('Diffusivity: %1.2e $\pm$ %1.2e m$^2$/s' % (self.D[0], self.D[1]))
         plt.xlabel('Time (ns)', fontsize=14)
         plt.ylabel('Mean squared displacement (nm$^2$)', fontsize=14)
@@ -227,7 +274,8 @@ if __name__ == "__main__":
 
     args = initialize().parse_args()
 
-    ctrw = CTRW(args.steps, args.ntraj, hop_dist=args.hop_length_distribution, dwell_dist=args.dwell_time_distribution)
+    ctrw = CTRW(args.steps, args.ntraj, hop_dist=args.hop_length_distribution, dwell_dist=args.dwell_time_distribution,
+                hop_sigma=args.hop_sigma, alpha=args.alpha)
     ctrw.generate_trajectories()
-    ctrw.calculate_msd()
+    ctrw.calculate_msd(ensemble=args.ensemble)
     ctrw.plot_msd()

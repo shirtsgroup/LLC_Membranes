@@ -190,20 +190,38 @@ def msd(x, axis, ensemble=False):
     """
 
     frames = x.shape[0]  # number of trajectory frames
-    no_comp = x.shape[1]  # number of trajectories
-    MSD = np.zeros([frames, no_comp], dtype=float)  # a set of MSDs per particle
+    ntraj = x.shape[1]  # number of trajectories
+    MSD = np.zeros([frames, ntraj], dtype=float)  # a set of MSDs per particle
 
-    size = x[0, :, axis].shape  # number of axes in array where MSDs will be calculated
-
+    size = len(x[0, :, axis].shape)  # number of axes in array where MSDs will be calculated
+    # if ensemble:
+    #     for t in range(1, frames):  # start at 1 since all row 0 will be all zeros
+    #         if size == 1:
+    #             MSD[t, :] = (x[t, :, axis] - x[0, :, axis])**2
+    #         else:
+    #             MSD[t, :] = np.linalg.norm(x[t, :, axis] - x[0, :, axis], axis=0)**2
     if ensemble:
-        for t in range(1, frames):  # start at 1 since all row 0 will be all zeros
+        for n in range(ntraj):  # start at 1 since all row 0 will be all zeros
             if size == 1:
-                MSD[t, :] = (x[t, :, axis] - x[0, :, axis])**2
+                MSD[:, n] = (x[:, n, axis] - x[0, n, axis])**2
             else:
-                MSD[t, :] = np.linalg.norm(x[t, :, axis] - x[0, :, axis], axis=0)**2
+                MSD[:, n] = np.linalg.norm(x[:, n, axis] - x[0, n, axis], axis=0)**2
+            # print(MSD[4, n])
+            # import matplotlib.pyplot as plt
+            # plt.plot(MSD[:, n])
+            # plt.plot(x[:, n, axis])
+            # plt.show()
+            # exit()
     else:
-        for n in range(no_comp):
+        for n in range(ntraj):
             MSD[:, n] = msd_fft(x[:, n, :], axis)
+
+    # import matplotlib.pyplot as plt
+    # print(MSD.mean(axis=1)[:20])
+    # exit()
+    # plt.plot(MSD.mean(axis=1))
+    # plt.show()
+    # exit()
 
     return MSD
 
