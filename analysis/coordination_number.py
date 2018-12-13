@@ -8,6 +8,7 @@ import sys
 import tqdm
 from scipy.sparse import lil_matrix
 import pickle
+import matplotlib.pyplot as plt
 
 
 def initialize():
@@ -34,13 +35,13 @@ def initialize():
     parser.add_argument('-tc', '--coordinated_type', default=None, help='Element name of coordinated atoms')
 
     # coordination calculation parameters
-    parser.add_argument('-cut', default=0.4, type=float, help='Maximum distance between pairs where they are considered'
+    parser.add_argument('-cut', default=0.35, type=float, help='Maximum distance between pairs where they are considered'
                                                               'coordinated')
 
     # saving options
-    parser.add_argument('-sd', '--save_distances', default='distances.pl', help='Name under which to save distance '
+    parser.add_argument('-s', '--savename', default='coordination.pl', help='Name under which to save distance '
                                                                                  'array')
-    parser.add_argument('-ld', '--load_distances', action="store_true", help='Load distance array saved with name '
+    parser.add_argument('-l', '--load', action="store_true", help='Load distance array saved with name '
                                                                              'passed to save_distances option.')
 
     parser.add_argument('-bins', nargs='+', default=100, type=int, help='Integer or array of bin values. If more than'
@@ -58,10 +59,17 @@ class System(object):
         self.t = md.load(traj, top=gro)[begin:end:skip]
         print("Done!")
 
+        self.time = self.t.time / 1000  # time in nanoseconds
+
         # get locations of atoms of interest and coordinating atoms
         # calculate centers of mass for certain groups. Decision-making in this regard is made in self.narrow_atoms()
-        self.com = self.narrow_atoms(atoms, residue, type)
-        self.com_coordinated = self.narrow_atoms(coordinated_atoms, coordinated_residue, ctype, coordination=True)
+        self.com, self.com_map = self.narrow_atoms(atoms, residue, type)
+        self.com_coordinated, self.com_coordinated_map = self.narrow_atoms(coordinated_atoms, coordinated_residue,
+                                                                           ctype, coordination=True)
+
+        # relate indices to
+        self.names = [a.name for a in self.t.topology.atoms]
+        self.residues = [a.residue.name for a in self.t.topology.atoms]
 
         self.distances = None
 
@@ -79,19 +87,22 @@ class System(object):
                 atom_indices = [a.index for a in self.t.topology.atoms if a.residue.name == residue and
                                 a.name in atoms]
 
-                residue = topology.Residue(residue)
-                atom_mass = [residue.mass[v] for v in residue.mass.keys() if v in atoms]  # mass of atoms of interest
-
                 if type is not None:
                     # if a residue is specified with an atom type, assume you want the locations of each atom of that
                     # type within each residue.
-                    return self.t.xyz[:, atom_indices, :]
+
+                    return self.t.xyz[:, atom_indices, :], topology.map_atoms(atom_indices)
 
                 else:
                     # If a residue is specified with atoms, assume that the user wants to isolate calculations to the
                     # center of mass of a group of atoms within a particular residue
 
-                    return physical.center_of_mass(self.t.xyz[:, atom_indices, :], atom_mass)
+                    residue = topology.Residue(residue)
+                    atom_mass = [residue.mass[v] for v in residue.mass.keys() if
+                                 v in atoms]  # mass of atoms of interest
+
+                    return physical.center_of_mass(self.t.xyz[:, atom_indices, :], atom_mass), \
+                           topology.map_atoms(atom_indices, len(atom_mass))
 
             else:
 
@@ -103,7 +114,7 @@ class System(object):
                     # get indices of any atoms in the "atoms" list
                     atom_indices = [a.index for a in self.t.topology.atoms if a.name in atoms]
 
-                return self.t.xyz[:, atom_indices, :]
+                return self.t.xyz[:, atom_indices, :], topology.map_atoms(atom_indices)
 
         else:
 
@@ -114,7 +125,8 @@ class System(object):
                 res = topology.Residue(residue)
                 atom_mass = [v for v in res.mass.values()]  # mass of each atom in an individual residue
 
-                return physical.center_of_mass(self.t.xyz[:, atom_indices, :], atom_mass)
+                return physical.center_of_mass(self.t.xyz[:, atom_indices, :], atom_mass), \
+                       topology.map_atoms(atom_indices, len(atom_mass))
 
             else:
                 # if you forget a flag, exit the program with a descriptive error
@@ -124,10 +136,13 @@ class System(object):
                 else:
                     sys.exit('You must supply at least a residue (-r / --residue) or an atom name (-a / --atoms)')
 
-    def distance_search(self, cut=0.5):
+    def distance_search(self, cut=0.31):
         """ Find all minimum image pairwise distances
 
-        :param cut:
+        :param cut: maximum distance
+
+        :type cut: float
+
         :return:
         """
 
@@ -144,30 +159,117 @@ class System(object):
                 under_cut = np.where(euclidean_dist < cut)[0]
                 self.distances[t][i, under_cut] = euclidean_dist[under_cut]
 
-    def save_distances(self, savename):
+    def plot(self, res=None, atom_groups=None):
+        """ Plot number of atoms coordinated to residue vs. time
 
-        with open(savename, 'wb') as f:
-            pickle.dump(self.distances, f)
+        :param res: a list of residue names. This function will plot coordinated atoms belonging to specific residues
+        separately.
+        :param atom_groups: a list of lists of atom names. Can be used to distinguish between coordination with
+        different groups of atoms within the same residue. If atom names are the same between residues, also pass
+        the appropriate residue name for each group of atoms to res
 
-    def load_distances(self, savename):
+        :type res: list
+        :type atom_groups: list
 
-        print('Loading distances!...', end='', flush=True)
-        self.distances = pickle.load(open(savename, "rb"))
-        print('Done!')
+        :return:
+        """
+
+        if atom_groups is not None:
+
+            ncoord = np.zeros([len(atom_groups), self.t.n_frames, self.com.shape[1]])
+
+            if res is not None:
+
+                print('Organizing atoms based on atom type and residue name...')
+                for t in tqdm.tqdm(range(self.t.n_frames)):
+                    for i in range(ncoord.shape[2]):
+                        atom_types = [self.names[self.com_coordinated_map[j][0]] for j in
+                                      np.nonzero(self.distances[t][i, :])[1]]  # residue name
+                        residues = [self.residues[self.com_coordinated_map[j][0]] for j in
+                                    np.nonzero(self.distances[t][i, :])[1]]
+
+                        grp = []
+                        for ndx, k in enumerate(atom_types):
+                            atoms = np.array([a.count(k) for a in atom_groups])
+                            resi = np.array([a.count(residues[ndx]) for a in res])
+                            try:
+                                grp.append(np.where(atoms + resi == 2)[0][0])
+                            except IndexError:
+                                pass
+
+                        for g in grp:
+                            ncoord[g, t, i] += 1
+
+            else:
+
+                print('Organizing atoms based on atom type...')
+                for t in tqdm.tqdm(range(self.t.n_frames)):
+                    for i in range(ncoord.shape[2]):
+                        atom_types = [self.names[self.com_coordinated_map[j][0]] for j in
+                                      np.nonzero(self.distances[t][i, :])[1]]  # residue name
+
+                        grp = []
+                        for ndx, k in enumerate(atom_types):
+                            atoms = [a.count(k) for a in atom_groups]
+
+                            try:
+                                grp.append(atoms.index(1))
+                            except IndexError:
+                                pass
+
+                        for g in grp:
+                            ncoord[g, t, i] += 1
+
+            # for i in range(ncoord.shape[0]):
+            #
+            #     plt.plot(self.time, ncoord[i, ...].mean(axis=1), label='%s of %s' % (atom_groups[i], res[i]),
+            #              linewidth=2)
+            colors = ['blue', 'green', 'orange']
+            for j in np.random.randint(ncoord.shape[2], size=1):
+                for i in range(ncoord.shape[0]):
+
+                    plt.plot(self.time, ncoord[i, :, j], label='%s of %s' % (atom_groups[i], res[i]),
+                             linewidth=2, color=colors[i])
+
+            #plt.legend()
+
+        else:
+            ncoord = np.zeros([self.t.n_frames, self.com.shape[1]])
+
+            for i in range(ncoord.shape[1]):
+                ncoord[:, i] = [len(np.nonzero(self.distances[t][i, :])[1]) for t in range(self.t.n_frames)]
+
+            plt.plot(self.time, ncoord.mean(axis=1))
+
+        plt.xlabel('Time (ns)', fontsize=14)
+        plt.ylabel('Number of coordinated molecules', fontsize=14)
+        plt.gcf().get_axes()[0].tick_params(labelsize=14)
+        plt.tight_layout()
+        plt.show()
 
 
 if __name__ == "__main__":
 
     args = initialize().parse_args()
 
-    system = System(args.traj, args.gro, atoms=args.atoms, coordinated_atoms=args.coordinated_atoms,
-                    residue=args.residue, coordinated_residue=args.coordinated_residue, type=args.type,
-                    ctype=args.coordinated_type, begin=args.begin, end=args.end, skip=args.skip)
+    if not args.load:
 
-    if args.load_distances:
-        system.load_distances(args.save_distances)
-    else:
+        system = System(args.traj, args.gro, atoms=args.atoms, coordinated_atoms=args.coordinated_atoms,
+                        residue=args.residue, coordinated_residue=args.coordinated_residue, type=args.type,
+                        ctype=args.coordinated_type, begin=args.begin, end=args.end, skip=args.skip)
+
         system.distance_search(cut=args.cut)  # calculate pairwise distance between all points in self.com and self.com_coordinated
-        system.save_distances(args.save_distances)
 
-    print(system.distances.shape)
+        with open(args.savename, 'wb') as f:
+            pickle.dump(system, f)
+
+    else:
+        print('Loading pickled object!...', end='', flush=True)
+        system = pickle.load(open(args.savename, "rb"))
+        print('Done!')
+
+    #system.plot(res=['HII', 'HII', 'HOH'], atom_groups=[['O3', 'O4'], ['O', 'O1', 'O2'], ['O']])
+    system.plot()
+
+    for i in np.nonzero(system.distances[-1][0, :])[1]:
+        print('%s -- %s' % (system.com_map[0], system.com_coordinated_map[i]))

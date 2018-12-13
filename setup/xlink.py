@@ -41,8 +41,8 @@ def initialize():
     parser.add_argument('-density', '--density', default=95, type=float, help='Cross-link density (percent of x-links'
                         'that need to be cross-linked for procedure to terminate')
     parser.add_argument('-p', '--percent', default=1, type=float, help='Percent of eligible carbons that will bond')
-    parser.add_argument('-rad_percent', default=20, type=float, help='Percent of radicals that react each iteration.'
-                                                                     'Not stable above 50 %')
+    parser.add_argument('-rad_percent', default=50, type=float, help='Percent of radicals that react each iteration.'
+                                                                     'Not stable above 50 % (?)')
     parser.add_argument('-out', '--output_gro', default='xlinked.gro', help='Name of final cross-linked structure')
     parser.add_argument('-rad_frac_term', default=0, type=float, help='Out of 100, how many radicals that will be '
                         'terminated on each iteration. Numbers greater than zero will decrease cross-link density')

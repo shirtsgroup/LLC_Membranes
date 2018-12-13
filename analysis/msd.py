@@ -1,16 +1,15 @@
 #! /usr/bin/env python
 
 import os
-from builtins import range
-from past.utils import old_div
+import sys
 import argparse
 import numpy as np
-import matplotlib.pyplot as plt
-from LLC_Membranes.analysis import Poly_fit, top, Atom_props, p2p
 import mdtraj as md
-import time
+import matplotlib.pyplot as plt
+from LLC_Membranes.analysis import Poly_fit, top, Atom_props
+from LLC_Membranes.llclib import physical, topology, timeseries, fitting_functions
 from scipy import stats
-from scipy.optimize import curve_fit
+import tqdm
 
 
 def initialize():
@@ -25,100 +24,20 @@ def initialize():
     parser.add_argument('-f', '--frontfrac', default=0, type=float, help='Where to start fitting line on msd curve')
     parser.add_argument('-F', '--fracshow', default=.2, type=float, help='Percent of graph to show, also where to stop '
                         'fitting line during diffusivity calculation')
-    parser.add_argument('-a', '--axis', default='xyz', type=str, help='Which axis to compute msd along')
+    parser.add_argument('-a', '--axis', default='z', type=str, help='Which axis to compute msd along')
     parser.add_argument('-nboot', default=200, type=int, help='Number of bootstrap trials for error estimation')
-    parser.add_argument('-ensemble', action="store_true", help='Calculate MSD as ensemble average')
-    parser.add_argument('-compare', action="store_true", help='Compare time-averaged and ensemble-averaged time'
-                                                              'series')
-    parser.add_argument('-power_law', action="store_true", help='Fit MSD to a power law')
+    parser.add_argument('-ensemble', '--ensemble', action="store_true", help='Calculate MSD as ensemble average')
+    parser.add_argument('-compare', '--compare', action="store_true", help='Compare time-averaged and ensemble-averaged '
+                                                                           'time series')
+    parser.add_argument('-power_law', '--power_law', action="store_true", help='Fit MSD to a power law')
 
-    # | not implemented |
-    # v                 v
-    parser.add_argument('--restrict_to_pores', action="store_true", help='Only look at residue within pores of HII'
-                                                                         'membrane')
-    parser.add_argument('-radius', default=1, type=float, help='Radius of pores. Anything greater than this distance'
-                        'from the pore center will not be included in calculation')
+    parser.add_argument('-tails', '--tails', action="store_true", help='Only look at transport within tails')
+    parser.add_argument('-pores', '--pores', action="store_true", help='Only look at transport within pores')
+    parser.add_argument('-pr', '--pore_radius', default=1.5, type=float, help='Radius of pores. Anything greater than '
+                        'this distance from the pore center will not be included in calculation')
+    parser.add_argument('-acf', '--autocorrelation', action="store_true", help='Plot step autocorrelation function')
 
-    args = parser.parse_args()
-
-    return args
-
-
-def log_power_law(x, a, alpha):
-    """ Log power law dependence of MSD curve (for curve fitting)
-
-    :param x: independent variable values
-    :param a: scaling coefficient
-    :param alpha: power (< 1: subdiffusive, 1: brownian, >1: superdiffusive)
-
-    :return function evaluated at x values
-    """
-
-    return a + alpha * np.log(x)
-
-
-def power_law(x, a, alpha):
-    """ Power law dependence of MSD curve
-
-    :param x: independent variable values
-    :param a: scaling coefficient
-    :param alpha: power (< 1: subdiffusive, 1: brownian, >1: superdiffusive)
-
-    :return function evaluated at x values
-    """
-
-    return a * x ** alpha
-
-
-def autocorrFFT(x):
-
-    N = len(x)
-    F = np.fft.fft(x, n=2*N)  # 2*N because of zero-padding
-    PSD = F * F.conjugate()
-    res = np.fft.ifft(PSD)
-    res = (res[:N]).real   # now we have the autocorrelation in convention B
-    n = N*np.ones(N) - np.arange(0, N)  # divide res(m) by (N-m)
-
-    return old_div(res, n)  # this is the autocorrelation in convention A
-
-
-def msd_fft(x, ndx):
-
-    r = np.copy(x)
-    r = r[:, ndx]
-    N = len(r)
-    D = np.square(r).sum(axis=1)
-    D = np.append(D, 0)
-    S2 = sum([autocorrFFT(r[:, i]) for i in range(r.shape[1])])
-    Q = 2 * D.sum()
-    S1 = np.zeros(N)
-    for m in range(N):
-      Q = Q - D[m - 1] - D[N - m]
-      S1[m] = old_div(Q, (N - m))
-
-    return S1 - 2 * S2
-
-
-def msd_straightforward(x, ndx):
-    """
-    Straightforward way to calculte msd. Gives same answer as msd()
-    :param x: positions of centers of mass of all particles for each frame, numpy array [nframes, natoms, dim]
-    :param ndx: list of indices to include in msd calculation (x = 0, y = 1, z = 2)
-    :return: Average MSD and individual particle MSDs
-    """
-    n = x.shape[1]  # number of atoms
-    N = x.shape[0]  # number of frames
-
-    MSD = np.zeros([N])
-    MSDs = np.zeros([N, n])
-
-    for m in range(N):  # there nT different length intervals we can look at
-        for k in range(N - m - 1):  # there are N - m - 1 independent intervals of length m
-            MSDs[m, :] += np.linalg.norm(x[k + m, :, ndx] - x[k, :, ndx], axis=0)**2  # mean square displacement of all particles summed over all intervals of length m
-        MSDs[m, :] /= (N - m)  # divide by the number of intervals to get an average msd over length m
-        MSD[m] = np.mean(MSDs[m, :])
-
-    return MSD, MSDs
+    return parser
 
 
 class Diffusivity(object):
@@ -137,30 +56,42 @@ class Diffusivity(object):
         residue, but only include a fraction of the total residues in the system.
         """
 
+        # initialize path locations
         self.script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
         self.top_location = "%s/../top/topologies" % self.script_location
 
+        # initialize arguments for use in other functions
+        self.gro = gro
+        self.traj = traj
+        self.residue = residue
+
+        # initialize trajectory properties
         print('Loading trajectory...', end='', flush=True)
-        t = md.load(traj, top=gro)[begin:]  # load trajectory
+        self.t = md.load(self.traj, top=self.gro)[begin:]  # load trajectory
         print('Done!')
-        self.nT = t.n_frames  # number of frames
-        self.time = t.time / 1000  # time stamp on each frame, converted to nanoseconds
-        self.MSD = None
-        self.limits = None
-        self.MSD_average = 0
+        self.nT = self.t.n_frames  # number of frames
+        self.time = self.t.time / 1000  # time stamp on each frame, converted to nanoseconds
+
+        # initialize fits to data, error analysis and plotting parameters
         self.startfit = int(startfit*self.nT)  # index at which to start fit
         self.endfit = int(endfit*self.nT)  # index at which to end fit
         self.y_fit = []
         self.A = []  # fit parameters
         self.W = []  # weight matrix for curve fitting
+        self.power_law_fit = None
         self.errorevery = int(np.ceil(self.nT / 100.0))  # plot only 100 bars total
         self.confidence_interval = 0
         self.yfit = None
+
+        # autocorrelation
+        self.acf = None
+
+        # initialize results
+        self.MSD = None
+        self.limits = None
+        self.MSD_average = 0
         self.slope_error = 0
         self.Davg = 0
-
-        # power law initializations
-        self.power_law_fit = None
 
         if residue:
 
@@ -171,27 +102,27 @@ class Diffusivity(object):
             self.itp = "%s/%s.itp" % (self.top_location, res)
 
             if restrict:
-                selection = [a.index for a in t.topology.atoms if a.residue.name == res and a.index in restrict]
+                selection = [a.index for a in self.t.topology.atoms if a.residue.name == res and a.index in restrict]
             else:
-                selection = [a.index for a in t.topology.atoms if a.residue.name == res]
+                selection = [a.index for a in self.t.topology.atoms if a.residue.name == res]
 
-            topology = top.Top(self.itp)  # read topology
-            atoms_per_residue = topology.natoms  # number atoms in a single residue
-            matoms = topology.atom_masses  # mass of the atoms in residue
+            topol = top.Top(self.itp)  # read topology
+            atoms_per_residue = topol.natoms  # number atoms in a single residue
+            matoms = topol.atom_masses  # mass of the atoms in residue
             self.mres = np.sum(matoms)  # total mass of residue
 
         elif atoms:
 
-            selection = [a.index for a in t.topology.atoms if a.name in atoms]
+            selection = [a.index for a in self.t.topology.atoms if a.name in atoms]
 
             atoms_per_residue = len(atoms)
             matoms = np.array([Atom_props.mass[x] for x in atoms])
             self.mres = np.sum(matoms)
         else:
-            print('Error: No valid group of atoms or residues selected')
-            exit()
+            sys.exit('Error: No valid group of atoms or residues selected')
 
-        pos = t.xyz[:, selection, :]
+        self.map = topology.map_atoms(selection, nres_atoms=atoms_per_residue)
+        pos = self.t.xyz[:, selection, :]
 
         self.axis = []
         if 'x' in axis:
@@ -216,35 +147,63 @@ class Diffusivity(object):
 
         self.dt = self.time[-1] - self.time[-2]  # time step (assuming equispaced time points)
 
-    def msd(self, ensemble=False):
-        """
-        Calculate mean square displacement based on particle positions
-        :param x: particle positions
-        :param axis: axis along which you want MSD (x, y, z, xy, xz, yz, xyz)
-        :return: MSD of each particle
+    def restrict_to_pore(self, r, dwell_fraction=0.95, tails=False, build_monomer='NAcarb11V.gro', spline=False,
+                         buffer=0, npores=4):
+        """ Restrict calculations to center of masses (COMs) that primarily stay in the pore OR tail region
+
+        :param r: radius of pore. Anything greater than r from the pore center is considered the tail region
+        :param dwell_fraction: Fraction of time spent in region of interest required in order to keep trajectory
+        :param tails: if True, then restrict calculations to COMs primarily in the tail region
+        :param build_monomer: monomer coordinate file of which liquid crystal membrane is mode
+        :param spline: track pore centers with a 3D spline
+        :param buffer: Do not count molecules below _buffer_ or above z-box-vector - _buffer_
+
+        :type r: float
+        :type tails: bool
+        :type build_monomer: str
+        :type spline: bool
+        :type buffer: float
         """
 
-        nT = self.com.shape[0]
-        no_comp = self.com.shape[1]
-        self.MSD = np.zeros([nT, no_comp], dtype=float)  # a set of MSDs per particle
-
-        if ensemble:
-            for t in range(1, nT):  # start at 1 since all row 0 will be all zeros
-                self.MSD[t, :] = np.linalg.norm(self.com[t, :, self.axis] - self.com[0, :, self.axis], axis=0)**2
+        # find pore centers
+        pore_defining_atoms = topology.LC(build_monomer).pore_defining_atoms
+        pore_atoms = [a.index for a in self.t.topology.atoms if a.name in pore_defining_atoms]
+        if spline:
+            print('Creating pore splines')
+            pore_centers = physical.trace_pores(self.t.xyz[:, pore_atoms, :], self.t.unitcell_vectors, 20)
         else:
-            for n in range(no_comp):
-                self.MSD[:, n] = msd_fft(self.com[:, n, :], self.axis)
+            pore_centers = physical.avg_pore_loc(npores, self.t.xyz[:, pore_atoms, :])
 
-        plt.plot(self.time, self.MSD[:, 0])
-        plt.show()
-        exit()
+        results = 0
+        if tails:
+            results = 1
+
+        inregion = physical.partition(self.com, pore_centers, r, buffer=buffer,
+                                      unitcell=self.t.unitcell_vectors, npores=npores)[results]
+
+        dwell = np.full((self.t.n_frames, self.com.shape[1]), False, dtype=bool)
+
+        for t in range(self.t.n_frames):
+            dwell[t, inregion[t]] = True
+
+        fraction_dwelled = np.sum(dwell, axis=0) / self.t.n_frames  # fraction of total time spend in region of interest
+
+        keep = np.where(fraction_dwelled >= dwell_fraction)[0]
+
+        self.com = self.com[:, keep, :]
 
     def calculate(self, ensemble=False):
 
         print('Calculating MSD...', end='', flush=True)
-        self.msd(ensemble=ensemble)
+        self.MSD = timeseries.msd(self.com, self.axis, ensemble=ensemble)
         self.MSD_average = np.mean(self.MSD, axis=1)
         print('Done!')
+
+    def step_autocorrelation(self):
+        """ Calculate autocorrelation of step length and direction
+        """
+
+        self.acf = timeseries.step_autocorrelation(self.com, axis=self.axis)
 
     def fit_linear(self):
 
@@ -289,7 +248,8 @@ class Diffusivity(object):
 
         self.power_law_fit = np.zeros([N, 2])
 
-        for b in range(N):
+        print('Bootstrapping power law fit...')
+        for b in tqdm.tqdm(range(N)):
 
             choices = np.random.randint(0, self.MSD.shape[1], size=self.MSD.shape[1])
             bootstrapped_msd = self.MSD[:, choices].mean(axis=1)
@@ -308,7 +268,8 @@ class Diffusivity(object):
 
         eMSDs = np.zeros([self.nT, N], dtype=float)  # create n bootstrapped trajectories
 
-        for b in range(N):
+        print('Bootstrapping MSD curves...')
+        for b in tqdm.tqdm(range(N)):
             indices = np.random.randint(0, self.com.shape[1], self.com.shape[1])  # randomly choose particles with replacement
             for n in range(self.com.shape[1]):
                 eMSDs[:, b] += self.MSD[:, indices[n]]  # add the MSDs of a randomly selected particle
@@ -328,7 +289,7 @@ class Diffusivity(object):
         if self.weights:
             self.W = np.zeros((npts, npts))
             for i in range(npts):
-                self.W[i, i] = old_div(1, ((self.limits[0, i + self.startfit]) ** 2))
+                self.W[i, i] = 1 / ((self.limits[0, i + self.startfit]) ** 2)
         else:
             self.W = 'none'
 
@@ -375,7 +336,8 @@ class Diffusivity(object):
         fig, ax = plt.subplots(1, 2, figsize=(8, 4))
 
         ax[0].plot(self.time, self.MSD_average, linewidth=2)
-        ax[0].plot(self.time, power_law(self.time, A[0], A[1]), linewidth=2, label=r'Power law fit to $Ae^{\alpha}$')
+        ax[0].plot(self.time, fitting_functions.power_law(self.time, A[0], A[1]), linewidth=2,
+                   label=r'Power law fit to $Ae^{\alpha}$')
         ax[0].set_ylabel('Ensemble MSD ($nm^2/ns$)', fontsize=14)
         ax[0].set_xlabel('Time (ns)', fontsize=14)
         ax[0].xaxis.set_tick_params(labelsize=14)
@@ -395,18 +357,42 @@ class Diffusivity(object):
         # plt.show()
         # exit()
 
+    def plot_autocorrelation(self, show=True):
+        """ Plot autocorrelation function
+
+        :param show: show plot
+
+        :type show: bool
+
+        :return:
+        """
+
+        plt.figure()
+        plt.plot(self.time[:self.acf.shape[1]], self.acf.mean(axis=0))
+        plt.xlabel('Time', fontsize=14)
+        plt.ylabel('Autocorrelation', fontsize=14)
+        plt.gcf().get_axes()[0].tick_params(labelsize=14)
+        plt.tight_layout()
+
+        if show:
+            plt.show()
+
 
 if __name__ == "__main__":
 
-    args = initialize()
+    args = initialize().parse_args()
 
     if args.compare:
 
         show = False
 
         D_ensemble = Diffusivity(args.trajectory, args.gro, args.axis, residue=args.residue, atoms=args.atoms)
+
+        if args.pores or args.tails:  # do this if solutes are restricted to tails or pores
+            D_ensemble.restrict_to_pore(args.pore_radius, tails=args.tails)
+
         D_ensemble.calculate(ensemble=True)
-        D_ensemble.fit_linear()  # make sure diffusivity is being measured from linear region of the MSD curve
+        # D_ensemble.fit_linear()  # make sure diffusivity is being measured from linear region of the MSD curve
         D_ensemble.bootstrap(args.nboot)
         D_ensemble.plot(args.axis, fracshow=args.fracshow)
         print('D = %1.2e +/- %1.2e m^2/s' % (D_ensemble.Davg, np.abs(D_ensemble.Davg -
@@ -415,13 +401,22 @@ if __name__ == "__main__":
         show = True
 
     D = Diffusivity(args.trajectory, args.gro, args.axis, residue=args.residue, atoms=args.atoms)
+
+    if args.pores or args.tails:  # do this if solutes are restricted to tails or pores
+        D.restrict_to_pore(args.pore_radius, tails=args.tails)
+
     D.calculate(ensemble=args.ensemble)
 
     if args.power_law:
         D.bootstrap_power_law(args.nboot)
         D.plot_power_law()
     else:
-        D.fit_linear()  # make sure diffusivity is being measured from the linear region of the MSD curve
+        if not args.compare:
+            D.fit_linear()  # make sure diffusivity is being measured from the linear region of the MSD curve
+
+    if args.autocorrelation:
+        D.step_autocorrelation()
+        D.plot_autocorrelation()
 
     D.bootstrap(args.nboot)
     plt.figure()
@@ -448,5 +443,5 @@ if __name__ == "__main__":
         plt.legend(fontsize=14)
         plt.gcf().get_axes()[0].tick_params(labelsize=14)
         plt.tight_layout()
-        plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/transport/figures/ethanol_msd_comparison.pdf')
+        #plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/transport/figures/ethanol_msd_comparison.pdf')
         plt.show(block=True)

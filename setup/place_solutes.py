@@ -329,7 +329,8 @@ class Solvent(object):
         ref = [a.index for a in self.t.topology.atoms if a.name in ref]
 
         # redo each time because positions change slightly upon energy minimization
-        self.pore_spline = physical.trace_pores(self.positions[ref, :], self.box_vectors[:2, :2], layers)
+        self.pore_spline = physical.trace_pores(self.positions[ref, :], self.t.unitcell_vectors[0, ...], layers,
+                                                progress=False)
 
         # format z so that it is an array
         if type(z) is float or type(z) is np.float64:

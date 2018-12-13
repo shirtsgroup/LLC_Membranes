@@ -196,9 +196,9 @@ class System(object):
         # np.random.seed(2)
         # plot 5 random z-traces
         for i in np.random.randint(0, self.nres, size=5):
-            # print(54930 + i + 1)
+            print(55331 + 3*i + 1)
             plt.plot(self.com[:, i, 2])
-        plt.show()
+            plt.show()
         exit()
 
         # initialize for later
