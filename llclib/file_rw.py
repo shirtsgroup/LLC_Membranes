@@ -173,7 +173,7 @@ def write_assembly(b, output, no_mon, bcc=False, xlink=False):
 
     for i in range(int(no_mon)):
         for k in range(0, ndp):
-            info = [int(x) for x in a[k + dihedrals_p_index + 3].split()]
+            info = [int(x) for x in a[k + dihedrals_p_index + 3].split()[:5]]
             # f.write('{:6d}{:7d}{:7d}{:7d}{:}'.format(i*nr + int(a[k + dihedrals_p_index + 3][0:6]),
             #                                        i*nr + int(a[k + dihedrals_p_index + 3][6:14]),
             #                                        i*nr + int(a[k + dihedrals_p_index + 3][14:22]),
@@ -197,7 +197,7 @@ def write_assembly(b, output, no_mon, bcc=False, xlink=False):
     # Can't have any space at the bottom of the file for this loop to work
     for i in range(int(no_mon)):
         for k in range(0, ndimp):
-            info = [int(x) for x in a[k + dihedrals_p_index + 3].split()]
+            info = [int(x) for x in a[k + dihedrals_imp_index + 3].split()[:5]]
             # f.write('{:6d}{:7d}{:7d}{:7d}{:}'.format(i*nr + int(a[k + dihedrals_imp_index + 3][0:6]),
             #                                        i*nr + int(a[k + dihedrals_imp_index + 3][6:14]),
             #                                        i*nr + int(a[k + dihedrals_imp_index + 3][14:22]),

@@ -51,7 +51,7 @@ if __name__ == "__main__":
             charges[key] += increment
         net_charge += increment*res.natoms
 
-    if net_charge < args.net_charge:
+    if net_charge != args.net_charge:
         changes = np.random.choice(list(charges.keys()), size=abs(net_charge - args.net_charge), replace=False)
         for i in changes:
             charges[i] += increment
