@@ -249,7 +249,7 @@ if __name__ == "__main__":
         components = ['C', 'C1', 'C2', 'C3', 'C4', 'C5']
         comp = [a.index for a in t.topology.atoms if a.name in components]
 
-        p_centers = physical.avg_pore_loc(npores, t.xyz[:, comp, :])
+        p_centers = physical.avg_pore_loc(npores, t.xyz[:, comp, :], box)
 
         for i, reg in enumerate(regions):
 

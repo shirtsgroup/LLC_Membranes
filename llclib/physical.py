@@ -206,14 +206,14 @@ def conc(t, comp, b):
     return avg_conc, std, avg_cross, thick, z_max, z_min
 
 
-def avg_pore_loc(npores, pos, buffer=0, spline=False, box=None, npts=20, progress=False, bins=False):
+def avg_pore_loc(npores, pos, box, buffer=0, spline=False, npts=20, progress=False, bins=False):
     """ Calculate average pore location for each pore at each frame
 
     :param no_pores: the number of pores in the unit cell
     :param pos: the coordinates of the component(s) which you are using to locate the pore centers
+    :param box: box vectors (t.unitcell_vectors when trajectory is load with mdtraj)
     :param buffer: fraction (of membrane thickness) of top and bottom of membrane to exclude from p2p calculations
     :param spline: trace pore centers with a spline
-    :param box: box vectors (t.unitcell_vectors when trajectory is load with mdtraj). Necessary when using spline.
     :param npts: number of points making up the spline in each pore
     :param progress: show progress bar while constructing splines
     :param bins: return the bin centers of each spline for plotting purposes
@@ -238,6 +238,7 @@ def avg_pore_loc(npores, pos, buffer=0, spline=False, box=None, npts=20, progres
             exit()
         else:
 
+            print('Calculating pore spline...')
             centers, bin_centers = trace_pores(pos, box, npts, npores=4, progress=progress)
 
             if bins:
@@ -254,18 +255,29 @@ def avg_pore_loc(npores, pos, buffer=0, spline=False, box=None, npts=20, progres
             p_center = np.zeros([nT, npores, 2])
 
             for i in range(nT):
-                zmax = np.amax(pos[i, :, 2])  # maximum z value for this frame
-                zmin = np.amin(pos[i, :, 2])  # minimum z value for this frame
-                thick = zmax - zmin
-                zmax -= buffer*thick
-                zmin += buffer*thick
-                for j in range(npores):
-                    count = 0
-                    for k in range(comp_ppore*j, comp_ppore*(j + 1)):
-                        if zmax >= pos[i, k, 2] >= zmin:
-                            p_center[i, j, :] += pos[i, k, :2]
-                            count += 1
-                    p_center[i, j, :] /= count  # take the average
+
+                positions = wrap_box(pos[i, ...], box[i, ...])
+
+                if buffer > 0:
+
+                    include = np.full(pos.shape[1], True)
+
+                    include[np.where(pos[i, :, 2] > box[i, 2, 2] + buffer)] = False
+                    include[np.where(pos[i, :, 2] < buffer)] = False
+
+                    for j in range(npores):
+                        p_center[i, j, :] = positions[comp_ppore * j:comp_ppore * (j + 1), :2].mean(axis=0)
+                        count = 0
+                        for k in range(comp_ppore * j, comp_ppore * (j + 1)):
+                            if include[k]:
+                                p_center[i, j, :] += positions[k, :2]
+                                count += 1
+                        p_center[i, j, :] /= count  # take the average
+
+                else:
+
+                    for j in range(npores):
+                        p_center[i, j, :] = positions[comp_ppore*j:comp_ppore*(j + 1), :2].mean(axis=0)
 
         elif len(pos.shape) == 2:  # single frame
 
@@ -586,7 +598,7 @@ def minimum_image_distance(dist, box):
     return d
 
 
-def partition(com, pore_centers, r, buffer=0, unitcell=None, npores=4):
+def partition(com, pore_centers, r, buffer=0, unitcell=None, npores=4, spline=False):
     """ Partition residue center of masses into tail and pore region
 
     :param com: positions of centers of mass of particle whose partition we are calculating
@@ -595,37 +607,101 @@ def partition(com, pore_centers, r, buffer=0, unitcell=None, npores=4):
     :param buffer: z distance (nm) to cut out from top and bottom of membrane (in cases where there is a water gap)
     :param unitcell: unitcell vectors in mdtraj format (t.unitcell_vectors). Only needed if buffer is used
     :param npores: number of pores
+    :param spline: calculate partition with respect to pore spline
 
     :type com: numpy.ndarray (nT, ncom, 3)
-    :type pore_centers: numpy.ndarray (nT, npores, 2) or (nT, npores, 3)
+    :type pore_centers: numpy.ndarray (nT, npores, 2) or (nT, npores, 3) or (nT, npores, npts, 3) if spline=True where
+    npts=number of points in spline
     :type r: float
     :type buffer: float
     :type unitcell: numpy.ndarray (nT, 3, 3)
     :type npores: int
+    :type spline: bool
     """
-
-    pore_water = []
-    tail_water = []
 
     nT = com.shape[0]
 
+    if spline:
+        npts = pore_centers.shape[2]  # number of points in each spline
+
+    part = np.zeros([nT, com.shape[1]], dtype=bool)  # Will be changed to True if solute in pores
+
     print('Calculating solute partition...')
     for i in tqdm.tqdm(range(nT)):
-        pore = []
 
         if buffer > 0:
             xy_positions = com[i, (com[i, :, 2] > buffer) & (com[i, :, 2] < unitcell[i, 2, 2] - buffer), :2]
         else:
             xy_positions = com[i, :, :2]
 
-        for p in range(npores):
-            d = np.linalg.norm(xy_positions - pore_centers[i, p, :], axis=1)
-            pore += np.where(d <= r)[0].tolist()
+        if spline:
 
-        pore_water.append(np.unique(pore).tolist())
+            z = com[i, :, 2]  # extract z-coordinates for this frame
+            zbox = unitcell[i, 2, 2]  # z-box vector for this frame
 
-        tails = np.full(xy_positions.shape[0], True, dtype=bool)  # array of True. Booleans are fast
-        tails[pore_water[i]] = False  # set pore indices to False
-        tail_water.append(np.where(tails)[0])  # list of tail indices where tails = True
+            # make sure z-component of every particle in the box
+            while np.max(z) > zbox or np.min(z) < 0:  # might need to do this multiple times
+                z = np.where(z > zbox, z - zbox, z)
+                z = np.where(z < 0, z + zbox, z)
 
-    return pore_water, tail_water
+            zbins = np.digitize(z, np.linspace(0, zbox, npts + 1))
+
+            # handle niche case where coordinate lies exactly on the upper or lower bound
+            zbins = np.where(zbins == 0, zbins + 1, zbins)
+            zbins = np.where(zbins == npts + 1, zbins - 1, zbins)
+            zbins -= 1  # digitize numbers bins starting at 1 (0 is below the bottom bin)
+
+            pore = []
+
+            for p in range(npores):
+                d = np.linalg.norm(xy_positions - pore_centers[i, p, zbins, :2], axis=1)
+                pore += np.where(d <= r)[0].tolist()
+
+        else:
+
+            pore = []
+
+            for p in range(npores):
+                d = np.linalg.norm(xy_positions - pore_centers[i, p, :], axis=1)
+                pore += np.where(d <= r)[0].tolist()
+
+        part[i, pore] = True
+
+    return part
+
+
+def wrap_box(positions, box):
+    """ Put all atoms in box
+
+    :param positions: xyz atomic position [n_atoms, 3]
+    :param box: box vectors [3, 3] (as obtained from mdtraj t.unitcell_vectors)
+
+    :type positions: np.ndarray
+    :type box: np.ndarray
+
+    :return: positions moved into box
+    """
+
+    xy = positions[:, :2]  # xy coordinates have dependent changes so this makes things neater below
+    z = positions[:, 2]
+
+    xbox, ybox, zbox = box[0, 0], box[1, 1], box[2, 2]
+
+    angle = np.arcsin(ybox / xbox)  # angle between y-box vector and x-box vector in radians
+    m = np.tan(angle)
+    b = - m * xbox  # y intercept of box vector that does not pass through origin (right side of box)
+
+    while max(xy[:, 1]) > ybox or min(xy[:, 1]) < 0:
+        xy[np.where(xy[:, 1] > ybox)[0], :2] -= [xbox*np.cos(angle), ybox]
+        xy[np.where(xy[:, 1] < 0)[0], :2] += [xbox * np.cos(angle), ybox]
+
+    while len(np.where(xy[:, 0] < (xy[:, 1] / m))[0]) > 0 or len(np.where(xy[:, 0] > ((xy[:, 1] - b) / m))[0]) > 0:
+        xy[np.where(xy[:, 0] < (xy[:, 1] / m))[0], 0] += xbox
+        xy[np.where(xy[:, 0] > ((xy[:, 1] - b) / m))[0], 0] -= xbox
+
+    # check z coordinates
+    while np.max(z) > zbox or np.min(z) < 0:  # might need to do this multiple times
+        z = np.where(z > zbox, z - zbox, z)
+        z = np.where(z < 0, z + zbox, z)
+
+    return np.concatenate((xy, z[:, np.newaxis]), axis=1)

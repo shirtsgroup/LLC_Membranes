@@ -233,12 +233,13 @@ class System(object):
     def locate_pore_centers(self, spline=False):
 
         # find pore centers
+        # can use physical.avg_pore_loc with spline argument instead of if/else below
         pore_atoms = [a.index for a in self.t.topology.atoms if a.name in self.pore_atoms]
         if spline:
             print('Creating pore splines')
             self.pore_centers = physical.trace_pores(self.pos[:, pore_atoms, :], self.t.unitcell_vectors, 20)
         else:
-            self.pore_centers = physical.avg_pore_loc(self.npores, self.pos[:, pore_atoms, :])
+            self.pore_centers = physical.avg_pore_loc(self.npores, self.pos[:, pore_atoms, :], self.t.unitcell_vectors)
 
     def partition(self, r, buffer=0):
         """ Partition solute residue into tail and pore region

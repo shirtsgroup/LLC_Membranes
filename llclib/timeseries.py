@@ -194,34 +194,16 @@ def msd(x, axis, ensemble=False):
     MSD = np.zeros([frames, ntraj], dtype=float)  # a set of MSDs per particle
 
     size = len(x[0, :, axis].shape)  # number of axes in array where MSDs will be calculated
-    # if ensemble:
-    #     for t in range(1, frames):  # start at 1 since all row 0 will be all zeros
-    #         if size == 1:
-    #             MSD[t, :] = (x[t, :, axis] - x[0, :, axis])**2
-    #         else:
-    #             MSD[t, :] = np.linalg.norm(x[t, :, axis] - x[0, :, axis], axis=0)**2
+
     if ensemble:
         for n in range(ntraj):  # start at 1 since all row 0 will be all zeros
             if size == 1:
                 MSD[:, n] = (x[:, n, axis] - x[0, n, axis])**2
             else:
-                MSD[:, n] = np.linalg.norm(x[:, n, axis] - x[0, n, axis], axis=0)**2
-            # print(MSD[4, n])
-            # import matplotlib.pyplot as plt
-            # plt.plot(MSD[:, n])
-            # plt.plot(x[:, n, axis])
-            # plt.show()
-            # exit()
+                MSD[:, n] = np.linalg.norm(x[:, n, axis] - x[0, n, axis], axis=1)**2
     else:
         for n in range(ntraj):
             MSD[:, n] = msd_fft(x[:, n, :], axis)
-
-    # import matplotlib.pyplot as plt
-    # print(MSD.mean(axis=1)[:20])
-    # exit()
-    # plt.plot(MSD.mean(axis=1))
-    # plt.show()
-    # exit()
 
     return MSD
 

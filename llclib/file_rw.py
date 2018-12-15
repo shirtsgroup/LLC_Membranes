@@ -10,6 +10,7 @@ import numpy as np
 import copy
 import math
 import os
+import pickle
 
 
 def read_pdb_coords(file):
@@ -573,3 +574,17 @@ def write_em_mdp(steps, freeze=False, freeze_group='', freeze_dim='xyz', xlink=F
 
         if xlink:
             f.write('periodic-molecules = yes\n')
+
+
+def save_object(obj, filename):
+
+    with open(filename, 'wb') as output:  # Overwrites any existing file.
+
+        pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
+
+
+def load_object(filename):
+
+    with open(filename, 'rb') as f:
+
+        return pickle.load(f)

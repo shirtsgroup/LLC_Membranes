@@ -172,7 +172,7 @@ class Diffusivity(object):
             print('Creating pore splines')
             pore_centers = physical.trace_pores(self.t.xyz[:, pore_atoms, :], self.t.unitcell_vectors, 20)
         else:
-            pore_centers = physical.avg_pore_loc(npores, self.t.xyz[:, pore_atoms, :])
+            pore_centers = physical.avg_pore_loc(npores, self.t.xyz[:, pore_atoms, :], self.t.unitcell_vectors)
 
         results = 0
         if tails:

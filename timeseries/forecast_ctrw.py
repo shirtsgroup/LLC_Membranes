@@ -7,10 +7,12 @@ import mdtraj as md
 import Atom_props
 import ruptures
 from scipy.optimize import curve_fit
-from LLC_Membranes.analysis.hbonds import Residue
+from LLC_Membranes.llclib import topology, physical, file_rw
 from LLC_Membranes.analysis import Poly_fit, p2p
 import tqdm
 from scipy.stats import expon
+import pickle
+from itertools import accumulate, groupby
 
 
 def initialize():
@@ -25,6 +27,9 @@ def initialize():
     parser.add_argument('-step', '--step', default=1, help='Include every "step" frames')
     parser.add_argument('-ma', '--moving_average', default=False, type=int, help='Calculate a moving average of the '
                         'center of mass coordinate')
+
+    # loading saved objects
+    parser.add_argument('-load', '--load', default=False, help='Specify name of pickled object to load')
 
     # restrict to pores parameters
     parser.add_argument('-restrict', '--restrict_to_pores', action='store_true', help='Only look at residues which'
@@ -94,7 +99,6 @@ def gaussian(points, mean, sigma, amplitude):
 def wait_times(t, A, lam):
 
     # calculate ecdf
-
 
     return A*np.exp(-lam * t)
 
@@ -172,44 +176,63 @@ class System(object):
         :type step: int
         """
 
+        # load trjaectory
+        print('Loading trajectory...', end='', flush=True)
         self.t = md.load(traj, top=gro)[start:end:step]
-        self.t.time /= 1000  # convert to nanoseconds
-        self.dt = self.t.time[1] - self.t.time[0]
+        print('Done!')
 
-        keep = [a.index for a in self.t.topology.atoms if a.residue.name == res]
+        self.time = self.t.time / 1000  # time in nanoseconds
+        self.dt = self.time[1] - self.time[0]  # time step
 
-        self.residue = Residue(res)
-        self.nres = len(keep) // self.residue.natoms
-        self.mass = np.array([Atom_props.mass[a.name] for a in self.t.topology.atoms if a.residue.name == res][:self.residue.natoms])
-        self.pos = self.t.xyz[:, keep, :]
+        keep = [a.index for a in self.t.topology.atoms if a.residue.name == res]  # get indices of atoms making up residue of interest
+        self.res_start = keep[0]  # index where residue starts
 
-        self.com = np.zeros([self.t.n_frames, self.nres, 3])
+        self.residue = topology.Residue(res)
+        self.nres = len(keep) // self.residue.natoms  # number of residues in system
+        self.mass = [v for v in self.residue.mass.values()]  # mass of atoms making up residue
+        self.pos = self.t.xyz[:, keep, :]  # positions of residue atoms
 
-        for f in range(self.t.n_frames):
-            for i in range(self.nres):
-                w = (self.pos[f, (i * self.residue.natoms):((i + 1)*self.residue.natoms), :].T * self.mass).T
-                self.com[f, i, :] = np.sum(w, axis=0) / sum(self.mass)
+        print('Calculating centers of mass...', end='', flush=True)
+        self.com = physical.center_of_mass(self.pos, self.mass)  # center of mass of residues
+        print('Done!')
 
         if ma:
             self.calculate_moving_average(ma)
-        print(self.com.shape)
-        # np.random.seed(2)
-        # plot 5 random z-traces
-        for i in np.random.randint(0, self.nres, size=5):
-            print(55331 + 3*i + 1)
-            plt.plot(self.com[:, i, 2])
-            plt.show()
-        exit()
 
         # initialize for later
-        # self.xs = np.zeros()
-        self.dwell_times = []
+        self.pore_centers = None
+        self.dwell_times = []  # distribution of dwell times
         self.tail_dwells = []
         self.hop_lengths = []
         self.lambda_distribution = []  # distribution of lambda for poisson process
         self.hop_sigma_distribution = []  # distribution of standard deviation of hop lengths
 
+        self.partition = None  # array telling whether a solute is in the pores or tails. True if in pores, else False
+
+    def plot_random_trajectories(self, n=1):
+        """ Plot random center of mass trajectories and print indices of atoms in residue defining that COM
+
+        :param n: Number of random trajectories to plot
+
+        :type n: int
+        """
+
+        for i in np.random.randint(self.nres, size=n):
+            start = self.res_start + len(self.mass)*i
+            end = start + len(self.mass)
+            print('Inidices %s through %s' % (start, end))
+            plt.plot(self.com[:, i, 2], linewidth=2)
+            plt.xlabel('Frame')
+            plt.ylabel('Coordinate')
+            plt.show()
+
     def calculate_moving_average(self, n):
+        """ Calculate moving average of a time series
+
+        :param n: Number of previous points to average
+
+        :type n: int
+        """
 
         nT = self.com.shape[0]
         ma = np.zeros([nT - n + 1, self.com.shape[1], 3])
@@ -221,6 +244,62 @@ class System(object):
                 ma[:, i, d] = ret[n - 1:] / n
 
         self.com = ma
+
+    def calculate_solute_partition(self, r=1.5, spline=False, membrane_residue='HII', write_tcl=True):
+        """ Determine whether each COM is in the tail or pore region as a function of time
+
+        :param r: radial distance from pore center where pore region transitions to tail region
+        :param spline: calculate pore centers as function of z using a spline in each pore
+        :param membrane_residue: if using spline, give the name of the liquid crystal residue used to make the membrane
+
+        :type r: float
+        :type spline: bool
+        :type membrane_residue: str
+        """
+
+        membrane = topology.LC('%s.gro' % membrane_residue)  # object w/ attributes of LC making up membrane
+        keep = [a.index for a in self.t.topology.atoms if a.name in membrane.pore_defining_atoms and a.residue.name
+                == membrane.name]
+        self.pore_centers = physical.avg_pore_loc(4, self.t.xyz[:, keep, :], self.t.unitcell_vectors, buffer=0,
+                                                  spline=spline, npts=10, progress=True, bins=False)
+
+        self.partition = physical.partition(self.com, self.pore_centers, r, unitcell=self.t.unitcell_vectors,
+                                            spline=spline)
+
+        if write_tcl:
+            self.write_tcl()
+
+    def write_tcl(self, frame=-1, name='partition.tcl'):
+        """ Write a .tcl script to view solute partition in VMD
+        """
+
+        pore_indices = [self.res_start + self.residue.natoms * i for i in np.where(self.partition[frame, :])[0]]
+        tail_indices = [self.res_start + self.residue.natoms * i for i in np.where(self.partition[frame, :] == False)[0]]
+
+        with open(name, 'w') as f:
+            f.write('color Display Background white\n')
+            f.write('mol addrep 0\n')
+            f.write('mol modselect 0 0 index')
+            for i in pore_indices:
+                f.write(' %s' % i)
+            f.write('\n')
+            f.write('mol modcolor 0 0 ColorID 0\n')
+            f.write('mol modstyle 0 0 CPK 2.0 0.3 12.0 12.0\n')
+            f.write('mol addrep 0\n')
+            f.write('mol modselect 1 0 index')
+            for i in tail_indices:
+                f.write(' %s' % i)
+            f.write('\n')
+            f.write('mol modstyle 1 0 CPK 2.0 0.3 12.0 12.0\n')
+            f.write('mol modcolor 1 0 ColorID 1\n')
+
+    def write_spline_coordinates(self, frame=-1):
+        """ write spline coordinates to a .gro file
+        """
+
+        coordinates = np.reshape(self.pore_centers[frame, ...], (self.pore_centers.shape[1]*self.pore_centers.shape[2],
+                                                                 3))
+        file_rw.write_gro_pos(coordinates, 'spline.gro', name='K')
 
     def restrict_to_pores(self, pore_defining_atoms, pore_defining_residue, r, npores=4):
         """ Identify which centers of mass are still in the pore center
@@ -257,12 +336,34 @@ class System(object):
         added
 
         :param penalty: penalty for cost function minimization
-        :return:
+
         """
 
         initial_dwells = []
         final_dwells = []
         for j in tqdm.tqdm(range(self.com.shape[1])):
+
+            # Get indices where res jumps between regions
+            # See https://stackoverflow.com/questions/36894822/how-do-i-identify-sequences-of-values-in-a-boolean-array
+            switch_points = np.argwhere(np.diff(self.partition[:, j])).squeeze().tolist()
+            switch_points.append(self.partition.shape[0])
+
+            # GET AVERAGE NOISE FOR SOLUTES IN PORE REGION
+            # Maybe don't count hops if not in pore region for more than x hops
+            # can probably count transition between regions as hops
+
+            # Analyze sub-trajectories where solute is in defined pore region
+            begin = 0
+            for i, end in enumerate(switch_points[::2]):  # only at switch points after which solute is in pores
+                subtraj = self.com[begin:end, j, 2]
+                plt.plot(subtraj)
+                try:
+                    begin = switch_points[2*i + 1]
+                except IndexError:
+                    pass
+                plt.show()
+            exit()
+
         # for j in range(10):
 
             # crude break point detection - could be worth formulating better once I understand cost functions better
@@ -270,35 +371,32 @@ class System(object):
             # std = np.std(hops)
             # bp = np.where(np.abs(hops) > 3*std)[0]
 
-            bp_x = ruptures.detection.Binseg(model='l2').fit_predict(self.com[:, j, 0], pen=penalty)
-            bp_y = ruptures.detection.Binseg(model='l2').fit_predict(self.com[:, j, 1], pen=penalty)
-            bp_z = ruptures.detection.Binseg(model='l2').fit_predict(self.com[:, j, 2], pen=penalty)
-            # print(bp
-            print(bp_x, bp_y, bp_z)
-            bp = sorted(set(bp_x + bp_y + bp_z))
-            print(bp)
-            bp2 = ruptures.detection.Binseg(model='l2').fit_predict(self.com[:, j, :], pen=penalty)
-            # ruptures.display(self.com[:, j, 0], bp_x, figsize=(10, 6))
-            # ruptures.display(self.com[:, j, 1], bp_y, figsize=(10, 6))
-            # ruptures.display(self.com[:, j, 2], bp_z, figsize=(10, 6))
-            ruptures.display(self.com[:, j, :], bp, figsize=(10, 6))
-            ruptures.display(self.com[:, j, :], bp2, figsize=(10, 6))
-            plt.show()
+            # bp_x = ruptures.detection.Binseg(model='l2').fit_predict(self.com[:, j, 0], pen=penalty)
+            # bp_y = ruptures.detection.Binseg(model='l2').fit_predict(self.com[:, j, 1], pen=penalty)
+            # bp_z = ruptures.detection.Binseg(model='l2').fit_predict(self.com[:, j, 2], pen=penalty)
+
+            bp = ruptures.detection.Binseg(model='l2').fit_predict(np.linalg.norm(self.com[:, j, :], axis=1), pen=penalty)
+
+            # ruptures.display(np.linalg.norm(self.com[:, j, :], axis=1), bp, figsize=(10, 6))
+            # plt.show()
 
             initial_dwells.append(bp[0])
             if len(bp) > 1:
                 final_dwells.append(bp[-1] - bp[-2])
 
             for i in range(len(bp) - 2):  # exclude first and last segments
-                # could get rid of loop and do vector-wise self.t.time[bp + 1] - self.t.time[bp]
+                # could get rid of loop and do vector-wise self.time[bp + 1] - self.time[bp]
                 # just need to figure out hop_lengths
-                self.dwell_times.append(self.t.time[bp[i + 1]] - self.t.time[bp[i]])
+                self.dwell_times.append(self.time[bp[i + 1]] - self.time[bp[i]])
 
                 if i > 0:
                     self.hop_lengths.append(np.mean(self.com[bp[i]:bp[i + 1], j, 2]) -
                                             np.mean(self.com[bp[i - 1]:bp[i], j, 2]))
 
         self.tail_dwells = np.array(initial_dwells + final_dwells)
+        plt.hist(self.dwell_times, bins=50)
+        plt.show()
+        exit()
 
     def fit_distributions(self, nbins=25, plot=True, nboot=200):
 
@@ -306,7 +404,7 @@ class System(object):
         # keep all bootstrapping data to generate error bars
         hist_dwell = np.zeros([nboot, nbins + 1])
         bins_dwell_centered = np.zeros([nboot, nbins + 1])
-        p_dwell = [1, len(self.dwell_times) / (self.nres * self.t.time[-1])]
+        p_dwell = [1, len(self.dwell_times) / (self.nres * self.time[-1])]
         hist_jump = np.zeros([nboot, nbins])
         bins_jump_centered = np.zeros([nboot, nbins])
 
@@ -420,6 +518,10 @@ class System(object):
             plt.tight_layout()
 
             plt.show()
+
+    def save(self):
+
+        np.savez_compressed()
 
 
 class CTRW(object):
@@ -589,11 +691,27 @@ if __name__ == "__main__":
 
     args = initialize().parse_args()
 
-    sys = System(args.trajectory, args.gro, args.residue, start=args.begin, end=args.end, step=args.step,
-                 ma=args.moving_average)
+    if args.load:
 
-    if args.restrict_to_pores:
-        sys.restrict_to_pores(args.pore_defining_atoms, args.pore_defining_residue, args.pore_radius)
+        sys = file_rw.load_object(args.load)
+
+    else:
+
+        sys = System(args.trajectory, args.gro, args.residue, start=args.begin, end=args.end, step=args.step,
+                     ma=args.moving_average)
+
+        sys.calculate_solute_partition(spline=False, membrane_residue='HII')
+
+        file_rw.save_object(sys, 'forecast_HOH.pl')
+
+    # histogram of time spent in pore region
+    # plt.hist(np.sum(sys.partition, axis=0) / sys.partition.shape[0], bins=50)
+    # plt.show()
+
+    sys.hops_and_dwells()
+
+    # if args.restrict_to_pores:
+    #     sys.restrict_to_pores(args.pore_defining_atoms, args.pore_defining_residue, args.pore_radius)
 
     sys.hops_and_dwells()
     sys.fit_distributions(nbins=args.nbins, nboot=args.nboot)

@@ -125,7 +125,7 @@ class System(object):
         if spline:
             print('Generating spline through each pore...')
 
-        pore_centers = physical.avg_pore_loc(4, self.t.xyz[:, pore_defining_atoms, :], spline=spline, box=self.box,
+        pore_centers = physical.avg_pore_loc(4, self.t.xyz[:, pore_defining_atoms, :], self.box, spline=spline,
                                              progress=progress, npts=npts_spline)
 
         if spline:

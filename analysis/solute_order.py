@@ -65,7 +65,7 @@ class System(object):
         reference_atoms = [a.index for a in self.t.topology.atoms if a.name in self.monomer.pore_defining_atoms and
                            a.residue.name in self.monomer.residues]
 
-        self.pore_centers = physical.avg_pore_loc(4, self.t.xyz[:, reference_atoms, :])
+        self.pore_centers = physical.avg_pore_loc(4, self.t.xyz[:, reference_atoms, :], self.t.unitcell_vectors)
 
         self.pore_vectors = self.pore_center_vectors()
 
