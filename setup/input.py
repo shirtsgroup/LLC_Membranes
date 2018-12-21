@@ -33,7 +33,7 @@ def initialize():
     parser.add_argument('--temp', default=300, help='Specify temperature at which to run simulation')
     parser.add_argument('--mdp', action="store_true", help='Only the .mdp will be written if this option is specified')
     parser.add_argument('--barostat', default='berendsen', type=str, help='pressure coupling scheme to use')
-    parser.add_argument('--genvel', action="store_true", help='generate velocities according to a maxwell distribution')
+    parser.add_argument('--nogenvel', action="store_false", help='Do not generate velocities')
     parser.add_argument('--bcc', action="store_true", help='Generate input files using bicontinuous cubic files')  # probably best to reorganize the repository
     parser.add_argument('--solvent', default='water', help='Name of solvent')
     parser.add_argument('--tau_t', default=0.1, type=float, help='Temperature coupling time constant')
@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
     mdp = SimulationMdp(args.coord, title=args.title, T=args.temp, em_steps=args.em_steps,
                         time_step=args.dt, length=args.length, p_coupling=args.pcoupltype,
-                        barostat=args.barostat, genvel=args.genvel, restraints=args.restraints, xlink=args.xlink,
+                        barostat=args.barostat, genvel=args.nogenvel, restraints=args.restraints, xlink=args.xlink,
                         bcc=args.bcc, tau_p=args.tau_p, tau_t=args.tau_t, nstxout=nstxout, nstvout=nstvout,
                         nstfout=nstfout, nstenergy=nstenergy)
 
