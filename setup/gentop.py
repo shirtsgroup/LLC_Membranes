@@ -3,7 +3,6 @@
 import argparse
 import mdtraj as md
 import os
-from LLC_Membranes.analysis import Atom_props
 
 
 def initialize():
@@ -40,8 +39,9 @@ class SystemTopology(object):
         self.forcefield = ff  # which forcefield to use
         self.name = None
         self.atoms = [a.name for a in t.topology.atoms]  # all atom names
-        self.atom_masses = [Atom_props.mass[a.name] for a in t.topology.atoms]
-        self.system_mass = sum(self.atom_masses)
+        # unused
+        # self.atom_masses = [Atom_props.mass[a.name] for a in t.topology.atoms]
+        # self.system_mass = sum(self.atom_masses)
         self.xlink = xlink
         self.xlinked_top_name = xlinked_top_name
 

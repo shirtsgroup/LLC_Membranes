@@ -4,15 +4,12 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import mdtraj as md
-import Atom_props
 import ruptures
 from scipy.optimize import curve_fit
-from LLC_Membranes.llclib import topology, physical, file_rw
+from LLC_Membranes.llclib import topology, physical, file_rw, fitting_functions
 from LLC_Membranes.analysis import Poly_fit, p2p
 import tqdm
 from scipy.stats import expon
-import pickle
-from itertools import accumulate, groupby
 
 
 def initialize():
@@ -301,104 +298,77 @@ class System(object):
                                                                  3))
         file_rw.write_gro_pos(coordinates, 'spline.gro', name='K')
 
-    def restrict_to_pores(self, pore_defining_atoms, pore_defining_residue, r, npores=4):
-        """ Identify which centers of mass are still in the pore center
-
-        :param pore_defining_atoms: atoms used to locate pore center
-        :param pore_defining_residue: name of residue to which pore_defining_atoms belong
-        :param npores: number of pores in unit cell
-
-        :type pore_defining_atoms: list
-        :type npores: int
-
-        :return: modify center of mass array
-        """
-
-        keep = [a.index for a in self.t.topology.atoms if a.name in pore_defining_atoms and a.residue.name ==
-                pore_defining_residue]
-
-        pores = self.t.xyz[-1, keep, :]  # positions of pore-defining atoms in last frame
-
-        p_centers = p2p.avg_pore_loc(npores, pores)  # pore centers for last frame
-
-        inside_pore = []
-        for i in range(npores):
-            d = np.linalg.norm(self.com[-1, :, :2] - p_centers[:, i], axis=1)
-            inpore = np.where(d < r)[0]
-            for j in inpore:
-                inside_pore.append(j)
-
-        self.com = self.com[:, inside_pore, :]  # restrict COMs to just those within pore
-
-    def hops_and_dwells(self, penalty=0.5):
+    def hops_and_dwells(self, penalty=1, nframes_dwell=10):
         """ Find breakpoints then assemble lists of dwell times and hop lengths. See documentation for Ruptures python
         package: http://ctruong.perso.math.cnrs.fr/ruptures-docs/build/html/index.html for more options that can be
         added
 
         :param penalty: penalty for cost function minimization
+        :param nframes_dwell: number of frames that a solute needs to stay in the region of interest in order to be
+        analyzed for hops.
+
+        :type penalty: float
+        :type nframes_dwell: int
 
         """
 
-        initial_dwells = []
-        final_dwells = []
+        # Handle initial and final dwell times since they don't have a true beginning or end. If the dwell times are
+        # longer than some limit, then they will be included so that we don't miss out on dwells that last on the order
+        # of the entire length of the trajectory
+        initial_dwells = []  # length of time particle initially dwells before its first hop
+        final_dwells = []  # length of time particle dwells up until end of trajectory
+
         for j in tqdm.tqdm(range(self.com.shape[1])):
 
             # Get indices where res jumps between regions
             # See https://stackoverflow.com/questions/36894822/how-do-i-identify-sequences-of-values-in-a-boolean-array
             switch_points = np.argwhere(np.diff(self.partition[:, j])).squeeze().tolist()
-            switch_points.append(self.partition.shape[0])
-
-            # GET AVERAGE NOISE FOR SOLUTES IN PORE REGION
-            # Maybe don't count hops if not in pore region for more than x hops
-            # can probably count transition between regions as hops
+            try:
+                switch_points.append(self.partition.shape[0])
+            except AttributeError:
+                switch_points = [switch_points]
+                switch_points.append(self.partition.shape[0])
 
             # Analyze sub-trajectories where solute is in defined pore region
             begin = 0
             for i, end in enumerate(switch_points[::2]):  # only at switch points after which solute is in pores
-                subtraj = self.com[begin:end, j, 2]
-                plt.plot(subtraj)
+                if (end - begin) > nframes_dwell:  # only include hops/dwells from trajectories long enough to analyze
+
+                    # movement_3d = np.linalg.norm(self.com[begin:end, j, :], axis=1)  # magnitude of distance travelled
+                    bp = ruptures.detection.Binseg(model='l2', min_size=1, jump=1).fit_predict(self.com[begin:end, j, :]
+                                                                                               , pen=penalty)
+                    # ruptures.display(self.com[begin:end, j, :], bp, figsize=(10, 6))
+                    # plt.show()
+
+                    initial_dwells.append(bp[0])
+                    if len(bp) > 1:  # handle case where the only break point is at the end of the simulation
+                        final_dwells.append(bp[-1] - bp[-2])
+
+                    for k in range(len(bp) - 2):  # exclude first and last segments
+
+                        #self.dwell_times.append(self.time[bp[k + 1]] - self.time[bp[k]])
+                        self.dwell_times.append(bp[k + 1] - bp[k])  # discrete form
+
+                        if k > 0:  # need two different z coordinates to get a hop length
+                            self.hop_lengths.append(np.mean(self.com[bp[k]:bp[k + 1], j, 2]) -
+                                                    np.mean(self.com[bp[k - 1]:bp[k], j, 2]))
                 try:
                     begin = switch_points[2*i + 1]
                 except IndexError:
                     pass
-                plt.show()
-            exit()
-
-        # for j in range(10):
-
-            # crude break point detection - could be worth formulating better once I understand cost functions better
-            # hops = self.com[1:, j, 0] - self.com[:-1, j, 0]
-            # std = np.std(hops)
-            # bp = np.where(np.abs(hops) > 3*std)[0]
-
-            # bp_x = ruptures.detection.Binseg(model='l2').fit_predict(self.com[:, j, 0], pen=penalty)
-            # bp_y = ruptures.detection.Binseg(model='l2').fit_predict(self.com[:, j, 1], pen=penalty)
-            # bp_z = ruptures.detection.Binseg(model='l2').fit_predict(self.com[:, j, 2], pen=penalty)
-
-            bp = ruptures.detection.Binseg(model='l2').fit_predict(np.linalg.norm(self.com[:, j, :], axis=1), pen=penalty)
-
-            # ruptures.display(np.linalg.norm(self.com[:, j, :], axis=1), bp, figsize=(10, 6))
-            # plt.show()
-
-            initial_dwells.append(bp[0])
-            if len(bp) > 1:
-                final_dwells.append(bp[-1] - bp[-2])
-
-            for i in range(len(bp) - 2):  # exclude first and last segments
-                # could get rid of loop and do vector-wise self.time[bp + 1] - self.time[bp]
-                # just need to figure out hop_lengths
-                self.dwell_times.append(self.time[bp[i + 1]] - self.time[bp[i]])
-
-                if i > 0:
-                    self.hop_lengths.append(np.mean(self.com[bp[i]:bp[i + 1], j, 2]) -
-                                            np.mean(self.com[bp[i - 1]:bp[i], j, 2]))
 
         self.tail_dwells = np.array(initial_dwells + final_dwells)
-        plt.hist(self.dwell_times, bins=50)
-        plt.show()
-        exit()
 
     def fit_distributions(self, nbins=25, plot=True, nboot=200):
+        """ Fit curves to dwell time and hop length distributions
+
+        :param nbins: number of bins in histograms
+        :param plot: show the plots of the averaged distributions and bootstrapped parameter estimates
+        :param nboot: number of bootstrap trials
+        :param min_pl: minimum histogram value for power law (can't be zero)
+
+        :return:
+        """
 
         # Reconstruct bootstrapped distributions by randomly sampling from data
         # keep all bootstrapping data to generate error bars
@@ -414,6 +384,16 @@ class System(object):
         A_dwell = 0  # scaling factor for decaying expontential
         A_hop = 0
 
+        #np.savez_compressed('dwells.npz', dwell_times=self.dwell_times)
+        hist, edges = np.histogram(self.dwell_times, range=(1, 25), bins=25)
+        normalized = hist / len(self.dwell_times)
+        plt.bar(edges[:-1], normalized, 1, align='edge')
+
+        plt.figure()
+        plt.hist(self.dwell_times, bins=50)
+        plt.show()
+        exit()
+
         i = 0
         while i < nboot:
 
@@ -423,10 +403,9 @@ class System(object):
 
                 # Recreate dwell time distribution by randomly choosing from all dwell times with replacement
                 dwell_times_boot = np.random.choice(self.dwell_times, size=len(self.dwell_times), replace=True)
-                # hist_dwell[i, :], bins_dwell = np.histogram(dwell_times_boot, bins=nbins)
 
                 # Define edges of histogram
-                edges = np.linspace(0, max(dwell_times_boot), nbins + 1)
+                edges = np.linspace(min(dwell_times_boot), max(dwell_times_boot), nbins + 1)
 
                 # Add long dwell times randomly selected from beginning and end of trajectory
                 tail_dwells = self.tail_dwells[np.where(self.tail_dwells > max(dwell_times_boot))[0]]
@@ -434,22 +413,36 @@ class System(object):
                                                   dwell_times_boot))
 
                 # bin the bins
-                bins = np.digitize(dwell_times_boot, edges, right=True)  # there will never be a 0 dwell time
+                bins = np.digitize(dwell_times_boot, edges)
                 hist_dwell[i, :], bins_dwell = np.histogram(bins, nbins + 1)
 
-                # bins_dwell_centered[i, :] = np.array([(bins_dwell[i + 1] + bins_dwell[i])/2 for i in
-                #                                       range(len(hist_dwell[i, :]))])
                 bin_width = edges[1] - edges[0]
-                bins_dwell_centered[i, :] = np.array([edges[i] + bin_width for i in range(len(edges))])
 
-                solp_dwell, cov_x = curve_fit(exponential, edges, hist_dwell[i, :], p_dwell)
+                bins_dwell_centered[i, :] = np.array([edges[i] + bin_width / 2 for i in range(len(edges))])
+
+                p_guess = [1.5, hist_dwell[i, np.argmin(np.abs(1 - edges))]]
+                bounds = [[1, 0], [2, np.inf]]
+
+                A, alpha = fitting_functions.fit_power_law(bins_dwell_centered[i, :], hist_dwell[i, :])
+
+                # solp_dwell, cov_x = curve_fit(fitting_functions.powerlaw_integrated, edges, hist_dwell[i, :], p_guess,
+                #                              bounds=bounds)
 
                 # plot individual fit
-                # A, B = solp_dwell  # A*B*e^-Bx
-                # plt.bar(edges, hist_dwell[i, :], edges[1] - edges[0], align='edge')
-                # plt.plot(edges, A*B*np.exp(-B*edges))
-                # plt.show()
-                # exit()
+                # alpha, A = solp_dwell
+                # print(alpha, A)
+                # alpha = 1.5
+                # A = hist_dwell[i, 0] / (min(dwell_times_boot) + (bin_width/2))**-alpha
+                #
+                # pdf = fitting_functions.powerlaw_integrated(edges, alpha, A)
+                #
+                # plt.bar(edges, pdf, bin_width, align='edge')
+                # print(hist_dwell[i, 0], A, min(dwell_times_boot), bin_width)
+
+                plt.bar(edges, hist_dwell[i, :] / bin_width, bin_width, align='edge')
+                plt.plot(bins_dwell_centered[i, :], A*bins_dwell_centered[i, :]**(-alpha), color='black')
+                plt.show()
+                exit()
 
                 self.lambda_distribution.append(solp_dwell[1])
 
@@ -477,7 +470,7 @@ class System(object):
 
                 i += 1
 
-            except RuntimeError:  # sometimes bootstrapping gives unfittable data - mechanism might not be hop-diffusion
+            except RuntimeError:  # sometimes bootstrapping gives unfittable data
                 continue
 
         dwell_bin_width /= nboot
@@ -518,10 +511,6 @@ class System(object):
             plt.tight_layout()
 
             plt.show()
-
-    def save(self):
-
-        np.savez_compressed()
 
 
 class CTRW(object):
@@ -702,19 +691,19 @@ if __name__ == "__main__":
 
         sys.calculate_solute_partition(spline=False, membrane_residue='HII')
 
-        file_rw.save_object(sys, 'forecast_HOH.pl')
+        sys.hops_and_dwells()
 
-    # histogram of time spent in pore region
+        file_rw.save_object(sys, 'forecast_%s.pl' % args.residue)
+
+    # sys.hops_and_dwells(penalty=1)
+    # file_rw.save_object(sys, 'forecast_%s.pl' % args.residue)
+
+    # histogram of time spent in pore region. Kind of interesting
     # plt.hist(np.sum(sys.partition, axis=0) / sys.partition.shape[0], bins=50)
     # plt.show()
 
-    sys.hops_and_dwells()
-
-    # if args.restrict_to_pores:
-    #     sys.restrict_to_pores(args.pore_defining_atoms, args.pore_defining_residue, args.pore_radius)
-
-    sys.hops_and_dwells()
     sys.fit_distributions(nbins=args.nbins, nboot=args.nboot)
+    exit()
 
     random_walks = CTRW(args.nhops, sys.lambda_distribution, sys.hop_sigma_distribution, 200)
     random_walks.generate_trajectories()

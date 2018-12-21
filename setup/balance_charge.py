@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 import argparse
-import os
 from LLC_Membranes.llclib import topology
 import numpy as np
 import subprocess
 import os
+import sys
 
 script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -35,8 +35,7 @@ if __name__ == "__main__":
     net_charge = sum(res.charges.values())
 
     if net_charge == args.net_charge:
-        print('Charge is already balanced')
-        exit()
+        sys.exit('Charge is already balanced')
 
     # increment all charge values if net_charge is greater than res.natoms
     n_changes = abs(int(net_charge / res.natoms))
@@ -56,10 +55,13 @@ if __name__ == "__main__":
         for i in changes:
             charges[i] += increment
 
-    subprocess.Popen(['cp', '%s/../top/topologies/%s.itp' % (script_location, args.itp),
-                      '%s/../top/topologies/%s.itp.bak' % (script_location, args.itp)])
+    # subprocess.Popen(['cp', '%s/../top/topologies/%s.itp' % (script_location, args.itp),
+    #                   '%s/../top/topologies/%s.itp.bak' % (script_location, args.itp)])
+    cp = 'cp %s.itp %s.itp.bak' % (args.itp, args.itp)
+    subprocess.Popen(cp.split())
 
-    with open('%s/../top/topologies/%s.itp' % (script_location, args.itp), 'w') as f:
+    #with open('%s/../top/topologies/%s.itp' % (script_location, args.itp), 'w') as f:
+    with open('%s.itp' % args.itp, 'w') as f:
         line = 0
         while res.itp[line].count('[ atoms ]') == 0:
             f.write(res.itp[line])

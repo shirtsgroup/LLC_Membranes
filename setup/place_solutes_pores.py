@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
 from LLC_Membranes.setup import place_solutes as ps, genmdp
+from LLC_Membranes.llclib import topology
 import numpy as np
 import argparse
 import os
+import subprocess
 
 
 def initialize():
@@ -15,7 +17,7 @@ def initialize():
     parser.add_argument('-o', '--out', default='initial.gro', type=str, help='Name of output topology file')
     parser.add_argument('-r', '--solute_resname', default='ETH', type=str, help='Name of solute residue that is being'
                         'added')
-    parser.add_argument('-n', '--nsolutes', default=6, type=int, help='Number of solute molecules to add')
+    parser.add_argument('-n', '--nsolutes', default=6, type=int, help='Number of solute molecules to add per pore')
     parser.add_argument('-mdps', '--generate_mdps', action="store_true", help='Create input .mdp files')
     parser.add_argument('-noxlink', action="store_false", help='If the system is not cross-linked, add this flag')
     parser.add_argument('-mpi', '--mpi', default=False, help="Specify number of MPI processes")
@@ -30,7 +32,7 @@ if __name__ == "__main__":
     args = initialize().parse_args()
 
     solvent = ps.Solvent('%s' % args.gro, xlink=args.noxlink)
-    solute = ps.Solute('%s' % args.solute_resname)
+    solute = topology.Solute('%s' % args.solute_resname)
 
     if args.mpi:
         solvent.mpi = True
@@ -53,3 +55,7 @@ if __name__ == "__main__":
                                    genvel='no')
         mdp.write_npt_mdp(out='PR')
 
+    # put everything in monoclinic cell
+    pipe = subprocess.Popen(['echo', '0'], stdout=subprocess.PIPE)
+    put_in_box = "gmx trjconv -f %s -o %s -pbc atom -ur tric -s em.tpr" % (args.out, args.out)
+    subprocess.Popen(put_in_box.split(), stdin=pipe.stdout)

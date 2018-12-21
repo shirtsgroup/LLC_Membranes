@@ -3,8 +3,7 @@
 import argparse
 import mdtraj as md
 import numpy as np
-from LLC_Membranes.analysis import Atom_props
-from LLC_Membranes.llclib import file_rw, transform, physical
+from LLC_Membranes.llclib import file_rw, transform, physical, topology
 from LLC_Membranes.setup.gentop import SystemTopology
 import subprocess
 import os
@@ -251,7 +250,7 @@ class Solvent(object):
         # data specifically required for adding solutes to pores
         self.pore_spline = None
         self.water = [a.index for a in self.t.topology.atoms if a.residue.name == 'HOH' and a.name == 'O']
-        self.water_top = Solute('SOL')
+        self.water_top = topology.Solute('SOL')
 
         # because mdtraj changes the names
         for a in self.t.topology.atoms:
@@ -280,11 +279,11 @@ class Solvent(object):
         """
 
         # randomly rotate the molecule and then tranlate it to the placement point
-        solute_positions = transform.random_orientation(solute.xyz[0, ...], solute.xyz[0, 0, :] - solute.xyz[0, 1, :],
-                                                        placement_point)
+        solute_positions = transform.random_orientation(solute.t.xyz[0, ...], solute.t.xyz[0, 0, :] -
+                                                        solute.t.xyz[0, 1, :], placement_point)
         self.positions = np.concatenate((self.positions, solute_positions))  # add to array of positions
-        self.residues += solute.residues  # add solute residues to list of all residues
-        self.names += solute.names  # add solute atom names to list of all names
+        self.residues += solute.res  # add solute residues to list of all residues
+        self.names += [solute.names.get(i) for i in range(1, solute.natoms + 1)]  # add solute atom names to all names
         self.top.add_residue(solute, write=True)  # add 1 solute to topology
 
         # write new .gro file
@@ -473,78 +472,78 @@ class Solvent(object):
 
         self.top.remove_residue(self.water_top, n, write=True)
 
-
-class Solute(object):
-
-    def __init__(self, name):
-
-        self.is_ion = False
-        # check if residue is an ion
-        with open('%s/../top/topologies/ions.txt' % script_location) as f:
-            ions = []
-            for line in f:
-                if line[0] != '#':
-                    ions.append(str.strip(line))
-
-        if name in ions:
-            self.is_ion = True
-            self.residues = [name]
-            self.names = [name]
-            self.xyz = np.zeros([1, 1, 3])
-            self.xyz[0, 0, :] = [0, 0, 0]
-            self.natoms = 1
-            self.mw = Atom_props.mass[name]
-            self.charge = Atom_props.charge[name]
-            self.resname = name
-        else:
-            try:
-                t = md.load('%s.pdb' % name, standard_names=False)  # see if there is a solute configuration in this directory
-            except OSError:
-                try:
-                    t = md.load('%s/../top/topologies/%s.pdb' % (script_location, name), standard_names=False)  # check if the configuration is
-                    # located with all of the other topologies
-                except OSError:
-                    print('No residue %s found' % name)
-                    exit()
-
-            try:
-                f = open('%s.itp' % name, 'r')
-            except FileNotFoundError:
-                try:
-                    f = open('%s/../top/topologies/%s.itp' % (script_location, name), 'r')
-                except FileNotFoundError:
-                    print('No topology %s.itp found' % name)
-
-            itp = []
-            for line in f:
-                itp.append(line)
-
-            f.close()
-
-            self.natoms = t.n_atoms
-
-            atoms_index = 0
-            while itp[atoms_index].count('[ atoms ]') == 0:
-                atoms_index += 1
-
-            atoms_index += 2
-            self.charge = 0
-            for i in range(self.natoms):
-                self.charge += float(itp[atoms_index + i].split()[6])
-
-            self.residues = [a.residue.name for a in t.topology.atoms]
-            self.resname = self.residues[0]
-            self.names = [a.name for a in t.topology.atoms]
-            self.xyz = t.xyz
-
-            self.mw = 0  # molecular weight (grams)
-            for a in t.topology.atoms:
-                self.mw += Atom_props.mass[a.name]
-
-            self.com = np.zeros([3])  # center of mass of solute
-            for i in range(self.xyz.shape[1]):
-                self.com += self.xyz[0, i, :] * Atom_props.mass[self.names[i]]
-            self.com /= self.mw
+# Revamped in llclib.topology
+# class Solute(object):
+#
+#     def __init__(self, name):
+#
+#         self.is_ion = False
+#         # check if residue is an ion
+#         with open('%s/../top/topologies/ions.txt' % script_location) as f:
+#             ions = []
+#             for line in f:
+#                 if line[0] != '#':
+#                     ions.append(str.strip(line))
+#
+#         if name in ions:
+#             self.is_ion = True
+#             self.residues = [name]
+#             self.names = [name]
+#             self.xyz = np.zeros([1, 1, 3])
+#             self.xyz[0, 0, :] = [0, 0, 0]
+#             self.natoms = 1
+#             self.mw = Atom_props.mass[name]
+#             self.charge = Atom_props.charge[name]
+#             self.resname = name
+#         else:
+#             try:
+#                 t = md.load('%s.pdb' % name, standard_names=False)  # see if there is a solute configuration in this directory
+#             except OSError:
+#                 try:
+#                     t = md.load('%s/../top/topologies/%s.pdb' % (script_location, name), standard_names=False)  # check if the configuration is
+#                     # located with all of the other topologies
+#                 except OSError:
+#                     print('No residue %s found' % name)
+#                     exit()
+#
+#             try:
+#                 f = open('%s.itp' % name, 'r')
+#             except FileNotFoundError:
+#                 try:
+#                     f = open('%s/../top/topologies/%s.itp' % (script_location, name), 'r')
+#                 except FileNotFoundError:
+#                     print('No topology %s.itp found' % name)
+#
+#             itp = []
+#             for line in f:
+#                 itp.append(line)
+#
+#             f.close()
+#
+#             self.natoms = t.n_atoms
+#
+#             atoms_index = 0
+#             while itp[atoms_index].count('[ atoms ]') == 0:
+#                 atoms_index += 1
+#
+#             atoms_index += 2
+#             self.charge = 0
+#             for i in range(self.natoms):
+#                 self.charge += float(itp[atoms_index + i].split()[6])
+#
+#             self.residues = [a.residue.name for a in t.topology.atoms]
+#             self.resname = self.residues[0]
+#             self.names = [a.name for a in t.topology.atoms]
+#             self.xyz = t.xyz
+#
+#             self.mw = 0  # molecular weight (grams)
+#             for a in t.topology.atoms:
+#                 self.mw += Atom_props.mass[a.name]
+#
+#             self.com = np.zeros([3])  # center of mass of solute
+#             for i in range(self.xyz.shape[1]):
+#                 self.com += self.xyz[0, i, :] * Atom_props.mass[self.names[i]]
+#             self.com /= self.mw
 
 
 if __name__ == "__main__":

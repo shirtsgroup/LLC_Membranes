@@ -4,6 +4,7 @@ import os
 import mdtraj as md
 import Atom_props
 import numpy as np
+import sys
 
 script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -35,16 +36,16 @@ class Residue(object):
 
         else:
             try:
-                t = md.load('%s.pdb' % name,
+                self.t = md.load('%s.pdb' % name,
                             standard_names=False)  # see if there is a solute configuration in this directory
             except OSError:
                 try:
-                    t = md.load('%s/../top/topologies/%s.pdb' % (script_location, name),
+                    self.t = md.load('%s/../top/topologies/%s.pdb' % (script_location, name),
                                 standard_names=False)  # check if the configuration is
                     # located with all of the other topologies
                 except OSError:
-                    print('No residue %s found' % name)
-                    exit()
+                    raise OSError('No residue %s found. Perhaps you have not made a %s.pdb yet?' % (name, name))
+                    #sys.exit('No residue %s found. Perhaps you have not made a %s.pdb yet?' % (name, name))
 
             try:
                 f = open('%s.itp' % name, 'r')
@@ -52,18 +53,17 @@ class Residue(object):
                 try:
                     f = open('%s/../top/topologies/%s.itp' % (script_location, name), 'r')
                 except FileNotFoundError:
-                    print('No topology %s.itp found' % name)
-                    exit()
+                    sys.exit('No topology %s.itp found' % name)
 
-            res = set([a.residue.name for a in t.topology.atoms])
+            self.res = [a.residue.name for a in self.t.topology.atoms]
 
-            if len(set(res)) > 1:
+            if len(set(self.res)) > 1:
                 self.residues = []
-                for i in set(res):
+                for i in set(self.res):
                     self.residues.append(Residue(i))
 
             else:
-
+                self.resname = self.res[0]
                 self.itp = []
                 for line in f:
                     self.itp.append(line)

@@ -51,7 +51,7 @@ def initialize():
 if __name__ == "__main__":
 
     args = initialize()
-
+    print(args.frames)
     # get output frequencies (important for controlling size of trajectory)
     if args.nstxout:
         nstxout = args.nstxout
