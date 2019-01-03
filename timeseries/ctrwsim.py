@@ -35,6 +35,7 @@ def initialize():
     parser.add_argument('-fix_time', '--fix_time', action="store_true", help='Fix the total time of simulated '
                         'trajectories. Total length will be steps*dt')
     parser.add_argument('-b', '--nboot', default=200, help='Number of bootstrap trials')
+    parser.add_argument('-ul', '--upper_limit', default=None, type=int, help='Upper limit on dwell-time length')
 
     # parallelization
     parser.add_argument('-nt', '--nthreads', default=0, type=int, help='Number of threads to use for parallelized '
@@ -59,7 +60,7 @@ def random_exponential_dwell(lam, size=1):
     return -np.log(1 - np.random.uniform(0, 1, size=size)) / lam
 
 
-def random_power_law_dwell(alpha, ll=0.1, size=1):
+def random_power_law_dwell(alpha, ll=0.1, size=1, limit=None):
     """ Randomly draw from a power law distribution of form t**-alpha
     See Appendix D of https://epubs.siam.org/doi/abs/10.1137/070710111
 
@@ -74,7 +75,12 @@ def random_power_law_dwell(alpha, ll=0.1, size=1):
     :return: array of random power law draws
     """
 
-    return ll * (1 - np.random.uniform(0, 1, size=size)) ** (-1 / (alpha - 1))
+    if limit is not None:
+        r = 1 - np.exp((1 - alpha)*np.log(limit/ll))
+    else:
+        r = 1
+
+    return ll * (1 - np.random.uniform(0, r, size=size)) ** (-1 / (alpha - 1))
 
 
 class CTRW(object):
@@ -124,11 +130,12 @@ class CTRW(object):
         self.fit_parameters = None
         self.bootstraps = None
         self.fit_cut = 1
+        self.fit_start = 0
 
         # Initialize multi-threading
         self.pbar = None
 
-    def generate_trajectories(self, fixed_time=False, noise=0, nt=1):
+    def generate_trajectories(self, fixed_time=False, noise=0, nt=1, ll=0.1, limit=None):
         """ Create trajectories by randomly drawing from dwell and hop distributions
 
         :param fixed_time: Propagate each trajectory until a certain wall time is reached
@@ -143,7 +150,7 @@ class CTRW(object):
         if fixed_time:
             self.fixed_time_trajectories()
         else:
-            self.fixed_steps_trajectories(noise=noise, nt=nt)
+            self.fixed_steps_trajectories(noise=noise, nt=nt, ll=ll, limit=limit)
 
     def fixed_time_trajectories(self):
 
@@ -197,11 +204,19 @@ class CTRW(object):
                     time_index -= 1
                 self.z_interpolated[t, i] = z[time_index]
 
-    def fixed_steps_trajectories(self, noise=0, nt=1):
+    def fixed_steps_trajectories(self, noise=0, nt=1, ll=0.1, limit=None):
         """ Generate CTRW trajectories using a fixed number of steps
 
         :param noise: magnitude of gaussian noise to add to each trajectory
+        :param nt: number of threads to use where parallelized
+        :param ll: lower limit on dwell time length
+        :param limit: upper limit on dwell time length (As implemented, this is not mathematically sound, so it's only
+        for demonstration purposes)
 
+        :type noise: float
+        :type nt: int
+        :type ll: float
+        :type limit: float
         """
 
         print('Generating Trajectories...')
@@ -219,7 +234,7 @@ class CTRW(object):
             if self.dwell_distribution == 'exponential':
                 time = random_exponential_dwell(self.lamb, size=self.nsteps)
             elif self.dwell_distribution == 'power':
-                time = random_power_law_dwell(1 + self.alpha, size=self.nsteps)
+                time = random_power_law_dwell(1 + self.alpha, size=self.nsteps, ll=ll, limit=limit)
             else:
                 sys.exit('Please enter a valid dwell time probability distribution')
 
@@ -304,9 +319,9 @@ class CTRW(object):
         if save:
             plt.savefig(savename)
 
-    def bootstrap_msd(self, nboot=200, fit_power_law=False):
+    def bootstrap_msd(self, nboot=200, fit_power_law=False, fit_linear=False):
 
-        if fit_power_law:
+        if fit_power_law or fit_linear:
             self.fit_parameters = np.zeros([nboot, 2])
 
         # The average MSD is a collective property, so each bootstrap trial should be an average of self.ntrials
@@ -318,9 +333,11 @@ class CTRW(object):
             self.bootstraps[i, :] = self.msd[indices, :].mean(axis=0)
             if fit_power_law:
                 self.fit_parameters[i, :] = self.fit_power_law(self.bootstraps[i, :])
+            if fit_linear:
+                self.fit_parameters[i, :] = self.fit_line(self.bootstraps[i, :])
 
     def fit_power_law(self, y, cut=0.25, interactive=True):
-        """ Fit power law to MSD curves
+        """ Fit power law to MSD curves. Should probably be replaced by MLE
         TODO: weighted fit (need to do error analysis first)
 
         :param y: y-axis values of MSD curve (x-axis values are values from self.time_uniform
@@ -334,30 +351,37 @@ class CTRW(object):
 
         self.fit_cut = cut
 
+        start = np.where(y > 0)[0][0]  # find first non-zero value since we will take the log
         end = int(self.fit_cut * len(self.time_uniform))  # fit up until a fraction, cut, of the trajectory
 
         # fit line to linear log plot
-        A = Poly_fit.poly_fit(np.log(self.time_uniform[1:end]), np.log(y[1:end]), 1)[-1]
+        A = Poly_fit.poly_fit(np.log(self.time_uniform[start:end]), np.log(y[start:end]), 1)[-1]
 
         return [np.exp(A[0]), A[1]]
 
-    def fit_line(self, y, cut=0.25):
+    def fit_line(self, y, start=0.1, cut=0.5):
         """ Fit line to MSD curve
 
-        :param y:
-        :param cut:
+        :param y: y-axis values of MSD curve (x-axis values are values from self.time_uniform
+        :param start: beginning fraction of trajectory to cut out of calculations
+        :param cut: fraction of trajectory to include in fit
 
-        :return:
+        :type y: np.ndarray
+        :type cut: float
+
+        :return: slope and intercept of fit line [y-intercept, slope]
         """
 
+        self.fit_start = start
         self.fit_cut = cut
+        start = int(self.fit_start * len(self.time_uniform))
         end = int(self.fit_cut * len(self.time_uniform))
 
-        A = Poly_fit.poly_fit(self.time_uniform[:end], y[:end], 1)[-1]
+        A = Poly_fit.poly_fit(self.time_uniform[start:end], y[start:end], 1)[-1]
 
         return [A[0], A[1]]
 
-    def plot_msd(self, confidence=95, plot_power_law=False, plot_linear=False):
+    def plot_msd(self, confidence=95, plot_power_law=False, plot_linear=False, show=True):
         """ Plot averaged mean squared displacement with error bars
 
         :param confidence: confidence interval for error bars
@@ -387,9 +411,12 @@ class CTRW(object):
 
         if plot_linear:
             fit = self.fit_line(self.msd.mean(axis=0))
+            start = int(self.fit_start * len(self.time_uniform))
             end = int(self.fit_cut * len(self.time_uniform))
-            plt.plot(self.time_uniform[:end], fitting_functions.line(fit[1], self.time_uniform[:end], fit[0]), '--',
-                     label='Linear fit')
+            print('Estimated slope of line: %.4f +/- %.4f' % (100*np.mean(self.fit_parameters[:, 1]),
+                                                                100*np.std(self.fit_parameters[:, 1])))
+            plt.plot(self.time_uniform[start:end], fitting_functions.line(fit[1], self.time_uniform[start:end], fit[0]),
+                     '--', label='Linear fit')
 
         if plot_linear | plot_power_law:
             plt.legend()
@@ -400,7 +427,8 @@ class CTRW(object):
         plt.tight_layout()
         #plt.savefig('msd_ctrw.pdf')
         #np.savez_compressed('msd.npz', msd=self.msd.mean(axis=0), error=error, time=self.time_uniform)
-        plt.show()
+        if show:
+            plt.show()
 
 
 if __name__ == "__main__":
@@ -409,14 +437,24 @@ if __name__ == "__main__":
 
     ctrw = CTRW(args.steps, args.ntraj, hop_dist=args.hop_length_distribution, dwell_dist=args.dwell_time_distribution,
                 hop_sigma=args.hop_sigma, alpha=args.alpha, dt=args.dt)
-    ctrw.generate_trajectories(fixed_time=args.fix_time, noise=args.noise, nt=args.nthreads)
+    ctrw.generate_trajectories(fixed_time=args.fix_time, noise=args.noise, nt=args.nthreads, limit=args.upper_limit)
     ctrw.calculate_msd(ensemble=args.ensemble)
-    ctrw.bootstrap_msd(nboot=args.nboot, fit_power_law=args.fit_power_law)
-    ctrw.plot_msd(plot_power_law=args.fit_power_law, plot_linear=args.fit_line)
+    ctrw.bootstrap_msd(nboot=args.nboot, fit_power_law=args.fit_power_law, fit_linear=args.fit_line)
+    ctrw.plot_msd(plot_power_law=args.fit_power_law, plot_linear=args.fit_line, show=False)
+
+    last = ctrw.msd.mean(axis=0)[int(0.5*ctrw.time_uniform.size)]
+    CI = stats.confidence_interval(ctrw.bootstraps, 95)[:, int(0.5*ctrw.time_uniform.size)]
+    print("MSD at 50 %% of time: %.2f 95 %% CI [%.2f, %.2f]" % (last, last - CI[0], CI[1] + last))
+
+    # run below with args.ensemble = False, fit_line = True
+    ctrw.calculate_msd(ensemble=True)
+    ctrw.bootstrap_msd(nboot=args.nboot, fit_power_law=True)
+    ctrw.plot_msd(plot_power_law=True, show=False)
 
     last = ctrw.msd.mean(axis=0)[-1]
     CI = stats.confidence_interval(ctrw.bootstraps, 95)[:, -1]
-    print("%.2f 95 %% CI [%.2f, %.2f]" %(last, last - CI[0], CI[1] + last))
+    print("MSD at 100 %% of time: %.2f 95 %% CI [%.2f, %.2f]" % (last, last - CI[0], CI[1] + last))
+    plt.show()
 
     # for plotting MSDs using a bunch of different dwell time limits
     # limits = [800, 1600, 3200, 6400, 12800, 25600, 51200, 102800]
@@ -433,6 +471,29 @@ if __name__ == "__main__":
     # plt.legend()
     # plt.xlabel('Time (ns)', fontsize=14)
     # plt.ylabel('Mean squared displacement (nm$^2$)', fontsize=14)
+    # plt.gcf().get_axes()[0].tick_params(labelsize=14)
+    # plt.tight_layout()
+    # plt.show()
+    # exit()
+
+    # for generated MSDs with varied amount of noise (with all else fixed).
+    # noise = [1, 0.1, 0]
+    # walks = []
+    # ctrw = CTRW(args.steps, args.ntraj, hop_dist=args.hop_length_distribution, dwell_dist=args.dwell_time_distribution,
+    #             hop_sigma=args.hop_sigma, alpha=args.alpha)
+    #
+    # plt.figure()
+    # for i, n in enumerate(noise):
+    #     np.random.seed(1)  # set random seed so trajectory generation will always be the same
+    #     ctrw.generate_trajectories(noise=n, nt=args.nthreads)
+    #     ctrw.calculate_msd(ensemble=args.ensemble)
+    #     #plt.plot(ctrw.time_uniform, ctrw.z_interpolated[1, :] - i*5, label='$\sigma_{noise}$ = %s' % n) # when plotting trajectories
+    #     plt.plot(ctrw.time_uniform, ctrw.msd.mean(axis=0), linewidth=2, label='$\sigma_{noise}$ = %s' % n) # when plotting MSD
+    #
+    # plt.legend()
+    # plt.xlabel('Time (ns)', fontsize=14)
+    # #plt.ylabel('$z$-position (nm)', fontsize=14)  # when plotting trajectories
+    # plt.ylabel('Mean squared displacement (nm$^2$)', fontsize=14)  # when plotting MSD
     # plt.gcf().get_axes()[0].tick_params(labelsize=14)
     # plt.tight_layout()
     # plt.show()
