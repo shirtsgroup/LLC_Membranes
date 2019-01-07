@@ -8,6 +8,7 @@ from LLC_Membranes.llclib import timeseries, fitting_functions, stats
 from LLC_Membranes.analysis import Poly_fit
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
+import time as timer
 
 
 def initialize():
@@ -86,7 +87,7 @@ def random_power_law_dwell(alpha, ll=0.1, size=1, limit=None):
 class CTRW(object):
 
     def __init__(self, length, ntraj, hop_dist='gaussian', dwell_dist='power', hop_sigma=1, alpha=0.5, lamb=0.5,
-                 padding=10, dt=1):
+                 padding=10, dt=1, nt=1):
         """ Initialize simulation of a continuous time random walk
 
         :param length: length of each simulated trajectory. If you fix the number of steps, this equals the number of
@@ -99,6 +100,7 @@ class CTRW(object):
         :param lamb: rate of decay for exponential random draws
         :param padding: multiplies number of discrete time points used to interpolate trajectories
         :param dt: time step for fixed time simulations
+        :param nt: number of threads to use where parallelized
 
         :type length: int
         :type ntraj: int
@@ -109,6 +111,7 @@ class CTRW(object):
         :type lamb: float
         :type padding: int
         :type dt: float
+        :type nt: int
         """
 
         self.nsteps = length
@@ -120,6 +123,7 @@ class CTRW(object):
         self.alpha = alpha
         self.padding = padding
         self.dt = dt
+        self.nt = nt
 
         self.trajectories = np.zeros([self.ntraj, self.nsteps, 2])
         self.trajectory_hops = np.zeros([self.ntraj, 2 * self.nsteps - 1, 2])  # for visualization
@@ -135,22 +139,20 @@ class CTRW(object):
         # Initialize multi-threading
         self.pbar = None
 
-    def generate_trajectories(self, fixed_time=False, noise=0, nt=1, ll=0.1, limit=None):
+    def generate_trajectories(self, fixed_time=False, noise=0, ll=0.1, limit=None):
         """ Create trajectories by randomly drawing from dwell and hop distributions
 
         :param fixed_time: Propagate each trajectory until a certain wall time is reached
         :param noise: add gaussian noise to final trajectories
-        :param nt: number of threads to use in parallelized portions
 
         :type fixed_time: bool
         :type noise: float
-        :type nt: int
         """
 
         if fixed_time:
             self.fixed_time_trajectories()
         else:
-            self.fixed_steps_trajectories(noise=noise, nt=nt, ll=ll, limit=limit)
+            self.fixed_steps_trajectories(noise=noise, nt=self.nt, ll=ll, limit=limit)
 
     def fixed_time_trajectories(self):
 
@@ -158,6 +160,7 @@ class CTRW(object):
         self.time_uniform = np.linspace(0, length, self.nsteps * self.padding)
 
         for t in tqdm.tqdm(range(self.ntraj)):
+
             time = [0]
             total_time = 0  # saves a lot of time
 
@@ -192,17 +195,7 @@ class CTRW(object):
             # trajectory_hops[-1, 1] = z[-1]
 
             # make uniform time intervals with the same interval for each simulated trajectory
-
-            # a vector-wise way to do it, but it's slow because it involves the creation of a large dense matrix
-            # time_index = np.argmin(np.abs(self.time_uniform[:, np.newaxis] - time), axis=1)
-            # time_index[np.where(self.time_uniform - time[time_index] < 0)] -= 1
-            # self.z_interpolated[t, :] = z[time_index]
-
-            for i, x in enumerate(self.time_uniform):
-                time_index = np.argmin(np.abs(x - time))
-                if x - time[time_index] < 0:
-                    time_index -= 1
-                self.z_interpolated[t, i] = z[time_index]
+            self.z_interpolated[t, :] = z[np.digitize(self.time_uniform, time, right=False) - 1]
 
     def fixed_steps_trajectories(self, noise=0, nt=1, ll=0.1, limit=None):
         """ Generate CTRW trajectories using a fixed number of steps
@@ -263,7 +256,9 @@ class CTRW(object):
                 self.z_interpolated[i, :] = t
         else:
             for t in tqdm.tqdm(range(self.ntraj)):
-                self.z_interpolated[t, :] = self.interpolate_trajectories(t, noise=noise)
+                self.z_interpolated[t, :] = self.trajectories[t, np.digitize(self.time_uniform,
+                                                              self.trajectories[t, :, 0], right=False) - 1, 1]
+                #self.z_interpolated[t, :] = self.interpolate_trajectories(t, noise=noise)
 
     def interpolate_trajectories(self, t, noise=0):
 
@@ -289,8 +284,9 @@ class CTRW(object):
         """
 
         print('Calculating MSD...', end='', flush=True)
-        self.msd = timeseries.msd(self.z_interpolated.T[..., np.newaxis], 0, ensemble=ensemble).T
-        print('Done!')
+        start = timer.time()
+        self.msd = timeseries.msd(self.z_interpolated.T[..., np.newaxis], 0, ensemble=ensemble, nt=self.nt).T
+        print('Done in %.3f seconds' % (timer.time() - start))
 
     def plot_trajectory(self, n, show=False, save=True, savename='ctrw_trajectory.pdf'):
         """ Plot a CTRW trajectory
@@ -326,15 +322,30 @@ class CTRW(object):
 
         # The average MSD is a collective property, so each bootstrap trial should be an average of self.ntrials
         # ranodomly reconstructed simulated trajectories
-        self.bootstraps = np.zeros([nboot, self.msd.shape[1]])
+
         print('Bootstrapping...')
+
+        # This is not any faster than the serial version for some reason
+        # if self.nt > 1:
+        #     with Pool(self.nt) as pool:
+        #         self.bootstraps = np.array(pool.map(self.bootstrap_trial, range(nboot)))
+        # else:
+        self.bootstraps = np.zeros([nboot, self.msd.shape[1]])
         for i in tqdm.tqdm(range(nboot)):
-            indices = np.random.choice(self.msd.shape[0], size=self.msd.shape[0], replace=True)
-            self.bootstraps[i, :] = self.msd[indices, :].mean(axis=0)
+            self.bootstraps[i, :] = self.bootstrap_trial()
+
+        for i in range(nboot):
             if fit_power_law:
                 self.fit_parameters[i, :] = self.fit_power_law(self.bootstraps[i, :])
             if fit_linear:
                 self.fit_parameters[i, :] = self.fit_line(self.bootstraps[i, :])
+
+    def bootstrap_trial(self):
+
+        indices = np.random.choice(self.msd.shape[0], size=self.msd.shape[0], replace=True)
+        # return self.msd[indices, :].mean(axis=0)  # ~30 % slower than following line (¯\_(ツ)_/¯)
+
+        return self.msd.take(indices, axis=0).mean(axis=0)
 
     def fit_power_law(self, y, cut=0.25, interactive=True):
         """ Fit power law to MSD curves. Should probably be replaced by MLE
@@ -434,10 +445,10 @@ class CTRW(object):
 if __name__ == "__main__":
 
     args = initialize().parse_args()
-
+    np.random.seed(1)
     ctrw = CTRW(args.steps, args.ntraj, hop_dist=args.hop_length_distribution, dwell_dist=args.dwell_time_distribution,
-                hop_sigma=args.hop_sigma, alpha=args.alpha, dt=args.dt)
-    ctrw.generate_trajectories(fixed_time=args.fix_time, noise=args.noise, nt=args.nthreads, limit=args.upper_limit)
+                hop_sigma=args.hop_sigma, alpha=args.alpha, dt=args.dt, nt=args.nthreads)
+    ctrw.generate_trajectories(fixed_time=args.fix_time, noise=args.noise, limit=args.upper_limit)
     ctrw.calculate_msd(ensemble=args.ensemble)
     ctrw.bootstrap_msd(nboot=args.nboot, fit_power_law=args.fit_power_law, fit_linear=args.fit_line)
     ctrw.plot_msd(plot_power_law=args.fit_power_law, plot_linear=args.fit_line, show=False)
@@ -454,7 +465,7 @@ if __name__ == "__main__":
     last = ctrw.msd.mean(axis=0)[-1]
     CI = stats.confidence_interval(ctrw.bootstraps, 95)[:, -1]
     print("MSD at 100 %% of time: %.2f 95 %% CI [%.2f, %.2f]" % (last, last - CI[0], CI[1] + last))
-    plt.show()
+    # plt.show()
 
     # for plotting MSDs using a bunch of different dwell time limits
     # limits = [800, 1600, 3200, 6400, 12800, 25600, 51200, 102800]

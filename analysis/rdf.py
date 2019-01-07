@@ -172,7 +172,7 @@ class System(object):
                                       self.density.mean(axis=0))  # 2.5 percent of data below this value
         self.errorbars[1, :] = np.percentile(self.bootstraps, upper_confidence, axis=0) - self.density.mean(axis=0)
 
-    def plot(self, show=False, normalize=False):
+    def plot(self, show=False, normalize=False, save=True, savename='rdf.pdf'):
 
         mean = self.density.mean(axis=0)
         if normalize:
@@ -198,6 +198,9 @@ class System(object):
         if show:
             plt.show()
 
+        if save:
+            plt.savefig(savename)
+
 
 if __name__ == "__main__":
 
@@ -221,6 +224,6 @@ if __name__ == "__main__":
         rdfs[i].radial_distribution_function(bins=args.bins, spline=args.spline, npts_spline=args.spline_pts,
                                              cut=args.cut)
         rdfs[i].bootstrap(args.nboot)
-        rdfs[i].plot(show=False, normalize=True)
+        rdfs[i].plot(show=False, normalize=True, save=True)
 
-    plt.show()
+    #plt.show()

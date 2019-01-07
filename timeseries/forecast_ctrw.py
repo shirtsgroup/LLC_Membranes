@@ -689,6 +689,9 @@ if __name__ == "__main__":
         sys = System(args.trajectory, args.gro, args.residue, start=args.begin, end=args.end, step=args.step,
                      ma=args.moving_average)
 
+        sys.plot_random_trajectories(5)
+        exit()
+
         sys.calculate_solute_partition(spline=False, membrane_residue='HII')
 
         sys.hops_and_dwells()

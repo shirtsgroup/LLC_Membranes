@@ -129,6 +129,8 @@ def simulate(mdp, top, config, out, restrained=False, mpi=False, np=4):
 
 def check_energy(logname='em.log'):
 
+    nrg = 1
+
     with open('%s' % logname) as f:
         for line in f:
             if line.count("Potential Energy") == 1:

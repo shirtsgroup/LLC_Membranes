@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import numpy as np
+from multiprocessing import Pool
+import tqdm
 
 
 def largest_prime_factor(n):
@@ -121,7 +123,7 @@ def autocorrFFT(x):
     return res / n  # this is the autocorrelation in convention A
 
 
-def msd_fft(x, axis):
+def msd_fft(args):
     """ Calculate msd using a fast fourier transform algorithm
 
     :param x: trajectory of particle positions, equispaced in time
@@ -132,6 +134,8 @@ def msd_fft(x, axis):
 
     :return: msd as a function of time
     """
+
+    x, axis = args
 
     r = np.copy(x)
     r = r[:, axis]
@@ -175,7 +179,7 @@ def msd_straightforward(x, axis):
     return MSD, MSDs
 
 
-def msd(x, axis, ensemble=False):
+def msd(x, axis, ensemble=False, nt=1):
     """ Calculate mean square displacement based on particle positions
 
     :param x: particle positions
@@ -196,16 +200,31 @@ def msd(x, axis, ensemble=False):
     size = len(x[0, :, axis].shape)  # number of axes in array where MSDs will be calculated
 
     if ensemble:
+
         for n in range(ntraj):  # start at 1 since all row 0 will be all zeros
-            if size == 1:
-                MSD[:, n] = (x[:, n, axis] - x[0, n, axis])**2
-            else:
-                MSD[:, n] = np.linalg.norm(x[:, n, axis] - x[0, n, axis], axis=1)**2
+            MSD[:, n] = ensemble_msd(x[0, n, axis], x[:, n, axis], size)
+
     else:
-        for n in range(ntraj):
-            MSD[:, n] = msd_fft(x[:, n, :], axis)
+        if nt > 1:
+            with Pool(nt) as pool:
+                for i, t in enumerate(pool.map(msd_fft, [(x[:, n, :], axis) for n in range(ntraj)])):
+                    MSD[:, i] = t
+        else:
+            for n in tqdm.tqdm(range(ntraj)):
+                MSD[:, n] = msd_fft((x[:, n, :], axis))
 
     return MSD
+
+
+def ensemble_msd(x0, x, size):
+
+    if size == 1:
+
+        return (x - x0) ** 2
+
+    else:
+
+        return np.linalg.norm(x0 - x, axis=1) ** 2
 
 
 def step_autocorrelation(trajectories, axis=0):
