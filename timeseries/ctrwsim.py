@@ -4,7 +4,7 @@ import argparse
 import numpy as np
 import tqdm
 import sys
-from LLC_Membranes.llclib import timeseries, fitting_functions, stats
+from LLC_Membranes.llclib import timeseries, fitting_functions, stats, sampling
 from LLC_Membranes.analysis import Poly_fit
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
@@ -43,45 +43,6 @@ def initialize():
                                                                        'portions of the code.')
 
     return parser
-
-
-def random_exponential_dwell(lam, size=1):
-    """ Randomly draw from an exponential distribution
-    See Appendix D of https://epubs.siam.org/doi/abs/10.1137/070710111
-
-    :param lam: rate of decay
-    :param size: number of random draws to perform
-
-    :type lam: float
-    :type size: int
-
-    :return: array of random draws
-    """
-
-    return -np.log(1 - np.random.uniform(0, 1, size=size)) / lam
-
-
-def random_power_law_dwell(alpha, ll=0.1, size=1, limit=None):
-    """ Randomly draw from a power law distribution of form t**-alpha
-    See Appendix D of https://epubs.siam.org/doi/abs/10.1137/070710111
-
-    :param alpha: anomalous exponent + 1
-    :param ll: lower limit of distribution.
-    :param size: number of random draws to perform
-
-    :type: alpha: float
-    :type ll: float
-    :type size: int
-
-    :return: array of random power law draws
-    """
-
-    if limit is not None:
-        r = 1 - np.exp((1 - alpha)*np.log(limit/ll))
-    else:
-        r = 1
-
-    return ll * (1 - np.random.uniform(0, r, size=size)) ** (-1 / (alpha - 1))
 
 
 class CTRW(object):
@@ -139,44 +100,73 @@ class CTRW(object):
         # Initialize multi-threading
         self.pbar = None
 
-    def generate_trajectories(self, fixed_time=False, noise=0, ll=0.1, limit=None):
+    def generate_trajectories(self, fixed_time=False, noise=0, ll=0.1, limit=None, distributions=None, discrete=False):
         """ Create trajectories by randomly drawing from dwell and hop distributions
 
         :param fixed_time: Propagate each trajectory until a certain wall time is reached
         :param noise: add gaussian noise to final trajectories
+        :param ll: lower limit of power law distribution
+        :param limit: upper limit on dwell time length (As implemented, this is not mathematically sound, so it's only
+        for demonstration purposes)
+        :param distributions: distributions of alpha and sigma values for dwell and hop length distributions
+        respectively. Passed as 2-tuple of arrays where each array contains a possible values of each parameter.
+        :param discrete: pull from discrete dwell time probability distributions
 
         :type fixed_time: bool
         :type noise: float
+        :type ll: float
+        :type limit: float
+        :type distributions: tuple
+        :type discrete: bool
         """
 
         if fixed_time:
-            self.fixed_time_trajectories()
+            self.fixed_time_trajectories(ll=ll, distributions=distributions, discrete=discrete)
         else:
             self.fixed_steps_trajectories(noise=noise, nt=self.nt, ll=ll, limit=limit)
 
-    def fixed_time_trajectories(self):
+    def fixed_time_trajectories(self, ll=1, distributions=None, discrete=False):
+        """ Create trajectories of fixed length where dwell times and hop lengths are drawn from the appropriate
+        distributions.
 
-        length = self.dt * self.nsteps  # total length of simulation
-        self.time_uniform = np.linspace(0, length, self.nsteps * self.padding)
+        :param ll: lower limit of power law distribution
+        :param distributions: distributions of alpha and sigma values for dwell and hop length distributions
+        respectively. Passed as 2-tuple of arrays where each array contains a possible values of each parameter.
+        :param discrete: pull from discrete dwell time probability distributions
+
+        :type ll: float
+        :type distributions: tuple
+        :type discrete: bool
+        """
+
+        self.time_uniform = np.linspace(0, self.nsteps, self.nsteps * self.padding)
 
         for t in tqdm.tqdm(range(self.ntraj)):
+
+            if distributions is not None:
+
+                if self.dwell_distribution == 'exponential':
+                    self.lamb = np.random.choice(distributions[0])
+                elif self.dwell_distribution == 'power':
+                    self.alpha = np.random.choice(distributions[0])
+
+                self.hop_sigma = np.random.choice(distributions[1])
 
             time = [0]
             total_time = 0  # saves a lot of time
 
-            while total_time < length:
+            while total_time < self.nsteps:
 
                 # hop at random time intervals according to one of the following PDFs
                 if self.dwell_distribution == 'exponential':
-                    time.append(random_exponential_dwell(self.lamb))
+                    time.append(sampling.random_exponential_dwell(self.lamb))
                 elif self.dwell_distribution == 'power':
-                    time.append(random_power_law_dwell(1 + self.alpha))
+                    time.append(sampling.random_power_law_dwell(1 + self.alpha, ll=ll, discrete=discrete))
                 else:
                     sys.exit('Please enter a valid dwell time probability distribution')
                 total_time += time[-1]
 
             time = np.cumsum(time)
-            time -= time[0]
 
             if self.hop_distribution == 'gaussian' or self.hop_distribution == 'Gaussian':
                 z = np.cumsum(np.random.normal(loc=0, scale=self.hop_sigma, size=len(time)))
@@ -196,6 +186,11 @@ class CTRW(object):
 
             # make uniform time intervals with the same interval for each simulated trajectory
             self.z_interpolated[t, :] = z[np.digitize(self.time_uniform, time, right=False) - 1]
+
+        self.time_uniform *= self.dt
+        # plt.plot(self.time_uniform, self.z_interpolated[0, :])
+        # plt.show()
+        # exit()
 
     def fixed_steps_trajectories(self, noise=0, nt=1, ll=0.1, limit=None):
         """ Generate CTRW trajectories using a fixed number of steps
@@ -225,9 +220,9 @@ class CTRW(object):
 
             # hop at random time intervals according to one of the following PDFs
             if self.dwell_distribution == 'exponential':
-                time = random_exponential_dwell(self.lamb, size=self.nsteps)
+                time = sampling.random_exponential_dwell(self.lamb, size=self.nsteps)
             elif self.dwell_distribution == 'power':
-                time = random_power_law_dwell(1 + self.alpha, size=self.nsteps, ll=ll, limit=limit)
+                time = sampling.random_power_law_dwell(1 + self.alpha, size=self.nsteps, ll=ll, limit=limit)
             else:
                 sys.exit('Please enter a valid dwell time probability distribution')
 
@@ -286,6 +281,10 @@ class CTRW(object):
         print('Calculating MSD...', end='', flush=True)
         start = timer.time()
         self.msd = timeseries.msd(self.z_interpolated.T[..., np.newaxis], 0, ensemble=ensemble, nt=self.nt).T
+        #plt.hist(self.msd[:, -1], range=(0, 10))
+        plt.plot(self.msd.mean(axis=0))
+        plt.show()
+        exit()
         print('Done in %.3f seconds' % (timer.time() - start))
 
     def plot_trajectory(self, n, show=False, save=True, savename='ctrw_trajectory.pdf'):
@@ -347,7 +346,7 @@ class CTRW(object):
 
         return self.msd.take(indices, axis=0).mean(axis=0)
 
-    def fit_power_law(self, y, cut=0.25, interactive=True):
+    def fit_power_law(self, y, cut=1, interactive=True):
         """ Fit power law to MSD curves. Should probably be replaced by MLE
         TODO: weighted fit (need to do error analysis first)
 

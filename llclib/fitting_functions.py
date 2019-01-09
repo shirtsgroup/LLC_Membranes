@@ -3,6 +3,7 @@
 import numpy as np
 from scipy.stats import expon
 from LLC_Membranes.analysis import Poly_fit
+from sympy import mpmath
 
 
 def log_power_law(x, a, alpha):
@@ -118,13 +119,15 @@ def fit_power_law(x, y, cut=1, interactive=True):
     :type y: np.ndarray
     :type cut: float
 
-    :return: Coefficient and exponent in power low of form [coefficient, power]
+    :return: Coefficient and exponent in power law of form [coefficient, power]
     """
 
     end = int(cut * len(x))  # fit up until a fraction, cut, of the trajectory
 
+    nonzero = y.nonzero()
+
     # fit line to linear log plot
-    A = Poly_fit.poly_fit(np.log(x[:end]), np.log(y[:end]), 1)[-1]
+    A = Poly_fit.poly_fit(np.log(x[nonzero]), np.log(y[nonzero]), 1)[-1]
 
     return [np.exp(A[0]), A[1]]
 
@@ -148,3 +151,83 @@ def line(m, x, b):
     """
 
     return m * x + b
+
+
+def zeta(x, alpha):
+    """ Numerical estimate of Hurwitz zeta function. Used as discrete power law
+    distribution normalization constant
+
+    sum from n=0 to infinity of (n + x)^-\alpha
+
+    :param x: point at which to evaluate function
+    :param alpha: exponent of power law
+    :param upper_limit: number of terms used to calculate Hurwitz zeta function (highest value of n above)
+
+    :type x: float
+    :type alpha: float
+    :type upper_limit: int
+
+    :return: evaluation of Hurwitz zeta function at x
+    :rtype: float
+    """
+
+    if type(alpha) is np.ndarray:
+        alpha = alpha[0]
+
+    return float(mpmath.zeta(alpha, a=x))
+
+
+def power_law_discrete_log_likelihood(alpha, x, xmin, minimize=False):
+    """ Calculate log likelihood for alpha given a set of x values that might come from a
+    power law distribution
+
+    :param alpha: power law exponent. Calculates the log-likelihood of this value of alpha
+    for the data
+    :param x: array of values making up emperical distribution
+    :param xmin: lower bound of power law distribution
+    :param upper_limit: number of terms used to calculate zeta function
+
+    :type alpha: float
+    :type x: np.ndarray
+    :type xmin: float
+    :type upper_limit: int
+
+    :return log-likelihood of input parameters
+    :rtype float
+    """
+
+    n = x.size
+    z = zeta(xmin, alpha)
+
+    res = - n * np.log(z) - alpha * sum([np.log(i) for i in x])
+
+    if minimize:
+        return res * - 1
+    else:
+        return res
+
+
+def gaussian_log_likelihood(parameters, data, maximize=False):
+    """ Calculate log-likelihood given parameters and data
+
+    :param parameters: a tuple of form (mean, sigma)
+    :param data: data that might be gaussian
+    :param maximize: if this is true, the opposite sign of the log-likelihood is returned so it can be used in a
+    minimization function (as a way to calculate the maximum)
+
+    :type parameters: tuple
+    :type data: np.ndarray
+    :type maximize: bool
+
+    :return: log-likelihood
+    """
+
+    mean, sigma = parameters  # unpack parameters
+    N = data.size
+
+    L = -0.5 * N * np.log(2 * np.pi * sigma ** 2) - sum([((i - mean) ** 2) / (2 * sigma ** 2) for i in data])
+
+    if maximize:
+        return -L
+    else:
+        return L

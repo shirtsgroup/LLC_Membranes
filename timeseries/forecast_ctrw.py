@@ -5,11 +5,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mdtraj as md
 import ruptures
-from scipy.optimize import curve_fit
+from scipy.optimize import curve_fit, minimize
 from LLC_Membranes.llclib import topology, physical, file_rw, fitting_functions
-from LLC_Membranes.analysis import Poly_fit, p2p
 import tqdm
-from scipy.stats import expon
+from ctrwsim import CTRW
 
 
 def initialize():
@@ -61,95 +60,10 @@ def initialize():
     return parser
 
 
-def autocorrFFT(x):
+def gaussian(points, mean, sigma):
 
-    N = len(x)
-    F = np.fft.fft(x, n=2*N)  # 2*N because of zero-padding
-    PSD = F * F.conjugate()
-    res = np.fft.ifft(PSD)
-    res = (res[:N]).real   # now we have the autocorrelation in convention B
-    n = N*np.ones(N)-np.arange(0, N)  # divide res(m) by (N-m)
-
-    return res / n  # this is the autocorrelation in convention A
-
-
-def msd_fft(x):
-
-    N = len(x)
-    D = np.square(x)
-    D = np.append(D, 0)
-    S2 = autocorrFFT(x)
-    Q = 2*D.sum()
-    S1 = np.zeros(N)
-    for m in range(N):
-      Q = Q-D[m-1]-D[N-m]
-      S1[m] = Q / (N-m)
-
-    return S1-2*S2
-
-
-def gaussian(points, mean, sigma, amplitude):
-    return (amplitude / np.sqrt(2 * np.pi * sigma ** 2)) * np.exp(
+    return (1 / np.sqrt(2 * np.pi * sigma ** 2)) * np.exp(
         -(points - mean) ** 2 / (2 * sigma ** 2))
-
-
-def wait_times(t, A, lam):
-
-    # calculate ecdf
-
-    return A*np.exp(-lam * t)
-
-
-def wait_times_empirical(t, A):
-
-    return A*np.exp(-lambda_empirical * t)
-
-
-def wait_times_cdf(t, lam):
-
-    return 1 - np.exp(-lam * t)
-
-
-def random_dwell_time(lam):
-
-        return -np.log(1 - np.random.uniform()) / lam
-
-
-def cdf(left, right, scale):
-    """ Calculate area under expnonential curve between two x locations """
-    return expon.cdf(right, scale=scale) - expon.cdf(left, scale=scale)
-
-
-def exponential(edges, A, B):
-
-    bin_width = edges[1] - edges[0]  # bin width
-
-    pdf = []
-    for i in range(len(edges) - 1):
-        pdf.append(cdf(edges[i], edges[i + 1], 1/float(B)))
-
-    pdf.append(1 - cdf(0, edges[-1], 1/float(B)))
-
-    return np.array(pdf) * (float(A) / bin_width)
-
-
-def confidence_interval(data, confidence):
-    """ Calculate confidence interval of data
-
-    :param confidence: % confidence
-    :return: error bars
-    """
-
-    lower_confidence = (100 - confidence) / 2
-    upper_confidence = 100 - lower_confidence
-
-    mean_data = data.mean(axis=0)
-
-    error = np.zeros([2, mean_data.size])  # [(lower,upper), number of data points
-    error[0, :] = np.abs(np.percentile(data, lower_confidence, axis=0) - mean_data)  # percent of data below this value
-    error[1, :] = np.percentile(data, upper_confidence, axis=0) - mean_data  # percent of data below this value
-
-    return error
 
 
 class System(object):
@@ -201,7 +115,7 @@ class System(object):
         self.dwell_times = []  # distribution of dwell times
         self.tail_dwells = []
         self.hop_lengths = []
-        self.lambda_distribution = []  # distribution of lambda for poisson process
+        self.alpha_distribution = []  # distribution of alpha for poisson process
         self.hop_sigma_distribution = []  # distribution of standard deviation of hop lengths
 
         self.partition = None  # array telling whether a solute is in the pores or tails. True if in pores, else False
@@ -298,7 +212,7 @@ class System(object):
                                                                  3))
         file_rw.write_gro_pos(coordinates, 'spline.gro', name='K')
 
-    def hops_and_dwells(self, penalty=1, nframes_dwell=10):
+    def hops_and_dwells(self, penalty=0.25, nframes_dwell=10):
         """ Find breakpoints then assemble lists of dwell times and hop lengths. See documentation for Ruptures python
         package: http://ctruong.perso.math.cnrs.fr/ruptures-docs/build/html/index.html for more options that can be
         added
@@ -372,27 +286,30 @@ class System(object):
 
         # Reconstruct bootstrapped distributions by randomly sampling from data
         # keep all bootstrapping data to generate error bars
-        hist_dwell = np.zeros([nboot, nbins + 1])
-        bins_dwell_centered = np.zeros([nboot, nbins + 1])
-        p_dwell = [1, len(self.dwell_times) / (self.nres * self.time[-1])]
+        hist_dwell = np.zeros([nboot, nbins])
         hist_jump = np.zeros([nboot, nbins])
-        bins_jump_centered = np.zeros([nboot, nbins])
 
-        dwell_bin_width = 0
-        hop_bin_width = 0
-        dwell_mean = 0
-        A_dwell = 0  # scaling factor for decaying expontential
-        A_hop = 0
+        hop_mean = 0
 
-        #np.savez_compressed('dwells.npz', dwell_times=self.dwell_times)
-        hist, edges = np.histogram(self.dwell_times, range=(1, 25), bins=25)
-        normalized = hist / len(self.dwell_times)
-        plt.bar(edges[:-1], normalized, 1, align='edge')
+        # Define bins so histograms can be added together
+        bins_dwell = np.linspace(np.min(self.dwell_times), np.amax(list(self.dwell_times) + list(self.tail_dwells)),
+                                 nbins + 1)
+        dwell_bin_width = bins_dwell[1] - bins_dwell[0]
+        bins_dwell_centered = np.array([i + dwell_bin_width/2 for i in bins_dwell[:-1]])
+        bins_hop = np.linspace(np.amin(self.hop_lengths), np.amax(self.hop_lengths), nbins + 1)
+        hop_bin_width = bins_hop[1] - bins_hop[0]
+        bins_hop_centered = np.array([i + hop_bin_width/2 for i in bins_hop[:-1]])
 
-        plt.figure()
-        plt.hist(self.dwell_times, bins=50)
-        plt.show()
-        exit()
+        # plot/save initial distribution
+        # np.savez_compressed('dwells.npz', dwell_times=self.dwell_times)
+        # hist, edges = np.histogram(self.dwell_times, range=(1, 25), bins=25)
+        # normalized = hist / len(self.dwell_times)
+        # plt.bar(edges[:-1], normalized, 1, align='edge')
+        #
+        # plt.figure()
+        # plt.hist(self.dwell_times, bins=50)
+        # plt.show()
+        # exit()
 
         i = 0
         while i < nboot:
@@ -404,102 +321,127 @@ class System(object):
                 # Recreate dwell time distribution by randomly choosing from all dwell times with replacement
                 dwell_times_boot = np.random.choice(self.dwell_times, size=len(self.dwell_times), replace=True)
 
-                # Define edges of histogram
-                edges = np.linspace(min(dwell_times_boot), max(dwell_times_boot), nbins + 1)
-
                 # Add long dwell times randomly selected from beginning and end of trajectory
                 tail_dwells = self.tail_dwells[np.where(self.tail_dwells > max(dwell_times_boot))[0]]
-                dwell_times_boot = np.concatenate((np.random.choice(tail_dwells, size=len(tail_dwells), replace=True),
-                                                  dwell_times_boot))
 
-                # bin the bins
-                bins = np.digitize(dwell_times_boot, edges)
-                hist_dwell[i, :], bins_dwell = np.histogram(bins, nbins + 1)
+                # add new tail dwells if there are any
+                try:
+                    dwell_times_boot = np.concatenate((np.random.choice(tail_dwells, size=len(tail_dwells),
+                                                                        replace=True), dwell_times_boot))
+                except ValueError:
+                    pass
 
-                bin_width = edges[1] - edges[0]
+                # Maximum likelihood estimate of alpha
+                args = (dwell_times_boot, int(min(dwell_times_boot)), True)  # (dwell times, xmin, maximize = True)
+                maximum = minimize(fitting_functions.power_law_discrete_log_likelihood, 1.5, args=args,
+                                   bounds=[(1.01, 3)]).x[0]
 
-                bins_dwell_centered[i, :] = np.array([edges[i] + bin_width / 2 for i in range(len(edges))])
+                self.alpha_distribution.append(maximum - 1)
 
-                p_guess = [1.5, hist_dwell[i, np.argmin(np.abs(1 - edges))]]
-                bounds = [[1, 0], [2, np.inf]]
-
-                A, alpha = fitting_functions.fit_power_law(bins_dwell_centered[i, :], hist_dwell[i, :])
-
-                # solp_dwell, cov_x = curve_fit(fitting_functions.powerlaw_integrated, edges, hist_dwell[i, :], p_guess,
-                #                              bounds=bounds)
-
-                # plot individual fit
-                # alpha, A = solp_dwell
-                # print(alpha, A)
-                # alpha = 1.5
-                # A = hist_dwell[i, 0] / (min(dwell_times_boot) + (bin_width/2))**-alpha
+                # Graphical representation of log-likelihood maximization
+                # ll = []  # list of log-likelihoods for each alpha tested
+                # alphas = np.linspace(1.01, 3, 100)
+                # for a in alphas:
+                #     ll.append(fitting_functions.power_law_discrete_log_likelihood(a, dwell_times_boot, 1))
                 #
-                # pdf = fitting_functions.powerlaw_integrated(edges, alpha, A)
+                # plt.plot(alphas, ll)
+                # plt.show()
+
+                if plot:
+
+                    # bin the bins
+                    hist_dwell[i, :], _ = np.histogram(dwell_times_boot, bins_dwell, normed=True)
+
+                # Fit a line to log-log plot of dwell time distribution and compare it to MLE plot
+                # _, alpha = fitting_functions.fit_power_law(np.array(bins_dwell_centered), hist_dwell[i, :])
                 #
-                # plt.bar(edges, pdf, bin_width, align='edge')
-                # print(hist_dwell[i, 0], A, min(dwell_times_boot), bin_width)
-
-                plt.bar(edges, hist_dwell[i, :] / bin_width, bin_width, align='edge')
-                plt.plot(bins_dwell_centered[i, :], A*bins_dwell_centered[i, :]**(-alpha), color='black')
-                plt.show()
-                exit()
-
-                self.lambda_distribution.append(solp_dwell[1])
+                # plt.plot(bins_dwell_centered, bins_dwell_centered ** alpha, color='blue', linewidth=3,
+                #          label=r'$\alpha$=%.2f (LS)' % -alpha)
+                #
+                # # compare MLE to Least squares estimate
+                # plt.bar(bins_dwell_centered, hist_dwell[i, :], dwell_bin_width, align='center')
+                # plt.plot(bins_dwell_centered, bins_dwell_centered ** - maximum, color='red',
+                #          linewidth=3, label=r'$\alpha$=%.2f (MLE)' % maximum)
+                # plt.legend(fontsize=14)
+                # plt.xlabel('Dwell Time (Frames)', fontsize=14)
+                # plt.ylabel('Probability', fontsize=14)
+                # plt.gcf().get_axes()[0].tick_params(labelsize=14)
+                # plt.tight_layout()
+                # plt.show()
+                # exit()
 
                 # jump lengths
                 hop_lengths_boot = np.random.choice(self.hop_lengths, size=len(self.hop_lengths), replace=True)
-                hist_jump[i, :], bins_jump = np.histogram(hop_lengths_boot, bins=nbins)
-                bins_jump_centered[i, :] = np.array([(bins_jump[i + 1] + bins_jump[i])/2 for i in
-                                                     range(len(hist_jump[i, :]))])
-                p_hops = [np.mean(hist_jump[i, :]), np.std(hist_jump[i, :]), 1]
-                solp_hops, cov_x = curve_fit(gaussian, bins_jump_centered[i, :], hist_jump[i, :], p_hops)
 
-                self.hop_sigma_distribution.append(np.abs(solp_hops[1]))  # sometime curve_fit finds negative answer
+                if plot:
 
-                # if np.abs(solp_hops[1]) > 2:
-                #     plt.hist(hist_jump[i, :], bins=25)
-                #     plt.show()
+                    hist_jump[i, :], _ = np.histogram(hop_lengths_boot, bins_hop, normed=True)
+
+                # Maximum likelihood estimate of mean and sigma of hop length distribution
+                # args = (hop_lengths_boot, True)  # (hop_lengths times, maximize = True)
+                # guess = np.array([np.mean(hop_lengths_boot), np.std(hop_lengths_boot)])
+                # hop_mle = minimize(fitting_functions.gaussian_log_likelihood, guess, args=args,
+                #                    bounds=[[-np.inf, np.inf], [0, np.inf]]).x
+
+                hop_mle = [np.mean(hop_lengths_boot), np.std(hop_lengths_boot)]  # mean and std are mle estimates
+
+                # least squares fit of gaussian to data
+                # p_hops = [np.mean(hop_lengths_boot), np.std(hop_lengths_boot)]
+                # solp_hops, cov_x = curve_fit(gaussian, bins_hop_centered, hist_jump[i, :], p_hops,
+                #                              bounds=([-np.inf, 0], [np.inf, np.inf]))
+                #
+                # mean_mle, sigma_mle = hop_mle
+                # mean_ls, sigma_ls = solp_hops
+                #
+                # plt.bar(bins_hop_centered, hist_jump[i, :], hop_bin_width)
+                # x = np.linspace(min(hop_lengths_boot), max(hop_lengths_boot), 500)
+                # plt.plot(x, gaussian(x, mean_ls, sigma_ls), label='$\sigma$=%.3f nm (LS)' % sigma_ls, color='blue',
+                #          linewidth=2)
+                # plt.plot(x, gaussian(x, mean_mle, sigma_mle), label='$\sigma$=%.3f nm (MLE)' % sigma_mle, color='red',
+                #          linewidth=2)
+                # plt.legend(fontsize=14)
+                # plt.xlabel('Hop length (z-direction, nm)', fontsize=14)
+                # plt.ylabel('Probability', fontsize=14)
+                # plt.gcf().get_axes()[0].tick_params(labelsize=14)
+                # plt.tight_layout()
+                # plt.show()
+                # exit()
+
+                self.hop_sigma_distribution.append(hop_mle[1])
 
                 # Things for plotting
+                if plot:
 
-                dwell_bin_width += bins_dwell_centered[i, 2] - bins_dwell_centered[i, 1]
-                hop_bin_width += bins_jump_centered[i, 1] - bins_jump_centered[i, 0]
-                A_dwell += solp_dwell[0]*solp_dwell[1]
-                dwell_mean += solp_hops[0]
-                A_hop += solp_hops[2]
+                    hop_mean += hop_mle[0]
 
-                i += 1
-
+                i += 1  # probably can go back to loop since using MLE
             except RuntimeError:  # sometimes bootstrapping gives unfittable data
                 continue
 
-        dwell_bin_width /= nboot
-        hop_bin_width /= nboot
-        dwell_mean /= nboot
-        A_dwell /= nboot
-        A_hop /= nboot
+        hop_mean /= nboot
 
         if plot:
 
             fig, ax = plt.subplots(2, 2, figsize=(12, 8))
 
-            ax[0, 0].bar(bins_dwell_centered.mean(axis=0), hist_dwell.mean(axis=0),
-                         width=dwell_bin_width, align='edge')
+            ax[0, 0].bar(bins_dwell_centered, hist_dwell.mean(axis=0), width=dwell_bin_width, align='center')
             ax[0, 0].set_xlabel('Dwell Time (ns)', fontsize=14)
             ax[0, 0].set_ylabel('Frequency', fontsize=14)
-            ax[0, 0].plot(bins_dwell_centered.mean(axis=0), wait_times(bins_dwell_centered.mean(axis=0), A_dwell,
-                    np.mean(self.lambda_distribution)), '--', color='black', label='$\lambda_{fit}$ = %.3f $\pm$ %.3f'
-                    'ns$^{-1}$' % (np.mean(self.lambda_distribution), np.std(self.lambda_distribution)))
+
+            ax[0, 0].plot(bins_dwell_centered, bins_dwell_centered ** -(1 + np.mean(self.alpha_distribution)),
+                          '--', color='black', label=r'$\alpha_{fit}$ = %.3f $\pm$ %.3f ns$^{-1}$' %
+                          (np.mean(self.alpha_distribution), np.std(self.alpha_distribution)))
             ax[0, 0].legend(fontsize=12)
 
-            ax[0, 1].hist(self.lambda_distribution, bins=nbins)
-            ax[0, 1].set_xlabel('Bootstrapped $\lambda$ (ns$^{-1}$)', fontsize=14)
+            ax[0, 1].hist(self.alpha_distribution, bins=nbins)
+            ax[0, 1].set_xlabel(r'Bootstrapped $\alpha$ (ns$^{-1}$)', fontsize=14)
             ax[0, 1].set_ylabel('Frequency', fontsize=14)
 
-            ax[1, 0].bar(bins_jump_centered.mean(axis=0), hist_jump.mean(axis=0), width=hop_bin_width)
-            ax[1, 0].plot(bins_jump_centered.mean(axis=0), gaussian(bins_jump_centered.mean(axis=0), dwell_mean,
-                    np.mean(self.hop_sigma_distribution), A_hop), '--', label='Gaussian fit\n $\sigma$=%.2f $\pm$ %.2f '
-                    'nm' % (np.mean(self.hop_sigma_distribution), np.std(self.hop_sigma_distribution)), color='black')
+            ax[1, 0].bar(bins_hop_centered, hist_jump.mean(axis=0), width=hop_bin_width)
+            ax[1, 0].plot(bins_hop_centered, gaussian(bins_hop_centered, hop_mean, np.mean(self.hop_sigma_distribution))
+                          , '--', label='Gaussian fit\n $\sigma$=%.2f $\pm$ %.2f nm' %
+                          (np.mean(self.hop_sigma_distribution), np.std(self.hop_sigma_distribution)), color='black')
+
             ax[1, 0].set_xlabel('Hop Length ($z$-direction, nm)', fontsize=14)
             ax[1, 0].set_ylabel('Frequency', fontsize=14)
             ax[1, 0].legend(fontsize=12)
@@ -511,169 +453,6 @@ class System(object):
             plt.tight_layout()
 
             plt.show()
-
-
-class CTRW(object):
-
-    def __init__(self, nhops, dwell_lambdas, hop_sigmas, ntrials):
-
-        self.dwell_lambdas = dwell_lambdas
-        self.hop_sigmas = hop_sigmas
-        self.nhops = nhops
-        self.ntrials = ntrials
-
-        self.trajectories = np.zeros([self.ntrials, self.nhops, 2])  # last dimension is [time, z_position]
-        self.trajectory_hops = np.zeros([self.ntrials, 2*self.nhops - 1, 2])
-        self.time_uniform = np.zeros([self.nhops])
-        self.z_interpolated = np.zeros([self.ntrials, self.nhops])  # separate from time_uniform to save memory
-        self.msd = np.zeros([self.ntrials, self.nhops])
-        self.bootstrapped_msd = None
-        self.yfit = None
-        self.startfit = 0
-        self.endfit = -1
-        self.D = 0
-
-    def generate_trajectories(self):
-
-        print('Generating Trajectories...')
-        for i in tqdm.tqdm(range(self.ntrials)):
-            # constrain mean of hop-length distribution to be zero
-            z_position = np.cumsum(np.random.normal(loc=0, scale=np.random.choice(self.hop_sigmas), size=self.nhops))
-            self.trajectories[i, :, 1] = z_position - z_position[0]  # make initial z equal to 0
-
-            time = np.zeros([self.nhops])
-            lambda_trial = np.random.choice(self.dwell_lambdas)
-            for j in range(1, self.nhops):  # make initial time equal to 0
-                time[j] = random_dwell_time(lambda_trial)  # hop at random time intervals according to poisson process
-            time = np.cumsum(time)
-            self.trajectories[i, :, 0] = time
-
-            self.trajectory_hops[i, 1::2, 0] = time[1:]
-            self.trajectory_hops[i, 2::2, 0] = time[1:]
-
-            self.trajectory_hops[i, ::2, 1] = self.trajectories[i, :, 1]
-            self.trajectory_hops[i, 1:-1:2, 1] = self.trajectories[i, :-1, 1]
-            self.trajectory_hops[i, -1, 1] = self.trajectories[i, -1, 1]
-
-        print('Interpolating Trajectories...')
-        # make uniform time intervals with the same interval for each simulated trajectory
-        max_time = np.min(self.trajectories[:, -1, 0])
-        self.time_uniform = np.linspace(0, max_time, self.nhops)
-        for t in tqdm.tqdm(range(self.ntrials)):
-            for i, x in enumerate(self.time_uniform):
-                time_index = np.argmin(np.abs(x - self.trajectories[t, :, 0]))
-                if x - self.trajectories[t, time_index, 0] < 0:
-                    time_index -= 1
-                self.z_interpolated[t, i] = self.trajectories[t, time_index, 1]
-
-    def calculate_msd(self):
-        """ Calculate the mean squared displacement for each CTRW trajectory
-
-        """
-        print('Computing mean squared displacement of each simulated trajectory')
-        for t in tqdm.tqdm(range(self.ntrials)):
-            self.msd[t, :] = msd_fft(self.z_interpolated[t, :])
-
-    def plot_trajectory(self, n, show=False, save=True, savename='ctrw_trajectory.pdf'):
-        """ Plot a CTRW trajectory
-
-        :param n: Trajectory number
-        """
-
-        plt.figure()
-        # plt.plot(self.trajectory_hops[n, :, 0] / 1000000, self.trajectory_hops[n, :, 1], linewidth=2)
-        plt.plot(self.trajectories[n, :, 0] / 1000000, self.trajectories[n, :, 1], linewidth=2)
-        plt.gcf().get_axes()[0].tick_params(labelsize=14)
-        plt.xlabel('Time (ms)', fontsize=14)
-        plt.ylabel('$z$-coordinate (nm)', fontsize=14)
-        plt.tight_layout()
-
-        if show:
-            plt.show(block=True)
-        if save:
-            plt.savefig(savename)
-
-    def fit_msd(self, start=0, end=-1):
-        """Interactively fit a line to the mean squared displacement curve
-
-        """
-
-        self.startfit = start
-        self.endfit = end
-        dt = self.time_uniform[1] - self.time_uniform[0]
-
-        plt.figure(2)
-        fit = 0
-        while fit == 0:
-
-            self.yfit = Poly_fit.poly_fit(self.time_uniform[self.startfit:self.endfit],
-                                                      self.msd.mean(axis=0)[self.startfit:self.endfit], 1)[0]
-
-            plt.plot(self.time_uniform[self.startfit:self.endfit], self.yfit, '--', color='black', label='Linear Fit')
-            plt.plot(self.time_uniform, self.msd.mean(axis=0), label='MSD')
-
-            plt.ylabel('MSD ($nm^2$)', fontsize=14)
-            plt.xlabel('time (ns)', fontsize=14)
-            plt.gcf().get_axes()[0].tick_params(labelsize=14)
-            plt.legend(loc=2)
-            plt.tight_layout()
-            plt.ion()
-            plt.show()
-            fit = int(input("Type '1' if the fit looks good: "))
-            if fit != 1:
-                print('Press enter to following prompts to leave as is')
-                self.startfit = float(input("Time to start fit (ns): ") or self.startfit)
-                self.endfit = float(input("Time to stop fit (ns): ") or self.endfit)
-                self.startfit = int(self.startfit / dt)  # convert time to index in t.time
-                self.endfit = int(self.endfit / dt)
-                plt.clf()
-            else:
-                plt.close(2)
-
-    def bootstrap_msd(self, nboot=200):
-
-        # The average MSD is a collective property, so each bootstrap trial should be an average of self.ntrials
-        # ranodomly reconstructed simulated trajectories
-        self.bootstrapped_msd = np.zeros([nboot, self.msd.shape[1]])
-        for i in range(nboot):
-            indices = np.random.choice(self.msd.shape[0], size=self.msd.shape[0], replace=True)
-            self.bootstrapped_msd[i, :] = self.msd[indices, :].mean(axis=0)
-
-        slopes = []
-        for i in range(nboot):
-            A = Poly_fit.poly_fit(self.time_uniform[self.startfit:self.endfit],
-                                  self.bootstrapped_msd[i, self.startfit:self.endfit], 1)[-1]
-            slopes.append(A[1])
-
-        self.D = [np.mean(slopes) / (2*1*10**9), np.std(slopes) / (2*1*10**9)]  # divide by dimension and converted to m^2/s
-
-    def plot_msd(self, CI=95, nerrorbars=50, fracshow=0.5, save=True):
-        """ Plot averaged mean squared displacement with error bars
-
-        :param CI: confidence interval for error bars
-        :param nerrorbars: show this many error bars
-        :param fracshow: fraction of MSD to plot
-        :param save: save the figure and the msd raw data
-
-        :type CI: float
-        :type nerrorbars: int
-        :type fracshow: float between 0 and 1
-        :type save: bool
-
-        """
-
-        plt.figure()
-        error = confidence_interval(self.bootstrapped_msd, CI)
-        plt.errorbar(self.time_uniform, self.msd.mean(axis=0), yerr=error, errorevery=self.msd.shape[1] // nerrorbars,
-                     linewidth=2, elinewidth=2)
-        plt.title('Diffusivity: %1.2e $\pm$ %1.2e m$^2$/s' % (self.D[0], self.D[1]))
-        plt.xlabel('Time (ns)', fontsize=14)
-        plt.ylabel('Mean squared displacement (nm$^2$)', fontsize=14)
-        plt.gcf().get_axes()[0].tick_params(labelsize=14)
-        plt.tight_layout()
-        plt.savefig('msd_ctrw.pdf')
-        np.savez_compressed('msd.npz', msd=self.msd.mean(axis=0), error=error, time=self.time_uniform)
-        plt.show()
 
 
 if __name__ == "__main__":
@@ -689,12 +468,11 @@ if __name__ == "__main__":
         sys = System(args.trajectory, args.gro, args.residue, start=args.begin, end=args.end, step=args.step,
                      ma=args.moving_average)
 
-        sys.plot_random_trajectories(5)
-        exit()
-
         sys.calculate_solute_partition(spline=False, membrane_residue='HII')
 
         sys.hops_and_dwells()
+
+        sys.fit_distributions(nbins=args.nbins, nboot=args.nboot, plot=True)
 
         file_rw.save_object(sys, 'forecast_%s.pl' % args.residue)
 
@@ -704,17 +482,17 @@ if __name__ == "__main__":
     # histogram of time spent in pore region. Kind of interesting
     # plt.hist(np.sum(sys.partition, axis=0) / sys.partition.shape[0], bins=50)
     # plt.show()
+    random_walks = CTRW(1000, 1000, dt=sys.dt)
+    #sys.hop_sigma_distribution = np.array([.26, .27, .28])
+    random_walks.generate_trajectories(fixed_time=True, distributions=(sys.alpha_distribution,
+                                       sys.hop_sigma_distribution), discrete=False, ll=0.1)
+    # Ensemble-averaged MSD
+    random_walks.calculate_msd(ensemble=True)
+    random_walks.bootstrap_msd(fit_power_law=True)
+    random_walks.plot_msd(plot_power_law=True, show=True)
 
-    sys.fit_distributions(nbins=args.nbins, nboot=args.nboot)
+    # Time-averaged MSD
+    # random_walks.calculate_msd()
+    # random_walks.bootstrap_msd(fit_linear=True)
+    # random_walks.plot_msd(plot_linear=True, show=True)
     exit()
-
-    random_walks = CTRW(args.nhops, sys.lambda_distribution, sys.hop_sigma_distribution, 200)
-    random_walks.generate_trajectories()
-    random_walks.calculate_msd()
-    random_walks.fit_msd()
-    random_walks.bootstrap_msd()
-    random_walks.plot_msd()
-    # for i in range(10):
-    #     random_walks.plot_trajectory(i, show=False, save=True, savename='ctrw_trajectory_%d.pdf' % i)
-
-    print('Diffusivity: %1.2e +/- %1.2e m$^2$/s' % (random_walks.D[0], random_walks.D[1]))
