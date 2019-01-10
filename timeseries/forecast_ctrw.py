@@ -482,7 +482,10 @@ if __name__ == "__main__":
     # histogram of time spent in pore region. Kind of interesting
     # plt.hist(np.sum(sys.partition, axis=0) / sys.partition.shape[0], bins=50)
     # plt.show()
-    random_walks = CTRW(1000, 1000, dt=sys.dt)
+
+    random_walks = CTRW(1000, 1000, dt=sys.dt, hop_dist='fbm', dwell_dist='power', H=0.3)
+    #random_walks = CTRW(1000, 1000, dt=sys.dt, hop_dist='gaussian', dwell_dist='power', H=0.3)
+
     #sys.hop_sigma_distribution = np.array([.26, .27, .28])
     random_walks.generate_trajectories(fixed_time=True, distributions=(sys.alpha_distribution,
                                        sys.hop_sigma_distribution), discrete=False, ll=0.1)
@@ -490,9 +493,10 @@ if __name__ == "__main__":
     random_walks.calculate_msd(ensemble=True)
     random_walks.bootstrap_msd(fit_power_law=True)
     random_walks.plot_msd(plot_power_law=True, show=True)
+    exit()
 
     # Time-averaged MSD
-    # random_walks.calculate_msd()
-    # random_walks.bootstrap_msd(fit_linear=True)
-    # random_walks.plot_msd(plot_linear=True, show=True)
+    random_walks.calculate_msd()
+    random_walks.bootstrap_msd(fit_linear=True)
+    random_walks.plot_msd(plot_linear=True, show=True)
     exit()

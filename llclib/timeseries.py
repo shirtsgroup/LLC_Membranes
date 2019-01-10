@@ -68,7 +68,9 @@ def acf(t, largest_prime=500):
 
     autocorr_fxn = ret[length // 2:].real
     autocorr_fxn /= np.arange(T.shape[0], 0, -1)[:, ...]
-    autocorr_fxn /= np.var(T, axis=0)
+
+    if sum(T) != 0:
+        autocorr_fxn /= np.var(T, axis=0)
 
     return autocorr_fxn  # normalized
 
@@ -89,21 +91,29 @@ def autocov(joint_distribution):
 
     :param joint_distribution: n x m numpy array with n independent realizations of a time series consisting of m data
     points (observations) per realization.
+
     :returns autocovariance of joint distribution as function of lag j
 
     """
 
     observations = joint_distribution.shape[1]
     autocov = np.zeros([observations])
+    counts = np.zeros([observations])
 
-    for j in range(observations):
+    for i in range(observations):
 
-        yt_expected_value = joint_distribution[:, -1] - joint_distribution[:, -1].mean()
-        ytlag_expected_value = joint_distribution[:, -j] - joint_distribution[:, -j].mean()
+        yt_expected_value = joint_distribution[:, i] - joint_distribution[:, i].mean()
 
-        autocov[j] = (yt_expected_value * ytlag_expected_value).mean()
+        for j in range(observations):
 
-    return autocov
+            ytlag_expected_value = joint_distribution[:, j] - joint_distribution[:, j].mean()
+
+            autocov[abs(j - i)] += (yt_expected_value * ytlag_expected_value).mean()
+            counts[abs(j - i)] += 1
+
+    acov = autocov / counts
+
+    return acov / np.amax(acov)
 
 
 def autocorrFFT(x):
@@ -237,8 +247,11 @@ def step_autocorrelation(trajectories, axis=0):
     :type axis: int or list
     """
 
-    if len(axis) == 1:
-        axis = axis[0]
+    try:
+        if len(axis) == 1:
+            axis = axis[0]
+    except TypeError:
+        pass
 
     ntraj = trajectories.shape[1]  # number of particles with a trajectory
 

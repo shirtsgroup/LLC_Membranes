@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from LLC_Membranes.analysis import Poly_fit
 from LLC_Membranes.llclib import timeseries, fitting_functions
 import tqdm
-import fbm
+from fbm_fork import fbm
 
 
 def initialize():
@@ -22,15 +22,18 @@ def initialize():
     parser.add_argument('-fdt', '--ftimestep', default=1, type=float, help='Time step between steps in fractional '
                         'brownian motion simulated trajectory (arbitrary units).')
     parser.add_argument('-acf', '--autocorrelation', action="store_true", help='Plot step autocorrelation function')
+    parser.add_argument('-acov', '--autocovariance', action="store_true", help='Plot autocovariance of fractional'
+                                                                               'gaussian noise')
     parser.add_argument('-ensemble', '--ensemble', action="store_true", help='Calculate MSD as ensemble average')
     parser.add_argument('-power_law', '--power_law', action="store_true", help='Fit MSD to a power law')
+    parser.add_argument('-scale', '--scale', default=None, type=float, help='Sigma of hop length distribution')
 
     return parser
 
 
 class FractionalBrownianMotion(object):
 
-    def __init__(self, nsteps, hurst, ntraj=1, length=2, method="daviesharte"):
+    def __init__(self, nsteps, hurst, ntraj=1, length=1, method="daviesharte", scale=None):
         """ Generate trajectories exhibiting fractional brownian motion
 
         :param nsteps: number of steps in trajectory
@@ -44,8 +47,8 @@ class FractionalBrownianMotion(object):
         self.ntraj = ntraj
         self.nsteps = nsteps
 
-        self.fbm = fbm.FBM(self.nsteps, self.hurst, length=length, method=method)
-        self.time = self.fbm.times()
+        self.fbm = fbm.FBM(self.nsteps, self.hurst, length=length, method=method, scale=scale)
+        self.time = fbm.times(self.nsteps, length=length)
 
         self.trajectories = np.zeros([nsteps + 1, ntraj])
 
@@ -56,6 +59,7 @@ class FractionalBrownianMotion(object):
         self.msd = None
         self.fit_parameters = None
         self.acf = None
+        self.acov = None
 
     def plot_fbm(self):
         """ Plot a fractional brownian motion trajectory using parameters in __init__
@@ -148,19 +152,64 @@ class FractionalBrownianMotion(object):
         if show:
             plt.show()
 
+    def step_autocovariance(self):
+        """ Calculate autocovariance of fractional gaussian noise in the trajectories (i.e. the step lengths)
+        """
+
+        self.acov = timeseries.autocov((self.trajectories[1:, :] - self.trajectories[:-1, :]).T)
+
+    def analytical_autocovariance_fbm(self):
+
+        k = np.arange(len(self.time))
+
+        return 0.5 * (np.abs(k - 1) ** (2 * self.hurst) - 2 * k ** (2 * self.hurst) + (k + 1) ** (2 * self.hurst))
+
+    def plot_autocovariance(self, show=False, analytical=True):
+        """ Plot autocovariance function
+
+        :param show: show plot
+        :param analytical: plot analytical autocovariance function for fractional gaussian noise
+
+        :type show: bool
+        :type analytical: bool
+
+        """
+
+        plt.figure()
+
+        plt.plot(self.time[:-1], self.acov, label='Simulated', color='blue', linewidth=3)
+
+        if analytical:
+            plt.plot(self.time, self.analytical_autocovariance_fbm(), label='Analytical', linewidth=1, color='black')
+            plt.legend()
+
+        plt.xlabel('Time Lag', fontsize=14)
+        plt.ylabel('Autocovariance', fontsize=14)
+        plt.gcf().get_axes()[0].tick_params(labelsize=14)
+        plt.tight_layout()
+
+        if show:
+            plt.show()
+
 
 if __name__ == "__main__":
 
     args = initialize().parse_args()
 
     fbm = FractionalBrownianMotion(args.fbmsteps, args.hurst, ntraj=args.nfbmtraj,
-                                   length=(args.ftimestep*args.fbmsteps), method="daviesharte")
+                                   length=(args.ftimestep*args.fbmsteps), method="daviesharte", scale=args.scale)
+
     fbm.calculate_msd(ensemble=args.ensemble)
 
     if args.autocorrelation:
         fbm.step_autocorrelation()
-
-    if args.autocorrelation:
+        print(fbm.acf[:, 1].mean())
         fbm.plot_autocorrelation(show=False)
 
-    fbm.plot_msd(plot_power_law=False)
+    if args.autocovariance:
+        fbm.step_autocovariance()
+        print(fbm.acov[1])
+        fbm.plot_autocovariance(show=False, analytical=False)
+    exit()
+
+    fbm.plot_msd(plot_power_law=args.power_law, show=True)

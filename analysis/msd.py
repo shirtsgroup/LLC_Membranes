@@ -36,6 +36,8 @@ def initialize():
     parser.add_argument('-pr', '--pore_radius', default=1.5, type=float, help='Radius of pores. Anything greater than '
                         'this distance from the pore center will not be included in calculation')
     parser.add_argument('-acf', '--autocorrelation', action="store_true", help='Plot step autocorrelation function')
+    parser.add_argument('-acov', '--autocovariance', action="store_true", help='Plot step autocovariance function')
+    parser.add_argument('-nofit', '--nofit', action="store_true", help='Do not attempt to fit any curve to MSD')
 
     return parser
 
@@ -83,8 +85,9 @@ class Diffusivity(object):
         self.confidence_interval = 0
         self.yfit = None
 
-        # autocorrelation
+        # autocorrelation / autocovariance
         self.acf = None
+        self.acov = None
 
         # initialize results
         self.MSD = None
@@ -377,6 +380,30 @@ class Diffusivity(object):
         if show:
             plt.show()
 
+    def step_autocovariance(self):
+        """ Calculate autocovariance of fractional gaussian noise in the trajectories (i.e. the step lengths)
+        """
+
+        self.acov = timeseries.autocov((self.com[1:, :, self.axis] - self.com[:-1, :, self.axis]).T[0, ...])
+
+    def plot_autocovariance(self, show=True):
+        """ Plot autocovariance function
+
+        :param show: show plot
+
+        :type show: bool
+        """
+
+        plt.figure()
+        plt.plot(self.time[:-1], self.acov, color='blue', linewidth=3)
+        plt.xlabel('Time Lag', fontsize=14)
+        plt.ylabel('Autocovariance', fontsize=14)
+        plt.gcf().get_axes()[0].tick_params(labelsize=14)
+        plt.tight_layout()
+
+        if show:
+            plt.show()
+
 
 if __name__ == "__main__":
 
@@ -407,22 +434,25 @@ if __name__ == "__main__":
 
     D.calculate(ensemble=args.ensemble)
 
-    if args.power_law:
+    if args.power_law and not args.nofit:
         D.bootstrap_power_law(args.nboot)
         D.plot_power_law()
     else:
-        if not args.compare:
+        if not args.compare and not args.nofit:
             D.fit_linear()  # make sure diffusivity is being measured from the linear region of the MSD curve
 
     if args.autocorrelation:
         D.step_autocorrelation()
         D.plot_autocorrelation()
 
+    if args.autocovariance:
+        D.step_autocovariance()
+        D.plot_autocovariance()
+
     D.bootstrap(args.nboot)
-    plt.figure()
     D.plot(args.axis, fracshow=args.fracshow, show=show)
 
-    if not args.power_law:
+    if not args.power_law and not args.nofit:
         print('D = %1.2e +/- %1.2e m^2/s' % (D.Davg, np.abs(D.Davg - D.confidence_interval[0])))
 
     if args.compare:

@@ -9,6 +9,7 @@ from LLC_Membranes.analysis import Poly_fit
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
 import time as timer
+from fbm_fork import fbm
 
 
 def initialize():
@@ -20,6 +21,8 @@ def initialize():
     # if more distributions are included, this will need to be more complicated depending what parameters are needed
     parser.add_argument('-hs', '--hop_sigma', default=1, type=float, help='Standard deviation of gaussian distribution '
                                                                           'used for drawing hop lengths')
+    parser.add_argument('-H', '--hurst', default=0.5, type=float, help='Hurst parameter, used if hops are modeled with '
+                                                                       'fractional brownian motion')
     parser.add_argument('-n', '--noise', default=0, type=float, help='Magnitude of gaussian noise to add to generated'
                                                                      'time series')
     parser.add_argument('-dwell', '--dwell_time_distribution', default='power', help='Functional form of dwell time'
@@ -37,6 +40,7 @@ def initialize():
                         'trajectories. Total length will be steps*dt')
     parser.add_argument('-b', '--nboot', default=200, help='Number of bootstrap trials')
     parser.add_argument('-ul', '--upper_limit', default=None, type=int, help='Upper limit on dwell-time length')
+    parser.add_argument('-acf', '--autocorrelation', action="store_true", help='Plot step autocorrelation function')
 
     # parallelization
     parser.add_argument('-nt', '--nthreads', default=0, type=int, help='Number of threads to use for parallelized '
@@ -48,13 +52,14 @@ def initialize():
 class CTRW(object):
 
     def __init__(self, length, ntraj, hop_dist='gaussian', dwell_dist='power', hop_sigma=1, alpha=0.5, lamb=0.5,
-                 padding=10, dt=1, nt=1):
+                 padding=10, dt=1, nt=1, H=0.5):
         """ Initialize simulation of a continuous time random walk
 
         :param length: length of each simulated trajectory. If you fix the number of steps, this equals the number of
         steps. If you fix the time, the total length of the simulation is length * dt
         :param ntraj: number of independent trajectories to generate
-        :param hop_dist: Name of probability distribution function used to generate random hop lengths
+        :param hop_dist: Method used to generate random hop lengths. "gaussian" draws randomly from a gaussian
+        distribution, while "fbm" generates correlated hops as in fractional brownian motion.
         :param dwell_dist: Name of probability distribution function used to generate random dwell times
         :param hop_sigma: Sigma for Gaussian hop_dist random draws
         :param alpha: Anomalous exponent for power law random draws
@@ -62,6 +67,8 @@ class CTRW(object):
         :param padding: multiplies number of discrete time points used to interpolate trajectories
         :param dt: time step for fixed time simulations
         :param nt: number of threads to use where parallelized
+        :param H: Hurst parameter for fractional brownian motion. Equals 2*alpha for pure FBM. For H < 0.5, trajectories
+        are subdiffusive, when H = 0.5, brownian motion is recovered.
 
         :type length: int
         :type ntraj: int
@@ -73,6 +80,7 @@ class CTRW(object):
         :type padding: int
         :type dt: float
         :type nt: int
+        :type H: float
         """
 
         self.nsteps = length
@@ -85,6 +93,7 @@ class CTRW(object):
         self.padding = padding
         self.dt = dt
         self.nt = nt
+        self.H = H
 
         self.trajectories = np.zeros([self.ntraj, self.nsteps, 2])
         self.trajectory_hops = np.zeros([self.ntraj, 2 * self.nsteps - 1, 2])  # for visualization
@@ -96,6 +105,7 @@ class CTRW(object):
         self.bootstraps = None
         self.fit_cut = 1
         self.fit_start = 0
+        self.acf = None # autocorrelation function
 
         # Initialize multi-threading
         self.pbar = None
@@ -121,11 +131,11 @@ class CTRW(object):
         """
 
         if fixed_time:
-            self.fixed_time_trajectories(ll=ll, distributions=distributions, discrete=discrete)
+            self.fixed_time_trajectories(ll=ll, distributions=distributions, discrete=discrete, noise=noise)
         else:
             self.fixed_steps_trajectories(noise=noise, nt=self.nt, ll=ll, limit=limit)
 
-    def fixed_time_trajectories(self, ll=1, distributions=None, discrete=False):
+    def fixed_time_trajectories(self, ll=1, distributions=None, discrete=False, noise=0):
         """ Create trajectories of fixed length where dwell times and hop lengths are drawn from the appropriate
         distributions.
 
@@ -168,9 +178,15 @@ class CTRW(object):
 
             time = np.cumsum(time)
 
-            if self.hop_distribution == 'gaussian' or self.hop_distribution == 'Gaussian':
+            if self.hop_distribution in ['gaussian', 'Gaussian']:
+
                 z = np.cumsum(np.random.normal(loc=0, scale=self.hop_sigma, size=len(time)))
                 z -= z[0]  # untested
+
+            elif self.hop_distribution in ['fbm', 'fractional', 'fraction_brownian_motion']:
+
+                z = fbm.FBM(len(time), self.H, method="daviesharte", scale=self.hop_sigma).fbm()[:-1]  # automatically inserts zero at beginning of array
+
             else:
                 sys.exit('Please enter a valid hop distance probability distribution')
 
@@ -183,12 +199,16 @@ class CTRW(object):
             # trajectory_hops[::2, 1] = z
             # trajectory_hops[1:-1:2, 1] = z[:-1]
             # trajectory_hops[-1, 1] = z[-1]
+            # plt.plot(trajectory_hops[:, 0], trajectory_hops[:, 1])
+            # plt.show()
+            # exit()
 
             # make uniform time intervals with the same interval for each simulated trajectory
             self.z_interpolated[t, :] = z[np.digitize(self.time_uniform, time, right=False) - 1]
 
         self.time_uniform *= self.dt
-        # plt.plot(self.time_uniform, self.z_interpolated[0, :])
+        # plt.plot(trajectory_hops[:, 0]*self.dt, trajectory_hops[:, 1])
+        # plt.plot(self.time_uniform, self.z_interpolated[-1, :])
         # plt.show()
         # exit()
 
@@ -281,10 +301,6 @@ class CTRW(object):
         print('Calculating MSD...', end='', flush=True)
         start = timer.time()
         self.msd = timeseries.msd(self.z_interpolated.T[..., np.newaxis], 0, ensemble=ensemble, nt=self.nt).T
-        #plt.hist(self.msd[:, -1], range=(0, 10))
-        plt.plot(self.msd.mean(axis=0))
-        plt.show()
-        exit()
         print('Done in %.3f seconds' % (timer.time() - start))
 
     def plot_trajectory(self, n, show=False, save=True, savename='ctrw_trajectory.pdf'):
@@ -440,17 +456,49 @@ class CTRW(object):
         if show:
             plt.show()
 
+    def step_autocorrelation(self):
+        """ Calculate autocorrelation of step length and direction
+        """
+
+        self.acf = timeseries.step_autocorrelation(self.z_interpolated.T[..., np.newaxis])
+
+    def plot_autocorrelation(self, show=True):
+        """ Plot autocorrelation function
+
+        :param show: show plot
+
+        :type show: bool
+
+        :return:
+        """
+
+        plt.figure()
+        plt.plot(self.time_uniform[:self.acf.shape[1]], self.acf.mean(axis=0))
+        plt.xlabel('Time', fontsize=14)
+        plt.ylabel('Autocorrelation', fontsize=14)
+        plt.gcf().get_axes()[0].tick_params(labelsize=14)
+        plt.tight_layout()
+
+        if show:
+            plt.show()
+
 
 if __name__ == "__main__":
 
     args = initialize().parse_args()
     np.random.seed(1)
     ctrw = CTRW(args.steps, args.ntraj, hop_dist=args.hop_length_distribution, dwell_dist=args.dwell_time_distribution,
-                hop_sigma=args.hop_sigma, alpha=args.alpha, dt=args.dt, nt=args.nthreads)
+                hop_sigma=args.hop_sigma, alpha=args.alpha, dt=args.dt, nt=args.nthreads, H=args.hurst)
     ctrw.generate_trajectories(fixed_time=args.fix_time, noise=args.noise, limit=args.upper_limit)
     ctrw.calculate_msd(ensemble=args.ensemble)
     ctrw.bootstrap_msd(nboot=args.nboot, fit_power_law=args.fit_power_law, fit_linear=args.fit_line)
-    ctrw.plot_msd(plot_power_law=args.fit_power_law, plot_linear=args.fit_line, show=False)
+    ctrw.plot_msd(plot_power_law=args.fit_power_law, plot_linear=args.fit_line, show=True)
+
+    if args.autocorrelation:
+        ctrw.step_autocorrelation()
+        ctrw.plot_autocorrelation(show=True)
+
+    exit()
 
     last = ctrw.msd.mean(axis=0)[int(0.5*ctrw.time_uniform.size)]
     CI = stats.confidence_interval(ctrw.bootstraps, 95)[:, int(0.5*ctrw.time_uniform.size)]
