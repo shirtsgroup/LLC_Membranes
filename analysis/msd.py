@@ -311,10 +311,17 @@ class Diffusivity(object):
 
     def plot(self, axis, fracshow=0.5, savedata=False, show=False):
 
+        plt.figure()
         end_frame = int(fracshow * self.time.size)
-        #plt.plot(self.time[self.startfit:self.endfit]/1000, self.yfit, '--', color='black', label='Linear Fit')
-        plt.errorbar(self.time[:end_frame], self.MSD_average[:end_frame], yerr=[self.limits[0, :end_frame],
-                     self.limits[1, :end_frame]], errorevery=self.errorevery, label='MSD')
+
+        plt.plot(self.time[:end_frame], self.MSD_average[:end_frame], label='MSD')
+        plt.fill_between(self.time[:end_frame], self.MSD_average[:end_frame] + self.limits[0, :end_frame],
+                         self.MSD_average[:end_frame] - self.limits[1, :end_frame], alpha=0.7)
+
+        last = self.MSD_average[(end_frame - 1)]
+
+        print('Final frame MSD: %.2f [%.2f, %.2f]' % (last, last - self.limits[1, end_frame - 1],
+                                                      last + self.limits[0, end_frame - 1]))
 
         if savedata:
 
@@ -324,8 +331,6 @@ class Diffusivity(object):
         plt.ylabel('MSD ($nm^2$)', fontsize=14)
         plt.xlabel('time (ns)', fontsize=14)
         plt.gcf().get_axes()[0].tick_params(labelsize=14)
-        #plt.title('D = %1.2e $\pm$ %1.2e $m^{2}/s$' % (self.Davg, np.abs(self.Davg - self.confidence_interval[0])))
-        #plt.legend(loc=2)
         plt.tight_layout()
         plt.savefig('Diffusivity_%s.pdf' % axis)
 
@@ -450,6 +455,11 @@ if __name__ == "__main__":
         D.plot_autocovariance()
 
     D.bootstrap(args.nboot)
+
+    if args.ensemble:
+        args.fracshow = 1  # same amount of statistics at each frame
+
+    show = False
     D.plot(args.axis, fracshow=args.fracshow, show=show)
 
     if not args.power_law and not args.nofit:

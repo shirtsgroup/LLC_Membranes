@@ -161,6 +161,7 @@ class CTRW(object):
                     self.alpha = np.random.choice(distributions[0])
 
                 self.hop_sigma = np.random.choice(distributions[1])
+                self.H = np.random.choice(distributions[2])
 
             time = [0]
             total_time = 0  # saves a lot of time
@@ -184,7 +185,6 @@ class CTRW(object):
                 z -= z[0]  # untested
 
             elif self.hop_distribution in ['fbm', 'fractional', 'fraction_brownian_motion']:
-
                 z = fbm.FBM(len(time), self.H, method="daviesharte", scale=self.hop_sigma).fbm()[:-1]  # automatically inserts zero at beginning of array
 
             else:
@@ -426,6 +426,7 @@ class CTRW(object):
         if self.bootstraps is not None:
             error = stats.confidence_interval(self.bootstraps, confidence)
             plt.fill_between(self.time_uniform, error[1, :] + mean, mean - error[0, :], alpha=0.7)
+            print('Estimated MSD: %.2f [%.2f, %.2f]' % (mean[-1], mean[-1] - error[0, -1], error[1, -1] + mean[-1]))
 
         if plot_power_law:
             fit = self.fit_power_law(self.msd.mean(axis=0))

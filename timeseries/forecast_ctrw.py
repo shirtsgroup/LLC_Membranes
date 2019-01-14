@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import mdtraj as md
 import ruptures
 from scipy.optimize import curve_fit, minimize
-from LLC_Membranes.llclib import topology, physical, file_rw, fitting_functions
+from LLC_Membranes.llclib import topology, physical, file_rw, fitting_functions, timeseries
 import tqdm
 from ctrwsim import CTRW
 
@@ -41,7 +41,7 @@ def initialize():
     parser.add_argument('-nbins', default=25, type=int, help='Number of bins to bin hop and dwell distributions into')
 
     # ctrw simulation
-    parser.add_argument('-n', '--nhops', default=10000, type=int, help='Number of hops to perform')
+    parser.add_argument('-ntsim', '--ntrajsim', default=1000, type=int, help='Number of trajectories to simulate')
 
     # bootstrapping
     parser.add_argument('-nboot', '--nboot', default=200, type=int, help='Number of bootstrap trials to be run')
@@ -115,6 +115,8 @@ class System(object):
         self.dwell_times = []  # distribution of dwell times
         self.tail_dwells = []
         self.hop_lengths = []
+        self.hurst_distribution = []
+        self.hop_acf = None
         self.alpha_distribution = []  # distribution of alpha for poisson process
         self.hop_sigma_distribution = []  # distribution of standard deviation of hop lengths
 
@@ -234,6 +236,8 @@ class System(object):
 
         for j in tqdm.tqdm(range(self.com.shape[1])):
 
+            hop_lengths = []  # hop lengths for this solute
+
             # Get indices where res jumps between regions
             # See https://stackoverflow.com/questions/36894822/how-do-i-identify-sequences-of-values-in-a-boolean-array
             switch_points = np.argwhere(np.diff(self.partition[:, j])).squeeze().tolist()
@@ -264,30 +268,41 @@ class System(object):
                         self.dwell_times.append(bp[k + 1] - bp[k])  # discrete form
 
                         if k > 0:  # need two different z coordinates to get a hop length
-                            self.hop_lengths.append(np.mean(self.com[bp[k]:bp[k + 1], j, 2]) -
+                            hop_lengths.append(np.mean(self.com[bp[k]:bp[k + 1], j, 2]) -
                                                     np.mean(self.com[bp[k - 1]:bp[k], j, 2]))
                 try:
                     begin = switch_points[2*i + 1]
                 except IndexError:
                     pass
 
+            self.hop_lengths.append(hop_lengths)
+
         self.tail_dwells = np.array(initial_dwells + final_dwells)
 
-    def fit_distributions(self, nbins=25, plot=True, nboot=200):
+    def fit_distributions(self, nbins=25, plot=True, nboot=200, show=False, save=True):
         """ Fit curves to dwell time and hop length distributions
 
         :param nbins: number of bins in histograms
-        :param plot: show the plots of the averaged distributions and bootstrapped parameter estimates
+        :param plot: make plots of the averaged distributions and bootstrapped parameter estimates
         :param nboot: number of bootstrap trials
-        :param min_pl: minimum histogram value for power law (can't be zero)
+        :param show: show plot of bootstrapped distributions
+        :param save: save plot of bootstrapped distributions
 
-        :return:
+        :type nbins: int
+        :type plot: bool
+        :type nboot: int
+        :type show: bool
+        :type save: bool
         """
 
         # Reconstruct bootstrapped distributions by randomly sampling from data
         # keep all bootstrapping data to generate error bars
         hist_dwell = np.zeros([nboot, nbins])
         hist_jump = np.zeros([nboot, nbins])
+
+        all_hops = []
+        for i in self.hop_lengths:
+            all_hops += i
 
         hop_mean = 0
 
@@ -296,7 +311,7 @@ class System(object):
                                  nbins + 1)
         dwell_bin_width = bins_dwell[1] - bins_dwell[0]
         bins_dwell_centered = np.array([i + dwell_bin_width/2 for i in bins_dwell[:-1]])
-        bins_hop = np.linspace(np.amin(self.hop_lengths), np.amax(self.hop_lengths), nbins + 1)
+        bins_hop = np.linspace(np.amin(all_hops), np.amax(all_hops), nbins + 1)
         hop_bin_width = bins_hop[1] - bins_hop[0]
         bins_hop_centered = np.array([i + hop_bin_width/2 for i in bins_hop[:-1]])
 
@@ -371,7 +386,7 @@ class System(object):
                 # exit()
 
                 # jump lengths
-                hop_lengths_boot = np.random.choice(self.hop_lengths, size=len(self.hop_lengths), replace=True)
+                hop_lengths_boot = np.random.choice(all_hops, size=len(all_hops), replace=True)
 
                 if plot:
 
@@ -452,7 +467,44 @@ class System(object):
 
             plt.tight_layout()
 
-            plt.show()
+            if save:
+                plt.savefig('hop_dwell_distribution.pdf')
+
+            if show:
+                plt.show()
+
+    def estimate_hurst(self, nboot=200):
+
+        max_hops = max([len(x) for x in self.hop_lengths])
+
+        acf = np.zeros([len(self.hop_lengths), max_hops])
+
+        keep = []  # list to hold indices of trajectories with a non-zero amount of hops
+        for i in range(len(self.hop_lengths)):
+            hops = self.hop_lengths[i]
+            if len(hops) != 0:
+                acf[i, :len(self.hop_lengths[i])] = timeseries.acf(self.hop_lengths[i])
+                keep.append(i)
+
+        acf = acf[keep, :]
+        ntraj = len(keep)
+
+        self.hop_acf = [acf[np.nonzero(acf[:, i]), i].mean() for i in range(max_hops)]
+
+        for b in range(nboot):
+
+            traj = np.random.randint(0, ntraj, size=ntraj)
+
+            hboot = acf[traj, 1].mean()
+
+            # temporary workaround until THF gets more data points
+            # H = np.log(2 * hboot + 2) / (2 * np.log(2))
+            #
+            # if H > 0:
+            #
+            #     self.hurst_distribution.append(H)
+
+            self.hurst_distribution.append(np.log(2 * hboot + 2) / (2 * np.log(2)))
 
 
 if __name__ == "__main__":
@@ -474,6 +526,8 @@ if __name__ == "__main__":
 
         sys.fit_distributions(nbins=args.nbins, nboot=args.nboot, plot=True)
 
+        sys.estimate_hurst()
+
         file_rw.save_object(sys, 'forecast_%s.pl' % args.residue)
 
     # sys.hops_and_dwells(penalty=1)
@@ -483,16 +537,17 @@ if __name__ == "__main__":
     # plt.hist(np.sum(sys.partition, axis=0) / sys.partition.shape[0], bins=50)
     # plt.show()
 
-    random_walks = CTRW(1000, 1000, dt=sys.dt, hop_dist='fbm', dwell_dist='power', H=0.3)
+    # simulate ntrajsim trajectories for same length as MD
+    random_walks = CTRW(len(sys.time), args.ntrajsim, dt=sys.dt, hop_dist='fbm', dwell_dist='power')
     #random_walks = CTRW(1000, 1000, dt=sys.dt, hop_dist='gaussian', dwell_dist='power', H=0.3)
 
     #sys.hop_sigma_distribution = np.array([.26, .27, .28])
     random_walks.generate_trajectories(fixed_time=True, distributions=(sys.alpha_distribution,
-                                       sys.hop_sigma_distribution), discrete=False, ll=0.1)
+                                       sys.hop_sigma_distribution, sys.hurst_distribution), discrete=False, ll=0.1)
     # Ensemble-averaged MSD
     random_walks.calculate_msd(ensemble=True)
     random_walks.bootstrap_msd(fit_power_law=True)
-    random_walks.plot_msd(plot_power_law=True, show=True)
+    random_walks.plot_msd(plot_power_law=True, show=False)
     exit()
 
     # Time-averaged MSD

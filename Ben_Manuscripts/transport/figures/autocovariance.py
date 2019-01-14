@@ -10,6 +10,7 @@ Hurst parameter estimation
 def autocovariance(H, length):
 
 	k = np.arange(length)
+	print(k)
 
 	return 0.5*(np.abs(k - 1)**(2*H) - 2*k**(2*H) + (k + 1)**(2*H))
 

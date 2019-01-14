@@ -12,6 +12,9 @@ def confidence_interval(data, confidence):
     :return: Upper and lower bounds to confidence intervals. Readily plotted with plt.errorbar
     """
 
+    if type(data) is list:
+        data = np.array(data)
+
     lower_confidence = (100 - confidence) / 2
     upper_confidence = 100 - lower_confidence
 

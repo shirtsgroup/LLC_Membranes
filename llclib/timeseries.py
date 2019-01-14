@@ -75,7 +75,7 @@ def acf(t, largest_prime=500):
     return autocorr_fxn  # normalized
 
 
-def autocov(joint_distribution):
+def autocov(joint_distribution, varied_length=False):
 
     """ Calculate the autocovariance function of the joint distribution of multiple realizations of a time series model
 
@@ -102,16 +102,35 @@ def autocov(joint_distribution):
 
     for i in range(observations):
 
-        yt_expected_value = joint_distribution[:, i] - joint_distribution[:, i].mean()
+        nonzero = np.nonzero(joint_distribution[:, i])
+        yt_expected_value = joint_distribution[nonzero, i] - joint_distribution[nonzero, i].mean()
 
         for j in range(observations):
 
-            ytlag_expected_value = joint_distribution[:, j] - joint_distribution[:, j].mean()
+            nonzero = np.nonzero(joint_distribution[:, j])
+            ytlag_expected_value = joint_distribution[nonzero, j] - joint_distribution[nonzero, j].mean()
 
             autocov[abs(j - i)] += (yt_expected_value * ytlag_expected_value).mean()
             counts[abs(j - i)] += 1
 
     acov = autocov / counts
+
+    # observations = joint_distribution.shape[1]
+    # autocov = np.zeros([observations])
+    # counts = np.zeros([observations])
+    #
+    # for i in range(observations):
+    #
+    #     yt_expected_value = joint_distribution[:, i] - joint_distribution[:, i].mean()
+    #
+    #     for j in range(observations):
+    #
+    #         ytlag_expected_value = joint_distribution[:, j] - joint_distribution[:, j].mean()
+    #
+    #         autocov[abs(j - i)] += (yt_expected_value * ytlag_expected_value).mean()
+    #         counts[abs(j - i)] += 1
+    #
+    # acov = autocov / counts
 
     return acov / np.amax(acov)
 

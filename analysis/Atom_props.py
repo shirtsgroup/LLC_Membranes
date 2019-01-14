@@ -184,6 +184,7 @@ mass['MW'] = 0.0
 mass['OXT'] = 15.99940
 mass['CA'] = 40.08
 mass['S'] = 32.06
+mass['S1'] = 32.06
 
 # fill in charge dictionary (Used make_dict.py to generate the following list)
 
