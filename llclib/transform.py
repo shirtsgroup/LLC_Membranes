@@ -32,6 +32,16 @@ def slope(pt1, pt2):
     return m
 
 
+def plane_rotation_matrix(n, angle):
+    """ Calculate the rotation matrix required to rotate a plane in 3 dimensions
+
+    :param n: vector normal to plane to be rotated
+    :param angle:
+
+    :return:
+    """
+
+
 def rotateplane(plane, angle=0):
     """
     Calculate a rotation matrix to rotate a plane in 3 dimensions

@@ -231,3 +231,18 @@ def gaussian_log_likelihood(parameters, data, maximize=False):
         return -L
     else:
         return L
+
+
+def hurst_autocovariance(K, H):
+    """ Return the analytical autocovariance of fractional gaussian noise for a given hurst exponent as a function
+    of step number, k
+
+    \gamma(k) = \dfrac{1}{2}[|k-1|^{2H} - 2|k|^{2H} + |k + 1|^{2H}]
+
+    :param K: values of k at which to evaluate autocovariance (only integer values make sense)
+    :param H: hurst exponent
+
+    :return: analytical autocovariance function for fractional gaussian noise
+    """
+
+    return np.array([0.5 * (np.abs(k - 1)**(2*H) - 2 * np.abs(k)**(2*H) + np.abs(k + 1)**(2*H)) for k in K])

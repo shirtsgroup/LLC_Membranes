@@ -105,7 +105,8 @@ class CTRW(object):
         self.bootstraps = None
         self.fit_cut = 1
         self.fit_start = 0
-        self.acf = None # autocorrelation function
+        self.acf = None  # autocorrelation function
+        self.final_msd = None
 
         # Initialize multi-threading
         self.pbar = None
@@ -426,7 +427,8 @@ class CTRW(object):
         if self.bootstraps is not None:
             error = stats.confidence_interval(self.bootstraps, confidence)
             plt.fill_between(self.time_uniform, error[1, :] + mean, mean - error[0, :], alpha=0.7)
-            print('Estimated MSD: %.2f [%.2f, %.2f]' % (mean[-1], mean[-1] - error[0, -1], error[1, -1] + mean[-1]))
+            self.final_msd = [mean[-1], mean[-1] - error[0, -1], error[1, -1] + mean[-1]]
+            print('Estimated MSD: %.2f [%.2f, %.2f]' % (self.final_msd[0], self.final_msd[1], self.final_msd[2]))
 
         if plot_power_law:
             fit = self.fit_power_law(self.msd.mean(axis=0))

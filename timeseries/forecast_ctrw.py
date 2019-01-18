@@ -9,6 +9,8 @@ from scipy.optimize import curve_fit, minimize
 from LLC_Membranes.llclib import topology, physical, file_rw, fitting_functions, timeseries
 import tqdm
 from ctrwsim import CTRW
+import sqlite3 as sql
+import os
 
 
 def initialize():
@@ -119,6 +121,8 @@ class System(object):
         self.hop_acf = None
         self.alpha_distribution = []  # distribution of alpha for poisson process
         self.hop_sigma_distribution = []  # distribution of standard deviation of hop lengths
+        self.breakpoint_penalty = 0
+        self.location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # This script location
 
         self.partition = None  # array telling whether a solute is in the pores or tails. True if in pores, else False
 
@@ -228,6 +232,8 @@ class System(object):
 
         """
 
+        self.breakpoint_penalty = penalty
+
         # Handle initial and final dwell times since they don't have a true beginning or end. If the dwell times are
         # longer than some limit, then they will be included so that we don't miss out on dwells that last on the order
         # of the entire length of the trajectory
@@ -254,7 +260,7 @@ class System(object):
 
                     # movement_3d = np.linalg.norm(self.com[begin:end, j, :], axis=1)  # magnitude of distance travelled
                     bp = ruptures.detection.Binseg(model='l2', min_size=1, jump=1).fit_predict(self.com[begin:end, j, :]
-                                                                                               , pen=penalty)
+                                                   , pen=self.breakpoint_penalty)
                     # ruptures.display(self.com[begin:end, j, :], bp, figsize=(10, 6))
                     # plt.show()
 
@@ -473,7 +479,17 @@ class System(object):
             if show:
                 plt.show()
 
-    def estimate_hurst(self, nboot=200):
+    def estimate_hurst(self, nboot=200, max_k=5):
+        """ Estimate the hurst parameter by fitting the emperical autocovariance function to theory:
+
+        \gamma(k) = \dfrac{1}{2}[|k-1|^{2H} - 2|k|^{2H} + |k + 1|^{2H}]
+
+        :param nboot: number of bootstrap trials used to generate distribution of H's
+        :param max_k: maximum number of time steps to fit in autocovariance function
+
+        :type nboot: int
+        :type max_k: int
+        """
 
         max_hops = max([len(x) for x in self.hop_lengths])
 
@@ -497,14 +513,102 @@ class System(object):
 
             hboot = acf[traj, 1].mean()
 
-            # temporary workaround until THF gets more data points
-            # H = np.log(2 * hboot + 2) / (2 * np.log(2))
-            #
-            # if H > 0:
-            #
-            #     self.hurst_distribution.append(H)
+            H = np.log(2 * hboot + 2) / (2 * np.log(2))  # initial guess at H based on first dip in autocovariance
 
-            self.hurst_distribution.append(np.log(2 * hboot + 2) / (2 * np.log(2)))
+            acf_boot = [acf[traj, i][np.nonzero(acf[traj, i])].mean() for i in range(max_k + 1)]
+
+            h_opt = curve_fit(fitting_functions.hurst_autocovariance, np.arange(max_k + 1), acf_boot[:(max_k + 1)],
+                              p0=H)[0]
+
+            # temporary workaround until THF gets more data points
+            if h_opt > 0:
+
+                self.hurst_distribution.append(h_opt[0])
+
+            #self.hurst_distribution.append(np.log(2 * hboot + 2) / (2 * np.log(2)))
+
+    def update_database(self, file="msd.db", tablename="msd", type='parameters', data=None):
+        """ Update SQL database with information from this run
+
+        :param file: relative path (relative to directory where this script is stored) to database to be updated
+        :param tablename: name of table being modified in database
+        :param type: The type of info to be updated/added to the table. 'parameters' indicates an update to alpha,
+        sigma, hurst, sim_length and mw. 'msds' indicates an update to python_MSD, python_MSD_CI_upper and
+        python_MSD_CI_Lower
+        :param data: data to be filled in if it is not a part of this object. For example, to update python MSDs,
+        include a list with [python_MSD, python_MSD_CI_lower, python_MSD_CI_upper] in that order.
+
+        :type file: str
+        :type tablename: str
+        :type type: str
+        :type data: list
+        """
+
+        connection = sql.connect("%s/%s" % (self.location, file))
+        crsr = connection.cursor()
+
+        alpha = np.mean(self.alpha_distribution)
+        sigma = np.mean(self.hop_sigma_distribution)
+        hurst = np.mean(self.hurst_distribution)
+
+        check_existence = "SELECT COUNT(1) FROM %s WHERE name = '%s' and penalty = %.2f" % (tablename,
+                           self.residue.name, self.breakpoint_penalty)
+
+        output = crsr.execute(check_existence).fetchall()
+
+        if type == 'parameters':
+
+            if output[0][0] == 1:
+
+                update_entry = "UPDATE %s SET alpha = %.2f, sigma = %.2f, hurst = %.2f, sim_length = %.2f, mw = %.2f " \
+                               "WHERE name = '%s' and penalty = %.2f" % (tablename, alpha, sigma, hurst, self.time[-1],
+                                                                         self.residue.mw, self.residue.name,
+                                                                         self.breakpoint_penalty)
+
+                crsr.execute(update_entry)
+
+            else:
+
+                fill_new_entry = "INSERT INTO %s (name, alpha, sigma, hurst, penalty, sim_length, mw) VALUES ('%s', " \
+                                 "%.2f, %.2f, %.2f, %.2f, %.2f, %.2f)" % (tablename, self.residue.name, alpha, sigma,
+                                                                          hurst, self.breakpoint_penalty, self.time[-1],
+                                                                          self.residue.mw)
+
+                crsr.execute(fill_new_entry)
+
+        elif type == 'msd':
+
+            error_message = "You must provide the MSD data to be input into the database in the format " \
+                                    "[python_MSD, python_MSD_CI_lower, python_MSD_CI_upper]"
+
+            if output[0][0] == 1:
+
+                try:
+                    update_entry = "UPDATE %s SET python_MSD = %.2f, python_MSD_CI_lower = %.2f, " \
+                                   "python_MSD_CI_upper = %.2f WHERE name = '%s' and penalty = %.2f" % (tablename, data[0],
+                                    data[1], data[2], self.residue.name, self.breakpoint_penalty)
+                except TypeError:
+                    raise TypeError(error_message)
+                except IndexError:
+                    raise IndexError(error_message)
+
+                crsr.execute(update_entry)
+
+            else:
+
+                try:
+                    fill_new_entry = "INSERT INTO %s (name, python_MSD, python_MSD_CI_lower, python_MSD_CI_upper, " \
+                                     "penalty) VALUES ('%s', %.2f, %.2f, %.2f, %.2f)" % (tablename, self.residue.name,
+                                     data[0], data[1], data[2], self.breakpoint_penalty)
+                except TypeError:
+                    raise TypeError(error_message)
+                except IndexError:
+                    raise IndexError(error_message)
+
+                crsr.execute(fill_new_entry)
+
+        connection.commit()
+        connection.close()
 
 
 if __name__ == "__main__":
@@ -528,8 +632,15 @@ if __name__ == "__main__":
 
         sys.estimate_hurst()
 
+        sys.update_database()
+
         file_rw.save_object(sys, 'forecast_%s.pl' % args.residue)
 
+    sys.update_database()
+    # sys.location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # This script location
+    # sys.breakpoint_penalty = 0.25
+
+    # sys.estimate_hurst()
     # sys.hops_and_dwells(penalty=1)
     # file_rw.save_object(sys, 'forecast_%s.pl' % args.residue)
 
@@ -539,15 +650,14 @@ if __name__ == "__main__":
 
     # simulate ntrajsim trajectories for same length as MD
     random_walks = CTRW(len(sys.time), args.ntrajsim, dt=sys.dt, hop_dist='fbm', dwell_dist='power')
-    #random_walks = CTRW(1000, 1000, dt=sys.dt, hop_dist='gaussian', dwell_dist='power', H=0.3)
 
-    #sys.hop_sigma_distribution = np.array([.26, .27, .28])
     random_walks.generate_trajectories(fixed_time=True, distributions=(sys.alpha_distribution,
                                        sys.hop_sigma_distribution, sys.hurst_distribution), discrete=False, ll=0.1)
     # Ensemble-averaged MSD
     random_walks.calculate_msd(ensemble=True)
     random_walks.bootstrap_msd(fit_power_law=True)
     random_walks.plot_msd(plot_power_law=True, show=False)
+    sys.update_database(type='msd', data=[1000 * (x / sys.time[-1]) for x in random_walks.final_msd])
     exit()
 
     # Time-averaged MSD

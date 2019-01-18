@@ -22,6 +22,9 @@ def acf_slow(d):
     :return: autocorrelation function
     """
 
+    if type(d) is list:
+        d = np.array(d)
+
     # Subtract mean
     d -= d.mean(axis=0)
 
@@ -69,8 +72,7 @@ def acf(t, largest_prime=500):
     autocorr_fxn = ret[length // 2:].real
     autocorr_fxn /= np.arange(T.shape[0], 0, -1)[:, ...]
 
-    if sum(T) != 0:
-        autocorr_fxn /= np.var(T, axis=0)
+    autocorr_fxn /= np.var(T, axis=0)
 
     return autocorr_fxn  # normalized
 

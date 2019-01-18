@@ -45,6 +45,10 @@ class Geometry(object):
         self.nframes = t.n_frames  # total frames in simulation
 
         keep = [a.index for a in t.topology.atoms if a.residue.name == residue]  # keep indices of residue of interest
+
+        if len(keep) == 0:
+            print("Warning: No atoms selected. Did you pass the correct residue name with the -r flag?")
+
         self.xyz = t.xyz[:, keep, :]  # xyz coordinates
 
         self.nres = len(keep) // self.residue.natoms  # number of residues in system
@@ -152,6 +156,31 @@ class Geometry(object):
         # plt.show()
         exit()
 
+    def fit_ellipsoid(self):
+
+        for t in tqdm.tqdm(range(self.nframes)):
+            for r in range(self.nres):
+                coords = self.xyz[t, self.res_ndx[r, :], :]  # coordinates to which we want to fit plane
+
+                # Perform principal component analysis to figure out direction where greatest variance occurs
+                y = (coords - np.mean(coords, axis=0)) * (1 / np.std(coords, axis=0)) # scale so mean is 0 and variance is 1
+                cov = np.cov(y.T)  # covariance matrix
+                eig_vals, eig_vecs = np.linalg.eig(cov)  # eigenvectors are all perpendicular to each other
+                sorted_ = eig_vecs[:, np.argsort(np.abs(eig_vals))[::-1]] # sort eigenvectors based on magnitude of eigen_values
+
+                # Largest 2 eigenvectors define plane
+                # Create rotation matrix that will make plane coplanar with xy plane
+                # Apply same rotation matrix to molecule
+                # Measure variance of points in x, y and z directions
+
+                import matplotlib.pyplot as plt
+                from mpl_toolkits.mplot3d import Axes3D
+
+
+
+                print(eig_vals)
+                exit()
+
     def plot_residue(self, n):
         """ Plot trajectory of geometric properties for a given residue
 
@@ -187,6 +216,9 @@ if __name__ == "__main__":
     args = initialize().parse_args()
 
     mol = Geometry(args.gro, args.trajectory, args.residue)
+
+    mol.fit_ellipsoid()
+    exit()
 
     mol.calculate_planarity(heavy_atoms=False)
 
