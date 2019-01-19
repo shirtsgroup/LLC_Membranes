@@ -44,6 +44,7 @@ def initialize():
 
     # ctrw simulation
     parser.add_argument('-ntsim', '--ntrajsim', default=1000, type=int, help='Number of trajectories to simulate')
+    parser.add_argument('--update', action="store_true", help="update database with all parameters calculated")
 
     # bootstrapping
     parser.add_argument('-nboot', '--nboot', default=200, type=int, help='Number of bootstrap trials to be run')
@@ -498,7 +499,7 @@ class System(object):
         keep = []  # list to hold indices of trajectories with a non-zero amount of hops
         for i in range(len(self.hop_lengths)):
             hops = self.hop_lengths[i]
-            if len(hops) != 0:
+            if len(hops) > 1:
                 acf[i, :len(self.hop_lengths[i])] = timeseries.acf(self.hop_lengths[i])
                 keep.append(i)
 
@@ -632,11 +633,11 @@ if __name__ == "__main__":
 
         sys.estimate_hurst()
 
-        sys.update_database()
+        if args.update:
+            sys.update_database()
 
         file_rw.save_object(sys, 'forecast_%s.pl' % args.residue)
 
-    sys.update_database()
     # sys.location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # This script location
     # sys.breakpoint_penalty = 0.25
 
@@ -649,7 +650,7 @@ if __name__ == "__main__":
     # plt.show()
 
     # simulate ntrajsim trajectories for same length as MD
-    random_walks = CTRW(len(sys.time), args.ntrajsim, dt=sys.dt, hop_dist='fbm', dwell_dist='power')
+    random_walks = CTRW(2000, args.ntrajsim, dt=sys.dt, hop_dist='fbm', dwell_dist='power')
 
     random_walks.generate_trajectories(fixed_time=True, distributions=(sys.alpha_distribution,
                                        sys.hop_sigma_distribution, sys.hurst_distribution), discrete=False, ll=0.1)
@@ -657,7 +658,9 @@ if __name__ == "__main__":
     random_walks.calculate_msd(ensemble=True)
     random_walks.bootstrap_msd(fit_power_law=True)
     random_walks.plot_msd(plot_power_law=True, show=False)
-    sys.update_database(type='msd', data=[1000 * (x / sys.time[-1]) for x in random_walks.final_msd])
+    # sys.update_database(type='msd', data=[1000 * (x / sys.time[-1]) for x in random_walks.final_msd])
+    if args.update:
+        sys.update_database(type='msd', data=random_walks.final_msd)
     exit()
 
     # Time-averaged MSD

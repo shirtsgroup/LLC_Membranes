@@ -8,6 +8,8 @@ from scipy.spatial import distance, ConvexHull
 from scipy.linalg import lstsq
 from LLC_Membranes.llclib import topology
 import tqdm
+import sqlite3 as sql
+import os
 
 
 def initialize():
@@ -19,6 +21,7 @@ def initialize():
                                                                             'must remain whole throughout simulation')
     parser.add_argument('-g', '--gro', default='em.gro', help='Name of .gro coordinate file.')
     parser.add_argument('-r', '--residue', default='ETH', help='Name of residue whose radius we want to calculate')
+    parser.add_argument('--update', action="store_true", help="update database with geometric values")
 
     return parser
 
@@ -60,6 +63,9 @@ class Geometry(object):
         self.radius = None
         self.volume = None
         self.planarity = None
+        self.ellipse_parameters = None
+        self.ellipse_uncertainty = None
+        self.location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # This script location
 
     def calculate_radius(self):
         """ Calculate longest atom-atom distance at each frame of trajectory
@@ -158,28 +164,23 @@ class Geometry(object):
 
     def fit_ellipsoid(self):
 
+        self.ellipse_parameters = np.zeros([self.nframes, self.nres, 3])
+
         for t in tqdm.tqdm(range(self.nframes)):
             for r in range(self.nres):
                 coords = self.xyz[t, self.res_ndx[r, :], :]  # coordinates to which we want to fit plane
 
                 # Perform principal component analysis to figure out direction where greatest variance occurs
-                y = (coords - np.mean(coords, axis=0)) * (1 / np.std(coords, axis=0)) # scale so mean is 0 and variance is 1
-                cov = np.cov(y.T)  # covariance matrix
+                # y = (coords - np.mean(coords, axis=0)) * (1 / np.std(coords, axis=0)) # scale so mean is 0 and variance is 1
+                cov = np.cov(coords.T)  # covariance matrix
                 eig_vals, eig_vecs = np.linalg.eig(cov)  # eigenvectors are all perpendicular to each other
-                sorted_ = eig_vecs[:, np.argsort(np.abs(eig_vals))[::-1]] # sort eigenvectors based on magnitude of eigen_values
 
-                # Largest 2 eigenvectors define plane
-                # Create rotation matrix that will make plane coplanar with xy plane
-                # Apply same rotation matrix to molecule
-                # Measure variance of points in x, y and z directions
+                # Eigenvalues give the actual variance in the direction of the eigenvectors, since data isnt normalized
+                self.ellipse_parameters[t, r, :] = eig_vals[np.argsort(eig_vals)][::-1]**0.5
 
-                import matplotlib.pyplot as plt
-                from mpl_toolkits.mplot3d import Axes3D
-
-
-
-                print(eig_vals)
-                exit()
+        self.ellipse_parameters = self.ellipse_parameters.reshape(self.nframes * self.nres, 3)
+        self.ellipse_uncertainty = self.ellipse_parameters.std(axis=0)
+        self.ellipse_parameters = self.ellipse_parameters.mean(axis=0)
 
     def plot_residue(self, n):
         """ Plot trajectory of geometric properties for a given residue
@@ -210,6 +211,53 @@ class Geometry(object):
         plt.tight_layout()
         plt.show()
 
+    def update_database(self, file="../timeseries/msd.db", tablename="msd", type='ellipse'):
+        """ Update SQL database with information from this run
+
+        :param file: relative path (relative to directory where this script is stored) to database to be updated
+        :param tablename: name of table being modified in database
+        :param type: The type of info to be updated/added to the table. 'parameters' indicates an update to alpha,
+        sigma, hurst, sim_length and mw. 'msds' indicates an update to python_MSD, python_MSD_CI_upper and
+        python_MSD_CI_Lower
+
+        :type file: str
+        :type tablename: str
+        :type type: str
+        :type data: list
+        """
+
+        connection = sql.connect("%s/%s" % (self.location, file))
+        crsr = connection.cursor()
+
+        # Count number of entries in table with same residue name
+        check_existence = "SELECT COUNT(1) FROM %s WHERE name = '%s'" % (tablename, self.residue.name)
+
+        output = crsr.execute(check_existence).fetchall()
+
+        if type == 'ellipse':
+
+            a, b, c = self.ellipse_parameters
+            a_std, b_std, c_std = self.ellipse_uncertainty
+
+            if output[0][0] > 1:  # There might be more than one entry for a given residue
+
+                update_entry = "UPDATE %s SET ellipse_a = %.3f, ellipse_b = %.3f, ellipse_c = %.3f, ellipse_a_std = " \
+                               "%.3f, ellipse_b_std = %.3f, ellipse_c_std = %.3f where name = '%s'" % \
+                               (tablename, a, b, c, a_std, b_std, c_std, self.residue.name)
+
+                crsr.execute(update_entry)
+
+            else:
+
+                fill_new_entry = "INSERT INTO %s (name, ellipse_a, ellipse_b, ellipse_c, ellipse_a_std, ellipse_b_std, " \
+                                 "ellipse_c_std) VALUES ('%s', %.3f, %.3f, %.3f, %.3f, %.3f, %.3f)" % \
+                                 (tablename, self.residue.name, a, b, c, a_std, b_std, c_std)
+
+                crsr.execute(fill_new_entry)
+
+        connection.commit()
+        connection.close()
+
 
 if __name__ == "__main__":
 
@@ -218,6 +266,10 @@ if __name__ == "__main__":
     mol = Geometry(args.gro, args.trajectory, args.residue)
 
     mol.fit_ellipsoid()
+
+    if args.update:
+        mol.update_database(type='ellipse')
+
     exit()
 
     mol.calculate_planarity(heavy_atoms=False)

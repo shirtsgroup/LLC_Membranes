@@ -10,6 +10,7 @@ from LLC_Membranes.analysis import Poly_fit, top, Atom_props
 from LLC_Membranes.llclib import physical, topology, timeseries, fitting_functions
 from scipy import stats
 import tqdm
+import sqlite3 as sql
 
 
 def initialize():
@@ -38,6 +39,7 @@ def initialize():
     parser.add_argument('-acf', '--autocorrelation', action="store_true", help='Plot step autocorrelation function')
     parser.add_argument('-acov', '--autocovariance', action="store_true", help='Plot step autocovariance function')
     parser.add_argument('-nofit', '--nofit', action="store_true", help='Do not attempt to fit any curve to MSD')
+    parser.add_argument('--update', action="store_true", help="update database with MD MSD values")
 
     return parser
 
@@ -409,6 +411,44 @@ class Diffusivity(object):
         if show:
             plt.show()
 
+    def update_database(self, file="../timeseries/msd.db", tablename="msd"):
+        """ Update SQL database with information from this run
+
+        :param file: relative path (relative to directory where this script is stored) to database to be updated
+        :param tablename: name of table being modified in database
+
+        :type file: str
+        :type tablename: str
+        """
+
+        connection = sql.connect("%s/%s" % (self.script_location, file))
+        crsr = connection.cursor()
+
+        check_existence = "SELECT COUNT(1) FROM %s WHERE name = '%s'" % (tablename, self.residue)
+
+        output = crsr.execute(check_existence).fetchall()
+
+        msd = self.MSD_average[-1]
+        msd_lower = msd - self.limits[1, -1]
+        msd_upper = msd + self.limits[0, -1]
+
+        if output[0][0] > 0:
+
+            update_entry = "UPDATE %s SET MD_MSD = %.2f, MD_MSD_CI_lower = %.2f, MD_MSD_CI_upper = %.2f where " \
+                           "name = '%s'" % (tablename, msd, msd_lower, msd_upper, self.residue)
+
+            crsr.execute(update_entry)
+
+        else:
+
+            fill_new_entry = "INSERT INTO %s (name, MD_MSD, MD_MSD_CI_lower, MD_MSD_CI_upper) VALUES ('%s', %.2f," \
+                             " %.2f, %.2f)" % (tablename, self.residue, msd, msd_lower, msd_upper)
+
+            crsr.execute(fill_new_entry)
+
+        connection.commit()
+        connection.close()
+
 
 if __name__ == "__main__":
 
@@ -459,8 +499,11 @@ if __name__ == "__main__":
     if args.ensemble:
         args.fracshow = 1  # same amount of statistics at each frame
 
-    show = False
+    # show = False
     D.plot(args.axis, fracshow=args.fracshow, show=show)
+
+    if args.update:
+        D.update_database()
 
     if not args.power_law and not args.nofit:
         print('D = %1.2e +/- %1.2e m^2/s' % (D.Davg, np.abs(D.Davg - D.confidence_interval[0])))
