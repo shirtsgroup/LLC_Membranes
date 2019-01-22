@@ -45,6 +45,8 @@ def initialize():
     # ctrw simulation
     parser.add_argument('-ntsim', '--ntrajsim', default=1000, type=int, help='Number of trajectories to simulate')
     parser.add_argument('--update', action="store_true", help="update database with all parameters calculated")
+    parser.add_argument('--ensemble', action="store_true", help="Calculate ensemble average MSD. If false, will do"
+                                                                "time-averaged MSD")
 
     # bootstrapping
     parser.add_argument('-nboot', '--nboot', default=200, type=int, help='Number of bootstrap trials to be run')
@@ -577,17 +579,22 @@ class System(object):
 
                 crsr.execute(fill_new_entry)
 
-        elif type == 'msd':
+        elif type == 'msd_ensemble' or type == 'msd_time_average':
+
+            if type == 'msd_ensemble':
+                data_labels = ['python_MSD', 'python_MSD_CI_lower', 'python_MSD_CI_upper']
+            elif type == 'msd_time_average':
+                data_labels = ['python_TAMSD', 'python_TAMSD_CI_lower', 'python_TAMSD_CI_upper']
 
             error_message = "You must provide the MSD data to be input into the database in the format " \
                                     "[python_MSD, python_MSD_CI_lower, python_MSD_CI_upper]"
 
-            if output[0][0] == 1:
+            if output[0][0] > 0:
 
                 try:
-                    update_entry = "UPDATE %s SET python_MSD = %.2f, python_MSD_CI_lower = %.2f, " \
-                                   "python_MSD_CI_upper = %.2f WHERE name = '%s' and penalty = %.2f" % (tablename, data[0],
-                                    data[1], data[2], self.residue.name, self.breakpoint_penalty)
+                    update_entry = "UPDATE %s SET %s = %.2f, %s = %.2f, %s = %.2f WHERE name = '%s' and penalty = %.2f" \
+                                   % (tablename, data_labels[0], data[0], data_labels[1], data[1], data_labels[2],
+                                      data[2], self.residue.name, self.breakpoint_penalty)
                 except TypeError:
                     raise TypeError(error_message)
                 except IndexError:
@@ -598,8 +605,8 @@ class System(object):
             else:
 
                 try:
-                    fill_new_entry = "INSERT INTO %s (name, python_MSD, python_MSD_CI_lower, python_MSD_CI_upper, " \
-                                     "penalty) VALUES ('%s', %.2f, %.2f, %.2f, %.2f)" % (tablename, self.residue.name,
+                    fill_new_entry = "INSERT INTO %s (name, %s, %s, %s, penalty) VALUES ('%s', %.2f, %.2f, %.2f, %.2f)" \
+                                     % (tablename, data_labels[0], data_labels[1], data_labels[2], self.residue.name,
                                      data[0], data[1], data[2], self.breakpoint_penalty)
                 except TypeError:
                     raise TypeError(error_message)
@@ -607,6 +614,8 @@ class System(object):
                     raise IndexError(error_message)
 
                 crsr.execute(fill_new_entry)
+        else:
+            sys.exit('Please choose a ')
 
         connection.commit()
         connection.close()
@@ -638,6 +647,15 @@ if __name__ == "__main__":
 
         file_rw.save_object(sys, 'forecast_%s.pl' % args.residue)
 
+    # plt.plot(sys.hop_acf, linewidth=2,  label='Simulation')
+    # plt.xlabel('k', fontsize=14)
+    # plt.ylabel('Autocovariance', fontsize=14)
+    # plt.plot(fitting_functions.hurst_autocovariance(np.arange(20), np.mean(sys.hurst_distribution)), label='Analytical', linewidth=2)
+    # plt.gcf().get_axes()[0].tick_params(labelsize=14)
+    # plt.legend(fontsize=14)
+    # plt.xlim(-1, 20)
+    # plt.show()
+
     # sys.location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # This script location
     # sys.breakpoint_penalty = 0.25
 
@@ -653,18 +671,21 @@ if __name__ == "__main__":
     random_walks = CTRW(2000, args.ntrajsim, dt=sys.dt, hop_dist='fbm', dwell_dist='power')
 
     random_walks.generate_trajectories(fixed_time=True, distributions=(sys.alpha_distribution,
-                                       sys.hop_sigma_distribution, sys.hurst_distribution), discrete=False, ll=0.1)
-    # Ensemble-averaged MSD
-    random_walks.calculate_msd(ensemble=True)
-    random_walks.bootstrap_msd(fit_power_law=True)
-    random_walks.plot_msd(plot_power_law=True, show=False)
-    # sys.update_database(type='msd', data=[1000 * (x / sys.time[-1]) for x in random_walks.final_msd])
-    if args.update:
-        sys.update_database(type='msd', data=random_walks.final_msd)
-    exit()
+                                       sys.hop_sigma_distribution, sys.hurst_distribution), discrete=True, ll=1)
+    random_walks.calculate_msd(ensemble=args.ensemble)
 
-    # Time-averaged MSD
-    random_walks.calculate_msd()
-    random_walks.bootstrap_msd(fit_linear=True)
-    random_walks.plot_msd(plot_linear=True, show=True)
+    if args.ensemble:  # Ensemble-averaged MSD
+
+        random_walks.bootstrap_msd(fit_power_law=True)
+        random_walks.plot_msd(plot_power_law=True, show=False)
+        # sys.update_database(type='msd', data=[1000 * (x / sys.time[-1]) for x in random_walks.final_msd])
+        if args.update:
+            sys.update_database(type='msd_ensemble', data=random_walks.final_msd)
+
+    else:  # Time-averaged MSD
+
+        random_walks.bootstrap_msd(fit_linear=False)
+        random_walks.plot_msd(show=False, end_frame=8000)  # get data up to 400 ns
+        if args.update:
+            sys.update_database(type='msd_time_average', data=random_walks.final_msd)
     exit()

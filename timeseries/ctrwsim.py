@@ -363,7 +363,7 @@ class CTRW(object):
 
         return self.msd.take(indices, axis=0).mean(axis=0)
 
-    def fit_power_law(self, y, cut=1, interactive=True):
+    def fit_power_law(self, y, cut=0.6, interactive=True):
         """ Fit power law to MSD curves. Should probably be replaced by MLE
         TODO: weighted fit (need to do error analysis first)
 
@@ -378,8 +378,10 @@ class CTRW(object):
 
         self.fit_cut = cut
 
-        start = np.where(y > 0)[0][0]  # find first non-zero value since we will take the log
+        start = np.where(y > 1e-6)[0][0]  # find first non-zero value since we will take the log
         end = int(self.fit_cut * len(self.time_uniform))  # fit up until a fraction, cut, of the trajectory
+        # print(y[start:end])
+        # exit()
 
         # fit line to linear log plot
         A = Poly_fit.poly_fit(np.log(self.time_uniform[start:end]), np.log(y[start:end]), 1)[-1]
@@ -408,7 +410,7 @@ class CTRW(object):
 
         return [A[0], A[1]]
 
-    def plot_msd(self, confidence=95, plot_power_law=False, plot_linear=False, show=True):
+    def plot_msd(self, confidence=95, plot_power_law=False, plot_linear=False, show=True, end_frame=None):
         """ Plot averaged mean squared displacement with error bars
 
         :param confidence: confidence interval for error bars
@@ -422,10 +424,16 @@ class CTRW(object):
 
         mean = self.msd.mean(axis=0)
 
+        if end_frame is not None:
+            mean = mean[:end_frame]
+            self.time_uniform = self.time_uniform[:end_frame]
+
         plt.plot(self.time_uniform, mean, linewidth=2)
 
         if self.bootstraps is not None:
             error = stats.confidence_interval(self.bootstraps, confidence)
+            if end_frame is not None:
+                error = error[:, :end_frame]
             plt.fill_between(self.time_uniform, error[1, :] + mean, mean - error[0, :], alpha=0.7)
             self.final_msd = [mean[-1], mean[-1] - error[0, -1], error[1, -1] + mean[-1]]
             print('Estimated MSD: %.2f [%.2f, %.2f]' % (self.final_msd[0], self.final_msd[1], self.final_msd[2]))
@@ -489,33 +497,54 @@ class CTRW(object):
 if __name__ == "__main__":
 
     args = initialize().parse_args()
-    np.random.seed(1)
-    ctrw = CTRW(args.steps, args.ntraj, hop_dist=args.hop_length_distribution, dwell_dist=args.dwell_time_distribution,
-                hop_sigma=args.hop_sigma, alpha=args.alpha, dt=args.dt, nt=args.nthreads, H=args.hurst)
-    ctrw.generate_trajectories(fixed_time=args.fix_time, noise=args.noise, limit=args.upper_limit)
-    ctrw.calculate_msd(ensemble=args.ensemble)
-    ctrw.bootstrap_msd(nboot=args.nboot, fit_power_law=args.fit_power_law, fit_linear=args.fit_line)
-    ctrw.plot_msd(plot_power_law=args.fit_power_law, plot_linear=args.fit_line, show=True)
 
-    if args.autocorrelation:
-        ctrw.step_autocorrelation()
-        ctrw.plot_autocorrelation(show=True)
+    # ctrw = CTRW(args.steps, args.ntraj, hop_dist=args.hop_length_distribution, dwell_dist=args.dwell_time_distribution,
+    #             hop_sigma=args.hop_sigma, alpha=args.alpha, dt=args.dt, nt=args.nthreads, H=args.hurst)
+    # ctrw.generate_trajectories(fixed_time=args.fix_time, noise=args.noise, limit=args.upper_limit)
+    # ctrw.calculate_msd(ensemble=args.ensemble)
+    # ctrw.bootstrap_msd(nboot=args.nboot, fit_power_law=args.fit_power_law, fit_linear=args.fit_line)
+    # ctrw.plot_msd(plot_power_law=args.fit_power_law, plot_linear=args.fit_line, show=True)#, end_frame=5000)
+    #
+    # if args.autocorrelation:
+    #     ctrw.step_autocorrelation()
+    #     ctrw.plot_autocorrelation(show=True)
+    #
+    # exit()
+    #
+    # last = ctrw.msd.mean(axis=0)[int(0.5*ctrw.time_uniform.size)]
+    # CI = stats.confidence_interval(ctrw.bootstraps, 95)[:, int(0.5*ctrw.time_uniform.size)]
+    # print("MSD at 50 %% of time: %.2f 95 %% CI [%.2f, %.2f]" % (last, last - CI[0], CI[1] + last))
+    #
+    # # run below with args.ensemble = False, fit_line = True
+    # ctrw.calculate_msd(ensemble=True)
+    # ctrw.bootstrap_msd(nboot=args.nboot, fit_power_law=True)
+    # ctrw.plot_msd(plot_power_law=True, show=False)
+    #
+    # last = ctrw.msd.mean(axis=0)[-1]
+    # CI = stats.confidence_interval(ctrw.bootstraps, 95)[:, -1]
+    # print("MSD at 100 %% of time: %.2f 95 %% CI [%.2f, %.2f]" % (last, last - CI[0], CI[1] + last))
+    # # plt.show()
 
+    # for ageing demonstration
+    steps = [500, 1000, 2000]
+    walks = []
+
+    plt.figure()
+    for i in steps:
+        ctrw = CTRW(i, args.ntraj, hop_dist=args.hop_length_distribution,
+                    dwell_dist=args.dwell_time_distribution,
+                    hop_sigma=args.hop_sigma, alpha=args.alpha)
+        ctrw.generate_trajectories(fixed_time=True)
+        ctrw.calculate_msd(ensemble=True)
+        plt.plot(ctrw.time_uniform, ctrw.msd.mean(axis=0), linewidth=2, label='Length = %s ns' % i)
+
+    plt.legend()
+    plt.xlabel('Time (ns)', fontsize=14)
+    plt.ylabel('Mean squared displacement (nm$^2$)', fontsize=14)
+    plt.gcf().get_axes()[0].tick_params(labelsize=14)
+    plt.tight_layout()
+    plt.show()
     exit()
-
-    last = ctrw.msd.mean(axis=0)[int(0.5*ctrw.time_uniform.size)]
-    CI = stats.confidence_interval(ctrw.bootstraps, 95)[:, int(0.5*ctrw.time_uniform.size)]
-    print("MSD at 50 %% of time: %.2f 95 %% CI [%.2f, %.2f]" % (last, last - CI[0], CI[1] + last))
-
-    # run below with args.ensemble = False, fit_line = True
-    ctrw.calculate_msd(ensemble=True)
-    ctrw.bootstrap_msd(nboot=args.nboot, fit_power_law=True)
-    ctrw.plot_msd(plot_power_law=True, show=False)
-
-    last = ctrw.msd.mean(axis=0)[-1]
-    CI = stats.confidence_interval(ctrw.bootstraps, 95)[:, -1]
-    print("MSD at 100 %% of time: %.2f 95 %% CI [%.2f, %.2f]" % (last, last - CI[0], CI[1] + last))
-    # plt.show()
 
     # for plotting MSDs using a bunch of different dwell time limits
     # limits = [800, 1600, 3200, 6400, 12800, 25600, 51200, 102800]

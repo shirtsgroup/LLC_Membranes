@@ -282,9 +282,12 @@ def step_autocorrelation(trajectories, axis=0):
     acfs = np.zeros([ntraj, ACF.size])
     acfs[0, :] = ACF
 
+    keep = []
     for t in range(1, ntraj):
         steps = trajectories[1:, t, axis] - trajectories[:-1, t, axis]
-        acfs[t, :] = acf(steps)
+        if not np.all(steps == 0):
+            acfs[t, :] = acf(steps)
+            keep.append(t)
         #acfs[t, :] = acf(trajectories[:ACF.size, t, axis])
 
-    return acfs
+    return acfs[keep, :]

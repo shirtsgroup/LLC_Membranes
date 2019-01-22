@@ -146,6 +146,20 @@ class Diffusivity(object):
                 self.com[f, i, :] = np.sum(w, axis=0) / self.mres  # sum the coordinates and divide by the mass of the residue
         print('Done!')
 
+        # plot 'random' z coordinate traces
+        # np.random.seed(4)  # 4 gives a nice spread for ethanol
+        # trajs = np.random.randint(0, self.com.shape[1], size=3)
+        # for i in trajs:
+        #     plt.plot(self.time, self.com[:, i, 2], linewidth=2)
+        #
+        # plt.ylabel('$z$-coordinate (nm)', fontsize=14)
+        # plt.xlabel('Time (ns)', fontsize=14)
+        # plt.gcf().get_axes()[0].tick_params(labelsize=14)
+        # plt.tight_layout()
+        #
+        # plt.show()
+        # exit()
+
         self.weights = True
         if self.com.shape[1] == 1:
             self.weights = False
@@ -314,21 +328,21 @@ class Diffusivity(object):
     def plot(self, axis, fracshow=0.5, savedata=False, show=False):
 
         plt.figure()
-        end_frame = int(fracshow * self.time.size)
+        self.endfit = int(fracshow * self.time.size)
 
-        plt.plot(self.time[:end_frame], self.MSD_average[:end_frame], label='MSD')
-        plt.fill_between(self.time[:end_frame], self.MSD_average[:end_frame] + self.limits[0, :end_frame],
-                         self.MSD_average[:end_frame] - self.limits[1, :end_frame], alpha=0.7)
+        plt.plot(self.time[:self.endfit], self.MSD_average[:self.endfit], label='MSD')
+        plt.fill_between(self.time[:self.endfit], self.MSD_average[:self.endfit] + self.limits[0, :self.endfit],
+                         self.MSD_average[:self.endfit] - self.limits[1, :self.endfit], alpha=0.7)
 
-        last = self.MSD_average[(end_frame - 1)]
+        last = self.MSD_average[(self.endfit - 1)]
 
-        print('Final frame MSD: %.2f [%.2f, %.2f]' % (last, last - self.limits[1, end_frame - 1],
-                                                      last + self.limits[0, end_frame - 1]))
+        print('Final frame MSD: %.2f [%.2f, %.2f]' % (last, last - self.limits[1, self.endfit - 1],
+                                                      last + self.limits[0, self.endfit - 1]))
 
         if savedata:
 
-            np.savez_compressed('msd.npz', time=self.time[:end_frame], msd=self.MSD_average[:end_frame],
-                                yerr=[self.limits[0, :end_frame], self.limits[1, :end_frame]])
+            np.savez_compressed('msd.npz', time=self.time[:self.endfit], msd=self.MSD_average[:self.endfit],
+                                yerr=[self.limits[0, :self.endfit], self.limits[1, :self.endfit]])
 
         plt.ylabel('MSD ($nm^2$)', fontsize=14)
         plt.xlabel('time (ns)', fontsize=14)
@@ -379,8 +393,8 @@ class Diffusivity(object):
 
         plt.figure()
         plt.plot(self.time[:self.acf.shape[1]], self.acf.mean(axis=0))
-        plt.xlabel('Time', fontsize=14)
-        plt.ylabel('Autocorrelation', fontsize=14)
+        plt.xlabel('Time (ns)', fontsize=14)
+        plt.ylabel('Autocovariance', fontsize=14)
         plt.gcf().get_axes()[0].tick_params(labelsize=14)
         plt.tight_layout()
 
@@ -411,7 +425,7 @@ class Diffusivity(object):
         if show:
             plt.show()
 
-    def update_database(self, file="../timeseries/msd.db", tablename="msd"):
+    def update_database(self, file="../timeseries/msd.db", tablename="msd", ensemble=False):
         """ Update SQL database with information from this run
 
         :param file: relative path (relative to directory where this script is stored) to database to be updated
@@ -428,21 +442,26 @@ class Diffusivity(object):
 
         output = crsr.execute(check_existence).fetchall()
 
-        msd = self.MSD_average[-1]
-        msd_lower = msd - self.limits[1, -1]
-        msd_upper = msd + self.limits[0, -1]
+        msd = self.MSD_average[self.endfit]
+        msd_lower = msd - self.limits[1, self.endfit]
+        msd_upper = msd + self.limits[0, self.endfit]
+
+        if ensemble:
+            data_labels = ['MD_MSD', 'MD_MSD_CI_lower', 'MD_MSD_CI_upper']
+        else:
+            data_labels = ['MD_TAMSD', 'MD_TAMSD_CI_lower', 'MD_TAMSD_CI_upper']
 
         if output[0][0] > 0:
 
-            update_entry = "UPDATE %s SET MD_MSD = %.2f, MD_MSD_CI_lower = %.2f, MD_MSD_CI_upper = %.2f where " \
-                           "name = '%s'" % (tablename, msd, msd_lower, msd_upper, self.residue)
+            update_entry = "UPDATE %s SET %s = %.3f, %s = %.3f, %s = %.3f where name = '%s'" % (tablename, data_labels[0],
+                            msd, data_labels[1], msd_lower, data_labels[2], msd_upper, self.residue)
 
             crsr.execute(update_entry)
 
         else:
 
-            fill_new_entry = "INSERT INTO %s (name, MD_MSD, MD_MSD_CI_lower, MD_MSD_CI_upper) VALUES ('%s', %.2f," \
-                             " %.2f, %.2f)" % (tablename, self.residue, msd, msd_lower, msd_upper)
+            fill_new_entry = "INSERT INTO %s (name, %s, %s, %s) VALUES ('%s', %.3f, %.3f, %.3f)" % (tablename,
+                              data_labels[0], data_labels[1], data_labels[2], self.residue, msd, msd_lower, msd_upper)
 
             crsr.execute(fill_new_entry)
 
@@ -499,7 +518,7 @@ if __name__ == "__main__":
     if args.ensemble:
         args.fracshow = 1  # same amount of statistics at each frame
 
-    # show = False
+    show = False
     D.plot(args.axis, fracshow=args.fracshow, show=show)
 
     if args.update:
@@ -512,18 +531,18 @@ if __name__ == "__main__":
 
         plt.figure()
         end_frame = int(args.fracshow * D.time.size)
-        plt.errorbar(D.time[:end_frame], D.MSD_average[:end_frame], yerr=[D.limits[0, :end_frame],
-                     D.limits[1, :end_frame]], errorevery=D.errorevery, linewidth=2, elinewidth=2,
-                     label='Time-averaged MSD')
+
+        plt.fill_between(D.time[:end_frame], D.MSD_average[:end_frame] + D.limits[0, :end_frame],
+                         D.MSD_average[:end_frame] - D.limits[1, :end_frame], alpha=0.7, label='Time-averaged MSD')
 
         end_frame = int(args.fracshow * D.time.size)
-        plt.errorbar(D_ensemble.time[:end_frame], D_ensemble.MSD_average[:end_frame],
-                     yerr=[D_ensemble.limits[0, :end_frame], D_ensemble.limits[1, :end_frame]],
-                     errorevery=D_ensemble.errorevery, linewidth=2, elinewidth=2, label='Ensemble-averaged MSD')
+        plt.fill_between(D_ensemble.time[:end_frame], D_ensemble.MSD_average[:end_frame] +
+                         D_ensemble.limits[0, :end_frame], D_ensemble.MSD_average[:end_frame] -
+                         D_ensemble.limits[1, :end_frame], alpha=0.7, label='Ensemble-averaged MSD')
 
         plt.ylabel('MSD ($nm^2$)', fontsize=14)
         plt.xlabel('time (ns)', fontsize=14)
-        plt.legend(fontsize=14)
+        plt.legend(fontsize=14, loc=2)
         plt.gcf().get_axes()[0].tick_params(labelsize=14)
         plt.tight_layout()
         #plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/transport/figures/ethanol_msd_comparison.pdf')

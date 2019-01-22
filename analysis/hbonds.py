@@ -47,15 +47,34 @@ def initialize():
                         'args.residues')
     parser.add_argument('-d', '--distance', default=.3, help='Maximum distance between acceptor and donor atoms')
     parser.add_argument('-angle', '--angle_cut', default=20, help='Maximum DHA angle to be considered an H-bond')
+    parser.add_argument('-xlink', '--xlink', action="store_true", help='Specify if system is cross-linked since'
+                                                                       'the topology will be set up')
+    parser.add_argument('-xtop', '--xlink_topology', default='assembly.itp', help='Name of .itp file which '
+                                                                                  'describes cross-linked residue')
+    parser.add_argument('-xres', '--xlink_residue', default='HII', help='Name of residue in molecules section of the '
+                                                                        'topology corresponding to args.xlink_topology')
 
     return parser
 
 
 class System(object):
 
-    def __init__(self, traj, gro, top, begin=0, end=-1, exclude_water=False):
+    def __init__(self, traj, gro, top, begin=0, end=-1, exclude_water=False, xlink=False, xlink_topology='assembly.itp',
+                 xlink_residue='HII'):
+        """
 
-        self.top = Topology(top)
+        :param traj:
+        :param gro:
+        :param top:
+        :param begin:
+        :param end:
+        :param exclude_water:
+        :param xlink:
+        :param xlink_topology:
+        :param xlink_residue:
+        """
+
+        self.top = Topology(top, xlink=xlink, xlink_topology=xlink_topology, xlink_residue=xlink_residue)
 
         print('Loading trajectory...', end="", flush=True)
         self.t = md.load(traj, top=gro)[begin:end]
@@ -121,6 +140,8 @@ class System(object):
                     # if a.element.symbol in self.donor_atoms:
                     #     self.donors.append(a.index)
                     if a.element.symbol == 'H':  # technically untested
+                        print(self.top.bonds)
+                        exit()
                         self.H.append(a.index)
                         self.D.append(self.top.bonds[a.index][0])
                     if a.element.symbol in self.acceptor_atoms:
@@ -259,7 +280,7 @@ class System(object):
 
 class Residue(object):
 
-    def __init__(self, name):
+    def __init__(self, name, xlink=False, xlink_topology='assembly.itp'):
 
         self.name = name
 
@@ -276,20 +297,23 @@ class Residue(object):
             self.natoms = 1
 
         else:
-            try:
-                t = md.load('%s.pdb' % name,
-                            standard_names=False)  # see if there is a solute configuration in this directory
-            except OSError:
-                try:
-                    t = md.load('%s/../top/topologies/%s.pdb' % (script_location, name),
-                                standard_names=False)  # check if the configuration is
-                    # located with all of the other topologies
-                except OSError:
-                    print('No residue %s found' % name)
-                    exit()
+            # try:
+            #     t = md.load('%s.pdb' % name,
+            #                 standard_names=False)  # see if there is a solute configuration in this directory
+            # except OSError:
+            #     try:
+            #         t = md.load('%s/../top/topologies/%s.pdb' % (script_location, name),
+            #                     standard_names=False)  # check if the configuration is
+            #         # located with all of the other topologies
+            #     except OSError:
+            #         print('No residue %s found' % name)
+            #         exit()
 
             try:
-                f = open('%s.itp' % name, 'r')
+                if xlink:
+                    f = open('%s' % xlink_topology, 'r')
+                else:
+                    f = open('%s.itp' % name, 'r')
             except FileNotFoundError:
                 try:
                     f = open('%s/../top/topologies/%s.itp' % (script_location, name), 'r')
@@ -303,8 +327,6 @@ class Residue(object):
 
             f.close()
 
-            self.natoms = t.n_atoms
-
             atoms_index = 0
             while itp[atoms_index].count('[ atoms ]') == 0:
                 atoms_index += 1
@@ -313,10 +335,14 @@ class Residue(object):
             self.names = {}  # key = index, value = atom name
 
             atoms_index += 2
-            for i in range(self.natoms):
+            i = 0
+            while itp[i + atoms_index] != '\n':
                 data = itp[i + atoms_index].split()
                 self.indices[data[4]] = int(data[0])
                 self.names[int(data[0])] = data[4]
+                i += 1
+
+            self.natoms = len(self.names)
 
             # find the bonds section
             bonds_index = 0
@@ -331,7 +357,7 @@ class Residue(object):
                 bonds_index += 1
 
             self.bonds = {}
-            for i in range(self.natoms):
+            for i in tqdm.tqdm(range(self.natoms)):
                 self.bonds[i] = []
                 involvement = [x for x in bonds if i + 1 in x]
                 for pair in involvement:
@@ -341,7 +367,14 @@ class Residue(object):
 
 class Topology(object):
 
-    def __init__(self, top):
+    def __init__(self, top, xlink=False, xlink_topology='assembly.itp', xlink_residue='HII'):
+        """
+
+        :param top:
+        :param xlink:
+        :param xlink_topology:
+        :param xlink_residue:
+        """
 
         topology_file = []
         with open(top, 'r') as f:
@@ -363,7 +396,11 @@ class Topology(object):
         self.bonds = {}
         preceding_atoms = 0  # atoms before residue
         for r in self.residues:  # look at all residues
+            if xlink and r == xlink_residue:
+                res = Residue(r, xlink=True, xlink_topology=xlink_topology)
             res = Residue(r)  # create residue object
+            print(res.natoms)
+            exit()
             if not res.is_ion:
                 for n in range(self.residues[r]):  # create bond for each same type residue
                     for b in res.bonds:  # look at bonds to each atom in order
@@ -382,7 +419,8 @@ if __name__ == "__main__":
     if not args.atoms:
         args.atoms = [['O3', 'O4']]  # a default value
 
-    sys = System(args.traj, args.gro, args.top, begin=args.begin, end=args.end, exclude_water=args.exclude_water)
+    sys = System(args.traj, args.gro, args.top, begin=args.begin, end=args.end, exclude_water=args.exclude_water,
+                 xlink=args.xlink, xlink_topology=args.xlink_topology, xlink_residue=args.xlink_residue)
 
     for i, r in enumerate(args.residues):
         sys.set_eligible(r, args.atoms[i])
