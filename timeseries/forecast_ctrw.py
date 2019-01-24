@@ -41,6 +41,8 @@ def initialize():
     parser.add_argument('-r', '--residue', default='ETH', type=str, help='Name of residue whose diffusivity we want')
     parser.add_argument('-atoms', nargs='+', help='Name of atoms whose collective diffusivity is desired')
     parser.add_argument('-nbins', default=25, type=int, help='Number of bins to bin hop and dwell distributions into')
+    parser.add_argument('-bp', '--breakpoint_penalty', default=0.25, type=float, help='Cost function penalty when '
+                                                                                      'determing break points')
 
     # ctrw simulation
     parser.add_argument('-ntsim', '--ntrajsim', default=1000, type=int, help='Number of trajectories to simulate')
@@ -236,6 +238,7 @@ class System(object):
         """
 
         self.breakpoint_penalty = penalty
+        print('penalty = %s' % self.breakpoint_penalty)
 
         # Handle initial and final dwell times since they don't have a true beginning or end. If the dwell times are
         # longer than some limit, then they will be included so that we don't miss out on dwells that last on the order
@@ -260,12 +263,14 @@ class System(object):
             begin = 0
             for i, end in enumerate(switch_points[::2]):  # only at switch points after which solute is in pores
                 if (end - begin) > nframes_dwell:  # only include hops/dwells from trajectories long enough to analyze
-
+                    # np.savez_compressed('MET_trace.npz', z=self.com[begin:end, j, :])
+                    # exit()
                     # movement_3d = np.linalg.norm(self.com[begin:end, j, :], axis=1)  # magnitude of distance travelled
                     bp = ruptures.detection.Binseg(model='l2', min_size=1, jump=1).fit_predict(self.com[begin:end, j, :]
                                                    , pen=self.breakpoint_penalty)
                     # ruptures.display(self.com[begin:end, j, :], bp, figsize=(10, 6))
                     # plt.show()
+                    # exit()
 
                     initial_dwells.append(bp[0])
                     if len(bp) > 1:  # handle case where the only break point is at the end of the simulation
@@ -592,7 +597,7 @@ class System(object):
             if output[0][0] > 0:
 
                 try:
-                    update_entry = "UPDATE %s SET %s = %.2f, %s = %.2f, %s = %.2f WHERE name = '%s' and penalty = %.2f" \
+                    update_entry = "UPDATE %s SET %s = %.3f, %s = %.3f, %s = %.3f WHERE name = '%s' and penalty = %.2f" \
                                    % (tablename, data_labels[0], data[0], data_labels[1], data[1], data_labels[2],
                                       data[2], self.residue.name, self.breakpoint_penalty)
                 except TypeError:
@@ -605,7 +610,7 @@ class System(object):
             else:
 
                 try:
-                    fill_new_entry = "INSERT INTO %s (name, %s, %s, %s, penalty) VALUES ('%s', %.2f, %.2f, %.2f, %.2f)" \
+                    fill_new_entry = "INSERT INTO %s (name, %s, %s, %s, penalty) VALUES ('%s', %.3f, %.3f, %.3f, %.2f)" \
                                      % (tablename, data_labels[0], data_labels[1], data_labels[2], self.residue.name,
                                      data[0], data[1], data[2], self.breakpoint_penalty)
                 except TypeError:
@@ -636,16 +641,16 @@ if __name__ == "__main__":
 
         sys.calculate_solute_partition(spline=False, membrane_residue='HII')
 
-        sys.hops_and_dwells()
+        sys.hops_and_dwells(penalty=args.breakpoint_penalty)
 
-        sys.fit_distributions(nbins=args.nbins, nboot=args.nboot, plot=True)
+        sys.fit_distributions(nbins=args.nbins, nboot=args.nboot, plot=False)
 
         sys.estimate_hurst()
 
         if args.update:
             sys.update_database()
 
-        file_rw.save_object(sys, 'forecast_%s.pl' % args.residue)
+        #file_rw.save_object(sys, 'forecast_%s.pl' % args.residue)
 
     # plt.plot(sys.hop_acf, linewidth=2,  label='Simulation')
     # plt.xlabel('k', fontsize=14)

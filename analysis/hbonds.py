@@ -26,6 +26,8 @@ import os
 import tqdm
 import matplotlib.pyplot as plt
 import pickle
+from LLC_Membranes.llclib import file_rw, topology, physical
+
 
 script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -39,6 +41,7 @@ def initialize():
     parser.add_argument('-p', '--top', default='topol.top', type=str, help='Gromacs topology file')
     parser.add_argument('-b', '--begin', default=0, type=int, help='End frame')
     parser.add_argument('-e', '--end', default=-1, type=int, help='Start frame')
+    parser.add_argument('-sk', '--skip', default=1, type=int, help='Skip every skip frames')
     parser.add_argument('-x', '--exclude_water', action='store_true', help='Exclude water while searching for hbonds')
     parser.add_argument('-r', '--residues', nargs='+', default=['HII'], help='Residues to include in h-bond search. '
                         'Water is automatically included if you do not specify the -x option')
@@ -53,14 +56,15 @@ def initialize():
                                                                                   'describes cross-linked residue')
     parser.add_argument('-xres', '--xlink_residue', default='HII', help='Name of residue in molecules section of the '
                                                                         'topology corresponding to args.xlink_topology')
+    parser.add_argument('-l', '--load', default=False, help='Load pickled system object')
 
     return parser
 
 
 class System(object):
 
-    def __init__(self, traj, gro, top, begin=0, end=-1, exclude_water=False, xlink=False, xlink_topology='assembly.itp',
-                 xlink_residue='HII'):
+    def __init__(self, traj, gro, top, begin=0, end=-1, skip=1, exclude_water=False, xlink=False,
+                 xlink_topology='assembly.itp', xlink_residue='HII'):
         """
 
         :param traj:
@@ -74,14 +78,17 @@ class System(object):
         :param xlink_residue:
         """
 
-        self.top = Topology(top, xlink=xlink, xlink_topology=xlink_topology, xlink_residue=xlink_residue)
+        # print('Generating bond list...', end="", flush=True)
+        # self.top = Topology(top, xlink=xlink, xlink_topology=xlink_topology, xlink_residue=xlink_residue)
+        # print('Done!')
 
         print('Loading trajectory...', end="", flush=True)
-        self.t = md.load(traj, top=gro)[begin:end]
+        self.t = md.load(traj, top=gro)[begin:end:skip]
         print('Done!')
         self.pos = self.t.xyz  # positions of all atoms
         self.hbonds = []  # will hold h-bonds for each frame [D, H, A, angle]
         self.dt = self.t.time[1] - self.t.time[0]
+        self.box = self.t.unitcell_vectors
 
         # for hbond_pairing
         # self.nwater = 0
@@ -118,14 +125,15 @@ class System(object):
         self.atom_to_matrix_index = {}
         self.matrix_to_atom_index = {}
 
-        if not exclude_water:
-
-            # all H's are potential donors
-            self.H = [a.index for a in self.t.topology.atoms if a.residue.name == 'HOH' and a.element.symbol == 'H']
-            # get the index of the atoms bonded to each H (all oxygens)
-            self.D = [self.top.bonds[x][0] for x in self.H]  # assumes only one bond to H as it should
-            # all oxygens are also potential acceptors
-            self.A = [a.index for a in self.t.topology.atoms if a.residue.name == 'HOH' and a.element.symbol == 'O']
+        # Now, specify water with the -r flag
+        # if not exclude_water:
+        #
+        #     # all H's are potential donors
+        #     self.H = [a.index for a in self.t.topology.atoms if a.residue.name == 'HOH' and a.element.symbol == 'H']
+        #     # get the index of the atoms bonded to each H (all oxygens)
+        #     self.D = [self.top.bonds[x][0] for x in self.H]  # assumes only one bond to H as it should
+        #     # all oxygens are also potential acceptors
+        #     self.A = [a.index for a in self.t.topology.atoms if a.residue.name == 'HOH' and a.element.symbol == 'O']
 
     def set_eligible(self, res, atoms):
         """
@@ -134,18 +142,31 @@ class System(object):
         :param atoms : atoms from residue to include in calculation
         """
 
+        residue = topology.Residue(res)
+
+        if atoms[0] is not 'all':
+            residue.hbond_H = [h for h in residue.hbond_H if h in atoms]
+            residue.hbond_D = [d for d in residue.hbond_D if d in atoms]
+            residue.hbond_A = [a for a in residue.hbond_A if a in atoms]
+
         for a in self.t.topology.atoms:
             if a.residue.name == res:
-                if a.name in atoms:
-                    # if a.element.symbol in self.donor_atoms:
-                    #     self.donors.append(a.index)
-                    if a.element.symbol == 'H':  # technically untested
-                        print(self.top.bonds)
-                        exit()
-                        self.H.append(a.index)
-                        self.D.append(self.top.bonds[a.index][0])
-                    if a.element.symbol in self.acceptor_atoms:
-                        self.A.append(a.index)
+                if a.name in residue.hbond_H:
+                    self.H.append(a.index)
+                if a.name in residue.hbond_D:
+                    self.D.append(a.index)
+                if a.name in residue.hbond_A:
+                    self.A.append(a.index)
+
+                # Old way
+                # if a.name in atoms or 'all' in atoms:
+                #     # if a.element.symbol in self.donor_atoms:
+                #     #     self.donors.append(a.index)
+                #     if a.element.symbol == 'H':  # technically untested
+                #         self.H.append(a.index)
+                #         self.D.append(self.top.bonds[a.index][0])
+                #     if a.element.symbol in self.acceptor_atoms:
+                #         self.A.append(a.index)
 
     def identify_hbonds(self, cut, angle):
 
@@ -161,13 +182,19 @@ class System(object):
             print('Calculating distances...')
             for t in tqdm.tqdm(range(d.shape[0]), unit='frames'):
                 for i in range(len(self.A)):
-                    d[t, i*Dlen:(i + 1) * Dlen] = np.linalg.norm(self.pos[t, self.D, :] - self.pos[t, self.A[i], np.newaxis, :], axis=1)
+                    minimum_image_distance = physical.minimum_image_distance(self.pos[t, self.D, :] -
+                                                                             self.pos[t, self.A[i], np.newaxis, :],
+                                                                             self.box[t, ...])
+                    d[t, i * Dlen:(i + 1) * Dlen] = np.linalg.norm(minimum_image_distance, axis=1)
         else:
             L = Alen
             print('Calculating distances...')
             for t in tqdm.tqdm(range(d.shape[0]), unit='frames'):
                 for i in range(len(self.D)):
-                    d[t, i * Alen:(i + 1) * Alen] = np.linalg.norm(self.pos[t, self.A, :] - self.pos[t, self.D[i], np.newaxis, :], axis=1)
+                    minimum_image_distance = physical.minimum_image_distance(self.pos[t, self.A, :] -
+                                                                             self.pos[t, self.D[i], np.newaxis, :],
+                                                                             self.box[t, ...])
+                    d[t, i * Alen:(i + 1) * Alen] = np.linalg.norm(minimum_image_distance, axis=1)
 
         print('Narrowing eligible atoms and calculating angles')
 
@@ -188,24 +215,27 @@ class System(object):
 
             self.hbonds.append(np.reshape(np.concatenate((Dindex, Hindex, Aindex)), (3, len(Aindex))))
 
-            # calculate vectors
-            v = np.zeros([2, len(Aindex), 3])
+            if self.hbonds[i].size > 0:  # don't calculate vectors if there aren't any hbonds this frame
+                # calculate vectors
+                v = np.zeros([2, len(Aindex), 3])
 
-            v[0, ...] = self.pos[i, self.hbonds[i][1, :], :] - self.pos[i, self.hbonds[i][0, :], :]  # D-H vectors
-            v[0, ...] /= np.linalg.norm(v[0, ...], axis=1)[:, np.newaxis]  # normalize (need to, to get correct angle)
-            v[1, :] = self.pos[i, self.hbonds[i][2, :], :] - self.pos[i, self.hbonds[i][1, :], :]  # H-A vectors
-            v[1, ...] /= np.linalg.norm(v[1, ...], axis=1)[:, np.newaxis]  # normalize
+                v[0, ...] = physical.minimum_image_distance(self.pos[i, self.hbonds[i][1, :], :] -
+                                                            self.pos[i, self.hbonds[i][0, :], :], self.box[i, ...])  # D-H vectors
+                v[0, ...] /= np.linalg.norm(v[0, ...], axis=1)[:, np.newaxis]  # normalize (need to, to get correct angle)
+                v[1, :] = physical.minimum_image_distance(self.pos[i, self.hbonds[i][2, :], :] -
+                                                          self.pos[i, self.hbonds[i][1, :], :], self.box[i, ...])  # H-A vectors
+                v[1, ...] /= np.linalg.norm(v[1, ...], axis=1)[:, np.newaxis]  # normalize
 
-            # calculate angles
+                # calculate angles
 
-            dot = np.zeros([v.shape[1]])
-            for j in range(dot.shape[0]):
-                dot[j] = np.dot(v[0, j, :], v[1, j, :])
+                dot = np.zeros([v.shape[1]])
+                for j in range(dot.shape[0]):
+                    dot[j] = np.dot(v[0, j, :], v[1, j, :])
 
-            a = np.arccos(dot) * (180/np.pi)  # convert to degrees
+                a = np.arccos(dot) * (180/np.pi)  # convert to degrees
 
-            self.hbonds[i] = np.delete(self.hbonds[i], np.where(a > angle)[0], axis=1)
-            self.hbonds[i] = np.concatenate((self.hbonds[i], a[a < 20][np.newaxis, :]), 0)
+                self.hbonds[i] = np.delete(self.hbonds[i], np.where(a > angle)[0], axis=1)
+                self.hbonds[i] = np.concatenate((self.hbonds[i], a[a < 20][np.newaxis, :]), 0)
 
     def plot_hbonds(self, show=True, save=True, savename='hbonds.png'):
 
@@ -356,10 +386,17 @@ class Residue(object):
                 bonds.append([int(bond_data[0]), int(bond_data[1])])
                 bonds_index += 1
 
+            bonds = np.array(bonds)  # converted to numpy array for use with np.where
+
             self.bonds = {}
-            for i in tqdm.tqdm(range(self.natoms)):
+            for i in range(self.natoms):
                 self.bonds[i] = []
-                involvement = [x for x in bonds if i + 1 in x]
+
+                # involvement = [list(x) for x in bonds if i + 1 in x]  # old (slow) way of doing this
+
+                x = np.where(bonds == i + 1)
+                involvement = [bonds[x[0][i]] for i in range(len(x[0]))]
+
                 for pair in involvement:
                     atom = [x - 1 for x in pair if x != (i + 1)][0]
                     self.bonds[i].append(atom)
@@ -398,9 +435,8 @@ class Topology(object):
         for r in self.residues:  # look at all residues
             if xlink and r == xlink_residue:
                 res = Residue(r, xlink=True, xlink_topology=xlink_topology)
-            res = Residue(r)  # create residue object
-            print(res.natoms)
-            exit()
+            else:
+                res = Residue(r)  # create residue object
             if not res.is_ion:
                 for n in range(self.residues[r]):  # create bond for each same type residue
                     for b in res.bonds:  # look at bonds to each atom in order
@@ -415,16 +451,26 @@ if __name__ == "__main__":
 
     args = initialize().parse_args()
 
-    # workaround for argparse. If default value is set, it is always included in the list with action='append'
-    if not args.atoms:
-        args.atoms = [['O3', 'O4']]  # a default value
+    if args.load:
 
-    sys = System(args.traj, args.gro, args.top, begin=args.begin, end=args.end, exclude_water=args.exclude_water,
-                 xlink=args.xlink, xlink_topology=args.xlink_topology, xlink_residue=args.xlink_residue)
+        sys = file_rw.load_object(args.load)
 
-    for i, r in enumerate(args.residues):
-        sys.set_eligible(r, args.atoms[i])
+    else:
+        # workaround for argparse. If default value is set, it is always included in the list with action='append'
+        if not args.atoms:
+            args.atoms = [['all'] for r in args.residues]  # a default value
 
-    sys.identify_hbonds(args.distance, args.angle_cut)
+        while len(args.atoms) != len(args.residues):
+            args.atoms.append(['all'])
+
+        sys = System(args.traj, args.gro, args.top, begin=args.begin, end=args.end, skip=args.skip,
+                     exclude_water=args.exclude_water, xlink=args.xlink, xlink_topology=args.xlink_topology,
+                     xlink_residue=args.xlink_residue)
+
+        for i, r in enumerate(args.residues):
+            sys.set_eligible(r, args.atoms[i])
+
+        sys.identify_hbonds(args.distance, args.angle_cut)
+        file_rw.save_object(sys, 'hbonds.pl')
 
     sys.plot_hbonds()

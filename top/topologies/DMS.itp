@@ -5,17 +5,17 @@
  DMS              3
 
 [ atoms ]
-;   nr  type  resi  res  atom  cgnr     charge      mass       ; qtot   bond_type
-     1   c3     1   DMS     C    1    -0.130800     12.01000 ; qtot -0.131
-     2   s4     1   DMS     S    2     0.268600     32.06000 ; qtot 0.138
-     3   c3     1   DMS    C1    3    -0.130800     12.01000 ; qtot 0.007
-     4    o     1   DMS     O    4    -0.507203     16.00000 ; qtot -0.500
-     5   h1     1   DMS     H    5     0.083367      1.00800 ; qtot -0.417
-     6   h1     1   DMS    H1    6     0.083367      1.00800 ; qtot -0.333
-     7   h1     1   DMS    H2    7     0.083367      1.00800 ; qtot -0.250
-     8   h1     1   DMS    H3    8     0.083367      1.00800 ; qtot -0.167
-     9   h1     1   DMS    H4    9     0.083367      1.00800 ; qtot -0.083
-    10   h1     1   DMS    H5   10     0.083367      1.00800 ; qtot 0.000
+;   nr  type  resi  res  atom  cgnr     charge      mass     
+     1   c3     1   DMS     C    1    -0.130800     12.01000 
+     2   s4     1   DMS     S    2     0.268600     32.06000 
+     3   c3     1   DMS    C1    3    -0.130800     12.01000 
+     4    o     1   DMS     O    4    -0.507203     16.00000 ; A 
+     5   h1     1   DMS     H    5     0.083367      1.00800 
+     6   h1     1   DMS    H1    6     0.083367      1.00800 
+     7   h1     1   DMS    H2    7     0.083367      1.00800 
+     8   h1     1   DMS    H3    8     0.083367      1.00800 
+     9   h1     1   DMS    H4    9     0.083367      1.00800 
+    10   h1     1   DMS    H5   10     0.083367      1.00800
 
 [ bonds ]
 ;   ai     aj funct   r             k

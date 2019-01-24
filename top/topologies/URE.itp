@@ -5,15 +5,15 @@
  URE              3
 
 [ atoms ]
-;   nr  type  resi  res  atom  cgnr     charge      mass       ; qtot   bond_type
-     1    n     1   URE     N    1    -0.642001    14.010000
+;   nr  type  resi  res  atom  cgnr     charge      mass
+     1    n     1   URE     N    1    -0.642001    14.010000 ; D A
      2    c     1   URE     C    2     0.727101    12.010000
-     3    n     1   URE    N1    3    -0.642001    14.010000
-     4    o     1   URE     O    4    -0.639100    16.000000
-     5   hn     1   URE     H    5     0.299000     1.008000
-     6   hn     1   URE    H1    6     0.299000     1.008000
-     7   hn     1   URE    H2    7     0.299001     1.008000
-     8   hn     1   URE    H3    8     0.299000     1.008000
+     3    n     1   URE    N1    3    -0.642001    14.010000 ; D A
+     4    o     1   URE     O    4    -0.639100    16.000000 ; A
+     5   hn     1   URE     H    5     0.299000     1.008000 ; H
+     6   hn     1   URE    H1    6     0.299000     1.008000 ; H
+     7   hn     1   URE    H2    7     0.299001     1.008000 ; H
+     8   hn     1   URE    H3    8     0.299000     1.008000 ; H
 
 [ bonds ]
 ;   ai     aj funct   r             k

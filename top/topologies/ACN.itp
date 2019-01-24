@@ -8,13 +8,13 @@
 ;   nr  type  resi  res  atom  cgnr     charge      mass       ; qtot   bond_type
      1   c3     1   ACN     C    1    -0.174099    12.010000
      2    c     1   ACN    C1    2     0.656101    12.010000
-     3    n     1   ACN     N    3    -0.685000    14.010000
-     4    o     1   ACN     O    4    -0.613100    16.000000
+     3    n     1   ACN     N    3    -0.685000    14.010000 ; D A
+     4    o     1   ACN     O    4    -0.613100    16.000000 ; A
      5   hc     1   ACN     H    5     0.065365     1.008000
      6   hc     1   ACN    H1    6     0.065365     1.008000
      7   hc     1   ACN    H2    7     0.065365     1.008000
-     8   hn     1   ACN    H3    8     0.310002     1.008000
-     9   hn     1   ACN    H4    9     0.310001     1.008000
+     8   hn     1   ACN    H3    8     0.310002     1.008000 ; H
+     9   hn     1   ACN    H4    9     0.310001     1.008000 ; H
 
 [ bonds ]
 ;   ai     aj funct   r             k

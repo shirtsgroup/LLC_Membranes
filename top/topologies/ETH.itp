@@ -8,13 +8,13 @@
 ;   nr  type  resi  res  atom  cgnr     charge      mass       ; qtot   bond_type
      1   c3     1   ETH     C    1    -0.096700    12.010000
      2   c3     1   ETH    C1    2     0.131400    12.010000
-     3   oh     1   ETH     O    3    -0.600600    16.000000
+     3   oh     1   ETH     O    3    -0.600600    16.000000 ; D A
      4   hc     1   ETH     H    4     0.044800     1.008000
      5   hc     1   ETH    H1    5     0.044800     1.008000
      6   hc     1   ETH    H2    6     0.044800     1.008000
      7   h1     1   ETH    H3    7     0.016800     1.008000
      8   h1     1   ETH    H4    8     0.016800     1.008000
-     9   ho     1   ETH    H5    9     0.397900     1.008000
+     9   ho     1   ETH    H5    9     0.397900     1.008000 ; H
 
 [ bonds ]
 ;   ai     aj funct   r             k

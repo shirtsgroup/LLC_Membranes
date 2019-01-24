@@ -37,15 +37,13 @@ class Residue(object):
         else:
             try:
                 self.t = md.load('%s.pdb' % name,
-                            standard_names=False)  # see if there is a solute configuration in this directory
+                                 standard_names=False)  # see if there is a solute configuration in this directory
             except OSError:
                 try:
                     self.t = md.load('%s/../top/topologies/%s.pdb' % (script_location, name),
-                                standard_names=False)  # check if the configuration is
-                    # located with all of the other topologies
+                                     standard_names=False)  # check if the config is with all of the other topologies
                 except OSError:
                     raise OSError('No residue %s found. Perhaps you have not made a %s.pdb yet?' % (name, name))
-                    #sys.exit('No residue %s found. Perhaps you have not made a %s.pdb yet?' % (name, name))
 
             try:
                 f = open('%s.itp' % name, 'r')
@@ -53,7 +51,7 @@ class Residue(object):
                 try:
                     f = open('%s/../top/topologies/%s.itp' % (script_location, name), 'r')
                 except FileNotFoundError:
-                    sys.exit('No topology %s.itp found' % name)
+                    raise FileNotFoundError('No topology %s.itp found' % name)
 
             self.res = [a.residue.name for a in self.t.topology.atoms]
 
@@ -79,14 +77,31 @@ class Residue(object):
                 self.mass = {}  # key = atom name, value = mass
                 self.charges = {}
 
+                self.hbond_H = []  # hydrogen atoms capable of hbonding
+                self.hbond_D = []  # hydrogen bond donor atoms
+                self.hbond_A = []  # hydrogen bond acceptors
+
                 atoms_index += 2
                 self.natoms = 0
                 while self.itp[self.natoms + atoms_index] != '\n':
+
                     data = self.itp[self.natoms + atoms_index].split()
                     self.indices[data[4]] = int(data[0])
                     self.names[int(data[0])] = data[4]
                     self.mass[data[4]] = float(data[7])
                     self.charges[data[4]] = float(data[6])
+
+                    try:  # check for annotations on atom
+                        annotations = self.itp[self.natoms + atoms_index].split(';')[1].split()
+                        if 'H' in annotations:
+                            self.hbond_H.append(data[4])
+                        if 'D' in annotations:
+                            self.hbond_D.append(data[4])
+                        if 'A' in annotations:
+                            self.hbond_A.append(data[4])
+                    except IndexError:
+                        pass
+
                     self.natoms += 1
 
                 self.mw = sum(self.mass.values())

@@ -8,14 +8,14 @@
 ;   nr  type  resi  res  atom  cgnr     charge      mass       ; qtot   bond_type
      1   c3     1   GCL     C    1     0.127210    12.010000
      2   c3     1   GCL    C1    2     0.127310    12.010000
-     3   oh     1   GCL     O    3    -0.603890    16.000000
-     4   oh     1   GCL    O1    4    -0.603890    16.000000
+     3   oh     1   GCL     O    3    -0.603890    16.000000 ; D A
+     4   oh     1   GCL    O1    4    -0.603890    16.000000 ; D A
      5   h1     1   GCL     H    5     0.035710     1.008000
      6   h1     1   GCL    H1    6     0.035710     1.008000
      7   h1     1   GCL    H2    7     0.035710     1.008000
      8   h1     1   GCL    H3    8     0.035710     1.008000
-     9   ho     1   GCL    H4    9     0.405210     1.008000
-    10   ho     1   GCL    H5   10     0.405210     1.008000
+     9   ho     1   GCL    H4    9     0.405210     1.008000 ; H
+    10   ho     1   GCL    H5   10     0.405210     1.008000 ; H
 
 [ bonds ]
 ;   ai     aj funct   r             k

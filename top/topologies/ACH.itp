@@ -5,15 +5,15 @@
  ACH              3
 
 [ atoms ]
-;   nr  type  resi  res  atom  cgnr     charge      mass       ; qtot   bond_type
-     1   c3     1   ACH     C    1    -0.149725    12.010000
+;   nr  type  resi  res  atom  cgnr     charge      mass     
+     1   c3     1   ACH     C    1    -0.149725    12.010000  
      2    c     1   ACH    C1    2     0.634575    12.010000
-     3   oh     1   ACH     O    3    -0.610825    16.000000
-     4    o     1   ACH    O1    4    -0.551325    16.000000
+     3   oh     1   ACH     O    3    -0.610825    16.000000 ; D A
+     4    o     1   ACH    O1    4    -0.551325    16.000000 ; A
      5   hc     1   ACH     H    5     0.077575     1.008000
      6   hc     1   ACH    H1    6     0.077575     1.008000
      7   hc     1   ACH    H2    7     0.077575     1.008000
-     8   ho     1   ACH    H3    8     0.444575     1.008000
+     8   ho     1   ACH    H3    8     0.444575     1.008000 ; H
 
 [ bonds ]
 ;   ai     aj funct   r             k
