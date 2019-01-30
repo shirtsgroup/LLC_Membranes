@@ -15,7 +15,9 @@
 \usepackage{gensymb}
 \usepackage{float}
 
-\title{The Transport Mechanisms of Polar Solutes in a Cross-linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
+%BJC: potential titles (uncommented is current favorite)
+%\title{The Transport Mechanisms of Polar Solutes in a Cross-linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
+\title{Size, Shape and Functionality Dependence of Solute Transport Mechanisms in a Cross-linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
 \author{Benjamin J. Coscia \and Michael R. Shirts} 
 
 \begin{document}
@@ -122,7 +124,7 @@
 	\item .mdp files are in the supporting information % with pressure controlled by the Parrinello-Rahman barostat.
   \end{itemize}
   
-  \subsubsection*{Modeling subdiffusion}\label{method:CTRW}
+  \subsubsection*{Modeling subdiffusion}\label{method:model_sFBM}
 
   Solutes in our H\textsubscript{II} LLC membrane exhibit subdiffusive
   behavior, a type of anomalous diffusion. 
@@ -345,40 +347,101 @@
   % BJC: For Greg to write if things work out
    
   \section{Results and Discussion}
-
-  \subsection{Simulated Predictions}\label{section:D_macro}
   
-  We extracted values of $\sigma$, $\alpha$ and $H$ for each solute and then
-  simulated 10000 solutes trajectories as described in the Methods. The results
-  are presented in Table~\ref{table:simulations}.
+  \subsection{Governing Mechanisms}\label{section:mechanism_overview}
+
+  % BJC: seems right to summarize overarching mechanisms observed first
+  The mechanisms which govern transport of small polar solutes in this 
+  system can be broadly described based a solute's size, shape, and polarity.
+  \begin{itemize}
+    \item In general, solutes can move fastest in the pore center, where
+    there is comparatively little resistance to diffusion. 
+  	\item The well-established trend of decreasing solute mobility with 
+  	size is not defied here, however we observe small solutes with lower-than-expected
+  	MSDs because they spend time trapped between monomer head groups.
+  	\item Additionally, planar molecules are prone to exhibiting similar
+  	trapping behavior, even for large molecules whose similar sized, but flexible
+  	counterparts exhibit faster diffusion.  %BJC: this is unproven
+  	\item The polarity of solutes also influences a solute's ability to stay in
+  	the pore center. Highly polar molecules tend to spend more time in the pore center,
+  	while those with hydrophobic character tend to spend more time in the head group
+  	region.
+  	\item Finally, the ability to hydrogen bond offers a second trapping mechanism. 
+  	Solutes that are hydrogen bond donors can donate hydrogen atoms to
+  	any of the 5 oxygen atoms located on the monomer head groups. Increasing the 
+  	number of hydrogen bond donating groups increases the solute's polarity causing
+  	solutes to spend more time in the pore centers, but the effect can be countered
+  	by excessive trapping if there many hydrogen bonds are being formed.
+  	\item Overall solutes exhibit some degree of trapping, by one or a combination of the above
+  	mechanisms, with anticorrelated hops between each period of immobility due to 
+  	obstructions.
+  \end{itemize}
+
+  \end{itemize}
+  
+  We will explore these factors in greater detail in the context of 
+  specific groups of molecules in the discussion that follows.
+
+  \subsection{MSD Predictions}\label{section:msd_predictions}
+  
+  %BJC: focus on MD MSD results
+  \noindent We calculated the MSD of each solute in the set over the course of 1$\mu$s MD simulations.  %BJC: type of MSD TBD 
+  \begin{itemize}
+	\item We extracted values of $\sigma$, $\alpha$ and $H$ for each solute
+	and then simulated 10000 sFBM trajectories of the same length as our MD
+	simulations, as described in Section~\ref{section:model_sFBM} of the Methods.
+	\item The final MSDs of the sFBM trajectories are compared to those 
+	calculated directly from MD simulations in Figure~\ref{fig:all_msds}. 
+	\item The three sFBM parameters, calculated based on MD solute trajectories
+	are presented in Table~\ref{table:simulations}.
+	\item We would like to emphasize that we rely on the MD MSD values in order to
+	define trends in the total MSD, while the sFBM trajectories and parameter 
+	values allow us to speculate as to the reasons for the observed trends. 
+	\item There is a non-negligible amount of error in the calculation of 
+	each parameter which prevents us from reliably portraying our sFBM MSDs as
+	reduced	uncertainty MD MSDs.
+  \end{itemize}
+  
+  Our simulated sFBM MSDs qualitatively reproduce the MD trends.
+  \begin{itemize}
+    \item sFBM generally lower
+    \item There are a few noticeable discrepancies.
+    \item We will discuss reasons for these as we proceed with the discussion.
+  \end{itemize}
+
+  \begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{all_emsds.pdf}
+  \caption{}\label{fig:all_msds}
+  \end{figure}
   
   % Add MD calculated MSD to this?
   \begin{table}[h]
   \centering
-  \begin{tabular}{ccccc}
+  \begin{tabular}{cccc}
   \toprule
-  System & $\sigma$ ($nm$) & $\alpha$ & $H$ & Simulated MSD ($nm^2$)\\
+  System & $\sigma$ ($nm$) & $\alpha$ & $H$ \\
   \midrule
-  Methanol & 0.46 & 0.85 & 0.40 & 55.06 [49.26, 60.58] \\
-  Urea & 0.33 & 0.64 & 0.40 & 15.64 [14.08, 17.32] \\
-  Ethylene Glycol & 0.35 & 0.64 & 0.36 & 6.30 [5.69, 6.93] \\
-  Acetic Acid & 0.28 & 0.51 & 0.43 & 4.11 [3.66, 4.65] \\
-  Mercaptoethanol & 0.32 & 0.58 & 0.37 & 2.54 [2.16, 2.93] \\
-  Propylene Glycol & 0.26 & 0.50 & 0.43 & 1.94 [1.70, 2.17] \\
-  Ethanol & 0.32 & 0.55 & 0.26 & 1.29 [1.14, 1.43] \\
-  Propanol & 0.25 & 0.41 & 0.39 & 1.13 [1.01, 1.27] \\
-  Glycerol & 0.22 & 0.46 & 0.37 & 1.09 [0.98, 1.20] \\
-  Ethyl Acetate & 0.21 & 0.42 & 0.37 & 0.82 [0.74, 0.91] \\
-  Acetone & 0.23 & 0.44 & 0.34 & 0.80 [0.70, 0.88] \\
-  Dimethyl Sulfoxide & 0.25 & 0.47 & 0.29 & 0.74 [0.65, 0.82] \\
-  Tetrose & 0.22 & 0.43 & 0.20 & 0.68 [0.61, 0.75] \\
-  Acetamide & 0.27 & 0.52 & 0.21 & 0.56 [0.51, 0.64] \\
-  2,3-Dimercapto-1-propanol & 0.20 & 0.38 & 0.37 & 0.53 [0.47, 0.58] \\
-  Butanol & 0.19 & 0.41 & 0.33 & 0.42 [0.36, 0.49] \\
-  Propylene Carbonate & 0.19 & 0.38 & 0.29 & 0.30 [0.26, 0.34] \\
-  Tetrahydrofuran & 0.25 & 0.40 & 0.24 & 0.29 [0.25, 0.34] \\
-  Dimethyl Formamide & 0.20 & 0.39 & 0.27 & 0.27 [0.24, 0.31] \\
-  Ribose & 0.21 & 0.43 & 0.23 & 0.27 [0.24, 0.31] \\
+  Methanol & 0.46 & 0.85 & 0.40 \\
+  Urea & 0.33 & 0.64 & 0.40 \\
+  Ethylene Glycol & 0.35 & 0.64 & 0.36 \\
+  Acetic Acid & 0.28 & 0.51 & 0.44 \\
+  Mercaptoethanol & 0.30 & 0.54 & 0.26 \\
+  Ethanol & 0.32 & 0.55 & 0.25 \\
+  Propylene Glycol & 0.26 & 0.48 & 0.35 \\
+  Glycerol & 0.23 & 0.46 & 0.37 \\
+  Acetamide & 0.28 & 0.52 & 0.26 \\
+  Propanol & 0.25 & 0.41 & 0.35 \\
+  Acetone & 0.23 & 0.44 & 0.34 \\
+  Ethyl Acetate & 0.21 & 0.41 & 0.37 \\
+  Dimethyl Sulfoxide & 0.26 & 0.48 & 0.26 \\
+  Tetrose & 0.24 & 0.43 & 0.30 \\
+  Butanol & 0.19 & 0.41 & 0.33 \\
+  Dimethyl Formamide & 0.20 & 0.39 & 0.32 \\
+  2,3-Dimercapto-1-propanol & 0.20 & 0.37 & 0.35 \\
+  Ribose & 0.20 & 0.40 & 0.27 \\
+  Propylene Carbonate & 0.19 & 0.38 & 0.29 \\
+  Tetrahydrofuran & 0.24 & 0.39 & 0.16 \\
   \bottomrule
   \end{tabular}
   \caption{We calculated values $\sigma$, $\alpha$ and $H$ from MD simulation
@@ -386,7 +449,7 @@
   simulated trajectories.}\label{table:simulations}
   \end{table}
   
-  It most cases, it is easy to relate $\sigma$, $\alpha$ and $H$ to the simulated
+  It most cases, it is easy to relate $\sigma$, $\alpha$ and $H$ to the
   simulated MSD values presented in Table~\ref{table:simulations}. 
   \begin{itemize}
   	\item Higher values of $\sigma$ indicate larger average hop lengths.
@@ -395,12 +458,6 @@
   	\item Values of $H$ near the Brownian limit of 0.5, indicate a lower degree
   	of anti-correlation.
   	\item All of which contribute to an overall increase in the simulated MSD
-  \end{itemize}
-  
-  Polar molecules generally exhibit a hop diffusion mechanism. 
-  \begin{itemize}
-	\item Each trajectory is characterized by a power law distribution of
-	dwell times between hops of random lengths from a Gaussian distribution.
   \end{itemize}
 
   % BJC: figure with selected trajectories for each molecule.

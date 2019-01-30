@@ -1,0 +1,21 @@
+;Forcefield
+#include "/home/bcoscia/PycharmProjects/LLC_Membranes/setup/../top/Forcefields/gaff/gaff.itp"
+
+;HII Topology
+#include "restrained.itp"
+
+;Ion Topology
+#include "/home/bcoscia/PycharmProjects/LLC_Membranes/setup/../top/topologies/ions.itp"
+
+;SOL Topology
+#include "/home/bcoscia/PycharmProjects/LLC_Membranes/setup/../top/topologies/SOL.itp"
+
+[ system ]
+Simulation Box
+
+[ molecules ]
+;Compounds     nmols
+HII                1
+NA               120
+SOL              146
+SOL                21

@@ -71,24 +71,23 @@ def z_correlation(z, L, v=0.1):
 
 class Assembly(LC):
 
-    """Initialize geometry of columnar pore structure
-
-    :param name: name of monomer with which the system will be built.
-    :param npores: number of pores in the system
-    :param p2p: absolute pore-to-pore distance
-    :param pore_alpha: angle between x and y box vector. For example if pore_alpha = 120 or 60, you'll get hexagonally packed pores
-    :param pore_radius: distance from pore center to place monomer head groups (nm)
-    :param tilt: tilt monomer head group with respect to xy plane
-
-    :type name: str
-    :type npores: int
-    :type p2p: float
-    :type pore_alpha: float
-    :type pore_radius: float
-    :type tilt: float
-    """
-
     def __init__(self, name, npores, p2p, pore_alpha, pore_radius, tilt=0):
+        """Initialize geometry of columnar pore structure
+
+        :param name: name of monomer with which the system will be built.
+        :param npores: number of pores in the system
+        :param p2p: absolute pore-to-pore distance
+        :param pore_alpha: angle between x and y box vector. For example if pore_alpha = 120 or 60, you'll get hexagonally packed pores
+        :param pore_radius: distance from pore center to place monomer head groups (nm)
+        :param tilt: tilt monomer head group with respect to xy plane
+
+        :type name: str
+        :type npores: int
+        :type p2p: float
+        :type pore_alpha: float
+        :type pore_radius: float
+        :type tilt: float
+        """
 
         super().__init__(name)
 

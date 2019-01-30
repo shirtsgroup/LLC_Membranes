@@ -107,6 +107,7 @@ class CTRW(object):
         self.fit_start = 0
         self.acf = None  # autocorrelation function
         self.final_msd = None
+        self.steps = []
 
         # Initialize multi-threading
         self.pbar = None
@@ -163,6 +164,7 @@ class CTRW(object):
 
                 self.hop_sigma = np.random.choice(distributions[1])
                 self.H = np.random.choice(distributions[2])
+                #self.H = np.mean(distributions[2])
 
             time = [0]
             total_time = 0  # saves a lot of time
@@ -173,7 +175,10 @@ class CTRW(object):
                 if self.dwell_distribution == 'exponential':
                     time.append(sampling.random_exponential_dwell(self.lamb))
                 elif self.dwell_distribution == 'power':
-                    time.append(sampling.random_power_law_dwell(1 + self.alpha, ll=ll, discrete=discrete))
+                    if self.alpha == 1:
+                        time.append(1)
+                    else:
+                        time.append(sampling.random_power_law_dwell(1 + self.alpha, ll=ll, discrete=discrete))
                 else:
                     sys.exit('Please enter a valid dwell time probability distribution')
                 total_time += time[-1]
@@ -187,6 +192,7 @@ class CTRW(object):
 
             elif self.hop_distribution in ['fbm', 'fractional', 'fraction_brownian_motion']:
                 z = fbm.FBM(len(time), self.H, method="daviesharte", scale=self.hop_sigma).fbm()[:-1]  # automatically inserts zero at beginning of array
+                self.steps.append(z[1:] - z[:-1])  # for autocorrelation calculation
 
             else:
                 sys.exit('Please enter a valid hop distance probability distribution')
@@ -471,9 +477,24 @@ class CTRW(object):
         """ Calculate autocorrelation of step length and direction
         """
 
-        self.acf = timeseries.step_autocorrelation(self.z_interpolated.T[..., np.newaxis])
+        max_hops = max([len(x) for x in self.steps])
 
-    def plot_autocorrelation(self, show=True):
+        self.acf = np.zeros([len(self.steps), max_hops])
+
+        keep = []  # list to hold indices of trajectories with a non-zero amount of hops
+        for i in range(len(self.steps)):
+            hops = self.steps[i]
+            if len(hops) > 1:
+                self.acf[i, :len(self.steps[i])] = timeseries.acf(self.steps[i])
+                keep.append(i)
+
+        self.acf = self.acf[keep, :]
+
+        self.acf = np.array([self.acf[np.nonzero(self.acf[:, i]), i].mean() for i in range(max_hops)])
+
+        #self.acf = timeseries.step_autocorrelation(self.z_interpolated.T[..., np.newaxis])
+
+    def plot_autocorrelation(self, show=True, fit=False):
         """ Plot autocorrelation function
 
         :param show: show plot
@@ -483,9 +504,27 @@ class CTRW(object):
         :return:
         """
 
+        # acf = self.acf.mean(axis=0)
+
+        if fit:
+
+            hdip = self.acf[1]
+
+            H = np.log(2 * hdip + 2) / (2 * np.log(2))  # initial guess at H based on first dip in autocovariance
+
+            print('First dip: %.3f' % H)
+
+            from scipy.optimize import curve_fit
+
+            max_k = 5
+            h_opt = curve_fit(fitting_functions.hurst_autocovariance, np.arange(max_k + 1), self.acf[:(max_k + 1)],
+                              p0=H)[0]
+
+            print('Fit H: %.3f' % h_opt)
+
         plt.figure()
-        plt.plot(self.time_uniform[:self.acf.shape[1]], self.acf.mean(axis=0))
-        plt.xlabel('Time', fontsize=14)
+        plt.plot(self.time_uniform[:self.acf.size], self.acf)
+        plt.xlabel('Steps', fontsize=14)
         plt.ylabel('Autocorrelation', fontsize=14)
         plt.gcf().get_axes()[0].tick_params(labelsize=14)
         plt.tight_layout()
@@ -498,18 +537,18 @@ if __name__ == "__main__":
 
     args = initialize().parse_args()
 
-    # ctrw = CTRW(args.steps, args.ntraj, hop_dist=args.hop_length_distribution, dwell_dist=args.dwell_time_distribution,
-    #             hop_sigma=args.hop_sigma, alpha=args.alpha, dt=args.dt, nt=args.nthreads, H=args.hurst)
-    # ctrw.generate_trajectories(fixed_time=args.fix_time, noise=args.noise, limit=args.upper_limit)
-    # ctrw.calculate_msd(ensemble=args.ensemble)
-    # ctrw.bootstrap_msd(nboot=args.nboot, fit_power_law=args.fit_power_law, fit_linear=args.fit_line)
-    # ctrw.plot_msd(plot_power_law=args.fit_power_law, plot_linear=args.fit_line, show=True)#, end_frame=5000)
-    #
-    # if args.autocorrelation:
-    #     ctrw.step_autocorrelation()
-    #     ctrw.plot_autocorrelation(show=True)
-    #
-    # exit()
+    ctrw = CTRW(args.steps, args.ntraj, hop_dist=args.hop_length_distribution, dwell_dist=args.dwell_time_distribution,
+                hop_sigma=args.hop_sigma, alpha=args.alpha, dt=args.dt, nt=args.nthreads, H=args.hurst)
+    ctrw.generate_trajectories(fixed_time=args.fix_time, noise=args.noise, limit=args.upper_limit)
+    ctrw.calculate_msd(ensemble=args.ensemble)
+    ctrw.bootstrap_msd(nboot=args.nboot, fit_power_law=args.fit_power_law, fit_linear=args.fit_line)
+    ctrw.plot_msd(plot_power_law=args.fit_power_law, plot_linear=args.fit_line, show=False)#, end_frame=5000)
+
+    if args.autocorrelation:
+        ctrw.step_autocorrelation()
+        ctrw.plot_autocorrelation(show=False, fit=True)
+
+    exit()
     #
     # last = ctrw.msd.mean(axis=0)[int(0.5*ctrw.time_uniform.size)]
     # CI = stats.confidence_interval(ctrw.bootstraps, 95)[:, int(0.5*ctrw.time_uniform.size)]

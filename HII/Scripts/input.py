@@ -88,6 +88,6 @@ if __name__ == "__main__":
         mdp.write_npt_mdp()
     elif args.ensemble == 'nvt':
         mdp.write_nvt_mdp()
-
+    print(args.coord)
     top = SystemTopology(args.coord, restraints=args.restraints, xlink=args.xlink)
     top.write_top()

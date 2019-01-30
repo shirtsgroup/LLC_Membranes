@@ -46,7 +46,7 @@ def initialize():
 
 class Diffusivity(object):
 
-    def __init__(self, traj, gro, axis, begin=0, startfit=0.01, endfit=0.2, residue=False, atoms=[], restrict=[]):
+    def __init__(self, traj, gro, axis, begin=0, startfit=0.01, endfit=1, residue=False, atoms=[], restrict=[]):
         """
         Calculate diffusivity from trajectory
         :param traj: unwrapped trajectory (i.e. gmx trjconv with -pbc nojump)
@@ -78,7 +78,11 @@ class Diffusivity(object):
 
         # initialize fits to data, error analysis and plotting parameters
         self.startfit = int(startfit*self.nT)  # index at which to start fit
-        self.endfit = int(endfit*self.nT)  # index at which to end fit
+        if endfit == 1:
+            self.endfit = self.nT - 1
+        else:
+            self.endfit = int(endfit*self.nT)  # index at which to end fit
+
         self.y_fit = []
         self.A = []  # fit parameters
         self.W = []  # weight matrix for curve fitting
@@ -442,9 +446,9 @@ class Diffusivity(object):
 
         output = crsr.execute(check_existence).fetchall()
 
-        msd = self.MSD_average[self.endfit]
-        msd_lower = msd - self.limits[1, self.endfit]
-        msd_upper = msd + self.limits[0, self.endfit]
+        msd = self.MSD_average[self.endfit - 1]  # usually I would do :self.endfit so subtracting 1 here makes sense
+        msd_lower = msd - self.limits[1, self.endfit - 1]
+        msd_upper = msd + self.limits[0, self.endfit - 1]
 
         if ensemble:
             data_labels = ['MD_MSD', 'MD_MSD_CI_lower', 'MD_MSD_CI_upper']
@@ -522,7 +526,7 @@ if __name__ == "__main__":
     D.plot(args.axis, fracshow=args.fracshow, show=show)
 
     if args.update:
-        D.update_database()
+        D.update_database(ensemble=args.ensemble)
 
     if not args.power_law and not args.nofit:
         print('D = %1.2e +/- %1.2e m^2/s' % (D.Davg, np.abs(D.Davg - D.confidence_interval[0])))

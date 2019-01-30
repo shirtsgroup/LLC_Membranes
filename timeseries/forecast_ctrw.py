@@ -272,18 +272,38 @@ class System(object):
                     # plt.show()
                     # exit()
 
+                    # for visualization predicted z-hops on top of time series
+                    # traj_hops = np.zeros([2*len(bp) - 1, 2])
+                    #
+                    # traj_hops[1::2, 0] = self.time[bp[:-1]]*2
+                    # traj_hops[2::2, 0] = self.time[bp[:-1]]*2
+
                     initial_dwells.append(bp[0])
                     if len(bp) > 1:  # handle case where the only break point is at the end of the simulation
                         final_dwells.append(bp[-1] - bp[-2])
 
-                    for k in range(len(bp) - 2):  # exclude first and last segments
+                    for k in range(len(bp) - 1):
 
-                        #self.dwell_times.append(self.time[bp[k + 1]] - self.time[bp[k]])
-                        self.dwell_times.append(bp[k + 1] - bp[k])  # discrete form
+                        if (k + 1) < (len(bp) - 1):  # exclude first and last segments for dwell times
+                            self.dwell_times.append(bp[k + 1] - bp[k])  # discrete form
 
                         if k > 0:  # need two different z coordinates to get a hop length
                             hop_lengths.append(np.mean(self.com[bp[k]:bp[k + 1], j, 2]) -
                                                     np.mean(self.com[bp[k - 1]:bp[k], j, 2]))
+                        else:
+                            # bp[0] != 0, rather it is the first break point location. bp[-1] is the last point in the
+                            # time series though
+                            hop_lengths.append(np.mean(self.com[bp[k]:bp[k + 1], j, 2]) -
+                                               np.mean(self.com[0:bp[k], j, 2]))  # hop at first segment
+
+                        # traj_hops[2*k, 0] = bp[k]
+                        # traj_hops[2*k + 1, 0] = bp[k + 1]
+                        # traj_hops[2*k:(2*k + 2), 1] = np.mean(self.com[bp[k]:bp[k + 1], j, 2])
+
+                    # ruptures.display(self.com[begin:end, j, :], bp, figsize=(10, 6))
+                    # plt.plot(traj_hops[:, 0], traj_hops[:, 1], '--', color='black')
+                    # plt.show()
+                    # exit()
                 try:
                     begin = switch_points[2*i + 1]
                 except IndexError:
@@ -523,12 +543,14 @@ class System(object):
 
             H = np.log(2 * hboot + 2) / (2 * np.log(2))  # initial guess at H based on first dip in autocovariance
 
+            # if H > 0:
+            #     self.hurst_distribution.append(H)
+
             acf_boot = [acf[traj, i][np.nonzero(acf[traj, i])].mean() for i in range(max_k + 1)]
 
             h_opt = curve_fit(fitting_functions.hurst_autocovariance, np.arange(max_k + 1), acf_boot[:(max_k + 1)],
                               p0=H)[0]
 
-            # temporary workaround until THF gets more data points
             if h_opt > 0:
 
                 self.hurst_distribution.append(h_opt[0])
@@ -643,15 +665,19 @@ if __name__ == "__main__":
 
         sys.hops_and_dwells(penalty=args.breakpoint_penalty)
 
-        sys.fit_distributions(nbins=args.nbins, nboot=args.nboot, plot=False)
+        sys.fit_distributions(nbins=args.nbins, nboot=args.nboot, plot=True, show=True)
 
         sys.estimate_hurst()
 
         if args.update:
             sys.update_database()
 
-        #file_rw.save_object(sys, 'forecast_%s.pl' % args.residue)
+        file_rw.save_object(sys, 'forecast_%s.pl' % args.residue)
 
+    sys.estimate_hurst()
+    plt.hist(sys.hurst_distribution, bins=25)
+    plt.show()
+    exit()
     # plt.plot(sys.hop_acf, linewidth=2,  label='Simulation')
     # plt.xlabel('k', fontsize=14)
     # plt.ylabel('Autocovariance', fontsize=14)
@@ -674,7 +700,8 @@ if __name__ == "__main__":
 
     # simulate ntrajsim trajectories for same length as MD
     random_walks = CTRW(2000, args.ntrajsim, dt=sys.dt, hop_dist='fbm', dwell_dist='power')
-
+    # sys.hurst_distribution = 0.5*np.ones(10)
+    # sys.alpha_distribution = np.ones(10)
     random_walks.generate_trajectories(fixed_time=True, distributions=(sys.alpha_distribution,
                                        sys.hop_sigma_distribution, sys.hurst_distribution), discrete=True, ll=1)
     random_walks.calculate_msd(ensemble=args.ensemble)
@@ -693,4 +720,3 @@ if __name__ == "__main__":
         random_walks.plot_msd(show=False, end_frame=8000)  # get data up to 400 ns
         if args.update:
             sys.update_database(type='msd_time_average', data=random_walks.final_msd)
-    exit()

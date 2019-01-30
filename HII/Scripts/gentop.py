@@ -29,7 +29,8 @@ class SystemTopology(object):
         :param gro: (str) coordinate file for which to create topology
         :param ff: (str) forcefield to use (default=gaff)
         """
-
+        print(gro)
+        exit()
         t = md.load(gro)  # load coordinate file
 
         self.script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))

@@ -224,6 +224,6 @@ if __name__ == "__main__":
         rdfs[i].radial_distribution_function(bins=args.bins, spline=args.spline, npts_spline=args.spline_pts,
                                              cut=args.cut)
         rdfs[i].bootstrap(args.nboot)
-        rdfs[i].plot(show=False, normalize=True, save=True)
+        rdfs[i].plot(show=False, normalize=args.normalize, save=True)
 
     #plt.show()

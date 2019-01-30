@@ -175,6 +175,13 @@ class System(object):
 
         equil.generate_input_files(gro, ensemble, self.args.length_nvt, restraints=self.args.restraint_residue)
 
+    def put_in_box(self, gro, tpr):
+
+        p1 = subprocess.Popen(['echo', '0'], stdout=subprocess.PIPE)
+        trjconv = "gmx trjconv -f %s -o %s -pbc atom -s %s -ur tric" % (gro, gro, tpr)
+        p2 = subprocess.Popen(trjconv.split(), stdin=p1.stdout)
+        p2.wait()
+
     def equilibrate(self, input_files=True):
 
         self.build()
@@ -200,6 +207,8 @@ class System(object):
         p = subprocess.Popen(cp.split())
         p.wait()
 
+        self.put_in_box('%s.gro' % self.args.forces[0], 'em.tpr')
+
     def calculate_pore_water(self):
 
         # solvate the system
@@ -211,9 +220,11 @@ class System(object):
         cmd = "%s solvate -cp %s.gro -cs spc216.gro -o solvated.gro -p topol.top" % (gmx, self.args.forces[0])
         subprocess.call(cmd.split())
 
+        self.put_in_box('solvated.gro', 'solvated.gro')
+
         pore_defining_atoms = lc_class.LC(self.args.build_monomer).pore_defining_atoms
 
-        self.solvated = solute_partitioning.System('solvated.gro', pore_defining_atoms, 'SOL')
+        self.solvated = solute_partitioning.System('solvated.gro', self.args.build_monomer, 'SOL')
         self.solvated.locate_pore_centers()
 
         # radius based on reference atom of lc_class, but partition based on pore_defining_atoms. Need to make choice or leave it

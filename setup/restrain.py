@@ -41,7 +41,6 @@ def initialize():
     parser.add_argument('-i', '--input', type=str, default='dipole.itp', help='Name of topology file to be edited if '
                                                                               'you use the option --append')
     ####################################################################################################################
-    parser.add_argument('--bcc', action="store_true", help='Use BCC topology')
     parser.add_argument('-dr', '--dihedral_restraints', action='append', nargs='+',
                         help='Specify atom names of dihedral to be restrained, followed by angle at which to restrain'
                              'them, the deviation from that angle allowed and the force constant to apply. For example:'
@@ -164,13 +163,12 @@ def dihedral_restraints(file, atoms):
 
 class RestrainedTopology(object):
 
-    def __init__(self, gro, res, atoms, bcc=False, name='restrained', com=False, xlink=False,
+    def __init__(self, gro, res, atoms, name='restrained', com=False, xlink=False,
                  vparams=None):
         """
         :param gro: coordinate file where restraints will be placed
         :param res: name of residue where position restraints are being added
         :param atoms: name of atoms to be restrained in res
-        :param bcc: whether or not this system is bicontinuous cubic (affects where topology is found)
         :param name: name of output topology file
         :param com: restrain center of mass of atoms instead of individual atoms
         :param xlink : whether or not the system is in the process of being crosslinked
@@ -235,7 +233,7 @@ class RestrainedTopology(object):
             # centers_of_mass = np.mean(groups, axis=1)
             # self.coords = centers_of_mass  # redefine coordinates as centers of mass
 
-            file_rw.write_assembly(residue_top, '%s.itp' % self.name, self.nmon, bcc=bcc, xlink=xlink)
+            file_rw.write_assembly(residue_top, '%s.itp' % self.name, self.nmon, xlink=xlink)
 
             # now the dummies need to be added to the .gro file. They are placed at the end of the residue section
             # This loop works for a single virtual site per monomer. It will need to be modified if multiple sites
@@ -251,7 +249,7 @@ class RestrainedTopology(object):
 
             file_rw.write_gro_pos(self.all_coords, '%s.gro' % self.name, ids=self.ids, res=self.res, box=self.box_gromacs)
         else:
-            file_rw.write_assembly(res, '%s.itp' % self.name, self.nmon, bcc=bcc, xlink=xlink)
+            file_rw.write_assembly(res, '%s.itp' % self.name, self.nmon, xlink=xlink)
 
         with open('%s.itp' % self.name, 'r') as f:
             self.topology = []
@@ -329,7 +327,7 @@ if __name__ == "__main__":
 
     args = initialize()
 
-    top = RestrainedTopology(args.gro, args.monomer, args.atoms, bcc=args.bcc, com=args.center_of_mass,
+    top = RestrainedTopology(args.gro, args.monomer, args.atoms, com=args.center_of_mass,
                              vparams=args.virtual_site_parameters)
     # top.add_distance_restraint_columns(float(args.bond_restraints[0]), float(args.bond_restraints[1]))
     top.add_position_restraints(args.axis, args.f_const)

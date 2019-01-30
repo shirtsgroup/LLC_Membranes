@@ -3,6 +3,7 @@
 import argparse
 import mdtraj as md
 import os
+from LLC_Membranes.llclib import topology
 
 
 def initialize():
@@ -96,7 +97,8 @@ class SystemTopology(object):
             if i in self.ions:
                 natoms = 1
             else:
-                natoms = md.load('%s/%s.gro' % (self.top_location, i)).xyz.shape[1]  # number of atoms that make up a single residue of type i
+                natoms = topology.Residue(i).natoms
+                #natoms = md.load('%s/%s.gro' % (self.top_location, i)).xyz.shape[1]  # number of atoms that make up a single residue of type i
             residue_count[i] = residues.count(i) // natoms
 
         self.residues = unique_residues

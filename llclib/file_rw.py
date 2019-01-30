@@ -59,12 +59,11 @@ def read_gro_coords(file):
     return xyz, identity, no_atoms, lines_of_text
 
 
-def write_assembly(b, output, no_mon, bcc=False, xlink=False):
+def write_assembly(b, output, no_mon, xlink=False):
     """
     :param b: Name of build monomer (string)
     :param output: name of output file
     :param no_mon: number of monomers in the assembly
-    :param bcc: whether this is a bicontinuous cubic system. In the future, can use try/except to look for topologies
     :param xlink : whether the system is being cross-linked
     :return:
     """
@@ -75,16 +74,10 @@ def write_assembly(b, output, no_mon, bcc=False, xlink=False):
     if type(b) is list:  # restrain.py might pass in an already modified topology that isn't in the below folders
         a = b
     else:
-        if not bcc:
-            with open("%s/../top/topologies/%s" % (location, '%s.itp' % b), "r") as f:
-                a = []
-                for line in f:
-                    a.append(line)
-        else:
-            with open("%s/../BCC/top/topologies/%s" % (location, '%s.itp' % b), "r") as f:
-                a = []
-                for line in f:
-                    a.append(line)
+        with open("%s/../top/topologies/%s" % (location, '%s.itp' % b), "r") as f:
+            a = []
+            for line in f:
+                a.append(line)
 
     atoms_index, bonds_index, pairs_index, angles_index, dihedrals_p_index, \
     dihedrals_imp_index, vsite_index, vtype = get_indices(a, xlink)

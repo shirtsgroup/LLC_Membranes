@@ -25,6 +25,8 @@ if __name__ == "__main__":
 
     args = initialize().parse_args()
 
+    args.net_charge *= 10**args.precision
+
     res = topology.Residue(args.itp)
 
     charges = res.charges
@@ -33,12 +35,11 @@ if __name__ == "__main__":
         charges[key] = int(value * 10**args.precision)
 
     net_charge = sum(res.charges.values())
-
     if net_charge == args.net_charge:
         sys.exit('Charge is already balanced')
 
     # increment all charge values if net_charge is greater than res.natoms
-    n_changes = abs(int(net_charge / res.natoms))
+    n_changes = abs(int((net_charge - args.net_charge) / res.natoms))
 
     if net_charge < args.net_charge:
         increment = 1
@@ -58,7 +59,8 @@ if __name__ == "__main__":
     # subprocess.Popen(['cp', '%s/../top/topologies/%s.itp' % (script_location, args.itp),
     #                   '%s/../top/topologies/%s.itp.bak' % (script_location, args.itp)])
     cp = 'cp %s.itp %s.itp.bak' % (args.itp, args.itp)
-    subprocess.Popen(cp.split())
+    p = subprocess.Popen(cp.split())
+    p.wait()
 
     #with open('%s/../top/topologies/%s.itp' % (script_location, args.itp), 'w') as f:
     with open('%s.itp' % args.itp, 'w') as f:
