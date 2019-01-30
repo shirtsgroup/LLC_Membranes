@@ -5,17 +5,19 @@ import unittest
 import numpy as np
 
 
-class check_build(unittest.TestCase):
+class CheckSetup(unittest.TestCase):
 
     def __init__(self):
 
         super().__init__()
 
+    def check_build(self):
+
         sys = build.Assembly('NAcarb11V.gro', 4, 45, 60, 1, tilt=0)  # name, npores, p2p, pore_alpha, pore_radius, tilt=0
 
         assert sum([sys.tilt, sys.pore_radius]) == 1, 'Should be 1'
 
-        self.assertAlmostEqual(168.374582405, np.linalg.norm(sys.pore_centers))
+        self.assertAlmostEqual(168.374582405, np.linalg.norm(sys.pore_centers), msg='Should be %.8f' % 168.374582405)
 
 # self.tilt = tilt
 # self.xyz = np.zeros([0, 3])
@@ -39,6 +41,5 @@ class check_build(unittest.TestCase):
 
 if __name__ == "__main__":
 
-    check_build()
-
-
+    setup = CheckSetup()
+    setup.check_build()
