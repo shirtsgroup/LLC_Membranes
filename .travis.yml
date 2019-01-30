@@ -7,7 +7,7 @@ python:
   - "3.6"
   
 install:
-  - pip install numpy cython
+  - pip install cython pandas
   - pip install -r requirements.txt
   
 script:
