@@ -13,16 +13,14 @@ setup(
     # Self-descriptive entries which should always be present
     name='LLC_Membranes',
     author='Ben Coscia',
-    description=DOCLINES[0],
-    long_description="\n".join(DOCLINES[2:]),
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     license='BSD-3-Clause',
     install_requires=['numpy', 'mdtraj', 'matplotlib', 'ruptures', 'scipy', 'tqdm', 'fbm'], 
 
     # Which Python importable modules should be included when your package is installed
-    packages=['LLC_Membranes', 'LLC_Membranes.tests', 'LLC_Membranes.setup', 'LLC_Membranes.analysis', 'LLC_Membranes.llclib', 'LLC_Membranes.timeseries'],
-
+    # packages=['LLC_Membranes', 'LLC_Membranes.tests', 'LLC_Membranes.setup', 'LLC_Membranes.analysis', 'LLC_Membranes.llclib', 'LLC_Membranes.timeseries'],
+    packages = ['tests', 'setup', 'analysis', 'llclib', 'timeseries'],
     # Optional include package data to ship with your package
     # Comment out this line to prevent the files from being packaged with your software
     # Extend/modify the list to include/exclude other items as need be
