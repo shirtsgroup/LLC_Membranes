@@ -1,5 +1,5 @@
-Log file opened on Wed Jan 30 12:53:46 2019
-Host: biot16-51-dhcp.int.colorado.edu  pid: 22361  rank ID: 0  number of ranks:  1
+Log file opened on Wed Jan 30 12:55:03 2019
+Host: biot16-51-dhcp.int.colorado.edu  pid: 23734  rank ID: 0  number of ranks:  1
                       :-) GROMACS - gmx mdrun, 2018.1 (-:
 
                             GROMACS is written by:
@@ -135,7 +135,7 @@ Input Parameters:
    comm-mode                      = Linear
    nstcomm                        = 100
    bd-fric                        = 0
-   ld-seed                        = 552262660
+   ld-seed                        = 243271899
    emtol                          = 10
    emstep                         = 0.01
    niter                          = 20
@@ -285,7 +285,7 @@ qm-opts:
          t0                       = 0
          sigma                    = 0
 grpopts:
-   nrdf:       51681
+   nrdf:       51831
    ref-t:           0
    tau-t:           0
 annealing:          No
@@ -324,7 +324,7 @@ J. Comp. Chem. 13 (1992) pp. 952-962
 -------- -------- --- Thank You --- -------- --------
 
 Initiating Steepest Descents
-Started Steepest Descents on rank 0 Wed Jan 30 12:53:46 2019
+Started Steepest Descents on rank 0 Wed Jan 30 12:55:03 2019
 
 Steepest Descents:
    Tolerance (Fmax)   =  1.00000e+01
@@ -334,73 +334,73 @@ Steepest Descents:
 
    Energies (kJ/mol)
            Bond          Angle    Proper Dih. Ryckaert-Bell.          LJ-14
-    2.89306e+03    2.13001e+04    2.44785e+02    2.40349e+04    1.33101e+04
+    2.82469e+03    2.13178e+04    2.51840e+02    2.41374e+04    1.33238e+04
      Coulomb-14        LJ (SR)   Coulomb (SR) Position Rest.      Potential
-    5.48158e+04    1.70805e+09   -1.65032e+05    0.00000e+00    1.70800e+09
+    5.48440e+04    7.78206e+04   -1.66152e+05    0.00000e+00    2.83684e+04
  Pressure (bar)
-    3.97840e+07
+    7.59907e+03
 
            Step           Time
               1        1.00000
 
    Energies (kJ/mol)
            Bond          Angle    Proper Dih. Ryckaert-Bell.          LJ-14
-    2.90628e+03    2.13013e+04    2.44785e+02    2.40348e+04    1.33095e+04
+    2.82602e+03    2.13187e+04    2.51877e+02    2.41389e+04    1.33240e+04
      Coulomb-14        LJ (SR)   Coulomb (SR) Position Rest.      Potential
-    5.48157e+04    2.73672e+08   -1.65001e+05    0.00000e+00    2.73624e+08
+    5.48446e+04    2.16477e+04   -1.66144e+05    1.14703e-04   -2.77920e+04
  Pressure (bar)
-   -3.20538e+07
+    6.44424e+02
 
            Step           Time
               2        2.00000
 
    Energies (kJ/mol)
            Bond          Angle    Proper Dih. Ryckaert-Bell.          LJ-14
-    2.98243e+03    2.13158e+04    2.44785e+02    2.40346e+04    1.33087e+04
+    2.83916e+03    2.13212e+04    2.51858e+02    2.41420e+04    1.33242e+04
      Coulomb-14        LJ (SR)   Coulomb (SR) Position Rest.      Potential
-    5.48158e+04    4.60269e+07   -1.65034e+05    0.00000e+00    4.59786e+07
+    5.48454e+04    3.01423e+03   -1.66135e+05    5.29621e-03   -4.63965e+04
  Pressure (bar)
-   -2.07101e+06
+   -9.25876e+02
 
            Step           Time
               3        3.00000
 
    Energies (kJ/mol)
            Bond          Angle    Proper Dih. Ryckaert-Bell.          LJ-14
-    3.15151e+03    2.13327e+04    2.44785e+02    2.40348e+04    1.33082e+04
+    2.85477e+03    2.13199e+04    2.51929e+02    2.41471e+04    1.33242e+04
      Coulomb-14        LJ (SR)   Coulomb (SR) Position Rest.      Potential
-    5.48158e+04    7.47219e+06   -1.65019e+05    1.00289e-12    7.42406e+06
+    5.48461e+04   -5.86454e+02   -1.66127e+05    1.83754e-01   -4.99694e+04
  Pressure (bar)
-   -8.50100e+05
+   -1.10137e+03
 
            Step           Time
               4        4.00000
 
    Energies (kJ/mol)
            Bond          Angle    Proper Dih. Ryckaert-Bell.          LJ-14
-    3.43154e+03    2.14012e+04    2.44785e+02    2.40366e+04    1.33084e+04
+    2.75694e+03    2.12747e+04    2.51469e+02    2.41505e+04    1.33234e+04
      Coulomb-14        LJ (SR)   Coulomb (SR) Position Rest.      Potential
-    5.48158e+04    1.08462e+06   -1.65007e+05    5.56838e-09    1.03685e+06
+    5.48470e+04   -1.26218e+03   -1.66126e+05    6.18946e+00   -5.07782e+04
  Pressure (bar)
-   -6.36970e+04
+   -1.11387e+03
 
            Step           Time
               5        5.00000
 
    Energies (kJ/mol)
            Bond          Angle    Proper Dih. Ryckaert-Bell.          LJ-14
-    3.92881e+03    2.14558e+04    2.44784e+02    2.40381e+04    1.33090e+04
+    2.57363e+03    2.11654e+04    2.46886e+02    2.41177e+04    1.33184e+04
      Coulomb-14        LJ (SR)   Coulomb (SR) Position Rest.      Potential
-    5.48158e+04    1.68332e+05   -1.64989e+05    5.31269e-06    1.21135e+05
+    5.48479e+04   -1.56434e+03   -1.66153e+05    3.33324e+01   -5.14145e+04
  Pressure (bar)
-   -1.29682e+04
+   -1.11698e+03
 
 
 Energy minimization reached the maximum number of steps before the forces
 reached the requested precision Fmax < 10.
 
 Steepest Descents did not converge to Fmax < 10 in 6 steps.
-Potential Energy  =  1.2113492e+05
-Maximum force     =  1.0597454e+07 on atom 7278
-Norm of force     =  9.9280604e+04
-Finished mdrun on rank 0 Wed Jan 30 12:53:46 2019
+Potential Energy  = -5.1414488e+04
+Maximum force     =  1.0461313e+04 on atom 16360
+Norm of force     =  1.7021407e+02
+Finished mdrun on rank 0 Wed Jan 30 12:55:03 2019
