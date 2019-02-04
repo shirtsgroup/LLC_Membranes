@@ -268,9 +268,9 @@ class System(object):
                     # movement_3d = np.linalg.norm(self.com[begin:end, j, :], axis=1)  # magnitude of distance travelled
                     bp = ruptures.detection.Binseg(model='l2', min_size=1, jump=1).fit_predict(self.com[begin:end, j, :]
                                                    , pen=self.breakpoint_penalty)
-                    # ruptures.display(self.com[begin:end, j, :], bp, figsize=(10, 6))
-                    # plt.show()
-                    # exit()
+                    ruptures.display(self.com[begin:end, j, :], bp, figsize=(10, 6))
+                    plt.show()
+                    exit()
 
                     # for visualization predicted z-hops on top of time series
                     # traj_hops = np.zeros([2*len(bp) - 1, 2])
@@ -534,6 +534,9 @@ class System(object):
         ntraj = len(keep)
 
         self.hop_acf = [acf[np.nonzero(acf[:, i]), i].mean() for i in range(max_hops)]
+
+        plt.plot(self.hop_acf)
+        plt.show()
 
         for b in range(nboot):
 

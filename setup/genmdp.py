@@ -46,7 +46,8 @@ class SimulationMdp(object):
 
     def __init__(self, gro, title='MD Simulation', T=300, em_steps=-1, time_step=0.002, length=1000,
                  p_coupling='semiisotropic', barostat='berendsen', genvel='yes', restraints=False,
-                 xlink=False, bcc=False, tau_p=20, tau_t=0.1, nstxout=5000, nstvout=5000, nstfout=5000, nstenergy=5000):
+                 xlink=False, bcc=False, tau_p=20, tau_t=0.1, nstxout=5000, nstvout=5000, nstfout=5000, nstenergy=5000,
+                 frames=None):
         """
         :param gro: (str) coordinate file which will be simulated
         :param title: (str) name of simulation
@@ -69,6 +70,8 @@ class SimulationMdp(object):
         :param nstvout: frequency of outputting velocity to trajectory file
         :param nstfout: frequency of outputting forces to trajectory file
         :param nstenergy: frequency of outputting energy to energy file
+        :param frames: number of frames to output. If not None, nstxout, nstvout, nstfou and nstenergy will be adjusted
+        accordingly
         """
 
         # initialize variables
@@ -95,6 +98,12 @@ class SimulationMdp(object):
         self.nstvout = nstvout
         self.nstfout = nstfout
         self.nstenergy = nstenergy
+
+        if frames is not None:
+            self.nstxout = int(self.length / (self.time_step * frames))
+            self.nstvout = int(self.length / (self.time_step * frames))
+            self.nstfout = int(self.length / (self.time_step * frames))
+            self.nstenergy = int(self.length / (self.time_step * frames))
 
     def write_em_mdp(self, out='em'):
         """

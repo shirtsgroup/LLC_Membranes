@@ -2,7 +2,7 @@
 ;	File 'mdout.mdp' was generated
 ;	By user: bcoscia (1000)
 ;	On host: biot16-51-dhcp.int.colorado.edu
-;	At date: Wed Jan 30 12:55:03 2019
+;	At date: Fri Feb  1 11:28:04 2019
 ;
 ;	Created by:
 ;	                     :-) GROMACS - gmx grompp, 2018.1 (-:
@@ -11,7 +11,7 @@
 ;	Data prefix:  /usr/local/gromacs
 ;	Working dir:  /home/bcoscia/PycharmProjects/LLC_Membranes/tests/test_system
 ;	Command line:
-;	  gmx grompp -f em.mdp -p topol.top -c water.gro -o solvated_final -r water.gro
+;	  gmx grompp -f nvt.mdp -p topol.top -c em.gro -o nvt -r em.gro
 
 ; VARIOUS PREPROCESSING OPTIONS
 ; Preprocessor information: use cpp syntax.
@@ -21,11 +21,11 @@ include                  =
 define                   = 
 
 ; RUN CONTROL PARAMETERS
-integrator               = steep
+integrator               = md
 ; Start time and timestep in ps
 tinit                    = 0
-dt                       = 0.001
-nsteps                   = -1
+dt                       = 0.002
+nsteps                   = 25000
 ; For exact run continuation or redoing part of a run
 init-step                = 0
 ; Part index is updated automatically on checkpointing (keeps files separate)
@@ -59,13 +59,13 @@ rtpi                     = 0.05
 
 ; OUTPUT CONTROL OPTIONS
 ; Output frequency for coords (x), velocities (v) and forces (f)
-nstxout                  = 0
-nstvout                  = 0
-nstfout                  = 0
+nstxout                  = 500
+nstvout                  = 500
+nstfout                  = 500
 ; Output frequency for energies to log file and energy file
 nstlog                   = 1000
 nstcalcenergy            = 100
-nstenergy                = 1000
+nstenergy                = 500
 ; Output frequency and precision for .xtc file
 nstxout-compressed       = 0
 compressed-x-precision   = 1000
@@ -78,11 +78,11 @@ energygrps               =
 
 ; NEIGHBORSEARCHING PARAMETERS
 ; cut-off scheme (Verlet: particle based cut-offs, group: using charge groups)
-cutoff-scheme            = verlet
+cutoff-scheme            = Verlet
 ; nblist update frequency
 nstlist                  = 40
 ; ns algorithm (simple or grid)
-ns-type                  = Grid
+nstype                   = grid
 ; Periodic boundary conditions: xyz, no, xy
 pbc                      = xyz
 periodic-molecules       = no
@@ -95,7 +95,7 @@ rlist                    = 1
 
 ; OPTIONS FOR ELECTROSTATICS AND VDW
 ; Method for doing electrostatics
-coulombtype              = Cut-off
+coulombtype              = PME
 coulomb-modifier         = Potential-shift-Verlet
 rcoulomb-switch          = 0
 rcoulomb                 = 1
@@ -103,13 +103,13 @@ rcoulomb                 = 1
 epsilon-r                = 1
 epsilon-rf               = 0
 ; Method for doing Van der Waals
-vdw-type                 = Cut-off
+vdwtype                  = PME
 vdw-modifier             = Potential-shift-Verlet
 ; cut-off lengths       
 rvdw-switch              = 0
 rvdw                     = 1
 ; Apply long range dispersion corrections for Energy and Pressure
-DispCorr                 = No
+DispCorr                 = EnerPres
 ; Extension of the potential lookup tables beyond the cut-off
 table-extension          = 1
 ; Separate tables between energy group pairs
@@ -155,15 +155,15 @@ sa-surface-tension       = -1
 
 ; OPTIONS FOR WEAK COUPLING ALGORITHMS
 ; Temperature coupling  
-tcoupl                   = No
+Tcoupl                   = v-rescale
 nsttcouple               = -1
 nh-chain-length          = 10
 print-nose-hoover-chain-variables = no
 ; Groups to couple separately
-tc-grps                  = 
+tc_grps                  = system
 ; Time constant (ps) and reference temperature (K)
-tau-t                    = 
-ref-t                    = 
+tau_t                    = 0.1
+ref_t                    = 300.0
 ; pressure coupling     
 pcoupl                   = No
 pcoupltype               = Isotropic
@@ -173,7 +173,7 @@ tau-p                    = 1
 compressibility          = 
 ref-p                    = 
 ; Scaling of reference coordinates, No, All or COM
-refcoord-scaling         = No
+refcoord_scaling         = all
 
 ; OPTIONS FOR QMMM calculations
 QMMM                     = no
@@ -211,14 +211,14 @@ annealing-time           =
 annealing-temp           = 
 
 ; GENERATE VELOCITIES FOR STARTUP RUN
-gen-vel                  = no
-gen-temp                 = 300
+gen-vel                  = yes
+gen-temp                 = 300.0
 gen-seed                 = -1
 
 ; OPTIONS FOR BONDS    
-constraints              = none
+constraints              = h-bonds
 ; Type of constraint algorithm
-constraint-algorithm     = Lincs
+constraint-algorithm     = lincs
 ; Do not constrain the start configuration
 continuation             = no
 ; Use successive overrelaxation to reduce the number of shake iterations

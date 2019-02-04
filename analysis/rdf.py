@@ -225,5 +225,4 @@ if __name__ == "__main__":
                                              cut=args.cut)
         rdfs[i].bootstrap(args.nboot)
         rdfs[i].plot(show=False, normalize=args.normalize, save=True)
-
-    #plt.show()
+        file_rw.save_object(rdfs[i], 'rdf_%s.pl' % r[0])

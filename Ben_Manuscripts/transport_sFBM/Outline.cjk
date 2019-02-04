@@ -1,0 +1,116 @@
+\def\CJKpreproc{extconv (CJK ver. 4.8.4)}\documentclass{article}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{subcaption}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath} % or simply amstext
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage[export]{adjustbox}
+\newcommand{\angstrom}{\textup{\AA}}
+\newcommand{\colormap}{jet}  % colorbar to use
+\usepackage{cleveref}
+\usepackage{booktabs}
+\usepackage{gensymb}
+\usepackage{float}
+
+\title{The Transport Mechanisms of Polar Solutes in a Cross-linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
+\author{Benjamin J. Coscia \and Douglas L. Gin \and Richard D. Noble \and Joe Yelk \and Matthew Glaser \and Xunda Feng \and Michael R. Shirts} 
+
+\begin{document}
+%  \bibliographystyle{ieeetr}
+  \graphicspath{{./figures/}}
+  \maketitle
+  \section{Introduction}
+  
+  We need highly selective membranes in order to perform efficient separations.
+
+  H\textsubscript{II} phase lyotropic liquid crystals have densely packed, uniform
+  sized pores and have the potential to disrupt conventional membrane separation
+  techniques by being selective based not only on size and charge, but on chemical
+  functionality as well.
+
+
+  We can only learn so much from experiment. MD can give us mechanistic insights with
+  atomistic resolution so that we can intelligently design new membranes for 
+  solute-specific separations.
+
+  In previous work, we determined the most likely structure of the hexagonal phase 
+  formed by the monomer Na-GA3C11.
+  \begin{itemize}
+  	\item We developed techniques for equilibrating the hexagonal phase made by
+	neat monomer as well as with varying amounts of water in the pores.
+  \end{itemize} 
+
+  In this work, we have determined the transport mechanisms and macroscopic transport 
+  properties exhibited by a number of polar solutes with varying size, chemical 
+  functionality and hydrophilic character.
+  \begin{itemize}
+	\item Many of the separations we are interested in involve polar organic 
+	compounds.
+  \end{itemize} 
+
+  We have compared our calculated diffusion coefficients with experimental measurements
+  made using DOSY NMR. 
+
+  \section{Methods}
+
+  \subsection{Molecular Dynamics Simulations}
+  
+  \subsubsection*{System Setup}
+
+  \subsubsection*{Modeling the Continuous Time Random Walk}
+
+  A continuous time random walk (CTRW) is a stochastic process characterized by a 
+  distribution of hop lengths and dwell times.
+  \begin{itemize}
+	\item We have limited data, so we attempted to approximate these distributions
+	with known continuous probability densities.
+	\item For solutes in our system the distribution of hop lengths is
+	well-represented by a Gaussian distribution while the distribution of dwell
+	times fits relatively well to an exponential distribution characteristic of a
+	Poisson process. (See supporting information)
+  \end{itemize}
+
+  \begin{equation}
+	Ae^{-x}
+  \end{equation}
+
+  At times much greater than the characteristic time of our exponential dwell time
+  distribution.
+
+  \subsection{Experimental}
+  % BJC: For Greg to write if things work out
+   
+  \section{Results and Discussion}
+  
+ 
+  \section{Conclusion}
+  
+ 
+  \section*{Supporting Information}
+
+  Detailed explanations and expansions upon the results and procedures mentioned in
+  the main text are described in the Supporting Information. This information is
+  available free of charge via the Internet at http://pubs.acs.org.
+
+  \section*{Acknowledgements}
+
+  Molecular simulations were performed using the Extreme Science and
+  Engineering Discovery Environment (XSEDE), which is supported by National
+  Science Foundation grant number ACI-1548562. Specifically, it used the Bridges
+  system, which is supported by NSF award number ACI-1445606, at the Pittsburgh
+  Supercomputing Center (PSC). This work also utilized the RMACC Summit supercomputer,
+  which is supported by the National Science Foundation (awards ACI-1532235 and
+  ACI-1532236), the University of Colorado Boulder, and Colorado State
+  University. The Summit supercomputer is a joint effort of the University of
+  Colorado Boulder and Colorado State University.
+
+  \clearpage
+  \bibliography{llc}
+
+  \newpage
+
+  \section*{TOC Graphic}
+
+\end{document}

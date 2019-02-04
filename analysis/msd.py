@@ -197,12 +197,11 @@ class Diffusivity(object):
         else:
             pore_centers = physical.avg_pore_loc(npores, self.t.xyz[:, pore_atoms, :], self.t.unitcell_vectors)
 
-        results = 0
-        if tails:
-            results = 1
-
         inregion = physical.partition(self.com, pore_centers, r, buffer=buffer,
-                                      unitcell=self.t.unitcell_vectors, npores=npores)[results]
+                                      unitcell=self.t.unitcell_vectors, npores=npores)
+
+        if tails:
+            inregion = ~inregion  # '~' flips True and False
 
         dwell = np.full((self.t.n_frames, self.com.shape[1]), False, dtype=bool)
 
@@ -522,7 +521,7 @@ if __name__ == "__main__":
     if args.ensemble:
         args.fracshow = 1  # same amount of statistics at each frame
 
-    show = False
+    # show = False
     D.plot(args.axis, fracshow=args.fracshow, show=show)
 
     if args.update:

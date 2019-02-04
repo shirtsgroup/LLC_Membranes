@@ -1,5 +1,5 @@
-Log file opened on Wed Jan 30 12:55:03 2019
-Host: biot16-51-dhcp.int.colorado.edu  pid: 23734  rank ID: 0  number of ranks:  1
+Log file opened on Fri Feb  1 11:28:23 2019
+Host: biot16-51-dhcp.int.colorado.edu  pid: 26749  rank ID: 0  number of ranks:  1
                       :-) GROMACS - gmx mdrun, 2018.1 (-:
 
                             GROMACS is written by:
@@ -31,7 +31,7 @@ Executable:   /usr/local/gromacs/bin/gmx
 Data prefix:  /usr/local/gromacs
 Working dir:  /home/bcoscia/PycharmProjects/LLC_Membranes/tests/test_system
 Command line:
-  gmx mdrun -deffnm em
+  gmx mdrun -v -deffnm em
 
 GROMACS version:    2018.1
 Precision:          single
@@ -324,7 +324,7 @@ J. Comp. Chem. 13 (1992) pp. 952-962
 -------- -------- --- Thank You --- -------- --------
 
 Initiating Steepest Descents
-Started Steepest Descents on rank 0 Wed Jan 30 12:55:03 2019
+Started Steepest Descents on rank 0 Fri Feb  1 11:28:23 2019
 
 Steepest Descents:
    Tolerance (Fmax)   =  1.00000e+01
@@ -403,4 +403,4 @@ Steepest Descents did not converge to Fmax < 10 in 6 steps.
 Potential Energy  = -5.1414488e+04
 Maximum force     =  1.0461313e+04 on atom 16360
 Norm of force     =  1.7021407e+02
-Finished mdrun on rank 0 Wed Jan 30 12:55:03 2019
+Finished mdrun on rank 0 Fri Feb  1 11:28:23 2019

@@ -47,12 +47,12 @@ if __name__ == "__main__":
 
     if args.generate_mdps:
 
-        mdp = genmdp.SimulationMdp('%s' % args.out, length=5000, barostat='berendsen', xlink=args.noxlink)
+        mdp = genmdp.SimulationMdp('%s' % args.out, length=5000, barostat='berendsen', xlink=args.noxlink, frames=50)
         mdp.write_em_mdp()
         mdp.write_npt_mdp(out='berendsen')
 
-        mdp = genmdp.SimulationMdp('%s' % args.out, length=400000, barostat='Parrinello-Rahman', xlink=args.noxlink,
-                                   genvel='no')
+        mdp = genmdp.SimulationMdp('%s' % args.out, length=1000000, barostat='Parrinello-Rahman', xlink=args.noxlink,
+                                   genvel='no', frames=2000)
         mdp.write_npt_mdp(out='PR')
 
     # put everything in monoclinic cell
