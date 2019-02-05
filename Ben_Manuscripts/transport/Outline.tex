@@ -343,7 +343,7 @@
    
   \section{Results and Discussion}
   
-  \subsection{Governing Mechanisms}\label{section:mechanism_overview}  
+  \subsection*{Governing Mechanisms}\label{section:mechanism_overview}  
   
   % BJC: seems right to summarize overarching mechanisms observed first  
   On the timescales simulated in our study, solutes exhibit subdiffusive
@@ -426,6 +426,7 @@
   \end{figure}
   
   % BJC: would it be better to report as a fraction of water MSD?
+  % BJC: need MSDs of 5 wt % systems here too. Can narrow to study of 10 wt % systems after
   \noindent We calculated the time-averaged MSD of each solute in the set over the
   course of 1 $\mu$s MD simulations. 
   \begin{itemize}
@@ -434,7 +435,16 @@
     particle with a linear MSD.
 	\item Instead, the values plotted in Figure~\ref{fig:all_msds} represent the
 	average MSD of each solute after a 400 ns time lag.
-  \end{itemize}
+  \end{itemize}  
+  
+%  \subsubsection*{The Influence of Water Content on Macroscopic Diffusion Coefficients}
+%
+%  Solutes in systems with lower water content exhibit lower diffusion coefficients.
+%  \begin{itemize}
+%	\item Pores are more crowded when there is less water (show RDFs of each)
+%	\item Not a linear function of pore size - radius increase by x, D increases by y
+%	\item Larger influence on bigger molecules
+%  \end{itemize}
   
   \begin{figure}
   \centering
@@ -448,47 +458,33 @@
   	\item Solutes that are hydrogen bond donors can be stabilized through hydrogen bonds
   	with one of the five oxygen atoms attached to each monomer head group. 
   	\item In a separate interaction, solutes can become kinetically trapped between 
-  	monomer head groups.
+  	monomer head groups. These interactions likely lead to the observed anti-correlated
+  	hopping	behavior.
   	\item Generally, both mechanisms affect each solute to varying degrees.
   \end{itemize}
   
   %BJC: somewhere need to say why solutes preferentially hbond with carboxylate groups -- is this real
   
-  \noindent A solute's size, shape, and polarity dictate the degree to which they 
-  are influenced by each entrapment mechanism.
+  %BJC: This will need updating once all the rest of outline is written.
+  \noindent The degree to which solutes are influenced by each entrapment mechanism
+  is a complex function of a solute's size, shape, and polarity.
   \begin{itemize}
     \item In general, solutes can move fastest in the pore center, where
     there is comparatively little resistance to diffusion.
-%    \item The smallest molecular weight solutes move fastest.
-    \item Low molecular weight, highly water-soluble, hydrogen bond donating molecules spend the most time
-    in the pore center where they are slowed down primarily by hydrogen bonds
-    with monomer carboxylate groups.
-    %BJC: this isn't fully accurate yet. Need to come back to this
-    \item Solutes that cannot donate hydrogen bonds, or are less miscible in water, 
-    tend to partition into the head group region where entrapment occurs. Most of
-    the anti-correlated motion occurs here.
-    \item The inverse relationship between solute size and mobility is disrupted
-    by solutes' preference for water. 
+	\item The 5 fastest solutes in our study have a low molecular weight and
+	spend a significant amount of time in the pore center. They are only slowed
+	by hydrogen bonds with monomer carboxylate groups.
+	\item Bulky solutes with many hydrogen bond donating groups, like glycerol,
+	spend most of their time in the pore center, but their large size combined
+	with a higher solute-head group hydrogen bond frequency, makes their dynamics slow. 
+    \item Solutes with high hydrophobic character tend to partition into the 
+    head group region where entrapment occurs.
     \item We observe low MW solutes with lower-than-expected MSDs because they
     spend more time trapped between monomer head groups due to low water
     solubility.
-    \item Small, planar molecules exhibit some of the shortest MSDs because
-    
-  	\item The well-established trend of decreasing solute mobility with 
-  	size is not defied here, however 
-  	\item Additionally, planar molecules are prone to exhibiting similar
-  	trapping behavior, even for large molecules whose similar sized, but flexible
-  	counterparts exhibit faster diffusion.  %BJC: this is unproven
-  	\item The polarity of solutes also influences a solute's ability to stay in
-  	the pore center. Highly polar molecules tend to spend more time in the pore center,
-  	while those with hydrophobic character tend to spend more time in the head group
-  	region.
-  	\item Finally, the ability to hydrogen bond offers a second trapping mechanism. 
-  	Solutes that are hydrogen bond donors can donate hydrogen atoms to
-  	any of the 5 oxygen atoms located on the monomer head groups. Increasing the 
-  	number of hydrogen bond donating groups increases the solute's polarity causing
-  	solutes to spend more time in the pore centers, but the effect can be countered
-  	by excessive trapping if there are many hydrogen bonds being formed.
+    \item Small, planar molecules like acetone exhibit some of the slowest MSDs.
+    Their flat geometry and small size makes it easy for them to get lodged deep
+    between head groups.
   	\item Overall solutes exhibit some degree of trapping, by one or a combination of the above
   	mechanisms, with anticorrelated hops between each period of immobility due to 
   	obstructions.
@@ -499,45 +495,12 @@
 
 %  We will explore these factors in greater detail in the context of 
 %  specific groups of molecules in the discussion that follows.
+
+  \subsection*{Transport of Water}
+
+  Water molecules also exhibit hop diffusion.
   
-  \subsection{Mean Squared Displacement Predictions}\label{section:msd_predictions}
-  
-  %BJC: focus on MD MSD results
-
-
-  \subsubsection*{The Influence of Water Content on Macroscopic Diffusion Coefficients}
-
-  Solutes in systems with lower water content exhibit lower diffusion coefficients.
-  \begin{itemize}
-	\item Pores are more crowded when there is less water (show RDFs of each)
-	\item Not a linear function of pore size - radius increase by x, D increases by y
-	\item Larger influence on bigger molecules
-  \end{itemize}
-
-  \subsubsection{Experimental Measurements}
-
-  % For Greg
-
-  \subsection{Transport Mechanisms}
-
-  In order to truly understand the molecular origins of the macroscopic
-  diffusion coefficients in Section~\ref{section:D_macro}, we studied the
-  microscopic interactions between solutes and the membrane that lead to the
-  observed dwell time and hop distributions.
-  \begin{itemize}
-	\item We studied the radial distribution functions of solutes as a
-	function of distance from the pore center
-	\item We looked at hydrogen bonding patterns
-	\item Coordination numbers
-	\item Order parameters
-  \end{itemize}
-
-  The radial distribution function of each solute studied is shown in 
-  Figure TBD.
-
-  \subsubsection*{Transport of Water}
-
-  All water molecules exhibit hop diffusion.
+  The overwhelming number of water molecules reduces
 
   Even in the center of the pore, where the density of water molecules is
   highest, individual water molecules exhibit hop diffusion as they create a
@@ -556,32 +519,66 @@
 
   %TODO: study diffusion mechanism of water
   
-  \subsubsection*{Transport of Alcohols}
+  \subsection*{Transport of Simple Alcohols}
 
-  The hydroxyl functional group of alcohol molecules is a hydrogen bond donor
-  and prefers to donate it's hydrogen to more strongly polarized carboxylate head
-  groups.
-
-  As alcohol groups increase in hydrophobic character, they are more inclined
-  to stick to the outside edges of the pore. 
-  \begin{itemize}
-	\item The alkane tails prefer to stay at the edges of the pore.
-	\item Radial distribution functions show peaks at pore edges, however
-	smaller alcohols have high densities near the pore center. 
-	\item They tend to get trapped between monomers and closer to 
-	the tail region. 
-	\item The entrapment is further stabilized by hydrogen bonds with
-	ether oxygens connecting the monomer's alkane tails to the head groups.
-	%TODO: quantify h-bonds with ether oxygens and carbonyl oxygens
+  The MSD of methanol, ethanol, propanol and butanol descends in order of 
+  their molecular weight, however, methanol travels faster than expected.  %BJC: find approximate relationship between MW and mobility
+  \begin{itemize}  
+    \item The radial distribution as a function of distance from the pore center
+    for each alcohol is plotted in Figure~\ref{fig:simple_alcohol_rdf}.
+    \item On average, the density of methanol in the pore center is only slightly
+    less than the density near the head groups.
+    \item All other alcohol molecules are concentrated in the head group region.
   \end{itemize}
-
-  The diffusion coefficient of simple alcohols increases as the length of 
-  the alkane chain increases.
+  
+  All simple alcohols participate in a similar number of hydrogen bonding interactions
+  with the monomer head groups , but with varying preference towards hydrogen bonds with
+  the monomer carboxylate oxygen atoms (See Figure~\ref{fig:simple_alcohol_hbonds}).
   \begin{itemize}
-	\item The dwell times increase as the oily tails become more
-	entrapped in monomer tails.
+  	\item If all 5 hydrogen bonding acceptor sites on the monomer head groups were equal,
+  	we would expect the ratio of the number of hydrogen bonds between solutes and the two 
+  	carboxylate oxygen atoms to the number of hydrogen bonds between solutes and the three
+  	ether groups to be 2/3. 
+  	\item Clearly there is a preference towards hydrogen bonding with the carboxylate 
+  	oxygen atoms for all solutes.
+  	\item This is largely due to the more highly crowded environment surrounding the ether
+  	oxygen atoms.
+  	\item Butanol shows the largest preference towards hydrogen bonds with carboxylate 
+  	head groups.
+  	\item The radial distribution function of atoms located at opposite ends of butanol
+  	shows that, on average, oxygen atoms are situated 0.25 nm closer to the pore centers
+  	than the distal carbon.
+  	\item This suggests that alcohols tend to orient themselves like the liquid crystal 
+  	monomers, with hydrophilic components point towards the pore centers.
   \end{itemize}
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\linewidth]{simple_alcohol_rdf.pdf}
+  \caption{}\label{fig:simple_alcohol_rdf}
+  \end{subfigure}
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\linewidth]{simple_alcohol_hbonds.pdf}
+  \caption{}\label{fig:simple_alcohol_hbonds}
+  \end{subfigure}
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\linewidth]{butanol_CO.pdf}  %BJC: can add inset to plot showing 
+  \caption{}\label{fig:butanol_CO}
+  \end{subfigure}
+  \caption{(a) The radial distribution functions of each simple alcohol shows a maximum close
+  to the highest density of monomer head groups (dashed line, normalized for easier visual
+  comparison). Methanol spends the largest proportion of time, relative to the other alcohols,
+  near the pore center, which may help explain its fast dynamics. (b) Despite relatively little
+  difference in the total number of hydrogen bond occurences, a given alcohol's preference
+  towards hydrogen bonds with the carboxylate groups increases with molecule size. (c) The average
+  location of butanol's oxygen atom is significantly closer to the pore center than its most distal
+  carbon atom, suggesting that the molecule is oriented with hydrophobic tails pointing away from
+  the pore center.}\label{fig:simple_alcohols}
+  \end{figure}
 
+  \subsection*{Transport of Diols and Triols}
+  
   Ethylene glycol, a diol, has two hydrogen bond donor groups.
   \begin{itemize}
 	\item Can hydrogen bond with same moeity.
@@ -591,8 +588,10 @@
 	with a hydrogen bond, the other unbound hydroxyl group may form a hydrogen bond
 	elsewhere and effectively pull the other bound hydroxyl group along with it. 
   \end{itemize}
+  
+  \subsection*{Transport of Sugars}
 
-  \subsubsection*{Transport of Acetone}
+  \subsection*{Transport of Ketone-like Solutes}
 
   The carbonyl group of Acetone is a hydrogen bond acceptor and therefore only
   form hydrogen bonds with water molecules in the pore. 
@@ -605,12 +604,12 @@
 	from acetone COM to pore center is non-zero.
   \end{itemize} 
 
-  \subsubsection*{Transport of Acetic Acid}
+  \subsection*{Transport of Acetic Acid}
 
   Acetic acid, since we modeled it solely in its protonated state, has hydrogen
   bond donor and acceptor groups. 
 
-  \subsubsection*{Transport of Ions} % probably just sodium
+  \subsection*{Transport of Ions} % probably just sodium
 
   Sodium ions also exhibit hop diffusion because polarized water and
   carboxylate head groups both work to neutralize its charge.

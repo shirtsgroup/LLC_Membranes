@@ -213,11 +213,13 @@ if __name__ == "__main__":
     for i, r in enumerate(args.residue):
 
         status = 'Calculating RDF of residue %s' % r[0]
+        savename = 'rdf_%s' % r[0]
         if args.atoms[i] is not None and args.atoms[i][0] != 'all':
             status += ' restricted to atoms'
+            savename += '_'
             for a in args.atoms[i]:
                 status += ' %s' % a
-        print(status)
+                savename += '%s' % a
 
         rdfs.append(System(args.gro, args.traj, r[0], args.build_monomer_residue, begin=args.begin,
                            end=args.end, skip=args.skip, atoms=args.atoms[i]))
@@ -225,4 +227,7 @@ if __name__ == "__main__":
                                              cut=args.cut)
         rdfs[i].bootstrap(args.nboot)
         rdfs[i].plot(show=False, normalize=args.normalize, save=True)
-        file_rw.save_object(rdfs[i], 'rdf_%s.pl' % r[0])
+
+        file_rw.save_object(rdfs[i], '%s.pl' % savename)
+
+    plt.show()

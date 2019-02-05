@@ -240,7 +240,30 @@ class System(object):
     def plot_hbonds(self, show=True, save=True, savename='hbonds.png'):
 
         n = [a.shape[1] for a in self.hbonds]
-        plt.plot(self.t.time / 1000, n)
+
+        ethers = ['O', 'O1', 'O2']
+        carb = ['O3', 'O4']
+        nether = np.zeros([self.t.n_frames])
+        ncarb = np.zeros([self.t.n_frames])
+
+        for i, x in enumerate(self.hbonds):
+
+            if x.shape[0] == 4:
+
+                acceptors = [self.names[int(x[2, j])] for j in range(x.shape[1])]
+
+                for k in acceptors:
+                    if k in ethers:
+                        nether[i] += 1
+                    elif k in carb:
+                        ncarb[i] += 1
+
+        print(sum(n))
+        print(np.sum(ncarb) / np.sum(nether))
+        exit()
+        plt.plot(self.t.time / 1000, nether / ncarb)
+
+        #plt.plot(self.t.time / 1000, n)
         plt.xlabel('Time (ns)', fontsize=14)
         plt.ylabel('Number of hydrogen bonds', fontsize=14)
         plt.tight_layout()
