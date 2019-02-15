@@ -5,7 +5,7 @@ import os
 import numpy as np
 import mdtraj as md
 from LLC_Membranes.analysis import detect_peaks
-from LLC_Membranes.llclib import file_rw
+from LLC_Membranes.llclib import file_rw, physical, topology
 import matplotlib.pyplot as plt
 import itertools
 import sys
@@ -31,6 +31,10 @@ def initialize():
                                                     'then that dihedral will not be calculated')
     parser.add_argument('-l', '--load', default=False, type=str, help='Load pickled data')
     parser.add_argument('-b', '--bins', default=100, type=int, help='Number of bins')
+    parser.add_argument('-p', '--partition', default=False, type=float, help='(Optional) Radial distance from pore '
+                        'center used to divide to regions.')
+    parser.add_argument('-bm', '--build_monomer', default='NAcarb11V', type=str, help='Name of monomer used to build'
+                        'system. Only necessary if using the partition option.')
 
     return parser
 
@@ -44,6 +48,7 @@ class Dihedrals(object):
         print('Done!')
 
         self.ndihedrals = len(dihedrals)
+        self.resname = resname
 
         # get distribution of dihedrals
         for i, d in enumerate(dihedrals):
@@ -52,7 +57,7 @@ class Dihedrals(object):
             names = []
             ndx = []
             for a in self.t.topology.atoms:
-                if a.name in d and a.residue.name == resname:
+                if a.name in d and a.residue.name == self.resname:
                     names.append(a.name)
                     ndx.append(a.index)
 
@@ -79,6 +84,69 @@ class Dihedrals(object):
         self.dihedral_bins = None  # to hold bin value of each dihedral on each solute
         self.permutations = None
         self.probs = None
+
+        # for calculating radial dependence of conformations
+        self.com = None
+        self.partition = None
+        self.spline = None
+
+    def partition_solutes(self, r, build_monomer, spts=10):
+        """ Calculate solute centers of mass, construct spline through pore and then calculate radial distance of
+        solute centers of mass from pore center.
+
+        :param r: distance from pore center defining partition
+        :param build_monomer: name of monomer used to build system. Will be used to define pore centers.
+        :param spts: number of points used to construct spline
+
+        :type r: float
+        :type build_monomer: str
+        :type spts: int
+
+        """
+
+        residue = topology.Residue(self.resname)
+        residue_indices = np.array([a.index for a in self.t.topology.atoms if a.residue.name == self.resname])
+
+        if residue_indices.size == 0:
+            sys.exit("No residue %s found" % self.resname)
+
+        residue_atom_names = [a.name for a in self.t.topology.atoms if a.residue.name == self.resname]
+        masses = [residue.mass[x] for x in residue_atom_names[:residue.natoms]]
+
+        print('Calculating centers of mass...', end='', flush=True)
+        self.com = physical.center_of_mass(self.t.xyz[:, residue_indices, :], masses)
+        print('Done!')
+
+        monomer = topology.LC('%s.gro' % build_monomer)
+        pore_defining_atoms = monomer.pore_defining_atoms
+
+        pore_atoms = [a.index for a in self.t.topology.atoms if a.name in pore_defining_atoms and a.residue.name in
+                      monomer.residues]
+
+        self.spline = physical.trace_pores(self.t.xyz[:, pore_atoms, :], self.t.unitcell_vectors, spts, npores=4,
+                                           progress=True)[0]
+
+        self.partition = physical.partition(self.com, self.spline, r, unitcell=self.t.unitcell_vectors, npores=4,
+                                            spline=True)
+
+    def build_spline(self, rep='K', frame=-1):
+        """ Build the spline into the last frame of the trajectory
+
+        :param pore_centers: output of physical.avg_pore_loc() with spline=True
+        :param rep: name of atom to use to represent spline
+
+        :return: 'spline.gro'
+        """
+        pos = self.t.xyz[frame, ...]
+
+        for i in range(4):
+            pos = np.concatenate((pos, self.spline[frame, i, ...]))
+        ids = [a.name for a in self.t.topology.atoms]
+        res = [a.residue.name for a in self.t.topology.atoms]
+        ids += [rep]*self.spline.shape[2]*self.spline.shape[1]
+        res += [rep]*self.spline.shape[2]*self.spline.shape[1]
+
+        file_rw.write_gro_pos(pos, 'spline.gro', ucell=self.t.unitcell_vectors[frame, ...], ids=ids, res=res)
 
     def define_bins(self, nbins=100):
         """ Define the peaks of the dihedral distribution by selecting cross-over points
@@ -136,6 +204,7 @@ class Dihedrals(object):
 
         # can probably flatten everything to speed the following up. but it's already quick enough
         self.dihedral_bins = np.zeros_like(self.dihedrals, dtype=int)
+
         for r in range(self.nres):
             for d in range(self.ndihedrals):
                 self.dihedral_bins[d, :, r] = np.digitize(self.dihedrals[d, :, r],
@@ -154,13 +223,29 @@ class Dihedrals(object):
             bins.append([i for i in range(len(b) - 1)])
 
         self.permutations = list(itertools.product(*bins))
-        self.probs = np.zeros([len(self.permutations)])
-        for i, p in enumerate(self.permutations):
-            for db in self.dihedral_bins.T:
-                if np.array_equal(db, p):
-                    self.probs[i] += 1
 
-        self.probs /= np.sum(self.probs)
+        if self.partition is not None:
+            self.partition = self.partition.flatten()
+            self.probs = np.zeros([2, len(self.permutations)])
+            for i, p in enumerate(self.permutations):
+                    for db in self.dihedral_bins[:, self.partition].T:
+                        if np.array_equal(db, p):
+                            self.probs[0, i] += 1
+                    for db in self.dihedral_bins[:, ~self.partition].T:
+                        if np.array_equal(db, p):
+                            self.probs[1, i] += 1
+
+            self.probs /= np.sum(self.probs, axis=1)[:, np.newaxis]
+
+        else:
+            self.probs = np.zeros([len(self.permutations)])
+
+            for i, p in enumerate(self.permutations):
+                for db in self.dihedral_bins.T:
+                    if np.array_equal(db, p):
+                        self.probs[i] += 1
+
+            self.probs /= np.sum(self.probs)
 
     def print_probabilities(self):
         """ Display the probability of each combination of dihedrals from highest to lowest
@@ -170,23 +255,28 @@ class Dihedrals(object):
         :return:
         """
 
-        headers = ''
-        for i in range(self.ndihedrals):
-            headers += '{:^7s}'.format('d%s' % (i + 1))
+        if self.spline is None:
+            self.probs = self.probs[np.newaxis, :]
 
-        headers += ' Probability'
-        print(headers)
+        for p in self.probs:
 
-        ordered = np.argsort(self.probs)[::-1]  # list in descending order
+            headers = ''
+            for i in range(self.ndihedrals):
+                headers += '{:^7s}'.format('d%s' % (i + 1))
 
-        for i in ordered:
-            angles = ['{:^7.1f}'.format(self.translate_bins[k][x]) for k, x in enumerate(self.permutations[i])]
-            data = ''
-            for k in angles:
-                data += k
+            headers += ' Probability'
+            print(headers)
 
-            data += '{:^12.2f}'.format(self.probs[i])
-            print(data)
+            ordered = np.argsort(p)[::-1]  # list in descending order
+
+            for i in ordered:
+                angles = ['{:^7.1f}'.format(self.translate_bins[k][x]) for k, x in enumerate(self.permutations[i])]
+                data = ''
+                for k in angles:
+                    data += k
+
+                data += '{:^12.2f}'.format(p[i])
+                print(data)
 
 
 if __name__ == "__main__":
@@ -197,6 +287,11 @@ if __name__ == "__main__":
         d = file_rw.load_object(args.load)
     else:
         d = Dihedrals(args.gro, args.traj, args.dihedrals, args.residue)
+
+        if args.partition:
+            d.partition_solutes(args.partition, args.build_monomer)
+            d.build_spline()
+
         d.define_bins(nbins=args.bins)
         d.bin_dihedrals()
         d.conformational_probabilities()

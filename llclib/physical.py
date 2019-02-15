@@ -657,7 +657,7 @@ def partition(com, pore_centers, r, buffer=0, unitcell=None, npores=4, spline=Fa
     :type spline: bool
 
     :return part: boolean numpy array with shape (nT, com.shape[1]) where True indicates a center of mass that is
-    inside the pore region
+    inside the inner region (i.e. < r)
     """
 
     nT = com.shape[0]

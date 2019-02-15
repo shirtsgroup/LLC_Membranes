@@ -6,8 +6,8 @@ from LLC_Membranes.llclib import file_rw
 import matplotlib.pyplot as plt
 import names
 
-r = 'DMP'
-atoms = ['O', 'S', 'S1']
+r = 'EAC'
+atoms = ['C', 'C3']
 wt=10
 maximum = 0
 

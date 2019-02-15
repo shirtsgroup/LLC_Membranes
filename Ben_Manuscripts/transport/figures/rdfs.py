@@ -27,7 +27,8 @@ simple_alcohols = False
 polyols = False
 head_groups = False 
 thiol_comparison = False 
-ketones = True
+ketones = False
+nondonors = True
 probability = False 
 
 if simple_alcohols:
@@ -39,6 +40,9 @@ elif thiol_comparison:
 	residues=["DMP", "GLY"]
 elif ketones:
 	residues=["ACH", "URE", "ACN", "ATO"]
+elif nondonors:
+	residues=["THF", "PCB", "EAC", "DMF"]
+	residues=["THF", "DMF"]
 else:
 	residues=["PG", "GCL"]
 	# residues=["DMP", "GLY"]

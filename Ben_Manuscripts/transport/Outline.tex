@@ -660,7 +660,7 @@
 %	elsewhere and effectively pull the other bound hydroxyl group along with it. 
 %  \end{itemize}
 
-  \subsection*{Sulfur Analogs}
+  \subsection*{Transport of Thiols} % BJC: maybe put this after next section and call it sulfur analogs and include DMSO?
   
   We studied the transport properties of sulfur analogs of glycerol and ethylene glycol.
   \begin{itemize}
@@ -695,49 +695,91 @@
   near monomer head groups. %BJC: should I give all the solutes nicknames (i.e. their residue names)?
   \begin{itemize}
     \item Glycerol frequently hydrogen bonds with more than one head group at a time.
-    \item It can also hydrogen bond with water molecule
+    \item It also hydrogen bond with water molecules which causes it to stay in the pore region
     \item 2-3-Dimercapto-1-propanol preferentially hydrogen bonds with head groups so it stays
     close to pore walls.
-  \end{itemize}
-  
-  Similar rdfs of ethylene glycol and dimercaptoethanol reinforces the lack of influence of hbonding % not really?
- 
-
-  \subsection*{Transport of Ketone-like Solutes}
-
-  The carbonyl group of Acetone is a hydrogen bond acceptor and therefore only
-  form hydrogen bonds with water molecules in the pore. 
-
-  The hydrophobic character of the two methyl groups on acetone causes the methyl
-  groups to gravitate towards the outside of the pore, while the carbonyl group
-  reaches towards the pore center in order to hydrogen bond with water molecules.
-  \begin{itemize}
-	\item Order parameter defined between vector along carbonyl and vector extending
-	from acetone COM to pore center is non-zero.
   \end{itemize} 
 
-  Acetic acid, since we modeled it solely in its protonated state, has hydrogen
-  bond donor and acceptor groups. 
-
-  \subsection*{Transport of Ions} % probably just sodium
-
-  Sodium ions also exhibit hop diffusion because polarized water and
-  carboxylate head groups both work to neutralize its charge.
+  \subsection*{Transport of Ketones}
+  
+  %BJC: DMSO might be added to this section. 
+  %BJC: DMSO might be slow because it's miscible in organic and polar solvents  
+  
+  The 4 ketone-like molecules tested show a range of transport behaviors.
   \begin{itemize}
-	\item Ions get trapped in oxygen 'cages' composed of combinations
-	of water molecules, carboxylate head groups and ether oxygens connecting
-	the head groups to their tails.
-  	\item Interesting coordination number data
-	\item Dwell time proportional to surrounding charge within coordination shell
+    \item Urea, Acetic Acid, Acetamide and Acetone are all characterized by a carbonyl group
+    with two attached heavy atoms. 
+    \item All have approximately the same molecular weight and are planar molecules due to
+    the sp2 hybridization of the carbonyl group.
+    \item The fastest solute of this grouping, Urea, has an MSD comparable to that of ethylene
+    glycol while the slowest, Acetone, has an MSD one third of that of Urea.
   \end{itemize}
+  
+  Once again, the trends in the MSD can in large part be explained by the solutes'
+  ability to hydrogen bond.  % or maybe just polarity
+  \begin{itemize}
+  	\item Urea, Acetic Acid and Acetamide are all capable of donating hydrogen bonds,
+  	while acetone is the first instance of a molecule in this study that can only
+  	accept hydrogen bonds.
+  	\item Urea has two hydrogen bond donor nitrogen atoms. It is not surprising that
+  	its density is high near the pore center, particularly near the monomer head groups.
+  	\item Acetamide has only one nitrogen atom. One of two peaks in its density is 
+  	located close to the peak of Urea, likely corresponding to hydrogen bonds with head groups.
+  	A second peak is located within the head group region. %BJC: hbonds with ethers vs. head groups. Or is it just planarity?
+  	\item Acetic acid, a carboxylic acid shows a relatively high density in the pore region, with 
+  	a peak close to the carboxylate groups.  %BJC: hbonds with 
+  	\item Acetone is stabilized by accepting hydrogen bonds from water in the pore region, but
+    its low polarity and planar shape gives it comparable stability when trapped between head groups.
+%  	\item Acetone's has two prominent peaks in its radial density. One is in the pore region and the o
+%  	other is relatively deep in the head group region.
+  \end{itemize}
+  
+  \subsection*{Hydrogen bond acceptors}  % Need a better heading since all molecules in this study are acceptors
+  
+  The final set of molecules we studied can accept hydrogen bonds, but cannot donate
+  them. 
+  \begin{itemize}
+  	\item Among this set are the two slowest solutes in our study: Tetrahydrofuran and Dimethyl Formamide.
+  	\item Ethyl acetate and Propylene Carbonate are only marginally faster, however they
+  	are both larger molecules. %BJC: not sure how far I should dive into this point
+  \end{itemize}
+  
+  The radial density functions highlight the solutes' preference for the 
+  pore region.
+  \begin{itemize}
+  	\item There are small peaks in the radial density greater than 1 nm 
+  	from the pore center.
+  	\item The solutes become trapped in these regions where each step is
+  	highly anti-correlated to its previous step, leading to very low MSDs.
+  	\item The large size and nonplanar shapes of ethyl acetate and propylene 
+  	carbonate may destabilize entrapment in the tail region more quickly, leading
+  	to slightly faster transport. 
+%  	\item The relatively small amount of movement on the timescales studied 
+%  	do not reveal definitive reasons
+  	\item Overall, 
+  \end{itemize}
+  Ethyl acetate spends all of its time in a linear or near-linear conformation. % can show with dihedrals
+  
+  THF and DMF are both planar which allows them to 
+  
 
-  \subsubsection*{Remarks}
-   
-  Overwhelming amount of water in 10 wt\% system makes hydrogen bonding
-  competitive between head groups and water.
-  %MRS: not sure what you mean above.
+  % THF shows highly anticorrelated hops
+  
+  %All have comparable densities near pore center except acetone which is lower
 
-  \subsection{Design Suggestions}
+%  \subsection*{Transport of Ions} % probably just sodium
+%
+%  Sodium ions also exhibit hop diffusion because polarized water and
+%  carboxylate head groups both work to neutralize its charge.
+%  \begin{itemize}
+%	\item Ions get trapped in oxygen 'cages' composed of combinations
+%	of water molecules, carboxylate head groups and ether oxygens connecting
+%	the head groups to their tails.
+%  	\item Interesting coordination number data
+%	\item Dwell time proportional to surrounding charge within coordination shell
+%  \end{itemize}
+
+  \subsection{Design Principles}
 
   Water content affects pore size. Experiments to understand this could be useful.
 
