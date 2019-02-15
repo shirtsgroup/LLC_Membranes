@@ -298,11 +298,11 @@ class System(object):
         residue = Residue(res)
         atoms = 1
         for a in self.t.topology.atoms:
-            if a.residue.name == 'HII':
+            if a.residue.name == res:
                 residue_numbers[a.index] = nres
-            if atoms % residue.natoms == 0:
-                nres += 1
-            atoms += 1
+                if atoms % residue.natoms == 0:
+                    nres += 1
+                atoms += 1
 
         return residue_numbers, nres
 

@@ -433,7 +433,7 @@
     \item Because the MSDs are non-linear and because of the ageing phenomenon, we
     did not attempt to calculate a diffusion constant as one might for a Brownian
     particle with a linear MSD.
-	\item Instead, the values plotted in Figure~\ref{fig:all_msds} represent the
+	\item Instead, the MSD values plotted in Figure~\ref{fig:all_msds} represent the
 	average MSD of each solute after a 400 ns time lag.
   \end{itemize}  
   
@@ -448,9 +448,18 @@
   
   \begin{figure}
   \centering
-  \includegraphics[width=\textwidth]{all_tamsds.pdf}
+  \includegraphics[width=\textwidth]{all_tamsds.pdf}  % include bar plot of MW to show it's non-monotonic
   \caption{}\label{fig:all_msds}
   \end{figure}
+  
+  \noindent The MSDs are not a monotonic function of solute molecular weight.
+  \begin{itemize}
+  	\item We plotted the solute molecular weights alongside their MSDs in Figure~\ref{fig:all_msds}.
+  	\item Transport is clearly affected by factors other than molecular weight. 
+  	\item Tetrose, our third heaviest solute, has an MSD higher than more than half of
+  	all solutes studied. 
+  	\item The three slowest solutes have lower molecular weights than 8 faster solutes.
+  \end{itemize}
   
   \noindent The MSDs in Figure~\ref{fig:all_msds} are a strong function of two solute 
   trapping mechanisms. % by which solutes become trapped.
@@ -532,22 +541,22 @@
   \end{itemize}
   
   All simple alcohols participate in a similar number of hydrogen bonding interactions
-  with the monomer head groups , but with varying preference towards hydrogen bonds with
+  with the monomer head groups, but with varying preference towards hydrogen bonds with
   the monomer carboxylate oxygen atoms (See Figure~\ref{fig:simple_alcohol_hbonds}).
   \begin{itemize}
   	\item If all 5 hydrogen bonding acceptor sites on the monomer head groups were equal,
   	we would expect the ratio of the number of hydrogen bonds between solutes and the two 
   	carboxylate oxygen atoms to the number of hydrogen bonds between solutes and the three
   	ether groups to be 2/3. 
-  	\item Clearly there is a preference towards hydrogen bonding with the carboxylate 
-  	oxygen atoms for all solutes.
+  	\item There is a clear preference towards hydrogen bonding with the carboxylate 
+  	oxygen atoms for all simple alcohols.
   	\item This is largely due to the more highly crowded environment surrounding the ether
   	oxygen atoms.
   	\item Butanol shows the largest preference towards hydrogen bonds with carboxylate 
   	head groups.
   	\item The radial distribution function of atoms located at opposite ends of butanol
   	shows that, on average, oxygen atoms are situated 0.25 nm closer to the pore centers
-  	than the distal carbon.
+  	than the distal carbon atoms.
   	\item This suggests that alcohols tend to orient themselves like the liquid crystal 
   	monomers, with hydrophilic components point towards the pore centers.
   \end{itemize}
@@ -563,7 +572,7 @@
   \caption{}\label{fig:simple_alcohol_hbonds}
   \end{subfigure}
   \begin{subfigure}{0.325\textwidth}
-  \includegraphics[width=\linewidth]{butanol_CO.pdf}  %BJC: can add inset to plot showing 
+  \includegraphics[width=\linewidth]{butanol_CO.pdf}  %BJC: can add inset to plot showing butanol with highlighted O and C
   \caption{}\label{fig:butanol_CO}
   \end{subfigure}
   \caption{(a) The radial distribution functions of each simple alcohol shows a maximum close
@@ -577,19 +586,122 @@
   the pore center.}\label{fig:simple_alcohols}
   \end{figure}
 
-  \subsection*{Transport of Diols and Triols}
+  \subsection*{Transport of Diols, Triols and Sugars}  % polyols instead of sugars?
   
-  Ethylene glycol, a diol, has two hydrogen bond donor groups.
+  Transport is both facilitated and hindered by additional solute hydroxyl groups.
   \begin{itemize}
-	\item Can hydrogen bond with same moeity.
-	\item Can hydrogen bond with different moeities in the same 
-	vicinity. 
-	\item Dwell times tend to be shorter. If one hydroxyl group is bound
-	with a hydrogen bond, the other unbound hydroxyl group may form a hydrogen bond
-	elsewhere and effectively pull the other bound hydroxyl group along with it. 
+    \item Extra hydroxyl groups cause solutes to favor the water-rich pore region
+    where there is the least hindrance to movement.
+    \item However, these extra hydroxyl groups facilitate a larger number of 
+    hydrogen bond interactions that work to hold solutes in place.
+    \item At the same time, solute molecular weight increases, which inherently
+    causes them to move more slowly.
+    \item Ethylene glycol, the fastest solute in this grouping (and second fastest
+    overall), obtains the best balance of both effects.
   \end{itemize}
   
-  \subsection*{Transport of Sugars}
+  The number of hydrogen bonding interactions between solutes and head groups
+  increases with the number of solute hydroxyl groups.
+  \begin{itemize}
+    \item These solutes frequently undergo simultaneous hydrogen bond interactions as
+    shown in Figure~\ref{fig:multi_hbonds}. 
+    \item For example, both hydroxyl groups of ethylene glycol can undergo hydrogen
+    bonds with different hydrogen bond acceptors at the same time.
+    \item In some cases, all 4 hydroxyl groups of ribose are hydrogen bonded to monomer
+    head groups simultaneously.
+%  	\item Simple alcohols, containing only one hydroxyl group, hydrogen bond
+%  	with head groups about 20 \% of the time. % BJC: I have a figure showing the average number of hydrogen bonds per solute
+  \end{itemize}
+  
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=\linewidth]{multi_hbonds.pdf}
+  \caption{The number of hydrogen bond interactions between solutes and monomers increases
+  as solutes gain additional hydroxyl groups. Multiple hydroxyl groups within a solute often
+  hydrogen bond in different locations simultaneously. Occasionally, all four hydroxyl groups
+  of Ribose (n = 4) are involved in a hydrogen bond interaction at the same time.}\label{fig:multi_hbonds}
+  \end{figure}
+  
+  Between the two diols, ethylene glycol moves significantly faster than propylene glycol
+  due to propylene glycol's affinty for the monomer head groups.  
+  \begin{itemize}
+  	\item The distribution of each solute's dwell time and hop length distributions shows that
+  	ethylene glycol has shorter dwell times and longer hop lengths, which combine to create a 
+  	relatively fast MSD. 
+    \item Both diols have comparable densities close to the pore center, however propylene glycol's
+    density has a large peak near the monomer head groups relative to ethylene glycol. 
+    \item Combined with an increase in molecular weight, the addition of a single methyl group
+    increases the molecule's hydophobic character and causes propylene glycol to favor positions
+    near monomer head groups.
+    \item This causes propylene glycol to form more highly stablized hydrogen bonds with
+    carboxylate groups, explaining the higher incidence of hydrogen bonds shown in Figure~\ref{fig:multi_hbonds}.
+    % BJC: could plot dwell time as a function of radial position (show that dwells are longest when PG
+    % is hbonding to head groups
+  \end{itemize}
+  
+  Solutes with three or more hydroxyl groups have the highest density
+  at the pore center which contributes to overall faster than expected transport.
+  \begin{itemize}
+  	\item These molecules are highly water soluble but relatively large
+  	\item They can easily hydrogen bond in multiple locations.
+  	\item Their large size and high hydrogen bonding capability prevents them
+  	from have larger MSDs.
+  \end{itemize}
+  
+  % BJC: Euclidean distance between simultaneous h-bonds for ethylene glycol?
+  
+%  Ethylene glycol, a diol, has two hydrogen bond donor groups.
+%  \begin{itemize}
+%	\item Can hydrogen bond with same moeity.
+%	\item Can hydrogen bond with different moeities in the same 
+%	vicinity. 
+%	\item Dwell times tend to be shorter. If one hydroxyl group is bound
+%	with a hydrogen bond, the other unbound hydroxyl group may form a hydrogen bond
+%	elsewhere and effectively pull the other bound hydroxyl group along with it. 
+%  \end{itemize}
+
+  \subsection*{Sulfur Analogs}
+  
+  We studied the transport properties of sulfur analogs of glycerol and ethylene glycol.
+  \begin{itemize}
+    \item We replaced all but one oxygen atom of each solute with sulfur atoms
+  	\item Sulfur is unable to hydrogen bond, however it is soluble in water  %BJC: maybe a reference to why sulfur can't hbond
+  	\item Comparisons of their RDFs are shown in Figure~\ref{fig:sulfur_analog_rdfs}.
+  \end{itemize}
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\linewidth}
+  \includegraphics[width=\textwidth]{thiol_comparison_SOH.pdf}
+  \caption{}\label{fig:SOH_GCL_comparison}
+  \end{subfigure}
+  \begin{subfigure}{0.45\linewidth}
+  \includegraphics[width=\textwidth]{thiol_comparison_DMP.pdf}
+  \caption{}\label{fig:DMP_GLY_comparison}
+  \end{subfigure}
+  \caption{}\label{fig:sulfur_analog_rdfs}
+  \end{figure}
+  
+  \noindent Mercaptoethanol has a similar average RDF and MSD to ethylene glycol.
+  \begin{itemize}
+    \item There is a much larger uncertainty associated with mercaptoethanol's MSD
+    % BJC: hypothesis about observation. Remains to be quantified
+    \item Mercaptoethanol exhibits some of the largest single observed hops among all solutes.
+    \item Less frequent hydrogen bonding and an affinity for the pore region may be responsible
+    for these hops.
+  \end{itemize}
+  
+  \noindent 2,3-Dimercapto-1-propanol exhibits slower transport than glycerol because it spends more time
+  near monomer head groups. %BJC: should I give all the solutes nicknames (i.e. their residue names)?
+  \begin{itemize}
+    \item Glycerol frequently hydrogen bonds with more than one head group at a time.
+    \item It can also hydrogen bond with water molecule
+    \item 2-3-Dimercapto-1-propanol preferentially hydrogen bonds with head groups so it stays
+    close to pore walls.
+  \end{itemize}
+  
+  Similar rdfs of ethylene glycol and dimercaptoethanol reinforces the lack of influence of hbonding % not really?
+ 
 
   \subsection*{Transport of Ketone-like Solutes}
 
@@ -603,8 +715,6 @@
 	\item Order parameter defined between vector along carbonyl and vector extending
 	from acetone COM to pore center is non-zero.
   \end{itemize} 
-
-  \subsection*{Transport of Acetic Acid}
 
   Acetic acid, since we modeled it solely in its protonated state, has hydrogen
   bond donor and acceptor groups. 

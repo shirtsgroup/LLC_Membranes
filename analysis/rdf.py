@@ -26,8 +26,8 @@ def initialize():
     parser.add_argument('-spline', '--spline', action="store_true", help='Trace pore centers using a spline')
     parser.add_argument('-spts', '--spline_pts', default=20, type=int, help='Number of points making up the spline of'
                                                                             'each pore')
-    parser.add_argument('-atoms', '--atoms', action='append', nargs='+', help='Names of atoms which '
-                        'are a part of residue whose radial distribution function we want to calculate.')
+    parser.add_argument('-atoms', '--atoms', action='append', nargs='+', help='Names of atom(s) which '
+                        'is/are a part of residue whose radial distribution function we want to calculate.')
     parser.add_argument('-normalize', action="store_true", help='Make the maximum value of the RDFs equal to 1 for '
                                                                 'easier visual comparison (and a single y-axis)')
     parser.add_argument('-cut', default=1.5, type=float, help='Largest distance from pore center to include in '
@@ -120,7 +120,7 @@ class System(object):
         self.density = np.zeros([self.t.n_frames, bins])
 
         pore_defining_atoms = [a.index for a in self.t.topology.atoms if a.name in self.monomer.pore_defining_atoms
-                               and a.residue.name == self.monomer.name]
+                               and a.residue.name in self.monomer.residues]
 
         if spline:
             print('Generating spline through each pore...')
@@ -220,6 +220,7 @@ if __name__ == "__main__":
             for a in args.atoms[i]:
                 status += ' %s' % a
                 savename += '%s' % a
+        print(status)
 
         rdfs.append(System(args.gro, args.traj, r[0], args.build_monomer_residue, begin=args.begin,
                            end=args.end, skip=args.skip, atoms=args.atoms[i]))

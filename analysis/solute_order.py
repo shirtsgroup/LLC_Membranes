@@ -194,7 +194,6 @@ class System(object):
                 ndx = np.where(~self.solute_partition[i, ])[0]
             else:
                 ndx = np.arange(self.costheta.shape[1])
-            print(len(ndx))
             # 2D (https://physics.stackexchange.com/questions/65358/2-d-orientational-order-parameter)
             self.nematic_order_parameter[i] = np.sum(2 * self.costheta[i, ndx] ** 2 - 1) / len(ndx)
 

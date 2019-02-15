@@ -103,6 +103,7 @@ class System(object):
         self.dt = self.time[1] - self.time[0]  # time step
 
         keep = [a.index for a in self.t.topology.atoms if a.residue.name == res]  # get indices of atoms making up residue of interest
+
         self.res_start = keep[0]  # index where residue starts
 
         self.residue = topology.Residue(res)
@@ -128,6 +129,7 @@ class System(object):
         self.hop_sigma_distribution = []  # distribution of standard deviation of hop lengths
         self.breakpoint_penalty = 0
         self.location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # This script location
+        self.r = []  # radial distance of solute from pore center when hops are made
 
         self.partition = None  # array telling whether a solute is in the pores or tails. True if in pores, else False
 
@@ -223,7 +225,7 @@ class System(object):
                                                                  3))
         file_rw.write_gro_pos(coordinates, 'spline.gro', name='K')
 
-    def hops_and_dwells(self, penalty=0.25, nframes_dwell=10):
+    def hops_and_dwells(self, penalty=0.25, nframes_dwell=10, locations=False):
         """ Find breakpoints then assemble lists of dwell times and hop lengths. See documentation for Ruptures python
         package: http://ctruong.perso.math.cnrs.fr/ruptures-docs/build/html/index.html for more options that can be
         added
@@ -231,9 +233,11 @@ class System(object):
         :param penalty: penalty for cost function minimization
         :param nframes_dwell: number of frames that a solute needs to stay in the region of interest in order to be
         analyzed for hops.
+        :param locations: if True, this function will return the distance from the pore center when hops are made
 
         :type penalty: float
         :type nframes_dwell: int
+        :type location: bool
 
         """
 
@@ -268,9 +272,29 @@ class System(object):
                     # movement_3d = np.linalg.norm(self.com[begin:end, j, :], axis=1)  # magnitude of distance travelled
                     bp = ruptures.detection.Binseg(model='l2', min_size=1, jump=1).fit_predict(self.com[begin:end, j, :]
                                                    , pen=self.breakpoint_penalty)
-                    ruptures.display(self.com[begin:end, j, :], bp, figsize=(10, 6))
-                    plt.show()
-                    exit()
+                    # ruptures.display(self.com[begin:end, j, :], bp, figsize=(10, 6))
+                    # plt.show()
+                    # exit()
+
+                    if locations:
+
+                        pore = j % self.pore_centers.shape[1]
+
+                        if len(self.pore_centers.shape) == 4:  # spline
+
+                            pore_centers = self.pore_centers[begin:end, pore, ...][bp[:-1]]
+                            coms = self.com[begin:end, j, :][bp[:-1]]
+                            box = self.t.unitcell_vectors[begin:end, ...][bp[:-1]]
+
+                            for k in range(len(bp[:-1])):
+                                self.r += physical.radial_distance_spline(pore_centers[k, ...], coms[k, :][np.newaxis, :],
+                                                                          box[k]).tolist()
+
+                        else:  # no spline
+
+                            pore_centers = self.pore_centers[begin:end, pore, :][bp[:-1]]
+                            coms = self.com[begin:end, j, :2][bp[:-1]]
+                            self.r += np.linalg.norm(pore_centers - coms, axis=1).tolist()
 
                     # for visualization predicted z-hops on top of time series
                     # traj_hops = np.zeros([2*len(bp) - 1, 2])
@@ -669,6 +693,7 @@ if __name__ == "__main__":
         sys.hops_and_dwells(penalty=args.breakpoint_penalty)
 
         sys.fit_distributions(nbins=args.nbins, nboot=args.nboot, plot=True, show=True)
+        exit()
 
         sys.estimate_hurst()
 

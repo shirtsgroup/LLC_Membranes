@@ -48,13 +48,13 @@ def load_topology(top):
             print('No topology %s found' % top)
             exit()
 
-    monomer_topology = []
+    topology = []
     for line in f:
-        monomer_topology.append(line)
+        topology.append(line)
 
     f.close()
 
-    return monomer_topology
+    return topology
 
 
 def calculate_dihedral(pos, indices):
@@ -177,13 +177,12 @@ def autocorrelation_slow(d):
 
 class Dihedral(object):
 
-    def __init__(self, gro, traj, top, d, resname, exclusions=[]):
+    def __init__(self, gro, traj, d, resname, exclusions=[]):
         """
         :param gro: coordinate file (GROMACS .gro format)
         :param traj: trajectory file (GROMACS .trr or .xtc)
-        :param top: name of topology file (GROMACS top format). File should be stored in directory where this script
-        is located or with all other monomer topologies.
         :param d: names of atoms, in order of connectivity, that define the dihedral/torsion of interest
+        :param resname: residue name to which dihedrals belong
         :param exclusion: list of atoms to be excluded in dihedral calculations. If that atom is present in exclusions,
         any dihedrals that is a part of will not be counted.
         """
@@ -192,14 +191,16 @@ class Dihedral(object):
         t = md.load(traj, top=gro)
         print('Done!')
 
-        self.pos = t.xyz
+        keep = [a.index for a in t.topology.atoms if a.residue.name == resname]
+
+        self.pos = t.xyz[:, keep, :]
         self.time = t.time
         self.autocorr_fxn = None
 
-        monomer_topology = load_topology(top)
+        residue_topology = load_topology('%s.itp' % resname)
 
         atoms_index = 0
-        while monomer_topology[atoms_index].count('[ atoms ]') == 0:
+        while residue_topology[atoms_index].count('[ atoms ]') == 0:
             atoms_index += 1
 
         atoms_index += 2  # skip over directive and line of comments (this can be made smarter if necessary)
@@ -207,8 +208,8 @@ class Dihedral(object):
         types = {}  # atom names with corresponding type
         names = {}  # atom numbers (starting at one) with corresponding names
         natoms_residue = 0  # number of atoms in the residue
-        while monomer_topology[atoms_index] != '\n':
-            linedata = monomer_topology[atoms_index].split()
+        while residue_topology[atoms_index] != '\n':
+            linedata = residue_topology[atoms_index].split()
             types[linedata[4]] = linedata[1]
             names[linedata[0]] = linedata[4]
             atoms_index += 1
@@ -226,14 +227,14 @@ class Dihedral(object):
 
         # read all the dihedrals
         dihedrals_index = 0
-        while monomer_topology[dihedrals_index].count('[ dihedrals ]') == 0:
+        while residue_topology[dihedrals_index].count('[ dihedrals ]') == 0:
             dihedrals_index += 1
 
         dihedrals_index += 2  # skip over directive and line of comments (this can be made smarter if necessary)
 
         dihedrals = []
-        while monomer_topology[dihedrals_index] != '\n':
-            dihedral = monomer_topology[dihedrals_index].split()[:4]
+        while dihedrals_index < len(residue_topology) and residue_topology[dihedrals_index] != '\n':
+            dihedral = residue_topology[dihedrals_index].split()[:4]
             dtype = [types[names[dihedral[i]]] for i in range(4)]
             if dtype == self.dihedral_type or dtype[::-1] == self.dihedral_type:
                 # print(dihedral)
@@ -253,15 +254,15 @@ class Dihedral(object):
         for i in range(self.ndihedrals):
             indices = np.zeros([nres, 4], dtype=int)
             for j in range(nres):
-                indices[j, :] = dihedrals[i]*(j + 1)
+                indices[j, :] = dihedrals[i] + j*natoms_residue
             self.all_dihedral_angles[i, ...] = calculate_dihedral(self.pos, indices)
 
-    def plot_histogram(self, bins=100, rb=False, ff='gaff', save=False, out='Dihedral.png', show=False):
+    def plot_histogram(self, bins=100, rb=False, ff='gaff', save=False, out='Dihedral', show=False):
 
-        hist, bin_edges = np.histogram(self.all_dihedral_angles, bins=bins)
+        hist, bin_edges = np.histogram(self.all_dihedral_angles, bins=bins, density=True)
         bin_width = bin_edges[1] - bin_edges[0]
         bin_centers = np.array([bin_edges[i] + bin_width / 2 for i in range(len(bin_edges) - 1)])
-        hist = hist / np.amax(hist)  # hist /= np.amax(hist) doesn't work
+        #hist = hist / np.amax(hist)  # hist /= np.amax(hist) doesn't work
 
         if rb:
 
@@ -288,6 +289,8 @@ class Dihedral(object):
             plt.plot(bin_centers, ryckaert_belleman(bin_centers, C, mode='degree', normalize=True), '--', color='black',
                      label='Dihedral Potential')
 
+        # lower, upper = 0, 180
+        # print(np.sum(hist[np.argmin((bin_centers - lower)**2): np.argmin((bin_centers - upper)**2)]) * bin_width)
         plt.bar(bin_centers, hist, bin_width)
         plt.xlabel('Angle ($\degree$)', fontsize=14)
         plt.ylabel('Count', fontsize=14)
@@ -295,7 +298,7 @@ class Dihedral(object):
                                                      self.dihedral_type[3]))
         plt.tight_layout()
         if save:
-            plt.savefig('%s.png' % out)
+            plt.savefig('%s.pdf' % out)
         if show:
             plt.show()
 
@@ -361,7 +364,7 @@ if __name__ == "__main__":
 
     args = initialize()
 
-    dihedrals = Dihedral(args.gro, args.traj, args.topology, args.dihedral, args.residue, exclusions=args.exclude)
-    dihedrals.plot_histogram(rb=True, save=True, show=True)
+    dihedrals = Dihedral(args.gro, args.traj, args.dihedral, args.residue, exclusions=args.exclude)
+    dihedrals.plot_histogram(rb=False, save=True, show=True)
     dihedrals.autocorrelation(cos=True)
     dihedrals.plot_autocorrelation(show=True)

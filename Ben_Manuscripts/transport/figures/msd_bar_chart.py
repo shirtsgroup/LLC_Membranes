@@ -8,6 +8,7 @@ import names
 connection = sql.connect("../../../timeseries/msd.db")
 crsr = connection.cursor()
 restrict_by_name = False 
+MW = True  # plot mw of species
 penalty = 0.5
 
 group = 'all'
@@ -20,7 +21,7 @@ if time_averaged:
 else:
 	savename = '%s_emsds.pdf' % group
 
-query = "SELECT name, sim_length, MD_TAMSD, MD_TAMSD_CI_lower, MD_TAMSD_CI_upper, MD_MSD, MD_MSD_CI_lower, MD_MSD_CI_upper from msd"
+query = "SELECT name, sim_length, MD_TAMSD, MD_TAMSD_CI_lower, MD_TAMSD_CI_upper, MD_MSD, MD_MSD_CI_lower, MD_MSD_CI_upper, mw from msd"
 
 if restrict_by_name:
 	#restricted_names = ['MET', 'ETH', 'PR', 'BUT']
@@ -50,6 +51,7 @@ md_tamsd_upper = np.array([i[4] for i in output]) - md_tamsd
 md_msd = np.array([i[5] for i in output])
 md_msd_lower = -np.array([i[6] for i in output]) + md_msd
 md_msd_upper = np.array([i[7] for i in output]) - md_msd
+mw = np.array([i[8] for i in output])
 
 # only need this block until all simulations are finished
 md_msd *= (1000 / sim_length)
@@ -61,32 +63,42 @@ if time_averaged:
 	md_tamsd = md_tamsd[ordered_md]
 	md_tamsd_lower = md_tamsd_lower[ordered_md]
 	md_tamsd_upper = md_tamsd_upper[ordered_md]
+	mw = mw[ordered_md]
 
 else:
 	ordered_md = np.argsort(md_msd)[::-1]
 	md_msd = md_msd[ordered_md]
 	md_msd_lower = md_msd_lower[ordered_md]
 	md_msd_upper = md_msd_upper[ordered_md]
+	mw = mw[ordered_md]
 
 labels = labels[ordered_md]
 # end temporary block
 
 fig, ax = plt.subplots(figsize=(12, 7))
-bar_width = 0.8
+bar_width = 0.4
 opacity = 0.8
 index = np.arange(len(labels))
+if not MW:
+	index += bar_width / 2
 
 if time_averaged:
-	ax.bar(index + bar_width/2, md_tamsd, bar_width, alpha=opacity, yerr=(md_tamsd_lower, md_tamsd_upper), label='MD Simulated time-averaged MSD')
+	ax.bar(index, md_tamsd, bar_width, alpha=opacity, yerr=(md_tamsd_lower, md_tamsd_upper), label='MD Simulated time-averaged MSD')
 else:
-	ax.bar(index + bar_width/2, md_msd, bar_width, alpha=opacity, yerr=(md_msd_lower, md_msd_upper), label='MD Simulated MSD')
-
+	ax.bar(index, md_msd, bar_width, alpha=opacity, yerr=(md_msd_lower, md_msd_upper), label='MD Simulated MSD')
 
 ax.set_ylabel('MSD ($nm^2$)', fontsize=14)
 ax.tick_params(labelsize=14)
 ax.set_xticks(index + bar_width/2)
 ax.set_xticklabels(labels, fontsize=14)
 plt.xticks(rotation=90)
+
+if MW:
+	ax1 = ax.twinx()
+	ax1.bar(index + bar_width, mw, bar_width, alpha=opacity, label = 'Molecular Weight', color='red')
+	ax1.tick_params(labelsize=14)
+	ax1.set_ylabel('Molecular Weight (g/mol)', fontsize=14)
+
 plt.xlim(-0.2, len(labels))
 fig.tight_layout()
 plt.savefig(savename)

@@ -218,6 +218,11 @@ class Diffusivity(object):
 
         print('Calculating MSD...', end='', flush=True)
         self.MSD = timeseries.msd(self.com, self.axis, ensemble=ensemble)
+        # for i in range(self.MSD.shape[1]):
+        #     print(np.amax(self.MSD[:, i]), i)
+        #     #plt.plot(self.MSD[:, i])
+        # #plt.show()
+        # exit()
         self.MSD_average = np.mean(self.MSD, axis=1)
         print('Done!')
 
@@ -302,7 +307,7 @@ class Diffusivity(object):
         upper_confidence = 100 - lower_confidence
 
         self.limits = np.zeros([2, self.nT], dtype=float)  # upper and lower bounds at each point along MSD curve
-        # determine a 95 % error bound for each tau (out of n MSD's, use that for the error bars)
+        # determine error bound for each tau (out of n MSD's, use that for the error bars)
         for t in range(self.nT):
             self.limits[0, t] = np.abs(np.percentile(eMSDs[t, :], lower_confidence) - self.MSD_average[t])
             self.limits[1, t] = np.abs(np.percentile(eMSDs[t, :], upper_confidence) - self.MSD_average[t])
@@ -456,8 +461,9 @@ class Diffusivity(object):
 
         if output[0][0] > 0:
 
-            update_entry = "UPDATE %s SET %s = %.3f, %s = %.3f, %s = %.3f where name = '%s'" % (tablename, data_labels[0],
-                            msd, data_labels[1], msd_lower, data_labels[2], msd_upper, self.residue)
+            update_entry = "UPDATE %s SET %s = %.3f, %s = %.3f, %s = %.3f, sim_length = %.2f where name = '%s'" % \
+                           (tablename, data_labels[0], msd, data_labels[1], msd_lower, data_labels[2], msd_upper,
+                            self.time[-1], self.residue)
 
             crsr.execute(update_entry)
 

@@ -86,7 +86,6 @@
     10      3     11      1    1.0955e+02    3.2786e+02 ;     H4 - C2     - H5    
 
 [ dihedrals ] ; propers
-; treated as RBs in GROMACS to use combine multiple AMBER torsions per quartet
 ;    i      j      k      l   func    C0         C1         C2         C3         C4         C5
      1      2      3      5      3    0.65084    1.95253    0.00000   -2.60338    0.00000    0.00000 ;      C-    C1-    C2-    O1
      1      2      3     10      3    0.65084    1.95253    0.00000   -2.60338    0.00000    0.00000 ;      C-    C1-    C2-    H4
