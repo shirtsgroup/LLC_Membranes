@@ -28,7 +28,7 @@ polyols = False
 head_groups = False 
 thiol_comparison = False 
 ketones = False
-nondonors = True
+nondonors = True 
 probability = False 
 
 if simple_alcohols:
@@ -36,13 +36,14 @@ if simple_alcohols:
 elif polyols:
 	residues=["GCL", "PG", "GLY", "TET", "RIB"]
 elif thiol_comparison:
-	#residues=["SOH", "GCL"]
-	residues=["DMP", "GLY"]
+	residues=["SOH", "GCL"]
+	#residues=["DMP", "GLY"]
+	#residues=["DMS", "ATO"]
 elif ketones:
 	residues=["ACH", "URE", "ACN", "ATO"]
 elif nondonors:
 	residues=["THF", "PCB", "EAC", "DMF"]
-	residues=["THF", "DMF"]
+	#residues=["THF", "DMF"]
 else:
 	residues=["PG", "GCL"]
 	# residues=["DMP", "GLY"]
@@ -116,5 +117,9 @@ elif polyols:
 	plt.savefig('polyols_rdf.pdf')
 elif thiol_comparison:
 	plt.savefig('thiol_comparison_%s.pdf' % residues[0])
+elif ketones:
+	plt.savefig('ketone_rdf.pdf')
+elif nondonors:
+	plt.savefig('nondonors_rdf.pdf')
 plt.show()
 

@@ -693,7 +693,6 @@ if __name__ == "__main__":
         sys.hops_and_dwells(penalty=args.breakpoint_penalty)
 
         sys.fit_distributions(nbins=args.nbins, nboot=args.nboot, plot=True, show=True)
-        exit()
 
         sys.estimate_hurst()
 

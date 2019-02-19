@@ -203,6 +203,8 @@ class System(object):
         self.pore_centers = None
         self.pore_water = []
         self.tail_water = []
+        self.spline = False
+        self.part = None
 
         if residue == 'SOL':
             for a in self.t.topology.atoms:
@@ -230,14 +232,15 @@ class System(object):
         self.com = physical.center_of_mass(self.pos[:, self.residue_indices, :], masses)
         print('Done!')
 
-    def locate_pore_centers(self, spline=False):
+    def locate_pore_centers(self, spline=False, save=True):
 
         # find pore centers
         # can use physical.avg_pore_loc with spline argument instead of if/else below
         pore_atoms = [a.index for a in self.t.topology.atoms if a.name in self.pore_atoms]
         if spline:
-            print('Creating pore splines')
-            self.pore_centers = physical.trace_pores(self.pos[:, pore_atoms, :], self.t.unitcell_vectors, 20)
+            self.spline = True
+            self.pore_centers = physical.trace_pores(self.pos[:, pore_atoms, :], self.t.unitcell_vectors, 20,
+                                                     save=save)[0]
         else:
             self.pore_centers = physical.avg_pore_loc(self.npores, self.pos[:, pore_atoms, :], self.t.unitcell_vectors)
 
@@ -252,40 +255,14 @@ class System(object):
 
         """
 
-        # to help determine buffer
-        # plt.hist(self.com[0, :, 2], bins=50)
-        # plt.show()
-
-        print('Calculating solute partition...')
-        for i in tqdm.tqdm(range(self.t.n_frames)):
-            pore = []
-
-            if buffer > 0:
-                xy_positions = self.com[i, (self.com[i, :, 2] > buffer) & (self.com[i, :, 2] <
-                                        self.t.unitcell_vectors[i, 2, 2] - buffer), :2]
-            else:
-                xy_positions = self.com[i, :, :2]
-
-            for p in range(self.npores):
-                d = np.linalg.norm(xy_positions - self.pore_centers[i, p, :], axis=1)
-                pore += np.where(d <= r)[0].tolist()
-
-            self.pore_water.append(np.unique(pore).tolist())
-
-            tails = np.full(xy_positions.shape[0], True, dtype=bool)  # array of True. Booleans are fast
-            tails[self.pore_water[i]] = False  # set pore indices to False
-            self.tail_water.append(np.where(tails)[0])  # list of tail indices where tails = True
-
-            # vvv slow vvv
-            #self.tail_water.append([x for x in np.arange(0, self.com.shape) if x not in self.pore_water[i]])
-    # def flux(self):
+        self.part = physical.partition(self.com, self.pore_centers, r, buffer=buffer,
+                                       unitcell=self.t.unitcell_vectors, spline=self.spline)
 
     def plot(self, resname='Water'):
 
-        ntail_water = [len(x) for x in self.tail_water]
-        npore_water = [len(x) for x in self.pore_water]
-        print(ntail_water[-10:])
-        print(npore_water[-10:])
+        ntail_water = [np.sum(x) for x in self.part]
+        npore_water = [np.sum(x) for x in ~self.part]
+
         plt.plot(self.t.time/1000, ntail_water, color='xkcd:blue', label='Tail %s' % resname)
         plt.plot(self.t.time/1000, npore_water, color='xkcd:orange', label='Pore %s' % resname)
         plt.xlabel('Time (ns)', fontsize=14)
@@ -316,7 +293,6 @@ if __name__ == "__main__":
         with open(args.savename, "rb") as f:
             sys = pickle.load(f)
 
-    print('Calculating solute partition by frame')
     sys.partition(args.pore_radius, buffer=args.buffer)
 
     name = '%s' % args.residue

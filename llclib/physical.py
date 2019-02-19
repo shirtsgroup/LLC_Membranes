@@ -378,7 +378,7 @@ def put_in_box(pt, x_box, y_box, m, angle):
     return pt
 
 
-def trace_pores(pos, box, npoints, npores=4, progress=True):
+def trace_pores(pos, box, npoints, npores=4, progress=True, save=True, savename='spline.pl'):
     """
     Find the line which traces through the center of the pores
     :param pos: positions of atoms used to define pore location (args.ref) [natoms, 3]
@@ -387,77 +387,94 @@ def trace_pores(pos, box, npoints, npores=4, progress=True):
     :param npores: number of pores in unit cell (assumed that atoms are number sequentially by pore. i.e. pore 1 atom
     numbers all precede those in pore 2)
     :param progress: set to True if you want a progress bar to be shown
+    :param save: save spline as pickled object
 
     :return: points which trace the pore center
     """
 
-    single_frame = False
-    if np.shape(pos.shape)[0] == 2:
-        pos = pos[np.newaxis, ...]  # add a new axis if we are looking at a single frame
-        box = box[np.newaxis, ...]
-        single_frame = True
+    try:
+        print('Attempting to load spline ... ', end='', flush=True)
+        spline = file_rw.load_object(savename)
+        print('Success!')
 
-    nframes = pos.shape[0]
-    atoms_p_pore = int(pos.shape[1] / npores)  # atoms in each pore
+        return spline[0], spline[1]
 
-    v = np.zeros([nframes, 4, 2])  # vertices of unitcell box
-    bounds = []
+    except FileNotFoundError:
 
-    v[:, 0, :] = [0, 0]
-    v[:, 1, 0] = box[:, 0, 0]
-    v[:, 3, :] = np.vstack((box[:, 1, 0], box[:, 1, 1])).T
-    v[:, 2, :] = v[:, 3, :] + np.vstack((box[:, 0, 0], np.zeros([nframes]))).T
-    center = np.vstack((np.mean(v[..., 0], axis=1), np.mean(v[..., 1], axis=1), np.zeros(nframes))).T
+        print('%s not found ... Calculating spline' % savename)
 
-    for t in range(nframes):
-        bounds.append(mplPath.Path(v[t, ...]))  # create a path tracing the vertices, v
+        single_frame = False
+        if np.shape(pos.shape)[0] == 2:
+            pos = pos[np.newaxis, ...]  # add a new axis if we are looking at a single frame
+            box = box[np.newaxis, ...]
+            single_frame = True
 
-    angle = np.arcsin(box[:, 1, 1]/box[:, 0, 0])  # specific to case where magnitude of x and y box lengths are equal
-    angle = np.where(box[:, 1, 0] < 0, angle + np.pi / 2, angle)  # haven't tested this well yet
+        nframes = pos.shape[0]
+        atoms_p_pore = int(pos.shape[1] / npores)  # atoms in each pore
 
-    m = (v[:, 3, 1] - v[:, 0, 1]) / (v[:, 3, 0] - v[:, 0, 0])  # slope from points connecting first and third vertices
+        v = np.zeros([nframes, 4, 2])  # vertices of unitcell box
+        bounds = []
 
-    centers = np.zeros([nframes, npores, npoints, 3])
-    bin_centers = np.zeros([nframes, npores, npoints])
+        v[:, 0, :] = [0, 0]
+        v[:, 1, 0] = box[:, 0, 0]
+        v[:, 3, :] = np.vstack((box[:, 1, 0], box[:, 1, 1])).T
+        v[:, 2, :] = v[:, 3, :] + np.vstack((box[:, 0, 0], np.zeros([nframes]))).T
+        center = np.vstack((np.mean(v[..., 0], axis=1), np.mean(v[..., 1], axis=1), np.zeros(nframes))).T
 
-    for t in tqdm.tqdm(range(nframes), disable=(not progress)):
-        for p in range(npores):
+        for t in range(nframes):
+            bounds.append(mplPath.Path(v[t, ...]))  # create a path tracing the vertices, v
 
-            pore = pos[t, p*atoms_p_pore:(p+1)*atoms_p_pore, :]  # coordinates for atoms belonging to a single pore
+        angle = np.arcsin(box[:, 1, 1]/box[:, 0, 0])  # specific to case where magnitude of x and y box lengths are equal
+        angle = np.where(box[:, 1, 0] < 0, angle + np.pi / 2, angle)  # haven't tested this well yet
 
-            while np.min(pore[:, 2]) < 0 or np.max(pore[:, 2]) > box[t, 2, 2]:  # because cross-linked configurations can extend very far up and down
+        m = (v[:, 3, 1] - v[:, 0, 1]) / (v[:, 3, 0] - v[:, 0, 0])  # slope from points connecting first and third vertices
 
-                pore[:, 2] = np.where(pore[:, 2] < 0, pore[:, 2] + box[t, 2, 2], pore[:, 2])
-                pore[:, 2] = np.where(pore[:, 2] > box[t, 2, 2], pore[:, 2] - box[t, 2, 2], pore[:, 2])
+        centers = np.zeros([nframes, npores, npoints, 3])
+        bin_centers = np.zeros([nframes, npores, npoints])
 
-            _, bins = np.histogram(pore[:, 2], bins=npoints)  # bin z-positions
+        for t in tqdm.tqdm(range(nframes), disable=(not progress)):
+            for p in range(npores):
 
-            section_indices = np.digitize(pore[:, 2], bins)  # list that tells which bin each atom belongs to
-            bin_centers[t, p, :] = [(bins[i] + bins[i + 1])/2 for i in range(npoints)]
+                pore = pos[t, p*atoms_p_pore:(p+1)*atoms_p_pore, :]  # coordinates for atoms belonging to a single pore
 
-            for l in range(1, npoints + 1):
+                while np.min(pore[:, 2]) < 0 or np.max(pore[:, 2]) > box[t, 2, 2]:  # because cross-linked configurations can extend very far up and down
 
-                atom_indices = np.where(section_indices == l)[0]
+                    pore[:, 2] = np.where(pore[:, 2] < 0, pore[:, 2] + box[t, 2, 2], pore[:, 2])
+                    pore[:, 2] = np.where(pore[:, 2] > box[t, 2, 2], pore[:, 2] - box[t, 2, 2], pore[:, 2])
 
-                before = pore[atom_indices[0], :]  # choose the first atom as a reference
+                _, bins = np.histogram(pore[:, 2], bins=npoints)  # bin z-positions
 
-                shift = transform.translate(pore[atom_indices, :], before, center[t, :])  # shift everything to towards the center
+                section_indices = np.digitize(pore[:, 2], bins)  # list that tells which bin each atom belongs to
+                bin_centers[t, p, :] = [(bins[i] + bins[i + 1])/2 for i in range(npoints)]
 
-                for i in range(shift.shape[0]):  # check if the points are within the bounds of the unitcell
-                    if not bounds[t].contains_point(shift[i, :2]):
-                        shift[i, :] = put_in_box(shift[i, :], box[t, 0, 0], box[t, 1, 1], m[t], angle[t])  # if its not in the unitcell, shift it so it is
+                for l in range(1, npoints + 1):
 
-                c = [np.mean(shift, axis=0)]
+                    atom_indices = np.where(section_indices == l)[0]
 
-                centers[t, p, l - 1, :] = transform.translate(c, center[t, :], before)  # move everything back to where it was
+                    before = pore[atom_indices[0], :]  # choose the first atom as a reference
 
-                if not bounds[t].contains_point(centers[t, p, l - 1, :]):  # make sure everything is in the box again
-                    centers[t, p, l - 1, :] = put_in_box(centers[t, p, l - 1, :], box[t, 0, 0], box[t, 1, 1], m[t], angle[t])
+                    shift = transform.translate(pore[atom_indices, :], before, center[t, :])  # shift everything to towards the center
 
-    if single_frame:
-        return centers[0, ...]  # doesn't return bin center yet
-    else:
-        return centers, bin_centers
+                    for i in range(shift.shape[0]):  # check if the points are within the bounds of the unitcell
+                        if not bounds[t].contains_point(shift[i, :2]):
+                            shift[i, :] = put_in_box(shift[i, :], box[t, 0, 0], box[t, 1, 1], m[t], angle[t])  # if its not in the unitcell, shift it so it is
+
+                    c = [np.mean(shift, axis=0)]
+
+                    centers[t, p, l - 1, :] = transform.translate(c, center[t, :], before)  # move everything back to where it was
+
+                    if not bounds[t].contains_point(centers[t, p, l - 1, :]):  # make sure everything is in the box again
+                        centers[t, p, l - 1, :] = put_in_box(centers[t, p, l - 1, :], box[t, 0, 0], box[t, 1, 1], m[t], angle[t])
+
+        if single_frame:
+            return centers[0, ...]  # doesn't return bin center yet
+
+        else:
+
+            if save:
+                file_rw.save_object((centers, bin_centers), savename)
+
+            return centers, bin_centers
 
 
 def center_of_mass(pos, mass_atoms):
@@ -643,7 +660,7 @@ def partition(com, pore_centers, r, buffer=0, unitcell=None, npores=4, spline=Fa
     :param pore_centers: positions of pore centers
     :param r: pore radius, outside of which atoms will be considered in the tail region
     :param buffer: z distance (nm) to cut out from top and bottom of membrane (in cases where there is a water gap)
-    :param unitcell: unitcell vectors in mdtraj format (t.unitcell_vectors). Only needed if buffer is used
+    :param unitcell: unitcell vectors in mdtraj format (t.unitcell_vectors). Only needed if buffer and/or spline is used
     :param npores: number of pores
     :param spline: calculate partition with respect to pore spline
 

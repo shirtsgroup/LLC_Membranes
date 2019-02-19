@@ -377,7 +377,7 @@
   	\item Although the autocovariance function is relatively noise, due to the somewhat small
   	number of hops observed over the course of each solute trajectory, there is the least 
   	uncertainty at k=1, the most insightful data point. This behavior is consistent across
-  	all solutes molecules.
+  	all solutes molecules. % Can put error bars on points
   	\item Therefore, we believe transport can be described as subordinated fractional Brownian
   	motion where the leading process is a CTRW with hops that are dictated by the parent
   	process, FBM.
@@ -466,7 +466,7 @@
   \begin{itemize}
   	\item Solutes that are hydrogen bond donors can be stabilized through hydrogen bonds
   	with one of the five oxygen atoms attached to each monomer head group. 
-  	\item In a separate interaction, solutes can become kinetically trapped between 
+  	\item In a separate interaction, solutes can become kinetically trapped between or behind
   	monomer head groups. These interactions likely lead to the observed anti-correlated
   	hopping	behavior.
   	\item Generally, both mechanisms affect each solute to varying degrees.
@@ -491,13 +491,17 @@
     \item We observe low MW solutes with lower-than-expected MSDs because they
     spend more time trapped between monomer head groups due to low water
     solubility.
-    \item Small, planar molecules like acetone exhibit some of the slowest MSDs.
-    Their flat geometry and small size makes it easy for them to get lodged deep
-    between head groups.
+    \item Small, planar molecules, without the ability to donate hydrogen bonds, like acetone,
+    exhibit some of the slowest MSDs. Their flat geometry and small size makes it easy for 
+    them to get lodged deep between head groups.
   	\item Overall solutes exhibit some degree of trapping, by one or a combination of the above
   	mechanisms, with anticorrelated hops between each period of immobility due to 
   	obstructions.
   \end{itemize}
+  
+  %BJC: potential figure to go with above paragraph
+  % (a) Plot showing how biggest jumps are at pore center
+  % (b) Illustrate preference for hbonds carboxylate head groups
   
   We will revisit these observations in the the context of specific groups of 
   molecules in the discussion that follows.
@@ -533,11 +537,11 @@
   The MSD of methanol, ethanol, propanol and butanol descends in order of 
   their molecular weight, however, methanol travels faster than expected.  %BJC: find approximate relationship between MW and mobility
   \begin{itemize}  
-    \item The radial distribution as a function of distance from the pore center
+    \item The radial density as a function of distance from the pore center
     for each alcohol is plotted in Figure~\ref{fig:simple_alcohol_rdf}.
     \item On average, the density of methanol in the pore center is only slightly
     less than the density near the head groups.
-    \item All other alcohol molecules are concentrated in the head group region.
+    \item All other alcohol molecules are most concentrated in the head group region.
   \end{itemize}
   
   All simple alcohols participate in a similar number of hydrogen bonding interactions
@@ -590,10 +594,10 @@
   
   Transport is both facilitated and hindered by additional solute hydroxyl groups.
   \begin{itemize}
-    \item Extra hydroxyl groups cause solutes to favor the water-rich pore region
+    \item Extra hydroxyl groups cause solutes to favor the water-rich pore region.
     where there is the least hindrance to movement.
     \item However, these extra hydroxyl groups facilitate a larger number of 
-    hydrogen bond interactions that work to hold solutes in place.
+    hydrogen bond interactions that work to hold solutes in place (See Figure~\ref{fig:multi_hbonds}).
     \item At the same time, solute molecular weight increases, which inherently
     causes them to move more slowly.
     \item Ethylene glycol, the fastest solute in this grouping (and second fastest
@@ -609,8 +613,6 @@
     bonds with different hydrogen bond acceptors at the same time.
     \item In some cases, all 4 hydroxyl groups of ribose are hydrogen bonded to monomer
     head groups simultaneously.
-%  	\item Simple alcohols, containing only one hydroxyl group, hydrogen bond
-%  	with head groups about 20 \% of the time. % BJC: I have a figure showing the average number of hydrogen bonds per solute
   \end{itemize}
   
   \begin{figure}[!htb]
@@ -628,16 +630,22 @@
   	\item The distribution of each solute's dwell time and hop length distributions shows that
   	ethylene glycol has shorter dwell times and longer hop lengths, which combine to create a 
   	relatively fast MSD. 
+  	%BJC: number of PG vs ethylene glycol that enters middle -- I don't think this will be any different than density function
     \item Both diols have comparable densities close to the pore center, however propylene glycol's
     density has a large peak near the monomer head groups relative to ethylene glycol. 
     \item Combined with an increase in molecular weight, the addition of a single methyl group
-    increases the molecule's hydophobic character and causes propylene glycol to favor positions
+    increases the molecule's hydrophobic character and causes propylene glycol to favor positions
     near monomer head groups.
     \item This causes propylene glycol to form more highly stablized hydrogen bonds with
     carboxylate groups, explaining the higher incidence of hydrogen bonds shown in Figure~\ref{fig:multi_hbonds}.
-    % BJC: could plot dwell time as a function of radial position (show that dwells are longest when PG
-    % is hbonding to head groups
   \end{itemize}
+  
+  % BJC: figure does not represent total number of hops (PG has less hops)
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=\linewidth]{dwell_hop_PG_GCL.pdf}
+  \caption{}\label{fig:dwell_hop_PG_GCL}
+  \end{figure}
   
   Solutes with three or more hydroxyl groups have the highest density
   at the pore center which contributes to overall faster than expected transport.
@@ -645,7 +653,7 @@
   	\item These molecules are highly water soluble but relatively large
   	\item They can easily hydrogen bond in multiple locations.
   	\item Their large size and high hydrogen bonding capability prevents them
-  	from have larger MSDs.
+  	from having larger MSDs.
   \end{itemize}
   
   % BJC: Euclidean distance between simultaneous h-bonds for ethylene glycol?
@@ -660,50 +668,7 @@
 %	elsewhere and effectively pull the other bound hydroxyl group along with it. 
 %  \end{itemize}
 
-  \subsection*{Transport of Thiols} % BJC: maybe put this after next section and call it sulfur analogs and include DMSO?
-  
-  We studied the transport properties of sulfur analogs of glycerol and ethylene glycol.
-  \begin{itemize}
-    \item We replaced all but one oxygen atom of each solute with sulfur atoms
-  	\item Sulfur is unable to hydrogen bond, however it is soluble in water  %BJC: maybe a reference to why sulfur can't hbond
-  	\item Comparisons of their RDFs are shown in Figure~\ref{fig:sulfur_analog_rdfs}.
-  \end{itemize}
-  
-  \begin{figure}
-  \centering
-  \begin{subfigure}{0.45\linewidth}
-  \includegraphics[width=\textwidth]{thiol_comparison_SOH.pdf}
-  \caption{}\label{fig:SOH_GCL_comparison}
-  \end{subfigure}
-  \begin{subfigure}{0.45\linewidth}
-  \includegraphics[width=\textwidth]{thiol_comparison_DMP.pdf}
-  \caption{}\label{fig:DMP_GLY_comparison}
-  \end{subfigure}
-  \caption{}\label{fig:sulfur_analog_rdfs}
-  \end{figure}
-  
-  \noindent Mercaptoethanol has a similar average RDF and MSD to ethylene glycol.
-  \begin{itemize}
-    \item There is a much larger uncertainty associated with mercaptoethanol's MSD
-    % BJC: hypothesis about observation. Remains to be quantified
-    \item Mercaptoethanol exhibits some of the largest single observed hops among all solutes.
-    \item Less frequent hydrogen bonding and an affinity for the pore region may be responsible
-    for these hops.
-  \end{itemize}
-  
-  \noindent 2,3-Dimercapto-1-propanol exhibits slower transport than glycerol because it spends more time
-  near monomer head groups. %BJC: should I give all the solutes nicknames (i.e. their residue names)?
-  \begin{itemize}
-    \item Glycerol frequently hydrogen bonds with more than one head group at a time.
-    \item It also hydrogen bond with water molecules which causes it to stay in the pore region
-    \item 2-3-Dimercapto-1-propanol preferentially hydrogen bonds with head groups so it stays
-    close to pore walls.
-  \end{itemize} 
-
   \subsection*{Transport of Ketones}
-  
-  %BJC: DMSO might be added to this section. 
-  %BJC: DMSO might be slow because it's miscible in organic and polar solvents  
   
   The 4 ketone-like molecules tested show a range of transport behaviors.
   \begin{itemize}
@@ -734,6 +699,91 @@
 %  	other is relatively deep in the head group region.
   \end{itemize}
   
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.45\textwidth]{ketone_rdf.pdf}
+  \caption{}\label{fig:ketones_rdf}
+  \end{figure}
+  
+  \subsection*{Transport of Thiols}
+  
+  We studied the transport properties of sulfur analogs of glycerol, ethylene glycol 
+  and acetone.
+%  Finally, we studied the transport properties of sulfur-containing compounds similar
+%  to some of the solutes studied above.
+  \begin{itemize}
+    \item We replaced all but one oxygen atom of ethylene glycol and glycerol with sulfur atoms
+    to create Dimercaptoethanol and 2,3-Dimercapto-1-propanol.
+    \item We replaced the carbonyl carbon of acetone with sulfur in order to create DMSO. 
+  	\item Sulfur is unable to hydrogen bond, however it is soluble in water  %BJC: maybe a reference to why sulfur can't hbond
+  	\item Comparisons of their RDFs are shown in Figure~\ref{fig:sulfur_analog_rdfs}.
+  \end{itemize}
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.325\linewidth}
+  \includegraphics[width=\textwidth]{thiol_comparison_SOH.pdf}
+  \caption{}\label{fig:SOH_GCL_comparison}
+  \end{subfigure}
+  \begin{subfigure}{0.325\linewidth}
+  \includegraphics[width=\textwidth]{thiol_comparison_DMP.pdf}
+  \caption{}\label{fig:DMP_GLY_comparison}
+  \end{subfigure}
+  \begin{subfigure}{0.325\linewidth}
+  \includegraphics[width=\textwidth]{thiol_comparison_DMS.pdf}
+  \caption{}\label{fig:DMP_GLY_comparison}
+  \end{subfigure}
+  \caption{}\label{fig:sulfur_analog_rdfs}
+  \end{figure}
+  
+  \noindent Mercaptoethanol has a similar average RDF and MSD to ethylene glycol.
+  \begin{itemize}
+    \item There is a much larger uncertainty associated with mercaptoethanol's MSD.
+    \item It spends more time in the tail region than ethylene glycol, where transport
+    is inherently slower, and may contribute to some slower MSDs.  % Can quantify as a percentage
+    \item Conversely, Mercaptoethanol also exhibits some of the highest single solute MSDs % BJC: hypothesis about observation. Remains to be quantified
+    \item It hydrogen bonds with head groups 6 times less frequently than ethylene glycol.
+    % Dwell time as a function of hbonds?
+    \item Some of this can be accounted for by the higher density of mercaptoethanol 
+    molecules in the head group / tail region.
+    \item When both hydroxyl groups of ethylene glycol are hydrogen bonded with the a
+    monomer head group simultaneously,
+    
+    \item Less frequent hydrogen bonding and an affinity for the pore region may be
+    responsible for these hops.
+  \end{itemize}
+  
+  % Potentially useful explanation
+%  Ethylene glycol has a high chance of hydrogen bonding at least once with monomer head groups. 
+%  An ethylene glycol molecule can hydrogen bond twice simultaneously.
+%  When one of those hydrogen bond breaks, the molecule is still stabilized by another hydrogen bond
+%  It can easily reform the second hydrogen bond in close proximity
+  
+  \noindent 2,3-Dimercapto-1-propanol exhibits slower transport than glycerol because it spends more time
+  near monomer head groups. % BJC: should I give all the solutes nicknames (i.e. their residue names)?
+  \begin{itemize}
+    \item Glycerol frequently hydrogen bonds with more than one head group at a time.
+    % BJC: can probably quantify the following:
+    \item It also hydrogen bonds with water molecules which increases its stability in the pore region
+    \item 2-3-Dimercapto-1-propanol preferentially hydrogen bonds with head groups so it gravitates
+    towards the head group region.
+  \end{itemize} 
+  
+  \noindent DMSO has a comparable MSD to acetone even though its molecular weight is
+  about 25 \% larger.
+  \begin{itemize}
+  	\item The pyramidal structure of DMSO may force it to spend more time closer to
+  	the pore center.  % BJC: might be a good place for a numbers comparison
+  	\item There are 20 \% more acetone than DMSO molecules in the region beyond 0.8 nm from the pore center.  % based on actual number, not density
+  	\item DMSO cannot as easily work its way in and out of the dense head group region. 
+  	\item There is a peak in DMSO's radial density near 1.1 nm which may be a consequence of 
+  	solute molecules that get stuck in the tails.
+%    \item This may be due to the higher polarity and the pyramidal structure of DMSO.
+%    \item DMSO is more stable in water than acetone and less stable in the head group region than acetone.
+%    \item There is a peak in the DMSO radial density function in the tails which means some of them still
+%    find their way back there and get trapped.
+  \end{itemize}  
+  
   \subsection*{Hydrogen bond acceptors}  % Need a better heading since all molecules in this study are acceptors
   
   The final set of molecules we studied can accept hydrogen bonds, but cannot donate
@@ -754,15 +804,18 @@
   	\item The large size and nonplanar shapes of ethyl acetate and propylene 
   	carbonate may destabilize entrapment in the tail region more quickly, leading
   	to slightly faster transport. 
+  	% BJC:  Ethyl acetate spends all of its time in a linear or near-linear conformation.
 %  	\item The relatively small amount of movement on the timescales studied 
 %  	do not reveal definitive reasons
   	\item Overall, 
   \end{itemize}
-  Ethyl acetate spends all of its time in a linear or near-linear conformation. % can show with dihedrals
+ 
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.45\textwidth]{nondonors_rdf.pdf}
+  \caption{}\label{fig:nondonors_rdf}
+  \end{figure}
   
-  THF and DMF are both planar which allows them to 
-  
-
   % THF shows highly anticorrelated hops
   
   %All have comparable densities near pore center except acetone which is lower

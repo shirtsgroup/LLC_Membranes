@@ -152,16 +152,16 @@ class Diffusivity(object):
 
         # plot 'random' z coordinate traces
         # np.random.seed(4)  # 4 gives a nice spread for ethanol
-        # trajs = np.random.randint(0, self.com.shape[1], size=3)
+        # trajs = np.random.randint(0, self.com.shape[1], size=24)
         # for i in trajs:
         #     plt.plot(self.time, self.com[:, i, 2], linewidth=2)
         #
-        # plt.ylabel('$z$-coordinate (nm)', fontsize=14)
-        # plt.xlabel('Time (ns)', fontsize=14)
-        # plt.gcf().get_axes()[0].tick_params(labelsize=14)
-        # plt.tight_layout()
+        #     plt.ylabel('$z$-coordinate (nm)', fontsize=14)
+        #     plt.xlabel('Time (ns)', fontsize=14)
+        #     plt.gcf().get_axes()[0].tick_params(labelsize=14)
+        #     plt.tight_layout()
         #
-        # plt.show()
+        #     plt.show()
         # exit()
 
         self.weights = True
@@ -218,11 +218,15 @@ class Diffusivity(object):
 
         print('Calculating MSD...', end='', flush=True)
         self.MSD = timeseries.msd(self.com, self.axis, ensemble=ensemble)
-        # for i in range(self.MSD.shape[1]):
-        #     print(np.amax(self.MSD[:, i]), i)
-        #     #plt.plot(self.MSD[:, i])
-        # #plt.show()
-        # exit()
+        highest = np.argmax(self.MSD[-1, :])
+        plt.plot(self.time, self.com[:, highest, 2], linewidth = 2)
+        # plt.plot(self.MSD[:, highest])
+        plt.show()
+        exit()
+        for i in range(self.MSD.shape[1]):
+            plt.plot(self.MSD[:, i])
+        plt.show()
+        exit()
         self.MSD_average = np.mean(self.MSD, axis=1)
         print('Done!')
 
