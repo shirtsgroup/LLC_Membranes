@@ -5,6 +5,7 @@ import mdtraj as md
 import Atom_props
 import numpy as np
 import sys
+import subprocess
 
 script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -430,3 +431,26 @@ def map_atoms(indices, nres_atoms=1):
         index_map[i] = indices[i*nres_atoms:(i + 1)*nres_atoms]
 
     return index_map
+
+
+def fix_names(gro):
+    """ Workaround for mdtraj. Fix atom names so they are the same as those shown in the gro file.
+
+    :param gro: name of .gro file with all atom names in it
+
+    :type gro: str
+    """
+
+    if gro.endswith('.gro'):
+        gro = gro.split('.')[0]
+
+    # if .pdb already exists, don't both remaking it -- this could be dangerous
+    if not os.path.isfile('%s.pdb' % gro):
+
+        convert_to_pdb = "gmx editconf -f %s.gro -o %s.pdb" % (gro, gro)
+        p = subprocess.Popen(convert_to_pdb.split(), stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
+        p.wait()
+
+    t = md.load('%s.pdb' % gro, standard_names=False)  # load doesn't have standard_names functionality for trr or xtc
+
+    return [a.name for a in t.topology.atoms]

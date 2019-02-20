@@ -34,7 +34,7 @@ script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__f
 
 def initialize():
 
-    parser = argparse.ArgumentParser(description='Run Cylindricity script')
+    parser = argparse.ArgumentParser(description='Use geometric criteria to identify hydrogen bonds')
 
     parser.add_argument('-t', '--traj', default='wiggle.trr', type=str, help='Path to input file')
     parser.add_argument('-g', '--gro', default='wiggle.gro', type=str, help='Coordinate file')
@@ -42,9 +42,7 @@ def initialize():
     parser.add_argument('-b', '--begin', default=0, type=int, help='End frame')
     parser.add_argument('-e', '--end', default=-1, type=int, help='Start frame')
     parser.add_argument('-sk', '--skip', default=1, type=int, help='Skip every skip frames')
-    parser.add_argument('-x', '--exclude_water', action='store_true', help='Exclude water while searching for hbonds')
-    parser.add_argument('-r', '--residues', nargs='+', default=['HII'], help='Residues to include in h-bond search. '
-                        'Water is automatically included if you do not specify the -x option')
+    parser.add_argument('-r', '--residues', nargs='+', default=['HII'], help='Residues to include in h-bond search')
     parser.add_argument('-a', '--atoms', action='append', nargs='+', help='Atoms to include for each '
                         'residue. Each list of atoms must be passed with a separate -a flag for each residue in'
                         'args.residues')
@@ -57,6 +55,14 @@ def initialize():
     parser.add_argument('-xres', '--xlink_residue', default='HII', help='Name of residue in molecules section of the '
                                                                         'topology corresponding to args.xlink_topology')
     parser.add_argument('-l', '--load', default=False, help='Load pickled system object')
+    parser.add_argument('-acc', '--acceptors', default=False, nargs='+', help='If you only want hbonds with acceptor'
+                        'atoms of a residue, use this flag. 1 for this condition, otherwise 0. Input as a list'
+                        ' of 0 and 1 in the same order as args.residues')
+    parser.add_argument('-donors', '--donors', default=False, nargs='+', help='If you only want hbonds with donor'
+                        'atoms of a residue, use this flag. 1 for this condition, otherwise 0. Input as a list'
+                        ' of 0 and 1 in the same order as args.residues')
+    parser.add_argument('-s', '--savename', default='hbonds.pl', type=str, help='Name of pickled object to save after'
+                                                                                'calcualtions are complete')
 
     return parser
 
@@ -110,6 +116,10 @@ class System(object):
             else:
                 self.names.append(a.name)
 
+        names = topology.fix_names(gro)  # rename atoms because mdtraj screws it up in some cases.
+        for i, a in enumerate(self.t.topology.atoms):
+            a.name = names[i]
+
         self.residues = [a.residue.name for a in self.t.topology.atoms]
 
         # definitions
@@ -135,19 +145,29 @@ class System(object):
         #     # all oxygens are also potential acceptors
         #     self.A = [a.index for a in self.t.topology.atoms if a.residue.name == 'HOH' and a.element.symbol == 'O']
 
-    def set_eligible(self, res, atoms):
+    def set_eligible(self, res, atoms, acceptor_only=True, donors_only=True):
         """
         Set eligible atoms to be included in h-bond calculation
         :param res : residue to include in calculation
         :param atoms : atoms from residue to include in calculation
+        :param acceptor_only: restrict residue so it can only accept hydrogen bonds
+        :param donor_only: restrict residue so it can only donate hydrogen bonds
         """
 
         residue = topology.Residue(res)
 
-        if atoms[0] is not 'all':
+        if atoms[0] != 'all':
+
             residue.hbond_H = [h for h in residue.hbond_H if h in atoms]
             residue.hbond_D = [d for d in residue.hbond_D if d in atoms]
             residue.hbond_A = [a for a in residue.hbond_A if a in atoms]
+
+        if acceptor_only:  # if we only want this residue to recieve hbonds, don't include its donor atom or H
+            residue.hbond_H = []
+            residue.hbond_D = []
+
+        if donors_only:
+            residue.hbond_A = []
 
         for a in self.t.topology.atoms:
             if a.residue.name == res:
@@ -157,16 +177,6 @@ class System(object):
                     self.D.append(a.index)
                 if a.name in residue.hbond_A:
                     self.A.append(a.index)
-
-                # Old way
-                # if a.name in atoms or 'all' in atoms:
-                #     # if a.element.symbol in self.donor_atoms:
-                #     #     self.donors.append(a.index)
-                #     if a.element.symbol == 'H':  # technically untested
-                #         self.H.append(a.index)
-                #         self.D.append(self.top.bonds[a.index][0])
-                #     if a.element.symbol in self.acceptor_atoms:
-                #         self.A.append(a.index)
 
     def identify_hbonds(self, cut, angle):
 
@@ -240,30 +250,31 @@ class System(object):
     def plot_hbonds(self, show=True, save=True, savename='hbonds.png'):
 
         n = [a.shape[1] for a in self.hbonds]
+        print(np.mean(n))
 
-        ethers = ['O', 'O1', 'O2']
-        carb = ['O3', 'O4']
-        nether = np.zeros([self.t.n_frames])
-        ncarb = np.zeros([self.t.n_frames])
+        # ethers = ['O', 'O1', 'O2']
+        # carb = ['O3', 'O4']
+        # nether = np.zeros([self.t.n_frames])
+        # ncarb = np.zeros([self.t.n_frames])
+        #
+        # for i, x in enumerate(self.hbonds):
+        #
+        #     if x.shape[0] == 4:
+        #
+        #         acceptors = [self.names[int(x[2, j])] for j in range(x.shape[1])]
+        #
+        #         for k in acceptors:
+        #             if k in ethers:
+        #                 nether[i] += 1
+        #             elif k in carb:
+        #                 ncarb[i] += 1
 
-        for i, x in enumerate(self.hbonds):
+        # print(sum(n))
+        # print(np.sum(ncarb) / np.sum(nether))
+        # exit()
+        # plt.plot(self.t.time / 1000, nether / ncarb)
 
-            if x.shape[0] == 4:
-
-                acceptors = [self.names[int(x[2, j])] for j in range(x.shape[1])]
-
-                for k in acceptors:
-                    if k in ethers:
-                        nether[i] += 1
-                    elif k in carb:
-                        ncarb[i] += 1
-
-        print(sum(n))
-        print(np.sum(ncarb) / np.sum(nether))
-        exit()
-        plt.plot(self.t.time / 1000, nether / ncarb)
-
-        #plt.plot(self.t.time / 1000, n)
+        plt.plot(self.t.time / 1000, n)
         plt.xlabel('Time (ns)', fontsize=14)
         plt.ylabel('Number of hydrogen bonds', fontsize=14)
         plt.tight_layout()
@@ -474,6 +485,16 @@ if __name__ == "__main__":
 
     args = initialize().parse_args()
 
+    if not args.acceptors:
+        args.acceptors = [False for i in args.residues]
+    else:
+        args.acceptors = [bool(int(i)) for i in args.acceptors]
+
+    if not args.donors:
+        args.donors = [False for i in args.residues]
+    else:
+        args.donors = [bool(int(i)) for i in args.donors]
+
     if args.load:
 
         sys = file_rw.load_object(args.load)
@@ -486,14 +507,13 @@ if __name__ == "__main__":
         while len(args.atoms) != len(args.residues):
             args.atoms.append(['all'])
 
-        sys = System(args.traj, args.gro, args.top, begin=args.begin, end=args.end, skip=args.skip,
-                     exclude_water=args.exclude_water, xlink=args.xlink, xlink_topology=args.xlink_topology,
-                     xlink_residue=args.xlink_residue)
+        sys = System(args.traj, args.gro, args.top, begin=args.begin, end=args.end, skip=args.skip, xlink=args.xlink,
+                     xlink_topology=args.xlink_topology, xlink_residue=args.xlink_residue)
 
         for i, r in enumerate(args.residues):
-            sys.set_eligible(r, args.atoms[i])
+            sys.set_eligible(r, args.atoms[i], acceptor_only=args.acceptors[i], donors_only=args.donors[i])
 
         sys.identify_hbonds(args.distance, args.angle_cut)
-        file_rw.save_object(sys, 'hbonds.pl')
+        file_rw.save_object(sys, '%s' % args.savename)
 
     sys.plot_hbonds()

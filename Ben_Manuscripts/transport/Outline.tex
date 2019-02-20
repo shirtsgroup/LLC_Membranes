@@ -670,29 +670,47 @@
 
   \subsection*{Transport of Ketones}
   
-  The 4 ketone-like molecules tested show a range of transport behaviors.
+  The 4 ketone-like molecules tested show a surprising range of transport behaviors.
   \begin{itemize}
     \item Urea, Acetic Acid, Acetamide and Acetone are all characterized by a carbonyl group
     with two attached heavy atoms. 
     \item All have approximately the same molecular weight and are planar molecules due to
     the sp2 hybridization of the carbonyl group.
-    \item The fastest solute of this grouping, Urea, has an MSD comparable to that of ethylene
-    glycol while the slowest, Acetone, has an MSD one third of that of Urea.
+    \item The fastest solute of this grouping, Urea (comparable to Acetic Acid too), has an
+    MSD comparable to that of ethylene glycol while the slowest, Acetone, has an MSD one 
+    third of that of Urea.
   \end{itemize}
   
   Once again, the trends in the MSD can in large part be explained by the solutes'
-  ability to hydrogen bond.  % or maybe just polarity
+  preference for water.
   \begin{itemize}
   	\item Urea, Acetic Acid and Acetamide are all capable of donating hydrogen bonds,
   	while acetone is the first instance of a molecule in this study that can only
-  	accept hydrogen bonds.
+  	accept hydrogen bonds. It follows that acetone has the slowest MSD of this grouping.
+  	\item Urea and Acetamide both have hydrogen bond donating nitrogen atoms, however
+  	nitrogen is a weaker hydrogen bond donor than oxygen due to its lower electronegativity.
+  	\item Hence, Acetic Acid donates the greatest number of hydrogen bonds and has
+  	the highest density throughout the pore region.
+  	\item With two nitrogen groups that hydrogen bond relatively infrequently, one might 
+  	expect Urea to exhibit much faster transport, however its MSD is comparable to
+  	the much stickier acetic acid. 
+  	\item Urea is highly soluble in water but not miscible in all proportions like 
+  	acetic acid or even acetone.
+  	\item Relative to acetic acid, acetamide, urea and acetone spend more time in the head group region.
+  	\item There is a large peak near the head groups, but \% of the urea molecules 
+  	are behind in the head group region.
+  	\item The structure of acetamide differs from acetic acid only by an amine group in place
+  	of a hydroxyl group.
+  	\item The weaker hydrogen bonding capability of acetamide and an extra nonpolar methyl group compared to
+  	Urea makes acetamide even more likely to partition. 
   	\item Urea has two hydrogen bond donor nitrogen atoms. It is not surprising that
   	its density is high near the pore center, particularly near the monomer head groups.
+  	
   	\item Acetamide has only one nitrogen atom. One of two peaks in its density is 
   	located close to the peak of Urea, likely corresponding to hydrogen bonds with head groups.
   	A second peak is located within the head group region. %BJC: hbonds with ethers vs. head groups. Or is it just planarity?
   	\item Acetic acid, a carboxylic acid shows a relatively high density in the pore region, with 
-  	a peak close to the carboxylate groups.  %BJC: hbonds with 
+  	a peak close to the carboxylate groups.  %BJC: hbonds a lot 
   	\item Acetone is stabilized by accepting hydrogen bonds from water in the pore region, but
     its low polarity and planar shape gives it comparable stability when trapped between head groups.
 %  	\item Acetone's has two prominent peaks in its radial density. One is in the pore region and the o
@@ -701,8 +719,14 @@
   
   \begin{figure}[!htb]
   \centering
-  \includegraphics[width=0.45\textwidth]{ketone_rdf.pdf}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{ketone_rdf.pdf}
   \caption{}\label{fig:ketones_rdf}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{ketone_ratio.pdf}
+  \caption{}\label{fig:ketones_ratio}
+  \end{subfigure}
   \end{figure}
   
   \subsection*{Transport of Thiols}
@@ -745,13 +769,23 @@
     \item It hydrogen bonds with head groups 6 times less frequently than ethylene glycol.
     % Dwell time as a function of hbonds?
     \item Some of this can be accounted for by the higher density of mercaptoethanol 
-    molecules in the head group / tail region.
+    molecules in the head group / tail region. There are nearly 40 \% more mercaptoethanol
+    beyond 0.8 nm from the pore center. 
     \item When both hydroxyl groups of ethylene glycol are hydrogen bonded with the a
     monomer head group simultaneously,
     
     \item Less frequent hydrogen bonding and an affinity for the pore region may be
     responsible for these hops.
   \end{itemize}
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\linewidth]{SOH_trace.pdf}
+  \caption{}\label{fig:SOH_trace}
+  \end{subfigure}
+  \caption{}
+  \end{figure}
   
   % Potentially useful explanation
 %  Ethylene glycol has a high chance of hydrogen bonding at least once with monomer head groups. 
@@ -795,7 +829,7 @@
   \end{itemize}
   
   The radial density functions highlight the solutes' preference for the 
-  pore region.
+  head group region.
   \begin{itemize}
   	\item There are small peaks in the radial density greater than 1 nm 
   	from the pore center.
