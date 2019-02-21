@@ -10,10 +10,10 @@ DOCLINES = __doc__.split("\n")
 
 try:
     import mdtraj
-except ImportError:
+except ModuleNotFoundError | ImportError:
     import subprocess
     command = 'conda install mdtraj'
-    p = subproces.Popen(command.split())
+    p = subprocess.Popen(command.split())
     p.wait()
 
 setup(
