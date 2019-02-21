@@ -6,6 +6,6 @@ python:
    
    version: 3.6
    install:
-       - requirement.readthedocs.txt
-       - requirements.txt
+       - requirements: requirement.readthedocs.txt
+       - requirements: requirements.txt
 
