@@ -269,7 +269,7 @@ if __name__ == "__main__":
         print('Done!')
 
     #system.plot(res=['HII', 'HII', 'HOH'], atom_groups=[['O3', 'O4'], ['O', 'O1', 'O2'], ['O']])
-    system.plot()
-
-    for i in np.nonzero(system.distances[-1][0, :])[1]:
-        print('%s -- %s' % (system.com_map[0], system.com_coordinated_map[i]))
+    # system.plot()
+    #
+    # for i in np.nonzero(system.distances[-1][0, :])[1]:
+    #     print('%s -- %s' % (system.com_map[0], system.com_coordinated_map[i]))

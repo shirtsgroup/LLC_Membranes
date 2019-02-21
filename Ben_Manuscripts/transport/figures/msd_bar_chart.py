@@ -10,6 +10,7 @@ crsr = connection.cursor()
 restrict_by_name = False 
 MW = True  # plot mw of species
 penalty = 0.5
+wt = 5 
 
 group = 'all'
 
@@ -17,9 +18,9 @@ restricted_groups = ['simple_alcohols', 'simple_plus_diols']
 time_averaged = True 
 
 if time_averaged:
-	savename = '%s_tamsds.pdf' % group
+	savename = '%s_%dwt_tamsds.pdf' % (group, wt)
 else:
-	savename = '%s_emsds.pdf' % group
+	savename = '%s_%dwt_emsds.pdf' % (group, wt)
 
 query = "SELECT name, sim_length, MD_TAMSD, MD_TAMSD_CI_lower, MD_TAMSD_CI_upper, MD_MSD, MD_MSD_CI_lower, MD_MSD_CI_upper, mw from msd"
 
@@ -38,17 +39,18 @@ if restrict_by_name:
 	query += ') and'
 else:
 	query += ' WHERE'
-query += " penalty = %s" % penalty
+#query += " penalty = %s and" % penalty
+query += " wt_water = %s" % wt
 query += " ORDER BY MD_TAMSD DESC"
 
 output = crsr.execute(query).fetchall()
 
 labels = np.array([names.res_to_name[i[0]] for i in output], dtype=object)
-sim_length = np.array([i[1] for i in output])
+sim_length = np.array([i[1] for i in output], dtype=float)
 md_tamsd = np.array([i[2] for i in output])
 md_tamsd_lower = -np.array([i[3] for i in output]) + md_tamsd
 md_tamsd_upper = np.array([i[4] for i in output]) - md_tamsd
-md_msd = np.array([i[5] for i in output])
+md_msd = np.array([i[5] for i in output], dtype=float)
 md_msd_lower = -np.array([i[6] for i in output]) + md_msd
 md_msd_upper = np.array([i[7] for i in output]) - md_msd
 mw = np.array([i[8] for i in output])
@@ -78,9 +80,9 @@ labels = labels[ordered_md]
 fig, ax = plt.subplots(figsize=(12, 7))
 bar_width = 0.4
 opacity = 0.8
-index = np.arange(len(labels))
+index = np.arange(len(labels), dtype=float)
 if not MW:
-	index += bar_width / 2
+	index += (bar_width / 2)
 
 if time_averaged:
 	ax.bar(index, md_tamsd, bar_width, alpha=opacity, yerr=(md_tamsd_lower, md_tamsd_upper), label='MD Simulated time-averaged MSD')

@@ -39,7 +39,10 @@ def initialize():
     parser.add_argument('-acf', '--autocorrelation', action="store_true", help='Plot step autocorrelation function')
     parser.add_argument('-acov', '--autocovariance', action="store_true", help='Plot step autocovariance function')
     parser.add_argument('-nofit', '--nofit', action="store_true", help='Do not attempt to fit any curve to MSD')
+
     parser.add_argument('--update', action="store_true", help="update database with MD MSD values")
+    parser.add_argument('-wt', '--wt_water', default=10, type=float, help='Weight percent water in system. Only need'
+                                                                          'to adjust this if updating database.')
 
     return parser
 
@@ -75,6 +78,7 @@ class Diffusivity(object):
         print('Done!')
         self.nT = self.t.n_frames  # number of frames
         self.time = self.t.time / 1000  # time stamp on each frame, converted to nanoseconds
+        print(self.time[-1])
 
         # initialize fits to data, error analysis and plotting parameters
         self.startfit = int(startfit*self.nT)  # index at which to start fit
@@ -193,7 +197,7 @@ class Diffusivity(object):
         pore_atoms = [a.index for a in self.t.topology.atoms if a.name in pore_defining_atoms]
         if spline:
             print('Creating pore splines')
-            pore_centers = physical.trace_pores(self.t.xyz[:, pore_atoms, :], self.t.unitcell_vectors, 20)
+            pore_centers = physical.trace_pores(self.t.xyz[:, pore_atoms, :], self.t.unitcell_vectors, 10)
         else:
             pore_centers = physical.avg_pore_loc(npores, self.t.xyz[:, pore_atoms, :], self.t.unitcell_vectors)
 
@@ -218,15 +222,15 @@ class Diffusivity(object):
 
         print('Calculating MSD...', end='', flush=True)
         self.MSD = timeseries.msd(self.com, self.axis, ensemble=ensemble)
-        highest = np.argmax(self.MSD[-1, :])
-        plt.plot(self.time, self.com[:, highest, 2], linewidth = 2)
-        # plt.plot(self.MSD[:, highest])
-        plt.show()
-        exit()
-        for i in range(self.MSD.shape[1]):
-            plt.plot(self.MSD[:, i])
-        plt.show()
-        exit()
+        # highest = np.argmax(self.MSD[-1, :])
+        # plt.plot(self.time, self.com[:, highest, 2], linewidth = 2)
+        # # plt.plot(self.MSD[:, highest])
+        # plt.show()
+        # exit()
+        # for i in range(self.MSD.shape[1]):
+        #     plt.plot(self.MSD[:, i])
+        # plt.show()
+        # exit()
         self.MSD_average = np.mean(self.MSD, axis=1)
         print('Done!')
 
@@ -437,20 +441,25 @@ class Diffusivity(object):
         if show:
             plt.show()
 
-    def update_database(self, file="../timeseries/msd.db", tablename="msd", ensemble=False):
+    def update_database(self, wt_water, file="../timeseries/msd.db", tablename="msd", ensemble=False):
         """ Update SQL database with information from this run
 
+        :param wt_water: weight percent of water in system
         :param file: relative path (relative to directory where this script is stored) to database to be updated
         :param tablename: name of table being modified in database
+        :param ensemble: True if ensemble MSD was calculated
 
+        :type wt_water: float
         :type file: str
         :type tablename: str
+        :type ensemble: bool
         """
 
         connection = sql.connect("%s/%s" % (self.script_location, file))
         crsr = connection.cursor()
 
-        check_existence = "SELECT COUNT(1) FROM %s WHERE name = '%s'" % (tablename, self.residue)
+        check_existence = "SELECT COUNT(1) FROM %s WHERE name = '%s' and wt_water = %.1f" % (tablename, self.residue,
+                                                                                             wt_water)
 
         output = crsr.execute(check_existence).fetchall()
 
@@ -465,16 +474,19 @@ class Diffusivity(object):
 
         if output[0][0] > 0:
 
-            update_entry = "UPDATE %s SET %s = %.3f, %s = %.3f, %s = %.3f, sim_length = %.2f where name = '%s'" % \
+            update_entry = "UPDATE %s SET %s = %.3f, %s = %.3f, %s = %.3f, sim_length = %.2f where name = '%s' and " \
+                           "wt = %.1f" % \
                            (tablename, data_labels[0], msd, data_labels[1], msd_lower, data_labels[2], msd_upper,
-                            self.time[-1], self.residue)
+                            self.time[-1], self.residue, wt_water)
 
             crsr.execute(update_entry)
 
         else:
 
-            fill_new_entry = "INSERT INTO %s (name, %s, %s, %s) VALUES ('%s', %.3f, %.3f, %.3f)" % (tablename,
-                              data_labels[0], data_labels[1], data_labels[2], self.residue, msd, msd_lower, msd_upper)
+            fill_new_entry = "INSERT INTO %s (name, %s, %s, %s, wt_water, sim_length) VALUES ('%s', %.3f, %.3f, %.3f, " \
+                             "%.1f, %.2f)" % \
+                             (tablename, data_labels[0], data_labels[1], data_labels[2], self.residue, msd, msd_lower,
+                              msd_upper, wt_water, self.time[-1])
 
             crsr.execute(fill_new_entry)
 
@@ -531,11 +543,11 @@ if __name__ == "__main__":
     if args.ensemble:
         args.fracshow = 1  # same amount of statistics at each frame
 
-    # show = False
+    show = False
     D.plot(args.axis, fracshow=args.fracshow, show=show)
 
     if args.update:
-        D.update_database(ensemble=args.ensemble)
+        D.update_database(args.wt_water, ensemble=args.ensemble)
 
     if not args.power_law and not args.nofit:
         print('D = %1.2e +/- %1.2e m^2/s' % (D.Davg, np.abs(D.Davg - D.confidence_interval[0])))

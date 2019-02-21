@@ -206,18 +206,22 @@ class System(object):
         self.spline = False
         self.part = None
 
-        if residue == 'SOL':
-            for a in self.t.topology.atoms:
-                if a.residue.name == 'HOH':  # workaround for mdtraj
-                    if a.name == 'O':
-                        a.name = 'OW'
-                    elif a.name == 'H1':
-                        a.name = 'HW1'
-                    elif a.name == 'H2':
-                        a.name = 'HW2'
-            for a in self.t.topology.atoms:
-                if a.residue.name == 'HOH':
-                    a.residue.name = 'SOL'
+        names = topology.fix_names(gro)  # rename atoms because mdtraj screws it up in some cases.
+        for i, a in enumerate(self.t.topology.atoms):
+            a.name = names[i]
+
+        # if residue == 'SOL':
+        #     for a in self.t.topology.atoms:
+        #         if a.residue.name == 'HOH':  # workaround for mdtraj
+        #             if a.name == 'O':
+        #                 a.name = 'OW'
+        #             elif a.name == 'H1':
+        #                 a.name = 'HW1'
+        #             elif a.name == 'H2':
+        #                 a.name = 'HW2'
+        #     for a in self.t.topology.atoms:
+        #         if a.residue.name == 'HOH':
+        #             a.residue.name = 'SOL'
 
         self.residue = topology.Residue(residue)
         self.residue_indices = np.array([a.index for a in self.t.topology.atoms if a.residue.name == residue])
@@ -265,6 +269,9 @@ class System(object):
 
         plt.plot(self.t.time/1000, ntail_water, color='xkcd:blue', label='Tail %s' % resname)
         plt.plot(self.t.time/1000, npore_water, color='xkcd:orange', label='Pore %s' % resname)
+
+        print('Delta = %d' % (npore_water[-1] - npore_water[0]))
+
         plt.xlabel('Time (ns)', fontsize=14)
         plt.ylabel('Number of water molecules', fontsize=14)
         plt.legend(fontsize=14)
@@ -272,7 +279,7 @@ class System(object):
 
         plt.tight_layout()
         #plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/transport/supporting_figures/5wt_offset_xlinked_equil.pdf')
-        plt.show()
+        # plt.show()
 
 
 if __name__ == "__main__":
