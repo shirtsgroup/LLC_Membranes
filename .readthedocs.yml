@@ -1,5 +1,12 @@
 # .readthedocs.yml
 
+version: 2
+
 python:
-   setup_py_install: true
+   
+   version: 3.6
+   install:
+       - requirement.readthedocs.txt
+       - requirements.txt
+
    pip_install: true
