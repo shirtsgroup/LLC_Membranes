@@ -11,8 +11,8 @@ DOCLINES = __doc__.split("\n")
 setup(
     # Self-descriptive entries which should always be present
     name='LLC_Membranes',
-    version = 0.1
-    description = 'Setup, simulate and analyze MD simulations of lyotropic liquid crystal membranes'
+    version = 0.1,
+    description = 'Setup, simulate and analyze MD simulations of lyotropic liquid crystal membranes',
     author='Ben Coscia',
     license='BSD-3-Clause',
     install_requires=['numpy', 'mdtraj', 'matplotlib', 'ruptures', 'scipy', 'tqdm', 'fbm'], 
