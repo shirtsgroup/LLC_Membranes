@@ -8,10 +8,10 @@ from setuptools import setup
 
 DOCLINES = __doc__.split("\n")
 
-import subprocess
-command = 'pip install mdtraj'
-p = subprocess.Popen(command.split())
-p.wait()
+#import subprocess
+#command = 'pip install mdtraj'
+#p = subprocess.Popen(command.split())
+#p.wait()
 
 setup(
     # Self-descriptive entries which should always be present
