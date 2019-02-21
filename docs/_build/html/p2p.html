@@ -1,0 +1,318 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>p2p.py &#8212; LLC_Membranes 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/agogo.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="hbonds.py" href="hbonds.html" /> 
+  </head>
+  <body role="document">
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="index.html">LLC_Membranes 0.1.0 documentation</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="hbonds.html" title="hbonds.py"
+             accesskey="P">previous</a> |
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="p2p-py">
+<h1>p2p.py<a class="headerlink" href="#p2p-py" title="Permalink to this headline">¶</a></h1>
+<p>Calculate the pore-to-pore distance from an MD trajectory of an HII LLC membrane</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">p2p</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">INPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">GRO</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">begin</span> <span class="n">BEGIN</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">end</span> <span class="n">END</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">--</span><span class="n">skip</span> <span class="n">SKIP</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PORES</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">COMPONENT</span> <span class="p">[</span><span class="n">COMPONENT</span> <span class="o">...</span><span class="p">]]</span>
+              <span class="p">[</span><span class="o">-</span><span class="n">E</span> <span class="n">EQUIL</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">x</span> <span class="n">EXCLUDE</span> <span class="p">[</span><span class="n">EXCLUDE</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">auto_exclude</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="n">NBOOT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plot_every</span> <span class="n">PLOT_EVERY</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">noshow</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">save</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">--</span><span class="n">plot_avg</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plot_std</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">T</span> <span class="n">T</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">buffer</span> <span class="n">BUFFER</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="Named Arguments">
+<h2>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h2>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>-t, &#8211;input</kbd></td>
+<td><p class="first">Path to input file</p>
+<p class="last">Default: &#8220;wiggle.trr&#8221;</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-g, &#8211;gro</kbd></td>
+<td><p class="first">Coordinate configuration file (.gro, .pdb)</p>
+<p class="last">Default: &#8220;wiggle.gro&#8221;</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>&#8211;begin</kbd></td>
+<td><p class="first">Frame to begin calculations</p>
+<p class="last">Default: 0</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>&#8211;end</kbd></td>
+<td><p class="first">Frame to stop calculations</p>
+<p class="last">Default: -1</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>&#8211;skip</kbd></td>
+<td><p class="first">Sample every nth frame</p>
+<p class="last">Default: 1</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-p, &#8211;pores</kbd></td>
+<td><p class="first">Number of pores in unit cell</p>
+<p class="last">Default: 4</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-c, &#8211;component</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">Name of monomer component used to trackpore positions. This script will calculate the average coordinate of each in each pore. Special predefined cases include: &#8220;tails&#8221;, &#8220;Tails&#8221;, &#8220;benzene&#8221;, &#8220;Benzene&#8221;, &#8220;Head Groups, &#8220;tail_ends&#8221;, &#8220;tail_fronts&#8221;, &#8220;Sodium&#8221;. These are specific to Na-GA3C11</p>
+<p class="last">Default: &#8220;NA&#8221;</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-E, &#8211;equil</kbd></td>
+<td><p class="first">Frame number where system is equilibrated. &#8220;auto&#8221; will use pymbar.timeseries.DetectEquilibration to determine which frame to start at. It is often worth double checking its choice manually</p>
+<p class="last">Default: &#8220;auto&#8221;</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-x, &#8211;exclude</kbd></td>
+<td><p class="first">Index of p2p distance to exclude as written inthe list: [&#8220;1-2&#8221;, &#8220;1-3&#8221;, &#8220;1-4&#8221;, &#8220;2-3&#8221;, &#8220;2-4&#8221;, &#8220;3-4&#8221;]</p>
+<p class="last">Default: [4]</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>&#8211;auto_exclude</kbd></td>
+<td><p class="first">Specifying this will override args.exclude and decide which pore-to-pore distance to exclude automatically by dropping the highest value</p>
+<p class="last">Default: False</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-b, &#8211;nboot</kbd></td>
+<td><p class="first">Number of bootstrap trials for generating statistics</p>
+<p class="last">Default: 2000</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>&#8211;plot_every</kbd></td>
+<td><p class="first">Plot every n frames</p>
+<p class="last">Default: 1</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>&#8211;noshow</kbd></td>
+<td><p class="first">Specify this flag to prevent the plot from showing</p>
+<p class="last">Default: False</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>&#8211;save</kbd></td>
+<td><p class="first">Save the output plot</p>
+<p class="last">Default: False</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>&#8211;plot_avg</kbd></td>
+<td><p class="first">Plot average p2p distance at each frame</p>
+<p class="last">Default: False</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>&#8211;plot_std</kbd></td>
+<td><p class="first">Plot average p2p distance at each frame</p>
+<p class="last">Default: False</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-T</kbd></td>
+<td>Use for concatenated trajectories of simulations run at multiple temperatures. Supply the name of index file (ascii format) with temperatures and times where the switch occurs. On each line supply the info with the format temp:time</td></tr>
+<tr><td class="option-group">
+<kbd>&#8211;buffer</kbd></td>
+<td><p class="first">Fraction (of membrane thickness) of top and bottom ofmembrane to exclude from p2p calculations. Useful if you solvate both sides with water andions float into solution.</p>
+<p class="last">Default: 0</p>
+</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="module-p2p">
+<span id="functions"></span><h2>Functions<a class="headerlink" href="#module-p2p" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="p2p.restrict_atoms">
+<code class="descclassname">p2p.</code><code class="descname">restrict_atoms</code><span class="sig-paren">(</span><em>t</em>, <em>component</em><span class="sig-paren">)</span><a class="headerlink" href="#p2p.restrict_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restrict trajectory of coordinates to selected atoms</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>t</strong> (<em>mdtraj.core.trajectory.Trajectory</em>) &#8211; mdtraj trajectory object</li>
+<li><strong>component</strong> (<em>str</em><em> or </em><em>list</em>) &#8211; names of components to be used for tracking pore centers.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="p2p.avg_pore_loc">
+<code class="descclassname">p2p.</code><code class="descname">avg_pore_loc</code><span class="sig-paren">(</span><em>npores</em>, <em>pos</em>, <em>buffer=0</em><span class="sig-paren">)</span><a class="headerlink" href="#p2p.avg_pore_loc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate average pore location for each pore at each frame</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>no_pores</strong> (<em>int</em>) &#8211; the number of pores in the unit cell</li>
+<li><strong>pos</strong> (<em>numpy.ndarray</em><em>, </em><em>shape</em><em>(</em><em>ncomponents</em><em>, </em><em>3</em><em>) or </em><em>numpy.ndarray</em><em>, </em><em>shape</em><em>(</em><em>nframes</em><em>, </em><em>ncomponents</em><em>, </em><em>3</em><em>)</em>) &#8211; the coordinates of the component(s) which you are using to locate the pore centers</li>
+<li><strong>buffer</strong> (<em>float</em>) &#8211; fraction (of membrane thickness) of top and bottom of membrane to exclude from p2p calculations</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">numpy array containing the x, y coordinates of the center of each pore at each frame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="p2p.p2p">
+<code class="descclassname">p2p.</code><code class="descname">p2p</code><span class="sig-paren">(</span><em>p_centers</em>, <em>distances</em><span class="sig-paren">)</span><a class="headerlink" href="#p2p.p2p" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate all pairwise pore-to-pore distances (4 pores is the only number of pores implemented currently)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>p_centers</strong> (<em>numpy.ndarray</em><em>, </em><em>shape</em><em>(</em><em>p_centers.shape</em><em>[</em><em>0</em><em>]</em><em>, </em><em>p_centers.shape</em><em>[</em><em>1</em><em>]</em><em>, </em><em>2</em><em>)</em>) &#8211; the x, y locations of the pore centers</li>
+<li><strong>distances</strong> (<em>int</em>) &#8211; the number of distinct distances between pores</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.ndarray, shape(p_centers.shape[0], distances, 2) All frame-by-frame pore-to-pore distances</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="p2p.p2p_stats">
+<code class="descclassname">p2p.</code><code class="descname">p2p_stats</code><span class="sig-paren">(</span><em>p2ps</em>, <em>exclude</em>, <em>nboot</em>, <em>equil</em><span class="sig-paren">)</span><a class="headerlink" href="#p2p.p2p_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the average and spread of pore-to-pore distances</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>p2ps</strong> (<em>numpy.ndarray</em><em>, </em><em>shape</em><em>(</em><em>nframes</em><em>, </em><em>np2p_distances</em><em>)</em>) &#8211; all of the pore-to-pore distances</li>
+<li><strong>exclude</strong> (<em>int</em><em> or </em><em>str</em>) &#8211; exclude a certain pore-to-pore interaction (such as the distance from pores on opposite sides of a
+parallelogram as is the case in a hexagonal system). If &#8216;auto&#8217;, then exclude will be automatically selected</li>
+<li><strong>nboot</strong> (<em>int</em>) &#8211; number of bootstrap trials to use when generating statistics</li>
+<li><strong>equil</strong> (<em>int</em><em> or </em><em>str</em>) &#8211; the trajectory frame at which to start generating statistics. Care about this parameter if you
+choose to detect equilibration manually. Otherwise &#8216;auto&#8217; will use pymbar to find it for you</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the average and standard deviation of pore to pore distances</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          <h3>Table Of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="setup.html">System Setup</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="analysis.html">Post-Simulation Trajectory Analysis</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="hbonds.html">hbonds.py</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">p2p.py</a></li>
+</ul>
+</li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Search</h3>
+            <form class="search" action="search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+            </form>
+          </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="hbonds.html" title="hbonds.py"
+              >previous</a> |
+            <a href="py-modindex.html" title="Python Module Index"
+              >modules</a> |
+            <a href="genindex.html" title="General Index"
+              >index</a>
+          </div>
+          <div role="note" aria-label="source link">
+              <br/>
+              <a href="_sources/p2p.rst.txt"
+                rel="nofollow">Show Source</a>
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Benjamin Coscia.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

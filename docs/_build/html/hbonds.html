@@ -1,0 +1,269 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>hbonds.py &#8212; LLC_Membranes 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/agogo.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="p2p.py" href="p2p.html" />
+    <link rel="prev" title="Post-Simulation Trajectory Analysis" href="analysis.html" /> 
+  </head>
+  <body role="document">
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="index.html">LLC_Membranes 0.1.0 documentation</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="analysis.html" title="Post-Simulation Trajectory Analysis"
+             accesskey="P">previous</a> |
+          <a href="p2p.html" title="p2p.py"
+             accesskey="N">next</a> |
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="hbonds-py">
+<h1>hbonds.py<a class="headerlink" href="#hbonds-py" title="Permalink to this headline">¶</a></h1>
+<p>Use geometric criteria to identify hydrogen bonds</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">hbonds</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">TRAJ</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">GRO</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">TOP</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="n">BEGIN</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">e</span> <span class="n">END</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">-</span><span class="n">sk</span> <span class="n">SKIP</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="n">RESIDUES</span> <span class="p">[</span><span class="n">RESIDUES</span> <span class="o">...</span><span class="p">]]</span>
+                 <span class="p">[</span><span class="o">-</span><span class="n">a</span> <span class="n">ATOMS</span> <span class="p">[</span><span class="n">ATOMS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">DISTANCE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">angle</span> <span class="n">ANGLE_CUT</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">-</span><span class="n">xlink</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">xtop</span> <span class="n">XLINK_TOPOLOGY</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">xres</span> <span class="n">XLINK_RESIDUE</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">-</span><span class="n">l</span> <span class="n">LOAD</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">acc</span> <span class="n">ACCEPTORS</span> <span class="p">[</span><span class="n">ACCEPTORS</span> <span class="o">...</span><span class="p">]]</span>
+                 <span class="p">[</span><span class="o">-</span><span class="n">donors</span> <span class="n">DONORS</span> <span class="p">[</span><span class="n">DONORS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span> <span class="n">SAVENAME</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="Named Arguments">
+<h2>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h2>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>-t, &#8211;traj</kbd></td>
+<td><p class="first">Path to input file</p>
+<p class="last">Default: &#8220;wiggle.trr&#8221;</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-g, &#8211;gro</kbd></td>
+<td><p class="first">Coordinate file</p>
+<p class="last">Default: &#8220;wiggle.gro&#8221;</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-p, &#8211;top</kbd></td>
+<td><p class="first">Gromacs topology file</p>
+<p class="last">Default: &#8220;topol.top&#8221;</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-b, &#8211;begin</kbd></td>
+<td><p class="first">End frame</p>
+<p class="last">Default: 0</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-e, &#8211;end</kbd></td>
+<td><p class="first">Start frame</p>
+<p class="last">Default: -1</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-sk, &#8211;skip</kbd></td>
+<td><p class="first">Skip every skip frames</p>
+<p class="last">Default: 1</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-r, &#8211;residues</kbd></td>
+<td><p class="first">Residues to include in h-bond search</p>
+<p class="last">Default: [&#8216;HII&#8217;]</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-a, &#8211;atoms</kbd></td>
+<td>Atoms to include for each residue. Each list of atoms must be passed with a separate -a flag for each residue inargs.residues</td></tr>
+<tr><td class="option-group">
+<kbd>-d, &#8211;distance</kbd></td>
+<td><p class="first">Maximum distance between acceptor and donor atoms</p>
+<p class="last">Default: 0.3</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-angle, &#8211;angle_cut</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">Maximum DHA angle to be considered an H-bond</p>
+<p class="last">Default: 20</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-xlink, &#8211;xlink</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">Specify if system is cross-linked sincethe topology will be set up</p>
+<p class="last">Default: False</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-xtop, &#8211;xlink_topology</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">Name of .itp file which describes cross-linked residue</p>
+<p class="last">Default: &#8220;assembly.itp&#8221;</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-xres, &#8211;xlink_residue</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">Name of residue in molecules section of the topology corresponding to args.xlink_topology</p>
+<p class="last">Default: &#8220;HII&#8221;</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-l, &#8211;load</kbd></td>
+<td><p class="first">Load pickled system object</p>
+<p class="last">Default: False</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-acc, &#8211;acceptors</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">If you only want hbonds with acceptoratoms of a residue, use this flag. 1 for this condition, otherwise 0. Input as a list of 0 and 1 in the same order as args.residues</p>
+<p class="last">Default: False</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-donors, &#8211;donors</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">If you only want hbonds with donoratoms of a residue, use this flag. 1 for this condition, otherwise 0. Input as a list of 0 and 1 in the same order as args.residues</p>
+<p class="last">Default: False</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-s, &#8211;savename</kbd></td>
+<td><p class="first">Name of pickled object to save aftercalcualtions are complete</p>
+<p class="last">Default: &#8220;hbonds.pl&#8221;</p>
+</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hbonds.System">
+<em class="property">class </em><code class="descclassname">hbonds.</code><code class="descname">System</code><span class="sig-paren">(</span><em>traj</em>, <em>gro</em>, <em>top</em>, <em>begin=0</em>, <em>end=-1</em>, <em>skip=1</em>, <em>exclude_water=False</em>, <em>xlink=False</em>, <em>xlink_topology='assembly.itp'</em>, <em>xlink_residue='HII'</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="hbonds.System.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>traj</em>, <em>gro</em>, <em>top</em>, <em>begin=0</em>, <em>end=-1</em>, <em>skip=1</em>, <em>exclude_water=False</em>, <em>xlink=False</em>, <em>xlink_topology='assembly.itp'</em>, <em>xlink_residue='HII'</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>traj</strong> &#8211; </li>
+<li><strong>gro</strong> &#8211; </li>
+<li><strong>top</strong> &#8211; </li>
+<li><strong>begin</strong> &#8211; </li>
+<li><strong>end</strong> &#8211; </li>
+<li><strong>exclude_water</strong> &#8211; </li>
+<li><strong>xlink</strong> &#8211; </li>
+<li><strong>xlink_topology</strong> &#8211; </li>
+<li><strong>xlink_residue</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hbonds.Residue">
+<em class="property">class </em><code class="descclassname">hbonds.</code><code class="descname">Residue</code><span class="sig-paren">(</span><em>name</em>, <em>xlink=False</em>, <em>xlink_topology='assembly.itp'</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.Residue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          <h3>Table Of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="setup.html">System Setup</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="analysis.html">Post-Simulation Trajectory Analysis</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">hbonds.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="p2p.html">p2p.py</a></li>
+</ul>
+</li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Search</h3>
+            <form class="search" action="search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+            </form>
+          </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="analysis.html" title="Post-Simulation Trajectory Analysis"
+              >previous</a> |
+            <a href="p2p.html" title="p2p.py"
+              >next</a> |
+            <a href="py-modindex.html" title="Python Module Index"
+              >modules</a> |
+            <a href="genindex.html" title="General Index"
+              >index</a>
+          </div>
+          <div role="note" aria-label="source link">
+              <br/>
+              <a href="_sources/hbonds.rst.txt"
+                rel="nofollow">Show Source</a>
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Benjamin Coscia.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>
