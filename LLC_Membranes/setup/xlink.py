@@ -99,11 +99,12 @@ class Residue(object):
         self.c1_atom_indices = None
         self.c2_atom_indices = None
         self.carbonyl_oxygen_indices = None
+        self.location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # path to this script
 
         if not self.is_ion:
 
             self.itp = []
-            with open('%s/../top/topologies/%s.itp' % (location, name), 'r') as f:
+            with open('%s/../top/topologies/%s.itp' % (self.location, name), 'r') as f:
                 for line in f:
                     self.itp.append(line)
 
@@ -124,7 +125,7 @@ class Residue(object):
 
         """
 
-        with open('%s/../top/topologies/ions.txt' % location) as f:
+        with open('%s/../top/topologies/ions.txt' % self.location) as f:
             ions = []
             for line in f:
                 if line[0] != '#':
@@ -230,7 +231,7 @@ class Residue(object):
         self.c1_atom_indices = []
         self.c2_atom_indices = []
 
-        with open('%s/../top/topologies/%s.gro' % (location, self.name), 'r') as f:
+        with open('%s/../top/topologies/%s.gro' % (self.location, self.name), 'r') as f:
 
             for line in f:
                 if line.count(';') != 0:
@@ -245,7 +246,7 @@ class Residue(object):
 
         self.carbonyl_oxygen_indices = []
 
-        with open('%s/../top/topologies/%s.gro' % (location, self.name), 'r') as f:
+        with open('%s/../top/topologies/%s.gro' % (self.location, self.name), 'r') as f:
 
             for line in f:
                 if line.count(';') != 0:
@@ -810,9 +811,6 @@ class System(Topology):
         file_rw.write_gro_pos(self.t.xyz[-1, keep, :], out, ids=ids, res=res, ucell=ucell)
 
         self.write_assembly_topology(virtual_sites=False, vsite_atom_name=dummy_atom_name)
-
-
-location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in
 
 if __name__ == "__main__":
 

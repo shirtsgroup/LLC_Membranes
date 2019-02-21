@@ -1,0 +1,7 @@
+# .readthedocs.yml
+
+python:
+    version: 3.6
+    pip_install: true
+    extra_requirements:
+        - cython

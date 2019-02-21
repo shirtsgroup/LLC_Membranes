@@ -29,9 +29,6 @@ import pickle
 from LLC_Membranes.llclib import file_rw, topology, physical
 
 
-script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-
-
 def initialize():
 
     parser = argparse.ArgumentParser(description='Use geometric criteria to identify hydrogen bonds')
@@ -348,6 +345,8 @@ class Residue(object):
 
         self.name = name
 
+        script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
         self.is_ion = False
         # check if residue is an ion
         with open('%s/../top/topologies/ions.txt' % script_location) as f:
@@ -361,17 +360,6 @@ class Residue(object):
             self.natoms = 1
 
         else:
-            # try:
-            #     t = md.load('%s.pdb' % name,
-            #                 standard_names=False)  # see if there is a solute configuration in this directory
-            # except OSError:
-            #     try:
-            #         t = md.load('%s/../top/topologies/%s.pdb' % (script_location, name),
-            #                     standard_names=False)  # check if the configuration is
-            #         # located with all of the other topologies
-            #     except OSError:
-            #         print('No residue %s found' % name)
-            #         exit()
 
             try:
                 if xlink:
@@ -382,8 +370,7 @@ class Residue(object):
                 try:
                     f = open('%s/../top/topologies/%s.itp' % (script_location, name), 'r')
                 except FileNotFoundError:
-                    print('No topology %s.itp found' % name)
-                    exit()
+                    sys.exit('No topology %s.itp found' % name)
 
             itp = []
             for line in f:
@@ -434,51 +421,6 @@ class Residue(object):
                 for pair in involvement:
                     atom = [x - 1 for x in pair if x != (i + 1)][0]
                     self.bonds[i].append(atom)
-
-
-class Topology(object):
-
-    def __init__(self, top, xlink=False, xlink_topology='assembly.itp', xlink_residue='HII'):
-        """
-
-        :param top:
-        :param xlink:
-        :param xlink_topology:
-        :param xlink_residue:
-        """
-
-        topology_file = []
-        with open(top, 'r') as f:
-            for line in f:
-                topology_file.append(line)
-
-        molecules_section = 0
-        while topology_file[molecules_section].count('[ molecules ]') == 0:
-            molecules_section += 1
-
-        molecules_section += 2
-
-        self.residues = {}  # key : residue name, value: number of residues
-        for i in range(molecules_section, len(topology_file)):
-            data = topology_file[i].split()
-            self.residues[data[0]] = int(data[1])
-
-        # create bond tree thing
-        self.bonds = {}
-        preceding_atoms = 0  # atoms before residue
-        for r in self.residues:  # look at all residues
-            if xlink and r == xlink_residue:
-                res = Residue(r, xlink=True, xlink_topology=xlink_topology)
-            else:
-                res = Residue(r)  # create residue object
-            if not res.is_ion:
-                for n in range(self.residues[r]):  # create bond for each same type residue
-                    for b in res.bonds:  # look at bonds to each atom in order
-                        num = preceding_atoms + n * res.natoms + b
-                        self.bonds[num] = []
-                        for nb in res.bonds[b]:
-                            self.bonds[num].append(preceding_atoms + n * res.natoms + nb)
-            preceding_atoms += res.natoms * self.residues[r]
 
 
 if __name__ == "__main__":
