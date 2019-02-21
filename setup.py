@@ -8,13 +8,10 @@ from setuptools import setup
 
 DOCLINES = __doc__.split("\n")
 
-try:
-    import mdtraj
-except ModuleNotFoundError | ImportError:
-    import subprocess
-    command = 'conda install mdtraj'
-    p = subprocess.Popen(command.split())
-    p.wait()
+import subprocess
+command = 'conda install mdtraj'
+p = subprocess.Popen(command.split())
+p.wait()
 
 setup(
     # Self-descriptive entries which should always be present
