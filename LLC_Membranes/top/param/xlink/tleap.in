@@ -1,0 +1,8 @@
+source oldff/leaprc.ff99SB
+source leaprc.gaff
+HIIX = loadmol2 xlink_product.mol2
+check HIIX
+loadamberparams xlink_product.frcmod
+saveoff HIIX HIIX.lib
+saveamberparm HIIX xlink_product.prmtop xlink_product.inpcrd
+quit

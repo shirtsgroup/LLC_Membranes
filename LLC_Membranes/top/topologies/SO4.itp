@@ -1,0 +1,29 @@
+; SO4_GMX.top created by acpype (Rev: 403) on Tue Apr 10 15:45:13 2018
+
+[ moleculetype ]
+;name            nrexcl
+ SO4              3
+
+[ atoms ]
+;   nr  type  resi  res  atom  cgnr     charge      mass       ; qtot   bond_type
+     1   s6     1   SO4     S    1     1.542960    32.060000
+     2    o     1   SO4     O    2    -0.885740    16.000000
+     3    o     1   SO4    O1    3    -0.885740    16.000000
+     4    o     1   SO4    O2    4    -0.885740    16.000000
+     5    o     1   SO4    O3    5    -0.885740    16.000000
+
+[ bonds ]
+;   ai     aj funct   r             k
+     1      2   1    1.4360e-01    4.5279e+05 ;      S - O     
+     1      3   1    1.4360e-01    4.5279e+05 ;      S - O1    
+     1      4   1    1.4360e-01    4.5279e+05 ;      S - O2    
+     1      5   1    1.4360e-01    4.5279e+05 ;      S - O3    
+
+[ angles ]
+;   ai     aj     ak    funct   theta         cth
+     2      1      3      1    1.1973e+02    6.2409e+02 ;      O - S      - O1    
+     2      1      4      1    1.1973e+02    6.2409e+02 ;      O - S      - O2    
+     2      1      5      1    1.1973e+02    6.2409e+02 ;      O - S      - O3    
+     3      1      4      1    1.1973e+02    6.2409e+02 ;     O1 - S      - O2    
+     3      1      5      1    1.1973e+02    6.2409e+02 ;     O1 - S      - O3    
+     4      1      5      1    1.1973e+02    6.2409e+02 ;     O2 - S      - O3    

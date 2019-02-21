@@ -1,0 +1,8 @@
+source oldff/leaprc.ff99SB
+source leaprc.gaff
+HX = loadmol2 MX1.mol2
+check HX
+loadamberparams MX1.frcmod
+saveoff HX HX.lib
+saveamberparm HX MX1.prmtop MX1.inpcrd
+quit
