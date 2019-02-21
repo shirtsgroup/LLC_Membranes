@@ -5,7 +5,6 @@ LLC_Membranes repository
 Used to analyze LLC membrane molecular dynamics trajectories
 """
 from setuptools import setup
-import versioneer
 
 DOCLINES = __doc__.split("\n")
 
@@ -13,8 +12,6 @@ setup(
     # Self-descriptive entries which should always be present
     name='LLC_Membranes',
     author='Ben Coscia',
-    version=versioneer.get_version(),
-    cmdclass=versioneer.get_cmdclass(),
     license='BSD-3-Clause',
     install_requires=['numpy', 'mdtraj', 'matplotlib', 'ruptures', 'scipy', 'tqdm', 'fbm'], 
 
