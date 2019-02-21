@@ -9,7 +9,7 @@ from setuptools import setup
 DOCLINES = __doc__.split("\n")
 
 import subprocess
-command = 'conda install mdtraj'
+command = 'pip install mdtraj'
 p = subprocess.Popen(command.split())
 p.wait()
 
