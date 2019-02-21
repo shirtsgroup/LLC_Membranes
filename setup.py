@@ -8,6 +8,11 @@ from setuptools import setup
 
 DOCLINES = __doc__.split("\n")
 
+try
+    import mdtraj
+    except ImportError:
+	conda install mdtraj
+
 setup(
     # Self-descriptive entries which should always be present
     name='LLC_Membranes',
