@@ -3,14 +3,15 @@
 import argparse
 import mdtraj as md
 import numpy as np
-from LLC_Membranes.analysis import Atom_props, detect_peaks
+from LLC_Membranes.analysis import detect_peaks
+from LLC_Membranes.llclib import physical, topology
 import tqdm
 import matplotlib.pyplot as plt
 from matplotlib import ticker
 from LLC_Membranes.llclib import fast_rotate
-from LLC_Membranes.setup.place_solutes import trace_pores
 from scipy.optimize import curve_fit
 from scipy.interpolate import RegularGridInterpolator
+import sys
 
 
 def initialize():
@@ -24,7 +25,7 @@ def initialize():
                         'function with respect to. The center of mass will be used')
     parser.add_argument('-r', '--res', nargs='+', help='Residue to create correlation function with '
                         'respect to. Will use center of mass. Will override atoms')
-    parser.add_argument('-b', '--begin', default=-50, type=int, help='Start frame')
+    parser.add_argument('-b', '--begin', default=0, type=int, help='Start frame')
     parser.add_argument('-e', '--end', default=-1, type=int, help='End frame')
     parser.add_argument('-bins', nargs='+', default=100, type=int, help='Integer or array of bin values. If more than'
                         'one value is used, order the inputs according to the order given in args.axis')
@@ -74,7 +75,7 @@ def exponential_decay(x, a, L):
 
 class Correlation(object):
 
-    def __init__(self, gro, trajectory=None, atoms='all', res='all', com=True, bins=[100, 100, 100], begin=0, end=-1,
+    def __init__(self, gro, trajectory=None, atoms=None, res=None, com=True, bins=[100, 100, 100], begin=0, end=-1,
                  theta=120):
         """
         :param gro: GROMACS coordinate file
@@ -89,6 +90,16 @@ class Correlation(object):
         :param begin: First frame of coordinates to use
         :param end: last frame of coordinates to use
         :param theta: angle between xy box vectors
+
+        :type gro: str
+        :type trajectory: str
+        :type atoms: str or list
+        :type res: str or list
+        :type com: bool
+        :type bins: list or int
+        :type begin: int
+        :type end: int
+        :type theta: float
         """
 
         # Initialize certain variables
@@ -108,6 +119,10 @@ class Correlation(object):
             self.t = md.load(trajectory, top=gro)[begin:end]
             print('Trajectory loaded')
 
+        if atoms is None:
+            if res is None:
+                sys.exit("You must specify either a group of atoms or residue. Neither have been provided therefore "
+                         "I can't do anything")
         if res is None:
             print('No residue names are attached to the atom groups provided, guessing at residue names instead. This '
                   'is probably a bad idea unless there is only one residue.')
@@ -115,35 +130,21 @@ class Correlation(object):
             res = list(set(residues))
             print('Guessed residues: %s' % res)
 
+        res = [topology.Residue(r) for r in res]
+
         # get indices of atoms to be included in calculation, separated into groups if specified
-        if atoms[0][0] == 'all':
-            self.keep = [a.index for a in self.t.topology.atoms]
-        else:
-            self.keep = []
-            for i, grp in enumerate(atoms):
-                self.keep.append([])
-                for a in self.t.topology.atoms:
-                    if a.name in grp and a.residue.name == res[i]:
-                        self.keep[i].append(a.index)
+        self.keep = []
+        for i, grp in enumerate(atoms):
+            self.keep.append([a.index for a in self.t.topology.atoms if a.name in grp and a.residue.name ==
+                              res[i].name])
 
-        # get mass of atoms that will be in calculation
-        if atoms[0][0] == 'all' or atoms == 'all':
-            self.mass = [Atom_props.mass[a.name] for a in self.t.topology.atoms]
-        else:
-            self.mass = []
-            for i, grp in enumerate(atoms):
-                self.mass.append([])
-                for x in grp:
-                    self.mass[i].append(Atom_props.mass[x])
+        # get mass of all atoms that will be included in calculation
+        self.mass = []
+        for i, grp in enumerate(atoms):
+            self.mass.append([res[i].mass[x] for x in grp])
 
-        if com:
-            self.com()
-        else:
-            # Use atomic positions rather than center of mass
-            keep = []
-            for i in range(len(self.keep)):
-                keep += self.keep[i]
-            self.positions = self.t.xyz[:, keep, :]
+        # Calculate centers of mass
+        self.com()
 
         if self.theta != 90:
 
@@ -154,7 +155,7 @@ class Correlation(object):
             self.positions[..., 0] -= self.positions[..., 1]*np.cos(self.theta)
 
         self.rescale()  # scale coordinates so box dimensions are the same for each frame
-        self.wrap_coordinates()  # put all atoms in the box
+        self.wrap_coordinates()  # put all atoms in the box (faster than physical.wrapbox since this is a cube)
         self.correlation3d, self.edges = self.calculate_correlation_function()
 
         self.bin_centers = []
@@ -482,13 +483,17 @@ if __name__ == "__main__":
         if args.atoms is None and args.res is None:
             args.atoms = [['C', 'C1', 'C2', 'C3', 'C4', 'C5']]
 
-        g = Correlation(args.gro, args.traj, atoms=args.atoms, res=args.res, com=args.center_of_mass,
-                                           bins=bins, begin=args.begin, end=args.end)
+        # Slice position array and calculate centers of mass of groups
+        # Then calculate structure factor and invert to get correlation function.
+        g = Correlation(args.gro, args.traj, atoms=args.atoms, res=args.res, com=args.center_of_mass, bins=bins,
+                        begin=args.begin, end=args.end)
 
         if args.slice:
-            axes = {'x': 0, 'y':1, 'z':2, 'X':0, 'Y':1, 'Z':2}
-            g.make_slice(axes[args.slice], radius=.225, plot=False)  # slice along z axis
 
+            #axes = {'x': 0, 'y': 1, 'z': 2, 'X': 0, 'Y': 1, 'Z': 2}
+            axes = ['x', 'y', 'z']
+            print(axes.index(args.slice.lower()))
+            g.make_slice(axes.index(args.slice.lower()), radius=.225, plot=False)  # slice along z axis
 
             plt.imshow(g.correlation3d[0, :, :].real)
             plt.show()
@@ -496,8 +501,6 @@ if __name__ == "__main__":
 
             g.plot_slice(axes[args.slice], show=True, fit=False,
                          limits=([0, g.bin_centers[axes[args.slice]][g.bin_centers[axes[args.slice]].size // 2]], []))
-
-
 
         exit()
 

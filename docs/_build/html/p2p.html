@@ -43,6 +43,7 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="hbonds.py" href="hbonds.html" /> 
@@ -169,11 +170,11 @@
   <div class="section" id="p2p-py">
 <h1>p2p.py<a class="headerlink" href="#p2p-py" title="Permalink to this headline">¶</a></h1>
 <p>Calculate the pore-to-pore distance from an MD trajectory of an HII LLC membrane</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">p2p</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">INPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">GRO</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">begin</span> <span class="n">BEGIN</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">end</span> <span class="n">END</span><span class="p">]</span>
-              <span class="p">[</span><span class="o">--</span><span class="n">skip</span> <span class="n">SKIP</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PORES</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">COMPONENT</span> <span class="p">[</span><span class="n">COMPONENT</span> <span class="o">...</span><span class="p">]]</span>
-              <span class="p">[</span><span class="o">-</span><span class="n">E</span> <span class="n">EQUIL</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">x</span> <span class="n">EXCLUDE</span> <span class="p">[</span><span class="n">EXCLUDE</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">auto_exclude</span><span class="p">]</span>
-              <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="n">NBOOT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plot_every</span> <span class="n">PLOT_EVERY</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">noshow</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">save</span><span class="p">]</span>
-              <span class="p">[</span><span class="o">--</span><span class="n">plot_avg</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plot_std</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">T</span> <span class="n">T</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">buffer</span> <span class="n">BUFFER</span><span class="p">]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">p2p</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">TRAJ</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">GRO</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">begin</span> <span class="n">BEGIN</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">end</span> <span class="n">END</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">skip</span> <span class="n">SKIP</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PORES</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">COMPONENT</span> <span class="p">[</span><span class="n">COMPONENT</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">E</span> <span class="n">EQUIL</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">-</span><span class="n">x</span> <span class="n">EXCLUDE</span> <span class="p">[</span><span class="n">EXCLUDE</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">auto_exclude</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="n">NBOOT</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">--</span><span class="n">plot_every</span> <span class="n">PLOT_EVERY</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">noshow</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">save</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plot_avg</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">--</span><span class="n">plot_std</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">T</span> <span class="n">T</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">buffer</span> <span class="n">BUFFER</span><span class="p">]</span>
 </pre></div>
 </div>
 <div class="section" id="Named Arguments">
@@ -183,27 +184,28 @@
 <col class="description" />
 <tbody valign="top">
 <tr><td class="option-group">
-<kbd>-t, &#8211;input</kbd></td>
+<kbd>-t, &#8211;traj</kbd></td>
 <td><p class="first">Path to input file</p>
-<p class="last">Default: &#8220;wiggle.trr&#8221;</p>
+<p class="last">Default: &#8220;PR.trr&#8221;</p>
 </td></tr>
 <tr><td class="option-group">
 <kbd>-g, &#8211;gro</kbd></td>
 <td><p class="first">Coordinate configuration file (.gro, .pdb)</p>
-<p class="last">Default: &#8220;wiggle.gro&#8221;</p>
+<p class="last">Default: &#8220;berendsen.gro&#8221;</p>
 </td></tr>
-<tr><td class="option-group">
-<kbd>&#8211;begin</kbd></td>
-<td><p class="first">Frame to begin calculations</p>
+<tr><td class="option-group" colspan="2">
+<kbd>-begin, &#8211;begin</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">Frame to begin calculations</p>
 <p class="last">Default: 0</p>
 </td></tr>
 <tr><td class="option-group">
-<kbd>&#8211;end</kbd></td>
+<kbd>-end, &#8211;end</kbd></td>
 <td><p class="first">Frame to stop calculations</p>
 <p class="last">Default: -1</p>
 </td></tr>
 <tr><td class="option-group">
-<kbd>&#8211;skip</kbd></td>
+<kbd>-skip, &#8211;skip</kbd></td>
 <td><p class="first">Sample every nth frame</p>
 <p class="last">Default: 1</p>
 </td></tr>
@@ -215,7 +217,7 @@
 <tr><td class="option-group" colspan="2">
 <kbd>-c, &#8211;component</kbd></td>
 </tr>
-<tr><td>&#160;</td><td><p class="first">Name of monomer component used to trackpore positions. This script will calculate the average coordinate of each in each pore. Special predefined cases include: &#8220;tails&#8221;, &#8220;Tails&#8221;, &#8220;benzene&#8221;, &#8220;Benzene&#8221;, &#8220;Head Groups, &#8220;tail_ends&#8221;, &#8220;tail_fronts&#8221;, &#8220;Sodium&#8221;. These are specific to Na-GA3C11</p>
+<tr><td>&#160;</td><td><p class="first">Name of monomer component used to track pore positions. This script will calculate the average coordinate of each in each pore. Special predefined cases include: &#8220;tails&#8221;, &#8220;Tails&#8221;, &#8220;benzene&#8221;, &#8220;Benzene&#8221;, &#8220;Head Groups, &#8220;tail_ends&#8221;, &#8220;tail_fronts&#8221;, &#8220;Sodium&#8221;. These are specific to Na-GA3C11</p>
 <p class="last">Default: &#8220;NA&#8221;</p>
 </td></tr>
 <tr><td class="option-group">

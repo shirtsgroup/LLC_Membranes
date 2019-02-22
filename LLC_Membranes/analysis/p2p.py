@@ -25,16 +25,17 @@ def initialize():
                                                  'HII LLC membrane')
 
     # Trajectory loading and slicing
-    parser.add_argument('-t', '--input', default='wiggle.trr', type=str, help='Path to input file')
-    parser.add_argument('-g', '--gro', default='wiggle.gro', type=str, help='Coordinate configuration file (.gro, .pdb)')
-    parser.add_argument('--begin', default=0, type=int, help='Frame to begin calculations')
-    parser.add_argument('--end', default=-1, type=int, help='Frame to stop calculations')
-    parser.add_argument('--skip', default=1, type=int, help='Sample every nth frame')
+    parser.add_argument('-t', '--traj', default='PR.trr', type=str, help='Path to input file')
+    parser.add_argument('-g', '--gro', default='berendsen.gro', type=str, help='Coordinate configuration file '
+                                                                               '(.gro, .pdb)')
+    parser.add_argument('-begin', '--begin', default=0, type=int, help='Frame to begin calculations')
+    parser.add_argument('-end', '--end', default=-1, type=int, help='Frame to stop calculations')
+    parser.add_argument('-skip', '--skip', default=1, type=int, help='Sample every nth frame')
 
     # System-dependent parameters
     parser.add_argument('-p', '--pores', default=4, help='Number of pores in unit cell')
     parser.add_argument('-c', '--component', default='NA', nargs='+', help='Name of monomer component used to track'
-                        'pore positions. This script will calculate the average coordinate of each in each pore. '
+                        ' pore positions. This script will calculate the average coordinate of each in each pore. '
                         'Special predefined cases include: "tails", "Tails", "benzene", "Benzene", "Head Groups, '
                         '"tail_ends", "tail_fronts", "Sodium". These are specific to Na-GA3C11')
     parser.add_argument('-E', '--equil', default='auto', help='Frame number where system is equilibrated. "auto" will '

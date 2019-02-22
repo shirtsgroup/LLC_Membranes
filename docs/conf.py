@@ -98,7 +98,12 @@ todo_include_todos = False
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme' # agogo traditional classic pyramid nature haiku sphixdoc scrolls alabaster nature bizstyle
-
+html_static_path = ['_static']
+html_context = {
+    'css_files': [
+        '_static/theme_overrides.css',  # override wide tables in RTD theme
+        ],
+     }
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
