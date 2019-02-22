@@ -45,16 +45,80 @@
 	neat monomer as well as with varying amounts of water in the pores.
   \end{itemize} 
 
-  In this work, we have determined the transport mechanisms and macroscopic
-  transport properties exhibited by a number of polar solutes with varying size,
-  chemical functionality and hydrophilic character.
+  In this work, we have studied the transport mechanisms exhibited by a number
+  of polar solutes with varying size, chemical functionality and hydrophilic character.
   \begin{itemize}
 	\item Many of the separations we are interested in involve polar organic 
 	compounds.
   \end{itemize} 
-
-  We have compared our calculated diffusion coefficients with experimental
-  measurements made using DOSY NMR. 
+  
+  There are a number of questions that we wish to answer in order to create a
+  framework for studying this system in even greater detail.
+  \begin{enumerate}
+  
+   	\item What transport mechanisms do we observe?
+  	
+  	Given that the pores will restrict motion of the solutes, we anticipate that 
+  	transport will be hindered in some way. We want to understand the differences in
+  	solute motion, specifically its mean squared displacement (MSD), based on a solute's
+  	size and chemical identity (functional groups). We will study the interactions
+  	between solutes, the membrane, and water in order to determine which mechanism
+  	or mechanisms dominate.
+  	
+%  	are dictated by a 
+%  	solute's chemical identity and if so, what interactions lead to this
+%  	difference.
+  
+  	\item How do molecules, including water, partition within the pores?
+  	
+  	From a macroscopic perspective, it is straightforward to hypothesize that the water and
+  	polar solutes spend their time exclusively in the tube-like hydrophilic pore region.
+  	Our previous work showed that there is a gradual compositional transition from the 
+  	hydrophilic to the hydrophobic region which means that solutes may not 
+  	necessarily stay confined to the centers of the pores or even within the
+  	pore region. We will study the gradient in composition of solutes and water
+  	and any resultant influence it might have on mechanistic properties.
+  	
+  	\item Can we describe the transport mechanisms using pre-existing 
+  	mathematical models.
+  	
+  	A mathematical model may provide additional insight into the transport
+  	mechanisms and, in future work, can help relate performance on the 
+  	timescales studied with MD to macroscopic timescales. We will use
+  	qualitative and semi-quantitative arguments in order to choose a 
+  	governing model. 
+  	
+  	\item How can we modify the current monomers in order to enhance
+  	solute-specific separations? 
+  	
+  	Most experimental characterization up to this point has been centered 
+  	around the monomer, Na-GA3C11, studied here. The primary reason for conducting
+  	these simulations is to understand what chemical modifications can be made 
+  	to this or similar liquid crystal molecules in order to enhance transport 
+  	of desired species or restrict that of undesired species. We will use the 
+  	insight gained from our mechanistic observations in order to suggest new 
+  	monomer designs.
+  	
+  \end{enumerate} 
+  
+  There are number of questions this study is not intended to answer.
+  \begin{itemize}
+    \item We will not study the concentration dependence of the observed
+    transport rates. Although the average MSD might change with concentration,
+    we are focused on the underlying interactions leading to the observed 
+    transport mechanisms which we conjecture will be the same regardless of
+    concentration.
+    \item We will not study the chemical potential of solutes in the pores, which
+    could give us a better understanding of equilibrium solute partitioning.
+    However, this information will not greatly enhance our understanding of 
+    mechanistic details in various membrane regions.
+    \item Both of the above points will add unnecessary levels of complexity
+    which can be left for a future study. 
+%    \item Our work is meant as a simple starting point for studying transport
+%    mechanisms in these complex LLC systems.
+    \item This work is a simple starting point meant for observing the types
+    of interactions which occur between isolated solutes and the membrane.
+  \end{itemize}
 
   \section{Methods}
 
@@ -344,6 +408,9 @@
   \section{Results and Discussion}
   
   \subsection*{Governing Mechanisms}\label{section:mechanism_overview}  
+  
+  We will answer the questions posed in the introduction in a general 
+  sense before addressing them with respect to specific molecules. 
   
   % BJC: seems right to summarize overarching mechanisms observed first  
   On the timescales simulated in our study, solutes exhibit subdiffusive
@@ -673,7 +740,7 @@
 %	elsewhere and effectively pull the other bound hydroxyl group along with it. 
 %  \end{itemize}
 
-  \subsection*{Transport of Ketones}
+  \subsection*{Transport of Ketones and Amides}
   
   The 4 ketone-like molecules tested show a surprising range of transport behaviors.
   \begin{itemize}

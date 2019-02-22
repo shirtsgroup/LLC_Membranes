@@ -26,7 +26,7 @@ def initialize():
     # atom selection
     parser.add_argument('-r', '--residue', default=None, help='Residue to calculate coordination number with respect '
                                                                'to')
-    parser.add_argument('-rc', '--coordinated_residue', default=None, help='Name of residue coordinated to _residue_')
+    parser.add_argument('-rc', '--coordinated_residue', default=None, help='Name of residue coordinated to residue_')
     parser.add_argument('-ac', '--coordinated_atoms', default=None, nargs='+', help='Name of residue coordinate to '
                         'residue')
     parser.add_argument('-a', '--atoms', default=None, nargs='+', help='Name of atoms to calculate correlation '
@@ -236,7 +236,7 @@ class System(object):
         else:
             ncoord = np.zeros([self.t.n_frames, self.com.shape[1]])
 
-            for i in range(ncoord.shape[1]):
+            for i in tqdm.tqdm(range(ncoord.shape[1])):
                 ncoord[:, i] = [len(np.nonzero(self.distances[t][i, :])[1]) for t in range(self.t.n_frames)]
 
             plt.plot(self.time, ncoord.mean(axis=1))
@@ -260,8 +260,8 @@ if __name__ == "__main__":
 
         system.distance_search(cut=args.cut)  # calculate pairwise distance between all points in self.com and self.com_coordinated
 
-        with open(args.savename, 'wb') as f:
-            pickle.dump(system, f)
+        # with open(args.savename, 'wb') as f:
+        #     pickle.dump(system, f)
 
     else:
         print('Loading pickled object!...', end='', flush=True)
@@ -269,7 +269,7 @@ if __name__ == "__main__":
         print('Done!')
 
     #system.plot(res=['HII', 'HII', 'HOH'], atom_groups=[['O3', 'O4'], ['O', 'O1', 'O2'], ['O']])
-    # system.plot()
+    system.plot()
     #
     # for i in np.nonzero(system.distances[-1][0, :])[1]:
     #     print('%s -- %s' % (system.com_map[0], system.com_coordinated_map[i]))
