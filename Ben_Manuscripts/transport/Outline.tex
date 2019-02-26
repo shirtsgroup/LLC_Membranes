@@ -52,8 +52,10 @@
 	compounds.
   \end{itemize} 
   
-  There are a number of questions that we wish to answer in order to create a
-  framework for studying this system in even greater detail.
+%  There are a number of questions that we wish to answer in order to create a
+%  framework for studying this system in even greater detail.
+  There are a number of questions we wish to address in order to characterize
+  transport in this system.
   \begin{enumerate}
   
    	\item What transport mechanisms do we observe?
@@ -61,13 +63,9 @@
   	Given that the pores will restrict motion of the solutes, we anticipate that 
   	transport will be hindered in some way. We want to understand the differences in
   	solute motion, specifically its mean squared displacement (MSD), based on a solute's
-  	size and chemical identity (functional groups). We will study the interactions
+  	size, shape and chemical functionality. We will study the interactions
   	between solutes, the membrane, and water in order to determine which mechanism
   	or mechanisms dominate.
-  	
-%  	are dictated by a 
-%  	solute's chemical identity and if so, what interactions lead to this
-%  	difference.
   
   	\item How do molecules, including water, partition within the pores?
   	
@@ -105,9 +103,9 @@
   \begin{itemize}
     \item We will not study the concentration dependence of the observed
     transport rates. Although the average MSD might change with concentration,
-    we are focused on the underlying interactions leading to the observed 
-    transport mechanisms which we conjecture will be the same regardless of
-    concentration.
+    we are focused on the underlying solute-membrane interactions that lead to
+    the observed transport mechanisms which we conjecture will be the same 
+    regardless of concentration.
     \item We will not study the chemical potential of solutes in the pores, which
     could give us a better understanding of equilibrium solute partitioning.
     However, this information will not greatly enhance our understanding of 
@@ -121,10 +119,8 @@
   \end{itemize}
 
   \section{Methods}
-
-  \subsection{Molecular Dynamics Simulations}
   
-  \subsubsection*{System Setup}
+  \subsection*{System Setup}
 
   Stable H\textsubscript{II} phases, assembled with Na-GA3C11, can be formed
   using a broad range of water concentrations.
@@ -136,6 +132,8 @@
 	\item We decided to test two different levels of water content: 5 and 10 wt \%
   \end{itemize} 
 
+  %BJC: reference to supporting info with more details on water partition
+  %BJC: or should that go in the main body results?
   We observed that water partitions into the tail region of our system and therefore
   built our initial configurations with water in both regions close to the expected
   equilibrium value.
@@ -374,7 +372,9 @@
 %%	trajectory length (as opposed to total number of steps).  
 %%  \end{itemize}
 
-  \subsubsection*{Radial Distribution Functions}
+  \subsection*{Mean Squared Displacment}
+
+  \subsection*{Radial Distribution Functions}
 
   We measured the average radial distance of each solute of interest from the pore
   centers.
@@ -394,7 +394,7 @@
 	coordinates of appropriate point on the spline.
   \end{itemize}
 
-  \subsubsection*{Coordination number}
+  \subsection*{Coordination number}
 
   We quantified the coordination of solutes with surrounding molecules.
   \begin{itemize}
@@ -409,22 +409,39 @@
   
   \subsection*{Governing Mechanisms}\label{section:mechanism_overview}  
   
-  We will answer the questions posed in the introduction in a general 
-  sense before addressing them with respect to specific molecules. 
+  We have gained a clearer picture of the general transport properties exhibited by
+  this system through the collective study of all solutes. We will first answer the
+  questions posed in the introduction in a general sense before addressing them with
+  respect to specific molecules where exceptions occur.
   
-  % BJC: seems right to summarize overarching mechanisms observed first  
-  On the timescales simulated in our study, solutes exhibit subdiffusive
-  transport behavior as evidenced by their sublinear MSD curves. 
+  On the timescales simulated in our study, we observe subdiffusive behavior.  
   \begin{itemize}  
-	\item As an example, the MSD curve for ethanol is plotted in 
-	Figure~\ref{fig:example_msd}.
-  \end{itemize}
-  
-  \noindent All solutes exhibit hop diffusion, characteristic of a continuous time random walk.
-  \begin{itemize}
-  	\item Figure~\ref{fig:example_ztraces} shows the $z$-coordinate versus time of
+    \item Figure~\ref{fig:example_ztraces} plots the $z$-coordinate versus time of
   	3 representative ethanol centers of mass.
   	\item There are clear periods of entrapment separated by relatively large hops.
+	\item The MSD calculated based on all ethanol molecules is plotted in Figure~\ref{fig:example_msd}
+	and is sublinear.
+	\item The long periods of entrapment likely lead to this sublinear, and thus
+	subdiffusive, behavior.
+  \end{itemize}
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\linewidth]{colorful_example_ztraces.pdf}
+  \caption{}\label{fig:example_ztraces}
+  \end{subfigure}
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\linewidth]{example_msd.pdf}
+  \caption{}\label{fig:example_msd}
+  \end{subfigure}
+  \caption{}\label{fig:qualitative_mechanisms}
+  \end{figure}
+  	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  Mathematical modeling 
+  All solutes exhibit hop diffusion, characteristic of a continuous time random walk.	
+  \begin{itemize}
   	\item The length of entrapment follows a power law distribution 
   	(Figure~\ref{fig:example_powerlaw}) and the distribution of hop lengths can be 
   	described with a Gaussian distribution (Figure~\ref{fig:example_hop_dist}).
@@ -451,6 +468,7 @@
   	\item Future publications will focus on modeling the solute's transport characteristics
   	with an sFBM model
   \end{itemize}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % BJC: first iteration of figure after this before I decided to include a hop length and dwell time distribution
 %  \begin{figure}

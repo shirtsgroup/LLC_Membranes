@@ -6,9 +6,7 @@ Write input files. Default settings are not included. Add an argument if you nee
 from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
-import os
 import argparse
-from LLC_Membranes.setup import lc_class, bcc_class
 from LLC_Membranes.setup.gentop import SystemTopology
 from LLC_Membranes.setup.genmdp import SimulationMdp
 

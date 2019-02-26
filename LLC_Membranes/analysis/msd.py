@@ -6,8 +6,8 @@ import argparse
 import numpy as np
 import mdtraj as md
 import matplotlib.pyplot as plt
-from LLC_Membranes.analysis import Poly_fit, top, Atom_props
-from LLC_Membranes.llclib import physical, topology, timeseries, fitting_functions
+from LLC_Membranes.analysis import Poly_fit, top
+from LLC_Membranes.llclib import physical, topology, timeseries, fitting_functions, atom_props
 from scipy import stats
 import tqdm
 import sqlite3 as sql
@@ -129,7 +129,7 @@ class Diffusivity(object):
             selection = [a.index for a in self.t.topology.atoms if a.name in atoms]
 
             atoms_per_residue = len(atoms)
-            matoms = np.array([Atom_props.mass[x] for x in atoms])
+            matoms = np.array([atom_props.mass[x] for x in atoms])
             self.mres = np.sum(matoms)
         else:
             sys.exit('Error: No valid group of atoms or residues selected')
@@ -155,18 +155,19 @@ class Diffusivity(object):
         print('Done!')
 
         # plot 'random' z coordinate traces
-        # np.random.seed(4)  # 4 gives a nice spread for ethanol
-        # trajs = np.random.randint(0, self.com.shape[1], size=24)
-        # for i in trajs:
-        #     plt.plot(self.time, self.com[:, i, 2], linewidth=2)
-        #
-        #     plt.ylabel('$z$-coordinate (nm)', fontsize=14)
-        #     plt.xlabel('Time (ns)', fontsize=14)
-        #     plt.gcf().get_axes()[0].tick_params(labelsize=14)
-        #     plt.tight_layout()
-        #
-        #     plt.show()
-        # exit()
+        np.random.seed(4)  # 4 gives a nice spread for ethanol
+        trajs = np.random.randint(0, self.com.shape[1], size=3)
+        print(trajs)
+        for i in trajs:
+            plt.plot(self.time, self.com[:, i, 2], linewidth=2)
+
+            plt.ylabel('$z$-coordinate (nm)', fontsize=14)
+            plt.xlabel('Time (ns)', fontsize=14)
+            plt.gcf().get_axes()[0].tick_params(labelsize=14)
+        plt.tight_layout()
+
+        plt.show()
+        exit()
 
         self.weights = True
         if self.com.shape[1] == 1:
