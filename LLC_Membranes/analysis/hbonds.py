@@ -43,7 +43,8 @@ def initialize():
     parser.add_argument('-a', '--atoms', action='append', nargs='+', help='Atoms to include for each '
                         'residue. Each list of atoms must be passed with a separate -a flag for each residue in'
                         'args.residues')
-    parser.add_argument('-d', '--distance', default=.3, help='Maximum distance between acceptor and donor atoms')
+    parser.add_argument('-d', '--distance', default=.3, type=float, help='Maximum distance between acceptor and donor'
+                                                                         ' atoms')
     parser.add_argument('-angle', '--angle_cut', default=20, help='Maximum DHA angle to be considered an H-bond')
     parser.add_argument('-xlink', '--xlink', action="store_true", help='Specify if system is cross-linked since'
                                                                        'the topology will be set up')

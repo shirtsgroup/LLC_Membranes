@@ -3,7 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from LLC_Membranes.llclib import file_rw, topology
-from LLC_Membranes.analysis.hbonds import System, Topology, Residue
+from LLC_Membranes.analysis.hbonds import System, Residue
 import names
 from matplotlib.patches import Patch 
 
@@ -19,7 +19,7 @@ n = []
 n_std = []
 start = 0
 
-fig, ax = plt.subplots(figsize=(10, 5))
+fig, ax = plt.subplots(figsize=(7, 5))
 bar_width = 0.2
 opacity = 0.8
 loc = 0
@@ -59,7 +59,7 @@ for i in solutes:
         ax.bar(loc, double, bar_width, color='xkcd:orange', alpha=opacity)
         loc += bar_width
         #print(single / double)
-    if triple != 0:
+    if triple > 0.1:
         ax.bar(loc, triple, bar_width, color='xkcd:green', alpha=opacity)
         loc += bar_width
         #print(double / triple)
@@ -69,7 +69,6 @@ for i in solutes:
         #print(triple / quadruple)
 
     xticks.append((-bar_width / 2) + start_loc + (loc - start_loc) / 2)
-
     loc += bar_width
 
 custom = [Patch(facecolor='xkcd:blue', alpha=opacity),

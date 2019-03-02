@@ -54,11 +54,11 @@
   
 %  There are a number of questions that we wish to answer in order to create a
 %  framework for studying this system in even greater detail.
-  There are a number of questions we wish to address in order to characterize
+  \noindent There are a number of questions we wish to address in order to characterize
   transport in this system.
   \begin{enumerate}
   
-   	\item What transport mechanisms do we observe?
+   	\item What transport mechanisms do we observe? \label{question:mechanisms}
   	
   	Given that the pores will restrict motion of the solutes, we anticipate that 
   	transport will be hindered in some way. We want to understand the differences in
@@ -67,7 +67,7 @@
   	between solutes, the membrane, and water in order to determine which mechanism
   	or mechanisms dominate.
   
-  	\item How do molecules, including water, partition within the pores?
+  	\item How do molecules, including water, partition within the pores? \label{question:partition}
   	
   	From a macroscopic perspective, it is straightforward to hypothesize that the water and
   	polar solutes spend their time exclusively in the tube-like hydrophilic pore region.
@@ -78,7 +78,7 @@
   	and any resultant influence it might have on mechanistic properties.
   	
   	\item Can we describe the transport mechanisms using pre-existing 
-  	mathematical models.
+  	mathematical models. \label{question:math}
   	
   	A mathematical model may provide additional insight into the transport
   	mechanisms and, in future work, can help relate performance on the 
@@ -87,7 +87,7 @@
   	governing model. 
   	
   	\item How can we modify the current monomers in order to enhance
-  	solute-specific separations? 
+  	solute-specific separations? \label{question:math}
   	
   	Most experimental characterization up to this point has been centered 
   	around the monomer, Na-GA3C11, studied here. The primary reason for conducting
@@ -99,7 +99,8 @@
   	
   \end{enumerate} 
   
-  There are number of questions this study is not intended to answer.
+  \noindent There are also a number of questions this study is not intended 
+  to answer.
   \begin{itemize}
     \item We will not study the concentration dependence of the observed
     transport rates. Although the average MSD might change with concentration,
@@ -108,7 +109,7 @@
     regardless of concentration.
     \item We will not study the chemical potential of solutes in the pores, which
     could give us a better understanding of equilibrium solute partitioning.
-    However, this information will not greatly enhance our understanding of 
+    This information will not greatly enhance our understanding of 
     mechanistic details in various membrane regions.
     \item Both of the above points will add unnecessary levels of complexity
     which can be left for a future study. 
@@ -162,7 +163,7 @@
 %  We cross-linked the equilibrated solvated configuration using the cross-linking procedure
 %  described in our previous work. 
 
-  We equilibrated an initial solvated configuration before adding solutes.
+  \noindent We equilibrated an initial solvated configuration before adding solutes.
   \begin{itemize}
 	\item We equilibrated the initial configuration using the `wet'
 	equilibration procedure described in our previous work~\cite{coscia_understanding_2019}.
@@ -170,7 +171,7 @@
 	cross-linking procedure described in our previous work. 
   \end{itemize}
 
-  We added 6 solute molecules to each pore of the equilibrated cross-linked
+  \noindent We added 6 solute molecules to each pore of the equilibrated cross-linked
   configuration.
   \begin{itemize}
 	\item We equally spaced each solute in the pore
@@ -184,52 +185,63 @@
 	\item We collected transport data using 1 $\mu$s simulations
   \end{itemize}
   
-%  \subsubsection*{Modeling subdiffusion}\label{method:model_sFBM}
-%
-%  Solutes in our H\textsubscript{II} LLC membrane exhibit subdiffusive
-%  behavior, a type of anomalous diffusion. 
-%  \begin{itemize}
-%  	\item During an anomalous diffusion process, the mean squared displacement (MSD)
-%  	does not grow linearly with time, rather it is of the form:
-%	\begin{equation} 
-%	\langle x^2(t) \rangle = K_{\alpha}t^\alpha
-%	\label{eqn:msd_form}
-%	\end{equation} 
-%	where $\alpha$ is the anomalous exponent and $K_\alpha$ is the
-%	generalized diffusion coefficient.
-%	\item A value of $\alpha < 1$ indicates a subdiffusive process, while a value of
-%	$\alpha = 1$ and $\alpha > 0$ is characteristic of Brownian and superdiffusive
-%	motion respectively.
-%  \end{itemize}
-%
-%  \noindent We calculated both the ensemble-averaged and time-averaged MSDs
-%  of the simulated trajectories.
-%  \begin{itemize}
-%	\item The ensemble-averaged MSD measures the displacement of a particle from its initial
-%	position~\cite{meroz_toolbox_2015} and can be written as
-%	\begin{equation}
-%	\langle x^2(t) \rangle = \langle x(t) - x(0) \rangle
-%	\label{eqn:ensemble_msd}
-%	\end{equation}
-%%	\item The average MSD calculated in this way recovers the form of
-%%	Equation~\ref{eqn:msd_form}. % time-averaged should recover it too for FBM 
-%	\item The time-averaged MSD measures the displacement between all possible time lags
-%	and can be written as
-%	\begin{equation}
-%	\overline{x^2(\tau)} = \dfrac{1}{T - \tau}\int_{0}^{T - \tau} (x(t + \tau) - x(t))^2 dt
-%	\end{equation}
-%	where $\tau$ is the time lag and T is the length of the
-%	trajectory~\cite{meroz_toolbox_2015}. 
-%%	\item The time-averaged MSD becomes linear in our simulations,
-%%	therefore we can fit a line to its slope in order to estimate the macroscopic
-%%	diffusivity of the particle.
-%	%BJC: this needs more justification. Not many people have done it
-%	%BJC: could also not report them as diffusivities. Comparison of total MSD
-%	% should give same information
-%	% Linear region probably exists because dwell times on the order of large lag times
-%	% become negligible
-%  \end{itemize}
-%  
+  \subsection*{Mean Squared Displacement}\label{method:MSD}
+
+  \noindent We measured the time-averaged mean squared displacement (MSD)
+  of the centers of mass of each solute over the course of 1 $\mu$s MD 
+  simulations using Equation~\ref{eqn:tamsd}.
+  \begin{itemize}
+    \item \begin{equation}
+	\overline{x^2(\tau)} = \dfrac{1}{T - \tau}\int_{0}^{T - \tau} (x(t + \tau) - x(t))^2 dt
+	\label{eqn:tamsd}
+	\end{equation}
+	where $\tau$ is the time lag and T is the length of the
+	trajectory~\cite{meroz_toolbox_2015}. 
+	\item Generally, the MSD grows according to Equation~\ref{eqn:msd_form},
+	\begin{equation} 
+	\langle x^2(t) \rangle = K_{\alpha}t^\alpha
+	\label{eqn:msd_form}
+	\end{equation} 
+	\item where $\alpha$ is the anomalous exponent and $K_\alpha$ is the
+	generalized diffusion coefficient.
+	\item A value of $\alpha < 1$ indicates a subdiffusive process, while a value of
+	$\alpha = 1$ and $\alpha > 1$ is characteristic of Brownian and superdiffusive
+	motion respectively.
+	\item In practice, $\alpha$ corresponds to the growth of the \textit{ensemble}
+	MSD given by Equation~\ref{eqn:ensemble_msd}~\cite{meroz_toolbox_2015}:
+	\begin{equation}
+	\langle x^2(t) \rangle = \langle x(t) - x(0) \rangle
+	\label{eqn:ensemble_msd}
+	\end{equation}
+	\item The ensemble MSD is calculated with respect to a reference position and
+	hence carries some dependence on its starting point.
+	\item The time-averaged MSD averages over all possible time lags of a given 
+	length, effectively eliminating any initial configuration dependence and generating
+	an increased number of observations. 
+	\item For ergodic systems, both types of MSDs will be equal.
+	\item Since we have a small number of solutes with which to generate statistics
+	and because we are not calculating values for $\alpha$ in this particular study,
+	we will only use the time-averaged MSD.
+  \end{itemize}  
+  
+  %BJC: need to word this differently since I haven't talked about CTRW yet
+  \noindent We fixed the length of each simulated trajectory so that we could compare
+  the total MSD between different solutes without the influence of the ageing phenomenon.
+  \begin{itemize}
+	\item Ageing is defined by the tendency of the average MSD to decrease
+	as the length of trajectories are increased~\cite{metzler_anomalous_2014}.
+	\item The maximum measured dwell time can be no longer than the total length
+	of a simulated trajectory. 
+	\item As measurement time or trajectory length is increased, longer dwell times
+	are incorporated into the calculation, lowering the average MSD. (See supporting
+	info for demonstration)
+	\item Because the MSDs are non-linear and because of the ageing phenomenon, we
+    did not attempt to calculate a diffusion constant as one might for a Brownian
+    particle with a linear MSD.
+	\item Instead, the reported values for MSD represent the average MSD for a given
+	solute after a 400 ns time lag.
+  \end{itemize} 
+  
 %  \noindent Three common mathematical models for modeling anomalous subdiffusion processes include 
 %  continuous time random walks (CTRW), fractional Brownian motion (FBM) and
 %  random walks on fractals (RWF).\cite{meroz_toolbox_2015}
@@ -244,7 +256,7 @@
 %    ends cause anti-correlated motion.\cite{meroz_toolbox_2015,neusius_subdiffusion_2008}
 %    \item The processes described above can happen alone or in combination.  	
 %  \end{itemize}
-%  
+  
 %  \noindent We believe that solutes in the system studied here exhibit subordinated 
 %  fractional Brownian motion (sFBM) where the parent process is FBM and the 
 %  leading process is a CTRW. 
@@ -267,114 +279,21 @@
 %  	where $\alpha$ is the anomalous exponent characteristic of the leading CTRW process
 %  	and $\beta$ is the anomalous exponent characteristic of the parent FBM process. 
 %  \end{itemize}
-%
-%  \noindent We can characterize a CTRW process using the parameters which describe its
-%  dwell time and hop length distribution.
-%  \begin{itemize}
-%	\item We used the \texttt{ruptures} python package in order to identify
-%	breakpoints in solute trajectories.\cite{truong_ruptures:_2018} (See Supporting Information for more
-%	details on chosen parameters. i.e. type of cost function, cost function penalty
-%	tolerance, number of dimensions used)
-%	\item The corresponding hop lengths and dwell times between break points were 
-%	used to construct empirical distributions.
-%	\item For solutes in our system, the distribution of hop lengths is
-%	well-represented by a Gaussian distribution.~\cite{metzler_random_2000,
-%	metzler_anomalous_2014,neusius_subdiffusion_2009}
-%	\item We are most interested in the standard deviation, $\sigma$, of the 
-%	hop length distribution.
-%	\item The distribution of dwell	times is expected to fit a power law (or heavy-tailed)
-%	distribution proportional to $t^{-1-\alpha}$.~\cite{meroz_toolbox_2015}
-%	\item Because we are limited to taking measurements at discrete values
-%	dictated by the output frequency of our simulation trajectories, we fit the
-%	empirical dwell times to a discrete power law distribution whose maximum
-%	likelihood $\alpha$ parameter we calculated by maximizing the following
-%	likelihood function: 
-%        \begin{equation}
-%	\mathcal{L}(\beta) = -n\text{ln}\zeta(\beta, x_{min}) -
-%	\beta\sum_{i=1}^{n} \text{ln}~x_i 
-%	\label{eqn:powerlaw_likelihood}
-%	\end{equation}
-%	where $\beta = 1 + \alpha$, $x_i$ are collected dwell time data points,
-%	$n$ the total number of data points, and $\zeta$ is the Hurwitz zeta function
-%	where $x_{min}$ is the smallest measured value of
-%	$x_i$.~\cite{clauset_power-law_2009} 
-%	\item We obtained distributions of the hop length standard deviations, $\sigma$, and
-%	$\alpha$ using statistical bootstrapping.\cite{efron_introduction_1994} 
-%  \end{itemize}
-%  
-%  \noindent FBM processes can be described using the Hurst parameter, $H$, where 
-%  $H = \beta/2$.
-%  \begin{itemize}
-%  	\item Brownian motion is recovered for $H = 0.5$
-%	\item The autocovariance function of hop lengths has the analytical form:~\cite{mandelbrot_fractional_1968}
-%    \begin{equation}
-%	\gamma(k) = \dfrac{1}{2}\bigg[|k-1|^{2H} - 2|k|^{2H} + |k+1|^{2H}\bigg]
-%	\label{eqn:autocovariance}
-%	\end{equation}
-%	where $k$ is the number of increments between hops.
-%	\item We obtained H by performing a least squares fit of Equation~\ref{eqn:autocovariance}
-%	to the empirically measured autocovariance function.
-%	\item We used statistical bootstrapping to generate a distribution of $H$ 
-%	values. %BJC: can provide more detail in supporting or just reference python script
-%  \end{itemize}
-%
-%%  We generated distributions of parameters for the dwell time and hop length
-%%  distributions using statistical bootstrapping.
-%%  \begin{itemize}
-%%	\item For each type of distribution, we randomly selected $n$ data points from the empirical
-%%	distribution with replacement.
-%%	\item We repeated the fitting procedure described above for each of 200 bootstrap trials.
-%%  \end{itemize} 
-%
-%%  We calculated macroscopic diffusion coefficients by simulating trajectories orders of
-%%  magnitude longer than our molecular simulations.
-%  \noindent For each solute, we simulated 10000 sFBM trajectories for 1 $\mu$s each. 
-%  \begin{itemize}
-%	\item We constructed trajectories by simulating	sequences of dwell times and correlated 
-%	hop	lengths generated based on parameters randomly chosen from our bootstrapped parameter
-%	distributions.
-%	\item We propagated each trajectory until the total time reached 1 $\mu$s, and truncated
-%	the last data point so that the total time exactly equaled 1 $\mu$s. 
-%    \item Valid comparisons are only possible between fixed length sFBM simulations. The
-%    power law dwell time behavior gives rise to the aging phenomenon, embodied by
-%    a decrease in MSD with measurement time.~\cite{neusius_subdiffusion_2008,metzler_anomalous_2014}
-%    \item We reported the MSD after 1 $\mu$s with corresponding 95 \% intervals
-%% Following probably better suited for supporting information, if included at all
-%%	\item We randomly sample Gaussian hop lengths using the
-%%	\texttt{numpy.random.normal} method of the \texttt{numpy} python package.
-%%	\item We randomly sampled dwell times from a discrete power law
-%%	distribution based on the recommendations of Clauset et
-%%	al.~\cite{clauset_power-law_2009}: 
-%%	\begin{equation}
-%%	x = \lfloor
-%%	(x_{min} - \tfrac{1}{2})(1 - r)^{-1/(\alpha - 1)} + \tfrac{1}{2} \rfloor
-%%	\label{eqn:discrete_powerlaw_draws}
-%%	\end{equation}
-%%	where $r$ is randomly drawn from a uniform distribution which we simulated
-%%	with \texttt{numpy.random.uniform}.
-%%	\item We found that thermal noise does not significantly influence the MSD and
-%%	therefore did not add any noise to the simulated trajectories. (See supporting info)
-%  \end{itemize}
-%
-%%BJC: probably don't need to explain this in great detail
-%%  \noindent We fixed the length of each simulated trajectory so that we could compare the total
-%%  MSD between different solutes without the influence of the ageing phenomenon.
-%%  \begin{itemize}
-%%	\item Ageing is defined by the tendency of the average MSD to decrease
-%%	as the length of trajectories are increased~\cite{metzler_anomalous_2014}.
-%%	\item The maximum measured dwell time can be no longer than the total length
-%%	of a simulated trajectory. 
-%%	\item As measurement time or trajectory length is increased, longer dwell times
-%%	are incorporated into the calculation, lowering the average MSD. (See supporting
-%%	info for demonstration)
-%%	\item We can achieve consistent total MSDs with low uncertainty for
-%%	simulated trajectories created with a given set of parameters if we fix the
-%%	trajectory length (as opposed to total number of steps).  
-%%  \end{itemize}
 
-  \subsection*{Mean Squared Displacment}
+  \subsection*{Dwell and Hop Length Distributions}\label{method:hops_and_dwells}
 
-  \subsection*{Radial Distribution Functions}
+  \noindent We measured the distribution of dwell times and hop lengths in order to test
+  the hypothesis that solutes follow a CTRW process.
+  \begin{itemize}
+	\item We used the \texttt{ruptures} python package in order to identify
+	breakpoints, times when hops occur, in solute trajectories.\cite{truong_ruptures:_2018}
+	(See Supporting Information for more details on chosen parameters. i.e. type of cost 
+	function, cost function penalty	tolerance, number of dimensions used)
+	\item The corresponding hop lengths and dwell times between break points were 
+	used to construct empirical distributions.
+  \end{itemize}
+
+  \subsection*{Radial Density Functions}
 
   We measured the average radial distance of each solute of interest from the pore
   centers.
@@ -385,13 +304,33 @@
 	small degree of tortuosity which disrupts the RDF calcuation 
 	\item We obtain the best RDF by constructing splines that run through the
 	pore centers.
-	\item We construct the splines by dividing the membrane into 20 slices
+	\item We construct the splines by dividing the membrane into 10 slices
 	in the $z$-direction. Within each slice, we calculate the location of 
 	the pore centers based on the average location of the aromatic rings
 	that make up the monomer head groups.
 	\item When calculating the RDF, the radial distance from the pore center
-	is based on the distance between the solute center-of-mass and the ($x$, $y$)
-	coordinates of appropriate point on the spline.
+	is based on the distance between the solute center-of-mass and the linearly
+	interpolated ($x$, $y$)	coordinates of the pore center calculated based
+	on the spline.
+  \end{itemize}
+  
+  \subsection*{Identification of Hydrogen Bonds}
+  
+  Based on the geometric criteria proposed by Luzar and Chandler \cite{luzar_effect_1996},
+  we determined a hydrogen bond to exist if the distance between the donor, D, and acceptor,
+  A, atoms is less than 3.5 \AA~and the angle formed by D--H...A is less than 30\degree.
+    %BJC: According to Luzar/Chandler: The range of a water molecule’s first coordination
+    % shell is 3.5 Å, as determined from the oxygen-oxygen radial distribution function.
+    % The amplitude of librations that break hydrogen bonds is ,~ 30 degrees, as estimated
+    % from Debye-Waller factors
+  \begin{itemize}
+    \item Attempts to describe a hydrogen bond in the context of molecular simulations has
+    yielded a number of definitions with no true consensus \cite{prada-gracia_quest_2013}.
+	\item The geometry of hydrogen bonds has some dependence on the system being studied. 
+    \item The definition of Luzar and Chandler is easily visualized for trajectories using
+    the \texttt{hbonds} representation of the Visual Molecular Dynamics (VMD) software 
+    package which allows us to directly check the validity of identified hydrogen bonds.
+    %BJC: might need to update this if something better exists for nitrogen 
   \end{itemize}
 
   \subsection*{Coordination number}
@@ -407,14 +346,123 @@
    
   \section{Results and Discussion}
   
-  \subsection*{Governing Mechanisms}\label{section:mechanism_overview}  
+  \subsection*{Structure and Transport of Membrane Components}\label{section:membrane_components}
   
-  We have gained a clearer picture of the general transport properties exhibited by
-  this system through the collective study of all solutes. We will first answer the
-  questions posed in the introduction in a general sense before addressing them with
-  respect to specific molecules where exceptions occur.
+  %BJC: Probably do analysis on pure water system for this section.  
   
-  On the timescales simulated in our study, we observe subdiffusive behavior.  
+  In contrast to our previous work with a solvent-free version of this membrane, the pore
+  region of the 5 and 10 wt \% water systems are primarily filled with water and sodium
+  ions.
+  \begin{itemize}
+    \item In dry systems, the pore center is densely filled with sodium ions and 
+    head groups (See Ref~\cite{coscia_understanding_2019}).
+    \item Figure~\ref{fig:component_densities} plots the densities of each
+    membrane component.
+    \item Water is densest at the center of each pore. 
+    \item Sodium ions are densest within the pore region, which we define as the
+    space between the pore center and the peak head group density.
+    \item The peak density of sodium ions is not at the pore center in either case
+    likely because they are still loosely associated with the monomer's 
+    carboxylate head groups.
+  \end{itemize}
+  
+  \noindent Pores in the 10 wt\% water system are wider and less crowded by monomers than
+  those in the 5 wt\% water system.
+  \begin{itemize}
+    \item The peak head group density of 10 wt\% water systems is about 0.2 nm
+    further from the pore center than the 5 wt\%
+    \item The 5 wt \% water system has a non-negligible amount of tail group atoms
+    that occupy the pore center.
+  \end{itemize}
+  
+  %BJC: I'm not sure if would be better to normalize the densities so that the
+  % shape of the sodium density is more pronounced
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{component_density_5wt.pdf}
+  \caption{5 wt\% water}\label{fig:component_density_5wt}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{component_density_10wt.pdf}
+  \caption{10 wt\% water}\label{fig:component_density_10wt}
+  \end{subfigure}
+  \caption{The radial densities of various monomer components paint a picture of the
+  pore topology where the pore centers are primarily composed of water and sodium ions.
+  The 5 wt \% system (a) appears to be much more crowded by monomers than the 
+  10 wt \% system (b). Head groups in (a) are densest closer to the pore center than
+  in (b). A small amount of tail components find their way close to the pore center 
+  of the 5 wt \% system. }\label{fig:component_densities}
+  \end{figure}
+  
+  The MSD of sodium and water become linear on long timescales.
+  \begin{itemize}
+    \item
+  \end{itemize}
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{water_msd_comparison.pdf}
+  \caption{Water}\label{fig:water_msd_comparison}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{na_msd_comparison.pdf}
+  \caption{Sodium Ions}\label{fig:na_msd_comparison}
+  \end{subfigure}
+  \caption{}\label{fig:msd_comparison}
+  \end{figure}
+  
+  Sodium coordinates with water.
+  
+  \noindent The diffusion constant of water is about 50 times faster than sodium.
+  \begin{itemize}
+    \item In a dilute sodium chloride solution, the diffusivity of sodium
+    is about 4 times slower than water.
+    \item The carboxylate groups, whose oxygen atoms each have a charge of -0.822
+    keep the positively charged sodium ions relatively close and restricts their
+    motion.
+  \end{itemize}
+  
+  \subsection*{Mechanisms Governing Small Solute Transport}\label{section:mechanism_overview}
+  
+  \noindent The MSDs for the solutes studied in this work span a moderate range. 
+  \begin{itemize}
+    \item We plotted the 400 ns time-lag MSD for each solute in Figure~\ref{fig:all_msds}.
+  	\item The fastest solute, methanol, has an MSD over 20 times greater than
+  	the slowest, dimethyl formamide. 
+  \end{itemize}
+  
+  \noindent The MSDs are not a monotonic function of solute size.
+  \begin{itemize}
+  	\item We plotted the solute size against their MSDs in Figure~\ref{fig:all_msds}.
+  	\item Tetrose, our fifth largest solute, has an average MSD higher than more 
+  	than half of all solutes studied. 
+  	\item The two slowest solutes, DMF and THF, are smaller than 10 faster solutes.
+  	\item Transport is clearly affected by factors other than molecular size. 
+  \end{itemize}
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.5\textwidth}
+  \includegraphics[width=\textwidth]{all_10wt_tamsds.pdf}  % include bar plot of MW to show it's non-monotonic
+  \caption{}\label{fig:all_msds}
+  \end{subfigure}
+  \begin{subfigure}{0.5\textwidth}
+  \includegraphics[width=\textwidth]{msd_radius.pdf} 
+  \caption{}\label{fig:msd_radius}
+  \end{subfigure}
+  \caption{}\label{fig:msds}
+  \end{figure}  
+  
+%  We have gained a clearer picture of the general transport properties exhibited by
+%  this system through the collective study of all solutes. We will first address the
+%  questions posed in the introduction in a general sense before addressing them with
+%  respect to specific molecules, where exceptions occur.
+%  \bigskip
+  
+  \noindent On the timescales simulated in our study, we observe subdiffusive behavior.
+  %, providing the beginnings of an answer to question~\ref{question:mechanisms}.
   \begin{itemize}  
     \item Figure~\ref{fig:example_ztraces} plots the $z$-coordinate versus time of
   	3 representative ethanol centers of mass.
@@ -423,6 +471,21 @@
 	and is sublinear.
 	\item The long periods of entrapment likely lead to this sublinear, and thus
 	subdiffusive, behavior.
+  \end{itemize}
+  
+  Solutes partition out of the pore into the head group region and beyond which
+  may lead to radially dependent transport mechanisms.
+  \begin{itemize}
+    \item It is clear from Figure~\ref{fig:example_ztraces} that the longest 
+    periods of entrapment generally occur when solutes are far from the pore
+    center.
+    \item There is a high resistance to movement in the dense head group and
+    tail regions.
+    \item When hops occur, and where there is the most $z$-positional noise, 
+    solutes are generally close to the pore center.
+    %BJC: need a radial density of head groups, tails, water etc.
+    \item Solutes can move relatively freely when they enter the pore region
+    which is primarily composed of water molecules.
   \end{itemize}
   
   \begin{figure}
@@ -435,27 +498,52 @@
   \includegraphics[width=\linewidth]{example_msd.pdf}
   \caption{}\label{fig:example_msd}
   \end{subfigure}
-  \caption{}\label{fig:qualitative_mechanisms}
+  \caption{All solutes show subdiffusive transport behavior inside the membrane's
+  nanopores, similar to that exhibited by ethanol. (a) The $z$-coordinate trace of
+  3 representative ethanol COMs shows clear periods of entrapment separated by hops.
+  In general, the longest dwell times occur when solutes are situated far from the
+  pore center and the hops occur when solutes are close to the pore center. (b) The
+  time-averaged MSD of ethanol is not linear which suggests transport is governed 
+  by an anomalous subdiffusion process.}\label{fig:qualitative_mechanisms}
   \end{figure}
+  
+  In addition to solute trapping in dense monomer regions, we observe a second
+  trapping mechanism caused by preferential hydrogen bonding between 
+  hydrogen bond donor solutes and monomer carboxylate groups. 
+  \begin{itemize}
+    \item Of the time spent donating hydrogen atom(s), x \% of the hydrogen
+    bonds occur between solutes and carboxylate groups as opposed to solutes
+    with water. 
+    \item This shows a high perference for the carboxylate anions since there
+    are 5 times more water molecules in the system.
+    \item The carboxylate oxygen atoms have a slightly higher partial negative
+    charge than water molecules.
+    \item Additionally, on average, each sodium ion is coordinated to 3 water
+    molecules. Roughly all of the water in the pore region is usually coordinated
+    to a sodium ion which decreases their availability to solutes.
+  \end{itemize}
   	
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  Mathematical modeling 
-  All solutes exhibit hop diffusion, characteristic of a continuous time random walk.	
+  \noindent The hopping and trapping mechanism exhibited by all solutes is characteristic of
+  a continuous time random walk (CTRW) model.	
   \begin{itemize}
   	\item The length of entrapment follows a power law distribution 
   	(Figure~\ref{fig:example_powerlaw}) and the distribution of hop lengths can be 
   	described with a Gaussian distribution (Figure~\ref{fig:example_hop_dist}).
   	\item Power law distributed dwell times are responsible for the ageing phenomenon
-  	which causes the MSD curve to decrease with increasing measurement time as longer
-  	dwell times get sampled.
+  	which causes the slope of the MSD curve to decrease with increasing measurement
+  	time because longer dwell times are sampled.  %BJC: might need to reword this a bit 
+ 	\item Although these observed distributions strongly support a CTRW model, the time-averaged
+ 	MSD of a pure CTRW should be linear which is not the case.~\cite{neusius_subdiffusion_2008,meroz_subdiffusion_2010}
   \end{itemize}
   
-  \noindent The direction of each hop is anti-correlated to the direction of the previous hop.
+%  \noindent The direction of each hop is anti-correlated to the direction of the previous hop.
+  \noindent Transport may be better described by a subordinated fractional brownian motion 
+  (sFBM) model.
   \begin{itemize}
   	\item Figure~\ref{fig:example_autocovariance} shows the autocovariance function of 
   	ethanol step vectors. % BJC: vectors because includes magnitude + direction. Better word?
   	\item The negative autocovariance at low values of k indicates anti-correlation
-  	between steps. 
+  	between hops. 
   	\item If solutes followed a pure CTRW mechanism, the autocovariance function would
   	decay to zero immediately.
   	\item Although the autocovariance function is relatively noise, due to the somewhat small
@@ -463,31 +551,17 @@
   	uncertainty at k=1, the most insightful data point. This behavior is consistent across
   	all solutes molecules. % Can put error bars on points
   	\item Therefore, we believe transport can be described as subordinated fractional Brownian
-  	motion where the leading process is a CTRW with hops that are dictated by the parent
+  	motion where the leading process is a CTRW with hops whose direction is dictated by the parent
   	process, FBM.
   	\item Future publications will focus on modeling the solute's transport characteristics
   	with an sFBM model
+  	\item We will draw on these observations only in a qualitative sense for the remainder of this work.
   \end{itemize}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% BJC: first iteration of figure after this before I decided to include a hop length and dwell time distribution
-%  \begin{figure}
-%  \centering
-%  \includegraphics[width=\textwidth]{msd_ztrace_acf.pdf}
-%  \caption{}\label{fig:msd_ztrace_acf}
-%  \end{figure}
+  
+  %BJC: seems like the MSD becomes linear at long times. Perhaps due to loss of memory with time.
 
   \begin{figure}
   \centering
-  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\linewidth]{example_msd.pdf}
-  \caption{}\label{fig:example_msd}
-  \end{subfigure}
-  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\linewidth]{example_ztraces.pdf}
-  \caption{}\label{fig:example_ztraces}
-  \end{subfigure}
-  \par\medskip
   \begin{subfigure}{0.325\textwidth}
   \includegraphics[width=\linewidth]{example_powerlaw.pdf}
   \caption{}\label{fig:example_powerlaw}
@@ -500,119 +574,78 @@
   \includegraphics[width=\linewidth]{example_autocovariance.pdf}
   \caption{}\label{fig:example_autocovariance}
   \end{subfigure}
-  \caption{All solutes show subdiffusive transport behavior inside the membrane's
-  nanopores, similar to that exhibited by ethanol. (a) The time-averaged MSD of 
-  ethanol is not linear which suggests transport is governed by an anomalous 
-  subdiffusion process. (b) The $z$-coordinate trace of 3 representative ethanol
-  COMs shows clear periods of entrapment separated by hops. (c) The distribution
-  of dwell times follows a power law. (d) The distribution of hop lengths appears
-  Gaussian. (e) Hops are anti-correlated to their previous hop as indicated by the
-  negative value of the autocovariance function at $k$ = 1.}\label{fig:examples}
+  \caption{(a) The distribution of dwell times resembles a power law distribution. 
+  (b) The distribution of hop lengths appears Gaussian. (c) Hops are anti-correlated
+  to their previous hop as indicated by the negative value of the autocovariance 
+  function at $k$ = 1.}\label{fig:examples}
   \end{figure}
   
-  % BJC: would it be better to report as a fraction of water MSD?
-  % BJC: need MSDs of 5 wt % systems here too. Can narrow to study of 10 wt % systems after
-  \noindent We calculated the time-averaged MSD of each solute in the set over the
-  course of 1 $\mu$s MD simulations. 
-  \begin{itemize}
-    \item Because the MSDs are non-linear and because of the ageing phenomenon, we
-    did not attempt to calculate a diffusion constant as one might for a Brownian
-    particle with a linear MSD.
-	\item Instead, the MSD values plotted in Figure~\ref{fig:all_msds} represent the
-	average MSD of each solute after a 400 ns time lag.
-  \end{itemize}  
-  
-%  \subsubsection*{The Influence of Water Content on Macroscopic Diffusion Coefficients}
-%
-%  Solutes in systems with lower water content exhibit lower diffusion coefficients.
+%  \noindent The MSDs in Figure~\ref{fig:all_msds} are a strong function of two solute 
+%  trapping mechanisms.
 %  \begin{itemize}
-%	\item Pores are more crowded when there is less water (show RDFs of each)
-%	\item Not a linear function of pore size - radius increase by x, D increases by y
-%	\item Larger influence on bigger molecules
+%  	\item Solutes that are hydrogen bond donors can be stabilized through hydrogen bonds
+%  	with one of the five oxygen atoms attached to each monomer head group. 
+%  	\item In a separate interaction, solutes can become kinetically trapped between or behind
+%  	monomer head groups. These interactions likely lead to the observed anti-correlated
+%  	hopping	behavior.
+%  	\item Generally, both mechanisms affect each solute to varying degrees.
 %  \end{itemize}
   
-  \begin{figure}
-  \centering
-  \includegraphics[width=\textwidth]{all_tamsds.pdf}  % include bar plot of MW to show it's non-monotonic
-  \caption{}\label{fig:all_msds}
-  \end{figure}
-  
-  \noindent The MSDs are not a monotonic function of solute molecular weight.
-  \begin{itemize}
-  	\item We plotted the solute molecular weights alongside their MSDs in Figure~\ref{fig:all_msds}.
-  	\item Transport is clearly affected by factors other than molecular weight. 
-  	\item Tetrose, our third heaviest solute, has an MSD higher than more than half of
-  	all solutes studied. 
-  	\item The three slowest solutes have lower molecular weights than 8 faster solutes.
-  \end{itemize}
-  
-  \noindent The MSDs in Figure~\ref{fig:all_msds} are a strong function of two solute 
-  trapping mechanisms. % by which solutes become trapped.
-  \begin{itemize}
-  	\item Solutes that are hydrogen bond donors can be stabilized through hydrogen bonds
-  	with one of the five oxygen atoms attached to each monomer head group. 
-  	\item In a separate interaction, solutes can become kinetically trapped between or behind
-  	monomer head groups. These interactions likely lead to the observed anti-correlated
-  	hopping	behavior.
-  	\item Generally, both mechanisms affect each solute to varying degrees.
-  \end{itemize}
-  
-  %BJC: somewhere need to say why solutes preferentially hbond with carboxylate groups -- is this real
-  
   %BJC: This will need updating once all the rest of outline is written.
-  \noindent The degree to which solutes are influenced by each entrapment mechanism
-  is a complex function of a solute's size, shape, and polarity.
-  \begin{itemize}
-    \item In general, solutes can move fastest in the pore center, where
-    there is comparatively little resistance to diffusion.
-	\item The 5 fastest solutes in our study have a low molecular weight and
-	spend a significant amount of time in the pore center. They are only slowed
-	by hydrogen bonds with monomer carboxylate groups.
-	\item Bulky solutes with many hydrogen bond donating groups, like glycerol,
-	spend most of their time in the pore center, but their large size combined
-	with a higher solute-head group hydrogen bond frequency, makes their dynamics slow. 
-    \item Solutes with high hydrophobic character tend to partition into the 
-    head group region where entrapment occurs.
-    \item We observe low MW solutes with lower-than-expected MSDs because they
-    spend more time trapped between monomer head groups due to low water
-    solubility.
-    \item Small, planar molecules, without the ability to donate hydrogen bonds, like acetone,
-    exhibit some of the slowest MSDs. Their flat geometry and small size makes it easy for 
-    them to get lodged deep between head groups.
-  	\item Overall solutes exhibit some degree of trapping, by one or a combination of the above
-  	mechanisms, with anticorrelated hops between each period of immobility due to 
-  	obstructions.
-  \end{itemize}
+%  \noindent The degree to which solutes are influenced by each entrapment mechanism
+%  is a complex function of a solute's size, shape, and polarity.
+%  \begin{itemize}
+%    \item In general, solutes can move fastest in the pore center, where
+%    there is comparatively little resistance to diffusion.
+%	\item The 5 fastest solutes in our study have a low molecular weight and
+%	spend a significant amount of time in the pore center. They are only slowed
+%	by hydrogen bonds with monomer carboxylate groups.
+%	\item Bulky solutes with many hydrogen bond donating groups, like glycerol,
+%	spend most of their time in the pore center, but their large size combined
+%	with a higher solute-head group hydrogen bond frequency, makes their dynamics slow. 
+%    \item Solutes with high hydrophobic character tend to partition into the 
+%    head group region where entrapment occurs.
+%    \item We observe low MW solutes with lower-than-expected MSDs because they
+%    spend more time trapped between monomer head groups due to low water
+%    solubility.
+%    \item Small, planar molecules, without the ability to donate hydrogen bonds, like acetone,
+%    exhibit some of the slowest MSDs. Their flat geometry and small size makes it easy for 
+%    them to get lodged deep between head groups.
+%  	\item Overall solutes exhibit some degree of trapping, by one or a combination of the above
+%  	mechanisms, with anticorrelated hops between each period of immobility due to 
+%  	obstructions.
+%  \end{itemize}
   
   %BJC: potential figure to go with above paragraph
   % (a) Plot showing how biggest jumps are at pore center
   % (b) Illustrate preference for hbonds carboxylate head groups
   
-  We will revisit these observations in the the context of specific groups of 
+  We will revisit our observations in the the context of specific groups of 
   molecules in the discussion that follows.
 
 %  We will explore these factors in greater detail in the context of 
 %  specific groups of molecules in the discussion that follows.
 
-  \subsection*{Transport of Water}
-
-  The MSD of water is a weak function of the solute residue disolved in
-  the pores.
-  \begin{itemize}
-  	\item Large molecules like glycerol and ribose obstruct the movement
-  	of water molecules forcing them to have lower MSDs
-  	\item I don't know why the MSD is fast in the fastest systems or why DMSO is slow.
-  	\item Sulfur containing compounds have slowest water transport
-  	\item How do 24 solute molecules have such a drastic effect on water motion
-  \end{itemize}
-
-  % BJC: MSDs only calculated for water molecules that spend > 95 % of their
-  % time in the pore. Pore region / tail region cutoff is at 1.5 nm (approximate location of lowest radial water density) 
-  \begin{figure}
-  \centering
-  \includegraphics[width=\textwidth]{water_msd.pdf}
-  \caption{}\label{fig:water_msd}
-  \end{figure}
+% BJC: Move to supporting
+%  \subsection*{Transport of Water}
+%
+%  The MSD of water is a weak function of the solute residue disolved in
+%  the pores.
+%  \begin{itemize}
+%  	\item Large molecules like glycerol and ribose obstruct the movement
+%  	of water molecules forcing them to have lower MSDs
+%  	\item I don't know why the MSD is fast in the fastest systems or why DMSO is slow.
+%  	\item Sulfur containing compounds have slowest water transport
+%  	\item How do 24 solute molecules have such a drastic effect on water motion
+%  \end{itemize}
+%
+%  % BJC: MSDs only calculated for water molecules that spend > 95 % of their
+%  % time in the pore. Pore region / tail region cutoff is at 1.5 nm (approximate location of lowest radial water density) 
+%  \begin{figure}
+%  \centering
+%  \includegraphics[width=\textwidth]{water_msd.pdf}
+%  \caption{}\label{fig:water_msd}
+%  \end{figure}
   
   % BJC. Other Notes:
   % There is no discernable trend in flux of water to/from pores. Most levels stay 
@@ -622,11 +655,24 @@
   % have lower MSDs -- although there aren't a lot of them to average over. They are
   % probably lower because they can't be moving much to stay so confined
   
+  % General framework for following sections
+  % The MSDs are in this order. This is counterintuitive / makes sense for some reason
+  % Here are the RDFs
+  % Here is some other feature that helps explain things.
+  
   \subsection*{Transport of Simple Alcohols}
 
   The MSD of methanol, ethanol, propanol and butanol descends in order of 
   their molecular weight, however, methanol travels faster than expected.  %BJC: find approximate relationship between MW and mobility
-  \begin{itemize}  
+  \begin{itemize}
+    \item The MSD of ethanol, propanol and butanol descend approximately
+    linearly as expected form the Stokes-Einstein relationship  % BJC: maybe better to use wilke-chang version with correction factor
+    \item However, methanol travels considerably faster based on this relationship. (See Figure~\ref{fig:msd_radius_simple_alcohol_rdf}
+  \end{itemize}    
+    
+  Methanol moves fast because it has the highest radial density near the pore center where
+  the largest hops occur.
+  \begin{itemize} 
     \item The radial density as a function of distance from the pore center
     for each alcohol is plotted in Figure~\ref{fig:simple_alcohol_rdf}.
     \item On average, the density of methanol in the pore center is only slightly
@@ -636,7 +682,8 @@
   
   All simple alcohols participate in a similar number of hydrogen bonding interactions
   with the monomer head groups, but with varying preference towards hydrogen bonds with
-  the monomer carboxylate oxygen atoms (See Figure~\ref{fig:simple_alcohol_hbonds}).
+  the monomer carboxylate oxygen atoms (See Figure~\ref{fig:simple_alcohol_hbonds}) caused
+  by increasing hydrophobic character.
   \begin{itemize}
   	\item If all 5 hydrogen bonding acceptor sites on the monomer head groups were equal,
   	we would expect the ratio of the number of hydrogen bonds between solutes and the two 
@@ -645,7 +692,7 @@
   	\item There is a clear preference towards hydrogen bonding with the carboxylate 
   	oxygen atoms for all simple alcohols.
   	\item This is largely due to the more highly crowded environment surrounding the ether
-  	oxygen atoms.
+  	oxygen atoms combined with their lower partial charges.
   	\item Butanol shows the largest preference towards hydrogen bonds with carboxylate 
   	head groups.
   	\item The radial distribution function of atoms located at opposite ends of butanol
@@ -653,19 +700,24 @@
   	than the distal carbon atoms.
   	\item This suggests that alcohols tend to orient themselves like the liquid crystal 
   	monomers, with hydrophilic components point towards the pore centers.
+  	\item When solutes are buried in the pore walls, their MSDs are shorter.
   \end{itemize}
   
   \begin{figure}
   \centering
-  \begin{subfigure}{0.325\textwidth}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\linewidth]{msd_radius_simple_alcohols.pdf}
+  \caption{}\label{fig:msd_radius_simple_alcohol_rdf}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\linewidth]{simple_alcohol_rdf.pdf}
   \caption{}\label{fig:simple_alcohol_rdf}
   \end{subfigure}
-  \begin{subfigure}{0.325\textwidth}
+  \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\linewidth]{simple_alcohol_hbonds.pdf}
   \caption{}\label{fig:simple_alcohol_hbonds}
   \end{subfigure}
-  \begin{subfigure}{0.325\textwidth}
+  \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\linewidth]{butanol_CO.pdf}  %BJC: can add inset to plot showing butanol with highlighted O and C
   \caption{}\label{fig:butanol_CO}
   \end{subfigure}
@@ -682,16 +734,28 @@
 
   \subsection*{Transport of Diols, Triols and Sugars}  % polyols instead of sugars?
   
-  Transport is both facilitated and hindered by additional solute hydroxyl groups.
+  The order of the MSDs of solutes in this grouping are roughly consistent with 
+  their size, however propylene glycol moves exceptionally slow.  %BJC: or tetrose and glucose are exceptionally fast
   \begin{itemize}
+  	\item Ethylene glycol has the highest MSD followed by tetrose
+  	and glycerol, whose MSDs are similar, propylene glycol, the second smallest
+  	solute of this set, and finally ribose.
+  \end{itemize}
+  
+  Transport is both facilitated and hindered by additional solute hydroxyl groups
+  due to their influence on radial density and hydrogen bond frequency.  	
+  \begin{itemize} 
     \item Extra hydroxyl groups cause solutes to favor the water-rich pore region.
-    where there is the least hindrance to movement.
+    where there is the least hindrance to movement (See Figure~\ref{fig:polyols_rdf}).
+    \item Tetrose, ribose and glycerol are densest close to the pore center. This is 
+    likely a result of their hydrophilicity and large size which prevents them from
+    partitioning into the head group region.
     \item However, these extra hydroxyl groups facilitate a larger number of 
     hydrogen bond interactions that work to hold solutes in place (See Figure~\ref{fig:multi_hbonds}).
-    \item At the same time, solute molecular weight increases, which inherently
-    causes them to move more slowly.
-    \item Ethylene glycol, the fastest solute in this grouping (and second fastest
-    overall), obtains the best balance of both effects.
+    \item It has been observed that hydrogen bonding in a system will generally
+    reduce diffusivity~\cite{srinivas_computer_1999}
+%    \item Ethylene glycol, the fastest solute in this grouping (and second fastest
+%    overall), obtains the best balance of both effects.
   \end{itemize}
   
   The number of hydrogen bonding interactions between solutes and head groups
@@ -703,48 +767,64 @@
     bonds with different hydrogen bond acceptors at the same time.
     \item In some cases, all 4 hydroxyl groups of ribose are hydrogen bonded to monomer
     head groups simultaneously.
+    \item Hydrogen bonds act as a kind of molecular glue which holds solutes in place, 
+    especially when there are many, however proximity to the pore center partially 
+    compensates for this effect in the cases of glycerol and tetrose.
   \end{itemize}
   
   \begin{figure}[!htb]
   \centering
+  \begin{subfigure}{0.45\textwidth}
+  % BJC: This might be better cut off at y ~ 0.6 and then provide an inset with full RDFs
+  \includegraphics[width=\linewidth]{polyols_rdf.pdf}
+  \caption{}\label{fig:polyols_rdf}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\linewidth]{multi_hbonds.pdf}
+  \caption{}\label{fig:multi_hbonds}
+  \end{subfigure}
+  % BJC: this subfigure is probably best suited for the supporting information.
+  \begin{subfigure}{\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{dwell_hop_PG_GCL.pdf}
+  \caption{}\label{fig:dwell_hop_PG_GCL}
+  \end{subfigure}
   \caption{The number of hydrogen bond interactions between solutes and monomers increases
   as solutes gain additional hydroxyl groups. Multiple hydroxyl groups within a solute often
   hydrogen bond in different locations simultaneously. Occasionally, all four hydroxyl groups
   of Ribose (n = 4) are involved in a hydrogen bond interaction at the same time.}\label{fig:multi_hbonds}
   \end{figure}
   
-  Between the two diols, ethylene glycol moves significantly faster than propylene glycol
-  due to propylene glycol's affinty for the monomer head groups.  
+  Of the two diols, ethylene glycol moves significantly faster than propylene glycol
+  due to propylene glycol's affinity for the monomer head groups.  
   \begin{itemize}
-  	\item The distribution of each solute's dwell time and hop length distributions shows that
-  	ethylene glycol has shorter dwell times and longer hop lengths, which combine to create a 
-  	relatively fast MSD. 
-  	%BJC: number of PG vs ethylene glycol that enters middle -- I don't think this will be any different than density function
-    \item Both diols have comparable densities close to the pore center, however propylene glycol's
-    density has a large peak near the monomer head groups relative to ethylene glycol. 
-    \item Combined with an increase in molecular weight, the addition of a single methyl group
-    increases the molecule's hydrophobic character and causes propylene glycol to favor positions
+    \item Combined with an increase in size, the addition of a single methyl group to ethylene glycol
+    increases propylene glycol's hydrophobic character and causes it to favor positions
     near monomer head groups.
-    \item This causes propylene glycol to form more highly stablized hydrogen bonds with
-    carboxylate groups, explaining the higher incidence of hydrogen bonds shown in Figure~\ref{fig:multi_hbonds}.
+    \item Both diols have comparable densities close to the pore center, however propylene glycol's
+    density has a large peak near the monomer head groups relative to ethylene glycol.
+    \item Propylene glycol can form more highly stablized hydrogen bonds with carboxylate groups,
+    explaining the higher incidence of hydrogen bonds shown in Figure~\ref{fig:multi_hbonds}.
+    \item These observations are further reflected in its dwell and hop length distributions
+    (See Figure~\ref{fig:dwell_hop_PG_GCL}).
+    \item Propylene glycol exhibits longer dwell times and a narrower distribution of 
+    hop lengths than ethylene glycol. 
+    \item Somewhat counterintuitively, there is a relatively high density of ethylene
+    glycol molecules beyond the head group region. This likely contributes to the relatively
+    large error bars on its MSD in Figure~\ref{fig:all_msds}. 
+    %BJC: can show figure of radial density colored with hop lengths
+    \item This implies that hops performed by ethylene glycol must be considerably larger
+    than those by propylene glycol in order to result in consistently larger MSD values.
   \end{itemize}
   
-  % BJC: figure does not represent total number of hops (PG has less hops)
-  \begin{figure}[!htb]
-  \centering
-  \includegraphics[width=\linewidth]{dwell_hop_PG_GCL.pdf}
-  \caption{}\label{fig:dwell_hop_PG_GCL}
-  \end{figure}
-  
-  Solutes with three or more hydroxyl groups have the highest density
-  at the pore center which contributes to overall faster than expected transport.
-  \begin{itemize}
-  	\item These molecules are highly water soluble but relatively large
-  	\item They can easily hydrogen bond in multiple locations.
-  	\item Their large size and high hydrogen bonding capability prevents them
-  	from having larger MSDs.
-  \end{itemize}
+%  Solutes with three or more hydroxyl groups have the highest density
+%  at the pore center which contributes to overall faster than expected transport.
+%  \begin{itemize}
+%  	\item These molecules are highly water soluble but relatively large
+%  	\item They can easily hydrogen bond in multiple locations.
+%  	\item Their large size and high hydrogen bonding capability prevents them
+%  	from having larger MSDs.
+%  \end{itemize}
   
   % BJC: Euclidean distance between simultaneous h-bonds for ethylene glycol?
   
@@ -762,14 +842,37 @@
   
   The 4 ketone-like molecules tested show a surprising range of transport behaviors.
   \begin{itemize}
-    \item Urea, Acetic Acid, Acetamide and Acetone are all characterized by a carbonyl group
+    \item Urea, acetic acid, acetamide and acetone are all characterized by a carbonyl group
     with two attached heavy atoms. 
-    \item All have approximately the same molecular weight and are planar molecules due to
-    the sp2 hybridization of the carbonyl group.
-    \item The fastest solute of this grouping, Urea (comparable to Acetic Acid too), has an
-    MSD comparable to that of ethylene glycol while the slowest, Acetone, has an MSD one 
-    third of that of Urea.
+    \item All are similar in size and are planar molecules due to the sp2 hybridization of
+    their carbonyl group.
+    \item The fastest solute of this grouping, acetic acid (comparable to urea), is about
+    3 times faster than the slowest, acetone, but only about 10 \% smaller.
   \end{itemize}
+  
+  The MSD of the solutes descend in order of their density close to the pore center.
+  \begin{itemize}
+    \item As shown in the radial density functions (Figure~\ref{fig:ketones_rdf}), 
+    Acetic has a fairly uniform and high density within the pore region.
+    \item Acetone spends relatively little time near the pore center with its
+    peak density nearest the peak head group density.
+  \end{itemize}
+  
+  The amides, urea and acetamide hydrogen bond with head groups relatively infrequently.
+  \begin{itemize}
+    \item Acetic acid hydrogen bonds with head groups nearly 20 times as frequently.
+    \item Urea and Acetamide both have hydrogen bond donating nitrogen atoms, however
+  	nitrogen is a weaker hydrogen bond donor than oxygen due to its lower electronegativity.
+    \item The peaks in their radial density are closer to the pore center than 
+    other solutes that hydrogen bond with carboxylate groups (see 
+    Figure~\ref{fig:simple_alcohol_rdf} for example).
+  \end{itemize}   
+  
+  Urea stays close to pore center because it's hydrophilic
+  Acetamide stays a little closer to pore walls because it has hydrophobic character
+  That's why acetamide is slower
+  Acetic Acid is being slowed down by hydrogen bonding (compare to methanol)
+  Urea is slowed down by ..?
   
   Once again, the trends in the MSD can in large part be explained by the solutes'
   preference for water.
@@ -838,8 +941,10 @@
     to create Dimercaptoethanol and 2,3-Dimercapto-1-propanol.
     \item We replaced the carbonyl carbon of acetone with sulfur in order to create DMSO. 
   	\item Sulfur is unable to hydrogen bond, however it is soluble in water  %BJC: maybe a reference to why sulfur can't hbond
-  	\item Comparisons of their RDFs are shown in Figure~\ref{fig:sulfur_analog_rdfs}.
-  \end{itemize}
+ \end{itemize}
+  	
+%  	\item Comparisons of their RDFs are shown in Figure~\ref{fig:sulfur_analog_rdfs}.
+%  \end{itemize}
   
   \begin{figure}
   \centering
@@ -858,12 +963,13 @@
   \caption{}\label{fig:sulfur_analog_rdfs}
   \end{figure}
   
-  \noindent Mercaptoethanol has a similar average RDF and MSD to ethylene glycol.
+  \noindent Mercaptoethanol has a similar average MSD and RDF to ethylene glycol.
   \begin{itemize}
     \item There is a much larger uncertainty associated with mercaptoethanol's MSD.
     \item It spends more time in the tail region than ethylene glycol, where transport
     is inherently slower, and may contribute to some slower MSDs.  % Can quantify as a percentage
-    \item Conversely, Mercaptoethanol also exhibits some of the highest single solute MSDs  % Only methanol has greater (I think)
+    \item Conversely, Mercaptoethanol also exhibits some of the highest single solute MSDs 
+    (See Figure~\ref{fig:SOH_trace})  % Only methanol has greater (I think)
     \item It hydrogen bonds with head groups 6 times less frequently than ethylene glycol.
     \item This may lead to larger hops in the pore region.
     \item Some of this can be accounted for by the higher density of mercaptoethanol 
@@ -875,6 +981,7 @@
 %    responsible for these hops.
   \end{itemize}
   
+  %BJC: Could be a supporting figure
   \begin{figure}
   \centering
   \begin{subfigure}{0.45\textwidth}
@@ -895,33 +1002,30 @@
   \begin{itemize}
     \item Glycerol frequently hydrogen bonds with more than one head group at a time.
     % BJC: can probably quantify the following:
-    \item It also hydrogen bonds with water molecules which increases its stability
+    \item It can also hydrogen bond with water molecules which increases its stability
     in the pore region.
     \item 2-3-Dimercapto-1-propanol preferentially hydrogen bonds with head groups 
     so it gravitates towards the head group region.
   \end{itemize} 
   
-  \noindent DMSO has a comparable MSD to acetone even though its molecular weight is
-  about 25 \% larger.
+  \noindent DMSO has an average MSD nearly twice as large as acetone even though it
+  is a slightly larger molecule.
   \begin{itemize}
+    \item The radial density of DMSO is higher than acetone close to the pore center.
   	\item The pyramidal structure of DMSO may force it to spend more time closer to
-  	the pore center.  % BJC: might be a good place for a numbers comparison
-  	\item There are 20 \% more acetone than DMSO molecules in the region beyond 
-  	0.8 nm from the pore center.  % based on actual number, not density
-  	\item DMSO cannot as easily work its way in and out of the dense head group region. % BJC: some kind of average regional lifetime
-  	\item There is a peak in DMSO's radial density near 1.1 nm which may be a consequence of 
-  	solute molecules that get stuck in the tails.
+  	the pore center.
   \end{itemize}  
   
   \subsection*{Hydrogen bond acceptors}  % Need a better heading since all molecules in this study are acceptors
-  
-  The final set of molecules we studied can accept hydrogen bonds, but cannot donate
+
+  %BJC: should probably at least mention acetone again in this section  
+  The slowest set of molecules we studied can accept hydrogen bonds, but cannot donate
   them. 
   \begin{itemize}
   	\item Among this set are the two slowest solutes in our study: Tetrahydrofuran and Dimethyl Formamide.
-  	\item Ethyl acetate and Propylene Carbonate are only marginally faster, however they
-  	are both larger molecules. %BJC: not sure how far I should dive into this point
-  \end{itemize}
+  	\item The MSDs of ethyl acetate and propylene carbonate are only marginally larger,
+  	however they are both larger molecules. %BJC: not sure how far I should dive into this point
+  \end{itemize}  
   
   The radial density functions highlight the solutes' preference for the 
   head group region.
@@ -934,9 +1038,29 @@
   	carbonate may destabilize entrapment in the tail region more quickly, leading
   	to slightly faster transport. 
   	% BJC:  Ethyl acetate spends all of its time in a linear or near-linear conformation.
-%  	\item The relatively small amount of movement on the timescales studied 
-%  	do not reveal definitive reasons
-  	\item Overall, 
+  \end{itemize}
+  
+  The radial density of solutes near the pore center in this set is surprisingly high
+  as shown in Figure~\ref{fig:nondonors_rdf}.
+  \begin{itemize}
+    \item Propylene carbonate and ethyl acetate are among the largest solutes
+    in this study. Their size prevents them from easily entering the tail 
+    region and generally gives faster transport properties since they spend
+    more time in the pore region. 
+    \item However, this is not a hard rule. When a solute does overcome the 
+    barrier of entry beyond the head group region, it can become trapped. All
+    solutes in this set show a peak $geq$ 1 nm from the pore center which is
+    likely caused by solutes that get trapped in the tail region for a significant
+    amount of time.
+	\item The peak density of THF is considerably offset from the pore center.
+	\item Observations of single THF trajectories have revealed that it does not make
+	large hops while in the pore center.
+	\item THF becomes nearly immobilized while associated with sodium ions (See 
+	Figure~\ref{fig:thf_sodium_coordination}).
+	\item DMF experiences a similar effect, but to a lesser extent. Its density is 
+	higher than THF near the head groups. The planar shape of DMF causes it to 
+	become stuck between head groups. Excursions into the pore region do not
+	necessarily result in large hops.
   \end{itemize}
  
   \begin{figure}
@@ -945,28 +1069,50 @@
   \caption{}\label{fig:nondonors_rdf}
   \end{figure}
   
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{thf_sodium_coordination.pdf}
+  %BJC: figure was hard to make exactly how I wanted it so I stopped until we decide the best way to illustrate this point
+  %BJC: Should I do two colorbars (one for sodium, one for THF)
+  %BJC: Should Sodium-THF distance be between THF COM and sodium in order to be consistent with above figure? 
+  \caption{Coordination of THF with sodium ions may help stabilize it inside the
+  pore region. For the first 700 ns of the trajectories shown, the center of mass
+  of THF (top line in top figure) and a sodium ion (bottom line in top figure) move
+  in tandem. The distance between the oxygen atom of THF and the sodium ion has only
+  occasional fluctuations away from a relatively stable separation of ca. 0.25 nm. 
+  After 700 ns, THF separates from the sodium ion and moves closer to the head group
+  region.}\label{fig:thf_sodium_coordination}
+  \end{figure}
+  
   % THF shows highly anticorrelated hops
   
+  The majority of THF trajectories are spent near or beyond the head groups. Some
+  trajectories spend all of their time near the pore center but with very little movement. 
+  High densities in head group / tail region is a consequence of trajectories where THF
+  gets trapped there. Ring structure of THF makes it miscible with water (has dipole). Bulky alkyl
+  substituents are kept from interfering with oxygen's electron pairs. THF does not
+  make large hops in the pore center for some reason.
+  Water does not get close to THF when it's in the pore center
+  THF appears to prefer to associate with sodium 
+  THF is stabilized by sodium or by a hydrogen bond with water leaving oily groups alone which
+  don't want to move through the water. The effective size of THF increases and prevents it
+  from moving.
+  
+  DMF shows similar characteristics, however spends a large proportion of its time trapped 
+  between head groups.
+  
   %All have comparable densities near pore center except acetone which is lower
-
-  \subsection*{Transport of Ions} % probably just sodium
-
-  Sodium ions coordinate with water molecules.
-
-%  Sodium ions also exhibit hop diffusion because polarized water and
-%  carboxylate head groups both work to neutralize its charge.
-%  \begin{itemize}
-%	\item Ions get trapped in oxygen 'cages' composed of combinations
-%	of water molecules, carboxylate head groups and ether oxygens connecting
-%	the head groups to their tails.
-%  	\item Interesting coordination number data
-%	\item Dwell time proportional to surrounding charge within coordination shell
-%  \end{itemize}
 
   \subsection{Design Principles}
 
   Water content affects pore size and strongly influence the MSD of both solutes and
   water. Experiments to understand how controllable this parameter is could be useful.
+  
+  Two routes one might want to go down:
+  \begin{enumerate}
+    \item Only allow water to pass
+    \item Selective separation of a dissolved species.
+  \end{enumerate}
   
   Monomers that cannot hydrogen bond. % Hard to make a monomer like this
 
@@ -976,6 +1122,9 @@
   	\item Hbond donors
 	\item More incentive to dwell on walls.
   \end{itemize}
+  
+  Ions with less water coordination (or more water) so that solutes can hbond with water
+  and perhaps be more inclined to stay in the pore region.
 
   \section{Conclusion}
 

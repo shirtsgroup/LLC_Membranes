@@ -7,7 +7,7 @@ import numpy as np
 import mdtraj as md
 import matplotlib.pyplot as plt
 from LLC_Membranes.analysis import Poly_fit, top
-from LLC_Membranes.llclib import physical, topology, timeseries, fitting_functions, atom_props
+from LLC_Membranes.llclib import physical, topology, timeseries, fitting_functions, atom_props, file_rw
 from scipy import stats
 import tqdm
 import sqlite3 as sql
@@ -43,6 +43,8 @@ def initialize():
     parser.add_argument('--update', action="store_true", help="update database with MD MSD values")
     parser.add_argument('-wt', '--wt_water', default=10, type=float, help='Weight percent water in system. Only need'
                                                                           'to adjust this if updating database.')
+    parser.add_argument('-s', '--savename', default=False, type=str, help='If specified, save the MSD curve in a '
+                                                                          'pickled .pl file of this name.')
 
     return parser
 
@@ -78,7 +80,6 @@ class Diffusivity(object):
         print('Done!')
         self.nT = self.t.n_frames  # number of frames
         self.time = self.t.time / 1000  # time stamp on each frame, converted to nanoseconds
-        print(self.time[-1])
 
         # initialize fits to data, error analysis and plotting parameters
         self.startfit = int(startfit*self.nT)  # index at which to start fit
@@ -112,17 +113,15 @@ class Diffusivity(object):
             if res == 'SOL':  # mdtraj changes the name from SOL to HOH
                 res = 'HOH'
 
-            self.itp = "%s/%s.itp" % (self.top_location, res)
-
             if restrict:
                 selection = [a.index for a in self.t.topology.atoms if a.residue.name == res and a.index in restrict]
             else:
                 selection = [a.index for a in self.t.topology.atoms if a.residue.name == res]
 
-            topol = top.Top(self.itp)  # read topology
+            topol = topology.Residue(res)
             atoms_per_residue = topol.natoms  # number atoms in a single residue
-            matoms = topol.atom_masses  # mass of the atoms in residue
-            self.mres = np.sum(matoms)  # total mass of residue
+            matoms = [i for i in topol.mass.values()]  # mass of the atoms in residue
+            self.mres = sum(matoms)
 
         elif atoms:
 
@@ -155,19 +154,19 @@ class Diffusivity(object):
         print('Done!')
 
         # plot 'random' z coordinate traces
-        np.random.seed(4)  # 4 gives a nice spread for ethanol
-        trajs = np.random.randint(0, self.com.shape[1], size=3)
-        print(trajs)
-        for i in trajs:
-            plt.plot(self.time, self.com[:, i, 2], linewidth=2)
-
-            plt.ylabel('$z$-coordinate (nm)', fontsize=14)
-            plt.xlabel('Time (ns)', fontsize=14)
-            plt.gcf().get_axes()[0].tick_params(labelsize=14)
-        plt.tight_layout()
-
-        plt.show()
-        exit()
+        # np.random.seed(4)  # 4 gives a nice spread for ethanol
+        # trajs = np.random.randint(0, self.com.shape[1], size=3)
+        # print(trajs)
+        # for i in trajs:
+        #     plt.plot(self.time, self.com[:, i, 2], linewidth=2)
+        #
+        #     plt.ylabel('$z$-coordinate (nm)', fontsize=14)
+        #     plt.xlabel('Time (ns)', fontsize=14)
+        #     plt.gcf().get_axes()[0].tick_params(labelsize=14)
+        # plt.tight_layout()
+        #
+        # plt.show()
+        # exit()
 
         self.weights = True
         if self.com.shape[1] == 1:
@@ -223,15 +222,6 @@ class Diffusivity(object):
 
         print('Calculating MSD...', end='', flush=True)
         self.MSD = timeseries.msd(self.com, self.axis, ensemble=ensemble)
-        # highest = np.argmax(self.MSD[-1, :])
-        # plt.plot(self.time, self.com[:, highest, 2], linewidth = 2)
-        # # plt.plot(self.MSD[:, highest])
-        # plt.show()
-        # exit()
-        # for i in range(self.MSD.shape[1]):
-        #     plt.plot(self.MSD[:, i])
-        # plt.show()
-        # exit()
         self.MSD_average = np.mean(self.MSD, axis=1)
         print('Done!')
 
@@ -336,7 +326,7 @@ class Diffusivity(object):
                                   1, self.W)[-1]
             slopes[b] = A[1]
 
-        slopes /= (2*1000000*len(self.axis))
+        slopes /= (2*100000*len(self.axis))  # nm^2 / ns = 1.0e-5 cm^2/s
 
         # calculate 95 % confidence interval
         self.confidence_interval = stats.t.interval(0.95, N - 1, loc=slopes.mean(), scale=stats.sem(slopes))
@@ -476,7 +466,7 @@ class Diffusivity(object):
         if output[0][0] > 0:
 
             update_entry = "UPDATE %s SET %s = %.3f, %s = %.3f, %s = %.3f, sim_length = %.2f where name = '%s' and " \
-                           "wt = %.1f" % \
+                           "wt_water = %.1f" % \
                            (tablename, data_labels[0], msd, data_labels[1], msd_lower, data_labels[2], msd_upper,
                             self.time[-1], self.residue, wt_water)
 
@@ -512,7 +502,7 @@ if __name__ == "__main__":
         # D_ensemble.fit_linear()  # make sure diffusivity is being measured from linear region of the MSD curve
         D_ensemble.bootstrap(args.nboot)
         D_ensemble.plot(args.axis, fracshow=args.fracshow)
-        print('D = %1.2e +/- %1.2e m^2/s' % (D_ensemble.Davg, np.abs(D_ensemble.Davg -
+        print('D = %1.2e +/- %1.2e cm^2/s' % (D_ensemble.Davg, np.abs(D_ensemble.Davg -
                                                                      D_ensemble.confidence_interval[0])))
     else:
         show = True
@@ -541,17 +531,20 @@ if __name__ == "__main__":
 
     D.bootstrap(args.nboot)
 
+    if args.savename:
+        file_rw.save_object(D, '%s.pl' % args.savename)
+
     if args.ensemble:
         args.fracshow = 1  # same amount of statistics at each frame
 
-    show = False
+    show = True
     D.plot(args.axis, fracshow=args.fracshow, show=show)
 
     if args.update:
         D.update_database(args.wt_water, ensemble=args.ensemble)
 
     if not args.power_law and not args.nofit:
-        print('D = %1.2e +/- %1.2e m^2/s' % (D.Davg, np.abs(D.Davg - D.confidence_interval[0])))
+        print('D = %1.2e +/- %1.2e cm^2/s' % (D.Davg, np.abs(D.Davg - D.confidence_interval[0])))
 
     if args.compare:
 

@@ -6,8 +6,8 @@ from LLC_Membranes.llclib import file_rw
 import matplotlib.pyplot as plt
 import names
 
-r = 'EAC'
-atoms = ['C', 'C3']
+r = 'BUT'
+atoms = ['C', 'O']
 wt=10
 maximum = 0
 
@@ -30,6 +30,6 @@ plt.gcf().get_axes()[0].tick_params(labelsize=14)
 plt.legend(fontsize=14)
 plt.tight_layout()
 plt.savefig('%s_%s.pdf' % (names.res_to_name[r], ''.join(atoms)))
-#plt.savefig('butanol_CO.pdf')
+plt.savefig('butanol_CO.pdf')
 plt.show()
 

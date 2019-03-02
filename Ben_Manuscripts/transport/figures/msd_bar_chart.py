@@ -5,12 +5,12 @@ import sqlite3 as sql
 import numpy as np
 import names
 
-connection = sql.connect("../../../timeseries/msd.db")
+connection = sql.connect("../../../LLC_Membranes/timeseries/msd.db")
 crsr = connection.cursor()
 restrict_by_name = False 
-MW = True  # plot mw of species
-penalty = 0.5
-wt = 5 
+MW = False  # plot mw of species
+penalty = 0.25
+wt = 10 
 
 group = 'all'
 
@@ -39,8 +39,9 @@ if restrict_by_name:
 	query += ') and'
 else:
 	query += ' WHERE'
-#query += " penalty = %s and" % penalty
+query += " penalty = %s and" % penalty
 query += " wt_water = %s" % wt
+query += " and name != 'HOH'"
 query += " ORDER BY MD_TAMSD DESC"
 
 output = crsr.execute(query).fetchall()
@@ -77,12 +78,13 @@ else:
 labels = labels[ordered_md]
 # end temporary block
 
-fig, ax = plt.subplots(figsize=(12, 7))
-bar_width = 0.4
+fig, ax = plt.subplots(figsize=(6, 7))
+bar_width = 0.8
 opacity = 0.8
 index = np.arange(len(labels), dtype=float)
+
 if not MW:
-	index += (bar_width / 2)
+	index += bar_width / 2
 
 if time_averaged:
 	ax.bar(index, md_tamsd, bar_width, alpha=opacity, yerr=(md_tamsd_lower, md_tamsd_upper), label='MD Simulated time-averaged MSD')
@@ -91,7 +93,7 @@ else:
 
 ax.set_ylabel('MSD ($nm^2$)', fontsize=14)
 ax.tick_params(labelsize=14)
-ax.set_xticks(index + bar_width/2)
+ax.set_xticks(index)# + bar_width/2)
 ax.set_xticklabels(labels, fontsize=14)
 plt.xticks(rotation=90)
 

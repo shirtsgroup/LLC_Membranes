@@ -35,8 +35,8 @@ def initialize():
     parser.add_argument('-tc', '--coordinated_type', default=None, help='Element name of coordinated atoms')
 
     # coordination calculation parameters
-    parser.add_argument('-cut', default=0.35, type=float, help='Maximum distance between pairs where they are considered'
-                                                              'coordinated')
+    parser.add_argument('-cut', default=0.3, type=float, help='Maximum distance between pairs where they are considered'
+                                                              'coordinated (nm)')
 
     # saving options
     parser.add_argument('-s', '--savename', default='coordination.pl', help='Name under which to save distance '
@@ -59,6 +59,10 @@ class System(object):
         self.t = md.load(traj, top=gro)[begin:end:skip]
         print("Done!")
 
+        names = topology.fix_names(gro)  # rename atoms because mdtraj screws it up in some cases.
+        for i, a in enumerate(self.t.topology.atoms):
+            a.name = names[i]
+
         self.time = self.t.time / 1000  # time in nanoseconds
 
         # get locations of atoms of interest and coordinating atoms
@@ -72,6 +76,7 @@ class System(object):
         self.residues = [a.residue.name for a in self.t.topology.atoms]
 
         self.distances = None
+        self.ncoord = None
 
     def narrow_atoms(self, atoms, residue, type, coordination=False):
 
@@ -101,8 +106,14 @@ class System(object):
                     atom_mass = [residue.mass[v] for v in residue.mass.keys() if
                                  v in atoms]  # mass of atoms of interest
 
-                    return physical.center_of_mass(self.t.xyz[:, atom_indices, :], atom_mass), \
-                           topology.map_atoms(atom_indices, len(atom_mass))
+                    if len(atom_mass) > 1:
+
+                        return physical.center_of_mass(self.t.xyz[:, atom_indices, :], atom_mass), \
+                               topology.map_atoms(atom_indices, len(atom_mass))
+
+                    else:
+
+                        return self.t.xyz[:, atom_indices, :], topology.map_atoms(atom_indices, len(atom_mass))
 
             else:
 
@@ -114,7 +125,7 @@ class System(object):
                     # get indices of any atoms in the "atoms" list
                     atom_indices = [a.index for a in self.t.topology.atoms if a.name in atoms]
 
-                return self.t.xyz[:, atom_indices, :], topology.map_atoms(atom_indices)
+            return self.t.xyz[:, atom_indices, :], topology.map_atoms(atom_indices)
 
         else:
 
@@ -159,7 +170,7 @@ class System(object):
                 under_cut = np.where(euclidean_dist < cut)[0]
                 self.distances[t][i, under_cut] = euclidean_dist[under_cut]
 
-    def plot(self, res=None, atom_groups=None):
+    def n_coordinated(self, res=None, atom_groups=None, plot=True):
         """ Plot number of atoms coordinated to residue vs. time
 
         :param res: a list of residue names. This function will plot coordinated atoms belonging to specific residues
@@ -176,7 +187,7 @@ class System(object):
 
         if atom_groups is not None:
 
-            ncoord = np.zeros([len(atom_groups), self.t.n_frames, self.com.shape[1]])
+            self.ncoord = np.zeros([len(atom_groups), self.t.n_frames, self.com.shape[1]])
 
             if res is not None:
 
@@ -198,13 +209,13 @@ class System(object):
                                 pass
 
                         for g in grp:
-                            ncoord[g, t, i] += 1
+                            self.ncoord[g, t, i] += 1
 
             else:
 
                 print('Organizing atoms based on atom type...')
                 for t in tqdm.tqdm(range(self.t.n_frames)):
-                    for i in range(ncoord.shape[2]):
+                    for i in range(self.ncoord.shape[2]):
                         atom_types = [self.names[self.com_coordinated_map[j][0]] for j in
                                       np.nonzero(self.distances[t][i, :])[1]]  # residue name
 
@@ -218,34 +229,44 @@ class System(object):
                                 pass
 
                         for g in grp:
-                            ncoord[g, t, i] += 1
+                            self.ncoord[g, t, i] += 1
 
             # for i in range(ncoord.shape[0]):
             #
             #     plt.plot(self.time, ncoord[i, ...].mean(axis=1), label='%s of %s' % (atom_groups[i], res[i]),
             #              linewidth=2)
             colors = ['blue', 'green', 'orange']
-            for j in np.random.randint(ncoord.shape[2], size=1):
-                for i in range(ncoord.shape[0]):
+            for j in np.random.randint(self.ncoord.shape[2], size=1):
+                for i in range(self.ncoord.shape[0]):
 
-                    plt.plot(self.time, ncoord[i, :, j], label='%s of %s' % (atom_groups[i], res[i]),
+                    plt.plot(self.time, self.ncoord[i, :, j], label='%s of %s' % (atom_groups[i], res[i]),
                              linewidth=2, color=colors[i])
 
             #plt.legend()
 
         else:
-            ncoord = np.zeros([self.t.n_frames, self.com.shape[1]])
+            self.ncoord = np.zeros([self.t.n_frames, self.com.shape[1]])
 
-            for i in tqdm.tqdm(range(ncoord.shape[1])):
-                ncoord[:, i] = [len(np.nonzero(self.distances[t][i, :])[1]) for t in range(self.t.n_frames)]
+            for i in tqdm.tqdm(range(self.ncoord.shape[1])):
+                self.ncoord[:, i] = [len(np.nonzero(self.distances[t][i, :])[1]) for t in range(self.t.n_frames)]
 
-            plt.plot(self.time, ncoord.mean(axis=1))
+            # for i in range(self.com.shape[1]):
+            #     print(i)
+            #     plt.plot(ncoord[:, i])
+            #     plt.show()
+            #
+            # exit()
 
-        plt.xlabel('Time (ns)', fontsize=14)
-        plt.ylabel('Number of coordinated molecules', fontsize=14)
-        plt.gcf().get_axes()[0].tick_params(labelsize=14)
-        plt.tight_layout()
-        plt.show()
+            plt.plot(self.time, self.ncoord.mean(axis=1))
+
+        if plot:
+
+            plt.xlabel('Time (ns)', fontsize=14)
+            plt.ylabel('Number of coordinated molecules', fontsize=14)
+            plt.gcf().get_axes()[0].tick_params(labelsize=14)
+            plt.tight_layout()
+
+            plt.show()
 
 
 if __name__ == "__main__":
@@ -260,8 +281,10 @@ if __name__ == "__main__":
 
         system.distance_search(cut=args.cut)  # calculate pairwise distance between all points in self.com and self.com_coordinated
 
-        # with open(args.savename, 'wb') as f:
-        #     pickle.dump(system, f)
+        system.n_coordinated()
+
+        with open(args.savename, 'wb') as f:
+            pickle.dump(system, f)
 
     else:
         print('Loading pickled object!...', end='', flush=True)
@@ -269,7 +292,7 @@ if __name__ == "__main__":
         print('Done!')
 
     #system.plot(res=['HII', 'HII', 'HOH'], atom_groups=[['O3', 'O4'], ['O', 'O1', 'O2'], ['O']])
-    system.plot()
+    system.n_coordinated(plot=True)
     #
     # for i in np.nonzero(system.distances[-1][0, :])[1]:
     #     print('%s -- %s' % (system.com_map[0], system.com_coordinated_map[i]))

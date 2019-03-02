@@ -3,7 +3,7 @@
 import mdtraj as md
 import argparse
 import numpy as np
-from LLC_Membranes.llclib import physical
+from LLC_Membranes.llclib import physical, topology
 from LLC_Membranes.analysis import p2p
 import matplotlib.pyplot as plt
 import tqdm
@@ -18,10 +18,11 @@ def initialize():
     parser.add_argument('-g', '--gro', default='wiggle.gro', help='Name of coordinate file')
     parser.add_argument('-t', '--traj', default='traj_whole.xtc', help='Trajectory file (.trr, .xtc should work)')
     parser.add_argument('-b', '--begin', default=0, type=int, help='Frame to begin calculations')
+    parser.add_argument('-c', '--components', nargs='+', help="Region(s) or atoms to include in calculation. Special"
+                                                              "groups include 'head groups' and 'tails'")
+    parser.add_argument('-m', '--monomer', default='NaGA3C11', help='Name of monomer (no file extension)')
     parser.add_argument('-e', '--end', default=-1, type=int, help='Frame to stop doing calculations')
     parser.add_argument('-bins', default=100, type=int, help='Number of bins to use')
-    parser.add_argument('-m', '--multi', nargs='+', help='Overlay the density of each region with the results from '
-                                                         'other trajectories')
     parser.add_argument('-s', '--solvate', action="store_true",
                         help='If the system is solvated, plot the number density of water as well')
     parser.add_argument('-l', '--load', help='Name of compressed .npz to load')
@@ -29,6 +30,80 @@ def initialize():
     args = parser.parse_args()
 
     return args
+
+
+def grps(name):
+    """ Return names of atoms making up specialized groups. This is specifically for NaGA3C11.
+
+    TODO: incorporate these groups as annotations (maybe)
+
+    :param name: specialized group names. Valid options are 'head groups' and 'tails'
+
+    :type name: str
+
+    :return: atom names that constitute specialized groups
+    """
+
+    if name == 'head groups':
+
+        return ['C', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'O3', 'O4']
+
+    elif name == 'tails':
+
+        return ['C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C21',
+                'C22', 'C23', 'C24', 'C25', 'C26', 'C27', 'C28', 'C29', 'C30', 'C31', 'C32', 'C33', 'C34', 'C35',
+                'C36', 'C37', 'C38', 'C39', 'C40', 'C41', 'C42', 'C43', 'C44', 'C45', 'C46', 'C47', 'C48']
+
+
+class Region(object):
+
+    def __init__(self, traj, gro, components, monomer, begin=0, end=-1):
+        """ Determine the density of components. Similar to a radial density, but instead of center of mass, the radial
+        density of each atom in the region is averaged together.
+
+        :param traj: name of trajectory to analyze (.xtc or .trr)
+        :param gro: name of GROMACS coordinate file with same topology as traj
+        :param component: list of atoms or name of groups of atoms
+        :param begin: first frame to analyze
+        :param end: last grame to analyze
+
+        :type traj: str
+        :type gro: str
+        :type component: list
+        :type begin: int
+        :type end: int
+        """
+
+        special_groups = ['head groups', 'tails']
+
+        if components[0].lower() in special_groups:
+            self.components = grps(components[0].lower())
+        else:
+            self.components = components
+
+        print('Loading trajectory...', end="")
+        self.t = md.load('%s' % traj, top='%s' % gro)[begin:end]
+        print('done')
+
+        self.monomer = topology.LC('%s.gro' % monomer)
+
+        self.r = None
+        self.density = None
+
+    def component_density(self, bins=50, spline=True, progress=True, npts_spline=10):
+
+        self.r = np.zeros([bins])
+        self.density = np.zeros([self.t.n_frames, bins])
+
+        pore_defining_atoms = [a.index for a in self.t.topology.atoms if a.name in self.monomer.pore_defining_atoms
+                               and a.residue.name in self.monomer.residues]
+
+        pore_centers = physical.avg_pore_loc(4, self.t.xyz[:, pore_defining_atoms, :], self.t.unitcell_vectors,
+                                             spline=spline, progress=progress, npts=npts_spline)
+
+        print('Calculating component density')
+        self.r, self.density = physical.compdensity(self.com, pore_centers, self.t.unitcell_vectors,
+                                                    nbins=bins, spline=spline, cut=cut)
 
 
 def duplicate(pos, box):
@@ -141,7 +216,8 @@ if __name__ == "__main__":
     # regions = ['Tails', 'Head Groups', 'Sodium']
     regions = ['Tails', 'Head Groups', 'Sodium']
 
-    if args.multi:
+    # if args.multi:
+    if False:
 
         # colors = ['blue', 'red', 'green', 'xkcd:orange']
         # colors = ['xkcd:red', 'xkcd:green', 'blue', 'xkcd:yellow']
@@ -230,6 +306,8 @@ if __name__ == "__main__":
         colors = ['red', 'green', 'blue']
 
     if not args.load:
+
+        R = Region(args.traj, args.gro, args.components, begin=args.begin, end=args.end)
 
         print('Loading trajectory...', end="")
         t = md.load('%s' % args.traj, top='%s' % args.gro)[args.begin:args.end]

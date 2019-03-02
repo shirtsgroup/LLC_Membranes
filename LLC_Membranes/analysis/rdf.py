@@ -36,9 +36,32 @@ def initialize():
     return parser
 
 
+def grps(name):
+    """ Return names of atoms making up specialized groups. This is specifically for NaGA3C11.
+
+    TODO: incorporate these groups as annotations (maybe)
+
+    :param name: specialized group names. Valid options are 'head groups' and 'tails'
+
+    :type name: str
+
+    :return: atom names that constitute specialized groups
+    """
+
+    if name == 'head groups':
+
+        return ['C', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'O3', 'O4']
+
+    elif name == 'tails':
+
+        return ['C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C21',
+                'C22', 'C23', 'C24', 'C25', 'C26', 'C27', 'C28', 'C29', 'C30', 'C31', 'C32', 'C33', 'C34', 'C35',
+                'C36', 'C37', 'C38', 'C39', 'C40', 'C41', 'C42', 'C43', 'C44', 'C45', 'C46', 'C47', 'C48']
+
+
 class System(object):
 
-    def __init__(self, gro, traj, residue, monomer, begin=0, end=-1, skip=1, npores=4, atoms=None):
+    def __init__(self, gro, traj, residue, monomer, begin=0, end=-1, skip=1, npores=4, atoms=None, com=True):
         """ Calculate the radial distribution of residue in a hexagonal phase LLC Membrane
 
         :param gro: Coordinate file (.gro or .pdb)
@@ -50,6 +73,7 @@ class System(object):
         :param skip: Skip every 'skip' frames
         :param npores: Number of pores
         :param atoms: Calculate RDF of atoms specified here which are a part of residue
+        :param com: Calculate density based on center of mass of residue or group of atoms
 
         :type gro: str
         :type traj: str
@@ -62,7 +86,9 @@ class System(object):
         :type atoms: list
         """
 
+        print('Loading Trajectory...', end='', flush=True)
         self.t = md.load(traj, top=gro)[begin:end:skip]
+        print('Done!')
         self.box = self.t.unitcell_vectors
         self.npores = npores
 
@@ -74,12 +100,18 @@ class System(object):
 
         if atoms is not None and 'all' not in atoms:
             res = [a.index for a in self.t.topology.atoms if a.residue.name == residue and a.name in atoms]
-            mass = [self.residue.mass[v] for v in self.residue.mass.keys() if v in atoms]
+            if com:
+                mass = [self.residue.mass[v] for v in self.residue.mass.keys() if v in atoms]
         else:
             res = [a.index for a in self.t.topology.atoms if a.residue.name == residue]
-            mass = [v for v in self.residue.mass.values()]
+            if com:
+                mass = [v for v in self.residue.mass.values()]
 
-        self.com = physical.center_of_mass(self.t.xyz[:, res, :], mass)
+        if com:
+            print('Calculating centers of mass...')
+            self.com = physical.center_of_mass(self.t.xyz[:, res, :], mass)
+        else:
+            self.com = self.t.xyz[:, res, :]
 
         self.r = None
         self.density = None
@@ -113,6 +145,7 @@ class System(object):
         :param spline: locate pore centers as a function of z. Recommended. Slower, but more accurate
         :param progress: Show progress bar while generating spline
         :param npts_spline: Number of points making up spline tr each pore
+
         :return:
         """
 
@@ -121,9 +154,6 @@ class System(object):
 
         pore_defining_atoms = [a.index for a in self.t.topology.atoms if a.name in self.monomer.pore_defining_atoms
                                and a.residue.name in self.monomer.residues]
-
-        if spline:
-            print('Generating spline through each pore...')
 
         pore_centers = physical.avg_pore_loc(4, self.t.xyz[:, pore_defining_atoms, :], self.box, spline=spline,
                                              progress=progress, npts=npts_spline)
@@ -172,7 +202,12 @@ class System(object):
                                       self.density.mean(axis=0))  # 2.5 percent of data below this value
         self.errorbars[1, :] = np.percentile(self.bootstraps, upper_confidence, axis=0) - self.density.mean(axis=0)
 
-    def plot(self, show=False, normalize=False, save=True, savename='rdf.pdf'):
+    def plot(self, show=False, normalize=False, save=True, savename='rdf.pdf', label=None):
+
+        if label is not None:
+            lab = label.title()
+        else:
+            lab = self.residue.name
 
         mean = self.density.mean(axis=0)
         if normalize:
@@ -182,7 +217,7 @@ class System(object):
         if self.bootstraps is not None:
             if normalize:
                 self.errorbars /= maximum
-            plt.plot(self.r, mean, linewidth=2, label=self.residue.name)
+            plt.plot(self.r, mean, linewidth=2, label=lab)
             #np.savez_compressed('NA_rdf.npz', r=self.r, mean=mean)
             plt.fill_between(self.r, self.errorbars[1, :] + mean, mean - self.errorbars[0, :], alpha=0.7)
         else:
@@ -209,25 +244,48 @@ if __name__ == "__main__":
     if args.atoms is None:
         args.atoms = [['all']]
 
+    while len(args.atoms) < len(args.residue):
+        args.atoms.append(None)
+
+    special_groups = ['head groups', 'tails']
+
     rdfs = []
     for i, r in enumerate(args.residue):
+
+        com = True
 
         status = 'Calculating RDF of residue %s' % r[0]
         savename = 'rdf_%s' % r[0]
         if args.atoms[i] is not None and args.atoms[i][0] != 'all':
-            status += ' restricted to atoms'
-            savename += '_'
-            for a in args.atoms[i]:
-                status += ' %s' % a
-                savename += '%s' % a
+
+            if args.atoms[i][0].lower() in special_groups:
+
+                label = args.atoms[i][0].lower()
+                status += ' restricted to %s atoms' % label
+                savename += '_%s' % label
+                args.atoms[i] = grps(label)
+                com = False
+
+            else:
+
+                status += ' restricted to atoms'
+                savename += '_'
+                for a in args.atoms[i]:
+                    status += ' %s' % a
+                    savename += '%s' % a
+
+                label = None
+        else:
+            label = None
+
         print(status)
 
         rdfs.append(System(args.gro, args.traj, r[0], args.build_monomer_residue, begin=args.begin,
-                           end=args.end, skip=args.skip, atoms=args.atoms[i]))
+                           end=args.end, skip=args.skip, atoms=args.atoms[i], com=com))
         rdfs[i].radial_distribution_function(bins=args.bins, spline=args.spline, npts_spline=args.spline_pts,
                                              cut=args.cut)
         rdfs[i].bootstrap(args.nboot)
-        rdfs[i].plot(show=False, normalize=args.normalize, save=True)
+        rdfs[i].plot(show=False, normalize=args.normalize, save=True, label=label)
 
         file_rw.save_object(rdfs[i], '%s.pl' % savename)
 
