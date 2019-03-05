@@ -187,9 +187,9 @@
   
   \subsection*{Mean Squared Displacement}\label{method:MSD}
 
-  \noindent We measured the time-averaged mean squared displacement (MSD)
-  of the centers of mass of each solute over the course of 1 $\mu$s MD 
-  simulations using Equation~\ref{eqn:tamsd}.
+  \noindent We measured the time-averaged $z$-direction mean squared 
+  displacement (MSD) of the centers of mass of each solute over the 
+  course of 1 $\mu$s MD simulations using Equation~\ref{eqn:tamsd}.
   \begin{itemize}
     \item \begin{equation}
 	\overline{x^2(\tau)} = \dfrac{1}{T - \tau}\int_{0}^{T - \tau} (x(t + \tau) - x(t))^2 dt
@@ -343,10 +343,15 @@
 	3D spherical radial distribution function because it gives detailed
 	frame-by-frame information rather than an average. 
   \end{itemize}
+  
+  Using four different methods, Rowley and Roux observed peaks in the radial
+  distribution function for sodium coordinated with water at an O-Na distance 
+  of between 2.3 and 2.5 \AA~\cite{rowley_solvation_2012}. We used 2.5 \AA as
+  the distance cutoff.
    
   \section{Results and Discussion}
   
-  \subsection*{Structure and Transport of Membrane Components}\label{section:membrane_components}
+  \subsection*{Structure and Transport of Membrane Constituents}\label{section:membrane_components}
   
   %BJC: Probably do analysis on pure water system for this section.  
   
@@ -357,10 +362,9 @@
     \item In dry systems, the pore center is densely filled with sodium ions and 
     head groups (See Ref~\cite{coscia_understanding_2019}).
     \item Figure~\ref{fig:component_densities} plots the densities of each
-    membrane component.
+    membrane constituent.
     \item Water is densest at the center of each pore. 
-    \item Sodium ions are densest within the pore region, which we define as the
-    space between the pore center and the peak head group density.
+    \item Sodium ions are densest between the pore center and the peak head group density.
     \item The peak density of sodium ions is not at the pore center in either case
     likely because they are still loosely associated with the monomer's 
     carboxylate head groups.
@@ -395,10 +399,30 @@
   of the 5 wt \% system. }\label{fig:component_densities}
   \end{figure}
   
-  The MSD of sodium and water become linear on long timescales.
+  The MSD of sodium and water is significantly larger in the 10 wt \% water system
+  versus the 5 wt \% water system.
   \begin{itemize}
-    \item
+    %BJC: these numbers will change. This is for incomplete methanol systems. I will
+    % redo calculations on pure water systems.
+    \item Water moves about 65 times faster and sodium moves about 40 times faster
+    in the 10 wt\% system.
+    \item Water moves about 65 times faster than sodium in the 10 wt \% system and
+    40 times faster than sodium in the 5 wt \% system. %BJC: weird coincidence
+    \item The diffusivity of water in the 10 wt \% system is still only 1 \% that of 
+    bulk water %BJC: 5.53e-07 versus 5.5e-05 cm^2/s
   \end{itemize}
+  
+  % BJC: could talk about subdiffusion a little here but I'd rather save it for 
+  % small molecule discussion
+  
+%  \noindent The diffusion constant of water is about 50 times faster than sodium.
+%  \begin{itemize}
+%    \item In a dilute sodium chloride solution, the diffusivity of sodium
+%    is about 4 times slower than water.
+%    \item The carboxylate groups, whose oxygen atoms each have a charge of -0.822
+%    keep the positively charged sodium ions relatively close and restricts their
+%    motion.
+%  \end{itemize}
   
   \begin{figure}[!htb]
   \centering
@@ -410,50 +434,55 @@
   \includegraphics[width=\textwidth]{na_msd_comparison.pdf}
   \caption{Sodium Ions}\label{fig:na_msd_comparison}
   \end{subfigure}
-  \caption{}\label{fig:msd_comparison}
+  \caption{(a) The MSD of water in the 10 wt \% water system is about 65 times
+  higher than water in the 5 wt \% water system. (b) The MSD of sodium in the
+  10 wt \% water system is about 40 times higher than sodium in the 5 wt \% 
+  water system.}\label{fig:msd_comparison}
   \end{figure}
   
-  Sodium coordinates with water.
-  
-  \noindent The diffusion constant of water is about 50 times faster than sodium.
+  \noindent Sodium coordinates with water far less than in bulk solution.
   \begin{itemize}
-    \item In a dilute sodium chloride solution, the diffusivity of sodium
-    is about 4 times slower than water.
-    \item The carboxylate groups, whose oxygen atoms each have a charge of -0.822
-    keep the positively charged sodium ions relatively close and restricts their
-    motion.
+    \item On average, each sodium ion is coordinated to about 1.7 water molecules in 
+    the 10 wt \% system and 1.15 water molecules in the 5 wt\% system.
+    \item In bulk water, it is estimated that sodium coordinates with 5.6 - 5.8 water
+    molecules~\cite{rowley_solvation_2012}
+    \item The low levels of water coordination under confinement are likely driven
+    in part by favorable interactions between sodium ions and carboxylate head groups.
+    \item A dehydrated sodium ion is not shielded from the negatively charged carboxylate
+    group.~\cite{ma_drastically_2019}
   \end{itemize}
+  
+  % BJC: This figure is from methanol simulations. Will be replaced by pure water
+  % simulations
+  % BJC: I can probably just report the averages rather than plot this
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{Na_water_coordination.pdf}
+  \caption{}\label{fig:na_water_coordination}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{Na_hg_coordination.pdf}
+  \caption{}\label{fig:na_hg_coordination}
+  \end{subfigure}
+  \end{figure}
   
   \subsection*{Mechanisms Governing Small Solute Transport}\label{section:mechanism_overview}
   
-  \noindent The MSDs for the solutes studied in this work span a moderate range. 
+  We observe trends in transport properties that are dependent on chemical 
+  environment within the nanopores as well as the chemical functionality of membrane
+  constituents rather than just solute size. 
   \begin{itemize}
-    \item We plotted the 400 ns time-lag MSD for each solute in Figure~\ref{fig:all_msds}.
-  	\item The fastest solute, methanol, has an MSD over 20 times greater than
-  	the slowest, dimethyl formamide. 
+    \item Polar solutes are slowed by interactions between monomer functional groups
+    and ions.
+    \item Solutes with hydrophobic character partition out of the pore and are 
+    slowed by densely packed organic monomer components.
+    \item A thorough understanding of these interactions will help us to create
+    monomer design principles.
+    \item We will begin our analysis by considering the collective trends observed  
+    across all systems and then focus on subsets of similar molecules where 
+    some exceptions occur. 
   \end{itemize}
-  
-  \noindent The MSDs are not a monotonic function of solute size.
-  \begin{itemize}
-  	\item We plotted the solute size against their MSDs in Figure~\ref{fig:all_msds}.
-  	\item Tetrose, our fifth largest solute, has an average MSD higher than more 
-  	than half of all solutes studied. 
-  	\item The two slowest solutes, DMF and THF, are smaller than 10 faster solutes.
-  	\item Transport is clearly affected by factors other than molecular size. 
-  \end{itemize}
-  
-  \begin{figure}
-  \centering
-  \begin{subfigure}{0.5\textwidth}
-  \includegraphics[width=\textwidth]{all_10wt_tamsds.pdf}  % include bar plot of MW to show it's non-monotonic
-  \caption{}\label{fig:all_msds}
-  \end{subfigure}
-  \begin{subfigure}{0.5\textwidth}
-  \includegraphics[width=\textwidth]{msd_radius.pdf} 
-  \caption{}\label{fig:msd_radius}
-  \end{subfigure}
-  \caption{}\label{fig:msds}
-  \end{figure}  
   
 %  We have gained a clearer picture of the general transport properties exhibited by
 %  this system through the collective study of all solutes. We will first address the
@@ -461,14 +490,77 @@
 %  respect to specific molecules, where exceptions occur.
 %  \bigskip
   
+  Like water and sodium above, the MSDs of the solutes studied in this work are 
+  significantly larger in the 10 wt \% system, than those in the 5 wt \% water 
+  system (Figure~\ref{fig:msds}). 
+  \begin{itemize}
+    \item The fastest moving solute in both cases, methanol, has an MSD about 175
+    times larger in the 10 wt \% versus the 5 wt \% system.
+    \item Clearly the equilibrium water content of a given LLC system will 
+    determine its viability for real separations.
+  \end{itemize} 
+  
+%  \noindent The MSDs for the solutes studied in this work span a moderate range. 
+%  \begin{itemize}
+%    \item We plotted the 400 ns time-lag MSD for each solute in Figure~\ref{fig:all_msds}.
+%  	\item The fastest solute, methanol, has an MSD over 20 times greater than
+%  	the slowest, dimethyl formamide. 
+%  \end{itemize}
+  
+  \noindent The MSDs are not a monotonic function of solute size.
+  \begin{itemize}
+  	\item We plotted the solute size against their MSDs in Figure~\ref{fig:msd_radius_5wt} and~\ref{fig:msd_radius_10wt}.
+  	\item There are numerous examples of solutes in our study that do not 
+  	follow the behavior set forth by the Stokes-Einstein equation which 
+  	implies that solute MSD should be inversely related to solute size.  % citation
+  	\item This behavior is not entirely surprising but worth emphasizing. 
+  	\item It is expected that the Stokes-Einstein relationship, which assumes that 
+  	the solute radius is much larger than the solvent, should break down once
+  	solute and solvent are of comparable size.
+  	\item Membranes, including that studied here, are often characterized 
+  	with size-exclusion experiments which emphasizes selectivity based on the ability
+  	to enter a given pore. 
+  	\item Once we reach the nm to sub-nm pore size regime, size-exclusion 
+  	becomes of secondary importance since the primary purpose of these membranes is to 
+  	separate molecules whose sizes are on the same order as water.
+  	\item In order to handle complex waste streams with molecules of similar size,
+  	it is important to take advantage of material properties other than pore size. 
+%  	\item Tetrose, our fifth largest solute, has an average MSD higher than more 
+%  	than half of all solutes studied. 
+%  	\item The two slowest solutes, DMF and THF, are smaller than 10 faster solutes.
+%  	\item Transport is clearly affected by factors other than molecular size. 
+  \end{itemize}
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{all_5wt_tamsds.pdf}
+  \caption{5 wt \% water}\label{fig:all_msds_5wt}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{all_10wt_tamsds.pdf}
+  \caption{10 wt \% water}\label{fig:all_msds_10wt}
+  \end{subfigure}
+  %BJC: missing a few since those simulations just got started
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{msd_radius_5wt.pdf} 
+  \caption{5 wt \% water}\label{fig:msd_radius_5wt}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{msd_radius_10wt.pdf} 
+  \caption{10 wt \% water}\label{fig:msd_radius_10wt}
+  \end{subfigure}
+  \caption{}\label{fig:msds}
+  \end{figure}  
+  
   \noindent On the timescales simulated in our study, we observe subdiffusive behavior.
   %, providing the beginnings of an answer to question~\ref{question:mechanisms}.
   \begin{itemize}  
     \item Figure~\ref{fig:example_ztraces} plots the $z$-coordinate versus time of
-  	3 representative ethanol centers of mass.
+  	3 representative ethanol centers of mass in the 10 wt \% water system.
   	\item There are clear periods of entrapment separated by relatively large hops.
-	\item The MSD calculated based on all ethanol molecules is plotted in Figure~\ref{fig:example_msd}
-	and is sublinear.
+	\item The MSD calculated based on all ethanol molecules is plotted in 
+	Figure~\ref{fig:example_msd} and is sublinear.
 	\item The long periods of entrapment likely lead to this sublinear, and thus
 	subdiffusive, behavior.
   \end{itemize}
@@ -477,15 +569,14 @@
   may lead to radially dependent transport mechanisms.
   \begin{itemize}
     \item It is clear from Figure~\ref{fig:example_ztraces} that the longest 
-    periods of entrapment generally occur when solutes are far from the pore
+    periods of entrapment usually occur when solutes are far from the pore
     center.
     \item There is a high resistance to movement in the dense head group and
     tail regions.
     \item When hops occur, and where there is the most $z$-positional noise, 
     solutes are generally close to the pore center.
-    %BJC: need a radial density of head groups, tails, water etc.
     \item Solutes can move relatively freely when they enter the pore region
-    which is primarily composed of water molecules.
+    which is primarily composed of water molecules and sodium ions.
   \end{itemize}
   
   \begin{figure}
@@ -507,6 +598,7 @@
   by an anomalous subdiffusion process.}\label{fig:qualitative_mechanisms}
   \end{figure}
   
+  %BJC: need to check whether sodium ion association is exhibited by all solutes
   In addition to solute trapping in dense monomer regions, we observe a second
   trapping mechanism caused by preferential hydrogen bonding between 
   hydrogen bond donor solutes and monomer carboxylate groups. 
@@ -514,7 +606,7 @@
     \item Of the time spent donating hydrogen atom(s), x \% of the hydrogen
     bonds occur between solutes and carboxylate groups as opposed to solutes
     with water. 
-    \item This shows a high perference for the carboxylate anions since there
+    \item This shows a high preference for the carboxylate anions since there
     are 5 times more water molecules in the system.
     \item The carboxylate oxygen atoms have a slightly higher partial negative
     charge than water molecules.
@@ -580,6 +672,22 @@
   function at $k$ = 1.}\label{fig:examples}
   \end{figure}
   
+  \noindent The transport behavior exhibited by solutes in the 5 wt \% water systems
+  is similar to those shown by those in the 10 wt \% system however the timescales are
+  much longer.
+  \begin{itemize}
+    %BJC: will put supporting data in supporting information
+    \item We observe subdiffusive behavior with intermittent hopping between
+    periods of entrapment.
+    \item The frequency and length of hops are both diminished in the 5 wt \% system.
+    \item Since there are only 24 solute molecules in each system, in order to obtain
+    better time-averaged descriptions of solute transport mechanisms, we will focus
+    the rest of our analysis on transport in the 10 wt \% water systems.
+  \end{itemize}
+  
+  We will revisit our observations in the the context of specific groups of 
+  molecules in the discussion that follows.
+  
 %  \noindent The MSDs in Figure~\ref{fig:all_msds} are a strong function of two solute 
 %  trapping mechanisms.
 %  \begin{itemize}
@@ -619,9 +727,6 @@
   %BJC: potential figure to go with above paragraph
   % (a) Plot showing how biggest jumps are at pore center
   % (b) Illustrate preference for hbonds carboxylate head groups
-  
-  We will revisit our observations in the the context of specific groups of 
-  molecules in the discussion that follows.
 
 %  We will explore these factors in greater detail in the context of 
 %  specific groups of molecules in the discussion that follows.

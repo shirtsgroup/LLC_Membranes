@@ -1,0 +1,8 @@
+source leaprc.ff99SB
+source leaprc.gaff
+MOL = loadmol2 Dibrpyr14.mol2
+check MOL
+loadamberparams Dibrpyr14.frcmod
+saveoff MOL MOL.lib
+saveamberparm MOL Dibrpyr14.prmtop Dibrpyr14.inpcrd
+quit

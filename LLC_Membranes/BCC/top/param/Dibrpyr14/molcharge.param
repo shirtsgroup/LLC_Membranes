@@ -1,0 +1,9 @@
+#Interface settings
+
+#molcharge :   
+    -in  BCC_new.pdb
+    -method  am1bccsym
+    -out  BCC_new.mol2
+    #-param (Not set, no default)
+    #-paramfile (Not set, no default)
+    #-prefix  molcharge

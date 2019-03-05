@@ -1,0 +1,8 @@
+source leaprc.ff99SB
+source leaprc.gaff
+GLY = loadmol2 glycerol.mol2
+check GLY
+loadamberparams glycerol.frcmod
+saveoff GLY GLY.lib
+saveamberparm GLY glycerol.prmtop glycerol.inpcrd
+quit

@@ -1,0 +1,16 @@
+;Forcefield
+#include "/home/bcoscia/PycharmProjects/GitHub/HII/Scripts/../top/Forcefields/gaff/gaff.itp"
+
+;Monomer Topology
+#include "/home/bcoscia/PycharmProjects/GitHub/BCC/top/topologies/BCC.itp"
+
+;Ion Topology
+#include "/home/bcoscia/PycharmProjects/GitHub/HII/Scripts/../top/Forcefields/gaff/ions.itp"
+
+[ system ]
+npt simulation of NAcarb11V
+
+[ molecules ]
+; Compound         nmols
+MOL                2
+BR                 4

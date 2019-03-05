@@ -193,7 +193,7 @@ class System(object):
 
                 print('Organizing atoms based on atom type and residue name...')
                 for t in tqdm.tqdm(range(self.t.n_frames)):
-                    for i in range(ncoord.shape[2]):
+                    for i in range(self.ncoord.shape[2]):
                         atom_types = [self.names[self.com_coordinated_map[j][0]] for j in
                                       np.nonzero(self.distances[t][i, :])[1]]  # residue name
                         residues = [self.residues[self.com_coordinated_map[j][0]] for j in
@@ -249,13 +249,14 @@ class System(object):
 
             for i in tqdm.tqdm(range(self.ncoord.shape[1])):
                 self.ncoord[:, i] = [len(np.nonzero(self.distances[t][i, :])[1]) for t in range(self.t.n_frames)]
+                #self.ncoord[:, i] = [(self.distances[t] != 0).sum(1).mean() for t in range(self.t.n_frames)]
 
-            # for i in range(self.com.shape[1]):
-            #     print(i)
-            #     plt.plot(ncoord[:, i])
-            #     plt.show()
-            #
-            # exit()
+            for i in range(self.com.shape[1]):
+                print(i)
+                plt.plot(self.ncoord[:, i])
+                plt.show()
+
+            exit()
 
             plt.plot(self.time, self.ncoord.mean(axis=1))
 
@@ -281,7 +282,7 @@ if __name__ == "__main__":
 
         system.distance_search(cut=args.cut)  # calculate pairwise distance between all points in self.com and self.com_coordinated
 
-        system.n_coordinated()
+        system.n_coordinated(plot=True)
 
         with open(args.savename, 'wb') as f:
             pickle.dump(system, f)
@@ -291,8 +292,10 @@ if __name__ == "__main__":
         system = pickle.load(open(args.savename, "rb"))
         print('Done!')
 
+        system.n_coordinated(plot=True)
+
     #system.plot(res=['HII', 'HII', 'HOH'], atom_groups=[['O3', 'O4'], ['O', 'O1', 'O2'], ['O']])
-    system.n_coordinated(plot=True)
+    # system.n_coordinated(plot=True)
     #
     # for i in np.nonzero(system.distances[-1][0, :])[1]:
     #     print('%s -- %s' % (system.com_map[0], system.com_coordinated_map[i]))

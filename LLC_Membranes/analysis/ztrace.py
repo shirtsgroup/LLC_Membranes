@@ -79,7 +79,7 @@ class ZTrace(object):
 
             self.radial_distance[t, :] = d[np.argmin(d, axis=0), np.arange(self.nres)]
 
-    def plot_trace(self, nr, colormap='plasma_r', cmax=None, savename=None):
+    def plot_trace(self, nr, colormap='plasma_r', cmax=None, savename=None, show=True):
 
         fig, ax = plt.subplots()
 
@@ -128,7 +128,8 @@ class ZTrace(object):
         if savename is not None:
             plt.savefig(savename)
 
-        plt.show()
+        if show:
+            plt.show()
 
 
 if __name__ == "__main__":

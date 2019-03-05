@@ -10,7 +10,7 @@ crsr = connection.cursor()
 restrict_by_name = False 
 MW = False  # plot mw of species
 penalty = 0.25
-wt = 10 
+wt = 5 
 
 group = 'all'
 
@@ -39,7 +39,10 @@ if restrict_by_name:
 	query += ') and'
 else:
 	query += ' WHERE'
-query += " penalty = %s and" % penalty
+
+if wt == 10:
+	query += " penalty = %s and" % penalty
+
 query += " wt_water = %s" % wt
 query += " and name != 'HOH'"
 query += " ORDER BY MD_TAMSD DESC"

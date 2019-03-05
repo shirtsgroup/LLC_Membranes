@@ -7,6 +7,7 @@ import sqlite3 as sql
 path = "/home/bcoscia/PycharmProjects/LLC_Membranes/LLC_Membranes/analysis/"
 connection = sql.connect('%s/size.db' % path)
 crsr = connection.cursor()
+wt = 10 
 
 simple_alcohols = False 
 if simple_alcohols:
@@ -33,7 +34,10 @@ r_std = np.array([i[2] for i in radii])
 connection = sql.connect('%s/../timeseries/msd.db' % path)
 crsr = connection.cursor()
 
-command = "SELECT name, MD_TAMSD, MD_TAMSD_CI_lower, MD_TAMSD_CI_upper, sim_length FROM msd WHERE penalty = 0.25"
+command = "SELECT name, MD_TAMSD, MD_TAMSD_CI_lower, MD_TAMSD_CI_upper, sim_length FROM msd WHERE wt_water = %d and name != 'HOH'" % wt
+
+if wt == 10:
+	command += "and penalty = 0.25"
 
 if restrict:
 	command += ' and ('
@@ -71,7 +75,7 @@ plt.xticks(fontsize=14)
 plt.yticks(fontsize=14)
 plt.tight_layout()
 if restrict:
-	plt.savefig('msd_radius_simple_alcohols.pdf')
+	plt.savefig('msd_radius_simple_alcohols_%dwt.pdf' % wt)
 else:
-	plt.savefig('msd_radius.pdf')
+	plt.savefig('msd_radius_%dwt.pdf' % wt)
 plt.show()

@@ -1,0 +1,16 @@
+;Forcefield
+#include "/home/bcoscia/PycharmProjects/GitHub/HII/Scripts/../top/Forcefields/gaff/gaff.itp"
+
+;Monomer Topology
+#include "/home/bcoscia/PycharmProjects/GitHub/HII/Scripts/../../BCC/top/topologies/Dibrpyr14.itp"
+
+;Ion Topology
+#include "/home/bcoscia/PycharmProjects/GitHub/HII/Scripts/../top/Forcefields/gaff/ions.itp"
+
+[ system ]
+npt simulation of Dibrpyr14
+
+[ molecules ]
+; Compound         nmols
+MOL                 582
+BR                 1164
