@@ -13,6 +13,141 @@ ions_mw = {}
 ions_mw['NA'] = 22.99
 
 
+class ReadItp(object):
+    """ Read a GROMACS topology file and extract desired information
+
+    :param name: name of GROMACS topology file
+
+    :return: charge,
+    """
+
+    def __init__(self, name):
+
+        try:
+            f = open('%s.itp' % name, 'r')
+        except FileNotFoundError:
+            try:
+                f = open('%s/../top/topologies/%s.itp' % (script_location, name), 'r')
+            except FileNotFoundError:
+                raise FileNotFoundError('No topology %s.itp found' % name)
+
+        self.itp = []
+        for line in f:
+            self.itp.append(line)
+
+        f.close()
+
+        # Intialize atom properties
+        self.natoms = 0
+        self.indices = {}  # key = atom name , value = index
+        self.names = {}  # key = index, value = atom name
+        self.mass = {}  # key = atom name, value = mass
+        self.charges = {}
+
+        # Initialize annotation lists
+        self.hbond_H = []  # hydrogen atoms capable of hbonding
+        self.hbond_D = []  # hydrogen bond donor atoms
+        self.hbond_A = []  # hydrogen bond acceptors
+        self.residues = []
+        self.planeatoms = []
+        self.plane_indices = []
+        self.benzene_carbons = []
+        self.lineatoms = np.zeros([2], dtype=int)
+        self.ref_atom_index = None
+        self.c1_atoms = []
+        self.c2_atoms = []
+        self.c1_index = []
+        self.c2_index = []
+        self.ion_indices = []
+        self.tail_atoms = []
+        self.no_ions = 0
+        self.ions = []
+        self.MW = 0
+        self.dummies = []
+        self.valence = 0
+        self.carboxylate_indices = []
+        self.pore_defining_atoms = []
+
+    def atoms(self, annotations=False):
+
+        atoms_index = 0
+        while self.itp[atoms_index].count('[ atoms ]') == 0:
+            atoms_index += 1
+
+        atoms_index += 2
+
+        while self.itp[self.natoms + atoms_index] != '\n':
+
+            data = self.itp[self.natoms + atoms_index].split()
+
+            _, type, _, resname, atom_name, _, _, _ = data[:8]
+
+            ndx = int(data[0])
+            charge = float(data[6])
+
+            try:
+                mass = float(data[7])
+            except ValueError:  # Throws error if annotation is present with semi colon directly next to mass
+                mass = float(data[7].split(';')[0])
+
+            self.indices[atom_name] = ndx
+            self.names[ndx] = atom_name
+            self.mass[atom_name] = float(mass)
+            self.charges[atom_name] = float(charge)
+            self.MW += mass
+
+            if resname not in self.residues:
+                self.residues.append(resname)
+
+            if annotations:
+
+                try:  # check for annotations on atom
+
+                    annotations = self.itp[self.natoms + atoms_index].split(';')[1].split()
+
+                    if 'H' in annotations:
+                        self.hbond_H.append(atom_name)
+                    if 'D' in annotations:
+                        self.hbond_D.append(atom_name)
+                    if 'A' in annotations:
+                        self.hbond_A.append(atom_name)
+                    if 'P' in annotations:
+                        self.planeatoms.append(atom_name)
+                        self.plane_indices.append(ndx)
+                    if 'L1' in annotations:
+                        self.lineatoms[1] = ndx
+                    if 'L2' in annotations:
+                        self.lineatoms[0] = ndx
+                    if 'R' in annotations:
+                        self.ref_atom_index = ndx
+                    if 'C1' in annotations:
+                        self.c1_atoms.append(atom_name)
+                        self.c1_index.append(ndx)
+                    if 'C2' in annotations:
+                        self.c2_atoms.append(atom_name)
+                        self.c2_index.append(ndx)
+                    if 'I' in annotations:
+                        self.no_ions += 1
+                        self.valence = charge
+                        if atom_name not in self.ions:
+                            self.ions.append(atom_name)
+                        self.ion_indices.append(ndx)
+                    if 'B' in annotations:
+                        self.benzene_carbons.append(atom_name)
+                    if 'C' in annotations:
+                        self.carboxylate_indices.append(ndx)
+                    if 'PDA' in annotations:
+                        self.pore_defining_atoms.append(atom_name)
+                    if 'T' in annotations:
+                        self.tail_atoms.append(atom_name)
+                    if 'D' in annotations:
+                        self.dummies.append(atom_name)
+                except IndexError:
+                    pass
+
+            self.natoms += 1
+
+
 class Residue(object):
 
     def __init__(self, name):
@@ -201,7 +336,7 @@ class Molecule(object):
             self.com /= self.mw
 
 
-class LC(object):
+class LC(ReadItp):
     """A Liquid Crystal monomer has the following attributes which are relevant to building and crosslinking:
 
     Attributes:
@@ -232,147 +367,23 @@ class LC(object):
 
     def __init__(self, name):
 
-        self.name = os.path.splitext(name)[0]  # build monomer name
+        super().__init__(name)
+
+        self.atoms(annotations=True)
+
+        self.name = name
 
         a = []
-        with open('%s/../top/topologies/%s' % (script_location, name)) as f:
+        with open('%s/../top/topologies/%s.gro' % (script_location, name)) as f:
             for line in f:
                 a.append(line)
 
-        t = md.load("%s/../top/topologies/%s" % (script_location, name))
+        t = md.load("%s/../top/topologies/%s.gro" % (script_location, name))
         self.LC_positions = t.xyz[0, :, :]
         self.LC_names = [a.name for a in t.topology.atoms]
         self.LC_residues = [a.residue.name for a in t.topology.atoms]
 
         self.full = a
-        P = []
-        P_ndx = []
-        L = np.zeros([2], dtype=int)
-        C1 = []
-        C2 = []
-        C1_ndx = []
-        C2_ndx = []
-        I_ndx = []
-        carb = []
-        PDA = []
-        self.tail_atoms = []
-        self.no_ions = 0
-        self.ions = []
-        self.MW = 0
-        self.dummies = []
-
-        if name.endswith('.gro'):
-
-            # Lists of Plane atoms, line atoms, and dummy atoms
-            residues = [str.strip(a[2][5:10])]
-            nres = []
-            res_count = 0
-            benzene_carbons = []
-            for i in range(2, len(a) - 1):
-                res = str.strip(a[i][5:10])
-                self.MW += atom_props.mass[(str.strip(a[i][10:15]))]
-                if res in residues:
-                    res_count += 1
-                else:
-                    residues.append(res)
-                    nres.append(res_count)
-                    res_count = 1
-                if a[i].count(';') != 0:
-                    fields = a[i].split(';')
-                    annotations = fields[1].split()
-                    if 'P' in annotations:
-                        P.append(str.strip(a[i][10:15]))
-                        P_ndx.append(i - 2)
-                    if 'L1' in annotations:
-                        L[1] = i - 2
-                    if 'L2' in annotations:
-                        L[0] = i - 2
-                    if 'R' in annotations:
-                        self.ref_atom_index = i - 2
-                    if 'C1' in annotations:
-                        C1.append(str.strip(a[i][10:15]))
-                        C1_ndx.append(int(a[i][15:20]))
-                    if 'C2' in annotations:
-                        C2.append(str.strip(a[i][10:15]))
-                        C2_ndx.append(int(a[i][15:20]))
-                    if 'I' in annotations:
-                        self.no_ions += 1
-                        ion = str.strip(a[i][10:15])
-                        self.valence = atom_props.charge[ion]
-                        if ion not in self.ions:
-                            self.ions.append(ion)
-                        I_ndx.append(i - 2)
-                    if 'B' in annotations:
-                        benzene_carbons.append(str.strip(a[i][10:15]))
-                    if 'C' in annotations:
-                        carb.append(i - 2)
-                    if 'PDA' in annotations:
-                        PDA.append(str.strip(a[i][10:15]))
-                    if 'T' in annotations:
-                        self.tail_atoms.append(str.strip(a[i][10:15]))
-                    if 'D' in annotations:
-                        self.dummies.append(str.strip(a[i][10:15]))
-
-            nres.append(res_count)
-
-        elif name.endswith('.pdb'):
-
-            # Lists of Plane atoms, line atoms, and dummy atoms
-            start = 0
-            while a[start].count('ATOM') == 0:
-                start += 1
-            end = start
-            while a[end].count('ATOM') != 0:
-                end += 1
-
-            residues = [str.strip(a[start][17:22])]
-            nres = []
-            res_count = 0
-            benzene_carbons = []
-            for i in range(start, end):
-                res = str.strip(a[i][17:22])
-                if res in residues:
-                    res_count += 1
-                else:
-                    residues.append(res)
-                    nres.append(res_count)
-                    res_count = 1
-                if a[i].count(';') != 0:
-                    fields = a[i].split(';')
-                    annotations = fields[1].split()
-                    if 'P' in annotations:
-                        P.append(str.strip(a[i][11:16]))
-                    if 'L' in annotations:
-                        L.append(i - start)  # adjust for top lines and index (count from 0 rather than 1)
-                    if 'R' in annotations:
-                        self.ref_atom_index = i - start
-                    if 'C1' in annotations:
-                        C1.append(str.strip(a[i][11:16]))
-                        C1_ndx.append(int(str.strip(a[i][0:5])))
-                    if 'C2' in annotations:
-                        C2.append(str.strip(a[i][11:16]))
-                        C2_ndx.append(int(str.strip(a[i][0:5])))
-                    if 'I' in annotations:
-                        self.valence = atom_props.charge[str.strip(a[i][11:16])]
-                    if 'B' in annotations:
-                        benzene_carbons.append(str.strip(a[i][11:16]))
-
-            nres.append(res_count)
-
-        self.natoms = sum(nres) - self.no_ions
-        self.planeatoms = P
-        self.plane_indices = P_ndx
-        self.lineatoms = L
-        self.residues = residues
-        self.nresidues = nres
-        self.c1_atoms = C1
-        self.c2_atoms = C2
-        self.c1_index = C1_ndx
-        self.c2_index = C2_ndx
-        self.benzene_carbons = benzene_carbons
-        self.ion_indices = I_ndx
-        self.carboxylate_indices = carb
-        self.pore_defining_atoms = PDA
 
     def get_index(self, name):
         """

@@ -5,11 +5,13 @@ import mdtraj as md
 from LLC_Membranes.llclib import physical, topology, file_rw
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
 
 def initialize():
 
-    parser = argparse.ArgumentParser(description='Calculate radial distribution of a monomer component')
+    parser = argparse.ArgumentParser(description='Calculate radial distribution function for components of a hexagonal'
+                                                 ' phase LLC membrane system from the command line')
 
     parser.add_argument('-g', '--gro', default='wiggle.gro', help='Name of coordinate file')
     parser.add_argument('-t', '--traj', default='traj_whole.xtc', help='Trajectory file (.trr, .xtc should work)')
@@ -60,19 +62,22 @@ def grps(name):
 
 
 class System(object):
+    """ Calculate the radial distribution of a residue, atom or group of atoms in a hexagonal phase LLC Membrane
+    """
 
     def __init__(self, gro, traj, residue, monomer, begin=0, end=-1, skip=1, npores=4, atoms=None, com=True):
-        """ Calculate the radial distribution of residue in a hexagonal phase LLC Membrane
+        """ Restrict the system to desired components. Calculate centers of mass of components if desired
 
-        :param gro: Coordinate file (.gro or .pdb)
-        :param traj: Trajectory file (.trr or .xtc)
-        :param residue: Name of residue whose rdf will be calculated
+        :param gro: GROMACS coordinate file (.gro or .pdb)
+        :param traj: GROMACS trajectory file (.trr or .xtc)
+        :param residue: Name of residue to which the desired component belongs. If no other options are specified the \
+        radial distribution of this residue's center of mass will be calculated
         :param monomer: Name of monomer used to build LLC Membrane
-        :param begin: First frame index
-        :param end: Last frame index
-        :param skip: Skip every 'skip' frames
-        :param npores: Number of pores
-        :param atoms: Calculate RDF of atoms specified here which are a part of residue
+        :param begin: Index of first frame of trajectory to be used in analysis
+        :param end: Index of last frame of trajectory to be used in analysis
+        :param skip: Do not include every 'skip' frames in the analysis
+        :param npores: Number of pores in the unit cell (Currently only works for 4 pores)
+        :param atoms: Restrict residue to atoms named here
         :param com: Calculate density based on center of mass of residue or group of atoms
 
         :type gro: str
@@ -96,7 +101,7 @@ class System(object):
             residue = 'HOH'
 
         self.residue = topology.Residue(residue)
-        self.monomer = topology.LC('%s.gro' % monomer)
+        self.monomer = topology.LC('%s' % monomer)
 
         if atoms is not None and 'all' not in atoms:
             res = [a.index for a in self.t.topology.atoms if a.residue.name == residue and a.name in atoms]
@@ -108,8 +113,9 @@ class System(object):
                 mass = [v for v in self.residue.mass.values()]
 
         if com:
-            print('Calculating centers of mass...')
+            print('Calculating centers of mass...', flush=True, end='')
             self.com = physical.center_of_mass(self.t.xyz[:, res, :], mass)
+            print('Done!')
         else:
             self.com = self.t.xyz[:, res, :]
 
@@ -119,13 +125,13 @@ class System(object):
         self.errorbars = None
 
     def build_com(self, rep='K'):
-        """ Build system with COM of residue plotted in order to confirm that this script is working
+        """ Build system with the center of mass of the residue or group of atoms plotted in order to confirm that this script is working
 
         :param rep: name of atom to use to represent spline
 
         :type rep: str
 
-        :return: structure file, 'spline.gro'
+        :return: 'com.gro'
         """
 
         pos = np.concatenate((self.t.xyz[-1, ...], self.com[-1, ...]))
@@ -137,16 +143,22 @@ class System(object):
 
         file_rw.write_gro_pos(pos, 'com.gro', ucell=self.box[-1, ...], ids=ids, res=res)
 
-    def radial_distribution_function(self, bins=50, cut=1.5, spline=False, progress=True, npts_spline=10):
+    def radial_distribution_function(self, bins=50, cut=1.5, spline=False, progress=True, npts_spline=10, build=True):
         """ Calculate the radial distribution function based on xy distance of solute center of mass from pore center
 
         :param bins: number of bins in histogram of radial distances
         :param cut: largest distance to include in radial distance histogram
         :param spline: locate pore centers as a function of z. Recommended. Slower, but more accurate
         :param progress: Show progress bar while generating spline
-        :param npts_spline: Number of points making up spline tr each pore
+        :param npts_spline: Number of points making up spline through each pore
+        :param build: Create a .gro file of the last frame with the spline represented as atoms
 
-        :return:
+        :type bins: int
+        :type cut: float
+        :type spline: bool
+        :type progress: bool
+        :type npts_spline: int
+        :type build: bool
         """
 
         self.r = np.zeros([bins])
@@ -155,10 +167,15 @@ class System(object):
         pore_defining_atoms = [a.index for a in self.t.topology.atoms if a.name in self.monomer.pore_defining_atoms
                                and a.residue.name in self.monomer.residues]
 
+        if not pore_defining_atoms:
+            sys.exit('There are no atoms specified which can be used to define the pore centers. Did you specify '
+                     'the correct monomer for this system? If so, have you properly annotated the pore defining '
+                     'atoms?')
+
         pore_centers = physical.avg_pore_loc(4, self.t.xyz[:, pore_defining_atoms, :], self.box, spline=spline,
                                              progress=progress, npts=npts_spline)
 
-        if spline:
+        if spline and build:
             self.build_spline(pore_centers)  # to check that the spline was constructed properly
             print('Calculating component density')
 
@@ -170,6 +187,9 @@ class System(object):
 
         :param pore_centers: output of physical.avg_pore_loc() with spline=True
         :param rep: name of atom to use to represent spline
+
+        :type pore_centers: np.ndarray
+        :type rep: str
 
         :return: 'spline.gro'
         """
@@ -185,6 +205,12 @@ class System(object):
         file_rw.write_gro_pos(pos, 'spline.gro', ucell=self.box[-1, ...], ids=ids, res=res)
 
     def bootstrap(self, nboot):
+        """ Generate statistics using the bootstrapping technique
+
+        :param nboot: number of bootstrap trials (i.e. number of time data is resampled)
+
+        :type nboot: int
+        """
 
         nT = self.density.shape[0]
         self.bootstraps = np.zeros([nboot, self.density.shape[1]])
@@ -203,6 +229,20 @@ class System(object):
         self.errorbars[1, :] = np.percentile(self.bootstraps, upper_confidence, axis=0) - self.density.mean(axis=0)
 
     def plot(self, show=False, normalize=False, save=True, savename='rdf.pdf', label=None):
+        """ Plot the radial distribution function
+
+        :param show: Display plot
+        :param normalize: Divide by all values of RDF by the maximum value
+        :param save: Save the plot under savename
+        :param savename: Name and format (determined by file extension) under which to save plot
+        :param label: Legend label. If None, residue name will be used.
+
+        :type show: bool
+        :type normalize: bool
+        :type save: bool
+        :type savename: str
+        :type label: str
+        """
 
         if label is not None:
             lab = label.title()
@@ -243,6 +283,9 @@ if __name__ == "__main__":
 
     if args.atoms is None:
         args.atoms = [['all']]
+
+    if args.residue is None:
+        sys.exit('Please specify a residue to calculate rdf with respect to')  # need better grammar here
 
     while len(args.atoms) < len(args.residue):
         args.atoms.append(None)

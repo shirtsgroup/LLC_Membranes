@@ -7,3 +7,4 @@ Post-Simulation Trajectory Analysis
 
       hbonds
       p2p
+      rdf
