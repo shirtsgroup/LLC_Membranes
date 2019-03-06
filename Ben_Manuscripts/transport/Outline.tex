@@ -347,7 +347,7 @@
   Using four different methods, Rowley and Roux observed peaks in the radial
   distribution function for sodium coordinated with water at an O-Na distance 
   of between 2.3 and 2.5 \AA~\cite{rowley_solvation_2012}. We used 2.5 \AA as
-  the distance cutoff.
+  the distance cutoff.  % BJC: this might be too strict. I've seen literature where they define 3.2 angstroms as the cutoff
    
   \section{Results and Discussion}
   
@@ -399,13 +399,14 @@
   of the 5 wt \% system. }\label{fig:component_densities}
   \end{figure}
   
-  The MSD of sodium and water is significantly larger in the 10 wt \% water system
-  versus the 5 wt \% water system.
+%  The MSD of sodium and water is significantly larger in the 10 wt \% water system
+%  versus the 5 wt \% water system.
+  \noindent Water's mobility is increased when pores are larger and less crowded.
   \begin{itemize}
     %BJC: these numbers will change. This is for incomplete methanol systems. I will
     % redo calculations on pure water systems.
-    \item Water moves about 65 times faster and sodium moves about 40 times faster
-    in the 10 wt\% system.
+    \item The MSD of water is about 65 times higher and the MSD of sodium is about 40
+    times higher in the 10 wt\% system.
     \item Water moves about 65 times faster than sodium in the 10 wt \% system and
     40 times faster than sodium in the 5 wt \% system. %BJC: weird coincidence
     \item The diffusivity of water in the 10 wt \% system is still only 1 \% that of 
@@ -440,16 +441,23 @@
   water system.}\label{fig:msd_comparison}
   \end{figure}
   
-  \noindent Sodium coordinates with water far less than in bulk solution.
+  \noindent Sodium coordinates with far less water molecules than it does in 
+  bulk solution.
   \begin{itemize}
-    \item On average, each sodium ion is coordinated to about 1.7 water molecules in 
-    the 10 wt \% system and 1.15 water molecules in the 5 wt\% system.
     \item In bulk water, it is estimated that sodium coordinates with 5.6 - 5.8 water
     molecules~\cite{rowley_solvation_2012}
+    \item In our system, on average, each sodium ion is coordinated to about 1.7 
+    water molecules in the 10 wt \% system and 1.15 water molecules in the 5 wt\% 
+    system.
     \item The low levels of water coordination under confinement are likely driven
     in part by favorable interactions between sodium ions and carboxylate head groups.
-    \item A dehydrated sodium ion is not shielded from the negatively charged carboxylate
-    group.~\cite{ma_drastically_2019}
+    \item A dehydrated sodium ion is not shielded from the negatively charged 
+    carboxylate group.~\cite{ma_drastically_2019}
+    \item On average, sodium ions coordinate with 0.5 head group oxygen atoms in the
+    10 wt \% water system and 0.4 head group oxygen atoms in the 5 wt \% water system. 
+    % BJC: I thought 5 wt \% might be a little higher. These numbers might be skewed by
+    % sodium ions that are within cutoff of both carboxylate oxygen atoms. Might be
+    % better to report average number of sodiums coordinated to a head group
   \end{itemize}
   
   % BJC: This figure is from methanol simulations. Will be replaced by pure water
@@ -463,7 +471,7 @@
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{Na_hg_coordination.pdf}
-  \caption{}\label{fig:na_hg_coordination}
+  \caption{}\label{fig:na_hg_coordination}  % No caption since this probably won't be a figure
   \end{subfigure}
   \end{figure}
   
@@ -550,10 +558,12 @@
   \includegraphics[width=\textwidth]{msd_radius_10wt.pdf} 
   \caption{10 wt \% water}\label{fig:msd_radius_10wt}
   \end{subfigure}
-  \caption{}\label{fig:msds}
+  \caption{The MSDs of solutes in the 5 wt \% water system (a) are significantly
+  smaller than those of the solutes in the 10 wt \% water system (b). The
+  MSDs are not a monotonic function of molecular size (c and d).}\label{fig:msds}
   \end{figure}  
   
-  \noindent On the timescales simulated in our study, we observe subdiffusive behavior.
+  \noindent On the timescales simulated in our study, solutes exhibit subdiffusive behavior.
   %, providing the beginnings of an answer to question~\ref{question:mechanisms}.
   \begin{itemize}  
     \item Figure~\ref{fig:example_ztraces} plots the $z$-coordinate versus time of
@@ -565,7 +575,7 @@
 	subdiffusive, behavior.
   \end{itemize}
   
-  Solutes partition out of the pore into the head group region and beyond which
+  \noindent Solutes partition out of the pore into the head group region and beyond which
   may lead to radially dependent transport mechanisms.
   \begin{itemize}
     \item It is clear from Figure~\ref{fig:example_ztraces} that the longest 
@@ -610,10 +620,33 @@
     are 5 times more water molecules in the system.
     \item The carboxylate oxygen atoms have a slightly higher partial negative
     charge than water molecules.
-    \item Additionally, on average, each sodium ion is coordinated to 3 water
+    \item Additionally, on average, each sodium ion is coordinated to 1.7 water
     molecules. Roughly all of the water in the pore region is usually coordinated
     to a sodium ion which decreases their availability to solutes.
   \end{itemize}
+  
+  Finally, we see instances of solutes which become immobilized or slowed by 
+  association with sodium counterions. 
+  \begin{itemize}
+    \item Much like water, the polarity of the solutes leaves partial negative
+    charges which are stabilized through electrostatic interactions with sodium ions.
+    \item There are many cases in which polar groups bind to sodium ions for at
+    least a few time steps. 
+    \item There are some cases where solutes become immobilized for long periods
+    of time while in close proximity to a sodium ion.
+    \item In Figure~\ref{fig:na_met_trace}, the oxygen atom of methanol stays
+    within 2.5 \AA of a sodium ion for the entire length of a trapping occurence.
+  \end{itemize}
+  
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.45\textwidth]{na_met_trace.pdf}
+  \caption{The oxygen atom of methanol stays bound to the same sodium ion for
+  the majority of the trapping occurence between 400 and 600 ns. Regions
+  highlighted red or blue indicate times when methanol's oxygen atom is within 
+  2.5 \AA~of a sodium ion. The color of the shaded regions is switched every time
+  the oxygen atom becomes associated to a different sodium ion.}\label{fig:na_met_trace}
+  \end{figure}
   	
   \noindent The hopping and trapping mechanism exhibited by all solutes is characteristic of
   a continuous time random walk (CTRW) model.	
@@ -633,7 +666,7 @@
   (sFBM) model.
   \begin{itemize}
   	\item Figure~\ref{fig:example_autocovariance} shows the autocovariance function of 
-  	ethanol step vectors. % BJC: vectors because includes magnitude + direction. Better word?
+  	ethanol step vectors. % BJC: vectors because includes magnitude + direction. Is there a better word?
   	\item The negative autocovariance at low values of k indicates anti-correlation
   	between hops. 
   	\item If solutes followed a pure CTRW mechanism, the autocovariance function would
@@ -685,8 +718,8 @@
     the rest of our analysis on transport in the 10 wt \% water systems.
   \end{itemize}
   
-  We will revisit our observations in the the context of specific groups of 
-  molecules in the discussion that follows.
+%  We will revisit our observations in the the context of specific groups of 
+%  molecules in the discussion that follows.
   
 %  \noindent The MSDs in Figure~\ref{fig:all_msds} are a strong function of two solute 
 %  trapping mechanisms.
@@ -771,13 +804,14 @@
   their molecular weight, however, methanol travels faster than expected.  %BJC: find approximate relationship between MW and mobility
   \begin{itemize}
     \item The MSD of ethanol, propanol and butanol descend approximately
-    linearly as expected form the Stokes-Einstein relationship  % BJC: maybe better to use wilke-chang version with correction factor
-    \item However, methanol travels considerably faster based on this relationship. (See Figure~\ref{fig:msd_radius_simple_alcohol_rdf}
+    linearly as expected from the Stokes-Einstein relationship  % BJC: maybe better to use wilke-chang version with correction factor
+    \item However, methanol travels considerably faster than suggested by the
+    relationship. (See Figure~\ref{fig:msd_radius_simple_alcohol_rdf}
   \end{itemize}    
     
-  Methanol moves fast because it has the highest radial density near the pore center where
-  the largest hops occur.
-  \begin{itemize} 
+  Methanol moves fast, not only because it is the smallest solute studied in this work, but
+  because it has the highest radial density near the pore center where the largest hops occur.
+  \begin{itemize}
     \item The radial density as a function of distance from the pore center
     for each alcohol is plotted in Figure~\ref{fig:simple_alcohol_rdf}.
     \item On average, the density of methanol in the pore center is only slightly
@@ -826,12 +860,14 @@
   \includegraphics[width=\linewidth]{butanol_CO.pdf}  %BJC: can add inset to plot showing butanol with highlighted O and C
   \caption{}\label{fig:butanol_CO}
   \end{subfigure}
-  \caption{(a) The radial distribution functions of each simple alcohol shows a maximum close
+  \caption{(a) The MSD of the simple alcohols decrease as a function of the solute size, however
+  methanol's MSD is considerably higher than expected based on the Stokes-Einstein equation. 
+  (b) The radial distribution functions of each simple alcohol shows a maximum close
   to the highest density of monomer head groups (dashed line, normalized for easier visual
   comparison). Methanol spends the largest proportion of time, relative to the other alcohols,
-  near the pore center, which may help explain its fast dynamics. (b) Despite relatively little
+  near the pore center, which may help explain its fast dynamics. (c) Despite relatively little
   difference in the total number of hydrogen bond occurences, a given alcohol's preference
-  towards hydrogen bonds with the carboxylate groups increases with molecule size. (c) The average
+  towards hydrogen bonds with the carboxylate groups increases with molecule size. (d) The average
   location of butanol's oxygen atom is significantly closer to the pore center than its most distal
   carbon atom, suggesting that the molecule is oriented with hydrophobic tails pointing away from
   the pore center.}\label{fig:simple_alcohols}
@@ -915,8 +951,8 @@
     \item Propylene glycol exhibits longer dwell times and a narrower distribution of 
     hop lengths than ethylene glycol. 
     \item Somewhat counterintuitively, there is a relatively high density of ethylene
-    glycol molecules beyond the head group region. This likely contributes to the relatively
-    large error bars on its MSD in Figure~\ref{fig:all_msds}. 
+    glycol molecules beyond the head group region probably due to its relatively small size.
+    This likely contributes to the somewhat large error bars on its MSD in Figure~\ref{fig:msds}. 
     %BJC: can show figure of radial density colored with hop lengths
     \item This implies that hops performed by ethylene glycol must be considerably larger
     than those by propylene glycol in order to result in consistently larger MSD values.
@@ -955,51 +991,68 @@
     3 times faster than the slowest, acetone, but only about 10 \% smaller.
   \end{itemize}
   
-  The MSD of the solutes descend in order of their density close to the pore center.
+  \noindent The MSD of the solutes descend in order of their density close to the pore center.
   \begin{itemize}
     \item As shown in the radial density functions (Figure~\ref{fig:ketones_rdf}), 
-    Acetic has a fairly uniform and high density within the pore region.
+    Acetic acid has a fairly uniform and high density within the pore region.
     \item Acetone spends relatively little time near the pore center with its
     peak density nearest the peak head group density.
   \end{itemize}
   
-  The amides, urea and acetamide hydrogen bond with head groups relatively infrequently.
+  \noindent The amides, urea and acetamide, hydrogen bond with head groups relatively 
+  infrequently, but regularly coordinate with sodium ions (See Figure~\ref{fig:ketones}).
   \begin{itemize}
-    \item Acetic acid hydrogen bonds with head groups nearly 20 times as frequently.
+    \item In an average frame, acetic acid participates in more than 12 hydrogen 
+    bonds with monomer head groups while urea and acetamide participate in less than 2.
     \item Urea and Acetamide both have hydrogen bond donating nitrogen atoms, however
   	nitrogen is a weaker hydrogen bond donor than oxygen due to its lower electronegativity.
-    \item The peaks in their radial density are closer to the pore center than 
-    other solutes that hydrogen bond with carboxylate groups (see 
-    Figure~\ref{fig:simple_alcohol_rdf} for example).
+  	\item Given their lower propensity to hydrogen bond one might expect amides to partition
+  	out of the pore and/or to move through the pore quickly, perhaps faster than methanol.
+    \item The peaks in their radial density are still situated between the pore center and the
+    head groups, but closer to the pore center than other solutes that hydrogen bond with 
+    carboxylate groups (see Figure~\ref{fig:simple_alcohol_rdf}, for example).
+    \item Both solutes spend about half of their time with their carbonyl oxygen atom 
+    coordinated to a sodium ion which restrains the solutes to within the pore region
+    %BJC: it's possible the solutes hop from sodium to sodium quickly meaning solutes are not always immobilized.
+    %BJC: could look into lifetime of association
+    \item Interestingly, the nitrogen atoms do not coordinate with any sodium ions despite
+    a similar negative partial charge. The hydrogen atoms may shield this interaction.
   \end{itemize}   
-  
-  Urea stays close to pore center because it's hydrophilic
-  Acetamide stays a little closer to pore walls because it has hydrophobic character
-  That's why acetamide is slower
-  Acetic Acid is being slowed down by hydrogen bonding (compare to methanol)
-  Urea is slowed down by ..?
-  
-  Once again, the trends in the MSD can in large part be explained by the solutes'
-  preference for water.
+
+  Acetone has the lowest MSD of this set because it is primarily trapped near and behind 
+  the head groups.
   \begin{itemize}
-  	\item Urea, Acetic Acid and Acetamide are all capable of donating hydrogen bonds,
-  	while acetone is the first instance of a molecule in this study that can only
-  	accept hydrogen bonds. It follows that acetone has the slowest MSD of this grouping.
-  	\item Urea and Acetamide both have hydrogen bond donating nitrogen atoms, however
-  	nitrogen is a weaker hydrogen bond donor than oxygen due to its lower electronegativity.
-  	\item Hence, Acetic Acid donates the greatest number of hydrogen bonds and has
-  	the highest density throughout the pore region.
-  	\item All other solutes show a higher preference for the tail region where three 
-  	dimensional confinement directly contributes to a lower MSD.
-  	\item Urea likely compensates for its loss of mobility in the head group region by
-  	making large hops upon escape into the pore region.
-  	\item Urea frequently moves between the head group and pore region because its planar
-  	shape makes it easier to transition between regions.% could quantify transition frequency probably. It seems like it might yield something. But also might make things more ambiguous.
-  	\item As the solutes become less polar, their MSD decreases. 
-  	\item Acetamide has one less amine group than Urea and a corresponding smaller MSD.
-  	\item Despite a peak in its density near the pore center due to its water solubility,
-  	Acetone is the least polar and spends the most time outside the tail group region 
-  	leading to the lowest MSD.
+    \item On average, acetone coordinates with sodium with the same frequency as acetic acid 
+    \item However, acetic acid spends more time in the pore center and therefore encounters
+    more sodium ions.
+    \item When an acetone molecule coordinates with a sodium ion, its polarity is 
+    largely neutralized and it retreats towards the head group region where it can easily
+    get trapped.
+    \item Acetic acid and the amides and acetic acid have alternate hydrophlic
+    groups when bound to sodium ions which increases their stability in the pore.
+  \end{itemize}
+  
+%  Once again, the trends in the MSD can in large part be explained by the solutes'
+%  preference for water.
+%  \begin{itemize}
+%  	\item Urea, Acetic Acid and Acetamide are all capable of donating hydrogen bonds,
+%  	while acetone is the first instance of a molecule in this study that can only
+%  	accept hydrogen bonds. It follows that acetone has the slowest MSD of this grouping.
+%  	\item Urea and Acetamide both have hydrogen bond donating nitrogen atoms, however
+%  	nitrogen is a weaker hydrogen bond donor than oxygen due to its lower electronegativity.
+%  	\item Hence, Acetic Acid donates the greatest number of hydrogen bonds and has
+%  	the highest density throughout the pore region.
+%  	\item All other solutes show a higher preference for the tail region where three 
+%  	dimensional confinement directly contributes to a lower MSD.
+%  	\item Urea likely compensates for its loss of mobility in the head group region by
+%  	making large hops upon escape into the pore region.
+%  	\item Urea frequently moves between the head group and pore region because its planar
+%  	shape makes it easier to transition between regions.% could quantify transition frequency probably. It seems like it might yield something. But also might make things more ambiguous.
+%  	\item As the solutes become less polar, their MSD decreases. 
+%  	\item Acetamide has one less amine group than Urea and a corresponding smaller MSD.
+%  	\item Despite a peak in its density near the pore center due to its water solubility,
+%  	Acetone is the least polar and spends the most time outside the tail group region 
+%  	leading to the lowest MSD.
 %  	\item With two nitrogen groups that hydrogen bond relatively infrequently, one might 
 %  	expect Urea to exhibit much faster transport, however its MSD is comparable to
 %  	the much stickier acetic acid. 
@@ -1021,7 +1074,7 @@
 %    its low polarity and planar shape gives it comparable stability when trapped between head groups.
 %  	\item Acetone's has two prominent peaks in its radial density. One is in the pore region and the o
 %  	other is relatively deep in the head group region.
-  \end{itemize}
+%  \end{itemize}
   
   \begin{figure}[!htb]
   \centering
@@ -1030,9 +1083,17 @@
   \caption{}\label{fig:ketones_rdf}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{ketone_ratio.pdf}
-  \caption{}\label{fig:ketones_ratio}
+  \includegraphics[width=\textwidth]{ketone_hbonds.pdf}
+  \caption{}\label{fig:ketone_hbonds}
   \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\textwidth]{ketone_ratio.pdf}
+%  \caption{}\label{fig:ketones_ratio}
+%  \end{subfigure}
+  \caption{(a) The radial density near the pore center (r = 0) decreases
+  with decreasing solute MSD. (b) The amides hydrogen bond with water far
+  less than acetic acid, however they tend to coordinate with sodium ions
+  more frequently.}\label{fig:ketones}
   \end{figure}
   
   \subsection*{Transport of Thiols}
@@ -1071,8 +1132,9 @@
   \noindent Mercaptoethanol has a similar average MSD and RDF to ethylene glycol.
   \begin{itemize}
     \item There is a much larger uncertainty associated with mercaptoethanol's MSD.
-    \item It spends more time in the tail region than ethylene glycol, where transport
-    is inherently slower, and may contribute to some slower MSDs.  % Can quantify as a percentage
+    \item It spends more time in the tail region than
+    ethylene glycol, where transport is inherently slower, and may contribute to some
+    slower MSDs.  % Can quantify as a percentage
     \item Conversely, Mercaptoethanol also exhibits some of the highest single solute MSDs 
     (See Figure~\ref{fig:SOH_trace})  % Only methanol has greater (I think)
     \item It hydrogen bonds with head groups 6 times less frequently than ethylene glycol.
@@ -1093,7 +1155,9 @@
   \includegraphics[width=\linewidth]{SOH_trace.pdf}
   \caption{}\label{fig:SOH_trace}
   \end{subfigure}
-  \caption{}
+  \caption{Mercaptoethanol exhibits transport behavior ranging from frequent hopping
+  to lengthy trapping. Large hops generally occur near the pore center while 
+  long entrapments occur while tangled among the monomer tails.}
   \end{figure}
   
   % Potentially useful explanation
@@ -1105,7 +1169,7 @@
   \noindent 2,3-Dimercapto-1-propanol exhibits slower transport than glycerol because it spends more time
   near monomer head groups. % BJC: should I give all the solutes nicknames (i.e. their residue names)?
   \begin{itemize}
-    \item Glycerol frequently hydrogen bonds with more than one head group at a time.
+    \item Glycerol frequently hydrogen bonds with more than one head group at a time (See Figure~\ref{fig:multi_hbonds}).
     % BJC: can probably quantify the following:
     \item It can also hydrogen bond with water molecules which increases its stability
     in the pore region.
@@ -1113,12 +1177,13 @@
     so it gravitates towards the head group region.
   \end{itemize} 
   
-  \noindent DMSO has an average MSD nearly twice as large as acetone even though it
+  \noindent DMSO has a comparable if not large MSD than acetone even though it
   is a slightly larger molecule.
   \begin{itemize}
     \item The radial density of DMSO is higher than acetone close to the pore center.
   	\item The pyramidal structure of DMSO may force it to spend more time closer to
   	the pore center.
+  	%BJC: quantify sodium coordination O group of DMSO
   \end{itemize}  
   
   \subsection*{Hydrogen bond acceptors}  % Need a better heading since all molecules in this study are acceptors
@@ -1128,22 +1193,22 @@
   them. 
   \begin{itemize}
   	\item Among this set are the two slowest solutes in our study: Tetrahydrofuran and Dimethyl Formamide.
-  	\item The MSDs of ethyl acetate and propylene carbonate are only marginally larger,
-  	however they are both larger molecules. %BJC: not sure how far I should dive into this point
+  	\item The MSDs of ethyl acetate, propylene carbonate and acetone are only marginally larger.
+  	% EAC and PCB are both larger molecules. Acetone is small. %BJC: not sure how far I should dive into this point
   \end{itemize}  
   
-  The radial density functions highlight the solutes' preference for the 
-  head group region.
-  \begin{itemize}
-  	\item There are small peaks in the radial density greater than 1 nm 
-  	from the pore center.
-  	\item The solutes become trapped in these regions where each step is
-  	highly anti-correlated to its previous step, leading to very low MSDs.
-  	\item The large size and nonplanar shapes of ethyl acetate and propylene 
-  	carbonate may destabilize entrapment in the tail region more quickly, leading
-  	to slightly faster transport. 
-  	% BJC:  Ethyl acetate spends all of its time in a linear or near-linear conformation.
-  \end{itemize}
+%  The radial density functions highlight the solutes' preference for the 
+%  head group region.
+%  \begin{itemize}
+%  	\item There are small peaks in the radial density greater than 1 nm 
+%  	from the pore center.
+%  	\item The solutes become trapped in these regions where each step is
+%  	highly anti-correlated to its previous step, leading to very low MSDs.
+%  	\item The large size and nonplanar shapes of ethyl acetate and propylene 
+%  	carbonate may destabilize entrapment in the tail region more quickly, leading
+%  	to slightly faster transport. 
+%  	% BJC:  Ethyl acetate spends all of its time in a linear or near-linear conformation.
+%  \end{itemize}
   
   The radial density of solutes near the pore center in this set is surprisingly high
   as shown in Figure~\ref{fig:nondonors_rdf}.
@@ -1167,11 +1232,30 @@
 	become stuck between head groups. Excursions into the pore region do not
 	necessarily result in large hops.
   \end{itemize}
+  
+  Carbonyl groups continue to show high degrees of association with sodium ions. 
+  \begin{itemize}
+    \item The number of sodium ions coordinated to the carbonyl group of 
+    propylene carbonate, dimethyl formamide, ethyl acetate are consistent with 
+    that shown by acetone, all between 6 and 7 per frame (See 
+    figure~\ref{fig:nondonors_hbonds})
+    \item The carbonyl group of the amides studied in the previous section
+    associate with sodium nearly twice as frequently as compounds that don't
+    contain nitrogen (see figure~\ref{fig:ketone_hbonds}).
+    \item In all cases, other polar groups on carbonyl-containing compounds
+    associate with sodium in negligible amounts.
+  \end{itemize}
  
   \begin{figure}
   \centering
-  \includegraphics[width=0.45\textwidth]{nondonors_rdf.pdf}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{nondonors_rdf.pdf}
   \caption{}\label{fig:nondonors_rdf}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{nondonor_hbonds.pdf}
+  \caption{}\label{fig:nondonors_hbonds}
+  \end{subfigure}
   \end{figure}
   
   \begin{figure}
@@ -1191,20 +1275,20 @@
   
   % THF shows highly anticorrelated hops
   
-  The majority of THF trajectories are spent near or beyond the head groups. Some
-  trajectories spend all of their time near the pore center but with very little movement. 
-  High densities in head group / tail region is a consequence of trajectories where THF
-  gets trapped there. Ring structure of THF makes it miscible with water (has dipole). Bulky alkyl
-  substituents are kept from interfering with oxygen's electron pairs. THF does not
-  make large hops in the pore center for some reason.
-  Water does not get close to THF when it's in the pore center
-  THF appears to prefer to associate with sodium 
-  THF is stabilized by sodium or by a hydrogen bond with water leaving oily groups alone which
-  don't want to move through the water. The effective size of THF increases and prevents it
-  from moving.
-  
-  DMF shows similar characteristics, however spends a large proportion of its time trapped 
-  between head groups.
+%  The majority of THF trajectories are spent near or beyond the head groups. Some
+%  trajectories spend all of their time near the pore center but with very little movement. 
+%  High densities in head group / tail region is a consequence of trajectories where THF
+%  gets trapped there. Ring structure of THF makes it miscible with water (has dipole). Bulky alkyl
+%  substituents are kept from interfering with oxygen's electron pairs. THF does not
+%  make large hops in the pore center for some reason.
+%  Water does not get close to THF when it's in the pore center
+%  THF appears to prefer to associate with sodium 
+%  THF is stabilized by sodium or by a hydrogen bond with water leaving oily groups alone which
+%  don't want to move through the water. The effective size of THF increases and prevents it
+%  from moving.
+%  
+%  DMF shows similar characteristics, however spends a large proportion of its time trapped 
+%  between head groups.
   
   %All have comparable densities near pore center except acetone which is lower
 

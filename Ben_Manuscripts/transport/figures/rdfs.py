@@ -150,7 +150,7 @@ elif thiol_comparison:
 	plt.savefig('thiol_comparison_%s.pdf' % residues[0])
 elif ketones:
 	plt.savefig('ketone_rdf.pdf')
-#elif nondonors:
-#	plt.savefig('nondonors_rdf.pdf')
+elif nondonors:
+	plt.savefig('nondonors_rdf.pdf')
 plt.show()
 

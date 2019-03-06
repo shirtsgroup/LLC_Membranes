@@ -35,7 +35,7 @@ def initialize():
     parser.add_argument('-tc', '--coordinated_type', default=None, help='Element name of coordinated atoms')
 
     # coordination calculation parameters
-    parser.add_argument('-cut', default=0.3, type=float, help='Maximum distance between pairs where they are considered'
+    parser.add_argument('-cut', default=0.25, type=float, help='Maximum distance between pairs where they are considered'
                                                               'coordinated (nm)')
 
     # saving options
@@ -251,12 +251,12 @@ class System(object):
                 self.ncoord[:, i] = [len(np.nonzero(self.distances[t][i, :])[1]) for t in range(self.t.n_frames)]
                 #self.ncoord[:, i] = [(self.distances[t] != 0).sum(1).mean() for t in range(self.t.n_frames)]
 
-            for i in range(self.com.shape[1]):
-                print(i)
-                plt.plot(self.ncoord[:, i])
-                plt.show()
-
-            exit()
+            # for i in range(self.com.shape[1]):
+            #     print(i)
+            #     plt.plot(self.ncoord[:, i])
+            #     plt.show()
+            #
+            # exit()
 
             plt.plot(self.time, self.ncoord.mean(axis=1))
 
@@ -284,6 +284,8 @@ if __name__ == "__main__":
 
         system.n_coordinated(plot=True)
 
+        print((system.ncoord.flatten() > 0).sum() / (system.ncoord.shape[0] * system.ncoord.shape[1]))
+
         with open(args.savename, 'wb') as f:
             pickle.dump(system, f)
 
@@ -292,7 +294,12 @@ if __name__ == "__main__":
         system = pickle.load(open(args.savename, "rb"))
         print('Done!')
 
-        system.n_coordinated(plot=True)
+        plt.plot(system.time, system.ncoord.sum(axis=1))
+        plt.show()
+        exit()
+        print((system.ncoord.flatten() > 0).sum() / (system.ncoord.shape[0] * system.ncoord.shape[1]))
+
+        # system.n_coordinated(plot=True)
 
     #system.plot(res=['HII', 'HII', 'HOH'], atom_groups=[['O3', 'O4'], ['O', 'O1', 'O2'], ['O']])
     # system.n_coordinated(plot=True)
