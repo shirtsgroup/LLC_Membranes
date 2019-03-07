@@ -5,6 +5,7 @@ Simulate Lyotropic Liquid Crystal Membranes
    :maxdepth: 2
    :titlesonly:
 
+   prep
    setup
    analysis
 

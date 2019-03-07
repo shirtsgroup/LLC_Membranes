@@ -1,5 +1,5 @@
-rdf.py
-============
+Radial Distribution Functions
+=============================
 
 For hexagonal phase LLC systems, we define the radial distribution 
 function of a component as the number density of that component

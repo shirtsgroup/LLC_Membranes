@@ -1,5 +1,5 @@
-p2p.py
-============
+Distance Between Pores
+======================
 
 .. argparse:: 
    :filename: ../LLC_Membranes/analysis/p2p.py

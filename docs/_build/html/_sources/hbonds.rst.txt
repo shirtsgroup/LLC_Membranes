@@ -1,5 +1,5 @@
-hbonds.py
-============
+Identify Hydrogen Bonds
+=======================
 
 .. argparse:: 
    :filename: ../LLC_Membranes/analysis/hbonds.py

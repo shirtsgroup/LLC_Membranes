@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>p2p.py &mdash; LLC_Membranes 0.1.0 documentation</title>
+  <title>Distance Between Pores &mdash; LLC_Membranes 0.1.0 documentation</title>
   
 
   
@@ -46,8 +46,8 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="rdf.py" href="rdf.html" />
-    <link rel="prev" title="hbonds.py" href="hbonds.html" /> 
+    <link rel="next" title="Radial Distribution Functions" href="rdf.html" />
+    <link rel="prev" title="Identify Hydrogen Bonds" href="hbonds.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -96,11 +96,12 @@
             
             
               <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="prep.html">Preparation of Monomers and Solutes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="setup.html">System Setup</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="analysis.html">Post-Simulation Trajectory Analysis</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="hbonds.html">hbonds.py</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">p2p.py</a></li>
-<li class="toctree-l2"><a class="reference internal" href="rdf.html">rdf.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hbonds.html">Identify Hydrogen Bonds</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Distance Between Pores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rdf.html">Radial Distribution Functions</a></li>
 </ul>
 </li>
 </ul>
@@ -150,7 +151,7 @@
         
           <li><a href="analysis.html">Post-Simulation Trajectory Analysis</a> &raquo;</li>
         
-      <li>p2p.py</li>
+      <li>Distance Between Pores</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -169,8 +170,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="p2p-py">
-<h1>p2p.py<a class="headerlink" href="#p2p-py" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="distance-between-pores">
+<h1>Distance Between Pores<a class="headerlink" href="#distance-between-pores" title="Permalink to this headline">¶</a></h1>
 <p>Calculate the pore-to-pore distance from an MD trajectory of an HII LLC membrane</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">p2p</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">TRAJ</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">GRO</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">begin</span> <span class="n">BEGIN</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">end</span> <span class="n">END</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">skip</span> <span class="n">SKIP</span><span class="p">]</span>
               <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PORES</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">COMPONENT</span> <span class="p">[</span><span class="n">COMPONENT</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">E</span> <span class="n">EQUIL</span><span class="p">]</span>
@@ -380,10 +381,10 @@ choose to detect equilibration manually. Otherwise &#8216;auto&#8217; will use p
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="rdf.html" class="btn btn-neutral float-right" title="rdf.py" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="rdf.html" class="btn btn-neutral float-right" title="Radial Distribution Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="hbonds.html" class="btn btn-neutral float-left" title="hbonds.py" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="hbonds.html" class="btn btn-neutral float-left" title="Identify Hydrogen Bonds" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
