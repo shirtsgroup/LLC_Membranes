@@ -22,12 +22,12 @@ def initialize():
     parser.add_argument('-begin', default=0, type=int, help='First frame to read')
     parser.add_argument('-end', default=-1, type=int, help='Last frame to read')
     parser.add_argument('-skip', default=1, type=int, help='Skip every n frames')
-    parser.add_argument('-b', '--build_monomer', default='NAcarb11V.gro', help='Name of annotated coordinate file '
-                        'describing monomer structure.')
+    parser.add_argument('-b', '--build_monomer', default='NAcarb11V', help='Name of monomer used to build unit '
+                                                                           'cell.')
     parser.add_argument('-atoms', nargs='+', help='Name of atoms whose collective diffusivity is desired')
     parser.add_argument('-a', '--axis', default='z', type=str, help='Which axis to compute msd along')
     parser.add_argument('-n', '--index', default=False, nargs='+', help='Solute number whose ztrace you want. If this'
-                                                                       'is not specified, all of them will be shown')
+                                                                        'is not specified, all of them will be shown')
     parser.add_argument('-pr', '--pore_radius', default=1.48, type=float, help='Max distance from pore center a water '
                         'molecule can exist in order to be counted as inside the pore')
     parser.add_argument('-cmax', '--colorbar_max', default=1.5, type=float, help='Maximum radial distance that gets'

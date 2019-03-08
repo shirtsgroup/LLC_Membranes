@@ -15,14 +15,47 @@ atoms needed for a specific type of calculation just one time.
 That is why we added annotations as an extra dimension to GROMACS
 topologies which is only parsed by our scripts. Comments in the
 GROMACS .itp files with specific codes help define extra
-attributes about specific liquid crystals monomers. 
+attributes about specific liquid crystals monomers.
 
-==========================
-Build-specific Annotations
-==========================
+Proper annotation of these attributes is illustrated below:
 
-We will place special emphasis on certain build-specific annotations
-because we anticipate some initial confusion. Parmeterized monomers
+.. figure:: images/annotated_itp.png
+   :scale: 100 %
+   :align: center
+
+   Screen capture of the .itp file created for the monomer pictured above
+
+Summary of Annotations
+-----------------------
+
++-------+--------------------------------------------+-----------------------------+
+|Symbol | Description                                |  More info                  |
++=======+============================================+=============================+
+|P      | Atoms that define monomer plane            |  :ref:`build-annotations`   |
++-------+--------------------------------------------+-----------------------------+
+|L1     |Atom, closest to pore center, used to define|  :ref:`build-annotations`   |
+|       |the vector pointing from the monomer to the |                             |
+|       |pore center                                 |                             |
++-------+--------------------------------------------+-----------------------------+
+|L2     |Atom, furthest from the pore center, used to|  :ref:`build-annotations`   |
+|       |define the vector pointing from the monomer |                             |
+|       |to the pore center                          |                             |
++-------+--------------------------------------------+-----------------------------+
+|R      |Reference atom. The distance from this atom |  :ref:`build-annotations`   |
+|       |to the pore center defines the radius of the|                             |
+|       |initial configuration                       |                             |
++-------+--------------------------------------------+-----------------------------+
+|C1     |Carbon to be cross-linked                   |  :ref:`xlink-annotations`   |
++-------+--------------------------------------------+-----------------------------+
+|C2     |Carbon to be cross-linked                   |  :ref:`xlink-annotations`   |
++-------+--------------------------------------------+-----------------------------+
+
+.. _build-annotations:
+
+Unit Cell Construction
+--------------------------------------
+
+Parmeterized monomers
 are usually randomly oriented in space. There are three pre-processing
 steps that take place before building a unit cell. We will consider
 them in the context of the specific monomer shown below, but the 
@@ -36,10 +69,11 @@ principles apply to any monomers used to build an HII phase unit cell:
    :scale: 50 %
    :align: center
 
-Proper annotation of these attributes is illustrated below:
+.. _xlink-annotations:
 
-.. figure:: images/annotated_itp.png
-   :scale: 100 %
-   :align: center
+Cross-linking
+----------------------------
 
-   Screen capture of the .itp file created for the monomer pictured above
+There is no automatic way to determine which atoms of a monomer will
+participate in a cross-linking reaction. Instead, we must decide for
+ourselves which atoms will be involved with the reaction.

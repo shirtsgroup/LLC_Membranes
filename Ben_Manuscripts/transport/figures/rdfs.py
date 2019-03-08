@@ -23,22 +23,22 @@ def calculate_rdf(res, path, gro='berendsen.gro', traj='PR_nojump.xtc', atoms=No
 	return rdf
 
 recalculate = False 
-simple_alcohols = False 
+simple_alcohols = False
 polyols = False 
-head_groups = False 
-thiol_comparison = False
+head_groups = True 
+thiol_comparison = False 
 ketones = False 
 nondonors = True 
 probability = False 
 
 if simple_alcohols:
-	residues=["BUT", "ETH", "PR", "MET"]  # simple_alcohol_rdf.pdf 
+	residues=["MET", "ETH", "PR", "BUT"]  # simple_alcohol_rdf.pdf 
 elif polyols:
 	residues=["GCL", "PG", "GLY", "TET", "RIB"]
 elif thiol_comparison:
-	# residues=["SOH", "GCL"]
-	#residues=["DMP", "GLY"]
-	residues=["DMS", "ATO"]
+	#residues=["SOH", "GCL"]
+	residues=["DMP", "GLY"]
+	#residues=["DMS", "ATO"]
 elif ketones:
 	residues=["ACH", "URE", "ACN", "ATO"]
 elif nondonors:
@@ -67,7 +67,6 @@ for r in residues:
 			rdf = file_rw.load_object('%s/rdf_%s.pl' %(path, r))
 		except FileNotFoundError:
 			rdf = calculate_rdf(r, path)
-	print(rdf.density.shape)
 	mean = rdf.density[equil:].mean(axis=0)
 
 	if probability:

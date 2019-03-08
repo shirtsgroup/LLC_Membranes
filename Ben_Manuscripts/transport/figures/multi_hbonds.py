@@ -34,6 +34,7 @@ for i in solutes:
     quadruple = 0
 
     sys = file_rw.load_object('%s/%s/10wt/hbonds.pl' % (path, i))
+    print(sys.t.n_frames)
     res_numbers = sys.number_residues(i)[0]
     for a in sys.hbonds:
         numbers = [res_numbers[j] for j in a[0]]
@@ -63,7 +64,7 @@ for i in solutes:
         ax.bar(loc, triple, bar_width, color='xkcd:green', alpha=opacity)
         loc += bar_width
         #print(double / triple)
-    if quadruple != 0:
+    if quadruple > 0.1:
         ax.bar(loc, quadruple, bar_width, color='xkcd:red', alpha=opacity)
         loc += bar_width
         #print(triple / quadruple)
@@ -82,7 +83,7 @@ ax.set_xticks(xticks)
 ax.set_xticklabels(resnames, fontsize=14)
 ax.tick_params(labelsize=14)
 #plt.xticks(rotation=)
-ax.set_ylabel('Hydrogen bond interactions', fontsize=14)
+ax.set_ylabel('Hydrogen bond interactions per frame', fontsize=14)
 plt.tight_layout()
 plt.savefig('multi_hbonds.pdf')
 plt.show()

@@ -46,12 +46,6 @@ def initialize():
     parser.add_argument('-d', '--distance', default=.35, type=float, help='Maximum distance between acceptor and donor'
                                                                          ' atoms')
     parser.add_argument('-angle', '--angle_cut', default=30, type=float, help='Maximum DHA angle to be considered an H-bond')
-    parser.add_argument('-xlink', '--xlink', action="store_true", help='Specify if system is cross-linked since'
-                                                                       'the topology will be set up')
-    parser.add_argument('-xtop', '--xlink_topology', default='assembly.itp', help='Name of .itp file which '
-                                                                                  'describes cross-linked residue')
-    parser.add_argument('-xres', '--xlink_residue', default='HII', help='Name of residue in molecules section of the '
-                                                                        'topology corresponding to args.xlink_topology')
     parser.add_argument('-l', '--load', default=False, help='Load pickled system object')
     parser.add_argument('-acc', '--acceptors', default=False, nargs='+', help='If you only want hbonds with acceptor'
                         'atoms of a residue, use this flag. 1 for this condition, otherwise 0. Input as a list'
@@ -67,19 +61,13 @@ def initialize():
 
 class System(object):
 
-    def __init__(self, traj, gro, top, begin=0, end=-1, skip=1, exclude_water=False, xlink=False,
-                 xlink_topology='assembly.itp', xlink_residue='HII'):
+    def __init__(self, traj, gro, top, begin=0, end=-1, skip=1):
         """
-
         :param traj:
         :param gro:
         :param top:
         :param begin:
         :param end:
-        :param exclude_water:
-        :param xlink:
-        :param xlink_topology:
-        :param xlink_residue:
         """
 
         # print('Generating bond list...', end="", flush=True)
@@ -248,28 +236,27 @@ class System(object):
     def plot_hbonds(self, show=True, save=True, savename='hbonds.png'):
 
         n = [a.shape[1] for a in self.hbonds]
-        print(np.mean(n))
 
-        # ethers = ['O', 'O1', 'O2']
-        # carb = ['O3', 'O4']
-        # nether = np.zeros([self.t.n_frames])
-        # ncarb = np.zeros([self.t.n_frames])
-        #
-        # for i, x in enumerate(self.hbonds):
-        #
-        #     if x.shape[0] == 4:
-        #
-        #         acceptors = [self.names[int(x[2, j])] for j in range(x.shape[1])]
-        #
-        #         for k in acceptors:
-        #             if k in ethers:
-        #                 nether[i] += 1
-        #             elif k in carb:
-        #                 ncarb[i] += 1
+        ethers = ['O', 'O1', 'O2']
+        carb = ['O3', 'O4']
+        nether = np.zeros([self.t.n_frames])
+        ncarb = np.zeros([self.t.n_frames])
 
-        # print(sum(n))
-        # print(np.sum(ncarb) / np.sum(nether))
-        # exit()
+        for i, x in enumerate(self.hbonds):
+
+            if x.shape[0] == 4:
+
+                acceptors = [self.names[int(x[2, j])] for j in range(x.shape[1])]
+
+                for k in acceptors:
+                    if k in ethers:
+                        nether[i] += 1
+                    elif k in carb:
+                        ncarb[i] += 1
+
+        print(sum(n))
+        print(np.sum(ncarb) / np.sum(nether))
+
         # plt.plot(self.t.time / 1000, nether / ncarb)
 
         plt.plot(self.t.time / 1000, n)
@@ -450,8 +437,7 @@ if __name__ == "__main__":
         while len(args.atoms) != len(args.residues):
             args.atoms.append(['all'])
 
-        sys = System(args.traj, args.gro, args.top, begin=args.begin, end=args.end, skip=args.skip, xlink=args.xlink,
-                     xlink_topology=args.xlink_topology, xlink_residue=args.xlink_residue)
+        sys = System(args.traj, args.gro, args.top, begin=args.begin, end=args.end, skip=args.skip)
 
         for i, r in enumerate(args.residues):
             sys.set_eligible(r, args.atoms[i], acceptor_only=args.acceptors[i], donors_only=args.donors[i])

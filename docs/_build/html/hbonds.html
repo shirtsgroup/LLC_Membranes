@@ -176,7 +176,6 @@
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">hbonds</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">TRAJ</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">GRO</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">TOP</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="n">BEGIN</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">e</span> <span class="n">END</span><span class="p">]</span>
                  <span class="p">[</span><span class="o">-</span><span class="n">sk</span> <span class="n">SKIP</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="n">RESIDUES</span> <span class="p">[</span><span class="n">RESIDUES</span> <span class="o">...</span><span class="p">]]</span>
                  <span class="p">[</span><span class="o">-</span><span class="n">a</span> <span class="n">ATOMS</span> <span class="p">[</span><span class="n">ATOMS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">DISTANCE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">angle</span> <span class="n">ANGLE_CUT</span><span class="p">]</span>
-                 <span class="p">[</span><span class="o">-</span><span class="n">xlink</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">xtop</span> <span class="n">XLINK_TOPOLOGY</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">xres</span> <span class="n">XLINK_RESIDUE</span><span class="p">]</span>
                  <span class="p">[</span><span class="o">-</span><span class="n">l</span> <span class="n">LOAD</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">acc</span> <span class="n">ACCEPTORS</span> <span class="p">[</span><span class="n">ACCEPTORS</span> <span class="o">...</span><span class="p">]]</span>
                  <span class="p">[</span><span class="o">-</span><span class="n">donors</span> <span class="n">DONORS</span> <span class="p">[</span><span class="n">DONORS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span> <span class="n">SAVENAME</span><span class="p">]</span>
 </pre></div>
@@ -236,24 +235,6 @@
 <tr><td>&#160;</td><td><p class="first">Maximum DHA angle to be considered an H-bond</p>
 <p class="last">Default: 30</p>
 </td></tr>
-<tr><td class="option-group" colspan="2">
-<kbd>-xlink, &#8211;xlink</kbd></td>
-</tr>
-<tr><td>&#160;</td><td><p class="first">Specify if system is cross-linked sincethe topology will be set up</p>
-<p class="last">Default: False</p>
-</td></tr>
-<tr><td class="option-group" colspan="2">
-<kbd>-xtop, &#8211;xlink_topology</kbd></td>
-</tr>
-<tr><td>&#160;</td><td><p class="first">Name of .itp file which describes cross-linked residue</p>
-<p class="last">Default: &#8220;assembly.itp&#8221;</p>
-</td></tr>
-<tr><td class="option-group" colspan="2">
-<kbd>-xres, &#8211;xlink_residue</kbd></td>
-</tr>
-<tr><td>&#160;</td><td><p class="first">Name of residue in molecules section of the topology corresponding to args.xlink_topology</p>
-<p class="last">Default: &#8220;HII&#8221;</p>
-</td></tr>
 <tr><td class="option-group">
 <kbd>-l, &#8211;load</kbd></td>
 <td><p class="first">Load pickled system object</p>
@@ -283,10 +264,10 @@
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="hbonds.System">
-<em class="property">class </em><code class="descclassname">hbonds.</code><code class="descname">System</code><span class="sig-paren">(</span><em>traj</em>, <em>gro</em>, <em>top</em>, <em>begin=0</em>, <em>end=-1</em>, <em>skip=1</em>, <em>exclude_water=False</em>, <em>xlink=False</em>, <em>xlink_topology='assembly.itp'</em>, <em>xlink_residue='HII'</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">hbonds.</code><code class="descname">System</code><span class="sig-paren">(</span><em>traj</em>, <em>gro</em>, <em>top</em>, <em>begin=0</em>, <em>end=-1</em>, <em>skip=1</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="hbonds.System.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>traj</em>, <em>gro</em>, <em>top</em>, <em>begin=0</em>, <em>end=-1</em>, <em>skip=1</em>, <em>exclude_water=False</em>, <em>xlink=False</em>, <em>xlink_topology='assembly.itp'</em>, <em>xlink_residue='HII'</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>traj</em>, <em>gro</em>, <em>top</em>, <em>begin=0</em>, <em>end=-1</em>, <em>skip=1</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -297,10 +278,6 @@
 <li><strong>top</strong> &#8211; </li>
 <li><strong>begin</strong> &#8211; </li>
 <li><strong>end</strong> &#8211; </li>
-<li><strong>exclude_water</strong> &#8211; </li>
-<li><strong>xlink</strong> &#8211; </li>
-<li><strong>xlink_topology</strong> &#8211; </li>
-<li><strong>xlink_residue</strong> &#8211; </li>
 </ul>
 </td>
 </tr>

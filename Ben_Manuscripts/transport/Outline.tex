@@ -17,7 +17,8 @@
 
 %BJC: potential titles (uncommented is current favorite)
 %\title{The Transport Mechanisms of Polar Solutes in a Cross-linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
-\title{Size, Shape and Functionality Dependence of Solute Transport Mechanisms in a Cross-linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
+%\title{Size, Shape and Functionality Dependence of Solute Transport Mechanisms in a Cross-linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
+\title{Chemically Dependent Selectivity in a Cross-linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
 \author{Benjamin J. Coscia \and Michael R. Shirts} 
 
 \begin{document}
@@ -121,6 +122,12 @@
 
   \section{Methods}
   
+  Python scripts used to set up systems and conduct post-simulation trajectory analysis are
+  available online at \texttt{https://github.com/bencoscia/llcsim}.
+  
+  \noindent We ran all molecular dynamics simulations and energy minimizations using 
+  GROMACS 2018.3 \cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008} 
+  
   \subsection*{System Setup}
 
   Stable H\textsubscript{II} phases, assembled with Na-GA3C11, can be formed
@@ -144,8 +151,8 @@
 	but if we don't put it in, the results will not be thermodynamically consistent, which 
 	will give issues with measurements and calculations.
 	\item See supporting info for water equilibration simulation data.
-	\item We adjusted the pore radius in our systems so that the right amount of water
-	fits in the pores without any vacuum using \texttt{gmx solvate}.
+	\item We iteratively adjusted the pore radius in our systems until the right amount of water
+	fit in the pores when we ran \texttt{gmx solvate}.
 	\item We placed water molecules in the tail region one at a time in random locations
 	with short energy minimizations between insertions.
   \end{itemize}
@@ -165,9 +172,9 @@
 
   \noindent We equilibrated an initial solvated configuration before adding solutes.
   \begin{itemize}
-	\item We equilibrated the initial configuration using the `wet'
+	\item First, we equilibrated the initial configuration using the `wet'
 	equilibration procedure described in our previous work~\cite{coscia_understanding_2019}.
-	\item We cross-linked the equilibrated solvated configuration using the
+	\item Then we cross-linked the equilibrated solvated configuration using the
 	cross-linking procedure described in our previous work. 
   \end{itemize}
 
@@ -182,8 +189,19 @@
 	then ran a short energy minimization.
 	\item We allowed the solutes to equilibrate for 5 ns using berendsen 
 	pressure control
-	\item We collected transport data using 1 $\mu$s simulations
+	\item We collected transport data over the course of 1 $\mu$s MD simulations
   \end{itemize}
+  
+  \subsection*{Solute Parameterization}
+  
+  %BJC: might need to reword. Most of this is taken from my last paper and adapted to solutes.
+  Like we have previously done for Na-GA3C11~\cite{coscia_understanding_2019}, we
+  parameterized the interaction potential for the solutes using the Generalized 
+  AMBER Force Field (GAFF)~\cite{wang_development_2004} with the Antechamber package
+  \cite{wang_automatic_2006} provided with AmberTools16~\cite{case_ambertools16_2016}.
+  We chose GAFF because it has been parameterized for use with organic molecules. We
+  assigned atomic charges using the am1bccsym method of \texttt{molcharge} shipped
+  with QUACPAC from Openeye Scientific Software.
   
   \subsection*{Mean Squared Displacement}\label{method:MSD}
 
@@ -228,13 +246,12 @@
   \noindent We fixed the length of each simulated trajectory so that we could compare
   the total MSD between different solutes without the influence of the ageing phenomenon.
   \begin{itemize}
-	\item Ageing is defined by the tendency of the average MSD to decrease
+	\item Ageing is defined by the tendency of the average slope of an MSD curve to decrease
 	as the length of trajectories are increased~\cite{metzler_anomalous_2014}.
 	\item The maximum measured dwell time can be no longer than the total length
 	of a simulated trajectory. 
 	\item As measurement time or trajectory length is increased, longer dwell times
-	are incorporated into the calculation, lowering the average MSD. (See supporting
-	info for demonstration)
+	are incorporated into the calculation, lowering the average MSD.
 	\item Because the MSDs are non-linear and because of the ageing phenomenon, we
     did not attempt to calculate a diffusion constant as one might for a Brownian
     particle with a linear MSD.
@@ -287,8 +304,8 @@
   \begin{itemize}
 	\item We used the \texttt{ruptures} python package in order to identify
 	breakpoints, times when hops occur, in solute trajectories.\cite{truong_ruptures:_2018}
-	(See Supporting Information for more details on chosen parameters. i.e. type of cost 
-	function, cost function penalty	tolerance, number of dimensions used)
+%	(See Supporting Information for more details on chosen parameters. i.e. type of cost 
+%	function, cost function penalty	tolerance, number of dimensions used)
 	\item The corresponding hop lengths and dwell times between break points were 
 	used to construct empirical distributions.
   \end{itemize}
@@ -346,7 +363,7 @@
   
   Using four different methods, Rowley and Roux observed peaks in the radial
   distribution function for sodium coordinated with water at an O-Na distance 
-  of between 2.3 and 2.5 \AA~\cite{rowley_solvation_2012}. We used 2.5 \AA as
+  of between 2.3 and 2.5 \AA~\cite{rowley_solvation_2012}. We used 2.5 \AA~as
   the distance cutoff.  % BJC: this might be too strict. I've seen literature where they define 3.2 angstroms as the cutoff
    
   \section{Results and Discussion}
@@ -866,7 +883,7 @@
   to the highest density of monomer head groups (dashed line, normalized for easier visual
   comparison). Methanol spends the largest proportion of time, relative to the other alcohols,
   near the pore center, which may help explain its fast dynamics. (c) Despite relatively little
-  difference in the total number of hydrogen bond occurences, a given alcohol's preference
+  difference in the total number of active hydrogen bonds per frame, a given alcohol's preference
   towards hydrogen bonds with the carboxylate groups increases with molecule size. (d) The average
   location of butanol's oxygen atom is significantly closer to the pore center than its most distal
   carbon atom, suggesting that the molecule is oriented with hydrophobic tails pointing away from
@@ -930,9 +947,12 @@
   \includegraphics[width=0.9\linewidth]{dwell_hop_PG_GCL.pdf}
   \caption{}\label{fig:dwell_hop_PG_GCL}
   \end{subfigure}
-  \caption{The number of hydrogen bond interactions between solutes and monomers increases
-  as solutes gain additional hydroxyl groups. Multiple hydroxyl groups within a solute often
-  hydrogen bond in different locations simultaneously. Occasionally, all four hydroxyl groups
+  \caption{(a) Glycerol, tetrose and ribose are densest close to the pore center because
+  they have a high number of hydrophilic groups and are relatively large. Ethylene glycol
+  and propylene glycol are densest close to the head group region. (b)The number of 
+  hydrogen bond interactions between solutes and monomers increases as solutes gain additional
+  hydroxyl groups. Often, multiple hydroxyl groups within a solute often hydrogen bond in
+  different locations simultaneously. Occasionally, all four hydroxyl groups
   of Ribose (n = 4) are involved in a hydrogen bond interaction at the same time.}\label{fig:multi_hbonds}
   \end{figure}
   
@@ -1015,11 +1035,12 @@
     coordinated to a sodium ion which restrains the solutes to within the pore region
     %BJC: it's possible the solutes hop from sodium to sodium quickly meaning solutes are not always immobilized.
     %BJC: could look into lifetime of association
-    \item Interestingly, the nitrogen atoms do not coordinate with any sodium ions despite
-    a similar negative partial charge. The hydrogen atoms may shield this interaction.
+    \item Interestingly, only the carbonyl oxygen atoms coordinate with sodium ions. 
+    The nitrogen atoms dooes not coordinate at all despite a similar negative partial
+    charge. The attached hydrogen atoms may shield this interaction.
   \end{itemize}   
 
-  Acetone has the lowest MSD of this set because it is primarily trapped near and behind 
+  \noindent Acetone has the lowest MSD of this set because it is primarily trapped near and behind 
   the head groups.
   \begin{itemize}
     \item On average, acetone coordinates with sodium with the same frequency as acetic acid 
@@ -1028,8 +1049,8 @@
     \item When an acetone molecule coordinates with a sodium ion, its polarity is 
     largely neutralized and it retreats towards the head group region where it can easily
     get trapped.
-    \item Acetic acid and the amides and acetic acid have alternate hydrophlic
-    groups when bound to sodium ions which increases their stability in the pore.
+    \item Acetic acid and the amides have other, unoccupied, hydrophilic groups while bound
+    to sodium ions which increases their stability in the pore.
   \end{itemize}
   
 %  Once again, the trends in the MSD can in large part be explained by the solutes'
@@ -1126,22 +1147,24 @@
   \includegraphics[width=\textwidth]{thiol_comparison_DMS.pdf}
   \caption{}\label{fig:DMP_GLY_comparison}
   \end{subfigure}
-  \caption{}\label{fig:sulfur_analog_rdfs}
+  \caption{(a) The RDF of mercaptoethanol is similar to ethylene glycol except 
+  for its higher density in the tail region. (b) 2,3-Dimercapto-1-propanol is
+  densest near the pore wall, unlike glycerol whose density is very high in the pore
+  center. (c) Dimethylsulfoxide has a higher density than acetone close to the pore
+  center which may in part explain its marginally larger MSD.}\label{fig:sulfur_analog_rdfs}
   \end{figure}
   
   \noindent Mercaptoethanol has a similar average MSD and RDF to ethylene glycol.
   \begin{itemize}
     \item There is a much larger uncertainty associated with mercaptoethanol's MSD.
-    \item It spends more time in the tail region than
-    ethylene glycol, where transport is inherently slower, and may contribute to some
-    slower MSDs.  % Can quantify as a percentage
-    \item Conversely, Mercaptoethanol also exhibits some of the highest single solute MSDs 
+    \item Some of this can be accounted for by the higher density of mercaptoethanol 
+    molecules in the head group / tail region, where transport is inherently slower. 
+    \item There are nearly 40 \% more mercaptoethanol molecules than ethylene 
+    glycol molecules beyond 0.8 nm from the pore center. 
+    \item Conversely, mercaptoethanol exhibits some of the highest single solute MSDs 
     (See Figure~\ref{fig:SOH_trace})  % Only methanol has greater (I think)
     \item It hydrogen bonds with head groups 6 times less frequently than ethylene glycol.
     \item This may lead to larger hops in the pore region.
-    \item Some of this can be accounted for by the higher density of mercaptoethanol 
-    molecules in the head group / tail region. There are nearly 40 \% more mercaptoethanol
-    molecules than ethylene glycol molecules beyond 0.8 nm from the pore center. 
 %    \item When both hydroxyl groups of ethylene glycol are hydrogen bonded with the a
 %    monomer head group simultaneously,
 %    \item Less frequent hydrogen bonding and an affinity for the pore region may be
@@ -1177,7 +1200,7 @@
     so it gravitates towards the head group region.
   \end{itemize} 
   
-  \noindent DMSO has a comparable if not large MSD than acetone even though it
+  \noindent DMSO has a comparable if not larger MSD than acetone even though it
   is a slightly larger molecule.
   \begin{itemize}
     \item The radial density of DMSO is higher than acetone close to the pore center.
@@ -1210,7 +1233,7 @@
 %  	% BJC:  Ethyl acetate spends all of its time in a linear or near-linear conformation.
 %  \end{itemize}
   
-  The radial density of solutes near the pore center in this set is surprisingly high
+  \noindent The radial density of solutes near the pore center in this set is surprisingly high
   as shown in Figure~\ref{fig:nondonors_rdf}.
   \begin{itemize}
     \item Propylene carbonate and ethyl acetate are among the largest solutes
@@ -1219,7 +1242,7 @@
     more time in the pore region. 
     \item However, this is not a hard rule. When a solute does overcome the 
     barrier of entry beyond the head group region, it can become trapped. All
-    solutes in this set show a peak $geq$ 1 nm from the pore center which is
+    solutes in this set show a peak $\geq$ 1 nm from the pore center which is
     likely caused by solutes that get trapped in the tail region for a significant
     amount of time.
 	\item The peak density of THF is considerably offset from the pore center.
@@ -1233,7 +1256,7 @@
 	necessarily result in large hops.
   \end{itemize}
   
-  Carbonyl groups continue to show high degrees of association with sodium ions. 
+  \noindent Carbonyl groups continue to show high degrees of association with sodium ions. 
   \begin{itemize}
     \item The number of sodium ions coordinated to the carbonyl group of 
     propylene carbonate, dimethyl formamide, ethyl acetate are consistent with 
@@ -1292,51 +1315,137 @@
   
   %All have comparable densities near pore center except acetone which is lower
 
-  \subsection{Design Principles}
+  \subsection{Design Considerations}
 
-  Water content affects pore size and strongly influence the MSD of both solutes and
-  water. Experiments to understand how controllable this parameter is could be useful.
-  
-  Two routes one might want to go down:
-  \begin{enumerate}
-    \item Only allow water to pass
-    \item Selective separation of a dissolved species.
-  \end{enumerate}
-  
-  Monomers that cannot hydrogen bond. % Hard to make a monomer like this
-
-  Separate polar molecules by creating monomers with head group components designed to
-  hydrogen bond.
+  Based on our observations of the complex interactions between various polar solutes
+  and the membrane's liquid crystal monomers, we can speculate on design criteria for 
+  the next generation of liquid crystal monomers to be used for LLC membrane
+  synthesis.
   \begin{itemize}
-  	\item Hbond donors
-	\item More incentive to dwell on walls.
+    \item Unfortunately, we cannot comment on the stability of the H\textsubscript{II}
+    phase if major changes are made to the monomers.
+    \item Therefore, our most feasible design suggestions are those which can be made
+    as a post-processing step to the cross-linked membrane created using Na-GA3C11.
   \end{itemize}
   
-  Ions with less water coordination (or more water) so that solutes can hbond with water
-  and perhaps be more inclined to stay in the pore region.
+  The transport properties of solutes are a strong function of the 3 trapping
+  mechanisms discussed above. Therefore, it is most logical to design monomers with 
+  them in mind. 
+  
+  Since solutes move slowly well entangled among the monomer tails, one can try to
+  design monomers that better control the partition of solutes between the pore and
+  tail region.
+  \begin{itemize}
+    \item The head groups of Na-GA3C11 are planar which leaves a fair amount of space
+    between adjacent head groups and it makes it easier for solutes to slip between and
+    past them.
+    \item Bulkier substituents, which do not impede stacking of monomers into columns,
+    might slow the rate at which solutes partition into the tails.
+    \item Additionally, one can include crosslinkable groups near the head groups in
+    order to fill free volume and effectively create a wall.
+    \item Finally, removal of the ether linkages between the head groups and the monomer
+    tails will decrease the stability of polar molecules in the head group region.
+    \item Overall, controlling the solute partition might not be the most important 
+    consideration to optimize because once enough solutes flow through, the membrane tail
+    region will become saturated with solute molecules and greatly reduce the rate of partition.
+  \end{itemize}
+  
+  Alternatively, one can focus on designing head groups with varying hydrogen 
+  bonding capabilites.
+  \begin{itemize}
+    \item Na-GA3C11 has a carboxylate group which readily accepts hydrogen bonds
+    \item One can increase the number of hydrogen bonding sites on the head groups
+    in order to trap more solutes, or decrease the number of hydrogen bond sites
+    to trap less.
+  \end{itemize}
+  
+  Finally, one can attempt to control the degree to which solutes coordinate 
+  with counterions.
+  \begin{itemize}
+    \item We have observed a significant amount of sodium association with 
+    negatively charge solute constituents.
+    \item Changing the size and valence of the counter ion may offer some
+    interesting behavior. 
+    \item For example, a counter ion with a charge of +2 may attract more solute
+    molecules and bind them more tightly, but there will only be half as many
+    counterions in the system which may reduce its overall influence.
+    \item Additionally, the size of the counterion will affect the mobility
+    of any complex formed. 
+    \item Sodium appears to do a good job of immobilizing complexes formed between
+    it and solutes. 
+    \item However, a Lithium ion might be more prone to go along for the ride.
+    \item Hydrogen would likely spend the majority of its time bound to the 
+    carboxylate head group or as part of a hydronium ion hence interfering with 
+    solute transport infrequently.
+  \end{itemize}
+  
+%  There are two types of separations for which this membrane may have some use.
+%  \begin{enumerate}
+%    \item In a purification process, one may only desire water to pass. In this 
+%    case, water should have much faster dynamics than any other dissolved species.~\label{sep:purification}
+%    \item For a separate application, one may desire to selectively separate a 
+%    dissolved species from a complex stream.~\label{sep:selective}
+%  \end{enumerate}
+  
+  The MSD of solutes may be much larger in more concentrated solutions because there
+  will be less available trapping sites for them to occupy.
+  \begin{itemize}
+    \item We purposely studied the behavior of the solutes in dilute conditions.
+    \item The difference in size between water and the fastest solute, methanol, is not
+    enough to explain the order of magnitude difference in their average MSDs.
+    \item The sheer number of water molecules prevents the majority of them from 
+    becoming trapped for long periods of time.
+    \item A similar effect may increase solute MSDs in more concentrated solutions.
+  \end{itemize}
+  
+  As a final consideration, water content affects pore size and strongly influences
+  the MSDs of solutes, water and counterions.
+  \begin{itemize}
+    \item The MSD of these components is about 2 orders of magnitude larger in the 
+    10 wt \% system than the 5 wt \% system.
+    \item The 5 wt \% system is much less feasible as a separations membrane on the basis
+    of water permeability alone.
+    \item Typically, the total water content used to create the H\textsubscript{II} phase
+    is reported, but the amount of water that resides in the pores, tails and in between
+    hexagonal mesophases is less clear.
+    \item Experiments, such as those by Jenkins et al.~\cite{jenkins_identification_2012}, 
+    may help elucidate the water composition in each region.
+    \item The results would be extremely useful for determining the viability of a given
+    LLC membrane system. 
+  \end{itemize}
 
   \section{Conclusion}
 
   We have examined the transport characteristics of a series of small polar
-  molecules in our model of the H\textsubscript{II} phase formed by 
-  Na-GA3C11.
+  molecules in our model of the H\textsubscript{II} phase formed by the liquid 
+  crystal monomer Na-GA3C11.
 
-  We calculated the macroscopic diffusion coefficients of each solute as 
-  approximated by a CTRW model and validated our estimates using experimental
-  DOSY NMR measurements.
-
-  We have studied the influence of water content on the diffusion coefficients.
-
-  We showed that hydrogen bonding between solutes and Na-GA3C11 monomers plays
-  a major role in mechanism by which molecules traverse the nanopores. 
-
-  We can use this intuition in order to modify our monomers for a specific 
-  separation.
+  We learned that the MSD of solutes, water and counter ions are highly dependent 
+  on LLC membrane water content.
   \begin{itemize}
-	\item Increase number of h-bond sites to increase selectivity towards water 
-	over polar molecules
+    \item As more water is added to the system, the pores become less crowded
+    with monomer components and the MSD of water, sodium and solutes increase.
+    \item The amount of water in the pores deserves special attention when 
+    screening new monomers.
+  \end{itemize}
+
+  We learned that solutes undergo anomalous diffusion which can be described 
+  as a subordinated fractional brownian motion process. 
+  \begin{itemize}
+    \item In general, solutes hop intermittently between periods of entrapment
+    \item These hops are anti-correlated to their previous hops
   \end{itemize}
   
+  We observed three mechanisms of solute entrapment.
+  \begin{itemize}
+    \item A solute can become stuck in the tail region. 
+    \item A solute can hydrogen bond with monomers
+    \item A solute can associate with a bound counterion
+  \end{itemize}
+  
+  Based on these trapping mechanisms, we have suggested modifications that
+  can be made to monomers in order to mitigate or enhance their effect on
+  solute MSDs.
  
   \section*{Supporting Information}
 

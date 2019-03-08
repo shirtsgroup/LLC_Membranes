@@ -17,7 +17,7 @@ def initialize():
     parser.add_argument('-t', '--traj', default='traj_whole.xtc', help='Trajectory file (.trr, .xtc should work)')
     parser.add_argument('-r', '--residue', action='append', nargs='+', help='Name of residue whose '
                         'radial distribution function we want to calculate')
-    parser.add_argument('-b', '--build_monomer_residue', default='HII', help='Name of monomer residue used to build'
+    parser.add_argument('-b', '--build_monomer_residue', default='NAcarb11V', help='Name of monomer residue used to build'
                                                                              'HII phase')
     parser.add_argument('-bins', '--bins', default=50, type=int, help='Number of bins for histogram of distances')
     parser.add_argument('--begin', default=0, type=int, help='Frame to begin calculations')
@@ -96,6 +96,10 @@ class System(object):
         print('Done!')
         self.box = self.t.unitcell_vectors
         self.npores = npores
+
+        names = topology.fix_names(gro)  # rename atoms because mdtraj screws it up in some cases.
+        for i, a in enumerate(self.t.topology.atoms):
+            a.name = names[i]
 
         if residue == 'SOL':  # workaround for mdtraj
             residue = 'HOH'
@@ -332,4 +336,4 @@ if __name__ == "__main__":
 
         file_rw.save_object(rdfs[i], '%s.pl' % savename)
 
-    plt.show()
+    # plt.show()

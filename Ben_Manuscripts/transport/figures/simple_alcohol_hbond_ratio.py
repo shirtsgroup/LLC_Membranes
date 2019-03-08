@@ -6,8 +6,12 @@ import names
 
 resnames = ['MET', 'ETH', 'PR', 'BUT']
 
-ratio = [2.3, 3.1, 3.47, 5.51]
-total_hbonds = [8819, 9762, 8857, 8651]
+# incomplete trajectories and stricter geometric criteria
+#ratio = [2.3, 3.1, 3.47, 5.51]
+#total_hbonds = [8819, 9762, 8857, 8651]
+ratio = [1.21781242618, 1.62801302932, 1.98014411529, 2.65940967134]
+frames = 2000
+total_hbonds = np.array([18776, 20170, 18661, 17481]) / frames
 
 index = np.arange(len(ratio))
 opacity=0.9
@@ -22,7 +26,7 @@ ax.tick_params(axis='y', labelcolor='xkcd:blue')
 ax2 = ax.twinx()
 ax2.bar(index + bar_width, total_hbonds, bar_width, color='xkcd:red', alpha=opacity)
 ax2.tick_params(axis='both', labelsize=14, labelcolor='xkcd:red')
-ax2.set_ylabel('Total Hydrogen Bond Occurences', fontsize=14, color='xkcd:red')
+ax2.set_ylabel('Hydrogen Bonds Per Frame', fontsize=14, color='xkcd:red')
 
 ax.set_xticks(index + bar_width/2)
 ax.set_xticklabels([names.res_to_name[r] for r in resnames], fontsize=14)

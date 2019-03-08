@@ -68,6 +68,9 @@ class ReadItp(object):
         self.carboxylate_indices = []
         self.pore_defining_atoms = []
 
+        # bonds
+        self.bonds = {}
+
     def atoms(self, annotations=False):
 
         atoms_index = 0
@@ -147,8 +150,29 @@ class ReadItp(object):
 
             self.natoms += 1
 
+    def organize_bonds(self):
 
-class Residue(object):
+        # find the bonds section
+        bonds_index = 0
+        while self.itp[bonds_index].count('[ bonds ]') == 0:
+            bonds_index += 1
+        bonds_index += 2
+
+        bonds = []
+        while self.itp[bonds_index] != '\n':
+            bond_data = str.split(self.itp[bonds_index])[:2]
+            bonds.append([int(bond_data[0]), int(bond_data[1])])
+            bonds_index += 1
+
+        for i in range(self.natoms):
+            self.bonds[i] = []
+            involvement = [x for x in bonds if i + 1 in x]
+            for pair in involvement:
+                atom = [x - 1 for x in pair if x != (i + 1)][0]
+                self.bonds[i].append(atom)
+
+
+class Residue(ReadItp):
 
     def __init__(self, name):
 
@@ -171,96 +195,100 @@ class Residue(object):
             self.mass[name] = ions_mw[name]
 
         else:
-            try:
-                self.t = md.load('%s.pdb' % name,
-                                 standard_names=False)  # see if there is a solute configuration in this directory
-            except OSError:
-                try:
-                    self.t = md.load('%s/../top/topologies/%s.pdb' % (script_location, name),
-                                     standard_names=False)  # check if the config is with all of the other topologies
-                except OSError:
-                    raise OSError('No residue %s found. Perhaps you have not made a %s.pdb yet?' % (name, name))
 
-            try:
-                f = open('%s.itp' % name, 'r')
-            except FileNotFoundError:
-                try:
-                    f = open('%s/../top/topologies/%s.itp' % (script_location, name), 'r')
-                except FileNotFoundError:
-                    raise FileNotFoundError('No topology %s.itp found' % name)
+            super().__init__(name)
+            self.atoms(annotations=True)
+            self.organize_bonds()
+            # try:
+            #     self.t = md.load('%s.pdb' % name,
+            #                      standard_names=False)  # see if there is a solute configuration in this directory
+            # except OSError:
+            #     try:
+            #         self.t = md.load('%s/../top/topologies/%s.pdb' % (script_location, name),
+            #                          standard_names=False)  # check if the config is with all of the other topologies
+            #     except OSError:
+            #         raise OSError('No residue %s found. Perhaps you have not made a %s.pdb yet?' % (name, name))
+            #
+            # try:
+            #     f = open('%s.itp' % name, 'r')
+            # except FileNotFoundError:
+            #     try:
+            #         f = open('%s/../top/topologies/%s.itp' % (script_location, name), 'r')
+            #     except FileNotFoundError:
+            #         raise FileNotFoundError('No topology %s.itp found' % name)
+            #
+            # self.res = [a.residue.name for a in self.t.topology.atoms]
+            #
+            # if len(set(self.res)) > 1:
+            #     self.residues = []
+            #     for i in set(self.res):
+            #         self.residues.append(Residue(i))
+            #
+            # else:
+            #     self.resname = self.res[0]
+            #     self.itp = []
+            #     for line in f:
+            #         self.itp.append(line)
+            #
+            #     f.close()
+            #
+            #     atoms_index = 0
+            #     while self.itp[atoms_index].count('[ atoms ]') == 0:
+            #         atoms_index += 1
+            #
+            #     self.indices = {}  # key = atom name , value = index
+            #     self.names = {}  # key = index, value = atom name
+            #     self.mass = {}  # key = atom name, value = mass
+            #     self.charges = {}
+            #
+            #     self.hbond_H = []  # hydrogen atoms capable of hbonding
+            #     self.hbond_D = []  # hydrogen bond donor atoms
+            #     self.hbond_A = []  # hydrogen bond acceptors
+            #
+            #     atoms_index += 2
+            #     self.natoms = 0
+            #     while self.itp[self.natoms + atoms_index] != '\n':
+            #
+            #         data = self.itp[self.natoms + atoms_index].split()
+            #         self.indices[data[4]] = int(data[0])
+            #         self.names[int(data[0])] = data[4]
+            #         self.mass[data[4]] = float(data[7])
+            #         self.charges[data[4]] = float(data[6])
+            #
+            #         try:  # check for annotations on atom
+            #             annotations = self.itp[self.natoms + atoms_index].split(';')[1].split()
+            #             if 'H' in annotations:
+            #                 self.hbond_H.append(data[4])
+            #             if 'D' in annotations:
+            #                 self.hbond_D.append(data[4])
+            #             if 'A' in annotations:
+            #                 self.hbond_A.append(data[4])
+            #         except IndexError:
+            #             pass
+            #
+            #         self.natoms += 1
+            #
+            #     self.mw = sum(self.mass.values())
 
-            self.res = [a.residue.name for a in self.t.topology.atoms]
-
-            if len(set(self.res)) > 1:
-                self.residues = []
-                for i in set(self.res):
-                    self.residues.append(Residue(i))
-
-            else:
-                self.resname = self.res[0]
-                self.itp = []
-                for line in f:
-                    self.itp.append(line)
-
-                f.close()
-
-                atoms_index = 0
-                while self.itp[atoms_index].count('[ atoms ]') == 0:
-                    atoms_index += 1
-
-                self.indices = {}  # key = atom name , value = index
-                self.names = {}  # key = index, value = atom name
-                self.mass = {}  # key = atom name, value = mass
-                self.charges = {}
-
-                self.hbond_H = []  # hydrogen atoms capable of hbonding
-                self.hbond_D = []  # hydrogen bond donor atoms
-                self.hbond_A = []  # hydrogen bond acceptors
-
-                atoms_index += 2
-                self.natoms = 0
-                while self.itp[self.natoms + atoms_index] != '\n':
-
-                    data = self.itp[self.natoms + atoms_index].split()
-                    self.indices[data[4]] = int(data[0])
-                    self.names[int(data[0])] = data[4]
-                    self.mass[data[4]] = float(data[7])
-                    self.charges[data[4]] = float(data[6])
-
-                    try:  # check for annotations on atom
-                        annotations = self.itp[self.natoms + atoms_index].split(';')[1].split()
-                        if 'H' in annotations:
-                            self.hbond_H.append(data[4])
-                        if 'D' in annotations:
-                            self.hbond_D.append(data[4])
-                        if 'A' in annotations:
-                            self.hbond_A.append(data[4])
-                    except IndexError:
-                        pass
-
-                    self.natoms += 1
-
-                self.mw = sum(self.mass.values())
-
-                # find the bonds section
-                bonds_index = 0
-                while self.itp[bonds_index].count('[ bonds ]') == 0:
-                    bonds_index += 1
-                bonds_index += 2
-
-                bonds = []
-                while self.itp[bonds_index] != '\n':
-                    bond_data = str.split(self.itp[bonds_index])[:2]
-                    bonds.append([int(bond_data[0]), int(bond_data[1])])
-                    bonds_index += 1
-
-                self.bonds = {}
-                for i in range(self.natoms):
-                    self.bonds[i] = []
-                    involvement = [x for x in bonds if i + 1 in x]
-                    for pair in involvement:
-                        atom = [x - 1 for x in pair if x != (i + 1)][0]
-                        self.bonds[i].append(atom)
+                # # find the bonds section
+                # bonds_index = 0
+                # while self.itp[bonds_index].count('[ bonds ]') == 0:
+                #     bonds_index += 1
+                # bonds_index += 2
+                #
+                # bonds = []
+                # while self.itp[bonds_index] != '\n':
+                #     bond_data = str.split(self.itp[bonds_index])[:2]
+                #     bonds.append([int(bond_data[0]), int(bond_data[1])])
+                #     bonds_index += 1
+                #
+                # self.bonds = {}
+                # for i in range(self.natoms):
+                #     self.bonds[i] = []
+                #     involvement = [x for x in bonds if i + 1 in x]
+                #     for pair in involvement:
+                #         atom = [x - 1 for x in pair if x != (i + 1)][0]
+                #         self.bonds[i].append(atom)
 
 
 class Molecule(object):
