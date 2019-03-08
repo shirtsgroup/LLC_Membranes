@@ -93,6 +93,7 @@ class ZTrace(object):
         norm = plt.Normalize(0, cmax)
 
         for i in nr:
+            print(i + 1)
 
             rd = self.radial_distance[:, i]
             trace = self.com[:, i, self.axis]
