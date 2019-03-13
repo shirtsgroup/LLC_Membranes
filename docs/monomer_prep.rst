@@ -49,6 +49,16 @@ Summary of Annotations
 +-------+--------------------------------------------+-----------------------------+
 |C2     |Carbon to be cross-linked                   |  :ref:`xlink-annotations`   |
 +-------+--------------------------------------------+-----------------------------+
+|H      |Specifies a hydrogen that can participate in|  :ref:`hbond-annotations`   |        
+|       |a hydrogen bonding interaction              |                             |
++-------+--------------------------------------------+-----------------------------+
+|D      |Specifies a hydrogen bond donor atom        |  :ref:`hbond-annotations`   |
++-------+--------------------------------------------+-----------------------------+
+|A      |Specifies a hydrogen bond acceptor atom     |  :ref:`hbond-annotations`   |
++-------+--------------------------------------------+-----------------------------+
+|PDA    |Atoms whose center of mass is used to locate|                             |
+|       |the center of the pores                     |                             |
++-------+--------------------------------------------+-----------------------------+
 
 .. _build-annotations:
 
@@ -77,3 +87,12 @@ Cross-linking
 There is no automatic way to determine which atoms of a monomer will
 participate in a cross-linking reaction. Instead, we must decide for
 ourselves which atoms will be involved with the reaction.
+
+.. _hbond-annotations:
+
+Hydrogen Bonding
+----------------
+
+In order to identify hydrogen bonds in a trajectory, one must specify which
+hydrogen atoms are able to participate in such an interaction as well as which
+atoms are hydrogen bond donors and which are hydrogen bond acceptors.

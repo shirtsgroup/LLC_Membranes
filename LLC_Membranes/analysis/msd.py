@@ -157,15 +157,17 @@ class Diffusivity(object):
         # np.random.seed(4)  # 4 gives a nice spread for ethanol
         # trajs = np.random.randint(0, self.com.shape[1], size=3)
         # print(trajs)
-        # for i in trajs:
-        #     plt.plot(self.time, self.com[:, i, 2], linewidth=2)
-        #
-        #     plt.ylabel('$z$-coordinate (nm)', fontsize=14)
-        #     plt.xlabel('Time (ns)', fontsize=14)
-        #     plt.gcf().get_axes()[0].tick_params(labelsize=14)
-        # plt.tight_layout()
-        #
-        # plt.show()
+        trajs = np.arange(24)
+        for i in trajs:
+            plt.plot(self.time, self.com[:, i, 2], linewidth=2)
+
+        plt.ylabel('$z$-coordinate (nm)', fontsize=14)
+        plt.xlabel('Time (ns)', fontsize=14)
+        plt.gcf().get_axes()[0].tick_params(labelsize=14)
+
+        plt.tight_layout()
+
+        plt.show()
         # exit()
 
         self.weights = True

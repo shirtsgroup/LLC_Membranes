@@ -35,7 +35,7 @@ def initialize():
     parser.add_argument('-tc', '--coordinated_type', default=None, help='Element name of coordinated atoms')
 
     # coordination calculation parameters
-    parser.add_argument('-cut', default=0.25, type=float, help='Maximum distance between pairs where they are considered'
+    parser.add_argument('-cut', default=0.35, type=float, help='Maximum distance between pairs where they are considered'
                                                               'coordinated (nm)')
 
     # saving options
@@ -46,14 +46,31 @@ def initialize():
 
     parser.add_argument('-bins', nargs='+', default=100, type=int, help='Integer or array of bin values. If more than'
                         'one value is used, order the inputs according to the order given in args.axis')
+    parser.add_argument('-nocom', action='store_true', help='Calculate coordination based on pairwise distance between'
+                                                            'all atoms, even those that are a part of the same residue.')
 
     return parser
 
 
 class System(object):
 
-    def __init__(self, traj, gro, atoms=None, coordinated_atoms=None, residue=None, coordinated_residue=None, type=None,
-                 ctype=None, begin=0, end=-1, skip=1):
+    def __init__(self, traj, gro, residue=None, coordinated_residue=None, atoms=None, coordinated_atoms=None, type=None,
+                 ctype=None, begin=0, end=-1, skip=1, com=True):
+        """ Narrow system down to groups of interest
+
+        :param traj: Name of GROMACS trajectory (.xtc or .trr)
+        :param gro: Name of GROMACS coordinate file (.gro)
+        :param residue: Name of residue to include in calculation
+        :param coordinated_residue: Name of residue whose coordination we are interested in
+        :param atoms: Specify names of atoms to include. All else will be excluded
+        :param coordinated_atoms: Specify names of coordinated atoms to include. All else will be excluded
+        :param type: Atom types to include
+        :param ctype: Coordinated atom types to include
+        :param begin: first frame to analyze
+        :param end: last frame to analyze
+        :param skip: number of frames to skip between analysis steps
+        :param com: Calculate coordination based on the center of mass position of the selected atom group
+        """
 
         print("Loading trajectory...", end='', flush=True)
         self.t = md.load(traj, top=gro)[begin:end:skip]
@@ -67,9 +84,18 @@ class System(object):
 
         # get locations of atoms of interest and coordinating atoms
         # calculate centers of mass for certain groups. Decision-making in this regard is made in self.narrow_atoms()
-        self.com, self.com_map = self.narrow_atoms(atoms, residue, type)
+
+        if atoms is not None:
+            if atoms[0] == 'all':
+                atoms = self.all_atoms(res=residue)
+
+        if coordinated_atoms is not None:
+            if coordinated_atoms[0] == 'all':
+                coordinated_atoms = self.all_atoms(res=coordinated_residue)
+
+        self.com, self.com_map = self.narrow_atoms(atoms, residue, type, com=com)
         self.com_coordinated, self.com_coordinated_map = self.narrow_atoms(coordinated_atoms, coordinated_residue,
-                                                                           ctype, coordination=True)
+                                                                           ctype, coordination=True, com=com)
 
         # relate indices to
         self.names = [a.name for a in self.t.topology.atoms]
@@ -78,7 +104,15 @@ class System(object):
         self.distances = None
         self.ncoord = None
 
-    def narrow_atoms(self, atoms, residue, type, coordination=False):
+    def all_atoms(self, res=None):
+
+        if res is not None:
+
+            r = topology.Residue(res)
+
+            return [x for x in r.names.values()]
+
+    def narrow_atoms(self, atoms, residue, type, coordination=False, com=True):
 
         if atoms is not None or type is not None:
 
@@ -102,18 +136,24 @@ class System(object):
                     # If a residue is specified with atoms, assume that the user wants to isolate calculations to the
                     # center of mass of a group of atoms within a particular residue
 
-                    residue = topology.Residue(residue)
-                    atom_mass = [residue.mass[v] for v in residue.mass.keys() if
-                                 v in atoms]  # mass of atoms of interest
+                    if com:
 
-                    if len(atom_mass) > 1:
+                        residue = topology.Residue(residue)
+                        atom_mass = [residue.mass[v] for v in residue.mass.keys() if
+                                     v in atoms]  # mass of atoms of interest
 
-                        return physical.center_of_mass(self.t.xyz[:, atom_indices, :], atom_mass), \
-                               topology.map_atoms(atom_indices, len(atom_mass))
+                        if len(atom_mass) > 1:
+
+                            return physical.center_of_mass(self.t.xyz[:, atom_indices, :], atom_mass), \
+                                   topology.map_atoms(atom_indices, len(atom_mass))
+
+                        else:
+
+                            self.t.xyz[:, atom_indices, :], topology.map_atoms(atom_indices)
 
                     else:
 
-                        return self.t.xyz[:, atom_indices, :], topology.map_atoms(atom_indices, len(atom_mass))
+                        return self.t.xyz[:, atom_indices, :], topology.map_atoms(atom_indices)
 
             else:
 
@@ -276,18 +316,23 @@ if __name__ == "__main__":
 
     if not args.load:
 
+        if args.nocom:
+            com = False
+        else:
+            com = True
+
         system = System(args.traj, args.gro, atoms=args.atoms, coordinated_atoms=args.coordinated_atoms,
                         residue=args.residue, coordinated_residue=args.coordinated_residue, type=args.type,
-                        ctype=args.coordinated_type, begin=args.begin, end=args.end, skip=args.skip)
+                        ctype=args.coordinated_type, begin=args.begin, end=args.end, skip=args.skip, com=com)
 
         system.distance_search(cut=args.cut)  # calculate pairwise distance between all points in self.com and self.com_coordinated
 
-        system.n_coordinated(plot=True)
+        system.n_coordinated(plot=False)
 
         print((system.ncoord.flatten() > 0).sum() / (system.ncoord.shape[0] * system.ncoord.shape[1]))
 
-        with open(args.savename, 'wb') as f:
-            pickle.dump(system, f)
+        # with open(args.savename, 'wb') as f:
+        #     pickle.dump(system, f)
 
     else:
         print('Loading pickled object!...', end='', flush=True)
