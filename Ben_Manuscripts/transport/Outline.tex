@@ -225,6 +225,7 @@
 	\item A value of $\alpha < 1$ indicates a subdiffusive process, while a value of
 	$\alpha = 1$ and $\alpha > 1$ is characteristic of Brownian and superdiffusive
 	motion respectively.
+        %MRS1: time vs. ensemble MSD better in follow-up paper.
 	\item In practice, $\alpha$ corresponds to the growth of the \textit{ensemble}
 	MSD given by Equation~\ref{eqn:ensemble_msd}~\cite{meroz_toolbox_2015}:
 	\begin{equation}
@@ -299,6 +300,8 @@
 
   \subsection*{Dwell and Hop Length Distributions}\label{method:hops_and_dwells}
 
+%MRS1: we probably only want enough do identify mechanism not to fit anything.  Think about minimum needed for physical understanding. 
+
   \noindent We measured the distribution of dwell times and hop lengths in order to test
   the hypothesis that solutes follow a CTRW process.
   \begin{itemize}
@@ -319,8 +322,10 @@
 	of the annulus defined by the bin edges.
 	\item Although the pores are often described as straight, they have a
 	small degree of tortuosity which disrupts the RDF calcuation 
+        %MRS1: can you report numerically the tortuosity?
 	\item We obtain the best RDF by constructing splines that run through the
 	pore centers.
+        %MRS1: need to make sure ``best'' is defined above.
 	\item We construct the splines by dividing the membrane into 10 slices
 	in the $z$-direction. Within each slice, we calculate the location of 
 	the pore centers based on the average location of the aromatic rings
@@ -332,7 +337,9 @@
   \end{itemize}
   
   \subsection*{Identification of Hydrogen Bonds}
-  
+
+  %MRS1: We want to be able to say that conclusions are independent of reasonable changes in the definition so
+  %we are not picking and choosing results (either consciously or unconsciously) 
   Based on the geometric criteria proposed by Luzar and Chandler \cite{luzar_effect_1996},
   we determined a hydrogen bond to exist if the distance between the donor, D, and acceptor,
   A, atoms is less than 3.5 \AA~and the angle formed by D--H...A is less than 30\degree.
@@ -353,6 +360,7 @@
   \subsection*{Coordination number}
 
   We quantified the coordination of solutes with surrounding molecules.
+  %MRS1: will need to be more clear of solute vs. water vs. ion.
   \begin{itemize}
   	\item For each frame, we counted the identities and number of
   	coordinated molecules to a given solute based on a distance cut-off. 
@@ -408,6 +416,8 @@
   \includegraphics[width=\textwidth]{component_density_10wt.pdf}
   \caption{10 wt\% water}\label{fig:component_density_10wt}
   \end{subfigure}
+  %MRS1: explicitly state the normalization used for the RDF.
+  %MRS1: possibly include vertical dotted line to show where max head group peak occurs.
   \caption{The radial densities of various monomer components paint a picture of the
   pore topology where the pore centers are primarily composed of water and sodium ions.
   The 5 wt \% system (a) appears to be much more crowded by monomers than the 
@@ -461,6 +471,8 @@
   \noindent Sodium coordinates with far less water molecules than it does in 
   bulk solution.
   \begin{itemize}
+    %MRS1: did they use the same definition for coordination number?  Might want to run this analysis in a water box with sodium to make sure
+    %it is consistent.  Seems like a large difference. 
     \item In bulk water, it is estimated that sodium coordinates with 5.6 - 5.8 water
     molecules~\cite{rowley_solvation_2012}
     \item In our system, on average, each sodium ion is coordinated to about 1.7 
@@ -470,6 +482,7 @@
     in part by favorable interactions between sodium ions and carboxylate head groups.
     \item A dehydrated sodium ion is not shielded from the negatively charged 
     carboxylate group.~\cite{ma_drastically_2019}
+    %MRS1: are ``head group oxygen'' atoms the same as carboxylate? Not clear. 
     \item On average, sodium ions coordinate with 0.5 head group oxygen atoms in the
     10 wt \% water system and 0.4 head group oxygen atoms in the 5 wt \% water system. 
     % BJC: I thought 5 wt \% might be a little higher. These numbers might be skewed by
@@ -480,6 +493,7 @@
   % BJC: This figure is from methanol simulations. Will be replaced by pure water
   % simulations
   % BJC: I can probably just report the averages rather than plot this
+  %MRS1: yeah, this is not really worth a graphic.
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.45\textwidth}
@@ -494,6 +508,7 @@
   
   \subsection*{Mechanisms Governing Small Solute Transport}\label{section:mechanism_overview}
   
+  %MRS1: probably want to lead with waterr, to show that it is reasonable.
   We observe trends in transport properties that are dependent on chemical 
   environment within the nanopores as well as the chemical functionality of membrane
   constituents rather than just solute size. 
@@ -533,15 +548,19 @@
 %  \end{itemize}
   
   \noindent The MSDs are not a monotonic function of solute size.
+  %MRS1: say how you calculated size.
   \begin{itemize}
   	\item We plotted the solute size against their MSDs in Figure~\ref{fig:msd_radius_5wt} and~\ref{fig:msd_radius_10wt}.
   	\item There are numerous examples of solutes in our study that do not 
   	follow the behavior set forth by the Stokes-Einstein equation which 
   	implies that solute MSD should be inversely related to solute size.  % citation
+        %MRS1: can you plot on the figure what the relatioship SHOULD look like?  It sort of looks linear-ish (especially 5).
   	\item This behavior is not entirely surprising but worth emphasizing. 
   	\item It is expected that the Stokes-Einstein relationship, which assumes that 
   	the solute radius is much larger than the solvent, should break down once
   	solute and solvent are of comparable size.
+        %MRS1: these points below seem more like intro points.
+
   	\item Membranes, including that studied here, are often characterized 
   	with size-exclusion experiments which emphasizes selectivity based on the ability
   	to enter a given pore. 
@@ -579,7 +598,7 @@
   smaller than those of the solutes in the 10 wt \% water system (b). The
   MSDs are not a monotonic function of molecular size (c and d).}\label{fig:msds}
   \end{figure}  
-  
+  %MRS1: Having so much data here grapically is nice.  ought to think how else data can be displayed. Perhaps figures with the dwell times as well?  Depends on if those are being shown.  2D scatter plots with average partitioning distance of solute vs. MSD? We should keep brainstorming which will be most relevant. 
   \noindent On the timescales simulated in our study, solutes exhibit subdiffusive behavior.
   %, providing the beginnings of an answer to question~\ref{question:mechanisms}.
   \begin{itemize}  
@@ -616,6 +635,7 @@
   \includegraphics[width=\linewidth]{example_msd.pdf}
   \caption{}\label{fig:example_msd}
   \end{subfigure}
+  %MRS1: nice graph!
   \caption{All solutes show subdiffusive transport behavior inside the membrane's
   nanopores, similar to that exhibited by ethanol. (a) The $z$-coordinate trace of
   3 representative ethanol COMs shows clear periods of entrapment separated by hops.
@@ -629,17 +649,21 @@
   In addition to solute trapping in dense monomer regions, we observe a second
   trapping mechanism caused by preferential hydrogen bonding between 
   hydrogen bond donor solutes and monomer carboxylate groups. 
+  %MRS1: is there a way we can deconvolute these two-three mechanisms?
   \begin{itemize}
     \item Of the time spent donating hydrogen atom(s), x \% of the hydrogen
     bonds occur between solutes and carboxylate groups as opposed to solutes
     with water. 
     \item This shows a high preference for the carboxylate anions since there
     are 5 times more water molecules in the system.
+    %MRS1: carboxylate also has net negative charge - not just higher negative partial charge,
+    %also no extra neutralizing positive partial charge nearby.
     \item The carboxylate oxygen atoms have a slightly higher partial negative
     charge than water molecules.
     \item Additionally, on average, each sodium ion is coordinated to 1.7 water
     molecules. Roughly all of the water in the pore region is usually coordinated
     to a sodium ion which decreases their availability to solutes.
+    %MRS1: this should lead to reduced ability to solvate positive things, but shouldn't reduce H-boonding that much?
   \end{itemize}
   
   Finally, we see instances of solutes which become immobilized or slowed by 
@@ -648,6 +672,7 @@
     \item Much like water, the polarity of the solutes leaves partial negative
     charges which are stabilized through electrostatic interactions with sodium ions.
     \item There are many cases in which polar groups bind to sodium ions for at
+    %MRS1: a 'few times steps' seems irrelevant.   
     least a few time steps. 
     \item There are some cases where solutes become immobilized for long periods
     of time while in close proximity to a sodium ion.
@@ -664,7 +689,8 @@
   2.5 \AA~of a sodium ion. The color of the shaded regions is switched every time
   the oxygen atom becomes associated to a different sodium ion.}\label{fig:na_met_trace}
   \end{figure}
-  	
+
+  %MRS1: I think maybe we want to keep this minimal. 
   \noindent The hopping and trapping mechanism exhibited by all solutes is characteristic of
   a continuous time random walk (CTRW) model.	
   \begin{itemize}
@@ -849,6 +875,8 @@
   	oxygen atoms for all simple alcohols.
   	\item This is largely due to the more highly crowded environment surrounding the ether
   	oxygen atoms combined with their lower partial charges.
+        %MRS1: also carboxylate has larger net charge.
+        %MRS1: note the partial chage is a moel thing
   	\item Butanol shows the largest preference towards hydrogen bonds with carboxylate 
   	head groups.
   	\item The radial distribution function of atoms located at opposite ends of butanol
@@ -857,6 +885,7 @@
   	\item This suggests that alcohols tend to orient themselves like the liquid crystal 
   	monomers, with hydrophilic components point towards the pore centers.
   	\item When solutes are buried in the pore walls, their MSDs are shorter.
+        %MRS1: is there enough data to establish this? How will it be graphed?  
   \end{itemize}
   
   \begin{figure}
@@ -877,6 +906,7 @@
   \includegraphics[width=\linewidth]{butanol_CO.pdf}  %BJC: can add inset to plot showing butanol with highlighted O and C
   \caption{}\label{fig:butanol_CO}
   \end{subfigure}
+  %MRS: label the black line (tails? heads?)
   \caption{(a) The MSD of the simple alcohols decrease as a function of the solute size, however
   methanol's MSD is considerably higher than expected based on the Stokes-Einstein equation. 
   (b) The radial distribution functions of each simple alcohol shows a maximum close
@@ -947,6 +977,7 @@
   \includegraphics[width=0.9\linewidth]{dwell_hop_PG_GCL.pdf}
   \caption{}\label{fig:dwell_hop_PG_GCL}
   \end{subfigure}
+  %MRS1: what is (c) supposed to be saying?  The distributions of distances seem similar with ethylene having shorter dwell times. Maybe can focus on <150 ns times to see differences.  Maybe smaller bins as well.
   \caption{(a) Glycerol, tetrose and ribose are densest close to the pore center because
   they have a high number of hydrophilic groups and are relatively large. Ethylene glycol
   and propylene glycol are densest close to the head group region. (b)The number of 
