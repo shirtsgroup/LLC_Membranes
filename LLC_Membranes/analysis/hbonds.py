@@ -131,7 +131,7 @@ class System(object):
         #     # all oxygens are also potential acceptors
         #     self.A = [a.index for a in self.t.topology.atoms if a.residue.name == 'HOH' and a.element.symbol == 'O']
 
-    def set_eligible(self, res, atoms, acceptor_only=True, donors_only=True):
+    def set_eligible(self, res, atoms, acceptor_only=False, donors_only=False):
         """
         Set eligible atoms to be included in h-bond calculation
         :param res : residue to include in calculation
@@ -142,8 +142,13 @@ class System(object):
 
         residue = topology.Residue(res)
 
-        if atoms[0] != 'all':
+        restrict = False
+        if type(atoms) is list and atoms[0] != 'all':
+            restrict = True
+        elif type(atoms) is not list and atoms != 'all':
+            restrict = True
 
+        if restrict:
             residue.hbond_H = [h for h in residue.hbond_H if h in atoms]
             residue.hbond_D = [d for d in residue.hbond_D if d in atoms]
             residue.hbond_A = [a for a in residue.hbond_A if a in atoms]
@@ -237,25 +242,25 @@ class System(object):
 
         n = [a.shape[1] for a in self.hbonds]
 
-        ethers = ['O', 'O1', 'O2']
-        carb = ['O3', 'O4']
-        nether = np.zeros([self.t.n_frames])
-        ncarb = np.zeros([self.t.n_frames])
-
-        for i, x in enumerate(self.hbonds):
-
-            if x.shape[0] == 4:
-
-                acceptors = [self.names[int(x[2, j])] for j in range(x.shape[1])]
-
-                for k in acceptors:
-                    if k in ethers:
-                        nether[i] += 1
-                    elif k in carb:
-                        ncarb[i] += 1
-
-        print(sum(n))
-        print(np.sum(ncarb) / np.sum(nether))
+        # ethers = ['O', 'O1', 'O2']
+        # carb = ['O3', 'O4']
+        # nether = np.zeros([self.t.n_frames])
+        # ncarb = np.zeros([self.t.n_frames])
+        #
+        # for i, x in enumerate(self.hbonds):
+        #
+        #     if x.shape[0] == 4:
+        #
+        #         acceptors = [self.names[int(x[2, j])] for j in range(x.shape[1])]
+        #
+        #         for k in acceptors:
+        #             if k in ethers:
+        #                 nether[i] += 1
+        #             elif k in carb:
+        #                 ncarb[i] += 1
+        #
+        # print(sum(n))
+        # print(np.sum(ncarb) / np.sum(nether))
 
         # plt.plot(self.t.time / 1000, nether / ncarb)
 

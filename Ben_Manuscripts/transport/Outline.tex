@@ -14,6 +14,9 @@
 \usepackage{booktabs}
 \usepackage{gensymb}
 \usepackage{float}
+\usepackage{xr}
+
+\externaldocument[S-]{Supporting_Information}
 
 %BJC: potential titles (uncommented is current favorite)
 %\title{The Transport Mechanisms of Polar Solutes in a Cross-linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
@@ -52,6 +55,18 @@
 	\item Many of the separations we are interested in involve polar organic 
 	compounds.
   \end{itemize} 
+
+  %BJC1: copied from discussion. Need to work this in the right place
+  \begin{itemize}  
+  	\item Membranes, including that studied here, are often characterized 
+  	with size-exclusion experiments which emphasizes selectivity based on the ability
+  	to enter a given pore. 
+  	\item Once we reach the nm to sub-nm pore size regime, size-exclusion 
+  	becomes of secondary importance since the primary purpose of these membranes is to 
+  	separate molecules whose sizes are on the same order as water.
+  	\item In order to handle complex waste streams with molecules of similar size,
+  	it is important to take advantage of material properties other than pore size. 
+  \end{itemize}
   
 %  There are a number of questions that we wish to answer in order to create a
 %  framework for studying this system in even greater detail.
@@ -78,14 +93,14 @@
   	pore region. We will study the gradient in composition of solutes and water
   	and any resultant influence it might have on mechanistic properties.
   	
-  	\item Can we describe the transport mechanisms using pre-existing 
-  	mathematical models. \label{question:math}
-  	
-  	A mathematical model may provide additional insight into the transport
-  	mechanisms and, in future work, can help relate performance on the 
-  	timescales studied with MD to macroscopic timescales. We will use
-  	qualitative and semi-quantitative arguments in order to choose a 
-  	governing model. 
+%  	\item Can we describe the transport mechanisms using pre-existing 
+%  	mathematical models. \label{question:math}
+%  	
+%  	A mathematical model may provide additional insight into the transport
+%  	mechanisms and, in future work, can help relate performance on the 
+%  	timescales studied with MD to macroscopic timescales. We will use
+%  	qualitative and semi-quantitative arguments in order to choose a 
+%  	governing model. 
   	
   	\item How can we modify the current monomers in order to enhance
   	solute-specific separations? \label{question:math}
@@ -122,13 +137,15 @@
 
   \section{Methods}
   
-  Python scripts used to set up systems and conduct post-simulation trajectory analysis are
-  available online at \texttt{https://github.com/bencoscia/llcsim}.
+  Python scripts used to set up systems and conduct post-simulation trajectory 
+  analysis are available online at \texttt{https://github.com/shirtsgroup/LLC\_Membranes}.
+  The appropriate script to use for each of the following calculations is summarized
+  in Table~\ref{S-table:python_scripts} of the SI.
   
-  \noindent We ran all molecular dynamics simulations and energy minimizations using 
-  GROMACS 2018.3 \cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008} 
+  \noindent We ran all molecular dynamics simulations and energy minimizations 
+  using GROMACS 2018.3 \cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008} 
   
-  \subsection*{System Setup}
+  \subsection*{System Setup}\label{method:system_setup}
 
   Stable H\textsubscript{II} phases, assembled with Na-GA3C11, can be formed
   using a broad range of water concentrations.
@@ -146,11 +163,12 @@
   built our initial configurations with water in both regions close to the expected
   equilibrium value.
   \begin{itemize}
-	\item There is about 2:1 water in the pores versus in the tails for the 10 wt \% system.
+	\item There is a 2:1 ratio of water in the pores versus in the tails for the 10 wt \% system.
 	\item The amount of water present in the tails may or may not be experimentally consistent
 	but if we don't put it in, the results will not be thermodynamically consistent, which 
 	will give issues with measurements and calculations.
-	\item See supporting info for water equilibration simulation data.
+	\item See section~\ref{S-section:water_content_equil} of the SI for further details on 
+	water equilibration in this system.
 	\item We iteratively adjusted the pore radius in our systems until the right amount of water
 	fit in the pores when we ran \texttt{gmx solvate}.
 	\item We placed water molecules in the tail region one at a time in random locations
@@ -175,11 +193,11 @@
 	\item First, we equilibrated the initial configuration using the `wet'
 	equilibration procedure described in our previous work~\cite{coscia_understanding_2019}.
 	\item Then we cross-linked the equilibrated solvated configuration using the
-	cross-linking procedure described in our previous work. 
+	cross-linking procedure described in our previous work.
   \end{itemize}
 
-  \noindent We added 6 solute molecules to each pore of the equilibrated cross-linked
-  configuration.
+  \noindent To study a given solute, we added 6 solute molecules to each pore of the
+  equilibrated cross-linked configuration.
   \begin{itemize}
 	\item We equally spaced each solute in the pore
 	\item 6 solutes per pore provided a balance of a useful amount of data
@@ -192,7 +210,7 @@
 	\item We collected transport data over the course of 1 $\mu$s MD simulations
   \end{itemize}
   
-  \subsection*{Solute Parameterization}
+  \subsection*{Solute Parameterization}\label{method:parameterization}
   
   %BJC: might need to reword. Most of this is taken from my last paper and adapted to solutes.
   Like we have previously done for Na-GA3C11~\cite{coscia_understanding_2019}, we
@@ -225,7 +243,7 @@
 	\item A value of $\alpha < 1$ indicates a subdiffusive process, while a value of
 	$\alpha = 1$ and $\alpha > 1$ is characteristic of Brownian and superdiffusive
 	motion respectively.
-        %MRS1: time vs. ensemble MSD better in follow-up paper.
+    % MRS1: time vs. ensemble MSD better in follow-up paper.
 	\item In practice, $\alpha$ corresponds to the growth of the \textit{ensemble}
 	MSD given by Equation~\ref{eqn:ensemble_msd}~\cite{meroz_toolbox_2015}:
 	\begin{equation}
@@ -298,9 +316,24 @@
 %  	and $\beta$ is the anomalous exponent characteristic of the parent FBM process. 
 %  \end{itemize}
 
+  \subsection*{Molecular Size Determination}\label{method:molecular_size}
+  
+  In order to determine an effective radius for each solute, we measured the 
+  maximum pairwise distance between atoms of each solute over the course of
+  a 2.5 ns simulation of solutes dissolved in a cubic box of water.
+  \begin{itemize}
+    \item Each box consisted of about 2100 water molecules and 6 solutes.
+    \item Although there exist more involved methods for determining the 
+    hydrodynamic radius~\cite{schultz_determination_1961}, we chose to use
+    a simpler and more intuitive metric since we are only interested in
+    observing trends in the solute mean squared displacement as a function
+    of solute size. 
+  \end{itemize}
+
   \subsection*{Dwell and Hop Length Distributions}\label{method:hops_and_dwells}
 
-%MRS1: we probably only want enough do identify mechanism not to fit anything.  Think about minimum needed for physical understanding. 
+  %MRS1: we probably only want enough do identify mechanism not to fit anything.  Think about minimum needed for physical understanding.
+  %BJC1: right, the following is the bear minimum if we want to mention dwell time and hop lengths at all. Otherwise this can be omitted.
 
   \noindent We measured the distribution of dwell times and hop lengths in order to test
   the hypothesis that solutes follow a CTRW process.
@@ -313,7 +346,8 @@
 	used to construct empirical distributions.
   \end{itemize}
 
-  \subsection*{Radial Density Functions}
+  \subsection*{Radial Density Functions}\label{method:rdfs}
+  % BJC1: Should it be Radial Distribution Functions?
 
   We measured the average radial distance of each solute of interest from the pore
   centers.
@@ -322,10 +356,9 @@
 	of the annulus defined by the bin edges.
 	\item Although the pores are often described as straight, they have a
 	small degree of tortuosity which disrupts the RDF calcuation 
-        %MRS1: can you report numerically the tortuosity?
-	\item We obtain the best RDF by constructing splines that run through the
-	pore centers.
-        %MRS1: need to make sure ``best'' is defined above.
+    % MRS1: can you report numerically the tortuosity?
+	\item We tried to mitigate the effects of tortuosity by calculating the RDF
+	with respect to splines that run through the pore centers.
 	\item We construct the splines by dividing the membrane into 10 slices
 	in the $z$-direction. Within each slice, we calculate the location of 
 	the pore centers based on the average location of the aromatic rings
@@ -336,7 +369,7 @@
 	on the spline.
   \end{itemize}
   
-  \subsection*{Identification of Hydrogen Bonds}
+  \subsection*{Identification of Hydrogen Bonds}\label{method:hbonds}
 
   %MRS1: We want to be able to say that conclusions are independent of reasonable changes in the definition so
   %we are not picking and choosing results (either consciously or unconsciously) 
@@ -354,31 +387,45 @@
     \item The definition of Luzar and Chandler is easily visualized for trajectories using
     the \texttt{hbonds} representation of the Visual Molecular Dynamics (VMD) software 
     package which allows us to directly check the validity of identified hydrogen bonds.
+    \item We tested the sensitivity of our conclusions to this definition in 
+    the Supporting Information.
     %BJC: might need to update this if something better exists for nitrogen 
   \end{itemize}
 
-  \subsection*{Coordination number}
+  \subsection*{Coordination number}\label{method:coordination}
 
-  We quantified the coordination of solutes with surrounding molecules.
-  %MRS1: will need to be more clear of solute vs. water vs. ion.
+  We quantified the coordination of solute constituent atoms with sodium ions.
   \begin{itemize}
-  	\item For each frame, we counted the identities and number of
-  	coordinated molecules to a given solute based on a distance cut-off. 
-	\item We found that this approach is more useful than calculating the
+  	\item For each frame, we counted the number of coordinated molecules to a
+  	given solute atom based on a distance cut-off. 
+  	\item Using four different methods, Rowley and Roux observed peaks in the
+  	radial distribution function for sodium coordinated with water at an O-Na
+  	distance of between 2.3 and 2.5 \AA~\cite{rowley_solvation_2012}. 
+  	\item We used 2.5 \AA~as the distance cutoff.
+  	\item We found that this approach is more useful than calculating the
 	3D spherical radial distribution function because it gives detailed
 	frame-by-frame information rather than an average. 
   \end{itemize}
   
-  Using four different methods, Rowley and Roux observed peaks in the radial
-  distribution function for sodium coordinated with water at an O-Na distance 
-  of between 2.3 and 2.5 \AA~\cite{rowley_solvation_2012}. We used 2.5 \AA~as
-  the distance cutoff.  % BJC: this might be too strict. I've seen literature where they define 3.2 angstroms as the cutoff
+  Using our procedure we found that sodium ions in a solution of tip3p water
+  coordinate with an average of 3.4 water molecules.
+  \begin{itemize}
+    \item We created a 4 x 4 x 4 nm cubic box of water with the GROMACS tool,
+    \texttt{gmx solvate}
+    \item We used \texttt{gmx genion} to replace water molecules with sodium
+    and chloride ions in order to create a 0.6 M NaCl solution.
+    \item We let the system simulate for 5 ns and reported the average
+    number of coordinated water molecules per frame after discarding the first ns of 
+    simulation. % need to actually do this
+    \item We found that the reported average value is not sensitive to NaCl
+    concentration (See Supporting Information)
+  \end{itemize}
    
   \section{Results and Discussion}
   
-  \subsection*{Structure and Transport of Membrane Constituents}\label{section:membrane_components}
+  \subsection*{Structure of Membrane Constituents}\label{section:membrane_components}
   
-  %BJC: Probably do analysis on pure water system for this section.  
+  %BJC: Do analysis on pure water system for this section.  
   
   In contrast to our previous work with a solvent-free version of this membrane, the pore
   region of the 5 and 10 wt \% water systems are primarily filled with water and sodium
@@ -425,7 +472,22 @@
   in (b). A small amount of tail components find their way close to the pore center 
   of the 5 wt \% system. }\label{fig:component_densities}
   \end{figure}
+
+  \subsection*{Mechanisms Governing Small Solute Transport}\label{section:mechanism_overview}
+
+  We observed transport of sodium, water and 20 other small polar solutes inside the
+  membrane nanopores. 
+  \begin{itemize}
+  	\item First, we will comment on transport of the membrane constituents, water and sodium,
+  	in a system absent of any additional solutes.
+%    \item There are significantly more water molecules and sodium ions in the membrane
+%    than solutes.
+    \item Then we will present the general trends that we observe among the set of 
+    solutes studied.
+  \end{itemize}
   
+  \subsubsection*{Water and Sodium Ions}\label{section:transport_water_sodium}
+
 %  The MSD of sodium and water is significantly larger in the 10 wt \% water system
 %  versus the 5 wt \% water system.
   \noindent Water's mobility is increased when pores are larger and less crowded.
@@ -471,10 +533,6 @@
   \noindent Sodium coordinates with far less water molecules than it does in 
   bulk solution.
   \begin{itemize}
-    %MRS1: did they use the same definition for coordination number?  Might want to run this analysis in a water box with sodium to make sure
-    %it is consistent.  Seems like a large difference. 
-    \item In bulk water, it is estimated that sodium coordinates with 5.6 - 5.8 water
-    molecules~\cite{rowley_solvation_2012}
     \item In our system, on average, each sodium ion is coordinated to about 1.7 
     water molecules in the 10 wt \% system and 1.15 water molecules in the 5 wt\% 
     system.
@@ -506,9 +564,8 @@
   \end{subfigure}
   \end{figure}
   
-  \subsection*{Mechanisms Governing Small Solute Transport}\label{section:mechanism_overview}
+  \subsubsection*{Transport of Small Polar Solutes}\label{section:general_transport_solutes}  
   
-  %MRS1: probably want to lead with waterr, to show that it is reasonable.
   We observe trends in transport properties that are dependent on chemical 
   environment within the nanopores as well as the chemical functionality of membrane
   constituents rather than just solute size. 
@@ -548,7 +605,6 @@
 %  \end{itemize}
   
   \noindent The MSDs are not a monotonic function of solute size.
-  %MRS1: say how you calculated size.
   \begin{itemize}
   	\item We plotted the solute size against their MSDs in Figure~\ref{fig:msd_radius_5wt} and~\ref{fig:msd_radius_10wt}.
   	\item There are numerous examples of solutes in our study that do not 
@@ -972,12 +1028,11 @@
   \caption{}\label{fig:multi_hbonds}
   \end{subfigure}
   % BJC: this subfigure is probably best suited for the supporting information.
-  \begin{subfigure}{\textwidth}
-  \centering
-  \includegraphics[width=0.9\linewidth]{dwell_hop_PG_GCL.pdf}
-  \caption{}\label{fig:dwell_hop_PG_GCL}
-  \end{subfigure}
-  %MRS1: what is (c) supposed to be saying?  The distributions of distances seem similar with ethylene having shorter dwell times. Maybe can focus on <150 ns times to see differences.  Maybe smaller bins as well.
+%  \begin{subfigure}{\textwidth}
+%  \centering
+%  \includegraphics[width=0.9\linewidth]{dwell_hop_PG_GCL.pdf}
+%  \caption{}\label{fig:dwell_hop_PG_GCL}
+%  \end{subfigure}
   \caption{(a) Glycerol, tetrose and ribose are densest close to the pore center because
   they have a high number of hydrophilic groups and are relatively large. Ethylene glycol
   and propylene glycol are densest close to the head group region. (b)The number of 

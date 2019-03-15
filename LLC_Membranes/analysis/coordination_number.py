@@ -297,7 +297,7 @@ class System(object):
             #     plt.show()
             #
             # exit()
-
+            print('Average coordinated molecules per frame: %.2f' % self.ncoord.mean())
             plt.plot(self.time, self.ncoord.mean(axis=1))
 
         if plot:
@@ -327,7 +327,7 @@ if __name__ == "__main__":
 
         system.distance_search(cut=args.cut)  # calculate pairwise distance between all points in self.com and self.com_coordinated
 
-        system.n_coordinated(plot=False)
+        system.n_coordinated(plot=True)
 
         print((system.ncoord.flatten() > 0).sum() / (system.ncoord.shape[0] * system.ncoord.shape[1]))
 

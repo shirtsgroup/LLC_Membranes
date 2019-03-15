@@ -13,6 +13,9 @@
 \usepackage{booktabs}
 \usepackage{gensymb}
 \usepackage{float}
+\usepackage{xr}
+
+\externaldocument[M-]{Outline}
 
 \renewcommand{\thefigure}{S\arabic{figure}}
 \renewcommand{\thesection}{S\arabic{section}}
@@ -222,7 +225,7 @@
   The pores contain 72 \% and 69 \% of the total water in the 5 and 10 wt \%
   systems respectively.
 
-  \begin{figure}
+  \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.45\textwidth}
 % Generated with solute_partitioning.py -t full_shifted.xtc -g berendsen.gro -r SOL -pr 1.6 --savename water_partitioning.pl
@@ -248,7 +251,7 @@
   equilibrate further for 100 ns. The water contents in each region does not
   change significantly in either case.
 
-  \begin{figure}
+  \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.45\textwidth}
 % Generated with solute_partitioning.py -t PR.trr -g PR.gro -r SOL --savename SOL_partitioning.pl
@@ -275,7 +278,7 @@
   where the center of a given solute came within 3.5 \AA of another same-solute
   center of mass.
   
-  \begin{figure}
+  \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.45\textwidth]{solute_interaction.pdf}
   \caption{Interactions between same-solutes are negligible when systems are 
@@ -283,6 +286,49 @@
   molcules the most, does so less than 0.05 \% of the time.}\label{fig:solute_interation}
   \end{figure}
 
+  \subsection{Hydrogen Bond Detection Sensitivity}\label{section:hbond_sensisitivity}
+  
+  In Section~\ref{M-method:hbonds} of the main text, we established geometric criteria for the 
+  identification of hydrogen bond interactions. Namely, if the distance between the donor,
+  D, and acceptor, A, atoms is less than 3.5 \AA~and the angle formed by D--H...A is less
+  than 30\degree, then we consider the interaction to be a consequence of hydrogen bonding.
+  
+  We tested the sensitivity of this criteria to ensure that our conclusions
+  were not a strong function of the chosen criteria. In Figure~\ref{fig:hbond_sensitivity} we
+  plotted the results of the same calculation performed to create Figure~\ref{M-fig:multi_hbonds}
+  of the main text. We varied the distance cut-off between 3.0 and 4.0 \AA, and varied the
+  angle cut-off between 25 and 35 \degree. 
+  
+  As the distance and angle cut-offs are increased, there is a slight increase in the total
+  number of hydrogen bonds, which is primarily manifested by an increased number of multiple-hydrogen-bond
+  interactions. Using our most lenient set of criteria (d = 4.0 \AA~and $\theta$ = 35 $\degree$), glycerol,
+  tetrose and ribose all show instances where they simultaneously hydrogen bond with 4 head group atoms.
+  In the strictest case (d = 3.0 \AA~and $\theta$ = 25 \degree), ribose is the only solute with a 
+  detected instance of a quadruple hydrogen bond.
+  
+  We can draw the same conclusions from any of the plots in Figure~\ref{fig:hbond_sensitivity}. 
+  \begin{enumerate}
+    \item An increased number of hydroxyl groups results in an increased number of hydrogen bond
+    interactions.
+    \item The number of multiple-hydrogen-bond interactions increases.
+    \item On average, propylene glcyol participates in more hydrogen bond interactions than 
+    ethylene glycol.  %BJC: might need to label the total hydrogen bonds (put number centered on top of bars)
+  \end{enumerate}
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{\textwidth}
+  \centering
+  \includegraphics[trim={0 0.5cm 0.5cm 0.5cm}, clip, width=0.5\textwidth]{hbond_sensitivity_legend.pdf}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+  \includegraphics[width=\textwidth]{hbond_sensitivity.pdf}
+  \end{subfigure}
+  \caption{We tested the sensitivity of our hydrogen bond detection to the chosen 
+  geometric criteria for hydrogen bonding. We varied the distance cut-off between 3.0 and
+  4.0 \AA, and varied the angle cut-off between 25 and 35 \degree.}\label{fig:hbond_sensitivity}
+  \end{figure}
+  
 % BJC: the arguments in the following section aren't as strong as I want them to be. 
 % And not necessary for this paper.
 %
