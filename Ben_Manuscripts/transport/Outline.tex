@@ -330,20 +330,47 @@
     of solute size. 
   \end{itemize}
 
-  \subsection*{Dwell and Hop Length Distributions}\label{method:hops_and_dwells}
-
-  %MRS1: we probably only want enough do identify mechanism not to fit anything.  Think about minimum needed for physical understanding.
-  %BJC1: right, the following is the bear minimum if we want to mention dwell time and hop lengths at all. Otherwise this can be omitted.
-
-  \noindent We measured the distribution of dwell times and hop lengths in order to test
-  the hypothesis that solutes follow a CTRW process.
+%  \subsection*{Dwell and Hop Length Distributions}\label{method:hops_and_dwells}
+%
+%  %MRS1: we probably only want enough do identify mechanism not to fit anything.  Think about minimum needed for physical understanding.
+%  %BJC1: right, the following is the bear minimum if we want to mention dwell time and hop lengths at all. Otherwise this can be omitted.
+%
+%  \noindent We measured the distribution of dwell times and hop lengths in order to test
+%  the hypothesis that solutes follow a CTRW process.
+%  \begin{itemize}
+%	\item We used the \texttt{ruptures} python package in order to identify
+%	breakpoints, times when hops occur, in solute trajectories.\cite{truong_ruptures:_2018}
+%%	(See Supporting Information for more details on chosen parameters. i.e. type of cost 
+%%	function, cost function penalty	tolerance, number of dimensions used)
+%	\item The corresponding hop lengths and dwell times between break points were 
+%	used to construct empirical distributions.
+%  \end{itemize}
+  
+  \subsection*{The Stokes-Einstein Relationship}\label{method:stokes}
+  
+  The Stokes-Einstein relationship expresses the diffusion coefficient of 
+  a hard spherical particle as a function inversely related to its radius.
   \begin{itemize}
-	\item We used the \texttt{ruptures} python package in order to identify
-	breakpoints, times when hops occur, in solute trajectories.\cite{truong_ruptures:_2018}
-%	(See Supporting Information for more details on chosen parameters. i.e. type of cost 
-%	function, cost function penalty	tolerance, number of dimensions used)
-	\item The corresponding hop lengths and dwell times between break points were 
-	used to construct empirical distributions.
+  	\item $D = \dfrac{k_bT}{6\pi\eta r}$ where $k_b$ and $T$ are Boltzmann
+  	constant and the system temperature respectively and $\eta$ is the 
+  	system's viscosity.
+  	\item For calculation relevant to this study, we assume that the viscosity
+  	is constant.
+  	\item Additionally, we will apply the relationship to solute MSDs which is
+  	valid because all trajectories are of the same length.
+  	\item It is well-known that the relationship breaks down when solute size becomes
+  	on the order of solvent size because the solute can no longer be treated
+  	as a non-interacting hard sphere. 
+  \end{itemize}
+  
+  Gierer and Wirtz introduced a microfriction correction factor in order to 
+  address this issue. 
+  \begin{itemize}
+    \item They proposed that $D = \dfrac{k_bT}{6\pi\eta fr}$
+    %\item Where $f = \left(1.5\dfrac{r_2}{r_1} + \dfrac{1}{1 + \dfrac{r_2}{r_1}}\right)^{-1}$
+    \item Where $f = \left(1.5(r_2/r_1) + \dfrac{1}{1 + (r_2/r_1)}\right)^{-1}$
+    \item and $r_1$ and $r_2$ are the radii of the solute and solvent molecules
+    respectively.
   \end{itemize}
 
   \subsection*{Radial Density Functions}\label{method:rdfs}
@@ -355,18 +382,29 @@
 	\item We binned the radial distances and then normalized by the volume
 	of the annulus defined by the bin edges.
 	\item Although the pores are often described as straight, they have a
-	small degree of tortuosity which disrupts the RDF calcuation 
+	small degree of tortuosity which disrupts the RDF calcuation.
     % MRS1: can you report numerically the tortuosity?
+    % BJC1: added at end of paragraph after introduction of splines since tortuosity calculation uses splines.
 	\item We tried to mitigate the effects of tortuosity by calculating the RDF
 	with respect to splines that run through the pore centers.
-	\item We construct the splines by dividing the membrane into 10 slices
-	in the $z$-direction. Within each slice, we calculate the location of 
-	the pore centers based on the average location of the aromatic rings
-	that make up the monomer head groups.
-	\item When calculating the RDF, the radial distance from the pore center
+%    \item We construct the splines by dividing the membrane into 10 slices
+%	in the $z$-direction. Within each slice, we calculate the location of 
+%	the pore centers based on the average location of the aromatic rings
+%	that make up the monomer head groups.
+	\item Each spline consists of 10 points, equally spaced in the $z$-direction, whose
+    ($x$, $y$) coordinates are defined based on the center of mass of all head
+    groups closest, in $z$, to the given point.
+	\item When calculating RDFs, the radial distance from the pore center
 	is based on the distance between the solute center-of-mass and the linearly
 	interpolated ($x$, $y$)	coordinates of the pore center calculated based
 	on the spline.
+	\item Using the splines, we calculated the tortuosity of the 
+	pores by calculating the ratio $\dfrac{L}{Z}$ where $L$ is the length of the spline and $Z$ is 
+    the length of the unit cell in the $z$-direction. 
+    \item The average tortuosity of each pore is 1.03 $\pm$ 0.01 and 1.07 $\pm$ 0.02 in the 
+    5 and 10 wt \% systems respectively. 
+%    \item Although the value of tortuosity is low, the author's experience suggests
+%    that a spline is still justified.	
   \end{itemize}
   
   \subsection*{Identification of Hydrogen Bonds}\label{method:hbonds}
@@ -388,7 +426,7 @@
     the \texttt{hbonds} representation of the Visual Molecular Dynamics (VMD) software 
     package which allows us to directly check the validity of identified hydrogen bonds.
     \item We tested the sensitivity of our conclusions to this definition in 
-    the Supporting Information.
+    Section~\ref{S-section:hbond_sensitivity} of the SI.
     %BJC: might need to update this if something better exists for nitrogen 
   \end{itemize}
 
@@ -418,12 +456,15 @@
     number of coordinated water molecules per frame after discarding the first ns of 
     simulation. % need to actually do this
     \item We found that the reported average value is not sensitive to NaCl
-    concentration (See Supporting Information)
+    concentration (See section~\ref{S-section:coord_number} of the SI)
   \end{itemize}
    
   \section{Results and Discussion}
   
   \subsection*{Structure of Membrane Constituents}\label{section:membrane_components}
+  
+  Before beginning the analysis of transport behavior, it is important to elucidate
+  the topology of the membrane pores.  
   
   %BJC: Do analysis on pure water system for this section.  
   
@@ -451,26 +492,34 @@
     that occupy the pore center.
   \end{itemize}
   
-  %BJC: I'm not sure if would be better to normalize the densities so that the
-  % shape of the sodium density is more pronounced
+  % BJC1: Should I show a dry system?
   \begin{figure}[!htb]
   \centering
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.415\textwidth}
   \includegraphics[width=\textwidth]{component_density_5wt.pdf}
   \caption{5 wt\% water}\label{fig:component_density_5wt}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.15\textwidth}
+  \vspace{-0.5cm}
+  \includegraphics[width=\textwidth]{monomer_color_coded.pdf}
+  \label{fig:monomer_color_coded}
+  \end{subfigure}
+  \begin{subfigure}{0.415\textwidth}
   \includegraphics[width=\textwidth]{component_density_10wt.pdf}
   \caption{10 wt\% water}\label{fig:component_density_10wt}
   \end{subfigure}
-  %MRS1: explicitly state the normalization used for the RDF.
+
   %MRS1: possibly include vertical dotted line to show where max head group peak occurs.
+  %BJC1: tried it out. Seems like a good addition.
   \caption{The radial densities of various monomer components paint a picture of the
   pore topology where the pore centers are primarily composed of water and sodium ions.
-  The 5 wt \% system (a) appears to be much more crowded by monomers than the 
-  10 wt \% system (b). Head groups in (a) are densest closer to the pore center than
-  in (b). A small amount of tail components find their way close to the pore center 
-  of the 5 wt \% system. }\label{fig:component_densities}
+  All RDFs represent the number of atoms located at a given distance from the pore center
+  normalized by the volume of the annular bin 
+  to which they belong. The 5 wt \% system (a) appears to be much more crowded by monomers
+  than the 10 wt \% system (b). Head groups in (a) are densest about 0.2 nm closer to the
+  pore center than in (b). A small amount of tail components find their way close to the 
+  pore center of the 5 wt \% system.
+  }\label{fig:component_densities}
   \end{figure}
 
   \subsection*{Mechanisms Governing Small Solute Transport}\label{section:mechanism_overview}
@@ -533,16 +582,16 @@
   \noindent Sodium coordinates with far less water molecules than it does in 
   bulk solution.
   \begin{itemize}
-    \item In our system, on average, each sodium ion is coordinated to about 1.7 
-    water molecules in the 10 wt \% system and 1.15 water molecules in the 5 wt\% 
-    system.
+    \item Compared to 3.4 coordinated water molecules in bulk solution (see 
+    section~\ref{method:coordination}), sodium ions in our system are, on average,
+    coordinated to about 1.7 water molecules in the 10 wt \% system and 1.2 water
+    molecules in the 5 wt\% system.
     \item The low levels of water coordination under confinement are likely driven
     in part by favorable interactions between sodium ions and carboxylate head groups.
     \item A dehydrated sodium ion is not shielded from the negatively charged 
-    carboxylate group.~\cite{ma_drastically_2019}
-    %MRS1: are ``head group oxygen'' atoms the same as carboxylate? Not clear. 
-    \item On average, sodium ions coordinate with 0.5 head group oxygen atoms in the
-    10 wt \% water system and 0.4 head group oxygen atoms in the 5 wt \% water system. 
+    carboxylate group.~\cite{ma_drastically_2019}. 
+    \item On average, sodium ions coordinate with 0.5 carboxylate group oxygen atoms in the
+    10 wt \% water system and 0.4 carboxylate oxygen atoms in the 5 wt \% water system. 
     % BJC: I thought 5 wt \% might be a little higher. These numbers might be skewed by
     % sodium ions that are within cutoff of both carboxylate oxygen atoms. Might be
     % better to report average number of sodiums coordinated to a head group
@@ -552,17 +601,17 @@
   % simulations
   % BJC: I can probably just report the averages rather than plot this
   %MRS1: yeah, this is not really worth a graphic.
-  \begin{figure}[!htb]
-  \centering
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{Na_water_coordination.pdf}
-  \caption{}\label{fig:na_water_coordination}
-  \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{Na_hg_coordination.pdf}
-  \caption{}\label{fig:na_hg_coordination}  % No caption since this probably won't be a figure
-  \end{subfigure}
-  \end{figure}
+%  \begin{figure}[!htb]
+%  \centering
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\textwidth]{Na_water_coordination.pdf}
+%  \caption{}\label{fig:na_water_coordination}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\textwidth]{Na_hg_coordination.pdf}
+%  \caption{}\label{fig:na_hg_coordination}  % No caption since this probably won't be a figure
+%  \end{subfigure}
+%  \end{figure}
   
   \subsubsection*{Transport of Small Polar Solutes}\label{section:general_transport_solutes}  
   
@@ -606,25 +655,39 @@
   
   \noindent The MSDs are not a monotonic function of solute size.
   \begin{itemize}
-  	\item We plotted the solute size against their MSDs in Figure~\ref{fig:msd_radius_5wt} and~\ref{fig:msd_radius_10wt}.
-  	\item There are numerous examples of solutes in our study that do not 
-  	follow the behavior set forth by the Stokes-Einstein equation which 
-  	implies that solute MSD should be inversely related to solute size.  % citation
-        %MRS1: can you plot on the figure what the relatioship SHOULD look like?  It sort of looks linear-ish (especially 5).
-  	\item This behavior is not entirely surprising but worth emphasizing. 
-  	\item It is expected that the Stokes-Einstein relationship, which assumes that 
-  	the solute radius is much larger than the solvent, should break down once
-  	solute and solvent are of comparable size.
-        %MRS1: these points below seem more like intro points.
-
-  	\item Membranes, including that studied here, are often characterized 
-  	with size-exclusion experiments which emphasizes selectivity based on the ability
-  	to enter a given pore. 
-  	\item Once we reach the nm to sub-nm pore size regime, size-exclusion 
-  	becomes of secondary importance since the primary purpose of these membranes is to 
-  	separate molecules whose sizes are on the same order as water.
-  	\item In order to handle complex waste streams with molecules of similar size,
-  	it is important to take advantage of material properties other than pore size. 
+  	\item We plotted the solute size against their MSDs in Figure~\ref{fig:msd_radius_5wt}
+  	and~\ref{fig:msd_radius_10wt}.
+  	\item Based on the Stokes-Einstein relationship, it is expected that
+  	the solute MSDs should be inversely related to solute size.
+  	\item Once solute and solvent are of comparable size, the relationship breaks
+  	down and tends to underestimate the MSD. 
+  	\item Gierer and Wirtz introduced a microfriction factor as theoretical
+  	correction.
+%  	\item It is expected that the Stokes-Einstein relationship, which assumes that 
+%  	the solute radius is much larger than the solvent, should break down once
+%  	solute and solvent are of comparable size.
+  	\item Assuming that the Stokes-Einstein relationship is no longer valid 
+  	for solutes with radius less than x nm, we fit the Stokes-Einstein relationship 
+  	with and without the correction factor making sure that the two curves intersected
+  	at x nm and that the corrected line passed through the highest MSD data point, methanol. %BJC1: need a justified value for x. Can also show its insensitivity to choice of intersection point.
+  	\item We believe methanol is subject to the least hindrance due to its 
+  	size 
+  	\item Although both curves are approximations, they illustrate that
+  	the majority of solutes in our study show lower than expected MSDs. 
+%  	\item There are numerous examples of solutes in our study that do not 
+%  	follow the behavior set forth by the Stokes-Einstein equation which 
+%  	implies that solute MSD should be inversely related to solute size.  % citation
+%    % MRS1: can you plot on the figure what the relatioship SHOULD look like?  It sort of looks linear-ish (especially 5).
+%  	\item This behavior is not entirely surprising but worth emphasizing. 
+	%BJC1: below moved to intro
+%  	\item Membranes, including that studied here, are often characterized 
+%  	with size-exclusion experiments which emphasizes selectivity based on the ability
+%  	to enter a given pore. 
+%  	\item Once we reach the nm to sub-nm pore size regime, size-exclusion 
+%  	becomes of secondary importance since the primary purpose of these membranes is to 
+%  	separate molecules whose sizes are on the same order as water.
+%  	\item In order to handle complex waste streams with molecules of similar size,
+%  	it is important to take advantage of material properties other than pore size. 
 %  	\item Tetrose, our fifth largest solute, has an average MSD higher than more 
 %  	than half of all solutes studied. 
 %  	\item The two slowest solutes, DMF and THF, are smaller than 10 faster solutes.
@@ -642,6 +705,8 @@
   \caption{10 wt \% water}\label{fig:all_msds_10wt}
   \end{subfigure}
   %BJC: missing a few since those simulations just got started
+  %BJC1: wondering if I should add some kind of confidence interval to the Stoke-Einstein plots. Based on the errorbars of methanol
+  %BJC1: should the points be labeled with residue names?
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{msd_radius_5wt.pdf} 
   \caption{5 wt \% water}\label{fig:msd_radius_5wt}
@@ -652,7 +717,9 @@
   \end{subfigure}
   \caption{The MSDs of solutes in the 5 wt \% water system (a) are significantly
   smaller than those of the solutes in the 10 wt \% water system (b). The
-  MSDs are not a monotonic function of molecular size (c and d).}\label{fig:msds}
+  MSDs are not a monotonic function of molecular size (c and d). A significant
+  number of solute MSDs fall below the theoretical lines predicted by the 
+  Stokes-Einstein equation and Gierer and Wirtz' corrected Stokes-Einstein equation.}\label{fig:msds}
   \end{figure}  
   %MRS1: Having so much data here grapically is nice.  ought to think how else data can be displayed. Perhaps figures with the dwell times as well?  Depends on if those are being shown.  2D scatter plots with average partitioning distance of solute vs. MSD? We should keep brainstorming which will be most relevant. 
   \noindent On the timescales simulated in our study, solutes exhibit subdiffusive behavior.
@@ -666,6 +733,12 @@
 	\item The long periods of entrapment likely lead to this sublinear, and thus
 	subdiffusive, behavior.
   \end{itemize}
+  
+  % Stokes-Einstein underestimates diffusion coefficient for small molecules.
+  % r down, f down, D up
+  % Stokes-Einstein breaks down for particles less ___ nm in size
+  % Fit corrected line through methanol.
+  % Make stokes einstein intersect corrected line at breakdown radius
   
   \noindent Solutes partition out of the pore into the head group region and beyond which
   may lead to radially dependent transport mechanisms.

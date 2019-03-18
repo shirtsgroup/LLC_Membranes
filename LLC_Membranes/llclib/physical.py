@@ -456,14 +456,14 @@ def trace_pores(pos, box, npoints, npores=4, progress=True, save=True, savename=
                     shift = transform.translate(pore[atom_indices, :], before, center[t, :])  # shift everything to towards the center
 
                     for i in range(shift.shape[0]):  # check if the points are within the bounds of the unitcell
-                        if not bounds[t].contains_point(shift[i, :2]):
+                        while not bounds[t].contains_point(shift[i, :2]):
                             shift[i, :] = put_in_box(shift[i, :], box[t, 0, 0], box[t, 1, 1], m[t], angle[t])  # if its not in the unitcell, shift it so it is
 
                     c = [np.mean(shift, axis=0)]
 
                     centers[t, p, l - 1, :] = transform.translate(c, center[t, :], before)  # move everything back to where it was
 
-                    if not bounds[t].contains_point(centers[t, p, l - 1, :]):  # make sure everything is in the box again
+                    while not bounds[t].contains_point(centers[t, p, l - 1, :]):  # make sure everything is in the box again
                         centers[t, p, l - 1, :] = put_in_box(centers[t, p, l - 1, :], box[t, 0, 0], box[t, 1, 1], m[t], angle[t])
 
         if single_frame:

@@ -285,6 +285,27 @@
   built with 6 solutes per pore. Even methanol, which interacts with other same-solute
   molcules the most, does so less than 0.05 \% of the time.}\label{fig:solute_interation}
   \end{figure}
+  
+  \subsection{Pore Splines}\label{section:splines}
+  
+  We captured the apparent $z$-dependence of the pore center locations by
+  constructing splines running through each pore (See Figure~\ref{fig:spline}).
+  Each spline consists of 10 points, equally spaced in the $z$-direction, whose
+  ($x$, $y$) coordinates are defined based on the center of mass of all head
+  groups closest, in $z$, to the given point.
+  
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.45\textwidth]{spline.pdf}
+  \caption{We traced the center of each pore as a function of $z$ using a spline (pink
+  line). We constructed the spline in each pore using 10 points (pink spheres) whose
+  positions we defined based on the center of mass of the head groups in closest proximity
+  to the spline point in the $z$-direction.}\label{fig:spline}
+  \end{figure}
+  
+  We calculated the tortuosity, $\tau$, of the pores by calculating the 
+  ratio $\dfrac{L}{Z}$ where $L$ is the length of the spline and $Z$ is 
+  the length of the unit cell in the $z$-direction.
 
   \subsection{Hydrogen Bond Detection Sensitivity}\label{section:hbond_sensisitivity}
   

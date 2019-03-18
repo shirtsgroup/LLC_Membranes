@@ -26,7 +26,7 @@ def initialize():
     parser.add_argument('-l', '--load', help='Name of compressed .npz to load')
     parser.add_argument('-nboot', default=200, type=int, help='Number of bootstrap trials')
     parser.add_argument('-spline', '--spline', action="store_true", help='Trace pore centers using a spline')
-    parser.add_argument('-spts', '--spline_pts', default=20, type=int, help='Number of points making up the spline of'
+    parser.add_argument('-spts', '--spline_pts', default=10, type=int, help='Number of points making up the spline of'
                                                                             'each pore')
     parser.add_argument('-atoms', '--atoms', action='append', nargs='+', help='Names of atom(s) which '
                         'is/are a part of residue whose radial distribution function we want to calculate.')

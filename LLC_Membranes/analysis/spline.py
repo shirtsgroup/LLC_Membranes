@@ -5,6 +5,7 @@ import mdtraj as md
 import numpy as np
 import sys
 from LLC_Membranes.llclib import topology, physical, file_rw
+import matplotlib.pyplot as plt
 
 
 def initialize():
@@ -58,6 +59,8 @@ class Spline(object):
         self.pore_centers = physical.avg_pore_loc(4, self.t.xyz[:, pore_defining_atoms, :], self.t.unitcell_vectors,
                                                   spline=True, progress=progress, npts=npts_spline)
 
+        self.tortuosity = None
+
     def build_spline(self, rep='K', frame=-1, name='spline'):
         """ Build the spline into the last frame of the trajectory
 
@@ -83,6 +86,42 @@ class Spline(object):
         file_rw.write_gro_pos(physical.wrap_box(pos, self.t.unitcell_vectors[frame, ...]), 'spline.gro',
                               ucell=self.t.unitcell_vectors[frame, ...], ids=ids, res=res)
 
+    def compute_tortuosity(self):
+        """ Calculate the tortuosity of the pores by computing the ratio of L / Z where L is the length of the pore
+        spline curve and Z is the length of the unit cell in the z direction
+
+        """
+
+        npts = self.pore_centers.shape[2]
+        npores = self.pore_centers.shape[1]
+        self.tortuosity = np.zeros([self.t.n_frames, npores])
+
+        for t in range(self.t.n_frames):
+
+            zbox = self.t.unitcell_vectors[t, 2, 2]  # z box dimension for this frame
+
+            l = np.zeros(npores)
+            for p in range(npts - 1):
+                l += np.linalg.norm(self.pore_centers[t, :, p + 1, :] - self.pore_centers[t, :, p, :], axis=1)
+
+            # Minimum image distance between 1st and last spline points
+            bot = self.pore_centers[t, :, 0, :] + [0, 0, zbox]  # shift bottom point up
+            l += np.linalg.norm(bot - self.pore_centers[t, :, -1, :], axis=1)
+            self.tortuosity[t, :] = l / zbox
+
+    def plot_tortuosity(self):
+
+        npores = self.pore_centers.shape[1]
+
+        for i in range(npores):
+            plt.plot(self.t.time, self.tortuosity[:, i], linewidth=2)
+
+        plt.show()
+
+    def save_tortuosity(self):
+
+        file_rw.save_object(self.tortuosity, 'tortuosity.pl')
+
 
 if __name__ == "__main__":
 
@@ -90,3 +129,7 @@ if __name__ == "__main__":
 
     spline = Spline(args.gro, args.traj, args.monomer, npts_spline=args.npts)
     spline.build_spline()
+    spline.compute_tortuosity()
+    print('Mean Tortuosity: %.2f +/- %.2f' % (spline.tortuosity.mean(), spline.tortuosity.std()))
+    spline.save_tortuosity()
+
