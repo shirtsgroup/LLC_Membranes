@@ -35,7 +35,6 @@ def initialize():
 
     parser.add_argument('-t', '--traj', default='wiggle.trr', type=str, help='Path to input file')
     parser.add_argument('-g', '--gro', default='wiggle.gro', type=str, help='Coordinate file')
-    parser.add_argument('-p', '--top', default='topol.top', type=str, help='Gromacs topology file')
     parser.add_argument('-b', '--begin', default=0, type=int, help='End frame')
     parser.add_argument('-e', '--end', default=-1, type=int, help='Start frame')
     parser.add_argument('-sk', '--skip', default=1, type=int, help='Skip every skip frames')
@@ -61,7 +60,7 @@ def initialize():
 
 class System(object):
 
-    def __init__(self, traj, gro, top, begin=0, end=-1, skip=1):
+    def __init__(self, traj, gro, begin=0, end=-1, skip=1):
         """
         :param traj:
         :param gro:
@@ -264,6 +263,7 @@ class System(object):
 
         # plt.plot(self.t.time / 1000, nether / ncarb)
 
+        print(np.mean(n))
         plt.plot(self.t.time / 1000, n)
         plt.xlabel('Time (ns)', fontsize=14)
         plt.ylabel('Number of hydrogen bonds', fontsize=14)
@@ -442,7 +442,7 @@ if __name__ == "__main__":
         while len(args.atoms) != len(args.residues):
             args.atoms.append(['all'])
 
-        sys = System(args.traj, args.gro, args.top, begin=args.begin, end=args.end, skip=args.skip)
+        sys = System(args.traj, args.gro, begin=args.begin, end=args.end, skip=args.skip)
 
         for i, r in enumerate(args.residues):
             sys.set_eligible(r, args.atoms[i], acceptor_only=args.acceptors[i], donors_only=args.donors[i])

@@ -349,23 +349,27 @@
   \subsection*{The Stokes-Einstein Relationship}\label{method:stokes}
   
   The Stokes-Einstein relationship expresses the diffusion coefficient of 
-  a hard spherical particle as a function inversely related to its radius.
+  a hard spherical particle as a function that is inversely related to the
+  particle's radius:
   \begin{itemize}
-  	\item $D = \dfrac{k_bT}{6\pi\eta r}$ where $k_b$ and $T$ are Boltzmann
-  	constant and the system temperature respectively and $\eta$ is the 
-  	system's viscosity.
-  	\item For calculation relevant to this study, we assume that the viscosity
-  	is constant.
-  	\item Additionally, we will apply the relationship to solute MSDs which is
-  	valid because all trajectories are of the same length.
-  	\item It is well-known that the relationship breaks down when solute size becomes
-  	on the order of solvent size because the solute can no longer be treated
-  	as a non-interacting hard sphere. 
+  	\item $D = \dfrac{k_bT}{6\pi\eta r}$
+  	\item where $k_b$ and $T$ are the Boltzmann	constant and the system 
+  	temperature respectively and $\eta$ is the system's viscosity.
+  	\item For the largely demonstrative calculations relevant to this study, 
+  	we assume that the system viscosity is constant since we only make minor
+  	changes to the membrane's composition and accurately assessing the viscosity
+  	in a complex and inhomogeneous system such as ours is a challenge by itself.
+  	\item Additionally, rather than calculate $D$, we will apply the relationship
+  	to analyze solute MSDs, which is valid because all trajectories are of the same
+  	length.
   \end{itemize}
   
-  Gierer and Wirtz introduced a microfriction correction factor in order to 
-  address this issue. 
+  \noindent It is well-known that the relationship breaks down when solute size becomes
+  on the order of solvent size because the solute can no longer be treated
+  as a non-interacting hard sphere. % citation
   \begin{itemize}
+    \item Gierer and Wirtz introduced a microfriction correction factor in order to 
+    address this issue. 
     \item They proposed that $D = \dfrac{k_bT}{6\pi\eta fr}$
     %\item Where $f = \left(1.5\dfrac{r_2}{r_1} + \dfrac{1}{1 + \dfrac{r_2}{r_1}}\right)^{-1}$
     \item Where $f = \left(1.5(r_2/r_1) + \dfrac{1}{1 + (r_2/r_1)}\right)^{-1}$
@@ -425,8 +429,8 @@
     \item The definition of Luzar and Chandler is easily visualized for trajectories using
     the \texttt{hbonds} representation of the Visual Molecular Dynamics (VMD) software 
     package which allows us to directly check the validity of identified hydrogen bonds.
-    \item We tested the sensitivity of our conclusions to this definition in 
-    Section~\ref{S-section:hbond_sensitivity} of the SI.
+    \item In section~\ref{S-section:hbond_sensitivity} of the SI, we show that our 
+    conclusions are insensitive to this definition within a reasonable range.
     %BJC: might need to update this if something better exists for nitrogen 
   \end{itemize}
 
@@ -475,9 +479,9 @@
     \item In dry systems, the pore center is densely filled with sodium ions and 
     head groups (See Ref~\cite{coscia_understanding_2019}).
     \item Figure~\ref{fig:component_densities} plots the densities of each
-    membrane constituent.
+    membrane constituent in the 5 and 10 wt \% systems.
     \item Water is densest at the center of each pore. 
-    \item Sodium ions are densest between the pore center and the peak head group density.
+    \item Sodium ions are densest between the pore center and the peak head group density (black dashed line).
     \item The peak density of sodium ions is not at the pore center in either case
     likely because they are still loosely associated with the monomer's 
     carboxylate head groups.
@@ -490,6 +494,8 @@
     further from the pore center than the 5 wt\%
     \item The 5 wt \% water system has a non-negligible amount of tail group atoms
     that occupy the pore center.
+    \item Based on these observations, we expect solute transport to be fastest 
+    in the 10 wt \% system.
   \end{itemize}
   
   % BJC1: Should I show a dry system?
@@ -514,11 +520,10 @@
   \caption{The radial densities of various monomer components paint a picture of the
   pore topology where the pore centers are primarily composed of water and sodium ions.
   All RDFs represent the number of atoms located at a given distance from the pore center
-  normalized by the volume of the annular bin 
-  to which they belong. The 5 wt \% system (a) appears to be much more crowded by monomers
-  than the 10 wt \% system (b). Head groups in (a) are densest about 0.2 nm closer to the
-  pore center than in (b). A small amount of tail components find their way close to the 
-  pore center of the 5 wt \% system.
+  normalized by the volume of the annular bin to which they belong. The pores of the 5 
+  wt \% system (a) appears to be much more crowded by monomers than the 10 wt \% system (b).
+  Head groups in (a) are densest about 0.2 nm closer to the pore center than in (b). 
+  A small amount of tail components find their way close to the pore center of the 5 wt \% system.
   }\label{fig:component_densities}
   \end{figure}
 
@@ -588,7 +593,7 @@
     molecules in the 5 wt\% system.
     \item The low levels of water coordination under confinement are likely driven
     in part by favorable interactions between sodium ions and carboxylate head groups.
-    \item A dehydrated sodium ion is not shielded from the negatively charged 
+    \item A dehydrated sodium ion is not well shielded from the negatively charged 
     carboxylate group.~\cite{ma_drastically_2019}. 
     \item On average, sodium ions coordinate with 0.5 carboxylate group oxygen atoms in the
     10 wt \% water system and 0.4 carboxylate oxygen atoms in the 5 wt \% water system. 
@@ -653,27 +658,31 @@
 %  	the slowest, dimethyl formamide. 
 %  \end{itemize}
   
-  \noindent The MSDs are not a monotonic function of solute size.
+  \noindent The MSDs depend on more than just solute size.
   \begin{itemize}
   	\item We plotted the solute size against their MSDs in Figure~\ref{fig:msd_radius_5wt}
   	and~\ref{fig:msd_radius_10wt}.
-  	\item Based on the Stokes-Einstein relationship, it is expected that
-  	the solute MSDs should be inversely related to solute size.
-  	\item Once solute and solvent are of comparable size, the relationship breaks
-  	down and tends to underestimate the MSD. 
-  	\item Gierer and Wirtz introduced a microfriction factor as theoretical
-  	correction.
+%  	\item Based on the Stokes-Einstein relationship, it is expected that
+%  	the solute MSDs should be inversely related to solute size.
+%  	\item Once solute and solvent are of comparable size, the relationship breaks
+%  	down and tends to underestimate the MSD. 
+%  	\item Gierer and Wirtz introduced a microfriction factor as theoretical
+%  	correction.
 %  	\item It is expected that the Stokes-Einstein relationship, which assumes that 
 %  	the solute radius is much larger than the solvent, should break down once
 %  	solute and solvent are of comparable size.
   	\item Assuming that the Stokes-Einstein relationship is no longer valid 
-  	for solutes with radius less than x nm, we fit the Stokes-Einstein relationship 
+  	for solutes with a radius less than x nm, we fit the Stokes-Einstein relationship 
   	with and without the correction factor making sure that the two curves intersected
   	at x nm and that the corrected line passed through the highest MSD data point, methanol. %BJC1: need a justified value for x. Can also show its insensitivity to choice of intersection point.
-  	\item We believe methanol is subject to the least hindrance due to its 
-  	size 
+  	\item We believe methanol is subject to the least hindrance due its small
+  	size and relatively fast motion.
   	\item Although both curves are approximations, they illustrate that
   	the majority of solutes in our study show lower than expected MSDs. 
+  	\item In most cases, the predicted MSDs even fall below the 
+  	conservative Stokes-Einstein estimate.
+  	\item It is clear that more complex mechanisms determine the MSDs of
+  	these solutes.
 %  	\item There are numerous examples of solutes in our study that do not 
 %  	follow the behavior set forth by the Stokes-Einstein equation which 
 %  	implies that solute MSD should be inversely related to solute size.  % citation
@@ -721,7 +730,7 @@
   number of solute MSDs fall below the theoretical lines predicted by the 
   Stokes-Einstein equation and Gierer and Wirtz' corrected Stokes-Einstein equation.}\label{fig:msds}
   \end{figure}  
-  %MRS1: Having so much data here grapically is nice.  ought to think how else data can be displayed. Perhaps figures with the dwell times as well?  Depends on if those are being shown.  2D scatter plots with average partitioning distance of solute vs. MSD? We should keep brainstorming which will be most relevant. 
+  %MRS1: Having so much data here grapically is nice. ought to think how else data can be displayed. Perhaps figures with the dwell times as well?  Depends on if those are being shown.  2D scatter plots with average partitioning distance of solute vs. MSD? We should keep brainstorming which will be most relevant. 
   \noindent On the timescales simulated in our study, solutes exhibit subdiffusive behavior.
   %, providing the beginnings of an answer to question~\ref{question:mechanisms}.
   \begin{itemize}  
@@ -774,111 +783,129 @@
   by an anomalous subdiffusion process.}\label{fig:qualitative_mechanisms}
   \end{figure}
   
-  %BJC: need to check whether sodium ion association is exhibited by all solutes
   In addition to solute trapping in dense monomer regions, we observe a second
   trapping mechanism caused by preferential hydrogen bonding between 
-  hydrogen bond donor solutes and monomer carboxylate groups. 
+  hydrogen bond donor solutes and monomer head groups. 
   %MRS1: is there a way we can deconvolute these two-three mechanisms?
   \begin{itemize}
-    \item Of the time spent donating hydrogen atom(s), x \% of the hydrogen
-    bonds occur between solutes and carboxylate groups as opposed to solutes
-    with water. 
-    \item This shows a high preference for the carboxylate anions since there
-    are 5 times more water molecules in the system.
+    \item To continue with our ethanol example, we observe that the 24 ethanol 
+    molecules donate an average of 15.7 hydrogen bonds per frame and accept 
+    0.6 hydrogen bonds per frame.
+    % BJC1: 6.33 hbonds between EtOH and COOH per frame, 3.84 b/w EtOH and 
+    % ether oxygen, 5.56 between EtOH and HOH (where Ethanol donates)
+    \item On average, 40 \% of hydrogen bonds donated by ethanol go to 
+    carboxylate head groups, 25 \% go to the ether linkages between the tails and
+    the head groups and the remaining 35 \% to water.
+%    \item This is significant because there are many more water molecules in
+%    the pores than there are carboxylate groups.  
+%    \item Of the time spent donating hydrogen atom(s), 53 \% of the hydrogen
+%    bonds occur between solutes and carboxylate groups as opposed to solutes
+%    with water. 
+%    \item This shows a high preference for the carboxylate anions since there
+%    are 5 times more water molecules in the system.  % BJC1: more like 3 times more water molecules because many are in the tails.
     %MRS1: carboxylate also has net negative charge - not just higher negative partial charge,
     %also no extra neutralizing positive partial charge nearby.
-    \item The carboxylate oxygen atoms have a slightly higher partial negative
-    charge than water molecules.
+    \item There are less carboxylate oxygen atoms in the pore than there are water
+    molecules yet more hydrogen bonds are donated to them.
+    \item The stability of hydrogen bonds with carboxylate oxygen atoms is likely
+    high since the oxygen atoms have a negative charge with no neutralizing positive
+    charges nearby.
     \item Additionally, on average, each sodium ion is coordinated to 1.7 water
-    molecules. Roughly all of the water in the pore region is usually coordinated
-    to a sodium ion which decreases their availability to solutes.
-    %MRS1: this should lead to reduced ability to solvate positive things, but shouldn't reduce H-boonding that much?
+    molecules meaning an appreciable fraction of the water molecules occupying 
+    the pore region are usually coordinated to a sodium ion which decreases 
+    their availability to accept hydrogen bonds from solutes.
+    % MRS1: this should lead to reduced ability to solvate positive things, but 
+    % shouldn't reduce H-bonding that much?
+    % BJC1: I think that it takes away acceptor oxygen atoms since they are occupied
+    % by sodium. The hydrogen atoms of water could still hbond but I'm just talking
+    % about ethanol donating to water, for which opportunities should be suppressed.
   \end{itemize}
   
-  Finally, we see instances of solutes which become immobilized or slowed by 
+  Finally, we see instances of solutes that become immobilized or slowed by 
   association with sodium counterions. 
   \begin{itemize}
-    \item Much like water, the polarity of the solutes leaves partial negative
-    charges which are stabilized through electrostatic interactions with sodium ions.
+    \item Much like water, the polarity of the solutes creates regions of high
+    electron density, modeled using partial negative charges, which are stabilized
+    through electrostatic interactions with sodium ions.
     \item There are many cases in which polar groups bind to sodium ions for at
-    %MRS1: a 'few times steps' seems irrelevant.   
-    least a few time steps. 
+    least a short period of time. 
     \item There are some cases where solutes become immobilized for long periods
     of time while in close proximity to a sodium ion.
     \item In Figure~\ref{fig:na_met_trace}, the oxygen atom of methanol stays
-    within 2.5 \AA of a sodium ion for the entire length of a trapping occurence.
+    within 2.5 \AA~of a sodium ion for the entire length of a trapping occurence.
   \end{itemize}
   
   \begin{figure}[!htb]
   \centering
-  \includegraphics[width=0.45\textwidth]{na_met_trace.pdf}
-  \caption{The oxygen atom of methanol stays bound to the same sodium ion for
+  \includegraphics[width=0.45\textwidth]{na_met_trace.pdf}  % create with nn.py located in MET/10wt
+  \caption{The oxygen atom of methanol stays within 2.5 \AA~of the same sodium ion for
   the majority of the trapping occurence between 400 and 600 ns. Regions
   highlighted red or blue indicate times when methanol's oxygen atom is within 
-  2.5 \AA~of a sodium ion. The color of the shaded regions is switched every time
+  2.5 \AA~of a sodium ion. The color of the shaded regions are switched every time
   the oxygen atom becomes associated to a different sodium ion.}\label{fig:na_met_trace}
   \end{figure}
 
   %MRS1: I think maybe we want to keep this minimal. 
-  \noindent The hopping and trapping mechanism exhibited by all solutes is characteristic of
-  a continuous time random walk (CTRW) model.	
-  \begin{itemize}
-  	\item The length of entrapment follows a power law distribution 
-  	(Figure~\ref{fig:example_powerlaw}) and the distribution of hop lengths can be 
-  	described with a Gaussian distribution (Figure~\ref{fig:example_hop_dist}).
-  	\item Power law distributed dwell times are responsible for the ageing phenomenon
-  	which causes the slope of the MSD curve to decrease with increasing measurement
-  	time because longer dwell times are sampled.  %BJC: might need to reword this a bit 
- 	\item Although these observed distributions strongly support a CTRW model, the time-averaged
- 	MSD of a pure CTRW should be linear which is not the case.~\cite{neusius_subdiffusion_2008,meroz_subdiffusion_2010}
-  \end{itemize}
-  
-%  \noindent The direction of each hop is anti-correlated to the direction of the previous hop.
-  \noindent Transport may be better described by a subordinated fractional brownian motion 
-  (sFBM) model.
-  \begin{itemize}
-  	\item Figure~\ref{fig:example_autocovariance} shows the autocovariance function of 
-  	ethanol step vectors. % BJC: vectors because includes magnitude + direction. Is there a better word?
-  	\item The negative autocovariance at low values of k indicates anti-correlation
-  	between hops. 
-  	\item If solutes followed a pure CTRW mechanism, the autocovariance function would
-  	decay to zero immediately.
-  	\item Although the autocovariance function is relatively noise, due to the somewhat small
-  	number of hops observed over the course of each solute trajectory, there is the least 
-  	uncertainty at k=1, the most insightful data point. This behavior is consistent across
-  	all solutes molecules. % Can put error bars on points
-  	\item Therefore, we believe transport can be described as subordinated fractional Brownian
-  	motion where the leading process is a CTRW with hops whose direction is dictated by the parent
-  	process, FBM.
-  	\item Future publications will focus on modeling the solute's transport characteristics
-  	with an sFBM model
-  	\item We will draw on these observations only in a qualitative sense for the remainder of this work.
-  \end{itemize}
-  
-  %BJC: seems like the MSD becomes linear at long times. Perhaps due to loss of memory with time.
-
-  \begin{figure}
-  \centering
-  \begin{subfigure}{0.325\textwidth}
-  \includegraphics[width=\linewidth]{example_powerlaw.pdf}
-  \caption{}\label{fig:example_powerlaw}
-  \end{subfigure}
-  \begin{subfigure}{0.325\textwidth}
-  \includegraphics[width=\linewidth]{example_hop_dist.pdf}
-  \caption{}\label{fig:example_hop_dist}
-  \end{subfigure}
-  \begin{subfigure}{0.325\textwidth}
-  \includegraphics[width=\linewidth]{example_autocovariance.pdf}
-  \caption{}\label{fig:example_autocovariance}
-  \end{subfigure}
-  \caption{(a) The distribution of dwell times resembles a power law distribution. 
-  (b) The distribution of hop lengths appears Gaussian. (c) Hops are anti-correlated
-  to their previous hop as indicated by the negative value of the autocovariance 
-  function at $k$ = 1.}\label{fig:examples}
-  \end{figure}
+  %BJC1: Leaving out for now
+%  \noindent The hopping and trapping mechanism exhibited by all solutes is characteristic of
+%  a continuous time random walk (CTRW) model.	
+%  \begin{itemize}
+%  	\item The length of entrapment follows a power law distribution 
+%  	(Figure~\ref{fig:example_powerlaw}) and the distribution of hop lengths can be 
+%  	described with a Gaussian distribution (Figure~\ref{fig:example_hop_dist}).
+%  	\item Power law distributed dwell times are responsible for the ageing phenomenon
+%  	which causes the slope of the MSD curve to decrease with increasing measurement
+%  	time because longer dwell times are sampled.  %BJC: might need to reword this a bit 
+% 	\item Although these observed distributions strongly support a CTRW model, the time-averaged
+% 	MSD of a pure CTRW should be linear which is not the case.~\cite{neusius_subdiffusion_2008,meroz_subdiffusion_2010}
+%  \end{itemize}
+%  
+%%  \noindent The direction of each hop is anti-correlated to the direction of the previous hop.
+%  \noindent Transport may be better described by a subordinated fractional brownian motion 
+%  (sFBM) model.
+%  \begin{itemize}
+%  	\item Figure~\ref{fig:example_autocovariance} shows the autocovariance function of 
+%  	ethanol step vectors. % BJC: vectors because includes magnitude + direction. Is there a better word?
+%  	\item The negative autocovariance at low values of k indicates anti-correlation
+%  	between hops. 
+%  	\item If solutes followed a pure CTRW mechanism, the autocovariance function would
+%  	decay to zero immediately.
+%  	\item Although the autocovariance function is relatively noise, due to the somewhat small
+%  	number of hops observed over the course of each solute trajectory, there is the least 
+%  	uncertainty at k=1, the most insightful data point. This behavior is consistent across
+%  	all solutes molecules. % Can put error bars on points
+%  	\item Therefore, we believe transport can be described as subordinated fractional Brownian
+%  	motion where the leading process is a CTRW with hops whose direction is dictated by the parent
+%  	process, FBM.
+%  	\item Future publications will focus on modeling the solute's transport characteristics
+%  	with an sFBM model
+%  	\item We will draw on these observations only in a qualitative sense for the remainder of this work.
+%  \end{itemize}
+%  
+%  %BJC: seems like the MSD becomes linear at long times. Perhaps due to loss of memory with time.
+%
+%  \begin{figure}
+%  \centering
+%  \begin{subfigure}{0.325\textwidth}
+%  \includegraphics[width=\linewidth]{example_powerlaw.pdf}
+%  \caption{}\label{fig:example_powerlaw}
+%  \end{subfigure}
+%  \begin{subfigure}{0.325\textwidth}
+%  \includegraphics[width=\linewidth]{example_hop_dist.pdf}
+%  \caption{}\label{fig:example_hop_dist}
+%  \end{subfigure}
+%  \begin{subfigure}{0.325\textwidth}
+%  \includegraphics[width=\linewidth]{example_autocovariance.pdf}
+%  \caption{}\label{fig:example_autocovariance}
+%  \end{subfigure}
+%  \caption{(a) The distribution of dwell times resembles a power law distribution. 
+%  (b) The distribution of hop lengths appears Gaussian. (c) Hops are anti-correlated
+%  to their previous hop as indicated by the negative value of the autocovariance 
+%  function at $k$ = 1.}\label{fig:examples}
+%  \end{figure}
   
   \noindent The transport behavior exhibited by solutes in the 5 wt \% water systems
-  is similar to those shown by those in the 10 wt \% system however the timescales are
+  is similar to that shown by those in the 10 wt \% system however the timescales are
   much longer.
   \begin{itemize}
     %BJC: will put supporting data in supporting information
@@ -972,15 +999,23 @@
   
   \subsection*{Transport of Simple Alcohols}
 
-  The MSD of methanol, ethanol, propanol and butanol descends in order of 
-  their molecular weight, however, methanol travels faster than expected.  %BJC: find approximate relationship between MW and mobility
+%  The MSD of methanol, ethanol, propanol and butanol descends in order of 
+%  their size, however, the.
+%  \begin{itemize}
+%    \item The MSD of ethanol, propanol and butanol descend approximately
+%    linearly as expected from the Stokes-Einstein relationship  % BJC: maybe better to use wilke-chang version with correction factor
+%    \item However, methanol travels considerably faster than suggested by the
+%    relationship. (See Figure~\ref{fig:msd_radius_simple_alcohol_rdf}
+%  \end{itemize}    
+
+  The MSDs of methanol, ethanol, propanol and butanol descend in order of 
+  their size.
   \begin{itemize}
-    \item The MSD of ethanol, propanol and butanol descend approximately
-    linearly as expected from the Stokes-Einstein relationship  % BJC: maybe better to use wilke-chang version with correction factor
-    \item However, methanol travels considerably faster than suggested by the
-    relationship. (See Figure~\ref{fig:msd_radius_simple_alcohol_rdf}
-  \end{itemize}    
-    
+    \item Using methanol as a reference, the other alcohols move slower than
+    expected according to both the pure Stokes-Einstein relationship and the
+    corrected relationship (See Figure~\ref{fig:msd_radius_simple_alcohol_rdf}).
+  \end{itemize}   
+  
   Methanol moves fast, not only because it is the smallest solute studied in this work, but
   because it has the highest radial density near the pore center where the largest hops occur.
   \begin{itemize}
@@ -993,8 +1028,8 @@
   
   All simple alcohols participate in a similar number of hydrogen bonding interactions
   with the monomer head groups, but with varying preference towards hydrogen bonds with
-  the monomer carboxylate oxygen atoms (See Figure~\ref{fig:simple_alcohol_hbonds}) caused
-  by increasing hydrophobic character.
+  the monomer carboxylate oxygen atoms over the ether oxygen atoms (See Figure~\ref{fig:simple_alcohol_hbonds})
+  % caused by increasing hydrophobic character.
   \begin{itemize}
   	\item If all 5 hydrogen bonding acceptor sites on the monomer head groups were equal,
   	we would expect the ratio of the number of hydrogen bonds between solutes and the two 
@@ -1002,10 +1037,8 @@
   	ether groups to be 2/3. 
   	\item There is a clear preference towards hydrogen bonding with the carboxylate 
   	oxygen atoms for all simple alcohols.
-  	\item This is largely due to the more highly crowded environment surrounding the ether
-  	oxygen atoms combined with their lower partial charges.
-        %MRS1: also carboxylate has larger net charge.
-        %MRS1: note the partial chage is a moel thing
+  	\item This is largely due to the large net charge of the carboxylate groups as well
+  	as the more highly crowded environment surrounding the ether oxygen atoms. % combined with their lower electron density. % partial charges.
   	\item Butanol shows the largest preference towards hydrogen bonds with carboxylate 
   	head groups.
   	\item The radial distribution function of atoms located at opposite ends of butanol
@@ -1013,14 +1046,14 @@
   	than the distal carbon atoms.
   	\item This suggests that alcohols tend to orient themselves like the liquid crystal 
   	monomers, with hydrophilic components point towards the pore centers.
-  	\item When solutes are buried in the pore walls, their MSDs are shorter.
-        %MRS1: is there enough data to establish this? How will it be graphed?  
+  	%\item When solutes are buried in the pore walls, their MSDs are shorter.
   \end{itemize}
   
   \begin{figure}
   \centering
+  %BJC1: I'm not sure of figure (a) is necessary
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\linewidth]{msd_radius_simple_alcohols.pdf}
+  \includegraphics[width=\linewidth]{msd_radius_simple_alcohols_10wt.pdf}
   \caption{}\label{fig:msd_radius_simple_alcohol_rdf}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
@@ -1032,7 +1065,7 @@
   \caption{}\label{fig:simple_alcohol_hbonds}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\linewidth]{butanol_CO.pdf}  %BJC: can add inset to plot showing butanol with highlighted O and C
+  \includegraphics[width=\linewidth]{butanol_CO.pdf}\lapbox[\width]{-2.85cm}{\raisebox{3cm}{\includegraphics[height=1.4cm]{butanol_labeled.pdf}}}
   \caption{}\label{fig:butanol_CO}
   \end{subfigure}
   %MRS: label the black line (tails? heads?)

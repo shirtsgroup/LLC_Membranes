@@ -7,9 +7,9 @@ import sqlite3 as sql
 path = "/home/bcoscia/PycharmProjects/LLC_Membranes/LLC_Membranes/analysis/"
 connection = sql.connect('%s/size.db' % path)
 crsr = connection.cursor()
-wt = 5 
+wt = 10 
 
-simple_alcohols = False 
+simple_alcohols = True 
 if simple_alcohols:
 	restrict = ['MET', 'ETH', 'PR', 'BUT']
 else:
@@ -89,7 +89,6 @@ r_intersect = 5 # where we want stokes-einstein and corrected stoke-einstein to 
 alpha_intersect = water_size / r_intersect
 f_intersect = ((3 * alpha_intersect / 2) + (1 / (1 + alpha_intersect)))**-1
 y_intersect = a / (f_intersect * r_intersect)
-print(y_intersect)
 y_stokes = y_intersect * r_intersect / r_theoretical
 y_gierer_wirtz = a / (r_theoretical * f)
 

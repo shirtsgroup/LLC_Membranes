@@ -5,7 +5,11 @@ from scipy import stats
 
 
 def confidence_interval(data, confidence):
-    """ Calculate confidence interval of data
+    """ Calculate confidence interval of data.
+
+    Plot these errorbars with plt.fill_between() as follows:
+    plt.fill_between(x, mean + error[1, :], mean - error[0, :])
+
 
     :param data: array of data trajectories [n_trajectories, n_data_points]
     :param confidence: percent confidence

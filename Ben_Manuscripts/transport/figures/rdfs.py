@@ -2,9 +2,10 @@
 
 import numpy as np
 from LLC_Membranes.analysis.rdf import System
-from LLC_Membranes.llclib import file_rw
+from LLC_Membranes.llclib import file_rw, stats
 import matplotlib.pyplot as plt
 import names
+import tqdm
 
 def calculate_rdf(res, path, gro='berendsen.gro', traj='PR_nojump.xtc', atoms=None):
 
@@ -23,12 +24,12 @@ def calculate_rdf(res, path, gro='berendsen.gro', traj='PR_nojump.xtc', atoms=No
 	return rdf
 
 recalculate = False 
-simple_alcohols = False
+simple_alcohols = True
 polyols = False 
 head_groups = True 
 thiol_comparison = False 
 ketones = False 
-nondonors = True 
+nondonors = False
 probability = False 
 
 if simple_alcohols:
@@ -50,7 +51,6 @@ else:
 	#residues = ["GLY", "TET", "RIB"]
 
 #residues = ["BUT", "THF", "PCB", "EAC", "DMF"]
-
 wt=10
 maximum = 0
 i = 0
@@ -82,22 +82,28 @@ for r in residues:
 	#plt.plot(rdf.r[:-1], v[i, :])
 	i += 1
 
-#plt.plot(rdf.r[:-1], v[0, :] / v[1, :])
-#plt.show()
-#exit()
+nboot = 200
 if head_groups:
 
-	d_head_groups = np.zeros([50, len(residues)])
+	nframes = 2000
+#	d_head_groups = np.zeros([len(residues)*nframes, 50, len(residues)])
+	d_head_groups = np.zeros([len(residues)*nframes, 50])
 
 	for i, r in enumerate(residues):
 		
 		path = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/%s/%dwt" %(r,wt)
 
 		hg = file_rw.load_object('%s/rdf_HII_CC1C2C3C4C5.pl' % path)
-		d_head_groups[:, i] = hg.density.mean(axis=0)
+		#d_head_groups[:, i] = hg.density.mean(axis=0)
+		d_head_groups[i*nframes:(i+1)*nframes, :] = hg.density
+	
+	boot = np.zeros([nboot, 50])
+	for b in tqdm.tqdm(range(nboot)):
+		ndx = np.random.choice(np.arange(d_head_groups.shape[0]), size=d_head_groups.shape[0], replace=True)
+		boot[b, :] = d_head_groups[ndx, :].mean(axis=0)
 
-	mean = d_head_groups.mean(axis=1)
-	std = d_head_groups.std(axis=1) * (maximum / np.max(mean))
+	mean = boot.mean(axis=0)
+	error = stats.confidence_interval(boot, 95) * (maximum / np.max(mean))
 	mean *= (maximum / np.max(mean))
 	#std *= (24 / 400)
 	#mean *= (24 / 400)
@@ -105,8 +111,9 @@ if head_groups:
 	#plt.plot(hg.r, maximum * hg.density.mean(axis=0) / np.max(hg.density.mean(axis=0)), '--')
 
 	# Option 1 
-	plt.plot(hg.r, mean, '--', color='black')
-	plt.fill_between(hg.r, mean + std, mean - std, alpha=0.6, color='black')
+	plt.plot(hg.r, mean, '--', color='black', label='Head Groups')
+	#plt.fill_between(hg.r, mean + std, mean - std, alpha=0.6, color='black')
+	plt.fill_between(hg.r, mean + error[1, :], mean - error[0, :], alpha=0.6, color='black')
 
 	# Option 2
 	#rmax = hg.r[np.argmax(mean)]
