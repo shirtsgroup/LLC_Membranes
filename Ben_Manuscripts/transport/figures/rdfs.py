@@ -24,12 +24,12 @@ def calculate_rdf(res, path, gro='berendsen.gro', traj='PR_nojump.xtc', atoms=No
 	return rdf
 
 recalculate = False 
-simple_alcohols = True
+simple_alcohols = False
 polyols = False 
 head_groups = True 
-thiol_comparison = False 
+thiol_comparison = False
 ketones = False 
-nondonors = False
+nondonors = True
 probability = False 
 
 if simple_alcohols:
@@ -37,8 +37,8 @@ if simple_alcohols:
 elif polyols:
 	residues=["GCL", "PG", "GLY", "TET", "RIB"]
 elif thiol_comparison:
-	#residues=["SOH", "GCL"]
-	residues=["DMP", "GLY"]
+	residues=["SOH", "GCL"]
+	#residues=["DMP", "GLY"]
 	#residues=["DMS", "ATO"]
 elif ketones:
 	residues=["ACH", "URE", "ACN", "ATO"]
@@ -145,8 +145,12 @@ if head_groups:
 
 plt.ylabel('Density (count / nm$^3$)', fontsize=14)
 plt.xlabel('Distance from pore center (nm)', fontsize=14)
+#plt.ylim(-0.05, 1.3) # for diols only
+#plt.ylim(-0.015, 0.45) # for DMSO and acetone thiol comparison
+# plt.ylim(-0.015, 0.5) # for mercaptoethanol and ethylene glycol comparison
+plt.ylim(-0.015, 0.55) # for nondonors
 plt.gcf().get_axes()[0].tick_params(labelsize=14)
-plt.legend(fontsize=14, loc=1)
+plt.legend(fontsize=13, loc=1, ncol=2, columnspacing=0.5)
 plt.tight_layout()
 if simple_alcohols:
 	plt.savefig('simple_alcohol_rdf.pdf')

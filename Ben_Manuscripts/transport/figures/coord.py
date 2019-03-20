@@ -34,6 +34,6 @@ plt.xlabel('Time (ns)', fontsize=14)
 plt.ylabel('Average %s \n Coordinated to Sodium' % coordinated, fontsize=14)
 plt.legend(fontsize=14)
 plt.tight_layout()
-plt.savefig(savename)
+#plt.savefig(savename)
 plt.show()
 

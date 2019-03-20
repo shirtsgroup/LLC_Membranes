@@ -31,18 +31,59 @@
 
   \section{Introduction}
 
-  We need highly selective membranes in order to perform efficient separations.
+  We need highly selective and permeable membranes in order to perform efficient 
+  separations.
+  \begin{itemize}
+    \item Cleanup of fracking water
+    \item Removal of organic micropollutants, such as pesticides, pharmaceuticals,
+    and personal care products, from the drinking water supply.
+    \item Desalination
+    \item All of these separations are possible with current commercial membrane
+    separation techniques but they are too energy intensive to be worth the 
+    capital investment needed to start the processes.
+  \end{itemize}
+  
+  Nanostructured membranes offer the potential for molecular-level design which
+  could overcome the limitations faced by conventional membrane technologies.
+  \begin{itemize}
+    \item Mitigation of stochastic aspects of membrane synthesis
+    \item Well-defined and uniform pores increase selectivity
+    \item Solute-specific separations.
+  \end{itemize} 
 
   H\textsubscript{II} phase lyotropic liquid crystals have densely packed, uniform
   sized pores and have the potential to disrupt conventional membrane separation
-  techniques by being selective based not only on size and charge, but on chemical
-  functionality as well.
+  techniques by being selective based not only on solute size and charge, but on 
+  chemical functionality as well.
+  \begin{itemize}
+    \item Uniform pores lead to high selectivity
+    \item The hexagonal geometry is ideal for high permeability
+  \end{itemize}
 
-  We can only learn so much from experiment. MD can give us mechanistic insights with
-  atomistic resolution so that we can intelligently design new membranes for 
-  solute-specific separations.
+  While H\textsubscript{II} membranes have been synthesized and characterized
+  in a lab setting, there is a limit to the level of detail that can be obtained 
+  from experiment. 
+  \begin{itemize}
+  	\item The separation performance of these membranes has been primarily 
+  	characterized with size-exclusion experiments which emphasizes selectivity
+  	based on the ability to enter a given pore. 
+  	\item While size-exclusion is a useful separation, it cannot 
+  	reliably purify a solution where the solute size is on the same order as water.
+%  	\item Once on the nm to sub-nm pore size regime, size-exclusion 
+%  	becomes of secondary importance since the primary purpose of these membranes is to 
+%  	separate molecules whose sizes are on the same order as water.
+%  	\item In order to handle complex waste streams with molecules of similar size,
+  	\item Therefore, it is important to take advantage of material properties other
+  	than pore size.
+  	\item Unfortunately, the complexity of LLC Membranes has obscured the interpretation 
+  	of experimental transport studies.
+  \end{itemize}
+  
+  Molecular dyanmics (MD) simulation can give us mechanistic insights with atomistic
+  resolution so that we can directly observe small solute transport within LLC membrane
+  nanopores and intelligently design new membranes for solute-specific separations.
 
-  In previous work, we determined the most likely structure of the hexagonal phase 
+  In our previous work, we determined the most likely structure of the hexagonal phase 
   formed by the monomer Na-GA3C11.
   \begin{itemize}
   	\item We developed techniques for equilibrating the hexagonal phase made by
@@ -55,18 +96,6 @@
 	\item Many of the separations we are interested in involve polar organic 
 	compounds.
   \end{itemize} 
-
-  %BJC1: copied from discussion. Need to work this in the right place
-  \begin{itemize}  
-  	\item Membranes, including that studied here, are often characterized 
-  	with size-exclusion experiments which emphasizes selectivity based on the ability
-  	to enter a given pore. 
-  	\item Once we reach the nm to sub-nm pore size regime, size-exclusion 
-  	becomes of secondary importance since the primary purpose of these membranes is to 
-  	separate molecules whose sizes are on the same order as water.
-  	\item In order to handle complex waste streams with molecules of similar size,
-  	it is important to take advantage of material properties other than pore size. 
-  \end{itemize}
   
 %  There are a number of questions that we wish to answer in order to create a
 %  framework for studying this system in even greater detail.
@@ -411,6 +440,14 @@
 %    that a spline is still justified.	
   \end{itemize}
   
+  In all RDF plots, we include the average RDF of the head groups as a reference.
+  \begin{itemize}
+    \item The head group RDF shown is the average of the head group RDFs for each
+    solute system in the plot.
+    \item We generated 95 \% confidence intervals by bootstrapping the frame-by-frame
+    RDFs obtained from both systems.
+  \end{itemize}
+  
   \subsection*{Identification of Hydrogen Bonds}\label{method:hbonds}
 
   %MRS1: We want to be able to say that conclusions are independent of reasonable changes in the definition so
@@ -450,17 +487,18 @@
   \end{itemize}
   
   Using our procedure we found that sodium ions in a solution of tip3p water
-  coordinate with an average of 3.4 water molecules.
+  coordinate with an average of 3.6 water molecules.
   \begin{itemize}
     \item We created a 4 x 4 x 4 nm cubic box of water with the GROMACS tool,
     \texttt{gmx solvate}
     \item We used \texttt{gmx genion} to replace water molecules with sodium
-    and chloride ions in order to create a 0.6 M NaCl solution.
+    and chloride ions in order to create a 0.1 M NaCl solution.
     \item We let the system simulate for 5 ns and reported the average
     number of coordinated water molecules per frame after discarding the first ns of 
     simulation. % need to actually do this
-    \item We found that the reported average value is not sensitive to NaCl
-    concentration (See section~\ref{S-section:coord_number} of the SI)
+    % BJC1: NaCl starts to crystallize for higher concentrations leading to lower coordination numbers
+%    \item We found that the reported average value is not sensitive to NaCl
+%    concentration (See section~\ref{S-section:coord_number} of the SI)
   \end{itemize}
    
   \section{Results and Discussion}
@@ -1082,7 +1120,7 @@
   the pore center.}\label{fig:simple_alcohols}
   \end{figure}
 
-  \subsection*{Transport of Diols, Triols and Sugars}  % polyols instead of sugars?
+  \subsection*{Transport of Diols, Triols and Sugars}\label{section:polyols}
   
   The order of the MSDs of solutes in this grouping are roughly consistent with 
   their size, however propylene glycol moves exceptionally slow.  %BJC: or tetrose and glucose are exceptionally fast
@@ -1098,8 +1136,8 @@
     \item Extra hydroxyl groups cause solutes to favor the water-rich pore region.
     where there is the least hindrance to movement (See Figure~\ref{fig:polyols_rdf}).
     \item Tetrose, ribose and glycerol are densest close to the pore center. This is 
-    likely a result of their hydrophilicity and large size which prevents them from
-    partitioning into the head group region.
+    likely a consequence of both their hydrophilicity and large size which prevents
+    them from partitioning into the head group region.
     \item However, these extra hydroxyl groups facilitate a larger number of 
     hydrogen bond interactions that work to hold solutes in place (See Figure~\ref{fig:multi_hbonds}).
     \item It has been observed that hydrogen bonding in a system will generally
@@ -1115,11 +1153,12 @@
     shown in Figure~\ref{fig:multi_hbonds}. 
     \item For example, both hydroxyl groups of ethylene glycol can undergo hydrogen
     bonds with different hydrogen bond acceptors at the same time.
-    \item In some cases, all 4 hydroxyl groups of ribose are hydrogen bonded to monomer
+    \item In some cases, all 4 hydroxyl groups of ribose hydrogen bonded to monomer
     head groups simultaneously.
     \item Hydrogen bonds act as a kind of molecular glue which holds solutes in place, 
     especially when there are many, however proximity to the pore center partially 
-    compensates for this effect in the cases of glycerol and tetrose.
+    compensates for this effect in the cases of glycerol and tetrose, causing them to
+    have relatively high MSDs for their size.
   \end{itemize}
   
   \begin{figure}[!htb]
@@ -1129,7 +1168,8 @@
   \includegraphics[width=\linewidth]{polyols_rdf.pdf}
   \caption{}\label{fig:polyols_rdf}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.50\textwidth}
+  \vspace{-0.275cm}
   \includegraphics[width=\linewidth]{multi_hbonds.pdf}
   \caption{}\label{fig:multi_hbonds}
   \end{subfigure}
@@ -1141,11 +1181,12 @@
 %  \end{subfigure}
   \caption{(a) Glycerol, tetrose and ribose are densest close to the pore center because
   they have a high number of hydrophilic groups and are relatively large. Ethylene glycol
-  and propylene glycol are densest close to the head group region. (b)The number of 
+  and propylene glycol are densest close to the head group region. (b) The number of 
   hydrogen bond interactions between solutes and monomers increases as solutes gain additional
-  hydroxyl groups. Often, multiple hydroxyl groups within a solute often hydrogen bond in
-  different locations simultaneously. Occasionally, all four hydroxyl groups
-  of Ribose (n = 4) are involved in a hydrogen bond interaction at the same time.}\label{fig:multi_hbonds}
+  hydroxyl groups. The number of hydrogen bonds made by a single solute in different locations
+  simultaneously, n, also increases with the number of hydroxyl groups. In the most extreme case,
+  all four hydroxyl groups of Ribose (n = 4) are involved in a hydrogen bond interaction at
+  the same time.}\label{fig:multi_hbonds}
   \end{figure}
   
   Of the two diols, ethylene glycol moves significantly faster than propylene glycol
@@ -1156,12 +1197,12 @@
     near monomer head groups.
     \item Both diols have comparable densities close to the pore center, however propylene glycol's
     density has a large peak near the monomer head groups relative to ethylene glycol.
-    \item Propylene glycol can form more highly stablized hydrogen bonds with carboxylate groups,
+    \item Propylene glycol can form more highly stabilized hydrogen bonds with carboxylate groups,
     explaining the higher incidence of hydrogen bonds shown in Figure~\ref{fig:multi_hbonds}.
-    \item These observations are further reflected in its dwell and hop length distributions
-    (See Figure~\ref{fig:dwell_hop_PG_GCL}).
-    \item Propylene glycol exhibits longer dwell times and a narrower distribution of 
-    hop lengths than ethylene glycol. 
+%    \item These observations are further reflected in its dwell and hop length distributions
+%    (See Figure~\ref{fig:dwell_hop_PG_GCL}).
+%    \item Propylene glycol exhibits longer dwell times and a narrower distribution of 
+%    hop lengths than ethylene glycol. 
     \item Somewhat counterintuitively, there is a relatively high density of ethylene
     glycol molecules beyond the head group region probably due to its relatively small size.
     This likely contributes to the somewhat large error bars on its MSD in Figure~\ref{fig:msds}. 
@@ -1199,8 +1240,8 @@
     with two attached heavy atoms. 
     \item All are similar in size and are planar molecules due to the sp2 hybridization of
     their carbonyl group.
-    \item The fastest solute of this grouping, acetic acid (comparable to urea), is about
-    3 times faster than the slowest, acetone, but only about 10 \% smaller.
+    \item The fastest solutes of this grouping, acetic acid and urea, are about
+    3 times faster than the slowest, acetone. %, but only about 10 \% smaller.
   \end{itemize}
   
   \noindent The MSD of the solutes descend in order of their density close to the pore center.
@@ -1217,25 +1258,29 @@
     \item In an average frame, acetic acid participates in more than 12 hydrogen 
     bonds with monomer head groups while urea and acetamide participate in less than 2.
     \item Urea and Acetamide both have hydrogen bond donating nitrogen atoms, however
-  	nitrogen is a weaker hydrogen bond donor than oxygen due to its lower electronegativity.
+  	nitrogen is a weaker hydrogen bond donor than oxygen due to its lower electronegativity. % citation
   	\item Given their lower propensity to hydrogen bond one might expect amides to partition
   	out of the pore and/or to move through the pore quickly, perhaps faster than methanol.
-    \item The peaks in their radial density are still situated between the pore center and the
-    head groups, but closer to the pore center than other solutes that hydrogen bond with 
-    carboxylate groups (see Figure~\ref{fig:simple_alcohol_rdf}, for example).
+    \item Both RDFs contain peaks in their radial density that are situated between the 
+    pore center and the head groups, but closer to the pore center than other solutes that
+    hydrogen bond with carboxylate groups.
+    \item Solutes that hydrogen bond frequently tend to show peaks in their RDFs near 
+    0.5-0.6 nm from the pore center (see Figure~\ref{fig:simple_alcohol_rdf}, for example) 
+    and those that coordinate with sodium ions more frequently tend to show peaks in
+    their RDFs near 0.2-0.3 nm from the pore center.
     \item Both solutes spend about half of their time with their carbonyl oxygen atom 
     coordinated to a sodium ion which restrains the solutes to within the pore region
-    %BJC: it's possible the solutes hop from sodium to sodium quickly meaning solutes are not always immobilized.
-    %BJC: could look into lifetime of association
-    \item Interestingly, only the carbonyl oxygen atoms coordinate with sodium ions. 
-    The nitrogen atoms dooes not coordinate at all despite a similar negative partial
-    charge. The attached hydrogen atoms may shield this interaction.
+    \item Only the carbonyl oxygen atoms coordinate with sodium ions. 
+    The nitrogen atoms do not coordinate at all despite a similar negative partial
+    charge because the attached hydrogen atoms shield this interaction by making the
+    NH\textsubscript{2} group approximately neutral.
   \end{itemize}   
 
-  \noindent Acetone has the lowest MSD of this set because it is primarily trapped near and behind 
-  the head groups.
+  \noindent Acetone has the lowest MSD of this set because it either coordinates with
+  sodium or stays trapped near and behind the head groups.
   \begin{itemize}
     \item On average, acetone coordinates with sodium with the same frequency as acetic acid 
+    which is manifested as a peak in its RDF about 0.2 nm from the pore center.
     \item However, acetic acid spends more time in the pore center and therefore encounters
     more sodium ions.
     \item When an acetone molecule coordinates with a sodium ion, its polarity is 
@@ -1304,26 +1349,24 @@
 %  \caption{}\label{fig:ketones_ratio}
 %  \end{subfigure}
   \caption{(a) The radial density near the pore center (r = 0) decreases
-  with decreasing solute MSD. (b) The amides hydrogen bond with water far
-  less than acetic acid, however they tend to coordinate with sodium ions
-  more frequently.}\label{fig:ketones}
+  with decreasing solute MSD. Peaks in the RDFs of urea, acetamide and
+  acetone near 0.2 - 0.3 nm from the pore center are likely due to coordination
+  with sodium ions. (b) The amides hydrogen bond with water far less than 
+  acetic acid, however they tend to coordinate with sodium ions more 
+  frequently.}\label{fig:ketones}
   \end{figure}
   
   \subsection*{Transport of Thiols}
   
   We also studied the transport properties of sulfur analogs of glycerol, ethylene
   glycol and acetone.
-%  Finally, we studied the transport properties of sulfur-containing compounds similar
-%  to some of the solutes studied above.
   \begin{itemize}
     \item We replaced all but one oxygen atom of ethylene glycol and glycerol with sulfur atoms
-    to create Dimercaptoethanol and 2,3-Dimercapto-1-propanol.
+    to create dimercaptoethanol and 2,3-dimercapto-1-propanol.
     \item We replaced the carbonyl carbon of acetone with sulfur in order to create DMSO. 
-  	\item Sulfur is unable to hydrogen bond, however it is soluble in water  %BJC: maybe a reference to why sulfur can't hbond
+  	\item Sulfur is unable to hydrogen bond making thiols less soluble in water than
+  	their hydroxyl group analogs.  % citation
  \end{itemize}
-  	
-%  	\item Comparisons of their RDFs are shown in Figure~\ref{fig:sulfur_analog_rdfs}.
-%  \end{itemize}
   
   \begin{figure}
   \centering
@@ -1340,10 +1383,11 @@
   \caption{}\label{fig:DMP_GLY_comparison}
   \end{subfigure}
   \caption{(a) The RDF of mercaptoethanol is similar to ethylene glycol except 
-  for its higher density in the tail region. (b) 2,3-Dimercapto-1-propanol is
-  densest near the pore wall, unlike glycerol whose density is very high in the pore
-  center. (c) Dimethylsulfoxide has a higher density than acetone close to the pore
-  center which may in part explain its marginally larger MSD.}\label{fig:sulfur_analog_rdfs}
+  for its higher density in the tail region and consequently lower density in the
+  pore region. (b) 2,3-dimercapto-1-propanol is densest near the head groups, 
+  unlike glycerol whose density is very high close to the pore center. 
+  (c) Overall, dimethylsulfoxide has a higher density than acetone within the 
+  pore region which may in part explain its marginally larger MSD.}\label{fig:sulfur_analog_rdfs}
   \end{figure}
   
   \noindent Mercaptoethanol has a similar average MSD and RDF to ethylene glycol.
@@ -1356,7 +1400,9 @@
     \item Conversely, mercaptoethanol exhibits some of the highest single solute MSDs 
     (See Figure~\ref{fig:SOH_trace})  % Only methanol has greater (I think)
     \item It hydrogen bonds with head groups 6 times less frequently than ethylene glycol.
-    \item This may lead to larger hops in the pore region.
+    which may lead to larger hops when in the pore region.
+    \item The range of behaviors shown by mercaptoethanol explain the large variance
+    of its MSD.
 %    \item When both hydroxyl groups of ethylene glycol are hydrogen bonded with the a
 %    monomer head group simultaneously,
 %    \item Less frequent hydrogen bonding and an affinity for the pore region may be
@@ -1381,35 +1427,43 @@
 %  When one of those hydrogen bond breaks, the molecule is still stabilized by another hydrogen bond
 %  It can easily reform the second hydrogen bond in close proximity
   
-  \noindent 2,3-Dimercapto-1-propanol exhibits slower transport than glycerol because it spends more time
-  near monomer head groups. % BJC: should I give all the solutes nicknames (i.e. their residue names)?
+  \noindent 2,3-dimercapto-1-propanol exhibits slower transport than glycerol 
+  because more of it partitions into the tail region. % BJC: should I give all the solutes nicknames (i.e. their residue names)?
   \begin{itemize}
-    \item Glycerol frequently hydrogen bonds with more than one head group at a time (See Figure~\ref{fig:multi_hbonds}).
-    % BJC: can probably quantify the following:
-    \item It can also hydrogen bond with water molecules which increases its stability
-    in the pore region.
-    \item 2-3-Dimercapto-1-propanol preferentially hydrogen bonds with head groups 
-    so it gravitates towards the head group region.
+    % BJC1: maybe next point better expressed as a percentage in each region.
+    \item The density of glycerol is always higher up to 0.7 nm from the 
+    pore center where the population of 2,3-dimercapto-1-propanol then 
+    becomes more dense into the tail region. 
+    \item Glycerol participates in about 3 times as many hydrogen bonds
+    as 2,3-dimercapto-1-propanol. %BJC1: 52.2 / 16.4 ~= 3.2. Includes hbonds with water (recieved and donated) as well as with ether + carboxylate oxygen atoms.
+    \item Because sulfur cannot hydrogen bond, 2,3-dimercapto-1-propanol is 
+    less soluble than glycerol in the water-filled pores and more readily 
+    partitions into the tail region.
   \end{itemize} 
   
   \noindent DMSO has a comparable if not larger MSD than acetone even though it
   is a slightly larger molecule.
   \begin{itemize}
-    \item The radial density of DMSO is higher than acetone close to the pore center.
+    \item The density of DMSO is higher than acetone in the pore region,
+    except for the peak exhibited by acetone near 0.2 nm, which is due to 
+    sodium ion association.
+    %BJC1: better to report a percentage?
+    \item On average, the 24 DMSO molecules coordinate with 8.4 sodium ions 
+    per frame, compared to 6.2 per frame by acetone.
   	\item The pyramidal structure of DMSO may force it to spend more time closer to
-  	the pore center.
-  	%BJC: quantify sodium coordination O group of DMSO
+  	the pore center which increases its interaction with sodium ions.
+  	\item The tendency of DMSO to stay in the pore region counterbalances the
+  	sodium ion interactions to give it a higher MSD than acetone. 
   \end{itemize}  
   
-  \subsection*{Hydrogen bond acceptors}  % Need a better heading since all molecules in this study are acceptors
+  \subsection*{Hydrogen Bond Acceptors}  % Need a better heading since all molecules in this study are acceptors
 
-  %BJC: should probably at least mention acetone again in this section  
+  % BJC: should probably at least mention acetone again in this section  
   The slowest set of molecules we studied can accept hydrogen bonds, but cannot donate
   them. 
   \begin{itemize}
   	\item Among this set are the two slowest solutes in our study: Tetrahydrofuran and Dimethyl Formamide.
   	\item The MSDs of ethyl acetate, propylene carbonate and acetone are only marginally larger.
-  	% EAC and PCB are both larger molecules. Acetone is small. %BJC: not sure how far I should dive into this point
   \end{itemize}  
   
 %  The radial density functions highlight the solutes' preference for the 
@@ -1425,30 +1479,33 @@
 %  	% BJC:  Ethyl acetate spends all of its time in a linear or near-linear conformation.
 %  \end{itemize}
   
-  \noindent The radial density of solutes near the pore center in this set is surprisingly high
-  as shown in Figure~\ref{fig:nondonors_rdf}.
+  \noindent The radial density of solutes near the pore center in this set is 
+  surprisingly high as shown in Figure~\ref{fig:nondonors_rdf}.
   \begin{itemize}
     \item Propylene carbonate and ethyl acetate are among the largest solutes
     in this study. Their size prevents them from easily entering the tail 
-    region and generally gives faster transport properties since they spend
-    more time in the pore region. 
+    region and consequently gives faster transport properties 
+    % since they spend more time in the pore region. 
     \item However, this is not a hard rule. When a solute does overcome the 
     barrier of entry beyond the head group region, it can become trapped. All
-    solutes in this set show a peak $\geq$ 1 nm from the pore center which is
-    likely caused by solutes that get trapped in the tail region for a significant
-    amount of time.
-	\item The peak density of THF is considerably offset from the pore center.
-	\item Observations of single THF trajectories have revealed that it does not make
-	large hops while in the pore center.
-	\item THF becomes nearly immobilized while associated with sodium ions (See 
-	Figure~\ref{fig:thf_sodium_coordination}).
+    solutes in this set show at least a small peak $\geq$ 0.9 nm from the pore 
+    center which is likely caused by solutes that get trapped in the tail region
+    for a significant amount of time.
+  \end{itemize}
+    
+  \noindent Solutes do not make frequent hops while in the pore region.
+  \begin{itemize}
+	\item Observations of single THF trajectories have revealed that it becomes 
+	nearly immobilized while associated with sodium ions 
+	(See Figure~\ref{fig:thf_sodium_coordination}).
 	\item DMF experiences a similar effect, but to a lesser extent. Its density is 
 	higher than THF near the head groups. The planar shape of DMF causes it to 
 	become stuck between head groups. Excursions into the pore region do not
 	necessarily result in large hops.
   \end{itemize}
   
-  \noindent Carbonyl groups continue to show high degrees of association with sodium ions. 
+  \noindent Carbonyl groups continue to show high degrees of association with
+  sodium ions. 
   \begin{itemize}
     \item The number of sodium ions coordinated to the carbonyl group of 
     propylene carbonate, dimethyl formamide, ethyl acetate are consistent with 
@@ -1457,11 +1514,11 @@
     \item The carbonyl group of the amides studied in the previous section
     associate with sodium nearly twice as frequently as compounds that don't
     contain nitrogen (see figure~\ref{fig:ketone_hbonds}).
-    \item In all cases, other polar groups on carbonyl-containing compounds
-    associate with sodium in negligible amounts.
+%    \item In all cases, other polar groups on carbonyl-containing compounds
+%    associate with sodium in negligible amounts.
   \end{itemize}
  
-  \begin{figure}
+  \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{nondonors_rdf.pdf}
@@ -1471,6 +1528,11 @@
   \includegraphics[width=\textwidth]{nondonor_hbonds.pdf}
   \caption{}\label{fig:nondonors_hbonds}
   \end{subfigure}
+  \caption{(a) The radial density of solutes that can only receive hydrogen bonds
+  is surprisingly high in the pore region. Conversely, there is also an appreciable
+  amount of each solute in the tails. (b) The low MSDs exhibited by each of these
+  solutes is due to a combination of entrapment within the tail region and a high 
+  degree of coordination with sodium ions.}\label{fig:nondonors}
   \end{figure}
   
   \begin{figure}
@@ -1524,7 +1586,7 @@
   mechanisms discussed above. Therefore, it is most logical to design monomers with 
   them in mind. 
   
-  Since solutes move slowly well entangled among the monomer tails, one can try to
+  Since solutes move slowly while entangled among the monomer tails, one can try to
   design monomers that better control the partition of solutes between the pore and
   tail region.
   \begin{itemize}
@@ -1555,7 +1617,7 @@
   with counterions.
   \begin{itemize}
     \item We have observed a significant amount of sodium association with 
-    negatively charge solute constituents.
+    electronegative solute constituents.
     \item Changing the size and valence of the counter ion may offer some
     interesting behavior. 
     \item For example, a counter ion with a charge of +2 may attract more solute
@@ -1621,12 +1683,12 @@
     screening new monomers.
   \end{itemize}
 
-  We learned that solutes undergo anomalous diffusion which can be described 
-  as a subordinated fractional brownian motion process. 
-  \begin{itemize}
-    \item In general, solutes hop intermittently between periods of entrapment
-    \item These hops are anti-correlated to their previous hops
-  \end{itemize}
+%  We learned that solutes undergo anomalous diffusion which can be described 
+%  as a subordinated fractional brownian motion process. 
+%  \begin{itemize}
+%    \item In general, solutes hop intermittently between periods of entrapment
+%    \item These hops are anti-correlated to their previous hops
+%  \end{itemize}
   
   We observed three mechanisms of solute entrapment.
   \begin{itemize}
