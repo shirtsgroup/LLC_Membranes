@@ -21,6 +21,7 @@
 %BJC: potential titles (uncommented is current favorite)
 %\title{The Transport Mechanisms of Polar Solutes in a Cross-linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
 %\title{Size, Shape and Functionality Dependence of Solute Transport Mechanisms in a Cross-linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
+%MRS1: Seems like transport should be somewhere in the title. 
 \title{Chemically Dependent Selectivity in a Cross-linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
 \author{Benjamin J. Coscia \and Michael R. Shirts} 
 
@@ -131,6 +132,8 @@
 %  	qualitative and semi-quantitative arguments in order to choose a 
 %  	governing model. 
   	
+        %MRS2: this is beyond the scope of what we can really answer. We can hypothesize things, but 
+        % we really haven't really done any experiments to confirm these.  So this should be deemphasized.
   	\item How can we modify the current monomers in order to enhance
   	solute-specific separations? \label{question:math}
   	
@@ -188,6 +191,7 @@
 
   %BJC: reference to supporting info with more details on water partition
   %BJC: or should that go in the main body results?
+  %MRS2: depends on whether it's necessary to support the main hypothesis. 
   We observed that water partitions into the tail region of our system and therefore
   built our initial configurations with water in both regions close to the expected
   equilibrium value.
@@ -350,6 +354,8 @@
   In order to determine an effective radius for each solute, we measured the 
   maximum pairwise distance between atoms of each solute over the course of
   a 2.5 ns simulation of solutes dissolved in a cubic box of water.
+  %MRS2: this might be slightly larger than the hydrodynamic radius?  We might not be able to place it 
+  %directly into stoke-einstein.
   \begin{itemize}
     \item Each box consisted of about 2100 water molecules and 6 solutes.
     \item Although there exist more involved methods for determining the 
@@ -408,7 +414,7 @@
 
   \subsection*{Radial Density Functions}\label{method:rdfs}
   % BJC1: Should it be Radial Distribution Functions?
-
+  %MRS2: distribution is more common.
   We measured the average radial distance of each solute of interest from the pore
   centers.
   \begin{itemize}
@@ -537,6 +543,7 @@
   \end{itemize}
   
   % BJC1: Should I show a dry system?
+  % MRS2: couldn't hurt, would provide more context.
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.415\textwidth}
@@ -555,6 +562,8 @@
 
   %MRS1: possibly include vertical dotted line to show where max head group peak occurs.
   %BJC1: tried it out. Seems like a good addition.
+  %MRS2: I wonder to what extent it would help to show the curves on top of each other to make it clear
+  %how much things are displaced.
   \caption{The radial densities of various monomer components paint a picture of the
   pore topology where the pore centers are primarily composed of water and sodium ions.
   All RDFs represent the number of atoms located at a given distance from the pore center
@@ -629,6 +638,7 @@
     section~\ref{method:coordination}), sodium ions in our system are, on average,
     coordinated to about 1.7 water molecules in the 10 wt \% system and 1.2 water
     molecules in the 5 wt\% system.
+    %MRS2: might need to point out that they are not that undercoordinated, as they also coordinate with solutes.
     \item The low levels of water coordination under confinement are likely driven
     in part by favorable interactions between sodium ions and carboxylate head groups.
     \item A dehydrated sodium ion is not well shielded from the negatively charged 
@@ -753,7 +763,11 @@
   \end{subfigure}
   %BJC: missing a few since those simulations just got started
   %BJC1: wondering if I should add some kind of confidence interval to the Stoke-Einstein plots. Based on the errorbars of methanol
+  %MRS2: probably, perhaps as a colored background.  But might make it too noisy to read.  MAybe color them by chemical group?
   %BJC1: should the points be labeled with residue names?
+  %MRS2: as long as there is a table in SI with the relevant information, probably isn't needed.  That would also make it hard to read the plot.   
+  %MRS2: for the plots with fewer points (like alcohol), the individual points should be labeled, there is room.
+  %MRS2: as discussed, maybe for each solute group, have a MSD plot a) and RDF plt b) and other important plots in c) and d)
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{msd_radius_5wt.pdf} 
   \caption{5 wt \% water}\label{fig:msd_radius_5wt}
@@ -875,6 +889,7 @@
   
   \begin{figure}[!htb]
   \centering
+  %MRS2: would be better if this was paired with ensemble data, instead of just one trajectory.
   \includegraphics[width=0.45\textwidth]{na_met_trace.pdf}  % create with nn.py located in MET/10wt
   \caption{The oxygen atom of methanol stays within 2.5 \AA~of the same sodium ion for
   the majority of the trapping occurence between 400 and 600 ns. Regions
@@ -1179,6 +1194,7 @@
 %  \includegraphics[width=0.9\linewidth]{dwell_hop_PG_GCL.pdf}
 %  \caption{}\label{fig:dwell_hop_PG_GCL}
 %  \end{subfigure}
+%MRS2: maybe include the MSD vs size plot subset here. 
   \caption{(a) Glycerol, tetrose and ribose are densest close to the pore center because
   they have a high number of hydrophilic groups and are relatively large. Ethylene glycol
   and propylene glycol are densest close to the head group region. (b) The number of 
@@ -1447,7 +1463,8 @@
     \item The density of DMSO is higher than acetone in the pore region,
     except for the peak exhibited by acetone near 0.2 nm, which is due to 
     sodium ion association.
-    %BJC1: better to report a percentage?
+    %BJC1: better to report a percentage?  
+    %MRS2: yes, report as intensive quantity
     \item On average, the 24 DMSO molecules coordinate with 8.4 sodium ions 
     per frame, compared to 6.2 per frame by acetone.
   	\item The pyramidal structure of DMSO may force it to spend more time closer to
@@ -1494,6 +1511,7 @@
   \end{itemize}
     
   \noindent Solutes do not make frequent hops while in the pore region.
+  %MRS2: is this because you need H-bonding to make hops? We should have some sense of this.
   \begin{itemize}
 	\item Observations of single THF trajectories have revealed that it becomes 
 	nearly immobilized while associated with sodium ions 
@@ -1549,7 +1567,10 @@
   After 700 ns, THF separates from the sodium ion and moves closer to the head group
   region.}\label{fig:thf_sodium_coordination}
   \end{figure}
-  
+  %MRS2: Can we show something that describes a distribution of multiple THF? this is just one, 
+  % which is suggestive, but this sort of suggestive information maybe should be in supporting. 
+  %MRS2: did you trace down any information on THF-ion complexation? We should be able to report on whether
+  %this is physical or a force field artifact.
   % THF shows highly anticorrelated hops
   
 %  The majority of THF trajectories are spent near or beyond the head groups. Some
@@ -1570,6 +1591,8 @@
   %All have comparable densities near pore center except acetone which is lower
 
   \subsection{Design Considerations}
+
+  %MRS2: should be a bit careful on what WILL happen, as opposed to what might happen.
 
   Based on our observations of the complex interactions between various polar solutes
   and the membrane's liquid crystal monomers, we can speculate on design criteria for 
@@ -1628,6 +1651,8 @@
     \item Sodium appears to do a good job of immobilizing complexes formed between
     it and solutes. 
     \item However, a Lithium ion might be more prone to go along for the ride.
+    %MRS2: hydrogen isn't a counter ion in and of itself, since it's only available either as hydronium 
+    % or will protonate the head groups.
     \item Hydrogen would likely spend the majority of its time bound to the 
     carboxylate head group or as part of a hydronium ion hence interfering with 
     solute transport infrequently.
@@ -1640,15 +1665,21 @@
 %    \item For a separate application, one may desire to selectively separate a 
 %    dissolved species from a complex stream.~\label{sep:selective}
 %  \end{enumerate}
-  
+
   The MSD of solutes may be much larger in more concentrated solutions because there
   will be less available trapping sites for them to occupy.
+  %MRS2: but will there be more crowding?  Will depend on the equilibrium concentration 
+  %of the different components in the pore, I suppose.  
+  %MRS2: we may need to test this at some point, but it also would involve trying to figure out what the 
+  %equilibrium concentration inside the pores was.
+
   \begin{itemize}
     \item We purposely studied the behavior of the solutes in dilute conditions.
     \item The difference in size between water and the fastest solute, methanol, is not
     enough to explain the order of magnitude difference in their average MSDs.
     \item The sheer number of water molecules prevents the majority of them from 
     becoming trapped for long periods of time.
+    %MRS2: majority of the solutes?
     \item A similar effect may increase solute MSDs in more concentrated solutions.
   \end{itemize}
   
@@ -1693,10 +1724,12 @@
   We observed three mechanisms of solute entrapment.
   \begin{itemize}
     \item A solute can become stuck in the tail region. 
+    %MRS2: is it all the way in the tail region?
     \item A solute can hydrogen bond with monomers
     \item A solute can associate with a bound counterion
   \end{itemize}
   
+  %MRS2: recommendations are less important, as they are hypothetical. 
   Based on these trapping mechanisms, we have suggested modifications that
   can be made to monomers in order to mitigate or enhance their effect on
   solute MSDs.
