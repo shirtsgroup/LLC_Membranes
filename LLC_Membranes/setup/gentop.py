@@ -8,8 +8,7 @@ from LLC_Membranes.llclib import topology
 
 def initialize():
 
-    parser = argparse.ArgumentParser(description='Generate topology file from coordinate file. This only works if all'
-                                                 'residues have a topology in HII/top')
+    parser = argparse.ArgumentParser(description='Generate topology file from coordinate file.')
 
     parser.add_argument('-g', '--gro', help='Name of coordinate file to write topology file for')
     parser.add_argument('-o', '--output', default='topol.top', help='Name of topology to output')
@@ -19,17 +18,27 @@ def initialize():
     parser.add_argument('-xlink', action="store_true", help='Create topology for cross-linked system')
     parser.add_argument('-xlink_topname', default='assembly.itp', help='Name of cross-linked topology')
 
-    args = parser.parse_args()
-
-    return args
+    return parser
 
 
 class SystemTopology(object):
 
     def __init__(self, gro, ff='gaff', restraints=False, xlink=False, xlinked_top_name='assembly.itp'):
-        """
-        :param gro: (str) coordinate file for which to create topology
-        :param ff: (str) forcefield to use (default=gaff)
+        """ Read coordinate file, identify and count different residues, and figure out where inidividual residue
+        topologies are located
+
+        :param gro: coordinate file for which to create topology
+        :param ff: forcefield to use
+        :param restraints: True if there are any position restraints
+        :param xlink: True if system is cross-linked (Topology is specialized in this case)
+        :param xlinked_top_name: Name of topology describing cross-linked system (include full path if not located in
+        same directory where this script is run)
+
+        :type gro: str
+        :type ff: str
+        :type restraints: bool
+        :type xlink: bool
+        :type xlinked_top_name: str
         """
 
         t = md.load(gro)  # load coordinate file
@@ -40,9 +49,6 @@ class SystemTopology(object):
         self.forcefield = ff  # which forcefield to use
         self.name = None
         self.atoms = [a.name for a in t.topology.atoms]  # all atom names
-        # unused
-        # self.atom_masses = [Atom_props.mass[a.name] for a in t.topology.atoms]
-        # self.system_mass = sum(self.atom_masses)
         self.xlink = xlink
         self.xlinked_top_name = xlinked_top_name
 
@@ -105,6 +111,16 @@ class SystemTopology(object):
         self.residue_count = residue_count
 
     def write_top(self, name='topol.top', description='Simulation Box', restrained_top_name='restrained.itp'):
+        """ Write out the topology in appropriate GROMACS format
+
+        :param name: name of output topology file
+        :param description: Description to add to [ system ] section of topology
+        :param restrained_top_name: Name of topology file that includes position restraints (TODO: add this to __init__)
+
+        :type name: str
+        :type description: str
+        :type restrained_top_name: str
+        """
 
         self.name = name
 
@@ -157,13 +173,19 @@ class SystemTopology(object):
                 f.write(line)
 
     def add_residue(self, residue, n=1, write=False, topname='topol.top', top_description='Simulation Box'):
-        """
-        Add molecule(s) of a single residue to the topology
-        :param residue : name of residue object
-        :param n : number of molecules to add
-        :param write : write new topology file
-        :param topname : name of output topology if written
-        :param top_description : system description to be written into top if desired
+        """ Add molecule(s) of a single residue to the topology
+
+        :param residue: name of residue object
+        :param n: number of molecules to add
+        :param write: write new topology file
+        :param topname: name of output topology if written
+        :param top_description: system description to be written into top if desired
+
+        :type residue: LLC_Membranes.llclib.topology.Residue object
+        :type n: int
+        :type write: bool
+        :type topname: str
+        :type top_description: str
         """
 
         resname = residue.resname
@@ -180,6 +202,20 @@ class SystemTopology(object):
             self.write_top(name=topname, description=top_description)
 
     def remove_residue(self, residue, n=1, write=False, topname='topol.top', top_description='Simulation Box'):
+        """ Remove a residue from the topology
+
+        :param residue: name of residue object
+        :param n: number of molecules to add
+        :param write: write new topology file
+        :param topname: name of output topology if written
+        :param top_description: system description to be written into top if desired
+
+        :type residue: LLC_Membranes.llclib.topology.Residue object
+        :type n: int
+        :type write: bool
+        :type topname: str
+        :type top_description: str
+        """
 
         resname = residue.resname
         self.residue_count[resname] -= n
@@ -190,6 +226,6 @@ class SystemTopology(object):
 
 if __name__ == "__main__":
 
-    args = initialize()
+    args = initialize().parse_args()
     t = SystemTopology(args.gro, ff=args.forcefield, xlink=True)
     t.write_top(name=args.output, description=args.description)

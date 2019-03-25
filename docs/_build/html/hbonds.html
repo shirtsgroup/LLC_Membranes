@@ -46,8 +46,8 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Distance Between Pores" href="p2p.html" />
-    <link rel="prev" title="Post-Simulation Trajectory Analysis" href="analysis.html" /> 
+    <link rel="next" title="Radial Distribution Functions" href="rdf.html" />
+    <link rel="prev" title="Calculate Mean Squared Displacement" href="msd.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -99,9 +99,13 @@
 <li class="toctree-l1"><a class="reference internal" href="prep.html">Preparation of Monomers and Solutes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="setup.html">System Setup</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="analysis.html">Post-Simulation Trajectory Analysis</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Identify Hydrogen Bonds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="p2p.html">Distance Between Pores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="msd.html">Calculate Mean Squared Displacement</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Identify Hydrogen Bonds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rdf.html">Radial Distribution Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="correlation.html">Correlation Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coordination_number.html">Calculate Coordination Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ztrace.html">Plot z-coordinate Versus Radial Position</a></li>
 </ul>
 </li>
 </ul>
@@ -173,10 +177,10 @@
   <div class="section" id="identify-hydrogen-bonds">
 <h1>Identify Hydrogen Bonds<a class="headerlink" href="#identify-hydrogen-bonds" title="Permalink to this headline">¶</a></h1>
 <p>Use geometric criteria to identify hydrogen bonds</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">hbonds</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">TRAJ</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">GRO</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">TOP</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="n">BEGIN</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">e</span> <span class="n">END</span><span class="p">]</span>
-                 <span class="p">[</span><span class="o">-</span><span class="n">sk</span> <span class="n">SKIP</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="n">RESIDUES</span> <span class="p">[</span><span class="n">RESIDUES</span> <span class="o">...</span><span class="p">]]</span>
-                 <span class="p">[</span><span class="o">-</span><span class="n">a</span> <span class="n">ATOMS</span> <span class="p">[</span><span class="n">ATOMS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">DISTANCE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">angle</span> <span class="n">ANGLE_CUT</span><span class="p">]</span>
-                 <span class="p">[</span><span class="o">-</span><span class="n">l</span> <span class="n">LOAD</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">acc</span> <span class="n">ACCEPTORS</span> <span class="p">[</span><span class="n">ACCEPTORS</span> <span class="o">...</span><span class="p">]]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">hbonds</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">TRAJ</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">GRO</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="n">BEGIN</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">e</span> <span class="n">END</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">sk</span> <span class="n">SKIP</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="n">RESIDUES</span> <span class="p">[</span><span class="n">RESIDUES</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span> <span class="n">ATOMS</span> <span class="p">[</span><span class="n">ATOMS</span> <span class="o">...</span><span class="p">]]</span>
+                 <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">DISTANCE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">angle</span> <span class="n">ANGLE_CUT</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span> <span class="n">LOAD</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">-</span><span class="n">acc</span> <span class="n">ACCEPTORS</span> <span class="p">[</span><span class="n">ACCEPTORS</span> <span class="o">...</span><span class="p">]]</span>
                  <span class="p">[</span><span class="o">-</span><span class="n">donors</span> <span class="n">DONORS</span> <span class="p">[</span><span class="n">DONORS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span> <span class="n">SAVENAME</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -195,11 +199,6 @@
 <kbd>-g, &#8211;gro</kbd></td>
 <td><p class="first">Coordinate file</p>
 <p class="last">Default: &#8220;wiggle.gro&#8221;</p>
-</td></tr>
-<tr><td class="option-group">
-<kbd>-p, &#8211;top</kbd></td>
-<td><p class="first">Gromacs topology file</p>
-<p class="last">Default: &#8220;topol.top&#8221;</p>
 </td></tr>
 <tr><td class="option-group">
 <kbd>-b, &#8211;begin</kbd></td>
@@ -264,10 +263,10 @@
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="hbonds.System">
-<em class="property">class </em><code class="descclassname">hbonds.</code><code class="descname">System</code><span class="sig-paren">(</span><em>traj</em>, <em>gro</em>, <em>top</em>, <em>begin=0</em>, <em>end=-1</em>, <em>skip=1</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">hbonds.</code><code class="descname">System</code><span class="sig-paren">(</span><em>traj</em>, <em>gro</em>, <em>begin=0</em>, <em>end=-1</em>, <em>skip=1</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="hbonds.System.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>traj</em>, <em>gro</em>, <em>top</em>, <em>begin=0</em>, <em>end=-1</em>, <em>skip=1</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>traj</em>, <em>gro</em>, <em>begin=0</em>, <em>end=-1</em>, <em>skip=1</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -303,10 +302,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="p2p.html" class="btn btn-neutral float-right" title="Distance Between Pores" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="rdf.html" class="btn btn-neutral float-right" title="Radial Distribution Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="analysis.html" class="btn btn-neutral float-left" title="Post-Simulation Trajectory Analysis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="msd.html" class="btn btn-neutral float-left" title="Calculate Mean Squared Displacement" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

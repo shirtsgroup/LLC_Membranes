@@ -5,7 +5,10 @@ Post-Simulation Trajectory Analysis
       :maxdepth: 2
       :titlesonly:
 
-      hbonds
       p2p
+      msd
+      hbonds
       rdf
       correlation
+      coordination_number
+      ztrace

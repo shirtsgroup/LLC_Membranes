@@ -3,7 +3,6 @@
 import argparse
 import mdtraj as md
 from LLC_Membranes.llclib import physical, topology
-from LLC_Membranes.analysis import Atom_props
 import numpy as np
 import matplotlib.pyplot as plt
 import tqdm
@@ -29,7 +28,7 @@ def initialize():
     parser.add_argument('-skip', default=1, type=int, help='Skip every n frames')
 
     # define system
-    parser.add_argument('-b', '--build_monomer', default='NAcarb11V.gro', help='Name of annotated coordinate file '
+    parser.add_argument('-b', '--build_monomer', default='NAcarb11V', help='Name of annotated coordinate file '
                         'describing monomer structure.')
 
     parser.add_argument('-ox', '--tail_oxygen', nargs='+', default=['O5', 'O6', 'O7', 'O8', 'O9', 'O10'], help='Oxygen'
@@ -56,116 +55,116 @@ def initialize():
     return parser
 
 
-def make_groups(t, pos, pore_atoms, tail_atoms, bounds, natoms, mpl):
-    """
-    :param t: mdtraj trajectory object
-    :param pore_atoms: atoms that define the pore region, list
-    :param tail_atoms: atoms that define the tail region, list
-    :param bounds: only include atoms within these z boundaries. list:[lower_bound, upper_bound]
-    :param natoms: number of atoms in monomer residue
-    :param mpl: number of monomers per layer
-    :return:
-    """
-
-    all_pore_atoms = []
-    all_tail_atoms = []
-    water = []  # oxygen atom of water molecule
-    other = []  # all other atoms within bounds. They will be needed for a weight percent calculation
-    mass = 0
-    for a in t.topology.atoms:
-        if bounds[0] <= pos[a.index, 2] <= bounds[1]:
-            mass += Atom_props.mass[a.name]
-            if a.residue.name == 'HOH' and a.name == 'O':
-                water.append(a.index)
-            elif a.name in pore_atoms:
-                all_pore_atoms.append(a.index)
-            elif a.name in tail_atoms:
-                all_tail_atoms.append(a.index)
-
-    # all_pore_atoms will be used to make a spline which traces through the pores. To do that properly, only full layers
-    # can be included in the list.
-
-    # layer_number = [i // (mpl*natoms) for i in all_pore_atoms]
-    #
-    # pore_atoms_keep = []
-    # for i in range(len(all_pore_atoms)):
-    #     if layer_number.count(layer_number[i]) == int(mpl*len(pore_atoms)):
-    #         pore_atoms_keep.append(all_pore_atoms[i])
-    #     else:
-    #         other.append(all_pore_atoms[i])
-
-    return all_pore_atoms, all_tail_atoms, water, mass
-
-
-def restrict_spline(full_spline, bounds):
-    """
-    Restrict a pore-tracing spline to be within two z boundaries
-    :param full_spline: A full spline
-    :param bounds: z boundaries
-    :return: restricted spline to within z-boundaries
-    """
-
-    restricted = []
-    for i in range(full_spline.shape[0]):
-        if bounds[0] <= full_spline[i, 2] <= bounds[1]:
-            restricted.append(full_spline[i, :])
-
-    return np.array(restricted)
-
-
-def water_content(pos, ref_pos, r, write=False):
-    """
-    Find number of water molecules in region
-    :param pos: positions of all water molecules (excluding those outside boundaries defined by args.bounds)
-    :param ref_pos: positions defining the region
-    :param r: distance from reference positions a point can be for it to be included as a part of the region
-    :return: number of water molecules in region
-    """
-
-    n = 0
-    ndx = []
-    tree = spatial.cKDTree(ref_pos)
-    for i in range(pos.shape[0]):
-        d = tree.query(pos[i, :])[0]
-        if d < r:
-            n += 1
-            ndx.append(i + 1)
-
-    if write:
-        return n, ndx
-    else:
-        return n
-
-
-def bootstrap(data, tau, nboot):
-    """
-    :param data: equilibrated data from a timeseries
-    :param tau: autocorrelation time (number of points in timeseries between uncorrelated samples)
-    :param nboot: number of bootstrap trials
-    :return: average and standard deviation
-    """
-
-    tau = int(tau)
-    nsub = data.shape[0] // tau  # number of uncorrelated subtrajectories to break data into
-
-    # divide data into independent subtrajectories
-    subtrajectories = np.zeros([nsub, tau])
-    for i in range(nsub):
-        if i == 0:
-            subtrajectories[i, :] = data[-tau:]
-        else:
-            subtrajectories[i, :] = data[-(i+1)*tau:-i*tau]
-
-    choices = np.linspace(0, tau - 1, tau, dtype=int)  # indices of each subtrajectory
-    boot = np.zeros([nboot])
-    for b in range(nboot):
-        trial = np.zeros([nsub])  # the statistic will be the average of each independent subtrajectory
-        for s in range(nsub):
-            ndx = np.random.choice(choices, size=tau, replace=True)
-            trial[s] = np.mean(subtrajectories[s, choices])
-        boot[b] = np.mean(trial)
-
-    return np.mean(boot), np.std(boot)
+# def make_groups(t, pos, pore_atoms, tail_atoms, bounds, natoms, mpl):
+#     """
+#     :param t: mdtraj trajectory object
+#     :param pore_atoms: atoms that define the pore region, list
+#     :param tail_atoms: atoms that define the tail region, list
+#     :param bounds: only include atoms within these z boundaries. list:[lower_bound, upper_bound]
+#     :param natoms: number of atoms in monomer residue
+#     :param mpl: number of monomers per layer
+#     :return:
+#     """
+#
+#     all_pore_atoms = []
+#     all_tail_atoms = []
+#     water = []  # oxygen atom of water molecule
+#     other = []  # all other atoms within bounds. They will be needed for a weight percent calculation
+#     mass = 0
+#     for a in t.topology.atoms:
+#         if bounds[0] <= pos[a.index, 2] <= bounds[1]:
+#             mass += Atom_props.mass[a.name]
+#             if a.residue.name == 'HOH' and a.name == 'O':
+#                 water.append(a.index)
+#             elif a.name in pore_atoms:
+#                 all_pore_atoms.append(a.index)
+#             elif a.name in tail_atoms:
+#                 all_tail_atoms.append(a.index)
+#
+#     # all_pore_atoms will be used to make a spline which traces through the pores. To do that properly, only full layers
+#     # can be included in the list.
+#
+#     # layer_number = [i // (mpl*natoms) for i in all_pore_atoms]
+#     #
+#     # pore_atoms_keep = []
+#     # for i in range(len(all_pore_atoms)):
+#     #     if layer_number.count(layer_number[i]) == int(mpl*len(pore_atoms)):
+#     #         pore_atoms_keep.append(all_pore_atoms[i])
+#     #     else:
+#     #         other.append(all_pore_atoms[i])
+#
+#     return all_pore_atoms, all_tail_atoms, water, mass
+#
+#
+# def restrict_spline(full_spline, bounds):
+#     """
+#     Restrict a pore-tracing spline to be within two z boundaries
+#     :param full_spline: A full spline
+#     :param bounds: z boundaries
+#     :return: restricted spline to within z-boundaries
+#     """
+#
+#     restricted = []
+#     for i in range(full_spline.shape[0]):
+#         if bounds[0] <= full_spline[i, 2] <= bounds[1]:
+#             restricted.append(full_spline[i, :])
+#
+#     return np.array(restricted)
+#
+#
+# def water_content(pos, ref_pos, r, write=False):
+#     """
+#     Find number of water molecules in region
+#     :param pos: positions of all water molecules (excluding those outside boundaries defined by args.bounds)
+#     :param ref_pos: positions defining the region
+#     :param r: distance from reference positions a point can be for it to be included as a part of the region
+#     :return: number of water molecules in region
+#     """
+#
+#     n = 0
+#     ndx = []
+#     tree = spatial.cKDTree(ref_pos)
+#     for i in range(pos.shape[0]):
+#         d = tree.query(pos[i, :])[0]
+#         if d < r:
+#             n += 1
+#             ndx.append(i + 1)
+#
+#     if write:
+#         return n, ndx
+#     else:
+#         return n
+#
+#
+# def bootstrap(data, tau, nboot):
+#     """
+#     :param data: equilibrated data from a timeseries
+#     :param tau: autocorrelation time (number of points in timeseries between uncorrelated samples)
+#     :param nboot: number of bootstrap trials
+#     :return: average and standard deviation
+#     """
+#
+#     tau = int(tau)
+#     nsub = data.shape[0] // tau  # number of uncorrelated subtrajectories to break data into
+#
+#     # divide data into independent subtrajectories
+#     subtrajectories = np.zeros([nsub, tau])
+#     for i in range(nsub):
+#         if i == 0:
+#             subtrajectories[i, :] = data[-tau:]
+#         else:
+#             subtrajectories[i, :] = data[-(i+1)*tau:-i*tau]
+#
+#     choices = np.linspace(0, tau - 1, tau, dtype=int)  # indices of each subtrajectory
+#     boot = np.zeros([nboot])
+#     for b in range(nboot):
+#         trial = np.zeros([nsub])  # the statistic will be the average of each independent subtrajectory
+#         for s in range(nsub):
+#             ndx = np.random.choice(choices, size=tau, replace=True)
+#             trial[s] = np.mean(subtrajectories[s, choices])
+#         boot[b] = np.mean(trial)
+#
+#     return np.mean(boot), np.std(boot)
 
 
 class System(object):
@@ -181,6 +180,10 @@ class System(object):
         :param skip: skip every n frames
         :param npores: number of pores. Assumes that atoms are number sequentially by pore
         """
+
+        # temporary fix
+        if residue == 'SOL':
+            residue = 'HOH'
 
         print('Loading trajectory...', flush=True, end='')
         if traj:
@@ -279,7 +282,7 @@ class System(object):
 
         plt.tight_layout()
         #plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/transport/supporting_figures/5wt_offset_xlinked_equil.pdf')
-        # plt.show()
+        plt.show()
 
 
 if __name__ == "__main__":

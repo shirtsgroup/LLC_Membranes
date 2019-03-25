@@ -9,8 +9,8 @@ from LLC_Membranes.analysis import Poly_fit
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
 import time as timer
-from fbm_fork import fbm
-
+#from fbm_fork import fbm
+import fbm
 
 def initialize():
 
@@ -178,7 +178,7 @@ class CTRW(object):
                     if self.alpha == 1:
                         time.append(1)
                     else:
-                        time.append(sampling.random_power_law_dwell(1 + self.alpha, ll=ll, discrete=discrete))
+                        time.append(sampling.random_power_law_dwell(1 + self.alpha, ll=ll, discrete=discrete)[0])
                 else:
                     sys.exit('Please enter a valid dwell time probability distribution')
                 total_time += time[-1]
@@ -212,6 +212,11 @@ class CTRW(object):
 
             # make uniform time intervals with the same interval for each simulated trajectory
             self.z_interpolated[t, :] = z[np.digitize(self.time_uniform, time, right=False) - 1]
+
+            plt.hist(np.random.normal(loc=0, scale=noise, size=len(self.time_uniform)))
+
+            if noise > 0:
+                self.z_interpolated += np.random.normal(loc=0, scale=noise, size=len(self.time_uniform))
 
         self.time_uniform *= self.dt
         # plt.plot(trajectory_hops[:, 0]*self.dt, trajectory_hops[:, 1])

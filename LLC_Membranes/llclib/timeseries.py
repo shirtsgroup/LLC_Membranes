@@ -3,6 +3,7 @@
 import numpy as np
 from multiprocessing import Pool
 import tqdm
+import warnings
 
 
 def largest_prime_factor(n):
@@ -70,9 +71,15 @@ def acf(t, largest_prime=500):
     ret = np.fft.fftshift(ret, axes=(0,))
 
     autocorr_fxn = ret[length // 2:].real
-    autocorr_fxn /= np.arange(T.shape[0], 0, -1)[:, ...]
 
-    autocorr_fxn /= np.var(T, axis=0)
+    if len(autocorr_fxn.shape) > 1:
+        autocorr_fxn /= np.arange(T.shape[0], 0, -1)[:, None]
+    else:
+        autocorr_fxn /= np.arange(T.shape[0], 0, -1)
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        autocorr_fxn /= np.var(T, axis=0)
 
     return autocorr_fxn  # normalized
 
@@ -228,7 +235,7 @@ def msd(x, axis, ensemble=False, nt=1):
     ntraj = x.shape[1]  # number of trajectories
     MSD = np.zeros([frames, ntraj], dtype=float)  # a set of MSDs per particle
 
-    size = len(x[0, :, axis].shape)  # number of axes in array where MSDs will be calculated
+    size = len(x[0, :, axis].shape)  # number of axes in array where MSDs will be calculate
 
     if ensemble:
 

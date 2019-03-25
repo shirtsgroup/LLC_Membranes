@@ -1,8 +1,5 @@
 #! /usr/bin/env python
 
-"""
-Write input files. Default settings are not included. Add an argument if you need to change a default that isn't shown
-"""
 from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
@@ -13,7 +10,7 @@ from LLC_Membranes.setup.genmdp import SimulationMdp
 
 def initialize():
 
-    parser = argparse.ArgumentParser(description='Write .mdp files and topology files for various types of simulation')
+    parser = argparse.ArgumentParser()
 
     parser.add_argument('-T', '--title', default='Generic Molecular Dynamics Simulation', type=str, help='Simulation Title')
     parser.add_argument('-b', '--build_mon', default='NAcarb11V', type=str, help='Monomer structure used for build')
@@ -41,14 +38,12 @@ def initialize():
     parser.add_argument('-nf', '--nstfout', type=int, help='Frequency to output forces to trajectory file')
     parser.add_argument('-ne', '--nstenergy', type=int, help='Frequency to output energy to energy file')
 
-    args = parser.parse_args()
-
-    return args
+    return parser
 
 
 if __name__ == "__main__":
 
-    args = initialize()
+    args = initialize().parse_args()
     # get output frequencies (important for controlling size of trajectory)
     if args.nstxout:
         nstxout = args.nstxout

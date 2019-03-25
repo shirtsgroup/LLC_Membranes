@@ -6,4 +6,7 @@ System Setup
       :titlesonly:
 
       build
+      input
+      solvation_equilibration
+      place_solutes_pores
       xlink

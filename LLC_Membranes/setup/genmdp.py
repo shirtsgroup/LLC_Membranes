@@ -37,9 +37,7 @@ def initialize():
     parser.add_argument('-nf', '--nstfout', type=int, help='Frequency to output forces to trajectory file')
     parser.add_argument('-ne', '--nstenergy', type=int, help='Frequency to output energy to energy file')
 
-    args = parser.parse_args()
-
-    return args
+    return parser
 
 
 class SimulationMdp(object):
@@ -58,9 +56,9 @@ class SimulationMdp(object):
         :param length: (int) simulation length, picoseconds
         :param p_coupling: (str) type of pressure coupling (None, semiisotropic, isotropic etc.)
         :param barostat: (str) barostat to use for pressure control
-        :param genvel: (bool) True if velocities should be generated for initial configuration.
+        :param genvel: (bool) True if velocities should be generated for initial configuration. \
         if you want to use velocities already present in coordinate file
-        :param restraints: (bool) whether or not the system has been restrained (meaning a special topology file has
+        :param restraints: (bool) whether or not the system has been restrained (meaning a special topology file has \
         been created
         :param xlink: (bool) whether the system is being run through the crosslinking algorithm
         :param bcc: (bool) if we are simulating the bicontinous cubic system
@@ -70,8 +68,8 @@ class SimulationMdp(object):
         :param nstvout: frequency of outputting velocity to trajectory file
         :param nstfout: frequency of outputting forces to trajectory file
         :param nstenergy: frequency of outputting energy to energy file
-        :param frames: number of frames to output. If not None, nstxout, nstvout, nstfou and nstenergy will be adjusted
-        accordingly
+        :param frames: number of frames to output. If not None, nstxout, nstvout, nstfou and nstenergy will be \
+        adjusted accordingly
         """
 
         # initialize variables
@@ -264,7 +262,10 @@ class SimulationMdp(object):
         self.nve_mdp_name = "%s.mdp" % out
 
     def add_pull_groups(self, ref_groups, coord_groups, k, rate, mdp, geometry='distance', type='umbrella', dim='z'):
-        """
+        """ Add pull groups
+
+        NOTE: This assumes all options apply to all pull coords (for now)
+
         :param ref_groups: name of groups used as reference com
         :param coord_groups: name of groups which will be used with a pull coordinate
         :param k: force constant (kJ / mol / nm^2)
@@ -274,8 +275,14 @@ class SimulationMdp(object):
         :param type: see http://manual.gromacs.org/documentation/2018/user-guide/mdp-options.html
         :param dim: axis a long which to pull
 
-        NOTE: This assumes all options apply to all pull coords (for now)
-
+        :type ref_groups: list or tuple
+        :type coord_groups: list or tuple
+        :type k: float
+        :type rate: float
+        :type mdp: str
+        :type geometry: str
+        :type type: str
+        :type dim: str
         """
 
         n = len(coord_groups)
@@ -311,7 +318,7 @@ class SimulationMdp(object):
 
 if __name__ == "__main__":
 
-    args = initialize()
+    args = initialize().parse_args()
 
     # get output frequencies (important for controlling size of trajectory)
     if args.nstxout:

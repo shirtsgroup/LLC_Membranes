@@ -94,6 +94,7 @@
             
             
               <ul>
+<li class="toctree-l1"><a class="reference internal" href="../prep.html">Preparation of Monomers and Solutes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../setup.html">System Setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../analysis.html">Post-Simulation Trajectory Analysis</a></li>
 </ul>
@@ -173,14 +174,14 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#gentop.SystemTopology.add_residue" title="gentop.SystemTopology.add_residue"><code class="xref py py-obj docutils literal"><span class="pre">add_residue</span></code></a>(residue[,&nbsp;n,&nbsp;write,&nbsp;topname,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="../gentop.html#gentop.SystemTopology.add_residue" title="gentop.SystemTopology.add_residue"><code class="xref py py-obj docutils literal"><span class="pre">add_residue</span></code></a>(residue[,&nbsp;n,&nbsp;write,&nbsp;topname,&nbsp;...])</td>
 <td>Add molecule(s) of a single residue to the topology</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#gentop.SystemTopology.remove_residue" title="gentop.SystemTopology.remove_residue"><code class="xref py py-obj docutils literal"><span class="pre">remove_residue</span></code></a>(residue[,&nbsp;n,&nbsp;write,&nbsp;topname,&nbsp;...])</td>
-<td></td>
+<tr class="row-even"><td><a class="reference internal" href="../gentop.html#gentop.SystemTopology.remove_residue" title="gentop.SystemTopology.remove_residue"><code class="xref py py-obj docutils literal"><span class="pre">remove_residue</span></code></a>(residue[,&nbsp;n,&nbsp;write,&nbsp;topname,&nbsp;...])</td>
+<td>Remove a residue from the topology</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#gentop.SystemTopology.write_top" title="gentop.SystemTopology.write_top"><code class="xref py py-obj docutils literal"><span class="pre">write_top</span></code></a>([name,&nbsp;description,&nbsp;...])</td>
-<td></td>
+<tr class="row-odd"><td><a class="reference internal" href="../gentop.html#gentop.SystemTopology.write_top" title="gentop.SystemTopology.write_top"><code class="xref py py-obj docutils literal"><span class="pre">write_top</span></code></a>([name,&nbsp;description,&nbsp;...])</td>
+<td>Write out the topology in appropriate GROMACS format</td>
 </tr>
 </tbody>
 </table>
@@ -188,23 +189,63 @@
 <dl class="method">
 <dt id="gentop.SystemTopology.add_residue">
 <code class="descname">add_residue</code><span class="sig-paren">(</span><em>residue</em>, <em>n=1</em>, <em>write=False</em>, <em>topname='topol.top'</em>, <em>top_description='Simulation Box'</em><span class="sig-paren">)</span><a class="headerlink" href="#gentop.SystemTopology.add_residue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add molecule(s) of a single residue to the topology
-:param residue : name of residue object
-:param n : number of molecules to add
-:param write : write new topology file
-:param topname : name of output topology if written
-:param top_description : system description to be written into top if desired</p>
+<dd><p>Add molecule(s) of a single residue to the topology</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>residue</strong> (<em>LLC_Membranes.llclib.topology.Residue object</em>) &#8211; name of residue object</li>
+<li><strong>n</strong> (<em>int</em>) &#8211; number of molecules to add</li>
+<li><strong>write</strong> (<em>bool</em>) &#8211; write new topology file</li>
+<li><strong>topname</strong> (<em>str</em>) &#8211; name of output topology if written</li>
+<li><strong>top_description</strong> (<em>str</em>) &#8211; system description to be written into top if desired</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="gentop.SystemTopology.remove_residue">
 <code class="descname">remove_residue</code><span class="sig-paren">(</span><em>residue</em>, <em>n=1</em>, <em>write=False</em>, <em>topname='topol.top'</em>, <em>top_description='Simulation Box'</em><span class="sig-paren">)</span><a class="headerlink" href="#gentop.SystemTopology.remove_residue" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Remove a residue from the topology</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>residue</strong> (<em>LLC_Membranes.llclib.topology.Residue object</em>) &#8211; name of residue object</li>
+<li><strong>n</strong> (<em>int</em>) &#8211; number of molecules to add</li>
+<li><strong>write</strong> (<em>bool</em>) &#8211; write new topology file</li>
+<li><strong>topname</strong> (<em>str</em>) &#8211; name of output topology if written</li>
+<li><strong>top_description</strong> (<em>str</em>) &#8211; system description to be written into top if desired</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="gentop.SystemTopology.write_top">
 <code class="descname">write_top</code><span class="sig-paren">(</span><em>name='topol.top'</em>, <em>description='Simulation Box'</em>, <em>restrained_top_name='restrained.itp'</em><span class="sig-paren">)</span><a class="headerlink" href="#gentop.SystemTopology.write_top" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Write out the topology in appropriate GROMACS format</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>str</em>) &#8211; name of output topology file</li>
+<li><strong>description</strong> (<em>str</em>) &#8211; Description to add to [ system ] section of topology</li>
+<li><strong>restrained_top_name</strong> (<em>str</em>) &#8211; Name of topology file that includes position restraints (TODO: add this to __init__)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 

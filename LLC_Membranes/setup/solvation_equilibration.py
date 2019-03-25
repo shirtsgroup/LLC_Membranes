@@ -6,10 +6,9 @@ import sqlite3 as sql
 from LLC_Membranes.llclib import topology, file_rw
 from LLC_Membranes.analysis import solute_partitioning
 from LLC_Membranes.setup import lc_class, equil, solvate_tails
+import mdtraj as md
 import numpy as np
 import os
-
-location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in
 
 
 def initialize():
@@ -32,8 +31,8 @@ def initialize():
     parser.add_argument('-np', '--nproc', default=4, help='Number of MPI processes')
 
     # same flags as to build.py
-    parser.add_argument('-b', '--build_monomer', default='NAcarb11V.gro', type=str, help='Name of single monomer'
-                        'structure file (.gro format) used to build full system')
+    parser.add_argument('-b', '--build_monomer', default='NAcarb11V', type=str, help='Name of single monomer used to '
+                                                                                     'build full system')
     parser.add_argument('-m', '--monomers_per_column', default=20, type=int, help='Number of monomers to stack in each'
                                                                                   'column')
     parser.add_argument('-c', '--ncolumns', default=5, type=int, help='Number of columns used to build each pore')
@@ -69,47 +68,105 @@ def initialize():
 
 class System(object):
 
-    def __init__(self, args, solute='HOH'):
-        """
+    def __init__(self, build_monomer, weight_percent, ratio, tolerance=1, solute='HOH', nopores=4, ncolumns=5,
+                 monomers_per_column=20, p2p=4.5, parallel_displaced=0, dbwl=0.37, random_seed=0, mpi=False, nproc=4):
+        """ Get unit cell build parameters and determine the number of water molecules required for each region in order
+        to have the correct final composition.
 
-        :param args: arguments fed to argparse
+        :param build_monomer: Name of liquid crystal monomer to use to build unit cell (no file extension)
+        :param weight_percent: Weight percent of water in the whole system
+        :param ratio: Ratio of water in the pores to water in the tails
+        :param tolerance: Acceptable error in the total number of water molecules placed in the pore region
         :param solute: name of solute used to solvate system
+        :param nopores: Number of pores in unit cell
+        :param ncolumns: Number of stacked monomer columns per pore
+        :param monomers_per_column: Number of monomers stacked into a column
+        :param p2p: Distance between pores (nm)
+        :param parallel_displaced: Angle of wedge formed between line extending from pore center to monomer and line \
+        from pore center to vertically adjacent monomer head group
+        :param dbwl: Distance between stacked monomers (nm)
+        :param random_seed: Monomer columns are randomly displaced in the z-direction when the initial configuration \
+        is built. Specify a random seed so that the same displacement is achieved each time the radius is changed. I \
+        think this helps with convergence, but it hasn't been extensively tested.
+        :param mpi: Run the MPI version of GROMACS
+        :param np: number of MPI process if mpi = True
+
+        :type build_monomer: str
+        :type weight_percent: float
+        :type ratio: float
+        :type tolerance: int
+        :type solute: str
+        :type nopores: int
+        :type ncolumns: int
+        :type monomers_per_column: int
+        :type p2p: float
+        :type parallel_displaced: float
+        :type dbwl: float
+        :type random_seed: int
+        :type mpi: bool
+        :type np: int
         """
 
-        self.args = args
+        # Initialize variables needed later
+        self.location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+        self.parallel_displaced = parallel_displaced
+        self.dbwl = dbwl
+        self.random_seed = random_seed
+        self.monomers_per_column = monomers_per_column
+        self.ncolumns = ncolumns
+        self.p2p = p2p
+        self.nopores = nopores
+        self.mpi = mpi
+        self.np = nproc
+        self.tolerance = tolerance
+        self.build_monomer = topology.LC(build_monomer)
 
-        # get build monomer molecular weight and calculate mw of entire dry system
-        self.build_monomer = topology.Residue(args.build_monomer.split('.')[0])
-        if self.build_monomer.residues:
-            self.build_monomer_mw = sum([x.mw for x in self.build_monomer.residues])
-        else:
-            self.build_monomer_mw = self.build_monomer.mw
+        t = md.load('%s/../top/topologies/%s.gro' % (self.location, build_monomer))
+        residues = set([a.residue.name for a in t.topology.atoms])
 
-        nmon = args.nopores * args.ncolumns * args.monomers_per_column  # number of build monomers in the system
+        # since liquid crystals with counterions contain multiple residues
+        self.build_monomer_mw = 0
+        for r in residues:
+            self.build_monomer_mw += topology.Residue(r).MW
+
+        nmon = self.nopores * self.ncolumns * self.monomers_per_column  # number of build monomers in the system
         self.dry_mass = nmon * self.build_monomer_mw  # mass of dry system
 
         # calculate required water in pores and tails
         self.water = topology.Residue(solute)
-        self.args.weight_percent /= 100.0  # convert to fraction
-        self.total_water = int((self.args.weight_percent * nmon * self.build_monomer_mw) / (self.water.mw *
-                            (1 - self.args.weight_percent)))
-        tail_water = self.total_water / (self.args.ratio + 1)
-        self.pore_water = int(args.ratio * tail_water)
+        self.weight_percent = weight_percent / 100.0  # convert to fraction
+        self.total_water = int((self.weight_percent * nmon * self.build_monomer_mw) / (self.water.MW *
+                            (1 - self.weight_percent)))
+        tail_water = self.total_water / (ratio + 1)
+        self.pore_water = int(ratio * tail_water)
         self.tail_water = int(tail_water)
 
         self.r = 0  # pore radius
         self.converged = False
         self.solvated = None  # an object that will describe solvated systems
 
-    def query_database(self, database='water_content.db'):
+    def query_database(self, database='water_content.db', guess_range=(0.4, 1), guess_stride=0.2):
+        """ Read an SQL database, of number of water molecules versus pore radius, to inform the next choice of pore
+        radius. The decision process bisects the two radii with water contents closest to the desired concentration. If
+        there is a single data point, an educated guess is made. If there are no data points, then make a random guess.
+
+        :param database: Name of database
+        :param guess_range: If water_content.db has no entries for the build monomer, an initial radius will be \
+        randomly selected from this range
+        :param guess_stride: How far above/below the highest/lowest value to make the next guess at pore radius if you \
+        need more/less water than the bounds of the water
+
+        :type database: str
+        :type guess_range: tuple
+        :type guess_stride: float
+        """
 
         # read database of pore radii and associated water contents
-        connection = sql.connect("%s/%s" % (location, database))  # database created in this directory
+        connection = sql.connect("%s/%s" % (self.location, database))  # database created in this directory
         crsr = connection.cursor()
         sql_command = "select nwater, radius from radii where monomer = '%s' and pd_angle = %.2f and dbwl = %.2f and " \
-                      "mon_per_col = %d and seed = %s;" % (self.args.build_monomer.split('.')[0],
-                                                           self.args.parallel_displaced, self.args.dbwl,
-                                                           self.args.monomers_per_column, self.args.random_seed)
+                      "mon_per_col = %d and seed = %s;" % (self.build_monomer.name, self.parallel_displaced, self.dbwl,
+                                                           self.monomers_per_column, self.random_seed)
 
         try:
             sql_output = crsr.execute(sql_command).fetchall()
@@ -126,19 +183,19 @@ class System(object):
             if len(nwater) == 1:
 
                 if self.pore_water > nwater[0]:
-                    self.r = radii[0] + self.args.guess_stride
+                    self.r = radii[0] + guess_stride
                 elif self.pore_water < nwater[0]:
-                    self.r = radii[0] - self.args.guess_stride
+                    self.r = radii[0] - guess_stride
                 else:
                     self.r = radii[0]
 
             elif self.pore_water < min(nwater):
 
-                self.r = min(radii) - self.args.guess_stride
+                self.r = min(radii) - guess_stride
 
             elif self.pore_water > max(nwater):
 
-                self.r = max(radii) + self.args.guess_stride
+                self.r = max(radii) + guess_stride
 
             else:
 
@@ -148,7 +205,7 @@ class System(object):
                     bin - 1]  # upper bound is exclusive. Lower bound is inclusive
 
                 # calculate water content if an entry doesn't already exist
-                if abs(self.pore_water - lower_bound) > self.args.tolerance:
+                if abs(self.pore_water - lower_bound) > self.tolerance:
                     # linearly interpolate what the next pore radius should be based on desired amount of water in pore
                     interpolation = (self.pore_water - lower_bound) / (upper_bound - lower_bound)
                     self.r = radii[bin - 1] + (radii[bin] - radii[bin - 1]) * interpolation
@@ -156,24 +213,23 @@ class System(object):
                     self.r = radii[bin - 1]
         else:
 
-            self.r = (self.args.guess_range[1] - self.args.guess_range[0]) * np.random.sample() + self.args.guess_range[0]
+            self.r = (guess_range[1] - guess_range[0]) * np.random.sample() + guess_range[0]
 
         connection.close()
 
     def build(self):
 
-        equil.build(self.args.build_monomer, 'initial.gro', self.args.monomers_per_column, self.args.ncolumns,
-                    self.r, self.args.p2p, self.args.dbwl, self.args.parallel_displaced,
-                    nopores=self.args.nopores, seed=self.args.random_seed)
+        equil.build('%s.gro' % self.build_monomer.name, 'initial.gro', self.monomers_per_column, self.ncolumns,
+                    self.r, self.p2p, self.dbwl, self.parallel_displaced,
+                    nopores=self.nopores, seed=self.random_seed)
 
-    def restrain(self, force):
+    def restrain(self, force, restraint_axis='xyz', ring_restraints=("C", "C1", "C2", "C3", "C4", "C5")):
 
-        equil.restrain('initial.gro', self.args.build_monomer, force, self.args.restraint_axis,
-                       self.args.ring_restraints)
+        equil.restrain('initial.gro', self.build_monomer.name, force, restraint_axis, ring_restraints)
 
-    def input_files(self, gro, ensemble):
+    def input_files(self, gro, ensemble, length=50, restraint_residue='HII'):
 
-        equil.generate_input_files(gro, ensemble, self.args.length_nvt, restraints=self.args.restraint_residue)
+        equil.generate_input_files(gro, ensemble, length, restraints=restraint_residue)
 
     def put_in_box(self, gro, tpr):
 
@@ -182,55 +238,76 @@ class System(object):
         p2 = subprocess.Popen(trjconv.split(), stdin=p1.stdout)
         p2.wait()
 
-    def equilibrate(self, input_files=True):
+    def equilibrate(self, input_files=True, length=50, force=1000000, restraint_residue='HII', restraint_axis='xyz',
+                    ring_restraints=("C", "C1", "C2", "C3", "C4", "C5")):
+        """ Simulate the unit cell with restraints placed on the head group
 
-        self.build()
+        :param input_files: Generate GROMACS .mdp and topology files
+        :param length: Simulation length (ps)
+        :param force: Force with which to restrain head groups kJ mol^-1 nm^-2
+        :param restraint_residue: Name of residue to which position restraints will be applied
+        :param restraint_axis: Axis/axes along which head groups should be restrained
+        :param ring_restraints: Names of head group atoms
+
+        :type input_files: bool
+        :type length: int
+        :type force: float or int
+        :type restraint_residue: str
+        :type restraint_axis: str
+        :type ring_restraints: tuple
+        """
+
+        self.build()  # build initial configuration
 
         if input_files:  # doesn't need to be done every time
-            self.restrain(self.args.forces[0])
-            self.input_files('initial.gro', 'nvt')
+            self.restrain(force, restraint_axis=restraint_axis, ring_restraints=ring_restraints)
+            self.input_files('initial.gro', 'nvt', length=length, restraint_residue=restraint_residue)
 
         nrg = 1
         while nrg > 0:
 
             self.build()
 
-            equil.simulate('em.mdp', 'topol.top', 'initial.gro', 'em', mpi=self.args.mpi, np=self.args.nproc,
-                           restrained=True)
+            equil.simulate('em.mdp', 'topol.top', 'initial.gro', 'em', mpi=self.mpi, np=self.np, restrained=True)
 
             nrg = equil.check_energy(logname='em.log')
 
-            if nrg > 0:
-                self.args.random_seed = np.random.randint(0, 4294967295) 
+            if nrg > 0:  # choose a new random seed if energy minimization doesn't work
+                self.random_seed = np.random.randint(0, 4294967295)
 
-        cp = 'cp em.gro %s.gro' % self.args.forces[0]
+        cp = 'cp em.gro %s.gro' % force
         p = subprocess.Popen(cp.split())
         p.wait()
 
-        self.put_in_box('%s.gro' % self.args.forces[0], 'em.tpr')
+        self.put_in_box('%s.gro' % force, 'em.tpr')
 
-    def calculate_pore_water(self):
+    def calculate_pore_water(self, config):
+        """ Determine the total number of water molecules within the pore radius. Update database with system
+        configuration parameters.
+
+        :param config: Name of .gro configuration of which to calculate pore water content
+
+        :type config: str
+        """
 
         # solvate the system
-        if self.args.mpi:
-            gmx = "mpirun -np %s gmx_mpi" % self.args.nproc
+        if self.mpi:
+            gmx = "mpirun -np %s gmx_mpi" % self.np
         else:
             gmx = "gmx"
 
-        cmd = "%s solvate -cp %s.gro -cs spc216.gro -o solvated.gro -p topol.top" % (gmx, self.args.forces[0])
+        cmd = "%s solvate -cp %s.gro -cs spc216.gro -o solvated.gro -p topol.top" % (gmx, config)
         subprocess.call(cmd.split())
 
         self.put_in_box('solvated.gro', 'solvated.gro')
 
-        pore_defining_atoms = lc_class.LC(self.args.build_monomer).pore_defining_atoms
-
-        self.solvated = solute_partitioning.System('solvated.gro', self.args.build_monomer, 'SOL')
+        self.solvated = solute_partitioning.System('solvated.gro', self.build_monomer.name, 'SOL')
         self.solvated.locate_pore_centers()
 
-        # radius based on reference atom of lc_class, but partition based on pore_defining_atoms. Need to make choice or leave it
+        # radius based on reference atom, but partition based on pore_defining_atoms. Need to make choice or leave it
         self.solvated.partition(self.r)
 
-        if abs(self.pore_water - len(self.solvated.pore_water[0])) <= self.args.tolerance:
+        if abs(self.pore_water - len(self.solvated.pore_water[0])) <= self.tolerance:
             self.converged = True
 
         if self.pore_water != self.solvated.pore_water[0]:  # avoid duplicates
@@ -238,14 +315,14 @@ class System(object):
 
     def update_database(self, database='water_content.db'):
 
-        connection = sql.connect("%s/%s" % (location, database))  # database created in this directory
+        connection = sql.connect("%s/%s" % (self.location, database))  # database created in this directory
 
         crsr = connection.cursor()
 
         sql_command = "insert into radii (monomer, radius, mon_per_col, nwater, pd_angle, dbwl, seed) values ('%s'," \
-                      "%.6f, %d, %d, %.2f, %.2f, %d);" % (self.args.build_monomer.split('.')[0], self.r,
-                      self.args.monomers_per_column, len(self.solvated.pore_water[0]), self.args.parallel_displaced,
-                                                          self.args.dbwl, self.args.random_seed)
+                      "%.6f, %d, %d, %.2f, %.2f, %d);" % (self.build_monomer.name, self.r, self.monomers_per_column,
+                                                          len(self.solvated.pore_water[0]), self.parallel_displaced,
+                                                          self.dbwl, self.random_seed)
 
         crsr.execute(sql_command)
 
@@ -253,6 +330,9 @@ class System(object):
         connection.close()
 
     def write_final_pore_configuration(self):
+        """ Write the configuration with the correct number of water molecules placed in the pore region, then
+        rwrite topology files.
+        """
 
         # only do this if we have converged on the correct number of waters
         water_indices = []
@@ -273,33 +353,58 @@ class System(object):
         # rewrite topology files
         self.input_files('solvated_pores.gro', 'nvt')
 
-    def place_water_tails(self):
+    def place_water_tails(self, output):
+        """ Place the desired number of water molecules in the tails. This is done by randomly inserting water molecules
+        in close proximity to the tails, one-by-one. A short energy minimzation is performed between each insertion.
 
-        tails = solvate_tails.System('solvated_pores.gro', 'topol.top', self.args.build_monomer,
-                                     rbounds=[0.3, 1], restraints=True, mpi=self.args.mpi, nproc=self.args.nproc)
+        :param output: Name of final configuration
 
-        tails.insert_all_water(self.tail_water, output=self.args.output, final_topname='topol.top')
+        :type output: str
+        """
 
-    def full_equilibration(self):
+        tails = solvate_tails.System('solvated_pores.gro', 'topol.top', self.build_monomer.name, rbounds=[0.3, 1],
+                                     restraints=True, mpi=self.mpi, nproc=self.np)
 
-        equil.simulate('nvt.mdp', 'topol.top', '%s' % self.args.output, 'nvt', mpi=self.args.mpi, np=self.args.nproc,
-                       restrained=True)
+        tails.insert_all_water(self.tail_water, output=output, final_topname='topol.top')
+
+    def full_equilibration(self, forces, fully_solvated='solvated_final.gro', l_nvt=50, l_berendsen=5000, l_pr=400000,
+                           restraint_residue='HII', restraint_axis='xyz',
+                           ring_restraints=("C", "C1", "C2", "C3", "C4", "C5")):
+        """ Simulate the unit cell with a sequence of decreasing restraints placed on the head group
+
+        :param forces: sequence of forces to apply to ring_restraints (:math:`\dfrac{kJ}{mol~nm^2}`)
+        :param fully_solvated: name of fully solvated coordinate file
+        :param l_nvt: Length of short restrained simulations (ps)
+        :param l_berendsen: Length of equilibration simulation run with berendsen pressure control (ps)
+        :param l_pr: Length of long equilibration simulation run with Parrinello-Rahman pressure control (ps)
+        :param restraint_residue: Name of residue to which position restraints will be applied
+        :param restraint_axis: Axis/axes along which head groups should be restrained
+        :param ring_restraints: Names of head group atoms
+
+        :type forces: tuple or list
+        :type fully_solvated: str
+        :type l_nvt: int
+        :type l_berendsen: int
+        :type l_pr: int
+        :type restraint_residue: str
+        :type restraint_axis: str
+        :type ring_restraints: tuple
+        """
+
+        equil.simulate('nvt.mdp', 'topol.top', '%s' % fully_solvated, 'nvt', mpi=self.mpi, np=self.np, restrained=True)
 
         cp = "cp nvt.gro em.gro"
         subprocess.Popen(cp.split()).wait()
 
-        cp = "cp nvt.gro %s.gro" % self.args.forces[0]
+        cp = "cp nvt.gro %s.gro" % forces[0]
         subprocess.Popen(cp.split()).wait()
 
-        equil.generate_input_files('nvt.gro', 'nvt', args.length_nvt, genvel=False,
-                                   restraints=self.args.restraint_residue)
+        equil.generate_input_files('nvt.gro', 'nvt', l_nvt, genvel=False, restraints=restraint_residue)
 
-        for f in self.args.forces[1:]:
+        for f in forces[1:]:
 
-            equil.restrain(self.args.output, self.args.build_monomer, f, self.args.restraint_axis,
-                           self.args.ring_restraints)
-            equil.simulate('nvt.mdp', 'topol.top', 'em.gro', 'nvt', mpi=self.args.mpi, np=self.args.nproc,
-                           restrained=True)
+            equil.restrain(fully_solvated, self.build_monomer.name, f, restraint_axis, ring_restraints)
+            equil.simulate('nvt.mdp', 'topol.top', 'em.gro', 'nvt', mpi=self.mpi, np=self.np, restrained=True)
 
             cp = "cp nvt.gro %s.gro" % f
             subprocess.Popen(cp.split()).wait()
@@ -307,13 +412,11 @@ class System(object):
             cp = "cp nvt.trr %s.trr" % f
             subprocess.Popen(cp.split()).wait()
 
-        equil.generate_input_files(self.args.output, 'npt', self.args.length_berendsen, genvel=False,
-                                   barostat='berendsen', frames=50)
-        equil.simulate('npt.mdp', 'topol.top', 'nvt.gro', 'berendsen', mpi=args.mpi, np=args.nproc)
+        equil.generate_input_files(fully_solvated, 'npt', l_berendsen, genvel=False, barostat='berendsen', frames=50)
+        equil.simulate('npt.mdp', 'topol.top', 'nvt.gro', 'berendsen', mpi=self.mpi, np=self.np)
 
-        equil.generate_input_files('berendsen.gro', 'npt', self.args.length_Parrinello_Rahman, genvel=False,
-                                   barostat='Parrinello-Rahman', frames=500)
-        equil.simulate('npt.mdp', 'topol.top', 'berendsen.gro', 'PR', mpi=args.mpi, np=args.nproc)
+        equil.generate_input_files('berendsen.gro', 'npt', l_pr, genvel=False, barostat='Parrinello-Rahman', frames=500)
+        equil.simulate('npt.mdp', 'topol.top', 'berendsen.gro', 'PR', mpi=self.mpi, np=self.np)
 
 
 if __name__ == "__main__":
@@ -322,13 +425,21 @@ if __name__ == "__main__":
 
     args = initialize().parse_args()
 
-    sys = System(args)
+    sys = System(args.build_monomer, args.weight_percent, args.ratio, solute='HOH', nopores=args.nopores,
+                 ncolumns=args.ncolumns, monomers_per_column=args.monomers_per_column, p2p=args.p2p,
+                 parallel_displaced=args.parallel_displaced, dbwl=args.dbwl, random_seed=args.random_seed,
+                 mpi=args.mpi, nproc=args.nproc, tolerance=args.tolerance)
 
     while not sys.converged:
-        sys.query_database()
-        sys.equilibrate()
-        sys.calculate_pore_water()
+        sys.query_database(database='water_content.db', guess_range=args.guess_range, guess_stride=args.guess_stride)
+        sys.equilibrate(input_files=True, length=args.length_nvt, force=args.forces[0],
+                        restraint_residue=args.restraint_residue, restraint_axis=args.restraint_axis,
+                        ring_restraints=args.ring_restraints)
+        sys.calculate_pore_water(args.forces[0])
 
     sys.write_final_pore_configuration()
-    sys.place_water_tails()
-    sys.full_equilibration()
+    sys.place_water_tails(args.output)
+    sys.full_equilibration(args.forces, fully_solvated=args.output, l_berendsen=args.length_berendsen,
+                           l_nvt=args.length_nvt, l_pr=args.length_Parrinello_Rahman,
+                           restraint_axis=args.restraint_axis, restraint_residue=args.restraint_residue,
+                           ring_restraints=args.ring_restraints)

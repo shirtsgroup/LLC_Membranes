@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from LLC_Membranes.analysis import Poly_fit
 from LLC_Membranes.llclib import timeseries, fitting_functions
 import tqdm
-from fbm_fork import fbm
+import fbm
 
 
 def initialize():
@@ -33,7 +33,7 @@ def initialize():
 
 class FractionalBrownianMotion(object):
 
-    def __init__(self, nsteps, hurst, ntraj=1, length=1, method="daviesharte", scale=None):
+    def __init__(self, nsteps, hurst, ntraj=1, length=1, method="daviesharte", scale=1, progress=True):
         """ Generate trajectories exhibiting fractional brownian motion
 
         :param nsteps: number of steps in trajectory
@@ -41,20 +41,22 @@ class FractionalBrownianMotion(object):
         :param ntraj: number of independent trajetories to generate
         :param length: total length of simulation trajectory
         :param method: method of fractional brownian motion simulation
+        :param scale: standard deviation in step size. A bigger scale means bigger steps.
         """
 
         self.hurst = hurst
         self.ntraj = ntraj
         self.nsteps = nsteps
 
-        self.fbm = fbm.FBM(self.nsteps, self.hurst, length=length, method=method, scale=scale)
+        self.fbm = fbm.FBM(self.nsteps, self.hurst, length=length, method=method)
         self.time = fbm.times(self.nsteps, length=length)
 
         self.trajectories = np.zeros([nsteps + 1, ntraj])
 
-        print('Generating FBM trajectories...')
-        for i in tqdm.tqdm(range(ntraj)):
-            self.trajectories[:, i] = self.fbm.fbm()
+        if progress:
+            print('Generating FBM trajectories...')
+        for i in tqdm.tqdm(range(ntraj), disable=(not progress)):
+            self.trajectories[:, i] = self.fbm.fbm()*scale
 
         self.msd = None
         self.fit_parameters = None

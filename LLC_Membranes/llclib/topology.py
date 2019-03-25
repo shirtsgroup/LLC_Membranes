@@ -190,7 +190,7 @@ class Residue(ReadItp):
 
             self.is_ion = True
             self.natoms = 1
-            self.mw = ions_mw[name]
+            self.MW = ions_mw[name]
             self.mass = {}  # key = atom name, value = mass
             self.mass[name] = ions_mw[name]
 
