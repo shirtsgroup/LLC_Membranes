@@ -11,6 +11,7 @@ r = 'BUT'
 atoms = ['C', 'O']
 wt=10
 maximum = 0
+opacity = 0.4
 
 fig, ax = plt.subplots()
 
@@ -20,11 +21,11 @@ for a in atoms:
 
 	rdf = file_rw.load_object('%s/rdf_%s_%s.pl' %(path, r, a))
 
-	mean = rdf.density.mean(axis=0)
+	mean = rdf.density[:500, :].mean(axis=0)
 	max_loc = np.argmax(mean)
 	ax.plot([rdf.r[max_loc], rdf.r[max_loc]], [0, 1.05*np.max(mean)], '--', color='black', linewidth=2)
 	ax.plot(rdf.r, mean, label='%s : %s' % (names.res_to_name[r], a))
-	ax.fill_between(rdf.r, rdf.errorbars[1, :] + mean, mean - rdf.errorbars[0, :], alpha=0.7)
+	ax.fill_between(rdf.r, rdf.errorbars[1, :] + mean, mean - rdf.errorbars[0, :], alpha=opacity)
 
 #im = plt.imread('butanol_labeled.png')
 #axins = plt.axes([0, 0, 1, 1])

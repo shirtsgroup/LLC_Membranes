@@ -157,17 +157,17 @@ class Diffusivity(object):
         # np.random.seed(4)  # 4 gives a nice spread for ethanol
         # trajs = np.random.randint(0, self.com.shape[1], size=3)
         # print(trajs)
-        trajs = np.arange(24)
-        for i in trajs:
-            plt.plot(self.time, self.com[:, i, 2], linewidth=2)
+        # trajs = np.arange(24)
+        # for i in trajs:
+        #     plt.plot(self.time, self.com[:, i, 2], linewidth=2)
 
-        plt.ylabel('$z$-coordinate (nm)', fontsize=14)
-        plt.xlabel('Time (ns)', fontsize=14)
-        plt.gcf().get_axes()[0].tick_params(labelsize=14)
-
-        plt.tight_layout()
-
-        plt.show()
+        # plt.ylabel('$z$-coordinate (nm)', fontsize=14)
+        # plt.xlabel('Time (ns)', fontsize=14)
+        # plt.gcf().get_axes()[0].tick_params(labelsize=14)
+        #
+        # plt.tight_layout()
+        #
+        # plt.show()
         # exit()
 
         self.weights = True
@@ -176,7 +176,7 @@ class Diffusivity(object):
 
         self.dt = self.time[-1] - self.time[-2]  # time step (assuming equispaced time points)
 
-    def restrict_to_pore(self, r, dwell_fraction=0.95, tails=False, build_monomer='NAcarb11V.gro', spline=False,
+    def restrict_to_pore(self, r, dwell_fraction=0.95, tails=False, build_monomer='NAcarb11V', spline=False,
                          buffer=0, npores=4):
         """ Restrict calculations to center of masses (COMs) that primarily stay in the pore OR tail region
 
@@ -471,6 +471,7 @@ class Diffusivity(object):
                            "wt_water = %.1f" % \
                            (tablename, data_labels[0], msd, data_labels[1], msd_lower, data_labels[2], msd_upper,
                             self.time[-1], self.residue, wt_water)
+            print(update_entry)
 
             crsr.execute(update_entry)
 
@@ -539,7 +540,7 @@ if __name__ == "__main__":
     if args.ensemble:
         args.fracshow = 1  # same amount of statistics at each frame
 
-    show = True
+    show = False
     D.plot(args.axis, fracshow=args.fracshow, show=show)
 
     if args.update:

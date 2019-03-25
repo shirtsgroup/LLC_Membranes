@@ -27,9 +27,9 @@ recalculate = False
 simple_alcohols = False
 polyols = False 
 head_groups = True 
-thiol_comparison = False
+thiol_comparison = True
 ketones = False 
-nondonors = True
+nondonors = False 
 probability = False 
 
 if simple_alcohols:
@@ -37,8 +37,8 @@ if simple_alcohols:
 elif polyols:
 	residues=["GCL", "PG", "GLY", "TET", "RIB"]
 elif thiol_comparison:
-	residues=["SOH", "GCL"]
-	#residues=["DMP", "GLY"]
+	#residues=["SOH", "GCL"]
+	residues=["DMP", "GLY"]
 	#residues=["DMS", "ATO"]
 elif ketones:
 	residues=["ACH", "URE", "ACN", "ATO"]
@@ -56,6 +56,7 @@ maximum = 0
 i = 0
 v = np.zeros([len(residues), 49])
 equil = 200  # chop off first equil frames
+opacity = 0.4
 for r in residues:
 
 	path = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/%s/%dwt" %(r,wt)
@@ -75,8 +76,8 @@ for r in residues:
 
 	new_max = np.amax(mean[np.argwhere(rdf.r > 0.4)])  # really looking for the head group peak
 	maximum = max(maximum, new_max)
-	plt.plot(rdf.r, mean, label='%s' % names.res_to_name[r])
-	plt.fill_between(rdf.r, rdf.errorbars[1, :] + mean, mean - rdf.errorbars[0, :], alpha=0.7)
+	plt.plot(rdf.r, mean, label='%s' % names.res_to_name[r], linewidth=2)
+	plt.fill_between(rdf.r, rdf.errorbars[1, :] + mean, mean - rdf.errorbars[0, :], alpha=opacity)
 	#v[i, :] = [mean[i] * np.pi*(rdf.r[i + 1] ** 2 - rdf.r[i] ** 2) for i in range(len(rdf.r) - 1)]
 	#print(r, sum(v[i, :np.argmin(np.abs(rdf.r - 0.4)**2)]))
 	#plt.plot(rdf.r[:-1], v[i, :])
@@ -113,7 +114,7 @@ if head_groups:
 	# Option 1 
 	plt.plot(hg.r, mean, '--', color='black', label='Head Groups')
 	#plt.fill_between(hg.r, mean + std, mean - std, alpha=0.6, color='black')
-	plt.fill_between(hg.r, mean + error[1, :], mean - error[0, :], alpha=0.6, color='black')
+	plt.fill_between(hg.r, mean + error[1, :], mean - error[0, :], alpha=opacity, color='black')
 
 	# Option 2
 	#rmax = hg.r[np.argmax(mean)]
@@ -145,12 +146,13 @@ if head_groups:
 
 plt.ylabel('Density (count / nm$^3$)', fontsize=14)
 plt.xlabel('Distance from pore center (nm)', fontsize=14)
-#plt.ylim(-0.05, 1.3) # for diols only
+# plt.ylim(-0.05, 1.3) # for diols only
 #plt.ylim(-0.015, 0.45) # for DMSO and acetone thiol comparison
-# plt.ylim(-0.015, 0.5) # for mercaptoethanol and ethylene glycol comparison
-plt.ylim(-0.015, 0.55) # for nondonors
+#plt.ylim(-0.015, 0.5) # for mercaptoethanol and ethylene glycol comparison
+#plt.ylim(-0.015, 0.55) # for nondonors
 plt.gcf().get_axes()[0].tick_params(labelsize=14)
-plt.legend(fontsize=13, loc=1, ncol=2, columnspacing=0.5)
+#plt.legend(fontsize=13, loc=1, ncol=2, columnspacing=0.5)  # for nondonors
+plt.legend(fontsize=14, loc=1)
 plt.tight_layout()
 if simple_alcohols:
 	plt.savefig('simple_alcohol_rdf.pdf')

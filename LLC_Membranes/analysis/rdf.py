@@ -336,4 +336,4 @@ if __name__ == "__main__":
 
         file_rw.save_object(rdfs[i], '%s.pl' % savename)
 
-    # plt.show()
+    plt.show()

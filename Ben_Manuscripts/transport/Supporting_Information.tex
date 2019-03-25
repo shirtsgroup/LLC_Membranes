@@ -307,7 +307,7 @@
   ratio $\dfrac{L}{Z}$ where $L$ is the length of the spline and $Z$ is 
   the length of the unit cell in the $z$-direction.
 
-  \subsection{Hydrogen Bond Detection Sensitivity}\label{section:hbond_sensisitivity}
+  \subsection{Hydrogen Bond Detection Sensitivity}\label{section:hbond_sensitivity}
   
   In Section~\ref{M-method:hbonds} of the main text, we established geometric criteria for the 
   identification of hydrogen bond interactions. Namely, if the distance between the donor,
@@ -349,6 +349,53 @@
   geometric criteria for hydrogen bonding. We varied the distance cut-off between 3.0 and
   4.0 \AA, and varied the angle cut-off between 25 and 35 \degree.}\label{fig:hbond_sensitivity}
   \end{figure}
+
+  \subsection{Solute Pairing with Sodium}
+
+  \begin{figure}[!htb]
+  \centering
+  %MRS2: would be better if this was paired with ensemble data, instead of just one trajectory.
+  \includegraphics[width=0.45\textwidth]{na_met_trace.pdf}  % create with nn.py located in MET/10wt
+  \caption{The oxygen atom of methanol stays within 2.5 \AA~of the same sodium ion for
+  the majority of the trapping occurence between 400 and 600 ns. Regions
+  highlighted red or blue indicate times when methanol's oxygen atom is within 
+  2.5 \AA~of a sodium ion. The color of the shaded regions are switched every time
+  the oxygen atom becomes associated to a different sodium ion.}\label{fig:na_met_trace}
+  \end{figure}
+  
+  %BJC: could probably safely remove this figure
+  \subsection{Mercaptoethanol's range of behavior}
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\linewidth]{SOH_trace.pdf}
+  \caption{}\label{fig:SOH_trace}
+  \end{subfigure}
+  \caption{Mercaptoethanol exhibits transport behavior ranging from frequent hopping
+  to lengthy trapping. Large hops generally occur near the pore center while 
+  long entrapments occur while tangled among the monomer tails.}
+  \end{figure}
+  
+  \subsection{THF-sodium Complexation}
+  
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{thf_sodium_coordination.pdf}
+  \caption{Coordination of THF with sodium ions may help stabilize it inside the
+  pore region. For the first 700 ns of the trajectories shown, the center of mass
+  of THF (top line in top figure) and a sodium ion (bottom line in top figure) move
+  in tandem. The distance between the oxygen atom of THF and the sodium ion has only
+  occasional fluctuations away from a relatively stable separation of ca. 0.25 nm. 
+  After 700 ns, THF separates from the sodium ion and moves closer to the head group
+  region.}\label{fig:thf_sodium_coordination}
+  \end{figure}
+  %MRS2: Can we show something that describes a distribution of multiple THF? this is just one, 
+  % which is suggestive, but this sort of suggestive information maybe should be in supporting. 
+  %MRS2: did you trace down any information on THF-ion complexation? We should be able to report on whether
+  %this is physical or a force field artifact.
+  % BJC2: probably better to find evidence of ether-ion complexation since it applies to multiple
+  % solutes that we studied
   
 % BJC: the arguments in the following section aren't as strong as I want them to be. 
 % And not necessary for this paper.
