@@ -540,7 +540,7 @@ if __name__ == "__main__":
     if args.ensemble:
         args.fracshow = 1  # same amount of statistics at each frame
 
-    show = False
+    show = True
     D.plot(args.axis, fracshow=args.fracshow, show=show)
 
     if args.update:

@@ -5,6 +5,8 @@ from LLC_Membranes.llclib import file_rw
 import numpy as np
 import matplotlib.pyplot as plt
 
+# run: coordination_number.py -t PR_nojump.xtc -g berendsen.gro -r NA -rc HOH/HII -ac OW / O3 O4
+
 head_groups = True
 wts = [5, 10] 
 #res = ['ACH', 'ACN', 'ATO', 'BUT', 'DMF', 'DMP', 'DMS', 'EAC', 'ETH', 'GCL', 'GLY', 'MET', 'PCB', 'PG', 'PR', 'RIB', 'SOH', 'TET', 'THF', 'URE']

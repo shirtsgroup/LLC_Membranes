@@ -7,9 +7,15 @@ import numpy as np
 
 # pickle files generated with : rdf.py -t PR_nojump.xtc -g berendsen.gro -r HII -a 'head groups' -r HII -a 'tails' -r NA -r HOH -spline
 
-wt = 5 
-path = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/MET/%dwt" % wt
-pickles = ['NA', 'HII_tails', 'HII_head groups', 'HOH']
+wt = 10 
+dry = False
+
+if dry:
+	path = "/home/bcoscia/Data/structure_paper/main_systems/offset"
+	pickles = ['NA', 'HII_tails', 'HII_head groups']
+else:
+	path = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/pure_water/%dwt" % wt
+	pickles = ['NA', 'HII_tails', 'HII_head groups', 'HOH']
 labels= ['Sodium', 'Tails', 'Head Groups', 'Water']
 colors = ['xkcd:blue', 'xkcd:red', 'xkcd:green', 'xkcd:orange']
 
@@ -30,5 +36,8 @@ plt.gcf().get_axes()[0].tick_params(labelsize=14)
 plt.legend(fontsize=14, loc=1)
 plt.tight_layout()
 
-plt.savefig('component_density_%swt.pdf' % wt)
+if dry:
+	plt.savefig('component_density_dry.pdf')
+else:
+	plt.savefig('component_density_%swt.pdf' % wt)
 plt.show()

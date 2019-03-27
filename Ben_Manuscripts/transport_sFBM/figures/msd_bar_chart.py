@@ -5,7 +5,7 @@ import sqlite3 as sql
 import numpy as np
 import names
 
-connection = sql.connect("../../../timeseries/msd.db")
+connection = sql.connect("../../../LLC_Membranes/timeseries/msd.db")
 crsr = connection.cursor()
 restrict_by_name = False 
 penalty = 0.5
@@ -111,6 +111,6 @@ ax.set_xticklabels(labels, fontsize=14)
 ax.legend(fontsize=14)
 plt.xticks(rotation=90)
 fig.tight_layout()
-plt.savefig(savename)
+#plt.savefig(savename)
 plt.show()
 
