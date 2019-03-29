@@ -76,7 +76,7 @@ class Geometry(object):
         print("Calculating Maximum Pairwise radius...")
         for t in tqdm.tqdm(range(self.nframes)):  # calculate radius at each frame
             for r in range(self.nres):  # calculate radius of each residue separately
-                self.radius[r, t] = distance.pdist(self.xyz[t, self.res_ndx[r, :], :]).max()
+                self.radius[r, t] = distance.pdist(self.xyz[t, self.res_ndx[r, :], :]).max() / 2
 
     def calculate_volume(self):
         """ Calculate volume occupied by points making up residues using a Convex Hull

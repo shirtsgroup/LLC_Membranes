@@ -14,9 +14,9 @@ color_dict = {'MET':colors[0], 'ETH':colors[0], 'PR':colors[0], 'BUT':colors[0],
 
 simple_alcohols = False 
 diols = False 
-ketones = True 
+ketones = False 
 sulfur = False 
-nondonors = False
+nondonors = True 
 if simple_alcohols:
 	restrict = ['MET', 'ETH', 'PR', 'BUT']
 	shiftx = {'MET':0.005, 'ETH':0.005, 'PR':0.005, 'BUT':0.005}
@@ -102,9 +102,9 @@ if restrict:
 
 
 # Theoretical Calcuations
-water_size = 0.151391485766 # from ACH cubic box. std: 0.000407801323403
+water_size = 0.151391485766 / 2 # from ACH cubic box. std: 0.000407801323403
 
-r_theoretical = np.linspace(0.25, 0.68, 100)
+r_theoretical = np.linspace(0.125, 0.34, 100)
 #r_theoretical = np.linspace(min(r), 10, 1000)
 
 # values for methanol
@@ -116,7 +116,7 @@ elif wt == 5:
 	msd_max = 0.111 
 	msd_lower = 0.081
 	msd_upper = 0.139
-rmax = 0.283
+rmax = 0.283 / 2
 
 # Corrected version first
 alpha = water_size / r_theoretical # radius of solute (residue) to solvent (water) 
@@ -128,7 +128,7 @@ a_error_upper = fmax * msd_upper * rmax
 a_error_lower = fmax * msd_lower * rmax
 
 # Make Stokes-Einstein intersect with correction at r_intersect
-r_intersect = 5 # where we want stokes-einstein and corrected stoke-einstein to intersect
+r_intersect = 2.5 # where we want stokes-einstein and corrected stoke-einstein to intersect
 
 alpha_intersect = water_size / r_intersect
 f_intersect = ((3 * alpha_intersect / 2) + (1 / (1 + alpha_intersect)))**-1
