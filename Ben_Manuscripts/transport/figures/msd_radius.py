@@ -128,7 +128,7 @@ a_error_upper = fmax * msd_upper * rmax
 a_error_lower = fmax * msd_lower * rmax
 
 # Make Stokes-Einstein intersect with correction at r_intersect
-r_intersect = 2.5 # where we want stokes-einstein and corrected stoke-einstein to intersect
+r_intersect = 1000  # where we want stokes-einstein and corrected stoke-einstein to intersect
 
 alpha_intersect = water_size / r_intersect
 f_intersect = ((3 * alpha_intersect / 2) + (1 / (1 + alpha_intersect)))**-1

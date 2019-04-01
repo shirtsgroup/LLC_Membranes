@@ -502,7 +502,7 @@ def center_of_mass(pos, mass_atoms):
     return com
 
 
-def compdensity(coord, pore_centers, box, cut=1.5, nbins=50, spline=False):
+def compdensity(coord, pore_centers, box, cut=1.5, nbins=50, spline=False, radial_distances=True):
     """ Measure the density of a component as a function of the distance from the pore centers
 
     :param coord: the coordinates of the component(s) which you want a radial distribution of at each frame
@@ -527,32 +527,21 @@ def compdensity(coord, pore_centers, box, cut=1.5, nbins=50, spline=False):
     nT = coord.shape[0]
     pores = pore_centers.shape[1]
     density = np.zeros([nT, nbins])  # number / nm^3
+    nsolute = pore_centers.shape[2]
+
+    r_distances = None
+    if radial_distances:
+        r_distances = np.zeros([nT, nsolute])
 
     if spline:
 
-        # npts = pore_centers.shape[2]  # number of points making up the spline in each pore
-        #
-        # # edges = np.zeros([nT, pores, npts + 1])  # bin edges, where bin centers are defined by point in spline.
         for t in tqdm.tqdm(range(nT), unit=' Frames'):
+            rd = []
             for p in range(pores):
 
                 distances = radial_distance_spline(pore_centers[t, p, ...], coord[t, ...], box[t, ...])
-
-                # This should be a function
-                # edges[t, p, 1:-1] = ((pore_centers[t, p, 1:, 2] - pore_centers[t, p, :-1, 2]) / 2) + pore_centers[t, p, :-1, 2]
-                # edges[t, p, -1] = box[t, 2, 2]
-                #
-                # while np.min(coord[t, :, 2]) < 0 or np.max(coord[t, :, 2]) > box[t, 2, 2]:  # because cross-linked configurations can extend very far up and down
-                #     coord[t, :, 2] = np.where(coord[t, :, 2] < 0, coord[t, :, 2] + box[t, 2, 2], coord[t, :, 2])
-                #     coord[t, :, 2] = np.where(coord[t, :, 2] > box[t, 2, 2], coord[t, :, 2] - box[t, 2, 2], coord[t, :, 2])
-                #
-                # zbins = np.digitize(coord[t, :, 2], edges[t, p, :])
-                #
-                # # handle niche case where coordinate lies exactly on the upper or lower bound
-                # zbins = np.where(zbins == 0, zbins + 1, zbins)
-                # zbins = np.where(zbins == edges.shape[2], zbins - 1, zbins)
-                #
-                # distances = np.linalg.norm(coord[t, :, :2] - pore_centers[t, p, zbins - 1, :2], axis=1)
+                if radial_distances:
+                    rd += distances.tolist()
 
                 indices = np.where(distances < cut)[0]
 
@@ -561,19 +550,31 @@ def compdensity(coord, pore_centers, box, cut=1.5, nbins=50, spline=False):
                 density[t, :] += hist
 
             density[t, :] /= box[t, 2, 2]  # normalize by z-dimension
+            if radial_distances:
+                # The smallest nsolute distances represent minimum solute-pore distances
+                rd = np.array(rd)
+                r_distances[t, :] = rd[np.argsort(rd)][:nsolute]
 
     else:
 
         for t in tqdm.tqdm(range(nT), unit=' Frames'):
+            rd = []
             for p in range(pores):
                 # narrow down the positions to those that are within 'cut' of at least one pore
                 distances = np.linalg.norm(coord[t, :, :2] - pore_centers[t, p, :], axis=1)
+                if radial_distances:
+                    rd += distances.tolist()
                 indices = np.where(distances < cut)[0]
                 hist, bin_edges = np.histogram(distances[indices], bins=nbins, range=(0, cut))  # the range option is necessary
                 #  to make sure we have equal sized bins on every iteration
                 density[t, :] += hist
 
             density[t, :] /= box[t, 2, 2]  # normalize by z-dimension
+
+            if radial_distances:
+                # The smallest nsolute distances represent minimum solute-pore distances
+                rd = np.array(rd)
+                r_distances[t, :] = rd[np.argsort(rd)][:nsolute]
 
     # normalize based on volume of anulus where bin is located (just need to divide by area since height done above)
     r = np.zeros([nbins])
@@ -583,7 +584,10 @@ def compdensity(coord, pore_centers, box, cut=1.5, nbins=50, spline=False):
 
     density /= pores  # normalize by number of pores
 
-    return r, density
+    if radial_distances:
+        return r, density, r_distances
+    else:
+        return r, density
 
 
 def radial_distance_spline(spline, com, box):

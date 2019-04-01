@@ -267,9 +267,9 @@
   \end{subfigure}
   \caption{The water content in the tail and pore region is not affected
   by cross-linking}\label{fig:solvation_equilibration}
-  \end{figure}
+  \end{figure}  
   
-  \subsection{Solute Interaction}\label{section:solute_interaction}
+  \section{Solute Interaction}\label{section:solute_interaction}
   
   We chose to model 6 solutes in each pore because there was a low degree of 
   interaction between solutes which gave us a sufficient number of independent 
@@ -286,7 +286,69 @@
   molcules the most, does so less than 0.05 \% of the time.}\label{fig:solute_interation}
   \end{figure}
   
-  \subsection{Pore Splines}\label{section:splines}
+%  \subsection{Sensitivity of Breakdown radius of Stokes-Einstein Equation}\label{section:se_sensitivity}
+%  
+%  In the main text, we estimated the trend in solute MSDs using the Stokes-Einstein
+%  equation with the correction factor of Gierer and Wirtz, $f$, given by 
+%  equation~\ref{M-eqn:correction_factor}. As $r \rightarrow \infty$ , $f \rightarrow 1$.
+%  
+%  We assumed that the Stokes-Einstein relationship could be approximated as a
+%  piecewise function where the correction factor of Gierer and Wirtz, $f$, given
+%  by equation~\ref{M-eqn:correction_factor} of the main text, is only applied below
+%  a critical radius. At radii greater than the critical radius, $f$ = 1.
+%  
+%  In the main text, we constrained the corrected Stokes-Einstein equation so that
+%  it passed through the highest MSD value. We also plotted the uncorrected 
+%  Stokes-Einstein equation ($f$=1) as a lower bound to our expectations for 
+%  unrestricted solute motion. The lower bound is relatively insensitive to our
+%  choice of critical radius. Even for an unrealistically small critical radius 
+%  of 0.5 nm, the curve is within
+%  
+%  \begin{figure}[!htb]
+%  \centering
+%  \includegraphics[width=0.45\textwidth]{stokes_intersection_sensitivity.pdf}
+%  \caption{We varied the molecular radius at which we assumed the Stokes-Einstein
+%  (SE) relationship to breaks down. It is assumed that the Gierer and Wirtz correction
+%  to the SE equation becomes a more accurate estimation of MSD at small radii, after
+%  the point of intersection }\label{fig:se_intersection_sensitivity}
+%  \end{figure}
+
+  \section{Solute MSD Ranking Time Lag Sensitivity}\label{section:lag_sensitivity}
+  
+  We chose to report the MSD of our solutes after a 400 ns time lag. This choice does
+  not have a significant influence on the ranking of the solute MSDs. Although there
+  is minor re-ranking among solutes with similar MSDs, it does not affect any of 
+  the conclusions drawn in the main text.
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\textwidth]{all_10wt_tamsds_F0_2.pdf}
+  \caption{Time lag = 200 ns}\label{fig:F0.2}
+  \end{subfigure}
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\textwidth]{all_10wt_tamsds_F0_3.pdf}
+  \caption{Time lag = 300 ns}\label{fig:F0.3}
+  \end{subfigure}
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\textwidth]{all_10wt_tamsds_F0_4.pdf}
+  \caption{Time lag = 400 ns}\label{fig:F0.4}
+  \end{subfigure}
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\textwidth]{all_10wt_tamsds_F0_5.pdf}
+  \caption{Time lag = 500 ns}\label{fig:F0.5}
+  \end{subfigure}
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\textwidth]{all_10wt_tamsds_F0_6.pdf}
+  \caption{Time lag = 600 ns}\label{fig:F0.6}
+  \end{subfigure}
+  \caption{The choice of time lag used to report solute MSDs does not 
+  influence the trends reported in the main text. We observe minor re-ranking
+  of solutes with similar MSDs and note that longer time lags generally
+  lead to large error bars on the MSDs, as expected. }\label{fig:lag_sensitivity}
+  \end{figure}
+  
+  \section{Pore Splines}\label{section:splines}
   
   We captured the apparent $z$-dependence of the pore center locations by
   constructing splines running through each pore (See Figure~\ref{fig:spline}).
@@ -307,7 +369,7 @@
   ratio $\dfrac{L}{Z}$ where $L$ is the length of the spline and $Z$ is 
   the length of the unit cell in the $z$-direction.
 
-  \subsection{Hydrogen Bond Detection Sensitivity}\label{section:hbond_sensitivity}
+  \section{Hydrogen Bond Detection Sensitivity}\label{section:hbond_sensitivity}
   
   In Section~\ref{M-method:hbonds} of the main text, we established geometric criteria for the 
   identification of hydrogen bond interactions. Namely, if the distance between the donor,
@@ -349,8 +411,46 @@
   geometric criteria for hydrogen bonding. We varied the distance cut-off between 3.0 and
   4.0 \AA, and varied the angle cut-off between 25 and 35 \degree.}\label{fig:hbond_sensitivity}
   \end{figure}
+  
+  \section{Total Membrane Density}\label{section:total_density}
+  
+  In our simulations, we observe that water partitions into the tail region
+  because of the tails' low density. We plotted the density of all atoms in 
+  the system as function of their $xy$ positions within the unit cell. The 
+  pore centers of the 5 and 10 wt \% water systems have a relatively low density
+  that is comparable to the density in the tails far from the pore center
+  (see figures~\ref{fig:total_density_5wt} and~\ref{fig:total_density_10wt}).
+  The density is highest near the middle of the tails. The observed density distribution
+  is necessary in order for the wedge-shaped monomers to fill space and stay in
+  the hexagonal phase. Accordingly, water is densest in the pore center and at 
+  the tail ends (see figures~\ref{fig:total_water_density_5wt} 
+  and~\ref{fig:total_water_density_10wt}). Very little water is present in the 
+  dense mid-tail region. 
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{total_density_5wt.pdf}
+  \caption{5 wt \% water, spatial density of all atoms}\label{fig:total_density_5wt}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{total_water_density_5wt.pdf}
+  \caption{5 wt \% water, spatial density of water}\label{fig:total_water_density_5wt}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{total_density_10wt.pdf}
+  \caption{10 wt \% water, spatial density of all atoms}\label{fig:total_density_10wt}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{total_water_density_10wt.pdf}
+  \caption{10 wt \% water, spatial density of water}\label{fig:total_water_density_10wt}
+  \end{subfigure}
+  \caption{The lowest density regions of both membranes are in the pore center and in the
+  tail region, furthest from the pore center (a \& c). Water is densest in the low density
+  regions (b \& d).}\label{fig:total_density}
+  \end{figure}
 
-  \subsection{Solute Pairing with Sodium}
+  \section{Solute Pairing with Sodium}
 
   \begin{figure}[!htb]
   \centering
@@ -364,7 +464,7 @@
   \end{figure}
   
   %BJC: could probably safely remove this figure
-  \subsection{Mercaptoethanol's range of behavior}
+  \section{Mercaptoethanol's range of behavior}
   
   \begin{figure}
   \centering
@@ -377,7 +477,7 @@
   long entrapments occur while tangled among the monomer tails.}
   \end{figure}
   
-  \subsection{THF-sodium Complexation}
+  \section{THF-sodium Complexation}
   
   \begin{figure}
   \centering

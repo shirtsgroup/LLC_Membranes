@@ -127,6 +127,7 @@ class System(object):
         self.density = None
         self.bootstraps = None
         self.errorbars = None
+        self.radial_distances = None
 
     def build_com(self, rep='K'):
         """ Build system with the center of mass of the residue or group of atoms plotted in order to confirm that this script is working
@@ -183,8 +184,14 @@ class System(object):
             self.build_spline(pore_centers)  # to check that the spline was constructed properly
             print('Calculating component density')
 
-        self.r, self.density = physical.compdensity(self.com, pore_centers, self.t.unitcell_vectors,
-                                                    nbins=bins, spline=spline, cut=cut)
+        self.r, self.density, self.radial_distances = physical.compdensity(self.com, pore_centers,
+                                                                           self.t.unitcell_vectors,
+                                                                           nbins=bins, spline=spline, cut=cut,
+                                                                           radial_distances=True)
+
+        print('boop')
+        print(self.radial_distances)
+        exit()
 
     def build_spline(self, pore_centers, rep='K'):
         """ Build the spline into the last frame of the trajectory

@@ -434,25 +434,27 @@ class Diffusivity(object):
         if show:
             plt.show()
 
-    def update_database(self, wt_water, file="../timeseries/msd.db", tablename="msd", ensemble=False):
+    def update_database(self, wt_water, file="../timeseries/msd.db", tablename="msd", ensemble=False, frac=0.5):
         """ Update SQL database with information from this run
 
         :param wt_water: weight percent of water in system
         :param file: relative path (relative to directory where this script is stored) to database to be updated
         :param tablename: name of table being modified in database
         :param ensemble: True if ensemble MSD was calculated
+        :param frac: Maximum time lag expressed as fraction of total simulation length
 
         :type wt_water: float
         :type file: str
         :type tablename: str
         :type ensemble: bool
+        :type frac: float
         """
 
         connection = sql.connect("%s/%s" % (self.script_location, file))
         crsr = connection.cursor()
 
-        check_existence = "SELECT COUNT(1) FROM %s WHERE name = '%s' and wt_water = %.1f" % (tablename, self.residue,
-                                                                                             wt_water)
+        check_existence = "SELECT COUNT(1) FROM %s WHERE name = '%s' and wt_water = %.1f and F = %.2f" % (tablename,
+                           self.residue, wt_water, frac)
 
         output = crsr.execute(check_existence).fetchall()
 
@@ -468,19 +470,19 @@ class Diffusivity(object):
         if output[0][0] > 0:
 
             update_entry = "UPDATE %s SET %s = %.3f, %s = %.3f, %s = %.3f, sim_length = %.2f where name = '%s' and " \
-                           "wt_water = %.1f" % \
+                           "wt_water = %.1f and F = %.2f" % \
                            (tablename, data_labels[0], msd, data_labels[1], msd_lower, data_labels[2], msd_upper,
-                            self.time[-1], self.residue, wt_water)
+                            self.time[-1], self.residue, wt_water, frac)
             print(update_entry)
 
             crsr.execute(update_entry)
 
         else:
 
-            fill_new_entry = "INSERT INTO %s (name, %s, %s, %s, wt_water, sim_length) VALUES ('%s', %.3f, %.3f, %.3f, " \
-                             "%.1f, %.2f)" % \
-                             (tablename, data_labels[0], data_labels[1], data_labels[2], self.residue, msd, msd_lower,
-                              msd_upper, wt_water, self.time[-1])
+            fill_new_entry = "INSERT INTO %s (name, %s, %s, %s, wt_water, sim_length, F) VALUES ('%s', %.3f, %.3f," \
+                             "%.3f, %.1f, %.2f, %.2f)" % (tablename, data_labels[0], data_labels[1], data_labels[2],
+                                                          self.residue, msd, msd_lower, msd_upper, wt_water,
+                                                          self.time[-1], frac)
 
             crsr.execute(fill_new_entry)
 
@@ -540,11 +542,11 @@ if __name__ == "__main__":
     if args.ensemble:
         args.fracshow = 1  # same amount of statistics at each frame
 
-    show = True
+    show = False
     D.plot(args.axis, fracshow=args.fracshow, show=show)
 
     if args.update:
-        D.update_database(args.wt_water, ensemble=args.ensemble)
+        D.update_database(args.wt_water, ensemble=args.ensemble, frac=args.fracshow)
 
     if not args.power_law and not args.nofit:
         print('D = %1.2e +/- %1.2e cm^2/s' % (D.Davg, np.abs(D.Davg - D.confidence_interval[0])))
