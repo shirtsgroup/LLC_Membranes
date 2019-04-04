@@ -16,7 +16,7 @@ def initialize():
     parser.add_argument('-t', '--traj', default='traj_whole.xtc', help='Trajectory file (.trr, .xtc should work)')
     parser.add_argument('-r', '--residue', help='Name of residue whose '
                         'radial distribution function we want to calculate')
-    parser.add_argument('-l', '--load', default=False, type=str, help='Name of compressed pickel file to load')
+    parser.add_argument('-l', '--load', default=False, type=str, help='Name of compressed pickle file to load')
     parser.add_argument('-cmax', '--set_cmap_max', default=False, type=float, help='Set the maximum on the colorbar')
     parser.add_argument('-cmap', '--colormap', default='plasma', type=str, help='Name of color map. See '
                         'https://matplotlib.org/examples/color/colormaps_reference.html for others.')
@@ -68,6 +68,27 @@ class HopLocation(System):
 
         for i in range(bins):
             ax.bar(bar_locations[i], heights[i], bar_width, color=colors[i])
+
+        lower_cut = 0.25
+        upper_cut = 0.65
+        lower_cut_ndx = np.argmin(np.abs(lower_cut - bar_locations))
+        upper_cut_ndx = np.argmin(np.abs(upper_cut - bar_locations))
+        print("Average hop length between %.2f and %.2f nm from the pore center: %.2f nm" % (lower_cut, upper_cut,
+              np.sum(heat[lower_cut_ndx:upper_cut_ndx] * heights[lower_cut_ndx:upper_cut_ndx]) /
+              np.sum(heights[lower_cut_ndx:upper_cut_ndx])))
+
+        cut = 0.65
+
+        cut_ndx = np.argmin(np.abs(cut - bar_locations))
+        print("Average hop length when less than %.2f nm from the pore center: %.2f nm" % (cut,
+              np.sum(heat[:cut_ndx] * heights[:cut_ndx]) / np.sum(heights[:cut_ndx])))
+
+        print("Total hops: %.2f" % sum(heights))
+        print("Total hops in pore: %.2f" % sum(heights[:cut_ndx]))
+        # exit()
+        # print(np.mean(heights[:cut_ndx]))
+        # print(bar_locations[cut_ndx])
+        # exit()
 
         # set up colorbar
         sm = ScalarMappable(cmap=cmap, norm=plt.Normalize(0, cmax))

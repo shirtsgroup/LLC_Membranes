@@ -3,7 +3,7 @@
 import argparse
 import numpy as np
 import mdtraj as md
-from LLC_Membranes.llclib import physical, topology, transform
+from LLC_Membranes.llclib import physical, topology, transform, file_rw
 import sys
 import tqdm
 from scipy.sparse import lil_matrix
@@ -31,7 +31,8 @@ def initialize():
                         'residue')
     parser.add_argument('-a', '--atoms', default=None, nargs='+', help='Name of atoms to calculate correlation '
                         'function with respect to. The center of mass will be used')
-    parser.add_argument('-ta', '--type', default=None, help='Element name of atoms that you want coordination number of')
+    parser.add_argument('-ta', '--atype', default=None, help='Element name of atoms of which you want coordination '
+                                                             'number')
     parser.add_argument('-tc', '--coordinated_type', default=None, help='Element name of coordinated atoms')
 
     # coordination calculation parameters
@@ -286,6 +287,7 @@ class System(object):
 
         else:
             self.ncoord = np.zeros([self.t.n_frames, self.com.shape[1]])
+            print(self.ncoord.shape)
 
             for i in tqdm.tqdm(range(self.ncoord.shape[1])):
                 self.ncoord[:, i] = [len(np.nonzero(self.distances[t][i, :])[1]) for t in range(self.t.n_frames)]
@@ -323,17 +325,14 @@ if __name__ == "__main__":
             com = True
 
         system = System(args.traj, args.gro, atoms=args.atoms, coordinated_atoms=args.coordinated_atoms,
-                        residue=args.residue, coordinated_residue=args.coordinated_residue, type=args.type,
+                        residue=args.residue, coordinated_residue=args.coordinated_residue, type=args.atype,
                         ctype=args.coordinated_type, begin=args.begin, end=args.end, skip=args.skip, com=com)
 
         system.distance_search(cut=args.cut)  # calculate pairwise distance between all points in self.com and self.com_coordinated
 
         system.n_coordinated(plot=True)
 
-        print((system.ncoord.flatten() > 0).sum() / (system.ncoord.shape[0] * system.ncoord.shape[1]))
-
-        # with open(args.savename, 'wb') as f:
-        #     pickle.dump(system, f)
+        file_rw.save_object(system, args.savename)
 
     else:
         print('Loading pickled object!...', end='', flush=True)

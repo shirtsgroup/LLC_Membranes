@@ -173,9 +173,12 @@ class System(object):
                                and a.residue.name in self.monomer.residues]
 
         if not pore_defining_atoms:
-            sys.exit('There are no atoms specified which can be used to define the pore centers. Did you specify '
-                     'the correct monomer for this system? If so, have you properly annotated the pore defining '
-                     'atoms?')
+            sys.exit('There are no atoms specified which can be used to define the pore centers.\n'
+                     'There are a few reasons this might have happened:\n'
+                     '1) Did you specify the correct monomer for this system?\n'
+                     '2) If so, have you properly annotated the pore defining atoms?\n'
+                     '3) Perhaps there is an annotated .itp in LLC_Membranes/top/topologies, but an unannotated .itp '
+                     'file for the same monomer present in this directory.\n')
 
         pore_centers = physical.avg_pore_loc(4, self.t.xyz[:, pore_defining_atoms, :], self.box, spline=spline,
                                              progress=progress, npts=npts_spline)
@@ -188,10 +191,6 @@ class System(object):
                                                                            self.t.unitcell_vectors,
                                                                            nbins=bins, spline=spline, cut=cut,
                                                                            radial_distances=True)
-
-        print('boop')
-        print(self.radial_distances)
-        exit()
 
     def build_spline(self, pore_centers, rep='K'):
         """ Build the spline into the last frame of the trajectory

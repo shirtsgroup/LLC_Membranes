@@ -8,8 +8,8 @@ import names
 names = ["Tetrahydrofuran", "Propylene\nCarbonate", "Ethyl\nAcetate", "Dimethyl\nFormamide"]
 #hg = [12.7, 1.84, 1.12, 0]
 #donors = [6.6, 2.6, 1.2, 0]
-acc = [0.4475, 1.5, .65, .765]
-na = np.array([.157, .292, .27, .28]) * 24
+acc = 100 * np.array([0.4475, 1.5, .65, .765]) / 24
+na = 100 * np.array([.157, .292, .27, .28]) #* 24
 
 index = np.arange(len(names))
 
@@ -17,7 +17,7 @@ fig, ax = plt.subplots()
 
 bar_width = 0.4
 
-ax.set_ylabel('Occurences Per Frame', fontsize=14)
+ax.set_ylabel('Percent Solutes Involved Per Frame', fontsize=14)
 ax.set_xlabel('   ')
 ax.tick_params(labelsize=14)
 ax.set_xticks(index + bar_width / 2)
@@ -30,7 +30,7 @@ ax.bar(index, na, bar_width, alpha=opacity, label='Coordinated to sodium')
 ax.bar(index + bar_width, acc, bar_width, alpha=opacity, label='Hbonds accepted from water')
 #ax.bar(index + 3*bar_width, na, bar_width, alpha=opacity, label='coordinated to sodium')
 
-plt.ylim(0, 10)
+plt.ylim(0, 37.5)
 plt.legend(fontsize=14)
 plt.tight_layout()
 plt.savefig('nondonor_hbonds.pdf')

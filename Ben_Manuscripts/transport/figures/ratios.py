@@ -23,9 +23,9 @@ def calculate_rdf(res, path, gro='berendsen.gro', traj='PR_nojump.xtc', atoms=No
 	return rdf
 
 recalculate = False 
-residues = ["DMS", "ATO"]
+#residues = ["DMS", "ATO"]
 residues = ["SOH", "GCL"]
-radius=0.8 # calculate percentage in or out of this radius from pore center
+radius=0.65 # calculate percentage in or out of this radius from pore center
 wt=10
 n = np.zeros(len(residues))
 

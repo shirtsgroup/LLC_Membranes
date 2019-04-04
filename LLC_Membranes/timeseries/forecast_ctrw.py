@@ -8,7 +8,7 @@ import ruptures
 from scipy.optimize import curve_fit, minimize
 from LLC_Membranes.llclib import topology, physical, file_rw, fitting_functions, timeseries
 import tqdm
-from ctrwsim import CTRW
+from LLC_Membranes.timeseries.ctrwsim import CTRW
 import sqlite3 as sql
 import os
 
@@ -181,7 +181,7 @@ class System(object):
         :type membrane_residue: str
         """
 
-        membrane = topology.LC('%s.gro' % membrane_residue)  # object w/ attributes of LC making up membrane
+        membrane = topology.LC('%s' % membrane_residue)  # object w/ attributes of LC making up membrane
         keep = [a.index for a in self.t.topology.atoms if a.name in membrane.pore_defining_atoms and a.residue.name
                 == membrane.name]
         self.pore_centers = physical.avg_pore_loc(4, self.t.xyz[:, keep, :], self.t.unitcell_vectors, buffer=0,

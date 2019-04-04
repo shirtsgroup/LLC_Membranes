@@ -232,7 +232,7 @@ class System(object):
                 for j in range(dot.shape[0]):
                     dot[j] = np.dot(v[0, j, :], v[1, j, :])
 
-                a = np.arccos(dot) * (180/np.pi)  # convert to degrees
+                a = np.arccos(dot) * (180 / np.pi)  # convert to degrees
 
                 self.hbonds[i] = np.delete(self.hbonds[i], np.where(a > angle)[0], axis=1)
                 self.hbonds[i] = np.concatenate((self.hbonds[i], a[a < angle][np.newaxis, :]), 0)

@@ -10,7 +10,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes, InsetPosition
 r = 'BUT'
 atoms = ['C', 'O']
 wt=10
-maximum = 0
+
 opacity = 0.4
 
 fig, ax = plt.subplots()
@@ -21,7 +21,7 @@ for a in atoms:
 
 	rdf = file_rw.load_object('%s/rdf_%s_%s.pl' %(path, r, a))
 
-	mean = rdf.density[:500, :].mean(axis=0)
+	mean = rdf.density.mean(axis=0)
 	max_loc = np.argmax(mean)
 	ax.plot([rdf.r[max_loc], rdf.r[max_loc]], [0, 1.05*np.max(mean)], '--', color='black', linewidth=2)
 	ax.plot(rdf.r, mean, label='%s : %s' % (names.res_to_name[r], a))
@@ -41,6 +41,6 @@ plt.gcf().get_axes()[0].tick_params(labelsize=14)
 ax.legend(fontsize=14)
 plt.tight_layout()
 #plt.savefig('%s_%s.pdf' % (names.res_to_name[r], ''.join(atoms)))
-#plt.savefig('butanol_CO.pdf')
+plt.savefig('butanol_CO.pdf')
 plt.show()
 
