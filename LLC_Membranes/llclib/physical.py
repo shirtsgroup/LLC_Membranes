@@ -502,79 +502,43 @@ def center_of_mass(pos, mass_atoms):
     return com
 
 
-def compdensity(coord, pore_centers, box, cut=1.5, nbins=50, spline=False, radial_distances=True):
-    """ Measure the density of a component as a function of the distance from the pore centers
+def compdensity(coord, pore_centers, box, cut=1.5, nbins=50, spline=False):
+    """ Measure the density of a component as a function of the distance from the pore centers.
 
     :param coord: the coordinates of the component(s) which you want a radial distribution of at each frame
     :param pore_centers: a numpy array of the locations of each pore center at each trajectory frame
     :param cut: cutoff distance for distance calculations. Will not count anything further than cut from the pore center
-    :param pores: number of pores (int) default=4
-    :param rmax: maximum distance from pore center to calculate density for, default = 3.5 nm
-    :param buffer: percentage used to define the location of z planes between which component density will be computed,
-           float, default = 0 (i.e. no buffer). Should be between 0 and 1. e.g. for 1 percent, use 0.01 as the buffer
+    :param nbins: number of bins in r direction
+    :param spline: calculate RDF with respect to spline
 
-    :type component: numpy.ndarray
+    :type coord: numpy.ndarray
     :type pore_centers: numpy.ndarray
     :type cut: float
-    :type pores: int
-    :type rmax: float
-    :type buffer: float
+    :type nbins: int
+    :type spline: bool
 
-    :return: the density of "component" as a function the distance from the pore center. Also
-             returns the calculated bin width for plotting
+
+    :return: Radial distance from pore center r, and the density of a species, whose positions are defined by
+    `coordinates`, as a function the distance from the pore center.
     """
 
     nT = coord.shape[0]
     pores = pore_centers.shape[1]
     density = np.zeros([nT, nbins])  # number / nm^3
-    nsolute = pore_centers.shape[2]
 
-    r_distances = None
-    if radial_distances:
-        r_distances = np.zeros([nT, nsolute])
+    for t in tqdm.tqdm(range(nT), unit=' Frames'):
+        for p in range(pores):
 
-    if spline:
-
-        for t in tqdm.tqdm(range(nT), unit=' Frames'):
-            rd = []
-            for p in range(pores):
-
+            if spline:
                 distances = radial_distance_spline(pore_centers[t, p, ...], coord[t, ...], box[t, ...])
-                if radial_distances:
-                    rd += distances.tolist()
-
-                indices = np.where(distances < cut)[0]
-
-                hist, bin_edges = np.histogram(distances[indices], bins=nbins, range=(0, cut))
-
-                density[t, :] += hist
-
-            density[t, :] /= box[t, 2, 2]  # normalize by z-dimension
-            if radial_distances:
-                # The smallest nsolute distances represent minimum solute-pore distances
-                rd = np.array(rd)
-                r_distances[t, :] = rd[np.argsort(rd)][:nsolute]
-
-    else:
-
-        for t in tqdm.tqdm(range(nT), unit=' Frames'):
-            rd = []
-            for p in range(pores):
-                # narrow down the positions to those that are within 'cut' of at least one pore
+            else:
                 distances = np.linalg.norm(coord[t, :, :2] - pore_centers[t, p, :], axis=1)
-                if radial_distances:
-                    rd += distances.tolist()
-                indices = np.where(distances < cut)[0]
-                hist, bin_edges = np.histogram(distances[indices], bins=nbins, range=(0, cut))  # the range option is necessary
-                #  to make sure we have equal sized bins on every iteration
-                density[t, :] += hist
 
-            density[t, :] /= box[t, 2, 2]  # normalize by z-dimension
+            hist, bin_edges = np.histogram(distances, bins=nbins, range=(0, cut))
 
-            if radial_distances:
-                # The smallest nsolute distances represent minimum solute-pore distances
-                rd = np.array(rd)
-                r_distances[t, :] = rd[np.argsort(rd)][:nsolute]
+            density[t, :] += hist
+
+        density[t, :] /= (pores * box[t, 2, 2])  # normalize by z-dimension
 
     # normalize based on volume of anulus where bin is located (just need to divide by area since height done above)
     r = np.zeros([nbins])
@@ -582,12 +546,48 @@ def compdensity(coord, pore_centers, box, cut=1.5, nbins=50, spline=False, radia
         density[:, i] /= (np.pi * (bin_edges[i + 1] ** 2 - bin_edges[i] ** 2))
         r[i] = (bin_edges[i + 1] + bin_edges[i]) / 2  # center of bins
 
-    density /= pores  # normalize by number of pores
+    return r, density
 
-    if radial_distances:
-        return r, density, r_distances
-    else:
-        return r, density
+
+def distance_from_pore_center(coord, pore_centers, box, spline=False):
+    """ Measure the density of a component as a function of the distance from the pore centers.
+
+    :param coord: the coordinates of the component(s) which you want a radial distribution of at each frame
+    :param pore_centers: a numpy array of the locations of each pore center at each trajectory frame
+    :param cut: cutoff distance for distance calculations. Will not count anything further than cut from the pore center
+    :param
+
+    :type coord: numpy.ndarray
+    :type pore_centers: numpy.ndarray
+    :type cut: float
+
+    :return: Radial distance of each individual solute/component, defined by coords, as a function of time
+    """
+
+    nT = coord.shape[0]
+    pores = pore_centers.shape[1]
+    nsolute = coord.shape[1]
+
+    r_distances = np.zeros([nT, nsolute])
+
+    for t in tqdm.tqdm(range(nT), unit=' Frames'):
+        rd = np.zeros([nsolute, pores])
+        for p in range(pores):
+
+            if spline:
+                rd[:, p] = radial_distance_spline(pore_centers[t, p, ...], coord[t, ...], box[t, ...])
+            else:
+                rd[:, p] = np.linalg.norm(coord[t, :, :2] - pore_centers[t, p, :], axis=1)
+
+        # Move the minimum solute--pore-center distance for each solute to the first index of rd
+        # This removes any assumption that there is a constant number of solutes per pore and that the solute
+        # stays in the same pore.
+        for i, r in enumerate(rd):  # there is probably a vectorized way to do this with argsort
+            rd[i, :] = r[np.argsort(r)]
+
+        r_distances[t, :] = rd[:, 0]
+
+    return r_distances
 
 
 def radial_distance_spline(spline, com, box):

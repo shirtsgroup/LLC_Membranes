@@ -3,20 +3,21 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sqlite3 as sql
+import names as resnames
 
 path = "/home/bcoscia/PycharmProjects/LLC_Membranes/LLC_Membranes/analysis/"
 connection = sql.connect('%s/size.db' % path)
 crsr = connection.cursor()
 wt = 10  
 
-colors = ['blue', 'red', 'xkcd:green', 'xkcd:orange', 'xkcd:goldenrod']
-color_dict = {'MET':colors[0], 'ETH':colors[0], 'PR':colors[0], 'BUT':colors[0], 'GCL':colors[1], 'PG':colors[1], 'GLY':colors[1], 'TET':colors[1], 'RIB':colors[1], 'ACH':colors[2], 'URE':colors[2], 'ACN':colors[2], 'ATO':colors[2], 'SOH':colors[3], 'DMP':colors[3], 'DMS':colors[3], 'THF':colors[4], 'PCB':colors[4], 'EAC':colors[4], 'DMF':colors[4]}
+#colors = ['blue', 'red', 'xkcd:green', 'xkcd:orange', 'xkcd:goldenrod']
+#color_dict = {'MET':colors[0], 'ETH':colors[0], 'PR':colors[0], 'BUT':colors[0], 'GCL':colors[1], 'PG':colors[1], 'GLY':colors[1], 'TET':colors[1], 'RIB':colors[1], 'ACH':colors[2], 'URE':colors[2], 'ACN':colors[2], 'ATO':colors[2], 'SOH':colors[3], 'DMP':colors[3], 'DMS':colors[3], 'THF':colors[4], 'PCB':colors[4], 'EAC':colors[4], 'DMF':colors[4]}
 
 simple_alcohols = False 
 diols = False 
 ketones = False 
-sulfur = False 
-nondonors = True 
+sulfur = True
+nondonors = False 
 if simple_alcohols:
 	restrict = ['MET', 'ETH', 'PR', 'BUT']
 	shiftx = {'MET':0.005, 'ETH':0.005, 'PR':0.005, 'BUT':0.005}
@@ -89,7 +90,8 @@ msd_lower = msd_lower[ordered]
 msd_upper = msd_upper[ordered]
 sim_length = sim_length[ordered]
 
-scatter_colors = [color_dict[i] for i in names]
+scatter_colors = [resnames.color_dict[i] for i in names]
+abbrevs = [resnames.abbreviation[i] for i in names]
 
 r_order = np.array([rnames.index(i) for i in names])
 
@@ -98,7 +100,7 @@ plt.scatter(r[r_order], msd, c=scatter_colors, s=50, zorder=3, edgecolors='black
 plt.errorbar(r[r_order], msd, yerr=(msd_lower, msd_upper), xerr=r_std[r_order], fmt='none', elinewidth=0.5, ecolor='black', marker="none")
 if restrict:
 	for i, x in enumerate(msd):
-		plt.text(r[r_order][i] + shiftx[names[i]], x + shifty[names[i]], names[i])
+		plt.text(r[r_order][i] + shiftx[names[i]], x + shifty[names[i]], abbrevs[i])
 
 
 # Theoretical Calcuations

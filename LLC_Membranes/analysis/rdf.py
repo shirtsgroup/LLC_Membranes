@@ -34,6 +34,7 @@ def initialize():
                                                                 'easier visual comparison (and a single y-axis)')
     parser.add_argument('-cut', default=1.5, type=float, help='Largest distance from pore center to include in '
                                                               'calculation')
+    parser.add_argument('--noshow', action="store_true", help='Do not display results')
 
     return parser
 
@@ -148,7 +149,7 @@ class System(object):
 
         file_rw.write_gro_pos(pos, 'com.gro', ucell=self.box[-1, ...], ids=ids, res=res)
 
-    def radial_distribution_function(self, bins=50, cut=1.5, spline=False, progress=True, npts_spline=10, build=True):
+    def radial_distribution_function(self, spline=False, progress=True, npts_spline=10, build=True):
         """ Calculate the radial distribution function based on xy distance of solute center of mass from pore center
 
         :param bins: number of bins in histogram of radial distances
@@ -157,6 +158,7 @@ class System(object):
         :param progress: Show progress bar while generating spline
         :param npts_spline: Number of points making up spline through each pore
         :param build: Create a .gro file of the last frame with the spline represented as atoms
+        :param nboot: Number of bootstrap trials
 
         :type bins: int
         :type cut: float
@@ -165,9 +167,6 @@ class System(object):
         :type npts_spline: int
         :type build: bool
         """
-
-        self.r = np.zeros([bins])
-        self.density = np.zeros([self.t.n_frames, bins])
 
         pore_defining_atoms = [a.index for a in self.t.topology.atoms if a.name in self.monomer.pore_defining_atoms
                                and a.residue.name in self.monomer.residues]
@@ -180,17 +179,15 @@ class System(object):
                      '3) Perhaps there is an annotated .itp in LLC_Membranes/top/topologies, but an unannotated .itp '
                      'file for the same monomer present in this directory.\n')
 
-        pore_centers = physical.avg_pore_loc(4, self.t.xyz[:, pore_defining_atoms, :], self.box, spline=spline,
-                                             progress=progress, npts=npts_spline)
+        pore_centers = physical.avg_pore_loc(self.npores, self.t.xyz[:, pore_defining_atoms, :], self.box,
+                                             spline=spline, progress=progress, npts=npts_spline)
 
         if spline and build:
             self.build_spline(pore_centers)  # to check that the spline was constructed properly
             print('Calculating component density')
 
-        self.r, self.density, self.radial_distances = physical.compdensity(self.com, pore_centers,
-                                                                           self.t.unitcell_vectors,
-                                                                           nbins=bins, spline=spline, cut=cut,
-                                                                           radial_distances=True)
+        self.radial_distances = physical.distance_from_pore_center(self.com, pore_centers, self.t.unitcell_vectors,
+                                                                   spline=spline)
 
     def build_spline(self, pore_centers, rep='K'):
         """ Build the spline into the last frame of the trajectory
@@ -214,29 +211,50 @@ class System(object):
 
         file_rw.write_gro_pos(pos, 'spline.gro', ucell=self.box[-1, ...], ids=ids, res=res)
 
-    def bootstrap(self, nboot):
+    def bootstrap(self, nboot, nbins=50, cut=1.5):
         """ Generate statistics using the bootstrapping technique
 
         :param nboot: number of bootstrap trials (i.e. number of time data is resampled)
+        :param nbins: number of bins to use when histogramming density each bootstrap trial
+        :param cut: maximum distance from pore center that will be plotted
 
         :type nboot: int
+        :type nbins: int
+        :type cut: float
         """
 
-        nT = self.density.shape[0]
-        self.bootstraps = np.zeros([nboot, self.density.shape[1]])
+        self.r = np.zeros([nbins])
+        nT = self.t.n_frames
+        nsolute = self.radial_distances.shape[1]
 
-        for i in range(nboot):
-            frames = np.random.choice(nT, size=nT, replace=True)  # choose random frames with replacement
-            self.bootstraps[i, :] = self.density[frames, :].mean(axis=0)  # average rdf from all frames
+        self.density = np.zeros([nboot, nbins])
+        for b in range(nboot):
+            trial = np.zeros([nbins])
+            for n in range(nsolute):
+                # randomly choose nT radial distances of solute n from trajectory, with replacement
+                ndx = np.random.randint(0, high=nT, size=nT)
+                r = self.radial_distances[ndx, n]
+                trial_box = self.t.unitcell_vectors[ndx, 2, 2]
+                hist, bin_edges = np.histogram(r, bins=nbins, range=(0, cut))
+                trial += (hist / trial_box.mean())  # normalize by average z-dimension
+
+            self.density[b, :] = trial / (nT * self.npores)
+
+        # normalize based on volume of anulus where bin is located (just need to divide by area since height done above)
+        self.r = np.zeros([nbins])
+        for i in range(nbins):
+            # density[:, i] /= area
+            self.density[:, i] /= (np.pi * (bin_edges[i + 1] ** 2 - bin_edges[i] ** 2))
+            self.r[i] = (bin_edges[i + 1] + bin_edges[i]) / 2  # center of bins
 
         confidence = 95  # percent confidence interval
         lower_confidence = (100 - confidence) / 2
         upper_confidence = 100 - lower_confidence
 
         self.errorbars = np.zeros([2, self.density.shape[1]])
-        self.errorbars[0, :] = np.abs(np.percentile(self.bootstraps, lower_confidence, axis=0) -
+        self.errorbars[0, :] = np.abs(np.percentile(self.density, lower_confidence, axis=0) -
                                       self.density.mean(axis=0))  # 2.5 percent of data below this value
-        self.errorbars[1, :] = np.percentile(self.bootstraps, upper_confidence, axis=0) - self.density.mean(axis=0)
+        self.errorbars[1, :] = np.percentile(self.density, upper_confidence, axis=0) - self.density.mean(axis=0)
 
     def plot(self, show=False, normalize=False, save=True, savename='rdf.pdf', label=None):
         """ Plot the radial distribution function
@@ -260,18 +278,16 @@ class System(object):
             lab = self.residue.name
 
         mean = self.density.mean(axis=0)
+
         if normalize:
             maximum = np.max(mean)
             mean /= maximum
 
-        if self.bootstraps is not None:
-            if normalize:
-                self.errorbars /= maximum
-            plt.plot(self.r, mean, linewidth=2, label=lab)
-            #np.savez_compressed('NA_rdf.npz', r=self.r, mean=mean)
-            plt.fill_between(self.r, self.errorbars[1, :] + mean, mean - self.errorbars[0, :], alpha=0.7)
-        else:
-            plt.plot(self.r, self.density.mean(axis=0), linewidth=2)
+        if normalize:
+            self.errorbars /= maximum
+
+        plt.plot(self.r, mean, linewidth=2, label=lab)
+        plt.fill_between(self.r, self.errorbars[1, :] + mean, mean - self.errorbars[0, :], alpha=0.7)
 
         plt.ylabel('Density (count / nm$^3$)', fontsize=14)
         plt.xlabel('Distance from pore center (nm)', fontsize=14)
@@ -335,11 +351,11 @@ if __name__ == "__main__":
 
         rdfs.append(System(args.gro, args.traj, r[0], args.build_monomer_residue, begin=args.begin,
                            end=args.end, skip=args.skip, atoms=args.atoms[i], com=com))
-        rdfs[i].radial_distribution_function(bins=args.bins, spline=args.spline, npts_spline=args.spline_pts,
-                                             cut=args.cut)
+        rdfs[i].radial_distribution_function(spline=args.spline, npts_spline=args.spline_pts)
         rdfs[i].bootstrap(args.nboot)
         rdfs[i].plot(show=False, normalize=args.normalize, save=True, label=label)
 
         file_rw.save_object(rdfs[i], '%s.pl' % savename)
 
-    plt.show()
+    if not args.noshow:
+        plt.show()

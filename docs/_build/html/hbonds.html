@@ -102,6 +102,8 @@
 <li class="toctree-l2"><a class="reference internal" href="p2p.html">Distance Between Pores</a></li>
 <li class="toctree-l2"><a class="reference internal" href="msd.html">Calculate Mean Squared Displacement</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Identify Hydrogen Bonds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-usage">Example Usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rdf.html">Radial Distribution Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="correlation.html">Correlation Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="coordination_number.html">Calculate Coordination Numbers</a></li>
@@ -176,6 +178,150 @@
             
   <div class="section" id="identify-hydrogen-bonds">
 <h1>Identify Hydrogen Bonds<a class="headerlink" href="#identify-hydrogen-bonds" title="Permalink to this headline">¶</a></h1>
+<p>Use the functionality of hbonds.py in order to identify hydrogen bonds in a
+molecular dynamics trajectory.</p>
+<p>Attempts to describe a hydrogen bond in the context of molecular simulations
+has yielded a number of definitions with no true consensus
+cite{prada-gracia_quest_2013} especially since the geometry of hydrogen bonds
+has some dependence on the system being studied. Luzar and Chandler proposed
+the geometric criterion such that a hydrogen bond exists if the distance
+between the donor, D, and acceptor, A, atoms is less than 3.5 AA~and the angle
+formed by D&#8211;H$cdotcdotcdot$A is less than 30degree.
+cite{luzar_effect_1996} The definition of Luzar and Chandler is easily
+visualized for trajectories using the texttt{hbonds} representation of the
+Visual Molecular Dynamics (VMD) software package which allows us to directly
+check the validity of identified hydrogen bonds.</p>
+<p>Some definitions:</p>
+<ul class="simple">
+<li>donor (D): atom covalently bonded to hydrogen</li>
+<li>acceptor (A) : atom which &#8216;accepts&#8217; hydrogen bond</li>
+</ul>
+<p>A diagram of an hbond:</p>
+<blockquote>
+<div>D&#8211;H - - A</div></blockquote>
+<p>Criterion:</p>
+<ul class="simple">
+<li>Distance between D and A below some distance</li>
+<li>Angle between DHA less than some cut-off</li>
+</ul>
+<p>Note: You will need to properly annotate any residue that you think might
+participate in a hydrogen bond. See <a class="reference internal" href="monomer_prep.html#annotation-table"><span class="std std-ref">Summary of Annotations</span></a>.</p>
+<div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hbonds.System">
+<em class="property">class </em><code class="descclassname">hbonds.</code><code class="descname">System</code><span class="sig-paren">(</span><em>traj</em>, <em>gro</em>, <em>begin=0</em>, <em>end=-1</em>, <em>skip=1</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="hbonds.System.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>traj</em>, <em>gro</em>, <em>begin=0</em>, <em>end=-1</em>, <em>skip=1</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load in the trajectory</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>traj</strong> (<em>str</em>) &#8211; GROMACS trajectory file (.xtc or .trr)</li>
+<li><strong>gro</strong> (<em>str</em>) &#8211; GROMACS coordinate file (.gro)</li>
+<li><strong>begin</strong> (<em>int</em>) &#8211; First frame to analyze</li>
+<li><strong>end</strong> (<em>int</em>) &#8211; Last frame to analyze</li>
+<li><strong>skip</strong> (<em>int</em>) &#8211; Only analyze every <cite>skip</cite> frames</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="hbonds.System.identify_hbonds">
+<code class="descname">identify_hbonds</code><span class="sig-paren">(</span><em>cut</em>, <em>angle</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System.identify_hbonds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identify hydrogen bonds based on geometric criteria. If the angle formed by D-H&#8211;A and the distance between
+donor and acceptor are less than the cut-offs, then we consider a hydrogen bond to exist</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>cut</strong> (<em>float</em>) &#8211; cut-off distance (nm)</li>
+<li><strong>angle</strong> (<em>float</em>) &#8211; cut-off angle (degrees)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="hbonds.System.plot_hbonds">
+<code class="descname">plot_hbonds</code><span class="sig-paren">(</span><em>show=True</em>, <em>save=True</em>, <em>savename='hbonds.png'</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System.plot_hbonds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the total number of hydrogen bonds per frame as a function of time</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>show</strong> (<em>bool</em>) &#8211; display plot</li>
+<li><strong>save</strong> (<em>bool</em>) &#8211; save plot under savename</li>
+<li><strong>savename</strong> (<em>str</em>) &#8211; name under which to save plot</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="hbonds.System.set_eligible">
+<code class="descname">set_eligible</code><span class="sig-paren">(</span><em>res</em>, <em>atoms</em>, <em>acceptor_only=False</em>, <em>donors_only=False</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System.set_eligible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define atoms that will be included in h-bond calculation. Make sure <cite>res</cite> is updated with proper
+annotations or no atoms will be selected!</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>res</strong> (<em>str</em>) &#8211; residue to include in calculation</li>
+<li><strong>atoms</strong> (<em>str</em><em> or </em><em>list</em>) &#8211; atoms from residue to include in calculation. Use &#8216;all&#8217; to include all potential hbonding atoms</li>
+<li><strong>acceptor_only</strong> (<em>bool</em>) &#8211; restrict residue so it can only accept hydrogen bonds</li>
+<li><strong>donor_only</strong> &#8211; restrict residue so it can only donate hydrogen bonds</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># imports</span>
+<span class="kn">from</span> <span class="nn">LLC_Membranes.analysis</span> <span class="kn">import</span> <span class="n">hbonds</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Initialize system</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">hbonds</span><span class="o">.</span><span class="n">System</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">gro</span><span class="p">)</span>
+
+<span class="c1"># Define residues involved in hbonds of interest</span>
+<span class="n">residues</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;HII&#39;</span><span class="p">,</span> <span class="s1">&#39;HOH&#39;</span><span class="p">]</span> <span class="c1"># hydrogen bonds between LLC monomer and water</span>
+
+<span class="c1"># Restrict system to hbonding atoms that are a part of HII and HOH</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">residues</span><span class="p">):</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">set_eligible</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="s1">&#39;all&#39;</span><span class="p">)</span>  <span class="c1"># restrict to all hbonding atoms of each residue</span>
+
+<span class="c1"># Apply geometric criteria to identify hydrogen bonds</span>
+<span class="n">distance</span> <span class="o">=</span> <span class="mf">0.35</span>  <span class="c1"># distance cut-off</span>
+<span class="n">angle</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">identify_hbonds</span><span class="p">(</span><span class="n">distance</span><span class="p">,</span> <span class="n">angle</span><span class="p">)</span>
+
+<span class="c1"># Plot total hydrogen bonds as a function of time</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">plot_hbonds</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="section" id="command-line-functionality">
+<h2>Command Line Functionality<a class="headerlink" href="#command-line-functionality" title="Permalink to this headline">¶</a></h2>
 <p>Use geometric criteria to identify hydrogen bonds</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">hbonds</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">TRAJ</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">GRO</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="n">BEGIN</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">e</span> <span class="n">END</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">sk</span> <span class="n">SKIP</span><span class="p">]</span>
                  <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="n">RESIDUES</span> <span class="p">[</span><span class="n">RESIDUES</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span> <span class="n">ATOMS</span> <span class="p">[</span><span class="n">ATOMS</span> <span class="o">...</span><span class="p">]]</span>
@@ -185,7 +331,7 @@
 </pre></div>
 </div>
 <div class="section" id="Named Arguments">
-<h2>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h2>
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
 <table class="docutils option-list" frame="void" rules="none">
 <col class="option" />
 <col class="description" />
@@ -259,38 +405,13 @@
 </tbody>
 </table>
 </div>
-<div class="section" id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="hbonds.System">
-<em class="property">class </em><code class="descclassname">hbonds.</code><code class="descname">System</code><span class="sig-paren">(</span><em>traj</em>, <em>gro</em>, <em>begin=0</em>, <em>end=-1</em>, <em>skip=1</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="hbonds.System.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>traj</em>, <em>gro</em>, <em>begin=0</em>, <em>end=-1</em>, <em>skip=1</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>traj</strong> &#8211; </li>
-<li><strong>gro</strong> &#8211; </li>
-<li><strong>top</strong> &#8211; </li>
-<li><strong>begin</strong> &#8211; </li>
-<li><strong>end</strong> &#8211; </li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="hbonds.Residue">
-<em class="property">class </em><code class="descclassname">hbonds.</code><code class="descname">Residue</code><span class="sig-paren">(</span><em>name</em>, <em>xlink=False</em>, <em>xlink_topology='assembly.itp'</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.Residue" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+</div>
+</div>
+<div class="section" id="example-usage">
+<h1>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># hydrogen bonds between atoms O3 and O4 of the monomer HII with all atoms of water</span>
+hbonds.py -t trajectory.xtc -g coordinates.gro -r HII HOH -a O3 O4 -a all
+</pre></div>
 </div>
 </div>
 

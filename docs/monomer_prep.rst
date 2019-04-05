@@ -25,6 +25,8 @@ Proper annotation of these attributes is illustrated below:
 
    Screen capture of the .itp file created for the monomer pictured above
 
+.. _annotation-table:
+
 Summary of Annotations
 -----------------------
 

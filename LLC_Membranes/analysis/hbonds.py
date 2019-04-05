@@ -61,12 +61,19 @@ def initialize():
 class System(object):
 
     def __init__(self, traj, gro, begin=0, end=-1, skip=1):
-        """
-        :param traj:
-        :param gro:
-        :param top:
-        :param begin:
-        :param end:
+        """ Load in the trajectory
+        
+        :param traj: GROMACS trajectory file (.xtc or .trr)
+        :param gro: GROMACS coordinate file (.gro)
+        :param begin: First frame to analyze
+        :param end: Last frame to analyze
+        :param skip: Only analyze every `skip` frames
+
+        :type traj: str
+        :type gro: str
+        :type begin: int
+        :type end: int
+        :type skip: int
         """
 
         # print('Generating bond list...', end="", flush=True)
@@ -131,12 +138,18 @@ class System(object):
         #     self.A = [a.index for a in self.t.topology.atoms if a.residue.name == 'HOH' and a.element.symbol == 'O']
 
     def set_eligible(self, res, atoms, acceptor_only=False, donors_only=False):
-        """
-        Set eligible atoms to be included in h-bond calculation
-        :param res : residue to include in calculation
-        :param atoms : atoms from residue to include in calculation
+        """ Define atoms that will be included in h-bond calculation. Make sure `res` is updated with proper
+        annotations or no atoms will be selected!
+
+        :param res: residue to include in calculation
+        :param atoms: atoms from residue to include in calculation. Use 'all' to include all potential hbonding atoms
         :param acceptor_only: restrict residue so it can only accept hydrogen bonds
         :param donor_only: restrict residue so it can only donate hydrogen bonds
+
+        :type res: str
+        :type atoms: str or list
+        :type acceptor_only: bool
+        :type donors_only: bool
         """
 
         residue = topology.Residue(res)
@@ -169,6 +182,15 @@ class System(object):
                     self.A.append(a.index)
 
     def identify_hbonds(self, cut, angle):
+        """ Identify hydrogen bonds based on geometric criteria. If the angle formed by D-H--A and the distance between
+        donor and acceptor are less than the cut-offs, then we consider a hydrogen bond to exist
+
+        :param cut: cut-off distance (nm)
+        :param angle: cut-off angle (degrees)
+
+        :type cut: float
+        :type angle: float
+        """
 
         # narrow list by doing a distance search
 
@@ -238,6 +260,16 @@ class System(object):
                 self.hbonds[i] = np.concatenate((self.hbonds[i], a[a < angle][np.newaxis, :]), 0)
 
     def plot_hbonds(self, show=True, save=True, savename='hbonds.png'):
+        """ Plot the total number of hydrogen bonds per frame as a function of time
+
+        :param show: display plot
+        :param save: save plot under savename
+        :param savename: name under which to save plot
+
+        :type show: bool
+        :type save: bool
+        :type savename: str
+        """
 
         n = [a.shape[1] for a in self.hbonds]
 
@@ -263,7 +295,7 @@ class System(object):
 
         # plt.plot(self.t.time / 1000, nether / ncarb)
 
-        print(np.mean(n))
+        print("Average Hydrogen Bonds Per Frame: % .2f" % np.mean(n))
         plt.plot(self.t.time / 1000, n)
         plt.xlabel('Time (ns)', fontsize=14)
         plt.ylabel('Number of hydrogen bonds', fontsize=14)

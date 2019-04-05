@@ -10,7 +10,7 @@ crsr = connection.cursor()
 restrict_by_name = False 
 MW = False  # plot mw of species
 penalty = 0.25
-wt = 5 
+wt = 10 
 
 group = 'all'
 
@@ -44,23 +44,25 @@ if wt == 10:
 	query += " penalty = %s and" % penalty
 
 query += " wt_water = %s" % wt
+query += " and F = 0.4"
 query += " and name != 'HOH'"
 query += " ORDER BY MD_TAMSD DESC"
 
 output = crsr.execute(query).fetchall()
 
-labels = np.array([names.res_to_name[i[0]] for i in output], dtype=object)
+labels = np.array([i[0] for i in output], dtype=object)
+abbrevs = np.array([names.abbreviation[i] for i in labels], dtype=object)
 sim_length = np.array([i[1] for i in output], dtype=float)
 md_tamsd = np.array([i[2] for i in output])
 md_tamsd_lower = -np.array([i[3] for i in output]) + md_tamsd
 md_tamsd_upper = np.array([i[4] for i in output]) - md_tamsd
-md_msd = np.array([i[5] for i in output], dtype=float)
-md_msd_lower = -np.array([i[6] for i in output]) + md_msd
-md_msd_upper = np.array([i[7] for i in output]) - md_msd
-mw = np.array([i[8] for i in output])
+#md_msd = np.array([i[5] for i in output], dtype=float)
+#md_msd_lower = -np.array([i[6] for i in output]) + md_msd
+#md_msd_upper = np.array([i[7] for i in output]) - md_msd
+#mw = np.array([i[8] for i in output])
 
 # only need this block until all simulations are finished
-md_msd *= (1000 / sim_length)
+#md_msd *= (1000 / sim_length)
 md_tamsd *= (400 / (sim_length * .4))
 
 if time_averaged:
@@ -69,7 +71,7 @@ if time_averaged:
 	md_tamsd = md_tamsd[ordered_md]
 	md_tamsd_lower = md_tamsd_lower[ordered_md]
 	md_tamsd_upper = md_tamsd_upper[ordered_md]
-	mw = mw[ordered_md]
+	#mw = mw[ordered_md]
 
 else:
 	ordered_md = np.argsort(md_msd)[::-1]
@@ -81,7 +83,8 @@ else:
 labels = labels[ordered_md]
 # end temporary block
 
-fig, ax = plt.subplots(figsize=(6, 7))
+#fig, ax = plt.subplots(figsize=(6, 7))
+fig, ax = plt.subplots()
 bar_width = 0.8
 opacity = 0.8
 index = np.arange(len(labels), dtype=float)
@@ -89,15 +92,18 @@ index = np.arange(len(labels), dtype=float)
 if not MW:
 	index += bar_width / 2
 
+colors = [names.color_dict[i] for i in labels]
 if time_averaged:
-	ax.bar(index, md_tamsd, bar_width, alpha=opacity, yerr=(md_tamsd_lower, md_tamsd_upper), label='MD Simulated time-averaged MSD')
+	ax.bar(index, md_tamsd, bar_width, alpha=opacity, yerr=(md_tamsd_lower, md_tamsd_upper), label='MD Simulated time-averaged MSD')#, color=colors)
 else:
 	ax.bar(index, md_msd, bar_width, alpha=opacity, yerr=(md_msd_lower, md_msd_upper), label='MD Simulated MSD')
 
 ax.set_ylabel('MSD ($nm^2$)', fontsize=14)
 ax.tick_params(labelsize=14)
 ax.set_xticks(index)# + bar_width/2)
-ax.set_xticklabels(labels, fontsize=14)
+ax.set_xticklabels(abbrevs, fontsize=14)
+[x.set_color(colors[i]) for i, x in enumerate(plt.gca().get_xticklabels())]
+#ax.tick_params(axis='x', colors='red')
 plt.xticks(rotation=90)
 
 if MW:
