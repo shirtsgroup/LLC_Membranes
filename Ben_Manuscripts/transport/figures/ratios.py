@@ -45,7 +45,7 @@ for i, r in enumerate(residues):
 	mean = rdf.density.mean(axis=0)
 	V = np.array([zbox * mean[i] * np.pi*(rdf.r[i + 1] ** 2 - rdf.r[i] ** 2) for i in range(len(rdf.r) - 1)])
 	divider = np.argmin(np.abs(rdf.r - radius))
-	n[i] = np.sum(V[divider:]) #/ np.sum(V)
+	n[i] = np.sum(V[:divider]) #/ np.sum(V)
 
 print(n)
 

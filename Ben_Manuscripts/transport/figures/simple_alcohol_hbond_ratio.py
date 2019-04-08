@@ -11,7 +11,8 @@ resnames = ['MET', 'ETH', 'PR', 'BUT']
 #total_hbonds = [8819, 9762, 8857, 8651]
 ratio = [1.21781242618, 1.62801302932, 1.98014411529, 2.65940967134]
 frames = 2000
-total_hbonds = 100 * np.array([18776, 20170, 18661, 17481]) / (frames * 24)
+#total_hbonds = 100 * np.array([18776, 20170, 18661, 17481]) / (frames * 24)
+total_hbonds = np.array([43.2, 42.2, 39.5, 38.9])
 
 index = np.arange(len(ratio))
 opacity=0.75

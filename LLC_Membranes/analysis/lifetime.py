@@ -63,6 +63,9 @@ def initialize():
     parser.add_argument('-s', '--savename', default='lifetime.pl', help='Name under which to save object.')
     parser.add_argument('-l', '--load', action="store_true", help='Load previously saved object.')
 
+    # display options
+    parser.add_argument('-noshow', '--noshow', action="store_true", help='Do not display plots at end')
+
     return parser
 
 
@@ -133,6 +136,7 @@ class CoordinationLifetime(coordination_number.System):
                     frame += 1
 
         print("Mean dwell time: %.2f ns" % np.mean(self.dwell_times))
+        print("Median Hbond lifetime %.2f ns" % np.median(self.dwell_times))
         print("Maximum dwell time : %.2f ns" % np.max(self.dwell_times))
 
     def plot_dwell_time_distribution(self, bins=25):
@@ -204,6 +208,7 @@ class HydrogenBondLifetime(hbonds.System):
                     frame += 1
 
         print("Mean Hbond lifetime: %.2f ns" % np.mean(self.dwell_times))
+        print("Median Hbond lifetime %.2f ns" % np.median(self.dwell_times))
         print("Maximum Hbond lifetime : %.2f ns" % np.max(self.dwell_times))
 
     def plot_dwell_time_distribution(self, bins=25):
@@ -264,4 +269,5 @@ if __name__ == "__main__":
 
     lifetime.calculate_lifetimes()
 
-    lifetime.plot_dwell_time_distribution()
+    if not args.noshow:
+        lifetime.plot_dwell_time_distribution()

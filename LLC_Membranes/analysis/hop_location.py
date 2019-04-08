@@ -77,11 +77,16 @@ class HopLocation(System):
               np.sum(heat[lower_cut_ndx:upper_cut_ndx] * heights[lower_cut_ndx:upper_cut_ndx]) /
               np.sum(heights[lower_cut_ndx:upper_cut_ndx])))
 
-        cut = 0.65
+        # cut = 0.723
+        cut = 0.513
 
         cut_ndx = np.argmin(np.abs(cut - bar_locations))
         print("Average hop length when less than %.2f nm from the pore center: %.2f nm" % (cut,
               np.sum(heat[:cut_ndx] * heights[:cut_ndx]) / np.sum(heights[:cut_ndx])))
+        print("Average hop length outside of pore region: %.2f nm" % (np.sum(heat[cut_ndx:] * heights[cut_ndx:]) /
+                                                                      np.sum(heights[cut_ndx:])))
+        # plt.hist(hop_lengths, bins=50)
+        # plt.show()
 
         print("Total hops: %.2f" % sum(heights))
         print("Total hops in pore: %.2f" % sum(heights[:cut_ndx]))
@@ -126,4 +131,4 @@ if __name__ == "__main__":
     else:
         cmax = None
 
-    hops.plot_hop_locations(show=True, cmap_max=cmax, colormap=args.colormap, bins=args.bins)
+    hops.plot_hop_locations(show=False, cmap_max=cmax, colormap=args.colormap, bins=args.bins)

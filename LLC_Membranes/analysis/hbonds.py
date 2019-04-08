@@ -54,6 +54,7 @@ def initialize():
                         ' of 0 and 1 in the same order as args.residues')
     parser.add_argument('-s', '--savename', default='hbonds.pl', type=str, help='Name of pickled object to save after'
                                                                                 'calcualtions are complete')
+    parser.add_argument('-noshow', '--noshow', action="store_true", help='Do not display plots')
 
     return parser
 
@@ -62,7 +63,7 @@ class System(object):
 
     def __init__(self, traj, gro, begin=0, end=-1, skip=1):
         """ Load in the trajectory
-        
+
         :param traj: GROMACS trajectory file (.xtc or .trr)
         :param gro: GROMACS coordinate file (.gro)
         :param begin: First frame to analyze
@@ -482,4 +483,5 @@ if __name__ == "__main__":
         sys.identify_hbonds(args.distance, args.angle_cut)
         file_rw.save_object(sys, '%s' % args.savename)
 
-    sys.plot_hbonds()
+    if not args.noshow:
+        sys.plot_hbonds()
