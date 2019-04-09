@@ -228,17 +228,28 @@ class System(object):
         nsolute = self.radial_distances.shape[1]
 
         self.density = np.zeros([nboot, nbins])
+        box = self.t.unitcell_vectors[:, 2, 2].mean()
         for b in range(nboot):
             trial = np.zeros([nbins])
             for n in range(nsolute):
                 # randomly choose nT radial distances of solute n from trajectory, with replacement
-                ndx = np.random.randint(0, high=nT, size=nT)
-                r = self.radial_distances[ndx, n]
-                trial_box = self.t.unitcell_vectors[ndx, 2, 2]
-                hist, bin_edges = np.histogram(r, bins=nbins, range=(0, cut))
-                trial += (hist / trial_box.mean())  # normalize by average z-dimension
+                # ndx = np.random.randint(0, high=nT, size=nT)
+                # r = self.radial_distances[ndx, n]
+                # trial_box = self.t.unitcell_vectors[ndx, 2, 2]
+                # hist, bin_edges = np.histogram(r, bins=nbins, range=(0, cut))
+                # trial += (hist / trial_box.mean())  # normalize by average z-dimension
 
-            self.density[b, :] = trial / (nT * self.npores)
+                # I think this is more right
+                n = np.random.randint(0, nsolute, size=nsolute)
+                r = self.radial_distances[:, n]
+
+                for i in r.T:
+                    hist, bin_edges = np.histogram(i, bins=nbins, range=(0, cut))
+                    trial += hist
+
+            self.density[b, :] = trial / (nT * self.npores * box)
+
+            # self.density[b, :] = trial / (nT * self.npores)
 
         # normalize based on volume of anulus where bin is located (just need to divide by area since height done above)
         self.r = np.zeros([nbins])
