@@ -1,0 +1,408 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{subcaption}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath} % or simply amstext
+\usepackage{amssymb}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage[export]{adjustbox}
+\usepackage{cleveref}
+\usepackage{booktabs}
+\usepackage{gensymb}
+\usepackage{float}
+\usepackage[x11names,table]{xcolor}
+\renewcommand{\baselinestretch}{1.5}
+\usepackage{url}
+\newcommand{\foo}{\color{LightSteelBlue3}\makebox[0pt]{\textbullet}\hskip-0.5pt\vrule width 1pt\hspace{\labelsep}}
+\DeclareCaptionFont{blue}{\color{LightSteelBlue3}}
+\usepackage{array,booktabs}
+
+\title{PhD Research Proposal: Molecular Level Design of Nanoporous Lyotropic Liquid
+Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
+\large Advisors: Michael Shirts and Richard Noble}
+
+\author{Benjamin J. Coscia} 
+
+\begin{document}
+
+  \maketitle
+  \thispagestyle{empty}
+  \clearpage
+  \setcounter{page}{1} % don't count title page as a page 
+
+  \section{State of the Art}\label{section:state-of-the-art}
+
+  \subsection*{Commercial Membranes for Small Molecule Separations}
+  
+  % perhaps a word or two about micro and ultra filtration  
+  
+  % re-word. This paragraph is verbatim from structure paper
+  More highly selective nanoporous membranes would be extremely useful
+  in performing complex aqueous separations with seawater and various
+  types of wastewater.
+  \begin{itemize}
+    \item For example, Sodium chloride and boron in seawater 
+    \cite{fritzmann_state---art_2007} and organic micropollutants found in
+    municipal and industrial wastewaters \cite{schwarzenbach_challenge_2006}
+    represent just a few of the diverse contaminants of water sources. 
+    \item By efficiently separating contaminants from feed solutions with
+    highly selective membranes, it is possible to reduce the number of 
+    required membrane passes and post-treatment steps needed for a given 
+    filtration process \cite{werber_materials_2016}, thus lowering energy
+    requirements. 
+    \item Additionally, one can also extract valuable resources from the 
+    feed streams. For example, flowback water produced during hydraulic
+    fracturing of shale formations contains dissolved species such as acetate
+    whose extraction has economic value \cite{dischinger_application_2017}.
+  \end{itemize}
+
+  Reverse osmosis (RO) and nanofiltration (NF) are two prevailing membrane
+  filtration processes that can be used to separate solutes on the order of
+  1 nm in size and smaller, including ions.
+  \begin{itemize}  
+    \item Both apply hydraulic pressure to the feed solution in order to 
+    overcome osmotic pressure and force water and unfiltered components 
+    through the membrane.
+    \item RO membranes are typically thin film composite with a porous mechanical 
+    support layer and a thin but dense polymer matrix active layer where separations
+    occur.\cite{jeong_interfacial_2007}
+    \item RO separates solutes based on the solute's ability to dissolve into
+    and diffuse through the tortuous pathways available in dense active layer.
+    \item RO offers high selectivity at the cost of relatively high energy 
+    requirements since one must apply a large hydraulic pressure in order to 
+    achieve an economical flux.  % get number
+    \item In contrast to RO membranes, NF membranes have explicit pores on the
+    order of 1 nm in size. 
+    \item Typically, separations are achieved based on size exclusion and
+    charge exclusion if the membrane surface is charged.
+    \item NF membranes require significantly less applied pressure in order
+    to achieve solute flux comparable to RO.
+    \item Unfortunately, conventional synthesis processes, such as 
+    phase-inversion\cite{smolders_microstructures_1992} are stochastic in
+    nature which yields pores that are polydisperse in size.\cite{werber_materials_2016} % name some synthesis processes
+    \item Pore size polydispersity is detrimental to membrane selectivity
+  \end{itemize}
+  
+  The downfall of RO and NF membranes can be summarized by the well-known
+  permeability-selectivity tradeoff. Namely, it is difficult to increase the
+  permeability of a desired molecular or atomic species, while maintaining
+  the same retention of an undesired species.\cite{werber_materials_2016}  
+  
+  \subsection*{Nanostructured Membranes}
+  
+  Nanostructured membranes attempt to overcome the permeability-selectivity 
+  tradeoff through molecular level design.
+  \begin{itemize}
+	\item Graphene sheets, carbon nanotubes (CNTs) and zeolites are three
+	highly studied nanostructured technologies.
+  \end{itemize}
+  
+  Graphene membranes are an extremely active are of research because 
+  they offer potential for extremely high permeability membranes.
+  \begin{itemize}
+    \item 2D materials
+    \item Functionalization?
+    \item Easy to introduce defects
+    \item Multi-layered
+  \end{itemize}
+  
+  Carbon nanotubes have shown promise due to unprecedentedly fast
+  water transport. 
+  \begin{itemize}
+    \item Functionalization of nanotubes
+    \item Aligned nanotubes difficult to synthesize
+  \end{itemize}
+   
+  Zeolite-coated ceramic membranes offer the potential for permeabilities
+  comparable to ultrafiltration with selectivities as good as NF and RO. 
+  \begin{itemize}
+    \item Zeolites have highly uniform nm-sized crystalline structures with
+    cage-like cavities that allow movement and trapping of small solutes. \cite{pendergast_review_2011}
+    \item The crystalline frameworks are typically formed by networks of silicon
+    and aluminum each attached to 4 oxygen atoms in a tetrahedral arrangement. 
+    \item One can replace the silicon and aluminum atoms via ion exchange 
+    in order to control the size of the cavities and hence its molecular-seiving properties.
+    \item A number of studies have tested the permeability and sodium salt
+    rejection of various zeolite membranes, however none have fully
+    overcome the permeability-selectivity tradeoff.
+    \item Most are prone to defects in the crystalline structure.
+  \end{itemize}
+
+  \subsection*{Lyotropic Liquid Crystal Membranes}
+  
+  Preliminary evidence has shown that cross-linked lyotropic liquid crystal
+  (LLC) membranes can be produced at moderate scale and may be capable of 
+  performing highly selective separations. 
+  \begin{itemize}  
+    \item LLCs are amphiphilic molecules that have the ability to self-assemble
+    into porous nanostructures \cite{smith_ordered_1997} and can be cross-linked
+    to create mechanically strong membrane films with periodic pores on the
+    order of 1 nm in diameter \cite{zhou_supported_2005}. 
+    \item LLC membrane pores are uniform in size because they are formed by 
+    self-assembly. 
+    \item Since LLC polymer membranes lack an appreciable pore size distribution,
+    they inherently exhibit high selectivity due to their strict molecular weight
+    cut-off (MWCO)~\cite{zhou_supported_2005}. 
+    \item Additionally, LLC monomers can be salts, and therefore lead to Donnan
+    exclusion of ions in solution.\cite{donnan_theory_1995}
+%    The membrane gains a net surface charge when counterions from
+%  the head groups that line the pore walls escape into the feed solution in an
+%  effort to balance the gradients of concentration and electric potential
+%  \cite{donnan_theory_1995}.
+  \end{itemize}
+
+  The feasibility of nanostructured LLC polymer membranes for selective separations
+  has been demonstrated using LLC monomers that form the type 1 bicontinuous cubic
+  (Q\textsubscript{I})\cite{hatakeyama_water_2011,hatakeyama_nanoporous_2010,carter_glycerol-based_2012}
+  and the inverted hexagonal (H\textsubscript{II}) \cite{zhou_supported_2005}
+  phases. 
+  \begin{itemize}
+    \item When separating organic solutes from NaCl, Q\textsubscript{I}-phase
+    membrane filtration experiments have shown selectivity 2--3 times higher than
+    commercial RO and 6--12 times higher than commercial NF membranes.\cite{dischinger_application_2017}
+    \item When separating a series of various sized dyes, the 
+    H\textsubscript{II}-phase membrane showed complete rejection of dyes bigger
+    than 1.2 nm in size \cite{zhou_supported_2005}.
+  \end{itemize}
+
+  The H\textsubscript{II}-phase pore geometry (Figure~\ref{fig:assembly}) has a
+  higher theoretical capacity for transport than the Q\textsubscript{I} phase.
+  \begin{itemize}
+	  \item The H\textsubscript{II} phase forms at room temperature in the 
+	  presence of ca.~10 wt\% water and consists of hexagonally packed, 
+	  hydrophilic pore columns\cite{smith_ordered_1997}. 
+	  % BJC: should rethink the following since we think that thermotropic doesn't exist
+	  \item In the absence of water, neat monomer will form the same hexagonal
+	  columnar structure which, in the literature, has been referred to as the
+	  Col\textsubscript{h} thermotropic phase\cite{feng_scalable_2014}.
+  \end{itemize}
+
+  Q\textsubscript{I}-phase membranes consist of a tortuous network of three
+  dimensionally interconnected pores that prevent optimal through-plane
+  transport. 
+  \begin{itemize}
+    \item In contrast, the densely packed, non-tortuous and uniform sized
+    pores of H\textsubscript{II}-phase membranes represent the ideal geometry
+    for achieving high solute flux\cite{matyka_tortuosity-porosity_2008}.  
+    \item However, the hexagonally packed LC domains of the H\textsubscript{II}-phase
+    generally form mutually unaligned domains, which hurts membrane permeability. 
+    \item This domain scale misalignment had inhibited further development of 
+    this technology, and research efforts were focused on the Q\textsubscript{I}
+    phase, whose geometry does not require alignment~\cite{zhou_new_2007}.
+  \end{itemize}
+
+  Recently, researchers have learned how to macroscopically align the
+  hexagonal domains which has revived research into H\textsubscript{II}-phase LLC
+  polymer membranes. 
+  \begin{itemize}
+    \item In 2014, Feng et al.~showed that one can align Col\textsubscript{h}
+    domains, created by the ``dry" monomer Na-GA3C11, using a magnetic field
+	with subsequent cross-linking to lock the structure in place\cite{feng_scalable_2014}.
+	\item In 2016, Feng et al.~showed that one could also obtain the same result
+	by confining the neat monomer between PDMS or glass substrates since hexagonal
+	mesophases preferentially anchor perpendicular to both surfaces\cite{feng_thin_2016}.
+  \end{itemize}
+  
+  Unfortunately, reproducing the work of Feng et al. with the H\textsubscript{II}
+  has been an experimental challenge. Therefore, the primary focus of experimental
+  research efforts has been with the Q\textsubscript{I} phase.
+
+  \section{Project Objectives}\label{section:objectives}  
+  
+  Our current understanding of the molecular details of LLC membranes'
+  nanostructure is not sufficient to be able to precisely design them for
+  specific separations. 
+  \begin{itemize} 
+%    \item Over the past 20 years, H\textsubscript{II}-phase LLC polymer 
+%    membrane studies have been limited primarily to the Na-GA3C11 monomer
+%    with some characterization done after minor structural modifications.\cite{zhou_supported_2005,resel_structural_2000}
+    \item Dischinger et al.~attempted to use an empirical model
+    that correlates the physiochemical properties of the counterion used in
+    a Q\textsubscript{I}-phase LLC membrane to solute rejection.\cite{dischinger_effect_2017}
+    \item Although their model showed some qualitative agreement with experiment, the
+    quality of fit of their model was limited due to complex solute-membrane
+    interactions that could not easily be modeled. 
+  \end{itemize}
+
+  A molecular-level understanding of structure of and transport in LLC polymer 
+  membranes, enabled by molecular dynamics (MD) simulations, can provide 
+  guidelines to reduce the large chemical space available to design
+  monomers for creation of separation-specific membranes. 
+  \begin{itemize}
+    \item Using a sufficiently accurate molecular model, we can directly 
+    observe transport of solutes within LLC membrane nanopores and infer
+    mechanisms. 
+    \item Based on this information we can intelligently design new membranes
+    by screening new liquid crystal monomer designs.
+    \item Our most promising designs can be tested experimentally.
+  \end{itemize}
+  
+  \noindent There are five primary objectives of our work.
+  \begin{enumerate}
+  
+    \item Develop techniques to build and understand the nanoscopic structure
+    of LLC membranes.
+    
+    Useful molecular-level modeling should incorporate a detailed picture 
+    of the nanoscopic pore structure, which is crucial to understanding
+    the role of monomer structure in solute transport and membrane design.
+    We will generate simulated X-ray diffraction patterns from MD trajectories
+    and compare them to an experimental 2D wide angle X-ray scattering (WAXS)
+    spectrum of a Col\textsubscript{h} phase membrane. We will assess the extent
+    to which we can apply our understanding to the H\textsubscript{II} phase,
+    as well as systems built with alternate monomers.
+    
+    \item Determine dominant solute-membrane interactions that give rise to
+    transport mechanisms.
+    
+    We will observe transport of a relatively large set of small polar solutes
+    placed within the H\textsubscript{II} membrane nanopores. We will observe
+    the time series of each solute's position as well as directly measure the
+    physical interactions, such as hydrogen bonding and ion coordination, 
+    between solutes and LLC monomers.
+    
+    \item Create a stochastic model which can project long timescale 
+    transport behavior.
+    
+    We will combine our general knowledge of the solute transport mechanisms
+    with simulation data in order to inform a stochastic model. This model
+    should closely reproduce the time series that we observe in our simulations.
+    Due to the low computational cost of a stochastic model relative to 
+    MD simulations, we will be able to project long timescale transport behavior
+    and make well-converged predictions of macroscopic transport properties.
+           
+    \item Adapt the same analysis to the Q\textsubscript{I} phase.
+    
+    Over the course of this project, experimental research surrounding
+    LLC membranes has shifted nearly all focus towards the Q\textsubscript{I}
+    phase due to its more facile synthesis.	Although most of our work has 
+    been applied to the H\textsubscript{II} phase, we expect that much of 
+    the same analyses can be applied to the Q\textsubscript{I} phase. The 
+    biggest challenge will be adapting our techniques to its more complex
+    geometry.
+    
+    \item Enable easy continuation of our work with a dedicated and 
+    well-documented python package.
+    
+	Although molecular simulations have become popular
+	for studying systems at the atomic level, LLCs used in this context
+	have not been heavily investigated. Consequently, much of the 
+	analysis developed for this project is not widely applied. Therefore, 
+	it is important for us to make available the scripts that reproduce
+	the exact results presented in our published papers along with detailed
+	documentation of the scripts. This will ensure near-seamless continuation
+	of this project and accelerate the development of LLC membranes.
+    
+  \end{enumerate}
+
+  \section{Progress to Date}\label{section:progress}
+  
+  \textbf{\large Objective 1:} \textit{\large Build and understand nanoscopic structure of LLC membranes} (\textcolor{green!40!olive}{\textbf{Complete}})
+  
+  \noindent We have developed a procedure for building an LLC membrane unit cell.
+  
+  \noindent We have created a molecular model that is maximally consistent with
+  experimental WAXS data.
+  
+  \noindent Water is necessary to fully reproduce all features in the WAXS pattern.
+  
+  \noindent An ensemble of simulation trajectories best capture the system's 
+  time averaged behavior.
+  
+  \noindent \textbf{\large Objective 2:} \textit{\large Determine transport mechanisms} (\textcolor{green!40!olive}{\textbf{Complete}})
+  
+  \noindent We added additional water to our model to create the H\textsubscript{II} phase
+  
+  \noindent Water partitions into the distal tail region
+  
+  \noindent The pore structure changes
+  
+  \noindent We place 20 small polar solutes 
+  
+  \noindent The mean squared displacements are not a monotonic function of solute MSD
+  
+  \noindent Solute behavior is subdiffusive.
+  
+  \noindent Subdiffusive behavior is a consequence of a hopping and trapping mechanism.
+  
+  \noindent There are three mechanisms of entrapment.
+  
+  \noindent \textbf{\large Objective 3:} \textit{\large Create a stochastic model} (\textcolor{blue}{\textbf{In Progress}})
+  
+  \noindent We are in the process of developing the theory required to build a 
+  stochastic model. 
+  
+  \noindent The distribution of dwell times is power law distributed.
+  
+  \noindent The distribution of hop lengths is approximately gaussian
+  
+  \noindent The model will likely have a radial dependence. 
+  
+  \noindent \textbf{\large Objective 4:} \textit{\large Apply analyses to Q\textsubscript{I} phase} (\textcolor{blue}{\textbf{In Progress}})
+  
+  \noindent We have developed a procedure to build the Q\textsubscript{I} phase.
+  
+  \noindent \textbf{\large Objective 5} \textit{\large Create a well-documented python package} (\textcolor{blue}{\textbf{In Progress}})
+  
+  Python scripts used to simulate X-ray diffraction patterns are available in the following
+  GitHub repository: \url{https://github.com/joeyelk/MD-Structure-Factor}. Documentation
+  is forthcoming. 
+  
+  Python scripts used to conduct all other post-simulation trajectory analysis are 
+  also available on GitHub: \url{https://github.com/shirtsgroup/LLC_Membranes}. 
+  Documentation is a work in progress. It is available for viewing in its 
+  current state at \url{https://llc-membranes.readthedocs.io/en/latest/}.
+
+  \section{Timeline for Completion of Objectives}\label{section:timeline}
+
+  A schematic of the estimated timeline that will be followed for the completion of
+  tasks pertinent to finishing all objectives is given in Table~\ref{table:timeline}.
+  \begin{itemize}
+    \item Simulations required to study the structure of the bicontinuous cubic
+    phase will be run in parallel while working out the details of our stochastic
+    model of transport in the H\textsubscript{II} phase.
+    \item Simulations and analysis required for Q\textsubscript{I} phase solute 
+    transport studies analogous to those of Objective 2 will be carried out 
+    throughout Fall 2019.
+    \item Finalization of code documentation and application of a stochastic
+    model to the Q\textsubscript{I} phase will be finished by May 2020
+  \end{itemize}
+
+  \begin{center}  
+  \begin{table}[!htb]
+	\renewcommand\arraystretch{1.4}\arrayrulecolor{LightSteelBlue3}
+	\captionsetup{singlelinecheck=false, font=blue, labelfont=sc, labelsep=quad}
+	\caption{Estimated Timeline for Completion of Objectives}\vskip -1.5ex
+	\begin{tabular}{@{\,}r <{\hskip 2pt} !{\foo} >{\raggedright\arraybackslash}p{8cm}}
+	\toprule
+	\addlinespace[1.5ex]
+	August 2019 & Complete Stochastic Model for H\textsubscript{II} phase \\
+	September 2019 & Finalize Q\textsubscript{I} phase structure \\
+    January 2020 & Finish transport study of Q\textsubscript{I} phase \\
+    April 2020 & Complete code documentation \\
+    April 2020 & Finish application of stochastic model to Q\textsubscript{I} phase \\
+    May 2020 & PhD Defense \\
+	\end{tabular}
+	\label{table:timeline}
+  \end{table}
+  \end{center}
+  
+  \section{Resource Requirements}\label{section:resources}
+  %BJC: Not sure what to include here. Hour estimate? Or omit this section.   
+  
+  The remainder of our work will require the use of high performance computing (HPC)
+  resources. 
+  \begin{itemize}
+    \item We will continue using Bridges, an XSEDE resource as well as Summit, a
+    supercomputer located at CU Boulder.
+  \end{itemize}
+  
+  % BJC: add funding?
+
+  \newpage
+  \bibliographystyle{ieeetr}
+  \bibliography{comps}
+
+\end{document}
