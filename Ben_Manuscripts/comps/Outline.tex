@@ -13,8 +13,13 @@
 \usepackage{gensymb}
 \usepackage{float}
 \usepackage[x11names,table]{xcolor}
-\renewcommand{\baselinestretch}{1.5}
+\usepackage{setspace}
+\usepackage[font=small]{caption}
+\setstretch{1.5} % line spacing
+\captionsetup[table]{font={stretch=1,small}} % line spacing in tables
+\captionsetup[figure]{font={stretch=1,small}} % line spacing in figures
 \usepackage{url}
+% For timeline
 \newcommand{\foo}{\color{LightSteelBlue3}\makebox[0pt]{\textbullet}\hskip-0.5pt\vrule width 1pt\hspace{\labelsep}}
 \DeclareCaptionFont{blue}{\color{LightSteelBlue3}}
 \usepackage{array,booktabs}
@@ -26,6 +31,8 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
 \author{Benjamin J. Coscia} 
 
 \begin{document}
+
+  \graphicspath{{./figures/}}
 
   \maketitle
   \thispagestyle{empty}
@@ -299,35 +306,499 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
 
   \section{Progress to Date}\label{section:progress}
   
-  \textbf{\large Objective 1:} \textit{\large Build and understand nanoscopic structure of LLC membranes} (\textcolor{green!40!olive}{\textbf{Complete}})
+  \textbf{\large Objective 1:} {\large Build and understand the nanoscopic structure of LLC membranes} (\textcolor{green!40!olive}{\textbf{Complete}})
   
-  \noindent We have developed a procedure for building an LLC membrane unit cell.
+  \noindent Our first task was to develop a procedure for building and equilibrating 
+  an atomistic LLC membrane system (see Figure~\ref{fig:assembly}).
+  \begin{itemize}
+    \item We built a monoclinic unit cell consisting of four pores.
+    \item Each pore is composed of monomer columns, where each column
+    consists of 20 monomers stacked on top of each other so that the 
+    phenyl groups are coplanar with each other and the $xy$ plane. 
+    \item The columns are oriented so that the hydrophilic monomer head
+    groups face towards the pore center.
+    \item We equilibrate the unit cell using a series of simulations
+    with head groups held in place by position restraints. 
+    \item We gradually reduce the force constant of the position 
+    restraints until the system is completely unrestrained.
+    \item We carried out 400 ns equilibration simulations.
+  \end{itemize}
   
-  \noindent We have created a molecular model that is maximally consistent with
-  experimental WAXS data.
+  \begin{figure}[!htb]
+      \centering
+      \begin{subfigure}{.3\textwidth}
+              \centering
+              \includegraphics[width=\textwidth]{NaGA3C11.pdf}
+              \caption{}~\label{fig:monomer}
+      \end{subfigure}
+      \begin{subfigure}{.3\textwidth}
+              \centering
+              \includegraphics[width=\textwidth]{monomer_twocolor.pdf}
+              \caption{}~\label{fig:atomistic_monomer}
+      \end{subfigure}
+      \begin{subfigure}{0.3\linewidth}
+              \centering
+              \includegraphics[width=0.6\textwidth]{wedge_thick.pdf}
+              \caption{}~\label{fig:wedge}
+      \end{subfigure}
+              \begin{subfigure}{0.4\linewidth}
+              \centering
+              \includegraphics[width=0.6\textwidth]{columns.pdf}
+              \caption{}~\label{fig:wedge_layer}
+      \end{subfigure}
+      \begin{subfigure}{0.4\linewidth}
+              \centering
+              \includegraphics[width=0.6\textwidth]{hexagonal_packing.pdf}
+              \caption{}~\label{fig:hex_packing_simple}
+      \end{subfigure}
+      \caption{(a) The LLC monomer Na-GA3C11 (b) rendered atomistically (c)
+      exhibits wedge-like character. (d) Monomers stack on top of each other to
+      create columns with short range order, then assemble into pores with
+      hydrophilic head groups (blue) facing towards the pore center. (e) The
+      pores assemble into hexagonally packed columnar mesophases.}~\label{fig:assembly}
+  \end{figure}
   
-  \noindent Water is necessary to fully reproduce all features in the WAXS pattern.
+  \noindent We tested a number of different initial column architectures. 
+  \begin{itemize}
+      \item We stacked monomers in parallel displaced and sandwiched 
+      configurations, two possible $\pi$-$\pi$ stacking modes.
+      \item We also varied the initial distance between stacked monomers, $d$.
+      \item We chose values of 3.7 \AA, based on experimental WAXS 
+      measurements, as well as 5 \AA as a test of its sensitivity.
+  \end{itemize}
   
-  \noindent An ensemble of simulation trajectories best capture the system's 
-  time averaged behavior.
+  \noindent Our model's geometry is most consistent with experiment for systems
+  built with 5 columns per pore and monomers initially stacked 3.7 \AA apart
+  (see Figure~\ref{fig:p2p}). 
+  \begin{itemize}
+    \item We equilibrated systems with 4, 5, 6, 7 and 8 columns per pore.
+    \item The pore spacing of 5 column-per-pore systems agree well with experiment.
+    \item 6 column-per-pore systems built with $d$ = 5 \AA appear to yield an
+    experimentally consistent pore spacing however, the equilibrated distance
+    between stacked monomers stay close to 5 \AA which is inconsistent with 
+    experiment. 
+    \item In general, the equilibrated distance between monomers stays close to
+    its initial value. 
+  \end{itemize}
+  
+  \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=\linewidth]{p2p.pdf}
+    \caption{Systems with 5 columns per pore have equilibrated pore spacings
+            closest to the experimental value of 4.12 nm. The equilibrated 
+            pore spacing of the model increases as the number of columns in
+            each pore increases.}~\label{fig:p2p}
+  \end{figure}
+  
+%  \noindent On timescales that we can reasonably simulate, our equilibrated
+%  structures show some initial configuration dependence. 
+%  \begin{itemize}
+%    \item All of the systems used to generate Figure~\ref{fig:p2p} are at 
+%    least metastable.
+%    \item We observe no large scale rearrangements that would be necessary
+%    for all structures to converge to the same equilibrium structure. 
+%  \end{itemize}
+
+  \noindent We further validated the structure of our molecular model by 
+  verifying its consistency with five major reflections present in the 
+  experimental WAXS pattern.
+  \begin{itemize}
+    \item The five major reflections and the structural features leading
+    to them are summarized in Figure~\ref{fig:WAXS_comparison}.
+    \item Using MD trajectories, we simulated X-ray diffraction (XRD) 
+    patterns that we could compare to the WAXS data by taking the 
+    appropriate cross-section of the time-averaged 3D structure factor. 
+    \item None of the models simulated to this point could reproduce R-double.   
+  \end{itemize}   
+  
+  \noindent It is necessary to add a small amount of water to our model in
+  order to fully reproduce all features of the WAXS pattern.
+  \begin{itemize}
+    \item We built our most experimentally consistent structure in the 
+    parallel displaced configuration with 1 wt \% water added to the 
+    pores. 
+    \item This is the only configuration that gives rise to the 
+    R-double feature. 
+    \item R-double appears because vertically adjacent monomer head groups
+    hydrogen bond with shared water molecules, causing them to be drawn 
+    closer together.
+    \item When multiple pairing interactions occur in series along the 
+    same pore axis, the center of masses of the pairs are spaced apart at 
+    twice the $\pi$-stacking distance. 
+  \end{itemize}
+  
+  %\begin{wrapfigure}{L}{0.5\textwidth}
+  \begin{figure}[!htb]
+  	\centering
+    \begin{subfigure}{0.49\linewidth}
+    	\includegraphics[width=\linewidth]{WAXS_annotated_words.pdf}
+        \caption{Experiment}\label{fig:WAXS}
+    \end{subfigure}
+	\begin{subfigure}{0.49\linewidth}
+        \includegraphics[width=\linewidth]{solvated_offset_rzplot_1.pdf}
+        \caption{Simulation}\label{fig:solvated_XRD}   
+	\end{subfigure}
+    \caption{(a) 2D-WAXS gives details about repeating features on the order of
+    angstroms. Our explanations for each of the 5 major reflections present are
+    as follows: (R-$\pi$) Aromatic head groups $\pi-\pi$ stack 3.7 \AA~apart. 
+    (R-double) Monomer head groups associate into pairs by hydrogen bonding with
+    a shared water molecule. (R-alkanes) Alkane chain tails pack 4.5 \AA~apart. 
+    (R-spots) Monomer tails pack hexagonally. (R-pores) The pores are spaced 
+    4.12 nm apart and pack hexagonally. (b) We obtain a maximally consistent
+    match between simulated XRD patterns and experimental WAXS data when we
+    build systems in the parallel displaced configuration with 1 wt \% water
+    included in the pores.}\label{fig:WAXS_comparison}
+ \end{figure}
+ %\end{wrapfigure}
+ 
+  %BJC: I think this is important to say somewhere
+  \noindent On the timescales that we can reasonably simulate, our model
+  exhibits slow dynamics. 
+  \begin{itemize}
+    \item Consequently, there are very few uncorrelated frames in our 
+    trajectories which leads to noise in the simulated XRD patterns. 
+    \item We can overcome this issue by combining the structure factors
+    generated from an ensemble of trajectories produced starting from 
+    an ensemble of uncorrelated initial configurations.
+  \end{itemize}
+ 
+  \noindent The composition of the pores does not change regardless of which
+  initial configuration we study.
+  \begin{itemize}
+    \item In Figure~\ref{fig:overlaid_densities}, we plot the radial density
+    of various monomer components as a function of distance from the pore
+    centers. 
+    \item All are qualitatively similar meaning that a solute placed in 
+    any of these systems should experience a similar chemical environment.
+    \item Although we will move forward with our most promising configuration,
+    this is an important finding since it implies that we do not need to apply
+    the same level of rigor when screening new monomers.
+  \end{itemize}
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{\textwidth}
+  \includegraphics[width=\textwidth]{regional_density_legend.pdf}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=1\linewidth]{head_group_density.pdf}
+        \caption{Head Groups}
+        \label{fig:head_groups_regional_density}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=1\linewidth]{tails_density.pdf}
+        \caption{Tails}
+        \label{fig:tails_regional_density}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=1\linewidth]{sodium_density.pdf}
+        \caption{Sodium Ions}
+        \label{fig:sodium_regional_density}
+  \end{subfigure}
+  \caption{In all cases, the component radial distribution functions are similar.
+      They exhibit a composition gradient transitioning from the hydrophilic to the hydrophobic
+          regions. The biggest differences are at r=0 where noise is higher due to
+          decreased sampling. The center of the pore is not hollow, but contains sodium ions and
+          head groups, even when the system is solvated. This architecture may impede transport in
+          the real system in a chemically-dependent manner.
+          The solvated system has a lower density of head groups near the
+          pore center which is likely due to the swelling that is necessary in order to fit water
+          molecules in the pore region.}~\label{fig:overlaid_densities}
+  \end{figure}
   
   \noindent \textbf{\large Objective 2:} \textit{\large Determine transport mechanisms} (\textcolor{green!40!olive}{\textbf{Complete}})
   
-  \noindent We added additional water to our model to create the H\textsubscript{II} phase
+  \noindent We added additional water to our best Col\textsubscript{h} 
+  phase model in order to create the H\textsubscript{II} phase.
+  \begin{itemize}
+    \item There have been a range of reported water contents used to 
+    form the H\textsubscript{II} phase with this particular monomer.
+    \item Although Resel et al. commented that the system is likely
+    already fully hydrated at 7 wt \% water with additional water
+    trapped in defects between mesophases.
+    \item Therefore, we built two systems with 5 and 10 wt \% water.
+  \end{itemize}
   
-  \noindent Water partitions into the distal tail region
+  \noindent We observed that water partitions into the distal tail region.
+  \begin{itemize}
+    \item We define the distal tail region to be any radial distance 
+    greater than 1.5 nm from any pore center. 
+    \item There is an approximately 3:2 ratio of water in the pores to
+    water in the distal tails. 
+    \item Due to the wedge shape of the monomers, the distal tail region
+    has a relatively low density leaving space for water molecules to 
+    fill.  
+  \end{itemize}
   
-  \noindent The pore structure changes
+  \noindent The pores of the H\textsubscript{II} phase are primarily a 
+  mixture of water and sodium ions.
+  \begin{itemize}
+    \item The maximum density of head groups occurs 0.45 and 0.65 nm from
+    the pore center in the 5 and 10 wt\% water systems respectively (see
+    Figure~\ref{fig:component_densities}). 
+    \item There are almost no head groups occupying the pore center.
+  \end{itemize}
   
-  \noindent We place 20 small polar solutes 
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{component_density_dry.pdf}
+  %BJC: simulation is extended to smooth out these curves
+  \caption{Dry System}\label{fig:component_density_dry}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \vspace{-0.5cm}
+  \includegraphics[width=\textwidth]{monomer_color_coded.pdf}
+  \label{fig:monomer_color_coded}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{component_density_5wt.pdf}
+  \caption{5 wt\% water}\label{fig:component_density_5wt}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{component_density_10wt.pdf}
+  \caption{10 wt\% water}\label{fig:component_density_10wt}
+  \end{subfigure}
+  \caption{The radial densities of various monomer components paint a
+  picture of the pore topology where the pore centers are primarily composed
+  of water and sodium ions. The monomer groups labeled in each plot correspond to
+  the color-coded monomer pictured in the upper right corner of the figure.
+  All RDFs represent the number of atoms located at a given distance from the
+  pore center normalized by the volume of the annular bin to which they belong.
+  (a) In the dry system, the density of head groups and sodium ions are highest
+  within 0.25 nm of the pore center. (b) In the 5 wt \% system, monomer head
+  groups retreat about 0.2 nm radially in order to make room for water molecules.
+  (c) Monomers in the 10 wt \% system retreat an additional 0.2 nm to make room
+  for more water.}\label{fig:component_densities}
+  \end{figure}
   
-  \noindent The mean squared displacements are not a monotonic function of solute MSD
+  \noindent Water and sodium transport is significantly faster in the less
+  crowded 10 wt \% water pores. 
+  \begin{itemize}
+    \item The MSD of water is about 51 times higher and the MSD of sodium is
+    about 49 times higher compared to 5 wt \% system.
+    \item In general we observe similar solute transport mechanisms in the 5
+    and 10 wt \% water systems but at different time scales.
+    \item Therefore, we will focus on the 10 wt \% water system since we
+    can collect a larger quantity of mechanistic data from the solute 
+    trajectories.
+  \end{itemize}
   
-  \noindent Solute behavior is subdiffusive.
+  \noindent We observed transport of 20 different small polar solutes in the
+  pores of our model. 
+  \begin{itemize}
+    \item We created a separate initial configuration for each solute studied.
+    \item We placed 6 solutes, equally spaced in $z$, in each nanopore.
+    \item We allowed the solutes to simulate for 1 microsecond. 
+  \end{itemize}
   
-  \noindent Subdiffusive behavior is a consequence of a hopping and trapping mechanism.
+  \noindent The MSDs are not a monotonic function of solute size.
+  \begin{itemize}
+    \item In Figure~\ref{fig:all_msds_10wt}, we plotted the average
+    MSD of each solute. 
+    \item In Figure~\ref{fig:msd_radius_10wt}, we plotted solute
+    MSDs against their molecular radius.
+    \item We also plotted theoretical curves which illustrate the 
+    expected MSD of each solute if they were to travel unhindered.
+    \item We ensured that the Stokes-Einstein equation with the
+    correction factor of Gierer and Wirtz passed through methanol 
+    in order to give an approximate frame of reference. 
+    \item Methanol is small and therefore can travel relatively
+    unhindered compared to all other solutes.
+    \item The theoretical line can be used as an approximate boundary
+    between subdiffusive, Brownian and superdiffusive behavior.
+  \end{itemize}
   
-  \noindent There are three mechanisms of entrapment.
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{all_10wt_tamsds.pdf}
+  \caption{10 wt \% water}\label{fig:all_msds_10wt}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{msd_radius_10wt.pdf}
+  \caption{10 wt \% water}\label{fig:msd_radius_10wt}
+  \end{subfigure}
+  \caption{The MSDs of solutes in the 5 wt \% water system (a) are significantly
+  smaller than those of the solutes in the 10 wt \% water system (b). The
+  MSDs are not a monotonic function of molecular size (c and d). A significant
+  number of solute MSDs fall below the theoretical lines predicted by the
+  Stokes-Einstein equation and Gierer and Wirtz' corrected Stokes-Einstein equation.
+  }\label{fig:msds}
+  \end{figure}
+  
+% 5 and 10 wt %
+%  \begin{figure}[!htb]
+%  \centering
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\textwidth]{all_5wt_tamsds.pdf}
+%  \caption{5 wt \% water}\label{fig:all_msds_5wt}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\textwidth]{all_10wt_tamsds.pdf}
+%  \caption{10 wt \% water}\label{fig:all_msds_10wt}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\textwidth]{msd_radius_5wt.pdf}
+%  \caption{5 wt \% water}\label{fig:msd_radius_5wt}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\textwidth]{msd_radius_10wt.pdf}
+%  \caption{10 wt \% water}\label{fig:msd_radius_10wt}
+%  \end{subfigure}
+%  \caption{The MSDs of solutes in the 5 wt \% water system (a) are significantly
+%  smaller than those of the solutes in the 10 wt \% water system (b). The
+%  MSDs are not a monotonic function of molecular size (c and d). A significant
+%  number of solute MSDs fall below the theoretical lines predicted by the
+%  Stokes-Einstein equation and Gierer and Wirtz' corrected Stokes-Einstein equation.
+%  }\label{fig:msds}
+%  \end{figure}
+  
+  \noindent Intermittent hops between long periods of entrapment lead
+  to subdiffusive solute transport behavior. 
+  \begin{itemize}
+    \item As Figure~\ref{fig:msd_radius_10wt} implies, most solutes
+    move significantly slower than expected.
+    \item In Figure~\ref{fig:example_ztraces}, we've plotted the $z$-direction
+    trajectory of three ethanol molecules.
+    \item Typically, long periods of entrapment occur when ethanol 
+    molecules are far from the pore center, while there is a much 
+    greater degree of mobility close to the pore center.
+    \item The MSD curve averaged over all ethanol trajectories is shown
+    in Figure~\ref{fig:example_msd}.
+    \item The curve is sub-linear and thus subdiffusive.
+  \end{itemize}
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\linewidth]{colorful_example_ztraces.pdf}
+  \caption{}\label{fig:example_ztraces}
+  \end{subfigure}
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\linewidth]{example_msd.pdf}
+  \caption{}\label{fig:example_msd}
+  \end{subfigure}
+  \caption{All solutes show subdiffusive transport behavior inside the membrane's
+  nanopores, similar to that exhibited by ethanol. (a) The $z$-coordinate trace of
+  3 representative ethanol COMs shows clear periods of entrapment separated by hops.
+  In general, the longest dwell times occur when solutes are situated far from the
+  pore center and the hops occur when solutes are close to the pore center. (b) The
+  time-averaged MSD of ethanol is sub-linear which suggests transport is governed
+  by an anomalous subdiffusion process.}\label{fig:qualitative_mechanisms}
+  \end{figure}
+  
+  \noindent We observe three mechanisms of entrapment that are responsible for 
+  subdiffusive behavior.
+  \begin{enumerate}
+    \item As already demonstrated in Figure~\ref{fig:example_ztraces}, solutes that
+    drift away from the pore center can become entangled in the monomer tails. 
+    \item Many of the solutes we studied are capable of donating hydrogen bonds to
+    monomer head groups and thus are prone to temporary immobilization through this interaction.
+    \item Because all solutes are polar, they have regions of concentrated electron
+    density, modeled as partial charges, which can associate with sodium ions
+    partially bound to monomer head groups.
+  \end{enumerate}
+  
+  Due to the crowded environment among the monomer tails, solutes generally move faster
+  in the less dense pore region.
+  \begin{itemize}
+    \item Figure~\ref{fig:hop_lengths} shows that this is the case for all solutes.
+    \item Hops made in the pore region are on average 45 \% larger than those made
+    outside the pore region.
+  \end{itemize}
+  
+  However, time spent in the pore region does not necessarily result
+  in a high MSD. 
+  \begin{itemize}
+    \item For example, ribose spends the largest fraction of time in 
+    the pore center, but has the lowest hop frequency and the third 
+    lowest average MSD (see Figures~\ref{fig:frac_time} and ~\ref{fig:hopfreq}).
+  \end{itemize}
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\linewidth]{hop_length.pdf}
+  \caption{}\label{fig:hop_lengths}
+  \end{subfigure}
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\textwidth]{frac_time_spent.pdf}
+  \caption{}\label{fig:frac_time}
+  \end{subfigure}
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\textwidth]{hopfreq_total.pdf}
+  \caption{}\label{fig:hopfreq}
+  \end{subfigure}
+  \caption{(a) Hops made in the pore region of the 10 wt \% water system
+  are, on average, 45 \% larger than those made outside the pore region.
+  The trend in hop lengths is similar to the trend in MSDs shown in
+  Figure~\ref{fig:all_msds_10wt} implying that solutes which make consistently
+  larger hops have higher MSDs. The fraction of time spent by a solute in the
+  pore region (b) does not necessarily lead to more frequent hopping (c). For
+  example, ribose spends the largest fraction of time in the pore region, yet
+  performs the the second lowest number of hops.}\label{fig:hops}
+  \end{figure}
+  
+  \noindent The frequency with which solutes donate hydrogen bonds to monomer
+  head groups is related to the number of hydrogen bond donating atoms as well
+  as their identity.
+  \begin{itemize}
+    \item The percentage of solutes actively participating in at least one
+    hydrogen bond with a head group each frame descends as the number of 
+    hydroxyl groups decreases.
+    \item Solutes that containing sulfur and nitrogen atoms in place of 
+    oxygen atoms hydrogen bond less frequently since they are less 
+    electronegative elements.
+    \item The lifetime of hydrogen bonds follows nearly the same trend. Hydrogen
+    bonds of solutes that hydrogen bond more frequently last longer. 
+  \end{itemize}
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{nhbonds_all.pdf}  % unique_hbonds.py
+  \caption{}\label{fig:nhbonds}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{hbond_lifetime.pdf}  % hbond_dwells.py
+  \caption{}\label{fig:hbond_dwells}
+  \end{subfigure}
+  \caption{(a) Solutes capable of donating hydrogen bonds to monomer head groups
+  do so to varying degrees. The reported percentages represent unique solute-monomer
+  hydrogen bonds. Individual solutes that hydrogen bond with multiple head groups
+  simultaneously are only counted once. (b) The lifetime of individual hydrogen
+  bonds appears correlated to the percentage of solutes involved in hydrogen bond
+  interactions. Hydrogen bond lifetimes tend to be longer for solutes that
+  hydrogen bond frequently. Note that solutes incapable of donating hydrogen
+  bonds are omitted from this figure.}\label{fig:hbonds}
+  \end{figure}
+  
+  \noindent Solutes with carbonyl groups tend to associate with sodium ions most frequently.
+  \begin{itemize}
+    \item The seven solutes that coordinate to sodium the most and 
+    the six solutes with the longest association dwell times all contain 
+    carbonyl groups, with the exception of DMSO which has an analagous sulfinyl group
+    (see Figures~\ref{fig:all_solutes_NA_coordination} and~\ref{fig:all_NA_dwells}).
+	\item Solutes with nitrogen atoms adjacent to the carbonyl groups tend to
+	associate with sodium ions significantly more. 
+  \end{itemize}
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{all_solutes_NA_coordination.pdf}
+  \caption{}\label{fig:all_solutes_NA_coordination}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{all_NA_dwells.pdf}
+  \caption{}\label{fig:all_NA_dwells}
+  \end{subfigure}
+  \caption{(a) Solutes, especially those with carbonyl groups, spend a
+  significant fraction of time coordinated to sodium ions. (b) The length
+  of time a solute-sodium pairs spends associated tends to be higher for
+  pairs that associate more frequently.}\label{fig:na_coordination}
+  \end{figure}
   
   \noindent \textbf{\large Objective 3:} \textit{\large Create a stochastic model} (\textcolor{blue}{\textbf{In Progress}})
   
@@ -336,13 +807,37 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   
   \noindent The distribution of dwell times is power law distributed.
   
-  \noindent The distribution of hop lengths is approximately gaussian
+  \noindent The distribution of hop lengths is approximately Gaussian
   
   \noindent The model will likely have a radial dependence. 
   
   \noindent \textbf{\large Objective 4:} \textit{\large Apply analyses to Q\textsubscript{I} phase} (\textcolor{blue}{\textbf{In Progress}})
   
-  \noindent We have developed a procedure to build the Q\textsubscript{I} phase.
+  Paralleling our work on the H\textsubscript{II} phase, our first task was to
+  build a suitable unit cell representation of the Q\textsubscript{I} phase. 
+  \begin{itemize}
+    \item Unfortunately, the true space group of the Q\textsubscript{I}
+    phase that we are studying is unknown. 
+    \item Experimental diffraction has narrowed down the possible bicontinuous
+    cubic configurations to the Ia3d and Pn3m space groups. 
+    \item Therefore, we will build both types of unit cells and search for
+    cues that can be used to differentiate them experimentally.
+  \end{itemize}  
+  
+  \noindent We have developed procedures to build both Ia3d and Pn3m unit
+  cells.
+  \begin{itemize}
+    \item To our knowledge, nobody has ever built an atomistic bicontinuous
+    cubic phase system without the aid of self-assembly.
+    \item Self-assembly can be a long process, especially for fully atomistic
+    systems. 
+    \item Instead, we used known analytical equations that describe the 
+    surface of these systems in order to place monomers into a unit cell.
+    \item Monomers are placed perpendicular to the surface in random locations
+    that don't overlap. One can control the pore size by translating monomers 
+    perpendicular to the surface at the point where they are attached.
+    %BJC: not sure how much more detail to include. Can go into a lot. Have to expand box and slowly compress. Add glycerol iteratively until there are no gaps.
+  \end{itemize}
   
   \noindent \textbf{\large Objective 5} \textit{\large Create a well-documented python package} (\textcolor{blue}{\textbf{In Progress}})
   
