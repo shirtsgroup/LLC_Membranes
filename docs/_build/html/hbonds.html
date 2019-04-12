@@ -102,8 +102,6 @@
 <li class="toctree-l2"><a class="reference internal" href="p2p.html">Distance Between Pores</a></li>
 <li class="toctree-l2"><a class="reference internal" href="msd.html">Calculate Mean Squared Displacement</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Identify Hydrogen Bonds</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#example-usage">Example Usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rdf.html">Radial Distribution Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="correlation.html">Correlation Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="coordination_number.html">Calculate Coordination Numbers</a></li>
@@ -294,9 +292,8 @@ annotations or no atoms will be selected!</p>
 </dd></dl>
 
 </div>
-</div>
 <div class="section" id="examples">
-<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># imports</span>
 <span class="kn">from</span> <span class="nn">LLC_Membranes.analysis</span> <span class="kn">import</span> <span class="n">hbonds</span>
 </pre></div>
@@ -320,6 +317,7 @@ annotations or no atoms will be selected!</p>
 <span class="n">sys</span><span class="o">.</span><span class="n">plot_hbonds</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
 <div class="section" id="command-line-functionality">
 <h2>Command Line Functionality<a class="headerlink" href="#command-line-functionality" title="Permalink to this headline">¶</a></h2>
 <p>Use geometric criteria to identify hydrogen bonds</p>
@@ -327,7 +325,7 @@ annotations or no atoms will be selected!</p>
                  <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="n">RESIDUES</span> <span class="p">[</span><span class="n">RESIDUES</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span> <span class="n">ATOMS</span> <span class="p">[</span><span class="n">ATOMS</span> <span class="o">...</span><span class="p">]]</span>
                  <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">DISTANCE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">angle</span> <span class="n">ANGLE_CUT</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span> <span class="n">LOAD</span><span class="p">]</span>
                  <span class="p">[</span><span class="o">-</span><span class="n">acc</span> <span class="n">ACCEPTORS</span> <span class="p">[</span><span class="n">ACCEPTORS</span> <span class="o">...</span><span class="p">]]</span>
-                 <span class="p">[</span><span class="o">-</span><span class="n">donors</span> <span class="n">DONORS</span> <span class="p">[</span><span class="n">DONORS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span> <span class="n">SAVENAME</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">-</span><span class="n">donors</span> <span class="n">DONORS</span> <span class="p">[</span><span class="n">DONORS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span> <span class="n">SAVENAME</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">noshow</span><span class="p">]</span>
 </pre></div>
 </div>
 <div class="section" id="Named Arguments">
@@ -402,16 +400,22 @@ annotations or no atoms will be selected!</p>
 <td><p class="first">Name of pickled object to save aftercalcualtions are complete</p>
 <p class="last">Default: &#8220;hbonds.pl&#8221;</p>
 </td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-noshow, &#8211;noshow</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">Do not display plots</p>
+<p class="last">Default: False</p>
+</td></tr>
 </tbody>
 </table>
 </div>
 </div>
-</div>
 <div class="section" id="example-usage">
-<h1>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h1>
+<h2>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># hydrogen bonds between atoms O3 and O4 of the monomer HII with all atoms of water</span>
 hbonds.py -t trajectory.xtc -g coordinates.gro -r HII HOH -a O3 O4 -a all
 </pre></div>
+</div>
 </div>
 </div>
 

@@ -1,3 +1,5 @@
+.. _analysis:
+
 Post-Simulation Trajectory Analysis
 ===================================
 
