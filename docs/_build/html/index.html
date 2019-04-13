@@ -46,7 +46,7 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Preparation of Monomers and Solutes" href="prep.html" /> 
+    <link rel="next" title="Software Requirements" href="requirements.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -95,6 +95,7 @@
             
             
               <ul>
+<li class="toctree-l1"><a class="reference internal" href="requirements.html">Software Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prep.html">Preparation of Monomers and Solutes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="setup.html">System Setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analysis.html">Post-Simulation Trajectory Analysis</a></li>
@@ -164,47 +165,66 @@
             
   <div class="section" id="simulate-lyotropic-liquid-crystal-membranes">
 <h1>Simulate Lyotropic Liquid Crystal Membranes<a class="headerlink" href="#simulate-lyotropic-liquid-crystal-membranes" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="_images/toc_image_final.png"><img alt="pic1" src="_images/toc_image_final.png" style="width: 49%;" /></a> <a class="reference internal" href="_images/unitcell.png"><img alt="pic2" src="_images/unitcell.png" style="width: 49%;" /></a></p>
 <div class="section" id="background">
 <h2>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h2>
-<p>Lyotropic liquid crystals (LLC) are amphiphilic molecules that
-can self-assemble into various ordered phases depending on the
-amount of water present in solution. LLC monomers with crosslinkable
-functional groups can be reacted in order to create stable and
-mechanically robust films that can be used as separations membranes.</p>
-<p>The hydrophilic pores of cross-linked nanostructured LLC membranes are
-uniform in size which makes them ideal for selective separations.</p>
-<p>We are most interested in the hexagonal (H_II) and bicontinuous cubic phases
-formed by LLC membranes because the</p>
+<p>Lyotropic liquid crystals (LLC) are amphiphilic molecules that can
+self-assemble into various ordered phases depending on the amount of water
+present in solution. LLC monomers with crosslinkable functional groups can be
+reacted in order to create stable and mechanically robust films that can be
+used as separations membranes.</p>
+<p>We are interested in studying the invert hexagonal (H<sub>II</sub>) and bicontinuous
+cubic phases (Q<sub>I</sub>) formed by LLC monomers. The hydrophilic pores of
+cross-linked nanostructured LLC membranes are uniform in size and contain
+interacting functional groups which makes them ideal for selective separations.</p>
+<p>The H<sub>II</sub> phase geometry (top left image) consists of hexagonally packed and
+uniform-sized pores. In the presence of water, LLC monomers spontaneously
+self-assemble into hexagonal mesophases that are isotropically oriented with
+respect to each other. In this state, transport is inherently slow. A fully
+aligned H<sub>II</sub> phase membrane with continuous through-pores represents the ideal
+geometry for high throughput separations. Aligning the hexagonal mesophases on
+a large scale is not trivial. Successful efforts have been made on a small
+scale (see <a class="footnote-reference" href="#id6" id="id1">[1]</a> and <a class="footnote-reference" href="#id7" id="id2">[2]</a>), however more work needs to be done to make this a
+viable membrane. Nevertheless, the primary focus of our simulations to date
+has been with the H<sub>II</sub> phase because its geometry is simple to model.</p>
+<p>The Q<sub>I</sub> phase (top right image) consists of a tortuous network of 3D
+interconnected pores.  This geometry does not require alignment and therefore
+has been studied as a separations membrane far more than the H<sub>II</sub> phase.  The
+high selectivity of these membranes has been studied and applied to complex
+waste streams such as hydraulic fracturing flowback water <a class="footnote-reference" href="#id8" id="id3">[3]</a> <a class="footnote-reference" href="#id9" id="id4">[4]</a> <a class="footnote-reference" href="#id10" id="id5">[5]</a>. To
+date, we have learned to build atomstic unit cells for these systems and we
+plan to carry out the same analyses applied to the H<sub>II</sub> system but adapted to
+the more complex Q<sub>I</sub> geometry.</p>
+</div>
+<div class="section" id="effective-use-of-this-repository">
+<h2>Effective use of this repository<a class="headerlink" href="#effective-use-of-this-repository" title="Permalink to this headline">¶</a></h2>
+<p>The tools in this repository are intended for studying structure and transport
+within H<sub>II</sub> or Q<sub>I</sub> phase membranes formed by liquid crystal monomers.</p>
+<p>Most of the tools are built using python and are tested to work with output
+files generated by molecular simulations run with <a class="reference external" href="http://www.gromacs.org">GROMACS</a>.  See our full list of <a class="reference internal" href="requirements.html#software-reqs"><span class="std std-ref">Software Requirements</span></a>.</p>
+<p>Screening a given monomer can be divided into three main categories:</p>
+<ol class="arabic simple">
+<li><strong>Parameterization</strong>: In most cases, you will need to build and parameterize monomers before building a full membrane. Instructions and scripts to do this are given in the <a class="reference internal" href="prep.html#prep"><span class="std std-ref">Preparation of Monomers and Solutes</span></a> section.</li>
+<li><strong>System Construction and Simulation</strong>: Next, you will need to build a unit cell and create input files for GROMACS simulations. See our <a class="reference internal" href="setup.html#system-setup"><span class="std std-ref">System Setup</span></a> section for instructions.</li>
+<li><strong>Analysis</strong>: Once your simulations are run, you can conduct <a class="reference internal" href="analysis.html#analysis"><span class="std std-ref">Post-Simulation Trajectory Analysis</span></a>.</li>
+</ol>
+</div>
+<div class="section" id="publications">
+<h2>Publications<a class="headerlink" href="#publications" title="Permalink to this headline">¶</a></h2>
+<p>Coscia, Benjamin J., Joseph Yelk, Matthew A. Glaser, Douglas L. Gin, Xunda
+Feng, and Michael R. Shirts. “Understanding the Nanoscale Structure of Inverted
+Hexagonal Phase Lyotropic Liquid Crystal Polymer Membranes.” The Journal of
+Physical Chemistry B 123, no. 1 (January 10, 2019): 289–309.
+<a class="reference external" href="https://doi.org/10.1021/acs.jpcb.8b09944">https://doi.org/10.1021/acs.jpcb.8b09944</a>.</p>
 </div>
 <div class="section" id="table-of-contents">
 <h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="prep.html">Preparation of Monomers and Solutes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="monomer_prep.html">Preparation of Liquid Crystal Monomers</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="setup.html">System Setup</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="build.html">Build Initial Configurations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="input.html">Generate Gromacs Input Files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="input.html#command-line-functionality">Command Line Functionality</a></li>
-<li class="toctree-l2"><a class="reference internal" href="solvation_equilibration.html">Solvate an Initial Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="place_solutes_pores.html">Place Solutes in Pores</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xlink.html">Cross-linking</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="analysis.html">Post-Simulation Trajectory Analysis</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="p2p.html">Distance Between Pores</a></li>
-<li class="toctree-l2"><a class="reference internal" href="msd.html">Calculate Mean Squared Displacement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hbonds.html">Identify Hydrogen Bonds</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hbonds.html#examples">Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hbonds.html#example-usage">Example Usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="rdf.html">Radial Distribution Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="correlation.html">Correlation Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="coordination_number.html">Calculate Coordination Numbers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ztrace.html">Plot z-coordinate Versus Radial Position</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="requirements.html">Software Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prep.html">Preparation of Monomers and Solutes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">System Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Post-Simulation Trajectory Analysis</a></li>
 </ul>
 </div>
 </div>
@@ -216,6 +236,39 @@ formed by LLC membranes because the</p>
 <li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
 <li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
 </ul>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<table class="docutils footnote" frame="void" id="id6" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Feng, Xunda, Marissa E. Tousley, Matthew G. Cowan, Brian R. Wiesenauer, Siamak Nejati, Youngwoo Choo, Richard D. Noble, Menachem Elimelech, Douglas L. Gin, and Chinedum O. Osuji. “Scalable Fabrication of Polymer Membranes with Vertically Aligned 1 Nm Pores by Magnetic Field Directed Self-Assembly.” ACS Nano 8, no. 12 (December 23, 2014): 11977–86. <a class="reference external" href="https://doi.org/10.1021/nn505037b">https://doi.org/10.1021/nn505037b</a>.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id7" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Feng, Xunda, Siamak Nejati, Matthew G. Cowan, Marissa E. Tousley, Brian R. Wiesenauer, Richard D. Noble, Menachem Elimelech, Douglas L. Gin, and Chinedum O. Osuji. “Thin Polymer Films with Continuous Vertically Aligned 1 Nm Pores Fabricated by Soft Confinement.” ACS Nano 10, no. 1 (January 26, 2016): 150–58. <a class="reference external" href="https://doi.org/10.1021/acsnano.5b06130">https://doi.org/10.1021/acsnano.5b06130</a>.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id8" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>Hatakeyama, Evan S., Christopher J. Gabriel, Brian R. Wiesenauer, Jenny L. Lohr, Meijuan Zhou, Richard D. Noble, and Douglas L. Gin. “Water Filtration Performance of a Lyotropic Liquid Crystal Polymer Membrane with Uniform, Sub-1-Nm Pores.” Journal of Membrane Science 366, no. 1–2 (2011): 62–72. <a class="reference external" href="https://doi.org/10.1016/j.memsci.2010.09.028">https://doi.org/10.1016/j.memsci.2010.09.028</a>.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id9" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[4]</a></td><td>Hatakeyama, Evan S., Brian R. Wiesenauer, Christopher J. Gabriel, Richard D. Noble, and Douglas L. Gin. “Nanoporous, Bicontinuous Cubic Lyotropic Liquid Crystal Networks via Polymerizable Gemini Ammonium Surfactants.” Chemistry of Materials 22, no. 16 (August 24, 2010): 4525–27. <a class="reference external" href="https://doi.org/10.1021/cm1013027">https://doi.org/10.1021/cm1013027</a>.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id10" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[5]</a></td><td>Dischinger, Sarah M., James Rosenblum, Richard D. Noble, Douglas L. Gin, and Karl G. Linden. “Application of a Lyotropic Liquid Crystal Nanofiltration Membrane for Hydraulic Fracturing Flowback Water: Selectivity and Implications for Treatment.” Journal of Membrane Science 543, no. Supplement C (December 1, 2017): 319–27. <a class="reference external" href="https://doi.org/10.1016/j.memsci.2017.08.028">https://doi.org/10.1016/j.memsci.2017.08.028</a>.</td></tr>
+</tbody>
+</table>
+</div>
 </div>
 
 
@@ -226,7 +279,7 @@ formed by LLC membranes because the</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="prep.html" class="btn btn-neutral float-right" title="Preparation of Monomers and Solutes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="requirements.html" class="btn btn-neutral float-right" title="Software Requirements" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>

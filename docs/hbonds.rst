@@ -41,6 +41,7 @@ Classes
 .. autoclass:: hbonds.System
    :members: __init__, set_eligible, identify_hbonds, plot_hbonds
 
+=========
 Examples
 =========
 
@@ -78,6 +79,7 @@ Command Line Functionality
    :func: initialize
    :prog: hbonds.py
 
+=============
 Example Usage
 =============
 
