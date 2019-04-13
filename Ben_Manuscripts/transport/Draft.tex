@@ -22,12 +22,17 @@
 
 \externaldocument[S-]{Supporting_Information}
 
+%MRS2: ``dependent -> selective?'' 
 \title{Chemically Dependent Transport in a Cross-linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
 \author{Benjamin J. Coscia}
 \affiliation{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, CO 80309, USA}
 \author{Michael R. Shirts}
 \email{michael.shirts@colorado.edu}
 \affiliation{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, CO 80309, USA}
+
+%MRS2: I think it would be useful to have a picture of the pores to
+% allow people to visualize what was going on.  ToC might be good, 
+% but I think that as people read, they need to see the 3D picture as well to think through things.
 
 \begin{document}
 
@@ -40,7 +45,11 @@
   phase lyotropic liquid crystal (LLC) membranes make them promising
   for selective separations. In this work, we observe transport
   of water, sodium ions and 20 small polar solutes within the pores 
-  of an LLC membrane using atomistic molecular simulations. We found
+  of an LLC membrane using atomistic molecular simulations. We 
+  %MRS2: 
+  find
+  %found
+  %MRS2: ``transport rate -> transport''
   that the transport rate of a species is dependent not only on 
   molecular size, but on chemical functionality as well. The 
   membrane's inhomogeneous composition gives rise to radially dependent
@@ -64,30 +73,32 @@
   Membranes capable of separating nm-sized solutes with high selectivity 
   and permeability are highly desirable for a number of applications. For 
   example, separation of salt from seawater or other briny sources can 
-  yield potable drinking water.\cite{fritzmann_state---art_2007} Removal
+  yield potable drinking water.~\cite{fritzmann_state---art_2007} Removal
   of organic micropollutants, such as personal care products, pesticides
   and pharmaceuticals, from surface and groundwaters, can have large benefits
-  for public health.\cite{schwarzenbach_challenge_2006} Finally,
+  for public health.~\cite{schwarzenbach_challenge_2006} Finally,
   one can purify and recover dissolved species present in complex
   hydraulic fracturing flowback water waste streams which would help mitigate
-  the effects of deep well injection and generate value.\cite{dischinger_application_2017} 
+  the effects of deep well injection and generate value.~\cite{dischinger_application_2017} 
   %BJC: could make last point more general
+  %MRS2: ``generate value'' is pretty vague, yeah.
   
 %  All of these separations are possible with current commercial membrane
 %  separation techniques but they are too energy intensive to be worth the 
 %  capital investment needed to start the processes  
+% MRS2: maybe ``are possible'' -> ``are possible in part''?  Otherwise, it logically follows that they shouldn't have major drawbacks.
   All of these separations are possible with current commercial membrane
   separation techniques but suffer from serious drawbacks. Currently, reverse 
   osmosis (RO) and nanofiltration (NF) dominate commercial membrane separations
-  of small molecules.\cite{warsinger_review_2018} RO membranes are typically
+  of small molecules.~\cite{warsinger_review_2018} RO membranes are typically
   dense polymer matrices that separate solutes based on differences in their
-  solubility and permeability in the membrane material.\cite{fritzmann_state---art_2007}
+  solubility and permeability in the membrane material.~\cite{fritzmann_state---art_2007}
   Although they can perform highly selective separations, high feed pressures,
   and thus large amounts of energy, are necessary in order to generate a 
-  useful permeate flux.\cite{van_der_bruggen_review_2003} NF membranes have 
+  useful permeate flux.~\cite{van_der_bruggen_review_2003} NF membranes have 
   well-defined nm-sized pores which can give the same permeate flux as RO
-  with lower applied pressure.\cite{hilal_comprehensive_2004} However, the 
-  pores are not uniform in size, limiting selectivity.\cite{werber_materials_2016}.
+  with lower applied pressure.~\cite{hilal_comprehensive_2004} However, the 
+  pores are not uniform in size, limiting selectivity.~\cite{werber_materials_2016}.
 %  Therefore, multiple membrane passes may be necessary in order to achieve 
 %  high selectivity. 
   
@@ -106,29 +117,29 @@
   Cross-linked H\textsubscript{II} phase lyotropic liquid crystal (LLC) 
   membranes are nanostructured membranes that may be able to achieve the
   selectivity of RO membranes while maintaining the high permeability
-  of NF membranes.\cite{zhou_supported_2005} The H\textsubscript{II} LLC
+  of NF membranes.~\cite{zhou_supported_2005} The H\textsubscript{II} LLC
   phase is formed when LLC monomers self-assemble into hexagonally packed
-  and uniform-sized pores.\cite{smith_ordered_1997} Alignment and subsequent
+  and uniform-sized pores.~\cite{smith_ordered_1997} Alignment and subsequent
   cross-linking of the hexagonal mesophases yields a mechanically strong
-  membrane.\cite{feng_scalable_2014,feng_thin_2016} The uniform-sized pores
+  membrane.~\cite{feng_scalable_2014,feng_thin_2016} The uniform-sized pores
   enforce a strict molecular-size cut-off while the hexagonal geometry is 
-  ideal for high permeability.\cite{zhou_supported_2005} Additionally, 
+  ideal for high permeability.~\cite{zhou_supported_2005} Additionally, 
   because the LLC monomers are salts, Donnan exclusion plays a role in 
-  rejection of charged molecules upon pore entry.\cite{donnan_theory_1995}
+  rejection of charged molecules upon pore entry.~\cite{donnan_theory_1995}
 %  Zhou et al. demonstrated complete rejection
 %  of solutes larger than 1.2 nm in size for H\textsubscript{II} LLC coated
-%  membranes.\cite{zhou_supported_2005}
-    
+%  membranes.~\cite{zhou_supported_2005}
+  
   In addition to geometric factors which make H\textsubscript{II} membranes
   ideal for selective separations, they have the potential to further disrupt
   conventional membrane separation techniques by being selective based not
   only on solute size and charge, but on chemical functionality as well. 
   The functional LLC monomer head groups that occupy the pore region of the
-  membrane can interact with solutes. Dischinger et al. studied the 
+  membrane can interact with solutes. Dischinger et al.~studied the 
   performance of a Q\textsubscript{I} phase LLC membrane, which has a 
   similar pore topology to the H\textsubscript{II} phase, but a more 
   tortuous geometry, and observed a range of selectivities dependent on the
-  anion coordinated to the LLC monomer.\cite{dischinger_effect_2017} Intelligent 
+  anion coordinated to the LLC monomer.~\cite{dischinger_effect_2017} Intelligent 
   design of LLC monomers can help us tailor membranes for solute-specific
   separations.
 
@@ -136,13 +147,15 @@
   in a lab setting, there is a limit to the level of detail that can be obtained 
   from experiment. The separation performance of these membranes has been 
   primarily characterized with size-exclusion experiments which emphasizes 
-  selectivity based on the ability to enter a given pore.\cite{zhou_supported_2005}
+  selectivity based on the ability to enter a given pore.~\cite{zhou_supported_2005}
   While size-exclusion is a useful separation, it cannot reliably purify a 
   solution where the solute size is on the same order as water. Therefore, it is
   important to take advantage of material properties other than pore size. 
-  Unfortunately, the complexity of LLC Membranes has obscured the interpretation
-  of experimental transport studies.\cite{dischinger_effect_2017}  % BJC: ref to Sarah?
-  
+  %MRS2: is ``complexity'' the right word? Can we be more specific?
+  Unfortunately, the complexity of LLC membranes has obscured the interpretation
+  of experimental transport studies.~\cite{dischinger_effect_2017}  % BJC: ref to Sarah?
+
+  %MRS2: odd to have a one sentence paragraph?  MAyber just join with the next paragraph.
   Molecular dynamics (MD) simulations can give us mechanistic insights with 
   atomistic resolution so that we can directly observe small solute transport
   within LLC membrane nanopores and intelligently design new membranes for 
@@ -150,7 +163,7 @@
 
   In our previous work, we used MD simulations to determine the most likely 
   structure of the hexagonal phase formed by the monomer Na-GA3C11, expanding 
-  upon the most recent experimental characterization.\cite{coscia_understanding_2018,feng_thin_2016}
+  upon the most recent experimental characterization.~\cite{coscia_understanding_2018,feng_thin_2016}
   We developed techniques for equilibrating the hexagonal phase formed by neat 
   monomer as well as with varying amounts of water in the pores.
 
@@ -225,31 +238,51 @@
   
   \end{multicols}
   
+  %MRS2: can you put molecules in the table as well? I think it would be better for reference. Some of the larger ones may have small molecules.  You can potentially partially stagger them horizontally so the size can be OK? 
   \end{tcolorbox}
   \caption{}\label{table:abbreviations}
   \end{table}
-  
-  First, we will comment on the membrane's structure. Previously, we have
+
+  %MRS2: generally, use present tense for what is being done in the paper, not future tense; 
+  %the paper is completely written, later sections are not being written in the future. 
+  %MRS2: descriptions of experiements can be in the past.   
+  %First, we will comment on the membrane's structure. 
+  We first address the structure of the pores formed in the membrane.
+  Previously, we have
   studied dry membrane systems and some systems with low water content. 
   We will observe how the radial density of monomer components and water 
-  change based on membrane water content.
+  change within the oore based on membrane water content.
   
   % BJC: I don't really explicity comment on the partitioning of solutes
   % out of the pore. Maybe I can add some sort of chart. Need to think more.
-  Then we will present our efforts to understand how small molecules, 
+  % MRS2: it should be mentioned somewhere, probably worth a paragraph or so.  
+  % If WATER is much slower outside of the pores, everything else will be slow as well, so we can
+  % justify transport there not being interesting
+  %Then we will present 
+  We then present
+  our efforts to understand how small molecules, 
   including water, partition within the pores. From a macroscopic perspective,
   it is straightforward to hypothesize that the water and polar solutes spend
   their time exclusively in the tube-like hydrophilic pore region. Our
   previous work showed that there is a gradual compositional transition from
   the hydrophilic to the hydrophobic region which means that solutes may not
   necessarily stay confined to the centers of the pores or even within the 
-  pore region. We will study the gradient in composition of solutes and 
+  pore region. 
+  %MRS2:
+  %We will 
+  We then study the gradient in composition of solutes and 
   water and any resultant influence it might have on mechanistic properties.
-  
-  Finally, and for the bulk of this work, we will present our observations 
+  %MRS2: tweak
+  %Finally, and for the bulk of this work, we will 
+  For the remainder of the paper, we 
+  present our observations 
   and explanations of the observed transport mechanisms exhibited by water
   and solutes. Given that the pores will restrict motion of the solutes, we
-  anticipate that transport will be hindered in some way. We want to understand
+  anticipate that transport will be hindered in some way. 
+
+  %MRS2: next line is a statement about what we want to do, not what we did?
+  %We want to understand
+  We investigate
   the differences in solute motion, specifically its mean squared displacement 
   (MSD), based on a solute's size, shape and chemical functionality. We will 
   study the interactions between solutes, the membrane, and water in order to
@@ -283,11 +316,11 @@
 
   Stable H\textsubscript{II} phases, assembled with Na-GA3C11, can be formed
   using a broad range of water concentrations. In the literature, the system 
-  studied in this work is typically synthesized with close to 10 wt \% water.
+  studied in this work is typically synthesized with close to 10 wt\% water.
   \cite{smith_ordered_1997, zhou_new_2007} However, Resel et al. noted that the
-  system is likely fully hydrated with less than 7 wt \% water.\cite{resel_h2-phase_2000}
+  system is likely fully hydrated with less than 7 wt\% water.~\cite{resel_h2-phase_2000}
   Excess water fills space between hexagonal mesophases. We decided to test 
-  systems with two different water contents: 5 and 10 wt \%.
+  systems with two different water contents: 5 and 10 wt\%.
 
   We observed that water partitions into the distal tail region of our system and therefore
   built our initial configurations with water in both regions, close to the expected
@@ -300,7 +333,7 @@
   \texttt{gmx solvate}. We placed water molecules in the distal tail region one at a time
   in random locations with a short energy minimization between each insertion. When 
   studying transport of water in the pores, we limited the calculations to water molecules
-  that spent greater than 95 \% of their time outside of the distal tail region.
+  that spent greater than 95\% of their time outside of the distal tail region.
 
   We equilibrated an initial solvated configuration before adding solutes. First, we 
   equilibrated the initial configuration using the `wet' equilibration procedure 
@@ -380,7 +413,7 @@
   ns time lag. Our results are shown to be insensitive to our choice of time lag in 
   Section~\ref{S-section:lag_sensitivity} of the Supporting Information.
   
-  The $z$-direction MSD of water in the 10 wt \% system is linear. Therefore, for
+  The $z$-direction MSD of water in the 10 wt\% system is linear. Therefore, for
   the purpose of comparison, we calculated its diffusion constant by fitting a line
   to the linear region of the MSD curve.~\cite{maginn_best_2018}. The diffusion constant
   is then equal to $m/2$ where $m$ is the slope of the linear fit. The slope is divided
@@ -438,8 +471,8 @@
   as ours is a challenge by itself. Second, we assume all particles are approximately
   spherical, neglecting the effect of solute shape on mobility. Chan et al. 
   showed that the difference in diffusion constants of differently shaped 
-  particles, with constant molecular volume, did not differ by more than 25 \%
-  with most deviating by less than 10 \%.~\cite{chan_effects_2015}. 
+  particles, with constant molecular volume, did not differ by more than 25\%
+  with most deviating by less than 10\%.~\cite{chan_effects_2015}. 
   Third, we assume that the ratio of solute and solvent radii as calculated using the
   methodology of Section~\ref{method:molecular_size}, is equivalent to the the 
   ratio of hydrodynamic radii. For similarly shaped molecules, it has been shown that
@@ -518,7 +551,7 @@
   radial distribution function because it gives detailed frame-by-frame 
   information rather than an average. 
   
-  Using our procedure we found that sodium ions in a solution of tip3p water
+  Using our procedure we found that sodium ions in a solution of TIP3P water
   coordinate with an average of 3.6 water molecules. We created a 4 x 4 x 4
   nm cubic box of water with the GROMACS tool, \texttt{gmx solvate}. We used
   \texttt{gmx genion} to replace water molecules with sodium and chloride 
@@ -565,13 +598,13 @@
   we calculated the tortuosity of the pores by calculating the ratio 
   $\dfrac{L}{Z}$ where $L$ is the length of the spline and $Z$ is the 
   length of the unit cell in the $z$-direction. The average tortuosity
-  of each pore is 1.03 $\pm$ 0.01 and 1.07 $\pm$ 0.02 in the 5 and 10 wt \%
+  of each pore is 1.03 $\pm$ 0.01 and 1.07 $\pm$ 0.02 in the 5 and 10 wt\%
   water systems respectively.
   
   In all RDF plots, we include the average RDF of the head groups as
   a reference. The head group RDF shown is the average of the head 
   group RDFs for each solute system in the plot. We generated 
-  95 \% confidence intervals by bootstrapping the RDF of each individual
+  95\% confidence intervals by bootstrapping the RDF of each individual
   head group. For each head group, we obtained an RDF averaged over the
   entire simulation trjaectory. We randomly chose head group RDFs with replacement
   and averaged them for each bootsrap trial. This approach assumes that
@@ -585,27 +618,27 @@
   elucidate the topology of the membrane pores in solvated systems.  
   
   In contrast to our previous work with a dry version of this 
-  membrane, the pore region of the 5 and 10 wt \% water 
+  membrane, the pore region of the 5 and 10 wt\% water 
   systems are primarily filled with water and sodium ions. We define the
   pore region based on the average COM position of the monomer head groups' 
   % BJC: not sure the best place in paper to define pore region. Maybe a system definitions section in Methods.
   % BJC: need to decide on exact definition. Should probably be the same as the 'Head Groups' line
   carboxylate oxygen atoms. Figure~\ref{fig:component_densities} plots the RDF of each membrane
-  constituent in the dry system as well as the 5 and 10 wt \% water systems. 
+  constituent in the dry system as well as the 5 and 10 wt\% water systems. 
   In dry systems, the pore center is densely filled with sodium ions and head
   groups. The peak head group density occurs within 0.25 nm of the pore center.
   In hydrated systems, water occupies, and is densest, at the center of each 
   pore. The density of sodium ions is somewhat uniform in the pore center of
-  the 5 wt \% water system while it shows a maximum closer to the head groups
-  in the 10 wt \% water system. The peak density of sodium ions is not at the
-  pore center in the 10 wt \% water system likely because they are still
+  the 5 wt\% water system while it shows a maximum closer to the head groups
+  in the 10 wt\% water system. The peak density of sodium ions is not at the
+  pore center in the 10 wt\% water system likely because they are still
   loosely associated with the monomer's carboxylate head groups.
   
   Pores in the 10 wt\% water system are wider and less crowded by monomers than
   those in the 5 wt\% water system. The peak head group density of 10 wt\% water
   systems is about 0.2 nm further from the pore center than the 5 wt\% water system. 
   Based on these observations, we expect solute transport to be fastest in the 10 wt
-  \% water system.
+ \% water system.
   
   \begin{figure}[!htb]
   \centering
@@ -627,6 +660,7 @@
   \includegraphics[width=\textwidth]{component_density_10wt.pdf}
   \caption{10 wt\% water}\label{fig:component_density_10wt}
   \end{subfigure}
+  %MRS2: interesting that the head group max is near the transition point where water/tail groups 
   \caption{The radial densities of various monomer components paint a 
   picture of the pore topology where the pore centers are primarily composed
   of water and sodium ions. The monomer groups labeled in each plot correspond to 
@@ -634,14 +668,14 @@
   All RDFs represent the number of atoms located at a given distance from the
   pore center normalized by the volume of the annular bin to which they belong.
   (a) In the dry system, the density of head groups and sodium ions are highest
-  within 0.25 nm of the pore center. (b) In the 5 wt \% system, monomer head 
+  within 0.25 nm of the pore center. (b) In the 5 wt\% system, monomer head 
   groups retreat about 0.2 nm radially in order to make room for water molecules.
-  (c) Monomers in the 10 wt \% system retreat an additional 0.2 nm to make room
+  (c) Monomers in the 10 wt\% system retreat an additional 0.2 nm to make room
   for more water.}\label{fig:component_densities}
   \end{figure}
   
   There is an appreciable amount of water that partitions into the distal tail
-  region of both systems. 28 \% and 31 \% of the total water is present in the tail
+  region of both systems. 28\% and 31\% of the total water is present in the tail
   regions of the 5 and 10 wt\% water systems respectively. See 
   Section~\ref{S-section:water_content_equil} of the Supporting Information for more details. This 
   result is due to a combination of the lower density of the tail region
@@ -661,11 +695,11 @@
 
   Water and sodium's mobilities increase in larger and less crowded pores. 
   In the 10 wt\% water system, the MSD of water is about 51 times higher and
-  the MSD of sodium is about 49 times higher compared to the 5 wt \% water system. 
-  In the 10 wt \% water system, water moves about 51 times faster than sodium 
-  and in the 5 wt \% system, water moves about 49 times faster than sodium. Assuming
-  long timescale Brownian behavior of water in the 10 wt \% system, we measured its
-  diffusivity to be 7.45e-07 $cm^2 / s$ which is only 1.4 \% that of bulk tip3p 
+  the MSD of sodium is about 49 times higher compared to the 5 wt\% water system. 
+  In the 10 wt\% water system, water moves about 51 times faster than sodium 
+  and in the 5 wt\% system, water moves about 49 times faster than sodium. Assuming
+  long timescale Brownian behavior of water in the 10 wt\% system, we measured its
+  diffusivity to be $7.45 \times 10^{-7}$cm$^2$ / s which is only 1.4\% that of bulk TIP3P 
   water.~\cite{mahoney_diffusion_2000} %BJC: 7.45e-07 versus 5.19e-05 cm^2/s
   
   % Plots generated with msd_curves.py in figures folder
@@ -680,20 +714,20 @@
   \includegraphics[width=\textwidth]{na_msd_comparison.pdf}
   \caption{Sodium Ions}\label{fig:na_msd_comparison}
   \end{subfigure}
-  \caption{(a) The MSD of water in the 10 wt \% water system is about 51 times
-  higher than water in the 5 wt \% water system. (b) The MSD of sodium in the
-  10 wt \% water system is about 49 times higher than sodium in the 5 wt \% 
+  \caption{(a) The MSD of water in the 10 wt\% water system is about 51 times
+  higher than water in the 5 wt\% water system. (b) The MSD of sodium in the
+  10 wt\% water system is about 49 times higher than sodium in the 5 wt\% 
   water system.}\label{fig:msd_comparison}
   \end{figure}
   
   Sodium coordinates with far less water molecules than it does in bulk solution.
   Compared to 3.4 coordinated water molecules in bulk solution (see 
   Section~\ref{method:coordination}), sodium ions in our system, on average,
-  coordinate with about 1.7 water molecules in the 10 wt \% system and 1.2 water
+  coordinate with about 1.7 water molecules in the 10 wt\% system and 1.2 water
   molecules in the 5 wt\% system. However, the sodium ions are not undercoordinated
   since they frequently pair with negatively charged carboxylate head groups.
-  On average, sodium ions coordinate with 1 carboxylate group in the 10 wt \% water
-  system and 0.8 carboxylate groups in the 5 wt \% water system.
+  On average, sodium ions coordinate with 1 carboxylate group in the 10 wt\% water
+  system and 0.8 carboxylate groups in the 5 wt\% water system.
   % Assuming only one sodium per carboxylate group, the numbers were multiplied by 2
   % since the averages were divided by 800 instead of 400
   
@@ -716,10 +750,10 @@
 %  \bigskip
   
   Like water and sodium above, the MSDs of the solutes studied in this work are 
-  significantly larger in the 10 wt \% system than those in the 5 wt \% water 
+  significantly larger in the 10 wt\% system than those in the 5 wt\% water 
   system (Figure~\ref{fig:msds}). The fastest moving solute in both cases, 
-  methanol, has an MSD about 175 times larger in the 10 wt \% versus the 5 wt 
-  \% water system. Clearly the equilibrium water content of a given LLC system will 
+  methanol, has an MSD about 175 times larger in the 10 wt\% versus the 5 wt 
+ \% water system. Clearly the equilibrium water content of a given LLC system will 
   determine its viability for real separations.
   
   The MSDs are not solely a function of solute size. We plotted each solute's radius
@@ -738,22 +772,22 @@
   \centering
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{all_5wt_tamsds.pdf}
-  \caption{5 wt \% water}\label{fig:all_msds_5wt}
+  \caption{5 wt\% water}\label{fig:all_msds_5wt}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{all_10wt_tamsds.pdf}
-  \caption{10 wt \% water}\label{fig:all_msds_10wt}
+  \caption{10 wt\% water}\label{fig:all_msds_10wt}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{msd_radius_5wt.pdf} 
-  \caption{5 wt \% water}\label{fig:msd_radius_5wt}
+  \caption{5 wt\% water}\label{fig:msd_radius_5wt}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{msd_radius_10wt.pdf} 
-  \caption{10 wt \% water}\label{fig:msd_radius_10wt}
+  \caption{10 wt\% water}\label{fig:msd_radius_10wt}
   \end{subfigure}
-  \caption{The MSDs of solutes in the 5 wt \% water system (a) are significantly
-  smaller than those of the solutes in the 10 wt \% water system (b). The
+  \caption{The MSDs of solutes in the 5 wt\% water system (a) are significantly
+  smaller than those of the solutes in the 10 wt\% water system (b). The
   MSDs are not a monotonic function of molecular size (c and d). A significant
   number of solute MSDs fall below the theoretical lines predicted by the 
   Stokes-Einstein equation and Gierer and Wirtz' corrected Stokes-Einstein equation.
@@ -762,7 +796,7 @@
     
   On the timescales simulated in our study, solutes exhibit subdiffusive
   behavior. Figure~\ref{fig:example_ztraces} plots the $z$-coordinate versus
-  time of 3 representative ethanol centers of mass in the 10 wt \% water system.
+  time of 3 representative ethanol centers of mass in the 10 wt\% water system.
   There are clear periods of entrapment separated by relatively large hops.
   The MSD calculated based on all ethanol molecules is plotted in 
   Figure~\ref{fig:example_msd} and its shape is sublinear. The long periods
@@ -789,7 +823,7 @@
   
   The complex and non-homogeneous structure of the membrane leads to radially
   dependent transport mechanisms. In general, we observed that hops 
-  made in the pore region are about 45 \% larger than those made outside
+  made in the pore region are about 45\% larger than those made outside
   the pore region (See Figure~\ref{fig:hop_lengths}). There is a high 
   resistance to movement in the alkane-dense head group and tail regions
   while, in the pore region, solutes can move relatively freely since it 
@@ -823,8 +857,8 @@
   \includegraphics[width=\textwidth]{hopfreq_total.pdf}
   \caption{}\label{fig:hopfreq}
   \end{subfigure}
-  \caption{(a) Hops made in the pore region of the 10 wt \% water system 
-  are, on average, 45 \% larger than those made outside the pore region. 
+  \caption{(a) Hops made in the pore region of the 10 wt\% water system 
+  are, on average, 45\% larger than those made outside the pore region. 
   The trend in hop lengths is similar to the trend in MSDs shown in 
   Figure~\ref{fig:all_msds_10wt} implying that solutes which make consistently 
   larger hops have higher MSDs. The fraction of time spent by a solute in the 
@@ -836,12 +870,12 @@
   In addition to solute trapping in dense monomer regions, 
   we observe a second trapping mechanism caused by preferential hydrogen 
   bonding between hydrogen bond donor solutes and monomer head groups. To 
-  continue with our ethanol example, we observe that 64 \% of ethanol 
+  continue with our ethanol example, we observe that 64\% of ethanol 
   molecules donate hydrogen bonds  % 15.7/24 donated, 0.6/24 accept -- BJC: double check these numbers
-  and 3 \% of ethanol molecules accept hydrogen bonds each frame. On average, 40 \%
+  and 3\% of ethanol molecules accept hydrogen bonds each frame. On average, 40\%
   of hydrogen bonds donated by ethanol go to carboxylate % BJC1: 6.33 hbonds between EtOH and COOH per frame, 3.84 b/w EtOH and ether oxygen, 5.56 between EtOH and HOH (where Ethanol donates)
-  head groups, 25 \% go to the ether linkages between the tails and the 
-  head groups and the remaining 35 \% to water. There are about 46 \% less  % 800 carboxylate oxygens total versus 2158 * 0.69 total water molcules in pores 
+  head groups, 25\% go to the ether linkages between the tails and the 
+  head groups and the remaining 35\% to water. There are about 46\% less  % 800 carboxylate oxygens total versus 2158 * 0.69 total water molcules in pores 
   carboxylate oxygen atoms in the pore than there are water molecules yet more
   hydrogen bonds are donated to them. The stability of hydrogen bonds with 
   carboxylate oxygen atoms is high because they have a negative charge
@@ -891,9 +925,9 @@
   In Figure~\ref{fig:na_coordination}, we've plotted the percentage
   of sodium ions coordinated to the oxygen atoms of each solute as well as the
   average length of time that pairs stay coordinated. The degree and length of 
-  coordination between solutes and sodium in the 5 wt \% water system is higher
-  in all cases than that in the 10 wt \% water systems. The crowded pores of 
-  the 5 wt \% water system forces sodium ions in close proximity to solutes. 
+  coordination between solutes and sodium in the 5 wt\% water system is higher
+  in all cases than that in the 10 wt\% water systems. The crowded pores of 
+  the 5 wt\% water system forces sodium ions in close proximity to solutes. 
   The 5 highest coordinated solutes, which also have the longest coordinated dwell times,
   all contain carbonyl groups (except for dimethyl sulfoxide which has an 
   analogous sulfinyl group) which leaves a highly electron-dense oxygen atom 
@@ -933,17 +967,17 @@
   group of a molecule used to design an organic electrode.~\cite{wu_unraveling_2015} 
   Finally, Shinoda et al. observed K\textsuperscript{+} ions coordinated with
   the carbonyl and hydroxyl groups of carboxy-terminal groups in crystallized
-  ATPase.\cite{shinoda_crystal_2009}
+  ATPase.~\cite{shinoda_crystal_2009}
   
-  Overall, the transport behavior exhibited by solutes in the 5 wt \% water
-  systems is similar to that shown by those in the 10 wt \% system however
+  Overall, the transport behavior exhibited by solutes in the 5 wt\% water
+  systems is similar to that shown by those in the 10 wt\% system however
   the timescales are much longer. We observe subdiffusive behavior with 
   intermittent hopping between periods of entrapment and evidence
   of the same three trapping mechanisms. The frequency and 
-  length of hops are both diminished in the 5 wt \% system. Since there are
+  length of hops are both diminished in the 5 wt\% system. Since there are
   only 24 solute molecules in each system, in order to obtain better 
   time-averaged descriptions of solute transport mechanisms, we will focus
-  the remainder of our analysis on transport in the 10 wt \% water systems.
+  the remainder of our analysis on transport in the 10 wt\% water systems.
   
   We will revisit our observations in the the context of specific groups of 
   molecules in the discussion that follows.
@@ -1053,7 +1087,7 @@
   head group region. However, these extra hydroxyl groups facilitate a larger 
   number of hydrogen bond interactions that work to hold solutes in place (see 
   Figure~\ref{fig:multi_hbonds}). It has been observed that hydrogen bonding 
-  in a system will generally reduce diffusivity.\cite{srinivas_computer_1999}
+  in a system will generally reduce diffusivity.~\cite{srinivas_computer_1999}
   
   The number of hydrogen bonding interactions between solutes and head groups
   increases with the number of solute hydroxyl groups. These solutes frequently
@@ -1129,12 +1163,12 @@
   
   The amides, urea and acetamide, hydrogen bond with head groups relatively 
   infrequently, but regularly coordinate with sodium ions (see 
-  Figure~\ref{fig:ketones}). In an average frame, over 50 \% of acetic acid molecules
+  Figure~\ref{fig:ketones}). In an average frame, over 50\% of acetic acid molecules
   participate in hydrogen bonds with monomer head groups while less than 
-  10 \% of urea and acetamide molecules hydrogen bond with head groups. 
+  10\% of urea and acetamide molecules hydrogen bond with head groups. 
   Urea and acetamide both have hydrogen bond donating nitrogen atoms, however
   nitrogen is a weaker hydrogen bond donor than oxygen due to its lower 
-  electronegativity.\cite{biswal_hydrogen_2015} Given their lower propensity
+  electronegativity.~\cite{biswal_hydrogen_2015} Given their lower propensity
   to hydrogen bond, one might expect amides to partition out of the pore 
   and/or to move through the pore quickly, perhaps faster than methanol. 
   However, both RDFs contain sharp peaks situated between the pore center
@@ -1234,9 +1268,9 @@
   MSD. The range of behaviors shown by mercaptoethanol help explain the
   large variance of its MSD. Some can be accounted for by the higher 
   density of mercaptoethanol molecules outside the pore region, where 
-  transport is inherently slower. Mercaptoethanol spends 20 \% less 
+  transport is inherently slower. Mercaptoethanol spends 20\% less 
   time in the pore region than ethylene glycol. Conversely, 
-  mercaptoethanol hydrogen bonds with head groups about 40 \% less 
+  mercaptoethanol hydrogen bonds with head groups about 40\% less 
   frequently, which is less than expected if equal amounts of both 
   solutes occupied the pore region. Consequently, shorter hydrogen 
   bond lifetimes within the pore region may yield some high MSD 
@@ -1244,7 +1278,7 @@
 
 % (20.2 - 12.857) / 20.2 = .364
 % (12.857 + 6.8215 + 0.803) / (20.2 + 11.969 + 1.935) = 0.6
-%  There are nearly 40 \% more mercaptoethanol 
+%  There are nearly 40\% more mercaptoethanol 
 %  molecules than ethylene glycol molecules beyond 0.8 nm  % ratios.py in figures folder
 %  from the pore center. 
 %  The average length
@@ -1261,18 +1295,18 @@
   % BJC: sums are (donate to monomer + recieve from water + donate to water).
   % BJC: (31.91 + 17.224 + 3.231) / (13.1 + 7.737 + 0.8965) ~= 2.45.
   % (2.788 + 2.0975 + 0)/ (13.1 + 7.737 + 0.8965) = 0.22
-  Only 22 \% of the hydrogen bond interactions of 2,3-dimercapto-1-propanol
+  Only 22\% of the hydrogen bond interactions of 2,3-dimercapto-1-propanol
   involve sulfur. Because sulfur can only weakly hydrogen bond, 
   2,3-dimercapto-1-propanol is less soluble than glycerol in the water-filled
   pores and more readily partitions into the tail region.
   
   DMSO has a comparable if not larger MSD than acetone even though it
-  is a slightly larger molecule. DMSO spends 17 \% more time in the pore
+  is a slightly larger molecule. DMSO spends 17\% more time in the pore
   than acetone. 
 %  The density of DMSO is higher than acetone in the pore region, except for
 %  the peak exhibited by acetone near 0.2 nm, which is due to sodium ion association.
-  On average, 35 \% of DMSO molecules are coordinated to a sodium ion each
-  frame compared with 26 \% of acetone molecules. The pyramidal structure 
+  On average, 35\% of DMSO molecules are coordinated to a sodium ion each
+  frame compared with 26\% of acetone molecules. The pyramidal structure 
   of DMSO may force it to spend more time closer to the pore center which
   increases its interaction with sodium ions. The tendency of DMSO to stay
   in the pore region counterbalances the sodium ion interactions to give it
@@ -1316,7 +1350,7 @@
 %  \end{itemize}
   
   Carbonyl groups continue to show high degrees of association with
-  sodium ions. Between 25 and 30 \% of propylene carbonate, dimethyl 
+  sodium ions. Between 25 and 30\% of propylene carbonate, dimethyl 
   formamide and ethyl acetate molecules are coordinated with sodium ions
   for a given frame which is consistent with the coordination exhibited by acetone
   (see Figure~\ref{fig:nondonors_hbonds}). The carbonyl group of the amides 
@@ -1356,7 +1390,7 @@
 
   We learned that the MSD of solutes, water and counter ions are highly 
   dependent on LLC membrane water content. The MSD of these components is about
-  2 orders of magnitude larger in the 10 wt \% system than in the 5 wt \% system.
+  2 orders of magnitude larger in the 10 wt\% system than in the 5 wt\% system.
   As more water is added to the system, the pores become less crowded with monomer
   components. The amount of water in the pores deserves special attention when 
   screening new monomers.
