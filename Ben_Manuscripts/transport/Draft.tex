@@ -5,6 +5,7 @@
 \usepackage{subcaption}
 \usepackage{amsmath} % or simply amstext
 \usepackage{amssymb}
+\usepackage{array}
 \usepackage{siunitx}
 \usepackage{booktabs}
 \usepackage[export]{adjustbox}
@@ -22,17 +23,17 @@
 
 \externaldocument[S-]{Supporting_Information}
 
-%MRS2: ``dependent -> selective?'' 
-\title{Chemically Dependent Transport in a Cross-linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
+\title{Chemically Selective Transport in a Cross-linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
 \author{Benjamin J. Coscia}
 \affiliation{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, CO 80309, USA}
 \author{Michael R. Shirts}
 \email{michael.shirts@colorado.edu}
 \affiliation{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, CO 80309, USA}
 
-%MRS2: I think it would be useful to have a picture of the pores to
-% allow people to visualize what was going on.  ToC might be good, 
-% but I think that as people read, they need to see the 3D picture as well to think through things.
+% MRS2: I think it would be useful to have a picture of the pores to 
+% allow people to visualize what was going on. ToC might be good, 
+% but I think that as people read, they need to see the 3D picture 
+% as well to think through things.
 
 \begin{document}
 
@@ -46,11 +47,7 @@
   for selective separations. In this work, we observe transport
   of water, sodium ions and 20 small polar solutes within the pores 
   of an LLC membrane using atomistic molecular simulations. We 
-  %MRS2: 
-  find
-  %found
-  %MRS2: ``transport rate -> transport''
-  that the transport rate of a species is dependent not only on 
+  find that the transport of a species is dependent not only on 
   molecular size, but on chemical functionality as well. The 
   membrane's inhomogeneous composition gives rise to radially dependent
   transport mechanisms with respect to the pore centers. In general, we 
@@ -79,15 +76,9 @@
   for public health.~\cite{schwarzenbach_challenge_2006} Finally,
   one can purify and recover dissolved species present in complex
   hydraulic fracturing flowback water waste streams which would help mitigate
-  the effects of deep well injection and generate value.~\cite{dischinger_application_2017} 
-  %BJC: could make last point more general
-  %MRS2: ``generate value'' is pretty vague, yeah.
+  the effects of deep well injection and can be sold for profit.~\cite{dischinger_application_2017} 
   
-%  All of these separations are possible with current commercial membrane
-%  separation techniques but they are too energy intensive to be worth the 
-%  capital investment needed to start the processes  
-% MRS2: maybe ``are possible'' -> ``are possible in part''?  Otherwise, it logically follows that they shouldn't have major drawbacks.
-  All of these separations are possible with current commercial membrane
+  All of these separations are possible in part with current commercial membrane
   separation techniques but suffer from serious drawbacks. Currently, reverse 
   osmosis (RO) and nanofiltration (NF) dominate commercial membrane separations
   of small molecules.~\cite{warsinger_review_2018} RO membranes are typically
@@ -151,19 +142,15 @@
   While size-exclusion is a useful separation, it cannot reliably purify a 
   solution where the solute size is on the same order as water. Therefore, it is
   important to take advantage of material properties other than pore size. 
-  %MRS2: is ``complexity'' the right word? Can we be more specific?
-  Unfortunately, the complexity of LLC membranes has obscured the interpretation
-  of experimental transport studies.~\cite{dischinger_effect_2017}  % BJC: ref to Sarah?
+  Unfortunately, interactions between solutes and pore moieties have yielded
+  unclear trends in experimental transport studies.~\cite{dischinger_effect_2017}
 
-  %MRS2: odd to have a one sentence paragraph?  MAyber just join with the next paragraph.
   Molecular dynamics (MD) simulations can give us mechanistic insights with 
   atomistic resolution so that we can directly observe small solute transport
   within LLC membrane nanopores and intelligently design new membranes for 
-  solute-specific separations.
-
-  In our previous work, we used MD simulations to determine the most likely 
-  structure of the hexagonal phase formed by the monomer Na-GA3C11, expanding 
-  upon the most recent experimental characterization.~\cite{coscia_understanding_2018,feng_thin_2016}
+  solute-specific separations. In our previous work, we used MD simulations to 
+  determine the most likely structure of the hexagonal phase formed by the monomer
+  Na-GA3C11, expanding upon the most recent experimental characterization.~\cite{coscia_understanding_2018,feng_thin_2016}
   We developed techniques for equilibrating the hexagonal phase formed by neat 
   monomer as well as with varying amounts of water in the pores.
 
@@ -172,121 +159,230 @@
   uncharged polar solutes with varying size, chemical functionality and hydrophilic 
   character. We have listed the solutes studied along with the abbreviations that
   we will use in the charts for the remainder of this paper in Table~\ref{table:abbreviations}.
-%  Many of the separations we are interested in involve polar organic 
-%  compounds.
+  Note that, in order to avoid studying charge species, we have only studied
+  %BJC: citations for pKa's
+  acetic acid in its protonated form. The pKa of gallic acid is 4.40 while the
+  pKa of acetic acid is 4.75. Assuming that the pKa of gallic acid is similar 
+  to NaGA3C11, it is possible for our sodium salted monomer to exist at the 
+  same time as protonated acetic acid.
 
-  % BJC: not sure if I should just leave formatting to the journal. Thought tcolorbox was neat though
-  % I can easily change these abbreviations and have them applied to all the figures. I haven't given
-  % them much thought. Just used their residue names
-  \begin{table}
+%  % BJC: not sure if I should just leave formatting to the journal. Thought tcolorbox was neat though
+%  % I can easily change these abbreviations and have them applied to all the figures. I haven't given
+%  % them much thought. Just used their residue names
+%  \begin{table}
+%  \centering
+%  \begin{tcolorbox}[%
+%  	colframe=blue,
+%  	title=\centering \textbf{Solute Names and Their Abbreviations},
+%  	width=0.7\textwidth,
+%  	box align=center,
+%  	halign=center,
+%  	valign=center,
+%  	fontupper=\linespread{1}\selectfont]
+%
+%  \begin{multicols}{2}
+%
+%  \textbf{Name} \\
+%  Acetic Acid \\
+%  Acetamide \\
+%  Acetone \\
+%  Butanol \\
+%  Dimethyl Formamide \\
+%  2,3-Dimercapto-1-propanol \\
+%  Dimethyl Sulfoxide \\
+%  Ethyl Acetate \\ 
+%  Ethanol \\
+%  Ethylene Glycol \\
+%  Glycerol \\
+%  Methanol \\ 
+%  Propylene Carbonate \\
+%  Propylene Glycol \\
+%  Propanol \\
+%  Ribose \\
+%  Mercaptoethanol \\
+%  Tetrose \\
+%  Tetrahydrofuran \\
+%  Urea \\
+%  \columnbreak
+%
+%  \textbf{Abbrevation} \\
+%  AcOH \\  % Acetic acid
+%  AcN \\  % Acetamide
+%  ACE \\  % Acetone
+%  BtOH \\  % Butanol
+%  DMF \\  % Dimethyl Formamide
+%  DMP \\  % 2,3-Dimercapto-1-propanol
+%  DMSO \\  % Dimethyl sulfoxide
+%  ETAC \\  % Ethyl Acetate
+%  EtOH \\  % ethanol
+%  EG \\  % ethylene glycol
+%  GLY \\  % glycerol
+%  MeOH \\  % methanol
+%  PC \\ % propylene carbonate
+%  PG \\  % propylene glycol
+%  PrOH \\  % propanol
+%  RIB \\ 
+%  ME \\ % mercaptoethanol
+%  TET \\
+%  THF \\ 
+%  URE \\
+%  
+%  \end{multicols}
+%  
+%  %MRS2: can you put molecules in the table as well? I think it would be better for reference. Some of the larger ones may have small molecules. You can potentially partially stagger them horizontally so the size can be OK? 
+%  \end{tcolorbox}
+%  \caption{}\label{table:abbreviations}
+%  \end{table}
+
+  \begin{table}[h!]
   \centering
-  \begin{tcolorbox}[%
-  	colframe=blue,
-  	title=\centering \textbf{Solute Names and Their Abbreviations},
-  	width=0.7\textwidth,
-  	box align=center,
-  	halign=center,
-  	valign=center,
-  	fontupper=\linespread{1}\selectfont]
-
-  \begin{multicols}{2}
-
-  \textbf{Name} \\
-  Acetic Acid \\
-  Acetamide \\
-  Acetone \\
-  Butanol \\
-  Dimethyl Formamide \\
-  2,3-Dimercapto-1-propanol \\
-  Dimethyl Sulfoxide \\
-  Ethyl Acetate \\ 
-  Ethanol \\
-  Ethylene Glycol \\
-  Glycerol \\
-  Methanol \\ 
-  Propylene Carbonate \\
-  Propylene Glycol \\
-  Propanol \\
-  Ribose \\
-  Mercaptoethanol \\
-  Tetrose \\
-  Tetrahydrofuran \\
-  Urea \\
-  \columnbreak
-
-  \textbf{Abbrevation} \\
-  ACH \\  
-  ACN \\
-  ATO \\
-  BUT \\
-  DMF \\
-  DMP \\
-  DMSO \\
-  EAC \\ 
-  ETH \\
-  GCL \\
-  GLY \\
-  MET \\
-  PCB \\ 
-  PG \\
-  PR \\
-  RIB \\ 
-  SOH \\ 
-  TET \\
-  THF \\ 
-  URE \\
-  
-  \end{multicols}
-  
-  %MRS2: can you put molecules in the table as well? I think it would be better for reference. Some of the larger ones may have small molecules.  You can potentially partially stagger them horizontally so the size can be OK? 
-  \end{tcolorbox}
+%  \begin{minipage}{.4\textwidth}
+%  \tiny
+  \begin{tabular}{ |lcclcc| }
+    \hline
+    Name & Abbreviation & Structure & Name & Abbreviation & Structure \\ \hline
+    
+	\color{blue}{Methanol} & \color{blue}{MeOH} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    
+   	\color{blue}{Ethanol} & \color{blue}{EtOH} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    
+  	\color{blue}{Propanol} & \color{blue}{PrOH} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    
+    \color{blue}{Butanol} & \color{blue}{BtOH} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    
+    \color{red}{Ethylene Glycol} & \color{red}{EG} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    
+    \color{red}{Propylene Glycol} & \color{red}{PG} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    
+    \color{red}{Glycerol} & \color{red}{GLY} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    
+    \color{red}{Tetrose} & \color{red}{TET} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    
+    \color{red}{Ribose} & \color{red}{RIB} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    
+    \color{green!40!olive}{Acetic Acid} & \color{green!40!olive}{AcOH} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+%    \hline
+%    \end{tabular}
+%    \end{minipage}%
+%    
+%    \begin{minipage}{.2\linewidth}
+%    \tiny
+%    \begin{tabular}{ | l c c | }
+%    \hline
+%    Name & Abbreviation & Structure \\ \hline
+    \color{green!40!olive}{Urea} & \color{green!40!olive}{URE} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    
+    \color{green!40!olive}{Acetamide} & \color{green!40!olive}{AcN} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    
+    \color{green!40!olive}{Acetone} & \color{green!40!olive}{ACE} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    
+    \color{orange}{Mercaptoethanol} & \color{orange}{ME} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    
+    \color{orange}{Dimethyl Sulfoxide} & \color{orange}{DMSO} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    
+    \color{orange}{2,3-Dimercapto-1-propanol} & \color{orange}{DMP} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    
+    \color{yellow!70!orange}{Tetrahydrofuran} & \color{yellow!70!orange}{THF} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    
+    \color{yellow!70!orange}{Dimethylformamide} & \color{yellow!70!orange}{DMF} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    
+    \color{yellow!70!orange}{Propylene Carbonate} & \color{yellow!70!orange}{PC} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    
+    \color{yellow!70!orange}{Ethyl Acetate} & \color{yellow!70!orange}{EAC} &     
+    \begin{minipage}{.1\textwidth}
+    \includegraphics[width=\linewidth]{structures/methanol.png}
+    \end{minipage} \\
+    \hline
+  \end{tabular}
+%  \end{minipage}
   \caption{}\label{table:abbreviations}
   \end{table}
 
   %MRS2: generally, use present tense for what is being done in the paper, not future tense; 
   %the paper is completely written, later sections are not being written in the future. 
   %MRS2: descriptions of experiements can be in the past.   
-  %First, we will comment on the membrane's structure. 
+ 
   We first address the structure of the pores formed in the membrane.
-  Previously, we have
-  studied dry membrane systems and some systems with low water content. 
-  We will observe how the radial density of monomer components and water 
-  change within the oore based on membrane water content.
+  Previously, we have studied dry membrane systems and some systems with 
+  low water content. We will observe how the radial density of monomer 
+  components and water change within the pore based on membrane water content.
   
-  % BJC: I don't really explicity comment on the partitioning of solutes
-  % out of the pore. Maybe I can add some sort of chart. Need to think more.
-  % MRS2: it should be mentioned somewhere, probably worth a paragraph or so.  
-  % If WATER is much slower outside of the pores, everything else will be slow as well, so we can
-  % justify transport there not being interesting
-  %Then we will present 
-  We then present
-  our efforts to understand how small molecules, 
+  We then present our efforts to understand how small molecules, 
   including water, partition within the pores. From a macroscopic perspective,
   it is straightforward to hypothesize that the water and polar solutes spend
   their time exclusively in the tube-like hydrophilic pore region. Our
   previous work showed that there is a gradual compositional transition from
   the hydrophilic to the hydrophobic region which means that solutes may not
   necessarily stay confined to the centers of the pores or even within the 
-  pore region. 
-  %MRS2:
-  %We will 
-  We then study the gradient in composition of solutes and 
+  pore region. We then study the gradient in composition of solutes and 
   water and any resultant influence it might have on mechanistic properties.
-  %MRS2: tweak
-  %Finally, and for the bulk of this work, we will 
-  For the remainder of the paper, we 
-  present our observations 
+
+  For the remainder of the paper, we present our observations 
   and explanations of the observed transport mechanisms exhibited by water
   and solutes. Given that the pores will restrict motion of the solutes, we
   anticipate that transport will be hindered in some way. 
 
-  %MRS2: next line is a statement about what we want to do, not what we did?
-  %We want to understand
-  We investigate
-  the differences in solute motion, specifically its mean squared displacement 
-  (MSD), based on a solute's size, shape and chemical functionality. We will 
-  study the interactions between solutes, the membrane, and water in order to
-  determine which mechanism or mechanisms dominate.
+  We investigate the differences in solute motion, specifically its mean 
+  squared displacement (MSD), based on a solute's size, shape and chemical
+  functionality. We will study the interactions between solutes, the membrane,
+  and water in order to determine which mechanism or mechanisms dominate.
   
   There are also a couple of points that this study is not intended to address. 
   First, we will not study the concentration dependence of the observed transport
@@ -731,6 +827,25 @@
   % Assuming only one sodium per carboxylate group, the numbers were multiplied by 2
   % since the averages were divided by 800 instead of 400
   
+  In the 10 wt\% water system, water molecules that spend the majority of 
+  their time in the distal tail region move significantly slower than those
+  confined to the pore region. In Figure~\ref{fig:water_msd_comparison}, we 
+  constructed the MSD curves based on water molecules that spent > 95\% of their
+  time in the pore region. If we instead restrict our calculation to water molecules
+  that spend > 95\% of their time in the distal tail region, the MSD of distal tail
+  water decreases 8-fold compared to pore water.
+  
+  % Changing pore radius does not change conclusion here.
+  In the 5 wt\% water system, water molecules that spend the majority of their 
+  time in the distal tail region have MSDs comparable to those of water molecules
+  which stay in the pore region. The MSD of distal tail water molecules is 1.71 nm$^2$,
+  which is actually higher than that of pore water. This anomaly is likely a consequence
+  of low density in the distal tails as well as structuring of water molecules. 
+  Water molecules are less likely to interact via hydrogen bonding while in the distal 
+  tail region since they are interspersed between chains, while they are in close
+  proximity in the pores.
+  % BJC: quantify this. Number of hbonds per frame. 
+  
   \subsubsection{Transport of Small Polar Solutes}\label{section:general_transport_solutes}  
   
   We observe trends in transport properties that are dependent on the chemical 
@@ -889,6 +1004,20 @@
   % BJC1: I think that it takes away acceptor oxygen atoms since they are occupied
   % by sodium. The hydrogen atoms of water could still hbond but I'm just talking
   % about ethanol donating to water's oxygen, for which opportunities should be suppressed.
+
+  % BJC: Clauset has an easily understood test for exponential versus power law. Would take
+  % me maybe half a day to implement and generate results. Not sure if necessary though since
+  % I'm just going to say that I don't know what distribution it is and we are going to
+  % use a percentile.
+  Hydrogen bond lifetimes appear to be distributed according to a power law or an
+  exponential function. A number of researchers provide evidence that supports a 
+  power law distribution~\cite{starr_fast_1999,martiniano_insights_2013}. However, these
+  studies were done on extremely short timescales relative to ours, outputting positions
+  every timestep. Voloshin et al. studied hydrogen bonding on multiple timescales and 
+  observed exponential behavior on the longest timescales~\cite{voloshin_hydrogen_2009}. 
+  We do not collect data frequently enough to provide a sufficient answer to this 
+  question so we instead report the 95\textsuperscript{th} percentile of hydrogen bond dwell times.
+  This places emphasis on solutes with long dwell times.
   
   The lifetime of hydrogen bonds between solutes and monomer head groups tends to 
   be longer for solutes that hydrogen bond more frequently. In Figure~\ref{fig:hbonds}

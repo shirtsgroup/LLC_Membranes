@@ -34,6 +34,7 @@ class HopLocation(System):
     def plot_hop_locations(self, show=False, bins=25, colormap='viridis', cmap_max=None):
 
         r_digitized = np.digitize(self.r, np.linspace(0, np.max(self.r), bins)) - 1  # bin all distances
+
         heights = [len(np.where(r_digitized == i)[0]) for i in range(bins)]  # number of counts per distance bin
 
         hop_lengths = []  # make all hop lengths into one long list
@@ -112,6 +113,59 @@ class HopLocation(System):
         if show:
             plt.show()
 
+    def regional_hop_lengths(self, r, nboot=200):
+        """ Calculate average hop lengths in and out of the pore region defined based on a cut-off radius.
+
+        :param r: distance from pore center at which pore region ends
+
+        :type r: float
+
+        :return tuple containing : (mean hop length in the pore, std in pore, mean out of pore, std out of pore)
+        """
+
+        self.r = np.array(self.r)
+
+        # flatten list
+        hops = []
+        for i in self.hop_lengths:
+            hops += i
+
+        hops = np.array(hops)
+
+        inpore = np.where(self.r <= r)[0]
+        outpore = np.where(self.r > r)[0]
+
+        mean_inpore = np.zeros([nboot])
+        mean_outpore = np.zeros([nboot])
+
+        for b in range(nboot):
+            mean_inpore[b] = np.abs(hops[np.random.choice(inpore, size=inpore.size)]).mean()
+            mean_outpore[b] = np.abs(hops[np.random.choice(outpore, size=outpore.size)]).mean()
+
+        # Assumes mean is 0! Otherwise this equation is far more complicated
+        # mean_inpore = np.sqrt(2 / np.pi) * np.std(hops[inpore])
+        # sigma_inpore = np.sqrt(np.std(hops[inpore])**2 - mean_inpore**2)
+        # mean_outpore = np.sqrt(2 / np.pi) * np.std(hops[outpore])
+        # sigma_outpore = np.sqrt(np.std(hops[outpore])**2 - mean_outpore**2)
+
+        return mean_inpore.mean(), mean_inpore.std(), mean_outpore.mean(), mean_outpore.std()
+
+    def hop_frequency(self):
+        # https://stats.stackexchange.com/questions/15371/how-to-calculate-a-confidence-level-for-a-poisson-distribution
+        # This function might fit better in a different script.
+
+        hops = []
+        for i in self.hop_lengths:
+            hops += i
+
+        hops = np.array(hops)
+
+        n = self.t.n_frames * self.dt * len(self.hop_lengths)  # solute-nanoseconds
+        freq = len(hops) / n  # per solute per ns
+        ci = 1.96 * np.sqrt(freq / n)  # normal approximation
+
+        return freq, ci
+
 
 if __name__ == "__main__":
 
@@ -130,5 +184,7 @@ if __name__ == "__main__":
         cmax = args.set_cmap_max
     else:
         cmax = None
+
+    hops.regional_hop_lengths(0.5)
 
     hops.plot_hop_locations(show=False, cmap_max=cmax, colormap=args.colormap, bins=args.bins)

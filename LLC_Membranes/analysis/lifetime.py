@@ -4,6 +4,7 @@ import argparse
 import mdtraj as md
 import numpy as np
 from LLC_Membranes.analysis import coordination_number, hbonds
+from LLC_Membranes.llclib import file_rw
 import matplotlib.pyplot as plt
 
 
@@ -104,6 +105,9 @@ class CoordinationLifetime(coordination_number.System):
         self.dwell_times = []
         self.dt = (self.t.time[1] - self.t.time[0]) / 1000  # dt in nanoseconds
 
+        self.mean_lifetime = 0
+        self.confidence = 0
+
     def create_timeseries(self):
         """ Process coordination_number output in order to generate timeseries for each solute
         """
@@ -111,7 +115,7 @@ class CoordinationLifetime(coordination_number.System):
         for t in range(self.t.n_frames):
             self.coordination_timeseries[t, self.distances[t].nonzero()[0]] = self.distances[t].nonzero()[1]
 
-    def calculate_lifetimes(self):
+    def calculate_lifetimes(self, ci=.95, nboot=200):
 
         for x in self.coordination_timeseries.T:
             frame = 0
@@ -135,9 +139,21 @@ class CoordinationLifetime(coordination_number.System):
                 else:
                     frame += 1
 
-        print("Mean dwell time: %.2f ns" % np.mean(self.dwell_times))
-        print("Median Hbond lifetime %.2f ns" % np.median(self.dwell_times))
-        print("Maximum dwell time : %.2f ns" % np.max(self.dwell_times))
+        means = np.zeros([nboot])
+        confidences = np.zeros([nboot])
+        ci_ndx = int(ci * len(self.dwell_times))
+        for b in range(nboot):
+            choices = np.random.choice(self.dwell_times, size=len(self.dwell_times), replace=True)
+            means[b] = np.mean(choices)
+            confidences[b] = choices[np.argsort(choices)][ci_ndx]
+
+        self.mean_lifetime = [means.mean(), means.std()]
+        self.confidence = [confidences.mean(), confidences.std()]
+
+        print("Mean association lifetime: %.2f ns" % self.mean_lifetime[0])
+        print("%.1f %% of associations last at least %.2f ns" % (100*(1 - ci), self.confidence[0]))
+        print("Median association lifetime %.2f ns" % np.median(self.dwell_times))
+        print("Maximum association lifetime : %.2f ns" % np.max(self.dwell_times))
 
     def plot_dwell_time_distribution(self, bins=25):
         """ Plot a histogram of the dwell times
@@ -161,6 +177,8 @@ class HydrogenBondLifetime(hbonds.System):
         self.unique_hbonds = {}
         self.dwell_times = []
         self.hbond_timeseries = None
+        self.mean_lifetime = 0
+        self.confidence = 0
 
     def identify_unique_hbonds(self):
         """
@@ -186,7 +204,15 @@ class HydrogenBondLifetime(hbonds.System):
                 lst = str([int(x) for x in hbond[:3]])
                 self.hbond_timeseries[t, self.unique_hbonds[lst]] = True
 
-    def calculate_lifetimes(self):
+    def calculate_lifetimes(self, ci=.95, nboot=200):
+        """ Calculate the lifetime of each hydrogen bond and output some statistics
+
+        :param ci: confidence that a solute has a hop length less than a certain amount
+        :param nboot: number of bootstrap trials for generating statistics
+
+        :type ci: float
+        :type nboot: int
+        """
 
         for x in self.hbond_timeseries.T:
             frame = 0
@@ -207,7 +233,19 @@ class HydrogenBondLifetime(hbonds.System):
                 else:
                     frame += 1
 
-        print("Mean Hbond lifetime: %.2f ns" % np.mean(self.dwell_times))
+        means = np.zeros([nboot])
+        confidences = np.zeros([nboot])
+        ci_ndx = int(ci * len(self.dwell_times))
+        for b in range(nboot):
+            choices = np.random.choice(self.dwell_times, size=len(self.dwell_times), replace=True)
+            means[b] = np.mean(choices)
+            confidences[b] = choices[np.argsort(choices)][ci_ndx]
+
+        self.mean_lifetime = [means.mean(), means.std()]
+        self.confidence = [confidences.mean(), confidences.std()]
+
+        print("Mean Hbond lifetime: %.2f ns" % self.mean_lifetime[0])
+        print("%.1f %% of Hbonds last at least %.2f ns" % (100*(1 - ci), self.confidence[0]))
         print("Median Hbond lifetime %.2f ns" % np.median(self.dwell_times))
         print("Maximum Hbond lifetime : %.2f ns" % np.max(self.dwell_times))
 
@@ -227,47 +265,58 @@ if __name__ == "__main__":
 
     args = initialize().parse_args()
 
-    if args.type == 'coord':
+    if args.load:
 
-        lifetime = CoordinationLifetime(args.traj, args.gro, atoms=args.atoms[0], coordinated_atoms=args.coordinated_atoms,
-                                        residue=args.residues[0], coordinated_residue=args.coordinated_residue,
-                                        type=args.atype, ctype=args.coordinated_type, begin=args.begin, end=args.end,
-                                        skip=args.skip, com=(not args.nocom))
-
-    elif args.type == 'hbonds':
-
-        # Preprocess the arguments
-        if not args.acceptors:
-            args.acceptors = [False for i in args.residues]
-        else:
-            args.acceptors = [bool(int(i)) for i in args.acceptors]
-
-        if not args.donors:
-            args.donors = [False for i in args.residues]
-        else:
-            args.donors = [bool(int(i)) for i in args.donors]
-
-        if not args.atoms:
-            args.atoms = [['all'] for r in args.residues]  # a default value
-
-        while len(args.atoms) != len(args.residues):
-            args.atoms.append(['all'])
-
-        lifetime = HydrogenBondLifetime(args.traj, args.gro, begin=args.begin, end=args.end, skip=args.skip)
-
-        for i, r in enumerate(args.residues):
-            lifetime.set_eligible(r, args.atoms[i], acceptor_only=args.acceptors[i], donors_only=args.donors[i])
-
-        lifetime.identify_hbonds(args.distance, args.angle_cut)
-        lifetime.identify_unique_hbonds()
-        lifetime.create_timeseries()
+        lifetime = file_rw.load_object(args.savename)
 
     else:
 
-        import sys
-        sys.exit('Please choose a type of lifetime to measure (hbonds or coord)')
+        if args.type == 'coord':
 
-    lifetime.calculate_lifetimes()
+            if args.atoms is None:
+                args.atoms = ['all']
+
+            lifetime = CoordinationLifetime(args.traj, args.gro, atoms=args.atoms[0], coordinated_atoms=args.coordinated_atoms,
+                                            residue=args.residues[0], coordinated_residue=args.coordinated_residue,
+                                            type=args.atype, ctype=args.coordinated_type, begin=args.begin, end=args.end,
+                                            skip=args.skip, com=(not args.nocom))
+
+        elif args.type == 'hbonds':
+
+            # Preprocess the arguments
+            if not args.acceptors:
+                args.acceptors = [False for i in args.residues]
+            else:
+                args.acceptors = [bool(int(i)) for i in args.acceptors]
+
+            if not args.donors:
+                args.donors = [False for i in args.residues]
+            else:
+                args.donors = [bool(int(i)) for i in args.donors]
+
+            if not args.atoms:
+                args.atoms = [['all'] for r in args.residues]  # a default value
+
+            while len(args.atoms) != len(args.residues):
+                args.atoms.append(['all'])
+
+            lifetime = HydrogenBondLifetime(args.traj, args.gro, begin=args.begin, end=args.end, skip=args.skip)
+
+            for i, r in enumerate(args.residues):
+                lifetime.set_eligible(r, args.atoms[i], acceptor_only=args.acceptors[i], donors_only=args.donors[i])
+
+            lifetime.identify_hbonds(args.distance, args.angle_cut)
+            lifetime.identify_unique_hbonds()
+            lifetime.create_timeseries()
+
+        else:
+
+            import sys
+            sys.exit('Please choose a type of lifetime to measure (hbonds or coord)')
+
+        lifetime.calculate_lifetimes()
+
+        file_rw.save_object(lifetime, args.savename)
 
     if not args.noshow:
         lifetime.plot_dwell_time_distribution()
