@@ -615,10 +615,43 @@
   used the 3 dimensional COM positions of each solute, rather than
   just the $z$-direction, in order to detect lateral hops. However,
   hop lengths are reported as their displacement the $z$-direction.
+  We reported the standard error in the average hop lengths by 
+  bootstrapping the hop lengths.
   % BJC: could add more detail about which algorithm and cost function
   % penalty I used. Seems unnecessary since it is all in my code.
   
-  \subsection{Identification of Hydrogen Bonds}\label{method:hbonds}
+  % This might change
+  We determined the frequency of hops by dividing the total number of 
+  hops by the total length of the simulation. We used the normal 
+  approximation in order to estimate the 95 \% confidence interval
+  of these estimates:
+  \begin{equation}
+  95\%~CI = 1.96 \sqrt{\dfrac{\lambda}{n}}
+  \end{equation}
+  where $\lambda$ is the average frequency of hops and n is the total
+  observation time accumulated for all solutes.
+  
+  Where instructive, we differentiated between the length of hops inside
+  and outside of the pores. For 10 wt\% water systems, we consider a solute
+  to be in the pore if it is within 0.75 nm of a pore center. This radial
+  cut-off maximizes the difference between average hop lengths in and out
+  of the pore. See Section~\ref{S-section:pore-region} of the Supporting
+  Information for further details on this optimization.
+  
+  \subsection{Time Spent in Pore Region}
+  
+  Using the cut-off defined above, we calculated the fraction of time
+  that a solute spends within the pore region. Since this is a process
+  with two possible outcomes, we calculated the standard error ($SE$) of our
+  calculations based on the binomial theorem: 
+  \begin{equation}
+  SE = \sqrt{\dfrac{p(1-p)}{n}}
+  \end{equation}
+  where $p$ is the probability that a solute is in the pore region and
+  $n$ is the sample size. Here $n$ is the total number of transitions
+  between each region. 
+  
+  \subsection{Identification and Analysis of Hydrogen Bonds}\label{method:hbonds}  % Could just make title 'Hydrogen Bonds'
 
   Based on the geometric criteria proposed by Luzar and Chandler 
   \cite{luzar_effect_1996}, we determined a hydrogen bond to exist if the
@@ -634,6 +667,15 @@
   In Section~\ref{S-section:hbond_sensitivity} of the Supporting Information, we
   show that our conclusions are insensitive to this definition within a 
   reasonable range.
+  
+  We determined the average percentage of solutes which actively participated
+  in a hydrogen bond interaction with monomers each frame. We only counted
+  unique solute--monomer hydrogen bond interactions meaning solutes
+  that hydrogen bond more than once simultaneously were classified as a
+  single pairing event. We determined the standard error of this calculation
+  by bootstrapping over each solute's trajectory. For each bootstrap trial,
+  we randomly chose 24 solutes with replacement and calculated the average
+  active solute-monomer hydrogen bonds per frame.
 
   \subsection{Coordination Number}\label{method:coordination}
 
@@ -655,6 +697,10 @@
   for 5 ns and reported the average number of coordinated water molecules 
   per frame after discarding the first nanosecond of simulation.
   
+  We determined the average percentage of solutes actively coordinated to
+  a sodium ion each frame. Our calculation procedure is analogous to that for
+  solute-monomer hydrogen bond interactions outlined in the previous section.
+  
   \subsection{Association Lifetimes}\label{method:lifetimes}
   
   We quantified the length that two species stay associated via hydrogen
@@ -665,13 +711,25 @@
   of these events into a distribution of association lifetimes.
   %BJC: could justify why I didn't use autocorrelation functions
   
-  We found that the distributions best fit a power law / exponential
-  distribution.
-  % BJC: need to do this. 
-  % BJC: reporting median doesn't work great since it is usually equal
-  % to the lowest possible value since time step is large.
-  % Would probably be better to report fit parameters (alpha for power law)
-  % Could use those values in analytical equations for median
+  % BJC: Clauset has an easily understood test for exponential versus power law. Would take
+  % me maybe half a day to implement and generate results. Not sure if necessary though since
+  % I'm just going to say that I don't know what distribution it is and we are going to
+  % use a percentile.
+  Hydrogen bond lifetimes appear to be distributed according to a power law or an
+  exponential function. A number of researchers provide evidence that supports a 
+  power law distribution~\cite{starr_fast_1999,martiniano_insights_2013}. However, these
+  studies were done on extremely short timescales relative to ours, outputting positions
+  every time step. Voloshin et al. studied hydrogen bonding on multiple timescales and 
+  observed exponential behavior on the longest timescales~\cite{voloshin_hydrogen_2009}. 
+  Due to memory limitations, we could not collect data frequently enough to provide a
+  sufficient answer to this question so we instead report the 95\textsuperscript{th} 
+  percentile of hydrogen bond dwell times. This places emphasis on solutes with 
+  long dwell times. We reported the standard error of this calculation by bootstrapping
+  the distribution of dwell times.
+  
+  The distribution of sodium association lifetimes appear similar to
+  hydrogen bond life time distributions. Therefore, we reported association
+  lifetimes in the same manner as hydrogen bond lifetimes.
   
   \subsection{Radial Distribution Functions}\label{method:rdfs}
 
@@ -710,36 +768,33 @@
   
   \subsection{Structure of Membrane Constituents}\label{section:membrane_components} 
   
-  Before beginning the analysis of transport behavior, it is important to
+  Before beginning the analysis of solute transport behavior, it is important to
   elucidate the topology of the membrane pores in solvated systems.  
   
-  In contrast to our previous work with a dry version of this 
-  membrane, the pore region of the 5 and 10 wt\% water 
-  systems are primarily filled with water and sodium ions. We define the
-  pore region based on the average COM position of the monomer head groups' 
-  % BJC: not sure the best place in paper to define pore region. Maybe a system definitions section in Methods.
-  % BJC: need to decide on exact definition. Should probably be the same as the 'Head Groups' line
-  carboxylate oxygen atoms. Figure~\ref{fig:component_densities} plots the RDF of each membrane
-  constituent in the dry system as well as the 5 and 10 wt\% water systems. 
-  In dry systems, the pore center is densely filled with sodium ions and head
-  groups. The peak head group density occurs within 0.25 nm of the pore center.
-  In hydrated systems, water occupies, and is densest, at the center of each 
-  pore. The density of sodium ions is somewhat uniform in the pore center of
-  the 5 wt\% water system while it shows a maximum closer to the head groups
-  in the 10 wt\% water system. The peak density of sodium ions is not at the
-  pore center in the 10 wt\% water system likely because they are still
-  loosely associated with the monomer's carboxylate head groups.
+  In contrast to our previous work with a dry version of this membrane, the 
+  region close to the pore center of the 5 and 10 wt\% water systems is 
+  primarily filled with water and sodium ions. Figure~\ref{fig:component_densities}
+  plots the RDF of each membrane constituent in the dry system as well as the
+  5 and 10 wt\% water systems. In dry systems, the pore center is densely 
+  filled with sodium ions and head groups. The peak head group density occurs
+  within 0.25 nm of the pore center. In hydrated systems, water occupies, 
+  and is densest, at the center of each pore. The density of sodium ions is 
+  somewhat uniform in the pore center of the 5 wt\% water system while it shows
+  a maximum closer to the head groups in the 10 wt\% water system. The peak 
+  density of sodium ions is not at the pore center in the 10 wt\% water system
+  likely because they are still loosely associated with the monomer's carboxylate
+  head groups.
   
   Pores in the 10 wt\% water system are wider and less crowded by monomers than
   those in the 5 wt\% water system. The peak head group density of 10 wt\% water
   systems is about 0.2 nm further from the pore center than the 5 wt\% water system. 
-  Based on these observations, we expect solute transport to be fastest in the 10 wt
- \% water system.
+  Based on these observations, we expect solute transport to be fastest in the 
+  10 wt\% water system.
   
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{component_density_dry.pdf}
+  \includegraphics[width=\textwidth]{component_density_dry.pdf}  % running this out on bridges to make smoother
   %BJC: simulation is extended to smooth out these curves
   \caption{Dry System}\label{fig:component_density_dry}
   \end{subfigure}
@@ -758,7 +813,7 @@
   \end{subfigure}
   %MRS2: interesting that the head group max is near the transition point where water/tail groups 
   \caption{The radial densities of various monomer components paint a 
-  picture of the pore topology where the pore centers are primarily composed
+  picture of the pore topology where the pore centers of hydrated systems are primarily composed
   of water and sodium ions. The monomer groups labeled in each plot correspond to 
   the color-coded monomer pictured in the upper right corner of the figure. 
   All RDFs represent the number of atoms located at a given distance from the
@@ -770,14 +825,15 @@
   for more water.}\label{fig:component_densities}
   \end{figure}
   
-  There is an appreciable amount of water that partitions into the distal tail
-  region of both systems. 28\% and 31\% of the total water is present in the tail
-  regions of the 5 and 10 wt\% water systems respectively. See 
-  Section~\ref{S-section:water_content_equil} of the Supporting Information for more details. This 
-  result is due to a combination of the lower density of the tail region
-  as well as oxygen atoms at the ends of each monomer tail which can further 
-  stabilize water molecules. See Figure~\ref{S-fig:total_density} of the 
-  Supporting Information for a graphical illustration of this point.
+  There is an appreciable amount of water that partitions into the distal tail % BJC: defined in methods
+  region of both systems. 28\% and 31\% of the total water is present in the
+  tail regions of the 5 and 10 wt\% water systems respectively. See 
+  Section~\ref{S-section:water_content_equil} of the Supporting Information 
+  for more details on the equilibration that led to this conclusion. The partition
+  is due to a combination of the distal tail region's lower density as well
+  as oxygen atoms at the ends of each monomer tail which can further stabilize
+  water molecules. See Figure~\ref{S-fig:total_density} of the Supporting 
+  Information for a graphical illustration of this point.
 
   \subsection{Mechanisms Governing Small Solute Transport}\label{section:mechanism_overview} 
 
@@ -785,7 +841,7 @@
   inside the membrane nanopores. First, we will comment on transport of the
   membrane constituents, water and sodium, in a system absent of any additional
   solutes. Then we will present the general trends that we observe among the
-  set of solutes studied.
+  all other solutes studied.
   
   \subsubsection{Water and Sodium Ions}\label{section:transport_water_sodium} 
 
@@ -829,23 +885,26 @@
   
   In the 10 wt\% water system, water molecules that spend the majority of 
   their time in the distal tail region move significantly slower than those
-  confined to the pore region. In Figure~\ref{fig:water_msd_comparison}, we 
-  constructed the MSD curves based on water molecules that spent > 95\% of their
-  time in the pore region. If we instead restrict our calculation to water molecules
-  that spend > 95\% of their time in the distal tail region, the MSD of distal tail
-  water decreases 8-fold compared to pore water.
+  close to the pore center. In Figure~\ref{fig:water_msd_comparison}, we 
+  constructed the MSD curves based on water molecules that spent $>$ 95\% of their
+  time outside the distal tail region. If we instead restrict our calculation to
+  water molecules that spend $>$ 95\% of their time in the distal tail region, 
+  the MSD of distal tail water decreases 8-fold. 
   
   % Changing pore radius does not change conclusion here.
   In the 5 wt\% water system, water molecules that spend the majority of their 
   time in the distal tail region have MSDs comparable to those of water molecules
-  which stay in the pore region. The MSD of distal tail water molecules is 1.71 nm$^2$,
-  which is actually higher than that of pore water. This anomaly is likely a consequence
-  of low density in the distal tails as well as structuring of water molecules. 
-  Water molecules are less likely to interact via hydrogen bonding while in the distal 
-  tail region since they are interspersed between chains, while they are in close
-  proximity in the pores.
-  % BJC: quantify this. Number of hbonds per frame. 
-  
+  close to the pore center. The MSD of distal tail water molecules is 1.71 nm$^2$.
+  This anomaly is likely a consequence of low density in the distal tails (see
+  Figure~\ref{S-fig:total_density}) as well as structuring of water molecules via
+  hydrogen bonding. Water molecules are less likely to hydrogen bond while in the
+  distal tail region since they are interspersed between chains, while those in 
+  the pores stay in close proximity to each other. We observed about 9 times more  % tailvpore_hbonding.py in figures folder
+  hydrogen bonding between water molecules near the pore center versus those in 
+  the distal tail region. While a similar observation holds for the 10 wt\% system,
+  its high water content facilitates a less crowded environment where diffusion
+  of water molecules dominates.  
+   
   \subsubsection{Transport of Small Polar Solutes}\label{section:general_transport_solutes}  
   
   We observe trends in transport properties that are dependent on the chemical 
@@ -856,27 +915,20 @@
   will help us to create monomer design principles. We will begin our analysis by
   considering the collective trends observed across all systems and then focus on
   subsets of similar molecules.
-%  where some exceptions occur. 
-  
-%  We have gained a clearer picture of the general transport properties exhibited by
-%  this system through the collective study of all solutes. We will first address the
-%  questions posed in the introduction in a general sense before addressing them with
-%  respect to specific molecules, where exceptions occur.
-%  \bigskip
   
   Like water and sodium above, the MSDs of the solutes studied in this work are 
   significantly larger in the 10 wt\% system than those in the 5 wt\% water 
   system (Figure~\ref{fig:msds}). The fastest moving solute in both cases, 
-  methanol, has an MSD about 175 times larger in the 10 wt\% versus the 5 wt 
- \% water system. Clearly the equilibrium water content of a given LLC system will 
-  determine its viability for real separations.
+  methanol, has an MSD about 175 times larger in the 10 versus the 5 wt\%
+  water system. Clearly the equilibrium water content of a given LLC system will 
+  determine its viability for real separations.  % BJC: last sentence too much speculation?
   
   The MSDs are not solely a function of solute size. We plotted each solute's radius
   against their MSD in Figures~\ref{fig:msd_radius_5wt} and~\ref{fig:msd_radius_10wt}.
   Of all the solutes, we believe methanol is subject to the least hindrance by
   the membrane due its small size. Therefore we fit Equation~\ref{eqn:stokes-einstein}
   so that it intersected methanol's MSD. The uncorrected version of 
-  Equation~\ref{eqn:stokes-einstein} is plotted and converges to the same value as the
+  Equation~\ref{eqn:stokes-einstein} ($f$=1) is plotted and converges to the same value as the
   corrected form for large radii (see Section~\ref{method:stokes}). Although both curves are 
   approximations, they illustrate that the majority of solutes in our study show
   lower than expected MSDs. In most cases, the predicted MSDs even fall below the 
@@ -931,15 +983,15 @@
   nanopores, similar to that exhibited by ethanol. (a) The $z$-coordinate trace of
   3 representative ethanol COMs shows clear periods of entrapment separated by hops.
   In general, the longest dwell times occur when solutes are situated far from the
-  pore center and the hops occur when solutes are close to the pore center. (b) The
-  time-averaged MSD of ethanol is sub-linear which suggests transport is governed 
-  by an anomalous subdiffusion process.}\label{fig:qualitative_mechanisms}
+  pore center and more frequent hops occur when solutes are close to the pore center.
+  (b) The time-averaged MSD of ethanol is sub-linear which suggests transport is
+  governed by an anomalous subdiffusion process.}\label{fig:qualitative_mechanisms}
   \end{figure}
   
   The complex and non-homogeneous structure of the membrane leads to radially
   dependent transport mechanisms. In general, we observed that hops 
-  made in the pore region are about 45\% larger than those made outside
-  the pore region (See Figure~\ref{fig:hop_lengths}). There is a high 
+  made in the pore region are about 59\% larger than those made outside
+  the pore region (see Figure~\ref{fig:hop_lengths}). There is a high 
   resistance to movement in the alkane-dense head group and tail regions
   while, in the pore region, solutes can move relatively freely since it 
   is primarily composed of water molecules. However, time spent in the 
@@ -947,7 +999,7 @@
   largest solutes in this study spend the most time in the pore region
   (see Figure~\ref{fig:frac_time}), but many hop with a below-average
   frequency (see Figure~\ref{fig:hopfreq}). Therefore, trapping mechanisms
-  controlled by membrane properties other than density must be prevalent.
+  controlled by membrane properties other than alkane density must be prevalent.
 
 %  Solutes partition out of the pore into the head group region and beyond
 %  which may lead to a radially dependent transport mechanism. It is clear 
@@ -957,7 +1009,6 @@
   % When hops occur, and where there is the most $z$-positional
   % noise, solutes are generally close to the pore center  
 
-  
   \begin{figure}
   \centering
   \begin{subfigure}{0.325\textwidth}
@@ -973,23 +1024,23 @@
   \caption{}\label{fig:hopfreq}
   \end{subfigure}
   \caption{(a) Hops made in the pore region of the 10 wt\% water system 
-  are, on average, 45\% larger than those made outside the pore region. 
+  are, on average, 59\% larger than those made outside the pore region. 
   The trend in hop lengths is similar to the trend in MSDs shown in 
   Figure~\ref{fig:all_msds_10wt} implying that solutes which make consistently 
   larger hops have higher MSDs. The fraction of time spent by a solute in the 
   pore region (b) does not necessarily lead to more frequent hopping (c). For
   example, ribose spends the largest fraction of time in the pore region, yet
-  performs the the second lowest number of hops.}\label{fig:hops}
+  hops the fifth least frequently.}\label{fig:hops}
   \end{figure}
   
-  In addition to solute trapping in dense monomer regions, 
-  we observe a second trapping mechanism caused by preferential hydrogen 
+  %In addition to solute trapping in dense monomer regions, 
+  We observe a second trapping mechanism caused by preferential hydrogen 
   bonding between hydrogen bond donor solutes and monomer head groups. To 
   continue with our ethanol example, we observe that 64\% of ethanol 
   molecules donate hydrogen bonds  % 15.7/24 donated, 0.6/24 accept -- BJC: double check these numbers
   and 3\% of ethanol molecules accept hydrogen bonds each frame. On average, 40\%
   of hydrogen bonds donated by ethanol go to carboxylate % BJC1: 6.33 hbonds between EtOH and COOH per frame, 3.84 b/w EtOH and ether oxygen, 5.56 between EtOH and HOH (where Ethanol donates)
-  head groups, 25\% go to the ether linkages between the tails and the 
+  head groups, 25\% go to the ether linkages connecting the monomers tails to the 
   head groups and the remaining 35\% to water. There are about 46\% less  % 800 carboxylate oxygens total versus 2158 * 0.69 total water molcules in pores 
   carboxylate oxygen atoms in the pore than there are water molecules yet more
   hydrogen bonds are donated to them. The stability of hydrogen bonds with 
@@ -1004,28 +1055,15 @@
   % BJC1: I think that it takes away acceptor oxygen atoms since they are occupied
   % by sodium. The hydrogen atoms of water could still hbond but I'm just talking
   % about ethanol donating to water's oxygen, for which opportunities should be suppressed.
-
-  % BJC: Clauset has an easily understood test for exponential versus power law. Would take
-  % me maybe half a day to implement and generate results. Not sure if necessary though since
-  % I'm just going to say that I don't know what distribution it is and we are going to
-  % use a percentile.
-  Hydrogen bond lifetimes appear to be distributed according to a power law or an
-  exponential function. A number of researchers provide evidence that supports a 
-  power law distribution~\cite{starr_fast_1999,martiniano_insights_2013}. However, these
-  studies were done on extremely short timescales relative to ours, outputting positions
-  every timestep. Voloshin et al. studied hydrogen bonding on multiple timescales and 
-  observed exponential behavior on the longest timescales~\cite{voloshin_hydrogen_2009}. 
-  We do not collect data frequently enough to provide a sufficient answer to this 
-  question so we instead report the 95\textsuperscript{th} percentile of hydrogen bond dwell times.
-  This places emphasis on solutes with long dwell times.
   
   The lifetime of hydrogen bonds between solutes and monomer head groups tends to 
   be longer for solutes that hydrogen bond more frequently. In Figure~\ref{fig:hbonds}
   we see nearly the same ordering of the percentage of solutes hydrogen bonded to
-  monomer head groups and the mean hydrogen bond lifetime. Solutes with multiple
-  hydroxyl groups donate hydrogen bonds most frequently and tend to stay hydrogen
-  bonded longer. Hydrogen bonds donated by nitrogen are far less common and tend 
-  to be short-lived as supported by acetamide and urea.
+  monomer head groups and the 95\textsuperscript{th} percentile of hydrogen bond 
+  lifetimes. Solutes with multiple hydroxyl groups donate hydrogen bonds most 
+  frequently and tend to stay hydrogen bonded longer. Hydrogen bonds donated by
+  nitrogen are far less common and tend to be short-lived as shown by acetamide
+  and urea.
 
   \begin{figure}[!htb]
   \centering
@@ -1053,20 +1091,29 @@
   which are stabilized through electrostatic interactions with sodium ions. 
   In Figure~\ref{fig:na_coordination}, we've plotted the percentage
   of sodium ions coordinated to the oxygen atoms of each solute as well as the
-  average length of time that pairs stay coordinated. The degree and length of 
+  95\textsuperscript{th} percentile of sodium association times. The degree and length of 
   coordination between solutes and sodium in the 5 wt\% water system is higher
   in all cases than that in the 10 wt\% water systems. The crowded pores of 
   the 5 wt\% water system forces sodium ions in close proximity to solutes. 
-  The 5 highest coordinated solutes, which also have the longest coordinated dwell times,
-  all contain carbonyl groups (except for dimethyl sulfoxide which has an 
-  analogous sulfinyl group) which leaves a highly electron-dense oxygen atom 
-  exposed and ready to interact with sodium. 
-  %BJC: need to verify following  
-  The dwell times are power law 
-  distributed, which means that while many of these interactions are fleeting,
-  there is still a chance for very long periods of association to occur. For 
-  example, the longest period of coordination between acetone and sodium was
-  110 ns.
+  
+  Carbonyl functional groups tend to associate with sodium the most. Nearly
+  all of the most coordinated solutes contain a carbonyl group (except for 
+  DMSO which has an analogous sulfinyl group). There is a significant
+  drop in sodium ion association for solutes that do not contain carbonyl 
+  groups or multiple hydroxyl groups to compensate. The corresponding dwell
+  times follow a similar trend, however the dwell times of highly coordinated 
+  solutes with multiple hydroxyl groups are generally lower since association
+  between hydroxyl groups and sodium is apparently a weaker interaction. Carbonyl
+  groups contain an exposed and highly electron-dense oxygen atom which interacts
+  readily with sodium ions. Carbonyl groups with nitrogen substituents appear
+  to interact with sodium more frequently than those with carbon substituents. 
+  Acetone associates with sodium significantly less than urea and acetamide. 
+
+%  The dwell times are power law 
+%  distributed, which means that while many of these interactions are fleeting,
+%  there is still a chance for very long periods of association to occur. For 
+%  example, the longest period of coordination between acetone and sodium was
+%  110 ns.
 %  There are many cases, particularly when an electronegative atom is left unprotected,
 %  in which polar groups bind to sodium ions for at least a short period of time. 
 
@@ -1075,12 +1122,13 @@
   % associates with sodium a lot, but the OH doesn't really. (28 % C=O versus 3 % COH)
   \begin{figure}[!htb]
   \centering
+  % BJC: maybe I should normalize these to number of oxygen atoms?
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{all_solutes_NA_coordination.pdf}
+  \includegraphics[width=\textwidth]{all_solutes_NA_coordination.pdf}  % all_coord.py
   \caption{}\label{fig:all_solutes_NA_coordination}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{all_NA_dwells.pdf}
+  \includegraphics[width=\textwidth]{all_NA_dwells.pdf}  % na_dwells.py
   \caption{}\label{fig:all_NA_dwells}
   \end{subfigure}
   \caption{(a) Solutes, especially those with carbonyl groups, spend a 
@@ -1091,7 +1139,7 @@
   
   Coordination of ions with oxygen has been observed in a variety of systems. 
   Carvajal et al. noted that Na\textsuperscript{+} coordinated with four 
-  tetrahydrofuran molecules when they dissolved a sodium salt in the solvent.~\cite{carvajal_studies_1965}
+  THF molecules when they dissolved a sodium salt in the solvent.~\cite{carvajal_studies_1965}
   Wu et al. observed coordination of Na\textsuperscript{+} with the carbonyl
   group of a molecule used to design an organic electrode.~\cite{wu_unraveling_2015} 
   Finally, Shinoda et al. observed K\textsuperscript{+} ions coordinated with
@@ -1123,8 +1171,8 @@
   and longest hops (see Figure~\ref{fig:hops}). Somewhat counterintuitively, 
   methanol, along with the other simple alcohols, spends a smaller fraction of its
   time in the pore region than most other solutes. However, even outside the pore
-  region, hops made by methanol are larger than those by any other solute. The
-  small size of methanol allows it to move relatively unhindered. 
+  region, hops made by methanol are larger than those made by almost any other solute
+  in the pore region. The small size of methanol allows it to move relatively unhindered. 
 
   The RDFs of longer chain alcohols show a sharp peak near the head groups 
   (see Figure~\ref{fig:simple_alcohol_rdf}). On average, the density of methanol
@@ -1154,7 +1202,7 @@
   the two carboxylate oxygen atoms to the number of hydrogen bonds between solutes
   and the three ether groups to be 2/3. There is a clear preference towards 
   hydrogen bonding with the carboxylate oxygen atoms for all simple alcohols. 
-  This is largely due to the large net charge of the carboxylate groups as well
+  This is largely due to the high net charge of the carboxylate groups as well
   as the more highly crowded environment surrounding the ether oxygen atoms. 
   Butanol shows the largest preference towards hydrogen bonds with carboxylate
   head groups. The radial distribution function of atoms located at opposite ends
@@ -1191,7 +1239,7 @@
   explain its fast dynamics. (c) Despite relatively little difference in the 
   total number of solutes actively participating in a hydrogen bond each frame,
   a given alcohol's preference towards hydrogen bonds with the carboxylate groups
-  of ether linkages increases with molecule size. (d) The average location of 
+  of ether linkages increases with increasing hydrophobic character. (d) The average location of 
   butanol's oxygen atom is closer to the pore center than its most distal carbon
   atom, suggesting that the molecule is oriented with hydrophobic tails pointing
   away from the pore center.}\label{fig:simple_alcohols}
@@ -1262,29 +1310,31 @@
   hydrogen bonds made by a single solute in different locations simultaneously, n, 
   also increases with the number of hydroxyl groups. In the most extreme case, all 
   four hydroxyl groups of Ribose (n = 4) are involved in a hydrogen bond interaction
-  at the same time.}\label{fig:multi_hbonds}
+  at the same time.}\label{fig:polyols}
   \end{figure}
   
   Of the two diols, ethylene glycol moves significantly faster than propylene
   glycol due to propylene glycol's affinity for the monomer head groups.
   Combined with an increase in size, the addition of a single methyl group to
   ethylene glycol increases propylene glycol's hydrophobic character and causes
-  it to favor positions near monomer head groups. Both diols have comparable 
-  densities close to the pore center, however propylene glycol's density has a
-  large peak near the monomer head groups relative to ethylene glycol. Propylene
-  glycol can form more highly stabilized hydrogen bonds with carboxylate groups,
-  explaining the slightly higher incidence of hydrogen bonds shown in 
-  Figure~\ref{fig:multi_hbonds}. The average hydrogen bond lifetime of propylene
-  glycol with monomers is 1.95 ns compared to 1.34 ns for ethylene glycol.  % BJC: 2.33 ns vs 1.62 ns for hbonds with carboxylate
-  Somewhat counterintuitively, there is a relatively high density of ethylene
-  glycol molecules beyond the head group region probably due to its relatively 
-  small size. This likely contributes to the somewhat large error bars on its MSD
-  in Figure~\ref{fig:msds}. 
+  it to favor positions near monomer head groups (see Figure~\ref{fig:polyols_rdf}).
+  Both diols have comparable densities close to the pore center, however propylene
+  glycol's density has a large peak near the monomer head groups relative to 
+  ethylene glycol. Propylene glycol can form more highly stabilized hydrogen 
+  bonds with carboxylate groups, explaining the slightly higher incidence of 
+  hydrogen bonds shown in Figure~\ref{fig:multi_hbonds}. The 95\textsuperscript{th}
+  percentile of hydrogen bond lifetimes for propylene glycol with monomers is 9.51 ns
+  compared to 7 ns for ethylene glycol. 
+  %BJC: not sure of following point is worthwhile  
+  Somewhat counterintuitively, there is a 
+  relatively high density of ethylene glycol molecules beyond the head group region
+  probably due to its relatively small size. This likely contributes to the somewhat
+  large error bars on its MSD in Figure~\ref{fig:msds}. 
 
   \subsection{Transport of Ketones and Amides}
   
-  The 4 ketone-like molecules tested show a surprising range of transport
-  behaviors. Urea, acetic acid, acetamide and acetone are all characterized by
+  The 4 ketone-like molecules tested show a range of transport behaviors. 
+  Urea, acetic acid, acetamide and acetone are all characterized by
   a carbonyl group with two attached heavy atoms. All are similar in size and
   are planar molecules due to the sp2 hybridization of their carbonyl group. 
   The fastest solutes of this grouping, acetic acid and urea, move about 3
@@ -1341,11 +1391,11 @@
   \caption{}\label{fig:ketones_rdf}
   \end{subfigure}
   \begin{subfigure}{0.325\textwidth}
-  \includegraphics[width=\textwidth]{ketone_hbonds.pdf}
+  \includegraphics[width=\textwidth]{ketone_hbonds.pdf}  %BJC: need error bars!
   \caption{}\label{fig:ketone_hbonds}
   \end{subfigure}
   \caption{(a) The MSD of the solutes decreases and the deviation from
-  Stokes-Einstein predicted behavior increases as with molecular size increases.
+  Stokes-Einstein predicted behavior increases with molecular size.
   (b) The radial density near the pore center (r = 0) decreases with decreasing
   solute MSD. Peaks in the RDFs of urea, acetamide and acetone that appear 
   0.2 - 0.4 nm from the pore center are likely due to coordination with sodium
@@ -1395,16 +1445,22 @@
   Mercaptoethanol has a similar average MSD and RDF to ethylene glycol.
   There is a much larger uncertainty associated with mercaptoethanol's
   MSD. The range of behaviors shown by mercaptoethanol help explain the
-  large variance of its MSD. Some can be accounted for by the higher 
+  large variance of its MSD. Much can be accounted for by the higher 
   density of mercaptoethanol molecules outside the pore region, where 
-  transport is inherently slower. Mercaptoethanol spends 20\% less 
-  time in the pore region than ethylene glycol. Conversely, 
-  mercaptoethanol hydrogen bonds with head groups about 40\% less 
-  frequently, which is less than expected if equal amounts of both 
-  solutes occupied the pore region. Consequently, shorter hydrogen 
-  bond lifetimes within the pore region may yield some high MSD 
-  trajectories. 
+  transport is inherently slower. Although both solutes
+  hop with a similar magnitude inside and outside of the pore region, mercaptoethanol 
+  spends about 18\% less time in the pore region (see Figure~\ref{fig:hops}).
+  This has a large impact on its hop frequency which is 42\% lower than that 
+  of ethylene glycol. This implies that mercaptoethanol is relatively
+  immobile outside of the pore, but moves quickly inside.
+%  Mercaptoethanol also hydrogen bonds with head groups about 16\% less 
+%  %BJC: 16\% less meaning 64.3 % - 48.3 %. Not sure if it is better to say (64.3 - 48.3 / 64.3) = 25 %
+%  frequently. Consequently, shorter hydrogen 
+%  bond lifetimes within the pore region may yield some high MSD 
+%  trajectories. 
 
+%, which is less than expected if equal amounts of both 
+%  solutes occupied the pore region. 
 % (20.2 - 12.857) / 20.2 = .364
 % (12.857 + 6.8215 + 0.803) / (20.2 + 11.969 + 1.935) = 0.6
 %  There are nearly 40\% more mercaptoethanol 
@@ -1416,11 +1472,12 @@
   
   2,3-dimercapto-1-propanol exhibits slower transport than glycerol 
   because more of it partitions into the tail region. 2,3-dimercapto-1-propanol
-  spends 38\% less time in the pore region than glycerol.
+  spends 27\% less time in the pore region than glycerol. 
+  %BJC: again, not sure if this should be 27\% because DMP spends 49% of time in pore and GLY spends 76% of time in pore or if it should be (76 - 49) / 76 = 36 %
 %  The density of glycerol is always higher up to 0.7 nm from the pore center where the 
 %  population of 2,3-dimercapto-1-propanol then becomes more dense into the tail region.
   Glycerol participates in about 2.5 times as many hydrogen
-  bonds as 2,3-dimercapto-1-propanol. % which is consistent with the number of hydroxyl groups per solute. 
+  bonds as 2,3-dimercapto-1-propanol (including all possible hydrogen bonding groups).  % BJC: might be confusing. Maybe refer to figure 6 instead.
   % BJC: sums are (donate to monomer + recieve from water + donate to water).
   % BJC: (31.91 + 17.224 + 3.231) / (13.1 + 7.737 + 0.8965) ~= 2.45.
   % (2.788 + 2.0975 + 0)/ (13.1 + 7.737 + 0.8965) = 0.22
@@ -1429,9 +1486,8 @@
   2,3-dimercapto-1-propanol is less soluble than glycerol in the water-filled
   pores and more readily partitions into the tail region.
   
-  DMSO has a comparable if not larger MSD than acetone even though it
-  is a slightly larger molecule. DMSO spends 17\% more time in the pore
-  than acetone. 
+  DMSO has a comparable MSD to acetone even though it is a larger molecule. 
+  DMSO spends 17\% more time in the pore than acetone. 
 %  The density of DMSO is higher than acetone in the pore region, except for
 %  the peak exhibited by acetone near 0.2 nm, which is due to sodium ion association.
   On average, 35\% of DMSO molecules are coordinated to a sodium ion each
@@ -1445,14 +1501,14 @@
 
   The slowest set of molecules we studied can accept hydrogen bonds, but
   cannot donate them. Among this set are the two slowest solutes in our study: 
-  tetrahydrofuran and dimethyl formamide. The MSDs of ethyl acetate, propylene
-  carbonate and acetone are only marginally larger.
+  THF and DMF. The MSDs of ethyl acetate, propylene carbonate and acetone are
+  only marginally larger.
   
   The solutes in this set have small hop lengths. 3 of the bottom 6 mean hop
   lengths are associated with ethyl acetate, propylene carbonate and
   dimethyl formamide (Figure~\ref{fig:hop_lengths}). Acetone and 
-  tetrahydrofuran perform slightly larger hops but have the third and
-  first lowest hop frequencies respectively (see Figure~\ref{fig:hopfreq}).
+  tetrahydrofuran perform slightly larger hops but low hop frequencies
+  (see Figure~\ref{fig:hopfreq}).
   
   The radial density of solutes near the pore center in this set is 
   surprisingly high as shown in Figure~\ref{fig:nondonors_rdf}. Propylene
@@ -1460,10 +1516,10 @@
   Their size prevents them from easily entering the tail region and 
   consequently leads to faster transport properties.  % since they spend more time in the pore region. 
   However, this is not a hard rule. When a solute does overcome the 
-  barrier of entry beyond the head group region, it can become trapped. All
-  solutes in this set show at least a small peak $\geq$ 0.9 nm from the pore 
-  center which is likely caused by solutes that get trapped in the tail region
-  for significant periods of time.
+  barrier of entry beyond the pore region, it can become trapped. All
+  solutes in this set show at least a small peak in the pore region which
+  is likely caused by solutes that get trapped in the tail region for 
+  significant periods of time.
     
 %  The solutes in this set do not make frequent hops while in the pore region. 
 %  % Time bound to sodium ion
@@ -1486,7 +1542,7 @@
   studied in the previous section associate with sodium nearly twice as 
   frequently as compounds that don't contain nitrogen 
   (see Figure~\ref{fig:ketone_hbonds}).
-  Assocaition between sodium and solutes in this set are also among the longest,
+  Association between sodium and solutes in this set are also among the longest,
   only beat by other solutes with carbonyl groups and ribose.
  
   \begin{figure}[!htb]

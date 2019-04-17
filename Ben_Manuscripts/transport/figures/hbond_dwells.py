@@ -73,7 +73,7 @@ ax.set_xticklabels(labels, fontsize=14)
 plt.xticks(rotation=90)
 ax.bar(index - bar_width / 2, ci_10wt[ordered, 0], bar_width, alpha=opacity, label='10 wt % water', yerr=ci_10wt[ordered, 1])
 ax.bar(index + bar_width / 2, ci_5wt[ordered, 0], bar_width, alpha=opacity, label='5 wt % water', yerr=ci_5wt[ordered, 1])
-ax.set_ylabel('Mean hydrogen bond lifetime (ns)', fontsize=14)
+ax.set_ylabel('95$^{th}$ percentile Hbond Lifetime (ns)', fontsize=14)
 savename = 'hbond_lifetime.pdf'
 plt.legend(fontsize=14)
 plt.tight_layout()

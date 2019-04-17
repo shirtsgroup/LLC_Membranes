@@ -14,7 +14,7 @@ path = '/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11'
 pickle = 'solute_NA_coordination.pl'
 savename = 'all_solutes_NA_coordination.pdf'
 
-residues = ['GLY', 'ACH', 'ACN', 'ATO', 'BUT', 'DMF', 'DMP', 'DMS', 'EAC', 'ETH', 'GCL', 'GLY', 'MET', 'PCB', 'PG', 'PR', 'RIB', 'SOH', 'TET', 'THF', 'URE']
+residues = ['ACH', 'ACN', 'ATO', 'BUT', 'DMF', 'DMP', 'DMS', 'EAC', 'ETH', 'GCL', 'GLY', 'MET', 'PCB', 'PG', 'PR', 'RIB', 'SOH', 'TET', 'THF', 'URE']
 
 labels = np.array([names.abbreviation[r] for r in residues])
 colors = np.array([names.color_dict[r] for r in residues])
@@ -85,7 +85,7 @@ except FileNotFoundError:
 #ordered_10wt = ['MET', 'SOH', 'GCL', 'ACH', 'URE', 'ETH', 'ACN', 'TET', 'GLY', 'PR', 'DMS', 'PG', 'PCB', 'ATO', 'EAC', 'DMP', 'BUT', 'RIB', 'THF', 'DMF']
 #ordered = [res.index(r) for r in ordered_10wt]
 
-ordered = np.argsort(values_10wt)[::-1]
+ordered = np.argsort(n_10wt[:, 0])[::-1]
 labels = labels[ordered]
 colors = colors[ordered]
 
@@ -102,16 +102,15 @@ fig, ax = plt.subplots()
 
 #	values[i] = 100 * np.mean(n)
 
-index = np.arange(len(res), dtype=float)
+index = np.arange(len(residues), dtype=float)
 bar_width = 0.4
 opacity =0.8
-ax.bar(index, values_5wt[ordered], bar_width, alpha=opacity, label='5 wt % water')
-ax.bar(index + bar_width, values_10wt[ordered], bar_width, label='10 wt % water')
+ax.bar(index, n_10wt[ordered, 0], bar_width, label='10 wt % water', yerr=n_10wt[ordered, 1])
+ax.bar(index + bar_width, n_5wt[ordered, 0], bar_width, alpha=opacity, label='5 wt % water', yerr=n_5wt[ordered, 1])
 ax.set_xticks(index + bar_width/2)
 ax.set_xticklabels(labels, fontsize=14)
 [x.set_color(colors[i]) for i, x in enumerate(plt.gca().get_xticklabels())]
 plt.xticks(rotation=90)
-
 plt.gcf().get_axes()[0].tick_params(labelsize=14)
 plt.ylabel('Percent of Solute Coordinated to Sodium', fontsize=14)
 plt.legend(fontsize=14)
