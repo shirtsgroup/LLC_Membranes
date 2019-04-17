@@ -32,27 +32,31 @@ except FileNotFoundError:
 			sys = file_rw.load_object('%s/hbonds.pl' %loc)
 	
 			n_unique_donors = []
+			donors = np.zeros([sys.t.n_frames, nsolute], dtype=bool)
 
 			res_no, nres = sys.number_residues(r)
 	
 			for frame in range(sys.t.n_frames):
 				res_numbers = [res_no[i] for i in sys.hbonds[frame][0]]
 				n_unique_donors.append(len(np.unique(res_numbers)))
-
+				donors[frame, np.unique(res_numbers).astype(int)] = True
+ 
 			# bootstrap
 			n_unique_donors = np.array(n_unique_donors)
 			nboot = 200
 			n = []
 			for b in range(nboot):
-				choice = np.random.choice(n_unique_donors, size=n_unique_donors.size, replace=True)
-				n.append(100*np.mean(n_unique_donors[choice]) / nsolute)
-			print(n)
-			exit()
+				choice = np.random.randint(nsolute, size=nsolute)
+				nperframe = donors[:, choice].sum(axis=1)
+				n.append(100*np.mean(nperframe) / nsolute)
+				
+				#choice = np.random.choice(n_unique_donors, size=n_unique_donors.size, replace=True)
+				#n.append(100*np.mean(choice) / nsolute)
 
 			if wt == 5:
-				n_5wt[i] = [100*np.mean(n_unique_donors) / nsolute, np.std(n)]
+				n_5wt[i] = [np.mean(n), np.std(n)]
 			elif wt == 10:
-				n_10wt[i] = [100*np.mean(n_unique_donors) / nsolute, np.std(n)]
+				n_10wt[i] = [np.mean(n), np.std(n)]
 
 	np.savez_compressed('unique_hbonds.npz', n_5wt=n_5wt, n_10wt=n_10wt)
 
@@ -79,6 +83,6 @@ plt.xticks(rotation=90)
 plt.legend(fontsize=14)
 plt.tight_layout()
 savename = 'nhbonds_all.pdf'
-#plt.savefig(savename)
+plt.savefig(savename)
 plt.show()
 

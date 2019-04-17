@@ -301,7 +301,8 @@ class System(object):
             # exit()
             print('Average coordinated molecules per frame: %.2f' % self.ncoord.mean())
             #plt.plot(self.time, self.ncoord.mean(axis=1))
-            plt.plot(self.time, self.ncoord.sum(axis=1))
+            if plot:
+                plt.plot(self.time, self.ncoord.sum(axis=1))
 
         if plot:
 

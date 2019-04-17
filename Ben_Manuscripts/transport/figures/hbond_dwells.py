@@ -77,5 +77,5 @@ ax.set_ylabel('Mean hydrogen bond lifetime (ns)', fontsize=14)
 savename = 'hbond_lifetime.pdf'
 plt.legend(fontsize=14)
 plt.tight_layout()
-#plt.savefig(savename)
+plt.savefig(savename)
 plt.show()
