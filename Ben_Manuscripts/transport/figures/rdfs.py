@@ -11,11 +11,11 @@ def calculate_rdf(res, path, gro='berendsen.gro', traj='PR_nojump.xtc', atoms=No
 
 	print('Calculating RDF of residue %s' % r)
 	if atoms is not None:
-		rdf = System('%s/%s' %(path, gro), '%s/%s' %(path, traj), r, 'HII', atoms=atoms)
+		rdf = System('%s/%s' %(path, gro), '%s/%s' %(path, traj), r, 'NAcarb11V', atoms=atoms)
 	else:
-		rdf = System('%s/%s' %(path, gro), '%s/%s' %(path, traj), r, 'HII')
+		rdf = System('%s/%s' %(path, gro), '%s/%s' %(path, traj), r, 'NAcarb11V')
 
-	rdf.radial_distribution_function(bins=50, spline=True, npts_spline=10, cut=1.5)
+	rdf.radial_distribution_function(spline=True, npts_spline=10)
 
 	rdf.bootstrap(200)
 	
@@ -25,11 +25,11 @@ def calculate_rdf(res, path, gro='berendsen.gro', traj='PR_nojump.xtc', atoms=No
 
 recalculate = False 
 simple_alcohols = False
-polyols = False 
-head_groups = True 
-thiol_comparison = True
+polyols = False
+head_groups = False 
+thiol_comparison = False
 ketones = False 
-nondonors = False 
+nondonors = True 
 probability = False 
 
 if simple_alcohols:
@@ -49,13 +49,11 @@ else:
 	residues=["PG", "GCL"]
 	# residues=["DMP", "GLY"]
 	#residues = ["GLY", "TET", "RIB"]
-
-#residues = ["BUT", "THF", "PCB", "EAC", "DMF"]
 wt=10
 maximum = 0
 i = 0
 v = np.zeros([len(residues), 49])
-equil = 200  # chop off first equil frames
+#equil = 200  # chop off first equil frames
 opacity = 0.4
 for r in residues:
 
@@ -68,13 +66,14 @@ for r in residues:
 			rdf = file_rw.load_object('%s/rdf_%s.pl' %(path, r))
 		except FileNotFoundError:
 			rdf = calculate_rdf(r, path)
-	mean = rdf.density[equil:].mean(axis=0)
+
+	mean = rdf.density.mean(axis=0)
 
 	if probability:
 		rdf.errorbars /= sum(mean)
 		mean /= sum(mean)
 
-	new_max = np.amax(mean[np.argwhere(rdf.r > 0.4)])  # really looking for the head group peak
+	new_max = np.amax(mean[np.argwhere(rdf.r > 0)])  # really looking for the head group peak
 	maximum = max(maximum, new_max)
 	plt.plot(rdf.r, mean, label='%s' % names.res_to_name[r], linewidth=2)
 	plt.fill_between(rdf.r, rdf.errorbars[1, :] + mean, mean - rdf.errorbars[0, :], alpha=opacity)
@@ -144,15 +143,19 @@ if head_groups:
 #plt.plot(rdf.r, maximum * rdf.density.mean(axis=0) / np.amax(rdf.density.mean(axis=0)), '--', color='black')
 #plt.plot(rdf.r, normalization * rdf.density.mean(axis=0), '--', color='black')
 
+top = maximum * 1.05
+plt.plot([0.75, 0.75], [0, top], '--', color='black')
+plt.fill_between([0.73, 0.77], [top, top], y2=[0, 0], color='grey', alpha=0.5)
+
 plt.ylabel('Density (count / nm$^3$)', fontsize=14)
 plt.xlabel('Distance from pore center (nm)', fontsize=14)
 # plt.ylim(-0.05, 1.3) # for diols only
 #plt.ylim(-0.015, 0.45) # for DMSO and acetone thiol comparison
 #plt.ylim(-0.015, 0.5) # for mercaptoethanol and ethylene glycol comparison
-#plt.ylim(-0.015, 0.55) # for nondonors
+#plt.ylim(-0.015, 12) # for nondonors
 plt.gcf().get_axes()[0].tick_params(labelsize=14)
 #plt.legend(fontsize=13, loc=1, ncol=2, columnspacing=0.5)  # for nondonors
-plt.legend(fontsize=14, loc=1)
+plt.legend(fontsize=13, loc=1)
 plt.tight_layout()
 if simple_alcohols:
 	plt.savefig('simple_alcohol_rdf.pdf')
