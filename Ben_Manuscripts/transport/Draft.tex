@@ -620,16 +620,20 @@
   % BJC: could add more detail about which algorithm and cost function
   % penalty I used. Seems unnecessary since it is all in my code.
   
-  % This might change
   We determined the frequency of hops by dividing the total number of 
-  hops by the total length of the simulation. We used the normal 
-  approximation in order to estimate the 95 \% confidence interval
-  of these estimates:
-  \begin{equation}
-  95\%~CI = 1.96 \sqrt{\dfrac{\lambda}{n}}
-  \end{equation}
-  where $\lambda$ is the average frequency of hops and n is the total
-  observation time accumulated for all solutes.
+  hops by the total length of the simulation. We used the average
+  frequency as the $\lambda$ parameter in a Poisson distribution. We
+  calculated the 95\% confidence intervals of the distribution based
+  on its cumulative distribution function. 
+ 
+%  We used the normal 
+%  approximation in order to estimate the 95 \% confidence interval
+%  of these estimates:
+%  \begin{equation}
+%  95\%~CI = 1.96 \sqrt{\dfrac{\lambda}{n}}
+%  \end{equation}
+%  where $\lambda$ is the average frequency of hops and n is the total
+%  observation time accumulated for all solutes.
   
   Where instructive, we differentiated between the length of hops inside
   and outside of the pores. For 10 wt\% water systems, we consider a solute
@@ -1218,6 +1222,7 @@
   \caption{}\label{fig:msd_radius_simple_alcohol_rdf}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
+  % BJC: update legends with abbreviations?
   \includegraphics[width=\linewidth]{simple_alcohol_rdf.pdf}
   \caption{}\label{fig:simple_alcohol_rdf}
   \end{subfigure}
