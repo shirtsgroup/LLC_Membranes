@@ -28,27 +28,27 @@ done
 # atomtyping and initial charge assigment with antechamber and tleap roughly follow steps descrbed here:
 # http://ambermd.org/tutorials/basic/tutorial4b/
 
-sed -i -e "s/UNL/${res}/g" ${name}.pdb  # specific to structures converted from .mol to .pdb with babel
-
-#bondtype -j full -i ANTECHAMBER_BOND_TYPE.AC0 -o ANTECHAMBER_BOND_TYPE.AC -f ac
-#atomtype -i ANTECHAMBER_AC.AC0 -o ANTECHAMBER_AC.AC -p gaff
-
-antechamber -i ${name}.pdb -fi pdb -o ${name}.mol2 -fo mol2 -c bcc -s 2 -nc ${nc} -pl 15 # The .pdb must have connectivity info!
-# -c bcc tells antechamber to use AM1-BCC charge model
-# -s flag just defines verbosity of output
-parmchk -i ${name}.mol2 -f mol2 -o ${name}.frcmod
-
-# Create input to tleap
-echo "source oldff/leaprc.ff99SB" > tleap.in
-echo "source leaprc.gaff" >> tleap.in  # make sure tleap knows about GAFF forcefield
-echo "${res} = loadmol2 ${name}.mol2" >> tleap.in  # load monomer
-echo "check ${res}" >> tleap.in  # checks for missing parameters
-echo "loadamberparams ${name}.frcmod" >> tleap.in  # tell tLeap what to do with missing parameters
-echo "saveoff ${res} ${res}.lib" >> tleap.in  # create a library file for the new residue
-echo "saveamberparm ${res} ${name}.prmtop ${name}.inpcrd" >> tleap.in  # make topology files
-echo "quit" >> tleap.in  # exit out of tleap
-
-tleap -f tleap.in  # run the previous block in tleap
+#sed -i -e "s/UNL/${res}/g" ${name}.pdb  # specific to structures converted from .mol to .pdb with babel
+#
+##bondtype -j full -i ANTECHAMBER_BOND_TYPE.AC0 -o ANTECHAMBER_BOND_TYPE.AC -f ac
+##atomtype -i ANTECHAMBER_AC.AC0 -o ANTECHAMBER_AC.AC -p gaff
+#
+#antechamber -i ${name}.pdb -fi pdb -o ${name}.mol2 -fo mol2 -c bcc -s 2 -nc ${nc} -pl 15 # The .pdb must have connectivity info!
+## -c bcc tells antechamber to use AM1-BCC charge model
+## -s flag just defines verbosity of output
+#parmchk -i ${name}.mol2 -f mol2 -o ${name}.frcmod
+#
+## Create input to tleap
+#echo "source oldff/leaprc.ff99SB" > tleap.in
+#echo "source leaprc.gaff" >> tleap.in  # make sure tleap knows about GAFF forcefield
+#echo "${res} = loadmol2 ${name}.mol2" >> tleap.in  # load monomer
+#echo "check ${res}" >> tleap.in  # checks for missing parameters
+#echo "loadamberparams ${name}.frcmod" >> tleap.in  # tell tLeap what to do with missing parameters
+#echo "saveoff ${res} ${res}.lib" >> tleap.in  # create a library file for the new residue
+#echo "saveamberparm ${res} ${name}.prmtop ${name}.inpcrd" >> tleap.in  # make topology files
+#echo "quit" >> tleap.in  # exit out of tleap
+#
+#tleap -f tleap.in  # run the previous block in tleap
 
 #sed -i -e "s/${res: -3}/${res}/g" ${name}.prmtop
 #sed -i -e "s/${res: -3}/${res}/g" ${name}.inpcrd
