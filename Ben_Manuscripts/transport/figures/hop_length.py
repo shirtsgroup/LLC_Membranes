@@ -13,7 +13,7 @@ residues = ['ACH', 'ACN', 'ATO', 'BUT', 'DMF', 'DMP', 'DMS', 'EAC', 'ETH', 'GCL'
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('-c', '--cut', default=0.5, type=float, help='Cut-off distance between pores and tails')
+parser.add_argument('-c', '--cut', default=0.75, type=float, help='Cut-off distance between pores and tails')
 
 args = parser.parse_args()
 
