@@ -423,7 +423,7 @@ class System(object):
                 if plot:
 
                     # bin the bins
-                    hist_dwell[i, :], _ = np.histogram(dwell_times_boot, bins_dwell, normed=True)
+                    hist_dwell[i, :], _ = np.histogram(dwell_times_boot, bins_dwell, density=True)
 
                 # Fit a line to log-log plot of dwell time distribution and compare it to MLE plot
                 # _, alpha = fitting_functions.fit_power_law(np.array(bins_dwell_centered), hist_dwell[i, :])
@@ -448,7 +448,7 @@ class System(object):
 
                 if plot:
 
-                    hist_jump[i, :], _ = np.histogram(hop_lengths_boot, bins_hop, normed=True)
+                    hist_jump[i, :], _ = np.histogram(hop_lengths_boot, bins_hop, density=True)
 
                 # Maximum likelihood estimate of mean and sigma of hop length distribution
                 # args = (hop_lengths_boot, True)  # (hop_lengths times, maximize = True)
@@ -692,7 +692,7 @@ if __name__ == "__main__":
 
         sys.hops_and_dwells(penalty=args.breakpoint_penalty)
 
-        sys.fit_distributions(nbins=args.nbins, nboot=args.nboot, plot=True, show=True)
+        sys.fit_distributions(nbins=args.nbins, nboot=args.nboot, plot=True, show=True, save=True)
         exit()
         sys.estimate_hurst()
 
