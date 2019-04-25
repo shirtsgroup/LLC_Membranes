@@ -10,7 +10,7 @@ crsr = connection.cursor()
 restrict_by_name = False 
 MW = False  # plot mw of species
 penalty = 0.25
-wt = 10 
+wt = 5 
 
 group = 'all'
 
