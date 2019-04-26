@@ -131,7 +131,11 @@
   similar pore topology to the H\textsubscript{II} phase, but a more 
   tortuous geometry, and observed a range of selectivities dependent on the
   anion coordinated to the LLC monomer.~\cite{dischinger_effect_2017} Intelligent 
-  design of LLC monomers can help us tailor membranes for solute-specific
+  design of LLC monomers 
+  %MRS4: 
+  %can 
+  have the potential to 
+  help us tailor membranes for solute-specific
   separations.
 
   While H\textsubscript{II} membranes have been synthesized and characterized
@@ -139,14 +143,22 @@
   from experiment. The separation performance of these membranes has been 
   primarily characterized with size-exclusion experiments which emphasizes 
   selectivity based on the ability to enter a given pore.~\cite{zhou_supported_2005}
+  %MRS4: might confuse readers here - talking about both size exclusion as a method to characterize the membranes, and 
+  %separation BY size exclusion; maybe rephrase?
   While size-exclusion is a useful separation, it cannot reliably purify a 
   solution where the solute size is on the same order as water. Therefore, it is
   important to take advantage of material properties other than pore size. 
   Unfortunately, interactions between solutes and pore moieties have yielded
   unclear trends in experimental transport studies.~\cite{dischinger_effect_2017}
+  %MRS4: expand the above.  What was discovered, and why was it unfortuate to the thesis?  
+  % I though it actually helped the thesis here since there was something happening that WASN'T just size dependence?
 
   Molecular dynamics (MD) simulations can give us mechanistic insights with 
-  atomistic resolution so that we can directly observe small solute transport
+  atomistic resolution so that we can directly 
+  %MRS4: observe is strong, maybe describe? I'm open to other options.
+  % observe 
+  describe
+  small solute transport
   within LLC membrane nanopores and intelligently design new membranes for 
   solute-specific separations. In our previous work, we used MD simulations to 
   determine the most likely structure of the hexagonal phase formed by the monomer
@@ -154,7 +166,8 @@
   We developed techniques for equilibrating the hexagonal phase formed by neat 
   monomer as well as with varying amounts of water in the pores.
 
-  %BJC: is a figure with all the solutes necessary? would take up a lot of space. maybe supporting
+  %BJC: is a figure with all the solutes necessary? would take up a lot of space. maybe supporting. 
+  %MRS4: I kind of like it here.  We can tweak the text to be a bit shorter without losing meaninig.
   In this work, we have studied the transport mechanisms exhibited by 20 
   uncharged polar solutes with varying size, chemical functionality and hydrophilic 
   character. We have listed the solutes studied along with the abbreviations that
@@ -164,8 +177,11 @@
   acetic acid in its protonated form. The pKa of gallic acid is 4.40 while the
   pKa of acetic acid is 4.75. Assuming that the pKa of gallic acid is similar 
   to NaGA3C11, it is possible for our sodium salted monomer to exist at the 
-  same time as protonated acetic acid.
+  same time as protonated acetic acid.  
+  %MRS4: added for clarity
+  In any case, we are more interested in mechanisms of interaction with specific chemical functionality more than the behavior of specific molecules.
 
+%MRS4: probably shouldn't capitalize the names.  Maybe make the yellow a bit darker for the text.
 %  % BJC: not sure if I should just leave formatting to the journal. Thought tcolorbox was neat though
 %  % I can easily change these abbreviations and have them applied to all the figures. I haven't given
 %  % them much thought. Just used their residue names
@@ -361,20 +377,32 @@
  
   We first address the structure of the pores formed in the membrane.
   Previously, we have studied dry membrane systems and some systems with 
-  low water content. We will observe how the radial density of monomer 
+  low water content. We 
+  %MRS4: we already observed it
+  %will observe 
+  therefore first analyze 
+  how the radial density of monomer 
   components and water change within the pore based on membrane water content.
   
   We then present our efforts to understand how small molecules, 
   including water, partition within the pores. From a macroscopic perspective,
-  it is straightforward to hypothesize that the water and polar solutes spend
-  their time exclusively in the tube-like hydrophilic pore region. Our
+  %MRS4: tweak.
+  %it is straightforward 
+  it might make sense
+  to hypothesize that the water and polar solutes spend
+  their time exclusively in the tube-like hydrophilic pore region. 
+  %MRS4: However,
+  our
   previous work showed that there is a gradual compositional transition from
   the hydrophilic to the hydrophobic region which means that solutes may not
   necessarily stay confined to the centers of the pores or even within the 
   pore region. We then study the gradient in composition of solutes and 
   water and any resultant influence it might have on mechanistic properties.
 
-  For the remainder of the paper, we present our observations 
+  %MRS4:
+  %For 
+  In
+  the remainder of the paper, we present our observations 
   and explanations of the observed transport mechanisms exhibited by water
   and solutes. Given that the pores will restrict motion of the solutes, we
   anticipate that transport will be hindered in some way. 
@@ -384,17 +412,33 @@
   functionality. We will study the interactions between solutes, the membrane,
   and water in order to determine which mechanism or mechanisms dominate.
   
-  There are also a couple of points that this study is not intended to address. 
+  There are also a couple of 
+  %points 
+  questions
+  that this study 
+  % is not intended to address. 
+  that are beyond the scope of this study.
   First, we will not study the concentration dependence of the observed transport
   rates. Although the average MSD might change with concentration, we are 
   focused on the underlying solute-membrane interactions that lead to the 
-  observed transport mechanisms which we conjecture will be the same 
+  observed transport mechanisms which we conjecture will 
+  %MRS4: Some tone tweaks below.
+  %be 
+  remain roughly
+  the same 
   regardless of concentration. Second, we will not study the chemical potential
   of solutes in the pores, which could give us a better understanding of 
-  equilibrium solute partitioning. This information will not greatly enhance our
-  understanding of mechanistic details in various membrane regions. Both of the
-  above points will add unnecessary levels of complexity which can be left for
-  a future study. This work is a simple starting point meant for observing
+  equilibrium solute partitioning. However, this information 
+  %will not greatly enhance our
+  is not needed to 
+  understanding of mechanistic details in various membrane regions; 
+  %Both of the
+  %above points will add unnecessary levels of complexity which can be left for
+  %a future study. 
+  this work 
+  %is a simple 
+  represents
+  starting point for observing
   the types of interactions which occur between isolated solutes and the
   membrane.
 
@@ -418,7 +462,10 @@
   Excess water fills space between hexagonal mesophases. We decided to test 
   systems with two different water contents: 5 and 10 wt\%.
 
-  We observed that water partitions into the distal tail region of our system and therefore
+  We observed that 
+  %MRS4: added
+  some
+  water partitions into the distal tail region of our system and therefore
   built our initial configurations with water in both regions, close to the expected
   equilibrium partition. We define the distal tail region to be ca. 1.5 nm from the pore
   center based on the minimum in the radial distribution of water
@@ -443,15 +490,19 @@
   statistics and a low degree of interaction between solutes (see 
   Section~\ref{S-section:solute_interaction} of the Supporting Information). At each
   insertion point we placed a randomly oriented solute molecule then ran a short 
-  energy minimization. We allowed the solutes to equilibrate for 5 ns using berendsen
+  energy minimization. We allowed the solutes to equilibrate for 5 ns using Berendsen
   pressure control then collected transport data over the course of 1 $\mu$s MD simulations.
-  
+  %MRS4: Was Berendsen pressure control used for the transport as well?  Should specify?  I thought those might have been NVT? If so, should put in an acknowledgement that it's not quite right, cite my and Pascal's paper.
   \subsection{Solute Parameterization}\label{method:parameterization}
   
   We parameterized the interaction potential for the monomer and solutes using 
   the Generalized AMBER Force Field (GAFF)~\cite{wang_development_2004} with the
   Antechamber package \cite{wang_automatic_2006} shipped with AmberTools16~\cite{case_ambertools16_2016}.
-  We use GAFF since it has been parameterized for use with organic molecules. We
+  We use GAFF 
+  as it has been used extensively 
+  %since it has been parameterized 
+  for use with organic molecules.
+  We
   assigned atomic charges using the am1bccsym method of \texttt{molcharge} included
   with QUACPAC from Openeye Scientific Software.
   
@@ -465,7 +516,8 @@
 	\label{eqn:tamsd}
   \end{equation}
   where $\tau$ is the time lag and T is the length of the trajectory~\cite{meroz_toolbox_2015}. 
-  Generally, the MSD grows according to Equation~\ref{eqn:msd_form}:
+  %Generally, 
+  The MSD, in standard treatments, grows according to Equation~\ref{eqn:msd_form}:
   \begin{equation} 
 	\langle z^2(t) \rangle = K_{\alpha}t^\alpha
 	\label{eqn:msd_form}
@@ -513,8 +565,11 @@
   the purpose of comparison, we calculated its diffusion constant by fitting a line
   to the linear region of the MSD curve.~\cite{maginn_best_2018}. The diffusion constant
   is then equal to $m/2$ where $m$ is the slope of the linear fit. The slope is divided
-  by 2 (rather than 6) because we only measured the diffusion coefficient in one 
-  dimension.
+  by 2 (rather than 6) because we only measured 
+  %MRS4: check that this change is correct. 
+  %the diffusion coefficient 
+  particle displacement
+  in one dimension.
 
   \subsection{Molecular Size Determination}\label{method:molecular_size}
   
@@ -552,6 +607,7 @@
   For consistency with the presentation of our results, rather than calculate trends
   in $D$, we will apply Equation~\ref{eqn:stokes-einstein} in order to analyze 
   trends in solute MSDs, which is only valid because all trajectories are of the 
+  %MRS4: a bit strange to say you are using Stokes-einstein, but only analyzing MSD's (when MSD's don't appear in that equation)? It could be clarified a bit more.
   same length.
 %  However, this assumes linear behavior
 %  of the MSD, which we will show is not that case. Our main usage of the 
@@ -616,15 +672,19 @@
   just the $z$-direction, in order to detect lateral hops. However,
   hop lengths are reported as their displacement the $z$-direction.
   We reported the standard error in the average hop lengths by 
-  bootstrapping the hop lengths.
+  bootstrapping the 
+  %MRS4:
+  empirical distribution of observed
+  hop lengths.
   % BJC: could add more detail about which algorithm and cost function
   % penalty I used. Seems unnecessary since it is all in my code.
-  
+  %MRS4: I would put in supporting.
+
   We determined the frequency of hops by dividing the total number of 
   hops by the total length of the simulation. We used the average
   frequency as the $\lambda$ parameter in a Poisson distribution. We
   calculated the 95\% confidence intervals of the distribution based
-  on its cumulative distribution function. 
+  on the Poisson cumulative distribution function. 
  
 %  We used the normal 
 %  approximation in order to estimate the 95 \% confidence interval
@@ -670,11 +730,12 @@
   package which allows us to directly check the validity of identified hydrogen bonds.
   In Section~\ref{S-section:hbond_sensitivity} of the Supporting Information, we
   show that our conclusions are insensitive to this definition within a 
-  reasonable range.
-  
+  reasonable range
+  %MRS4:added
+  of distances and angles.
   We determined the average percentage of solutes which actively participated
   in a hydrogen bond interaction with monomers each frame. We only counted
-  unique solute--monomer hydrogen bond interactions meaning solutes
+  unique solute--monomer hydrogen bond interactions, meaning solutes
   that hydrogen bond more than once simultaneously were classified as a
   single pairing event. We determined the standard error of this calculation
   by bootstrapping over each solute's trajectory. For each bootstrap trial,
@@ -719,6 +780,7 @@
   % me maybe half a day to implement and generate results. Not sure if necessary though since
   % I'm just going to say that I don't know what distribution it is and we are going to
   % use a percentile.
+  % MRS4: maybe while we are waiting for review.
   Hydrogen bond lifetimes appear to be distributed according to a power law or an
   exponential function. A number of researchers provide evidence that supports a 
   power law distribution~\cite{starr_fast_1999,martiniano_insights_2013}. However, these
@@ -726,7 +788,8 @@
   every time step. Voloshin et al. studied hydrogen bonding on multiple timescales and 
   observed exponential behavior on the longest timescales~\cite{voloshin_hydrogen_2009}. 
   Due to memory limitations, we could not collect data frequently enough to provide a
-  sufficient answer to this question so we instead report the 95\textsuperscript{th} 
+  %MRS4: tweaking to 
+  sufficient answer to this question so when comparing solutes, we use the 95\textsuperscript{th} 
   percentile of hydrogen bond dwell times. This places emphasis on solutes with 
   long dwell times. We reported the standard error of this calculation by bootstrapping
   the distribution of dwell times.
@@ -817,7 +880,10 @@
   \end{subfigure}
   %MRS2: interesting that the head group max is near the transition point where water/tail groups 
   \caption{The radial densities of various monomer components paint a 
-  picture of the pore topology where the pore centers of hydrated systems are primarily composed
+  picture of the pore topology where the pore centers of hydrated systems are primarily,
+  %MRS4: added
+  but not exlusively,
+ composed
   of water and sodium ions. The monomer groups labeled in each plot correspond to 
   the color-coded monomer pictured in the upper right corner of the figure. 
   All RDFs represent the number of atoms located at a given distance from the
@@ -827,8 +893,10 @@
   groups retreat about 0.2 nm radially in order to make room for water molecules.
   (c) Monomers in the 10 wt\% system retreat an additional 0.2 nm to make room
   for more water.}\label{fig:component_densities}
+  %MRS4: dotted horizontal line not defined.
   \end{figure}
   
+  %MRS4: this would be a good place to say that these waters won't be considered and why.
   There is an appreciable amount of water that partitions into the distal tail % BJC: defined in methods
   region of both systems. 28\% and 31\% of the total water is present in the
   tail regions of the 5 and 10 wt\% water systems respectively. See 
@@ -894,28 +962,41 @@
   time outside the distal tail region. If we instead restrict our calculation to
   water molecules that spend $>$ 95\% of their time in the distal tail region, 
   the MSD of distal tail water decreases 8-fold. 
-  
+  %MRS4: did it really decrease? From what?  What was the previous definision.
+
   % Changing pore radius does not change conclusion here.
   In the 5 wt\% water system, water molecules that spend the majority of their 
   time in the distal tail region have MSDs comparable to those of water molecules
   close to the pore center. The MSD of distal tail water molecules is 1.71 nm$^2$.
+  %MRS4: might not be clear to the reader what the consequence of this MSD value is above, since it's not compared to anything.
+  %MRS4: interesting the water in the tails is almost as fast as the water in the 10% weight. 
   This anomaly is likely a consequence of low density in the distal tails (see
   Figure~\ref{S-fig:total_density}) as well as structuring of water molecules via
-  hydrogen bonding. Water molecules are less likely to hydrogen bond while in the
+  hydrogen bonding. 
+  %MRS4: a bit confusing, since H-bonding occurs in both 10 and 5?
+Water molecules are less likely to hydrogen bond while in the
   distal tail region since they are interspersed between chains, while those in 
   the pores stay in close proximity to each other. We observed about 9 times more  % tailvpore_hbonding.py in figures folder
-  hydrogen bonding between water molecules near the pore center versus those in 
+  %MRS4: but there is also H-bonding to ions and carboxylate groups, which seems like they should be even stronger than water-water.
+ hydrogen bonding between water molecules near the pore center versus those in 
   the distal tail region. While a similar observation holds for the 10 wt\% system,
   its high water content facilitates a less crowded environment where diffusion
   of water molecules dominates.  
-   
-  \subsubsection{Transport of Small Polar Solutes}\label{section:general_transport_solutes}  
+  %MRS4: math seems a little inconsistent.  Does the tail water move the same rate in 5 and 10%? Seems like it should.
+  %MRS4: but above would tend to indicate that it moves 51/8 = 6.4 times faster in the tails in 10%? 
+  %MRS4: think about reading over/describiing the tail water here
+  %MRS4: would probably be useful to the reader to specify that we are neglecting transport in the tails here.
+ \subsubsection{Transport of Small Polar Solutes}\label{section:general_transport_solutes}  
   
   We observe trends in transport properties that are dependent on the chemical 
   environment within the nanopores rather than just solute size. Polar solutes
-  are slowed by interactions between monomer functional groups and ions. Solutes
+  are slowed by interactions between monomer functional groups and ions. 
+  %MRS4: sentence here seems like out of scope for the section title. 
+  Solutes
   with hydrophobic character partition out of the pore and are slowed by densely
-  packed organic monomer components. A thorough understanding of these interactions
+  packed organic monomer components. 
+  %MRS4: this above seems like a general statement for all transport, not just small polar solutes?  Should there be a bit of an introduction to transport as a whole before going into specific molecular classes?
+  A thorough understanding of these interactions
   will help us to create monomer design principles. We will begin our analysis by
   considering the collective trends observed across all systems and then focus on
   subsets of similar molecules.
@@ -929,9 +1010,16 @@
   
   The MSDs are not solely a function of solute size. We plotted each solute's radius
   against their MSD in Figures~\ref{fig:msd_radius_5wt} and~\ref{fig:msd_radius_10wt}.
-  Of all the solutes, we believe methanol is subject to the least hindrance by
+  Of all the solutes, %we believe 
+  methanol 
+  %MRS4:
+  %added
+  likely
+  is subject to the least hindrance by
   the membrane due its small size. Therefore we fit Equation~\ref{eqn:stokes-einstein}
-  so that it intersected methanol's MSD. The uncorrected version of 
+  so that it intersects methanol's MSD. 
+  %MRS4: intersect where?  Might not be clear to readers that next sentence is a continuation of the process in the sentence above.
+  The uncorrected version of 
   Equation~\ref{eqn:stokes-einstein} ($f$=1) is plotted and converges to the same value as the
   corrected form for large radii (see Section~\ref{method:stokes}). Although both curves are 
   approximations, they illustrate that the majority of solutes in our study show
@@ -1151,7 +1239,7 @@
   ATPase.~\cite{shinoda_crystal_2009}
   
   Overall, the transport behavior exhibited by solutes in the 5 wt\% water
-  systems is similar to that shown by those in the 10 wt\% system however
+  systems is similar to that shown by those in the 10 wt\% system; however
   the timescales are much longer. We observe subdiffusive behavior with 
   intermittent hopping between periods of entrapment and evidence
   of the same three trapping mechanisms. The frequency and 
@@ -1234,6 +1322,7 @@
   \includegraphics[width=\linewidth]{butanol_CO.pdf}\lapbox[\width]{-2.85cm}{\raisebox{3cm}{\includegraphics[height=1.4cm]{butanol_labeled.pdf}}}
   \caption{}\label{fig:butanol_CO}
   \end{subfigure}
+  %MRS4: suggest putting something at the beginning of the caption indicating which chemical group it is.
   \caption{(a) The MSD of the simple alcohols decrease as a function of the
   solute size, however the MSDs of ethanol, propanol and butanol are considerably
   lower than expected based on the Stokes-Einstein equation. (b) The radial 
@@ -1253,7 +1342,7 @@
   \subsection{Transport of Diols, Triols and Sugars}\label{section:polyols}
   
   The order of the MSDs of solutes in this grouping are roughly consistent with 
-  their size, however propylene glycol moves exceptionally slow (see 
+  their size; however, propylene glycol moves exceptionally slowly (see 
   Figure~\ref{fig:polyols_msd}). Ethylene glycol has the highest MSD followed
   by tetrose and glycerol, whose MSDs are similar, propylene glycol, the second
   smallest	solute of this set, and finally ribose.
@@ -1264,7 +1353,7 @@
   is the least hindrance to movement (See Figure~\ref{fig:polyols_rdf}). Tetrose,
   ribose and glycerol are densest close to the pore center. They spend a greater
   fraction of their time in the pore region than any other solute (see 
-  Figure~\ref{fig:frac_time}) This is likely a consequence of both their 
+  Figure~\ref{fig:frac_time}). This is likely a consequence of both their 
   hydrophilicity and large size which prevents them from partitioning into the 
   head group region. However, these extra hydroxyl groups facilitate a larger 
   number of hydrogen bond interactions that work to hold solutes in place (see 
@@ -1303,6 +1392,8 @@
   \includegraphics[width=\linewidth]{multi_hbonds.pdf}
   \caption{}\label{fig:multi_hbonds}
   \end{subfigure}
+  %MRS4: suggest cutting off the density in height at 1.0, so that the scales of the other molecules can be seen.
+  %MRS4: below - specify which set this is.
   \caption{(a) The MSDs of the solutes in this set descend in order of their size, except
   for propylene glycol which moves exceptionally slow. The MSD of ethylene glycol 
   is in close agreement with the theoretical lines, implying that the solute 
@@ -1341,7 +1432,7 @@
   The 4 ketone-like molecules tested show a range of transport behaviors. 
   Urea, acetic acid, acetamide and acetone are all characterized by
   a carbonyl group with two attached heavy atoms. All are similar in size and
-  are planar molecules due to the sp2 hybridization of their carbonyl group. 
+  are planar molecules due to the $sp^2$ hybridization of their carbonyl group. 
   The fastest solutes of this grouping, acetic acid and urea, move about 3
   times faster than the slowest, acetone.
   
@@ -1403,7 +1494,9 @@
   Stokes-Einstein predicted behavior increases with molecular size.
   (b) The radial density near the pore center (r = 0) decreases with decreasing
   solute MSD. Peaks in the RDFs of urea, acetamide and acetone that appear 
-  0.2 - 0.4 nm from the pore center are likely due to coordination with sodium
+  0.2 - 0.4 nm from the pore center are 
+  %MRS4: seems like we could make it stronger with ``likely do''?
+  likely due to coordination with sodium
   ions. (c) The amides hydrogen bond with water far less than acetic acid, 
   however they tend to coordinate with sodium ions more frequently. Acetone
   coordinates with sodium with same frequency as acetic acid.}\label{fig:ketones}
@@ -1606,9 +1699,10 @@
   to trap less. Finally, one can attempt to control the degree to which solutes
   coordinate with counterions. Changing the size and valence of the counter 
   ion may offer some interesting behavior. 
- 
+  %MRS4: abrupt ending . . . think about a better way to wrap up that focuses on what was learned as well.
   %BJC: future work? i.e. talk about mathematical modeling 
- 
+  %MRS4: the modeling is scietifically a bit different.  MAybe nto
+
   \section{Supporting Information}
 
   Detailed explanations and expansions upon the results and procedures mentioned in
