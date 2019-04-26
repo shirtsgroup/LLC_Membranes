@@ -559,8 +559,15 @@ class System(object):
 
         self.hop_acf = [acf[np.nonzero(acf[:, i]), i].mean() for i in range(max_hops)]
 
-        plt.plot(self.hop_acf)
-        plt.show()
+        plt.figure()
+        plt.plot(self.hop_acf, linewidth=2)
+        plt.xlabel('Lag', fontsize=14)
+        plt.ylabel('Autocovariance', fontsize=14)
+        plt.tick_params(labelsize=14)
+        plt.xlim(0.05, 15)
+        plt.tight_layout()
+        plt.savefig('hop_acf.pdf')
+        # plt.show()
 
         for b in range(nboot):
 
@@ -619,7 +626,7 @@ class System(object):
 
                 update_entry = "UPDATE %s SET alpha = %.2f, sigma = %.2f, hurst = %.2f, sim_length = %.2f, mw = %.2f " \
                                "WHERE name = '%s' and penalty = %.2f" % (tablename, alpha, sigma, hurst, self.time[-1],
-                                                                         self.residue.mw, self.residue.name,
+                                                                         self.residue.MW, self.residue.name,
                                                                          self.breakpoint_penalty)
 
                 crsr.execute(update_entry)
@@ -629,7 +636,7 @@ class System(object):
                 fill_new_entry = "INSERT INTO %s (name, alpha, sigma, hurst, penalty, sim_length, mw) VALUES ('%s', " \
                                  "%.2f, %.2f, %.2f, %.2f, %.2f, %.2f)" % (tablename, self.residue.name, alpha, sigma,
                                                                           hurst, self.breakpoint_penalty, self.time[-1],
-                                                                          self.residue.mw)
+                                                                          self.residue.MW)
 
                 crsr.execute(fill_new_entry)
 
@@ -692,19 +699,19 @@ if __name__ == "__main__":
 
         sys.hops_and_dwells(penalty=args.breakpoint_penalty)
 
-        sys.fit_distributions(nbins=args.nbins, nboot=args.nboot, plot=True, show=True, save=True)
-        exit()
+        sys.fit_distributions(nbins=args.nbins, nboot=args.nboot, plot=True, show=False, save=True)
+
         sys.estimate_hurst()
 
         if args.update:
             sys.update_database()
 
         file_rw.save_object(sys, 'forecast_%s.pl' % args.residue)
-
-    sys.estimate_hurst()
-    plt.hist(sys.hurst_distribution, bins=25)
-    plt.show()
     exit()
+    # sys.estimate_hurst()
+    # plt.hist(sys.hurst_distribution, bins=25)
+    # plt.show()
+    # exit()
     # plt.plot(sys.hop_acf, linewidth=2,  label='Simulation')
     # plt.xlabel('k', fontsize=14)
     # plt.ylabel('Autocovariance', fontsize=14)

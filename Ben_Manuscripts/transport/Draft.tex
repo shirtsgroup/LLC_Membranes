@@ -20,6 +20,9 @@
 \usepackage{multicol}
 
 \SectionNumbersOn
+%\definecolor{amber}{rgb}{1.0, 0.75, 0.0} % amber
+%\definecolor{amber}{rgb}{1.0, 0.84, 0.0} % gold
+\definecolor{amber}{rgb}{0.99, 0.76, 0.0} % golden poppy
 
 \externaldocument[S-]{Supporting_Information}
 
@@ -131,43 +134,43 @@
   similar pore topology to the H\textsubscript{II} phase, but a more 
   tortuous geometry, and observed a range of selectivities dependent on the
   anion coordinated to the LLC monomer.~\cite{dischinger_effect_2017} Intelligent 
-  design of LLC monomers 
-  %MRS4: 
-  %can 
-  have the potential to 
-  help us tailor membranes for solute-specific
-  separations.
+  design of LLC monomers have the potential to help us tailor membranes for 
+  solute-specific separations.
 
   While H\textsubscript{II} membranes have been synthesized and characterized
   in a lab setting, there is a limit to the level of detail that can be obtained 
-  from experiment. The separation performance of these membranes has been 
+  from experiment. 
+%  These membranes have been primarily characterized with size-exclusion experiments
+%  which can give an estimate of pore size as well as selectivity based on differences
+%  in solute sizes~\cite{zhou_supported_2005}.  
+  The separation performance of these membranes has been 
   primarily characterized with size-exclusion experiments which emphasizes 
   selectivity based on the ability to enter a given pore.~\cite{zhou_supported_2005}
   %MRS4: might confuse readers here - talking about both size exclusion as a method to characterize the membranes, and 
   %separation BY size exclusion; maybe rephrase?
-  While size-exclusion is a useful separation, it cannot reliably purify a 
-  solution where the solute size is on the same order as water. Therefore, it is
+  %BJC4: Hmm, by characerization, I mean testing their ability to separate, so I'm 
+  While size-exclusion is a useful separation, it 
+  cannot reliably purify a solution where the solute size is on the same order as water. Therefore, it is
   important to take advantage of material properties other than pore size. 
-  Unfortunately, interactions between solutes and pore moieties have yielded
-  unclear trends in experimental transport studies.~\cite{dischinger_effect_2017}
+  Unfortunately, this is a more complicated design problem. Experimental transport
+  studies of small solutes in a Q\textsubscript{I} phase membrane yielded 
+  unclear trends due to interactions between solutes and pore moieties. Although
+  the authors identified some correlation between select physicochemical properties
+  and solute transport trends, their empirical model does not offer a sufficient 
+  explanation of the molecular interactions responsible for those correlations~\cite{dischinger_effect_2017}
   %MRS4: expand the above.  What was discovered, and why was it unfortuate to the thesis?  
   % I though it actually helped the thesis here since there was something happening that WASN'T just size dependence?
+  %BJC4: gave it another shot above.
 
   Molecular dynamics (MD) simulations can give us mechanistic insights with 
-  atomistic resolution so that we can directly 
-  %MRS4: observe is strong, maybe describe? I'm open to other options.
-  % observe 
-  describe
-  small solute transport
-  within LLC membrane nanopores and intelligently design new membranes for 
+  atomistic resolution so that we can provide detailed descriptions of
+  small solute transport within LLC membrane nanopores and intelligently design new membranes for 
   solute-specific separations. In our previous work, we used MD simulations to 
   determine the most likely structure of the hexagonal phase formed by the monomer
   Na-GA3C11, expanding upon the most recent experimental characterization.~\cite{coscia_understanding_2018,feng_thin_2016}
   We developed techniques for equilibrating the hexagonal phase formed by neat 
   monomer as well as with varying amounts of water in the pores.
 
-  %BJC: is a figure with all the solutes necessary? would take up a lot of space. maybe supporting. 
-  %MRS4: I kind of like it here.  We can tweak the text to be a bit shorter without losing meaninig.
   In this work, we have studied the transport mechanisms exhibited by 20 
   uncharged polar solutes with varying size, chemical functionality and hydrophilic 
   character. We have listed the solutes studied along with the abbreviations that
@@ -177,78 +180,12 @@
   acetic acid in its protonated form. The pKa of gallic acid is 4.40 while the
   pKa of acetic acid is 4.75. Assuming that the pKa of gallic acid is similar 
   to NaGA3C11, it is possible for our sodium salted monomer to exist at the 
-  same time as protonated acetic acid.  
-  %MRS4: added for clarity
-  In any case, we are more interested in mechanisms of interaction with specific chemical functionality more than the behavior of specific molecules.
+  same time as protonated acetic acid. In any case, we are more interested 
+  in mechanisms of interaction with specific chemical functionality more than 
+  the behavior of specific molecules.
 
 %MRS4: probably shouldn't capitalize the names.  Maybe make the yellow a bit darker for the text.
-%  % BJC: not sure if I should just leave formatting to the journal. Thought tcolorbox was neat though
-%  % I can easily change these abbreviations and have them applied to all the figures. I haven't given
-%  % them much thought. Just used their residue names
-%  \begin{table}
-%  \centering
-%  \begin{tcolorbox}[%
-%  	colframe=blue,
-%  	title=\centering \textbf{Solute Names and Their Abbreviations},
-%  	width=0.7\textwidth,
-%  	box align=center,
-%  	halign=center,
-%  	valign=center,
-%  	fontupper=\linespread{1}\selectfont]
-%
-%  \begin{multicols}{2}
-%
-%  \textbf{Name} \\
-%  Acetic Acid \\
-%  Acetamide \\
-%  Acetone \\
-%  Butanol \\
-%  Dimethyl Formamide \\
-%  2,3-Dimercapto-1-propanol \\
-%  Dimethyl Sulfoxide \\
-%  Ethyl Acetate \\ 
-%  Ethanol \\
-%  Ethylene Glycol \\
-%  Glycerol \\
-%  Methanol \\ 
-%  Propylene Carbonate \\
-%  Propylene Glycol \\
-%  Propanol \\
-%  Ribose \\
-%  Mercaptoethanol \\
-%  Tetrose \\
-%  Tetrahydrofuran \\
-%  Urea \\
-%  \columnbreak
-%
-%  \textbf{Abbrevation} \\
-%  AcOH \\  % Acetic acid
-%  AcN \\  % Acetamide
-%  ACE \\  % Acetone
-%  BtOH \\  % Butanol
-%  DMF \\  % Dimethyl Formamide
-%  DMP \\  % 2,3-Dimercapto-1-propanol
-%  DMSO \\  % Dimethyl sulfoxide
-%  ETAC \\  % Ethyl Acetate
-%  EtOH \\  % ethanol
-%  EG \\  % ethylene glycol
-%  GLY \\  % glycerol
-%  MeOH \\  % methanol
-%  PC \\ % propylene carbonate
-%  PG \\  % propylene glycol
-%  PrOH \\  % propanol
-%  RIB \\ 
-%  ME \\ % mercaptoethanol
-%  TET \\
-%  THF \\ 
-%  URE \\
-%  
-%  \end{multicols}
-%  
-%  %MRS2: can you put molecules in the table as well? I think it would be better for reference. Some of the larger ones may have small molecules. You can potentially partially stagger them horizontally so the size can be OK? 
-%  \end{tcolorbox}
-%  \caption{}\label{table:abbreviations}
-%  \end{table}
+%BJC4: tried a new yellow. I think it's more readable. Hard to say
 
   \begin{table}[h!]
   \centering
@@ -259,102 +196,102 @@
     \hline
     \multicolumn{2}{|c}{Solute Name~~~~~~~~~Abbreviation} & Structure &\multicolumn{2}{c}{Solute Name~~~~~~~~~Abbreviation} & Structure \\
     \hline
-	\color{blue}{Methanol} & \color{blue}{MeOH} &     
+	\color{blue}{methanol} & \color{blue}{MeOH} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/MET.pdf}
     \end{minipage} &
 
-    \color{green!40!olive}{Urea} & \color{green!40!olive}{URE} &     
+    \color{green!40!olive}{urea} & \color{green!40!olive}{URE} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/URE.pdf}
     \end{minipage} \\
     
-   	\color{blue}{Ethanol} & \color{blue}{EtOH} &     
+   	\color{blue}{ethanol} & \color{blue}{EtOH} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/ETH.pdf}
     \end{minipage} &
     
-    \color{green!40!olive}{Acetamide} & \color{green!40!olive}{AcN} &     
+    \color{green!40!olive}{acetamide} & \color{green!40!olive}{AcN} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/ACN.pdf}
     \end{minipage} \\
     
-  	\color{blue}{Propanol} & \color{blue}{PrOH} &     
+  	\color{blue}{propanol} & \color{blue}{PrOH} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/PR.pdf}
     \end{minipage} &
     
-    \color{green!40!olive}{Acetone} & \color{green!40!olive}{ACE} &     
+    \color{green!40!olive}{acetone} & \color{green!40!olive}{ACE} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/ATO.pdf}
     \end{minipage} \\
     
-    \color{blue}{Butanol} & \color{blue}{BtOH} &     
+    \color{blue}{butanol} & \color{blue}{BtOH} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/BUT.pdf}
     \end{minipage} &
     
-    \color{orange}{Mercaptoethanol} & \color{orange}{ME} &     
+    \color{orange}{mercaptoethanol} & \color{orange}{ME} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/SOH.pdf}
     \end{minipage} \\
     
-    \color{red}{Ethylene Glycol} & \color{red}{EG} &     
+    \color{red}{ethylene glycol} & \color{red}{EG} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/GCL.pdf}
     \end{minipage} &
 
-    \color{orange}{Dimethyl Sulfoxide} & \color{orange}{DMSO} &     
+    \color{orange}{dimethyl sulfoxide} & \color{orange}{DMSO} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/DMS.pdf}
     \end{minipage} \\
     
-    \color{red}{Propylene Glycol} & \color{red}{PG} &     
+    \color{red}{propylene glycol} & \color{red}{PG} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/PG.pdf}
     \end{minipage} &
     
-    \color{orange}{2,3-Dimercapto-1-propanol} & \color{orange}{DMP} &     
+    \color{orange}{2,3-dimercapto-1-propanol} & \color{orange}{DMP} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/DMP.pdf}
     \end{minipage} \\
     
-    \color{red}{Glycerol} & \color{red}{GLY} &     
+    \color{red}{glycerol} & \color{red}{GLY} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/GLY.pdf}
     \end{minipage} &
 
-    \color{yellow!70!orange}{Tetrahydrofuran} & \color{yellow!70!orange}{THF} &     
+    \color{amber}{tetrahydrofuran} & \color{amber}{THF} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/THF.pdf}
     \end{minipage} \\
     
-    \color{red}{Tetrose} & \color{red}{TET} &     
+    \color{red}{tetrose} & \color{red}{TET} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/TET.pdf}
     \end{minipage} &
     
-    \color{yellow!70!orange}{Dimethylformamide} & \color{yellow!70!orange}{DMF} &     
+    \color{amber}{dimethylformamide} & \color{amber}{DMF} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/DMF.pdf}
     \end{minipage} \\
     
-    \color{red}{Ribose} & \color{red}{RIB} &     
+    \color{red}{ribose} & \color{red}{RIB} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/RIB.pdf}
     \end{minipage} &
 
-    \color{yellow!70!orange}{Propylene Carbonate} & \color{yellow!70!orange}{PC} &     
+    \color{amber}{propylene carbonate} & \color{amber}{PC} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/PCB.pdf}
     \end{minipage} \\
     
-    \color{green!40!olive}{Acetic Acid} & \color{green!40!olive}{AcOH} &     
+    \color{green!40!olive}{acetic acid} & \color{green!40!olive}{AcOH} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/ACH.pdf}
     \end{minipage} &
-    
-    \color{yellow!70!orange}{Ethyl Acetate} & \color{yellow!70!orange}{EAC} &     
+
+    \color{amber}{ethyl acetate} & \color{amber}{EAC} &     
     \begin{minipage}{.1\textwidth}
     \includegraphics[width=\linewidth]{structures/EAC.pdf}
     \end{minipage} \\
