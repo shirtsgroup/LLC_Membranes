@@ -5,8 +5,11 @@ from LLC_Membranes.analysis import hbonds
 from LLC_Membranes.llclib import topology, physical
 
 path = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/pure_water"
-spline = True
-tails = True  # look at hbonds in the tails
+spline = True 
+tails = False  # look at hbonds in the tails
+head_groups = True
+if head_groups:
+	tails = False  #water molecules in the tails will not be hydrogen bonding with head groups
 wt = 5
 r = 1.5  # cut-off between distal tails
 npores = 4
@@ -16,7 +19,11 @@ full_path = path + '/%swt' % wt
 
 hb = hbonds.System('%s/PR_nojump.xtc' % full_path, '%s/berendsen.gro' % full_path)
 
-hb.set_eligible('HOH', 'all')
+if head_groups:
+	hb.set_eligible('HOH', 'all', donors_only=True)
+	hb.set_eligible('HII', 'all')
+else:
+	hb.set_eligible('HOH', 'all')
 
 # find pore centers
 pore_defining_atoms = topology.LC('NAcarb11V').pore_defining_atoms
@@ -29,7 +36,7 @@ else:
     pore_centers = physical.avg_pore_loc(npores, hb.t.xyz[:, pore_atoms, :], hb.t.unitcell_vectors)[0]
 
 oxygen = [a.index for a in hb.t.topology.atoms if a.residue.name == 'HOH' and a.name == 'OW']
-inregion = physical.partition(hb.t.xyz[:, oxygen, :], pore_centers, r, buffer=0, unitcell=hb.t.unitcell_vectors, npores=npores, spline=True)
+inregion = physical.partition(hb.t.xyz[:, oxygen, :], pore_centers, r, buffer=0, unitcell=hb.t.unitcell_vectors, npores=npores, spline=spline)
 
 if tails:
     inregion = ~inregion  # '~' flips True and False
@@ -55,4 +62,5 @@ total_waters = len(hb.A)
 hb.identify_hbonds(0.35, 30)
 n = [a.shape[1] for a in hb.hbonds]
 
+print('Average number of water molecules hbonded per frame: %s' % np.mean(n))
 print('Fraction of water molecules involved in an hbond: %s' % (np.mean(n) / total_waters))

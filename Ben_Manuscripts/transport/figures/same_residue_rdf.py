@@ -11,7 +11,7 @@ r = 'BUT'
 atoms = ['C', 'O']
 wt=10
 
-opacity = 0.4
+opacity = 0.2
 
 fig, ax = plt.subplots()
 

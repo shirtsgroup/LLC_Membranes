@@ -15,7 +15,8 @@ colors = ['xkcd:blue', 'xkcd:red', 'xkcd:green', 'xkcd:orange']
 markers = ["s", "o"]
 
 for j, w in enumerate(wts):
-	path = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/MET/%dwt" % w
+	#path = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/MET/%dwt" % w
+	path = '/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/dry'
 
 	for i, r in enumerate(pickles):
 

@@ -6,6 +6,7 @@ from LLC_Membranes.llclib import physical, topology, file_rw
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import tqdm
 
 
 def initialize():
@@ -211,12 +212,13 @@ class System(object):
 
         file_rw.write_gro_pos(pos, 'spline.gro', ucell=self.box[-1, ...], ids=ids, res=res)
 
-    def bootstrap(self, nboot, nbins=50, cut=1.5):
+    def bootstrap(self, nboot, nbins=50, cut=1.5, confidence=68):
         """ Generate statistics using the bootstrapping technique
 
         :param nboot: number of bootstrap trials (i.e. number of time data is resampled)
         :param nbins: number of bins to use when histogramming density each bootstrap trial
         :param cut: maximum distance from pore center that will be plotted
+        :param confidence: confidence interval (%)
 
         :type nboot: int
         :type nbins: int
@@ -229,25 +231,26 @@ class System(object):
 
         self.density = np.zeros([nboot, nbins])
         box = self.t.unitcell_vectors[:, 2, 2].mean()
-        for b in range(nboot):
-            trial = np.zeros([nbins])
-            for n in range(nsolute):
-                # randomly choose nT radial distances of solute n from trajectory, with replacement
-                # ndx = np.random.randint(0, high=nT, size=nT)
-                # r = self.radial_distances[ndx, n]
-                # trial_box = self.t.unitcell_vectors[ndx, 2, 2]
-                # hist, bin_edges = np.histogram(r, bins=nbins, range=(0, cut))
-                # trial += (hist / trial_box.mean())  # normalize by average z-dimension
+        for b in tqdm.tqdm(range(nboot)):
+            # trial = np.zeros([nbins])
+            # for n in range(nsolute):
+            #     # randomly choose nT radial distances of solute n from trajectory, with replacement
+            #     # ndx = np.random.randint(0, high=nT, size=nT)
+            #     # r = self.radial_distances[ndx, n]
+            #     # trial_box = self.t.unitcell_vectors[ndx, 2, 2]
+            #     # hist, bin_edges = np.histogram(r, bins=nbins, range=(0, cut))
+            #     # trial += (hist / trial_box.mean())  # normalize by average z-dimension
 
                 # I think this is more right
-                n = np.random.randint(0, nsolute, size=nsolute)
-                r = self.radial_distances[:, n]
+            n = np.random.randint(0, nsolute, size=nsolute)
+            r = self.radial_distances[:, n]
+            hist, bin_edges = np.histogram(r.flatten(), bins=nbins, range=(0, cut))
 
-                for i in r.T:
-                    hist, bin_edges = np.histogram(i, bins=nbins, range=(0, cut))
-                    trial += hist
+                # for i in r.T:
+                #     hist, bin_edges = np.histogram(i, bins=nbins, range=(0, cut))
+                #     trial += hist
 
-            self.density[b, :] = trial / (nT * self.npores * box)
+            self.density[b, :] = hist / (nT * self.npores * box)
 
             # self.density[b, :] = trial / (nT * self.npores)
 
@@ -258,7 +261,6 @@ class System(object):
             self.density[:, i] /= (np.pi * (bin_edges[i + 1] ** 2 - bin_edges[i] ** 2))
             self.r[i] = (bin_edges[i + 1] + bin_edges[i]) / 2  # center of bins
 
-        confidence = 95  # percent confidence interval
         lower_confidence = (100 - confidence) / 2
         upper_confidence = 100 - lower_confidence
 

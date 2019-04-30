@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from LLC_Membranes.analysis import hop_location
 import names
+from scipy import stats
 
 residues = ['ACH', 'ACN', 'ATO', 'BUT', 'DMF', 'DMP', 'DMS', 'EAC', 'ETH', 'GCL', 'GLY', 'MET', 'PCB', 'PG', 'PR', 'RIB', 'SOH', 'TET', 'THF', 'URE']
 
@@ -32,6 +33,26 @@ ordered = np.argsort(hopfreq[:, 0])[::-1]
 labels = np.array([names.abbreviation[r] for r in residues])[ordered]
 colors = np.array([names.color_dict[r] for r in residues])[ordered]
 
+# Use poisson pmf to generate errorbars instead
+nhops = hopfreq[ordered, 0] * 1000 # total hops over 1000 ns
+err = np.zeros([2, nhops.size])
+confidence = 68.27
+lower_confidence = (100 - confidence) / 2 
+upper_confidence = 100 - lower_confidence
+lower_confidence /= 100
+upper_confidence /= 100
+
+for i, n in enumerate(nhops):
+	k = np.arange(0, 1000)
+	cdf = stats.poisson.cdf(k, n)
+	bottom = np.argmin(np.abs(cdf - lower_confidence))
+	top = np.argmin(np.abs(cdf - upper_confidence))
+	err[:, i] = [k[bottom], k[top]]
+
+err /= 1000  # convert to hops per 1 ns
+err[0, :] = hopfreq[ordered, 0] - err[0, :]
+err[1, :] -= hopfreq[ordered, 0]
+
 bar_width = 0.8
 opacity = 0.8
 index = np.arange(len(residues))
@@ -41,7 +62,8 @@ ax.set_xticks(index)
 ax.set_xticklabels(labels, fontsize=14)
 [x.set_color(colors[i]) for i, x in enumerate(plt.gca().get_xticklabels())]
 plt.xticks(rotation=90)
-ax.bar(index, hopfreq[ordered, 0], bar_width, alpha=opacity, yerr=hopfreq[ordered, 1])
+#ax.bar(index, hopfreq[ordered, 0], bar_width, alpha=opacity, yerr=hopfreq[ordered, 1])
+ax.bar(index, hopfreq[ordered, 0], bar_width, alpha=opacity, yerr=err)
 ax.set_ylabel('Hop Frequency (ns$^{-1}$)', fontsize=14)
 savename = 'hopfreq_total.pdf'
 plt.tight_layout()

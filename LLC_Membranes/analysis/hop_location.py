@@ -154,13 +154,14 @@ class HopLocation(System):
         # https://stats.stackexchange.com/questions/15371/how-to-calculate-a-confidence-level-for-a-poisson-distribution
         # This function might fit better in a different script.
 
+        # flatten hop lengths list
         hops = []
         for i in self.hop_lengths:
             hops += i
 
         hops = np.array(hops)
 
-        n = self.t.n_frames * self.dt * len(self.hop_lengths)  # solute-nanoseconds
+        n = self.t.n_frames * self.dt * len(self.hop_lengths)  # solute-nanoseconds. len(self.hop_lengths) = nsolutes
         freq = len(hops) / n  # per solute per ns
         ci = 1.96 * np.sqrt(freq / n)  # normal approximation
 

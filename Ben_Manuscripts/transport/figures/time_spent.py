@@ -5,6 +5,7 @@ from LLC_Membranes.analysis.rdf import System
 from LLC_Membranes.llclib import file_rw
 import matplotlib.pyplot as plt
 import names
+from scipy import stats
 
 def calculate_rdf(res, path, gro='berendsen.gro', traj='PR_nojump.xtc', atoms=None):
 

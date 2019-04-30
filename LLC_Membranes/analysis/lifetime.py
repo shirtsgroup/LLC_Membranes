@@ -107,6 +107,7 @@ class CoordinationLifetime(coordination_number.System):
 
         self.mean_lifetime = 0
         self.confidence = 0
+        self.lifetimes = []
 
     def create_timeseries(self):
         """ Process coordination_number output in order to generate timeseries for each solute
@@ -117,7 +118,8 @@ class CoordinationLifetime(coordination_number.System):
 
     def calculate_lifetimes(self, ci=.95, nboot=200):
 
-        for x in self.coordination_timeseries.T:
+        for i, x in enumerate(self.coordination_timeseries.T):  # loop through each solute trajectory
+            self.lifetimes.append({})
             frame = 0
             while frame < x.size:
                 if x[frame] != 0:
@@ -136,6 +138,7 @@ class CoordinationLifetime(coordination_number.System):
                     frame += count
                     if frame < x.size:  # don't count the last dwell time since it was not necessarily finished
                         self.dwell_times.append(count * self.dt)
+                        self.lifetimes[i]['%s-%s' % (frame-count, frame)] = [count*self.dt]
                 else:
                     frame += 1
 
@@ -274,7 +277,7 @@ if __name__ == "__main__":
         if args.type == 'coord':
 
             if args.atoms is None:
-                args.atoms = ['all']
+                args.atoms = ['all']  # I think the 'all' option is broken
 
             lifetime = CoordinationLifetime(args.traj, args.gro, atoms=args.atoms[0], coordinated_atoms=args.coordinated_atoms,
                                             residue=args.residues[0], coordinated_residue=args.coordinated_residue,

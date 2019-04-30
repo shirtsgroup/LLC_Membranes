@@ -24,10 +24,10 @@ def calculate_rdf(res, path, gro='berendsen.gro', traj='PR_nojump.xtc', atoms=No
 	return rdf
 
 recalculate = False 
-simple_alcohols = False
+simple_alcohols = False 
 polyols = False
-head_groups = False 
-thiol_comparison = False
+head_groups = True 
+thiol_comparison = False 
 ketones = False 
 nondonors = True 
 probability = False 
@@ -38,8 +38,8 @@ elif polyols:
 	residues=["GCL", "PG", "GLY", "TET", "RIB"]
 elif thiol_comparison:
 	#residues=["SOH", "GCL"]
-	residues=["DMP", "GLY"]
-	#residues=["DMS", "ATO"]
+	#residues=["DMP", "GLY"]
+	residues=["DMS", "ATO"]
 elif ketones:
 	residues=["ACH", "URE", "ACN", "ATO"]
 elif nondonors:
@@ -54,7 +54,7 @@ maximum = 0
 i = 0
 v = np.zeros([len(residues), 49])
 #equil = 200  # chop off first equil frames
-opacity = 0.4
+opacity = 0.2
 for r in residues:
 
 	path = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/%s/%dwt" %(r,wt)
@@ -73,7 +73,7 @@ for r in residues:
 		rdf.errorbars /= sum(mean)
 		mean /= sum(mean)
 
-	new_max = np.amax(mean[np.argwhere(rdf.r > 0)])  # really looking for the head group peak
+	new_max = np.amax(mean[np.argwhere(rdf.r > 0.4)])  # really looking for the head group peak
 	maximum = max(maximum, new_max)
 	plt.plot(rdf.r, mean, label='%s' % names.res_to_name[r], linewidth=2)
 	plt.fill_between(rdf.r, rdf.errorbars[1, :] + mean, mean - rdf.errorbars[0, :], alpha=opacity)
@@ -83,9 +83,10 @@ for r in residues:
 	i += 1
 
 nboot = 200
+nselect = 400 * len(residues)  # each system has 400 head groups. Each bootstrap trial should randomly select "400 * n residues being plotted" RDFs
 if head_groups:
 
-	nframes = 2000
+	nframes = 200
 #	d_head_groups = np.zeros([len(residues)*nframes, 50, len(residues)])
 	d_head_groups = np.zeros([len(residues)*nframes, 50])
 
@@ -99,12 +100,13 @@ if head_groups:
 	
 	boot = np.zeros([nboot, 50])
 	for b in tqdm.tqdm(range(nboot)):
-		ndx = np.random.choice(np.arange(d_head_groups.shape[0]), size=d_head_groups.shape[0], replace=True)
+		ndx = np.random.choice(np.arange(d_head_groups.shape[0]), size=nselect, replace=True)
 		boot[b, :] = d_head_groups[ndx, :].mean(axis=0)
 
 	mean = boot.mean(axis=0)
-	error = stats.confidence_interval(boot, 95) * (maximum / np.max(mean))
+	error = stats.confidence_interval(boot, 68) * (maximum / np.max(mean))
 	mean *= (maximum / np.max(mean))
+	#mean *= (24 / 400)
 	#std *= (24 / 400)
 	#mean *= (24 / 400)
 	
@@ -143,16 +145,22 @@ if head_groups:
 #plt.plot(rdf.r, maximum * rdf.density.mean(axis=0) / np.amax(rdf.density.mean(axis=0)), '--', color='black')
 #plt.plot(rdf.r, normalization * rdf.density.mean(axis=0), '--', color='black')
 
-top = maximum * 1.05
-plt.plot([0.75, 0.75], [0, top], '--', color='black')
-plt.fill_between([0.73, 0.77], [top, top], y2=[0, 0], color='grey', alpha=0.5)
+if not head_groups:
+	top = maximum * 1.05
+	plt.plot([0.75, 0.75], [0, top], '--', color='black')
+	plt.fill_between([0.73, 0.77], [top, top], y2=[0, 0], color='grey', alpha=0.5)
 
 plt.ylabel('Density (count / nm$^3$)', fontsize=14)
 plt.xlabel('Distance from pore center (nm)', fontsize=14)
-# plt.ylim(-0.05, 1.3) # for diols only
-#plt.ylim(-0.015, 0.45) # for DMSO and acetone thiol comparison
-#plt.ylim(-0.015, 0.5) # for mercaptoethanol and ethylene glycol comparison
+if polyols:
+	plt.ylim(-0.05, 1) # for diols only
+if thiol_comparison: 
+	if 'DMS' in residues:
+		plt.ylim(-0.015, 0.45) # for DMSO and acetone thiol comparison
+	elif 'SOH' in residues:
+		plt.ylim(-0.015, 0.5) # for mercaptoethanol and ethylene glycol comparison
 #plt.ylim(-0.015, 12) # for nondonors
+#plt.ylim(-0.015, 1)
 plt.gcf().get_axes()[0].tick_params(labelsize=14)
 #plt.legend(fontsize=13, loc=1, ncol=2, columnspacing=0.5)  # for nondonors
 plt.legend(fontsize=13, loc=1)

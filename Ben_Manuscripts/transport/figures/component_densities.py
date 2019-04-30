@@ -7,11 +7,12 @@ import numpy as np
 
 # pickle files generated with : rdf.py -t PR_nojump.xtc -g berendsen.gro -r HII -a 'head groups' -r HII -a 'tails' -r NA -r HOH -spline
 
-wt = 10 
-dry = False
+wt = 5 
+dry = False 
+opacity = 0.2
 
 if dry:
-	path = "/home/bcoscia/Data/structure_paper/main_systems/offset"
+	path = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/dry"
 	pickles = ['NA', 'HII_tails', 'HII_head groups']
 else:
 	path = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/pure_water/%dwt" % wt
@@ -22,9 +23,10 @@ colors = ['xkcd:blue', 'xkcd:red', 'xkcd:green', 'xkcd:orange']
 for i, r in enumerate(pickles):
 
 	rdf = file_rw.load_object('%s/rdf_%s.pl' % (path, r))
+	print(r)
 	mean = rdf.density.mean(axis=0)
 	plt.plot(rdf.r, mean, linewidth=2, label=labels[i], color=colors[i])
-	plt.fill_between(rdf.r, rdf.errorbars[1, :] + mean, mean - rdf.errorbars[0, :], alpha=0.7)
+	plt.fill_between(rdf.r, rdf.errorbars[1, :] + mean, mean - rdf.errorbars[0, :], alpha=opacity)
 	if r == 'HII_head groups':
 		maximum = rdf.r[np.argmax(mean)]
 		maxy = np.max(mean)
