@@ -93,7 +93,7 @@
   flux.~\cite{van_der_bruggen_review_2003} NF membranes have well-defined
   nm-sized pores which can give the same permeate flux as RO with lower applied
   pressure.~\cite{hilal_comprehensive_2004} However, the pores are not uniform in
-  size, limiting selectivity.~\cite{werber_materials_2016}.
+  size, limiting their selectivity.~\cite{werber_materials_2016}.
 %  Therefore, multiple membrane passes may be necessary in order to achieve 
 %  high selectivity. 
   
@@ -112,7 +112,7 @@
   Cross-linked H\textsubscript{II} phase lyotropic liquid crystal (LLC) 
   membranes are nanostructured membranes that may be able to achieve the
   selectivity of RO membranes while maintaining the high permeability
-  of NF membranes.~\cite{zhou_supported_2005} The H\textsubscript{II} LLC
+  of NF membranes.~\cite{zhou_supported_2005} The H\textsubscript{II}
   phase is formed when LLC monomers self-assemble into hexagonally packed
   and uniform-sized pores.~\cite{smith_ordered_1997} Alignment and subsequent
   cross-linking of the hexagonal mesophases yields a mechanically strong
@@ -175,7 +175,7 @@
   solute-specific separations. In our previous work, we used MD simulations to 
   determine the most likely structure of the hexagonal phase formed by the monomer
   Na-GA3C11, expanding upon the most recent experimental characterization.~\cite{coscia_understanding_2018,feng_thin_2016}
-  We developed techniques for equilibrating the hexagonal phase formed by neat 
+  We developed techniques to simulate the hexagonal phase formed by neat 
   monomer as well as with varying amounts of water in the pores.
   
   \begin{figure}
@@ -190,24 +190,24 @@
   \end{subfigure}
   \caption{In both figures, water molecules that occupy the pores are colored blue,
   the hydrophilic head groups of the LLC monomers are colored orange with all else
-  colored gray. (a) Membrane pores are approximately straight and (b) are packed 
-  hexagonally.}\label{fig:membrane_rendering}
+  colored gray. We expect that transport will be primarily determined by solute
+  behavior within the pores. (a) Membrane pores are approximately straight and (b)
+  are packed hexagonally.}\label{fig:membrane_rendering}
   \end{figure}
 
   In this work, we have studied the transport mechanisms exhibited by 20 
   uncharged polar solutes with varying size, chemical functionality and hydrophilic 
   character. Figure~\ref{fig:membrane_rendering} shows an atomistic rendering of
-  the membrane in which solutes are placed. 
-  We have listed the solutes studied along with the abbreviations that
+  the membrane in which we placed solutes. We have listed the solutes studied along with the abbreviations that
   we will use in the charts for the remainder of this paper in Table~\ref{table:abbreviations}.
-  Note that, in order to avoid studying charge species, we have only studied
+  Note that, in order limit our studies to uncharged species, we have only studied
   %BJC: citations for pKa's
   acetic acid in its protonated form. The pKa of gallic acid is 4.40 while the
-  pKa of acetic acid is 4.75. Assuming that the pKa of gallic acid is similar 
-  to NaGA3C11, it is possible for our sodium salted monomer to exist at the 
-  same time as protonated acetic acid. In any case, we are more interested 
-  in mechanisms of interaction with specific chemical functionality more than 
-  the behavior of specific molecules.
+  pKa of acetic acid is 4.75.~\cite{chuysinuan_gallic_2009,perrin_pka_1981} 
+  Assuming that the pKa of gallic acid is similar to NaGA3C11, it is possible
+  for our sodium salted monomer to exist at the same time as protonated acetic
+  acid. In any case, we are more interested in mechanisms of interaction with
+  specific chemical functionality more than the behavior of specific molecules.
 
   \begin{table}[h!]
   \centering
@@ -322,10 +322,12 @@
   \end{tabular}
 %  \end{minipage}
   \caption{Names of solutes along with their molecular structures and the
-  abbreviations which we use in this paper. Colors corresponds to solute groupings
-  and are used in many plots. Blue corresponds to simple alcohols, red to 
-  diols, triols and sugars, green to ketone-like solutes, orange to sulfur-containing
-  solutes and yellow to solutes that can only accept hydrogen bonds but not donate.}\label{table:abbreviations}
+  abbreviations which we use in this paper. Colors correspond to solute groupings
+  and are used in many plots. 
+%  Blue corresponds to simple alcohols, red to 
+%  diols, triols and sugars, green to ketone-like solutes, orange to sulfur-containing
+%  solutes and yellow to solutes that can only accept hydrogen bonds but not donate.
+  }\label{table:abbreviations}
   \end{table}
 
   %MRS2: generally, use present tense for what is being done in the paper, not future tense; 
@@ -337,15 +339,17 @@
   low water content. We therefore first analyze how the radial density of monomer 
   components and water change within the pore based on membrane water content.
   
-  We then present our efforts to understand how small molecules, 
-  including water, partition within the pores. From a macroscopic perspective,
-  it might make sense to hypothesize that the water and polar solutes spend
-  their time exclusively in the tube-like hydrophilic pore region. Our
+  We then present our efforts to understand how water partitions within the pores.
+  From a macroscopic perspective, it might make sense to hypothesize that water 
+  spends its time exclusively in the tube-like hydrophilic pore region. Our
   previous work showed that there is a gradual compositional transition from
   the hydrophilic to the hydrophobic region which means that solutes may not
   necessarily stay confined to the centers of the pores or even within the 
-  pore region. We then study the gradient in composition of solutes and 
-  water and any resultant influence it might have on mechanistic properties.
+  pore region. We use this information in order to justify our restriction
+  of solute transport studies to just the pore region.
+  
+%  We then study the gradient in composition of solutes and 
+%  water and any resultant influence it might have on mechanistic properties.
 
   In the remainder of the paper, we present our observations 
   and explanations of the observed transport mechanisms exhibited by water
@@ -353,12 +357,12 @@
   anticipate that transport will be hindered in some way. 
 
   We investigate the differences in solute motion, specifically its mean 
-  squared displacement (MSD), based on a solute's size, shape and chemical
+  squared displacement (MSD), based on a solute's size and chemical
   functionality. We will study the interactions between solutes, the membrane,
   and water in order to determine which mechanism or mechanisms dominate.
   
-  There are also a couple of questions that this study that are beyond the 
-  scope of this study. First, we will not study the concentration dependence of the observed transport
+  There are also a couple of questions that are beyond the scope of this study.
+  First, we will not study the concentration dependence of the observed transport
   rates. Although the average MSD might change with concentration, we are 
   focused on the underlying solute-membrane interactions that lead to the 
   observed transport mechanisms which we conjecture will remain roughly
@@ -366,8 +370,8 @@
   of solutes in the pores, which could give us a better understanding of 
   equilibrium solute partitioning. However, this information is not needed
   to understand the mechanistic details in various membrane regions; 
-  This work represents a starting point for observing the types of interactions
-  which occur between isolated solutes and the membrane.
+  this work represents a starting point for observing the types of interactions
+  that occur between isolated solutes and the membrane.
 
   \section{Methods}
   
@@ -378,6 +382,15 @@
   Table~\ref{S-table:python_scripts} of the Supporting Information.
   
   We ran all molecular dynamics simulations and energy minimizations using GROMACS 2018.3 \cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008} 
+  
+  \subsection{Solute Parameterization}\label{method:parameterization}
+  
+  We parameterized the interaction potential for the monomer and solutes using 
+  the Generalized AMBER Force Field (GAFF)~\cite{wang_development_2004} with the
+  Antechamber package \cite{wang_automatic_2006} shipped with AmberTools16~\cite{case_ambertools16_2016}.
+  We use GAFF as it has been used extensively for use with organic molecules.
+  We assigned atomic charges using the am1bccsym method of \texttt{molcharge} included
+  with QUACPAC from Openeye Scientific Software.
   
   \subsection{System Setup}\label{method:system_setup}
 
@@ -391,7 +404,8 @@
 
   We observed that some water partitions into the distal tail region of our system and therefore
   built our initial configurations with water in both regions, close to the expected
-  equilibrium partition. We define the distal tail region to be ca. 1.5 nm from the pore
+  equilibrium partition (see Section~\ref{S-section:water_content_equil} of the Supporting
+  Information). We define the distal tail region to be ca. 1.5 nm from the pore
   center based on the minimum in the radial distribution of water
   (see Section~\ref{method:rdfs}). The amount of water present in the distal tail region
   may or may not be experimentally consistent but it is necessary for our results to be 
@@ -409,28 +423,20 @@
   work.~\cite{coscia_understanding_2019}
 
   To study a given solute, we added 6, equally spaced in $z$, solute molecules to the
-  center of each pore of the equilibrated cross-linked configuration. Our choice of 6
-  solutes per pore provided a balance of a useful amount of data for generating 
-  statistics and a low degree of interaction between solutes (see 
+  center of each pore of the equilibrated cross-linked configuration, for a total of 24
+  solutes. Our choice of 6 solutes per pore provides a balance of a useful amount of 
+  data for generating statistics and a low degree of interaction between solutes (see 
   Section~\ref{S-section:solute_interaction} of the Supporting Information). At each
   insertion point we placed a randomly oriented solute molecule then ran a short 
   energy minimization. We allowed the solutes to equilibrate for 5 ns using Berendsen
   pressure control then collected transport data over the course of 1 $\mu$s MD simulations
   with pressure controlled by the Parrinello-Rahman barostat.
   
-  \subsection{Solute Parameterization}\label{method:parameterization}
-  
-  We parameterized the interaction potential for the monomer and solutes using 
-  the Generalized AMBER Force Field (GAFF)~\cite{wang_development_2004} with the
-  Antechamber package \cite{wang_automatic_2006} shipped with AmberTools16~\cite{case_ambertools16_2016}.
-  We use GAFF as it has been used extensively for use with organic molecules.
-  We assigned atomic charges using the am1bccsym method of \texttt{molcharge} included
-  with QUACPAC from Openeye Scientific Software.
-  
   \subsection{Mean Squared Displacement}\label{method:MSD}
 
-  We measured the time-averaged $z$-direction mean squared displacement (MSD) of the
-  centers of mass (COM) of each solute over the course of 1 $\mu$s MD simulations using 
+  We measured the time-averaged $z$-direction (parallel to the pores) mean squared
+  displacement (MSD) of the centers of mass (COM) of each solute over the course of 
+  1 $\mu$s MD simulations using 
   Equation~\ref{eqn:tamsd}:
   \begin{equation}
 	\overline{z^2(\tau)} = \dfrac{1}{T - \tau}\int_{0}^{T - \tau} (z(t + \tau) - z(t))^2 dt
@@ -481,7 +487,7 @@
   ns time lag. Our results are shown to be insensitive to our choice of time lag in 
   Section~\ref{S-section:lag_sensitivity} of the Supporting Information.
   
-  The $z$-direction MSD of water in the 10 wt\% system is linear. Therefore, for
+  The $z$-direction MSD of water in the 10 wt\% system \textit{is} linear. Therefore, for
   the purpose of comparison, we calculated its diffusion constant by fitting a line
   to the linear region of the MSD curve.~\cite{maginn_best_2018}. The diffusion constant
   is then equal to $m/2$ where $m$ is the slope of the linear fit. The slope is divided
@@ -495,7 +501,7 @@
   consisted of about 2100 water molecules and 6 solutes. Although there exist
   more involved methods for determining the hydrodynamic radius~\cite{schultz_determination_1961},
   we chose to use a simpler and more intuitive metric since we are only interested
-  in observing trends in the solute mean squared displacement as a function
+  in observing trends in the solute MSD as a function
   of solute size.
   
   \subsection{The Stokes-Einstein Relationship}\label{method:stokes}
@@ -593,7 +599,7 @@
   points hops occurred in the time series of each solutes' COM. We
   used the 3 dimensional COM positions of each solute, rather than
   just the $z$-direction, in order to detect lateral hops. However,
-  hop lengths are reported as their displacement the $z$-direction.
+  hop lengths are reported as their displacement in the $z$-direction.
   We reported the standard error in the average hop lengths by 
   bootstrapping the empirical distribution of observed
   hop lengths.\cite{efron_introduction_1994}
@@ -604,7 +610,7 @@
   We determined the average frequency of hops by dividing the total number of 
   hops by the total length of the simulation. We used the frequency of
   hops per 1000 ns as the $\lambda$ parameter in a Poisson distribution.
-  We calculated the 1--$\sigma$ confidence intervals of the probability % BJC: not sure best way to write 1-sigma CI
+  We calculated the 1$\sigma$ confidence intervals of the probability % BJC: not sure best way to write 1-sigma CI
   distribution of hops per 1000 ns based on the corresponding Poisson 
   cumulative distribution function and scaled them to a per--nanosecond basis. 
  
@@ -652,14 +658,16 @@
   package which allows us to directly check the validity of identified hydrogen bonds.
   In Section~\ref{S-section:hbond_sensitivity} of the Supporting Information, we
   show that our conclusions are insensitive to this definition within a 
-  reasonable range of distances and angles. We determined the average percentage
-  of solutes which actively participated in a hydrogen bond interaction with 
-  monomers each frame. We only counted unique solute--monomer hydrogen bond 
-  interactions, meaning solutes that hydrogen bond more than once simultaneously were classified as a
-  single pairing event. We determined the standard error of this calculation
-  by bootstrapping over each solute's trajectory. For each bootstrap trial,
-  we randomly chose 24 solutes with replacement and calculated the average
-  active solute-monomer hydrogen bonds per frame.
+  reasonable range of distances and angles. 
+  
+  We determined the average percentage of solutes
+  which actively participated in a hydrogen bond interaction with monomers 
+  each frame. Unless noted otherwise, we only counted unique solute--monomer
+  hydrogen bond interactions, meaning solutes that hydrogen bond more than 
+  once simultaneously were classified as a single pairing event. We determined
+  the standard error of this calculation by bootstrapping over each solute's 
+  trajectory. For each bootstrap trial, we randomly chose 24 solutes with 
+  replacement and calculated the average active solute--monomer hydrogen bonds per frame.
 
   \subsection{Coordination Number}\label{method:coordination}
 
@@ -668,12 +676,12 @@
   given solute atom based on a distance cut-off. Using four different methods,
   Rowley and Roux observed peaks in the radial distribution function for sodium
   coordinated with water at an O--Na distance of between 2.3 and 2.5 \AA.
-  \cite{rowley_solvation_2012} We used 2.5 \AA~as the distance cut-off. We 
-  found that this approach is more useful than calculating the 3D spherical
-  radial distribution function because it gives detailed frame-by-frame 
-  information rather than an average. 
+  \cite{rowley_solvation_2012} We used 2.5 \AA~as the distance cut-off in our
+  calculations. We found that this approach is more useful than calculating 
+  the 3D spherical radial distribution function because it gives detailed 
+  frame-by-frame information rather than an average. 
   
-  Using our procedure we found that sodium ions in a solution of TIP3P water
+  Using our procedure, we found that sodium ions in a solution of TIP3P water
   coordinate with an average of 3.6 water molecules. We created a 4 x 4 x 4
   nm cubic box of water with the GROMACS tool, \texttt{gmx solvate}. We used
   \texttt{gmx genion} to replace water molecules with sodium and chloride 
@@ -683,7 +691,7 @@
   
   We determined the average percentage of solutes actively coordinated to
   a sodium ion each frame. Our calculation procedure is analogous to that for
-  solute-monomer hydrogen bond interactions outlined in the previous section.
+  solute--monomer hydrogen bond interactions outlined in the previous section.
   
   \subsection{Association Lifetimes}\label{method:lifetimes}
   
@@ -701,13 +709,13 @@
   % use a percentile.
   % MRS4: maybe while we are waiting for review.
   Hydrogen bond lifetimes appear to be distributed according to a power law or an
-  exponential function. A number of researchers provide evidence that supports a 
+  exponential function (see Figure~\ref{S-fig:lifetime_distributions} of the 
+  Supporting Information). A number of researchers provide evidence that supports a 
   power law distribution~\cite{starr_fast_1999,martiniano_insights_2013}. However, these
   studies were done on extremely short timescales relative to ours, outputting positions
   every time step. Voloshin et al. studied hydrogen bonding on multiple timescales and 
   observed exponential behavior on the longest timescales~\cite{voloshin_hydrogen_2009}. 
   Due to memory limitations, we could not collect data frequently enough to provide a
-  %MRS4: tweaking to 
   sufficient answer to this question so when comparing solutes, we use the 95\textsuperscript{th} 
   percentile of hydrogen bond dwell times. This places emphasis on solutes with 
   long dwell times. We reported the standard error of this calculation by bootstrapping
@@ -722,7 +730,7 @@
   We measured the average radial distance of each solute of interest 
   from the pore centers. We binned the radial distances and then 
   normalized by the volume of the annulus defined by the bin edges.
-  We generated 1-$\sigma$ confidence intervals by bootstrapping the 
+  We generated 1$\sigma$ confidence intervals by bootstrapping the 
   RDFs of each individual solute 200 times. For each solute, we obtained
   an RDF averaged over the entire simulation trajectory. We randomly 
   chose solute RDFs with replacement and averaged them for each bootstrap
@@ -737,9 +745,9 @@
   Section~\ref{S-section:splines} of the Supporting Information for 
   a graphical illustration. Each spline consists of 10 points, equally
   spaced in the $z$-direction, whose ($x$, $y$) coordinates are defined
-  based on the center of mass of all head groups closest, in $z$, to the
+  based on the COM of all head groups closest, in $z$, to the
   given point. When calculating RDFs, the radial distance from the pore 
-  center is based on the distance between the solute center-of-mass and
+  center is based on the distance between the solute COM and
   the linearly interpolated ($x$, $y$) coordinates of the pore center 
   calculated based on the closest two spline points. Using the splines, 
   we calculated the tortuosity of the pores by calculating the ratio 
@@ -750,9 +758,9 @@
   
   In all RDF plots, we include the average RDF of the head groups as a 
   reference. The head group RDF shown is the average of the head group
-  RDFs for each solute system in the plot. We generated 1-$\sigma$ 
+  RDFs for each solute system in the plot. We generated 1$\sigma$ 
   confidence intervals by bootstrapping the RDFs in the same way we did
-  the solutes. We scaled the head group RDF so that it would be visible
+  the solutes. We scaled the head group RDF so that it would be in frame
   next to solute RDFs.
 
 %  of each individual
@@ -765,7 +773,7 @@
   
   \subsection{Structure of Membrane Constituents}\label{section:membrane_components} 
   
-  Before beginning the analysis of solute transport behavior, it is important to
+  Before beginning our analysis of solute transport behavior, it is important to
   elucidate the topology of the membrane pores in solvated systems.  
   
   In contrast to our previous work with a dry version of this membrane, the 
@@ -773,8 +781,7 @@
   primarily filled with water and sodium ions. Figure~\ref{fig:component_densities}
   plots the RDF of each membrane constituent in the dry system as well as the
   5 and 10 wt\% water systems. In dry systems, the pore center is densely 
-  filled with sodium ions and head groups. The peak head group density occurs
-  within 0.25 nm of the pore center. In hydrated systems, water occupies, 
+  filled with sodium ions and head groups. In hydrated systems, water occupies, 
   and is densest, at the center of each pore. The density of sodium ions is 
   somewhat uniform in the pore center of the 5 wt\% water system while it shows
   a maximum closer to the head groups in the 10 wt\% water system. The peak 
@@ -819,7 +826,7 @@
   the maximum head group density.
   (a) In the dry system, the density of head groups and sodium ions are highest
   0.15 to 0.4 nm from the pore center. There is an appreciable density of head groups
-  crowding the pore center (b) In the 5 wt\% system, monomer head 
+  crowding the pore center. (b) In the 5 wt\% system, monomer head 
   groups retreat radially in order to make room for water molecules at the pore center.
   (c) Monomers in the 10 wt\% system retreat an additional 0.2 nm to make room
   for more water.}\label{fig:component_densities}
@@ -828,7 +835,7 @@
   
   There is an appreciable amount of water that partitions into the distal tail % BJC: defined in methods
   region of both systems. 28\% and 31\% of the total water is present in the
-  tail regions of the 5 and 10 wt\% water systems respectively. See 
+  distal tail regions of the 5 and 10 wt\% water systems respectively. See 
   Section~\ref{S-section:water_content_equil} of the Supporting Information 
   for more details on the equilibration that led to this conclusion. The partition
   is due to a combination of the distal tail region's lower density as well
@@ -850,9 +857,10 @@
   In the 10 wt\% water system, the MSD of water is about 51 times higher and
   the MSD of sodium is about 49 times higher compared to the 5 wt\% water system. 
   In the 10 wt\% water system, water moves about 51 times faster than sodium 
-  and in the 5 wt\% system, water moves about 49 times faster than sodium. Assuming
-  long timescale Brownian behavior of water in the 10 wt\% system, we measured its
-  diffusivity to be $7.45 \times 10^{-7}$cm$^2$ / s which is only 1.4\% that of bulk TIP3P 
+  and in the 5 wt\% system, water moves about 49 times faster than sodium. Due to
+  the linearity of water's MSD in the 10 wt\% water system, we assumed
+  long timescale Brownian behavior and measured its diffusivity to be 
+  $7.45 \times 10^{-7}$cm$^2$/s which is only 1.4\% that of bulk TIP3P 
   water.~\cite{mahoney_diffusion_2000} %BJC: 7.45e-07 versus 5.19e-05 cm^2/s
   
   % Plots generated with msd_curves.py in figures folder
@@ -867,10 +875,11 @@
   \includegraphics[width=\textwidth]{na_msd_comparison.pdf}
   \caption{Sodium Ions}\label{fig:na_msd_comparison}
   \end{subfigure}
-  \caption{(a) The MSD of water in the 10 wt\% water system is about 51 times
-  higher than water in the 5 wt\% water system. (b) The MSD of sodium in the
-  10 wt\% water system is about 49 times higher than sodium in the 5 wt\% 
-  water system.}\label{fig:msd_comparison}
+  \caption{(a) The $z$-direction MSD of water in the 10 wt\% water system 
+  is about 51 times higher than water in the 5 wt\% water system. Water 
+  appears to exhibit Brownian motion in the 10 wt\% system due to its
+  linear MSD. (b) The MSD of sodium in the 10 wt\% water system is about 
+  49 times higher than sodium in the 5 wt\% water system.}\label{fig:msd_comparison}
   \end{figure}
   
   Sodium coordinates with far less water molecules than it does in bulk solution.
@@ -880,9 +889,18 @@
   molecules in the 5 wt\% system. However, the sodium ions are not undercoordinated
   since they frequently pair with negatively charged carboxylate head groups.
   On average, sodium ions coordinate with 1 carboxylate group in the 10 wt\% water
-  system and 0.8 carboxylate groups in the 5 wt\% water system.
+  system and 0.8 carboxylate groups in the 5 wt\% water system. This behavior likely
+  slows their motion considerably.
   % Assuming only one sodium per carboxylate group, the numbers were multiplied by 2
   % since the averages were divided by 800 instead of 400
+
+  In the 10 wt\% water system, water molecules that spend the majority of 
+  their time in the distal tail region move significantly slower than those
+  close to the pore center. In Figure~\ref{fig:water_msd_comparison}, we 
+  constructed the MSD curves based on water molecules that spent $>$ 95\% of their
+  time outside the distal tail region. If we instead restrict our calculation to
+  water molecules that spend $>$ 95\% of their time \textit{in} the distal tail region, 
+  the MSD of distal tail water decreases 8-fold from 59.6 to 8.2 nm$^2$. 
   
   % Changing pore radius does not change conclusion here.
   In the 5 wt\% water system, water molecules that spend the majority of their 
@@ -890,7 +908,7 @@
   close to the pore center. The MSD of distal tail water molecules is 1.7 nm$^2$
   compared to 1.2 nm$^2$ outside the distal tails. This anomaly is likely a 
   consequence of lower density in the distal tails relative to the pores,
-  leading to faster diffusion in the tails (see Figure~\ref{S-fig:total_density}),
+  leading to faster diffusion in the tails,
   as well as slowed diffusion of water molecules in the pores via hydrogen bonds
   with other water molecules and association with sodium ions. Water molecules 
   are less likely to hydrogen bond with each other while in the distal tail 
@@ -903,26 +921,15 @@
   compared to 44 \% in the 10 wt\% water system. There is a negligible amount of
   hydrogen bonds between water molecules and monomer head groups. 
   
-  In the 10 wt\% water system, water molecules that spend the majority of 
-  their time in the distal tail region move significantly slower than those
-  close to the pore center. In Figure~\ref{fig:water_msd_comparison}, we 
-  constructed the MSD curves based on water molecules that spent $>$ 95\% of their
-  time outside the distal tail region. If we instead restrict our calculation to
-  water molecules that spend $>$ 95\% of their time in the distal tail region, 
-  the MSD of distal tail water decreases 8-fold from 59.6 to 8.2 nm$^2$. 
-  %MRS4: did it really decrease? From what?  What was the previous definision.
-  
   Because the MSD of water in the pores of the 10 wt\% system is significantly
-  higher than that in the tails, we restricted our studies of transport to 
-  solutes in the pore region. Transport of solutes in the pores will be the 
+  higher than that in the tails, we've restricted our studies of transport to 
+  solutes close to the pore center. Transport of solutes in the pores will be the 
   limiting factor that determines permeability and rejection. Although we showed
   the opposite in the 5 wt\% water system, water transport is significantly slower
   than in the 10 wt\% system. For practical applications, a membrane with water 
   transport properties comparable to the 10 wt\% system is far more feasible than
   the 5 wt\% system.
  
-  
-  
 %  45 \% of water molecules associated with sodium in 5 wt\% system
 %  
 %  While a similar observation holds for the 10 wt\% system,
@@ -947,21 +954,22 @@
   are slowed by interactions between monomer functional groups and ions. 
   A thorough understanding of these interactions will help us to create monomer
   design principles. We will begin our analysis by considering the collective
-  trends observed across all systems and then focus on subsets of similar molecules.
+  trends observed across all systems and then focus on subsets of molecules
+  with structural similarities.
   
   Like water and sodium above, the MSDs of the solutes studied in this work are 
   significantly larger in the 10 wt\% system than those in the 5 wt\% water 
-  system (Figure~\ref{fig:msds}). The fastest moving solute in both cases, 
+  system (see Figures~\ref{fig:all_msds_5wt} and~\ref{fig:all_msds_10wt}). The fastest moving solute in both cases, 
   methanol, has an MSD about 175 times larger in the 10 versus the 5 wt\%
   water system. Clearly the equilibrium water content of a given LLC system will 
   determine its viability for real separations.
   
   The MSDs are not solely a function of solute size. We plotted each solute's radius
   against their MSD in Figures~\ref{fig:msd_radius_5wt} and~\ref{fig:msd_radius_10wt}.
-  Of all the solutes, methanol likely is subject to the least hindrance by
+  Of all the solutes, methanol is likely subject to the least hindrance by
   the membrane due its small size. Therefore we fit Equation~\ref{eqn:msd-stokes-einstein}
   so that it intersects with methanol's average MSD and radius. The uncorrected version of 
-  Equation~\ref{eqn:stokes-einstein} ($f$=1) is plotted and converges to the same value as the
+  Equation~\ref{eqn:msd-stokes-einstein} ($f$=1) is plotted and converges to the same value as the
   corrected form for large radii (see Section~\ref{method:stokes}). Although both curves are 
   approximations, they illustrate that the majority of solutes in our study show
   lower than expected MSDs. In most cases, the predicted MSDs even fall below the 
@@ -1017,7 +1025,7 @@
   3 representative ethanol COMs shows clear periods of entrapment separated by hops.
   In general, the longest dwell times occur when solutes are situated far from the
   pore center and more frequent hops occur when solutes are close to the pore center.
-  (b) The time-averaged MSD of ethanol is sub-linear which suggests transport is
+  (b) The time-averaged MSD of ethanol is sublinear which suggests transport is
   governed by an anomalous subdiffusion process.}\label{fig:qualitative_mechanisms}
   \end{figure}
   
@@ -1122,9 +1130,9 @@
   sodium counterions. Much like water, the polarity of the solutes creates 
   regions of high electron density, modeled using partial negative charges, 
   which are stabilized through electrostatic interactions with sodium ions. 
-  In Figure~\ref{fig:na_coordination}, we've plotted the percentage
-  of sodium ions coordinated to the oxygen atoms of each solute as well as the
-  95\textsuperscript{th} percentile of sodium association times. The degree and length of 
+  In Figure~\ref{fig:na_coordination}, we've plotted the average percentage
+  of solutes coordinated to a sodium ion each frame as well as the
+  95\textsuperscript{th} percentile of sodium association lifetimes. The degree and length of 
   coordination between solutes and sodium in the 5 wt\% water system is higher
   in all cases than that in the 10 wt\% water systems. The crowded pores of 
   the 5 wt\% water system forces sodium ions in close proximity to solutes. 
@@ -1133,8 +1141,8 @@
   all of the most coordinated solutes contain a carbonyl group (except for 
   DMSO which has an analogous sulfinyl group). There is a significant
   drop in sodium ion association for solutes that do not contain carbonyl 
-  groups or multiple hydroxyl groups to compensate. The corresponding dwell
-  times follow a similar trend, however the dwell times of highly coordinated 
+  groups or multiple hydroxyl groups to compensate. The corresponding association
+  lifetimes follow a similar trend, however the association lifetimes of highly coordinated 
   solutes with multiple hydroxyl groups are generally lower since association
   between hydroxyl groups and sodium is apparently a weaker interaction. Carbonyl
   groups contain an exposed and highly electron-dense oxygen atom which interacts
@@ -1239,9 +1247,9 @@
   as the more highly crowded environment surrounding the ether oxygen atoms. 
   Butanol shows the largest preference towards hydrogen bonds with carboxylate
   head groups. The radial distribution function of atoms located at opposite ends
-  of butanol shows that, on average, oxygen atoms are situated closer to the pore
-  centers than the most distal carbon atoms. This suggests that alcohols tend to 
-  orient themselves like the liquid crystal monomers, with hydrophilic components
+  of butanol (Figure~\ref{fig:butanol_CO}) shows that, on average, oxygen atoms are situated closer to the pore
+  centers than the most distal carbon atoms. This suggests that long chain alcohols
+  will tend to orient themselves like the liquid crystal monomers, with hydrophilic components
   directed towards the pore centers.
   
   \begin{figure}[!htb]
@@ -1274,7 +1282,7 @@
   explain its fast dynamics. (c) Despite relatively little difference in the 
   total number of solutes actively participating in a hydrogen bond each frame,
   a given alcohol's preference towards hydrogen bonds with the carboxylate groups
-  of ether linkages increases with increasing hydrophobic character. (d) The average location of 
+  over ether linkages increases with increasing hydrophobic character. (d) The average location of 
   butanol's oxygen atom is closer to the pore center than its most distal carbon
   atom, suggesting that the molecule is oriented with hydrophobic tails pointing
   away from the pore center.}\label{fig:simple_alcohols}
@@ -1282,16 +1290,16 @@
 
   \subsection{Transport of Diols, Triols and Sugars}\label{section:polyols}
   
-  The order of the MSDs of solutes in this grouping are roughly consistent with 
+  The order of the MSDs of the diols, triols and sugars are roughly consistent with 
   their size; however, propylene glycol moves exceptionally slowly (see 
   Figure~\ref{fig:polyols_msd}). Ethylene glycol has the highest MSD followed
   by tetrose and glycerol, whose MSDs are similar, propylene glycol, the second
-  smallest	solute of this set, and finally ribose.
+  smallest solute of this set, and finally ribose.
   
   Transport is both facilitated and hindered by additional solute hydroxyl groups
   due to their influence on radial density and hydrogen bond frequency. Extra 
   hydroxyl groups cause solutes to favor the water-rich pore region where there 
-  is the least hindrance to movement (See Figure~\ref{fig:polyols_rdf}). Tetrose,
+  is the least hindrance to movement (see Figure~\ref{fig:polyols_rdf}). Tetrose,
   ribose and glycerol are densest close to the pore center. They spend a greater
   fraction of their time in the pore region than any other solute (see 
   Figure~\ref{fig:frac_time}). This is likely a consequence of both their 
@@ -1429,13 +1437,11 @@
   \includegraphics[width=\textwidth]{ketone_hbonds.pdf}  %BJC: need error bars!
   \caption{}\label{fig:ketone_hbonds}
   \end{subfigure}
-  \caption{(a) The MSD of the solutes decreases and the deviation from
+  \caption{(a) The MSD of ketones and amides decreases and the deviation from
   Stokes-Einstein predicted behavior increases with molecular size.
   (b) The radial density near the pore center (r = 0) decreases with decreasing
   solute MSD. Peaks in the RDFs of urea, acetamide and acetone that appear 
-  0.2 - 0.4 nm from the pore center are 
-  %MRS4: seems like we could make it stronger with ``likely do''?
-  likely due to coordination with sodium
+  0.2 - 0.4 nm from the pore center are likely due to coordination with sodium
   ions. (c) The amides hydrogen bond with water far less than acetic acid, 
   however they tend to coordinate with sodium ions more frequently. Acetone
   coordinates with sodium with same frequency as acetic acid.}\label{fig:ketones}
@@ -1457,7 +1463,7 @@
   \begin{subfigure}{0.45\linewidth}
   %BJC: should I plot ethylene glycol, glycerol and acetone MSDs here as well?
   \includegraphics[width=\textwidth]{msd_radius_sulfur_10wt.pdf}
-  \caption{}\label{fig:SOH_GCL_comparison}
+  \caption{}\label{fig:msd_radius_sulfur_10wt}
   \end{subfigure}
   \begin{subfigure}{0.45\linewidth}
   \includegraphics[width=\textwidth]{thiol_comparison_SOH.pdf}
@@ -1469,7 +1475,7 @@
   \end{subfigure}
   \begin{subfigure}{0.45\linewidth}
   \includegraphics[width=\textwidth]{thiol_comparison_DMS.pdf}
-  \caption{}\label{fig:DMP_GLY_comparison}
+  \caption{}\label{fig:DMS_ATO_comparison}
   \end{subfigure}
   \caption{(a) The RDF of mercaptoethanol is similar to ethylene glycol except 
   for its higher density in the tail region and consequently lower density in the
@@ -1479,7 +1485,8 @@
   pore region which may in part explain its marginally larger MSD.}\label{fig:sulfur_analog_rdfs}
   \end{figure}
   
-  Mercaptoethanol has a similar average MSD and RDF to ethylene glycol.
+  Mercaptoethanol has a similar average MSD and RDF to ethylene glycol
+  (see Figures~\ref{fig:all_msds_10wt} and~\ref{fig:SOH_GCL_comparison}).
   There is a much larger uncertainty associated with mercaptoethanol's
   MSD. The range of behaviors shown by mercaptoethanol help explain the
   large variance of its MSD. Much can be accounted for by the higher 
@@ -1508,7 +1515,8 @@
 %  center is 1.43 nm compared to 1.20 for ethylene glycol. % hop_location.py. Even larger difference if cut-off lower
   
   2,3-dimercapto-1-propanol exhibits slower transport than glycerol 
-  because more of it partitions into the tail region. 2,3-dimercapto-1-propanol
+  because more of it partitions into the tail region (see 
+  Figure~\ref{fig:DMP_GLY_comparison}). 2,3-dimercapto-1-propanol
   spends 27\% less time in the pore region than glycerol. 
   %BJC: again, not sure if this should be 27\% because DMP spends 49% of time in pore and GLY spends 76% of time in pore or if it should be (76 - 49) / 76 = 36 %
 %  The density of glycerol is always higher up to 0.7 nm from the pore center where the 
@@ -1523,8 +1531,8 @@
   2,3-dimercapto-1-propanol is less soluble than glycerol in the water-filled
   pores and more readily partitions into the tail region.
   
-  DMSO has a comparable MSD to acetone even though it is a larger molecule. 
-  DMSO spends 17\% more time in the pore than acetone. 
+  DMSO has a comparable MSD to acetone even though it is a larger molecule
+  (see Figure~\ref{fig:msds}). DMSO spends 17\% more time in the pore than acetone. 
 %  The density of DMSO is higher than acetone in the pore region, except for
 %  the peak exhibited by acetone near 0.2 nm, which is due to sodium ion association.
   On average, 35\% of DMSO molecules are coordinated to a sodium ion each
@@ -1534,7 +1542,7 @@
   in the pore region counterbalances the sodium ion interactions to give it
   a higher MSD than acetone. 
   
-  \subsection{Hydrogen Bond Acceptors}  % Need a better heading since all molecules in this study are acceptors
+  \subsection{Solutes Unable to Donate Hydrogen Bonds}  % Need a better heading since all molecules in this study are acceptors
 
   The slowest set of molecules we studied can accept hydrogen bonds, but
   cannot donate them. Among this set are the two slowest solutes in our study: 
@@ -1580,7 +1588,7 @@
   frequently as compounds that don't contain nitrogen 
   (see Figure~\ref{fig:ketone_hbonds}).
   Association between sodium and solutes in this set are also among the longest,
-  only beat by other solutes with carbonyl groups and ribose.
+  only beaten by other solutes with carbonyl groups and ribose.
  
   \begin{figure}[!htb]
   \centering
@@ -1623,9 +1631,9 @@
   
   We observed three mechanisms of solute entrapment.
   \begin{enumerate}
-    \item A solute can become stuck among monomer tails. 
-    \item A solute can donate hydrogen bonds to immobile monomers.
-    \item A solute can associate with a bound counterion.
+    \item Solutes can become entangled among monomer tails. 
+    \item Solutes can donate hydrogen bonds to immobile monomers.
+    \item Solutes can associate with counterions.
   \end{enumerate}
   
   The chemical functionality of solutes influences the degree to which
@@ -1634,11 +1642,10 @@
   Alcohols and sugars with multiple hydroxyl groups are very stable
   in the pore region, but frequent hydrogen bonds with monomer head 
   groups prevents them from diffusing quickly. This effect is reduced when
-  hydroxyl groups are replaced with thiols but the solutes become less
+  hydroxyl groups are replaced with thiol groups but the solutes become less
   stable in the pore. Finally, solutes with carbonyl groups, which includes
-  the ketones, amides and hydrogen bond acceptors, associate with
-  sodium ions, temporarily immobilizing them when the sodium ions are 
-  simulateneously partially bound to a monomer head group. 
+  the ketones, amides and solutes that can only accept hydrogen bonds, associate
+  with sodium ions, temporarily slowing or immobilizing them. 
   
   Based on these trapping mechanisms, we can suggest modifications that
   can be made to monomers in order to mitigate or enhance their effect on
@@ -1653,21 +1660,25 @@
   to trap less. Finally, one can attempt to control the degree to which solutes
   coordinate with counterions. Changing the size and valence of the counter 
   ion may offer some interesting behavior. 
+  
+  Combined with our previous structural work, it is relatively straightforward
+  to apply our approaches to the screening of solute interactions with new 
+  H\textsubscript{II} phase-forming monomers.
 
-  \section{Supporting Information}
+  \section*{Supporting Information}
 
   Detailed explanations and expansions upon the results and procedures mentioned in
   the main text are described in the Supporting Information. This information is
   available free of charge via the Internet at http://pubs.acs.org.
 
-  \section{Acknowledgements}
+  \section*{Acknowledgements}
 
   Molecular simulations were performed using the Extreme Science and
   Engineering Discovery Environment (XSEDE), which is supported by National
-  Science Foundation grant number ACI-1548562. Specifically, it used the Bridges
+  Science Foundation (NSF) grant number ACI-1548562. Specifically, it used the Bridges
   system, which is supported by NSF award number ACI-1445606, at the Pittsburgh
   Supercomputing Center (PSC). This work also utilized the RMACC Summit supercomputer,
-  which is supported by the National Science Foundation (awards ACI-1532235 and
+  which is supported by the NSF (awards ACI-1532235 and
   ACI-1532236), the University of Colorado Boulder, and Colorado State
   University. The Summit supercomputer is a joint effort of the University of
   Colorado Boulder and Colorado State University.
@@ -1684,6 +1695,6 @@
 
   \newpage
 
-  \section{TOC Graphic}
+  \section*{TOC Graphic}
 
 \end{document}

@@ -87,7 +87,7 @@ ax.set_xticklabels(labels, fontsize=14)
 plt.xticks(rotation=90)
 
 plt.gcf().get_axes()[0].tick_params(labelsize=14)
-plt.ylabel('95$^{th}$ Percentile Dwell Time (ns)', fontsize=14)
+plt.ylabel('95$^{th}$ Percentile Association lifetime (ns)', fontsize=14)
 plt.gca().set_ylim(bottom=0.5)
 plt.legend(fontsize=14)
 fig.tight_layout()

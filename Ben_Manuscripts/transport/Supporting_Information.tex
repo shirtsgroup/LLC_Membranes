@@ -22,7 +22,7 @@
 \renewcommand{\thepage}{S\arabic{page}}
 \renewcommand{\thetable}{S\arabic{table}}
 
-\title{Supporting Information: The Transport Mechanisms of Polar Solutes in a Cross-linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
+\title{Supporting Information: Chemically Selective Transport in a Cross-linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
 \author{Benjamin J. Coscia \and Michael R. Shirts} 
 
 \begin{document}
@@ -50,33 +50,37 @@
   \textbf{Script Name} & \textbf{Section} & ~~~~~~~~~~~~~~~~~~~~~\textbf{Description} \\
   \hline
 
-  \texttt{/setup/param.sh} & TBD & Parameterize liquid crystal monomers and 
-  solutes with GAFF \\ \hline
+  \texttt{/setup/param.sh} & 2.1 & Parameterize liquid 
+  crystal monomers and solutes with GAFF \\ \hline
 
-  \texttt{/setup/solvation\_equilibration.py} & TBD & Add water to the pores and tails
+  \texttt{/setup/solvation\_equilibration.py} & 2.2 & Add water to the pores and tails
   in order to achieve a specific total water content and ratio of water molecules in each
   region, then equilibrate the solvated system. \\ \hline
   
-  \texttt{/setup/input.py} & TBD & Create GROMACS topology and .mdp files \\ \hline
+  \texttt{/setup/input.py} & 2.2 & Create GROMACS topology and .mdp files \\ \hline
   
-  \texttt{/setup/xlink.py} & TBD & Iteratively cross-link a configuration \\ \hline
+  \texttt{/setup/xlink.py} & 2.2 & Iteratively cross-link a configuration \\ \hline
   
-  \texttt{/setup/place\_solutes\_pores.py} & TBD & Place a desired number of solutes
+  \texttt{/setup/place\_solutes\_pores.py} & 2.2 & Place a desired number of solutes
   in the pore center, equally space in the $z$-direction. \\ \hline
   
-  \texttt{/analysis/msd.py} & TBD & Calculate the mean squared displacement of residues \\ \hline
+  \texttt{/analysis/msd.py} & 2.3 & Calculate the mean squared displacement of residues \\ \hline
   
-  \texttt{/analysis/rdf.py} & TBD & Calculate the cylindrical radial distribution function of
+  \texttt{/analysis/radius.py} & 2.4 & Calculate the maximum end-to-end distance of a solute over a trajectory \\ \hline
+  
+  \texttt{/timeseries/forecast\_ctrw.py} & 2.6 & Construct dwell time and hop length distributions \\ \hline 
+  
+  \texttt{/analysis/rdf.py} & 2.7, 2.11 & Calculate the cylindrical radial distribution function of
   a solute or membrane component with respect to the pore centers. \\ \hline
   
-  \texttt{/analysis/hbonds.py} & TBD & Identify hydrogen bonds based on geometric criteria \\ \hline
+  \texttt{/analysis/hbonds.py} & 2.8 & Identify hydrogen bonds based on geometric criteria \\ \hline
   
-  \texttt{/timeseries/forecast\_ctrw.py} & TBD & Construct dwell time and hop length distributions \\ \hline 
-  
-  \texttt{/analysis/coordination\_number.py} & TBD & Calculate number of molecules or atoms within a
+  \texttt{/analysis/coordination\_number.py} & 2.9 & Calculate number of molecules or atoms within a
   cutoff distance of another type of molecule or atom. \\ \hline
   
-  \texttt{/analysis/ztrace.py} & TBD & Plot the center of mass $z$-coordinate of an atom or molecule
+  \texttt{/analysis/lifetime.py} & 2.10 & Calculate association lifetimes \\ \hline
+  
+  \texttt{/analysis/ztrace.py} & 3.2.2 & Plot the center of mass $z$-coordinate of an atom or molecule
   versus time which is colored according to its distance from the pore center. \\ \hline
 
   \end{tabular}
@@ -95,18 +99,18 @@
 
   We initially attempted to equilibrate our system with water by allowing water
   molecules to naturally penetrate the membrane from a water bath separating
-  periodic images of the system in the $z$-direction (See Figure~\ref{fig:gap}).
+  periodic images of the system in the $z$-direction (see Figure~\ref{fig:gap}).
   We allowed a dry, previously equilibrated system to further equilibrate in
   coexistence with a 3 nm-thick (in the $z$-direction) layer of water. Water
   readily enters the tail region where the density of monomers is low. About 3
   times more water molecules occupy the tail region after 1000 ns of
-  equilibration (See Figure~\ref{fig:equilibrated_water_penetration}). Although
+  equilibration (see Figure~\ref{fig:equilibrated_water_penetration}). Although
   the water level in the pore appears to plateau in this system, it is clear that
   equilibration of this system is kinetically limited since water does not fill
-  the pores uniformly. The density of water along the pore axis, averaged over
-  the last 50 nanoseconds of simulation, is close to zero at the membrane center.
-  Therefore, we required a different equilibration technique in order to overcome
-  the kinetic limitation.
+  the pores uniformly (see Figure~\ref{fig:penetration_density}). The density of
+  water along the pore axis, averaged over the last 50 nanoseconds of simulation,
+  is close to zero at the membrane center. Therefore, we required a different
+  equilibration technique in order to overcome the kinetic limitation.
 
   \begin{figure}[!htb]
   \centering
@@ -125,23 +129,23 @@
   \includegraphics[width=\linewidth]{penetration_density.pdf}
   \caption{}\label{fig:penetration_density}
   \end{subfigure}  
-  \caption{(a) Using an equilibrated dry configuration, we inserted a layer of water between
-           periodic copies of the system in the $z$-direction. (b) Water slowly enters 
-	   the membrane. Most water enters the tail region where the density of monomers is
-	   lowest. Water entering the pore plateaus after 500 ns. (c) Although the water
-	   content of the pore appears equilibrated in (b), the density of water throughout
-	   the pores is not uniform, with almost no water close to the pore center. Note that
-           the density is not shown below 3 nm or above 9.5 nm, because the the system
-	   enters the water layer at those points.
+  \caption{(a) Using an equilibrated dry configuration, we inserted a 3 nm thick layer 
+  of water between periodic copies of the system in the $z$-direction. (b) Water slowly
+  enters the membrane. Most water enters the tail region where the density of monomers
+  is lowest. Water entering the pore plateaus after 500 ns. (c) Although the water
+  content of the pore appears equilibrated in (b), the density of water throughout
+  the pores is not uniform, with almost no water close to the pore center. Note that
+  the density is not shown below 3 nm or above 9.5 nm, because the the system
+  enters the water layer at those points.
   }\label{fig:gap_solvation}
   \end{figure}
 
   We equilibrated 4 systems where we initially placed water in the pores and in
   the tails in addition to a water reservoir between periodic images. We filled
   the pores with water by running \texttt{gmx solvate} on our initial
-  configuration and removing any water molecules placed outside of the pore
-  region. The GROMACS command \texttt{gmx solvate} places water molecules in
-  proximity to other atoms based on their van der waals radii and therefore does
+  configuration and removing any water molecules placed in the tail region. The
+  GROMACS command \texttt{gmx solvate} places water molecules in proximity to
+  other atoms based on their van der waals radii and therefore does
   a decent job of preventing equilibration issues. This also means that the
   intial pore radius dictates the water content of the pore. We can however, put
   arbitrary amounts of water into the tail region. We chose to test systems with
@@ -161,8 +165,8 @@
   \hline
   \end{tabular}
   \caption{We chose a diverse combination of initial pore and tail water
-	  contents in order to study its effect on equilibrium water
-	  content.}\label{table:water_content}
+  contents in order to study its effect on equilibrium water
+  content.}\label{table:water_content}
   \end{table}
 
   Systems appear to be most stable when there is more water in the pores than
@@ -269,13 +273,15 @@
   by cross-linking}\label{fig:solvation_equilibration}
   \end{figure}  
   
+  \clearpage  
+  
   \section{Solute Interaction}\label{section:solute_interaction}
   
   We chose to model 6 solutes in each pore because there was a low degree of 
   interaction between solutes which gave us a sufficient number of independent 
   trajectories to observe and analyze. There are a negligible number of occurrences
   % BJC: not sure what the appropriate cut-off should be
-  where the center of a given solute came within 3.5 \AA of another same-solute
+  where the center of a given solute came within 3.5 \AA~of another same-solute
   center of mass.
   
   \begin{figure}[!htb]
@@ -312,7 +318,7 @@
 %  to the SE equation becomes a more accurate estimation of MSD at small radii, after
 %  the point of intersection }\label{fig:se_intersection_sensitivity}
 %  \end{figure}
-
+  \clearpage
   \section{Solute MSD Ranking Time Lag Sensitivity}\label{section:lag_sensitivity}
   
   We chose to report the MSD of our solutes after a 400 ns time lag. This choice does
@@ -348,13 +354,14 @@
   lead to large error bars on the MSDs, as expected. }\label{fig:lag_sensitivity}
   \end{figure}
   
+  \clearpage
   \section{Pore Region Definition}\label{section:pore-region}
   
   We performed a sensitivity analysis in order to determine the radial 
   cut-off that maximizes the difference in hop lengths in and out of 
   the pore region. We varied the location of the cut-off defining the
   edge of the pore region in increments of 0.05 from 0.3 to 0.7. We
-  varied the cut-off in increments of 0.1 from 0.7 to 0.8 in order to
+  varied the cut-off in increments of 0.01 from 0.7 to 0.8 in order to
   increase our resolution about the maximum (see Figure~\ref{fig:pore_cutoff}). 
   Defining the cut-off 0.75 nm from the pore center maximizes the 
   difference in hop lengths between solutes in and out of the pore.
@@ -366,10 +373,78 @@
   difference in hop lengths between solutes in and out of the pore. We 
   varied the location of the cut-off defining the edge of the pore region
   in increments of 0.05 from 0.3 to 0.7. We varied the cut-off in 
-  increments of 0.1 from 0.7 to 0.8 in order to increase our resolution
+  increments of 0.01 from 0.7 to 0.8 in order to increase our resolution
   about the maximum.}\label{fig:pore_cutoff}
   \end{figure}
+
+  \clearpage
+  \section{Hydrogen Bond Detection Sensitivity}\label{section:hbond_sensitivity}
   
+  In Section 2.8 of the main text, we established geometric criteria for the 
+  identification of hydrogen bond interactions. Namely, if the distance between the donor,
+  D, and acceptor, A, atoms is less than 3.5 \AA~and the angle formed by D--H...A is less
+  than 30\degree, then we consider the interaction to be a consequence of hydrogen bonding.
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{\textwidth}
+  \centering
+  \includegraphics[trim={0 0.5cm 0.5cm 0.5cm}, clip, width=0.5\textwidth]{hbond_sensitivity_legend.pdf}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+  \includegraphics[width=\textwidth]{hbond_sensitivity.pdf}
+  \end{subfigure}
+  \caption{We tested the sensitivity of our hydrogen bond detection to the chosen 
+  geometric criteria for hydrogen bonding. We varied the distance cut-off between 3.0 and
+  4.0 \AA, and varied the angle cut-off between 25 and 35 \degree.}\label{fig:hbond_sensitivity}
+  \end{figure}
+  
+  We tested the sensitivity of this criteria to ensure that our conclusions
+  were not a strong function of the chosen criteria. In Figure~\ref{fig:hbond_sensitivity} we
+  plotted the results of the same calculation performed to create Figure~\ref{M-fig:multi_hbonds}c
+  of the main text. We varied the distance cut-off between 3.0 and 4.0 \AA, and varied the
+  angle cut-off between 25 and 35 \degree. 
+  
+  As the distance and angle cut-offs are increased, there is a slight increase in the total
+  number of hydrogen bonds, which is primarily manifested by an increased number of multiple-hydrogen-bond
+  interactions. Using our most lenient set of criteria (d = 4.0 \AA~and $\theta$ = 35 $\degree$), glycerol,
+  tetrose and ribose all show instances where they simultaneously hydrogen bond with 4 head group atoms.
+  In the strictest case (d = 3.0 \AA~and $\theta$ = 25 \degree), ribose is the only solute with a 
+  detected instance of a quadruple hydrogen bond.
+  
+  We can draw the same conclusions from any of the plots in Figure~\ref{fig:hbond_sensitivity}:
+  \begin{enumerate}
+    \item An increased number of hydroxyl groups results in an increased number of hydrogen bond
+    interactions.
+    \item The number of multiple-hydrogen-bond interactions increases.
+    \item On average, propylene glcyol participates in more hydrogen bond interactions than 
+    ethylene glycol.  %BJC: might need to label the total hydrogen bonds (put number centered on top of bars)
+  \end{enumerate}
+  
+  \section{Lifetime Distributions}\label{section:lifetime_distributions}
+  
+  The distribution of hydrogen bond lifetimes and association lifetimes
+  for all solutes appears to be power law or exponentially distributed. 
+  Example distributions generated from ethylene glycol are shown in
+  Figure~\ref{fig:lifetime_distributions}. 
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\linewidth]{gcl_hbond_dist.png}
+  \caption{}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\linewidth]{gcl_coord_dist.png}
+  \caption{}
+  \end{subfigure}
+  \caption{The distribution of hydrogen bond lifetimes and association lifetimes of
+  ethylene glycol both appear to be power law or exponentially distributed. We
+  do not attempt to distinguish between the type of distribution and instead report
+  the 95\% confidence interval of association lifetimes.}\label{fig:lifetime_distributions}
+  \end{figure}  
+  
+  \clearpage
   \section{Pore Splines}\label{section:splines}
   
   We captured the apparent $z$-dependence of the pore center locations by
@@ -389,51 +464,11 @@
   
   We calculated the tortuosity, $\tau$, of the pores by calculating the 
   ratio $\dfrac{L}{Z}$ where $L$ is the length of the spline and $Z$ is 
-  the length of the unit cell in the $z$-direction.
-
-  \section{Hydrogen Bond Detection Sensitivity}\label{section:hbond_sensitivity}
+  the length of the unit cell in the $z$-direction. The average tortuosity
+  of each pore is 1.03 $\pm$ 0.01 and 1.07 $\pm$ 0.02 in the 5 and 10 wt\%
+  water systems respectively.
   
-  In Section~\ref{M-method:hbonds} of the main text, we established geometric criteria for the 
-  identification of hydrogen bond interactions. Namely, if the distance between the donor,
-  D, and acceptor, A, atoms is less than 3.5 \AA~and the angle formed by D--H...A is less
-  than 30\degree, then we consider the interaction to be a consequence of hydrogen bonding.
-  
-  We tested the sensitivity of this criteria to ensure that our conclusions
-  were not a strong function of the chosen criteria. In Figure~\ref{fig:hbond_sensitivity} we
-  plotted the results of the same calculation performed to create Figure~\ref{M-fig:multi_hbonds}
-  of the main text. We varied the distance cut-off between 3.0 and 4.0 \AA, and varied the
-  angle cut-off between 25 and 35 \degree. 
-  
-  As the distance and angle cut-offs are increased, there is a slight increase in the total
-  number of hydrogen bonds, which is primarily manifested by an increased number of multiple-hydrogen-bond
-  interactions. Using our most lenient set of criteria (d = 4.0 \AA~and $\theta$ = 35 $\degree$), glycerol,
-  tetrose and ribose all show instances where they simultaneously hydrogen bond with 4 head group atoms.
-  In the strictest case (d = 3.0 \AA~and $\theta$ = 25 \degree), ribose is the only solute with a 
-  detected instance of a quadruple hydrogen bond.
-  
-  We can draw the same conclusions from any of the plots in Figure~\ref{fig:hbond_sensitivity}. 
-  \begin{enumerate}
-    \item An increased number of hydroxyl groups results in an increased number of hydrogen bond
-    interactions.
-    \item The number of multiple-hydrogen-bond interactions increases.
-    \item On average, propylene glcyol participates in more hydrogen bond interactions than 
-    ethylene glycol.  %BJC: might need to label the total hydrogen bonds (put number centered on top of bars)
-  \end{enumerate}
-  
-  \begin{figure}[!htb]
-  \centering
-  \begin{subfigure}{\textwidth}
-  \centering
-  \includegraphics[trim={0 0.5cm 0.5cm 0.5cm}, clip, width=0.5\textwidth]{hbond_sensitivity_legend.pdf}
-  \end{subfigure}
-  \begin{subfigure}{\textwidth}
-  \includegraphics[width=\textwidth]{hbond_sensitivity.pdf}
-  \end{subfigure}
-  \caption{We tested the sensitivity of our hydrogen bond detection to the chosen 
-  geometric criteria for hydrogen bonding. We varied the distance cut-off between 3.0 and
-  4.0 \AA, and varied the angle cut-off between 25 and 35 \degree.}\label{fig:hbond_sensitivity}
-  \end{figure}
-  
+  \clearpage
   \section{Total Membrane Density}\label{section:total_density}
   
   In our simulations, we observe that water partitions into the tail region
@@ -472,46 +507,45 @@
   regions (b \& d).}\label{fig:total_density}
   \end{figure}
 
-  \section{Solute Pairing with Sodium}
-
-  \begin{figure}[!htb]
-  \centering
-  %MRS2: would be better if this was paired with ensemble data, instead of just one trajectory.
-  \includegraphics[width=0.45\textwidth]{na_met_trace.pdf}  % create with nn.py located in MET/10wt
-  \caption{The oxygen atom of methanol stays within 2.5 \AA~of the same sodium ion for
-  the majority of the trapping occurence between 400 and 600 ns. Regions
-  highlighted red or blue indicate times when methanol's oxygen atom is within 
-  2.5 \AA~of a sodium ion. The color of the shaded regions are switched every time
-  the oxygen atom becomes associated to a different sodium ion.}\label{fig:na_met_trace}
-  \end{figure}
-  
-  %BJC: could probably safely remove this figure
-  \section{Mercaptoethanol's range of behavior}
-  
-  \begin{figure}
-  \centering
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\linewidth]{SOH_trace.pdf}
-  \caption{}\label{fig:SOH_trace}
-  \end{subfigure}
-  \caption{Mercaptoethanol exhibits transport behavior ranging from frequent hopping
-  to lengthy trapping. Large hops generally occur near the pore center while 
-  long entrapments occur while tangled among the monomer tails.}
-  \end{figure}
-  
-  \section{THF-sodium Complexation}
-  
-  \begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{thf_sodium_coordination.pdf}
-  \caption{Coordination of THF with sodium ions may help stabilize it inside the
-  pore region. For the first 700 ns of the trajectories shown, the center of mass
-  of THF (top line in top figure) and a sodium ion (bottom line in top figure) move
-  in tandem. The distance between the oxygen atom of THF and the sodium ion has only
-  occasional fluctuations away from a relatively stable separation of ca. 0.25 nm. 
-  After 700 ns, THF separates from the sodium ion and moves closer to the head group
-  region.}\label{fig:thf_sodium_coordination}
-  \end{figure}
+%  \clearpage
+%  \section{Solute Pairing with Sodium}
+%
+%  \begin{figure}[!htb]
+%  \centering
+%  \includegraphics[width=0.45\textwidth]{na_met_trace.pdf}  % create with nn.py located in MET/10wt
+%  \caption{The oxygen atom of methanol stays within 2.5 \AA~of the same sodium ion for
+%  the majority of the trapping occurence between 400 and 600 ns. Regions
+%  highlighted red or blue indicate times when methanol's oxygen atom is within 
+%  2.5 \AA~of a sodium ion. The color of the shaded regions are switched every time
+%  the oxygen atom becomes associated to a different sodium ion.}\label{fig:na_met_trace}
+%  \end{figure}
+%  
+%  \section{Mercaptoethanol's range of behavior}
+%  
+%  \begin{figure}
+%  \centering
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\linewidth]{SOH_trace.pdf}
+%  \caption{}\label{fig:SOH_trace}
+%  \end{subfigure}
+%  \caption{Mercaptoethanol exhibits transport behavior ranging from frequent hopping
+%  to lengthy trapping. Large hops generally occur near the pore center while 
+%  long entrapments occur while tangled among the monomer tails.}
+%  \end{figure}
+%  
+%  \section{THF-sodium Complexation}
+%  
+%  \begin{figure}
+%  \centering
+%  \includegraphics[width=0.5\textwidth]{thf_sodium_coordination.pdf}
+%  \caption{Coordination of THF with sodium ions may help stabilize it inside the
+%  pore region. For the first 700 ns of the trajectories shown, the center of mass
+%  of THF (top line in top figure) and a sodium ion (bottom line in top figure) move
+%  in tandem. The distance between the oxygen atom of THF and the sodium ion has only
+%  occasional fluctuations away from a relatively stable separation of ca. 0.25 nm. 
+%  After 700 ns, THF separates from the sodium ion and moves closer to the head group
+%  region.}\label{fig:thf_sodium_coordination}
+%  \end{figure}
   %MRS2: Can we show something that describes a distribution of multiple THF? this is just one, 
   % which is suggestive, but this sort of suggestive information maybe should be in supporting. 
   %MRS2: did you trace down any information on THF-ion complexation? We should be able to report on whether
@@ -646,7 +680,7 @@
 %	   at large time lags due to decreased sampling.}\label{fig:eth_autocorrelation}
 %  \end{figure}
 
-  \clearpage
-  \bibliography{transport}
+%  \clearpage
+%  \bibliography{transport}
 
 \end{document}

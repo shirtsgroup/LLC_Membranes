@@ -16,15 +16,15 @@ wt = 10
 simple_alcohols = False 
 diols = False 
 ketones = False 
-sulfur = True
-nondonors = False 
+sulfur = False
+nondonors = True 
 if simple_alcohols:
 	restrict = ['MET', 'ETH', 'PR', 'BUT']
 	shiftx = {'MET':0.005, 'ETH':0.005, 'PR':0.005, 'BUT':0.005}
 	shifty = {'MET':0.03, 'ETH':0.03, 'PR':0.03, 'BUT':0.03}
 elif diols:
 	restrict = ['GCL', 'PG', 'GLY', 'TET', 'RIB']
-	shiftx = {'GCL':0.005, 'PG':0.005, 'GLY':0.005, 'TET':0.005, 'RIB':0.005}
+	shiftx = {'GCL':0.005, 'PG':0.005, 'GLY':-0.015, 'TET':0.005, 'RIB':0.005}
 	shifty = {'GCL':0.03, 'PG':0.03, 'GLY':0.03, 'TET':0.03, 'RIB':0.03}
 elif ketones:
 	restrict = ['ACH', 'URE', 'ACN', 'ATO']
