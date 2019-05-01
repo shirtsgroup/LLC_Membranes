@@ -7,8 +7,8 @@ import numpy as np
 
 # pickle files generated with : rdf.py -t PR_nojump.xtc -g berendsen.gro -r HII -a 'head groups' -r HII -a 'tails' -r NA -r HOH -spline
 
-wt = 5 
-dry = False 
+wt = 10 
+dry = True
 opacity = 0.2
 
 if dry:
