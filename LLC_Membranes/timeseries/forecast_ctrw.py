@@ -115,6 +115,17 @@ class System(object):
         self.com = physical.center_of_mass(self.pos, self.mass)  # center of mass of residues
         print('Done!')
 
+        # plot first order difference histogram
+        nbins = 100
+        plt.hist((self.com[1:, :, 2] - self.com[:-1, :, 2]).flatten(), bins=nbins, density=True)
+        plt.tick_params(labelsize=14)
+        plt.xlabel('$z$-direction hop length (nm)', fontsize=14)
+        plt.ylabel('Frequency', fontsize=14)
+        plt.tight_layout()
+        plt.show()
+        print(self.com.shape)
+        exit()
+
         if ma:
             self.calculate_moving_average(ma)
 
