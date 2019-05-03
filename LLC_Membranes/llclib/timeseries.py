@@ -4,6 +4,7 @@ import numpy as np
 from multiprocessing import Pool
 import tqdm
 import warnings
+import matplotlib.pyplot as plt
 
 
 def largest_prime_factor(n):
@@ -307,7 +308,7 @@ def correlograms(zt):
     :type zt: np.ndarray
     """
     # Initialize a 2x2 figure
-    fig, ax = plt.subplots(2, 2, figsize=(15, 10), sharex=True, sharey=True)
+    fig, ax = plt.subplots(2, 2, figsize=(9, 6), sharex=True, sharey=True)
 
     stop = 200  # index of point at which to stop (Diebold et al. stopped at 200)
 
@@ -321,3 +322,8 @@ def correlograms(zt):
     for i in range(4):
         ax[i // 2, i % 2].set_title(titles[i], fontsize=14)
         ax[i // 2, i % 2].tick_params(labelsize=14)
+
+    ax[1, 0].set_xlabel('Lag (time steps)', fontsize=14)
+    ax[1, 1].set_xlabel('Lag (time steps)', fontsize=14)
+    ax[0, 0].set_ylabel('Correlation', fontsize=14)
+    ax[1, 0].set_ylabel('Correlation', fontsize=14)

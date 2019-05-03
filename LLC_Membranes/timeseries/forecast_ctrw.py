@@ -125,14 +125,14 @@ class System(object):
         # exit()
 
         # plot first order difference histogram
-        # nbins = 100
-        # plt.hist((self.com[1:, :, 2] - self.com[:-1, :, 2]).flatten(), bins=nbins, density=True)
-        # plt.tick_params(labelsize=14)
-        # plt.xlabel('$z$-direction hop length (nm)', fontsize=14)
-        # plt.ylabel('Frequency', fontsize=14)
-        # plt.tight_layout()
-        # plt.show()
-        # exit()
+        nbins = 100
+        plt.hist((self.com[1:, :, 2] - self.com[:-1, :, 2]).flatten(), bins=nbins, density=True)
+        plt.tick_params(labelsize=14)
+        plt.xlabel('$z$-direction hop length (nm)', fontsize=14)
+        plt.ylabel('Frequency', fontsize=14)
+        plt.tight_layout()
+        plt.show()
+        exit()
 
         # plot first order differences
         #plt.plot((self.com[1:, 1, 2] - self.com[:-1, 1, 2]))
