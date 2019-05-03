@@ -70,3 +70,45 @@ def outliers(data, alpha=0.01):
             outlier = False
 
     return outliers
+
+
+class Cdf(object):  # taken from compare_disorder.py
+
+    def __init__(self, data):
+        """
+        Generate an emperical cumulative distribution function from data
+        :param data: x-values of data in no particular order
+        """
+
+        self.xs = np.array(sorted(data))
+        self.N = float(len(self.xs))
+        self.ys = np.arange(1, self.N + 1) / self.N
+
+    def cdf(self, x):
+        """
+        Callable cumulative emperical distribution function
+        :param x: array of x-values at which to evaluate cumulative emperical distribution function
+        :return:
+        """
+        if type(x) is np.float64:
+            x = np.array([x])
+
+        ndx = [np.argmin(np.abs(self.xs - x[i])) for i in range(x.size)]
+
+        return self.ys[ndx]
+
+    def random_sample(self, n=1):
+        """
+        :param n: number of random samples to draw (default=1)
+        :return: random samples
+        """
+
+        return np.random.choice(self.xs, size=n, replace=True)
+
+    def update_cdf(self, obs):
+        """ Add observation to the cdf (only works for single value right now)
+        """
+
+        self.xs = sorted(np.concatenate((self.xs, [obs])))
+        self.N = float(len(self.xs))
+        self.ys = np.arange(1, self.N + 1) / self.N

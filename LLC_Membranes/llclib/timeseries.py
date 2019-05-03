@@ -298,3 +298,26 @@ def step_autocorrelation(trajectories, axis=0):
         #acfs[t, :] = acf(trajectories[:ACF.size, t, axis])
 
     return acfs[keep, :]
+
+
+def correlograms(zt):
+    """ Plot correlograms of (z - zmean), (z - zmean)^2, (z - zmean)^3, (z - zmean)^4
+    :param zt: timeseries of probability integral transforms
+
+    :type zt: np.ndarray
+    """
+    # Initialize a 2x2 figure
+    fig, ax = plt.subplots(2, 2, figsize=(15, 10), sharex=True, sharey=True)
+
+    stop = 200  # index of point at which to stop (Diebold et al. stopped at 200)
+
+    ax[0, 0].plot(acf(zt - zt.mean())[:stop], linewidth=2)  # (z - meanz)
+    ax[0, 1].plot(acf((zt - zt.mean()) ** 2)[:stop], linewidth=2)  # (z - meanz)^2
+    ax[1, 0].plot(acf((zt - zt.mean()) ** 3)[:stop], linewidth=2)  # (z - meanz)^2
+    ax[1, 1].plot(acf((zt - zt.mean()) ** 4)[:stop], linewidth=2)  # (z - meanz)^2
+
+    titles = ['$(z - \overline{z})$', '$(z - \overline{z})^2$', '$(z - \overline{z})^3$', '$(z - \overline{z})^4$']
+
+    for i in range(4):
+        ax[i // 2, i % 2].set_title(titles[i], fontsize=14)
+        ax[i // 2, i % 2].tick_params(labelsize=14)

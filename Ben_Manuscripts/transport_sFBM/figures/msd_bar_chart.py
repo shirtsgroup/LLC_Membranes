@@ -92,8 +92,8 @@ opacity = 0.8
 index = np.arange(len(labels))
 
 if time_averaged:
-	rect2 = ax.bar(index , md_tamsd, bar_width, alpha=opacity, color='red', yerr=(md_tamsd_lower, md_tamsd_upper), label='MD Simulated time-averaged MSD')
-	rects1 = ax.bar(index + bar_width, python_tamsd, bar_width, alpha=opacity, color='blue', yerr=(python_tamsd_lower, python_tamsd_upper), label='sFBM simulated Time-averaged MSD')
+	rect2 = ax.bar(index , md_tamsd, bar_width, alpha=opacity, color='red', yerr=(md_tamsd_lower, md_tamsd_upper), label='MD Simulated MSD')
+	rects1 = ax.bar(index + bar_width, python_tamsd, bar_width, alpha=opacity, color='blue', yerr=(python_tamsd_lower, python_tamsd_upper), label='sFBM simulated MSD')
 else:
 	rect2 = ax.bar(index, md_msd, bar_width, alpha=opacity, color='red', yerr=(md_msd_lower, md_msd_upper), label='MD Simulated MSD')
 	rects1 = ax.bar(index + bar_width, python_msd, bar_width, alpha=opacity, color='blue', yerr=(python_msd_lower, python_msd_upper), label='sFBM Simulated MSD')

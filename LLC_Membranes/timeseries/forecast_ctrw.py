@@ -115,15 +115,46 @@ class System(object):
         self.com = physical.center_of_mass(self.pos, self.mass)  # center of mass of residues
         print('Done!')
 
+        # plot z-coordinate trace
+        # plt.plot(self.time, self.com[:, 1, 2], linewidth=2)
+        # plt.tick_params(labelsize=14)
+        # plt.xlabel('Time (ns)', fontsize=14)
+        # plt.ylabel('$z$-coordinate (nm)', fontsize=14)
+        # plt.tight_layout()
+        # plt.show()
+        # exit()
+
         # plot first order difference histogram
-        nbins = 100
-        plt.hist((self.com[1:, :, 2] - self.com[:-1, :, 2]).flatten(), bins=nbins, density=True)
-        plt.tick_params(labelsize=14)
-        plt.xlabel('$z$-direction hop length (nm)', fontsize=14)
-        plt.ylabel('Frequency', fontsize=14)
-        plt.tight_layout()
-        plt.show()
-        print(self.com.shape)
+        # nbins = 100
+        # plt.hist((self.com[1:, :, 2] - self.com[:-1, :, 2]).flatten(), bins=nbins, density=True)
+        # plt.tick_params(labelsize=14)
+        # plt.xlabel('$z$-direction hop length (nm)', fontsize=14)
+        # plt.ylabel('Frequency', fontsize=14)
+        # plt.tight_layout()
+        # plt.show()
+        # exit()
+
+        # plot first order differences
+        #plt.plot((self.com[1:, 1, 2] - self.com[:-1, 1, 2]))
+        # plt.plot(self.com[:, 1, 2], linewidth=2)
+        # plt.tick_params(labelsize=14)
+        # plt.xticks(np.linspace(0, 2000, 9), [int(i) for i in np.linspace(0, 1000, 9)])
+        # plt.xlabel('Time (ns)', fontsize=14)
+        # plt.ylabel('$z$-direction hop length (nm)', fontsize=14)
+        # plt.tight_layout()
+        # plt.show()
+        # exit()
+
+        # create timeseries by randomly drawing from unconditional pdf of hop lengths
+        p = (self.com[1:, :, 2] - self.com[:-1, :, 2]).flatten()
+        for i in range(10):
+            t = np.random.choice(p, size=2000)
+            plt.plot(np.linspace(0, 1000, len(t)), np.cumsum(t), linewidth=2)
+            plt.tick_params(labelsize=14)
+            plt.xlabel('Time (ns)', fontsize=14)
+            plt.ylabel('$z$-coordinate (nm)', fontsize=14)
+            plt.tight_layout()
+            plt.show()
         exit()
 
         if ma:
@@ -283,9 +314,15 @@ class System(object):
                     # movement_3d = np.linalg.norm(self.com[begin:end, j, :], axis=1)  # magnitude of distance travelled
                     bp = ruptures.detection.Binseg(model='l2', min_size=1, jump=1).fit_predict(self.com[begin:end, j, :]
                                                    , pen=self.breakpoint_penalty)
-                    # ruptures.display(self.com[begin:end, j, :], bp, figsize=(10, 6))
-                    # plt.show()
-                    # exit()
+                    # if j == 1:
+                    #     # bp = ruptures.detection.Binseg(model='l2', min_size=1, jump=1).fit_predict(self.com[begin:end, j, 2], pen=self.breakpoint_penalty)
+                    #     ruptures.display(self.com[begin:end, j, 2], bp)
+                    #     plt.xlabel('Time (ns)', fontsize=14)
+                    #     plt.ylabel('$z$-position (nm)', fontsize=14)
+                    #     plt.xticks(np.linspace(0, 2000, 9), [int(i) for i in np.linspace(0, 1000, 9)])
+                    #     plt.tight_layout()
+                    #     plt.show()
+                    #     exit()
 
                     if locations:
 
@@ -718,7 +755,7 @@ if __name__ == "__main__":
             sys.update_database()
 
         file_rw.save_object(sys, 'forecast_%s.pl' % args.residue)
-    exit()
+
     # sys.estimate_hurst()
     # plt.hist(sys.hurst_distribution, bins=25)
     # plt.show()
