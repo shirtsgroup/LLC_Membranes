@@ -61,6 +61,8 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   %MRS: if particular applications wouldn't be directly enabled by the research, at least draw to the connection
   %MRS: i.e. talk about the general tools of computation to understand nanostructured membranes, even if the current
   %MRS: membranes under development aren't suitable for the particular separations described.
+  %BJC: Something like: The computational techniques developed here are suitable not just for LLC Membranes, but for any nanostructured 
+  % membrane material.
   \begin{itemize}
     \item For example, sodium chloride and boron in seawater 
     \cite{fritzmann_state---art_2007} and organic micropollutants found in
@@ -263,12 +265,10 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
     \item Using a sufficiently accurate molecular model, we can directly 
     observe transport of solutes within LLC membrane nanopores and infer
     mechanisms. 
-    \item Based on this information 
-%MRS: maybe ``will have a much greater capability''.  'can' is strong. 
-we can intelligently design new membranes
-    by screening new liquid crystal monomer designs.
-    \item Our most promising designs can be tested experimentally.
-%MRS: above: more likely, the principles learned can be implemented experimentally - that's much easier than full design.
+    \item Based on this information we will have a much greater capability
+    intelligently design new membranes by screening new liquid crystal 
+    monomer designs.
+    \item The principles learned can be implemented and tested experimentally.
   \end{itemize}
   
   \noindent There are four primary objectives of this PhD research.
@@ -279,43 +279,51 @@ we can intelligently design new membranes
 
     %MRS: probably should talk about this 1) with proper tense (some of these things have been done) and 2) talk about what YOU are doing, not we. I helped design the research, but you carried essentially all of it out! If phrased in future tense, committee will be confused, thinking those are things still to be done.  
 
-    Useful molecular-level modeling should incorporate a detailed picture 
+    A useful molecular-level model should incorporate a detailed picture 
     of the nanoscopic pore structure, which is crucial to understanding
     the role of monomer structure in solute transport and membrane design.
-    We will generate simulated X-ray diffraction (XRD) patterns from MD trajectories
-    and compare them to an experimental 2D wide angle X-ray scattering (WAXS)
-    spectrum of a Col\textsubscript{h} phase membrane. We will assess the extent
-    to which we can apply our understanding to the H\textsubscript{II} phase,
-    as well as systems built with alternate monomers.
+    I have created a maximally consistent structural model by comparing 
+    simulated X-ray diffraction (XRD) patterns, generated from MD trajectories,
+    to an experimental 2D wide angle X-ray scattering (WAXS) spectrum of a 
+    Col\textsubscript{h} phase LLC membrane. I have used this model as an 
+    example in order to understand the ease with which we can apply our approach
+    to alternate monomers. 
+    
+%    shown that we achieve a
+%    similar pore composition regardless of initial configuration which is 
+%    influenced by a number of variables. This implies that our model can
+%    
+%        We will assess the extent to which
+%    we can apply our understanding to the H\textsubscript{II} phase, as well
+%    as systems built with alternate monomers.
     
     \item Determine dominant solute-membrane interactions that give rise to
     transport mechanisms.
     
-    We will observe transport of a relatively large set of small polar solutes
-    placed within the H\textsubscript{II} membrane nanopores. We will observe
-    the time series of each solute's position as well as directly measure the
-    physical interactions, such as hydrogen bonding and ion coordination, 
+    I observed the transport of a relatively large set of small polar solutes
+    placed within the H\textsubscript{II} phase membrane nanopores. I analyzed
+    the time series of each solute's position in addition to directly measuring
+    the physical interactions, such as hydrogen bonding and ion coordination, 
     between solutes and LLC monomers.
     
     \item Create a stochastic model which can project long timescale 
     transport behavior.
     
-    We will combine our general knowledge of the solute transport mechanisms
+    I will combine my qualitative knowledge of the solute transport mechanisms
     with simulation data in order to inform a stochastic model. This model
-    should closely reproduce the time series that we observe in our simulations.
-    Due to the low computational cost of a stochastic model relative to 
-    MD simulations, we will be able to project long timescale transport behavior
-    and make well-converged predictions of macroscopic transport properties.
+    should closely reproduce the properties of the time series that we observe 
+    in our simulations. Due to the low computational cost of a stochastic model
+    relative to MD simulations, I will be able to forecast long timescale transport
+    behavior and make well-converged predictions of macroscopic transport properties.
            
     \item Adapt the same analysis to the Q\textsubscript{I} phase.
     
     Over the course of this project, experimental research surrounding
     LLC membranes has shifted nearly all focus towards the Q\textsubscript{I}
-    phase due to its more facile synthesis.	Although most of our work has 
-    been applied to the H\textsubscript{II} phase, we expect that much of 
-    the same analyses can be applied to the Q\textsubscript{I} phase. The 
-    biggest challenge will be adapting our techniques to its more complex
-    geometry.
+    phase due to its more facile synthesis.	Although most of my work has 
+    been applied to the H\textsubscript{II} phase, much of the same analyses
+    can be applied to the Q\textsubscript{I} phase. The biggest challenge will
+    be adapting my techniques to its more complex three dimensional geometry.
     
 %    \item Enable easy continuation of our work with a dedicated and 
 %    well-documented python package.
