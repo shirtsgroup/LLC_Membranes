@@ -53,8 +53,14 @@
   find that the transport of a species is dependent not only on 
   molecular size, but on chemical functionality as well. The 
   membrane's inhomogeneous composition gives rise to radially dependent
-  transport mechanisms with respect to the pore centers. In general, we 
-  observed that all solutes perform intermittent hops between lengthy
+  transport mechanisms with respect to the pore centers. 
+  %MRS3: remove qualifier?
+  %In general, 
+  We 
+  %MRS3: tense
+  %observed 
+  observe
+  that all solutes perform intermittent hops between lengthy
   periods of entrapment. Three different trapping mechanisms are 
   responsible for this behavior. First, solutes that drift
   out of the pore can become entangled among the dense monomer
@@ -82,13 +88,16 @@
   injection and can be sold for profit.~\cite{dischinger_application_2017} 
 
   All of these separations are possible in part with current commercial
-  membrane separation techniques but suffer from serious drawbacks. Currently,
+  membrane separation techniques, but
+  %MRS3: tweaking
+  all still
+  suffer from serious drawbacks. Currently,
   reverse osmosis (RO) and nanofiltration (NF) dominate commercial membrane
   separations of small molecules.~\cite{warsinger_review_2018} RO membranes are
   typically dense polymer matrices that separate solutes based on differences in
   their solubility and permeability in the membrane
   material.~\cite{fritzmann_state---art_2007} Although they can perform highly
-  selective separations, high feed pressures, and thus large amounts of energy,
+  selective separations, high feed pressures and thus large amounts of energy
   are necessary in order to generate a useful permeate
   flux.~\cite{van_der_bruggen_review_2003} NF membranes have well-defined
   nm-sized pores which can give the same permeate flux as RO with lower applied
@@ -145,18 +154,17 @@
   selectivity based on differences in solute sizes~\cite{zhou_supported_2005}. 
   However, size exclusion does not appear to be sufficient to fully describe LLC
   membranes. Dischinger et al. studied a similar membrane and found that they do
-  not separate purely on the basis of size. Empirical modeling revealed correlations
+  not separate purely on the basis of size.~\cite{dischinger_effect_2017} Empirical modeling revealed correlations
   between various solute physicochemical properties and observed solute rejection. 
   Although there was some agreement with their empirical model, it does not
-  offer a sufficiently detailed explanation of governing molecular interactions.
-  ~\cite{dischinger_effect_2017}
+  offer a sufficiently detailed explanation of governing molecular interactions.~\cite{dischinger_effect_2017}
  
 %  The separation performance of these membranes has been 
 %  primarily characterized with size-exclusion experiments which emphasizes 
 %  selectivity based on the ability to enter a given pore.~\cite{zhou_supported_2005}
 %  %MRS4: might confuse readers here - talking about both size exclusion as a method to characterize the membranes, and 
 %  %separation BY size exclusion; maybe rephrase?
-%  %BJC4: Hmm, by characerization, I mean testing their ability to separate, so I'm 
+%  %BJC4: Hmm, by characterization, I mean testing their ability to separate, so I'm 
 %  While size-exclusion is a useful separation, it 
 %  cannot reliably purify a solution where the solute size is on the same order as water. Therefore, it is
 %  important to take advantage of material properties other than pore size. 
@@ -166,7 +174,7 @@
 %  the authors identified some correlation between select physicochemical properties
 %  and solute transport trends, their empirical model does not offer a sufficient 
 %  explanation of the molecular interactions responsible for those correlations~\cite{dischinger_effect_2017}
-  %MRS4: expand the above.  What was discovered, and why was it unfortuate to the thesis?  
+  %MRS4: expand the above.  What was discovered, and why was it unfortunate to the thesis?  
   % I though it actually helped the thesis here since there was something happening that WASN'T just size dependence?
 
   Molecular dynamics (MD) simulations can give us mechanistic insights with 
@@ -188,13 +196,18 @@
   \includegraphics[width=\textwidth]{top_view.pdf}
   \caption{}
   \end{subfigure}
+  %MRS3: include a bit more description in the caption of what the system: This is the figure that provides the orientation to the readers of what they will be thinking about for the rest of the paper.
   \caption{In both figures, water molecules that occupy the pores are colored blue,
   the hydrophilic head groups of the LLC monomers are colored orange with all else
-  colored gray. We expect that transport will be primarily determined by solute
-  behavior within the pores. (a) Membrane pores are approximately straight and (b)
+  colored gray. 
+  %MRS3: probably this point below can be better addressed in the text; looks a little out of place here.
+  We expect that transport will be primarily determined by solute
+  behavior within the pores. 
+  (a) Membrane pores are approximately straight and (b)
   are packed hexagonally.}\label{fig:membrane_rendering}
   \end{figure}
 
+  %MRS3: maybe say ``we present studies of''? ``This work'' is the paper, so using past tense is weird.
   In this work, we have studied the transport mechanisms exhibited by 20 
   uncharged polar solutes with varying size, chemical functionality and hydrophilic 
   character. Figure~\ref{fig:membrane_rendering} shows an atomistic rendering of
@@ -332,8 +345,8 @@
 
   %MRS2: generally, use present tense for what is being done in the paper, not future tense; 
   %the paper is completely written, later sections are not being written in the future. 
-  %MRS2: descriptions of experiements can be in the past.   
- 
+  %MRS2: descriptions of experiments can be in the past.   
+  %MRS2: look over this section at the end of the intro again for clarity - some paragraphs are too short (ideas introduced and brushed past quickly) sometimes without strong theses.
   We first address the structure of the pores formed in the membrane.
   Previously, we have studied dry membrane systems and some systems with 
   low water content. We therefore first analyze how the radial density of monomer 
@@ -345,7 +358,10 @@
   previous work showed that there is a gradual compositional transition from
   the hydrophilic to the hydrophobic region which means that solutes may not
   necessarily stay confined to the centers of the pores or even within the 
-  pore region. We use this information in order to justify our restriction
+  pore region. 
+  %MRS2: ``this information'' is ambiguous. Which information? Also, I'm not sure the paragraph above is enough to 
+  %demonstrate why we can/should neglect the tails.
+  We use this information in order to justify our restriction
   of solute transport studies to just the pore region.
   
 %  We then study the gradient in composition of solutes and 
@@ -353,34 +369,52 @@
 
   In the remainder of the paper, we present our observations 
   and explanations of the observed transport mechanisms exhibited by water
-  and solutes. Given that the pores will restrict motion of the solutes, we
+  and solutes. 
+  %MRS2: The thesis of this paragraph could be stronger. expand ``pores will restrict motion of the solutes'' a little using the physical details about the pores; paint the picture that will be filled in with detail   
+Given that the pores will restrict motion of the solutes, we
   anticipate that transport will be hindered in some way. 
 
+  %MRS2: be consistent on tense.  What is presented in the paper is present tense.  We already studied it, we are presenting it.  
   We investigate the differences in solute motion, specifically its mean 
   squared displacement (MSD), based on a solute's size and chemical
   functionality. We will study the interactions between solutes, the membrane,
   and water in order to determine which mechanism or mechanisms dominate.
   
-  There are also a couple of questions that are beyond the scope of this study.
+  There are also 
+  %a couple of questions that are beyond
+  several questions beyond
+  the scope of this study.
   First, we will not study the concentration dependence of the observed transport
   rates. Although the average MSD might change with concentration, we are 
   focused on the underlying solute-membrane interactions that lead to the 
   observed transport mechanisms which we conjecture will remain roughly
   the same regardless of concentration. Second, we will not study the chemical potential
   of solutes in the pores, which could give us a better understanding of 
-  equilibrium solute partitioning. However, this information is not needed
-  to understand the mechanistic details in various membrane regions; 
-  this work represents a starting point for observing the types of interactions
+  equilibrium solute partitioning. However, this information is 
+  %MRS3: added - there might be mechanisms that only happen with multiple solutes in contact
+  likely
+  not needed
+  to understand the 
+  %MRS3: added
+  principal
+  mechanistic details in various membrane regions. 
+  %MRS3: broke sentence
+  This work 
+  %MRS3: added for flow
+  instead
+  represents a starting point for observing the types of interactions
   that occur between isolated solutes and the membrane.
 
   \section{Methods}
   
   Python scripts used to set up systems and conduct post-simulation trajectory 
-  analysis are available online at \texttt{https://github.com/shirtsgroup/LLC\_Membranes}. 
-  %BJC: also link to readthedocs? I have the link in the repo
+  analysis 
+  %MRS2: added to make sure it's clear the basic description is not JUST in the scripts.
+  (as described below and in the supporting information) are available online at \texttt{https://github.com/shirtsgroup/LLC\_Membranes}. 
+  %BJC: also link to readthedocs? I have the link in the repo 
+  %MRS2: either is fine. 
   The appropriate scripts to use for the subsequent calculations are summarized in 
   Table~\ref{S-table:python_scripts} of the Supporting Information.
-  
   We ran all molecular dynamics simulations and energy minimizations using GROMACS 2018.3 \cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008} 
   
   \subsection{Solute Parameterization}\label{method:parameterization}
@@ -409,12 +443,16 @@
   center based on the minimum in the radial distribution of water
   (see Section~\ref{method:rdfs}). The amount of water present in the distal tail region
   may or may not be experimentally consistent but it is necessary for our results to be 
-  thermodynamically consistent. We iteratively adjusted the pore radius in our systems
+  thermodynamically consistent;
+  %MRS3: providing some context
+  otherwise, water would slowly leak from the pore into the tail region over several hundred nanoseconds.
+We iteratively adjusted the pore radius in our systems
   until the appropriate amount of water fit in the pores after running the GROMACS command
   \texttt{gmx solvate}. We placed water molecules in the distal tail region one at a time
   in random locations with a short energy minimization between each insertion. When 
   studying transport of water in the pores, we limited the calculations to water molecules
   that spent greater than 95\% of their time outside of the distal tail region.
+  %MRS2: seems like here is where we need to provide the justification for this decision, since the decision is described here (or, explain how we will justify it later)
 
   We equilibrated an initial solvated configuration before adding solutes. First, we 
   equilibrated the initial configuration using the `wet' equilibration procedure 
@@ -422,16 +460,17 @@
   configuration using the cross-linking procedure also described in our previous 
   work.~\cite{coscia_understanding_2019}
 
-  To study a given solute, we added 6, equally spaced in $z$, solute molecules to the
+  To study a given solute, we added 6 solute molecules, equally spaced in $z$, to the
   center of each pore of the equilibrated cross-linked configuration, for a total of 24
-  solutes. Our choice of 6 solutes per pore provides a balance of a useful amount of 
+  solute molecules. We chose 6 solutes per pore to provide a balance of a useful amount of 
   data for generating statistics and a low degree of interaction between solutes (see 
   Section~\ref{S-section:solute_interaction} of the Supporting Information). At each
   insertion point we placed a randomly oriented solute molecule then ran a short 
   energy minimization. We allowed the solutes to equilibrate for 5 ns using Berendsen
   pressure control then collected transport data over the course of 1 $\mu$s MD simulations
   with pressure controlled by the Parrinello-Rahman barostat.
-  
+
+  %MRS2: could potentially make these sections bulleted list, rather than full subsections.
   \subsection{Mean Squared Displacement}\label{method:MSD}
 
   We measured the time-averaged $z$-direction (parallel to the pores) mean squared
@@ -487,7 +526,10 @@
   ns time lag. Our results are shown to be insensitive to our choice of time lag in 
   Section~\ref{S-section:lag_sensitivity} of the Supporting Information.
   
-  The $z$-direction MSD of water in the 10 wt\% system \textit{is} linear. Therefore, for
+  The $z$-direction MSD of water in the 10 wt\% system \textit{is} linear
+  %MRS2: added
+  to within statistical precision.
+  Therefore, for
   the purpose of comparison, we calculated its diffusion constant by fitting a line
   to the linear region of the MSD curve.~\cite{maginn_best_2018}. The diffusion constant
   is then equal to $m/2$ where $m$ is the slope of the linear fit. The slope is divided
@@ -623,6 +665,7 @@
 %  where $\lambda$ is the average frequency of hops and n is the total
 %  observation time accumulated for all solutes.
   
+  %MRS2: Be more explicit than 'instructive'' - ``Where it help to demonstrate X'' or something like that?
   Where instructive, we differentiated between the length of hops inside
   and outside of the pores. For 10 wt\% water systems, we consider a solute
   to be in the pore if it is within 0.75 nm of a pore center. This radial
@@ -733,13 +776,16 @@
   We generated 1$\sigma$ confidence intervals by bootstrapping the 
   RDFs of each individual solute 200 times. For each solute, we obtained
   an RDF averaged over the entire simulation trajectory. We randomly 
-  chose solute RDFs with replacement and averaged them for each bootstrap
-  trial. This approach assumes that solute positions are uncorrelated to
+  %MRS2: tweaked for clarity
+  chose individual solute RDFs with replacement from the set of 24 and averaged 
+  each set for each bootstrap
+  trial in order to generate a distribution from which to calculate uncertainties. 
+  This approach assumes that solute positions are uncorrelated to
   other solutes which we believe is valid due to the low degree of 
   interaction between solutes described in Section~\ref{method:system_setup}.
   
   Although the pores are often described as straight, they have a
-  small degree of tortuosity which disrupts the RDF calcuation. We 
+  small degree of tortuosity which disrupts the RDF calculation. We 
   tried to mitigate the effects of tortuosity by calculating the RDF
   with respect to splines that run through the pore centers. See
   Section~\ref{S-section:splines} of the Supporting Information for 
@@ -765,8 +811,8 @@
 
 %  of each individual
 %  head group. For each head group, we obtained an RDF averaged over the
-%  entire simulation trajactory. We randomly chose head group RDFs with replacement
-%  and averaged them for each bootsrap trial. This approach assumes that
+%  entire simulation trajectory. We randomly chose head group RDFs with replacement
+%  and averaged them for each bootstrap trial. This approach assumes that
 %  head group positions are uncorrelated.
    
   \section{Results and Discussion}
@@ -786,7 +832,10 @@
   somewhat uniform in the pore center of the 5 wt\% water system while it shows
   a maximum closer to the head groups in the 10 wt\% water system. The peak 
   density of sodium ions is not at the pore center in the 10 wt\% water system
-  likely because they are still loosely associated with the monomer's carboxylate
+  likely because they are 
+  %MRS2: not that loose
+  %still loosely 
+  associated with the monomer's carboxylate
   head groups.
   
   Pores in the 10 wt\% water system are wider and less crowded by monomers than
@@ -820,7 +869,7 @@
   picture of the pore topology where the pore centers of hydrated systems are primarily,
   but not exclusively, composed of water and sodium ions. The monomer groups labeled in each plot correspond to 
   the color-coded monomer pictured in the upper right corner of the figure. 
-  All RDFs represent the number of atoms located at a given distance from the
+  RDFs show the average number of atoms located at a given distance from the
   pore center normalized by the volume of the annular bin to which they belong.
   The vertical dashed black lines are positioned so that they intersect with 
   the maximum head group density.
@@ -833,6 +882,9 @@
   %MRS4: dotted horizontal line not defined.
   \end{figure}
   
+  %MRS2: probably would be better to consolidate the information about water in the tails in one place.  Could be here?
+  %MRS2: fundamentally, needs to be explicit justification of the choice to look at transport in the pores alone.
+
   There is an appreciable amount of water that partitions into the distal tail % BJC: defined in methods
   region of both systems. 28\% and 31\% of the total water is present in the
   distal tail regions of the 5 and 10 wt\% water systems respectively. See 
@@ -845,10 +897,11 @@
 
   \subsection{Mechanisms Governing Small Solute Transport}\label{section:mechanism_overview} 
 
+  %MRS2: changed tense to present on the paper itself, past on studies leading to the paper.
   We observed transport of sodium, water and 20 other small polar solutes
-  inside the membrane nanopores. First, we will comment on transport of the
+  inside the membrane nanopores. First, we comment on transport of the
   membrane constituents, water and sodium, in a system absent of any additional
-  solutes. Then we will present the general trends that we observe among the
+  solutes. We then present the general trends that we observe among the
   all other solutes studied.
   
   \subsubsection{Water and Sodium Ions}\label{section:transport_water_sodium} 
@@ -881,16 +934,16 @@
   linear MSD. (b) The MSD of sodium in the 10 wt\% water system is about 
   49 times higher than sodium in the 5 wt\% water system.}\label{fig:msd_comparison}
   \end{figure}
-  
-  Sodium coordinates with far less water molecules than it does in bulk solution.
-  Compared to 3.4 coordinated water molecules in bulk solution (see 
-  Section~\ref{method:coordination}), sodium ions in our system, on average,
-  coordinate with about 1.7 water molecules in the 10 wt\% system and 1.2 water
-  molecules in the 5 wt\% system. However, the sodium ions are not undercoordinated
-  since they frequently pair with negatively charged carboxylate head groups.
-  On average, sodium ions coordinate with 1 carboxylate group in the 10 wt\% water
+
+  %MRS2: rephrasing
+  Sodium coordinates with both water and carboxylate moieties from the head groups in the pores.
+  Sodium coordinates with 3.4 water molecules in bulk solution (see 
+  Section~\ref{method:coordination}), but on average in the pores,
+  coordinates with 1.7 water molecules in the 10 wt\% system and 1.2 water
+  molecules in the 5 wt\% system. The sodium ions additionally coordinate with 1 carboxylate group in the 10 wt\% water
   system and 0.8 carboxylate groups in the 5 wt\% water system. This behavior likely
-  slows their motion considerably.
+  slows the motion of the sodium ions considerably compared to bulk water.
+  %MRS2: is one sodium per carboxylate group correct?
   % Assuming only one sodium per carboxylate group, the numbers were multiplied by 2
   % since the averages were divided by 800 instead of 400
 
@@ -921,11 +974,12 @@
   compared to 44 \% in the 10 wt\% water system. There is a negligible amount of
   hydrogen bonds between water molecules and monomer head groups. 
   
+  %MRS2: some tweaking
   Because the MSD of water in the pores of the 10 wt\% system is significantly
-  higher than that in the tails, we've restricted our studies of transport to 
-  solutes close to the pore center. Transport of solutes in the pores will be the 
-  limiting factor that determines permeability and rejection. Although we showed
-  the opposite in the 5 wt\% water system, water transport is significantly slower
+  higher than that in the tails, we restrict our studies of transport in this paper to 
+  solutes in or near the pore center. Transport of solutes in the pores will be the 
+  limiting factor that determines permeability and rejection. Although tail transport of water in the 
+  the 5 wt\% water system is faster than pore transport, water transport overall is significantly slower
   than in the 10 wt\% system. For practical applications, a membrane with water 
   transport properties comparable to the 10 wt\% system is far more feasible than
   the 5 wt\% system.
@@ -937,7 +991,7 @@
 %  of water molecules dominates.  
 %  %MRS4: math seems a little inconsistent.  Does the tail water move the same rate in 5 and 10%? Seems like it should.
 %  %MRS4: but above would tend to indicate that it moves 51/8 = 6.4 times faster in the tails in 10%? 
-%  %MRS4: think about reading over/describiing the tail water here
+%  %MRS4: think about reading over/describing the tail water here
 %  %MRS4: would probably be useful to the reader to specify that we are neglecting transport in the tails here.
 %
 %  Hydrogen bonds to charged things. Dipole-point charge stronger than dipole-dipole
@@ -956,8 +1010,11 @@
   design principles. We will begin our analysis by considering the collective
   trends observed across all systems and then focus on subsets of molecules
   with structural similarities.
-  
-  Like water and sodium above, the MSDs of the solutes studied in this work are 
+
+  %MRS2: tweak
+  %Like water and sodium above, 
+  As with water and sodium,
+  the MSDs of the solutes studied in this work are 
   significantly larger in the 10 wt\% system than those in the 5 wt\% water 
   system (see Figures~\ref{fig:all_msds_5wt} and~\ref{fig:all_msds_10wt}). The fastest moving solute in both cases, 
   methanol, has an MSD about 175 times larger in the 10 versus the 5 wt\%
@@ -1008,7 +1065,7 @@
   There are clear periods of entrapment separated by relatively large hops.
   The MSD calculated based on all ethanol molecules is plotted in 
   Figure~\ref{fig:example_msd} and its shape is sublinear. The long periods
-  of entrapment lead, in part, to this sublinear, and thus subdiffusive, behavior.
+  of entrapment lead in part to this sublinear, and thus subdiffusive, behavior.
   
   \begin{figure}[!htb]
   \centering
@@ -1082,7 +1139,7 @@
   and 3\% of ethanol molecules accept hydrogen bonds each frame. On average, 40\%
   of hydrogen bonds donated by ethanol go to carboxylate % BJC1: 6.33 hbonds between EtOH and COOH per frame, 3.84 b/w EtOH and ether oxygen, 5.56 between EtOH and HOH (where Ethanol donates)
   head groups, 25\% go to the ether linkages connecting the monomers tails to the 
-  head groups and the remaining 35\% to water. There are about 46\% less  % 800 carboxylate oxygens total versus 2158 * 0.69 total water molcules in pores 
+  head groups and the remaining 35\% to water. There are about 46\% less  % 800 carboxylate oxygens total versus 2158 * 0.69 total water molecules in pores 
   carboxylate oxygen atoms in the pore than there are water molecules yet more
   hydrogen bonds are donated to them. The stability of hydrogen bonds with 
   carboxylate oxygen atoms is high because they have a negative charge
@@ -1366,9 +1423,13 @@
   ethylene glycol. Propylene glycol can form more highly stabilized hydrogen 
   bonds with carboxylate groups, explaining the slightly higher incidence of 
   hydrogen bonds shown in Figure~\ref{fig:multi_hbonds}. The 95\textsuperscript{th}
-  percentile of hydrogen bond lifetimes for propylene glycol with monomers is 9.51 ns
+  percentile of hydrogen bond lifetimes for propylene glycol with monomers is 
+  %MRS2: too much precision
+  %9.51
+  9.5 ns
   compared to 7 ns for ethylene glycol. 
-  %BJC: not sure of following point is worthwhile  
+  %BJC: not sure of following point is worthwhile 
+  %MRS2: seems OK.
   Somewhat counterintuitively, there is a 
   relatively high density of ethylene glycol molecules beyond the head group region
   probably due to its relatively small size. This likely contributes to the somewhat
@@ -1523,7 +1584,7 @@
 %  population of 2,3-dimercapto-1-propanol then becomes more dense into the tail region.
   Glycerol participates in about 2.5 times as many hydrogen
   bonds as 2,3-dimercapto-1-propanol (including all possible hydrogen bonding groups).  % BJC: might be confusing. Maybe refer to figure 6 instead.
-  % BJC: sums are (donate to monomer + recieve from water + donate to water).
+  % BJC: sums are (donate to monomer + receive from water + donate to water).
   % BJC: (31.91 + 17.224 + 3.231) / (13.1 + 7.737 + 0.8965) ~= 2.45.
   % (2.788 + 2.0975 + 0)/ (13.1 + 7.737 + 0.8965) = 0.22
   Only 22\% of the hydrogen bond interactions of 2,3-dimercapto-1-propanol
@@ -1563,7 +1624,9 @@
   However, this is not a hard rule. When a solute does overcome the 
   barrier of entry beyond the pore region, it can become trapped. All
   solutes in this set show at least a small peak in the pore region which
-  is likely caused by solutes that get trapped in the tail region for 
+  is 
+  %MRS2: can you be more definitive than ``likely caused''?
+likely caused by solutes that get trapped in the tail region for 
   significant periods of time.
     
 %  The solutes in this set do not make frequent hops while in the pore region. 
@@ -1605,6 +1668,8 @@
   \includegraphics[width=\textwidth]{nondonor_hbonds.pdf}
   \caption{}\label{fig:nondonors_hbonds}
   \end{subfigure}
+  %MRS2: should an explicit note of the change of scale from 5% to 10% graph; easiest is in the caption.  Could also note it by some
+  %MRS2: some sort of graphical indication on the graph itself.  But definitely need to draw attention to it. 
   \caption{(a) The MSDs of solutes that can only receive hydrogen bonds are
   significantly lower than expected. (b) The solutes' radial density
   is surprisingly high in the pore region, but is balanced by an appreciable
@@ -1649,9 +1714,17 @@
   the ketones, amides and solutes that can only accept hydrogen bonds, associate
   with sodium ions, temporarily slowing or immobilizing them. 
   
-  Based on these trapping mechanisms, we can suggest modifications that
-  can be made to monomers in order to mitigate or enhance their effect on
-  solute MSDs. Since solutes move slowly while entangled among the monomer
+  Based on these trapping mechanisms, we 
+  %MRS2:
+  %can suggest 
+  may be able to suggest
+  modifications that
+  can be made to monomers in order to 
+  %MRS2: trying something else to emphasize what we are trying to do.  Can you add a bit more detail so it's not just slowing up or speeding solutes, but slowing or speeding up solutes of a particular type?  We can emphasize chemical selectivity . . . 
+  %mitigate or enhance their effect on   solute MSDs. 
+  modulate the effect on specific solute MSDs in order to make transport even more 
+  selective for particular solutes.
+  Since solutes move slowly while entangled among the monomer
   tails, one can try to design monomers that better control the partition
   of solutes between the pore and tail region. For example, removal of the 
   ether linkages between the head groups and the monomer tails will decrease
@@ -1664,14 +1737,23 @@
   ion may offer some interesting behavior. These hypotheses remain to be 
   tested in future simulations of new monomers.
   
-  The optimal design of new LLC membranes for a given separation is not obvious.
-  Experimental progress up to this point in time is the culmination of an iterative 
-  educated guess-and-check framework. An array of solute-membrane interactions
-  ensuing from the chemically complex and inhomogeneous LLC membrane structure
-  as well as the complexity of the solutes themselves, have hindered the 
-  establishment of firm design criteria. Our atomistic modeling approach gives
-  us the opportunity to approximate these interactions at the molecular scale
-  so that we can observe them and think more critically about LLC membrane design. 
+  %MRS2: tweaking
+  %The optimal design of new LLC membranes for a given separation is not obvious.
+  The findings here are likely too complex to point towards a clear design for optimal LLC membranes for a 
+  particular separation.   
+  %Experimental progress up to this point in time is the culmination of an iterative 
+  %educated guess-and-check framework. 
+  This work does demonstrate that a large range of solute-membrane interactions
+  resulting from the chemically complex and inhomogeneous LLC membrane structure
+  and the varying chemical functionality of the solutes themselves 
+  %as well as the complexity of the solutes themselves, have hindered the 
+  %establishment of firm design criteria. 
+  gives rise to an immense diversity of transport behavior. This behavior suggests 
+  that a large range of chemical selectivities that may be 
+  possible in self-assembled nanoporous membranes. 
+  Atomistic modeling gives
+  us the opportunity to observe these interactions at the molecular scale, at least approximately,
+  in order to think more critically about nanostructured membrane design. 
 %  We can use insights gained from our model to hypothesize and screen new monomers
 %  in order to rapidly increase LLC membrane development.
 
@@ -1681,7 +1763,7 @@
   the main text are described in the Supporting Information. This information is
   available free of charge via the Internet at http://pubs.acs.org.
 
-  \section*{Acknowledgements}
+  \section*{Acknowledgments}
 
   Molecular simulations were performed using the Extreme Science and
   Engineering Discovery Environment (XSEDE), which is supported by National
@@ -1713,3 +1795,26 @@
   \end{figure}
 
 \end{document}
+
+% LocalWords:  lyotropic LLC solutes solute permeability micropollutants RO NF
+% LocalWords:  groundwaters flowback nanofiltration bruggen Nanostructured feng
+% LocalWords:  nanostructured mesophases Donnan Zhou al Dischinger BJC Hmm Na
+% LocalWords:  selectivities physicochemical nanopores GA pKa's protonated pKa
+% LocalWords:  gallic perrin pka NaGA MeOH URE EtOH acetamide AcN propanol PrOH
+% LocalWords:  butanol BtOH mercaptoethanol EG sulfoxide DMSO PG dimercapto DMP
+% LocalWords:  GLY tetrahydrofuran THF tetrose dimethylformamide DMF AcOH diols
+% LocalWords:  triols MSD solute's readthedocs repo GROMACS gromacs der hess wt
+% LocalWords:  Antechamber bccsym molcharge QUACPAC zhou Resel equil ca gmx COM
+% LocalWords:  solvate solvated Parrinello barostat subdiffusive superdiffusive
+% LocalWords:  subdiffusion CTRW MSDs ageing microfriction Gierer einstein Chan
+% LocalWords:  MSD's comps li Rg appoximation polson bT fr CI Luzar Chandler py
+% LocalWords:  hbonds VMD Roux genion disassociated Clauset martiniano Voloshin
+% LocalWords:  timescales binned RDFs RDF tortuosity carboxylate pdf sodium's
+% LocalWords:  mobilities timescale diffusivity msd tailvpore methanol's tamsds
+% LocalWords:  msds sublinear ztraces COMs alkane COOH HOH hbond immobilization
+% LocalWords:  counterions sulfinyl substituents electronegative COH coord na
+% LocalWords:  Carvajal Wu Shinoda carboxy ATPase rdf counterintuitively Amides
+% LocalWords:  unhindered propanol's butanol's hydrophilicity glycol's Ketones
+% LocalWords:  hybridization amides electronegativity NH ketones Thiols SOH ACI
+% LocalWords:  dimercaptoethanol dimethylsulfoxide rdfs mercaptoethanol's thiol
+% LocalWords:  formamide nondonors nanoporous XSEDE PSC RMACC
