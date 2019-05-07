@@ -42,7 +42,7 @@ query += " ORDER BY MD_MSD DESC"
 
 output = crsr.execute(query).fetchall()
 
-labels = np.array([names.res_to_name[i[0]] for i in output], dtype=object)
+labels = np.array([i[0] for i in output], dtype=object)
 python_msd = np.array([i[1] for i in output])
 python_msd_lower = -np.array([i[2] for i in output]) + python_msd
 python_msd_upper = np.array([i[3] for i in output]) - python_msd
@@ -84,16 +84,19 @@ else:
 	md_msd_upper = md_msd_upper[ordered_md]
 
 labels = labels[ordered_md]
+
 # end temporary block
 
-fig, ax = plt.subplots(figsize=(12, 7))
+fig, ax = plt.subplots()#figsize=(12, 7))
 bar_width = 0.4
 opacity = 0.8
 index = np.arange(len(labels))
+print((python_tamsd / md_tamsd)[1:].mean())
+exit()
 
 if time_averaged:
-	rect2 = ax.bar(index , md_tamsd, bar_width, alpha=opacity, color='red', yerr=(md_tamsd_lower, md_tamsd_upper), label='MD Simulated MSD')
-	rects1 = ax.bar(index + bar_width, python_tamsd, bar_width, alpha=opacity, color='blue', yerr=(python_tamsd_lower, python_tamsd_upper), label='sFBM simulated MSD')
+	rect2 = ax.bar(index , md_tamsd, bar_width, alpha=opacity, yerr=(md_tamsd_lower, md_tamsd_upper), label='MD Simulated MSD')
+	rects1 = ax.bar(index + bar_width, python_tamsd, bar_width, alpha=opacity, yerr=(python_tamsd_lower, python_tamsd_upper), label='sFBM simulated MSD')
 else:
 	rect2 = ax.bar(index, md_msd, bar_width, alpha=opacity, color='red', yerr=(md_msd_lower, md_msd_upper), label='MD Simulated MSD')
 	rects1 = ax.bar(index + bar_width, python_msd, bar_width, alpha=opacity, color='blue', yerr=(python_msd_lower, python_msd_upper), label='sFBM Simulated MSD')
@@ -102,15 +105,18 @@ else:
 #ax2.bar(index + bar_width, sigma, bar_width, alpha=opacity, color='green', label='Hurst Parameter')
 #ax2.set_ylabel('Hurst parameter', fontsize=14)
 #ax2.tick_params(labelsize=14)
-
+colors = [names.color_dict[i] for i in labels]
 #ax.set_xlabel('Molecule')
 ax.set_ylabel('MSD ($nm^2$)', fontsize=14)
 ax.tick_params(labelsize=14)
 ax.set_xticks(index + bar_width/2)
 ax.set_xticklabels(labels, fontsize=14)
+[x.set_color(colors[i]) for i, x in enumerate(plt.gca().get_xticklabels())]
+labels = [names.abbreviation[i] for i in labels]
+ax.set_xticklabels(labels, fontsize=14)
 ax.legend(fontsize=14)
 plt.xticks(rotation=90)
 fig.tight_layout()
-#plt.savefig(savename)
+plt.savefig(savename)
 plt.show()
 
