@@ -910,15 +910,16 @@
   49 times higher than sodium in the 5 wt\% water system.}\label{fig:msd_comparison}
   \end{figure}
 
-  %MRS2: rephrasing
-  Sodium coordinates with both water and carboxylate moieties from the head groups in the pores.
-  Sodium coordinates with 3.4 water molecules in bulk solution (see 
-  Section~\ref{method:coordination}), but on average in the pores,
+  Sodium coordinates with both water and carboxylate moieties from the head
+  groups in the pores. Sodium coordinates with 3.4 water molecules in bulk 
+  solution (see Section~\ref{method:coordination}), but on average in the pores,
   coordinates with 1.7 water molecules in the 10 wt\% system and 1.2 water
-  molecules in the 5 wt\% system. The sodium ions additionally coordinate with 1 carboxylate group in the 10 wt\% water
-  system and 0.8 carboxylate groups in the 5 wt\% water system. This behavior likely
-  slows the motion of the sodium ions considerably compared to bulk water.
+  molecules in the 5 wt\% system. The sodium ions additionally coordinate with
+  1 carboxylate group in the 10 wt\% water system and 0.8 carboxylate groups 
+  in the 5 wt\% water system. This behavior likely slows the motion of the 
+  sodium ions considerably compared to bulk water.
   %MRS2: is one sodium per carboxylate group correct?
+  %BJC3: yes, if sodium within cutoff of both oxygens, it is only counted once.
   % Assuming only one sodium per carboxylate group, the numbers were multiplied by 2
   % since the averages were divided by 800 instead of 400
 
@@ -928,7 +929,7 @@
   constructed the MSD curves based on water molecules that spent $>$ 95\% of their
   time outside the distal tail region. If we instead restrict our calculation to
   water molecules that spend $>$ 95\% of their time \textit{in} the distal tail region, 
-  the MSD of distal tail water decreases 8-fold from 59.6 to 8.2 nm$^2$. 
+  the MSD of water is about 8 times lower, decreasing from 59.6 to 8.2 nm$^2$. 
   
   % Changing pore radius does not change conclusion here.
   In the 5 wt\% water system, water molecules that spend the majority of their 
@@ -1679,32 +1680,55 @@
 
   %MRS2: trying something else to emphasize what we are trying to do.  Can you add a bit more detail so it's not just slowing up or speeding solutes, but slowing or speeding up solutes of a particular type?  We can emphasize chemical selectivity . . . 
   %mitigate or enhance their effect on   solute MSDs.   
-  %BJC3: gave it a try
+  %BJC3: gave it a try. Broke into paragraphs
   Based on these trapping mechanisms, we may be able to suggest modifications
   that can be made to monomers that will modulate their effect on specific 
   solute MSDs in order to make transport even more selective for particular 
-  solutes. Since solutes move slowly while entangled among the monomer tails, 
-  one can try to design monomers that better control the partition of solutes
-  between the pore and tail region. For example, removal of the ether linkages between the
-  head groups and the monomer tails will decrease the stability of polar 
-  molecules near the head groups. Solutes that spend a large fraction of their 
-  time in the tails, such as butanol with its high hydrophilic character, could
-  exhibit higher permeabilities from these types of changes. Alternatively, one
-  can focus on designing head groups with varying hydrogen bonding capabilities.
-  One can increase the number of hydrogen bonding sites on the head groups in 
-  order to trap solutes like sugars that have many hydroxyl groups, or decrease
-  the number of hydrogen bond sites to trap less. Finally, one can attempt to control 
-  the degree to which solutes coordinate with counterions. Changing the size
-  and valence of the counterion may offer some interesting behavior. Higher
-  valence counter ions will bind more strongly to solutes which may be a useful
-  way to trap solutes like urea with carbonyl groups. These hypotheses remain to be 
-  tested in future simulations of new monomers.
+  solutes. 
+  
+  Since solutes move slowly while entangled among the monomer tails,
+  and since more than half of the solutes studied spend at least 40\% of their
+  time in the tails, one can try to design monomers that better control the 
+  partition of solutes between the pore and tail region. Solutes move into 
+  the tails due both to their size and hydrophilic character. One may be 
+  able to contain solutes, even small ones like methanol, by increasing
+  the density of monomers close to the head groups through incorporation of 
+  cross-linkable groups in the vicinity. Alternatively, removal of the ether
+  linkages between the head groups and the monomer tails may decrease the 
+  stability of any of the molecules we studied near the head groups and 
+  force them to spend more time within the pore. 
+  
+  %Solutes that spend a large fraction of their 
+  %time in the tails, such as butanol with its high hydrophilic character, could
+  %exhibit higher permeabilities from these types of changes. 
+  
+  One can instead focus on designing head groups with varying hydrogen bonding
+  capabilities. Increasing the number of hydrogen bonding sites on the head 
+  groups may enhance the membrane's ability to trap solutes like sugars that 
+  have many hydroxyl groups. Conversely, one can decrease the number of hydrogen
+  bond sites, or replace them with weaker hydrogen bonding atoms like nitrogen, to
+  trap less. In contrast to the system studied here, one can design the head 
+  groups so they can donate hydrogen bonds, which can enhance entrapment of 
+  solutes like acetone that can only accept hydrogen bonds.
+  
+  Finally, one can attempt to control the degree to which solutes coordinate
+  with counterions. Increasing the valence of the counterions may cause them
+  to bind more strongly to solutes which may be a useful way to trap 
+  carbonyl-containing solutes like urea for longer periods of time. Of course,
+  an increased valence would require proportionately less total counter ions
+  to balance the system charge which could result in the opposite effect. One
+  could also design the head groups so that counterions are negatively charged
+  which may eliminate their interaction with most solutes.
+ 
+%  
+%  These hypotheses remain to be tested in future simulations of new
+%  monomers.
   
   The findings here are likely too complex to point towards a clear design of an 
   optimal LLC membrane for a particular separation. This work does demonstrate
-  that a large range of solute-membrane interactions resulting from the chemically
-  complex and inhomogeneous LLC membrane structure and the varying chemical 
-  functionality of the solutes themselves gives rise to an immense diversity of
+  that there is a large range of solute-membrane interactions resulting from the
+  chemically complex and inhomogeneous LLC membrane structure. The varying 
+  chemical functionality of the solutes themselves gives rise to an immense diversity of
   transport behavior. This behavior suggests that a large range of chemical 
   selectivities may be possible in self-assembled nanoporous membranes. Atomistic
   modeling gives us the opportunity to observe these interactions at the molecular
