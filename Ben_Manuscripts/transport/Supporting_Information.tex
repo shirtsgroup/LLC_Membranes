@@ -145,9 +145,9 @@
   the pores with water by running \texttt{gmx solvate} on our initial
   configuration and removing any water molecules placed in the tail region. The
   GROMACS command \texttt{gmx solvate} places water molecules in proximity to
-  other atoms based on their van der waals radii and therefore does
+  other atoms based on their van der Waals radii and therefore does
   a decent job of preventing equilibration issues. This also means that the
-  intial pore radius dictates the water content of the pore. We can however, put
+  initial pore radius dictates the water content of the pore. We can however, put
   arbitrary amounts of water into the tail region. We chose to test systems with
   initial pore radii of 5, 6, 7 and 8 \AA~with tail and pore water compositions
   given in Table~\ref{table:water_content}.
@@ -289,7 +289,7 @@
   \includegraphics[width=0.45\textwidth]{solute_interaction.pdf}
   \caption{Interactions between same-solutes are negligible when systems are 
   built with 6 solutes per pore. Even methanol, which interacts with other same-solute
-  molcules the most, does so less than 0.05 \% of the time.}\label{fig:solute_interation}
+  molecules the most, does so less than 0.05 \% of the time.}\label{fig:solute_interaction}
   \end{figure}
   
 %  \subsection{Sensitivity of Breakdown radius of Stokes-Einstein Equation}\label{section:se_sensitivity}
@@ -514,7 +514,7 @@
 %  \centering
 %  \includegraphics[width=0.45\textwidth]{na_met_trace.pdf}  % create with nn.py located in MET/10wt
 %  \caption{The oxygen atom of methanol stays within 2.5 \AA~of the same sodium ion for
-%  the majority of the trapping occurence between 400 and 600 ns. Regions
+%  the majority of the trapping occurrence between 400 and 600 ns. Regions
 %  highlighted red or blue indicate times when methanol's oxygen atom is within 
 %  2.5 \AA~of a sodium ion. The color of the shaded regions are switched every time
 %  the oxygen atom becomes associated to a different sodium ion.}\label{fig:na_met_trace}
@@ -570,7 +570,7 @@
 %	\langle x^2(t) \rangle \sim t ^ \alpha
 %	\label{eqn:msd}
 %  \end{equation}
-%  For brownian motion, $\alpha = 1$ and the MSD is linear. When $\alpha \neq
+%  For Brownian motion, $\alpha = 1$ and the MSD is linear. When $\alpha \neq
 %  1$, the particle of interest exhibits anomalous diffusion. Values of $\alpha$
 %  greater than 1 give rise to superdiffusion, while values of $\alpha$ less than
 %  1 give rise to subdiffusion.
@@ -610,7 +610,7 @@
 %  diffusion mechanisms. In an ergodic system, the time-averaged behavior of an
 %  observable should yield the same result as the ensemble average of the same
 %  observable. Examples of anomalous diffusion processes that are ergodic include
-%  random walks on fractals (RWF) and fractional brownian motion (FBM).
+%  random walks on fractals (RWF) and fractional Brownian motion (FBM).
 %  Non-ergodic systems generally give rise to CTRWs with the possibility of
 %  combination with a RWF and/or FBM.\cite{meroz_toolbox_2015} 
 %
@@ -660,7 +660,7 @@
 %% a particularly hoppy trajectory after longer simulation.
 %
 %
-%  Based on the previous two sections, our model can likey be studied as a CTRW. 
+%  Based on the previous two sections, our model can likely be studied as a CTRW. 
 %  However, it is still possible that our CTRW model might also be convoluted with
 %  an FBM or a RWF process. In a pure CTRW, the steps are uncorrelated. 
 %  Both FBM and RWF exhibit anti-correlated steps. 
@@ -684,3 +684,11 @@
 %  \bibliography{transport}
 
 \end{document}
+
+% LocalWords:  LLC solutes py solvated GROMACS mdp solute ctrw GitHub equil xtc
+% LocalWords:  kinetically gro gmx solvate der Waals wt PR savename pl pr trr
+% LocalWords:  plateaued xlinked BJC MSDs Gierer Wirtz MSD SE tamsds hbond dist
+% LocalWords:  tetrose ribose glcyol png tortuosity nn methanol's THF ca Meroz
+% LocalWords:  Mercaptoethanol's Mercaptoethanol Complexation complexation msd
+% LocalWords:  Sokolov superdiffusion subdiffusion nojump ETH nboot RWF FBM npt
+% LocalWords:  subdiffusive CTRWs traj fracshow nanopore RW hoppy ACF brownian
