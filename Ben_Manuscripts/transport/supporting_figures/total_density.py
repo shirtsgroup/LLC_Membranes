@@ -6,8 +6,8 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 import tqdm
 
-wt = 5 
-water = True
+wt = 10 
+water = True 
 path = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/pure_water/%swt" % wt
 
 t = md.load('%s/PR_box.xtc' % path, top='%s/berendsen.gro' % path)
@@ -39,7 +39,13 @@ cmap = 'viridis'
 im = ax.imshow(hist.T, extent=[xmin, xmax, ymin, ymax], interpolation='gaussian', cmap=cmap, vmin=0, vmax=hist[np.nonzero(hist)].max())
 divider = make_axes_locatable(ax)
 cax = divider.append_axes("right", size="5%", pad=0.05)
-plt.colorbar(im, cax=cax)
+cbar = plt.colorbar(im, cax=cax)
+
+if water:
+	cbar.set_label('Density ($H_2O / nm^2$)', fontsize=14)
+else:
+	cbar.set_label('Density ($Atoms / nm^2$)', fontsize=14)
+
 ax.set_xlabel('$x$-location (nm)', fontsize=14)
 ax.set_ylabel('$y$-location (nm)', fontsize=14)
 ax.tick_params(labelsize=14)

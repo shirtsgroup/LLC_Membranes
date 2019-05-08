@@ -132,48 +132,40 @@
   %BJC4: generalized to amphiphilic self-assembled structures.
   Under the right conditions, amphiphilic molecules can self-assemble into
   ordered nanostructures that may be capable of performing highly selective
-  separations with permeabilities comparable to NF.
-  \begin{itemize}
-    \item The uniform-sized aqueous pores characteristic of these types of
-    systems enforce a molecular-size cut-off, eliminating issues related to the
-    polydisperity of NF pores.
-    \item In addition to size-exclusion, it may be possible to control the
-    chemical environment within the nanopores by altering the identities of the
-    hydrophilic moeties that form the pores, affording solute-specific separations.
-  \end{itemize}
+  separations with permeabilities comparable to NF.~\cite{alexandridis_amphiphilic_2000}
+  The uniform-sized aqueous pores characteristic of these types of systems 
+  enforce a molecular-size cut-off, eliminating issues related to the 
+  polydisperity of NF pores.~\cite{zhou_supported_2005} In addition to size-exclusion,
+  it may be possible to control the chemical environment within the nanopores by
+  altering the identities of the hydrophilic moieties that form the pores, 
+  affording solute-specific separations.~\cite{dischinger_effect_2017}
 
   %BJC4: bring it back to LLCs but don't make it seem like HII is the best
   Amphiphilic lyotropic liquid crystals (LLCs) are known to form the type I 
   bicontinuous (Q\textsubscript{I}) and inverted hexagonal (H\textsubscript{II})
-  phases.
-  \begin{itemize}
-	\item When cross-linked, these materials can function as mechanically
-	strong separations membranes.
-	\item The H\textsubscript{II} phase has hexagonally packed, straight
-	pores which is the ideal geometry for high throughtput separations.
-	\item However, the synthesis of H\textsubscript{II} membranes with 
-	highly aligned hexagonal mesophases has been a challenge that has 
-	prevented the material's viability as a separations membrane.
-	\item The Q\textsubscript{I} consists of a three dimensional network
-	of tortuous and interconnected pores. 
-	\item It's more facile synthesis has yielded it more success
-	\item The latest Q\textsubscript{I} phase membranes have been shown
-	to exhibit selectivities and permeabilities higher than commercial
-	RO and NF membranes.
-  \end{itemize}
+  phases.~\cite{smith_ordered_1997,dischinger_application_2017,carter_glycerol-based_2012,hatakeyama_nanoporous_2010} 
+  When cross-linked, these materials can function as mechanically
+  strong separations membranes.~\cite{zhou_supported_2005} The H\textsubscript{II}
+  phase has hexagonally packed, straight pores which is the ideal geometry 
+  for high throughtput separations. However, the synthesis of H\textsubscript{II}
+  membranes with highly aligned hexagonal mesophases has been a challenge that
+  has been met with limited success and has prevented the material's viability 
+  as a separations membrane.~\cite{feng_scalable_2014,feng_thin_2016} The Q\textsubscript{I} 
+  consists of a three dimensional network of tortuous and interconnected pores. 
+  It's more facile synthesis has yielded it more success. The latest 
+  Q\textsubscript{I} phase membranes have been shown to exhibit selectivities
+  higher than commercial NF and RO membranes permeabilities higher than commercial
+  RO membranes.~\cite{dischinger_application_2017}
 
   % Highlight that QI has the best chance.
   Although Q\textsubscript{I} membranes have shown promising results, it
   is not clear how to controllably design them for specific separations
-  beyond what has already been achieved.
-  \begin{itemize}
-    \item Dischinger et al. found that they do not separate purely on the basis
-    of size.~\cite{dischinger_effect_2017} 
-    \item Empirical modeling revealed correlations between various solute
-    physicochemical properties and observed solute rejection. 
-    \item Although there was some agreement with their empirical model, it does not
-    offer a sufficiently detailed explanation of governing molecular interactions.~\cite{dischinger_effect_2017}
-  \end{itemize}
+  beyond what has already been achieved. Dischinger et al. found that they
+  do not separate purely on the basis of size. Empirical modeling revealed
+  correlations between various solute physicochemical properties and 
+  observed solute rejection. Although there was some agreement with their
+  empirical model, it does not offer a sufficiently detailed explanation
+  of governing molecular interactions.~\cite{dischinger_effect_2017}
 
 %  Zhou et al. demonstrated complete rejection
 %  of solutes larger than 1.2 nm in size for H\textsubscript{II} LLC coated
@@ -227,7 +219,7 @@
   solute transport within LLC membrane nanopores and intelligently design new
   membranes for solute-specific separations. In our previous work, we used MD
   simulations to determine the most likely structure of the hexagonal phase
-   formed by the monomer Na-GA3C11, expanding upon the most recent experimental
+  formed by the monomer Na-GA3C11, expanding upon the most recent experimental
   characterization.~\cite{coscia_understanding_2018,feng_thin_2016} We developed
   techniques to simulate the hexagonal phase formed by neat monomer as well as
   with varying amounts of water in the pores.
@@ -922,10 +914,36 @@
   distal tail regions of the 5 and 10 wt\% water systems respectively. See 
   Section~\ref{S-section:water_content_equil} of the Supporting Information 
   for more details on the equilibrations that led to this conclusion. The partition
-  is due to a combination of the distal tail region's lower density as well
-  as oxygen atoms at the ends of each monomer tail which can further stabilize
-  water molecules. See Figure~\ref{S-fig:total_density} of the Supporting 
-  Information for a graphical illustration of this point.
+  is due to a combination of the distal tail region's lower density (see 
+  Figure~\ref{fig:total_density})as well as oxygen atoms at the ends of each
+  monomer tail which can further stabilize water molecules. 
+  
+  %See Figure~\ref{S-fig:total_density} of the Supporting 
+  %Information for a graphical illustration of this point.
+  
+  \begin{figure}[!htb]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{total_density_5wt.pdf}
+  \caption{5 wt \% water, spatial density of all atoms}\label{fig:total_density_5wt}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{total_water_density_5wt.pdf}
+  \caption{5 wt \% water, spatial density of water}\label{fig:total_water_density_5wt}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{total_density_10wt.pdf}
+  \caption{10 wt \% water, spatial density of all atoms}\label{fig:total_density_10wt}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \vspace{-0.5cm}
+  \includegraphics[width=\textwidth]{total_water_density_10wt.pdf}
+  \caption{10 wt \% water, spatial density of water}\label{fig:total_water_density_10wt}
+  \end{subfigure}
+  \caption{Looking down at the $xy$ plane of the LLC membranes, the lowest density regions
+  of both membranes are in the pore center and in the tail region, furthest from the pore
+  center (a \& c). Water is densest in the low density regions (b \& d).}\label{fig:total_density}
+  \end{figure}
   
   We will restrict our studies of transport to solutes and water outside of the 
   distal tail region because transport is fastest in the pores. We provide more 
@@ -1761,9 +1779,7 @@
   Based on these trapping mechanisms, we may be able to suggest modifications
   that can be made to monomers that will modulate their effect on specific 
   solute MSDs in order to make transport even more selective for particular 
-  solutes. 
-  %MRS3: I'd actually suggest connecting these; since above is a thesis statement for the next bit. 
-  Since solutes move slowly while entangled among the monomer tails,
+  solutes. Since solutes move slowly while entangled among the monomer tails,
   and since more than half of the solutes studied spend at least 40\% of their
   time in the tails, one can try to design monomers that better control the 
   partition of solutes between the pore and tail region. Solutes move into 
