@@ -44,10 +44,13 @@
   
   \begin{abstract}
 
-  The uniform size and complex chemical topology of the pores that 
-  constitute cross-linked inverted hexagonal (H\textsubscript{II})
-  phase lyotropic liquid crystal (LLC) membranes make them promising
-  candidates for selective separation membranes. 
+  The uniform size and complex chemical topology of the pores formed by
+  self-assembled amphiphilic molecules such as liquid crystals make them
+  promising candidates for selective separations.
+  %that 
+  %constitute cross-linked inverted hexagonal (H\textsubscript{II})
+  %phase lyotropic liquid crystal (LLC) membranes make them promising
+  %candidates for selective separation membranes. 
   %MRS3: I do worry that the above makes it look like we are not acknowledging
   %the formulation problems.  Maybe something like: ''models of how chemically
   %selective separation membranes could can function''?  So the focus is more
@@ -56,24 +59,21 @@
   %introduction. Thoughts? I didn't go ahead and make  the change since it
   %needs a bit more thought.  I'm open to other ways to reformulate.  Some of
   %this thinking will percolate into the rest of the introduction as well.
-  In this work, we observe transport
-  of water, sodium ions and 20 small polar solutes within the pores 
-  of an LLC membrane using atomistic molecular simulations. We 
-  find that the transport of a species is dependent not only on 
-  molecular size, but on chemical functionality as well. The 
-  membrane's inhomogeneous composition gives rise to radially dependent
-  transport mechanisms with respect to the pore centers. We observe
-  that all solutes perform intermittent hops between lengthy
-  periods of entrapment. Three different trapping mechanisms are 
-  responsible for this behavior. First, solutes that drift
-  out of the pore can become entangled among the dense monomer
-  tails. Second, solutes can donate hydrogen bonds to the monomer
-  head groups. Third, solutes can coordinate with sodium counter ions.
-  The degree to which a solute is affected by each mechanism is 
-  dependent on the chemical functionality of the solute. Using the
-  insights developed in this study, we can begin to think about 
-  how to redesign existing LLC membranes in order to perform 
-  solute-specific separations.
+  In this work, we observe transport of water, sodium ions and 20 small polar
+  solutes within the pores of a lyotropic liquid crystal (LLC) membrane using
+  atomistic molecular simulations. We find that the transport of a species is
+  dependent not only on molecular size, but on chemical functionality as well.
+  The membrane's inhomogeneous composition gives rise to radially dependent
+  transport mechanisms with respect to the pore centers. We observe that all
+  solutes perform intermittent hops between lengthy periods of entrapment. Three
+  different trapping mechanisms are responsible for this behavior. First, solutes
+  that drift out of the pore can become entangled among the dense monomer tails.
+  Second, solutes can donate hydrogen bonds to the monomer head groups. Third,
+  solutes can coordinate with sodium counter ions.  The degree to which a solute
+  is affected by each mechanism is dependent on the chemical functionality of the
+  solute. Using the insights developed in this study, we can begin to think about
+  how to redesign existing LLC membranes in order to perform solute-specific
+  separations.
    
   \end{abstract}
 
@@ -134,31 +134,50 @@
 %  because the LLC monomers are salts, Donnan exclusion plays a role in 
 %  rejection of charged molecules upon pore entry.~\cite{donnan_theory_1995}
 
-  Under the right conditions, amphiphilic molecules can self-assemble
-  into ordered nanostructures that may be capable of performing highly
-  selective separations.
+  %BJC4: generalized to amphiphilic self-assembled structures.
+  Under the right conditions, amphiphilic molecules can self-assemble into
+  ordered nanostructures that may be capable of performing highly selective
+  separations with permeabilities comparable to NF.
   \begin{itemize}
     \item The uniform-sized aqueous pores characteristic of these types of
     systems enforce a molecular-size cut-off, eliminating issues related to the
     polydisperity of NF pores.
-    \item By controlling the chemical identity of moeties inside the pores, 
-    it may be possible to tune these types of materials for solute-specific
-    separations.
+    \item In addition to size-exclusion, it may be possible to control the
+    chemical environment within the nanopores by altering the identities of the
+    hydrophilic moeties that form the pores, affording solute-specific separations.
   \end{itemize}
 
+  %BJC4: bring it back to LLCs but don't make it seem like HII is the best
   Amphiphilic lyotropic liquid crystals (LLCs) are known to form the type I 
   bicontinuous (Q\textsubscript{I}) and inverted hexagonal (H\textsubscript{II})
   phases.
   \begin{itemize}
-	\item When cross-linked, these materials can function as separations
-	 membranes.
+	\item When cross-linked, these materials can function as mechanically
+	strong separations membranes.
 	\item The H\textsubscript{II} phase has hexagonally packed, straight
 	pores which is the ideal geometry for high throughtput separations.
 	\item However, the synthesis of H\textsubscript{II} membranes with 
 	highly aligned hexagonal mesophases has been a challenge that has 
-	prevented this type of membrane's viability.
-	\item The Q\textsubscript{I} has been studied with much more 
-	success. 
+	prevented the material's viability as a separations membrane.
+	\item The Q\textsubscript{I} consists of a three dimensional network
+	of tortuous and interconnected pores. 
+	\item It's more facile synthesis has yielded it more success
+	\item The latest Q\textsubscript{I} phase membranes have been shown
+	to exhibit selectivities and permeabilities higher than commercial
+	RO and NF membranes.
+  \end{itemize}
+
+  % Highlight that QI has the best chance.
+  Although Q\textsubscript{I} membranes have shown promising results, it
+  is not clear how to controllably design them for specific separations
+  beyond what has already been achieved.
+  \begin{itemize}
+    \item Dischinger et al. found that they do not separate purely on the basis
+    of size.~\cite{dischinger_effect_2017} 
+    \item Empirical modeling revealed correlations between various solute
+    physicochemical properties and observed solute rejection. 
+    \item Although there was some agreement with their empirical model, it does not
+    offer a sufficiently detailed explanation of governing molecular interactions.~\cite{dischinger_effect_2017}
   \end{itemize}
 
 %  Zhou et al. demonstrated complete rejection
@@ -208,27 +227,37 @@
   %MRS4: expand the above.  What was discovered, and why was it unfortunate to the thesis?  
   % I though it actually helped the thesis here since there was something happening that WASN'T just size dependence?
 
-  Molecular dynamics (MD) simulations can give us mechanistic insights with 
-  atomistic resolution so that we can provide detailed descriptions of
-  small solute transport within LLC membrane nanopores and intelligently design new membranes for 
-  solute-specific separations. In our previous work, we used MD simulations to 
-  determine the most likely structure of the hexagonal phase formed by the monomer
-  Na-GA3C11, expanding upon the most recent experimental characterization.~\cite{coscia_understanding_2018,feng_thin_2016}
-  We developed techniques to simulate the hexagonal phase formed by neat 
-  monomer as well as with varying amounts of water in the pores.
+  Molecular dynamics (MD) simulations can give us mechanistic insights with
+  atomistic resolution so that we can provide detailed descriptions of small
+  solute transport within LLC membrane nanopores and intelligently design new
+  membranes for solute-specific separations. In our previous work, we used MD
+  simulations to determine the most likely structure of the hexagonal phase
+   formed by the monomer Na-GA3C11, expanding upon the most recent experimental
+  characterization.~\cite{coscia_understanding_2018,feng_thin_2016} We developed
+  techniques to simulate the hexagonal phase formed by neat monomer as well as
+  with varying amounts of water in the pores.
  
+  %BJC4: also edited here to help with the flow.
   In this work, we present studies of the transport mechanisms exhibited by 20 
   uncharged polar solutes with varying size, chemical functionality and hydrophilic 
-  character. Figure~\ref{fig:membrane_rendering} shows an atomistic rendering of
-  the membrane in which we placed solutes. We have listed the solutes studied along with the abbreviations that
-  we will use in the charts for the remainder of this paper in Table~\ref{table:abbreviations}.
-  Note that, in order limit our studies to uncharged species, we have only studied
-  acetic acid in its protonated form. The pKa of gallic acid is 4.40 while the
-  pKa of acetic acid is 4.75.~\cite{chuysinuan_gallic_2009,perrin_pka_1981} 
-  Assuming that the pKa of gallic acid is similar to NaGA3C11, it is possible
-  for our sodium salted monomer to exist at the same time as protonated acetic
-  acid. In any case, we are more interested in mechanisms of interaction with
-  specific chemical functionality more than the behavior of specific molecules.
+  character within the pores of an H\textsubscript{II} phase LLC. The pores of the 
+  H\textsubscript{II} phase have a similar topology to the Q\textsubscript{I} phase but
+  is a simpler geometry to model. In future studies, we will extend our techniques to
+  the Q\textsubscript{I} phase. 
+
+  %BJC4: not sure if I should add a thesis to this paragraph, reattach above, or just
+  % leave as is since it's informational.
+  Figure~\ref{fig:membrane_rendering} shows an atomistic rendering of the
+  membrane in which we placed solutes. We have listed the solutes studied along
+  with the abbreviations that we will use in the charts for the remainder of this
+  paper in Table~\ref{table:abbreviations}. Note that, in order limit our
+  studies to uncharged species, we have only studied acetic acid in its
+  protonated form. The pKa of gallic acid is 4.40 while the pKa of acetic acid is
+  4.75.~\cite{chuysinuan_gallic_2009,perrin_pka_1981} Assuming that the pKa of
+  gallic acid is similar to NaGA3C11, it is possible for our sodium salted
+  monomer to exist at the same time as protonated acetic acid. In any case, we
+  are more interested in mechanisms of interaction with specific chemical
+  functionality more than the behavior of specific molecules.
 
   \begin{figure}
   \centering
