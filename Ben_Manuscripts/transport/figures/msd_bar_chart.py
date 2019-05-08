@@ -10,7 +10,7 @@ crsr = connection.cursor()
 restrict_by_name = False 
 MW = False  # plot mw of species
 penalty = 0.25
-wt = 5 
+wt = 10
 
 group = 'all'
 
@@ -111,6 +111,9 @@ if MW:
 	ax1.bar(index + bar_width, mw, bar_width, alpha=opacity, label = 'Molecular Weight', color='red')
 	ax1.tick_params(labelsize=14)
 	ax1.set_ylabel('Molecular Weight (g/mol)', fontsize=14)
+
+if wt == 10:
+	plt.text(1.25, 3.25, '*Scale is 25x part (a)', fontsize=14)
 
 plt.xlim(-0.2, len(labels))
 fig.tight_layout()

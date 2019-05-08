@@ -5,19 +5,19 @@
 \usepackage{subcaption}
 \usepackage{amsmath} % or simply amstext
 \usepackage{amssymb}
-\usepackage{array}
+%\usepackage{array}
 \usepackage{siunitx}
 \usepackage{booktabs}
 \usepackage[export]{adjustbox}
 \newcommand{\angstrom}{\textup{\AA}}
-\newcommand{\colormap}{jet}  % colorbar to use
+%\newcommand{\colormap}{jet}  % colorbar to use
 \usepackage{cleveref}
 \usepackage{booktabs}
 \usepackage{gensymb}
 \usepackage{float}
 \usepackage{xr}
-\usepackage{tcolorbox}
 \usepackage{multicol}
+\usepackage{tcolorbox}
 
 \SectionNumbersOn
 %\definecolor{amber}{rgb}{1.0, 0.75, 0.0} % amber
@@ -215,14 +215,13 @@
   %MRS4: expand the above.  What was discovered, and why was it unfortunate to the thesis?  
   % I though it actually helped the thesis here since there was something happening that WASN'T just size dependence?
 
-  % TODO: monomer structure
   Molecular dynamics (MD) simulations can give us mechanistic insights with
   atomistic resolution so that we can provide detailed descriptions of small
   solute transport within LLC membrane nanopores and intelligently design new
   membranes for solute-specific separations. In our previous work, we used MD
   simulations to determine the most likely structure of the hexagonal phase
   formed by the monomer Na-GA3C11, expanding upon the most recent experimental
-  characterization.~\cite{coscia_understanding_2018,feng_thin_2016} We developed
+  characterization.~\cite{coscia_understanding_2019,feng_thin_2016} We developed
   techniques to simulate the hexagonal phase formed by neat monomer as well as
   with varying amounts of water in the pores.
  
@@ -231,7 +230,7 @@
   uncharged polar solutes with varying size, chemical functionality and
   hydrophilic character within the pores of an H\textsubscript{II} phase LLC
   membrane. The pores of the H\textsubscript{II} phase have a similar topology to
-  the Q\textsubscript{I} phase but their geomeitry is simpler to model. In future
+  the Q\textsubscript{I} phase but their geometry is simpler to model. In future
   studies, we will extend our techniques to the Q\textsubscript{I} phase. 
 
   %BJC4: not sure if I should add a thesis to this paragraph, reattach above, or just
@@ -250,20 +249,26 @@
 
   \begin{figure}
   \centering
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.325\textwidth}
+  \vspace{1.4cm}
+  \includegraphics[width=\textwidth]{NaGA3C11.pdf}
+  \vspace{1cm}
+  \caption{}
+  \end{subfigure}
+  \begin{subfigure}{0.325\textwidth}
   \includegraphics[width=\textwidth]{ortho_view.pdf}
   \caption{}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.325\textwidth}
   \includegraphics[width=\textwidth]{top_view.pdf}
   \caption{}
   \end{subfigure}
   %MRS3: include a bit more description in the caption of what the system: This is the figure that provides the orientation to the readers of what they will be thinking about for the rest of the paper.
   %BJC3: gave it another shot
-  \caption{The H\textsubscript{II} phase formed by LLC monomers consists of pores
-  that are approximately straight (a) and packed hexagonally (b). In both figures,
-  water molecules that occupy the pores are colored blue, the hydrophilic head 
-  groups of the LLC monomers are colored orange and all else is colored gray. 
+  \caption{The H\textsubscript{II} phase formed by LLC monomer NaGA3C11 (a)
+  consists of pores that are approximately straight (b) and packed hexagonally (c).
+  In both figures, water molecules that occupy the pores are colored blue, 
+  the hydrophilic head groups of the LLC monomers are colored orange and all else is colored gray. 
   The chemical environment within the nanopores is largely determined by the functionality
   of the head groups. Additionally, there is not a well-defined transition
   point from the aqueous pore region to the alkane-dense, hydrophobic tail region,
@@ -732,11 +737,10 @@
   bonds has some dependence on the system being studied. The definition of
   Luzar and Chandler is easily visualized for trajectories using the 
   \texttt{hbonds} representation of the Visual Molecular Dynamics (VMD) software 
-  %TODO: reference for VMD
-  package which allows us to directly check the validity of identified hydrogen bonds.
-  In Section~\ref{S-section:hbond_sensitivity} of the Supporting Information, we
-  show that our conclusions are insensitive to this definition within a 
-  reasonable range of distances and angles. 
+  package which allows us to directly check the validity of identified hydrogen 
+  bonds~\cite{humphrey_VMD:_1996}. In Section~\ref{S-section:hbond_sensitivity} 
+  of the Supporting Information, we show that our conclusions are insensitive
+  to this definition within a reasonable range of distances and angles. 
   
   We determined the average percentage of solutes
   which actively participated in a hydrogen bond interaction with monomers 
@@ -946,9 +950,10 @@
   \includegraphics[width=\textwidth]{total_water_density_10wt.pdf}
   \caption{10 wt \% water, spatial density of water}\label{fig:total_water_density_10wt}
   \end{subfigure}
-  \caption{Looking down at the $xy$ plane of the LLC membranes, the lowest density regions
-  of both membranes are in the pore center and in the distal tail region, furthest from the pore
-  center (a \& c). Water is densest in the low density regions (b \& d).}\label{fig:total_density}
+  \caption{Looking down at the $xy$ plane of the cross-linked LLC membranes, the lowest
+  density regions of both membranes are in the pore center and in the distal tail region,
+  furthest from the pore center (a \& c). Water concentration is highest in regions of
+  low monomer density regions (b \& d).}\label{fig:total_density}
   \end{figure}
   
   We will restrict our studies of transport to solutes and water outside of the 
@@ -1109,7 +1114,6 @@
   \end{subfigure}
   %MRS2: should an explicit note of the change of scale from 5% to 10% graph; easiest is in the caption.  Could also note it by some
   %MRS2: some sort of graphical indication on the graph itself.  But definitely need to draw attention to it. 
-  %TODO: add indication of scale
   \caption{The MSDs of solutes in the 5 wt\% water system (a) are significantly
   smaller than those of the solutes in the 10 wt\% water system (b). The
   MSDs are not a monotonic function of molecular size (c and d). A significant

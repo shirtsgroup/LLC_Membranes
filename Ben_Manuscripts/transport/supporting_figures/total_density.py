@@ -6,7 +6,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 import tqdm
 
-wt = 10 
+wt = 5 
 water = True 
 path = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/pure_water/%swt" % wt
 
@@ -43,6 +43,10 @@ cbar = plt.colorbar(im, cax=cax)
 
 if water:
 	cbar.set_label('Density ($H_2O / nm^2$)', fontsize=14)
+	if wt == 5:
+		ax.annotate("pore region", xy=(7.5, 5.8), xytext=(9, 5.8), arrowprops=dict(color="white", arrowstyle="->"), fontsize=14, color='white')
+		ax.annotate("distal tail\n region", xy=(5.5, 4.5), xytext=(1, 4), arrowprops=dict(color="white", arrowstyle="->"), fontsize=14, color='white')
+
 else:
 	cbar.set_label('Density ($Atoms / nm^2$)', fontsize=14)
 
