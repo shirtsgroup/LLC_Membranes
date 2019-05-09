@@ -134,18 +134,20 @@ class System(object):
         # plt.show()
         # exit()
 
-        # plot first order differences
-        #plt.plot((self.com[1:, 1, 2] - self.com[:-1, 1, 2]))
+        #plot first order differences
+        plt.figure()
+        plt.plot((self.com[1:, 1, 2] - self.com[:-1, 1, 2]))
         # plt.plot(self.com[:, 1, 2], linewidth=2)
-        # plt.tick_params(labelsize=14)
-        # plt.xticks(np.linspace(0, 2000, 9), [int(i) for i in np.linspace(0, 1000, 9)])
-        # plt.xlabel('Time (ns)', fontsize=14)
-        # plt.ylabel('$z$-direction hop length (nm)', fontsize=14)
-        # plt.tight_layout()
-        # plt.show()
-        # exit()
+        plt.tick_params(labelsize=14)
+        plt.xticks(np.linspace(0, 2000, 9), [int(i) for i in np.linspace(0, 1000, 9)])
+        plt.xlabel('Time (ns)', fontsize=14)
+        plt.ylabel('$z$-direction hop length (nm)', fontsize=14)
+        plt.tight_layout()
+        plt.show()
+        exit()
 
-        # create timeseries by randomly drawing from unconditional pdf of hop lengths
+        #create timeseries by randomly drawing from unconditional pdf of hop lengths
+        # plt.figure()
         # p = (self.com[1:, :, 2] - self.com[:-1, :, 2]).flatten()
         # for i in range(10):
         #     t = np.random.choice(p, size=2000)
