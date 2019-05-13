@@ -198,7 +198,7 @@ print("Lorentzian FWHM = %.3f +/- %.3f A^-1" % (solp_lorentz[0], cov_x_lorentz[0
 print("Gaussian FWHM = %.3f +/- %.3f A^-1" % (2*np.sqrt(2*np.log(2))*solp_gaussian[1],
                                        2 * np.sqrt(2 * np.log(2)) * cov_x_gaussian[1, 1] ** 0.5))
 plt.gcf().get_axes()[0].tick_params(labelsize=18)
-plt.legend(fontsize=17)
+#plt.legend(fontsize=17)
 plt.tight_layout()
 
 plt.figure()
@@ -222,7 +222,7 @@ print("Gaussian FWHM = %.3f +/- %.3f A^-1" % (2*np.sqrt(2*np.log(2))*solp_gaussi
 plt.xlabel('$q_z\ (\AA^{-1}$)', fontsize=18)
 plt.ylabel('Intensity', fontsize=18)
 plt.gcf().get_axes()[0].tick_params(labelsize=18)
-plt.legend(fontsize=18)
+#plt.legend(fontsize=18)
 plt.tight_layout()
 
 ################ Calculate R-pi and R-double from cross-section ########################

@@ -113,7 +113,7 @@ class HopLocation(System):
         if show:
             plt.show()
 
-    def regional_hop_lengths(self, r, nboot=200):
+    def regional_hop_lengths(self, r, nboot=200, plot_distributions=True):
         """ Calculate average hop lengths in and out of the pore region defined based on a cut-off radius.
 
         :param r: distance from pore center at which pore region ends
@@ -122,7 +122,7 @@ class HopLocation(System):
 
         :return tuple containing : (mean hop length in the pore, std in pore, mean out of pore, std out of pore)
         """
-
+        print(r)
         self.r = np.array(self.r)
 
         # flatten list
@@ -141,6 +141,19 @@ class HopLocation(System):
         for b in range(nboot):
             mean_inpore[b] = np.abs(hops[np.random.choice(inpore, size=inpore.size)]).mean()
             mean_outpore[b] = np.abs(hops[np.random.choice(outpore, size=outpore.size)]).mean()
+
+        if plot_distributions:
+            print('sigma_inpore = %.2f' % np.std(hops[inpore]))
+            print('sigma_outpore = %.2f' % np.std(hops[outpore]))
+            plt.hist(hops[inpore], alpha=0.7, bins=25, label='Hops in pore', density=True)
+            plt.hist(hops[outpore], alpha=0.7, bins=25, label='Hops in tails', density=True)
+            plt.xlabel('$z$-direction hop length (nm)', fontsize=14)
+            plt.ylabel('Frequency', fontsize=14)
+            plt.legend(fontsize=14)
+            plt.tick_params(labelsize=14)
+            plt.xlim(-1.4, 1.4)
+            plt.tight_layout()
+            plt.show()
 
         # Assumes mean is 0! Otherwise this equation is far more complicated
         # mean_inpore = np.sqrt(2 / np.pi) * np.std(hops[inpore])
@@ -186,6 +199,6 @@ if __name__ == "__main__":
     else:
         cmax = None
 
-    hops.regional_hop_lengths(0.5)
+    hops.regional_hop_lengths(0.75)
 
     hops.plot_hop_locations(show=False, cmap_max=cmax, colormap=args.colormap, bins=args.bins)

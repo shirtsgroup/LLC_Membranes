@@ -307,6 +307,7 @@ def correlograms(zt):
 
     :type zt: np.ndarray
     """
+
     # Initialize a 2x2 figure
     fig, ax = plt.subplots(2, 2, figsize=(9, 6), sharex=True, sharey=True)
 
