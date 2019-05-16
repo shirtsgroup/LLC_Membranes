@@ -26,7 +26,7 @@
 \usepackage[superscript,biblabel]{cite}  % make citations superscripts to save space
 %\setlength{\belowcaptionskip}{-1.2\baselineskip}
 
-\title{PhD Research Proposal: Molecular Level Design of Nanoporous Lyotropic Liquid
+\title{PhD Research Proposal: Towards Molecular Level Design of Nanoporous Lyotropic Liquid
 Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
 \large Advisors: Michael Shirts and Richard Noble}
 
@@ -45,29 +45,9 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
 
   \subsection*{Commercial Membranes for Small Molecule Separations}
   
-  % perhaps a word or two about micro and ultra filtration  
-  
-  %MRS: probably can do a little less introduction of the overall membrane needs, as we want to make sure 
-  %MRS: the focus is on the research (thesis, you can include everything).  Can probably hold off that until you get the rest done, then trim as needed for space.
-  %
-  %MRS: remember the purpose of the introduction to any document is to lay out the rules of engagement; you want 
-  %MRS: to raise the questions that the rest of the document will answer.
-  % 
-  %MRS: try to make sure the application motivation and the research described match up when possible.
-  %MRS: if particular applications wouldn't be directly enabled by the research, at least draw to the connection
-  %MRS: i.e. talk about the general tools of computation to understand nanostructured membranes, even if the current
-  %MRS: membranes under development aren't suitable for the particular separations described.
-  %BJC: Something like: The computational techniques developed here are suitable not just for LLC Membranes, but for any nanostructured 
-  % membrane material.
-  
-    %MRS2: rephrase; sound like you are talking about only a minor problem. I would suggest adding a few more with citations
-  %MRS2: to show you are aware of the breadth of the subject, and these aren't the only ones you know about.
-  %represent a small subset
-  %BJC2: rephrased then added 4 more citations
-  
-  More highly selective nanoporous membranes would be useful for 
+  More highly selective nanoporous membranes could be useful for 
   performing complex aqueous separations with seawater and various
-  types of wastewater. For example, separating sodium chloride and 
+  sources of wastewater. For example, separating sodium chloride and 
   boron in seawater could yield potable drinking water in water scarce
   regions~\cite{fritzmann_state---art_2007} while separation of organic
   micropollutants found in municipal and industrial wastewaters could 
@@ -76,51 +56,48 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   By efficiently separating contaminants from feed solutions with
   highly selective membranes, it is possible to reduce the number of 
   required membrane passes and post-treatment steps needed for a given 
-  filtration process \cite{werber_materials_2016}, thus lowering energy 
-  requirements and cost. Additionally, one can extract valuable 
+  filtration process~\cite{werber_materials_2016}, thus lowering energy 
+  requirements and cost. Additionally, one can extract valuable
   resources from the feed streams~\cite{sales_resource_2015}. For example,
   flowback water produced during hydraulic fracturing of shale 
   formations contains dissolved species like acetate whose extraction has 
-  economic value \cite{dischinger_application_2017,theodori_hydraulic_2014}.
+  economic value.~\cite{dischinger_application_2017,theodori_hydraulic_2014}
 
-  Reverse osmosis (RO) and nanofiltration (NF) are two prevailing commercial membrane
-  filtration processes that can be used to separate solutes on the order of
-  1 nm in size and smaller, including ions. Both apply hydraulic pressure 
-  to the feed solution in order to overcome osmotic pressure and force water
-  and unfiltered components through the membrane. RO membranes are typically
-  thin film composite with a porous mechanical support layer and a thin but
-  dense polymer matrix active layer where separations occur.\cite{jeong_interfacial_2007}
+  Reverse osmosis (RO) and nanofiltration (NF) are two prevailing commercial
+  membrane filtration processes that can be used to separate solutes on the 
+  order of 1 nm in size and smaller, including ions. Both apply hydraulic 
+  pressure to the feed solution in order to overcome osmotic pressure and 
+  force water and unfiltered components through the membrane. RO membranes
+  are typically thin film composite with a porous mechanical support layer
+  and a thin but dense polymer matrix active layer where separation occurs.~\cite{jeong_interfacial_2007}
   RO separates solutes based on the solute's ability to dissolve into and 
   diffuse through the tortuous pathways available in the membrane's dense 
   active layer. RO offers high selectivity at the cost of relatively high 
   energy requirements since one must apply hydraulic pressure on the order of
-  50--100 bar to the feed solution in order to achieve an economical flux~\cite{van_der_bruggen_review_2003}.
+  50--100 bar to the feed solution in order to achieve an economical flux.~\cite{van_der_bruggen_review_2003}
   In contrast to RO membranes, NF membranes have explicit pores on the order
   of 1 nm in size. Typically, separations are achieved based on size exclusion
   and Donnan exclusion if the membrane's surface has a net charge.~\cite{donnan_theory_1995}
-  NF membranes require significantly less applied pressure in order to achieve solute flux
-  comparable to RO. Unfortunately, conventional NF membrane synthesis processes, such as 
-  phase-inversion\cite{smolders_microstructures_1992}, are stochastic in
-  nature which yields pores that are polydisperse in size.\cite{werber_materials_2016}
+  NF membranes require significantly less applied pressure in order to achieve
+  solute flux comparable to RO. Unfortunately, conventional NF membrane synthesis
+  processes, such as phase-inversion\cite{smolders_microstructures_1992}, are 
+  stochastic in nature which yields pores that are polydisperse in size.~\cite{werber_materials_2016}
   Pore size polydispersity is detrimental to membrane selectivity.
   
-  The downfall of RO and NF membranes can be summarized by the well-known
+  The downfall of traditional RO and NF membranes can be summarized by the well-known
   permeability-selectivity tradeoff. Namely, it is difficult to increase the
   permeability of a desired molecular or atomic species, while maintaining
   the same retention of undesired species.\cite{werber_materials_2016}  
   
   \subsection*{Nanostructured Membranes}
   
-  % BJC2: condensed this section into one paragraph
   Nanostructured membranes attempt to overcome the permeability-selectivity 
-  tradeoff through intelligent design at the molecular level. 
-%  Graphene sheets, carbon nanotubes (CNTs) and zeolites are three highly
-%  studied nanostructured technologies. 
-  Ultrathin-film graphene and graphene oxide membranes are an active area
-  of research because they are atomically thick and therefore offer potential
-  for extremely high permeability membranes.~\cite{humplik_nanostructured_2011}
-  However, scalable synthesis without introducing microscopic, performance
-  degrading defects has not yet been achieved.~\cite{cohen-tanugi_multilayer_2016,wei_multilayered_2018}
+  tradeoff through intelligent design at the molecular level. Ultrathin-film
+  graphene and graphene oxide membranes are an active area of research because
+  they are atomically thick and therefore offer potential for extremely high
+  permeability membranes.~\cite{humplik_nanostructured_2011} However, scalable
+  synthesis without introducing microscopic, performance degrading defects has
+  not yet been achieved.~\cite{cohen-tanugi_multilayer_2016,wei_multilayered_2018}
   Carbon nanotubes (CNTs) have shown promise as aqueous separations membranes
   due to unprecedentedly fast water transport.\cite{humplik_nanostructured_2011,hummer_water_2001} 
   Practically, dispersing and aligning CNTs into a polymer matrix is extremely
@@ -185,15 +162,16 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
 %  effort to balance the gradients of concentration and electric potential
 %  \cite{donnan_theory_1995}.
 
-  The feasibility of nanostructured LLC polymer membranes for selective separations
-  has been demonstrated using LLC monomers that form the type 1 bicontinuous cubic
-  (Q\textsubscript{I})~\cite{hatakeyama_water_2011,hatakeyama_nanoporous_2010,carter_glycerol-based_2012}
-  and the inverted hexagonal (H\textsubscript{II}) 
-  phases (see Figure~\ref{fig:structures}).~\cite{zhou_supported_2005} When separating organic solutes from NaCl, Q\textsubscript{I}-phase
-  membrane filtration experiments have shown selectivity 2--3 times higher than
-  commercial RO and 6--12 times higher than commercial NF membranes.~\cite{dischinger_application_2017}
+  The feasibility of nanostructured LLC polymer membranes for selective 
+  separations has been demonstrated using LLC monomers that form the type
+  1 bicontinuous cubic (Q\textsubscript{I})~\cite{hatakeyama_water_2011,hatakeyama_nanoporous_2010,carter_glycerol-based_2012}
+  and the inverted hexagonal (H\textsubscript{II}) phases (see 
+  Figure~\ref{fig:structures}).~\cite{zhou_supported_2005} When separating
+  organic solutes from NaCl, Q\textsubscript{I}-phase membrane filtration 
+  experiments have shown selectivity 2--3 times higher than commercial RO
+  and 6--12 times higher than commercial NF membranes.~\cite{dischinger_application_2017}
   When separating a series of various sized dyes, an H\textsubscript{II}-phase 
-  LLC membrane showed complete rejection of dyes bigger than 1.2 nm in size~\cite{zhou_supported_2005}.
+  LLC membrane showed complete rejection of dyes bigger than 1.2 nm in size.~\cite{zhou_supported_2005}
 
 %  \begin{wrapfigure}{L}{0.5\textwidth}
 %  \centering
@@ -258,8 +236,8 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   
   Unfortunately, reproducing the work of Feng et al. with the hydrated 
   H\textsubscript{II} phase has been an experimental challenge. Therefore, the
-  primary focus of experimental research efforts has been with the Q\textsubscript{I} 
-  phase.
+  primary focus of the most recent experimental research efforts has been 
+  on the Q\textsubscript{I} phase.
 
   \section{Project Objectives}\label{section:objectives}  
   
@@ -292,20 +270,13 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   designs with MD simulations. The principles learned can be implemented 
   and tested experimentally.
   
-  \noindent There are four primary objectives of this PhD research which are 
+  There are four primary objectives of this PhD research which are 
   at various stages of completion.
 
   \begin{enumerate}
   
     \item Develop techniques to build and understand the nanoscopic structure
     of LLC membranes. (\textcolor{green!40!olive}{\textbf{Complete}})
-
-    %MRS2: Objectives shouldn't include a description of what has and hasn't 
-    %been done.  Then it's not an really just an objective anymore. I would 
-    %suggest rephrasing these in terms of the intellectual objective, focusing
-    %on the questions to be asked and hypotheses to be tested, and then talk 
-    %in the next section about what has been done (or is to do).
-    %BJC2: got it, rephrased first 2 objectives.
 
     A useful molecular-level model should incorporate a detailed picture 
     of the nanoscopic pore structure, which is crucial to understanding
@@ -315,26 +286,6 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
     evaluate and justify the minimum effort required to build systems with
     alternate monomers while maintaining an experimentally-consistent 
     chemical environment. 
-    
-%    I have created a maximally consistent structural model by comparing 
-%    simulated X-ray diffraction (XRD) patterns, generated from MD trajectories,
-%    to an experimental 2D wide angle X-ray scattering (WAXS) spectrum of a 
-%    Col\textsubscript{h} phase LLC membrane. I have used this model as an 
-%    example in order to 
-%    %MRS2: I don't know that it's easy yet . . . 
-%    %understand the ease with which 
-%    demonstrate how 
-%    we can apply our approach
-%    to alternate monomers and other LC phases. 
-
-
-%    shown that we achieve a
-%    similar pore composition regardless of initial configuration which is 
-%    influenced by a number of variables. This implies that our model can
-%    
-%        We will assess the extent to which
-%    we can apply our understanding to the H\textsubscript{II} phase, as well
-%    as systems built with alternate monomers.
     
     \item Determine solute-membrane interactions that give rise to
     transport mechanisms. (\textcolor{green!40!olive}{\textbf{Complete}})
@@ -346,12 +297,6 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
     distinct mechanisms that can help guide membrane design based on 
     chemical functionality of both solutes and LLC monomers.
     
-%    I observed the transport of a relatively large set of small polar solutes
-%    placed within the H\textsubscript{II} phase membrane nanopores. I analyzed
-%    the time series of each solute's position in addition to directly measuring
-%    the physical interactions, such as hydrogen bonding and ion coordination, 
-%    between solutes and LLC monomers.
-    
     \item Create a stochastic model which can project long timescale 
     transport behavior. (\textcolor{blue}{\textbf{In Progress}})
     
@@ -362,7 +307,7 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
     relative to MD simulations, I will be able to forecast long timescale transport
     behavior and make well-converged predictions of macroscopic transport properties.
            
-    \item Adapt the same analysis to the Q\textsubscript{I} phase. (\textcolor{blue}{\textbf{In Progress}})
+    \item Adapt the analysis of Objectives 1--3 to the Q\textsubscript{I} phase. (\textcolor{blue}{\textbf{In Progress}})
     
     Over the course of this project, experimental research surrounding
     LLC membranes has shifted nearly all focus towards the Q\textsubscript{I}
@@ -370,18 +315,6 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
     been applied to the H\textsubscript{II} phase, much of the same analyses
     can be applied to the Q\textsubscript{I} phase. The biggest challenge will
     be adapting my techniques to its more complex three dimensional geometry.
-    
-%    \item Enable easy continuation of our work with a dedicated and 
-%    well-documented python package.
-%    
-%	Although molecular simulations have become popular
-%	for studying systems at the atomic level, LLCs used in this context
-%	have not been heavily investigated. Consequently, much of the 
-%	analysis developed for this project is not widely applied. Therefore, 
-%	it is important for us to make available the scripts that reproduce
-%	the exact results presented in our published papers along with detailed
-%	documentation of the scripts. This will ensure near-seamless continuation
-%	of this project and accelerate the development of LLC membranes.
     
   \end{enumerate}
 
@@ -394,15 +327,14 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   \noindent My work fulfilling this objective is published in the Journal of Physical 
   Chemistry B: Coscia et al. \textit{J. Phys. Chem. B}, 123, 289-309 (2019).
 
-  My first task was to develop a procedure for building and equilibrating 
-  an atomistic LLC membrane system (see Figure~\ref{fig:assembly}). I chose to build
-  a monoclinic unit cell consisting of four pores. Each pore is composed of monomer
-  columns, where each column consists of 20 monomers stacked on top of each other
-  so that the phenyl groups are coplanar with each other and the $xy$ plane. The
-  columns are oriented so that the hydrophilic monomer head groups face towards
-  the pore center. I did not add any water to the initial configuration because I
-  compared the structure to experimental data for a system claimed to be
-  synthesized with only neat monomer. 
+  I developed a procedure for building and equilibrating an atomistic LLC membrane 
+  system (see Figure~\ref{fig:assembly}). I chose to build a monoclinic unit cell
+  consisting of four pores. Each pore is composed of monomer columns, where each
+  column consists of 20 monomers stacked on top of each other so that the phenyl
+  groups are coplanar with each other and the $xy$ plane. The columns are oriented
+  so that the hydrophilic monomer head groups face towards the pore center. I did
+  not add any water to the initial configuration because I compared the structure
+  to experimental data for a system claimed to be synthesized with only neat monomer. 
   
   %BJC2: removing unnecessary details
 %  I equilibrated unit cells using a series
@@ -481,19 +413,10 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
             each pore increases.}~\label{fig:p2p}
     \vspace{-1.25cm}
   \end{wrapfigure}
-  
-%  \noindent On timescales that we can reasonably simulate, our equilibrated
-%  structures show some initial configuration dependence. 
-%  \begin{itemize}
-%    \item All of the systems used to generate Figure~\ref{fig:p2p} are at 
-%    least metastable.
-%    \item We observe no large scale rearrangements that would be necessary
-%    for all structures to converge to the same equilibrium structure. 
-%  \end{itemize}
 
   I further validated the structure of our molecular model by verifying 
   its consistency with five major reflections present in the experimental
-  WAXS pattern. Using MD trajectories, we simulated X-ray diffraction (XRD)
+  WAXS pattern. Using MD trajectories, I simulated X-ray diffraction (XRD)
   patterns that we could compare to the WAXS data by taking the appropriate
   cross-section of the time-averaged 3D structure factor. The five major 
   reflections and the structural features leading to them are summarized
@@ -540,14 +463,14 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
     \vspace{-0.75cm}
  \end{wrapfigure}
  
-  On the timescales that one can reasonably simulate, my model exhibits slow 
-  dynamics. Consequently, there are very few uncorrelated frames in the 
-  trajectories which leads to noise and sharpened reflections in the simulated
-  XRD patterns. One can overcome this issue by combining the structure factors
-  generated from an ensemble of simulated trajectories each produced
-  from an ensemble of uncorrelated initial configurations. One can create 
-  decorrelated initial configurations by randomly displacing monomer columns in
-  the $z$-direction.
+  My model exhibits slow dynamics on timescales longer than can be reasonably
+  simulated with current computer resources. Consequently, there are very few
+  uncorrelated frames in the trajectories which leads to noise and sharpened
+  reflections in the simulated XRD patterns. One can overcome this issue by 
+  combining the structure factors generated from an ensemble of simulated 
+  trajectories each produced from an ensemble of uncorrelated initial 
+  configurations. One can create decorrelated initial configurations by 
+  randomly displacing monomer columns in the $z$-direction.
  
   Perhaps the most important conclusion from my structural work is that the 
   chemical composition of the pores is relatively insensitive to the initial 
@@ -562,9 +485,6 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{\textwidth}
-  %BJC: probably change this legend to `d = x Angstroms` instead of 
-  % disordered/ordered, since I don't have space to talk about ordered / disorderd configurations (requires 
-  % nematic order parameter to give a complete justification of the names)
   \includegraphics[width=\textwidth]{regional_density_legend.pdf}
   \end{subfigure}
   \begin{subfigure}{0.32\textwidth}
@@ -582,16 +502,17 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
         \caption{Sodium Ions}
         \label{fig:sodium_regional_density}
   \end{subfigure}
-  %MRS2: important consquence of all radian distribution functions being similar is that we should get useful transport details even if we didn't get the structure exactly right. 
-  \caption{In all systems studied, the component radial distribution functions are similar.
-      They exhibit a composition gradient transitioning from the hydrophilic to the hydrophobic
-          regions. The biggest differences are at r=0 where noise is higher due to
-          decreased sampling. The center of the pore is not hollow, but contains sodium ions and
-          head groups, even when the system is solvated. This architecture may impede transport in
-          the real system in a chemically-dependent manner.
-          The solvated system has a lower density of head groups near the
-          pore center which is likely due to the swelling that is necessary in order to fit water
-          molecules in the pore region.}~\label{fig:overlaid_densities}
+  \caption{Even if we fail to get the system's structure exactly right, we can still 
+  		   expect to extract useful transport details. In all systems studied, the 
+  		   component radial distribution functions are similar. They exhibit a 
+  		   composition gradient transitioning from the hydrophilic to the hydrophobic
+           regions. The biggest differences are at r=0 where noise is higher due to
+           decreased sampling. The center of the pore is not hollow, but contains sodium
+           ions and head groups, even when the system is solvated. This architecture may
+           impede transport in the real system in a chemically-dependent manner. The
+           solvated system has a lower density of head groups near the pore center 
+           which is likely due to the swelling that is necessary in order to fit water
+           molecules in the pore region.}~\label{fig:overlaid_densities}
   \vspace{-0.5cm}
   \end{figure}
   
@@ -606,11 +527,11 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   the NaGA3C11 monomer with water contents ranging from 7 - 20 wt\%, with 
   close to 10 wt\% being the most common.~\cite{smith_ordered_1997,zhou_supported_2005} 
   However, Resel et al. stated that the system is likely fully hydrated at
-  7 wt \% water with additional water trapped in defects between hexagonal
-  mesophases.~\cite{resel_structural_2000} Consequently, we chose to build
+  7 wt \% water with excess water trapped in defects between hexagonal
+  mesophases.~\cite{resel_structural_2000} Consequently, I chose to build
   two systems with 5 and 10 wt\% water.
   
-  Upon simulating each system, we observed that water partitions into the
+  Upon simulating each system, I observed that water partitions into the
   distal tail region. Based on the radial distance from the pore center where 
   the minimum water density occurs, we defined the distal tail region to 
   be greater than 1.5 nm from any pore center. There is approximately a 3:2
@@ -620,17 +541,6 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   
   \begin{wrapfigure}{l}{0.65\textwidth}
   \centering
-%  \vspace{-0.3cm}
-%  \begin{subfigure}{0.325\textwidth}
-%  \includegraphics[width=\textwidth]{component_density_dry.pdf}
-%  %BJC: simulation is extended to smooth out these curves
-%  \caption{Dry System}\label{fig:component_density_dry}
-%  \end{subfigure}
-%  \begin{subfigure}{0.45\textwidth}
-%  \vspace{-0.5cm}
-%  \includegraphics[width=\textwidth]{monomer_color_coded.pdf}
-%  \label{fig:monomer_color_coded}
-%  \end{subfigure}
   \begin{subfigure}{0.49\linewidth}
   \includegraphics[width=\linewidth]{component_density_5wt.pdf}
   \caption{5 wt\% water}\label{fig:component_density_5wt}
@@ -642,11 +552,7 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   \caption{The radial densities of various monomer components paint a
   picture of the pore topology where the pore centers are primarily 
   composed of water, sodium ions and head groups to varying degrees
-  depending on total water composition.
-  %MRS2: there's actually a lot of head groups in the pores except at the very center.  Does the sentence above
-  %MRS2: communicate that well? 
-  %BJC2: rephrased.
-  The monomer groups labeled in each plot correspond to
+  depending on total water composition. The monomer groups labeled in each plot correspond to
   the color-coded monomer pictured in Figure~\ref{fig:HII_mon}. All RDFs
   represent the number of atoms located at a given distance from the pore center
   normalized by the volume of the annular bin to which they belong. The black
@@ -664,36 +570,19 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   The maximum density of head groups occurs 0.45 and 0.65 nm from the pore 
   center in the 5 and 10 wt\% water systems respectively (see 
   Figure~\ref{fig:component_densities}).
-  
-  %There are almost no head groups 
-  %occupying the pore center.
-  %MRS2: I guess that's not entirely clear to me. Yes, at R=0, but most of the pore volume is at R=0.2-0.4, and there are a lot of head groups there.  There might be a general issue of confusion between ``pore center'' and ``pore regions''
-  %BJC2: Avoiding the confusion. I think saying this makes more sense when comparing
-  %directly to the dry system which has a significant head group density at R=0.
     
   Water and sodium transport is significantly faster in the less crowded 
   10 wt\% water pores. The mean squared displacement (MSD) of water is about
   51 times higher and the MSD of sodium is about 49 times higher compared to
   the 5 wt\% system. In general we observe similar solute transport mechanisms
   in the 5 and 10 wt\% water systems but on different time scales.
-    %BJC: might as well leave 5 wt% data in there.
-%    \item Therefore, we focus the remainder of this discussion on the 10 wt\%
-%    water system since we were able to collect a larger quantity of mechanistic
-%    data from the solute trajectories.
   
-  %MRS2: not great thesis statement.  Thesis statements should be trying to convince reader - this is just listing something you did. 
-  %BJC2: tried again.
   I explored the influence of a solute's chemical functionality on its 
-  transport properties within the H\textsubscript{II} nanopores using simulations
-  of 20 different small polar solutes (see Table~\ref{fig:solute_table}).
+  transport properties within the H\textsubscript{II} nanopores .
   For each solute, I created a separate initial configuration and placed 6 
   solutes, equally spaced in $z$, in each nanopore. This gave a sufficient
   number of solute trajectories from which to generate statistics while 
   maintaining a low degree of interaction between solutes. 
-  
-  % Unnecessary details
-  % After a 5 ns equilibration, we allowed the solutes to simulate for
-  % 1 microsecond. 
   
   \begin{figure}
   \includegraphics[width=\textwidth]{solute_table.pdf}
@@ -705,26 +594,6 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   hydrogen bonds but not donate.}\label{fig:solute_table}
   \vspace{-0.5cm}
   \end{figure}
-
-%  \begin{wrapfigure}{R}{0.6\textwidth}
-%  \centering
-%  \begin{subfigure}{0.45\linewidth}
-%  \includegraphics[width=\linewidth]{all_10wt_tamsds.pdf}
-%  \caption{10 wt \% water}\label{fig:all_msds_10wt}
-%  \end{subfigure}
-%  \begin{subfigure}{0.45\linewidth}
-%  \includegraphics[width=\linewidth]{msd_radius_10wt.pdf}
-%  \caption{10 wt \% water}\label{fig:msd_radius_10wt}
-%  \end{subfigure}
-%  \caption{The MSDs of solutes in the 5 wt \% water system (a) are significantly
-%  smaller than those of the solutes in the 10 wt \% water system (b). The
-%  MSDs are not a monotonic function of molecular size (c and d). A significant
-%  number of solute MSDs fall below the theoretical lines predicted by the
-%  Stokes-Einstein equation and Gierer and Wirtz' corrected Stokes-Einstein equation.
-%  }\label{fig:msds}
-%  \vspace{-1.5cm}
-%  \end{wrapfigure}
-    % 5 and 10 wt %
   
   The solute MSDs are not a monotonic function of solute size. In 
   Figures~\ref{fig:all_msds_5wt} and~\ref{fig:all_msds_10wt}, we plot
@@ -971,46 +840,16 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   towards a stochastic model is to simulate realizations of a subordinated 
   fractional Brownian motion (sFBM) process based on parameters extracted 
   from solute time series. As demonstrated by the example in 
-  Figures~\ref{fig:hop_dist} and~\ref{fig:dwell_dist}, hop length 
-  distributions in the $z$-direction appear Gaussian while the distribution
-  of dwell times between hops appears to be distributed according to a power
-  law. Alone, these distributions characterize a continuous time random walk
-  (CTRW), which is a subdiffusive process where particles hop a random distance
-  in a random direction and stay there for a random period of time.~\cite{meroz_toolbox_2015}.
+  Figures~\ref{fig:hop_dist} and~\ref{fig:dwell_dist}, the distribution of 
+  hop lengths in the $z$-direction appear Gaussian while the distribution
+  of dwell times between hops appears to be described by a power law. Alone,
+  these distributions characterize a continuous time random walk (CTRW), 
+  a subdiffusive process where particles hop a random distance in a random
+  direction and stay there for a random period of time.~\cite{meroz_toolbox_2015}.
   Unlike a CTRW, the hops in the system I study appear anti-correlated to 
   their previous hop as demonstrated by the autocorrelation function in 
   Figure~\ref{fig:hop_acf}. A CTRW with anticorrelated hops is well-described
-  by an sFBM process.~\cite{meroz_subdiffusion_2010}
-
-%  \begin{wrapfigure}{l}{0.6\textwidth}
-%  \centering
-%  \vspace{-0.5cm}
-%  \begin{subfigure}{0.49\linewidth}
-%  \includegraphics[width=\linewidth]{breakpoints.pdf}
-%  \caption{}\label{fig:breakpoints}
-%  \end{subfigure}
-%  \begin{subfigure}{0.49\linewidth}
-%  \includegraphics[width=\linewidth]{first_order_difference.pdf}
-%  \caption{}\label{fig:first_order_difference}
-%  \end{subfigure}
-%  \begin{subfigure}{0.49\linewidth}
-%  \includegraphics[width=\linewidth]{hop_density.pdf}
-%  \caption{}\label{fig:hop_density}
-%  \end{subfigure}
-%  \begin{subfigure}{0.49\linewidth}
-%  \includegraphics[width=\linewidth]{naive_density_forecast.pdf}
-%  \caption{}\label{fig:naive_density_forecast}
-%  \end{subfigure}
-%  \caption{In contrast to our first approach which relies on accurate 
-%  detection of hops, density forecasting uses all of the time series 
-%  information at our disposal. (a) Our first approach identifies hops 
-%  based on breakpoints, indicated by color transitions. All information 
-%  is lost between breakpoints. (b) Instead we can calculate hop lengths
-%  between each time step and (c) compile them into a single probability 
-%  density. (d) As a first approximation, one can simulate time series
-%  by randomly drawing from the distribution in (c).}\label{fig:density_forecast}
-%  \vspace{-1.5cm}
-%  \end{wrapfigure}  
+  by an sFBM process.~\cite{meroz_subdiffusion_2010} 
   
   Solute MSDs calculated based on realizations of an sFBM process mostly
   preserve the trends in MSD calculated directly from MD simulations (see
@@ -1021,16 +860,6 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   comparison between their MSDs. While the sFBM MSD prediction for methanol
   is too high, the rest are on average only 46\% of the MD calculated MSD
   values. 
-  
-%  \begin{wrapfigure}{r}{0.4\textwidth}
-%  \centering
-%  \vspace{-0.5cm}
-%  \includegraphics[width=\linewidth]{z_histogram.pdf}
-%  \caption{The histogram of $z$ values coming from $z_t$ calculated with 
-%  Equation~\ref{eqn:pit} appears uniform meaning $p(h)$ is well-sampled 
-%  by the out-sample data.}\label{fig:z_histogram}
-%  \vspace{-1cm}
-%  \end{wrapfigure}
   
   \begin{wrapfigure}{l}{0.4\textwidth}
   \centering
@@ -1066,16 +895,16 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   function, or I could assign parameters that are dependent on the type of
   trapping mechanism affecting the solute.
   
-  It is important to note that this first approach throws out a significant fraction
-  of the data. In order to construct distributions of hop lengths and dwell 
-  times with my first approach, I needed to locate precise time points at which
-  hops occurred. We achieved this using an off-line change point detection algorithm implemented
-  in the python package \texttt{ruptures}.~\cite{truong_review_2018} The 
-  algorithm does a decent job of identifying hops, but still loses information
+  It is important to note that this first approach does not use a significant
+  fraction of the data. In order to construct distributions of hop lengths 
+  and dwell times, I needed to locate precise time points at which hops 
+  occurred. I achieved this using an off-line change point detection algorithm
+  implemented in the python package \texttt{ruptures}.~\cite{truong_review_2018}
+  The algorithm does a decent job of identifying hops, but still loses information
   as demonstrated in Figure~\ref{fig:breakpoints}. 
 
   \textit{Approach 2: Markov Switching Models}: Instead of limiting my 
-  analysis to 3 fit parameters ($\alpha$, $\sigma$ and $H$), my second
+  analysis to 3 fitting parameters ($\alpha$, $\sigma$ and $H$), my second
   approach uses all of the available data in order to classify sequences
   of time series behavior into distinct states. In 
   Figure~\ref{fig:markov_states_timeseries}, for demonstrative purposes,
@@ -1100,90 +929,34 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   potential states based on the time series pictured above. State 1: solutes
   far from the pore region are trapped in the tails leading to restricted 
   motion. State 2: unbound solutes within the pores make large and frequent
-  movements. State 3: solutes donating hydrogen bonds to monomer head groups
-  tend to stay in place. (b) There is a probability associated with each
-  transition between states, represented by the arrows above. For example, following
-  the red arrow, there are associated probabilities for going from State 1 to
+  movements. State 3: solutes are held in place by hydrogen bonds with monomer head groups
+  (b) There is a probability associated with each transition between states, represented by the arrows above. For example, following
+  the red arrows, there are probabilities associated with going from State 1 to
   State 2, from State 1 to State 3 and from State 1 back to State 1.
   }\label{fig:markov_states}
   \vspace{-.5cm}
   \end{figure}
   
   I will use the Kalman filter algorithm in order to identify distinct states
-  in solute time series and simultaneously describe the dynamics of each state.~\cite{hamilton_time_1994}
+  in solute time series and simultaneously describe the dynamics of each state.~\cite{kalman_new_1960}
   In general, the Kalman filter can attempt to linearly project subsequent 
   steps in a time series based on its past values. The error in each prediction
   is stored sequentially. Regions of the time series associated with the 
   largest prediction uncertainties can be used as an indication of a state change.
   Using a non-parametric Bayesian approach to identify states, I will not need to 
-  pre-define the number of states which will allow the data to drive the
-  model complexity.~\cite{lee_unraveling_2017} A convenient byproduct of the Kalman
-  filter are maximum likelihood estimates for parameters which describe the times
+  pre-define the number of states, which will allow the data to drive the
+  model's complexity.~\cite{lee_unraveling_2017} A convenient byproduct of the Kalman
+  filter are maximum likelihood estimates for parameters which describe the time
   series in terms of an autoregressive moving average (ARMA) process:~\cite{hamilton_time_1994}
   \begin{equation}
   Y_t = c + \phi_1 Y_{t-1} + \phi_2 Y_{t-2} + \cdot\cdot\cdot + \phi_p Y_{t-p} + \epsilon_t + \theta_1\epsilon_{t-1} + \theta_2\epsilon_{t-2} + \cdot\cdot\cdot + \theta_q\epsilon_{t-q}
   \label{eqn:arma}
   \end{equation}
-  where $\epsilon$ is a white noise parameter. With knowledge of the transition 
-  probabilities and the dynamic behavior of each state described by 
-  Equation~\ref{eqn:arma}, I can forecast solute time series orders of 
+  where $Y_t$ represents the time series value at time $t$, $\epsilon$ is a white noise
+  parameter and $\phi$ and $\theta$ are coefficients determined by the Kalman filter. 
+  With knowledge of the transition probabilities and the dynamic behavior of each
+  state described by Equation~\ref{eqn:arma}, I can forecast solute time series orders of 
   magnitude longer than with molecular simulations.
-  
-%  Density forecasting can provide
-%  predictions based on properties of a time series without any knowledge
-%  of the physical interactions leading to those properties. 
-  
-%  \begin{wrapfigure}{l}{0.6\textwidth}
-%  \centering
-%  \vspace{-0.75cm}
-%  \includegraphics[width=\linewidth]{correlograms.pdf}
-%  \caption{Correlograms of $z_t$ reveal dependence for all 4 powers of 
-%  $(z - \overline{z})$.}\label{fig:correlograms}
-%  \vspace{-0.5cm}
-%  \end{wrapfigure}
-  
-%With density forecasting, one can instead 
-%  compile the hop length and magnitude between each time step 
-%  (Figure~\ref{fig:first_order_difference}) into a probability density
-%  like that shown in Figure~\ref{fig:hop_density}. As a first attempt, 
-%  one could randomly draw from this distribution in order to construct
-%  a time series like that shown in Figure~\ref{fig:naive_density_forecast}.
-  
-%  One can test how well a time series of hop lengths, $h_t$, is described by the 
-%  hop density, $p(h)$, in Figure~\ref{fig:hop_density} using the probability
-%  integral transform:~\cite{diebold_evaluating_1998}
-%  \begin{equation}
-%  z_t = \int_{-\infty}^{h_t} p(u) du
-%  \label{eqn:pit}
-%  \end{equation}
-%  Generally, one uses the first half of a time series, or in-sample data, to
-%  create $p(h)$ and applies Equation~\ref{eqn:pit} to the second half of
-%  the time series, or out-sample data. If the distribution of $z_t$ values
-%  is uniform, then the cumulative distribution function of $p(h)$ has been
-%  sampled uniformly by the out-sample data and there is evidence that the 
-%  time series is well-described by $p(h)$. Using the out-sample data from 
-%  Figure~\ref{fig:density_forecast}, we observe a uniform distribution of
-%  $z_t$ values (Figure~\ref{fig:z_histogram}).
-  
-%  However, it is also necessary to look for correlations in $z_t$. Diebold
-%  et al. found that examination of the correlograms of $(z - \overline{z})$,
-%  $(z - \overline{z})^2$, $(z - \overline{z})^3$ and $(z - \overline{z})^4$,
-%  which represent dependence of the mean, variance, skewness and kurtosis 
-%  respectively, are adequate to identify potentially sophisticated and 
-%  nonlinear forms of past dependence.~\cite{diebold_evaluating_1998} Continuing
-%  with our example above, the correlograms of $z_t$ shown in Figure~\ref{fig:correlograms} 
-%  exhibit serial dependence for all powers of $(z - \overline{z})$. Our 
-%  time series exhibits dependence on its past values, a feature that was 
-%  not included in the forecast shown in Figure~\ref{fig:naive_density_forecast}.
-  %This likely explains the qualitative difference in the time series of 
-  %Figure~\ref{fig:breakpoints} versus~\ref{fig:naive_density_forecast}.
-  
-%  Going forward, I will need to incorporate previous dependence in the 
-%  form of a conditional density forecast with the form $p(h|\Omega_t)$ where
-%  $\Omega_t$ incorporates past hop lengths and radial distances from
-%  the pore center. These types of autoregressive models have been widely
-%  studied in the context of economics, but are still well-suited for 
-%  application to solute transport.~\cite{hamilton_time_1994}
   
   \noindent \textbf{\large Objective 4:} \textit{\large Apply analyses to 
   Q\textsubscript{I} phase} (\textcolor{blue}{\textbf{In Progress}})
@@ -1251,19 +1024,6 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   use my molecular model to offer an explanation for the complex behavior described
   in their work (see first paragraph of Section~\ref{section:objectives}).
 
-  %MRS2: emphasize comparison to experiments more here, based on what they have done, and what they will do; outline how you will compare to those experiments.
-
-%  \noindent \textbf{\large Objective 5} \textit{\large Create a well-documented python package} (\textcolor{blue}{\textbf{In Progress}})
-%  
-%  Python scripts used to simulate X-ray diffraction patterns are available in the following
-%  GitHub repository: \url{https://github.com/joeyelk/MD-Structure-Factor}. Documentation
-%  is forthcoming. 
-%  
-%  Python scripts used to conduct all other post-simulation trajectory analysis are 
-%  also available on GitHub: \url{https://github.com/shirtsgroup/LLC_Membranes}. 
-%  Documentation is a work in progress. It is available for viewing in its 
-%  current state at \url{https://llc-membranes.readthedocs.io/en/latest/}.
-
   \section{Timeline for Completion of Objectives}\label{section:timeline}
 
   A schematic of the estimated timeline that I plan to follow for the 
@@ -1286,10 +1046,10 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
 	\begin{tabular}{@{\,}r <{\hskip 2pt} !{\foo} >{\raggedright\arraybackslash}p{8cm}}
 	\toprule
 	\addlinespace[1.5ex]
-	August 2019 & Complete Stochastic Model for H\textsubscript{II} phase \\
-	September 2019 & Finalize Q\textsubscript{I} phase structure \\
-    January 2020 & Finish transport study of Q\textsubscript{I} phase \\
-    April 2020 & Finish application of stochastic model to Q\textsubscript{I} phase \\
+	August 2019 & Complete Stochastic Model for H\textsubscript{II} phase (Objective 3) \\
+	September 2019 & Finalize Q\textsubscript{I} phase structure (Objective 4) \\
+    January 2020 & Finish transport study of Q\textsubscript{I} phase (Objective 4) \\
+    April 2020 & Finish application of stochastic model to Q\textsubscript{I} phase (Objective 4) \\
     May 2020 & PhD Defense \\
 	\end{tabular}
 	\label{table:timeline}

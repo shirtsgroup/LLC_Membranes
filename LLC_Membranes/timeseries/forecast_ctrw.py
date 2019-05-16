@@ -116,13 +116,13 @@ class System(object):
         print('Done!')
 
         #plot z-coordinate trace
-        plt.plot(self.time, self.com[:, 1, 2], linewidth=2)
-        plt.tick_params(labelsize=14)
-        plt.xlabel('Time (ns)', fontsize=14)
-        plt.ylabel('$z$-coordinate (nm)', fontsize=14)
-        plt.tight_layout()
-        plt.show()
-        exit()
+        # plt.plot(self.time, self.com[:, 1, 2], linewidth=2)
+        # plt.tick_params(labelsize=14)
+        # plt.xlabel('Time (ns)', fontsize=14)
+        # plt.ylabel('$z$-coordinate (nm)', fontsize=14)
+        # plt.tight_layout()
+        # plt.show()
+        # exit()
 
         # plot first order difference histogram
         # nbins = 100
@@ -135,16 +135,16 @@ class System(object):
         # exit()
 
         #plot first order differences
-        plt.figure()
-        plt.plot((self.com[1:, 1, 2] - self.com[:-1, 1, 2]))
-        # plt.plot(self.com[:, 1, 2], linewidth=2)
-        plt.tick_params(labelsize=14)
-        plt.xticks(np.linspace(0, 2000, 9), [int(i) for i in np.linspace(0, 1000, 9)])
-        plt.xlabel('Time (ns)', fontsize=14)
-        plt.ylabel('$z$-direction hop length (nm)', fontsize=14)
-        plt.tight_layout()
-        plt.show()
-        exit()
+        # plt.figure()
+        # plt.plot((self.com[1:, 1, 2] - self.com[:-1, 1, 2]))
+        # # plt.plot(self.com[:, 1, 2], linewidth=2)
+        # plt.tick_params(labelsize=14)
+        # plt.xticks(np.linspace(0, 2000, 9), [int(i) for i in np.linspace(0, 1000, 9)])
+        # plt.xlabel('Time (ns)', fontsize=14)
+        # plt.ylabel('$z$-direction hop length (nm)', fontsize=14)
+        # plt.tight_layout()
+        # plt.show()
+        # exit()
 
         #create timeseries by randomly drawing from unconditional pdf of hop lengths
         # plt.figure()
@@ -548,6 +548,7 @@ class System(object):
             fig, ax = plt.subplots(2, 2, figsize=(12, 8))
             hops, hop_ax = plt.subplots()
             dwells, dwell_ax = plt.subplots()
+            fontsize = 16
 
             ax[0, 0].bar(bins_dwell_centered, hist_dwell.mean(axis=0), width=dwell_bin_width, align='center')
             ax[0, 0].set_xlabel('Dwell Time (ns)', fontsize=14)
@@ -559,15 +560,16 @@ class System(object):
             ax[0, 0].legend(fontsize=12)
 
             dwell_ax.bar(bins_dwell_centered, hist_dwell.mean(axis=0), width=dwell_bin_width, align='center')
-            dwell_ax.set_xlabel('Dwell Time (ns)', fontsize=14)
-            dwell_ax.set_ylabel('Frequency', fontsize=14)
+            dwell_ax.set_xlabel('Dwell Time (ns)', fontsize=fontsize)
+            dwell_ax.set_ylabel('Frequency', fontsize=fontsize)
 
             dwell_ax.plot(bins_dwell_centered, bins_dwell_centered ** -(1 + np.mean(self.alpha_distribution)),
                           '--', color='black', label='Power law MLE fit', linewidth=2)
-            dwell_ax.legend(fontsize=14)
-            dwell_ax.text(360, 0.0225, r'$p \propto t^{(-1 - \alpha)}$', fontsize=14)
-            dwell_ax.text(360, 0.02, r'$\alpha_{fit}$ = %.3f $\pm$ %.3f ns$^{-1}$' %
-            (np.mean(self.alpha_distribution), np.std(self.alpha_distribution)), fontsize=14)
+            dwell_ax.legend(fontsize=fontsize)
+            dwell_ax.text(290, 0.022, r'$p \propto t^{(-1 - \alpha)}$', fontsize=fontsize)
+            dwell_ax.text(290, 0.019, r'$\alpha_{fit}$ = %.3f $\pm$ %.3f ns$^{-1}$' %
+            (np.mean(self.alpha_distribution), np.std(self.alpha_distribution)), fontsize=fontsize)
+            dwell_ax.tick_params(labelsize=fontsize)
 
             ax[0, 1].hist(self.alpha_distribution, bins=nbins)
             ax[0, 1].set_xlabel(r'Bootstrapped $\alpha$ (ns$^{-1}$)', fontsize=14)
@@ -586,12 +588,13 @@ class System(object):
             hop_ax.plot(bins_hop_centered, gaussian(bins_hop_centered, hop_mean, np.mean(self.hop_sigma_distribution))
                           , '--', label='Gaussian MLE fit', color='black', linewidth=2)
 
-            hop_ax.set_xlabel('Hop Length ($z$-direction, nm)', fontsize=14)
-            hop_ax.set_ylabel('Frequency', fontsize=14)
-            hop_ax.legend(fontsize=14)
-            hop_ax.text(0.325, 1.025, '$p \propto e^{\dfrac{(x-\mu)^2}{2\sigma^2}}$', fontsize=14)
-            hop_ax.text(0.325, 0.925, '$\sigma$=%.2f $\pm$ %.2f nm' % (np.mean(self.hop_sigma_distribution),
-                                                                 np.std(self.hop_sigma_distribution)), fontsize=14)
+            hop_ax.set_xlabel('Hop Length ($z$-direction, nm)', fontsize=fontsize)
+            hop_ax.set_ylabel('Frequency', fontsize=fontsize)
+            hop_ax.legend(fontsize=fontsize)
+            hop_ax.text(0.31, 0.95, '$p \propto e^{\dfrac{(x-\mu)^2}{2\sigma^2}}$', fontsize=fontsize)
+            hop_ax.text(0.31, 0.825, '$\sigma$=%.2f $\pm$ %.2f nm' % (np.mean(self.hop_sigma_distribution),
+                                                                np.std(self.hop_sigma_distribution)), fontsize=fontsize)
+            hop_ax.tick_params(labelsize=fontsize)
 
             ax[1, 1].hist(self.hop_sigma_distribution, bins=nbins)
             ax[1, 1].set_xlabel('Bootstrapped $\sigma$ (nm)', fontsize=14)
@@ -680,6 +683,7 @@ class System(object):
 
             #self.hurst_distribution.append(np.log(2 * hboot + 2) / (2 * np.log(2)))
 
+        fontsize=16
         plt.figure()
         plt.plot(self.hop_acf, linewidth=2, label='Simulated autocorrelation')
         plt.plot(np.arange(max_hops), fitting_functions.hurst_autocovariance(np.arange(max_hops),
@@ -688,13 +692,14 @@ class System(object):
         plt.fill_between(np.arange(max_hops), errorbars[1, :] + boot.mean(axis=0),
                          boot.mean(axis=0) - errorbars[0, :],
                          alpha=0.25)
-        plt.text(4.25, 0.575, '$\gamma(k) = \dfrac{1}{2}[|k-1|^{2H} - 2|k|^{2H} + |k + 1|^{2H}]$', fontsize=14)
-        plt.text(4.25, 0.4, '$H$ = %.2f $\pm$ %.2f' % (np.mean(self.hurst_distribution), np.std(self.hurst_distribution)), fontsize=14)
-        plt.xlabel('Lag', fontsize=14)
-        plt.ylabel('Autocorrelation', fontsize=14)
-        plt.tick_params(labelsize=14)
+        plt.text(1.5, 0.5, '$\gamma(k) = \dfrac{1}{2}[|k-1|^{2H} - 2|k|^{2H} + |k + 1|^{2H}]$', fontsize=fontsize)
+        plt.text(1.5, 0.3, '$H$ = %.2f $\pm$ %.2f' % (np.mean(self.hurst_distribution), np.std(self.hurst_distribution)), fontsize=fontsize)
+        plt.xticks([1, 3, 5, 7, 9, 11, 13, 15])
+        plt.xlabel('Lag (k)', fontsize=fontsize)
+        plt.ylabel('Autocorrelation', fontsize=fontsize)
+        plt.tick_params(labelsize=fontsize)
         plt.xlim(0.05, 15)
-        plt.legend(fontsize=14)
+        plt.legend(fontsize=fontsize)
         plt.tight_layout()
         plt.savefig('hop_acf.pdf')
         # plt.show()
@@ -816,9 +821,9 @@ if __name__ == "__main__":
 
         file_rw.save_object(sys, 'forecast_%s.pl' % args.residue)
 
-    sys.fit_distributions(nbins=args.nbins, nboot=args.nboot, plot=True, show=False, save=True)
-    #sys.estimate_hurst()
-    # plt.hist(sys.hurst_distribution, bins=25)
+    #sys.fit_distributions(nbins=args.nbins, nboot=args.nboot, plot=True, show=False, save=True)
+    sys.estimate_hurst()
+    #plt.hist(sys.hurst_distribution, bins=25)
     plt.show()
     exit()
     # plt.plot(sys.hop_acf, linewidth=2,  label='Simulation')
