@@ -115,14 +115,14 @@ class System(object):
         self.com = physical.center_of_mass(self.pos, self.mass)  # center of mass of residues
         print('Done!')
 
-        # plot z-coordinate trace
-        # plt.plot(self.time, self.com[:, 1, 2], linewidth=2)
-        # plt.tick_params(labelsize=14)
-        # plt.xlabel('Time (ns)', fontsize=14)
-        # plt.ylabel('$z$-coordinate (nm)', fontsize=14)
-        # plt.tight_layout()
-        # plt.show()
-        # exit()
+        #plot z-coordinate trace
+        plt.plot(self.time, self.com[:, 1, 2], linewidth=2)
+        plt.tick_params(labelsize=14)
+        plt.xlabel('Time (ns)', fontsize=14)
+        plt.ylabel('$z$-coordinate (nm)', fontsize=14)
+        plt.tight_layout()
+        plt.show()
+        exit()
 
         # plot first order difference histogram
         # nbins = 100

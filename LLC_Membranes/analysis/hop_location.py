@@ -199,6 +199,6 @@ if __name__ == "__main__":
     else:
         cmax = None
 
-    hops.regional_hop_lengths(0.75)
+    #hops.regional_hop_lengths(0.75)
 
-    hops.plot_hop_locations(show=False, cmap_max=cmax, colormap=args.colormap, bins=args.bins)
+    hops.plot_hop_locations(show=True, cmap_max=cmax, colormap=args.colormap, bins=args.bins)
