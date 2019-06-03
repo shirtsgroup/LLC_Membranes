@@ -23,7 +23,7 @@ def initialize():
     parser.add_argument('-d', '--dim', default=10, type=float, help='Unit cell dimension (length of x, y and z vector)')
     parser.add_argument('-o', '--output', default='initial.gro', type=str, help='Name of output .gro file')
     parser.add_argument('-dens', '--density', default=1.1, type=float, help='Density of system (g/cm3)')
-    parser.add_argument('-c', '--curvature', default=-1, type=int,help='-1 : QI phase, 1, QII phase. Determines whether'
+    parser.add_argument('-c', '--curvature', default=-1, type=int, help='-1 : QI phase, 1, QII phase. Determines whether'
                         'the phase is normal or inverted')
     parser.add_argument('-wt', '--weight_percent', default=77.1, type=float, help='Weight %% of monomer in membrane')
     parser.add_argument('-sol', '--solvent', default='glycerol', type=str, help='Name of solvent mixed with monomer')

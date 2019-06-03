@@ -52,8 +52,9 @@ class ReadItp(object):
         self.planeatoms = []
         self.plane_indices = []
         self.benzene_carbons = []
-        self.lineatoms = np.zeros([2], dtype=int)
-        self.ref_atom_index = None
+        #self.lineatoms = np.zeros([2], dtype=int)
+        self.lineatoms = [[], []]
+        self.ref_atom_index = []
         self.c1_atoms = []
         self.c2_atoms = []
         self.c1_index = []
@@ -85,7 +86,7 @@ class ReadItp(object):
 
             _, type, _, resname, atom_name, _, _, _ = data[:8]
 
-            ndx = int(data[0])
+            ndx = int(data[0]) - 1
             charge = float(data[6])
 
             try:
@@ -118,11 +119,11 @@ class ReadItp(object):
                         self.planeatoms.append(atom_name)
                         self.plane_indices.append(ndx)
                     if 'L1' in annotations:
-                        self.lineatoms[1] = ndx
+                        self.lineatoms[1].append(ndx)
                     if 'L2' in annotations:
-                        self.lineatoms[0] = ndx
+                        self.lineatoms[0].append(ndx)
                     if 'R' in annotations:
-                        self.ref_atom_index = ndx
+                        self.ref_atom_index.append(ndx)
                     if 'C1' in annotations:
                         self.c1_atoms.append(atom_name)
                         self.c1_index.append(ndx)
@@ -149,6 +150,8 @@ class ReadItp(object):
                     pass
 
             self.natoms += 1
+
+        #self.lineatoms = [np.array(x) for x in self.lineatoms]
 
     def organize_bonds(self):
 
@@ -410,6 +413,10 @@ class LC(ReadItp):
         self.LC_positions = t.xyz[0, :, :]
         self.LC_names = [a.name for a in t.topology.atoms]
         self.LC_residues = [a.residue.name for a in t.topology.atoms]
+
+        # Things ReadItp gets wrong because it doesn't include the ion .itps
+        self.natoms = len(self.LC_names)
+        self.residues = np.unique(self.LC_residues)
 
         self.full = a
 

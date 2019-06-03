@@ -91,7 +91,22 @@ fig, ax = plt.subplots()#figsize=(12, 7))
 bar_width = 0.4
 opacity = 0.8
 index = np.arange(len(labels))
-print((python_tamsd / md_tamsd)[1:].mean())
+
+from scipy.stats import linregress
+slope, intercept, rvalue, _, _ = linregress(md_tamsd[1:], python_tamsd[1:])
+xmax = 4
+x = np.linspace(0, xmax, 100)
+plt.plot(x, slope*x + intercept, '--', color='black')
+plt.scatter(md_tamsd, python_tamsd)
+plt.xlim(0, 1.05*max(md_tamsd[1:]))
+plt.ylim(0, 1.05*max(python_tamsd[1:]))
+plt.ylabel('MSD from sFBM realizations', fontsize=16)
+plt.xlabel('MSD from MD trajectories', fontsize=16)
+plt.text(1, 0.35, "y = %.2fx + %.2f" % (slope, intercept), fontsize=16) 
+plt.text(1, 0.25, "$R^2$ = %.3f" % rvalue**2, fontsize=16) 
+plt.tick_params(labelsize=16)
+plt.tight_layout()
+plt.show()
 exit()
 
 if time_averaged:

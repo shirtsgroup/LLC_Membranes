@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import os
-from LLC_Membranes.analysis import Atom_props
+# from LLC_Membranes.analysis import Atom_props
 import numpy as np
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -28,7 +28,7 @@ class LC(object):
         self.name = os.path.splitext(name)[0]  # build monomer name
 
         a = []
-        with open('%s/../top/structures/%s' % (location, name)) as f:
+        with open('%s/../top/topologies/%s' % (location, name)) as f:
             for line in f:
                 a.append(line)
 
@@ -56,7 +56,7 @@ class LC(object):
                 xyz[i - 2, :] = [float(a[i][20:28]), float(a[i][28:36]), float(a[i][36:44])]
                 res = str.strip(a[i][5:10])
                 name = str.strip(a[i][10:15])
-                MW += Atom_props.mass[name]
+                #MW += Atom_props.mass[name]
                 names.append(name)
                 resid.append(res)
                 if res in residues:
@@ -81,7 +81,7 @@ class LC(object):
                     if 'I' in annotations:
                         self.no_ions += 1
                         ion = str.strip(a[i][10:15])
-                        self.valence = Atom_props.charge[ion]
+                        #self.valence = Atom_props.charge[ion]
                         if ion not in self.ions:
                             self.ions.append(ion)
 
@@ -109,7 +109,7 @@ class LC(object):
                 xyz[i - start, :] = [float(line[5]), float(line[6]), float(line[7])]
                 res = str.strip(a[i][17:22])
                 name = str.strip(a[i][11:17])
-                MW += Atom_props.mass[name]
+                #MW += Atom_props.mass[name]
                 if res in residues:
                     res_count += 1
                 else:
@@ -130,7 +130,7 @@ class LC(object):
                     if 'I' in annotations:
                         self.no_ions += 1
                         ion = line[2]
-                        self.valence = Atom_props.charge[ion]
+                        #self.valence = #Atom_props.charge[ion]
                         if ion not in self.ions:
                             self.ions.append(ion)
 
@@ -143,6 +143,7 @@ class LC(object):
 	
         # direction monomer is pointing
         L = np.zeros([2, 3])
+        print(L)
         L[0, :] = np.array([sum([l[0] for l in L1]), sum([l[1] for l in L1]), sum([l[2] for l in L1])]) / len(L1)
         L[1, :] = np.array([sum([l[0] for l in L2]), sum([l[1] for l in L2]), sum([l[2] for l in L2])]) / len(L2)
         V = L[1, :] - L[0, :]  # direction monomer is pointing based on points defined by average xyz of L1 and L2
