@@ -13,7 +13,7 @@ def simulate(mdp, top, gro, out, verbose=False, em_energy=False, mpi=False, npro
 
     gmx = "gmx"
     if mpi:
-        gmx = "gmx_mpi mpirun -np %d" % nprocesses
+        gmx = "mpirun -np %d gmx_mpi" % nprocesses
 
     grompp = '%s grompp -f %s -c %s -p %s -o %s' % (gmx, mdp, gro, top, out)
 
@@ -65,7 +65,7 @@ def insert_molecules(gro, solute, n, out, scale=0.4, mpi=False, nprocesses=4):
 
     gmx = "gmx"
     if mpi:
-        gmx = "gmx_mpi mpirun -np %d" % nprocesses
+        gmx = "mpirun -np %d gmx_mpi" % nprocesses
 
     insert = "%s insert-molecules -f %s -ci %s/../top/topologies/%s -nmol %d -o %s -scale %s" % (gmx, gro,
                                                                                                  script_location,
