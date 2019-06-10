@@ -24,7 +24,7 @@ def simulate(mdp, top, gro, out, verbose=False, em_energy=False, mpi=False, npro
 
     p1.wait()
 
-    mdrun = 'gmx mdrun -deffnm %s' % out
+    mdrun = '%s mdrun -deffnm %s' % (gmx, out)
 
     if verbose:
         mdrun += ' -v'
