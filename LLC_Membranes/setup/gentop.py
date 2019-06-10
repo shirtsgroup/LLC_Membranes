@@ -188,7 +188,7 @@ class SystemTopology(object):
         :type top_description: str
         """
 
-        resname = residue.resname
+        resname = residue.name
         if residue.is_ion:
             self.ions.append(resname)
 

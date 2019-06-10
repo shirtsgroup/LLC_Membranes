@@ -192,5 +192,6 @@ if __name__ == "__main__":
     generate_input_files(args.initial, 'npt', args.length_berendsen, genvel=False, barostat='berendsen')
     simulate('npt.mdp', 'topol.top', 'nvt.gro', 'berendsen', mpi=args.mpi, np=args.nproc)
 
-    generate_input_files(args.initial, 'npt', args.length_Parrinello_Rahman, genvel=False, barostat='Parrinello-Rahman', frames=400)
+    generate_input_files(args.initial, 'npt', args.length_Parrinello_Rahman, genvel=False, barostat='Parrinello-Rahman',
+                         frames=400)
     simulate('npt.mdp', 'topol.top', 'berendsen.gro', 'PR', mpi=args.mpi, np=args.nproc)

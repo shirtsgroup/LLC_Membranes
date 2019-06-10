@@ -172,4 +172,6 @@ if __name__ == "__main__":
 
         system.place_monomers(shift=args.shift, curvature=args.curvature)
 
+        system.reorder()
+
         system.write_final_configuration()

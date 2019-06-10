@@ -68,6 +68,8 @@ class BicontinuousCubicBuild(topology.LC):
         # initialize other variables
         self.grid = None
         self.final_positions = None
+        self.all_residues = None
+        self.all_names = None
 
     def gen_grid(self, n, plot=False):
         """ Create an n x n x n grid of points which lie close to the surface describing the unit cell space group
@@ -142,7 +144,7 @@ class BicontinuousCubicBuild(topology.LC):
         # multiple atoms can be used to specify the lineatoms and reference atoms. Their average positions are used
         l1 = self.LC_positions[self.lineatoms[1], :].mean(axis=0)
         l2 = self.LC_positions[self.lineatoms[0], :].mean(axis=0)
-        linevector = l1 - l2
+        linevector = l2 - l1
         reference_position = self.LC_positions[self.ref_atom_index, :].mean(axis=0)
 
         for i in range(self.nmon):
@@ -164,7 +166,23 @@ class BicontinuousCubicBuild(topology.LC):
 
             self.final_positions[i * self.natoms:(i + 1) * self.natoms, :] = xyz_origin
 
-    def write_final_configuration(self):
+    def reorder(self):
+        """ reorder coordinate, residues and atom names so that residues are separated """
 
-        file_rw.write_gro_pos(self.final_positions, 'initial.gro', res=self.LC_residues * self.grid.shape[0],
-                              ids=self.LC_names * self.grid.shape[0], box=[self.period, self.period, self.period])
+        ordered = []
+        for r in self.residues:
+            ordered += [i for i, a in enumerate(self.LC_residues * self.nmon) if a == r]
+
+        self.final_positions = self.final_positions[ordered, :]
+        all_residues = self.LC_residues * self.nmon
+        all_names = self.LC_names * self.nmon
+        self.all_residues = [all_residues[i] for i in ordered]
+        self.all_names = [all_names[i] for i in ordered]
+
+    def write_final_configuration(self, name='initial.gro', box=None):
+
+        if not box:
+            box = [self.period, self.period, self.period]
+
+        file_rw.write_gro_pos(self.final_positions, name, res=self.all_residues, ids=self.all_names,
+                              box=box)

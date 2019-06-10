@@ -358,7 +358,7 @@ class Molecule(object):
             self.xyz = t.xyz
 
             self.mw = 0  # molecular weight (grams)
-            for a in t.topology.atoms:
+            for a in t.topology.deltaatoms:
                 self.mw += atom_props.mass[a.name]
 
             self.com = np.zeros([3])  # center of mass of solute
@@ -416,7 +416,15 @@ class LC(ReadItp):
 
         # Things ReadItp gets wrong because it doesn't include the ion .itps
         self.natoms = len(self.LC_names)
-        self.residues = np.unique(self.LC_residues)
+
+        # This has a more predictable order than np.unique and set()
+        self.residues = []
+        self.MW = 0
+        for a in t.topology.atoms:
+            element = ''.join([i for i in a.name if not i.isdigit()])  # get rid of number in atom name
+            self.MW += md.element.Element.getBySymbol(element).mass
+            if a.residue.name not in self.residues:
+                self.residues.append(a.residue.name)
 
         self.full = a
 

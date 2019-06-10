@@ -132,7 +132,6 @@ while [[ ${ntot} -lt ${nsol} ]]; do
     cp nvt.gro nvt_${ntot}.gro
 
 done
-exit
 
 # a 'long' nvt equilibration
 ${python} ${DIR2}/input.py --bcc -b ${build_mon} -l 5000 --temp ${temp} -f 50 --genvel yes -e nvt -S --solvent glycerol --restraints

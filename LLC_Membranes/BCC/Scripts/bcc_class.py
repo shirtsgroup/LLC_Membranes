@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import os
-from LLC_Membranes.analysis import Atom_props
+# from LLC_Membranes.analysis import Atom_props
 import numpy as np
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -42,6 +42,7 @@ class LC(object):
         names = []
         resid = []
         MW = 0  # molecular weight
+        MW = 716
 
         if name.endswith('.gro'):
 
@@ -56,7 +57,7 @@ class LC(object):
                 xyz[i - 2, :] = [float(a[i][20:28]), float(a[i][28:36]), float(a[i][36:44])]
                 res = str.strip(a[i][5:10])
                 name = str.strip(a[i][10:15])
-                MW += Atom_props.mass[name]
+                #MW += Atom_props.mass[name]
                 names.append(name)
                 resid.append(res)
                 if res in residues:
@@ -81,7 +82,7 @@ class LC(object):
                     if 'I' in annotations:
                         self.no_ions += 1
                         ion = str.strip(a[i][10:15])
-                        self.valence = Atom_props.charge[ion]
+                        #self.valence = Atom_props.charge[ion]
                         if ion not in self.ions:
                             self.ions.append(ion)
 
@@ -109,7 +110,7 @@ class LC(object):
                 xyz[i - start, :] = [float(line[5]), float(line[6]), float(line[7])]
                 res = str.strip(a[i][17:22])
                 name = str.strip(a[i][11:17])
-                MW += Atom_props.mass[name]
+                #MW += Atom_props.mass[name]
                 if res in residues:
                     res_count += 1
                 else:
@@ -130,7 +131,7 @@ class LC(object):
                     if 'I' in annotations:
                         self.no_ions += 1
                         ion = line[2]
-                        self.valence = Atom_props.charge[ion]
+                        #self.valence = Atom_props.charge[ion]
                         if ion not in self.ions:
                             self.ions.append(ion)
 
