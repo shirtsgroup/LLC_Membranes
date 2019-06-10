@@ -42,7 +42,8 @@ def initialize():
 
     # run options
     parser.add_argument('-mpi', '--mpi', action="store_true", help='Parallelize computation via MPI')
-    parser.add_argument('-np', '--nprocesses', default=4, help='Number of MPI processes. Only if `mpi` is true')
+    parser.add_argument('-np', '--nprocesses', default=4, type=int, help='Number of MPI processes. Only if `mpi` is '
+                                                                         'true')
 
     return parser
 
