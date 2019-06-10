@@ -297,23 +297,25 @@ if __name__ == "__main__":
                            shift=args.shift, curvature=args.curvature)
 
     equil.build_initial_config(grid_points=args.grid, r=0.5)
-    # equil.scale_unit_cell(args.scale_factor)
-    #
-    # equil.generate_topology(name='topol.top')  # creates an output file
-    # equil.generate_mdps(length=50, frames=2, T=args.temperature)  # creates an object
-    # equil.mdp.write_em_mdp(out='em')
-    #
-    # nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True)  # mdp, top, gro, out
-    #
-    # while nrg >= 0:
-    #
-    #     equil.build_initial_config(grid_points=args.grid, r=0.5)
-    #     equil.scale_unit_cell(args.scale_factor)
-    #     nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True)
-    #
-    # cp = 'cp em.gro scaled_%.4f.gro' % args.scale_factor
-    # p = subprocess.Popen(cp.split())
-    # p.wait()
+    equil.scale_unit_cell(args.scale_factor)
+
+    equil.generate_topology(name='topol.top')  # creates an output file
+    equil.generate_mdps(length=50, frames=2, T=args.temperature)  # creates an object
+    equil.mdp.write_em_mdp(out='em')
+
+    nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
+                           nprocesses=args.nprocesses)  # mdp, top, gro, out
+
+    while nrg >= 0:
+
+        equil.build_initial_config(grid_points=args.grid, r=0.5)
+        equil.scale_unit_cell(args.scale_factor)
+        nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
+                               nprocesses=args.nprocesses)
+
+    cp = 'cp em.gro scaled_%.4f.gro' % args.scale_factor
+    p = subprocess.Popen(cp.split())
+    p.wait()
 
     equil.gro_name = 'scaled_%.4f.gro' % args.scale_factor
 
