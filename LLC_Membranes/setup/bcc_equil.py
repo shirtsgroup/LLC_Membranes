@@ -40,12 +40,17 @@ def initialize():
     parser.add_argument('-f', '--scale_factor', default=2, type=float, help='Factor by which to isotropically scale'
                                                                             'box dimensions during initial setup')
 
+    # run options
+    parser.add_argument('-mpi', '--mpi', action="store_true", help='Parallelize computation via MPI')
+    parser.add_argument('-np', '--nproc', default=4, help='Number of MPI processes. Only if `mpi` is true')
+
     return parser
 
 
 class EquilibrateBCC(topology.LC):
 
-    def __init__(self, build_monomer, space_group, box_length, weight_percent, density, shift=0, curvature=-1):
+    def __init__(self, build_monomer, space_group, box_length, weight_percent, density, shift=0, curvature=-1,
+                 mpi=False, nprocesses=4):
         """
         :param build_monomer: name of monomer with which to build phase
         :param space_group: name of space group into which monomers are arranged (i.e. gyroid, schwarzD etc.)
@@ -56,6 +61,8 @@ class EquilibrateBCC(topology.LC):
         :param shift: translate monomer along vector perpendicular to space group surface by this amount (nm). This
         parameter effectively controls the pore size
         :param curvature: determines whether the phase is normal or inverted. {-1 : QI phase, 1: QII phase}'
+        :param mpi: parallelize GROMACS commands using MPI
+        :param nprocesses: number of MPI processes if `mpi` is true
 
         :type monomer: str
         :type space_group: str
@@ -64,6 +71,8 @@ class EquilibrateBCC(topology.LC):
         :type density: float
         :type shift: float
         :type curvature: int
+        :type mpi: bool
+        :type nprocesses: int
         """
 
         super().__init__(build_monomer)
@@ -88,6 +97,10 @@ class EquilibrateBCC(topology.LC):
         self.mdp = None
         self.solvent = None
         self.nsolvent = 0
+
+        # parallelization
+        self.mpi = mpi
+        self.nprocesses = nprocesses
 
     def build_initial_config(self, grid_points=50, r=0.5, name='initial.gro'):
         """ Build an initial configuration with parameters specified in the __init__ function
@@ -191,6 +204,40 @@ class EquilibrateBCC(topology.LC):
 
         self.gro_name = name
 
+    def shrink_unit_cell(self, start, stop, step):
+        """ shrink the Q1 phase unit cell by isotropically scaling monomer positions and box lengths. Runs an energy
+        minimization between each shrinkage and reduces the rate of shrinkage if an energy minimization fails.
+
+        :param system: EquilibrateBCC object
+        :param start: scale of unit cell relative to desired scale
+        :param stop: final scale of unit cell relative to desired scale
+        :param step: how much to decrease scale each iteration
+
+        :type system: EquilibrateBCC object
+        :type start: float
+        :type stop: float
+        :type step: float
+        """
+
+        for i in np.linspace(start - step, stop, int(round((start - stop) / step))):
+
+            f = i / (i + step)
+            self.scale_unit_cell(f)
+            print('Attempting energy minimization with box lengths %.4f times desired size' % i, end='', flush=True)
+            nrg = gromacs.simulate(self.em_mdp, self.top_name, self.gro_name, self.em_mdp.split('.')[0],
+                                   em_energy=True, verbose=False, mpi=self.mpi, nprocesses=self.nprocesses)
+
+            if nrg >= 0:
+                print('...Failed. Will shrink slower on next iteration.')
+                self.gro_name = 'scaled_%.4f.gro' % (i + step)
+                self.shrink_unit_cell(i + step, i, step / 2)  # reduce shrink rate
+            else:
+                print('...Success!')
+
+            cp = 'cp em.gro scaled_%.4f.gro' % i
+            p = subprocess.Popen(cp.split())
+            p.wait()
+
     def add_solvent(self, solvent, tol=10):
         """ Name of solvent residue to add to structure. This is an iterative process of solvent insertion, energy
         minimzation, and an nvt simulation
@@ -202,7 +249,7 @@ class EquilibrateBCC(topology.LC):
         :type solvent: str
         :type tol: int
         """
-        print(self.gro_name)
+
         self.solvent = topology.Residue(solvent)
 
         mass_solvent = self.system.nmon * self.system.MW * ((100 - self.weight_percent) / self.weight_percent)
@@ -240,44 +287,6 @@ class EquilibrateBCC(topology.LC):
         p.wait()
 
 
-def shrink_unit_cell(system, start, stop, step):
-    """ shrink the Q1 phase unit cell by isotropically scaling monomer positions and box lengths. Runs an energy
-    minimization between each shrinkage and reduces the rate of shrinkage if an energy minimization fails.
-
-    :param system: EquilibrateBCC object
-    :param start: scale of unit cell relative to desired scale
-    :param stop: final scale of unit cell relative to desired scale
-    :param step: how much to decrease scale each iteration
-
-    :type system: EquilibrateBCC object
-    :type start: float
-    :type stop: float
-    :type step: float
-    """
-
-    for i in np.linspace(start - step, stop, int(round((start - stop) / step))):
-
-        # print(start, stop, step, int(round((start - stop) / step)))
-        # print(np.linspace(start - step, stop, int(((start - stop) / step))))
-        # print(i, i + step)
-        f = i / (i + step)
-        system.scale_unit_cell(f)
-        nrg = gromacs.simulate(system.em_mdp, system.top_name, system.gro_name, system.em_mdp.split('.')[0],
-                               em_energy=True, verbose=False)
-        print('Attempting energy minimization with box lengths %.4f times desired size' % (start*f), end='', flush=True)
-
-        if nrg >= 0:
-            print('...Failed. Will shrink slower on next iteration.')
-            system.gro_name = 'scaled_%.4f.gro' % (i + step)
-            shrink_unit_cell(system, i + step, i, step / 2)  # reduce shrink rate
-        else:
-            print('...Success!')
-
-        cp = 'cp em.gro scaled_%.4f.gro' % i
-        p = subprocess.Popen(cp.split())
-        p.wait()
-
-
 if __name__ == "__main__":
 
     args = initialize().parse_args()
@@ -288,27 +297,27 @@ if __name__ == "__main__":
                            shift=args.shift, curvature=args.curvature)
 
     equil.build_initial_config(grid_points=args.grid, r=0.5)
-    equil.scale_unit_cell(args.scale_factor)
-
-    equil.generate_topology(name='topol.top')  # creates an output file
-    equil.generate_mdps(length=50, frames=2, T=args.temperature)  # creates an object
-    equil.mdp.write_em_mdp(out='em')
-
-    nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True)  # mdp, top, gro, out
-
-    while nrg >= 0:
-
-        equil.build_initial_config(grid_points=args.grid, r=0.5)
-        equil.scale_unit_cell(args.scale_factor)
-        nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True)
-
-    cp = 'cp em.gro scaled_%.4f.gro' % args.scale_factor
-    p = subprocess.Popen(cp.split())
-    p.wait()
+    # equil.scale_unit_cell(args.scale_factor)
+    #
+    # equil.generate_topology(name='topol.top')  # creates an output file
+    # equil.generate_mdps(length=50, frames=2, T=args.temperature)  # creates an object
+    # equil.mdp.write_em_mdp(out='em')
+    #
+    # nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True)  # mdp, top, gro, out
+    #
+    # while nrg >= 0:
+    #
+    #     equil.build_initial_config(grid_points=args.grid, r=0.5)
+    #     equil.scale_unit_cell(args.scale_factor)
+    #     nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True)
+    #
+    # cp = 'cp em.gro scaled_%.4f.gro' % args.scale_factor
+    # p = subprocess.Popen(cp.split())
+    # p.wait()
 
     equil.gro_name = 'scaled_%.4f.gro' % args.scale_factor
 
     # slowly compress system to correct density
-    shrink_unit_cell(equil, args.scale_factor, 1.0, 0.1)  # EquilibrateBCC object, start, stop, step
+    equil.shrink_unit_cell(args.scale_factor, 1.0, 0.1)  # EquilibrateBCC object, start, stop, step
 
     equil.add_solvent(args.solvent)

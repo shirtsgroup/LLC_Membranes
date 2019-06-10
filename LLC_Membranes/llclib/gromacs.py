@@ -9,9 +9,13 @@ import os
 script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
-def simulate(mdp, top, gro, out, verbose=False, em_energy=False):
+def simulate(mdp, top, gro, out, verbose=False, em_energy=False, mpi=False, nprocesses=4):
 
-    grompp = 'gmx grompp -f %s -c %s -p %s -o %s' % (mdp, gro, top, out)
+    gmx = "gmx"
+    if mpi:
+        gmx = "gmx_mpi mpirun -np %d" % nprocesses
+
+    grompp = '%s grompp -f %s -c %s -p %s -o %s' % (gmx, mdp, gro, top, out)
 
     if verbose:
         p1 = subprocess.Popen(grompp.split())
@@ -42,7 +46,7 @@ def simulate(mdp, top, gro, out, verbose=False, em_energy=False):
             # empty string. Make nrg=0 so placement gets attempted again
 
 
-def insert_molecules(gro, solute, n, out, scale=0.4):
+def insert_molecules(gro, solute, n, out, scale=0.4, mpi=False, nprocesses=4):
     """ Insert n solutes into a .gro file
 
     :param gro: name of coordinate file where solutes will be placed
@@ -59,8 +63,13 @@ def insert_molecules(gro, solute, n, out, scale=0.4):
     :type scale: float
     """
 
-    insert = "gmx insert-molecules -f %s -ci %s/../top/topologies/%s -nmol %d -o %s -scale %s" % (gro, script_location,
-                                                                                                  solute, n, out, scale)
+    gmx = "gmx"
+    if mpi:
+        gmx = "gmx_mpi mpirun -np %d" % nprocesses
+
+    insert = "%s insert-molecules -f %s -ci %s/../top/topologies/%s -nmol %d -o %s -scale %s" % (gmx, gro,
+                                                                                                 script_location,
+                                                                                                 solute, n, out, scale)
 
     p = subprocess.Popen(insert.split(), stdout=open('inserted.txt', 'w'), stderr=subprocess.STDOUT)
     p.wait()
