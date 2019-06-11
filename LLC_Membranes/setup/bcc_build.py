@@ -142,8 +142,10 @@ class BicontinuousCubicBuild(topology.LC):
         self.final_positions = np.zeros([self.natoms * self.nmon, 3])
 
         # multiple atoms can be used to specify the lineatoms and reference atoms. Their average positions are used
+
         l1 = self.LC_positions[self.lineatoms[1], :].mean(axis=0)
         l2 = self.LC_positions[self.lineatoms[0], :].mean(axis=0)
+
         linevector = l2 - l1
         reference_position = self.LC_positions[self.ref_atom_index, :].mean(axis=0)
 
