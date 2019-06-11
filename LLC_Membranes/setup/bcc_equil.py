@@ -251,12 +251,12 @@ class EquilibrateBCC(topology.LC):
         :type tol: int
         """
 
-        self.solvent = topology.Residue(solvent)
+        # figure out number of solvent molecules to add
+        self.solvent = topology.Residue(solvent)  # get solvent properties
 
         mass_solvent = self.system.nmon * self.system.MW * ((100 - self.weight_percent) / self.weight_percent)
 
-        # number of solvent molecules to add
-        self.nsolvent = mass_solvent / self.solvent.MW
+        self.nsolvent = int(mass_solvent / self.solvent.MW)  # total number of solutes to add
 
         # create nvt mdp file
         self.mdp.write_nvt_mdp()
@@ -267,9 +267,12 @@ class EquilibrateBCC(topology.LC):
         total = 0  # for naming
         while self.nsolvent > 0 and delta > tol:
 
-            delta = gromacs.insert_molecules(self.gro_name, self.solvent.name, self.nsolvent, 'solvated.gro', scale=0.4)
+            delta = gromacs.insert_molecules(self.gro_name, self.solvent.name, self.nsolvent, 'solvated.gro', scale=0.57)
             total += delta
             print('Inserted %d %s molecules for a total of %d' % (delta, self.solvent.name, total))
+
+            if delta == 0:  # prevents an unnecessary extra energy minimization
+                break
 
             self.topology.add_residue(self.solvent, n=delta, write=True, topname=self.top_name)
             print('Energy minimizing...', end='', flush=True)
@@ -298,29 +301,29 @@ if __name__ == "__main__":
                            shift=args.shift, curvature=args.curvature)
 
     equil.build_initial_config(grid_points=args.grid, r=0.5)
-    equil.scale_unit_cell(args.scale_factor)
-
+    # equil.scale_unit_cell(args.scale_factor)
+    #
     equil.generate_topology(name='topol.top')  # creates an output file
     equil.generate_mdps(length=50, frames=2, T=args.temperature)  # creates an object
-    equil.mdp.write_em_mdp(out='em')
-
-    nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
-                           nprocesses=args.nprocesses)  # mdp, top, gro, out
-
-    while nrg >= 0:
-
-        equil.build_initial_config(grid_points=args.grid, r=0.5)
-        equil.scale_unit_cell(args.scale_factor)
-        nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
-                               nprocesses=args.nprocesses)
-
-    cp = 'cp em.gro scaled_%.4f.gro' % args.scale_factor
-    p = subprocess.Popen(cp.split())
-    p.wait()
+    # equil.mdp.write_em_mdp(out='em')
+    #
+    # nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
+    #                        nprocesses=args.nprocesses)  # mdp, top, gro, out
+    #
+    # while nrg >= 0:
+    #
+    #     equil.build_initial_config(grid_points=args.grid, r=0.5)
+    #     equil.scale_unit_cell(args.scale_factor)
+    #     nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
+    #                            nprocesses=args.nprocesses)
+    #
+    # cp = 'cp em.gro scaled_%.4f.gro' % args.scale_factor
+    # p = subprocess.Popen(cp.split())
+    # p.wait()
 
     equil.gro_name = 'scaled_%.4f.gro' % args.scale_factor
 
     # slowly compress system to correct density
-    equil.shrink_unit_cell(args.scale_factor, 1.0, 0.1)  # EquilibrateBCC object, start, stop, step
-
+    #equil.shrink_unit_cell(args.scale_factor, 1.0, 0.1)  # EquilibrateBCC object, start, stop, step
+    equil.gro_name = 'scaled_1.0000.gro'
     equil.add_solvent(args.solvent)

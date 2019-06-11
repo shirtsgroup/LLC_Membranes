@@ -3,6 +3,14 @@
 import numpy as np
 
 
+class SurfaceError(Exception):
+    """ Raised if invalid phase specified """
+
+    def __init__(self, message):
+
+        super().__init__(message)
+
+
 def SchwarzD(x, period):
     """
     :param x: a vector of coordinates (x1, x2, x3)
@@ -108,16 +116,20 @@ def gradient(v, surf, period):
 
     n = 2*np.pi / period
 
-    if surf == 'Ia3d' or surf == 'gyroid' or surf == 'ia3d' or surf == 'SchwarzD':
+    if surf.lower() == 'ia3d' or surf.lower() == 'gyroid':
 
         a = n*np.cos(n*x)*np.cos(n*y) - n*np.sin(n*x)*np.sin(n*z)
         b = -n*np.sin(n*y)*np.sin(n*x) + n*np.cos(n*y)*np.cos(n*z)
         c = -n*np.sin(n*y)*np.sin(n*z) + n*np.cos(n*z)*np.cos(n*x)
 
-    elif surf == 'Pn3m' or surf == 'pn3m':
+    elif surf.lower() == 'pn3m' or surf.lower() == 'schwarzd':
 
         a = n*np.cos(n*x)*np.sin(n*y)*np.sin(n*z) + n*np.cos(n*x)*np.cos(n*y)*np.cos(n*z) - n*np.sin(n*x)*np.sin(n*y)*np.cos(n*z) - n*np.sin(n*x)*np.cos(n*y)*np.sin(n*z)
         b = n*np.sin(n*x)*np.cos(n*y)*np.sin(n*z) - n*np.sin(n*x)*np.sin(n*y)*np.cos(n*z) + n*np.cos(n*x)*np.cos(n*y)*np.cos(n*z) - n*np.cos(n*x)*np.sin(n*y)*np.sin(n*z)
         c = n*np.sin(n*x)*np.sin(n*y)*np.cos(n*z) - n*np.sin(n*x)*np.cos(n*y)*np.sin(n*z) - n*np.cos(n*x)*np.sin(n*y)*np.sin(n*z) + n*np.cos(n*x)*np.cos(n*y)*np.cos(n*z)
+
+    else:
+
+        raise SurfaceError('The surface %s is named incorrectly or is not implemented' % surf)
 
     return np.array([a, b, c])

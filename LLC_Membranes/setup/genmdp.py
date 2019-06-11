@@ -113,9 +113,11 @@ class SimulationMdp(object):
         nsteps = 'nsteps = %s' % self.em_steps
         cutoff_scheme = 'cutoff-scheme = verlet'
         nstlist = 'nstlist = 40'
+        constraints = 'constraints = h-bonds'
 
         f = open('%s.mdp' % out, 'w')
-        f.writelines([title + '\n', integrator + '\n', nsteps + '\n', cutoff_scheme + '\n', nstlist + '\n'])
+        f.writelines([title + '\n', integrator + '\n', nsteps + '\n', cutoff_scheme + '\n', nstlist + '\n', constraints
+                      + '\n'])
 
         if self.xlink:
             f.write('periodic-molecules = yes\n')
