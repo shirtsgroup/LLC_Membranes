@@ -122,7 +122,7 @@ class HopLocation(System):
 
         :return tuple containing : (mean hop length in the pore, std in pore, mean out of pore, std out of pore)
         """
-        print(r)
+
         self.r = np.array(self.r)
 
         # flatten list
@@ -201,4 +201,4 @@ if __name__ == "__main__":
 
     #hops.regional_hop_lengths(0.75)
 
-    hops.plot_hop_locations(show=True, cmap_max=cmax, colormap=args.colormap, bins=args.bins)
+    #hops.plot_hop_locations(show=True, cmap_max=cmax, colormap=args.colormap, bins=args.bins)

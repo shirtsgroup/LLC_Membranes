@@ -7,7 +7,7 @@ import numpy as np
 import tqdm
 
 wt = 5 
-water = True 
+water = False 
 path = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/pure_water/%swt" % wt
 
 t = md.load('%s/PR_box.xtc' % path, top='%s/berendsen.gro' % path)
@@ -54,8 +54,8 @@ ax.set_xlabel('$x$-location (nm)', fontsize=14)
 ax.set_ylabel('$y$-location (nm)', fontsize=14)
 ax.tick_params(labelsize=14)
 plt.tight_layout()
-if water:
-	plt.savefig('total_water_density_%swt.pdf' % wt)
-else:
-	plt.savefig('total_density_%swt.pdf' % wt)
+#if water:
+#	plt.savefig('total_water_density_%swt.pdf' % wt)
+#else:
+#	plt.savefig('total_density_%swt.pdf' % wt)
 plt.show()

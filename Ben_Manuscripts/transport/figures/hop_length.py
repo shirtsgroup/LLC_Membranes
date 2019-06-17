@@ -8,7 +8,7 @@ from LLC_Membranes.llclib import file_rw
 import argparse
 
 path = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11"
-wt = 10
+wt = 5 
 residues = ['ACH', 'ACN', 'ATO', 'BUT', 'DMF', 'DMP', 'DMS', 'EAC', 'ETH', 'GCL', 'GLY', 'MET', 'PCB', 'PG', 'PR', 'RIB', 'SOH', 'TET', 'THF', 'URE']
 
 parser = argparse.ArgumentParser()
@@ -22,8 +22,10 @@ cut = args.cut
 print('Cut-off = %s' % cut)
 
 try:
-
-	loaded = np.load('hop_lengths_cut_%s.npz' % cut)
+	if wt == 5:
+		loaded = np.load('hop_lengths_cut_%s_5wt.npz' % cut)
+	else:
+		loaded = np.load('hop_lengths_cut_%s.npz' % cut)
 	inpore = loaded['inpore']
 	outpore = loaded['outpore']
 
@@ -36,13 +38,16 @@ except FileNotFoundError:
 		print(r)
 
 		hops = file_rw.load_object('%s/%s/%swt/hop_locations.pl' % (path, r, wt))
-		x = hops.regional_hop_lengths(cut)
+		x = hops.regional_hop_lengths(cut, plot_distributions=False)
 		inpore[i, 0] = x[0]
 		inpore[i, 1] = x[1]
 		outpore[i, 0] = x[2]
 		outpore[i, 1] = x[3]
 
-	np.savez_compressed('hop_lengths_cut_%s' % cut, inpore=inpore, outpore=outpore)
+	if wt == 5:
+		np.savez_compressed('hop_lengths_cut_%s_5wt' % cut, inpore=inpore, outpore=outpore)
+	else:
+		np.savez_compressed('hop_lengths_cut_%s' % cut, inpore=inpore, outpore=outpore)
 
 # saved values
 #inpore = np.array([0.25, 0.23, 0.21, 0.18, 0.16, 0.16, 0.24, 0.19, 0.28, 0.30, 0.20, 0.39, 0.18, 0.22, 0.23, 0.15, 0.27, 0.21, 0.22, 0.26])
@@ -70,5 +75,5 @@ ax.set_ylabel('Mean hop length (nm)', fontsize=14)
 savename = 'hop_length.pdf'
 plt.legend(fontsize=14)
 plt.tight_layout()
-plt.savefig(savename)
-plt.show()
+#plt.savefig(savename)
+#plt.show()

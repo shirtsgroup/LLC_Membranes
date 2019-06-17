@@ -98,6 +98,7 @@ class System(object):
         self.com_coordinated, self.com_coordinated_map = self.narrow_atoms(coordinated_atoms, coordinated_residue,
                                                                            ctype, coordination=True, com=com)
 
+        print(self.com.shape, self.com_coordinated.shape)
         # relate indices to
         self.names = [a.name for a in self.t.topology.atoms]
         self.residues = [a.residue.name for a in self.t.topology.atoms]
@@ -299,7 +300,7 @@ class System(object):
             #     plt.show()
             #
             # exit()
-            print('Average coordinated molecules per frame: %.2f' % self.ncoord.mean())
+            print('Average coordinated molecules per frame: %.2f +/- %.2f' % self.ncoord.mean(), self.ncoord.std())
             #plt.plot(self.time, self.ncoord.mean(axis=1))
             if plot:
                 plt.plot(self.time, self.ncoord.sum(axis=1))

@@ -60,6 +60,7 @@ class Spline(object):
                                                   spline=True, progress=progress, npts=npts_spline)
 
         self.tortuosity = None
+        self.length = None
 
     def build_spline(self, rep='K', frame=-1, name='spline'):
         """ Build the spline into the last frame of the trajectory
@@ -95,6 +96,7 @@ class Spline(object):
         npts = self.pore_centers.shape[2]
         npores = self.pore_centers.shape[1]
         self.tortuosity = np.zeros([self.t.n_frames, npores])
+        self.length = np.zeros([self.t.n_frames, npores])
 
         for t in range(self.t.n_frames):
 
@@ -108,6 +110,7 @@ class Spline(object):
             bot = self.pore_centers[t, :, 0, :] + [0, 0, zbox]  # shift bottom point up
             l += np.linalg.norm(bot - self.pore_centers[t, :, -1, :], axis=1)
             self.tortuosity[t, :] = l / zbox
+            self.length[t, :] = l
 
     def plot_tortuosity(self):
 
@@ -131,5 +134,6 @@ if __name__ == "__main__":
     spline.build_spline()
     spline.compute_tortuosity()
     print('Mean Tortuosity: %.2f +/- %.2f' % (spline.tortuosity.mean(), spline.tortuosity.std()))
+    print('Mean Pore Length: %.2f +/- %.2f' % (spline.length.mean(), spline.length.std()))
     spline.save_tortuosity()
 

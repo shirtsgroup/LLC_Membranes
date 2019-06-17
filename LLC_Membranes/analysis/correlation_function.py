@@ -124,7 +124,7 @@ class Correlation(object):
             print('Trajectory loaded')
 
         if atoms is None:
-            if res is None:
+            if res is None:  # better to raise an exception
                 sys.exit("You must specify either a group of atoms or residue. Neither have been provided therefore "
                          "I can't do anything")
 

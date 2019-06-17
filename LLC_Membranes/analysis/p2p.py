@@ -380,7 +380,7 @@ if __name__ == '__main__':
 
     args = initialize().parse_args()  # parse the args
 
-    t = md.load(args.input, top=args.gro)[args.begin:args.end:args.skip]
+    t = md.load(args.traj, top=args.gro)[args.begin:args.end:args.skip]
 
     pos = restrict_atoms(t, args.component)  # convenience function
     nT = np.shape(pos)[0]

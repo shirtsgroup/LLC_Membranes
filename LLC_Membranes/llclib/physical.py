@@ -255,6 +255,7 @@ def avg_pore_loc(npores, pos, box, buffer=0, spline=False, npts=20, progress=Fal
             p_center = np.zeros([nT, npores, 2])
 
             for i in range(nT):
+                print(i)
 
                 positions = wrap_box(pos[i, ...], box[i, ...])
 
@@ -732,7 +733,7 @@ def partition(com, pore_centers, r, buffer=0, unitcell=None, npores=4, spline=Fa
     return part
 
 
-def wrap_box(positions, box):
+def wrap_box(positions, box, tol=1e-6):
     """ Put all atoms in box
 
     :param positions: xyz atomic position [n_atoms, 3]
@@ -757,7 +758,9 @@ def wrap_box(positions, box):
         xy[np.where(xy[:, 1] > ybox)[0], :2] -= [xbox*np.cos(angle), ybox]
         xy[np.where(xy[:, 1] < 0)[0], :2] += [xbox * np.cos(angle), ybox]
 
-    while len(np.where(xy[:, 0] < (xy[:, 1] / m))[0]) > 0 or len(np.where(xy[:, 0] > ((xy[:, 1] - b) / m))[0]) > 0:
+    # added tolerance for corner case
+    while len(np.where(xy[:, 0] - (xy[:, 1] / m) < -tol)[0]) > 0 or \
+            len(np.where(xy[:, 0] - ((xy[:, 1] - b) / m) > 0)[0]) > 0:
         xy[np.where(xy[:, 0] < (xy[:, 1] / m))[0], 0] += xbox
         xy[np.where(xy[:, 0] > ((xy[:, 1] - b) / m))[0], 0] -= xbox
 
