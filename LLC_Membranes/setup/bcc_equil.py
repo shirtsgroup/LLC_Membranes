@@ -374,7 +374,7 @@ if __name__ == "__main__":
     os.environ["GMX_MAXBACKUP"] = "-1"  # stop GROMACS from making backups
 
     # equil = EquilibrateBCC(args.build_monomer, args.space_group, args.box_length, args.weight_percent, args.density,
-    #                        shift=args.shift, curvature=args.curvature)
+    #                        shift=args.shift, curvature=args.curvature, mpi=args.mpi, nprocesses=args.nprocesses)
     #
     # equil.build_initial_config(grid_points=args.grid, r=0.5)
     # equil.scale_unit_cell(args.scale_factor)
@@ -405,7 +405,7 @@ if __name__ == "__main__":
     # equil.add_solvent(args.solvent)
 
     equil = EquilibrateBCC(args.build_monomer, args.space_group, args.box_length, args.weight_percent, args.density,
-                           shift=args.shift, curvature=args.curvature)
+                           shift=args.shift, curvature=args.curvature, mpi=args.mpi, nprocesses=args.nprocesses)
 
     equil.build_initial_config(grid_points=args.grid, r=0.5)
 
