@@ -205,7 +205,7 @@ class SimulationMdp(object):
             self.length = length
 
         a = []
-        a = ['title = NVT simulation of %s\n' % self.gro]
+        a.append(['title = NVT simulation of %s\n' % self.gro])
         # a.append(['cutoff-scheme = verlet'])  # I think verlet is default
         a.append(['integrator = md\n'])  # this also might be default
         a.append(['dt = %s\n' % self.time_step])
