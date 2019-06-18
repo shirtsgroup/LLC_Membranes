@@ -124,10 +124,19 @@ class SimulationMdp(object):
 
         self.em_mdp_name = out
 
-    def write_npt_mdp(self, out='npt'):
+    def write_npt_mdp(self, out='npt', length=None):
+        """ Write an .mdp file for an NPT simulation (constant number of particles, pressure and temperature)
+
+        :param out: name of output file
+        :param length: simulation length (ps). Only need to specify this if you are changing the simulation length
+        from how it was initialized
+
+        :type out: str
+        :type length: int
         """
-        :param out: (str) name of output file
-        """
+
+        if length is not None:
+            self.length = length
 
         a = []
         a.append(['title = NPT simulation of %s at %s K\n' % (self.gro, self.temperature)])
@@ -181,12 +190,22 @@ class SimulationMdp(object):
 
         self.npt_mdp_name = "%s.mdp" % out
 
-    def write_nvt_mdp(self, out='nvt'):
+    def write_nvt_mdp(self, out='nvt', length=None):
+        """ Write an .mdp file for an NVT simulation (constant number of particles, volume and temperature)
+
+        :param out: name of output file
+        :param length: simulation length (ps). Only need to specify this if you are changing the simulation length
+        from how it was initialized
+
+        :type out: str
+        :type length: int
         """
-        :param out: (str) name of output file
-        """
+
+        if length is not None:
+            self.length = length
+
         a = []
-        a.append(['title = NVT simulation of %s\n' % self.gro])
+        a = ['title = NVT simulation of %s\n' % self.gro]
         # a.append(['cutoff-scheme = verlet'])  # I think verlet is default
         a.append(['integrator = md\n'])  # this also might be default
         a.append(['dt = %s\n' % self.time_step])

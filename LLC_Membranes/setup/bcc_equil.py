@@ -48,6 +48,14 @@ def initialize():
     return parser
 
 
+class EnsembleError(Exception):
+    """ Raised if invalid thermodynamic ensemble is passed """
+
+    def __init__(self, message):
+
+        super().__init__(message)
+
+
 class EquilibrateBCC(topology.LC):
 
     def __init__(self, build_monomer, space_group, box_length, weight_percent, density, shift=0, curvature=-1,
@@ -109,8 +117,11 @@ class EquilibrateBCC(topology.LC):
         :param grid_points: number of grid points to use when approximating implicit surface
         :param r: distance between monomer placement points (no monomers will be placed within a sphere of radius, r
         from a given monomer.
+        :param name: name of output configuration
 
-        :return:
+        :type grid_points: int
+        :type r: float
+        :type name: str
         """
 
         self.system = BicontinuousCubicBuild(self.build_monomer, self.space_group, self.period, self.weight_percent,
@@ -171,8 +182,10 @@ class EquilibrateBCC(topology.LC):
         """ Isotropically expand unit cell by some factor
 
         :param factor: factor by which to scale each dimension
+        :param name: name of scaled unit cell
 
-        :return:
+        :type factor: float
+        :type name: str
         """
 
         t = md.load(self.gro_name)  # load up unit cell
@@ -239,56 +252,119 @@ class EquilibrateBCC(topology.LC):
             p = subprocess.Popen(cp.split())
             p.wait()
 
-    def add_solvent(self, solvent, tol=10):
+    def insert_molecules(self, scale, total, ensemble):
+        """ Insert solvent molecules. Used by add_solvent
+
+        :param scale: factor by which to scale van der waals radii when inserting solvent molecules with gmx solvate
+        :param total: the total number of solvent molecules added to the system before calling this function
+        :param ensemble: thermodynamic ensemble in which to simulate system
+
+        :type scale: float
+        :type total: int
+        :type ensemble: str
+
+        :return delta: number of solutes added
+
+        :rtype delta: int
+        """
+
+        if ensemble.upper() == 'NVT':
+            mdp = self.nvt_mdp
+        elif ensemble.upper() == 'NPT':
+            mdp = self.npt_mdp
+        else:
+            raise EnsembleError("%s is not a valid (or not implemented) thermodynamic ensemble" % ensemble)
+
+        delta = gromacs.insert_molecules(self.gro_name, self.solvent.name, self.nsolvent, 'solvated.gro',
+                                         scale=scale)
+        total += delta
+        print('Inserted %d %s molecules for a total of %d' % (delta, self.solvent.name, total))
+
+        if delta != 0:  # prevents unnecessary energy minimizations
+
+            self.topology.add_residue(self.solvent, n=delta, write=True, topname=self.top_name)
+            print('Energy minimizing...', end='', flush=True)
+            gromacs.simulate(self.em_mdp, self.top_name, 'solvated.gro', 'em_%d' % total, mpi=self.mpi,
+                             nprocesses=self.nprocesses)  # energy minimize
+            print('Done!')
+
+            # short simulation
+            print('Running %s simulation...' % ensemble.upper(), end='', flush=True)
+            gromacs.simulate(mdp, self.top_name, 'em_%d' % total, 'solvated_%s_%d' % (ensemble.lower(), total),
+                             mpi=self.mpi, nprocesses=self.nprocesses)
+            print('Done!')
+
+            self.gro_name = 'solvated_%s_%d.gro' % (ensemble.lower(), total)
+            self.nsolvent -= delta
+
+        return delta
+
+    def add_solvent(self, solvent, tol=10, scale=0.4, nvt_length=1000, npt_length=1000, out='solvated_final.gro'):
         """ Name of solvent residue to add to structure. This is an iterative process of solvent insertion, energy
         minimzation, and an nvt simulation
 
         :param solvent: residue name to add
         :param tol: Once an iteration can fit no more than tol solvent atoms into structure (with gmx insert-molecules),
         the iteration stops
+        :param scale: factor by which to scale van der waals radii when inserting solvent molecules with gmx solvate
+        :param nvt_length: length of long NVT simulation (ps)
+        :param npt_length: length of long NPT simulation (ps)
 
         :type solvent: str
         :type tol: int
+        :type scale: float
+        :type nvt_length: int
+        :type npt_length: int
         """
 
         # figure out number of solvent molecules to add
         self.solvent = topology.Residue(solvent)  # get solvent properties
-
         mass_solvent = self.system.nmon * self.system.MW * ((100 - self.weight_percent) / self.weight_percent)
-
         self.nsolvent = int(mass_solvent / self.solvent.MW)  # total number of solutes to add
 
         # create nvt mdp file
-        self.mdp.write_nvt_mdp()
+        self.mdp.write_nvt_mdp(length=50)
 
         print('Attempting to insert %d solvent molecules' % self.nsolvent)
 
         delta = self.nsolvent  # convergence parameter
         total = 0  # for naming
         while self.nsolvent > 0 and delta > tol:
-
-            delta = gromacs.insert_molecules(self.gro_name, self.solvent.name, self.nsolvent, 'solvated.gro', scale=0.57)
+            delta = self.insert_molecules(scale, total, "NVT")
             total += delta
-            print('Inserted %d %s molecules for a total of %d' % (delta, self.solvent.name, total))
 
-            if delta == 0:  # prevents an unnecessary extra energy minimization
-                break
+        # run a longer NVT simulation
+        print("Running %d ps NVT equilibration" % nvt_length)
+        self.mdp.write_nvt_mdp(length=nvt_length)
+        gromacs.simulate(self.nvt_mdp, self.top_name, self.gro_name, 'nvt_equil', mpi=self.mpi,
+                         nprocesses=self.nprocesses)
 
-            self.topology.add_residue(self.solvent, n=delta, write=True, topname=self.top_name)
-            print('Energy minimizing...', end='', flush=True)
-            gromacs.simulate(self.em_mdp, self.top_name, 'solvated.gro', 'em_%d' % total)  # energy minimize
-            print('Done!')
+        # run a short NPT simulation
+        self.mdp.write_npt_mdp(length=50)
+        gromacs.simulate(self.npt_mdp, self.top_name, 'nvt_equil.gro', 'npt_%d' % total, mpi=self.mpi,
+                         nprocesses=self.nprocesses)
+        self.gro_name = 'npt_%d.gro' % total
 
-            print('Running NVT simulation...', end='', flush=True)
-            gromacs.simulate(self.nvt_mdp, self.top_name, 'em_%d' % total, 'solvated_%d' % total)  # short NVT sim
-            print('Done!')
+        # run series of NPT simulations to try and stuff more solutes in
+        while self.nsolvent > 0 and delta > tol:
+            delta = self.insert_molecules(scale, total, "NPT")
+            total += delta
 
-            self.gro_name = 'solvated_%d.gro' % total
-            self.nsolvent -= delta
+        # run a longer NPT simulation
+        print("Running %d ps NPT equilibration" % npt_length)
+        self.mdp.write_npt_mdp(length=npt_length)
+        gromacs.simulate(self.npt_mdp, self.top_name, self.gro_name, 'npt_equil', mpi=self.mpi,
+                         nprocesses=self.nprocesses)
+        self.gro_name = 'npt_equil.gro'
 
-        cp = 'cp solvated_%d.gro solvated.gro' % total
+        # rename things to desired final output name
+        cp = 'cp %s %s' % (self.gro_name, out)
         p = subprocess.Popen(cp.split())
         p.wait()
+
+        self.gro_name = out
+
+        print('Successfully inserted %s %s molecules' % (total, self.solvent.name))
 
 
 if __name__ == "__main__":
@@ -297,34 +373,46 @@ if __name__ == "__main__":
 
     os.environ["GMX_MAXBACKUP"] = "-1"  # stop GROMACS from making backups
 
+    # equil = EquilibrateBCC(args.build_monomer, args.space_group, args.box_length, args.weight_percent, args.density,
+    #                        shift=args.shift, curvature=args.curvature)
+    #
+    # equil.build_initial_config(grid_points=args.grid, r=0.5)
+    # equil.scale_unit_cell(args.scale_factor)
+    #
+    # equil.generate_topology(name='topol.top')  # creates an output file
+    # equil.generate_mdps(length=50, frames=2, T=args.temperature)  # creates an object
+    # equil.mdp.write_em_mdp(out='em')
+    #
+    # nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
+    #                        nprocesses=args.nprocesses)  # mdp, top, gro, out
+    #
+    # while nrg >= 0:
+    #
+    #     equil.build_initial_config(grid_points=args.grid, r=0.5)
+    #     equil.scale_unit_cell(args.scale_factor)
+    #     nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
+    #                            nprocesses=args.nprocesses)
+    #
+    # cp = 'cp em.gro scaled_%.4f.gro' % args.scale_factor
+    # p = subprocess.Popen(cp.split())
+    # p.wait()
+    #
+    # equil.gro_name = 'scaled_%.4f.gro' % args.scale_factor
+    #
+    # # slowly compress system to correct density
+    # equil.shrink_unit_cell(args.scale_factor, 1.0, 0.1)  # EquilibrateBCC object, start, stop, step
+    #
+    # equil.add_solvent(args.solvent)
+
     equil = EquilibrateBCC(args.build_monomer, args.space_group, args.box_length, args.weight_percent, args.density,
                            shift=args.shift, curvature=args.curvature)
 
     equil.build_initial_config(grid_points=args.grid, r=0.5)
-    equil.scale_unit_cell(args.scale_factor)
-    exit()
 
     equil.generate_topology(name='topol.top')  # creates an output file
     equil.generate_mdps(length=50, frames=2, T=args.temperature)  # creates an object
     equil.mdp.write_em_mdp(out='em')
 
-    nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
-                           nprocesses=args.nprocesses)  # mdp, top, gro, out
+    equil.gro_name = "scaled_1.0000.gro"
 
-    while nrg >= 0:
-
-        equil.build_initial_config(grid_points=args.grid, r=0.5)
-        equil.scale_unit_cell(args.scale_factor)
-        nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
-                               nprocesses=args.nprocesses)
-
-    cp = 'cp em.gro scaled_%.4f.gro' % args.scale_factor
-    p = subprocess.Popen(cp.split())
-    p.wait()
-
-    equil.gro_name = 'scaled_%.4f.gro' % args.scale_factor
-
-    # slowly compress system to correct density
-    equil.shrink_unit_cell(args.scale_factor, 1.0, 0.1)  # EquilibrateBCC object, start, stop, step
-    equil.gro_name = 'scaled_1.0000.gro'
     equil.add_solvent(args.solvent)
