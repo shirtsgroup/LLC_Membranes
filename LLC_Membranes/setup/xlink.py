@@ -77,7 +77,7 @@ class Atoms(object):
         for i in range(len(res.atom_info)):
             self.type[i::natoms] = str(res.atom_info[i][1])
             self.charge[i::natoms] = float(res.atom_info[i][6])
-            self.mass[i::natoms] = float(res.atom_info[i][7])
+            self.mass[i::natoms] = float(res.atom_info[i][7].split(';')[0])
 
 
 class Residue(object):
@@ -90,6 +90,7 @@ class Residue(object):
 
     def __init__(self, name):
 
+        self.location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # path to this script
         self.name = name
         self.is_ion = False
         self.check_ion()
@@ -99,7 +100,6 @@ class Residue(object):
         self.c1_atom_indices = None
         self.c2_atom_indices = None
         self.carbonyl_oxygen_indices = None
-        self.location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # path to this script
 
         if not self.is_ion:
 
@@ -256,7 +256,7 @@ class Residue(object):
         return self.carbonyl_oxygen_indices
 
 
-class Topology():
+class Topology:
 
     def __init__(self):
 
@@ -453,7 +453,7 @@ class System(Topology):
     def __init__(self, initial_configuration, residue, dummy_residue, dummy_name='dummies.gro',
                  reaction_percentage=1, cutoff=0.6, radical_reaction_percentage=20, radical_termination_fraction=50):
 
-        add_dummies(md.load(initial_configuration), residue, dummy_residue,
+        add_dummies(initial_configuration, residue, dummy_residue,
                     out=dummy_name)  # add dummy atoms to the initial configuration
 
         self.original_residue_name = residue
@@ -812,6 +812,7 @@ class System(Topology):
 
         self.write_assembly_topology(virtual_sites=False, vsite_atom_name=dummy_atom_name)
 
+
 if __name__ == "__main__":
 
     args = initialize().parse_args()
@@ -835,6 +836,7 @@ if __name__ == "__main__":
                  radical_reaction_percentage=args.rad_percent, reaction_percentage=args.percent,
                  radical_termination_fraction=args.rad_frac_term)
     print('Done! %s created' % args.dummy_name)
+    exit()
 
     print('Generating input files: %s, %s, %s and %s ...' % (args.xlink_top_name, args.topname, args.mdp_em,
           args.mdp_nvt),  end='', flush=True)

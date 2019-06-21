@@ -146,7 +146,7 @@ class EquilibrateBCC(topology.LC):
         self.topology = SystemTopology(self.gro_name)
         self.topology.write_top(name=name)
 
-    def generate_mdps(self, T=300, em_steps=-1, time_step=0.002, length=1000, p_coupling='semiisotropic',
+    def generate_mdps(self, T=300, em_steps=-1, time_step=0.002, length=1000, p_coupling='isotropic',
                       barostat='berendsen', genvel='yes', restraints=False, xlink=False, tau_p=20, tau_t=0.1,
                       nstxout=5000, nstvout=5000, nstfout=5000, nstenergy=5000, frames=None):
 
@@ -373,46 +373,47 @@ if __name__ == "__main__":
 
     os.environ["GMX_MAXBACKUP"] = "-1"  # stop GROMACS from making backups
 
-    # equil = EquilibrateBCC(args.build_monomer, args.space_group, args.box_length, args.weight_percent, args.density,
-    #                        shift=args.shift, curvature=args.curvature, mpi=args.mpi, nprocesses=args.nprocesses)
-    #
-    # equil.build_initial_config(grid_points=args.grid, r=0.5)
-    # equil.scale_unit_cell(args.scale_factor)
-    #
-    # equil.generate_topology(name='topol.top')  # creates an output file
-    # equil.generate_mdps(length=50, frames=2, T=args.temperature)  # creates an object
-    # equil.mdp.write_em_mdp(out='em')
-    #
-    # nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
-    #                        nprocesses=args.nprocesses)  # mdp, top, gro, out
-    #
-    # while nrg >= 0:
-    #
-    #     equil.build_initial_config(grid_points=args.grid, r=0.5)
-    #     equil.scale_unit_cell(args.scale_factor)
-    #     nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
-    #                            nprocesses=args.nprocesses)
-    #
-    # cp = 'cp em.gro scaled_%.4f.gro' % args.scale_factor
-    # p = subprocess.Popen(cp.split())
-    # p.wait()
-    #
-    # equil.gro_name = 'scaled_%.4f.gro' % args.scale_factor
-    #
-    # # slowly compress system to correct density
-    # equil.shrink_unit_cell(args.scale_factor, 1.0, 0.1)  # EquilibrateBCC object, start, stop, step
-    #
-    # equil.add_solvent(args.solvent)
-
     equil = EquilibrateBCC(args.build_monomer, args.space_group, args.box_length, args.weight_percent, args.density,
                            shift=args.shift, curvature=args.curvature, mpi=args.mpi, nprocesses=args.nprocesses)
 
     equil.build_initial_config(grid_points=args.grid, r=0.5)
+    equil.scale_unit_cell(args.scale_factor)
 
     equil.generate_topology(name='topol.top')  # creates an output file
     equil.generate_mdps(length=50, frames=2, T=args.temperature)  # creates an object
     equil.mdp.write_em_mdp(out='em')
 
-    equil.gro_name = "scaled_1.0000.gro"
+    nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
+                           nprocesses=args.nprocesses)  # mdp, top, gro, out
+
+    while nrg >= 0:
+
+        equil.build_initial_config(grid_points=args.grid, r=0.5)
+        equil.scale_unit_cell(args.scale_factor)
+        nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
+                               nprocesses=args.nprocesses)
+
+    cp = 'cp em.gro scaled_%.4f.gro' % args.scale_factor
+    p = subprocess.Popen(cp.split())
+    p.wait()
+
+    equil.gro_name = 'scaled_%.4f.gro' % args.scale_factor
+
+    # slowly compress system to correct density
+    equil.shrink_unit_cell(args.scale_factor, 1.0, 0.1)  # EquilibrateBCC object, start, stop, step
 
     equil.add_solvent(args.solvent)
+
+    # Can use this to continue from an expanded then shrunk initial configuration
+    # equil = EquilibrateBCC(args.build_monomer, args.space_group, args.box_length, args.weight_percent, args.density,
+    #                        shift=args.shift, curvature=args.curvature, mpi=args.mpi, nprocesses=args.nprocesses)
+    #
+    # equil.build_initial_config(grid_points=args.grid, r=0.5)
+    #
+    # equil.generate_topology(name='topol.top')  # creates an output file
+    # equil.generate_mdps(length=50, frames=2, T=args.temperature)  # creates an object
+    # equil.mdp.write_em_mdp(out='em')
+    #
+    # equil.gro_name = "scaled_1.0000.gro"
+    #
+    # equil.add_solvent(args.solvent)
