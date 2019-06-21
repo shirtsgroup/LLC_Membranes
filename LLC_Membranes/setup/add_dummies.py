@@ -12,21 +12,40 @@ def initialize():
 
     parser.add_argument('-g', '--gro', default='wiggle.gro', type=str, help='Name of coordinate file')
     parser.add_argument('-o', '--out', default='wiggled.gro', type=str, help='Name of output file')
+    parser.add_argument('-r', '--residue', default='HII', type=str, help='Name of residue to be replaced by a dummy'
+                                                                         'residue')
+    parser.add_argument('-d', '--dummy_residue', default='HIId', type=str, help='Name of dummy residue')
 
     args = parser.parse_args()
 
     return args
 
 
-def add_dummies(t, residue, dummy_residue, out='dummies.gro', nmon=400):
+def add_dummies(gro, residue, dummy_residue, out='dummies.gro'):
+    # TODO: This script can be improved quite a bit, but it is functional for now while I develop xlink.py
+    """ Add dummy hydrogen atoms to chosen residues in a configuration
 
-    """
-    TODO: This script can be improved quite a bit, but it is functional for now while I develop xlink.py
     :param t: topology object created from mdtraj
-    :return:
+    :param residue: name of residue to which dummy atoms are added
+    :param dummy_residue: name of dummy_residue associated with dummy topology file
+    :param out: name of output .gro file
+
+    :type t: mdtraj object
+    :type residue: str
+    :type dummy_residue: str
+    :type out: str
+
+    :return: .gro file with dummies atoms added. Note: an energy minimization is necessary to snap the dummies into
+    place
     """
 
-    LC = topology.LC('%s.gro' % dummy_residue)
+    t = md.load(gro)
+    names = topology.fix_names(gro)
+    for i, a in enumerate(t.topology.atoms):
+        a.name = names[i]
+
+    original_residue = topology.LC('%s' % residue)
+    LC = topology.LC('%s' % dummy_residue)
 
     residues = [a.residue.name for a in t.topology.atoms]
 
@@ -52,11 +71,11 @@ def add_dummies(t, residue, dummy_residue, out='dummies.gro', nmon=400):
 
     natoms = t.n_atoms - nsol
 
-    nmonomers = nmon
     Hd = LC.dummies
     ndummies = len(Hd)
 
-    atomspmon = int(natoms / nmonomers)
+    atomspmon = original_residue.natoms
+    nmonomers = natoms // atomspmon
     v = t.unitcell_vectors
 
     with open(out, 'w') as f:
@@ -69,13 +88,17 @@ def add_dummies(t, residue, dummy_residue, out='dummies.gro', nmon=400):
         for a in t.topology.atoms:
             if count2 != 0 and count2 % atomspmon == 0 and count < (nmonomers * (atomspmon + ndummies)):
                 for j in range(ndummies):
-                    f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(int(count / atomspmon), dummy_residue,
+                    f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(int(count2 / atomspmon), dummy_residue,
                                                                                   Hd[j], count, 0, 0, 0))
                     count += 1
 
+            # kind of hacky
+            if a.residue.name == original_residue.residues[0]:
+                a.residue.name = dummy_residue
+
             f.write('{:5d}{:5s}{:>5s}{:5d}{:8.3f}{:8.3f}{:8.3f}\n'.format(a.residue.index + 1, a.residue.name, a.name,
-                                                                    count, t.xyz[0, count2, 0], t.xyz[0, count2, 1],
-                                                                    t.xyz[0, count2, 2]))
+                                                                          count % 100000, t.xyz[0, count2, 0],
+                                                                          t.xyz[0, count2, 1], t.xyz[0, count2, 2]))
             count += 1
             count2 += 1
 
@@ -88,7 +111,4 @@ if __name__ == "__main__":
 
     args = initialize()
 
-    t = md.load(args.gro)  # load trajectory using mdtraj
-    pos = t.xyz  # get positions
-    v = t.unitcell_vectors
-    add_dummies(t, 'HII', 'HIId', out=args.out)
+    add_dummies(args.gro, args.residue, args.dummy_residue, out=args.out)
