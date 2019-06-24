@@ -36,7 +36,7 @@ done
 antechamber -i ${name}.pdb -fi pdb -o ${name}.mol2 -fo mol2 -c bcc -s 2 -nc ${nc} -pl 15 # The .pdb must have connectivity info!
 # -c bcc tells antechamber to use AM1-BCC charge model
 # -s flag just defines verbosity of output
-parmchk -i ${name}.mol2 -f mol2 -o ${name}.frcmod
+parmchk2 -i ${name}.mol2 -f mol2 -o ${name}.frcmod
 
 # Create input to tleap
 echo "source oldff/leaprc.ff99SB" > tleap.in

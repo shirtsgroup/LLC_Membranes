@@ -51,30 +51,36 @@ class ReadItp(object):
         self.hbond_D = []  # hydrogen bond donor atoms
         self.hbond_A = []  # hydrogen bond acceptors
         self.residues = []
-        self.planeatoms = []
-        self.plane_indices = []
-        self.benzene_carbons = []
-        self.lineatoms = [[], []]
-        self.ref_atom_index = []
-        self.c1_atoms = []
-        self.c2_atoms = []
-        self.c1_index = []
-        self.c2_index = []
-        self.ion_indices = []
-        self.tail_atoms = []
-        self.no_ions = 0
-        self.ions = []
-        self.MW = 0
-        self.dummies = []
+        self.planeatoms = []  # names of atoms defining plane used to align monmers
+        self.plane_indices = []  # indices of atoms in planeatoms
+        self.benzene_carbons = []  # names of atoms making up aromatic ring
+        self.lineatoms = [[], []]  # indices of atoms used to create a vector used to orient monomers during build
+        self.ref_atom_index = []  # index of atom(s) used as a reference for translating a molecule around during build
+        self.c1_atoms = []  # terminal carbon atoms of tails (for cross-linking)
+        self.c2_atoms = []  # 2nd carbon atoms from end of monomers tails (for cross-linking)
+        self.c1_index = []  # indices of terminal carbon atoms of tails
+        self.c2_index = []  # indices of c2_atoms
+        self.ion_indices = []  # indices of ions
+        self.tail_atoms = []  # names of atoms at ends of tails. Used for placing solutes near tail ends
+        self.no_ions = 0  # number of ions in system
+        self.ions = []  # names of ions
+        self.MW = 0  # molecular weight of system
+        self.dummies = []  # names of dummy atoms
         self.valence = 0
-        self.carboxylate_indices = []
-        self.pore_defining_atoms = []
+        self.carboxylate_indices = []  # index of carboxylate carbon atoms on head groups
+        self.pore_defining_atoms = []  # atoms used to define the edges of the pore. used to locate pore center
+
+        # atoms that are a part of improper dihedrals which should not be removed during cross-linking. For example, in
+        # NA-GA3C11, the tail has connectivity R-C=O-CH-CH2. When the C2 bonds, it becomes sp3 hybridized and its
+        # improper dihedral must be removed. But we don't want to accidentally remove the carbonyl's improper which
+        # still involves c2. Specifying the oxygen atom index in improper_dihedral_exclusions prevents this.
+        self.improper_dihedral_exclusions = []
 
         # connectivity
-        self.bonds = []
-        self.organized_bonds = {}
-        self.improper_dihedrals = []
-        self.virtual_sites = []
+        self.bonds = []  # stores all data in [ bonds ] section of topology
+        self.organized_bonds = {}  # a dictionary of atom indices with values that are indices to which atom is bonded
+        self.improper_dihedrals = []  # stores all data in [ dihedrals ] ; impropers section of topology
+        self.virtual_sites = []  # stores all data in [ virtualsites* ] of topology
 
     def atoms(self, annotations=False):
 
@@ -152,6 +158,8 @@ class ReadItp(object):
                         self.tail_atoms.append(atom_name)
                     if 'D' in annotations:
                         self.dummies.append(atom_name)
+                    if 'impex' in annotations:
+                        self.improper_dihedral_exclusions.append(ndx)
                 except IndexError:
                     pass
 

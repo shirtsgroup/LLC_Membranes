@@ -61,13 +61,9 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
     of tail water transport in the 5 wt\% water system, as our point could be 
     confusing without proper explanation.
 
-    %MRS: I'd leave out the text that stays the same (like the first sentence). 
-    Original text: ``In the 5 wt\% water system, water molecules that spend the majority
-    of their time in the distal tail region have MSDs slightly higher than those of water
-    molecules close to the pore center. The MSD of distal tail water molecules is 1.7 nm$^2$
-    compared to 1.2 nm$^2$ outside the distal tails. This anomaly is likely a consequence
-    of lower density in the distal tails relative to the pores, leading to faster diffusion
-    in the tails, as well as slowed diffusion of water molecules in the pores via hydrogen 
+    Original text: ``This anomaly is likely a consequence of lower density in the
+    distal tails relative to the pores, leading to faster diffusion in the tails,
+    as well as slowed diffusion of water molecules in the pores via hydrogen 
     bonds with other water molecules and association with sodium ions. Water molecules are 
     less likely to hydrogen bond with each other while in the distal tail region since they
     are interspersed between chains, while those in the pores stay in close proximity to 
@@ -77,35 +73,41 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
     with a sodium ion each frame compared to 44\% in the 10 wt\% water system. There is a
     negligible amount of hydrogen bonds between water molecules and monomer head groups.
     
-    New text: ``In the 5 wt\% water system, water molecules that spend the majority of their 
-	time in the distal tail region have MSDs slightly higher than those of water molecules
-	close to the pore center. The MSD of distal tail water molecules is 1.7 nm$^2$
-	compared to 1.2 nm$^2$ outside the distal tails. The reason for this anomaly is twofold. 
-	First, monomer head groups are concentrated about 0.2 nm closer to the pore centers
-	in the 5 wt\% versus the 10 wt\% water system (see Figure~\ref{M-fig:component_densities})  %BJC: this is the RDF figure of head groups, tails, sodium, water
-        %MRS: rather than saying there are more frequent collisions, I'd just say that it leaves less space, 
-        %restricting the motion of the water.   
-        which results in more frequent collisions between water molecules and relatively immobile 
-	monomer head groups. 
-        %MRS: but this next ``Second,'' doesn't explain why this slows things down more in 5%; just because the concentration of ions is higher?  But the concentration of water molecules is lower. 
-        Second, the diffusion of water molecules is slowed via hydrogen
-	bonds with other water molecules and association with sodium ions. Notably, there is a 
-	negligible number of hydrogen bonds between water molecules and monomer head groups.
+    %BJC2: restructured into single reason, since longer association times are a 
+    % consequence of crowding.
+    %New text: ``The reason for this anomaly is twofold. First, monomer head groups are
+    New text: ``This behavior is likely due to the much more crowded pore environment
+    in the 5 wt\% versus the 10 wt\% water system. Monomer head groups are
+    concentrated about 2\AA closer to the pore centers in the 5 wt\% versus the 10 
+    wt\% water system (see Figure~\ref{M-fig:component_densities})  %BJC: this is the RDF figure of head groups, tails, sodium, water
+    % MRS: rather than saying there are more frequent collisions, I'd just say that it leaves less space, 
+    %restricting the motion of the water.   
+    which leaves less space for water molecules and restricts their movement among the 
+    relatively immobile monomer head groups. 
+    % MRS: but this next ``Second,'' doesn't explain why this slows things down more in 5%; 
+    % just because the concentration of ions is higher?  But the concentration of water molecules is lower. 
+%    This slow-down, caused by the high energetic barrier to diffusion, is exacerbated by 
+%    simultaneously enhancing the favorability of interactions between water and monomer
+%    components. 
+    The consequently high energetic barrier to diffusion enhances the favorability of 
+    associative interactions between water and monomer components.
+%    As a consequence of this crowding, the diffusion of water molecules is even 
+%    further slowed by longer periods of association with monomer components. %hydrogen bonds with other water molecules and association with sodium ions. 
+%    Notably, there is a negligible number of hydrogen bonds between water molecules and monomer head groups.
     The 95th percentile lifetime of hydrogen bonds between water molecules located near the
 	pore center is 2.1 ns in the 5 wt\% system compared to 0.5 ns in the 10 wt\% system. 
 	However, since we only saved simulation output every 0.5 ns, it is likely that the 
-	true hydrogen bond lifetimes in the 10 wt\% system are smaller than this value. 
-        %MRS: hmm the organization says: 2 effects, x and y.  Here is more about X. Here is more about Y. 
-        %MRS to make clear what is being talked about where, it might be better to say: ``There are 2 effects. Here is X, here is Y.''
-        %MRS: don't start with dependent clauses.  This logic makes sense, but the above one doesn't so much, 
-        %MRS: because it's not made clear why the H-bonds are lasting longer (clearly, if they are lasting longer, MSD will go up). 
-	With regard to sodium ions, more frequent and longer periods of association
-	with water molecules helps to drive down water's MSD. An average of 65\% of water 
-	molecules in the pores of the 5 wt\% water system associate with a sodium ion each
-	frame compared to 44\% in the 10 wt\% water system. There are about half as many water
-	molecules in the 5 wt\% water system which allows a larger fraction of them to associate
-	with sodium ions. The lifetime of associations between sodium ions and water is 7.5 ns
-	and 3.0 ns in 5 and 10 wt\% water systems respectively.  ``
+	true hydrogen bond lifetimes in the 10 wt\% system are smaller than this value.
+    %MRS: hmm the organization says: 2 effects, x and y.  Here is more about X. Here is more about Y. 
+    %MRS to make clear what is being talked about where, it might be better to say: ``There are 2 effects. Here is X, here is Y.''
+    %MRS: don't start with dependent clauses. This logic makes sense, but the above one doesn't so much, 
+    %MRS: because it's not made clear why the H-bonds are lasting longer (clearly, if they are lasting longer, MSD will go up). 
+	Additionally, there are more frequent and longer periods of association between water
+	and sodium ions. An average of 65\% of water molecules in the pores of the 5 wt\% water
+	system associate with a sodium ion each frame compared to 44\% in the 10 wt\% water system.
+	There are about half as many water molecules in the 5 wt\% water system which allows a 
+	larger fraction of them to associate with sodium ions. The lifetime of associations
+	between sodium ions and water is 7.5 ns and 3.0 ns in 5 and 10 wt\% water systems respectively.``
 	
     \item \begin{quote}
     \textit{The final paragraph of the conclusions of the manuscript ends on a blunt, and 
@@ -127,13 +129,8 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
 	
     Author reply: We thank the reviewer for encouraging us to strengthen our conclusions and
     to end on a more positive note. We have modified our final paragraph with this in mind 
-    and to emphasize that these types of studies are 
-    %necessary to identify
-    very valuable in identifying
-    transport behavior
-    that might not be obvious based solely on intuition
-    %MRS: added
-    or bulk scale experiments.
+    and to emphasize that these types of studies are very valuable in identifying transport
+    behavior that might not be obvious based solely on intuition or bulk scale experiments.
     
     Original text: ``The findings here are likely too complex to point towards a clear 
     design of an optimal LLC membrane for a particular separation. This work does demonstrate
@@ -145,42 +142,23 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
     opportunity to observe these interactions at the molecular scale, at least approximately,
     so that we can think more critically about nanostructured membrane design.''
     
-    New text: ``Our work demonstrates that one cannot rely solely on chemical intuition while 
-    designing LLC membranes for particular separations. 
-    %MRS5: Hmm.  Still not quite: we want to communicate ``experiment PLUS
-    %simulations!'' not ``experiments are not enough''. How about something more like this?
-    %``Our work demonstrates that there are important, atomistic features of nanostructed, self-assembled materials 
-    % that molecular simulation can play a key role in elucidating''
-    The complex interplay between the
-    inhomogeneous membrane structure, solute size and solute functionality leads to a variety of
-    solute-membrane interactions, of which many are quite subtle. For example, association
-    between polar groups and ions is seldom mentioned in the literature, but we could not give a
-    complete mechanistic explanation of observed transport behavior without its consideration. 
-    %MRS: is there a second example you can put in as well?
-    The interactions we observed, along with those that may arise in 
-    %MRS: simpler
-    %alternative 
-    other
-    self-assembled
-    nanoporous membranes, 
-    %can lead to an substantial
-    have the potential to produce an immense 
-    diversity of transport behavior, 
-    %which suggests
-    suggesting
-    that a 
-    %MRS: 
-    previously unexplored range
-    %large range 
-    of chemical selectivities may be possible. Atomistic molecular modeling
-    %MRS: maybe a bit overkill
-    %may be the best hope of
-    is likely to be highly useful in
-    uncovering 
-    %the dominant 
-    important 
-    mechanisms that will inspire and accelerate
-    novel design by experimentalists.''
+    % BJC: incorporated MRS thesis suggestion
+    New text: ``Our work demonstrates that there are important, atomistic features of nanostructed, 
+    self-assembled materials that molecular simulation can play a key role in elucidating.
+    The complex interplay between the inhomogeneous membrane structure, solute size and 
+    solute functionality leads to a variety of solute-membrane interactions, of which many
+    are quite subtle. For example, association between polar groups and ions is seldom 
+    mentioned in the literature, but we could not give a complete mechanistic explanation
+    of observed transport behavior without its consideration. 
+    % MRS: is there a second example you can put in as well?
+    % BJC: A second example  (water in the tails):
+    We also observed that water and solutes partition into the tails, an area previously 
+    assumed to be devoid of solutes, which offers another route towards selectivity.
+    The interactions we observed, along with those that may arise in other self-assembled
+    nanoporous membranes, have the potential to produce an immense diversity of transport
+    behavior, suggesting that a previously unexplored range of chemical selectivities may
+    be possible. Atomistic molecular modeling is likely to be highly useful in uncovering 
+    important mechanisms that will inspire and accelerate novel design by experimentalists.''
 	
 \end{enumerate}
 
@@ -212,17 +190,29 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
 	Author reply: We thank the reviewer for pointing out that we are missing this essential detail.
 	We have added the following text to section 2.1 of the main text:
 
-	New text: ``We simulated water molecules using the TIP3P water model because it is 
-    computationally efficient and reasonably reproduces water's physical properties
-    at 300K, the temperature of our simulations.``
-        %MRS3: TIP-4P is pretty close in efficiency, and TIP3P is only mediocre in bulk water properties  I would probably say that TIP3P was used because it is the water model that GAFF and other AMBER family parameters were optmized with.  TIP3P also diffuses faster than experimental water, which is both a negative (can't compare absolute diffusion) and positive (things happen faster). 
+	New text: ``We simulated water molecules using the TIP3P water model because it 
+	has been shown to sufficiently reproduce physical properties well in lipid membrane
+	system where other residues were parameterized with GAFF.''
+%    computationally efficient and reasonably reproduces water's physical properties
+%    at 300K, the temperature of our simulations.``
+
+    %MRS3: TIP-4P is pretty close in efficiency, and TIP3P is only mediocre in bulk water properties  I would probably say that TIP3P was used because it is the water model that GAFF and other AMBER family parameters were optmized with.  TIP3P also diffuses faster than experimental water, which is both a negative (can't compare absolute diffusion) and positive (things happen faster). 
+    %BJC2: I don't see any mention of water models in the GAFF paper. Maybe I'm overlooking something. 
+    % Instead, I cited a study of TIP3P in a lipid membrane system where the lipids were parameterized with
+    % GAFF.
+    
   	We also added the following citation in support of our justification:
   	
-        %MRS: that's the TIP5P paper, though . . . did you mean to cite it?
-  	Mahoney, M. W.; Jorgensen, W. L. A Five-Site Model for Liquid Water and the Reproduction
-  	of the Density Anomaly by Rigid, Nonpolarizable Potential Functions. J. Chem. Phys. 2000, 
-  	112, 8910–8922
-    
+    %MRS: that's the TIP5P paper, though . . . did you mean to cite it?
+    %BJC2: I used it because it has a comparison between physical properties exhibited by different water models inlcuding tip3p. 
+%  	Mahoney, M. W.; Jorgensen, W. L. A Five-Site Model for Liquid Water and the Reproduction
+%  	of the Density Anomaly by Rigid, Nonpolarizable Potential Functions. J. Chem. Phys. 2000, 
+%  	112, 8910–8922
+
+    Jójárt, Balázs, and Tamás A. Martinek. “Performance of the General Amber Force Field
+    in Modeling Aqueous POPC Membrane Bilayers.” Journal of Computational Chemistry 28, 
+    no. 12 (2007): 2051–58. https://doi.org/10.1002/jcc.20748.
+
     \item \begin{quote}
     
     \textit{The Methods section should contain more details about the model membranes, for 
@@ -235,13 +225,18 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
     to our readers if we included more details about our models. We have added the following 
     text to Section 2.2 of our Methods.
     
-    %BJC: not sure what else to include.  Don't want to say anything about pore size
-    %BJC: density is about the same 
-    New text: ``The equilibrated unit cells have different geometries depending on water content. 
-    The average distance between pores is 4.15 +/- 0.08 nm and 4.41 +/- 0.07 nm
+    %BJC2: incorporated point about pore size
+    New text: ``The equilibrated unit cells have different geometries depending on water
+    content. The average distance between pores is 4.15 +/- 0.08 nm and 4.41 +/- 0.07 nm
     in the 5 and 10 wt\% water systems respectively. The length of the pores, accounting
     for tortuosity (see Section~\ref{M-method:rdfs}), is 9.03 +/- 0.12 nm and 8.07 +/- 0.11
-    nm in the 5 and 10 wt\% water systems respectively.''  
+    nm in the 5 and 10 wt\% water systems respectively. The approximate size of the pore
+    region increases with water content (see Section~\ref{M-section:membrane_components}), 
+    however we did not quantify the pore radius because its definition is ambiguous. As
+    described in our previous work, there is not a hard partition between the pore and tail
+    regions.~\cite{coscia_understanding_2019} Rather, there is a gradual transition from 
+    the hydrophilic to hydrophobic region.''  
+    
     % BJC: not sure what if anything to say about difference in lengths of pores (which is roughly
     % equivalent to the box dimension in the z-direction). My guess is that when monomers don't 
     % stack directly on top of each other, they can pack tighter in the z-direction. When there
@@ -254,12 +249,13 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
     %- if the reviewer missed it, readers will as well.  If it's in
     %there already, I would emphasize it, and then mention here where
     %it was added, and cite the previous paper - it was one of the main messages of that paper.
-    We elected to not include pore sizes because its definition is ambiguous. There is not a 
-    hard partition between the pore and tails. Rather, there is a gradual transition from 
-    the hydrophilic to hydrophobic region. 
-    The approximate size of the pore region and the 
-    boundaries we defined are addressed later in the methods and throughout the results and 
-    discussion section.
+    %BJC2: moved into paragraph above
+%    We elected to not include pore sizes because its definition is ambiguous. There is not a 
+%    hard partition between the pore and tails. Rather, there is a gradual transition from 
+%    the hydrophilic to hydrophobic region. 
+%    The approximate size of the pore region and the 
+%    boundaries we defined are addressed later in the methods and throughout the results and 
+%    discussion section.
     
     \item \begin{quote}
     
@@ -304,11 +300,14 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
 	is close to zero at the membrane center, implying that there is a kinetic
 	barrier to water filling the pores which we will be unable to overcome using
 	conventional simulations. See Section~\ref{S-section:water_content_equil} 
-        %MRS: will need to get the references working using xr or manually for the letter.
-        of the Supporting Information for an expanded explanation and supporting figures. 
+    %MRS: will need to get the references working using xr or manually for the letter.
+    %BJC2: will ensure this before sending off
+    of the Supporting Information for an expanded explanation and supporting figures. 
 	  
-        %MRS: might want to make it clear that this below is a separate feature, observed in 
-        %different simulations than the ones above.
+    % MRS: might want to make it clear that this below is a separate feature, observed in 
+    % different simulations than the ones above.
+    % BJC2: I'm actually talking about the same simulation since I observed water in the 
+    % tails of the water bath simulations as well. That's what inspired the other systems.
 	We observed water enters into the distal tail region of our system. We define the 
 	distal tail region to be ca. 1.5 nm from the pore center based on the minimum in 
 	the radial distribution function of water (see Section~\ref{M-method:rdfs}). Therefore
@@ -324,62 +323,65 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
 	GROMACS command \texttt{gmx solvate} on our initial configuration followed by the 
 	removal of any water molecules placed in the distal tail region. This method requires
 	that we vary the 
-        %MRS: is ``initial pore radius'' a good phrase to use, since we are fighting against the idea of 
-        % well-defined pore radii?  ``monomer starting radius?''
-        initial pore radius since the vacant space dictates the pore's 
+    %MRS: is ``initial pore radius'' a good phrase to use, since we are fighting against the idea of 
+    % well-defined pore radii?  ``monomer starting radius?''
+    % BJC2: good point
+    monomer starting radius since the vacant space dictates the pore's 
 	water content. We then placed a defined number of water molecules into the distal tail
 	region one at a time with a short energy minimization between each insertion.
 	We chose to test systems with initial pore radii of 5, 6, 7 and 8 \AA~with tail and 
-	pore water compositions given in Table~\ref{table:water_content}. We found that 
+	pore water compositions given in Table~\ref{S-table:water_content}. We found that 
 	systems started with more water in the pores than tails tended to equilibrate relatively
 	quickly with an approximate ratio of 3 water molecules in the pores to 2 in the tails.
 
-    % BJC: could go back in supporting
+    % BJC: could go back in supporting.
     % MRS: I could go either way.
-    \begin{table}[!htb]
-    \centering
-    \begin{tabular}{|c|c|c|}
-    \hline
-    Pore Radius (\AA) & wt \% water tails & wt \% water pores \\
-    \hline
-    5                 &        5.67       &     1.09          \\
-    6                 &        2.88       &     2.38          \\
-    7                 &        1.91       &     4.12          \\
-    8                 &        2.78       &     6.00          \\
-    \hline
-    \end{tabular}
-    \caption{We chose a diverse combination of initial pore and tail water
-    contents in order to study its effect on equilibrium water
-    content.}\label{table:water_content}
-    \end{table}
+    % BJC2: moved to supporting. I don't think it adds much value here.
+%    \begin{table}[!htb]
+%    \centering
+%    \begin{tabular}{|c|c|c|}
+%    \hline
+%    Pore Radius (\AA) & wt \% water tails & wt \% water pores \\
+%    \hline
+%    5                 &        5.67       &     1.09          \\
+%    6                 &        2.88       &     2.38          \\
+%    7                 &        1.91       &     4.12          \\
+%    8                 &        2.78       &     6.00          \\
+%    \hline
+%    \end{tabular}
+%    \caption{We chose a diverse combination of initial pore and tail water
+%    contents in order to study its effect on equilibrium water
+%    content.}\label{table:water_content}
+%    \end{table}
 
     %MRS: is this figure below moving to the front?  I think may be it still is more of a supporting figure.
-    \begin{figure}[!htb]
-    \centering
-    \begin{subfigure}{0.45\textwidth}
-    \includegraphics[width=\textwidth]{5wt_offset_equil.pdf}
-    \caption{5 wt \%}\label{fig:5wt_offset_equil}
-    \end{subfigure}
-    \begin{subfigure}{0.45\textwidth}
-    \includegraphics[width=\textwidth]{10wt_offset_equil.pdf}
-    \caption{10 wt \%}\label{fig:10wt_offset_equil}
-    \end{subfigure}
-    \caption{We created solvated systems with one third of the total water
-	  initially placed in the tail region. (a) With 5 wt \% total water, the water
-	  content equilibrates after 600 ns, with $\sim$ 72 \% of the total water in the
-	  pores. (b) With 10 wt \% total water, the water content equilibrates after 100
-	  ns, with $\sim$ 69 \% of the total water in the
-	  pores.}\label{fig:solvation_equilibration}
-    \end{figure}
+    %BJC2: I agree, removed from main document. 
+%    \begin{figure}[!htb]
+%    \centering
+%    \begin{subfigure}{0.45\textwidth}
+%    \includegraphics[width=\textwidth]{5wt_offset_equil.pdf}
+%    \caption{5 wt \%}\label{fig:5wt_offset_equil}
+%    \end{subfigure}
+%    \begin{subfigure}{0.45\textwidth}
+%    \includegraphics[width=\textwidth]{10wt_offset_equil.pdf}
+%    \caption{10 wt \%}\label{fig:10wt_offset_equil}
+%    \end{subfigure}
+%    \caption{We created solvated systems with one third of the total water
+%	  initially placed in the tail region. (a) With 5 wt \% total water, the water
+%	  content equilibrates after 600 ns, with $\sim$ 72 \% of the total water in the
+%	  pores. (b) With 10 wt \% total water, the water content equilibrates after 100
+%	  ns, with $\sim$ 69 \% of the total water in the
+%	  pores.}\label{fig:solvation_equilibration}
+%    \end{figure}
   
     We removed the water reservoir and allowed the pore and tail water
     contents to equilibrate with 5 and 10 wt\% total water with a 3:2 ratio
     of pore to tail water. We considered the water content
     equilibrated once the water contents plateaued. The 5 wt\% system did
-    not plateau until $\sim$ 600 ns (Figure~\ref{fig:5wt_offset_equil})
+    not plateau until $\sim$ 600 ns 
     while the 10 wt \% water system equilibrated within the first 100 ns of 
-    simulation (Figure~\ref{fig:10wt_offset_equil}).
-    The equilibrated pores contain 72 \% and 69 \% of the total water in the
+    simulation (see Figure~\ref{S-fig:5wt_offset_equil} and Figure~\ref{S-fig:10wt_offset_equil} of
+    the Supporting Information). The equilibrated pores contain 72 \% and 69 \% of the total water in the
     5 and 10 wt \% systems respectively. We cross-linked the equilibrated 
     solvated systems, then allowed them to equilibrate further for 100 ns. 
     The water contents in each region does not change significantly in either case 
@@ -388,5 +390,8 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
     the methods outlined in our previous work.''
 
 \end{enumerate}
+
+\bibliographystyle{ieeetr}
+\bibliography{transport}
 
 \end{document}
