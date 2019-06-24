@@ -373,7 +373,9 @@ cg  hc  cg  hc       1    000.00   0.00000   2
  c  cg  c2  hc       1    000.00   0.00000   2
 ;ce  hc  c3  hc       1    000.00   0.00000   2 ; new x-linked parameters
 ;c   c3  ce  hc       1    000.00   0.00000   2
-c2   h4  c2  os	     1   180.00   4.60240    2
-c2   ha  c2  ha 	1   180.00   4.60240   2
-ca   o   c   oh		1   180.00   4.60240   2 
-ca   ca  ca  c3		1   180.00   4.60240   2
+c2  h4  c2  os	     1    180.00   4.60240   2
+c2  ha  c2  ha 	     1    180.00   4.60240   2
+ca  o   c   oh	     1    180.00   4.60240   2 
+ca  ca  ca  c3	     1    180.00   4.60240   2
+c2  c3  c2  ha       1    180.00   4.60240   2 ; For diene cross-link
+c3  c2  c2  ha       1    180.00   4.60240   2 ; For diene cross-link

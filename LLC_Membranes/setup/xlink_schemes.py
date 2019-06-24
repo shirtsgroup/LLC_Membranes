@@ -39,6 +39,18 @@ class DieneScheme:
 
             self.dummy_mass = 1.008  # mass of hydrogen
 
+    def determine_chains(self, c1, c2):
+
+        chain1 = None
+        chain2 = None
+        for k in self.chains.keys():
+            if c1 in self.chains[k].values():
+                chain1 = k
+            if c2 in self.chains[k].values():
+                chain2 = k
+
+        return chain1, chain2
+
     def head2tail(self, atoms):
         """ Define the head-to-tail addition of the terminal double bonds (c1 -- c2)
 
@@ -52,13 +64,7 @@ class DieneScheme:
         c1, c2 = atoms.keys()
         c1_ndx, c2_ndx = atoms.values()
 
-        chain1 = None  # chain with c1 atom
-        chain2 = None  # chain with c2 atom
-        for k in self.chains.keys():
-            if c1 in self.chains[k].values():
-                chain1 = k
-            if c2 in self.chains[k].values():
-                chain2 = k
+        chain1, chain2 = self.determine_chains(c1, c2)
 
         # to get indexing right
         c1_ndx -= self.indices[chain1]['C1']
@@ -66,7 +72,7 @@ class DieneScheme:
 
         types = {'chain1': {'C1': 'c3', 'C2': 'c3', 'C3': 'c2', 'C4': 'c2', 'H1': 'hc', 'H2': 'hc', 'H3': 'hc',
                             'H4': 'ha', 'H5': 'ha', 'D1': 'hc', 'D2': 'hc'},
-                 'chain2': {'C1': 'c3', 'C2': 'c2', 'C3': 'c2', 'C4': 'c2', 'H1': 'hc', 'H2': 'hc', 'H3': 'hc',
+                 'chain2': {'C1': 'c3', 'C2': 'c2', 'C3': 'c2', 'C4': 'c2', 'H1': 'hc', 'H2': 'hc', 'H3': 'ha',
                             'H4': 'ha', 'H5': 'ha', 'D1': 'hc'}}
 
         # update types
@@ -84,7 +90,7 @@ class DieneScheme:
         # define which improper dihedrals to remove -- written in same order as .itp file!!!
         # note that the order of the atoms may be different for each chain
         impropers = {'a': {1: ['H2', 'C1', 'H1', 'C2'], 2: ['C1', 'C3', 'C2', 'H3']},
-                     'b': {1: ['C2', 'H2', 'C1', 'H1'], 2: ['C3', 'C1', 'C2', 'H3']}}
+                     'b': {1: ['C2', 'H2', 'C1', 'H1'], 2: ['C1', 'C3', 'C2', 'H3']}}
 
         # step through this for chain2's second iteration (1st is right. all after are wrong)
         chain1_impropers = [1, 2]
