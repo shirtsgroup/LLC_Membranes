@@ -78,7 +78,7 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
     %New text: ``The reason for this anomaly is twofold. First, monomer head groups are
     New text: ``This behavior is likely due to the much more crowded pore environment
     in the 5 wt\% versus the 10 wt\% water system. Monomer head groups are
-    concentrated about 2\AA closer to the pore centers in the 5 wt\% versus the 10 
+    concentrated about 2\AA~closer to the pore centers in the 5 wt\% versus the 10 
     wt\% water system (see Figure~\ref{M-fig:component_densities})  %BJC: this is the RDF figure of head groups, tails, sodium, water
     % MRS: rather than saying there are more frequent collisions, I'd just say that it leaves less space, 
     %restricting the motion of the water.   
@@ -97,7 +97,11 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
     The 95th percentile lifetime of hydrogen bonds between water molecules located near the
 	pore center is 2.1 ns in the 5 wt\% system compared to 0.5 ns in the 10 wt\% system. 
 	However, since we only saved simulation output every 0.5 ns, it is likely that the 
-	true hydrogen bond lifetimes in the 10 wt\% system are smaller than this value.
+	true hydrogen bond lifetimes in the 10 wt\% system are 
+        %MRS2: tweaked
+        %smaller
+        shorter
+        than this value.
     %MRS: hmm the organization says: 2 effects, x and y.  Here is more about X. Here is more about Y. 
     %MRS to make clear what is being talked about where, it might be better to say: ``There are 2 effects. Here is X, here is Y.''
     %MRS: don't start with dependent clauses. This logic makes sense, but the above one doesn't so much, 
@@ -146,7 +150,7 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
     New text: ``Our work demonstrates that there are important, atomistic features of nanostructed, 
     self-assembled materials that molecular simulation can play a key role in elucidating.
     The complex interplay between the inhomogeneous membrane structure, solute size and 
-    solute functionality leads to a variety of solute-membrane interactions, of which many
+    solute functionality leads to a variety of solute-membrane interactions, many of which
     are quite subtle. For example, association between polar groups and ions is seldom 
     mentioned in the literature, but we could not give a complete mechanistic explanation
     of observed transport behavior without its consideration. 
@@ -196,15 +200,17 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
 %    computationally efficient and reasonably reproduces water's physical properties
 %    at 300K, the temperature of our simulations.``
 
-    %MRS3: TIP-4P is pretty close in efficiency, and TIP3P is only mediocre in bulk water properties  I would probably say that TIP3P was used because it is the water model that GAFF and other AMBER family parameters were optmized with.  TIP3P also diffuses faster than experimental water, which is both a negative (can't compare absolute diffusion) and positive (things happen faster). 
+    %MRS: TIP-4P is pretty close in efficiency, and TIP3P is only mediocre in bulk water properties  I would probably say that TIP3P was used because it is the water model that GAFF and other AMBER family parameters were optmized with.  TIP3P also diffuses faster than experimental water, which is both a negative (can't compare absolute diffusion) and positive (things happen faster). 
     %BJC2: I don't see any mention of water models in the GAFF paper. Maybe I'm overlooking something. 
     % Instead, I cited a study of TIP3P in a lipid membrane system where the lipids were parameterized with
     % GAFF.
+    %MRS: Gaff uses the same charge model and VDW types that AMBER does, which was parameterized to be compatible with TIP3P water.
     
   	We also added the following citation in support of our justification:
   	
     %MRS: that's the TIP5P paper, though . . . did you mean to cite it?
     %BJC2: I used it because it has a comparison between physical properties exhibited by different water models inlcuding tip3p. 
+    %MRS2: there have been a number of water model papers since then (look at TIP4P-Ew paper of Horn et al, OPC paper)
 %  	Mahoney, M. W.; Jorgensen, W. L. A Five-Site Model for Liquid Water and the Reproduction
 %  	of the Density Anomaly by Rigid, Nonpolarizable Potential Functions. J. Chem. Phys. 2000, 
 %  	112, 8910–8922
@@ -236,6 +242,8 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
     described in our previous work, there is not a hard partition between the pore and tail
     regions.~\cite{coscia_understanding_2019} Rather, there is a gradual transition from 
     the hydrophilic to hydrophobic region.''  
+    %MRS2: should also talk about where this is discussed in THIS paper.  We want to make sure people are 
+    % visualizing what we are imagining when reading this paper.
     
     % BJC: not sure what if anything to say about difference in lengths of pores (which is roughly
     % equivalent to the box dimension in the z-direction). My guess is that when monomers don't 
