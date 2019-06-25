@@ -242,7 +242,7 @@
   studies to uncharged species, we have only studied acetic acid in its
   protonated form. The pKa of gallic acid is 4.40 while the pKa of acetic acid is
   4.75.~\cite{chuysinuan_gallic_2009,perrin_pka_1981} Assuming that the pKa of
-  gallic acid is similar to NaGA3C11, it is possible for our sodium salted
+  gallic acid is similar to Na-GA3C11, it is possible for our sodium salted
   monomer to exist at the same time as protonated acetic acid. In any case, we
   are more interested in mechanisms of interaction with specific chemical
   functionality more than the behavior of specific molecules.
@@ -263,9 +263,9 @@
   \includegraphics[width=\textwidth]{top_view.pdf}
   \caption{}
   \end{subfigure}
-  \caption{The H\textsubscript{II} phase formed by LLC monomer NaGA3C11 (a)
+  \caption{The H\textsubscript{II} phase formed by LLC monomer Na-GA3C11 (a)
   consists of pores that are approximately straight (b) and packed hexagonally (c).
-  In both figures, water molecules that occupy the pores are colored blue, 
+  In both (b) and (c), water molecules that occupy the pores are colored blue, 
   the hydrophilic head groups of the LLC monomers are colored orange and all else is colored gray. 
   The chemical environment within the nanopores is largely determined by the functionality
   of the head groups. Additionally, there is not a well-defined transition
@@ -461,15 +461,15 @@
   \subsection{Molecule Parameterization}\label{method:parameterization}
   
   We parameterized the interaction potential for the monomer and solutes using
-  the Generalized AMBER Force Field (GAFF)~\cite{wang_development_2004} with the
+  the General AMBER Force Field (GAFF)~\cite{wang_development_2004} with the
   Antechamber package \cite{wang_automatic_2006} shipped with
-  AmberTools16~\cite{case_ambertools16_2016}.  We use GAFF as it has been used
-  extensively with organic molecules.  We assigned atomic charges using the
+  AmberTools16~\cite{case_ambertools16_2016}. We use GAFF as it has been used
+  extensively with organic molecules. We assigned atomic charges using the
   am1bccsym method of \texttt{molcharge} included with QUACPAC from OpenEye
   Scientific Software.
   
-  We simulated water molecules using the TIP3P water model because it because
-  it is the water model that GAFF and other AMBER family parameters were optmized 
+  We simulated water molecules using the TIP3P water model because it is the
+  water model that GAFF and other AMBER family parameters have been optmized
   with.~\cite{florova_explicit_2010} %~\cite{mahoney_five-site_2000}
   
   \subsection{System Setup}\label{method:system_setup}
@@ -493,42 +493,45 @@
   conventional simulations. See Section~\ref{S-section:water_content_equil} 
   of the Supporting Information for an expanded explanation and supporting figures. 
 	  
-  We observed water enters into the distal tail region of our system. We define the 
-  distal tail region to be ca. 1.5 nm from the pore center based on the minimum in 
-  the radial distribution function of water (see Section~\ref{method:rdfs}). Therefore
-  we aimed to build our initial configurations with water in both regions, close to
-  the expected equilibrium partition. The final amount of water present in the distal
-  tail region may or may not be experimentally consistent but it is necessary for our
-  results to be thermodynamically consistent; otherwise, water would slowly leak 
-  from the pore into the tail region over several hundred nanoseconds. 
+  We observed that water enters into the distal tail region of our system. We
+  define the distal tail region to be ca. 1.5 nm from the pore center based on
+  the minimum in the radial distribution function of water (see
+  Section~\ref{method:rdfs}). Therefore we aimed to build our initial
+  configurations with water in both regions, close to the expected equilibrium
+  partition. The final amount of water present in the distal tail region may or
+  may not be experimentally consistent but it is necessary for our results to be
+  thermodynamically consistent; otherwise, water would slowly leak from the pore
+  into the tail region over several hundred nanoseconds. 
 	
-  To determine the approximate ratio of water in the pores to tails, we equilibrated 4 systems
-  where we initially placed water in the pores and in the tails in addition to a water
-  reservoir between periodic images. We filled the pores with water by running the 
-  GROMACS command \texttt{gmx solvate} on our initial configuration followed by the 
-  removal of any water molecules placed in the distal tail region. This method requires
-  that we vary the monomer starting radius since the vacant space dictates the pore's 
-  water content. We then placed a defined number of water molecules into the distal tail
-  region one at a time with a short energy minimization between each insertion.
-  We chose to test systems with initial pore radii of 5, 6, 7 and 8 \AA~with tail and 
-  pore water compositions given in Table~\ref{S-table:water_content}. We found that 
-  systems started with more water in the pores than tails tended to equilibrate relatively
-  quickly with an approximate ratio of 3 water molecules in the pores to 2 in the tails.
-  
-  We removed the water reservoir and allowed the pore and tail water
-  contents to equilibrate with 5 and 10 wt\% total water with a 3:2 ratio
-  of pore to tail water. We considered the water content
-  equilibrated once the water contents plateaued. The 5 wt\% system did
-  not plateau until $\sim$ 600 ns 
-  while the 10 wt \% water system equilibrated within the first 100 ns of 
-  simulation (see Figure~\ref{S-fig:5wt_offset_equil} and Figure~\ref{S-fig:10wt_offset_equil} of
-  the Supporting Information). The equilibrated pores contain 72 \% and 69 \% of the total water in the
-  5 and 10 wt \% systems respectively. We cross-linked the equilibrated 
-  solvated systems, then allowed them to equilibrate further for 100 ns. 
-  The water contents in each region does not change significantly in either case 
-  (see Figure~\ref{S-fig:xlinked_solvation_equilibration} of the Supporting Information).
-  The `wet' equilibration and cross-linking procedures follow
-  the methods outlined in our previous work.
+  To determine the approximate ratio of water in the pores to tails, we
+  equilibrated 4 systems where we initially placed water in the pores and in the
+  tails in addition to a water reservoir between periodic images. We filled the
+  pores of our initial configuraiton with water by running the GROMACS command
+  \texttt{gmx solvate} on our initial configuration followed by the removal of
+  any water molecules placed in the distal tail region. This method requires that
+  we vary the monomer starting radius since the vacant space dictates the pore's
+  water content. We then placed a defined number of water molecules into the
+  distal tail region one at a time with a short energy minimization between each
+  insertion. We chose to test systems with initial pore radii of 5, 6, 7 and 8
+  \AA~with tail and pore water compositions given in
+  Table~\ref{S-table:water_content}. We found that systems started with more
+  water in the pores than tails tended to equilibrate relatively quickly with an
+  approximate ratio of 3 water molecules in the pores to 2 in the tails.
+
+  We removed the water reservoir and allowed the pore and tail water contents
+  to equilibrate with 5 and 10 wt\% total water with a 3:2 ratio of pore to tail
+  water. We considered the water content equilibrated once the number of water
+  molecules in each region plateaued. The 5 wt\% system did not plateau until
+  $\sim$ 600 ns while the 10 wt \% water system equilibrated within the first 100
+  ns of simulation (see Figure~\ref{S-fig:5wt_offset_equil} and
+  Figure~\ref{S-fig:10wt_offset_equil} of the Supporting Information). The
+  equilibrated pores contain 72 \% and 69 \% of the total water in the 5 and 10
+  wt \% systems respectively. We cross-linked the equilibrated solvated systems,
+  then allowed them to equilibrate further for 100 ns. The water contents in
+  each region does not change significantly in either case (see
+  Figure~\ref{S-fig:xlinked_solvation_equilibration} of the Supporting
+  Information). The `wet' equilibration and cross-linking procedures follow the
+  methods outlined in our previous work.~\cite{coscia_understanding_2019}
 
 %  We observed that some water partitions into the distal tail region of our system and therefore
 %  built our initial configurations with water in both regions, close to the expected
@@ -1014,7 +1017,7 @@
   \caption{Looking down at the $xy$ plane of the cross-linked LLC membranes, the lowest
   density regions of both membranes are in the pore center and in the distal tail region,
   furthest from the pore center (a \& c). Water concentration is highest in regions of
-  low monomer density regions (b \& d).}\label{fig:total_density}
+  low monomer density (b \& d).}\label{fig:total_density}
   \end{figure}
   
   We will restrict our studies of transport to solutes and water outside of the 
@@ -1026,7 +1029,7 @@
   We observed transport of sodium, water and 20 other small polar solutes
   inside the membrane nanopores. First, we comment on transport of the
   membrane constituents, water and sodium, in a system absent of any additional
-  solutes. We then present the general trends that we observe among the
+  solutes. We then present the general trends that we observe among 
   all other solutes studied.
   
   \subsubsection{Water and Sodium Ions}\label{section:transport_water_sodium} 
@@ -1087,7 +1090,7 @@
   close to the pore center. The MSD of distal tail water molecules is 1.7 nm$^2$
   compared to 1.2 nm$^2$ outside the distal tails. This behavior is likely due to the
   much more crowded pore environment in the 5 wt\% versus the 10 wt\% water system. 
-  Monomer head groups are concentrated about 2\AA~closer to the pore centers in the
+  Monomer head groups are concentrated about 2~\AA~closer to the pore centers in the
   5 wt\% versus the 10 wt\% water system (see Figure~\ref{fig:component_densities})  %BJC: this is the RDF figure of head groups, tails, sodium, water 
   which leaves less space for water molecules and restricts their movement among the 
   relatively immobile monomer head groups. The consequently high energetic barrier 
@@ -1579,7 +1582,7 @@
   monomers increases as solutes gain additional hydroxyl groups. The number of 
   hydrogen bonds made by a single solute in different locations simultaneously, n, 
   also increases with the number of hydroxyl groups. In the most extreme case, all 
-  four hydroxyl groups of Ribose (n = 4) are involved in a hydrogen bond interaction
+  four hydroxyl groups of ribose (n = 4) are involved in a hydrogen bond interaction
   at the same time.}\label{fig:polyols}
   \end{figure}
   
