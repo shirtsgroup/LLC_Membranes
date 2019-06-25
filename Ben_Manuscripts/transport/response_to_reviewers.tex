@@ -87,7 +87,7 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
     system are shorter than this value. Additionally, there are more frequent and longer
     periods of association between water and sodium ions. An average of 65\% of water 
     molecules in the pores of the 5 wt\% water system associate with a sodium ion each
-    frame compared to 44\% in the 10 wt\% water system.There are about half as many water
+    frame compared to 44\% in the 10 wt\% water system. There are about half as many water
     molecules in the 5 wt\% water system which allows a larger fraction of them to 
     associate with sodium ions. The lifetime of associations between sodium ions and 
     water is 7.5 ns and 3.0 ns in 5 and 10 wt\% water systems respectively.``
@@ -176,18 +176,19 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
 %    computationally efficient and reasonably reproduces water's physical properties
 %    at 300K, the temperature of our simulations.``
 
-    %MRS: TIP-4P is pretty close in efficiency, and TIP3P is only mediocre in bulk water properties  I would probably say that TIP3P was used because it is the water model that GAFF and other AMBER family parameters were optmized with.  TIP3P also diffuses faster than experimental water, which is both a negative (can't compare absolute diffusion) and positive (things happen faster). 
+    %MRS: TIP-4P is pretty close in efficiency, and TIP3P is only mediocre in bulk water properties  I would probably say that TIP3P was used because it is the water model that GAFF and other AMBER family parameters were optimized with.  TIP3P also diffuses faster than experimental water, which is both a negative (can't compare absolute diffusion) and positive (things happen faster). 
     %BJC2: I don't see any mention of water models in the GAFF paper. Maybe I'm overlooking something. 
     % Instead, I cited a study of TIP3P in a lipid membrane system where the lipids were parameterized with
     % GAFF.
     %MRS: Gaff uses the same charge model and VDW types that AMBER does, which was parameterized to be compatible with TIP3P water.
     
   	We added the following citation in support of our justification:
-    
+
+    %MRS3: fix accents below in LaTeX.
     Florová, Petra, Petr Sklenovský, Pavel Banáš, and Michal Otyepka. “Explicit Water 
     Models Affect the Specific Solvation and Dynamics of Unfolded Peptides While the 
     Conformational Behavior and Flexibility of Folded Peptides Remain Intact.” Journal 
-    of Chemical Theory and Computation 6, no. 11 (November 9, 2010): 3569–79. https://doi.org/10.1021/ct1003687.
+    of Chemical Theory and Computation 6, no. 11 (2010): 3569--79. https://doi.org/10.1021/ct1003687.
 
     \item \begin{quote}
     
@@ -224,7 +225,7 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
     text to include a consolidated discussion of the data and analysis presented in Section S2, 
     while leaving the full discussion in Section S2.
     
-    Old text: `` We observed that some water partitions into the distal tail region of our system and therefore
+    Old text: ``We observed that some water partitions into the distal tail region of our system and therefore
 	built our initial configurations with water in both regions, close to the expected
 	equilibrium partition (see Section~\ref{S-section:water_content_equil} of the Supporting
 	Information). We define the distal tail region to be ca. 1.5 nm from the pore
@@ -298,3 +299,4 @@ original text (denoted by ``Original text:") followed by the new text (denoted b
 %\bibliography{transport}
 
 \end{document}
+
