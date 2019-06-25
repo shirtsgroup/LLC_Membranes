@@ -14,17 +14,22 @@
 \usepackage{gensymb}
 \usepackage{float}
 \usepackage{xr}
+\usepackage{authblk}
 
-\externaldocument[M-]{Draft}
+\externaldocument[M-]{Final_Draft}
 
 \renewcommand{\thefigure}{S\arabic{figure}}
 \renewcommand{\thesection}{S\arabic{section}}
 \renewcommand{\thepage}{S\arabic{page}}
 \renewcommand{\thetable}{S\arabic{table}}
 
-\title{Supporting Information: Chemically Selective Transport in a Cross-linked 
+\title{Supporting Information: Chemically Selective Transport in a Cross-Linked 
 H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
-\author{Benjamin J. Coscia \and Michael R. Shirts} 
+\author[1]{Benjamin J. Coscia}
+\author[1]{Michael R. Shirts} 
+\date{E-mail: michael.shirts@colorado.edu}
+
+\affil[1]{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, CO 80309, USA}
 
 \begin{document}
 
@@ -229,7 +234,7 @@ H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
   simulation (Figure~\ref{fig:10wt_offset_equil}).
   The pores contain 72 \% and 69 \% of the total water in the 5 and 10 wt \%
   systems respectively.
-
+  \clearpage
   \begin{figure}[!htb]
   \centering
   \begin{subfigure}{0.45\textwidth}
@@ -274,8 +279,7 @@ H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
   by cross-linking}\label{fig:xlinked_solvation_equilibration}
   \end{figure}  
   
-  \clearpage  
-  
+  \clearpage
   \section{Solute Interaction}\label{section:solute_interaction}
   
   We chose to model 6 solutes in each pore because there was a low degree of 
@@ -319,13 +323,13 @@ H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
 %  to the SE equation becomes a more accurate estimation of MSD at small radii, after
 %  the point of intersection }\label{fig:se_intersection_sensitivity}
 %  \end{figure}
-  \clearpage
+
   \section{Solute MSD Ranking Time Lag Sensitivity}\label{section:lag_sensitivity}
   
   We chose to report the MSD of our solutes after a 400 ns time lag. This choice does
-  not have a significant influence on the ranking of the solute MSDs. Although there
-  is minor re-ranking among solutes with similar MSDs, it does not affect any of 
-  the conclusions drawn in the main text.
+  not have a significant influence on the ranking of the solute MSDs (see 
+  Figure~\ref{fig:lag_sensitivity}). Although there is minor re-ranking among solutes
+  with similar MSDs, it does not affect any of the conclusions drawn in the main text.
   
   \begin{figure}[!htb]
   \centering
@@ -356,6 +360,7 @@ H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
   \end{figure}
   
   \clearpage
+  
   \section{Pore Region Definition}\label{section:pore-region}
   
   We performed a sensitivity analysis in order to determine the radial 
@@ -367,7 +372,7 @@ H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
   Defining the cut-off 0.75 nm from the pore center maximizes the 
   difference in hop lengths between solutes in and out of the pore.
   
-  \begin{figure}
+  \begin{figure}[H]
   \centering
   \includegraphics[width=0.5\linewidth]{pore_cutoff.pdf}
   \caption{Defining the cut-off 0.75 nm from the pore center maximizes the 
