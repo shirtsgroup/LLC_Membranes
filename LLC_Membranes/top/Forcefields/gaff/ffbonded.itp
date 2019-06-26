@@ -42,7 +42,8 @@
   c2  h4	1    1.0868e-01    2.8836e+05
   c2  c2	1    1.3343e-01    4.7647e+05
   os  c2	 1    1.3596e-01    3.2568e+05
-  c3  ca	1    1.5156e-01    2.6861e+05
+  c3  ca	1    1.5156e-01    2.6861e+05i
+
 [ angletypes ]
 ;ai aj  ak   func    theta       cth
 ca  ca  ca     1    119.970    562.160 ; angle between three sp2 hybridized aromatic C's
@@ -147,6 +148,8 @@ ca  c   oh	1    1.1345e+02    5.7907e+02
 ca  c3  hc	1    1.1047e+02    3.9162e+02
 c3  ca  ca	1    1.2077e+02    5.3137e+02
 c3  c3  ca	1    1.1207e+02    5.2802e+02
+c2  c2  c3      1    1.2363e+02    5.3639e+02 ; for xlinking
+c2  c2  c2      1    123.080    550.030 ; same as ce ce c2 for xlinking
 
 [ dihedraltypes ]
 ;i   j   k   l     func     C0        C1          C2        C3         C4        C5
@@ -337,7 +340,14 @@ c3  ca  ca  ca		3   30.33400    0.00000  -30.33400    0.00000    0.00000    0.00
 c3  c3  ca  ca		3    0.00000    0.00000    0.00000    0.00000    0.00000    0.00000
 n   c3  c3  ca		3    0.65084    1.95253    0.00000   -2.60338    0.00000    0.00000
 c   c3  c3  ca		3    0.65084    1.95253    0.00000   -2.60338    0.00000    0.00000
-
+c2  c2  c3  hc          3    6.40152   -9.58136    0.00000    6.35968    0.00000    0.00000
+c2  c2  c3  c3          3    0.00000    0.00000    0.00000    0.00000    0.00000    0.00000
+ha  c2  c2  ha          3   55.64720    0.00000  -55.64720    0.00000    0.00000    0.00000
+c2  c2  c2  ha          3   55.64720   0.00000   -55.64720    0.00000    0.00000    0.00000 ; Radical intermediate during xlinking. Same as ha c2 ce ce 
+c2  c2  c2  c3          3   66.64720    0.00000  -55.64720    0.00000    0.00000    0.00000 ; Radical intermediate during xlinking. Same as c3 c2 ce ce
+c3  c2  c2  ha          3   55.64720    0.00000  -55.64720    0.00000    0.00000    0.00000  
+c3  c2  c2  c3          3   63.59680    7.94960  -55.64720    0.00000    0.00000    0.00000
+c2  c3  c3  c2          3    0.65084    1.95253    0.00000   -2.60338    0.00000    0.00000 
 
 [ dihedraltypes ]
 ;i   j   k   l     func   phase       kd    pn
@@ -379,3 +389,5 @@ ca  o   c   oh	     1    180.00   4.60240   2
 ca  ca  ca  c3	     1    180.00   4.60240   2
 c2  c3  c2  ha       1    180.00   4.60240   2 ; For diene cross-link
 c3  c2  c2  ha       1    180.00   4.60240   2 ; For diene cross-link
+c2  c2  c2  ha       1    180.00   4.60240   2 ; For diene cross-link (intermediate product)
+c3  c2  c3  hc       1    180.00   4.60240   2 ; For diene cross-link
