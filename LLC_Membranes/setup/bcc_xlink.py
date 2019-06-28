@@ -5,7 +5,6 @@ import argparse
 import time
 import os
 import numpy as np
-import subprocess
 from LLC_Membranes.setup.xlink_schemes import XlinkReaction
 from LLC_Membranes.setup.add_dummies import add_dummies
 from LLC_Membranes.setup.gentop import SystemTopology
@@ -45,7 +44,7 @@ def initialize():
     parser.add_argument('-rad_percent', default=50, type=float, help='Percent of radicals that react each iteration.'
                                                                      'Not stable above 50 % (?)')
     parser.add_argument('-out', '--output_gro', default='xlinked.gro', help='Name of final cross-linked structure')
-    parser.add_argument('-rad_frac_term', default=0, type=float, help='Out of 100, how many radicals that will be '
+    parser.add_argument('-rad_frac_term', default=20, type=float, help='Out of 100, how many radicals that will be '
                         'terminated on each iteration. Numbers greater than zero will decrease cross-link density')
     parser.add_argument('-stagnation', default=5, type=int, help='The number of iterations without generating a new'
                                                                  'cross-link before the algorithm forces termination')
@@ -509,7 +508,8 @@ class System(Topology):
 
             self.react(self.reaction_type[i], {c1_name: x, c2_name: self.bond_c2[i]})
 
-        # TODO: double check that this works properly (use first iteration)
+        self.terminate_radicals()  # this needs to go here since termination requires an improper to be removed
+
         rm_improper_ndx = []
         for i, p in enumerate(self.impropers):
             if p[:4].tolist() in self.rm_impropers:
@@ -517,12 +517,10 @@ class System(Topology):
 
         self.impropers = np.delete(self.impropers, rm_improper_ndx, axis=0)
 
-        #self.terminate_radicals()
-
         self.nxlinks += len(self.bond_c1)  # update total number of cross-links in system
 
         # self.identify_terminated(rad_term_frac=self.rad_frac_term)  # this will become it's own reaction scheme
-        self.remove_virtual_sites()  # could go in above loop and get rid of self.initiators
+        self.remove_virtual_sites()  # could go in self.react and get rid of self.initiators
 
         self.define_topology()  # make new angles, pairs and dihedrals lists
 
@@ -561,9 +559,17 @@ class System(Topology):
         for t in terminate:
             self.terminate.append(t - 1)
 
-        # remove radical if this is a radical reaction -- this will need to be improved to be more general
+        # remove radical if this is a radical reaction -- this will need to be improved to be more general. 
+        # It could be a return in the reaction schemes
         if 'radical' in reaction_type:
-            self.radicals.remove(list(atoms.values())[1] - 1)
+            ndx = list(atoms.values())[1] - 1
+            self.radicals.remove(ndx)
+            self.terminated_radicals.append(ndx)
+
+        if 'terminate' in reaction_type:
+            ndx = terminate[0] - 1
+            self.radicals.remove(terminate[0] - 1)
+            self.terminated_radicals.append(ndx)
 
     def terminate_radicals(self):
         """ Choose which remaining radicals to terminate and then terminate them. All reacted radicals should have been
@@ -571,13 +577,13 @@ class System(Topology):
         """
 
         nterm = int(self.rad_frac_term * len(self.radicals))
-        terminate = np.random.choice(self.radicals, size=nterm)
+        terminate = np.random.choice(self.radicals, size=nterm, replace=False)
 
         for t in terminate:
 
-            name = self.xlink_residue_atoms.name[t - 1]
+            name = self.xlink_residue_atoms.name[t]  # self.radicals indexing starts at 0
 
-            self.reaction.scheme.react('terminate', {name: t})
+            self.react('terminate', {name: t + 1})
 
         return terminate
 
@@ -723,10 +729,10 @@ if __name__ == "__main__":
             args.stagnation:
 
         #### FOR TESTING ####
-        sys.iteration = 2
-        lists = np.load('radicals.npz')
-        sys.radicals = list(lists['radicals'])
-        sys.terminate = list(lists['term'])
+        # sys.iteration = 2
+        # lists = np.load('radicals.npz')
+        # sys.radicals = list(lists['radicals'])
+        # sys.terminate = list(lists['term'])
         #####################
 
         print('-'*80)
@@ -743,8 +749,7 @@ if __name__ == "__main__":
         sys.write_assembly_topology()  # re-write assembly topology
         print('Done!')
         print('Total new bonds: %d' % len(sys.bond_c1))
-        # np.savez_compressed('radicals', radicals=sys.radicals, term=sys.terminate)
-        exit()
+        #np.savez_compressed('radicals', radicals=sys.radicals, term=sys.terminate)
 
         # energy minimize then run short NVT simulation
         print('Energy minimizing new cross-links...', end='', flush=True)

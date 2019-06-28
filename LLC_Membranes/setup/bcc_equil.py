@@ -378,6 +378,7 @@ if __name__ == "__main__":
 
     equil.build_initial_config(grid_points=args.grid, r=0.5)
     equil.scale_unit_cell(args.scale_factor)
+    exit()
 
     equil.generate_topology(name='topol.top')  # creates an output file
     equil.generate_mdps(length=50, frames=2, T=args.temperature)  # creates an object

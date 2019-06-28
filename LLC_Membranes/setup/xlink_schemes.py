@@ -142,7 +142,6 @@ class DieneScheme:
         impropers = {'a': {1: ['H2', 'C1', 'H1', 'C2'], 2: ['C1', 'C3', 'C2', 'H3']},
                      'b': {1: ['C2', 'H2', 'C1', 'H1'], 2: ['C1', 'C3', 'C2', 'H3']}}
 
-        # step through this for chain2's second iteration (1st is right. all after are wrong)
         chain1_impropers = [1]
         chain2_impropers = [1, 2]
         rm_improper = []
@@ -197,7 +196,6 @@ class DieneScheme:
         impropers = {'a': {1: ['H2', 'C1', 'H1', 'C2'], 2: ['C1', 'C3', 'C2', 'H3']},
                      'b': {1: ['C2', 'H2', 'C1', 'H1'], 2: ['C1', 'C3', 'C2', 'H3']}}
 
-        # step through this for chain2's second iteration (1st is right. all after are wrong)
         chain1_impropers = [1]
         chain2_impropers = [2]
         rm_improper = []
@@ -222,43 +220,40 @@ class DieneScheme:
         :return: reacted_types, dummy_bonds, radicals, rm_improper, terminated
         """
 
-        c = list(atoms.keys())[0]
-        c_ndx = list(atoms.values())[0]
+        c = list(atoms.keys())[0]  # name of carbon atom being terminated
+        c_ndx = list(atoms.values())[0]  # serial index of carbon begin terminated
 
-        chain = self.determine_chains(c)[0]
+        chain = self.determine_chains(c)[0]  # which chain carbon atom is on
+        c_name = self.chains[chain][c]
 
         # to get indexing right
-        c_ndx -= self.indices[chain][self.chains[chain][c]]
+        c_ndx -= self.indices[chain][c_name]
 
-        # types after reaction
-        types = {'chain': {self.chains[chain][c]: 'c3', {self.dummy_connectivity[c]: 'hc'}}}
+        # types after reaction. Keeping this dictionary format so it integrates easily with xlinking algorithm
+        types = {'chain': {self.chains[chain][c]: 'c3', self.dummy_connectivity[chain][c]: 'hc'}}
 
         # update types
-        reacted_types = {'chain1': {c1_ndx + self.indices[chain1][a]: types['chain1'][a] for a in types['chain1'].keys()},
-                         'chain2': {c2_ndx + self.indices[chain2][a]: types['chain2'][a] for a in types['chain2'].keys()}}
+        reacted_types = {'chain': {c_ndx + self.indices[chain][a]: types['chain'][a] for a in types['chain'].keys()}}
 
-        # update bonds - no new bonds between dummy atoms and carbon
-        dummy_bonds = []
+        # add dummy atom bond
+        dummy_bonds = [list(reacted_types['chain'].keys())]
 
-        # define indices of left-over radicals
-        radicals = [c1_ndx + self.indices[chain1]['C2']]
+        # no radicals are produced (only eliminated) -- TODO: make sure the elimination is accounted for
+        radicals = []
+        # stopped here
 
         # define which improper dihedrals to remove -- written in same order as .itp file!!!
         # note that the order of the atoms may be different for each chain
-        impropers = {'a': {1: ['H2', 'C1', 'H1', 'C2'], 2: ['C1', 'C3', 'C2', 'H3']},
-                     'b': {1: ['C2', 'H2', 'C1', 'H1'], 2: ['C1', 'C3', 'C2', 'H3']}}
+        # NOTE: C3 not tested
+        impropers = {'a': {'C1': ['H2', 'C1', 'H1', 'C2'], 'C2': ['C1', 'C3', 'C2', 'H3'],
+                           'C3': ['C4', 'C2', 'C3', 'H4']},
+                     'b': {'C1': ['C2', 'H2', 'C1', 'H1'], 'C2': ['C1', 'C3', 'C2', 'H3'],
+                           'C3': ['C4', 'C2', 'C3', 'H4']}}
 
-        # step through this for chain2's second iteration (1st is right. all after are wrong)
-        chain1_impropers = [1]
-        chain2_impropers = [2]
-        rm_improper = []
-        for c in chain1_impropers:
-            rm_improper.append([c1_ndx + self.indices[chain1][x] for x in impropers[chain1][c]])
-        for c in chain2_impropers:
-            rm_improper.append([c2_ndx + self.indices[chain2][x] for x in impropers[chain2][c]])
+        rm_improper = [[c_ndx + self.indices[chain][x] for x in impropers[chain][c_name]]]
 
         # define terminated atoms
-        terminated = [c1_ndx + self.indices[chain1]['C1'], c2_ndx + self.indices[chain2]['C2']]
+        terminated = [c_ndx + self.indices[chain][c_name]]
 
         return reacted_types, dummy_bonds, radicals, rm_improper, terminated
 

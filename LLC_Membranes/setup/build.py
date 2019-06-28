@@ -50,9 +50,9 @@ def initialize():
     parser.add_argument('-g', '--grid', default=50, type=int, help='Number of sections to break grid into when '
                                                                 'approximating the chosen implicit function')
     parser.add_argument('-dens', '--density', default=1.1, type=float, help='Density of system (g/cm3)')
-    parser.add_argument('-c', '--curvature', default=-1, type=int,
-                        help='-1 : QI phase, 1, QII phase. Determines whether'
-                             'the phase is normal or inverted')
+    parser.add_argument('-c', '--curvature', default=1, type=int,
+                        help='1 : QI phase (negative mean curvature, convex interface), 1, QII phase (positive mean'
+                             'curvature, concave interface). Determines whether the phase is normal or inverted')
     parser.add_argument('-wt', '--weight_percent', default=77.1, type=float,
                         help='Weight %% of monomer in membrane')
     parser.add_argument('-sol', '--solvent', default='glycerol', type=str,
@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
     # Choose phase and space group
     acceptable_hII_names = ['hii', 'h2', 'hexagonal', 'colh']  # lowercase so I can make input case insensitive
-    acceptable_qI_names = ['gyroid', 'ia3d', 'ia3d', 'schwarzd', 'pn3m']
+    acceptable_qI_names = ['gyroid', 'ia3d', 'schwarzd', 'pn3m']
     vague_names = ['q1', 'qi']  # phases by these names do not give enough information to determine the structure
 
     phase = args.phase.lower()

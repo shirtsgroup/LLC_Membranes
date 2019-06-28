@@ -244,20 +244,20 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   Our current understanding of the molecular details of LLC membranes'
   nanostructure is not sufficient to be able to precisely design them for
   specific separations. Dischinger et al.~attempted to use an empirical model
-  that correlates the physicochemical properties of the counterion used in
-  a Q\textsubscript{I}-phase LLC membrane to solute rejection. Although there
-  was some agreement with their empirical model, it does not offer a 
-  sufficiently detailed explanation of the critical molecular interactions 
-  leading to the observed behavior.~\cite{dischinger_effect_2017} 
-  H\textsubscript{II}-phase LLC polymer membrane studies have been limited
-  primarily to the Na-GA3C11 monomer (Figure~\ref{fig:HII_mon}) with
-  some characterization done after minor monomer structural modifications. 
-  These studies emphasized large scale structural features such as pore spacing
-  as well as size-based rejection.~\cite{zhou_supported_2005,resel_structural_2000}
-  Given the similar topology of H\textsubscript{II} and Q\textsubscript{I}
-  membrane pores, we expect the H\textsubscript{II} phase will also be 
-  subject to complex solute-membrane interactions that are not easily explained
-  by an empirical model.
+  that correlates the physicochemical properties of the counterion used in a
+  Q\textsubscript{I}-phase LLC membrane to solute rejection. Although there was
+  some agreement with their empirical model, it does not offer a sufficiently
+  detailed explanation of the critical molecular interactions leading to the
+  observed behavior.~\cite{dischinger_effect_2017} H\textsubscript{II}-phase LLC
+  polymer membrane studies have been limited primarily to the Na-GA3C11 monomer
+  (Figure~\ref{fig:HII_mon}) with some characterization done after minor monomer
+  structural modifications.  These studies emphasized large scale structural
+  features such as pore spacing as well as size-based
+  rejection.~\cite{zhou_supported_2005,resel_structural_2000} Given the similar
+  topology of H\textsubscript{II} and Q\textsubscript{I} membrane pores, we
+  expect the H\textsubscript{II} phase will also be subject to complex
+  solute-membrane interactions that are not easily explained by an empirical
+  model.
 
   A molecular-level understanding of structure and transport in LLC polymer 
   membranes, enabled by molecular dynamics (MD) simulations, can provide 
@@ -276,7 +276,7 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   \begin{enumerate}
   
     \item Develop techniques to build and understand the nanoscopic structure
-    of LLC membranes. (\textcolor{green!40!olive}{\textbf{Complete}})
+    of H\textsubscript{II} LLC membranes. (\textcolor{green!40!olive}{\textbf{Complete}})
 
     A useful molecular-level model should incorporate a detailed picture 
     of the nanoscopic pore structure, which is crucial to understanding
@@ -327,14 +327,15 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   \noindent My work fulfilling this objective is published in the Journal of Physical 
   Chemistry B: Coscia et al. \textit{J. Phys. Chem. B}, 123, 289-309 (2019).
 
-  I developed a procedure for building and equilibrating an atomistic LLC membrane 
-  system (see Figure~\ref{fig:assembly}). I chose to build a monoclinic unit cell
-  consisting of four pores. Each pore is composed of monomer columns, where each
-  column consists of 20 monomers stacked on top of each other so that the phenyl
-  groups are coplanar with each other and the $xy$ plane. The columns are oriented
-  so that the hydrophilic monomer head groups face towards the pore center. I did
-  not add any water to the initial configuration because I compared the structure
-  to experimental data for a system claimed to be synthesized with only neat monomer. 
+  I developed a procedure for building and equilibrating an atomistic
+  H\textsubscript{II} LLC membrane system (see Figure~\ref{fig:assembly}). I
+  chose to build a monoclinic unit cell consisting of four pores. Each pore is
+  composed of monomer columns, where each column consists of 20 monomers stacked
+  on top of each other so that the phenyl groups are coplanar with each other and
+  the $xy$ plane. The columns are oriented so that the hydrophilic monomer head
+  groups face towards the pore center. Initially, I did not add any water to the starting 
+  configuration because I compared the structure to experimental data for a
+  system claimed to be synthesized with only neat monomer. 
   
   %BJC2: removing unnecessary details
 %  I equilibrated unit cells using a series
@@ -453,11 +454,11 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
     angstroms. Explanations for each of the 5 major reflections present are
     as follows: (R-$\pi$) Aromatic head groups $\pi-\pi$ stack 3.7 \AA~apart. 
     (R-double) Monomer head groups associate into pairs by hydrogen bonding with
-    a shared water molecule. R-double does not appear in dry systems. 
+    a shared water molecule. This reflection does not appear in dry systems. 
     (R-alkanes) Alkane chain tails pack 4.5 \AA~apart. (R-spots) Monomer tails
     pack hexagonally. (R-pores) The pores are spaced 4.12 nm apart and pack 
-    hexagonally. (b) We obtain a maximally consistent match between simulated
-    XRD patterns and experimental WAXS data when we build systems in the 
+    hexagonally. (b) I obtain a maximally consistent match between simulated
+    XRD patterns and experimental WAXS data when I build systems in the 
     parallel displaced configuration with 1 wt \% water included in the pores.
     }\label{fig:WAXS_comparison}
     \vspace{-0.75cm}
@@ -478,7 +479,7 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   distribution function of various monomer components as a function of distance
   from the closest pore center. All are qualitatively similar meaning that a 
   solute placed in any of these systems should experience a similar chemical 
-  environment. Although we will move forward with our most promising 
+  environment. Although I will move forward with the most experimentally-consistent 
   configuration, this is an important finding since it implies that one does
   not need to apply the same level of rigor when screening new monomers.
   
@@ -502,17 +503,17 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
         \caption{Sodium Ions}
         \label{fig:sodium_regional_density}
   \end{subfigure}
-  \caption{Even if we fail to get the system's structure exactly right, we can still 
-  		   expect to extract useful transport details. In all systems studied, the 
-  		   component radial distribution functions are similar. They exhibit a 
-  		   composition gradient transitioning from the hydrophilic to the hydrophobic
-           regions. The biggest differences are at r=0 where noise is higher due to
-           decreased sampling. The center of the pore is not hollow, but contains sodium
-           ions and head groups, even when the system is solvated. This architecture may
-           impede transport in the real system in a chemically-dependent manner. The
-           solvated system has a lower density of head groups near the pore center 
-           which is likely due to the swelling that is necessary in order to fit water
-           molecules in the pore region.}~\label{fig:overlaid_densities}
+  \caption{Even if we fail to get the system's structure exactly right, we can
+	  still expect to extract useful transport details. In all systems studied, the
+	  component radial distribution functions are similar. They exhibit a composition
+	  gradient transitioning from the hydrophilic to the hydrophobic regions. The
+	  biggest differences are at r=0 where noise is higher due to decreased sampling.
+	  The center of the pore is not hollow, but contains sodium ions and head groups,
+	  even when the system is solvated. This architecture may impede transport in the
+	  real system in a chemically-dependent manner. The solvated system has a lower
+	  density of head groups near the pore center which is likely due to the swelling
+	  that is necessary in order to fit water molecules in the pore
+	  region.}~\label{fig:overlaid_densities}
   \vspace{-0.5cm}
   \end{figure}
   
@@ -533,13 +534,14 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   
   Upon simulating each system, I observed that water partitions into the
   distal tail region. Based on the radial distance from the pore center where 
-  the minimum water density occurs, we defined the distal tail region to 
+  the minimum water density occurs, I defined the distal tail region to 
   be greater than 1.5 nm from any pore center. There is approximately a 3:2
   ratio of water in the pores to water in the distal tails. Due to the wedge
   shape of the monomers, the distal tail region has a relatively low density
   leaving space for water molecules to fill.
   
   \begin{wrapfigure}{l}{0.65\textwidth}
+  \vspace{-0.5cm}
   \centering
   \begin{subfigure}{0.49\linewidth}
   \includegraphics[width=\linewidth]{component_density_5wt.pdf}
@@ -549,8 +551,7 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   \includegraphics[width=\linewidth]{component_density_10wt.pdf}
   \caption{10 wt\% water}\label{fig:component_density_10wt}
   \end{subfigure}
-  \caption{The radial densities of various monomer components paint a
-  picture of the pore topology where the pore centers are primarily 
+  \caption{The pore centers are primarily 
   composed of water, sodium ions and head groups to varying degrees
   depending on total water composition. The monomer groups labeled in each plot correspond to
   the color-coded monomer pictured in Figure~\ref{fig:HII_mon}. All RDFs
@@ -562,7 +563,6 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   (b) Monomers in the 10 wt \% system retreat an additional 0.2 nm to make room
   for more water. Water is densest at the pore center, but sodium ion density
   peaks closer to the head groups since many stay bound to carboxylate groups.}\label{fig:component_densities}
-  \vspace{-0.5cm}
   \end{wrapfigure}
   
   The pores of the H\textsubscript{II} phase are a mixture of water, sodium
@@ -574,11 +574,11 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   Water and sodium transport is significantly faster in the less crowded 
   10 wt\% water pores. The mean squared displacement (MSD) of water is about
   51 times higher and the MSD of sodium is about 49 times higher compared to
-  the 5 wt\% system. In general we observe similar solute transport mechanisms
-  in the 5 and 10 wt\% water systems but on different time scales.
+  the 5 wt\% system. In general the solute transport mechanisms are similar
+  in the 5 and 10 wt\% water systems but act on different time scales.
   
   I explored the influence of a solute's chemical functionality on its 
-  transport properties within the H\textsubscript{II} nanopores .
+  transport properties within the H\textsubscript{II} nanopores.
   For each solute, I created a separate initial configuration and placed 6 
   solutes, equally spaced in $z$, in each nanopore. This gave a sufficient
   number of solute trajectories from which to generate statistics while 
@@ -596,8 +596,8 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   \end{figure}
   
   The solute MSDs are not a monotonic function of solute size. In 
-  Figures~\ref{fig:all_msds_5wt} and~\ref{fig:all_msds_10wt}, we plot
-  the average MSD of each solute. In Figure~\ref{fig:msd_radius_5wt} 
+  Figures~\ref{fig:all_msds_5wt} and~\ref{fig:all_msds_10wt}, I plotted
+  the average MSD of each solute. In Figures~\ref{fig:msd_radius_5wt} 
   and~\ref{fig:msd_radius_10wt}, I plotted the solute MSDs against their
   molecular radius. Also plotted are theoretical curves which illustrate the 
   expected MSD of each solute if they were to travel unhindered. The 
@@ -642,7 +642,7 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   \end{wrapfigure}
 
   Intermittent hops between long periods of entrapment lead to subdiffusive
-  solute transport behavior. As implied by Figures~\ref{fig:msd_radius_10wt} and~\ref{fig:msd_radius_5wt}, 
+  solute transport behavior. As implied by Figures~\ref{fig:msd_radius_5wt} and~\ref{fig:msd_radius_10wt}, 
   most solutes move significantly slower than expected. In 
   Figure~\ref{fig:example_ztraces}, I've plotted the $z$-direction trajectory
   of three ethanol molecules. Typically, long periods of entrapment occur
@@ -663,9 +663,9 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   \end{subfigure}
   \caption{All solutes show subdiffusive transport behavior inside the membrane's
   nanopores, similar to that exhibited by ethanol. (a) The $z$-coordinate trace of
-  3 representative ethanol COMs shows clear periods of entrapment separated by hops.
+  3 representative ethanol centers of mass show clear periods of entrapment separated by hops.
   In general, the longest dwell times occur when solutes are situated far from the
-  pore center and the hops occur when solutes are close to the pore center. (b) The
+  pore center and the hops occur most frequently when solutes are close to the pore center. (b) The
   time-averaged MSD of ethanol is sub-linear which suggests transport is governed
   by an anomalous subdiffusion process.}\label{fig:qualitative_mechanisms}
 
@@ -704,14 +704,14 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   larger hops have higher MSDs. The fraction of time spent by a solute in the
   pore region (b) does not necessarily lead to more frequent hopping (c). For
   example, ribose spends the largest fraction of time in the pore region, yet
-  performs the the fifth lowest number of hops and third lowest MSD.}\label{fig:hops}
+  performs the the fifth lowest number of hops and has the third lowest MSD.}\label{fig:hops}
   \end{figure}
   
   Among the set of solutes studied, we observe three different mechanisms 
   of entrapment that are responsible for subdiffusive behavior:
   \begin{enumerate}
     \item As already demonstrated by Figures~\ref{fig:example_ztraces} and 
-    Figure~\ref{fig:hop_lengths}, solutes that drift away from the pore center
+    \ref{fig:hop_lengths}, solutes that drift away from the pore center
     can become entangled in the monomer tails. 
     \item Many of the solutes we studied are capable of donating hydrogen bonds to
     monomer head groups and thus are prone to temporary immobilization through 
@@ -770,7 +770,7 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   \end{subfigure}
   \caption{(a) Solutes, especially those with carbonyl groups, spend a
   significant fraction of time coordinated to sodium ions. (b) The length
-  of time a solute-sodium pairs spends associated tends to be higher for
+  of time a solute-sodium pair spends associated tends to be higher for
   pairs that associate more frequently.}\label{fig:na_coordination}
   \vspace{-0.5cm}
   \end{wrapfigure}
@@ -1001,11 +1001,11 @@ Crystal Membranes for Aqueous Separations \\ \vspace{0.5cm}
   perpendicular to the surface at the point where they are attached.
   
   First, I will study the structure of the Q\textsubscript{I} phase using
-  methodology similar to that used for the H\textsubscript{II} phase 
+  methodology similar to that used for the H\textsubscript{II} phase.
   I will attempt to identify one of the space groups as the most likely
   experimental configuration based on simulated XRD signatures, although
   this might not work due to the known similarity of Ia3d and Pn3m XRD 
-  patterns.
+  patterns for this system.
   
   Then I will study transport of solutes within these atomistic unit cells, 
   adapting the same analyses used in Objectives 2--3. The primary 

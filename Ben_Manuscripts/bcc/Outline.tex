@@ -1,0 +1,215 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{subcaption}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath} % or simply amstext
+\usepackage{amssymb}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage[export]{adjustbox}
+\newcommand{\angstrom}{\textup{\AA}}
+\newcommand{\colormap}{jet}  % colorbar to use
+\usepackage{cleveref}
+\usepackage{booktabs}
+\usepackage{gensymb}
+\usepackage{float}
+
+%BJC: potential titles (uncommented is current favorite)
+\title{Understanding the nanoscopic structure of Q\textsubscript{I} phase LLC membranes}
+\author{Benjamin J. Coscia \and Michael R. Shirts} 
+
+\begin{document}
+
+  \graphicspath{{./figures/}}
+  \maketitle
+
+  \section{Introduction}
+
+  We need highly selective membranes in order to perform efficient separations.
+
+  Amphiphilic molecules are capable of self-assembling into ordered nanostructures.
+
+  Lytropic liquid crystals are a class of amphiphilic molecules that can be cross-linked
+  into mechanically strong membranes.
+  \begin{itemize}
+  	\item H\textsubscript{II} phase lyotropic liquid crystals have densely packed, uniform
+	sized pores and have the potential to disrupt conventional membrane separation
+	techniques by being selective based not only on size and charge, but on chemical
+	functionality as well.
+	\item Q\textsubscript{I} phase LLCs consist of a tortuous network of 3D interconnected
+	pores.
+  \end{itemize}
+
+  We can only learn so much from experiment. MD can give us mechanistic insights with
+  atomistic resolution so that we can intelligently design new membranes for 
+  solute-specific separations.
+
+  In our previous work, we studied the transport of 20 small polar molecules
+  in an H\textsubscript{II} phase LLC membrane. 
+
+  Unfortunately, the timescales that we can simulate with MD are insufficient to be
+  able to predict macroscopic transport properties traditionally used to characterize
+  membranes in the lab.
+
+  % review of techniques for predicting long time scale behavior
+
+  In this work, we have determined the transport mechanisms and macroscopic
+  transport properties exhibited by a number of polar solutes with varying size,
+  chemical functionality and hydrophilic character.
+  \begin{itemize}
+	\item Many of the separations we are interested in involve polar organic 
+	compounds.
+  \end{itemize} 
+
+  \section{Methods}
+
+  \subsection{Molecular Dynamics Simulations}
+  
+  \subsubsection{Unit Cell Construction}\label{method:unit_cell}
+  
+  % BJC: These first 3 paragraphs might be better suited for introduction.
+  The space group of the Q\textsubscript{I} phase configuration formed by
+  the monomer 1 is thought to be either Pn3m or Ia3d.
+  \begin{itemize}
+    \item 6 Q phase architectures have been identified in small molecule
+    amphiphile systems.~\cite{mariani_cubic_1988}
+    \item Of these, only 4 are consistent with diffraction data generated
+    by the gemini surfactant used here.~\cite{pindzola_cross-linked_2003}
+    %BJC: excess detail for now
+    \item Q$^{230}$ (Ia3d), Q$^{224}$ (Pn3m), Q$^{229}$ (Im3m) or Q$^{212}$ (P4\textsubscript{3}32) phase of type I configuration
+    \item The presence of $1 / \sqrt{6}$ and $1 / \sqrt{8}$ peaks rules out the
+    Q$^{227}$ (Fd3m) and Q$^{223}$ (Pm3n) configurations.
+    \item The most likely phase is the type I Q$^{230}$ (Ia3d) because it is the
+    most common phase observed between lamellar and hexagonal phases and the
+    monomeric alkyltrimethylammonium salts used to synthesize the gemini LCs
+    exhibit clear Ia3d symmetry. 
+  \end{itemize}
+  
+  Molecular simulation studies of systems exhibiting bicontinuous cubic 
+  phase behavior are typically centered around phase formation
+  ~\cite{mondal_self-assembly_2013,ellison_entropy-driven_2006,gonzalez-segredo_coarsening_2004}
+  and the few which study transport rely on a previously self-assembled unit cell.
+  ~\cite{roy_water_2016}
+  \begin{itemize}
+    \item Self-assembly is a slow process which usually requires united atom
+    or coarser molecular representations.~\cite{klein_large-scale_2008}
+    \item Self-assembly also prevents us from creating unit cells with arbitrary
+    space group symmetry since one space group is likely to be most energetically
+    favorable for a given interaction potential.
+    \item Therefore, we developed an initial configuration build procedure that allowed 
+    us to place LLC monomers with Ia3d, Pn3m and any other symmetry. 
+  \end{itemize}
+  
+  The interface between the hydrophilic and hydrophobic regions of Pn3m
+  and Ia3d Q\textsubscript{I} unit cells can be described using triply-periodic
+  minimal surfaces.~\cite{marrink_molecular_2001}  % This ref does what I do for monomer placement
+  \begin{itemize}
+	\item Schwarz' D surface describes the Pn3m interface while Schoen's gyroid
+	describes the Ia3d interface.~\cite{hyde_bicontinuous_1996, andersson_minimal_1988}
+	\item Both surfaces can be approximated using implicit trigonometric expressions:~\cite{von_schnering_nodal_1991}
+	\item \begin{equation} 
+	          sin(x)sin(y)sin(z) + sin(x)cos(y)cos(z) + cos(x)sin(y)cos(z) + cos(x)cos(y)sin(z) = C 
+	      \label{eqn:schwarzD}
+	      \end{equation}
+	\item \begin{equation} 
+	          sin(x)cos(y) + sin(y)cos(z) + sin(z)cos(x) = C 
+	      \label{eqn:gyroid}
+	      \end{equation}
+	\item When $C$ = 0, the surface splits the unit cell into two equal volumes. % need reference if I'm actually going to say this
+  \end{itemize}
+  
+  We find points that lie on the implicit surface and then place monomers
+  perpendicular to the surface at those points.
+  \begin{itemize}
+    \item We placed 582 monomers at points on the desired surface of our unit
+    cell based on the known experimental density, unit cell dimensions and 
+    water content. % glycerol content? need to look this up again
+    \item We identified points which lie close to the surface by creating a 
+    cubic grid of points and only keeping those whose $(x, y, z)$ coordinates
+    lie within a specified tolerance of C when substituted into 
+    equation~ref{eqn:schwarD} or~\ref{eqn:gyroid}.
+    \item We constructed a vector, $\mathbf{v}$, based on the monomer's constituent
+    atom positions which points from the tails to the head groups.
+    \item To place each monomer, we randomly chose one of the points on the surface, 
+    translated a reference atom on the monomer to that point,
+    and rotated the monomer so that $\mathbf{v}$ coincided with the vector normal
+    to the surface, calculated based on the gradient of equations~\ref{eqn:schwarzD}
+    and~\ref{eqn:gyroid}.
+    \item After each monomer placement, we removed all grid points within a specified
+    distance of the monomer in order to reduce overlaps in the initial configuration.
+    \item This procedure shares similarities with that of Marrink and Tieleman.~\cite{marrink_molecular_2001} % BJC: Just found this reference :( I came up with this independently
+  \end{itemize}
+  
+  Despite our best efforts, overlaps in our initial configuration were unavoidable
+  since we used an all-atom model. 
+  \begin{itemize}
+    \item The simplest way to overcome this problem was to isotropically expand 
+    the unit cell by doubling the unit cell vectors in all directions, increasing the unit
+    cell volume by a factor of 8. 
+    \item In a series of energy minimizations, we slowly shrank the unit cell
+    back down to the desired size.
+  \end{itemize}
+  
+  In accordance with experimental procedure, we solvated the unit cell with glycerol at
+  70$^{\circ}$ C.
+  \begin{itemize}
+    \item We used the GROMACS command \texttt{gmx insert-molecules} to add the desired
+    number of glycerol molecules to the unit cell.
+    \item All of which were placed in the vacant pore region.
+    \item In general, we could not insert all of the glycerol molecules intended in one try. 
+    \item We performed a series of NVT simulations, inserting more glycerol molecules between
+    each.
+    \item Once we could no longer fit more glycerol molecules, we switched to the NPT
+    ensemble and continued inserting glycerol molecules.
+    \item We then allowed the system to equilibrate for an additional 5 ns.
+  \end{itemize}
+  
+  % add glycerol to tails?
+  
+  Also in accordance with experimental preparation procedure, we cross-linked the 
+  monoemr's diene tails at 70$^{\circ}$ C. 
+  \begin{itemize}
+    \item Practically, cross-linking is necessary for the membrane's mechanical
+    integrity which likely will not have a significant influence on the timescales
+    which we study. We include it anyways for consistency.
+    \item Our cross-linking procedure is iterative. 
+    \item Each iteration, we identify carbon atoms that are a part of the diene 
+    tails and in close proximity.
+    \item We update the topology to include new bonds and update atom types and
+    other topological information accordingly.
+    \item See Supporting Information for more details.
+  \end{itemize}
+   
+  \section{Results and Discussion}
+
+  \section{Conclusion}
+ 
+  \section*{Supporting Information}
+
+  Detailed explanations and expansions upon the results and procedures mentioned in
+  the main text are described in the Supporting Information. This information is
+  available free of charge via the Internet at http://pubs.acs.org.
+
+  \section*{Acknowledgements}
+
+  Molecular simulations were performed using the Extreme Science and
+  Engineering Discovery Environment (XSEDE), which is supported by National
+  Science Foundation grant number ACI-1548562. Specifically, it used the Bridges
+  system, which is supported by NSF award number ACI-1445606, at the Pittsburgh
+  Supercomputing Center (PSC). This work also utilized the RMACC Summit supercomputer,
+  which is supported by the National Science Foundation (awards ACI-1532235 and
+  ACI-1532236), the University of Colorado Boulder, and Colorado State
+  University. The Summit supercomputer is a joint effort of the University of
+  Colorado Boulder and Colorado State University.
+
+  \clearpage
+
+  \bibliographystyle{ieeetr}
+  \bibliography{BCC}
+
+  \newpage
+
+  \section*{TOC Graphic}
+
+\end{document}
