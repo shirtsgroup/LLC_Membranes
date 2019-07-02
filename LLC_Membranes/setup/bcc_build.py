@@ -34,8 +34,8 @@ class BicontinuousCubicBuild(topology.LC):
 
         :param monomer: name of monomer with which to build phase
         :param space_group: name of space group into which monomers are arranged (i.e. gyroid, schwarzD etc.)
-        :param dimensions: length of each edge of the unit cell (nm). The box is cubic, so they must all be the same (or
-        just one length specified)
+        :param dimensions: length of each edge of the unit cell (nm). The box is cubic, so they must all be the same \
+        (or just one length specified)
         :param weight_percent: percent by weight of monomer in membrane
         :param density: experimentally derived density of membrane
 
@@ -93,8 +93,8 @@ class BicontinuousCubicBuild(topology.LC):
     def determine_monomer_placement(self, r=0.4):
         """ Choose grid points where monomers will be placed
 
-        :param r: Any points within this distance of a chosen grid point will be removed as potential new grid points in
-        an effort to keep point sufficiently spaced.
+        :param r: Any points within this distance of a chosen grid point will be removed as potential new grid points \
+        in an effort to keep point sufficiently spaced.
 
         :type r: float
         """
@@ -128,7 +128,7 @@ class BicontinuousCubicBuild(topology.LC):
     def place_monomers(self, shift=0, curvature=-1):
         """ Place monomers perpendicular to the space group surface at grid point locations
 
-        :param shift: translate monomer along vector perpendicular to space group surface by this amount (nm). This
+        :param shift: translate monomer along vector perpendicular to space group surface by this amount (nm). This \
         parameter effectively controls the pore size
         :param curvature: determines whether the phase is normal or inverted. {-1 : QI phase, 1: QII phase}'
 

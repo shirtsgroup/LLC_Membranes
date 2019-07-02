@@ -128,7 +128,7 @@ class SimulationMdp(object):
         """ Write an .mdp file for an NPT simulation (constant number of particles, pressure and temperature)
 
         :param out: name of output file
-        :param length: simulation length (ps). Only need to specify this if you are changing the simulation length
+        :param length: simulation length (ps). Only need to specify this if you are changing the simulation length \
         from how it was initialized
 
         :type out: str
@@ -194,7 +194,7 @@ class SimulationMdp(object):
         """ Write an .mdp file for an NVT simulation (constant number of particles, volume and temperature)
 
         :param out: name of output file
-        :param length: simulation length (ps). Only need to specify this if you are changing the simulation length
+        :param length: simulation length (ps). Only need to specify this if you are changing the simulation length \
         from how it was initialized
 
         :type out: str

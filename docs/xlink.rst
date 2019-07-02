@@ -1,6 +1,9 @@
 Cross-linking
 =============
 
+Our cross-linking algorithm is designed to simulate the result of a 
+free radical polymerization. 
+
 .. argparse:: 
    :filename: ../LLC_Membranes/setup/xlink.py
    :func: initialize

@@ -9,9 +9,12 @@ the files are accurate before using them.
 
 *input.py* calls the classes defined on the following pages:
 
-* :ref:`Generate Gromacs Topology File <gentop>`
+.. toctree::
+      :maxdepth: 0 
+      :titlesonly:
 
-* :ref:`Generate Gromacs .mdp Files <genmdp>`
+      gentop
+      genmdp
 
 .. _input-script:
 

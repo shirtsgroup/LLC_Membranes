@@ -4,10 +4,6 @@ import numpy as np
 import argparse
 from LLC_Membranes.setup.hexagonal_build import BuildHexagonal
 from LLC_Membranes.setup.bcc_build import BicontinuousCubicBuild
-from LLC_Membranes.llclib import file_rw, transform
-from LLC_Membranes.setup.lc_class import LC
-import os
-import mdtraj as md
 
 
 def initialize():

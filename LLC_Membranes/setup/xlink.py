@@ -5,11 +5,11 @@ import argparse
 import time
 import os
 import numpy as np
-import subprocess
+from LLC_Membranes.setup.xlink_schemes import XlinkReaction
 from LLC_Membranes.setup.add_dummies import add_dummies
 from LLC_Membranes.setup.gentop import SystemTopology
 from LLC_Membranes.setup.genmdp import SimulationMdp
-from LLC_Membranes.llclib import file_rw
+from LLC_Membranes.llclib import file_rw, topology, gromacs
 from scipy.sparse import lil_matrix
 
 
@@ -41,10 +41,10 @@ def initialize():
     parser.add_argument('-density', '--density', default=95, type=float, help='Cross-link density (percent of x-links'
                         'that need to be cross-linked for procedure to terminate')
     parser.add_argument('-p', '--percent', default=1, type=float, help='Percent of eligible carbons that will bond')
-    parser.add_argument('-rad_percent', default=50, type=float, help='Percent of radicals that react each iteration.'
+    parser.add_argument('-rad_percent', default=20, type=float, help='Percent of radicals that react each iteration.'
                                                                      'Not stable above 50 % (?)')
     parser.add_argument('-out', '--output_gro', default='xlinked.gro', help='Name of final cross-linked structure')
-    parser.add_argument('-rad_frac_term', default=0, type=float, help='Out of 100, how many radicals that will be '
+    parser.add_argument('-rad_frac_term', default=20, type=float, help='Out of 100, how many radicals that will be '
                         'terminated on each iteration. Numbers greater than zero will decrease cross-link density')
     parser.add_argument('-stagnation', default=5, type=int, help='The number of iterations without generating a new'
                                                                  'cross-link before the algorithm forces termination')
@@ -70,190 +70,16 @@ class Atoms(object):
     def __init__(self, res, nres):
 
         natoms = res.natoms
+        self.name = np.zeros([nres*natoms], dtype=object)
         self.type = np.zeros([nres*natoms], dtype=object)
         self.charge = np.zeros([nres*natoms])
         self.mass = np.zeros([nres*natoms])
 
         for i in range(len(res.atom_info)):
+            self.name[i::natoms] = str(res.atom_info[i][4])
             self.type[i::natoms] = str(res.atom_info[i][1])
             self.charge[i::natoms] = float(res.atom_info[i][6])
             self.mass[i::natoms] = float(res.atom_info[i][7].split(';')[0])
-
-
-class Residue(object):
-    """ Get topology information about a given residue
-
-    :param: name: name of residue. name.itp and name.gro should be stored in llcsim/top/topologies
-
-    :type: name: str
-    """
-
-    def __init__(self, name):
-
-        self.location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # path to this script
-        self.name = name
-        self.is_ion = False
-        self.check_ion()
-        self.virtual_sites = None
-        self.c1_atoms = None
-        self.c2_atoms = None
-        self.c1_atom_indices = None
-        self.c2_atom_indices = None
-        self.carbonyl_oxygen_indices = None
-
-        if not self.is_ion:
-
-            self.itp = []
-            with open('%s/../top/topologies/%s.itp' % (self.location, name), 'r') as f:
-                for line in f:
-                    self.itp.append(line)
-
-            self.bonds = self.get_bonds()
-
-            self.atom_info = self.get_atoms()
-            self.natoms = len(self.atom_info)
-
-            self.virtual_sites = self.get_vsites()
-            self.improper_dihedrals = self.get_improper_dihedrals()
-
-        else:
-            self.natoms = 1
-
-    def check_ion(self):
-        """ Check whether the given residue is an ion. Return True its name is stored in ions.txt located in
-        llcsim/top/topologies
-
-        """
-
-        with open('%s/../top/topologies/ions.txt' % self.location) as f:
-            ions = []
-            for line in f:
-                if line[0] != '#':
-                    ions.append(str.strip(line))
-
-        if self.name in ions:
-            self.is_ion = True
-
-    def get_atoms(self):
-        """ Store all information inside the "[ atoms ]" section of name.itp
-
-        """
-
-        atoms_index = 0
-        while self.itp[atoms_index].count('[ atoms ]') == 0:
-            atoms_index += 1
-        atoms_index += 1
-
-        while self.itp[atoms_index].split()[0] == ';':
-            atoms_index += 1
-
-        atoms = []
-        while self.itp[atoms_index] != '\n':
-            atoms.append(self.itp[atoms_index].split())
-            atoms_index += 1
-
-        return atoms
-
-    def get_bonds(self):
-        """ Store all information in the "[ bonds ]" section of name.itp
-
-        """
-
-        bonds_index = 0
-        while self.itp[bonds_index].count('[ bonds ]') == 0:
-            bonds_index += 1
-        bonds_index += 1
-
-        while self.itp[bonds_index].split()[0] == ';':
-            bonds_index += 1
-
-        bonds = []
-        while self.itp[bonds_index] != '\n':
-            bonds.append([int(self.itp[bonds_index].split()[i]) for i in range(2)])
-            bonds_index += 1
-
-        return bonds
-
-    def get_improper_dihedrals(self):
-        """ Store all information in the "[ dihedrals ] ; impropers" section of name.itp
-
-        """
-
-        imp_ndx = 0
-
-        while self.itp[imp_ndx].count('[ dihedrals ] ; impropers') == 0:
-            imp_ndx += 1
-            if imp_ndx >= len(self.itp):
-                break
-
-        impropers = None
-        if imp_ndx < len(self.itp):
-            impropers = []
-            imp_ndx += 1
-            while self.itp[imp_ndx][0] == ';':
-                imp_ndx += 1
-            while imp_ndx < len(self.itp) and self.itp[imp_ndx] != '\n':
-                impropers.append(self.itp[imp_ndx].split())
-                imp_ndx += 1
-
-        return impropers
-
-    def get_vsites(self):
-        """ Store all information in the "[ virtual_sites ]" section of name.itp
-
-        """
-
-        vsite_index = 0
-        while self.itp[vsite_index].count('[ virtual_sites4 ]') == 0:
-            vsite_index += 1
-            if vsite_index >= len(self.itp):
-                break
-
-        vsites = None
-        if vsite_index < len(self.itp):
-            vsites = []
-            vsite_index += 1
-            while self.itp[vsite_index][0] == ';':
-                vsite_index += 1
-            while vsite_index < len(self.itp):
-                vsites.append(self.itp[vsite_index].split())
-                vsite_index += 1
-
-        return vsites
-
-    def get_reactive_carbons(self):
-        """ Read annotations in name.gro to determine which
-
-        """
-
-        self.c1_atoms = []
-        self.c2_atoms = []
-        self.c1_atom_indices = []
-        self.c2_atom_indices = []
-
-        with open('%s/../top/topologies/%s.gro' % (self.location, self.name), 'r') as f:
-
-            for line in f:
-                if line.count(';') != 0:
-                    if line.split(';')[1].count('C1') > 0:
-                        self.c1_atoms.append(line[10:15].strip())
-                        self.c1_atom_indices.append(int(line[15:20]))
-                    if line.split(';')[1].count('C2') > 0:
-                        self.c2_atoms.append(line[10:15].strip())
-                        self.c2_atom_indices.append(int(line[15:20]))
-
-    def get_carbonyl_oxygens(self):
-
-        self.carbonyl_oxygen_indices = []
-
-        with open('%s/../top/topologies/%s.gro' % (self.location, self.name), 'r') as f:
-
-            for line in f:
-                if line.count(';') != 0:
-                    if line.split(';')[1].count('O') > 0:
-                        self.carbonyl_oxygen_indices.append(int(line[15:20]))
-
-        return self.carbonyl_oxygen_indices
 
 
 class Topology:
@@ -261,12 +87,12 @@ class Topology:
     def __init__(self):
 
         # create residue object for each residue in system
-        self.residues = [Residue(a) for a in list(set([a.residue.name for a in self.t.topology.atoms]))]
+        self.residues = [topology.Residue(a, connectivity=True) for a in list(set([a.residue.name for a in
+                                                                                   self.t.topology.atoms]))]
 
         # define which residue is going to be cross-linked
         self.res_ndx = [i.name for i in self.residues].index(self.xlink_residue_name)
         self.xlink_residue = self.residues[self.res_ndx]
-        self.xlink_residue.get_reactive_carbons()  # get names of carbon atoms that will bond
 
         # number of atoms per residue
         self.nresidues = {}
@@ -278,8 +104,8 @@ class Topology:
 
         # get all bonds
         self.all_bonds = []
-        natoms = self.residues[self.res_ndx].natoms
-        bonds = self.residues[self.res_ndx].bonds
+        natoms = self.xlink_residue.natoms
+        bonds = self.xlink_residue.bonds
         for i in range(self.nresidues[self.xlink_residue_name]):
             for j in range(len(bonds)):
                 self.all_bonds.append([int(bonds[j][0]) + i * natoms, int(bonds[j][1]) + i * natoms])
@@ -347,7 +173,7 @@ class Topology:
                                 self.xlink_residue_atoms.mass[i * natoms + j]))
                         if (i * natoms + j) in self.radicals:
                             f.write('; *\n')
-                        elif (i * natoms + j + 1) in self.terminate:
+                        elif (i * natoms + j) in self.terminate:
                             f.write('; T\n')
                         else:
                             f.write('\n')
@@ -452,27 +278,59 @@ class System(Topology):
 
     def __init__(self, initial_configuration, residue, dummy_residue, dummy_name='dummies.gro',
                  reaction_percentage=1, cutoff=0.6, radical_reaction_percentage=20, radical_termination_fraction=50):
+        """ Initialize system for cross-linking and create a configuration with dummy atoms in appropriate locations
+
+        :param initial_configuration: coordinate file to be cross-linked (.gro)
+        :param residue: name of residue involved in cross-linking
+        :param dummy_residue: file with same topology as residue in addition to dummy atoms
+        :param dummy_name: name of coordinate file with dummy atoms
+        :param reaction_percentage: percentage of atom pairs within the cutoff distance that will be chosen to bond
+        :param cutoff: max distance two atoms can be away from each in order to still be considered from bonding
+        :param radical_reaction_percentage: percentage of radicals that react on each iteration
+        :param radical_termination_fraction: percentage of radicals that terminate each iteration
+
+        :type initial_configuration: str
+        :type residue: str
+        :type dummy_residue: str
+        :type dummy_name: str
+        :type reaction_percentage: float
+        :type cutoff: float
+        :type radical_reaction_percentage: float
+        :type radical_termination_fraction: float
+        """
 
         add_dummies(initial_configuration, residue, dummy_residue,
                     out=dummy_name)  # add dummy atoms to the initial configuration
 
+        self.reaction = XlinkReaction(residue)
         self.original_residue_name = residue
         self.xlink_residue_name = dummy_residue
         self.t = md.load(dummy_name)
         self.all_residues = [a.residue.name for a in self.t.topology.atoms]
+        self.atom_names = [a.name for a in self.t.topology.atoms]
 
-        super().__init__()  # inherit from Topology()
+        super().__init__()  # inherit from Topology(). Topology() uses attributes defined above
 
-        self.c1_atoms = [a.index for a in self.t.topology.atoms if a.name in self.xlink_residue.c1_atoms]
-        self.c2_atoms = [a.index for a in self.t.topology.atoms if a.name in self.xlink_residue.c2_atoms]
+        # self.n_xlink_residue = self.xlink_residue_atoms.name.size // self.xlink_residue.natoms
 
-        self.bond_c1 = []
-        self.bond_c2 = []
+        self.chain1_atoms, self.chain2_atoms = [], []
+
+        for i in self.reaction.scheme.bonds_with:
+            self.chain1_atoms.append([a.index for a in self.t.topology.atoms if a.name in i[0]
+                                      and a.residue.name == self.xlink_residue.name])
+            self.chain2_atoms.append([a.index for a in self.t.topology.atoms if a.name in i[1]
+                                      and a.residue.name == self.xlink_residue.name])
+
+        self.bond_chain1, self.bond_chain2 = [], []
+        self.reaction_type = []
 
         # Mostly informational variables
         self.nxlinks = 0
-        self.total_possible_xlinks = len(self.c1_atoms)
-        self.total_possible_terminated = len(self.c1_atoms) + len(self.c2_atoms)
+        # self.total_possible_xlinks = len(self.c1_atoms)
+        # self.total_possible_terminated = len(self.c1_atoms) + len(self.c2_atoms)
+        self.total_possible_xlinks = sum([len(i) for i in self.chain1_atoms])  # TODO: need to think about this more.
+        self.total_possible_terminated = sum([len(i) for i in self.chain1_atoms]) + \
+                                         sum([len(i) for i in self.chain2_atoms])
         self.iteration = 1
         self.terminated_radicals = []
         self.n_reacted_radicals = 0  # number of reacted radicals for a given iteration
@@ -484,23 +342,17 @@ class System(Topology):
         self.former_radicals = None
         self.rad_frac_term = radical_termination_fraction / 100.
 
-    def simulate(self, configuration, mdp='em.mdp', top='topol.top', out='em', parallel=True, np=4):
-        """
-        Energy minimize a configuration using existing .mdp files
-        """
+        # Variables for topology modification
+        self.rm_impropers = []
 
-        p1 = subprocess.Popen(
-            ["gmx", "grompp", "-p", "%s" % top, "-f", "%s" % mdp, "-o", "%s" % out, "-c", "%s" % configuration],
-            stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)  # generate atomic level input file
-        p1.wait()
+    def chain_number(self, ndx):
+        """ Determine the chain number based on serial index """
 
-        if parallel:
-            p2 = subprocess.Popen(["mpirun", "-np", "%s" % np, "gmx_mpi", "mdrun", "-deffnm", "%s" % out],
-                                  stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
-        else:
-            p2 = subprocess.Popen(["gmx", "mdrun", "-deffnm", "%s" % out], stdout=open(os.devnull, 'w'),
-                                  stderr=subprocess.STDOUT)  # run energy minimization
-        p2.wait()
+        name = self.xlink_residue_atoms.name[ndx]
+        mon = ndx // self.xlink_residue.natoms  # monomer number
+        chain = self.reaction.scheme.determine_chains(name)[0]  # chain label
+
+        return mon * self.reaction.scheme.nchains + self.reaction.scheme.chain_numbers[chain]
 
     def minimum_image_distances(self, list1, list2):
         """
@@ -540,7 +392,7 @@ class System(Topology):
 
         d_ndx = np.argsort(d)
 
-        # These lists may need post-modification to account for adjacent atoms
+        # These lists need post-modification to account for adjacent atoms
         eligible_list1 = (d_ndx // len(list2))
         eligible_list2 = (d_ndx % len(list2))
 
@@ -553,161 +405,242 @@ class System(Topology):
 
     def select_eligible_carbons(self):
         """
-        This whole function could be written better since generating radical list is same code as bonded carbon list
-        - Calculate the distance between atoms of interest. Find out which pairs meet the distance cutoff criteria
-        - Head-to-tail addition dominates due to sterics and radical stabilization
-        :param percent: the bottom percentage of the distribution of distances (below cut) that will be chosen for cross-linking
-        :param cut: any distance beyond 'cut' will not be accounted for when calculating percent
-        :param percent_rad: percentage of eligible radicals that will react
+        - Calculate the distance between atoms of interest.
+        - Find out which pairs meet the distance cutoff criteria and make realistic bonds
+        - Determine type of reaction
         """
 
         # calculate minimum image distance between c1 and c2 atoms
+        if not np.isclose(self.t.unitcell_angles[:, 2].mean(), 90., rtol=1e-01):
+            # If unit cell is non-cubic, transform it to cubic -- this is not generalized. Works for HII unit cell
+            print('hellurr')
+            # shift so box is temporarily cubic. The min image distances are just an approximation using this approach
+            theta = self.t.unitcell_angles[:, 2].mean() * (np.pi / 180.)
 
-        # shift so box is cubic temporarily. The minimum image distances are just an approximation using this approach
-        theta = np.pi / 3
-
-        self.t.xyz[..., 1] /= np.sin(theta)
-        self.t.xyz[..., 0] = self.t.xyz[..., 0] - self.t.xyz[..., 1]*np.cos(theta)
+            self.t.xyz[..., 1] /= np.sin(theta)
+            self.t.xyz[..., 0] = self.t.xyz[..., 0] - self.t.xyz[..., 1]*np.cos(theta)
 
         if self.radicals:
+            # TODO: testing
+            eligible_c_rad, eligible_rad = [], []
+            for i, c in enumerate(self.chain1_atoms):
+                d = self.generate_ordered_distances(c + self.chain2_atoms[i], self.radicals)
+                eligible_c_rad += d[0].tolist()  # list of numpy arrays
+                eligible_rad += d[1].tolist()
 
-            eligible_c1_rad, eligible_rad = self.generate_ordered_distances(self.c1_atoms, self.radicals)
+            bonds = self.bond_filter(np.array(eligible_c_rad), np.array(eligible_rad), radical=True)
+            self.bond_chain1 += bonds[0]
+            self.bond_chain2 += bonds[1]
 
-            nreact = int(self.radical_reaction_percentage * len(self.radicals))
+            # eligible_c1_rad, eligible_rad = self.generate_ordered_distances(self.chain1_atoms, self.radicals)
+            # bonds = self.bond_filter(eligible_c1_rad, eligible_rad, radical=True)
+            # self.bond_chain1 += bonds[0]
+            # self.bond_chain2 += bonds[1]
+            # for i in range(len(bonds[0])):
+            #     self.reaction_type.append('radical_c2')
 
-            for i, x in enumerate(eligible_c1_rad):
-                if len(self.bond_c1) < nreact and (x + 1) not in self.bond_c1 and (eligible_rad[i] + 1) not in self.bond_c2:
-                    self.bond_c1.append(x + 1)
-                    self.bond_c2.append(eligible_rad[i] + 1)
-                if len(self.bond_c1) >= nreact:
-                    break
+        eligible_c1, eligible_c2 = [], []
+        for i, c in enumerate(self.chain1_atoms):
 
-        eligible_c1, eligible_c2 = self.generate_ordered_distances(self.c1_atoms, self.c2_atoms)
+            d = self.generate_ordered_distances(c, self.chain2_atoms[i])
+            eligible_c1 += d[0].tolist()  # list of numpy arrays
+            eligible_c2 += d[1].tolist()
 
-        # prevent adjacent carbon atoms from bonding
-        exclude = 0
-        while eligible_c1[exclude] == (eligible_c2[exclude] + 1):  # This 1 is hard-coded. Could be made more general
-            exclude += 1
+        bonds = self.bond_filter(np.array(eligible_c1), np.array(eligible_c2))
+        self.bond_chain1 += bonds[0]
+        self.bond_chain2 += bonds[1]
 
-        eligible_c1 = eligible_c1[exclude:]
-        eligible_c2 = eligible_c2[exclude:]
+        for i, x in enumerate(self.bond_chain1):
+            print(x, self.bond_chain2[i])
+
+        # for i in range(len(bonds[0])):
+        #     self.reaction_type.append('head2tail')
+
+        # eligible_c1, eligible_c2 = self.generate_ordered_distances(self.c1_atoms, self.c2_atoms)
+        # nreact = int(self.reaction_percentage * len(eligible_c1))
+        # bonds = self.bond_filter(eligible_c1, eligible_c2, nreact)
+        # self.bond_c1 += bonds[0]
+        # self.bond_c2 += bonds[1]
+        # for i in range(len(bonds[0])):
+        #     self.reaction_type.append('head2tail')
+
+    def bond_filter(self, eligible_chain1, eligible_chain2, radical=False):
+        """ Choose which carbons to bond based on proximity. In the process filter out bonds that should not form --
+        two bonds to the same carbon, bonds between carbons on same chain, simultaneous bonds on same chain.
+
+        :param eligible_chain1: chain1 atoms to bond. Formatted as a numpy array for efficient slicing
+        :param eligible_chain2: chain2 atoms to bond. This list determines the number of bonds based on the percent
+        :param radical: True if this is a radical reaction. A different percentage of eligible chains will react
+
+        :type eligible_chain1: np.ndarray
+        :type eligible_chain2: np.ndarray
+        :type radical: bool
+        """
+
+        # Determine reaction types and eliminate potential reactions that don't actually happen. So far this only
+        # happens with radicals
+        rxn_types = np.zeros([len(eligible_chain1)], dtype=object)
+        keep = []
+        for i, x in enumerate(eligible_chain1):
+            c1_name = self.atom_names[x]
+            c2_name = self.atom_names[eligible_chain2[i]]
+            rxn_types[i] = self.reaction.scheme.determine_reaction_type(c1_name, c2_name, radical=radical)
+            if rxn_types[i]:
+                keep.append(i)
+
+        eligible_chain1 = eligible_chain1[keep]
+        eligible_chain2 = eligible_chain2[keep]
+        rxn_types = rxn_types[keep]
+
+        # prevent same-chain carbon atoms from bonding
+        keep = []
+        for i, x in enumerate(eligible_chain1):
+            if not self.check_pair(x, eligible_chain2[i]):
+                keep.append(i)
+
+        eligible_chain1 = eligible_chain1[keep]
+        eligible_chain2 = eligible_chain2[keep]
+        rxn_types = rxn_types[keep]
 
         # narrow list to bottom percent of distances
-        stop = int(self.reaction_percentage * len(eligible_c1))
-        self.bond_c1 += (eligible_c1[:stop] + 1).tolist()  # convert indices to serial
-        self.bond_c2 += (eligible_c2[:stop] + 1).tolist()
+        # redetermine nreact based on number of eligible carbons _after_ above loop
+        percent = self.reaction_percentage
+        if radical:
+            percent = self.radical_reaction_percentage
+        nreact = int(percent * len(eligible_chain2))  # total number of reactions
 
-        # do not allow a carbon to bond twice (prioritizes radical reactions)
-        keep_c1 = np.sort(np.unique(self.bond_c1, return_index=True)[1])
-        self.bond_c1 = np.array(self.bond_c1)[keep_c1]
-        self.bond_c2 = np.array(self.bond_c2)[keep_c1]
+        reactions = self.reaction.scheme.reaction_weights
+        if radical:
+            reactions = self.reaction.scheme.radical_reaction_weights
 
-        keep_c2 = np.sort(np.unique(self.bond_c2, return_index=True)[1])
-        self.bond_c1 = self.bond_c1[keep_c2]
-        self.bond_c2 = self.bond_c2[keep_c2]
+        n_rxn_per_type = {k: int(reactions[k]*nreact) for k in list(reactions.keys())}  # number reactions of each type
+        n_rxn_count = {k: 0 for k in list(reactions.keys())}  # counter for number of reactions of each type so far
 
-        # ensure that a tail is not donating and recieving bonds at the same time
-        delete = []
-        for i, x in enumerate(self.bond_c1[::-1]):  # go backwards to maintain radical prioritization
-            if x - 1 in self.bond_c2:
-                delete.append(len(self.bond_c1) - i - 1)
+        bond_chain1 = []
+        bond_chain2 = []
+        chain_numbers = []
+        for i, r in enumerate(rxn_types):
+            if n_rxn_count[r] < n_rxn_per_type[r]:
+                chain1 = self.chain_number(eligible_chain1[i])
+                chain2 = self.chain_number(eligible_chain2[i])
+                if chain1 == chain2:  # this shouldn't happen, but this will let me know if it does.
+                    print('chain1 equals chain2!')
+                if chain1 not in chain_numbers and chain2 not in chain_numbers:  # make sure its always new independent chains reacting
+                    bond_chain1.append(eligible_chain1[i] + 1)  # convert to serial
+                    bond_chain2.append(eligible_chain2[i] + 1)
+                    n_rxn_count[r] += 1
+                    self.reaction_type.append(r)
+                    chain_numbers += [chain1, chain2]
 
-        self.bond_c1 = np.delete(self.bond_c1, delete)
-        self.bond_c2 = np.delete(self.bond_c2, delete)
+        return bond_chain1, bond_chain2
 
-        print('Total new bonds: %d' % len(self.bond_c1))
+    def check_pair(self, i, j):
+        """ Determine if two potential bonding carbon atoms are on the same chain
 
-    def make_initiators_real(self):
+        :return: True if pair is on same chain, False of pair is part of different chains
+        """
 
-        # When c1 bonds to a c2 atom due to initiation, the c1 adjacent to c2 (not the c1 atom involved in bonding)
-        # gains an initiator which is just represented as a hydrogen
-        # If a radical c2 reacts, then there is no initiator that needs to be made real
+        # check if carbons are a part of the same monomer
+        if i // self.xlink_residue.natoms == j // self.xlink_residue.natoms:
+            # check if carbons are part of the same chain
+            chain1, chain2 = self.reaction.scheme.determine_chains([self.atom_names[i], self.atom_names[j]])
+            if chain1 == chain2:
+                return True
+            else:
+                return False
+        else:
+            return False
 
-        # number of atoms between c1 and c2 (based on order that they are written in the coordinate file)
-        diff = np.array(self.xlink_residue.c2_atom_indices) - np.array(self.xlink_residue.c1_atom_indices)
-        bond_c2 = np.array([x for x in self.bond_c2 if (x - 1) not in self.radicals])  # don't include radicals
+    def bond(self):
+        """ Create all new cross-links and terminate some of the radicals that are formed
+        """
 
-        if len(bond_c2) > 0:
-            tails = bond_c2 % len(self.xlink_residue.c2_atoms)  # define which tail each c2 atom is part of
-            c1 = bond_c2 - diff[tails]  # indices of c1 atoms which gain a hydrogen atom
+        for i, x in enumerate(self.bond_chain1):
 
-            # Get (serial) indices of hydrogen atoms to make real
-            for i in c1:
-                ndx = np.where(self.vsites[:, 1] == i)[0]  # index 1 contains serial carbon index used to construct vsite
-                self.initiators.append(int(self.vsites[ndx, 0]))  # index 0 contains serial index of dummy H atom
+            c1_name = self.xlink_residue_atoms.name[x - 1]  # might be better to use self.atom_names
+            c2_name = self.xlink_residue_atoms.name[self.bond_chain2[i] - 1]
 
-            # add bonds -- this can be made more general
-            for i, x in enumerate(c1):
-                self.all_bonds.append([x, self.initiators[i]])
-                self.xlink_residue_atoms.type[self.initiators[i] - 1] = 'hc'  # change from dummy hydrogen to real hydrogen
-                self.xlink_residue_atoms.mass[self.initiators[i] - 1] = 1.008  # give mass to the former dummy atom
-                self.xlink_residue_atoms.type[x - 1] = 'c3'  # make carbon sp3 hybridized
+            # add chain1--chain2 bond
+            self.all_bonds.append([x, self.bond_chain2[i]])
 
-    def identify_new_radicals(self):
+            self.react(self.reaction_type[i], {c1_name: x, c2_name: self.bond_chain2[i]})
 
-        # first remove reacted radicals
-        self.radicals = [x for x in self.radicals if (x + 1) not in self.bond_c2]
+        self.terminate_radicals()  # this needs to go here since termination requires an improper to be removed
 
-        # c2 next to c1 that just bonded to a different c2 is now a radical
-        if len(self.bond_c1) > 0:
-            diff = np.array(self.xlink_residue.c1_atom_indices) - np.array(self.xlink_residue.c2_atom_indices)
-            tails = self.bond_c1 % len(self.xlink_residue.c1_atoms)  # define which tail each c2 atom is part of
-            for i in self.bond_c1 - diff[tails]:  # indices of c2 atoms which become radicals
-                self.radicals.append(i - 1)
-                self.xlink_residue_atoms.type[i - 1] = 'c2'  # change atom type from ce to c2
+        rm_improper_ndx = []
+        for i, p in enumerate(self.impropers):
+            if p[:4].tolist() in self.rm_impropers:
+                rm_improper_ndx.append(i)
 
-    def remove_improper_dihedrals(self):
+        self.impropers = np.delete(self.impropers, rm_improper_ndx, axis=0)
 
-        # keep improper dihedrals involving oxygen
-        oxygen = self.xlink_residue.get_carbonyl_oxygens()
+        self.nxlinks += len(self.bond_chain1)  # update total number of cross-links in system
 
-        rm_imp = []
-        # all improper dihedrals that c1 is involved with do not involve the carbonyl oxygen
-        for i in self.bond_c1:
-            imps = np.where(self.impropers == i)[0]
-            for j in imps:
-                rm_imp.append(j)
+        # self.identify_terminated(rad_term_frac=self.rad_frac_term)  # this will become it's own reaction scheme
+        self.remove_virtual_sites()  # could go in self.react and get rid of self.initiators
 
-        for i in self.bond_c2:
-            imps = np.where(self.impropers == i)[0]
-            for j in imps:
-                test = [x for x in (self.impropers[j, :] % self.xlink_residue.natoms) if x in oxygen]
-                if not test:  # if list is empty, then there is no carbonyl carbon, so we should remove the dihedral
-                    rm_imp.append(j)
+        self.define_topology()  # make new angles, pairs and dihedrals lists
 
-        rm_imp = np.unique(rm_imp)  # should be unnecessary
+    def react(self, reaction_type, atoms):
+        """ React according the reaction type and scheme
 
-        self.impropers = np.delete(self.impropers, rm_imp, axis=0)
+        :param reaction_type: type of reaction
+        :param atoms: dictionary of atom names and their corresponding serial indices
 
-    def identify_terminated(self, rad_term_frac=0.5):
+        :type reaction_type: str
+        :type atoms: dict
+        """
 
-        if self.iteration > 1:  # don't do this on the first iteration
+        types, bonds, radicals, rm_impropers, terminate = self.reaction.scheme.react(reaction_type, atoms)
 
-            # terminate enough radicals to keep the number of radicals stable
-            nterm = int(rad_term_frac * len(self.radicals))
-            chosen_terminated_radicals = np.random.choice(len(self.radicals), size=nterm, replace=False)
-            self.terminated_radicals = np.array(self.radicals)[chosen_terminated_radicals]
-            self.radicals = np.delete(self.radicals, chosen_terminated_radicals).tolist()
+        # add bonds between dummy atoms (made real) and carbon atoms
+        for b in bonds:
+            self.all_bonds.append(b)
+            self.xlink_residue_atoms.mass[b[1] - 1] = self.reaction.scheme.dummy_mass  # dummy always 2nd entry in b
+            self.initiators.append(b[1])  # The hydrogen dummy atoms are our 'initiators'.
 
-            # bond dummy hydrogen to terminated radicals
-            for i in self.terminated_radicals:
-                ndx = np.where(self.vsites[:, 1] == (i + 1))[0]  # index 1 contains serial carbon index used to construct vsite
-                H = int(self.vsites[ndx, 0])  # index 0 contains serial index of dummy H atom
-                self.all_bonds.append([i + 1, H])
-                self.xlink_residue_atoms.type[H - 1] = 'hc'  # change from dummy hydrogen to real hydrogen
-                self.xlink_residue_atoms.mass[H - 1] = 1.008  # give mass to the former dummy atom
-                self.xlink_residue_atoms.type[i] = 'c3'  # make carbon sp3 hybridized
-                self.initiators.append(H)  # add to initiators so that the virtual site gets deleted
+        # change atom types of newly bonded carbon and former dummy atoms
+        for k in types.keys():
+            for j in types[k].keys():
+                self.xlink_residue_atoms.type[j - 1] = types[k][j]
 
-            for i in self.terminated_radicals:
-                self.terminate.append(i + 1)  # I think radicals are numbered from 0
+        # add new radical to list of radicals
+        for r in radicals:
+            self.radicals.append(r - 1)
 
-        for i in self.bond_c1:
-            self.terminate.append(i)
-        for i in self.bond_c2:
-            self.terminate.append(i)
-            if i not in self.radicals:
-                self.terminate.append(i + 1)  # terminate c1 adjacent to bonding c2 unless already terminated previously
+        # remove improper dihedrals where hybridization changed
+        for p in rm_impropers:
+            self.rm_impropers.append(p)
+
+        # terminate sp3 things
+        for t in terminate:
+            self.terminate.append(t - 1)
+
+        # remove radical if this is a radical reaction -- this will need to be improved to be more general. 
+        # It could be a return in the reaction schemes
+        if 'radical' in reaction_type:
+            ndx = list(atoms.values())[1] - 1
+            self.radicals.remove(ndx)
+            self.terminated_radicals.append(ndx)
+
+        if 'terminate' in reaction_type:
+            ndx = terminate[0] - 1
+            self.radicals.remove(terminate[0] - 1)
+            self.terminated_radicals.append(ndx)
+
+    def terminate_radicals(self):
+        """ Choose which remaining radicals to terminate and then terminate them. All reacted radicals should have been
+        removed before running this.
+        """
+
+        nterm = int(self.rad_frac_term * len(self.radicals))
+        terminate = np.random.choice(self.radicals, size=nterm, replace=False)
+
+        for t in terminate:
+
+            name = self.xlink_residue_atoms.name[t]  # self.radicals indexing starts at 0
+
+            self.react('terminate', {name: t + 1})
 
     def remove_virtual_sites(self):
 
@@ -719,42 +652,28 @@ class System(Topology):
 
         self.vsites = np.delete(self.vsites, rm_vsite, axis=0)  # delete vsite entries
 
-    def bond(self):
-
-        self.make_initiators_real()  # turn dummy atoms into real atoms
-        self.identify_new_radicals()  # get indices of the latest radicals
-
-        for i, x in enumerate(self.bond_c1):
-            self.all_bonds.append([x, self.bond_c2[i]])
-            # change atom types of newly bonded carbon atoms
-            self.xlink_residue_atoms.type[x - 1] = 'c3'
-            self.xlink_residue_atoms.type[self.bond_c2[i] - 1] = 'c3'
-
-        self.nxlinks += len(self.bond_c1)  # update total number of cross-links in system
-
-        self.identify_terminated(rad_term_frac=self.rad_frac_term)
-        self.remove_virtual_sites()
-        self.remove_improper_dihedrals()
-
-        self.define_topology()  # make new angles, pairs and dihedrals lists
-
     def reload_coordinates(self, name):
 
         self.t = md.load(name)
 
     def update_lists(self):
 
-        # reacted c1 and c2 atoms are no longer eligible for bonding
-        # self.c1_atoms is numbered by index, while self.bond_c1 is number serially
-
-        self.c1_atoms = [x for x in self.c1_atoms if (x + 1) not in self.terminate]
-        self.c2_atoms = [x for x in self.c2_atoms if (x + 1) not in self.terminate]
+        # reacted chain1 and chain2 atoms are no longer eligible for bonding
+        # self.chain1_atoms is numbered by index, while self.bond_chain1 is number serially
+        for i, c in enumerate(self.chain1_atoms):
+            self.chain1_atoms[i] = [x for x in c if x not in self.terminate and x not in self.radicals]
+            self.chain2_atoms[i] = [x for x in self.chain2_atoms[i] if x not in self.terminate and x not in
+                                    self.radicals]
+        # self.chain1_atoms = [x for x in self.chain1_atoms if x not in self.terminate and x not in self.radicals]
+        # self.chain2_atoms = [x for x in self.chain2_atoms if x not in self.terminate and x not in self.radicals]
 
         # re-initialize bonding carbon lists
-        self.bond_c1 = []
-        self.bond_c2 = []
+        self.bond_chain1 = []
+        self.bond_chain2 = []
+        self.reaction_type = []
 
-        self.initiators = []
+        self.initiators = []  # bad name for this. It's really just dummy atoms that become real
+        self.rm_impropers = []
 
     def update_log(self):
 
@@ -765,17 +684,23 @@ class System(Topology):
         with open('xlink.log', '%s' % write_mode) as f:
 
             f.write('Iteration Number: %d \n' % self.iteration)
-            f.write('Number of new cross-links: %d\n' % len(self.bond_c1))
+            f.write('Number of new cross-links: %d\n' % len(self.bond_chain1))
             f.write('Total system cross-links: %d\n' % self.nxlinks)
             f.write('Cross-link density: %.2f %%\n' % (100. * (self.nxlinks / self.total_possible_xlinks)))
             f.write('+-----------------------------------+\n')
             f.write('| Serial indices of new cross-links |\n')
             f.write('+------+------+---------------------+\n')
-            f.write('|{:^6}|{:^6}|\n'.format('c1', 'c2'))
+            f.write('|{:^6}|{:^6}|\n'.format('chain1', 'chain2'))
             f.write('+------+------+\n')
-            for i, x in enumerate(self.bond_c1):
-                f.write('{:>5d} -- {:<5d}\n'.format(x, self.bond_c2[i]))
+            for i, x in enumerate(self.bond_chain1):
+                f.write('{:>5d} -- {:<5d}  %s\n'.format(x, self.bond_chain2[i], self.reaction_type[i]))
             f.write('Total radicals terminated: %.2d\n' % len(self.terminated_radicals))
+            f.write('+---------------------------------------+\n')
+            f.write('| Serial indices of terminated radicals |\n')
+            f.write('+------+------+-------------------------+\n')
+            f.write('|{:^6}|{:^6}|\n'.format('chain1', 'chain2'))
+            for x in self.terminated_radicals:
+                f.write('{:>5d}\n'.format(x))
             f.write('Total radicals left in system: %d\n' % len(self.radicals))
             f.write('Percent terminated: %.2f %%\n' % (100 * len(self.terminate) / (self.total_possible_terminated)))
             f.write('%s\n' % (80*'-'))
@@ -835,10 +760,9 @@ if __name__ == "__main__":
     sys = System(args.initial, args.residue, args.dummy_residue, dummy_name=args.dummy_name,
                  radical_reaction_percentage=args.rad_percent, reaction_percentage=args.percent,
                  radical_termination_fraction=args.rad_frac_term)
-    print('Done! %s created' % args.dummy_name)
-    exit()
+    print('Done!\n%s created' % args.dummy_name)
 
-    print('Generating input files: %s, %s, %s and %s ...' % (args.xlink_top_name, args.topname, args.mdp_em,
+    print('Generating input files: %s, %s, %s and %s...' % (args.xlink_top_name, args.topname, args.mdp_em,
           args.mdp_nvt),  end='', flush=True)
     sys.write_assembly_topology()
 
@@ -858,14 +782,22 @@ if __name__ == "__main__":
     print('Done!')
 
     # energy minimize starting configuration to get dummies in the right place
-    print('Energy minimizing %s...' % args.dummy_name, end='', flush=True)
-    sys.simulate(args.dummy_name, mdp=args.mdp_em, top=args.topname, out='em_%s' % args.dummy_name.split('.')[0],
-                 parallel=args.parallelize, np=args.nproc)
-    print('Done!')
+    # print('Energy minimizing %s...' % args.dummy_name, end='', flush=True)
+    # gromacs.simulate(args.mdp_em, args.topname, args.dummy_name, 'em_%s' % args.dummy_name.split('.')[0],
+    #                  mpi=args.parallelize, nprocesses=args.nproc)
+    # print('Done!')
 
     # Rest of iterations
-    stagnated_iterations = 0
-    while (len(sys.terminate) / sys.total_possible_terminated) < (args.density / 100.) and stagnated_iterations < args.stagnation:
+    stagnated_iterations = 0  # number of iterations without forming a cross-link
+    while (len(sys.terminate) / sys.total_possible_terminated) < (args.density / 100.) and stagnated_iterations < \
+            args.stagnation:
+
+        #### FOR TESTING ####
+        # sys.iteration = 2
+        # lists = np.load('radicals.npz')
+        # sys.radicals = list(lists['radicals'])
+        # sys.terminate = list(lists['term'])
+        #####################
 
         print('-'*80)
         print('Iteration: %d' % sys.iteration)
@@ -880,29 +812,30 @@ if __name__ == "__main__":
         sys.bond()
         sys.write_assembly_topology()  # re-write assembly topology
         print('Done!')
+        print('Total new bonds: %d' % len(sys.bond_chain1))
+        #np.savez_compressed('radicals', radicals=sys.radicals, term=sys.terminate)
 
         # energy minimize then run short NVT simulation
         print('Energy minimizing new cross-links...', end='', flush=True)
         if sys.iteration == 1:
-            sys.simulate('em_%s' % args.dummy_name.split('.')[0], mdp=args.mdp_em, top=args.topname, out='em',
-                         parallel=args.parallelize, np=args.nproc)
+            gromacs.simulate(args.mdp_em, args.topname, 'em_%s' % args.dummy_name, 'em', mpi=args.parallelize,
+                             nprocesses=args.nproc)
         else:
-            sys.simulate('nvt.gro', mdp=args.mdp_em, top=args.topname, out='em', parallel=args.parallelize,
-                         np=args.nproc)
+            gromacs.simulate(args.mdp_em, args.topname, 'nvt.gro', 'em', mpi=args.parallelize, nprocesses=args.nproc)
         print('Done!')
 
         print('Running %.1f ps NVT simulation...' % args.length, end='', flush=True)
-        sys.simulate('em.gro', mdp=args.mdp_nvt, top=args.topname, out='nvt', parallel=args.parallelize, np=args.nproc)
+        gromacs.simulate(args.mdp_nvt, args.topname, 'em.gro', 'nvt', mpi=args.parallelize, nprocesses=args.nproc)
         print('Done!')
 
-        print('\nTotal new cross-links: %d' % len(sys.bond_c1))
+        print('\nTotal new cross-links: %d' % len(sys.bond_chain1))
         print('Total system cross-links: %d' % sys.nxlinks)
         print('Cross-link density: %.2f %%' % (100.*(sys.nxlinks / sys.total_possible_xlinks)))
         print('Total radicals terminated: %.2d' % len(sys.terminated_radicals))
         print('Total radicals left in system: %d' % len(sys.radicals))
         print('Percent terminated: %.2f' % (100 * len(sys.terminate) / sys.total_possible_terminated))
 
-        if len(sys.bond_c1) > 0:
+        if len(sys.bond_chain1) > 0:
             stagnated_iterations = 0
         else:
             stagnated_iterations += 1
@@ -921,8 +854,8 @@ if __name__ == "__main__":
     print('Done!')
 
     print('Energy minimizing %s...' % args.output_gro, end='', flush=True)
-    sys.simulate(args.output_gro, mdp=args.mdp_em, top=args.topname, out=args.output_gro.split('.')[0],
-                 parallel=args.parallelize, np=args.nproc)
+    gromacs.simulate(args.mdp_em, args.topname, args.output_gro, args.output_gro.split('.')[0], mpi=args.parallelize,
+                     nprocesses=args.nproc)
     print('Done!')
 
     print('Finished cross-linking in %.2f seconds' % (time.time() - start))

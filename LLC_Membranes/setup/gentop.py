@@ -31,7 +31,7 @@ class SystemTopology(object):
         :param ff: forcefield to use
         :param restraints: True if there are any position restraints
         :param xlink: True if system is cross-linked (Topology is specialized in this case)
-        :param xlinked_top_name: Name of topology describing cross-linked system (include full path if not located in
+        :param xlinked_top_name: Name of topology describing cross-linked system (include full path if not located in \
         same directory where this script is run)
 
         :type gro: str

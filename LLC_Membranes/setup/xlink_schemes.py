@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+import numpy as np
 
 """ Specify reactants and products of cross-linking reactions
 """
@@ -27,6 +28,18 @@ class XlinkReaction:
 class DieneScheme:
 
     def __init__(self, monomer):
+        """ Define the cross-linking reaction of a monomer with terminal diene tails
+
+        :param monomer: name of monomer
+
+        :type monomer: str
+        """
+
+        # keys: type of carbon carbon bond; values: dict with (keys: name of reaction, values: likelihood of reaction)
+        self.weights = {'C1-C2': {'head2tail': 1., '14addition': 0},
+                        'C1-C2_radical': {'radical_c2': 1}}  # probabilities must sum to 1
+        self.reaction_weights = {'head2tail': 1., '14addition': 0, '13addition': 0}
+        self.radical_reaction_weights = {'radical_c2': 1.}
 
         if monomer in ['Dibrpyr14', 'MOL']:  # could build this into annotations. Might be better like this
 
@@ -36,6 +49,12 @@ class DieneScheme:
                            'b': {'C45': 'C1', 'C44': 'C2', 'C43': 'C3', 'C42': 'C4', 'H81': 'H1', 'H80': 'H2',
                                  'H79': 'H3', 'H78': 'H4', 'H77': 'H5'}
                            }
+
+            self.nchains = len(list(self.chains.keys()))
+
+            self.chain_numbers = {'a': 0, 'b': 1}  # used to number chains
+
+            self.carbons = {'C1': ['C', 'C45'], 'C2': ['C1', 'C44'], 'C3': ['C2', 'C43'], 'C4': ['C3', 'C42']}
 
             self.initial_types = {'C1': 'c2', 'C2': 'ce', 'C3': 'ce', 'C4': 'c2', 'H1': 'ha', 'H2': 'ha', 'H3': 'ha',
                                   'H4': 'ha', 'H5': 'ha'}
@@ -50,20 +69,16 @@ class DieneScheme:
             self.dummy_connectivity = {'a': {'C': 'D1', 'C1': 'D2', 'C2': 'D3', 'C3': 'D4'},
                                        'b': {'C45': 'D1', 'C44': 'D2', 'C43': 'D3', 'C42': 'D4'}}
 
+            self.hydrogen_connectivity = {'C': ['H1', 'H2'], 'C1': ['H3'], 'C2': ['H4'], 'C3': ['H5'],
+                                          'C45': ['H1', 'H2'], 'C44': ['H3'], 'C43': ['H4'], 'C42': ['H5']}
+
             self.dummy_mass = 1.008  # mass of hydrogen
 
-    # def determine_chains(self, c1, c2):
-    # TODO: delete after testing below
-    #
-    #     chain1 = None
-    #     chain2 = None
-    #     for k in self.chains.keys():
-    #         if c1 in self.chains[k].values():
-    #             chain1 = k
-    #         if c2 in self.chains[k].values():
-    #             chain2 = k
-    #
-    #     return chain1, chain2
+            # write these in order of priority
+            # for efficiency, don't repeat things. For example self.carbons['C1']: self.carbons['C2'] is the same as
+            # self.carbons['C2']: self.carbons['C1']. Otherwise, computational expense goes up and a new reaction has
+            # to be defined below.
+            self.bonds_with = [[self.carbons['C1'], self.carbons['C2']]]
 
     def determine_chains(self, c):
         """ Determine to which chain carbon atoms come from
@@ -83,6 +98,29 @@ class DieneScheme:
                     chains[i] = k
 
         return chains
+
+    def determine_reaction_type(self, c1, c2, radical=False):
+        """ Determine the type of reaction based on which carbons are bonding
+
+        :param c1: name of carbon in first chain
+        :param c2: name of carbon in second chain
+        :param radical: True if this reaction involves a radical
+
+        :type c1: str
+        :type c2: str
+        :type radical: bool
+        """
+
+        chain1, chain2 = self.determine_chains([c1, c2])
+        bond = '%s-%s' % (self.chains[chain1][c1], self.chains[chain2][c2])
+
+        if radical:
+            bond += '_radical'
+
+        try:
+            return np.random.choice(list(self.weights[bond].keys()), p=list(self.weights[bond].values()))
+        except KeyError:
+            return False  # bond between chain1 and chain2 is not defined
 
     def react(self, reaction_type, atoms):
 
@@ -121,7 +159,7 @@ class DieneScheme:
         c2_ndx -= self.indices[chain2]['C2']
 
         types = {'chain1': {'C1': 'c3', 'C2': 'c2', 'C3': 'c2', 'C4': 'c2', 'H1': 'hc', 'H2': 'hc', 'H3': 'ha',
-                            'H4': 'ha', 'H5': 'ha', 'D1': 'hc'},
+                            'H4': 'ha', 'H5': 'ha'},
                  'chain2': {'C1': 'c3', 'C2': 'c3', 'C3': 'c2', 'C4': 'c2', 'H1': 'hc', 'H2': 'hc', 'H3': 'hc',
                             'H4': 'ha', 'H5': 'ha', 'D1': 'hc', 'D2': 'hc'}}
 
@@ -129,9 +167,8 @@ class DieneScheme:
         reacted_types = {'chain1': {c1_ndx + self.indices[chain1][a]: types['chain1'][a] for a in types['chain1'].keys()},
                          'chain2': {c2_ndx + self.indices[chain2][a]: types['chain2'][a] for a in types['chain2'].keys()}}
 
-        # update bonds - 3 new bonds between dummy atoms and carbon
-        dummy_bonds = [[c1_ndx + self.indices[chain1]['C1'], c1_ndx + self.indices[chain1]['D1']],
-                       [c2_ndx + self.indices[chain2]['C2'], c2_ndx + self.indices[chain2]['D2']],
+        # update bonds - 2 new bonds between dummy atoms and carbon
+        dummy_bonds = [[c2_ndx + self.indices[chain2]['C2'], c2_ndx + self.indices[chain2]['D2']],
                        [c2_ndx + self.indices[chain2]['C1'], c2_ndx + self.indices[chain2]['D1']]]
 
         # define indices of left-over radicals
@@ -231,6 +268,9 @@ class DieneScheme:
 
         # types after reaction. Keeping this dictionary format so it integrates easily with xlinking algorithm
         types = {'chain': {self.chains[chain][c]: 'c3', self.dummy_connectivity[chain][c]: 'hc'}}
+
+        for i in self.hydrogen_connectivity[c]:  # turn already attached carbon(s) to c3
+            types['chain'][i] = 'hc'
 
         # update types
         reacted_types = {'chain': {c_ndx + self.indices[chain][a]: types['chain'][a] for a in types['chain'].keys()}}

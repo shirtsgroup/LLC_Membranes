@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import numpy as np
-from LLC_Membranes.setup.lc_class import LC
 from LLC_Membranes.llclib import file_rw, transform, topology
 
 
@@ -41,7 +40,8 @@ class BuildHexagonal(topology.LC):
         :param name: name of monomer with which the system will be built.
         :param npores: number of pores in the system
         :param p2p: absolute pore-to-pore distance
-        :param pore_alpha: angle between x and y box vector. For example if pore_alpha = 120 or 60, you'll get hexagonally packed pores
+        :param pore_alpha: angle between x and y box vector. For example if pore_alpha = 120 or 60, you'll get \
+        hexagonally packed pores
         :param pore_radius: distance from pore center to place monomer head groups (nm)
         :param tilt: tilt monomer head group with respect to xy plane
 
@@ -83,7 +83,7 @@ class BuildHexagonal(topology.LC):
         :param correlation: adjust z positions so there is a correlation length
         :param var: variance in multivariate normal distribution used to make correlated points
         :param correlation_length: length for which correlation between stacked monomers to persist
-        :param pd: Angle of wedge created between vertically adjacent monomers. Defined by angle between vectors
+        :param pd: Angle of wedge created between vertically adjacent monomers. Defined by angle between vectors \
         extending from pore center to monomer head groups.
         :param random_shift: if True, randomly shift columns in z-direction by choosing a displacement from a uniform \
         distribution bounded by (0, d), where d is the vertical distance between stacked monomers

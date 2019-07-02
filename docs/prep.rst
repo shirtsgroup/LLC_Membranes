@@ -8,4 +8,3 @@ Preparation of Monomers and Solutes
       :titlesonly:
 
       monomer_prep
-      solute_prep
