@@ -315,7 +315,7 @@ class System(Topology):
 
         self.chain1_atoms, self.chain2_atoms = [], []
 
-        for i in self.reaction.scheme.bonds_with:
+        for i in self.reaction.scheme.monomer.bonds_with:
             self.chain1_atoms.append([a.index for a in self.t.topology.atoms if a.name in i[0]
                                       and a.residue.name == self.xlink_residue.name])
             self.chain2_atoms.append([a.index for a in self.t.topology.atoms if a.name in i[1]
@@ -352,7 +352,7 @@ class System(Topology):
         mon = ndx // self.xlink_residue.natoms  # monomer number
         chain = self.reaction.scheme.determine_chains(name)[0]  # chain label
 
-        return mon * self.reaction.scheme.nchains + self.reaction.scheme.chain_numbers[chain]
+        return mon * self.reaction.scheme.monomer.nchains + self.reaction.scheme.monomer.chain_numbers[chain]
 
     def minimum_image_distances(self, list1, list2):
         """
@@ -431,6 +431,9 @@ class System(Topology):
             bonds = self.bond_filter(np.array(eligible_c_rad), np.array(eligible_rad), radical=True)
             self.bond_chain1 += bonds[0]
             self.bond_chain2 += bonds[1]
+            for i, x in enumerate(self.bond_chain1):
+                print(x, self.bond_chain2[i])
+            print('----------------------------------')
 
             # eligible_c1_rad, eligible_rad = self.generate_ordered_distances(self.chain1_atoms, self.radicals)
             # bonds = self.bond_filter(eligible_c1_rad, eligible_rad, radical=True)
@@ -592,11 +595,16 @@ class System(Topology):
         """
 
         types, bonds, radicals, rm_impropers, terminate = self.reaction.scheme.react(reaction_type, atoms)
+        print(types)
+        print(bonds)
+        print(radicals)
+        print(rm_impropers)
+        print(terminate)
 
         # add bonds between dummy atoms (made real) and carbon atoms
         for b in bonds:
             self.all_bonds.append(b)
-            self.xlink_residue_atoms.mass[b[1] - 1] = self.reaction.scheme.dummy_mass  # dummy always 2nd entry in b
+            self.xlink_residue_atoms.mass[b[1] - 1] = self.reaction.scheme.monomer.dummy_mass  # dummy always 2nd entry in b
             self.initiators.append(b[1])  # The hydrogen dummy atoms are our 'initiators'.
 
         # change atom types of newly bonded carbon and former dummy atoms
@@ -813,7 +821,7 @@ if __name__ == "__main__":
         sys.write_assembly_topology()  # re-write assembly topology
         print('Done!')
         print('Total new bonds: %d' % len(sys.bond_chain1))
-        #np.savez_compressed('radicals', radicals=sys.radicals, term=sys.terminate)
+        np.savez_compressed('radicals', radicals=sys.radicals, term=sys.terminate)
 
         # energy minimize then run short NVT simulation
         print('Energy minimizing new cross-links...', end='', flush=True)

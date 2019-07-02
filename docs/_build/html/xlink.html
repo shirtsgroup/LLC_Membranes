@@ -175,6 +175,50 @@
             
   <div class="section" id="cross-linking">
 <h1>Cross-linking<a class="headerlink" href="#cross-linking" title="Permalink to this headline">¶</a></h1>
+<p>Our cross-linking algorithm is designed to simulate the result of a
+free radical polymerization (FRP) between vinyl group containing monomers.
+There are three main components to a free radical polymerization:</p>
+<ol class="arabic">
+<li><p class="first">Initiation</p>
+<blockquote>
+<div><p>In an FRP, an initiator decomposes into free radicals which readily
+react with one electron from the pi bond of a C=C group, creating a new bond
+with one of the C atoms. The extra pi-bond electron moves to the other C atom
+which becomes the new active radical site.</p>
+<p>In an an effort to simplify our proces, we represent the initiator as hydrogen
+so that we only have to add single hydrogen atoms at initiation sites.</p>
+<p>Atoms are added to the system during cross-linking. In order to make this work
+efficiently with molecular simulations, we added dummy hydrogen atoms to all
+sites where an initiator could potentially be added. The dummy atoms are only
+made real when necessary and are eliminated after cross-linking has terminated.</p>
+</div></blockquote>
+</li>
+<li><p class="first">Progagation</p>
+<blockquote>
+<div><p>During propagation, monomers sequentially add to active centers.
+Monomers with radical components react with other monomers in the same way as
+the intiator.</p>
+</div></blockquote>
+</li>
+<li><p class="first">Termination</p>
+<blockquote>
+<div><p>For the reaction to be terminated, all of the radicals must react.  The
+two most common termination mechanisms are combination and disproportionation.
+Combination involves two monomers with active centers coupling together.
+Disproportionation involves abstraction of a hydrogen atom by one radical
+species from another species.</p>
+</div></blockquote>
+</li>
+</ol>
+<p>Our cross-linking algorithm happens iteratively. Each iteration, a group of
+potentially bonding atoms are selected based on their proximity to each other.
+We update the topology file with the new atom types, bonds, angles, etc, then
+perform an energy minimization to zip together the new bonds and finally a
+short NVT simulation. This process is repeated until the convergence criteria,
+the number of cross-links, is met.</p>
+<p>This algorithm is meant to be used with any vinyl containing system, however
+the user will have to define any undefined reactions.</p>
+<p>See <a class="reference internal" href="xlink_schemes.html#xlink-schemes"><span class="std std-ref">Designing Cross-Linking Reactions</span></a></p>
 <p>Crosslink LLC structure</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">xlink</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">i</span> <span class="n">INITIAL</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="n">BUILD_MON</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">CUTOFF</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">e</span> <span class="n">TERM_PROB</span><span class="p">]</span>
                 <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">DUMMY_NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">itp</span> <span class="n">XLINK_TOP_NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">top</span> <span class="n">TOPNAME</span><span class="p">]</span>
@@ -297,7 +341,7 @@
 <tr><td class="option-group">
 <kbd>-rad_percent</kbd></td>
 <td><p class="first">Percent of radicals that react each iteration.Not stable above 50 % (?)</p>
-<p class="last">Default: 50</p>
+<p class="last">Default: 20</p>
 </td></tr>
 <tr><td class="option-group" colspan="2">
 <kbd>-out, &#8211;output_gro</kbd></td>
@@ -308,7 +352,7 @@
 <tr><td class="option-group">
 <kbd>-rad_frac_term</kbd></td>
 <td><p class="first">Out of 100, how many radicals that will be terminated on each iteration. Numbers greater than zero will decrease cross-link density</p>
-<p class="last">Default: 0</p>
+<p class="last">Default: 20</p>
 </td></tr>
 <tr><td class="option-group">
 <kbd>-stagnation</kbd></td>
@@ -335,6 +379,30 @@
 <dt id="xlink.System">
 <em class="property">class </em><code class="descclassname">xlink.</code><code class="descname">System</code><span class="sig-paren">(</span><em>initial_configuration</em>, <em>residue</em>, <em>dummy_residue</em>, <em>dummy_name='dummies.gro'</em>, <em>reaction_percentage=1</em>, <em>cutoff=0.6</em>, <em>radical_reaction_percentage=20</em>, <em>radical_termination_fraction=50</em><span class="sig-paren">)</span><a class="headerlink" href="#xlink.System" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#xlink.Topology" title="xlink.Topology"><code class="xref py py-class docutils literal"><span class="pre">xlink.Topology</span></code></a></p>
+<dl class="method">
+<dt id="xlink.System.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>initial_configuration</em>, <em>residue</em>, <em>dummy_residue</em>, <em>dummy_name='dummies.gro'</em>, <em>reaction_percentage=1</em>, <em>cutoff=0.6</em>, <em>radical_reaction_percentage=20</em>, <em>radical_termination_fraction=50</em><span class="sig-paren">)</span><a class="headerlink" href="#xlink.System.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize system for cross-linking and create a configuration with dummy atoms in appropriate locations</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>initial_configuration</strong> (<em>str</em>) &#8211; coordinate file to be cross-linked (.gro)</li>
+<li><strong>residue</strong> (<em>str</em>) &#8211; name of residue involved in cross-linking</li>
+<li><strong>dummy_residue</strong> (<em>str</em>) &#8211; file with same topology as residue in addition to dummy atoms</li>
+<li><strong>dummy_name</strong> (<em>str</em>) &#8211; name of coordinate file with dummy atoms</li>
+<li><strong>reaction_percentage</strong> (<em>float</em>) &#8211; percentage of atom pairs within the cutoff distance that will be chosen to bond</li>
+<li><strong>cutoff</strong> (<em>float</em>) &#8211; max distance two atoms can be away from each in order to still be considered from bonding</li>
+<li><strong>radical_reaction_percentage</strong> (<em>float</em>) &#8211; percentage of radicals that react on each iteration</li>
+<li><strong>radical_termination_fraction</strong> (<em>float</em>) &#8211; percentage of radicals that terminate each iteration</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">

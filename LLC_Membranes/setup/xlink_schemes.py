@@ -2,6 +2,7 @@
 
 import sys
 import numpy as np
+import importlib
 
 """ Specify reactants and products of cross-linking reactions
 """
@@ -18,8 +19,20 @@ class UndefinedReactionError(Exception):
 class XlinkReaction:
 
     def __init__(self, monomer):
+        """ Define the cross-linking reaction scheme based on the monomer.
 
-        if monomer in ['Dibrpyr14', 'MOL']:
+        :param monomer: name of monomer being cross-linked. It should have its own class defined with attributes.
+
+        :type monomer: str
+
+        Attributes:
+            scheme: a class that defines the reaction scheme followed by the monomer
+        """
+
+        if monomer == 'MOL':  # maybe use a dict here instead
+            monomer = 'Dibrpyr14'
+
+        if monomer == 'Dibrpyr14':
             self.scheme = DieneScheme(monomer)
         else:
             self.scheme = None
@@ -33,52 +46,27 @@ class DieneScheme:
         :param monomer: name of monomer
 
         :type monomer: str
+
+        Attributes:
+            monomer: a class defining the constituent atoms. The name of the class is the same as the monomer
+
+            weights: dictionary with the relative weights of one type of reaction. For example, a C1 and C2 atom may
+            be chosen to bond but there may be multiple types of addition (e.g. head-to-tail and 1,4 addition)
+
+            reaction_weights: the relative weights of all types of reactions. For example, a C1 and C2 may be eligible
+            to react and perhaps another C2 is eligible to react with a C3. These weights control the number of each
+            type of distinct reaction so that head-to-tail dominates over 13 addition for example.
+
+            radical_reaction_weights: the same as reaction weights, but applied to the radical reactions.
         """
+
+        self.monomer = getattr(importlib.import_module("LLC_Membranes.setup.xlink_schemes"), '%s' % monomer)()
 
         # keys: type of carbon carbon bond; values: dict with (keys: name of reaction, values: likelihood of reaction)
         self.weights = {'C1-C2': {'head2tail': 1., '14addition': 0},
                         'C1-C2_radical': {'radical_c2': 1}}  # probabilities must sum to 1
         self.reaction_weights = {'head2tail': 1., '14addition': 0, '13addition': 0}
         self.radical_reaction_weights = {'radical_c2': 1.}
-
-        if monomer in ['Dibrpyr14', 'MOL']:  # could build this into annotations. Might be better like this
-
-            # names of atoms that make up relevant segements of each chain
-            self.chains = {'a': {'C': 'C1', 'C1': 'C2', 'C2': 'C3', 'C3': 'C4', 'H': 'H1', 'H1': 'H2', 'H2': 'H3',
-                                 'H3': 'H4', 'H4': 'H5'},
-                           'b': {'C45': 'C1', 'C44': 'C2', 'C43': 'C3', 'C42': 'C4', 'H81': 'H1', 'H80': 'H2',
-                                 'H79': 'H3', 'H78': 'H4', 'H77': 'H5'}
-                           }
-
-            self.nchains = len(list(self.chains.keys()))
-
-            self.chain_numbers = {'a': 0, 'b': 1}  # used to number chains
-
-            self.carbons = {'C1': ['C', 'C45'], 'C2': ['C1', 'C44'], 'C3': ['C2', 'C43'], 'C4': ['C3', 'C42']}
-
-            self.initial_types = {'C1': 'c2', 'C2': 'ce', 'C3': 'ce', 'C4': 'c2', 'H1': 'ha', 'H2': 'ha', 'H3': 'ha',
-                                  'H4': 'ha', 'H5': 'ha'}
-
-            # all indices numbered from 0. D1, D2, ... correspond to dummies attached to C1, C2, ... respectively
-            self.indices = {'a': {'C1': 0, 'C2': 1, 'C3': 2, 'C4': 3, 'H1': 52, 'H2': 53, 'H3': 54, 'H4': 55, 'H5': 56,
-                                  'D1': 136, 'D2': 137, 'D3': 138, 'D4': 139},
-                            'b': {'C1': 49, 'C2': 48, 'C3': 47, 'C4': 46, 'H1': 133, 'H2': 132, 'H3': 131, 'H4': 130,
-                                  'H5': 129, 'D1': 140, 'D2': 141, 'D3': 142, 'D4': 143}
-                            }
-
-            self.dummy_connectivity = {'a': {'C': 'D1', 'C1': 'D2', 'C2': 'D3', 'C3': 'D4'},
-                                       'b': {'C45': 'D1', 'C44': 'D2', 'C43': 'D3', 'C42': 'D4'}}
-
-            self.hydrogen_connectivity = {'C': ['H1', 'H2'], 'C1': ['H3'], 'C2': ['H4'], 'C3': ['H5'],
-                                          'C45': ['H1', 'H2'], 'C44': ['H3'], 'C43': ['H4'], 'C42': ['H5']}
-
-            self.dummy_mass = 1.008  # mass of hydrogen
-
-            # write these in order of priority
-            # for efficiency, don't repeat things. For example self.carbons['C1']: self.carbons['C2'] is the same as
-            # self.carbons['C2']: self.carbons['C1']. Otherwise, computational expense goes up and a new reaction has
-            # to be defined below.
-            self.bonds_with = [[self.carbons['C1'], self.carbons['C2']]]
 
     def determine_chains(self, c):
         """ Determine to which chain carbon atoms come from
@@ -92,9 +80,9 @@ class DieneScheme:
             c = [c]
 
         chains = [None for _ in c]
-        for k in self.chains.keys():
+        for k in self.monomer.chains.keys():
             for i, x in enumerate(c):
-                if x in self.chains[k].keys():
+                if x in self.monomer.chains[k].keys():
                     chains[i] = k
 
         return chains
@@ -112,7 +100,7 @@ class DieneScheme:
         """
 
         chain1, chain2 = self.determine_chains([c1, c2])
-        bond = '%s-%s' % (self.chains[chain1][c1], self.chains[chain2][c2])
+        bond = '%s-%s' % (self.monomer.chains[chain1][c1], self.monomer.chains[chain2][c2])
 
         if radical:
             bond += '_radical'
@@ -155,41 +143,42 @@ class DieneScheme:
         chain1, chain2 = self.determine_chains([c1, c2])
 
         # to get indexing right
-        c1_ndx -= self.indices[chain1]['C1']
-        c2_ndx -= self.indices[chain2]['C2']
+        c1_ndx -= self.monomer.indices[chain1]['C1']
+        c2_ndx -= self.monomer.indices[chain2]['C2']
 
         types = {'chain1': {'C1': 'c3', 'C2': 'c2', 'C3': 'c2', 'C4': 'c2', 'H1': 'hc', 'H2': 'hc', 'H3': 'ha',
                             'H4': 'ha', 'H5': 'ha'},
                  'chain2': {'C1': 'c3', 'C2': 'c3', 'C3': 'c2', 'C4': 'c2', 'H1': 'hc', 'H2': 'hc', 'H3': 'hc',
-                            'H4': 'ha', 'H5': 'ha', 'D1': 'hc', 'D2': 'hc'}}
+                            'H4': 'ha', 'H5': 'ha', 'D1': 'hc'}}
 
         # update types
-        reacted_types = {'chain1': {c1_ndx + self.indices[chain1][a]: types['chain1'][a] for a in types['chain1'].keys()},
-                         'chain2': {c2_ndx + self.indices[chain2][a]: types['chain2'][a] for a in types['chain2'].keys()}}
+        reacted_types = {'chain1': {c1_ndx + self.monomer.indices[chain1][a]: types['chain1'][a] for a in
+                                    types['chain1'].keys()},
+                         'chain2': {c2_ndx + self.monomer.indices[chain2][a]: types['chain2'][a] for a in
+                                    types['chain2'].keys()}}
 
-        # update bonds - 2 new bonds between dummy atoms and carbon
-        dummy_bonds = [[c2_ndx + self.indices[chain2]['C2'], c2_ndx + self.indices[chain2]['D2']],
-                       [c2_ndx + self.indices[chain2]['C1'], c2_ndx + self.indices[chain2]['D1']]]
+        # update bonds - 1 new bond between dummy atoms and carbon
+        dummy_bonds = [[c2_ndx + self.monomer.indices[chain2]['C1'], c2_ndx + self.monomer.indices[chain2]['D1']]]
 
         # define indices of left-over radicals
-        radicals = [c1_ndx + self.indices[chain1]['C2']]
+        radicals = [c1_ndx + self.monomer.indices[chain1]['C2']]
 
         # define which improper dihedrals to remove -- written in same order as .itp file!!!
         # note that the order of the atoms may be different for each chain
-        impropers = {'a': {1: ['H2', 'C1', 'H1', 'C2'], 2: ['C1', 'C3', 'C2', 'H3']},
-                     'b': {1: ['C2', 'H2', 'C1', 'H1'], 2: ['C1', 'C3', 'C2', 'H3']}}
+        # impropers = {'a': {1: ['H2', 'C1', 'H1', 'C2'], 2: ['C1', 'C3', 'C2', 'H3']},
+        #              'b': {1: ['C2', 'H2', 'C1', 'H1'], 2: ['C1', 'C3', 'C2', 'H3']}}
 
-        chain1_impropers = [1]
-        chain2_impropers = [1, 2]
+        chain1_impropers = ['C1']  # [1]
+        chain2_impropers = ['C1', 'C2']  # [1, 2]
         rm_improper = []
         for c in chain1_impropers:
-            rm_improper.append([c1_ndx + self.indices[chain1][x] for x in impropers[chain1][c]])
+            rm_improper.append([c1_ndx + self.monomer.indices[chain1][x] for x in self.monomer.impropers[chain1][c]])
         for c in chain2_impropers:
-            rm_improper.append([c2_ndx + self.indices[chain2][x] for x in impropers[chain2][c]])
+            rm_improper.append([c2_ndx + self.monomer.indices[chain2][x] for x in self.monomer.impropers[chain2][c]])
 
         # define terminated atoms
-        terminated = [c1_ndx + self.indices[chain1]['C1'], c2_ndx + self.indices[chain2]['C2'], c2_ndx +
-                      self.indices[chain2]['C1']]
+        terminated = [c1_ndx + self.monomer.indices[chain1]['C1'], c2_ndx + self.monomer.indices[chain2]['C2'], c2_ndx +
+                      self.monomer.indices[chain2]['C1']]
 
         return reacted_types, dummy_bonds, radicals, rm_improper, terminated
 
@@ -209,8 +198,8 @@ class DieneScheme:
         chain1, chain2 = self.determine_chains([c1, c2])
 
         # to get indexing right
-        c1_ndx -= self.indices[chain1]['C1']
-        c2_ndx -= self.indices[chain2]['C2']
+        c1_ndx -= self.monomer.indices[chain1]['C1']
+        c2_ndx -= self.monomer.indices[chain2]['C2']
 
         # types after reaction
         types = {'chain1': {'C1': 'c3', 'C2': 'c2', 'C3': 'c2', 'C4': 'c2', 'H1': 'hc', 'H2': 'hc', 'H3': 'ha',
@@ -219,30 +208,27 @@ class DieneScheme:
                             'H4': 'ha', 'H5': 'ha'}}  # chain2 contains c2 radical
 
         # update types
-        reacted_types = {'chain1': {c1_ndx + self.indices[chain1][a]: types['chain1'][a] for a in types['chain1'].keys()},
-                         'chain2': {c2_ndx + self.indices[chain2][a]: types['chain2'][a] for a in types['chain2'].keys()}}
+        reacted_types = {'chain1': {c1_ndx + self.monomer.indices[chain1][a]: types['chain1'][a]
+                                    for a in types['chain1'].keys()},
+                         'chain2': {c2_ndx + self.monomer.indices[chain2][a]: types['chain2'][a]
+                                    for a in types['chain2'].keys()}}
 
         # update bonds - no new bonds between dummy atoms and carbon
         dummy_bonds = []
 
         # define indices of left-over radicals
-        radicals = [c1_ndx + self.indices[chain1]['C2']]
+        radicals = [c1_ndx + self.monomer.indices[chain1]['C2']]
 
-        # define which improper dihedrals to remove -- written in same order as .itp file!!!
-        # note that the order of the atoms may be different for each chain
-        impropers = {'a': {1: ['H2', 'C1', 'H1', 'C2'], 2: ['C1', 'C3', 'C2', 'H3']},
-                     'b': {1: ['C2', 'H2', 'C1', 'H1'], 2: ['C1', 'C3', 'C2', 'H3']}}
-
-        chain1_impropers = [1]
-        chain2_impropers = [2]
+        chain1_impropers = ['C1']  # [1]
+        chain2_impropers = ['C2']  # [2]
         rm_improper = []
         for c in chain1_impropers:
-            rm_improper.append([c1_ndx + self.indices[chain1][x] for x in impropers[chain1][c]])
+            rm_improper.append([c1_ndx + self.monomer.indices[chain1][x] for x in self.monomer.impropers[chain1][c]])
         for c in chain2_impropers:
-            rm_improper.append([c2_ndx + self.indices[chain2][x] for x in impropers[chain2][c]])
+            rm_improper.append([c2_ndx + self.monomer.indices[chain2][x] for x in self.monomer.impropers[chain2][c]])
 
         # define terminated atoms
-        terminated = [c1_ndx + self.indices[chain1]['C1'], c2_ndx + self.indices[chain2]['C2']]
+        terminated = [c1_ndx + self.monomer.indices[chain1]['C1'], c2_ndx + self.monomer.indices[chain2]['C2']]
 
         return reacted_types, dummy_bonds, radicals, rm_improper, terminated
 
@@ -261,39 +247,79 @@ class DieneScheme:
         c_ndx = list(atoms.values())[0]  # serial index of carbon begin terminated
 
         chain = self.determine_chains(c)[0]  # which chain carbon atom is on
-        c_name = self.chains[chain][c]
+        c_name = self.monomer.chains[chain][c]
 
         # to get indexing right
-        c_ndx -= self.indices[chain][c_name]
+        c_ndx -= self.monomer.indices[chain][c_name]
 
         # types after reaction. Keeping this dictionary format so it integrates easily with xlinking algorithm
-        types = {'chain': {self.chains[chain][c]: 'c3', self.dummy_connectivity[chain][c]: 'hc'}}
+        types = {'chain': {self.monomer.chains[chain][c]: 'c3', self.monomer.dummy_connectivity[chain][c]: 'hc'}}
 
-        for i in self.hydrogen_connectivity[c]:  # turn already attached carbon(s) to c3
+        for i in self.monomer.hydrogen_connectivity[c]:  # turn already attached carbon(s) to c3
             types['chain'][i] = 'hc'
 
         # update types
-        reacted_types = {'chain': {c_ndx + self.indices[chain][a]: types['chain'][a] for a in types['chain'].keys()}}
+        reacted_types = {'chain': {c_ndx + self.monomer.indices[chain][a]: types['chain'][a]
+                                   for a in types['chain'].keys()}}
 
         # add dummy atom bond
-        dummy_bonds = [list(reacted_types['chain'].keys())]
+        dummy_bonds = [[c_ndx + self.monomer.indices[chain]['C2'], c_ndx + self.monomer.indices[chain]['D2']]]
 
-        # no radicals are produced (only eliminated) -- TODO: make sure the elimination is accounted for
         radicals = []
-        # stopped here
+
+        rm_improper = [[c_ndx + self.monomer.indices[chain][x] for x in self.monomer.impropers[chain][c_name]]]
+
+        # define terminated atoms
+        terminated = [c_ndx + self.monomer.indices[chain][c_name]]
+
+        return reacted_types, dummy_bonds, radicals, rm_improper, terminated
+
+
+class Dibrpyr14:
+
+    def __init__(self):
+
+        # names of atoms that make up relevant segements of each chain
+        self.chains = {'a': {'C': 'C1', 'C1': 'C2', 'C2': 'C3', 'C3': 'C4', 'H': 'H1', 'H1': 'H2', 'H2': 'H3',
+                             'H3': 'H4', 'H4': 'H5'},
+                       'b': {'C45': 'C1', 'C44': 'C2', 'C43': 'C3', 'C42': 'C4', 'H81': 'H1', 'H80': 'H2',
+                             'H79': 'H3', 'H78': 'H4', 'H77': 'H5'}
+                       }
+
+        self.nchains = len(list(self.chains.keys()))
+
+        self.chain_numbers = {'a': 0, 'b': 1}  # used to number chains
+
+        self.carbons = {'C1': ['C', 'C45'], 'C2': ['C1', 'C44'], 'C3': ['C2', 'C43'], 'C4': ['C3', 'C42']}
+
+        self.initial_types = {'C1': 'c2', 'C2': 'ce', 'C3': 'ce', 'C4': 'c2', 'H1': 'ha', 'H2': 'ha', 'H3': 'ha',
+                              'H4': 'ha', 'H5': 'ha'}
+
+        # all indices numbered from 0. D1, D2, ... correspond to dummies attached to C1, C2, ... respectively
+        self.indices = {'a': {'C1': 0, 'C2': 1, 'C3': 2, 'C4': 3, 'H1': 52, 'H2': 53, 'H3': 54, 'H4': 55, 'H5': 56,
+                              'D1': 136, 'D2': 137, 'D3': 138, 'D4': 139},
+                        'b': {'C1': 49, 'C2': 48, 'C3': 47, 'C4': 46, 'H1': 133, 'H2': 132, 'H3': 131, 'H4': 130,
+                              'H5': 129, 'D1': 140, 'D2': 141, 'D3': 142, 'D4': 143}
+                        }
+
+        self.dummy_connectivity = {'a': {'C': 'D1', 'C1': 'D2', 'C2': 'D3', 'C3': 'D4'},
+                                   'b': {'C45': 'D1', 'C44': 'D2', 'C43': 'D3', 'C42': 'D4'}}
+
+        self.hydrogen_connectivity = {'C': ['H1', 'H2'], 'C1': ['H3'], 'C2': ['H4'], 'C3': ['H5'],
+                                      'C45': ['H1', 'H2'], 'C44': ['H3'], 'C43': ['H4'], 'C42': ['H5']}
+
+        self.dummy_mass = 1.008  # mass of hydrogen
+
+        # write these in order of priority
+        # for efficiency, don't repeat things. For example self.carbons['C1']: self.carbons['C2'] is the same as
+        # self.carbons['C2']: self.carbons['C1']. Otherwise, computational expense goes up and a new reaction has
+        # to be defined below.
+        self.bonds_with = [[self.carbons['C1'], self.carbons['C2']]]
 
         # define which improper dihedrals to remove -- written in same order as .itp file!!!
         # note that the order of the atoms may be different for each chain
         # NOTE: C3 not tested
-        impropers = {'a': {'C1': ['H2', 'C1', 'H1', 'C2'], 'C2': ['C1', 'C3', 'C2', 'H3'],
+        self.impropers = {'a': {'C1': ['H2', 'C1', 'H1', 'C2'], 'C2': ['C1', 'C3', 'C2', 'H3'],
                            'C3': ['C4', 'C2', 'C3', 'H4']},
                      'b': {'C1': ['C2', 'H2', 'C1', 'H1'], 'C2': ['C1', 'C3', 'C2', 'H3'],
                            'C3': ['C4', 'C2', 'C3', 'H4']}}
-
-        rm_improper = [[c_ndx + self.indices[chain][x] for x in impropers[chain][c_name]]]
-
-        # define terminated atoms
-        terminated = [c_ndx + self.indices[chain][c_name]]
-
-        return reacted_types, dummy_bonds, radicals, rm_improper, terminated
-
