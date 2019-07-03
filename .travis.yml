@@ -6,7 +6,7 @@ python:
   - "3.6"
   
 install:
-  - pip install numpy cython pandas
+  - pip install cython pandas numpy==1.16.1
   - pip install -r requirements.txt
   
 script:
