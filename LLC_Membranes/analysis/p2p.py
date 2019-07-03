@@ -16,7 +16,6 @@ import mdtraj as md
 from scipy.optimize import curve_fit
 from scipy import spatial
 import tqdm
-from scipy.misc import factorial
 
 
 def initialize():
