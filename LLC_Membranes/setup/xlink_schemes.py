@@ -63,7 +63,7 @@ class DieneScheme:
         self.monomer = getattr(importlib.import_module("LLC_Membranes.setup.xlink_schemes"), '%s' % monomer)()
 
         # keys: type of carbon carbon bond; values: dict with (keys: name of reaction, values: likelihood of reaction)
-        self.weights = {'C1-C2': {'head2tail': 1., '14addition': 0},
+        self.weights = {'C1-C2': {'head2tail': 1., 'head2head': 0},
                         'C1-C2_radical': {'radical_c2': 1}}  # probabilities must sum to 1
         self.reaction_weights = {'head2tail': 1., '14addition': 0, '13addition': 0}
         self.radical_reaction_weights = {'radical_c2': 1.}
@@ -137,6 +137,62 @@ class DieneScheme:
         :return: atom indices and their corresponding types after reaction
         """
 
+        c1, c2 = atoms.keys()
+        c1_ndx, c2_ndx = atoms.values()
+
+        chain1, chain2 = self.determine_chains([c1, c2])
+
+        # to get indexing right
+        c1_ndx -= self.monomer.indices[chain1]['C1']
+        c2_ndx -= self.monomer.indices[chain2]['C2']
+
+        types = {'chain1': {'C1': 'c3', 'C2': 'c2', 'C3': 'c2', 'C4': 'c2', 'H1': 'hc', 'H2': 'hc', 'H3': 'ha',
+                            'H4': 'ha', 'H5': 'ha'},
+                 'chain2': {'C1': 'c3', 'C2': 'c3', 'C3': 'c2', 'C4': 'c2', 'H1': 'hc', 'H2': 'hc', 'H3': 'hc',
+                            'H4': 'ha', 'H5': 'ha', 'D1': 'hc'}}
+
+        # update types
+        reacted_types = {'chain1': {c1_ndx + self.monomer.indices[chain1][a]: types['chain1'][a] for a in
+                                    types['chain1'].keys()},
+                         'chain2': {c2_ndx + self.monomer.indices[chain2][a]: types['chain2'][a] for a in
+                                    types['chain2'].keys()}}
+
+        # update bonds - 1 new bond between dummy atoms and carbon
+        dummy_bonds = [[c2_ndx + self.monomer.indices[chain2]['C1'], c2_ndx + self.monomer.indices[chain2]['D1']]]
+
+        # define indices of left-over radicals
+        radicals = [c1_ndx + self.monomer.indices[chain1]['C2']]
+
+        # define which improper dihedrals to remove -- written in same order as .itp file!!!
+        # note that the order of the atoms may be different for each chain
+        # impropers = {'a': {1: ['H2', 'C1', 'H1', 'C2'], 2: ['C1', 'C3', 'C2', 'H3']},
+        #              'b': {1: ['C2', 'H2', 'C1', 'H1'], 2: ['C1', 'C3', 'C2', 'H3']}}
+
+        chain1_impropers = ['C1']  # [1]
+        chain2_impropers = ['C1', 'C2']  # [1, 2]
+        rm_improper = []
+        for c in chain1_impropers:
+            rm_improper.append([c1_ndx + self.monomer.indices[chain1][x] for x in self.monomer.impropers[chain1][c]])
+        for c in chain2_impropers:
+            rm_improper.append([c2_ndx + self.monomer.indices[chain2][x] for x in self.monomer.impropers[chain2][c]])
+
+        # define terminated atoms
+        terminated = [c1_ndx + self.monomer.indices[chain1]['C1'], c2_ndx + self.monomer.indices[chain2]['C2'], c2_ndx +
+                      self.monomer.indices[chain2]['C1']]
+
+        return reacted_types, dummy_bonds, radicals, rm_improper, terminated
+
+    def head2head(self, atoms):
+        """ Define the head-to-head addition of the terminal double bonds (c1 -- c1). Note that this reaction actually
+        occurs based on proximity of c1 and c2 atoms
+
+        :param atoms: dictionary of atom names (keys) and their index (values) in the context of an entire unit cell
+
+        :type atoms: dict
+
+        :return: atom indices and their corresponding types after reaction
+        """
+        # TODO: I haven't even started this!
         c1, c2 = atoms.keys()
         c1_ndx, c2_ndx = atoms.values()
 
@@ -278,6 +334,55 @@ class DieneScheme:
 class Dibrpyr14:
 
     def __init__(self):
+        """ Define monomer attributes necessary for cross-linking
+        TODO: clean this up! Some attributes can be combined or written more intuitively
+        Attributes:
+            chains: a dictionary of dictionaries of the form {'a': {'C': 'C1', 'C1': 'C2 ...}, 'b': {'C45': 'C1, \
+            'C44': 'C2' ...}}. This monomer contains two alkane chain tails. 'a' and 'b' are labels referring to each \
+            chain respectively. Each sub-dictionary is used to map the names of relevant monomer atoms to generalized \
+            atom names that are recognized by the reaction schemes. For a diene tail, C1 refers to the terminal carbon \
+            atom, C2 refers to the second-to-last carbon atom and so on. H1 and H2 refer to hydrogen atoms attached to \
+            C1. H3 is attached to C2, H4 to C3 and H5 to C4. These generalized names are the values in each \
+            sub-dictionary. The keys are the names of the carbon atoms in the context of the monomer, so the names as \
+            they appear in the .gro file. Take a look at Dibrpyr14.gro if this is still unclear.
+
+            nchains: the number of chains that a monomer has. This makes code more readable elsewhere
+
+            chain_numbers: Each chain should have its own number starting from 0. This is used to determine whether a \
+            given chain has already been involved in a reaction.
+
+            indices: this dictionary of dictionaries stores the indices of relevant monomer atoms in the context of a \
+            single monomer. It is constructed in a similar way to self.chains, but the generalized carbon atoms names \
+            are the keys (instead of the values) and the index is the index of generalized carbon atom. For example, \
+            C1 in chain 'b' is index 49, meaning it is the 50th atom in the topology file for a single Dibrpyr14 \
+            residue. (See Dibrpyr14.gro or Dibrpyr14.itp to confirm this and all other entries). The indices include \
+            those corresponding to the dummy atoms (D1, D2, D3, D4).
+
+            dummy_connectivity: this dictionary of dictionaries defines the connectivity between carbon atoms and the \
+            dummy atoms. For each chain, the sub-dictionary contains the name of each carbon atom (in the context of \
+            the monomer) as keys and the generalized name of the attached dummy atom as the value. In general, for the \
+            diene reaction, D1 is attached to C1, D2 to C2 and so on.
+
+            hydrogen_connectivity: similar to dummy_connectivity, this defines which hydrogen atoms are bonded to \
+            which carbon. This dictionary does not distinguish between chains. Each key is the name of a carbon atom, \
+            as you'd find in the corresponding Dibrpyr14 .gro or .itp file, with a list of generalized hydrogen atoms \
+            that are attached to that carbon.
+
+            dummy_mass: the mass of the dummy atom (hydrogen)
+
+            carbons: a dictionary with keys that are the generalized carbon atom names and values that are a list of \
+            the actual carbon atom names as you'd find them in the .gro or .itp file.
+
+            bonds_with: a list of carbon pairs. Each sub-list contains two lists: a list of carbon atoms in the 1st \
+            entry that can bond with carbon atoms in the second list entry.
+
+            impropers: a dictionary of dictionaries. Each sub-dictionary refers to a chain. The sub-directories \
+            contain keys corresponding to each carbon atom. Each value is a list of atoms that make up the improper \
+            dihedral which holds the originally sp2 carbon in a planar configuration. When an sp2 carbon is converted \
+            to sp3, the improper must be removed. The order of the improper is written in the same way that you'd find \
+            it in Dibrpyr14.itp. Required ordering was a choice that I made to speed up some calculations. Be very \
+            careful defining this attribute.
+        """
 
         # names of atoms that make up relevant segements of each chain
         self.chains = {'a': {'C': 'C1', 'C1': 'C2', 'C2': 'C3', 'C3': 'C4', 'H': 'H1', 'H1': 'H2', 'H2': 'H3',
@@ -290,10 +395,8 @@ class Dibrpyr14:
 
         self.chain_numbers = {'a': 0, 'b': 1}  # used to number chains
 
-        self.carbons = {'C1': ['C', 'C45'], 'C2': ['C1', 'C44'], 'C3': ['C2', 'C43'], 'C4': ['C3', 'C42']}
-
-        self.initial_types = {'C1': 'c2', 'C2': 'ce', 'C3': 'ce', 'C4': 'c2', 'H1': 'ha', 'H2': 'ha', 'H3': 'ha',
-                              'H4': 'ha', 'H5': 'ha'}
+        # self.initial_types = {'C1': 'c2', 'C2': 'ce', 'C3': 'ce', 'C4': 'c2', 'H1': 'ha', 'H2': 'ha', 'H3': 'ha',
+        #                       'H4': 'ha', 'H5': 'ha'}
 
         # all indices numbered from 0. D1, D2, ... correspond to dummies attached to C1, C2, ... respectively
         self.indices = {'a': {'C1': 0, 'C2': 1, 'C3': 2, 'C4': 3, 'H1': 52, 'H2': 53, 'H3': 54, 'H4': 55, 'H5': 56,
@@ -314,12 +417,13 @@ class Dibrpyr14:
         # for efficiency, don't repeat things. For example self.carbons['C1']: self.carbons['C2'] is the same as
         # self.carbons['C2']: self.carbons['C1']. Otherwise, computational expense goes up and a new reaction has
         # to be defined below.
+        self.carbons = {'C1': ['C', 'C45'], 'C2': ['C1', 'C44'], 'C3': ['C2', 'C43'], 'C4': ['C3', 'C42']}
         self.bonds_with = [[self.carbons['C1'], self.carbons['C2']]]
 
         # define which improper dihedrals to remove -- written in same order as .itp file!!!
         # note that the order of the atoms may be different for each chain
         # NOTE: C3 not tested
         self.impropers = {'a': {'C1': ['H2', 'C1', 'H1', 'C2'], 'C2': ['C1', 'C3', 'C2', 'H3'],
-                           'C3': ['C4', 'C2', 'C3', 'H4']},
-                     'b': {'C1': ['C2', 'H2', 'C1', 'H1'], 'C2': ['C1', 'C3', 'C2', 'H3'],
-                           'C3': ['C4', 'C2', 'C3', 'H4']}}
+                          'C3': ['C4', 'C2', 'C3', 'H4']},
+                          'b': {'C1': ['C2', 'H2', 'C1', 'H1'], 'C2': ['C1', 'C3', 'C2', 'H3'],
+                          'C3': ['C4', 'C2', 'C3', 'H4']}}
