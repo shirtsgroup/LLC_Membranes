@@ -11,6 +11,7 @@ from LLC_Membranes.setup.gentop import SystemTopology
 from LLC_Membranes.setup.genmdp import SimulationMdp
 from LLC_Membranes.llclib import file_rw, topology, gromacs
 from scipy.sparse import lil_matrix
+import subprocess
 
 
 def initialize():
@@ -53,6 +54,11 @@ def initialize():
     parser.add_argument('-mpi', '--parallelize', action="store_true", help='specify true if running with MPI or GPU')
     parser.add_argument('-np', '--nproc', default=4, type=int, help='Number of processess to run in parallel (number'
                                                                     'of GPUs on Bridges and Summit)')
+
+    # save options
+    parser.add_argument('-s', '--save_intermediates', action="store_true", help='Save intermediate topology and energy'
+                        'minimized structures in a folder called `intermediates`.')
+    parser.add_argument('-sf', '--save_frequency', default=1, help='Number of iterations between saves')
 
     return parser
 
@@ -341,6 +347,7 @@ class System(Topology):
         self.cutoff = cutoff
         self.former_radicals = None
         self.rad_frac_term = radical_termination_fraction / 100.
+        self.chain_numbers = []  # this is used to ensure that the same atoms don't react twice
 
         # Variables for topology modification
         self.rm_impropers = []
@@ -521,19 +528,18 @@ class System(Topology):
 
         bond_chain1 = []
         bond_chain2 = []
-        chain_numbers = []
         for i, r in enumerate(rxn_types):
             if n_rxn_count[r] < n_rxn_per_type[r]:
                 chain1 = self.chain_number(eligible_chain1[i])
                 chain2 = self.chain_number(eligible_chain2[i])
                 if chain1 == chain2:  # this shouldn't happen, but this will let me know if it does.
                     print('chain1 equals chain2!')
-                if chain1 not in chain_numbers and chain2 not in chain_numbers:  # make sure its always new independent chains reacting
+                if chain1 not in self.chain_numbers and chain2 not in self.chain_numbers:  # make sure its always new independent chains reacting
                     bond_chain1.append(eligible_chain1[i] + 1)  # convert to serial
                     bond_chain2.append(eligible_chain2[i] + 1)
                     n_rxn_count[r] += 1
                     self.reaction_type.append(r)
-                    chain_numbers += [chain1, chain2]
+                    self.chain_numbers += [chain1, chain2]
 
         return bond_chain1, bond_chain2
 
@@ -595,11 +601,11 @@ class System(Topology):
         """
 
         types, bonds, radicals, rm_impropers, terminate = self.reaction.scheme.react(reaction_type, atoms)
-        print(types)
-        print(bonds)
-        print(radicals)
-        print(rm_impropers)
-        print(terminate)
+        # print(types)
+        # print(bonds)
+        # print(radicals)
+        # print(rm_impropers)
+        # print(terminate)
 
         # add bonds between dummy atoms (made real) and carbon atoms
         for b in bonds:
@@ -672,13 +678,12 @@ class System(Topology):
             self.chain1_atoms[i] = [x for x in c if x not in self.terminate and x not in self.radicals]
             self.chain2_atoms[i] = [x for x in self.chain2_atoms[i] if x not in self.terminate and x not in
                                     self.radicals]
-        # self.chain1_atoms = [x for x in self.chain1_atoms if x not in self.terminate and x not in self.radicals]
-        # self.chain2_atoms = [x for x in self.chain2_atoms if x not in self.terminate and x not in self.radicals]
 
         # re-initialize bonding carbon lists
         self.bond_chain1 = []
         self.bond_chain2 = []
         self.reaction_type = []
+        self.chain_numbers = []
 
         self.initiators = []  # bad name for this. It's really just dummy atoms that become real
         self.rm_impropers = []
@@ -746,6 +751,25 @@ class System(Topology):
         self.write_assembly_topology(virtual_sites=False, vsite_atom_name=dummy_atom_name)
 
 
+def save_intermediates(files, iteration):
+    """ For a given iteration, save intermediate files in a folder called `intermediates`
+
+    :param files: list of file names to save
+    :param iteration: iteration number used for naming
+
+    :type file: list of str
+    :type iteration: int
+    """
+
+    if not os.path.isdir("./intermediates"):
+        os.mkdir('intermediates')
+
+    for f in files:
+        cp = "cp %s intermediates/%s_%d" % (f, f, iteration)
+        p = subprocess.Popen(cp.split())
+        p.wait()
+
+
 if __name__ == "__main__":
 
     args = initialize().parse_args()
@@ -783,6 +807,7 @@ if __name__ == "__main__":
     mdpshort.write_em_mdp(out='%s' % args.mdp_em.split('.')[0])
     mdpshort.write_nvt_mdp(out='%s' % args.mdp_nvt.split('.')[0])
 
+    # TODO: I'm not sure the short time step NVT simulation is used (or needed)
     mdpshort = SimulationMdp(args.dummy_name, T=args.temperature, em_steps=args.em_steps, time_step=dt_short,
         length=length_short, p_coupling='semiisotropic', barostat='berendsen', genvel='yes', restraints=False,
                              xlink=True, bcc=False)
@@ -842,6 +867,9 @@ if __name__ == "__main__":
         print('Total radicals terminated: %.2d' % len(sys.terminated_radicals))
         print('Total radicals left in system: %d' % len(sys.radicals))
         print('Percent terminated: %.2f' % (100 * len(sys.terminate) / sys.total_possible_terminated))
+
+        if args.save_intermediates and sys.iteration % args.save_frequency == 0:
+            save_intermediates(['em.gro', 'nvt.gro', 'assembly.itp'], sys.iteration)
 
         if len(sys.bond_chain1) > 0:
             stagnated_iterations = 0

@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from LLC_Membranes.setup import build
+from LLC_Membranes.setup import hexagonal_build
 from unittest import TestCase as tc
 import numpy as np
 
@@ -9,7 +9,7 @@ class TestSetup():
 
     def test_build(self):
 
-        sys = build.Assembly('NAcarb11V.gro', 4, 45, 60, 1, tilt=0)  # name, npores, p2p, pore_alpha, pore_radius, tilt=0
+        sys = hexagonal_build.BuildHexagonal('NAcarb11V', 4, 45, 60, 1, tilt=0)  # name, npores, p2p, pore_alpha, pore_radius, tilt=0
 
         assert sum([sys.tilt, sys.pore_radius]) == 1, 'Should be 1'
 
