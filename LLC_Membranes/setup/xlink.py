@@ -773,17 +773,20 @@ def save_intermediates(files, iteration):
         p.wait()
 
 
-if __name__ == "__main__":
+def crosslink(params):
+    """ The main cross-linking algorithm
 
-    args = initialize().parse_args()
+    :param params: a dictionary of parameters controlling the cross-linking reaction. There is a dictionary key for
+    every argument in xlink.initialize()
 
-    os.environ["GMX_MAXBACKUP"] = "-1"  # stop GROMACS from making backups
+    :type params: dict
+    """
 
     start = time.time()
-    initial_message = '# Cross-linking %s #' % args.initial
-    print('#'*len(initial_message))
+    initial_message = '# Cross-linking %s #' % params['initial']
+    print('#' * len(initial_message))
     print(initial_message)
-    print('#'*len(initial_message))
+    print('#' * len(initial_message))
 
     # if needed
     dt_short = 0.0005  # simulation time step (ps) (unstable if timestep is too large)
@@ -792,41 +795,43 @@ if __name__ == "__main__":
     # get the system ready for cross-linking
     # Add dummy atoms create topology for entire assembly
     print('Initializing system and adding dummy atoms...', end='', flush=True)
-    sys = System(args.initial, args.residue, args.dummy_residue, dummy_name=args.dummy_name,
-                 radical_reaction_percentage=args.rad_percent, reaction_percentage=args.percent,
-                 radical_termination_fraction=args.rad_frac_term)
-    print('Done!\n%s created' % args.dummy_name)
+    sys = System(params['initial'], params['residue'], params['dummy_residue'], dummy_name=params['dummy_name'],
+                 radical_reaction_percentage=params['rad_percent'], reaction_percentage=params['percent'],
+                 radical_termination_fraction=params['rad_frac_term'])
+    print('Done!\n%s created' % params['dummy_name'])
 
-    print('Generating input files: %s, %s, %s and %s...' % (args.xlink_top_name, args.topname, args.mdp_em,
-          args.mdp_nvt),  end='', flush=True)
+    print('Generating input files: %s, %s, %s and %s...' % (params['xlink_top_name'], params['topname'],
+                                                            params['mdp_em'], params['mdp_nvt']), end='', flush=True)
     sys.write_assembly_topology()
 
     # generate input files that will be used throughtout cross-linking process
-    full_top = SystemTopology(args.dummy_name, ff=args.forcefield, xlink=True, xlinked_top_name=args.xlink_top_name)  # topology with other residues and forcefield
-    full_top.write_top(name=args.topname)
-    mdpshort = SimulationMdp(args.dummy_name, T=args.temperature, em_steps=args.em_steps, time_step=args.dt,
-        length=args.length, p_coupling='semiisotropic', barostat='berendsen', genvel='yes', restraints=False,
-                             xlink=True, bcc=False)
-    mdpshort.write_em_mdp(out='%s' % args.mdp_em.split('.')[0])
-    mdpshort.write_nvt_mdp(out='%s' % args.mdp_nvt.split('.')[0])
+    full_top = SystemTopology(params['dummy_name'], ff=params['forcefield'], xlink=True,
+                              xlinked_top_name=params['xlink_top_name'])  # topology with other residues and forcefield
+    full_top.write_top(name=params['topname'])
+    mdpshort = SimulationMdp(params['dummy_name'], T=params['temperature'], em_steps=params['em_steps'],
+                             time_step=params['dt'], length=params['length'], p_coupling='semiisotropic',
+                             barostat='berendsen', genvel='yes', restraints=False, xlink=True, bcc=False)
+    mdpshort.write_em_mdp(out='%s' % params['mdp_em'].split('.')[0])
+    mdpshort.write_nvt_mdp(out='%s' % params['mdp_nvt'].split('.')[0])
 
     # TODO: I'm not sure the short time step NVT simulation is used (or needed)
-    mdpshort = SimulationMdp(args.dummy_name, T=args.temperature, em_steps=args.em_steps, time_step=dt_short,
-        length=length_short, p_coupling='semiisotropic', barostat='berendsen', genvel='yes', restraints=False,
-                             xlink=True, bcc=False)
+    mdpshort = SimulationMdp(params['dummy_name'], T=params['temperature'], em_steps=params['em_steps'],
+                             time_step=dt_short, length=length_short, p_coupling='semiisotropic', barostat='berendsen',
+                             genvel='yes', restraints=False, xlink=True, bcc=False)
     mdpshort.write_nvt_mdp(out='nvt_short')
     print('Done!')
 
     # energy minimize starting configuration to get dummies in the right place
-    print('Energy minimizing %s...' % args.dummy_name, end='', flush=True)
-    gromacs.simulate(args.mdp_em, args.topname, args.dummy_name, 'em_%s' % args.dummy_name.split('.')[0],
-                     mpi=args.parallelize, nprocesses=args.nproc, dd=args.domain_decomposition)
+    print('Energy minimizing %s...' % params['dummy_name'], end='', flush=True)
+    gromacs.simulate(params['mdp_em'], params['topname'], params['dummy_name'],
+                     'em_%s' % params['dummy_name'].split('.')[0], mpi=params['parallelize'],
+                     nprocesses=params['nproc'], dd=params['domain_decomposition'])
     print('Done!')
 
     # Rest of iterations
     stagnated_iterations = 0  # number of iterations without forming a cross-link
-    while (len(sys.terminate) / sys.total_possible_terminated) < (args.density / 100.) and stagnated_iterations < \
-            args.stagnation:
+    while (len(sys.terminate) / sys.total_possible_terminated) < (params['density'] / 100.) and stagnated_iterations < \
+            params['stagnation']:
 
         #### FOR TESTING ####
         # sys.iteration = 2
@@ -835,7 +840,7 @@ if __name__ == "__main__":
         # sys.terminate = list(lists['term'])
         #####################
 
-        print('-'*80)
+        print('-' * 80)
         print('Iteration: %d' % sys.iteration)
 
         if sys.iteration > 1:
@@ -854,26 +859,26 @@ if __name__ == "__main__":
         # energy minimize then run short NVT simulation
         print('Energy minimizing new cross-links...', end='', flush=True)
         if sys.iteration == 1:
-            gromacs.simulate(args.mdp_em, args.topname, 'em_%s' % args.dummy_name, 'em', mpi=args.parallelize,
-                             nprocesses=args.nproc, dd=args.domain_decomposition)
+            gromacs.simulate(params['mdp_em'], params['topname'], 'em_%s' % params['dummy_name'], 'em',
+                             mpi=params['parallelize'], nprocesses=params['nproc'], dd=params['domain_decomposition'])
         else:
-            gromacs.simulate(args.mdp_em, args.topname, 'nvt.gro', 'em', mpi=args.parallelize, nprocesses=args.nproc,
-                             dd=args.domain_decomposition)
+            gromacs.simulate(params['mdp_em'], params['topname'], 'nvt.gro', 'em', mpi=params['parallelize'],
+                             nprocesses=params['nproc'], dd=params['domain_decomposition'])
         print('Done!')
 
-        print('Running %.1f ps NVT simulation...' % args.length, end='', flush=True)
-        gromacs.simulate(args.mdp_nvt, args.topname, 'em.gro', 'nvt', mpi=args.parallelize, nprocesses=args.nproc,
-                         dd=args.domain_decomposition)
+        print('Running %.1f ps NVT simulation...' % params['length'], end='', flush=True)
+        gromacs.simulate(params['mdp_nvt'], params['topname'], 'em.gro', 'nvt', mpi=params['parallelize'],
+                         nprocesses=params['nproc'], dd=params['domain_decomposition'])
         print('Done!')
 
         print('\nTotal new cross-links: %d' % len(sys.bond_chain1))
         print('Total system cross-links: %d' % sys.nxlinks)
-        print('Cross-link density: %.2f %%' % (100.*(sys.nxlinks / sys.total_possible_xlinks)))
+        print('Cross-link density: %.2f %%' % (100. * (sys.nxlinks / sys.total_possible_xlinks)))
         print('Total radicals terminated: %.2d' % len(sys.terminated_radicals))
         print('Total radicals left in system: %d' % len(sys.radicals))
         print('Percent terminated: %.2f' % (100 * len(sys.terminate) / sys.total_possible_terminated))
 
-        if args.save_intermediates and sys.iteration % args.save_frequency == 0:
+        if params['save_intermediates'] and sys.iteration % params['save_frequency'] == 0:
             save_intermediates(['em.gro', 'nvt.gro', 'assembly.itp'], sys.iteration)
 
         if len(sys.bond_chain1) > 0:
@@ -891,12 +896,145 @@ if __name__ == "__main__":
     sys.identify_terminated(rad_term_frac=1)  # terminate all radicals
     sys.remove_virtual_sites()
     sys.define_topology()
-    sys.cleanup(out=args.output_gro)
+    sys.cleanup(out=params['output_gro'])
     print('Done!')
 
-    print('Energy minimizing %s...' % args.output_gro, end='', flush=True)
-    gromacs.simulate(args.mdp_em, args.topname, args.output_gro, args.output_gro.split('.')[0], mpi=args.parallelize,
-                     nprocesses=args.nproc)
+    print('Energy minimizing %s...' % params['output_gro'], end='', flush=True)
+    gromacs.simulate(params['mdp_em'], params['topname'], params['output_gro'], params['output_gro'].split('.')[0],
+                     mpi=params['parallelize'], nprocesses=params['nproc'])
     print('Done!')
 
     print('Finished cross-linking in %.2f seconds' % (time.time() - start))
+
+
+if __name__ == "__main__":
+
+    args = initialize().parse_args()
+    # print(type(vars(args)))
+    # exit()
+
+    os.environ["GMX_MAXBACKUP"] = "-1"  # stop GROMACS from making backups
+
+    crosslink(vars(args))
+
+    # start = time.time()
+    # initial_message = '# Cross-linking %s #' % args.initial
+    # print('#'*len(initial_message))
+    # print(initial_message)
+    # print('#'*len(initial_message))
+    #
+    # # if needed
+    # dt_short = 0.0005  # simulation time step (ps) (unstable if timestep is too large)
+    # length_short = .025  # (integer for now, so this is as low as it goes) length of short nvt simulation in picoseconds
+    #
+    # # get the system ready for cross-linking
+    # # Add dummy atoms create topology for entire assembly
+    # print('Initializing system and adding dummy atoms...', end='', flush=True)
+    # sys = System(args.initial, args.residue, args.dummy_residue, dummy_name=args.dummy_name,
+    #              radical_reaction_percentage=args.rad_percent, reaction_percentage=args.percent,
+    #              radical_termination_fraction=args.rad_frac_term)
+    # print('Done!\n%s created' % args.dummy_name)
+    #
+    # print('Generating input files: %s, %s, %s and %s...' % (args.xlink_top_name, args.topname, args.mdp_em,
+    #       args.mdp_nvt),  end='', flush=True)
+    # sys.write_assembly_topology()
+    #
+    # # generate input files that will be used throughtout cross-linking process
+    # full_top = SystemTopology(args.dummy_name, ff=args.forcefield, xlink=True, xlinked_top_name=args.xlink_top_name)  # topology with other residues and forcefield
+    # full_top.write_top(name=args.topname)
+    # mdpshort = SimulationMdp(args.dummy_name, T=args.temperature, em_steps=args.em_steps, time_step=args.dt,
+    #     length=args.length, p_coupling='semiisotropic', barostat='berendsen', genvel='yes', restraints=False,
+    #                          xlink=True, bcc=False)
+    # mdpshort.write_em_mdp(out='%s' % args.mdp_em.split('.')[0])
+    # mdpshort.write_nvt_mdp(out='%s' % args.mdp_nvt.split('.')[0])
+    #
+    # # TODO: I'm not sure the short time step NVT simulation is used (or needed)
+    # mdpshort = SimulationMdp(args.dummy_name, T=args.temperature, em_steps=args.em_steps, time_step=dt_short,
+    #     length=length_short, p_coupling='semiisotropic', barostat='berendsen', genvel='yes', restraints=False,
+    #                          xlink=True, bcc=False)
+    # mdpshort.write_nvt_mdp(out='nvt_short')
+    # print('Done!')
+    #
+    # # energy minimize starting configuration to get dummies in the right place
+    # print('Energy minimizing %s...' % args.dummy_name, end='', flush=True)
+    # gromacs.simulate(args.mdp_em, args.topname, args.dummy_name, 'em_%s' % args.dummy_name.split('.')[0],
+    #                  mpi=args.parallelize, nprocesses=args.nproc, dd=args.domain_decomposition)
+    # print('Done!')
+    #
+    # # Rest of iterations
+    # stagnated_iterations = 0  # number of iterations without forming a cross-link
+    # while (len(sys.terminate) / sys.total_possible_terminated) < (args.density / 100.) and stagnated_iterations < \
+    #         args.stagnation:
+    #
+    #     #### FOR TESTING ####
+    #     # sys.iteration = 2
+    #     # lists = np.load('radicals.npz')
+    #     # sys.radicals = list(lists['radicals'])
+    #     # sys.terminate = list(lists['term'])
+    #     #####################
+    #
+    #     print('-'*80)
+    #     print('Iteration: %d' % sys.iteration)
+    #
+    #     if sys.iteration > 1:
+    #         # update coordinates
+    #         sys.reload_coordinates('nvt.gro')
+    #         sys.update_lists()
+    #
+    #     print('Choosing atoms and cross-linking them...', end='', flush=True)
+    #     sys.select_eligible_carbons()
+    #     sys.bond()
+    #     sys.write_assembly_topology()  # re-write assembly topology
+    #     print('Done!')
+    #     print('Total new bonds: %d' % len(sys.bond_chain1))
+    #     np.savez_compressed('radicals', radicals=sys.radicals, term=sys.terminate)
+    #
+    #     # energy minimize then run short NVT simulation
+    #     print('Energy minimizing new cross-links...', end='', flush=True)
+    #     if sys.iteration == 1:
+    #         gromacs.simulate(args.mdp_em, args.topname, 'em_%s' % args.dummy_name, 'em', mpi=args.parallelize,
+    #                          nprocesses=args.nproc, dd=args.domain_decomposition)
+    #     else:
+    #         gromacs.simulate(args.mdp_em, args.topname, 'nvt.gro', 'em', mpi=args.parallelize, nprocesses=args.nproc,
+    #                          dd=args.domain_decomposition)
+    #     print('Done!')
+    #
+    #     print('Running %.1f ps NVT simulation...' % args.length, end='', flush=True)
+    #     gromacs.simulate(args.mdp_nvt, args.topname, 'em.gro', 'nvt', mpi=args.parallelize, nprocesses=args.nproc,
+    #                      dd=args.domain_decomposition)
+    #     print('Done!')
+    #
+    #     print('\nTotal new cross-links: %d' % len(sys.bond_chain1))
+    #     print('Total system cross-links: %d' % sys.nxlinks)
+    #     print('Cross-link density: %.2f %%' % (100.*(sys.nxlinks / sys.total_possible_xlinks)))
+    #     print('Total radicals terminated: %.2d' % len(sys.terminated_radicals))
+    #     print('Total radicals left in system: %d' % len(sys.radicals))
+    #     print('Percent terminated: %.2f' % (100 * len(sys.terminate) / sys.total_possible_terminated))
+    #
+    #     if args.save_intermediates and sys.iteration % args.save_frequency == 0:
+    #         save_intermediates(['em.gro', 'nvt.gro', 'assembly.itp'], sys.iteration)
+    #
+    #     if len(sys.bond_chain1) > 0:
+    #         stagnated_iterations = 0
+    #     else:
+    #         stagnated_iterations += 1
+    #
+    #     # update log
+    #     sys.update_log()
+    #     sys.iteration += 1
+    #
+    # print('Removing remaining dummy atoms from .gro and .itp files...', end='', flush=True)
+    # sys.reload_coordinates('nvt.gro')
+    # sys.update_lists()
+    # sys.identify_terminated(rad_term_frac=1)  # terminate all radicals
+    # sys.remove_virtual_sites()
+    # sys.define_topology()
+    # sys.cleanup(out=args.output_gro)
+    # print('Done!')
+    #
+    # print('Energy minimizing %s...' % args.output_gro, end='', flush=True)
+    # gromacs.simulate(args.mdp_em, args.topname, args.output_gro, args.output_gro.split('.')[0], mpi=args.parallelize,
+    #                  nprocesses=args.nproc)
+    # print('Done!')
+    #
+    # print('Finished cross-linking in %.2f seconds' % (time.time() - start))
