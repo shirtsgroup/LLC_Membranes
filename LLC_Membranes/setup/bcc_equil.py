@@ -134,11 +134,11 @@ class EquilibrateBCC(topology.LC):
         self.system = BicontinuousCubicBuild(self.build_monomer, self.space_group, self.period, self.weight_percent,
                                              self.density)
 
-        self.system.gen_grid(grid_points)
+        self.system.gen_grid(grid_points, self.curvature)
 
         self.system.determine_monomer_placement(r=r)
 
-        self.system.place_monomers(shift=self.shift, curvature=self.curvature)
+        self.system.place_monomers(shift=self.shift)
 
         self.system.reorder()
 
