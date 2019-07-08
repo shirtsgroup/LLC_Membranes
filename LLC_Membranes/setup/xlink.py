@@ -716,10 +716,10 @@ class System(Topology):
             f.write('| Serial indices of terminated radicals |\n')
             f.write('+------+------+-------------------------+\n')
             for i, x in enumerate(self.terminated_radicals):
-                if i % 10 == 0:
-                    f.write('{:>5d}\n'.format(x))
+                if i != 0 and i % 10 == 0 or i + 1 == len(self.terminated_radicals):
+                    f.write('{:>6d}\n'.format(x))
                 else:
-                    f.write('{:>5d}'.format(x))
+                    f.write('{:>6d}'.format(x))
             f.write('Total radicals left in system: %d\n' % len(self.radicals))
             f.write('Percent terminated: %.2f %%\n' % (100 * len(self.terminate) / (self.total_possible_terminated)))
             f.write('%s\n' % (80*'-'))

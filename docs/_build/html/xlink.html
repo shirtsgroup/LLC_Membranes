@@ -227,7 +227,8 @@ the user will have to define any undefined reactions.</p>
                 <span class="p">[</span><span class="o">-</span><span class="n">res</span> <span class="n">RESIDUE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">resd</span> <span class="n">DUMMY_RESIDUE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">density</span> <span class="n">DENSITY</span><span class="p">]</span>
                 <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PERCENT</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">rad_percent</span> <span class="n">RAD_PERCENT</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">out</span> <span class="n">OUTPUT_GRO</span><span class="p">]</span>
                 <span class="p">[</span><span class="o">-</span><span class="n">rad_frac_term</span> <span class="n">RAD_FRAC_TERM</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">stagnation</span> <span class="n">STAGNATION</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">mpi</span><span class="p">]</span>
-                <span class="p">[</span><span class="o">-</span><span class="n">np</span> <span class="n">NPROC</span><span class="p">]</span>
+                <span class="p">[</span><span class="o">-</span><span class="n">np</span> <span class="n">NPROC</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">dd</span> <span class="n">DOMAIN_DECOMPOSITION</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span><span class="p">]</span>
+                <span class="p">[</span><span class="o">-</span><span class="n">sf</span> <span class="n">SAVE_FREQUENCY</span><span class="p">]</span>
 </pre></div>
 </div>
 <div class="section" id="Named Arguments">
@@ -369,6 +370,24 @@ the user will have to define any undefined reactions.</p>
 <kbd>-np, &#8211;nproc</kbd></td>
 <td><p class="first">Number of processess to run in parallel (numberof GPUs on Bridges and Summit)</p>
 <p class="last">Default: 4</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-dd, &#8211;domain_decomposition</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">xyz dimensions of domain decomposition grid. This may need to be adjusted if there are issues with mdrun. The productof these values should equal the number of processes (np)</p>
+<p class="last">Default: [2, 2, 1]</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-s, &#8211;save_intermediates</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">Save intermediate topology and energyminimized structures in a folder called <cite>intermediates</cite>.</p>
+<p class="last">Default: False</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-sf, &#8211;save_frequency</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">Number of iterations between saves</p>
+<p class="last">Default: 1</p>
 </td></tr>
 </tbody>
 </table>

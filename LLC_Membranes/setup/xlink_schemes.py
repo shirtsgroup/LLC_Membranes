@@ -48,16 +48,16 @@ class DieneScheme:
         :type monomer: str
 
         Attributes:
-            monomer: a class defining the constituent atoms. The name of the class is the same as the monomer
+            **monomer**: a class defining the constituent atoms. The name of the class is the same as the monomer
 
-            weights: dictionary with the relative weights of one type of reaction. For example, a C1 and C2 atom may
-            be chosen to bond but there may be multiple types of addition (e.g. head-to-tail and 1,4 addition)
+            **weights**: dictionary with the relative weights of one type of reaction. For example, a C1 and C2 atom \
+            may be chosen to bond but there may be multiple types of addition (e.g. head-to-tail and 1,4 addition)
 
-            reaction_weights: the relative weights of all types of reactions. For example, a C1 and C2 may be eligible
-            to react and perhaps another C2 is eligible to react with a C3. These weights control the number of each
-            type of distinct reaction so that head-to-tail dominates over 13 addition for example.
+            **reaction_weights**: the relative weights of all types of reactions. For example, a C1 and C2 may be \
+            eligible to react and perhaps another C2 is eligible to react with a C3. These weights control the number \
+            of each type of distinct reaction so that head-to-tail dominates over 13 addition for example.
 
-            radical_reaction_weights: the same as reaction weights, but applied to the radical reactions.
+            **radical_reaction_weights**: the same as reaction weights, but applied to the radical reactions.
         """
 
         self.monomer = getattr(importlib.import_module("LLC_Membranes.setup.xlink_schemes"), '%s' % monomer)()
@@ -339,7 +339,7 @@ class Dibrpyr14:
         """ Define monomer attributes necessary for cross-linking
         TODO: clean this up! Some attributes can be combined or written more intuitively
         Attributes:
-            chains: a dictionary of dictionaries of the form {'a': {'C': 'C1', 'C1': 'C2 ...}, 'b': {'C45': 'C1, \
+            **chains**: a dictionary of dictionaries of the form {'a': {'C': 'C1', 'C1': 'C2 ...}, 'b': {'C45': 'C1, \
             'C44': 'C2' ...}}. This monomer contains two alkane chain tails. 'a' and 'b' are labels referring to each \
             chain respectively. Each sub-dictionary is used to map the names of relevant monomer atoms to generalized \
             atom names that are recognized by the reaction schemes. For a diene tail, C1 refers to the terminal carbon \
@@ -348,37 +348,37 @@ class Dibrpyr14:
             sub-dictionary. The keys are the names of the carbon atoms in the context of the monomer, so the names as \
             they appear in the .gro file. Take a look at Dibrpyr14.gro if this is still unclear.
 
-            nchains: the number of chains that a monomer has. This makes code more readable elsewhere
+            **nchains**: the number of chains that a monomer has. This makes code more readable elsewhere
 
-            chain_numbers: Each chain should have its own number starting from 0. This is used to determine whether a \
-            given chain has already been involved in a reaction.
+            **chain_numbers**: Each chain should have its own number starting from 0. This is used to determine \
+            whether a given chain has already been involved in a reaction.
 
-            indices: this dictionary of dictionaries stores the indices of relevant monomer atoms in the context of a \
-            single monomer. It is constructed in a similar way to self.chains, but the generalized carbon atoms names \
-            are the keys (instead of the values) and the index is the index of generalized carbon atom. For example, \
-            C1 in chain 'b' is index 49, meaning it is the 50th atom in the topology file for a single Dibrpyr14 \
-            residue. (See Dibrpyr14.gro or Dibrpyr14.itp to confirm this and all other entries). The indices include \
-            those corresponding to the dummy atoms (D1, D2, D3, D4).
+            **indices**: this dictionary of dictionaries stores the indices of relevant monomer atoms in the context \
+            of a single monomer. It is constructed in a similar way to self.chains, but the generalized carbon atoms \
+            names are the keys (instead of the values) and the index is the index of generalized carbon atom. For \
+            example, C1 in chain 'b' is index 49, meaning it is the 50th atom in the topology file for a single \
+            Dibrpyr14 residue. (See Dibrpyr14.gro or Dibrpyr14.itp to confirm this and all other entries). The indices \
+            include those corresponding to the dummy atoms (D1, D2, D3, D4).
 
-            dummy_connectivity: this dictionary of dictionaries defines the connectivity between carbon atoms and the \
-            dummy atoms. For each chain, the sub-dictionary contains the name of each carbon atom (in the context of \
-            the monomer) as keys and the generalized name of the attached dummy atom as the value. In general, for the \
-            diene reaction, D1 is attached to C1, D2 to C2 and so on.
+            **dummy_connectivity**: this dictionary of dictionaries defines the connectivity between carbon atoms and \
+            the dummy atoms. For each chain, the sub-dictionary contains the name of each carbon atom (in the context \
+            of the monomer) as keys and the generalized name of the attached dummy atom as the value. In general, for \
+            the diene reaction, D1 is attached to C1, D2 to C2 and so on.
 
-            hydrogen_connectivity: similar to dummy_connectivity, this defines which hydrogen atoms are bonded to \
+            **hydrogen_connectivity**: similar to dummy_connectivity, this defines which hydrogen atoms are bonded to \
             which carbon. This dictionary does not distinguish between chains. Each key is the name of a carbon atom, \
             as you'd find in the corresponding Dibrpyr14 .gro or .itp file, with a list of generalized hydrogen atoms \
             that are attached to that carbon.
 
-            dummy_mass: the mass of the dummy atom (hydrogen)
+            **dummy_mass**: the mass of the dummy atom (hydrogen)
 
-            carbons: a dictionary with keys that are the generalized carbon atom names and values that are a list of \
-            the actual carbon atom names as you'd find them in the .gro or .itp file.
+            **carbons**: a dictionary with keys that are the generalized carbon atom names and values that are a list \
+            of the actual carbon atom names as you'd find them in the .gro or .itp file.
 
-            bonds_with: a list of carbon pairs. Each sub-list contains two lists: a list of carbon atoms in the 1st \
-            entry that can bond with carbon atoms in the second list entry.
+            **bonds_with**: a list of carbon pairs. Each sub-list contains two lists: a list of carbon atoms in the \
+            1st entry that can bond with carbon atoms in the second list entry.
 
-            impropers: a dictionary of dictionaries. Each sub-dictionary refers to a chain. The sub-directories \
+            **impropers**: a dictionary of dictionaries. Each sub-dictionary refers to a chain. The sub-directories \
             contain keys corresponding to each carbon atom. Each value is a list of atoms that make up the improper \
             dihedral which holds the originally sp2 carbon in a planar configuration. When an sp2 carbon is converted \
             to sp3, the improper must be removed. The order of the improper is written in the same way that you'd find \

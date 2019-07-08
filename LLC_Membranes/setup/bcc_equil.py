@@ -33,7 +33,7 @@ def initialize():
                              'positive mean curvature respectively.')
     parser.add_argument('-wt', '--weight_percent', default=77.1, type=float, help='Weight %% of monomer in membrane')
     parser.add_argument('-sol', '--solvent', default='GLY', type=str, help='Name of solvent residue mixed with monomer')
-    parser.add_argument('-shift', '--shift', default=1, type=float, help='Shift position of head group shift units in'
+    parser.add_argument('-shift', '--shift', default=0, type=float, help='Shift position of head group shift units in'
                         'the direction opposite of the normal vector at that point')
     parser.add_argument('-res', '--residue', default='MOL', help='Name of residue corresponding to build monomer')
     parser.add_argument('-resd', '--dummy_residue', default='MOLd', help='Name of residue to be cross-linked with '
