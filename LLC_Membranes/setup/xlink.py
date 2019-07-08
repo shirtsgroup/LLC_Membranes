@@ -54,6 +54,9 @@ def initialize():
     parser.add_argument('-mpi', '--parallelize', action="store_true", help='specify true if running with MPI or GPU')
     parser.add_argument('-np', '--nproc', default=4, type=int, help='Number of processess to run in parallel (number'
                                                                     'of GPUs on Bridges and Summit)')
+    parser.add_argument('-dd', '--domain_decomposition', default=[2, 2, 1], help='xyz dimensions of domain '
+                        'decomposition grid. This may need to be adjusted if there are issues with mdrun. The product'
+                        'of these values should equal the number of processes (np)')
 
     # save options
     parser.add_argument('-s', '--save_intermediates', action="store_true", help='Save intermediate topology and energy'
@@ -815,10 +818,10 @@ if __name__ == "__main__":
     print('Done!')
 
     # energy minimize starting configuration to get dummies in the right place
-    # print('Energy minimizing %s...' % args.dummy_name, end='', flush=True)
-    # gromacs.simulate(args.mdp_em, args.topname, args.dummy_name, 'em_%s' % args.dummy_name.split('.')[0],
-    #                  mpi=args.parallelize, nprocesses=args.nproc)
-    # print('Done!')
+    print('Energy minimizing %s...' % args.dummy_name, end='', flush=True)
+    gromacs.simulate(args.mdp_em, args.topname, args.dummy_name, 'em_%s' % args.dummy_name.split('.')[0],
+                     mpi=args.parallelize, nprocesses=args.nproc, dd=args.domain_decomposition)
+    print('Done!')
 
     # Rest of iterations
     stagnated_iterations = 0  # number of iterations without forming a cross-link
@@ -852,13 +855,15 @@ if __name__ == "__main__":
         print('Energy minimizing new cross-links...', end='', flush=True)
         if sys.iteration == 1:
             gromacs.simulate(args.mdp_em, args.topname, 'em_%s' % args.dummy_name, 'em', mpi=args.parallelize,
-                             nprocesses=args.nproc)
+                             nprocesses=args.nproc, dd=args.domain_decomposition)
         else:
-            gromacs.simulate(args.mdp_em, args.topname, 'nvt.gro', 'em', mpi=args.parallelize, nprocesses=args.nproc)
+            gromacs.simulate(args.mdp_em, args.topname, 'nvt.gro', 'em', mpi=args.parallelize, nprocesses=args.nproc,
+                             dd=args.domain_decomposition)
         print('Done!')
 
         print('Running %.1f ps NVT simulation...' % args.length, end='', flush=True)
-        gromacs.simulate(args.mdp_nvt, args.topname, 'em.gro', 'nvt', mpi=args.parallelize, nprocesses=args.nproc)
+        gromacs.simulate(args.mdp_nvt, args.topname, 'em.gro', 'nvt', mpi=args.parallelize, nprocesses=args.nproc,
+                         dd=args.domain_decomposition)
         print('Done!')
 
         print('\nTotal new cross-links: %d' % len(sys.bond_chain1))

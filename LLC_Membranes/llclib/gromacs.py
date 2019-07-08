@@ -9,11 +9,36 @@ import os
 script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
-def simulate(mdp, top, gro, out, verbose=False, em_energy=False, mpi=False, nprocesses=4):
+def simulate(mdp, top, gro, out, verbose=False, em_energy=False, mpi=False, nprocesses=4, dd=None):
+    """ A wrapper for running GROMACS molecular dynamics simulations
+
+    :param mdp: name of GROMACS Molecular Dynamics Paramters (mdp) file
+    :param top: name of GROMACS topology (.top)
+    :param gro: name of GROMACS coordinate file (.gro)
+    :param out: name of output simulation files
+    :param verbose: if True, prints simulation output to the screen
+    :param em_energy: if this is an energy minimzation and this argument is True, return the final total energy
+    :param mpi: if True, run simulation in parallel using MPI
+    :param nprocesses: number of MPI process for an MPI simulation
+    :param dd: domain decomposition grid for parallelization. If this is not specified, GROMACS decides (which usually
+    works)
+
+    :type mdp: str
+    :type top: str
+    :type gro: str
+    :type out: str
+    :type verbose: bool
+    :type em_energy: bool
+    :type mpi: bool
+    :type nprocesses: int
+    :type dd: list
+    """
 
     gmx = "gmx"
     if mpi:
         gmx = "mpirun -np %d gmx_mpi" % nprocesses
+        if dd:
+            gmx += '-dd %s %s %s' % tuple(dd)
 
     grompp = '%s grompp -f %s -c %s -p %s -o %s' % (gmx, mdp, gro, top, out)
 
