@@ -118,7 +118,7 @@ class EquilibrateBCC(topology.LC):
         self.mpi = mpi
         self.nprocesses = nprocesses
 
-    def build_initial_config(self, grid_points=50, r=0.5, name='initial.gro'):
+    def build_initial_config(self, grid_points=50, r=0.4, name='initial.gro'):
         """ Build an initial configuration with parameters specified in the __init__ function
 
         :param grid_points: number of grid points to use when approximating implicit surface
