@@ -690,6 +690,7 @@ class System(Topology):
 
         self.initiators = []  # bad name for this. It's really just dummy atoms that become real
         self.rm_impropers = []
+        self.terminated_radicals = []
 
     def update_log(self):
 
@@ -706,17 +707,19 @@ class System(Topology):
             f.write('+-----------------------------------+\n')
             f.write('| Serial indices of new cross-links |\n')
             f.write('+------+------+---------------------+\n')
-            f.write('|{:^6}|{:^6}|\n'.format('chain1', 'chain2'))
+            f.write('|{:^6}|{:^6}|{:^21}|\n'.format('chain1', 'chain2', 'Reaction Type'))
             f.write('+------+------+\n')
             for i, x in enumerate(self.bond_chain1):
-                f.write('{:>5d} -- {:<5d}  %s\n'.format(x, self.bond_chain2[i], self.reaction_type[i]))
+                f.write('{:>5d} -- {:<5d}  {}\n'.format(x, self.bond_chain2[i], self.reaction_type[i]))
             f.write('Total radicals terminated: %.2d\n' % len(self.terminated_radicals))
             f.write('+---------------------------------------+\n')
             f.write('| Serial indices of terminated radicals |\n')
             f.write('+------+------+-------------------------+\n')
-            f.write('|{:^6}|{:^6}|\n'.format('chain1', 'chain2'))
-            for x in self.terminated_radicals:
-                f.write('{:>5d}\n'.format(x))
+            for i, x in enumerate(self.terminated_radicals):
+                if i % 10 == 0:
+                    f.write('{:>5d}\n'.format(x))
+                else:
+                    f.write('{:>5d}'.format(x))
             f.write('Total radicals left in system: %d\n' % len(self.radicals))
             f.write('Percent terminated: %.2f %%\n' % (100 * len(self.terminate) / (self.total_possible_terminated)))
             f.write('%s\n' % (80*'-'))
@@ -822,11 +825,11 @@ def crosslink(params):
     print('Done!')
 
     # energy minimize starting configuration to get dummies in the right place
-    print('Energy minimizing %s...' % params['dummy_name'], end='', flush=True)
-    gromacs.simulate(params['mdp_em'], params['topname'], params['dummy_name'],
-                     'em_%s' % params['dummy_name'].split('.')[0], mpi=params['parallelize'],
-                     nprocesses=params['nproc'], dd=params['domain_decomposition'])
-    print('Done!')
+    # print('Energy minimizing %s...' % params['dummy_name'], end='', flush=True)
+    # gromacs.simulate(params['mdp_em'], params['topname'], params['dummy_name'],
+    #                  'em_%s' % params['dummy_name'].split('.')[0], mpi=params['parallelize'],
+    #                  nprocesses=params['nproc'], dd=params['domain_decomposition'])
+    # print('Done!')
 
     # Rest of iterations
     stagnated_iterations = 0  # number of iterations without forming a cross-link

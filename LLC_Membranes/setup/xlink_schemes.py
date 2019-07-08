@@ -63,9 +63,9 @@ class DieneScheme:
         self.monomer = getattr(importlib.import_module("LLC_Membranes.setup.xlink_schemes"), '%s' % monomer)()
 
         # keys: type of carbon carbon bond; values: dict with (keys: name of reaction, values: likelihood of reaction)
-        self.weights = {'C1-C2': {'head2tail': 1., 'head2head': 0},
+        self.weights = {'C1-C2': {'head2tail': 0.5, 'head2head': 0.5},
                         'C1-C2_radical': {'radical_c2': 1}}  # probabilities must sum to 1
-        self.reaction_weights = {'head2tail': 1., '14addition': 0, '13addition': 0}
+        self.reaction_weights = {'head2tail': 0.5, 'head2head': 0.5, '13addition': 0}
         self.radical_reaction_weights = {'radical_c2': 1.}
 
     def determine_chains(self, c):
@@ -124,8 +124,12 @@ class DieneScheme:
 
             return self.terminate(atoms)
 
+        elif reaction_type == 'head2head':
+
+            return self.head2head(atoms)
+
         else:
-            raise UndefinedReactionError('Reaction %s Undefined' % reaction_type)  # replace with custom exception
+            raise UndefinedReactionError('Reaction %s undefined' % reaction_type)  # replace with custom exception
 
     def head2tail(self, atoms):
         """ Define the head-to-tail addition of the terminal double bonds (c1 -- c2)
@@ -192,7 +196,7 @@ class DieneScheme:
 
         :return: atom indices and their corresponding types after reaction
         """
-        # TODO: I haven't even started this!
+
         c1, c2 = atoms.keys()
         c1_ndx, c2_ndx = atoms.values()
 
@@ -204,8 +208,8 @@ class DieneScheme:
 
         types = {'chain1': {'C1': 'c3', 'C2': 'c2', 'C3': 'c2', 'C4': 'c2', 'H1': 'hc', 'H2': 'hc', 'H3': 'ha',
                             'H4': 'ha', 'H5': 'ha'},
-                 'chain2': {'C1': 'c3', 'C2': 'c3', 'C3': 'c2', 'C4': 'c2', 'H1': 'hc', 'H2': 'hc', 'H3': 'hc',
-                            'H4': 'ha', 'H5': 'ha', 'D1': 'hc'}}
+                 'chain2': {'C1': 'c3', 'C2': 'c2', 'C3': 'c2', 'C4': 'c3', 'H1': 'hc', 'H2': 'hc', 'H3': 'ha',
+                            'H4': 'ha', 'H5': 'hc', 'D4': 'hc'}}
 
         # update types
         reacted_types = {'chain1': {c1_ndx + self.monomer.indices[chain1][a]: types['chain1'][a] for a in
@@ -214,18 +218,13 @@ class DieneScheme:
                                     types['chain2'].keys()}}
 
         # update bonds - 1 new bond between dummy atoms and carbon
-        dummy_bonds = [[c2_ndx + self.monomer.indices[chain2]['C1'], c2_ndx + self.monomer.indices[chain2]['D1']]]
+        dummy_bonds = [[c2_ndx + self.monomer.indices[chain2]['C4'], c2_ndx + self.monomer.indices[chain2]['D4']]]
 
         # define indices of left-over radicals
         radicals = [c1_ndx + self.monomer.indices[chain1]['C2']]
 
-        # define which improper dihedrals to remove -- written in same order as .itp file!!!
-        # note that the order of the atoms may be different for each chain
-        # impropers = {'a': {1: ['H2', 'C1', 'H1', 'C2'], 2: ['C1', 'C3', 'C2', 'H3']},
-        #              'b': {1: ['C2', 'H2', 'C1', 'H1'], 2: ['C1', 'C3', 'C2', 'H3']}}
-
         chain1_impropers = ['C1']  # [1]
-        chain2_impropers = ['C1', 'C2']  # [1, 2]
+        chain2_impropers = ['C1', 'C4']  # [1, 2]
         rm_improper = []
         for c in chain1_impropers:
             rm_improper.append([c1_ndx + self.monomer.indices[chain1][x] for x in self.monomer.impropers[chain1][c]])
@@ -233,8 +232,8 @@ class DieneScheme:
             rm_improper.append([c2_ndx + self.monomer.indices[chain2][x] for x in self.monomer.impropers[chain2][c]])
 
         # define terminated atoms
-        terminated = [c1_ndx + self.monomer.indices[chain1]['C1'], c2_ndx + self.monomer.indices[chain2]['C2'], c2_ndx +
-                      self.monomer.indices[chain2]['C1']]
+        terminated = [c1_ndx + self.monomer.indices[chain1]['C1'], c2_ndx + self.monomer.indices[chain2]['C1'],
+                      c2_ndx + self.monomer.indices[chain2]['C2']]  # C2 terminated for now even though still alkene
 
         return reacted_types, dummy_bonds, radicals, rm_improper, terminated
 
@@ -385,9 +384,9 @@ class Dibrpyr14:
         """
 
         # names of atoms that make up relevant segements of each chain
-        self.chains = {'a': {'C': 'C1', 'C1': 'C2', 'C2': 'C3', 'C3': 'C4', 'H': 'H1', 'H1': 'H2', 'H2': 'H3',
-                             'H3': 'H4', 'H4': 'H5'},
-                       'b': {'C45': 'C1', 'C44': 'C2', 'C43': 'C3', 'C42': 'C4', 'H81': 'H1', 'H80': 'H2',
+        self.chains = {'a': {'C': 'C1', 'C1': 'C2', 'C2': 'C3', 'C3': 'C4', 'C4': 'C5', 'H': 'H1', 'H1': 'H2',
+                             'H2': 'H3', 'H3': 'H4', 'H4': 'H5'},
+                       'b': {'C45': 'C1', 'C44': 'C2', 'C43': 'C3', 'C42': 'C4', 'C41': 'C5', 'H81': 'H1', 'H80': 'H2',
                              'H79': 'H3', 'H78': 'H4', 'H77': 'H5'}
                        }
 
@@ -399,10 +398,10 @@ class Dibrpyr14:
         #                       'H4': 'ha', 'H5': 'ha'}
 
         # all indices numbered from 0. D1, D2, ... correspond to dummies attached to C1, C2, ... respectively
-        self.indices = {'a': {'C1': 0, 'C2': 1, 'C3': 2, 'C4': 3, 'H1': 52, 'H2': 53, 'H3': 54, 'H4': 55, 'H5': 56,
-                              'D1': 136, 'D2': 137, 'D3': 138, 'D4': 139},
-                        'b': {'C1': 49, 'C2': 48, 'C3': 47, 'C4': 46, 'H1': 133, 'H2': 132, 'H3': 131, 'H4': 130,
-                              'H5': 129, 'D1': 140, 'D2': 141, 'D3': 142, 'D4': 143}
+        self.indices = {'a': {'C1': 0, 'C2': 1, 'C3': 2, 'C4': 3, 'C5': 4, 'H1': 52, 'H2': 53, 'H3': 54, 'H4': 55,
+                              'H5': 56, 'D1': 136, 'D2': 137, 'D3': 138, 'D4': 139},
+                        'b': {'C1': 49, 'C2': 48, 'C3': 47, 'C4': 46, 'C5': 45, 'H1': 133, 'H2': 132, 'H3': 131,
+                              'H4': 130, 'H5': 129, 'D1': 140, 'D2': 141, 'D3': 142, 'D4': 143}
                         }
 
         self.dummy_connectivity = {'a': {'C': 'D1', 'C1': 'D2', 'C2': 'D3', 'C3': 'D4'},
@@ -424,6 +423,6 @@ class Dibrpyr14:
         # note that the order of the atoms may be different for each chain
         # NOTE: C3 not tested
         self.impropers = {'a': {'C1': ['H2', 'C1', 'H1', 'C2'], 'C2': ['C1', 'C3', 'C2', 'H3'],
-                          'C3': ['C4', 'C2', 'C3', 'H4']},
+                          'C3': ['C4', 'C2', 'C3', 'H4'], 'C4': ['C5', 'C3', 'C4', 'H5']},
                           'b': {'C1': ['C2', 'H2', 'C1', 'H1'], 'C2': ['C1', 'C3', 'C2', 'H3'],
-                          'C3': ['C4', 'C2', 'C3', 'H4']}}
+                          'C3': ['C4', 'C2', 'C3', 'H4'], 'C4': ['C5', 'C3', 'C4', 'H5']}}
