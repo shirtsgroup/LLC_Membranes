@@ -161,19 +161,17 @@ class DieneScheme:
                          'chain2': {c2_ndx + self.monomer.indices[chain2][a]: types['chain2'][a] for a in
                                     types['chain2'].keys()}}
 
-        # update bonds - 1 new bond between dummy atoms and carbon
-        dummy_bonds = [[c2_ndx + self.monomer.indices[chain2]['C1'], c2_ndx + self.monomer.indices[chain2]['D1']]]
+        # bond between carbons. Format [c1, c2, type]
+        bonds = [[c1_ndx + self.monomer.indices[chain1]['C1'], c2_ndx + self.monomer.indices[chain2]['C2'], 'carbon']]
+
+        # dummy bonds - 1 new bond between dummy atoms and carbon
+        bonds += [[c2_ndx + self.monomer.indices[chain2]['C1'], c2_ndx + self.monomer.indices[chain2]['D1'], 'dummy']]
 
         # define indices of left-over radicals
         radicals = [c1_ndx + self.monomer.indices[chain1]['C2']]
 
-        # define which improper dihedrals to remove -- written in same order as .itp file!!!
-        # note that the order of the atoms may be different for each chain
-        # impropers = {'a': {1: ['H2', 'C1', 'H1', 'C2'], 2: ['C1', 'C3', 'C2', 'H3']},
-        #              'b': {1: ['C2', 'H2', 'C1', 'H1'], 2: ['C1', 'C3', 'C2', 'H3']}}
-
-        chain1_impropers = ['C1']  # [1]
-        chain2_impropers = ['C1', 'C2']  # [1, 2]
+        chain1_impropers = ['C1']
+        chain2_impropers = ['C1', 'C2']
         rm_improper = []
         for c in chain1_impropers:
             rm_improper.append([c1_ndx + self.monomer.indices[chain1][x] for x in self.monomer.impropers[chain1][c]])
@@ -184,7 +182,7 @@ class DieneScheme:
         terminated = [c1_ndx + self.monomer.indices[chain1]['C1'], c2_ndx + self.monomer.indices[chain2]['C2'], c2_ndx +
                       self.monomer.indices[chain2]['C1']]
 
-        return reacted_types, dummy_bonds, radicals, rm_improper, terminated
+        return reacted_types, bonds, radicals, rm_improper, terminated
 
     def head2head(self, atoms):
         """ Define the head-to-head addition of the terminal double bonds (c1 -- c1). Note that this reaction actually
@@ -217,8 +215,11 @@ class DieneScheme:
                          'chain2': {c2_ndx + self.monomer.indices[chain2][a]: types['chain2'][a] for a in
                                     types['chain2'].keys()}}
 
-        # update bonds - 1 new bond between dummy atoms and carbon
-        dummy_bonds = [[c2_ndx + self.monomer.indices[chain2]['C4'], c2_ndx + self.monomer.indices[chain2]['D4']]]
+        # bond between carbons
+        bonds = [[c1_ndx + self.monomer.indices[chain1]['C1'], c2_ndx + self.monomer.indices[chain2]['C1'], 'carbon']]
+
+        # dummy bonds - 1 new bond between dummy atoms and carbon
+        bonds += [[c2_ndx + self.monomer.indices[chain2]['C4'], c2_ndx + self.monomer.indices[chain2]['D4'], 'dummy']]
 
         # define indices of left-over radicals
         radicals = [c1_ndx + self.monomer.indices[chain1]['C2']]
@@ -235,7 +236,7 @@ class DieneScheme:
         terminated = [c1_ndx + self.monomer.indices[chain1]['C1'], c2_ndx + self.monomer.indices[chain2]['C1'],
                       c2_ndx + self.monomer.indices[chain2]['C2']]  # C2 terminated for now even though still alkene
 
-        return reacted_types, dummy_bonds, radicals, rm_improper, terminated
+        return reacted_types, bonds, radicals, rm_improper, terminated
 
     def radical_c2(self, atoms):
         """ Define the reaction of a radical c2 with unreacted c1
@@ -268,8 +269,10 @@ class DieneScheme:
                          'chain2': {c2_ndx + self.monomer.indices[chain2][a]: types['chain2'][a]
                                     for a in types['chain2'].keys()}}
 
-        # update bonds - no new bonds between dummy atoms and carbon
-        dummy_bonds = []
+        # new bonds
+        bonds = [[c1_ndx + self.monomer.indices[chain1]['C1'], c2_ndx + self.monomer.indices[chain2]['C2'], 'carbon']]
+
+        # no dummy bonds to add
 
         # define indices of left-over radicals
         radicals = [c1_ndx + self.monomer.indices[chain1]['C2']]
@@ -285,7 +288,7 @@ class DieneScheme:
         # define terminated atoms
         terminated = [c1_ndx + self.monomer.indices[chain1]['C1'], c2_ndx + self.monomer.indices[chain2]['C2']]
 
-        return reacted_types, dummy_bonds, radicals, rm_improper, terminated
+        return reacted_types, bonds, radicals, rm_improper, terminated
 
     def terminate(self, atoms):
         """ Define the termination reaction. i.e. a dummy atom attaches to a radical carbon atoms. The hybridization of
@@ -318,7 +321,7 @@ class DieneScheme:
                                    for a in types['chain'].keys()}}
 
         # add dummy atom bond
-        dummy_bonds = [[c_ndx + self.monomer.indices[chain]['C2'], c_ndx + self.monomer.indices[chain]['D2']]]
+        bonds = [[c_ndx + self.monomer.indices[chain]['C2'], c_ndx + self.monomer.indices[chain]['D2'], 'dummy']]
 
         radicals = []
 
@@ -327,7 +330,7 @@ class DieneScheme:
         # define terminated atoms
         terminated = [c_ndx + self.monomer.indices[chain][c_name]]
 
-        return reacted_types, dummy_bonds, radicals, rm_improper, terminated
+        return reacted_types, bonds, radicals, rm_improper, terminated
 
 
 class Dibrpyr14:

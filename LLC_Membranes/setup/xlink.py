@@ -431,7 +431,6 @@ class System(Topology):
             self.t.xyz[..., 0] = self.t.xyz[..., 0] - self.t.xyz[..., 1]*np.cos(theta)
 
         if self.radicals:
-            # TODO: testing
             eligible_c_rad, eligible_rad = [], []
             for i, c in enumerate(self.chain1_atoms):
                 d = self.generate_ordered_distances(c + self.chain2_atoms[i], self.radicals)
@@ -464,7 +463,7 @@ class System(Topology):
         self.bond_chain2 += bonds[1]
 
         for i, x in enumerate(self.bond_chain1):
-            print(x, self.bond_chain2[i])
+            print(x, self.bond_chain2[i], self.reaction_type[i])
 
         # for i in range(len(bonds[0])):
         #     self.reaction_type.append('head2tail')
@@ -572,8 +571,8 @@ class System(Topology):
             c1_name = self.xlink_residue_atoms.name[x - 1]  # might be better to use self.atom_names
             c2_name = self.xlink_residue_atoms.name[self.bond_chain2[i] - 1]
 
-            # add chain1--chain2 bond
-            self.all_bonds.append([x, self.bond_chain2[i]])
+            # # add chain1--chain2 bond
+            # self.all_bonds.append([x, self.bond_chain2[i]])
 
             self.react(self.reaction_type[i], {c1_name: x, c2_name: self.bond_chain2[i]})
 
@@ -612,9 +611,10 @@ class System(Topology):
 
         # add bonds between dummy atoms (made real) and carbon atoms
         for b in bonds:
-            self.all_bonds.append(b)
-            self.xlink_residue_atoms.mass[b[1] - 1] = self.reaction.scheme.monomer.dummy_mass  # dummy always 2nd entry in b
-            self.initiators.append(b[1])  # The hydrogen dummy atoms are our 'initiators'.
+            self.all_bonds.append(b[:2])
+            if b[2] == 'dummy':
+                self.xlink_residue_atoms.mass[b[1] - 1] = self.reaction.scheme.monomer.dummy_mass  # dummy always 2nd entry in b
+                self.initiators.append(b[1])  # The hydrogen dummy atoms are our 'initiators'.
 
         # change atom types of newly bonded carbon and former dummy atoms
         for k in types.keys():
