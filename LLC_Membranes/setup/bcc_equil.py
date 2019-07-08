@@ -28,9 +28,9 @@ def initialize():
     parser.add_argument('-g', '--grid', default=50, type=int, help='Number of sections to break grid into when '
                                                                 'approximating the chosen implicit function')
     parser.add_argument('-dens', '--density', default=1.1, type=float, help='Density of system (g/cm3)')
-    parser.add_argument('-c', '--curvature', default=1, type=int,
-                        help='-1 : QI phase, 1, QII phase. Determines whether'
-                             'the phase is normal or inverted')
+    parser.add_argument('-c', '--curvature', default=1, type=float,
+                        help='mean curvature of the system. A value of 0, < 0 and > 0 correspond to zero, negative and'
+                             'positive mean curvature respectively.')
     parser.add_argument('-wt', '--weight_percent', default=77.1, type=float, help='Weight %% of monomer in membrane')
     parser.add_argument('-sol', '--solvent', default='GLY', type=str, help='Name of solvent residue mixed with monomer')
     parser.add_argument('-shift', '--shift', default=1, type=float, help='Shift position of head group shift units in'
@@ -380,39 +380,66 @@ if __name__ == "__main__":
 
     os.environ["GMX_MAXBACKUP"] = "-1"  # stop GROMACS from making backups
 
+    # equil = EquilibrateBCC(args.build_monomer, args.space_group, args.box_length, args.weight_percent, args.density,
+    #                        shift=args.shift, curvature=args.curvature, mpi=args.mpi, nprocesses=args.nprocesses)
+    #
+    # equil.build_initial_config(grid_points=args.grid, r=0.5)
+    # equil.scale_unit_cell(args.scale_factor)
+    #
+    # equil.generate_topology(name='topol.top')  # creates an output file
+    # equil.generate_mdps(length=50, frames=2, T=args.temperature)  # creates an object
+    # equil.mdp.write_em_mdp(out='em')
+    #
+    # nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
+    #                        nprocesses=args.nprocesses)  # mdp, top, gro, out
+    #
+    # while nrg >= 0:
+    #
+    #     equil.build_initial_config(grid_points=args.grid, r=0.5)
+    #     equil.scale_unit_cell(args.scale_factor)
+    #     nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
+    #                            nprocesses=args.nprocesses)
+    #
+    # cp = 'cp em.gro scaled_%.4f.gro' % args.scale_factor
+    # p = subprocess.Popen(cp.split())
+    # p.wait()
+    #
+    # equil.gro_name = 'scaled_%.4f.gro' % args.scale_factor
+    #
+    # # slowly compress system to correct density
+    # equil.shrink_unit_cell(args.scale_factor, 1.0, 0.1)  # EquilibrateBCC object, start, stop, step
+    #
+    # equil.add_solvent(args.solvent)
+    #
+    # # cross-linking
+    # params = vars(xlink.initialize().parse_args())  # get default arguments passed to xlink
+    # # modify certain params for this system.
+    # params['initial'] = equil.gro_name
+    # params['build_mon'] = args.build_monomer
+    # params['temperature'] = args.temperature
+    # params['residue'] = args.residue
+    # params['dummy_residue'] = args.dummy_residue
+    # params['parallelize'] = args.mpi
+    # params['nproc'] = args.nprocesses
+    # params['domain_decomposition'] = args.domain_decomposition
+    #
+    # xlink.crosslink(params)  # run cross-linking algorithm
+
+    # Can use this to continue from an expanded then shrunk initial configuration
     equil = EquilibrateBCC(args.build_monomer, args.space_group, args.box_length, args.weight_percent, args.density,
                            shift=args.shift, curvature=args.curvature, mpi=args.mpi, nprocesses=args.nprocesses)
 
     equil.build_initial_config(grid_points=args.grid, r=0.5)
-    equil.scale_unit_cell(args.scale_factor)
 
     equil.generate_topology(name='topol.top')  # creates an output file
     equil.generate_mdps(length=50, frames=2, T=args.temperature)  # creates an object
     equil.mdp.write_em_mdp(out='em')
 
-    nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
-                           nprocesses=args.nprocesses)  # mdp, top, gro, out
+    equil.gro_name = "scaled_1.0000.gro"
 
-    while nrg >= 0:
+    equil.add_solvent(args.solvent, scale=0.45)
 
-        equil.build_initial_config(grid_points=args.grid, r=0.5)
-        equil.scale_unit_cell(args.scale_factor)
-        nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
-                               nprocesses=args.nprocesses)
-
-    cp = 'cp em.gro scaled_%.4f.gro' % args.scale_factor
-    p = subprocess.Popen(cp.split())
-    p.wait()
-
-    equil.gro_name = 'scaled_%.4f.gro' % args.scale_factor
-
-    # slowly compress system to correct density
-    equil.shrink_unit_cell(args.scale_factor, 1.0, 0.1)  # EquilibrateBCC object, start, stop, step
-
-    equil.add_solvent(args.solvent)
-
-    # cross-linking
-    params = xlink.initialize().parse_args()  # get default arguments passed to xlink
+    params = vars(xlink.initialize().parse_args())  # get default arguments passed to xlink
     # modify certain params for this system.
     params['initial'] = equil.gro_name
     params['build_mon'] = args.build_monomer
@@ -425,17 +452,3 @@ if __name__ == "__main__":
 
     xlink.crosslink(params)  # run cross-linking algorithm
 
-
-    # Can use this to continue from an expanded then shrunk initial configuration
-    # equil = EquilibrateBCC(args.build_monomer, args.space_group, args.box_length, args.weight_percent, args.density,
-    #                        shift=args.shift, curvature=args.curvature, mpi=args.mpi, nprocesses=args.nprocesses)
-    #
-    # equil.build_initial_config(grid_points=args.grid, r=0.5)
-    #
-    # equil.generate_topology(name='topol.top')  # creates an output file
-    # equil.generate_mdps(length=50, frames=2, T=args.temperature)  # creates an object
-    # equil.mdp.write_em_mdp(out='em')
-    #
-    # equil.gro_name = "scaled_1.0000.gro"
-    #
-    # equil.add_solvent(args.solvent)

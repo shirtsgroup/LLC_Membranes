@@ -44,16 +44,16 @@ def initialize():
 
     # Bicontinuous cubic structure
     parser.add_argument('-g', '--grid', default=50, type=int, help='Number of sections to break grid into when '
-                                                                'approximating the chosen implicit function')
+                                                                   'approximating the chosen implicit function')
     parser.add_argument('-dens', '--density', default=1.1, type=float, help='Density of system (g/cm3)')
-    parser.add_argument('-c', '--curvature', default=1, type=int,
-                        help='1 : QI phase (negative mean curvature, convex interface), 1, QII phase (positive mean'
-                             'curvature, concave interface). Determines whether the phase is normal or inverted')
+    parser.add_argument('-c', '--curvature', default=1, type=float,
+                        help='> 0 : QI phase (positive mean curvature), < 0, QII phase (negative mean'
+                             'curvature). Determines whether the phase is normal or inverted')
     parser.add_argument('-wt', '--weight_percent', default=77.1, type=float,
                         help='Weight %% of monomer in membrane')
     parser.add_argument('-sol', '--solvent', default='glycerol', type=str,
                         help='Name of solvent mixed with monomer')
-    parser.add_argument('-shift', '--shift', default=0.5, type=float,
+    parser.add_argument('-shift', '--shift', default=0, type=float,
                         help='Shift position of head group shift units '
                              'in the direction opposite of the normal vector at that point')
     parser.add_argument('-plot', '--plot_grid', action="store_true", help='Plot the grid of points used to defined the '
@@ -76,7 +76,7 @@ if __name__ == "__main__":
 
     # Choose phase and space group
     acceptable_hII_names = ['hii', 'h2', 'hexagonal', 'colh']  # lowercase so I can make input case insensitive
-    acceptable_qI_names = ['gyroid', 'ia3d', 'schwarzd', 'pn3m']
+    acceptable_qI_names = ['gyroid', 'ia3d', 'schwarzd', 'pn3m', 'sphere']
     vague_names = ['q1', 'qi']  # phases by these names do not give enough information to determine the structure
 
     phase = args.phase.lower()
@@ -162,12 +162,11 @@ if __name__ == "__main__":
 
         system = BicontinuousCubicBuild(build_monomer, space_group, box_dimensions, args.weight_percent, args.density)
 
-        system.gen_grid(args.grid, plot=args.plot_grid)
+        system.gen_grid(args.grid, args.curvature, plot=args.plot_grid)
 
         system.determine_monomer_placement(r=0.4)
 
-        system.place_monomers(shift=args.shift, curvature=args.curvature)
-
+        system.place_monomers(shift=args.shift)
         system.reorder()
 
         system.write_final_configuration()

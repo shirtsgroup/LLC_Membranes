@@ -40,19 +40,27 @@ def gyroid(x, period):
     return a + b + c
 
 
-def gridgen(surf, low, high, n, tol=0.05):
+def Sphere(x):
+
+    return np.square(x).sum()
+
+
+def gridgen(surf, low, high, n, c=0, tol=0.05):
     """ Generate an n x n x n grid and reduce it to points that lie close to an implicit surface defined by `surf`
 
     :param surf: name of implicit surface to approximate
     :param low: lowest coordinate on each axis of grid
     :param high: highest coordinate on each axis of grid (if low is 0, then high is the length of the box vector)
     :param n: number of grid points in each dimension
+    :param c: value of c in F(x, y, z) = c. c = 0 corresponds to zero mean curvature. c < 0 is negative mean curvature
+    and c > 0 is positive mean curvature
     :param tol: surface--point distance tolerance. Anything within this cutoff can be used to approximate the surface.
 
     :type surf: str
     :type low: float
     :type high: float
     :type n: int
+    :type c: float
     :type tol: float
     """
 
@@ -72,7 +80,7 @@ def gridgen(surf, low, high, n, tol=0.05):
         for i in range(n):
             for j in range(n):
                 for k in range(n):
-                    if -tol < gyro[i, j, k] < tol:
+                    if abs(gyro[i, j, k] - c) < tol:
                         gyro_eval[count_gyro, :] = [x[i], y[j], z[k]]
                         count_gyro += 1
 
@@ -86,11 +94,26 @@ def gridgen(surf, low, high, n, tol=0.05):
         for i in range(n):
             for j in range(n):
                 for k in range(n):
-                    if -tol < schwarz[i, j, k] < tol:
+                    if -tol < schwarz[i, j, k] - c < tol:
                         schwarz_eval[count_schwarz, :] = [x[i], y[j], z[k]]
                         count_schwarz += 1
 
         grid = schwarz_eval[:count_schwarz, :]
+
+    elif surf.lower() == 'sphere':
+
+        sphere = Sphere([x[:, None, None], y[None, :, None], z[None, None, :]])#, high - low)
+        sphere_eval = np.zeros([n**3, 3])
+        count_sphere = 0
+        for i in range(n):
+            for j in range(n):
+                for k in range(n):
+                    if -tol < sphere[i, j, k] - c**2 < tol:
+                        sphere_eval[count_sphere, :] = [x[i], y[j], z[k]]
+                        count_sphere += 1
+
+        grid = sphere_eval[:count_sphere, :]
+
     else:
         print('The phase you selected is not defined (yet)')
         exit()
@@ -127,6 +150,12 @@ def gradient(v, surf, period):
         a = n*np.cos(n*x)*np.sin(n*y)*np.sin(n*z) + n*np.cos(n*x)*np.cos(n*y)*np.cos(n*z) - n*np.sin(n*x)*np.sin(n*y)*np.cos(n*z) - n*np.sin(n*x)*np.cos(n*y)*np.sin(n*z)
         b = n*np.sin(n*x)*np.cos(n*y)*np.sin(n*z) - n*np.sin(n*x)*np.sin(n*y)*np.cos(n*z) + n*np.cos(n*x)*np.cos(n*y)*np.cos(n*z) - n*np.cos(n*x)*np.sin(n*y)*np.sin(n*z)
         c = n*np.sin(n*x)*np.sin(n*y)*np.cos(n*z) - n*np.sin(n*x)*np.cos(n*y)*np.sin(n*z) - n*np.cos(n*x)*np.sin(n*y)*np.sin(n*z) + n*np.cos(n*x)*np.cos(n*y)*np.cos(n*z)
+
+    elif surf.lower() == 'sphere':
+
+        a = 2 * x
+        b = 2 * y
+        c = 2 * z
 
     else:
 

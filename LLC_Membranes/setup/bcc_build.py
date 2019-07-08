@@ -71,17 +71,20 @@ class BicontinuousCubicBuild(topology.LC):
         self.all_residues = None
         self.all_names = None
 
-    def gen_grid(self, n, plot=False):
+    def gen_grid(self, n, curvature, plot=False):
         """ Create an n x n x n grid of points which lie close to the surface describing the unit cell space group
 
         :param n: number of points in the x, y and z direction
+        :param curvature: determines mean curvature of hydrophilic/hydrophobic interface and thus whether the phase is
+        normal or inverted. {> 0 : QI phase, < 0: QII phase}'
         :param plot: show a 3D scatter plot of the surface
 
         :type n: int
+        :type curvature: float
         :type plot: bool
         """
 
-        self.grid = surfaces.gridgen(self.space_group, 0, self.period, n)
+        self.grid = surfaces.gridgen(self.space_group, 0, self.period, n, c=curvature)
 
         if plot:
 
@@ -125,19 +128,17 @@ class BicontinuousCubicBuild(topology.LC):
 
         self.grid = new_grid
 
-    def place_monomers(self, shift=0, curvature=-1):
+    def place_monomers(self, shift=0):
         """ Place monomers perpendicular to the space group surface at grid point locations
 
         :param shift: translate monomer along vector perpendicular to space group surface by this amount (nm). This \
         parameter effectively controls the pore size
-        :param curvature: determines whether the phase is normal or inverted. {-1 : QI phase, 1: QII phase}'
 
         :type shift: float
-        :type curvature : int
         """
 
-        if curvature not in [-1, 1]:
-            raise CurvatureError('The value for curvature must be either -1 or 1')
+        # if curvature not in [-1, 1]:
+        #     raise CurvatureError('The value for curvature must be either -1 or 1')
 
         self.final_positions = np.zeros([self.natoms * self.nmon, 3])
 
@@ -151,7 +152,7 @@ class BicontinuousCubicBuild(topology.LC):
 
         for i in range(self.nmon):
 
-            n = curvature * surfaces.gradient(self.grid[i, :], self.space_group, period=self.period)  # normal vector to surface at point grid[i, :]
+            n = surfaces.gradient(self.grid[i, :], self.space_group, period=self.period)  # vector normal to surface at point grid[i, :]
             R = transform.Rvect2vect(linevector, n)  # rotation matrix to rotate monomer in same direction as n
 
             # translate to origin
