@@ -37,8 +37,6 @@ def simulate(mdp, top, gro, out, verbose=False, em_energy=False, mpi=False, npro
     gmx = "gmx"
     if mpi:
         gmx = "mpirun -np %d gmx_mpi" % nprocesses
-        if dd:
-            gmx += '-dd %s %s %s' % tuple(dd)
 
     grompp = '%s grompp -f %s -c %s -p %s -o %s' % (gmx, mdp, gro, top, out)
 
@@ -50,6 +48,9 @@ def simulate(mdp, top, gro, out, verbose=False, em_energy=False, mpi=False, npro
     p1.wait()
 
     mdrun = '%s mdrun -deffnm %s' % (gmx, out)
+
+    if dd and mpi:
+        mdrun += ' -dd %s %s %s' % tuple(dd)
 
     if verbose:
         mdrun += ' -v'
