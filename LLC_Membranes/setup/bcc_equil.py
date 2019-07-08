@@ -5,6 +5,7 @@ from LLC_Membranes.setup.bcc_build import BicontinuousCubicBuild
 from LLC_Membranes.setup.gentop import SystemTopology
 from LLC_Membranes.setup.genmdp import SimulationMdp
 from LLC_Membranes.llclib import topology, transform, gromacs
+from LLC_Membranes.setup import xlink
 import mdtraj as md
 import os
 import numpy as np
@@ -27,13 +28,16 @@ def initialize():
     parser.add_argument('-g', '--grid', default=50, type=int, help='Number of sections to break grid into when '
                                                                 'approximating the chosen implicit function')
     parser.add_argument('-dens', '--density', default=1.1, type=float, help='Density of system (g/cm3)')
-    parser.add_argument('-c', '--curvature', default=-1, type=int,
+    parser.add_argument('-c', '--curvature', default=1, type=int,
                         help='-1 : QI phase, 1, QII phase. Determines whether'
                              'the phase is normal or inverted')
     parser.add_argument('-wt', '--weight_percent', default=77.1, type=float, help='Weight %% of monomer in membrane')
     parser.add_argument('-sol', '--solvent', default='GLY', type=str, help='Name of solvent residue mixed with monomer')
     parser.add_argument('-shift', '--shift', default=1, type=float, help='Shift position of head group shift units in'
                         'the direction opposite of the normal vector at that point')
+    parser.add_argument('-res', '--residue', default='MOL', help='Name of residue corresponding to build monomer')
+    parser.add_argument('-resd', '--dummy_residue', default='MOLd', help='Name of residue to be cross-linked with '
+                                                                         'dummy atoms included in the topology')
 
     # simulation parameters
     parser.add_argument('-T', '--temperature', default=343, type=float, help='Temperature at which to simulate')
@@ -44,6 +48,9 @@ def initialize():
     parser.add_argument('-mpi', '--mpi', action="store_true", help='Parallelize computation via MPI')
     parser.add_argument('-np', '--nprocesses', default=4, type=int, help='Number of MPI processes. Only if `mpi` is '
                                                                          'true')
+    parser.add_argument('-dd', '--domain_decomposition', default=[2, 2, 1], help='xyz dimensions of domain '
+                        'decomposition grid. This may need to be adjusted if there are issues with mdrun. The product'
+                        'of these values should equal the number of processes (np)')
 
     return parser
 
@@ -403,6 +410,21 @@ if __name__ == "__main__":
     equil.shrink_unit_cell(args.scale_factor, 1.0, 0.1)  # EquilibrateBCC object, start, stop, step
 
     equil.add_solvent(args.solvent)
+
+    # cross-linking
+    params = xlink.initialize().parse_args()  # get default arguments passed to xlink
+    # modify certain params for this system.
+    params['initial'] = equil.gro_name
+    params['build_mon'] = args.build_monomer
+    params['temperature'] = args.temperature
+    params['residue'] = args.residue
+    params['dummy_residue'] = args.dummy_residue
+    params['parallelize'] = args.mpi
+    params['nproc'] = args.nprocesses
+    params['domain_decomposition'] = args.domain_decomposition
+
+    xlink.crosslink(params)  # run cross-linking algorithm
+
 
     # Can use this to continue from an expanded then shrunk initial configuration
     # equil = EquilibrateBCC(args.build_monomer, args.space_group, args.box_length, args.weight_percent, args.density,
