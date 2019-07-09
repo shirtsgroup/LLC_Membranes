@@ -306,7 +306,7 @@ class EquilibrateBCC(topology.LC):
 
         return delta
 
-    def add_solvent(self, solvent, tol=10, scale=0.4, nvt_length=1000, npt_length=1000, out='solvated_final.gro'):
+    def add_solvent(self, solvent, tol=10, scale=0.45, nvt_length=1000, npt_length=1000, out='solvated_final.gro'):
         """ Name of solvent residue to add to structure. This is an iterative process of solvent insertion, energy
         minimzation, and an nvt simulation
 
@@ -383,7 +383,7 @@ if __name__ == "__main__":
     equil = EquilibrateBCC(args.build_monomer, args.space_group, args.box_length, args.weight_percent, args.density,
                            shift=args.shift, curvature=args.curvature, mpi=args.mpi, nprocesses=args.nprocesses)
 
-    equil.build_initial_config(grid_points=args.grid, r=0.5)
+    equil.build_initial_config(grid_points=args.grid, r=0.4)
     equil.scale_unit_cell(args.scale_factor)
 
     equil.generate_topology(name='topol.top')  # creates an output file
@@ -395,7 +395,7 @@ if __name__ == "__main__":
 
     while nrg >= 0:
 
-        equil.build_initial_config(grid_points=args.grid, r=0.5)
+        equil.build_initial_config(grid_points=args.grid, r=0.4)
         equil.scale_unit_cell(args.scale_factor)
         nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
                                nprocesses=args.nprocesses)
