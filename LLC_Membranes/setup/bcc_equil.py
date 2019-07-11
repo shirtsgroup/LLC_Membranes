@@ -51,6 +51,11 @@ def initialize():
     parser.add_argument('-dd', '--domain_decomposition', default=[2, 2, 1], help='xyz dimensions of domain '
                         'decomposition grid. This may need to be adjusted if there are issues with mdrun. The product'
                         'of these values should equal the number of processes (np)')
+    parser.add_argument('-continue_dry', '--continue_dry', action="store_true", help='Continue simulation from a dry '
+                        'unit cell. This will only work if scaled_1.0000.gro exists. i.e. youve already expanded and '
+                        'shrunk an initial configuration')
+    parser.add_argument('-continue_solvated', '--continue_solvated', action="store_true", help='Continue procedure '
+                        'starting from cross-linking step. solvated_final.gro must exist')
 
     return parser
 
@@ -390,26 +395,38 @@ if __name__ == "__main__":
     equil.generate_mdps(length=50, frames=2, T=args.temperature)  # creates an object
     equil.mdp.write_em_mdp(out='em')
 
-    nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
-                           nprocesses=args.nprocesses)  # mdp, top, gro, out
+    if not args.continue_dry and not args.continue_solvated:
 
-    while nrg >= 0:
-
-        equil.build_initial_config(grid_points=args.grid, r=0.4)
-        equil.scale_unit_cell(args.scale_factor)
         nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
-                               nprocesses=args.nprocesses)
+                               nprocesses=args.nprocesses)  # mdp, top, gro, out
 
-    cp = 'cp em.gro scaled_%.4f.gro' % args.scale_factor
-    p = subprocess.Popen(cp.split())
-    p.wait()
+        while nrg >= 0:
 
-    equil.gro_name = 'scaled_%.4f.gro' % args.scale_factor
+            equil.build_initial_config(grid_points=args.grid, r=0.4)
+            equil.scale_unit_cell(args.scale_factor)
+            nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
+                                   nprocesses=args.nprocesses)
 
-    # slowly compress system to correct density
-    equil.shrink_unit_cell(args.scale_factor, 1.0, 0.1)  # EquilibrateBCC object, start, stop, step
+        cp = 'cp em.gro scaled_%.4f.gro' % args.scale_factor
+        p = subprocess.Popen(cp.split())
+        p.wait()
 
-    equil.add_solvent(args.solvent)
+        equil.gro_name = 'scaled_%.4f.gro' % args.scale_factor
+
+        # slowly compress system to correct density
+        equil.shrink_unit_cell(args.scale_factor, 1.0, 0.1)  # EquilibrateBCC object, start, stop, step
+
+    else:
+
+        equil.gro_name = 'scaled_1.0000.gro'
+
+    if not args.continue_solvated:
+
+        equil.add_solvent(args.solvent)
+
+    else:
+
+        equil.gro_name = 'solvated_final.gro'
 
     # cross-linking
     params = vars(xlink.initialize().parse_args())  # get default arguments passed to xlink
@@ -424,31 +441,3 @@ if __name__ == "__main__":
     params['domain_decomposition'] = args.domain_decomposition
 
     xlink.crosslink(params)  # run cross-linking algorithm
-
-    # Can use this to continue from an expanded then shrunk initial configuration
-    # equil = EquilibrateBCC(args.build_monomer, args.space_group, args.box_length, args.weight_percent, args.density,
-    #                        shift=args.shift, curvature=args.curvature, mpi=args.mpi, nprocesses=args.nprocesses)
-    #
-    # equil.build_initial_config(grid_points=args.grid, r=0.4)
-    #
-    # equil.generate_topology(name='topol.top')  # creates an output file
-    # equil.generate_mdps(length=50, frames=2, T=args.temperature)  # creates an object
-    # equil.mdp.write_em_mdp(out='em')
-    #
-    # equil.gro_name = "scaled_1.0000.gro"
-    #
-    # equil.add_solvent(args.solvent, scale=0.45)
-    #
-    # params = vars(xlink.initialize().parse_args())  # get default arguments passed to xlink
-    # # modify certain params for this system.
-    # params['initial'] = equil.gro_name
-    # params['build_mon'] = args.build_monomer
-    # params['temperature'] = args.temperature
-    # params['residue'] = args.residue
-    # params['dummy_residue'] = args.dummy_residue
-    # params['parallelize'] = args.mpi
-    # params['nproc'] = args.nprocesses
-    # params['domain_decomposition'] = args.domain_decomposition
-    #
-    # xlink.crosslink(params)  # run cross-linking algorithm
-
