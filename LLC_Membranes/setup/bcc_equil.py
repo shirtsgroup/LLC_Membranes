@@ -429,7 +429,7 @@ if __name__ == "__main__":
         equil.gro_name = 'solvated_final.gro'
 
     # cross-linking
-    params = vars(xlink.initialize().parse_args())  # get default arguments passed to xlink
+    params = vars(xlink.initialize().parse_args([]))  # get default arguments passed to xlink
     # modify certain params for this system.
     params['initial'] = equil.gro_name
     params['build_mon'] = args.build_monomer
