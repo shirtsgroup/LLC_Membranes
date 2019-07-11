@@ -837,11 +837,11 @@ def crosslink(params):
     print('Done!')
 
     # energy minimize starting configuration to get dummies in the right place
-    # print('Energy minimizing %s...' % params['dummy_name'], end='', flush=True)
-    # gromacs.simulate(params['mdp_em'], params['topname'], params['dummy_name'],
-    #                  'em_%s' % params['dummy_name'].split('.')[0], mpi=params['parallelize'],
-    #                  nprocesses=params['nproc'], dd=params['domain_decomposition'])
-    # print('Done!')
+    print('Energy minimizing %s...' % params['dummy_name'], end='', flush=True)
+    gromacs.simulate(params['mdp_em'], params['topname'], params['dummy_name'],
+                     'em_%s' % params['dummy_name'].split('.')[0], mpi=params['parallelize'],
+                     nprocesses=params['nproc'], dd=params['domain_decomposition'])
+    print('Done!')
 
     # Rest of iterations
     stagnated_iterations = 0  # number of iterations without forming a cross-link
