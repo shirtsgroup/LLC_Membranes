@@ -477,19 +477,22 @@ def map_atoms(indices, nres_atoms=1):
     return index_map
 
 
-def fix_names(gro):
+def fix_names(gro, force_convert=True):
     """ Workaround for mdtraj. Fix atom names so they are the same as those shown in the gro file.
 
     :param gro: name of .gro file with all atom names in it
+    :param force_convert: If this option is True, then it will convert the .gro to .pdb no matter what. If False and a \
+    .pdb file of the same name as gro exists, this function will use that .pdb in order to load standard atom names.
 
     :type gro: str
+    :type force_convert: bool
     """
 
     if gro.endswith('.gro'):
         gro = gro.split('.')[0]
 
     # if .pdb already exists, don't both remaking it -- this could be dangerous
-    if not os.path.isfile('%s.pdb' % gro):
+    if not os.path.isfile('%s.pdb' % gro) or force_convert:
 
         convert_to_pdb = "gmx editconf -f %s.gro -o %s.pdb" % (gro, gro)
         p = subprocess.Popen(convert_to_pdb.split(), stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
