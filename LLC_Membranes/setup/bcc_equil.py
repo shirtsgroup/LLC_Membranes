@@ -416,6 +416,18 @@ if __name__ == "__main__":
         # slowly compress system to correct density
         equil.shrink_unit_cell(args.scale_factor, 1.0, 0.1)  # EquilibrateBCC object, start, stop, step
 
+        # CLEAN UP -- move all scaled unit cells into a separate directory
+        if not os.path.isdir("./intermediates"):
+            os.mkdir('intermediates')
+
+        mv = "mv scaled*.gro intermediates"
+        p = subprocess.Popen(mv, shell=True)  # don't split mv because shell=True
+        p.wait()
+
+        cp = 'cp em.gro scaled_1.0000.gro'  # will keep a copy if this file in main directory for next step
+        p = subprocess.Popen(cp.split())
+        p.wait()
+
     else:
 
         equil.gro_name = 'scaled_1.0000.gro'
@@ -424,12 +436,18 @@ if __name__ == "__main__":
 
         equil.add_solvent(args.solvent)
 
+        mv = "mv solvated_nvt* solvated_npt* npt_equil* nvt_equil* em_* intermediates"
+        p = subprocess.Popen(mv, shell=True)  # don't split mv because shell=True
+        p.wait()
+
     else:
 
         equil.gro_name = 'solvated_final.gro'
 
     # cross-linking
-    params = vars(xlink.initialize().parse_args([]))  # get default arguments passed to xlink
+    # get default arguments passed to xlink. [] prevents this from reading command line arguments to bcc_equil
+    params = vars(xlink.initialize().parse_args([]))
+
     # modify certain params for this system.
     params['initial'] = equil.gro_name
     params['build_mon'] = args.build_monomer
