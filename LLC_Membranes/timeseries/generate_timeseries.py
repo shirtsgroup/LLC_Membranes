@@ -29,6 +29,12 @@ def initialize():
     parser.add_argument('-r', '--order', default=1, type=int, help='Autoregressive order (number of time lags that '
                                                                    'yt depends on.')
 
+    # phantom state linking
+    parser.add_argument('-l', '--link', action="store_true", help='Link together the independent trajetories with a'
+                                                                  'phantom state in between.')
+    parser.add_argument('-pl', '--phantom_length', default=100, type=int, help='Number of time steps for phantom state '
+                                                                               'linkage')
+
     return parser
 
 
@@ -198,6 +204,40 @@ def generate_ar_parameters(r):
     return phi
 
 
+def link(t, labels, phantom_length=250, phantom_variance=0, phantom_mean=0):
+    """ link together independent trajectories with a phantom state in between each
+
+    :param t: trajectories (npoints, ntraj, 3)
+    :param labels: true state of each point in trajectory (npoints, ntraj)
+    :param phantom_length: number of timesteps to stay in phantom state
+    :param phantom_variance: variance of phantom state
+    :param phantom_mean: mean of phantom state
+
+    :type t: np.ndarray
+    :type labels: np.ndarray
+    :type phantom_length: int
+    :type phantom_variance: float
+    :type phantom_mean: float
+
+    :return single trajectory (npoints x ntraj + (ntraj - 1)*phantom_length, 3) and associated state labels
+    """
+
+    nstates = len(np.unique(state_labels.flatten()))
+
+    phantom_state = phantom_variance*np.random.randn(phantom_length, 3) + phantom_mean
+    p_label = nstates*np.ones(phantom_length)
+
+    ntraj = t.shape[1]
+
+    linked = t[:, 0, :]
+    states = labels[:, 0]
+    for i in range(1, ntraj):
+        linked = np.concatenate((linked, phantom_state, t[:, i, :]), axis=0)
+        states = np.concatenate((states, p_label, labels[:, i]), axis=0)
+
+    return linked.reshape((linked.shape[0], 1, linked.shape[1])), states.reshape((states.shape[0], 1))
+
+
 if __name__ == "__main__":
 
     args = initialize().parse_args()
@@ -211,9 +251,18 @@ if __name__ == "__main__":
     for i in range(args.ntraj):
         data[:, i, 2], state_labels[:, i] = data_generator.gen_trajectory(args.ndraws)
 
-    io.savemat('%s_data.mat' % args.type.lower(), dict(traj=data, labels=state_labels, T=data_generator.T,
-                                                       phis=data_generator.phis))
+    if args.link:
+        linked_data, linked_state_labels = link(data, state_labels, phantom_length=args.phantom_length)
+        print(linked_state_labels.shape)
+        io.savemat('%s_data.mat' % args.type.lower(), dict(traj=data, labels=state_labels, T=data_generator.T,
+                                                           phis=data_generator.phis, linked_data=linked_data,
+                                                           linked_state_labels=linked_state_labels))
 
-    plt.plot(data[:, 0, 2])
+        plt.plot(linked_data[:, 0, 2])
+        plt.plot(linked_state_labels)
 
-    plt.show()
+        plt.show()
+
+    else:
+        io.savemat('%s_data.mat' % args.type.lower(), dict(traj=data, labels=state_labels, T=data_generator.T,
+                                                           phis=data_generator.phis))
