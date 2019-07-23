@@ -15,7 +15,7 @@ def initialize():
                                                                      "(autoregressive) are implemented.")
     parser.add_argument('-d', '--ndraws', default=2000, type=int, help='Number of time steps to take')
     parser.add_argument('-n', '--ntraj', default=4, type=int, help='Number of trajetories to generate')
-    parser.add_argument('-f', '--format', default='mat', type=str, help='Format of output array (mat or npz)')
+    parser.add_argument('-f', '--format', nargs='+', default='mat', type=str, help='Format of output array (mat or npz)')
 
     # Define transition matrix. Either provide your own, or let this script generate one
     parser.add_argument('-T', '--transition_matrix', nargs='+', action='append', type=float, help='Define a transition '
@@ -181,7 +181,7 @@ class GenData:
 
         order = self.phis.shape[1]  # autoregressive order
         data = np.zeros([ndraws + order])
-        state_labels = np.zeros([ndraws])
+        state_labels = np.zeros([ndraws], dtype=int)
 
         state = np.random.choice(self.state_labels)  # choose initial state with uniform probability
         for d in range(ndraws):
@@ -255,12 +255,10 @@ def link(t, labels, phantom_length=250, phantom_variance=0, phantom_mean=0):
 
 def save(array_dict, type, format):
 
-    if format == 'mat':
+    if 'mat' in format:
         io.savemat('%s_data.mat' % type.lower(), array_dict)
-    elif format == 'npz':
+    if 'npz' in format:
         np.savez_compressed('%s_data.npz' % type.lower(), data=array_dict)
-    else:
-        print('Please choose a valid save format')
 
 
 if __name__ == "__main__":
@@ -269,7 +267,7 @@ if __name__ == "__main__":
 
     # generate trajectories
     data = np.zeros([args.ndraws, args.ntraj, 3])
-    state_labels = np.zeros([args.ndraws, args.ntraj])
+    state_labels = np.zeros([args.ndraws, args.ntraj], dtype=int)
 
     data_generator = GenData(args.type, args.transition_matrix, phis=args.phis, nstates=args.nstates, slip=args.slip,
                              order=args.order, stds=args.stds)

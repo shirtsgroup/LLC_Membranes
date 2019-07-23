@@ -3,8 +3,15 @@
 import argparse
 import numpy as np
 from scipy.stats import wishart, norm
+from scipy import io
 import tqdm
 from scipy import sparse
+import matplotlib.pyplot as plt
+from matplotlib.collections import LineCollection
+from matplotlib.colors import ListedColormap, BoundaryNorm
+from itertools import combinations, permutations
+from LLC_Membranes.llclib import file_rw
+np.set_printoptions(precision=4, suppress=True)
 
 """
 Python implementation of the infinite hidden markov model.
@@ -37,6 +44,7 @@ def initialize():
                                                                             'found')
     parser.add_argument('-niter', '--niterations', default=2000, type=int, help='Number of iterations to perform '
                                                                                 'sampling procedure')
+    parser.add_argument('-load', '--load', action="store_true", help='Load saved arrays from previously run HDPHMM')
 
     ####### Trajectory Generation #######
     parser.add_argument('-nd', '--ndraws', default=2000, type=int, help='Number of time steps to take')
@@ -119,11 +127,16 @@ class InfiniteHMM:
         self.nT = self.trajectories.shape[0]
         self.nsolute = self.trajectories.shape[1]
 
+        if 'labels' in self.data.keys():
+            self.labels = self.data['labels']
+
+        print('Fitting %d %d dimensional trajectories with an autoregressive order of %d' %
+              (self.nsolute, self.trajectories.shape[2], order))
+
         self.observation_model = observation_model
         self.prior = prior
         self.order = order
         self.max_states = max_states
-        self.niter = 2000  # number of iterations TODO: add argument
 
         self.dimensions = self.trajectories.shape[2]
 
@@ -147,7 +160,7 @@ class InfiniteHMM:
         # sticky HDP-HMM parameter settings
         self.a_alpha = 1
         self.b_alpha = 0.01
-        self.a_gamma = 1
+        self.a_gamma = 1  # global expected # of HMM states (affects \beta) -- TODO: play with this
         self.b_gamma = 0.01
         if self.Ks > 1:  # i think this only applies to SLDS
             self.a_sigma = 1
@@ -213,7 +226,9 @@ class InfiniteHMM:
         self.pi_init = None  # initial distribution
         self.beta_vec = None
         self.s = np.zeros([self.nsolute, self.nT - self.order])
-        self.z = np.zeros([self.nsolute, self.nT - self.order])  # will hold estimated states
+        self.z = np.zeros([self.nsolute, self.nT - self.order], dtype=int)  # will hold estimated states
+
+        self.iteration = 0
 
     def make_design_matrix(self, observations):
         """ Create an (order*d , T) matrix of shifted observations. For each order create a trajectory shifted an
@@ -334,7 +349,14 @@ class InfiniteHMM:
         # in first iteration, barM is all zeros, so the output looks like pulls from beta distributions centered
         # at 1 / self.max_states
         # G0 ~ DP(gamma, H)  H is a base measure
+
         self.beta_vec = np.random.dirichlet(self.stateCounts['barM'].sum(axis=0) + gamma0 / self.max_states)  # G0
+        if (self.beta_vec == 0).sum() > 0:
+            print(self.stateCounts['barM'].sum(axis=0))
+            print(gamma0)
+            print(self.max_states)
+            print(self.beta_vec)
+            print(self.beta_vec == 0)
 
         N = self.stateCounts['N']
         Ns = self.stateCounts['Ns']
@@ -349,6 +371,9 @@ class InfiniteHMM:
             # Gj ~ DP(alpha, G0)  -- this is the hierarchical part. If it were Gj ~ DP(gamma, H) this wouldn't work
             vec = alpha0*self.beta_vec + N[j, :]
             vec[j] += kappa0  # here is the sticky part. This ends up weighting self-transitions pretty heavily
+            if (vec == 0).sum() > 0:
+                print(vec)
+                exit()
             self.pi_z[j, :] = np.random.dirichlet(vec)
             self.pi_s[j, :] = np.random.dirichlet(Ns[j, :] + sigma0 / self.Ks)
 
@@ -370,8 +395,6 @@ class InfiniteHMM:
             store_XX = self.Ustats['XX']
             store_YX = self.Ustats['YX']
             store_YY = self.Ustats['YY']
-            store_sumY = self.Ustats['sumY']
-            store_sumX = self.Ustats['sumX']
 
             K = self.prior_params['K']
             M = self.prior_params['M']
@@ -381,6 +404,7 @@ class InfiniteHMM:
             for kz in range(self.max_states):
                 for ks in range(self.Ks):
 
+                    # Calculations in this conditional are verified consistent with MATLAB
                     if store_card[kz, ks] > 0:
 
                         Sxx = store_XX[:, :, kz, ks] + K
@@ -397,11 +421,15 @@ class InfiniteHMM:
                         Sygx = 0
 
                     sqrtSigma, sqrtinvSigma = randiwishart(Sygx + nu_delta, nu + store_card[kz, ks])
+                    # distribution of invSigma looks correct
                     invSigma[:, :, kz, ks] = sqrtinvSigma.T @ sqrtinvSigma  # I guess sqrtinvSigma is cholesky decomp
 
                     cholinvSxx = np.linalg.cholesky(np.linalg.inv(Sxx)).T  # transposed to match MATLAB
-                    A[:, :, kz, ks] = sample_from_matrix_normal(SyxSxxInv, sqrtSigma, cholinvSxx)
 
+                    A[:, :, kz, ks] = sample_from_matrix_normal(SyxSxxInv, sqrtSigma, cholinvSxx)
+                    # distribution of A looks correct
+
+            # io.savemat('A_invSigma.mat', dict(A=A, invSigma=invSigma))
             # reassign values
             self.theta['invSigma'] = invSigma
             self.theta['A'] = A
@@ -418,6 +446,7 @@ class InfiniteHMM:
 
             self.update_ustats(self.sample_zs())
             self.sample_tables()
+            self.iteration += 1
             self.sample_distributions()
             self.sample_theta()
             self.sample_hyperparams()
@@ -448,19 +477,24 @@ class InfiniteHMM:
             z = np.zeros([T], dtype=int)
             s = np.zeros([int(blockSize.sum())], dtype=int)
 
-            likelihood = self.compute_likelihood(i)
-            partial_marg = self.backwards_message_vec(likelihood)
+            # loop good up to here
+            likelihood = self.compute_likelihood(i)  # likelihoods between 0 and 1. Distribution qualitatively consistent with MATLAB
+            partial_marg = self.backwards_message_vec(likelihood)  # distribution qualitatively similar to MATLAB
 
-            # sampel the state and sub-state sequences
+            # sample the state and sub-state sequences
 
             totSeq = np.zeros([self.max_states, self.Ks], dtype=int)
             indSeq = np.zeros([T, self.max_states, self.Ks])
 
             for t in range(T):
+
                 if t == 0:
+
                     Pz = np.multiply(self.pi_init.T, partial_marg[:, 0])
                     obsInd = np.arange(0, blockEnd[0])
+
                 else:
+
                     Pz = np.multiply(self.pi_z[z[t - 1], :].T, partial_marg[:, t])
                     obsInd = np.arange(blockEnd[t - 1], blockEnd[t])
 
@@ -487,7 +521,7 @@ class InfiniteHMM:
 
                     Ns[z[t], s[obsInd[k]]] += 1
                     totSeq[z[t], s[obsInd[k]]] += 1
-                    indSeq[totSeq[z[t], s[obsInd[k]]] - 1, z[t], s[obsInd[k]]] = obsInd[k]
+                    indSeq[totSeq[z[t], s[obsInd[k]]] - 1, z[t], s[obsInd[k]]] = obsInd[k] #+ 1
 
             self.z[i, :] = z
             self.s[i, :] = s
@@ -495,7 +529,7 @@ class InfiniteHMM:
             for j in range(self.max_states):
                 for k in range(self.Ks):
                     obsIndzs[i]['tot'][j, k] = totSeq[j, k]
-                    obsIndzs[i]['inds'][j, k] = sparse.csr_matrix(indSeq[:, j, k])
+                    obsIndzs[i]['inds'][j, k] = sparse.csr_matrix(indSeq[:, j, k], dtype=int)
 
         binNs = np.zeros_like(Ns)
         binNs[Ns > 0] = 1
@@ -533,7 +567,7 @@ class InfiniteHMM:
                 for kz in unique_z:
                     unique_s_for_z = np.where(Ns[kz, :] > 0)[0]
                     for ks in unique_s_for_z:
-                        obsInd = inds[i]['inds'][kz, ks][:inds[i]['tot'][kz, ks]].indices  # yuck
+                        obsInd = inds[i]['inds'][kz, ks][:inds[i]['tot'][kz, ks]].data  # yuck
                         self.Ustats['XX'][:, :, kz, ks] += X[:, obsInd] @ X[:, obsInd].T
                         self.Ustats['YX'][:, :, kz, ks] += u[:, obsInd] @ X[:, obsInd].T
                         self.Ustats['YY'][:, :, kz, ks] += u[:, obsInd] @ u[:, obsInd].T
@@ -574,8 +608,9 @@ class InfiniteHMM:
 
         if self.observation_model == 'AR':
 
+            # This should be good since invSigma distribution looked good in sample_theta
             invSigma = self.theta['invSigma']
-            A = self.theta['A']
+            A = self.theta['A']  # sample_from_matrix_normal also looked good
             mu = self.theta['mu']
 
             dimu = self.trajectories.shape[2]
@@ -591,6 +626,7 @@ class InfiniteHMM:
 
                     v = self.trajectories[:, solute_no, :].T - A[:, :, kz, ks] @ self.X[solute_no, ...] - \
                         mu[:, kz*np.ones([T], dtype=int), ks]
+
                     u = cholinvSigma @ v
 
                     log_likelihood[kz, ks, :] = -0.5 * np.square(u).sum(axis=0) + np.log(dcholinvSigma).sum()
@@ -600,7 +636,7 @@ class InfiniteHMM:
             likelihood = np.exp(log_likelihood)  # can we just use log likelihoods?
             normalizer -= (dimu/2)*np.log(2*np.pi)
 
-            return likelihood
+        return likelihood
 
     def backwards_message_vec(self, likelihood):
         """ reproduction of backwards_message_vec.m
@@ -614,7 +650,9 @@ class InfiniteHMM:
         bwds_msg = np.ones([self.max_states, T])
         partial_marg = np.zeros([self.max_states, T])
 
-        block_like = np.multiply(likelihood.T, self.pi_s).T.sum(axis=1)  # marginal likelihood
+        # This may need to be modified for s > 1
+        # block_like = np.multiply(likelihood.T, self.pi_s).T.sum(axis=1)  # This is close but wrong. prob need for loop
+        block_like = likelihood.sum(axis=1)
 
         # compute messages backward in time
         for tt in range(T - 1, 0, -1):
@@ -626,9 +664,142 @@ class InfiniteHMM:
             bwds_msg[:, tt - 1] /= bwds_msg[:, tt - 1].sum()
 
         # compute marginal for first time point
-        partial_marg[:, 0] = np.multiply(block_like[:, 0], bwds_msg[:, 1])
+        partial_marg[:, 0] = np.multiply(block_like[:, 0], bwds_msg[:, 0])
 
         return partial_marg
+
+    def plot_states(self, cmap=plt.cm.jet, traj_no=3):
+        """ Plot estimated state sequence. If true labels exist, compare those.
+        """
+
+        traj = self.trajectories[:, traj_no, 0]
+        estimated_states = self.z[traj_no, :]
+        true_states = self.labels[:, traj_no]
+        found_states = list(np.unique(estimated_states))
+        nT = len(estimated_states)
+
+        true_state_labels = list(np.unique(true_states))
+        nstates = len(true_state_labels)
+
+        print('%d states were used to generate this data' % nstates)
+        print('Found %d unique states' % len(found_states))
+
+        dummies = []
+        if len(found_states) < len(true_state_labels):
+            print('Less states were found than exist...adding a dummy state')
+            for i in range(len(true_state_labels) - len(found_states)):
+                dummy = sum(found_states)
+                found_states.append(dummy)
+                dummies.append(dummy)
+
+        # We need to identify which states match up with the known labels
+        mismatches = []  # count up the number of mismatches for each subset and its permutations
+        subsets = list(combinations(found_states, len(true_state_labels)))
+        nperm = len(list(permutations(subsets[0])))
+        for sub in subsets:
+            p = permutations(sub)
+            for i, perm in enumerate(p):
+                M = dict(zip(true_state_labels, perm))
+                wrong = 0
+                for s, estimate in enumerate(estimated_states):
+                    if estimate != M[true_states[s + self.order]]:
+                        wrong += 1
+                mismatches.append(wrong)
+
+        mindex = np.argmin(mismatches)  # index of minimum number of wrong label assignments
+        subset = subsets[(mindex // nperm)]  # subset number of minimum wrong labels
+        p = list(permutations(subset))  # permutations of subset
+        states = list(p[mindex % nperm])  # the states listed in subset in the order that leads to minimum wrong labels
+
+        # give extra states their own labels
+        diff = len(found_states) - len(states)  # difference between number of found states and actual number of states
+        extra_states = [x for x in found_states if x not in states]
+        if diff > 0:
+            for i in range(diff):
+                states.append(extra_states[i])
+                true_state_labels.append(nstates + i)
+
+        M = dict(zip(true_state_labels, states))  # dictionary of state numbers mapped to original labels
+        reverseM = dict(zip(states, true_state_labels))
+
+        # determine the indices where the wrong label assignments occur
+        wrong_label = []
+        for s, estimate in enumerate(estimated_states):
+            if estimate != M[true_states[s + self.order]]:
+                wrong_label.append(s + self.order)
+
+        print('Correctly identified %.1f %% of states' % (100*(1 - (len(wrong_label) / len(estimated_states)))))
+
+        # Make a color-coded plot
+        fig, ax = plt.subplots(2, 1, figsize=(12, 8))
+
+        # randomly assign color values from colormap
+        colors = np.array([cmap(i) for i in np.random.choice(np.arange(cmap.N), size=len(found_states))])
+
+        # plot true state sequence
+        z = true_states
+        collection0 = multicolored_line_collection(np.arange(nT), traj, z, colors[:nstates, :])
+
+        ax[0].set_title('True State Sequence', fontsize=16)
+        ax[0].add_collection(collection0)  # plot
+        ax[0].set_xlim([0, nT])
+        ax[0].set_ylim([traj.min(), traj.max()])
+        ax[0].tick_params(labelsize=14)
+
+        # plot all found states with unique colors
+        z = np.array([reverseM[x] for x in estimated_states])
+
+        ax[1].set_title('Estimated State Sequence', fontsize=16)
+        ax[1].add_collection(multicolored_line_collection(np.arange(nT), traj, z, colors))  # plot
+        ax[1].set_xlim([0, nT])
+        ax[1].set_ylim([traj.min(), traj.max()])
+        ax[1].scatter(wrong_label, traj[wrong_label], color='red', marker='x', zorder=10)
+        ax[1].tick_params(labelsize=14)
+
+        # Make all misidentified states a single color
+        # z = []
+        # for i, x in enumerate(estimated_states):
+        #     if i in wrong_label:
+        #         z.append(nstates)  # lump all wrong states into one state
+        #     else:
+        #         z.append(reverseM[x])
+        #
+        # c = colors[:(nstates + 1), :]
+        # c[-1, :] = [0, 0, 0, 1]  # black
+        #
+        # ax[2].set_title('Misidentified States', fontsize=14)
+        # ax[2].add_collection(multicolored_line_collection(np.arange(nT), traj, np.array(z), c))  # plot
+        # ax[2].set_xlim([0, nT])
+        # ax[2].set_ylim([traj.min(), traj.max()])
+
+        plt.tight_layout()
+        plt.show()
+
+
+def multicolored_line_collection(x, y, z, colors):
+    """ Color a 2D line based on which state it is in
+
+    :param x: data x-axis values
+    :param y: data y-axis values
+    :param z: values that determine the color of each (x, y) pair
+    """
+
+    nstates = colors.shape[0]
+    # come up with color map and normalization (i.e. boundaries of colors)
+    cmap = ListedColormap(colors)
+    bounds = np.arange(-1, nstates) + 0.1
+    norm = BoundaryNorm(bounds, cmap.N)  # add
+
+    # create line segments to color individually
+    points = np.array([x, y]).T.reshape(-1, 1, 2)
+    segments = np.concatenate([points[:-1], points[1:]], axis=1)
+
+    # Set the values used for colormapping
+    lc = LineCollection(segments, cmap=cmap, norm=norm)
+    lc.set_array(z)
+    lc.set_linewidth(2)
+
+    return lc
 
 
 def randiwishart(sigma, df):
@@ -651,8 +822,15 @@ def randiwishart(sigma, df):
     d = np.linalg.cholesky(sigma)  # the output is the transpose of MATLAB's chol function
     di = np.linalg.inv(d)  # so no need to take transpose of d here
 
-    a = np.linalg.cholesky(wishart.rvs(df, sigma)).T  # to match MATLAB's randwishart
-    sqrtinvx = np.sqrt(2)*a @ di
+    # if sigma.size == 1:
+    #     W = np.array([[wishart.rvs(df / 2, sigma)]])
+    # else:
+    #     W = wishart.rvs(df / 2, sigma)
+    #
+    # a = np.linalg.cholesky(W).T  # to match MATLAB's randwishart
+    a = randwishart(df/2, n)  # THIS appears to be sampling correct distribution but
+
+    sqrtinvx = (np.sqrt(2) * a) @ di
     sqrtx = np.linalg.inv(sqrtinvx).T
 
     return sqrtx, sqrtinvx
@@ -668,7 +846,6 @@ def sample_from_matrix_normal(M, sqrtV, sqrtinvK):
 
     mu = M.flatten()
     sqrtsigma = np.kron(sqrtinvK, sqrtV)
-
     S = mu + sqrtsigma.T @ norm.rvs(size=mu.size)
 
     return S.reshape(M.shape, order='F')
@@ -760,14 +937,43 @@ def gibbs_conparam(alpha, numdata, numclass, aa, bb, numiter):
     return alpha
 
 
+def randwishart(a, d):
+    """ Implementation of randwishart.m in lightspeed toolbox. I think this is a wrong implementation but this is what
+    is used
+
+    :param a: degrees of freedom
+    :param d: dimension of output matrix
+
+    :type a: float
+    :type d: int
+    """
+
+    sqrth = np.sqrt(0.5)
+    cholX = sqrth * np.triu(np.random.normal(size=(d, d)))
+    i = np.arange(0, d)
+    diag = [np.sqrt(np.random.gamma(g)) for g in a - i*0.5]
+    for i in range(d):
+        cholX[i, i] = diag[i]
+
+    return cholX
+
+
 if __name__ == "__main__":
 
     args = initialize().parse_args()
 
-    hmm = InfiniteHMM(args.traj, observation_model=args.obstype, prior=args.prior, order=args.order,
-                      max_states=args.max_states, dim=args.dim)
-    hmm.sample_hyperparams_init()
-    hmm.sample_distributions()
-    hmm.sample_theta()
-    hmm.inference(args.niterations)
+    if not args.load:
 
+        hmm = InfiniteHMM(args.traj, observation_model=args.obstype, prior=args.prior, order=args.order,
+                          max_states=args.max_states, dim=args.dim)
+        hmm.sample_hyperparams_init()
+        hmm.sample_distributions()
+        hmm.sample_theta()
+        hmm.inference(args.niterations)
+        file_rw.save_object(hmm, 'hmm.pl')
+        hmm.plot_states()
+
+    else:
+
+        hmm = file_rw.load_object('hmm.pl')
+        hmm.plot_states()
