@@ -11,11 +11,12 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Generate timeseries with different underlying models')
 
-    parser.add_argument('-t', '--type', default='AR', type=str, help="Underlying dynamical model. 'Gaussian' and 'AR'"
-                                                                     "(autoregressive) are implemented.")
+    parser.add_argument('-t', '--type', default='AR', type=str, help="Underlying dynamical model. Only AR is fully"
+                                                                     "implemented.")
     parser.add_argument('-d', '--ndraws', default=2000, type=int, help='Number of time steps to take')
     parser.add_argument('-n', '--ntraj', default=4, type=int, help='Number of trajetories to generate')
     parser.add_argument('-f', '--format', nargs='+', default='mat', type=str, help='Format of output array (mat or npz)')
+    parser.add_argument('-nd', '--ndimensions', default=1, type=int, help='Number of dimensions of trajectory.')
 
     # Define transition matrix. Either provide your own, or let this script generate one
     parser.add_argument('-T', '--transition_matrix', nargs='+', action='append', type=float, help='Define a transition '
@@ -57,10 +58,11 @@ class StateError(Exception):
 
 class GenData:
 
-    def __init__(self, type, transition_matrix, phis=None, nstates=None, slip=0.25, order=1, stds=None, stdmax=1):
+    def __init__(self, type, dim, transition_matrix, phis=None, nstates=None, slip=0.25, order=1, cov=None, stdmax=1):
         """ Given a transition matrix, generate timeseries using Markov Chains
 
         :param type: underlying dynamical model ('Gaussian' or 'AR' are currently implemented)
+        :param dim: number of dimensions of trajectory data
         :param transition_matrix: a list of N N-length lists. Each list represents a row of the transition matrix. If
         None or False is passed, a transition matrix will be generated randomly
         :param phis: a list of N order-length lists of autoregressive coefficients for each state. In order of phi_1,
@@ -70,10 +72,12 @@ class GenData:
         diagonals to the rest and vice versa. A high of zero will result in an identity matrix, meaning there will be no
         transitions from the initial state
         :param order: autoregressive order. Only specified if type is 'AR'
-        :param stds: standard deviation of Gaussian white noise for each state. If None, random stds will be generated
+        :param cov: covariance matrix of multivariate Gaussian white noise for each state. If None, a random covariance
+         matrix will be generated
         :param stdmax: maximum standard deviation of Gaussian white noise. This is only used if stds=None
 
         :type type: str
+        :type dim: int
         :type transition_matrix: list of lists
         :type nstates: int
         :type slip: float
@@ -101,14 +105,21 @@ class GenData:
             if phis:
                 self.phis = np.array(phis)
             else:
-                self.phis = np.zeros([self.nstates, order])
+                # NOTE: for multidimensional case, off-diagonal terms in each phi coefficient matrix are set to zero.
+                # I'm not sure what the stabilty rules are for the multidimensional case
+                self.phis = np.zeros([self.nstates, order, dim, dim])
                 for s in range(self.nstates):
-                    self.phis[s, :] = generate_ar_parameters(order)
+                    self.phis[s, ...] = generate_ar_parameters(order, dim)
 
-        if not stds:
-            self.stds = np.random.uniform(0, stdmax, size=self.nstates)
+        if not cov:
+            self.cov = np.zeros([self.nstates, dim, dim])
+            for i in range(self.nstates):
+                A = np.random.uniform(0, stdmax, size=(dim, dim))
+                self.cov[i, ...] = A @ A.T
         else:
-            self.stds = stds
+            self.cov = cov
+
+        self.mu = np.zeros([self.nstates, dim])
 
         self.state_labels = np.arange(self.nstates)
 
@@ -137,33 +148,6 @@ class GenData:
 
             return self.gen_ar_hmm(ndraws)
 
-    def gen_gaussian_hmm(self, ndraws, means=None, var=None):
-        """ Unfinished
-
-        :param ndraws:
-        :param means:
-        :param var:
-        :return:
-        """
-
-        if means is None:
-            state_means = np.arange(self.nstates)
-
-        if var is None:
-            state_variances = 0.01 * np.ones(self.nstates)
-        else:
-            state_variances = var * np.ones(self.nstates)
-
-        data = np.zeros([ndraws])
-        state = np.random.choice(self.states)  # random initial state
-        data[0] = norm.rvs(loc=state_means[state], scale=state_variances[state])
-
-        for i in range(1, ndraws):
-            state = np.random.choice(states, p=T[state, :])
-            data[i] = norm.rvs(loc=state_means[state], scale=state_variances[state])
-
-        return data
-
     def gen_ar_hmm(self, ndraws):
         """ Generate a mean-zero autoregressive timeseries based on the transition matrix and autoregressive parameters.
         The timeseries is defined as:
@@ -179,44 +163,109 @@ class GenData:
         :type phis: np.ndarray
         """
 
-        order = self.phis.shape[1]  # autoregressive order
-        data = np.zeros([ndraws + order])
+        # order = self.phis.shape[1]  # autoregressive order
+        # data = np.zeros([ndraws + order])
+        # state_labels = np.zeros([ndraws], dtype=int)
+        #
+        # state = np.random.choice(self.state_labels)  # choose initial state with uniform probability
+        # for d in range(ndraws):
+        #     state = np.random.choice(self.state_labels, p=self.T[state, :])  # choose state based on transition matrix
+        #     state_labels[d] = state  # actual state labels for future comparison
+        #     ar = sum([x * data[d + order - (i + 1)] for i, x in enumerate(self.phis[state, :])])
+        #     data[d + order] = ar + norm.rvs(scale=self.stds[state])
+
+        order = self.phis.shape[1]
+        dim = self.phis.shape[-1]
+        data = np.zeros([ndraws + order, dim])
         state_labels = np.zeros([ndraws], dtype=int)
 
         state = np.random.choice(self.state_labels)  # choose initial state with uniform probability
-        for d in range(ndraws):
+        for d in range(order, ndraws):
+            # choose state
             state = np.random.choice(self.state_labels, p=self.T[state, :])  # choose state based on transition matrix
             state_labels[d] = state  # actual state labels for future comparison
-            ar = sum([x * data[d + order - (i + 1)] for i, x in enumerate(self.phis[state, :])])
-            data[d + order] = ar + norm.rvs(scale=self.stds[state])
 
-        return data[order:], state_labels
+            # calculate autoregressive terms
+            data[d, :] = sum([self.phis[state, i, ...] @ data[d - (i + 1), :] for i in range(order)])
+
+            # add Gaussian noise by drawing from multivariate normal distribution
+            data[d, :] += np.random.multivariate_normal(self.mu[state, ...], self.cov[state, ...])
+
+        return data[order:, :], state_labels
 
 
-def generate_ar_parameters(r):
+def generate_mar_process(phis, mu, cov, dim, ndraws):
+    # TODO: move to generate_timeseries.py
+    """ Create multivariate autoregressive timeseries. 'dim' dependent timeseries will be created with multivariate
+    gaussian noise
+
+    :param phis: autoregressive coefficients (order x dim x dim)
+    :param mu: mean of trajectories in each dimension
+    :param cov: covariance matrix describing multivariate normal distribution from which noise will be pulled
+    :param dim: dimension, number of dependent trajectories to generate
+    :param ndraws: number of points in each trajectory
+
+    :type phis: numpy.ndarray
+    :param mu: numpy.ndarray
+    :type cov: numpy.ndarray
+    :type dim: int
+    :type ndraws: int
+    """
+
+    data = np.zeros([ndraws, dim])
+    order = phis.shape[0]
+
+    for d in range(order, ndraws):
+
+        # calculate autoregressive terms
+        data[d, :] = sum([phis[i, ...] @ data[d - (i + 1), :] for i in range(order)])
+
+        # add gaussian noise
+        data[d, :] += np.random.multivariate_normal(mu, cov)  # draw from multivariate normal distribution
+
+    return data
+
+
+def generate_ar_parameters(r, dim):
     """ generate autoregressive parameters, phi_n as defined below
+
+    ** 1D case **
 
     yt = \sum_{n=1}^{r} phi_n * y_{t-n} + \epsilon_t
 
     NOTE: for stationarity to be achieved, the roots of 1 - phi_1*z - phi_2*z^2 ... phi_n * z^n must lie outside the
     unit circle
 
+    ** multi-D case **
+
+    For generating phi values for multi-dimensional trajectories, a matrix is used. Each matrix A_i contains the i-th
+    lag autoregressive parameters for all dimension. i ranges from 1 to r. The matrices are square with shape dim x dim.
+    Phis are generated for each dimension independently, so only the diagonals of A_i are filled.
+
     :param r: autoregressive order
+    :param dim: number of dimensions
 
     :type r: int
+    :type dim: int
 
     :return: vector of autoregressive coefficients, phi
     """
 
-    phi = None
-    in_unit_circle = True
-    while in_unit_circle:
-        phi = np.random.uniform(-1, 1, size=r)  # made negative for compatibility with np.roots
-        phi_transformed = [1] + (-1 * phi).tolist()
-        roots = np.roots(phi_transformed[::-1])  # list reverse for compatibilty with np.roots
-        in_unit_circle = False if np.absolute(roots).min() > 1 else True
+    phis = np.zeros([r, dim, dim])  # dim x dim matrix for each autoregressive order
 
-    return phi
+    for i in range(dim):
+
+        phi = None
+        in_unit_circle = True
+        while in_unit_circle:
+            phi = np.random.uniform(-1, 1, size=r)  # made negative for compatibility with np.roots
+            phi_transformed = [1] + (-1 * phi).tolist()
+            roots = np.roots(phi_transformed[::-1])  # list reverse for compatibilty with np.roots
+            in_unit_circle = False if np.absolute(roots).min() > 1 else True
+
+        phis[:, i, i] = phi
+
+    return phis
 
 
 def link(t, labels, phantom_length=250, phantom_variance=0, phantom_mean=0):
@@ -266,14 +315,14 @@ if __name__ == "__main__":
     args = initialize().parse_args()
 
     # generate trajectories
-    data = np.zeros([args.ndraws, args.ntraj, 3])
+    data = np.zeros([args.ndraws, args.ntraj, args.ndimensions])
     state_labels = np.zeros([args.ndraws, args.ntraj], dtype=int)
 
-    data_generator = GenData(args.type, args.transition_matrix, phis=args.phis, nstates=args.nstates, slip=args.slip,
-                             order=args.order, stds=args.stds)
+    data_generator = GenData(args.type, args.ndimensions, args.transition_matrix, phis=args.phis, nstates=args.nstates,
+                             slip=args.slip, order=args.order, cov=args.stds)
 
     for i in range(args.ntraj):
-        data[:, i, 2], state_labels[:, i] = data_generator.gen_trajectory(args.ndraws)
+        data[:, i, :], state_labels[:, i] = data_generator.gen_trajectory(args.ndraws)
 
     if args.link:
         linked_data, linked_state_labels = link(data, state_labels, phantom_length=args.phantom_length)
@@ -293,7 +342,7 @@ if __name__ == "__main__":
         #                                                    phis=data_generator.phis))
         save(dict(traj=data, labels=state_labels, T=data_generator.T, phis=data_generator.phis), args.type, args.format)
 
-        plt.plot(data[:, 0, 2])
+        plt.plot(data[:, 0, 0])
         plt.plot(state_labels)
 
         plt.show()

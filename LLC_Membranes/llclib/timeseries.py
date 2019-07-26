@@ -5,6 +5,7 @@ from multiprocessing import Pool
 import tqdm
 import warnings
 import matplotlib.pyplot as plt
+from statsmodels.tsa.api import VAR
 
 
 def largest_prime_factor(n):
@@ -328,3 +329,69 @@ def correlograms(zt):
     ax[1, 1].set_xlabel('Lag (time steps)', fontsize=14)
     ax[0, 0].set_ylabel('Correlation', fontsize=14)
     ax[1, 0].set_ylabel('Correlation', fontsize=14)
+
+
+class VectorAutoRegression:
+
+    def __init__(self, timeseries, r):
+        """ Fit a vector autogressive (VAR) process to data using statsmodels.tsa.vector_ar. The output object is
+        just reduction and renaming of attributes produced after running the fit() method of the VAR class
+
+        For more detailed docs, see: https://www.statsmodels.org/dev/vector_ar.html#module-statsmodels.tsa.vector_ar
+
+        For a multidimensional time series, one could write a system of dependent autoregressive equations:
+
+        Yt = A_1*Y_{t-1} + ... + A_p*Y_{t-p} + u_t
+
+        where:
+             [y_1,t]             [y_1,{t-1}]
+             [y_2,t]             [y_2,{t-1}]
+        Yt = [ ... ] , Y_{t-1} = [  ....   ] ...
+             [y_k,t]             [y_k,{t-1}]
+
+        The matrices A_i are K x K matrices where K is the number of dimensions of the trajectory.
+        A_1 contains the 1st time lag autoregressive coefficients
+
+        if A_1 = [0.5, 0]
+                 [0, 0.4]
+
+        the associated system of equations for a VAR(1) process would be:
+
+        y1_t = 0.5y1_{t-1} + u1_t
+        y2_t = 0.4y2_{t-1} + u2_t
+
+        Of course, adding cross-terms to A would create more complex dynamical behavior
+
+        u_t is a K-dimensional vector multivariate gaussian noise generated on the covariance matrix of the data
+
+        :param timeseries: a T x K matrix where T is the number of observations and K is the number of variables/dimension
+        :param r: autoregressive order. Number of past point on which current point depends
+
+        :type timeseries: numpy.ndarray
+        :type r: int
+        """
+
+        self.dim = timeseries.shape[1]  # number of dimensions
+
+        # fit VAR model with statsmodels.tsa
+        model = VAR(timeseries)
+        results = model.fit(r)
+        print(results.summary())
+
+        # covariance matrix
+        self.covariance = results.sigma_u_mle  # give same result as following commented out block
+        # results summary stores the correlation matrix of residuals
+        # https://blogs.sas.com/content/iml/2010/12/10/converting-between-correlation-and-covariance-matrices.html
+        # corr = results.resid_corr  # residual correlation matrix
+        # stds = results.resid.std(axis=0)  # standard deviation of data in each dimension
+        # D = np.diag(stds)  # turn stds into a diagonal matrix
+        # cov = D @ corr @ D  # convert correlation matrix to covariance matrix
+
+        self.mu = results.params[0, :]
+        self.mu_std = results.stderr[0, :]
+
+        self.phi = results.coefs
+        self.phi_std = np.zeros_like(self.phi)
+
+        for i in range(self.dim):
+            self.phi_std[:, i, :] = results.stderr[1:, i].reshape(r, self.dim)

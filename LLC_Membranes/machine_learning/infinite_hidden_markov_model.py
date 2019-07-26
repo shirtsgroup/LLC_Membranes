@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap, BoundaryNorm
 from itertools import combinations, permutations
-from LLC_Membranes.llclib import file_rw
+from LLC_Membranes.llclib import file_rw, rand
 np.set_printoptions(precision=4, suppress=True)
 
 """
@@ -34,7 +34,7 @@ def initialize():
     parser = argparse.ArgumentParser(description='Generate timeseries with different underlying models')
 
     parser.add_argument('-t', '--traj', type=str, help='Name of trajectory data structure to load.')
-    parser.add_argument('-d', '--dim', nargs='+', type=int, default=2, help='dimensions of trajectory to use in analysis')
+    parser.add_argument('-d', '--dim', nargs='+', type=int, help='dimensions of trajectory to use in analysis')
     parser.add_argument('-obs', '--obstype', default='AR', type=str, help="Model describing observation sequence")
     parser.add_argument('-r', '--order', default=1, type=int, help='Autoregressive order (number of time lags that '
                                                                    'yt depends on.')
@@ -102,7 +102,7 @@ class DfError(Exception):
 
 class InfiniteHMM:
 
-    def __init__(self, data, observation_model='AR', prior='MNIW', order=1, max_states=20, dim=[2]):
+    def __init__(self, data, observation_model='AR', prior='MNIW', order=1, max_states=20, dim=None):
         """ Identify the potentially infinite number of dynamical modes in a time series using a hierarchical dirichlet
          process hidden Markov model (HDPHMM)
 
@@ -123,7 +123,13 @@ class InfiniteHMM:
 
         # things in runstuff.m #
         self.data = np.load(data)['data'][()]  # silly workaround for now. Ways of loading data will change
-        self.trajectories = self.data['traj'][..., dim]  # only using z-dimension for now. Will extend to multiple dimensions
+
+        if dim is None:
+            self.trajectories = self.data['traj']
+        else:  # Can probably get rid of this functionality, but maybe it's useful to cut out dimensions
+            self.trajectories = self.data['traj'][..., dim]
+
+        self.dimensions = self.trajectories.shape[2]
         self.nT = self.trajectories.shape[0]
         self.nsolute = self.trajectories.shape[1]
 
@@ -131,14 +137,12 @@ class InfiniteHMM:
             self.labels = self.data['labels']
 
         print('Fitting %d %d dimensional trajectories with an autoregressive order of %d' %
-              (self.nsolute, self.trajectories.shape[2], order))
+              (self.nsolute, self.dimensions, order))
 
         self.observation_model = observation_model
         self.prior = prior
         self.order = order
         self.max_states = max_states
-
-        self.dimensions = self.trajectories.shape[2]
 
         # TODO: figure out what these things really do and rename or delete
         K = np.linalg.inv(np.diag(0.1*np.ones(self.dimensions*self.order)))  # TODO: name, argument for 0.1
@@ -324,10 +328,11 @@ class InfiniteHMM:
 
         if self.resample_kappa:
 
-            # resample self-transition proportion parameter:
+            #resample self-transition proportion parameter:
             A = self.c + sum_w.sum()
             B = self.d + M.sum() - sum_w.sum()
-            rho0 = np.random.beta(A, B)
+            # rho0 = np.random.beta(A, B)
+            rho0 = randdirichlet([A, B])[0]
 
         self.hyperparams['alpha0_p_kappa0'] = alpha0_p_kappa0
         self.hyperparams['sigma0'] = sigma0
@@ -349,8 +354,12 @@ class InfiniteHMM:
         # in first iteration, barM is all zeros, so the output looks like pulls from beta distributions centered
         # at 1 / self.max_states
         # G0 ~ DP(gamma, H)  H is a base measure
+        # print(self.stateCounts['barM'].sum(axis=0) + gamma0 / self.max_states)
+        # exit()
 
-        self.beta_vec = np.random.dirichlet(self.stateCounts['barM'].sum(axis=0) + gamma0 / self.max_states)  # G0
+        #self.beta_vec = np.random.dirichlet(self.stateCounts['barM'].sum(axis=0) + gamma0 / self.max_states)  # G0
+        self.beta_vec = randdirichlet(self.stateCounts['barM'].sum(axis=0) + gamma0 / self.max_states)[:, 0]  # REMOVE
+
         if (self.beta_vec == 0).sum() > 0:
             print(self.stateCounts['barM'].sum(axis=0))
             print(gamma0)
@@ -360,7 +369,7 @@ class InfiniteHMM:
 
         N = self.stateCounts['N']
         Ns = self.stateCounts['Ns']
-
+        # print('--------------------')
         for j in range(self.max_states):
 
             # instead of alpha0*beta_vec + kappa_vec + N[j, :], I just added kappa0 as below
@@ -370,14 +379,22 @@ class InfiniteHMM:
             # sample rows of transition matrix based on G0, counts and sticky parameter
             # Gj ~ DP(alpha, G0)  -- this is the hierarchical part. If it were Gj ~ DP(gamma, H) this wouldn't work
             vec = alpha0*self.beta_vec + N[j, :]
+
             vec[j] += kappa0  # here is the sticky part. This ends up weighting self-transitions pretty heavily
             if (vec == 0).sum() > 0:
                 print(vec)
                 exit()
-            self.pi_z[j, :] = np.random.dirichlet(vec)
-            self.pi_s[j, :] = np.random.dirichlet(Ns[j, :] + sigma0 / self.Ks)
+            #self.pi_z[j, :] = np.random.dirichlet(vec)
+            # self.pi_s[j, :] = np.random.dirichlet(Ns[j, :] + sigma0 / self.Ks)
 
-        self.pi_init = np.random.dirichlet(alpha0*self.beta_vec + N[self.max_states, :])
+            self.pi_z[j, :] = randdirichlet(vec)[:, 0]  # REMOVE
+            self.pi_s[j, :] = randdirichlet(Ns[j, :] + sigma0 / self.Ks)[:, 0]  # REMOVE
+
+        #self.pi_init = np.random.dirichlet(alpha0 * self.beta_vec + N[self.max_states, :])
+        self.pi_init = randdirichlet(alpha0*self.beta_vec + N[self.max_states, :])[:, 0]  # REMOVE
+        # if self.iteration > 0:
+        #     io.savemat('pi_iter2.mat', dict(pi_z=self.pi_z, pi_s=self.pi_s, pi_init=self.pi_init))
+        #     exit()
 
     def sample_theta(self):
         """ reproduction of sample_theta.m
@@ -405,9 +422,11 @@ class InfiniteHMM:
                 for ks in range(self.Ks):
 
                     # Calculations in this conditional are verified consistent with MATLAB
+                    # print('------------------')
                     if store_card[kz, ks] > 0:
 
                         Sxx = store_XX[:, :, kz, ks] + K
+                        # print(store_XX[:, :, kz, ks])
                         Syx = store_YX[:, :, kz, ks] + MK
                         Syy = store_YY[:, :, kz, ks] + MKM
                         # https://stackoverflow.com/questions/1001634/array-division-translating-from-matlab-to-python
@@ -421,16 +440,80 @@ class InfiniteHMM:
                         Sygx = 0
 
                     sqrtSigma, sqrtinvSigma = randiwishart(Sygx + nu_delta, nu + store_card[kz, ks])
+
+                    # a = []
+                    # b = []
+                    # c = []
+                    # for i in range(10000):
+                    #     sqrtSigma, sqrtinvSigma = randiwishart(Sygx + nu_delta, nu + store_card[kz, ks])
+                    #     a.append(sqrtSigma[0, 0])
+                    #     b.append(sqrtSigma[1, 0])
+                    #     c.append(sqrtSigma[1, 1])
+                    #
+                    # plt.hist(a, bins=50, range=(0, 3))
+                    # plt.figure()
+                    # plt.hist(b, bins=50, range=(-5, 5))
+                    # plt.figure()
+                    # plt.hist(c, bins=50, range=(0, 5))
+                    # plt.show()
+                    # exit()
+
+                    # print(sqrtSigma)
+                    # print(sqrtinvSigma)
                     # distribution of invSigma looks correct
                     invSigma[:, :, kz, ks] = sqrtinvSigma.T @ sqrtinvSigma  # I guess sqrtinvSigma is cholesky decomp
 
                     cholinvSxx = np.linalg.cholesky(np.linalg.inv(Sxx)).T  # transposed to match MATLAB
 
                     A[:, :, kz, ks] = sample_from_matrix_normal(SyxSxxInv, sqrtSigma, cholinvSxx)
+
+                    # if self.iteration == 1 and kz == 0:
+                    #     print(sqrtSigma)
+                    #     print(cholinvSxx)
+                    #     print(Sxx)
+                    #     print(SyxSxxInv)
+                    #     print(Sygx)
+                    #     print(store_card[kz, ks])
+                    #     print(A[:, :, kz, ks])
+
+                    # a = []
+                    # b = []
+                    # c = []
+                    # d = []
+                    # for i in range(10000):
+                    #     ans = sample_from_matrix_normal(SyxSxxInv, sqrtSigma, cholinvSxx)
+                    #     a.append(ans[0, 0])
+                    #     b.append(ans[0, 1])
+                    #     c.append(ans[1, 0])
+                    #     d.append(ans[1, 1])
+                    #
+                    # plt.hist(a, bins=50, range=(-2, 2))
+                    # plt.title('a')
+                    # plt.figure()
+                    # plt.hist(b, bins=50, range=(-2, 2))
+                    # plt.title('b')
+                    # plt.figure()
+                    # plt.hist(c, bins=50, range=(-2, 2))
+                    # plt.title('c')
+                    # plt.figure()
+                    # plt.hist(d, bins=50, range=(-2, 2))
+                    # plt.title('d')
+                    # plt.show()
+                    # exit()
                     # distribution of A looks correct
 
-            # io.savemat('A_invSigma.mat', dict(A=A, invSigma=invSigma))
+            # if self.iteration > 0:
+            #     io.savemat('A_invSigma2.mat', dict(A=A, invSigma=invSigma))
+            #     exit()
             # reassign values
+
+            # if self.iteration > 0:
+            #     #print(A[:, :, -1, :])
+            #     exit()
+            # print(invSigma.sum())
+            # if self.iteration > 0:
+            #     exit()
+
             self.theta['invSigma'] = invSigma
             self.theta['A'] = A
 
@@ -489,7 +572,6 @@ class InfiniteHMM:
             for t in range(T):
 
                 if t == 0:
-
                     Pz = np.multiply(self.pi_init.T, partial_marg[:, 0])
                     obsInd = np.arange(0, blockEnd[0])
 
@@ -501,7 +583,8 @@ class InfiniteHMM:
                 Pz = np.cumsum(Pz)
 
                 # beam sampling
-                z[t] = (Pz[-1] * np.random.uniform() > Pz).sum()  # removed addition of 1. States named from 0
+                u = np.random.uniform()
+                z[t] = (Pz[-1] * u > Pz).sum()  # removed addition of 1. States named from 0
 
                 # add state to state counts matrix
                 if t > 0:
@@ -521,7 +604,14 @@ class InfiniteHMM:
 
                     Ns[z[t], s[obsInd[k]]] += 1
                     totSeq[z[t], s[obsInd[k]]] += 1
-                    indSeq[totSeq[z[t], s[obsInd[k]]] - 1, z[t], s[obsInd[k]]] = obsInd[k] #+ 1
+                    indSeq[totSeq[z[t], s[obsInd[k]]] - 1, z[t], s[obsInd[k]]] = obsInd[k] + 1
+                #     print(obsInd[k])
+                #     exit()
+                #     # print(indSeq[0, -1, :])
+                #     # exit()
+                # exit()
+            # print(indSeq.sum())
+            # exit()
 
             self.z[i, :] = z
             self.s[i, :] = s
@@ -531,9 +621,13 @@ class InfiniteHMM:
                     obsIndzs[i]['tot'][j, k] = totSeq[j, k]
                     obsIndzs[i]['inds'][j, k] = sparse.csr_matrix(indSeq[:, j, k], dtype=int)
 
+            # print(indSeq[:, j, k])
+            # exit()
+            # print(obsIndzs[i]['inds'][-1, -1][:obsIndzs[i]['tot'][-1, -1]].data)
+            # exit()
+
         binNs = np.zeros_like(Ns)
         binNs[Ns > 0] = 1
-
         self.stateCounts['N'] = N
         self.stateCounts['Ns'] = Ns
         self.stateCounts['uniqueS'] = binNs.sum(axis=1)
@@ -567,13 +661,18 @@ class InfiniteHMM:
                 for kz in unique_z:
                     unique_s_for_z = np.where(Ns[kz, :] > 0)[0]
                     for ks in unique_s_for_z:
-                        obsInd = inds[i]['inds'][kz, ks][:inds[i]['tot'][kz, ks]].data  # yuck
+                        obsInd = inds[i]['inds'][kz, ks][:inds[i]['tot'][kz, ks]].data - 1  # yuck
+                        # print(kz)
+                        # print(obsInd)
+                        # exit()
                         self.Ustats['XX'][:, :, kz, ks] += X[:, obsInd] @ X[:, obsInd].T
                         self.Ustats['YX'][:, :, kz, ks] += u[:, obsInd] @ X[:, obsInd].T
                         self.Ustats['YY'][:, :, kz, ks] += u[:, obsInd] @ u[:, obsInd].T
                         self.Ustats['sumY'][:, kz, ks] += u[:, obsInd].sum(axis=1)
                         self.Ustats['sumX'][:, kz, ks] += X[:, obsInd].sum(axis=1)
 
+            # print(self.Ustats['XX'][:, :, -1, :])
+            # exit()
             self.Ustats['card'] = Ns
 
     def sample_tables(self):
@@ -590,11 +689,14 @@ class InfiniteHMM:
         alpha = self.beta_vec * np.ones([self.max_states, self.max_states]) * alpha0 + kappa0 * np.eye(self.max_states)
         alpha = np.vstack((alpha, alpha0 * self.beta_vec))
         M = randnumtable(alpha, N)
+
         barM, sum_w = sample_barM(M, self.beta_vec, rho0)
 
         self.stateCounts['M'] = M
         self.stateCounts['barM'] = barM
         self.stateCounts['sum_w'] = sum_w
+
+        #io.savemat('table_samples.mat', dict(M=M, barM=barM, sum_w=sum_w))
 
     def compute_likelihood(self, solute_no):
         """ compute the likelihood of each state at each point in the time series
@@ -612,6 +714,7 @@ class InfiniteHMM:
             invSigma = self.theta['invSigma']
             A = self.theta['A']  # sample_from_matrix_normal also looked good
             mu = self.theta['mu']
+            # print(self.iteration, '%.7f' % A.sum())
 
             dimu = self.trajectories.shape[2]
             T = self.trajectories.shape[0]
@@ -625,12 +728,19 @@ class InfiniteHMM:
                     dcholinvSigma = np.diag(cholinvSigma)
 
                     v = self.trajectories[:, solute_no, :].T - A[:, :, kz, ks] @ self.X[solute_no, ...] - \
-                        mu[:, kz*np.ones([T], dtype=int), ks]
+                        mu[:, kz*np.ones([T], dtype=int), ks]  # bug here
 
                     u = cholinvSigma @ v
 
                     log_likelihood[kz, ks, :] = -0.5 * np.square(u).sum(axis=0) + np.log(dcholinvSigma).sum()
 
+                    # print(log_likelihood[kz, ks, :].sum())
+                    # if kz == 0 and self.iteration == 1:
+                    #     print(A[:, :, kz, ks])
+
+                    # if self.iteration == 2:
+                    #     exit()
+            # print(log_likelihood.sum())
             normalizer = log_likelihood.max(axis=0).max(axis=0)
             log_likelihood -= normalizer
             likelihood = np.exp(log_likelihood)  # can we just use log likelihoods?
@@ -668,13 +778,14 @@ class InfiniteHMM:
 
         return partial_marg
 
-    def plot_states(self, cmap=plt.cm.jet, traj_no=3):
+    def summarize_results(self, cmap=plt.cm.jet, traj_no=1, plot_dim='all'):
         """ Plot estimated state sequence. If true labels exist, compare those.
         """
 
+        # Get data
         traj = self.trajectories[:, traj_no, 0]
         estimated_states = self.z[traj_no, :]
-        true_states = self.labels[:, traj_no]
+        true_states = self.labels[self.order:, traj_no]
         found_states = list(np.unique(estimated_states))
         nT = len(estimated_states)
 
@@ -684,15 +795,17 @@ class InfiniteHMM:
         print('%d states were used to generate this data' % nstates)
         print('Found %d unique states' % len(found_states))
 
+        # if too few states were found, add a dummy state in order to make following calculations work
         dummies = []
         if len(found_states) < len(true_state_labels):
             print('Less states were found than exist...adding a dummy state')
             for i in range(len(true_state_labels) - len(found_states)):
-                dummy = sum(found_states)
+                dummy = sum(found_states)  # add all the found states to get a unique dummy state label
                 found_states.append(dummy)
                 dummies.append(dummy)
 
-        # We need to identify which states match up with the known labels
+        # We need to identify which states match up with the known labels. I think the Munkres algorithm is a more
+        # efficient way of doing this
         mismatches = []  # count up the number of mismatches for each subset and its permutations
         subsets = list(combinations(found_states, len(true_state_labels)))
         nperm = len(list(permutations(subsets[0])))
@@ -702,7 +815,7 @@ class InfiniteHMM:
                 M = dict(zip(true_state_labels, perm))
                 wrong = 0
                 for s, estimate in enumerate(estimated_states):
-                    if estimate != M[true_states[s + self.order]]:
+                    if estimate != M[true_states[s]]:
                         wrong += 1
                 mismatches.append(wrong)
 
@@ -710,6 +823,23 @@ class InfiniteHMM:
         subset = subsets[(mindex // nperm)]  # subset number of minimum wrong labels
         p = list(permutations(subset))  # permutations of subset
         states = list(p[mindex % nperm])  # the states listed in subset in the order that leads to minimum wrong labels
+
+        # Print estimate properties
+        estimated_transition_matrix = self.pi_z[tuple(np.meshgrid(states, states))].T
+
+        for i in range(len(states)):
+            estimated_transition_matrix[i, :] /= estimated_transition_matrix[i, :].sum()
+
+        actual_transition_matrix = self.data['T']
+        rms = np.sqrt(np.square(estimated_transition_matrix - actual_transition_matrix).mean())
+
+        print('\nEstimated Transition Matrix:\n')
+        print(estimated_transition_matrix)
+
+        print('\nActual Transition Matrix:\n')
+        print(actual_transition_matrix)
+
+        print('\nRoot mean squared error between estimated and true matrices: %.4f\n' % rms)
 
         # give extra states their own labels
         diff = len(found_states) - len(states)  # difference between number of found states and actual number of states
@@ -725,8 +855,8 @@ class InfiniteHMM:
         # determine the indices where the wrong label assignments occur
         wrong_label = []
         for s, estimate in enumerate(estimated_states):
-            if estimate != M[true_states[s + self.order]]:
-                wrong_label.append(s + self.order)
+            if estimate != M[true_states[s]]:
+                wrong_label.append(s)
 
         print('Correctly identified %.1f %% of states' % (100*(1 - (len(wrong_label) / len(estimated_states)))))
 
@@ -755,22 +885,6 @@ class InfiniteHMM:
         ax[1].set_ylim([traj.min(), traj.max()])
         ax[1].scatter(wrong_label, traj[wrong_label], color='red', marker='x', zorder=10)
         ax[1].tick_params(labelsize=14)
-
-        # Make all misidentified states a single color
-        # z = []
-        # for i, x in enumerate(estimated_states):
-        #     if i in wrong_label:
-        #         z.append(nstates)  # lump all wrong states into one state
-        #     else:
-        #         z.append(reverseM[x])
-        #
-        # c = colors[:(nstates + 1), :]
-        # c[-1, :] = [0, 0, 0, 1]  # black
-        #
-        # ax[2].set_title('Misidentified States', fontsize=14)
-        # ax[2].add_collection(multicolored_line_collection(np.arange(nT), traj, np.array(z), c))  # plot
-        # ax[2].set_xlim([0, nT])
-        # ax[2].set_ylim([traj.min(), traj.max()])
 
         plt.tight_layout()
         plt.show()
@@ -828,7 +942,8 @@ def randiwishart(sigma, df):
     #     W = wishart.rvs(df / 2, sigma)
     #
     # a = np.linalg.cholesky(W).T  # to match MATLAB's randwishart
-    a = randwishart(df/2, n)  # THIS appears to be sampling correct distribution but
+    #a = randwishart(df/2, n)  # THIS appears to be sampling correct distribution but
+    a = rand.randomwishart(df/2, n)  # REMOVE
 
     sqrtinvx = (np.sqrt(2) * a) @ di
     sqrtx = np.linalg.inv(sqrtinvx).T
@@ -844,9 +959,13 @@ def sample_from_matrix_normal(M, sqrtV, sqrtinvK):
     :param sqrtinvK:
     """
 
-    mu = M.flatten()
+    mu = M.flatten(order='F')  # order F caused 1.5 days of debugging
     sqrtsigma = np.kron(sqrtinvK, sqrtV)
-    S = mu + sqrtsigma.T @ norm.rvs(size=mu.size)
+
+    #S = mu + sqrtsigma.T @ norm.rvs(size=mu.size)
+
+    normald = rand.randomnormal(0, 1, mu.size)  # REMOVE
+    S = mu + sqrtsigma.T @ normald  # REMOVE
 
     return S.reshape(M.shape, order='F')
 
@@ -860,13 +979,12 @@ def randnumtable(alpha, numdata):
     """
 
     numtable = np.zeros_like(numdata)
-
-    for i in range(numdata.shape[0]):
-        for j in range(numdata.shape[1]):
-            if numdata[i, j] > 0:
-                numtable[i, j] = 1 + sum(np.random.uniform(size=numdata[i, j] - 1) <
-                                         (np.ones([numdata[i, j] - 1]) * alpha[i, j]) / (alpha[i, j] +
-                                                                                         np.arange(1, numdata[i, j])))
+    for i in range(numdata.shape[1]):
+        for j in range(numdata.shape[0]):
+            if numdata[j, i] > 0:
+                numtable[j, i] = 1 + sum(np.random.uniform(size=numdata[j, i] - 1) <
+                                         (np.ones([numdata[j, i] - 1]) * alpha[j, i]) / (alpha[j, i] +
+                                                                                         np.arange(1, numdata[j, i])))
 
     numtable[numdata == 0] = 0
 
@@ -897,7 +1015,8 @@ def sample_barM(M, beta_vec, rho0):
         else:
             p = 0
 
-        sum_w[j] = np.random.binomial(M[j, j], p)
+        #sum_w[j] = np.random.binomial(M[j, j], p)
+        sum_w[j] = rand.randombinomial(M[j, j], p)  # REMOVE
         barM[j, j] = M[j, j] - sum_w[j]
 
     return barM, sum_w
@@ -921,18 +1040,24 @@ def gibbs_conparam(alpha, numdata, numclass, aa, bb, numiter):
     A[:, 0] = alpha + 1
     A[:, 1] = numdata
 
+    #np.random.seed()
     for i in range(numiter):
 
         # beta auxiliary variables (the beta distribution is the 2D case of the dirichlet distribution)
-        xj = np.array([np.random.dirichlet(a) for a in A])
+        #xj = np.array([np.random.dirichlet(a) for a in A])
+        xj = np.array([randdirichlet(a) for a in A])  # REMOVE
+
         xx = xj[:, 0]
 
         # binomial auxiliary variables -- debug this if there is an issue. I think this is right though
         zz = np.less(np.multiply(np.random.uniform(size=numgroup), alpha + numdata), numdata)
 
         gammaa = aa + totalclass - sum(zz)
+
         gammab = bb - sum(np.log(xx))
-        alpha = np.random.gamma(gammaa) / gammab
+
+        #alpha = np.random.gamma(gammaa) / gammab
+        alpha = (rand.randomgamma(gammaa) / gammab)[0, 0]  # REMOVE
 
     return alpha
 
@@ -958,10 +1083,23 @@ def randwishart(a, d):
     return cholX
 
 
+def randdirichlet(a):
+    """ Python implementation of randdirichlet.m using randomgamma fucnction
+
+    :param a: vector of weights (shape parameters to the gamma distribution)
+    """
+
+    x = rand.randomgamma(a)
+    x /= x.sum(axis=0)
+
+    return x
+
+
 if __name__ == "__main__":
 
     args = initialize().parse_args()
 
+    np.random.seed(3)
     if not args.load:
 
         hmm = InfiniteHMM(args.traj, observation_model=args.obstype, prior=args.prior, order=args.order,
@@ -971,9 +1109,9 @@ if __name__ == "__main__":
         hmm.sample_theta()
         hmm.inference(args.niterations)
         file_rw.save_object(hmm, 'hmm.pl')
-        hmm.plot_states()
+        hmm.summarize_results()  # make it pretty
 
     else:
 
         hmm = file_rw.load_object('hmm.pl')
-        hmm.plot_states()
+        hmm.summarize_results()
