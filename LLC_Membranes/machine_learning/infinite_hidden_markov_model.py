@@ -353,7 +353,7 @@ class InfiniteHMM:
 
         # in first iteration, barM is all zeros, so the output looks like pulls from beta distributions centered
         # at 1 / self.max_states
-        # G0 ~ DP(gamma, H)  H is a base measure
+        # G0 ~ DP(gamma, H)  H is a uniform base measure
         # print(self.stateCounts['barM'].sum(axis=0) + gamma0 / self.max_states)
         # exit()
 
@@ -386,7 +386,6 @@ class InfiniteHMM:
                 exit()
             #self.pi_z[j, :] = np.random.dirichlet(vec)
             # self.pi_s[j, :] = np.random.dirichlet(Ns[j, :] + sigma0 / self.Ks)
-
             self.pi_z[j, :] = randdirichlet(vec)[:, 0]  # REMOVE
             self.pi_s[j, :] = randdirichlet(Ns[j, :] + sigma0 / self.Ks)[:, 0]  # REMOVE
 
@@ -778,7 +777,7 @@ class InfiniteHMM:
 
         return partial_marg
 
-    def summarize_results(self, cmap=plt.cm.jet, traj_no=1, plot_dim='all'):
+    def summarize_results(self, cmap=plt.cm.jet, traj_no=0, plot_dim='all'):
         """ Plot estimated state sequence. If true labels exist, compare those.
         """
 
