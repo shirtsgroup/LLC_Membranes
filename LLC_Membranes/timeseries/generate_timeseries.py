@@ -15,7 +15,7 @@ def initialize():
                                                                      "implemented.")
     parser.add_argument('-d', '--ndraws', default=2000, type=int, help='Number of time steps to take')
     parser.add_argument('-n', '--ntraj', default=4, type=int, help='Number of trajetories to generate')
-    parser.add_argument('-f', '--format', nargs='+', default='mat', type=str, help='Format of output array (mat or npz)')
+    parser.add_argument('-f', '--format', nargs='+', default='npz', type=str, help='Format of output array (mat or npz)')
     parser.add_argument('-nd', '--ndimensions', default=1, type=int, help='Number of dimensions of trajectory.')
 
     # Define transition matrix. Either provide your own, or let this script generate one
@@ -36,8 +36,8 @@ def initialize():
                         'for you.')
 
     # noise parameters
-    parser.add_argument('-stds', '--stds', nargs='+', type=float, help='List of standard deviations of Gaussian white '
-                                                                       'noise for each state.')
+    parser.add_argument('-cov', '--covariance', nargs='+', action='append', type=float, help='Covariance matrix for '
+                        'each state. Pass matrix for each state with a separate flag.')
 
     # phantom state linking
     parser.add_argument('-l', '--link', action="store_true", help='Link together the independent trajetories with a'
@@ -102,8 +102,15 @@ class GenData:
 
         if type == 'AR':
 
+            self.phis = np.zeros([self.nstates, order, dim, dim])
+
             if phis:
-                self.phis = np.array(phis)
+                # only works for r = 1
+                for s in range(self.nstates):
+                    try:
+                        self.phis[s, ...] = np.array(phis[s]).reshape(dim, dim)
+                    except IndexError:
+                        raise IndexError('You have not provided enough phi matrices for the number of requested states')
             else:
                 # NOTE: for multidimensional case, off-diagonal terms in each phi coefficient matrix are set to zero.
                 # I'm not sure what the stabilty rules are for the multidimensional case
@@ -111,13 +118,14 @@ class GenData:
                 for s in range(self.nstates):
                     self.phis[s, ...] = generate_ar_parameters(order, dim)
 
+        self.cov = np.zeros([self.nstates, dim, dim])
         if not cov:
-            self.cov = np.zeros([self.nstates, dim, dim])
-            for i in range(self.nstates):
+            for s in range(self.nstates):
                 A = np.random.uniform(0, stdmax, size=(dim, dim))
-                self.cov[i, ...] = A @ A.T
+                self.cov[s, ...] = A @ A.T
         else:
-            self.cov = cov
+            for s in range(self.nstates):
+                self.cov[s, ...] = np.array(cov[s]).reshape(dim, dim)
 
         self.mu = np.zeros([self.nstates, dim])
 
@@ -319,7 +327,7 @@ if __name__ == "__main__":
     state_labels = np.zeros([args.ndraws, args.ntraj], dtype=int)
 
     data_generator = GenData(args.type, args.ndimensions, args.transition_matrix, phis=args.phis, nstates=args.nstates,
-                             slip=args.slip, order=args.order, cov=args.stds)
+                             slip=args.slip, order=args.order, cov=args.covariance)
 
     for i in range(args.ntraj):
         data[:, i, :], state_labels[:, i] = data_generator.gen_trajectory(args.ndraws)

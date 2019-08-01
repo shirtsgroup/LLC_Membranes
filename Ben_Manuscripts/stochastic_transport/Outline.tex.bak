@@ -312,7 +312,7 @@
 %	frame-by-frame information rather than an average. 
 %  \end{itemize}
 
-  \subsection{The Infinite State Hidden Markov Model}
+  \subsection{The Infinite State Hidden Markov Model}  %BJC: potentially a separate paper
   
   Hidden Markov models (HMMs) are a useful and widely used technique
   for modeling sequences of observations where the probability of the next observation
@@ -320,60 +320,64 @@
   \begin{itemize}
     \item In the context of our simulations, the observations correspond to 
     the center of mass coordinates of the solutes versus time, and the states
-    correspond to the dynamical behavior which giving rise to those types
+    correspond to the dynamical behavior which give rise to those types
     of observations.
-    \item Unfortunately, HMMs require the number of hidden states to be known
+    \item Unfortunately, standard HMMs require the number of hidden states to be known
     a priori.
   \end{itemize}
   
-  The infinite-state HMM overcomes this drawback using a hierarchical
-  Dirichlet process (HDP).
+  The infinite-state HMM overcomes this drawback by placing a hierarchical
+  Dirichlet process (HDP) prior on the transition probabilities.
   \begin{itemize}
     \item Using some base probability distribution, H, a Dirichlet process 
     (DP) generates distributions over a countably infinite number of 
     probability measures:
     \begin{equation}
-      G_0 = \sum_{k=1}^{\infty} \beta_k \delta_{\theta_k} ~~ \theta_k \sim H
+      G_0 = \sum_{k=1}^{\infty} \beta_k \delta_{\theta_k} ~~ \theta_k \sim H, \beta \sim GEM(\gamma)
     \end{equation}
-    where the weights $\beta_k$ on the $\theta_k$ values drawn from the base
-    distribution come from a stick-breaking process.
+    where the $\theta_k$ are values drawn from the base distribution and the
+    weights $\beta_k$ come from a stick-breaking process parameterized by the concentration 
+    parameter $\gamma$ (equivalently referred to as GEM($\gamma$)). 
+    \item The concentration parameter expresses one's confidence in H relative to the posterior 
+    and is closely related to the number of data observations.
+    \item Each row, $G_j$, of the transition matrix is produced by drawing from a DP specified 
+    using the $\beta$ vector as a discrete base distribution and a separate concentration
+    parameter, $\alpha$.
+    \begin{equation}
+      G_j = \sum_{k=1}^{\infty} \pi_{jk} \delta_{\theta_k} ~~ \pi_j \sim DP(\alpha, \beta)
+    \end{equation}
+    \item This hierarchical specification ensures that the transition probabilities in 
+    each row share the same support points \{$\theta_1$, ..., $\theta_k$\}.
+  \end{itemize}
+   
+  \noindent We describe the dynamics of each state using a vector autoregressive (VAR) model. 
+  \begin{itemize}
+  	\item A VAR process is characterized by a vector of observations in a time series 
+  	that are dependent on $r$ previous values of the time series vector, weighted by a
+  	coefficient matrix $A_i$ in addition to a white noise term $\mathbf{e}_t$:
+  	\begin{equation}
+  	\mathbf{y}_t = \sum_{i=1}^r A_i\mathbf{y}_{t-i} + \mathbf{e}_t~~~~\mathbf{e}_t \sim N(0, \Sigma)
+  	\end{equation}
+  	\item We assumed multivariate Gaussian noise and limited our analysis to an 
+  	autoregressive order of $r=1$.
+  	\item We used a conjugate matrix-normal inverse-Wishart prior on parameters
+  	$A$ and $\Sigma$ in order to analytically draw from the posterior.
+  \end{itemize}   
+  
+  Based on the VAR parameters and matrix of transition probabilities, we calculated
+  the most likely sequence of hidden states.
+  \begin{itemize}
+    \item We repeated this process iteratively until we reached convergence % BJC: need to define convergence criteria
+    \item Our python implementation of this process is heavily adapted from the MATLAB code
+    of Fox et al.~\cite{fox_sticky_2007} 
+    \item We refer the interested reader to much more extensive descriptions of 
+    this process and its implementation. 
+    ~\cite{beal_infinite_2002,teh_hierarchical_2006,van_gael_beam_2008,fox_nonparametric_2009,fox_bayesian_2010}
   \end{itemize}
    
   \section{Results and Discussion}
-  
-  \subsection{Governing Mechanisms}\label{section:mechanism_overview}
 
-  % BJC: seems right to summarize overarching mechanisms observed first
-  The mechanisms which govern transport of small polar solutes in this 
-  system can be broadly described based a solute's size, shape, and polarity.
-  \begin{itemize}
-    \item In general, solutes can move fastest in the pore center, where
-    there is comparatively little resistance to diffusion. 
-  	\item The well-established trend of decreasing solute mobility with 
-  	size is not defied here, however we observe small solutes with lower-than-expected
-  	MSDs because they spend time trapped between monomer head groups.
-  	\item Additionally, planar molecules are prone to exhibiting similar
-  	trapping behavior, even for large molecules whose similar sized, but flexible
-  	counterparts exhibit faster diffusion.  %BJC: this is unproven
-  	\item The polarity of solutes also influences a solute's ability to stay in
-  	the pore center. Highly polar molecules tend to spend more time in the pore center,
-  	while those with hydrophobic character tend to spend more time in the head group
-  	region.
-  	\item Finally, the ability to hydrogen bond offers a second trapping mechanism. 
-  	Solutes that are hydrogen bond donors can donate hydrogen atoms to
-  	any of the 5 oxygen atoms located on the monomer head groups. Increasing the 
-  	number of hydrogen bond donating groups increases the solute's polarity causing
-  	solutes to spend more time in the pore centers, but the effect can be countered
-  	by excessive trapping if there many hydrogen bonds are being formed.
-  	\item Overall solutes exhibit some degree of trapping, by one or a combination of the above
-  	mechanisms, with anticorrelated hops between each period of immobility due to 
-  	obstructions.
-  \end{itemize}
-  
-  We will explore these factors in greater detail in the context of 
-  specific groups of molecules in the discussion that follows.
-
-  \subsection{MSD Predictions}\label{section:msd_predictions}
+  \subsection{Subordinated Fractional Brownian Motion Modeling}\label{section:sFBM}
   
   %BJC: focus on MD MSD results
   \noindent We calculated the MSD of each solute in the set over the course of 1$\mu$s MD simulations.  %BJC: type of MSD TBD 
@@ -393,6 +397,25 @@
 	reduced	uncertainty MD MSDs.
   \end{itemize}
   
+  % BJC: worth including single parameter model (i.e. no radial dependence) to 
+  % show its shortcomings? Or send to supporting information
+  \begin{table}[h]
+  \centering
+  \begin{tabular}{cccc}
+  \toprule
+  System & $\sigma$ ($nm$) & $\alpha$ & $H$ \\
+  \midrule
+  Methanol & 0.46 & 0.85 & 0.40 \\
+  Urea & 0.33 & 0.64 & 0.40 \\
+  Ethylene Glycol & 0.35 & 0.64 & 0.36 \\
+  Acetic Acid & 0.28 & 0.51 & 0.44 \\
+  \bottomrule
+  \end{tabular}
+  \caption{We calculated values $\sigma$, $\alpha$ and $H$ from MD simulation
+  trajectories and then computed the average ensemble-averaged MSD of 10000 
+  simulated trajectories.}\label{table:simulations}
+  \end{table}
+  
   Our simulated sFBM MSDs qualitatively reproduce the MD trends.
   \begin{itemize}
     \item sFBM generally lower
@@ -405,41 +428,7 @@
   \includegraphics[width=\textwidth]{all_emsds.pdf}
   \caption{}\label{fig:all_msds}
   \end{figure}
-  
-  % Add MD calculated MSD to this?
-  \begin{table}[h]
-  \centering
-  \begin{tabular}{cccc}
-  \toprule
-  System & $\sigma$ ($nm$) & $\alpha$ & $H$ \\
-  \midrule
-  Methanol & 0.46 & 0.85 & 0.40 \\
-  Urea & 0.33 & 0.64 & 0.40 \\
-  Ethylene Glycol & 0.35 & 0.64 & 0.36 \\
-  Acetic Acid & 0.28 & 0.51 & 0.44 \\
-  Mercaptoethanol & 0.30 & 0.54 & 0.26 \\
-  Ethanol & 0.32 & 0.55 & 0.25 \\
-  Propylene Glycol & 0.26 & 0.48 & 0.35 \\
-  Glycerol & 0.23 & 0.46 & 0.37 \\
-  Acetamide & 0.28 & 0.52 & 0.26 \\
-  Propanol & 0.25 & 0.41 & 0.35 \\
-  Acetone & 0.23 & 0.44 & 0.34 \\
-  Ethyl Acetate & 0.21 & 0.41 & 0.37 \\
-  Dimethyl Sulfoxide & 0.26 & 0.48 & 0.26 \\
-  Tetrose & 0.24 & 0.43 & 0.30 \\
-  Butanol & 0.19 & 0.41 & 0.33 \\
-  Dimethyl Formamide & 0.20 & 0.39 & 0.32 \\
-  2,3-Dimercapto-1-propanol & 0.20 & 0.37 & 0.35 \\
-  Ribose & 0.20 & 0.40 & 0.27 \\
-  Propylene Carbonate & 0.19 & 0.38 & 0.29 \\
-  Tetrahydrofuran & 0.24 & 0.39 & 0.16 \\
-  \bottomrule
-  \end{tabular}
-  \caption{We calculated values $\sigma$, $\alpha$ and $H$ from MD simulation
-  trajectories and then computed the average ensemble-averaged MSD of 10000 
-  simulated trajectories.}\label{table:simulations}
-  \end{table}
-  
+
   It most cases, it is easy to relate $\sigma$, $\alpha$ and $H$ to the
   simulated MSD values presented in Table~\ref{table:simulations}. 
   \begin{itemize}
@@ -452,7 +441,6 @@
   \end{itemize}
 
   % BJC: figure with selected trajectories for each molecule.
-
   We fit a CTRW model (see Section~\ref{method:CTRW}) to these 
   trajectories and predicted macroscopic diffusion coefficients which are
   presented in Table TBD.
@@ -468,164 +456,10 @@
 	uncorrelated which tells us the system is likely well-described
 	by a CTRW. 
   \end{itemize}
-
-  % BJC: table with finalized diffusion coefficients
-
-  \subsubsection*{The Influence of Water Content on Macroscopic Diffusion Coefficients}
-
-  Solutes in systems with lower water content exhibit lower diffusion coefficients.
-  \begin{itemize}
-	\item Pores are more crowded when there is less water (show RDFs of each)
-	\item Not a linear function of pore size - radius increase by x, D increases by y
-	\item Larger influence on bigger molecules
-  \end{itemize}
-
-  \subsubsection{Experimental Measurements}
-
-  % For Greg
-
-  \subsection{Transport Mechanisms}
-
-  In order to truly understand the molecular origins of the macroscopic
-  diffusion coefficients in Section~\ref{section:D_macro}, we studied the
-  microscopic interactions between solutes and the membrane that lead to the
-  observed dwell time and hop distributions.
-  \begin{itemize}
-	\item We studied the radial distribution functions of solutes as a
-	function of distance from the pore center
-	\item We looked at hydrogen bonding patterns
-	\item Coordination numbers
-	\item Order parameters
-  \end{itemize}
-
-  The radial distribution function of each solute studied is shown in 
-  Figure TBD.
-
-  \subsubsection*{Transport of Water}
-
-  All water molecules exhibit hop diffusion.
-
-  Even in the center of the pore, where the density of water molecules is
-  highest, individual water molecules exhibit hop diffusion as they create a
-  tight hydrogen bond network.
-  %TODO: the following is a hypothesis
-  \begin{itemize}
-	\item Water sticks to pore walls
-	\item Dwell times are short
-	\item Water tumbles across pore for a while until it sticks again. 
-	\item Water gets caught in h-bonds with other water molecules away
-	from pore center.
-  \end{itemize}
-
-  In this confined environment, the diffusion constant is x times lower than
-  expected bulk diffusion coefficient of tip3p water.
-
-  %TODO: study diffusion mechanism of water
   
-  \subsubsection*{Transport of Alcohols}
-
-  The hydroxyl functional group of alcohol molecules is a hydrogen bond donor
-  and prefers to donate it's hydrogen to more strongly polarized carboxylate head
-  groups.
-
-  As alcohol groups increase in hydrophobic character, they are more inclined
-  to stick to the outside edges of the pore. 
-  \begin{itemize}
-	\item The alkane tails prefer to stay at the edges of the pore.
-	\item Radial distribution functions show peaks at pore edges, however
-	smaller alcohols have high densities near the pore center. 
-	\item They tend to get trapped between monomers and closer to 
-	the tail region. 
-	\item The entrapment is further stabilized by hydrogen bonds with
-	ether oxygens connecting the monomer's alkane tails to the head groups.
-	%TODO: quantify h-bonds with ether oxygens and carbonyl oxygens
-  \end{itemize}
-
-  The diffusion coefficient of simple alcohols increases as the length of 
-  the alkane chain increases.
-  \begin{itemize}
-	\item The dwell times increase as the oily tails become more
-	entrapped in monomer tails.
-  \end{itemize}
-
-  Ethylene glycol, a diol, has two hydrogen bond donor groups.
-  \begin{itemize}
-	\item Can hydrogen bond with same moeity.
-	\item Can hydrogen bond with different moeities in the same 
-	vicinity. 
-	\item Dwell times tend to be shorter. If one hydroxyl group is bound
-	with a hydrogen bond, the other unbound hydroxyl group may form a hydrogen bond
-	elsewhere and effectively pull the other bound hydroxyl group along with it. 
-  \end{itemize}
-
-  \subsubsection*{Transport of Acetone}
-
-  The carbonyl group of Acetone is a hydrogen bond acceptor and therefore only
-  form hydrogen bonds with water molecules in the pore. 
-
-  The hydrophobic character of the two methyl groups on acetone causes the methyl
-  groups to gravitate towards the outside of the pore, while the carbonyl group
-  reaches towards the pore center in order to hydrogen bond with water molecules.
-  \begin{itemize}
-	\item Order parameter defined between vector along carbonyl and vector extending
-	from acetone COM to pore center is non-zero.
-  \end{itemize} 
-
-  \subsubsection*{Transport of Acetic Acid}
-
-  Acetic acid, since we modeled it solely in its protonated state, has hydrogen
-  bond donor and acceptor groups. 
-
-  \subsubsection*{Transport of Ions} % probably just sodium
-
-  Sodium ions also exhibit hop diffusion because polarized water and
-  carboxylate head groups both work to neutralize its charge.
-  \begin{itemize}
-	\item Ions get trapped in oxygen 'cages' composed of combinations
-	of water molecules, carboxylate head groups and ether oxygens connecting
-	the head groups to their tails.
-  	\item Interesting coordination number data
-	\item Dwell time proportional to surrounding charge within coordination shell
-  \end{itemize}
-
-  \subsubsection*{Remarks}
-   
-  Overwhelming amount of water in 10 wt\% system makes hydrogen bonding
-  competitive between head groups and water.
-  %MRS: not sure what you mean above.
-
-  \subsection{Design Suggestions}
-
-  Water content affects pore size. Experiments to understand this could be useful.
-
-  Separate polar molecules by creating monomers with more hydrophilic head group components.
-  More incentive to dwell on walls.
-
-  Make ions move faster by placing charges in sterically inaccessible places. 
+  \section{Markov Modeling}\label{section:markov_models}
 
   \section{Conclusion}
-
-  We have examined the transport characteristics of a series of small polar
-  molecules in our model of the H\textsubscript{II} phase formed by 
-  Na-GA3C11.
-
-  We calculated the macroscopic diffusion coefficients of each solute as 
-  approximated by a CTRW model and validated our estimates using experimental
-  DOSY NMR measurements.
-
-  We have studied the influence of water content on the diffusion coefficients.
-
-  We showed that hydrogen bonding between solutes and Na-GA3C11 monomers plays
-  a major role in mechanism by which molecules traverse the nanopores. 
-
-  We can use this intuition in order to modify our monomers for a specific 
-  separation.
-  \begin{itemize}
-	\item Increase number of h-bond sites to increase selectivity towards water 
-	over polar molecules
-	\item Also separate acetone (things with only h-bond accepting groups) in this way
-  \end{itemize}
-  
  
   \section*{Supporting Information}
 
