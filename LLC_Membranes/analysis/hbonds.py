@@ -61,7 +61,7 @@ def initialize():
 
 class System(object):
 
-    def __init__(self, traj, gro, begin=0, end=-1, skip=1):
+    def __init__(self, traj, gro, begin=0, end=-1, skip=1, t=None):
         """ Load in the trajectory
 
         :param traj: GROMACS trajectory file (.xtc or .trr)
@@ -69,21 +69,27 @@ class System(object):
         :param begin: First frame to analyze
         :param end: Last frame to analyze
         :param skip: Only analyze every `skip` frames
+        :param t: mdtraj trajectory object. If this is provided, traj and gro will not be loaded
 
         :type traj: str
         :type gro: str
         :type begin: int
         :type end: int
         :type skip: int
+        :type t: object
         """
 
         # print('Generating bond list...', end="", flush=True)
         # self.top = Topology(top, xlink=xlink, xlink_topology=xlink_topology, xlink_residue=xlink_residue)
         # print('Done!')
 
-        print('Loading trajectory...', end="", flush=True)
-        self.t = md.load(traj, top=gro)[begin:end:skip]
-        print('Done!')
+        if t is None:
+            print('Loading trajectory...', end="", flush=True)
+            self.t = md.load(traj, top=gro)[begin:end:skip]
+            print('Done!')
+        else:
+            self.t = t
+
         self.pos = self.t.xyz  # positions of all atoms
         self.hbonds = []  # will hold h-bonds for each frame [D, H, A, angle]
         self.dt = self.t.time[1] - self.t.time[0]

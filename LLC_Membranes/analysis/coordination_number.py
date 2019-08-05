@@ -56,7 +56,7 @@ def initialize():
 class System(object):
 
     def __init__(self, traj, gro, residue=None, coordinated_residue=None, atoms=None, coordinated_atoms=None, type=None,
-                 ctype=None, begin=0, end=-1, skip=1, com=True):
+                 ctype=None, begin=0, end=-1, skip=1, com=True, t=None):
         """ Narrow system down to groups of interest
 
         :param traj: Name of GROMACS trajectory (.xtc or .trr)
@@ -71,11 +71,29 @@ class System(object):
         :param end: last frame to analyze
         :param skip: number of frames to skip between analysis steps
         :param com: Calculate coordination based on the center of mass position of the selected atom group
+        :param t: mdtraj trajectory object. If this is passed, traj and gro will not be loaded
+
+        :type traj: str
+        :type gro: str
+        :type residue: str
+        :type coordinated_residue: str
+        :type atoms: list of str
+        :type coordinated_atoms: list of str
+        :type type: list of str
+        :type ctype: list of str
+        :type begin: int
+        :type end: int
+        :type skip: int
+        :type com: bool
+        :type t: object
         """
 
-        print("Loading trajectory...", end='', flush=True)
-        self.t = md.load(traj, top=gro)[begin:end:skip]
-        print("Done!")
+        if t is None:
+            print("Loading trajectory...", end='', flush=True)
+            self.t = md.load(traj, top=gro)[begin:end:skip]
+            print("Done!")
+        else:
+            self.t = t
 
         names = topology.fix_names(gro)  # rename atoms because mdtraj screws it up in some cases.
         for i, a in enumerate(self.t.topology.atoms):
@@ -98,7 +116,6 @@ class System(object):
         self.com_coordinated, self.com_coordinated_map = self.narrow_atoms(coordinated_atoms, coordinated_residue,
                                                                            ctype, coordination=True, com=com)
 
-        print(self.com.shape, self.com_coordinated.shape)
         # relate indices to
         self.names = [a.name for a in self.t.topology.atoms]
         self.residues = [a.residue.name for a in self.t.topology.atoms]

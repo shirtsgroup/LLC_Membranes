@@ -45,21 +45,31 @@
   solute-specific separations.
 
   In our previous work, we studied the transport of 20 small polar molecules
-  in an H\textsubscript{II} phase LLC membrane. 
+  in an H\textsubscript{II} phase LLC membrane.
+  \begin{itemize}
+    \item In general, we observed subdiffusive transport behavior characterized 
+    by intermittent hops separated by periods of entrapment.
+    \item We identified three mechanisms responsible for the solute trapping behavior:
+    entanglement among monomer tails, hydrogen bonding with monomer head groups, and
+    association with sodium counter ions.
+  \end{itemize}
 
   Unfortunately, the timescales that we can simulate with MD are insufficient to be
-  able to predict well-converged predictions of macroscopic transport properties 
+  able to make well-converged predictions of macroscopic transport properties 
   traditionally used to characterize membranes in the lab.
 
   % review of techniques for predicting long time scale behavior
 
-  In this work, we explore two approaches to modeling the dynamic behavior of 
-  a subset of solutes that we studied in our previous work.
+  In this work, we explore three approaches to model the long timescale behavior
+  of the four solutes fasted moving solutes studied in our previous work.
   \begin{itemize}
-  	\item First is based on the anomalous diffusion literature
-  	\item Our second approach to modeling solute transport groups solute behavior
-    into different dynamical states.
-%  	\item Second focuses on the analysis of time series  % Need a better way to talk about it here 
+    \item Specifically, we study methanol, urea, ethylene glycol and acetic acid
+  	\item Our first approach is based on the anomalous diffusion literature.
+  	\item The second approach uses Markov state models (MSMs) 
+  	\item The third uses an infinite hidden Markov model (iHMM), an unsupervised machine
+  	learning algorithm which groups solute behavior into different dynamical states.
+  	% BJC: somewhere emphasize that this last approach is powerful since it doesn't 
+  	% require anything different in systems with more complex geometries (i.e. QI)
   \end{itemize}
 
   \section{Methods}
@@ -312,7 +322,40 @@
 %	frame-by-frame information rather than an average. 
 %  \end{itemize}
 
-  \subsection{The Infinite State Hidden Markov Model}  %BJC: potentially a separate paper
+  \subsection{Markov State Models}\label{method:MSMs}
+  
+  A Markov state model decomposes a time series into a set of discrete states
+  with transitions between states defined by a transition probability matrix, T,
+  which describes the conditional probability of jumping to a specific 
+  state given the previously observed state.~\cite{pande_everything_2010,wehmeyer_introduction_2018}
+  \begin{itemize}
+    \item In the context of molecular simulations, MSMs are frequently used
+    to study systems with slow dynamics, such as protein folding.~\cite{snow_how_2005,chodera_automatic_2007}
+    \item Researchers typically aim to come up with a low dimensional 
+    representation of the system based on features which preserve the process
+    kinetics. This facilitates the identification of discrete states from
+    which T is generated.
+    \item Software packages such as MSMbuilder~\cite{beauchamp_msmbuilder2:_2011}
+    and pyEMMA~\cite{scherer_pyemma_2015} provide work flows capable 
+    of featurization and dimensional reduction.
+  \end{itemize}
+  
+  In this work, we define discrete states based on the 3 trapping mechanisms
+  observed in our previous work. 
+  \begin{itemize}
+  	\item Therefore, there is no need to subject our trajectories to any reduction
+  	in dimensionality. 
+  	\item This assumes that there are no significant kinetic effects resulting
+  	from solute conformational changes or pore size fluctuations, an assumption 
+  	that may be relaxed in future work.
+  	\item However, we will adopt the validation techniques used in the packages
+  	mentioned above.  
+  \end{itemize}
+  
+  % BJC: does it make sense to use Dirichlet Process as a conjugate prior for
+  % getting error on transition matrix?
+
+  \subsection{The Infinite State Hidden Markov Model}\label{method:iHMM}  %BJC: potentially a separate paper
   
   Hidden Markov models (HMMs) are a useful and widely used technique
   for modeling sequences of observations where the probability of the next observation

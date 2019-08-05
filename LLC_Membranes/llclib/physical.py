@@ -2,7 +2,7 @@
 
 from __future__ import division
 from builtins import range
-from LLC_Membranes.llclib import file_rw, transform
+from LLC_Membranes.llclib import file_rw, transform, topology
 import mdtraj as md
 import numpy as np
 import matplotlib.path as mplPath
@@ -501,6 +501,28 @@ def center_of_mass(pos, mass_atoms):
             com[f, i, :] = np.sum(w, axis=0) / sum(mass_atoms)  # sum the coordinates and divide by the mass of the residue
 
     return com
+
+
+def residue_center_of_mass(t, res):
+    """ Calculate the center of mass versus time of a residue in an MD trajectory
+
+    :param t: mdtraj trajectory object
+    :param res: name of residue to track
+
+    :type t: object
+    :type res: str
+
+    :return: center of mass of residue versus time
+    """
+
+    residue = topology.Residue(res)  # get resiude attributes
+
+    ndx = [a.index for a in t.topology.atoms if a.residue.name == res]  # index of all residue atoms
+    names = [a.name for a in t.topology.atoms if a.residue.name == res][:residue.natoms]  # names of atoms in one residue
+    mass = [residue.mass[x] for x in names]  # mass of atoms in order that they appear in file
+    print('Calculating center of mass trajectories of residue %s' % residue.name)
+
+    return center_of_mass(t.xyz[:, ndx, :], mass)  # determine center of mass trajectories
 
 
 def compdensity(coord, pore_centers, box, cut=1.5, nbins=50, spline=False):
