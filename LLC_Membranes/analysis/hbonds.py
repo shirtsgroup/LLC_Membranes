@@ -64,14 +64,14 @@ class System(object):
     def __init__(self, traj, gro, begin=0, end=-1, skip=1, t=None):
         """ Load in the trajectory
 
-        :param traj: GROMACS trajectory file (.xtc or .trr)
+        :param traj: GROMACS trajectory file (.xtc or .trr), can be None if t is provided
         :param gro: GROMACS coordinate file (.gro)
         :param begin: First frame to analyze
         :param end: Last frame to analyze
         :param skip: Only analyze every `skip` frames
         :param t: mdtraj trajectory object. If this is provided, traj and gro will not be loaded
 
-        :type traj: str
+        :type traj: str or NoneType
         :type gro: str
         :type begin: int
         :type end: int
@@ -353,6 +353,7 @@ class System(object):
 
     def hbond_matrix(self):
 
+        # identify unique atoms in hbond list
         unique_atoms = []
         for i in range(len(self.hbonds)):
             unique_atoms.append(np.unique(self.hbonds[i][::2, :]))

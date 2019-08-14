@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.9.22)  1 AUG 2019 16:26
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.9.22)  14 AUG 2019 17:02
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -748,7 +748,7 @@ File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 35.
 
-Overfull \hbox (66.77353pt too wide) in paragraph at lines 75--78
+Overfull \hbox (66.77353pt too wide) in paragraph at lines 79--82
 \OT1/cmr/m/n/10 simulation tra-jec-tory us-ing python scripts which are avail-a
 ble on-line at \OT1/cmtt/m/n/10 https://github.com/shirtsgroup/LLC[]Membranes\O
 T1/cmr/m/n/10 . 
@@ -758,31 +758,64 @@ T1/cmr/m/n/10 .
 
 {/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 [2]
-Overfull \hbox (20.39182pt too wide) in paragraph at lines 228--230
+Overfull \hbox (20.39182pt too wide) in paragraph at lines 232--234
 []\OT1/cmr/m/n/10 We ob-tained dis-tri-bu-tions of the hop length stan-dard de-
 vi-a-tions, $\OML/cmm/m/it/10 ^^[$\OT1/cmr/m/n/10 , and $\OML/cmm/m/it/10 $ \O
 T1/cmr/m/n/10 us-ing sta-tis-ti-cal bootstrapping.[[]] 
  []
 
-[3] [4] [5]
+[3] [4] [5] [6]
 
-LaTeX Warning: Reference `section:model_sFBM' on page 6 undefined on input line
- 421.
+LaTeX Warning: File `emissions_MET.pdf' not found on input line 509.
 
-<./figures/all_emsds.pdf, id=31, pagebox=cropbox, 867.24pt x 505.89pt>
+
+! Package pdftex.def Error: File `emissions_MET.pdf' not found: using draft set
+ting.
+
+See the pdftex.def package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.509 ...hics[width=\textwidth]{emissions_MET.pdf}
+                                                  
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+LaTeX Warning: File `msd_MET.pdf' not found on input line 514.
+
+
+! Package pdftex.def Error: File `msd_MET.pdf' not found: using draft setting.
+
+See the pdftex.def package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.514 ...degraphics[width=\textwidth]{msd_MET.pdf}
+                                                  
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+LaTeX Warning: Reference `section:model_sFBM' on page 7 undefined on input line
+ 525.
+
+[7] [8] [9]
+<./figures/all_emsds.pdf, id=44, pagebox=cropbox, 867.24pt x 505.89pt>
 File: ./figures/all_emsds.pdf Graphic file (type pdf)
 <use ./figures/all_emsds.pdf>
-Package pdftex.def Info: ./figures/all_emsds.pdf  used on input line 462. on in
-put line 462.
+Package pdftex.def Info: ./figures/all_emsds.pdf  used on input line 566. on in
+put line 566.
 Package pdftex.def Info: Requested size: 469.75502pt x 274.02563pt on input lin
-e 462.
+e 566.
 
-LaTeX Warning: Reference `method:CTRW' on page 6 undefined on input line 478.
 
-[6] [7 <./figures/all_emsds.pdf>] (./Outline.bbl
+LaTeX Warning: Reference `method:CTRW' on page 10 undefined on input line 582.
+
+[10 <./figures/all_emsds.pdf>] [11] (./Outline.bbl
 Missing character: There is no Ã in font cmr10!
 Missing character: There is no © in font cmr10!
- [8
+ [12
 
 ]
 Missing character: There is no Ã in font cmr10!
@@ -791,16 +824,26 @@ Missing character: There is no Ã in font cmr10!
 Missing character: There is no ¡ in font cmr10!
 Missing character: There is no Ã in font cmr10!
 Missing character: There is no © in font cmr10!
-) [9] [10] (./Outline.aux)
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no  in font cmr10!
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no “ in font cmr10!
+) [13] [14]
+(./Outline.aux)
 
 LaTeX Warning: There were undefined references.
 
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
  ) 
 Here is how much of TeX's memory you used:
- 16788 strings out of 492990
- 340898 string characters out of 6132621
+ 16800 strings out of 492990
+ 341122 string characters out of 6132621
  374930 words of memory out of 5000000
- 20182 multiletter control sequences out of 15000+600000
+ 20192 multiletter control sequences out of 15000+600000
  543643 words of font info for 75 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  42i,8n,77p,10379b,533s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -818,10 +861,10 @@ live/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texl
 ive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texliv
 e/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive
 /2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on Outline.pdf (10 pages, 211618 bytes).
+Output written on Outline.pdf (14 pages, 219548 bytes).
 PDF statistics:
- 150 PDF objects out of 1000 (max. 8388607)
- 76 compressed objects within 1 object stream
+ 163 PDF objects out of 1000 (max. 8388607)
+ 85 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  6 words of extra memory for PDF output out of 10000 (max. 10000000)
 

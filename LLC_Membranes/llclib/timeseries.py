@@ -267,6 +267,42 @@ def ensemble_msd(x0, x, size):
         return np.linalg.norm(x0 - x, axis=1) ** 2
 
 
+def bootstrap_msd(msds, N, confidence=68):
+    """ Estimate error at each point in the MSD curve using bootstrapping
+
+    :param msds: mean squared discplacements to sample
+    :param N: number of bootstrap trials
+    :param confidence: percentile for error calculation
+
+    :type msds: np.ndarray
+    :type N: int
+    :type confidence: float
+    """
+
+    nT, nparticles = msds.shape
+
+    msd_average = msds.mean(axis=1)
+    eMSDs = np.zeros([nT, N], dtype=float)  # create n bootstrapped trajectories
+
+    print('Bootstrapping MSD curves...')
+    for b in tqdm.tqdm(range(N)):
+        indices = np.random.randint(0, nparticles, nparticles)  # randomly choose particles with replacement
+        for n in range(nparticles):
+            eMSDs[:, b] += msds[:, indices[n]]  # add the MSDs of a randomly selected particle
+        eMSDs[:, b] /= nparticles  # average the MSDs
+
+    lower_confidence = (100 - confidence) / 2
+    upper_confidence = 100 - lower_confidence
+
+    limits = np.zeros([2, nT], dtype=float)  # upper and lower bounds at each point along MSD curve
+    # determine error bound for each tau (out of n MSD's, use that for the error bars)
+    for t in range(nT):
+        limits[0, t] = np.abs(np.percentile(eMSDs[t, :], lower_confidence) - msd_average[t])
+        limits[1, t] = np.abs(np.percentile(eMSDs[t, :], upper_confidence) - msd_average[t])
+
+    return limits
+
+
 def step_autocorrelation(trajectories, axis=0):
     """ Calculate autocorrelation of step length and direction
 

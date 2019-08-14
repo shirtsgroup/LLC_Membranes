@@ -59,7 +59,7 @@ class System(object):
                  ctype=None, begin=0, end=-1, skip=1, com=True, t=None):
         """ Narrow system down to groups of interest
 
-        :param traj: Name of GROMACS trajectory (.xtc or .trr)
+        :param traj: Name of GROMACS trajectory (.xtc or .trr), can be None if t is specified
         :param gro: Name of GROMACS coordinate file (.gro)
         :param residue: Name of residue to include in calculation
         :param coordinated_residue: Name of residue whose coordination we are interested in
@@ -73,7 +73,7 @@ class System(object):
         :param com: Calculate coordination based on the center of mass position of the selected atom group
         :param t: mdtraj trajectory object. If this is passed, traj and gro will not be loaded
 
-        :type traj: str
+        :type traj: str or NoneType
         :type gro: str
         :type residue: str
         :type coordinated_residue: str
@@ -305,20 +305,12 @@ class System(object):
 
         else:
             self.ncoord = np.zeros([self.t.n_frames, self.com.shape[1]])
-            print(self.ncoord.shape)
 
             for i in tqdm.tqdm(range(self.ncoord.shape[1])):
                 self.ncoord[:, i] = [len(np.nonzero(self.distances[t][i, :])[1]) for t in range(self.t.n_frames)]
-                #self.ncoord[:, i] = [(self.distances[t] != 0).sum(1).mean() for t in range(self.t.n_frames)]
 
-            # for i in range(self.com.shape[1]):
-            #     print(i)
-            #     plt.plot(self.ncoord[:, i])
-            #     plt.show()
-            #
-            # exit()
-            print('Average coordinated molecules per frame: %.2f +/- %.2f' % self.ncoord.mean(), self.ncoord.std())
-            #plt.plot(self.time, self.ncoord.mean(axis=1))
+            # print('Average coordinated molecules per frame: %.2f +/- %.2f' % (self.ncoord.mean(), self.ncoord.std()))
+
             if plot:
                 plt.plot(self.time, self.ncoord.sum(axis=1))
 

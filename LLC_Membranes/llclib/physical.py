@@ -383,7 +383,7 @@ def trace_pores(pos, box, npoints, npores=4, progress=True, save=True, savename=
     """
     Find the line which traces through the center of the pores
     :param pos: positions of atoms used to define pore location (args.ref) [natoms, 3]
-    :param box: xy box vectors, [2, 2], mdtraj format
+    :param box: xy box vectors, [2, 2], mdtraj format (t.unitcell_vectors)
     :param npoints: number of points for spline in each pore
     :param npores: number of pores in unit cell (assumed that atoms are number sequentially by pore. i.e. pore 1 atom
     numbers all precede those in pore 2)
