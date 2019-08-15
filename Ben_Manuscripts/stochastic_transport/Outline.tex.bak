@@ -27,7 +27,7 @@
   %BJC: obviously this section will get beefed up
   We need highly selective membranes in order to perform efficient separations.
 
-  Amphiphilic molecules are capable of self-assembling into ordered nanostructures.
+  \noindent Amphiphilic molecules are capable of self-assembling into ordered nanostructures.
 
   Lytropic liquid crystals are a class of amphiphilic molecules that can be cross-linked
   into mechanically strong membranes.
@@ -37,7 +37,7 @@
 	techniques by being selective based not only on size and charge, but on chemical
 	functionality as well.
 	\item Q\textsubscript{I} phase LLCs consist of a tortuous network of 3D interconnected
-	pores.
+	pores. They are easier to make.
   \end{itemize}
 
   We can only learn so much from experiment. MD can give us mechanistic insights with
@@ -54,13 +54,39 @@
     association with sodium counter ions.
   \end{itemize}
 
+  % BJC: I've been trying to understand the following justification a bit more. Does it
+  % rely on the MSD becoming linear so we can get experimentally diffusion constants? Is
+  % it just to try and reduce uncertainty in our MSD predictions? What can we learn from
+  % long stochastic simulations that we can't learn from the shorter simulations.
+  % BJC: To me the value in this is gaining a deeper mechanistic understanding by 
+  % putting things in terms of easily interpreted equations.
+  % BJC: Maybe it's just a combination of both.
   Unfortunately, the timescales that we can simulate with MD are insufficient to be
   able to make well-converged predictions of macroscopic transport properties 
   traditionally used to characterize membranes in the lab.
 
+  One can draw from a number of scientific field to model transport behavior.
+  \begin{itemize}
+    \item In the simulation literature, most start with mean squared displacement (MSD)
+    \item Mean first passage time 
+  \end{itemize}
+
   % brief (1 paragraph) review of techniques for predicting long time scale behavior
-  The are numerous ways one can approach modeling solute transport behavior.
+  The are numerous ways one can approach modeling transport behavior, withing varying
+  levels of complexity.
+  \begin{itemize}
+    \item Most 
+    \item But more often than not, due to the time scales most people simulate, the MSD
+    does not give a complete picture of what is happening.
+    \item Mean first passage time?
+    \item Markov state models are popular with researchers of proteins which have 
+    many dynamical states occurring over multiple time scales.
+    \item Hidden markov models are useful for when states are known but one cannot
+  \end{itemize}
   % Ornstein-Uhlenbeck (Gaussian + non-Gaussian)
+  
+  Talk about finance, single particle tracking and other places this type of analysis
+  are used. Use word ubiquitous
 
   In this work, we explore three approaches to model the long timescale behavior
   of the four solutes fasted moving solutes studied in our previous work.
@@ -116,215 +142,7 @@
     respectively.
   \end{itemize}
   
-  \subsection{Modeling subdiffusion}\label{method:model_sFBM}
-
-  Solutes in our H\textsubscript{II} LLC membrane system exhibit subdiffusive
-  behavior, a type of anomalous diffusion.
-  \begin{itemize}
-  	\item During an anomalous diffusion process, the mean squared displacement (MSD)
-  	does not grow linearly with time, rather it is of the form:
-	\begin{equation} 
-	\langle x^2(t) \rangle = K_{\alpha}t^\alpha
-	\label{eqn:msd_form}
-	\end{equation} 
-	where $\alpha$ is the anomalous exponent and $K_\alpha$ is the
-	generalized diffusion coefficient.
-	\item A value of $\alpha < 1$ indicates a subdiffusive process, while values of
-	$\alpha = 1$ and $\alpha > 0$ are characteristic of Brownian and superdiffusive
-	motion respectively.
-  \end{itemize}
-
-  \noindent We analyzed both the ensemble-averaged and time-averaged MSDs
-  of the simulated trajectories.
-  \begin{itemize}
-	\item The ensemble-averaged MSD measures the displacement of a particle from its initial
-	position~\cite{meroz_toolbox_2015} and can be written as
-	\begin{equation}
-	\langle x^2(t) \rangle = \langle x(t) - x(0) \rangle
-	\label{eqn:ensemble_msd}
-	\end{equation}
-%	\item The average MSD calculated in this way recovers the form of
-%	Equation~\ref{eqn:msd_form}. % time-averaged should recover it too for FBM 
-	\item The time-averaged MSD measures the displacement between all possible time lags
-	and can be written as
-	\begin{equation}
-	\overline{x^2(\tau)} = \dfrac{1}{T - \tau}\int_{0}^{T - \tau} (x(t + \tau) - x(t))^2 dt
-	\end{equation}
-	where $\tau$ is the time lag and T is the length of the
-	trajectory~\cite{meroz_toolbox_2015}. 
-  \end{itemize}
-  
-  \noindent Three common mathematical models for modeling anomalous subdiffusion
-  processes include continuous time random walks (CTRW), fractional Brownian motion
-  (FBM) and random walks on fractals (RWF).\cite{meroz_toolbox_2015}
-  \begin{itemize}
-    \item FBM is common in crowded, viscoelastic environments where each step comes 
-    from a Gaussian distribution but is anti-correlated to its previous 
-    step.~\cite{mandelbrot_fractional_1968,jeon_fractional_2010,banks_anomalous_2005}
-    \item A CTRW is characterized by a distribution of hop lengths and 
-    dwell times, where each each step is characterized by independent random draws from 
-    each distribution.\cite{montroll_random_1965,morrin_three_2018}
-    \item An RWF is imposed by a system's geometry. Systems with tortuous pathways and dead
-    ends cause anti-correlated motion.\cite{meroz_toolbox_2015,neusius_subdiffusion_2008}
-    \item The processes described above can happen alone or in combination.  	
-  \end{itemize}
-  
-  % BJC: Should this be in the results?
-  \noindent We believe that solutes in the system studied here exhibit subordinated 
-  fractional Brownian motion (sFBM) where the parent process is FBM and the 
-  leading process is a CTRW. 
-  \begin{itemize}
-  	\item The ensemble-averaged MSD differs from the time-averaged MSD, which
-  	is indicative of non-ergodicity, a trait inherent to CTRWs but not FBM or RWFs.~\cite{thiel_weak_2014}
-  	\item We also observe non-stationary $z$-coordinate traces of each solute's
-  	center of mass (COM). %BJC: figure of a z-coordinate trace in main text or in supporting info
-  	\item For a pure CTRW, the time-averaged MSD should be linear.
-  	~\cite{neusius_subdiffusion_2008,meroz_subdiffusion_2010}
-  	\item However, a typical time-averaged solute MSD is sublinear (see supporting
-  	information), which suggests that there is another underlying subdiffusive mechanism.
-  	\item The hop lengths recorded after each dwell period are anti-correlated (See supporting information)
-  	\item Given the viscoelastic nature of the monomers in our system, we believe
-  	the hop lengths can be modeled with FBM. 
- 	\item For subordinated FBM, it can be shown that
-  	\begin{equation}
-  	\langle x^2(t) \rangle \simeq t^{\alpha\beta}
-  	\end{equation}
-  	where $\alpha$ is the anomalous exponent characteristic of the leading CTRW process
-  	and $\beta$ is the anomalous exponent characteristic of the parent FBM process. 
-  \end{itemize}
-
-  \noindent We can characterize a CTRW process using the parameters which describe its
-  dwell time and hop length distribution.
-  \begin{itemize}
-	\item We used the \texttt{ruptures} python package in order to identify
-	changepoints in solute trajectories.\cite{truong_ruptures:_2018} (See Supporting
-	Information for more details on chosen parameters. i.e. type of cost function, 
-	cost function penalty tolerance, number of dimensions used)
-	\item We used the corresponding hop lengths and dwell times between break points
-	to construct empirical distributions.
-  \end{itemize}
-	
-  For solutes in our system, the distribution of hop lengths appears to be
-  well-represented by a Gaussian distribution.~\cite{metzler_random_2000,
-  metzler_anomalous_2014,neusius_subdiffusion_2009}
-  \begin{itemize}
-	\item We are most interested in the standard deviation, $\sigma$, of the 
-	hop length distribution.
-  \end{itemize}
-  
-  The distribution of dwell	times is expected to fit a power law (or heavy-tailed)
-  distribution proportional to $t^{-1-\alpha}$.~\cite{meroz_toolbox_2015}
-  \begin{itemize}
-	\item Because we are limited to taking measurements at discrete values
-	dictated by the output frequency of our simulation trajectories, we fit the
-	empirical dwell times to a discrete power law distribution whose maximum
-	likelihood $\alpha$ parameter we calculated by maximizing the following
-	likelihood function: 
-        \begin{equation}
-	\mathcal{L}(\beta) = -n\text{ln}\zeta(\beta, x_{min}) -
-	\beta\sum_{i=1}^{n} \text{ln}~x_i 
-	\label{eqn:powerlaw_likelihood}
-	\end{equation}
-	where $\beta = 1 + \alpha$, $x_i$ are collected dwell time data points,
-	$n$ the total number of data points, and $\zeta$ is the Hurwitz zeta function
-	where $x_{min}$ is the smallest measured value of
-	$x_i$.~\cite{clauset_power-law_2009} 
-	\item We obtained distributions of the hop length standard deviations, $\sigma$, and
-	$\alpha$ using statistical bootstrapping.\cite{efron_introduction_1994} 
-  \end{itemize}
-  
-  \noindent FBM processes can be described using the Hurst parameter, $H$, where 
-  $H = \beta/2$.
-  \begin{itemize}
-  	\item Brownian motion is recovered for $H = 0.5$
-	\item The autocovariance function of hop lengths has the analytical form:~\cite{mandelbrot_fractional_1968}
-    \begin{equation}
-	\gamma(k) = \dfrac{1}{2}\bigg[|k-1|^{2H} - 2|k|^{2H} + |k+1|^{2H}\bigg]
-	\label{eqn:autocovariance}
-	\end{equation}
-	where $k$ is the number of increments between hops.
-	\item We obtained H by performing a least squares fit of Equation~\ref{eqn:autocovariance}
-	to the empirically measured autocovariance function.
-	\item We used statistical bootstrapping to generate a distribution of $H$ 
-	values. %BJC: can provide more detail in supporting or just reference python script
-  \end{itemize}
-  
-  In general, we observe different dynamical behavior when solutes move inside the
-  pore versus in the tail region.
-  \begin{itemize}
-    \item Therefore, we created 2 sets of parameters based on the solute's radial location.
-    \item Solutes in the pore region are located less than 0.75 nm from the pore center and
-    all else are in the tail region. 
-    \item We determined this cut-off and described how we calculated radial 
-    distance from the pore center in our previous work~\cite{coscia_chemically_2019}
-  \end{itemize}
-
-%  We generated distributions of parameters for the dwell time and hop length
-%  distributions using statistical bootstrapping.
-%  \begin{itemize}
-%	\item For each type of distribution, we randomly selected $n$ data points from the empirical
-%	distribution with replacement.
-%	\item We repeated the fitting procedure described above for each of 200 bootstrap trials.
-%  \end{itemize} 
-
-%  We calculated macroscopic diffusion coefficients by simulating trajectories orders of
-%  magnitude longer than our molecular simulations.
-  \noindent For each solute, we simulated 10000 5 $\mu$s sFBM trajectories. 
-  \begin{itemize}
-	\item We constructed trajectories by simulating	sequences of dwell times and correlated 
-	hop	lengths generated based on parameters randomly chosen from our bootstrapped parameter
-	distributions.
-	\item We propagated each trajectory until the total time reached 1 $\mu$s, and truncated
-	the last data point so that the total time exactly equaled 5 $\mu$s. 
-    \item Valid comparisons are only possible between fixed length sFBM simulations. The
-    power law dwell time behavior gives rise to the aging phenomenon, embodied by
-    a decrease in MSD with measurement time.~\cite{neusius_subdiffusion_2008,metzler_anomalous_2014}
-    \item We reported the MSD after 5 $\mu$s with corresponding 95 \% intervals
-% Following probably better suited for supporting information, if included at all
-%	\item We randomly sample Gaussian hop lengths using the
-%	\texttt{numpy.random.normal} method of the \texttt{numpy} python package.
-%	\item We randomly sampled dwell times from a discrete power law
-%	distribution based on the recommendations of Clauset et
-%	al.~\cite{clauset_power-law_2009}: 
-%	\begin{equation}
-%	x = \lfloor
-%	(x_{min} - \tfrac{1}{2})(1 - r)^{-1/(\alpha - 1)} + \tfrac{1}{2} \rfloor
-%	\label{eqn:discrete_powerlaw_draws}
-%	\end{equation}
-%	where $r$ is randomly drawn from a uniform distribution which we simulated
-%	with \texttt{numpy.random.uniform}.
-%	\item We found that thermal noise does not significantly influence the MSD and
-%	therefore did not add any noise to the simulated trajectories. (See supporting info)
-  \end{itemize}
-
-%BJC: probably don't need to explain this in great detail
-%  \noindent We fixed the length of each simulated trajectory so that we could compare the total
-%  MSD between different solutes without the influence of the ageing phenomenon.
-%  \begin{itemize}
-%	\item Ageing is defined by the tendency of the average MSD to decrease
-%	as the length of trajectories are increased~\cite{metzler_anomalous_2014}.
-%	\item The maximum measured dwell time can be no longer than the total length
-%	of a simulated trajectory. 
-%	\item As measurement time or trajectory length is increased, longer dwell times
-%	are incorporated into the calculation, lowering the average MSD. (See supporting
-%	info for demonstration)
-%	\item We can achieve consistent total MSDs with low uncertainty for
-%	simulated trajectories created with a given set of parameters if we fix the
-%	trajectory length (as opposed to total number of steps).  
-%  \end{itemize}
-
-%  \subsubsection*{Coordination number}
-
-%  We quantified the coordination of solutes with surrounding molecules.
-%  \begin{itemize}
-%  	\item For each frame, we counted the identities and number of
-%  	coordinated molecules to a given solute based on a distance cut-off. 
-%	\item We found that this approach is more useful than calculating the
-%	3D spherical radial distribution function because it gives detailed
-%	frame-by-frame information rather than an average. 
-%  \end{itemize}
-
-  \subsection{Markov State Models}\label{method:MSMs}
+  \subsection{Markov State Models}\label{method:MSMs}  % BJC: this section first in hopes that sfbm works better
   
   A Markov state model decomposes a time series into a set of discrete states
   with transitions between states defined by a transition probability matrix, T,
@@ -395,7 +213,7 @@
     \item The shape of the distributions are symmetric and heavy-tailed. 
   \end{itemize}
   
-  \noindent We modeled the emission distributions as stable L\'evy distributions.
+  \noindent We modeled the emission distributions as L\'evy stable distributions.  % cauchy is a case of a Levy stable distribution. The tails are too heavy though.
   \begin{itemize}
     \item For independent and identically distributed (iid) random variables, the 
     generalized central limit theorem guarantees convergence of the associated 
@@ -413,15 +231,37 @@
     added later if I keep these formulas in. % https://tex.stackexchange.com/questions/32140/how-to-write-a-function-piecewise-with-bracket-outside
     \item $\alpha$ is the index of stability or L\'evy index, $\beta$ is the skewness 
     parameter, $\mu$ is the shift parameter and $\sigma$ is a scale parameter.
-    \item The most familiar case is that of Brownian motion ($\alpha$ = 2), corresponding to 
-    a Gaussian PDF, however the more general family of L\'evy stable distributions allows
+    \item The most familiar case, and 1 of 3 that can be expressed in terms of elementary
+    functions, is the Gaussian PDF ($\alpha$ = 2).
+    \item The more general family of L\'evy stable distributions allows
     greater flexibility in defining the observed emission distribution PDFs.
     \item In the case that the empirical emission distributions are iid, sequential draws
     from a L\'evy stable PDF defines a L\'evy process. 
     \item We can relax the iid assumption and maintain the flexibility of L\'evy stable 
     probability distributions if we instead consider the dynamics to be governed by a
-    non-Gaussian Ornstein-Uhlenbeck (OU) process.\cite{barndorffnielsen_non-gaussian_2001}
-    \item We will discuss the implications of each.  % BJC: replaces Weiner process with Levy process
+    non-Gaussian Ornstein-Uhlenbeck (OU) process.\cite{barndorffnielsen_non-gaussian_2001} % BJC: replaces Wiener process with Levy process
+    \item OU processes contain temporal dependence but the marginal observation distributions
+    are consistent with the underlying stochastic driver.~\cite{taufer_simulation_2009}
+    \item We will discuss the implications of each.  
+  \end{itemize}
+  
+  L\'evy stable distributions often have heavy tails and an undefined variance 
+  which can give rise to arbitrarily long particle displacements.
+  \begin{itemize}
+  	\item We do not observe hops longer than x nm in our simulations which 
+  	emphasizes that these distributions are only an approximation.
+    \item We avoid unrealistic, enormous hops problem by truncating the tails
+    of the distribution. %BJC: can add some citations about truncated Levy distributions
+    \item Since solutes in our system cannot hop further than the length of our 
+    simulation unit cell, we truncate the tails of the distribution at this
+    magnitude.
+    % BJC: Is this actually the right way to do this? I am looking at unwrapped coordinates,
+    % so theoretically a particle can move as far as it wants between frames.
+    % BJC: The cut-off choice is pretty important and has a significant effect on MSD. 
+    % For example, if I truncate at the unit cell length I reproducably get a final MSD of ~ 66 nm^2 (1000 ns stochastic simulation)
+    % If I truncate the tails at double the unit cell length, I get a final MSD of ~107 nm^2
+    % The uncertainty also increases (since variance diverges for these distributions)
+    % So maybe it makes the most sense to truncate based on largest observed hops.
   \end{itemize}
   
   We simulated realizations of the stochastic process using the probability transition
@@ -434,7 +274,224 @@
     distribution respectively.
   \end{itemize}
   
-  %BJC: need to add some validation of Markovian behavior and time step choice.
+  %BJC: need to add some validation of Markovian behavior and time step choice.  
+  
+  \subsection{Modeling subdiffusion}\label{method:model_sFBM}
+
+  Solutes in this system exhibit subdiffusive behavior, a type of anomalous diffusion.
+  \begin{itemize}
+  	\item During an anomalous diffusion process, the mean squared displacement (MSD)
+  	does not grow linearly with time, rather it is of the form:
+	\begin{equation} 
+	\langle x^2(t) \rangle = K_{\alpha}t^\alpha
+	\label{eqn:msd_form}
+	\end{equation} 
+	where $\alpha$ is the anomalous exponent and $K_\alpha$ is the
+	generalized diffusion coefficient.
+	\item A value of $\alpha < 1$ indicates a subdiffusive process, while values of
+	$\alpha = 1$ and $\alpha > 0$ are characteristic of Brownian and superdiffusive
+	motion respectively.
+  \end{itemize}
+
+  \noindent We analyzed both the ensemble-averaged and time-averaged MSDs
+  of the simulated trajectories.
+  \begin{itemize}
+	\item The ensemble-averaged MSD measures the displacement of a particle from its initial
+	position~\cite{meroz_toolbox_2015} and can be written as
+	\begin{equation}
+	\langle x^2(t) \rangle = \langle x(t) - x(0) \rangle^2
+	\label{eqn:ensemble_msd}
+	\end{equation}
+%	\item The average MSD calculated in this way recovers the form of
+%	Equation~\ref{eqn:msd_form}. % time-averaged should recover it too for FBM 
+	\item The time-averaged MSD measures the displacement between all possible time lags
+	and can be written as
+	\begin{equation}
+	\overline{x^2(\tau)} = \dfrac{1}{T - \tau}\int_{0}^{T - \tau} (x(t + \tau) - x(t))^2 dt
+	\end{equation}
+	where $\tau$ is the time lag and T is the length of the
+	trajectory~\cite{meroz_toolbox_2015}. 
+  \end{itemize}
+  
+  \noindent Three common mathematical models for modeling anomalous subdiffusion
+  processes include continuous time random walks (CTRW), fractional Brownian motion
+  (FBM) and random walks on fractals (RWF).\cite{meroz_toolbox_2015}
+  \begin{itemize}
+    \item FBM is common in crowded, viscoelastic environments where each step comes 
+    from a Gaussian distribution but is anti-correlated to its previous 
+    step.~\cite{mandelbrot_fractional_1968,jeon_fractional_2010,banks_anomalous_2005}
+    \item A CTRW is characterized by a distribution of hop lengths and 
+    dwell times, where each each step is characterized by independent random draws from 
+    each distribution.\cite{montroll_random_1965,morrin_three_2018}
+    \item An RWF is imposed by a system's geometry. Systems with tortuous pathways and dead
+    ends cause anti-correlated motion.\cite{meroz_toolbox_2015,neusius_subdiffusion_2008}
+    \item The processes described above can happen alone or in combination.  	
+  \end{itemize}
+  
+  % BJC: Should this be in the results? Lots of figures to show in support of the claims below
+  \noindent We believe that solutes in the system studied here exhibit subordinated 
+  fractional Brownian motion (sFBM) where the parent process is FBM and the 
+  leading process is a CTRW. 
+  \begin{itemize}
+  	\item The ensemble-averaged MSD differs from the time-averaged MSD, which
+  	is indicative of non-ergodicity, a trait inherent to CTRWs but not FBM or RWFs.~\cite{thiel_weak_2014}  % BJC: need a figure to show this
+  	\item We also observe non-stationary $z$-coordinate traces of each solute's
+  	center of mass (COM). %BJC: figure of a z-coordinate trace in main text or in supporting info
+  	\item For a pure CTRW, the time-averaged MSD should be linear.
+  	~\cite{neusius_subdiffusion_2008,meroz_subdiffusion_2010}
+  	\item However, a typical time-averaged solute MSD is sublinear (see supporting
+  	information), which suggests that there is another underlying subdiffusive mechanism.
+  	\item The hop lengths recorded after each dwell period are anti-correlated (See supporting information)
+  	\item Given the viscoelastic nature of the monomers in our system, we believe
+  	the hop lengths can be modeled with FBM. 
+ 	\item For subordinated FBM, it can be shown that
+  	\begin{equation}
+  	\langle x^2(t) \rangle \simeq t^{\alpha\beta}
+  	\end{equation}
+  	where $\alpha$ is the anomalous exponent characteristic of the leading CTRW process
+  	and $\beta$ is the anomalous exponent characteristic of the parent FBM process. 
+  \end{itemize}
+
+  \noindent We can characterize a CTRW process using the parameters which describe its
+  dwell time and hop length distribution.  % This is different from the emissions of the markov state model where every single step is used to construct the distribution. 
+  \begin{itemize}
+	\item We used the \texttt{ruptures} python package in order to identify
+	changepoints in solute trajectories.\cite{truong_ruptures:_2018} (See Supporting
+	Information for more details on chosen parameters. i.e. type of cost function, 
+	cost function penalty tolerance, number of dimensions used)
+	\item We used the corresponding hop lengths and dwell times between break points
+	to construct empirical distributions.
+  \end{itemize}
+	
+  For solutes in our system, the distribution of hop lengths appears to be
+  well-represented by a Gaussian distribution.~\cite{metzler_random_2000,
+  metzler_anomalous_2014,neusius_subdiffusion_2009}
+  \begin{itemize}
+	\item We are most interested in the standard deviation, $\sigma$, of the 
+	hop length distribution.
+  \end{itemize}
+  
+  \noindent The distribution of dwell times is expected to fit a power law
+  distribution proportional to $t^{-1-\alpha}$.~\cite{meroz_toolbox_2015}
+  \begin{itemize}
+	\item Because we are limited to taking measurements at discrete values
+	dictated by the output frequency of our simulation trajectories, we fit the
+	empirical dwell times to a discrete power law distribution whose maximum
+	likelihood $\alpha$ parameter we calculated by maximizing the following
+	likelihood function: 
+        \begin{equation}
+	\mathcal{L}(\beta) = -n\text{ln}\zeta(\beta, x_{min}) -
+	\beta\sum_{i=1}^{n} \text{ln}~x_i 
+	\label{eqn:powerlaw_likelihood}
+	\end{equation}
+	where $\beta = 1 + \alpha$, $x_i$ are collected dwell time data points,
+	$n$ the total number of data points, and $\zeta$ is the Hurwitz zeta function
+	where $x_{min}$ is the smallest measured value of
+	$x_i$.~\cite{clauset_power-law_2009} 
+	\item We obtained distributions of the hop length standard deviations, $\sigma$, and
+	$\alpha$ using statistical bootstrapping.\cite{efron_introduction_1994} 
+  \end{itemize}
+  
+  \noindent FBM processes can be described using the Hurst parameter, $H$, where 
+  $H = \beta/2$.
+  \begin{itemize}
+  	\item Brownian motion is recovered for $H = 0.5$
+	\item The autocovariance function of hop lengths has the analytical form:~\cite{mandelbrot_fractional_1968}
+    \begin{equation}
+	\gamma(k) = \dfrac{1}{2}\bigg[|k-1|^{2H} - 2|k|^{2H} + |k+1|^{2H}\bigg]
+	\label{eqn:autocovariance}
+	\end{equation}
+	where $k$ is the number of increments between hops.
+	\item We obtained H by performing a least squares fit of Equation~\ref{eqn:autocovariance}
+	to the empirically measured autocovariance function.
+	\item We used statistical bootstrapping to generate a distribution of $H$ 
+	values. %BJC: can provide more detail in supporting or just reference python script
+  \end{itemize}
+  
+  % BJC: Is it worth showing performance of both types of models? one mode versus two mode?
+  % Probably worth showing that 1 state fails
+  % BJC: also not sure if there is a better word than mode. I stayed away from 'state' since
+  % it's used heavily in the MSM section.
+  % BJC: I haven't created the 2 mode model yet, but that'll only take a few hours. I'll
+  % do that after I get BCC equilibrations running
+  In general, we observe different dynamical behavior when solutes move inside the
+  pore versus in the tail region.
+  \begin{itemize}
+    \item This inspired two models of varying complexity.
+    \item We created a simple, single mode model with a single $\alpha$, $\sigma$ and $H$
+    parameter fit to each solute.
+    \item Our second, two mode model assigns a set of parameters to each of 2 modes based
+    on the solute's radial location.
+    \item Solutes in mode 1 are in the pore region defined as less than 0.75 nm from any
+    pore center and all else are in mode 2, the tail region. 
+    \item We determined this cut-off and described how we calculated radial 
+    distance from the pore center in our previous work~\cite{coscia_chemically_2019}
+  \end{itemize}
+
+%  We generated distributions of parameters for the dwell time and hop length
+%  distributions using statistical bootstrapping.
+%  \begin{itemize}
+%	\item For each type of distribution, we randomly selected $n$ data points from the empirical
+%	distribution with replacement.
+%	\item We repeated the fitting procedure described above for each of 200 bootstrap trials.
+%  \end{itemize} 
+
+%  We calculated macroscopic diffusion coefficients by simulating trajectories orders of
+%  magnitude longer than our molecular simulations.
+  \noindent For each solute, we simulated 10000 5 $\mu$s sFBM trajectories. 
+  \begin{itemize}
+	\item We constructed trajectories by simulating	sequences of dwell times and correlated 
+	hop	lengths generated based on parameters randomly chosen from our bootstrapped parameter
+	distributions.
+	\item We propagated each trajectory until the total time reached 1 $\mu$s, and truncated
+	the last data point so that the total time exactly equaled 5 $\mu$s. 
+    \item Valid comparisons are only possible between fixed length sFBM simulations. The
+    power law dwell time behavior gives rise to the aging phenomenon, embodied by
+    a decrease in MSD with measurement time.~\cite{neusius_subdiffusion_2008,metzler_anomalous_2014}
+    \item We reported the MSD after 5 $\mu$s with corresponding 95 \% intervals
+% Following probably better suited for supporting information, if included at all
+%	\item We randomly sample Gaussian hop lengths using the
+%	\texttt{numpy.random.normal} method of the \texttt{numpy} python package.
+%	\item We randomly sampled dwell times from a discrete power law
+%	distribution based on the recommendations of Clauset et
+%	al.~\cite{clauset_power-law_2009}: 
+%	\begin{equation}
+%	x = \lfloor
+%	(x_{min} - \tfrac{1}{2})(1 - r)^{-1/(\alpha - 1)} + \tfrac{1}{2} \rfloor
+%	\label{eqn:discrete_powerlaw_draws}
+%	\end{equation}
+%	where $r$ is randomly drawn from a uniform distribution which we simulated
+%	with \texttt{numpy.random.uniform}.
+%	\item We found that thermal noise does not significantly influence the MSD and
+%	therefore did not add any noise to the simulated trajectories. (See supporting info)
+  \end{itemize}
+
+%BJC: probably don't need to explain this in great detail
+%  \noindent We fixed the length of each simulated trajectory so that we could compare the total
+%  MSD between different solutes without the influence of the ageing phenomenon.
+%  \begin{itemize}
+%	\item Ageing is defined by the tendency of the average MSD to decrease
+%	as the length of trajectories are increased~\cite{metzler_anomalous_2014}.
+%	\item The maximum measured dwell time can be no longer than the total length
+%	of a simulated trajectory. 
+%	\item As measurement time or trajectory length is increased, longer dwell times
+%	are incorporated into the calculation, lowering the average MSD. (See supporting
+%	info for demonstration)
+%	\item We can achieve consistent total MSDs with low uncertainty for
+%	simulated trajectories created with a given set of parameters if we fix the
+%	trajectory length (as opposed to total number of steps).  
+%  \end{itemize}
+
+%  \subsubsection*{Coordination number}
+
+%  We quantified the coordination of solutes with surrounding molecules.
+%  \begin{itemize}
+%  	\item For each frame, we counted the identities and number of
+%  	coordinated molecules to a given solute based on a distance cut-off. 
+%	\item We found that this approach is more useful than calculating the
+%	3D spherical radial distribution function because it gives detailed
+%	frame-by-frame information rather than an average. 
+%  \end{itemize}
 
   \subsection{The Infinite State Hidden Markov Model}\label{method:iHMM}  %BJC: potentially a separate paper
   
@@ -498,45 +555,93 @@
     this process and its implementation. 
     ~\cite{beal_infinite_2002,teh_hierarchical_2006,van_gael_beam_2008,fox_nonparametric_2009,fox_bayesian_2010}
   \end{itemize}
-   
+  \break
   \section{Results and Discussion}
+  
+  \subsection{Molecular Dynamics Simulations}\label{section:MD_simulations}
+  
+  The MSDs for of the solutes calculated from 5 $\mu s$ MD simulation trajectories
+  are shown in Figure TBD.
+  \begin{itemize}
+    \item 2 options for a figure:
+    \item 1) 2 panels: 1st panel: bar chart with final MSD value + error bars. 2nd panel: a selected MSD curve
+    \item 2) 1 panel. All MSD curves. Overlapping errors might look bad
+  \end{itemize}
+  
+  Solute motion is influenced by the same three trapping mechanisms observed in our
+  previous works.
+  \begin{itemize}
+    \item The extent to which each trapping mechanism influences each solute is
+  depicted graphically in Figure TBD.
+    \item Same types of figures from transport paper:
+    \item Fraction participating in hydrogen bonds, fraction associated, fraction
+    in the tails.
+    \item Lifetimes of hbonds and sodium associations?
+  \end{itemize}
   
   \subsection{Markov State Model Fits}\label{section:msm_results}
   
-  The emission distributions are clearly non-Gaussian
+  The emission distributions are non-Gaussian and heavy-tailed (see Figure~\ref{fig:emissions_MET}).
+  \begin{itemize}
+    \item The heavy tails of the distribution are a consequence of hopping.
+    \item Heavily sampled states fit well to L\'evy stable distributions.
+    \item The rarer states have less data, but we still assume L\'evy stable distributions.
+  \end{itemize}
   
-  \begin{figure}
+  % BJC: worth proving these are non-Gaussian? One might argue that they look Gaussian but they are not at all.
+  \begin{figure}[!h]
   \includegraphics[width=\textwidth]{emissions_MET.pdf}
   \caption{}\label{fig:emissions_MET}
   \end{figure}
 
-  \begin{figure}
-  \includegraphics[width=\textwidth]{msd_MET.pdf}
+  % BJC: need better or more descriptive way of describing stochastic simulations
+  % BJC: or could say that whenever we say simulations, we mean stochastic simulations unless it is specified as a molecular dynamics simulation.
+  Simulating solute trajectories (see Section~\ref{method:MSMs}) by drawing independent  
+  observations from the emission distributions yields near linear MSD curves
+  with final values that are far higher than those observed in our molecular simulations.
+  \begin{itemize}
+	% BJC: right number of solute trajectories to simulate for comparison? More tightens the error bars
+    \item In the case of methanol, the final MSD value is about 25x higher than that observed in our
+    previous transport study (see Figure~\ref{fig:msd_MET}).
+    \item The linear behavior of the MSD curve is not consistent with subdiffusion.
+  \end{itemize}
+
+  \begin{figure}[!h]
+  \includegraphics[width=\textwidth]{MET_msd.pdf}
   \caption{}\label{fig:msd_MET}
   \end{figure}
+  
+  Anti-correlation between hops may be responsible for subdiffusive behavior.
+  \begin{itemize}
+    \item In general, we observe negative correlation between hops.
+    \item A L\'evy driven OU process may be a more appropriate way to model
+    the stochastic dynamics of this system since you can incorporate autocorrelation.
+    \item Extracting reliable correlation functions is difficult with our data
+    due to relatively frequent switching resulting in sets of short disjoint time 
+    series describing each state.
+    \item Therefore we did not do this and attempted to fit a different model. 
+    %BJC: we could add some artificial correlation to test the anti-correlation hypothesis
+  \end{itemize}
 
   \subsection{Subordinated Fractional Brownian Motion Modeling}\label{section:sFBM}
   
-  %BJC: focus on MD MSD results
-  \noindent We calculated the MSD of each solute in the set over the course of 1$\mu$s MD simulations.  %BJC: type of MSD TBD 
+  Using the techniques from Section~\ref{section:model_sFBM}, we extracted values 
+  of $\sigma$, $\alpha$ and $H$ for each solute for the 1 and 2 mode model 
+  (see Table~\ref{table:sfbm_params}).
   \begin{itemize}
-	\item We extracted values of $\sigma$, $\alpha$ and $H$ for each solute
-	and then simulated 10000 sFBM trajectories of the same length as our MD
-	simulations, as described in Section~\ref{section:model_sFBM} of the Methods.
-	\item The final MSDs of the sFBM trajectories are compared to those 
-	calculated directly from MD simulations in Figure~\ref{fig:all_msds}. 
-	\item The three sFBM parameters, calculated based on MD solute trajectories
-	are presented in Table~\ref{table:simulations}.
-	\item We would like to emphasize that we rely on the MD MSD values in order to
-	define trends in the total MSD, while the sFBM trajectories and parameter 
-	values allow us to speculate as to the reasons for the observed trends. 
-	\item There is a non-negligible amount of error in the calculation of 
-	each parameter which prevents us from reliably portraying our sFBM MSDs as
-	reduced	uncertainty MD MSDs.
+    \item In most cases, it is easy to relate $\sigma$, $\alpha$ and $H$ to the
+    simulated MSD values presented in Table~\ref{table:simulations}. 
+  	\item Higher values of $\sigma$ indicate larger average hop lengths.
+  	\item Higher values of $\alpha$ mean that there will be less sampling of 
+  	long dwell times.
+  	\item Values of $H$ near the Brownian limit of 0.5, indicate a lower degree
+  	of anti-correlation.
+  	\item All of which contribute to an overall increase in the MSD.
   \end{itemize}
   
   % BJC: worth including single parameter model (i.e. no radial dependence) to 
   % show its shortcomings? Or send to supporting information
+  % BJC: obviously still needs 2 mode data
   \begin{table}[h]
   \centering
   \begin{tabular}{cccc}
@@ -551,53 +656,52 @@
   \end{tabular}
   \caption{We calculated values $\sigma$, $\alpha$ and $H$ from MD simulation
   trajectories and then computed the average ensemble-averaged MSD of 10000 
-  simulated trajectories.}\label{table:simulations}
+  simulated trajectories.}\label{table:sfbm_params}
   \end{table}
-  
-  Our simulated sFBM MSDs qualitatively reproduce the MD trends.
+
+  \noindent We compared the MSD of simulated sFBM trajectories to MD simulated
+  MSDs.
   \begin{itemize}
-    \item sFBM generally lower
-    \item There are a few noticeable discrepancies.
-    \item We will discuss reasons for these as we proceed with the discussion.
+	\item We simulated 10000 sFBM trajectories of the same length as our MD
+	simulations, as described in Section~\ref{section:model_sFBM} of the Methods.
+	\item The final MSDs of the sFBM trajectories are compared to those 
+	calculated directly from MD simulations in Figure~\ref{fig:all_msds}. 
+	\item We would like to emphasize that we rely on the MD MSD values in order to
+	define trends in the total MSD, while the sFBM trajectories and parameter 
+	values allow us to speculate as to the reasons for the observed trends. 
+	\item There is a non-negligible amount of error in the calculation of 
+	each parameter which prevents us from reliably portraying our sFBM MSDs as
+	reduced	uncertainty MD MSDs.
+	% BJC: I think it's more the power law tails that increases uncertainty.
+  \end{itemize}
+  
+  The two-mode sFBM model does a better job than the one-mode model at 
+  reproducing the MD MSD trends. 
+  \begin{itemize}
+    \item One-mode model generally undershoots MSDs.
   \end{itemize}
 
+  %BJC: reduce this figure to solutes studied and put 3 bars for each solute: MD MSD, one-mode sfbm MSD, two-mode sfbm MSD
   \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{all_emsds.pdf}
   \caption{}\label{fig:all_msds}
   \end{figure}
 
-  It most cases, it is easy to relate $\sigma$, $\alpha$ and $H$ to the
-  simulated MSD values presented in Table~\ref{table:simulations}. 
-  \begin{itemize}
-  	\item Higher values of $\sigma$ indicate larger average hop lengths.
-  	\item Higher values of $\alpha$ mean that there will be less sampling of 
-  	long dwell times.
-  	\item Values of $H$ near the Brownian limit of 0.5, indicate a lower degree
-  	of anti-correlation.
-  	\item All of which contribute to an overall increase in the simulated MSD
-  \end{itemize}
-
-  % BJC: figure with selected trajectories for each molecule.
-  We fit a CTRW model (see Section~\ref{method:CTRW}) to these 
-  trajectories and predicted macroscopic diffusion coefficients which are
-  presented in Table TBD.
-  \begin{itemize}
-	\item We confirmed that our molecules exhibit anomalous diffusion
-	by fitting a power law to the MSD curve. The exponent is less than
-	1, indicative of anomalous subdiffusion.
-	\item We used the decision making process given by Meroz and Sokolov
-	in order to identify the appropriate subdiffusion model to use 
-	based on our time series (See Section S-TBD of the Supporting info for
-	more details).
-	\item The motion of the solutes is non-ergodic and the steps are
-	uncorrelated which tells us the system is likely well-described
-	by a CTRW. 
-  \end{itemize}
-  
-  \section{Markov Modeling}\label{section:markov_models}
-
   \section{Conclusion}
+  
+  We have tested two different mathematical frameworks for describing solute
+  motion in an H\textsubscript{II} phase LLC membrane.
+  \begin{itemize}
+    \item Markov state modeling with predefined states gives a nice description
+    of transitions between observed states as well as the type of stochastic 
+    behavior shown in each state. However, it doesn't accurately portray correlated
+    time series behavior leading to overpredicted MSDs.
+    \item Subordinated fractional Brownian motion has a nice theoretical foundation
+    in the anomalous diffusion literature. A two mode model that describes dynamics
+    based on whether a solute is in or out of the pore region leads to MSDs fairly
+    consistent with MD simulated trajectories.
+  \end{itemize}
  
   \section*{Supporting Information}
 

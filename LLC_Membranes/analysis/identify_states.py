@@ -442,7 +442,10 @@ class Chain:
 
             states[t + 1] = np.random.choice(self.nstates, p=self.transition_matrix[states[t], :])
 
-        traj[-1] = self.hop(states[-2], states[-1])
+        hop = self.hop(states[-2], states[-1])
+        while abs(hop) > bound:
+            hop = self.hop(states[-2], states[-1])
+        traj[-1] = hop
 
         return np.cumsum(traj), states
 
