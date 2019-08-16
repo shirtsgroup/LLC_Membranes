@@ -10,11 +10,16 @@ import mdtraj as md
 import os
 import numpy as np
 import subprocess
+import yaml
+import sys
 
 
 def initialize():
 
     parser = argparse.ArgumentParser(description='Equilibrate bicontinuous cubic phase unit cell')
+
+    parser.add_argument('-y', '--yaml', type=str, help='A .yaml configuration file. This is preferred over using'
+                                                       'argparse. It leads to better reproducibility.')
 
     # Build parameters
     parser.add_argument('-p', '--space_group', default='gyroid', type=str, help='Liquid crystal phase to build (HII, QI '
@@ -383,38 +388,51 @@ if __name__ == "__main__":
 
     args = initialize().parse_args()
 
+    if args.yaml:
+        with open(args.yaml, 'r') as yml:
+            cfg = yaml.load(yml)
+
+            build_params = cfg['build_parameters']
+            sim_params = cfg['simulation_parameters']
+            parallelize = cfg['parallelization']
+            xlink_params = cfg['crosslinking']
+    else:
+        sys.exit('Using argparse for most arguments in this script is no longer supported. Please make a .yaml file')
+
     os.environ["GMX_MAXBACKUP"] = "-1"  # stop GROMACS from making backups
 
-    equil = EquilibrateBCC(args.build_monomer, args.space_group, args.box_length, args.weight_percent, args.density,
-                           shift=args.shift, curvature=args.curvature, mpi=args.mpi, nprocesses=args.nprocesses)
+    equil = EquilibrateBCC(build_params['build_monomer'], build_params['space_group'], build_params['box_length'],
+                           build_params['weight_percent'], build_params['density'], shift=build_params['shift'],
+                           curvature=build_params['curvature'], mpi=parallelize['mpi'],
+                           nprocesses=parallelize['nprocesses'])
 
-    equil.build_initial_config(grid_points=args.grid, r=0.4)
-    equil.scale_unit_cell(args.scale_factor)
+    equil.build_initial_config(grid_points=build_params['grid'], r=0.4)
+    equil.scale_unit_cell(sim_params['scale_factor'])
 
     equil.generate_topology(name='topol.top')  # creates an output file
-    equil.generate_mdps(length=50, frames=2, T=args.temperature)  # creates an object
+    equil.generate_mdps(length=50, frames=2, T=sim_params['temperature'])  # creates an object
     equil.mdp.write_em_mdp(out='em')
 
     if not args.continue_dry and not args.continue_solvated:
 
-        nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
-                               nprocesses=args.nprocesses)  # mdp, top, gro, out
+        nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True,
+                               mpi=parallelize['mpi'], nprocesses=parallelize['nprocesses'])  # mdp, top, gro, out
 
         while nrg >= 0:
 
-            equil.build_initial_config(grid_points=args.grid, r=0.4)
-            equil.scale_unit_cell(args.scale_factor)
-            nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True, mpi=args.mpi,
-                                   nprocesses=args.nprocesses)
+            equil.build_initial_config(grid_points=build_params['grid'], r=0.4)
+            equil.scale_unit_cell(sim_params['scale_factor'])
+            nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True,
+                                   mpi=parallelize['mpi'], nprocesses=parallelize['nprocesses'])
 
-        cp = 'cp em.gro scaled_%.4f.gro' % args.scale_factor
+        cp = 'cp em.gro scaled_%.4f.gro' % sim_params['scale_factor']
         p = subprocess.Popen(cp.split())
         p.wait()
 
-        equil.gro_name = 'scaled_%.4f.gro' % args.scale_factor
+        equil.gro_name = 'scaled_%.4f.gro' % sim_params['scale_factor']
 
         # slowly compress system to correct density
-        equil.shrink_unit_cell(args.scale_factor, 1.0, 0.1)  # EquilibrateBCC object, start, stop, step
+        equil.shrink_unit_cell(sim_params['scale_factor'], 1.0, 0.1)  # EquilibrateBCC object, start, stop, step
 
         # CLEAN UP -- move all scaled unit cells into a separate directory
         if not os.path.isdir("./intermediates"):
@@ -434,7 +452,7 @@ if __name__ == "__main__":
 
     if not args.continue_solvated:
 
-        equil.add_solvent(args.solvent)
+        equil.add_solvent(build_params['solvent'])
 
         mv = "mv solvated_nvt* solvated_npt* npt_equil* nvt_equil* em_* intermediates"
         p = subprocess.Popen(mv, shell=True)  # don't split mv because shell=True
@@ -445,17 +463,4 @@ if __name__ == "__main__":
         equil.gro_name = 'solvated_final.gro'
 
     # cross-linking
-    # get default arguments passed to xlink. [] prevents this from reading command line arguments to bcc_equil
-    params = vars(xlink.initialize().parse_args([]))
-
-    # modify certain params for this system.
-    params['initial'] = equil.gro_name
-    params['build_mon'] = args.build_monomer
-    params['temperature'] = args.temperature
-    params['residue'] = args.residue
-    params['dummy_residue'] = args.dummy_residue
-    params['parallelize'] = args.mpi
-    params['nproc'] = args.nprocesses
-    params['domain_decomposition'] = args.domain_decomposition
-
-    xlink.crosslink(params)  # run cross-linking algorithm
+    xlink.crosslink(xlink_params)  # run cross-linking algorithm
