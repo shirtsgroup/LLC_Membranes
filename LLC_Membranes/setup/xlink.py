@@ -562,7 +562,7 @@ class System(Topology):
         else:
             return False
 
-    def bond(self, quench=True):
+    def bond(self, quench=False):
         """ Create all new cross-links and terminate some of the radicals that are formed
 
         :param quench: if True, do not try to bond anything and just terminate all remaining radicals
@@ -614,6 +614,7 @@ class System(Topology):
         # print(radicals)
         # print(rm_impropers)
         # print(terminate)
+        # exit()
 
         # add bonds between dummy atoms (made real) and carbon atoms
         for b in bonds:
@@ -868,6 +869,7 @@ def crosslink(params):
         sys.bond()
         sys.write_assembly_topology()  # re-write assembly topology
         print('Done!')
+
         print('Total new bonds: %d' % len(sys.bond_chain1))
         np.savez_compressed('radicals', radicals=sys.radicals, term=sys.terminate)
 

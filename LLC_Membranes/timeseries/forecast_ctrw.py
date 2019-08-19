@@ -17,6 +17,9 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Model a continuous time random walk')
 
+    parser.add_argument('-y', '--yaml', help='Name of yaml configuration file with all of the following arguments'
+                                             'already in it.')
+
     # MD trajectory control
     parser.add_argument('-t', '--trajectory', default='PR_nojump.xtc', help='Path to input file.')
     parser.add_argument('-g', '--gro', default='em.gro', help='Name of .gro coordinate file.')
@@ -26,7 +29,7 @@ def initialize():
     parser.add_argument('-ma', '--moving_average', default=False, type=int, help='Calculate a moving average of the '
                         'center of mass coordinate')
 
-    # loading saved objects
+    # loading saved objects (not part of yaml)
     parser.add_argument('-load', '--load', default=False, help='Specify name of pickled object to load')
 
     # restrict to pores parameters
@@ -242,7 +245,7 @@ class System(object):
         """
 
         pore_indices = [self.res_start + self.residue.natoms * i for i in np.where(self.partition[frame, :])[0]]
-        tail_indices = [self.res_start + self.residue.natoms * i for i in np.where(self.partition[frame, :] == False)[0]]
+        tail_indices = [self.res_start + self.residue.natoms * i for i in np.where(self.partition[frame, :] is False)[0]]
 
         with open(name, 'w') as f:
             f.write('color Display Background white\n')
@@ -304,7 +307,7 @@ class System(object):
             try:
                 switch_points.append(self.partition.shape[0])
             except AttributeError:
-                switch_points = [switch_points]
+                switch_points = list(switch_points)
                 switch_points.append(self.partition.shape[0])
 
             # Analyze sub-trajectories where solute is in defined pore region
