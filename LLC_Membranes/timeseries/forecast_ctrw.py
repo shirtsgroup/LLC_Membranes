@@ -11,6 +11,8 @@ import tqdm
 from LLC_Membranes.timeseries.ctrwsim import CTRW
 import sqlite3 as sql
 import os
+import sys
+import yaml
 
 
 def initialize():
@@ -78,7 +80,7 @@ def gaussian(points, mean, sigma):
 
 class System(object):
 
-    def __init__(self, traj, gro, res, start=0, end=-1, step=1, ma=False):
+    def __init__(self, traj, gro, res, start=0, end=-1, step=1, ma=False, nmodes=1):
         """ Using an MD trajectory, calculate fit parameters for the dwell time distribution and hop length distribution
 
         :param traj: name of MD trajectory (GROMACS .xtc or .trr)
@@ -88,6 +90,8 @@ class System(object):
         :param end: last frame of trajectory to include
         :param step: include every step frames in calculations
         :param ma: calculate a moving average on the center of mass coordinate traces
+        :param nmodes: number of modes to consider. 1 mode will treat all hops and dwells as being performed in the
+        same environment. 2 modes will treat hops and dwells in the tails versus pores differently.
 
         :type traj: str
         :type gro: str
@@ -95,6 +99,7 @@ class System(object):
         :type start: int
         :type end: int
         :type step: int
+        :type nmodes: int
         """
 
         # load trjaectory
@@ -166,14 +171,15 @@ class System(object):
             self.calculate_moving_average(ma)
 
         # initialize for later
+        self.nmodes = nmodes
         self.pore_centers = None
-        self.dwell_times = []  # distribution of dwell times
-        self.tail_dwells = []
+        self.dwell_times = [[] for _ in range(self.nmodes)]  # dwell times in each dynamical mode
+        self.tail_dwells = []  # tail as in tail ends of trajectory
         self.hop_lengths = []
         self.hurst_distribution = []
         self.hop_acf = None
-        self.alpha_distribution = []  # distribution of alpha for poisson process
-        self.hop_sigma_distribution = []  # distribution of standard deviation of hop lengths
+        self.alpha_distribution = [[] for _ in range(self.nmodes)]  # distribution of alpha for poisson process
+        self.hop_sigma_distribution = [[] for _ in range(self.nmodes)]  # distribution of standard deviation of hop lengths
         self.breakpoint_penalty = 0
         self.location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # This script location
         self.r = []  # radial distance of solute from pore center when hops are made
@@ -222,10 +228,13 @@ class System(object):
         :param r: radial distance from pore center where pore region transitions to tail region
         :param spline: calculate pore centers as function of z using a spline in each pore
         :param membrane_residue: if using spline, give the name of the liquid crystal residue used to make the membrane
+        :param write_tcl: write a tcl script that will color code solutes based on their radial position. A good way to
+        make sure this function worked as intended.
 
         :type r: float
         :type spline: bool
         :type membrane_residue: str
+        :type write_tcl: bool
         """
 
         membrane = topology.LC('%s' % membrane_residue)  # object w/ attributes of LC making up membrane
@@ -242,24 +251,33 @@ class System(object):
 
     def write_tcl(self, frame=-1, name='partition.tcl'):
         """ Write a .tcl script to view solute partition in VMD
+
+        :param frame: frame to write .tcl script for. Make sure you have the .gro file corresponding to this frame or
+        the output will not be useful. (use get_frame.py if you don't have the proper gro file)
+        :param name: name of .tcl file
+
+        :type frame: int
+        :type name: str
         """
 
         pore_indices = [self.res_start + self.residue.natoms * i for i in np.where(self.partition[frame, :])[0]]
-        tail_indices = [self.res_start + self.residue.natoms * i for i in np.where(self.partition[frame, :] is False)[0]]
+        tail_indices = [self.res_start + self.residue.natoms * i for i in np.where(self.partition[frame, :] == False)[0]]  # have to use double equals sign. Using is doesn't work with np.where
 
         with open(name, 'w') as f:
             f.write('color Display Background white\n')
             f.write('mol addrep 0\n')
             f.write('mol modselect 0 0 index')
             for i in pore_indices:
-                f.write(' %s' % i)
+                end = i + len(self.mass)
+                f.write(' %s to %s' % (i, end - 1))
             f.write('\n')
             f.write('mol modcolor 0 0 ColorID 0\n')
             f.write('mol modstyle 0 0 CPK 2.0 0.3 12.0 12.0\n')
             f.write('mol addrep 0\n')
             f.write('mol modselect 1 0 index')
             for i in tail_indices:
-                f.write(' %s' % i)
+                end = i + len(self.mass)
+                f.write(' %s to %s' % (i, end - 1))
             f.write('\n')
             f.write('mol modstyle 1 0 CPK 2.0 0.3 12.0 12.0\n')
             f.write('mol modcolor 1 0 ColorID 1\n')
@@ -284,94 +302,117 @@ class System(object):
 
         :type penalty: float
         :type nframes_dwell: int
-        :type location: bool
-
+        :type locations: bool
         """
 
         self.breakpoint_penalty = penalty
-        print('penalty = %s' % self.breakpoint_penalty)
 
         # Handle initial and final dwell times since they don't have a true beginning or end. If the dwell times are
-        # longer than some limit, then they will be included so that we don't miss out on dwells that last on the order
-        # of the entire length of the trajectory
-        initial_dwells = []  # length of time particle initially dwells before its first hop
-        final_dwells = []  # length of time particle dwells up until end of trajectory
+        # longer than some limit, then they will be included so that we don't miss out on dwells that last on the
+        # order of the entire trajectory length.
+        initial_dwells = [[] for _ in range(self.nmodes)]  # length time particle initially dwells before its first hop
+        final_dwells = [[] for _ in range(self.nmodes)]  # length of time particle dwells up until end of trajectory
 
         for j in tqdm.tqdm(range(self.com.shape[1])):
 
-            hop_lengths = []  # hop lengths for this solute
+            hop_lengths = [[] for _ in range(self.nmodes)]
+
+            # find all hops
+            bp = ruptures.detection.Binseg(model='l2', min_size=1, jump=1).fit_predict(self.com[:, j, :]
+                                                                                       , pen=self.breakpoint_penalty)
+
+            # ruptures.display(self.com[:, j, 2], bp)
+            # plt.xlabel('Time (ns)', fontsize=14)
+            # plt.ylabel('$z$-position (nm)', fontsize=14)
+            # plt.xticks(np.linspace(0, 2000, 9), [int(i) for i in np.linspace(0, 1000, 9)])
+            # plt.tight_layout()
+            # plt.show()
+            # exit()
+
+            if locations:  # hasn't been tested with modified script
+
+                pore = j % self.pore_centers.shape[1]  # assumes solutes placed with place_solutes_pores.py
+
+                if len(self.pore_centers.shape) == 4:  # spline
+
+                    pore_centers = self.pore_centers[:, pore, ...][bp[:-1]]
+                    coms = self.com[:, j, :][bp[:-1]]
+                    box = self.t.unitcell_vectors[:, ...][bp[:-1]]
+
+                    for k in range(len(bp[:-1])):
+                        self.r += physical.radial_distance_spline(pore_centers[k, ...], coms[k, :][np.newaxis, :],
+                                                                  box[k]).tolist()
+
+                else:  # no spline
+
+                    pore_centers = self.pore_centers[:, pore, :][bp[:-1]]
+                    coms = self.com[:, j, :2][bp[:-1]]
+                    self.r += np.linalg.norm(pore_centers - coms, axis=1).tolist()
+
+            location = 0
+            if self.nmodes == 2:
+                location = self.partition[bp[0], j]
+
+            initial_dwells[location].append(bp[0])
+            if len(bp) > 1:  # handle case where the only break point is at the end of the simulation
+                if self.nmodes == 2:
+                    location = self.partition[bp[-2], j]  # -1 is always the last frame
+                final_dwells[location].append(bp[-1] - bp[-2])
+
+            for k in range(len(bp) - 1):
+
+                if k > 0:  # need two different z coordinates to get a hop length
+                    hop_length = np.mean(self.com[bp[k]:bp[k + 1], j, 2]) - np.mean(self.com[bp[k - 1]:bp[k], j, 2])
+                else:
+                    # bp[0] != 0, rather it is the first break point location. bp[-1] is the last point in the
+                    # time series though
+                    # hop at first segment
+                    hop_length = np.mean(self.com[bp[k]:bp[k + 1], j, 2]) - np.mean(self.com[0:bp[k], j, 2])
+
+                location = 0
+                if self.nmodes == 2:
+                    location = self.partition[bp[k], j]  # determine location of solute when it hops
+
+                hop_lengths[location].append(hop_length)
+
+                # Assume solute stays in region it hopped to
+                if (k + 1) < (len(bp) - 1):  # exclude first and last segments for dwell times
+                    self.dwell_times[location].append(bp[k + 1] - bp[k])  # discrete form
 
             # Get indices where res jumps between regions
             # See https://stackoverflow.com/questions/36894822/how-do-i-identify-sequences-of-values-in-a-boolean-array
-            switch_points = np.argwhere(np.diff(self.partition[:, j])).squeeze().tolist()
-            try:
-                switch_points.append(self.partition.shape[0])
-            except AttributeError:
-                switch_points = list(switch_points)
-                switch_points.append(self.partition.shape[0])
-
-            # Analyze sub-trajectories where solute is in defined pore region
-            begin = 0
-            for i, end in enumerate(switch_points[::2]):  # only at switch points after which solute is in pores
-                if (end - begin) > nframes_dwell:  # only include hops/dwells from trajectories long enough to analyze
-                    # np.savez_compressed('MET_trace.npz', z=self.com[begin:end, j, :])
-                    # exit()
-                    # movement_3d = np.linalg.norm(self.com[begin:end, j, :], axis=1)  # magnitude of distance travelled
-                    bp = ruptures.detection.Binseg(model='l2', min_size=1, jump=1).fit_predict(self.com[begin:end, j, :]
-                                                   , pen=self.breakpoint_penalty)
-                    # if j == 1:
-                    #     # bp = ruptures.detection.Binseg(model='l2', min_size=1, jump=1).fit_predict(self.com[begin:end, j, 2], pen=self.breakpoint_penalty)
-                    #     ruptures.display(self.com[begin:end, j, 2], bp)
-                    #     plt.xlabel('Time (ns)', fontsize=14)
-                    #     plt.ylabel('$z$-position (nm)', fontsize=14)
-                    #     plt.xticks(np.linspace(0, 2000, 9), [int(i) for i in np.linspace(0, 1000, 9)])
-                    #     plt.tight_layout()
-                    #     plt.show()
-                    #     exit()
-
-                    if locations:
-
-                        pore = j % self.pore_centers.shape[1]
-
-                        if len(self.pore_centers.shape) == 4:  # spline
-
-                            pore_centers = self.pore_centers[begin:end, pore, ...][bp[:-1]]
-                            coms = self.com[begin:end, j, :][bp[:-1]]
-                            box = self.t.unitcell_vectors[begin:end, ...][bp[:-1]]
-
-                            for k in range(len(bp[:-1])):
-                                self.r += physical.radial_distance_spline(pore_centers[k, ...], coms[k, :][np.newaxis, :],
-                                                                          box[k]).tolist()
-
-                        else:  # no spline
-
-                            pore_centers = self.pore_centers[begin:end, pore, :][bp[:-1]]
-                            coms = self.com[begin:end, j, :2][bp[:-1]]
-                            self.r += np.linalg.norm(pore_centers - coms, axis=1).tolist()
+            # switch_points = np.argwhere(np.diff(self.partition[:, j])).squeeze().tolist()
+            #
+            # try:
+            #     switch_points.append(self.partition.shape[0])
+            # except AttributeError:
+            #     switch_points = list(switch_points)
+            #     switch_points.append(self.partition.shape[0])
+            #
+            # # Analyze sub-trajectories where solute is in defined pore region
+            # begin = 0
+            # for i, end in enumerate(switch_points[::2]):  # only at switch points after which solute is in pores
+            #     if (end - begin) > nframes_dwell:  # only include hops/dwells from trajectories long enough to analyze
+            #         # np.savez_compressed('MET_trace.npz', z=self.com[begin:end, j, :])
+            #         # exit()
+            #         # movement_3d = np.linalg.norm(self.com[begin:end, j, :], axis=1)  # magnitude of distance travelled
+            #         bp = ruptures.detection.Binseg(model='l2', min_size=1, jump=1).fit_predict(self.com[begin:end, j, :]
+            #                                        , pen=self.breakpoint_penalty)
+            #         # if j == 1:
+            #         #     # bp = ruptures.detection.Binseg(model='l2', min_size=1, jump=1).fit_predict(self.com[begin:end, j, 2], pen=self.breakpoint_penalty)
+            #         #     ruptures.display(self.com[begin:end, j, 2], bp)
+            #         #     plt.xlabel('Time (ns)', fontsize=14)
+            #         #     plt.ylabel('$z$-position (nm)', fontsize=14)
+            #         #     plt.xticks(np.linspace(0, 2000, 9), [int(i) for i in np.linspace(0, 1000, 9)])
+            #         #     plt.tight_layout()
+            #         #     plt.show()
+            #         #     exit()
 
                     # for visualization predicted z-hops on top of time series
                     # traj_hops = np.zeros([2*len(bp) - 1, 2])
                     #
                     # traj_hops[1::2, 0] = self.time[bp[:-1]]*2
                     # traj_hops[2::2, 0] = self.time[bp[:-1]]*2
-
-                    initial_dwells.append(bp[0])
-                    if len(bp) > 1:  # handle case where the only break point is at the end of the simulation
-                        final_dwells.append(bp[-1] - bp[-2])
-
-                    for k in range(len(bp) - 1):
-
-                        if (k + 1) < (len(bp) - 1):  # exclude first and last segments for dwell times
-                            self.dwell_times.append(bp[k + 1] - bp[k])  # discrete form
-
-                        if k > 0:  # need two different z coordinates to get a hop length
-                            hop_lengths.append(np.mean(self.com[bp[k]:bp[k + 1], j, 2]) -
-                                                    np.mean(self.com[bp[k - 1]:bp[k], j, 2]))
-                        else:
-                            # bp[0] != 0, rather it is the first break point location. bp[-1] is the last point in the
-                            # time series though
-                            hop_lengths.append(np.mean(self.com[bp[k]:bp[k + 1], j, 2]) -
-                                               np.mean(self.com[0:bp[k], j, 2]))  # hop at first segment
 
                         # traj_hops[2*k, 0] = bp[k]
                         # traj_hops[2*k + 1, 0] = bp[k + 1]
@@ -381,14 +422,15 @@ class System(object):
                     # plt.plot(traj_hops[:, 0], traj_hops[:, 1], '--', color='black')
                     # plt.show()
                     # exit()
-                try:
-                    begin = switch_points[2*i + 1]
-                except IndexError:
-                    pass
+                # try:
+                #     begin = switch_points[2*i + 1]
+                # except IndexError:
+                #     pass
 
             self.hop_lengths.append(hop_lengths)
 
-        self.tail_dwells = np.array(initial_dwells + final_dwells)
+        # tail_dwells as in tail ends of trajectory
+        self.tail_dwells = [initial_dwells[i] + final_dwells[i] for i in range(self.nmodes)]
 
     def fit_distributions(self, nbins=25, plot=True, nboot=200, show=False, save=True):
         """ Fit curves to dwell time and hop length distributions
@@ -408,209 +450,193 @@ class System(object):
 
         # Reconstruct bootstrapped distributions by randomly sampling from data
         # keep all bootstrapping data to generate error bars
-        hist_dwell = np.zeros([nboot, nbins])
-        hist_jump = np.zeros([nboot, nbins])
+        hist_dwell = np.zeros([self.nmodes, nboot, nbins])
+        hist_jump = np.zeros([self.nmodes, nboot, nbins])
 
-        all_hops = []
-        for i in self.hop_lengths:
-            all_hops += i
+        all_hops = [[] for _ in range(self.nmodes)]
 
-        hop_mean = 0
+        for h in self.hop_lengths:
+            for m in range(self.nmodes):
+                all_hops[m] += h[m]
 
-        # Define bins so histograms can be added together
-        bins_dwell = np.linspace(np.min(self.dwell_times), np.amax(list(self.dwell_times) + list(self.tail_dwells)),
-                                 nbins + 1)
-        dwell_bin_width = bins_dwell[1] - bins_dwell[0]
-        bins_dwell_centered = np.array([i + dwell_bin_width/2 for i in bins_dwell[:-1]])
-        bins_hop = np.linspace(np.amin(all_hops), np.amax(all_hops), nbins + 1)
-        hop_bin_width = bins_hop[1] - bins_hop[0]
-        bins_hop_centered = np.array([i + hop_bin_width/2 for i in bins_hop[:-1]])
+        hop_mean = np.zeros(self.nmodes)
 
-        # plot/save initial distribution
-        # np.savez_compressed('dwells.npz', dwell_times=self.dwell_times)
-        # hist, edges = np.histogram(self.dwell_times, range=(1, 25), bins=25)
-        # normalized = hist / len(self.dwell_times)
-        # plt.bar(edges[:-1], normalized, 1, align='edge')
-        #
-        # plt.figure()
-        # plt.hist(self.dwell_times, bins=50)
-        # plt.show()
-        # exit()
+        # Define bins so histograms can be added together. Do it separately for each mode
+        min_dwells = [min(i) for i in self.dwell_times]
+        max_dwells = [max(max(self.dwell_times[i]), max(self.tail_dwells[i])) for i in range(self.nmodes)]
+        min_hops = [min(i) for i in all_hops]
+        max_hops = [max(i) for i in all_hops]
+
+        bins_dwell = np.zeros([self.nmodes, nbins + 1])
+        bins_hop = np.zeros([self.nmodes, nbins + 1])
+        for m in range(self.nmodes):
+            bins_dwell[m, :] = np.linspace(min_dwells[m], max_dwells[m], nbins + 1)
+            bins_hop[m, :] = np.linspace(min_hops[m], max_hops[m], nbins + 1)
+
+        dwell_bin_width = bins_dwell[:, 1] - bins_dwell[:, 0]
+        hop_bin_width = bins_hop[:, 1] - bins_hop[:, 0]
+
+        bins_dwell_centered = np.zeros([self.nmodes, nbins])
+        bins_hop_centered = np.zeros([self.nmodes, nbins])
+        for m in range(self.nmodes):
+            bins_dwell_centered[m, :] = [i + dwell_bin_width[m]/2 for i in bins_dwell[m, :-1]]
+            bins_hop_centered[m, :] = [i + hop_bin_width[m]/2 for i in bins_hop[m, :-1]]
 
         i = 0
         while i < nboot:
 
+            print('Bootstrapping ... Trial %s\r' % (i + 1), end='', flush=True)
             # dwell times
-            try:
-                print('Bootstrapping ... Trial %s\r' % (i + 1), end='', flush=True)
+            for m in range(self.nmodes):
 
-                # Recreate dwell time distribution by randomly choosing from all dwell times with replacement
-                dwell_times_boot = np.random.choice(self.dwell_times, size=len(self.dwell_times), replace=True)
-
-                # Add long dwell times randomly selected from beginning and end of trajectory
-                tail_dwells = self.tail_dwells[np.where(self.tail_dwells > max(dwell_times_boot))[0]]
-
-                # add new tail dwells if there are any
                 try:
-                    dwell_times_boot = np.concatenate((np.random.choice(tail_dwells, size=len(tail_dwells),
-                                                                        replace=True), dwell_times_boot))
-                except ValueError:
-                    pass
 
-                # Maximum likelihood estimate of alpha
-                args = (dwell_times_boot, int(min(dwell_times_boot)), True)  # (dwell times, xmin, maximize = True)
-                maximum = minimize(fitting_functions.power_law_discrete_log_likelihood, 1.5, args=args,
-                                   bounds=[(1.01, 3)]).x[0]
+                    # Recreate dwell time distribution by randomly choosing from all dwell times with replacement
+                    dwell_times_boot = np.random.choice(self.dwell_times[m], size=len(self.dwell_times[m]),
+                                                        replace=True)
 
-                self.alpha_distribution.append(maximum - 1)
+                    # Add long dwell times randomly selected from beginning and end of trajectory
+                    tail_dwells = np.array(self.tail_dwells[m])[np.where(self.tail_dwells[m] > max(dwell_times_boot))[0]]
 
-                # Graphical representation of log-likelihood maximization
-                # ll = []  # list of log-likelihoods for each alpha tested
-                # alphas = np.linspace(1.01, 3, 100)
-                # for a in alphas:
-                #     ll.append(fitting_functions.power_law_discrete_log_likelihood(a, dwell_times_boot, 1))
-                #
-                # plt.plot(alphas, ll)
-                # plt.show()
+                    # add new tail dwells if there are any
+                    try:
+                        dwell_times_boot = np.concatenate((np.random.choice(tail_dwells, size=len(tail_dwells),
+                                                                            replace=True), dwell_times_boot))
+                    except ValueError:
+                        pass
 
-                if plot:
+                    # Maximum likelihood estimate of alpha
+                    args = (dwell_times_boot, int(min(dwell_times_boot)), True)  # (dwell times, xmin, maximize = True)
+                    maximum = minimize(fitting_functions.power_law_discrete_log_likelihood, 1.5, args=args,
+                                       bounds=[(1.01, 3)]).x[0]
 
-                    # bin the bins
-                    hist_dwell[i, :], _ = np.histogram(dwell_times_boot, bins_dwell, density=True)
+                    self.alpha_distribution[m].append(maximum - 1)
 
-                # Fit a line to log-log plot of dwell time distribution and compare it to MLE plot
-                # _, alpha = fitting_functions.fit_power_law(np.array(bins_dwell_centered), hist_dwell[i, :])
-                #
-                # plt.plot(bins_dwell_centered, bins_dwell_centered ** alpha, color='blue', linewidth=3,
-                #          label=r'$\alpha$=%.2f (LS)' % -alpha)
-                #
-                # # compare MLE to Least squares estimate
-                # plt.bar(bins_dwell_centered, hist_dwell[i, :], dwell_bin_width, align='center')
-                # plt.plot(bins_dwell_centered, bins_dwell_centered ** - maximum, color='red',
-                #          linewidth=3, label=r'$\alpha$=%.2f (MLE)' % maximum)
-                # plt.legend(fontsize=14)
-                # plt.xlabel('Dwell Time (Frames)', fontsize=14)
-                # plt.ylabel('Probability', fontsize=14)
-                # plt.gcf().get_axes()[0].tick_params(labelsize=14)
-                # plt.tight_layout()
-                # plt.show()
-                # exit()
+                    # Graphical representation of log-likelihood maximization
+                    # ll = []  # list of log-likelihoods for each alpha tested
+                    # alphas = np.linspace(1.01, 3, 100)
+                    # for a in alphas:
+                    #     ll.append(fitting_functions.power_law_discrete_log_likelihood(a, dwell_times_boot,
+                    #                                                                   int(min(dwell_times_boot))))
+                    #
+                    # plt.plot(alphas, ll)
+                    # plt.show()
+                    # exit()
 
-                # jump lengths
-                hop_lengths_boot = np.random.choice(all_hops, size=len(all_hops), replace=True)
+                    if plot:
 
-                if plot:
+                        # bin the bins
+                        hist_dwell[m, i, :], _ = np.histogram(dwell_times_boot, bins_dwell[m, :], density=True)
 
-                    hist_jump[i, :], _ = np.histogram(hop_lengths_boot, bins_hop, density=True)
+                    # jump lengths
+                    hop_lengths_boot = np.random.choice(all_hops[m], size=len(all_hops[m]), replace=True)
 
-                # Maximum likelihood estimate of mean and sigma of hop length distribution
-                # args = (hop_lengths_boot, True)  # (hop_lengths times, maximize = True)
-                # guess = np.array([np.mean(hop_lengths_boot), np.std(hop_lengths_boot)])
-                # hop_mle = minimize(fitting_functions.gaussian_log_likelihood, guess, args=args,
-                #                    bounds=[[-np.inf, np.inf], [0, np.inf]]).x
+                    if plot:
 
-                hop_mle = [np.mean(hop_lengths_boot), np.std(hop_lengths_boot)]  # mean and std are mle estimates
+                        hist_jump[m, i, :], _ = np.histogram(hop_lengths_boot, bins_hop[m, :], density=True)
 
-                # least squares fit of gaussian to data
-                # p_hops = [np.mean(hop_lengths_boot), np.std(hop_lengths_boot)]
-                # solp_hops, cov_x = curve_fit(gaussian, bins_hop_centered, hist_jump[i, :], p_hops,
-                #                              bounds=([-np.inf, 0], [np.inf, np.inf]))
-                #
-                # mean_mle, sigma_mle = hop_mle
-                # mean_ls, sigma_ls = solp_hops
-                #
-                # plt.bar(bins_hop_centered, hist_jump[i, :], hop_bin_width)
-                # x = np.linspace(min(hop_lengths_boot), max(hop_lengths_boot), 500)
-                # plt.plot(x, gaussian(x, mean_ls, sigma_ls), label='$\sigma$=%.3f nm (LS)' % sigma_ls, color='blue',
-                #          linewidth=2)
-                # plt.plot(x, gaussian(x, mean_mle, sigma_mle), label='$\sigma$=%.3f nm (MLE)' % sigma_mle, color='red',
-                #          linewidth=2)
-                # plt.legend(fontsize=14)
-                # plt.xlabel('Hop length (z-direction, nm)', fontsize=14)
-                # plt.ylabel('Probability', fontsize=14)
-                # plt.gcf().get_axes()[0].tick_params(labelsize=14)
-                # plt.tight_layout()
-                # plt.show()
-                # exit()
+                    # Maximum likelihood estimate of mean and sigma of hop length distribution
+                    hop_mle = [np.mean(hop_lengths_boot), np.std(hop_lengths_boot)]  # mean and std are mle estimates
 
-                self.hop_sigma_distribution.append(hop_mle[1])
+                    self.hop_sigma_distribution[m].append(hop_mle[1])
 
-                # Things for plotting
-                if plot:
+                    # Things for plotting
+                    if plot:
 
-                    hop_mean += hop_mle[0]
+                        hop_mean += hop_mle[0]
 
-                i += 1  # probably can go back to loop since using MLE
-            except RuntimeError:  # sometimes bootstrapping gives unfittable data
-                continue
+                    if m == self.nmodes - 1:
+                        i += 1  # probably can go back to loop since using MLE
+
+                except RuntimeError:  # sometimes bootstrapping gives unfittable data
+                    continue
 
         hop_mean /= nboot
 
         if plot:
 
-            fig, ax = plt.subplots(2, 2, figsize=(12, 8))
-            hops, hop_ax = plt.subplots()
-            dwells, dwell_ax = plt.subplots()
+            fig, ax = plt.subplots(self.nmodes, 2, figsize=(self.nmodes * 6, 8))
+            # hops, hop_ax = plt.subplots()
+            # dwells, dwell_ax = plt.subplots()
             fontsize = 16
+            label_fontsize = 14
+            legend_fontsize = 12
 
-            ax[0, 0].bar(bins_dwell_centered, hist_dwell.mean(axis=0), width=dwell_bin_width, align='center')
-            ax[0, 0].set_xlabel('Dwell Time (ns)', fontsize=14)
-            ax[0, 0].set_ylabel('Frequency', fontsize=14)
+            for m in range(self.nmodes):
 
-            ax[0, 0].plot(bins_dwell_centered, bins_dwell_centered ** -(1 + np.mean(self.alpha_distribution)),
-                          '--', color='black', label=r'$\alpha_{fit}$ = %.3f $\pm$ %.3f ns$^{-1}$' %
-                          (np.mean(self.alpha_distribution), np.std(self.alpha_distribution)))
-            ax[0, 0].legend(fontsize=12)
+                ax[m, 0].bar(bins_dwell_centered[m, :], hist_dwell[m, ...].mean(axis=0), width=dwell_bin_width[m],
+                             align='center')
+                ax[m, 0].set_xlabel('Dwell Time (ns)', fontsize=label_fontsize)
+                ax[m, 0].set_ylabel('Frequency', fontsize=label_fontsize)
 
-            dwell_ax.bar(bins_dwell_centered, hist_dwell.mean(axis=0), width=dwell_bin_width, align='center')
-            dwell_ax.set_xlabel('Dwell Time (ns)', fontsize=fontsize)
-            dwell_ax.set_ylabel('Frequency', fontsize=fontsize)
+                ax[m, 0].plot(bins_dwell_centered[m, :], bins_dwell_centered[m, :] ** -(1 +
+                              np.mean(self.alpha_distribution)), '--', color='black',
+                              label=r'$\alpha_{fit}$ = %.3f $\pm$ %.3f ns$^{-1}$' % (np.mean(self.alpha_distribution[m]),
+                                                                                     np.std(self.alpha_distribution[m])))
+                ax[m, 0].legend(fontsize=legend_fontsize)
+                ax[m, 0].tick_params(labelsize=fontsize)
 
-            dwell_ax.plot(bins_dwell_centered, bins_dwell_centered ** -(1 + np.mean(self.alpha_distribution)),
-                          '--', color='black', label='Power law MLE fit', linewidth=2)
-            dwell_ax.legend(fontsize=fontsize)
-            dwell_ax.text(290, 0.022, r'$p \propto t^{(-1 - \alpha)}$', fontsize=fontsize)
-            dwell_ax.text(290, 0.019, r'$\alpha_{fit}$ = %.3f $\pm$ %.3f ns$^{-1}$' %
-            (np.mean(self.alpha_distribution), np.std(self.alpha_distribution)), fontsize=fontsize)
-            dwell_ax.tick_params(labelsize=fontsize)
+                ax[m, 1].bar(bins_hop_centered[m, :], hist_jump[m, ...].mean(axis=0), width=hop_bin_width[m])
+                ax[m, 1].plot(bins_hop_centered[m, :],
+                              gaussian(bins_hop_centered[m, :], hop_mean[m], np.mean(self.hop_sigma_distribution[m]))
+                              , '--', label='Gaussian fit\n $\sigma$=%.2f $\pm$ %.2f nm' %
+                              (np.mean(self.hop_sigma_distribution[m]), np.std(self.hop_sigma_distribution[m])),
+                              color='black')
+                ax[m, 1].legend(fontsize=legend_fontsize)
+                ax[m, 1].set_xlabel('Hop Length (nm)', fontsize=label_fontsize)
+                ax[m, 1].set_ylabel('Frequency', fontsize=label_fontsize)
 
-            ax[0, 1].hist(self.alpha_distribution, bins=nbins)
-            ax[0, 1].set_xlabel(r'Bootstrapped $\alpha$ (ns$^{-1}$)', fontsize=14)
-            ax[0, 1].set_ylabel('Frequency', fontsize=14)
+                ax[m, 1].tick_params(labelsize=fontsize)
 
-            ax[1, 0].bar(bins_hop_centered, hist_jump.mean(axis=0), width=hop_bin_width)
-            ax[1, 0].plot(bins_hop_centered, gaussian(bins_hop_centered, hop_mean, np.mean(self.hop_sigma_distribution))
-                          , '--', label='Gaussian fit\n $\sigma$=%.2f $\pm$ %.2f nm' %
-                          (np.mean(self.hop_sigma_distribution), np.std(self.hop_sigma_distribution)), color='black')
+            # dwell_ax.bar(bins_dwell_centered, hist_dwell.mean(axis=0), width=dwell_bin_width, align='center')
+            # dwell_ax.set_xlabel('Dwell Time (ns)', fontsize=fontsize)
+            # dwell_ax.set_ylabel('Frequency', fontsize=fontsize)
+            #
+            # dwell_ax.plot(bins_dwell_centered, bins_dwell_centered ** -(1 + np.mean(self.alpha_distribution)),
+            #               '--', color='black', label='Power law MLE fit', linewidth=2)
+            # dwell_ax.legend(fontsize=fontsize)
+            # dwell_ax.text(290, 0.022, r'$p \propto t^{(-1 - \alpha)}$', fontsize=fontsize)
+            # dwell_ax.text(290, 0.019, r'$\alpha_{fit}$ = %.3f $\pm$ %.3f ns$^{-1}$' %
+            # (np.mean(self.alpha_distribution), np.std(self.alpha_distribution)), fontsize=fontsize)
+            # dwell_ax.tick_params(labelsize=fontsize)
 
-            ax[1, 0].set_xlabel('Hop Length ($z$-direction, nm)', fontsize=14)
-            ax[1, 0].set_ylabel('Frequency', fontsize=14)
-            ax[1, 0].legend(fontsize=12)
-
-            hop_ax.bar(bins_hop_centered, hist_jump.mean(axis=0), width=hop_bin_width)
-            hop_ax.plot(bins_hop_centered, gaussian(bins_hop_centered, hop_mean, np.mean(self.hop_sigma_distribution))
-                          , '--', label='Gaussian MLE fit', color='black', linewidth=2)
-
-            hop_ax.set_xlabel('Hop Length ($z$-direction, nm)', fontsize=fontsize)
-            hop_ax.set_ylabel('Frequency', fontsize=fontsize)
-            hop_ax.legend(fontsize=fontsize)
-            hop_ax.text(0.31, 0.95, '$p \propto e^{\dfrac{(x-\mu)^2}{2\sigma^2}}$', fontsize=fontsize)
-            hop_ax.text(0.31, 0.825, '$\sigma$=%.2f $\pm$ %.2f nm' % (np.mean(self.hop_sigma_distribution),
-                                                                np.std(self.hop_sigma_distribution)), fontsize=fontsize)
-            hop_ax.tick_params(labelsize=fontsize)
-
-            ax[1, 1].hist(self.hop_sigma_distribution, bins=nbins)
-            ax[1, 1].set_xlabel('Bootstrapped $\sigma$ (nm)', fontsize=14)
-            ax[1, 1].set_ylabel('Frequency', fontsize=14)
+            # ax[0, 1].hist(self.alpha_distribution, bins=nbins)
+            # ax[0, 1].set_xlabel(r'Bootstrapped $\alpha$ (ns$^{-1}$)', fontsize=14)
+            # ax[0, 1].set_ylabel('Frequency', fontsize=14)
+            #
+            # ax[1, 0].bar(bins_hop_centered, hist_jump.mean(axis=0), width=hop_bin_width)
+            # ax[1, 0].plot(bins_hop_centered, gaussian(bins_hop_centered, hop_mean, np.mean(self.hop_sigma_distribution))
+            #               , '--', label='Gaussian fit\n $\sigma$=%.2f $\pm$ %.2f nm' %
+            #               (np.mean(self.hop_sigma_distribution), np.std(self.hop_sigma_distribution)), color='black')
+            #
+            # ax[1, 0].set_xlabel('Hop Length ($z$-direction, nm)', fontsize=14)
+            # ax[1, 0].set_ylabel('Frequency', fontsize=14)
+            # ax[1, 0].legend(fontsize=12)
+            #
+            # hop_ax.bar(bins_hop_centered, hist_jump.mean(axis=0), width=hop_bin_width)
+            # hop_ax.plot(bins_hop_centered, gaussian(bins_hop_centered, hop_mean, np.mean(self.hop_sigma_distribution))
+            #               , '--', label='Gaussian MLE fit', color='black', linewidth=2)
+            #
+            # hop_ax.set_xlabel('Hop Length ($z$-direction, nm)', fontsize=fontsize)
+            # hop_ax.set_ylabel('Frequency', fontsize=fontsize)
+            # hop_ax.legend(fontsize=fontsize)
+            # hop_ax.text(0.31, 0.95, '$p \propto e^{\dfrac{(x-\mu)^2}{2\sigma^2}}$', fontsize=fontsize)
+            # hop_ax.text(0.31, 0.825, '$\sigma$=%.2f $\pm$ %.2f nm' % (np.mean(self.hop_sigma_distribution),
+            #                                                     np.std(self.hop_sigma_distribution)), fontsize=fontsize)
+            # hop_ax.tick_params(labelsize=fontsize)
+            #
+            # ax[1, 1].hist(self.hop_sigma_distribution, bins=nbins)
+            # ax[1, 1].set_xlabel('Bootstrapped $\sigma$ (nm)', fontsize=14)
+            # ax[1, 1].set_ylabel('Frequency', fontsize=14)
 
             fig.tight_layout()
-            hops.tight_layout()
-            dwells.tight_layout()
+            # hops.tight_layout()
+            # dwells.tight_layout()
 
             if save:
                 fig.savefig('hop_dwell_distribution.pdf')
-                hops.savefig('hop_distribution.pdf')
-                dwells.savefig('dwell_distribution.pdf')
+                # hops.savefig('hop_distribution.pdf')
+                # dwells.savefig('dwell_distribution.pdf')
 
             if show:
                 plt.show()
@@ -802,27 +828,38 @@ if __name__ == "__main__":
 
     args = initialize().parse_args()
 
+    if args.yaml:
+        with open(args.yaml, 'r') as yml:
+            cfg = yaml.load(yml)
+    else:
+        sys.exit('Argparse arguments (except --load and --yaml) are no longer supported. Please make a .yaml file.')
+
     if args.load:
 
         sys = file_rw.load_object(args.load)
 
+        sys.fit_distributions(nbins=cfg['bins'], nboot=cfg['nboot'], plot=True, show=False, save=True)
+
     else:
 
-        sys = System(args.trajectory, args.gro, args.residue, start=args.begin, end=args.end, step=args.step,
-                     ma=args.moving_average)
+        sys = System(cfg['trajectory'], cfg['gro'], cfg['residue'], start=cfg['begin'], end=cfg['end'],
+                     step=cfg['step'], ma=cfg['ma'], nmodes=cfg['nmodes'])
 
-        sys.calculate_solute_partition(spline=False, membrane_residue='HII')
+        sys.calculate_solute_partition(spline=cfg['spline'], membrane_residue=cfg['membrane_residue'],
+                                       r=cfg['pore_cut'])
 
-        sys.hops_and_dwells(penalty=args.breakpoint_penalty)
+        sys.hops_and_dwells(penalty=cfg['breakpoint_penalty'])
 
-        sys.fit_distributions(nbins=args.nbins, nboot=args.nboot, plot=True, show=False, save=True)
+        file_rw.save_object(sys, 'forecast_%s.pl' % cfg['residue'])
+
+        sys.fit_distributions(nbins=cfg['bins'], nboot=cfg['nboot'], plot=True, show=False, save=True)
 
         sys.estimate_hurst()
 
         if args.update:
             sys.update_database()
 
-        file_rw.save_object(sys, 'forecast_%s.pl' % args.residue)
+        file_rw.save_object(sys, 'forecast_%s.pl' % cfg['residue'])
 
     #sys.fit_distributions(nbins=args.nbins, nboot=args.nboot, plot=True, show=False, save=True)
     sys.estimate_hurst()
