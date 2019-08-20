@@ -492,18 +492,36 @@ def write_water_ndx(keep, t):
             count += 1
 
 
-def write_gro_pos(pos, out, name='NA', box=[0, 0, 0], ids=None, res=None, vel=None, ucell=None):
-    """
-    write a .gro file from positions
-    :param pos: xyz coordinates in
+def write_gro_pos(pos, out, name='NA', box=None, ids=None, res=None, vel=None, ucell=None):
+    """ write a .gro file from positions
+
+    :param pos: xyz coordinates (natoms, 3)
     :param out: name of output .gro file
     :param name: name to give atoms being put in the .gro
+    :param box: unitcell vectors. Length 9 list or length 3 list if box is cubic
+    :param ids: name of each atom ordered by index (i.e. id 1 should correspond to atom 1)
+    :param: res: name of residue for each atom
+    :param: vel: velocity of each atom (natoms x 3 numpy array)
+    :param: ucell: unit cell dimensions in mdtraj format (a 3x3 matrix)
+
+    :type pos: np.ndarray
+    :type out: str
+    :type name: str
+    :type box: list
+    :type ids: list
+    :type res: list
+    :type vel: np.ndarray
+    :type ucell: np.ndarray
+
     :return: A .gro file
     """
 
     if ucell is not None:
         box = [ucell[0, 0], ucell[1, 1], ucell[2, 2], ucell[0, 1], ucell[2, 0], ucell[1, 0], ucell[0, 2], ucell[1, 2],
                ucell[2, 0]]
+
+    if box is None:  # to avoid mutable default
+        box = [0., 0., 0.]
 
     with open(out, 'w') as f:
 

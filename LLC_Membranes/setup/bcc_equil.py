@@ -446,9 +446,7 @@ if __name__ == "__main__":
         p = subprocess.Popen(cp.split())
         p.wait()
 
-    else:
-
-        equil.gro_name = 'scaled_1.0000.gro'
+    equil.gro_name = 'scaled_1.0000.gro'
 
     if not args.continue_solvated:
 
