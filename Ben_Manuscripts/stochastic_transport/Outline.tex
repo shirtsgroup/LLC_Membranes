@@ -15,7 +15,13 @@
 \usepackage{gensymb}
 \usepackage{float}
 
+%MRS: better to have the first outline shorter to iterate more quickly!
+
+%MRS: better to have a title that described a finding, rather than the
+%approach used.  But we may need to wait a bit further until we can decide on a finding.
+%MRS: also 'stochastic modeling' is pretty vague.  should be more precise. 
 \title{Using Stochastic Modeling to Predict Long Timescale Transport Behavior of Solutes in an H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
+%MRS: we should discuss whether Chris Calderon would be on this one.  I would guess no, but I don't know for sure. 
 \author{Benjamin J. Coscia \and Michael R. Shirts} 
 
 \begin{document}
@@ -61,19 +67,41 @@
   % BJC: To me the value in this is gaining a deeper mechanistic understanding by 
   % putting things in terms of easily interpreted equations.
   % BJC: Maybe it's just a combination of both.
+
+  % MRS: They way to think about it, I think, is that the simplest
+  % assumption is the the transport mechanism is simple diffusion;
+  % uncorrelated random jumps due to molecular collisions. If you make
+  % that assumption, you get MSD linear in time.  So that's IS a
+  % stochastic process, but not a very complex one. To make long
+  % timescale predictions, we need to increase the detail.  Is that
+  % what you are referring to? Not sure if I answered the question . . . 
+
   Unfortunately, the timescales that we can simulate with MD are insufficient to be
   able to make well-converged predictions of macroscopic transport properties 
   traditionally used to characterize membranes in the lab. \\
 
   One can project long timescale solute behavior by modeling transport as a
   stochastic process.
+  %MRS: as above, simple diffusion is stochastic, just not very complex.  So we want to add appropriate complexity.
   \begin{itemize}
+    %MRS: best talk about these mechanisms in terms of the
+    %mathematical models they capture.  But I don't know that it's
+    %necessary to review all of them.  
+  
+    %It may be a better approach to start from the features of the
+    %problem (i.e. certain mechanisms) and choose the model (of the
+    %existing choices) that is appropriate for those mechanisms.
+    %I.e. diagnose first, then choose, rather than just applying a
+    %list of models useful in other field's timeseries. Let me know if that makes sense;
+    %I think how the methods applied are selected is a key to solve the problem.
+
     \item Various disciplines study this type of problem in a number of ways.
     \item In the simulation literature, most start by measuring mean squared 
     displacement (MSD), as we did previously.  % This doesn't quite fit the thesis
     \item Due to the short time scales most people can feasibly simulate, the MSD 
     does not give a complete picture of what happens long-term, other than hinting
     at types of mechanisms that could lead to the curve's shape.
+    %MRS: I'd say that MSD is too simple compared to what is going on mechanistically, but it's fundamentally the same idea.  
     \item mean first passage time?
     \item Markov state models are popular with researchers of proteins which have 
     many dynamical states occurring over multiple time scales.
@@ -102,6 +130,7 @@
     
   We ran all MD simulations and energy minimizations using GROMACS 2018. We  % needs gromacs citations
   performed all post-simulation trajectory using python scripts which are available
+  %MRS: eventually want to say what scripts were used to do what, but that is not at the outline stage!
   online at \\ \texttt{https://github.com/shirtsgroup/LLC\_Membranes}.
 
   \subsection{Molecular Dynamics Simulations}
@@ -116,6 +145,7 @@
     significantly faster than in the 5 wt \% system studied previously.
     \item Appropriate stochastic modeling requires that solutes explore 
     as much structural space as possible.  %BJC: better term than structural space?
+    %MRS: something simpler like ``sample the accessible mechanisms with representative probability''?
   \end{itemize}
   
   We chose to study a subset of 4 of the fastest moving solutes from our previous
@@ -123,6 +153,7 @@
   \begin{itemize} 
     \item In addition to exploring membrane structural space the most, these solutes
     have a relatively diverse set of chemical functionality.   
+    %MRS: do the solutes also have some diversity of mechanisms (that were observed previously?)
     \item For each solute we created a separate system and to each system we
     added 6 solutes per pore for a total of 24 solutes.
     \item This number of solutes per pore provides a balance of a low 
@@ -158,7 +189,8 @@
     and pyEMMA~\cite{scherer_pyemma_2015} provide work flows capable 
     of featurization and dimensional reduction.
   \end{itemize}
-  
+
+  %MRS: probably write it as a 2x4 table.
   In this work, we define a total of 8 discrete states based on the 3 trapping
   mechanisms observed in our previous work. 
   \begin{itemize}
@@ -212,7 +244,8 @@
     populated than others. % BJC: not sure if the emission distributions are reversible. i.e. if 1 --> 2 transition has same emission distribution as 2 --> 1. It might be required to be Markovian since transition matrix is symmetric. Not sure.
     %\item The shape of the distributions are symmetric and heavy-tailed. 
   \end{itemize}
-  
+
+  %MRS: this below sort of goes beyond standard use of MSM's though, right? where everything is usually constant-rate expoential processes? Should be explicitly mentioned.
   \noindent We modeled the emission distributions as L\'evy stable distributions.  % cauchy is a case of a Levy stable distribution. The tails are too heavy though.
   \begin{itemize}
     \item For independent and identically distributed (iid) random variables, the 
@@ -225,7 +258,7 @@
     \item The characteristic equation describing the Fourier transform of a L\'evy 
     stable PDF is given below:
     \begin{equation}
-    p_{\alpha, \beta}(k;\mu,\sigma) = exp\left[i\mu k - \sigma^{\alpha}|k|^{\alpha}\left(1 - i\beta\frac{k}{|k|}\omega(k, \alpha)\right)\right]
+    p_{\alpha, \beta}(k;\mu,\sigma) =\exp\left[i\mu k - \sigma^{\alpha}|k|^{\alpha}\left(1 - i\beta\frac{k}{|k|}\omega(k, \alpha)\right)\right]
     \end{equation}
     \item Where $\omega$ is defined with something that is complicated to format and can be 
     added later if I keep these formulas in. % https://tex.stackexchange.com/questions/32140/how-to-write-a-function-piecewise-with-bracket-outside
@@ -243,6 +276,8 @@
     \item OU processes contain temporal dependence but the marginal observation distributions
     are consistent with the underlying stochastic driver.~\cite{taufer_simulation_2009}
     \item We will discuss the implications of each.  
+    %MRS: does the process described above include the motion within the state? That is something I feel that the
+    %standard MSM doesn't include either, since they are typically interested just in the distribution of states in equilibrium, not the diffusion. 
   \end{itemize}
   
   L\'evy stable distributions often have heavy tails and an undefined variance 
@@ -275,11 +310,14 @@
   \end{itemize}
   
   %BJC: need to add some validation of Markovian behavior and time step choice.  
-  
+
+  %MRS: you intend this to be a separate model than the above?  If so, make clearer.
   \subsection{Modeling subdiffusion}\label{method:model_sFBM}
 
   Solutes in this system exhibit subdiffusive behavior, a type of anomalous diffusion.
   \begin{itemize}
+  %MRS: you would probably want to be clear what the mechanistic reasons for for anomalous diffusion: 
+  %want to talk about why, given the mechanisms you would consider. 
   	\item During an anomalous diffusion process, the mean squared displacement (MSD)
   	does not grow linearly with time, rather it is of the form:
 	\begin{equation} 
@@ -296,6 +334,7 @@
   \noindent We analyzed both the ensemble-averaged and time-averaged MSDs
   of the simulated trajectories.
   \begin{itemize}
+    %MRS: describe the physical situations in which one would want to choose each of these ways of calculating the MSD.
 	\item The ensemble-averaged MSD measures the displacement of a particle from its initial
 	position~\cite{meroz_toolbox_2015} and can be written as
 	\begin{equation}
@@ -327,8 +366,11 @@
     ends cause anti-correlated motion.\cite{meroz_toolbox_2015,neusius_subdiffusion_2008}
     \item The processes described above can happen alone or in combination.  	
   \end{itemize}
-  
+  %MRS: talk about which of these should apply given the data mechanistically, as well as fit.
+
   % BJC: Should this be in the results? Lots of figures to show in support of the claims below
+  %MRS: can you provide mechanistic reasoning for the below? Then can show the claims for the reasonable possibilities.
+
   \noindent We believe that solutes in the system studied here exhibit subordinated 
   fractional Brownian motion (sFBM) where the parent process is FBM and the 
   leading process is a CTRW. 
@@ -416,6 +458,9 @@
   % do that after I get BCC equilibrations running
   In general, we observe different dynamical behavior when solutes move inside the
   pore versus in the tail region.
+
+  %MRS: could present the two models sequentiually.  Talk about one COULD have multiple modes, then in results present 1, then 2. 
+
   \begin{itemize}
     \item This inspired two models of varying complexity.
     \item We created a simple, single mode model with a single $\alpha$, $\sigma$ and $H$
@@ -561,11 +606,13 @@
   The MSDs for of the solutes calculated from 5 $\mu s$ MD simulation trajectories
   are shown in Figure TBD.
   \begin{itemize}
+    %MRS: probably option 1.
     \item 2 options for a figure:
     \item 1) 2 panels: 1st panel: bar chart with final MSD value + error bars. 2nd panel: a selected MSD curve
     \item 2) 1 panel. All MSD curves. Overlapping errors might look bad
   \end{itemize}
   
+  %MRS: I'm not sure where the below is different from what was found in the previous study (i.e MSD's).
   \noindent Solute motion is influenced by the same three trapping mechanisms observed in our
   previous work.
   \begin{itemize} 
@@ -587,6 +634,8 @@
   \end{itemize}
   
   % BJC: worth proving these are non-Gaussian? One might argue that they look Gaussian but they are not at all.
+  % MRS: there are some simple statistical tests for Gaussianness you can use.  Also might br good to put the 
+  % parameters with the plots, as it's hard to tell how different they may or may not be. 
   \begin{figure}[!h]
   \includegraphics[width=\textwidth]{emissions_MET.pdf}
   \caption{}\label{fig:emissions_MET}
@@ -594,6 +643,7 @@
 
   % BJC: need better or more descriptive way of describing stochastic simulations
   % BJC: or could say that whenever we say simulations, we mean stochastic simulations unless it is specified as a molecular dynamics simulation.
+  % MRS: could say timeseries simulation?  MD is stochastic as well.
   Simulating solute trajectories (see Section~\ref{method:MSMs}) by drawing independent  
   observations from the emission distributions yields near linear MSD curves
   with final values that are far higher than those observed in our molecular simulations.
@@ -603,7 +653,8 @@
     previous transport study (see Figure~\ref{fig:msd_MET}).
     \item The linear behavior of the MSD curve is not consistent with subdiffusion.
   \end{itemize}
-
+  %MRS: so, is there a way we should have been able to tell beforrehand that this approach didn't work that we an explain?
+  %or can we show we needed to do this to get the results?
   \begin{figure}[!h]
   \centering
   \includegraphics[width=0.5\textwidth]{MET_msd.pdf}
