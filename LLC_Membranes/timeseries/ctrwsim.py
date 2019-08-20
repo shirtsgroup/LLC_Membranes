@@ -51,13 +51,14 @@ def initialize():
 
 class CTRW(object):
 
-    def __init__(self, length, ntraj, hop_dist='gaussian', dwell_dist='power', hop_sigma=1, alpha=0.5, lamb=0.5,
-                 padding=10, dt=1, nt=1, H=0.5):
+    def __init__(self, length, ntraj, nmodes=1, hop_dist='gaussian', dwell_dist='power', hop_sigma=1, alpha=0.5,
+                 lamb=0.5, padding=10, dt=1, nt=1, H=0.5, transition_matrix=None):
         """ Initialize simulation of a continuous time random walk
 
         :param length: length of each simulated trajectory. If you fix the number of steps, this equals the number of
         steps. If you fix the time, the total length of the simulation is length * dt
         :param ntraj: number of independent trajectories to generate
+        :param nmodes: number of modes. There should be sigma, alpha and H parameters for each mode
         :param hop_dist: Method used to generate random hop lengths. "gaussian" draws randomly from a gaussian
         distribution, while "fbm" generates correlated hops as in fractional brownian motion.
         :param dwell_dist: Name of probability distribution function used to generate random dwell times
@@ -69,9 +70,12 @@ class CTRW(object):
         :param nt: number of threads to use where parallelized
         :param H: Hurst parameter for fractional brownian motion. Equals 2*alpha for pure FBM. For H < 0.5, trajectories
         are subdiffusive, when H = 0.5, brownian motion is recovered.
+        :param transition_matrix: nmode x nmode matrix of transition probabilties between states. Only needed if
+        nmodes > 1.
 
         :type length: int
         :type ntraj: int
+        :type nmodes: int
         :type hop_dist: str
         :type dwell_dist: str
         :type hop_sigma: float
@@ -81,6 +85,7 @@ class CTRW(object):
         :type dt: float
         :type nt: int
         :type H: float
+        :type transition_matrix: np.ndarray
         """
 
         self.nsteps = length
@@ -94,6 +99,13 @@ class CTRW(object):
         self.dt = dt
         self.nt = nt
         self.H = H
+        self.nmodes = nmodes
+
+        if self.nmodes > 1:
+            if transition_matrix is not None:
+                self.transition_matrix = transition_matrix
+            else:
+                sys.exit("You must provide a probability transition matrix if nmodes is greater than 1")
 
         self.trajectories = np.zeros([self.ntraj, self.nsteps, 2])
         self.trajectory_hops = np.zeros([self.ntraj, 2 * self.nsteps - 1, 2])  # for visualization
@@ -145,10 +157,12 @@ class CTRW(object):
         :param distributions: distributions of alpha and sigma values for dwell and hop length distributions
         respectively. Passed as 2-tuple of arrays where each array contains a possible values of each parameter.
         :param discrete: pull from discrete dwell time probability distributions
+        :param noise: add Gaussian noise to final trajectories
 
         :type ll: float
         :type distributions: tuple
         :type discrete: bool
+        :type noise: float
         """
 
         self.time_uniform = np.linspace(0, self.nsteps, self.nsteps * self.padding)
@@ -158,59 +172,82 @@ class CTRW(object):
             if distributions is not None:
 
                 if self.dwell_distribution == 'exponential':
-                    self.lamb = np.random.choice(distributions[0])
+                    self.lamb = [np.random.choice(distributions[0][m]) for m in range(self.nmodes)]
                 elif self.dwell_distribution == 'power':
-                    self.alpha = np.random.choice(distributions[0])
+                    self.alpha = [np.random.choice(distributions[0][m]) for m in range(self.nmodes)]
 
-                self.hop_sigma = np.random.choice(distributions[1])
-                self.H = np.random.choice(distributions[2])
-                #self.H = np.mean(distributions[2])
+                self.hop_sigma = [np.random.choice(distributions[1][m]) for m in range(self.nmodes)]
+                self.H = [np.random.choice(distributions[2][m]) for m in range(self.nmodes)]
 
             time = [0]
             total_time = 0  # saves a lot of time
 
+            # randomly choose initial state from uniform distribution
+            mode = 0
+            if self.nmodes > 1:
+                mode = np.random.randint(self.nmodes)
+            mode_sequence = list()
+
             while total_time < self.nsteps:
+
+                mode_sequence.append(mode)
 
                 # hop at random time intervals according to one of the following PDFs
                 if self.dwell_distribution == 'exponential':
-                    time.append(sampling.random_exponential_dwell(self.lamb))
+                    time.append(sampling.random_exponential_dwell(self.lamb[mode]))
                 elif self.dwell_distribution == 'power':
                     if self.alpha == 1:
                         time.append(1)
                     else:
-                        time.append(sampling.random_power_law_dwell(1 + self.alpha, ll=ll, discrete=discrete)[0])
+                        time.append(sampling.random_power_law_dwell(1 + self.alpha[mode], ll=ll, discrete=discrete)[0])
                 else:
                     sys.exit('Please enter a valid dwell time probability distribution')
                 total_time += time[-1]
 
+                # choose next mode
+                mode = np.random.choice(self.nmodes, p=self.transition_matrix[mode, :])
+
             time = np.cumsum(time)
+            print(mode_sequence)
+            switch_points = timeseries.switch_points(mode_sequence)
+            switch_points[-1] += 1  # this makes sure 'end' below covers all the points
+            z = np.zeros(len(time))
 
-            if self.hop_distribution in ['gaussian', 'Gaussian']:
+            for pt in range(switch_points.size - 1):
 
-                z = np.cumsum(np.random.normal(loc=0, scale=self.hop_sigma, size=len(time)))
-                z -= z[0]  # untested
+                begin = switch_points[pt]
+                end = switch_points[pt + 1]
+                length = int(end - begin)  # length of segment
+                mode = mode_sequence[pt]  # mode we are in
 
-            elif self.hop_distribution in ['fbm', 'fractional', 'fraction_brownian_motion']:
-                z = fbm.FBM(len(time), self.H, method="daviesharte").fbm()[:-1]  # automatically inserts zero at beginning of array
-                z /= ((1.0 / len(time)) ** self.H)  # reversing a normalization done in the fbm code
-                z *= self.hop_sigma
-                self.steps.append(z[1:] - z[:-1])  # for autocorrelation calculation
+                if self.hop_distribution in ['gaussian', 'Gaussian']:
 
-            else:
-                sys.exit('Please enter a valid hop distance probability distribution')
+                    z[begin:end] = np.random.normal(loc=0, scale=self.hop_sigma, size=length)
+                    z -= z[0]  # untested
+
+                elif self.hop_distribution in ['fbm', 'fractional', 'fraction_brownian_motion']:
+
+                    z[begin:end] = fbm.FBM(length, self.H[mode], method="daviesharte").fbm()[:-1]  # automatically inserts zero at beginning of array
+                    z[begin:end] /= ((1.0 / length) ** self.H[mode])  # reversing a normalization done in the fbm code
+                    z[begin:end] *= self.hop_sigma[mode]
+
+                else:
+                    sys.exit('Please enter a valid hop distance probability distribution')
+
+            self.steps.append(z[1:] - z[:-1])  # for autocorrelation calculation
 
             # for visualizing hops
-            # trajectory_hops = np.zeros([2 * len(time) - 1, 2])
-            #
-            # trajectory_hops[1::2, 0] = time[1:]
-            # trajectory_hops[2::2, 0] = time[1:]
-            #
-            # trajectory_hops[::2, 1] = z
-            # trajectory_hops[1:-1:2, 1] = z[:-1]
-            # trajectory_hops[-1, 1] = z[-1]
-            # plt.plot(trajectory_hops[:, 0], trajectory_hops[:, 1])
-            # plt.show()
-            # exit()
+            trajectory_hops = np.zeros([2 * len(time) - 1, 2])
+
+            trajectory_hops[1::2, 0] = time[1:]
+            trajectory_hops[2::2, 0] = time[1:]
+
+            trajectory_hops[::2, 1] = z
+            trajectory_hops[1:-1:2, 1] = z[:-1]
+            trajectory_hops[-1, 1] = z[-1]
+            plt.plot(trajectory_hops[:, 0], trajectory_hops[:, 1])
+            plt.show()
+            exit()
 
             # make uniform time intervals with the same interval for each simulated trajectory
             self.z_interpolated[t, :] = z[np.digitize(self.time_uniform, time, right=False) - 1]

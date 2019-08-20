@@ -431,3 +431,28 @@ class VectorAutoRegression:
 
         for i in range(self.dim):
             self.phi_std[:, i, :] = results.stderr[1:, i].reshape(r, self.dim)
+
+
+def switch_points(sequence):
+    """ Determine points in discrete state time series where switches between states occurs. NOTE: includes first and
+    last point of time series
+
+    :param sequence: series of discrete states
+
+    :type sequence: list
+
+    :return: list of indices where swithces between states occur
+    :rtype: np.ndarray
+    """
+
+    # See https://stackoverflow.com/questions/36894822/how-do-i-identify-sequences-of-values-in-a-boolean-array
+    switch_ndx = np.argwhere(np.diff(sequence)).squeeze().tolist()
+
+    # add last frame as a switch point
+    try:
+        switch_ndx.append(len(sequence))
+    except AttributeError:  # if there are no switches, it won't return a list
+        switch_ndx = list([switch_ndx])
+        switch_ndx.append(len(sequence))
+
+    return np.array([0] + switch_ndx)  # also add first frame

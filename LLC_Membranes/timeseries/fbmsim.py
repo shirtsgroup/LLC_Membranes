@@ -16,14 +16,14 @@ def initialize():
     parser.add_argument('-H', '--hurst', default=0.5, type=float, help='Hurst exponent for fbm simulation. 2H=alpha '
                         'where alpha is the anomalous exponent. H=0.5 is brownian motion')
     parser.add_argument('-fsteps', '--fbmsteps', default=1000, type=int, help='Number of steps to take along fractional'
-                                                                    'Brownian motion trajectory')
+                                                                              'Brownian motion trajectory')
     parser.add_argument('-nftraj', '--nfbmtraj', default=100, type=int, help='Number of independent fractional brownian'
                                                                              ' motion trajectories.')
     parser.add_argument('-fdt', '--ftimestep', default=1, type=float, help='Time step between steps in fractional '
                         'brownian motion simulated trajectory (arbitrary units).')
     parser.add_argument('-acf', '--autocorrelation', action="store_true", help='Plot step autocorrelation function')
     parser.add_argument('-acov', '--autocovariance', action="store_true", help='Plot autocovariance of fractional'
-                                                                               'gaussian noise')
+                                                                               'Gaussian noise')
     parser.add_argument('-ensemble', '--ensemble', action="store_true", help='Calculate MSD as ensemble average')
     parser.add_argument('-power_law', '--power_law', action="store_true", help='Fit MSD to a power law')
     parser.add_argument('-scale', '--scale', default=None, type=float, help='Sigma of hop length distribution')
