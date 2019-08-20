@@ -46,7 +46,7 @@ def acf_slow(d):
 def acf(t, largest_prime=500):
 
     """ Quickly calculated the autocorrelation function of a time series, t. This gives the same results as acf_slow()
-    but uses FFTs. This method is faster than numpy.correlate. Efficiency is key in order to avoid headaches.
+    but uses FFTs. This method is faster than numpy.correlate.
 
     :param t: time series : ndarray [npoints, nseries]
     :param largest_prime : the largest prime factor of array length allowed. The smaller the faster. 1.6M points takes

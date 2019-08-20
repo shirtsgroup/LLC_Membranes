@@ -316,7 +316,7 @@ class System(Topology):
         self.xlink_residue_name = dummy_residue
         self.t = md.load(dummy_name)
         self.all_residues = [a.residue.name for a in self.t.topology.atoms]
-        self.atom_names = [a.name for a in self.t.topology.atoms]
+        self.atom_names = topology.fix_names(initial_configuration, force_convert=True)
 
         super().__init__()  # inherit from Topology(). Topology() uses attributes defined above
 
@@ -749,7 +749,7 @@ class System(Topology):
         keep = [i for i, x in enumerate(self.xlink_residue_atoms.type) if x != dummy_atom_name]
         keep += [a.index for a in self.t.topology.atoms if a.residue.name != self.original_residue_name]
 
-        ids = np.array([a.name for a in self.t.topology.atoms], dtype=object)[keep]
+        ids = np.array([a.name for a in self.atom_names], dtype=object)[keep]
         res = np.array([a.residue.name for a in self.t.topology.atoms], dtype=object)[keep]
 
         # mdtraj workaround because SOL gets renamed to HOH, OW1 to O, HW1 to H1 and HW2 to H2

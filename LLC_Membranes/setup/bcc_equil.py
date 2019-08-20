@@ -61,6 +61,8 @@ def initialize():
                         'shrunk an initial configuration')
     parser.add_argument('-continue_solvated', '--continue_solvated', action="store_true", help='Continue procedure '
                         'starting from cross-linking step. solvated_final.gro must exist')
+    parser.add_argument('-continue_xlinked', '--continue_xlinked', action="store_true", help='Continue procedure '
+                        'starting after the system has been cross-linked. xlinked.gro must exist.')
 
     return parser
 
@@ -413,7 +415,7 @@ if __name__ == "__main__":
     equil.generate_mdps(length=50, frames=2, T=sim_params['temperature'])  # creates an object
     equil.mdp.write_em_mdp(out='em')
 
-    if not args.continue_dry and not args.continue_solvated:
+    if not args.continue_dry and not args.continue_solvated and not args.continue_xlinked:
 
         nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True,
                                mpi=parallelize['mpi'], nprocesses=parallelize['nprocesses'])  # mdp, top, gro, out
@@ -448,7 +450,7 @@ if __name__ == "__main__":
 
     equil.gro_name = 'scaled_1.0000.gro'
 
-    if not args.continue_solvated:
+    if not args.continue_solvated and not args.continue_xlinked:
 
         equil.add_solvent(build_params['solvent'])
 
@@ -460,5 +462,8 @@ if __name__ == "__main__":
 
         equil.gro_name = 'solvated_final.gro'
 
-    # cross-linking
-    xlink.crosslink(xlink_params)  # run cross-linking algorithm
+    if not args.continue_xlinked:
+        # cross-linking
+        xlink.crosslink(xlink_params)  # run cross-linking algorithm
+
+    equil.gro_name = 'xlinked.gro'

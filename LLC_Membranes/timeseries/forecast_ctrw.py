@@ -102,13 +102,14 @@ class System(object):
         :type nmodes: int
         """
 
-        # load trjaectory
+        # load trajectory
         print('Loading trajectory...', end='', flush=True)
         self.t = md.load(traj, top=gro)[start:end:step]
         print('Done!')
 
         self.time = self.t.time / 1000  # time in nanoseconds
         self.dt = self.time[1] - self.time[0]  # time step
+        self.nT = self.t.n_frames
 
         keep = [a.index for a in self.t.topology.atoms if a.residue.name == res]  # get indices of atoms making up residue of interest
 
@@ -123,14 +124,14 @@ class System(object):
         self.com = physical.center_of_mass(self.pos, self.mass)  # center of mass of residues
         print('Done!')
 
-        #plot z-coordinate trace
-        # plt.plot(self.time, self.com[:, 1, 2], linewidth=2)
-        # plt.tick_params(labelsize=14)
-        # plt.xlabel('Time (ns)', fontsize=14)
-        # plt.ylabel('$z$-coordinate (nm)', fontsize=14)
-        # plt.tight_layout()
-        # plt.show()
-        # exit()
+        # plot z-coordinate trace
+        # for i in range(self.com.shape[1]):
+        #     plt.plot(self.time, self.com[:, i, 2], linewidth=2)
+        #     plt.tick_params(labelsize=14)
+        #     plt.xlabel('Time (ns)', fontsize=14)
+        #     plt.ylabel('$z$-coordinate (nm)', fontsize=14)
+        #     plt.tight_layout()
+        #     plt.show()
 
         # plot first order difference histogram
         # nbins = 100
@@ -176,13 +177,17 @@ class System(object):
         self.dwell_times = [[] for _ in range(self.nmodes)]  # dwell times in each dynamical mode
         self.tail_dwells = []  # tail as in tail ends of trajectory
         self.hop_lengths = []
-        self.hurst_distribution = []
+        self.hurst_distribution = [[] for _ in range(self.nmodes)]
         self.hop_acf = None
         self.alpha_distribution = [[] for _ in range(self.nmodes)]  # distribution of alpha for poisson process
         self.hop_sigma_distribution = [[] for _ in range(self.nmodes)]  # distribution of standard deviation of hop lengths
         self.breakpoint_penalty = 0
         self.location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # This script location
         self.r = []  # radial distance of solute from pore center when hops are made
+        self.segments = [[] for _ in range(self.nmodes)]
+        self.hop_series = [[] for _ in range(self.nmodes)]
+        self.nsolute = self.com.shape[1]
+        self.transition_matrix = np.zeros([self.nmodes, self.nmodes])
 
         self.partition = None  # array telling whether a solute is in the pores or tails. True if in pores, else False
 
@@ -290,7 +295,7 @@ class System(object):
                                                                  3))
         file_rw.write_gro_pos(coordinates, 'spline.gro', name='K')
 
-    def hops_and_dwells(self, penalty=0.25, nframes_dwell=10, locations=False):
+    def hops_and_dwells(self, penalty=0.25, locations=False):
         """ Find breakpoints then assemble lists of dwell times and hop lengths. See documentation for Ruptures python
         package: http://ctruong.perso.math.cnrs.fr/ruptures-docs/build/html/index.html for more options that can be
         added
@@ -314,6 +319,8 @@ class System(object):
         final_dwells = [[] for _ in range(self.nmodes)]  # length of time particle dwells up until end of trajectory
 
         for j in tqdm.tqdm(range(self.com.shape[1])):
+
+            hop_sequence = []  # create sequence of hop lengths IF the mode does not change from previous mode
 
             hop_lengths = [[] for _ in range(self.nmodes)]
 
@@ -359,6 +366,7 @@ class System(object):
                     location = self.partition[bp[-2], j]  # -1 is always the last frame
                 final_dwells[location].append(bp[-1] - bp[-2])
 
+            previous_location = -1
             for k in range(len(bp) - 1):
 
                 if k > 0:  # need two different z coordinates to get a hop length
@@ -375,19 +383,22 @@ class System(object):
 
                 hop_lengths[location].append(hop_length)
 
+                if location == previous_location:
+                    hop_sequence.append(hop_length)
+                else:
+                    if hop_sequence:  # avoid appending empty lists. This is possible since I reset the list each traj
+                        self.hop_series[previous_location].append(hop_sequence)
+                    hop_sequence = [hop_length]
+
                 # Assume solute stays in region it hopped to
                 if (k + 1) < (len(bp) - 1):  # exclude first and last segments for dwell times
                     self.dwell_times[location].append(bp[k + 1] - bp[k])  # discrete form
 
-            # Get indices where res jumps between regions
-            # See https://stackoverflow.com/questions/36894822/how-do-i-identify-sequences-of-values-in-a-boolean-array
-            # switch_points = np.argwhere(np.diff(self.partition[:, j])).squeeze().tolist()
-            #
-            # try:
-            #     switch_points.append(self.partition.shape[0])
-            # except AttributeError:
-            #     switch_points = list(switch_points)
-            #     switch_points.append(self.partition.shape[0])
+                previous_location = location
+
+            # make sure to get last observed sequence
+            if hop_sequence:
+                self.hop_series[previous_location].append(hop_sequence)
             #
             # # Analyze sub-trajectories where solute is in defined pore region
             # begin = 0
@@ -555,7 +566,10 @@ class System(object):
 
         if plot:
 
-            fig, ax = plt.subplots(self.nmodes, 2, figsize=(self.nmodes * 6, 8))
+            fig, ax = plt.subplots(self.nmodes, 2, figsize=(8, self.nmodes * 6))
+
+            if self.nmodes == 1:
+                ax = ax[np.newaxis, :]
             # hops, hop_ax = plt.subplots()
             # dwells, dwell_ax = plt.subplots()
             fontsize = 16
@@ -641,6 +655,51 @@ class System(object):
             if show:
                 plt.show()
 
+    def identify_segments(self, min_segment_length=10):
+        """ Identify all segments between region transitions that are at least min_segment_length long
+        TODO: add this to identify_states.py -- can be used to calculate acf in each region
+        :param min_segment_length: minimum number of frames for a segment to be kept
+
+        :type min_segment_length: int
+
+        :return max_dwell: the maximum segment length
+        """
+
+        nsolute = self.com.shape[1]  # number of solute trajectories
+        max_dwell = 0
+
+        for s in range(nsolute):
+
+            # Get indices where res jumps between regions
+            # See https://stackoverflow.com/questions/36894822/how-do-i-identify-sequences-of-values-in-a-boolean-array
+            switch_points = np.argwhere(np.diff(self.partition[:, s])).squeeze().tolist()
+
+            # add last frame as a switch point
+            try:
+                switch_points.append(self.partition.shape[0])
+            except AttributeError:  # if there are no switches, it won't return a list
+                switch_points = list(switch_points)
+                switch_points.append(self.partition.shape[0])
+
+            switch_points = np.array([0] + switch_points)  # also add first frame
+
+            dwells = switch_points[1:] - switch_points[:-1]  # length of dwells
+
+            if max(dwells) > max_dwell:
+                max_dwell = max(dwells)
+
+            long_enough = np.where(dwells >= 10)[0]  # indices of segments with dwell times that are long enough
+
+            for seg in long_enough:  # make pairs of indices (beginning and end) defining where eligible segments are
+                segment = (switch_points[seg], switch_points[seg + 1])
+                location = self.partition[segment[0]:segment[1], s]
+                if self.nmodes > 1:  # if this is a multi-mode model, identify the mode and assign segment accordingly
+                    self.segments[int(round(location.mean()))].append(segment)
+                else:
+                    self.segments.append(segment)
+
+        return max_dwell
+
     def estimate_hurst(self, nboot=200, max_k=5, confidence=95):
         """ Estimate the hurst parameter by fitting the emperical autocovariance function to theory:
 
@@ -655,83 +714,130 @@ class System(object):
         :type confidence: float
         """
 
-        nhops = np.array([len(x) for x in self.hop_lengths])
-        max_hops = max(nhops)
+        # lists of arrays that will be needed
+        self.hop_acf = []  # average autocorrelation function
+        lower_confidence = (100 - confidence) / 2  # confidence intervals (percentiles)
+        upper_confidence = 100 - lower_confidence
 
-        acf = np.zeros([len(self.hop_lengths), max_hops])
+        # plot settings. Work around for plot subscripting
+        if self.nmodes == 2:
+            fig, (ax1, ax2) = plt.subplots(1, self.nmodes, figsize=(6 * self.nmodes, 5))
+            ax = [ax1, ax2]
+        else:
+            fig, ax1 = plt.subplots(1, 1, figsize=(6, 5))
+            ax = [ax1]
 
-        keep = []  # list to hold indices of trajectories with a non-zero amount of hops
-        for i in range(len(self.hop_lengths)):
-            hops = self.hop_lengths[i]
-            if len(hops) > 1:
-                acf[i, :len(self.hop_lengths[i])] = timeseries.acf(self.hop_lengths[i])
-                keep.append(i)
+        fontsize = 14
 
-        acf = acf[keep, :]
-        ntraj = len(keep)
+        for m in range(self.nmodes):
 
-        boot = np.zeros([nboot, max_hops])
-        for b in range(nboot):
-            sol = np.random.randint(acf.shape[0], size=acf.shape[0])
-            for i in range(max(nhops[sol])):
-                try:
-                    boot[b, i] = acf[sol[np.nonzero(acf[sol, i])], i].mean()
-                except RuntimeWarning:  # happens if the solute with the max_hops dwell time is not included in 'sol'
-                    boot[b, i] = 0
+            nhops = np.array([len(x) for x in self.hop_series[m]])
+
+            max_hops = max(nhops)
+
+            acf = np.zeros([len(self.hop_series[m]), max_hops])
+            boot = np.zeros([nboot, max_hops])
+
+            keep = []  # list to hold indices of trajectories with a non-zero amount of hops
+            for i in range(acf.shape[0]):
+                hops = self.hop_series[m][i]
+                if len(hops) > 2:  # correlation between two points is useless. Will always be +1, -1
+                    autocorrelation = timeseries.acf(hops)
+                    acf[i, :autocorrelation.size] = autocorrelation
+                    keep.append(i)
+
+            acf = acf[keep, :]
+            nhops = nhops[keep]
+
+            nsegments = acf.shape[0]
+
+            for b in range(nboot):
+                sol = np.random.randint(acf.shape[0], size=acf.shape[0])
+                for i in range(max(nhops[sol])):
+                    ndx = sol[np.nonzero(acf[sol, i])]
+                    if not list(ndx):
+                        boot[b, i] = 0
+                    else:
+                        boot[b, i] = acf[ndx, i].mean()
+                    # This is more pythonic, but multiple exceptions are raised so it doesn't really work as intended.
+                    # try:
+                    #     boot[b, i] = acf[ndx, i].mean()
+                    # except RuntimeWarning:  # happens if the solute with the max_hops dwell time is not included in 'sol'
+                    #     boot[b, i] = 0
 
             # boot[b, :] = [acf[np.nonzero(acf[sol, i]), i].mean() for i in range(max_hops)]
+            # bootstrap acf
+            #self.hop_acf.append([acf[np.nonzero(acf[:, i]), i].mean() for i in range(max_hops)])
+            self.hop_acf.append(boot.mean(axis=0))
 
-        self.hop_acf = [acf[np.nonzero(acf[:, i]), i].mean() for i in range(max_hops)]
+            errorbars = np.zeros([2, len(self.hop_acf[m])])
+            errorbars[0, :] = np.abs(np.percentile(boot, lower_confidence, axis=0) -
+                                     boot.mean(axis=0))  # 2.5 percent of data below this value
+            errorbars[1, :] = np.percentile(boot, upper_confidence, axis=0) - boot.mean(axis=0)
 
-        lower_confidence = (100 - confidence) / 2
-        upper_confidence = 100 - lower_confidence
-        errorbars = np.zeros([2, len(self.hop_acf)])
-        errorbars[0, :] = np.abs(np.percentile(boot, lower_confidence, axis=0) -
-                                 boot.mean(axis=0))  # 2.5 percent of data below this value
-        errorbars[1, :] = np.percentile(boot, upper_confidence, axis=0) - boot.mean(axis=0)
+            for b in range(nboot):
 
-        for b in range(nboot):
+                traj = np.random.randint(0, nsegments, size=nsegments)
 
-            traj = np.random.randint(0, ntraj, size=ntraj)
+                hboot = acf[traj, 1].mean()  # first time lag autocovariance
 
-            hboot = acf[traj, 1].mean()
+                H = np.log(2 * hboot + 2) / (2 * np.log(2))  # initial guess at H based on first dip in autocovariance
 
-            H = np.log(2 * hboot + 2) / (2 * np.log(2))  # initial guess at H based on first dip in autocovariance
+                # if H > 0:
+                #     self.hurst_distribution.append(H)
+                # can probably combine this loop with above bootstrapping loop
+                acf_boot = [acf[traj, i][np.nonzero(acf[traj, i])].mean() for i in range(max_k + 1)]
 
-            # if H > 0:
-            #     self.hurst_distribution.append(H)
+                h_opt = curve_fit(fitting_functions.hurst_autocovariance, np.arange(max_k + 1), acf_boot[:(max_k + 1)],
+                                  p0=H)[0]
 
-            acf_boot = [acf[traj, i][np.nonzero(acf[traj, i])].mean() for i in range(max_k + 1)]
+                if h_opt > 0:
 
-            h_opt = curve_fit(fitting_functions.hurst_autocovariance, np.arange(max_k + 1), acf_boot[:(max_k + 1)],
-                              p0=H)[0]
+                    self.hurst_distribution[m].append(h_opt[0])
 
-            if h_opt > 0:
+            ax[m].plot(self.hop_acf[m], linewidth=2, label='Simulated autocorrelation')
+            ax[m].plot(np.arange(max_hops), fitting_functions.hurst_autocovariance(np.arange(max_hops),
+                     np.mean(self.hurst_distribution[m])), '--', color='black', linewidth=2,
+                     label='Fit theoretical autocorrelation')
+            ax[m].fill_between(np.arange(max_hops), errorbars[1, :] + boot.mean(axis=0),
+                               boot.mean(axis=0) - errorbars[0, :], alpha=0.25)
+            ax[m].text(3.0, 0.5, '$\gamma(k) = \dfrac{1}{2}[|k-1|^{2H} - 2|k|^{2H} + |k + 1|^{2H}]$', fontsize=fontsize)
+            ax[m].text(3.0, 0.3, '$H$ = %.2f $\pm$ %.2f' % (np.mean(self.hurst_distribution[m]),
+                                                            np.std(self.hurst_distribution[m])), fontsize=fontsize)
+            ax[m].set_xticks([1, 3, 5, 7, 9, 11, 13, 15])
+            ax[m].set_xlabel('Lag (k)', fontsize=fontsize)
+            ax[m].set_ylabel('Autocorrelation', fontsize=fontsize)
+            ax[m].tick_params(labelsize=fontsize)
+            ax[m].set_xlim(0.05, 15)
+            ax[m].set_ylim(-1, 1)
+            ax[m].legend(fontsize=fontsize)
 
-                self.hurst_distribution.append(h_opt[0])
+        fig.tight_layout()
+        fig.savefig('hop_acf.pdf')
+        plt.show()
 
-            #self.hurst_distribution.append(np.log(2 * hboot + 2) / (2 * np.log(2)))
+    def determine_transition_matrix(self, start=1):
+        """ Create a transition matrix describing the probability of transitions between states. This is same as
+        make_transition_matrix in identify_states.py. Could be added to a library. Would need to recast self.partition
+        as an integer array.
 
-        fontsize=16
-        plt.figure()
-        plt.plot(self.hop_acf, linewidth=2, label='Simulated autocorrelation')
-        plt.plot(np.arange(max_hops), fitting_functions.hurst_autocovariance(np.arange(max_hops),
-                 np.mean(self.hurst_distribution)), '--', color='black', linewidth=2,
-                 label='Fit theoretical autocorrelation')
-        plt.fill_between(np.arange(max_hops), errorbars[1, :] + boot.mean(axis=0),
-                         boot.mean(axis=0) - errorbars[0, :],
-                         alpha=0.25)
-        plt.text(1.5, 0.5, '$\gamma(k) = \dfrac{1}{2}[|k-1|^{2H} - 2|k|^{2H} + |k + 1|^{2H}]$', fontsize=fontsize)
-        plt.text(1.5, 0.3, '$H$ = %.2f $\pm$ %.2f' % (np.mean(self.hurst_distribution), np.std(self.hurst_distribution)), fontsize=fontsize)
-        plt.xticks([1, 3, 5, 7, 9, 11, 13, 15])
-        plt.xlabel('Lag (k)', fontsize=fontsize)
-        plt.ylabel('Autocorrelation', fontsize=fontsize)
-        plt.tick_params(labelsize=fontsize)
-        plt.xlim(0.05, 15)
-        plt.legend(fontsize=fontsize)
-        plt.tight_layout()
-        plt.savefig('hop_acf.pdf')
-        # plt.show()
+        :param start: first frame to include. Must be greater than 0 since we will need to know the previous state
+
+        :type start: int
+        """
+
+        nT = self.partition.shape[0]
+
+        count_matrix = np.zeros_like(self.transition_matrix, dtype=int)
+
+        for t in range(start, nT):  # start at frame 1. May need to truncate more as equilibration
+            transitioned_from = self.partition[t - 1, :].astype(int)
+            transitioned_to = self.partition[t, :].astype(int)
+            for pair in zip(transitioned_from, transitioned_to):
+                count_matrix[pair[0], pair[1]] += 1
+
+        # normalize so rows sum to unity
+        self.transition_matrix = (count_matrix.T / count_matrix.sum(axis=1)).T
 
     def update_database(self, file="msd.db", tablename="msd", type='parameters', data=None):
         """ Update SQL database with information from this run
@@ -838,8 +944,6 @@ if __name__ == "__main__":
 
         sys = file_rw.load_object(args.load)
 
-        sys.fit_distributions(nbins=cfg['bins'], nboot=cfg['nboot'], plot=True, show=False, save=True)
-
     else:
 
         sys = System(cfg['trajectory'], cfg['gro'], cfg['residue'], start=cfg['begin'], end=cfg['end'],
@@ -850,8 +954,6 @@ if __name__ == "__main__":
 
         sys.hops_and_dwells(penalty=cfg['breakpoint_penalty'])
 
-        file_rw.save_object(sys, 'forecast_%s.pl' % cfg['residue'])
-
         sys.fit_distributions(nbins=cfg['bins'], nboot=cfg['nboot'], plot=True, show=False, save=True)
 
         sys.estimate_hurst()
@@ -859,10 +961,15 @@ if __name__ == "__main__":
         if args.update:
             sys.update_database()
 
-        file_rw.save_object(sys, 'forecast_%s.pl' % cfg['residue'])
+        if sys.nmodes > 1:
+            sys.determine_transition_matrix()
+
+        sys.t = None  # save memory in pickled file this info is no longer needed. Can write function to reload
+        sys.com = None
+        file_rw.save_object(sys, 'forecast_%s_%dstate.pl' % (cfg['residue'], sys.nmodes))
 
     #sys.fit_distributions(nbins=args.nbins, nboot=args.nboot, plot=True, show=False, save=True)
-    sys.estimate_hurst()
+    # sys.estimate_hurst()
     #plt.hist(sys.hurst_distribution, bins=25)
     plt.show()
     exit()
