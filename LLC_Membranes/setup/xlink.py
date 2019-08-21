@@ -316,7 +316,8 @@ class System(Topology):
         self.xlink_residue_name = dummy_residue
         self.t = md.load(dummy_name)
         self.all_residues = [a.residue.name for a in self.t.topology.atoms]
-        self.atom_names = topology.fix_names(initial_configuration, force_convert=True)
+        # self.atom_names = [a.name for a in self.t.topology.atoms]
+        self.atom_names = topology.fix_names(dummy_name, force_convert=True)
 
         super().__init__()  # inherit from Topology(). Topology() uses attributes defined above
 
@@ -838,11 +839,11 @@ def crosslink(params):
     print('Done!')
 
     # energy minimize starting configuration to get dummies in the right place
-    print('Energy minimizing %s...' % params['dummy_name'], end='', flush=True)
-    gromacs.simulate(params['mdp_em'], params['topname'], params['dummy_name'],
-                     'em_%s' % params['dummy_name'].split('.')[0], mpi=params['parallelize'],
-                     nprocesses=params['nproc'], dd=params['domain_decomposition'])
-    print('Done!')
+    # print('Energy minimizing %s...' % params['dummy_name'], end='', flush=True)
+    # gromacs.simulate(params['mdp_em'], params['topname'], params['dummy_name'],
+    #                  'em_%s' % params['dummy_name'].split('.')[0], mpi=params['parallelize'],
+    #                  nprocesses=params['nproc'], dd=params['domain_decomposition'])
+    # print('Done!')
 
     # Rest of iterations
     stagnated_iterations = 0  # number of iterations without forming a cross-link

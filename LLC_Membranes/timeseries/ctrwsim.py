@@ -208,10 +208,10 @@ class CTRW(object):
                 mode = np.random.choice(self.nmodes, p=self.transition_matrix[mode, :])
 
             time = np.cumsum(time)
-            print(mode_sequence)
             switch_points = timeseries.switch_points(mode_sequence)
             switch_points[-1] += 1  # this makes sure 'end' below covers all the points
             z = np.zeros(len(time))
+            print(switch_points)
 
             for pt in range(switch_points.size - 1):
 
@@ -223,40 +223,48 @@ class CTRW(object):
                 if self.hop_distribution in ['gaussian', 'Gaussian']:
 
                     z[begin:end] = np.random.normal(loc=0, scale=self.hop_sigma, size=length)
-                    z -= z[0]  # untested
+                    if begin > 0:
+                        z[begin:end] += z[begin - 1]
 
                 elif self.hop_distribution in ['fbm', 'fractional', 'fraction_brownian_motion']:
 
-                    z[begin:end] = fbm.FBM(length, self.H[mode], method="daviesharte").fbm()[:-1]  # automatically inserts zero at beginning of array
+                    z[begin:end] = fbm.FBM(length, self.H[mode], method="daviesharte").fbm()[1:]  # automatically inserts zero at beginning of array
                     z[begin:end] /= ((1.0 / length) ** self.H[mode])  # reversing a normalization done in the fbm code
                     z[begin:end] *= self.hop_sigma[mode]
+                    if begin > 0:
+                        z[begin:end] += z[begin - 1]
 
                 else:
                     sys.exit('Please enter a valid hop distance probability distribution')
 
+            z -= z[0]
             self.steps.append(z[1:] - z[:-1])  # for autocorrelation calculation
 
             # for visualizing hops
-            trajectory_hops = np.zeros([2 * len(time) - 1, 2])
-
-            trajectory_hops[1::2, 0] = time[1:]
-            trajectory_hops[2::2, 0] = time[1:]
-
-            trajectory_hops[::2, 1] = z
-            trajectory_hops[1:-1:2, 1] = z[:-1]
-            trajectory_hops[-1, 1] = z[-1]
-            plt.plot(trajectory_hops[:, 0], trajectory_hops[:, 1])
-            plt.show()
-            exit()
+            # trajectory_hops = np.zeros([2 * len(time) - 1, 2])
+            #
+            # trajectory_hops[1::2, 0] = time[1:]
+            # trajectory_hops[2::2, 0] = time[1:]
+            #
+            # trajectory_hops[::2, 1] = z
+            # trajectory_hops[1:-1:2, 1] = z[:-1]
+            # trajectory_hops[-1, 1] = z[-1]
+            # plt.plot(trajectory_hops[:, 0], trajectory_hops[:, 1])
+            # plt.show()
+            # exit()
 
             # make uniform time intervals with the same interval for each simulated trajectory
             self.z_interpolated[t, :] = z[np.digitize(self.time_uniform, time, right=False) - 1]
+
+            # plt.plot(self.z_interpolated[t, :])
+            # plt.show()
+            # exit()
 
             #plt.hist(np.random.normal(loc=0, scale=noise, size=len(self.time_uniform)))
 
             if noise > 0:
                 self.z_interpolated += np.random.normal(loc=0, scale=noise, size=len(self.time_uniform))
-
+        exit()
         self.time_uniform *= self.dt
         # plt.plot(trajectory_hops[:, 0]*self.dt, trajectory_hops[:, 1])
         # plt.plot(self.time_uniform, self.z_interpolated[-1, :])
