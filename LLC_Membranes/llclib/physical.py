@@ -709,6 +709,13 @@ def partition(com, pore_centers, r, buffer=0, unitcell=None, npores=4, spline=Fa
     if spline:
         npts = pore_centers.shape[2]  # number of points in each spline
 
+    if nT < pore_centers.shape[0]:
+        print('The number of frames in the trajectory is less than the number frames in the spline. I will assume that'
+              ' the difference has been chopped off from the full trajectory and truncate the spline accordingly. If'
+              ' this seems wrong, check out partition() in LLC_Membranes.llclib.physical')
+        diff = pore_centers.shape[0] - nT
+        pore_centers = pore_centers[diff:, ...]  # assumes trajectory h
+
     part = np.zeros([nT, com.shape[1]], dtype=bool)  # Will be changed to True if solute in pores
 
     print('Calculating solute partition...')

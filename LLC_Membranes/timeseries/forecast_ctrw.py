@@ -66,6 +66,23 @@ def initialize():
     return parser
 
 
+import numpy as np
+
+
+def calculate_moving_average(series, n):
+    """ Calculate moving average of a time series
+
+    :param n: Number of previous points to average
+
+    :type n: int
+    """
+
+    ret = np.cumsum(series, dtype=float)
+    ret[n:] = ret[n:] - ret[:-n]
+
+    return ret[n - 1:] / n
+
+
 if __name__ == "__main__":
 
     args = initialize().parse_args()
@@ -73,6 +90,10 @@ if __name__ == "__main__":
     if args.yaml:
         with open(args.yaml, 'r') as yml:
             cfg = yaml.load(yml)
+
+        fit = cfg['fit']
+        project = cfg['project']
+
     else:
         sys.exit('Argparse arguments (except --load and --yaml) are no longer supported. Please make a .yaml file.')
 
@@ -82,37 +103,58 @@ if __name__ == "__main__":
 
     else:
 
-        sys = SFBMParameters(cfg['trajectory'], cfg['gro'], cfg['residue'], start=cfg['begin'], end=cfg['end'],
-                             step=cfg['step'], ma=cfg['ma'], nmodes=cfg['nmodes'])
+        sys = SFBMParameters(fit['trajectory'], fit['gro'], fit['residue'], start=fit['begin'], end=fit['end'],
+                             step=fit['step'], ma=fit['ma'], nmodes=fit['nmodes'])
 
-        sys.calculate_solute_partition(spline=cfg['spline'], membrane_residue=cfg['membrane_residue'],
-                                       r=cfg['pore_cut'])
+        sys.calculate_solute_partition(spline=fit['spline'], membrane_residue=fit['membrane_residue'],
+                                       r=fit['pore_cut'])
 
-        sys.hops_and_dwells(penalty=cfg['breakpoint_penalty'])
+        # for x in [0.5, 0.75, 1.0, 1.25, 1.50]:
+        #     sys.calculate_solute_partition(spline=fit['spline'], membrane_residue=fit['membrane_residue'],
+        #                                    r=x)
+        #     plt.plot(sys.time[:-24], calculate_moving_average(sys.partition.sum(axis=1), 25) / 24,
+        #              label='r = %.2f nm' % x, lw=2)
+        # plt.ylabel('Fraction of solutes in pore', fontsize=14)
+        # plt.xlabel('Time (ns)', fontsize=14)
+        # plt.legend()
+        # plt.show()
+        # exit()
 
-        sys.fit_distributions(nbins=cfg['bins'], nboot=cfg['nboot'], plot=True, show=False, save=True)
+        sys.hops_and_dwells(penalty=fit['breakpoint_penalty'])
+
+        sys.fit_distributions(nbins=fit['bins'], nboot=fit['nboot'], plot=True, show=False, save=True)
 
         sys.estimate_hurst()
 
         if args.update:
             sys.update_database()
 
-        if sys.nmodes > 1:
-            sys.determine_transition_matrix()
+        # if sys.nmodes > 1:
+        #     sys.determine_transition_matrix()
 
         sys.t = None  # save memory in pickled file this info is no longer needed. Can write function to reload
         sys.com = None
-        file_rw.save_object(sys, 'forecast_%s_%dstate.pl' % (cfg['residue'], sys.nmodes))
+        file_rw.save_object(sys, 'forecast_%s_%dstate.pl' % (fit['residue'], sys.nmodes))
 
+    print('Generating SFBM realizations...')
     # simulate ntrajsim trajectories for same length as MD
-    random_walks = CTRW(10000, args.ntrajsim, nmodes=sys.nmodes, dt=sys.dt, hop_dist='fbm', dwell_dist='power',
+    nsteps = int(project['length'] / sys.dt)
+    random_walks = CTRW(nsteps, args.ntrajsim, nmodes=sys.nmodes, dt=sys.dt, hop_dist=project['hop_dist'],
+                        dwell_dist=project['dwell_dist'],
                         transition_matrix=sys.transition_matrix if sys.nmodes > 1 else None)
 
     random_walks.generate_trajectories(fixed_time=True, distributions=(sys.alpha_distribution,
-                                       sys.hop_sigma_distribution, sys.hurst_distribution), discrete=True, ll=1)
-    random_walks.calculate_msd(ensemble=args.ensemble)
+                                       sys.hop_sigma_distribution, sys.hurst_distribution), discrete=True,
+                                       ll=sys.dwell_lower_limit)  # change lower limit
 
-    if args.ensemble:  # Ensemble-averaged MSD
+    if project['ensemble']:
+        print('Calculating ensemble averaged mean squared displacement...')
+    else:
+        print('Calculating time averaged mean squared displacement...')
+
+    random_walks.calculate_msd(ensemble=project['ensemble'])
+
+    if project['ensemble']:  # Ensemble-averaged MSD
 
         random_walks.bootstrap_msd(fit_power_law=True)
         random_walks.plot_msd(plot_power_law=True, show=False)
@@ -123,6 +165,6 @@ if __name__ == "__main__":
     else:  # Time-averaged MSD
 
         random_walks.bootstrap_msd(fit_linear=False)
-        random_walks.plot_msd(show=False, end_frame=8000)  # get data up to 400 ns
+        random_walks.plot_msd(show=True, end_frame=int(project['frac_MSD_show'] * project['padding'] * nsteps))
         if args.update:
             sys.update_database(type='msd_time_average', data=random_walks.final_msd)

@@ -138,11 +138,14 @@ class CTRW(object):
 
         :type fixed_time: bool
         :type noise: float
-        :type ll: float
+        :type ll: list of floats
         :type limit: float
         :type distributions: tuple
         :type discrete: bool
         """
+
+        if type(ll) is not list:
+            ll = [ll]
 
         if fixed_time:
             self.fixed_time_trajectories(ll=ll, distributions=distributions, discrete=discrete, noise=noise)
@@ -159,11 +162,14 @@ class CTRW(object):
         :param discrete: pull from discrete dwell time probability distributions
         :param noise: add Gaussian noise to final trajectories
 
-        :type ll: float
+        :type ll: list of floats
         :type distributions: tuple
         :type discrete: bool
         :type noise: float
         """
+
+        if type(ll) is not list:
+            ll = [ll]
 
         self.time_uniform = np.linspace(0, self.nsteps, self.nsteps * self.padding)
 
@@ -178,6 +184,7 @@ class CTRW(object):
 
                 self.hop_sigma = [np.random.choice(distributions[1][m]) for m in range(self.nmodes)]
                 self.H = [np.random.choice(distributions[2][m]) for m in range(self.nmodes)]
+                #self.H = [0.5]#, 0.5]  # forced Brownian
 
             time = [0]
             total_time = 0  # saves a lot of time
@@ -199,19 +206,19 @@ class CTRW(object):
                     if self.alpha == 1:
                         time.append(1)
                     else:
-                        time.append(sampling.random_power_law_dwell(1 + self.alpha[mode], ll=ll, discrete=discrete)[0])
+                        time.append(sampling.random_power_law_dwell(1 + self.alpha[mode], ll=ll[mode], discrete=discrete)[0])
                 else:
                     sys.exit('Please enter a valid dwell time probability distribution')
                 total_time += time[-1]
 
                 # choose next mode
-                mode = np.random.choice(self.nmodes, p=self.transition_matrix[mode, :])
+                if self.nmodes > 1:
+                    mode = np.random.choice(self.nmodes, p=self.transition_matrix[mode, :])
 
             time = np.cumsum(time)
             switch_points = timeseries.switch_points(mode_sequence)
             switch_points[-1] += 1  # this makes sure 'end' below covers all the points
             z = np.zeros(len(time))
-            print(switch_points)
 
             for pt in range(switch_points.size - 1):
 
@@ -264,7 +271,7 @@ class CTRW(object):
 
             if noise > 0:
                 self.z_interpolated += np.random.normal(loc=0, scale=noise, size=len(self.time_uniform))
-        exit()
+
         self.time_uniform *= self.dt
         # plt.plot(trajectory_hops[:, 0]*self.dt, trajectory_hops[:, 1])
         # plt.plot(self.time_uniform, self.z_interpolated[-1, :])
@@ -282,9 +289,12 @@ class CTRW(object):
 
         :type noise: float
         :type nt: int
-        :type ll: float
+        :type ll: list of floats
         :type limit: float
         """
+
+        if type(ll) is not list:
+            ll = [ll]
 
         print('Generating Trajectories...')
         for i in tqdm.tqdm(range(self.ntraj)):
@@ -358,9 +368,9 @@ class CTRW(object):
         """
 
         print('Calculating MSD...', end='', flush=True)
-        start = timer.time()
+        # start = timer.time()  # This is just here to test parallelization
         self.msd = timeseries.msd(self.z_interpolated.T[..., np.newaxis], 0, ensemble=ensemble, nt=self.nt).T
-        print('Done in %.3f seconds' % (timer.time() - start))
+        # print('Done in %.3f seconds' % (timer.time() - start))
 
     def plot_trajectory(self, n, show=False, save=True, savename='ctrw_trajectory.pdf'):
         """ Plot a CTRW trajectory

@@ -10,6 +10,7 @@ import tqdm
 import sqlite3 as sql
 import os
 import sys
+import pymbar
 
 
 def gaussian(points, mean, sigma):
@@ -128,6 +129,7 @@ class SFBMParameters(object):
         self.hop_series = [[] for _ in range(self.nmodes)]
         self.nsolute = self.com.shape[1]
         self.transition_matrix = np.zeros([self.nmodes, self.nmodes])
+        self.dwell_lower_limit = []
 
         self.partition = None  # array telling whether a solute is in the pores or tails. True if in pores, else False
 
@@ -193,6 +195,12 @@ class SFBMParameters(object):
 
         if write_tcl:
             self.write_tcl()
+
+        # equil = pymbar.timeseries.detectEquilibration(self.partition.sum(axis=1))[0]
+        #
+        # plt.plot(self.time[:-24], timeseries.calculate_moving_average(self.partition.sum(axis=1), 25) / 24)
+        # plt.plot([equil, equil], [0, 1], '--', lw=2)
+        # plt.show()
 
     def write_tcl(self, frame=-1, name='partition.tcl'):
         """ Write a .tcl script to view solute partition in VMD
@@ -320,6 +328,8 @@ class SFBMParameters(object):
                 location = 0
                 if self.nmodes == 2:
                     location = self.partition[bp[k], j]  # determine location of solute when it hops
+                    if k > 0:
+                        self.transition_matrix[int(previous_location), int(location)] += 1
 
                 hop_lengths[location].append(hop_length)
 
@@ -383,6 +393,9 @@ class SFBMParameters(object):
         # tail_dwells as in tail ends of trajectory
         self.tail_dwells = [initial_dwells[i] + final_dwells[i] for i in range(self.nmodes)]
 
+        self.transition_matrix = (self.transition_matrix.T / self.transition_matrix.sum(axis=1)).T
+        print(self.transition_matrix)
+
     def fit_distributions(self, nbins=25, plot=True, nboot=200, show=False, save=True):
         """ Fit curves to dwell time and hop length distributions
 
@@ -417,6 +430,8 @@ class SFBMParameters(object):
         max_dwells = [max(max(self.dwell_times[i]), max(self.tail_dwells[i])) for i in range(self.nmodes)]
         min_hops = [min(i) for i in all_hops]
         max_hops = [max(i) for i in all_hops]
+
+        self.dwell_lower_limit = min_dwells
 
         bins_dwell = np.zeros([self.nmodes, nbins + 1])
         bins_hop = np.zeros([self.nmodes, nbins + 1])
@@ -506,7 +521,7 @@ class SFBMParameters(object):
 
         if plot:
 
-            fig, ax = plt.subplots(self.nmodes, 2, figsize=(self.nmodes * 6, 8))
+            fig, ax = plt.subplots(self.nmodes, 2, figsize=(8, self.nmodes * 4))
 
             if self.nmodes == 1:
                 ax = ax[np.newaxis, :]
@@ -760,6 +775,9 @@ class SFBMParameters(object):
         """ Create a transition matrix describing the probability of transitions between states. This is same as
         make_transition_matrix in identify_states.py. Could be added to a library. Would need to recast self.partition
         as an integer array.
+
+        NOTE: this is based on the partition array, rather than where solutes are when hops occur. So this might not
+        be the best way to do this.
 
         :param start: first frame to include. Must be greater than 0 since we will need to know the previous state
 

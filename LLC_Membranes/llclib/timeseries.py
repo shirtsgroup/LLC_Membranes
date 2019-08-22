@@ -455,4 +455,21 @@ def switch_points(sequence):
         switch_ndx = list([switch_ndx])
         switch_ndx.append(len(sequence))
 
-    return np.array([0] + switch_ndx)  # also add first frame
+    if switch_ndx[0] != 0:
+        return np.array([0] + switch_ndx)  # also add first frame
+    else:
+        return np.array(switch_ndx)
+
+
+def calculate_moving_average(series, n):
+    """ Calculate moving average of a time series
+
+    :param n: Number of previous points to average
+
+    :type n: int
+    """
+
+    ret = np.cumsum(series, dtype=float)
+    ret[n:] = ret[n:] - ret[:-n]
+
+    return ret[n - 1:] / n

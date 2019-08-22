@@ -750,7 +750,7 @@ class System(Topology):
         keep = [i for i, x in enumerate(self.xlink_residue_atoms.type) if x != dummy_atom_name]
         keep += [a.index for a in self.t.topology.atoms if a.residue.name != self.original_residue_name]
 
-        ids = np.array([a.name for a in self.atom_names], dtype=object)[keep]
+        ids = np.array(self.atom_names, dtype=object)[keep]
         res = np.array([a.residue.name for a in self.t.topology.atoms], dtype=object)[keep]
 
         # mdtraj workaround because SOL gets renamed to HOH, OW1 to O, HW1 to H1 and HW2 to H2
