@@ -137,6 +137,7 @@
   We ran all MD simulations and energy minimizations using GROMACS 2018. We  % needs gromacs citations
   performed all post-simulation trajectory using python scripts which are available
   %MRS: eventually want to say what scripts were used to do what, but that is not at the outline stage!
+  %BJC1: I usually put a table like that in the SI. Is that sufficient?
   online at \\ \texttt{https://github.com/shirtsgroup/LLC\_Membranes}.
 
   \subsection{Molecular Dynamics Simulations}
@@ -149,9 +150,8 @@
     with the rest near the pore center.
     \item We chose to study the 10 wt \% water system because solutes move 
     significantly faster than in the 5 wt \% system studied previously.
-    \item Appropriate stochastic modeling requires that solutes explore 
-    as much structural space as possible.  %BJC: better term than structural space?
-    %MRS: something simpler like ``sample the accessible mechanisms with representative probability''?
+    \item Appropriate stochastic modeling requires that solutes sample the 
+    accessible mechanisms with representative probability.  %BJC1: incorporated suggested phrasing
   \end{itemize}
   
   We chose to study a subset of 4 of the fastest moving solutes from our previous
@@ -160,6 +160,11 @@
     \item In addition to exploring membrane structural space the most, these solutes
     have a relatively diverse set of chemical functionality.   
     %MRS: do the solutes also have some diversity of mechanisms (that were observed previously?)
+    %BJC1: Yes. Need to put following into words
+    %BJC1: Ranking of time spent in pore region: AcOH > EG > URE > MeOH  (spans 4th most to 3rd least)
+    %BJC1: All have high hop frequency which is consistent with fast motion
+    %BJC1: Hbonding: Urea barely hbonds. AcOH and EG hbond a lot. AcOH has highest hbond lifetime of all 20 solutes. MeOH on par with all other simple alcohols
+    %BJC1: Sodium Association: Urea coordinates with sodium the most of all 20 solutes. AcOH, EG, MeOH spread out of rest of range. Lifetime similar 
     \item For each solute we created a separate system and to each system we
     added 6 solutes per pore for a total of 24 solutes.
     \item This number of solutes per pore provides a balance of a low 
@@ -251,7 +256,9 @@
     %\item The shape of the distributions are symmetric and heavy-tailed. 
   \end{itemize}
 
-  %MRS: this below sort of goes beyond standard use of MSM's though, right? where everything is usually constant-rate expoential processes? Should be explicitly mentioned.
+  % MRS: this below sort of goes beyond standard use of MSM's though, right? where everything is 
+  % usually constant-rate expoential processes? Should be explicitly mentioned.N
+  %BJC1: yes
   \noindent We modeled the emission distributions as L\'evy stable distributions.  % cauchy is a case of a Levy stable distribution. The tails are too heavy though.
   \begin{itemize}
     \item For independent and identically distributed (iid) random variables, the 
@@ -292,7 +299,7 @@
   	\item We do not observe hops longer than x nm in our simulations which 
   	emphasizes that these distributions are only an approximation.
     \item We avoid enormous and unrealistic hops problem by truncating the tails
-    of the distribution. %BJC: can add some citations about truncated Levy distributions
+    of the distribution. %BJC: can add some citations about truncated Levy distributions which are used frequently in modeling
     \item Since solutes in our system cannot hop further than the length of our 
     simulation unit cell, we truncate the tails of the distribution at this
     magnitude.
@@ -318,12 +325,14 @@
   %BJC: need to add some validation of Markovian behavior and time step choice.  
 
   %MRS: you intend this to be a separate model than the above?  If so, make clearer.
-  \subsection{Modeling subdiffusion}\label{method:model_sFBM}
+  %BJC1: renamed, is that what you meant?
+  \subsection{The Anomalous Diffusion Model}\label{method:model_sFBM}
 
   Solutes in this system exhibit subdiffusive behavior, a type of anomalous diffusion.
   \begin{itemize}
   %MRS: you would probably want to be clear what the mechanistic reasons for for anomalous diffusion: 
   %want to talk about why, given the mechanisms you would consider. 
+  %BJC1: could go through flow chart
   	\item During an anomalous diffusion process, the mean squared displacement (MSD)
   	does not grow linearly with time, rather it is of the form:
 	\begin{equation} 
@@ -341,6 +350,7 @@
   of the simulated trajectories.
   \begin{itemize}
     %MRS: describe the physical situations in which one would want to choose each of these ways of calculating the MSD.
+    %BJC1: For determining ergodicity. Ensemble for determining anomalous exponent. Not sure I'll use ensemble MSD
 	\item The ensemble-averaged MSD measures the displacement of a particle from its initial
 	position~\cite{meroz_toolbox_2015} and can be written as
 	\begin{equation}
@@ -373,6 +383,7 @@
     \item The processes described above can happen alone or in combination.  	
   \end{itemize}
   %MRS: talk about which of these should apply given the data mechanistically, as well as fit.
+  %BJC1: I believe that's what I try to do in the paragraph below. I can be a little more explicit
 
   % BJC: Should this be in the results? Lots of figures to show in support of the claims below
   %MRS: can you provide mechanistic reasoning for the below? Then can show the claims for the reasonable possibilities.
@@ -641,7 +652,7 @@
   
   % BJC: worth proving these are non-Gaussian? One might argue that they look Gaussian but they are not at all.
   % MRS: there are some simple statistical tests for Gaussianness you can use.  Also might br good to put the 
-  % parameters with the plots, as it's hard to tell how different they may or may not be. 
+  % parameters with the plots, as it's hard to tell how different they may or may not be.
   \begin{figure}[!h]
   \includegraphics[width=\textwidth]{emissions_MET.pdf}
   \caption{}\label{fig:emissions_MET}
@@ -661,6 +672,7 @@
   \end{itemize}
   %MRS: so, is there a way we should have been able to tell beforrehand that this approach didn't work that we an explain?
   %or can we show we needed to do this to get the results?
+  %BJC1: could just show autocorrelation function of all increments, which has negative dip at k=1 
   \begin{figure}[!h]
   \centering
   \includegraphics[width=0.5\textwidth]{MET_msd.pdf}
