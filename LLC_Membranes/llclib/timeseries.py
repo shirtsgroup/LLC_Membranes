@@ -370,35 +370,43 @@ def correlograms(zt):
 class VectorAutoRegression:
 
     def __init__(self, timeseries, r):
-        """ Fit a vector autogressive (VAR) process to data using statsmodels.tsa.vector_ar. The output object is
+        r""" Fit a vector autogressive (VAR) process to data using statsmodels.tsa.vector_ar. The output object is
         just reduction and renaming of attributes produced after running the fit() method of the VAR class
 
         For more detailed docs, see: https://www.statsmodels.org/dev/vector_ar.html#module-statsmodels.tsa.vector_ar
 
         For a multidimensional time series, one could write a system of dependent autoregressive equations:
 
-        Yt = A_1*Y_{t-1} + ... + A_p*Y_{t-p} + u_t
+        .. math::
 
-        where:
-             [y_1,t]             [y_1,{t-1}]
-             [y_2,t]             [y_2,{t-1}]
-        Yt = [ ... ] , Y_{t-1} = [  ....   ] ...
-             [y_k,t]             [y_k,{t-1}]
+            Y_t = A_1*Y_{t-1} + ... + A_p*Y_{t-p} + u_t
 
-        The matrices A_i are K x K matrices where K is the number of dimensions of the trajectory.
-        A_1 contains the 1st time lag autoregressive coefficients
+        where
 
-        if A_1 = [0.5, 0]
-                 [0, 0.4]
+        .. math::
+
+           Y_t = \begin{bmatrix} y_{1,t} \\ y_{2,t} \\ ... \\  y_{k,t} \end{bmatrix},
+           Y_{t-1} = \begin{bmatrix} y_{1,t-1} \\ y_{2,t-1} \\ ... \\  y_{k,t-1} \end{bmatrix},
+           ...
+
+        The matrices :math:`A_i` are K x K matrices where K is the number of dimensions of the trajectory.
+        :math:`A_1` contains the 1st time lag autoregressive coefficients. If
+
+        .. math::
+
+            A_1 = \begin{bmatrix} 0.5 & 0 \\ 0 & 0.4 \end{bmatrix}
 
         the associated system of equations for a VAR(1) process would be:
 
-        y1_t = 0.5y1_{t-1} + u1_t
-        y2_t = 0.4y2_{t-1} + u2_t
+        .. math::
+
+            y_{1,t} = 0.5y_{1,t-1} + u_{1,t}
+
+            y_{2,t} = 0.4y_{2, t-1} + u_{2,t}
 
         Of course, adding cross-terms to A would create more complex dynamical behavior
 
-        u_t is a K-dimensional vector multivariate gaussian noise generated on the covariance matrix of the data
+        :math:`u_t` is a K-dimensional vector multivariate gaussian noise generated on the covariance matrix of the data
 
         :param timeseries: a T x K matrix where T is the number of observations and K is the number of variables/dimension
         :param r: autoregressive order. Number of past point on which current point depends

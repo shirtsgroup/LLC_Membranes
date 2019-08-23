@@ -15,7 +15,7 @@ ions_mw['BR'] = 79.904
 
 
 class ReadItp(object):
-    """ Read a GROMACS topology file and extract desired information
+    """ Read and store information from a GROMACS topology file
 
     :param name: name of GROMACS topology file
 
@@ -23,6 +23,12 @@ class ReadItp(object):
     """
 
     def __init__(self, name):
+        """ Read in .itp file and initialize data structures
+
+        :param name: name of itp (without extension)
+
+        :type name: str
+        """
 
         try:
             f = open('%s.itp' % name, 'r')
@@ -83,6 +89,13 @@ class ReadItp(object):
         self.virtual_sites = []  # stores all data in [ virtualsites* ] of topology
 
     def atoms(self, annotations=False):
+        """ Read itp line-by-line, extract annotations (optional) and determine number of atoms, atom indices, names,
+        mass, charges and residue molecular weight
+
+        :param annotations: If True, read annotations
+
+        :type annotations: bool
+        """
 
         atoms_index = 0
         while self.itp[atoms_index].count('[ atoms ]') == 0:
@@ -170,6 +183,7 @@ class ReadItp(object):
 
         :return: A dict with keys that are atom indices and values that are all of the atom indices to which they are
         bonded
+        :rtype: dict
         """
 
         # find the bonds section
@@ -252,6 +266,14 @@ class ReadItp(object):
 class Residue(ReadItp):
 
     def __init__(self, name, connectivity=False):
+        """ Get attributes of residue based on an .itp file
+
+        :param name: name of .itp file (no extension)
+        :param connectivity: get bonds, improper dihedrals and virtual sites
+
+        :type name: str
+        :type connectivity: bool
+        """
 
         self.name = name
 
@@ -387,6 +409,10 @@ class LC(ReadItp):
     """
 
     def __init__(self, name):
+        """ Get attributes from .itp file in addition to some liquid crystal specific attributes
+
+        :param name: name of .itp file
+        """
 
         super().__init__(name)
 

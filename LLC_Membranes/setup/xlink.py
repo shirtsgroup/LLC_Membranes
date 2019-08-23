@@ -768,6 +768,7 @@ class System(Topology):
 
         file_rw.write_gro_pos(self.t.xyz[-1, keep, :], out, ids=ids, res=res, ucell=ucell)
 
+        self.xlink_residue_name = self.original_residue_name  # Untested! I think this should fix the final residue name
         self.write_assembly_topology(virtual_sites=False, vsite_atom_name=dummy_atom_name)
 
 

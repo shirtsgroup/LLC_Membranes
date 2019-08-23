@@ -4,7 +4,7 @@ import argparse
 from LLC_Membranes.setup.bcc_build import BicontinuousCubicBuild
 from LLC_Membranes.setup.gentop import SystemTopology
 from LLC_Membranes.setup.genmdp import SimulationMdp
-from LLC_Membranes.llclib import topology, transform, gromacs
+from LLC_Membranes.llclib import topology, transform, gromacs, file_rw
 from LLC_Membranes.setup import xlink
 import mdtraj as md
 import os
@@ -158,11 +158,17 @@ class EquilibrateBCC(topology.LC):
 
         self.gro_name = name
 
-    def generate_topology(self, name='topol.top'):
+    def generate_topology(self, name='topol.top', xlinked=False):
         """ Generate a topology for the current unit cell
+
+        :param name: name of topology file
+        :param xlinked: True if the system has been cross-linked
+
+        :type name: str
+        :type xlinked: bool
         """
 
-        self.topology = SystemTopology(self.gro_name)
+        self.topology = SystemTopology(self.gro_name, xlink=xlinked)
         self.topology.write_top(name=name)
 
     def generate_mdps(self, T=300, em_steps=-1, time_step=0.002, length=1000, p_coupling='isotropic',
@@ -318,7 +324,8 @@ class EquilibrateBCC(topology.LC):
 
         return delta
 
-    def add_solvent(self, solvent, tol=10, scale=0.45, nvt_length=1000, npt_length=1000, out='solvated_final.gro'):
+    def add_solvent(self, solvent, tol=10, scale=0.45, nvt_length=1000, npt_length=1000, out='solvated_final.gro',
+                    nolimit=True):
         """ Name of solvent residue to add to structure. This is an iterative process of solvent insertion, energy
         minimzation, and an nvt simulation
 
@@ -328,23 +335,33 @@ class EquilibrateBCC(topology.LC):
         :param scale: factor by which to scale van der waals radii when inserting solvent molecules with gmx solvate
         :param nvt_length: length of long NVT simulation (ps)
         :param npt_length: length of long NPT simulation (ps)
+        :param out: name of final solvated output structure
+        :param nolimit: This will cause solvent molecules to be inserted until tol is met, with no cap on number of
+        solvent molecules
 
         :type solvent: str
         :type tol: int
         :type scale: float
         :type nvt_length: int
         :type npt_length: int
+        :type nolimit: bool
         """
 
         # figure out number of solvent molecules to add
         self.solvent = topology.Residue(solvent)  # get solvent properties
-        mass_solvent = self.system.nmon * self.system.MW * ((100 - self.weight_percent) / self.weight_percent)
-        self.nsolvent = int(mass_solvent / self.solvent.MW)  # total number of solutes to add
+        if nolimit:
+            self.nsolvent = 100000  # an unacheiveably high number. I'm not really a fan of this approach.
+        else:
+            mass_solvent = self.system.nmon * self.system.MW * ((100 - self.weight_percent) / self.weight_percent)
+            self.nsolvent = int(mass_solvent / self.solvent.MW)  # total number of solutes to add
 
         # create nvt mdp file
         self.mdp.write_nvt_mdp(length=50)
 
-        print('Attempting to insert %d solvent molecules' % self.nsolvent)
+        if nolimit:
+            print('Inserting as many %s molecules as possible' % self.solvent.name)
+        else:
+            print('Attempting to insert %d %s molecules' % (self.nsolvent, self.solvent.name))
 
         delta = self.nsolvent  # convergence parameter
         total = 0  # for naming
@@ -384,6 +401,29 @@ class EquilibrateBCC(topology.LC):
         self.gro_name = out
 
         print('Successfully inserted %s %s molecules' % (total, self.solvent.name))
+
+    def remove_solvent(self, gro, out='dry.gro'):
+        """ Delete all solvent molecules
+
+        :param gro: name of coordinate file from which to remove solvent
+        :param out: name of output solvent-less gro file
+
+        :type gro: str
+        :type out: str
+        """
+
+        # remove solvent from gro file
+        t = md.load(gro)
+        all_names = np.array(topology.fix_names(gro))
+        keep = [a.index for a in t.topology.atoms if a.residue.name != self.solvent.name]
+        ids = all_names[keep]
+        res = [a.residue.name for a in t.topology.atoms if a.residue.name != self.solvent.name]
+
+        file_rw.write_gro_pos(t.xyz[0, keep, :], out, ucell=t.unitcell_vectors[0, ...], ids=ids, res=res)
+        self.gro_name = out
+
+        # rewrite topology
+        self.generate_topology(xlinked=True)
 
 
 if __name__ == "__main__":
@@ -466,4 +506,13 @@ if __name__ == "__main__":
         # cross-linking
         xlink.crosslink(xlink_params)  # run cross-linking algorithm
 
-    equil.gro_name = 'xlinked.gro'
+    equil.gro_name = xlink_params['output_gro']
+
+    # system is cross-linked with glycerol. Now time to flush out the glycerol and replace with water
+
+    # This block is just for development
+    equil.solvent = topology.Residue(build_params['solvent'])  # get solvent properties
+
+    # This is the real stuff
+    equil.remove_solvent(xlink_params['output_gro'])
+    equil.add_solvent('HOH')  # add that water

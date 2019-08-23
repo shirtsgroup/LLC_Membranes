@@ -209,21 +209,22 @@ participate in a hydrogen bond. See <span class="xref std std-ref">annotation-ta
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="hbonds.System">
-<em class="property">class </em><code class="descclassname">hbonds.</code><code class="descname">System</code><span class="sig-paren">(</span><em>traj</em>, <em>gro</em>, <em>begin=0</em>, <em>end=-1</em>, <em>skip=1</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">hbonds.</code><code class="descname">System</code><span class="sig-paren">(</span><em>traj</em>, <em>gro</em>, <em>begin=0</em>, <em>end=-1</em>, <em>skip=1</em>, <em>t=None</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="hbonds.System.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>traj</em>, <em>gro</em>, <em>begin=0</em>, <em>end=-1</em>, <em>skip=1</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>traj</em>, <em>gro</em>, <em>begin=0</em>, <em>end=-1</em>, <em>skip=1</em>, <em>t=None</em><span class="sig-paren">)</span><a class="headerlink" href="#hbonds.System.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load in the trajectory</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>traj</strong> (<em>str</em>) &#8211; GROMACS trajectory file (.xtc or .trr)</li>
+<li><strong>traj</strong> (<em>str</em><em> or </em><em>NoneType</em>) &#8211; GROMACS trajectory file (.xtc or .trr), can be None if t is provided</li>
 <li><strong>gro</strong> (<em>str</em>) &#8211; GROMACS coordinate file (.gro)</li>
 <li><strong>begin</strong> (<em>int</em>) &#8211; First frame to analyze</li>
 <li><strong>end</strong> (<em>int</em>) &#8211; Last frame to analyze</li>
 <li><strong>skip</strong> (<em>int</em>) &#8211; Only analyze every <cite>skip</cite> frames</li>
+<li><strong>t</strong> (<em>object</em>) &#8211; mdtraj trajectory object. If this is provided, traj and gro will not be loaded</li>
 </ul>
 </td>
 </tr>

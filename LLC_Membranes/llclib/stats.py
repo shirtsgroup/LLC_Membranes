@@ -10,7 +10,6 @@ def confidence_interval(data, confidence):
     Plot these errorbars with plt.fill_between() as follows:
     plt.fill_between(x, mean + error[1, :], mean - error[0, :])
 
-
     :param data: array of data trajectories [n_trajectories, n_data_points]
     :param confidence: percent confidence
 
@@ -75,9 +74,11 @@ def outliers(data, alpha=0.01):
 class Cdf(object):  # taken from compare_disorder.py
 
     def __init__(self, data):
-        """
-        Generate an emperical cumulative distribution function from data
+        """ Generate an emperical cumulative distribution function from data
+
         :param data: x-values of data in no particular order
+
+        :type data: list
         """
 
         self.xs = np.array(sorted(data))

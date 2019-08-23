@@ -1,8 +1,5 @@
 #! /usr/bin/env python
 
-"""
-Commonly used coordinate transforms and related manipulations of positions, including fourier transforms
-"""
 from __future__ import division
 from __future__ import print_function
 
@@ -43,11 +40,16 @@ def plane_rotation_matrix(n, angle):
 
 
 def rotateplane(plane, angle=0):
-    """
-    Calculate a rotation matrix to rotate a plane in 3 dimensions
-    :param plane: indices of atoms making up plane which is being aligned in the xy plane
+    """ Calculate a rotation matrix to rotate a plane in 3 dimensions
+
+    :param plane: coordinates of 3 points defining a plane
     :param angle: desired angle between xy plane (optional, default = 0 i.e. in plane)
-    :return:
+
+    :type plane: numpy.ndarray
+    :type angle: float
+
+    :return: 4 x 4 rotation matrix
+    :rtype: numpy.ndarray
     """
 
     if plane[0, 2] == plane[1, 2] and plane[1, 2] == plane[2, 2]:
@@ -91,12 +93,18 @@ def rotateplane(plane, angle=0):
 
 
 def rotateplane_coords(xyz, plane, angle=0):
-    """
-    Calculate a rotation matrix to rotate a plane in 3 dimensions
-    :param xyz: xyz coordinates of all positions to be rotated
-    :param plane: indices of atoms making up plane which is being aligned in the xy plane
+    """ Rotate coordinates about a plane
+
+    :param xyz: (n, 3) array of xyz coordinates of all positions to be rotated
+    :param plane: coordinates of 3 points defining a plane
     :param angle: desired angle between xy plane (optional, default = 0 i.e. in plane)
-    :return:
+
+    :type xyz: numpy.ndarray
+    :type plane: numpy.ndarray
+    :type angle: float
+
+    :return: rotated coordinates
+    :rtype: numpy.ndarray
     """
 
     if plane[0, 2] == plane[1, 2] and plane[1, 2] == plane[2, 2]:
@@ -138,11 +146,16 @@ def quadrant(pt, origin=[0, 0]):
         return 0  # the case where the point lies on the x or y axis
 
 
-def transdir(pt, origin=[0, 0]):
-    """
-    figure out in which direction the coordinates will be shifted. They are always shifted away from the origin
-    :param pt:
-    :return:
+def transdir(pt, origin=(0, 0)):
+    """ Figure out in which direction the coordinates will be shifted. They are always shifted away from the origin
+
+    :param pt: 2D point whose quadrant is unknown
+    :param origin: xy coordinates of the origin
+
+    :type pt: list or tuple or numpy.ndarray
+    :type origin: tuple or list or numpy.ndarray
+
+    :return: vector directing where to shift coordinates
     """
     if quadrant(pt, origin) == 1:  # e.g. in quadrant 1, the x's are shifted in the positive x and positive y directions
         vx = 1
@@ -176,10 +189,14 @@ def transdir(pt, origin=[0, 0]):
 
 
 def rotate_x(theta):
-    """
-    formerly 'rotate'
-    :param: angle by which to rotate the monomer
+    """ Generate rotation matrix for rotating about the x-axis
+
+    :param: theta: angle by which to rotate
+
+    :type theta: float
+
     :return: Rotation matrix to rotate input vector about x-axis
+    :rtype numpy.ndarray
     """
     Rx = np.zeros([3, 3])  # makes a 3 x 3 zero matrix
     Rx[0, 0] = 1
@@ -192,10 +209,14 @@ def rotate_x(theta):
 
 
 def rotate_z(theta):
-    """
-    formerly 'rotate'
-    :param: angle by which to rotate the monomer
+    """ Generate rotation matrix for rotating about the z-axis
+
+    :param: theta: angle by which to rotate
+
+    :type theta: float
+
     :return: Rotation matrix to rotate input vector about z-axis
+    :rtype numpy.ndarray
     """
     Rz = np.zeros([3, 3])  # makes a 3 x 3 zero matrix
     Rz[0, 0] = math.cos(theta)
@@ -208,6 +229,8 @@ def rotate_z(theta):
 
 
 def reposition(xyz, R, ref_index, lineatoms, pore_radius):
+    """ I think this rotates and translates LC monomer. But it is no longer used.
+    """
 
     b = np.ones([1])
     for i in range(np.shape(xyz)[1]):
@@ -259,11 +282,18 @@ def reposition(xyz, R, ref_index, lineatoms, pore_radius):
 
 
 def translate(xyz, before, after):
-    """
-    :param xyz: coordinates of set of points to be translated [npts, 3]
-    :param before: reference coordinate location before [3]
-    :param after: reference coordinate location after [3]
+    """ Translate coordinates based on a reference position
+
+    :param xyz: coordinates of set of points to be translated (n, 3)
+    :param before: reference coordinate location before (3)
+    :param after: reference coordinate location after (3)
+
+    :type xyz: numpy.ndarray
+    :type before: numpy.ndarray
+    :type after: numpy.ndarray
+
     :return: translated points with respect to reference coordinate before/after locations [npts, 3]
+    :rtype: numpy.ndarray
     """
 
     pos = np.copy(xyz)
@@ -356,11 +386,18 @@ def pbcs(pts, images, angle, box, frame, nogap=False):
 
 
 def rotate_vector(xyz, v1, v2):
-    """
+    """ Rotate coordinates based on a reference vector to a second vector
+
     :param xyz: xyz coordinates of object to be rotated
     :param v1: original vector
     :param v2: direction you want v1 to be pointing in
+
+    :type xyz: numpy.ndarray
+    :type v1: numpy.ndarray
+    :type v2: numpy.ndarray
+
     :return: rotated coordinates
+    :rtype: numpy.ndarray
     """
 
     quad = quadrant(v1)
@@ -382,10 +419,16 @@ def rotate_vector(xyz, v1, v2):
 
 
 def rotate_coords_x(pos, angle):
-    """
-    :param xyz: xyz coordinates of atoms to be rotated, degrees
+    """ Rotate a set of coordinates about the x-axis
+
+    :param pos: (n, 3) xyz coordinates to be rotated
     :param angle: angle to rotate them by w.r.t origin
-    :return:
+
+    :type pos: numpy.ndarray
+    :type angle: float
+
+    :return: array of rotated coordinates
+    :rtype: numpy.ndarray
     """
 
     xyz = np.copy(pos)
@@ -400,10 +443,16 @@ def rotate_coords_x(pos, angle):
 
 
 def rotate_coords_z(pos, angle):
-    """
-    :param xyz: xyz coordinates of atoms to be rotated, degrees
+    """ Rotate a set of coordinates about the z-axis
+
+    :param pos: (n, 3) xyz coordinates to be rotated
     :param angle: angle to rotate them by w.r.t origin
-    :return:
+
+    :type pos: numpy.ndarray
+    :type angle: float
+
+    :return: array of rotated coordinates
+    :rtype: numpy.ndarray
     """
 
     xyz = np.copy(pos)
@@ -418,11 +467,15 @@ def rotate_coords_z(pos, angle):
 
 
 def Rvect2vect(A, B):
-    """
-    Find rotation of a so that its orientation matches b.
-    :param a: vector to be rotated
-    :param b: vector to rotate to
-    :return: rotation matrix for rotate a to b
+    """ Find rotation matrix so that when applied to A, its orientation matches B
+    .
+    :param A: 3D vector to be rotated
+    :param B: 3D vector to rotate to
+
+    :type A: numpy.ndarray
+    :type B: numpy.ndarray
+
+    :return: rotation matrix for rotate A to B
     """
 
     # normalize
@@ -455,11 +508,16 @@ def Rvect2vect(A, B):
 
 
 def rotate_coords(xyz, R):
-    """
-    Given a rotation matrix, rotate all points in an array
-    :param xyz: xyz coordinates of all positions to be rotated
-    :param R: rotate plane
+    """ Given a rotation matrix, rotate all points in an array
+
+    :param xyz: n x 3 xyz coordinates of all positions to be rotated
+    :param R: 4x4 rotation matrix
+
+    :type xyz: numpy.ndarray
+    :type R: numpy.ndarray
+
     :return: rotated coordinates
+    :rtype: numpy.ndarray
     """
     pos = np.copy(xyz)
     for i in range(np.shape(pos)[0]):
@@ -469,12 +527,19 @@ def rotate_coords(xyz, R):
 
 
 def random_orientation(xyz, alignment_vector, placement):
-    """
-    Randomly orient a water molecule and then place it a desired location
-    :param water_xyz: 3d coordinates of molecule
-    :param water_alignment_vector: A reference vector to rotate the water molecule about
-    :param placement: where to place final water configuration in space
-    :return: coordinates of oriented and translated water molecule
+    """ Randomly orient a vector and then place its tail at a specific point. Can be used to randomly rotate a molecule
+    and place it somewhere.
+
+    :param xyz: 3D coordinates
+    :param alignment_vector: A 3D reference vector to rotate about
+    :param placement: 3D point at which to place vector tail.
+
+    :type xyz: numpy.ndarray
+    :type alignment_vector: numpy.ndarray
+    :type placement: numpy.ndarray
+
+    :return: coordinates of oriented and translated group of coordinates
+    :rtype: numpy.ndarray
     """
 
     u = np.random.normal(size=3)  # random vector. From normal distribution since sphere
@@ -495,9 +560,16 @@ def random_orientation(xyz, alignment_vector, placement):
 
 
 def rescale(coords, dims):
-    """
-    rescale coordinates so that cell dimensions are constant over the simulation
-    returns rescaled coordinates and average length
+    """ Rescale coordinates so that cell dimensions are constant over the simulation
+
+    :param coords: coordinates to rescale (nframes, natoms, 3)
+    :param dims: unitcell vectors (nframes, 3, 3) as the unitcellvectors trajectory attribute output by mdtraj.load
+
+    :type coords: numpy.ndarray
+    :type dims: numpy.ndarray
+
+    :return: rescaled coordinates and average length
+    :rtype: numpy.ndarray
     """
 
     avgdims = np.average(dims, axis=0)
@@ -512,7 +584,17 @@ def rescale(coords, dims):
 
 
 def monoclinic_to_cubic(xyz, theta=60):
-    """Convert monoclinic cell to cubic cell"""
+    """ Convert monoclinic cell to cubic cell
+
+    :param xyz: (nframes, natoms, 3) coordinate array
+    :param theta: angle between x and y vectors of unit cell
+
+    :type xyz: numpy.ndarray
+    :type theta: float
+
+    :return: Coordinates shifted into a cubic unit cell
+    :rtype: numpy.ndarray
+    """
 
     print("transforming coordinates to monoclinic cell (theta={:3.2f} deg)".format(theta*180.0/np.pi))
 
@@ -521,44 +603,3 @@ def monoclinic_to_cubic(xyz, theta=60):
     coordinates[..., 0] -= coordinates[..., 1]*np.cos(theta)
 
     return coordinates
-
-
-def fft_3D_monoclinic(xyz, box_vectors, bins, angle=60, sf=False):
-    """ Calculate 3D discrete fourier transform for each frame of a trajectory of coordinates in monoclinic unit cell
-
-    :param xyz: frame-by-frames coordinates of atoms whose 3D DFT we want to calculate
-    :param box_vectors: matrix of box vectors of shape (nT, 3, 3)
-    :param bins: number of bins in each dimension
-    :return:
-    """
-
-    nT = xyz.shape[0]  # number of frames
-    L = np.linalg.norm(box_vectors, axis=2)
-
-    locations, L = rescale(xyz, L)  # make unit cell constant size
-
-    # define histograme bin edges
-    x = np.linspace(0, L[0], int(bins[0]))
-    y = np.linspace(0, L[1], int(bins[1]))
-    z = np.linspace(0, L[2], int(bins[2]))
-
-    zv = [0.0, 0.0, 0.0]  # zero vector
-
-    # put all atoms inside box - works for single frame and multiframe
-    for it in range(locations.shape[0]):  # looped to save memory
-        locations[it, ...] = np.where(locations[it, ...] < L, locations[it, ...], locations[it, ...] - L)  # get positions in periodic cell
-        locations[it, ...] = np.where(locations[it, ...] > zv, locations[it, ...], locations[it, ...] + L)
-
-    # fourier transform loop
-    sf = np.zeros([x.size - 1, y.size - 1, z.size - 1])
-    for frame in tqdm.tqdm(range(nT), unit=' Frames'):
-        H, edges = np.histogramdd(locations[frame, ...], bins=(x, y, z))
-        if sf:
-            fft = np.fft.fftn(H - H.mean())
-            sf += (fft * fft.conjugate()).real
-        else:
-            sf += np.abs(np.fft.fftn(H)) ** 2
-
-    sf /= nT  # average of all frames
-
-    return sf

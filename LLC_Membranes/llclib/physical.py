@@ -799,3 +799,50 @@ def wrap_box(positions, box, tol=1e-6):
         z = np.where(z < 0, z + zbox, z)
 
     return np.concatenate((xy, z[:, np.newaxis]), axis=1)
+
+
+def fft_3D_monoclinic(xyz, box_vectors, bins):
+    """ Calculate 3D discrete fourier transform for each frame of a trajectory of coordinates in monoclinic unit cell
+
+    :param xyz: (nframes, natoms, 3) coordinate array of atoms whose 3D DFT we want to calculate
+    :param box_vectors: matrix of box vectors of shape (nT, 3, 3)
+    :param bins: number of bins in each dimension
+
+    :type xyz: np.ndarray
+    :type box_vectors: np.ndarray
+    :type bins: list of ints
+
+    :return: 3D structure factor
+    :type: np.ndarray
+    """
+
+    nT = xyz.shape[0]  # number of frames
+    L = np.linalg.norm(box_vectors, axis=2)
+
+    locations, L = rescale(xyz, L)  # make unit cell constant size
+
+    # define histograme bin edges
+    x = np.linspace(0, L[0], int(bins[0]))
+    y = np.linspace(0, L[1], int(bins[1]))
+    z = np.linspace(0, L[2], int(bins[2]))
+
+    zv = [0.0, 0.0, 0.0]  # zero vector
+
+    # put all atoms inside box - works for single frame and multiframe
+    for it in range(locations.shape[0]):  # looped to save memory
+        locations[it, ...] = np.where(locations[it, ...] < L, locations[it, ...], locations[it, ...] - L)  # get positions in periodic cell
+        locations[it, ...] = np.where(locations[it, ...] > zv, locations[it, ...], locations[it, ...] + L)
+
+    # fourier transform loop
+    sf = np.zeros([x.size - 1, y.size - 1, z.size - 1])
+    for frame in tqdm.tqdm(range(nT), unit=' Frames'):
+        H, edges = np.histogramdd(locations[frame, ...], bins=(x, y, z))
+        if sf:
+            fft = np.fft.fftn(H - H.mean())
+            sf += (fft * fft.conjugate()).real
+        else:
+            sf += np.abs(np.fft.fftn(H)) ** 2
+
+    sf /= nT  # average of all frames
+
+    return sf
