@@ -16,6 +16,7 @@
 \usepackage{float}
 
 %MRS: better to have the first outline shorter to iterate more quickly!
+%BJC1: right, this one has been in the works for a while now. Wrote the anomalous diffusion methods a long time ago
 
 %MRS: better to have a title that described a finding, rather than the
 %approach used.  But we may need to wait a bit further until we can decide on a finding.
@@ -55,12 +56,82 @@
   \noindent In our previous work, we studied the transport of 20 small polar molecules
   in an H\textsubscript{II} phase LLC membrane.
   \begin{itemize}
-    \item In general, we observed subdiffusive transport behavior characterized 
-    by intermittent hops separated by periods of entrapment.
+    \item In general, we observed subdiffusive transport behavior characterized by 
+    intermittent hops separated by periods of entrapment.
     \item We identified three mechanisms responsible for the solute trapping behavior:
     entanglement among monomer tails, hydrogen bonding with monomer head groups, and
     association with sodium counter ions.
   \end{itemize}
+
+  Unfortunately, the timescales that we can simulate with MD are insufficient to be
+  able to make well-converged predictions of macroscopic transport properties 
+  traditionally used to characterize membranes in the lab. \\
+  \begin{itemize}
+    \item However, if we use descriptive stochastic models that can capture solute
+    dynamics, then we could project long timescale behavior in addition to gaining
+    a deeper understanding of solute behavior on short timescales.
+  \end{itemize}
+  
+  \noindent Researchers have developed a rigorous theoretical foundation for describing
+  the motion of particles exhibiting non-Brownian, or anomalous, transport behavior.
+  \begin{itemize}
+    \item The tools introduced by fractional calculus are instrumental to this theory. 
+    \item They allow us to generalize the normally linear diffusion equation using fractional
+    derivative orders, providing descriptions of a much more diverse set of behavior. % diverging from the relatively simple Brownian model.
+%    \item They facilitate proof of the relationship between the observed growth of a
+%    particle's mean squared displacement and underlying dwell times 
+%    \item In the absence of an external potential or complicated boundary conditions, 
+%    one can define random walk based on independent hop length and dwell time 
+%    distributions and arrive at any type of diffusive behavior. 
+  \end{itemize}
+  
+  % BJC1: moved from methods
+  \noindent Three well-known classes of behavior leading to anomalous subdiffusion are 
+  continuous time random walks (CTRW), fractional Brownian motion
+  (FBM) and random walks on fractals (RWF).\cite{meroz_toolbox_2015}
+  \begin{itemize}
+    \item A CTRW is characterized by a distribution of hop lengths and 
+    dwell times, where each each hop is characterized by independent random draws from 
+    each distribution.\cite{montroll_random_1965,morrin_three_2018}
+    \item FBM is common in crowded, viscoelastic environments where each jump comes 
+    from a Gaussian distribution but is anti-correlated to its previous 
+    step.~\cite{mandelbrot_fractional_1968,jeon_fractional_2010,banks_anomalous_2005}
+    \item An RWF is imposed by a system's geometry. Systems with tortuous pathways and dead
+    ends cause anti-correlated motion.\cite{meroz_toolbox_2015,neusius_subdiffusion_2008}
+    \item The processes described above can happen alone or in combination. 
+    \item Meroz and Sokolov suggested a decision tree for determining which subdiffusive
+    mechanisms apply to a system, adapted in Figure X. 
+    \item Of course, more complicated variations of these models can arise which we 
+    will incorporate as needed.	  % BJC1: e.g. fractional levy motion or langevin with levy noise
+  \end{itemize}
+  
+  % BJC1: Flow chart here
+  
+  While elegant, pure anomalous diffusion theory may in some cases give only a qualitative
+  understanding of transport mechanisms.
+  \begin{itemize}
+    \item Complex temporal relationships in between hops may have a significant effect on MSD
+    \item Inhomogeneity of a medium or multiple types of interactions may lead to a number of
+    distinct diffusive regimes. 
+    \item In this case, a state based model may be useful. 
+  \end{itemize}
+  
+  We can use the observations of transport from our previous work in order to create 
+  state-based models.
+  \begin{itemize}
+  	\item We know that dynamics differ between solutes moving inside the pores and in the tails.
+  	\item We can fit the above models to our data as a function of location.
+  	\item Alternatively, we can abandon the anomalous diffusion theory and adapt the 
+  	methods of Markov state models.
+  \end{itemize}
+
+  Markov state models blah blah blah.
+  \begin{itemize}
+    \item Markov state models are popular with researchers of proteins which have 
+    many dynamical states occurring over multiple time scales.
+  \end{itemize}
+  
+  We will extend the Markov state models framework to include dynamics between jumps. 
 
   % BJC: I've been trying to understand the following justification a bit more. Does it
   % rely on the MSD becoming linear so we can get experimentally diffusion constants? Is
@@ -80,10 +151,6 @@
   % BJC1: Yea, I see what you're saying. Just not sure what else the long
   % timescale will tell us that we can't learn from short ones. Probably 
   % better to talk about this in person. 
-
-  Unfortunately, the timescales that we can simulate with MD are insufficient to be
-  able to make well-converged predictions of macroscopic transport properties 
-  traditionally used to characterize membranes in the lab. \\
 
   We can use the observed mechanisms in order to choose a stochastic model of
   sufficient complexity One can project long timescale solute behavior by modeling transport as a
@@ -293,6 +360,12 @@
     %standard MSM doesn't include either, since they are typically interested just in the distribution of states in equilibrium, not the diffusion. 
   \end{itemize}
   
+  % BJC: quote from anomalous diffusion book:
+  % "While the continuous time random walk model for Levy flights ... is a
+  % conventient description, in all other cases the fraction Fokker-Planck or,
+  % equivalently, the Langevin equation with white Levy stable noise are the 
+  % description of choice" -- pretty sure this is exactly what I'm suggesting above.  
+  
   L\'evy stable distributions often have heavy tails and an undefined variance 
   which can give rise to arbitrarily long particle displacements.
   \begin{itemize}
@@ -368,26 +441,26 @@
 	trajectory~\cite{meroz_toolbox_2015}. 
   \end{itemize}
   
-  \noindent Three common mathematical models for modeling anomalous subdiffusion
-  processes include continuous time random walks (CTRW), fractional Brownian motion
-  (FBM) and random walks on fractals (RWF).\cite{meroz_toolbox_2015}
-  \begin{itemize}
-    \item FBM is common in crowded, viscoelastic environments where each step comes 
-    from a Gaussian distribution but is anti-correlated to its previous 
-    step.~\cite{mandelbrot_fractional_1968,jeon_fractional_2010,banks_anomalous_2005}
-    \item A CTRW is characterized by a distribution of hop lengths and 
-    dwell times, where each each step is characterized by independent random draws from 
-    each distribution.\cite{montroll_random_1965,morrin_three_2018}
-    \item An RWF is imposed by a system's geometry. Systems with tortuous pathways and dead
-    ends cause anti-correlated motion.\cite{meroz_toolbox_2015,neusius_subdiffusion_2008}
-    \item The processes described above can happen alone or in combination.  	
-  \end{itemize}
+  % BJC1: moved this to intro
+%  \noindent Three common mathematical models for modeling anomalous subdiffusion
+%  processes include continuous time random walks (CTRW), fractional Brownian motion
+%  (FBM) and random walks on fractals (RWF).\cite{meroz_toolbox_2015}
+%  \begin{itemize}
+%    \item FBM is common in crowded, viscoelastic environments where each step comes 
+%    from a Gaussian distribution but is anti-correlated to its previous 
+%    step.~\cite{mandelbrot_fractional_1968,jeon_fractional_2010,banks_anomalous_2005}
+%    \item A CTRW is characterized by a distribution of hop lengths and 
+%    dwell times, where each each step is characterized by independent random draws from 
+%    each distribution.\cite{montroll_random_1965,morrin_three_2018}
+%    \item An RWF is imposed by a system's geometry. Systems with tortuous pathways and dead
+%    ends cause anti-correlated motion.\cite{meroz_toolbox_2015,neusius_subdiffusion_2008}
+%    \item The processes described above can happen alone or in combination.  	
+%  \end{itemize}
   %MRS: talk about which of these should apply given the data mechanistically, as well as fit.
   %BJC1: I believe that's what I try to do in the paragraph below. I can be a little more explicit
 
   % BJC: Should this be in the results? Lots of figures to show in support of the claims below
   %MRS: can you provide mechanistic reasoning for the below? Then can show the claims for the reasonable possibilities.
-
   \noindent We believe that solutes in the system studied here exhibit subordinated 
   fractional Brownian motion (sFBM) where the parent process is FBM and the 
   leading process is a CTRW. 
