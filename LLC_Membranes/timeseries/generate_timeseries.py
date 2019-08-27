@@ -118,6 +118,8 @@ class GenData:
                 for s in range(self.nstates):
                     self.phis[s, ...] = generate_ar_parameters(order, dim)
 
+            print(phis)
+
         self.cov = np.zeros([self.nstates, dim, dim])
         if not cov:
             for s in range(self.nstates):
