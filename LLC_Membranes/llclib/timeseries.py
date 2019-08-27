@@ -282,6 +282,7 @@ def bootstrap_msd(msds, N, confidence=68):
     nT, nparticles = msds.shape
 
     msd_average = msds.mean(axis=1)
+
     eMSDs = np.zeros([nT, N], dtype=float)  # create n bootstrapped trajectories
 
     print('Bootstrapping MSD curves...')
