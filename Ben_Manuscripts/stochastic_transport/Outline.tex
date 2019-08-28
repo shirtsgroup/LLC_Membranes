@@ -25,6 +25,7 @@
 %MRS: we should discuss whether Chris Calderon would be on this one.  I would guess no, but I don't know for sure. 
 %BJC1: Yea maybe Chris as an acknowledgement on this one. He didn't directly contribute anything other than pointing
 %me towards Greg Morrin who pointed me towards useful anomalous diffusion literature.
+%MRS1: I wonder if ``Times series modeling'' is better?  We should keep thinking about a better term.  Stochastic modeling is such a general term, it encompasses a lot  . . . 
 \author{Benjamin J. Coscia \and Michael R. Shirts} 
 
 \begin{document}
@@ -34,6 +35,8 @@
 
   \section{Introduction}
   %BJC: obviously this section will get beefed up
+  %MRS1: I would start with something more central to the content of the paper - how do solutes move in complex separations membranes?  Let people know right from the start what the paper is about.  This paragraph should still be in the intro, but start with something that captures the main question of the paper. 
+
   We need highly selective membranes in order to perform efficient separations. \\
 
   \noindent Amphiphilic molecules are capable of self-assembling into ordered nanostructures.\\
@@ -140,6 +143,11 @@
     kinetics.
     \item This still often results in thousands of distinct states. 
   \end{itemize}
+
+  %MRS1: probably want to make clear that you really are doing some
+  %substantially different things in in MSM modeling than most people
+  %do, by adding on modeling the z-diffusion as an auxiliary variable
+  %of the state.  I think that's actually kind of innovative.
   
   In this work we attempt to model the long timescale behavior of the four 
   fastest moving solutes studied in our previous work.
@@ -422,6 +430,7 @@
 	$x_i$.~\cite{clauset_power-law_2009} 
 	\item We obtained distributions of the hop length standard deviations, $\sigma$, and
 	$\alpha$ using statistical bootstrapping.\cite{efron_introduction_1994} 
+        %MRS1: can just say bootstrapping.
   \end{itemize}
   
   \noindent FBM processes can be described using the Hurst parameter, $H$, where 
@@ -542,6 +551,7 @@
   	%BJC: not sure the best way to lay these out
   	\item The states we've chosen include all combinations of trapping mechanisms 
   	in the pore and out of the pore:
+        %MRS: ``1. in tails and 5. in pores seem to encompass the things below them. Maybe us ``in tails, not trapped,'' etc. as the last entry in each column.'' 
     \begin{table}[!htb]
 	  \centering
 	  \begin{tabular}{ll}
@@ -627,6 +637,7 @@
     \item We can relax the iid assumption and maintain the flexibility of L\'evy stable 
     probability distributions if we instead consider the dynamics to be governed by a
     non-Gaussian Ornstein-Uhlenbeck (OU) process.\cite{barndorffnielsen_non-gaussian_2001} % BJC: replaces Wiener process with Levy process
+    %MRS1: you many consider putting some of the long explanations in supporrting. 
     \item OU processes contain temporal dependence but the marginal observation distributions
     are consistent with the underlying stochastic driver.~\cite{taufer_simulation_2009}
     \item We will discuss the implications of each.  
@@ -757,6 +768,7 @@
   % BJC1: yea we'll see
   The two-mode sFBM model does a better job than the one-mode model at 
   reproducing the MD MSD trends. 
+  %MRS1: will need to make the claims a bit more specific.
   \begin{itemize}
     \item One-mode model generally undershoots MSDs.
   \end{itemize}
@@ -800,6 +812,7 @@
   %MRS: so, is there a way we should have been able to tell beforrehand that this approach didn't work that we an explain?
   %or can we show we needed to do this to get the results?
   %BJC1: could just show autocorrelation function of all increments, which has negative dip at k=1 
+  %MRS1: sgounds good.
   \begin{figure}[!h]
   \centering
   \includegraphics[width=0.5\textwidth]{MET_msd.pdf}
@@ -819,6 +832,10 @@
   \end{itemize}
 
   \section{Conclusion}
+
+  % MRS1: will want to make a stateemnt about whether these approaches
+  % are together good enough for predictive purposes, and if not,
+  % explore what else should be done in the future.
   
   We have tested two different mathematical frameworks for describing solute
   motion in an H\textsubscript{II} phase LLC membrane.
