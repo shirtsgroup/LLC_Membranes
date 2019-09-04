@@ -8,9 +8,7 @@ Post-Simulation Trajectory Analysis
       :titlesonly:
 
       p2p
-      msd
       hbonds
       rdf
-      correlation
       coordination_number
-      ztrace
+      tsa

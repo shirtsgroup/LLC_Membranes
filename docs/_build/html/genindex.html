@@ -199,6 +199,8 @@
       <ul>
         <li><a href="correlation.html#correlation_function.Correlation.__init__">(correlation_function.Correlation method)</a>
 </li>
+        <li><a href="ctrwsim.html#ctrwsim.CTRW.__init__">(ctrwsim.CTRW method)</a>
+</li>
         <li><a href="genmdp.html#genmdp.SimulationMdp.__init__">(genmdp.SimulationMdp method)</a>
 </li>
         <li><a href="gentop.html#gentop.SystemTopology.__init__">(gentop.SystemTopology method)</a>
@@ -210,6 +212,8 @@
         <li><a href="physical.html#physical.region.__init__">(physical.region method)</a>
 </li>
         <li><a href="rdf.html#rdf.System.__init__">(rdf.System method)</a>
+</li>
+        <li><a href="sfbm_parameters.html#sfbm_parameters.SFBMParameters.__init__">(sfbm_parameters.SFBMParameters method)</a>
 </li>
         <li><a href="solvation_equilibration.html#solvation_equilibration.System.__init__">(solvation_equilibration.System method)</a>
 </li>
@@ -293,8 +297,16 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="timeseries.html#timeseries.calculate_moving_average">calculate_moving_average() (in module timeseries)</a>
+
+      <ul>
+        <li><a href="sfbm_parameters.html#sfbm_parameters.SFBMParameters.calculate_moving_average">(sfbm_parameters.SFBMParameters method)</a>
+</li>
+      </ul></li>
+      <li><a href="ctrwsim.html#ctrwsim.CTRW.calculate_msd">calculate_msd() (ctrwsim.CTRW method)</a>
 </li>
       <li><a href="solvation_equilibration.html#solvation_equilibration.System.calculate_pore_water">calculate_pore_water() (solvation_equilibration.System method)</a>
+</li>
+      <li><a href="sfbm_parameters.html#sfbm_parameters.SFBMParameters.calculate_solute_partition">calculate_solute_partition() (sfbm_parameters.SFBMParameters method)</a>
 </li>
       <li><a href="stats.html#stats.Cdf">Cdf (class in stats)</a>
 </li>
@@ -302,10 +314,10 @@
 </li>
       <li><a href="fitting_functions.html#fitting_functions.cdf_exp">cdf_exp() (in module fitting_functions)</a>
 </li>
-      <li><a href="fitting_functions.html#fitting_functions.cdf_power_law">cdf_power_law() (in module fitting_functions)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="fitting_functions.html#fitting_functions.cdf_power_law">cdf_power_law() (in module fitting_functions)</a>
+</li>
       <li><a href="physical.html#physical.center_of_mass">center_of_mass() (in module physical)</a>
 </li>
       <li><a href="physical.html#physical.compdensity">compdensity() (in module physical)</a>
@@ -317,6 +329,8 @@
       <li><a href="correlation.html#correlation_function.Correlation">Correlation (class in correlation_function)</a>
 </li>
       <li><a href="timeseries.html#timeseries.correlograms">correlograms() (in module timeseries)</a>
+</li>
+      <li><a href="ctrwsim.html#ctrwsim.CTRW">CTRW (class in ctrwsim)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -346,6 +360,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="solvation_equilibration.html#solvation_equilibration.System.equilibrate">equilibrate() (solvation_equilibration.System method)</a>
 </li>
+      <li><a href="sfbm_parameters.html#sfbm_parameters.SFBMParameters.estimate_hurst">estimate_hurst() (sfbm_parameters.SFBMParameters method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="sampling.html#sampling.exact_discrete_power_law_sample">exact_discrete_power_law_sample() (in module sampling)</a>
@@ -360,8 +376,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="file_rw.html#module-file_rw">file_rw (module)</a>
 </li>
-      <li><a href="fitting_functions.html#fitting_functions.fit_power_law">fit_power_law() (in module fitting_functions)</a>
+      <li><a href="sfbm_parameters.html#sfbm_parameters.SFBMParameters.fit_distributions">fit_distributions() (sfbm_parameters.SFBMParameters method)</a>
 </li>
+      <li><a href="ctrwsim.html#ctrwsim.CTRW.fit_line">fit_line() (ctrwsim.CTRW method)</a>
+</li>
+      <li><a href="ctrwsim.html#ctrwsim.CTRW.fit_power_law">fit_power_law() (ctrwsim.CTRW method)</a>
+
+      <ul>
+        <li><a href="fitting_functions.html#fitting_functions.fit_power_law">(in module fitting_functions)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="fitting_functions.html#module-fitting_functions">fitting_functions (module)</a>
@@ -379,6 +403,8 @@
       <li><a href="fitting_functions.html#fitting_functions.gaussian_log_likelihood">gaussian_log_likelihood() (in module fitting_functions)</a>
 </li>
       <li><a href="bcc_build.html#bcc_build.BicontinuousCubicBuild.gen_grid">gen_grid() (bcc_build.BicontinuousCubicBuild method)</a>
+</li>
+      <li><a href="ctrwsim.html#ctrwsim.CTRW.generate_trajectories">generate_trajectories() (ctrwsim.CTRW method)</a>
 </li>
       <li><a href="topology.html#topology.ReadItp.get_bonds">get_bonds() (topology.ReadItp method)</a>
 </li>
@@ -400,9 +426,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="xlink_schemes.html#xlink_schemes.DieneScheme.head2tail">head2tail() (xlink_schemes.DieneScheme method)</a>
 </li>
+      <li><a href="hexagonal_build.html#module-hexagonal_build">hexagonal_build (module)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="hexagonal_build.html#module-hexagonal_build">hexagonal_build (module)</a>
+      <li><a href="sfbm_parameters.html#sfbm_parameters.SFBMParameters.hops_and_dwells">hops_and_dwells() (sfbm_parameters.SFBMParameters method)</a>
 </li>
       <li><a href="fitting_functions.html#fitting_functions.hurst_autocovariance">hurst_autocovariance() (in module fitting_functions)</a>
 </li>
@@ -488,19 +516,29 @@
 </li>
       <li><a href="bcc_build.html#bcc_build.BicontinuousCubicBuild.place_monomers">place_monomers() (bcc_build.BicontinuousCubicBuild method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="solvation_equilibration.html#solvation_equilibration.System.place_water_tails">place_water_tails() (solvation_equilibration.System method)</a>
 </li>
       <li><a href="rdf.html#rdf.System.plot">plot() (rdf.System method)</a>
 </li>
+      <li><a href="ctrwsim.html#ctrwsim.CTRW.plot_autocorrelation">plot_autocorrelation() (ctrwsim.CTRW method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="hbonds.html#hbonds.System.plot_hbonds">plot_hbonds() (hbonds.System method)</a>
 </li>
+      <li><a href="ctrwsim.html#ctrwsim.CTRW.plot_msd">plot_msd() (ctrwsim.CTRW method)</a>
+</li>
+      <li><a href="sfbm_parameters.html#sfbm_parameters.SFBMParameters.plot_random_trajectories">plot_random_trajectories() (sfbm_parameters.SFBMParameters method)</a>
+</li>
       <li><a href="correlation.html#correlation_function.Correlation.plot_slice">plot_slice() (correlation_function.Correlation method)</a>
+</li>
+      <li><a href="ctrwsim.html#ctrwsim.CTRW.plot_trajectory">plot_trajectory() (ctrwsim.CTRW method)</a>
 </li>
       <li><a href="fitting_functions.html#fitting_functions.power_law">power_law() (in module fitting_functions)</a>
 </li>
       <li><a href="fitting_functions.html#fitting_functions.power_law_discrete_log_likelihood">power_law_discrete_log_likelihood() (in module fitting_functions)</a>
+</li>
+      <li><a href="fitting_functions.html#fitting_functions.powerlaw_cutoff_mle">powerlaw_cutoff_mle() (in module fitting_functions)</a>
 </li>
       <li><a href="fitting_functions.html#fitting_functions.powerlaw_integrated">powerlaw_integrated() (in module fitting_functions)</a>
 </li>
@@ -604,14 +642,20 @@
 </li>
       <li><a href="hbonds.html#hbonds.System.set_eligible">set_eligible() (hbonds.System method)</a>
 </li>
+      <li><a href="sfbm_parameters.html#sfbm_parameters.SFBMParameters">SFBMParameters (class in sfbm_parameters)</a>
+</li>
       <li><a href="gromacs.html#gromacs.simulate">simulate() (in module gromacs)</a>
 </li>
       <li><a href="genmdp.html#genmdp.SimulationMdp">SimulationMdp (class in genmdp)</a>
 </li>
       <li><a href="stats.html#module-stats">stats (module)</a>
 </li>
-      <li><a href="timeseries.html#timeseries.step_autocorrelation">step_autocorrelation() (in module timeseries)</a>
+      <li><a href="ctrwsim.html#ctrwsim.CTRW.step_autocorrelation">step_autocorrelation() (ctrwsim.CTRW method)</a>
+
+      <ul>
+        <li><a href="timeseries.html#timeseries.step_autocorrelation">(in module timeseries)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="timeseries.html#timeseries.switch_points">switch_points() (in module timeseries)</a>
@@ -663,6 +707,10 @@
       <li><a href="stats.html#stats.Cdf.update_cdf">update_cdf() (stats.Cdf method)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="sfbm_parameters.html#sfbm_parameters.SFBMParameters.update_database">update_database() (sfbm_parameters.SFBMParameters method)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="V">V</h2>
@@ -703,6 +751,10 @@
       <li><a href="genmdp.html#genmdp.SimulationMdp.write_nve_mdp">write_nve_mdp() (genmdp.SimulationMdp method)</a>
 </li>
       <li><a href="genmdp.html#genmdp.SimulationMdp.write_nvt_mdp">write_nvt_mdp() (genmdp.SimulationMdp method)</a>
+</li>
+      <li><a href="sfbm_parameters.html#sfbm_parameters.SFBMParameters.write_spline_coordinates">write_spline_coordinates() (sfbm_parameters.SFBMParameters method)</a>
+</li>
+      <li><a href="sfbm_parameters.html#sfbm_parameters.SFBMParameters.write_tcl">write_tcl() (sfbm_parameters.SFBMParameters method)</a>
 </li>
       <li><a href="gentop.html#gentop.SystemTopology.write_top">write_top() (gentop.SystemTopology method)</a>
 </li>

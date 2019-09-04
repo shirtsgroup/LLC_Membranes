@@ -29,6 +29,7 @@ def initialize():
     parser.add_argument('-t', '--trajectory', default='PR_nojump.xtc', help='Path to input file.')
     parser.add_argument('-g', '--gro', default='em.gro', help='Name of .gro coordinate file.')
     parser.add_argument('-r', '--res', default='MET', help='Name of residue')
+    parser.add_argument('-s', '--start', default=0, type=int, help='Frame at which to start analysis.')
 
     # association parameters
     parser.add_argument('-rc', '--coordinated_residue', default=None, help='Name of residue coordinated to residue_')
@@ -70,18 +71,18 @@ def initialize():
 
 class States:
 
-    def __init__(self, traj, gro, res, **kwargs):
+    def __init__(self, traj, gro, res, start=0, **kwargs):
         """ Identify discrete states in a trajectory
 
         :param traj: name of GROMACS trajectory file (.xtc or .trr)
         :param gro: name of GROMACS coordinate file (.gro)
         :param res: name of residue whose states will be tracked
-        :param kwargs: dictionaries of tuning paramters for state identification
+        :param start: frame to start analysis. Should be after system is equilibrated
 
         :type traj: str
         :type gro: str
         :type res: str
-        :type kwargs: dict
+        :type start: int
         """
 
         self.residue = res
@@ -115,7 +116,7 @@ class States:
         self.nstates = len(self.state_labels['state_dict'].keys())
 
         print("Loading trajectory...", end='', flush=True)
-        self.t = md.load(traj, top=gro)
+        self.t = md.load(traj, top=gro)[start:]
         print("Done!")
 
         print("Identifying hydrogen bonds...")
@@ -362,6 +363,81 @@ class States:
 
         plt.show()
 
+    def transition_autocorrelation(self, nboot=200, confidence=95, fontsize=14):
+        """ Calculate the autocorrelation function of hops only when transitions occur.
+
+        :param nboot: number of bootstrap trials for generating confidence intervals
+        :param confidence: percent confidence interval (out of 100)
+        :param fontsize: size of font on axes
+
+        :type nboot: int
+        :type confidence: float
+        :type fontsize: int
+        """
+
+        # a lot of this is very similar to estimate_hurst() in sfbm_parameters.py. Could be put in llclib as an
+        # an autocorrelation function calculation with uneven length timeseries.
+        transitions = []
+        for s in range(self.nsolute):
+            switch_points = timeseries.switch_points(states.state_sequence[:, 0])
+            transitions.append(self.com[switch_points[:-1] + 1, s, 2] - self.com[switch_points[:-1], s, 2])
+
+        ntransitions = np.array([len(x) for x in transitions])
+
+        max_transitions = max(ntransitions)
+
+        acf = np.zeros([self.nsolute, max_transitions])
+        boot = np.zeros([nboot, max_transitions])
+
+        keep = []  # list to hold indices of trajectories with a non-zero amount of hops
+        for i in range(acf.shape[0]):
+            hops = transitions[i]
+            if len(hops) > 2:  # correlation between two points is useless. Will always be +1, -1
+                autocorrelation = timeseries.acf(hops)
+                acf[i, :autocorrelation.size] = autocorrelation
+                keep.append(i)
+
+        acf = acf[keep, :]
+        ntransitions = ntransitions[keep]
+
+        for b in range(nboot):
+            sol = np.random.randint(acf.shape[0], size=acf.shape[0])
+            for i in range(max(ntransitions[sol])):
+                ndx = sol[np.nonzero(acf[sol, i])]
+                if not list(ndx):
+                    boot[b, i] = 0
+                else:
+                    boot[b, i] = acf[ndx, i].mean()
+
+        lower_confidence = (100 - confidence) / 2  # confidence intervals (percentiles)
+        upper_confidence = 100 - lower_confidence
+
+        errorbars = np.zeros([2, max_transitions])
+        errorbars[0, :] = np.abs(np.percentile(boot, lower_confidence, axis=0) -
+                                 boot.mean(axis=0))  # 2.5 percent of data below this value
+        errorbars[1, :] = np.percentile(boot, upper_confidence, axis=0) - boot.mean(axis=0)
+
+        fig, ax = plt.subplots(1, 1)
+        plt.plot(acf.mean(axis=0), linewidth=2, label='Simulated autocorrelation')
+        # ax[m].plot(np.arange(max_hops), fitting_functions.hurst_autocovariance(np.arange(max_hops),
+        #                                                                        np.mean(self.hurst_distribution[m])),
+        #            '--', color='black', linewidth=2,
+        #            label='Fit theoretical autocorrelation')
+        ax.fill_between(np.arange(max_transitions), errorbars[1, :] + boot.mean(axis=0), boot.mean(axis=0) -
+                        errorbars[0, :], alpha=0.25)
+        # ax[m].text(3.0, 0.5, '$\gamma(k) = \dfrac{1}{2}[|k-1|^{2H} - 2|k|^{2H} + |k + 1|^{2H}]$', fontsize=fontsize)
+        # ax[m].text(3.0, 0.3, '$H$ = %.2f $\pm$ %.2f' % (np.mean(self.hurst_distribution[m]),
+        #                                                 np.std(self.hurst_distribution[m])), fontsize=fontsize)
+        ax.set_xticks([1, 3, 5, 7, 9, 11, 13, 15])
+        ax.set_xlabel('Lag (k)', fontsize=fontsize)
+        ax.set_ylabel('Autocorrelation', fontsize=fontsize)
+        ax.tick_params(labelsize=fontsize)
+        ax.set_xlim(0.05, 15)
+        ax.set_ylim(-1, 1)
+        ax.legend(fontsize=fontsize)
+
+        plt.show()
+
 
 class Chain:
 
@@ -547,7 +623,7 @@ if __name__ == "__main__":
             state_labels = {'intails': 0, 'hbonded': 1, 'associated': 2, 'inpores': 3, 'state_dict': {'1000': 0,
                             '1100': 1, '1010': 2, '1110': 3, '0001': 4, '0101': 5, '0011': 6, '0111': 7}}
 
-            traj, gro, res = args.trajectory, args.gro, args.res
+            traj, gro, res, start = args.trajectory, args.gro, args.res, args.start
 
         else:  # preferred
 
@@ -555,14 +631,14 @@ if __name__ == "__main__":
                 cfg = yaml.load(yml)
 
             trajectory = cfg['trajectory']
-            traj, gro, res = trajectory['trajectory'], trajectory['gro'], trajectory['res']
+            traj, gro, res, start = trajectory['trajectory'], trajectory['gro'], trajectory['res'], trajectory['start']
 
             association_params = cfg['association_params']
             hbond_params = cfg['hbond_params']
             partition_params = cfg['partition_params']
             state_labels = cfg['state_labels']
 
-        states = States(traj, gro, res, association_params=association_params, hbond_params=hbond_params,
+        states = States(traj, gro, res, start=start, association_params=association_params, hbond_params=hbond_params,
                         partition_params=partition_params, state_labels=state_labels)
 
         states.t = None  # to save memory
@@ -579,7 +655,55 @@ if __name__ == "__main__":
         #states.measure_state_emissions(fit_function=levy)
         #states.plot_emissions()
 
+    # fig, ax = plt.subplots(8, 8, figsize=(10, 10), sharex=True, sharey=True)
+    # for i in range(states.nstates):
+    #     for j in range(states.nstates):
+    #         ax[i, j].hist(states.emissions[i][j], bins=50, density=True, label='n = %d' % len(states.emissions[i][j]))
+    #         ax[i, j].legend(fontsize=8)
+    #         ax[i, j].tick_params(labelsize=8)
+    #
+    # plt.xlim(-0.5, 0.5)
+    # plt.tight_layout()
+    # plt.show()
+    # exit()
+    #states.transition_autocorrelation()
+    import itertools
+
+    dwells = [[] for _ in range(states.nstates)]
+    for solute in range(states.nsolute):
+        for state, group in itertools.groupby(states.state_sequence[:, solute]):
+            dwells[state].append(len(list(group)))
+
+    all_dwells = []
+    for i in dwells:
+        all_dwells += i
+
+    plt.hist(all_dwells, bins=22, range=(3, 25))
+    plt.show()
+    exit()
+
+    for i in range(8):
+        plt.hist(dwells[i], bins=50)
+        plt.show()
+    exit()
+
+    emissions = []
+    for i in range(states.nstates):
+        for j in range(states.nstates):
+            if i != j:
+                emissions += states.emissions[i][j]
+
+    plt.hist(emissions, bins=50, range=(-.75, .75))
+    plt.show()
+    exit()
+
+    max_emissions = []
+    for i in states.emissions:
+        for j in i:
+            max_emissions.append(max(j))
+
     chains = Chain(states.transition_matrix, states.fit_params, emission_function=levy_stable)
-    chains.generate_realizations(24, 2000, bound=states.box_length)
+    #chains.generate_realizations(24, 2000, bound=states.box_length)
+    chains.generate_realizations(24, 10000, bound=max(max_emissions))
     chains.calculate_msd()
     chains.plot_msd()

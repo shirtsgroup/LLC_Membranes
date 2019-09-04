@@ -62,6 +62,7 @@ Summary of Annotations
 |       |the center of the pores                     |                             |
 +-------+--------------------------------------------+-----------------------------+
 
+
 .. _build-annotations:
 
 Unit Cell Construction

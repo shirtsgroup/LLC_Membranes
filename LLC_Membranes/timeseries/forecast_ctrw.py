@@ -122,9 +122,10 @@ if __name__ == "__main__":
 
         sys.hops_and_dwells(penalty=fit['breakpoint_penalty'])
 
-        sys.fit_distributions(nbins=fit['bins'], nboot=fit['nboot'], plot=True, show=False, save=True)
+        sys.fit_distributions(nbins=fit['bins'], nboot=fit['nboot'], plot=True, show=False, save=True,
+                              dwell_distribution=fit['dwell_distribution'], hop_distribution=fit['hop_distribution'])
 
-        sys.estimate_hurst()
+        sys.estimate_hurst(modes=fit['hurst_modes'])
 
         if args.update:
             sys.update_database()
@@ -136,16 +137,24 @@ if __name__ == "__main__":
         sys.com = None
         file_rw.save_object(sys, 'forecast_%s_%dstate.pl' % (fit['residue'], sys.nmodes))
 
+    # sys.fit_distributions(nbins=fit['bins'], nboot=10, plot=True, show=True, save=True,
+    #                       dwell_distribution=fit['dwell_distribution'], hop_distribution=fit['hop_distribution'])
+
+    # sys.estimate_hurst(modes=fit['hurst_modes'])
+    # exit()
+    exit()
+
     print('Generating SFBM realizations...')
     # simulate ntrajsim trajectories for same length as MD
+
     nsteps = int(project['length'] / sys.dt)
-    random_walks = CTRW(nsteps, args.ntrajsim, nmodes=sys.nmodes, dt=sys.dt, hop_dist=project['hop_dist'],
+    random_walks = CTRW(nsteps, project['ntrajsim'], nmodes=sys.nmodes, dt=sys.dt, hop_dist=project['hop_dist'],
                         dwell_dist=project['dwell_dist'],
                         transition_matrix=sys.transition_matrix if sys.nmodes > 1 else None)
 
-    random_walks.generate_trajectories(fixed_time=True, distributions=(sys.alpha_distribution,
-                                       sys.hop_sigma_distribution, sys.hurst_distribution), discrete=True,
-                                       ll=sys.dwell_lower_limit)  # change lower limit
+    random_walks.generate_trajectories(fixed_time=True, distributions=(sys.dwell_parameters,
+                                       sys.hop_parameters, sys.hurst_distribution), discrete=True,
+                                       ll=sys.dwell_lower_limit, max_hop=sys.max_hop)  # change lower limit
 
     if project['ensemble']:
         print('Calculating ensemble averaged mean squared displacement...')

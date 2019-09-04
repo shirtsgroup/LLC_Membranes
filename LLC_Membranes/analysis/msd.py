@@ -51,7 +51,7 @@ def initialize():
 
 class Diffusivity(object):
 
-    def __init__(self, traj, gro, axis, begin=0, startfit=0.01, endfit=1, residue=False, atoms=[], restrict=[]):
+    def __init__(self, traj, gro, axis, begin=0, startfit=0.01, endfit=1, residue=False, atoms=(), restrict=()):
         """
         Calculate diffusivity from trajectory
         :param traj: unwrapped trajectory (i.e. gmx trjconv with -pbc nojump)
@@ -288,7 +288,7 @@ class Diffusivity(object):
             #                                        self.power_law_fit[b, 1]))
             # plt.show()
 
-    def bootstrap(self, N):
+    def bootstrap(self, N, fit_line=True):
         """
         Estimate error at each point in the MSD curve using bootstrapping
         :param N: number of bootstrap trials
@@ -313,26 +313,28 @@ class Diffusivity(object):
             self.limits[0, t] = np.abs(np.percentile(eMSDs[t, :], lower_confidence) - self.MSD_average[t])
             self.limits[1, t] = np.abs(np.percentile(eMSDs[t, :], upper_confidence) - self.MSD_average[t])
 
-        npts = self.endfit - self.startfit
-        if self.weights:
-            self.W = np.zeros((npts, npts))
-            for i in range(npts):
-                self.W[i, i] = 1 / ((self.limits[0, i + self.startfit]) ** 2)
-        else:
-            self.W = 'none'
+        if fit_line:
 
-        slopes = np.zeros([N])
-        for b in range(N):
-            # fit line to each bootstrapped MSD
-            A = Poly_fit.poly_fit(self.time[self.startfit:self.endfit], eMSDs[self.startfit:self.endfit, b],
-                                  1, self.W)[-1]
-            slopes[b] = A[1]
+            npts = self.endfit - self.startfit
+            if self.weights:
+                self.W = np.zeros((npts, npts))
+                for i in range(npts):
+                    self.W[i, i] = 1 / ((self.limits[0, i + self.startfit]) ** 2)
+            else:
+                self.W = 'none'
 
-        slopes /= (2*100000*len(self.axis))  # nm^2 / ns = 1.0e-5 cm^2/s
+            slopes = np.zeros([N])
+            for b in range(N):
+                # fit line to each bootstrapped MSD
+                A = Poly_fit.poly_fit(self.time[self.startfit:self.endfit], eMSDs[self.startfit:self.endfit, b],
+                                      1, self.W)[-1]
+                slopes[b] = A[1]
 
-        # calculate 95 % confidence interval
-        self.confidence_interval = stats.t.interval(0.95, N - 1, loc=slopes.mean(), scale=stats.sem(slopes))
-        self.Davg = slopes.mean()
+            slopes /= (2*100000*len(self.axis))  # nm^2 / ns = 1.0e-5 cm^2/s
+
+            # calculate 95 % confidence interval
+            self.confidence_interval = stats.t.interval(0.95, N - 1, loc=slopes.mean(), scale=stats.sem(slopes))
+            self.Davg = slopes.mean()
 
     def plot(self, axis, fracshow=0.5, savedata=False, show=False):
 

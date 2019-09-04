@@ -4,19 +4,30 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mdtraj as md
 import ruptures
-from scipy.optimize import curve_fit, minimize
+from scipy.optimize import curve_fit
+from scipy.stats import levy_stable
+from sympy import mpmath
 from LLC_Membranes.llclib import topology, physical, file_rw, fitting_functions, timeseries
 import tqdm
 import sqlite3 as sql
 import os
 import sys
 import pymbar
+import levy
 
 
 def gaussian(points, mean, sigma):
 
     return (1 / np.sqrt(2 * np.pi * sigma ** 2)) * np.exp(
         -(points - mean) ** 2 / (2 * sigma ** 2))
+
+
+class DistributionError(Exception):
+    """ Raised if an undefined reaction is attempted """
+
+    def __init__(self, message):
+
+        super().__init__(message)
 
 
 class SFBMParameters(object):
@@ -31,7 +42,7 @@ class SFBMParameters(object):
         :param end: last frame of trajectory to include
         :param step: include every step frames in calculations
         :param ma: calculate a moving average on the center of mass coordinate traces
-        :param nmodes: number of modes to consider. 1 mode will treat all hops and dwells as being performed in the
+        :param nmodes: number of modes to consider. 1 mode will treat all hops and dwells as being performed in the \
         same environment. 2 modes will treat hops and dwells in the tails versus pores differently.
 
         :type traj: str
@@ -120,16 +131,18 @@ class SFBMParameters(object):
         self.hop_lengths = []
         self.hurst_distribution = [[] for _ in range(self.nmodes)]
         self.hop_acf = None
-        self.alpha_distribution = [[] for _ in range(self.nmodes)]  # distribution of alpha for poisson process
-        self.hop_sigma_distribution = [[] for _ in range(self.nmodes)]  # distribution of standard deviation of hop lengths
+        self.dwell_parameters = [[] for _ in range(self.nmodes)]  # distribution of alpha for poisson process
+        self.hop_parameters = [[] for _ in range(self.nmodes)]  # distribution of parameters describing hop lengths
         self.breakpoint_penalty = 0
         self.location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # This script location
         self.r = []  # radial distance of solute from pore center when hops are made
         self.segments = [[] for _ in range(self.nmodes)]
         self.hop_series = [[] for _ in range(self.nmodes)]
+        self.hop_series_order = [[] for _ in range(self.nres)]
         self.nsolute = self.com.shape[1]
         self.transition_matrix = np.zeros([self.nmodes, self.nmodes])
         self.dwell_lower_limit = []
+        self.max_hop = 0  # The maximum hop length
 
         self.partition = None  # array telling whether a solute is in the pores or tails. True if in pores, else False
 
@@ -175,8 +188,8 @@ class SFBMParameters(object):
         :param r: radial distance from pore center where pore region transitions to tail region
         :param spline: calculate pore centers as function of z using a spline in each pore
         :param membrane_residue: if using spline, give the name of the liquid crystal residue used to make the membrane
-        :param write_tcl: write a tcl script that will color code solutes based on their radial position. A good way to
-        make sure this function worked as intended.
+        :param write_tcl: write a tcl script that will color code solutes based on their radial position. A good way \
+        to make sure this function worked as intended.
 
         :type r: float
         :type spline: bool
@@ -205,7 +218,7 @@ class SFBMParameters(object):
     def write_tcl(self, frame=-1, name='partition.tcl'):
         """ Write a .tcl script to view solute partition in VMD
 
-        :param frame: frame to write .tcl script for. Make sure you have the .gro file corresponding to this frame or
+        :param frame: frame to write .tcl script for. Make sure you have the .gro file corresponding to this frame or \
         the output will not be useful. (use get_frame.py if you don't have the proper gro file)
         :param name: name of .tcl file
 
@@ -244,12 +257,12 @@ class SFBMParameters(object):
         file_rw.write_gro_pos(coordinates, 'spline.gro', name='K')
 
     def hops_and_dwells(self, penalty=0.25, locations=False):
-        """ Find breakpoints then assemble lists of dwell times and hop lengths. See documentation for Ruptures python
-        package: http://ctruong.perso.math.cnrs.fr/ruptures-docs/build/html/index.html for more options that can be
-        added
+        """ Find breakpoints then assemble lists of dwell times and hop lengths. See documentation for the `Ruptures
+        python package <http://ctruong.perso.math.cnrs.fr/ruptures-docs/build/html/index.html>`_ for more options that
+        can be added
 
         :param penalty: penalty for cost function minimization
-        :param nframes_dwell: number of frames that a solute needs to stay in the region of interest in order to be
+        :param nframes_dwell: number of frames that a solute needs to stay in the region of interest in order to be \
         analyzed for hops.
         :param locations: if True, this function will return the distance from the pore center when hops are made
 
@@ -338,6 +351,7 @@ class SFBMParameters(object):
                 else:
                     if hop_sequence:  # avoid appending empty lists. This is possible since I reset the list each traj
                         self.hop_series[previous_location].append(hop_sequence)
+                        self.hop_series_order[j].append([previous_location, len(self.hop_series[previous_location])])
                     hop_sequence = [hop_length]
 
                 # Assume solute stays in region it hopped to
@@ -349,6 +363,7 @@ class SFBMParameters(object):
             # make sure to get last observed sequence
             if hop_sequence:
                 self.hop_series[previous_location].append(hop_sequence)
+                self.hop_series_order[j].append([previous_location, len(self.hop_series[previous_location])])
             #
             # # Analyze sub-trajectories where solute is in defined pore region
             # begin = 0
@@ -393,10 +408,12 @@ class SFBMParameters(object):
         # tail_dwells as in tail ends of trajectory
         self.tail_dwells = [initial_dwells[i] + final_dwells[i] for i in range(self.nmodes)]
 
-        self.transition_matrix = (self.transition_matrix.T / self.transition_matrix.sum(axis=1)).T
-        print(self.transition_matrix)
+        if self.nmodes > 1:
+            self.transition_matrix = (self.transition_matrix.T / self.transition_matrix.sum(axis=1)).T
+            print(self.transition_matrix)
 
-    def fit_distributions(self, nbins=25, plot=True, nboot=200, show=False, save=True):
+    def fit_distributions(self, nbins=25, plot=True, nboot=200, show=False, save=True, dwell_distribution='powerlaw',
+                          hop_distribution='Gaussian'):
         """ Fit curves to dwell time and hop length distributions
 
         :param nbins: number of bins in histograms
@@ -417,13 +434,17 @@ class SFBMParameters(object):
         hist_dwell = np.zeros([self.nmodes, nboot, nbins])
         hist_jump = np.zeros([self.nmodes, nboot, nbins])
 
+        # Empty these lists in case this function is run again after loading pickled file
+        self.dwell_parameters = [[] for _ in range(self.nmodes)]  # distribution of alpha for poisson process
+        self.hop_parameters = [[] for _ in range(self.nmodes)]  # distribution of parameters describing hop lengths
+
         all_hops = [[] for _ in range(self.nmodes)]
 
         for h in self.hop_lengths:
             for m in range(self.nmodes):
                 all_hops[m] += h[m]
 
-        hop_mean = np.zeros(self.nmodes)
+        self.max_hop = max([np.max(np.absolute(all_hops[m])) for m in range(self.nmodes)])
 
         # Define bins so histograms can be added together. Do it separately for each mode
         min_dwells = [min(i) for i in self.dwell_times]
@@ -471,23 +492,23 @@ class SFBMParameters(object):
                     except ValueError:
                         pass
 
-                    # Maximum likelihood estimate of alpha
-                    args = (dwell_times_boot, int(min(dwell_times_boot)), True)  # (dwell times, xmin, maximize = True)
-                    maximum = minimize(fitting_functions.power_law_discrete_log_likelihood, 1.5, args=args,
-                                       bounds=[(1.01, 3)]).x[0]
+                    # Maximum likelihood estimate of dwell distribution parameters.
+                    if dwell_distribution.lower() in ['power law', 'powerlaw', 'power', 'power_law']:
 
-                    self.alpha_distribution[m].append(maximum - 1)
+                        p = fitting_functions.powerlaw_mle(dwell_times_boot, int(min(dwell_times_boot)), guess=1.5)
+                        p -= 1
 
-                    # Graphical representation of log-likelihood maximization
-                    # ll = []  # list of log-likelihoods for each alpha tested
-                    # alphas = np.linspace(1.01, 3, 100)
-                    # for a in alphas:
-                    #     ll.append(fitting_functions.power_law_discrete_log_likelihood(a, dwell_times_boot,
-                    #                                                                   int(min(dwell_times_boot))))
-                    #
-                    # plt.plot(alphas, ll)
-                    # plt.show()
-                    # exit()
+                    elif dwell_distribution.lower() in ['power law exponential cutoff', 'powerlaw_cutoff']:
+
+                        p = fitting_functions.powerlaw_cutoff_mle(dwell_times_boot, xmin=int(min(dwell_times_boot)),
+                                                                  guess=(1.5, 0.001))
+                        p[0] -= 1
+
+                    else:
+                        raise DistributionError('The dwell time distribution, %s, has not been implemented. Please'
+                                                'choose something that has been implemented' % dwell_distribution)
+
+                    self.dwell_parameters[m].append(p)
 
                     if plot:
 
@@ -502,14 +523,20 @@ class SFBMParameters(object):
                         hist_jump[m, i, :], _ = np.histogram(hop_lengths_boot, bins_hop[m, :], density=True)
 
                     # Maximum likelihood estimate of mean and sigma of hop length distribution
-                    hop_mle = [np.mean(hop_lengths_boot), np.std(hop_lengths_boot)]  # mean and std are mle estimates
+                    if hop_distribution.lower() in ['gaussian', 'normal']:
 
-                    self.hop_sigma_distribution[m].append(hop_mle[1])
+                        p = [np.mean(hop_lengths_boot), np.std(hop_lengths_boot)]  # mean and std are mle estimates
 
-                    # Things for plotting
-                    if plot:
+                    elif hop_distribution.lower() in ['levy']:
 
-                        hop_mean += hop_mle[0]
+                        # assume a symmetric distribution
+                        p = levy.fit_levy(hop_lengths_boot, beta=0)[0].x
+
+                    else:
+                        raise DistributionError('The hop length distribution, %s, has not been implemented. Please '
+                                                'choose something that has been implemented' % hop_distribution)
+
+                    self.hop_parameters[m].append(p)
 
                     if m == self.nmodes - 1:
                         i += 1  # probably can go back to loop since using MLE
@@ -517,95 +544,84 @@ class SFBMParameters(object):
                 except RuntimeError:  # sometimes bootstrapping gives unfittable data
                     continue
 
-        hop_mean /= nboot
-
         if plot:
 
-            fig, ax = plt.subplots(self.nmodes, 2, figsize=(8, self.nmodes * 4))
+            fig, ax = plt.subplots(self.nmodes, 2, figsize=(12, self.nmodes * 4))
 
             if self.nmodes == 1:
                 ax = ax[np.newaxis, :]
-            # hops, hop_ax = plt.subplots()
-            # dwells, dwell_ax = plt.subplots()
+
             fontsize = 16
             label_fontsize = 14
             legend_fontsize = 12
 
             for m in range(self.nmodes):
 
-                ax[m, 0].bar(bins_dwell_centered[m, :], hist_dwell[m, ...].mean(axis=0), width=dwell_bin_width[m],
-                             align='center')
+                mean = hist_dwell[m, ...].mean(axis=0)
+                ax[m, 0].bar(bins_dwell_centered[m, :],  mean / mean.max(), width=dwell_bin_width[m], align='center')
                 ax[m, 0].set_xlabel('Dwell Time (ns)', fontsize=label_fontsize)
                 ax[m, 0].set_ylabel('Frequency', fontsize=label_fontsize)
 
-                ax[m, 0].plot(bins_dwell_centered[m, :], bins_dwell_centered[m, :] ** -(1 +
-                              np.mean(self.alpha_distribution)), '--', color='black',
-                              label=r'$\alpha_{fit}$ = %.3f $\pm$ %.3f ns$^{-1}$' % (np.mean(self.alpha_distribution[m]),
-                                                                                     np.std(self.alpha_distribution[m])))
+                if dwell_distribution.lower() in ['powerlaw', 'power', 'power_law', 'power law']:
+
+                    y = bins_dwell_centered[m, :] ** - (1 + np.mean(self.dwell_parameters[m]))
+                    label = r'$\alpha_{fit}$ = %.3f $\pm$ %.3f ns$^{-1}$' % (np.mean(self.dwell_parameters[m]),
+                                                                             np.std(self.dwell_parameters[m]))
+
+                elif dwell_distribution.lower() in ['powerlaw_cutoff', 'power law exponential cutoff']:
+
+                    x = bins_dwell_centered[m, :]
+
+                    alphas = [p[0] for p in self.dwell_parameters[m]]
+                    lambs = [p[1] for p in self.dwell_parameters[m]]
+
+                    # c = np.mean(lambs) ** (1 - np.mean(alphas)) / float(mpmath.gammainc(1 - np.mean(alphas),
+                    #     np.mean(lambs) * self.dwell_lower_limit[m]))
+                    y = x ** - (1 + np.mean(alphas)) * np.exp(-np.mean(lambs) * x)
+                    y /= y.max()
+                    label = r'$\alpha_{fit}$' + '= %.3f $\pm$ %.3f ns$^{-1}$\n' \
+                            r'$\lambda_{fit}$ = %.4f $\pm$ %.4f ns$^{-1}$' \
+                            % (np.mean(alphas), np.std(alphas), np.mean(lambs), np.std(lambs))
+                else:
+                    raise DistributionError('The dwell time distribution, %s, has not been implemented. Please'
+                                            'choose something that has been implemented' % dwell_distribution)
+
+                ax[m, 0].plot(bins_dwell_centered[m, :], y, '--', color='black', label=label)
                 ax[m, 0].legend(fontsize=legend_fontsize)
                 ax[m, 0].tick_params(labelsize=fontsize)
 
                 ax[m, 1].bar(bins_hop_centered[m, :], hist_jump[m, ...].mean(axis=0), width=hop_bin_width[m])
-                ax[m, 1].plot(bins_hop_centered[m, :],
-                              gaussian(bins_hop_centered[m, :], hop_mean[m], np.mean(self.hop_sigma_distribution[m]))
-                              , '--', label='Gaussian fit\n $\sigma$=%.2f $\pm$ %.2f nm' %
-                              (np.mean(self.hop_sigma_distribution[m]), np.std(self.hop_sigma_distribution[m])),
-                              color='black')
+
+                x = np.linspace(bins_hop_centered[m, 0], bins_hop_centered[m, -1], 100)
+                if hop_distribution.lower() in ['gaussian', 'normal']:
+
+                    hops = [p[0] for p in self.hop_parameters[m]]
+                    hop_std = [p[1] for p in self.hop_parameters[m]]
+                    y = gaussian(x, np.mean(hops), np.mean(hop_std))
+                    label = 'Gaussian fit\n $\sigma$=%.2f $\pm$ %.2f nm' % (np.mean(hop_std), np.std(hop_std))
+
+                elif hop_distribution.lower() in ['levy']:
+
+                    alphas = [p[0] for p in self.hop_parameters[m]]
+                    means = [p[1] for p in self.hop_parameters[m]]
+                    scales = [p[2] for p in self.hop_parameters[m]]
+                    y = levy_stable.pdf(x, np.mean(alphas), 0, loc=np.mean(means), scale=np.mean(scales))
+                    label = r'$\alpha_{fit}$' + '= %.3f $\pm$ %.3f ns$^{-1}$\n' \
+                            r'$\sigma_{fit}$ = %.3f $\pm$ %.3f ns$^{-1}$' \
+                            % (np.mean(alphas), np.std(alphas), np.mean(scales), np.std(scales))
+
+                ax[m, 1].plot(x, y, '--', label=label, color='black')
+
                 ax[m, 1].legend(fontsize=legend_fontsize)
                 ax[m, 1].set_xlabel('Hop Length (nm)', fontsize=label_fontsize)
                 ax[m, 1].set_ylabel('Frequency', fontsize=label_fontsize)
 
                 ax[m, 1].tick_params(labelsize=fontsize)
 
-            # dwell_ax.bar(bins_dwell_centered, hist_dwell.mean(axis=0), width=dwell_bin_width, align='center')
-            # dwell_ax.set_xlabel('Dwell Time (ns)', fontsize=fontsize)
-            # dwell_ax.set_ylabel('Frequency', fontsize=fontsize)
-            #
-            # dwell_ax.plot(bins_dwell_centered, bins_dwell_centered ** -(1 + np.mean(self.alpha_distribution)),
-            #               '--', color='black', label='Power law MLE fit', linewidth=2)
-            # dwell_ax.legend(fontsize=fontsize)
-            # dwell_ax.text(290, 0.022, r'$p \propto t^{(-1 - \alpha)}$', fontsize=fontsize)
-            # dwell_ax.text(290, 0.019, r'$\alpha_{fit}$ = %.3f $\pm$ %.3f ns$^{-1}$' %
-            # (np.mean(self.alpha_distribution), np.std(self.alpha_distribution)), fontsize=fontsize)
-            # dwell_ax.tick_params(labelsize=fontsize)
-
-            # ax[0, 1].hist(self.alpha_distribution, bins=nbins)
-            # ax[0, 1].set_xlabel(r'Bootstrapped $\alpha$ (ns$^{-1}$)', fontsize=14)
-            # ax[0, 1].set_ylabel('Frequency', fontsize=14)
-            #
-            # ax[1, 0].bar(bins_hop_centered, hist_jump.mean(axis=0), width=hop_bin_width)
-            # ax[1, 0].plot(bins_hop_centered, gaussian(bins_hop_centered, hop_mean, np.mean(self.hop_sigma_distribution))
-            #               , '--', label='Gaussian fit\n $\sigma$=%.2f $\pm$ %.2f nm' %
-            #               (np.mean(self.hop_sigma_distribution), np.std(self.hop_sigma_distribution)), color='black')
-            #
-            # ax[1, 0].set_xlabel('Hop Length ($z$-direction, nm)', fontsize=14)
-            # ax[1, 0].set_ylabel('Frequency', fontsize=14)
-            # ax[1, 0].legend(fontsize=12)
-            #
-            # hop_ax.bar(bins_hop_centered, hist_jump.mean(axis=0), width=hop_bin_width)
-            # hop_ax.plot(bins_hop_centered, gaussian(bins_hop_centered, hop_mean, np.mean(self.hop_sigma_distribution))
-            #               , '--', label='Gaussian MLE fit', color='black', linewidth=2)
-            #
-            # hop_ax.set_xlabel('Hop Length ($z$-direction, nm)', fontsize=fontsize)
-            # hop_ax.set_ylabel('Frequency', fontsize=fontsize)
-            # hop_ax.legend(fontsize=fontsize)
-            # hop_ax.text(0.31, 0.95, '$p \propto e^{\dfrac{(x-\mu)^2}{2\sigma^2}}$', fontsize=fontsize)
-            # hop_ax.text(0.31, 0.825, '$\sigma$=%.2f $\pm$ %.2f nm' % (np.mean(self.hop_sigma_distribution),
-            #                                                     np.std(self.hop_sigma_distribution)), fontsize=fontsize)
-            # hop_ax.tick_params(labelsize=fontsize)
-            #
-            # ax[1, 1].hist(self.hop_sigma_distribution, bins=nbins)
-            # ax[1, 1].set_xlabel('Bootstrapped $\sigma$ (nm)', fontsize=14)
-            # ax[1, 1].set_ylabel('Frequency', fontsize=14)
-
             fig.tight_layout()
-            # hops.tight_layout()
-            # dwells.tight_layout()
 
             if save:
                 fig.savefig('hop_dwell_distribution.pdf')
-                # hops.savefig('hop_distribution.pdf')
-                # dwells.savefig('dwell_distribution.pdf')
 
             if show:
                 plt.show()
@@ -655,18 +671,24 @@ class SFBMParameters(object):
 
         return max_dwell
 
-    def estimate_hurst(self, nboot=200, max_k=5, confidence=95):
-        """ Estimate the hurst parameter by fitting the emperical autocovariance function to theory:
+    def estimate_hurst(self, nboot=200, max_k=5, confidence=95, modes=None):
+        r""" Estimate the hurst parameter by fitting the emperical autocovariance function to theory:
 
-        \gamma(k) = \dfrac{1}{2}[|k-1|^{2H} - 2|k|^{2H} + |k + 1|^{2H}]
+        .. math::
+
+            \gamma(k) = \dfrac{1}{2}[|k-1|^{2H} - 2|k|^{2H} + |k + 1|^{2H}]
 
         :param nboot: number of bootstrap trials used to generate distribution of H's
         :param max_k: maximum number of time steps to fit in autocovariance function
         :param confidence: confidence interval
+        :param modes: number of modes. If None, will use the same number of modes used to characterize the hops and \
+        dwells. This is meant to give a more flexible model.
+
 
         :type nboot: int
         :type max_k: int
         :type confidence: float
+        :type modes: int or NoneType
         """
 
         # lists of arrays that will be needed
@@ -674,9 +696,27 @@ class SFBMParameters(object):
         lower_confidence = (100 - confidence) / 2  # confidence intervals (percentiles)
         upper_confidence = 100 - lower_confidence
 
+        nmodes = self.nmodes
+        if modes is not None:
+            nmodes = modes
+            # reconstruct hop series without mode transitions
+            if nmodes == 1 and len(self.hop_series) != 1:
+
+                hop_series = [[]]
+                for t in self.hop_series_order:
+
+                    series = []
+                    for mode, n in t:
+                        series += self.hop_series[int(mode)][n - 1]
+                    hop_series[0].append(series)
+
+                self.hop_series = hop_series
+
+        self.hurst_distribution = [[] for _ in range(nmodes)]
+
         # plot settings. Work around for plot subscripting
-        if self.nmodes == 2:
-            fig, (ax1, ax2) = plt.subplots(1, self.nmodes, figsize=(6 * self.nmodes, 5))
+        if nmodes == 2:
+            fig, (ax1, ax2) = plt.subplots(1, nmodes, figsize=(6 * nmodes, 5))
             ax = [ax1, ax2]
         else:
             fig, ax1 = plt.subplots(1, 1, figsize=(6, 5))
@@ -684,7 +724,7 @@ class SFBMParameters(object):
 
         fontsize = 14
 
-        for m in range(self.nmodes):
+        for m in range(nmodes):
 
             nhops = np.array([len(x) for x in self.hop_series[m]])
 
@@ -802,10 +842,10 @@ class SFBMParameters(object):
 
         :param file: relative path (relative to directory where this script is stored) to database to be updated
         :param tablename: name of table being modified in database
-        :param type: The type of info to be updated/added to the table. 'parameters' indicates an update to alpha,
-        sigma, hurst, sim_length and mw. 'msds' indicates an update to python_MSD, python_MSD_CI_upper and
+        :param type: The type of info to be updated/added to the table. 'parameters' indicates an update to alpha, \
+        sigma, hurst, sim_length and mw. 'msds' indicates an update to python_MSD, python_MSD_CI_upper and \
         python_MSD_CI_Lower
-        :param data: data to be filled in if it is not a part of this object. For example, to update python MSDs,
+        :param data: data to be filled in if it is not a part of this object. For example, to update python MSDs, \
         include a list with [python_MSD, python_MSD_CI_lower, python_MSD_CI_upper] in that order.
 
         :type file: str

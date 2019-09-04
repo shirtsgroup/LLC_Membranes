@@ -9,28 +9,31 @@ import sys
 import matplotlib.pyplot as plt
 from LLC_Membranes.llclib import timeseries, stats
 import tqdm
+import math
 
 
 class FLM:
 
-    def __init__(self, H, alpha, m=256, M=6000, C=1, N=2**12, n=1, scale=1):
+    def __init__(self, H, alpha, m=256, M=6000, C=1, N=2**12, scale=1):
         """ Generate realizations of fractional levy motion, also know as linear fractional stable motion
 
         :param H: Hurst parameter. Also known as the self-similarity parameter
         :param alpha: the tail-exponent of the stable distribution (between 0 and 2). Lower alpha = heavier tails
         :param m: 1/m is the mesh size
         :param M: kernel cut-off parameter
-        :param C: scale parameter
+        :param C: normalization parameter
         :param N: size of sample
-        :param scale:
+        :param scale: scale parameter of Levy distribution
         """
+
+        if math.log(N, 2) - int(math.log(N, 2)) != 0:
+            N = 2 ** (int(math.log(N, 2)) + 1)  # so we can use FFTs efficiently
 
         self.H = H
         self.alpha = alpha
         self.m = m
         self.M = M
         self.N = N
-        self.scale = C
         self.Na = m * (M + N)
 
         if alpha < 0 or alpha > 2:
@@ -42,46 +45,55 @@ class FLM:
         t1 = np.linspace(1 + mh, M, int((M - (1 + mh)) / mh) + 1)
         t1 = t1 ** d - (t1 - 1) ** d
         self.A = mh ** (1 / alpha) * np.concatenate((t0, t1))
-        self.scale *= (np.abs(self.A) ** alpha).sum() ** (-1 / alpha)
-        self.A *= self.scale
+        C *= (np.abs(self.A) ** alpha).sum() ** (-1 / alpha)
+        self.A *= C
         self.A = np.fft.fft(self.A, n=self.Na)
 
         self.realizations = None
+        self.noise = None
+        self.scale = scale
+        #print(self.scale)
 
-    def generate_realizations(self, n, truncate=None):
+    def generate_realizations(self, n, truncate=None, progress=True):
         """ Generate realization of fractional levy motion
 
         :param n: Number of realizations to generate
         :param truncate: largest allowable fluctuation
+        :param progress: show progress bar
 
         :type n: int
         :type truncate: float or None
+        :type progress: bool
         """
 
-        self.realizations = np.zeros([n, self.N])
+        self.noise = np.zeros([n, self.N])
 
-        for i in tqdm.tqdm(range(n)):
+        for i in tqdm.tqdm(range(n), disable=(not progress)):
 
             if self.alpha == 2:
                 z = np.random.normal(0, scale=self.scale, size=self.Na)
             else:
-                if truncate is None:
-                    z = levy_stable.rvs(self.alpha, 0, loc=0, scale=self.scale, size=self.Na)
-                else:
-                    z = np.zeros(self.Na)
-                    # TODO: generate all of them then replace all values with new rvs until all under truncate.
-                    for j in tqdm.tqdm(range(self.Na)):
-                        rv = levy_stable.rvs(self.alpha, 0, loc=0, scale=self.scale)
-                        while rv > truncate:
-                            rv = levy_stable.rvs(self.alpha, 0, loc=0, scale=self.scale)
-                        z[j] = rv
+                z = levy_stable.rvs(self.alpha, 0, loc=0, scale=self.scale, size=self.Na)
+
+                if truncate is not None:
+                    too_big = np.where(np.abs(z) > truncate)[0]
+                    while too_big.size > 0:
+                        z[too_big] = levy_stable.rvs(self.alpha, 0, loc=0, scale=self.scale, size=too_big.size)
+                        too_big = np.where(np.abs(z) > truncate)[0]
+
+            #plt.hist(z, range=(-5, 5), bins=50, alpha=0.5, color='red', density=True)
 
             z = np.fft.fft(z, self.Na)
             w = np.fft.ifft(z * self.A, self.Na).real
 
-            self.realizations[i, :] = w[:self.N*self.m:self.m]
+            self.noise[i, :] = w[:self.N*self.m:self.m]
 
-        print(np.std(self.realizations.flatten()))
+        self.realizations = np.cumsum(self.noise, axis=1)
+
+        # print(self.realizations.max())
+        # plt.hist(self.realizations[0, :], range=(-5, 5), bins=50, alpha=0.5, color='blue', density=True)
+        # plt.show()
+        # exit()
 
     def plot_marginal(self, bounds=(-4, 4), bins=50, show=False):
         """ Plot a histogram of the marginal distribution of increments, with the expect PDF overlayed on top of it
@@ -97,7 +109,7 @@ class FLM:
 
         x = np.linspace(bounds[0], bounds[1], 1000)
 
-        hist, bin_edges = np.histogram(self.realizations.flatten(), bins=bins, range=bounds, density=True)
+        hist, bin_edges = np.histogram(self.noise.flatten(), bins=bins, range=bounds, density=True)
 
         # account for part of PDF that is chopped off. Using density=True makes hist sum to 1
         area_covered = levy_stable.cdf(bounds[1], self.alpha, 0, loc=0, scale=self.scale) - \
@@ -179,7 +191,7 @@ class FLM:
 
         plt.figure()
         for i in traj_no:
-            plt.plot(np.cumsum(self.realizations[i, :]), lw=2)
+            plt.plot(self.realizations[i, :], lw=2)
 
         plt.xlabel('Time', fontsize=14)
         plt.ylabel('Position', fontsize=14)
@@ -205,8 +217,7 @@ class FLM:
 
         plt.figure()
 
-        traj = np.cumsum(self.realizations, axis=1)
-        msds = timeseries.msd(traj.T[..., np.newaxis], 0)
+        msds = timeseries.msd(self.realizations.T[..., np.newaxis], 0)
 
         errorbars = timeseries.bootstrap_msd(msds, nboot, confidence=confidence)
         end = int(frac*self.N)
@@ -225,11 +236,13 @@ class FLM:
 
 if __name__ == "__main__":
 
-    np.random.seed(1)
-    flm = FLM(0.4, 1.5, C=1)
-    flm.generate_realizations(24, truncate=5)
-    flm.plot_marginal()
-    flm.plot_autocorrelation()
-    flm.plot_trajectory([0, 1])
+    # np.random.seed(1)
+    flm = FLM(0.39, 1.82378772, scale=0.2047838, M=4, N=100)
+    flm.generate_realizations(200, truncate=None)
+    print(flm.realizations.max())
+    flm.plot_marginal(show=True, bounds=(-1.5, 1.5))
+    exit()
+    #flm.plot_autocorrelation()
+    #flm.plot_trajectory([0, 1])
     flm.plot_msd(show=True)
 

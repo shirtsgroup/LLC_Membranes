@@ -4,6 +4,7 @@ import numpy as np
 from scipy.stats import expon
 from LLC_Membranes.analysis import Poly_fit
 from sympy import mpmath
+from scipy.optimize import minimize
 
 
 def log_power_law(x, a, alpha):
@@ -237,7 +238,9 @@ def hurst_autocovariance(K, H):
     """ Return the analytical autocovariance of fractional gaussian noise for a given hurst exponent as a function
     of step number, k
 
-    \gamma(k) = \dfrac{1}{2}[|k-1|^{2H} - 2|k|^{2H} + |k + 1|^{2H}]
+    .. math::
+
+        \gamma(k) = \dfrac{1}{2}[|k-1|^{2H} - 2|k|^{2H} + |k + 1|^{2H}]
 
     :param K: values of k at which to evaluate autocovariance (only integer values make sense)
     :param H: hurst exponent
@@ -246,3 +249,89 @@ def hurst_autocovariance(K, H):
     """
 
     return np.array([0.5 * (np.abs(k - 1)**(2*H) - 2 * np.abs(k)**(2*H) + np.abs(k + 1)**(2*H)) for k in K])
+
+
+def powerlaw_cutoff_mle(x, xmin=1., guess=(1.5, 0.1)):
+    r""" Given data, determine the maximum likelihood paramters, :math:`\alpha` and :math:`\lambda` for a power law with
+    an exponential cutoff. Based on `this answer
+    <https://mathoverflow.net/questions/66731/maximum-likelihood-estimator-for-power-law-with-exponential-cutoff#87969>`_
+    to a mathoverflow question.
+
+    The PDF for a power law with an exponential cut-off is:
+
+    .. math::
+
+        P(x; \alpha , \lambda , x_{min}) = \frac{\lambda^{1-\alpha}}{\Gamma (1-\alpha , \lambda x_{min})} x^{-\alpha}e^{-\lambda x}
+
+    There is no closed form formula for the MLE parameters, so we maximize the log likelihood:
+
+    .. math::
+
+        \mathcal{L} = n*(1 - \alpha)ln\lambda - n*ln\Gamma(1 - \alpha, x_{min}\lambda) - \alpha\sum_{i=1}^{n}ln x_i - \lambda\sum_{i=1}^n x_i
+
+    :param x: vector of data points
+    :param xmin: minimum x-value where power law behavior is observed
+    :param guess: initial guess at paramters (:math:`\alpha`, :math:`\lambda`)
+
+    :type x: numpy.ndarray
+    :type xmin: float
+    :type guess: tuple of floats
+
+    :return: MLE values of :math:`\alpha` and :math:`\lambda`
+    """
+
+    args = (x, xmin)
+
+    return minimize(powerlaw_cutoff_loglikelihood, np.array(guess), args=args, bounds=[(1, 3), (1e-10, np.inf)]).x
+
+
+def powerlaw_cutoff_loglikelihood(params, x, xmin=1.):
+    """ Calculate log likelihood that a power law with an exponential cut-off and paramters alpha and lamb fits the
+    data.
+
+    The likelihood function is:
+
+    .. math::
+
+        \mathcal{L} = n*(1 - \alpha)ln\lambda - n*ln\Gamma(1 - \alpha, x_{min}\lambda) - \alpha\sum_{i=1}^{n}ln x_i - \lambda\sum_{i=1}^n x_i
+
+    :param params: parameters of distribution in order [alpha, lambda]
+    :param x: data
+    :param xmin: minimum x-value where power law behavior is observed
+
+    :type params: tuple of floats
+    :type x: numpy.ndarray
+    :type xmin: float
+
+    :return: likelihood
+    :rtype: float
+    """
+
+    alpha, lamb = params[0], params[1]
+    a = x.size * np.log(lamb ** (1 - alpha) / float(mpmath.gammainc(1 - alpha, lamb * xmin)))
+    result = a - alpha * np.log(x).sum() - lamb * x.sum()
+
+    return -result
+
+
+def powerlaw_mle(x, xmin, guess=1.5):
+    r""" Return maximum likelihood estimate of parameters describing power law distribution.
+
+    .. math::
+
+        f(x) = Cx^{\alpha}
+
+    :param x: data
+    :param xmin: minimum x-value where power law behavior is observed
+    :param guess: initial guess at alpha
+
+    :type x: numpy.ndarray
+    :type xmin: float
+    :type guess: initial guess at :math:`\alpha`
+
+    :return: MLE estimate of :math:`alpha`
+    """
+
+    args = (x, xmin, True)  # (dwell times, xmin, maximize = True)
+
+    return minimize(power_law_discrete_log_likelihood, guess, args=args, bounds=[(1.01, 3)]).x[0]

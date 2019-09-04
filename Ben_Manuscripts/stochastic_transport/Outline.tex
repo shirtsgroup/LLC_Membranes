@@ -15,13 +15,10 @@
 \usepackage{gensymb}
 \usepackage{float}
 
-%MRS: better to have the first outline shorter to iterate more quickly!
-%BJC1: right, this one has been in the works for a while now. Wrote the anomalous diffusion methods a long time ago
-
 %MRS: better to have a title that described a finding, rather than the
 %approach used.  But we may need to wait a bit further until we can decide on a finding.
 %MRS: also 'stochastic modeling' is pretty vague.  should be more precise. 
-\title{Using Stochastic Modeling to Predict Long Timescale Transport Behavior of Solutes in an H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
+\title{Time Series Modeling of Solute Transport in an H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
 %MRS: we should discuss whether Chris Calderon would be on this one.  I would guess no, but I don't know for sure. 
 %BJC1: Yea maybe Chris as an acknowledgement on this one. He didn't directly contribute anything other than pointing
 %me towards Greg Morrin who pointed me towards useful anomalous diffusion literature.
@@ -34,15 +31,48 @@
   \maketitle
 
   \section{Introduction}
-  %BJC: obviously this section will get beefed up
-  %MRS1: I would start with something more central to the content of the paper - how do solutes move in complex separations membranes?  Let people know right from the start what the paper is about.  This paragraph should still be in the intro, but start with something that captures the main question of the paper. 
 
+  % MRS1: I would start with something more central to the content of the paper - how do solutes move in complex separations membranes?  Let people know right from the start what the paper is about.  This paragraph should still be in the intro, but start with something that captures the main question of the paper. 
+  % BJC2: This paragraph will need more tweaking but is the gist of what I'm thinking
+  Mathematical descriptions of transport in complex separations membranes are a powerful 
+  way to understand mechanisms and formulate membrane design principles.
+  \begin{itemize}
+    \item The complexity of a model generally parallels the complexity of the 
+    transport mechanism at hand, as well as the desired outputs.
+    \item In dense homogeneous membranes, the solution-diffusion model can extract
+    diffusion and partition coefficients and has successfully predicted solute transport
+    rates.
+    \item Analogously, pore-flow models yield predictions of diffusion coefficients
+    and solute transport rates in nanoporous membranes.~\cite{wijmans_solution-diffusion_1995}
+    \item Single particle tracking allows us to further characterize more complex
+    diffusive behavior.
+    \item Finally, Molecular simulation provides a framework for studying both single
+    particle dynamics and bulk transport properties with atomic resolution.
+    \item All of these approaches facilitate speculation on the molecular origins of
+    separations and suggest experiments that should be run by attempting to give a more
+    intuitive understanding of how solutes move as a function of their environment.
+%    \item The hydrodynamic Ferry model is the simplest pore-flow model, with extensions such
+%    as the Donnan-Steric Pore Model which includes extra terms for the pressure gradient
+%    across the membrane and membrane charge.
+%    \item Dischinger et al. created an empirical correlation to determine the
+%    effect of solute physicochemical properties on solute rejection.
+  \end{itemize}
+
+%  \begin{itemize}
+%    \item More recently, rapid advancements in computational power have made it feasible
+%    to observe transport in simulated systems with atomic resolution. This allows us to
+%    shift towards analysis of the motion of individual particles and gives an even more 
+%    fundamental understanding of observed bulk properties.
+%  \end{itemize}
+
+  % BJC1: tie this paragraph into above by commenting that highly selective membranes
+  % often have complex mechanistic reasons that aren't explained by simpler models
   We need highly selective membranes in order to perform efficient separations. \\
 
   \noindent Amphiphilic molecules are capable of self-assembling into ordered nanostructures.\\
 
   Lyotropic liquid crystals are a class of amphiphilic molecules that can be cross-linked
-  into mechanically strong membranes.
+  into mechanically strong and highly selective membranes.
   \begin{itemize}
   	\item H\textsubscript{II} phase lyotropic liquid crystals have densely packed, uniform
 	sized pores and have the potential to disrupt conventional membrane separation
@@ -111,6 +141,18 @@
   
   % BJC1: Flow chart here
   
+  % BJC2: moved this from below
+  Our first modeling approach is based on the anomalous diffusion literature, applying the 
+  mathematical formalism describing subdiffusive transport to observed solute 
+  trajectories.
+  \begin{itemize}
+    \item We determine the most likely subdiffusive mechanisms at play using the 
+    flow chart in figure X. 
+    \item We then fit anomalous diffusion models in two ways: First, based on a
+    single set of parameters. Second, we use a two-state approach incorporating
+    two sets of parameters based on a solute's radial distance from the pore center. 
+  \end{itemize}
+  
   While elegant, pure anomalous diffusion theory may in some cases give only a qualitative
   understanding of transport mechanisms.
   \begin{itemize}
@@ -125,7 +167,7 @@
   \begin{itemize}
   	\item We know that dynamics differ between solutes moving inside the pores and 
   	in the tails.
-  	\item We can use the anomalous diffusion approach to model to our data as a 
+  	\item We can use the anomalous diffusion approach to model our data as a 
   	function of radial distance from the closest pore center.
   	\item Alternatively, we can abandon the anomalous diffusion theory and adapt the 
   	methods of Markov state modeling.
@@ -149,6 +191,19 @@
   %do, by adding on modeling the z-diffusion as an auxiliary variable
   %of the state.  I think that's actually kind of innovative.
   
+  %BJC2: moved this paragraph up from below to clarify novelty of this approach
+  Our second modeling approach adapts the MSM framework to a relatively small set
+  of known states based on the three observed solute trapping mechanisms.
+  \begin{itemize}
+    \item Standard MSMs assume first order kinetics and are typically applied 
+    towards determining equilibrium populations of various state configurations.
+    \item We extend the framework to include dynamics within states and
+    between jumps. 
+    \item That is we incorporate the magnitude and temporal dependence of the 
+    time series fluctuations between each transition to a different state. 
+    \item Temporal dependence has a significant influence on mean squared displacement.
+  \end{itemize}
+  
   In this work we attempt to model the long timescale behavior of the four 
   fastest moving solutes studied in our previous work.
   \begin{itemize}
@@ -163,26 +218,6 @@
 %  	learning algorithm which groups solute behavior into different dynamical states.
   	% BJC: somewhere emphasize that this last approach is powerful since it doesn't 
   	% require anything different in systems with more complex geometries (i.e. QI)
-  \end{itemize}
-  
-  Our first approach is based on the anomalous diffusion literature, applying the 
-  mathematical formalism describing subdiffusive transport to observed solute 
-  trajectories.
-  \begin{itemize}
-    \item We determine the most likely subdiffusive mechanisms at play using the 
-    flow chart in figure X. 
-    \item We then fit anomalous diffusion models in two ways: First, based on a
-    single set of parameters. Second, we use a two-state approach incorporating
-    two sets of parameters based on a solute's radial distance from the pore center. 
-  \end{itemize}
-  
-  The second approach adapts the MSM framework to a relatively small set of known 
-  states based on the three observed solute trapping mechanisms.
-  \begin{itemize}
-    \item We extend the framework to include dynamics between jumps. 
-    \item That is we incorporate the magnitude and temporal dependence of the 
-    time series fluctuations between each transition to a different state. 
-    \item Temporal dependence has a significant influence on mean squared displacement.
   \end{itemize}
 
   % BJC: I've been trying to understand the following justification a bit more. Does it
@@ -290,8 +325,6 @@
     \item We recorded frames every 0.5 ns
   \end{itemize}
 
-  % MRS: you intend this to be a separate model than the above?  If so, make clearer.
-  % BJC1: renamed, is that what you meant?
   \subsection{The Anomalous Diffusion Model}\label{method:model_sFBM}
 
   Solutes in this system exhibit subdiffusive behavior, a type of anomalous diffusion.
@@ -403,6 +436,7 @@
 	
   % BJC1: not sure about this anymore. Might eventually change to Levy. But in the 
   % interest of simplicity, maybe leave it at Gaussian.
+  % BJC2: This will change to Levy. 
   For solutes in our system, the distribution of hop lengths appears to be
   well-represented by a Gaussian distribution.~\cite{metzler_random_2000,
   metzler_anomalous_2014,neusius_subdiffusion_2009}  % Note that this is different from the distribution of all increments (which is heavy-tailed)
@@ -522,7 +556,9 @@
 %  \end{itemize}
 
 
-  \subsection{Markov State Models}\label{method:MSMs}
+  \subsection{Markov State Models}\label{method:MSMs}  
+  % BJC2: still need a better name
+  % name candidates - correlated MSMs, Dynamical mode switching
   
   A Markov state model (MSM) decomposes a time series into a set of discrete states
   with transitions between states defined by a transition probability matrix, T,
@@ -552,11 +588,12 @@
   	\item The states we've chosen include all combinations of trapping mechanisms 
   	in the pore and out of the pore:
         %MRS: ``1. in tails and 5. in pores seem to encompass the things below them. Maybe us ``in tails, not trapped,'' etc. as the last entry in each column.'' 
+        %BJC2: good point
     \begin{table}[!htb]
 	  \centering
 	  \begin{tabular}{ll}
 	  \hline
-	  1. In tails                                  & 5. In pores                                  \\
+	  1. In tails, not trapped                     & 5. In pores, not trapped                     \\
 	  2. In tails and hydrogen bonding             & 6. In pores and hydrogen bonding             \\
 	  3. In tails and associated with sodium       & 7. In pores and associated with sodium       \\
 	  4. In tails, hydrogen bonding and associated & 8. In pores, hydrogen bonding and associated \\
@@ -610,6 +647,8 @@
     %\item The shape of the distributions are symmetric and heavy-tailed. 
   \end{itemize}
 
+  % BJC2: An abbreviated from of this paragraph probably belongs in previous section
+  % since I'll be using subordinated levy motion.
   \noindent We modeled the emission distributions as L\'evy stable distributions.  % cauchy is a case of a Levy stable distribution. The tails are too heavy though.
   \begin{itemize}
     \item For independent and identically distributed (iid) random variables, the 
@@ -684,7 +723,7 @@
     distribution respectively.
   \end{itemize}
   
-  %BJC: need to add some validation of Markovian behavior and time step choice.  
+  % BJC: need to add some validation of Markovian behavior and time step choice.  
 
   \section{Results and Discussion}
   
@@ -718,14 +757,16 @@
   \subsection{Subordinated Fractional Brownian Motion Modeling}\label{section:sFBM}
   
   Using the techniques from Section~\ref{method:model_sFBM}, we extracted values 
-  of $\sigma$, $\alpha$ and $H$ for each solute for the 1 and 2 mode models 
+  of $\sigma$, $\alpha$, $H$ and $\lambda$ for each solute for the 1 and 2 mode models 
   (see Table~\ref{table:sfbm_params}).
   \begin{itemize}
     \item In most cases, it is easy to relate the values of $\sigma$, $\alpha$ 
-    and $H$ presented in Table~\ref{table:sfbm_params} to the simulated MSD values . 
+    and $H$ presented in Table~\ref{table:sfbm_params} to the simulated MSD values. 
   	\item Higher values of $\sigma$ indicate larger average hop lengths.
   	\item Higher values of $\alpha$ mean that there will be less sampling of 
   	long dwell times.
+  	\item Higher values of $\lambda$ truncates the power law distribution earlier
+  	preventing extremely long dwell times.
   	\item Values of $H$ near the Brownian limit of 0.5, indicate a lower degree
   	of anti-correlation.
   	\item All of which contribute to an overall increase in the MSD.
@@ -749,7 +790,10 @@
   simulated trajectories.}\label{table:sfbm_params}
   \end{table}
 
-  \noindent We compared the MSD of simulated sFBM trajectories to MD simulated
+  % BJC2: Adding all combinations of distributions.
+  % Power law + Gaussian, Power law + Levy, Power law w/cutoff + Gaussian, Power Law w/cutoff + Levy
+  % BJC2: Probably a good idea to at least mention results when no anitcorrelation is included
+  \noindent We compared the MSD of simulated sFBM and sFLM trajectories to MD simulated
   MSDs.
   \begin{itemize}
 	\item We simulated 10000 sFBM trajectories of the same length as our MD
@@ -759,32 +803,61 @@
 	\item We would like to emphasize that we rely on the MD MSD values in order to
 	define trends in the total MSD, while the sFBM trajectories and parameter 
 	values allow us to speculate as to the reasons for the observed trends. 
-	\item There is a non-negligible amount of error in the calculation of 
-	each parameter which prevents us from reliably portraying our sFBM MSDs as
-	reduced	uncertainty MD MSDs.
+%	\item There is a non-negligible amount of error in the calculation of 
+%	each parameter which prevents us from reliably portraying our sFBM MSDs as
+%	reduced	uncertainty MD MSDs.
 	% BJC: I think it's more the power law tails that increases uncertainty.
+	% BJC2: Error looks relatively small now.
   \end{itemize}
   
-  % BJC1: yea we'll see
-  The two-mode sFBM model does a better job than the one-mode model at 
-  reproducing the MD MSD trends. 
-  %MRS1: will need to make the claims a bit more specific.
+  % BJC2: A qualitative comparison of sFLM trajectories to MD trajectories might be nice.
+  
+  \noindent The power law with exponential cut-off has the largest effect on the on 
+  the match between MD MSD and sFLM trajectories.
   \begin{itemize}
-    \item One-mode model generally undershoots MSDs.
+    \item Using the power law with cutoff produces predictions in relatively good agreement
+    with MD.
   \end{itemize}
+  
+  \noindent The choice between Levy and Gaussian distributions has only a small effect, 
+  but the Levy appears to fit emission distributions better.
 
-  %BJC: reduce this figure to solutes studied and put 3 bars for each solute: MD MSD, one-mode sfbm MSD, two-mode sfbm MSD
+  % BJC: reduce this figure to solutes studied and put 3 bars for each solute: MD MSD, 
+  % one-mode sfbm MSD, two-mode sfbm MSD.
+  % BJC2: Actually I think I prefer showing the MSD curves on one plot, like in my research journal. Since it shows shape.
   \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{all_emsds.pdf}
   \caption{}\label{fig:all_msds}
   \end{figure}
+  
+  \noindent We can use the model to project our simulations out to very long timescales.
+  \begin{itemize}
+    \item We can not definitively say which combination of distributions are best to use.
+    \item Although the longest observed dwell times and hop lengths are less than
+    the length of the simulated trajectories and box lengths respectively, it is still possible
+    that that extremely long dwell times and hops are observed experimentally in rare but
+    significant cases.
+    \item We present long timescale projections using combinations of each distribution in the
+    table below
+  \end{itemize}
+
+  % BJC2: table of long timescale projections using combinations of dwell and hop distributions. 
+  %% TABLE %%
 
   \subsection{Markov State Model Fits}\label{section:msm_results}
+  % BJC2: This section should parallel the previous section in terms of presentation of results.
+  
+  We constructed emission distributions which correspond to each entry in the transition
+  matrix.
+  \begin{itemize}
+    \item Some states are sampled far more frequently than other leading to better converged
+    distributions.
+  \end{itemize}
   
   The emission distributions are non-Gaussian and heavy-tailed (see Figure~\ref{fig:emissions_MET}).
   \begin{itemize}
-    \item The heavy tails of the distribution are a consequence of hopping.
+    %\item The heavy tails of the distribution are a consequence of hopping.
     \item Heavily sampled states fit well to L\'evy stable distributions.
     \item The rarer states have less data, but we still assume L\'evy stable distributions.
   \end{itemize}
@@ -796,59 +869,70 @@
   \includegraphics[width=\textwidth]{emissions_MET.pdf}
   \caption{}\label{fig:emissions_MET}
   \end{figure}
-
-  % BJC: need better or more descriptive way of describing stochastic simulations
-  % BJC: or could say that whenever we say simulations, we mean stochastic simulations unless it is specified as a molecular dynamics simulation.
-  % MRS: could say timeseries simulation?  MD is stochastic as well.
-  Simulating solute trajectories (see Section~\ref{method:MSMs}) by drawing independent  
-  observations from the emission distributions yields near linear MSD curves
-  with final values that are far higher than those observed in our molecular simulations.
+  
+  % BJC2: I need to look into the motion when a solute is trapped. It should have a very low H.
+  \noindent Motion within states is anticorrelated. 
   \begin{itemize}
-	% BJC: right number of solute trajectories to simulate for comparison? More tightens the error bars
-    \item In the case of methanol, the final MSD value is about 25x higher than that observed in our
-    previous transport study (see Figure~\ref{fig:msd_MET}).
-    \item The linear behavior of the MSD curve is not consistent with subdiffusion.
+    \item We calculated the self-similarity parameter for motion within each state.
   \end{itemize}
-  %MRS: so, is there a way we should have been able to tell beforrehand that this approach didn't work that we an explain?
-  %or can we show we needed to do this to get the results?
-  %BJC1: could just show autocorrelation function of all increments, which has negative dip at k=1 
-  %MRS1: sgounds good.
+  
+  \noindent The emissions resulting from transitions between states are anticorrelated.
+  \begin{itemize}
+    \item We simulated these emissions by combining all transition emissions into a single
+    distribution with a single self-similarity parameter.
+    \item We are unaware of techniques for simulating correlated draws from L\'evy distributions
+    with varying shapes.
+  \end{itemize}
+  
+  % BJC2: Could explore a second model with an emission distribution for transitions in tails versus pores.
+
+  % BJC2: FIGURE: autocorrelation of motion while trapped in a state and autocorrelation of emissions.
+  
+  % BJC2: This figure will show predicted MSDs versus MD MSDs
   \begin{figure}[!h]
   \centering
   \includegraphics[width=0.5\textwidth]{MET_msd.pdf}
   \caption{}\label{fig:msd_MET}
   \end{figure}
   
-  \noindent Anti-correlation between hops may be responsible for subdiffusive behavior.
-  \begin{itemize}
-    \item In general, we observe negative correlation between hops.
-    \item A L\'evy driven OU process may be a more appropriate way to model
-    the stochastic dynamics of this system since you can incorporate autocorrelation.
-    \item Extracting reliable correlation functions is difficult with our data
-    due to relatively frequent switching resulting in sets of short disjoint time 
-    series describing each state.
-    % \item Therefore we did not do this and attempted to fit a different model. 
-    %BJC: we could add some artificial correlation to prove the anti-correlation hypothesis
-  \end{itemize}
+%  \noindent Anti-correlation between hops may be responsible for subdiffusive behavior.
+%  \begin{itemize}
+%    \item In general, we observe negative correlation between hops.
+%    \item A L\'evy driven OU process may be a more appropriate way to model
+%    the stochastic dynamics of this system since you can incorporate autocorrelation.
+%    \item Extracting reliable correlation functions is difficult with our data
+%    due to relatively frequent switching resulting in sets of short disjoint time 
+%    series describing each state.
+%    % \item Therefore we did not do this and attempted to fit a different model. 
+%    %BJC: we could add some artificial correlation to prove the anti-correlation hypothesis
+%  \end{itemize}
+
+  We projected the long timescale behavior using this model. 
+  %BJC2: TABLE. 
+  %BJC2: Would probably be best to combine this with table from anomalous diffusion.
 
   \section{Conclusion}
 
   % MRS1: will want to make a stateemnt about whether these approaches
   % are together good enough for predictive purposes, and if not,
   % explore what else should be done in the future.
+  % BJC2: It seems like it would be hard to make say these can be used
+  % for prediction without experimental confirmation of the trends that we observe.
   
   We have tested two different mathematical frameworks for describing solute
   motion in an H\textsubscript{II} phase LLC membrane.
   \begin{itemize}
-    \item Markov state modeling with predefined states gives a nice description
-    of transitions between observed states as well as the type of stochastic 
-    behavior shown in each state. However, it doesn't accurately portray correlated
-    time series behavior leading to overpredicted MSDs.
     \item Subordinated fractional Brownian motion has a nice theoretical foundation
     in the anomalous diffusion literature. A two mode model that describes dynamics
     based on whether a solute is in or out of the pore region leads to MSDs fairly
     consistent with MD simulated trajectories.
+    \item Markov state modeling with predefined states gives a nice description
+    of transitions between observed states as well as the type of stochastic 
+    behavior shown in each state. However, it doesn't accurately portray correlated
+    time series behavior leading to overpredicted MSDs.
   \end{itemize}
+  
+  
  
   \section*{Supporting Information}
 

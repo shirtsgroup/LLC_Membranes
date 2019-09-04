@@ -4,12 +4,13 @@ import argparse
 import numpy as np
 import tqdm
 import sys
-from LLC_Membranes.llclib import timeseries, fitting_functions, stats, sampling
+from LLC_Membranes.llclib import timeseries, fitting_functions, stats, rand
 from LLC_Membranes.analysis import Poly_fit
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
 import time as timer
 import fbm
+from LLC_Membranes.timeseries.fractional_levy_motion import FLM
 
 
 def initialize():
@@ -55,11 +56,11 @@ class CTRW(object):
                  lamb=0.5, padding=10, dt=1, nt=1, H=0.5, transition_matrix=None):
         """ Initialize simulation of a continuous time random walk
 
-        :param length: length of each simulated trajectory. If you fix the number of steps, this equals the number of
+        :param length: length of each simulated trajectory. If you fix the number of steps, this equals the number of \
         steps. If you fix the time, the total length of the simulation is length * dt
         :param ntraj: number of independent trajectories to generate
         :param nmodes: number of modes. There should be sigma, alpha and H parameters for each mode
-        :param hop_dist: Method used to generate random hop lengths. "gaussian" draws randomly from a gaussian
+        :param hop_dist: Method used to generate random hop lengths. "gaussian" draws randomly from a gaussian \
         distribution, while "fbm" generates correlated hops as in fractional brownian motion.
         :param dwell_dist: Name of probability distribution function used to generate random dwell times
         :param hop_sigma: Sigma for Gaussian hop_dist random draws
@@ -68,9 +69,9 @@ class CTRW(object):
         :param padding: multiplies number of discrete time points used to interpolate trajectories
         :param dt: time step for fixed time simulations
         :param nt: number of threads to use where parallelized
-        :param H: Hurst parameter for fractional brownian motion. Equals 2*alpha for pure FBM. For H < 0.5, trajectories
-        are subdiffusive, when H = 0.5, brownian motion is recovered.
-        :param transition_matrix: nmode x nmode matrix of transition probabilties between states. Only needed if
+        :param H: Hurst parameter for fractional brownian motion. Equals 2*alpha for pure FBM. For H < 0.5, \
+        trajectories are subdiffusive, when H = 0.5, brownian motion is recovered.
+        :param transition_matrix: nmode x nmode matrix of transition probabilties between states. Only needed if \
         nmodes > 1.
 
         :type length: int
@@ -93,9 +94,9 @@ class CTRW(object):
         self.hop_distribution = hop_dist
         self.hop_sigma = hop_sigma
         self.dwell_distribution = dwell_dist
-        self.lamb = lamb
-        self.alpha = alpha
         self.padding = padding
+        self.alpha = alpha
+        self.lamb = lamb
         self.dt = dt
         self.nt = nt
         self.H = H
@@ -124,18 +125,21 @@ class CTRW(object):
         # Initialize multi-threading
         self.pbar = None
 
-    def generate_trajectories(self, fixed_time=False, noise=0, ll=0.1, limit=None, distributions=None, discrete=False):
+    def generate_trajectories(self, max_hop=None, fixed_time=False, noise=0, ll=0.1, limit=None, distributions=None,
+                              discrete=False):
         """ Create trajectories by randomly drawing from dwell and hop distributions
 
+        :param max_hop: maximum distance a solute can hop
         :param fixed_time: Propagate each trajectory until a certain wall time is reached
         :param noise: add gaussian noise to final trajectories
         :param ll: lower limit of power law distribution
-        :param limit: upper limit on dwell time length (As implemented, this is not mathematically sound, so it's only
+        :param limit: upper limit on dwell time length (As implemented, this is not mathematically sound, so it's only \
         for demonstration purposes)
-        :param distributions: distributions of alpha and sigma values for dwell and hop length distributions
+        :param distributions: distributions of alpha and sigma values for dwell and hop length distributions \
         respectively. Passed as 2-tuple of arrays where each array contains a possible values of each parameter.
         :param discrete: pull from discrete dwell time probability distributions
 
+        :type max_hop: float or NoneType
         :type fixed_time: bool
         :type noise: float
         :type ll: list of floats
@@ -148,20 +152,23 @@ class CTRW(object):
             ll = [ll]
 
         if fixed_time:
-            self.fixed_time_trajectories(ll=ll, distributions=distributions, discrete=discrete, noise=noise)
+            self.fixed_time_trajectories(ll=ll, distributions=distributions, discrete=discrete, noise=noise,
+                                         max_hop=max_hop)
         else:
             self.fixed_steps_trajectories(noise=noise, nt=self.nt, ll=ll, limit=limit)
 
-    def fixed_time_trajectories(self, ll=1, distributions=None, discrete=False, noise=0):
+    def fixed_time_trajectories(self, ll=1, distributions=None, discrete=False, noise=0, max_hop=None):
         """ Create trajectories of fixed length where dwell times and hop lengths are drawn from the appropriate
         distributions.
 
+        :param max_hop: maximum distance a solute can hop
         :param ll: lower limit of power law distribution
-        :param distributions: distributions of alpha and sigma values for dwell and hop length distributions
+        :param distributions: distributions of alpha and sigma values for dwell and hop length distributions \
         respectively. Passed as 2-tuple of arrays where each array contains a possible values of each parameter.
         :param discrete: pull from discrete dwell time probability distributions
         :param noise: add Gaussian noise to final trajectories
 
+        :type max_hop: float or NoneType
         :type ll: list of floats
         :type distributions: tuple
         :type discrete: bool
@@ -173,40 +180,49 @@ class CTRW(object):
 
         self.time_uniform = np.linspace(0, self.nsteps, self.nsteps * self.padding)
 
+        # generate ntraj realizations
         for t in tqdm.tqdm(range(self.ntraj)):
 
+            # Get H, alpha and sigma parameter values
             if distributions is not None:
 
-                if self.dwell_distribution == 'exponential':
-                    self.lamb = [np.random.choice(distributions[0][m]) for m in range(self.nmodes)]
-                elif self.dwell_distribution == 'power':
-                    self.alpha = [np.random.choice(distributions[0][m]) for m in range(self.nmodes)]
+                # if self.dwell_distribution == 'exponential':
+                #     self.lamb = [np.random.choice(distributions[0][m]) for m in range(self.nmodes)]
+                # elif self.dwell_distribution == 'power':
+                #     self.alpha = [np.random.choice(distributions[0][m]) for m in range(self.nmodes)]
 
-                self.hop_sigma = [np.random.choice(distributions[1][m]) for m in range(self.nmodes)]
-                self.H = [np.random.choice(distributions[2][m]) for m in range(self.nmodes)]
-                #self.H = [0.5]#, 0.5]  # forced Brownian
+                dwell_parameters = [distributions[0][m][np.random.choice(len(distributions[0][m]))] for m in range(self.nmodes)]
+                hop_parameters = [distributions[1][m][np.random.choice(len(distributions[1][m]))] for m in range(self.nmodes)]
+
+                # make flexible enough to allow one hurst parameter in pseudo-two-mode model
+                hurst_modes = len(distributions[2])
+                H = [distributions[2][m][np.random.choice(len(distributions[2][m]))] for m in range(hurst_modes)]
 
             time = [0]
-            total_time = 0  # saves a lot of time
+            total_time = 0
 
-            # randomly choose initial state from uniform distribution
+            # randomly choose initial mode from uniform distribution
             mode = 0
             if self.nmodes > 1:
                 mode = np.random.randint(self.nmodes)
             mode_sequence = list()
 
+            # Determine when hops occur
             while total_time < self.nsteps:
 
                 mode_sequence.append(mode)
 
                 # hop at random time intervals according to one of the following PDFs
-                if self.dwell_distribution == 'exponential':
-                    time.append(sampling.random_exponential_dwell(self.lamb[mode]))
-                elif self.dwell_distribution == 'power':
+                if self.dwell_distribution.lower() in ['exponential']:
+                    time.append(rand.random_exponential(dwell_parameters[mode]))  # needs testing if ever used again
+                elif self.dwell_distribution.lower() in ['power', 'powerlaw', 'power law']:
                     if self.alpha == 1:
                         time.append(1)
                     else:
-                        time.append(sampling.random_power_law_dwell(1 + self.alpha[mode], ll=ll[mode], discrete=discrete)[0])
+                        time.append(rand.random_powerlaw(1 + dwell_parameters[mode], ll=ll[mode], discrete=discrete)[0])
+                elif self.dwell_distribution.lower() in ['power law exponential cutoff', 'powerlaw_cutoff']:
+                        time.append(rand.random_powerlaw_cutoff(1 + dwell_parameters[mode][0], dwell_parameters[mode][1]
+                                                                , xmin=ll[mode])[0])
                 else:
                     sys.exit('Please enter a valid dwell time probability distribution')
                 total_time += time[-1]
@@ -216,15 +232,18 @@ class CTRW(object):
                     mode = np.random.choice(self.nmodes, p=self.transition_matrix[mode, :])
 
             time = np.cumsum(time)
-            switch_points = timeseries.switch_points(mode_sequence)
-            switch_points[-1] += 1  # this makes sure 'end' below covers all the points
             z = np.zeros(len(time))
 
+            switch_points = timeseries.switch_points(mode_sequence)
+            switch_points[-1] += 1  # this makes sure 'end' below covers all the points
+
+            # get hop lengths and directions
             for pt in range(switch_points.size - 1):
 
                 begin = switch_points[pt]
                 end = switch_points[pt + 1]
                 length = int(end - begin)  # length of segment
+
                 mode = mode_sequence[pt]  # mode we are in
 
                 if self.hop_distribution in ['gaussian', 'Gaussian']:
@@ -233,11 +252,29 @@ class CTRW(object):
                     if begin > 0:
                         z[begin:end] += z[begin - 1]
 
-                elif self.hop_distribution in ['fbm', 'fractional', 'fraction_brownian_motion']:
+                elif self.hop_distribution in ['fbm', 'fractional', 'fractional_brownian_motion']:
 
-                    z[begin:end] = fbm.FBM(length, self.H[mode], method="daviesharte").fbm()[1:]  # automatically inserts zero at beginning of array
-                    z[begin:end] /= ((1.0 / length) ** self.H[mode])  # reversing a normalization done in the fbm code
-                    z[begin:end] *= self.hop_sigma[mode]
+                    hurst = H[mode] if hurst_modes == self.nmodes else H[0]
+
+                    z[begin:end] = fbm.FBM(length, hurst, method="daviesharte").fbm()[1:]  # automatically inserts zero at beginning of array
+                    z[begin:end] /= ((1.0 / length) ** hurst)  # reversing a normalization done in the fbm code
+                    z[begin:end] *= hop_parameters[mode][1]
+                    if begin > 0:
+                        z[begin:end] += z[begin - 1]
+
+                elif self.hop_distribution in ['flm', 'fractional_levy_motion']:
+
+                    hurst = H[mode] if hurst_modes == self.nmodes else H[0]
+
+                    # TODO: Best way to get H. Where to truncate
+                    flm = FLM(hurst, hop_parameters[mode][0], scale=hop_parameters[mode][2], N=length, M=4)
+
+                    flm.generate_realizations(1, progress=False, truncate=None)
+                    if max_hop is not None:  # brute force but will have to do until there is a better FLM procedure
+                        while np.absolute(flm.noise[0, :length]).max() > max_hop:
+                            flm.generate_realizations(1, progress=False, truncate=None)
+
+                    z[begin:end] = flm.realizations[0, :length]
                     if begin > 0:
                         z[begin:end] += z[begin - 1]
 
@@ -309,9 +346,9 @@ class CTRW(object):
 
             # hop at random time intervals according to one of the following PDFs
             if self.dwell_distribution == 'exponential':
-                time = sampling.random_exponential_dwell(self.lamb, size=self.nsteps)
+                time = rand.random_exponential(self.lamb, size=self.nsteps)
             elif self.dwell_distribution == 'power':
-                time = sampling.random_power_law_dwell(1 + self.alpha, size=self.nsteps, ll=ll, limit=limit)
+                time = rand.random_powerlaw(1 + self.alpha, size=self.nsteps, ll=ll, limit=limit)
             else:
                 sys.exit('Please enter a valid dwell time probability distribution')
 
@@ -478,17 +515,27 @@ class CTRW(object):
 
         return [A[0], A[1]]
 
-    def plot_msd(self, confidence=95, plot_power_law=False, plot_linear=False, show=True, end_frame=None):
+    def plot_msd(self, confidence=95, plot_power_law=False, plot_linear=False, show=True, end_frame=None, newfig=True):
         """ Plot averaged mean squared displacement with error bars
 
         :param confidence: confidence interval for error bars
         :param plot_power_law: if True, fit power law to MSD
+        :param plot_linear: if True, fit a line to MSD
+        :param show: if True, show plot after this function is run
+        :param end_frame: last frame to include in fit to MSD
+        :param newfig: Make this a figure of its own. Set to False if trying to plot multiple MSDs on top of each other
+        using this function.
 
         :type confidence: float
         :type plot_power_law: bool
+        :type plot_linear: bool
+        :type show: bool
+        :type end_frame: int
+        :type newfig: bool
         """
 
-        plt.figure()
+        if newfig:
+            plt.figure()
 
         mean = self.msd.mean(axis=0)
 
@@ -502,7 +549,7 @@ class CTRW(object):
             error = stats.confidence_interval(self.bootstraps, confidence)
             if end_frame is not None:
                 error = error[:, :end_frame]
-            plt.fill_between(self.time_uniform, error[1, :] + mean, mean - error[0, :], alpha=0.7)
+            plt.fill_between(self.time_uniform, error[1, :] + mean, mean - error[0, :], alpha=0.5)
             self.final_msd = [mean[-1], mean[-1] - error[0, -1], error[1, -1] + mean[-1]]
             print('Estimated MSD: %.2f [%.2f, %.2f]' % (self.final_msd[0], self.final_msd[1], self.final_msd[2]))
 
@@ -560,10 +607,10 @@ class CTRW(object):
         """ Plot autocorrelation function
 
         :param show: show plot
+        :param fit: fit the autocorrelation function for subordinate fractional brownian motion to acf
 
         :type show: bool
-
-        :return:
+        :type fit: bool
         """
 
         # acf = self.acf.mean(axis=0)
