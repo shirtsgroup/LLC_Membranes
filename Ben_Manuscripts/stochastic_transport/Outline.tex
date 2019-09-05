@@ -34,6 +34,9 @@
 
   % MRS1: I would start with something more central to the content of the paper - how do solutes move in complex separations membranes?  Let people know right from the start what the paper is about.  This paragraph should still be in the intro, but start with something that captures the main question of the paper. 
   % BJC2: This paragraph will need more tweaking but is the gist of what I'm thinking
+  % BJC2: I'm not sure if this is exactly what you meant though
+%  Making sense of solute motion in complex separations membranes is central to 
+%  understanding transport mechanisms and formulating membrane design principles.
   Mathematical descriptions of transport in complex separations membranes are a powerful 
   way to understand mechanisms and formulate membrane design principles.
   \begin{itemize}
@@ -67,7 +70,8 @@
 
   % BJC1: tie this paragraph into above by commenting that highly selective membranes
   % often have complex mechanistic reasons that aren't explained by simpler models
-  We need highly selective membranes in order to perform efficient separations. \\
+  These approaches can be especially useful for designing highly selective membranes. \\
+  %BJC2: this paragraph will contain examples of highly selective separations
 
   \noindent Amphiphilic molecules are capable of self-assembling into ordered nanostructures.\\
 
@@ -85,6 +89,7 @@
   We can only learn so much from experiment. MD can give us mechanistic insights with
   atomistic resolution so that we can intelligently design new membranes for 
   solute-specific separations.\\
+  %BJC2: simple models from first paragraph fail to adequately describe transport.
 
   \noindent In our previous work, we studied the transport of 20 small polar molecules
   in an H\textsubscript{II} phase LLC membrane.
@@ -98,7 +103,7 @@
 
   Unfortunately, the timescales that we can simulate with MD are insufficient to be
   able to make well-converged predictions of macroscopic transport properties 
-  traditionally used to characterize membranes in the lab. \\
+  traditionally used to characterize membranes in the lab.
   \begin{itemize}
     \item However, if we use descriptive stochastic models that sufficiently capture solute
     dynamics, then we could project long timescale behavior in addition to gaining
@@ -162,16 +167,16 @@
     \item In this case, a state based model may be useful. 
   \end{itemize}
   
-  \noindent We can use the observations of transport from our previous work in order to create 
-  state-based models.
-  \begin{itemize}
-  	\item We know that dynamics differ between solutes moving inside the pores and 
-  	in the tails.
-  	\item We can use the anomalous diffusion approach to model our data as a 
-  	function of radial distance from the closest pore center.
-  	\item Alternatively, we can abandon the anomalous diffusion theory and adapt the 
-  	methods of Markov state modeling.
-  \end{itemize}
+%  \noindent We can use the observations of transport from our previous work in order to create 
+%  state-based models.
+%  \begin{itemize}
+%  	\item We know that dynamics differ between solutes moving inside the pores and 
+%  	in the tails.
+%  	\item We can use the anomalous diffusion approach to model our data as a 
+%  	function of radial distance from the closest pore center.
+%  	\item Alternatively, we can abandon the anomalous diffusion theory and adapt the 
+%  	methods of Markov state modeling.
+%  \end{itemize}
 
   % moved parts of method to here.
   Markov state models (MSMs) are a popular class of models used to project long timescale
@@ -204,8 +209,8 @@
     \item Temporal dependence has a significant influence on mean squared displacement.
   \end{itemize}
   
-  In this work we attempt to model the long timescale behavior of the four 
-  fastest moving solutes studied in our previous work.
+  In this work we apply the two modeling approaches in order to predict the long
+  timescale behavior of the four fastest moving solutes studied in our previous work.
   \begin{itemize}
     \item Specifically, we study methanol, urea, ethylene glycol and acetic acid
     \item In addition to moving quickly, these solutes have a range of chemical
@@ -213,7 +218,6 @@
     degrees.
     \item It is our goal to reproduce the MSDs exhibited by each solute on MD timescales
     and then to project the long-term dynamics of each solute. 
-    \item We explore two modeling approaches
 %  	\item The third uses an infinite hidden Markov model (iHMM), an unsupervised machine
 %  	learning algorithm which groups solute behavior into different dynamical states.
   	% BJC: somewhere emphasize that this last approach is powerful since it doesn't 
@@ -277,7 +281,7 @@
   \section{Methods}
     
   We ran all MD simulations and energy minimizations using GROMACS 2018. We  % needs gromacs citations
-  performed all post-simulation trajectory using python scripts which are available
+  performed all post-simulation trajectory analysis using python scripts which are available
   %MRS: eventually want to say what scripts were used to do what, but that is not at the outline stage!
   %BJC1: I usually put a table like that in the SI. Is that sufficient?
   online at \\ \texttt{https://github.com/shirtsgroup/LLC\_Membranes}.
@@ -324,6 +328,9 @@
     respectively.
     \item We recorded frames every 0.5 ns
   \end{itemize}
+  
+  We determined equilibration based on the solute partition between the pore and tail
+  region.
 
   \subsection{The Anomalous Diffusion Model}\label{method:model_sFBM}
 
@@ -390,6 +397,7 @@
   % BJC1: modified this paragraph to parallel the flow chart. I'm still not sure the
   % best place for this. It seems like it belongs in the discussion, but I need to 
   % justify the choice in model so I can write the methods about the chosen models
+  % BJC2: Perhaps just say that we think it's sFBM and move the proof to discussion.
   \noindent We believe that solutes in the system studied here exhibit subordinated 
   fractional Brownian motion (sFBM) where the parent process is FBM and the 
   leading process is a CTRW. 
@@ -453,7 +461,7 @@
 	empirical dwell times to a discrete power law distribution whose maximum
 	likelihood $\alpha$ parameter we calculated by maximizing the following
 	likelihood function: 
-        \begin{equation}
+    \begin{equation}
 	\mathcal{L}(\beta) = -n\text{ln}\zeta(\beta, x_{min}) -
 	\beta\sum_{i=1}^{n} \text{ln}~x_i 
 	\label{eqn:powerlaw_likelihood}
@@ -463,12 +471,28 @@
 	where $x_{min}$ is the smallest measured value of
 	$x_i$.~\cite{clauset_power-law_2009} 
 	\item We obtained distributions of the hop length standard deviations, $\sigma$, and
-	$\alpha$ using statistical bootstrapping.\cite{efron_introduction_1994} 
-        %MRS1: can just say bootstrapping.
+	$\alpha$ using bootstrapping.\cite{efron_introduction_1994} 
   \end{itemize}
   
-  \noindent FBM processes can be described using the Hurst parameter, $H$, where 
-  $H = \beta/2$.
+  In practical applications, the heavy tail of power law distributions can result in 
+  arbitrarily long dwell times that are never observed in MD simulations. 
+  \begin{itemize}
+    \item We can not observe dwell times longer than the length of a single trajectory.
+    \item In fact the longest dwell time observed by solutes in this study is X.
+    \item In order to compare our anomalous diffusion model to MD results we need to 
+    bound the dwell time distribution.
+    \item We do this by adding an exponential cut-off to the power law so the dwell 
+    time distribution is of the form:
+    \begin{equation}
+    t^{-1 - \alpha}e^{-\lambda t}
+    \end{equation}
+    \item We determine MLEs of $\alpha$ and $\lambda$ by maximizing the likelihood function:~\cite{clauset_power-law_2009}
+    \begin{equation}
+    \mathcal{L}(\alpha, \lambda) = n*(1 - \alpha)ln\lambda - n*ln\Gamma(1 - \alpha, x_{min}\lambda) - \alpha\sum_{i=1}^{n}ln x_i - \lambda\sum_{i=1}^n x_i
+    \end{equation}
+  \end{itemize}
+  
+  \noindent FBM processes can be described using the Hurst parameter, $H$.
   \begin{itemize}
   	\item Brownian motion is recovered for $H = 0.5$
 	\item The autocovariance function of hop lengths has the analytical form:~\cite{mandelbrot_fractional_1968}
@@ -481,10 +505,44 @@
 	to the empirically measured autocovariance function.
 	\item We used statistical bootstrapping to generate a distribution of $H$ 
 	values. %BJC: can provide more detail in supporting or just reference python script
+	\item There are more complicated ways to calculate H but well-converged estimates 
+	require far more data than we have access to.
   \end{itemize}
   
-  In general, we observe different dynamical behavior when solutes move inside the
-  pore versus in the tail region.
+  \noindent If the distribution of hops is not Gaussian, we can model them with the
+  more general class of L\'evy stable distributions.
+  \begin{itemize}
+    \item For independent and identically distributed (iid) random variables, the 
+    generalized central limit theorem guarantees convergence of the associated 
+    probability distribution function (PDF) to a L\'evy stable PDF. \cite{klages_anomalous_2008}
+    % BJC: ``For sums of independent, iid random variables with proper normalization to the
+%    sample size, the generalized central limit theorem guarantees the convergence of
+%    the associated PDF to a L\'evy stable PDF even though the variance of these random
+%    variables diverges." \cite{klages_anomalous_2008}  % BJC: reword
+    \item The characteristic equation describing the Fourier transform of a L\'evy 
+    stable PDF is given below:
+    \begin{equation}
+    p_{\alpha, \beta}(k;\mu,\sigma) =\exp\left[i\mu k - \sigma^{\alpha}|k|^{\alpha}\left(1 - i\beta\frac{k}{|k|}\omega(k, \alpha)\right)\right]
+    \end{equation}
+    \item Where $\omega$ is defined with something that is complicated to format and can be 
+    added later if I keep these formulas in. % https://tex.stackexchange.com/questions/32140/how-to-write-a-function-piecewise-with-bracket-outside
+    \item $\alpha$ is the index of stability or L\'evy index, $\beta$ is the skewness 
+    parameter, $\mu$ is the shift parameter and $\sigma$ is a scale parameter.
+    \item The most familiar case, and 1 of 3 that can be expressed in terms of elementary
+    functions, is the Gaussian PDF ($\alpha$ = 2).
+    \item We assume symmetric distributions centered about 0 implying that $\beta$ and $\mu$ are both 0.
+  \end{itemize}
+  
+  \noindent If the hops are correlated, we can describe their motion as subordinated 
+  fractional L\'evy motion.
+  \begin{itemize}
+    \item The hurst parameter can again be used to describe the degree of anitcorrelation.
+    \item It has the form: %BJC2: need to see if there is an analytical form for H
+    %BJC2: might need to use a different way to estimate H (which is more standard): https://pypi.org/project/hurst/
+  \end{itemize}
+  
+  In general, we observe different dynamical behavior when solutes move while inside 
+  the pore versus while in the tail region.
   %MRS: could present the two models sequentiually.  Talk about one COULD have multiple modes, then in results present 1, then 2. 
   \begin{itemize}
     \item This inspired two models of varying complexity.
@@ -499,7 +557,7 @@
   \end{itemize}
   
   For the two mode model, we needed to define a probability transition matrix 
-  describing transitions between the tail and pore region. 
+  describing transitions between the tail and pore region. \\
 
 %  We generated distributions of parameters for the dwell time and hop length
 %  distributions using statistical bootstrapping.
@@ -516,12 +574,15 @@
 	\item We constructed trajectories by simulating	sequences of dwell times and correlated 
 	hop	lengths generated based on parameters randomly chosen from our bootstrapped parameter
 	distributions.
+	\item We use the python package \texttt{fbm} to simulate fractional Brownian motion and 
+	our own implementation of the algorithm by Stoev and Taqqu to simulation fraction L\'evy motion.~\cite{stoev_simulation_2004}
 	\item We propagated each trajectory until the total time equaled or exceeded 5 $\mu$s, 
 	then truncated the last data point so that the total time exactly equaled 5 $\mu$s. 
     \item Valid comparisons are only possible between fixed length sFBM simulations. The
     power law dwell time behavior gives rise to the aging phenomenon, embodied by
     a decrease in MSD with measurement time.~\cite{neusius_subdiffusion_2008,metzler_anomalous_2014}
-    \item We reported the MSD after 5 $\mu$s with corresponding 95 \% intervals
+    \item We reported the time-averaged MSD after 2 $\mu$s time lags with corresponding 
+    95 \% intervals
 % Following probably better suited for supporting information, if included at all
 %	\item We randomly sample Gaussian hop lengths using the
 %	\texttt{numpy.random.normal} method of the \texttt{numpy} python package.
@@ -644,47 +705,48 @@
     the transition dynamics is even more important.
     \item This results in 64 distinct emission distributions. Some are far more
     populated than others. % BJC1: need to look into lumping transition emissions into one distribution
+    \item We modeled the emission distributions as L\'evy stable distributions. 
     %\item The shape of the distributions are symmetric and heavy-tailed. 
   \end{itemize}
 
-  % BJC2: An abbreviated from of this paragraph probably belongs in previous section
+  % BJC2: Moved the meat of this paragraph to previous section
   % since I'll be using subordinated levy motion.
-  \noindent We modeled the emission distributions as L\'evy stable distributions.  % cauchy is a case of a Levy stable distribution. The tails are too heavy though.
-  \begin{itemize}
-    \item For independent and identically distributed (iid) random variables, the 
-    generalized central limit theorem guarantees convergence of the associated 
-    probability distribution function (PDF) to a L\'evy stable PDF. \cite{klages_anomalous_2008}
-    % BJC: ``For sums of independent, iid random variables with proper normalization to the
-%    sample size, the generalized central limit theorem guarantees the convergence of
-%    the associated PDF to a L\'evy stable PDF even though the variance of these random
-%    variables diverges." \cite{klages_anomalous_2008}  % BJC: reword
-    \item The characteristic equation describing the Fourier transform of a L\'evy 
-    stable PDF is given below:
-    \begin{equation}
-    p_{\alpha, \beta}(k;\mu,\sigma) =\exp\left[i\mu k - \sigma^{\alpha}|k|^{\alpha}\left(1 - i\beta\frac{k}{|k|}\omega(k, \alpha)\right)\right]
-    \end{equation}
-    \item Where $\omega$ is defined with something that is complicated to format and can be 
-    added later if I keep these formulas in. % https://tex.stackexchange.com/questions/32140/how-to-write-a-function-piecewise-with-bracket-outside
-    \item $\alpha$ is the index of stability or L\'evy index, $\beta$ is the skewness 
-    parameter, $\mu$ is the shift parameter and $\sigma$ is a scale parameter.
-    \item The most familiar case, and 1 of 3 that can be expressed in terms of elementary
-    functions, is the Gaussian PDF ($\alpha$ = 2).
-    \item The more general family of L\'evy stable distributions allows
-    greater flexibility in defining the observed emission distribution PDFs.
-    \item In the case that the empirical emission distributions are iid, sequential draws
-    from a L\'evy stable PDF defines a L\'evy process. 
-    \item We can relax the iid assumption and maintain the flexibility of L\'evy stable 
-    probability distributions if we instead consider the dynamics to be governed by a
-    non-Gaussian Ornstein-Uhlenbeck (OU) process.\cite{barndorffnielsen_non-gaussian_2001} % BJC: replaces Wiener process with Levy process
-    %MRS1: you many consider putting some of the long explanations in supporrting. 
-    \item OU processes contain temporal dependence but the marginal observation distributions
-    are consistent with the underlying stochastic driver.~\cite{taufer_simulation_2009}
-    \item We will discuss the implications of each.  
-    % MRS: does the process described above include the motion within the state? That is something I feel that the
-    %standard MSM doesn't include either, since they are typically interested just in the distribution of states in equilibrium, not the diffusion. 
-    % BJC1: Right, I added a sentence to the paragraph before this one to make it clear that we
-    % are adding to the standard MSM.
-  \end{itemize}
+  \noindent  % cauchy is a case of a Levy stable distribution. The tails are too heavy though.
+%  \begin{itemize}
+%    \item For independent and identically distributed (iid) random variables, the 
+%    generalized central limit theorem guarantees convergence of the associated 
+%    probability distribution function (PDF) to a L\'evy stable PDF. \cite{klages_anomalous_2008}
+%    % BJC: ``For sums of independent, iid random variables with proper normalization to the
+%%    sample size, the generalized central limit theorem guarantees the convergence of
+%%    the associated PDF to a L\'evy stable PDF even though the variance of these random
+%%    variables diverges." \cite{klages_anomalous_2008}  % BJC: reword
+%    \item The characteristic equation describing the Fourier transform of a L\'evy 
+%    stable PDF is given below:
+%    \begin{equation}
+%    p_{\alpha, \beta}(k;\mu,\sigma) =\exp\left[i\mu k - \sigma^{\alpha}|k|^{\alpha}\left(1 - i\beta\frac{k}{|k|}\omega(k, \alpha)\right)\right]
+%    \end{equation}
+%    \item Where $\omega$ is defined with something that is complicated to format and can be 
+%    added later if I keep these formulas in. % https://tex.stackexchange.com/questions/32140/how-to-write-a-function-piecewise-with-bracket-outside
+%    \item $\alpha$ is the index of stability or L\'evy index, $\beta$ is the skewness 
+%    parameter, $\mu$ is the shift parameter and $\sigma$ is a scale parameter.
+%    \item The most familiar case, and 1 of 3 that can be expressed in terms of elementary
+%    functions, is the Gaussian PDF ($\alpha$ = 2).
+%    \item The more general family of L\'evy stable distributions allows
+%    greater flexibility in defining the observed emission distribution PDFs.
+%    \item In the case that the empirical emission distributions are iid, sequential draws
+%    from a L\'evy stable PDF defines a L\'evy process. 
+%    \item We can relax the iid assumption and maintain the flexibility of L\'evy stable 
+%    probability distributions if we instead consider the dynamics to be governed by a
+%    non-Gaussian Ornstein-Uhlenbeck (OU) process.\cite{barndorffnielsen_non-gaussian_2001} % BJC: replaces Wiener process with Levy process
+%    %MRS1: you many consider putting some of the long explanations in supporrting. 
+%    \item OU processes contain temporal dependence but the marginal observation distributions
+%    are consistent with the underlying stochastic driver.~\cite{taufer_simulation_2009}
+%    \item We will discuss the implications of each.  
+%    % MRS: does the process described above include the motion within the state? That is something I feel that the
+%    %standard MSM doesn't include either, since they are typically interested just in the distribution of states in equilibrium, not the diffusion. 
+%    % BJC1: Right, I added a sentence to the paragraph before this one to make it clear that we
+%    % are adding to the standard MSM.
+%  \end{itemize}
   
   % BJC: quote from anomalous diffusion book:
   % "While the continuous time random walk model for Levy flights ... is a
@@ -721,6 +783,8 @@
     \item We randomly drew subsequent state transitions and corresponding emissions 
     from the rows of the probability transition matrix and the appropriate emission
     distribution respectively.
+    \item We added correlation between transitions as well as correlation to sequences
+    of emissions while dwelling in specific states.
   \end{itemize}
   
   % BJC: need to add some validation of Markovian behavior and time step choice.  
@@ -754,18 +818,27 @@
   Methanol and acetic acid are not fully equilibrated, therefore we did not use them
   to test our models.
 
-  \subsection{Subordinated Fractional Brownian Motion Modeling}\label{section:sFBM}
+  \subsection{Anomlaous Diffusion Modeling}\label{section:sFBM}
+  
+  %BJC2: I think it makes sense to show the data supporting that this is likely
+  % sFBM here in the discussion. The methods would just point here.
+  We determined that transport is likely governed by sFBM using the flow chart in
+  Figure X.
+  \begin{itemize}
+    \item Show weak ergodicity breaking, non-stationarity and correlation between hops
+    \item Geometric argument against random walk on fractal?
+  \end{itemize}
   
   Using the techniques from Section~\ref{method:model_sFBM}, we extracted values 
   of $\sigma$, $\alpha$, $H$ and $\lambda$ for each solute for the 1 and 2 mode models 
   (see Table~\ref{table:sfbm_params}).
   \begin{itemize}
-    \item In most cases, it is easy to relate the values of $\sigma$, $\alpha$ 
-    and $H$ presented in Table~\ref{table:sfbm_params} to the simulated MSD values. 
+    \item In most cases, it is easy to relate the parameter values 
+    Table~\ref{table:sfbm_params} to the simulated MSD values. 
   	\item Higher values of $\sigma$ indicate larger average hop lengths.
   	\item Higher values of $\alpha$ mean that there will be less sampling of 
   	long dwell times.
-  	\item Higher values of $\lambda$ truncates the power law distribution earlier
+  	\item Higher values of $\lambda$ truncate the power law distribution earlier
   	preventing extremely long dwell times.
   	\item Values of $H$ near the Brownian limit of 0.5, indicate a lower degree
   	of anti-correlation.
@@ -820,7 +893,7 @@
   \end{itemize}
   
   \noindent The choice between Levy and Gaussian distributions has only a small effect, 
-  but the Levy appears to fit emission distributions better.
+  but the Levy appears to fit emission distributions better. \\
 
   % BJC: reduce this figure to solutes studied and put 3 bars for each solute: MD MSD, 
   % one-mode sfbm MSD, two-mode sfbm MSD.
@@ -845,7 +918,7 @@
   % BJC2: table of long timescale projections using combinations of dwell and hop distributions. 
   %% TABLE %%
 
-  \subsection{Markov State Model Fits}\label{section:msm_results}
+  \subsection{Markov State Modeling}\label{section:msm_results}
   % BJC2: This section should parallel the previous section in terms of presentation of results.
   
   We constructed emission distributions which correspond to each entry in the transition
@@ -865,6 +938,7 @@
   % BJC: worth proving these are non-Gaussian? One might argue that they look Gaussian but they are not at all.
   % MRS: there are some simple statistical tests for Gaussianness you can use.  Also might br good to put the 
   % parameters with the plots, as it's hard to tell how different they may or may not be.
+  % BJC2: This figure is just 1 microsecond of data
   \begin{figure}[!h]
   \includegraphics[width=\textwidth]{emissions_MET.pdf}
   \caption{}\label{fig:emissions_MET}
@@ -932,8 +1006,6 @@
     time series behavior leading to overpredicted MSDs.
   \end{itemize}
   
-  
- 
   \section*{Supporting Information}
 
   Detailed explanations and expansions upon the results and procedures mentioned in
