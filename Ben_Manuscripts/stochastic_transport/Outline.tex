@@ -39,6 +39,7 @@
 %  understanding transport mechanisms and formulating membrane design principles.
   Mathematical descriptions of transport in complex separations membranes are a powerful 
   way to understand mechanisms and formulate membrane design principles.
+  % MRS3: seems pretty good.  We can tweak later when turning into text; I don't think that it will really affect the logic of the paper. The introduction will be important here to set the stage, but probably more of that will be in the next paragraph.
   \begin{itemize}
     \item The complexity of a model generally parallels the complexity of the 
     transport mechanism at hand, as well as the desired outputs.
@@ -49,7 +50,7 @@
     and solute transport rates in nanoporous membranes.~\cite{wijmans_solution-diffusion_1995}
     \item Single particle tracking allows us to further characterize more complex
     diffusive behavior.
-    \item Finally, Molecular simulation provides a framework for studying both single
+    \item Finally, molecular simulation provides a framework for studying both single
     particle dynamics and bulk transport properties with atomic resolution.
     \item All of these approaches facilitate speculation on the molecular origins of
     separations and suggest experiments that should be run by attempting to give a more
@@ -73,7 +74,8 @@
   These approaches can be especially useful for designing highly selective membranes. \\
   %BJC2: this paragraph will contain examples of highly selective separations
 
-  \noindent Amphiphilic molecules are capable of self-assembling into ordered nanostructures.\\
+  %MRS3: I'd omit next line (That I commented out); you talk about membranes above, so better to start the next paragraph talking about membranes.
+  %\noindent Amphiphilic molecules are capable of self-assembling into ordered nanostructures.\\
 
   Lyotropic liquid crystals are a class of amphiphilic molecules that can be cross-linked
   into mechanically strong and highly selective membranes.
@@ -84,9 +86,17 @@
 	functionality as well.
 	\item Q\textsubscript{I} phase LLCs consist of a tortuous network of 3D interconnected
 	pores. They are easier to make.
+        %MRS3: probably want to put a more here about why we are studing these membranes, and what advantages they might have, and why transport in them is complicated.  
   \end{itemize}
+  
+  %MRS3: One missing connection between the above information and what is in the paper would be making the connection between MD simulations
+  %and mathematical modeling, using MD to provide/justify the fuctional form and/or some of the parameters for the model, 
+  %rather than just experiment.
 
-  We can only learn so much from experiment. MD can give us mechanistic insights with
+  %MRS3: a suggested tweak in language
+  %We can only learn so much from experiment. 
+  There are limitations to what we can learn from experiment about the atomistic details of transport.
+  MD can give us mechanistic insights with
   atomistic resolution so that we can intelligently design new membranes for 
   solute-specific separations.\\
   %BJC2: simple models from first paragraph fail to adequately describe transport.
@@ -99,6 +109,7 @@
     \item We identified three mechanisms responsible for the solute trapping behavior:
     entanglement among monomer tails, hydrogen bonding with monomer head groups, and
     association with sodium counter ions.
+    %MRS3: point out that they were all subdiffusive (unlike water)
   \end{itemize}
 
   Unfortunately, the timescales that we can simulate with MD are insufficient to be
@@ -462,8 +473,9 @@
 	likelihood $\alpha$ parameter we calculated by maximizing the following
 	likelihood function: 
     \begin{equation}
-	\mathcal{L}(\beta) = -n\text{ln}\zeta(\beta, x_{min}) -
-	\beta\sum_{i=1}^{n} \text{ln}~x_i 
+      %MRS: use \ln instead of ln or \text{ln} 
+	\mathcal{L}(\beta) = -n\ln \zeta(\beta, x_{min}) -
+	\beta\sum_{i=1}^{n} \ln x_i 
 	\label{eqn:powerlaw_likelihood}
 	\end{equation}
 	where $\beta = 1 + \alpha$, $x_i$ are collected dwell time data points,
@@ -488,7 +500,8 @@
     \end{equation}
     \item We determine MLEs of $\alpha$ and $\lambda$ by maximizing the likelihood function:~\cite{clauset_power-law_2009}
     \begin{equation}
-    \mathcal{L}(\alpha, \lambda) = n*(1 - \alpha)ln\lambda - n*ln\Gamma(1 - \alpha, x_{min}\lambda) - \alpha\sum_{i=1}^{n}ln x_i - \lambda\sum_{i=1}^n x_i
+    %MRS3: I replaced ln with \ln
+    \mathcal{L}(\alpha, \lambda) = n(1 - \alpha)\ln\lambda - n\ln\Gamma(1 - \alpha, x_{min}\lambda) - \alpha\sum_{i=1}^{n}\ln x_i - \lambda\sum_{i=1}^n x_i
     \end{equation}
   \end{itemize}
   
@@ -620,7 +633,10 @@
   \subsection{Markov State Models}\label{method:MSMs}  
   % BJC2: still need a better name
   % name candidates - correlated MSMs, Dynamical mode switching
-  
+  % MRS3: probably not ``correlated MSMs'', that's insufficiently descriptive. Many things dynamically change modes.
+  % Maybe ``Markov state-dependent dynamics?'' You have dynamics/transport that are a function of the state, which is 
+  % determined by a Markov state model. 
+
   A Markov state model (MSM) decomposes a time series into a set of discrete states
   with transitions between states defined by a transition probability matrix, T,
   which describes the conditional probability of jumping to a specific 
@@ -652,7 +668,8 @@
         %BJC2: good point
     \begin{table}[!htb]
 	  \centering
-	  \begin{tabular}{ll}
+          %MRS3: tweaked formatting, change back if you want!
+	  \begin{tabular}{|c|c|}
 	  \hline
 	  1. In tails, not trapped                     & 5. In pores, not trapped                     \\
 	  2. In tails and hydrogen bonding             & 6. In pores and hydrogen bonding             \\
@@ -898,6 +915,7 @@
   % BJC: reduce this figure to solutes studied and put 3 bars for each solute: MD MSD, 
   % one-mode sfbm MSD, two-mode sfbm MSD.
   % BJC2: Actually I think I prefer showing the MSD curves on one plot, like in my research journal. Since it shows shape.
+  % MRS3: OK.
   \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{all_emsds.pdf}
@@ -1014,6 +1032,8 @@
 
   \section*{Acknowledgements}
 
+  %MRS3: add specific info for PRF and GAANN
+  This work was supported in part by the ACS Petroleum Research Fund grant XXXXXX and GAANN grant YYYYY.
   Molecular simulations were performed using the Extreme Science and
   Engineering Discovery Environment (XSEDE), which is supported by National
   Science Foundation grant number ACI-1548562. Specifically, it used the Bridges
