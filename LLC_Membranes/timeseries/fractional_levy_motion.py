@@ -24,6 +24,14 @@ class FLM:
         :param C: normalization parameter
         :param N: size of sample
         :param scale: scale parameter of Levy distribution
+
+        :type H: float
+        :type alpha: float
+        :type m: int
+        :type M: int
+        :type C: float
+        :type N: int
+        :type scale: float
         """
 
         if math.log(N, 2) - int(math.log(N, 2)) != 0:
@@ -45,13 +53,15 @@ class FLM:
         t1 = np.linspace(1 + mh, M, int((M - (1 + mh)) / mh) + 1)
         t1 = t1 ** d - (t1 - 1) ** d
         self.A = mh ** (1 / alpha) * np.concatenate((t0, t1))
-        C *= (np.abs(self.A) ** alpha).sum() ** (-1 / alpha)
-        self.A *= C
+        self.C = C * (np.abs(self.A) ** alpha).sum() ** (-1 / alpha)
+        self.A *= self.C
         self.A = np.fft.fft(self.A, n=self.Na)
 
         self.realizations = None
         self.noise = None
         self.scale = scale
+        self.acf = None
+        self.autocov = None
         #print(self.scale)
 
     def generate_realizations(self, n, truncate=None, progress=True):
@@ -132,6 +142,23 @@ class FLM:
         if show:
             plt.show()
 
+    def autocorrelation(self):
+        """ Calculate autocorrelation of time series
+        """
+
+        # calculate acf of each trajectory
+        ntraj = self.noise.shape[0]
+        self.acf = np.zeros([ntraj, self.N - 1])
+        for i in range(ntraj):
+            self.acf[i, :] = timeseries.acf(self.noise[i, :])
+
+    def autocovariance(self):
+
+        ntraj = self.noise.shape[0]
+        self.autocov = np.zeros([ntraj, self.N - 1])
+        for i in range(ntraj):
+            self.autocov[i, :] = timeseries.autocovariance(self.noise[i, :])
+
     def plot_autocorrelation(self, max_k=25, nboot=200, confidence=68.27, show=False):
         """ Plot autocorrelation function of increments
 
@@ -146,17 +173,16 @@ class FLM:
         :type show: bool
         """
 
-        # calculate acf of each trajectory
-        ntraj = self.realizations.shape[0]
-        acf = np.zeros([ntraj, self.N - 1])
-        for i in range(ntraj):
-            acf[i, :] = timeseries.acf(self.realizations[i, :])
+        if self.acf is None:
+            self.autocorrelation()
+
+        ntraj = self.acf.shape[0]
 
         # bootstrap
         boot = np.zeros([nboot, self.N - 1])
         for i in range(nboot):
             ndx = np.random.randint(ntraj, size=ntraj)
-            boot[i, :] = acf[ndx, :].mean(axis=0)
+            boot[i, :] = self.acf[ndx, :].mean(axis=0)
 
         errorbars = stats.confidence_interval(boot, confidence)
 

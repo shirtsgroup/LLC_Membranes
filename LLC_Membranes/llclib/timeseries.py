@@ -6,6 +6,7 @@ import tqdm
 import warnings
 import matplotlib.pyplot as plt
 from statsmodels.tsa.api import VAR
+from LLC_Membranes.llclib import stats
 
 
 def largest_prime_factor(n):
@@ -43,15 +44,25 @@ def acf_slow(d):
     return autocorr
 
 
-def acf(t, largest_prime=500):
+def autocovariance(t, largest_prime=500):
+
+    return acf(t, largest_prime=largest_prime, autocov=True)
+
+
+def acf(t, largest_prime=500, autocov=False):
 
     """ Quickly calculated the autocorrelation function of a time series, t. This gives the same results as acf_slow()
     but uses FFTs. This method is faster than numpy.correlate.
 
-    :param t: time series : ndarray [npoints, nseries]
+    :param t: time series array (npoints, nseries)
     :param largest_prime : the largest prime factor of array length allowed. The smaller the faster. 1.6M points takes
     about 5 seconds with largest_prime=1000. Just be aware that you are losing data by truncating. But 5-6 data points
     isn't a big deal for large arrays.
+    :param autocov: return autocovariance function insted (which is just the unnormalized autocorrelation)
+
+    :type t: numpy.ndarray
+    :type largest_prime: int
+    :type autocov: bool
 
     """
 
@@ -79,11 +90,64 @@ def acf(t, largest_prime=500):
     else:
         autocorr_fxn /= np.arange(T.shape[0], 0, -1)
 
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        autocorr_fxn /= np.var(T, axis=0)
+    if not autocov:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            autocorr_fxn /= np.var(T, axis=0)
 
     return autocorr_fxn  # normalized
+
+
+def plot_autocorrelation(acfxn, max_k=25, bootstrap=True, nboot=200, confidence=68.27, show=False):
+    """ Plot autocorrelation function of increments
+
+    :param acfxn: autocorrelation function of n trajectories (ntrajectories, npoints)
+    :param max_k: maximum lag time to plot
+    :param bootstrap: bootstrap data
+    :param nboot: number of bootstrap trials
+    :param confidence: confidence interval of shaded error region (percent)
+    :param show: show the plot when done
+
+    :type acfxn: numpy.ndarray
+    :type max_k: int
+    :type bootstrap: bool
+    :type nboot: int
+    :type confidence: float
+    :type show: bool
+    """
+
+    plt.figure()
+
+    # calculate acf of each trajectory
+    ntraj, n = acfxn.shape
+
+    if bootstrap:
+
+        boot = np.zeros([nboot, n])
+        for i in range(nboot):
+            ndx = np.random.randint(ntraj, size=ntraj)
+            boot[i, :] = acfxn[ndx, :].mean(axis=0)
+
+        errorbars = stats.confidence_interval(boot, confidence)
+
+        avg = boot.mean(axis=0)
+        plt.plot(np.arange(n), avg, lw=2)
+        plt.fill_between(np.arange(n), avg + errorbars[0, :], avg - errorbars[1, :], alpha=0.25)
+
+    else:
+
+        plt.plot(np.arange(n), acfxn.mean(axis=0), lw=2)
+
+    # formatting
+    plt.xlim(-0.5, max_k)
+    plt.ylim(-0.6, 1)
+    plt.xlabel('Lag Time (steps)', fontsize=14)
+    plt.ylabel('Correlation', fontsize=14)
+    plt.gcf().get_axes()[0].tick_params(labelsize=14)
+    plt.tight_layout()
+
+    if show:
+        plt.show()
 
 
 def autocov(joint_distribution, varied_length=False):

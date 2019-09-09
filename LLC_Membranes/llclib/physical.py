@@ -255,7 +255,6 @@ def avg_pore_loc(npores, pos, box, buffer=0, spline=False, npts=20, progress=Fal
             p_center = np.zeros([nT, npores, 2])
 
             for i in range(nT):
-                print(i)
 
                 positions = wrap_box(pos[i, ...], box[i, ...])
 
