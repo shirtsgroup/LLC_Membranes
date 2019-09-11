@@ -4,7 +4,8 @@ import numpy as np
 from scipy.stats import expon
 from LLC_Membranes.analysis import Poly_fit
 from sympy import mpmath
-from scipy.optimize import minimize
+from scipy.optimize import curve_fit, minimize
+from scipy.special import gamma
 
 
 def log_power_law(x, a, alpha):
@@ -335,3 +336,29 @@ def powerlaw_mle(x, xmin, guess=1.5):
     args = (x, xmin, True)  # (dwell times, xmin, maximize = True)
 
     return minimize(power_law_discrete_log_likelihood, guess, args=args, bounds=[(1.01, 3)]).x[0]
+
+
+def hurst_autocorrelation_flm(k, H):
+    """ Evaluate the analytical hurst autocorrelation function:
+
+    .. math::
+
+        \gamma(k) = \frac{E[L(1)^2]}{2\Gamma(2H + 1)sin(\pi H)} \times [|k-1|^{2H} - 2|k|^{2H} + |k + 1|^{2H}]
+
+    :param k: time lag values at which to calculate acf
+    :param H: hurst self-similarity parameter
+
+    :return:
+    """
+
+    autocov = np.abs(k - 1) ** (2 * H) - 2 * np.abs(k) ** (2 * H) + np.abs(k + 1) ** (2 * H)
+    autocov *= 1 / (2 * gamma(2 * H + 1) * np.sin(np.pi * H))
+
+    return autocov / autocov[0]
+
+
+def fit_hurst_autocorrelation_flm(x, max_k=-1, guess=0.5):
+
+    h_opt = curve_fit(hurst_autocorrelation_flm, np.arange(max_k + 1), x[:max_k + 1], p0=guess)[0]
+
+    return h_opt

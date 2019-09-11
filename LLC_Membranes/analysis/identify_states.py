@@ -7,6 +7,7 @@ import mdtraj as md
 import matplotlib.pyplot as plt
 from LLC_Membranes.analysis import hbonds, coordination_number
 from LLC_Membranes.llclib import file_rw, physical, topology, timeseries
+import sys
 import tqdm
 from scipy.stats import cauchy, laplace, t, levy_stable
 import levy
@@ -113,6 +114,11 @@ class States:
         else:
             self.state_labels = kwargs['state_labels']
 
+        if 'emission_params' not in kwargs:
+            self.emission_params = {'distribution': 'Levy', 'lump_transitions': True}
+        else:
+            self.emission_params = kwargs['emission_params']
+
         self.nstates = len(self.state_labels['state_dict'].keys())
 
         print("Loading trajectory...", end='', flush=True)
@@ -120,15 +126,15 @@ class States:
         print("Done!")
 
         print("Identifying hydrogen bonds...")
-        self.hbonds = self.identify_hydrogen_bonds(gro)
+        self.hbonds = self._identify_hydrogen_bonds(gro)
         print("Done!")
 
         print("Identifying other electrostatic associations...")
-        self.associations = self.identify_associations(gro)
+        self.associations = self._identify_associations(gro)
         print("Done!")
 
         print("Determining frame-by-frame partition of solutes between between pore and tail...")
-        self.partition, self.com = self.define_partition()
+        self.partition, self.com = self._define_partition()
         print("Done!")
 
         self.nT, self.nsolute = self.com.shape[:2]
@@ -139,13 +145,13 @@ class States:
         self.emissions = None
         self.fit_params = None
 
-        self.determine_state_sequence()
-        self.make_transition_matrix()
+        self._determine_state_sequence()
+        self._make_transition_matrix()
         self.measure_state_emissions()
 
         self.box_length = self.t.unitcell_vectors[:, 2, 2].mean()
 
-    def identify_hydrogen_bonds(self, gro):
+    def _identify_hydrogen_bonds(self, gro):
         """ Use hbonds.System to identify hydrogen bonds between the residue and the specified set of atoms
 
         :param gro: GROMACS coordinate file describing system
@@ -194,7 +200,7 @@ class States:
 
         return hb_binary
 
-    def identify_associations(self, gro):
+    def _identify_associations(self, gro):
         """ Use coordination_number.System to identify electrostatic associations between the residue and the specified
         set of atoms
 
@@ -218,7 +224,7 @@ class States:
 
         return association.ncoord.astype(bool)
 
-    def define_partition(self):
+    def _define_partition(self):
         """ Classify solutes as either {True: in the pores} or {False: in the tails} based on their center of mass
         positions
 
@@ -229,7 +235,7 @@ class States:
         :return: array of True/False in/out of pore region
         """
 
-        com = self.center_of_mass()
+        com = self._center_of_mass()
         atoms = [a.index for a in self.t.topology.atoms if a.name in self.partition_params['ref_atoms']]
         pore_centers = physical.trace_pores(self.t.xyz[:, atoms, :], self.t.unitcell_vectors,
                                             self.partition_params['npts_spline'], npores=4, progress=True, save=True,
@@ -237,7 +243,7 @@ class States:
         return physical.partition(com, pore_centers, self.partition_params['r'], unitcell=self.t.unitcell_vectors,
                                   npores=4, spline=True), com
 
-    def center_of_mass(self):
+    def _center_of_mass(self):
 
         print('Calculating center of mass trajectories of residue %s' % self.residue)
 
@@ -250,7 +256,7 @@ class States:
 
         return physical.center_of_mass(self.t.xyz[:, ndx, :], mass)  # determine center of mass trajectories
 
-    def translate_state(self, s):
+    def _translate_state(self, s):
         """ convert list of True/False to string of 1's and 0's and use that to determine its state label from
         self.state_labels['state_dict']
 
@@ -263,7 +269,7 @@ class States:
 
         return self.state_labels['state_dict'][''.join([str(int(i)) for i in s])]
 
-    def determine_state_sequence(self):
+    def _determine_state_sequence(self):
         """ Based on trapping mechanisms, assign a state to each time point and each solute
         """
 
@@ -280,11 +286,11 @@ class States:
         for t in tqdm.tqdm(range(self.nT)):
 
             for i, s in enumerate(zip(self.hbonds[t], self.associations[t], ~self.partition[t], self.partition[t])):
-                self.state_sequence[t, i] = self.translate_state(np.array(s)[order])
+                self.state_sequence[t, i] = self._translate_state(np.array(s)[order])
 
         print("Done!")
 
-    def make_transition_matrix(self, start=1):
+    def _make_transition_matrix(self, start=1):
         """ Estimate a transition matrix based on the state sequence
         """
 
@@ -305,7 +311,7 @@ class States:
         """ Measure observations as a function of state.
 
         :param dim: dimension of trajectory whose emissions will be measured
-        :param fit_function: name of function to fit emissions to. Only works for levy
+        :param fit_function: name of function to fit emissions to. Only works for Levy currently due to naming
 
         :type dim: int or list
         :type fit_function: scipy.stats.rv_continuous
@@ -315,19 +321,70 @@ class States:
         for row in range(self.nstates):  # column for each state
             self.emissions[row] = [[] for _ in range(self.nstates)]
 
-        print("Measuring state emissions...")
+        print("Measuring state emissions...", flush=True, end='')
         for t in range(1, self.nT):
             for e in range(self.nsolute):
                 self.emissions[self.state_sequence[t - 1, e]][self.state_sequence[t, e]].append(self.com[t, e, dim] -
                                                                                                 self.com[t - 1, e, dim])
         print('Done!')
 
-        print('Fitting emission distributions...')
-        self.fit_params = np.zeros([self.nstates, self.nstates, 3])  # only 3 parameters since beta is fixed
-        for i in tqdm.tqdm(range(self.nstates)):
-            for j in range(self.nstates):
-                self.fit_params[i, j, :] = fit_function.fit_levy(self.emissions[i][j], beta=0)[0].x
+        if self.emission_params['lump_transitions']:
+            self._lump_transition_emissions()
+
+        self._fit_emissions_distributions(fit_function)
+
+    def _lump_transition_emissions(self):
+        """ Lump all of the emission distributions for transitions between states together. The last entry in the
+        emissions list
+        """
+
+        emissions = [[] for _ in range(self.nstates + 1)]  # a distribution for each state and 1 for transitions
+        for s1 in range(self.nstates):
+            for s2 in range(self.nstates):
+                if s1 == s2:
+                    emissions[s1] += self.emissions[s1][s2]
+                else:
+                    emissions[-1] += self.emissions[s1][s2]
+
+        self.emissions = emissions
+
+    def _fit_emissions_distributions(self, fit_function):
+        """ Fit Levy distribution to emission distributions
+
+        :param fit_function: functional form of emission distributions
+        """
+
+        print('Fitting emission distributions...', flush=True, end='')
+        if self.emission_params['lump_transitions']:
+            self.fit_params = np.zeros([self.nstates + 1, 3])
+            for s in range(self.nstates + 1):
+                self.fit_params[s, :] = fit_function.fit_levy(self.emissions[s], beta=0)[0].x
+        else:
+            self.fit_params = np.zeros([self.nstates, self.nstates, 3])  # only 3 parameters since beta is fixed
+
+            for i in tqdm.tqdm(range(self.nstates)):
+                for j in range(self.nstates):
+                    self.fit_params[i, j, :] = fit_function.fit_levy(self.emissions[i][j], beta=0)[0].x
+
         print('Done!')
+
+    def maximum_emission(self):
+        """ Find the largest observed emission
+
+        :return The largest observed emission
+        :rtype: float
+        """
+
+        max_emissions = []
+        if self.emission_params['lump_transitions']:
+            for i in self.emissions:
+                max_emissions.append(max(np.abs(i)))
+        else:
+            for i in self.emissions:
+                for j in i:
+                    max_emissions.append(max(np.abs(j)))
+
+        return max(max_emissions)
 
     def plot_emissions(self, save=False, savename='emissions'):
         """ Plot emissions within discrete states. (This does not plot transition distributions)
@@ -376,7 +433,7 @@ class States:
         """
 
         # a lot of this is very similar to estimate_hurst() in sfbm_parameters.py. Could be put in llclib as an
-        # an autocorrelation function calculation with uneven length timeseries.
+        # autocorrelation function calculation with uneven length timeseries.
         transitions = []
         for s in range(self.nsolute):
             switch_points = timeseries.switch_points(states.state_sequence[:, 0])
@@ -447,8 +504,9 @@ class Chain:
 
         :param transition_matrix: n x n matrix of probabilities of transitions between each of the n states. Rows should
         sum to 1.
-        :param emission_parameters: parameters describing distribution of emissions for each state (n x p) where p is
-        the number of paramters.
+        :param emission_parameters: parameters describing distribution of emissions for each state (n + 1 x p) where p
+        is the number of paramters, and n the number of states. The extra set of parameters should be those of the
+        lumped together transition emission distribution.
         :param emission_function: name of probability distribution describing emissions
 
         :type transition_matrix: np.ndarray
@@ -461,6 +519,10 @@ class Chain:
         self.emission_function = emission_function
 
         self.nstates = self.transition_matrix.shape[0]
+
+        # self.lumped_transitions = False
+        # if self.emission_parameters.shape[0] == (self.transition_matrix.shape[0] + 1):
+        #     self.lumped_transitions = True
 
         self.chains = None
         self.states = None
@@ -637,9 +699,13 @@ if __name__ == "__main__":
             hbond_params = cfg['hbond_params']
             partition_params = cfg['partition_params']
             state_labels = cfg['state_labels']
+            emission_params = cfg['emission_params']
+
+            if emission_params['distributions'].lower() is not 'levy':
+                sys.exit("The emission distribution, '%s', is not implemented" % emission_params['distributions'])
 
         states = States(traj, gro, res, start=start, association_params=association_params, hbond_params=hbond_params,
-                        partition_params=partition_params, state_labels=state_labels)
+                        partition_params=partition_params, state_labels=state_labels, emission_params=emission_params)
 
         states.t = None  # to save memory
         file_rw.save_object(states, 'states.pl')
@@ -667,43 +733,37 @@ if __name__ == "__main__":
     # plt.show()
     # exit()
     #states.transition_autocorrelation()
-    import itertools
-
-    dwells = [[] for _ in range(states.nstates)]
-    for solute in range(states.nsolute):
-        for state, group in itertools.groupby(states.state_sequence[:, solute]):
-            dwells[state].append(len(list(group)))
-
-    all_dwells = []
-    for i in dwells:
-        all_dwells += i
-
-    plt.hist(all_dwells, bins=22, range=(3, 25))
-    plt.show()
-    exit()
-
-    for i in range(8):
-        plt.hist(dwells[i], bins=50)
-        plt.show()
-    exit()
-
-    emissions = []
-    for i in range(states.nstates):
-        for j in range(states.nstates):
-            if i != j:
-                emissions += states.emissions[i][j]
-
-    plt.hist(emissions, bins=50, range=(-.75, .75))
-    plt.show()
-    exit()
-
-    max_emissions = []
-    for i in states.emissions:
-        for j in i:
-            max_emissions.append(max(j))
+    # import itertools
+    #
+    # dwells = [[] for _ in range(states.nstates)]
+    # for solute in range(states.nsolute):
+    #     for state, group in itertools.groupby(states.state_sequence[:, solute]):
+    #         dwells[state].append(len(list(group)))
+    #
+    # all_dwells = []
+    # for i in dwells:
+    #     all_dwells += i
+    #
+    # plt.hist(all_dwells, bins=22, range=(3, 25))
+    # plt.show()
+    # exit()
+    #
+    # for i in range(8):
+    #     plt.hist(dwells[i], bins=50)
+    #     plt.show()
+    # exit()
+    #
+    # emissions = []
+    # for i in range(states.nstates):
+    #     for j in range(states.nstates):
+    #         if i != j:
+    #             emissions += states.emissions[i][j]
+    #
+    # plt.hist(emissions, bins=50, range=(-.75, .75))
+    # plt.show()
+    # exit()
 
     chains = Chain(states.transition_matrix, states.fit_params, emission_function=levy_stable)
-    #chains.generate_realizations(24, 2000, bound=states.box_length)
-    chains.generate_realizations(24, 10000, bound=max(max_emissions))
+    chains.generate_realizations(24, 10000, bound=states.maximum_emission())
     chains.calculate_msd()
     chains.plot_msd()
