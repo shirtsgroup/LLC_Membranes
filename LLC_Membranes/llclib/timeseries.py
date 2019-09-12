@@ -6,7 +6,8 @@ import tqdm
 import warnings
 import matplotlib.pyplot as plt
 from statsmodels.tsa.api import VAR
-from LLC_Membranes.llclib import stats
+from LLC_Membranes.llclib import stats, fitting_functions
+from scipy.optimize import curve_fit
 
 
 def largest_prime_factor(n):
@@ -47,6 +48,71 @@ def acf_slow(d):
 def autocovariance(t, largest_prime=500):
 
     return acf(t, largest_prime=largest_prime, autocov=True)
+
+
+def acf_uneven(t, nboot=None, confidence=95.):
+    """ Calculate autocorrelation function of uneven-length timeseries. Optionally generate bootstrapped statistics
+
+    :param t: list of n time series. The length of each can be different.
+    :param nboot: if not None, generate statistics using this many bootstrap trials
+    :param confidence: confidence interval (expressed out of 100). Only necessary if nboot is not None
+
+    :type t: list of lists
+    :type nboot: None or int
+    :type confidence: float
+
+    :return: autocorrelation function and (optionally) bootstrapped statistics
+    """
+
+    len_ = np.array([len(x) for x in t])  # length of each trajectory
+
+    max_len = max(len_)
+
+    acf_ = np.zeros([len(t), max_len])
+
+    keep = []  # list to hold indices of trajectories with a non-zero amount of hops
+    for i in range(acf_.shape[0]):
+        hops = t[i]
+        if len(hops) > 2:  # correlation between two points is useless. Will always be +1, -1
+            autocorrelation = acf(hops)
+            acf_[i, :autocorrelation.size] = autocorrelation
+            keep.append(i)
+
+    acf_ = acf_[keep, :]
+    len_ = len_[keep]
+
+    if nboot is not None:
+
+        boot = np.zeros([nboot, max_len])
+        for b in range(nboot):
+            sol = np.random.randint(acf_.shape[0], size=acf_.shape[0])
+            for i in range(max(len_[sol])):
+                ndx = sol[np.nonzero(acf_[sol, i])]
+                if not list(ndx):
+                    boot[b, i] = 0
+                else:
+                    #boot[b, i] = acf_[ndx, i].mean()
+                    # give more weight to longer trajectories
+                    boot[b, i] = np.average(acf_[ndx, i], weights=len_[ndx])
+            # This is more pythonic, but multiple exceptions are raised so it doesn't really work as intended.
+            # try:
+            #     boot[b, i] = acf[ndx, i].mean()
+            # except RuntimeWarning:  # happens if the solute with the max_hops dwell time is not included in 'sol'
+            #     boot[b, i] = 0
+
+        lower_confidence = (100 - confidence) / 2  # confidence intervals (percentiles)
+        upper_confidence = 100 - lower_confidence
+
+        errorbars = np.zeros([2, max_len])
+        errorbars[0, :] = np.abs(np.percentile(boot, lower_confidence, axis=0) -
+                                 boot.mean(axis=0))  # 2.5 percent of data below this value
+        errorbars[1, :] = np.percentile(boot, upper_confidence, axis=0) - boot.mean(axis=0)
+
+        return acf_, errorbars
+
+    else:
+
+        return acf_
 
 
 def acf(t, largest_prime=500, autocov=False):
@@ -98,15 +164,18 @@ def acf(t, largest_prime=500, autocov=False):
     return autocorr_fxn  # normalized
 
 
-def plot_autocorrelation(acfxn, max_k=25, bootstrap=True, nboot=200, confidence=68.27, show=False):
+def plot_autocorrelation(acfxn, errorbars=None, max_k=25, bootstrap=True, nboot=200, confidence=68.27, show=False,
+                         fontsize=14):
     """ Plot autocorrelation function of increments
 
     :param acfxn: autocorrelation function of n trajectories (ntrajectories, npoints)
+    :param errorbars: optional errorbars obtained by bootstrapping acf (2, npoints)
     :param max_k: maximum lag time to plot
     :param bootstrap: bootstrap data
     :param nboot: number of bootstrap trials
     :param confidence: confidence interval of shaded error region (percent)
     :param show: show the plot when done
+    :param fontsize: size of font on axes and legend
 
     :type acfxn: numpy.ndarray
     :type max_k: int
@@ -114,6 +183,7 @@ def plot_autocorrelation(acfxn, max_k=25, bootstrap=True, nboot=200, confidence=
     :type nboot: int
     :type confidence: float
     :type show: bool
+    :type fontsize: int
     """
 
     plt.figure()
@@ -121,12 +191,14 @@ def plot_autocorrelation(acfxn, max_k=25, bootstrap=True, nboot=200, confidence=
     # calculate acf of each trajectory
     ntraj, n = acfxn.shape
 
-    if bootstrap:
+    if bootstrap and errorbars is None:
 
+        # This needs to be modified for uneven trajectory lengths
         boot = np.zeros([nboot, n])
         for i in range(nboot):
             ndx = np.random.randint(ntraj, size=ntraj)
             boot[i, :] = acfxn[ndx, :].mean(axis=0)
+            #boot[i, :] = np.average(acfxn)
 
         errorbars = stats.confidence_interval(boot, confidence)
 
@@ -138,12 +210,17 @@ def plot_autocorrelation(acfxn, max_k=25, bootstrap=True, nboot=200, confidence=
 
         plt.plot(np.arange(n), acfxn.mean(axis=0), lw=2)
 
+        if errorbars is not None:
+            plt.fill_between(np.arange(acfxn.shape[1]), errorbars[1, :] + acfxn.mean(axis=0), acfxn.mean(axis=0) -
+                             errorbars[0, :], alpha=0.25)
+
     # formatting
+    plt.xticks(np.arange(1, max_k)[::2])
     plt.xlim(-0.5, max_k)
     plt.ylim(-0.6, 1)
-    plt.xlabel('Lag Time (steps)', fontsize=14)
-    plt.ylabel('Correlation', fontsize=14)
-    plt.gcf().get_axes()[0].tick_params(labelsize=14)
+    plt.xlabel('Lag Time (steps)', fontsize=fontsize)
+    plt.ylabel('Autocorrelation', fontsize=fontsize)
+    plt.gcf().get_axes()[0].tick_params(labelsize=fontsize)
     plt.tight_layout()
 
     if show:
@@ -208,6 +285,83 @@ def autocov(joint_distribution, varied_length=False):
     # acov = autocov / counts
 
     return acov / np.amax(acov)
+
+
+def hurst(acf_, nboot=1, max_k=20, ll=1e-6):
+    """ Estimate a distribution of Hurst parameters by fitting to an autocorrelation function. A distribution is
+    obtained by bootstrapping.
+
+    :param acf_: autocorrelation function for multiple trajectories (n x l) where n is the number of trajetories and
+    l is the maximum length of the trajectories. The trajectories need not be the same length. This function can be
+    obtained by timeseries.acf_uneven()
+    :param nboot: number of bootstrap trials. This also determines the number of samples in the hurst distribution. If
+    nboot=1 (default), you will get a single Hurst parameter based on a fit to the average acf.
+    :param max_k: maximum time lag (in frames) used for fitting
+    :param ll: lower limit on hurst parameter. If estimated H is below 0, then set the H equal to this lower limit. This
+    should really only happen if you don't have a ton of data. And the dip in the acf should be pretty close to -0.5
+
+    :type acf_: numpy.ndarray()
+    :type nboot: int
+    :type max_k: int
+    :type ll: float
+
+    :return: distribution of hurst parameters or a single hurst parameter if nboot=1
+    :rtype: numpy.ndarray or float
+    """
+
+    weights = np.array([np.nonzero(acf_[i, :])[0].size for i in range(acf_.shape[0])])
+
+    if nboot > 1:
+
+        distribution = np.zeros([nboot])
+        nsegments = acf_.shape[0]
+
+        for b in range(nboot):
+
+            traj = np.random.randint(0, nsegments, size=nsegments)
+            #hboot = acf_[traj, 1].mean()  # first time lag autocovariance
+            hboot = np.average(acf_[traj, 1], weights=weights[traj])
+            H = np.log(2 * hboot + 2) / (2 * np.log(2))  # initial guess at H based on first dip in autocovariance
+
+            acf_boot = np.zeros(max(weights[traj]))
+            if H <= 0:  # a consequence of a small amount of data
+                distribution[b] = ll
+            else:
+                distribution[b] = H
+            # else:
+            #     for i in range(max(weights[traj])):
+            #         ndx = traj[np.nonzero(acf_[traj, i])]
+            #         if not list(ndx):
+            #             acf_boot[i] = 0
+            #         else:
+            #             # give more weight to longer trajectories
+            #             acf_boot[i] = np.average(acf_[ndx, i], weights=weights[ndx])
+            #
+            #     #acf_boot = [acf_[traj, i][np.nonzero(acf_[traj, i])].mean() for i in range(max_k + 1)]
+            #     if max_k > acf_boot.size:
+            #         x = np.arange(acf_boot.size)
+            #         y = acf_boot
+            #     else:
+            #         x = np.arange(max_k)
+            #         y = acf_boot[:max_k]
+            #
+            #     h_opt = curve_fit(fitting_functions.hurst_autocovariance, x, y, p0=H)[0]
+            #     distribution[b] = h_opt[0]
+
+        return distribution
+
+    else:
+
+        # hboot = acf_[:, 1].mean()  # first time lag autocovariance
+        hboot = np.average(acf_[:, 1], weights=weights)
+        H = np.log(2 * hboot + 2) / (2 * np.log(2))  # initial guess at H based on first dip in autocovariance
+
+        if H <= 0:
+            h_opt = ll
+        else:
+            h_opt = curve_fit(fitting_functions.hurst_autocovariance, np.arange(max_k), acf_[:max_k], p0=H)[0]
+
+        return h_opt[0]
 
 
 def autocorrFFT(x):
@@ -512,10 +666,10 @@ def switch_points(sequence):
 
     :param sequence: series of discrete states
 
-    :type sequence: list
+    :type sequence: list or numpy.ndarray
 
     :return: list of indices where swithces between states occur
-    :rtype: np.ndarray
+    :rtype: numpy.ndarray
     """
 
     # See https://stackoverflow.com/questions/36894822/how-do-i-identify-sequences-of-values-in-a-boolean-array

@@ -6,11 +6,13 @@ import numpy as np
 import mdtraj as md
 import matplotlib.pyplot as plt
 from LLC_Membranes.analysis import hbonds, coordination_number
-from LLC_Membranes.llclib import file_rw, physical, topology, timeseries
+from LLC_Membranes.llclib import file_rw, physical, topology, timeseries, fitting_functions
+from LLC_Membranes.timeseries.fractional_levy_motion import FLM
 import sys
 import tqdm
 from scipy.stats import cauchy, laplace, t, levy_stable
 import levy
+import itertools
 np.set_printoptions(precision=4, suppress=True)
 
 
@@ -144,10 +146,12 @@ class States:
         self.count_matrix = None
         self.emissions = None
         self.fit_params = None
+        self.hurst = None
 
         self._determine_state_sequence()
         self._make_transition_matrix()
         self.measure_state_emissions()
+        self.calculate_hurst()
 
         self.box_length = self.t.unitcell_vectors[:, 2, 2].mean()
 
@@ -358,7 +362,7 @@ class States:
         if self.emission_params['lump_transitions']:
             self.fit_params = np.zeros([self.nstates + 1, 3])
             for s in range(self.nstates + 1):
-                self.fit_params[s, :] = fit_function.fit_levy(self.emissions[s], beta=0)[0].x
+                self.fit_params[s, :] = fit_function.fit_levy(self.emissions[s], beta=0)[0].x  # alpha, mu, sigma
         else:
             self.fit_params = np.zeros([self.nstates, self.nstates, 3])  # only 3 parameters since beta is fixed
 
@@ -420,85 +424,103 @@ class States:
 
         plt.show()
 
-    def transition_autocorrelation(self, nboot=200, confidence=95, fontsize=14):
+    def transition_autocorrelation(self, nboot=200, confidence=95, plot=False, max_k=15, fontsize=14):
         """ Calculate the autocorrelation function of hops only when transitions occur.
 
         :param nboot: number of bootstrap trials for generating confidence intervals
         :param confidence: percent confidence interval (out of 100)
-        :param fontsize: size of font on axes
+        :param plot: plot autocorrelation function
+        :param fontsize: size of font on plot axes
+        :param max_k: largest time lag to plot
 
         :type nboot: int
         :type confidence: float
         :type fontsize: int
+        :type plot: bool
+        :type max_k: int
+
+        :return: acf
+        :rtype: numpy.ndarray
         """
 
-        # a lot of this is very similar to estimate_hurst() in sfbm_parameters.py. Could be put in llclib as an
-        # autocorrelation function calculation with uneven length timeseries.
         transitions = []
         for s in range(self.nsolute):
-            switch_points = timeseries.switch_points(states.state_sequence[:, 0])
+            switch_points = timeseries.switch_points(self.state_sequence[:, 0])
             transitions.append(self.com[switch_points[:-1] + 1, s, 2] - self.com[switch_points[:-1], s, 2])
 
-        ntransitions = np.array([len(x) for x in transitions])
+        if plot:
 
-        max_transitions = max(ntransitions)
+            # calculate the autocorrelation function of uneven length trajectories
+            acf, errorbars = timeseries.acf_uneven(transitions, nboot=nboot, confidence=confidence)
+            timeseries.plot_autocorrelation(acf, errorbars=errorbars, bootstrap=False, show=True, max_k=max_k,
+                                            fontsize=fontsize)
 
-        acf = np.zeros([self.nsolute, max_transitions])
-        boot = np.zeros([nboot, max_transitions])
+        else:
 
-        keep = []  # list to hold indices of trajectories with a non-zero amount of hops
-        for i in range(acf.shape[0]):
-            hops = transitions[i]
-            if len(hops) > 2:  # correlation between two points is useless. Will always be +1, -1
-                autocorrelation = timeseries.acf(hops)
-                acf[i, :autocorrelation.size] = autocorrelation
-                keep.append(i)
+            acf = timeseries.acf_uneven(transitions)  # get acf of each traj without bootstrapping
 
-        acf = acf[keep, :]
-        ntransitions = ntransitions[keep]
+        return acf
 
-        for b in range(nboot):
-            sol = np.random.randint(acf.shape[0], size=acf.shape[0])
-            for i in range(max(ntransitions[sol])):
-                ndx = sol[np.nonzero(acf[sol, i])]
-                if not list(ndx):
-                    boot[b, i] = 0
-                else:
-                    boot[b, i] = acf[ndx, i].mean()
+    def state_autocorrelation(self):
+        """ Calculate autocorrelation while in a specific state
+        """
 
-        lower_confidence = (100 - confidence) / 2  # confidence intervals (percentiles)
-        upper_confidence = 100 - lower_confidence
+        sequences = [[] for _ in range(self.nstates)]
+        for solute in range(self.nsolute):
+            ndx = 0
+            for state, group in itertools.groupby(self.state_sequence[:, solute]):
+                n = len(list(group))  # sequence length
+                positions = self.com[ndx:(ndx + n), solute, 2]  # z-positions during dwell sequence
+                if positions.size > 1:  # need at least two data points to get a hop within a state
+                    sequences[state].append(positions[1:] - positions[:-1])  # sequence of increments during dwell
+                ndx += n
 
-        errorbars = np.zeros([2, max_transitions])
-        errorbars[0, :] = np.abs(np.percentile(boot, lower_confidence, axis=0) -
-                                 boot.mean(axis=0))  # 2.5 percent of data below this value
-        errorbars[1, :] = np.percentile(boot, upper_confidence, axis=0) - boot.mean(axis=0)
+        acfs = []
 
-        fig, ax = plt.subplots(1, 1)
-        plt.plot(acf.mean(axis=0), linewidth=2, label='Simulated autocorrelation')
-        # ax[m].plot(np.arange(max_hops), fitting_functions.hurst_autocovariance(np.arange(max_hops),
-        #                                                                        np.mean(self.hurst_distribution[m])),
-        #            '--', color='black', linewidth=2,
-        #            label='Fit theoretical autocorrelation')
-        ax.fill_between(np.arange(max_transitions), errorbars[1, :] + boot.mean(axis=0), boot.mean(axis=0) -
-                        errorbars[0, :], alpha=0.25)
-        # ax[m].text(3.0, 0.5, '$\gamma(k) = \dfrac{1}{2}[|k-1|^{2H} - 2|k|^{2H} + |k + 1|^{2H}]$', fontsize=fontsize)
-        # ax[m].text(3.0, 0.3, '$H$ = %.2f $\pm$ %.2f' % (np.mean(self.hurst_distribution[m]),
-        #                                                 np.std(self.hurst_distribution[m])), fontsize=fontsize)
-        ax.set_xticks([1, 3, 5, 7, 9, 11, 13, 15])
-        ax.set_xlabel('Lag (k)', fontsize=fontsize)
-        ax.set_ylabel('Autocorrelation', fontsize=fontsize)
-        ax.tick_params(labelsize=fontsize)
-        ax.set_xlim(0.05, 15)
-        ax.set_ylim(-1, 1)
-        ax.legend(fontsize=fontsize)
+        for seq in sequences:
+            acfs.append(timeseries.acf_uneven(seq))
 
-        plt.show()
+        # for i, seq in enumerate(sequences):
+        #     acf, errorbars = timeseries.acf_uneven(seq, nboot=200)
+        #     timeseries.plot_autocorrelation(acf, show=False, errorbars=errorbars)
+        #     plt.figure()
+        #     biggest = np.argmax([len(j) for j in sequences[i]])
+        #     plt.plot(sequences[i][biggest])
+        #     plt.figure()
+        #     plt.plot(np.cumsum(sequences[i][biggest]))
+        #     plt.show()
+        # exit()
+
+        return acfs
+
+    def calculate_hurst(self, nboot=200, max_k=15, plot=False, state=0):
+        """
+        """
+
+        self.hurst = np.zeros([self.fit_params.shape[0], nboot])
+
+        for h, acf in enumerate(self.state_autocorrelation()):
+            self.hurst[h, :] = timeseries.hurst(acf, nboot=nboot, max_k=max_k)
+
+        acf = self.transition_autocorrelation()
+        self.hurst[-1] = timeseries.hurst(acf, nboot=nboot, max_k=max_k)
+
+        if plot:
+
+            acf = self.state_autocorrelation()[state]
+            weights = np.array([np.nonzero(acf[i, :])[0].size for i in range(acf.shape[0])])
+            fig, ax = plt.subplots(1, 1)
+            ax.plot(np.average(acf, axis=0, weights=weights)[:max_k], linewidth=2, label='Simulated autocorrelation')
+            ax.plot(np.arange(max_k), fitting_functions.hurst_autocovariance(np.arange(max_k),
+                    np.mean(self.hurst[state])), '--', color='black', lw=2, label='Fit theoretical autocorrelation')
+            ax.legend(fontsize=14)
+
+            plt.show()
 
 
 class Chain:
 
-    def __init__(self, transition_matrix, emission_parameters, emission_function=cauchy):
+    def __init__(self, transition_matrix, emission_parameters, hurst_parameters=None, emission_function=levy_stable):
         """ Generate markov chains based on a probability transition matrix and some emission paramters describing the
         observations.
 
@@ -507,16 +529,21 @@ class Chain:
         :param emission_parameters: parameters describing distribution of emissions for each state (n + 1 x p) where p
         is the number of paramters, and n the number of states. The extra set of parameters should be those of the
         lumped together transition emission distribution.
+        :param hurst_parameters: distribution of self-similarity parameters for each state and transitions between
+        states. (nstates + 1, n) where n is the number of hurst parameters in the distribution. Each distribution is
+        created by bootstrapping fits to the acf.
         :param emission_function: name of probability distribution describing emissions
 
         :type transition_matrix: np.ndarray
         :type emission_parameters: np.ndarray
+        :type hurst_parameters: np.ndarray
         :type emission_function: scipy.stats.continuous_rv
         """
 
         self.transition_matrix = transition_matrix
         self.emission_parameters = emission_parameters
         self.emission_function = emission_function
+        self.hurst_parameters = hurst_parameters
 
         self.nstates = self.transition_matrix.shape[0]
 
@@ -561,10 +588,106 @@ class Chain:
         :type bound: float
         """
 
+        if self.hurst_parameters is None:
+
+            return self._uncorrelated_realization(length, bound=bound)
+
+        else:
+
+            return self._correlated_realizations(length, bound=bound)
+
+    def _correlated_realizations(self, length, bound=7.6):
+        """ Generate a realization with correlated emissions
+
+        :param length: length of trajectory
+        :param bound: largest hop allowable. This essentially truncates the emission distribution
+
+        :type length: int
+        :type bound: float
+        """
+
         traj = np.zeros([length])
         states = np.zeros([length], dtype=int)
 
-        # Initial state and associated emission
+        # Determine state sequence
+        states[0] = np.random.randint(self.nstates)  # choose initial state with uniform probability
+
+        for t in range(1, length):
+
+            states[t] = np.random.choice(self.nstates, p=self.transition_matrix[states[t], :])
+
+        # find where transitions occur
+        transitions = timeseries.switch_points(states)  # indices of state array where transitions occur
+        if states[0] == states[1] and transitions[0] == 0:  # switch_points always includes first and last data point
+            transitions = transitions[1:]
+
+        for i, t in enumerate(transitions[:-1]):
+            dwell = transitions[i + 1] - t  # plus two since using enumerate and starting at index 1 of transitions
+            if dwell > 1:
+                if dwell > 2:
+                    traj[t + 1: transitions[i + 1]] = self._flm_sequence(dwell - 1, states[t], bound=bound)
+                elif dwell == 2:
+                    # one data point so generate single point from emission distribution to save time
+                    rv = bound + 1
+                    while np.abs(rv) > bound:
+                        rv = self.emission_function.rvs(self.emission_parameters[states[t], 0], 0,
+                                                        loc=self.emission_parameters[states[t], 1],
+                                                        scale=self.emission_parameters[states[t], 2])
+
+                    traj[t + 1] = rv
+            # print(t, transitions[i + 1], traj.min())
+
+        traj[transitions[:-1]] = self._flm_sequence(transitions.size - 1, -1, bound=bound)
+
+        return np.cumsum(traj), states
+
+    def _flm_sequence(self, l, state, bound=7.6):
+        """ Generate a sequence of correlated draws from a levy process
+
+        :param l: length of sequence
+        :param state: state
+        :param bound: largest allowable hop
+
+        :type l: int
+        :type state: int
+        :type bound: float
+
+        :return: sequence
+        :rtype: numpy.ndarray
+        """
+
+        realization = self._unbounded_flm_sequence(l, state)
+
+        realization[realization > bound] = bound  # temporary fix
+        realization[realization < (-bound)] = -bound
+
+        # while np.abs(realization).max() > bound:
+        #     realization = self._unbounded_flm_sequence(l, state)
+
+        return realization
+
+    def _unbounded_flm_sequence(self, l, state):
+
+        H = np.random.choice(self.hurst_parameters[state])  # random hurst parameter from transition distribution
+        alpha, scale = self.emission_parameters[state, [0, 2]]
+        flm = FLM(H, alpha, M=2, N=l, scale=scale)
+        flm.generate_realizations(1, progress=False)
+
+        return flm.noise[0][:l]
+
+    def _uncorrelated_realization(self, length, bound=7.6):
+        """ Generate a trajectory with uncorrelated emissions
+
+        :param length: length of trajectory
+        :param bound: largest hop allowable. This essentially truncates the emission distribution
+
+        :type length: int
+        :type bound: float
+        """
+
+        traj = np.zeros([length])
+        states = np.zeros([length], dtype=int)
+
         states[0] = np.random.randint(self.nstates)  # choose initial state with uniform probability
         hop = self.hop(states[0], states[0])  # assume hop drawn from emission distribution in that state
         while abs(hop) > bound:
@@ -597,9 +720,16 @@ class Chain:
         :type state2: int
         """
 
-        return self.emission_function.rvs(self.emission_parameters[state1, state2, 0], 0,
-                                          loc=self.emission_parameters[state1, state2, 1],
-                                          scale=self.emission_parameters[state1, state2, 2])
+        if state1 == state2:
+
+            return self.emission_function.rvs(self.emission_parameters[state1, 0], 0,
+                                              loc=self.emission_parameters[state1, 1],
+                                              scale=self.emission_parameters[state1, 2])
+        else:
+
+            return self.emission_function.rvs(self.emission_parameters[-1, 0], 0,
+                                              loc=self.emission_parameters[-1, 1],
+                                              scale=self.emission_parameters[-1, 2])
 
     def calculate_msd(self, nboot=200):
         """ Calculate the average mean squared displacement (MSD) of simulated particle trajectories
@@ -701,8 +831,8 @@ if __name__ == "__main__":
             state_labels = cfg['state_labels']
             emission_params = cfg['emission_params']
 
-            if emission_params['distributions'].lower() is not 'levy':
-                sys.exit("The emission distribution, '%s', is not implemented" % emission_params['distributions'])
+            if emission_params['distribution'].lower() != 'levy':
+                sys.exit("The emission distribution, '%s', is not implemented" % emission_params['distribution'].lower())
 
         states = States(traj, gro, res, start=start, association_params=association_params, hbond_params=hbond_params,
                         partition_params=partition_params, state_labels=state_labels, emission_params=emission_params)
@@ -710,7 +840,7 @@ if __name__ == "__main__":
         states.t = None  # to save memory
         file_rw.save_object(states, 'states.pl')
 
-        states.plot_emissions()
+        #states.plot_emissions()
 
     else:
 
@@ -732,7 +862,11 @@ if __name__ == "__main__":
     # plt.tight_layout()
     # plt.show()
     # exit()
-    #states.transition_autocorrelation()
+    states.calculate_hurst()
+    # print(states.fit_params)
+    for i in states.hurst:
+        print(i.mean())
+    # exit()
     # import itertools
     #
     # dwells = [[] for _ in range(states.nstates)]
@@ -763,7 +897,8 @@ if __name__ == "__main__":
     # plt.show()
     # exit()
 
-    chains = Chain(states.transition_matrix, states.fit_params, emission_function=levy_stable)
+    chains = Chain(states.transition_matrix, states.fit_params, hurst_parameters=states.hurst,
+                   emission_function=levy_stable)
     chains.generate_realizations(24, 10000, bound=states.maximum_emission())
     chains.calculate_msd()
     chains.plot_msd()
