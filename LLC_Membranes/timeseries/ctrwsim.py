@@ -102,6 +102,9 @@ class CTRW(object):
         self.H = H
         self.nmodes = nmodes
 
+        if self.hop_distribution in ['flm', 'fractional_levy_motion']:
+            self.hurst_correction = fitting_functions.HurstCorrection()
+
         if self.nmodes > 1:
             if transition_matrix is not None:
                 self.transition_matrix = transition_matrix
@@ -267,7 +270,9 @@ class CTRW(object):
                     hurst = H[mode] if hurst_modes == self.nmodes else H[0]
 
                     # TODO: Best way to get H. Where to truncate
-                    flm = FLM(hurst, hop_parameters[mode][0], scale=hop_parameters[mode][2], N=length, M=4)
+                    alpha = hop_parameters[mode][0]
+                    flm = FLM(self.hurst_correction.interpolate(hurst, alpha), alpha, scale=hop_parameters[mode][2],
+                              N=length, M=4, correct_hurst=False)
 
                     flm.generate_realizations(1, progress=False, truncate=None)
                     if max_hop is not None:  # brute force but will have to do until there is a better FLM procedure

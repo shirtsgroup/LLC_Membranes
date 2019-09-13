@@ -66,8 +66,8 @@ H_data = np.array(df['H'], dtype=float)  # input H
 alpha_data = np.array(df['alpha'], dtype=float)  # input alpha
 h_data = np.array(df['h'], dtype=float)
 
-H = 0.425
-alpha = 1.95833
+H = 0.05
+alpha = 1.4
 
 flm = FLM(H, alpha, M=4, N=length)  # correction happens when this class is initialized
 flm.generate_realizations(100)

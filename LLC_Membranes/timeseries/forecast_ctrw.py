@@ -7,6 +7,7 @@ from LLC_Membranes.timeseries.ctrwsim import CTRW
 from LLC_Membranes.analysis.sfbm_parameters import SFBMParameters
 import sys
 import yaml
+import numpy as np
 
 
 def initialize():
@@ -64,9 +65,6 @@ def initialize():
     #                     'from the pore center will not be included in calculation')
 
     return parser
-
-
-import numpy as np
 
 
 def calculate_moving_average(series, n):
@@ -142,7 +140,6 @@ if __name__ == "__main__":
 
     # sys.estimate_hurst(modes=fit['hurst_modes'])
     # exit()
-    exit()
 
     print('Generating SFBM realizations...')
     # simulate ntrajsim trajectories for same length as MD
