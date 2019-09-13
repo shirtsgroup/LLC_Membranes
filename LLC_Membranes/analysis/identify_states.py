@@ -556,6 +556,8 @@ class Chain:
         self.msds = None
         self.limits = None
 
+        self.interpolator = fitting_functions.HurstCorrection()
+
     def generate_realizations(self, n, length, bound=7.6):
         """ Generate Markov chains using transition matrix and emission probabilities
 
@@ -670,7 +672,7 @@ class Chain:
 
         H = np.random.choice(self.hurst_parameters[state])  # random hurst parameter from transition distribution
         alpha, scale = self.emission_parameters[state, [0, 2]]
-        flm = FLM(H, alpha, M=2, N=l, scale=scale)
+        flm = FLM(self.interpolator.interpolate(H, alpha), alpha, M=2, N=l, scale=scale, correct_hurst=False)
         flm.generate_realizations(1, progress=False)
 
         return flm.noise[0][:l]

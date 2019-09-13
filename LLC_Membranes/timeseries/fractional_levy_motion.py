@@ -7,14 +7,14 @@ import numpy as np
 from scipy.stats import levy_stable
 import sys
 import matplotlib.pyplot as plt
-from LLC_Membranes.llclib import timeseries, stats
+from LLC_Membranes.llclib import timeseries, stats, fitting_functions
 import tqdm
 import math
 
 
 class FLM:
 
-    def __init__(self, H, alpha, m=256, M=6000, C=1, N=2**12, scale=1):
+    def __init__(self, H, alpha, m=256, M=6000, C=1, N=2**12, scale=1, correct_hurst=True):
         """ Generate realizations of fractional levy motion, also know as linear fractional stable motion
 
         :param H: Hurst parameter. Also known as the self-similarity parameter
@@ -24,6 +24,8 @@ class FLM:
         :param C: normalization parameter
         :param N: size of sample
         :param scale: scale parameter of Levy distribution
+        :param correct_hurst: Correct the input Hurst parameter so the output correlation structure is consistent with
+        the analytical autocorrelation.
 
         :type H: float
         :type alpha: float
@@ -32,10 +34,16 @@ class FLM:
         :type C: float
         :type N: int
         :type scale: float
+        :type correct_hurst: bool
         """
 
         if math.log(N, 2) - int(math.log(N, 2)) != 0:
             N = 2 ** (int(math.log(N, 2)) + 1)  # so we can use FFTs efficiently
+
+        if correct_hurst:
+            # Interpolate a database of input and output H parameters
+            interpolator = fitting_functions.HurstCorrection()
+            H = interpolator.interpolate(H, alpha)
 
         self.H = H
         self.alpha = alpha
