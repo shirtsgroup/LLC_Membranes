@@ -15,8 +15,7 @@ import argparse
 import numpy as np
 import warnings
 import os
-from LLC_Membranes.llclib import file_rw
-from LLC_Membranes.setup import lc_class
+from LLC_Membranes.llclib import file_rw, topology
 import mdtraj as md
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Location of this script
@@ -165,7 +164,8 @@ class RestrainedTopology(object):
 
     def __init__(self, gro, res, atoms, name='restrained', com=False, xlink=False,
                  vparams=None):
-        """
+        """ Write topology to restrain one or more residues with position restraints in GROMACS
+
         :param gro: coordinate file where restraints will be placed
         :param res: name of residue where position restraints are being added
         :param atoms: name of atoms to be restrained in res
@@ -179,12 +179,14 @@ class RestrainedTopology(object):
         t = md.load(gro)
 
         self.all_coords = t.xyz[0, :, :]  # all coordinates for system
-        self.atom_numbers = np.array([a.index + 1 for a in t.topology.atoms if a.name in atoms])
+        self.atom_numbers = []
+        for i in range(len(atoms)):
+            self.atom_numbers.append([a.index + 1 for a in t.topology.atoms if a.name in atoms[i] and a.residue.name == res[i]])
         self.atoms = t.n_atoms  # number of atoms in full system
-        self.nmon = len(self.atom_numbers) // len(atoms)  # number of monomer residues
+        self.nmon = [len(self.atom_numbers[i]) // len(atoms[i]) for i in range(len(atoms))]  # number of monomer residues
         self.name = name  # name of output files (.itp, .gro if you are using centers of masses)
-        self.residue = res  # name of residue to which position restraints are being applied
-        self.LC = lc_class.LC('%s.gro' % self.residue)  # everything we can know about the residue
+        self.residue = res  # name of residue(s) to which position restraints are being applied
+        self.LC = [topology.LC('%s' % r) for r in self.residue]  # everything we can know about the residue
         self.com = com
 
         # self.keep = np.array([a.index for a in t.topology.atoms if a.name in atoms])  # atoms to keep
@@ -249,6 +251,7 @@ class RestrainedTopology(object):
 
             file_rw.write_gro_pos(self.all_coords, '%s.gro' % self.name, ids=self.ids, res=self.res, box=self.box_gromacs)
         else:
+
             file_rw.write_assembly(res, '%s.itp' % self.name, self.nmon, xlink=xlink)
 
         with open('%s.itp' % self.name, 'r') as f:
@@ -275,9 +278,13 @@ class RestrainedTopology(object):
             if a == 'z':
                 fc[2] = f_const[i]
 
-        restraints = np.zeros([5, len(self.atom_numbers)])  # organize them into a list which can be translated to a topology
-        for i in range(len(self.atom_numbers)):
-            restraints[:, i] = [self.atom_numbers[i], 1, fc[0], fc[1], fc[2]]  # See: http://www.gromacs.org/Documentation/How-tos/Position_Restraints
+        atom_numbers = []
+        for i in self.atom_numbers:
+            atom_numbers += i
+
+        restraints = np.zeros([5, len(atom_numbers)])  # organize them into a list which can be translated to a topology
+        for i in range(len(atom_numbers)):
+            restraints[:, i] = [atom_numbers[i], 1, fc[0], fc[1], fc[2]]  # See: http://www.gromacs.org/Documentation/How-tos/Position_Restraints
             self.topology.append('{:6d}{:6d}{:1s}{:9f}{:1s}{:9f}{:1s}{:9f}\n'.format(int(restraints[0, i]),
                                 int(restraints[1, i]),'', restraints[2, i], '', restraints[3, i], '', restraints[4, i]))
 

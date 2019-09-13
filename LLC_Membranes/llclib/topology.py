@@ -2,7 +2,7 @@
 
 import os
 import mdtraj as md
-from LLC_Membranes.llclib import atom_props
+from LLC_Membranes.llclib import atom_props, transform
 import numpy as np
 import sys
 import subprocess
@@ -457,6 +457,41 @@ class LC(ReadItp):
                 break
 
         return ndx
+
+    def align_monomer(self, tilt=0):
+
+        self._align_plane(tilt=tilt)
+        self._translate_to_origin()
+        self._align_with_x()
+
+    def _align_plane(self, tilt=0):
+        """ Align the atoms defined by the plane_indices attribute of LC with the xy plane """
+
+        plane_atoms = np.zeros([3, 3])
+        for i in range(plane_atoms.shape[0]):
+            plane_atoms[i, :] = self.LC_positions[self.plane_indices[i], :]
+
+        R = transform.rotateplane(plane_atoms, angle=tilt)  # generate rotation matrix
+
+        b = np.ones([1])
+        for i in range(self.LC_positions.shape[0]):
+            coord = np.concatenate((self.LC_positions[i, :], b))
+            x = np.dot(R, coord)
+            self.LC_positions[i, :] = x[:3]
+
+    def _translate_to_origin(self):
+        """ Translate molecule to the origin using the ref_atom_index attribute of LC """
+
+        before = self.LC_positions[self.ref_atom_index, :].mean(axis=0)
+
+        self.LC_positions = transform.translate(self.LC_positions, before, np.array([0, 0, 0]))
+
+    def _align_with_x(self):
+        """ Align vector defined by lineatoms in LC object with x axis """
+
+        v = np.array([self.LC_positions[self.lineatoms[0], :2] - self.LC_positions[self.lineatoms[1], :2]])
+        angle = np.arctan2(v[0, 0, 1], v[0, 0, 0])
+        self.LC_positions = transform.rotate_coords_z(self.LC_positions, - angle * 180 / np.pi)
 
 
 class Solute(Residue):

@@ -68,175 +68,246 @@ def write_assembly(b, output, no_mon, xlink=False):
     :return:
     """
     # print up to ' [ atoms ] ' since everything before it does not need to be modified
-
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Location of this script
+    nres = len(b)  # number of different residues
 
-    if type(b) is list:  # restrain.py might pass in an already modified topology that isn't in the below folders
-        a = b
-    else:
-        with open("%s/../top/topologies/%s" % (location, '%s.itp' % b), "r") as f:
-            a = []
-            for line in f:
-                a.append(line)
+    section_indices = []
+    itps = []
+    for m, res in enumerate(b):
 
-    atoms_index, bonds_index, pairs_index, angles_index, dihedrals_p_index, \
-    dihedrals_imp_index, vsite_index, vtype = get_indices(a, xlink)
+        if type(res) is list:  # restrain.py might pass in an already modified topology that isn't in the below folders
+            itps.append(b)
+        else:
+            with open("%s/../top/topologies/%s" % (location, '%s.itp' % res), "r") as f:
+                a = []
+                for line in f:
+                    a.append(line)
+            itps.append(a)
+
+        section_indices.append(get_indices(itps[m], xlink))
+        # atoms_index, bonds_index, pairs_index, angles_index, dihedrals_p_index, \
+        # dihedrals_imp_index, vsite_index, vtype = get_indices(a, xlink)
+
+    # for i in range(0, atoms_index + 2):  # prints up to and including [ atoms ] in addition to the header line after it
+    #     f.write(a[i])
 
     f = open('%s' % output, 'w')
 
-    for i in range(0, atoms_index + 2):  # prints up to and including [ atoms ] in addition to the header line after it
-        f.write(a[i])
+    f.write('[ moleculetype ]\n')
+    f.write(';name           nrexcl\n')
+    f.write('restrained         3\n')
+    f.write('\n[ atoms ]\n')
 
     # [ atoms ]
+    natoms = []
+    start_ndx = 0
+    for r in range(nres):
 
-    atoms_count = atoms_index + 2
-    nr = 0  # number of atoms
-    while a[atoms_count] != '\n':
-        atoms_count += 1  # increments the while loop
-        nr += 1  # counts number of atoms
+        a = itps[r]
+        atoms_index = section_indices[r]['atoms_index']
+        atoms_count = atoms_index + 2
+        nr = 0  # number of atoms
+        while a[atoms_count] != '\n':
+            atoms_count += 1  # increments the while loop
+            nr += 1  # counts number of atoms
 
-    for i in range(int(no_mon)):  # print atom information for each monomer
-        for k in range(0, nr):  # getting the number right
-            f.write('{:5d}{:25s}{:5d}{:}'.format(i*nr + k + 1, a[k + atoms_index + 2][6:29],
-                                               i*nr + int(a[k + atoms_index + 2][29:34]),
-                                               a[k + atoms_index + 2][34:len(a[k + atoms_index + 2])]))
+        natoms.append(nr)
 
-    f.write("\n")  # space in between sections
+        for i in range(int(no_mon[r])):  # print atom information for each monomer
+            for k in range(0, nr):  # getting the number right
+                f.write('{:5d}{:25s}{:5d}{:}'.format(i*nr + k + 1 + start_ndx, a[k + atoms_index + 2][6:29],
+                                                   i*nr + int(a[k + atoms_index + 2][29:34]) + start_ndx,
+                                                   a[k + atoms_index + 2][34:len(a[k + atoms_index + 2])]))
+
+        start_ndx = int(no_mon[r]*nr)
+
+    f.write("\n[ bonds ]\n")
 
     # [ bonds ]
 
-    f.write(a[bonds_index] + a[bonds_index + 1])
+    start_ndx = 0
+    for r in range(nres):
 
-    nb = 0  # number of lines in the 'bonds' section
-    bond_count = bonds_index + 2
-    while a[bond_count] != '\n':
-        bond_count += 1  # increments while loop
-        nb += 1  # counting number of lines in 'bonds' section
+        a = itps[r]
+        bonds_index = section_indices[r]['bonds_index']
 
-    for i in range(int(no_mon)):
-        for k in range(0, nb):
-            f.write('{:6d}{:7d}{:}'.format(i*nr + int(a[k + bonds_index + 2][0:6]), i*nr + int(a[k + bonds_index + 2][6:14]),
-                                         a[k + bonds_index + 2][14:]))
+        nb = 0  # number of lines in the 'bonds' section
+        bond_count = bonds_index + 2
+        while a[bond_count] != '\n':
+            bond_count += 1  # increments while loop
+            nb += 1  # counting number of lines in 'bonds' section
 
-    f.write("\n")  # space in between sections
+        nr = natoms[r]
+
+        for i in range(int(no_mon[r])):
+            for k in range(0, nb):
+                f.write('{:6d}{:7d}{:}'.format(i*nr + int(a[k + bonds_index + 2][0:6]) + start_ndx,
+                                               i*nr + int(a[k + bonds_index + 2][6:14]) + start_ndx,
+                                               a[k + bonds_index + 2][14:]))
+
+        start_ndx = int(no_mon[r]*nr)
 
     # [ pairs ]
 
-    f.write(a[pairs_index] + a[pairs_index + 1])
+    f.write("\n[ pairs ]\n")
 
-    npair = 0  # number of lines in the 'pairs' section
-    pairs_count = pairs_index + 2  # keep track of index of a
-    while a[pairs_count] != '\n':
-        pairs_count += 1
-        npair += 1
+    start_ndx = 0
+    for r in range(nres):
 
-    for i in range(int(no_mon)):
-        for k in range(0, npair):
-            f.write('{:6d}{:7d}{:}'.format(i*nr + int(a[k + pairs_index + 2][0:6]), i*nr + int(a[k + pairs_index + 2][6:14]),
-                                         a[k + pairs_index + 2][14:len(a[k + pairs_index + 2])]))
+        a = itps[r]
+        pairs_index = section_indices[r]['pairs_index']
+        nr = natoms[r]
 
-    f.write("\n")  # space in between sections
+        npair = 0  # number of lines in the 'pairs' section
+        pairs_count = pairs_index + 2  # keep track of index of a
+        while a[pairs_count] != '\n':
+            pairs_count += 1
+            npair += 1
+
+        for i in range(int(no_mon[r])):
+            for k in range(0, npair):
+                f.write('{:6d}{:7d}{:}'.format(i*nr + int(a[k + pairs_index + 2][0:6]) + start_ndx,
+                                               i*nr + int(a[k + pairs_index + 2][6:14]) + start_ndx,
+                                               a[k + pairs_index + 2][14:len(a[k + pairs_index + 2])]))
+
+        start_ndx = int(no_mon[r] * nr)
 
     # [ angles ]
 
-    f.write(a[angles_index] + a[angles_index + 1])
+    f.write("\n[ angles ]\n")
 
-    na = 0  # number of lines in the 'angles' section
-    angle_count = angles_index + 2  # keep track of index of a
-    while a[angle_count] != '\n':
-        angle_count += 1
-        na += 1
+    start_ndx = 0
+    for r in range(nres):
 
-    for i in range(int(no_mon)):
-        for k in range(0, na):
-            f.write('{:6d}{:7d}{:7d}{:}'.format(i*nr + int(a[k + angles_index + 2][0:6]), i*nr + int(a[k + angles_index + 2][6:14]),
-                                              i*nr + int(a[k + angles_index + 2][14:22]),
-                                                         a[k + angles_index + 2][22:len(a[k + angles_index + 2])]))
+        a = itps[r]
+        angles_index = section_indices[r]['angles_index']
 
-    f.write("\n")  # space in between sections
+        na = 0  # number of lines in the 'angles' section
+        angle_count = angles_index + 2  # keep track of index of a
+        while a[angle_count] != '\n':
+            angle_count += 1
+            na += 1
+
+        nr = natoms[r]
+
+        for i in range(int(no_mon[r])):
+            for k in range(0, na):
+                f.write('{:6d}{:7d}{:7d}{:}'.format(i*nr + int(a[k + angles_index + 2][0:6]) + start_ndx,
+                                                    i*nr + int(a[k + angles_index + 2][6:14]) + start_ndx,
+                                                    i*nr + int(a[k + angles_index + 2][14:22]) + start_ndx,
+                                                    a[k + angles_index + 2][22:len(a[k + angles_index + 2])]))
+        start_ndx = int(no_mon[r] * nr)
 
     # [ dihedrals ] ; propers
 
-    f.write(a[dihedrals_p_index] + a[dihedrals_p_index + 2])  # +2 because there is extra info that we don't need on one line
+    f.write("\n[ dihedrals ] ; propers\n")  # space in between sections
 
-    ndp = 0  # number of lines in the 'dihedrals ; proper' section
-    dihedrals_p_count = dihedrals_p_index + 3  # keep track of index of a
-    while a[dihedrals_p_count] != '\n':
-        dihedrals_p_count += 1
-        ndp += 1
+    start_ndx = 0
+    for r in range(nres):
 
-    for i in range(int(no_mon)):
-        for k in range(0, ndp):
-            info = [int(x) for x in a[k + dihedrals_p_index + 3].split()[:5]]
-            # f.write('{:6d}{:7d}{:7d}{:7d}{:}'.format(i*nr + int(a[k + dihedrals_p_index + 3][0:6]),
-            #                                        i*nr + int(a[k + dihedrals_p_index + 3][6:14]),
-            #                                        i*nr + int(a[k + dihedrals_p_index + 3][14:22]),
-            #                                        i*nr + int(a[k + dihedrals_p_index + 3][22:30]),
-            #                                        a[k + dihedrals_p_index + 3][30:len(a[k + dihedrals_p_index + 3])]))
-            f.write('{:6d}{:7d}{:7d}{:7d}{:7d}\n'.format(i * nr + info[0], i * nr + info[1], i * nr + info[2],
-                                                         i * nr + info[3], info[4]))
+        a = itps[r]
+        dihedrals_p_index = section_indices[r]['dihedrals_p_index']
 
-    f.write("\n")  # space in between sections
+        # TODO: rewrite these so they just ignore all the comment lines
+        ndp = 0  # number of lines in the 'dihedrals ; proper' section
+        dihedrals_p_count = dihedrals_p_index + 3  # keep track of index of a
+        while a[dihedrals_p_count] != '\n':
+            dihedrals_p_count += 1
+            ndp += 1
+
+        nr = natoms[r]
+
+        for i in range(int(no_mon[r])):
+            for k in range(0, ndp):
+                info = [int(x) for x in a[k + dihedrals_p_index + 3].split()[:5]]
+                # f.write('{:6d}{:7d}{:7d}{:7d}{:}'.format(i*nr + int(a[k + dihedrals_p_index + 3][0:6]),
+                #                                        i*nr + int(a[k + dihedrals_p_index + 3][6:14]),
+                #                                        i*nr + int(a[k + dihedrals_p_index + 3][14:22]),
+                #                                        i*nr + int(a[k + dihedrals_p_index + 3][22:30]),
+                #                                        a[k + dihedrals_p_index + 3][30:len(a[k + dihedrals_p_index + 3])]))
+                f.write('{:6d}{:7d}{:7d}{:7d}{:7d}\n'.format(i * nr + info[0] + start_ndx, i * nr + info[1] + start_ndx,
+                                                             i * nr + info[2] + start_ndx, i * nr + info[3] + start_ndx,
+                                                             info[4]))
+
+        start_ndx = int(no_mon[r] * nr)
 
     # [ dihedrals ] ; impropers
 
-    f.write(a[dihedrals_imp_index] + a[dihedrals_imp_index + 2]),
-    ndimp = 0  # number of lines in the 'dihedrals ; impropers' section
-    dihedrals_imp_count = dihedrals_imp_index + 3
+    f.write("\n[ dihedrals ] ; impropers\n")  # space in between sections
 
-    while dihedrals_imp_count < len(a) and a[dihedrals_imp_count] != '\n':
-        dihedrals_imp_count += 1
-        ndimp += 1
+    start_ndx = 0
+    for r in range(nres):
 
-    # Can't have any space at the bottom of the file for this loop to work
-    for i in range(int(no_mon)):
-        for k in range(0, ndimp):
-            info = [int(x) for x in a[k + dihedrals_imp_index + 3].split()[:5]]
-            # f.write('{:6d}{:7d}{:7d}{:7d}{:}'.format(i*nr + int(a[k + dihedrals_imp_index + 3][0:6]),
-            #                                        i*nr + int(a[k + dihedrals_imp_index + 3][6:14]),
-            #                                        i*nr + int(a[k + dihedrals_imp_index + 3][14:22]),
-            #                                        i*nr + int(a[k + dihedrals_imp_index + 3][22:30]),
-            #                                        a[k + dihedrals_imp_index + 3][30:len(a[k + dihedrals_imp_index + 3])]))
-            f.write('{:6d}{:7d}{:7d}{:7d}{:7d}\n'.format(i * nr + info[0], i * nr + info[1], i * nr + info[2],
-                                                         i * nr + info[3], info[4]))
+        a = itps[r]
+        dihedrals_imp_index = section_indices[r]['dihedrals_imp_index']
+
+        ndimp = 0  # number of lines in the 'dihedrals ; impropers' section
+        dihedrals_imp_count = dihedrals_imp_index + 3
+
+        while dihedrals_imp_count < len(a) and a[dihedrals_imp_count] != '\n':
+            dihedrals_imp_count += 1
+            ndimp += 1
+
+        nr = natoms[r]
+
+        # Can't have any space at the bottom of the file for this loop to work
+        for i in range(int(no_mon[r])):
+            for k in range(0, ndimp):
+                info = [int(x) for x in a[k + dihedrals_imp_index + 3].split()[:5]]
+                f.write('{:6d}{:7d}{:7d}{:7d}{:7d}\n'.format(i * nr + info[0] + start_ndx, i * nr + info[1] + start_ndx,
+                                                             i * nr + info[2] + start_ndx, i * nr + info[3] + start_ndx,
+                                                             info[4]))
+        start_ndx = int(no_mon[r] * nr)
 
     f.write("\n")  # space in between sections
 
     # [ virtual_sites4 ]
+    # NOTE: untested for multiple residues
+    start_ndx = 0
+    for r in range(nres):
 
-    if vsite_index is not None:
-        f.write(a[vsite_index] + a[vsite_index + 1]),
-        nv = 0
-        vsite_count = vsite_index + 2
+        vsite_index = section_indices[r]['vsite_index']
 
-        for i in range(vsite_count, len(a)):  # This is the last section in the input .itp file
-            vsite_count += 1
-            nv += 1
+        if vsite_index is not None:
 
-        if vtype == '3fd':
-            for i in range(int(no_mon)):
-                for k in range(nv):
-                    f.write('{:<6d}{:<6d}{:<6d}{:<6d}{:<6d}{:<8.4f}{:<8.4f}\n'.format(i*nr + int(a[k + vsite_index + 1][0:6]),
-                                                           i*nr + int(a[k + vsite_index + 1][6:12]),
-                                                           i*nr + int(a[k + vsite_index + 1][12:18]),
-                                                           i*nr + int(a[k + vsite_index + 1][18:24]),
-                                                           int(a[k + vsite_index + 1][24:30]),
-                                                           float(a[k + vsite_index + 1][30:38]),
-                                                           float(a[k + vsite_index + 1][38:])))
-        elif xlink:
+            f.write("\n[ virtual_sites4 ]\n")
 
-            # Make sure there is no space at the bottom of the topology if you are getting errors
-            for i in range(int(no_mon)):
-                print(i)
-                for k in range(0, nv):
-                    f.write('{:<8d}{:<6d}{:<6d}{:<6d}{:<8d}{:<8d}{:<11}{:<11}{:}'.format(i*nr + int(a[k + vsite_index + 2][0:8]),
-                                                           i*nr + int(a[k + vsite_index + 2][8:14]),
-                                                           i*nr + int(a[k + vsite_index + 2][14:20]),
-                                                           i*nr + int(a[k + vsite_index + 2][20:26]),
-                                                           i*nr + int(a[k + vsite_index + 2][26:34]),
-                                                           int(a[k + vsite_index + 2][34:42]), a[k + vsite_index + 2][42:53],
-                                                           a[k + vsite_index + 2][53:64],
-                                                           a[k + vsite_index + 2][64:len(a[k + vsite_index + 2])]))
+            a = itps[r]
+
+            nv = 0
+            vsite_count = vsite_index + 2
+
+            for i in range(vsite_count, len(a)):  # This is the last section in the input .itp file
+                vsite_count += 1
+                nv += 1
+
+            nr = natoms[r]
+
+            if section_indices[r]['vtype'] == '3fd':
+                for i in range(int(no_mon[r])):
+                    for k in range(nv):
+                        f.write('{:<6d}{:<6d}{:<6d}{:<6d}{:<6d}{:<8.4f}{:<8.4f}\n'.format(
+                            i*nr + int(a[k + vsite_index + 1][0:6]) + start_ndx,
+                            i*nr + int(a[k + vsite_index + 1][6:12]) + start_ndx,
+                            i*nr + int(a[k + vsite_index + 1][12:18]) + start_ndx,
+                            i*nr + int(a[k + vsite_index + 1][18:24]) + start_ndx,
+                            int(a[k + vsite_index + 1][24:30]), float(a[k + vsite_index + 1][30:38]),
+                            float(a[k + vsite_index + 1][38:])))
+            elif xlink:
+
+                # Make sure there is no space at the bottom of the topology if you are getting errors
+                for i in range(int(no_mon[r])):
+                    for k in range(0, nv):
+                        f.write('{:<8d}{:<6d}{:<6d}{:<6d}{:<8d}{:<8d}{:<11}{:<11}{:}'.format(
+                            i*nr + int(a[k + vsite_index + 2][0:8]) + start_ndx,
+                            i*nr + int(a[k + vsite_index + 2][8:14]) + start_ndx,
+                            i*nr + int(a[k + vsite_index + 2][14:20]) + start_ndx,
+                            i*nr + int(a[k + vsite_index + 2][20:26]) + start_ndx,
+                            i*nr + int(a[k + vsite_index + 2][26:34]) + start_ndx,
+                            int(a[k + vsite_index + 2][34:42]), a[k + vsite_index + 2][42:53],
+                            a[k + vsite_index + 2][53:64], a[k + vsite_index + 2][64:len(a[k + vsite_index + 2])]))
+        start_ndx = int(no_mon[r] * nr)
+
     f.close()
 
 
@@ -281,7 +352,9 @@ def get_indices(a, xlink):
     # else:
     #     vsite_index = 0
 
-    return atoms_index, bonds_index, pairs_index, angles_index, dihedrals_p_index, dihedrals_imp_index, vsite_index, vtype
+    return {'atoms_index': atoms_index, 'bonds_index': bonds_index, 'pairs_index': pairs_index,
+            'angles_index': angles_index, 'dihedrals_p_index': dihedrals_p_index,
+            'dihedrals_imp_index': dihedrals_imp_index, 'vsite_index': vsite_index, 'vtype': vtype}
 
 
 def write_initial_config(positions, identity, name, no_layers, layer_distribution, dist, no_pores, p2p, no_ions, rot, out,

@@ -8,11 +8,13 @@ from LLC_Membranes.setup.bcc_build import BicontinuousCubicBuild
 
 def initialize():
 
+    # TODO: make a yaml
+
     parser = argparse.ArgumentParser(description='Build LLC unit cell')
 
     parser.add_argument('-phase', '--phase', default='gyroid', type=str, help='Liquid crystal phase to build (HII, QI '
                                                                               'etc.)')
-    parser.add_argument('-b', '--build_monomer', type=str, help='Name of single monomer'
+    parser.add_argument('-b', '--build_monomer', type=str, nargs='+', help='Name of single monomer'
                         'structure file (.gro format) used to build full system')
     parser.add_argument('-o', '--out', default='initial.gro', help='Name of output .gro file for full system')
 
@@ -41,6 +43,9 @@ def initialize():
     parser.add_argument('-pd', '--parallel_displaced', default=0, type=float, help='Angle of wedge formed between line'
                         'extending from pore center to monomer and line from pore center to vertically adjacent monomer'
                                                                                    'head group.')
+    parser.add_argument('-mf', '--mol_frac', nargs='+', default=[1.], type=float, help='If using the -random flag, this gives'
+                        'the relative amount of each monomer to add. List the fractions in the same order as'
+                        '-build_monomer')
 
     # Bicontinuous cubic structure
     parser.add_argument('-g', '--grid', default=50, type=int, help='Number of sections to break grid into when '
@@ -96,7 +101,10 @@ if __name__ == "__main__":
         if not args.build_monomer:
             build_monomer = 'NAcarb11V'  # default monomer for HII phase
         else:
-            build_monomer = args.build_monomer.split('.')[0]  # remove file extension if there is one
+            if type(args.build_monomer) is list:
+                build_monomer = [i.split('.')[0] for i in args.build_monomer]
+            else:
+                build_monomer = args.build_monomer.split('.')[0]  # remove file extension if there is one
 
         correlation = False
         if args.correlation_length is not None:
@@ -109,9 +117,11 @@ if __name__ == "__main__":
 
         system = BuildHexagonal(build_monomer, args.nopores, args.p2p, args.angles[2], args.pore_radius)
 
-        system.align_plane()  # align monomer head group with xy plane
-        system.translate_to_origin()  # move monomer to origin for rotation
-        system.align_with_x()  # align vector from benzene ring to carboxylate with x axis
+        system.reorient_monomer()  # align monomer with xy plane and orient along x-axis
+
+        # system.align_plane()  # align monomer head group with xy plane
+        # system.translate_to_origin()  # move monomer to origin for rotation
+        # system.align_with_x()  # align vector from benzene ring to carboxylate with x axis
 
         wedge_theta = 360 / args.ncolumns  # rotation between laterally adjacent monomers (angle defining slice)
         for i in range(args.nopores):
@@ -123,7 +133,7 @@ if __name__ == "__main__":
                 z = np.linspace(0, args.dbwl*args.monomers_per_column - args.dbwl, args.monomers_per_column)
                 system.build_column(i, z, thetas[j], correlation=correlation, var=args.Lvar,
                                     correlation_length=args.correlation_length, pd=args.parallel_displaced,
-                                    random_shift=args.no_column_shift)
+                                    random_shift=args.no_column_shift, mole_fraction=args.mol_frac)
 
         system.reorder()
 

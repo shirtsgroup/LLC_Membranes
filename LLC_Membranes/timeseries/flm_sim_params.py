@@ -2,6 +2,7 @@
 
 import numpy as np
 from scipy.interpolate import LinearNDInterpolator
+from scipy.optimize import minimize
 import pandas as pd
 import os
 
@@ -52,7 +53,18 @@ class HurstCorrection:
         return interp
 
 
-def truncate(limit):
+def max_realization(input_limit, actual_limit, n):
+
+    from LLC_Membranes.timeseries.fractional_levy_motion import FLM
+
+    flm = FLM(0.4, 1.75, M=4, N=n)
+    # short traj with lots of realizations faster than single long traj
+    flm.generate_realizations(100, truncate=input_limit)
+
+    return np.abs(flm.noise.max() - actual_limit)
+
+
+def truncate(limit, n=2**10):
     """ Determine where to truncate the initial Levy distribution in fractional_levy_motion.FLM() so that the magnitude
     of draws stay below some some limit.
 
@@ -63,14 +75,9 @@ def truncate(limit):
     :return:
     """
 
-    from LLC_Membranes.timeseries.fractional_levy_motion import FLM
-
-    flm = FLM(0.4, 1.75, M=4, N=2**12)
-    flm.generate_realizations(1, truncate=limit)
-
-    print(flm.noise.max())
+    return minimize(max_realization, np.array(limit), args=(limit, n))
 
 
 if __name__ == "__main__":
 
-    truncate(1.75)
+    print(truncate(3))

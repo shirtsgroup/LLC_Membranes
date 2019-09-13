@@ -101,7 +101,6 @@ class FLM:
                         too_big = np.where(np.abs(z) > truncate)[0]
 
             #plt.hist(z, range=(-5, 5), bins=50, alpha=0.5, color='red', density=True)
-
             z = np.fft.fft(z, self.Na)
             w = np.fft.ifft(z * self.A, self.Na).real
 

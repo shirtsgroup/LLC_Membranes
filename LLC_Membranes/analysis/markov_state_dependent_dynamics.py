@@ -865,6 +865,20 @@ if __name__ == "__main__":
     # plt.tight_layout()
     # plt.show()
     # exit()
+    alpha, mu, sigma = states.fit_params[-1]
+    transition_emissions = np.array(states.emissions[-1])
+    print(transition_emissions.size)
+    print(np.where(np.abs(transition_emissions) > 0.8)[0].size)
+    plt.hist(states.emissions[-1], bins=100, range=(-0.8, 0.8), density=True)
+    x = np.linspace(-0.8, 0.8, 1000)
+    plt.plot(x, levy_stable.pdf(x, alpha=alpha, beta=0, loc=mu, scale=sigma), '--', lw=2, label="L\'evy")
+    from scipy.stats import norm
+    plt.plot(x, norm.pdf(x, loc=0, scale=np.std(states.emissions[-1])), '--', lw=2, label='Gaussian')
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+    exit()
     states.transition_autocorrelation(plot=True)
     exit()
     states.calculate_hurst()

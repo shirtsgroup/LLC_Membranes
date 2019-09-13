@@ -5,6 +5,8 @@ import os
 import subprocess
 from LLC_Membranes.setup.gentop import SystemTopology
 from LLC_Membranes.setup.genmdp import SimulationMdp
+from LLC_Membranes.setup.restrain import RestrainedTopology
+from LLC_Membranes.llclib import topology
 
 location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))  # Directory this script is in
 
@@ -29,8 +31,8 @@ def initialize():
     parser.add_argument('-np', '--nproc', default=4, help='Number of MPI processes')
 
     # same flags as to build.py
-    parser.add_argument('-b', '--build_monomer', default='NAcarb11V.gro', type=str, help='Name of single monomer'
-                        'structure file (.gro format) used to build full system')
+    parser.add_argument('-b', '--build_monomer', default='NAcarb11V.gro', nargs='+', type=str, help='Name of single '
+                        'monomer structure file (.gro format) used to build full system')
     parser.add_argument('-m', '--monomers_per_column', default=20, type=int, help='Number of monomers to stack in each'
                                                                                   'column')
     parser.add_argument('-c', '--ncolumns', default=5, type=int, help='Number of columns used to build each pore')
@@ -46,6 +48,9 @@ def initialize():
                         'box vectors')
     parser.add_argument('-seed', '--random_seed', default=False, type=int, help='Pass an integer to give a seed for '
                                                                                 'random column displacement')
+    parser.add_argument('-mf', '--mol_frac', nargs='+', default=1., type=float, help='If using the -random flag, this gives'
+                        'the relative amount of each monomer to add. List the fractions in the same order as'
+                        '-build_monomer')
 
     # flags unique to equil.sh
     parser.add_argument('-ring_restraints', '--ring_restraints', default=["C", "C1", "C2", "C3", "C4", "C5"], nargs='+',
@@ -58,20 +63,31 @@ def initialize():
                                                                                   'pressure control')
     parser.add_argument('-lpr', '--length_Parrinello_Rahman', default=400000, type=int, help='Length of simulation '
                         'using Parrinello-Rahman pressure control')
-    parser.add_argument('--restraint_residue', default='HII', type=str, help='Name of residue to which ring_restraint'
-                                                                             'atoms belong')
+    parser.add_argument('--restraint_residue', default='HII', nargs='+', type=str,
+                        help='Name of residue to which ring_restraint atoms belong')
     parser.add_argument('--restraint_axis', default='xyz', type=str, help='Axes along which to apply position '
                                                                           'restraints')
 
     return parser
 
 
-def build(build_monomer, out, mon_per_col, ncol, radius, p2p, dbwl, pd, nopores=4, seed=False):
+def build(build_monomer, out, mon_per_col, ncol, radius, p2p, dbwl, pd, nopores=4, seed=False, mole_fraction=1.):
 
     # update once build.py is more class-based
 
-    build = 'build.py -b %s -m %s -c %s -r %s -p %s -n %s -d %s -pd %s -o %s' % (build_monomer, mon_per_col, ncol,
-                                                                                 radius, p2p, nopores, dbwl, pd, out)
+    build = 'build.py -phase h2 -m %s -c %s -r %s -p %s -n %s -d %s -pd %s -o %s -b' % (mon_per_col, ncol,
+            radius, p2p, nopores, dbwl, pd, out)
+
+    for mon in build_monomer:
+        build += ' %s' % mon
+
+    if type(mole_fraction) is float:
+        mole_fraction = [mole_fraction]
+
+    build += ' -mf'
+    for mf in mole_fraction:
+        build += ' %s' % mf
+
     if seed:
         build += ' -seed %s' % seed
 
@@ -98,13 +114,10 @@ def generate_input_files(gro, ensemble, length, barostat='berendsen', genvel=Tru
 
 
 def restrain(gro, build_monomer, force, axis, restraint_atoms):
-    # update once restrain.py is class-based
 
-    cmd = 'restrain.py -f %s -A %s -g %s -m %s -a %s' % (' '.join([str(force) for a in range(len(axis))]), axis, gro,
-        build_monomer.split('.')[0], ' '.join(map(str, restraint_atoms)))
-
-    p = subprocess.Popen(cmd.split())
-    p.wait()
+    top = RestrainedTopology(gro, build_monomer, restraint_atoms, com=False)
+    top.add_position_restraints(axis, [force for _ in range(len(axis))])
+    top.write_topology()
 
 
 def simulate(mdp, top, config, out, restrained=False, mpi=False, np=4):
@@ -146,14 +159,17 @@ if __name__ == "__main__":
     os.environ["GMX_MAXBACKUP"] = "-1"  # stop GROMACS from making backups
 
     # initial build
-    build(args.build_monomer, args.initial, args.monomers_per_column, args.ncolumns, args.pore_radius, args.p2p,
-          args.dbwl, args.parallel_displaced, nopores=args.nopores, seed=args.random_seed)
+    # build(args.build_monomer, args.initial, args.monomers_per_column, args.ncolumns, args.pore_radius, args.p2p,
+    #       args.dbwl, args.parallel_displaced, nopores=args.nopores, seed=args.random_seed, mole_fraction=args.mol_frac)
 
     # generate input files once
-    restrain(args.initial, args.build_monomer, args.forces[0], args.restraint_axis, args.ring_restraints)
-    generate_input_files(args.initial, 'nvt', args.length_nvt, restraints=args.restraint_residue)
+    # lc = [topology.LC(mon) for mon in args.build_monomer]
+    # atoms = [l.pore_defining_atoms for l in lc]
+    # restrain(args.initial, args.build_monomer, args.forces[0], args.restraint_axis, atoms)
 
+    generate_input_files(args.initial, 'nvt', args.length_nvt, restraints=args.restraint_residue)
     simulate('em.mdp', 'topol.top', '%s' % args.initial, 'em', mpi=args.mpi, np=args.nproc, restrained=True)
+    exit()
 
     nrg = check_energy(logname='em.log')
 

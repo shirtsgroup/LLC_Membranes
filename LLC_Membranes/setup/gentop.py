@@ -129,6 +129,8 @@ class SystemTopology(object):
         top.append('#include "%s/%s/%s.itp"\n' % (self.ff_location, self.forcefield, self.forcefield))
         top.append('\n')
 
+        restraints_included = False
+
         ion_count = 0
         for r in self.residues:
             if r in self.ions:
@@ -141,7 +143,9 @@ class SystemTopology(object):
                 top.append(';%s Topology\n' % r)
                 if self.restraints:
                     if r in self.restraints:
-                        top.append('#include "%s"\n' % restrained_top_name)  # need to modify so this is not hardcoded.
+                        if not restraints_included:
+                            top.append('#include "%s"\n' % restrained_top_name)  # need to modify so this is not hardcoded.
+                            restraints_included = True  # prevent restrained topology from being included twice
                     else:
                         top.append('#include "%s/%s.itp"\n' % (self.top_location, r))
                 elif self.xlink and r == self.xlink_residue:
@@ -157,10 +161,13 @@ class SystemTopology(object):
         top.append('[ molecules ]\n')
         top.append(';Compounds     nmols\n')
 
+        restraints_included = False
         for r in self.residues:
             if self.restraints:
                 if r in self.restraints:
-                    top.append('{:10s}{:>10d}\n'.format(r, 1))
+                    if not restraints_included:
+                        top.append('{:10s}{:>10d}\n'.format('restrained', 1))
+                        restraints_included = True
                 else:
                     top.append('{:10s}{:>10d}\n'.format(r, self.residue_count[r]))
             elif self.xlink and r == self.xlink_residue:

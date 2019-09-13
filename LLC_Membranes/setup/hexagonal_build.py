@@ -32,7 +32,7 @@ def z_correlation(z, L, v=0.1):
     return locations
 
 
-class BuildHexagonal(topology.LC):
+class BuildHexagonal:
 
     def __init__(self, name, npores, p2p, pore_alpha, pore_radius, tilt=0):
         """Initialize geometry of columnar pore structure
@@ -53,7 +53,11 @@ class BuildHexagonal(topology.LC):
         :type tilt: float
         """
 
-        super().__init__(name)
+        # can't use inheritance if there are two LCs
+        if type(name) is list:
+            self.LC = [topology.LC(i) for i in name]
+        else:
+            self.LC = [topology.LC(name)]
 
         self.tilt = tilt
         self.xyz = np.zeros([0, 3])
@@ -74,7 +78,8 @@ class BuildHexagonal(topology.LC):
         self.pore_centers[:, 0] += (p2p / 2) * (1 + np.cos(pore_alpha_radians))
         self.pore_centers[:, 1] += (p2p / 2) * np.sin(pore_alpha_radians)
 
-    def build_column(self, pore, z, theta, correlation=True, var=0, correlation_length=0, pd=0, random_shift=True):
+    def build_column(self, pore, z, theta, correlation=True, var=0, correlation_length=0, pd=0, random_shift=True,
+                     mole_fraction=(1.,)):
         """ Place a column at angle theta on xy plane with respect to a pore center
 
         :param pore: pore number (0 : npores - 1)
@@ -88,6 +93,8 @@ class BuildHexagonal(topology.LC):
         :param random_shift: if True, randomly shift columns in z-direction by choosing a displacement from a uniform \
         distribution bounded by (0, d), where d is the vertical distance between stacked monomers
         :param seed: random seed if you want to reproduce randomly displaced structures
+        :param mole_fraction: mol fraction of each type of monomer. This only has meaning if the system is built with a
+        mixture of monomers.
 
         :type pore: int
         :type z: np.array
@@ -97,6 +104,7 @@ class BuildHexagonal(topology.LC):
         :type correlation_length: float
         :type pd: float
         :type random_shift: bool
+        :type mole_fraction: tuple of floats or numpy.ndarray
         """
 
         if correlation:
@@ -111,26 +119,44 @@ class BuildHexagonal(topology.LC):
 
         displaced_theta = pd
 
-        natoms = self.LC_positions.shape[0]  # number of atoms including ions
-        pos = np.copy(self.LC_positions)
-        pos[:, 0] += self.pore_radius
+        # natoms = self.LC_positions.shape[0]  # number of atoms including ions
+        # pos = np.copy(self.LC_positions)
+        # pos[:, 0] += self.pore_radius
+        # displaced_pos = np.copy(pos)
+
+        natoms = [lc.LC_positions.shape[0] for lc in self.LC]
+        pos = []
+        for i, lc in enumerate(self.LC):
+            pos.append(np.copy(lc.LC_positions))
+            pos[i][:, 0] += self.pore_radius
         displaced_pos = np.copy(pos)
 
-        pos = transform.rotate_coords_z(pos, theta)
-        displaced_pos = transform.rotate_coords_z(displaced_pos, theta + displaced_theta)
+        pos = [transform.rotate_coords_z(p, theta) for p in pos]
+        displaced_pos = [transform.rotate_coords_z(p, theta + displaced_theta) for p in displaced_pos]
 
-        column = np.zeros([z.size * natoms, 3])
+        if len(mole_fraction) != len(self.LC):
+            raise Exception('You must supply one mole fraction for each monomer.')
+
+        mole_fraction = np.array(mole_fraction)
+        mole_fraction /= mole_fraction.sum()
+
+        monomer_ids = np.random.choice(np.arange(len(self.LC)), p=mole_fraction, size=z.size)
+
+        atom_indices = np.cumsum([0] + [natoms[i] for i in monomer_ids])
+        column = np.zeros([atom_indices[-1], 3])
 
         before = np.array([0, 0, 0])
         for l in range(z.size):
+            mon = monomer_ids[l]
             if l % 2 == 0:
-                column[l * natoms:(l + 1) * natoms, :] = transform.translate(pos, before, np.array([0, 0, z[l]]))
+                column[atom_indices[l]: atom_indices[l + 1]] = transform.translate(pos[mon], before, np.array([0, 0, z[l]]))
             else:
-                column[l * natoms:(l + 1) * natoms, :] = transform.translate(displaced_pos, before, np.array([0, 0, z[l]]))
-            self.names += self.LC_names
-            self.all_residues += self.LC_residues
+                column[atom_indices[l]: atom_indices[l + 1]] = transform.translate(displaced_pos[mon], before,
+                                                                             np.array([0, 0, z[l]]))
+            self.names += self.LC[mon].LC_names
+            self.all_residues += self.LC[mon].LC_residues
 
-        column = transform.translate(column, before, [self.pore_centers[pore, 0], self.pore_centers[pore, 1], 0])
+        column = transform.translate(column, before, np.array([self.pore_centers[pore, 0], self.pore_centers[pore, 1], 0]))
 
         self.xyz = np.concatenate((self.xyz, column))
 
@@ -147,44 +173,60 @@ class BuildHexagonal(topology.LC):
 
         file_rw.write_gro_pos(self.xyz, out, ids=self.names, res=self.all_residues, ucell=ucell)
 
-    def align_plane(self):
-        """ Align the atoms defined by the plane_indices attribute of LC with the xy plane """
+    def reorient_monomer(self):
+        """ Align monomer head groups so they are coplanar with the xy plane and vector pointing towards pore center is
+        aligned with x-axis
+        """
 
-        plane_atoms = np.zeros([3, 3])
-        for i in range(plane_atoms.shape[0]):
-            plane_atoms[i, :] = self.LC_positions[self.plane_indices[i], :]
+        for lc in self.LC:
+            lc.align_monomer(tilt=self.tilt)
 
-        R = transform.rotateplane(plane_atoms, angle=self.tilt)  # generate rotation matrix
-
-        b = np.ones([1])
-        for i in range(self.LC_positions.shape[0]):
-            coord = np.concatenate((self.LC_positions[i, :], b))
-            x = np.dot(R, coord)
-            self.LC_positions[i, :] = x[:3]
-
-    def translate_to_origin(self):
-        """ Translate molecule to the origin using the ref_atom_index attribute of LC """
-
-        self.LC_positions = transform.translate(self.LC_positions, self.LC_positions[self.ref_atom_index, :], [0, 0, 0])
-
-    def align_with_x(self):
-        """ Align vector defined by lineatoms in LC object with x axis """
-
-        v = np.array([self.LC_positions[self.lineatoms[0], :2] - self.LC_positions[self.lineatoms[1], :2]])
-        angle = np.arctan2(v[0, 0, 1], v[0, 0, 0])
-        self.LC_positions = transform.rotate_coords_z(self.LC_positions, - angle * 180 / np.pi)
+    # def align_plane(self):
+    #     """ Align the atoms defined by the plane_indices attribute of LC with the xy plane """
+    #
+    #     plane_atoms = np.zeros([3, 3])
+    #     for i in range(plane_atoms.shape[0]):
+    #         plane_atoms[i, :] = self.LC_positions[self.plane_indices[i], :]
+    #
+    #     R = transform.rotateplane(plane_atoms, angle=self.tilt)  # generate rotation matrix
+    #
+    #     b = np.ones([1])
+    #     for i in range(self.LC_positions.shape[0]):
+    #         coord = np.concatenate((self.LC_positions[i, :], b))
+    #         x = np.dot(R, coord)
+    #         self.LC_positions[i, :] = x[:3]
+    #
+    # def translate_to_origin(self):
+    #     """ Translate molecule to the origin using the ref_atom_index attribute of LC """
+    #
+    #     self.LC_positions = transform.translate(self.LC_positions, self.LC_positions[self.ref_atom_index, :], [0, 0, 0])
+    #
+    # def align_with_x(self):
+    #     """ Align vector defined by lineatoms in LC object with x axis """
+    #
+    #     v = np.array([self.LC_positions[self.lineatoms[0], :2] - self.LC_positions[self.lineatoms[1], :2]])
+    #     angle = np.arctan2(v[0, 0, 1], v[0, 0, 0])
+    #     self.LC_positions = transform.rotate_coords_z(self.LC_positions, - angle * 180 / np.pi)
 
     def reorder(self):
-        """ reorder coordinate, residues and atom names so that residues are separated """
+        """ reorder coordinate, residues and atom names so that all residues are separated. Some scripts (might) still
+        rely on this ordering.
+        """
 
-        residue_indices = []
-        for r in self.residues:
-            ndx = [i for i, a in enumerate(self.all_residues) if a == r]
-            residue_indices.append(ndx)
+        residues = []
+        for lc in self.LC:
+            for r in lc.residues:
+                residues.append(r)
 
         ordered = []
-        for i in range(len(residue_indices)):
-            ordered += residue_indices[i]
+        for r in residues:
+            ndx = [i for i, a in enumerate(self.all_residues) if a == r]
+            ordered += ndx
+        #     residue_indices.append(ndx)
+        #
+        # ordered = []
+        # for i in range(len(residue_indices)):
+        #     ordered += residue_indices[i]
 
         self.xyz = self.xyz[ordered, :]
         self.all_residues = [self.all_residues[i] for i in ordered]
