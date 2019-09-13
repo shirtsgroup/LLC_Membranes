@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from LLC_Membranes.analysis import hbonds, coordination_number
 from LLC_Membranes.llclib import file_rw, physical, topology, timeseries, fitting_functions
 from LLC_Membranes.timeseries.fractional_levy_motion import FLM
+from LLC_Membranes.timeseries import flm_sim_params
 import sys
 import tqdm
 from scipy.stats import cauchy, laplace, t, levy_stable
@@ -556,7 +557,7 @@ class Chain:
         self.msds = None
         self.limits = None
 
-        self.interpolator = fitting_functions.HurstCorrection()
+        self.interpolator = flm_sim_params.HurstCorrection()
 
     def generate_realizations(self, n, length, bound=7.6):
         """ Generate Markov chains using transition matrix and emission probabilities
@@ -623,21 +624,21 @@ class Chain:
         if states[0] == states[1] and transitions[0] == 0:  # switch_points always includes first and last data point
             transitions = transitions[1:]
 
-        for i, t in enumerate(transitions[:-1]):
-            dwell = transitions[i + 1] - t  # plus two since using enumerate and starting at index 1 of transitions
-            if dwell > 1:
-                if dwell > 2:
-                    traj[t + 1: transitions[i + 1]] = self._flm_sequence(dwell - 1, states[t], bound=bound)
-                elif dwell == 2:
-                    # one data point so generate single point from emission distribution to save time
-                    rv = bound + 1
-                    while np.abs(rv) > bound:
-                        rv = self.emission_function.rvs(self.emission_parameters[states[t], 0], 0,
-                                                        loc=self.emission_parameters[states[t], 1],
-                                                        scale=self.emission_parameters[states[t], 2])
-
-                    traj[t + 1] = rv
-            # print(t, transitions[i + 1], traj.min())
+        # for i, t in enumerate(transitions[:-1]):
+        #     dwell = transitions[i + 1] - t  # plus two since using enumerate and starting at index 1 of transitions
+        #     if dwell > 1:
+        #         if dwell > 2:
+        #             traj[t + 1: transitions[i + 1]] = self._flm_sequence(dwell - 1, states[t], bound=bound)
+        #         elif dwell == 2:
+        #             # one data point so generate single point from emission distribution to save time
+        #             rv = bound + 1
+        #             while np.abs(rv) > bound:
+        #                 rv = self.emission_function.rvs(self.emission_parameters[states[t], 0], 0,
+        #                                                 loc=self.emission_parameters[states[t], 1],
+        #                                                 scale=self.emission_parameters[states[t], 2])
+        #
+        #             traj[t + 1] = rv
+        #     # print(t, transitions[i + 1], traj.min())
 
         traj[transitions[:-1]] = self._flm_sequence(transitions.size - 1, -1, bound=bound)
 
@@ -864,6 +865,8 @@ if __name__ == "__main__":
     # plt.tight_layout()
     # plt.show()
     # exit()
+    states.transition_autocorrelation(plot=True)
+    exit()
     states.calculate_hurst()
     # print(states.fit_params)
     for i in states.hurst:

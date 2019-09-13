@@ -7,7 +7,8 @@ import numpy as np
 from scipy.stats import levy_stable
 import sys
 import matplotlib.pyplot as plt
-from LLC_Membranes.llclib import timeseries, stats, fitting_functions
+from LLC_Membranes.llclib import timeseries, stats
+from LLC_Membranes.timeseries.flm_sim_params import HurstCorrection
 import tqdm
 import math
 
@@ -42,7 +43,7 @@ class FLM:
 
         if correct_hurst:
             # Interpolate a database of input and output H parameters
-            interpolator = fitting_functions.HurstCorrection()
+            interpolator = HurstCorrection()
             H = interpolator.interpolate(H, alpha)
 
         self.H = H
@@ -156,7 +157,10 @@ class FLM:
 
         # calculate acf of each trajectory
         ntraj = self.noise.shape[0]
-        self.acf = np.zeros([ntraj, self.N - 1])
+        if (math.log(self.N, 2) - int(math.log(self.N, 2))) < 1e-10:
+            self.acf = np.zeros([ntraj, self.N])
+        else:
+            self.acf = np.zeros([ntraj, self.N - 1])
         for i in range(ntraj):
             self.acf[i, :] = timeseries.acf(self.noise[i, :])
 

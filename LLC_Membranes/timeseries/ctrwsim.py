@@ -11,6 +11,7 @@ from multiprocessing import Pool
 import time as timer
 import fbm
 from LLC_Membranes.timeseries.fractional_levy_motion import FLM
+from LLC_Membranes.timeseries import flm_sim_params
 
 
 def initialize():
@@ -103,7 +104,7 @@ class CTRW(object):
         self.nmodes = nmodes
 
         if self.hop_distribution in ['flm', 'fractional_levy_motion']:
-            self.hurst_correction = fitting_functions.HurstCorrection()
+            self.hurst_correction = flm_sim_params.HurstCorrection()
 
         if self.nmodes > 1:
             if transition_matrix is not None:
