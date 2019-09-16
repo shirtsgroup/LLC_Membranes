@@ -39,6 +39,39 @@ def plane_rotation_matrix(n, angle):
     """
 
 
+def rotate_about_axis(n, theta, radians=False):
+    """
+
+    :param n:
+    :param theta:
+
+    :return:
+    """
+
+    if not radians:
+        theta *= (np.pi / 180)  # convert to radians
+
+    n = np.array(n) / np.linalg.norm(n)  # normalize n in case it isn't already
+    n1, n2, n3 = n
+
+    R = np.zeros([3, 3])
+
+    cos = 1 - np.cos(theta)
+    sin = np.sin(theta)
+
+    R[0, 0] = np.cos(theta) + n1**2 * cos
+    R[0, 1] = n1 * n2 * cos - n3 * sin
+    R[0, 2] = n1 * n3 * cos + n2 * sin
+    R[1, 0] = n1 * n2 * cos + n3 * sin
+    R[1, 1] = np.cos(theta) + n2**2 * cos
+    R[1, 2] = n2 * n3 * cos - n1 * sin
+    R[2, 0] = n1 * n3 * cos - n2 * sin
+    R[2, 1] = n2 * n3 * cos + n1 * sin
+    R[2, 2] = np.cos(theta) + n3**2 * cos
+
+    return R
+
+
 def rotateplane(plane, angle=0):
     """ Calculate a rotation matrix to rotate a plane in 3 dimensions
 

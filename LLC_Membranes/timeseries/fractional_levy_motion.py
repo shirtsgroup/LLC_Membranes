@@ -106,6 +106,12 @@ class FLM:
 
             self.noise[i, :] = w[:self.N*self.m:self.m]
 
+            # Idea: replace too large values with ones drawn from same distribution with same sign as self.noise[i, :]
+            # if truncate is not None:
+            #     too_big = np.where(np.abs(self.noise[i, :]) > truncate)[0]
+            #     while too_big.size > 0:
+            #         replacements = levy_stable.rvs(self.alpha, 0, loc=0, scale=self.scale, size=too_big.size)
+
         self.realizations = np.cumsum(self.noise, axis=1)
 
         # print(self.realizations.max())
@@ -113,7 +119,7 @@ class FLM:
         # plt.show()
         # exit()
 
-    def plot_marginal(self, bounds=(-4, 4), bins=50, show=False):
+    def plot_marginal(self, bounds=(-.5, .5), bins=50, show=False):
         """ Plot a histogram of the marginal distribution of increments, with the expect PDF overlayed on top of it
 
         :param bounds: largest increments to be included in histogram
@@ -132,6 +138,7 @@ class FLM:
         # account for part of PDF that is chopped off. Using density=True makes hist sum to 1
         area_covered = levy_stable.cdf(bounds[1], self.alpha, 0, loc=0, scale=self.scale) - \
                        levy_stable.cdf(bounds[0], self.alpha, 0, loc=0, scale=self.scale)
+
         hist *= area_covered
 
         # plot bars. Can't use plt.hist since I needed to modify the bin heights

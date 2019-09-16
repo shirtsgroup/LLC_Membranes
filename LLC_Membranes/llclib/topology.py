@@ -425,10 +425,10 @@ class LC(ReadItp):
             for line in f:
                 a.append(line)
 
-        t = md.load("%s/../top/topologies/%s.gro" % (script_location, name))
-        self.LC_positions = t.xyz[0, :, :]
-        self.LC_names = [a.name for a in t.topology.atoms]
-        self.LC_residues = [a.residue.name for a in t.topology.atoms]
+        self.t = md.load("%s/../top/topologies/%s.gro" % (script_location, name))
+        self.LC_positions = self.t.xyz[0, :, :]
+        self.LC_names = [a.name for a in self.t.topology.atoms]
+        self.LC_residues = [a.residue.name for a in self.t.topology.atoms]
 
         # Things ReadItp gets wrong because it doesn't include the ion .itps
         self.natoms = len(self.LC_names)
@@ -436,7 +436,7 @@ class LC(ReadItp):
         # This has a more predictable order than np.unique and set()
         self.residues = []
         self.MW = 0
-        for a in t.topology.atoms:
+        for a in self.t.topology.atoms:
             element = ''.join([i for i in a.name if not i.isdigit()])  # get rid of number in atom name
             self.MW += md.element.Element.getBySymbol(element).mass
             if a.residue.name not in self.residues:

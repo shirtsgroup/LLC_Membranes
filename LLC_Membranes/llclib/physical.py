@@ -8,7 +8,6 @@ import numpy as np
 import matplotlib.path as mplPath
 import mdtraj as md
 from random import randint
-from pymbar import timeseries
 import tqdm
 
 
@@ -152,6 +151,8 @@ def conc(t, comp, b):
     :param b: buffer. distance into membrane to go before starting calculation
     :return: concentration
     """
+
+    from pymbar import timeseries
 
     box = t.unitcell_vectors
     equil = timeseries.detectEquilibration(box[:, 2, 2])[0]

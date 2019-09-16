@@ -9,7 +9,7 @@ import os
 script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
-def simulate(mdp, top, gro, out, verbose=False, em_energy=False, mpi=False, nprocesses=4, dd=None):
+def simulate(mdp, top, gro, out, verbose=False, em_energy=False, mpi=False, nprocesses=4, dd=None, restraints=False):
     """ A wrapper for running GROMACS molecular dynamics simulations
 
     :param mdp: name of GROMACS Molecular Dynamics Paramters (mdp) file
@@ -22,6 +22,7 @@ def simulate(mdp, top, gro, out, verbose=False, em_energy=False, mpi=False, npro
     :param nprocesses: number of MPI process for an MPI simulation
     :param dd: domain decomposition grid for parallelization. If this is not specified, GROMACS decides (which usually
     works)
+    :param restraints: True if position restraints are applied
 
     :type mdp: str
     :type top: str
@@ -32,6 +33,7 @@ def simulate(mdp, top, gro, out, verbose=False, em_energy=False, mpi=False, npro
     :type mpi: bool
     :type nprocesses: int
     :type dd: list
+    :type restraints: bool
     """
 
     gmx = "gmx"
@@ -39,6 +41,9 @@ def simulate(mdp, top, gro, out, verbose=False, em_energy=False, mpi=False, npro
         gmx = "mpirun -np %d gmx_mpi" % nprocesses
 
     grompp = '%s grompp -f %s -c %s -p %s -o %s' % (gmx, mdp, gro, top, out)
+
+    if restraints:
+        grompp += ' -r %s' % gro
 
     if verbose:
         p1 = subprocess.Popen(grompp.split())

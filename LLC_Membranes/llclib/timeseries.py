@@ -5,7 +5,6 @@ from multiprocessing import Pool
 import tqdm
 import warnings
 import matplotlib.pyplot as plt
-from statsmodels.tsa.api import VAR
 from LLC_Membranes.llclib import stats, fitting_functions
 from scipy.optimize import curve_fit
 
@@ -633,6 +632,8 @@ class VectorAutoRegression:
         :type timeseries: numpy.ndarray
         :type r: int
         """
+
+        from statsmodels.tsa.api import VAR
 
         self.dim = timeseries.shape[1]  # number of dimensions
 
