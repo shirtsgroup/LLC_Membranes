@@ -11,13 +11,24 @@ import numpy as np
 import pandas as pd
 from LLC_Membranes.timeseries.fractional_levy_motion import FLM
 import matplotlib.pyplot as plt
+import numpy as np
 
 # as a function of H, alpha and truncation parameter, t
 
-t = 20
-flm = FLM(0.4, 1.75, M=4, N=2**12, scale=0.05)
-# short traj with lots of realizations faster than single long traj
-flm.generate_realizations(10, truncate=t)
-flm.plot_marginal(show=True)
+alphas = np.linspace(1, 2, 10)
+H = np.linspace(0.0, 0.5, 11)
+trunc = np.linspace(1, 100, 10)
+scale = 0.0363
+nrealizations = 10
 
-print(flm.noise.max())
+df = pd.DataFrame(index=np.arange(alphas.size*H.size*trunc.size), columns=('H', 'alpha', 't', 'scale', 'max'))
+
+for i, a in enumerate(alphas):
+    for j, h in enumerate(H):
+        for k, t in enumerate(trunc):
+
+            flm = FLM(h, a, M=4, N=2**12, scale=scale)
+            # short traj with lots of realizations faster than single long traj
+            flm.generate_realizations(nrealizations, truncate=t)
+
+            print(flm.noise.max())

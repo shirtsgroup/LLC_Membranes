@@ -866,6 +866,7 @@ if __name__ == "__main__":
     # plt.show()
     # exit()
     alpha, mu, sigma = states.fit_params[-1]
+    print(sigma)
     transition_emissions = np.array(states.emissions[-1])
     print(transition_emissions.size)
     print(np.where(np.abs(transition_emissions) > 0.8)[0].size)

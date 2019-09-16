@@ -264,6 +264,10 @@ if __name__ == "__main__":
 
         equil.scale_columns(2)
 
+        cp = 'cp em.gro scaled_2.0000.gro'
+        p = subprocess.Popen(cp.split())
+        p.wait()
+
         nrg = gromacs.simulate(equil.mdp.em_mdp_name, equil.top.name, equil.gro_name, 'em', em_energy=True,
                                verbose=True, mpi=False, nprocesses=4, restraints=True)
 
