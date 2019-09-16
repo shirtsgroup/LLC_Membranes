@@ -26,9 +26,11 @@ df = pd.DataFrame(index=np.arange(alphas.size*H.size*trunc.size), columns=('H', 
 for i, a in enumerate(alphas):
     for j, h in enumerate(H):
         for k, t in enumerate(trunc):
-
+            df_ndx = i * alphas.size + j * H.size + k
             flm = FLM(h, a, M=4, N=2**12, scale=scale)
             # short traj with lots of realizations faster than single long traj
             flm.generate_realizations(nrealizations, truncate=t)
 
-            print(flm.noise.max())
+            df.loc[df_ndx] = [h, a, t, scale, flm.noise.max()]
+            print(df.loc[df_ndx])
+            exit()
