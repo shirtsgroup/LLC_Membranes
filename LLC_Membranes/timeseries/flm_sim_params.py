@@ -46,11 +46,42 @@ class HurstCorrection:
         if np.isnan(interp):
             if hurst < 1e-5:  # if desired Hurst parameter is near zero. 1e-5 is kind of arbitrary
                 interp = -10  # H needs to be a large negative number to get the lag 1 acf to be close to -0.5
+            elif hurst == 0.5:
+                interp = hurst + (1 / alpha) - 0.5
             else:
                 raise Exception('The database is incomplete around H = %f so it cannot be interpolated. Please '
                                 'add more data where this value of H has been achieved.' % hurst)
 
         return interp
+
+
+class TruncateLevy:
+
+    def __init__(self, data_pickle='truncate_levy.pl'):
+
+        """ When simulating fractional levy motion, truncating the base levy distribution is not trivial. The value you
+        provide to fractional_levy_motion.py truncates the initial distribution from which random draws are pulled but
+        correlation structure is added using a fourier transform which changes the maximum drawn values. This class
+        interpolates a pandas dataframe with input truncation parameters and the average resulting max value actually
+        observed
+
+        :param data_pickle:
+        """
+
+        script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+        df = pd.read_pickle('%s/%s' % (script_location, data_pickle))
+
+        H = np.array(df['H'], dtype=float)  # H values passed to FLM algorithm
+        alpha = np.array(df['alpha'], dtype=float)  # alpha values passed to FLM algorithm
+        t = np.array(df['t'], dtype=float)  # h value calculated based on resultant autocorrelation function
+        #scale = np.array(df['scale'], dtype=float)  # can't add scale until I have more data
+        max = np.array(df['max'], dtype=float)
+
+        self.interpolator = LinearNDInterpolator((H, alpha, max), t)  # interpolator for unstructured data
+
+    def interpolate(self, H, alpha, max, scale):
+
+        return self.interpolator(H, alpha, max)
 
 
 def max_realization(input_limit, actual_limit, n):

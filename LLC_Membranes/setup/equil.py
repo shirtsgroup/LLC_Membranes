@@ -260,22 +260,27 @@ if __name__ == "__main__":
 
     equil.generate_input_files('nvt', args.length_nvt, restraints=args.restraint_residue)
 
-    if len(args.build_monomer) > 1:
+    # try energy minimizing
+    nrg = gromacs.simulate(equil.mdp.em_mdp_name, equil.top.name, equil.gro_name, 'em', em_energy=True,
+                           verbose=True, mpi=False, nprocesses=4, restraints=True)
 
-        equil.scale_columns(2)
+    if nrg > 0:  # if energy minimization doesn't work
 
-        nrg = gromacs.simulate(equil.mdp.em_mdp_name, equil.top.name, equil.gro_name, 'em', em_energy=True,
+        equil.scale_columns(2)  # scale the unit cell
+        print(equil.gro_name)
+        # try energy minimization again
+        nrg = gromacs.simulate('em.mdp', equil.top.name, equil.gro_name, 'em', em_energy=True,
                                verbose=True, mpi=False, nprocesses=4, restraints=True)
 
-        while nrg > 0:
+        while nrg > 0:  # rebuild if that doesn't work
 
             equil.build(args.build_monomer, args.initial, args.monomers_per_column, args.ncolumns, args.pore_radius,
                         args.p2p,
                         args.dbwl, args.parallel_displaced, nopores=args.nopores, seed=args.random_seed,
                         mole_fraction=args.mol_frac)
 
-            # generate input files once
-            equil.restrain(args.build_monomer, args.forces[0], args.restraint_axis, atoms)
+            if len(args.build_monomer) > 1:  # order of monomers changes if there is a mix. Otherwise can keep top
+                equil.restrain(args.build_monomer, args.forces[0], args.restraint_axis, atoms)
 
             equil.scale_columns(2)
 

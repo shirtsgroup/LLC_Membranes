@@ -557,7 +557,8 @@ class Chain:
         self.msds = None
         self.limits = None
 
-        self.interpolator = flm_sim_params.HurstCorrection()
+        self.hurst_interpolator = flm_sim_params.HurstCorrection()
+        self.truncation_interpolator = flm_sim_params.TruncateLevy()
 
     def generate_realizations(self, n, length, bound=7.6):
         """ Generate Markov chains using transition matrix and emission probabilities
@@ -624,21 +625,20 @@ class Chain:
         if states[0] == states[1] and transitions[0] == 0:  # switch_points always includes first and last data point
             transitions = transitions[1:]
 
-        # for i, t in enumerate(transitions[:-1]):
-        #     dwell = transitions[i + 1] - t  # plus two since using enumerate and starting at index 1 of transitions
-        #     if dwell > 1:
-        #         if dwell > 2:
-        #             traj[t + 1: transitions[i + 1]] = self._flm_sequence(dwell - 1, states[t], bound=bound)
-        #         elif dwell == 2:
-        #             # one data point so generate single point from emission distribution to save time
-        #             rv = bound + 1
-        #             while np.abs(rv) > bound:
-        #                 rv = self.emission_function.rvs(self.emission_parameters[states[t], 0], 0,
-        #                                                 loc=self.emission_parameters[states[t], 1],
-        #                                                 scale=self.emission_parameters[states[t], 2])
-        #
-        #             traj[t + 1] = rv
-        #     # print(t, transitions[i + 1], traj.min())
+        for i, t in enumerate(transitions[:-1]):
+            dwell = transitions[i + 1] - t  # plus two since using enumerate and starting at index 1 of transitions
+            if dwell > 1:
+                if dwell > 2:
+                    traj[t + 1: transitions[i + 1]] = self._flm_sequence(dwell - 1, states[t], bound=bound)
+                elif dwell == 2:
+                    # one data point so generate single point from emission distribution to save time
+                    rv = bound + 1
+                    while np.abs(rv) > bound:
+                        rv = self.emission_function.rvs(self.emission_parameters[states[t], 0], 0,
+                                                        loc=self.emission_parameters[states[t], 1],
+                                                        scale=self.emission_parameters[states[t], 2])
+
+                    traj[t + 1] = rv
 
         traj[transitions[:-1]] = self._flm_sequence(transitions.size - 1, -1, bound=bound)
 
@@ -659,24 +659,24 @@ class Chain:
         :rtype: numpy.ndarray
         """
 
-        realization = self._unbounded_flm_sequence(l, state)
-
-        realization[realization > bound] = bound  # temporary fix
-        realization[realization < (-bound)] = -bound
-
-        # while np.abs(realization).max() > bound:
-        #     realization = self._unbounded_flm_sequence(l, state)
-
-        return realization
-
-    def _unbounded_flm_sequence(self, l, state):
-
         H = np.random.choice(self.hurst_parameters[state])  # random hurst parameter from transition distribution
         alpha, scale = self.emission_parameters[state, [0, 2]]
-        flm = FLM(self.interpolator.interpolate(H, alpha), alpha, M=2, N=l, scale=scale, correct_hurst=False)
-        flm.generate_realizations(1, progress=False)
+        corrected_bound = self.truncation_interpolator.interpolate(H, alpha, bound, scale)
+        corrected_H = self.hurst_interpolator.interpolate(H, alpha)
+        flm = FLM(corrected_H, alpha, M=2, N=l, scale=scale, truncate=corrected_bound,
+                  correct_hurst=False, correct_truncation=False)
+        flm.generate_realizations(1, progress=False)  # generate a single realization
 
-        return flm.noise[0][:l]
+        # flm.autocorrelation()
+        # H = np.log(2 * flm.acf[:, 1].mean() + 2) / (2 * np.log(2))
+        # print(H)
+        # plt.hist(flm.noise[0, :], bins=50, range=(-bound/2, bound/2), density=True)
+        # x = np.linspace(-bound/2, bound/2, 200)
+        # plt.plot(x, levy_stable.pdf(x, alpha=alpha, loc=0, beta=0, scale=scale))
+        # plt.show()
+        # exit()
+
+        return flm.noise[0, :l]
 
     def _uncorrelated_realization(self, length, bound=7.6):
         """ Generate a trajectory with uncorrelated emissions
@@ -865,27 +865,25 @@ if __name__ == "__main__":
     # plt.tight_layout()
     # plt.show()
     # exit()
-    alpha, mu, sigma = states.fit_params[-1]
-    print(sigma)
-    transition_emissions = np.array(states.emissions[-1])
-    print(transition_emissions.size)
-    print(np.where(np.abs(transition_emissions) > 0.8)[0].size)
-    plt.hist(states.emissions[-1], bins=100, range=(-0.8, 0.8), density=True)
-    x = np.linspace(-0.8, 0.8, 1000)
-    plt.plot(x, levy_stable.pdf(x, alpha=alpha, beta=0, loc=mu, scale=sigma), '--', lw=2, label="L\'evy")
-    from scipy.stats import norm
-    plt.plot(x, norm.pdf(x, loc=0, scale=np.std(states.emissions[-1])), '--', lw=2, label='Gaussian')
-    plt.legend()
-    plt.tight_layout()
-    plt.show()
+    # alpha, mu, sigma = states.fit_params[-1]
+    # print(sigma)
+    # transition_emissions = np.array(states.emissions[-1])
+    # print(transition_emissions.size)
+    # print(np.where(np.abs(transition_emissions) > 0.8)[0].size)
+    # plt.hist(states.emissions[-1], bins=100, range=(-0.8, 0.8), density=True)
+    # x = np.linspace(-0.8, 0.8, 1000)
+    # plt.plot(x, levy_stable.pdf(x, alpha=alpha, beta=0, loc=mu, scale=sigma), '--', lw=2, label="L\'evy")
+    # from scipy.stats import norm
+    # plt.plot(x, norm.pdf(x, loc=0, scale=np.std(states.emissions[-1])), '--', lw=2, label='Gaussian')
+    # plt.legend()
+    # plt.tight_layout()
+    # plt.show()
 
-    exit()
-    states.transition_autocorrelation(plot=True)
-    exit()
-    states.calculate_hurst()
-    # print(states.fit_params)
-    for i in states.hurst:
-        print(i.mean())
+    # states.transition_autocorrelation(plot=True)
+    # states.calculate_hurst()
+    # # print(states.fit_params)
+    # for i in states.hurst:
+    #     print(i.mean())
     # exit()
     # import itertools
     #
@@ -919,6 +917,7 @@ if __name__ == "__main__":
 
     chains = Chain(states.transition_matrix, states.fit_params, hurst_parameters=states.hurst,
                    emission_function=levy_stable)
-    chains.generate_realizations(24, 10000, bound=states.maximum_emission())
+    #chains.generate_realizations(24, 10000, bound=states.maximum_emission())
+    chains.generate_realizations(24, 10000, bound=0.8)
     chains.calculate_msd()
     chains.plot_msd()

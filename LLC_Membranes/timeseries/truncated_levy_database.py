@@ -12,6 +12,7 @@ import pandas as pd
 from LLC_Membranes.timeseries.fractional_levy_motion import FLM
 import matplotlib.pyplot as plt
 import numpy as np
+from LLC_Membranes.timeseries.flm_sim_params import TruncateLevy
 
 # as a function of H, alpha and truncation parameter, t
 
@@ -20,17 +21,37 @@ H = np.linspace(0.0, 0.5, 11)
 trunc = np.linspace(1, 100, 10)
 scale = 0.0363
 nrealizations = 10
+load = True
 
-df = pd.DataFrame(index=np.arange(alphas.size*H.size*trunc.size), columns=('H', 'alpha', 't', 'scale', 'max'))
+if not load:
 
-for i, a in enumerate(alphas):
-    for j, h in enumerate(H):
-        for k, t in enumerate(trunc):
-            df_ndx = i * alphas.size + j * H.size + k
-            flm = FLM(h, a, M=4, N=2**12, scale=scale)
-            # short traj with lots of realizations faster than single long traj
-            flm.generate_realizations(nrealizations, truncate=t)
+    df = pd.DataFrame(index=np.arange(alphas.size*H.size*trunc.size), columns=('H', 'alpha', 't', 'scale', 'max'))
 
-            df.loc[df_ndx] = [h, a, t, scale, flm.noise.max()]
-            print(df.loc[df_ndx])
-            exit()
+    for i, a in enumerate(alphas):
+        for j, h in enumerate(H):
+            for k, t in enumerate(trunc):
+                df_ndx = i * (H.size * trunc.size) + j * trunc.size + k
+                print('Iteration # %d' % df_ndx)
+                flm = FLM(h, a, M=4, N=2**12, scale=scale, truncate=t, correct_truncation=False)  # this is with correction to hurst
+                # short traj with lots of realizations faster than single long traj
+                flm.generate_realizations(nrealizations, progress=False)
+
+                df.loc[df_ndx] = [h, a, t, scale, flm.noise.max()]
+                # df.loc[df_ndx] = [h, a, t, scale, flm.noise.max(axis=1).mean()]
+
+    df.to_pickle('truncate_levy.pl')
+
+else:
+
+    df = pd.read_pickle('truncate_levy.pl')
+
+h_test = 0.35
+alpha_test = 1.4
+max_value = 1
+
+trunc = TruncateLevy(data_pickle='truncate_levy.pl')
+t = trunc.interpolate(h_test, alpha_test, max_value, 0.0363)
+flm = FLM(h_test, alpha_test, M=4, N=2**12, scale=scale)
+flm.generate_realizations(nrealizations, truncate=t)
+print(flm.noise.max())
+

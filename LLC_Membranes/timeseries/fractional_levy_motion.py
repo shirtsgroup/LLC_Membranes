@@ -8,14 +8,15 @@ from scipy.stats import levy_stable
 import sys
 import matplotlib.pyplot as plt
 from LLC_Membranes.llclib import timeseries, stats
-from LLC_Membranes.timeseries.flm_sim_params import HurstCorrection
+from LLC_Membranes.timeseries.flm_sim_params import HurstCorrection, TruncateLevy
 import tqdm
 import math
 
 
 class FLM:
 
-    def __init__(self, H, alpha, m=256, M=6000, C=1, N=2**12, scale=1, correct_hurst=True):
+    def __init__(self, H, alpha, m=256, M=6000, C=1, N=2**12, scale=1, correct_hurst=True, truncate=None,
+                 correct_truncation=True):
         """ Generate realizations of fractional levy motion, also know as linear fractional stable motion
 
         :param H: Hurst parameter. Also known as the self-similarity parameter
@@ -27,6 +28,8 @@ class FLM:
         :param scale: scale parameter of Levy distribution
         :param correct_hurst: Correct the input Hurst parameter so the output correlation structure is consistent with
         the analytical autocorrelation.
+        :param truncate: the largest value of emissions
+        :param correct_truncation: Correct the truncation parameter so the max value of emissions is close to truncate
 
         :type H: float
         :type alpha: float
@@ -36,10 +39,28 @@ class FLM:
         :type N: int
         :type scale: float
         :type correct_hurst: bool
+        :type truncate: NoneType or float
+        :type correct_truncation: bool
         """
 
         if math.log(N, 2) - int(math.log(N, 2)) != 0:
             N = 2 ** (int(math.log(N, 2)) + 1)  # so we can use FFTs efficiently
+
+        if truncate is not None and correct_truncation:
+
+            trunc = TruncateLevy()
+            # H values recorded in database are not the corrected values. They were corrected in order to get the output
+            # truncation value, but you must read the database using the uncorrected H value
+            self.truncate = trunc.interpolate(H, alpha, truncate, scale)
+
+            if not correct_hurst:
+                raise Warning('You are correcting the truncation parameter, but not correcting the Hurst parameter. If'
+                              'you corrected the Hurst parameter before passing it to FLM, then you can ignore this '
+                              'message. If you did not already correct the Hurst parameter, the truncation correction'
+                              'will not be accurate.')
+
+        else:
+            self.truncate = truncate
 
         if correct_hurst:
             # Interpolate a database of input and output H parameters
@@ -71,9 +92,8 @@ class FLM:
         self.scale = scale
         self.acf = None
         self.autocov = None
-        #print(self.scale)
 
-    def generate_realizations(self, n, truncate=None, progress=True):
+    def generate_realizations(self, n, progress=True):
         """ Generate realization of fractional levy motion
 
         :param n: Number of realizations to generate
@@ -94,13 +114,12 @@ class FLM:
             else:
                 z = levy_stable.rvs(self.alpha, 0, loc=0, scale=self.scale, size=self.Na)
 
-                if truncate is not None:
-                    too_big = np.where(np.abs(z) > truncate)[0]
+                if self.truncate is not None:
+                    too_big = np.where(np.abs(z) > self.truncate)[0]
                     while too_big.size > 0:
                         z[too_big] = levy_stable.rvs(self.alpha, 0, loc=0, scale=self.scale, size=too_big.size)
-                        too_big = np.where(np.abs(z) > truncate)[0]
+                        too_big = np.where(np.abs(z) > self.truncate)[0]
 
-            #plt.hist(z, range=(-5, 5), bins=50, alpha=0.5, color='red', density=True)
             z = np.fft.fft(z, self.Na)
             w = np.fft.ifft(z * self.A, self.Na).real
 
@@ -163,12 +182,15 @@ class FLM:
 
         # calculate acf of each trajectory
         ntraj = self.noise.shape[0]
-        if (math.log(self.N, 2) - int(math.log(self.N, 2))) < 1e-10:
-            self.acf = np.zeros([ntraj, self.N])
-        else:
+        try:
             self.acf = np.zeros([ntraj, self.N - 1])
-        for i in range(ntraj):
-            self.acf[i, :] = timeseries.acf(self.noise[i, :])
+            for i in range(ntraj):
+                self.acf[i, :] = timeseries.acf(self.noise[i, :])
+        except ValueError:
+            length = timeseries.acf(self.noise[0, :]).size
+            self.acf = np.zeros([ntraj, length])
+            for i in range(ntraj):
+                self.acf[i, :] = timeseries.acf(self.noise[i, :])
 
     def autocovariance(self):
 
@@ -177,7 +199,8 @@ class FLM:
         for i in range(ntraj):
             self.autocov[i, :] = timeseries.autocovariance(self.noise[i, :])
 
-    def plot_autocorrelation(self, max_k=25, nboot=200, confidence=68.27, show=False):
+    def plot_autocorrelation(self, max_k=25, nboot=200, confidence=68.27, show=False, overlay=False, label=None,
+                             fontsize=14):
         """ Plot autocorrelation function of increments
 
         :param max_k: maximum lag time to plot
@@ -197,24 +220,25 @@ class FLM:
         ntraj = self.acf.shape[0]
 
         # bootstrap
-        boot = np.zeros([nboot, self.N - 1])
+        boot = np.zeros([nboot, self.acf.shape[1]])
         for i in range(nboot):
             ndx = np.random.randint(ntraj, size=ntraj)
             boot[i, :] = self.acf[ndx, :].mean(axis=0)
 
         errorbars = stats.confidence_interval(boot, confidence)
 
-        plt.figure()
+        if not overlay:
+            plt.figure()
         avg = boot.mean(axis=0)
-        plt.plot(np.arange(self.N - 1), avg, lw=2)
-        plt.fill_between(np.arange(self.N - 1), avg + errorbars[0, :], avg - errorbars[1, :], alpha=0.25)
+        plt.plot(np.arange(self.acf.shape[1]), avg, lw=2, label=label)
+        plt.fill_between(np.arange(self.acf.shape[1]), avg + errorbars[0, :], avg - errorbars[1, :], alpha=0.25)
 
         # formatting
         plt.xlim(-0.5, max_k)
         plt.ylim(-0.6, 1)
-        plt.xlabel('Lag Time (steps)', fontsize=14)
-        plt.ylabel('Correlation', fontsize=14)
-        plt.gcf().get_axes()[0].tick_params(labelsize=14)
+        plt.xlabel('Lag Time (steps)', fontsize=fontsize)
+        plt.ylabel('Correlation', fontsize=fontsize)
+        plt.gcf().get_axes()[0].tick_params(labelsize=fontsize)
         plt.tight_layout()
 
         if show:

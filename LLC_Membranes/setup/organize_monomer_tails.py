@@ -54,6 +54,8 @@ class Monomer(topology.LC):
     def rotate(self, dihedral_indices, desired_dihedral_angle, rotated_atom_indices):
         """ Determine how many degrees to rotate dihedral
 
+        try following this:
+        https://github.com/MDAnalysis/mdanalysis/blob/develop/package/MDAnalysis/transformations/rotate.py
         :return:
         """
 
