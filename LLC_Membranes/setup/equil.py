@@ -290,6 +290,7 @@ if __name__ == "__main__":
 
             nrg = gromacs.simulate('em.mdp', equil.top.name, equil.gro_name, 'em', em_energy=True,
                                    verbose=False, mpi=equil.mpi, nprocesses=4, restraints=True)
+            print(nrg)
 
             try_ += 1
 

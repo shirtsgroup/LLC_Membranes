@@ -66,15 +66,15 @@ def simulate(mdp, top, gro, out, verbose=False, em_energy=False, mpi=False, npro
     p2.wait()
 
     if em_energy:
-
+        print('hello')
         nrg = subprocess.check_output(
             ["awk", "/Potential Energy/ {print $4}", "%s.log" % out])  # get Potential energy from em.log
 
         try:
             return float(nrg.decode("utf-8"))
         except ValueError:
-            return 0  # If the system did not energy minimize, the above statement will not work because nrg will be an
-            # empty string. Make nrg=0 so placement gets attempted again
+            return 1  # If the system did not energy minimize, the above statement will not work because nrg will be an
+            # empty string. Make nrg=1 so placement gets attempted again
 
 
 def insert_molecules(gro, solute, n, out, scale=0.4, mpi=False, nprocesses=4):
