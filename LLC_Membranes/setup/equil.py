@@ -158,6 +158,9 @@ class HexagonalPhaseEquilibration:
                 self.gro_name = 'scaled_%.4f.gro' % (i + step)
                 self.shrink_unit_cell(i + step, i, step / 2)  # reduce shrink rate
             else:
+                print('Running short NVT simulation...', end='', flush=True)
+                self.gro_name = self.mdp.em_mdp_name.split('.')[0] + '.gro'
+                self.simulate(self.mdp.nvt_mdp_name, self.top.name, 'nvt_%.4f' % i, restrained=True)
                 print('...Success!')
 
             cp = 'cp em.gro scaled_%.4f.gro' % i
@@ -209,10 +212,10 @@ class HexagonalPhaseEquilibration:
         self.gro_name = 'scaled.gro'
         file_rw.write_gro_pos(t.xyz[0, ...], self.gro_name, ids=ids, res=resnames, ucell=ucell)
 
-    def simulate(self, mdp, top, out, restrained=False, mpi=False, np=4):
+    def simulate(self, mdp, top, out, restrained=False):
 
-        if mpi:
-            gmx = "mpirun -np %s gmx_mpi" % np
+        if self.mpi:
+            gmx = "mpirun -np %s gmx_mpi" % self.nprocesses
         else:
             gmx = "gmx"
 
