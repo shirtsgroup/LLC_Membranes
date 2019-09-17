@@ -70,6 +70,11 @@ def initialize():
     parser.add_argument('--restraint_axis', default='xyz', type=str, help='Axes along which to apply position '
                                                                           'restraints')
 
+    parser.add_argument('--continue_initial_config', default=None, help='Equilibrate energy minimized initial '
+                                                                        'configuration.')
+    parser.add_argument('-try', '--ntries', default=10, help='The number of times to try to energy minimize an initial'
+                        'configuration before resorting to scaling + shrinking it.')
+
     return parser
 
 # TODO: make a yaml
@@ -231,6 +236,8 @@ class HexagonalPhaseEquilibration:
         p = subprocess.Popen(mdrun.split())
         p.wait()
 
+        self.gro_name = out + '.gro'
+
 
 def check_energy(logname='em.log'):
 
@@ -252,30 +259,25 @@ if __name__ == "__main__":
 
     equil = HexagonalPhaseEquilibration(args.build_monomer)
 
-    # initial build
-    equil.build(args.build_monomer, args.initial, args.monomers_per_column, args.ncolumns, args.pore_radius, args.p2p,
-          args.dbwl, args.parallel_displaced, nopores=args.nopores, seed=args.random_seed, mole_fraction=args.mol_frac)
-    #
-    # # generate input files once
-    lc = [topology.LC(mon) for mon in args.build_monomer]
-    atoms = [l.pore_defining_atoms for l in lc]
-    equil.restrain(args.build_monomer, args.forces[0], args.restraint_axis, atoms)
+    if args.continue_initial_config is None:
 
-    equil.generate_input_files('nvt', args.length_nvt, restraints=args.restraint_residue)
+        # initial build
+        equil.build(args.build_monomer, args.initial, args.monomers_per_column, args.ncolumns, args.pore_radius, args.p2p,
+              args.dbwl, args.parallel_displaced, nopores=args.nopores, seed=args.random_seed, mole_fraction=args.mol_frac)
+        #
+        # # generate input files once
+        lc = [topology.LC(mon) for mon in args.build_monomer]
+        atoms = [l.pore_defining_atoms for l in lc]
+        equil.restrain(args.build_monomer, args.forces[0], args.restraint_axis, atoms)
 
-    # try energy minimizing
-    nrg = gromacs.simulate(equil.mdp.em_mdp_name, equil.top.name, equil.gro_name, 'em', em_energy=True,
-                           verbose=True, mpi=False, nprocesses=4, restraints=True)
+        equil.generate_input_files('nvt', args.length_nvt, restraints=args.restraint_residue)
 
-    if nrg > 0:  # if energy minimization doesn't work
-
-        equil.scale_columns(2)  # scale the unit cell
-        print(equil.gro_name)
-        # try energy minimization again
-        nrg = gromacs.simulate('em.mdp', equil.top.name, equil.gro_name, 'em', em_energy=True,
+        # try energy minimizing
+        nrg = gromacs.simulate(equil.mdp.em_mdp_name, equil.top.name, equil.gro_name, 'em', em_energy=True,
                                verbose=True, mpi=False, nprocesses=4, restraints=True)
 
-        while nrg > 0:  # rebuild if that doesn't work
+        try_ = 0  # try rebuilding the system ntries times to see if we get any working configs
+        while nrg > 0 and try_ < args.ntries:  # rebuild if that doesn't work
 
             equil.build(args.build_monomer, args.initial, args.monomers_per_column, args.ncolumns, args.pore_radius,
                         args.p2p,
@@ -285,33 +287,50 @@ if __name__ == "__main__":
             if len(args.build_monomer) > 1:  # order of monomers changes if there is a mix. Otherwise can keep top
                 equil.restrain(args.build_monomer, args.forces[0], args.restraint_axis, atoms)
 
-            equil.scale_columns(2)
-
             nrg = gromacs.simulate('em.mdp', equil.top.name, equil.gro_name, 'em', em_energy=True,
                                    verbose=True, mpi=False, nprocesses=4, restraints=True)
 
-        cp = 'cp em.gro scaled_2.0000.gro'
-        p = subprocess.Popen(cp.split())
-        p.wait()
+            try_ += 1
 
-        equil.shrink_unit_cell(2, 1, 0.2)
+        if nrg > 0:  # if energy minimization still doesn't work
 
-    equil.simulate('em.mdp', 'topol.top', '%s' % args.initial, 'em', mpi=args.mpi, np=args.nproc, restrained=True)
-    exit()
+            equil.scale_columns(2)  # scale the unit cell
 
-    nrg = check_energy(logname='em.log')
+            # try energy minimization again
+            nrg = gromacs.simulate('em.mdp', equil.top.name, equil.gro_name, 'em', em_energy=True,
+                                   verbose=True, mpi=False, nprocesses=4, restraints=True)
 
-    # rebuild until energy minimization reaches a negative potential energy
-    while nrg > 0:
+            while nrg > 0:  # rebuild if that doesn't work
 
-        build(args.build_monomer, args.initial, args.monomers_per_column, args.ncolumns, args.pore_radius, args.p2p,
-                  args.dbwl, args.parallel_displaced, nopores=args.nopores)
+                equil.build(args.build_monomer, args.initial, args.monomers_per_column, args.ncolumns, args.pore_radius,
+                            args.p2p,
+                            args.dbwl, args.parallel_displaced, nopores=args.nopores, seed=args.random_seed,
+                            mole_fraction=args.mol_frac)
 
-        simulate('em.mdp', 'topol.top', '%s' % args.initial, 'em', mpi=args.mpi, np=args.nproc, restrained=True)
+                if len(args.build_monomer) > 1:  # order of monomers changes if there is a mix. Otherwise can keep top
+                    equil.restrain(args.build_monomer, args.forces[0], args.restraint_axis, atoms)
 
-        nrg = check_energy(logname='em.log')
+                equil.scale_columns(2)
 
-    simulate('nvt.mdp', 'topol.top', 'em.gro', 'nvt', mpi=args.mpi, np=args.nproc, restrained=True)
+                nrg = gromacs.simulate('em.mdp', equil.top.name, equil.gro_name, 'em', em_energy=True,
+                                       verbose=True, mpi=False, nprocesses=4, restraints=True)
+
+            cp = 'cp em.gro scaled_2.0000.gro'
+            p = subprocess.Popen(cp.split())
+            p.wait()
+
+            equil.shrink_unit_cell(2, 1, 0.2)
+    else:
+
+        equil.gro_name = args.continue_initial_config
+
+        lc = [topology.LC(mon) for mon in args.build_monomer]
+        atoms = [l.pore_defining_atoms for l in lc]
+        equil.restrain(args.build_monomer, args.forces[0], args.restraint_axis, atoms)
+
+        equil.generate_input_files('nvt', args.length_nvt, restraints=args.restraint_residue)
+
+    equil.simulate('nvt.mdp', 'topol.top', equil.gro_nam, 'nvt', mpi=args.mpi, np=args.nproc, restrained=True)
 
     copy = "cp nvt.gro %s.gro" % args.forces[0]
     p = subprocess.Popen(copy.split())
