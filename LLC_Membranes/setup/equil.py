@@ -336,12 +336,12 @@ if __name__ == "__main__":
 
     copy = "cp nvt.gro %s.gro" % args.forces[0]
     p = subprocess.Popen(copy.split())
+    p.wait()
     copy = "cp nvt.trr %s.trr" % args.forces[0]
     p = subprocess.Popen(copy.split())
+    p.wait()
 
     equil.generate_input_files('nvt.gro', args.length_nvt, genvel=False, restraints=args.restraint_residue)
-
-    exit()
 
     for f in args.forces[1:]:
 
