@@ -2,7 +2,7 @@
 
 import os
 import mdtraj as md
-from LLC_Membranes.llclib import atom_props, transform
+from LLC_Membranes.llclib import atom_props, transform, file_rw
 import numpy as np
 import sys
 import subprocess
@@ -555,10 +555,32 @@ def fix_names(gro, force_convert=True):
     # if .pdb already exists, don't both remaking it -- this could be dangerous
     if not os.path.isfile('%s.pdb' % gro) or force_convert:
 
-        convert_to_pdb = "gmx editconf -f %s.gro -o %s.pdb" % (gro, gro)
-        p = subprocess.Popen(convert_to_pdb.split(), stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
-        p.wait()
+        convert_to_pdb(gro) #= "gmx editconf -f %s.gro -o %s.pdb" % (gro, gro)
+        #p = subprocess.Popen(convert_to_pdb.split(), stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
+        #p.wait()
 
     t = md.load('%s.pdb' % gro, standard_names=False)  # load doesn't have standard_names functionality for trr or xtc
 
     return [a.name for a in t.topology.atoms]
+
+
+def convert_to_pdb(gro):
+
+    convert_to_pdb = "gmx editconf -f %s.gro -o %s.pdb" % (gro, gro)
+    p = subprocess.Popen(convert_to_pdb.split(), stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
+    p.wait()
+
+
+def fix_resnumbers(gro):
+
+    with open(gro, 'r') as f:
+        a = []
+        for line in f:
+            a.append(line)
+
+    with open(gro, 'w') as f:
+        for i, line in enumerate(a):
+            if i > 1 and i < (len(a) - 1):
+                f.write('{:<5d}'.format(i - 1) + line[5:])
+            else:
+                f.write(line)

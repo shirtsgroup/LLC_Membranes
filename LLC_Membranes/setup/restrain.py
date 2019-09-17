@@ -176,12 +176,15 @@ class RestrainedTopology(object):
                site, required length parameters (i.e. a, b, c or d) in the order specified in GROMACS documentation
         """
 
+        topology.fix_resnumbers(gro)
         t = md.load(gro)
 
         self.all_coords = t.xyz[0, :, :]  # all coordinates for system
         self.atom_numbers = []
         for i in range(len(atoms)):
-            self.atom_numbers.append([a.index + 1 for a in t.topology.atoms if a.name in atoms[i] and a.residue.name == res[i]])
+            self.atom_numbers.append([a.index + 1 for a in t.topology.atoms if a.name in atoms[i] and a.residue.name ==
+                                      res[i]])
+
         self.atoms = t.n_atoms  # number of atoms in full system
         self.nmon = [len(self.atom_numbers[i]) // len(atoms[i]) for i in range(len(atoms))]  # number of monomer residues
         self.name = name  # name of output files (.itp, .gro if you are using centers of masses)

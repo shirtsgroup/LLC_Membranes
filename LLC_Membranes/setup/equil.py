@@ -259,15 +259,16 @@ if __name__ == "__main__":
 
     equil = HexagonalPhaseEquilibration(args.build_monomer)
 
+    lc = [topology.LC(mon) for mon in args.build_monomer]
+    atoms = [l.pore_defining_atoms for l in lc]
+
     if args.continue_initial_config is None:
 
         # initial build
         equil.build(args.build_monomer, args.initial, args.monomers_per_column, args.ncolumns, args.pore_radius, args.p2p,
               args.dbwl, args.parallel_displaced, nopores=args.nopores, seed=args.random_seed, mole_fraction=args.mol_frac)
-        #
-        # # generate input files once
-        lc = [topology.LC(mon) for mon in args.build_monomer]
-        atoms = [l.pore_defining_atoms for l in lc]
+
+        # generate input files once
         equil.restrain(args.build_monomer, args.forces[0], args.restraint_axis, atoms)
 
         equil.generate_input_files('nvt', args.length_nvt, restraints=args.restraint_residue)
@@ -278,7 +279,7 @@ if __name__ == "__main__":
 
         try_ = 0  # try rebuilding the system ntries times to see if we get any working configs
         while nrg > 0 and try_ < args.ntries:  # rebuild if that doesn't work
-
+            print('Try # %d\r' % try_ + 1)
             equil.build(args.build_monomer, args.initial, args.monomers_per_column, args.ncolumns, args.pore_radius,
                         args.p2p,
                         args.dbwl, args.parallel_displaced, nopores=args.nopores, seed=args.random_seed,
@@ -288,7 +289,7 @@ if __name__ == "__main__":
                 equil.restrain(args.build_monomer, args.forces[0], args.restraint_axis, atoms)
 
             nrg = gromacs.simulate('em.mdp', equil.top.name, equil.gro_name, 'em', em_energy=True,
-                                   verbose=True, mpi=False, nprocesses=4, restraints=True)
+                                   verbose=False, mpi=False, nprocesses=4, restraints=True)
 
             try_ += 1
 
@@ -324,25 +325,25 @@ if __name__ == "__main__":
 
         equil.gro_name = args.continue_initial_config
 
-        lc = [topology.LC(mon) for mon in args.build_monomer]
-        atoms = [l.pore_defining_atoms for l in lc]
         equil.restrain(args.build_monomer, args.forces[0], args.restraint_axis, atoms)
 
         equil.generate_input_files('nvt', args.length_nvt, restraints=args.restraint_residue)
 
-    equil.simulate('nvt.mdp', 'topol.top', equil.gro_nam, 'nvt', mpi=args.mpi, np=args.nproc, restrained=True)
+    equil.simulate('nvt.mdp', 'topol.top', 'nvt', restrained=True)
 
     copy = "cp nvt.gro %s.gro" % args.forces[0]
     p = subprocess.Popen(copy.split())
     copy = "cp nvt.trr %s.trr" % args.forces[0]
     p = subprocess.Popen(copy.split())
 
-    generate_input_files('nvt.gro', 'nvt', args.length_nvt, genvel=False, restraints=args.restraint_residue)
+    equil.generate_input_files('nvt.gro', args.length_nvt, genvel=False, restraints=args.restraint_residue)
+
+    exit()
 
     for f in args.forces[1:]:
 
-        restrain(args.initial, args.build_monomer, f, args.restraint_axis, args.ring_restraints)
-        simulate('nvt.mdp', 'topol.top', 'em.gro', 'nvt', mpi=args.mpi, np=args.nproc, restrained=True)
+        equil.restrain(args.build_monomer, f, args.restraint_axis, atoms)
+        equil.simulate(equil.mdp.nvt_mdp_name, equil.top.name, equil.mdp.nvt_mdp_name.split('.')[0], restrained=True)
 
         copy = "cp nvt.gro %s.gro" % f
         p = subprocess.Popen(copy.split())
@@ -352,9 +353,9 @@ if __name__ == "__main__":
         p = subprocess.Popen(copy.split())
         p.wait()
 
-    generate_input_files(args.initial, 'npt', args.length_berendsen, genvel=False, barostat='berendsen')
-    simulate('npt.mdp', 'topol.top', 'nvt.gro', 'berendsen', mpi=args.mpi, np=args.nproc)
+    equil.generate_input_files('npt', args.length_berendsen, genvel=False, barostat='berendsen')
+    equil.simulate('npt.mdp', 'topol.top', 'berendsen')
 
-    generate_input_files(args.initial, 'npt', args.length_Parrinello_Rahman, genvel=False, barostat='Parrinello-Rahman',
-                         frames=400)
-    simulate('npt.mdp', 'topol.top', 'berendsen.gro', 'PR', mpi=args.mpi, np=args.nproc)
+    equil.generate_input_files('npt', args.length_Parrinello_Rahman, genvel=False, barostat='Parrinello-Rahman',
+                               frames=400)
+    equil.simulate('npt.mdp', 'topol.top', 'PR')
