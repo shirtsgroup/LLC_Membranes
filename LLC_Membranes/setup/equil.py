@@ -286,8 +286,7 @@ if __name__ == "__main__":
                         args.dbwl, args.parallel_displaced, nopores=args.nopores, seed=args.random_seed,
                         mole_fraction=args.mol_frac)
 
-            if len(args.build_monomer) > 1:  # order of monomers changes if there is a mix. Otherwise can keep top
-                equil.restrain(args.build_monomer, args.forces[0], args.restraint_axis, atoms)
+            equil.restrain(args.build_monomer, args.forces[0], args.restraint_axis, atoms)
 
             nrg = gromacs.simulate('em.mdp', equil.top.name, equil.gro_name, 'em', em_energy=True,
                                    verbose=False, mpi=equil.mpi, nprocesses=4, restraints=True)
