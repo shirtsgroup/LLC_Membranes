@@ -253,11 +253,12 @@ def check_energy(logname='em.log'):
 
 if __name__ == "__main__":
 
+    # TODO: replace equil.simulate() with gromacs.simulate()
     args = initialize().parse_args()
 
     os.environ["GMX_MAXBACKUP"] = "-1"  # stop GROMACS from making backups
 
-    equil = HexagonalPhaseEquilibration(args.build_monomer)
+    equil = HexagonalPhaseEquilibration(args.build_monomer, mpi=args.mpi, nprocesses=args.nproc)
 
     lc = [topology.LC(mon) for mon in args.build_monomer]
     atoms = [l.pore_defining_atoms for l in lc]
@@ -275,7 +276,7 @@ if __name__ == "__main__":
 
         # try energy minimizing
         nrg = gromacs.simulate(equil.mdp.em_mdp_name, equil.top.name, equil.gro_name, 'em', em_energy=True,
-                               verbose=True, mpi=False, nprocesses=4, restraints=True)
+                               verbose=True, mpi=equil.mpi, nprocesses=4, restraints=True)
 
         try_ = 0  # try rebuilding the system ntries times to see if we get any working configs
         while nrg > 0 and try_ < args.ntries:  # rebuild if that doesn't work
@@ -289,7 +290,7 @@ if __name__ == "__main__":
                 equil.restrain(args.build_monomer, args.forces[0], args.restraint_axis, atoms)
 
             nrg = gromacs.simulate('em.mdp', equil.top.name, equil.gro_name, 'em', em_energy=True,
-                                   verbose=False, mpi=False, nprocesses=4, restraints=True)
+                                   verbose=False, mpi=equil.mpi, nprocesses=4, restraints=True)
 
             try_ += 1
 
@@ -299,7 +300,7 @@ if __name__ == "__main__":
 
             # try energy minimization again
             nrg = gromacs.simulate('em.mdp', equil.top.name, equil.gro_name, 'em', em_energy=True,
-                                   verbose=True, mpi=False, nprocesses=4, restraints=True)
+                                   verbose=True, mpi=equil.mpi, nprocesses=4, restraints=True)
 
             while nrg > 0:  # rebuild if that doesn't work
 
@@ -314,7 +315,7 @@ if __name__ == "__main__":
                 equil.scale_columns(2)
 
                 nrg = gromacs.simulate('em.mdp', equil.top.name, equil.gro_name, 'em', em_energy=True,
-                                       verbose=True, mpi=False, nprocesses=4, restraints=True)
+                                       verbose=True, mpi=equil.mpi, nprocesses=4, restraints=True)
 
             cp = 'cp em.gro scaled_2.0000.gro'
             p = subprocess.Popen(cp.split())
