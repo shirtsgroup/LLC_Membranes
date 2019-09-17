@@ -72,7 +72,7 @@ def initialize():
 
     parser.add_argument('--continue_initial_config', default=None, help='Equilibrate energy minimized initial '
                                                                         'configuration.')
-    parser.add_argument('-try', '--ntries', default=10, help='The number of times to try to energy minimize an initial'
+    parser.add_argument('-try', '--ntries', default=10, type=int, help='The number of times to try to energy minimize an initial'
                         'configuration before resorting to scaling + shrinking it.')
 
     return parser
@@ -279,7 +279,7 @@ if __name__ == "__main__":
 
         try_ = 0  # try rebuilding the system ntries times to see if we get any working configs
         while nrg > 0 and try_ < args.ntries:  # rebuild if that doesn't work
-            print('Try # %d\r' % try_ + 1)
+            print('Try # %d' % (try_ + 1))
             equil.build(args.build_monomer, args.initial, args.monomers_per_column, args.ncolumns, args.pore_radius,
                         args.p2p,
                         args.dbwl, args.parallel_displaced, nopores=args.nopores, seed=args.random_seed,
@@ -321,6 +321,9 @@ if __name__ == "__main__":
             p.wait()
 
             equil.shrink_unit_cell(2, 1, 0.2)
+
+        equil.gro_name = 'em.gro'
+
     else:
 
         equil.gro_name = args.continue_initial_config
