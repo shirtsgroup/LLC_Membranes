@@ -195,9 +195,15 @@ class FLM:
     def autocovariance(self):
 
         ntraj = self.noise.shape[0]
-        self.autocov = np.zeros([ntraj, self.N - 1])
-        for i in range(ntraj):
-            self.autocov[i, :] = timeseries.autocovariance(self.noise[i, :])
+        try:
+            self.autocov = np.zeros([ntraj, self.N - 1])
+            for i in range(ntraj):
+                self.autocov[i, :] = timeseries.autocovariance(self.noise[i, :])
+        except ValueError:
+            length = timeseries.autocovariance(self.noise[0, :]).size
+            self.autocov = np.zeros([ntraj, length])
+            for i in range(ntraj):
+                self.autocov[i, :] = timeseries.autocovariance(self.noise[i, :])
 
     def plot_autocorrelation(self, max_k=25, nboot=200, confidence=68.27, show=False, overlay=False, label=None,
                              fontsize=14):

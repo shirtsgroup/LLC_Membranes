@@ -521,12 +521,12 @@ class States:
 
 class Chain:
 
-    def __init__(self, transition_matrix, emission_parameters, hurst_parameters=None, emission_function=levy_stable):
+    def __init__(self, count_matrix, emission_parameters, hurst_parameters=None, emission_function=levy_stable):
         """ Generate markov chains based on a probability transition matrix and some emission paramters describing the
         observations.
 
-        :param transition_matrix: n x n matrix of probabilities of transitions between each of the n states. Rows should
-        sum to 1.
+        :param count_matrix: n x n matrix of counts of transitions between each of the n states. This will be
+        converted to a transition matrix.
         :param emission_parameters: parameters describing distribution of emissions for each state (n + 1 x p) where p
         is the number of paramters, and n the number of states. The extra set of parameters should be those of the
         lumped together transition emission distribution.
@@ -541,7 +541,8 @@ class Chain:
         :type emission_function: scipy.stats.continuous_rv
         """
 
-        self.transition_matrix = transition_matrix
+        self.count_matrix = count_matrix
+        self.transition_matrix = (self.count_matrix.T / self.count_matrix.sum(axis=1)).T
         self.emission_parameters = emission_parameters
         self.emission_function = emission_function
         self.hurst_parameters = hurst_parameters
@@ -618,7 +619,9 @@ class Chain:
 
         for t in range(1, length):
 
-            states[t] = np.random.choice(self.nstates, p=self.transition_matrix[states[t], :])
+            p = np.random.dirichlet(self.count_matrix[states[t], :])
+            #states[t] = np.random.choice(self.nstates, p=self.transition_matrix[states[t - 1], :])
+            states[t] = np.random.choice(self.nstates, p=p)
 
         # find where transitions occur
         transitions = timeseries.switch_points(states)  # indices of state array where transitions occur
@@ -865,19 +868,45 @@ if __name__ == "__main__":
     # plt.tight_layout()
     # plt.show()
     # exit()
+
+    ############ Cut-off Justification Plot ##################
     # alpha, mu, sigma = states.fit_params[-1]
-    # print(sigma)
+    # bins, edges = np.histogram(states.emissions[-1], bins=200, range=(-1.75, 1.75), density=True)
+    # bin_width = edges[1] - edges[0]
+    # centers = edges[:-1] + bin_width / 2
+    # ratio = [bins[i] / levy_stable.pdf(x, alpha=alpha, beta=0, loc=mu, scale=sigma) for i, x in enumerate(centers)]
+    #
+    # plt.figure(figsize=(10, 6))
+    # plt.bar(centers, bins, bin_width, align='center', alpha=0.5, label='Empirical Disribution', color='xkcd:blue')
+    # plt.plot(centers, levy_stable.pdf(centers, alpha=alpha, beta=0, loc=mu, scale=sigma), '--', lw=2,
+    #          color='xkcd:orange', label='Analytical PDF')
+    # plt.plot(centers, ratio, label='Ratio of Empirical:Analytical PDF', color='red', lw=2)
+    # plt.plot(np.linspace(-1.75, 1.75, 3), np.ones([3]), '--', color='black', label='Exact agreement')
+    # plt.gcf().get_axes()[0].tick_params(labelsize=14)
+    # plt.legend(fontsize=14)
+    # plt.ylabel('Probability Density', fontsize=14)
+    # plt.tight_layout()
+    # plt.show()
+    # exit()
+    ############################################################
+    ###### Show that Levy is better than Gaussian ######
+    ###### Numbers that show undersampling of tails #######
+
+    # alpha, mu, sigma = states.fit_params[-1]
     # transition_emissions = np.array(states.emissions[-1])
     # print(transition_emissions.size)
     # print(np.where(np.abs(transition_emissions) > 0.8)[0].size)
-    # plt.hist(states.emissions[-1], bins=100, range=(-0.8, 0.8), density=True)
-    # x = np.linspace(-0.8, 0.8, 1000)
+    #
+    # plt.hist(states.emissions[-1], bins=200, range=(-1.75, 1.75), density=True)
+    # x = np.linspace(-1.75, 1.75, 1000)
     # plt.plot(x, levy_stable.pdf(x, alpha=alpha, beta=0, loc=mu, scale=sigma), '--', lw=2, label="L\'evy")
     # from scipy.stats import norm
     # plt.plot(x, norm.pdf(x, loc=0, scale=np.std(states.emissions[-1])), '--', lw=2, label='Gaussian')
     # plt.legend()
     # plt.tight_layout()
     # plt.show()
+    # exit()
+    #############################################################
 
     # states.transition_autocorrelation(plot=True)
     # states.calculate_hurst()
@@ -915,9 +944,9 @@ if __name__ == "__main__":
     # plt.show()
     # exit()
 
-    chains = Chain(states.transition_matrix, states.fit_params, hurst_parameters=states.hurst,
+    chains = Chain(states.count_matrix, states.fit_params, hurst_parameters=states.hurst,
                    emission_function=levy_stable)
     #chains.generate_realizations(24, 10000, bound=states.maximum_emission())
-    chains.generate_realizations(24, 10000, bound=0.8)
+    chains.generate_realizations(24, 10000, bound=1.0)
     chains.calculate_msd()
     chains.plot_msd()

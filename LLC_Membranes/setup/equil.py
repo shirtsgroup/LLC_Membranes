@@ -30,7 +30,7 @@ def initialize():
 
     # parallelization
     parser.add_argument('-mpi', '--mpi', action="store_true", help='Run MD simulations in parallel')
-    parser.add_argument('-np', '--nproc', default=4, help='Number of MPI processes')
+    parser.add_argument('-np', '--nproc', default=4, type=int, help='Number of MPI processes')
 
     # same flags as to build.py
     parser.add_argument('-b', '--build_monomer', default='NAcarb11V.gro', nargs='+', type=str, help='Name of single '
@@ -84,7 +84,8 @@ class HexagonalPhaseEquilibration:
 
     def __init__(self, build_monomers, mpi=False, nprocesses=4):
 
-        self.lc = [topology.LC(m) for m in build_monomers]
+        self.build_monomers = build_monomers
+        self.lc = [topology.LC(m) for m in self.build_monomers]
 
         self.gro_name = None
         self.top = None
@@ -133,7 +134,12 @@ class HexagonalPhaseEquilibration:
         elif ensemble == 'nvt':
             self.mdp.write_nvt_mdp()
 
-        self.top = SystemTopology(self.gro_name, restraints=restraints, xlink=xlink)
+        fix_residues = False
+        # after restrainded simulation, all residues in output gro have the same number preventing proper labeling
+        if len(self.build_monomers) > 1:  # and not restraints   # this condition may provide marginal speedup
+            fix_residues = True
+
+        self.top = SystemTopology(self.gro_name, restraints=restraints, xlink=xlink, fix_residues=fix_residues)
         self.top.write_top()
 
     def restrain(self, build_monomer, force, axis, restraint_atoms):
@@ -333,6 +339,8 @@ if __name__ == "__main__":
 
         equil.generate_input_files('nvt', args.length_nvt, restraints=args.restraint_residue)
 
+    # exit()
+
     equil.simulate('nvt.mdp', 'topol.top', 'nvt', restrained=True)
 
     copy = "cp nvt.gro %s.gro" % args.forces[0]
@@ -342,7 +350,7 @@ if __name__ == "__main__":
     p = subprocess.Popen(copy.split())
     p.wait()
 
-    equil.generate_input_files('nvt.gro', args.length_nvt, genvel=False, restraints=args.restraint_residue)
+    equil.generate_input_files('nvt', args.length_nvt, genvel=False, restraints=args.restraint_residue)
 
     for f in args.forces[1:]:
 
@@ -361,5 +369,5 @@ if __name__ == "__main__":
     equil.simulate('npt.mdp', 'topol.top', 'berendsen')
 
     equil.generate_input_files('npt', args.length_Parrinello_Rahman, genvel=False, barostat='Parrinello-Rahman',
-                               frames=400)
+                               frames=1600)
     equil.simulate('npt.mdp', 'topol.top', 'PR')

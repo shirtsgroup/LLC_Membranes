@@ -66,7 +66,7 @@ def simulate(mdp, top, gro, out, verbose=False, em_energy=False, mpi=False, npro
     p2.wait()
 
     if em_energy:
-        print('hello')
+
         nrg = subprocess.check_output(
             ["awk", "/Potential Energy/ {print $4}", "%s.log" % out])  # get Potential energy from em.log
 

@@ -105,6 +105,7 @@ class CTRW(object):
 
         if self.hop_distribution in ['flm', 'fractional_levy_motion']:
             self.hurst_correction = flm_sim_params.HurstCorrection()
+            self.truncation_correction = flm_sim_params.TruncateLevy()
 
         if self.nmodes > 1:
             if transition_matrix is not None:
@@ -272,13 +273,15 @@ class CTRW(object):
 
                     # TODO: Best way to get H. Where to truncate
                     alpha = hop_parameters[mode][0]
-                    flm = FLM(self.hurst_correction.interpolate(hurst, alpha), alpha, scale=hop_parameters[mode][2],
-                              N=length, M=4, correct_hurst=False)
+                    scale = hop_parameters[mode][2]
+                    corrected_max_hop = self.truncation_correction.interpolate(hurst, alpha, max_hop, scale)
+                    flm = FLM(self.hurst_correction.interpolate(hurst, alpha), alpha, scale=scale,
+                              N=length, M=4, correct_hurst=False, truncate=corrected_max_hop, correct_truncation=False)
 
-                    flm.generate_realizations(1, progress=False, truncate=None)
-                    if max_hop is not None:  # brute force but will have to do until there is a better FLM procedure
-                        while np.absolute(flm.noise[0, :length]).max() > max_hop:
-                            flm.generate_realizations(1, progress=False, truncate=None)
+                    flm.generate_realizations(1, progress=False)
+                    # if max_hop is not None:  # brute force but will have to do until there is a better FLM procedure
+                    #     while np.absolute(flm.noise[0, :length]).max() > max_hop:
+                    #         flm.generate_realizations(1, progress=False, truncate=None)
 
                     z[begin:end] = flm.realizations[0, :length]
                     if begin > 0:

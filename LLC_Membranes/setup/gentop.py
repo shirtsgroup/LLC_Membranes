@@ -23,7 +23,8 @@ def initialize():
 
 class SystemTopology(object):
 
-    def __init__(self, gro, ff='gaff', restraints=False, xlink=False, xlinked_top_name='assembly.itp'):
+    def __init__(self, gro, ff='gaff', restraints=False, xlink=False, xlinked_top_name='assembly.itp',
+                 fix_residues=False):
         """ Read coordinate file, identify and count different residues, and figure out where inidividual residue
         topologies are located
 
@@ -40,6 +41,9 @@ class SystemTopology(object):
         :type xlink: bool
         :type xlinked_top_name: str
         """
+
+        if fix_residues:
+            topology.fix_resnumbers(gro)
 
         t = md.load(gro)  # load coordinate file
 
