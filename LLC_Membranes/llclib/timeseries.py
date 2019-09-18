@@ -164,7 +164,7 @@ def acf(t, largest_prime=500, autocov=False):
 
 
 def plot_autocorrelation(acfxn, errorbars=None, max_k=25, bootstrap=True, nboot=200, confidence=68.27, show=False,
-                         fontsize=14):
+                         fontsize=14, label=None, color='black', overlay=False):
     """ Plot autocorrelation function of increments
 
     :param acfxn: autocorrelation function of n trajectories (ntrajectories, npoints)
@@ -175,6 +175,9 @@ def plot_autocorrelation(acfxn, errorbars=None, max_k=25, bootstrap=True, nboot=
     :param confidence: confidence interval of shaded error region (percent)
     :param show: show the plot when done
     :param fontsize: size of font on axes and legend
+    :param label: legend label
+    :param color: line color
+    :param overlay: If True, this will not create a new figure if one already exists.
 
     :type acfxn: numpy.ndarray
     :type max_k: int
@@ -183,9 +186,13 @@ def plot_autocorrelation(acfxn, errorbars=None, max_k=25, bootstrap=True, nboot=
     :type confidence: float
     :type show: bool
     :type fontsize: int
+    :type label: NoneType or str
+    :type color: str
+    :type overlay: bool
     """
 
-    plt.figure()
+    if not overlay:
+        plt.figure()
 
     # calculate acf of each trajectory
     ntraj, n = acfxn.shape
@@ -202,12 +209,12 @@ def plot_autocorrelation(acfxn, errorbars=None, max_k=25, bootstrap=True, nboot=
         errorbars = stats.confidence_interval(boot, confidence)
 
         avg = boot.mean(axis=0)
-        plt.plot(np.arange(n), avg, lw=2)
+        plt.plot(np.arange(n), avg, lw=2, label=label, color=color)
         plt.fill_between(np.arange(n), avg + errorbars[0, :], avg - errorbars[1, :], alpha=0.25)
 
     else:
 
-        plt.plot(np.arange(n), acfxn.mean(axis=0), lw=2)
+        plt.plot(np.arange(n), acfxn.mean(axis=0), lw=2, label=label, color=color)
 
         if errorbars is not None:
             plt.fill_between(np.arange(acfxn.shape[1]), errorbars[1, :] + acfxn.mean(axis=0), acfxn.mean(axis=0) -

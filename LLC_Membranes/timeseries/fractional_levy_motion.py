@@ -54,9 +54,9 @@ class FLM:
             self.truncate = trunc.interpolate(H, alpha, truncate, scale)
 
             if not correct_hurst:
-                raise Warning('You are correcting the truncation parameter, but not correcting the Hurst parameter. If'
+                raise Warning('You are correcting the truncation parameter, but not correcting the Hurst parameter. If '
                               'you corrected the Hurst parameter before passing it to FLM, then you can ignore this '
-                              'message. If you did not already correct the Hurst parameter, the truncation correction'
+                              'message. If you did not already correct the Hurst parameter, the truncation correction '
                               'will not be accurate.')
 
         else:

@@ -339,7 +339,7 @@ if __name__ == "__main__":
 
         equil.generate_input_files('nvt', args.length_nvt, restraints=args.restraint_residue)
 
-    # exit()
+    exit()
 
     equil.simulate('nvt.mdp', 'topol.top', 'nvt', restrained=True)
 

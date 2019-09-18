@@ -191,11 +191,135 @@ Phase Lyotropic Liquid Crystal Membrane}
 	   at large time lags due to decreased sampling.}\label{fig:eth_autocorrelation}
   \end{figure}
   
-  \subsection*{Simulating Fractional L\'evy Motion}\label{section:sFLM}
+  \newpage
+  \section{Estimating the Hurst Parameter}\label{section:H_estimate}
   
-  We simulated sFLM.
+  We chose to estimate the Hurst parameter, $H$ by a least squares fit to the analytical
+  autocorrelation function for fractional Brownian motion (the variance-normalized version 
+  of Equation~\ref{M-eqn:fbm_autocorrelation} in the main text):
+  
+  \begin{equation}
+    \gamma(k) = \dfrac{1}{2}\bigg[|k-1|^{2H} - 2|k|^{2H} + |k+1|^{2H}\bigg]
+  \label{eqn:fbm_autocorrelation}
+  \end{equation}  
+  
+  In Figure~\ref{fig:hurst_autocorrelation}, we plotted Equation~\ref{eqn:fbm_autocorrelation}
+  for different values of $H$. When $H > 0.5$, Equation~\ref{eqn:fbm_autocorrelation} decays
+  slowly to zero meaning one needs to study large time lags with high frequency in order to
+  obtain accurate estimates. Fortunately, all of our solutes show anti-correlated motion, so
+  most of the information in Equation \ref{eqn:fbm_autocorrelation} is contained within the 
+  first few lags. 
+
+  % /supporting_figures/hurst_autocorrelation.py
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{hurst_autocorrelation.pdf}
+  \caption{The analytical autocorrelation function of FBM decays to zero faster when 
+  H $<$ 0.5 compared to when H $>$ 0.5.}\label{fig:hurst_autocorrelation}
+  \end{figure}
+  
+  The autocovariance function of Fractional L\'evy motion is different from fractional
+  Brownian motion (see Equation~\ref{M-eqn:fbm_autocorrelation}
+  and~\ref{M-eqn:flm_autocovariance} of the main text), but their autocorrelation 
+  structures are the same. The autocovariance function of FLM is dependent on the 
+  expected value of squared draws from the underlying L\'evy distribution, $E\big[L(1)^2\big]$. 
+  This is effectively the distribution's variance, which is undefined for most 
+  L\'evy stable distributions due to their heavy tails. As a consequence, one should 
+  expect $E\big[L(1)^2\big]$ to grow as more samples are drawn from the distribution. 
+  However, we are only interested in the autocorrelation function. In order to predict
+  the Hurst parameter from the autocorrelation function, we must show that it has 
+  well-defined structure and is independent of the coefficient in 
+  Equation~\ref{M-eqn:flm_autocovariance} of the main text. In Figure~\ref{fig:flm_autocorrelation}, 
+  we plot the average autocorrelation function from an FLM process with an increasing 
+  number of observations per generated sequence. For all simulations we set $H$=0.35 
+  and $\alpha$=1.4. The variance-normalized autocovariance function, i.e. the autocorrelation
+  function does not change with increasing sequence length. Additionally, the
+  autocorrelation function of FBM, with the same $H$ is the same.
+  
+  % supporting_figures/flm_autocov.py
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{flm_autocovariance.pdf}
+  \caption{The autocorrelation function of an FLM process does not change with 
+  increasing sequence length (N). It shares the same autocorrelation function as
+  fractional Brownian motion (FBM). All sequenced used to make this plot were 
+  generated using $H$=0.35 and $\alpha$=1.4 (for FLM).}\label{fig:flm_autocovariance}
+  \end{figure}
+  
+  \section{Simulating Fractional L\'evy Motion}\label{section:sFLM}
+  
+  \subsection*{Achieving the right correlation structure}
+  
+  We simulated FLM using the algorithm of Stoev and Taqqu~\cite{stoev_simulation_2004}.
+  There are no known exact methods for simulating FLM. As a consequence, passing a
+  value of $H$ and $\alpha$ to the algorithm does not necessarily result in the correct
+  correlation structure, although the marginal L\'evy stable distribution is correct. 
+  We applied a database-based empirical correction in order to use the
+  algorithm to achieve the correct marginal distribution and correlation structure.
+  
+  Stoev and Taqqu note that the transition between negatively and positively correlated
+  draws occurs when $H = 1/ \alpha$. When $\alpha=2$, the marginal distribution is 
+  Gaussian and $H=0.5$ as expected from FBM. We corrected the input $H$ so that the 
+  value of $H$ measured based on the output sequence equaled the desired $H$. We 
+  first adjusted the value of $H$ by adding ($1 / \alpha - 0.5$), effectively 
+  recentering the correlation sign transition for any value of $1 \leq \alpha \leq 2$.
+  This correction alone does a good job for input $H$ values near 0.5, but is
+  insufficient if one desires a low values of $H$. The exact correction to $H$ is 
+  not obvious so we created a database of output $H$ values tabulated as a function
+  of input $H$ and $\alpha$ values. Figure~\ref{fig:hurst_correction} demonstrates the
+  results of applying our correction. Without the correction, FLM realizations are
+  more negatively correlated. This would result in under-predicted mean squared
+  displacements when applying the model.
+  
+  % /supporting_figures/demonstrate_hurst_correction.py
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{hurst_correction.pdf}
+  \caption{Correcting the Hurst parameter input to the algorithm of Stoev and Taqqu
+  results in an FLM process with a more accurate correlation structure. We generated
+  sequences with an input $H$ of 0.35. We estimated $H$ by fitting the autocorrelation
+  function. Without the correction, $H$ is underestimated, meaning realizations are 
+  more negatively correlated than they should be.}\label{fig:hurst_correction}
+  \end{figure}
+
+  \subsection*{FLM realizations from truncated L\'evy stable distributions}
+  
+  To generate realizations from an uncorrelated truncated L\'evy process, one would
+  randomly sample from the base distribution and replace values that are too large
+  with new random samples from the base distribution, repeating the process until
+  all samples are under the desired cut-off. 
+  
+  This procedure is complicated by the correlation structure of FLM. At a high level,
+  Stoev and Taqqu use Riemann-sum approximations of the stochastic integrals defining
+  FLM in order to generate realizations. They do this efficiently with the help of 
+  Fast Fourier Transforms. In practice, this requires one to Fourier transform a zero-padded
+  vector of random samples drawn from the appropriate L\'evy stable distribution, multiply
+  the vector in Fourier space by a kernel function and invert back to real space. The end
+  result is a correlated vector of fractional L\'evy noise.
+  
+  If one is to truncate an FLM process, one can apply the simple procedure above for 
+  drawing uncorrelated values from the marginal L\'evy stable distribution, but after
+  adding correlation, the maximum drawn value is typically lower than the limit set 
+  by the user. Additionally, the shape of the distribution itself changes. Analogous
+  to the database used to correct the Hurst parameter, we created a database to 
+  correct the input truncation parameter (the maximum desired draw). The database
+  returns the value of the truncation parameter that will properly truncate the
+  output marginal distribution based on $H$, $\alpha$ and $\sigma$ (the width parameter).
+  Figure~\ref{fig:truncation_correction} shows the result of applying our correction.
+  
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{truncation_correction.pdf}
+  \caption{We can accurately truncate the marginal distribution of FLM innovations by
+  applying a correction to the input truncation parameter. We generated FLM sequences
+  and truncated the initial L\'evy stable distribution (before Fourier transforming) at 
+  a value of 0.5. After correlation structure is added, the width of the distribution 
+  of fractional L\'evy noise decreases significantly. We corrected the input truncation
+  parameter with our database resulting in a much more accurate distribution with 
+  a maximum value close to 0.5.}\label{fig:truncation_correction}
+  \end{figure}
 
   \clearpage
-  \bibliography{transport}
+  \bibliography{stochastic_transport}
 
 \end{document}
