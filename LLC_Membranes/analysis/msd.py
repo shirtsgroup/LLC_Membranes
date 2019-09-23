@@ -8,6 +8,7 @@ import mdtraj as md
 import matplotlib.pyplot as plt
 from LLC_Membranes.analysis import Poly_fit, top
 from LLC_Membranes.llclib import physical, topology, timeseries, fitting_functions, atom_props, file_rw
+from statsmodels.tsa.stattools import adfuller
 from scipy import stats
 import tqdm
 import sqlite3 as sql
@@ -265,12 +266,40 @@ class Diffusivity(object):
 
     def fit_power_law(self, y):
         """ Fit power law to MSD curves
+
         :return: Coefficient and exponent in power low of form [coefficient, power]
         """
 
         A = Poly_fit.poly_fit(np.log(self.time[1:]), np.log(y[1:]), 1, self.W)[-1]
 
         return [np.exp(A[0]), A[1]]
+
+    def stationarity(self, axis=2):
+        """ Determine if increments (resulting from first-order differencing) are stationary using the Augmented
+        Dickey Fuller test. The null hypothesis of the ADF test is that the time series has a unit root, i.e. it is
+        non-stationary. If the returned p-value is below some threshold (often 0.05), then one can reject the null
+        hypothesis and claim stationarity. The p-value is calculated from the ADF statistic. A more negative ADF
+        statistic indicates a greater chance of rejecting the null hypothesis.
+
+        :return: p value for each trajectory
+        :rtype: numpy.ndarray
+        """
+
+        pvalues = np.zeros([self.com.shape[1]])
+        for res in range(self.com.shape[1]):
+            pvalues[res] = adfuller(self.com[1:, res, axis] - self.com[:-1, res, axis])[1]
+
+        return pvalues
+
+    def ergodicity_breaking_parameter(self):
+
+        mean_msd_variance = np.zeros_like(self.MSD_average)
+        for i in range(1, self.MSD.shape[0]):
+            mean_msd_variance[i] = np.square(self.MSD[i, :]).mean()
+
+        mean_msd_squared = np.square(self.MSD_average)  # <delta^2>^2
+
+        return (mean_msd_variance - mean_msd_squared) / mean_msd_squared
 
     def bootstrap_power_law(self, N):
 
@@ -288,7 +317,7 @@ class Diffusivity(object):
             #                                        self.power_law_fit[b, 1]))
             # plt.show()
 
-    def bootstrap(self, N, fit_line=True):
+    def bootstrap(self, N, fit_line=True, confidence=68):
         """
         Estimate error at each point in the MSD curve using bootstrapping
         :param N: number of bootstrap trials
@@ -303,7 +332,6 @@ class Diffusivity(object):
                 eMSDs[:, b] += self.MSD[:, indices[n]]  # add the MSDs of a randomly selected particle
             eMSDs[:, b] /= self.com.shape[1]  # Divide every timestep by Nparticles -- average the MSDs
 
-        confidence = 68  # percent confidence interval
         lower_confidence = (100 - confidence) / 2
         upper_confidence = 100 - lower_confidence
 
@@ -336,7 +364,7 @@ class Diffusivity(object):
             self.confidence_interval = stats.t.interval(0.95, N - 1, loc=slopes.mean(), scale=stats.sem(slopes))
             self.Davg = slopes.mean()
 
-    def plot(self, axis, fracshow=0.5, savedata=False, show=False):
+    def plot(self, axis, fracshow=0.5, savedata=False, show=False, save=False):
 
         plt.figure()
         self.endfit = int(fracshow * self.time.size)
@@ -359,7 +387,9 @@ class Diffusivity(object):
         plt.xlabel('time (ns)', fontsize=14)
         plt.gcf().get_axes()[0].tick_params(labelsize=14)
         plt.tight_layout()
-        plt.savefig('Diffusivity_%s.pdf' % axis)
+
+        if save:
+            plt.savefig('Diffusivity_%s.pdf' % axis)
 
         if show:
             plt.show(block=True)

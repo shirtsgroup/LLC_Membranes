@@ -2,7 +2,7 @@
 
 import argparse
 from LLC_Membranes.llclib import file_rw
-from LLC_Membranes.timeseries.forecast_ctrw import System
+from LLC_Membranes.analysis.sfbm_parameters import SFBMParameters
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.cm import ScalarMappable
@@ -25,7 +25,7 @@ def initialize():
     return parser
 
 
-class HopLocation(System):
+class HopLocation(SFBMParameters):
 
     def __init__(self, traj, gro, res):
 

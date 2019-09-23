@@ -207,7 +207,7 @@ def conc(t, comp, b):
     return avg_conc, std, avg_cross, thick, z_max, z_min
 
 
-def avg_pore_loc(npores, pos, box, buffer=0, spline=False, npts=20, progress=False, bins=False):
+def avg_pore_loc(npores, pos, box, buffer=0, spline=False, npts=20, progress=False, bins=False, spline_name='spline.pl'):
     """ Calculate average pore location for each pore at each frame
 
     :param no_pores: the number of pores in the unit cell
@@ -218,6 +218,7 @@ def avg_pore_loc(npores, pos, box, buffer=0, spline=False, npts=20, progress=Fal
     :param npts: number of points making up the spline in each pore
     :param progress: show progress bar while constructing splines
     :param bins: return the bin centers of each spline for plotting purposes
+    :param spline_name: name of spline. Include absolute path if not in same directory where script was run
 
     :type no_pores: int
     :type pos: numpy.ndarray, shape(ncomponents, 3) or numpy.ndarray, shape(nframes, ncomponents, 3)
@@ -227,6 +228,7 @@ def avg_pore_loc(npores, pos, box, buffer=0, spline=False, npts=20, progress=Fal
     :type npts: int
     :type progress: bool
     :type bins: bool
+    :type spline_name: str
 
     :return: numpy array containing the x, y coordinates of the center of each pore at each frame
     """
@@ -240,7 +242,7 @@ def avg_pore_loc(npores, pos, box, buffer=0, spline=False, npts=20, progress=Fal
         else:
 
             print('Calculating pore spline...')
-            centers, bin_centers = trace_pores(pos, box, npts, npores=4, progress=progress)
+            centers, bin_centers = trace_pores(pos, box, npts, npores=4, progress=progress, savename=spline_name)
 
             if bins:
                 return centers, bin_centers

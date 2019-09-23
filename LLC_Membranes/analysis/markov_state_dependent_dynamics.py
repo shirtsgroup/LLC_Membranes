@@ -767,25 +767,34 @@ class Chain:
         print(transition_matrix)
         print(self.transition_matrix)
 
-    def plot_msd(self, cutoff=0.4, dt=0.5, save=False, savename='msd.pdf'):
+    def plot_msd(self, cutoff=0.4, dt=0.5, save=False, savename='msd.pdf', label='MSD', overlay=False, show=True):
         """ Plot mean squared displacement curve.
 
         :param cutoff: cut off the plot at this fraction of the total trajectory
         :param dt: time step (ns)
         :param save: save plot
         :param savename: name of saved plot
+        :param label: legend label for plot
+        :param overlay: if False, create a new figure
+        :param show: show plot after
 
         :type cutoff: float
         :type dt: float
         :type save: bool
         :type savename: str
+        :type label: str
+        :type overlay: bool
+        :type show: bool
         """
+
+        if not overlay:
+            plt.figure()
 
         time = np.arange(self.msds.shape[0])*dt
         end = int(len(time)*cutoff)
         avg = self.msds.mean(axis=1)
 
-        plt.plot(time[:end], avg[:end], label='MSD', linewidth=2)
+        plt.plot(time[:end], avg[:end], label=label, linewidth=2)
         plt.fill_between(time[:end], avg[:end] + self.limits[0, :end], avg[:end] - self.limits[1, :end], alpha=0.7)
         plt.gcf().get_axes()[0].tick_params(labelsize=14)
         plt.xlabel('Time (ns)', fontsize=14)
@@ -796,7 +805,8 @@ class Chain:
         plt.tight_layout()
         if save:
             plt.savefig(savename)
-        plt.show()
+        if show:
+            plt.show()
 
 
 if __name__ == "__main__":
@@ -855,7 +865,7 @@ if __name__ == "__main__":
 
         #states.measure_state_emissions(fit_function=levy)
         #states.plot_emissions()
-
+    exit()
     # fig, ax = plt.subplots(8, 8, figsize=(10, 10), sharex=True, sharey=True)
     # for i in range(states.nstates):
     #     for j in range(states.nstates):
@@ -870,16 +880,16 @@ if __name__ == "__main__":
     # print(states.state_sequence)
     # exit()
 
-    states._make_transition_matrix(1, end=100)
-
-    total = states.count_matrix.sum(axis=0)
-    p = total / total.sum()  # probability of being in state i at any time t
-    w, v = np.linalg.eig(states.transition_matrix.T)
-
-    print(w[0])
-    print(v[:, 0] / v[:, 0].sum())
-    print(p)
-    exit()
+    # states._make_transition_matrix(1, end=100)
+    #
+    # total = states.count_matrix.sum(axis=0)
+    # p = total / total.sum()  # probability of being in state i at any time t
+    # w, v = np.linalg.eig(states.transition_matrix.T)
+    #
+    # print(w[0])
+    # print(v[:, 0] / v[:, 0].sum())
+    # print(p)
+    # exit()
     ############ Cut-off Justification Plot ##################
     # alpha, mu, sigma = states.fit_params[-1]
     # bins, edges = np.histogram(states.emissions[-1], bins=200, range=(-1.75, 1.75), density=True)
@@ -957,7 +967,7 @@ if __name__ == "__main__":
 
     chains = Chain(states.count_matrix, states.fit_params, hurst_parameters=states.hurst,
                    emission_function=levy_stable)
-    #chains.generate_realizations(24, 10000, bound=states.maximum_emission())
+    # chains.generate_realizations(24, 10000, bound=states.maximum_emission())
     chains.generate_realizations(24, 10000, bound=1.0)
     chains.calculate_msd()
     chains.plot_msd()

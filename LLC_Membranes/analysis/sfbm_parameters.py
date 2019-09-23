@@ -183,7 +183,8 @@ class SFBMParameters(object):
 
         self.com = ma
 
-    def calculate_solute_partition(self, r=1.5, spline=False, membrane_residue='HII', write_tcl=True):
+    def calculate_solute_partition(self, r=1.5, spline=False, membrane_residue='HII', write_tcl=True,
+                                   spline_name='spline.pl'):
         """ Determine whether each COM is in the tail or pore region as a function of time
 
         :param r: radial distance from pore center where pore region transitions to tail region
@@ -191,18 +192,21 @@ class SFBMParameters(object):
         :param membrane_residue: if using spline, give the name of the liquid crystal residue used to make the membrane
         :param write_tcl: write a tcl script that will color code solutes based on their radial position. A good way \
         to make sure this function worked as intended.
+        :param spline_name: name of spline. Provide absolute path if spline not in same directory where script is ran
 
         :type r: float
         :type spline: bool
         :type membrane_residue: str
         :type write_tcl: bool
+        :type spline_name: str
         """
 
         membrane = topology.LC('%s' % membrane_residue)  # object w/ attributes of LC making up membrane
         keep = [a.index for a in self.t.topology.atoms if a.name in membrane.pore_defining_atoms and a.residue.name
                 == membrane.name]
         self.pore_centers = physical.avg_pore_loc(4, self.t.xyz[:, keep, :], self.t.unitcell_vectors, buffer=0,
-                                                  spline=spline, npts=10, progress=True, bins=False)
+                                                  spline=spline, npts=10, progress=True, bins=False,
+                                                  spline_name=spline_name)
 
         self.partition = physical.partition(self.com, self.pore_centers, r, unitcell=self.t.unitcell_vectors,
                                             spline=spline)
