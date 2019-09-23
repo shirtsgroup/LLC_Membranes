@@ -307,7 +307,6 @@ class States:
             transitioned_to = self.state_sequence[t, :]
             for pair in zip(transitioned_from, transitioned_to):
                 self.count_matrix[pair[0], pair[1]] += 1
-            #self.count_matrix[transitioned_from, transitioned_to] += 1
 
         # normalize so rows sum to unity
         self.transition_matrix = (self.count_matrix.T / self.count_matrix.sum(axis=1)).T
@@ -868,7 +867,19 @@ if __name__ == "__main__":
     # plt.tight_layout()
     # plt.show()
     # exit()
+    # print(states.state_sequence)
+    # exit()
 
+    states._make_transition_matrix(1, end=100)
+
+    total = states.count_matrix.sum(axis=0)
+    p = total / total.sum()  # probability of being in state i at any time t
+    w, v = np.linalg.eig(states.transition_matrix.T)
+
+    print(w[0])
+    print(v[:, 0] / v[:, 0].sum())
+    print(p)
+    exit()
     ############ Cut-off Justification Plot ##################
     # alpha, mu, sigma = states.fit_params[-1]
     # bins, edges = np.histogram(states.emissions[-1], bins=200, range=(-1.75, 1.75), density=True)

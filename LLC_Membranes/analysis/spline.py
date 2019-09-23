@@ -18,7 +18,7 @@ def initialize():
                                                                                'build unit cell (no extension)')
     parser.add_argument('-n', '--npts', default=10, type=int, help='Number of points in spline')
     parser.add_argument('-l', '--load', default=False, help='Load pickled system object')
-    parser.add_argument('-s', '--savename', default='hbonds.pl', type=str, help='Name of pickled object to save after'
+    parser.add_argument('-s', '--savename', default='spline.pl', type=str, help='Name of pickled object to save after'
                                                                                 'calcualtions are complete')
 
     return parser

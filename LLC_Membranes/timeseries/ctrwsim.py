@@ -54,7 +54,7 @@ def initialize():
 class CTRW(object):
 
     def __init__(self, length, ntraj, nmodes=1, hop_dist='gaussian', dwell_dist='power', hop_sigma=1, alpha=0.5,
-                 lamb=0.5, padding=10, dt=1, nt=1, H=0.5, transition_matrix=None):
+                 lamb=0.5, padding=10, dt=1, nt=1, H=0.5, transition_count_matrix=None):
         """ Initialize simulation of a continuous time random walk
 
         :param length: length of each simulated trajectory. If you fix the number of steps, this equals the number of \
@@ -72,7 +72,7 @@ class CTRW(object):
         :param nt: number of threads to use where parallelized
         :param H: Hurst parameter for fractional brownian motion. Equals 2*alpha for pure FBM. For H < 0.5, \
         trajectories are subdiffusive, when H = 0.5, brownian motion is recovered.
-        :param transition_matrix: nmode x nmode matrix of transition probabilties between states. Only needed if \
+        :param transition_count_matrix: nmode x nmode matrix of counts of transitions between states. Only needed if \
         nmodes > 1.
 
         :type length: int
@@ -87,7 +87,7 @@ class CTRW(object):
         :type dt: float
         :type nt: int
         :type H: float
-        :type transition_matrix: np.ndarray
+        :type transition_count_matrix: np.ndarray
         """
 
         self.nsteps = length
@@ -108,10 +108,10 @@ class CTRW(object):
             self.truncation_correction = flm_sim_params.TruncateLevy()
 
         if self.nmodes > 1:
-            if transition_matrix is not None:
-                self.transition_matrix = transition_matrix
+            if transition_count_matrix is not None:
+                self.transition_count_matrix = transition_count_matrix
             else:
-                sys.exit("You must provide a probability transition matrix if nmodes is greater than 1")
+                sys.exit("You must provide a transition count matrix if nmodes is greater than 1")
 
         self.trajectories = np.zeros([self.ntraj, self.nsteps, 2])
         self.trajectory_hops = np.zeros([self.ntraj, 2 * self.nsteps - 1, 2])  # for visualization
@@ -234,7 +234,8 @@ class CTRW(object):
 
                 # choose next mode
                 if self.nmodes > 1:
-                    mode = np.random.choice(self.nmodes, p=self.transition_matrix[mode, :])
+                    p = np.random.dirichlet(self.transition_count_matrix[mode, :])
+                    mode = np.random.choice(self.nmodes, p=p)
 
             time = np.cumsum(time)
             z = np.zeros(len(time))

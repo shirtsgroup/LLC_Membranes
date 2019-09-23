@@ -140,14 +140,14 @@ if __name__ == "__main__":
 
     # sys.estimate_hurst(modes=fit['hurst_modes'])
     # exit()
-
+    exit()
     print('Generating SFBM realizations...')
     # simulate ntrajsim trajectories for same length as MD
 
     nsteps = int(project['length'] / sys.dt)
     random_walks = CTRW(nsteps, project['ntrajsim'], nmodes=sys.nmodes, dt=sys.dt, hop_dist=project['hop_dist'],
                         dwell_dist=project['dwell_dist'],
-                        transition_matrix=sys.transition_matrix if sys.nmodes > 1 else None)
+                        transition_count_matrix=sys.count_matrix if sys.nmodes > 1 else None)
 
     random_walks.generate_trajectories(fixed_time=True, distributions=(sys.dwell_parameters,
                                        sys.hop_parameters, sys.hurst_distribution), discrete=True,

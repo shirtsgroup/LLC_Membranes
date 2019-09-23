@@ -141,6 +141,7 @@ class SFBMParameters(object):
         self.hop_series_order = [[] for _ in range(self.nres)]
         self.nsolute = self.com.shape[1]
         self.transition_matrix = np.zeros([self.nmodes, self.nmodes])
+        self.count_matrix = np.zeros_like(self.transition_matrix)
         self.dwell_lower_limit = []
         self.max_hop = 0  # The maximum hop length
 
@@ -826,16 +827,16 @@ class SFBMParameters(object):
 
         nT = self.partition.shape[0]
 
-        count_matrix = np.zeros_like(self.transition_matrix, dtype=int)
+        self.count_matrix = np.zeros_like(self.transition_matrix, dtype=int)
 
         for t in range(start, nT):  # start at frame 1. May need to truncate more as equilibration
             transitioned_from = self.partition[t - 1, :].astype(int)
             transitioned_to = self.partition[t, :].astype(int)
             for pair in zip(transitioned_from, transitioned_to):
-                count_matrix[pair[0], pair[1]] += 1
+                self.count_matrix[pair[0], pair[1]] += 1
 
         # normalize so rows sum to unity
-        self.transition_matrix = (count_matrix.T / count_matrix.sum(axis=1)).T
+        self.transition_matrix = (self.count_matrix.T / self.count_matrix.sum(axis=1)).T
 
     def update_database(self, file="msd.db", tablename="msd", type='parameters', data=None):
         """ Update SQL database with information from this run

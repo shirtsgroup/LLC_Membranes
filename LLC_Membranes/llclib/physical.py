@@ -389,6 +389,15 @@ def trace_pores(pos, box, npoints, npores=4, progress=True, save=True, savename=
     numbers all precede those in pore 2)
     :param progress: set to True if you want a progress bar to be shown
     :param save: save spline as pickled object
+    :param savename: path to spline. If absolute path is not provided, will look in current directory
+
+    :type pos: np.ndarray
+    :type box: np.ndarray
+    :type npoints: int
+    :type npores: int
+    :type progress: bool
+    :type save: bool
+    :type savename: str
 
     :return: points which trace the pore center
     """
@@ -690,6 +699,7 @@ def partition(com, pore_centers, r, buffer=0, unitcell=None, npores=4, spline=Fa
     :param unitcell: unitcell vectors in mdtraj format (t.unitcell_vectors). Only needed if buffer and/or spline is used
     :param npores: number of pores
     :param spline: calculate partition with respect to pore spline
+    :param spline_path: directory where spline is located
 
     :type com: numpy.ndarray (nT, ncom, 3)
     :type pore_centers: numpy.ndarray (nT, npores, 2) or (nT, npores, 3) or (nT, npores, npts, 3) if spline=True where
@@ -699,6 +709,7 @@ def partition(com, pore_centers, r, buffer=0, unitcell=None, npores=4, spline=Fa
     :type unitcell: numpy.ndarray (nT, 3, 3)
     :type npores: int
     :type spline: bool
+    :type spline_path: str
 
     :return part: boolean numpy array with shape (nT, com.shape[1]) where True indicates a center of mass that is
     inside the inner region (i.e. < r)

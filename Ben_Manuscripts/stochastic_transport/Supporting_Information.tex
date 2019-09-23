@@ -66,6 +66,42 @@ Phase Lyotropic Liquid Crystal Membrane}
   }~\label{table:python_scripts}
 
   \end{table}
+  
+  \section{Solute Equilibration}\label{section:equilibration}
+  
+  We collected all data used for model generation after the solutes were 
+  equilibrated. We assumed a solute to be equilibrated when the partition of
+  solutes in and out of the pore region stopped changing. The pore region is
+  defined as within 0.75 nm of the pore center. We've plotted the partition
+  versus time in Figure~\ref{fig:equilibration} and indicated the chosen
+  equilibration time points.
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{URE_equilibration.pdf}
+  \caption{}\label{fig:URE_equilibration}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{GCL_equilibration.pdf}
+  \caption{}\label{fig:GCL_equilibration}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{ACH_equilibration.pdf}
+  \caption{}\label{fig:ACH_equilibration}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{MET_equilibration.pdf}
+  \caption{}\label{fig:MET_equilibration}
+  \end{subfigure}
+  \caption{We considered a system to be equilibrated when the partition of solutes
+  between the tails and pore plateaued. Our chosen equilibration point for each
+  solute is indicated by the vertical black dashed line. (a) Urea equilibrates
+  the fastest, after 1000 ns. (b) Ethylene glycol equilibrates after 1200 ns 
+  (c) Acetic Acid does not equilibrate until 4400 ns. (d) We considered methanol
+  to be equilibrated after 3500 ns. Methanol nearly completely partitions into
+  the tails.}\label{fig:equilibration}
+  \end{figure}
 
   \section{Choosing a transport model}\label{section:transport_model_selection}
 
@@ -162,34 +198,6 @@ Phase Lyotropic Liquid Crystal Membrane}
 	  be true here because both MSDs are in agreement. }\label{fig:msd_comparison}
   \end{figure}
 
-  \subsection*{Autocorrelation of steps}
-
-% From Sokolov paper: "Assigning different waiting times τ i to each step, and assuming that the
-% steps are uncorrelated as in a regular RW, gives rise to the CTRW model" -- I
-% might need to check autocorrelation of steps lengths when a hop occurs rather
-% than every time step. Not sure if there is enough data for that, but could check 
-% a particularly hoppy trajectory after longer simulation.
-
-
-  Based on the previous two sections, our model can likey be studied as a CTRW. 
-  However, it is still possible that our CTRW model might also be convoluted with
-  an FBM or a RWF process. In a pure CTRW, the steps are uncorrelated. 
-  Both FBM and RWF exhibit anti-correlated steps. 
-
-  The steps in our system are not correlated. We showed this by calculating the
-  autocorrelation function (ACF) of the step lengths in the $z$-direction. The
-  ACF of a representative trajectory is shown in Figure~\ref{fig:eth_autocorrelation}.  
-  
-  \begin{figure}[!htb]
-  \centering
-% Generated with brownian_test.py -t PR_nojump.xtc -g PR.gro -r ETH (and appropriate uncommenting -- need to rework that script)
-% in directory: /home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/ETH/10wt
-  \includegraphics[width=0.8\textwidth]{eth_autocorrelation.pdf}
-  \caption{The autocorrelation function (right) of a representative ethanol
-	   center of mass $z$-coordinate trajectory (left) almost immediately decays to zero,
-	   indicating a complete loss of memory of it's previous position. Noise increases
-	   at large time lags due to decreased sampling.}\label{fig:eth_autocorrelation}
-  \end{figure}
   
   \newpage
   \section{Estimating the Hurst Parameter}\label{section:H_estimate}
@@ -206,9 +214,9 @@ Phase Lyotropic Liquid Crystal Membrane}
   In Figure~\ref{fig:hurst_autocorrelation}, we plotted Equation~\ref{eqn:fbm_autocorrelation}
   for different values of $H$. When $H > 0.5$, Equation~\ref{eqn:fbm_autocorrelation} decays
   slowly to zero meaning one needs to study large time lags with high frequency in order to
-  obtain accurate estimates. Fortunately, all of our solutes show anti-correlated motion, so
-  most of the information in Equation \ref{eqn:fbm_autocorrelation} is contained within the 
-  first few lags. 
+  accurately estimate $H$ from the data. Fortunately, all of our solutes show anti-correlated
+  motion, so most of the information in Equation \ref{eqn:fbm_autocorrelation} is contained
+  within the first few lags. 
 
   % /supporting_figures/hurst_autocorrelation.py
   \begin{figure}
@@ -218,23 +226,24 @@ Phase Lyotropic Liquid Crystal Membrane}
   H $<$ 0.5 compared to when H $>$ 0.5.}\label{fig:hurst_autocorrelation}
   \end{figure}
   
-  The autocovariance function of Fractional L\'evy motion is different from fractional
-  Brownian motion (see Equation~\ref{M-eqn:fbm_autocorrelation}
+  The autocovariance function of fractional L\'evy motion is different from fractional
+  Brownian motion (see Equations~\ref{M-eqn:fbm_autocorrelation}
   and~\ref{M-eqn:flm_autocovariance} of the main text), but their autocorrelation 
   structures are the same. The autocovariance function of FLM is dependent on the 
   expected value of squared draws from the underlying L\'evy distribution, $E\big[L(1)^2\big]$. 
   This is effectively the distribution's variance, which is undefined for most 
   L\'evy stable distributions due to their heavy tails. As a consequence, one should 
-  expect $E\big[L(1)^2\big]$ to grow as more samples are drawn from the distribution. 
+  expect $E\big[L(1)^2\big]$ to grow as more samples are drawn from the distribution
+  with the autocovariance function responding accordingly. 
   However, we are only interested in the autocorrelation function. In order to predict
   the Hurst parameter from the autocorrelation function, we must show that it has 
-  well-defined structure and is independent of the coefficient in 
+  a well-defined structure and is independent of the coefficient in 
   Equation~\ref{M-eqn:flm_autocovariance} of the main text. In Figure~\ref{fig:flm_autocorrelation}, 
   we plot the average autocorrelation function from an FLM process with an increasing 
   number of observations per generated sequence. For all simulations we set $H$=0.35 
   and $\alpha$=1.4. The variance-normalized autocovariance function, i.e. the autocorrelation
-  function does not change with increasing sequence length. Additionally, the
-  autocorrelation function of FBM, with the same $H$ is the same.
+  function, does not change with increasing sequence length. Additionally, the
+  autocorrelation function of FBM, with the same $H$, is the same.
   
   % supporting_figures/flm_autocov.py
   \begin{figure}
@@ -243,47 +252,39 @@ Phase Lyotropic Liquid Crystal Membrane}
   \caption{The autocorrelation function of an FLM process does not change with 
   increasing sequence length (N). It shares the same autocorrelation function as
   fractional Brownian motion (FBM). All sequenced used to make this plot were 
-  generated using $H$=0.35 and $\alpha$=1.4 (for FLM).}\label{fig:flm_autocovariance}
+  generated using $H$=0.35 and, for FLM, $\alpha$=1.4.}\label{fig:flm_autocorrelation}
   \end{figure}
   
   \section{Simulating Fractional L\'evy Motion}\label{section:sFLM}
+
+  \subsection{Truncated L\'evy stable hop distributions}\label{section:truncation}
   
-  \subsection*{Achieving the right correlation structure}
+  \textit{Determining where to truncate the hop distribution:} A pure
+  L\'evy stable distribution has heavy tails which can lead to arbitrarily
+  long hop lengths. Our distribution of hop lengths fits well to a L\'evy
+  distribution near the mean, but under samples the tails. In 
+  Figure~\ref{fig:truncation_correction} we compare the empirically 
+  measured hop length distribution of Urea to its maximum likelihood fit to
+  a L\'evy stable distribution. The ratio between the two distributions 
+  at each bin is nearly 1 close to the center, indicating a near-perfect
+  fit, larger than 1 slightly further from the center, suggesting that 
+  we slightly over sample intermediate hop lengths, and below 1 far from 
+  the center, indicating under sampling of extremely long hop lengths.
+  Based on the plot, we chose a cut-off of 0.8 nm in order to compensate for
+  over sampled intermediate hop lengths. We used the same procedure
+  to determine truncation parameters for all solutes.
   
-  We simulated FLM using the algorithm of Stoev and Taqqu~\cite{stoev_simulation_2004}.
-  There are no known exact methods for simulating FLM. As a consequence, passing a
-  value of $H$ and $\alpha$ to the algorithm does not necessarily result in the correct
-  correlation structure, although the marginal L\'evy stable distribution is correct. 
-  We applied a database-based empirical correction in order to use the
-  algorithm to achieve the correct marginal distribution and correlation structure.
-  
-  Stoev and Taqqu note that the transition between negatively and positively correlated
-  draws occurs when $H = 1/ \alpha$. When $\alpha=2$, the marginal distribution is 
-  Gaussian and $H=0.5$ as expected from FBM. We corrected the input $H$ so that the 
-  value of $H$ measured based on the output sequence equaled the desired $H$. We 
-  first adjusted the value of $H$ by adding ($1 / \alpha - 0.5$), effectively 
-  recentering the correlation sign transition for any value of $1 \leq \alpha \leq 2$.
-  This correction alone does a good job for input $H$ values near 0.5, but is
-  insufficient if one desires a low values of $H$. The exact correction to $H$ is 
-  not obvious so we created a database of output $H$ values tabulated as a function
-  of input $H$ and $\alpha$ values. Figure~\ref{fig:hurst_correction} demonstrates the
-  results of applying our correction. Without the correction, FLM realizations are
-  more negatively correlated. This would result in under-predicted mean squared
-  displacements when applying the model.
-  
-  % /supporting_figures/demonstrate_hurst_correction.py
   \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{hurst_correction.pdf}
-  \caption{Correcting the Hurst parameter input to the algorithm of Stoev and Taqqu
-  results in an FLM process with a more accurate correlation structure. We generated
-  sequences with an input $H$ of 0.35. We estimated $H$ by fitting the autocorrelation
-  function. Without the correction, $H$ is underestimated, meaning realizations are 
-  more negatively correlated than they should be.}\label{fig:hurst_correction}
+  \includegraphics[width=0.75\textwidth]{truncation_cutoff.pdf}
+  \caption{The ratio between the empirical and maximum likelihood theoretical
+  distribution quantifies the quality of fit as function of hop length. The fit
+  is near-perfect close to the mean. Intermediate hop lengths are over sampled, 
+  and the tails are under sampled. We used this type of plot to determine the
+  appropriate place to truncate the L\'evy stable distributions.}\label{fig:truncation_cutoff}
   \end{figure}
-
-  \subsection*{FLM realizations from truncated L\'evy stable distributions}
   
+  \textit{Generating FLM realizations from a truncated L\'evy distribution:}
   To generate realizations from an uncorrelated truncated L\'evy process, one would
   randomly sample from the base distribution and replace values that are too large
   with new random samples from the base distribution, repeating the process until
@@ -306,6 +307,10 @@ Phase Lyotropic Liquid Crystal Membrane}
   returns the value of the truncation parameter that will properly truncate the
   output marginal distribution based on $H$, $\alpha$ and $\sigma$ (the width parameter).
   Figure~\ref{fig:truncation_correction} shows the result of applying our correction.
+  Note that generating this database requires a significant amount of simulation and
+  still likely doesn't perfectly correct the truncation parameter. The output leads
+  to a somewhat fuzzy cut-off of the output distribution. This is likely beneficial
+  since we observe a small proportion of hops longer the chosen truncation cut-off.
   
   \begin{figure}
   \centering
@@ -315,8 +320,42 @@ Phase Lyotropic Liquid Crystal Membrane}
   and truncated the initial L\'evy stable distribution (before Fourier transforming) at 
   a value of 0.5. After correlation structure is added, the width of the distribution 
   of fractional L\'evy noise decreases significantly. We corrected the input truncation
-  parameter with our database resulting in a much more accurate distribution with 
-  a maximum value close to 0.5.}\label{fig:truncation_correction}
+  parameter with our database resulting in a distribution close to the theoretical
+  distribution (black dashed line) with a maximum value close to 0.5.}\label{fig:truncation_correction}
+  \end{figure}
+  
+  \subsection{Achieving the right correlation structure}\label{section:flm_correlation}
+  
+  We simulated FLM using the algorithm of Stoev and Taqqu~\cite{stoev_simulation_2004}.
+  There are no known exact methods for simulating FLM. As a consequence, passing a
+  value of $H$ and $\alpha$ to the algorithm does not necessarily result in the correct
+  correlation structure, although the marginal L\'evy stable distribution is correct. 
+  We applied a database-based empirical correction in order to use the
+  algorithm to achieve the correct marginal distribution and correlation structure.
+  
+  Stoev and Taqqu note that the transition between negatively and positively correlated
+  draws occurs when $H = 1/ \alpha$. When $\alpha=2$, the marginal distribution is 
+  Gaussian and the transition occurs at $H=0.5$ as expected from FBM. We corrected 
+  the input $H$ so that the value of $H$ measured based on the output sequence equaled
+  the desired $H$. We first adjusted the value of $H$ by adding ($1 / \alpha - 0.5$),
+  effectively recentering the correlation sign transition for any value of $1 \leq \alpha \leq 2$.
+  This correction alone does a good job for input $H$ values near 0.5, but is
+  insufficient if one desires a low value of $H$. The exact correction to $H$ is 
+  not obvious so we created a database of output $H$ values tabulated as a function
+  of input $H$ and $\alpha$ values. Figure~\ref{fig:hurst_correction} demonstrates the
+  results of applying our correction. Without the correction, FLM realizations are
+  more negatively correlated. This would result in under-predicted mean squared
+  displacements when applying the model.
+  
+  % /supporting_figures/demonstrate_hurst_correction.py
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{hurst_correction.pdf}
+  \caption{Correcting the Hurst parameter input to the algorithm of Stoev and Taqqu
+  results in an FLM process with a more accurate correlation structure. We generated
+  sequences with an input $H$ of 0.35. We estimated $H$ by fitting the autocorrelation
+  function. Without the correction, $H$ is underestimated, meaning realizations are 
+  more negatively correlated than they should be.}\label{fig:hurst_correction}
   \end{figure}
 
   \clearpage

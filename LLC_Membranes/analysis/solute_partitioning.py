@@ -239,7 +239,7 @@ class System(object):
         self.com = physical.center_of_mass(self.pos[:, self.residue_indices, :], masses)
         print('Done!')
 
-    def locate_pore_centers(self, spline=False, save=True):
+    def locate_pore_centers(self, spline=False, save=True, spline_path='./spline.pl'):
 
         # find pore centers
         # can use physical.avg_pore_loc with spline argument instead of if/else below
@@ -247,7 +247,7 @@ class System(object):
         if spline:
             self.spline = True
             self.pore_centers = physical.trace_pores(self.pos[:, pore_atoms, :], self.t.unitcell_vectors, 20,
-                                                     save=save)[0]
+                                                     save=save, savename=spline_path)[0]
         else:
             self.pore_centers = physical.avg_pore_loc(self.npores, self.pos[:, pore_atoms, :], self.t.unitcell_vectors)
 
