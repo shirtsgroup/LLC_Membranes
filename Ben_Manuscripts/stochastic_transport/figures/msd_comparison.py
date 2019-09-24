@@ -23,12 +23,12 @@ def md_diffusivity():
         return MD_MSD
 
 
-res = 'GCL'
+res = 'MET'
 directory = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/%s/10wt" % res
 fracshow = 0.4  # fraction of MD MSD to plot
 recalculate_msd = False 
 recalculate_walks = True 
-nmodes = 2
+nmodes = 2 
 ntraj = 1000  # number of trajectories to simulate
 nboot = 200  # number of bootstrap trials when getting errorbars on MSD
 padding = 10  # higher number gives better resolution to CTRW trajectories
@@ -119,8 +119,9 @@ for i, dists in enumerate(zip(dwell_dist, hop_dist)):
 	print('Hurst parameter: %.2f' % np.mean(sys.hurst_distribution))
 
 	if recalculate_walks:
-		sys.determine_transition_matrix()
-		print(sys.count_matrix)
+		if nmodes > 1:
+			sys.determine_transition_matrix()
+			print(sys.count_matrix)
 		random_walks = CTRW(nsteps, ntraj, nmodes=nmodes, dt=dt, hop_dist=motion, dwell_dist=dwell, transition_count_matrix=sys.count_matrix if sys.nmodes > 1 else None)
 		random_walks.generate_trajectories(fixed_time=True, distributions=(sys.dwell_parameters, sys.hop_parameters, sys.hurst_distribution), discrete=True, ll=sys.dwell_lower_limit, max_hop=sys.max_hop)
 

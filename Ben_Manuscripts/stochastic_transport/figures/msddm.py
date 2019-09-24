@@ -22,7 +22,7 @@ def md_diffusivity():
 
         return MD_MSD
 
-res = 'URE'
+res = 'MET'
 directory = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/%s/10wt" % res
 fracshow = 0.4  # fraction of MD MSD to plot
 recalculate_msd = False 
@@ -60,6 +60,9 @@ nsteps = MD_MSD.nT  # match the number of frames
 # probably easier to just re-run these calculations in the appropriate directory. 
 # Doesn't matter which dwell/hop is used as they will be re-fit below
 states = file_rw.load_object('%s/states.pl' % directory)
+print(states.hurst.mean(axis=1))
+print(states.fit_params)
+exit()
 
 chains = Chain(states.count_matrix, states.fit_params, hurst_parameters=states.hurst, emission_function=levy_stable)
 chains.generate_realizations(ntraj, nsteps, bound=truncate[res])

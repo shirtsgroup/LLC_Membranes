@@ -19,9 +19,10 @@ from LLC_Membranes.timeseries.flm_sim_params import TruncateLevy
 alphas = np.linspace(1, 2, 10)
 H = np.linspace(0.0, 0.5, 11)
 trunc = np.linspace(1, 100, 10)
-scale = 0.0363
+scale = 0.05
 nrealizations = 10
-load = True
+load = False
+append = True
 
 if not load:
 
@@ -38,6 +39,9 @@ if not load:
 
                 df.loc[df_ndx] = [h, a, t, scale, flm.noise.max()]
                 # df.loc[df_ndx] = [h, a, t, scale, flm.noise.max(axis=1).mean()]
+
+    if append:
+        df.append(pd.read_pickle('truncate_levy.pl'))  # append to previous pickle
 
     df.to_pickle('truncate_levy.pl')
 

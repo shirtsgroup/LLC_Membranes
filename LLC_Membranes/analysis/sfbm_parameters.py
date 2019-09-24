@@ -676,7 +676,8 @@ class SFBMParameters(object):
 
         return max_dwell
 
-    def estimate_hurst(self, nboot=200, max_k=5, confidence=95, modes=None):
+    def estimate_hurst(self, nboot=200, max_k=5, confidence=95, modes=None, show=True, savename='hop_acf.pdf',
+                       color='black', plot_params=True):
         r""" Estimate the hurst parameter by fitting the emperical autocovariance function to theory:
 
         .. math::
@@ -688,12 +689,20 @@ class SFBMParameters(object):
         :param confidence: confidence interval
         :param modes: number of modes. If None, will use the same number of modes used to characterize the hops and \
         dwells. This is meant to give a more flexible model.
+        :param show: show finished plot
+        :param savename: name under which to save plot
+        :param color: color of theoretical line
+        :param plot_params: print theoretical equation and fit parameters on plot
 
 
         :type nboot: int
         :type max_k: int
         :type confidence: float
         :type modes: int or NoneType
+        :type show: bool
+        :type savename: str
+        :type color: str
+        :type plot_params: bool
         """
 
         # lists of arrays that will be needed
@@ -797,13 +806,14 @@ class SFBMParameters(object):
 
             ax[m].plot(self.hop_acf[m], linewidth=2, label='Simulated autocorrelation')
             ax[m].plot(np.arange(max_hops), fitting_functions.hurst_autocovariance(np.arange(max_hops),
-                     np.mean(self.hurst_distribution[m])), '--', color='black', linewidth=2,
+                     np.mean(self.hurst_distribution[m])), '--', color=color, linewidth=2,
                      label='Fit theoretical autocorrelation')
             ax[m].fill_between(np.arange(max_hops), errorbars[1, :] + boot.mean(axis=0),
                                boot.mean(axis=0) - errorbars[0, :], alpha=0.25)
-            ax[m].text(3.0, 0.5, '$\gamma(k) = \dfrac{1}{2}[|k-1|^{2H} - 2|k|^{2H} + |k + 1|^{2H}]$', fontsize=fontsize)
-            ax[m].text(3.0, 0.3, '$H$ = %.2f $\pm$ %.2f' % (np.mean(self.hurst_distribution[m]),
-                                                            np.std(self.hurst_distribution[m])), fontsize=fontsize)
+            if plot_params:
+                ax[m].text(3.0, 0.5, '$\gamma(k) = \dfrac{1}{2}[|k-1|^{2H} - 2|k|^{2H} + |k + 1|^{2H}]$', fontsize=fontsize)
+                ax[m].text(3.0, 0.3, '$H$ = %.2f $\pm$ %.2f' % (np.mean(self.hurst_distribution[m]),
+                                                                np.std(self.hurst_distribution[m])), fontsize=fontsize)
             ax[m].set_xticks([1, 3, 5, 7, 9, 11, 13, 15])
             ax[m].set_xlabel('Lag (k)', fontsize=fontsize)
             ax[m].set_ylabel('Autocorrelation', fontsize=fontsize)
@@ -813,8 +823,9 @@ class SFBMParameters(object):
             ax[m].legend(fontsize=fontsize)
 
         fig.tight_layout()
-        fig.savefig('hop_acf.pdf')
-        plt.show()
+        fig.savefig(savename)
+        if show:
+            plt.show()
 
     def determine_transition_matrix(self, start=1):
         """ Create a transition matrix describing the probability of transitions between states. This is same as

@@ -79,6 +79,7 @@ class System(object):
         :type t: object
         """
 
+        topology.fix_resnumbers(gro)
         # print('Generating bond list...', end="", flush=True)
         # self.top = Topology(top, xlink=xlink, xlink_topology=xlink_topology, xlink_residue=xlink_residue)
         # print('Done!')

@@ -43,6 +43,7 @@ class ZTrace(object):
     def __init__(self, traj, gro, residue, build_monomer, axis, begin=0, end=-1, skip=1, npores=4):
 
         self.t = md.load(traj, top=gro)[begin:end:skip]
+        self.time = self.t.time
 
         self.axis = ['x', 'y', 'z'].index(axis.lower())
 
@@ -60,13 +61,13 @@ class ZTrace(object):
         self.spline = None
         self.radial_distance = np.zeros([self.t.n_frames, self.nres])
 
-    def locate_pore_centers(self, npts_spline=10, save=True):
+    def locate_pore_centers(self, npts_spline=10, save=True, savename='spline.pl'):
 
         pore_atoms = [a.index for a in self.t.topology.atoms if a.name in self.monomer.pore_defining_atoms and
                       a.residue.name in self.monomer.residues]
 
         self.spline = physical.trace_pores(self.t.xyz[:, pore_atoms, :], self.t.unitcell_vectors, npts_spline,
-                                           save=save)[0]
+                                           save=save, savename=savename)[0]
 
     def radial_distances(self, npores=4):
 
@@ -98,7 +99,7 @@ class ZTrace(object):
             rd = self.radial_distance[:, i]
             trace = self.com[:, i, self.axis]
 
-            points = np.array([self.t.time / 1000, trace]).T.reshape(-1, 1, 2)
+            points = np.array([self.time / 1000, trace]).T.reshape(-1, 1, 2)
             segments = np.concatenate([points[:-1], points[1:]], axis=1)
 
             lc = LineCollection(segments, cmap=colormap, norm=norm)
@@ -115,7 +116,7 @@ class ZTrace(object):
         ymin -= .05 * span
 
         ax.set_ylim(ymin, ymax)
-        ax.set_xlim(0, self.t.time[-1] / 1000)
+        ax.set_xlim(0, self.time[-1] / 1000)
 
         # labels + colorbar
         ax.set_ylabel('$z$-coordinate (nm)', fontsize=14)
