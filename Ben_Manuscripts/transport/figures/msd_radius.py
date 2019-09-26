@@ -14,10 +14,10 @@ wt = 10
 #color_dict = {'MET':colors[0], 'ETH':colors[0], 'PR':colors[0], 'BUT':colors[0], 'GCL':colors[1], 'PG':colors[1], 'GLY':colors[1], 'TET':colors[1], 'RIB':colors[1], 'ACH':colors[2], 'URE':colors[2], 'ACN':colors[2], 'ATO':colors[2], 'SOH':colors[3], 'DMP':colors[3], 'DMS':colors[3], 'THF':colors[4], 'PCB':colors[4], 'EAC':colors[4], 'DMF':colors[4]}
 
 simple_alcohols = False 
-diols = False 
+diols = True 
 ketones = False 
 sulfur = False
-nondonors = True 
+nondonors = False 
 if simple_alcohols:
 	restrict = ['MET', 'ETH', 'PR', 'BUT']
 	shiftx = {'MET':0.005, 'ETH':0.005, 'PR':0.005, 'BUT':0.005}
@@ -56,6 +56,9 @@ radii = crsr.execute(command).fetchall()
 rnames = [i[0] for i in radii]
 r = np.array([i[1] for i in radii])
 r_std = np.array([i[2] for i in radii])
+print(rnames)
+print(r)
+exit()
 connection = sql.connect('%s/../timeseries/msd.db' % path)
 crsr = connection.cursor()
 

@@ -23,12 +23,12 @@ def md_diffusivity():
         return MD_MSD
 
 
-res = 'MET'
+res = 'GCL'
 directory = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/%s/10wt" % res
 fracshow = 0.4  # fraction of MD MSD to plot
 recalculate_msd = False 
-recalculate_walks = True 
-nmodes = 2 
+recalculate_walks = True
+nmodes = 1 
 ntraj = 1000  # number of trajectories to simulate
 nboot = 200  # number of bootstrap trials when getting errorbars on MSD
 padding = 10  # higher number gives better resolution to CTRW trajectories
@@ -76,7 +76,8 @@ for i, dists in enumerate(zip(dwell_dist, hop_dist)):
 	hop = dists[1]
 
 	abbrev = abbreviations[dwell + ' ' + hop]
-	savename = '%s_%s.pl' % (res, abbrev)
+	savename = '%s_%s_%dmode.pl' % (res, abbrev, nmodes)
+	#savename = '%s_%s.pl' % (res, abbrev)
 
 	if recalculate_walks:
 		sys.fit_distributions(nbins=50, nboot=nboot, plot=False, show=False, save=False, dwell_distribution=dwell, hop_distribution=hop)
@@ -98,7 +99,7 @@ for i, dists in enumerate(zip(dwell_dist, hop_dist)):
 			mean_sigma = np.mean([p[2] for p in sys.hop_parameters[m]])
 			mean_mu = np.mean([p[1] for p in sys.hop_parameters[m]])
 			print('Mode %d' % (m + 1))
-			print('alpha = %.2f\nsigma = %.2f\nmu = %.2f' % (mean_alpha, mean_sigma, mean_mu))
+			print('alpha = %.3f\nsigma = %.2f\nmu = %.2f' % (mean_alpha, mean_sigma, mean_mu))
 	else:
 		import sys
 		sys.exit('Type of motion undefined')
@@ -108,13 +109,13 @@ for i, dists in enumerate(zip(dwell_dist, hop_dist)):
 		for m in range(nmodes):
 			mean_alpha = np.mean(sys.dwell_parameters[m])
 			print('Mode %d' % (m + 1))
-			print('alpha=%.2f' % mean_alpha)
+			print('alpha=%.4f' % mean_alpha)
 	elif dwell == 'Power Law Exponential Cutoff':
 		for m in range(nmodes):
 			mean_alpha = np.mean([p[0] for p in sys.dwell_parameters[m]])
 			mean_lambda = np.mean([p[1] for p in sys.dwell_parameters[m]])
 			print('Mode %d' % (m + 1))
-			print('alpha=%.2f\nlambda=%.4f' % (mean_alpha, mean_lambda))
+			print('alpha=%.4f\nlambda=%.4f' % (mean_alpha, mean_lambda))
 
 	print('Hurst parameter: %.2f' % np.mean(sys.hurst_distribution))
 
