@@ -74,14 +74,14 @@ class TruncateLevy:
         H = np.array(df['H'], dtype=float)  # H values passed to FLM algorithm
         alpha = np.array(df['alpha'], dtype=float)  # alpha values passed to FLM algorithm
         t = np.array(df['t'], dtype=float)  # h value calculated based on resultant autocorrelation function
-        #scale = np.array(df['scale'], dtype=float)  # can't add scale until I have more data
+        scale = np.array(df['scale'], dtype=float)  # can't add scale until I have more data
         max = np.array(df['max'], dtype=float)
 
-        self.interpolator = LinearNDInterpolator((H, alpha, max), t)  # interpolator for unstructured data
+        self.interpolator = LinearNDInterpolator((H, alpha, max, scale), t)  # interpolator for unstructured data
 
     def interpolate(self, H, alpha, max, scale):
 
-        return self.interpolator(H, alpha, max)
+        return self.interpolator(H, alpha, max, scale)
 
 
 def max_realization(input_limit, actual_limit, n):

@@ -11,7 +11,7 @@ from LLC_Membranes.llclib import timeseries, stats
 from LLC_Membranes.timeseries.flm_sim_params import HurstCorrection, TruncateLevy
 import tqdm
 import math
-
+np.seterr(all='raise')
 
 class FLM:
 

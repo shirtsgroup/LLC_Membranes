@@ -633,6 +633,7 @@ class Chain:
                 if dwell > 2:
                     traj[t + 1: transitions[i + 1]] = self._flm_sequence(dwell - 1, states[t], bound=bound)
                 elif dwell == 2:
+
                     # one data point so generate single point from emission distribution to save time
                     rv = bound + 1
                     while np.abs(rv) > bound:
@@ -641,6 +642,7 @@ class Chain:
                                                         scale=self.emission_parameters[states[t], 2])
 
                     traj[t + 1] = rv
+                    #traj[t + 1] = self._flm_sequence(1, states[t], bound=bound)
 
         traj[transitions[:-1]] = self._flm_sequence(transitions.size - 1, -1, bound=bound)
 
@@ -664,6 +666,7 @@ class Chain:
         H = np.random.choice(self.hurst_parameters[state])  # random hurst parameter from transition distribution
         alpha, scale = self.emission_parameters[state, [0, 2]]
         corrected_bound = self.truncation_interpolator.interpolate(H, alpha, bound, scale)
+        #print(H, alpha, bound, scale, state, corrected_bound)
         corrected_H = self.hurst_interpolator.interpolate(H, alpha)
         flm = FLM(corrected_H, alpha, M=2, N=l, scale=scale, truncate=corrected_bound,
                   correct_hurst=False, correct_truncation=False)

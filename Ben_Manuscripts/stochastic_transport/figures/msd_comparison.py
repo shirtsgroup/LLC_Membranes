@@ -23,7 +23,7 @@ def md_diffusivity():
         return MD_MSD
 
 
-res = 'GCL'
+res = 'URE'
 directory = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/%s/10wt" % res
 fracshow = 0.4  # fraction of MD MSD to plot
 recalculate_msd = False 
@@ -63,7 +63,6 @@ endframe = int(fracshow * padding * nsteps)
 # probably easier to just re-run these calculations in the appropriate directory. 
 # Doesn't matter which dwell/hop is used as they will be re-fit below
 sys = file_rw.load_object('%s/forecast_%s_%dstate.pl' % (directory, res, nmodes))
-
 dwell_dist = ['Power Law', 'Power Law Exponential Cutoff', 'Power Law', 'Power Law Exponential Cutoff']
 hop_dist = ['Gaussian', 'Gaussian', 'Levy', 'Levy']
 
@@ -124,7 +123,7 @@ for i, dists in enumerate(zip(dwell_dist, hop_dist)):
 			sys.determine_transition_matrix()
 			print(sys.count_matrix)
 		random_walks = CTRW(nsteps, ntraj, nmodes=nmodes, dt=dt, hop_dist=motion, dwell_dist=dwell, transition_count_matrix=sys.count_matrix if sys.nmodes > 1 else None)
-		random_walks.generate_trajectories(fixed_time=True, distributions=(sys.dwell_parameters, sys.hop_parameters, sys.hurst_distribution), discrete=True, ll=sys.dwell_lower_limit, max_hop=sys.max_hop)
+		random_walks.generate_trajectories(fixed_time=True, distributions=(sys.dwell_parameters, sys.hop_parameters, sys.hurst_distribution), discrete=True, ll=sys.dwell_lower_limit, max_hop=2*sys.max_hop)
 
 		random_walks.calculate_msd(ensemble=False)
 		random_walks.bootstrap_msd(fit_linear=False)
