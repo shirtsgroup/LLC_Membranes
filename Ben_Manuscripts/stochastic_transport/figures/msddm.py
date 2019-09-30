@@ -28,7 +28,7 @@ fracshow = 0.4  # fraction of MD MSD to plot
 recalculate_msd = False 
 recalculate_walks = True 
 extreme_trapping = False 
-ntraj = 24  # number of trajectories to simulate
+ntraj = 1000  # number of trajectories to simulate
 nboot = 200  # number of bootstrap trials when getting errorbars on MSD
 
 equil = {'GCL': 2400, 'URE': 2000, 'MET': 7000, 'ACH': 8800}  # frame number, not ns. (multiply ns by 2)
@@ -56,6 +56,8 @@ plt.plot(np.arange(endshow)*dt, MD_MSD.MSD_average[:endshow], color='black', lw=
 plt.fill_between(np.arange(endshow)*dt, MD_MSD.MSD_average[:endshow] + MD_MSD.limits[0, :endshow], MD_MSD.MSD_average[:endshow] - MD_MSD.limits[1, :endshow], alpha=0.3, color='black')
 labels = ['MD']
 
+print(MD_MSD.MSD_average[endshow])
+
 nsteps = MD_MSD.nT  # match the number of frames 
 
 # probably easier to just re-run these calculations in the appropriate directory. 
@@ -72,7 +74,8 @@ chains = Chain(states.count_matrix, states.fit_params, hurst_parameters=states.h
 chains.generate_realizations(ntraj, nsteps, bound=truncate[res])
 chains.calculate_msd()
 chains.plot_msd(cutoff=fracshow, label='MSDDM', overlay=True, show=False)
-
+labels.append('MSDDM')
+print(chains.msds.mean(axis=1)[int(fracshow*nsteps)])
 plt.legend(labels, loc=0, fontsize=14)
 plt.tight_layout()
 savename = '%s_msddm' % res

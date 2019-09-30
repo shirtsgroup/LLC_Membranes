@@ -103,100 +103,100 @@ Phase Lyotropic Liquid Crystal Membrane}
   the tails.}\label{fig:equilibration}
   \end{figure}
 
-  \section{Choosing a transport model}\label{section:transport_model_selection}
-
-  We used the toolbox created by Meroz and Sokolov in order to justify our
-  choice of transport model.\cite{meroz_toolbox_2015} The solutes in our systems
-  exhibit anomalous transport properties characteristic of a Continuous Time
-  Random Walk (CTRW). 
-
-  \subsection*{Mean Squared Displacement}
-
-  The general form of a mean squared displacement (MSD) curve is:
-  \begin{equation}
-	\langle x^2(t) \rangle \sim t ^ \alpha
-	\label{eqn:msd}
-  \end{equation}
-  For brownian motion, $\alpha = 1$ and the MSD is linear. When $\alpha \neq
-  1$, the particle of interest exhibits anomalous diffusion. Values of $\alpha$
-  greater than 1 give rise to superdiffusion, while values of $\alpha$ less than
-  1 give rise to subdiffusion.
-
-  We can calculate the ensemble-averaged MSD curve by averaging the MSDs of
-  each particle trajectory, where each MSD is calculated using:
-  \begin{equation}
-	\delta^2(t) = \| \mathbf{r}(t) - \mathbf{r}(0) \|^2
-	\label{eqn:ensemble_msd}
-  \end{equation}
-  where $\|\cdot\|$ represents the Euclidean norm. 
-
-  The mean squared displacement of solutes in our model is a non-linear
-  function of time, with $\alpha < 1$ which is indicative of anomalous
-  subdiffusion. Figure \ref{fig:msd_power_law}a plots the ensemble-averaged MSD
-  curve for 24 ethanol molecules diffusing in a 10 wt\% water H\textsubscript{II}
-  LLC membrane system. We fit a power law of the form $Ae^{\alpha}$ to the MSD
-  curve. We performed 2000 bootstrap trials by randomly sampling 24 MSD curves
-  with replacement from the 24 total ethanol MSD curves. The bootstrapped average
-  value of $\alpha$ is 0.75 for this system. 
- 
-  \begin{figure}[!htb]
-  \centering
-% Generated with : msd.py -t PR_nojump.xtc -g PR.gro -r ETH -ensemble -power_law -a z -nboot 2000
-% in directory: /home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/ETH/10wt
-  \includegraphics[width=0.8\linewidth]{msd_power_law.pdf}
-  \caption{(a) We fit a curve with the form of Equation~\ref{eqn:msd} to the
-	  ensemble-averaged MSD curve. (b) The average value of $\alpha$, obtained using
-	  fits to MSDs calculated from bootstrapped ensembles, is less than 1 suggesting
-	  that ethanol molecules in our model exhibit subdiffusive
-	  behavior.}\label{fig:msd_power_law}
-  \end{figure}
-
-  \subsection*{Ergodicity}
-
-  The ergodicity of a system can help us narrow down the possible anomalous
-  diffusion mechanisms. In an ergodic system, the time-averaged behavior of an
-  observable should yield the same result as the ensemble average of the same
-  observable. Examples of anomalous diffusion processes that are ergodic include
-  random walks on fractals (RWF) and fractional brownian motion (FBM).
-  Non-ergodic systems generally give rise to CTRWs with the possibility of
-  combination with a RWF and/or FBM.\cite{meroz_toolbox_2015} 
-
-  We tested the ergodicity of our system by comparing the ensemble-averaged
-  and time-averaged MSD curves. We calculated the MSD of each ethanol trajectory
-  using Equation~\ref{eqn:ensemble_msd} and a time-averaged algorithm: 
-  \begin{equation}
-	\delta^2(t) = \dfrac{1}{N-t} \sum_{i=0}^{N-t-1} \| \mathbf{r}(i + t) - \mathbf{r}(i) \|^2
-  \end{equation}
-  where N is the total number of simulation frames, and t represents the length
-  of subinterval or number of frames per subinterval. We averaged the MSD curves
-  from each trajectory in order to create final MSD plots.
-
-  The ethanol molecules exhibit non-ergodic behavior because their
-  time-averaged and ensemble-averaged MSDs do not agree with each other
-  (Figure~\ref{fig:ethanol_msd_comparison}). We validated our analysis using a 1
-  ns simulation of a box of tip3p water molecules. As expected, since the
-  particles exhibit Brownian motion, the time-averaged and ensemble-averaged MSDs
-  agree with each within error (Figure~\ref{fig:water_box_msd_comparison}).
-
-  \begin{figure}[!htb]
-  \centering
-  \begin{subfigure}{0.45\textwidth}
-% Generated with : msd.py -t PR_nojump.xtc -g PR.gro -r ETH -compare -nboot 2000 -a z
-% in directory: /home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/ETH/10wt
-  \includegraphics[width=\textwidth]{ethanol_msd_comparison.pdf}
-  \caption{}\label{fig:ethanol_msd_comparison}
-  \end{subfigure} 
-  \begin{subfigure}{0.45\textwidth}
-% Generated with msd.py -t traj_nojump.xtc -g npt.gro -r SOL -compare --fracshow 0.4 -nboot 2000 -a z
-% in directory: /home/bcoscia/Documents/Gromacs/Transport/Solvent/solvent_boxes/pure_water
-  \includegraphics[width=\textwidth]{water_box_msd_comparison.pdf}
-  \caption{}\label{fig:water_box_msd_comparison}
-  \end{subfigure} 
-  \caption{(a) The time-averaged and the ensemble-averaged MSDs for ethanol in
-	  an H\textsubscript{II} nanopore are not in agreement, implying non-ergodicity.
-	  (b) A box of tip3p water molecules is expected to be ergodic and it is shown to
-	  be true here because both MSDs are in agreement. }\label{fig:msd_comparison}
-  \end{figure}
+%  \section{Choosing a transport model}\label{section:transport_model_selection}
+%
+%  We used the toolbox created by Meroz and Sokolov in order to justify our
+%  choice of transport model.\cite{meroz_toolbox_2015} The solutes in our systems
+%  exhibit anomalous transport properties characteristic of a Continuous Time
+%  Random Walk (CTRW). 
+%
+%  \subsection*{Mean Squared Displacement}
+%
+%  The general form of a mean squared displacement (MSD) curve is:
+%  \begin{equation}
+%	\langle x^2(t) \rangle \sim t ^ \alpha
+%	\label{eqn:msd}
+%  \end{equation}
+%  For brownian motion, $\alpha = 1$ and the MSD is linear. When $\alpha \neq
+%  1$, the particle of interest exhibits anomalous diffusion. Values of $\alpha$
+%  greater than 1 give rise to superdiffusion, while values of $\alpha$ less than
+%  1 give rise to subdiffusion.
+%
+%  We can calculate the ensemble-averaged MSD curve by averaging the MSDs of
+%  each particle trajectory, where each MSD is calculated using:
+%  \begin{equation}
+%	\delta^2(t) = \| \mathbf{r}(t) - \mathbf{r}(0) \|^2
+%	\label{eqn:ensemble_msd}
+%  \end{equation}
+%  where $\|\cdot\|$ represents the Euclidean norm. 
+%
+%  The mean squared displacement of solutes in our model is a non-linear
+%  function of time, with $\alpha < 1$ which is indicative of anomalous
+%  subdiffusion. Figure \ref{fig:msd_power_law}a plots the ensemble-averaged MSD
+%  curve for 24 ethanol molecules diffusing in a 10 wt\% water H\textsubscript{II}
+%  LLC membrane system. We fit a power law of the form $Ae^{\alpha}$ to the MSD
+%  curve. We performed 2000 bootstrap trials by randomly sampling 24 MSD curves
+%  with replacement from the 24 total ethanol MSD curves. The bootstrapped average
+%  value of $\alpha$ is 0.75 for this system. 
+% 
+%  \begin{figure}[!htb]
+%  \centering
+%% Generated with : msd.py -t PR_nojump.xtc -g PR.gro -r ETH -ensemble -power_law -a z -nboot 2000
+%% in directory: /home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/ETH/10wt
+%  \includegraphics[width=0.8\linewidth]{msd_power_law.pdf}
+%  \caption{(a) We fit a curve with the form of Equation~\ref{eqn:msd} to the
+%	  ensemble-averaged MSD curve. (b) The average value of $\alpha$, obtained using
+%	  fits to MSDs calculated from bootstrapped ensembles, is less than 1 suggesting
+%	  that ethanol molecules in our model exhibit subdiffusive
+%	  behavior.}\label{fig:msd_power_law}
+%  \end{figure}
+%
+%  \subsection*{Ergodicity}
+%
+%  The ergodicity of a system can help us narrow down the possible anomalous
+%  diffusion mechanisms. In an ergodic system, the time-averaged behavior of an
+%  observable should yield the same result as the ensemble average of the same
+%  observable. Examples of anomalous diffusion processes that are ergodic include
+%  random walks on fractals (RWF) and fractional brownian motion (FBM).
+%  Non-ergodic systems generally give rise to CTRWs with the possibility of
+%  combination with a RWF and/or FBM.\cite{meroz_toolbox_2015} 
+%
+%  We tested the ergodicity of our system by comparing the ensemble-averaged
+%  and time-averaged MSD curves. We calculated the MSD of each ethanol trajectory
+%  using Equation~\ref{eqn:ensemble_msd} and a time-averaged algorithm: 
+%  \begin{equation}
+%	\delta^2(t) = \dfrac{1}{N-t} \sum_{i=0}^{N-t-1} \| \mathbf{r}(i + t) - \mathbf{r}(i) \|^2
+%  \end{equation}
+%  where N is the total number of simulation frames, and t represents the length
+%  of subinterval or number of frames per subinterval. We averaged the MSD curves
+%  from each trajectory in order to create final MSD plots.
+%
+%  The ethanol molecules exhibit non-ergodic behavior because their
+%  time-averaged and ensemble-averaged MSDs do not agree with each other
+%  (Figure~\ref{fig:ethanol_msd_comparison}). We validated our analysis using a 1
+%  ns simulation of a box of tip3p water molecules. As expected, since the
+%  particles exhibit Brownian motion, the time-averaged and ensemble-averaged MSDs
+%  agree with each within error (Figure~\ref{fig:water_box_msd_comparison}).
+%
+%  \begin{figure}[!htb]
+%  \centering
+%  \begin{subfigure}{0.45\textwidth}
+%% Generated with : msd.py -t PR_nojump.xtc -g PR.gro -r ETH -compare -nboot 2000 -a z
+%% in directory: /home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/ETH/10wt
+%  \includegraphics[width=\textwidth]{ethanol_msd_comparison.pdf}
+%  \caption{}\label{fig:ethanol_msd_comparison}
+%  \end{subfigure} 
+%  \begin{subfigure}{0.45\textwidth}
+%% Generated with msd.py -t traj_nojump.xtc -g npt.gro -r SOL -compare --fracshow 0.4 -nboot 2000 -a z
+%% in directory: /home/bcoscia/Documents/Gromacs/Transport/Solvent/solvent_boxes/pure_water
+%  \includegraphics[width=\textwidth]{water_box_msd_comparison.pdf}
+%  \caption{}\label{fig:water_box_msd_comparison}
+%  \end{subfigure} 
+%  \caption{(a) The time-averaged and the ensemble-averaged MSDs for ethanol in
+%	  an H\textsubscript{II} nanopore are not in agreement, implying non-ergodicity.
+%	  (b) A box of tip3p water molecules is expected to be ergodic and it is shown to
+%	  be true here because both MSDs are in agreement. }\label{fig:msd_comparison}
+%  \end{figure}
 
   
   \newpage
@@ -264,7 +264,7 @@ Phase Lyotropic Liquid Crystal Membrane}
   long hop lengths. Our distribution of hop lengths fits well to a L\'evy
   distribution near the mean, but under samples the tails. In 
   Figure~\ref{fig:truncation_correction} we compare the empirically 
-  measured hop length distribution of Urea to its maximum likelihood fit to
+  measured transition emission distribution of the MSDDM for Urea to its maximum likelihood fit to
   a L\'evy stable distribution. The ratio between the two distributions 
   at each bin is nearly 1 close to the center, indicating a near-perfect
   fit, larger than 1 slightly further from the center, suggesting that 
@@ -309,8 +309,14 @@ Phase Lyotropic Liquid Crystal Membrane}
   Figure~\ref{fig:truncation_correction} shows the result of applying our correction.
   Note that generating this database requires a significant amount of simulation and
   still likely doesn't perfectly correct the truncation parameter. The output leads
-  to a somewhat fuzzy cut-off of the output distribution. This is likely beneficial
-  since we observe a small proportion of hops longer the chosen truncation cut-off.
+  to a somewhat fuzzy, rather than abrupt, cut-off of the output distribution. This 
+  is likely beneficial since we observe a small proportion of hops longer the chosen
+  truncation cut-off. When the cut-off value is close to the L\'evy stable $\sigma$ parameter,
+  as it is in our anomalous diffusion models, we observed that the tails of the 
+  truncated distribution tend to be undersampled. In order to maintain the distribution's 
+  approximate shape up to the cut-off value we recommend ensuring that the cut-off
+  value is at least 2 times $\sigma$. However, this may lead to a slight over-prediction
+  of the MSD.
   
   \begin{figure}
   \centering
@@ -357,6 +363,26 @@ Phase Lyotropic Liquid Crystal Membrane}
   function. Without the correction, $H$ is underestimated, meaning realizations are 
   more negatively correlated than they should be.}\label{fig:hurst_correction}
   \end{figure}
+  
+  \section{2-state MSDDM parameters}\label{section:simple_msddm_params}
+  
+  We used a simple 2-state model to illustrate how the self-transition probability 
+  effects simulated MSDs generated from the MSDDM. We used the following parameters:
+  
+  \begin{table}[h]
+  \centering
+  \begin{tabular}{|c|c|c|c|}
+  \hline
+  State & H     & $\alpha_h$ & $\sigma$ \\\hline
+  1     & 0.1  & 1.7       & 0.04    \\
+  2     & 0.2  & 1.5       & 0.04    \\
+  T     & 0.4  & 1.4       & 0.04    \\\hline
+  \end{tabular}
+  \caption{Values of $H$, $\alpha_h$ and $\sigma$ used to simulate realizations
+  of the simple MSDDM whose MSDs are shown in Figure~\ref{M-fig:T_sensitivity} of
+  the main text. The values are chosen to be similar to those in Table~\ref{M-table:msddm_params}
+  of the main text.}\label{table:msddm_params}
+  \end{table}
 
   \clearpage
   \bibliography{stochastic_transport}

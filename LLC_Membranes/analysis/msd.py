@@ -154,6 +154,11 @@ class Diffusivity(object):
                 self.com[f, i, :] = np.sum(w, axis=0) / self.mres  # sum the coordinates and divide by the mass of the residue
         print('Done!')
 
+        for i in range(self.com.shape[1]):
+            plt.plot(self.com[:, i, 2])
+            plt.title('%d' % i)
+            plt.show()
+        exit()
         # plot 'random' z coordinate traces
         # np.random.seed(4)  # 4 gives a nice spread for ethanol
         # trajs = np.random.randint(0, self.com.shape[1], size=3)
