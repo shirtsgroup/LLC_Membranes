@@ -7,9 +7,11 @@ Software Requirements
 Python
 ======
 
-Our scripts are tested on python versions 3.4 - 3.6. We recommend downloading
-and installing `anaconda <https://www.anaconda.com/>`_, which ships with most
-of the heavily used modules in LLC_Membranes.
+Our scripts are tested on python 3.6. Most will likely work with lower versions
+of python but some external modules may present issues that you'll need to
+solve independently. We recommend downloading and installing `anaconda
+<https://www.anaconda.com/>`_, which ships with most of the heavily used
+modules in LLC_Membranes.
 
 Some modules that you may need to install manually include:
 
