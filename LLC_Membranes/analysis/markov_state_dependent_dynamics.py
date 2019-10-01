@@ -5,6 +5,9 @@ import yaml
 import numpy as np
 import mdtraj as md
 import matplotlib.pyplot as plt
+import matplotlib.colors as colors
+import matplotlib.cbook as cbook
+from mpl_toolkits.axes_grid1 import AxesGrid
 from LLC_Membranes.analysis import hbonds, coordination_number
 from LLC_Membranes.llclib import file_rw, physical, topology, timeseries, fitting_functions
 from LLC_Membranes.timeseries.fractional_levy_motion import FLM
@@ -295,14 +298,14 @@ class States:
 
         print("Done!")
 
-    def _make_transition_matrix(self, start=1):
+    def _make_transition_matrix(self, start=1, step=1):
         """ Estimate a transition matrix based on the state sequence
         """
 
         self.transition_matrix = np.zeros([self.nstates, self.nstates])
         self.count_matrix = np.zeros_like(self.transition_matrix, dtype=int)
 
-        for t in range(start, self.nT):  # start at frame 1. May need to truncate more as equilibration
+        for t in range(start, self.nT, step):  # start at frame 1. May need to truncate more as equilibration
             transitioned_from = self.state_sequence[t - 1, :]
             transitioned_to = self.state_sequence[t, :]
             for pair in zip(transitioned_from, transitioned_to):
@@ -310,6 +313,73 @@ class States:
 
         # normalize so rows sum to unity
         self.transition_matrix = (self.count_matrix.T / self.count_matrix.sum(axis=1)).T
+
+    def verify_markovinity(self, timesteps=(1, 2, 4), cmap='bwr', dt=0.5, show=False, save=False):
+        """ Verify that the transition matrix is Markovian
+
+        The condition of detailed balance is satisfied if the following holds:
+        .. math::
+
+            T_{i,j}P_j(t=\infty) = T_{j, i}P_j(t=\infty)
+
+        In other words, the off-diagonal entries of the transition matrix are equal.
+
+        A further test is to show that the transition matrix is independent of the time step.
+
+        :param timesteps: timesteps at which to create transition matrix. A timestep of x would add to the transition
+        matrix every x frames.
+
+        :type timesteps: tuple
+        """
+
+        start = 0.5
+        end = self.nstates + start
+        extent = [start, end, start, end]
+        x_positions = np.linspace(start, end - 1, self.nstates)
+        y_positions = np.linspace(start, end - 1, self.nstates)
+
+        fig = plt.figure(figsize=(15, 6))
+        fig2 = plt.figure(figsize=(15, 6))
+        grid = AxesGrid(fig, 111, nrows_ncols=(1, 3), cbar_mode='none', cbar_location='top', cbar_pad=0.2)
+        grid2 = AxesGrid(fig2, 111, nrows_ncols=(1, 3), cbar_mode='none', cbar_location='top', cbar_pad=0.2)
+
+        for s, ax in enumerate(grid):
+
+            self._make_transition_matrix(step=timesteps[s])
+
+            T = self.transition_matrix[::-1, :].T
+            C = self.count_matrix[::-1, :].T
+
+            ax.imshow(T.T, extent=extent, origin='lower', cmap=cmap)
+            grid2.axes_all[s].imshow(C.T, extent=extent, origin='lower', cmap=cmap,
+                                     norm=colors.LogNorm(self.count_matrix.min(), self.count_matrix.max()))
+
+            for yndx, y in enumerate(y_positions):
+                for xndx, x in enumerate(x_positions):
+
+                    label = T[xndx, yndx]
+                    counts = C[xndx, yndx]
+                    ax.text(x + start, y + start, '%.2f' % label, color='black', ha='center', va='center', weight='bold')
+                    grid2.axes_all[s].text(x + start, y + start, '%d' % counts, color='black', ha='center', va='center', weight='bold')
+
+            ax.tick_params(labelsize=14)
+            ax.set_xticks(np.arange(1, self.nstates + 1))
+            ax.set_title('Timestep = %.1f ns' % (dt * timesteps[s]), fontsize=14)
+            ax.set_yticklabels(np.arange(9, 0, -1))
+
+            grid2.axes_all[s].tick_params(labelsize=14)
+            grid2.axes_all[s].set_xticks(np.arange(1, self.nstates + 1))
+            grid2.axes_all[s].set_title('Timestep = %.1f ns' % (dt * timesteps[s]), fontsize=14)
+            grid2.axes_all[s].set_yticklabels(np.arange(9, 0, -1))
+
+        fig.tight_layout()
+        fig2.tight_layout()
+
+        if save:
+            fig.savefig('%s_transitions.pdf' % self.residue)
+            fig2.savefig('%s_counts.pdf' % self.residue)
+        if show:
+            plt.show()
 
     def measure_state_emissions(self, dim=2, fit_function=levy):
         """ Measure observations as a function of state.
@@ -883,8 +953,10 @@ if __name__ == "__main__":
     # print(states.state_sequence)
     # exit()
 
-    # states._make_transition_matrix(1, end=100)
-    #
+    states.verify_markovinity()
+
+    #states._make_transition_matrix(1, end=100)
+
     total = states.count_matrix.sum(axis=0)
     p = total / total.sum()  # probability of being in state i at any time t
     w, v = np.linalg.eig(states.transition_matrix.T)
@@ -892,6 +964,7 @@ if __name__ == "__main__":
     print(w[0])
     print(v[:, 0] / v[:, 0].sum())
     print(p)
+    plt.show()
     exit()
     ############ Cut-off Justification Plot ##################
     # alpha, mu, sigma = states.fit_params[-1]

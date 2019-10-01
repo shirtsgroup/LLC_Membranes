@@ -364,6 +364,51 @@ Phase Lyotropic Liquid Crystal Membrane}
   more negatively correlated than they should be.}\label{fig:hurst_correction}
   \end{figure}
   
+  \section{Verifying Markovianity}\label{section:markov_validation}
+  
+  We verified the Markovianity of our transition matrix, $T$, in two ways. First we 
+  ensured that the process satisfied detailed balance:
+  \begin{equation}
+  T_{i,j}P_i(t=\infty) = T_{j,i}P_j(t=\infty)
+  \end{equation}
+  where $P$ is the equilibrium distribution of states. This implies that the number
+  of transitions from state $i$ to $j$ and from state $j$ to $i$ should be equal. Graphical 
+  representations of the count matrices show that this is true in Figure~\ref{fig:counts}. 
+  
+  Second, we ensured that the transition matrix did not change on coarser time scales.
+  In Figures~\ref{fig:counts} and~\ref{fig:transitions}, we show that increasing the 
+  length of time between samples does not change the properties of the count or
+  probability transition matrices.
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{\textwidth}
+  \includegraphics[width=\textwidth]{URE_counts.pdf}
+  \caption{Urea}\label{fig:URE_counts}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+  \includegraphics[width=\textwidth]{GCL_counts.pdf}
+  \caption{Ethylene Glycol}\label{fig:GCL_counts}
+  \end{subfigure}
+  \caption{The number of transitions from state $i$ to $j$ and $j$ to $i$ are very close
+  indicating that our process obeys detailed balance. Detailed balance is conserved for 
+  different sized time steps.}\label{fig:counts}
+  \end{figure}
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{\textwidth}
+  \includegraphics[width=\textwidth]{URE_transitions.pdf}
+  \caption{Urea}\label{fig:URE_transitions}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+  \includegraphics[width=\textwidth]{GCL_transitions.pdf}
+  \caption{Ethylene Glycol}\label{fig:GCL_transitions}
+  \end{subfigure}
+  \caption{As the timestep between observations increases, the probability
+  transition matrix does not change signficantly.}\label{fig:transitions}
+  \end{figure}
+  
   \section{2-state MSDDM parameters}\label{section:simple_msddm_params}
   
   We used a simple 2-state model to illustrate how the self-transition probability 
