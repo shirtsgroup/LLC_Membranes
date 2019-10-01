@@ -7,4 +7,6 @@ Preparation of Monomers and Solutes
       :maxdepth: 2
       :titlesonly:
 
+      param
       monomer_prep
+      solute_prep

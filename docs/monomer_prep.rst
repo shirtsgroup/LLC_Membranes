@@ -1,3 +1,5 @@
+.. _monomer-prep:
+
 Preparation of Liquid Crystal Monomers
 ======================================
 

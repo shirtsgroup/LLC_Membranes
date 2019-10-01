@@ -112,3 +112,29 @@ def insert_molecules(gro, solute, n, out, scale=0.4, mpi=False, nprocesses=4):
                 nadded = int(line.split()[1])
 
     return nadded
+
+
+def editconf(gro, out, d=None, center=True, box_type='cubic'):
+    """ Run gmx editconf. See their documentation: http://manual.gromacs.org/documentation/2019/onlinehelp/gmx-editconf.html
+
+    :param gro: name of input coordinate file to put a box around
+    :param out: name of output file
+    :param d: if not None, distance between solute and box
+    :param center: center solute in box
+    :param box_type: type of box (only cubic is implemented)
+
+    :type gro: str
+    :type out: str
+    :type d: float
+    :type center: bool
+    :type box_type: str
+    """
+
+    editconf = 'gmx editconf -f %s -o %s -bt %s' % (gro, out, box_type)
+    if center:
+        editconf += ' -c'
+    if d is not None:
+        editconf += ' -d %f' % d
+
+    p = subprocess.Popen(editconf.split())
+    p.wait()
