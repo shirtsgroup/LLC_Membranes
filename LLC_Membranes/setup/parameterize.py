@@ -11,7 +11,7 @@ import numpy as np
 
 def initialize():
 
-    parser = argparse.ArgumentParser(description='Model a continuous time random walk')
+    parser = argparse.ArgumentParser(description='Parameterize a solute with a force field')
     parser.add_argument('-p', '--pdb_file', type=str, help='Input .pdb file')
     parser.add_argument('-o', '--output_name', type=str, help='String for names of output files.')
     parser.add_argument('-m', '--mdp_file', type=str, help='gromacs .mdp file for energy minimization.')

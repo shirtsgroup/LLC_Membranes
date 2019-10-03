@@ -27,6 +27,7 @@ import tqdm
 import matplotlib.pyplot as plt
 import pickle
 from LLC_Membranes.llclib import file_rw, topology, physical
+from scipy import sparse
 
 
 def initialize():
@@ -95,6 +96,7 @@ class System(object):
         self.hbonds = []  # will hold h-bonds for each frame [D, H, A, angle]
         self.dt = self.t.time[1] - self.t.time[0]
         self.box = self.t.unitcell_vectors
+        self.nframes = self.t.n_frames
 
         # for hbond_pairing
         # self.nwater = 0
@@ -135,6 +137,12 @@ class System(object):
         self.atom_to_matrix_index = {}
         self.matrix_to_atom_index = {}
 
+        self.distance = None
+        self.angle = None
+
+        self.bonds = dict()
+        self.connectivity = dict()
+
         # Now, specify water with the -r flag
         # if not exclude_water:
         #
@@ -161,6 +169,8 @@ class System(object):
         """
 
         residue = topology.Residue(res)
+        residue.get_bonds()
+        self.bonds[residue.name] = (residue.indices, residue.names, residue.bonds)
 
         restrict = False
         if type(atoms) is list and atoms[0] != 'all':
@@ -189,6 +199,24 @@ class System(object):
                 if a.name in residue.hbond_A:
                     self.A.append(a.index)
 
+    def _donor_connectivity(self):
+        """ Get the indices of atoms that the donor is connected to
+        """
+
+        for d in self.D:
+
+            res = self.residues[d]  # residue name of donor atom
+            name = self.names[d]  # name of donor atom
+            indices, names, bonds = self.bonds[res]  # some helpful dictionaries
+            bonds = np.array(bonds)  # convert from list to array for use with numpy funcitons
+            ndx = indices[name]  # index of donor atom in single residue
+
+            bonded = bonds[np.where(bonds == ndx + 1)[0]]  # find bonds that donor is involved in
+            hydrogens = np.array([x for x in bonded.flatten() if 'H' in names[x - 1]], dtype=int)  # keep indices of connect hydrogen atoms
+
+            diff = ndx - hydrogens
+            self.connectivity[d] = d - diff - 1
+
     def identify_hbonds(self, cut, angle):
         """ Identify hydrogen bonds based on geometric criteria. If the angle formed by D-H--A and the distance between
         donor and acceptor are less than the cut-offs, then we consider a hydrogen bond to exist
@@ -200,60 +228,57 @@ class System(object):
         :type angle: float
         """
 
-        # narrow list by doing a distance search
+        self.distance = cut
+        self.angle = angle
 
-        Dlen = len(self.D)
-        Alen = len(self.A)
-        d = np.zeros([self.pos.shape[0], Dlen * Alen])
+        d = self._calculate_distances()  # return nframe-length list. Each entry is a len(D) x len(A) sparse matrix
 
-        # distance search can be sped up with cKDtree
-        if Dlen >= Alen:
-            L = Dlen
-            print('Calculating distances...')
-            for t in tqdm.tqdm(range(d.shape[0]), unit='frames'):
-                for i in range(len(self.A)):
-                    minimum_image_distance = physical.minimum_image_distance(self.pos[t, self.D, :] -
-                                                                             self.pos[t, self.A[i], np.newaxis, :],
-                                                                             self.box[t, ...])
-                    d[t, i * Dlen:(i + 1) * Dlen] = np.linalg.norm(minimum_image_distance, axis=1)
-        else:
-            L = Alen
-            print('Calculating distances...')
-            for t in tqdm.tqdm(range(d.shape[0]), unit='frames'):
-                for i in range(len(self.D)):
-                    minimum_image_distance = physical.minimum_image_distance(self.pos[t, self.A, :] -
-                                                                             self.pos[t, self.D[i], np.newaxis, :],
-                                                                             self.box[t, ...])
-                    d[t, i * Alen:(i + 1) * Alen] = np.linalg.norm(minimum_image_distance, axis=1)
+        self._donor_connectivity()  # see which hydrogen atoms the donor atom is bonded to
 
-        print('Narrowing eligible atoms and calculating angles')
+        # loop through frame-by-frame
+        for i in tqdm.tqdm(range(self.nframes)):
 
-        for i in tqdm.tqdm(range(d.shape[0])):
+            # indices = np.where(d[i, :] < cut)[0]  # indices where distance is below cutoff
+            #
+            # distance_eligible = indices[np.nonzero(d[i, indices])]  # narrow to only nonzero values
 
-            indices = np.where(d[i, :] < cut)[0]  # indices where distance is below cutoff
+            potential_hbonds = []
+            nonzero = d[i].nonzero()
+            for donor, acceptor in zip(nonzero[0], nonzero[1]):
+                donor_ndx = self.D[donor]  # index of donor among full system
+                for h in self.connectivity[donor_ndx]:  # make sure we check all hydrogens attached to the donor
+                    potential_hbonds.append([donor_ndx, h, self.A[acceptor]])
 
-            distance_eligible = indices[np.nonzero(d[i, indices])]  # narrow to only nonzero values
+            potential_hbonds = np.array(potential_hbonds, dtype=int)
 
-            if Dlen >= Alen:
-                Aindex = np.array(self.A)[distance_eligible // L]  # indices of distance eligible acceptor atoms
-                Dindex = np.array(self.D)[distance_eligible % L]  # indices of distance eligible donor atoms
-                Hindex = np.array(self.H)[distance_eligible % L]  # H atoms attached to eligible donors
-            else:
-                Aindex = np.array(self.A)[distance_eligible % L]  # indices of distance eligible acceptor atoms
-                Dindex = np.array(self.D)[distance_eligible // L]  # indices of distance eligible donor atoms
-                Hindex = np.array(self.H)[distance_eligible // L]  # H atoms attached to eligible donors
+            # if Dlen >= Alen:
+            #     Aindex = np.array(self.A)[distance_eligible // L]  # indices of distance eligible acceptor atoms
+            #     Dindex = np.array(self.D)[distance_eligible % L]  # indices of distance eligible donor atoms
+            #     Hindex = np.array(self.H)[distance_eligible % L]  # H atoms attached to eligible donors
+            # else:
+            #     Aindex = np.array(self.A)[distance_eligible % L]  # indices of distance eligible acceptor atoms
+            #     Dindex = np.array(self.D)[distance_eligible // L]  # indices of distance eligible donor atoms
+            #     Hindex = np.array(self.H)[distance_eligible // L]  # H atoms attached to eligible donors
+            #
+            # self.hbonds.append(np.reshape(np.concatenate((Dindex, Hindex, Aindex)), (3, len(Aindex))))
 
-            self.hbonds.append(np.reshape(np.concatenate((Dindex, Hindex, Aindex)), (3, len(Aindex))))
-
-            if self.hbonds[i].size > 0:  # don't calculate vectors if there aren't any hbonds this frame
+            #if self.hbonds[i].size > 0:  # don't calculate vectors if there aren't any hbonds this frame
+            if potential_hbonds.size > 0:
                 # calculate vectors
-                v = np.zeros([2, len(Aindex), 3])
+                v = np.zeros([2, potential_hbonds.shape[0], 3])
 
-                v[0, ...] = physical.minimum_image_distance(self.pos[i, self.hbonds[i][1, :], :] -
-                                                            self.pos[i, self.hbonds[i][0, :], :], self.box[i, ...])  # D-H vectors
+                # v[0, ...] = physical.minimum_image_distance(self.pos[i, self.hbonds[i][1, :], :] -
+                #                                             self.pos[i, self.hbonds[i][0, :], :], self.box[i, ...])  # D-H vectors
+                # v[0, ...] /= np.linalg.norm(v[0, ...], axis=1)[:, np.newaxis]  # normalize (need to, to get correct angle)
+                # v[1, :] = physical.minimum_image_distance(self.pos[i, self.hbonds[i][2, :], :] -
+                #                                           self.pos[i, self.hbonds[i][1, :], :], self.box[i, ...])  # H-A vectors
+                # v[1, ...] /= np.linalg.norm(v[1, ...], axis=1)[:, np.newaxis]  # normalize
+
+                v[0, ...] = physical.minimum_image_distance(self.pos[i, potential_hbonds[:, 1], :] -
+                                                            self.pos[i, potential_hbonds[:, 0], :], self.box[i, ...])  # D-H vectors
                 v[0, ...] /= np.linalg.norm(v[0, ...], axis=1)[:, np.newaxis]  # normalize (need to, to get correct angle)
-                v[1, :] = physical.minimum_image_distance(self.pos[i, self.hbonds[i][2, :], :] -
-                                                          self.pos[i, self.hbonds[i][1, :], :], self.box[i, ...])  # H-A vectors
+                v[1, :] = physical.minimum_image_distance(self.pos[i, potential_hbonds[:, 2], :] -
+                                                          self.pos[i, potential_hbonds[:, 1], :], self.box[i, ...])  # H-A vectors
                 v[1, ...] /= np.linalg.norm(v[1, ...], axis=1)[:, np.newaxis]  # normalize
 
                 # calculate angles
@@ -264,8 +289,62 @@ class System(object):
 
                 a = np.arccos(dot) * (180 / np.pi)  # convert to degrees
 
-                self.hbonds[i] = np.delete(self.hbonds[i], np.where(a > angle)[0], axis=1)
-                self.hbonds[i] = np.concatenate((self.hbonds[i], a[a < angle][np.newaxis, :]), 0)
+                keep = np.where(a <= angle)[0]
+                # print(potential_hbonds[keep, :].shape)
+                # print(a[keep].shape)
+                # exit()
+                self.hbonds.append(np.concatenate((potential_hbonds[keep, :].T, a[keep][np.newaxis, :]), 0))
+
+                # self.hbonds[i] = np.delete(self.hbonds[i], np.where(a > angle)[0], axis=1)
+                # self.hbonds[i] = np.concatenate((self.hbonds[i], a[a < angle][np.newaxis, :]), 0)
+
+            else:
+
+                self.hbonds.append([])
+
+    def _calculate_distances(self):
+        """ Calculate distance between eligible hbond acceptors and donors
+        """
+
+        Dlen = len(self.D)
+        Alen = len(self.A)
+        #d = np.zeros([self.pos.shape[0], Dlen * Alen])
+
+        hbond_matrix = []
+
+        if len(self.D) >= len(self.A):
+            print('Calculating distances...')
+            for t in tqdm.tqdm(range(self.nframes), unit='frames'):
+                hbond_matrix.append(sparse.lil_matrix((len(self.D), len(self.A)), dtype=bool))
+                for i in range(len(self.A)):
+                    minimum_image_distance = physical.minimum_image_distance(self.pos[t, self.D, :] -
+                                                                             self.pos[t, self.A[i], np.newaxis, :],
+                                                                             self.box[t, ...])
+
+                    absolute_distance = np.linalg.norm(minimum_image_distance, axis=1)
+                    inrange = np.where(absolute_distance <= self.distance)[0]
+                    inrange = inrange[np.nonzero(absolute_distance[inrange])]  # some distances are between same atoms
+                    hbond_matrix[t][inrange, i] = True
+                    #d[t, i * Dlen:(i + 1) * Dlen] = np.linalg.norm(minimum_image_distance, axis=1)
+        else:
+            print('Calculating distances...')
+            for t in tqdm.tqdm(range(self.nframes), unit='frames'):
+                hbond_matrix.append(sparse.lil_matrix((len(self.D), len(self.A)), dtype=bool))
+                for i in range(len(self.D)):
+                    minimum_image_distance = physical.minimum_image_distance(self.pos[t, self.A, :] -
+                                                                             self.pos[t, self.D[i], np.newaxis, :],
+                                                                             self.box[t, ...])
+
+                    absolute_distance = np.linalg.norm(minimum_image_distance, axis=1)
+                    inrange = np.where(absolute_distance <= self.distance)[0]
+                    inrange = inrange[np.nonzero(absolute_distance[inrange])]  # some distances are between same atoms
+                    hbond_matrix[t][i, inrange] = True
+
+                    #d[t, i * Alen:(i + 1) * Alen] = np.linalg.norm(minimum_image_distance, axis=1)
+
+        print('Narrowing eligible atoms and calculating angles')
+
+        return hbond_matrix
 
     def plot_hbonds(self, show=True, save=True, savename='hbonds.png'):
         """ Plot the total number of hydrogen bonds per frame as a function of time
@@ -371,6 +450,30 @@ class System(object):
             hbond_frame = self.hbonds[t]
             for i in range(hbond_frame.shape[1]):
                 self.donor_acceptor_matrix[t, self.atom_to_matrix_index[hbond_frame[0, i]]] = hbond_frame[2, i]
+
+    def visualize_hbonds(self, frame, name='hbonds.tcl'):
+        """ Write a .tcl file that will load the hydrogen bonds as
+
+        :param frame: frame to visualize (starting at 0)
+        :param name: name of output tcl file
+
+        :type frame: int
+        :type name: str
+        """
+
+        hbonds = ''
+        for h in range(self.hbonds[frame].shape[1]):
+            for bond in self.hbonds[frame][:3, h]:
+                hbonds += '%s ' % int(bond)
+
+        with open(name, 'w') as f:
+
+            f.write('color Display Background white\n')
+            f.write('mol modstyle 0 0 HBonds %.6f %.6f 1.000000\n' % (10*self.distance, self.angle))
+            f.write('mol addrep 0\n')
+            f.write('mol modselect 1 0 index %s\n' % hbonds)
+
+            f.write('mol modstyle 1 0 CPK 2.0 0.3 12.0 12.0\n')
 
 
 class Residue(object):
