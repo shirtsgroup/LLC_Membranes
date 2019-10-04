@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env pythonclear
 
 import numpy as np
 from scipy import stats

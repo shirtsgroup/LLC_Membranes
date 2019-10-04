@@ -34,6 +34,7 @@ class HbondReactions(hbonds.System):
 
         self.terminated_donors = []
         self.terminated_acceptors = []
+        self.fraction_reacted = None
 
     def count_reactions(self, donors=('O1'), acceptors=('N1')):
         """ Count reactions cumulatively over time. Once an hbond forms, it is assumed to have undergone an acid-base
@@ -56,32 +57,8 @@ class HbondReactions(hbonds.System):
                     if a not in self.terminated_acceptors[t] and d not in self.terminated_donors[t]:
                         self.terminated_acceptors[t].append(a)
                         self.terminated_donors[t].append(d)
-        #
-        # for t in range(self.t.n_frames):
-        #
-        #     self.terminated_donors.append([])
-        #     self.terminated_acceptors.append([])
-        #
-        #     frame = t
-        #     if t == 0:
-        #         frame = 1
-        #     else:
-        #         self.terminated_donors[frame] += self.terminated_donors[frame - 1]
-        #
-        #     for d, a in self.hbonds[t][[0, 2], :].T:
-        #
-        #         if d not in self.terminated_donors[frame - 1] and a not in self.terminated_acceptors[frame - 1]:
-        #
-        #             if self.names[int(d)] in donors and self.names[int(a)] in acceptors:
-        #
-        #                 self.terminated_donors[t].append(d)
-        #                 self.terminated_acceptors[t].append(a)
-        #
-        #     print(self.terminated_donors[t])
-        #     if t == 1:
-        #         exit()
 
-    def plot_reaction(self, save=True, show=False, label=None):
+    def get_fraction_reacted(self):
 
         nacceptors = len([x for x in self.D if self.names[x] == 'N1'])
         ndonors = len([x for x in self.D if self.names[x] == 'O1'])
@@ -92,9 +69,14 @@ class HbondReactions(hbonds.System):
         # nreacted = [len(np.unique(x)) for x in self.terminated_donors]  # terminated donors and acceptors should be same length
 
         nreacted = [len(x) for x in self.terminated_donors]
-        fraction_reacted = [100 * x / total_possible for x in nreacted]
+        self.fraction_reacted = [100 * x / total_possible for x in nreacted]
 
-        plt.plot(self.t.time / 1000, fraction_reacted, lw=2, label=label)
+    def plot_reaction(self, save=True, show=False, label=None):
+
+        if self.fraction_reacted is None:
+            self.get_fraction_reacted()
+
+        plt.plot(self.t.time / 1000, self.fraction_reacted, lw=2, label=label)
         plt.gcf().get_axes()[0].tick_params(labelsize=14)
         plt.xlabel('Time (ns)', fontsize=14)
         plt.ylabel('Percent reacted', fontsize=14)
