@@ -47,7 +47,9 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Build Initial HII Phase Configurations" href="hexagonal_build.html" />
-    <link rel="prev" title="System Setup" href="setup.html" /> 
+    <link rel="prev" title="System Setup" href="setup.html" />
+    <link href="_static/theme_overrides.css" rel="stylesheet" type="text/css">
+
 </head>
 
 <body class="wy-body-for-nav">
@@ -189,15 +191,15 @@ cubic (QI) phase. This method implements the methods of:</p>
 </ul>
 </div>
 <p>Build LLC unit cell</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">build</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">phase</span> <span class="n">PHASE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="n">BUILD_MONOMER</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">o</span> <span class="n">OUT</span><span class="p">]</span>
-                <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="n">PORE_RADIUS</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">seed</span> <span class="n">RANDOM_SEED</span><span class="p">]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">build</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">phase</span> <span class="n">PHASE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="n">BUILD_MONOMER</span> <span class="p">[</span><span class="n">BUILD_MONOMER</span> <span class="o">...</span><span class="p">]]</span>
+                <span class="p">[</span><span class="o">-</span><span class="n">o</span> <span class="n">OUT</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="n">PORE_RADIUS</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">seed</span> <span class="n">RANDOM_SEED</span><span class="p">]</span>
                 <span class="p">[</span><span class="o">-</span><span class="n">box</span> <span class="n">BOX_LENGTHS</span> <span class="p">[</span><span class="n">BOX_LENGTHS</span> <span class="o">...</span><span class="p">]]</span>
                 <span class="p">[</span><span class="o">-</span><span class="n">angles</span> <span class="n">ANGLES</span> <span class="p">[</span><span class="n">ANGLES</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">nc</span> <span class="n">NCOLUMNS</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">P2P</span><span class="p">]</span>
                 <span class="p">[</span><span class="o">-</span><span class="n">n</span> <span class="n">NOPORES</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">DBWL</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">m</span> <span class="n">MONOMERS_PER_COLUMN</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">TILT</span><span class="p">]</span>
                 <span class="p">[</span><span class="o">-</span><span class="n">L</span> <span class="n">CORRELATION_LENGTH</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no_column_shift</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">Lvar</span> <span class="n">LVAR</span><span class="p">]</span>
-                <span class="p">[</span><span class="o">-</span><span class="n">pd</span> <span class="n">PARALLEL_DISPLACED</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">GRID</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">dens</span> <span class="n">DENSITY</span><span class="p">]</span>
-                <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">CURVATURE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">wt</span> <span class="n">WEIGHT_PERCENT</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">sol</span> <span class="n">SOLVENT</span><span class="p">]</span>
-                <span class="p">[</span><span class="o">-</span><span class="n">shift</span> <span class="n">SHIFT</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">plot</span><span class="p">]</span>
+                <span class="p">[</span><span class="o">-</span><span class="n">pd</span> <span class="n">PARALLEL_DISPLACED</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">mf</span> <span class="n">MOL_FRAC</span> <span class="p">[</span><span class="n">MOL_FRAC</span> <span class="o">...</span><span class="p">]]</span>
+                <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">GRID</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">dens</span> <span class="n">DENSITY</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">CURVATURE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">wt</span> <span class="n">WEIGHT_PERCENT</span><span class="p">]</span>
+                <span class="p">[</span><span class="o">-</span><span class="n">sol</span> <span class="n">SOLVENT</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">shift</span> <span class="n">SHIFT</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">plot</span><span class="p">]</span>
 </pre></div>
 </div>
 <div class="section" id="Named Arguments">
@@ -296,6 +298,12 @@ cubic (QI) phase. This method implements the methods of:</p>
 <tr><td>&#160;</td><td><p class="first">Angle of wedge formed between lineextending from pore center to monomer and line from pore center to vertically adjacent monomerhead group.</p>
 <p class="last">Default: 0</p>
 </td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-mf, &#8211;mol_frac</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">If using the -random flag, this givesthe relative amount of each monomer to add. List the fractions in the same order as-build_monomer</p>
+<p class="last">Default: [1.0]</p>
+</td></tr>
 <tr><td class="option-group">
 <kbd>-g, &#8211;grid</kbd></td>
 <td><p class="first">Number of sections to break grid into when approximating the chosen implicit function</p>
@@ -310,7 +318,7 @@ cubic (QI) phase. This method implements the methods of:</p>
 <tr><td class="option-group" colspan="2">
 <kbd>-c, &#8211;curvature</kbd></td>
 </tr>
-<tr><td>&#160;</td><td><p class="first">1 : QI phase (negative mean curvature, convex interface), 1, QII phase (positive meancurvature, concave interface). Determines whether the phase is normal or inverted</p>
+<tr><td>&#160;</td><td><p class="first">&gt; 0 : QI phase (positive mean curvature), &lt; 0, QII phase (negative meancurvature). Determines whether the phase is normal or inverted</p>
 <p class="last">Default: 1</p>
 </td></tr>
 <tr><td class="option-group" colspan="2">
@@ -329,7 +337,7 @@ cubic (QI) phase. This method implements the methods of:</p>
 <kbd>-shift, &#8211;shift</kbd></td>
 </tr>
 <tr><td>&#160;</td><td><p class="first">Shift position of head group shift units in the direction opposite of the normal vector at that point</p>
-<p class="last">Default: 0.5</p>
+<p class="last">Default: 0</p>
 </td></tr>
 <tr><td class="option-group" colspan="2">
 <kbd>-plot, &#8211;plot_grid</kbd></td>

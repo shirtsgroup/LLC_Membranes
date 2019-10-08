@@ -46,7 +46,9 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="#" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link href="_static/theme_overrides.css" rel="stylesheet" type="text/css">
+
 </head>
 
 <body class="wy-body-for-nav">
@@ -197,6 +199,8 @@
       <li><a href="bcc_build.html#bcc_build.BicontinuousCubicBuild.__init__">__init__() (bcc_build.BicontinuousCubicBuild method)</a>
 
       <ul>
+        <li><a href="coordinate_trace.html#coordinate_trace.CoordinateTrace.__init__">(coordinate_trace.CoordinateTrace method)</a>
+</li>
         <li><a href="correlation.html#correlation_function.Correlation.__init__">(correlation_function.Correlation method)</a>
 </li>
         <li><a href="ctrwsim.html#ctrwsim.CTRW.__init__">(ctrwsim.CTRW method)</a>
@@ -208,6 +212,8 @@
         <li><a href="hbonds.html#hbonds.System.__init__">(hbonds.System method)</a>
 </li>
         <li><a href="hexagonal_build.html#hexagonal_build.BuildHexagonal.__init__">(hexagonal_build.BuildHexagonal method)</a>
+</li>
+        <li><a href="msd.html#msd.Diffusivity.__init__">(msd.Diffusivity method)</a>
 </li>
         <li><a href="param.html#parameterize.Parameterize.__init__">(parameterize.Parameterize method)</a>
 </li>
@@ -278,12 +284,18 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bcc_build.html#bcc_build.BicontinuousCubicBuild">BicontinuousCubicBuild (class in bcc_build)</a>
 </li>
-      <li><a href="rdf.html#rdf.System.bootstrap">bootstrap() (rdf.System method)</a>
+      <li><a href="msd.html#msd.Diffusivity.bootstrap">bootstrap() (msd.Diffusivity method)</a>
+
+      <ul>
+        <li><a href="rdf.html#rdf.System.bootstrap">(rdf.System method)</a>
 </li>
+      </ul></li>
       <li><a href="timeseries.html#timeseries.bootstrap_msd">bootstrap_msd() (in module timeseries)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="msd.html#msd.Diffusivity.bootstrap_power_law">bootstrap_power_law() (msd.Diffusivity method)</a>
+</li>
       <li><a href="hexagonal_build.html#hexagonal_build.BuildHexagonal.build_column">build_column() (hexagonal_build.BuildHexagonal method)</a>
 </li>
       <li><a href="rdf.html#rdf.System.build_com">build_com() (rdf.System method)</a>
@@ -298,6 +310,8 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="msd.html#msd.Diffusivity.calculate">calculate() (msd.Diffusivity method)</a>
+</li>
       <li><a href="timeseries.html#timeseries.calculate_moving_average">calculate_moving_average() (in module timeseries)</a>
 
       <ul>
@@ -330,6 +344,8 @@
 </li>
       <li><a href="param.html#parameterize.Parameterize.convert_parameter_format">convert_parameter_format() (parameterize.Parameterize method)</a>
 </li>
+      <li><a href="coordinate_trace.html#coordinate_trace.CoordinateTrace">CoordinateTrace (class in coordinate_trace)</a>
+</li>
       <li><a href="correlation.html#correlation_function.Correlation">Correlation (class in correlation_function)</a>
 </li>
       <li><a href="timeseries.html#timeseries.correlograms">correlograms() (in module timeseries)</a>
@@ -351,6 +367,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="xlink_schemes.html#xlink_schemes.DieneScheme">DieneScheme (class in xlink_schemes)</a>
+</li>
+      <li><a href="msd.html#msd.Diffusivity">Diffusivity (class in msd)</a>
 </li>
       <li><a href="sampling.html#sampling.discrete_powerlaw_ccdf">discrete_powerlaw_ccdf() (in module sampling)</a>
 </li>
@@ -386,10 +404,14 @@
 </li>
       <li><a href="ctrwsim.html#ctrwsim.CTRW.fit_line">fit_line() (ctrwsim.CTRW method)</a>
 </li>
+      <li><a href="msd.html#msd.Diffusivity.fit_linear">fit_linear() (msd.Diffusivity method)</a>
+</li>
       <li><a href="ctrwsim.html#ctrwsim.CTRW.fit_power_law">fit_power_law() (ctrwsim.CTRW method)</a>
 
       <ul>
         <li><a href="fitting_functions.html#fitting_functions.fit_power_law">(in module fitting_functions)</a>
+</li>
+        <li><a href="msd.html#msd.Diffusivity.fit_power_law">(msd.Diffusivity method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -466,6 +488,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="fitting_functions.html#fitting_functions.line">line() (in module fitting_functions)</a>
 </li>
+      <li><a href="coordinate_trace.html#coordinate_trace.CoordinateTrace.locate_pore_centers">locate_pore_centers() (coordinate_trace.CoordinateTrace method)</a>
+</li>
       <li><a href="fitting_functions.html#fitting_functions.log_power_law">log_power_law() (in module fitting_functions)</a>
 </li>
   </ul></td>
@@ -528,12 +552,20 @@
 </li>
       <li><a href="solvation_equilibration.html#solvation_equilibration.System.place_water_tails">place_water_tails() (solvation_equilibration.System method)</a>
 </li>
-      <li><a href="rdf.html#rdf.System.plot">plot() (rdf.System method)</a>
+      <li><a href="msd.html#msd.Diffusivity.plot">plot() (msd.Diffusivity method)</a>
+
+      <ul>
+        <li><a href="rdf.html#rdf.System.plot">(rdf.System method)</a>
 </li>
+      </ul></li>
+      <li><a href="ctrwsim.html#ctrwsim.CTRW.plot_autocorrelation">plot_autocorrelation() (ctrwsim.CTRW method)</a>
+
+      <ul>
+        <li><a href="msd.html#msd.Diffusivity.plot_autocorrelation">(msd.Diffusivity method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ctrwsim.html#ctrwsim.CTRW.plot_autocorrelation">plot_autocorrelation() (ctrwsim.CTRW method)</a>
-</li>
       <li><a href="hbonds.html#hbonds.System.plot_hbonds">plot_hbonds() (hbonds.System method)</a>
 </li>
       <li><a href="ctrwsim.html#ctrwsim.CTRW.plot_msd">plot_msd() (ctrwsim.CTRW method)</a>
@@ -541,6 +573,8 @@
       <li><a href="sfbm_parameters.html#sfbm_parameters.SFBMParameters.plot_random_trajectories">plot_random_trajectories() (sfbm_parameters.SFBMParameters method)</a>
 </li>
       <li><a href="correlation.html#correlation_function.Correlation.plot_slice">plot_slice() (correlation_function.Correlation method)</a>
+</li>
+      <li><a href="coordinate_trace.html#coordinate_trace.CoordinateTrace.plot_trace">plot_trace() (coordinate_trace.CoordinateTrace method)</a>
 </li>
       <li><a href="ctrwsim.html#ctrwsim.CTRW.plot_trajectory">plot_trajectory() (ctrwsim.CTRW method)</a>
 </li>
@@ -569,6 +603,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="physical.html#physical.radial_distance_spline">radial_distance_spline() (in module physical)</a>
+</li>
+      <li><a href="coordinate_trace.html#coordinate_trace.CoordinateTrace.radial_distances">radial_distances() (coordinate_trace.CoordinateTrace method)</a>
 </li>
       <li><a href="rdf.html#rdf.System.radial_distribution_function">radial_distribution_function() (rdf.System method)</a>
 </li>
@@ -624,6 +660,8 @@
 </li>
       <li><a href="p2p.html#p2p.restrict_atoms">restrict_atoms() (in module p2p)</a>
 </li>
+      <li><a href="msd.html#msd.Diffusivity.restrict_to_pore">restrict_to_pore() (msd.Diffusivity method)</a>
+</li>
       <li><a href="transform.html#transform.rotate_coords">rotate_coords() (in module transform)</a>
 </li>
       <li><a href="transform.html#transform.rotate_coords_x">rotate_coords_x() (in module transform)</a>
@@ -658,12 +696,16 @@
 </li>
       <li><a href="genmdp.html#genmdp.SimulationMdp">SimulationMdp (class in genmdp)</a>
 </li>
+      <li><a href="msd.html#msd.Diffusivity.stationarity">stationarity() (msd.Diffusivity method)</a>
+</li>
       <li><a href="stats.html#module-stats">stats (module)</a>
 </li>
       <li><a href="ctrwsim.html#ctrwsim.CTRW.step_autocorrelation">step_autocorrelation() (ctrwsim.CTRW method)</a>
 
       <ul>
         <li><a href="timeseries.html#timeseries.step_autocorrelation">(in module timeseries)</a>
+</li>
+        <li><a href="msd.html#msd.Diffusivity.step_autocorrelation">(msd.Diffusivity method)</a>
 </li>
       </ul></li>
   </ul></td>

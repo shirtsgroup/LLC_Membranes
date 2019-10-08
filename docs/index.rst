@@ -74,6 +74,8 @@ once should be in an appropriate llclib module.
 
 A directory tree would go well here to make importing more intuitive
 
+.. _publications:
+
 Publications
 ------------
 

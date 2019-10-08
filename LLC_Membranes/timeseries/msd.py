@@ -53,8 +53,8 @@ def initialize():
 class Diffusivity(object):
 
     def __init__(self, traj, gro, axis, begin=0, startfit=0.01, endfit=1, residue=False, atoms=(), restrict=()):
-        """
-        Calculate diffusivity from trajectory
+        """ Calculate diffusivity from trajectory
+
         :param traj: unwrapped trajectory (i.e. gmx trjconv with -pbc nojump)
         :param gro: representative coordinate file
         :param axis: axis along which to compute MSD
@@ -62,7 +62,7 @@ class Diffusivity(object):
         :param endfit: end linear fit to MSD endfit % into trajectory
         :param residue: if specified, the residue whose center of mass MSD will be measured
         :param atoms: if specified, group of atoms whose center of mass MSD will be measured
-        :param restrict: restrict selection to certain indices. For example, if you want to calculate MSD of a certain
+        :param restrict: restrict selection to certain indices. For example, if you want to calculate MSD of a certain\
         residue, but only include a fraction of the total residues in the system.
         """
 
@@ -227,6 +227,12 @@ class Diffusivity(object):
         self.com = self.com[:, keep, :]
 
     def calculate(self, ensemble=False):
+        """ Calculate mean squared displacement of trajectory
+
+        :param ensemble: Calculate the ensemble MSD instead of the time-averaged MSD
+
+        :type ensemble: bool
+        """
 
         print('Calculating MSD...', end='', flush=True)
         self.MSD = timeseries.msd(self.com, self.axis, ensemble=ensemble)
@@ -234,12 +240,16 @@ class Diffusivity(object):
         print('Done!')
 
     def step_autocorrelation(self):
-        """ Calculate autocorrelation of step length and direction
+        """ Calculate autocorrelation of step length in the direction of axis.
         """
 
         self.acf = timeseries.step_autocorrelation(self.com, axis=self.axis)
 
     def fit_linear(self):
+        """ Fit a line to the MSD curve. This function will prompt the user to define the linear region as there is no
+        rule of thumb for determining exactly where to fit the MSD curve. Make sure to report what you chose as the
+        linear region.
+        """
 
         fit = 0
         while fit == 0:
@@ -270,7 +280,11 @@ class Diffusivity(object):
             plt.clf()
 
     def fit_power_law(self, y):
-        """ Fit power law to MSD curves
+        """ Fit power law to MSD curve.
+
+        :param y: y values of MSD curve
+
+        :type y: numpy.ndarray
 
         :return: Coefficient and exponent in power low of form [coefficient, power]
         """
@@ -285,6 +299,10 @@ class Diffusivity(object):
         non-stationary. If the returned p-value is below some threshold (often 0.05), then one can reject the null
         hypothesis and claim stationarity. The p-value is calculated from the ADF statistic. A more negative ADF
         statistic indicates a greater chance of rejecting the null hypothesis.
+
+        :param axis: axis along which to measure increments. (x = 0, y = 1, z = 2)
+
+        :type axis: int
 
         :return: p value for each trajectory
         :rtype: numpy.ndarray
@@ -307,6 +325,12 @@ class Diffusivity(object):
         return (mean_msd_variance - mean_msd_squared) / mean_msd_squared
 
     def bootstrap_power_law(self, N):
+        """ Bootstrap fits of a power law to the MSD
+
+        :param N: number of bootstrap trials
+
+        :type N: int
+        """
 
         self.power_law_fit = np.zeros([N, 2])
 
@@ -323,9 +347,16 @@ class Diffusivity(object):
             # plt.show()
 
     def bootstrap(self, N, fit_line=True, confidence=68):
-        """
-        Estimate error at each point in the MSD curve using bootstrapping
+        """ Estimate error at each point in the MSD curve using bootstrapping
+
         :param N: number of bootstrap trials
+        :param fit_line: Fit a line to the MSD curve
+        :param confidence: percent confidence interval (out of 100)
+
+        :type N: int
+        :type fit_line: bool
+        :type confidence: float
+
         """
 
         eMSDs = np.zeros([self.nT, N], dtype=float)  # create n bootstrapped trajectories
@@ -371,7 +402,21 @@ class Diffusivity(object):
             self.confidence_interval = stats.t.interval(0.95, N - 1, loc=slopes.mean(), scale=stats.sem(slopes))
             self.Davg = slopes.mean()
 
-    def plot(self, axis, fracshow=0.5, savedata=False, show=False, save=False):
+    def plot(self, fracshow=0.5, save=False, savename='diffusivity.pdf', savedata=False, show=False):
+        """ Plot the MSD curve
+
+        :param fracshow: fraction of MSD curve to show on plot
+        :param save: save plot
+        :param savename: name under which to save plot (including file extension)
+        :param savedata: save MSD curve data in a numpy compressed .npz file
+        :param show: show plot when done
+
+        :type fracshow: float
+        :type save: bool
+        :type savename: str
+        :type savedata: bool
+        :type show: bool
+        """
 
         plt.figure()
         self.endfit = int(fracshow * self.time.size)
@@ -396,7 +441,7 @@ class Diffusivity(object):
         plt.tight_layout()
 
         if save:
-            plt.savefig('Diffusivity_%s.pdf' % axis)
+            plt.savefig(savename)
 
         if show:
             plt.show(block=True)

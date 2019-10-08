@@ -1,3 +1,5 @@
+.. _rdf:
+
 Radial Distribution Functions
 =============================
 

@@ -46,8 +46,8 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Calculate Mean Squared Displacement" href="msd.html" />
-    <link rel="prev" title="Post-Simulation Trajectory Analysis" href="analysis.html" /> 
+    <link href="_static/theme_overrides.css" rel="stylesheet" type="text/css">
+
 </head>
 
 <body class="wy-body-for-nav">
@@ -95,20 +95,12 @@
               
             
             
-              <ul class="current">
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="requirements.html">Software Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prep.html">Preparation of Monomers and Solutes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="setup.html">System Setup</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="analysis.html">Post-Simulation Trajectory Analysis</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Distance Between Pores</a></li>
-<li class="toctree-l2"><a class="reference internal" href="msd.html">Calculate Mean Squared Displacement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hbonds.html">Identify Hydrogen Bonds</a></li>
-<li class="toctree-l2"><a class="reference internal" href="rdf.html">Radial Distribution Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="correlation.html">Correlation Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="coordination_number.html">Calculate Coordination Numbers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ztrace.html">Plot z-coordinate Versus Radial Position</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Post-Simulation Trajectory Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="llclib.html">Useful Functions</a></li>
 </ul>
 
             
@@ -154,8 +146,6 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-          <li><a href="analysis.html">Post-Simulation Trajectory Analysis</a> &raquo;</li>
-        
       <li>Distance Between Pores</li>
     
     
@@ -176,7 +166,7 @@
            <div itemprop="articleBody">
             
   <div class="section" id="distance-between-pores">
-<h1>Distance Between Pores<a class="headerlink" href="#distance-between-pores" title="Permalink to this headline">¶</a></h1>
+<span id="p2p"></span><h1>Distance Between Pores<a class="headerlink" href="#distance-between-pores" title="Permalink to this headline">¶</a></h1>
 <p>Calculate the pore-to-pore distance from an MD trajectory of an HII LLC membrane</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">p2p</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">TRAJ</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">GRO</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">begin</span> <span class="n">BEGIN</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">end</span> <span class="n">END</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">skip</span> <span class="n">SKIP</span><span class="p">]</span>
               <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PORES</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">COMPONENT</span> <span class="p">[</span><span class="n">COMPONENT</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">E</span> <span class="n">EQUIL</span><span class="p">]</span>
@@ -383,15 +373,6 @@ choose to detect equilibration manually. Otherwise &#8216;auto&#8217; will use p
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="msd.html" class="btn btn-neutral float-right" title="Calculate Mean Squared Displacement" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="analysis.html" class="btn btn-neutral float-left" title="Post-Simulation Trajectory Analysis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>

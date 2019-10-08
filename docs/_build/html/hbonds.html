@@ -46,8 +46,8 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Radial Distribution Functions" href="rdf.html" />
-    <link rel="prev" title="Distance Between Pores" href="p2p.html" /> 
+    <link href="_static/theme_overrides.css" rel="stylesheet" type="text/css">
+
 </head>
 
 <body class="wy-body-for-nav">
@@ -95,18 +95,11 @@
               
             
             
-              <ul class="current">
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="requirements.html">Software Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prep.html">Preparation of Monomers and Solutes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="setup.html">System Setup</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="analysis.html">Post-Simulation Trajectory Analysis</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="p2p.html">Distance Between Pores</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Identify Hydrogen Bonds</a></li>
-<li class="toctree-l2"><a class="reference internal" href="rdf.html">Radial Distribution Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="coordination_number.html">Calculate Coordination Numbers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tsa.html">Time Series Analysis and Forecasting</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Post-Simulation Trajectory Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="llclib.html">Useful Functions</a></li>
 </ul>
 
@@ -153,8 +146,6 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-          <li><a href="analysis.html">Post-Simulation Trajectory Analysis</a> &raquo;</li>
-        
       <li>Identify Hydrogen Bonds</li>
     
     
@@ -174,8 +165,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="identify-hydrogen-bonds">
-<h1>Identify Hydrogen Bonds<a class="headerlink" href="#identify-hydrogen-bonds" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="hbonds">
+<span id="identify-hydrogen-bonds"></span><h1>Identify Hydrogen Bonds<a class="headerlink" href="#hbonds" title="Permalink to this headline">¶</a></h1>
 <p>Use the functionality of hbonds.py in order to identify hydrogen bonds in a
 molecular dynamics trajectory.</p>
 <p>Attempts to describe a hydrogen bond in the context of molecular simulations
@@ -425,15 +416,6 @@ hbonds.py -t trajectory.xtc -g coordinates.gro -r HII HOH -a O3 O4 -a all
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="rdf.html" class="btn btn-neutral float-right" title="Radial Distribution Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="p2p.html" class="btn btn-neutral float-left" title="Distance Between Pores" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>

@@ -3,6 +3,9 @@
 Simulate Realizations of a CTRW
 ===============================
 
+A continue time random walk (CTRW) is a stochastic process characterize
+by random length hops between random length dwells. 
+
 =======
 Classes
 =======

@@ -1,5 +1,7 @@
+.. _correlation:
+
 Correlation Functions
-=============================
+=====================
 
 A correlation function is a measure of order in a system. It's main purpose is to determine the spatial relationship between a single atom or group of atoms to other surrounding atoms or groups of atoms.
 

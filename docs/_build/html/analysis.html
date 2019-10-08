@@ -46,8 +46,10 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Distance Between Pores" href="p2p.html" />
-    <link rel="prev" title="Cross-linking" href="xlink.html" /> 
+    <link rel="next" title="Useful Functions" href="llclib.html" />
+    <link rel="prev" title="Cross-linking" href="xlink.html" />
+    <link href="_static/theme_overrides.css" rel="stylesheet" type="text/css">
+
 </head>
 
 <body class="wy-body-for-nav">
@@ -99,14 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="requirements.html">Software Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="prep.html">Preparation of Monomers and Solutes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="setup.html">System Setup</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Post-Simulation Trajectory Analysis</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="p2p.html">Distance Between Pores</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hbonds.html">Identify Hydrogen Bonds</a></li>
-<li class="toctree-l2"><a class="reference internal" href="rdf.html">Radial Distribution Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="coordination_number.html">Calculate Coordination Numbers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tsa.html">Time Series Analysis and Forecasting</a></li>
-</ul>
-</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Post-Simulation Trajectory Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="llclib.html">Useful Functions</a></li>
 </ul>
 
@@ -174,22 +169,97 @@
             
   <div class="section" id="post-simulation-trajectory-analysis">
 <span id="analysis"></span><h1>Post-Simulation Trajectory Analysis<a class="headerlink" href="#post-simulation-trajectory-analysis" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="p2p.html">Distance Between Pores</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hbonds.html">Identify Hydrogen Bonds</a></li>
-<li class="toctree-l1"><a class="reference internal" href="rdf.html">Radial Distribution Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="coordination_number.html">Calculate Coordination Numbers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tsa.html">Time Series Analysis and Forecasting</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="msd.html">Calculate Mean Squared Displacement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="correlation.html">Correlation Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ztrace.html">Plot z-coordinate Versus Radial Position</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ctrwsim.html">Simulate Realizations of a CTRW</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sfbm_parameters.html">Calculate Dwell, Hop and Correlation Parameters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="forecast_ctrw.html">Fit a CTRW and Simulate Realizations</a></li>
-</ul>
-</li>
-</ul>
+<p>The scripts described below are used to perform all post-simulation analysis
+and create the figures in our <a class="reference internal" href="index.html#publications"><span class="std std-ref">papers</span></a>. Short descriptions
+of each script are given below. Generally all of the scripts can be run from
+the command line by passing arguments. Click on them to learn more about what
+they do, the classes and functions that can be borrowed from them, and how to
+run them from the command line.</p>
+<div class="section" id="structural-analysis-llc-membranes-analysis">
+<h2>Structural Analysis <code class="code docutils literal"><span class="pre">LLC_Membranes.analysis</span></code><a class="headerlink" href="#structural-analysis-llc-membranes-analysis" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Script Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference internal" href="p2p.html#p2p"><span class="std std-ref">p2p.py</span></a></td>
+<td>Calculate the average distance between pore centers</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="rdf.html#rdf"><span class="std std-ref">rdf.py</span></a></td>
+<td>Calculate radial distribution function of a residue with
+respect to pore centers</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="correlation.html#correlation"><span class="std std-ref">correlation_function.py</span></a></td>
+<td>Calculate the correlation function of a residue or part
+of a residue along an axis</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="non-covalent-interactions-llc-membranes-analysis">
+<h2>Non-covalent Interactions <code class="code docutils literal"><span class="pre">LLC_Membranes.analysis</span></code><a class="headerlink" href="#non-covalent-interactions-llc-membranes-analysis" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Script Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference internal" href="hbonds.html#hbonds"><span class="std std-ref">hbonds.py</span></a></td>
+<td>Identify hydrogen bonds based on geometric distance and angle criteria</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="coordination_number.html#coord-number"><span class="std std-ref">coordination_number.py</span></a></td>
+<td>&#160;</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="time-series-analysis-llc-membranes-timeseries">
+<h2>Time Series Analysis <code class="code docutils literal"><span class="pre">LLC_Membranes.timeseries</span></code><a class="headerlink" href="#time-series-analysis-llc-membranes-timeseries" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Script Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference internal" href="msd.html#msd"><span class="std std-ref">msd.py</span></a></td>
+<td>Calculate the mean squared displacement and, optionally, the diffusion
+coefficient of a residue.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="coordinate_trace.html#z-trace"><span class="std std-ref">coordinate_trace.py</span></a></td>
+<td>Track z-coordinate of a residue center of mass along with its radial
+position with respect to the pore center</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="ctrwsim.html#ctrwsim"><span class="std std-ref">ctrwsim.py</span></a></td>
+<td>Simulate realizations of a continuous time random walk</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="sfbm_parameters.html#sfbm-parameters"><span class="std std-ref">sfbm_parameters.py</span></a></td>
+<td>Fit parameters assuming a solute undergoes subordinated fractional
+Brownian motion</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="forecast_ctrw.html#forecast-ctrw"><span class="std std-ref">forecast_ctrw.py</span></a></td>
+<td>Fit a correlated continuous time random walk to residue trajectory data</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="flm.html#flm"><span class="std std-ref">fractional_levy_motion.py</span></a></td>
+<td>Simulate realizations of fractional Levy motion</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
@@ -201,7 +271,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="p2p.html" class="btn btn-neutral float-right" title="Distance Between Pores" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="llclib.html" class="btn btn-neutral float-right" title="Useful Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="xlink.html" class="btn btn-neutral float-left" title="Cross-linking" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

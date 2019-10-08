@@ -1,3 +1,5 @@
+.. _hbonds:
+
 Identify Hydrogen Bonds
 =======================
 

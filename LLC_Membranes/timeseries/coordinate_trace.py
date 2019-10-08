@@ -38,9 +38,29 @@ def initialize():
     return parser
 
 
-class ZTrace(object):
+class CoordinateTrace(object):
 
-    def __init__(self, traj, gro, residue, build_monomer, axis, begin=0, end=-1, skip=1, npores=4):
+    def __init__(self, traj, gro, residue, build_monomer, axis, begin=0, end=-1, skip=1):
+        """ Initialize the calculation of a center of mass coordinate trace along a specified axis.
+
+        :param traj: name of GROMACS trajectory (.xtc or .gro)
+        :param gro: name of GROMACS coordinate file (.gro)
+        :param residue: name of residue to track
+        :param build_monomer: name of  monomer used to build LLC membrane
+        :param axis: axis along which to trace (x, y or z)
+        :param begin: first frame to track
+        :param end: last frame to track
+        :param skip: only record data every **skip** frames
+
+        :type traj: str
+        :type gro: str
+        :type residue: str
+        :type build_monomer: str
+        :type axis: str
+        :type begin: int
+        :type end: int
+        :type skip: int
+        """
 
         self.t = md.load(traj, top=gro)[begin:end:skip]
         self.time = self.t.time
@@ -62,6 +82,17 @@ class ZTrace(object):
         self.radial_distance = np.zeros([self.t.n_frames, self.nres])
 
     def locate_pore_centers(self, npts_spline=10, save=True, savename='spline.pl'):
+        """ Fit a spline through the centers of the pores based on the pore defining atoms
+        (see :ref:`annotation-table-lc`) of the monomer used to construct the unit cell.
+
+        :param npts_spline: number of points in each pore of the spline
+        :param save: save the spline
+        :param savename: name of spline
+
+        :type npts_spline: int
+        :type save: bool
+        :type savename: str
+        """
 
         pore_atoms = [a.index for a in self.t.topology.atoms if a.name in self.monomer.pore_defining_atoms and
                       a.residue.name in self.monomer.residues]
@@ -69,8 +100,11 @@ class ZTrace(object):
         self.spline = physical.trace_pores(self.t.xyz[:, pore_atoms, :], self.t.unitcell_vectors, npts_spline,
                                            save=save, savename=savename)[0]
 
-    def radial_distances(self, npores=4):
+    def radial_distances(self):
+        """ Calculate each residue of interest's distance from the pore center at each frame
+        """
 
+        npores = self.spline.shape[1]
         for t in tqdm.tqdm(range(self.t.n_frames), unit=' Frames'):
             d = np.zeros([npores, self.nres])
             for p in range(npores):
@@ -81,6 +115,22 @@ class ZTrace(object):
             self.radial_distance[t, :] = d[np.argmin(d, axis=0), np.arange(self.nres)]
 
     def plot_trace(self, nr, colormap='plasma_r', cmax=None, savename=None, show=True):
+        """ Plot the coordinate trace of chosen residue centers of mass colored according to its radial distance from
+        the closest pore center
+
+        :param nr: index or indices of solutes to display. Indices are relative to the total number of residues,\
+        starting from 0. For example, to look at the first and third residues pass [0, 2]
+        :param colormap: name of colormap to use
+        :param cmax: max value of color scale
+        :param savename: name of plot
+        :param show: show plot when finished plotting
+
+        :type nr: int or list of int
+        :type colormap: str
+        :type cmax: float
+        :type savename: str
+        :type show: bool
+        """
 
         fig, ax = plt.subplots()
 
@@ -141,8 +191,8 @@ if __name__ == "__main__":
     if args.load:
         trace = file_rw.load_object(args.savename)
     else:
-        trace = ZTrace(args.trajectory, args.gro, args.residue, args.build_monomer, args.axis, begin=args.begin,
-                       end=args.end, skip=args.skip)
+        trace = CoordinateTrace(args.trajectory, args.gro, args.residue, args.build_monomer, args.axis,
+                                begin=args.begin, end=args.end, skip=args.skip)
 
         trace.locate_pore_centers(save=True)
 

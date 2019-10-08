@@ -100,16 +100,6 @@ todo_include_todos = False
 #
 html_theme = 'sphinx_rtd_theme' # agogo traditional classic pyramid nature haiku sphixdoc scrolls alabaster nature bizstyle
 html_static_path = ['_static']
-html_context = {
-    'css_files': [
-        '_static/theme_overrides.css',  # override wide tables in RTD theme
-        ],
-     }
-# Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
-# documentation.
-#
-# html_theme_options = {}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -173,5 +163,14 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
-
+html_context = {
+    'css_files': [
+        '_static/theme_overrides.css',  # override wide tables in RTD theme
+        ],
+     }
+# Theme options are theme-specific and customize the look and feel of a theme
+# further.  For a list of options available for each theme, see the
+# documentation.
+#
+# html_theme_options = {}
 

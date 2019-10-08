@@ -7,7 +7,7 @@ Similar to :ref:`monomer_prep`, we annotate solute topologies
 to aid specific calculations. At present these annotations are
 only needed to label solute atoms involved in hydrogen bonding.
 
-.. _annotation-table:
+.. _annotation-table-solutes:
 
 Summary of Annotations
 -----------------------
