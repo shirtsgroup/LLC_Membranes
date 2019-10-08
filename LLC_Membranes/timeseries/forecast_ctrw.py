@@ -64,6 +64,8 @@ def initialize():
     # parser.add_argument('-radius', default=1, type=float, help='Radius of pores. Anything greater than this distance'
     #                     'from the pore center will not be included in calculation')
 
+    parser.add_argument('-suffix', '--save_suffix', default=None, help='If not None, add this suffix to save name')
+
     return parser
 
 
@@ -133,7 +135,13 @@ if __name__ == "__main__":
 
         sys.t = None  # save memory in pickled file this info is no longer needed. Can write function to reload
         sys.com = None
-        file_rw.save_object(sys, 'forecast_%s_%dstate.pl' % (fit['residue'], sys.nmodes))
+
+        savename = 'forecast_%s_%dstate' % (fit['residue'], sys.nmodes)
+        if args.save_suffix is not None:
+            savename += args.save_suffix
+        savename += '.pl'
+
+        file_rw.save_object(sys, savename)
 
     # sys.fit_distributions(nbins=fit['bins'], nboot=10, plot=True, show=True, save=True,
     #                       dwell_distribution=fit['dwell_distribution'], hop_distribution=fit['hop_distribution'])

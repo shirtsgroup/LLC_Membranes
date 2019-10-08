@@ -13,6 +13,7 @@ import tqdm
 import math
 np.seterr(all='raise')
 
+
 class FLM:
 
     def __init__(self, H, alpha, m=256, M=6000, C=1, N=2**12, scale=1, correct_hurst=True, truncate=None,
@@ -115,10 +116,20 @@ class FLM:
                 z = levy_stable.rvs(self.alpha, 0, loc=0, scale=self.scale, size=self.Na)
 
                 if self.truncate is not None:
-                    too_big = np.where(np.abs(z) > self.truncate)[0]
+                    try:
+                        too_big = np.where(np.abs(z) > self.truncate)[0]
+                    except FloatingPointError:
+                        for i in np.abs(z):
+                            print(i)
+                        exit()
                     while too_big.size > 0:
                         z[too_big] = levy_stable.rvs(self.alpha, 0, loc=0, scale=self.scale, size=too_big.size)
-                        too_big = np.where(np.abs(z) > self.truncate)[0]
+                        try:
+                            too_big = np.where(np.abs(z) > self.truncate)[0]
+                        except FloatingPointError:
+                            for i in np.abs(z):
+                                print(i)
+                            exit()
 
             z = np.fft.fft(z, self.Na)
             w = np.fft.ifft(z * self.A, self.Na).real

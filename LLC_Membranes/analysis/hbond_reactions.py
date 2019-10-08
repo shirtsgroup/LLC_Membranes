@@ -2,7 +2,6 @@
 
 from LLC_Membranes.analysis import hbonds
 from LLC_Membranes.llclib import file_rw
-import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 
