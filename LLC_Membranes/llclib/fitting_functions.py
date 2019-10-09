@@ -3,7 +3,7 @@
 import numpy as np
 from scipy.stats import expon
 from LLC_Membranes.analysis import Poly_fit
-from sympy import mpmath
+import mpmath
 from scipy.optimize import curve_fit, minimize
 from scipy.special import gamma
 

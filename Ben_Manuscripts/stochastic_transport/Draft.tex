@@ -119,10 +119,10 @@
   its pore structure may decrease a Q\textsubscript{I} membrane's permeability, it is considerably
   easier to synthesize.
   
-  Molecular modeling may make it possible to create efficient solute-specific separation
+  Molecular modeling may make it possible to efficiently create solute-specific separation
   membranes using the available chemical space of LLC monomers. To date, only a limited 
   subset of LLC monomers have been studied in membrane applications.
-  ~\cite{carter_glycerol-based_2012,hatakeyama_nanoporous_2010,smith_ordered_1997,zhou_assembly_2003,resel_structural_2000}
+  \cite{carter_glycerol-based_2012,hatakeyama_nanoporous_2010,smith_ordered_1997,zhou_assembly_2003,resel_structural_2000}
   Even within this small subset, they have demonstrated selectivities that could not be
   explained beyond speculation and vague empirical correlations.~\cite{dischinger_application_2017}
   Atomistic molecular modeling can provide the resolution necessary to identify molecular 
@@ -131,7 +131,7 @@
 
   In our previous work, we used molecular dynamics (MD) simulations to study the transport
   of 20 small polar molecules in an H\textsubscript{II} phase LLC membrane.~\cite{coscia_chemically_2019}
-  The H\textsubscript{II} is a simpler geometry to model than the Q\textsubscript{I} phase.  
+  The H\textsubscript{II} phase is a simpler geometry to model than the Q\textsubscript{I} phase.  
   In general, we observed subdiffusive transport behavior characterized by intermittent hops 
   separated by periods of entrapment. We identified three mechanisms responsible for the 
   solute trapping behavior: entanglement among monomer tails, hydrogen bonding with monomer
@@ -162,7 +162,7 @@
   %BJC4: added citations of prominent anomalous diffusion work
   Researchers have developed a rigorous theoretical foundation for describing the 
   motion of particles exhibiting non-Brownian, or anomalous, transport behavior.
-  ~\cite{metzler_random_2000,bouchaud_anomalous_1990} The tools introduced by 
+  \cite{metzler_random_2000,bouchaud_anomalous_1990} The tools introduced by 
   fractional calculus are instrumental to this theory.~\cite{gorenflo_fractional_1997}
   They allow us to generalize the normally linear diffusion equation to fractional
   derivative orders, providing descriptions of a much more diverse set of behavior.~\cite{klages_anomalous_2008}
@@ -171,6 +171,7 @@
   continuous time random walks (CTRW), fractional Brownian motion
   (FBM) and random walks on fractals (RWF).\cite{meroz_toolbox_2015}
   The theory is frequently used to describe single particle trajectories.~\cite{morrin_three_2018,metzler_anomalous_2014}
+  %BJC4: consider rewording sentence below
   A CTRW is characterized by a distribution of hop lengths and dwell times, 
   where trajectories are characterized by independent random draws from 
   each distribution.\cite{montroll_random_1965} FBM is common in crowded,
@@ -180,6 +181,7 @@
   and dead ends cause anti-correlated motion.\cite{meroz_toolbox_2015,neusius_subdiffusion_2008}
   These processes can occur alone or in combination.
 
+  %BJC4: should I mention which anomalous subdiffusion model we chose? 
   Our first modeling approach is based on the anomalous diffusion literature, 
   applying the mathematical formalism describing subdiffusive transport to observed
   solute trajectories. We fit anomalous diffusion models in two ways: 
@@ -191,6 +193,9 @@
   extracting two sets of model parameters calculated based on a solute's radial
   distance from the closest pore center.
   
+  %BJC4: might want to change the theme of this paragraph to something like: 
+  % Anomalous diffusion can help uncover mechanisms. Once we know mechanisms, we 
+  % can define them as states and use the MSDDM.
   While elegant, pure anomalous diffusion theory may in some cases give only a 
   qualitative understanding of transport mechanisms. 
   %MRS4: might need to provide a bit more explanation why it would be ony qualitative.  
@@ -242,17 +247,49 @@
 %  to different states. 
   That is the magnitudes of a solute's fluctuations from its average trapped 
   position and the degree of correlation with its previous fluctuations is 
-  defined by the parameters of its current state.
+  defined by the parameters of its current state. To distinguish our approach from
+  standard MSMs, we have named it the Markov state-dependent dynamical model (MSDDM).
+  %BJC4: Added name of our modeling approach in last sentence
   
-  In this work we apply the two modeling approaches in order to predict the long
-  timescale behavior of the four fastest moving solutes studied in our previous work.
+  %BJC4: making goals more explicit
+  The success of our modeling approaches can be defined in two ways. First, if we
+  can closely reproduce solute MSDs measured from MD simulations with realizations
+  of our models, then it is likely that the model sufficiently captures solute 
+  dynamics and can be used in a predictive capacity. Even if a model fails to 
+  reproduce the MD MSDs, there is value in uncovering the cause of the deviation.
+  The second measure of success is by analysis of the parameters defining each 
+  model. The parameters themselves should provide clues that help explain solute 
+  behavior in a coherent way. A model that successfully reproduces MD MSDs, but 
+  with nonsensical parameters has severely diminished value.
+  
+  % BJC4: new paragraph
+  The goal of this work is not to definitively determine which modeling approach
+  is better but to evaluate their performance independently because they both
+  have potential value dependent on one's research goals. The anomalous subdiffusion
+  approach provides a systematic way to compare the dynamical behavior of different
+  solutes based solely on the time series of their center of mass positions. The process
+  of choosing the correct anomalous subdiffusion provides its own mechanistic insight
+  since it requires a thorough analysis of solute time series behavior. One can then
+  screen different solutes, compare the fit model parameters and relate them back to 
+  differences in solute size and chemical composition. The MSDDM characterizes 
+  explicitly defined trapping mechanisms, providing a clear picture of solute behavior
+  while in each trapped state as well as the equilibrium occupation of each trapping state.
+  It is possible to use the two models in tandem, the anomalous diffusion model to
+  identify mechanisms, and the MSDDM to characterize mechanisms. 
+  
+  %BJC4: missing something about predictive capabilities
+  
+  We evaluate the two modeling approaches by using them to characterize the dynamical
+  behavior of the four fastest moving solutes studied in our previous work.
   Specifically, we study methanol, urea, ethylene glycol and acetic acid. In addition
   to moving quickly, allowing them to extensively explore membrane structural space,
   these solutes have a range of chemical functionality and experience each of the 
-  three trapping mechanisms to different degrees. It is our goal to reproduce
-  the mean squared displacements (MSDs) exhibited by each solute on MD timescales and
-  then to project the long-term dynamics of each solute. We can gain further
-  mechanistic insight by studying the parameters of each model. 
+  three trapping mechanisms to different extents. 
+  
+%  It is our goal to reproduce
+%  the mean squared displacements (MSDs) exhibited by each solute on MD timescales and
+%  then to project the long-term dynamics of each solute. We can gain further
+%  mechanistic insight by studying the parameters of each model. 
   %BJC3: need to decide value in long term projections
 
   \section{Methods}
@@ -1261,17 +1298,19 @@
   
   %BJC3: would take ~ 20 hours to simulation 10000 trajectories.
   %MRS4: state how much it overestimated (1% or 10000%?)
+  %BJC4: added percentages. Is it redundant since I already said how many time
   The MSDDM over-estimates solute MSDs by 200--300 \% (see Figure~\ref{fig:msddm_performance}). 
   We simulated 1000 trajectories as described in Section~\ref{method:MSMs} then
   %BJC3: 2.2 and 3.3 x higher than MD to be exact
-  calculated their MSDs. The MSD of urea and ethylene glycol are about 2 and 3 times
+  calculated their MSDs. The MSDs of urea and ethylene glycol are about 2 and 3 times
   higher than MD simulations respectively.
  
   %MRS4: It's not as clear what effect you are talking about until
   %later, i.e. the fact that the correlation is destroyed by the
   %state switching.
-  The MSDDM overestimates solute MSDs because we simulated each state
-  sequence independently. Although correlation exists within each
+  %BJC4: modified thesis
+  The MSDDM overestimates solute MSDs because correlation is lost
+  every time a state switch occurs. Although correlation exists within each
   sequence, there is no memory of the previous state or state transition 
   that can be built into the first emission of the most recent state. 
   This implies that the first value in a state sequence is a random
@@ -1288,7 +1327,7 @@
   times in each state. We set the off-diagonal elements of $T$ to be equal values that make the
   rows of $T$ sum to unity when combined with the self-transition probabilities. 
   As we increase the self-transition probability, $T_{ii}$, the simulated MSD 
-  decreases. Longer dwell times in each state allow us to more accurately
+  decreases. Consequently longer dwell times in each state allow us to more accurately
   simulate the negative correlation that we observe in MD.
   
   \begin{figure}
@@ -1299,28 +1338,25 @@
   of individual state sequences is simulated more accurately.}\label{fig:T_sensitivity}
   \end{figure}
   
-%MRS4: be more clear here what mechanistic insight it offers.
+  % MRS4: be more clear here what mechanistic insight it offers.
+  % BJC4: added a couple sentences after thesis
   The MSDDM offers mechanistic insight but cannot be used for reliable predictions
-  of solute MSDs. It may be suitable for processes with rarer transitions between 
-  states. If we can further reduce the state-space of our models, the MSDDM
-  may have better predictive success, but we lose mechanistic detail.
+  of solute MSDs. We can obtain a detailed picture of dynamics within each state in
+  terms of the magnitude of their fluctuations and correlation with previous 
+  motion. Unfortunately correlation between adjacent same-state sequences is lost
+  with our model which causes the MSDs to be significantly over-predicted. The MSDDM
+  may be suitable for processes with rarer transitions between states. If we can 
+  further reduce the state-space of our models, it may have better predictive success,
+  but we lose mechanistic detail.
   
 %  We projected the long timescale behavior using this model. 
 
   \section{Conclusions}
-
-  % MRS1: will want to make a statement about whether these approaches
-  % are together good enough for predictive purposes, and if not,
-  % explore what else should be done in the future.
-  % BJC2: It seems like it would be hard to make say these can be used
-  % for prediction without experimental confirmation of the trends that we observe.
   
   We have tested two different mathematical frameworks for describing solute
-  motion in an H\textsubscript{II} phase LLC membrane. 
-  %MRS4: added some more specificity. 
-  The values obtained for the parameters when fitting the models to the timeseries data  
-  %The parameters of each model 
-  offer important mechanistic insight on the molecular details of transport.
+  motion in an H\textsubscript{II} phase LLC membrane. The values obtained for
+  the parameters when fitting the models to the time series data offer important
+  mechanistic insight on the molecular details of transport.
   Subordinated fractional Brownian and L\'evy motion have a nice theoretical 
   foundation in the anomalous diffusion literature. Our single mode model
   quantifies and allows comparison of the hopping and trapping behavior 
@@ -1356,7 +1392,7 @@
   partitions a trajectory into discrete mechanisms and quantifies their
   relative dominance in the real system. For example, it is clear that 
   sodium ion association is primarily responsible for trapping urea while 
-  hydrogen bonding dominates ethylene glycol. If one redesigns an LLC monomer
+  hydrogen bonding dominates ethylene glycol. If one re-designs an LLC monomer
   to eliminate one source of trapping, 
   %MRS4: by what mechanisms are high selectivities possible?
   then high selectivities are possible.
