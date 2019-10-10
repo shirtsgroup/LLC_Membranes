@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from LLC_Membranes.analysis.sfbm_parameters import SFBMParameters
-from LLC_Membranes.analysis.msd import Diffusivity
+from LLC_Membranes.timeseries.msd import Diffusivity
 from LLC_Membranes.llclib import file_rw
 from LLC_Membranes.timeseries.ctrwsim import CTRW
 import matplotlib.pyplot as plt
@@ -26,10 +26,10 @@ def md_diffusivity():
 res = 'URE'
 directory = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/%s/10wt" % res
 fracshow = 0.4  # fraction of MD MSD to plot
-recalculate_msd = False 
+recalculate_msd = True 
 recalculate_walks = True
 nmodes = 1 
-ntraj = 1000  # number of trajectories to simulate
+ntraj = 100  # number of trajectories to simulate
 nboot = 200  # number of bootstrap trials when getting errorbars on MSD
 padding = 10  # higher number gives better resolution to CTRW trajectories
 

@@ -75,7 +75,7 @@ class CTRW(object):
         :param transition_count_matrix: nmode x nmode matrix of counts of transitions between states. Only needed if \
         nmodes > 1.
 
-        :type length: int
+        :type length: int or float
         :type ntraj: int
         :type nmodes: int
         :type hop_dist: str
