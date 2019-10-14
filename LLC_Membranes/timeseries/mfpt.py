@@ -36,11 +36,9 @@ class MFPT(CTRW):
 
     def _check_length(self):
         """ Find which particles have reached the distance threshold
-
-        :return:
         """
 
-        #TODO: This needs debugging
+        # TODO: This needs debugging
         print(np.abs(self.z_interpolated).max(axis=1))
         done = np.where(np.abs(self.z_interpolated).max(axis=1) >= self.length)[0]
         self.done[done] = True
