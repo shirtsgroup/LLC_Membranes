@@ -382,7 +382,7 @@ def exponential_plateau(x, M, a):
     :return: f evaluated at all x
     """
 
-    return M * 1 - np.exp(-a * x)
+    return M * (1 - np.exp(-a * x))
 
 
 def fit_exponential_plateau(x, y):
@@ -405,10 +405,59 @@ def fit_exponential_plateau(x, y):
     :rtype a: float
     """
 
-    M_guess = np.max(x)
-    a_guess = ((-1 / x) * (1 - (y / M_guess))).mean()
-    print(a_guess)
+    M_guess = np.max(y)
+    a_guess = -((-1 / x[1:]) * (1 - (y[1:] / M_guess))).mean()  # exclude first data point since x = 0
 
     opt, cov = curve_fit(exponential_plateau, x, y, p0=(M_guess, a_guess))
+
+    return opt, cov
+
+
+def powerlaw_plateau(x, M, a):
+    """ A power law-type plateau-ing function of the form:
+
+    .. math::
+
+        f(x) = M(1 - x^{-a})
+
+    :param x: independent variable
+    :param M: plateau value
+    :param a: decay rate
+
+    :type x: numpy.ndarray
+    :type M: float
+    :type a: float
+
+    :return: f evaluated at all x
+    """
+
+    return M * (1 - (x**-a))
+
+
+def fit_powerlaw_plateau(x, y):
+    """ Fit an power law plateau function using non-linear least squares (via scipy.optimize.curve_fit)
+
+    .. math::
+
+        f(x) = M(1 - x^{-a})
+
+    :param x: independent variable
+    :param y: dependent variable
+
+    :type x: numpy.ndarray
+    :type y: numpy.ndarray
+
+    :return M: plateau value (maximum value reached)
+    :return a: decay rate parameter
+
+    :rtype M: float
+    :rtype a: float
+    """
+
+    M_guess = np.max(y)
+    #a_guess = (-np.log(1 - (y / M_guess)) / np.log(x)).mean()
+    a_guess = 1
+
+    opt, cov = curve_fit(powerlaw_plateau, x, y, p0=(M_guess, a_guess))
 
     return opt, cov

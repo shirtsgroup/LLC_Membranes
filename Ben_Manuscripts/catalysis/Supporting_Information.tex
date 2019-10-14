@@ -161,6 +161,65 @@
   (higher $d$ and $\theta$), the percentage of reacted monomers increases
   but still plateau's well below 100\%.}\label{fig:sensitivity}
   \end{figure}  
+  
+  We extrapolated the final number of reacted catalytic groups by fitting a
+  plateauing function of the form:
+  \begin{equation}
+  f(x) = M(1 - x^{-a})
+  \label{eqn:plateau}
+  \end{equation}
+  where $M$ and $a$ are the asymptotic maximum function value and the rate of
+  decay respectively. We believe this type of fit is necessary because the 
+  number of hydrogen bond "reactions" continues to grow slowly over time even
+  after long plateaus (see Figure~\ref{fig:reacted_all}).
+  
+  There are multiple regimes of growth in the number of hydrogen bond surrogate
+  reactions. Since we are interested in the asymptotic value, $M$, of the plateau,
+  we fit Equation~\ref{eqn:plateau} to the average growth curve starting after
+  40 ns where the percent reacted head groups versus the log of time becomes
+  consistently linear (see Figure~\ref{fig:loglog}).
+  
+%  Because the system is very slowly approaching a plateau, we found that 
+%  an $x^{-a}$ power law dependence in Equation~\ref{eqn:plateau} provided 
+%  a better fit to the data than an exponential dependence ($e^{-ax}$) 
+%  (see Figure~\ref{fig:fit_comparison}).
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{reacted_all.pdf}
+  \caption{}\label{fig:reacted_all}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{loglog.pdf}
+  \caption{}\label{fig:loglog}
+  \end{subfigure}
+%  \begin{subfigure}{0.325\textwidth}
+%  \includegraphics[width=\textwidth]{fit_comparison.pdf}
+%  \caption{}\label{fig:fit_comparison}
+%  \end{subfigure}
+  \caption{(a) Although the growth rate of total surrogate reactions decreases 
+  with time, it is likely that the curves will not fully plateau on a time scale
+  that we can reasonably simulate. (b) The growth rate appears to enter at least
+  three distinct regimes shown approximately by the different colored regions. We
+  fit Equation~\ref{eqn:plateau} to the last (green) regime. 
+  %(c) A power law 
+  %growth rate ($x^{-a}$) gives a superior fit to our simulation data compared to
+  %an exponential growth rate ($e^{-ax}$).
+  }\label{fig:plateau}
+  \end{figure}
+  
+  We used bootstrapping to determine the mean value of $M$ with its associated
+  uncertainty. The procedure is as follows:
+  \begin{enumerate}
+  	\item Randomly choose, with replacement, 4 of the curves in Figure~\ref{fig:reacted_all}.
+  	\item Fit Equation~\ref{eqn:plateau} to the mean of the 4 curves to get the value of $M$.
+  	\item Repeat 200 times to generate a distribution of $M$ values. 
+  	\item Report mean and standard error of $M$ distribution.
+  \end{enumerate}
+  Note that this procedure is best performed with many more than 4 curves, however
+  it should still yield a more realistic uncertainty than the typically very small
+  error returned by the single non-linear least squares fit to the average. 
 
   \pagebreak
   \bibliography{Catalysis}
