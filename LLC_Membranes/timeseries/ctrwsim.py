@@ -58,15 +58,18 @@ class CTRW(object):
         """ Initialize simulation of a continuous time random walk
 
         :param length: length of each simulated trajectory. If you fix the number of steps, this equals the number of \
-        steps. If you fix the time, the total length of the simulation is length * dt
+        steps. If you fix the time, the total length of the simulation is length * dt. If you fix the displacement, \
+        this is the absolute distance a particle must travel before the trajectory is discontinued.
         :param ntraj: number of independent trajectories to generate
         :param nmodes: number of modes. There should be sigma, alpha and H parameters for each mode
         :param hop_dist: Method used to generate random hop lengths. "gaussian" draws randomly from a gaussian \
         distribution, while "fbm" generates correlated hops as in fractional brownian motion.
-        :param dwell_dist: Name of probability distribution function used to generate random dwell times
+        :param dwell_dist: Name of probability distribution function used to generate random dwell times. If None, \
+        dwell times will all be 1 time step.
         :param hop_sigma: Sigma for Gaussian hop_dist random draws
         :param alpha: Anomalous exponent for power law random draws
         :param lamb: rate of decay for exponential random draws
+
         :param padding: multiplies number of discrete time points used to interpolate trajectories
         :param dt: time step for fixed time simulations
         :param nt: number of threads to use where parallelized
@@ -79,7 +82,7 @@ class CTRW(object):
         :type ntraj: int
         :type nmodes: int
         :type hop_dist: str
-        :type dwell_dist: str
+        :type dwell_dist: str or NoneType
         :type hop_sigma: float
         :type alpha: float
         :type lamb: float
@@ -90,7 +93,7 @@ class CTRW(object):
         :type transition_count_matrix: np.ndarray
         """
 
-        self.nsteps = length
+        self.length = length
         self.ntraj = ntraj
         self.hop_distribution = hop_dist
         self.hop_sigma = hop_sigma
@@ -113,10 +116,11 @@ class CTRW(object):
             else:
                 sys.exit("You must provide a transition count matrix if nmodes is greater than 1")
 
-        self.trajectories = np.zeros([self.ntraj, self.nsteps, 2])
-        self.trajectory_hops = np.zeros([self.ntraj, 2 * self.nsteps - 1, 2])  # for visualization
+        self.trajectories = np.zeros([self.ntraj, self.length, 2])
+        self.trajectory_hops = np.zeros([self.ntraj, 2 * self.length - 1, 2])  # for visualization
+        self.time = None
         self.time_uniform = None
-        self.z_interpolated = np.zeros([self.ntraj, self.nsteps*self.padding])  # separate from time_uniform to save memory
+        self.z_interpolated = np.zeros([self.ntraj, self.length*self.padding])  # separate from time_uniform to save memory
 
         self.msd = None
         self.fit_parameters = None
@@ -131,7 +135,7 @@ class CTRW(object):
         self.pbar = None
 
     def generate_trajectories(self, max_hop=None, fixed_time=False, noise=0, ll=0.1, limit=None, distributions=None,
-                              discrete=False):
+                              discrete=False, fixed_displacement=False):
         """ Create trajectories by randomly drawing from dwell and hop distributions
 
         :param max_hop: maximum distance a solute can hop
@@ -143,6 +147,7 @@ class CTRW(object):
         :param distributions: distributions of alpha and sigma values for dwell and hop length distributions \
         respectively. Passed as 2-tuple of arrays where each array contains a possible values of each parameter.
         :param discrete: pull from discrete dwell time probability distributions
+        :param fixed_displacement: generate trajectories that stop once they reach a certain absolute displacement
 
         :type max_hop: float or NoneType
         :type fixed_time: bool
@@ -151,6 +156,7 @@ class CTRW(object):
         :type limit: float
         :type distributions: tuple
         :type discrete: bool
+        :type fixed_displacement: bool
         """
 
         if type(ll) is not list:
@@ -159,6 +165,8 @@ class CTRW(object):
         if fixed_time:
             self.fixed_time_trajectories(ll=ll, distributions=distributions, discrete=discrete, noise=noise,
                                          max_hop=max_hop)
+        elif fixed_displacement:
+            self.fixed_displacement_trajectories()
         else:
             self.fixed_steps_trajectories(noise=noise, nt=self.nt, ll=ll, limit=limit)
 
@@ -183,7 +191,7 @@ class CTRW(object):
         if type(ll) is not list:
             ll = [ll]
 
-        self.time_uniform = np.linspace(0, self.nsteps, self.nsteps * self.padding)
+        self.time_uniform = np.linspace(0, self.length, self.length * self.padding)
 
         # generate ntraj realizations
         for t in tqdm.tqdm(range(self.ntraj)):
@@ -213,7 +221,7 @@ class CTRW(object):
             mode_sequence = list()
 
             # Determine when hops occur
-            while total_time < self.nsteps:
+            while total_time < self.length:
 
                 mode_sequence.append(mode)
 
@@ -272,7 +280,6 @@ class CTRW(object):
 
                     hurst = H[mode] if hurst_modes == self.nmodes else H[0]
 
-                    # TODO: Best way to get H. Where to truncate
                     alpha = hop_parameters[mode][0]
                     scale = hop_parameters[mode][2]
                     corrected_max_hop = self.truncation_correction.interpolate(hurst, alpha, max_hop, scale)
@@ -324,6 +331,91 @@ class CTRW(object):
         # plt.plot(self.time_uniform, self.z_interpolated[-1, :])
         # plt.show()
         # exit()
+        
+    def mean_first_passage_time(self, ll=1):
+        """ Generate n independent CTRWs that propagate until the simulated particle's absolute displacment from its
+        initial position crosses some distance threshold.
+
+        :param ll: lower limit on draws from power law dwell time distribution
+
+        :type ll: float
+
+        :return passage_times: the time it takes each particle to cross the distance threshold
+        :rtype: numpy.ndarray
+        """
+
+        self.trajectories = []
+        self.time = []
+
+        passage_times = np.zeros(self.ntraj)
+        for t in tqdm.tqdm(range(self.ntraj), unit=' Trajectories'):
+            
+            d = [0]
+            if self.hop_distribution.lower() == 'gaussian':
+                while abs(d[-1]) < self.length:
+                    d.append(d[-1] + np.random.normal(loc=0, scale=self.hop_sigma))
+
+            d = np.array(d)
+
+            if self.dwell_distribution is not None:
+                if self.dwell_distribution.lower() == 'exponential':
+                    time = rand.random_exponential(self.lamb, size=len(d))
+                elif self.dwell_distribution.lower() == 'power':
+                    time = rand.random_powerlaw(1 + self.alpha, size=len(d), ll=ll)
+                else:
+                    sys.exit('Please enter a valid dwell time probability distribution')
+            else:
+                time = np.ones(len(d))
+
+            # if d[-1] < 0:
+            #     d *= -1
+
+            d += np.random.normal(loc=0, scale=self.hop_sigma)
+            self.trajectories.append(d)
+            self.time.append(np.cumsum(time))
+
+            # crosses_zero = timeseries.switch_points(d > 0)
+            # for i, cross in enumerate(crosses_zero[1:]):
+            #
+            #     start = crosses_zero[i] + 1
+            #     if i == 0:
+            #         start = 0
+            #
+            #     end = cross + 1  # we want to include the last point
+            #
+            #     traj = np.abs(d[start:end])
+            #
+            #     self.trajectories.append(traj - traj[0])
+            #     self.time.append(np.cumsum(time[start:end]) - 1)
+            #
+            # passage_times[t] = self.time[-1][-1]
+            #print(passage_times[t])
+
+            # If a particle exits the pore back the way it came then the net flux is zero. Therefore only include the
+            # part of the trajectory where the particle stays in the pore the whole time
+            # start_inpore = d.size - np.argmax(d[::-1] < 0)
+            # if start_inpore == d.size:  # this means that d never left the pore to begin with
+            #     start_inpore = 0
+            #
+            # passage_times[t] = sum(time[start_inpore:])
+            # print(passage_times[t])
+            #
+            # self.trajectories.append(d[start_inpore:])
+            # self.time.append(np.cumsum(time[start_inpore:]) - 1)
+            # plt.plot(np.cumsum(time[start_inpore:]) - 1, d[start_inpore:])
+            # plt.show()
+
+            # plt.plot(np.cumsum(time[start_inpore:]), d[start_inpore:])
+            # plt.show()
+
+            # if passage_times[t] == 0:  # This can happen with a Levy distribution
+            #     print(d)
+            #     print(start_inpore)
+            #     plt.plot(np.cumsum(time), d)
+            #     plt.show()
+            #     exit()
+
+        return passage_times
 
     def fixed_steps_trajectories(self, noise=0, nt=1, ll=0.1, limit=None):
         """ Generate CTRW trajectories using a fixed number of steps
@@ -348,7 +440,7 @@ class CTRW(object):
 
             if self.hop_distribution == 'gaussian' or self.hop_distribution == 'Gaussian':
                 z_position = np.cumsum(
-                    np.random.normal(loc=0, scale=self.hop_sigma, size=self.nsteps))  # accumulate gaussian steps
+                    np.random.normal(loc=0, scale=self.hop_sigma, size=self.length))  # accumulate gaussian steps
             else:
                 sys.exit('Please enter a valid hop distance probability distribution')
 
@@ -356,9 +448,9 @@ class CTRW(object):
 
             # hop at random time intervals according to one of the following PDFs
             if self.dwell_distribution == 'exponential':
-                time = rand.random_exponential(self.lamb, size=self.nsteps)
+                time = rand.random_exponential(self.lamb, size=self.length)
             elif self.dwell_distribution == 'power':
-                time = rand.random_powerlaw(1 + self.alpha, size=self.nsteps, ll=ll, limit=limit)
+                time = rand.random_powerlaw(1 + self.alpha, size=self.length, ll=ll, limit=limit)
             else:
                 sys.exit('Please enter a valid dwell time probability distribution')
 
@@ -378,7 +470,7 @@ class CTRW(object):
         print('Interpolating Trajectories...')
         # make uniform time intervals with the same interval for each simulated trajectory
         max_time = np.min(self.trajectories[:, -1, 0])
-        self.time_uniform = np.linspace(0, max_time, self.nsteps*10)
+        self.time_uniform = np.linspace(0, max_time, self.length*10)
 
         if nt > 1:
             # self.pbar = tqdm.tqdm(total=self.ntraj)

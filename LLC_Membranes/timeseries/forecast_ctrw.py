@@ -122,10 +122,10 @@ if __name__ == "__main__":
 
         sys.hops_and_dwells(penalty=fit['breakpoint_penalty'])
 
-        sys.fit_distributions(nbins=fit['bins'], nboot=fit['nboot'], plot=True, show=False, save=True,
+        sys.fit_distributions(nbins=fit['bins'], nboot=fit['nboot'], plot=False, show=False, save=True,
                               dwell_distribution=fit['dwell_distribution'], hop_distribution=fit['hop_distribution'])
 
-        sys.estimate_hurst(modes=fit['hurst_modes'])
+        sys.estimate_hurst(modes=fit['hurst_modes'], show=False)
 
         if args.update:
             sys.update_database()

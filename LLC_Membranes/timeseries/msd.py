@@ -46,6 +46,7 @@ def initialize():
                                                                           'to adjust this if updating database.')
     parser.add_argument('-s', '--savename', default=False, type=str, help='If specified, save the MSD curve in a '
                                                                           'pickled .pl file of this name.')
+    parser.add_argument('-begin', '--begin', default=0, type=int, help='First frame to analyze')
 
     return parser
 
@@ -590,13 +591,13 @@ if __name__ == "__main__":
         D_ensemble.calculate(ensemble=True)
         # D_ensemble.fit_linear()  # make sure diffusivity is being measured from linear region of the MSD curve
         D_ensemble.bootstrap(args.nboot)
-        D_ensemble.plot(args.axis, fracshow=args.fracshow)
+        D_ensemble.plot(fracshow=args.fracshow)
         print('D = %1.2e +/- %1.2e cm^2/s' % (D_ensemble.Davg, np.abs(D_ensemble.Davg -
                                                                      D_ensemble.confidence_interval[0])))
     else:
         show = True
 
-    D = Diffusivity(args.trajectory, args.gro, args.axis, residue=args.residue, atoms=args.atoms)
+    D = Diffusivity(args.trajectory, args.gro, args.axis, begin=args.begin, residue=args.residue, atoms=args.atoms)
 
     if args.pores or args.tails:  # do this if solutes are restricted to tails or pores
         D.restrict_to_pore(args.pore_radius, tails=args.tails)
@@ -627,7 +628,7 @@ if __name__ == "__main__":
         args.fracshow = 1  # same amount of statistics at each frame
 
     show = False
-    D.plot(args.axis, fracshow=args.fracshow, show=show)
+    D.plot(fracshow=args.fracshow, show=show, save=True)
 
     if args.update:
         D.update_database(args.wt_water, ensemble=args.ensemble, frac=args.fracshow)

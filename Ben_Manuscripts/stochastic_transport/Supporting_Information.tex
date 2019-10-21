@@ -44,16 +44,24 @@ Phase Lyotropic Liquid Crystal Membrane}
   \begin{table}[htb!]
   \centering
   \newcolumntype{A}{ >{\centering\arraybackslash} m{2.5in} }
-  \newcolumntype{B}{ >{\centering\arraybackslash} m{0.75in} }
-  \newcolumntype{C}{m{2.75in}}
+  \newcolumntype{B}{ >{\centering\arraybackslash} m{0.5in} }
+  \newcolumntype{C}{m{3in}}
   \begin{tabular}{|A|B|C|}
   \hline
   \textbf{Script Name} & \textbf{Section} & ~~~~~~~~~~~~~~~~~~~~~\textbf{Description} \\
   \hline
 
   % mimic this
-  \texttt{/setup/param.sh} & 2.1 & Parameterize liquid
-  crystal monomers and solutes with GAFF \\ \hline
+  \texttt{/setup/parameterize.py}            & 2.1 & Parameterize liquid crystal monomers and solutes with GAFF \\ \hline
+  \texttt{/setup/build.py}                   & 2.1 & Build simulation unit cell \\ \hline
+  \texttt{/setup/place\_solutes\_pores.py}   & 2.1 & Place equispaced solutes in the pore centers of a unit cell \\\hline
+  \texttt{/setup/equil.py}                   & 2.1 & Equilibrate unit cell and run production simulation \\\hline
+  \texttt{/analysis/solute\_partitioning.py} & 2.1 & Determine time evolution of partition of solutes between pores and tails \\\hline
+  \texttt{/timeseries/msd.py}                & 2.2 & Calculate the mean squared displacement of solutes \\\hline
+  \texttt{/analysis/sfbm\_parameters.py}     & 2.2 & Get subordinated fractional Brownian motion parameters by fitting to a solute's dwell and hop length distributions and positional autocorrelation function. \\\hline
+  \texttt{/timeseries/ctrwsim.py}            & 2.2 & Generate realizations of a continuous time random walk with the user's choice of dwell and hop distributions \\\hline
+  \texttt{/timeseries/forecast\_ctrw.py}     & 2.2 & Combines classes from \texttt{sfbm\_parameters.py} and \texttt{ctrwsim.py} to parameterize and predict MSD in one shot. \\\hline
+  \texttt{/analysis/ markov\_state\_dependent\_dynamics.py} & 2.3 & Identify frame-by-frame state of each solute, construct a transition matrix and simulate realizations of the MSDDM model. \\\hline
 
   \end{tabular}
 

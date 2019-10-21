@@ -6,6 +6,18 @@ from LLC_Membranes.llclib import file_rw
 from LLC_Membranes.timeseries.ctrwsim import CTRW
 import matplotlib.pyplot as plt
 import numpy as np
+import argparse
+
+def initialize():
+
+	parser = argparse.ArgumentParser()
+	parser.add_argument('-r', '--residue', default='URE', help='Name of residue to analyze')
+	parser.add_argument('-msd', '--recalculate_msd', action="store_true")
+	parser.add_argument('-walks', '--recalculate_walks', action="store_true")
+	parser.add_argument('-m', '--nmodes', type=int, default=1)
+	parser.add_argument('-n', '--ntraj', type=int, default=1000)
+
+	return parser
 
 def md_diffusivity():
 
@@ -22,18 +34,21 @@ def md_diffusivity():
 
         return MD_MSD
 
+args = initialize().parse_args()
+res = args.residue
 
-res = 'URE'
+print('Residue %s' % res)
 directory = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/%s/10wt" % res
-fracshow = 0.4  # fraction of MD MSD to plot
-recalculate_msd = True 
-recalculate_walks = True
-nmodes = 1 
-ntraj = 100  # number of trajectories to simulate
+endframe = 2000
+#fracshow = 0.4  # fraction of MD MSD to plot
+recalculate_msd = args.recalculate_msd 
+recalculate_walks = args.recalculate_walks
+nmodes = args.nmodes 
+ntraj = args.ntraj  # number of trajectories to simulate
 nboot = 200  # number of bootstrap trials when getting errorbars on MSD
 padding = 10  # higher number gives better resolution to CTRW trajectories
 
-equil = {'GCL': 2400, 'URE': 2000, 'MET': 7000, 'ACH': 8800}  # frame number, not ns. (multiply ns by 2)
+equil = {'GCL': 2400, 'URE': 2000, 'MET': 7000, 'ACH': 4000}  # frame number, not ns. (multiply ns by 2)
 
 traj = '5ms_nojump.xtc'
 gro = 'em.gro'
@@ -51,14 +66,16 @@ else:
 
 		MD_MSD = md_diffusivity()
 	
-endshow = int(MD_MSD.nT * fracshow)
+#endshow = int(MD_MSD.nT * fracshow)
+endshow = endframe
 dt = MD_MSD.dt
 plt.plot(np.arange(endshow)*dt, MD_MSD.MSD_average[:endshow], color='black', lw=2)
 plt.fill_between(np.arange(endshow)*dt, MD_MSD.MSD_average[:endshow] + MD_MSD.limits[0, :endshow], MD_MSD.MSD_average[:endshow] - MD_MSD.limits[1, :endshow], alpha=0.3, color='black')
 labels = ['MD']
 
 nsteps = MD_MSD.nT  # match the number of frames 
-endframe = int(fracshow * padding * nsteps)
+#endframe = int(fracshow * padding * nsteps)
+endframe *= padding
 
 # probably easier to just re-run these calculations in the appropriate directory. 
 # Doesn't matter which dwell/hop is used as they will be re-fit below
@@ -66,8 +83,8 @@ sys = file_rw.load_object('%s/forecast_%s_%dstate.pl' % (directory, res, nmodes)
 dwell_dist = ['Power Law', 'Power Law Exponential Cutoff', 'Power Law', 'Power Law Exponential Cutoff']
 hop_dist = ['Gaussian', 'Gaussian', 'Levy', 'Levy']
 
-dwell_dist = ['Power Law Exponential Cutoff']
-hop_dist = ['Levy']
+#dwell_dist = ['Power Law Exponential Cutoff']
+#hop_dist = ['Levy']
 
 # names here will appear in legend
 abbreviations = {'Power Law Gaussian': 'sFBM', 'Power Law Exponential Cutoff Gaussian': 'sFBMcut', 'Power Law Levy': 'sFLM', 'Power Law Exponential Cutoff Levy': 'sFLMcut'}
@@ -139,8 +156,9 @@ for i, dists in enumerate(zip(dwell_dist, hop_dist)):
 		
 	labels.append(abbrev)
 
-#plt.legend(labels, loc=0, fontsize=14)
+plt.legend(labels, loc=0, fontsize=14)
 plt.tight_layout()
-plt.savefig('toc_msd.png')
-#plt.savefig('%dmode_msd_comparison_%s.pdf' % (nmodes,res))
-plt.show()
+#plt.savefig('toc_msd.png')
+plt.savefig('%dmode_msd_comparison_%s.pdf' % (nmodes,res))
+#if not noshow:
+#	plt.show()
