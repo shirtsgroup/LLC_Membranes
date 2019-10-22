@@ -48,6 +48,10 @@ class HurstCorrection:
                 interp = -10  # H needs to be a large negative number to get the lag 1 acf to be close to -0.5
             elif hurst == 0.5:
                 interp = hurst + (1 / alpha) - 0.5
+            elif 0.05 > (hurst - 0.5) > 0:
+                interp = 0.5
+                print('NOTE: The hurst parameter is greater than 0.5. I will assume that this is a consequence of'
+                      'measurement noise and adjust H down to 0.5.')
             else:
                 raise Exception('The database is incomplete around H = %f so it cannot be interpolated. Please '
                                 'add more data where this value of H has been achieved.' % hurst)

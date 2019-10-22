@@ -119,6 +119,9 @@ class FLM:
                     try:
                         too_big = np.where(np.abs(z) > self.truncate)[0]
                     except FloatingPointError:
+                        print(self.truncate)
+                        np.savez_compressed('truncate.npz', z=z)
+                        exit()
                         for i in np.abs(z):
                             print(i)
                         exit()

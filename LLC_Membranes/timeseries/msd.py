@@ -47,13 +47,14 @@ def initialize():
     parser.add_argument('-s', '--savename', default=False, type=str, help='If specified, save the MSD curve in a '
                                                                           'pickled .pl file of this name.')
     parser.add_argument('-begin', '--begin', default=0, type=int, help='First frame to analyze')
+    parser.add_argument('-end', '--end', default=-1, type=int, help='Last frame to analyze')
 
     return parser
 
 
 class Diffusivity(object):
 
-    def __init__(self, traj, gro, axis, begin=0, startfit=0.01, endfit=1, residue=False, atoms=(), restrict=()):
+    def __init__(self, traj, gro, axis, begin=0, end=-1, startfit=0.01, endfit=1, residue=False, atoms=(), restrict=()):
         """ Calculate diffusivity from trajectory
 
         :param traj: unwrapped trajectory (i.e. gmx trjconv with -pbc nojump)
@@ -78,7 +79,7 @@ class Diffusivity(object):
 
         # initialize trajectory properties
         print('Loading trajectory...', end='', flush=True)
-        self.t = md.load(self.traj, top=self.gro)[begin:]  # load trajectory
+        self.t = md.load(self.traj, top=self.gro)[begin:end]  # load trajectory
         print('Done!')
         self.nT = self.t.n_frames  # number of frames
         self.time = self.t.time / 1000  # time stamp on each frame, converted to nanoseconds
@@ -360,10 +361,8 @@ class Diffusivity(object):
 
         """
 
-        eMSDs = np.zeros([self.nT, N], dtype=float)  # create n bootstrapped trajectories
-        print(eMSDs.shape)
-        print(self.MSD.shape)
-        print(self.com.shape)
+        eMSDs = np.zeros([self.MSD.shape[0], N], dtype=float)  # create n bootstrapped trajectories
+
         print('Bootstrapping MSD curves...')
         for b in tqdm.tqdm(range(N)):
             indices = np.random.randint(0, self.com.shape[1], self.com.shape[1])  # randomly choose particles with replacement
@@ -374,9 +373,9 @@ class Diffusivity(object):
         lower_confidence = (100 - confidence) / 2
         upper_confidence = 100 - lower_confidence
 
-        self.limits = np.zeros([2, self.nT], dtype=float)  # upper and lower bounds at each point along MSD curve
+        self.limits = np.zeros([2, self.MSD.shape[0]], dtype=float)  # upper and lower bounds at each point along MSD curve
         # determine error bound for each tau (out of n MSD's, use that for the error bars)
-        for t in range(self.nT):
+        for t in range(self.MSD.shape[0]):
             self.limits[0, t] = np.abs(np.percentile(eMSDs[t, :], lower_confidence) - self.MSD_average[t])
             self.limits[1, t] = np.abs(np.percentile(eMSDs[t, :], upper_confidence) - self.MSD_average[t])
 
@@ -597,7 +596,9 @@ if __name__ == "__main__":
     else:
         show = True
 
-    D = Diffusivity(args.trajectory, args.gro, args.axis, begin=args.begin, residue=args.residue, atoms=args.atoms)
+    print(args.begin, args.end)
+    D = Diffusivity(args.trajectory, args.gro, args.axis, begin=args.begin, end=args.end,
+                    residue=args.residue, atoms=args.atoms)
 
     if args.pores or args.tails:  # do this if solutes are restricted to tails or pores
         D.restrict_to_pore(args.pore_radius, tails=args.tails)

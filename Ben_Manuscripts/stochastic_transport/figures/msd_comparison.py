@@ -16,6 +16,8 @@ def initialize():
 	parser.add_argument('-walks', '--recalculate_walks', action="store_true")
 	parser.add_argument('-m', '--nmodes', type=int, default=1)
 	parser.add_argument('-n', '--ntraj', type=int, default=1000)
+	parser.add_argument('-e', '--endframe', type=int, default=2000)
+	parser.add_argument('-noshow', '--noshow', action="store_true")
 
 	return parser
 
@@ -39,7 +41,7 @@ res = args.residue
 
 print('Residue %s' % res)
 directory = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/%s/10wt" % res
-endframe = 2000
+endframe = args.endframe 
 #fracshow = 0.4  # fraction of MD MSD to plot
 recalculate_msd = args.recalculate_msd 
 recalculate_walks = args.recalculate_walks
@@ -160,5 +162,5 @@ plt.legend(labels, loc=0, fontsize=14)
 plt.tight_layout()
 #plt.savefig('toc_msd.png')
 plt.savefig('%dmode_msd_comparison_%s.pdf' % (nmodes,res))
-#if not noshow:
-#	plt.show()
+if not args.noshow:
+	plt.show()

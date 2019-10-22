@@ -296,7 +296,7 @@ def random_exponential(lam, size=1, xmin=0):
     :return: array of random draws
     """
 
-    return xmin -np.log(1 - np.random.uniform(0, 1, size=size)) / lam
+    return xmin - np.log(1 - np.random.uniform(0, 1, size=size)) / lam
 
 
 def random_powerlaw_cutoff(alpha, lam, xmin=1, size=1):

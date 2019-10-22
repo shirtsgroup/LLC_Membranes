@@ -885,91 +885,17 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   Figure~\ref{fig:hop_distribution_comparison}. The L\'evy distribution does a better
   job capturing the heavy tails and high density near 0 of the hop length distribution.
   However, since there are no known exact simulation techniques for generating 
-  realizations of fractional L\'evy motion, we must explore whether this more general
+  realizations of fractional L\'evy motion, we must evaluate whether this more general
   fit is worthwhile. 
   
   We also modeled the distribution of dwell times in two ways. First, we assumed pure
   power law behavior since it is consistent with most theoretical descriptions of CTRWs.
-  The data fits well to this model at short dwell times but
-  the density of long dwell times is over-estimated. In our second approach, we truncate
-  the power law distribution with an exponential cut-off, lowering the probability of
-  long dwell times. We demonstrate this effect in the inset to Figure~\ref{fig:powerlaw}, where the
+  The data fits well to this model at short dwell times but the density of long dwell
+  times is over-estimated. In our second approach, we truncate the power law distribution
+  with an exponential cut-off, lowering the probability of extremely long dwell times. 
+  We demonstrate this effect in the inset to Figure~\ref{fig:powerlaw}, where the
   density of the truncated power law drops below that of the pure power law and tends towards
   0 near a dwell time of 250 ns.
-  
-  The model parameters for the 1 and 2 mode models are tabulated in 
-  Tables~\ref{table:sfbm_params} and~\ref{table:sfbm_params_2mode} respectively 
-  and tell their own story about each solute's behavior. 
-%  Using the techniques 
-%  from Section~\ref{method:model_sFBM}, we extracted parameter values for each
-%  solute in order to create 1 and 2 mode models, displayed in Tables~\ref{table:sfbm_params} 
-%  and~\ref{table:sfbm_params_2mode} respectively. 
-  Higher values of $\sigma$ and lower
-  values of $\alpha_h$ indicate larger average hop length magnitudes by increasing the
-  hop length distribution's width and tail density respectively. Higher values of $\alpha_d$
-  indicate a lower probability of long dwell times. Higher values of $\lambda$ truncate
-  the power law distribution earlier preventing extremely long dwell times. Values of $H$
-  closer to the Brownian limit of 0.5, indicate a lower degree of negative correlation 
-  between hops. All of which contribute to an overall increase in the MSD.
-  
-  The parameters of the 1 mode model indicate some diversity in solute behavior. The value
-  of $\alpha_d$ for pure and truncated power law fits to the dwell time distributions of 
-  urea, ethylene glycol and methanol are similar. The value of $\alpha_d$ for acetic
-  acid is significantly lower than the rest of the solutes meaning it stays trapped 
-  for long periods of time more frequently. The value of $\lambda$ is largest for
-  methanol indicating that its longest dwell time is shorter than the longest dwell
-  times of all other solutes. When hops are fit to a Gaussian, it is clear that acetic
-  acid takes the smallest hops while methanol takes the largest. If we fit hops to a
-  L\'{e}vy stable distribution, we observe a similar trend in $\sigma$ values, but 
-  with varying weights on the distribution's tails. Acetic acid has the heaviest
-  tails (lowest $\alpha_h$), meaning it is more likely to take large hops, while 
-  ethylene glycol stays close to a Gaussian distribution (i.e. $\alpha_h$ near 2).
-  The Hurst parameters indicate a moderate degree of anti-correlation between hops. 
-  Surprisingly, methanol takes the most anti-correlated hops (lowest $H$). This is
-  likely because methanol spends the largest fraction of its time within the pores. 
-  It can still make large hops thanks to its small size, but tends to bounce around
-  the tails.
-
-%  BJC4: urea and ethylene glycol only
-%  The parameters of the 1 mode model are similar between urea and ethylene glycol which 
-%  is not surprising considering their similar MD MSDs. Dwell times by 
-%  ethylene glycol are shorter as shown by its larger $\alpha_d$ and $\lambda$ values. Both
-%  solutes make similarly sized hops with hop distributions that are relatively close 
-%  to Gaussian (i.e. $\alpha_h$ near 2) when fit to a L\'evy stable distribution. Finally,
-%  both solutes exhibit a similar degree of correlation between hops with ethylene glycol
-%  exhibiting motion closer to Brownian. 
-  
-  The difference in parameters of each mode of the 2 mode sFBM model offer additional
-  mechanistic insight which the 1 mode model lacks. It is clear that solutes are 
-  significantly slowed while they are in the tail region (mode 2) where long dwell times
-  are more probable and hops are smaller (smaller $\alpha_d$). 
-% BJC: I'm not sure how valid it is to analyze lambda because it is dependent on alpha. There is some counterbalancing going on.  
-% The values of $\lambda$, however, do not 
-% appear to be directly correlated to mode. For example, $\lambda$ for ethylene glycol is
-% lower in the pores, meaning its longest dwell times in the pores are longer than its
-% longest dwell times in the tails. This may be a consequence of    
-  Interestingly, $\alpha_h$ for urea and acetic acid in mode 2 is 1.50 meaning its 
-  hop distribution is heavy tailed relative to ethylene glycol and methanol whose 
-  $\alpha_h$ values are more consistent with a Gaussian distribution. Acetic acid and
-  urea are structurally similar molecules, both planar with two heavy atoms attached to
-  a carbonyl group. Their small size and rigid shape may allow them to slip through 
-  gaps in the tails. Meanwhile, methanol is small enough that it does not need to make 
-  larger jumps to escape traps. 
-  
-%  BJC4: Urea and ethlyene glycol only
-%  The parameters of the 2 mode model are again similar between urea and ethylene glycol, 
-%  but the difference between parameters of each mode offer more detailed mechanistic
-%  insight than the 1 mode model. It is clear that solutes are significantly slowed while
-%  they are in the tail region where long dwell times are more probable (lower $\alpha_d$)
-%  and hops are smaller (smaller $\sigma$).  
-%  Interestingly, $\alpha_h$ for urea in mode 2 is 1.50 meaning its hop distribution is
-%  heavy tailed relative to ethylene glycol which has an $\alpha_d$ more consistent 
-%  with a Gaussian distribution. Although urea's $\sigma$ parameter is much smaller in 
-%  the tails, it still has an appreciable probability of making large hops. This could 
-%  be a consequence of urea's relatively small size and rigid shape compared to ethylene glycol.
-  %Ethylene glycol is a linear chain that can
-  %easily become entangled among the alkane tails while urea is planar with its four
-  %heavy atoms bonded to a single central atom.
   
   % BJC3: is it worth trying to combine these tables?
   % BJC: note to self -- modes are flipped in simulation output because 
@@ -1006,32 +932,33 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \multicolumn{7}{|c|}{2 Mode Model} \\\hline
                 & Parameters                               & Mode & Urea         & Ethylene Glycol &  Methanol    & Acetic Acid \\
   \hline
-                &\multirow{2}{*}{$P(\alpha_d)$}            & 1    & 0.69         &  0.69           & 0.92         & 0.58         \\\cline{3-7}
+                &\multirow{2}{*}{$P(\alpha_d)$}            & 1    & 0.69         &  0.69           & 0.90         & 0.58         \\\cline{3-7}
   Dwell         &                                          & 2    & 0.38         &  0.48           & 0.58         & 0.33         \\\cline{2-7}
-  Distributions &\multirow{2}{*}{$P_T(\alpha_d, \lambda)$} & 1    & 0.56, 0.0037 &  0.62, 0.0026   & 1.07, 0.0005 & 0.41, 0.0026 \\\cline{3-7}
-                &                                          & 2    & 0.00, 0.0027 &  0.06, 0.0049   & 0.32, 0.0049 & 0.00, 0.0021 \\\hline
-                &\multirow{2}{*}{$\mathcal{N}(\sigma)$}    & 1    & 0.35         &  0.38           & 0.43         & 0.32         \\\cline{3-7}
+  Distributions &\multirow{2}{*}{$P_T(\alpha_d, \lambda)$} & 1    & 0.56, 0.0037 &  0.62, 0.0026   & 1.04, 0.0006 & 0.41, 0.0026 \\\cline{3-7}
+                &                                          & 2    & 0.00, 0.0027 &  0.06, 0.0049   & 0.30, 0.0054 & 0.00, 0.0021 \\\hline
+                &\multirow{2}{*}{$\mathcal{N}(\sigma)$}    & 1    & 0.35         &  0.38           & 0.45         & 0.32         \\\cline{3-7}
   Hop           &                                          & 2    & 0.24         &  0.23           & 0.32         & 0.17         \\\cline{2-7}
-  Distributions &\multirow{2}{*}{$L(\sigma, \alpha_h)$}    & 1    & 0.24, 1.91   &  0.26, 1.99     & 0.28, 1.87   & 0.21, 1.91   \\\cline{3-7}
-                &                                          & 2    & 0.12, 1.50   &  0.15, 1.90     & 0.20, 1.80   & 0.09, 1.50   \\\hline
+  Distributions &\multirow{2}{*}{$L(\sigma, \alpha_h)$}    & 1    & 0.24, 1.91   &  0.26, 1.99     & 0.31, 1.97   & 0.21, 1.91   \\\cline{3-7}
+                &                                          & 2    & 0.12, 1.50   &  0.15, 1.90     & 0.20, 1.85   & 0.09, 1.50   \\\hline
   Correlation   & $\gamma(H)$                              & --   & 0.37         &  0.40           & 0.30         & 0.34         \\\cline{3-7}
   \hline 
   \end{tabular}
-  %MRS4: more about what the consequences of these results are?
-  \caption{To create a 2 mode model, we generated a set of parameters based on solute
-  behavior as function of distance from the pore center. Mode 1 corresponds to solute
-  behavior within 0.75 nm of the pore center and mode 2 corresponds to behavior greater
-  than or equal to 0.75 nm from the pore center. Note that we used the same Hurst parameter
-  for both modes due to a low number of sufficiently long sequences of hops in each mode. 
-  See Table~\ref{table:sfbm_params} for descriptions of the parameters.}\label{table:sfbm_params_2mode}
+  \caption{The two model parameterizes solute behavior in the pores and tails separately. 
+  Generally, movement is much more restricted in the tail region. To create a 2 mode model,
+  we generated a set of parameters based on solute behavior as function of distance from
+  the pore center. Mode 1 corresponds to solute behavior within 0.75 nm of the pore center
+  and mode 2 corresponds to behavior greater than or equal to 0.75 nm from the pore center.
+  Note that we used the same Hurst parameter for both modes due to a low number of 
+  sufficiently long sequences of hops in each mode. See Table~\ref{table:sfbm_params} for
+  descriptions of the parameters.}\label{table:sfbm_params_2mode}
   \end{table}
   
-  Our models can reasonably predict the MD simulated MSDs. Using the parameters in 
-  Tables~\ref{table:sfbm_params} and~\ref{table:sfbm_params_2mode} as inputs, we compared
-  the MSD of simulated anomalous diffusion trajectories to MD simulated MSDs. The MSD
-  curves generated from 1 and 2 mode models are overlayed with the MD simulated MSDs
-  for comparison in Figures~\ref{fig:anomalous_msds_1mode} and 
-  Figure~\ref{fig:anomalous_msds_2mode} respectively. 
+  Using the parameters in Tables~\ref{table:sfbm_params} and~\ref{table:sfbm_params_2mode}
+  as inputs to our models, we obtain reasonable predictions of the MD simulated MSDs. The 
+  MSD curves generated from 1 and 2 mode models are overlayed with the MD simulated MSDs for 
+  comparison in Figures~\ref{fig:anomalous_msds_1mode} and Figure~\ref{fig:anomalous_msds_2mode}
+  respectively. Our anomalous diffusion trajectories have a significantly reduced 
+  uncertainty and lie well within the error bars of MD.
   
   \begin{figure}
   \centering
@@ -1083,94 +1010,117 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \end{figure}
   
   Truncating the power laws with an exponential cut-off has the largest effect on the on 
-  the match between MD MSD and simulated anomalous diffusion trajectories. Without 
-  truncation, the MD MSDs are underestimated. This is because dwell times on the order 
-  of the MD simulation length are sampled and incorporated into the simulated anomalous
-  diffusion trajectories, reducing the MSD. The longest observed dwell time among the
-  solutes was 1.3 $\mu$s by ethylene glycol.
+  the match between the MD-calculated MSD and that measured from the simulated anomalous
+  diffusion trajectories. Without truncation, the MD MSDs are underestimated in all cases.
+  This is because dwell times on the order of the MD simulation length are sampled and 
+  incorporated into the simulated anomalous diffusion trajectories, reducing the MSD. 
+  The longest observed dwell time among the solutes was 1.3 $\mu$s by ethylene glycol.
   
   %BJC3: simulated anomalous diffusion --> SAD ? HMM kind of a downer
   Simulated anomalous diffusion trajectories which draw from a L\'evy stable distribution
   generally predict higher MSDs. The heavy tails of the distribution incorporate large
   jumps more frequently into the trajectories. The only exception is that of ethylene
   glycol in the 2 mode model where the L\'evy index for both modes is near 2, indicating
-  a near Gaussian distribution, but the MLE of the $\sigma$ values of the L\'evy stable
-  distribution are much smaller than the Gaussian MLE $\sigma$ values.
-  %BJC3: I need to investigate this. How could sigma be so far underestimated if basically Gaussian
-    
-  % BJC3: I'd like to present the parameter values because they give clues
-  % towards mechanisms
-%  \begin{table}[h]
-%  \centering
-%  \begin{tabular}{|c|c|c|c|c|}
-%  \hline
-%  \multirow{4}{*}{Model} & \multicolumn{4}{c|}{Urea} \\\cline{2-5}
-%  & \multicolumn{4}{c|}{Single Mode (H = 0.37)} \\\cline{2-5}
-%  & \multicolumn{2}{c|}{Dwells} & \multicolumn{2}{c|}{hops} \\\cline{2-5}
-%  & $\alpha$ & $\lambda$ & $\sigma$ & $\alpha$ \\\hline
-%  sFBM   & 0.57 & --     & 0.33 & --   \\
-%  sFBMcut& 0.40 & 0.0024 & 0.33 & --   \\
-%  sFLM   & 0.57 & --     & 0.21 & 1.84 \\
-%  sFLMcut& 0.40 & 0.0024 & 0.21 & 1.84 \\
-%  \hline
-%  \end{tabular}
-%  \caption{We calculated values $\sigma$, $\alpha$ and $H$ from MD simulation
-%  trajectories and then computed the average ensemble-averaged MSD of 10000 
-%  simulated trajectories.}\label{table:sfbm_params}
-%  \end{table}
+  a near Gaussian distribution.
   
-%  \begin{table}[h]
-%  \centering
-%  \begin{tabular}{|M{2cm}|M{1.65cm}|M{1.95cm}|M{1.95cm}|M{1.95cm}|M{1.95cm}|}
-%  \hline
-%  1 Mode Model  & Parameters                & Urea         & Ethylene Glycol & Methanol & Acetic Acid \\
-%  \hline
-%  Dwell         & $P(\alpha_d)$             & 0.57         & & & \\
-%  Distributions & $P_T(\alpha_d, \lambda)$  & (0.4, 0.0024)& & & \\
-%  \hline
-%  Hop           & $\mathcal{N}(\sigma)$     & 0.33         & & & \\
-%  Distributions & $L(\sigma, \alpha_h)$     & (0.21, 1.84) & & & \\
-%  \hline
-%  Correlation   & $\gamma(H)$               & 0.37         & & & \\
-%  \hline 
-%  \end{tabular}
-%  \caption{To create a 1 mode model for each solute, we parameterized a pure power
-%  law ($P(\alpha_d)$) and a truncated power law $P_T(\alpha_d, \lambda)$ distribution 
-%  to describe solute dwell times. Lower values of $\alpha_d$ lead to heavier power 
-%  law tails and higher values of $\lambda$ truncate the distribution at lower
-%  dwell times. We parameterized Gaussian ($\mathcal{N}$) and L\'evy stable 
-%  ($L(\sigma, \alpha_h)$) distributions to describe solute hop lengths. We assume
-%  the mean ($\mu$) to be zero for these distributions and there to be no skewness ($\beta=0$)
-%  in the L\'evy stable distributions. High values of $\sigma$ and lower values of
-%  $\alpha_h$ result in larger hops. Finally, we parameterized the hop autocorrelation
-%  function ($\gamma(H)$) to describe the degree of correlation between hops. 
-%  Higher values of $H$ display closer to Brownian behavior.}\label{table:sfbm_params}
-%  \end{table}
-%  
-%  \begin{table}[h]
-%  \centering
-%  \begin{tabular}{|M{2cm}|M{1.65cm}|M{.75cm}|M{1.95cm}|M{1.95cm}|M{1.95cm}|M{1.95cm}|}
-%  \hline
-%  2 Mode Model  & Parameters                               & Mode & Urea         & Ethylene Glycol & Methanol & Acetic Acid \\
-%  \hline
-%                &\multirow{2}{*}{$P(\alpha_d)$}            & 1    & 0.57         & & & \\\cline{3-7}
-%  Dwell         &                                          & 2    & 0.57         & & & \\\cline{2-7}
-%  Distributions &\multirow{2}{*}{$P_T(\alpha_d, \lambda)$} & 1    &(0.4, 0.0024) & & & \\\cline{3-7}
-%                &                                          & 2    &(0.4, 0.0024) & & & \\\hline
-%                &\multirow{2}{*}{$\mathcal{N}(\sigma)$}    & 1    & 0.33         & & & \\\cline{3-7}
-%  Hop           &                                          & 2    & (0.21, 1.84) & & & \\\cline{2-7}
-%  Distributions &\multirow{2}{*}{$L(\sigma, \alpha_h)$}    & 1    & 0.33         & & & \\\cline{3-7}
-%                &                                          & 2    & (0.21, 1.84) & & & \\\hline
-%  \multirow{2}{*}{Correlation}&\multirow{2}{*}{$\gamma(H)$}& 1    & 0.37         & & & \\\cline{3-7}
-%                &                                          & 2    & 0.37         & & & \\\cline{3-7}
-%  \hline 
-%  \end{tabular}
-%  \caption{To create a 2 mode model, we generated a set of parameters based on solute
-%  behavior as function of distance from the pore center. Mode 1 corresponds to solute
-%  behavior within 0.75 nm of the pore center and mode 2 corresponds to behavior greater
-%  than or equal to 0.75 nm from the pore center. See Table~\ref{table:sfbm_params}
-%  for descriptions of the parameters.}\label{table:sfbm_params_2mode}
-%  \end{table}
+  The model parameters for the 1 and 2 mode models tell stories about each solute's behavior. 
+  Higher values of $\sigma$ and lower values of $\alpha_h$ indicate larger average 
+  hop length magnitudes by increasing the hop length distribution's width and tail 
+  density respectively. Higher values of $\alpha_d$ indicate a lower probability of 
+  long dwell times. Higher values of $\lambda$ truncate the power law distribution 
+  earlier preventing extremely long dwell times. Values of $H$ closer to the Brownian
+  limit of 0.5, indicate a lower degree of negative correlation between hops. All 
+  of which contribute to an overall increase in the MSD.
+  
+  Turning first to the parameters of the 1 mode model, we can begin to break down the
+  trends in solute MSDs. The parameters belonging to ethylene glycol and methanol are
+  relatively similar which is consistent with their similar MD-measured MSDs. Methanol 
+  tends to stay trapped for less time and takes larger hops but the most substantial
+  difference is with respect to their Hurst parameters. In fact, methanol has the lowest
+  $H$ of all the solutes studied. It is possible that we have underestimated $H$ since 
+  it appears that our model consistently under-predicts the methanol MSD curve relative
+  to other solutes. However, it remains plausible that methanol does have a low $H$ 
+  value because it spends the majority of its time outside the pore region where collisions
+  with tails are frequent. Urea has the third highest MSD which is influenced primarily
+  by more frequent and long dwell times, indicated by lower values of $\alpha_d$ and 
+  $\lambda$. Urea's hop lengths ($\sigma$) and correlation ($H$) are comparable to ethylene
+  glycol and methanol. Acetic acid has the smallest MSD among the solutes studied due 
+  to longer periods of entrapment and shorter hops. Its trapping behavior is parameterized
+  by an $\alpha_d$ value significantly lower than other solutes, but an intermediate 
+  $\lambda$ value, suggesting it experiences many medium length periods of entrapment. 
+  Its hops are smaller but are slightly compensated by a heavier tailed distribution 
+  (lower $\alpha_h$) than the other solutes. 
+  
+  We can use the 2 mode model to gain an even deeper understanding of solute behavior
+  in the pore versus in the tails. It is clear that solutes are significantly slowed 
+  while they are in the tail region (mode 2) where long dwell times are more probable
+  (smaller $\alpha_d$) and hops are smaller (smaller $\sigma$). Interestingly, 
+  $\alpha_h$ for urea and acetic acid in the tails is 1.50 meaning its hop distribution
+  is heavy tailed relative to ethylene glycol and methanol whose $\alpha_h$ values are
+  more consistent with a Gaussian distribution ($\alpha$=2). Acetic acid and urea are
+  structurally similar molecules, both planar with two heavy atoms attached to a 
+  carbonyl group. Their small size and rigid shape may allow them to slip through 
+  gaps in the tails. Meanwhile, methanol is small enough that it does not need to make 
+  larger jumps to escape traps. 
+  
+%  The parameters of the 1 mode model indicate some diversity in solute behavior. The value
+%  of $\alpha_d$ for pure and truncated power law fits to the dwell time distributions of 
+%  urea, ethylene glycol and methanol are similar. The value of $\alpha_d$ for acetic
+%  acid is significantly lower than the rest of the solutes meaning it stays trapped 
+%  for long periods of time more frequently. The value of $\lambda$ is largest for
+%  methanol indicating that its longest dwell time is shorter than the longest dwell
+%  times of all other solutes. When hops are fit to a Gaussian, it is clear that acetic
+%  acid takes the smallest hops while methanol takes the largest. If we fit hops to a
+%  L\'{e}vy stable distribution, we observe a similar trend in $\sigma$ values, but 
+%  with varying weights on the distribution's tails. Acetic acid has the heaviest
+%  tails (lowest $\alpha_h$), meaning it is more likely to take large hops, while 
+%  ethylene glycol stays close to a Gaussian distribution (i.e. $\alpha_h$ near 2).
+%  The Hurst parameters indicate a moderate degree of anti-correlation between hops. 
+%  Surprisingly, methanol takes the most anti-correlated hops (lowest $H$). This is
+%  likely because methanol spends the largest fraction of its time within the pores. 
+%  It can still make large hops thanks to its small size, but tends to bounce around
+%  the tails.
+
+%  BJC4: urea and ethylene glycol only
+%  The parameters of the 1 mode model are similar between urea and ethylene glycol which 
+%  is not surprising considering their similar MD MSDs. Dwell times by 
+%  ethylene glycol are shorter as shown by its larger $\alpha_d$ and $\lambda$ values. Both
+%  solutes make similarly sized hops with hop distributions that are relatively close 
+%  to Gaussian (i.e. $\alpha_h$ near 2) when fit to a L\'evy stable distribution. Finally,
+%  both solutes exhibit a similar degree of correlation between hops with ethylene glycol
+%  exhibiting motion closer to Brownian. 
+  
+%  The difference in parameters of each mode of the 2 mode sFBM model offer additional
+%  mechanistic insight which the 1 mode model lacks. It is clear that solutes are 
+%  significantly slowed while they are in the tail region (mode 2) where long dwell times
+%  are more probable and hops are smaller (smaller $\alpha_d$). 
+% BJC: I'm not sure how valid it is to analyze lambda because it is dependent on alpha. There is some counterbalancing going on.  
+% The values of $\lambda$, however, do not 
+% appear to be directly correlated to mode. For example, $\lambda$ for ethylene glycol is
+% lower in the pores, meaning its longest dwell times in the pores are longer than its
+% longest dwell times in the tails. This may be a consequence of    
+%  Interestingly, $\alpha_h$ for urea and acetic acid in mode 2 is 1.50 meaning its 
+%  hop distribution is heavy tailed relative to ethylene glycol and methanol whose 
+%  $\alpha_h$ values are more consistent with a Gaussian distribution. Acetic acid and
+%  urea are structurally similar molecules, both planar with two heavy atoms attached to
+%  a carbonyl group. Their small size and rigid shape may allow them to slip through 
+%  gaps in the tails. Meanwhile, methanol is small enough that it does not need to make 
+%  larger jumps to escape traps. 
+  
+%  BJC4: Urea and ethlyene glycol only
+%  The parameters of the 2 mode model are again similar between urea and ethylene glycol, 
+%  but the difference between parameters of each mode offer more detailed mechanistic
+%  insight than the 1 mode model. It is clear that solutes are significantly slowed while
+%  they are in the tail region where long dwell times are more probable (lower $\alpha_d$)
+%  and hops are smaller (smaller $\sigma$).  
+%  Interestingly, $\alpha_h$ for urea in mode 2 is 1.50 meaning its hop distribution is
+%  heavy tailed relative to ethylene glycol which has an $\alpha_d$ more consistent 
+%  with a Gaussian distribution. Although urea's $\sigma$ parameter is much smaller in 
+%  the tails, it still has an appreciable probability of making large hops. This could 
+%  be a consequence of urea's relatively small size and rigid shape compared to ethylene glycol.
+  %Ethylene glycol is a linear chain that can
+  %easily become entangled among the alkane tails while urea is planar with its four
+  %heavy atoms bonded to a single central atom.
 
   We further validated our models by training the parameters on half of the 
   equilibrated trajectories and then using them to predict the MSD calculated
@@ -1180,18 +1130,26 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   
   \begin{table}[h]
   \centering
-  \begin{tabular}{|M{1.75cm}|M{1.65cm}|M{2cm}|M{2cm}|M{2cm}|M{2cm}|}
+  \begin{tabular}{|M{1.75cm}|M{1cm}|M{1.65cm}|M{2.5cm}|M{2.5cm}|M{2.5cm}|M{2.5cm}|}
   \hline
-  \multirow{2}{*}{Solute}&\multirow{2}{*}{Model}& \multicolumn{2}{c|}{Trained on First Half} & \multicolumn{2}{c|}{Trained on Second Half}        \\\cline{3-6}
-                              &        & MSD                     & Prediction & MSD                 & Prediction \\\hline
-  \multirow{2}{*}{Urea}       & sFBMcut&\multirow{2}{*}{}        &            &\multirow{2}{*}{}    &            \\\cline{2-2}\cline{4-4}\cline{6-6}
-                              & sFLMcut&                         &            &                     &            \\\hline
-  Ethylene                    & sFBMcut&\multirow{2}{*}{}        &            &\multirow{2}{*}{}    &            \\\cline{2-2}\cline{4-4}\cline{6-6}
-  Glycol                      & sFLMcut&                         &            &                     &            \\\hline
-  \multirow{2}{*}{Methanol}   & sFBMcut&\multirow{2}{*}{}        &            &\multirow{2}{*}{}    &            \\\cline{2-2}\cline{4-4}\cline{6-6}
-                              & sFLMcut&                         &            &                     &            \\\hline
-  \multirow{2}{*}{Acetic Acid}& sFBMcut&\multirow{2}{*}{}        &            &\multirow{2}{*}{}    &            \\\cline{2-2}\cline{4-4}\cline{6-6}
-                              & sFLMcut&                         &            &                     &            \\\hline
+  \multirow{2}{*}{Solute}&\multirow{2}{*}{Modes}&\multirow{2}{*}{Model}&\multicolumn{2}{c|}{Trained on First Half} & \multicolumn{2}{c|}{Trained on Second Half}        \\\cline{4-7}
+                              &                   &        & MD MSD                & Prediction & MD MSD               & Prediction \\\hline
+  \multirow{4}{*}{Urea}       & \multirow{2}{*}{1}&sFBMcut&\multirow{4}{*}{1.43 (1.11, 1.76)}&0.31 (0.28, 0.35)&\multirow{4}{*}{1.43 (1.11, 1.77)}    &            \\\cline{3-3}\cline{5-5}\cline{7-7}
+                              &                   &sFLMcut&                         &0.35 (0.30, 0.40)&                     &            \\\cline{2-3}\cline{5-5}\cline{7-7}
+                              & \multirow{2}{*}{2}&sFBMcut&                         &0.23 (0.20, 0.27)&                     &            \\\cline{3-3}\cline{5-5}\cline{7-7}
+                              &                   &sFLMcut&                         &            &                     &            \\\hline
+                              & \multirow{2}{*}{1}&sFBMcut&\multirow{4}{*}{1.03 (0.79, 1.29)}        &            &\multirow{4}{*}{1.03 (0.77, 1.30)}    &            \\\cline{3-3}\cline{5-5}\cline{7-7}
+  Ethylene                    &                   &sFLMcut&                         &            &                     &            \\\cline{2-3}\cline{5-5}\cline{7-7}
+  Glycol                      &\multirow{2}{*}{2} &sFBMcut&                         &            &                     &            \\\cline{3-3}\cline{5-5}\cline{7-7}
+                              &                   &sFLMcut&                         &            &                     &            \\\hline
+  \multirow{4}{*}{Methanol}   &\multirow{2}{*}{1} &sFBMcut&\multirow{4}{*}{1.06 (0.69, 1.36)}        &            &\multirow{4}{*}{1.06 (0.67, 1.37)}    &            \\\cline{3-3}\cline{5-5}\cline{7-7}
+                              &                   &sFLMcut&                         &            &                     &            \\\cline{2-3}\cline{5-5}\cline{7-7}
+                              &\multirow{2}{*}{2} &sFBMcut&                         &            &                     &            \\\cline{3-3}\cline{5-5}\cline{7-7}
+                              &                   &sFLMcut&                         &            &                     &            \\\hline
+  \multirow{4}{*}{Acetic Acid}& \multirow{2}{*}{1}&sFBMcut&\multirow{4}{*}{0.35 (0.28, 0.45)}&0.31 (0.28, 0.35)&\multirow{4}{*}{0.35 (0.26, 0.47)}    &            \\\cline{3-3}\cline{5-5}\cline{7-7}
+                              &                   &sFLMcut&                         &0.35 (0.30, 0.40)&                     &            \\\cline{2-3}\cline{5-5}\cline{7-7}
+                              & \multirow{2}{*}{2}&sFBMcut&                         &0.23 (0.20, 0.27)&                     &            \\\cline{3-3}\cline{5-5}\cline{7-7}
+                              &                   &sFLMcut&                         &            &                     &            \\\hline
   \end{tabular}
   \caption{}\label{table:sFBM_train}
   \end{table}
@@ -1226,12 +1184,14 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 
   \subsection{Markov State-Dependent Dynamics}\label{section:msm_results}
   
-  To create an MSDDM for each solute, we generated emission distributions based 
-  on transitions from each state and transitions between states. There are not
+  %BJC4: maybe some kind of transitional paragraph here.  
+  
+  To create an MSDDM for each solute, we generated emission distributions for
+  fluctuations within each state and transitions between states. There are not
   enough consecutive observations of each type of transition with which to study
   their individual correlation structures so we grouped all transition distributions
   into a single distribution and measured the correlation of the series of all 
-  transitions. We lose information about individual types of transitions however, 
+  transitions. We lose information about individual types of transitions, however, 
   we believe this is unavoidable without at least an order of magnitude of additional data.
   
   We observe correlated emissions drawn from L\'evy stable distributions.
@@ -1242,7 +1202,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   The parameters of the L\'evy stable distributions along with their Hurst parameters 
   are tabulated in Table~\ref{table:msddm_params}. 
   %MRS4: might this work better visually?  Table in SI, figure here?
-  %BJC4: like a bar plot?
+  %BJC4: Somehow I'd need to fit 108 pieces of data into a figure
   \begin{figure}
   \centering
   \begin{subfigure}{0.49\textwidth}
@@ -1263,27 +1223,27 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   an appropriate way to model jumps.} \label{fig:msddm_emissions}
   \end{figure}
   
-%  %BJC3: TODO automate this table
-%  \begin{table}[h]
-%  \centering
-%  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-%  \hline
-%  & \multicolumn{3}{c|}{Urea} & \multicolumn{3}{c|}{Ethylene Glycol} & \multicolumn{3}{c|}{Methanol} & \multicolumn{3}{c|}{Acetic Acid} \\\hline
-%  State & H     & $\alpha$ & $\sigma$ & H    & $\alpha$ & $\sigma$ & H & $\alpha$ & $\sigma$ & H & $\alpha$ & $\sigma$ \\\hline
-%  1     & 0.10  & 1.79     & 0.034    & 0.09 & 1.68     & 0.045    &   &          &           &  &          &           \\
-%  2     & 0.06  & 1.80     & 0.033    & 0.09 & 1.75     & 0.037    &   &          &           &  &          &           \\
-%  3     & 0.11  & 1.88     & 0.030    & 0.11 & 1.86     & 0.030    &   &          &           &  &          &           \\
-%  4     & 0.10  & 1.95     & 0.027    & 0.04 & 1.91     & 0.028    &   &          &           &  &          &           \\
-%  5     & 0.19  & 1.34     & 0.048    & 0.15 & 1.40     & 0.062    &   &          &           &  &          &           \\
-%  6     & 0.15  & 1.45     & 0.040    & 0.11 & 1.52     & 0.040    &   &          &           &  &          &           \\
-%  7     & 0.15  & 1.61     & 0.032    & 0.05 & 1.60     & 0.040    &   &          &           &  &          &           \\
-%  8     & 0.11  & 1.71     & 0.028    & 0.05 & 1.74     & 0.030    &   &          &           &  &          &           \\
-%  T     & 0.34  & 1.42     & 0.036    & 0.37 & 1.44     & 0.045    &   &          &           &  &          &           \\\hline
-%  \end{tabular}
-%  \caption{We calculated values $\sigma$, $\alpha$ and $H$ from MD simulation
-%  trajectories and then computed the average ensemble-averaged MSD of 10000 
-%  simulated trajectories.}\label{table:msddm_params}
-%  \end{table}
+  \begin{table}[h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+  \hline
+  & \multicolumn{3}{c|}{Urea} & \multicolumn{3}{c|}{Ethylene Glycol} & \multicolumn{3}{c|}{Methanol} & \multicolumn{3}{c|}{Acetic Acid} \\\hline
+  State & H     & $\alpha$ & $\sigma$ & H    & $\alpha$ & $\sigma$   & H     & $\alpha$ & $\sigma$ & H    & $\alpha$ & $\sigma$ \\\hline
+  1     & 0.10  & 1.79     & 0.034    & 0.09 & 1.68     & 0.045      & 0.11  & 1.56     & 0.052    & 0.10 & 1.78     & 0.035    \\
+  2     & 0.06  & 1.80     & 0.033    & 0.09 & 1.75     & 0.037      & 0.07  & 1.63     & 0.043    & 0.08 & 1.88     & 0.032    \\
+  3     & 0.11  & 1.88     & 0.030    & 0.11 & 1.86     & 0.030      & 0.02  & 1.80     & 0.036    & 0.04 & 2.00     & 0.030    \\
+  4     & 0.10  & 1.95     & 0.027    & 0.04 & 1.91     & 0.028      & 0.02  & 1.75     & 0.036    & 0.04 & 2.00     & 0.027    \\
+  5     & 0.19  & 1.34     & 0.048    & 0.15 & 1.40     & 0.062      & 0.10  & 1.28     & 0.074    & 0.13 & 1.47     & 0.048    \\
+  6     & 0.15  & 1.45     & 0.040    & 0.11 & 1.52     & 0.040      & 0.03  & 1.50     & 0.042    & 0.09 & 1.70     & 0.038    \\
+  7     & 0.15  & 1.61     & 0.032    & 0.05 & 1.60     & 0.040      & 0.28  & 1.20     & 0.043    & 0.08 & 1.77     & 0.031    \\
+  8     & 0.11  & 1.71     & 0.028    & 0.05 & 1.74     & 0.030      & 0.04  & 1.83     & 0.037    & 0.01 & 2.00     & 0.030    \\
+  T     & 0.34  & 1.42     & 0.036    & 0.37 & 1.44     & 0.045      & 0.35  & 1.45     & 0.057    & 0.34 & 1.54     & 0.040    \\\hline
+  \end{tabular}
+  \caption{We calculated values of $H$, $\alpha_h$ and $\sigma$ from MD simulation
+  trajectories and then computed the average ensemble-averaged MSD of 1000 
+  simulated trajectories. The states are defined in Table~\ref{table:states}
+  except state T which refers to the transition emissions.}\label{table:msddm_params}
+  \end{table}
 %  
 %  \begin{table}[h]
 %  \centering
@@ -1307,27 +1267,27 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 %  except state T which refers to the transition emissions.}\label{table:msddm_params}
 %  \end{table}
   
-  \begin{table}[h]
-  \centering
-  \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
-  \hline
-  & \multicolumn{3}{c|}{Urea}                      & \multicolumn{3}{c|}{Ethylene Glycol} \\\hline
-  State & H     & $\alpha_h$ & $\sigma$  & H    & $\alpha_h$ & $\sigma$ \\\hline
-  1     & 0.10  & 1.79       & 0.034     & 0.09 & 1.68       & 0.045    \\
-  2     & 0.06  & 1.80       & 0.033     & 0.09 & 1.75       & 0.037    \\
-  3     & 0.11  & 1.88       & 0.030     & 0.11 & 1.86       & 0.030    \\
-  4     & 0.10  & 1.95       & 0.027     & 0.04 & 1.91       & 0.028    \\
-  5     & 0.19  & 1.34       & 0.048     & 0.15 & 1.40       & 0.062    \\
-  6     & 0.15  & 1.45       & 0.040     & 0.11 & 1.52       & 0.040    \\
-  7     & 0.15  & 1.61       & 0.032     & 0.05 & 1.60       & 0.040    \\
-  8     & 0.11  & 1.71       & 0.028     & 0.05 & 1.74       & 0.030    \\
-  T     & 0.34  & 1.42       & 0.036     & 0.37 & 1.44       & 0.045    \\\hline
-  \end{tabular}
-  \caption{We calculated values of $H$, $\alpha_h$ and $\sigma$ from MD simulation
-  trajectories and then computed the average ensemble-averaged MSD of 10000 
-  simulated trajectories. The states are defined in Table~\ref{table:states}
-  except state T which refers to the transition emissions.}\label{table:msddm_params}
-  \end{table}
+%  \begin{table}[h]
+%  \centering
+%  \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+%  \hline
+%  & \multicolumn{3}{c|}{Urea}                      & \multicolumn{3}{c|}{Ethylene Glycol} \\\hline
+%  State & H     & $\alpha_h$ & $\sigma$  & H    & $\alpha_h$ & $\sigma$ \\\hline
+%  1     & 0.10  & 1.79       & 0.034     & 0.09 & 1.68       & 0.045    \\
+%  2     & 0.06  & 1.80       & 0.033     & 0.09 & 1.75       & 0.037    \\
+%  3     & 0.11  & 1.88       & 0.030     & 0.11 & 1.86       & 0.030    \\
+%  4     & 0.10  & 1.95       & 0.027     & 0.04 & 1.91       & 0.028    \\
+%  5     & 0.19  & 1.34       & 0.048     & 0.15 & 1.40       & 0.062    \\
+%  6     & 0.15  & 1.45       & 0.040     & 0.11 & 1.52       & 0.040    \\
+%  7     & 0.15  & 1.61       & 0.032     & 0.05 & 1.60       & 0.040    \\
+%  8     & 0.11  & 1.71       & 0.028     & 0.05 & 1.74       & 0.030    \\
+%  T     & 0.34  & 1.42       & 0.036     & 0.37 & 1.44       & 0.045    \\\hline
+%  \end{tabular}
+%  \caption{We calculated values of $H$, $\alpha_h$ and $\sigma$ from MD simulation
+%  trajectories and then computed the average ensemble-averaged MSD of 10000 
+%  simulated trajectories. The states are defined in Table~\ref{table:states}
+%  except state T which refers to the transition emissions.}\label{table:msddm_params}
+%  \end{table}
 
   Most of a solute's MSD is a consequence of transitions between the 8 states
   in Table~\ref{table:states}. Motion while trapped in a state is highly 
@@ -1366,6 +1326,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   of ethylene glycol readily donate their hydrogen atoms to the carboxylate
   head groups and the ether linkages between the head groups and monomer tails. 
   
+  % /figures/msddm_state_probabilities.py
   \begin{figure}
   \centering
   \includegraphics[width=0.5\textwidth]{state_probabilities.pdf}
@@ -1387,15 +1348,14 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \includegraphics[width=\textwidth]{GCL_msddm.pdf}
   \caption{}\label{fig:GCL_msddm}
   \end{subfigure}
-  % BJC3: these need more data
-%  \begin{subfigure}{0.45\textwidth}
-%  \includegraphics[width=\textwidth]{URE_msddm.pdf}
-%  \caption{}\label{fig:MET_msddm}
-%  \end{subfigure}
-%  \begin{subfigure}{0.45\textwidth}
-%  \includegraphics[width=\textwidth]{GCL_msddm.pdf}
-%  \caption{}\label{fig:ACH_msddm}
-%  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{MET_msddm.pdf}
+  \caption{}\label{fig:MET_msddm}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{ACH_msddm.pdf}
+  \caption{}\label{fig:ACH_msddm}
+  \end{subfigure}
   \caption{MSDs predicted by the MSDDM significantly over-predict those
   from generated from MD simulations.}\label{fig:msddm_performance}
   \end{figure}

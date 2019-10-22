@@ -227,7 +227,7 @@ class CTRW(object):
 
                 # hop at random time intervals according to one of the following PDFs
                 if self.dwell_distribution.lower() in ['exponential']:
-                    time.append(rand.random_exponential(dwell_parameters[mode]))  # needs testing if ever used again
+                    time.append(rand.random_exponential(1 + dwell_parameters[mode]))  # needs testing if ever used again
                 elif self.dwell_distribution.lower() in ['power', 'powerlaw', 'power law']:
                     if self.alpha == 1:
                         time.append(1)
@@ -283,6 +283,17 @@ class CTRW(object):
                     alpha = hop_parameters[mode][0]
                     scale = hop_parameters[mode][2]
                     corrected_max_hop = self.truncation_correction.interpolate(hurst, alpha, max_hop, scale)
+                    while np.isnan(corrected_max_hop):
+
+                        alpha -= 0.01
+                        # Temporary workaround due to potential scipy bug: https://github.com/scipy/scipy/issues/9737
+                        corrected_max_hop = self.truncation_correction.interpolate(hurst, alpha - .01, max_hop, scale)
+
+                        print('NOTE: alpha adjust from %.2f to %.2f due to scipy bug' % (alpha + 0.01, alpha))
+                        if np.isnan(corrected_max_hop):
+                            sys.exit('Scipy is screwing up or the database is not populated around H=%.3f, '
+                                     'alpha=%.3f, max_hop=%.2f, scale=%.2f' % (hurst, alpha - 0.01, max_hop, scale))
+
                     flm = FLM(self.hurst_correction.interpolate(hurst, alpha), alpha, scale=scale,
                               N=length, M=4, correct_hurst=False, truncate=corrected_max_hop, correct_truncation=False)
 

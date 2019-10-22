@@ -114,6 +114,23 @@ class CoordinateTrace(object):
 
             self.radial_distance[t, :] = d[np.argmin(d, axis=0), np.arange(self.nres)]
 
+    def plot_mean_radial_distance(self, cutoff=None):
+
+        if cutoff is not None:
+            avg = []
+            for t in range(self.t.n_frames):
+                ndx = np.where(self.radial_distance[t, :] > cutoff)[0]
+                avg.append(self.radial_distance[t, ndx].mean())
+        else:
+            avg = self.radial_distance.mean(axis=1)
+
+        plt.plot(self.time / 1000, avg, lw=2)
+        plt.xlabel('Time (ns)', fontsize=14)
+        plt.ylabel('Mean distance from pore center (nm)', fontsize=14)
+        plt.tick_params(labelsize=14)
+        plt.tight_layout()
+        plt.show()
+
     def plot_trace(self, nr, colormap='plasma_r', cmax=None, savename=None, show=True):
         """ Plot the coordinate trace of chosen residue centers of mass colored according to its radial distance from
         the closest pore center
@@ -200,9 +217,13 @@ if __name__ == "__main__":
 
         file_rw.save_object(trace, '%s' % args.savename)
 
+    # trace.plot_mean_radial_distance(args.pore_radius)
+    # exit()
+
     if args.index:
         args.index = [int(i) for i in args.index]
         trace.plot_trace(args.index, cmax=args.colorbar_max)
     else:
         for i in range(trace.com.shape[1]):
             trace.plot_trace(i, cmax=args.colorbar_max)
+

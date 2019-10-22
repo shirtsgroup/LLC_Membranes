@@ -106,6 +106,7 @@ if __name__ == "__main__":
         sys = SFBMParameters(fit['trajectory'], fit['gro'], fit['residue'], start=fit['begin'], end=fit['end'],
                              step=fit['step'], ma=fit['ma'], nmodes=fit['nmodes'])
 
+        # only need this if 2 mode I think
         sys.calculate_solute_partition(spline=fit['spline'], membrane_residue=fit['membrane_residue'],
                                        r=fit['pore_cut'])
 

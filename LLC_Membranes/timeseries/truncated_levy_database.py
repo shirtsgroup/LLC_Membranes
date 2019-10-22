@@ -19,7 +19,7 @@ from LLC_Membranes.timeseries.flm_sim_params import TruncateLevy
 alphas = np.linspace(1, 2, 10)
 H = np.linspace(0.0, 0.5, 11)
 trunc = np.linspace(1, 100, 10)
-scale = 0.12
+scale = 0.35
 nrealizations = 10
 load = False
 append = True

@@ -59,6 +59,9 @@ class SFBMParameters(object):
         self.t = md.load(traj, top=gro)[start:end:step]
         print('Done!')
 
+        self.begin = start
+        self.end = end
+
         self.time = self.t.time / 1000  # time in nanoseconds
         self.dt = self.time[1] - self.time[0]  # time step
         self.nT = self.t.n_frames
@@ -209,7 +212,7 @@ class SFBMParameters(object):
                                                   spline_name=spline_name)
 
         self.partition = physical.partition(self.com, self.pore_centers, r, unitcell=self.t.unitcell_vectors,
-                                            spline=spline)
+                                            spline=spline, spline_range=(self.begin, self.end))
 
         if write_tcl:
             self.write_tcl()

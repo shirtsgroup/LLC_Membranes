@@ -691,7 +691,7 @@ def minimum_image_distance(dist, box):
     return d
 
 
-def partition(com, pore_centers, r, buffer=0, unitcell=None, npores=4, spline=False):
+def partition(com, pore_centers, r, buffer=0, unitcell=None, npores=4, spline=False, spline_range=None):
     """ Partition residue center of masses into tail and pore region
 
     :param com: positions of centers of mass of particle whose partition we are calculating
@@ -701,7 +701,8 @@ def partition(com, pore_centers, r, buffer=0, unitcell=None, npores=4, spline=Fa
     :param unitcell: unitcell vectors in mdtraj format (t.unitcell_vectors). Only needed if buffer and/or spline is used
     :param npores: number of pores
     :param spline: calculate partition with respect to pore spline
-    :param spline_path: directory where spline is located
+    :param spline_range: range of frames to use in spline. Provide a tuple with the first and last (non-inclusive)
+    frame that should be included.
 
     :type com: numpy.ndarray (nT, ncom, 3)
     :type pore_centers: numpy.ndarray (nT, npores, 2) or (nT, npores, 3) or (nT, npores, npts, 3) if spline=True where
@@ -712,6 +713,7 @@ def partition(com, pore_centers, r, buffer=0, unitcell=None, npores=4, spline=Fa
     :type npores: int
     :type spline: bool
     :type spline_path: str
+    :type spline_range: NoneType or tuple
 
     :return part: boolean numpy array with shape (nT, com.shape[1]) where True indicates a center of mass that is
     inside the inner region (i.e. < r)
@@ -723,11 +725,21 @@ def partition(com, pore_centers, r, buffer=0, unitcell=None, npores=4, spline=Fa
         npts = pore_centers.shape[2]  # number of points in each spline
 
     if nT < pore_centers.shape[0]:
-        print('The number of frames in the trajectory is less than the number frames in the spline. I will assume that'
-              ' the difference has been chopped off from the front of the full trajectory and truncate the spline '
-              'accordingly. If this seems wrong, check out partition() in LLC_Membranes.llclib.physical')
-        diff = pore_centers.shape[0] - nT
-        pore_centers = pore_centers[diff:, ...]  # assumes trajectory h
+
+        if spline_range is not None:
+
+            start, end = spline_range
+            pore_centers = pore_centers[start:end]
+
+        else:
+
+            print('The number of frames in the trajectory is less than the number frames in the spline. I will assume '
+                  'that the difference has been chopped off from the front of the full trajectory and truncate the '
+                  'spline accordingly. If this seems wrong, check out partition() in LLC_Membranes.llclib.physical')
+
+            diff = pore_centers.shape[0] - nT
+
+            pore_centers = pore_centers[diff:, ...]  # assumes trajectory h
 
     part = np.zeros([nT, com.shape[1]], dtype=bool)  # Will be changed to True if solute in pores
 
