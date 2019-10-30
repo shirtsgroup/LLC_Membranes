@@ -87,6 +87,8 @@ hop_dist = ['Gaussian', 'Gaussian', 'Levy', 'Levy']
 
 #dwell_dist = ['Power Law Exponential Cutoff']
 #hop_dist = ['Levy']
+#dwell_dist = ['Power Law']
+#hop_dist = ['Levy']
 
 # names here will appear in legend
 abbreviations = {'Power Law Gaussian': 'sFBM', 'Power Law Exponential Cutoff Gaussian': 'sFBMcut', 'Power Law Levy': 'sFLM', 'Power Law Exponential Cutoff Levy': 'sFLMcut'}

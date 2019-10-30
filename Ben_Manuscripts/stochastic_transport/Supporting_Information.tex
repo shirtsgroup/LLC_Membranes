@@ -417,6 +417,34 @@ Phase Lyotropic Liquid Crystal Membrane}
   transition matrix does not change signficantly.}\label{fig:transitions}
   \end{figure}
   
+  \section{Stationarity of Solute Trajectories}\label{section:msd_comparison}
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{URE_MSD_halves.pdf}
+  \caption{Urea}\label{fig:URE_MSD_halves}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{GCL_MSD_halves.pdf}
+  \caption{Ethylene Glycol}\label{fig:GCL_MSD_halves}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{MET_MSD_halves.pdf}
+  \caption{Methanol}\label{fig:MET_MSD_halves}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{ACH_MSD_halves.pdf}
+  \caption{Acetic Acid}\label{fig:ACH_MSD_halves}
+  \end{subfigure}
+  \caption{The ensemble of solute trajectories may be stationary if the MSD
+  calculated from different portions of the trajectory are the same. Here we
+  plot the MSD calcluated up to a 500 ns time lag of the first and second
+  halves of the equilibrated solute trajctories. Urea and acetic acid have
+  similar MSDs, providing evidence of stationarity, while the MSDs of 
+  ethylene glycol and methanol are different.}\label{fig:msd_comparison}
+  \end{figure}
+  
   \section{2-state MSDDM parameters}\label{section:simple_msddm_params}
   
   We used a simple 2-state model to illustrate how the self-transition probability 
@@ -436,6 +464,17 @@ Phase Lyotropic Liquid Crystal Membrane}
   the main text. The values are chosen to be similar to those in Table~\ref{M-table:msddm_params}
   of the main text.}\label{table:msddm_params}
   \end{table}
+  
+  \section{Mean first passage time simulations}\label{section:mfpt}
+  
+  We validated our approach to simulating trajectory realizations by testing
+  it against analytical solutions to the mean first passage time of a Brownian
+  particle with 2 absorbing boundaries.
+  
+  % equations here 
+  % Analytical CDF: https://journals.aps.org/pre/pdf/10.1103/PhysRevE.73.046104
+  % Analytical MFPT https://journals.aps.org/pre/pdf/10.1103/PhysRevE.62.6065
+  % Figures: mfpt_pdf.pdf and mfpt_cdf.pdf
 
   \clearpage
   \bibliography{stochastic_transport}

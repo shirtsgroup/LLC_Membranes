@@ -32,7 +32,7 @@ class DistributionError(Exception):
 
 class SFBMParameters(object):
 
-    def __init__(self, traj, gro, res, start=0, end=-1, step=1, ma=False, nmodes=1):
+    def __init__(self, traj, gro, res, start=0, end=-1, step=1, ma=False, nmodes=1, train=False):
         """ Using an MD trajectory, calculate fit parameters for the dwell time distribution and hop length distribution
 
         :param traj: name of MD trajectory (GROMACS .xtc or .trr)
@@ -44,6 +44,7 @@ class SFBMParameters(object):
         :param ma: calculate a moving average on the center of mass coordinate traces
         :param nmodes: number of modes to consider. 1 mode will treat all hops and dwells as being performed in the \
         same environment. 2 modes will treat hops and dwells in the tails versus pores differently.
+        :param train: if not False, provide a set of solute indices on which to train parameters.
 
         :type traj: str
         :type gro: str
@@ -52,6 +53,7 @@ class SFBMParameters(object):
         :type end: int
         :type step: int
         :type nmodes: int
+        :type train: bool or list
         """
 
         # load trajectory
@@ -78,6 +80,10 @@ class SFBMParameters(object):
         print('Calculating centers of mass...', end='', flush=True)
         self.com = physical.center_of_mass(self.pos, self.mass)  # center of mass of residues
         print('Done!')
+
+        if train:
+            self.com = self.com[:, train, :]
+            print(self.com.shape)
 
         # plot z-coordinate trace
         # for i in range(self.com.shape[1]):

@@ -54,18 +54,32 @@ def initialize():
 
 class Diffusivity(object):
 
-    def __init__(self, traj, gro, axis, begin=0, end=-1, startfit=0.01, endfit=1, residue=False, atoms=(), restrict=()):
-        """ Calculate diffusivity from trajectory
+    def __init__(self, traj, gro, axis, begin=0, end=-1, startfit=0.01, endfit=1, residue=False, atoms=(), restrict=(),
+                 solute_indices=()):
+        """ Calculate the mean squared displacement of a selection from an unwrapped coordinate trajectory
 
         :param traj: unwrapped trajectory (i.e. gmx trjconv with -pbc nojump)
         :param gro: representative coordinate file
-        :param axis: axis along which to compute MSD
+        :param axis: axis along which to compute MSD (choices: x, y, z, xy, yz, xz, xyz)
         :param startfit: start linear fit to MSD startfit % into trajectory
         :param endfit: end linear fit to MSD endfit % into trajectory
         :param residue: if specified, the residue whose center of mass MSD will be measured
         :param atoms: if specified, group of atoms whose center of mass MSD will be measured
         :param restrict: restrict selection to certain indices. For example, if you want to calculate MSD of a certain\
         residue, but only include a fraction of the total residues in the system.
+        :param solute_indices: different from restrict, this specifies the indices of the solute centers of mass of
+        which to calculate the MSDs. For example, if there are 24 solutes and you only want the MSD of the first two
+        solutes, you would pass [0, 1].
+
+        :type traj: str
+        :type gro: str
+        :type axis: str
+        :type startfit: int
+        :type endfit: int
+        :type residue: str
+        :type atoms: list
+        :type restrict: list
+        :type solute_indices: list
         """
 
         # initialize path locations
@@ -155,6 +169,9 @@ class Diffusivity(object):
                 w = (pos[f, i * atoms_per_residue:(i + 1) * atoms_per_residue, :].T * matoms).T  # weight each atom in the residue by its mass
                 self.com[f, i, :] = np.sum(w, axis=0) / self.mres  # sum the coordinates and divide by the mass of the residue
         print('Done!')
+
+        if solute_indices:
+            self.com = self.com[:, solute_indices, :]
 
         # for i in range(self.com.shape[1]):
         #     plt.plot(self.com[:, i, 2])

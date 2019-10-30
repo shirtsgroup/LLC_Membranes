@@ -3,16 +3,24 @@
 """ Find the mean first passage time (MFPT) of a type of particle
 """
 
-from LLC_Membranes.timeseries.ctrwsim import CTRW
+from LLC_Membranes.llclib import timeseries
 import matplotlib.pyplot as plt
 from matplotlib import animation
 import numpy as np
 import tqdm
+from multiprocessing import Pool
+from scipy.sparse import csr_matrix as sparse_matrix
+import warnings
+
+with warnings.catch_warnings():
+    warnings.filterwarnings('ignore', "Changing the sparsity structure of a csr_matrix is expensive. lil_matrix is "
+                                      "more efficient.")
 
 
-class MFPT(CTRW):
+class Flux:
 
-    def __init__(self, L, n, k=0.5, bulk_concentration=4, pore_concentration=4, pore_radius=0.6, nbins=25):
+    def __init__(self, L, n, dt=1., sigma=1, k=0.5, bulk_concentration=4, pore_concentration=4, pore_radius=0.6,
+                 nbins=25, nt=1):
         """ Calculate the mean first passage time for a particle by simulating a continuous time random walk of an
         ensemble of particles until they cross some distance threshold.
 
@@ -27,11 +35,18 @@ class MFPT(CTRW):
         :type steps: int
         """
 
-        super().__init__(L, n, dwell_dist=None)
+        self.length = L
+        self.ntraj = n
+        self.sigma = sigma
+        self.trajectories = []
+        self.time = []
+        self.dt = dt
 
         print('Generating Trajectories...')
-        self.passage_times = self.mean_first_passage_time()  # Generates trajectories, inherited from CTRW
 
+        self.generate_trajectories(nt=nt)
+
+        self.passage_times = None
         self.bulk_concentration = bulk_concentration
         self.mass_transfer_coefficient = k
         self.pore_concentration = pore_concentration  # concentration at pore entrance
@@ -44,7 +59,8 @@ class MFPT(CTRW):
         self.concentration = np.zeros([0, self.nbins])
         self.nparticles_in_pore = np.array([])
 
-        self.flux = self.mass_transfer_coefficient * (self.bulk_concentration - self.pore_concentration)
+        #self.flux = self.mass_transfer_coefficient * (self.bulk_concentration - self.pore_concentration)
+        self.flux_out = None
 
         self.done = np.zeros(n, dtype=bool)
         self.positions = None
@@ -56,17 +72,74 @@ class MFPT(CTRW):
         self.ax = None
         self.fig = None
 
-    def simulate_flux(self, dt=1, dz=0.1, steps=2000):
+    def _trajectory_realizations(self, ntraj, sigma):
+
+        trajectories = []
+        times = []
+
+        for _ in tqdm.tqdm(range(ntraj), unit='trajectories'):
+
+            walk = [sigma * np.random.normal()]
+            while np.abs(walk[-1]) < self.length:
+
+                walk.append(walk[-1] + sigma * np.random.normal())
+
+            walk = np.array(walk)
+            time = np.ones(len(walk))
+
+            crosses_zero = timeseries.switch_points(walk > 0)
+            for i, cross in enumerate(crosses_zero[1:]):
+
+                start = crosses_zero[i] + 1
+                if i == 0:
+                    start = 0
+
+                end = cross + 1  # we want to include the last point
+
+                traj = np.abs(walk[start:end])
+
+                trajectories.append(traj)  # + sigma * np.random.normal())
+
+                times.append(np.cumsum(time[start:end]) - 1)
+
+        return trajectories, times
+
+    def generate_trajectories(self, nt=1):
+        """ Generate Brownian trajectories
+
+        :param nt: number of threads
+        """
+
+        sigma = np.sqrt(self.dt) * self.sigma
+
+        pool = Pool(processes=nt)
+
+        trajectories_per_thread = self.ntraj // nt
+
+        arguments = [(trajectories_per_thread, sigma) for _ in range(nt)]
+
+        result = pool.starmap(self._trajectory_realizations, arguments)
+
+        for thread in range(nt):
+            self.trajectories += result[thread][0]
+            self.time += result[thread][1]
+
+    def simulate_flux(self, dt=1, dz=0.1, steps=2000, measure_flux=False):
         """ Simulate a flux into the pore, starting new particles after a specified time
         """
 
+        longest = max([len(x) for x in self.trajectories])
+
         # discretize position versus time
-        self.positions = np.zeros([self.ntraj, int(np.ceil(np.max(self.passage_times))) +
-                                   steps * self.pore_concentration]) - 1  # - 1 to help find inactive trajectories.
+        self.positions = sparse_matrix((self.ntraj, longest + steps * self.pore_concentration))
+
         self.dz = dz
         self.inlet_volume = self.pore_cross_sectional_area * self.dz
         self.time_uniform = np.arange(self.positions.shape[1]) * dt
         self.steps = steps
+
+        if measure_flux:
+            self.flux_out = np.zeros(self.steps)
 
         traj_no = 0
         start = 0
@@ -76,20 +149,15 @@ class MFPT(CTRW):
         for step in tqdm.tqdm(range(steps), unit=' Time Steps'):
 
             # figure out how many solutes to add in order to keep concentration constant
-
             nadd = self.pore_concentration - self._get_inlet_concentration(start)
-            # if step > 0:
-            #     print(self._get_inlet_concentration(start - 1))
-            #     exit()
 
             if nadd < 0:  # pore concentration too high. Don't add any
                 nadd = 0
 
-            nadd = self.pore_concentration
-
             naddtot.append(nadd)
 
             if traj_no + nadd > self.ntraj:
+                print("Cleaning position matrix ...")
 
                 previous_step = self.nparticles_in_pore.size
                 # Record the total number of particles in the pore before modifying position matrix
@@ -102,13 +170,13 @@ class MFPT(CTRW):
                 self.positions, traj_no = self._clean_position_matrix(step - previous_step)
                 start = 0
 
-                #current_location += previous_step
-
             for particle in range(traj_no, traj_no + nadd):
 
                 random_trajectory_index = np.random.choice(self.ntraj)  # randomly choose a trajectory
 
                 traj = self.trajectories[random_trajectory_index]
+                # print(traj)
+                # exit()
                 time = self.time[random_trajectory_index]
                 last = np.argmin(np.abs(time[-1] - self.time_uniform))
                 tu = self.time_uniform[:(last + 1)]
@@ -122,116 +190,24 @@ class MFPT(CTRW):
                 interpolated = traj[time_index]  # TODO: this has issues for trajectories starting at zero
 
                 self.positions[particle, start:interpolated.size + start] = interpolated
+
                 # print(self._get_inlet_concentration(start))
+
+            if measure_flux:
+
+                self.flux_out[step] = self._count_flux_out(start)
 
             traj_no += nadd
             start += 1
 
         plt.plot(naddtot)
+        #plt.plot(self.flux_out)
 
         previous_step = self.nparticles_in_pore.size
         self._update_nparticles_in_pore(steps - previous_step)
         self._update_concentration_profile(steps - previous_step)
 
         #self.animate_concentration_profile()
-
-    def simulate_constant_flux(self, nparticles=100, dt=1, dz=0.1, steps=2000):
-        """ Simulate a flux into the pore, starting new particles after a specified time
-        """
-
-        # discretize position versus time
-        self.positions = np.zeros([self.ntraj, int(np.ceil(np.max(self.passage_times))) +
-                                   steps * self.pore_concentration]) - 1  # - 1 to help find inactive trajectories.
-        self.dz = dz
-        self.inlet_volume = self.pore_cross_sectional_area * self.dz
-        self.time_uniform = np.arange(self.positions.shape[1]) * dt
-        self.steps = steps
-
-        traj_no = 0
-        start = 0
-        naddtot = []
-        total_trajectories = len(self.trajectories)
-        self.nparticles_in_pore = np.zeros(steps) - 1
-        previous_step = 0
-        print('Simulating flux by maintaing a constant number of particles in the pore')
-        for step in tqdm.tqdm(range(steps), unit=' Time Steps'):
-
-            # figure out how many solutes to add in order to keep concentration constant
-            nadd = nparticles - self._get_nparticles_in_pore(start)
-
-            if nadd < 0:  # pore concentration too high. Don't add any
-                nadd = 0
-            # print(self._get_nparticles_in_pore(start), start, nadd)
-            # if step > 0:
-            #     positive = np.where(self.positions[:, start] >= 0)[0]
-            #     print(positive.size)
-            #     exit()
-
-            naddtot.append(nadd)
-
-            if traj_no + nadd > self.ntraj:
-
-                # # Record the total number of particles in the pore before modifying position matrix
-                # self._update_nparticles_in_pore(step - previous_step)
-
-                # Record concentration profile in pore before modifying position matrix
-                self._update_concentration_profile(step - previous_step)
-
-                # Remove trajetories that are already finished
-                self.positions, traj_no = self._clean_position_matrix(step - previous_step)
-                start = 0
-
-                previous_step = step
-
-            for particle in range(traj_no, traj_no + nadd):
-
-                random_trajectory_index = np.random.choice(total_trajectories)  # randomly choose a trajectory
-
-                traj = self.trajectories[random_trajectory_index]
-                time = self.time[random_trajectory_index]
-                last = np.argmin(np.abs(time[-1] - self.time_uniform))
-                tu = self.time_uniform[:(last + 1)]
-
-                # find the indices of the time point closest to the interpolated uniform time series
-                time_index = np.argmin(np.abs(time[:, np.newaxis] - tu), axis=0)
-                # make sure that jumps don't occur in interpolated trajectory until jumps occur in real trajectory
-                time_index[np.where(tu - time[time_index] < 0)[0]] -= 1
-                time_index[np.where(time_index < 0)] += 1  # Relax above restriction for first time point
-
-                interpolated = traj[time_index]
-                # print(time_index[:4])
-                # exit()
-                interpolated = traj
-
-                self.positions[particle, start:interpolated.size + start] = interpolated
-                # print(traj[:2])
-                # print(interpolated[:2])
-                # print(self.positions[particle, start:start + 3])
-                # exit()
-            # print(self._get_nparticles_in_pore(start), start)
-            # if step > 5:
-            #     exit()
-            # if start > 1:
-            #     negative = np.nonzero(self.positions[:, (start + 1)] < 0)[0]
-            #     print(negative.size)
-            #     print(self.positions[negative, (start + 1)])
-            #     exit()
-            #     print(self._get_nparticles_in_pore(start + 1))
-
-            self.nparticles_in_pore[step] = self._get_nparticles_in_pore(start)
-
-            # if start > 1:
-            #     print(self.nparticles_in_pore[:(start + 1)])
-            #     exit()
-            # print(self.positions)
-
-            traj_no += nadd
-            start += 1
-
-        plt.plot(naddtot)
-        print(previous_step)
-        #self._update_nparticles_in_pore(steps - previous_step)
-        self._update_concentration_profile(steps - previous_step)
 
     def _get_inlet_concentration(self, step):
         """ Number of particles in inlet slab
@@ -243,16 +219,21 @@ class MFPT(CTRW):
         :return: number of particles in inlet slab
         """
 
-        nonzero = np.nonzero(self.positions[:, step] >= 0)[0]
+        # this gets progressively slower as sparse matrix grows
+        # return np.where(self.positions.tocsr()[:, step].data < self.dz)[0].size
 
-        return len(np.where(self.positions[nonzero, step] < self.dz)[0])
+        # for lil_matrix
+        # return np.where(np.array(self.positions[:, step].T.data[0]) < self.dz)[0].size
+
+        # when self.positions is already a csr matrix
+        return np.where(self.positions[:, step].data < self.dz)[0].size
 
     def _clean_position_matrix(self, step):
         """ Create a new position matrix, discarding trajectories that have left the pore already.
         """
 
-        positions = np.zeros_like(self.positions) - 1
-        nonzero = np.nonzero(self.positions[:, step] >= 0)[0]
+        positions = sparse_matrix(self.positions.shape)
+        nonzero = self.positions[:, step].nonzero()[0]
 
         positions[:nonzero.size, :(positions.shape[1] - step)] = self.positions[nonzero, step:]
 
@@ -260,9 +241,11 @@ class MFPT(CTRW):
 
         return positions, first_free_slot
 
-    def _get_nparticles_in_pore(self, step):
+    def _count_flux_out(self, step):
+        """ Return the number of particles which left the pore at x = L during this step
+        """
 
-        return np.nonzero(self.positions[:, step] >= 0)[0].size
+        return np.nonzero(self.positions[:, step] >= self.length)[0].size
 
     def _update_nparticles_in_pore(self, step):
         """ Update the array keeping track of the number of particles in the pore
@@ -272,22 +255,17 @@ class MFPT(CTRW):
         :type step: int
         """
 
-        nonzero = np.zeros(step)
-        for t in range(step):
-            nonzero[t] = self._get_nparticles_in_pore(t)
+        nonzero = self.positions[:, :step].getnnz(axis=0)
 
         self.nparticles_in_pore = np.concatenate((self.nparticles_in_pore, nonzero))
 
     def _update_concentration_profile(self, step):
 
         concentration = np.zeros([step, self.nbins])
+        # data = self.positions.T.data
 
         for t in range(step):
-            nonzero = np.nonzero(self.positions[:, t] >= 0)[0]
-            concentration[t, :] = np.histogram(self.positions[nonzero, t], self.nbins, range=(0, self.length),
-                                               density=False)[0]
-            # concentration[t, :], bins = np.histogram(self.positions[:, t], self.nbins, range=(-self.length, self.length),
-            #                                    density=False)
+            concentration[t, :] = np.histogram(self.positions[:, t].data, self.nbins, range=(0, self.length), density=False)[0]
 
         self.concentration = np.concatenate((self.concentration, concentration))
 
@@ -300,7 +278,7 @@ class MFPT(CTRW):
         if show:
             plt.show()
 
-    def plot_average_concentration(self, equil=500, show=False):
+    def plot_average_concentration(self, equil=500, show=False, theoretical=True, save=True):
         """ Plot the average concentration profile along the pore
 
         :param equil: the frame at which the flux can be considered to be equilibrated
@@ -310,12 +288,28 @@ class MFPT(CTRW):
 
         plt.figure()
         bar_edges = np.linspace(0, self.length, self.nbins + 1)
+
         bin_width = bar_edges[1] - bar_edges[0]
-        bar_locations = [b + bin_width for b in bar_edges[:-1]]
-        plt.bar(bar_locations, self.concentration[equil:, :].mean(axis=0), bin_width)
+        bar_locations = [b + (bin_width / 2) for b in bar_edges[:-1]]
+        plt.bar(bar_locations, self.concentration[equil:, :].mean(axis=0), bin_width, align='center')
         plt.xlabel('Distance along pore axis (nm)', fontsize=14)
         plt.ylabel('Concentration', fontsize=14)
+
+        if theoretical:
+            # theoretical profile based on measured flux  c = c0 * (1 - x / L)
+            x = np.linspace(0, self.length, 1000)
+            c = self.pore_concentration * (1 - x / self.length)
+            plt.plot(x, c, '--', color='black', lw=2, label='Theoretical Profile')
+            plt.legend(fontsize=14)
+
         plt.tick_params(labelsize=14)
+        plt.tight_layout()
+        plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/stochastic_transport/supporting_figures/brownian_conc_profile.pdf')
+
+        # x = np.linspace(0, self.length, 1000)
+        # c0 = self.pore_concentration
+        # j = self.pore_concentration
+        # plt.plot(x, c0 - j * x)
 
         if show:
             plt.show()
@@ -353,37 +347,24 @@ class MFPT(CTRW):
 
         return self.patches
 
-    #     # continue running trajectories until all of them have reached +/- L
-    #     self._check_length()
-    #
-    # def _check_length(self):
-    #     """ Find which particles have reached the distance threshold
-    #     """
-    #
-    #     done = np.where(np.abs(self.trajectories[..., 1]).max(axis=1) >= self.length)[0]
-    #     self.done[done] = True
-    #
-    #     for d in done:
-    #         crossing_time = np.argmax(np.abs(self.trajectories[d, :, 1]) >= self.length)
-    #         self.passage_time[d] = self.trajectories[d, crossing_time, 0]  # converts boolean and finds first True
-    #
-    #     print(done)
-    #     print(self.passage_time[done])
-
 
 if __name__ == "__main__":
-    
-    L = 10
-    ntraj = 5000
-    pore_conc = 10
-    bins = 200
-    steps = 10000
-    equil = int(steps/2)
-    dz = 0.05
-    nparticles = 100
 
-    mfpt = MFPT(L, ntraj, pore_concentration=pore_conc, nbins=bins)  # higher fluxes require more trajectories
+    L = 5
+    ntraj = 5000
+    pore_conc = 1
+    bins = 50
+    steps = 50000
+    equil = int(steps/2)
+    dz = L / bins  # when dz changes, so does the inlet concentration
+    nparticles = 100
+    sigma = 1
+    dt = 0.1
+    nt = 8
+
+    mfpt = Flux(L, ntraj, dt=dt, sigma=sigma, pore_concentration=pore_conc, nbins=bins, nt=nt)  # higher fluxes require more trajectories
     mfpt.simulate_flux(dz=dz, steps=steps)
+    #print(mfpt.flux_out[equil:].mean())
     #mfpt.simulate_constant_flux(nparticles=nparticles, dz=dz, steps=steps)
     mfpt.plot_average_concentration(equil=equil)
     mfpt.plot_number_particles(show=True)

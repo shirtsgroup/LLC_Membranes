@@ -381,6 +381,8 @@ class CTRW(object):
             # if d[-1] < 0:
             #     d *= -1
 
+            # plt.plot(np.cumsum(time), d)
+
             d += np.random.normal(loc=0, scale=self.hop_sigma)
             self.trajectories.append(d)
             self.time.append(np.cumsum(time))
@@ -402,6 +404,10 @@ class CTRW(object):
             # passage_times[t] = self.time[-1][-1]
             #print(passage_times[t])
 
+            passage_times[t] = sum(time)
+            # print(passage_times[t])
+            # plt.show()
+            # exit()
             # If a particle exits the pore back the way it came then the net flux is zero. Therefore only include the
             # part of the trajectory where the particle stays in the pore the whole time
             # start_inpore = d.size - np.argmax(d[::-1] < 0)

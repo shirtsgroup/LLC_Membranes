@@ -13,7 +13,7 @@ def initialize():
 	parser = argparse.ArgumentParser(description='Model a continuous time random walk')
 
 	parser.add_argument('-r', '--residue', default='URE')
-	parser.add_argument('-n', '--ntraj', default=1000, dtype=int)
+	parser.add_argument('-n', '--ntraj', default=1000, type=int)
 
 	return parser
 
