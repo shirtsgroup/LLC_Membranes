@@ -3,7 +3,7 @@
 """ Find the mean first passage time (MFPT) of a type of particle
 """
 
-from LLC_Membranes.llclib import timeseries
+from LLC_Membranes.llclib import timeseries, file_rw
 import matplotlib.pyplot as plt
 from matplotlib import animation
 import numpy as np
@@ -143,14 +143,15 @@ class Flux:
 
                 walk.append(walk[-1] + sigma * np.random.normal())
 
-            walk = np.array(walk)
+            if len(walk) > 2:
 
-            trajectories.append(walk)
-            times.append(np.arange(walk.size))
+                walk = np.array(walk)
 
-            if walk[-1] >= self.length:
-                n += 1
-                #self.pbar.update(1)
+                trajectories.append(walk[1:])
+                times.append(np.arange(walk[1:].size))
+
+                if walk[-1] >= self.length:
+                    n += 1
 
         return trajectories, times
 
@@ -177,7 +178,8 @@ class Flux:
             self.time += result[thread][1]
 
         if save:
-            np.savez_compressed(savename, trajectories=self.trajectories, time=self.time)
+            file_rw.save_object((self.trajectories, self.time), 'trajectories.pl')
+            #np.savez_compressed(savename, trajectories=self.trajectories, time=self.time)
 
     def simulate_flux(self, pore_concentration=1, dt=1, dz=0.1, steps=2000, measure_flux=False):
         """ Simulate a flux into the pore, starting new particles after a specified time
@@ -305,7 +307,8 @@ class Flux:
         """ Return the number of particles which left the pore at x = L during this step
         """
 
-        return np.nonzero(self.positions[:, step] >= self.length)[0].size
+        return np.where(self.positions[:, step].data >= self.length)[0].size
+        #return np.nonzero(self.positions[:, step] >= self.length)[0].size
 
     def _update_nparticles_in_pore(self, step):
         """ Update the array keeping track of the number of particles in the pore
@@ -411,23 +414,23 @@ class Flux:
 if __name__ == "__main__":
 
     L = 5
-    ntraj = 1000  # this is the number of trajectories that actually make it to the end
-    pore_conc = 5
+    ntraj = 5000  # this is the number of trajectories that actually make it to the end
+    pore_conc = 1
     bins = 25
-    steps = 400000
+    steps = 1000000
     equil = int(steps/2)  # use 3/4 of the data
     dz = L / bins  # when dz changes, so does the inlet concentration
     nparticles = 100
     sigma = 1
-    dt = 0.0005
+    dt = 0.01
     save = False
     load = False
 
     nt = 8
 
     mfpt = Flux(L, ntraj, dt=dt, sigma=sigma, nbins=bins, nt=nt, save=save, load=load)  # higher fluxes require more trajectories
-    mfpt.simulate_flux(pore_concentration=pore_conc, dz=dz, steps=steps)
-    #print(mfpt.flux_out[equil:].mean())
+    mfpt.simulate_flux(pore_concentration=pore_conc, dz=dz, steps=steps, measure_flux=True)
+    print(mfpt.flux_out[equil:].mean())
     #mfpt.simulate_constant_flux(nparticles=nparticles, dz=dz, steps=steps)
     mfpt.plot_average_concentration(equil=equil)
     mfpt.plot_number_particles(show=True)

@@ -31,7 +31,7 @@ def SchwarzD(x, period):
 
 def gyroid(x, period):
 
-    n = 2*np.pi / period
+    n = 2 * np.pi / period
 
     a = np.sin(n*x[0])*np.cos(n*x[1])
     b = np.sin(n*x[1])*np.cos(n*x[2])

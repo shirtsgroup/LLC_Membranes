@@ -57,6 +57,9 @@ class BicontinuousCubicBuild(topology.LC):
             self.period = dimensions[0]
         else:
             self.period = dimensions
+        #
+        # print(self.period)
+        # exit()
 
         # calculate nubmer of monomers that will go in the unit cell
         avogadros_number = 6.022 * 10 ** 23

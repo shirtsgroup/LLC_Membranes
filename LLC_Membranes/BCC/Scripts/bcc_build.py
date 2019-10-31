@@ -144,14 +144,20 @@ if __name__ == "__main__":
 
     LC = bcc_class.LC(args.build_mon)  # get all properties of the liquid crystal
     period = args.dim  # length of one side of the unit cell
+    # print(period)
+    # exit()
     grid = gridgen(args.phase, 0, args.dim, args.n)  # 3d grid of points from 0 to args.dim spaced by args.dim / args.n
     
     # figure out how many grid points we actually want to keep
     NA = 6.022 * 10 ** 23  # avogadros number
     mass = LC.MW / NA  # mass of a single monomer (g)
+    print(LC.MW)
+    exit()
     V = args.dim ** 3 * 10 ** -21  # volume of unit cell (cm ^ 3)
     mon_mass = (args.weight_percent / 100) * args.density * V  # mass of all monomers in unit cell
     nmon = int(mon_mass / mass)
+    print(nmon)
+    exit()
 
     mass = mw[args.solvent] / NA
     solv_mass = args.density * V * (100 - args.weight_percent) / 100

@@ -449,6 +449,7 @@ if __name__ == "__main__":
                            nprocesses=parallelize['nprocesses'])
 
     equil.build_initial_config(grid_points=build_params['grid'], r=0.4)
+    exit()
     equil.scale_unit_cell(sim_params['scale_factor'])
 
     equil.generate_topology(name='topol.top')  # creates an output file
