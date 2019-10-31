@@ -15,20 +15,26 @@ import warnings
 with warnings.catch_warnings():
     warnings.filterwarnings('ignore', "Changing the sparsity structure of a csr_matrix is expensive. lil_matrix is "
                                       "more efficient.")
+    warnings.filterwarnings('ignore', "SparseEfficiencyWarning")
 
 
 class Flux:
 
-    def __init__(self, L, n, dt=1., sigma=1, k=0.5, bulk_concentration=4, pore_concentration=4, pore_radius=0.6,
-                 nbins=25, nt=1):
+    def __init__(self, L, n, dt=1., sigma=1, nbins=25, nt=1, save=True, load=False):
         """ Calculate the mean first passage time for a particle by simulating a continuous time random walk of an
         ensemble of particles until they cross some distance threshold.
 
-        :param L: length of 1D path that particle follows (nm).
+        :param L: length of 1D path (a pore for example) that particle follows (nm).
         :param n: number of particle trajectories to generate. It should be at least the number expected to be in a pore
         at steady state, but more is always better.
-        :param steps: number of steps to take between trajectory evaluations. After the specified number of steps are
-        taken, trajectories that have crossed the distance threshold are discontinued. All else are continued.
+        :param dt: timestep to use while contsructing trajectories
+        :param sigma: width of hop distribution per unit time. The width of the hop distribution for the draws made each
+        timestep is sqrt(dt) * sigma
+        :param nbins: number of bins in concentration profile
+        :param nt: number of threads to use when generating trajectories
+        :param save: save trajectories to disk
+        :param load: load trajectories saved to disk
+
 
         :type L: float
         :type n: int
@@ -44,13 +50,11 @@ class Flux:
 
         print('Generating Trajectories...')
 
-        self.generate_trajectories(nt=nt)
+        self.generate_trajectories(nt=nt, save=save)
 
         self.passage_times = None
-        self.bulk_concentration = bulk_concentration
-        self.mass_transfer_coefficient = k
-        self.pore_concentration = pore_concentration  # concentration at pore entrance
-        self.pore_cross_sectional_area = np.pi * (pore_radius ** 2)
+        self.pore_concentration = 0  # concentration at pore entrance
+        #self.pore_cross_sectional_area = np.pi * (pore_radius ** 2)
         self.inlet_volume = 0
         self.dz = 0
         self.steps = 0
@@ -65,6 +69,7 @@ class Flux:
         self.done = np.zeros(n, dtype=bool)
         self.positions = None
         self.time_uniform = None
+        self.pbar = None
 
         # for animated plotting
         self.patches = None
@@ -79,36 +84,83 @@ class Flux:
 
         for _ in tqdm.tqdm(range(ntraj), unit='trajectories'):
 
-            walk = [sigma * np.random.normal()]
+            walk = [0]
             while np.abs(walk[-1]) < self.length:
 
                 walk.append(walk[-1] + sigma * np.random.normal())
 
             walk = np.array(walk)
-            time = np.ones(len(walk))
 
-            crosses_zero = timeseries.switch_points(walk > 0)
-            for i, cross in enumerate(crosses_zero[1:]):
+            traj, time = self._crossings(walk)
 
-                start = crosses_zero[i] + 1
-                if i == 0:
-                    start = 0
-
-                end = cross + 1  # we want to include the last point
-
-                traj = np.abs(walk[start:end])
-
-                trajectories.append(traj)  # + sigma * np.random.normal())
-
-                times.append(np.cumsum(time[start:end]) - 1)
+            trajectories += traj
+            times += time
 
         return trajectories, times
 
-    def generate_trajectories(self, nt=1):
+    def _crossings(self, x):
+
+        time = np.ones(len(x))
+        crosses_zero = timeseries.switch_points(x > 0)
+
+        trajectories = []
+        times = []
+
+        for i, cross in enumerate(crosses_zero[1:]):
+
+            start = crosses_zero[i] + 1
+            if i == 0:
+                start = 0
+
+            end = cross + 1  # we want to include the last point
+
+            traj = np.abs(x[start:end])
+            traj -= traj[0]
+
+            # Recursion!
+            if timeseries.switch_points(traj >= 0).size > 2:
+                traj_, time_ = self._crossings(traj)
+                trajectories += traj_
+                times += time_
+            else:
+                trajectories += [traj]  # + sigma * np.random.normal())
+                times += [np.cumsum(time[start:end]) - 1]
+
+        return trajectories, times
+
+    def _trajectory_realizations2(self, ntraj, sigma):
+
+        trajectories = []
+        times = []
+
+        n = 0
+
+        while n < ntraj:
+            print('\r%d/%d trajectories' % (n, ntraj), end='')
+            walk = [0]
+
+            while 0 <= walk[-1] < self.length:
+
+                walk.append(walk[-1] + sigma * np.random.normal())
+
+            walk = np.array(walk)
+
+            trajectories.append(walk)
+            times.append(np.arange(walk.size))
+
+            if walk[-1] >= self.length:
+                n += 1
+                #self.pbar.update(1)
+
+        return trajectories, times
+
+    def generate_trajectories(self, nt=1, save=True, savename='trajectories.npz'):
         """ Generate Brownian trajectories
 
         :param nt: number of threads
         """
+
+        #self.pbar = tqdm.tqdm(total=self.ntraj)
 
         sigma = np.sqrt(self.dt) * self.sigma
 
@@ -118,23 +170,30 @@ class Flux:
 
         arguments = [(trajectories_per_thread, sigma) for _ in range(nt)]
 
-        result = pool.starmap(self._trajectory_realizations, arguments)
+        result = pool.starmap(self._trajectory_realizations2, arguments)
 
         for thread in range(nt):
             self.trajectories += result[thread][0]
             self.time += result[thread][1]
 
-    def simulate_flux(self, dt=1, dz=0.1, steps=2000, measure_flux=False):
+        if save:
+            np.savez_compressed(savename, trajectories=self.trajectories, time=self.time)
+
+    def simulate_flux(self, pore_concentration=1, dt=1, dz=0.1, steps=2000, measure_flux=False):
         """ Simulate a flux into the pore, starting new particles after a specified time
         """
 
+        self.pore_concentration = pore_concentration
+
         longest = max([len(x) for x in self.trajectories])
+        total_trajectories = len(self.trajectories)
+        print(total_trajectories)
 
         # discretize position versus time
         self.positions = sparse_matrix((self.ntraj, longest + steps * self.pore_concentration))
 
         self.dz = dz
-        self.inlet_volume = self.pore_cross_sectional_area * self.dz
+        #self.inlet_volume = self.pore_cross_sectional_area * self.dz
         self.time_uniform = np.arange(self.positions.shape[1]) * dt
         self.steps = steps
 
@@ -172,24 +231,25 @@ class Flux:
 
             for particle in range(traj_no, traj_no + nadd):
 
-                random_trajectory_index = np.random.choice(self.ntraj)  # randomly choose a trajectory
+                random_trajectory_index = np.random.choice(total_trajectories)  # randomly choose a trajectory
 
                 traj = self.trajectories[random_trajectory_index]
                 # print(traj)
                 # exit()
                 time = self.time[random_trajectory_index]
                 last = np.argmin(np.abs(time[-1] - self.time_uniform))
-                tu = self.time_uniform[:(last + 1)]
+                # tu = self.time_uniform[:(last + 1)]
 
                 # find the indices of the time point closest to the interpolated uniform time series
-                time_index = np.argmin(np.abs(time[:, np.newaxis] - tu), axis=0)
-                # make sure that jumps don't occur in interpolated trajectory until jumps occur in real trajectory
-                time_index[np.where(tu - time[time_index] < 0)[0]] -= 1
-                time_index[np.where(time_index < 0)] += 1  # Relax above restriction for first time point
+                # time_index = np.argmin(np.abs(time[:, np.newaxis] - tu), axis=0)
+                # # make sure that jumps don't occur in interpolated trajectory until jumps occur in real trajectory
+                # time_index[np.where(tu - time[time_index] < 0)[0]] -= 1
+                # time_index[np.where(time_index < 0)] += 1  # Relax above restriction for first time point
+                #
+                # interpolated = traj[time_index]  # TODO: this has issues for trajectories starting at zero
 
-                interpolated = traj[time_index]  # TODO: this has issues for trajectories starting at zero
-
-                self.positions[particle, start:interpolated.size + start] = interpolated
+                #self.positions[particle, start:interpolated.size + start] = interpolated
+                self.positions[particle, start:(traj.size + start)] = traj
 
                 # print(self._get_inlet_concentration(start))
 
@@ -351,19 +411,22 @@ class Flux:
 if __name__ == "__main__":
 
     L = 5
-    ntraj = 5000
-    pore_conc = 1
-    bins = 50
-    steps = 50000
-    equil = int(steps/2)
+    ntraj = 1000  # this is the number of trajectories that actually make it to the end
+    pore_conc = 5
+    bins = 25
+    steps = 400000
+    equil = int(steps/2)  # use 3/4 of the data
     dz = L / bins  # when dz changes, so does the inlet concentration
     nparticles = 100
     sigma = 1
-    dt = 0.1
+    dt = 0.0005
+    save = False
+    load = False
+
     nt = 8
 
-    mfpt = Flux(L, ntraj, dt=dt, sigma=sigma, pore_concentration=pore_conc, nbins=bins, nt=nt)  # higher fluxes require more trajectories
-    mfpt.simulate_flux(dz=dz, steps=steps)
+    mfpt = Flux(L, ntraj, dt=dt, sigma=sigma, nbins=bins, nt=nt, save=save, load=load)  # higher fluxes require more trajectories
+    mfpt.simulate_flux(pore_concentration=pore_conc, dz=dz, steps=steps)
     #print(mfpt.flux_out[equil:].mean())
     #mfpt.simulate_constant_flux(nparticles=nparticles, dz=dz, steps=steps)
     mfpt.plot_average_concentration(equil=equil)

@@ -502,6 +502,8 @@ if __name__ == "__main__":
 
         equil.gro_name = 'solvated_final.gro'
 
+    exit()
+
     if not args.continue_xlinked:
         # cross-linking
         xlink.crosslink(xlink_params)  # run cross-linking algorithm
