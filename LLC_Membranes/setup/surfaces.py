@@ -45,7 +45,7 @@ def Sphere(x):
     return np.square(x).sum()
 
 
-def gridgen(surf, low, high, n, c=0, tol=0.05):
+def gridgen(surf, low, high, n, c=0, tol=0.01):
     """ Generate an n x n x n grid and reduce it to points that lie close to an implicit surface defined by `surf`
 
     :param surf: name of implicit surface to approximate
@@ -161,4 +161,6 @@ def gradient(v, surf, period):
 
         raise SurfaceError('The surface %s is named incorrectly or is not implemented' % surf)
 
-    return np.array([a, b, c])
+    n = np.array([a, b, c])
+
+    return n / np.linalg.norm(n)

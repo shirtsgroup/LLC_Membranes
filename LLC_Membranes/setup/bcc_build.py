@@ -150,12 +150,13 @@ class BicontinuousCubicBuild(topology.LC):
         l1 = self.LC_positions[self.lineatoms[1], :].mean(axis=0)
         l2 = self.LC_positions[self.lineatoms[0], :].mean(axis=0)
 
-        linevector = l2 - l1
+        linevector = l1 - l2
         reference_position = self.LC_positions[self.ref_atom_index, :].mean(axis=0)
 
         for i in range(self.nmon):
 
             n = surfaces.gradient(self.grid[i, :], self.space_group, period=self.period)  # vector normal to surface at point grid[i, :]
+
             R = transform.Rvect2vect(linevector, n)  # rotation matrix to rotate monomer in same direction as n
 
             # translate to origin

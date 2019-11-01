@@ -457,7 +457,7 @@ if __name__ == "__main__":
     ntraj = 5000  # this is the number of trajectories that actually make it to the end
     pore_conc = 1
     bins = 25 
-    steps = 400000
+    steps = 1000000
     equil = int(steps/2)  # use 3/4 of the data
     dz = L / bins  # make dz independent of bins. Will just need to change normalization on plot
     print('dz: %.2f' % dz)
@@ -465,7 +465,7 @@ if __name__ == "__main__":
     sigma = 1
     dt = 0.001
     print('sigma per step: %.2f' % (sigma * np.sqrt(dt)))
-    save = False
+    save = True
     load = False
 
     nt = 8
