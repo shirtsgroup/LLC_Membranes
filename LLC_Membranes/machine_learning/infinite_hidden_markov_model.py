@@ -830,14 +830,14 @@ class InfiniteHMM:
                                                  + i * shift, z, colors))  # plot
 
         ax_estimated.set_xlim([0, nT * self.dt])
-        # ymin = self.trajectories[:, traj_no, 0].min()
-        # if dim > 1:
-        #     ymax = self.trajectories[:, traj_no, 1:].max() + (dim - 1)*shift
-        # else:
-        #     ymax = self.trajectories[:, traj_no, 0].max()
-        #
-        # ax_estimated.set_ylim([ymin, ymax])
-        ax_estimated.set_ylim([self.com[:, traj_no, 2].min(), self.com[:, traj_no, 2].max()])
+        ymin = self.trajectories[:, traj_no, 0].min()
+        if dim > 1:
+            ymax = self.trajectories[:, traj_no, 1:].max() + (dim - 1)*shift
+        else:
+            ymax = self.trajectories[:, traj_no, 0].max()
+        
+        ax_estimated.set_ylim([ymin, ymax])
+        #ax_estimated.set_ylim([self.com[:, traj_no, 2].min(), self.com[:, traj_no, 2].max()])
 
         ax_estimated.tick_params(labelsize=14)
         ax_estimated.set_xlabel('Time', fontsize=14)

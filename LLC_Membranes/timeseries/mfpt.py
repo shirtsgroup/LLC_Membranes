@@ -147,8 +147,8 @@ class Flux:
 
                 walk = np.array(walk)
 
-                trajectories.append(walk[1:])
-                times.append(np.arange(walk[1:].size))
+                trajectories.append(walk)
+                times.append(np.arange(walk.size))
 
                 if walk[-1] >= self.length:
                     n += 1
@@ -205,17 +205,34 @@ class Flux:
         traj_no = 0
         start = 0
         naddtot = []
-
+        inlet = np.zeros(steps)
         print('Simulating flux by holding the interface concentration constant at %d particles' % self.pore_concentration)
         for step in tqdm.tqdm(range(steps), unit=' Time Steps'):
 
-            # figure out how many solutes to add in order to keep concentration constant
-            nadd = self.pore_concentration - self._get_inlet_concentration(start)
+            nadd = 0
+            if step > 0:
+                #print(inlet[:step], inlet[:step].mean())
+                if inlet[:step].mean() < pore_concentration:
+                    nadd = 1  # This will need to be changed to handle higher inlet concentration
+            else:
+                nadd = 1
 
-            if nadd < 0:  # pore concentration too high. Don't add any
-                nadd = 0
+            # figure out how many solutes to add in order to keep concentration constant
+            #if self._get_inlet_concentration(start) == 0 and self._get_inlet_concentration(start + 1) == 0:
+            #    nadd = 1
+            #else:
+            #    nadd = 0
+
+            
+            #c = self._get_inlet_concentration(start)
+            #nadd = self.pore_concentration - c
+            #inlet.append(c)
+
+            #if nadd < 0:  # pore concentration too high. Don't add any
+            #    nadd = 0
 
             naddtot.append(nadd)
+
 
             if traj_no + nadd > self.ntraj:
                 print("Cleaning position matrix ...")
@@ -259,11 +276,24 @@ class Flux:
 
                 self.flux_out[step] = self._count_flux_out(start)
 
+            inlet[step] = self._get_inlet_concentration(start)
+            #print(inlet[step], nadd)
+            #data = self.positions[:, start].data
+            #print(data)
+            #print(np.where(np.logical_and(data >=0, data < self.dz))[0].size)
+            #if step == 10:
+            #    exit()
+
             traj_no += nadd
             start += 1
-
+        
+      
         plt.plot(naddtot)
         #plt.plot(self.flux_out)
+        plt.figure()
+        plt.plot(inlet)
+        plt.title('Inlet Concentration')
+        file_rw.save_object(inlet, 'inlet.pl')
 
         previous_step = self.nparticles_in_pore.size
         self._update_nparticles_in_pore(steps - previous_step)
@@ -288,7 +318,9 @@ class Flux:
         # return np.where(np.array(self.positions[:, step].T.data[0]) < self.dz)[0].size
 
         # when self.positions is already a csr matrix
-        return np.where(self.positions[:, step].data < self.dz)[0].size
+        #return np.where(self.positions[:, step].data < self.dz)[0].size
+        data = self.positions[:, step].data
+        return np.where(np.logical_and(data >=0, data < self.dz))[0].size
 
     def _clean_position_matrix(self, step):
         """ Create a new position matrix, discarding trajectories that have left the pore already.
@@ -367,7 +399,7 @@ class Flux:
 
         plt.tick_params(labelsize=14)
         plt.tight_layout()
-        plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/stochastic_transport/supporting_figures/brownian_conc_profile.pdf')
+        #plt.savefig('/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/stochastic_transport/supporting_figures/brownian_conc_profile.pdf')
 
         # x = np.linspace(0, self.length, 1000)
         # c0 = self.pore_concentration
@@ -413,16 +445,26 @@ class Flux:
 
 if __name__ == "__main__":
 
+    """ NOTES
+    - include first step of trajectory (at zero) for flux simulations. But exclude from histogram method
+    - script now maintains concentration based on average of all previoius frames. Might want to update to a moving window since might only want to average equilibrium portion with equilibrium concentrations
+    - pore concentration fixed to read 0 < x < dz
+    - need to make dz independent from number of bins in concentration profile. Can be done by normalizing conc profile
+    - larger dz makes it harder to maintain concentration (?)
+    """
+
     L = 5
     ntraj = 5000  # this is the number of trajectories that actually make it to the end
     pore_conc = 1
-    bins = 25
-    steps = 1000000
+    bins = 25 
+    steps = 400000
     equil = int(steps/2)  # use 3/4 of the data
-    dz = L / bins  # when dz changes, so does the inlet concentration
+    dz = L / bins  # make dz independent of bins. Will just need to change normalization on plot
+    print('dz: %.2f' % dz)
     nparticles = 100
     sigma = 1
-    dt = 0.01
+    dt = 0.001
+    print('sigma per step: %.2f' % (sigma * np.sqrt(dt)))
     save = False
     load = False
 
@@ -430,7 +472,7 @@ if __name__ == "__main__":
 
     mfpt = Flux(L, ntraj, dt=dt, sigma=sigma, nbins=bins, nt=nt, save=save, load=load)  # higher fluxes require more trajectories
     mfpt.simulate_flux(pore_concentration=pore_conc, dz=dz, steps=steps, measure_flux=True)
-    print(mfpt.flux_out[equil:].mean())
+    print(mfpt.flux_out[equil:].mean() / dt)
     #mfpt.simulate_constant_flux(nparticles=nparticles, dz=dz, steps=steps)
     mfpt.plot_average_concentration(equil=equil)
     mfpt.plot_number_particles(show=True)
