@@ -319,7 +319,6 @@ def random_powerlaw_cutoff(alpha, lam, xmin=1, size=1):
     :return: array of random draws
     """
 
-    print(lam)
     x = random_exponential(lam, size=size, xmin=xmin)
     p = (x / xmin) ** - alpha  # acceptance probability
     u = np.random.uniform(size=p.size)

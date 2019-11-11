@@ -3,7 +3,7 @@
 """ Find the mean first passage time (MFPT) of a type of particle
 """
 
-from LLC_Membranes.llclib import timeseries, file_rw
+from LLC_Membranes.llclib import timeseries, file_rw, rand
 import matplotlib.pyplot as plt
 from matplotlib import animation
 import numpy as np
@@ -11,20 +11,84 @@ import tqdm
 from multiprocessing import Pool
 from scipy.sparse import csr_matrix as sparse_matrix
 import warnings
+from scipy.stats import norm
+import levy
+import fbm
 
 with warnings.catch_warnings():
     warnings.filterwarnings('ignore', "Changing the sparsity structure of a csr_matrix is expensive. lil_matrix is more efficient.")
     warnings.filterwarnings('ignore', "SparseEfficiencyWarning")
 
 
+# TODO: should move these to llclib.rand
+class Hops:
+
+    def __init__(self, distribution, params):
+
+        self.params = params
+
+        if distribution.lower() in ['gaussian', 'normal', 'brownian']:
+            self.name = 'gaussian'
+        elif distribution.lower() in ['fbm']:
+            self.name = 'fbm'
+        elif distribution.lower() in ['flm']:
+            self.name = 'flm'
+        elif distribution.lower() in ['levy']:
+            self.name = 'levy'
+
+    def random_hop(self):
+
+        if self.name == 'gaussian':
+            return norm.rvs()
+        elif self.name == 'levy':
+            return levy.random(2, 0)
+
+    def trajectory(self, length):
+
+        if self.name == 'fbm':
+            return self.params[0] * fbm.FBM(length, self.params[1], method="daviesharte").fbm() \
+                   / ((1.0 / length) ** self.params[1])
+
+
+class Dwell:
+
+    def __init__(self, distribution, params):
+
+        if distribution is None:
+            self.name = None
+        elif distribution.lower() in ['power']:
+            self.name = 'power'
+        elif distribution.lower() in ['power_cut']:
+            self.name = 'power_cut'
+        elif distribution.lower() in ['exponential']:
+            self.name = 'exponential'
+
+        self.params = params
+
+    def random_dwell(self, size=1):
+
+        if self.name is None:
+            return np.ones(size)
+        elif self.name == 'power':
+            return rand.random_powerlaw(self.params[0], ll=self.params[1], size=size, limit=None,
+                                        discrete=False, exact=False)
+        elif self.name == 'power_cut':
+            return rand.random_powerlaw_cutoff(self.params[0], self.params[1], xmin=self.params[2], size=size)
+        elif self.name == 'exponential':
+            return rand.random_exponential(self.params[0], size=size, xmin=self.params[1])
+
+
 class Flux:
 
-    def __init__(self, L, n, dt=1., sigma=1, nbins=25, nt=1, save=True, load=False):
+    def __init__(self, L, n, hop_dist='fbm', dwell_dist=None, dt=1., sigma=1, nbins=25, nt=1, save=True,
+                 load=False):
         """ Generate concentration profiles
 
         :param L: length of 1D path (a pore for example) that particle follows (nm).
         :param n: number of particle trajectories to generate. It should be at least the number expected to be in a pore
         at steady state, but more is always better.
+        :param hop_dist: hop length distribution
+        :param dwell_dist:
         :param dt: timestep to use while contsructing trajectories
         :param sigma: width of hop distribution per unit time. The width of the hop distribution for the draws made each
         timestep is sqrt(dt) * sigma
@@ -36,6 +100,8 @@ class Flux:
 
         :type L: float
         :type n: int
+        :type hop_dist: str
+        :type dwell_dist: str or NoneType
         :type dt: float
         :type sigma: float
         :type nbins: int
@@ -51,10 +117,31 @@ class Flux:
         self.trajectories = []
         self.time = []
         self.dt = dt
-        self.passage_times = None
+        self.passage_times = []
+        self.nt = nt
+
+        H = 0.5
+        params = (np.sqrt(self.dt) * sigma, H)
+        if hop_dist.lower() in ['gaussian', 'normal', 'brownian']:
+            self.hop_dist = Hops('gaussian', params)
+        elif hop_dist.lower() in ['levy']:
+            self.hop_dist = Hops('levy', params)
+        elif hop_dist.lower() in ['fbm']:
+            self.hop_dist = Hops('fbm', params)
+
+        # TODO: these need to be passed
+        params = [0.1, 1]
+        if dwell_dist is None:
+            self.dwell_dist = Dwell(None, params)
+        elif dwell_dist.lower() in ['power']:
+            self.dwell_dist = Dwell('power', params)
+        elif dwell_dist.lower() in ['power_cut']:
+            self.dwell_dist = Dwell('power_cut', params)
+        elif dwell_dist.lower() in ['exponential']:
+            self.dwell_dist = Dwell('exponential', params)
 
         print('Generating Trajectories...')
-        self.generate_trajectories(nt=nt, save=save)
+        self.generate_trajectories(save=save)
 
         # flux simulation arrays
         self.positions = None
@@ -76,30 +163,60 @@ class Flux:
 
     def _trajectory_realizations(self, ntraj, sigma):
 
+        np.random.seed()  # need a different random seed for each thread
+
         trajectories = []
         times = []
         passage_times = []
 
         n = 0
 
-        while n < ntraj:
-            print('\r%d/%d trajectories' % (n, ntraj), end='')
-            walk = [0]
+        while len(passage_times) < ntraj:
+            print('\r%d/%d trajectories' % (len(passage_times), ntraj), end='')
 
-            while 0 <= walk[-1] < self.length:
+            if self.hop_dist.name == 'gaussian':
 
-                walk.append(walk[-1] + sigma * np.random.normal())
+                walk = [0]
 
-            if len(walk) > 2:
+                # eventually move this to Hop class
+                while 0 <= walk[-1] < self.length:
 
-                walk = np.array(walk)
+                    walk.append(walk[-1] + sigma * np.random.normal())
 
-                trajectories.append(walk)
-                times.append(np.arange(walk.size))
+                if len(walk) > 2:
 
-                if walk[-1] >= self.length:
-                    n += 1
-                    passage_times.append(len(walk))
+                    walk = np.array(walk)
+
+                    trajectories.append(walk[1:].tolist())
+                    time = np.cumsum(self.dwell_dist.random_dwell(
+                        walk.size)) * self.dt  # TODO : not sure if multiplying by dt is right
+                    times.append(time - time[0])
+
+                    if walk[-1] >= self.length:
+
+                        n += 1
+                        passage_times.append(len(walk))
+
+            elif self.hop_dist.name == 'fbm':
+
+                walk = self.hop_dist.trajectory(2**16)
+
+                if np.abs(walk).max() >= self.length:
+
+                    # find when the cross-over occurs
+                    # cross = timeseries.switch_points(np.abs(walk) >= self.length)
+                    # walk = walk[:(cross[1] + 2)]
+
+                    traj, time, ptimes = self._crossings(walk)
+
+                    for i, t in enumerate(traj):
+
+                        trajectories.append(t)
+                        time.append(time[i])
+
+                    passage_times += ptimes
+
+        print('\n')
 
         return trajectories, times, passage_times
 
@@ -135,35 +252,172 @@ class Flux:
 
     def _crossings(self, x):
 
+        # TODO: this needs to make sure trajectories stay within self.length
         time = np.ones(len(x))
+
+        #crosses_boundary = timeseries.switch_points(np.logical_and(x > 0, x <= self.length))
+
         crosses_zero = timeseries.switch_points(x > 0)
+        crosses_pore = timeseries.switch_points(np.abs(x) > self.length)
+
+        crosses = np.unique(sorted(crosses_zero.tolist() + crosses_pore.tolist()))
 
         trajectories = []
         times = []
+        passage_times = []
 
-        for i, cross in enumerate(crosses_zero[1:]):
+        for i, cross in enumerate(crosses[1:]):
 
-            start = crosses_zero[i] + 1
+            start = crosses[i] + 1
             if i == 0:
                 start = 0
 
             end = cross + 1  # we want to include the last point
 
-            traj = np.abs(x[start:end])
-            traj -= traj[0]
+            # print(i, x.size, start, end)
+
+            # traj = np.abs(x[start:end])
+
+            traj = np.copy(x[start:end])
+
+            try:
+                if x[end] - x[start] > self.length:
+                    passage_times.append(end - start)
+            except IndexError:
+                pass
+
+            #
+            # if traj.min() < -self.length:
+            #     print(traj.min(), traj[-1], np.argmin(traj), len(traj))
+            #     exit()
+            #
+
+            factor = np.abs(traj[0]) // (self.length / 2)
+            if factor > 0:
+                factor = ((factor - 1) // 2) + 1
+                if traj[0] < 0:
+                    traj += factor*self.length
+                else:
+                    traj -= factor*self.length
+
+            # try:
+            #     if np.abs(traj[0]) > self.length:
+            #         if traj[0] < 0:
+            #             traj += self.length
+            #         else:
+            #             traj -= self.length
+            # except IndexError:
+            #     pass
 
             # Recursion!
-            if timeseries.switch_points(traj >= 0).size > 2:
+            #if timeseries.switch_points(np.logical_and(traj > 0, traj <= self.length)).size > 2:
+
+            crosses_zero = timeseries.switch_points(x > 0)
+            crosses_pore = timeseries.switch_points(np.abs(x) > self.length)
+
+            crosses2 = np.unique(sorted(crosses_zero.tolist() + crosses_pore.tolist()))
+
+            if crosses2.size > 2:
+
+            #if timeseries.switch_points(traj > 0).size > 2:
+                # plt.plot(traj)
+                # plt.vlines(timeseries.switch_points(np.logical_and(traj > 0, traj <= self.length)), traj.min(), traj.max())
+                # plt.show()
+                # print('hello')
+                # exit()
+
+            # if timeseries.switch_points(traj > 0).size > 2:
+            #     # print(traj)
+            #     # print(timeseries.switch_points(np.logical_and(traj > 0, traj <= self.length)))
+            #     # print('hello')
+            #     # exit()
+            # if timeseries.switch_points(x > 0).size > 2:
+                traj_, time_, ptimes_ = self._crossings(traj)
+                trajectories += traj_
+                times += time_
+                passage_times += ptimes_
+
+            else:
+
+                if traj.size > 1:
+
+                    # if traj.size > 10:
+                    #     print(x[start], x[end])
+                    #     plt.plot(traj)
+                    #     plt.plot(x[start:end])
+                    #     plt.show()
+
+                    trajectories += [np.abs(traj).tolist()]  # + sigma * np.random.normal())
+                    times += [np.cumsum(time[start:end]) - 1]
+
+        return trajectories, times, passage_times
+
+    def _crossings_old(self, x):
+
+        # TODO: this needs to make sure trajectories stay within self.length
+        time = np.ones(len(x))
+
+        # crosses_boundary = timeseries.switch_points(np.logical_and(x > 0, x <= self.length))
+        crosses_boundary = timeseries.switch_points(x > 0)
+
+        trajectories = []
+        times = []
+
+        for i, cross in enumerate(crosses_boundary[1:]):
+
+            start = crosses_boundary[i] + 1
+            if i == 0:
+                start = 0
+
+            end = cross + 1  # we want to include the last point
+
+            # print(i, x.size, start, end)
+
+            traj = np.abs(x[start:end])
+
+            # traj = x[start:end]
+            # if traj.min() < -self.length:
+            #     print(traj.min(), traj[-1], np.argmin(traj), len(traj))
+            #     exit()
+            #
+            # try:
+            #     if np.abs(traj[end]) > self.length:
+            #         if traj[end + 1] < 0:
+            #             print('\n', x[end + 1])
+            #             exit()
+            #         traj -= self.length
+            #
+            # except IndexError:
+            #     pass
+
+            # Recursion!
+            # if timeseries.switch_points(np.logical_and(traj > 0, traj <= self.length)).size > 2:
+            if timeseries.switch_points(traj > 0).size > 2:
+                # plt.plot(traj)
+                # plt.vlines(timeseries.switch_points(np.logical_and(traj > 0, traj <= self.length)), traj.min(), traj.max())
+                # plt.show()
+                # print('hello')
+                # exit()
+
+                # if timeseries.switch_points(traj > 0).size > 2:
+                #     # print(traj)
+                #     # print(timeseries.switch_points(np.logical_and(traj > 0, traj <= self.length)))
+                #     # print('hello')
+                #     # exit()
+                # if timeseries.switch_points(x > 0).size > 2:
                 traj_, time_ = self._crossings(traj)
                 trajectories += traj_
                 times += time_
+
             else:
-                trajectories += [traj]  # + sigma * np.random.normal())
-                times += [np.cumsum(time[start:end]) - 1]
+
+                if traj.size > 1:
+                    trajectories += [np.abs(x[start:end])]  # + sigma * np.random.normal())
+                    times += [np.cumsum(time[start:end]) - 1]
 
         return trajectories, times
 
-    def generate_trajectories(self, nt=1, save=True, savename='trajectories.npz'):
+    def generate_trajectories(self, save=True, savename='trajectories.npz'):
         """ Generate Brownian trajectories
 
         :param nt: number of threads
@@ -171,21 +425,29 @@ class Flux:
 
         sigma = np.sqrt(self.dt) * self.sigma
 
-        pool = Pool(processes=nt)
+        pool = Pool(processes=self.nt)
 
-        trajectories_per_thread = self.ntraj // nt
+        trajectories_per_thread = self.ntraj // self.nt
 
-        arguments = [(trajectories_per_thread, sigma) for _ in range(nt)]
+        arguments = [(trajectories_per_thread, sigma) for _ in range(self.nt)]
 
         result = pool.starmap(self._trajectory_realizations, arguments)
+        pool.close()
 
         passage_times = []
-        for thread in range(nt):
+        for thread in range(self.nt):
             self.trajectories += result[thread][0]
             self.time += result[thread][1]
             passage_times += result[thread][2]
 
         self.passage_times = np.array(passage_times) * dt
+
+        # print(self.passage_times.size)
+        # print(np.unique(self.passage_times).size)
+        # print(self.passage_times.mean())
+        # plt.hist(self.passage_times, 25)
+        # plt.show()
+        # exit()
         # print(self.passage_times.mean())
         # plt.hist(self.passage_times, bins=50)
         # plt.show()
@@ -195,7 +457,74 @@ class Flux:
             file_rw.save_object((self.trajectories, self.time), 'trajectories.pl')
             #np.savez_compressed(savename, trajectories=self.trajectories, time=self.time)
 
-    def simulate_flux(self, pore_concentration=1, dt=1, dz=0.1, steps=2000, measure_flux=False):
+    def discretize_time(self):
+        # TODO: increase bins in time_uniform (e.g. make time steps one tenth of dt)
+
+        ntraj = len(self.trajectories)
+        nperthread = ntraj // self.nt
+
+        arguments = []
+        for n in range(self.nt):
+            if n < (self.nt - 1):
+                arguments.append((n * nperthread, (n + 1) * nperthread))
+            else:
+                arguments.append((n * nperthread, (n + 1) * nperthread + (ntraj % self.nt)))
+
+        pool = Pool(processes=self.nt)
+        pool.starmap(self._discretize_group, arguments)
+        pool.close()
+
+    def _discretize_group(self, start, end):
+
+        for i in tqdm.tqdm(range(start, end)):
+
+            t = self.trajectories[i]
+
+            last = np.argmin(np.abs(t[-1] - self.time_uniform))
+            tu = self.time_uniform[:(last + 1)]
+
+            # find the indices of the time point closest to the interpolated uniform time series
+            time_index = np.argmin(np.abs(t[:, np.newaxis] - tu), axis=0)
+
+            # make sure that jumps don't occur in interpolated trajectory until jumps occur in real trajectory
+            time_index[np.where(tu - t[time_index] < 0)[0]] -= 1
+            time_index[np.where(time_index < 0)] += 1  # Relax above restriction for first time point
+
+            self.trajectories[i] = self.trajectories[i][time_index]
+            self.time[i] = tu
+
+            # self.visualize_discretization(self.trajectories[0], t)
+            # self.visualize_discretization(self.trajectories[0][time_index], tu)
+            # plt.show()
+
+    @staticmethod
+    def visualize_discretization(z, time):
+
+        # for visualizing hops
+        trajectory_hops = np.zeros([2 * len(time) - 1, 2])
+
+        trajectory_hops[1::2, 0] = time[1:]
+        trajectory_hops[2::2, 0] = time[1:]
+
+        trajectory_hops[::2, 1] = z
+        trajectory_hops[1:-1:2, 1] = z[:-1]
+        trajectory_hops[-1, 1] = z[-1]
+        plt.plot(trajectory_hops[:, 0], trajectory_hops[:, 1])
+
+    def concentration_from_histogram(self):
+        """ Generate a concentration profile by histogramming the atomic """
+
+        data = []
+        for t in self.trajectories:
+            data += t#.tolist()
+
+        file_rw.save_object(data, 'data.pl')
+
+        print(self.nbins, self.length)
+        plt.hist(data, self.nbins, range=(0, self.length))
+        plt.show()
+
+    def simulate_flux(self, pore_concentration=1, dz=0.1, steps=2000, measure_flux=False):
         """ Simulate a flux into the pore, starting new particles after a specified time
         """
 
@@ -203,14 +532,22 @@ class Flux:
 
         longest = max([len(x) for x in self.trajectories])
         total_trajectories = len(self.trajectories)
-        print(total_trajectories)
+        print('%d total trajectories generated' % total_trajectories)
 
         # discretize position versus time
         self.positions = sparse_matrix((self.ntraj, longest + steps * self.pore_concentration))
 
         self.dz = dz
-        #self.inlet_volume = self.pore_cross_sectional_area * self.dz
-        self.time_uniform = np.arange(self.positions.shape[1]) * dt
+
+        if self.dwell_dist.name is not None:
+            print('Discretizing Trajectory...')
+            n = 1
+            self.time_uniform = np.arange(longest * n) * self.dt / n
+            self.discretize_time()
+
+        self.concentration_from_histogram()
+        exit()
+
         self.steps = steps
 
         if measure_flux:
@@ -221,7 +558,7 @@ class Flux:
         naddtot = []
         inlet = np.zeros(steps)
         dwell_times = []
-    
+
         print('Simulating flux by holding the interface concentration constant at %d particles' % self.pore_concentration)
         for step in tqdm.tqdm(range(steps), unit=' Time Steps'):
 
@@ -325,7 +662,7 @@ class Flux:
 
         #self.animate_concentration_profile()
 
-    def simulate_flux_constant_particles(self, n=50, dt=1, steps=2000, measure_flux=False):
+    def simulate_flux_constant_particles(self, n=50, steps=2000, measure_flux=False):
         """ Simulate a flux into the pore, starting new particles after a specified time
         """
 
@@ -335,7 +672,7 @@ class Flux:
         # discretize position versus time
         self.positions = sparse_matrix((self.ntraj, longest + steps))
 
-        self.time_uniform = np.arange(self.positions.shape[1]) * dt
+        self.time_uniform = np.arange(self.positions.shape[1]) * self.dt
         self.steps = steps
 
         if measure_flux:
@@ -574,11 +911,11 @@ if __name__ == "__main__":
     - larger dz makes it harder to maintain concentration (?)
     """
 
-    L = 5
-    ntraj = 1000  # this is the number of trajectories that actually make it to the end
+    L = 10
+    ntraj = 500  # this is the number of trajectories that actually make it to the end
     pore_conc = 1
-    bins = 25 
-    steps = 10000
+    bins = 25
+    steps = 500000
     equil = int(steps/2)  # use 3/4 of the data
     dz = L / bins  # make dz independent of bins. Will just need to change normalization on plot
     print('dz: %.2f' % dz)
