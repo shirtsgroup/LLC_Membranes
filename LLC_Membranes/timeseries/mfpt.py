@@ -161,6 +161,25 @@ class Flux:
         self.ax = None
         self.fig = None
 
+    def _crossings2(self, x):
+
+        start = 0
+        end = 0
+        traj = []
+
+        while end < x.size:
+
+            if x[start] * x[start + 1] < 0:
+                end = start + 1
+            else:
+                end += (timeseries.switch_points(x[start:] > 0)[1] + 1)  # the next sign change
+
+            traj.append(np.abs(x[start:end]))
+
+            start = end
+
+        return traj
+
     def _trajectory_realizations(self, ntraj, sigma):
 
         np.random.seed()  # need a different random seed for each thread
@@ -172,7 +191,6 @@ class Flux:
         n = 0
 
         while len(passage_times) < ntraj:
-            print('\r%d/%d trajectories' % (len(passage_times), ntraj), end='')
 
             if self.hop_dist.name == 'gaussian':
 
@@ -199,23 +217,42 @@ class Flux:
 
             elif self.hop_dist.name == 'fbm':
 
-                walk = self.hop_dist.trajectory(2**16)
+                #walk = self.hop_dist.trajectory(2**16)
+                walk = np.cumsum(sigma * np.random.normal(size=2**16))
 
                 if np.abs(walk).max() >= self.length:
 
                     # find when the cross-over occurs
-                    # cross = timeseries.switch_points(np.abs(walk) >= self.length)
-                    # walk = walk[:(cross[1] + 2)]
+                    cross = timeseries.switch_points(np.abs(walk) >= self.length)[1] + 2
+                    walk = walk[:cross]
 
-                    traj, time, ptimes = self._crossings(walk)
+                    #traj, time, ptimes = self._crossings2(walk)
+                    traj = self._crossings2(walk)
+
+                    # print(traj)
+                    # exit()
+                    # plt.plot(traj[-1])
+                    # plt.show()
+                    # exit()
 
                     for i, t in enumerate(traj):
 
-                        trajectories.append(t)
-                        time.append(time[i])
+                        trajectories.append(t.tolist())
+                        #time.append(time[i])
 
-                    passage_times += ptimes
+                    #passage_times += ptimes
+                    passage_times.append(len(traj[-1]))
 
+            print('\r%d/%d trajectories' % (len(passage_times), ntraj), end='')
+
+        data = []
+        for i in trajectories:
+            data += i
+        # file_rw.save_object(data, 'data.pl')
+        # exit()
+        plt.hist(data, 500, range=(0, 5))
+        plt.show()
+        exit()
         print('\n')
 
         return trajectories, times, passage_times
@@ -926,7 +963,7 @@ if __name__ == "__main__":
     save = True
     load = False
 
-    nt = 8
+    nt = 1
 
     mfpt = Flux(L, ntraj, dt=dt, sigma=sigma, nbins=bins, nt=nt, save=save, load=load)  # higher fluxes require more trajectories
     mfpt.simulate_flux(pore_concentration=pore_conc, dz=dz, steps=steps, measure_flux=True)
