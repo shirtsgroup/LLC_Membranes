@@ -4,6 +4,8 @@
 """
 
 from LLC_Membranes.llclib import timeseries, file_rw, rand
+from LLC_Membranes.timeseries.fractional_levy_motion import FLM
+from LLC_Membranes.timeseries import flm_sim_params
 import matplotlib.pyplot as plt
 from matplotlib import animation
 import numpy as np
@@ -14,81 +16,153 @@ import warnings
 from scipy.stats import norm
 import levy
 import fbm
+import yaml
+import argparse
+import sys
+
 
 with warnings.catch_warnings():
     warnings.filterwarnings('ignore', "Changing the sparsity structure of a csr_matrix is expensive. lil_matrix is more efficient.")
     warnings.filterwarnings('ignore', "SparseEfficiencyWarning")
 
 
-# TODO: should move these to llclib.rand
+def initialize():
+
+    parser = argparse.ArgumentParser(description='Calculate mean first passage time from realizations of the specified'
+                                                 'type of random walk.')
+
+    parser.add_argument('-y', '--yaml', type=str, help='A .yaml configuration file. This is preferred over using'
+                                                       'argparse. It leads to better reproducibility.')
+
+    return parser
+
+
+# TODO: should move these to llclib
 class Hops:
 
-    def __init__(self, distribution, params):
+    def __init__(self, distribution, params, n):
+        """ Generate a sequence of hops, with a correlation structure of hurst parameter does not equal 0.5
 
+        :param distribution: name of distribution. It should be defined in self.distributions
+        :param params: parameters of the distribution in order (sigma, alpha, hurst, max_hop)
+        :param n: number of points to generate when a call to hops is made (you will get best performance if a power of\
+        2)
+
+        :type distribution: str
+        :type params: tuple or list
+        :type n: int
+        """
+
+        self.name = distribution
         self.params = params
+        self._distributions = {'gaussian': self._gaussian_hops, 'levy': self._levy_hops}
+        self.length = n
+        self.hops = self._distributions[self.name]
 
-        if distribution.lower() in ['gaussian', 'normal', 'brownian']:
-            self.name = 'gaussian'
-        elif distribution.lower() in ['fbm']:
-            self.name = 'fbm'
-        elif distribution.lower() in ['flm']:
-            self.name = 'flm'
-        elif distribution.lower() in ['levy']:
-            self.name = 'levy'
+        if self.name == 'levy':
 
-    def random_hop(self):
+            print('Generating corrections to truncated Levy stable distribution...', end='', flush=True)
+            self.hurst_correction = flm_sim_params.HurstCorrection()
+            self.truncation_correction = flm_sim_params.TruncateLevy()
+            corrected_max_hop = self.truncation_correction.interpolate(self.params[2], self.params[1] - .01,
+                                                                       self.params[3], self.params[0])
+            self.flm = FLM(self.hurst_correction.interpolate(self.params[2], self.params[1]), self.params[1],
+                           scale=self.params[0],
+                           N=self.length, M=4, correct_hurst=False, truncate=corrected_max_hop, correct_truncation=False)
+            print('Done!')
 
-        if self.name == 'gaussian':
-            return norm.rvs()
-        elif self.name == 'levy':
-            return levy.random(2, 0)
+    def _gaussian_hops(self):
+        """ Draw hop lengths from a Gaussian distribution with a correlation structure defined by the hurst parameter.
+        If the hurst parameter equals 0.5, it will be the same as Brownian motion
 
-    def trajectory(self, length):
+        :return: sequence of cumulative hop lengths
+        """
 
-        if self.name == 'fbm':
-            return self.params[0] * fbm.FBM(length, self.params[1], method="daviesharte").fbm() \
-                   / ((1.0 / length) ** self.params[1])
+        return self.params[0] * fbm.FBM(self.length, self.params[2], method="daviesharte").fbm() \
+               / ((1.0 / self.length) ** self.params[2])
+
+    def _levy_hops(self):
+        """ Draw a sequence of hop lengths from a Levy stable distribution
+
+        :return:
+        """
+
+        self.flm.generate_realizations(1, progress=False)
+
+        return self.flm.realizations[0, :]
 
 
 class Dwell:
 
     def __init__(self, distribution, params):
+        """ Generate a sequence of dwell times by drawing from the appropriate dwell time distibution
 
-        if distribution is None:
-            self.name = None
-        elif distribution.lower() in ['power']:
-            self.name = 'power'
-        elif distribution.lower() in ['power_cut']:
-            self.name = 'power_cut'
-        elif distribution.lower() in ['exponential']:
-            self.name = 'exponential'
+        :param distribution: name of dwell distribution. If None, there are no dwells and a hop will occur every step
+        :param params: parameters of chosen dwell time distribution. Passed in order (alpha, lambda, lower_limit)
+        """
+
+        self.name = distribution
+        self._distributions = {None: self._no_trapping, 'power': self._powerlaw,
+                              'power_cut': self._powerlaw_cut, 'exponential': self._exponential}
+
+        self.dwells = self._distributions[self.name]
 
         self.params = params
 
-    def random_dwell(self, size=1):
+    @staticmethod
+    def _no_trapping(n):
+        """ Return a bunch of ones since there is no trapping occuring
 
-        if self.name is None:
-            return np.ones(size)
-        elif self.name == 'power':
-            return rand.random_powerlaw(self.params[0], ll=self.params[1], size=size, limit=None,
-                                        discrete=False, exact=False)
-        elif self.name == 'power_cut':
-            return rand.random_powerlaw_cutoff(self.params[0], self.params[1], xmin=self.params[2], size=size)
-        elif self.name == 'exponential':
-            return rand.random_exponential(self.params[0], size=size, xmin=self.params[1])
+        :param n: number of samples to draw
+        :type n: int
+        """
+
+        return np.ones(n)
+
+    def _powerlaw(self, n):
+        """ Draw dwell times from pure power law. Note that this has an infinite variance
+
+        :param n: number of samples to draw
+        :type n: int
+        """
+
+        return rand.random_powerlaw(self.params[0], ll=self.params[2], size=n, limit=None,
+                                    discrete=False, exact=False)
+
+    def _powerlaw_cut(self, n):
+        """ Draw dwell times from a power law with an exponential cut-off
+
+        :param n: number of samples to draw
+        :type n: int
+        """
+
+        return rand.random_powerlaw_cutoff(self.params[0], self.params[1], xmin=self.params[2], size=n)
+
+    def _exponential(self, n):
+        """ Draw dwell times from an exponential distribution
+
+        :param n: number of samples to draw
+        :type n: int
+        """
+
+        return rand.random_exponential(self.params[1], size=n, xmin=self.params[1])
 
 
-class Flux:
+class MeanFirstPassageTime:
 
-    def __init__(self, L, n, hop_dist='fbm', dwell_dist=None, dt=1., sigma=1, nbins=25, nt=1, save=True,
-                 load=False):
-        """ Generate concentration profiles
+    def __init__(self, L, n, nT, hop_params=None, dwell_params=None, dt=1., sigma=1, nbins=25, nt=1, save=True,
+                 discretization_points=1):
+        """ Generate trajectories from which to calculate mean first passage times. One can also use them to calculate
+        the concentration profile within the pore
 
         :param L: length of 1D path (a pore for example) that particle follows (nm).
-        :param n: number of particle trajectories to generate. It should be at least the number expected to be in a pore
-        at steady state, but more is always better.
-        :param hop_dist: hop length distribution
-        :param dwell_dist:
+        :param n: number of particle trajectories to generate. It should be at least the number expected to be in a \
+        pore at steady state, but more is always better.
+        :param nT: number of steps more particle trajectory. Make this a multiple of 2 for the best performance. Note \
+        that there are better ways to do this for pure Brownian motion, but this script is built with correlation in \
+        mind.
+        :param hop_params: dictionary with keys distribution, sigma, alpha and hurst
+        :param dwell_params: dictionary with keys distribution and alpha
         :param dt: timestep to use while contsructing trajectories
         :param sigma: width of hop distribution per unit time. The width of the hop distribution for the draws made each
         timestep is sqrt(dt) * sigma
@@ -96,12 +170,15 @@ class Flux:
         :param nt: number of threads to use when generating trajectories
         :param save: save trajectories to disk
         :param load: load trajectories saved to disk
+        :param discretization_points: to discretize, the time series will be divided into equal length segments. This \
+        parameter is multiplied by the number of observed time points in order to determine the number of segments. A \
+        higher value will give a higher resolution trajectories with respect to non-uniform dwell times. \
 
 
         :type L: float
         :type n: int
-        :type hop_dist: str
-        :type dwell_dist: str or NoneType
+        :type hop_params: dict
+        :type dwell_params: dict
         :type dt: float
         :type sigma: float
         :type nbins: int
@@ -115,29 +192,32 @@ class Flux:
         self.ntraj = n
         self.sigma = sigma
         self.trajectories = []
+        self.passage_times = []
         self.time = []
         self.dt = dt
         self.passage_times = []
         self.nt = nt
+        self.discretization_points = discretization_points
 
-        H = 0.5
-        params = (np.sqrt(self.dt) * sigma, H)
+        hop_dist = hop_params['distribution']
+
+        params = (np.sqrt(self.dt) * sigma, hop_params['alpha'], hop_params['hurst'], hop_params['max_hop'])
         if hop_dist.lower() in ['gaussian', 'normal', 'brownian']:
-            self.hop_dist = Hops('gaussian', params)
+            self.hop_dist = Hops('gaussian', params, nT)
         elif hop_dist.lower() in ['levy']:
-            self.hop_dist = Hops('levy', params)
-        elif hop_dist.lower() in ['fbm']:
-            self.hop_dist = Hops('fbm', params)
+            self.hop_dist = Hops('levy', params, nT)
 
         # TODO: these need to be passed
-        params = [0.1, 1]
+        dwell_dist = dwell_params['distribution']
+        params = (dwell_params['alpha'], dwell_params['lambda'], dwell_params['lower_limit'])
+
         if dwell_dist is None:
             self.dwell_dist = Dwell(None, params)
-        elif dwell_dist.lower() in ['power']:
+        elif dwell_dist.lower() in ['power', 'powerlaw']:
             self.dwell_dist = Dwell('power', params)
         elif dwell_dist.lower() in ['power_cut']:
             self.dwell_dist = Dwell('power_cut', params)
-        elif dwell_dist.lower() in ['exponential']:
+        elif dwell_dist.lower() in ['exponential', 'exp']:
             self.dwell_dist = Dwell('exponential', params)
 
         print('Generating Trajectories...')
@@ -161,298 +241,117 @@ class Flux:
         self.ax = None
         self.fig = None
 
-    def _crossings2(self, x):
+    def _trajectory_realizations(self, ntraj):
+        """ Generate realizations of random walk with predefined hop length and dwell time distributions
+
+        :param ntraj: number of realizations to generate.
+        :type ntraj: int
+        """
+
+        np.random.seed()  # need to set a different random seed for each thread
+
+        trajectories = []
+        times = []
+        passage_times = []
+
+        n = 0  # a diagnostic variable to track how many trajectories are generated in total
+
+        while len(passage_times) < ntraj:
+
+            walk = self.hop_dist.hops()
+            from scipy.stats import levy_stable
+            increments = walk[1:] - walk[:-1]
+            plt.hist(increments, 100, range=(-1.2, 1.2), density=True)
+            x = np.linspace(-1.2, 1.2, 1000)
+            y = levy_stable.pdf(x, 2, 0, loc=0, scale=np.sqrt(0.001))
+
+            plt.plot(x, y)
+            plt.show()
+
+            # plt.plot(walk)
+            # plt.show()
+            exit()
+
+            # find when the cross-over occurs
+            cross = timeseries.switch_points(np.abs(walk) >= self.length)[1] + 2
+
+            walk = walk[:cross]
+
+            traj = self._crossings(walk)
+
+            for i, t in enumerate(traj):
+                trajectories.append(t)
+                time = self.dt * np.cumsum(self.dwell_dist.dwells(len(t)))
+                times.append(time - time[0])
+
+            if np.abs(walk).max() >= self.length:
+                passage_times.append(times[-1][-1])
+
+            # if self.hop_dist.name == 'gaussian':
+            #
+            #     walk = [0]
+            #
+            #     # eventually move this to Hop class
+            #     while 0 <= walk[-1] < self.length:
+            #
+            #         walk.append(walk[-1] + sigma * np.random.normal())
+            #
+            #     if len(walk) > 1:
+            #
+            #         walk = np.array(walk)
+            #
+            #         trajectories.append(walk[1:])
+            #         time = np.cumsum(self.dwell_dist.random_dwell(
+            #             walk.size)) * self.dt  # TODO : not sure if multiplying by dt is right
+            #         times.append(time - time[0])
+            #
+            #         if walk[-1] >= self.length:
+            #
+            #             passage_times.append(len(walk))
+            #
+            # elif self.hop_dist.name == 'fbm':
+            #
+            #     # length of trajectories should be sufficiently long that traj always reaches end
+            #     walk = self.hop_dist.hops()
+            #
+            #     # find when the cross-over occurs
+            #     cross = timeseries.switch_points(np.abs(walk) >= self.length)[1] + 2
+            #
+            #     walk = walk[:cross]
+            #
+            #     trajectories += self._crossings(walk)
+            #
+            #     if np.abs(walk).max() >= self.length:
+            #         passage_times.append(len(trajectories[-1]))
+
+            n += 1
+            print('\r%d/%d trajectories' % (len(passage_times), ntraj), end='')
+
+        return trajectories, times, passage_times, n
+
+    @staticmethod
+    def _crossings(x):
+        """ Identify whenever a
+
+        :param x:
+        :return:
+        """
 
         start = 0
         end = 0
         traj = []
 
-        while end < x.size:
+        while start < (x.size - 1):
 
             if x[start] * x[start + 1] < 0:
                 end = start + 1
             else:
-                end += (timeseries.switch_points(x[start:] > 0)[1] + 1)  # the next sign change
+                end += (timeseries.switch_points(x[start:] > 0)[1] + 2)
 
             traj.append(np.abs(x[start:end]))
-
             start = end
 
         return traj
-
-    def _trajectory_realizations(self, ntraj, sigma):
-
-        np.random.seed()  # need a different random seed for each thread
-
-        trajectories = []
-        times = []
-        passage_times = []
-
-        n = 0
-
-        while len(passage_times) < ntraj:
-
-            if self.hop_dist.name == 'gaussian':
-
-                walk = [0]
-
-                # eventually move this to Hop class
-                while 0 <= walk[-1] < self.length:
-
-                    walk.append(walk[-1] + sigma * np.random.normal())
-
-                if len(walk) > 2:
-
-                    walk = np.array(walk)
-
-                    trajectories.append(walk[1:].tolist())
-                    time = np.cumsum(self.dwell_dist.random_dwell(
-                        walk.size)) * self.dt  # TODO : not sure if multiplying by dt is right
-                    times.append(time - time[0])
-
-                    if walk[-1] >= self.length:
-
-                        n += 1
-                        passage_times.append(len(walk))
-
-            elif self.hop_dist.name == 'fbm':
-
-                #walk = self.hop_dist.trajectory(2**16)
-                walk = np.cumsum(sigma * np.random.normal(size=2**16))
-
-                if np.abs(walk).max() >= self.length:
-
-                    # find when the cross-over occurs
-                    cross = timeseries.switch_points(np.abs(walk) >= self.length)[1] + 2
-                    walk = walk[:cross]
-
-                    #traj, time, ptimes = self._crossings2(walk)
-                    traj = self._crossings2(walk)
-
-                    # print(traj)
-                    # exit()
-                    # plt.plot(traj[-1])
-                    # plt.show()
-                    # exit()
-
-                    for i, t in enumerate(traj):
-
-                        trajectories.append(t.tolist())
-                        #time.append(time[i])
-
-                    #passage_times += ptimes
-                    passage_times.append(len(traj[-1]))
-
-            print('\r%d/%d trajectories' % (len(passage_times), ntraj), end='')
-
-        data = []
-        for i in trajectories:
-            data += i
-        # file_rw.save_object(data, 'data.pl')
-        # exit()
-        plt.hist(data, 500, range=(0, 5))
-        plt.show()
-        exit()
-        print('\n')
-
-        return trajectories, times, passage_times
-
-    def _recursive_trajectory_realizations(self, ntraj, sigma):
-        """ A second way of generating trajectories. It's done by generating a single trajectory that eventually
-        makes it the length of the pore. Then it is chopped up into segements based on whether the trajectory is
-        positive or negative. Each of those segments is pulled back to the origin and the segmentation is repeated on
-        the segment.
-
-        :param ntraj:
-        :param sigma:
-        :return:
-        """
-
-        trajectories = []
-        times = []
-
-        for _ in tqdm.tqdm(range(ntraj), unit='trajectories'):
-
-            walk = [0]
-            while np.abs(walk[-1]) < self.length:
-
-                walk.append(walk[-1] + sigma * np.random.normal())
-
-            walk = np.array(walk)
-
-            traj, time = self._crossings(walk)
-
-            trajectories += traj
-            times += time
-
-        return trajectories, times
-
-    def _crossings(self, x):
-
-        # TODO: this needs to make sure trajectories stay within self.length
-        time = np.ones(len(x))
-
-        #crosses_boundary = timeseries.switch_points(np.logical_and(x > 0, x <= self.length))
-
-        crosses_zero = timeseries.switch_points(x > 0)
-        crosses_pore = timeseries.switch_points(np.abs(x) > self.length)
-
-        crosses = np.unique(sorted(crosses_zero.tolist() + crosses_pore.tolist()))
-
-        trajectories = []
-        times = []
-        passage_times = []
-
-        for i, cross in enumerate(crosses[1:]):
-
-            start = crosses[i] + 1
-            if i == 0:
-                start = 0
-
-            end = cross + 1  # we want to include the last point
-
-            # print(i, x.size, start, end)
-
-            # traj = np.abs(x[start:end])
-
-            traj = np.copy(x[start:end])
-
-            try:
-                if x[end] - x[start] > self.length:
-                    passage_times.append(end - start)
-            except IndexError:
-                pass
-
-            #
-            # if traj.min() < -self.length:
-            #     print(traj.min(), traj[-1], np.argmin(traj), len(traj))
-            #     exit()
-            #
-
-            factor = np.abs(traj[0]) // (self.length / 2)
-            if factor > 0:
-                factor = ((factor - 1) // 2) + 1
-                if traj[0] < 0:
-                    traj += factor*self.length
-                else:
-                    traj -= factor*self.length
-
-            # try:
-            #     if np.abs(traj[0]) > self.length:
-            #         if traj[0] < 0:
-            #             traj += self.length
-            #         else:
-            #             traj -= self.length
-            # except IndexError:
-            #     pass
-
-            # Recursion!
-            #if timeseries.switch_points(np.logical_and(traj > 0, traj <= self.length)).size > 2:
-
-            crosses_zero = timeseries.switch_points(x > 0)
-            crosses_pore = timeseries.switch_points(np.abs(x) > self.length)
-
-            crosses2 = np.unique(sorted(crosses_zero.tolist() + crosses_pore.tolist()))
-
-            if crosses2.size > 2:
-
-            #if timeseries.switch_points(traj > 0).size > 2:
-                # plt.plot(traj)
-                # plt.vlines(timeseries.switch_points(np.logical_and(traj > 0, traj <= self.length)), traj.min(), traj.max())
-                # plt.show()
-                # print('hello')
-                # exit()
-
-            # if timeseries.switch_points(traj > 0).size > 2:
-            #     # print(traj)
-            #     # print(timeseries.switch_points(np.logical_and(traj > 0, traj <= self.length)))
-            #     # print('hello')
-            #     # exit()
-            # if timeseries.switch_points(x > 0).size > 2:
-                traj_, time_, ptimes_ = self._crossings(traj)
-                trajectories += traj_
-                times += time_
-                passage_times += ptimes_
-
-            else:
-
-                if traj.size > 1:
-
-                    # if traj.size > 10:
-                    #     print(x[start], x[end])
-                    #     plt.plot(traj)
-                    #     plt.plot(x[start:end])
-                    #     plt.show()
-
-                    trajectories += [np.abs(traj).tolist()]  # + sigma * np.random.normal())
-                    times += [np.cumsum(time[start:end]) - 1]
-
-        return trajectories, times, passage_times
-
-    def _crossings_old(self, x):
-
-        # TODO: this needs to make sure trajectories stay within self.length
-        time = np.ones(len(x))
-
-        # crosses_boundary = timeseries.switch_points(np.logical_and(x > 0, x <= self.length))
-        crosses_boundary = timeseries.switch_points(x > 0)
-
-        trajectories = []
-        times = []
-
-        for i, cross in enumerate(crosses_boundary[1:]):
-
-            start = crosses_boundary[i] + 1
-            if i == 0:
-                start = 0
-
-            end = cross + 1  # we want to include the last point
-
-            # print(i, x.size, start, end)
-
-            traj = np.abs(x[start:end])
-
-            # traj = x[start:end]
-            # if traj.min() < -self.length:
-            #     print(traj.min(), traj[-1], np.argmin(traj), len(traj))
-            #     exit()
-            #
-            # try:
-            #     if np.abs(traj[end]) > self.length:
-            #         if traj[end + 1] < 0:
-            #             print('\n', x[end + 1])
-            #             exit()
-            #         traj -= self.length
-            #
-            # except IndexError:
-            #     pass
-
-            # Recursion!
-            # if timeseries.switch_points(np.logical_and(traj > 0, traj <= self.length)).size > 2:
-            if timeseries.switch_points(traj > 0).size > 2:
-                # plt.plot(traj)
-                # plt.vlines(timeseries.switch_points(np.logical_and(traj > 0, traj <= self.length)), traj.min(), traj.max())
-                # plt.show()
-                # print('hello')
-                # exit()
-
-                # if timeseries.switch_points(traj > 0).size > 2:
-                #     # print(traj)
-                #     # print(timeseries.switch_points(np.logical_and(traj > 0, traj <= self.length)))
-                #     # print('hello')
-                #     # exit()
-                # if timeseries.switch_points(x > 0).size > 2:
-                traj_, time_ = self._crossings(traj)
-                trajectories += traj_
-                times += time_
-
-            else:
-
-                if traj.size > 1:
-                    trajectories += [np.abs(x[start:end])]  # + sigma * np.random.normal())
-                    times += [np.cumsum(time[start:end]) - 1]
-
-        return trajectories, times
 
     def generate_trajectories(self, save=True, savename='trajectories.npz'):
         """ Generate Brownian trajectories
@@ -460,39 +359,41 @@ class Flux:
         :param nt: number of threads
         """
 
-        sigma = np.sqrt(self.dt) * self.sigma
-
         pool = Pool(processes=self.nt)
 
         trajectories_per_thread = self.ntraj // self.nt
 
-        arguments = [(trajectories_per_thread, sigma) for _ in range(self.nt)]
+        arguments = [trajectories_per_thread for _ in range(self.nt)]
 
-        result = pool.starmap(self._trajectory_realizations, arguments)
+        result = pool.map(self._trajectory_realizations, arguments)
+
         pool.close()
+        pool.join()
 
-        passage_times = []
+        n = 0
         for thread in range(self.nt):
             self.trajectories += result[thread][0]
             self.time += result[thread][1]
-            passage_times += result[thread][2]
+            self.passage_times += result[thread][2]
+            n += result[thread][3]
 
-        self.passage_times = np.array(passage_times) * dt
+        percent_crossed_pore = 100 * trajectories_per_thread * self.nt / n
 
-        # print(self.passage_times.size)
-        # print(np.unique(self.passage_times).size)
-        # print(self.passage_times.mean())
-        # plt.hist(self.passage_times, 25)
-        # plt.show()
-        # exit()
-        # print(self.passage_times.mean())
-        # plt.hist(self.passage_times, bins=50)
-        # plt.show()
-        # exit()
+        self.passage_times = np.array(self.passage_times)
+
+        print('\n%.2f %% of trajectories reached L' % percent_crossed_pore)
+        print('Mean first passage time: %.2f ns' % self.passage_times.mean())
 
         if save:
             file_rw.save_object((self.trajectories, self.time), 'trajectories.pl')
-            #np.savez_compressed(savename, trajectories=self.trajectories, time=self.time)
+
+        if self.dwell_dist.name is not None:
+
+            n = self.discretization_points
+            longest = max([len(x) for x in self.trajectories])
+            longest_time = max([x[-1] for x in self.time])
+            self.time_uniform = np.linspace(0, longest_time, longest * n)
+            self.discretize_time()
 
     def discretize_time(self):
         # TODO: increase bins in time_uniform (e.g. make time steps one tenth of dt)
@@ -511,28 +412,39 @@ class Flux:
         pool.starmap(self._discretize_group, arguments)
         pool.close()
 
-    def _discretize_group(self, start, end):
+    def _discretize_group(self, start, end, max_memory=4 * 10 ** 9):
 
         for i in tqdm.tqdm(range(start, end)):
 
-            t = self.trajectories[i]
+            #t = self.trajectories[i]
+            t = self.time[i]
 
             last = np.argmin(np.abs(t[-1] - self.time_uniform))
             tu = self.time_uniform[:(last + 1)]
 
             # find the indices of the time point closest to the interpolated uniform time series
-            time_index = np.argmin(np.abs(t[:, np.newaxis] - tu), axis=0)
+            if 8 * t.size * tu.size < max_memory:
+                time_index = np.argmin(np.abs(t[:, np.newaxis] - tu), axis=0)
+            else:
+                # slower but less issues with memory
+                time_index = []
+                for x in tu:
+                    time_ndx = np.argmin(np.abs(x - t))
+                    time_index.append(time_ndx)
+
+                time_index = np.array(time_index)
 
             # make sure that jumps don't occur in interpolated trajectory until jumps occur in real trajectory
             time_index[np.where(tu - t[time_index] < 0)[0]] -= 1
             time_index[np.where(time_index < 0)] += 1  # Relax above restriction for first time point
 
+            # self.visualize_discretization(self.trajectories[i], t)
+            # self.visualize_discretization(self.trajectories[i][time_index], tu)
+            # plt.show()
+            # exit()
+
             self.trajectories[i] = self.trajectories[i][time_index]
             self.time[i] = tu
-
-            # self.visualize_discretization(self.trajectories[0], t)
-            # self.visualize_discretization(self.trajectories[0][time_index], tu)
-            # plt.show()
 
     @staticmethod
     def visualize_discretization(z, time):
@@ -553,11 +465,11 @@ class Flux:
 
         data = []
         for t in self.trajectories:
-            data += t#.tolist()
+            data += t.tolist()
 
-        file_rw.save_object(data, 'data.pl')
+        #file_rw.save_object(data, 'data.pl')
 
-        print(self.nbins, self.length)
+        #print(self.nbins, self.length)
         plt.hist(data, self.nbins, range=(0, self.length))
         plt.show()
 
@@ -948,8 +860,28 @@ if __name__ == "__main__":
     - larger dz makes it harder to maintain concentration (?)
     """
 
-    L = 10
-    ntraj = 500  # this is the number of trajectories that actually make it to the end
+    args = initialize().parse_args()
+
+    if args.yaml:
+        with open(args.yaml, 'r') as yml:
+            cfg = yaml.load(yml)
+    else:
+        sys.exit('You must provide a yaml configuration file.')
+
+    L = cfg['pore_length']
+    ntraj = cfg['ntraj']  # this is the number of trajectories that actually make it to the end
+    sigma = cfg['hops']['sigma']
+    dt = cfg['dt']
+    nt = cfg['nthreads']
+    hop_parameters = cfg['hops']
+    dwell_parameters = cfg['dwells']
+    nT = 2**cfg['nT']
+    save_trajectories = cfg['save_trajectories']
+    discretization_points = cfg['discretization_points']
+
+    print('sigma per step: %.2f' % (sigma * np.sqrt(dt)))
+
+    # flux stuff
     pore_conc = 1
     bins = 25
     steps = 500000
@@ -957,15 +889,15 @@ if __name__ == "__main__":
     dz = L / bins  # make dz independent of bins. Will just need to change normalization on plot
     print('dz: %.2f' % dz)
     nparticles = 5
-    sigma = 1
-    dt = 0.001
-    print('sigma per step: %.2f' % (sigma * np.sqrt(dt)))
-    save = True
+
     load = False
 
-    nt = 1
+    mfpt = MeanFirstPassageTime(L, ntraj, nT, hop_params=hop_parameters, dwell_params=dwell_parameters, dt=dt,
+                                nbins=bins, nt=nt, save=save_trajectories, discretization_points=discretization_points)
+    mfpt.concentration_from_histogram()
 
-    mfpt = Flux(L, ntraj, dt=dt, sigma=sigma, nbins=bins, nt=nt, save=save, load=load)  # higher fluxes require more trajectories
+    exit()
+
     mfpt.simulate_flux(pore_concentration=pore_conc, dz=dz, steps=steps, measure_flux=True)
     #mfpt.simulate_flux_constant_particles(n=nparticles, dt=dt, steps=steps, measure_flux=True)
     print(mfpt.flux_out[equil:].mean() / dt)
