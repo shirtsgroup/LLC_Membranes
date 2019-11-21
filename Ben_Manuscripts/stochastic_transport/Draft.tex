@@ -824,7 +824,47 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 %  as well as to sequences of emissions while dwelling in specific states using the FLM
 %  simulation procedure described in Section~\ref{method:model_sFBM}.
 
-  \subsection{Solute Flux}
+  \subsection{Mean First Passage Time}
+  
+  We used the mean first passage time (MFPT) in order to quantify how long it would take a 
+  typical particle, parameterized with the above models, to travel across a membrane pore
+  of length $L$. To measure this quantity, we simulated realizations of 10000 particle 
+  trajectories, started at the pore entrance ($z=0$). In the case of uncorrelated hops, one
+  can continuously draw from the hop length distribution until $z \geq L$ (Or $-L$ for 
+  the sake of computational efficiency). The length of time between the last time the 
+  particle crossed $z=0$ and the end of the trajectory gives a single passage time. 
+  When particle hops are correlated, as they are in all cases of this work, we cannot 
+  continuously construct the particle trajectories. Rather, we must generate trajectories
+  of length $n$ and measure the length of the sub-trajectory which traverses from $0$ 
+  to $L$ without becoming negative. It is important to choose a value of $n$ sufficiently
+  large that all trajectories reach $L$, or else the mean first passage time will 
+  be underestimated. 
+  
+  Our definition of the mean first passage time differs from more standard treatments.
+  The setup of our system is consistent with a one dimensional interval with two absorbing 
+  boundaries. In the absence of an external force and a constant diffusion coefficient, $D$, 
+  the mean first passage time is simply:
+  \begin{equation}
+  T = \frac{z_0(L - z_0)}{2D}
+  \end{equation}
+  where $z_0$ is the initial position of particle trajectories.~\cite{gitterman_mean_2000}
+  Of course that implies a conventional MFPT of 0 since particles overwhelmingly exit the
+  pore at $z=0$. Therefore, we chose only to include trajectories in the MFPT calculation 
+  which cross the boundary at $L$. We are unaware of an analytical form of the MFPT or 
+  the distribution of passage times describing our system even in the simplest case of 
+  Brownian increments. 
+  
+  In the absence of an analytical equation for the MFPT, we instead report the location of
+  the peak of the passage time distribution. This has the added advantage of treating
+  cases where the passage time distribution diverges and no mean exists. While we will
+  call the peak in the distribution the MFPT, it is important to recognize that this 
+  value is more representative of a typical passage time rather than a mean. 
+  
+  
+  % BJC: concentration profile stuff
+%  One would then segment the trajectory
+%  each time it crosses $0$ and reflect all of the negative trajectories. The ensemble of
+%  trajectories is consistent with the fraction of partic
   
   \section{Results and Discussion}
   

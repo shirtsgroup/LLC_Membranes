@@ -3,9 +3,10 @@
 """ Find the mean first passage time (MFPT) of a type of particle
 """
 
-from LLC_Membranes.llclib import timeseries, file_rw, rand
+from LLC_Membranes.llclib import timeseries, file_rw, rand, stats
 from LLC_Membranes.timeseries.fractional_levy_motion import FLM
 from LLC_Membranes.timeseries import flm_sim_params
+from LLC_Membranes.analysis.sfbm_parameters import SFBMParameters
 import matplotlib.pyplot as plt
 from matplotlib import animation
 import numpy as np
@@ -19,6 +20,7 @@ import fbm
 import yaml
 import argparse
 import sys
+import random
 
 
 with warnings.catch_warnings():
@@ -56,8 +58,10 @@ class Hops:
         self.name = distribution
         self.params = params
         self._distributions = {'gaussian': self._gaussian_hops, 'levy': self._levy_hops}
+        self._set_params = {'gaussian': self._set_gaussian_params, 'levy': self._set_levy_params}
         self.length = n
         self.hops = self._distributions[self.name]
+        self.set_params = self._set_params[self.name]
 
         if self.name == 'levy':
 
@@ -81,6 +85,12 @@ class Hops:
         return self.params[0] * fbm.FBM(self.length, self.params[2], method="daviesharte").fbm() \
                / ((1.0 / self.length) ** self.params[2])
 
+    def _set_gaussian_params(self, params):
+
+        params[2] = 0.5  # for speed while testing
+
+        self.params = (params[1], self.params[1], params[2], self.params[3])
+
     def _levy_hops(self):
         """ Draw a sequence of hop lengths from a Levy stable distribution
 
@@ -90,6 +100,10 @@ class Hops:
         self.flm.generate_realizations(1, progress=False)
 
         return self.flm.realizations[0, :]
+
+    def _set_levy_params(self, params):
+
+        pass
 
 
 class Dwell:
@@ -103,11 +117,15 @@ class Dwell:
 
         self.name = distribution
         self._distributions = {None: self._no_trapping, 'power': self._powerlaw,
-                              'power_cut': self._powerlaw_cut, 'exponential': self._exponential}
+                               'power_cut': self._powerlaw_cut, 'exponential': self._exponential}
+        self._set_params = {None: self._set_no_trapping_params, 'power': self._set_powerlaw_params,
+                            'power_cut': self._set_powerlaw_cut_params, 'exponential': self._set_exponential_params}
 
         self.dwells = self._distributions[self.name]
 
         self.params = params
+
+        self.set_params = self._set_params[self.name]
 
     @staticmethod
     def _no_trapping(n):
@@ -119,6 +137,11 @@ class Dwell:
 
         return np.ones(n)
 
+    @staticmethod
+    def _set_no_trapping_params(params):
+
+        pass
+
     def _powerlaw(self, n):
         """ Draw dwell times from pure power law. Note that this has an infinite variance
 
@@ -129,6 +152,10 @@ class Dwell:
         return rand.random_powerlaw(self.params[0], ll=self.params[2], size=n, limit=None,
                                     discrete=False, exact=False)
 
+    def _set_powerlaw_params(self, params):
+
+        self.params = (1 + params[0], self.params[1], self.params[2])
+
     def _powerlaw_cut(self, n):
         """ Draw dwell times from a power law with an exponential cut-off
 
@@ -137,6 +164,10 @@ class Dwell:
         """
 
         return rand.random_powerlaw_cutoff(self.params[0], self.params[1], xmin=self.params[2], size=n)
+
+    def _set_powerlaw_cut_params(self, params):
+
+        self.params = (1 + params[0], params[1], self.params[2])
 
     def _exponential(self, n):
         """ Draw dwell times from an exponential distribution
@@ -147,13 +178,19 @@ class Dwell:
 
         return rand.random_exponential(self.params[1], size=n, xmin=self.params[1])
 
+    def _set_exponential_params(self, params):
+
+        self.params = (self.params[0], params[0], self.params[2])
+
 
 class MeanFirstPassageTime:
 
-    def __init__(self, L, n, nT, hop_params=None, dwell_params=None, dt=1., sigma=1, nbins=25, nt=1, save=True,
-                 discretization_points=1):
+    def __init__(self, L, n, nT, pickled_parameters=None, hop_params=None, dwell_params=None, dt=1., nbins=25,
+                 nt=1, save=True, concentration_profile=False):
         """ Generate trajectories from which to calculate mean first passage times. One can also use them to calculate
         the concentration profile within the pore
+
+        Only 1 mode anomalous diffusion trajectories are implemented
 
         :param L: length of 1D path (a pore for example) that particle follows (nm).
         :param n: number of particle trajectories to generate. It should be at least the number expected to be in a \
@@ -161,6 +198,8 @@ class MeanFirstPassageTime:
         :param nT: number of steps more particle trajectory. Make this a multiple of 2 for the best performance. Note \
         that there are better ways to do this for pure Brownian motion, but this script is built with correlation in \
         mind.
+        :param pickled_parameters: load hop and dwell paramters from pickle file generated by SFBMParameters class. This \
+        will override hop_params and dwell_params
         :param hop_params: dictionary with keys distribution, sigma, alpha and hurst
         :param dwell_params: dictionary with keys distribution and alpha
         :param dt: timestep to use while contsructing trajectories
@@ -170,10 +209,8 @@ class MeanFirstPassageTime:
         :param nt: number of threads to use when generating trajectories
         :param save: save trajectories to disk
         :param load: load trajectories saved to disk
-        :param discretization_points: to discretize, the time series will be divided into equal length segments. This \
-        parameter is multiplied by the number of observed time points in order to determine the number of segments. A \
-        higher value will give a higher resolution trajectories with respect to non-uniform dwell times. \
-
+        :param concentration_profile: set to True if you want to plot the concentration profile at the end. This
+        requires all trajectories to be saved.
 
         :type L: float
         :type n: int
@@ -185,12 +222,12 @@ class MeanFirstPassageTime:
         :type nt: int
         :type save: bool
         :type load: bool
+        :type concentration_profile: bool
         """
 
         # trajectory building parameters
         self.length = L
         self.ntraj = n
-        self.sigma = sigma
         self.trajectories = []
         self.passage_times = []
         self.time = []
@@ -198,27 +235,86 @@ class MeanFirstPassageTime:
         self.passage_times = []
         self.nt = nt
         self.discretization_points = discretization_points
+        self.nbins = nbins
+        self.resample = False
+
+        self.store_traj = False
+        if concentration_profile:
+            self.store_traj = True
 
         hop_dist = hop_params['distribution']
-
-        params = (np.sqrt(self.dt) * sigma, hop_params['alpha'], hop_params['hurst'], hop_params['max_hop'])
-        if hop_dist.lower() in ['gaussian', 'normal', 'brownian']:
-            self.hop_dist = Hops('gaussian', params, nT)
-        elif hop_dist.lower() in ['levy']:
-            self.hop_dist = Hops('levy', params, nT)
-
-        # TODO: these need to be passed
         dwell_dist = dwell_params['distribution']
-        params = (dwell_params['alpha'], dwell_params['lambda'], dwell_params['lower_limit'])
 
+        # conform names of distribution
+        hop_dist_name = None
+        if hop_dist.lower() in ['gaussian', 'normal', 'brownian']:
+            hop_dist_name = 'gaussian'
+        elif hop_dist.lower() in ['levy']:
+            hop_dist_name = 'levy'
+
+        dwell_dist_name = None
         if dwell_dist is None:
-            self.dwell_dist = Dwell(None, params)
+            dwell_dist_name = None
         elif dwell_dist.lower() in ['power', 'powerlaw']:
-            self.dwell_dist = Dwell('power', params)
-        elif dwell_dist.lower() in ['power_cut']:
-            self.dwell_dist = Dwell('power_cut', params)
+            dwell_dist_name = 'power'
+        elif dwell_dist.lower() in ['power_cut', 'powercut']:
+            dwell_dist_name = 'power_cut'
         elif dwell_dist.lower() in ['exponential', 'exp']:
-            self.dwell_dist = Dwell('exponential', params)
+            dwell_dist_name = 'exponential'
+
+        hop_p = None
+        dwell_p = None
+
+        if pickled_parameters is not None:
+            # This can be improved but first requires improvements to SFBMParameters
+
+            print('Loading Parameters from %s...' % pickled_parameters, end='', flush=True)
+            measured_params = file_rw.load_object(pickled_parameters)
+            print('Done!')
+
+            self.hop_parameter_distribution = measured_params.hop_parameters[0]  # [0] is index of mode (only 1 mode works)
+            self.dwell_parameter_distribution = measured_params.dwell_parameters[0]
+            self.hurst_distribution = measured_params.hurst_distribution[0]
+
+            if hop_dist_name == 'gaussian':
+
+                sig = random.choice(self.hop_parameter_distribution)[1]
+                hurst = random.choice(self.hurst_distribution)
+                #hurst = 0.5
+
+                hop_p = (sig, 2, hurst, measured_params.max_hop)
+
+            elif hop_dist_name == 'levy':
+
+                p = random.choice(self.hop_parameter_distribution)
+
+                hop_p = (p[2], 2, p[0], measured_params.max_hop)
+
+            if dwell_dist_name == 'power':
+
+                dwell_alpha = random.choice(self.dwell_parameter_distribution)
+
+                dwell_p = (1 + dwell_alpha, 0, measured_params.dwell_lower_limit[0])
+
+            elif dwell_dist_name == 'power_cut':
+
+                p = random.choice(self.dwell_parameter_distribution)
+
+                dwell_p = (1 + p[0], p[1], measured_params.dwell_lower_limit[0])
+
+            self.resample = True
+
+        else:
+
+            hop_p = (np.sqrt(self.dt) * hop_params['sigma'], hop_params['alpha'], hop_params['hurst'], hop_params['max_hop'])
+            dwell_p = (dwell_params['alpha'], dwell_params['lambda'], dwell_params['lower_limit'])
+
+        # print(hop_p)
+        # print(dwell_p)
+        # exit()
+
+        self.hop_dist = Hops(hop_dist_name, hop_p, nT)
+        self.dwell_dist = Dwell(dwell_dist_name, dwell_p)
 
         print('Generating Trajectories...')
         self.generate_trajectories(save=save)
@@ -231,7 +327,6 @@ class MeanFirstPassageTime:
         self.pore_concentration = 0  # concentration at pore entrance
         self.dz = 0
         self.steps = 0
-        self.nbins = nbins
         self.concentration = np.zeros([0, self.nbins])
         self.nparticles_in_pore = np.array([])
 
@@ -258,19 +353,16 @@ class MeanFirstPassageTime:
 
         while len(passage_times) < ntraj:
 
+            if self.resample:
+
+                hops = random.choice(self.hop_parameter_distribution)
+                dwells = random.choice(self.dwell_parameter_distribution)
+                hurst = random.choice(self.hurst_distribution)
+
+                self.hop_dist.set_params(hops + [hurst])
+                self.dwell_dist.set_params(dwells)
+
             walk = self.hop_dist.hops()
-            from scipy.stats import levy_stable
-            increments = walk[1:] - walk[:-1]
-            plt.hist(increments, 100, range=(-1.2, 1.2), density=True)
-            x = np.linspace(-1.2, 1.2, 1000)
-            y = levy_stable.pdf(x, 2, 0, loc=0, scale=np.sqrt(0.001))
-
-            plt.plot(x, y)
-            plt.show()
-
-            # plt.plot(walk)
-            # plt.show()
-            exit()
 
             # find when the cross-over occurs
             cross = timeseries.switch_points(np.abs(walk) >= self.length)[1] + 2
@@ -279,50 +371,20 @@ class MeanFirstPassageTime:
 
             traj = self._crossings(walk)
 
-            for i, t in enumerate(traj):
-                trajectories.append(t)
-                time = self.dt * np.cumsum(self.dwell_dist.dwells(len(t)))
-                times.append(time - time[0])
+            if self.store_traj:
 
-            if np.abs(walk).max() >= self.length:
-                passage_times.append(times[-1][-1])
+                for i, t in enumerate(traj):
+                    trajectories.append(t)
+                    time = self.dt * np.cumsum(self.dwell_dist.dwells(len(t)))
+                    times.append(time - time[0])
 
-            # if self.hop_dist.name == 'gaussian':
-            #
-            #     walk = [0]
-            #
-            #     # eventually move this to Hop class
-            #     while 0 <= walk[-1] < self.length:
-            #
-            #         walk.append(walk[-1] + sigma * np.random.normal())
-            #
-            #     if len(walk) > 1:
-            #
-            #         walk = np.array(walk)
-            #
-            #         trajectories.append(walk[1:])
-            #         time = np.cumsum(self.dwell_dist.random_dwell(
-            #             walk.size)) * self.dt  # TODO : not sure if multiplying by dt is right
-            #         times.append(time - time[0])
-            #
-            #         if walk[-1] >= self.length:
-            #
-            #             passage_times.append(len(walk))
-            #
-            # elif self.hop_dist.name == 'fbm':
-            #
-            #     # length of trajectories should be sufficiently long that traj always reaches end
-            #     walk = self.hop_dist.hops()
-            #
-            #     # find when the cross-over occurs
-            #     cross = timeseries.switch_points(np.abs(walk) >= self.length)[1] + 2
-            #
-            #     walk = walk[:cross]
-            #
-            #     trajectories += self._crossings(walk)
-            #
-            #     if np.abs(walk).max() >= self.length:
-            #         passage_times.append(len(trajectories[-1]))
+                if np.abs(walk).max() >= self.length:
+                    passage_times.append(times[-1][-1])
+
+            else:
+
+                time = np.cumsum(self.dwell_dist.dwells(len(traj[-1])))
+                passage_times.append(time[-1] * self.dt)
 
             n += 1
             print('\r%d/%d trajectories' % (len(passage_times), ntraj), end='')
@@ -382,20 +444,111 @@ class MeanFirstPassageTime:
         self.passage_times = np.array(self.passage_times)
 
         print('\n%.2f %% of trajectories reached L' % percent_crossed_pore)
-        print('Mean first passage time: %.2f ns' % self.passage_times.mean())
 
         if save:
             file_rw.save_object((self.trajectories, self.time), 'trajectories.pl')
 
-        if self.dwell_dist.name is not None:
+    def mfpt(self, nboot, percentile=99.5):
+        """ Bootstrap the distribution of mean first passage times and report where the maximum occurs
 
-            n = self.discretization_points
-            longest = max([len(x) for x in self.trajectories])
-            longest_time = max([x[-1] for x in self.time])
-            self.time_uniform = np.linspace(0, longest_time, longest * n)
-            self.discretize_time()
+        :param nboot: number of bootstrap trials
+        :param percentile: plot all passage times up to this percentile of the distribution
+        
+        :type nboot: int
+        :type percentile: float
+        """
 
-    def discretize_time(self):
+        max_pt = np.zeros(nboot)
+        limits = (self.passage_times.min(), np.percentile(self.passage_times, percentile))
+        bar_heights = np.zeros(self.nbins)
+
+        for b in range(nboot):
+
+            ptimes = np.random.choice(self.passage_times, size=self.passage_times.size, replace=True)
+
+            n, edges = np.histogram(ptimes, bins=self.nbins, range=limits, density=True)
+            bin_width = edges[1] - edges[0]
+            bin_centers = [x + bin_width / 2 for x in edges[:-1]]
+
+            max_pt[b] = bin_centers[np.argmax(n)]
+            bar_heights += n
+
+        bar_heights /= nboot
+
+        plt.bar(bin_centers, bar_heights, bin_width)
+        # from scipy.signal import savgol_filter as sf
+        # plt.plot(bin_centers, sf(bar_heights, 19, 5), '--', lw=2, color='black')
+
+        print('Mean first passage time: %.2f +/- %.2f ns' % (max_pt.mean(), max_pt.std()))
+
+        plt.ylabel('Probability', fontsize=14)
+        plt.xlabel('Passage time (ns)', fontsize=14)
+        plt.tick_params(labelsize=14)
+        plt.tight_layout()
+        # self.mfpt_ecdf()
+
+        plt.savefig('mfpt_L%s.pdf' % self.length)
+        plt.show()
+
+    def mfpt_ecdf(self):
+        """ Calculate the emperical cumulative distribution function of the passage times.
+        """
+
+        cdf = stats.Cdf(self.passage_times)
+
+        # plt.figure()
+        # plt.plot(cdf.xs, cdf.ys)
+
+        x, uniq_ndx = np.unique(cdf.xs, return_index=True)
+        y = cdf.ys[uniq_ndx]
+
+        from scipy.interpolate import PchipInterpolator as pchip
+        from scipy.signal import savgol_filter as sf
+
+        smooth = sf(y, 201, 3)
+        # plt.plot(x, smooth, '--', lw=2, color='black')
+        #
+        # #spline = pchip(x[::100], y[::100])
+        #
+        # plt.plot(x, y)
+        # plt.show()
+        # exit()
+        # xinterp = np.linspace(x[0], x[-1], 500)
+        # yinterp = spline(xinterp)
+
+        # plt.plot(x, cdf.ys[uniq_ndx])
+        # plt.show()
+        # exit()
+
+        #plt.figure()
+        dx = x[1:] - x[:-1]
+        deriv = np.diff(smooth) / dx
+        file_rw.save_object(self.passage_times, 'ptimes.pl')
+        plt.plot(x, sf(y, 501, 3, deriv=1), '--', label='Approximate Analytical PDF', lw=2, color='black')
+        plt.show()
+        exit()
+
+    def save_passage_times(self, name='passage_times.pl'):
+
+        file_rw.save_object(self.passage_times, name)
+
+    def discretize(self, buffer=1):
+        """ Discretize timeseries into equal length segments. Dwell time distributions are continuous. This is only
+        useful for flux calculations because the concentration profile doesn't depend on the dwell time distribution.
+
+        :param buffer: to discretize, the time series will be divided into equal length segments. This parameter is \
+        multiplied by the number of observed time points in order to determine the number of segments. A higher value \
+        will give a higher resolution trajectories with respect to non-uniform dwell times.
+
+        :type buffer: int
+        """
+
+        longest = max([len(x) for x in self.trajectories])
+        longest_time = max([x[-1] for x in self.time])
+        self.time_uniform = np.linspace(0, longest_time, longest * buffer)
+        self._discretize_time()
+
+    def _discretize_time(self):
         # TODO: increase bins in time_uniform (e.g. make time steps one tenth of dt)
 
         ntraj = len(self.trajectories)
@@ -469,8 +622,18 @@ class MeanFirstPassageTime:
 
         #file_rw.save_object(data, 'data.pl')
 
-        #print(self.nbins, self.length)
-        plt.hist(data, self.nbins, range=(0, self.length))
+        n, edges = np.histogram(data, bins=self.nbins, range=(0, self.length), density=True)
+        bin_width = edges[1] - edges[0]
+        bin_centers = [x + bin_width / 2 for x in edges[:-1]]
+
+        plt.figure()
+        plt.plot(bin_centers, n, lw=2)
+        plt.fill_between(bin_centers, np.zeros(n.size), n, alpha=0.5)
+        #plt.hist(data, self.nbins, range=(0, self.length), density=True)
+        plt.xlabel('Pore coordinate (nm)', fontsize=14)
+        plt.ylabel('Probability', fontsize=14)
+        plt.tick_params(labelsize=14)
+        plt.tight_layout()
         plt.show()
 
     def simulate_flux(self, pore_concentration=1, dz=0.1, steps=2000, measure_flux=False):
@@ -878,12 +1041,12 @@ if __name__ == "__main__":
     nT = 2**cfg['nT']
     save_trajectories = cfg['save_trajectories']
     discretization_points = cfg['discretization_points']
+    bins = cfg['bins']
 
     print('sigma per step: %.2f' % (sigma * np.sqrt(dt)))
 
     # flux stuff
     pore_conc = 1
-    bins = 25
     steps = 500000
     equil = int(steps/2)  # use 3/4 of the data
     dz = L / bins  # make dz independent of bins. Will just need to change normalization on plot
@@ -893,8 +1056,14 @@ if __name__ == "__main__":
     load = False
 
     mfpt = MeanFirstPassageTime(L, ntraj, nT, hop_params=hop_parameters, dwell_params=dwell_parameters, dt=dt,
-                                nbins=bins, nt=nt, save=save_trajectories, discretization_points=discretization_points)
-    mfpt.concentration_from_histogram()
+                                nbins=bins, nt=nt, save=save_trajectories, pickled_parameters=cfg['pickled_parameters'],
+                                concentration_profile=cfg['concentration'])
+    mfpt.mfpt(cfg['nboot'])
+    if cfg['concentration']:
+        mfpt.concentration_from_histogram()
+
+    if cfg['save_passage_times']:
+        mfpt.save_passage_times(name=cfg['save_passage_times_name'])
 
     exit()
 
