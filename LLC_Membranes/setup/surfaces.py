@@ -70,7 +70,7 @@ def gridgen(surf, low, high, n, c=0, tol=0.01):
     y = np.linspace(low, high - bin_size, n)
     z = np.linspace(low, high - bin_size, n)
 
-    if surf.lower() == 'ia3d' or surf.lower() == 'gyroid':
+    if surf.lower() in ['ia3d', 'gyroid']:
 
         gyro = gyroid([x[:, None, None], y[None, :, None], z[None, None, :]], high - low)
 
@@ -86,7 +86,7 @@ def gridgen(surf, low, high, n, c=0, tol=0.01):
 
         grid = gyro_eval[:count_gyro, :]
 
-    elif surf.lower() == 'pn3m' or surf.lower() == 'schwarzd':
+    elif surf.lower() in ['pn3m', 'schwarzd', 'diamond']:
 
         schwarz = SchwarzD([x[:, None, None], y[None, :, None], z[None, None, :]], high - low)
         schwarz_eval = np.zeros([n**3, 3])
@@ -139,13 +139,13 @@ def gradient(v, surf, period):
 
     n = 2*np.pi / period
 
-    if surf.lower() == 'ia3d' or surf.lower() == 'gyroid':
+    if surf.lower() in ['ia3d', 'gyroid']:
 
         a = n*np.cos(n*x)*np.cos(n*y) - n*np.sin(n*x)*np.sin(n*z)
         b = -n*np.sin(n*y)*np.sin(n*x) + n*np.cos(n*y)*np.cos(n*z)
         c = -n*np.sin(n*y)*np.sin(n*z) + n*np.cos(n*z)*np.cos(n*x)
 
-    elif surf.lower() == 'pn3m' or surf.lower() == 'schwarzd':
+    elif surf.lower() in ['pn3m', 'schwarzd', 'diamond']:
 
         a = n*np.cos(n*x)*np.sin(n*y)*np.sin(n*z) + n*np.cos(n*x)*np.cos(n*y)*np.cos(n*z) - n*np.sin(n*x)*np.sin(n*y)*np.cos(n*z) - n*np.sin(n*x)*np.cos(n*y)*np.sin(n*z)
         b = n*np.sin(n*x)*np.cos(n*y)*np.sin(n*z) - n*np.sin(n*x)*np.sin(n*y)*np.cos(n*z) + n*np.cos(n*x)*np.cos(n*y)*np.cos(n*z) - n*np.cos(n*x)*np.sin(n*y)*np.sin(n*z)

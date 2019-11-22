@@ -6,13 +6,11 @@ import mdtraj as md
 import ruptures
 from scipy.optimize import curve_fit
 from scipy.stats import levy_stable
-from sympy import mpmath
 from LLC_Membranes.llclib import topology, physical, file_rw, fitting_functions, timeseries
 import tqdm
 import sqlite3 as sql
 import os
 import sys
-import pymbar
 import levy
 
 

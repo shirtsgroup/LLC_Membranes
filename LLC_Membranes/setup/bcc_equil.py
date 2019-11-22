@@ -325,7 +325,7 @@ class EquilibrateBCC(topology.LC):
         return delta
 
     def add_solvent(self, solvent, tol=10, scale=0.45, nvt_length=1000, npt_length=1000, out='solvated_final.gro',
-                    nolimit=True):
+                    nolimit=False):
         """ Name of solvent residue to add to structure. This is an iterative process of solvent insertion, energy
         minimzation, and an nvt simulation
 
@@ -354,6 +354,9 @@ class EquilibrateBCC(topology.LC):
         else:
             mass_solvent = self.system.nmon * self.system.MW * ((100 - self.weight_percent) / self.weight_percent)
             self.nsolvent = int(mass_solvent / self.solvent.MW)  # total number of solutes to add
+            # print(self.system.nmon)
+            # print(self.system.MW, self.solvent.MW, self.nsolvent)
+            # exit()
 
         # create nvt mdp file
         self.mdp.write_nvt_mdp(length=50)

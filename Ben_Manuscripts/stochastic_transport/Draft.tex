@@ -824,7 +824,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 %  as well as to sequences of emissions while dwelling in specific states using the FLM
 %  simulation procedure described in Section~\ref{method:model_sFBM}.
 
-  \subsection{Mean First Passage Time}
+  \subsection{Mean First Passage Time}\label{method:mfpt}
   
   We used the mean first passage time (MFPT) in order to quantify how long it would take a 
   typical particle, parameterized with the above models, to travel across a membrane pore
@@ -1587,21 +1587,61 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   further reduce the state-space of our models, it may have better predictive success,
   but we lose mechanistic detail.
   
-  \subsection{Predicting solute flux}\label{section:mfpt}
+  \subsection{Solute Mean First Passage Times}\label{section:mfpt}
   
-  In this section, we use our most promising models to predict solute flux 
-  through a theoretical 50 nm channel. For our comparisons to MD, using a truncated
-  power law distribution is an obvious choice. However, given that extremely
-  long dwells are a rare event, it is possible that studying a much larger set of 
-  solutes will fill in the tail of the pure power law PDF. Regarding hop length 
-  distributions, the generality of L\'evy stable distributions is powerful, but the
-  lack of exact methods for simulation of fractional L\'evy motion reduces it's 
-  accuracy and computational tractability. Treating the dynamics as fractional 
-  Brownian motion is probably sufficient unless the L\'evy index, $\alpha_h$, is 
-  well below 2.
+  We used the 1-mode sFBMcut (see Table~\ref{table:anomalous_models}) anomalous 
+  diffusion model in order to demonstrate how one can use its realizations in
+  order to calculate the MFPT (section~\ref{method:mfpt}) of solutes given model 
+  parameters extracted from MD simulations. Any approach which allows one to 
+  generate realizations of solute trajectories can be used in place of the AD model. 
   
-  Choosing which model to use for long timescale projections is not entirely obvious
-  without experimental data to compare with. 
+  In Figure~\ref{fig:mfpt_curves_regular} we show that the MFPT grows super-linearly
+  with pore length. We fit a curve of the form $cL^{\alpha}$ to the curves in order
+  to estimate the growth exponent, $\alpha$. The growth exponent is inversely proportional
+  to the solute MSDs which is consistent with longer passage times for solutes that
+  progres through the pores more slowly. 
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{mfpt_curves.pdf}
+  \caption{}\label{fig:mfpt_curves_regular}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{mfpt_curves_brownian.pdf}
+  \caption{}\label{fig:mfpt_curves_brownian}
+  \end{subfigure}
+  \caption{}\label{fig:mfpt_curves}
+  \end{figure}
+  
+  The growth exponent is inversely related to the hurst parameter. In 
+  Figure~\ref{fig:mfpt_curves_brownian}, we removed the correlation structure (set
+  $H$=0.5) from AD trajectory realizations so that all hops were uncorrelated.
+  Regardless of the parameters of the dwell time distribution, the growth 
+  exponent is always about 2, the same value that we observe for Brownian 
+  motion (see Figure~\ref{S-fig:mfpt_curve_brownian} of the Supporting 
+  Information). 
+  
+  Comparison of Figures~\ref{fig:mfpt_curves_regular} and~\ref{fig:mfpt_curves_brownian}
+  highlights that the Hurst parameter plays a major role in 
+  
+  The correlation between hops signficantly 
+  
+  %BJC: can make design suggestions by trying to decrease anticorrelation by x
+  
+%  In this section, we use our most promising models to predict solute flux 
+%  through a theoretical 50 nm channel. For our comparisons to MD, using a truncated
+%  power law distribution is an obvious choice. However, given that extremely
+%  long dwells are a rare event, it is possible that studying a much larger set of 
+%  solutes will fill in the tail of the pure power law PDF. Regarding hop length 
+%  distributions, the generality of L\'evy stable distributions is powerful, but the
+%  lack of exact methods for simulation of fractional L\'evy motion reduces it's 
+%  accuracy and computational tractability. Treating the dynamics as fractional 
+%  Brownian motion is probably sufficient unless the L\'evy index, $\alpha_h$, is 
+%  well below 2.
+%  
+%  Choosing which model to use for long timescale projections is not entirely obvious
+%  without experimental data to compare with. 
   
 %  We projected the long timescale behavior using this model. 
 
@@ -1690,7 +1730,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   %MRS3: add specific info for PRF and GAANN
   %BJC3: I don't know the PRF info. I wrote GAANN as I did on the last paper which is what Rob Davis told me to do
   %MRS4: I will≈ç track down the PRF grant number (if typical)
-  This work was supported in part by the ACS Petroleum Research Fund grant XXXXXX 
+  This work was supported in part by the ACS Petroleum Research Fund grant \#59814-ND7
   and the Graduate Assistance in Areas of National Need (GAANN)
   fellowship which is funded by the U.S. Department of Education.
   Molecular simulations were performed using the Extreme Science and

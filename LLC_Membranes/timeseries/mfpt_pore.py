@@ -309,6 +309,7 @@ class MeanFirstPassageTime:
             hop_p = (np.sqrt(self.dt) * hop_params['sigma'], hop_params['alpha'], hop_params['hurst'], hop_params['max_hop'])
             dwell_p = (dwell_params['alpha'], dwell_params['lambda'], dwell_params['lower_limit'])
 
+        # print(dwell_dist_name)
         # print(hop_p)
         # print(dwell_p)
         # exit()
@@ -383,10 +384,12 @@ class MeanFirstPassageTime:
 
             else:
 
-                time = np.cumsum(self.dwell_dist.dwells(len(traj[-1])))
-                passage_times.append(time[-1] * self.dt)
+                if np.abs(walk).max() >= self.length:
+                    time = np.cumsum(self.dwell_dist.dwells(len(traj[-1])))
+                    passage_times.append(time[-1] * self.dt)
 
             n += 1
+
             print('\r%d/%d trajectories' % (len(passage_times), ntraj), end='')
 
         return trajectories, times, passage_times, n
@@ -488,7 +491,7 @@ class MeanFirstPassageTime:
         # self.mfpt_ecdf()
 
         plt.savefig('mfpt_L%s.pdf' % self.length)
-        plt.show()
+        #plt.show()
 
     def mfpt_ecdf(self):
         """ Calculate the emperical cumulative distribution function of the passage times.
