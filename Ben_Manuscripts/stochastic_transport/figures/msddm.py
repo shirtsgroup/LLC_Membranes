@@ -79,6 +79,8 @@ nsteps = MD_MSD.nT  # match the number of frames
 # probably easier to just re-run these calculations in the appropriate directory. 
 # Doesn't matter which dwell/hop is used as they will be re-fit below
 states = file_rw.load_object('%s/states.pl' % directory)
+print(states.hurst)
+exit()
 
 if extreme_trapping:
 	states.hurst[:, :] = 0

@@ -828,22 +828,24 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   
   We used the mean first passage time (MFPT) in order to quantify how long it would take a 
   typical particle, parameterized with the above models, to travel across a membrane pore
-  of length $L$. To measure this quantity, we simulated realizations of 10000 particle 
-  trajectories, started at the pore entrance ($z=0$). In the case of uncorrelated hops, one
-  can continuously draw from the hop length distribution until $z \geq L$ (Or $-L$ for 
+  of length $L$. To measure this quantity, we simulated 50000 realizations of particle 
+  trajectories, released at the pore entrance ($z=0$). In the case of uncorrelated hops, one
+  can continuously draw from the hop length distribution until $z \geq L$ (or $-L$ for 
   the sake of computational efficiency). The length of time between the last time the 
   particle crossed $z=0$ and the end of the trajectory gives a single passage time. 
   When particle hops are correlated, as they are in all cases of this work, we cannot 
   continuously construct the particle trajectories. Rather, we must generate trajectories
   of length $n$ and measure the length of the sub-trajectory which traverses from $0$ 
-  to $L$ without becoming negative. It is important to choose a value of $n$ sufficiently
-  large that all trajectories reach $L$, or else the mean first passage time will 
-  be underestimated. 
+  to $L$ without becoming negative.
+  %BJC4: below is only necessary if you the mean of the distribution exists.
+  %It is important to choose a value of $n$ sufficiently
+  %large that all trajectories reach $L$, or else the mean first passage time will 
+  %be underestimated. 
   
-  Our definition of the mean first passage time differs from more standard treatments.
-  The setup of our system is consistent with a one dimensional interval with two absorbing 
-  boundaries. In the absence of an external force and a constant diffusion coefficient, $D$, 
-  the mean first passage time is simply:
+  Our definition of the MFPT differs from more standard treatments. The setup of our 
+  system is consistent with a one dimensional interval with two absorbing boundaries. In
+  the absence of an external force and with a constant diffusion coefficient,
+  $D$, the MFPT is simply:
   \begin{equation}
   T = \frac{z_0(L - z_0)}{2D}
   \end{equation}
@@ -852,15 +854,17 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   pore at $z=0$. Therefore, we chose only to include trajectories in the MFPT calculation 
   which cross the boundary at $L$. We are unaware of an analytical form of the MFPT or 
   the distribution of passage times describing our system even in the simplest case of 
-  Brownian increments. 
+  Brownian increments. %BJC4: still digging for an analytical solution. Rich said the 
+  %'marathon' runner problem might give a solution. It may be the same as the distribution
+  % of runners crossing the finish line
   
+  %BJC4: I'm not sure the best way to get the peak
   In the absence of an analytical equation for the MFPT, we instead report the location of
   the peak of the passage time distribution. This has the added advantage of treating
   cases where the passage time distribution diverges and no mean exists. While we will
   call the peak in the distribution the MFPT, it is important to recognize that this 
   value is more representative of a typical passage time rather than a mean. 
-  
-  
+
   % BJC: concentration profile stuff
 %  One would then segment the trajectory
 %  each time it crosses $0$ and reflect all of the negative trajectories. The ensemble of
@@ -917,13 +921,14 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   immobility (see Figure~\ref{fig:solute_trajectories} for example). The near-Gaussian distribution
   of jump lengths and power law distribution of dwell times are both characteristic of 
   CTRWs (Figures~\ref{fig:hop_distribution_comparison} and~\ref{fig:powerlaw}). The apparent
-  correlation between hops suggests a fractional diffusion process is subordinate to the
+  anti-correlation between hops suggests a fractional diffusion process is subordinate to the
   CTRW. We believe the subordinated process is FBM because its analytical correlation 
   structure is close to that observed in our simulation (Figure~\ref{fig:hop_acf}). FBM
   is common in crowded viscoelastic environments where motions are highly influenced by
   the motion of surrounding components, such as monomer tails in our case.~\cite{ernst_fractional_2012}
   The parameter estimates describing our 1 and 2 mode models are summarized in 
-  Tables~\ref{table:sfbm_params} and~\ref{table:sfbm_params_2mode}.
+  Tables~\ref{table:sfbm_params} and~\ref{table:sfbm_params_2mode} (also trying it out in 
+  Figures~\ref{fig:radars} and~\ref{fig:radars_nolines})
   
   \begin{figure}
   \centering
@@ -1034,6 +1039,48 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   sufficiently long sequences of hops in each mode. See Table~\ref{table:sfbm_params} for
   descriptions of the parameters.}\label{table:sfbm_params_2mode}
   \end{table}
+  
+  %BJC4: another way to visualize data
+  %BJC4: I think these are kind of hard to read. Can't really see any trends. Open to other
+  %ideas.
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\linewidth]{1mode_radar.pdf}
+  \caption{}\label{fig:1mode_radar}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\linewidth]{2mode_radar.pdf}
+  \caption{}\label{fig:2mode_radar}
+  \end{subfigure}
+  \caption{Another way to visualize Tables~\ref{table:sfbm_params} and~\ref{table:sfbm_params_2mode}}\label{fig:radars}
+  \end{figure}
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\linewidth]{1mode_radar_nolines.pdf}
+  \caption{}\label{fig:1mode_radar}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\linewidth]{2mode_radar_nolines.png}   % for some reason it has trouble saving this as a PDF
+  \caption{}\label{fig:2mode_radar}
+  \end{subfigure}
+  \caption{Same as Figure~\ref{fig:radars} but with no lines between points}\label{fig:radars_nolines}
+  \end{figure}
+  
+%  \begin{figure}
+%  \centering
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\linewidth]{1mode_radar_nolines.pdf}
+%  \caption{}\label{fig:1mode_radar_nolines}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\linewidth]{2mode_radar_nolines.pdf}
+%  \caption{}\label{fig:2mode_radar_nolines}
+%  \end{subfigure}
+%  \caption{Same as Figure~\ref{fig:radars} but with no lines between points}\label{fig:radars_nolines}
+%  \end{figure}
   
   Using the parameters in Tables~\ref{table:sfbm_params} and~\ref{table:sfbm_params_2mode}
   as inputs to our models, we obtain reasonable predictions of the MD simulated MSDs. The 
@@ -1363,7 +1410,6 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   are tabulated in Table~\ref{table:msddm_params}. 
   
   %MRS4: might this work better visually?  Table in SI, figure here?
-  %BJC4: Are you talking about the table after this figure? Somehow I'd need to fit 108 pieces of data into a single figure
   \begin{figure}
   \centering
   \begin{subfigure}{0.49\textwidth}
@@ -1405,6 +1451,33 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   are defined in Table~\ref{table:states} except state T which describes the transition
   emissions.}\label{table:msddm_params}
   \end{table}
+  
+  
+  %BJC4: better visualization scheme
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{H_v_state.pdf}
+  \caption{}\label{fig:H_v_state}
+  \end{subfigure}
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{alpha_v_state.pdf}
+  \caption{}\label{fig:alpha_v_state}
+  \end{subfigure}
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{sigma_v_state.pdf}
+  \caption{}\label{fig:sigma_v_state}
+  \end{subfigure}
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{state_probabilities.pdf}
+  \caption{}\label{fig:state_probabilities}
+  \end{subfigure}
+  \caption{We calculated values of $H$, $\alpha_h$ and $\sigma$ from MD simulation
+  trajectories and used them to generate realizations of our MSDDM model. The states
+  are defined in Table~\ref{table:states} except state T which describes the transition
+  emissions.}\label{fig:msddm_parameters}
+  \end{figure}
+  
 %  
 %  \begin{table}[h]
 %  \centering
@@ -1501,12 +1574,13 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   of the pore.
   
   % /figures/msddm_state_probabilities.py
-  \begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{state_probabilities.pdf}
-  \caption{The probability of finding urea or ethylene glycol in a given state.}\label{fig:state_probabilities}
-  \end{figure}
-  
+  %BJC4: combined with previous figure.
+%  \begin{figure}
+%  \centering
+%  \includegraphics[width=0.5\textwidth]{state_probabilities.pdf}
+%  \caption{The probability of finding urea or ethylene glycol in a given state.}\label{fig:state_probabilities}
+%  \end{figure}
+%  
   
   %BJC3: show how much of the MSD comes from each? Not sure this will work because of transition matrix dependence
   %BJC3: can just say 
@@ -1599,33 +1673,54 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   with pore length. We fit a curve of the form $cL^{\alpha}$ to the curves in order
   to estimate the growth exponent, $\alpha$. The growth exponent is inversely proportional
   to the solute MSDs which is consistent with longer passage times for solutes that
-  progres through the pores more slowly. 
+  progress through the pores more slowly. 
   
-  \begin{figure}
-  \centering
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{mfpt_curves.pdf}
-  \caption{}\label{fig:mfpt_curves_regular}
-  \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{mfpt_curves_brownian.pdf}
-  \caption{}\label{fig:mfpt_curves_brownian}
-  \end{subfigure}
-  \caption{}\label{fig:mfpt_curves}
-  \end{figure}
-  
-  The growth exponent is inversely related to the hurst parameter. In 
+  The growth exponent is inversely related to the hurst parameter, $H$. In 
   Figure~\ref{fig:mfpt_curves_brownian}, we removed the correlation structure (set
   $H$=0.5) from AD trajectory realizations so that all hops were uncorrelated.
   Regardless of the parameters of the dwell time distribution, the growth 
   exponent is always about 2, the same value that we observe for Brownian 
   motion (see Figure~\ref{S-fig:mfpt_curve_brownian} of the Supporting 
-  Information). 
+  Information).
+  
+  % BJC5: I'm not sure the best way to calculate statistics on this. Since I don't know
+  % the density function of the mean first passage time distribution, I use bins to 
+  % to locate the peaks. So the error bars are dependent on the bin width. 
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\textwidth]{mfpt_curves.pdf}
+  \caption{Correlated Hops}\label{fig:mfpt_curves_regular}
+  \end{subfigure}
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\textwidth]{mfpt_curves_brownian.pdf}
+  \caption{Uncorrelated Hops}\label{fig:mfpt_curves_brownian}
+  \end{subfigure}
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\textwidth]{frac_pore.pdf}  % This figure might fit in earlier
+  \caption{}\label{fig:frac_pore}
+  \end{subfigure}
+  \caption{(a) We fit the MFPT versus pore length to a function of the form $cL^{\alpha}$. 
+  The MFPT grows super-linearly with increasing pore length. Solutes with lower MSDs have
+  higher MFPTs. (b) If we remove correlation between hops, the MFPTs reduce significantly
+  and the growth exponent stays constant at 2 for all solutes independent of dwell
+  distribution parameters. Higher degrees of anti-correlation (lower $H$) lead to higher
+  growth exponents. (c) Solutes that spend a large fraction of their time in the tails tend
+  to have larger Hurst parameters.}\label{fig:mfpt_curves}
+  \end{figure}
   
   Comparison of Figures~\ref{fig:mfpt_curves_regular} and~\ref{fig:mfpt_curves_brownian}
-  highlights that the Hurst parameter plays a major role in 
+  highlights that anti-correlation between hops plays a major role in solute passage times.
+  With a pore length of 50 nm, the MFPT of the fasted moving solute, ethylene glycol is 
+  c.a. 5 times higher with versus without anti-correlated hops. The MFPTs of the slowest
+  moving solute, acetic acid, are about 16 times higher by the same comparison. This 
+  difference will only grow with increasing pore length. 
   
-  The correlation between hops signficantly 
+  In Figure~\ref{fig:frac_pore}, we show that solutes which spend more time in the tails
+  tend to have lower Hurst parameters. The densely packed, viscoelastic alkane chains 
+  bounce solutes between them, severely limiting their mobility. Designing LLC membranes
+  that can control or prevent the partition of solutes into the tails may offer the highest
+  returns on membrane performance.
   
   %BJC: can make design suggestions by trying to decrease anticorrelation by x
   
