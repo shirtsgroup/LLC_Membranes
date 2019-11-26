@@ -121,7 +121,7 @@ if __name__ == '__main__':
 
     plt.tight_layout()
     if lw == 0:
-        plt.savefig('2mode_radar_nolines.png')
+        plt.savefig('2mode_radar_nolines.pdf')
     else:
         plt.savefig('2mode_radar.pdf')
     plt.show()

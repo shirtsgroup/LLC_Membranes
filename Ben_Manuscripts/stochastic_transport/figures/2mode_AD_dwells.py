@@ -44,8 +44,9 @@ names = {'URE': 'urea', 'GCL': 'ethylene glycol', 'MET': 'methanol', 'ACH': 'ace
 names2 = ['urea', 'ethylene\nglycol', 'methanol', 'acetic\nacid']
 bar_width = 0.2
 bar_locations = np.arange(1, 5)
+fontsize=16
 
-fig, ax1 = plt.subplots()
+fig, ax1 = plt.subplots(figsize=(8,6))
 ax2 = ax1.twinx()
 
 # mode 1
@@ -85,7 +86,7 @@ for i, res in enumerate(sol):
 
 hatch1 = mpatches.Patch(facecolor='white', label=r'$\alpha_d$', edgecolor='black')
 hatch2 = mpatches.Patch(facecolor='white', hatch='//', label='$\lambda$', edgecolor='black')
-plt.legend(handles=[hatch1, hatch2], fontsize=14, loc=0)
+plt.legend(handles=[hatch1, hatch2], fontsize=fontsize, loc=0)
 plt.xticks([1.05, 2.05, 3.05, 4.05], names2)
 #ax1.set_yticklabels([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1.0], labels=[1, 0.75, 0.5, 0.25, 0, 0.25, 0.5, 0.75, 1.0])
 ax1.set_yticklabels([1, 0.75, 0.5, 0.25, 0, 0.25, 0.5, 0.75, 1.0])
@@ -93,11 +94,16 @@ ax2.set_yticklabels([0.006, 0.004, 0.002, 0, 0.002, 0.004, 0.006])
 for xtick, res in zip(ax1.get_xticklabels(), sol):
     xtick.set_color(colors[res])
 
+ax1.text(2.6, 1, 'Mode 1', verticalalignment='center', horizontalalignment='center', fontsize=18, fontweight='bold')#, bbox=props, fontweight='bold')
+ax1.text(2.6, -0.9, 'Mode 2', verticalalignment='center', horizontalalignment='center', fontsize=18, fontweight='bold')#, bbox=props, fontweight='bold')
+
 #ax1.set_xlabel('Solute', fontsize=14)
-ax1.set_ylabel(r'$\alpha_d$', fontsize=14)
-ax2.set_ylabel('$\lambda$', fontsize=14)
-ax1.tick_params(labelsize=14)
-ax2.tick_params(labelsize=14)
+ax1.set_ylabel(r'$\alpha_d$', fontsize=fontsize)
+ax2.set_ylabel('$\lambda$', fontsize=fontsize)
+ax1.tick_params(labelsize=fontsize)
+ax2.tick_params(labelsize=fontsize)
+ax1.plot([0.6, 4.6], [0, 0], lw=2, color='black')
+ax1.set_xlim(0.6, 4.6)
 ax2.set_ylim(-0.006, 0.0045)
 ax1.set_ylim(-0.65, 1.1)
 align_yaxis(ax1, 0, ax2, 0)

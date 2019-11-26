@@ -1041,8 +1041,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \end{table}
   
   %BJC4: another way to visualize data
-  %BJC4: I think these are kind of hard to read. Can't really see any trends. Open to other
-  %ideas.
+  %BJC4: I think these are kind of hard to read. Can't really see any trends.
   \begin{figure}
   \centering
   \begin{subfigure}{0.45\textwidth}
@@ -1063,7 +1062,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \caption{}\label{fig:1mode_radar}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\linewidth]{2mode_radar_nolines.png}   % for some reason it has trouble saving this as a PDF
+  \includegraphics[width=\linewidth]{2mode_radar_nolines.eps}   % for some reason it has trouble saving this as a PDF (.eps doesn't show opacity)
   \caption{}\label{fig:2mode_radar}
   \end{subfigure}
   \caption{Same as Figure~\ref{fig:radars} but with no lines between points}\label{fig:radars_nolines}
@@ -1081,7 +1080,70 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 %  \end{subfigure}
 %  \caption{Same as Figure~\ref{fig:radars} but with no lines between points}\label{fig:radars_nolines}
 %  \end{figure}
-  
+
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\textwidth]{1mode_AD_hops.pdf}
+  \caption{$\mathcal{N}(\sigma) / L(\sigma, \alpha_h)$}\label{fig:1mode_AD_hops}
+  \end{subfigure}
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\textwidth]{1mode_AD_dwells.pdf}
+  \caption{$P(\alpha_d) / P_T(\alpha_d, \lambda)$}\label{fig:1mode_AD_dwells}
+  \end{subfigure}
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\textwidth]{hurst_barchart.pdf}
+  \caption{$\gamma(H)$}\label{fig:hurst_barchart}
+  \end{subfigure}
+  \caption{The parameters of the 1 mode model reveal differences in solute
+	  dynamics. (a) We parameterized Gaussian ($\mathcal{N}(\sigma)$,
+	  parameters given by bars with white background) and L\'evy stable
+	  ($L(\sigma, \alpha_h)$, parameters given by bars with gray
+	  background) distributions to describe solute hop lengths. We assume
+	  the mean ($\mu$) to be zero for these distributions and there to be
+	  no skewness ($\beta=0$) in the L\'evy stable distributions. High
+	  values of $\sigma$ and lower values of $\alpha_h$ result in larger
+	  hops. (b) We parameterized a pure power law ($P(\alpha_d)$, white
+	  background) and a truncated power law ($P_T(\alpha_d, \lambda)$, gray
+	  background) distribution to describe solute dwell times. Lower values
+	  of $\alpha_d$ lead to heavier power law tails and higher values of
+	  $\lambda$ truncate the distribution at lower dwell times.(c) Finally,
+	  we parameterized the hop autocorrelation function ($\gamma(H)$) to
+	  describe the degree of correlation between hops.  Higher values of
+	  $H$ display closer to Brownian behavior.
+	  }\label{fig:1mode_bar_charts}
+  \end{figure}
+
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{2mode_AD_hops.pdf}
+  \caption{$\mathcal{N}(\sigma) / L(\sigma, \alpha_h)$}\label{fig:2mode_AD_hops}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{2mode_AD_dwells.pdf}
+  \caption{$P(\alpha_d) / P_T(\alpha_d, \lambda)$}\label{fig:2mode_AD_dwells}
+  \end{subfigure}
+  \caption{The two mode model parameterizes solute behavior in the pores and
+	  tails separately. Mode 1 corresponds to solute behavior within 0.75
+	  nm of the pore center, the pore region, and mode 2 corresponds to
+	  behavior greater than or equal to 0.75 nm from the pore center, the
+	  tail region. (a) Generally, movement is much more restricted in the
+	  tail region shown by lower mode 2 $\sigma$ values for the Normal
+	  (white background) and L\'evy distributions (gray background). Values
+	  of $\alpha$ are significantly lower for urea and acetic acid meaning
+	  there is a larger probability that they will take large hops.
+	  (b) Dwell times are longer in in the tails. Lower values of
+	  $\alpha_d$ correspond to power laws with heavier tails and thus
+	  higher probabilities of long dwell times. There is no easily
+	  discernable trend in $\lambda$ of the truncated power law
+	  distribution (gray background).  Note that we used the same Hurst
+	  parameter for both modes due to a low number of sufficiently long
+	  sequences of hops in each mode. See Figure~\ref{fig:1mode_bar_charts}
+	  for descriptions of the parameters.
+  }\label{fig:2mode_bar_charts}
+  \end{figure}
+
   Using the parameters in Tables~\ref{table:sfbm_params} and~\ref{table:sfbm_params_2mode}
   as inputs to our models, we obtain reasonable predictions of the MD simulated MSDs. The 
   MSD curves generated from 1 and 2 mode models are overlayed with the MD simulated MSDs for 
