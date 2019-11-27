@@ -43,7 +43,7 @@ def bootstrap_m(nboot, maxes, L):
 
         return b, m	
 
-correlation = False  
+correlation = True  
 
 root_dir = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/"
 
@@ -53,7 +53,7 @@ colors = {'URE':'xkcd:blue', 'GCL':'xkcd:orange', 'MET':'xkcd:green', 'ACH':'xkc
 names = {'URE': 'Urea', 'GCL': 'Ethylene Glycol', 'MET': 'Methanol', 'ACH': 'Acetic Acid'}
 
 if correlation:
-	Ls = {'URE': [10, 15, 20, 25, 30, 35, 40, 45, 50], 'GCL': [10, 15, 20, 25, 30, 35, 40, 45, 50], 'MET': [10, 15, 20, 25, 30, 35, 40, 45], 'ACH': [10, 15, 20, 25, 30, 35, 40, 45]}
+	Ls = {'URE': [10, 15, 20, 25, 30, 35, 40, 45, 50], 'GCL': [10, 15, 20, 25, 30, 35, 40, 45, 50], 'MET': [10, 15, 20, 25, 30, 35, 40, 45], 'ACH': [10, 15, 20, 25, 30, 35, 40, 45, 50]}
 else:
 	Ls = {'URE': [10, 15, 20, 25, 30, 35, 40, 45, 50], 'GCL': [10, 15, 20, 25, 30, 35, 40, 45, 50], 'MET': [10, 15, 20, 25, 30, 35, 40, 45, 50], 'ACH': [10, 15, 20, 25, 30, 35, 40, 45, 50]}
 
