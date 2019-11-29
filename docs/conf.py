@@ -27,6 +27,7 @@ sys.path.insert(0, os.path.abspath('../LLC_Membranes/setup'))
 sys.path.insert(0, os.path.abspath('../LLC_Membranes/analysis'))
 sys.path.insert(0, os.path.abspath('../LLC_Membranes/llclib'))
 sys.path.insert(0, os.path.abspath('../LLC_Membranes/timeseries'))
+sys.path.insert(0, os.path.abspath('../LLC_Membranes/machine_learning'))
 
 # -- General configuration ------------------------------------------------
 

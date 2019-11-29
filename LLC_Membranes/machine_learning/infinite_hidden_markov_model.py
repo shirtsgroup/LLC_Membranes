@@ -107,15 +107,35 @@ class DfError(Exception):
 
         super().__init__(message)
 
+# Identify the potentially infinite number of dynamical modes in a time series using a hierarchical dirichlet
+#    process hidden Markov model (HDPHMM)
+
 
 class InfiniteHMM:
+    """
+    Python implementation of the infinite hidden markov model. Note that all functions for generating random numbers are
+    based on pulls from uniform distributions. This allows side-by-side comparison to MATLAB output
+
+    Original paper: http://mlg.eng.cam.ac.uk/zoubin/papers/ihmm.pdf
+
+    This implementation follows the MATLAB implementation of the Fox group. Variable and function names are mostly the
+    same (https://homes.cs.washington.edu/~ebfox/software-packages/HDPHMM_HDPSLDS_toolbox.zip)
+
+    A paper demonstrating their implementation: https://ieeexplore.ieee.org/abstract/document/5563110
+
+    Unfortunately their code is not well-documented and one can not easily learn the approach by following it. This
+    script attempts to reproduce their work in an easier to understand context. For now, it only uses an autoregressive
+    model because that is all I need.
+
+    """
 
     def __init__(self, data, gro=None, res=None, difference=True, observation_model='AR', prior='MNIW', order=1,
                  max_states=20, dim=None):
-        """ Identify the potentially infinite number of dynamical modes in a time series using a hierarchical dirichlet
-         process hidden Markov model (HDPHMM)
+        """
 
-        :param data: trajectories to analyze TODO: describe what goes in this data structure
+        :param data: trajectories to analyze. If gro is not None, then this should be the name of a GROMACS trajectory \
+         file (.xtc or .trr) TODO: describe what goes in this data structure
+        :param gro: GROMACS coordinate file
         :param observation_model: Model describing the observations (AR = autoregressive)
         :param prior: prior (MNIW : Matrix Normal inverse Wishart produces)
         :param order: for AR observation model, autoregressive order of data (order = 1 would be Y_t = phi*Y_{t-1} + c)
@@ -299,7 +319,7 @@ class InfiniteHMM:
 
         return X[:, self.order:]
 
-    def sample_hyperparams_init(self):
+    def _sample_hyperparams_init(self):
         """ Sample hyperparameters to start iterations. Reproduction of sample_hyperparams_init.m for AR case
         """
 
@@ -316,7 +336,7 @@ class InfiniteHMM:
         else:
             self.hyperparams['rho0'] = 0
 
-    def sample_hyperparams(self):
+    def _sample_hyperparams(self):
         """ Sample concentration parameters that define the distribution on transition distributions and mixture weights
         of the various model components.
         """
@@ -372,7 +392,7 @@ class InfiniteHMM:
         self.hyperparams['sigma0'] = sigma0
         self.hyperparams['rho0'] = rho0
 
-    def sample_distributions(self):
+    def _sample_distributions(self):
         """ Sample the transition distributions pi_z, initial distribution pi_init, emission weights pi_s, and global
         transition distribution beta from the priors on these distributions.
 
@@ -408,7 +428,7 @@ class InfiniteHMM:
         # self.pi_init = np.random.dirichlet(alpha0 * self.beta_vec + N[self.max_states, :])
         self.pi_init = randdirichlet(alpha0*self.beta_vec + N[self.max_states, :])[:, 0]  # REMOVE
 
-    def sample_theta(self):
+    def _sample_theta(self):
         """ reproduction of sample_theta.m
 
         Sampling follows this paper:
@@ -473,16 +493,20 @@ class InfiniteHMM:
         :type niter: int
         """
 
+        hmm._sample_hyperparams_init()
+        hmm._sample_distributions()
+        hmm._sample_theta()
+
         for _ in tqdm.tqdm(range(niter)):
 
-            self.update_ustats(self.sample_zs())
-            self.sample_tables()
+            self._update_ustats(self._sample_zs())
+            self._sample_tables()
             self.iteration += 1
-            self.sample_distributions()
-            self.sample_theta()
-            self.sample_hyperparams()
+            self._sample_distributions()
+            self._sample_theta()
+            self._sample_hyperparams()
 
-    def sample_zs(self):
+    def _sample_zs(self):
         """ reproduction of sample_zs.m
 
         :return:
@@ -505,8 +529,8 @@ class InfiniteHMM:
             z = np.zeros([T], dtype=int)
             s = np.zeros([int(blockSize.sum())], dtype=int)
 
-            likelihood = self.compute_likelihood(i)
-            partial_marg = self.backwards_message_vec(likelihood)
+            likelihood = self._compute_likelihood(i)
+            partial_marg = self._backwards_message_vec(likelihood)
 
             # sample the state and sub-state sequences
             totSeq = np.zeros([self.max_states, self.Ks], dtype=int)
@@ -565,7 +589,7 @@ class InfiniteHMM:
 
         return obsIndzs
 
-    def update_ustats(self, inds):
+    def _update_ustats(self, inds):
         """ reprduction of update_Ustats.m"""
 
         Ns = self.stateCounts['Ns']
@@ -604,7 +628,7 @@ class InfiniteHMM:
 
             self.Ustats['card'] = Ns
 
-    def sample_tables(self):
+    def _sample_tables(self):
         """ reproduction of sample_tables.m
         """
 
@@ -625,7 +649,7 @@ class InfiniteHMM:
         self.stateCounts['barM'] = barM
         self.stateCounts['sum_w'] = sum_w
 
-    def compute_likelihood(self, solute_no):
+    def _compute_likelihood(self, solute_no):
         """ compute the likelihood of each state at each point in the time series
 
         :param solute_no: solute number (trajectory number in self.trajectories)
@@ -668,7 +692,7 @@ class InfiniteHMM:
 
         return likelihood
 
-    def backwards_message_vec(self, likelihood):
+    def _backwards_message_vec(self, likelihood):
         """ reproduction of backwards_message_vec.m
 
         :param likelihood: likelihood of being in each state at each time point (max_states x ks x T)
@@ -1099,9 +1123,6 @@ if __name__ == "__main__":
 
         hmm = InfiniteHMM(args.traj, gro=args.gro, res=args.residue, observation_model=args.obstype, prior=args.prior,
                           order=args.order, max_states=args.max_states, dim=args.dim)
-        hmm.sample_hyperparams_init()
-        hmm.sample_distributions()
-        hmm.sample_theta()
         hmm.inference(args.niterations)
         file_rw.save_object(hmm, 'hmm.pl')
         hmm.summarize_results(traj_no=args.plot_traj)  # make it pretty
