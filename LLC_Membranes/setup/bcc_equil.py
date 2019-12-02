@@ -483,14 +483,14 @@ if __name__ == "__main__":
     if not args.continue_dry and not args.continue_solvated and not args.continue_xlinked:
 
         nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True,
-                               mpi=parallelize['mpi'], nprocesses=parallelize['nprocesses'], restraints=True) 
+                               mpi=parallelize['mpi'], nprocesses=parallelize['nprocesses'], restraints=True)
 
         while nrg >= 0:
 
             equil.build_initial_config(grid_points=build_params['grid'], r=0.4)
             equil.scale_unit_cell(sim_params['scale_factor'])
             nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True,
-                                   mpi=parallelize['mpi'], nprocesses=parallelize['nprocesses'])
+                                   mpi=parallelize['mpi'], nprocesses=parallelize['nprocesses'], restraints=True)
 
         cp = 'cp em.gro scaled_%.4f.gro' % sim_params['scale_factor']
         p = subprocess.Popen(cp.split())
