@@ -75,6 +75,7 @@ class ReadItp(object):
         self.valence = 0
         self.carboxylate_indices = []  # index of carboxylate carbon atoms on head groups
         self.pore_defining_atoms = []  # atoms used to define the edges of the pore. used to locate pore center
+        self.build_restraints = [] # atoms that will be restrained during build procedure
 
         # atoms that are a part of improper dihedrals which should not be removed during cross-linking. For example, in
         # NA-GA3C11, the tail has connectivity R-C=O-CH-CH2. When the C2 bonds, it becomes sp3 hybridized and its
@@ -173,6 +174,9 @@ class ReadItp(object):
                         self.dummies.append(atom_name)
                     if 'impex' in annotations:
                         self.improper_dihedral_exclusions.append(ndx)
+                    if 'Rb' in annotations:
+                        self.build_restraints.append(atom_name)
+
                 except IndexError:
                     pass
 

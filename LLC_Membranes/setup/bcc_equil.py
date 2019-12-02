@@ -5,13 +5,16 @@ from LLC_Membranes.setup.bcc_build import BicontinuousCubicBuild
 from LLC_Membranes.setup.gentop import SystemTopology
 from LLC_Membranes.setup.genmdp import SimulationMdp
 from LLC_Membranes.llclib import topology, transform, gromacs, file_rw
-from LLC_Membranes.setup import xlink
+from LLC_Membranes.setup import xlink, restrain
+import warnings
 import mdtraj as md
 import os
 import numpy as np
 import subprocess
 import yaml
 import sys
+
+#warnings.simplefilter('error', UserWarning)
 
 
 def initialize():
@@ -77,8 +80,8 @@ class EnsembleError(Exception):
 
 class EquilibrateBCC(topology.LC):
 
-    def __init__(self, build_monomer, space_group, box_length, weight_percent, density, shift=0, curvature=-1,
-                 mpi=False, nprocesses=4):
+    def __init__(self, build_monomer, space_group, box_length, weight_percent, density, restraints, restraint_residue,
+                 shift=0, curvature=-1, mpi=False, nprocesses=4):
         """
         :param build_monomer: name of monomer with which to build phase
         :param space_group: name of space group into which monomers are arranged (i.e. gyroid, schwarzD etc.)
@@ -86,6 +89,9 @@ class EquilibrateBCC(topology.LC):
         just one length specified)
         :param weight_percent: percent by weight of monomer in membrane
         :param density: experimentally derived density of membrane
+        :param restraints: while scaling and shrinking unit cell, add restraints to atoms annotated with 'Rb' in the
+        monomer topology file. 3x1 tuple or list
+        :param restraint_residue: name of resiude to be restrained
         :param shift: translate monomer along vector perpendicular to space group surface by this amount (nm). This
         parameter effectively controls the pore size
         :param curvature: determines whether the phase is normal or inverted. {-1 : QI phase, 1: QII phase}'
@@ -97,6 +103,8 @@ class EquilibrateBCC(topology.LC):
         :type dimensions: float, list of floats
         :type weight_percent: int, float
         :type density: float
+        :type restraints: tuple or list
+        :type restraint_residue: str
         :type shift: float
         :type curvature: int
         :type mpi: bool
@@ -112,6 +120,11 @@ class EquilibrateBCC(topology.LC):
         self.density = density
         self.shift = shift
         self.curvature = curvature
+        self.restraints = restraints
+        self.restraint_residue = restraint_residue
+        if self.restraint_residue not in self.residues:
+            warnings.warn('Specified restraint residue, %s, is not consistent with passed monomer residues (%s).'
+                          % (self.restraint_residue, ', '.join(self.residues)))
 
         # names of files (hard coded for now since it's not really important
         self.em_mdp = 'em.mdp'
@@ -158,17 +171,25 @@ class EquilibrateBCC(topology.LC):
 
         self.gro_name = name
 
-    def generate_topology(self, name='topol.top', xlinked=False):
+    def generate_topology(self, name='topol.top', xlinked=False, restrained=False):
         """ Generate a topology for the current unit cell
 
         :param name: name of topology file
         :param xlinked: True if the system has been cross-linked
+        :param restrained: add restraints to topology
 
         :type name: str
         :type xlinked: bool
+        :type restrained: bool
         """
 
-        self.topology = SystemTopology(self.gro_name, xlink=xlinked)
+        if restrained:
+            r = restrain.RestrainedTopology(self.gro_name, self.restraint_residue, self.build_restraints, com=False,
+                                            xlink=xlinked, vparams=None)
+            r.add_position_restraints('xyz', self.restraints)
+            r.write_topology()
+
+        self.topology = SystemTopology(self.gro_name, xlink=xlinked, restraints=[self.restraint_residue])
         self.topology.write_top(name=name)
 
     def generate_mdps(self, T=300, em_steps=-1, time_step=0.002, length=1000, p_coupling='isotropic',
@@ -447,22 +468,22 @@ if __name__ == "__main__":
     os.environ["GMX_MAXBACKUP"] = "-1"  # stop GROMACS from making backups
 
     equil = EquilibrateBCC(build_params['build_monomer'], build_params['space_group'], build_params['box_length'],
-                           build_params['weight_percent'], build_params['density'], shift=build_params['shift'],
+                           build_params['weight_percent'], build_params['density'], build_params['restraints'],
+                           build_params['restraint_residue'], shift=build_params['shift'],
                            curvature=build_params['curvature'], mpi=parallelize['mpi'],
                            nprocesses=parallelize['nprocesses'])
 
     equil.build_initial_config(grid_points=build_params['grid'], r=0.4)
-    exit()
     equil.scale_unit_cell(sim_params['scale_factor'])
 
-    equil.generate_topology(name='topol.top')  # creates an output file
+    equil.generate_topology(name='topol.top', restrained=True)  # creates an output file
     equil.generate_mdps(length=50, frames=2, T=sim_params['temperature'])  # creates an object
     equil.mdp.write_em_mdp(out='em')
 
     if not args.continue_dry and not args.continue_solvated and not args.continue_xlinked:
 
         nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True,
-                               mpi=parallelize['mpi'], nprocesses=parallelize['nprocesses'])  # mdp, top, gro, out
+                               mpi=parallelize['mpi'], nprocesses=parallelize['nprocesses'], restraints=True) 
 
         while nrg >= 0:
 

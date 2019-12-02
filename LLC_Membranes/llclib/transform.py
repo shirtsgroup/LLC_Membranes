@@ -332,14 +332,14 @@ def translate(xyz, before, after):
     pos = np.copy(xyz)
     direction = after - before
 
-    translation = np.matrix([[1, 0, 0, direction[0]], [0, 1, 0, direction[1]],
+    translation = np.array([[1, 0, 0, direction[0]], [0, 1, 0, direction[1]],
                          [0, 0, 1, direction[2]], [0, 0, 0, 1]])
 
     b = np.ones([1])
     for i in range(pos.shape[0]):
         coord = np.concatenate((pos[i, :], b))
         x = np.dot(translation, coord)
-        pos[i, :] = x[0, :3]
+        pos[i, :] = x[:3]
 
     return pos
 
@@ -519,9 +519,10 @@ def Rvect2vect(A, B):
     s = np.linalg.norm(v)
     c = np.dot(a, b)
 
-    v_skew = np.matrix([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]])
+    v_skew = np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]])
 
-    R = np.identity(3) + v_skew + v_skew**2*(1 - c)/(s**2)
+    #R = np.identity(3) + v_skew + v_skew**2*(1 - c)/(s**2) # works with np.matrix
+    R = np.identity(3) + v_skew + np.dot(v_skew, v_skew) * (1 - c) / s ** 2
 
     # print(R)
     # cross = np.cross(a, b)  # find vector perpendicular to a and b
@@ -537,7 +538,7 @@ def Rvect2vect(A, B):
     # print(R)
     # exit()
 
-    return np.matrix(R)
+    return np.array(R)
 
 
 def rotate_coords(xyz, R):

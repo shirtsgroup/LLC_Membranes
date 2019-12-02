@@ -179,6 +179,10 @@ class RestrainedTopology(object):
         topology.fix_resnumbers(gro)
         t = md.load(gro)
 
+        if type(res) is str:
+            res = [res]
+            atoms = [atoms]
+
         self.all_coords = t.xyz[0, :, :]  # all coordinates for system
         self.atom_numbers = []
         for i in range(len(atoms)):
