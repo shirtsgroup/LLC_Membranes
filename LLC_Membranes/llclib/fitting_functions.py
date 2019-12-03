@@ -5,7 +5,63 @@ from scipy.stats import expon
 from LLC_Membranes.analysis import Poly_fit
 import mpmath
 from scipy.optimize import curve_fit, minimize
-from scipy.special import gamma
+from scipy.special import gamma, erfc
+
+
+def continuum_passage_time_distribution(t, x, v, D):
+    """ The distribution of passage times for a particle moving in the positive x direction past some absorbing boundary
+
+    :param t: passage times
+    :param x: location of absorbing boundary (positive number)
+    :param v: average velocity of particles
+    :param D: diffusion constant of particles
+    """
+
+    # This is exact and allows evaluation at single time point
+    # a = np.exp(-(x - t * v)**2 / (4 * D * t))  # faster but causes underflow errors
+    if type(t) is np.ndarray:
+        a = np.array([float(mpmath.exp(-(x - i * v)**2 / (4 * D * i))) for i in t])  # mpmath has arbitrary precision
+    else:
+        a = float(mpmath.exp(-(x - t * v)**2 / (4 * D * t)))
+
+    b = D * (x - t * v) / (4 * (D * t) ** 1.5)
+    c = v / (2 * np.sqrt(D * t))
+
+    return -(1 / np.sqrt(np.pi)) * a * (-b - c)
+
+
+def continuum_ptime_distribution_expected_value(t, x, v, D):
+    """ Integrate this equation (scipy.integrate.quad) to get the expected value
+
+    :param t:
+    :param x:
+    :param v:
+    :param D:
+    :return:
+    """
+
+    return t * continuum_passage_time_distribution(t, x, v, D)
+
+
+def stretched_exponential(x, A, beta):
+
+    #logy = -x ** beta + np.log(A)
+    #return np.exp(logy)
+    return A * np.exp(-x ** beta)
+
+
+def stretched_exponential_expected_value(x, A, beta, area):
+    """ For integrating in order to calculate the expected value
+
+    E[x] = integrate xf(x) dx
+
+    :param x:
+    :param A:
+    :param beta:
+    :return:
+    """
+
+    return x * A * np.exp(-x ** beta) / area
 
 
 def log_power_law(x, a, alpha):

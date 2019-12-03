@@ -475,6 +475,7 @@ if __name__ == "__main__":
 
     equil.build_initial_config(grid_points=build_params['grid'], r=0.4)
     equil.scale_unit_cell(sim_params['scale_factor'])
+    exit()
 
     equil.generate_topology(name='topol.top', restrained=True)  # creates an output file
     equil.generate_mdps(length=50, frames=2, T=sim_params['temperature'])  # creates an object
