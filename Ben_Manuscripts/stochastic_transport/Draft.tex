@@ -883,38 +883,50 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 %  % of runners crossing the finish line
   
   To come up with an analytical equation describing the passage time distributions, 
-  one can frame the problem as a pulse of particles at the pore inlet ($z=0$) that 
-  spreads out over time as it approaches $L$. 
+  one can frame the problem as a pulse of particles instantaneously released at the 
+  pore inlet ($z=0$) which moves at a constant velocity and spreads out as it 
+  approaches $L$. This gives results equivalent to if we had released each particle
+  individually and then analyzed the positions of the ensemble of trajectories as 
+  a function of time. 
   
-%  This pulse model effectively describes
-%  the time-dependent probability distribution of particles which eventually reaches 
-%  $L$. The diffusion equation describing this situation is:
-%  \begin{equation}
-%  \frac{\partial c}{\partial t} + v\frac{\partial c}{\partial x} = D\frac{\partial^2 c}{\partial x^2}
-%  \end{equation}
-%  where $v$ is some average velocity describing the location of the center of the
-%  distribution and $D$ is a diffusion constant. 
-%  One can show that the normalized
-%  concentration profile is:
-  First, consider a pulse spreading out with a fixed mean. It is well known that the 
-  time-dependent probability distribution of particle positions is:
+  First, consider an initial pulse spreading out over time with a fixed mean. We can
+  solve for the time-dependent probability density of particle positions by solving 
+  the one dimensional diffusion equation:
   \begin{equation}
-  p(x, t) = \frac{1}{\sqrt{4 \pi D t}}exp\bigg(\frac{-x^2}{4Dt}\bigg)
+  \frac{\partial p}{\partial t} = D \frac{\partial^2 p}{\partial z^2}
   \end{equation}
-  We can make the substitution $x = x - vt$ in order to linearly shift the mean as a
+  The appropriate initial and boundary conditions are:
+  \begin{equation}
+  BC1: t > 0, z = \infty, p = 0
+  \end{equation}
+  \begin{equation}
+  BC2: t > 0, z = 0, \frac{\partial p}{\partial z} = 0
+  \end{equation}
+  \begin{equation}
+  IC: t = 0, c = M\delta(z)
+  \end{equation}
+  where $M$ is the total number of particles in the system. It has been shown 
+  elsewhere that the solution to this equation is:
+  \begin{equation}
+  p(z, t) = \frac{1}{\sqrt{4 \pi D t}}exp\bigg(\frac{-z^2}{4Dt}\bigg)
+  \end{equation}
+  We can make the substitution $z = z - vt$ in order to linearly shift the mean as a
   function of time:
   \begin{equation}
-  p(x, t) = \frac{1}{\sqrt{4 \pi D t}}exp\bigg(\frac{-(x - vt)^2}{4Dt}\bigg)
+  p(z, t) = \frac{1}{\sqrt{4 \pi D t}}exp\bigg(\frac{-(z - vt)^2}{4Dt}\bigg)
   \end{equation}
-  One can track the number of the fraction of particles, $F$, that have crossed the pore 
+  One can track the fraction of particles, $F$, that have crossed the pore 
   boundary by integrating:
   \begin{equation}
-  F = \int_x^\infty p~ dx = erfc\bigg(\frac{x - vt}{2\sqrt{D t}}\bigg)
+  F = \int_L^\infty p~dz = erfc\bigg(\frac{L - vt}{2\sqrt{D t}}\bigg)
   \end{equation}
-  and finally take the derivative to arrive at the first passage time distribution:
+  where $L$ is the pore length. This represents the cumulative first passage 
+  time distribution so we take its derivative in order to arrive at the first
+  passage time distribution:
   \begin{equation}
-  P = -\frac{1}{\sqrt{\pi}}e^{-(x - vt)^2 / (4Dt)}\bigg(-\frac{D(x - vt)}{4(Dt)^{3/2}} - \frac{v}{2\sqrt{Dt}}\bigg)
-  \end{equation}
+  P = -\frac{1}{\sqrt{\pi}}e^{-(L - vt)^2 / (4Dt)}\bigg(-\frac{D(L - vt)}{4(Dt)^{3/2}} - \frac{v}{2\sqrt{Dt}}\bigg)
+  \label{eqn:passage_times}
+  \end{equation} 
   
   %BJC4: we have better ways of getting peaks now
 %  In the absence of an analytical equation for the MFPT, we instead report the location of

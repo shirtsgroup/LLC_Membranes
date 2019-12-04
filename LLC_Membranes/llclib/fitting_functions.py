@@ -20,14 +20,29 @@ def continuum_passage_time_distribution(t, x, v, D):
     # This is exact and allows evaluation at single time point
     # a = np.exp(-(x - t * v)**2 / (4 * D * t))  # faster but causes underflow errors
     if type(t) is np.ndarray:
-        a = np.array([float(mpmath.exp(-(x - i * v)**2 / (4 * D * i))) for i in t])  # mpmath has arbitrary precision
+        a = np.array([np.float(mpmath.exp(-(x - i * v)**2 / (4 * D * i))) for i in t])  # mpmath has arbitrary precision
     else:
         a = float(mpmath.exp(-(x - t * v)**2 / (4 * D * t)))
 
     b = D * (x - t * v) / (4 * (D * t) ** 1.5)
     c = v / (2 * np.sqrt(D * t))
 
-    return -(1 / np.sqrt(np.pi)) * a * (-b - c)
+    try:
+        return -(1 / np.sqrt(np.pi)) * a * (-b - c)
+    except FloatingPointError:
+
+        if type(a) is np.ndarray:
+            print(a)
+            A = []
+            for i in a:
+                if i < 1e-300:
+                    A.append(0)
+                else:
+                    A.append(i)
+            print(A)
+            return np.array(A)
+        else:
+            return 0
 
 
 def continuum_ptime_distribution_expected_value(t, x, v, D):
