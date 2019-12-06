@@ -779,5 +779,5 @@ if __name__ == "__main__":
     if cfg['concentration']:
         mfpt.concentration_from_histogram()
 
-    # if cfg['save_passage_times']:
-    #     mfpt.save_passage_times(name=cfg['save_passage_times_name'])
+    if cfg['save_passage_times']:
+        mfpt.save_passage_times(name=cfg['save_passage_times_name'])

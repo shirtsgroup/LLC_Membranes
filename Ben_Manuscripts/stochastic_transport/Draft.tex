@@ -838,10 +838,13 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   Hill relation:~\cite{hill_free_1989}
   \begin{equation}
   J = \frac{1}{MFPT}
+  \label{eqn:hill_relation}
   \end{equation}
-  where $J$ is solute flux and MFPT refers to the mean first passage time. In the 
-  context of our work, the MFPT describes the average length of time it takes a particle
-  to move from the pore entrance to the pore exit.
+  where $J$ is the single particle solute flux and MFPT refers to the mean first passage
+  time. For particle concentrations higher than 1 at the pore entrance, one can multiply
+  Equation~\ref{eqn:hill_relation} by the total number of particles to get the total flux.
+  In the context of our work, the MFPT describes the average length of time it takes a particle
+  to move from the pore entrance to the pore exit. 
   
   We generated particle trajectories, parameterized with the above models, in order
   to construct a distribution of first passage times across a membrane pore of length $L$.
@@ -889,44 +892,75 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   individually and then analyzed the positions of the ensemble of trajectories as 
   a function of time. 
   
-  First, consider an initial pulse spreading out over time with a fixed mean. We can
-  solve for the time-dependent probability density of particle positions by solving 
-  the one dimensional diffusion equation:
+  To derive an analytical equation, first consider an initial pulse spreading out 
+  over time with a fixed mean. We can solve for the time-dependent probability density
+  of particle positions by solving the one dimensional diffusion equation:
   \begin{equation}
   \frac{\partial p}{\partial t} = D \frac{\partial^2 p}{\partial z^2}
   \end{equation}
   The appropriate initial and boundary conditions are:
-  \begin{equation}
-  BC1: t > 0, z = \infty, p = 0
-  \end{equation}
-  \begin{equation}
-  BC2: t > 0, z = 0, \frac{\partial p}{\partial z} = 0
-  \end{equation}
-  \begin{equation}
-  IC: t = 0, c = M\delta(z)
-  \end{equation}
+  $$BC1: t > 0, z = \infty, p = 0$$
+  $$BC2: t > 0, z = 0, \frac{\partial p}{\partial z} = 0$$
+  $$IC: t = 0, c = M\delta(z)$$
   where $M$ is the total number of particles in the system. It has been shown 
-  elsewhere that the solution to this equation is:
+  elsewhere that the solution to this equation is:~\cite{cussler_diffusion:_2009}
   \begin{equation}
   p(z, t) = \frac{1}{\sqrt{4 \pi D t}}exp\bigg(\frac{-z^2}{4Dt}\bigg)
   \end{equation}
-  We can make the substitution $z = z - vt$ in order to linearly shift the mean as a
-  function of time:
+  We can make the substitution $z = z - vt$, where $v$ represents a constant average
+  velocity, in order to linearly shift the mean as a function of time:
   \begin{equation}
   p(z, t) = \frac{1}{\sqrt{4 \pi D t}}exp\bigg(\frac{-(z - vt)^2}{4Dt}\bigg)
   \end{equation}
   One can track the fraction of particles, $F$, that have crossed the pore 
   boundary by integrating:
   \begin{equation}
-  F = \int_L^\infty p~dz = erfc\bigg(\frac{L - vt}{2\sqrt{D t}}\bigg)
+  F(t) = \int_L^\infty p~dz = erfc\bigg(\frac{L - vt}{2\sqrt{D t}}\bigg)
   \end{equation}
   where $L$ is the pore length. This represents the cumulative first passage 
   time distribution so we take its derivative in order to arrive at the first
   passage time distribution:
   \begin{equation}
-  P = -\frac{1}{\sqrt{\pi}}e^{-(L - vt)^2 / (4Dt)}\bigg(-\frac{D(L - vt)}{4(Dt)^{3/2}} - \frac{v}{2\sqrt{Dt}}\bigg)
+  P(t) = -\frac{1}{\sqrt{\pi}}e^{-(L - vt)^2 / (4Dt)}\bigg(-\frac{D(L - vt)}{4(Dt)^{3/2}} - \frac{v}{2\sqrt{Dt}}\bigg)
   \label{eqn:passage_times}
   \end{equation} 
+  where the only free parameters for fitting are $v$ and $D$. We calculated the
+  expected value of Equation~\ref{eqn:passage_times} in order to get the MFPT.
+  
+  We used the ratio of solute fluxes in order to determine membrane selectivity, $S$,
+  towards solutes. Selectivity of solute $i$ versus $j$ is defined in terms of the
+  ratio of solute permeabilities, $P$:~\cite{guo_pervaporation_2004}
+  \begin{equation}
+  S_{ij} = \frac{P_i}{P_j}
+  \end{equation}
+  We can relate this to solute flux using Kedem and Katchalsky's equations for 
+  solvent volumetric flux, $J_v$, and solute flux, $J_s$:~\cite{kedem_permeability_1963}
+  %al-zoubi_rejection_2007 clarifies that these equations can be used for nanofiltration, ultrafiltration etc. by treating the membrane as a black box subject to irreversible thermodynamics.
+  \begin{equation}
+  J_v = L_p(\Delta P - \Delta \pi)
+  \end{equation} 
+  \begin{equation}
+  J_s = P_s \Delta C + (1 - \sigma)CJ_v
+  \label{eqn:solute_flux}
+  \end{equation}
+  where $L_p$ is the pure water permeability, $\Delta P$ and $\Delta \pi$ are the 
+  trans-membrane hydraulic and osmotic pressure differences, $\sigma$ is the reflection
+  coefficient, $P_s$ is the solute permeability, $\Delta C$ is the trans-membrane
+  solute concentration difference and $C$ is the mean solute concentration. Since our
+  simulations do not include convective solute flux, we eliminate the second term 
+  of Equation~\ref{eqn:solute_flux} which allows us to derive a simple expression
+  for selectivity in terms of solute flux:
+  \begin{equation}
+  S_{ij} = \frac{J_i / \Delta C_i}{J_j / \Delta C_j}
+  \label{eqn:selectivity}
+  \end{equation}
+  
+  
+%    $$ A_i = \frac{J}{(\Delta P - \Delta \pi)} $$
+%  $$ S = \frac{A_i}{A_j} for a given pore length, L$$
+%  $$J = A(\Delta P - \Delta \pi)$$
+%  $$A = \frac{P_i}{L} $$
+%  $$P_i = \frac{flux}{drivingforce \cdot L} [=] \frac{particles}{s \cdot bar \cdot L}$$
   
   %BJC4: we have better ways of getting peaks now
 %  In the absence of an analytical equation for the MFPT, we instead report the location of
@@ -1110,34 +1144,32 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   descriptions of the parameters.}\label{table:sfbm_params_2mode}
   \end{table}
   
-  %BJC4: another way to visualize data
-  %BJC4: I think these are kind of hard to read. Can't really see any trends. Open to other
-  %ideas.
-  \begin{figure}
-  \centering
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\linewidth]{1mode_radar.pdf}
-  \caption{}\label{fig:1mode_radar}
-  \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\linewidth]{2mode_radar.pdf}
-  \caption{}\label{fig:2mode_radar}
-  \end{subfigure}
-  \caption{Another way to visualize Tables~\ref{table:sfbm_params} and~\ref{table:sfbm_params_2mode}}\label{fig:radars}
-  \end{figure}
-  
-  \begin{figure}
-  \centering
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\linewidth]{1mode_radar_nolines.pdf}
-  \caption{}\label{fig:1mode_radar}
-  \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\linewidth]{2mode_radar_nolines.png}   % for some reason it has trouble saving this as a PDF
-  \caption{}\label{fig:2mode_radar}
-  \end{subfigure}
-  \caption{Same as Figure~\ref{fig:radars} but with no lines between points}\label{fig:radars_nolines}
-  \end{figure}
+  %BJC4: another (bad) way to visualize data
+%  \begin{figure}
+%  \centering
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\linewidth]{1mode_radar.pdf}
+%  \caption{}\label{fig:1mode_radar}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\linewidth]{2mode_radar.pdf}
+%  \caption{}\label{fig:2mode_radar}
+%  \end{subfigure}
+%  \caption{Another way to visualize Tables~\ref{table:sfbm_params} and~\ref{table:sfbm_params_2mode}}\label{fig:radars}
+%  \end{figure}
+%  
+%  \begin{figure}
+%  \centering
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\linewidth]{1mode_radar_nolines.pdf}
+%  \caption{}\label{fig:1mode_radar}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\linewidth]{2mode_radar_nolines.png}   % for some reason it has trouble saving this as a PDF
+%  \caption{}\label{fig:2mode_radar}
+%  \end{subfigure}
+%  \caption{Same as Figure~\ref{fig:radars} but with no lines between points}\label{fig:radars_nolines}
+%  \end{figure}
   
 %  \begin{figure}
 %  \centering
@@ -1731,66 +1763,185 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   further reduce the state-space of our models, it may have better predictive success,
   but we lose mechanistic detail.
   
-  \subsection{Solute Mean First Passage Times}\label{section:mfpt}
+  \subsection{Solute Flux}\label{section:mfpt}
   
   We used the 1-mode sFBMcut (see Table~\ref{table:anomalous_models}) anomalous 
   diffusion model in order to demonstrate how one can use its realizations in
-  order to calculate the MFPT (section~\ref{method:mfpt}) of solutes given model 
-  parameters extracted from MD simulations. Any approach which allows one to 
-  generate realizations of solute trajectories can be used in place of the AD model. 
+  order to calculate the flux (section~\ref{method:mfpt}) of solutes given model 
+  parameters extracted from MD simulations. We believe the 1-mode sFBMcut model
+  shows the most promising predictive ability of the models studied in this work. 
+  %Any approach which allows one to 
+  %generate realizations of solute trajectories can be used in place of the AD model. 
   
-  In Figure~\ref{fig:mfpt_curves_regular} we show that the MFPT grows super-linearly
-  with pore length. We fit a curve of the form $cL^{\alpha}$ to the curves in order
-  to estimate the growth exponent, $\alpha$. The growth exponent is inversely proportional
-  to the solute MSDs which is consistent with longer passage times for solutes that
-  progress through the pores more slowly. 
+  %BJC4: not sure if the next couple paragraphs belong in methods
+  It is computationally unfeasible to simulate trajectories long enough that they
+  traverse the length of a macroscopic pore. To date, the thinnest H\textsubscript{II}
+  LLC membrane synthesized with the monomer in this work was 7$\mu$m thick. Using
+  24 cores to simulate trajectory realizations in parallel, it takes on the order 
+  of 1 day to simulate 50000 realizations of solutes traversing a 50 nm pore. The 
+  RAM requirements and performance scales greater than linearly and thus would 
+  take an unfeasible amount of memory and time to simulate transport through a 
+  pore over 100 times longer.
   
-  The growth exponent is inversely related to the hurst parameter, $H$. In 
-  Figure~\ref{fig:mfpt_curves_brownian}, we removed the correlation structure (set
-  $H$=0.5) from AD trajectory realizations so that all hops were uncorrelated.
-  Regardless of the parameters of the dwell time distribution, the growth 
-  exponent is always about 2, the same value that we observe for Brownian 
-  motion (see Figure~\ref{S-fig:mfpt_curve_brownian} of the Supporting 
-  Information).
+  %BJC4: methods?
+  We used simulated trajectories which traverse computationally-reasonable length
+  pores in order to construct an empirical model which one can use to estimate 
+  particle flux for arbitrary length pores. As shown in Figure~\ref{fig:flux_curves},
+  the flux appears to scale according to a power law of the form:
+  \begin{equation}
+  J(L) = cL^{-\beta} 
+  \label{eqn:flux_decay}
+  \end{equation}
+  %while the MFPT scales as its inverse, $(1/c)L^{\beta}$. 
   
-  % BJC5: I'm not sure the best way to calculate statistics on this. Since I don't know
-  % the density function of the mean first passage time distribution, I use bins to 
-  % to locate the peaks. So the error bars are dependent on the bin width. 
+  The prefactor, $c$, in Equation~\ref{eqn:flux_decay} grows with increasing
+  solute MSD while the value of the growth exponent, $\beta$, is inversely 
+  related to the Hurst parameter, $H$ (see Figure~\ref{fig:flux_parameters}).
+  In Figure~\ref{fig:flux_curves_brownian}, we removed the correlation 
+  structure (set $H$=0.5) from AD trajectory realizations so that all hops 
+  were uncorrelated. Regardless of the parameters of the dwell time distribution,
+  the growth exponent is always about 2, the same value that we observe for 
+  Brownian motion (see Figure~\ref{S-fig:mfpt_curve_brownian} of the 
+  Supporting Information).
+  
+  Comparison of Figures~\ref{fig:flux_curves_regular} and~\ref{fig:flux_curves_brownian}
+  highlights that anti-correlation between hops plays a major role in solute flux.
+  With a pore length of 50 nm, the flux of the fasted moving solute, ethylene glycol is 
+  c.a. 5 times lower with versus without anti-correlated hops. The flux of the slowest
+  moving solute, acetic acid, is about 16 times lower by the same comparison. This 
+  difference will only grow with increasing pore length. Note also that the ranking
+  of solute fluxes changes. Methanol jumps from the second lowest to the highest
+  flux when we remove hop correlation. The high degree of anti-correlation among
+  hops made by methanol outweighs its relatively wide hop length distribution.
+  
+%   In Figure~\ref{fig:mfpt_curves_regular} we show that the MFPT grows super-linearly
+%  with pore length. We fit a curve of the form  to the curves in order
+%  to estimate the growth exponent, $\alpha$. The growth exponent is inversely proportional
+%  to the solute MSDs which is consistent with longer passage times for solutes that
+%  progress through the pores more slowly. 
+  
+  %BJC: need simulations with increased length for L=35-50 nm pores of acetic acid and methanol
+  %BJC: see of clauset has better way of fitting t^-alpha (alpha might be too big)
+  %BJC: not sure mfpt is necessary. Takes up space.
+  %BJC: change alpha to beta
+  %BJC: make a chart with parameters
+  %BJC: should have a paragraph about c -- roughly follows their MSDs.
   \begin{figure}
   \centering
   \begin{subfigure}{0.325\textwidth}
-  \includegraphics[width=\textwidth]{mfpt_curves.pdf}
-  \caption{Correlated Hops}\label{fig:mfpt_curves_regular}
+  \includegraphics[width=\textwidth]{flux_curves.pdf}
+  \caption{Fits to $cL^{-\beta}$}\label{fig:flux_curves_regular}
   \end{subfigure}
+  % BJC: could use better color scheme. Maybe outline hurst parameters
   \begin{subfigure}{0.325\textwidth}
-  \includegraphics[width=\textwidth]{mfpt_curves_brownian.pdf}
-  \caption{Uncorrelated Hops}\label{fig:mfpt_curves_brownian}
+  \includegraphics[width=\textwidth]{flux_parameters.pdf}
+  \caption{}\label{fig:flux_parameters}
   \end{subfigure}
+%  \begin{subfigure}{0.475\textwidth}
+%  \includegraphics[width=\textwidth]{mfpt_curves.pdf}
+%  \caption{}\label{fig:mfpt_curves}
+%  \end{subfigure}
+  %BJC: going out to 3 decimal places seems silly
+  %BJC: might get closer to beta=2 if I use different curve fitting technique than fitting line to log-log
   \begin{subfigure}{0.325\textwidth}
-  \includegraphics[width=\textwidth]{frac_pore.pdf}  % This figure might fit in earlier
-  \caption{}\label{fig:frac_pore}
+  \includegraphics[width=\textwidth]{flux_curves_brownian.pdf}
+  \caption{Fixed $H=0.5$}\label{fig:flux_curves_brownian}
   \end{subfigure}
-  \caption{(a) We fit the MFPT versus pore length to a function of the form $cL^{\alpha}$. 
-  The MFPT grows super-linearly with increasing pore length. Solutes with lower MSDs have
-  higher MFPTs. (b) If we remove correlation between hops, the MFPTs reduce significantly
-  and the growth exponent stays constant at 2 for all solutes independent of dwell
-  distribution parameters. Higher degrees of anti-correlation (lower $H$) lead to higher
-  growth exponents. (c) Solutes that spend a large fraction of their time in the tails tend
-  to have larger Hurst parameters.}\label{fig:mfpt_curves}
+%  \begin{subfigure}{0.475\textwidth}
+%  \includegraphics[width=\textwidth]{mfpt_curves_brownian.pdf}
+%  \caption{}\label{fig:mfpt_curves_brownian}
+%  \end{subfigure}
+  \caption{(a) The single particle solute flux decays with increasing pore length. 
+  Solutes with high MSDs have higher fluxes. (b) We fit the single particle solute flux 
+  versus pore length, $L$, to a power law function of the form $cL^{-\beta}$ (dashed 
+  lines in (a)). Solutes with higher fluxes have higher values of $c$. Solutes with 
+  smaller Hurst parameters, $H$, have larger values of $\beta$. (c) If we remove 
+  correlation between hops (set $H$=0.5), the flux increases significantly and 
+  $\beta$ is constant at about 2 for all solutes independent of dwell distribution
+  parameters.}\label{fig:flux_curves}
   \end{figure}
   
-  Comparison of Figures~\ref{fig:mfpt_curves_regular} and~\ref{fig:mfpt_curves_brownian}
-  highlights that anti-correlation between hops plays a major role in solute passage times.
-  With a pore length of 50 nm, the MFPT of the fasted moving solute, ethylene glycol is 
-  c.a. 5 times higher with versus without anti-correlated hops. The MFPTs of the slowest
-  moving solute, acetic acid, are about 16 times higher by the same comparison. This 
-  difference will only grow with increasing pore length. 
+  % Partially in methods?
+  The power law decay of the flux with pore length implies the following relationship
+  for selectivity via substitution of Equation~\ref{eqn:flux_decay} into 
+  Equation~\ref{eqn:selectivity}:
+  \begin{equation}
+  S_{ij}(L) = \bigg(\frac{c_i}{c_j}\bigg)L^{(\beta_i - \beta_j)}
+  \label{eqn:selectivity_ratio}
+  \end{equation}
   
-  In Figure~\ref{fig:frac_pore}, we show that solutes which spend more time in the tails
-  tend to have lower Hurst parameters. The densely packed, viscoelastic alkane chains 
-  bounce solutes between them, severely limiting their mobility. Designing LLC membranes
-  that can control or prevent the partition of solutes into the tails may offer the highest
-  returns on membrane performance.
+  In Figure~\ref{fig:selectivity}, we plot Equation~\ref{eqn:selectivity_ratio} for pore
+  lengths ranging from those studied in Figure~\ref{fig:flux_curves} to macroscopic-length
+  pores. Greater differences in $\beta$ values leads to selectivities that are stronger 
+  functions of pore length. For $(c_i / c_j)=1$, LLC membranes will be more selective
+  towards passage of solutes with lower $\beta$ values versus those with high $\beta$ values.
+  When $\beta$ values are equal, as is the case for uncorrelated motion, selectivity only
+  depends on the pre-factors, $c$. 
+  
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{selectivity.pdf}
+  \caption{The selectivity of 2 species changes monotonically with pore length. The
+  strength of dependence on pore length depends on the difference between $\beta$ values.}
+  \label{fig:selectivity}
+  \end{figure}
+  
+  Out of the solutes studied, the data suggests that this particular LLC membrane 
+  would be most useful for selectively separating ethylene glycol from methanol and 
+  acetic acid. 
+  %It also shows reasonable selectivity of Urea over acetic acid.  
+  Ethylene glycol has the highest $c$ value and the lowest $\beta$ value. The high
+  value of $c$ itself greatly enhances its selective passage. Even more importantly,
+  the relatively large difference between its $\beta$ value and those of methanol 
+  and acetic acid give rise to a strong pore length dependence. The selectivity is
+  enhanced as the pore length increases at the cost of lower solute flux, a 
+  phenomenon ubiquitous in polymer separations membranes.~\cite{geise_water_2011}
+
+  Of course, this approach to modeling LLC membrane selectivity neglects a number of
+  factors that influence real-world aqueous membrane separations. The most glaring is 
+  that we neglected convective flux which should work to increase overall solute flux 
+  and lower selectivity (see Equation ~\ref{eqn:solute_flux}). Defects in the pore 
+  structure will have a strong influence on solute flux which may exacerbate the length 
+  dependence of flux. Even in a perfectly structured membrane, the barrier to pore
+  entry from the bulk solution will have its own influence on experimentally observed 
+  selectivities. This energetic barrier can be made even worse by foulants deposited on
+  the membrane's surface. Therefore, our predictions should be primarily used to 
+  identify the most promising types of selective separations for an H\textsubscript{II}
+  LLC membrane made from a specific monomer.
+  %BJC: though about mentioning fouli
+  
+  
+    Neglects concentration polarization, membrane defects and fouling.
+
+%  BJC4: Uncomment to see MFPT curves
+%  \begin{figure}
+%  \centering
+%  \begin{subfigure}{0.325\textwidth}
+%  \includegraphics[width=\textwidth]{mfpt_curves.pdf}
+%  \caption{Correlated Hops}\label{fig:mfpt_curves_regular}
+%  \end{subfigure}
+%  \begin{subfigure}{0.325\textwidth}
+%  \includegraphics[width=\textwidth]{mfpt_curves_brownian.pdf}
+%  \caption{Uncorrelated Hops}\label{fig:mfpt_curves_brownian}
+%  \end{subfigure}
+%  \begin{subfigure}{0.325\textwidth}
+%  \includegraphics[width=\textwidth]{frac_pore.pdf}  % This figure might fit in earlier
+%  \caption{}\label{fig:frac_pore}
+%  \end{subfigure}
+%  \caption{(a) We fit the MFPT versus pore length to a function of the form $cL^{\alpha}$. 
+%  The MFPT grows super-linearly with increasing pore length. Solutes with lower MSDs have
+%  higher MFPTs. (b) If we remove correlation between hops, the MFPTs reduce significantly
+%  and the growth exponent stays constant at 2 for all solutes independent of dwell
+%  distribution parameters. Higher degrees of anti-correlation (lower $H$) lead to higher
+%  growth exponents. (c) Solutes that spend a large fraction of their time in the tails tend
+%  to have larger Hurst parameters.}\label{fig:mfpt_curves}
+%  \end{figure}
+  
+%  In Figure~\ref{fig:frac_pore}, we show that solutes which spend more time in the tails
+%  tend to have lower Hurst parameters. The densely packed, viscoelastic alkane chains 
+%  bounce solutes between them, severely limiting their mobility. Designing LLC membranes
+%  that can control or prevent the partition of solutes into the tails may offer the highest
+%  returns on membrane performance.
   
   %BJC: can make design suggestions by trying to decrease anticorrelation by x
   
