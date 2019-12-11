@@ -36,7 +36,7 @@ def initialize():
     parser.add_argument('-power_law', '--fit_power_law', action="store_true", help='Fit MSD to a power law')
     parser.add_argument('-linear', '--fit_line', action="store_true", help='Fit a line to the MSD')
     parser.add_argument('-alpha', '--alpha', default=0.5, type=float, help='Anomalous exponent')
-    parser.add_argument('-lambda', '--lambda', default=0.5, type=float, help='Exponential decay rate')
+    parser.add_argument('-lamb', '--lamb', default=0.5, type=float, help='Exponential decay rate')
     parser.add_argument('-dt', '--dt', default=1, type=float, help='Discrete time step for fixed length simulations')
     parser.add_argument('-fix_time', '--fix_time', action="store_true", help='Fix the total time of simulated '
                         'trajectories. Total length will be steps*dt')
@@ -177,7 +177,7 @@ class CTRW(object):
         :param max_hop: maximum distance a solute can hop
         :param ll: lower limit of power law distribution
         :param distributions: distributions of alpha and sigma values for dwell and hop length distributions \
-        respectively. Passed as 2-tuple of arrays where each array contains a possible values of each parameter.
+        respectively. Passed as 2-tuple of arrays where each array contains possible values of each parameter.
         :param discrete: pull from discrete dwell time probability distributions
         :param noise: add Gaussian noise to final trajectories
 
@@ -232,10 +232,16 @@ class CTRW(object):
                     if self.alpha == 1:
                         time.append(1)
                     else:
-                        time.append(rand.random_powerlaw(1 + dwell_parameters[mode], ll=ll[mode], discrete=discrete)[0])
+                        if distributions is not None:
+                            time.append(rand.random_powerlaw(1 + dwell_parameters[mode], ll=ll[mode], discrete=discrete)[0])
+                        else:
+                            time.append(rand.random_powerlaw(1 + self.alpha, ll=ll, discrete=discrete)[0])
                 elif self.dwell_distribution.lower() in ['power law exponential cutoff', 'powerlaw_cutoff']:
-                        time.append(rand.random_powerlaw_cutoff(1 + dwell_parameters[mode][0], dwell_parameters[mode][1]
-                                                                , xmin=ll[mode])[0])
+                        if distributions is not None:
+                            time.append(rand.random_powerlaw_cutoff(1 + dwell_parameters[mode][0],
+                                                                    dwell_parameters[mode][1], xmin=ll[mode])[0])
+                        else:
+                            time.append(rand.random_powerlaw_cutoff(1 + self.alpha, self.lamb, xmin=ll)[0])
                 else:
                     sys.exit('Please enter a valid dwell time probability distribution')
                 total_time += time[-1]
@@ -268,11 +274,19 @@ class CTRW(object):
 
                 elif self.hop_distribution in ['fbm', 'fractional', 'fractional_brownian_motion']:
 
-                    hurst = H[mode] if hurst_modes == self.nmodes else H[0]
+                    if distributions is not None:
+                        hurst = H[mode] if hurst_modes == self.nmodes else H[0]
+                    else:
+                        hurst = self.H
 
                     z[begin:end] = fbm.FBM(length, hurst, method="daviesharte").fbm()[1:]  # automatically inserts zero at beginning of array
                     z[begin:end] /= ((1.0 / length) ** hurst)  # reversing a normalization done in the fbm code
-                    z[begin:end] *= hop_parameters[mode][1]
+
+                    if distributions is not None:
+                        z[begin:end] *= hop_parameters[mode][1]
+                    else:
+                        z[begin:end] *= self.hop_sigma
+
                     if begin > 0:
                         z[begin:end] += z[begin - 1]
 
@@ -766,11 +780,11 @@ if __name__ == "__main__":
     args = initialize().parse_args()
 
     ctrw = CTRW(args.steps, args.ntraj, hop_dist=args.hop_length_distribution, dwell_dist=args.dwell_time_distribution,
-                hop_sigma=args.hop_sigma, alpha=args.alpha, dt=args.dt, nt=args.nthreads, H=args.hurst)
+                hop_sigma=args.hop_sigma, alpha=args.alpha, dt=args.dt, nt=args.nthreads, H=args.hurst, lamb=args.lamb)
     ctrw.generate_trajectories(fixed_time=args.fix_time, noise=args.noise, limit=args.upper_limit)
     ctrw.calculate_msd(ensemble=args.ensemble)
     ctrw.bootstrap_msd(nboot=args.nboot, fit_power_law=args.fit_power_law, fit_linear=args.fit_line)
-    ctrw.plot_msd(plot_power_law=args.fit_power_law, plot_linear=args.fit_line, show=False)#, end_frame=5000)
+    ctrw.plot_msd(plot_power_law=args.fit_power_law, plot_linear=args.fit_line, show=True, end_frame=5000)
 
     if args.autocorrelation:
         ctrw.step_autocorrelation()

@@ -44,9 +44,13 @@ recalculate_walks = True
 extreme_trapping = False 
 ntraj = args.ntraj # number of trajectories to simulate
 nboot = 200  # number of bootstrap trials when getting errorbars on MSD
+nt = 8 # number of threads
 
 equil = {'GCL': 2400, 'URE': 2000, 'MET': 7000, 'ACH': 4000}  # frame number, not ns. (multiply ns by 2)
 truncate = {'GCL': 1.0, 'URE': 1.0, 'MET': 1.0, 'ACH': 1.0}
+m = 256
+Mlowerbound = 6000
+#M = {'GCL': 8619, 'URE': 8253, 'MET': 11577, 'ACH': 7917}
 
 traj = '5ms_nojump.xtc'
 gro = 'em.gro'
@@ -79,16 +83,17 @@ nsteps = MD_MSD.nT  # match the number of frames
 # probably easier to just re-run these calculations in the appropriate directory. 
 # Doesn't matter which dwell/hop is used as they will be re-fit below
 states = file_rw.load_object('%s/states.pl' % directory)
-print(states.hurst)
-exit()
+#print(states.hurst)
+#exit()
 
 if extreme_trapping:
 	states.hurst[:, :] = 0
 print(states.hurst.mean(axis=1))
 print(states.fit_params)
-
-chains = Chain(states.count_matrix, states.fit_params, hurst_parameters=states.hurst, emission_function=levy_stable)
-chains.generate_realizations(ntraj, nsteps, bound=truncate[res])
+print(ntraj)
+#chains = Chain(states.count_matrix, states.fit_params, hurst_parameters=states.hurst, emission_function=levy_stable)
+chains = Chain(states.count_matrix, states.fit_params, hurst_parameters=None, emission_function=levy_stable)
+chains.generate_realizations(ntraj, nsteps, bound=truncate[res], m=m, Mlowerbound=Mlowerbound, nt=nt)
 chains.calculate_msd()
 chains.plot_msd(cutoff=fracshow, label='MSDDM', overlay=True, show=False)
 labels.append('MSDDM')
@@ -98,5 +103,5 @@ plt.tight_layout()
 savename = '%s_msddm' % res
 if extreme_trapping:
 	savename += '_zeroH'
-plt.savefig('%s.pdf' % savename)
+#plt.savefig('%s.pdf' % savename)
 plt.show()

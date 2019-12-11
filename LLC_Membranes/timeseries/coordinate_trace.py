@@ -62,7 +62,10 @@ class CoordinateTrace(object):
         :type skip: int
         """
 
+        print('Loading Trajectory...', end='', flush=True)
         self.t = md.load(traj, top=gro)[begin:end:skip]
+        print('Done!')
+
         self.time = self.t.time
 
         self.axis = ['x', 'y', 'z'].index(axis.lower())

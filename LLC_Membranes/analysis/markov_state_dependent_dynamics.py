@@ -17,6 +17,7 @@ import tqdm
 from scipy.stats import cauchy, laplace, t, levy_stable
 import levy
 import itertools
+from multiprocessing import Pool
 np.set_printoptions(precision=4, suppress=True)
 
 
@@ -422,23 +423,28 @@ class States:
 
         self.emissions = emissions
 
-    def _fit_emissions_distributions(self, fit_function):
+    def _fit_emissions_distributions(self, fit_function, nboot=200):
         """ Fit Levy distribution to emission distributions
 
         :param fit_function: functional form of emission distributions
+        :param nboot: number of bootstrap trials
         """
 
         print('Fitting emission distributions...', flush=True, end='')
         if self.emission_params['lump_transitions']:
-            self.fit_params = np.zeros([self.nstates + 1, 3])
-            for s in range(self.nstates + 1):
-                self.fit_params[s, :] = fit_function.fit_levy(self.emissions[s], beta=0)[0].x  # alpha, mu, sigma
+            self.fit_params = np.zeros([nboot, self.nstates + 1, 3])
+            for s in tqdm.tqdm(range(self.nstates + 1), unit='States'):
+                for b in range(nboot):
+                    emissions = np.random.choice(self.emissions[s], size=len(self.emissions[s]), replace=True)
+                    self.fit_params[b, s, :] = fit_function.fit_levy(emissions, beta=0)[0].x  # alpha, mu, sigma
         else:
-            self.fit_params = np.zeros([self.nstates, self.nstates, 3])  # only 3 parameters since beta is fixed
+            self.fit_params = np.zeros([nboot, self.nstates, self.nstates, 3])  # only 3 parameters since beta is fixed
 
             for i in tqdm.tqdm(range(self.nstates)):
                 for j in range(self.nstates):
-                    self.fit_params[i, j, :] = fit_function.fit_levy(self.emissions[i][j], beta=0)[0].x
+                    for b in range(nboot):
+                        emissions = np.random.choice(self.emissions[i][j], size=len(self.emissions[i][j]), replace=True)
+                        self.fit_params[b, i, j, :] = fit_function.fit_levy(emissions, beta=0)[0].x
 
         print('Done!')
 
@@ -627,32 +633,97 @@ class Chain:
         self.msds = None
         self.limits = None
 
-        self.hurst_interpolator = flm_sim_params.HurstCorrection()
-        self.truncation_interpolator = flm_sim_params.TruncateLevy()
+        if self.hurst_parameters is not None:
 
-    def generate_realizations(self, n, length, bound=7.6):
+            self.hurst_interpolator = flm_sim_params.HurstCorrection()
+            self.truncation_interpolator = flm_sim_params.TruncateLevy()
+
+            self.m = 256
+            self.Mlowerbound = 6000
+
+    def generate_realizations(self, n, length, bound=7.6, m=256, Mlowerbound=6000, nt=1):
         """ Generate Markov chains using transition matrix and emission probabilities
 
         :param n: number of independent trajectories to generate
         :param length: length (number of steps) of generated trajectories
         :param bound: largest hop allowable. This essentially truncates the emission distribution
+        :param m: mesh size. Choose a value that is a power of 2
+        :param Mlowerbound: M is the kernel function cut-off. This is the lowest possible value of M that will be \
+        chosen. M will be chosen such that M + length is a power of 2. Higher values of M will lead to more accurate \
+        calculation of the correlation structure at large time lags.
+        :param nt: number of threads to use for trajectory realization generation.
 
         :type n: int
         :type length: int
         :type bound: float
+        :type m: int
+        :type Mlowerbound: int
+        :type nt: int
         """
 
-        self.chains = np.zeros([length, n])
-        self.states = np.zeros([length, n], dtype=int)
+        trajectories_per_thread = n // nt
+
+        self.chains = np.zeros([length, trajectories_per_thread * nt])
+        self.states = np.zeros([length, trajectories_per_thread * nt], dtype=int)
+
+        self.m = m
+        self.Mlowerbound = Mlowerbound
 
         print("Generating trajectories...")
-        for i in tqdm.tqdm(range(n)):
-            self.chains[:, i], self.states[:, i] = self.realization(length, bound=bound)
+
+        if nt > 1:
+
+            pool = Pool(processes=nt)  # set up multiprocessing pool
+
+            trajectories_per_thread = n // nt
+
+            arguments = [(trajectories_per_thread, length, bound) for _ in range(nt)]  # arguments for each thread
+
+            result = pool.starmap(self._realizations, arguments)  # do the calculations
+
+            # unpack result list
+            for i, r in enumerate(result):
+                
+                self.chains[:, i * trajectories_per_thread:(i + 1) * trajectories_per_thread] = r[0]
+                self.states[:, i * trajectories_per_thread:(i + 1) * trajectories_per_thread] = r[1]
+
+            pool.close()
+            pool.join()
+
+        else:
+
+            self.chains, self.states = self._realizations(n, length, bound)
+
+        # for i in tqdm.tqdm(range(n)):
+        #     self.chains[:, i], self.states[:, i] = self._realization(length, bound=bound)
 
         #     plt.plot(self.chains[:, i])
         # plt.show()
 
-    def realization(self, length, bound=7.6):
+    def _realizations(self, n, length, bound):
+        """ Generate multiple realization of Markov chain. This function exists by itself to aid parallelization
+
+        :param n: number of trajectories to generate
+        :param length: length of trajectory
+        :param bound: largest hop allowable. This essentially truncates the emission distribution
+
+        :type n: int
+        :type length: int
+        :type bound: float
+
+        :return: chains, states
+        """
+
+        np.random.seed()
+
+        chains = np.zeros([length, n])
+        states = np.zeros([length, n], dtype=int)
+        for i in tqdm.tqdm(range(n)):
+            chains[:, i], states[:, i] = self._realization(length, bound=bound)
+
+        return chains, states
+
+    def _realization(self, length, bound=7.6):
         """ Generate single realization of Markov chain
 
         :param length: length of trajectory
@@ -668,9 +739,9 @@ class Chain:
 
         else:
 
-            return self._correlated_realizations(length, bound=bound)
+            return self._correlated_realization(length, bound=bound)
 
-    def _correlated_realizations(self, length, bound=7.6):
+    def _correlated_realization(self, length, bound=7.6):
         """ Generate a realization with correlated emissions
 
         :param length: length of trajectory
@@ -733,12 +804,17 @@ class Chain:
         :rtype: numpy.ndarray
         """
 
+        # for efficiency, make sure m * (l + M) is a power of 2
+        M = l + self.Mlowerbound
+        n = np.log(M) / np.log(2)
+        M = int(2 ** np.ceil(n) - l)
+
         H = np.random.choice(self.hurst_parameters[state])  # random hurst parameter from transition distribution
         alpha, scale = self.emission_parameters[state, [0, 2]]
         corrected_bound = self.truncation_interpolator.interpolate(H, alpha, bound, scale)
         #print(H, alpha, bound, scale, state, corrected_bound)
         corrected_H = self.hurst_interpolator.interpolate(H, alpha)
-        flm = FLM(corrected_H, alpha, M=2, N=l, scale=scale, truncate=corrected_bound,
+        flm = FLM(corrected_H, alpha, m=self.m, M=M, N=l, scale=scale, truncate=corrected_bound,
                   correct_hurst=False, correct_truncation=False)
         flm.generate_realizations(1, progress=False)  # generate a single realization
 

@@ -14,6 +14,14 @@
 \usepackage{gensymb}
 \usepackage{float}
 \usepackage{xr}
+\usepackage{array}
+\usepackage{multirow}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\newcommand{\PreserveBackslash}[1]{\let\temp=\\#1\let\\=\temp}
+\newcolumntype{C}[1]{>{\PreserveBackslash\centering}p{#1}}
+\newcolumntype{R}[1]{>{\PreserveBackslash\raggedleft}p{#1}}
+\newcolumntype{L}[1]{>{\PreserveBackslash\raggedright}p{#1}}
 
 \externaldocument[M-]{Draft}
 
@@ -417,6 +425,146 @@ Phase Lyotropic Liquid Crystal Membrane}
   transition matrix does not change signficantly.}\label{fig:transitions}
   \end{figure}
   
+  \section{Solute hopping and trapping behavior}\label{section:sfbm_other_solutes}
+  
+  \begin{figure}
+  \centering
+  %BJC3: included radial distance from pore center because I could. But does that make it look bad?
+  % /figures/solute_trajectories.py
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{GCL_trajectories.pdf}
+  \caption{}\label{fig:GCL_solute_trajectories}
+  \end{subfigure}
+  % Next 3: /figures/distributions_sfbm.py
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{gaussian_levy_comparison_anomalous_GCL.pdf}
+  \caption{}\label{fig:GCL_hop_distribution_comparison}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{GCL_powerlaw.pdf}
+  \caption{}\label{fig:GCL_powerlaw}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{GCL_hop_acf.pdf}
+  \caption{}\label{fig:GCL_hop_acf}
+  \end{subfigure}
+  \caption{For ethylene glycol: (a) representative $z$-coordinate center of mass trajectories, (b) hop 
+  length distributions, (c) dwell time distributions and (d) hop autocorrelation functions
+  for ethylene glycol. See Figure~\ref{M-fig:anticorrelated_hops} and Section~\ref{M-section:AD_parameterization}
+  in the main text for a more detailed discussion.}\label{fig:GCL_anticorrelated_hops}
+  \end{figure}
+  
+  \begin{figure}
+  \centering
+  %BJC3: included radial distance from pore center because I could. But does that make it look bad?
+  % /figures/solute_trajectories.py
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{ACH_trajectories.pdf}
+  \caption{}\label{fig:ACH_solute_trajectories}
+  \end{subfigure}
+  % Next 3: /figures/distributions_sfbm.py
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{gaussian_levy_comparison_anomalous_ACH.pdf}
+  \caption{}\label{fig:ACH_hop_distribution_comparison}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{ACH_powerlaw.pdf}
+  \caption{}\label{fig:ACH_powerlaw}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{ACH_hop_acf.pdf}
+  \caption{}\label{fig:ACH_hop_acf}
+  \end{subfigure}
+  \caption{For acetic acid: (a) representative $z$-coordinate center of mass trajectories, (b) hop 
+  length distributions, (c) dwell time distributions and (d) hop autocorrelation functions
+  for acetic acid. See Figure~\ref{M-fig:anticorrelated_hops} and Section~\ref{M-section:AD_parameterization}
+  in the main text for a more detailed discussion.}\label{fig:ACH_anticorrelated_hops}
+  \end{figure}
+  
+  \begin{figure}
+  \centering
+  %BJC3: included radial distance from pore center because I could. But does that make it look bad?
+  % /figures/solute_trajectories.py
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{MET_trajectories.pdf}
+  \caption{}\label{fig:MET_solute_trajectories}
+  \end{subfigure}
+  % Next 3: /figures/distributions_sfbm.py
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{gaussian_levy_comparison_anomalous_MET.pdf}
+  \caption{}\label{fig:MET_hop_distribution_comparison}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{MET_powerlaw.pdf}
+  \caption{}\label{fig:MET_powerlaw}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{MET_hop_acf.pdf}
+  \caption{}\label{fig:MET_hop_acf}
+  \end{subfigure}
+  \caption{For methanol: (a) representative $z$-coordinate center of mass trajectories, (b) hop 
+  length distributions, (c) dwell time distributions and (d) hop autocorrelation functions
+  for methanol. See Figure~\ref{M-fig:anticorrelated_hops} and Section~\ref{M-section:AD_parameterization}
+  in the main text for a more detailed discussion.}\label{fig:MET_anticorrelated_hops}
+  \end{figure}
+  
+  \section{Tabular Anomalous Diffusion Parameters}\label{section:tabular_AD_params}
+  
+  % BJC: note to self -- modes are flipped in simulation output because 
+  % physical.partition() sets mode as booleans and when r <= 0.75, in-pore is True (1) instead of 0. 
+  \begin{table}[h]
+  \centering
+  \begin{tabular}{|M{2cm}|M{1.65cm}|M{1.95cm}|M{1.95cm}|M{1.95cm}|M{1.95cm}|}
+  \hline
+  1 Mode Model  & Parameters                & Urea         & Ethylene Glycol &   Methanol   & Acetic Acid  \\\hline
+  Dwell         & $P(\alpha_d)$             & 0.57         & 0.62            & 0.62         & 0.45         \\\cline{2-6}
+  Distributions & $P_T(\alpha_d, \lambda)$  & 0.40, 0.0024 & 0.47, 0.0030    & 0.44, 0.0040 & 0.08, 0.0033 \\\hline
+  Hop           & $\mathcal{N}(\sigma)$     & 0.33         & 0.34            & 0.35         & 0.27         \\\cline{2-6}
+  Distributions & $L(\sigma, \alpha_h)$     & 0.21, 1.84   & 0.23, 1.92      & 0.22, 1.80   & 0.16, 1.72   \\\hline
+  Correlation   & $\gamma(H)$               & 0.37         & 0.40            & 0.30         & 0.34         \\
+  \hline 
+  \end{tabular}
+  \caption{To create a 1 mode model for each solute, we parameterized a pure power
+  law ($P(\alpha_d)$) and a truncated power law ($P_T(\alpha_d, \lambda)$) distribution 
+  to describe solute dwell times. Lower values of $\alpha_d$ lead to heavier power 
+  law tails and higher values of $\lambda$ truncate the distribution at lower
+  dwell times. We parameterized Gaussian ($\mathcal{N}(\sigma)$) and L\'evy stable 
+  ($L(\sigma, \alpha_h)$) distributions to describe solute hop lengths. We assume
+  the mean ($\mu$) to be zero for these distributions and there to be no skewness ($\beta=0$)
+  in the L\'evy stable distributions. High values of $\sigma$ and lower values of
+  $\alpha_h$ result in larger hops. Finally, we parameterized the hop autocorrelation
+  function ($\gamma(H)$) to describe the degree of correlation between hops. 
+  Higher values of $H$ display closer to Brownian behavior.}\label{table:sfbm_params}
+  \end{table}
+  
+  \begin{table}[h]
+  \centering
+  \begin{tabular}{|M{2cm}|M{1.65cm}|M{.75cm}|M{1.95cm}|M{1.95cm}|M{1.95cm}|M{1.95cm}|M{1.95cm}|M{1.95cm}|}
+  \hline
+  \multicolumn{7}{|c|}{2 Mode Model} \\\hline
+                & Parameters                               & Mode & Urea         & Ethylene Glycol &  Methanol    & Acetic Acid \\
+  \hline
+                &\multirow{2}{*}{$P(\alpha_d)$}            & 1    & 0.69         &  0.69           & 0.90         & 0.58         \\\cline{3-7}
+  Dwell         &                                          & 2    & 0.38         &  0.48           & 0.58         & 0.33         \\\cline{2-7}
+  Distributions &\multirow{2}{*}{$P_T(\alpha_d, \lambda)$} & 1    & 0.56, 0.0037 &  0.62, 0.0026   & 1.04, 0.0006 & 0.41, 0.0026 \\\cline{3-7}
+                &                                          & 2    & 0.00, 0.0027 &  0.06, 0.0049   & 0.30, 0.0054 & 0.00, 0.0021 \\\hline
+                &\multirow{2}{*}{$\mathcal{N}(\sigma)$}    & 1    & 0.35         &  0.38           & 0.45         & 0.32         \\\cline{3-7}
+  Hop           &                                          & 2    & 0.24         &  0.23           & 0.32         & 0.17         \\\cline{2-7}
+  Distributions &\multirow{2}{*}{$L(\sigma, \alpha_h)$}    & 1    & 0.24, 1.91   &  0.26, 1.99     & 0.31, 1.97   & 0.21, 1.91   \\\cline{3-7}
+                &                                          & 2    & 0.12, 1.50   &  0.15, 1.90     & 0.20, 1.85   & 0.09, 1.50   \\\hline
+  Correlation   & $\gamma(H)$                              & --   & 0.37         &  0.40           & 0.30         & 0.34         \\\cline{3-7}
+  \hline 
+  \end{tabular}
+  \caption{The two model parameterizes solute behavior in the pores and tails separately. 
+  Generally, movement is much more restricted in the tail region. To create a 2 mode model,
+  we generated a set of parameters based on solute behavior as function of distance from
+  the pore center. Mode 1 corresponds to solute behavior within 0.75 nm of the pore center
+  and mode 2 corresponds to behavior greater than or equal to 0.75 nm from the pore center.
+  Note that we used the same Hurst parameter for both modes due to a low number of 
+  sufficiently long sequences of hops in each mode. See Table~\ref{table:sfbm_params} for
+  descriptions of the parameters.}\label{table:sfbm_params_2mode}
+  \end{table}
+  
   \section{Stationarity of Solute Trajectories}\label{section:msd_comparison}
   
   \begin{figure}
@@ -444,6 +592,31 @@ Phase Lyotropic Liquid Crystal Membrane}
   similar MSDs, providing evidence of stationarity, while the MSDs of 
   ethylene glycol and methanol are different.}\label{fig:msd_comparison}
   \end{figure}
+  
+  \section{Tabular MSDDM parameters}\label{section:msddm_params}
+  
+  \begin{table}[h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+  \hline
+  & \multicolumn{3}{c|}{Urea} & \multicolumn{3}{c|}{Ethylene Glycol} & \multicolumn{3}{c|}{Methanol} & \multicolumn{3}{c|}{Acetic Acid} \\\hline
+  State & H     &$\alpha_h$& $\sigma$ & H    &$\alpha_h$& $\sigma$   & H     &$\alpha_h$& $\sigma$ & H    &$\alpha_h$& $\sigma$ \\\hline
+  1     & 0.10  & 1.79     & 0.034    & 0.09 & 1.68     & 0.045      & 0.11  & 1.56     & 0.052    & 0.10 & 1.78     & 0.035    \\
+  2     & 0.06  & 1.80     & 0.033    & 0.09 & 1.75     & 0.037      & 0.07  & 1.63     & 0.043    & 0.08 & 1.88     & 0.032    \\
+  3     & 0.11  & 1.88     & 0.030    & 0.11 & 1.86     & 0.030      & 0.02  & 1.80     & 0.036    & 0.04 & 2.00     & 0.030    \\
+  4     & 0.10  & 1.95     & 0.027    & 0.04 & 1.91     & 0.028      & 0.02  & 1.75     & 0.036    & 0.04 & 2.00     & 0.027    \\
+  5     & 0.19  & 1.34     & 0.048    & 0.15 & 1.40     & 0.062      & 0.10  & 1.28     & 0.074    & 0.13 & 1.47     & 0.048    \\
+  6     & 0.15  & 1.45     & 0.040    & 0.11 & 1.52     & 0.040      & 0.03  & 1.50     & 0.042    & 0.09 & 1.70     & 0.038    \\
+  7     & 0.15  & 1.61     & 0.032    & 0.05 & 1.60     & 0.040      & 0.28  & 1.20     & 0.043    & 0.08 & 1.77     & 0.031    \\
+  8     & 0.11  & 1.71     & 0.028    & 0.05 & 1.74     & 0.030      & 0.04  & 1.83     & 0.037    & 0.01 & 2.00     & 0.030    \\
+  T     & 0.34  & 1.42     & 0.036    & 0.37 & 1.44     & 0.045      & 0.35  & 1.45     & 0.057    & 0.34 & 1.54     & 0.040    \\\hline
+  \end{tabular}
+  \caption{We calculated values of $H$, $\alpha_h$ and $\sigma$ from MD simulation
+  trajectories and used them to generate realizations of our MSDDM model. The states
+  are defined in Table~\ref{table:states} except state T which describes the transition
+  emissions.}\label{table:msddm_params}
+  \end{table}  
+  
   
   \section{2-state MSDDM parameters}\label{section:simple_msddm_params}
   

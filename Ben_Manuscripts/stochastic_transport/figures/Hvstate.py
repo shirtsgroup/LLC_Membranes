@@ -21,8 +21,9 @@ def transition_matrix(t):
 				T[i, j] = 1 - t
 	return T
 
-#sol = ['URE', 'GCL', 'MET', 'ACH']
-sol = ['MET', 'ACH', 'URE', 'GCL']
+sol = ['URE', 'GCL', 'MET', 'ACH']
+#sol = ['MET', 'ACH', 'URE', 'GCL']
+root_dir = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11"
 names = {'URE': 'urea', 'GCL': 'ethylene glycol', 'MET': 'methanol', 'ACH': 'acetic acid'}
 colors = {'URE':'xkcd:blue', 'GCL':'xkcd:orange', 'MET':'xkcd:green', 'ACH':'xkcd:magenta'}
 path = '/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11'
@@ -47,9 +48,13 @@ hatch2 = '...'
 hatches = [hatch1, hatch1, hatch1, hatch1, hatch2, hatch2, hatch2, hatch2, None]
 
 for i, res in enumerate(sol):
-    heights = H[i]
+
+    states = file_rw.load_object('%s/%s/10wt/states.pl' % (root_dir, res))
+    heights = states.hurst
+
     for j in range(9):
-        plt.bar(bar_locations[j] + (i - 1)*bar_width - bar_width/2, heights[j], bar_width, label=names[res], color=colors[res], edgecolor='black', alpha=alpha, hatch=hatches[j])
+        ci = np.abs(np.array([[np.percentile(heights[j, :], 16)], [np.percentile(heights[j, :], 84)]]) - heights[j, :].mean())
+        plt.bar(bar_locations[j] + (i - 1)*bar_width - bar_width/2, heights[j, :].mean(), bar_width, label=names[res], color=colors[res], edgecolor='black', alpha=alpha, hatch=hatches[j], yerr=ci)
 
 import matplotlib.patches as mpatches
 hatch1 = mpatches.Patch(facecolor='white', label='In Tails', edgecolor='black', hatch=hatch1)
