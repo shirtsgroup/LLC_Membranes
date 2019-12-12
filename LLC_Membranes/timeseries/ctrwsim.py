@@ -54,7 +54,7 @@ def initialize():
 class CTRW(object):
 
     def __init__(self, length, ntraj, nmodes=1, hop_dist='gaussian', dwell_dist='power', hop_sigma=1, alpha=0.5,
-                 lamb=0.5, padding=10, dt=1, nt=1, H=0.5, transition_count_matrix=None):
+                 lamb=0.5, padding=10, dt=1, H=0.5, transition_count_matrix=None):
         """ Initialize simulation of a continuous time random walk
 
         :param length: length of each simulated trajectory. If you fix the number of steps, this equals the number of \
@@ -102,7 +102,6 @@ class CTRW(object):
         self.alpha = alpha
         self.lamb = lamb
         self.dt = dt
-        self.nt = nt
         self.H = H
         self.nmodes = nmodes
 
@@ -134,8 +133,12 @@ class CTRW(object):
         # Initialize multi-threading
         self.pbar = None
 
+        # For fractional levy motion
+        self.m = 256
+        self.Mlowerbound = 6000
+
     def generate_trajectories(self, max_hop=None, fixed_time=False, noise=0, ll=0.1, limit=None, distributions=None,
-                              discrete=False, fixed_displacement=False):
+                              discrete=False, fixed_displacement=False, m=256, Mlowerbound=6000, nt=1):
         """ Create trajectories by randomly drawing from dwell and hop distributions
 
         :param max_hop: maximum distance a solute can hop
@@ -148,6 +151,11 @@ class CTRW(object):
         respectively. Passed as 2-tuple of arrays where each array contains a possible values of each parameter.
         :param discrete: pull from discrete dwell time probability distributions
         :param fixed_displacement: generate trajectories that stop once they reach a certain absolute displacement
+        :param m: mesh size. Choose a value that is a power of 2
+        :param Mlowerbound: M is the kernel function cut-off. This is the lowest possible value of M that will be \
+        chosen. M will be chosen such that M + length is a power of 2. Higher values of M will lead to more accurate \
+        calculation of the correlation structure at large time lags.
+        :param nt: number of threads to use for trajectory generation
 
         :type max_hop: float or NoneType
         :type fixed_time: bool
@@ -157,23 +165,63 @@ class CTRW(object):
         :type distributions: tuple
         :type discrete: bool
         :type fixed_displacement: bool
+        :type m: int
+        :type Mlowerbound: int
+        :type nt: int
         """
+
+        self.m = m
+        self.Mlowerbound = Mlowerbound
+
+        self.time_uniform = np.linspace(0, self.length, self.length * self.padding)
 
         if type(ll) is not list:
             ll = [ll]
 
-        if fixed_time:
-            self.fixed_time_trajectories(ll=ll, distributions=distributions, discrete=discrete, noise=noise,
-                                         max_hop=max_hop)
-        elif fixed_displacement:
-            self.fixed_displacement_trajectories()
-        else:
-            self.fixed_steps_trajectories(noise=noise, nt=self.nt, ll=ll, limit=limit)
+        if nt > 1:
 
-    def fixed_time_trajectories(self, ll=1, distributions=None, discrete=False, noise=0, max_hop=None):
+            pool = Pool(processes=nt)  # set up multiprocessing pool
+
+            trajectories_per_thread = self.ntraj // nt
+
+            arguments = []
+            for n in range(nt):
+                if n == (nt - 1): # give the last worker a little extra work
+                    ntraj = trajectories_per_thread + (self.ntraj - nt * trajectories_per_thread)
+                    arguments.append((ntraj, ll, distributions, discrete, noise, max_hop))
+                else:
+                    arguments.append((trajectories_per_thread, ll, distributions, discrete, noise, max_hop))
+
+            result = pool.starmap(self._fixed_time_trajectories, arguments)  # do the calculations
+
+            # unpack result list
+            for i, r in enumerate(result):
+
+                if i < (nt - 1):
+                    self.z_interpolated[i * trajectories_per_thread:(i + 1) * trajectories_per_thread, :] = r[0]
+                else:
+                    self.z_interpolated[i * trajectories_per_thread:(i + 1) * trajectories_per_thread, :] = r[0]
+
+                self.steps += r[1]
+
+            pool.close()
+            pool.join()
+
+        else:
+
+            if fixed_time:
+                self.z_interpolated, self.steps = self._fixed_time_trajectories(self.ntraj, ll, distributions, discrete,
+                                                                                noise, max_hop)
+            else:
+                self.fixed_steps_trajectories(noise=noise, nt=nt, ll=ll, limit=limit)
+
+        self.time_uniform *= self.dt
+
+    def _fixed_time_trajectories(self, n, ll, distributions, discrete, noise, max_hop):
         """ Create trajectories of fixed length where dwell times and hop lengths are drawn from the appropriate
         distributions.
 
+        :param n: number of trajectories to generate
         :param max_hop: maximum distance a solute can hop
         :param ll: lower limit of power law distribution
         :param distributions: distributions of alpha and sigma values for dwell and hop length distributions \
@@ -181,6 +229,7 @@ class CTRW(object):
         :param discrete: pull from discrete dwell time probability distributions
         :param noise: add Gaussian noise to final trajectories
 
+        :type n: int
         :type max_hop: float or NoneType
         :type ll: list of floats
         :type distributions: tuple
@@ -188,13 +237,14 @@ class CTRW(object):
         :type noise: float
         """
 
+        z_interpolated = np.zeros([n, self.length*self.padding])  # separate from time_uniform to save memory
+        steps = []
+
         if type(ll) is not list:
             ll = [ll]
 
-        self.time_uniform = np.linspace(0, self.length, self.length * self.padding)
-
         # generate ntraj realizations
-        for t in tqdm.tqdm(range(self.ntraj)):
+        for t in tqdm.tqdm(range(n)):
 
             # Get H, alpha and sigma parameter values
             if distributions is not None:
@@ -308,8 +358,13 @@ class CTRW(object):
                             sys.exit('Scipy is screwing up or the database is not populated around H=%.3f, '
                                      'alpha=%.3f, max_hop=%.2f, scale=%.2f' % (hurst, alpha - 0.01, max_hop, scale))
 
-                    flm = FLM(self.hurst_correction.interpolate(hurst, alpha), alpha, scale=scale,
-                              N=length, M=4, correct_hurst=False, truncate=corrected_max_hop, correct_truncation=False)
+                    # ensure that M + length is a power of 2
+                    M = length + self.Mlowerbound
+                    n = np.log(M) / np.log(2)
+                    M = int(2 ** np.ceil(n) - length)
+
+                    flm = FLM(self.hurst_correction.interpolate(hurst, alpha), alpha, scale=scale, m=self.m,
+                              N=length, M=M, correct_hurst=False, truncate=corrected_max_hop, correct_truncation=False)
 
                     flm.generate_realizations(1, progress=False)
                     # if max_hop is not None:  # brute force but will have to do until there is a better FLM procedure
@@ -324,7 +379,7 @@ class CTRW(object):
                     sys.exit('Please enter a valid hop distance probability distribution')
 
             z -= z[0]
-            self.steps.append(z[1:] - z[:-1])  # for autocorrelation calculation
+            steps.append(z[1:] - z[:-1])  # for autocorrelation calculation
 
             # for visualizing hops
             # trajectory_hops = np.zeros([2 * len(time) - 1, 2])
@@ -340,7 +395,7 @@ class CTRW(object):
             # exit()
 
             # make uniform time intervals with the same interval for each simulated trajectory
-            self.z_interpolated[t, :] = z[np.digitize(self.time_uniform, time, right=False) - 1]
+            z_interpolated[t, :] = z[np.digitize(self.time_uniform, time, right=False) - 1]
 
             # plt.plot(self.z_interpolated[t, :])
             # plt.show()
@@ -349,13 +404,15 @@ class CTRW(object):
             #plt.hist(np.random.normal(loc=0, scale=noise, size=len(self.time_uniform)))
 
             if noise > 0:
-                self.z_interpolated += np.random.normal(loc=0, scale=noise, size=len(self.time_uniform))
+                z_interpolated += np.random.normal(loc=0, scale=noise, size=len(self.time_uniform))
 
-        self.time_uniform *= self.dt
+        # self.time_uniform *= self.dt
         # plt.plot(trajectory_hops[:, 0]*self.dt, trajectory_hops[:, 1])
         # plt.plot(self.time_uniform, self.z_interpolated[-1, :])
         # plt.show()
         # exit()
+
+        return z_interpolated, steps
         
     def mean_first_passage_time(self, ll=1):
         """ Generate n independent CTRWs that propagate until the simulated particle's absolute displacment from its
@@ -539,7 +596,7 @@ class CTRW(object):
 
         print('Calculating MSD...', end='', flush=True)
         # start = timer.time()  # This is just here to test parallelization
-        self.msd = timeseries.msd(self.z_interpolated.T[..., np.newaxis], 0, ensemble=ensemble, nt=self.nt).T
+        self.msd = timeseries.msd(self.z_interpolated.T[..., np.newaxis], 0, ensemble=ensemble).T
         # print('Done in %.3f seconds' % (timer.time() - start))
 
     def plot_trajectory(self, n, show=False, save=True, savename='ctrw_trajectory.pdf'):

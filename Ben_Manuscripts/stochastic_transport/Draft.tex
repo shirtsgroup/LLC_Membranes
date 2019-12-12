@@ -837,15 +837,10 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \label{eqn:hill_relation}
   \end{equation}
   where $J$ is the single particle solute flux and MFPT refers to the mean first passage
-  time. 
-  %MRS5: I would phrase below: 
-  To account for input concentration dependence of the flux, assuming that 
-  particles are uncorrelated, 
-  %For particle concentrations higher than 1 at the pore entrance, 
-  one can multiply
-  Equation~\ref{eqn:hill_relation} by the total number of particles to get the total flux.
-  In the context of our work, the MFPT describes the average length of time it takes a particle
-  to move from the pore entrance to the pore exit. 
+  time. To account for input concentration dependence of the flux, assuming that particles
+  are uncorrelated, one can multiply Equation~\ref{eqn:hill_relation} by the total number
+  of particles to get the total flux. In the context of our work, the MFPT describes the
+  average length of time it takes a particle to move from the pore entrance to the pore exit. 
   
   We generated particle trajectories, parameterized with the above models, in order
   to construct a distribution of first passage times across a membrane pore of length $L$.
@@ -888,46 +883,52 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   
   To come up with an analytical equation describing the passage time distributions, 
   one can frame the problem as a pulse of particles instantaneously released at the 
-  pore inlet ($z=0$) which moves at a constant velocity and spreads out as it 
-  approaches $L$. This gives results equivalent to if we had released each particle
-  individually and then analyzed the positions of the ensemble of trajectories as 
-  a function of time. 
-  %MRS5: I would put this next section up until just before Eq. 15 in the supporting information (keep any citations in the main text). 
-  To derive an analytical equation, first consider an initial pulse spreading out 
-  over time with a fixed mean. We can solve for the time-dependent probability density
-  of particle positions by solving the one dimensional diffusion equation:
-  \begin{equation}
-  \frac{\partial p}{\partial t} = D \frac{\partial^2 p}{\partial z^2}
-  \end{equation}
-  The appropriate initial and boundary conditions are:
-  $$BC1: t > 0, z = \infty, p = 0$$
-  $$BC2: t > 0, z = 0, \frac{\partial p}{\partial z} = 0$$
-  $$IC: t = 0, c = M\delta(z)$$
-  where $M$ is the total number of particles in the system. It has been shown 
-  elsewhere that the solution to this equation is:~\cite{cussler_diffusion:_2009}
-  \begin{equation}
-  p(z, t) = \frac{1}{\sqrt{4 \pi D t}}\exp\bigg(\frac{-z^2}{4Dt}\bigg)
-  \end{equation}
-  We can make the substitution $z = z - vt$, where $v$ represents a constant average
-  velocity, in order to linearly shift the mean as a function of time:
-  \begin{equation}
-  p(z, t) = \frac{1}{\sqrt{4 \pi D t}}\exp\bigg(\frac{-(z - vt)^2}{4Dt}\bigg)
-  \end{equation}
-  One can track the fraction of particles, $F$, that have crossed the pore 
-  boundary by integrating:
-  \begin{equation}
-  F(t) = \int_L^\infty p~dz = \mathrm{erfc}\bigg(\frac{L - vt}{2\sqrt{D t}}\bigg)
-  \end{equation}
-  where $L$ is the pore length. This represents the cumulative first passage 
-  time distribution so we take its derivative in order to arrive at the first
-  passage time distribution:
+  pore inlet ($z=0$) which moves at a constant velocity, $v$, and spreads out as it 
+  approaches $L$. This spreading is parameterized by an effective diffusivity 
+  parameter, $D$. This approach gives results equivalent to if we had released each
+  particle individually and then analyzed the positions of the ensemble of trajectories as 
+  a function of time. The analytical expression describing the distribution of 
+  first passage times is:~\cite{cussler_diffusion:_2009}
   \begin{equation}
   P(t) = -\frac{1}{\sqrt{\pi}}e^{-(L - vt)^2 / (4Dt)}\bigg(-\frac{D(L - vt)}{4(Dt)^{3/2}} - \frac{v}{2\sqrt{Dt}}\bigg)
   \label{eqn:passage_times}
   \end{equation} 
-  where the only free parameters for fitting are $v$ and $D$. We calculated the
-  expected value of Equation~\ref{eqn:passage_times} in order to get the MFPT.
+  where the only free parameters for fitting are $v$ and $D$. A derivation
+  of Equation~\ref{eqn:passage_times} is given in Section~\ref{S-section:fpt_derivation}
+  of the Supporting Information. We calculated the expected value of 
+  Equation~\ref{eqn:passage_times} in order to get the MFPT.
   
+  %MRS5: I would put this next section up until just before Eq. 15 in the supporting information (keep any citations in the main text). 
+  %BJC5: moved to supporting
+%  To derive an analytical equation, first consider an initial pulse spreading out 
+%  over time with a fixed mean. We can solve for the time-dependent probability density
+%  of particle positions by solving the one dimensional diffusion equation:
+%  \begin{equation}
+%  \frac{\partial p}{\partial t} = D \frac{\partial^2 p}{\partial z^2}
+%  \end{equation}
+%  The appropriate initial and boundary conditions are:
+%  $$BC1: t > 0, z = \infty, p = 0$$
+%  $$BC2: t > 0, z = 0, \frac{\partial p}{\partial z} = 0$$
+%  $$IC: t = 0, c = M\delta(z)$$
+%  where $M$ is the total number of particles in the system. It has been shown 
+%  elsewhere that the solution to this equation is:~\cite{cussler_diffusion:_2009}
+%  \begin{equation}
+%  p(z, t) = \frac{1}{\sqrt{4 \pi D t}}\exp\bigg(\frac{-z^2}{4Dt}\bigg)
+%  \end{equation}
+%  We can make the substitution $z = z - vt$, where $v$ represents a constant average
+%  velocity, in order to linearly shift the mean as a function of time:
+%  \begin{equation}
+%  p(z, t) = \frac{1}{\sqrt{4 \pi D t}}\exp\bigg(\frac{-(z - vt)^2}{4Dt}\bigg)
+%  \end{equation}
+%  One can track the fraction of particles, $F$, that have crossed the pore 
+%  boundary by integrating:
+%  \begin{equation}
+%  F(t) = \int_L^\infty p~dz = \mathrm{erfc}\bigg(\frac{L - vt}{2\sqrt{D t}}\bigg)
+%  \end{equation}
+%  where $L$ is the pore length. This represents the cumulative first passage 
+%  time distribution so we take its derivative in order to arrive at the first
+%  passage time distribution:
+
   We used the ratio of solute fluxes in order to determine membrane selectivity, $S_{ij}$,
   towards solutes. Selectivity of solute $i$ versus $j$ is defined in terms of the
   ratio of solute permeabilities, $P$:~\cite{guo_pervaporation_2004}
@@ -935,7 +936,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   S_{ij} = \frac{P_i}{P_j}
   \end{equation}
   We can relate this to solute flux using Kedem and Katchalsky's equations for 
-  solvent volumetric flux, $J_v$, and solute flux, $J_s$:~\cite{kedem_permeability_1963}
+  solvent volumetric flux, $J_v$, and solute flux, $J_s$:~\cite{kedem_permeability_1963,al-zoubi_rejection_2007}
   %al-zoubi_rejection_2007 clarifies that these equations can be used for nanofiltration, ultrafiltration etc. by treating the membrane as a black box subject to irreversible thermodynamics.
   \begin{equation}
   J_v = L_p(\Delta P - \sigma\Delta \pi)
@@ -1766,6 +1767,9 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 
   %BJC4: not sure if the next couple paragraphs belong in methods 
   %MRS5: this could potentially be in methods.  Alternatives can be discussed there.
+  %BJC5: I tried putting this in methods, but it feels weird without stating the
+  % empirical equation. And I'm avoiding stating the empirical model in the methods
+  % since it is informed by the data.
   It is computationally infeasible to simulate trajectories long enough that they
   traverse the length of a macroscopic pore. To date, the thinnest H\textsubscript{II}
   LLC membrane synthesized with the monomer in this work was 7$\mu$m thick. Using
@@ -1775,8 +1779,6 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   take an infeasible amount of memory and time to simulate transport through a 
   pore over 100 times longer.
   
-  %BJC4: methods?  
-  %MRS5: This requires knowing the data, so maybe here. 
   We used simulated trajectories which traverse computationally-reasonable length
   pores in order to construct an empirical model which one can use to estimate 
   particle flux for arbitrary length pores. As shown in Figure~\ref{fig:flux_curves},
@@ -1836,8 +1838,12 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \end{subfigure}
   % BJC: could use better color scheme. Maybe outline hurst parameters
   \begin{subfigure}{0.325\textwidth}
-  \includegraphics[width=\textwidth]{flux_parameters.pdf}
-  \caption{}\label{fig:flux_parameters}
+  \includegraphics[width=\textwidth]{c_parameters.pdf}
+  \caption{}\label{fig:c_parameters}
+  \end{subfigure}
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\textwidth]{beta_parameters.pdf}
+  \caption{}\label{fig:beta_parameters}
   \end{subfigure}
 %  \begin{subfigure}{0.475\textwidth}
 %  \includegraphics[width=\textwidth]{mfpt_curves.pdf}
@@ -1845,10 +1851,10 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 %  \end{subfigure}
   %BJC: going out to 3 decimal places seems silly
   %BJC: might get closer to beta=2 if I use different curve fitting technique than fitting line to log-log
-  \begin{subfigure}{0.325\textwidth}
-  \includegraphics[width=\textwidth]{flux_curves_brownian.pdf}
-  \caption{Fixed $H=0.5$}\label{fig:flux_curves_brownian}
-  \end{subfigure}
+%  \begin{subfigure}{0.325\textwidth}
+%  \includegraphics[width=\textwidth]{flux_curves_brownian.pdf}
+%  \caption{Fixed $H=0.5$}\label{fig:flux_curves_brownian}
+%  \end{subfigure}
 %  \begin{subfigure}{0.475\textwidth}
 %  \includegraphics[width=\textwidth]{mfpt_curves_brownian.pdf}
 %  \caption{}\label{fig:mfpt_curves_brownian}
@@ -1917,10 +1923,6 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   the membrane's surface. Therefore, our predictions should be primarily used to 
   identify the most promising types of selective separations for an H\textsubscript{II}
   LLC membrane made from a specific monomer.
-  %BJC: though about mentioning fouli
-  
-  %MRS5: sentence fragment left here?
-    Neglects concentration polarization, membrane defects and fouling.
 
 %  BJC4: Uncomment to see MFPT curves
 %  \begin{figure}

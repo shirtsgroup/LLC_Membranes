@@ -425,6 +425,44 @@ Phase Lyotropic Liquid Crystal Membrane}
   transition matrix does not change signficantly.}\label{fig:transitions}
   \end{figure}
   
+  \section{Derivation of Passage Time Distributions}\label{section:fpt_derivation}
+  
+  To derive an analytical equation for the mean first passage time as calculated
+  in the main text, first consider an initial pulse spreading out over time with
+  a fixed mean. We can solve for the time-dependent probability density of 
+  particle positions by solving the one dimensional diffusion equation:
+  \begin{equation}
+  \frac{\partial p}{\partial t} = D \frac{\partial^2 p}{\partial z^2}
+  \end{equation}
+  The appropriate initial and boundary conditions are:
+  $$BC1: t > 0, z = \infty, p = 0$$
+  $$BC2: t > 0, z = 0, \frac{\partial p}{\partial z} = 0$$
+  $$IC: t = 0, c = M\delta(z)$$
+  where $M$ is the total number of particles in the system. It has been shown 
+  elsewhere that the solution to this equation is:~\cite{cussler_diffusion:_2009}
+  \begin{equation}
+  p(z, t) = \frac{1}{\sqrt{4 \pi D t}}\exp\bigg(\frac{-z^2}{4Dt}\bigg)
+  \end{equation}
+  We can make the substitution $z = z - vt$, where $v$ represents a constant average
+  velocity, in order to linearly shift the mean as a function of time:
+  \begin{equation}
+  p(z, t) = \frac{1}{\sqrt{4 \pi D t}}\exp\bigg(\frac{-(z - vt)^2}{4Dt}\bigg)
+  \end{equation}
+  One can track the fraction of particles, $F$, that have crossed the pore 
+  boundary by integrating:
+  \begin{equation}
+  F(t) = \int_L^\infty p~dz = \mathrm{erfc}\bigg(\frac{L - vt}{2\sqrt{D t}}\bigg)
+  \end{equation}
+  where $L$ is the pore length. This represents the cumulative first passage 
+  time distribution so we take its derivative in order to arrive at the first
+  passage time distribution:
+  \begin{equation}
+  P(t) = -\frac{1}{\sqrt{\pi}}e^{-(L - vt)^2 / (4Dt)}\bigg(-\frac{D(L - vt)}{4(Dt)^{3/2}} - \frac{v}{2\sqrt{Dt}}\bigg)
+  \label{eqn:passage_times}
+  \end{equation} 
+  where the only free parameters for fitting are $v$ and $D$. We calculated the
+  expected value of Equation~\ref{eqn:passage_times} in order to get the MFPT.
+  
   \section{Solute hopping and trapping behavior}\label{section:sfbm_other_solutes}
   
   \begin{figure}
@@ -643,6 +681,11 @@ Phase Lyotropic Liquid Crystal Membrane}
 %  We validated our approach to simulating trajectory realizations by testing
 %  it against analytical solutions to the mean first passage time of a Brownian
 %  particle with 2 absorbing boundaries.
+
+  \begin{figure}
+  \includegraphics[width=0.5\textwidth]{flux_curves_brownian.pdf}
+  \caption{Fixed $H=0.5$}\label{fig:flux_curves_brownian}
+  \end{figure}
   
   \begin{figure}
   \centering

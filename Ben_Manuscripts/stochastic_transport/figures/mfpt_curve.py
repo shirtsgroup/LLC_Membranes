@@ -7,6 +7,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 from scipy.integrate import quad
 import matplotlib.patches as mpatches
+from matplotlib.lines import Line2D
 
 def growth(x, c, alpha):
 
@@ -87,7 +88,7 @@ root_dir = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/"
 nboot = 200 
 
 #residues = ['URE', 'GCL', 'MET', 'ACH']
-residues = ['ACH', 'MET', 'URE', 'GCL']
+residues = np.array(['ACH', 'MET', 'URE', 'GCL'])
 colors = {'URE':'xkcd:blue', 'GCL':'xkcd:orange', 'MET':'xkcd:green', 'ACH':'xkcd:magenta'}
 names = {'URE': 'Urea', 'GCL': 'Ethylene Glycol', 'MET': 'Methanol', 'ACH': 'Acetic Acid'}
 names2 = {'URE': 'Urea', 'GCL': 'Ethylene\nGlycol', 'MET': 'Methanol', 'ACH': 'Acetic\nAcid'}
@@ -109,10 +110,9 @@ fig1, ax1 = plt.subplots()
 fig2, ax2 = plt.subplots()
 
 params = np.zeros([len(residues), nboot, 2]) 
-
+labels = []
 for j, r in enumerate(residues):
     print(r)
-
     if correlation:
         workdir = "%s/%s/10wt/mfpt/" % (root_dir, r)
     else:
@@ -148,11 +148,14 @@ for j, r in enumerate(residues):
     #plt.plot(x, np.exp(b.mean()) * x ** m.mean() , '--', color=colors[r], label = r'%s ($\alpha = %.2f \pm %.2f, c = %.2f \pm %.2f $)' % (names[r], m.mean(), m.std(), np.exp(b.mean()), np.exp(b).std()), lw=2)
     #ax2.plot(x, np.exp(b.mean()) * x ** m.mean() , '--', color=colors[r], label = r'%s ($\beta = %.2f \pm %.2f$)' % (names[r], m.mean(), m.std()), lw=2)
     ax2.plot(x, np.exp(b.mean()) * x ** m.mean() , '--', color=colors[r], label = '%s' % names[r], lw=2)
+    labels.append(Line2D([0], [0], color=colors[r], label='%s' % names[r], lw=2))
+
+labels.append(Line2D([0], [0], color='black', linestyle='--', label=r'Fits to $cL^{-\beta}$', lw=2))
 
 ax1.set_xlabel('Pore Length, L (nm)', fontsize=14)
 ax1.set_ylabel('Flux ($\mu$s$^{-1}$)', fontsize=14)
 ax1.tick_params(labelsize=14)
-ax1.legend(fontsize=14)
+ax1.legend(handles=labels, fontsize=14)
 fig1.tight_layout()
 
 ax2.set_xlabel('Pore Length, L (nm)', fontsize=14)
@@ -196,17 +199,18 @@ plt.xlabel('Pore length ($\mu m$)', fontsize=14)
 plt.ylabel('Selectivity', fontsize=14)
 plt.tick_params(labelsize=14)
 plt.tight_layout()
-plt.savefig('selectivity.pdf')
+#plt.savefig('selectivity.pdf')
 
 #######################
 # Parameter Bar Chart #
 #######################
 
-fig, bar = plt.subplots()
-bar2 = bar.twinx()
+#fig, bar = plt.subplots()
+#bar2 = bar.twinx()
 
 bar_locations = np.array([1, 2, 3, 4])
-bar_width = 0.4
+bar_width1 = 0.8
+bar_width2 = 0.4
 
 c = np.array([p[:, 0].mean() for p in params])
 c_err = np.array([p[:, 0].std() for p in params])
@@ -214,28 +218,59 @@ c_err = np.array([p[:, 0].std() for p in params])
 beta = np.array([p[:, 1].mean() for p in params])
 beta_err = np.array([p[:, 1].std() for p in params])
 
-bar.bar(bar_locations - bar_width/2, c, bar_width, edgecolor='black', color='xkcd:blue', label='c', yerr=c_err)
-bar2.bar(bar_locations + bar_width/2, -beta, bar_width, edgecolor='black', color='xkcd:magenta', label=r'$\beta$', yerr=beta_err)
+#bar.bar(bar_locations - bar_width/2, c, bar_width, edgecolor='black', color='xkcd:blue', label='c', yerr=c_err)
+#bar2.bar(bar_locations + bar_width/2, -beta, bar_width, edgecolor='black', color='xkcd:magenta', label=r'$\beta$', yerr=beta_err)
 
-H = [0.34, 0.30, 0.37, 0.40]
+H = np.array([0.34, 0.30, 0.37, 0.40])
 
-for i, h in enumerate(H):
-    bar2.text(bar_locations[i] + bar_width/2, -beta[i] + 0.025, '%.2f' % h, fontsize=12, horizontalalignment='center', fontweight='bold', color='xkcd:green')
+#for i, h in enumerate(H):
+#    bar2.text(bar_locations[i] + bar_width/2, -beta[i] + 0.025, '%.2f' % h, fontsize=12, horizontalalignment='center', fontweight='bold', color='xkcd:green')
 
-hatch1 = mpatches.Patch(facecolor='xkcd:blue', label='c', edgecolor='black')
-hatch2 = mpatches.Patch(facecolor='xkcd:magenta', label=r'$\beta$', edgecolor='black')
-hatch3 = mpatches.Patch(facecolor='xkcd:green', label='H', edgecolor='black')
+#hatch1 = mpatches.Patch(facecolor='xkcd:blue', label='c', edgecolor='black')
+#hatch2 = mpatches.Patch(facecolor='xkcd:magenta', label=r'$\beta$', edgecolor='black')
+#hatch3 = mpatches.Patch(facecolor='xkcd:green', label='H', edgecolor='black')
 
-bar.set_ylabel('c', fontsize=14)
-bar2.set_ylabel(r'$\beta$', fontsize=14)
-bar2.set_ylim(2, 3)
+#bar.set_ylabel('c', fontsize=14)
+#bar2.set_ylabel(r'$\beta$', fontsize=14)
+#bar2.set_ylim(2, 3)
+#plt.xticks(np.arange(1, 5), [names2[r] for r in residues])
+#bar.tick_params(labelsize=14)
+#bar2.tick_params(labelsize=14)
+#plt.legend(handles=[hatch1, hatch2, hatch3], fontsize=14, loc='upper left')
+
+
+fig1, bar1 = plt.subplots()
+
+bar1.bar(bar_locations, c, bar_width1, edgecolor='black', color='xkcd:blue', label='c', yerr=c_err)
 plt.xticks(np.arange(1, 5), [names2[r] for r in residues])
-bar.tick_params(labelsize=14)
-bar2.tick_params(labelsize=14)
-plt.legend(handles=[hatch1, hatch2, hatch3], fontsize=14, loc='upper left')
+bar1.tick_params(labelsize=14)
+bar1.set_ylabel('c', fontsize=14)
+
+fig1.tight_layout()
+fig1.savefig('c_parameters.pdf')
+
+fig, ax = plt.subplots()
+ax2 = ax.twinx()
+
+reordered = [3, 2, 0, 1]
+
+ax.bar(bar_locations - bar_width2/2, -beta[reordered], bar_width2, edgecolor='black', color='xkcd:blue', label=r'$\beta$', yerr=beta_err)
+ax2.bar(bar_locations + bar_width2/2, H[reordered], bar_width2, edgecolor='black', color='xkcd:orange', label='$H$')
+
+hatch1 = mpatches.Patch(facecolor='xkcd:blue', label=r'$\beta$', edgecolor='black')
+hatch2 = mpatches.Patch(facecolor='xkcd:orange', label='$H$', edgecolor='black')
+ax.legend(handles=[hatch1, hatch2], fontsize=14, loc='upper left', ncol=2)
+
+ax.set_ylabel(r'$\beta$', fontsize=14)
+ax.tick_params(labelsize=14)
+ax2.set_ylabel('$H$', fontsize=14)
+ax2.tick_params(labelsize=14)
+
+ax.set_ylim(2.4, 2.8)
+ax2.set_ylim(0.2, 0.45)
+plt.xticks(np.arange(1, 5), [names2[r] for r in residues[reordered]])
 
 fig.tight_layout()
-fig.savefig('flux_parameters.pdf')
-
+fig.savefig('beta_parameters.pdf')
 
 plt.show()

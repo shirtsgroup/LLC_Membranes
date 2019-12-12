@@ -683,7 +683,7 @@ class Chain:
 
             # unpack result list
             for i, r in enumerate(result):
-                
+
                 self.chains[:, i * trajectories_per_thread:(i + 1) * trajectories_per_thread] = r[0]
                 self.states[:, i * trajectories_per_thread:(i + 1) * trajectories_per_thread] = r[1]
 

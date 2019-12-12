@@ -5,6 +5,7 @@ the Markov State-Dependent model
 """
 
 from LLC_Membranes.analysis.markov_state_dependent_dynamics import Chain
+from LLC_Membranes.llclib import file_rw
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -37,8 +38,9 @@ ts = [0.7, 0.85, 0.99]
 for t in ts:
 
 	count_matrix = counts * transition_matrix(t)
-	chains = Chain(count_matrix, emission_parameters, hurst_parameters=H)	
-	chains.generate_realizations(100, 1000, bound=1.0)
+	chains = file_rw.load_object('%s_chains.pl' % t)
+	#chains = Chain(count_matrix, emission_parameters, hurst_parameters=H)	
+	#chains.generate_realizations(100, 1000, bound=1.0)
 	chains.calculate_msd()
 	chains.plot_msd(overlay=True, show=False, label='$T_{ii}$ =%.2f' % t)
 

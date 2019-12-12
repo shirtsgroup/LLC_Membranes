@@ -43,7 +43,7 @@ res = args.residue
 directory = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/%s/10wt" % res
 fracshow = 0.4  # fraction of MD MSD to plot
 recalculate_msd = args.msd 
-recalculate_walks = True
+recalculate_walks = True 
 
 front = False
 if args.portion.lower() == 'front':
@@ -112,6 +112,9 @@ hop_dist = ['Gaussian', 'Gaussian', 'Levy', 'Levy']
 
 #dwell_dist = ['Power Law Exponential Cutoff', 'Power Law Exponential Cutoff']
 #hop_dist = ['Gaussian', 'Levy']
+
+dwell_dist = ['Power Law Exponential Cutoff']
+hop_dist = ['Levy']
 
 # names here will appear in legend
 abbreviations = {'Power Law Gaussian': 'sFBM', 'Power Law Exponential Cutoff Gaussian': 'sFBMcut', 'Power Law Levy': 'sFLM', 'Power Law Exponential Cutoff Levy': 'sFLMcut'}
@@ -186,5 +189,5 @@ for i, dists in enumerate(zip(dwell_dist, hop_dist)):
 plt.legend(labels, loc=0, fontsize=14)
 plt.tight_layout()
 #plt.savefig('toc_msd.png')
-plt.savefig('%dmode_msd_comparison_%s_train_%s.pdf' % (nmodes,res,suffix))
-#plt.show()
+#plt.savefig('%dmode_msd_comparison_%s_train_%s.pdf' % (nmodes,res,suffix))
+plt.show()

@@ -40,11 +40,12 @@ directory = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/%s/10wt" % res
 fracshow = 0.4  # fraction of MD MSD to plot
 endframe = 2000
 recalculate_msd = False 
-recalculate_walks = True 
+recalculate_walks = False 
 extreme_trapping = False 
 ntraj = args.ntraj # number of trajectories to simulate
 nboot = 200  # number of bootstrap trials when getting errorbars on MSD
 nt = 8 # number of threads
+load = True
 
 equil = {'GCL': 2400, 'URE': 2000, 'MET': 7000, 'ACH': 4000}  # frame number, not ns. (multiply ns by 2)
 truncate = {'GCL': 1.0, 'URE': 1.0, 'MET': 1.0, 'ACH': 1.0}
@@ -80,20 +81,25 @@ print(MD_MSD.MSD_average[endshow])
 
 nsteps = MD_MSD.nT  # match the number of frames 
 
-# probably easier to just re-run these calculations in the appropriate directory. 
-# Doesn't matter which dwell/hop is used as they will be re-fit below
-states = file_rw.load_object('%s/states.pl' % directory)
-#print(states.hurst)
-#exit()
+if not load:
+	# probably easier to just re-run these calculations in the appropriate directory. 
+	# Doesn't matter which dwell/hop is used as they will be re-fit below
+	states = file_rw.load_object('%s/states.pl' % directory)
+	#print(states.hurst)
+	#exit()
 
-if extreme_trapping:
-	states.hurst[:, :] = 0
-print(states.hurst.mean(axis=1))
-print(states.fit_params)
-print(ntraj)
-#chains = Chain(states.count_matrix, states.fit_params, hurst_parameters=states.hurst, emission_function=levy_stable)
-chains = Chain(states.count_matrix, states.fit_params, hurst_parameters=None, emission_function=levy_stable)
-chains.generate_realizations(ntraj, nsteps, bound=truncate[res], m=m, Mlowerbound=Mlowerbound, nt=nt)
+	if extreme_trapping:
+		states.hurst[:, :] = 0
+	print(states.hurst.mean(axis=1))
+	print(states.fit_params)
+	print(ntraj)
+
+	chains = Chain(states.count_matrix, states.fit_params, hurst_parameters=states.hurst, emission_function=levy_stable)
+	#chains = Chain(states.count_matrix, states.fit_params, hurst_parameters=None, emission_function=levy_stable)
+	chains.generate_realizations(ntraj, nsteps, bound=truncate[res], m=m, Mlowerbound=Mlowerbound, nt=nt)
+else:
+	chains = file_rw.load_object('%s_msddm_chains1.pl' % res)
+
 chains.calculate_msd()
 chains.plot_msd(cutoff=fracshow, label='MSDDM', overlay=True, show=False)
 labels.append('MSDDM')
@@ -103,5 +109,5 @@ plt.tight_layout()
 savename = '%s_msddm' % res
 if extreme_trapping:
 	savename += '_zeroH'
-#plt.savefig('%s.pdf' % savename)
+plt.savefig('%s.pdf' % savename)
 plt.show()
