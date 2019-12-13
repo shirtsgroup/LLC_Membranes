@@ -1747,23 +1747,22 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   We used the 1-mode sFBMcut (see Table~\ref{table:anomalous_models}) anomalous 
   diffusion model in order to demonstrate how one can use its realizations in
   order to calculate the flux (section~\ref{method:mfpt}) of solutes given model 
-  parameters extracted from MD simulations. We believe the 1-mode sFBMcut model
-  shows the most promising predictive ability of the models studied in this work. 
-  %Any approach which allows one to 
-  %generate realizations of solute trajectories can be used in place of the AD model. 
-
+  parameters extracted from MD simulations. The sFLMcut model and MSDDM yield 
+  similar predictions at a much greater computational cost due to the slow
+  generation of fractional L\'evy noise.
   %MRS5: One question is if other method would lead to substantially
   %different results for fluxes or selectivity.  May need too think
   %about justification more if just one method is mentioned.
+  %BJC5: would love to test MSDDM against this but I don't know how to make 
+  % the algorithm faster. It already uses an FFT to correlate the data (to which I pass powers of 2)
 
+ 
   %MRS5: I think it might be useful to have at least visualizions of
   %distribution of FPT and its fit.  It might not be obvious to
   %readers that the different mechanisms have distributions of FPT
   %that are well decscribed by the relatively simple moving diffusion
-  %equation in eq 15.  
-
-  %Does't fitting to eq 15 cut down on the expense of the number of trajectories
-  %by a fair amount?  Should there be some discussion of this? 
+  %equation in eq 15. 
+  %BJC5: added to figure
 
   %BJC4: not sure if the next couple paragraphs belong in methods 
   %MRS5: this could potentially be in methods.  Alternatives can be discussed there.
@@ -1774,21 +1773,82 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   traverse the length of a macroscopic pore. To date, the thinnest H\textsubscript{II}
   LLC membrane synthesized with the monomer in this work was 7$\mu$m thick. Using
   24 cores to simulate trajectory realizations in parallel, it takes on the order 
-  of 1 day to simulate 50000 realizations of solutes traversing a 50 nm pore. The 
+  of 1 day to simulate 10000 realizations of solutes traversing a 50 nm pore. The 
   RAM requirements and performance scales greater than linearly and thus would 
   take an infeasible amount of memory and time to simulate transport through a 
   pore over 100 times longer.
   
   We used simulated trajectories which traverse computationally-reasonable length
   pores in order to construct an empirical model which one can use to estimate 
-  particle flux for arbitrary length pores. As shown in Figure~\ref{fig:flux_curves},
+  particle flux for arbitrary length pores. We fit Equation~\ref{eqn:passage_times}
+  to the empirical distribution of first passage times in Figure~\ref{fig:fpt_distributions}
+  and used the expected value of the analytical equation to calculate flux from 
+  Equation~\ref{eqn:hill_relation}. As shown in Figure~\ref{fig:flux_curves}, 
   the flux appears to scale according to a power law of the form:
   \begin{equation}
   J(L) = cL^{-\beta} 
   \label{eqn:flux_decay}
   \end{equation}
   %while the MFPT scales as its inverse, $(1/c)L^{\beta}$. 
-
+  
+  %BJC: need simulations with increased length for L=35-50 nm pores of acetic acid and methanol
+  %BJC: see of clauset has better way of fitting t^-alpha (alpha might be too big)
+  %BJC: should have a paragraph about c -- roughly follows their MSDs.
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.475\textwidth}
+  \includegraphics[width=\textwidth]{fpt_distributions.pdf}
+  \caption{}\label{fig:fpt_distributions}
+  \end{subfigure}
+  \begin{subfigure}{0.475\textwidth}
+  \includegraphics[width=\textwidth]{flux_curves.pdf}
+  \caption{}\label{fig:flux_curves_regular}
+  \end{subfigure}
+  % BJC: could use better color scheme. Maybe outline hurst parameters
+  \begin{subfigure}{0.475\textwidth}
+  \includegraphics[width=\textwidth]{c_parameters.pdf}
+  \caption{}\label{fig:c_parameters}
+  \end{subfigure}
+  \begin{subfigure}{0.475\textwidth}
+  \includegraphics[width=\textwidth]{beta_parameters.pdf}
+  \caption{}\label{fig:beta_parameters}
+  \end{subfigure}
+%  \begin{subfigure}{0.475\textwidth}
+%  \includegraphics[width=\textwidth]{mfpt_curves.pdf}
+%  \caption{}\label{fig:mfpt_curves}
+%  \end{subfigure}
+  %BJC: going out to 3 decimal places seems silly
+  %BJC: might get closer to beta=2 if I use different curve fitting technique than fitting line to log-log
+%  \begin{subfigure}{0.325\textwidth}
+%  \includegraphics[width=\textwidth]{flux_curves_brownian.pdf}
+%  \caption{Fixed $H=0.5$}\label{fig:flux_curves_brownian}
+%  \end{subfigure}
+%  \begin{subfigure}{0.475\textwidth}
+%  \includegraphics[width=\textwidth]{mfpt_curves_brownian.pdf}
+%  \caption{}\label{fig:mfpt_curves_brownian}
+%  \end{subfigure}
+  %MRS5: the b) pane is a little messy.  If c) is moved to the supporting, maybe can make b into two figures, and 
+  % have each just show 1 point? 
+  \caption{(a) The single particle solute flux decays with increasing pore length. 
+  Solutes with high MSDs have higher fluxes. (b) We fit the single particle solute flux 
+  versus pore length, $L$, to a power law function of the form $cL^{-\beta}$ (dashed 
+  lines in (a)). Solutes with higher fluxes have higher values of $c$. Solutes with 
+  smaller Hurst parameters, $H$, have larger values of $\beta$. (c) If we remove 
+  correlation between hops (set $H$=0.5), the flux increases significantly and 
+  $\beta \sim 2$ for all solutes independent of dwell distribution
+  parameters.}\label{fig:flux_curves}
+  \end{figure}
+  
+  %MRS5: Does't fitting to eq 15 cut down on the expense of the number of trajectories
+  %by a fair amount?  Should there be some discussion of this? 
+  %BJC5: added this
+  Although we used 10000 trajectory realizations in order to generate 
+  Figure~\ref{fig:flux_curves}, one may actually need considerably less realizations
+  in order to predict and compare flux between solutes. In Figure~\ref{S-fig:flux_curve_sensitivity}
+  of the Supporting information, we show that one can still show statistically
+  significant differences in solute flux with as little as 100 trajectory 
+  realizations.
+  
   %MRS: can you put a physical thesis here, not just a mathematical one?  Why is this change in parameters important to flux?
   The prefactor, $c$, in Equation~\ref{eqn:flux_decay} grows with increasing
   solute MSD while the value of the growth exponent, $\beta$, is inversely 
@@ -1822,54 +1882,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 %  with pore length. We fit a curve of the form  to the curves in order
 %  to estimate the growth exponent, $\alpha$. The growth exponent is inversely proportional
 %  to the solute MSDs which is consistent with longer passage times for solutes that
-%  progress through the pores more slowly. 
-  
-  %BJC: need simulations with increased length for L=35-50 nm pores of acetic acid and methanol
-  %BJC: see of clauset has better way of fitting t^-alpha (alpha might be too big)
-  %BJC: not sure mfpt is necessary. Takes up space.
-  %BJC: change alpha to beta
-  %BJC: make a chart with parameters
-  %BJC: should have a paragraph about c -- roughly follows their MSDs.
-  \begin{figure}
-  \centering
-  \begin{subfigure}{0.325\textwidth}
-  \includegraphics[width=\textwidth]{flux_curves.pdf}
-  \caption{Fits to $cL^{-\beta}$}\label{fig:flux_curves_regular}
-  \end{subfigure}
-  % BJC: could use better color scheme. Maybe outline hurst parameters
-  \begin{subfigure}{0.325\textwidth}
-  \includegraphics[width=\textwidth]{c_parameters.pdf}
-  \caption{}\label{fig:c_parameters}
-  \end{subfigure}
-  \begin{subfigure}{0.325\textwidth}
-  \includegraphics[width=\textwidth]{beta_parameters.pdf}
-  \caption{}\label{fig:beta_parameters}
-  \end{subfigure}
-%  \begin{subfigure}{0.475\textwidth}
-%  \includegraphics[width=\textwidth]{mfpt_curves.pdf}
-%  \caption{}\label{fig:mfpt_curves}
-%  \end{subfigure}
-  %BJC: going out to 3 decimal places seems silly
-  %BJC: might get closer to beta=2 if I use different curve fitting technique than fitting line to log-log
-%  \begin{subfigure}{0.325\textwidth}
-%  \includegraphics[width=\textwidth]{flux_curves_brownian.pdf}
-%  \caption{Fixed $H=0.5$}\label{fig:flux_curves_brownian}
-%  \end{subfigure}
-%  \begin{subfigure}{0.475\textwidth}
-%  \includegraphics[width=\textwidth]{mfpt_curves_brownian.pdf}
-%  \caption{}\label{fig:mfpt_curves_brownian}
-%  \end{subfigure}
-  %MRS5: the b) pane is a little messy.  If c) is moved to the supporting, maybe can make b into two figures, and 
-  % have each just show 1 point? 
-  \caption{(a) The single particle solute flux decays with increasing pore length. 
-  Solutes with high MSDs have higher fluxes. (b) We fit the single particle solute flux 
-  versus pore length, $L$, to a power law function of the form $cL^{-\beta}$ (dashed 
-  lines in (a)). Solutes with higher fluxes have higher values of $c$. Solutes with 
-  smaller Hurst parameters, $H$, have larger values of $\beta$. (c) If we remove 
-  correlation between hops (set $H$=0.5), the flux increases significantly and 
-  $\beta \sim 2$ for all solutes independent of dwell distribution
-  parameters.}\label{fig:flux_curves}
-  \end{figure}
+%  progress through the pores more slowly.
   
   % Partially in methods?
   The power law decay of the flux with pore length implies the following relationship

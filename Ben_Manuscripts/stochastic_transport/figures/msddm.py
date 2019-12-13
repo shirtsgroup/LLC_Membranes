@@ -45,7 +45,7 @@ extreme_trapping = False
 ntraj = args.ntraj # number of trajectories to simulate
 nboot = 200  # number of bootstrap trials when getting errorbars on MSD
 nt = 8 # number of threads
-load = True
+load = True 
 
 equil = {'GCL': 2400, 'URE': 2000, 'MET': 7000, 'ACH': 4000}  # frame number, not ns. (multiply ns by 2)
 truncate = {'GCL': 1.0, 'URE': 1.0, 'MET': 1.0, 'ACH': 1.0}

@@ -221,7 +221,17 @@ beta_err = np.array([p[:, 1].std() for p in params])
 #bar.bar(bar_locations - bar_width/2, c, bar_width, edgecolor='black', color='xkcd:blue', label='c', yerr=c_err)
 #bar2.bar(bar_locations + bar_width/2, -beta, bar_width, edgecolor='black', color='xkcd:magenta', label=r'$\beta$', yerr=beta_err)
 
-H = np.array([0.34, 0.30, 0.37, 0.40])
+H = []
+Herr = []
+for r in residues:
+    params = file_rw.load_object('%s/%s/10wt/forecast_%s_1state.pl' %(root_dir, r, r))
+    H.append(np.mean(params.hurst_distribution))
+    Herr.append(np.std(params.hurst_distribution))
+
+H = np.array(H)
+Herr = np.array(Herr)
+
+#H = np.array([0.34, 0.30, 0.37, 0.40])
 
 #for i, h in enumerate(H):
 #    bar2.text(bar_locations[i] + bar_width/2, -beta[i] + 0.025, '%.2f' % h, fontsize=12, horizontalalignment='center', fontweight='bold', color='xkcd:green')
@@ -254,8 +264,8 @@ ax2 = ax.twinx()
 
 reordered = [3, 2, 0, 1]
 
-ax.bar(bar_locations - bar_width2/2, -beta[reordered], bar_width2, edgecolor='black', color='xkcd:blue', label=r'$\beta$', yerr=beta_err)
-ax2.bar(bar_locations + bar_width2/2, H[reordered], bar_width2, edgecolor='black', color='xkcd:orange', label='$H$')
+ax.bar(bar_locations - bar_width2/2, -beta[reordered], bar_width2, edgecolor='black', color='xkcd:blue', label=r'$\beta$', yerr=beta_err[reordered])
+ax2.bar(bar_locations + bar_width2/2, H[reordered], bar_width2, edgecolor='black', color='xkcd:orange', label='$H$', yerr=Herr[reordered])
 
 hatch1 = mpatches.Patch(facecolor='xkcd:blue', label=r'$\beta$', edgecolor='black')
 hatch2 = mpatches.Patch(facecolor='xkcd:orange', label='$H$', edgecolor='black')

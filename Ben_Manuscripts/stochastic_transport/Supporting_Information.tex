@@ -683,6 +683,7 @@ Phase Lyotropic Liquid Crystal Membrane}
 %  particle with 2 absorbing boundaries.
 
   \begin{figure}
+  \centering
   \includegraphics[width=0.5\textwidth]{flux_curves_brownian.pdf}
   \caption{Fixed $H=0.5$}\label{fig:flux_curves_brownian}
   \end{figure}
@@ -691,6 +692,28 @@ Phase Lyotropic Liquid Crystal Membrane}
   \centering
   \includegraphics[width=0.45\textwidth]{mfpt_curves_brownian.pdf}
   \caption{}\label{fig:mfpt_curve_brownian}
+  \end{figure}
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{flux_curves_N100.pdf}
+  \caption{100 Independent Trajectories}\label{fig:N100}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{flux_curves_N1000.pdf}
+  \caption{1000 Independent Trajectories}\label{fig:N1000}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{flux_curves_N5000.pdf}
+  \caption{5000 Independent Trajectories}\label{fig:N5000}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{flux_curves_N9984.pdf}
+  \caption{10000 Independent Trajectories}\label{fig:N10000}
+  \end{subfigure}
+  \caption{Even using a small number of independent trajectories, one can
+  reliably calculate flux as a function of pore length. The uncertainty in
+  the flux curves decreases as we add more independent trajectories.}\label{fig:flux_curve_sensitivity}
   \end{figure}
   
   % equations here 

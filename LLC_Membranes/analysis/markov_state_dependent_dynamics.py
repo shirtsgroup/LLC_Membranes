@@ -635,13 +635,17 @@ class Chain:
 
         if self.hurst_parameters is not None:
 
+            print('Generating Interpolator Objects ...', end='', flush=True)
             self.hurst_interpolator = flm_sim_params.HurstCorrection()
             self.truncation_interpolator = flm_sim_params.TruncateLevy()
+            print('Done!')
 
             self.m = 256
             self.Mlowerbound = 6000
 
-    def generate_realizations(self, n, length, bound=7.6, m=256, Mlowerbound=6000, nt=1):
+        self.average_params = None
+
+    def generate_realizations(self, n, length, bound=7.6, m=256, Mlowerbound=6000, nt=1, speedup=True):
         """ Generate Markov chains using transition matrix and emission probabilities
 
         :param n: number of independent trajectories to generate
@@ -652,6 +656,8 @@ class Chain:
         chosen. M will be chosen such that M + length is a power of 2. Higher values of M will lead to more accurate \
         calculation of the correlation structure at large time lags.
         :param nt: number of threads to use for trajectory realization generation.
+        :param speedup: speed up trajectory generation by using the mean of the parameter distributions so that
+        interpolation doesn't need to be done repeatedly.
 
         :type n: int
         :type length: int
@@ -659,7 +665,29 @@ class Chain:
         :type m: int
         :type Mlowerbound: int
         :type nt: int
+        :type speedup: bool
         """
+
+        if speedup:
+            print('Interpolating Mean Parameters')
+
+            self.average_params = {'alpha': {}, 'scale': {}, 'hurst': {}, 'corrected_bound': {}, 'corrected_H': {}}
+
+            # This loop could take some time
+            for s in tqdm.tqdm(range(self.nstates + 1)):
+
+                H = np.mean(self.hurst_parameters[s])
+                alpha, scale = self.emission_parameters[s, [0, 2]]
+                corrected_bound = self.truncation_interpolator.interpolate(H, alpha, bound, scale)
+                corrected_H = self.hurst_interpolator.interpolate(H, alpha)
+
+                self.average_params['hurst'][s] = H
+                self.average_params['alpha'][s] = alpha
+                self.average_params['scale'][s] = scale
+                self.average_params['corrected_bound'][s] = corrected_bound
+                self.average_params['corrected_H'][s] = corrected_H
+
+            print(self.average_params)
 
         trajectories_per_thread = n // nt
 
@@ -767,8 +795,9 @@ class Chain:
         transitions = timeseries.switch_points(states)  # indices of state array where transitions occur
         if states[0] == states[1] and transitions[0] == 0:  # switch_points always includes first and last data point
             transitions = transitions[1:]
-
+        print(transitions.size)
         for i, t in enumerate(transitions[:-1]):
+
             dwell = transitions[i + 1] - t  # plus two since using enumerate and starting at index 1 of transitions
             if dwell > 1:
                 if dwell > 2:
@@ -809,11 +838,20 @@ class Chain:
         n = np.log(M) / np.log(2)
         M = int(2 ** np.ceil(n) - l)
 
-        H = np.random.choice(self.hurst_parameters[state])  # random hurst parameter from transition distribution
-        alpha, scale = self.emission_parameters[state, [0, 2]]
-        corrected_bound = self.truncation_interpolator.interpolate(H, alpha, bound, scale)
-        #print(H, alpha, bound, scale, state, corrected_bound)
-        corrected_H = self.hurst_interpolator.interpolate(H, alpha)
+        if self.average_params is not None:
+
+            alpha = self.average_params['alpha'][state]
+            scale = self.average_params['scale'][state]
+            corrected_H = self.average_params['corrected_H'][state]
+            corrected_bound = self.average_params['corrected_bound'][state]
+
+        else:
+
+            H = np.random.choice(self.hurst_parameters[state])  # random hurst parameter from transition distribution
+            alpha, scale = self.emission_parameters[state, [0, 2]]
+            corrected_bound = self.truncation_interpolator.interpolate(H, alpha, bound, scale)
+            corrected_H = self.hurst_interpolator.interpolate(H, alpha)
+
         flm = FLM(corrected_H, alpha, m=self.m, M=M, N=l, scale=scale, truncate=corrected_bound,
                   correct_hurst=False, correct_truncation=False)
         flm.generate_realizations(1, progress=False)  # generate a single realization
