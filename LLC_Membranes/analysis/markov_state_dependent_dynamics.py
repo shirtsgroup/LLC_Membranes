@@ -596,7 +596,8 @@ class States:
 
 class Chain:
 
-    def __init__(self, count_matrix, emission_parameters, hurst_parameters=None, emission_function=levy_stable):
+    def __init__(self, count_matrix, emission_parameters, hurst_parameters=None, emission_function=levy_stable,
+                 bound=7.6, speedup=True):
         """ Generate markov chains based on a probability transition matrix and some emission paramters describing the
         observations.
 
@@ -632,6 +633,7 @@ class Chain:
         self.states = None
         self.msds = None
         self.limits = None
+        self.bound = bound
 
         if self.hurst_parameters is not None:
 
@@ -643,9 +645,35 @@ class Chain:
             self.m = 256
             self.Mlowerbound = 6000
 
+            if speedup:
+
+                self._get_average_params()
+
         self.average_params = None
 
-    def generate_realizations(self, n, length, bound=7.6, m=256, Mlowerbound=6000, nt=1, speedup=True):
+    def _get_average_params(self):
+
+        print('Interpolating Mean Parameters ...', flush=True, end='')
+
+        self.average_params = {'alpha': {}, 'scale': {}, 'hurst': {}, 'corrected_bound': {}, 'corrected_H': {}}
+
+        # This loop could take some time
+        for s in tqdm.tqdm(range(self.nstates + 1)):
+
+            H = np.mean(self.hurst_parameters[s])
+            alpha, scale = self.emission_parameters[s, [0, 2]]
+            corrected_bound = self.truncation_interpolator.interpolate(H, alpha, self.bound, scale)
+            corrected_H = self.hurst_interpolator.interpolate(H, alpha)
+
+            self.average_params['hurst'][s] = H
+            self.average_params['alpha'][s] = alpha
+            self.average_params['scale'][s] = scale
+            self.average_params['corrected_bound'][s] = corrected_bound
+            self.average_params['corrected_H'][s] = corrected_H
+
+        print('Done!')
+
+    def generate_realizations(self, n, length, bound=7.6, m=256, Mlowerbound=6000, nt=1, speedup=True, quiet=False):
         """ Generate Markov chains using transition matrix and emission probabilities
 
         :param n: number of independent trajectories to generate
@@ -668,26 +696,17 @@ class Chain:
         :type speedup: bool
         """
 
-        if speedup:
-            print('Interpolating Mean Parameters')
+        # allow resetting of bound from that passed to __init__
+        if np.abs(self.bound - bound) > 0.0001:
+            print(self.bound, bound)
+            self.bound = bound
 
-            self.average_params = {'alpha': {}, 'scale': {}, 'hurst': {}, 'corrected_bound': {}, 'corrected_H': {}}
+            if speedup:
+                self._get_average_params()
 
-            # This loop could take some time
-            for s in tqdm.tqdm(range(self.nstates + 1)):
-
-                H = np.mean(self.hurst_parameters[s])
-                alpha, scale = self.emission_parameters[s, [0, 2]]
-                corrected_bound = self.truncation_interpolator.interpolate(H, alpha, bound, scale)
-                corrected_H = self.hurst_interpolator.interpolate(H, alpha)
-
-                self.average_params['hurst'][s] = H
-                self.average_params['alpha'][s] = alpha
-                self.average_params['scale'][s] = scale
-                self.average_params['corrected_bound'][s] = corrected_bound
-                self.average_params['corrected_H'][s] = corrected_H
-
-            print(self.average_params)
+        # if bound isn't reset but speedup is passed and it wasn't passed to __init__
+        elif speedup and self.average_params is None:
+            self._get_average_params()
 
         trajectories_per_thread = n // nt
 
@@ -697,7 +716,8 @@ class Chain:
         self.m = m
         self.Mlowerbound = Mlowerbound
 
-        print("Generating trajectories...")
+        if not quiet:
+            print("Generating trajectories...")
 
         if nt > 1:
 
@@ -705,7 +725,7 @@ class Chain:
 
             trajectories_per_thread = n // nt
 
-            arguments = [(trajectories_per_thread, length, bound) for _ in range(nt)]  # arguments for each thread
+            arguments = [(trajectories_per_thread, length, bound, quiet) for _ in range(nt)]  # arguments for each thread
 
             result = pool.starmap(self._realizations, arguments)  # do the calculations
 
@@ -720,7 +740,7 @@ class Chain:
 
         else:
 
-            self.chains, self.states = self._realizations(n, length, bound)
+            self.chains, self.states = self._realizations(n, length, bound, quiet)
 
         # for i in tqdm.tqdm(range(n)):
         #     self.chains[:, i], self.states[:, i] = self._realization(length, bound=bound)
@@ -728,7 +748,7 @@ class Chain:
         #     plt.plot(self.chains[:, i])
         # plt.show()
 
-    def _realizations(self, n, length, bound):
+    def _realizations(self, n, length, bound, quiet):
         """ Generate multiple realization of Markov chain. This function exists by itself to aid parallelization
 
         :param n: number of trajectories to generate
@@ -746,7 +766,7 @@ class Chain:
 
         chains = np.zeros([length, n])
         states = np.zeros([length, n], dtype=int)
-        for i in tqdm.tqdm(range(n)):
+        for i in tqdm.tqdm(range(n), disable=not quiet):
             chains[:, i], states[:, i] = self._realization(length, bound=bound)
 
         return chains, states
@@ -795,7 +815,9 @@ class Chain:
         transitions = timeseries.switch_points(states)  # indices of state array where transitions occur
         if states[0] == states[1] and transitions[0] == 0:  # switch_points always includes first and last data point
             transitions = transitions[1:]
-        print(transitions.size)
+
+        #print(transitions.size)
+
         for i, t in enumerate(transitions[:-1]):
 
             dwell = transitions[i + 1] - t  # plus two since using enumerate and starting at index 1 of transitions
@@ -814,7 +836,7 @@ class Chain:
                     traj[t + 1] = rv
                     #traj[t + 1] = self._flm_sequence(1, states[t], bound=bound)
 
-        traj[transitions[:-1]] = self._flm_sequence(transitions.size - 1, -1, bound=bound)
+        traj[transitions[:-1]] = self._flm_sequence(transitions.size - 1, self.nstates, bound=bound)
 
         return np.cumsum(traj), states
 

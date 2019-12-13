@@ -158,7 +158,12 @@ def acf(t, largest_prime=500, autocov=False):
     if not autocov:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            autocorr_fxn /= np.var(T, axis=0)
+            try:
+                autocorr_fxn /= np.var(T, axis=0)
+            except FloatingPointError:
+                print(autocorr_fxn)
+                print(np.var(T, axis=0))
+                exit()
 
     return autocorr_fxn  # normalized
 
