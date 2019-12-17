@@ -9,7 +9,7 @@ import matplotlib.colors as colors
 import matplotlib.cbook as cbook
 from mpl_toolkits.axes_grid1 import AxesGrid
 from LLC_Membranes.analysis import hbonds, coordination_number
-from LLC_Membranes.llclib import file_rw, physical, topology, timeseries, fitting_functions
+from LLC_Membranes.llclib import file_rw, physical, topology, timeseries, fitting_functions, sampling
 from LLC_Membranes.timeseries.fractional_levy_motion import FLM
 from LLC_Membranes.timeseries import flm_sim_params
 import sys
@@ -19,6 +19,7 @@ import levy
 import itertools
 from multiprocessing import Pool
 np.set_printoptions(precision=4, suppress=True)
+import time as timer
 
 
 def initialize():
@@ -635,6 +636,10 @@ class Chain:
         self.limits = None
         self.bound = bound
 
+        self.average_params = None
+        self.truncated_distributions = None
+        self.flms = None
+
         if self.hurst_parameters is not None:
 
             print('Generating Interpolator Objects ...', end='', flush=True)
@@ -649,7 +654,7 @@ class Chain:
 
                 self._get_average_params()
 
-        self.average_params = None
+                self._get_truncated_distributions()
 
     def _get_average_params(self):
 
@@ -672,6 +677,30 @@ class Chain:
             self.average_params['corrected_H'][s] = corrected_H
 
         print('Done!')
+
+    def _get_truncated_distributions(self):
+
+        print('Creating empirical truncated Levy stable distributions ...', flush=True, end='')
+        self.truncated_distributions = []
+        for s in tqdm.tqdm(range(self.nstates + 1)):
+            self.truncated_distributions.append(
+                sampling.TruncatedLevyDistribution(self.bound, self.average_params['alpha'][s],
+                                                   self.average_params['scale'][s], 1000000, beta=0, mean=0))
+        print('Done!')
+
+    def _initialize_flm(self):
+
+        print('Initializing FLM objects for each state ...', flush=True, end='')
+        self.flms = []
+        for s in tqdm.tqdm(range(self.nstates + 1)):
+
+            corrected_H = self.average_params['corrected_H'][s]
+            alpha = self.average_params['alpha'][s]
+            scale = self.average_params['scale'][s]
+            corrected_bound = self.average_params['corrected_bound'][s]
+            #
+            # self.flms.append(FLM(corrected_H, alpha, m=self.m, M=4, N=l, scale=scale, truncate=corrected_bound,
+            # correct_hurst=False, correct_truncation=False)
 
     def generate_realizations(self, n, length, bound=7.6, m=256, Mlowerbound=6000, nt=1, speedup=True, quiet=False):
         """ Generate Markov chains using transition matrix and emission probabilities
@@ -698,15 +727,21 @@ class Chain:
 
         # allow resetting of bound from that passed to __init__
         if np.abs(self.bound - bound) > 0.0001:
-            print(self.bound, bound)
+
             self.bound = bound
 
             if speedup:
+
                 self._get_average_params()
+
+                self._get_truncated_distributions()
 
         # if bound isn't reset but speedup is passed and it wasn't passed to __init__
         elif speedup and self.average_params is None:
+
             self._get_average_params()
+
+            self._get_truncated_distributions()
 
         trajectories_per_thread = n // nt
 
@@ -766,7 +801,7 @@ class Chain:
 
         chains = np.zeros([length, n])
         states = np.zeros([length, n], dtype=int)
-        for i in tqdm.tqdm(range(n), disable=not quiet):
+        for i in tqdm.tqdm(range(n), disable=quiet):
             chains[:, i], states[:, i] = self._realization(length, bound=bound)
 
         return chains, states
@@ -816,8 +851,6 @@ class Chain:
         if states[0] == states[1] and transitions[0] == 0:  # switch_points always includes first and last data point
             transitions = transitions[1:]
 
-        #print(transitions.size)
-
         for i, t in enumerate(transitions[:-1]):
 
             dwell = transitions[i + 1] - t  # plus two since using enumerate and starting at index 1 of transitions
@@ -836,6 +869,7 @@ class Chain:
                     traj[t + 1] = rv
                     #traj[t + 1] = self._flm_sequence(1, states[t], bound=bound)
 
+        # slow step
         traj[transitions[:-1]] = self._flm_sequence(transitions.size - 1, self.nstates, bound=bound)
 
         return np.cumsum(traj), states
@@ -874,9 +908,18 @@ class Chain:
             corrected_bound = self.truncation_interpolator.interpolate(H, alpha, bound, scale)
             corrected_H = self.hurst_interpolator.interpolate(H, alpha)
 
+        trunc_dist = None
+        if self.truncated_distributions is not None:
+            trunc_dist = self.truncated_distributions[state]
+
+        # if state == 8:
+        #     start = timer.time()
         flm = FLM(corrected_H, alpha, m=self.m, M=M, N=l, scale=scale, truncate=corrected_bound,
                   correct_hurst=False, correct_truncation=False)
-        flm.generate_realizations(1, progress=False)  # generate a single realization
+        # if state == 8:
+        #     print(timer.time() - start)
+        #     exit()
+        flm.generate_realizations(1, progress=False, truncated_distribution=trunc_dist)  # generate a single realization
 
         # flm.autocorrelation()
         # H = np.log(2 * flm.acf[:, 1].mean() + 2) / (2 * np.log(2))

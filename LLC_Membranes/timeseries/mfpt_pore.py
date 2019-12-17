@@ -21,6 +21,7 @@ import yaml
 import argparse
 import sys
 import random
+import time as timer
 
 
 with warnings.catch_warnings():
@@ -384,13 +385,14 @@ class MeanFirstPassageTime:
         n = 0  # a diagnostic variable to track how many trajectories are generated in total
 
         while len(passage_times) < ntraj:
-
+            #start = timer.time()
             walk = self.hop_realization()
 
             # find when the cross-over occurs
             cross = timeseries.switch_points(np.abs(walk) >= self.length)[1] + 2
 
             walk = walk[:cross]
+            print(walk[-1])
 
             traj = self._crossings(walk)
 
@@ -420,6 +422,7 @@ class MeanFirstPassageTime:
             n += 1
 
             print('\r%d/%d trajectories' % (len(passage_times), ntraj), end='')
+            #print(timer.time() - start)
 
         return trajectories, times, passage_times, n
 
@@ -442,7 +445,7 @@ class MeanFirstPassageTime:
     def _msddm_hops(self):
 
         # some hard sets for now
-        self.chains.generate_realizations(1, self.nT, bound=self.bound, m=256, Mlowerbound=4, nt=1)
+        self.chains.generate_realizations(1, self.nT, bound=self.bound, m=256, Mlowerbound=4, nt=1, quiet=True)
 
         return self.chains.chains[:, 0]
 
@@ -508,7 +511,7 @@ class MeanFirstPassageTime:
         if save:
             file_rw.save_object((self.trajectories, self.time), 'trajectories.pl')
 
-    def mfpt(self, nboot, method='peak', percentile=99.5, tstart=0):
+    def mfpt(self, nboot, method='peak', percentile=99.5, tstart=0, show=False):
         """ Bootstrap the distribution of mean first passage times and report where the maximum occurs
 
         :param nboot: number of bootstrap trials
@@ -518,11 +521,14 @@ class MeanFirstPassageTime:
         based on the Marathon runner problem.
         :param percentile: plot all passage times up to this percentile of the distribution
         :param tstart: Needed for 'fit_tails' method. time after which to start fitting
+        :param show: show the fit to the histogram
 
         
         :type nboot: int
         :type percentile: float
         :type method: str
+        :type tstart: int
+        :type show: bool
         """
 
         methods = {'peak': self._mfpt_peak, 'fit_tails': self._mfpt_fit_tails, 'analytical': self._mfpt_analytical}
@@ -555,18 +561,20 @@ class MeanFirstPassageTime:
         popt = curve_fit(fitting_functions.continuum_passage_time_distribution, bin_centers, hist, p0=p0,
                          bounds=bounds)[0]
 
-        print(popt)
+        #print(popt)
 
         t = np.linspace(0.1, self.passage_times.max(), 1000)
         mfpt = quad(fitting_functions.continuum_ptime_distribution_expected_value, 0.1, np.inf,
                     args=(popt[0], popt[1], popt[2]))[0]
-        print(mfpt)
+        #print(mfpt)
 
-        plt.plot(t, fitting_functions.continuum_passage_time_distribution(t, popt[0], popt[1], popt[2]), '--',
-                 color='black', lw=2)
-
-        plt.hist(ptimes, self.nbins, density=True)
-        plt.show()
+        # if show:
+        #
+        #     plt.plot(t, fitting_functions.continuum_passage_time_distribution(t, popt[0], popt[1], popt[2]), '--',
+        #              color='black', lw=2)
+        #
+        #     plt.hist(ptimes, self.nbins, density=True)
+        #     plt.show()
 
     def _mfpt_fit_tails(self, nboot, percentile, **kwargs):
         """ Fit a stretch exponential function to the tail of an incomplete passage time distribution
@@ -847,7 +855,7 @@ if __name__ == "__main__":
                                 nbins=bins, nt=nt, save=save_trajectories, pickled_parameters=cfg['pickled_parameters'],
                                 concentration_profile=cfg['concentration'], load_passage_times=load)
 
-    mfpt.mfpt(cfg['nboot'], method=cfg['mfpt']['method'], tstart=cfg['mfpt']['tstart'])
+    #mfpt.mfpt(cfg['nboot'], method=cfg['mfpt']['method'], tstart=cfg['mfpt']['tstart'])
 
     if cfg['concentration']:
         mfpt.concentration_from_histogram()

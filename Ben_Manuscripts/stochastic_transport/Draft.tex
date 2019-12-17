@@ -1112,9 +1112,9 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   we compare the MSD of the solutes calculated using trajectory data from the 
   first and second halves of the equilibrated simulation time. Ethylene glycol 
   and methanol show considerable differences in their MSDs. Urea and acetic acid
-  appear to demonstrate satisfactory stationarity on the 5 $\mu$s timescale. The
-  shapes of their MSDs curves are also very similar (see Figure~\ref{S-fig:msd_comparison}
-  of the Supporting Information).
+  appear to demonstrate satisfactory stationarity. The shapes of their MSDs curves
+  are also very similar (see Figure~\ref{S-fig:msd_comparison} of the Supporting
+  Information).
   
   \begin{table}[h]
   \centering
@@ -1137,14 +1137,13 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   when calculated from the second half of the equilibrated trajectories.}\label{table:stationarity}
   \end{table}
   
-  %BJC4: need figures to support these claims.
-  The non-stationary behavior of ethylene glycol and methanol present themselves
-  in different ways. On average, methanol molecules in the tails appear to be 
-  drifting further away from the pore center with time. Methanol's small size 
-  significantly increases the volume of accessible structural space. Ethylene 
-  glycol appears to experience an increased incidence of long trapping times. 
-  These problems probably cannot be addressed without more simulation time or 
-  additional solute trajectories. 
+%  The non-stationary behavior of ethylene glycol and methanol present themselves
+%  in different ways. On average, methanol molecules in the tails appear to be 
+%  drifting further away from the pore center with time. Methanol's small size 
+%  significantly increases the volume of accessible structural space. Ethylene 
+%  glycol appears to experience an increased incidence of long trapping times. 
+%  These problems probably cannot be addressed without more simulation time or 
+%  additional solute trajectories. 
 
   Using the approach described above, we validated our 1 and 2 mode models with
   urea and acetic acid, since their trajectories appear stationary. The 
@@ -1190,17 +1189,17 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   MD simulation length are sampled and incorporated into the simulated anomalous
   diffusion trajectories. Considering the longest observed dwell time among all
   solutes was 1.3 $\mu$s by ethylene glycol, we believe truncation is well-justified.
-  Although in most cases, the predicted MSD curves overlap the 1-$\sigma$ confidence
-  intervals of the MD MSD curves, they appear to lie systematically below the mean. 
-  It is not clear whether this is a consistent feature of the AD model since we 
-  only used 2 solutes for this analysis. 
+  %Although in most cases, the predicted MSD curves overlap the 1-$\sigma$ confidence
+  %intervals of the MD MSD curves, they appear to lie systematically below the mean. 
+  %It is not clear whether this is a consistent feature of the AD model since we 
+  %only used 2 solutes for this analysis. 
   
 %  We also observe that simulated AD trajectories which draw from a L\'evy stable 
 %  distribution generally predict higher MSDs. The heavy tails of the distribution 
 %  incorporate large jumps more frequently into the trajectories. 
   
   From a qualitative perspective, the models only have moderate success at predicting
-  the shape of the MSD curves. Error in the MSD curvature can help explain some of
+  the shape of the MSD curves. Error in the MSD curvature can also help explain some of
   the error in the predicted MSD magnitudes. The curves predicted for Urea with both 1 
   and 2 modes appear to have too much curvature, which causes it to under-predict the 
   MSD at long timescales, while those of acetic acid lack curvature, leading the
@@ -1253,7 +1252,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   MSDs.
   
   This analysis also suggests that working with only half of the data we collected
-  ($\sim$2$\mu$s post-equilibration) is not always sufficient for extracting reliable
+  ($\sim$ 2 $\mu$s post-equilibration) is not always sufficient for extracting reliable
   parameter estimates. In most cases, the magnitude of the MSD predictions after a 
   500 ns time lag are within or close to within error of the MD MSDs (for sFBMcut and
   sFLMcut), but still appear to systematically under-predict the mean. We may be
@@ -1286,8 +1285,8 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   
   \subsubsection{Model predictions using all equilibrated data}\label{section:AD_all_data}
   
-  We obtain reasonable predictions of the MD simulated MSDs when we parameterize the
-  AD model with all available data after the perceived equilibration time. We visualized the
+  We obtain reasonable predictions of the MD simulated MSDs when we parameterize the AD 
+  model with all available data after the perceived equilibration time. We visualized the
   parameters in Figures~\ref{fig:1mode_parameters} and~\ref{fig:2mode_parameters}.
   The MSD curves generated from 1 and 2 mode models are overlayed with the MD simulated MSDs for 
   comparison in Figures~\ref{fig:anomalous_msds_1mode} and~\ref{fig:anomalous_msds_2mode}
@@ -1396,36 +1395,64 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   we draw dwell times from a power law distribution with an exponential cut-off.}\label{fig:anomalous_msds_2mode}
   \end{figure}
   
-  After a 1000 ns time lag, for all solutes except acetic acid, the 1 and 2 mode 
-  AD models do a fairly good job of predicting the magnitude of the MD 
-  MSD curves when we use truncated power laws. In all but one case (two mode 
-  ethylene glycol), MSD curves predicted by the sFLMcut model are higher than 
-  those predicted by the sFBMcut model because of the heavy tails of the L\'evy 
-  stable hop length distribution. 
+  After a 1000 ns time lag, the 1 and 2 mode AD models do a fairly good job of 
+  predicting the magnitude of the MD MSD curves when we use truncated power
+  laws to describe the dwell time distributions. In most cases, the sFBMcut
+  and sFLMcut models give very similar results probably because their $\alpha_h$
+  parameter values are relatively close to 2, meaning the hop length distribution
+  is nearly Gaussian even when fit to a more general L\'evy distribution. 
   
-  Qualitatively, the curves with the highest final MSDs (ethylene glycol and 
-  methanol) show more linear growth and their shapes are well captured by the
-  sFLMcut and sFBMcut AD models. The MSD curve of urea bends slightly and 
-  that of acetic acid has the most significant curvature. When the MD MSD 
-  curves bend, the MSD curves predicted by the sFBMcut model tends to more 
-  accurately portray their curvature since the sFLMcut model tends to become 
-  linear faster.
+  The deviation between the 1 mode MSD predictions and MD are primarily due
+  to differences in their curvature at long time lags. The shape and magnitude of the curves appears accurate 
+  at short time lags, however, the curves tend to undershoot the MD MSD mean
+  as the time lag increases. As discussed in the previous section, long time
+  positional anti-correlation may not exist in the MD system which results 
+  in a shift from sub-linear to linear MSD behavior. Acetic acid exemplifies
+  this point. At first glance, acetic acid's predicted MSD (sFLMcut and sFBMcut)
+  appear to match the curvature of MD quite well, but closer examination reveals
+  that the MD MSD curve actually shifts from a sub-linear to a linear regime 
+  around 500 ns.
   
-  Acetic acid is a notable exception as no model accurately predicts its
-  MSD or curvature. Both sFBMcut and sFLMcut significantly over-predict the final
-  MSD while sFBM and sFLM significantly under-predict it. Once again, it 
-  appears that the Hurst parameter may be over-estimated. However, the parameters
-  of the hop and dwell distributions may be improved over those used to produce
-  Figures~\ref{fig:1mode_msd_comparison_ACH_train_front} and
-  \ref{fig:2mode_msd_comparison_ACH_train_front}. A lower value of $H$ would 
-  increase the curvature and reduce the AD predicted MSD to values more consistent
-  with acetic acid's MD MSD.
+  The 2 mode models shows considerably less curvature at large time lags than
+  the 1 mode model because the implementation of the 2 mode model prevents long
+  timescale correlation. The width of the hop distribution changes every time
+  a switch between pores and tails occurs. We are unaware of an appropriate
+  technique which can correlate hops that come from different hop distributions, 
+  therefore every time a mode switch occurs, the correlation structure is 
+  broken. Solutes which switch between modes the least show the greatest
+  curvature. Methanol spends $> 90\%$ of its time in the tails, so mode transitions
+  are relatively rare and the predicted MSD has curvature. This artificially
+  solves the problem of long timescale correlation, however we do not recommend this
+  as it has no theoretical basis.
   
-  Despite their deviations from the MD, the ranking of the magnitude of predicted
-  MSDs remains the same as MD: ethylene glycol $\approx$ methanol $>$ urea $>$ acetic acid.
-%  The discrepancies between MD and the predictions of the AD model may be resolved
-%  by gathering longer and a greater quantity of solute trajectories
-  Therefore, we can use the current parameters to understand solute dynamics.
+  % In all but one case (two mode 
+  % ethylene glycol), MSD curves predicted by the sFLMcut model are higher than 
+  % those predicted by the sFBMcut model because of the heavy tails of the L\'evy 
+  % stable hop length distribution. 
+  
+%  Qualitatively, the curves with the highest final MSDs (ethylene glycol and 
+%  methanol) show more linear growth and their shapes are well captured by the
+%  sFLMcut and sFBMcut AD models. The MSD curve of urea bends slightly and 
+%  that of acetic acid has the most significant curvature. When the MD MSD 
+%  curves bend, the MSD curves predicted by the sFBMcut model tends to more 
+%  accurately portray their curvature since the sFLMcut model tends to become 
+%  linear faster.
+%  
+%  Acetic acid is a notable exception as no model accurately predicts its
+%  MSD or curvature. Both sFBMcut and sFLMcut significantly over-predict the final
+%  MSD while sFBM and sFLM significantly under-predict it. Once again, it 
+%  appears that the Hurst parameter may be over-estimated. However, the parameters
+%  of the hop and dwell distributions may be improved over those used to produce
+%  Figures~\ref{fig:1mode_msd_comparison_ACH_train_front} and
+%  \ref{fig:2mode_msd_comparison_ACH_train_front}. A lower value of $H$ would 
+%  increase the curvature and reduce the AD predicted MSD to values more consistent
+%  with acetic acid's MD MSD.
+  
+%  Despite their deviations from the MD, the ranking of the magnitude of predicted
+%  MSDs remains the same as MD: ethylene glycol $\approx$ methanol $>$ urea $>$ acetic acid.
+%%  The discrepancies between MD and the predictions of the AD model may be resolved
+%%  by gathering longer and a greater quantity of solute trajectories
+%  Therefore, we can use the current parameters to understand solute dynamics.
   
   The model parameters for the 1 and 2 mode models tell stories about each solute's
   behavior that help explain the difference between the MSDs of different solutes. 
@@ -1443,11 +1470,11 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   tends to stay trapped for less time and takes larger hops but the most substantial
   difference is with respect to their Hurst parameters. In fact, methanol has the lowest
   $H$ of all the solutes studied. It is possible that we have underestimated $H$ since 
-  it appears that our model consistently under-predicts the methanol MSD curve relative
+  it appears that our model under-predicts the methanol MSD curve relative
   to other solutes. However, it remains plausible that methanol does have a low $H$ 
   value because it spends the majority of its time outside the pore region where collisions
-  with tails are frequent. Urea has the third highest MSD that is primarily a consequence of
-  more frequent and long dwell times, indicated by lower values of $\alpha_d$ and 
+  with tails are frequent. Urea has the third highest MSD which is primarily a consequence of
+  more frequent and longer dwell times, indicated by lower values of $\alpha_d$ and 
   $\lambda$. Urea's hop lengths ($\sigma$) and correlation ($H$) are comparable to ethylene
   glycol and methanol. Acetic acid has the smallest MSD among the solutes studied due 
   to longer periods of entrapment and shorter hops. Its trapping behavior is parameterized
@@ -1458,7 +1485,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   
   We can use the 2 mode model to gain an even deeper understanding of solute behavior
   in the pore versus in the tails. It is clear that solutes are significantly slowed 
-  while they are in the tail region (mode 2) where long dwell times are more probable
+  while they are in the tail region where long dwell times are more probable
   (smaller $\alpha_d$) and hops are smaller (smaller $\sigma$). Interestingly, 
   $\alpha_h$ for urea and acetic acid in the tails is 1.50 meaning its hop distribution
   is heavy tailed relative to ethylene glycol and methanol whose $\alpha_h$ values are
@@ -1470,14 +1497,16 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   
   Overall, the AD model does a reasonable job of predicting solute MSDs and its 
   parameters can help us further understand solute dynamics. Hops appear to be well
-  modeled as anticorrelated draws from Gaussian and L\'evy stable distributions. 
+  modeled as anti-correlated draws from Gaussian and L\'evy stable distributions. 
   The data strongly suggests that one must truncate the power law dwell time 
   distributions in order to obtain accurate MSD estimates. We can further understand
   solute dynamics by adding radially dependent parameter distributions as in the 
   2 mode model. A significant amount of solute trajectory data is necessary 
   in order to achieve good parameter estimates. The exact amount of data required 
-  is dependent on the solute studied. Solutes which achieve higher MSDs
-  in a given amount of time appear to be more accurately parameterized.
+  is dependent on the solute studied. 
+  
+  %Solutes which achieve higher MSDs
+  %in a given amount of time appear to be more accurately parameterized.
   
 %  The parameters of the 1 mode model indicate some diversity in solute behavior. The value
 %  of $\alpha_d$ for pure and truncated power law fits to the dwell time distributions of 
@@ -1578,6 +1607,8 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   fluctuations, which we call the MSDDM.
   
   % BJC4: I moved this discussion up. It used to be after I presented the parameters
+  % BJC5: The pore/tail percentages could potentially go in the previous section, with
+  % the two-mode model.
   Solute size and chemical functionality influence which states are visited most frequently.
   In Figure~\ref{fig:state_probabilities}, we plotted the probabilities of occupying
   a given state at any time. Urea and acetic acid spend slightly more than half 
@@ -1625,6 +1656,9 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   into a single distribution and measured the correlation of the series of all 
   transitions. We lose information about individual types of transitions, however, 
   we believe this is unavoidable without at least an order of magnitude of additional data.
+  In theory, one could parameterize separate transition distributions for those
+  which occur in the tails versus in the pores, however this would lead to the same
+  issues shown by the anomalous diffusion model.
   
   We observe correlated emissions drawn from L\'evy stable distributions. The 
   deviation of the emission distributions from Gaussian behavior is far more pronounced
@@ -1694,16 +1728,16 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   Surprisingly, state 5 $H$ values are low despite the solutes being subject to no
   trapping mechanisms. Highly anti-correlated behavior in the pores in the absence of
   any trapping mechanism is likely caused by collisions with monomer head groups 
-  within the pore region. The Hurst parameters for transitional (T) emissions are 2-18 times higher 
-  than emissions from trapped states. The value of $\alpha_h$ for transition 
-  emissions is also relatively low giving higher probabilities to larger hops.
+  within the pore region. The Hurst parameters for transitional (T) emissions are up to 
+  18 times higher than emissions from trapped states. The value of $\alpha_h$ for 
+  transition emissions is also relatively low giving higher probabilities to larger hops.
   
   As solutes are influenced by more trapping interactions simultaneously (i.e. hydrogen
   bonding \textit{and} associated with sodium versus just hydrogen bonding), the 
   width of the hop length distribution, $\sigma$, decreases while its L\'evy index,
-  $\alpha_h$, increases. Treating the tail and pore regions independently, $\sigma$
-  is largest and $\alpha_h$ is smallest when solutes are not hydrogen bonding or 
-  associating with sodium (states 1 and 5). Solutes are free to move and take 
+  $\alpha_h$, increases. Treating states in the tail and pore regions independently, 
+  $\sigma$ is largest and $\alpha_h$ is smallest when solutes are not hydrogen bonding
+  or associating with sodium (states 1 and 5). Solutes are free to move and take 
   occasionally large hops. The smallest $\sigma$ and highest $\alpha_h$ values are
   measured when solutes are hydrogen bonding and associating with sodium at the
   same time (states 4 and 8). Motion is restricted by multiple tethers which 
@@ -1718,10 +1752,13 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 %  its two hydrophilic hydroxyl groups. Meanwhile methanol spends 91 \% of its 
 %  time in the tails likely due to its small size.
   
-  Using the parameters shown in Figure~\ref{fig:msddm_parameters}, we simulated 
-  1000 MSDDM trajectory realizations as described in Section~\ref{method:MSMs}
-  then calculated their MSDs. The MSDDM over-estimates solute MSDs by c.a. 250--650 \%
-  (see Figure~\ref{fig:msddm_performance}).   
+  In most cases, The MSDDM predicts the magnitude of the MD MSDs within their 
+  1-$\sigma$ confidence intervals. Using the parameters shown in 
+  Figure~\ref{fig:msddm_parameters}, we simulated 1000 MSDDM trajectory 
+  realizations for each solute, as described in Section~\ref{method:MSMs},
+  then calculated their MSDs (see Figure~\ref{fig:msddm_performance}). Methanol's
+  MSD is over-predicted at short timescales while acetic acid's entire MSD 
+  curve is severely over-predicted.
   
   \begin{figure}
   \centering
@@ -1741,54 +1778,75 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \includegraphics[width=\textwidth]{ACH_msddm.pdf}
   \caption{Acetic Acid}\label{fig:ACH_msddm}
   \end{subfigure}
-  \caption{The MSD curves predicted by the MSDDM significantly over-predict the
-  magnitude and misrepresent the curvature of those generated from MD simulations.
-  We expect urea and acetic acid to show some curvature on these time scales.}\label{fig:msddm_performance}
+  \caption{In most cases, the magnitude of the MSD curves predicted by the 
+  MSDDM agree well with those generated from MD simulations. The predicted MSD
+  curves of urea and ethylene glycol lie within the 1-$\sigma$ confidence 
+  intervals of MD for all time lags. Methanol under-predicts the MSD at small
+  time lags and acetic acid grossly over-predicts the MSD at all time lags.
+  Like the anomalous diffusion model, the MSDDM doesn't fully capture the 
+  curvature of the MD MSD curves. }\label{fig:msddm_performance}
   \end{figure}
   
-  %It is clear that the predictive
-  %abilities of the MSDDM are inadequate but it is still possible to salvage
-  %key insights.
- 
-  The MSDDM overestimates solute MSDs because correlation is lost every time a
-  state switch occurs. Although correlation exists within each sequence, there
-  is no memory of the previous state or state transition that can be built into
-  the first emission of the most recent state. This implies that the first 
-  value in a state sequence is a random draw from the underlying emission 
-  distribution. Frequent transitions between states lead to an abundance of 
-  short dwell times. It is difficult to accurately correlate short sequences so
-  we are almost simulating uncorrelated draws from the emission distribution.
-  In Figure~\ref{fig:T_sensitivity}, we demonstrate this effect by varying the
-  transition matrix and simulating a simple 2-state model with parameters similar
-  to those in Table~\ref{table:msddm_params} (we tabulated the parameters used 
-  in Table~\ref{S-table:msddm_params} of the Supporting Information). We modified
-  the probability transition matrix, $T$, in order to control the probability of 
-  self-transitions (the diagonal elements of $T$). Larger self-transition 
-  probabilities lead to longer dwell times in each state. We set the off-diagonal
-  elements of $T$ to be equal values that make the rows of $T$ sum to unity when
-  combined with the self-transition probabilities. As we increase the 
-  self-transition probability, $T_{ii}$, the simulated MSD decreases. Consequently,
-  longer dwell times in each state allow us to more accurately simulate the
-  negative correlation that we observe in MD.
+  The dynamics of urea, ethylene glycol and, to a lesser extent, methanol 
+  appear to be well-captured by the MSDDM. One could argue that the curves
+  of ethylene glycol and urea are statistically indistinguishable. However, 
+  it's possible that they may diverge on longer timescales due to differences
+  in their curvature. Similarly, methanol's MD MSD is nearly linear while 
+  the MSDDM prediction is curving downward implying that it may underestimate
+  the MSD on longer timescales. 
   
-  \begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{T_sensitivity.pdf}
-  \caption{As we increase the self-transition probabilities ($T_{ii}$) of an MSDDM,
-  the simulated MSD of the process decreases because the negative correlation structure
-  of individual state sequences is simulated more accurately.}\label{fig:T_sensitivity}
-  \end{figure}
+  The predicted MSD of acetic acid is severely over-estimated most likely due
+  to poor parameterization. Acetic acid has a transitional Hurst parameter 
+  $\sigma$ values that are very similar to Urea. Consequently, the final 
+  magnitude of acetic acid's MSD actually lies just within the lower bound
+  of Urea's MD MSD 1-$\sigma$ confidence interval.
   
-  % MRS4: be more clear here what mechanistic insight it offers.
-  % BJC4: added a couple sentences after thesis
-  The MSDDM offers mechanistic insight but cannot be used for reliable predictions
-  of solute MSDs. We can obtain a detailed picture of dynamics within each state in
-  terms of the magnitude of their fluctuations and correlation with previous 
-  motion. Unfortunately correlation between adjacent same-state sequences is lost
-  with our model which causes the MSDs to be significantly over-predicted. The MSDDM
-  may be suitable for processes with rarer transitions between states. If we can 
-  further reduce the state-space of our models, it may have better predictive success,
-  but we lose mechanistic detail.
+  The MSDDM suffers similar shortcomings to the AD model. First, curvature 
+  on long timescales due to positional anti-correlation may result in 
+  underestimates of the MSD at large time lags. As suggested earlier, truncating
+  the positional autocorrelation function may help solve this issue. Second, 
+  parameterization can be challenging.
+  
+  The MSDDM offers mechanistic insight and, in 3 out of 4 cases, gives reasonable
+  predictions of solute MSDs. We can used the MSDDM to obtain a detailed picture of dynamics within
+  each state in terms of the magnitude of their fluctuations and correlation with previous 
+  motion. 
+  
+%  Unfortunately correlation between adjacent same-state sequences is lost
+%  with our model which causes the MSDs to be significantly over-predicted. The MSDDM
+%  may be suitable for processes with rarer transitions between states. If we can 
+%  further reduce the state-space of our models, it may have better predictive success,
+%  but we lose mechanistic detail.
+  
+% BJC5: following not true
+%  The MSDDM overestimates solute MSDs because correlation is lost every time a
+%  state switch occurs. Although correlation exists within each sequence, there
+%  is no memory of the previous state or state transition that can be built into
+%  the first emission of the most recent state. This implies that the first 
+%  value in a state sequence is a random draw from the underlying emission 
+%  distribution. Frequent transitions between states lead to an abundance of 
+%  short dwell times. It is difficult to accurately correlate short sequences so
+%  we are almost simulating uncorrelated draws from the emission distribution.
+%  In Figure~\ref{fig:T_sensitivity}, we demonstrate this effect by varying the
+%  transition matrix and simulating a simple 2-state model with parameters similar
+%  to those in Table~\ref{table:msddm_params} (we tabulated the parameters used 
+%  in Table~\ref{S-table:msddm_params} of the Supporting Information). We modified
+%  the probability transition matrix, $T$, in order to control the probability of 
+%  self-transitions (the diagonal elements of $T$). Larger self-transition 
+%  probabilities lead to longer dwell times in each state. We set the off-diagonal
+%  elements of $T$ to be equal values that make the rows of $T$ sum to unity when
+%  combined with the self-transition probabilities. As we increase the 
+%  self-transition probability, $T_{ii}$, the simulated MSD decreases. Consequently,
+%  longer dwell times in each state allow us to more accurately simulate the
+%  negative correlation that we observe in MD.
+%  
+%  \begin{figure}
+%  \centering
+%  \includegraphics[width=0.5\textwidth]{T_sensitivity.pdf}
+%  \caption{As we increase the self-transition probabilities ($T_{ii}$) of an MSDDM,
+%  the simulated MSD of the process decreases because the negative correlation structure
+%  of individual state sequences is simulated more accurately.}\label{fig:T_sensitivity}
+%  \end{figure}
   
   \subsection{Solute Flux}\label{section:mfpt}
   

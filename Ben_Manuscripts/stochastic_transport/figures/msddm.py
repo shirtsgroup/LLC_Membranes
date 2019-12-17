@@ -45,7 +45,7 @@ extreme_trapping = False
 ntraj = args.ntraj # number of trajectories to simulate
 nboot = 200  # number of bootstrap trials when getting errorbars on MSD
 nt = 8 # number of threads
-load = True
+load = False
 
 equil = {'GCL': 2400, 'URE': 2000, 'MET': 7000, 'ACH': 4000}  # frame number, not ns. (multiply ns by 2)
 truncate = {'GCL': 1.0, 'URE': 1.0, 'MET': 1.0, 'ACH': 1.0}
@@ -87,7 +87,13 @@ if not load:
 	states = file_rw.load_object('%s/states.pl' % directory)
 	#print(states.hurst)
 	#exit()
+	diag = 0
+	for i in range(8):
+		diag += states.count_matrix[i, i]
 
+	offdiag = states.count_matrix.sum() - diag
+	print(diag, offdiag)
+	exit()
 	if extreme_trapping:
 		states.hurst[:, :] = 0
 	print(states.hurst.mean(axis=1))

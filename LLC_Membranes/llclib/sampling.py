@@ -2,6 +2,79 @@
 
 from LLC_Membranes.llclib import fitting_functions
 import numpy as np
+from scipy.stats import levy_stable
+
+
+class TruncatedLevyDistribution:
+    """ This class is meant to help approximate draws from a truncated levy distribution repeatedly with speed. The only
+    way (that I know how) to draw from a truncated levy stable distribution is via rejection sampling. If one draws a
+    large enough sample via rejection sampling, the resulting draws should approximate the real distribution. So you
+    can save time by drawing from this empirical distribution. This may offer significant speedup with little loss
+    of information.
+    """
+
+    def __init__(self, t, alpha, scale, n, beta=0, mean=0):
+        """ Create the empirical distribution. This should be the most time-consuming step. Draws should be quicker.
+
+        :param t: absolute value at which to truncate distribution. (truncation is symmetric)
+        :param alpha: Defines weight of tails
+        :param scale: Width of levy stable distribution
+        :param n: number of samples to incorporate into empirical distribution
+        :param beta: skewness parameter
+        :param mean: mean of distribution
+
+        :type t: float
+        :type alpha: float
+        :type scale: float
+        :type n: int
+        :type beta: float
+        :type mean: float
+        """
+
+        self.empirical_distribution = truncated_levy_distribution(t, alpha, scale, n, beta=beta, mean=mean)
+
+    def sample(self, n):
+        """ randomly draw from empirical truncated levy distribution
+
+        :param n: number of random draws
+
+        :type n: int
+        """
+
+        return np.random.choice(self.empirical_distribution, size=n, replace=True)
+
+
+def truncated_levy_distribution(t, alpha, scale, n, beta=0, mean=0):
+    """ Create the empirical distribution. This should be the most time-consuming step. Draws should be quicker.
+
+    :param t: absolute value at which to truncate distribution. (truncation is symmetric)
+    :param alpha: Defines weight of tails
+    :param scale: Width of levy stable distribution
+    :param n: number of samples to incorporate into empirical distribution
+    :param beta: skewness parameter
+    :param mean: mean of distribution
+
+    :type t: float
+    :type alpha: float
+    :type scale: float
+    :type n: int
+    :type beta: float
+    :type mean: float
+    """
+
+    z = levy_stable.rvs(alpha, beta, loc=mean, scale=scale, size=n)
+
+    too_big = np.where(np.abs(z) > t)[0]
+
+    while too_big.size > 0:
+
+        z[too_big] = levy_stable.rvs(alpha, beta, loc=mean, scale=scale, size=too_big.size)
+
+        too_big_remaining = np.where(np.abs(z[too_big]) > t)[0]
+
+        too_big = too_big[too_big_remaining]
+
+    return z
 
 
 def discrete_powerlaw_ccdf(val, xmin, alpha):

@@ -7,10 +7,11 @@ import numpy as np
 from scipy.stats import levy_stable
 import sys
 import matplotlib.pyplot as plt
-from LLC_Membranes.llclib import timeseries, stats
+from LLC_Membranes.llclib import timeseries, stats, sampling
 from LLC_Membranes.timeseries.flm_sim_params import HurstCorrection, TruncateLevy
 import tqdm
 import math
+import time as timer
 np.seterr(all='raise')
 
 
@@ -44,8 +45,9 @@ class FLM:
         :type correct_truncation: bool
         """
 
-        if math.log(N, 2) - int(math.log(N, 2)) != 0:
-            N = 2 ** (int(math.log(N, 2)) + 1)  # so we can use FFTs efficiently
+        # actually m ( M + N ) needs to be a power of 2
+        # if math.log(N, 2) - int(math.log(N, 2)) != 0:
+        #     N = 2 ** (int(math.log(N, 2)) + 1)  # so we can use FFTs efficiently
 
         if truncate is not None and correct_truncation:
 
@@ -94,12 +96,13 @@ class FLM:
         self.acf = None
         self.autocov = None
 
-    def generate_realizations(self, n, progress=True):
+    def generate_realizations(self, n, progress=True, truncated_distribution=None):
         """ Generate realization of fractional levy motion
 
         :param n: Number of realizations to generate
         :param truncate: largest allowable fluctuation
         :param progress: show progress bar
+        :param truncated_distribution: TruncatedLevyDistribution object from llclib.sampling
 
         :type n: int
         :type truncate: float or None
@@ -111,28 +114,41 @@ class FLM:
         for i in tqdm.tqdm(range(n), disable=(not progress)):
 
             if self.alpha == 2:
+
                 z = np.random.normal(0, scale=self.scale, size=self.Na)
+
             else:
-                z = levy_stable.rvs(self.alpha, 0, loc=0, scale=self.scale, size=self.Na)
 
                 if self.truncate is not None:
-                    try:
-                        too_big = np.where(np.abs(z) > self.truncate)[0]
-                    except FloatingPointError:
-                        print(self.truncate)
-                        np.savez_compressed('truncate.npz', z=z)
-                        exit()
-                        for i in np.abs(z):
-                            print(i)
-                        exit()
-                    while too_big.size > 0:
-                        z[too_big] = levy_stable.rvs(self.alpha, 0, loc=0, scale=self.scale, size=too_big.size)
-                        try:
-                            too_big = np.where(np.abs(z) > self.truncate)[0]
-                        except FloatingPointError:
-                            for i in np.abs(z):
-                                print(i)
-                            exit()
+
+                    if truncated_distribution is not None:
+
+                        z = truncated_distribution.sample(self.Na)
+
+                    else:
+
+                        z = sampling.truncated_levy_distribution(self.truncate, self.alpha, self.scale, self.Na)
+                    # try:
+                    #     too_big = np.where(np.abs(z) > self.truncate)[0]
+                    # except FloatingPointError:
+                    #     print(self.truncate)
+                    #     np.savez_compressed('truncate.npz', z=z)
+                    #     exit()
+                    #     for i in np.abs(z):
+                    #         print(i)
+                    #     exit()
+                    # while too_big.size > 0:
+                    #     z[too_big] = levy_stable.rvs(self.alpha, 0, loc=0, scale=self.scale, size=too_big.size)
+                    #     try:
+                    #         too_big = np.where(np.abs(z) > self.truncate)[0]
+                    #     except FloatingPointError:
+                    #         for i in np.abs(z):
+                    #             print(i)
+                    #         exit()
+
+                else:
+
+                    z = levy_stable.rvs(self.alpha, 0, loc=0, scale=self.scale, size=self.Na)
 
             z = np.fft.fft(z, self.Na)
             w = np.fft.ifft(z * self.A, self.Na).real
