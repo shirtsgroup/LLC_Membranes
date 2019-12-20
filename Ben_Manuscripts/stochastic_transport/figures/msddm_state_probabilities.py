@@ -82,10 +82,13 @@ patch1 = mpatches.Patch(facecolor=colors['URE'], label=names['URE'], edgecolor='
 patch2 = mpatches.Patch(facecolor=colors['GCL'], label=names['GCL'], edgecolor='black', alpha=opacity)
 patch3 = mpatches.Patch(facecolor=colors['MET'], label=names['MET'], edgecolor='black', alpha=opacity)
 patch4 = mpatches.Patch(facecolor=colors['ACH'], label=names['ACH'], edgecolor='black', alpha=opacity)
+patch5 = mpatches.Patch(facecolor='w', label='', edgecolor='w', alpha=opacity)
+patch6 = mpatches.Patch(facecolor='w', label='', edgecolor='w', alpha=opacity)
+
 #plt.rc('text', usetex=True)
 labels = ['1\n$^{t}$', '2\n$^{(t/h)}$', '3\n$^{(t/a)}$', '4\n$^{(t/h/a)}$', '5\n$^{(p)}$', '6\n$^{(p/h)}$', '7\n$^{(p/a)}$', '8\n$^{(p/h/a)}$', 'T']
 
-#plt.legend(fontsize=14, handles=[patch1, patch2, patch3, patch4, hatch1, hatch2])
+plt.legend(fontsize=14, handles=[patch1, patch2, patch3, patch4, hatch1, hatch2, patch5, patch6], ncol=2, columnspacing=1)
 plt.xticks(ticks=bar_locations, labels=labels)
 plt.xlabel('State', fontsize=14)
 plt.ylabel('Probability of Occupation', fontsize=14)

@@ -20,6 +20,7 @@ import itertools
 from multiprocessing import Pool
 np.set_printoptions(precision=4, suppress=True)
 import time as timer
+import fbm
 
 
 def initialize():
@@ -635,6 +636,7 @@ class Chain:
         self.msds = None
         self.limits = None
         self.bound = bound
+        self.timeout = None
 
         self.average_params = None
         self.truncated_distributions = None
@@ -702,7 +704,8 @@ class Chain:
             # self.flms.append(FLM(corrected_H, alpha, m=self.m, M=4, N=l, scale=scale, truncate=corrected_bound,
             # correct_hurst=False, correct_truncation=False)
 
-    def generate_realizations(self, n, length, bound=7.6, m=256, Mlowerbound=6000, nt=1, speedup=True, quiet=False):
+    def generate_realizations(self, n, length, bound=7.6, m=256, Mlowerbound=6000, nt=1, speedup=True, quiet=False,
+                              timeout=None):
         """ Generate Markov chains using transition matrix and emission probabilities
 
         :param n: number of independent trajectories to generate
@@ -742,6 +745,8 @@ class Chain:
             self._get_average_params()
 
             self._get_truncated_distributions()
+
+        self.timeout = timeout
 
         trajectories_per_thread = n // nt
 
@@ -891,6 +896,10 @@ class Chain:
 
         # for efficiency, make sure m * (l + M) is a power of 2
         M = l + self.Mlowerbound
+
+        # if state == 8:
+        #     M = 200000
+
         n = np.log(M) / np.log(2)
         M = int(2 ** np.ceil(n) - l)
 
@@ -912,14 +921,30 @@ class Chain:
         if self.truncated_distributions is not None:
             trunc_dist = self.truncated_distributions[state]
 
-        # if state == 8:
-        #     start = timer.time()
         flm = FLM(corrected_H, alpha, m=self.m, M=M, N=l, scale=scale, truncate=corrected_bound,
                   correct_hurst=False, correct_truncation=False)
+
+        # generate a single realization
+        flm.generate_realizations(1, progress=False, truncated_distribution=trunc_dist)
+
+        return flm.noise[0, :l]
+
         # if state == 8:
-        #     print(timer.time() - start)
-        #     exit()
-        flm.generate_realizations(1, progress=False, truncated_distribution=trunc_dist)  # generate a single realization
+        #     # flm = FLM(corrected_H, alpha, m=self.m, M=M, N=l, scale=scale, truncate=corrected_bound,
+        #     #           correct_hurst=False, correct_truncation=False)
+        #     #
+        #     # # generate a single realization
+        #     # flm.generate_realizations(1, progress=False, truncated_distribution=trunc_dist)
+        #     # #(sigma, alpha, hurst, max_hop)
+        #     H = 0.35
+        #
+        #     return scale * fbm.FBM(l, H, method="daviesharte").fgn() / ((1.0 / l) ** H)
+        #
+        #     #return flm.noise[0, :l]
+        #
+        # else:
+        #
+        #     return np.zeros(l)
 
         # flm.autocorrelation()
         # H = np.log(2 * flm.acf[:, 1].mean() + 2) / (2 * np.log(2))
@@ -929,8 +954,6 @@ class Chain:
         # plt.plot(x, levy_stable.pdf(x, alpha=alpha, loc=0, beta=0, scale=scale))
         # plt.show()
         # exit()
-
-        return flm.noise[0, :l]
 
     def _uncorrelated_realization(self, length, bound=7.6):
         """ Generate a trajectory with uncorrelated emissions

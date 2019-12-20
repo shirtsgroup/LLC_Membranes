@@ -13,12 +13,14 @@ import tqdm
 import math
 import time as timer
 np.seterr(all='raise')
+from pebble import ProcessPool
+from concurrent.futures import TimeoutError
 
 
 class FLM:
 
     def __init__(self, H, alpha, m=256, M=6000, C=1, N=2**12, scale=1, correct_hurst=True, truncate=None,
-                 correct_truncation=True):
+                 correct_truncation=True, time=False):
         """ Generate realizations of fractional levy motion, also know as linear fractional stable motion
 
         :param H: Hurst parameter. Also known as the self-similarity parameter
@@ -88,7 +90,14 @@ class FLM:
         self.A = mh ** (1 / alpha) * np.concatenate((t0, t1))
         self.C = C * (np.abs(self.A) ** alpha).sum() ** (-1 / alpha)
         self.A *= self.C
+
+        if time:
+            start = timer.time()
+            print('Starting fft of A. Size=', self.A.size)
         self.A = np.fft.fft(self.A, n=self.Na)
+
+        if time:
+            print('Calculated fft of A:', timer.time() - start)
 
         self.realizations = None
         self.noise = None
@@ -96,7 +105,7 @@ class FLM:
         self.acf = None
         self.autocov = None
 
-    def generate_realizations(self, n, progress=True, truncated_distribution=None):
+    def generate_realizations(self, n, progress=True, truncated_distribution=None, time=False, timeout=None):
         """ Generate realization of fractional levy motion
 
         :param n: Number of realizations to generate
@@ -113,60 +122,57 @@ class FLM:
 
         for i in tqdm.tqdm(range(n), disable=(not progress)):
 
-            if self.alpha == 2:
+            if timeout is not None:
 
-                z = np.random.normal(0, scale=self.scale, size=self.Na)
+                self.noise[i, :] = self._pool(truncated_distribution, timeout)
 
             else:
 
-                if self.truncate is not None:
-
-                    if truncated_distribution is not None:
-
-                        z = truncated_distribution.sample(self.Na)
-
-                    else:
-
-                        z = sampling.truncated_levy_distribution(self.truncate, self.alpha, self.scale, self.Na)
-                    # try:
-                    #     too_big = np.where(np.abs(z) > self.truncate)[0]
-                    # except FloatingPointError:
-                    #     print(self.truncate)
-                    #     np.savez_compressed('truncate.npz', z=z)
-                    #     exit()
-                    #     for i in np.abs(z):
-                    #         print(i)
-                    #     exit()
-                    # while too_big.size > 0:
-                    #     z[too_big] = levy_stable.rvs(self.alpha, 0, loc=0, scale=self.scale, size=too_big.size)
-                    #     try:
-                    #         too_big = np.where(np.abs(z) > self.truncate)[0]
-                    #     except FloatingPointError:
-                    #         for i in np.abs(z):
-                    #             print(i)
-                    #         exit()
-
-                else:
-
-                    z = levy_stable.rvs(self.alpha, 0, loc=0, scale=self.scale, size=self.Na)
-
-            z = np.fft.fft(z, self.Na)
-            w = np.fft.ifft(z * self.A, self.Na).real
-
-            self.noise[i, :] = w[:self.N*self.m:self.m]
-
-            # Idea: replace too large values with ones drawn from same distribution with same sign as self.noise[i, :]
-            # if truncate is not None:
-            #     too_big = np.where(np.abs(self.noise[i, :]) > truncate)[0]
-            #     while too_big.size > 0:
-            #         replacements = levy_stable.rvs(self.alpha, 0, loc=0, scale=self.scale, size=too_big.size)
+                self.noise[i, :] = self._realization(truncated_distribution)
 
         self.realizations = np.cumsum(self.noise, axis=1)
 
-        # print(self.realizations.max())
-        # plt.hist(self.realizations[0, :], range=(-5, 5), bins=50, alpha=0.5, color='blue', density=True)
-        # plt.show()
-        # exit()
+    def _pool(self, truncated_distribution, timeout):
+
+        with ProcessPool() as pool:
+
+            future = pool.map(self._realization, [truncated_distribution], timeout=timeout)
+
+            try:
+                result = next(future.result())
+                return result
+
+            except TimeoutError as error:
+                print('Realization took longer than %s seconds, retrying ...' % error.args[1], flush=True)
+                self._pool(truncated_distribution, timeout)
+
+    def _realization(self, truncated_distribution):
+
+        if self.alpha == 2:
+
+            z = np.random.normal(0, scale=self.scale, size=self.Na)
+
+        else:
+
+            if self.truncate is not None:
+
+                if truncated_distribution is not None:
+
+                    z = truncated_distribution.sample(self.Na)
+
+                else:
+
+                    z = sampling.truncated_levy_distribution(self.truncate, self.alpha, self.scale, self.Na)
+
+            else:
+
+                z = levy_stable.rvs(self.alpha, 0, loc=0, scale=self.scale, size=self.Na)
+
+        z = np.fft.fft(z, self.Na)
+
+        w = np.fft.ifft(z * self.A, self.Na).real
+
+        return w[:self.N * self.m:self.m]
 
     def plot_marginal(self, bounds=(-.5, .5), bins=50, show=False):
         """ Plot a histogram of the marginal distribution of increments, with the expect PDF overlayed on top of it

@@ -1037,8 +1037,8 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   structure is close to that observed in our simulation (Figure~\ref{fig:hop_acf}). FBM
   is common in crowded viscoelastic environments where motions are highly influenced by
   the motion of surrounding components, such as monomer tails in our case.~\cite{ernst_fractional_2012}
-  The parameter estimates describing the 1 and 2 mode hop and dwell distributions are 
-  summarized in Figures~\ref{fig:1mode_parameters} and~\ref{fig:2mode_parameters}.
+  %The parameter estimates describing the 1 and 2 mode hop and dwell distributions are 
+  %summarized in Figures~\ref{fig:1mode_parameters} and~\ref{fig:2mode_parameters}.
   
   \begin{figure}
   \centering
@@ -1146,11 +1146,25 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 %  additional solute trajectories. 
 
   Using the approach described above, we validated our 1 and 2 mode models with
-  urea and acetic acid, since their trajectories appear stationary. The 
-  resultant MSD plots are shown in Figure~\ref{fig:train_test}. We consider 
-  our models to match well if their predictions lie within the 1-$\sigma$
-  confidence intervals of the MD MSDs. We also look for qualitative agreement
-  in the shape of the curves.
+  urea and acetic acid, since their trajectories appear stationary. In 
+  Figure~\ref{fig:ad_eyetest}, we show that realizations of the AD model appear
+  qualitatively similar to those seen in our MD simulations (Figure~\ref{fig:solute_trajectories}).
+  The MSDs resulting from 1000 realizations of the AD model are shown in 
+  Figure~\ref{fig:train_test}. We consider the model's prediction to match well if the
+  MSD lies within the 1-$\sigma$ confidence intervals of the MD MSDs. We also
+  look for qualitative agreement in the shape of the curves.
+  
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{ad_realizations_1mode.pdf}
+  \caption{Simulations of 1 mode AD model trajectories for Urea display 
+  qualitatively similar hopping and trapping behavior to that shown in 
+  Figure~\ref{fig:solute_trajectories}. Analogous plots are shown for other solutes
+  %BJC5: todo: add plots to SI. Show I add a 2 mode model plot?
+  and the 2 mode mdoel in the Supporting Information. Dwell times may be exaggerated in the
+  sFBM and sFLM models because the power law dwell time distributions have infinite
+  variance.}\label{fig:ad_eyetest}
+  \end{figure}
   
   \begin{figure}
   \centering
@@ -1245,8 +1259,8 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   % BJC4: play around with this to see how to change shape of acetic acid curve. Hurst makes it arc more
   % ctrwsim.py -alpha 0.08 -fix_time -hop fbm -H 0.34 -ntraj 100 -dwell powerlaw_cutoff -lamb 0.0033 -hs 0.27
   
-  This brief analysis suggests two shortcomings of the AD model. First, positional
-  anti-correlation may diminish after a sufficiently long time lag, dependent on the 
+  This brief qualitative analysis suggests two shortcomings of the AD model. First, 
+  positional anti-correlation may dissipate after a sufficiently long time lag, dependent on the 
   solute being studied. Second, it is difficult to reliably parameterize the Hurst
   parameter which is important for accurately describing the curvature of the solute
   MSDs.
@@ -1364,11 +1378,12 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \includegraphics[width=\textwidth]{1mode_msd_comparison_ACH.pdf}
   \caption{Acetic Acid}\label{fig:1mode_msd_comparison_ACH}
   \end{subfigure}
-  \caption{MSDs generated from realizations of our 1 mode anomalous diffusion models
-  agree well with MD-generated data when using an exponential cutoff (sFBMcut and SFLMcut).
-  When we do not apply an exponential cut-off to the dwell time distribution (sFBM 
-  and SFLM), MSDs are underpredicted. Drawing hops from a truncated L\'evy stable 
-  distribution results in higher MSDs than draws from Gaussians (sFLM and sFLMcut).}\label{fig:anomalous_msds_1mode}
+  \caption{In most cases, MSDs generated from realizations of our 1 mode anomalous
+  diffusion models agree well with MD-generated data when using an exponential cutoff
+  on the dwell time distribution (sFBMcut and SFLMcut). When we do not apply an 
+  exponential cut-off (sFBM and SFLM), MSDs are underpredicted. Drawing hops from a
+  truncated L\'evy stable distribution yields MSDs similar to when hops are drawn 
+  from Gaussian disributions (sFLM and sFLMcut).}\label{fig:anomalous_msds_1mode}
   \end{figure}
   
   \begin{figure}
@@ -1389,10 +1404,10 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \includegraphics[width=\textwidth]{2mode_msd_comparison_ACH.pdf}
   \caption{Acetic Acid}\label{fig:2mode_msd_comparison_ACH}
   \end{subfigure}
-  \caption{MSDs generated from realization of our 2-mode anomalous diffusion model
-  also match well to MD-generated data. The MSD of urea appears to be underpredicted
-  by all model combinations. The MSD of ethylene glycol is predicted well when 
-  we draw dwell times from a power law distribution with an exponential cut-off.}\label{fig:anomalous_msds_2mode}
+  \caption{MSDs generated from realizations of our 2-mode anomalous diffusion model
+  predict the magnitude of the MSDs to a similar degree of accuracy as the 1 mode
+  model. Relative to the predictions of the 1 mode model the MSDs lack curvature because
+  the hop correlation structure is broken every time a transition between tails occurs.}\label{fig:anomalous_msds_2mode}
   \end{figure}
   
   After a 1000 ns time lag, the 1 and 2 mode AD models do a fairly good job of 
@@ -1421,7 +1436,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   therefore every time a mode switch occurs, the correlation structure is 
   broken. Solutes which switch between modes the least show the greatest
   curvature. Methanol spends $> 90\%$ of its time in the tails, so mode transitions
-  are relatively rare and the predicted MSD has curvature. This artificially
+  are relatively rare and the predicted MSD has significant curvature. This artificially
   solves the problem of long timescale correlation, however we do not recommend this
   as it has no theoretical basis.
   
@@ -1486,14 +1501,32 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   We can use the 2 mode model to gain an even deeper understanding of solute behavior
   in the pore versus in the tails. It is clear that solutes are significantly slowed 
   while they are in the tail region where long dwell times are more probable
-  (smaller $\alpha_d$) and hops are smaller (smaller $\sigma$). Interestingly, 
-  $\alpha_h$ for urea and acetic acid in the tails is 1.50 meaning its hop distribution
+  (smaller $\alpha_d$) and hops are smaller (smaller $\sigma$). Each solute spends 
+  a different amount of time in the tails (see Figure~\ref{fig:AD_mode_occupation}). 
+  Urea and acetic acid spend slightly more than half of their time in the tails 
+  (56\% and 62\% of their time respectively) while ethylene glycol spends about 
+  44\% of its time in the tails. Urea and acetic acid's compact and flat structure 
+  allows it to more easily partition into the tails while ethylene glycol prefers
+  the pore region due to its two hydrophilic hydroxyl groups. Meanwhile methanol 
+  spends 91 \% of its time in the tails likely due to its small size.  
+  The value of $\alpha_h$ for urea and acetic acid in the tails is 1.50 meaning its hop distribution
   is heavy tailed relative to ethylene glycol and methanol whose $\alpha_h$ values are
   more consistent with a Gaussian distribution ($\alpha$=2). Acetic acid and urea are
   structurally similar molecules, both planar with two heavy atoms attached to a 
   carbonyl group. Their small size and rigid shape may allow them to occasionally slip
   through gaps in the tails. Meanwhile, methanol is small enough that it does not need
-  to make larger jumps to escape traps. 
+  to make larger jumps to escape traps.
+  
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{AD_mode_occupation.pdf}
+  \caption{Solutes spend various amounts of time in the tail and pore region dependent
+  on their size, shape and chemical functionality. Methanol's small size favors 
+  occupation of the much larger accessible volume in the tails. Urea and acetic acid
+  are fairly stable in both regions since they are small and hydrophilic. Ethylene 
+  glycol is has a slight preference for the pores likely because it is a larger
+  molecule with two hydrophilic hydroxyl groups.}\label{fig:AD_mode_occupation}
+  \end{figure}
   
   Overall, the AD model does a reasonable job of predicting solute MSDs and its 
   parameters can help us further understand solute dynamics. Hops appear to be well
@@ -1607,30 +1640,37 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   fluctuations, which we call the MSDDM.
   
   % BJC4: I moved this discussion up. It used to be after I presented the parameters
-  % BJC5: The pore/tail percentages could potentially go in the previous section, with
-  % the two-mode model.
   Solute size and chemical functionality influence which states are visited most frequently.
   In Figure~\ref{fig:state_probabilities}, we plotted the probabilities of occupying
-  a given state at any time. Urea and acetic acid spend slightly more than half 
-  their time in the tails (56\% and 62\% of their time respectively) while ethylene
-  glycol spends about 44\% of its time in the tails. Urea and acetic acid's compact
-  and flat structure allows it to more easily partition into the tails while ethylene
-  glycol prefers the pore region due to its two hydrophilic hydroxyl groups. Meanwhile
-  methanol spends 91 \% of its time in the tails likely due to its small size.
+  a given state at any time. Solutes tend to favor the same types of interactions 
+  independent of which region they are in.
+
+  % BJC5: moved to previous section  
+%   Urea and acetic acid spend slightly more than half of
+%  their time in the tails (56\% and 62\% of their time respectively) while ethylene
+%  glycol spends about 44\% of its time in the tails. Urea and acetic acid's compact
+%  and flat structure allows it to more easily partition into the tails while ethylene
+%  glycol prefers the pore region due to its two hydrophilic hydroxyl groups. Meanwhile
+%  methanol spends 91 \% of its time in the tails likely due to its small size.
   
   \begin{figure}
   \centering
   \includegraphics[width=0.475\textwidth]{state_probabilities.pdf}
   \caption{Solutes spend varying amounts of time under the influence of each
-  trapping mechanism. Methanol spends the majority of its time in the tail region
-  while the rest of solute spend similar amounts of time in each region.}\label{fig:state_probabilities}
+  trapping mechanism. To aid the reader, we labeled each state with an abbreviation which
+  identifies the combination of conditions to which each solute is subject in each state:
+  t - tails, p - pores, h - hydrogen bonded, a - associated with sodium. Solutes tend to 
+  favor the same types of interactions (e.g. hydrogen bonding and/or associating with sodium
+  ions) independent of whether they are in the pores or the tails.}\label{fig:state_probabilities}
   \end{figure}
   
   Urea spends the largest fraction of its time trapped via association with sodium ions.
   It does so 31\% of the total time while in the tails (state 3) and 21\% of the
-  total time while in the pores (state 7). The electron-dense and unshielded oxygen
-  atom of urea's carbonyl group is prone to associate with positively charged sodium
-  ions. The nitrogen atoms of urea are only weak hydrogen bond donors.
+  total time while in the pores (state 7). Note that sodium does not drift significantly 
+  into the tails but sits close to the pore/tail region boundary. The electron-dense 
+  and unshielded oxygen atom of urea's carbonyl group is prone to associate with 
+  positively charged sodium ions. The nitrogen atoms of urea are only weak hydrogen bond
+  donors.
   
   Ethylene glycol spends the largest fraction of its time trapped in a hydrogen
   bonded state. It does so 24\% of the total time while in the tails (state 2)
@@ -1639,7 +1679,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   head groups and the ether linkages between the head groups and monomer tails. 
   
   Methanol spends most of its time unbound in the tail region (state 1) and spends a 
-  significant portion of time hydrogen bonded to while in the tail regions.
+  significant portion of time hydrogen bonded while in the tail regions.
   Most of the tail region hydrogen bonds are donated from methanol to the ether
   linkages between the monomer head groups and tails.
   
@@ -1657,8 +1697,8 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   transitions. We lose information about individual types of transitions, however, 
   we believe this is unavoidable without at least an order of magnitude of additional data.
   In theory, one could parameterize separate transition distributions for those
-  which occur in the tails versus in the pores, however this would lead to the same
-  issues shown by the anomalous diffusion model.
+  which occur in the tails versus in the pores, however this would lead a broken 
+  correlation structure similar to that seen in the 2 mode AD model.
   
   We observe correlated emissions drawn from L\'evy stable distributions. The 
   deviation of the emission distributions from Gaussian behavior is far more pronounced
@@ -1704,11 +1744,9 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \caption{}\label{fig:alpha_v_state}
   \end{subfigure}
   \caption{The parameters of the MSDDM are strong functions of trapping mechanisms.
-  We observe different parameters bu with similar trends between the tail and pore
-  region. The states are defined in Table~\ref{table:states}. To aid the reader, we 
-  labeled each state with an abbreviation which identifies the combination of 
-  conditions to which each solute is subject: t - tails, p - pores, h - hydrogen bonded, 
-  a - associated with sodium. The legend in (a) applies to all subplots. (a) Motion is
+  We observe different parameters but with similar trends between the tail and pore
+  region. The states are defined in Table~\ref{table:states}. See Figure~\ref{fig:state_probabilities}
+  for a description of the abbreviation under each state number. The legend in (a) applies to all subplots. (a) Motion is
   highly anti-correlated in trapped states. As the number of simultaneously influencing
   trapping mechanisms increases, the Hurst parameter decreases. The Hurst parameter is
   highest during transitions between states (state T). (b) As more trapping mechanisms
@@ -1732,8 +1770,8 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   18 times higher than emissions from trapped states. The value of $\alpha_h$ for 
   transition emissions is also relatively low giving higher probabilities to larger hops.
   
-  As solutes are influenced by more trapping interactions simultaneously (i.e. hydrogen
-  bonding \textit{and} associated with sodium versus just hydrogen bonding), the 
+  As solutes are influenced by more trapping interactions simultaneously (e.g.~hydrogen
+  bonding \textit{and} association with sodium versus just hydrogen bonding), the 
   width of the hop length distribution, $\sigma$, decreases while its L\'evy index,
   $\alpha_h$, increases. Treating states in the tail and pore regions independently, 
   $\sigma$ is largest and $\alpha_h$ is smallest when solutes are not hydrogen bonding
@@ -1751,14 +1789,34 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 %  partition into the tails while ethylene glycol prefers the pore region due to 
 %  its two hydrophilic hydroxyl groups. Meanwhile methanol spends 91 \% of its 
 %  time in the tails likely due to its small size.
+
+  Qualitatively, realizations of the MSDDM are not consistent with MD solute
+  trajectories. Using the parameters shown in Figure~\ref{fig:msddm_parameters}
+  we generated realizations of the MSDDM and plotted a typical realization for each
+  solute in Figure~\ref{fig:msddm_eyetest}. Except in rare cases, the solutes do not make
+  large hops. There are two reasons for this behavior. First, the width of 
+  hop length distributions are much smaller than those of the AD model. Closer
+  examination of Figure~\ref{fig:solute_trajectories} reveals that hops tend
+  to be an accumulation of a series of hops in the same direction. All of the 
+  hops in the MSDDM are negatively correlated which prevents this from happening.
+  The second reason is a consequence of using a single hop length distribution 
+  for transitions. Many transitions occur between two trapped states where the 
+  transitional hops are actually very small. Our model ignores this physical 
+  restriction which can cause the solute to drift rather than stay trapped.
   
-  In most cases, The MSDDM predicts the magnitude of the MD MSDs within their 
-  1-$\sigma$ confidence intervals. Using the parameters shown in 
-  Figure~\ref{fig:msddm_parameters}, we simulated 1000 MSDDM trajectory 
-  realizations for each solute, as described in Section~\ref{method:MSMs},
-  then calculated their MSDs (see Figure~\ref{fig:msddm_performance}). Methanol's
-  MSD is over-predicted at short timescales while acetic acid's entire MSD 
-  curve is severely over-predicted.
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{msddm_realizations.pdf}
+  \caption{Realizations of the MSDDM for each solute do not reproduce the hopping
+  and trapping behavior observed in our MD simulations. Except for a few large 
+  hops, the trajectories are qualitatively similar to what one might expect for
+  Brownian motion. Note that the length of the realizations are equal to the length
+  of the equlibrated portion of the MD trajectories for each solute.}\label{fig:msddm_eyetest}
+  \end{figure}
+  
+  %Methanol's
+  %MSD is over-predicted at short timescales while acetic acid's entire MSD 
+  %curve is severely over-predicted.
   
   \begin{figure}
   \centering
@@ -1781,14 +1839,18 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \caption{In most cases, the magnitude of the MSD curves predicted by the 
   MSDDM agree well with those generated from MD simulations. The predicted MSD
   curves of urea and ethylene glycol lie within the 1-$\sigma$ confidence 
-  intervals of MD for all time lags. Methanol under-predicts the MSD at small
+  intervals of MD for all time lags. Methanol over-predicts the MSD at small
   time lags and acetic acid grossly over-predicts the MSD at all time lags.
   Like the anomalous diffusion model, the MSDDM doesn't fully capture the 
   curvature of the MD MSD curves. }\label{fig:msddm_performance}
   \end{figure}
   
-  The dynamics of urea, ethylene glycol and, to a lesser extent, methanol 
-  appear to be well-captured by the MSDDM. One could argue that the curves
+  Despite qualitative differences in trajectory realizations, the dynamics of 
+  urea, ethylene glycol and, to a lesser extent, methanol appear to be well-captured
+  by the MSDDM. We simulated 1000 MSDDM trajectory realizations for each solute, as
+  described in Section~\ref{method:MSMs}, then calculated their MSDs (see 
+  Figure~\ref{fig:msddm_performance}). In most cases, the MSDDM predicts the magnitude of the MD MSDs 
+  within their 1-$\sigma$ confidence intervals. One could argue that the curves
   of ethylene glycol and urea are statistically indistinguishable. However, 
   it's possible that they may diverge on longer timescales due to differences
   in their curvature. Similarly, methanol's MD MSD is nearly linear while 
@@ -1796,21 +1858,37 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   the MSD on longer timescales. 
   
   The predicted MSD of acetic acid is severely over-estimated most likely due
-  to poor parameterization. Acetic acid has a transitional Hurst parameter 
-  $\sigma$ values that are very similar to Urea. Consequently, the final 
-  magnitude of acetic acid's MSD actually lies just within the lower bound
-  of Urea's MD MSD 1-$\sigma$ confidence interval.
+  to poor parameterization. As stated earlier, most of a solute's motion is 
+  due to displacements during state transitions. Acetic acid has a transitional
+  Hurst parameter close to Urea's and a transitional $\sigma$ value that 
+  is higher than urea's. This suggests that the heavier tails of urea's transitional
+  hop distribution (greater $\alpha_h$ value) are in large part responsible for 
+  urea's higher predicted MSD. Although we note that acetic acid's predicted MSD
+  actually lies just within the lower bound of Urea's MD MSD 1-$\sigma$ 
+  confidence interval. There is also the strong possibility that the over-estimate is
+  a consequence of lumping together all of acetic acid's transitional hops into
+  a single correlated distribution.
   
   The MSDDM suffers similar shortcomings to the AD model. First, curvature 
   on long timescales due to positional anti-correlation may result in 
   underestimates of the MSD at large time lags. As suggested earlier, truncating
   the positional autocorrelation function may help solve this issue. Second, 
-  parameterization can be challenging.
+  parameterization can be challenging. In addition to possibly poor estimates 
+  of the Hurst parameter, we made the simplifying assumption that we could lump
+  all transitional hops into a single distribution. While this appears to work
+  in most cases, it is the source of qualitative mismatches between MSDDM
+  realations and MD simulation trajectories and it may be the source of the 
+  over-estimate of acetic acid's MSD.
   
   The MSDDM offers mechanistic insight and, in 3 out of 4 cases, gives reasonable
-  predictions of solute MSDs. We can used the MSDDM to obtain a detailed picture of dynamics within
-  each state in terms of the magnitude of their fluctuations and correlation with previous 
-  motion. 
+  predictions of solute MSDs. To successfully apply the model, one must know 
+  representative discrete states beforehand or apply some technique to identify
+  them. At the very least, we can used the MSDDM to obtain a detailed quantitative
+  picture of dynamics within each state in terms of the magnitude of their 
+  fluctuations and correlation with previous motion. If we have confidence in
+  their predictive ability, then we can project solute trajectories out to 
+  macroscopic timescales and estimate macroscopic observables such as solute 
+  flux and selectivity.
   
 %  Unfortunately correlation between adjacent same-state sequences is lost
 %  with our model which causes the MSDs to be significantly over-predicted. The MSDDM
@@ -1851,20 +1929,20 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \subsection{Solute Flux}\label{section:mfpt}
   
   We used the 1-mode sFBMcut (see Table~\ref{table:anomalous_models}) anomalous 
-  diffusion model in order to demonstrate how one can use its realizations in
-  order to calculate the flux (section~\ref{method:mfpt}) of solutes given model 
-  parameters extracted from MD simulations. The sFLMcut AD model and MSDDM yield 
-  similar predictions at a much greater computational cost due to the slow
-  generation of fractional L\'evy noise.
+  diffusion model and the MSDDM in order to demonstrate how one can use their realizations
+  in order to calculate the flux (section~\ref{method:mfpt}) of solutes given model 
+  parameters extracted from MD simulations. The 1-mode sFBMcut mode generates predictions
+  similar to the 1-mode sFLMcut model at a lower computational cost and is far more
+  accurate than sFBM and sFLM. The 2-mode model has a broken correlation structure, so 
+  we do not consider it here.
+  
   %MRS5: One question is if other method would lead to substantially
   %different results for fluxes or selectivity.  May need too think
   %about justification more if just one method is mentioned.
-  %BJC5: would love to test MSDDM against this but I don't know how to make 
-  % the algorithm faster. It already uses an FFT to correlate the data (to which I pass powers of 2)
+  %BJC5: Added MSDDM
 
- 
   %MRS5: I think it might be useful to have at least visualizions of
-  %distribution of FPT and its fit.  It might not be obvious to
+  %distribution of FPT and its fit. It might not be obvious to
   %readers that the different mechanisms have distributions of FPT
   %that are well decscribed by the relatively simple moving diffusion
   %equation in eq 15. 
@@ -1879,10 +1957,11 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   traverse the length of a macroscopic pore. To date, the thinnest H\textsubscript{II}
   LLC membrane synthesized with the monomer in this work was 7$\mu$m thick. Using
   24 cores to simulate trajectory realizations in parallel, it takes on the order 
-  of 1 day to simulate 10000 realizations of solutes traversing a 50 nm pore. The 
-  RAM requirements and performance scales greater than linearly and thus would 
-  take an infeasible amount of memory and time to simulate transport through a 
-  pore over 100 times longer.
+  of 1 day to simulate 10000 sFBMcut realizations of solutes traversing a 50 nm pore.
+  The computational requirements of the MSDDM are about 10 times longer. For both
+  models, the RAM requirements and performance scales greater than linearly and 
+  thus would take an infeasible amount of memory and time to simulate transport 
+  through a pore over 100 times longer.
   
   We used simulated trajectories which traverse computationally-reasonable length
   pores in order to construct an empirical model which one can use to estimate 
@@ -1948,12 +2027,14 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   %MRS5: Does't fitting to eq 15 cut down on the expense of the number of trajectories
   %by a fair amount?  Should there be some discussion of this? 
   %BJC5: added this
-  Although we used 10000 trajectory realizations in order to generate 
-  Figure~\ref{fig:flux_curves}, one may actually need considerably less realizations
-  in order to predict and compare flux between solutes. In Figure~\ref{S-fig:flux_curve_sensitivity}
+  It is only necessary to simulate 1000 realizations of each model in order to
+  parameterize Equation~\ref{eqn:flux_decay}. We used 10000 trajectory realizations 
+  in order to generate Figure~\ref{fig:flux_curves}, however, in Figure~\ref{S-fig:flux_curve_sensitivity}
   of the Supporting information, we show that one can still show statistically
   significant differences in solute flux with as little as 100 trajectory 
-  realizations.
+  realizations. To be sure, we recommend simulating at least 1000 realizations. 
+  Since the computational cost of the MSDDM is greater than the AD model, we 
+  generated flux curves using only 1000 realizations at each pore length.
   
   %MRS: can you put a physical thesis here, not just a mathematical one?  Why is this change in parameters important to flux?
   The prefactor, $c$, in Equation~\ref{eqn:flux_decay} grows with increasing
@@ -2096,31 +2177,34 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   % BJC4: Say something about pore entry and exit as an improvement to the model
   
   We have tested two different mathematical frameworks for describing solute
-  motion in an H\textsubscript{II} phase LLC membrane. The values obtained for
-  the parameters when fitting the models to the time series data offer important
-  mechanistic insight on the molecular details of transport.
+  motion by applying them to an H\textsubscript{II} phase LLC membrane. The values
+  obtained for the parameters when fitting the models to the time series data 
+  offer important mechanistic insight on the molecular details of transport.
   Subordinated fractional Brownian and L\'evy motion have a nice theoretical 
   foundation in the anomalous diffusion literature. Our single mode model
   quantifies and allows comparison of the hopping and trapping behavior 
-  between solutes. A two mode model that describes dynamics based on whether
+  among solutes. A two mode model that describes dynamics based on whether
   a solute is in or out of the pore region allows us to break down individual
   solute motion into the two distinct regimes and we showed that solute motion is
   clearly restricted while in the tail region. Our Markov state-dependent dynamical
   model uses explicitly defined trapping mechanisms and gives a nice description 
   of transitions between these observed states, the equilibrium distribution of 
   solutes among states as well as the type of stochastic behavior shown in each 
-  state. However, it doesn't accurately portray correlated time series behavior
-  leading to overpredicted MSDs.
+  state. 
   
-  %MRS4: test/train in order to show power?
-  We believe that our models have moderate predictive power. 
-  %MRS4: be more precise on how superior is quantified below.
-  The anomalous
-  diffusion model has superior performance to the MSDDM. Both 1 and 2 mode 
-  sFBM and sFLM with truncated power law distributions predict MSDs close 
-  to those simulated with MD while the MSDDM significantly over-predicts MSDs.
-  One might have more success using the MSDDM with a system that exhibits
-  infrequent transitions between states.
+  All of the models we tested have moderate success reproducing the MSDs of
+  solute trajectories generated by MD simulations. In almost all cases, large 
+  portions of the MSDs predicted by our model fall within the 1-$\sigma$
+  confidence intervals of MD. Aside from inaccuracies in parameter estimates,
+  the most significant shortcoming of all models is their ability to 
+  accurately portray the curvature of the MSD curves. The MD MSD curves tend
+  to  become linear on long timescales, but the MSD curves generated by our
+  models have persistent curvature that may cause them to under-predict
+  the MSD on very long timescales.
+  
+  We demonstrated how one could used our models in order to to determine
+  macroscopic flux and selectivity.
+  %BJC5: I'll write the rest of this paragraph after I finish the MSDDM flux calculations.
 
   Our mathematical models help us think about how to design LLC monomers for 
   solute-specific separations by forcing us to think in terms of controlling 

@@ -187,7 +187,7 @@ class Dwell:
 class MeanFirstPassageTime:
 
     def __init__(self, L, n, nT, model, pickled_parameters=None, hop_params=None, dwell_params=None, dt=1., nbins=25,
-                 nt=1, save=True, concentration_profile=False, load_passage_times=None):
+                 nt=1, save=True, concentration_profile=False, load_passage_times=None, timeout=None):
         """ Generate trajectories from which to calculate mean first passage times. One can also use them to calculate
         the concentration profile within the pore
 
@@ -229,6 +229,8 @@ class MeanFirstPassageTime:
         :type concentration_profile: bool
         """
 
+        print('Simulating pore of length %.1f nm' % L)
+
         # trajectory building parameters
         self.length = L
         self.ntraj = n
@@ -248,6 +250,7 @@ class MeanFirstPassageTime:
         self.dwell_realization = None
         self.nT = nT
         self.bound = None
+        self.timeout = timeout
 
         self.store_traj = False
         if concentration_profile:
@@ -414,14 +417,20 @@ class MeanFirstPassageTime:
 
                 if np.abs(walk).max() >= self.length:
 
-                    dwells = self.dwell_realization(len(traj[-1]))
+                    #dwells = self.dwell_realization(len(traj[-1]))
+                    #dwells = np.ones(len(traj[-1]))
 
                     time = np.cumsum(dwells)
+                    #
+                    # plt.plot(time, traj[-1])
+                    # plt.show()
+                    # exit()
+
                     passage_times.append(time[-1] * self.dt)
 
             n += 1
 
-            print('\r%d/%d trajectories' % (len(passage_times), ntraj), end='')
+            print('\r%d/%d trajectories' % (len(passage_times), ntraj), end='', flush=True)
             #print(timer.time() - start)
 
         return trajectories, times, passage_times, n
@@ -445,7 +454,8 @@ class MeanFirstPassageTime:
     def _msddm_hops(self):
 
         # some hard sets for now
-        self.chains.generate_realizations(1, self.nT, bound=self.bound, m=256, Mlowerbound=4, nt=1, quiet=True)
+        self.chains.generate_realizations(1, self.nT, bound=self.bound, m=256, Mlowerbound=4, nt=1, quiet=True,
+                                          timeout=self.timeout)
 
         return self.chains.chains[:, 0]
 
@@ -836,6 +846,7 @@ if __name__ == "__main__":
     discretization_points = cfg['discretization_points']
     bins = cfg['bins']
     model = cfg['model']
+    timeout = cfg['timeout']
 
     print('sigma per step: %.2f' % (sigma * np.sqrt(dt)))
 
@@ -853,7 +864,7 @@ if __name__ == "__main__":
 
     mfpt = MeanFirstPassageTime(L, ntraj, nT, model, hop_params=hop_parameters, dwell_params=dwell_parameters, dt=dt,
                                 nbins=bins, nt=nt, save=save_trajectories, pickled_parameters=cfg['pickled_parameters'],
-                                concentration_profile=cfg['concentration'], load_passage_times=load)
+                                concentration_profile=cfg['concentration'], load_passage_times=load, timeout=timeout)
 
     #mfpt.mfpt(cfg['nboot'], method=cfg['mfpt']['method'], tstart=cfg['mfpt']['tstart'])
 

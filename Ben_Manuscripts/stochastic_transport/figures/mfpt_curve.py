@@ -80,27 +80,32 @@ def mfpt_analytical(passage_times, nbins, length, nboot, guess_params):
 
             #plt.hist(ptimes, nbins, density=True)
             #plt.show()
+            #exit()
 
         return boot
 
 correlation = True 
+msddm = True 
 root_dir = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/"
-nboot = 200 
+nboot = 50
 
 #residues = ['URE', 'GCL', 'MET', 'ACH']
 residues = np.array(['ACH', 'MET', 'URE', 'GCL'])
+#residues = np.array(['GCL'])
 colors = {'URE':'xkcd:blue', 'GCL':'xkcd:orange', 'MET':'xkcd:green', 'ACH':'xkcd:magenta'}
 names = {'URE': 'Urea', 'GCL': 'Ethylene Glycol', 'MET': 'Methanol', 'ACH': 'Acetic Acid'}
 names2 = {'URE': 'Urea', 'GCL': 'Ethylene\nGlycol', 'MET': 'Methanol', 'ACH': 'Acetic\nAcid'}
 
 guess_parameters = {'URE': [30, 1.5, 2.5], 'GCL': [30, 1.5, 2.5], 'MET': [np.exp(2.83), 1.7, 1], 'ACH': [np.exp(1.742), 1.6, 1]}
-if correlation:
+if correlation and not msddm:
 	Ls = {'URE': [10, 15, 20, 25, 30, 35, 40, 45, 50], 'GCL': [10, 15, 20, 25, 30, 35, 40, 45, 50], 'MET': [10, 15, 20, 25, 30, 35, 40, 45], 'ACH': [10, 15, 20, 25, 30, 35, 40, 45, 50]}
+elif msddm:
+	Ls = {'URE': [15, 20], 'MET': [10, 15, 20], 'ACH': [10, 15], 'GCL': [10, 15, 20]}
 else:
 	Ls = {'URE': [10, 15, 20, 25, 30, 35, 40, 45, 50], 'GCL': [10, 15, 20, 25, 30, 35, 40, 45, 50], 'MET': [10, 15, 20, 25, 30, 35, 40, 45, 50], 'ACH': [10, 15, 20, 25, 30, 35, 40, 45, 50]}
 
 ndx = {10:0, 15:1, 20:2, 25:3, 30:4, 35:5, 40:6, 45:7, 50:8}
-nbins = 100
+nbins = 50
 
 ########################
 # Flux and MFPT curves #
@@ -125,8 +130,12 @@ for j, r in enumerate(residues):
     mfpts = np.zeros([len(L), nboot])
 
     for i, l in enumerate(L):
+        if msddm:
+                path = '%s/msddm/passage_times_%s_%d.pl' % (workdir, r, l)
+        else:
+                path = '%s/passage_times_%s_%d.pl' % (workdir, r, l)
         print(l)
-        passage_times = file_rw.load_object('%s/passage_times_%s_%d.pl' % (workdir, r, l))
+        passage_times = file_rw.load_object(path)
         mfpts[i, :] = mfpt_analytical(passage_times, nbins, l, nboot, guess_parameters[r])
         mean[i], std[i] = mfpts[i, :].mean(), mfpts[i, :].std()
 
@@ -135,6 +144,7 @@ for j, r in enumerate(residues):
 
     params[j, :, 0] = np.exp(flux_b)
     params[j, :, 1] = flux_m
+    print(r, flux_m.mean())
     ax1.errorbar(L, fluxes.mean(axis=1), yerr=fluxes.std(axis=1), lw=2, elinewidth=2, capsize=5, capthick=2, color=colors[r])
     x = np.linspace(L[0], L[-1], 1000)
     if not correlation:
@@ -164,6 +174,14 @@ ax2.tick_params(labelsize=14)
 ax2.legend(fontsize=14)
 fig2.tight_layout()
 
+plt.show()
+
+print(params)
+exit()
+
+
+if msddm:
+	exit()
 if correlation:
     fig1.savefig('flux_curves.pdf')
     fig2.savefig('mfpt_curves.pdf')

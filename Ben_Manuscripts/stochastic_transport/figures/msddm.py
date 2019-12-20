@@ -49,7 +49,7 @@ load = False
 
 equil = {'GCL': 2400, 'URE': 2000, 'MET': 7000, 'ACH': 4000}  # frame number, not ns. (multiply ns by 2)
 truncate = {'GCL': 1.0, 'URE': 1.0, 'MET': 1.0, 'ACH': 1.0}
-m = 256
+m = 256 
 Mlowerbound = 64 
 #M = {'GCL': 8619, 'URE': 8253, 'MET': 11577, 'ACH': 7917}
 
@@ -85,15 +85,7 @@ if not load:
 	# probably easier to just re-run these calculations in the appropriate directory. 
 	# Doesn't matter which dwell/hop is used as they will be re-fit below
 	states = file_rw.load_object('%s/states.pl' % directory)
-	#print(states.hurst)
-	#exit()
-	diag = 0
-	for i in range(8):
-		diag += states.count_matrix[i, i]
 
-	offdiag = states.count_matrix.sum() - diag
-	print(diag, offdiag)
-	exit()
 	if extreme_trapping:
 		states.hurst[:, :] = 0
 	print(states.hurst.mean(axis=1))
@@ -103,11 +95,9 @@ if not load:
 	chains = Chain(states.count_matrix, states.fit_params, hurst_parameters=states.hurst, emission_function=levy_stable)
 	#chains = Chain(states.count_matrix, states.fit_params, hurst_parameters=None, emission_function=levy_stable)
 	chains.generate_realizations(ntraj, nsteps, bound=truncate[res], m=m, Mlowerbound=Mlowerbound, nt=nt)
+	file_rw.save_object(chains, '%s_msddm_chains_%s.pl' %(res, m))
 else:
-	chains = file_rw.load_object('%s_msddm_chains.pl' % res)
-
-print(chains.chains.shape)
-exit()
+	chains = file_rw.load_object('%s_msddm_chains.pl' % (res, m))
 
 chains.calculate_msd()
 chains.plot_msd(cutoff=fracshow, label='MSDDM', overlay=True, show=False)
