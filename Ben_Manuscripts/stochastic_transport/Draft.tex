@@ -1930,23 +1930,11 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   
   We used the 1-mode sFBMcut (see Table~\ref{table:anomalous_models}) anomalous 
   diffusion model and the MSDDM in order to demonstrate how one can use their realizations
-  in order to calculate the flux (section~\ref{method:mfpt}) of solutes given model 
+  in order to calculate the flux (see section~\ref{method:mfpt}) of solutes given model 
   parameters extracted from MD simulations. The 1-mode sFBMcut mode generates predictions
   similar to the 1-mode sFLMcut model at a lower computational cost and is far more
-  accurate than sFBM and sFLM. The 2-mode model has a broken correlation structure, so 
-  we do not consider it here.
-  
-  %MRS5: One question is if other method would lead to substantially
-  %different results for fluxes or selectivity.  May need too think
-  %about justification more if just one method is mentioned.
-  %BJC5: Added MSDDM
-
-  %MRS5: I think it might be useful to have at least visualizions of
-  %distribution of FPT and its fit. It might not be obvious to
-  %readers that the different mechanisms have distributions of FPT
-  %that are well decscribed by the relatively simple moving diffusion
-  %equation in eq 15. 
-  %BJC5: added to figure
+  accurate than sFBM and sFLM. The 2-mode AD model has a broken correlation structure, 
+  so we do not consider it here.
 
   %BJC4: not sure if the next couple paragraphs belong in methods 
   %MRS5: this could potentially be in methods.  Alternatives can be discussed there.
@@ -1968,8 +1956,9 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   particle flux for arbitrary length pores. We fit Equation~\ref{eqn:passage_times}
   to the empirical distribution of first passage times in Figure~\ref{fig:fpt_distributions}
   and used the expected value of the analytical equation to calculate flux from 
-  Equation~\ref{eqn:hill_relation}. As shown in Figure~\ref{fig:flux_curves}, 
-  the flux appears to scale according to a power law of the form:
+  Equation~\ref{eqn:hill_relation}. As shown in Figures~\ref{fig:flux_curves_ad} and
+  \ref{fig:flux_curves_msddm}, the flux appears to scale according to a power law 
+  of the form:
   \begin{equation}
   J(L) = cL^{-\beta} 
   \label{eqn:flux_decay}
@@ -1981,23 +1970,47 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   %BJC: should have a paragraph about c -- roughly follows their MSDs.
   \begin{figure}
   \centering
-  \begin{subfigure}{0.475\textwidth}
+  %BJC5: TODO: make same figure for msddm
+  \begin{subfigure}{0.325\textwidth}
   \includegraphics[width=\textwidth]{fpt_distributions.pdf}
   \caption{}\label{fig:fpt_distributions}
   \end{subfigure}
-  \begin{subfigure}{0.475\textwidth}
+  \begin{subfigure}{0.325\textwidth}
   \includegraphics[width=\textwidth]{flux_curves.pdf}
-  \caption{}\label{fig:flux_curves_regular}
+  \caption{sFBMcut}\label{fig:flux_curves_ad}
   \end{subfigure}
+  \begin{subfigure}{0.325\textwidth}
+  \includegraphics[width=\textwidth]{flux_curves_msddm.pdf}
+  \caption{MSDDM}\label{fig:flux_curves_msddm}
+  \end{subfigure}  
+  \caption{(a) The distributions of passage times generated from the sFBMcut model
+  fit well to Equation~\ref{eqn:passage_times}. We show similar fits for the remaining
+  solutes as well as the MSDDM in Figures~\ref{S-fig:ad_fpt_fits} and~\ref{S-fig:msddm_fpt_fits}
+  of the Supporting Information. (b) The single particle flux measured 
+  by the sFBMcut AD model and (c) the MSDDM decays with increasing pore length. 
+  The rankings of solute fluxes are consistent with the MSDs predicted by each model.
+  The ranking of the MSDDM is most consistent with MD MSDs. The MSDDM predicts higher
+  fluxes than the sFBMcut model. We fit the single particle solute flux versus pore
+  length, $L$, to a power law function of the form $cL^{-\beta}$ (dashed lines in (b)
+  and (c)). 
+%  Solutes with higher fluxes have higher values of $c$. Solutes with 
+%  smaller Hurst parameters, $H$, have larger values of $\beta$. (c) If we remove 
+%  correlation between hops (set $H$=0.5), the flux increases significantly and 
+%  $\beta \sim 2$ for all solutes independent of dwell distribution
+%  parameters.
+  }\label{fig:flux_curves}
+  \end{figure}
+  
+  
   % BJC: could use better color scheme. Maybe outline hurst parameters
-  \begin{subfigure}{0.475\textwidth}
-  \includegraphics[width=\textwidth]{c_parameters.pdf}
-  \caption{}\label{fig:c_parameters}
-  \end{subfigure}
-  \begin{subfigure}{0.475\textwidth}
-  \includegraphics[width=\textwidth]{beta_parameters.pdf}
-  \caption{}\label{fig:beta_parameters}
-  \end{subfigure}
+%  \begin{subfigure}{0.475\textwidth}
+%  \includegraphics[width=\textwidth]{c_parameters.pdf}
+%  \caption{}\label{fig:c_parameters}
+%  \end{subfigure}
+%  \begin{subfigure}{0.475\textwidth}
+%  \includegraphics[width=\textwidth]{beta_parameters.pdf}
+%  \caption{}\label{fig:beta_parameters}
+%  \end{subfigure}
 %  \begin{subfigure}{0.475\textwidth}
 %  \includegraphics[width=\textwidth]{mfpt_curves.pdf}
 %  \caption{}\label{fig:mfpt_curves}
@@ -2014,51 +2027,84 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 %  \end{subfigure}
   %MRS5: the b) pane is a little messy.  If c) is moved to the supporting, maybe can make b into two figures, and 
   % have each just show 1 point? 
-  \caption{(a) The single particle solute flux decays with increasing pore length. 
-  Solutes with high MSDs have higher fluxes. (b) We fit the single particle solute flux 
-  versus pore length, $L$, to a power law function of the form $cL^{-\beta}$ (dashed 
-  lines in (a)). Solutes with higher fluxes have higher values of $c$. Solutes with 
-  smaller Hurst parameters, $H$, have larger values of $\beta$. (c) If we remove 
-  correlation between hops (set $H$=0.5), the flux increases significantly and 
-  $\beta \sim 2$ for all solutes independent of dwell distribution
-  parameters.}\label{fig:flux_curves}
+
+  We determined that it is only necessary to simulate 1000 realizations of each model
+  in order to parameterize Equation~\ref{eqn:flux_decay}. We used 10000 trajectory
+  realizations in order to generate each point in Figure~\ref{fig:flux_curves_ad}, 
+  however, in Figure~\ref{S-fig:flux_curve_sensitivity} of the Supporting information,
+  we show that one can still show statistically significant differences in solute 
+  flux, with minimal change to the mean flux values, using as few as 100 trajectory
+  realizations. To be sure, we recommend simulating at least 1000 realizations. 
+  Since the computational cost of the MSDDM is greater than the AD model, we generated
+  each point of the flux curves in Figure~\ref{fig:flux_curves_msddm} using only 1000
+  realizations at each pore length. 
+  
+  Anti-correlation between solute hops has a significant effect on the scaling
+  of solute flux with pore length. In Figure~\ref{fig:beta_hurst}, we show that 
+  $\beta$, as derived from the sFBMcut model, is inversely related to the Hurst
+  parameter while $\beta$, as derived from the MSDDM, shows no discernible
+  trend.
+  
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.43\textwidth}
+  \includegraphics[width=\textwidth]{beta_hurst.pdf}
+  \caption{}\label{fig:beta_hurst}
+  \end{subfigure}
+  \begin{subfigure}{0.52\textwidth}
+  \includegraphics[width=\textwidth]{beta_parameters.pdf}
+  \caption{}\label{fig:beta_parameters}
+  \end{subfigure}
   \end{figure}
   
-  %MRS5: Does't fitting to eq 15 cut down on the expense of the number of trajectories
-  %by a fair amount?  Should there be some discussion of this? 
-  %BJC5: added this
-  It is only necessary to simulate 1000 realizations of each model in order to
-  parameterize Equation~\ref{eqn:flux_decay}. We used 10000 trajectory realizations 
-  in order to generate Figure~\ref{fig:flux_curves}, however, in Figure~\ref{S-fig:flux_curve_sensitivity}
-  of the Supporting information, we show that one can still show statistically
-  significant differences in solute flux with as little as 100 trajectory 
-  realizations. To be sure, we recommend simulating at least 1000 realizations. 
-  Since the computational cost of the MSDDM is greater than the AD model, we 
-  generated flux curves using only 1000 realizations at each pore length.
-  
-  %MRS: can you put a physical thesis here, not just a mathematical one?  Why is this change in parameters important to flux?
-  The prefactor, $c$, in Equation~\ref{eqn:flux_decay} grows with increasing
-  solute MSD while the value of the growth exponent, $\beta$, is inversely 
-  related to the Hurst parameter, $H$ (see Figure~\ref{fig:flux_parameters}).
-  In Figure~\ref{fig:flux_curves_brownian}, we removed the correlation 
-  structure (set $H$=0.5) from AD trajectory realizations so that all hops 
-  were uncorrelated. Regardless of the parameters of the dwell time distribution,
-  the growth exponent is always about 2, the same value that we observe for 
-  Brownian motion (see Figure~\ref{S-fig:mfpt_curve_brownian} of the 
-  Supporting Information). 
+%  \begin{figure}
+%  \centering
+%  % bar charts
+%%  \begin{subfigure}{0.45\textwidth}
+%%  \includegraphics[width=\textwidth]{c_parameter_comparison.pdf}
+%%  \end{subfigure}
+%%  \begin{subfigure}{0.45\textwidth}
+%%  \includegraphics[width=\textwidth]{beta_parameter_comparison.pdf}
+%%  \end{subfigure}
+%  \includegraphics[width=0.5\textwidth]{beta_c_parameter_comparison.pdf}
+%  \caption{}\label{fig:flux_parameters}
+%  \end{figure}
 
   %MRS5: probably the figure showing beta \sim 2 can be in supporting
   %information, and you just state the result here.
-  
-  Comparison of Figures~\ref{fig:flux_curves_regular} and~\ref{fig:flux_curves_brownian}
-  highlights that anti-correlation between hops plays a major role in solute flux.
-  With a pore length of 50 nm, the flux of the fasted moving solute, ethylene glycol is 
-  c.a. 5 times lower with versus without anti-correlated hops. The flux of the slowest
-  moving solute, acetic acid, is about 16 times lower by the same comparison. This 
-  difference will only grow with increasing pore length. Note also that the ranking
-  of solute fluxes changes. Methanol jumps from the second lowest to the highest
-  flux when we remove hop correlation. The high degree of anti-correlation among
-  hops made by methanol outweighs its relatively wide hop length distribution.
+  %MRS: can you put a physical thesis here, not just a mathematical one?  Why is this change in parameters important to flux? 
+%  The prefactor, $c$, in Equation~\ref{eqn:flux_decay} grows with increasing
+%  solute MSD while the value of the growth exponent, $\beta$, is inversely 
+%  related to the Hurst parameter, $H$ (see Figure~\ref{fig:flux_parameters}).
+%  In Figure~\ref{fig:flux_curves_brownian}, we removed the correlation 
+%  structure (set $H$=0.5) from AD trajectory realizations so that all hops 
+%  were uncorrelated. Regardless of the parameters of the dwell time distribution,
+%  the growth exponent is always about 2, the same value that we observe for 
+%  Brownian motion (see Figure~\ref{S-fig:mfpt_curve_brownian} of the 
+%  Supporting Information). 
+
+% BJC: following is wrong
+%  Dwell times between hops have a significant effect on the length dependence
+%  of solute flux. The values of $\beta$ fit to realizations of the sFBMcut AD
+%  model are significantly higher than the MSDDM. As evident by comparison of 
+%  Figures~\ref{fig:msddm_eyetest} and~\ref{fig:ad_eyetest}, realizations of the
+%  AD model exhibit much longer and more frequent periods of immobility. If we
+%  generate realizations of the sFBMcut model without trapping (dwell times are
+%  all 1 time step), the value of $\beta$ drops to 2 in all cases. In fact, we
+%  observe the same value of $\beta$ for Brownian motion (see Figure blah of the 
+%  Supporting Information) which implies that the Hurst parameter has no effect
+%  on the length dependence of flux.
+%  
+%  Comparison of Figures~\ref{fig:flux_curves_regular} and~\ref{fig:flux_curves_brownian}
+%  highlights that anti-correlation between hops plays a major role in solute flux.
+%  With a pore length of 50 nm, the flux of the fasted moving solute, ethylene glycol is 
+%  c.a. 5 times lower with versus without anti-correlated hops. The flux of the slowest
+%  moving solute, acetic acid, is about 16 times lower by the same comparison. This 
+%  difference will only grow with increasing pore length. Note also that the ranking
+%  of solute fluxes changes. Methanol jumps from the second lowest to the highest
+%  flux when we remove hop correlation. The high degree of anti-correlation among
+%  hops made by methanol outweighs its relatively wide hop length distribution.
   
 %MRS: can you connect directly to $\beta$ and $c$ here?  Important to
 %make connections between macroscopic parameters and the molecular

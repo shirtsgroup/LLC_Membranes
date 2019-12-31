@@ -88,7 +88,7 @@ class Hops:
 
     def _set_gaussian_params(self, params):
 
-        params[2] = 0.5  # for speed while testing
+        #params[2] = 0.5  # for speed while testing
 
         self.params = (params[1], self.params[1], params[2], self.params[3])
 
@@ -293,8 +293,14 @@ class MeanFirstPassageTime:
 
         self.bound = hop_params['max_hop']
 
+        fbm = False
+        try:
+            fbm = hop_params['fbm']
+        except KeyError:
+            pass
+
         self.chains = Chain(states.count_matrix, states.fit_params, hurst_parameters=states.hurst,
-                            emission_function=levy_stable, speedup=speedup, bound=self.bound)
+                            emission_function=levy_stable, speedup=speedup, bound=self.bound, fbm=fbm)
 
     def _load_anomalous_diffusion_params(self, hop_params, dwell_params, pickled_parameters):
 
@@ -418,7 +424,7 @@ class MeanFirstPassageTime:
                 if np.abs(walk).max() >= self.length:
 
                     #dwells = self.dwell_realization(len(traj[-1]))
-                    #dwells = np.ones(len(traj[-1]))
+                    dwells = np.ones(len(traj[-1]))
 
                     time = np.cumsum(dwells)
                     #
@@ -454,7 +460,7 @@ class MeanFirstPassageTime:
     def _msddm_hops(self):
 
         # some hard sets for now
-        self.chains.generate_realizations(1, self.nT, bound=self.bound, m=256, Mlowerbound=4, nt=1, quiet=True,
+        self.chains.generate_realizations(1, self.nT, bound=self.bound, m=256, Mlowerbound=6000, nt=1, quiet=True,
                                           timeout=self.timeout)
 
         return self.chains.chains[:, 0]

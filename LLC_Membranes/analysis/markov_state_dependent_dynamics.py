@@ -599,7 +599,7 @@ class States:
 class Chain:
 
     def __init__(self, count_matrix, emission_parameters, hurst_parameters=None, emission_function=levy_stable,
-                 bound=7.6, speedup=True):
+                 bound=7.6, speedup=True, fbm=False):
         """ Generate markov chains based on a probability transition matrix and some emission paramters describing the
         observations.
 
@@ -637,12 +637,22 @@ class Chain:
         self.limits = None
         self.bound = bound
         self.timeout = None
+        self.fbm = fbm
+        self.gaussian_params = None
 
         self.average_params = None
         self.truncated_distributions = None
         self.flms = None
 
-        if self.hurst_parameters is not None:
+        if self.hurst_parameters is None:
+
+            raise Exception('You must provide a distribution of Hurst parameters')
+
+        elif self.fbm:
+
+            self._convert_levy_to_gaussian()
+
+        else:
 
             print('Generating Interpolator Objects ...', end='', flush=True)
             self.hurst_interpolator = flm_sim_params.HurstCorrection()
@@ -657,6 +667,24 @@ class Chain:
                 self._get_average_params()
 
                 self._get_truncated_distributions()
+
+    def _convert_levy_to_gaussian(self):
+        """ Convert truncated levy distribution to a Gaussian distribution by taking the standard deviation of the
+        truncated distribution. Assumes zero skew and zero mean.
+        """
+
+        self.gaussian_params = np.zeros(self.nstates + 1)
+
+        print('Converting truncated Levy distribution to Gaussian...', flush=True)
+        for s in tqdm.tqdm(range(self.nstates + 1)):
+
+            alpha, scale = self.emission_parameters[s, [0, 2]]
+
+            levy = sampling.TruncatedLevyDistribution(self.bound, alpha, scale, 1000000, beta=0, mean=0)
+
+            self.gaussian_params[s] = np.std(levy.empirical_distribution)
+
+        print('Done!')
 
     def _get_average_params(self):
 
@@ -682,12 +710,15 @@ class Chain:
 
     def _get_truncated_distributions(self):
 
+        # BJC: I think this might be wrong. You should get alpha and scale from the original emission params
+
         print('Creating empirical truncated Levy stable distributions ...', flush=True, end='')
         self.truncated_distributions = []
         for s in tqdm.tqdm(range(self.nstates + 1)):
             self.truncated_distributions.append(
                 sampling.TruncatedLevyDistribution(self.bound, self.average_params['alpha'][s],
                                                    self.average_params['scale'][s], 1000000, beta=0, mean=0))
+            # self.average_params['scale'][s] = np.std(self.truncated_distributions[s].sample(10000))  # REMOVE!
         print('Done!')
 
     def _initialize_flm(self):
@@ -729,7 +760,7 @@ class Chain:
         """
 
         # allow resetting of bound from that passed to __init__
-        if np.abs(self.bound - bound) > 0.0001:
+        if np.abs(self.bound - bound) > 0.0001 and not self.fbm:
 
             self.bound = bound
 
@@ -740,7 +771,7 @@ class Chain:
                 self._get_truncated_distributions()
 
         # if bound isn't reset but speedup is passed and it wasn't passed to __init__
-        elif speedup and self.average_params is None:
+        elif speedup and self.average_params is None and not self.fbm:
 
             self._get_average_params()
 
@@ -781,12 +812,6 @@ class Chain:
         else:
 
             self.chains, self.states = self._realizations(n, length, bound, quiet)
-
-        # for i in tqdm.tqdm(range(n)):
-        #     self.chains[:, i], self.states[:, i] = self._realization(length, bound=bound)
-
-        #     plt.plot(self.chains[:, i])
-        # plt.show()
 
     def _realizations(self, n, length, bound, quiet):
         """ Generate multiple realization of Markov chain. This function exists by itself to aid parallelization
@@ -865,11 +890,18 @@ class Chain:
                 elif dwell == 2:
 
                     # one data point so generate single point from emission distribution to save time
-                    rv = bound + 1
-                    while np.abs(rv) > bound:
-                        rv = self.emission_function.rvs(self.emission_parameters[states[t], 0], 0,
-                                                        loc=self.emission_parameters[states[t], 1],
-                                                        scale=self.emission_parameters[states[t], 2])
+                    if self.fbm:  # this section could definitely be written better
+
+                        rv = np.random.normal(0, self.gaussian_params[states[t]], 1)
+
+                    else:
+
+                        rv = bound + 1
+                        while np.abs(rv) > bound:
+
+                                rv = self.emission_function.rvs(self.emission_parameters[states[t], 0], 0,
+                                                                loc=self.emission_parameters[states[t], 1],
+                                                                scale=self.emission_parameters[states[t], 2])
 
                     traj[t + 1] = rv
                     #traj[t + 1] = self._flm_sequence(1, states[t], bound=bound)
@@ -894,40 +926,61 @@ class Chain:
         :rtype: numpy.ndarray
         """
 
-        # for efficiency, make sure m * (l + M) is a power of 2
-        M = l + self.Mlowerbound
+        if not self.fbm:
 
-        # if state == 8:
-        #     M = 200000
+            if state != 8:
 
-        n = np.log(M) / np.log(2)
-        M = int(2 ** np.ceil(n) - l)
+                return np.zeros(l)
 
-        if self.average_params is not None:
+            else:
 
-            alpha = self.average_params['alpha'][state]
-            scale = self.average_params['scale'][state]
-            corrected_H = self.average_params['corrected_H'][state]
-            corrected_bound = self.average_params['corrected_bound'][state]
+                # for efficiency, ensure m * (l + M) is a power of 2
+                M = l + self.Mlowerbound
+                n = np.log(M) / np.log(2)
+                M = int(2 ** np.ceil(n) - l)
+
+                if self.average_params is not None:
+
+                    alpha = self.average_params['alpha'][state]
+                    scale = self.average_params['scale'][state]
+                    corrected_H = self.average_params['corrected_H'][state]
+                    corrected_bound = self.average_params['corrected_bound'][state]
+
+                else:
+
+                    H = np.random.choice(self.hurst_parameters[state])  # random hurst parameter from transition distribution
+                    alpha, scale = self.emission_parameters[state, [0, 2]]
+                    corrected_bound = self.truncation_interpolator.interpolate(H, alpha, bound, scale)
+                    corrected_H = self.hurst_interpolator.interpolate(H, alpha)
+
+                trunc_dist = None
+                if self.truncated_distributions is not None:
+                    trunc_dist = self.truncated_distributions[state]
+
+                flm = FLM(corrected_H, alpha, m=self.m, M=M, N=l, scale=scale, truncate=corrected_bound,
+                          correct_hurst=False, correct_truncation=False)
+
+                # generate a single realization
+                flm.generate_realizations(1, progress=False, truncated_distribution=trunc_dist)
+
+                #H = self.average_params['hurst'][state]
+
+                #return scale * fbm.FBM(int(l), H, method="daviesharte").fgn() / ((1.0 / l) ** H)
+
+                return flm.noise[0, :l]
 
         else:
 
-            H = np.random.choice(self.hurst_parameters[state])  # random hurst parameter from transition distribution
-            alpha, scale = self.emission_parameters[state, [0, 2]]
-            corrected_bound = self.truncation_interpolator.interpolate(H, alpha, bound, scale)
-            corrected_H = self.hurst_interpolator.interpolate(H, alpha)
+            H = np.random.choice(self.hurst_parameters[state])
+            scale = self.gaussian_params[state]
 
-        trunc_dist = None
-        if self.truncated_distributions is not None:
-            trunc_dist = self.truncated_distributions[state]
+            if state != 8:
 
-        flm = FLM(corrected_H, alpha, m=self.m, M=M, N=l, scale=scale, truncate=corrected_bound,
-                  correct_hurst=False, correct_truncation=False)
+                return np.zeros(l)
 
-        # generate a single realization
-        flm.generate_realizations(1, progress=False, truncated_distribution=trunc_dist)
+            else:
 
-        return flm.noise[0, :l]
+                return scale * fbm.FBM(int(l), H, method="daviesharte").fgn() / ((1.0 / l) ** H)
 
         # if state == 8:
         #     # flm = FLM(corrected_H, alpha, m=self.m, M=M, N=l, scale=scale, truncate=corrected_bound,

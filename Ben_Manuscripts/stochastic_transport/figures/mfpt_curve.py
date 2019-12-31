@@ -87,7 +87,7 @@ def mfpt_analytical(passage_times, nbins, length, nboot, guess_params):
 correlation = True 
 msddm = True 
 root_dir = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/"
-nboot = 50
+nboot = 200 
 
 #residues = ['URE', 'GCL', 'MET', 'ACH']
 residues = np.array(['ACH', 'MET', 'URE', 'GCL'])
@@ -100,7 +100,7 @@ guess_parameters = {'URE': [30, 1.5, 2.5], 'GCL': [30, 1.5, 2.5], 'MET': [np.exp
 if correlation and not msddm:
 	Ls = {'URE': [10, 15, 20, 25, 30, 35, 40, 45, 50], 'GCL': [10, 15, 20, 25, 30, 35, 40, 45, 50], 'MET': [10, 15, 20, 25, 30, 35, 40, 45], 'ACH': [10, 15, 20, 25, 30, 35, 40, 45, 50]}
 elif msddm:
-	Ls = {'URE': [15, 20], 'MET': [10, 15, 20], 'ACH': [10, 15], 'GCL': [10, 15, 20]}
+	Ls = {'URE': [10, 15, 20, 25, 30, 35, 40], 'MET': [10, 15, 20, 25, 30, 35, 40], 'ACH': [10, 15, 20, 25, 30, 35], 'GCL': [10, 15, 20, 25, 30, 35, 40]}
 else:
 	Ls = {'URE': [10, 15, 20, 25, 30, 35, 40, 45, 50], 'GCL': [10, 15, 20, 25, 30, 35, 40, 45, 50], 'MET': [10, 15, 20, 25, 30, 35, 40, 45, 50], 'ACH': [10, 15, 20, 25, 30, 35, 40, 45, 50]}
 
@@ -144,7 +144,7 @@ for j, r in enumerate(residues):
 
     params[j, :, 0] = np.exp(flux_b)
     params[j, :, 1] = flux_m
-    print(r, flux_m.mean())
+
     ax1.errorbar(L, fluxes.mean(axis=1), yerr=fluxes.std(axis=1), lw=2, elinewidth=2, capsize=5, capthick=2, color=colors[r])
     x = np.linspace(L[0], L[-1], 1000)
     if not correlation:
@@ -174,23 +174,23 @@ ax2.tick_params(labelsize=14)
 ax2.legend(fontsize=14)
 fig2.tight_layout()
 
-plt.show()
-
-print(params)
-exit()
-
-
-if msddm:
-	exit()
 if correlation:
-    fig1.savefig('flux_curves.pdf')
-    fig2.savefig('mfpt_curves.pdf')
+    if msddm:
+        fig1.savefig('flux_curves_msddm.pdf')
+        fig2.savefig('mfpt_curves_msddm.pdf')
+        file_rw.save_object(params, 'flux_params_msddm.pl')
+
+    else:
+        fig1.savefig('flux_curves.pdf')
+        fig2.savefig('mfpt_curves.pdf')
+        file_rw.save_object(params, 'flux_params_ad.pl')
+
 else:
     fig1.savefig('flux_curves_brownian.pdf')
     fig2.savefig('mfpt_curves_brownian.pdf')
     plt.show()
     exit()
-
+exit()
 ####################
 # Selectivity Plot #
 ####################
@@ -217,8 +217,13 @@ plt.xlabel('Pore length ($\mu m$)', fontsize=14)
 plt.ylabel('Selectivity', fontsize=14)
 plt.tick_params(labelsize=14)
 plt.tight_layout()
-#plt.savefig('selectivity.pdf')
+if msddm:
+    plt.savefig('selectivity_msddm.pdf')
+else:
+    plt.savefig('selectivity.pdf')
 
+plt.show()
+exit()
 #######################
 # Parameter Bar Chart #
 #######################
@@ -275,7 +280,7 @@ bar1.tick_params(labelsize=14)
 bar1.set_ylabel('c', fontsize=14)
 
 fig1.tight_layout()
-fig1.savefig('c_parameters.pdf')
+#fig1.savefig('c_parameters.pdf')
 
 fig, ax = plt.subplots()
 ax2 = ax.twinx()
@@ -299,6 +304,6 @@ ax2.set_ylim(0.2, 0.45)
 plt.xticks(np.arange(1, 5), [names2[r] for r in residues[reordered]])
 
 fig.tight_layout()
-fig.savefig('beta_parameters.pdf')
+#fig.savefig('beta_parameters.pdf')
 
 plt.show()
