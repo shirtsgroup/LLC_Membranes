@@ -189,8 +189,7 @@ else:
     fig1.savefig('flux_curves_brownian.pdf')
     fig2.savefig('mfpt_curves_brownian.pdf')
     plt.show()
-    exit()
-exit()
+
 ####################
 # Selectivity Plot #
 ####################
@@ -216,6 +215,9 @@ plt.legend(fontsize=12)
 plt.xlabel('Pore length ($\mu m$)', fontsize=14)
 plt.ylabel('Selectivity', fontsize=14)
 plt.tick_params(labelsize=14)
+if msddm:
+	plt.ylim(0, 4)
+
 plt.tight_layout()
 if msddm:
     plt.savefig('selectivity_msddm.pdf')

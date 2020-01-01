@@ -1,4 +1,16 @@
 \documentclass{article}
+
+% Table of contents formatting
+\usepackage{tocloft}
+
+\renewcommand\cftsecfont{\normalfont}
+\renewcommand\cftsecpagefont{\normalfont}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftsecdotsep}}
+\renewcommand\cftsecdotsep{\cftdot}
+\renewcommand\cftsubsecdotsep{\cftdot}
+\cftsetindents{section}{0em}{3em}
+%\cftsetindents{subsection}{1em}{3em}
+
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage{subcaption}
@@ -37,8 +49,11 @@ Phase Lyotropic Liquid Crystal Membrane}
 \begin{document}
 
   \maketitle
+  \tableofcontents
   \graphicspath{{./supporting_figures/}}
   \bibliographystyle{ieeetr}
+  
+  \newpage  
   
   \section{Setup and analysis scripts}\label{section:python_scripts}
 
@@ -70,7 +85,8 @@ Phase Lyotropic Liquid Crystal Membrane}
   \texttt{/timeseries/ctrwsim.py}            & 2.2 & Generate realizations of a continuous time random walk with the user's choice of dwell and hop distributions \\\hline
   \texttt{/timeseries/forecast\_ctrw.py}     & 2.2 & Combines classes from \texttt{sfbm\_parameters.py} and \texttt{ctrwsim.py} to parameterize and predict MSD in one shot. \\\hline
   \texttt{/analysis/ markov\_state\_dependent\_dynamics.py} & 2.3 & Identify frame-by-frame state of each solute, construct a transition matrix and simulate realizations of the MSDDM model. \\\hline
-
+  \texttt{/timeseries/mfpt\_pore.py}          & 2.4 & Simulate mean first passage time distributions using the AD or MSDDM model. \\\hline
+  
   \end{tabular}
 
   \caption{The first column provides the names of the python scripts available in
@@ -83,6 +99,8 @@ Phase Lyotropic Liquid Crystal Membrane}
 
   \end{table}
   
+  \newpage
+  
   \section{Solute Equilibration}\label{section:equilibration}
   
   We collected all data used for model generation after the solutes were 
@@ -92,7 +110,7 @@ Phase Lyotropic Liquid Crystal Membrane}
   versus time in Figure~\ref{fig:equilibration} and indicated the chosen
   equilibration time points.
   
-  \begin{figure}
+  \begin{figure}[hb]
   \centering
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{URE_equilibration.pdf}
@@ -114,9 +132,9 @@ Phase Lyotropic Liquid Crystal Membrane}
   between the tails and pore plateaued. Our chosen equilibration point for each
   solute is indicated by the vertical black dashed line. (a) Urea equilibrates
   the fastest, after 1000 ns. (b) Ethylene glycol equilibrates after 1200 ns 
-  (c) Acetic Acid does not equilibrate until 4400 ns. (d) We considered methanol
-  to be equilibrated after 3500 ns. Methanol nearly completely partitions into
-  the tails.}\label{fig:equilibration}
+  (c) The partition of acetic acid appears oscillate slowly. We considered it to be
+  equilibrated after 2000 ns. (d) We considered methanol to be equilibrated after
+  3500 ns. Methanol nearly completely partitions into the tails.}\label{fig:equilibration}
   \end{figure}
 
 %  \section{Choosing a transport model}\label{section:transport_model_selection}
@@ -216,6 +234,7 @@ Phase Lyotropic Liquid Crystal Membrane}
 
   
   \newpage
+  
   \section{Estimating the Hurst Parameter}\label{section:H_estimate}
   
   We chose to estimate the Hurst parameter, $H$ by a least squares fit to the analytical
@@ -237,9 +256,20 @@ Phase Lyotropic Liquid Crystal Membrane}
   % /supporting_figures/hurst_autocorrelation.py
   \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{hurst_autocorrelation.pdf}
-  \caption{The analytical autocorrelation function of FBM decays to zero faster when 
-  H $<$ 0.5 compared to when H $>$ 0.5.}\label{fig:hurst_autocorrelation}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{hurst_autocorrelation.pdf}
+  \caption{}\label{fig:hurst_autocorrelation}
+  \end{subfigure}
+  % supporting_figures/flm_autocov.py
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{flm_autocovariance.pdf}
+  \caption{}\label{fig:flm_autocorrelation}
+  \end{subfigure}
+  \caption{(a) The analytical autocorrelation function of FBM decays to zero faster
+  when H $<$ 0.5 compared to when H $>$ 0.5. (b) The autocorrelation function of an 
+  FLM process does not change with increasing sequence length (N). It shares the same
+  autocorrelation function as fractional Brownian motion (FBM). All sequenced used to
+  make this plot were generated using $H$=0.35 and, for FLM, $\alpha$=1.4.}\label{fig:hurst_parameters}
   \end{figure}
   
   The autocovariance function of fractional L\'evy motion is different from fractional
@@ -259,92 +289,13 @@ Phase Lyotropic Liquid Crystal Membrane}
   number of observations per generated sequence. For all simulations we set $H$=0.35 
   and $\alpha$=1.4. The variance-normalized autocovariance function, i.e. the autocorrelation
   function, does not change with increasing sequence length. Additionally, the
-  autocorrelation function of FBM, with the same $H$, is the same.
+  autocorrelation function of FBM, with the same $H$, is the same. Therefore we are 
+  confident that we can use the same Hurst parameter as an input to both FBM and FLM
+  simulations.
   
-  % supporting_figures/flm_autocov.py
-  \begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{flm_autocovariance.pdf}
-  \caption{The autocorrelation function of an FLM process does not change with 
-  increasing sequence length (N). It shares the same autocorrelation function as
-  fractional Brownian motion (FBM). All sequenced used to make this plot were 
-  generated using $H$=0.35 and, for FLM, $\alpha$=1.4.}\label{fig:flm_autocorrelation}
-  \end{figure}
+  \newpage
   
   \section{Simulating Fractional L\'evy Motion}\label{section:sFLM}
-
-  \subsection{Truncated L\'evy stable hop distributions}\label{section:truncation}
-  
-  \textit{Determining where to truncate the hop distribution:} A pure
-  L\'evy stable distribution has heavy tails which can lead to arbitrarily
-  long hop lengths. Our distribution of hop lengths fits well to a L\'evy
-  distribution near the mean, but under samples the tails. In 
-  Figure~\ref{fig:truncation_correction} we compare the empirically 
-  measured transition emission distribution of the MSDDM for Urea to its maximum likelihood fit to
-  a L\'evy stable distribution. The ratio between the two distributions 
-  at each bin is nearly 1 close to the center, indicating a near-perfect
-  fit, larger than 1 slightly further from the center, suggesting that 
-  we slightly over sample intermediate hop lengths, and below 1 far from 
-  the center, indicating under sampling of extremely long hop lengths.
-  Based on the plot, we chose a cut-off of 0.8 nm in order to compensate for
-  over sampled intermediate hop lengths. We used the same procedure
-  to determine truncation parameters for all solutes.
-  
-  \begin{figure}
-  \centering
-  \includegraphics[width=0.75\textwidth]{truncation_cutoff.pdf}
-  \caption{The ratio between the empirical and maximum likelihood theoretical
-  distribution quantifies the quality of fit as function of hop length. The fit
-  is near-perfect close to the mean. Intermediate hop lengths are over sampled, 
-  and the tails are under sampled. We used this type of plot to determine the
-  appropriate place to truncate the L\'evy stable distributions.}\label{fig:truncation_cutoff}
-  \end{figure}
-  
-  \textit{Generating FLM realizations from a truncated L\'evy distribution:}
-  To generate realizations from an uncorrelated truncated L\'evy process, one would
-  randomly sample from the base distribution and replace values that are too large
-  with new random samples from the base distribution, repeating the process until
-  all samples are under the desired cut-off. 
-  
-  This procedure is complicated by the correlation structure of FLM. At a high level,
-  Stoev and Taqqu use Riemann-sum approximations of the stochastic integrals defining
-  FLM in order to generate realizations. They do this efficiently with the help of 
-  Fast Fourier Transforms. In practice, this requires one to Fourier transform a zero-padded
-  vector of random samples drawn from the appropriate L\'evy stable distribution, multiply
-  the vector in Fourier space by a kernel function and invert back to real space. The end
-  result is a correlated vector of fractional L\'evy noise.
-  
-  If one is to truncate an FLM process, one can apply the simple procedure above for 
-  drawing uncorrelated values from the marginal L\'evy stable distribution, but after
-  adding correlation, the maximum drawn value is typically lower than the limit set 
-  by the user. Additionally, the shape of the distribution itself changes. Analogous
-  to the database used to correct the Hurst parameter, we created a database to 
-  correct the input truncation parameter (the maximum desired draw). The database
-  returns the value of the truncation parameter that will properly truncate the
-  output marginal distribution based on $H$, $\alpha$ and $\sigma$ (the width parameter).
-  Figure~\ref{fig:truncation_correction} shows the result of applying our correction.
-  Note that generating this database requires a significant amount of simulation and
-  still likely doesn't perfectly correct the truncation parameter. The output leads
-  to a somewhat fuzzy, rather than abrupt, cut-off of the output distribution. This 
-  is likely beneficial since we observe a small proportion of hops longer the chosen
-  truncation cut-off. When the cut-off value is close to the L\'evy stable $\sigma$ parameter,
-  as it is in our anomalous diffusion models, we observed that the tails of the 
-  truncated distribution tend to be undersampled. In order to maintain the distribution's 
-  approximate shape up to the cut-off value we recommend ensuring that the cut-off
-  value is at least 2 times $\sigma$. However, this may lead to a slight over-prediction
-  of the MSD.
-  
-  \begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{truncation_correction.pdf}
-  \caption{We can accurately truncate the marginal distribution of FLM innovations by
-  applying a correction to the input truncation parameter. We generated FLM sequences
-  and truncated the initial L\'evy stable distribution (before Fourier transforming) at 
-  a value of 0.5. After correlation structure is added, the width of the distribution 
-  of fractional L\'evy noise decreases significantly. We corrected the input truncation
-  parameter with our database resulting in a distribution close to the theoretical
-  distribution (black dashed line) with a maximum value close to 0.5.}\label{fig:truncation_correction}
-  \end{figure}
   
   \subsection{Achieving the right correlation structure}\label{section:flm_correlation}
   
@@ -379,6 +330,81 @@ Phase Lyotropic Liquid Crystal Membrane}
   function. Without the correction, $H$ is underestimated, meaning realizations are 
   more negatively correlated than they should be.}\label{fig:hurst_correction}
   \end{figure}
+
+  \subsection{Truncated L\'evy stable hop distributions}\label{section:truncation}
+  
+  \textit{Determining where to truncate the hop distribution:} A pure
+  L\'evy stable distribution has heavy tails which can lead to arbitrarily
+  long hop lengths. Our distribution of hop lengths fits well to a L\'evy
+  distribution near the mean, but under samples the tails. In 
+  Figure~\ref{fig:truncation_correction} we compare the empirically 
+  measured transition emission distribution of the MSDDM for urea to its maximum likelihood fit to
+  a L\'evy stable distribution. The ratio between the two distributions 
+  at each bin is nearly 1 close to the center, indicating a near-perfect
+  fit, larger than 1 slightly further from the center, suggesting that 
+  we slightly over sample intermediate hop lengths, and below 1 far from 
+  the center, indicating under sampling of extremely long hop lengths.
+  Based on the plot, we chose a cut-off of 1 nm in order to compensate for
+  over sampled intermediate hop lengths. We chose the same cut-off for all
+  solutes.
+  
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.75\textwidth]{truncation_cutoff.pdf}
+  \caption{The ratio between the empirical and maximum likelihood theoretical
+  distribution quantifies the quality of fit as function of hop length. The fit
+  is near-perfect close to the mean. Intermediate hop lengths are over sampled, 
+  and the tails are under sampled. We used this type of plot to determine the
+  appropriate place to truncate the L\'evy stable distributions.}\label{fig:truncation_cutoff}
+  \end{figure}
+  
+  \textit{Generating FLM realizations from a truncated L\'evy distribution:}
+  To generate realizations from an uncorrelated truncated L\'evy process, one would
+  randomly sample from the base distribution and replace values that are too large
+  with new random samples from the base distribution, repeating the process until
+  all samples are under the desired cut-off. 
+  
+  This procedure is complicated by the correlation structure of FLM. At a high level,
+  Stoev and Taqqu use Riemann-sum approximations of the stochastic integrals defining
+  FLM in order to generate realizations.~\cite{stoev_simulation_2004} They do this efficiently with the help of 
+  Fast Fourier Transforms. In practice, this requires one to Fourier transform a zero-padded
+  vector of random samples drawn from the appropriate L\'evy stable distribution, multiply
+  the vector in Fourier space by a kernel function and invert back to real space. The end
+  result is a correlated vector of fractional L\'evy noise.
+  
+  We are unaware of a technique for simulating truncated FLM, therefore we devised our
+  own based on the above discussion. If one is to truncate an FLM process, one can apply
+  the simple procedure above for drawing uncorrelated values from the marginal L\'evy 
+  stable distribution, \textit{but}, after adding correlation, the maximum drawn value is typically lower than the limit set 
+  by the user. Additionally, the shape of the distribution itself changes. Therefore, 
+  we created a database meant to correct the input truncation parameter (the maximum desired draw). The database
+  returns the value of the truncation parameter that will properly truncate the
+  output marginal distribution based on $H$, $\alpha$ and $\sigma$ (the width parameter).
+  Figure~\ref{fig:truncation_correction} shows the result of applying our correction.
+  Note that generating this database requires a significant amount of simulation and
+  still likely doesn't perfectly correct the truncation parameter. The output leads
+  to a somewhat fuzzy, rather than abrupt, cut-off of the output distribution. This 
+  is likely beneficial since we observe a small proportion of hops longer the chosen
+  truncation cut-off. When the cut-off value is close to the L\'evy stable $\sigma$ parameter,
+  as it is in our anomalous diffusion models, we observed that the tails of the 
+  truncated distribution tend to be undersampled. In order to maintain the distribution's 
+  approximate shape up to the cut-off value we recommend ensuring that the cut-off
+  value is at least 2 times $\sigma$. However, this may lead to a slight over-prediction
+  of the MSD.
+  
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{truncation_correction.pdf}
+  \caption{We can accurately truncate the marginal distribution of FLM innovations by
+  applying a correction to the input truncation parameter. We generated FLM sequences
+  and truncated the initial L\'evy stable distribution (before Fourier transforming) at 
+  a value of 0.5. After correlation structure is added, the width of the distribution 
+  of fractional L\'evy noise decreases significantly. We corrected the input truncation
+  parameter with our database resulting in a distribution close to the theoretical
+  distribution (black dashed line) with a maximum value close to 0.5.}\label{fig:truncation_correction}
+  \end{figure}
+  
+  \newpage
   
   \section{Verifying Markovianity}\label{section:markov_validation}
   
@@ -425,12 +451,15 @@ Phase Lyotropic Liquid Crystal Membrane}
   transition matrix does not change signficantly.}\label{fig:transitions}
   \end{figure}
   
+  \newpage  
+  
   \section{Derivation of Passage Time Distributions}\label{section:fpt_derivation}
   
-  To derive an analytical equation for the mean first passage time as calculated
-  in the main text, first consider an initial pulse spreading out over time with
-  a fixed mean. We can solve for the time-dependent probability density of 
-  particle positions by solving the one dimensional diffusion equation:
+  To derive an analytical equation for the mean first passage time 
+  (Equation~\ref{M-eqn:passage_times} of the main text), first consider an 
+  initial pulse spreading out over time with a fixed mean. We can solve for the 
+  time-dependent probability density of particle positions, $p$, by solving the one
+  dimensional diffusion equation:
   \begin{equation}
   \frac{\partial p}{\partial t} = D \frac{\partial^2 p}{\partial z^2}
   \end{equation}
@@ -461,11 +490,22 @@ Phase Lyotropic Liquid Crystal Membrane}
   \label{eqn:passage_times}
   \end{equation} 
   where the only free parameters for fitting are $v$ and $D$. We calculated the
-  expected value of Equation~\ref{eqn:passage_times} in order to get the MFPT.
+  expected value of Equation~\ref{eqn:passage_times} in order to get the MFPT. Specifically,
+  we used the python package \texttt{scipy.integrate.quad} to numerically integrate:
+  \begin{equation}
+  E[t] = \int_0^\infty tP(t) dt
+  \end{equation}
+  
+  \newpage
   
   \section{Solute hopping and trapping behavior}\label{section:sfbm_other_solutes}
   
-  \begin{figure}
+  Analagous to Figure~\ref{M-fig:anticorrelated_hops} of the main text,
+  Figures~\ref{fig:GCL_anticorrelated_hops}--\ref{fig:MET_anticorrelated_hops} 
+  demonstrate that all solutes exhibit the same kind of anti-correlated hopping
+  and trapping behavior.
+  
+  \begin{figure}[h]
   \centering
   %BJC3: included radial distance from pore center because I could. But does that make it look bad?
   % /figures/solute_trajectories.py
@@ -487,8 +527,8 @@ Phase Lyotropic Liquid Crystal Membrane}
   \caption{}\label{fig:GCL_hop_acf}
   \end{subfigure}
   \caption{For ethylene glycol: (a) representative $z$-coordinate center of mass trajectories, (b) hop 
-  length distributions, (c) dwell time distributions and (d) hop autocorrelation functions
-  for ethylene glycol. See Figure~\ref{M-fig:anticorrelated_hops} and Section~\ref{M-section:AD_parameterization}
+  length distributions, (c) dwell time distributions and (d) hop autocorrelation functions. 
+  See Figure~\ref{M-fig:anticorrelated_hops} and Section~\ref{M-section:AD_parameterization}
   in the main text for a more detailed discussion.}\label{fig:GCL_anticorrelated_hops}
   \end{figure}
   
@@ -514,8 +554,8 @@ Phase Lyotropic Liquid Crystal Membrane}
   \caption{}\label{fig:ACH_hop_acf}
   \end{subfigure}
   \caption{For acetic acid: (a) representative $z$-coordinate center of mass trajectories, (b) hop 
-  length distributions, (c) dwell time distributions and (d) hop autocorrelation functions
-  for acetic acid. See Figure~\ref{M-fig:anticorrelated_hops} and Section~\ref{M-section:AD_parameterization}
+  length distributions, (c) dwell time distributions and (d) hop autocorrelation functions.
+  See Figure~\ref{M-fig:anticorrelated_hops} and Section~\ref{M-section:AD_parameterization}
   in the main text for a more detailed discussion.}\label{fig:ACH_anticorrelated_hops}
   \end{figure}
   
@@ -541,12 +581,48 @@ Phase Lyotropic Liquid Crystal Membrane}
   \caption{}\label{fig:MET_hop_acf}
   \end{subfigure}
   \caption{For methanol: (a) representative $z$-coordinate center of mass trajectories, (b) hop 
-  length distributions, (c) dwell time distributions and (d) hop autocorrelation functions
-  for methanol. See Figure~\ref{M-fig:anticorrelated_hops} and Section~\ref{M-section:AD_parameterization}
+  length distributions, (c) dwell time distributions and (d) hop autocorrelation functions.
+  See Figure~\ref{M-fig:anticorrelated_hops} and Section~\ref{M-section:AD_parameterization}
   in the main text for a more detailed discussion.}\label{fig:MET_anticorrelated_hops}
   \end{figure}
   
+  \newpage
+  
+  \section{Stationarity of Solute Trajectories}\label{section:msd_comparison}
+  
+  \begin{figure}[h]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{URE_MSD_halves.pdf}
+  \caption{Urea}\label{fig:URE_MSD_halves}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{GCL_MSD_halves.pdf}
+  \caption{Ethylene Glycol}\label{fig:GCL_MSD_halves}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{MET_MSD_halves.pdf}
+  \caption{Methanol}\label{fig:MET_MSD_halves}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{ACH_MSD_halves.pdf}
+  \caption{Acetic Acid}\label{fig:ACH_MSD_halves}
+  \end{subfigure}
+  \caption{The ensemble of solute trajectories may be stationary if the MSD
+  calculated from different portions of the trajectory are the same. Here we
+  plot the MSD calcluated up to a 500 ns time lag of the first and second
+  halves of the equilibrated solute trajctories. Urea and acetic acid have
+  similar MSDs, providing evidence of stationarity, while the MSDs of 
+  ethylene glycol and methanol are different suggesting that they are not.}\label{fig:msd_comparison}
+  \end{figure}
+  
+  \newpage  
+  
   \section{Tabular Anomalous Diffusion Parameters}\label{section:tabular_AD_params}
+  
+  The tables in the section are tabular representations of the parameters depicted
+  in Figures~\ref{M-fig:1mode_parameters} and~\ref{M-fig:2mode_parameters} of the 
+  main text.
   
   % BJC: note to self -- modes are flipped in simulation output because 
   % physical.partition() sets mode as booleans and when r <= 0.75, in-pore is True (1) instead of 0. 
@@ -603,35 +679,12 @@ Phase Lyotropic Liquid Crystal Membrane}
   descriptions of the parameters.}\label{table:sfbm_params_2mode}
   \end{table}
   
-  \section{Stationarity of Solute Trajectories}\label{section:msd_comparison}
-  
-  \begin{figure}
-  \centering
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{URE_MSD_halves.pdf}
-  \caption{Urea}\label{fig:URE_MSD_halves}
-  \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{GCL_MSD_halves.pdf}
-  \caption{Ethylene Glycol}\label{fig:GCL_MSD_halves}
-  \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{MET_MSD_halves.pdf}
-  \caption{Methanol}\label{fig:MET_MSD_halves}
-  \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{ACH_MSD_halves.pdf}
-  \caption{Acetic Acid}\label{fig:ACH_MSD_halves}
-  \end{subfigure}
-  \caption{The ensemble of solute trajectories may be stationary if the MSD
-  calculated from different portions of the trajectory are the same. Here we
-  plot the MSD calcluated up to a 500 ns time lag of the first and second
-  halves of the equilibrated solute trajctories. Urea and acetic acid have
-  similar MSDs, providing evidence of stationarity, while the MSDs of 
-  ethylene glycol and methanol are different suggesting that they are not.}\label{fig:msd_comparison}
-  \end{figure}
+  \newpage
   
   \section{Tabular MSDDM parameters}\label{section:msddm_params}
+  
+  The following table is a tabular representation of the parameters 
+  depicted in Figure~\ref{M-fig:msddm_parameters} of the main text.
   
   \begin{table}[h]
   \centering
@@ -655,26 +708,28 @@ Phase Lyotropic Liquid Crystal Membrane}
   emissions.}\label{table:msddm_params}
   \end{table}  
   
+% This is not used I think
+%  \section{2-state MSDDM parameters}\label{section:simple_msddm_params}
+%  
+%  We used a simple 2-state model to illustrate how the self-transition probability 
+%  effects simulated MSDs generated from the MSDDM. We used the following parameters:
+%  
+%  \begin{table}[h]
+%  \centering
+%  \begin{tabular}{|c|c|c|c|}
+%  \hline
+%  State & H     & $\alpha_h$ & $\sigma$ \\\hline
+%  1     & 0.1  & 1.7       & 0.04    \\
+%  2     & 0.2  & 1.5       & 0.04    \\
+%  T     & 0.4  & 1.4       & 0.04    \\\hline
+%  \end{tabular}
+%  \caption{Values of $H$, $\alpha_h$ and $\sigma$ used to simulate realizations
+%  of the simple MSDDM whose MSDs are shown in Figure~\ref{M-fig:T_sensitivity} of
+%  the main text. The values are chosen to be similar to those in Table~\ref{M-table:msddm_params}
+%  of the main text.}\label{table:msddm_params}
+%  \end{table}
   
-  \section{2-state MSDDM parameters}\label{section:simple_msddm_params}
-  
-  We used a simple 2-state model to illustrate how the self-transition probability 
-  effects simulated MSDs generated from the MSDDM. We used the following parameters:
-  
-  \begin{table}[h]
-  \centering
-  \begin{tabular}{|c|c|c|c|}
-  \hline
-  State & H     & $\alpha_h$ & $\sigma$ \\\hline
-  1     & 0.1  & 1.7       & 0.04    \\
-  2     & 0.2  & 1.5       & 0.04    \\
-  T     & 0.4  & 1.4       & 0.04    \\\hline
-  \end{tabular}
-  \caption{Values of $H$, $\alpha_h$ and $\sigma$ used to simulate realizations
-  of the simple MSDDM whose MSDs are shown in Figure~\ref{M-fig:T_sensitivity} of
-  the main text. The values are chosen to be similar to those in Table~\ref{M-table:msddm_params}
-  of the main text.}\label{table:msddm_params}
-  \end{table}
+  \newpage  
   
   \section{Mean first passage time simulations}\label{section:mfpt}
   
@@ -683,7 +738,18 @@ Phase Lyotropic Liquid Crystal Membrane}
 %  particle with 2 absorbing boundaries.
   \subsection*{Analytical fits to MFPT distributions}
   
-  \begin{figure}
+  In Figures~\ref{fig:ad_fpt_fits} and~\ref{fig:msddm_fpt_fits}, we demonstrate
+  the high quality of our analytical fits of Equation~\ref{eqn:passage_times} to 
+  the distribution of solute first passage times derived from both the AD
+  and MSDDM models. The histograms in Figure~\ref{fig:msddm_fpt_fits} are 
+  relatively noisy because we only generated 1000 realizations of the MSDDM 
+  versus 10000 of the AD model. In Figure~\ref{fig:flux_curve_sensitivity}, we
+  justify our use of fewer MSDDM realizations by using subsets of the 10000 AD 
+  model realizations to show that one needs as few as 100 independent trajectory
+  realizations at each pore length in order to reliably fit Equation~\ref{eqn:passage_times}
+  to the passage time distributions.
+  
+  \begin{figure}[h]
   \centering
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{ad_fpt_distributions_URE.pdf}

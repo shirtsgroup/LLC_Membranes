@@ -2039,12 +2039,57 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   each point of the flux curves in Figure~\ref{fig:flux_curves_msddm} using only 1000
   realizations at each pore length. 
   
-  Anti-correlation between solute hops has a significant effect on the scaling
-  of solute flux with pore length. In Figure~\ref{fig:beta_hurst}, we show that 
-  $\beta$, as derived from the sFBMcut model, is inversely related to the Hurst
-  parameter while $\beta$, as derived from the MSDDM, shows no discernible
-  trend.
+  %The scaling of solute flux with pore length is a complicated function of hop and 
+  %dwell parameters, however, anti-correlation between solute hops appears to
+  %be the most significant influencing factor. 
+  The scaling of solute flux with pore length is primarily influenced by anti-correlation
+  between solute hops. In Figure~\ref{fig:beta_hurst}, we show that $\beta$, as derived 
+  from the sFBMcut model, is inversely related to the Hurst parameter. This makes intuitive
+  sense since higher degrees of anti-correlation should slow the rate at which solutes
+  cross the membrane pore. $\beta$, as derived from the MSDDM, appears approximately 
+  constant but this is consistent with nearly invariant transitional Hurst parameters
+  (see Figure~\ref{fig:H_v_state}). However, Figure~\ref{fig:beta_hurst} does raise
+  the question as to why $\beta$ is so much lower than the sFBMcut model.
   
+  To understand the behavior of the MSDDM, we studied the $\beta$ parameter derived 
+  from variations on each model, visualized in Figure~\ref{fig:beta_parameters}. First, 
+  we removed anti-correlation between hops in the sFBMcut trajectory (set $H$=0.5). 
+  The $\beta$ parameter drops to values similar to the MSDDM. When we remove anti-correlation
+  \textit{and} dwell times between hops (set dwell times equal to 1), effectively simulating 
+  Brownian motion, we observe similar $\beta$ parameters. These two variations imply that,
+  in the AD models, the $\beta$ parameter is only a function of $H$ and not dependent on
+  dwell times ($\alpha_d$) or hop lengths ($\sigma$). The MSDDM is fundamentally similar to 
+  the AD model in that one makes correlated draws from a hop distribution. Therefore,
+  we should expect the $\beta$ value of the MSDDM to be larger than that of Brownian 
+  motion.
+  %Although the dwell times are
+  %insignificant compared to the AD model (compare Figures~\ref{fig:ad_eyetest} and
+  %\ref{fig:msddm_eyetest} for example), we have just shown 
+  
+  The value of $\beta$ for the MSDDM is under-estimated due to assumptions of the model
+  itself as well as inaccuracies resulting from of simulation of very long FLM trajectories.
+  Turning first to the model itself, we have designed it to ensure that the magnitude of the
+  hops in the series of transitions between states are anti-correlated from start to finish. 
+  This assumes that the transition correlation structure is unaffected by the
+  sub-trajectories between each state transition. Each time a state transition occurs, one
+  must initialize a new time series sub-trajectory with its own correlation structure. 
+  Even with a low Hurst parameter, as exhibited by most trapped states, the time spent 
+  in each state is relatively short making the accuracy of the correlation structure 
+  questionable. Additionally, $\sigma$ of transitional hops is similar in magnitude to
+  $\sigma$ in trapped states. Since we add the transitional hop lengths to each end of
+  trapped state sub-trajectories, the transitional hop lengths are shifted with respect 
+  to one another largely decorrelating them. We tested this reasoning by modifying the 
+  MSDDM to completely immobilize particles except when they transition between states. 
+  Suprisingly, $\beta$ is still close to the Brownian value. Further experimentation 
+  reveals that this is actually a consequence of the FLM simulation procedure. Simulating
+  FLM requires Riemann-sum approximations of the stochastic integrals defining the process.
+  In short, it is computationally infeasible to use enough terms to accurately incorporate
+  long timescale correlations into our long MSDDM realizations. Thus at long timescales, 
+  we lose correlation between transitional jumps. We confirmed this hypothesis by using 
+  fractional Brownian motion, for which we have an exact simulation method, in place of 
+  FLM. When we use FBM, $\beta$ increases well above the Brownian value. $\beta$ increases
+  even further if we immobilize the trapped states. Thus the low value of $\beta$ of the
+  MSDDM is a consequence of model assumptions and inexact simulation of FLM.  
   
   \begin{figure}
   \centering
@@ -2056,7 +2101,41 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \includegraphics[width=\textwidth]{beta_parameters.pdf}
   \caption{}\label{fig:beta_parameters}
   \end{subfigure}
+  \caption{(a) The $\beta$ values of the sFBMcut model appear to be inversely proportional
+  to the Hurst parameters. The $\beta$ values of the MSDDM are much lower with much less
+  variation than the sFBMcut model. (b) The $\beta$ parameters of the MSDDM are low because
+  sub-trajectories between state transitions decorrelate transitional hops and because
+  our FLM simulation procedure does not accurately correlate hops after long time lags. 
+  The high $\beta$ parameters of the sFBMcut model are a consequence of anti-correlation
+  between hops. Removing hop correlations causes $\beta$ to drop down close to MSDDM
+  values (sFBMcut ($H$=0.5)). Removing dwell times in addition to hop correlation
+  yields a similar value of $\beta$ (Brownian). Immobilizing particles while in a trapped state
+  also yields a similar value of $\beta$ (MSDDM (immobile states)). Replacing FLM with
+  FBM in the MSDDM raises $\beta$ well above the Brownian value (MSDDM (FBM)). Replacing FLM with FBM and
+  immobilizing particles in trapped states further raises the value of $\beta$.}\label{fig:beta}
   \end{figure}
+  
+  The values of $c$ are likely a complex function of $\sigma$, $alpha_d$, $H$ and $\alpha_d$
+  where applicable. The values of $c$ scale the flux curves and are directly correlated to 
+  flux magnitude. We showed earlier that $\beta$ is not a function of $\sigma$ or $\alpha_d$,
+  therefore dwell times and hop lengths must influence $c$. In fact, any parameter which acts
+  to modify the rate at which solutes move through the membrane pores will affect $c$.
+  Therefore it is sensible to hypothesize that a higher degree of anti-correlation (lower $H$)
+  should decrease $c$ and a higher value of $\alpha_h$ should also increase $c$.
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{c_parameter_comparison.pdf}
+  \caption{}\label{fig:c_parameters}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{c_parameter_comparison.pdf}
+  \caption{}\label{fig:c_influence}
+  \end{subfigure}
+  \caption{(a) The c paramters are directly related to your mom (b) }\label{fig:c}
+  \end{figure}
+  
   
 %  \begin{figure}
 %  \centering
@@ -2117,7 +2196,6 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 %  to the solute MSDs which is consistent with longer passage times for solutes that
 %  progress through the pores more slowly.
   
-  % Partially in methods?
   The power law decay of the flux with pore length implies the following relationship
   for selectivity via substitution of Equation~\ref{eqn:flux_decay} into 
   Equation~\ref{eqn:selectivity}:
@@ -2133,16 +2211,49 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   functions of pore length. For $(c_i / c_j)=1$, LLC membranes will be more selective
   towards passage of solutes with lower $\beta$ values versus those with high $\beta$ values.
   When $\beta$ values are equal, as is the case for uncorrelated motion, selectivity only
-  depends on the pre-factors, $c$. 
+  depends on the pre-factors, $c$. In most cases, the length dependence of selectivity 
+  plateaus quickly which implies that a coating of LLC membrane with a thickness on the 
+  order of those already made experimentally should be sufficiently optimal. 
   %MRS5? can you remind people of the physical source (in terms of dwell times, hop lengths) of the differences in beta and c? Want to try to stablish the connection between particle dynamic behavior and selectivity. 
 
   \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{selectivity.pdf}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{selectivity.pdf}
+  \caption{sFBMcut}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{selectivity_msddm.pdf}
+  \caption{MSDDM}
+  \end{subfigure}
   \caption{The selectivity of 2 species changes monotonically with pore length. The
-  strength of dependence on pore length depends on the difference between $\beta$ values.}
+  strength of dependence on pore length depends on the difference between $\beta$ values.
+  The selectivities predicted by the sFBMcut AD model (a) are much larger in magnitude than
+  those predicted by the MSDDM (b) because predictions of the AD model result in a much
+  larger variation in flux (compare Figures~\ref{fig:flux_curves_ad} and~\ref{fig:flux_curves_msddm}).}
   \label{fig:selectivity}
   \end{figure}
+  
+  The selectivities predicted by the sFBMcut model are both higher in magnitude and
+  ordered differently than the those predicted by the MSDDM. The magnitudes of the
+  sFBMcut predictions are higher because the predicted solute fluxes vary more widely
+  than those predicted by the MSDDM (compare Figures~\ref{fig:flux_curves_ad} 
+  and~\ref{fig:flux_curves_msddm}). The ordering is different mostly because the 
+  ordering of the flux predictions is different. 
+  
+  We cannot say with absolute certainty which selectivity curves are more 
+  trustworthy. The sFBMcut model uses exact simulation techniques and yields 
+  qualitatively accurate solute trajectories, but it may overestimate long 
+  timescale correlation present in the real system. For this reason, we might
+  expect the $\beta$ values of the true flux curves to be closer to the 
+  Brownian value as exhibited by the MSDDM. But the MSDDM yields qualitatively
+  inaccurate solute trajectories and we do not have a good understanding of
+  how to precisely control the point at which solute hops become decorrelated.
+  
+  However, we may gain the most by using the two models in tandem. In both cases,  
+  the data suggests that this particular LLC membrane might be most useful for 
+  selectively separating ethylene glycol from acetic acid.
+
   
   Out of the solutes studied, the data suggests that this particular LLC membrane 
   %MRS5: would is a bit strong given the number of limitations.
@@ -2304,8 +2415,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \section*{Acknowledgments}
   %MRS: add people who contributed non-author level ideas. 
   %MRS3: add specific info for PRF and GAANN
-  %BJC3: I don't know the PRF info. I wrote GAANN as I did on the last paper which is what Rob Davis told me to do
-  %MRS4: I will≈ç track down the PRF grant number (if typical)
+  %BJC3: I wrote GAANN as I did on the last paper which is what Rob Davis told me to do
   This work was supported in part by the ACS Petroleum Research Fund grant \#59814-ND7
   and the Graduate Assistance in Areas of National Need (GAANN)
   fellowship which is funded by the U.S. Department of Education.
@@ -2318,6 +2428,11 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   ACI-1532236), the University of Colorado Boulder, and Colorado State
   University. The Summit supercomputer is a joint effort of the University of
   Colorado Boulder and Colorado State University.
+  
+  We would also like to thank Richard Noble for helping us make the connection 
+  between the empirical mean first passage time distribution and the analytical
+  equation to which we fit the distributions (Equation~\ref{eqn:passage_times}).
+  
 
   \clearpage
 

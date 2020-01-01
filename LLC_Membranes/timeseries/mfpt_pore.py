@@ -88,7 +88,7 @@ class Hops:
 
     def _set_gaussian_params(self, params):
 
-        #params[2] = 0.5  # for speed while testing
+        params[2] = 0.5  # for speed while testing
 
         self.params = (params[1], self.params[1], params[2], self.params[3])
 
@@ -423,8 +423,8 @@ class MeanFirstPassageTime:
 
                 if np.abs(walk).max() >= self.length:
 
-                    #dwells = self.dwell_realization(len(traj[-1]))
-                    dwells = np.ones(len(traj[-1]))
+                    dwells = self.dwell_realization(len(traj[-1]))
+                    # dwells = np.ones(len(traj[-1]))
 
                     time = np.cumsum(dwells)
                     #
