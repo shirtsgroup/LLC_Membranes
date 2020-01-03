@@ -42,8 +42,8 @@
 \renewcommand{\thepage}{S\arabic{page}}
 \renewcommand{\thetable}{S\arabic{table}}
 
-\title{Supporting Information: Time Series Modeling of Solute Transport in an H\textsubscript{II} 
-Phase Lyotropic Liquid Crystal Membrane}
+\title{Supporting Information: Time Series Modeling of Varying Complexity Captures 
+Subdiffusive Solute Dynamics and Predicts Long Timescale Behavior in Nanoscale Pores.}
 \author{Benjamin J. Coscia \and Michael R. Shirts} 
 
 \begin{document}
@@ -92,7 +92,7 @@ Phase Lyotropic Liquid Crystal Membrane}
   \caption{The first column provides the names of the python scripts available in
   the \texttt{LLC\_Membranes} GitHub repository that were used for system setup and
   post-simulation trajectory analysis. Paths preceding script names are relative to the
-  \texttt{LLC\_Membranes/LLC\_Membranes} directory. The second columns lists the section in the main
+  \texttt{LLC\_Membranes/LLC\_Membranes} directory. The second column lists the section in the main
   text where the output or usage of the script is first described. The third column
   gives a brief description of the purpose of each script.
   }~\label{table:python_scripts}
@@ -108,7 +108,11 @@ Phase Lyotropic Liquid Crystal Membrane}
   solutes in and out of the pore region stopped changing. The pore region is
   defined as within 0.75 nm of the pore center. We've plotted the partition
   versus time in Figure~\ref{fig:equilibration} and indicated the chosen
-  equilibration time points.
+  equilibration time points. 
+  
+  %Note that the partition of acetic acid appears
+  %to be oscillating slowly. We do not expect the system to plateau on a
+  %reasonable time scale, so we settled for including a complete oscillation.
   
   \begin{figure}[hb]
   \centering
@@ -297,40 +301,7 @@ Phase Lyotropic Liquid Crystal Membrane}
   
   \section{Simulating Fractional L\'evy Motion}\label{section:sFLM}
   
-  \subsection{Achieving the right correlation structure}\label{section:flm_correlation}
-  
-  We simulated FLM using the algorithm of Stoev and Taqqu~\cite{stoev_simulation_2004}.
-  There are no known exact methods for simulating FLM. As a consequence, passing a
-  value of $H$ and $\alpha$ to the algorithm does not necessarily result in the correct
-  correlation structure, although the marginal L\'evy stable distribution is correct. 
-  We applied a database-based empirical correction in order to use the
-  algorithm to achieve the correct marginal distribution and correlation structure.
-  
-  Stoev and Taqqu note that the transition between negatively and positively correlated
-  draws occurs when $H = 1/ \alpha$. When $\alpha=2$, the marginal distribution is 
-  Gaussian and the transition occurs at $H=0.5$ as expected from FBM. We corrected 
-  the input $H$ so that the value of $H$ measured based on the output sequence equaled
-  the desired $H$. We first adjusted the value of $H$ by adding ($1 / \alpha - 0.5$),
-  effectively recentering the correlation sign transition for any value of $1 \leq \alpha \leq 2$.
-  This correction alone does a good job for input $H$ values near 0.5, but is
-  insufficient if one desires a low value of $H$. The exact correction to $H$ is 
-  not obvious so we created a database of output $H$ values tabulated as a function
-  of input $H$ and $\alpha$ values. Figure~\ref{fig:hurst_correction} demonstrates the
-  results of applying our correction. Without the correction, FLM realizations are
-  more negatively correlated. This would result in under-predicted mean squared
-  displacements when applying the model.
-  
-  % /supporting_figures/demonstrate_hurst_correction.py
-  \begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{hurst_correction.pdf}
-  \caption{Correcting the Hurst parameter input to the algorithm of Stoev and Taqqu
-  results in an FLM process with a more accurate correlation structure. We generated
-  sequences with an input $H$ of 0.35. We estimated $H$ by fitting the autocorrelation
-  function. Without the correction, $H$ is underestimated, meaning realizations are 
-  more negatively correlated than they should be.}\label{fig:hurst_correction}
-  \end{figure}
-
+  % ordered this way to be consistent with mentions in the main text
   \subsection{Truncated L\'evy stable hop distributions}\label{section:truncation}
   
   \textit{Determining where to truncate the hop distribution:} A pure
@@ -404,6 +375,40 @@ Phase Lyotropic Liquid Crystal Membrane}
   distribution (black dashed line) with a maximum value close to 0.5.}\label{fig:truncation_correction}
   \end{figure}
   
+  \subsection{Achieving the right correlation structure}\label{section:flm_correlation}
+  
+  We simulated FLM using the algorithm of Stoev and Taqqu~\cite{stoev_simulation_2004}.
+  There are no known exact methods for simulating FLM. As a consequence, passing a
+  value of $H$ and $\alpha$ to the algorithm does not necessarily result in the correct
+  correlation structure, although the marginal L\'evy stable distribution is correct. 
+  We applied a database-based empirical correction in order to use the
+  algorithm to achieve the correct marginal distribution and correlation structure.
+  
+  Stoev and Taqqu note that the transition between negatively and positively correlated
+  draws occurs when $H = 1/ \alpha$. When $\alpha=2$, the marginal distribution is 
+  Gaussian and the transition occurs at $H=0.5$ as expected from FBM. We corrected 
+  the input $H$ so that the value of $H$ measured based on the output sequence equaled
+  the desired $H$. We first adjusted the value of $H$ by adding ($1 / \alpha - 0.5$),
+  effectively recentering the correlation sign transition for any value of $1 \leq \alpha \leq 2$.
+  This correction alone does a good job for input $H$ values near 0.5, but is
+  insufficient if one desires a low value of $H$. The exact correction to $H$ is 
+  not obvious so we created a database of output $H$ values tabulated as a function
+  of input $H$ and $\alpha$ values. Figure~\ref{fig:hurst_correction} demonstrates the
+  results of applying our correction. Without the correction, FLM realizations are
+  more negatively correlated. This would result in under-predicted mean squared
+  displacements when applying the model.
+  
+  % /supporting_figures/demonstrate_hurst_correction.py
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{hurst_correction.pdf}
+  \caption{Correcting the Hurst parameter input to the algorithm of Stoev and Taqqu
+  results in an FLM process with a more accurate correlation structure. We generated
+  sequences with an input $H$ of 0.35. We estimated $H$ by fitting the autocorrelation
+  function. Without the correction, $H$ is underestimated, meaning realizations are 
+  more negatively correlated than they should be.}\label{fig:hurst_correction}
+  \end{figure}
+  
   \newpage
   
   \section{Verifying Markovianity}\label{section:markov_validation}
@@ -466,8 +471,9 @@ Phase Lyotropic Liquid Crystal Membrane}
   The appropriate initial and boundary conditions are:
   $$BC1: t > 0, z = \infty, p = 0$$
   $$BC2: t > 0, z = 0, \frac{\partial p}{\partial z} = 0$$
-  $$IC: t = 0, c = M\delta(z)$$
-  where $M$ is the total number of particles in the system. It has been shown 
+  $$IC: t = 0, c = \delta(z)$$ % M\delta(z)
+  %where $M$ is the total number of particles in the system. 
+  It has been shown 
   elsewhere that the solution to this equation is:~\cite{cussler_diffusion:_2009}
   \begin{equation}
   p(z, t) = \frac{1}{\sqrt{4 \pi D t}}\exp\bigg(\frac{-z^2}{4Dt}\bigg)

@@ -460,7 +460,7 @@ class MeanFirstPassageTime:
     def _msddm_hops(self):
 
         # some hard sets for now
-        self.chains.generate_realizations(1, self.nT, bound=self.bound, m=256, Mlowerbound=6000, nt=1, quiet=True,
+        self.chains.generate_realizations(1, self.nT, bound=self.bound, m=256, Mlowerbound=8, nt=1, quiet=True,
                                           timeout=self.timeout)
 
         return self.chains.chains[:, 0]

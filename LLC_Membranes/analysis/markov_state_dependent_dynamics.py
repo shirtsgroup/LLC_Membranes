@@ -928,7 +928,7 @@ class Chain:
 
         if not self.fbm:
 
-            if state != 8:
+            if state == 8:
 
                 return np.zeros(l)
 
@@ -974,7 +974,7 @@ class Chain:
             H = np.random.choice(self.hurst_parameters[state])
             scale = self.gaussian_params[state]
 
-            if state == 10:
+            if state != 8:
 
                 return np.zeros(l)
 
