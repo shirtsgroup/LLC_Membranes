@@ -31,8 +31,12 @@
 \externaldocument[S-]{Supporting_Information}
 
 %BJC5: wondering about replacing "Predicts long timescale behavior" with "predicts selectivity"
-\title{Time Series Modeling of Varying Complexity Captures Subdiffusive Solute Dynamics
-and Predicts Long Timescale Behavior in Nanoscale Pores.}
+%MRS6: I would focus first on the outputs.  Not sure about the behavior/vs. selectivity.  Probably 
+% selelctivity since it's more results oriented. ``of varying complexity'' is unneeded in the titel
+%\title{Time Series Modeling of Varying Complexity Captures Subdiffusive Solute Dynamics
+%and Predicts Long Timescale Behavior in Nanoscale Pores.}
+\title{Capturing subdiffusive solute dynamics and predicting long timescale selectivity in nanoscale pores
+with time series modeling}
 \author{Benjamin J. Coscia \and Michael R. Shirts} 
 
 \begin{document}
@@ -47,24 +51,44 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   parameterized from long molecular dynamics (MD) simulation trajectories of
   a cross-linked H\textsubscript{II} phase lyotropic liquid crystal (LLC) 
   membrane, in order to predict solute mean squared displacements (MSDs) 
-  and solute flux in macroscopic length pores. With our first model, based on 
-  the anomalous diffusion theory, we show how solute dynamics can be modeled 
+  and solute flux,
+  %MRS6: added
+  and thus solute selectivity, 
+  in macroscopic length pores. 
+  %MRS6: tweak
+  %With our first model, based on the 
+  First, using
+  anomalous diffusion theory, we show how solute dynamics can be modeled 
   as a fractional diffusion process subordinate to a continuous time random 
   walk. From the MD simulations, we parameterize the distribution of 
   dwell times, hop lengths between dwells and correlation between hops. We 
   explore 2 variations of the anomalous diffusion model. The first variation
   applies a single set of parameters to the solute displacements and the second
   applies 2 sets of parameters based on the solute's radial distance from the
-  closest pore center. Our second model, a generalization of Markov state models,
-  treats the configurational state of the system as a Markov process, each of
-  which has state dependent transport behavior. For each state and transition
+  closest pore center. 
+  %MRS6: tweak.
+
+  Next, we generalize Markov state models,
+  treating the configurational state of the system as a Markov process, each 
+  %MRS6: tweak
+  %of which has state dependent transport behavior. 
+  state of which has separate transport properties
+  For each state and transition
   between states, we parameterize the distribution and temporal correlation 
   structure of positional fluctuations as a means of characterization and to 
   allow us to predict solute MSDs. We show that our models reasonably reproduce
-  the MSDs calculated from MD simulations. Finally, we demonstrate how one can
-  use our models in order to calculate flux of a given solute across a 
+  the MSDs calculated from MD simulations. 
+
+  Finally, we demonstrate how one can
+  use our models 
+  %in order to calculate 
+  to estimate
+  flux of a 
+  %given 
+  solute across a 
   macroscopic-length pore and, based on those quantities, the membrane's selectivity
-  towards each solute. Overall, this work helps connect the relationship between
+  towards each solute. Overall, this work helps to connect 
+  % the relationship between
   microscopic chemically-dependent solute motions and macroscopic membrane performance.
 
   \end{abstract}
@@ -112,7 +136,13 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   size and charge, but on solute chemical functionality as well.~\cite{dischinger_application_2017}
   One can tune the functionality of LLC monomers
   in order to enhance or weaken specific solute-membrane interactions.~\cite{dischinger_effect_2017}
-  Two types of LLC membranes are in active development. The inverted hexagonal, 
+  Tweaks.
+  Two
+  general types of LLC membranes 
+  are 
+  being actively developed.
+  %in active development. 
+  The inverted hexagonal, 
   H\textsubscript{II}, LLC phase has densely packed, uniform-sized pores on the order of 1 nm
   in size. A perfectly synthesized H\textsubscript{II} phase has an ideal geometry for high
   throughput separations, however aligning the microscopic hexagonal mesophases on a large 
@@ -126,6 +156,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   Molecular modeling may make it possible to efficiently evaluate solute-specific separation
   membranes using the available chemical space of LLC monomers. To date, only a limited 
   subset of LLC monomers have been studied experimentally in membrane applications.
+  %MRS6: should these references be contracted?
   \cite{carter_glycerol-based_2012,hatakeyama_nanoporous_2010,smith_ordered_1997,zhou_assembly_2003,resel_structural_2000}
   Even within this small subset, they have demonstrated selectivities that could not be
   explained beyond speculation and vague empirical correlations.~\cite{dischinger_application_2017}
@@ -135,6 +166,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 
   In our previous work, we used molecular dynamics (MD) simulations to study the transport
   of 20 small polar molecules in an H\textsubscript{II} phase LLC membrane.~\cite{coscia_chemically_2019}
+  %MRS6: sentence seems out of place here? True, but does it support the thesis here?
   The H\textsubscript{II} phase is a simpler geometry to model than the Q\textsubscript{I} phase.  
   In general, we observed subdiffusive transport behavior characterized by intermittent hops 
   separated by periods of entrapment. We identified three mechanisms responsible for the 
@@ -144,11 +176,19 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   %BJC4: Added next two paragraphs to help ease more into time series modeling
   So far, our molecular models have provided valuable qualitative mechanistic insight 
   with some quantitative support which already allows us to speculate about new LLC
-  monomer designs, however they would be of greater value to a wider audience if we 
+  monomer designs
+  %MRS6: breaking sentence.
+  However, they would be of greater value to a 
+  %wider audience 
+  larger set of reseachers
+  if we 
   could provide quantitative predictions of macroscopic observables such as solute 
   flux and selectivity. Due to the size of the types of systems we are studying (at least 62,000 atoms)
   it is prohibitively expensive and time-consuming to run simulations longer than 
-  those performed for this work ($\sim$5 $\mu$s). And even with the relatively large 
+  those performed for this work ($\sim$5 $\mu$s). 
+  %MRS:deleting.
+  %And 
+  Even with the relatively large 
   size of our system, we only simulate 24 solute trajectories per unit cell in order
   to minimize solute-solute interactions. This results in relatively high uncertainties
   in observables such as mean squared displacement (MSD), preventing reliable long
@@ -177,9 +217,18 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 
   %BJC4: Tried to make this paragraph connect to previous a little better
   Using a bottom-up modeling approach, we can parameterize single particle behavior
-  by reducing our MD simulations to observations of several key properties
+  by 
+  %MRS6:
+  extracting from 
+  %reducing
+  our MD simulations 
+  %to observations of several key 
+  properties
+  of their trajectories
   that have the greatest influence on solute dynamics and then construct an ensemble 
-  of characteristic single solute trajectories useful for making long timescale
+  of characteristic single solute trajectories 
+  with these properties
+  useful for making long timescale
   predictions with computational ease and lower uncertainties. Fortunately, there 
   is an abundance of information encoded in the complex solute trajectories. Into a
   model, we can incorporate fluctuations and time-dependent correlations in solute
@@ -202,7 +251,9 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   mathematical models which aim to predict membrane performance while providing quantitative 
   mechanistic insights. The functional form of these models is driven by mechanistic 
   observations from our previous work and their inputs are parameterized using a 
-  substantial amount of data generated by long ($\geq 5~\mu$s) MD simulations. The formulation
+  substantial amount of data generated by long ($\geq 5~\mu$s) MD simulations. 
+  %MRS6: maybe rephrase the next - 'dive' is kind of casual?  Also, it seems more like the start of the next paragraph.
+  The formulation
   of these models requires a dive into stochastically driven processes.
   
 %  Our approach employs descriptive stochastic models that sufficiently
@@ -257,7 +308,9 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   simulate solute trajectories, can help uncover the underlying solute-membrane
   interactions which result in observed transport mechanisms. It can help 
   researchers formulate hypotheses to explain why a certain set of parameters is
-  characteristic to a specific solute. This is largely the approach we used to
+  characteristic to a specific solute. 
+  %MRS6: next sentence implies you used sFBM to uncover the mechanisms of the last paper, but that detail wasn't really there? 
+  This is largely the approach we used to
   discover the three primary trapping mechanisms in our previous work.~\cite{coscia_chemically_2019}
   Once one has knowledge of the primary mechanisms leading to anomalous diffusion
   behavior, one may gain additional insight by formulating a state-based model.
@@ -297,7 +350,11 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   % BJC4: new paragraph
   The goal of this work is not to definitively determine which modeling approach
   is better but to evaluate their performance independently because they both
-  have potential value dependent on one's research goals. The anomalous subdiffusion
+  have potential value dependent on 
+  %MRS:
+  %one's research
+  a give reseach study's
+  goals. The anomalous subdiffusion
   approach provides a systematic way to compare the dynamical behavior of different
   solutes based solely on the time series of their center of mass positions. The process
   of choosing the correct anomalous subdiffusion provides its own mechanistic insight
@@ -320,7 +377,11 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   pores of macroscopic length, thus achieving a better understanding
   of macroscopic properties on the basis of microscopic dynamics. We show that 
   anti-correlated solute hopping behavior severely reduces flux relative to 
-  uncorrelated behavior. We use the relative solute fluxes to calculate the 
+  uncorrelated behavior. We use the relative solute fluxes to 
+  %MRS6: tweak
+  %calculate 
+  estimate
+  the 
   membrane's selectivity between all pairs of solutes and demonstrate that, when 
   solutes display different degrees of anti-correlated hopping behavior, selectivity
   becomes a function of pore length. With this improved understanding of 
@@ -340,9 +401,8 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 
   \section{Methods}
     
-  We ran all MD simulations and energy minimizations using GROMACS 2018.  %BJC4: version 2018. That's it not 2018.3 or anything. 
-  ~\cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008}
-  We performed all post-simulation trajectory analysis using python scripts which 
+  We ran all MD simulations and energy minimizations using GROMACS 2018~\cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008}.  %BJC4: version 2018. That's it not 2018.3 or anything. 
+  We performed all post-simulation trajectory analysis using Python scripts which 
   are available online at \\ \texttt{https://github.com/shirtsgroup/LLC\_Membranes}.
   The appropriate scripts to use for subsequent calculations are summarized in 
   Table~\ref{S-table:python_scripts} of the Supporting Information.
@@ -374,7 +434,9 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   hexagonal phase in the presence of water where the carboxylate head groups occupy the
   pore centers. (b) A cross-section of a periodically replicated atomistic unit cell 
   used for simulations in this study reveals the membrane's aqueous, hexagonally packed,
-  straight and uniform sized pores. Water present in the distal tail region is omitted 
+  straight and uniform sized pores. Water present in the 
+  %MRS6: isn't distal tail redundant? 
+  distal tail region is omitted 
   for clarity.}\label{fig:membrane_structure}
   \end{figure}
   
@@ -401,9 +463,14 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 
   \subsection{The Anomalous Diffusion Model}\label{method:model_sFBM}
 
-  Solutes in this system exhibit subdiffusive behavior, a type of anomalous diffusion.
+  Solutes in this system 
+  %MRS6: added
+  very clearly 
+  exhibit 
+  subdiffusive behavior, a type of anomalous diffusion.
   During an anomalous diffusion process, the mean squared displacement (MSD)
   does not grow linearly with time, but instead it follows a power law of the form:
+  %MRS6: do you need the subscript for $\alpha$? makes it harder to read. 
   \begin{equation} 
   \langle z^2(t) \rangle = K_{\alpha_d}t^{\alpha_d}
   \label{eqn:msd_form}
@@ -414,6 +481,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   indicates a subdiffusive process, while values of $\alpha_d = 1$ and $\alpha_d > 1$ 
   are characteristic of Brownian and superdiffusive motion respectively.
   
+  %MRS6: next paragraph could be clearer.  Maybe motivate at the beginning why the importance of time. vs. ensemble averated. It's sprung a sort of a surprise there's a difference 
   We analyzed the time-averaged MSD of the simulated trajectories by measuring
   all possible displacements over time lag $\tau$:
   \begin{equation}
@@ -435,7 +503,9 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   with trapping times on the order of the measurement time get incorporated into the 
   calculation.~\cite{bel_weak_2005} We chose to analyze just the time-averaged MSD 
   because, compared to the ensemble average, it is a more statistically robust measure
-  of the average distance a solute travels over time. Although theoretically possible, we do
+  of the average distance a solute travels over time. 
+  %MRS6: does it correspond properly to the physical situation of entry into the pore of new particles at each unit time?
+  Although theoretically possible, we do
   not use the MSD to calculate $\alpha_d$ because we can extract the same parameter 
   with higher precision using the dwell time distributions as described below.
   
@@ -456,7 +526,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 %  We modeled solute motion as a CTRW subordinate to FBM, also called sFBM. 
   
   One can characterize the CTRW component of an sFBM process by the parameters which describe
-  its dwell time and hop length distributions. We used the \texttt{ruptures} python
+  its dwell time and hop length distributions. We used the \texttt{ruptures} Python
   package in order to automatically identify mean shifts in solute trajectories, 
   indicating hops.\cite{truong_ruptures:_2018} We used the corresponding hop lengths
   and dwell times between hops to construct empirical distributions.
@@ -484,6 +554,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   trajectories we need to bound the dwell time distribution. We do this by adding 
   an exponential cut-off to the power law so the dwell time distribution is 
   now proportional to $t^{-1 - \alpha_d}e^{-\lambda t}$.
+  %MRS6: are there papers to cite that this is a standard way to cut them off (i.e. rather than truncate, etc).
   % of the form:
 %  \begin{equation}  %BJC3: maybe make this equation in line? Else move regular power law to its own equation
 %    p(t) \propto t^{-1 - \alpha}e^{-\lambda t}
@@ -523,17 +594,22 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   Figure~\ref{S-fig:hurst_autocorrelation} of the Supporting Information). Any hope of
   fitting longer time lags to our data is lost in the noise since the analytical values
   are so close to zero. Therefore, we obtained H by performing a least squares fit of 
-  Equation~\ref{eqn:fbm_autocorrelation} to the first 10 0.5 ns time lags of the 
+  Equation~\ref{eqn:fbm_autocorrelation} to the first 
+  ten  
+  0.5 ns time lags of the 
   empirically measured autocorrelation function.
 
   \subsubsection{Subordinated Fractional L\'evy Motion}\label{method:sflm}
-
-  If the distribution of hops is not Gaussian, we can model them with the
+  %MRS6: maybe make it clearer that this is something you will be doing in the paper 
+  Since we also want to account for the possibility that
+  %If the 
+  distribution of hops is not Gaussian, we can model them with the
   more general class of L\'evy stable distributions. For independent and identically
   distributed random variables, the generalized central limit theorem assures 
   convergence of the associated probability distribution function (PDF) to a 
   L\'evy stable PDF. \cite{klages_anomalous_2008} The characteristic equation which 
   describes the Fourier transform of a L\'evy stable PDF is:
+  %MRS6: maybe use just $\alpha$ for the general subdiffusive case, and alpha_h here.   
   \begin{equation}
     p_{\alpha_h, \beta}(k;\mu,\sigma) =\exp\left[i\mu k - \sigma^{\alpha_h}|k|^{\alpha_h}\left(1 - i\beta\frac{k}{|k|}\omega(k, \alpha_h)\right)\right]
   \end{equation}
@@ -545,7 +621,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \]
   $\alpha_h$ is the index of stability or L\'evy index, $\beta$ is the skewness 
   parameter, $\mu$ is the shift parameter and $\sigma$ is a scale parameter. The most
-  familiar case, and 1 of 3 that can be expressed in terms of elementary functions,
+  familiar case, and one of three that can be expressed in terms of elementary functions,
   is the Gaussian PDF ($\alpha_h$ = 2, $\beta$ = 0). We assume symmetric distributions
   centered about 0 implying that $\beta$ and $\mu$ are both 0.
   
@@ -635,7 +711,10 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   % BJC3: will need to modify this text to reflect different lengths of simulations
   For each solute, we simulated 1,000 anomalous diffusion trajectories of length
   $T_{sim}$ in order to directly compare our model's predictions to MD simulations.
-  $T_{sim}$ varied due to differing solute equilibration times. We constructed 
+  $T_{sim}$ varied 
+  %MRS6:
+  between solutes
+  due to differing solute equilibration times. We constructed 
   trajectories by simulating sequences of dwell times and correlated hop lengths
   generated based on parameters randomly chosen from our bootstrapped parameter 
   distributions. We propagated each trajectory until the total time equaled or 
@@ -656,7 +735,10 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   %MRS4: not quite sure what you mean by incorporating uncertainty. 
   %BJC4: Added comment about having a finite amount of data with which to create transition matrix. Therefore it is uncertain
   incorporated by re-sampling each row from a two dimensional Dirichlet distribution
-  (also called a beta distribution for the 2D case) with concentration parameters 
+  %MRS6:
+  %(also called a 
+  (which is also a 
+  beta distribution for the 2D case) with concentration parameters 
   defined by the count matrix.~\cite{bacallado_bayesian_2009}
 
   %BJC4: already said this earlier
@@ -667,16 +749,18 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 %  autocorrelation functions. 
   
   %BJC3: not sure how to cite fbm
-  We used the python package \texttt{fbm} to generate exact simulations of FBM and our
-  own python implementation of the algorithm by Stoev and Taqqu to simulate FLM.
+  We used the Python package \texttt{fbm} to generate exact simulations of FBM and our
+  own Python implementation of the algorithm by Stoev and Taqqu to simulate FLM.
   \cite{stoev_simulation_2004} Note that, to our knowledge, there are no known exact
-  simulation algorithms for generating FLM trajectories, however, the algorithm
+  simulation algorithms for generating FLM trajectories. 
+  %MRS6: broke sentence
+  However, the algorithm
   we used sufficiently approximates draws from the marginal distribution and 
   reasonably approximates the correlation structure on MD simulation timescales. We
   added an empirical correction to enhance the accuracy of the correlation structure
   (see Section~\ref{S-section:flm_correlation} of the Supporting Information for 
   validation of the approach).
-  
+  %MRS6: suggest in the supporting information describe what measure was used to determine that the algorithm sufficiently and reasonably approxmiates.
 %  When simulating 5 $\mu s$ FLM trajectories, we limited the maximum hop length to
 %  be no larger than the largest hop observed in our MD simulations. L\'evy stable 
 %  distributions often have heavy tails and an undefined variance which can give 
@@ -712,6 +796,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   with transitions between states defined by a transition probability matrix, $T$,
   which describes the conditional probability of jumping to a specific state given
   the previously observed state.~\cite{pande_everything_2010,wehmeyer_introduction_2018}
+  %MRS6: maybe skip this next sentence since you don't actually use them?
   Software packages such as MSMbuilder~\cite{beauchamp_msmbuilder2:_2011} and 
   pyEMMA~\cite{scherer_pyemma_2015} provide work flows capable of featurization and
   dimensional reduction which are often necessary to identify representative states.
@@ -722,13 +807,21 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   discrete states. The states we have chosen include all combinations of trapping
   mechanisms in the pore and out of the pore (see Table~\ref{table:states}). They
   assume that there are no significant kinetic effects resulting from solute 
-  conformational changes or pore size fluctuations, an assumption that may be 
-  relaxed in future work. We use the same radial cut-off (0.75 nm) as in the 
+  conformational changes or pore size fluctuations. 
+  %MRS6:
+  %Eh, Don't need to talk about future work. 
+  %an assumption that may be relaxed in future work. 
+
+  
+
+  We use the same radial cut-off (0.75 nm) as in the 
   anomalous diffusion model to differentiate the pore and tail region.  We define 
   a hydrogen bond to exist if the distance between donor, D, and acceptor, A, 
   atoms is less than 3.5 \AA~and the angle formed by $D-H \cdots A$ is less than
   30$\degree$. We define a sodium ion to be associated with an atom if they are 
-  within 2.5 \AA~of each other.~\cite{coscia_chemically_2019}
+  within 2.5 \AA~of each other, 
+  %MRS6:
+  as determined in our previous work~\cite{coscia_chemically_2019}
   
   \begin{table}[!htb]
 	  \centering
@@ -817,7 +910,9 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 %  as well as to sequences of emissions while dwelling in specific states using the FLM
 %  simulation procedure described in Section~\ref{method:model_sFBM}.
 
-  \subsection{Solute Flux}\label{method:mfpt}
+  %\subsection{Solute Flux}\label{method:mfpt}
+  %MRS6: tweak to make more active
+  \subsection{Estimating Solute Flux}\label{method:mfpt}
   
   We determined the rate at which solutes cross macroscopic-length pores based on the
   Hill relation:~\cite{hill_free_1989}
@@ -833,7 +928,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   
   We generated particle trajectories, parameterized with the above models, in order
   to construct a distribution of first passage times across a membrane pore of length $L$.
-  For computational reasons dependent on the model used, we simulated 1000-10000 trajectory
+  For computational reasons dependent on the model used, we simulated 1,000-10,000 trajectory
   realizations, released at the pore entrance ($z=0$). In the case of 
   uncorrelated hops, one can continuously draw from the hop length distribution until 
   $z \geq L$ (or $-L$ for the sake of computational efficiency). The length of time 
@@ -967,6 +1062,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 %  each time it crosses $0$ and reflect all of the negative trajectories. The ensemble of
 %  trajectories is consistent with the fraction of partic
   
+%MRS6: maybe more subsections in results so people can get a sense of where the flow is going at a glance?
   \section{Results and Discussion}
   
   %BJC4: Not sure if I should start by commenting on the stationarity of the 
@@ -1016,7 +1112,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \subsubsection{Parameterizing Subordinated Fractional Brownian Motion}\label{section:AD_parameterization}
 
   The evidence suggests that solutes in this system can be well-modeled by subordinated
-  fractional Brownian motion. In Figure~\ref{fig:anticorrelated_hops}, we use Urea to
+  fractional Brownian motion. In Figure~\ref{fig:anticorrelated_hops}, we use urea to
   support this claim. Analogous figures for all other solutes are presented in the Supporting
   Information, Figures~\ref{S-fig:GCL_anticorrelated_hops}--\ref{S-fig:MET_anticorrelated_hops}.
   The solutes clearly perform jumps after periods of relative
@@ -1065,6 +1161,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   Supporting Information).}\label{fig:anticorrelated_hops}
   %MRS4: are there similar figures in the supporting information.
   %BJC4: added
+  %MRS6: I'm wondering if the other plots should be in the main text.  They are part of the core of the paper, showing that the modeling is reasonable. 
   \end{figure}
   
   We modeled the distributions of hop lengths in two ways. First, we assumed the 
@@ -1098,11 +1195,13 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \begin{figure}
   \centering
   \includegraphics[width=0.5\textwidth]{ad_realizations_1mode.pdf}
-  \caption{Simulations of 1 mode AD model trajectories for Urea display qualitatively
+  \caption{Simulations of 1 mode AD model trajectories for urea display qualitatively
   similar hopping and trapping behavior to that shown in Figure~\ref{fig:solute_trajectories}. 
   Dwell times appear exaggerated in the sFBM and sFLM models because the power law dwell
   time distributions are not truncated and have infinite variance.
   %Analogous plots are shown for other solutes
+  %MRS6: I don't think the comparison between the cut and no cut are that interesting for the main text.  Move to supporting?
+  %MRS6: comparisons between modeled and actual trajectories side by side would be more interesting. 
   %BJC5: todo: add plots to SI. Show I add a 2 mode model plot?
   %and the 2 mode model in the Supporting Information. 
   }\label{fig:ad_eyetest}
@@ -1138,7 +1237,8 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   Ethylene Glycol          & 3.11 (2.06, 4.25)& 1.03 (0.76, 1.29)\\\hline
   Methanol                 & 2.24 (1.61, 2.92)& 1.06 (0.77, 1.39)\\\hline
   Acetic Acid              & 1.58 (1.11, 2.03)& 1.43 (1.10, 1.73)\\\hline
-  
+
+  %MRS6: you don't say what is in the paragraphs.
   \end{tabular}
   \caption{In order to be considered stationary, the MSD of the ensemble of solute trajectories
   should be the same independent of the portion of equilibrated trajectory that is
@@ -1182,14 +1282,20 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \includegraphics[width=\textwidth]{2mode_msd_comparison_ACH_train_front.pdf}
   \caption{Acetic acid (2 modes)}\label{fig:2mode_msd_comparison_ACH_train_front}
   \end{subfigure} 
+  %MRS6: I'm not sure I see red in urea.  Is the uncertainty that low?
   \caption{In most cases, when using power laws with exponential cut-offs 
   (sFBMcut and sFLMcut), the MSD curves predicted by the AD model trained on 
   the first half of the equilibrated data lie within the 1$\sigma$ confidence
   intervals of the MD MSD curves generated from the second half of the equilibrated
   solute data. The models which use pure power laws systematically under-predict
-  the MD MSD curves. Improper curvature of the MSD curves cause the magnitude of
+  the MD MSD curves. 
+  %MRS6: be more specific when you say ``improper''. What is improper?
+Improper curvature of the MSD curves cause the magnitude of
   the urea's predicted MSDs to be under-predicted at long timescales and those
   of acetic acid to be under-predicted at short timescales.}\label{fig:train_test}
+  %MRS6: I'm not sure it makes sense to show the ``without cutoff'' lines here.  Maybe supporting?  
+  %MRS6: I'm just not sure it really pushes the paper forward to show more data that something you've shown
+  %MRS6: isn't likely to work earlier still isn't working. 
   \end{figure}
   
   The models are capable of reasonably predicting the MD MSD values of the second
@@ -1219,7 +1325,13 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   AD model to under-predict the MSD at short timescales. 
   
   The under-estimate of Urea's MSD at long timescales is due to long timescale
-  positional anti-correlation which may not be present in the real system. The 
+  positional anti-correlation which may not be present in the 
+  %MRS6: real?
+  %real 
+  molecularly detailed simulations of the 
+  system. The 
+  %MRS6: I'm not following whether or not there should be positional anti-correlation.  I was thinking there should be,
+  %but perhaps I'm misunderstanding something here? 
   persistent curvature of the predicted MSD curves is a direct consequence of 
   the Hurst parameter. Without anti-correlation, the process would be 
   a pure CTRW for which one would expect the time averaged MSD curves to become 
@@ -1234,7 +1346,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   small amount of data (see Section~\ref{method:sfbm} for further discussion of this 
   challenge). A more accurate measurement of $H$ would fix the shape of the MSD curve,
   but also lower the predicted MSD meaning we are either underestimating the width of
-  the hop length distribution, favoring longer dwell times or both.
+  the hop length distribution, favoring longer dwell times, or both.
   
 %  Urea's curves appear to have
 %  close to the right amount of curvature at short timescales 
@@ -1274,7 +1386,10 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   be necessary. Therefore, in the next section we will work with parameters fit to the
   full equilibrated portion of the solute trajectories, doubling the data.
   
+%MRS6: My instinct is to only show the graphs of the full model, with validation graphs shown in the supporting.  We can talk about this. We do what the focus to be on what we can learn physically.  The discussion gets pretty repetitive.
   
+%MRS6: be a bit clearer about how the MD MSD error bounds are calculated.  That becomes important for determining how accurate the modeling is. . 
+
 %  However, in the case of acetic acid, this may only happen because the 
 %  Hurst parameter is overestimated. It appears we are operating on the border of the
 %  minimum amount of data required to accurately parameterize the AD model. Longer
@@ -1397,10 +1512,13 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \caption{}\label{fig:2mode_AD_dwells}
   \end{subfigure}
   \caption{
+  %MRS6: shouldnt the values be positive below the axis as well (if that can be done) I guess they are for b, but not for A.
   The two mode model parameterizes solute behavior in the pore and tails separately.
   We consider solutes to be within the pore region if they are 0.75 nm from a given pore
   center, otherwise they are in the tails. (a) Generally, movement is much more restricted
-  in the tail region shown by lower $\sigma$ values for the Normal and L\'evy stable 
+  in the tail region shown by lower $\sigma$ 
+  %MRS6: define sigma to remind people what it is
+  values for the normal and L\'evy stable 
   distributions. Values of $\alpha$ are significantly lower for urea and acetic acid meaning 
   there is a larger probability that they will take large hops. (b) Dwell times are longer in 
   the tails. Lower values of $\alpha_d$ correspond to power laws with heavier tails and 
@@ -1420,7 +1538,9 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   
   The deviation between the 1 mode MSD predictions and MD are primarily due
   to differences in their curvature at long time lags. The shape and magnitude of the curves appears accurate 
-  at short time lags, however, the curves tend to undershoot the MD MSD mean
+  at short time lags.  
+  %MRS6: which curves?
+  However, the curves tend to undershoot the MD MSD mean
   as the time lag increases. As discussed in the previous section, long time
   positional anti-correlation may not exist in the MD system which results 
   in a shift from sub-linear to linear MSD behavior. Acetic acid exemplifies
@@ -1429,6 +1549,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   that the MD MSD curve actually shifts from a sub-linear to a linear regime 
   around 500 ns.
   
+  %MRS6: is it more or less physical that it has this behavior? 
   The 2 mode models shows considerably less curvature at large time lags than
   the 1 mode model because the implementation of the 2 mode model prevents long
   timescale correlation. The width of the hop distribution changes every time
@@ -1478,8 +1599,14 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   long dwell times. Higher values of $\lambda$ truncate the power law distribution 
   earlier preventing extremely long dwell times. Values of $H$ closer to the Brownian
   limit of 0.5, indicate a lower degree of negative correlation between hops. All 
-  of which contribute to an overall increase in the MSD.
-  
+  of 
+  these model properties
+  %which 
+  contribute to 
+  %MRS6: increase in the MSD compared to what, be specific?
+  an overall increase in the MSD.
+
+
   Turning first to the parameters of the 1 mode model, we can begin to break down the
   trends in solute MSDs. The parameters belonging to ethylene glycol and methanol are
   relatively similar which is consistent with their similar MD MSDs. Methanol 
@@ -1509,8 +1636,8 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   44\% of its time in the tails. Urea and acetic acid's compact and flat structure 
   allows it to more easily partition into the tails while ethylene glycol prefers
   the pore region due to its two hydrophilic hydroxyl groups. Meanwhile methanol 
-  spends 91 \% of its time in the tails likely due to its small size.  
-  The value of $\alpha_h$ for urea and acetic acid in the tails is 1.50 meaning its hop distribution
+  spends 91\% of its time in the tails likely due to its small size.  
+  The value of $\alpha_h$ for urea and acetic acid in the tails is 1.50, meaning its hop distribution
   is heavy tailed relative to ethylene glycol and methanol whose $\alpha_h$ values are
   more consistent with a Gaussian distribution ($\alpha$=2). Acetic acid and urea are
   structurally similar molecules, both planar with two heavy atoms attached to a 
@@ -1638,8 +1765,13 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   already studied transport mechanisms in detail in our previous work, we can
   attempt to model transport as transitions between known discrete
   states, defined in Table~\ref{table:states}, with state-dependent positional
-  fluctuations, which we call the MSDDM.
-  
+  fluctuations, which we 
+  %MRS6:
+  refer to as
+  %call 
+  the MSDDM.
+  %MRS6: maybe give full name before if you are essentially defining it. 
+
   % BJC4: I moved this discussion up. It used to be after I presented the parameters
   Solute size and chemical functionality influence which states are visited most frequently.
   In Figure~\ref{fig:state_probabilities}, we plotted the probabilities of occupying
@@ -1695,12 +1827,14 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   consecutive observations of each type of transition with which to study their 
   individual correlation structures so we grouped all transition distributions
   into a single distribution and measured the correlation of the series of all 
-  transitions. We lose information about individual types of transitions, however, 
+  transitions. 
+  %MRS6: how much of this is described earlier in methods?
+  We lose information about individual types of transitions, however, 
   we believe this is unavoidable without at least an order of magnitude of additional data.
   In theory, one could parameterize separate transition distributions for those
   which occur in the tails versus in the pores, however this would lead to a broken 
   correlation structure similar to that seen in the 2 mode AD model.
-  
+
   We observe correlated emissions drawn from L\'evy stable distributions. The 
   deviation of the emission distributions from Gaussian behavior is far more pronounced
   than that seen in the hop length distributions of the previous section, therefore we 
@@ -1791,6 +1925,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 %  its two hydrophilic hydroxyl groups. Meanwhile methanol spends 91 \% of its 
 %  time in the tails likely due to its small size.
 
+%MRS6: even if the MSD is well predicted, if the trajectories look different, can it really be a useful model?  I.e. is one getting the right answer for the wrong reasons?  What does it mean if MSD's are good, but the dwell times are not great?
   Qualitatively, realizations of the MSDDM are not consistent with MD solute
   trajectories. Using the parameters shown in Figure~\ref{fig:msddm_parameters}
   we generated realizations of the MSDDM and plotted a typical realization for each
@@ -1808,6 +1943,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \begin{figure}
   \centering
   \includegraphics[width=0.5\textwidth]{msddm_realizations.pdf}
+  %MRS6: see above - right for wrong reasons?
   \caption{Realizations of the MSDDM for each solute do not reproduce the hopping
   and trapping behavior observed in our MD simulations. Except for a few large 
   hops, the trajectories are qualitatively similar to what one might expect for
@@ -1859,7 +1995,9 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   the MSD on longer timescales. 
   
   The predicted MSD of acetic acid is severely over-estimated most likely due
-  to poor parameterization. As stated earlier, most of a solute's motion is 
+  to poor parameterization. 
+  %MRS6: poor parameterization is vague.  Of which features?
+As stated earlier, most of a solute's motion is 
   due to displacements during state transitions. Acetic acid has a transitional
   Hurst parameter close to urea's and a transitional $\sigma$ value that 
   is higher than urea's. This suggests that the heavier tails of urea's transitional
@@ -1929,6 +2067,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   
   \subsection{Solute Flux}\label{section:mfpt}
   
+  %MRS6: to what extent can be 'cut' models be the ones used, and the untruncated ones thrown out early in the paper to simplify the presentation. 
   We used the 1-mode sFBMcut (see Table~\ref{table:anomalous_models}) anomalous 
   diffusion model and the MSDDM in order to demonstrate how one can use their realizations
   in order to calculate the flux (see section~\ref{method:mfpt}) of solutes given model 
@@ -1984,7 +2123,8 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \includegraphics[width=\textwidth]{flux_curves_msddm.pdf}
   \caption{MSDDM}\label{fig:flux_curves_msddm}
   \end{subfigure}  
-  \caption{(a) The distributions of passage times generated from the sFBMcut model
+  %MRS6: make clear the dots are experiment. 
+  \caption{(a) The distributions of first passage times generated from the sFBMcut model
   fit well to Equation~\ref{eqn:passage_times}. We show similar fits for the remaining
   solutes as well as the MSDDM in Figures~\ref{S-fig:ad_fpt_fits} and~\ref{S-fig:msddm_fpt_fits}
   of the Supporting Information. (b) The single particle flux measured 
@@ -2035,7 +2175,9 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   however, in Figure~\ref{S-fig:flux_curve_sensitivity} of the Supporting information,
   we show that one can still show statistically significant differences in solute 
   flux, with minimal change to the mean flux values, using as few as 100 trajectory
-  realizations. To be sure, we recommend simulating at least 1000 realizations. 
+  realizations. 
+  %To be sure, 
+  For better precision, we recommend simulating at least 1000 realizations. 
   Since the computational cost of the MSDDM is greater than the AD model, we generated
   each point of the flux curves in Figure~\ref{fig:flux_curves_msddm} using only 1000
   realizations at each pore length. 
@@ -2107,6 +2249,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \caption{}\label{fig:beta_parameters}
   \end{subfigure}
   %BJC5: need to update MSDDM (immobile states). Waiting on those simulations
+  %MRS6: should try to lead with what the overall results/conclusions are.  What does it mean that parameters are larger or smaller?  What should the reader take from the discussion?  Should it be in supportinig?
   \caption{(a) The $\beta$ values of the sFBMcut model appear to be inversely proportional
   to the Hurst parameters. The $\beta$ values of the MSDDM are much lower with much less
   variation than the sFBMcut model. (b) The $\beta$ parameters of the MSDDM are low because
@@ -2121,6 +2264,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   immobilizing particles in trapped states further raises the value of $\beta$.}\label{fig:beta}
   \end{figure}
   
+  %MRS6: can this be made a physical thesis instead of a mathematical one?
   The values of $c$ are directly related to the magnitude of solute flux and, where
   applicable, are functions of $\sigma$, $\alpha_d$, $\lambda$ and $\alpha_h$. 
   In Figure~\ref{fig:c_parameters}, we plot the $c$ values measured
@@ -2370,7 +2514,9 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   motion by applying them to an H\textsubscript{II} phase LLC membrane. The values
   obtained for the parameters when fitting the models to the time series data 
   offer important mechanistic insight on the molecular details of transport.
-  Subordinated fractional Brownian and L\'evy motion have a nice theoretical 
+  Subordinated fractional Brownian and L\'evy motion have a 
+  %nice 
+  strong theoretical 
   foundation in the anomalous diffusion literature. Our single mode model
   quantifies and allows comparison of the hopping and trapping behavior 
   among solutes. A two mode model that describes dynamics based on whether
@@ -2382,6 +2528,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   solutes among states as well as the type of stochastic behavior shown in each 
   state. 
   
+  %MRS6: right answer, wrong reason for MSD match issue?
   All of the models we tested have moderate success reproducing the MSDs of
   solute trajectories generated by MD simulations. In almost all cases, large 
   portions of the MSDs predicted by our models fall close to or within the 1$\sigma$
@@ -2496,6 +2643,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
 
   \clearpage
 
+  %MRS6: look over and make bibliography consistent (i.e. no months, consistent journal abbreviations)
   \bibliographystyle{ieeetr}
   \bibliography{stochastic_transport}
 
@@ -2504,6 +2652,7 @@ and Predicts Long Timescale Behavior in Nanoscale Pores.}
   \section*{TOC Graphic}
     
   %BJC5: still a work in progress
+  %MRS6: seems pretty reasonable as a concept. If you can make the three figure labels the same color (doesn't have to be black or white) and same font, might be nice.  Maybe make arrows more like circle arcs, and change the color from black so it stands out more?  The time series model figure is a bit busy. Can it be reduced from 4 subfigures?  May not be necessary, but one thing to think about.
   \begin{figure}[!htb]
   \centering
   \includegraphics[width=3.25in]{toc.pdf}
