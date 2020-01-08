@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[12pt]{article}
 
 \usepackage{setspace}
 \doublespacing
@@ -418,13 +418,13 @@ with time series modeling}
   a power law of the form:
   %MRS6: do you need the subscript for $\alpha$? makes it harder to read. 
   \begin{equation} 
-  \langle z^2(t) \rangle = K_{\alpha_d}t^{\alpha_d}
+  \langle z^2(t) \rangle = K_{\alpha}t^{\alpha}
   \label{eqn:msd_form}
   \end{equation} 
-  where $\alpha_d$ is the anomalous exponent and $K_{\alpha_d}$ is the generalized 
+  where $\alpha$ is the anomalous exponent and $K_{\alpha}$ is the generalized 
   diffusion coefficient. We only calculate MSD with respect to the solutes' center of
-  mass $z$-coordinate, which is oriented along the pore axis. A value of $\alpha_d < 1$
-  indicates a subdiffusive process, while values of $\alpha_d = 1$ and $\alpha_d > 1$ 
+  mass $z$-coordinate, which is oriented along the pore axis. A value of $\alpha < 1$
+  indicates a subdiffusive process, while values of $\alpha = 1$ and $\alpha > 1$ 
   are characteristic of Brownian and superdiffusive motion respectively.
   
   %MRS6: next paragraph could be clearer.  Maybe motivate at the beginning why the importance of time. vs. ensemble averated. It's sprung a sort of a surprise there's a difference 
@@ -462,7 +462,7 @@ with time series modeling}
   % pore of new particles at each unit time?
   % BJC6: no, but neither does ensemble
   Although theoretically possible, we do not use the ensemble averaged MSD to 
-  calculate $\alpha_d$ because we can extract the same parameter with higher 
+  calculate $\alpha$ because we can extract the same parameter with higher 
   precision using the dwell time distributions as described below.
   
 %  Only the \textit{ensemble} averaged MSD will reproduce the form of 
@@ -492,7 +492,7 @@ with time series modeling}
 %  of the average distance a solute travels over time. 
 %  %MRS6: does it correspond properly to the physical situation of entry into the pore of new particles at each unit time?
 %  Although theoretically possible, we do
-%  not use the MSD to calculate $\alpha_d$ because we can extract the same parameter 
+%  not use the MSD to calculate $\alpha$ because we can extract the same parameter 
 %  with higher precision using the dwell time distributions as described below.
   
 %  of the process is exhibits weak ergodicity breaking due to 
@@ -519,17 +519,17 @@ with time series modeling}
   
   \textit{Dwell time distributions:} For subdiffusive transport, the distribution 
   of dwell times is expected to fit a power law distribution 
-  proportional to $t^{-1-\alpha_d}$.~\cite{meroz_toolbox_2015}
+  proportional to $t^{-1-\alpha}$.~\cite{meroz_toolbox_2015}
   Because we are limited to taking measurements at discrete intervals dictated by the output 
   frequency of our simulation trajectories, we fit the empirical dwell times
-  to a discrete power law distribution whose maximum likelihood $\alpha_d$ 
+  to a discrete power law distribution whose maximum likelihood $\alpha$ 
   parameter we calculated by maximizing the likelihood function: 
   \begin{equation}
 	\mathcal{L}(\beta) = -n\ln \zeta(\beta, t_{min}) -
 	\beta\sum_{i=1}^{n} \ln t_i 
   \label{eqn:powerlaw_likelihood}
   \end{equation}
-  where $\beta = 1 + \alpha_d$, $t_i$ are collected dwell time data points,
+  where $\beta = 1 + \alpha$, $t_i$ are collected dwell time data points,
   $n$ the total number of data points, and $\zeta$ is the Hurwitz zeta function
   where $t_{min}$ is the smallest measured value of	$t$.~\cite{clauset_power-law_2009}
   
@@ -539,16 +539,16 @@ with time series modeling}
   In order to directly compare our anomalous diffusion model to finite-length MD 
   trajectories we need to bound the dwell time distribution. We do this by adding 
   an exponential cut-off to the power law so the dwell time distribution is 
-  now proportional to $t^{-1 - \alpha_d}e^{-\lambda t}$.
+  now proportional to $t^{-1 - \alpha}e^{-\lambda t}$.
   %MRS6: are there papers to cite that this is a standard way to cut them off (i.e. rather than truncate, etc).
   % of the form:
 %  \begin{equation}  %BJC3: maybe make this equation in line? Else move regular power law to its own equation
 %    p(t) \propto t^{-1 - \alpha}e^{-\lambda t}
 %  \label{eqn:powerlaw_cutoff}
 %  \end{equation}
-  We determine MLEs of $\alpha_d$ and $\lambda$ by maximizing the likelihood function:~\cite{clauset_power-law_2009}
+  We determine MLEs of $\alpha$ and $\lambda$ by maximizing the likelihood function:~\cite{clauset_power-law_2009}
   \begin{equation}
-    \mathcal{L}(\alpha_d, \lambda) = n(1 - \alpha_d)\ln\lambda - n\ln\Gamma(1 - \alpha_d, t_{min}\lambda) - \alpha_d\sum_{i=1}^{n}\ln t_i - \lambda\sum_{i=1}^n t_i
+    \mathcal{L}(\alpha, \lambda) = n(1 - \alpha)\ln\lambda - n\ln\Gamma(1 - \alpha, t_{min}\lambda) - \alpha\sum_{i=1}^{n}\ln t_i - \lambda\sum_{i=1}^n t_i
   \label{eqn:powerlaw_cutoff_likelihood}
   \end{equation}
   
@@ -1455,9 +1455,9 @@ Improper curvature of the MSD curves cause the magnitude of
   $L(\sigma, \alpha_h)$, distributions to describe solute hop lengths. We assume the 
   mean ($\mu$) to be zero for these distributions and there to be no skewness ($\beta = 0$)
   in the L\'evy stable disributions. High values of $\sigma$ and lower values of $\alpha_h$
-  result in larger hops. (b) We parameterized a pure power law, $P(\alpha_d)$, and a 
-  truncated power law, $P_T(\alpha_d, \lambda)$, distribution to describe solute dwell
-  times. Lower values of $\alpha_d$ lead to heavier power law tails and higher values of 
+  result in larger hops. (b) We parameterized a pure power law, $P(\alpha)$, and a 
+  truncated power law, $P_T(\alpha, \lambda)$, distribution to describe solute dwell
+  times. Lower values of $\alpha$ lead to heavier power law tails and higher values of 
   $\lambda$ truncate the distibution at lower dwell times. (c) Finally, we parameterized the
   hop autocorrelation function, $\gamma(H)$, to describe the degree of correlation between
   hops. Higher values of $H$ display closer to Brownian behavior.}\label{fig:1mode_parameters}
@@ -1482,7 +1482,7 @@ Improper curvature of the MSD curves cause the magnitude of
   in the tail region shown by lower $\sigma$ values (smaller hops) for the normal and L\'evy stable 
   distributions. Values of $\alpha$ are significantly lower for urea and acetic acid meaning 
   there is a larger probability that they will take large hops. (b) Dwell times are longer in 
-  the tails. Lower values of $\alpha_d$ correspond to power laws with heavier tails and 
+  the tails. Lower values of $\alpha$ correspond to power laws with heavier tails and 
   thus higher probabilities of long dwell times. There is no easily discernable trend in
   $\lambda$ of the truncated power law distribution. Note that we used the same Hurst parameter
   for both modes (shown in Figure~\ref{fig:hurst_barchart}) due to a low number of 
@@ -1556,7 +1556,7 @@ Improper curvature of the MSD curves cause the magnitude of
   %BJC6: need to double check this after alpha_h c parameter simulations are re-done
   Higher values of $\sigma$ and lower values of $\alpha_h$ indicate larger average 
   hop length magnitudes by increasing the hop length distribution's width and tail 
-  density respectively. Higher values of $\alpha_d$ indicate a lower probability of 
+  density respectively. Higher values of $\alpha$ indicate a lower probability of 
   long dwell times. Higher values of $\lambda$ truncate the power law distribution 
   earlier preventing extremely long dwell times. Values of $H$ closer to the Brownian
   limit of 0.5 indicate a lower degree of negative correlation between hops. All 
@@ -1577,11 +1577,11 @@ Improper curvature of the MSD curves cause the magnitude of
   to other solutes. However, it remains plausible that methanol does have a low $H$ 
   value because it spends the majority of its time outside the pore region where collisions
   with tails are frequent. Urea has the third highest MSD which is primarily a consequence of
-  more frequent and longer dwell times, indicated by lower values of $\alpha_d$ and 
+  more frequent and longer dwell times, indicated by lower values of $\alpha$ and 
   $\lambda$. Urea's hop lengths ($\sigma$) and correlation ($H$) are comparable to ethylene
   glycol and methanol. Acetic acid has the smallest MSD among the solutes studied due 
   to longer periods of entrapment and shorter hops. Its trapping behavior is parameterized
-  by an $\alpha_d$ value significantly lower than other solutes, but an intermediate 
+  by an $\alpha$ value significantly lower than other solutes, but an intermediate 
   $\lambda$ value, suggesting it experiences many medium length periods of entrapment. 
   Its hops are smaller but are slightly compensated by a heavier tailed distribution 
   (lower $\alpha_h$) than the other solutes. 
@@ -1589,7 +1589,7 @@ Improper curvature of the MSD curves cause the magnitude of
   We can use the 2 mode model to gain an even deeper understanding of solute behavior
   in the pore versus in the tails. It is clear that solutes are significantly slowed 
   while they are in the tail region where long dwell times are more probable
-  (smaller $\alpha_d$) and hops are smaller (smaller $\sigma$). Each solute spends 
+  (smaller $\alpha$) and hops are smaller (smaller $\sigma$). Each solute spends 
   a different amount of time in the tails (see Figure~\ref{fig:AD_mode_occupation}). 
   Urea and acetic acid spend slightly more than half of their time in the tails 
   (56\% and 62\% of their time respectively) while ethylene glycol spends about 
@@ -1630,8 +1630,8 @@ Improper curvature of the MSD curves cause the magnitude of
   %in a given amount of time appear to be more accurately parameterized.
   
 %  The parameters of the 1 mode model indicate some diversity in solute behavior. The value
-%  of $\alpha_d$ for pure and truncated power law fits to the dwell time distributions of 
-%  urea, ethylene glycol and methanol are similar. The value of $\alpha_d$ for acetic
+%  of $\alpha$ for pure and truncated power law fits to the dwell time distributions of 
+%  urea, ethylene glycol and methanol are similar. The value of $\alpha$ for acetic
 %  acid is significantly lower than the rest of the solutes meaning it stays trapped 
 %  for long periods of time more frequently. The value of $\lambda$ is largest for
 %  methanol indicating that its longest dwell time is shorter than the longest dwell
@@ -1650,7 +1650,7 @@ Improper curvature of the MSD curves cause the magnitude of
 %  BJC4: urea and ethylene glycol only
 %  The parameters of the 1 mode model are similar between urea and ethylene glycol which 
 %  is not surprising considering their similar MD MSDs. Dwell times by 
-%  ethylene glycol are shorter as shown by its larger $\alpha_d$ and $\lambda$ values. Both
+%  ethylene glycol are shorter as shown by its larger $\alpha$ and $\lambda$ values. Both
 %  solutes make similarly sized hops with hop distributions that are relatively close 
 %  to Gaussian (i.e. $\alpha_h$ near 2) when fit to a L\'evy stable distribution. Finally,
 %  both solutes exhibit a similar degree of correlation between hops with ethylene glycol
@@ -1659,7 +1659,7 @@ Improper curvature of the MSD curves cause the magnitude of
 %  The difference in parameters of each mode of the 2 mode sFBM model offer additional
 %  mechanistic insight which the 1 mode model lacks. It is clear that solutes are 
 %  significantly slowed while they are in the tail region (mode 2) where long dwell times
-%  are more probable and hops are smaller (smaller $\alpha_d$). 
+%  are more probable and hops are smaller (smaller $\alpha$). 
 % BJC: I'm not sure how valid it is to analyze lambda because it is dependent on alpha. There is some counterbalancing going on.  
 % The values of $\lambda$, however, do not 
 % appear to be directly correlated to mode. For example, $\lambda$ for ethylene glycol is
@@ -1677,10 +1677,10 @@ Improper curvature of the MSD curves cause the magnitude of
 %  The parameters of the 2 mode model are again similar between urea and ethylene glycol, 
 %  but the difference between parameters of each mode offer more detailed mechanistic
 %  insight than the 1 mode model. It is clear that solutes are significantly slowed while
-%  they are in the tail region where long dwell times are more probable (lower $\alpha_d$)
+%  they are in the tail region where long dwell times are more probable (lower $\alpha$)
 %  and hops are smaller (smaller $\sigma$).  
 %  Interestingly, $\alpha_h$ for urea in mode 2 is 1.50 meaning its hop distribution is
-%  heavy tailed relative to ethylene glycol which has an $\alpha_d$ more consistent 
+%  heavy tailed relative to ethylene glycol which has an $\alpha$ more consistent 
 %  with a Gaussian distribution. Although urea's $\sigma$ parameter is much smaller in 
 %  the tails, it still has an appreciable probability of making large hops. This could 
 %  be a consequence of urea's relatively small size and rigid shape compared to ethylene glycol.
@@ -2162,7 +2162,7 @@ As stated earlier, most of a solute's motion is
   \textit{and} dwell times between hops (set dwell times equal to 1), effectively simulating 
   Brownian motion, we observe similar $\beta$ parameters. These two variations imply that,
   in the AD models, the $\beta$ parameter is only a function of $H$ and not dependent on
-  dwell times ($\alpha_d$, $\lambda$) or hop lengths ($\sigma$). The MSDDM is fundamentally similar to 
+  dwell times ($\alpha$, $\lambda$) or hop lengths ($\sigma$). The MSDDM is fundamentally similar to 
   the AD model in that one makes correlated draws from a hop distribution. Therefore,
   we should expect the $\beta$ value of the MSDDM to be larger than that of Brownian 
   motion.
@@ -2227,7 +2227,7 @@ As stated earlier, most of a solute's motion is
   
   %MRS6: can this be made a physical thesis instead of a mathematical one?
   The values of $c$ are directly related to the magnitude of solute flux and, where
-  applicable, are functions of $\sigma$, $\alpha_d$, $\lambda$ and $\alpha_h$. 
+  applicable, are functions of $\sigma$, $\alpha$, $\lambda$ and $\alpha_h$. 
   In Figure~\ref{fig:c_parameters}, we plot the $c$ values measured
   for each solute with each model from lowest to highest. In general, $c$ values generated
   by the MSDDM model are smaller than the those generated by the sFBMcut AD model 
@@ -2238,14 +2238,14 @@ As stated earlier, most of a solute's motion is
   that any parameter which acts to modify the rate at which solutes move through the
   membrane pores will affect $c$ for various physical reasons. In 
   Figure~\ref{fig:c_influence} we demonstrate that decreased dwell times
-  (increased $\alpha_d$), increased hop lengths (increased $\sigma$), cutting off the
+  (increased $\alpha$), increased hop lengths (increased $\sigma$), cutting off the
   dwell time distribution at shorter times (increased $\lambda$) and decreased tail 
   weights of the hop length distribution (increased $\alpha_h$) independently lead to
   an increase in $c$. Figure~\ref{fig:c_influence} also suggests that $c$ is not dependent on hop
   anti-correlation ($H$).
 
 %  We showed earlier that $\beta$ is not a
-%  function of $\sigma$ or $\alpha_d$, therefore dwell times and hop lengths must
+%  function of $\sigma$ or $\alpha$, therefore dwell times and hop lengths must
 %  influence $c$. In fact, any parameter which acts to modify the rate at which 
 %  solutes move through the membrane pores will affect $c$. Therefore it is 
 %  sensible to hypothesize that a higher degree of anti-correlation (lower $H$)
@@ -2270,14 +2270,14 @@ As stated earlier, most of a solute's motion is
   of the MSDDM are smaller than the sFBMcut AD model because the AD model must
   compensate for its strong length dependence (higher $\beta$). (b) Changes to parameters
   which increase the rate of solute displacement result in larger values of $c$. 
-  To test the dependence of $c$ on $\alpha_d$, $\sigma$, $H$ and $\lambda$, we chose a 
+  To test the dependence of $c$ on $\alpha$, $\sigma$, $H$ and $\lambda$, we chose a 
   single set of parameters, representative of solutes parameterized by the sFBMcut AD model,
   and generated realizations of the model by varying each parameter independently about the
   same base parameter set. Therefore, the middle bars for these four 4 parameters are 
-  generated from the same set of parameters. Decreased dwell times (increased $\alpha_d$),
+  generated from the same set of parameters. Decreased dwell times (increased $\alpha$),
   increased hop lengths (increased $\sigma$), and a lower cut-off to the dwell time
   distribution (increased $\lambda$) lead to increases in $c$. $c$ responds linearly
-  to increases in $\sigma$ and $\lambda$ and non-linearly to $\alpha_d$. The data 
+  to increases in $\sigma$ and $\lambda$ and non-linearly to $\alpha$. The data 
   suggests that the $c$ parameters do not depend on hop anti-correlation ($H$). To test 
   $\alpha_h$, we used the set of parameters defining the MSDDM of Urea (since sFBMcut does
   not use a L\'evy distribution) and varied the $\alpha_h$ parameter of the transitional

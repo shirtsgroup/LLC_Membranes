@@ -86,8 +86,8 @@ sys = file_rw.load_object('%s/forecast_%s_%dstate.pl' % (directory, res, nmodes)
 dwell_dist = ['Power Law', 'Power Law Exponential Cutoff', 'Power Law', 'Power Law Exponential Cutoff']
 hop_dist = ['Gaussian', 'Gaussian', 'Levy', 'Levy']
 
-#dwell_dist = ['Power Law Exponential Cutoff']
-#hop_dist = ['Levy']
+dwell_dist = ['Power Law Exponential Cutoff', 'Power Law Exponential Cutoff']
+hop_dist = ['Gaussian', 'Levy']
 #dwell_dist = ['Power Law']
 #hop_dist = ['Levy']
 
@@ -161,9 +161,9 @@ for i, dists in enumerate(zip(dwell_dist, hop_dist)):
 		
 	labels.append(abbrev)
 
-plt.legend(labels, loc=0, fontsize=14)
+plt.legend(labels, loc='upper left', fontsize=14)
 plt.tight_layout()
 #plt.savefig('toc_msd.png')
-#plt.savefig('%dmode_msd_comparison_%s.pdf' % (nmodes,res))
+plt.savefig('%dmode_msd_comparison_%s.pdf' % (nmodes,res))
 if not args.noshow:
 	plt.show()

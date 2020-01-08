@@ -705,7 +705,8 @@ class CTRW(object):
 
         return [A[0], A[1]]
 
-    def plot_msd(self, confidence=95, plot_power_law=False, plot_linear=False, show=True, end_frame=None, newfig=True):
+    def plot_msd(self, confidence=95, plot_power_law=False, plot_linear=False, show=True, end_frame=None, newfig=True,
+                 alpha=0.5):
         """ Plot averaged mean squared displacement with error bars
 
         :param confidence: confidence interval for error bars
@@ -715,6 +716,7 @@ class CTRW(object):
         :param end_frame: last frame to include in fit to MSD
         :param newfig: Make this a figure of its own. Set to False if trying to plot multiple MSDs on top of each other
         using this function.
+        :param alpha: opacity of errorbars
 
         :type confidence: float
         :type plot_power_law: bool
@@ -739,7 +741,7 @@ class CTRW(object):
             error = stats.confidence_interval(self.bootstraps, confidence)
             if end_frame is not None:
                 error = error[:, :end_frame]
-            plt.fill_between(self.time_uniform, error[1, :] + mean, mean - error[0, :], alpha=0.5)
+            plt.fill_between(self.time_uniform, error[1, :] + mean, mean - error[0, :], alpha=alpha)
             self.final_msd = [mean[-1], mean[-1] - error[0, -1], error[1, -1] + mean[-1]]
             print('Estimated MSD: %.2f [%.2f, %.2f]' % (self.final_msd[0], self.final_msd[1], self.final_msd[2]))
 

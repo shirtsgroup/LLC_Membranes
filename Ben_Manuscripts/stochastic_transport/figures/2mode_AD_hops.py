@@ -42,8 +42,8 @@ def adjust_yaxis(ax,ydif,v):
 
 root_dir = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11"
 sol = ['URE', 'GCL', 'MET', 'ACH']
-colors = {'URE':'xkcd:blue', 'GCL':'xkcd:orange', 'MET':'xkcd:green', 'ACH':'xkcd:magenta'}
-colors = {'sigma_normal': 'xkcd:blue', 'sigma_levy': 'xkcd:gold', 'alpha': 'xkcd:orangered'}
+colors = {'URE':'xkcd:magenta', 'GCL':'xkcd:orange', 'MET':'xkcd:green', 'ACH':'xkcd:magenta'}
+colors = {'sigma_normal': 'xkcd:magenta', 'sigma_levy': 'xkcd:orange', 'alpha': 'xkcd:blue'}
 names = {'URE': 'urea', 'GCL': 'ethylene glycol', 'MET': 'methanol', 'ACH': 'acetic acid'}
 names2 = ['urea', 'ethylene\nglycol', 'methanol', 'acetic\nacid']
 bar_width = 0.2
@@ -144,6 +144,9 @@ plt.xticks([1.0, 2.0, 3.0, 4.0], names2)
 props = dict(boxstyle='square', facecolor='grey', alpha=0.3, lw=0, fill=False)
 ax1.text(2.6, 1.2, 'Pores', verticalalignment='center', horizontalalignment='center', fontsize=18, fontweight='bold')#, bbox=props, fontweight='bold')
 ax1.text(2.6, -1.2, 'Tails', verticalalignment='center', horizontalalignment='center', fontsize=18, fontweight='bold')#, bbox=props, fontweight='bold')
+
+ax1.set_yticklabels([1.5, 1, 0.5, 0, 0.5, 1])#, 0.75, 0.5, 0.25, 0, 0.25, 0.5, 0.75, 1.0])
+ax2.set_yticklabels([3, 2, 1, 0, 1, 2])#0.006, 0.004, 0.002, 0, 0.002, 0.004, 0.006])
 
 ax1.plot([0, 5], [0, 0], color='black', lw=2)
 #ax1.set_xlabel('Solute', fontsize=14)

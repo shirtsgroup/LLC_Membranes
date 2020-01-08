@@ -35,7 +35,7 @@
 \newcolumntype{R}[1]{>{\PreserveBackslash\raggedleft}p{#1}}
 \newcolumntype{L}[1]{>{\PreserveBackslash\raggedright}p{#1}}
 
-\externaldocument[M-]{Draft}
+\externaldocument[M-]{Final_Draft}
 
 \renewcommand{\thefigure}{S\arabic{figure}}
 \renewcommand{\thesection}{S\arabic{section}}
@@ -507,94 +507,117 @@ Subdiffusive Solute Dynamics and Predicts Long Timescale Behavior in Nanoscale P
   \section{Solute hopping and trapping behavior}\label{section:sfbm_other_solutes}
   
   Analagous to Figure~\ref{M-fig:anticorrelated_hops} of the main text,
-  Figures~\ref{fig:GCL_anticorrelated_hops}--\ref{fig:MET_anticorrelated_hops} 
-  demonstrate that all solutes exhibit the same kind of anti-correlated hopping
-  and trapping behavior.
+  Figure~\ref{fig:anticorrelated_hops} demonstrates that all solutes exhibit the
+  same kind of anti-correlated hopping and trapping behavior.
   
   \begin{figure}[h]
   \centering
-  %BJC3: included radial distance from pore center because I could. But does that make it look bad?
-  % /figures/solute_trajectories.py
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{GCL_trajectories.pdf}
-  \caption{}\label{fig:GCL_solute_trajectories}
-  \end{subfigure}
-  % Next 3: /figures/distributions_sfbm.py
-  \begin{subfigure}{0.45\textwidth}
+  % /figures/distributions_sfbm.py
+  \begin{subfigure}{0.3\textwidth}
   \includegraphics[width=\textwidth]{gaussian_levy_comparison_anomalous_GCL.pdf}
   \caption{}\label{fig:GCL_hop_distribution_comparison}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.3\textwidth}
   \includegraphics[width=\textwidth]{GCL_powerlaw.pdf}
   \caption{}\label{fig:GCL_powerlaw}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.3\textwidth}
   \includegraphics[width=\textwidth]{GCL_hop_acf.pdf}
   \caption{}\label{fig:GCL_hop_acf}
   \end{subfigure}
-  \caption{For ethylene glycol: (a) representative $z$-coordinate center of mass trajectories, (b) hop 
-  length distributions, (c) dwell time distributions and (d) hop autocorrelation functions. 
-  See Figure~\ref{M-fig:anticorrelated_hops} and Section~\ref{M-section:AD_parameterization}
-  in the main text for a more detailed discussion.}\label{fig:GCL_anticorrelated_hops}
-  \end{figure}
-  
-  \begin{figure}
-  \centering
-  %BJC3: included radial distance from pore center because I could. But does that make it look bad?
-  % /figures/solute_trajectories.py
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{ACH_trajectories.pdf}
-  \caption{}\label{fig:ACH_solute_trajectories}
-  \end{subfigure}
-  % Next 3: /figures/distributions_sfbm.py
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.3\textwidth}
   \includegraphics[width=\textwidth]{gaussian_levy_comparison_anomalous_ACH.pdf}
   \caption{}\label{fig:ACH_hop_distribution_comparison}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.3\textwidth}
   \includegraphics[width=\textwidth]{ACH_powerlaw.pdf}
   \caption{}\label{fig:ACH_powerlaw}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.3\textwidth}
   \includegraphics[width=\textwidth]{ACH_hop_acf.pdf}
   \caption{}\label{fig:ACH_hop_acf}
   \end{subfigure}
-  \caption{For acetic acid: (a) representative $z$-coordinate center of mass trajectories, (b) hop 
-  length distributions, (c) dwell time distributions and (d) hop autocorrelation functions.
-  See Figure~\ref{M-fig:anticorrelated_hops} and Section~\ref{M-section:AD_parameterization}
-  in the main text for a more detailed discussion.}\label{fig:ACH_anticorrelated_hops}
-  \end{figure}
-  
-  \begin{figure}
-  \centering
-  %BJC3: included radial distance from pore center because I could. But does that make it look bad?
-  % /figures/solute_trajectories.py
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{MET_trajectories.pdf}
-  \caption{}\label{fig:MET_solute_trajectories}
-  \end{subfigure}
-  % Next 3: /figures/distributions_sfbm.py
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.3\textwidth}
   \includegraphics[width=\textwidth]{gaussian_levy_comparison_anomalous_MET.pdf}
   \caption{}\label{fig:MET_hop_distribution_comparison}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.3\textwidth}
   \includegraphics[width=\textwidth]{MET_powerlaw.pdf}
   \caption{}\label{fig:MET_powerlaw}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.3\textwidth}
   \includegraphics[width=\textwidth]{MET_hop_acf.pdf}
   \caption{}\label{fig:MET_hop_acf}
   \end{subfigure}
-  \caption{For methanol: (a) representative $z$-coordinate center of mass trajectories, (b) hop 
-  length distributions, (c) dwell time distributions and (d) hop autocorrelation functions.
-  See Figure~\ref{M-fig:anticorrelated_hops} and Section~\ref{M-section:AD_parameterization}
-  in the main text for a more detailed discussion.}\label{fig:MET_anticorrelated_hops}
+  \caption{Hop length distributions, dwell time distributions and hop autocorrelation functions
+  respectively for ethylene glycol (a-c), acetic acid (d-f) and methanol (g-i).
+  See Section~\ref{M-section:AD_parameterization} of the main text for a more detailed discussion.
+  }\label{fig:anticorrelated_hops}
   \end{figure}
   
   \newpage
   
+  \section{AD model MSD Predictions with Pure Power Law Dwell Times}\label{section:pure_power_law}
+  
+  When we use a pure power law distribution to parameterize the dwell time 
+  distributions of the 1 and 2 mode AD models, the MD MSDs are severely 
+  under-predicted because we are incorporating dwell times on the order of 
+  the simulation length into simulated trajectories 
+  (see Figure~\ref{fig:anomalous_msds_bothmode}). The parameters of the pure power law 
+   distribution are included in Figure~\ref{fig:pure_power_law_params}. 
+  
+  \begin{figure}[h]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{bothmode_msd_comparison_URE.pdf}
+  \caption{Urea}\label{fig:bothmode_msd_comparison_URE}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{bothmode_msd_comparison_GCL.pdf}
+  \caption{Ethylene Glycol}\label{bothmode_msd_comparison_GCL}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{bothmode_msd_comparison_MET.pdf}
+  \caption{Methanol}\label{fig:bothmode_msd_comparison_MET}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{bothmode_msd_comparison_ACH.pdf}
+  \caption{Acetic Acid}\label{fig:bothmode_msd_comparison_ACH}
+  \end{subfigure}
+  \caption{When we do not apply an exponential cut-off to the power law
+  distribution of dwell times,  MSDs are consistently under-predicted by the
+  AD model.
+  }\label{fig:anomalous_msds_bothmode}
+  \end{figure}
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{1mode_AD_dwells.pdf}
+  \caption{}\label{fig:1mode_AD_dwells}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{2mode_AD_dwells.pdf}
+  \caption{}\label{fig:2mode_AD_dwells}
+  \end{subfigure}
+  \caption{We can parameterize the dwell time distribution in two ways: as a pure
+  power law (P($\alpha$)) and as a power law with an exponential cut-off (P($\alpha$, $\lambda$)).
+  Pure power laws have an infinite variance which allows extremely long dwell
+  times to be sampled (see Figure~\ref{fig:anomalous_msds_bothmode}.
+  }\label{fig:pure_power_law_params}
+  \end{figure} 
+  
+  \newpage 
+  
   \section{Stationarity of Solute Trajectories}\label{section:msd_comparison}
+  
+  We evaluated the predictive capabilities of the AD modeling approach by training
+  the model parameters on the first half of the equilibrated MD trajectory data and
+  then comparing the MSD calculated from AD model realizations to the MSD calculated
+  from the second half of the equilibrated MD trajectory data. This metric is
+  only meaningful if the ensemble of solute trajectories is stationary. In 
+  Figure~\ref{msd_comparison}, we show that urea and acetic acid show acceptable
+  stationary behavior while methanol and ethylene glycol do not.
   
   \begin{figure}[h]
   \centering
@@ -621,6 +644,131 @@ Subdiffusive Solute Dynamics and Predicts Long Timescale Behavior in Nanoscale P
   similar MSDs, providing evidence of stationarity, while the MSDs of 
   ethylene glycol and methanol are different suggesting that they are not.}\label{fig:msd_comparison}
   \end{figure}
+
+  We validated both the 1 and 2 mode AD models with urea and acetic acid, since their
+  trajectories appear stationary. The MSDs resulting from 1000 realizations of the AD
+  model are shown in Figure~\ref{fig:train_test}. We consider the model's prediction 
+  to match well if the MSD lies within the 1$\sigma$ confidence intervals of the MD MSDs.
+  We also look for qualitative agreement in the shape of the curves.
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{1mode_msd_comparison_URE_train_front.pdf}
+  \caption{Urea (1 mode)}\label{fig:1mode_msd_comparison_URE_train_front}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{2mode_msd_comparison_URE_train_front.pdf}
+  \caption{Urea (2 modes)}\label{fig:2mode_msd_comparison_URE_train_front}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{1mode_msd_comparison_ACH_train_front.pdf}
+  \caption{Acetic acid (1 mode)}\label{fig:1mode_msd_comparison_ACH_train_front}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{2mode_msd_comparison_ACH_train_front.pdf}
+  \caption{Acetic acid (2 modes)}\label{fig:2mode_msd_comparison_ACH_train_front}
+  \end{subfigure} 
+  %MRS6: I'm not sure I see red in urea.  Is the uncertainty that low?
+  %BJC6: I think red and orange are directly on top of each other with same error bars
+  \caption{In most cases, when using power laws with exponential cut-offs 
+  (sFBMcut and sFLMcut), the MSD curves predicted by the AD model trained on 
+  the first half of the equilibrated data lie within the 1$\sigma$ confidence
+  intervals of the MD MSD curves generated from the second half of the equilibrated
+  solute data. The models which use pure power laws systematically under-predict
+  the MD MSD curves. Over and under-estimated curvature of the of urea and acetic acid's 
+  MSD curves respectively causes the magnitude of urea's predicted MSDs to be 
+  under-predicted at long timescales and those of acetic acid to be under-predicted
+  at short timescales.}\label{fig:train_test}
+  \end{figure}
+  
+  The models are capable of reasonably predicting the MD MSD values of the second
+  half of the solute trajectories based on parameters generated from the first half
+  when the dwell time distributions are parameterized by a power law with an 
+  exponential cut-off. At long timescales, the MSD of Urea is under-predicted 
+  for both the 1 and 2 mode models with the same true of acetic acid on short 
+  timescales. Without truncation of the power law distribution, the MD 
+  MSDs are underestimated in all cases because dwell times on the order of the
+  MD simulation length are sampled and incorporated into the simulated anomalous
+  diffusion trajectories. Considering the longest observed dwell time among all
+  solutes was 1.3 $\mu$s by ethylene glycol, we believe truncation is well-justified.
+  %Although in most cases, the predicted MSD curves overlap the 1-$\sigma$ confidence
+  %intervals of the MD MSD curves, they appear to lie systematically below the mean. 
+  %It is not clear whether this is a consistent feature of the AD model since we 
+  %only used 2 solutes for this analysis. 
+  
+%  We also observe that simulated AD trajectories which draw from a L\'evy stable 
+%  distribution generally predict higher MSDs. The heavy tails of the distribution 
+%  incorporate large jumps more frequently into the trajectories. 
+  
+  From a qualitative perspective, the models only have moderate success at predicting
+  the shape of the MSD curves. Error in the MSD curvature can also help explain some of
+  the error in the predicted MSD magnitudes. The curves predicted for Urea with both 1 
+  and 2 modes appear to have too much curvature, which causes it to under-predict the 
+  MSD at long timescales, while those of acetic acid lack curvature, leading the
+  AD model to under-predict the MSD at short timescales. 
+  
+  The under-estimate of Urea's MSD at long timescales is due to long timescale
+  positional anti-correlation which may not be present in the molecularly 
+  detailed simulations of the system. The 
+  %MRS6: I'm not following whether or not there should be positional anti-correlation.  I was thinking there should be,
+  %but perhaps I'm misunderstanding something here? 
+  persistent curvature of the predicted MSD curves is a direct consequence of 
+  the Hurst parameter. Without anti-correlation, the process would be 
+  a pure CTRW for which one would expect the time averaged MSD curves to become 
+  linear.~\cite{meroz_toolbox_2015} It may be true that on the $\mu$s time scale, 
+  positional correlation is lost which would manifest as a transition from a sub-linear
+  to linear MSD curve. A solution for more accurately modeling this behavior in  
+  the future may be to truncate the positional autocorrelation function.~\cite{molina-garcia_crossover_2018}
+  
+  The under-estimate of the curvature of acetic acid's predicted MSD suggests that,
+  in this case, the AD model over-estimates the Hurst parameter. This is not surprising
+  because the Hurst parameter is challenging to quantify, especially with a relatively 
+  small amount of data (see Section~\ref{method:sfbm} for further discussion of this 
+  challenge). A more accurate measurement of $H$ would fix the shape of the MSD curve,
+  but also lower the predicted MSD meaning we are either underestimating the width of
+  the hop length distribution, favoring longer dwell times, or both.
+  
+  This brief qualitative analysis suggests two shortcomings of the AD model. First, in
+  a real system, positional anti-correlation may dissipate after a sufficiently long 
+  time lag, dependent on the solute being studied. Second, it is difficult to reliably
+  parameterize the Hurst parameter which is important for accurately describing the 
+  curvature of the solute MSDs.
+  
+  This analysis also suggests that working with only half of the data we collected
+  ($\sim$ 2 $\mu$s post-equilibration) is not always sufficient for extracting reliable
+  parameter estimates. In most cases, the magnitude of the MSD predictions after a 
+  500 ns time lag are within or close to within error of the MD MSDs (for sFBMcut and
+  sFLMcut), but still appear to systematically under-predict the mean. We may be
+  operating on the border of the minimum amount of data required to accurately 
+  parameterize the AD model. Longer simulations and more independent trajectories may
+  be necessary. Therefore, in the next section we will work with parameters fit to the
+  full equilibrated portion of the solute trajectories, doubling the data.
+  
+%MRS6: My instinct is to only show the graphs of the full model, with validation graphs shown in the supporting.  We can talk about this. We do what the focus to be on what we can learn physically.  The discussion gets pretty repetitive.
+  
+%MRS6: be a bit clearer about how the MD MSD error bounds are calculated.  That becomes important for determining how accurate the modeling is. . 
+
+%  However, in the case of acetic acid, this may only happen because the 
+%  Hurst parameter is overestimated. It appears we are operating on the border of the
+%  minimum amount of data required to accurately parameterize the AD model. Longer
+%  simulations and more independent trajectories may be necessary. Therefore, in 
+%  the next section we will work with parameters fit to the full equilibrated portion
+%  of the solute trajectories, doubling the data.
+
+%  This brief analysis highlights some of the shortcomings of the AD model. So far, we have 
+%  shown that it does a reasonable job of approximating the magnitude of the MD-MSD
+%  after a 500 ns time lag, but the shape can sometimes be qualitatively wrong because of
+%  inaccurate Hurst parameters. In the case of acetic acid, a poorly measured $H$, but 
+%  accurate prediction of the magnitude of the MSD after 500 ns, may mask underlying 
+%  problems with the parameters of the hop length and dwell time distributions. Acetic
+%  acid has the lowest MSD of the solutes studied, therefore these issues may be resolved
+%  by longer simulations.
+ 
+  %BJC4: comment here about the length of time simulations need to be run in 
+  % order to get reliable data
+  % Or maybe a little later since acetic acid, although stationary
+  % comment on acetic acid's trajectory shape.
   
   \newpage  
   

@@ -12,7 +12,8 @@ import matplotlib.patches as mpatches
 root_dir = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11"
 sol = ['URE', 'GCL', 'MET', 'ACH']
 colors = {'URE':'xkcd:blue', 'GCL':'xkcd:orange', 'MET':'xkcd:green', 'ACH':'xkcd:magenta'}
-colors = {'sigma_normal': 'xkcd:blue', 'sigma_levy': 'xkcd:gold', 'alpha': 'xkcd:orangered'}
+colors = {'sigma_normal': (0.667, 0.361, 0.224), 'sigma_levy': (0.165, 0.306, 0.431), 'alpha': (0.361, 0.588, 0.196)}
+colors = {'sigma_normal': 'xkcd:magenta', 'sigma_levy': 'xkcd:orange', 'alpha': 'xkcd:blue'}
 names = {'URE': 'urea', 'GCL': 'ethylene glycol', 'MET': 'methanol', 'ACH': 'acetic acid'}
 names2 = ['urea', 'ethylene\nglycol', 'methanol', 'acetic\nacid']
 bar_width = 0.2
