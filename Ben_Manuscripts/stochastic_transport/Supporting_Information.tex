@@ -616,7 +616,7 @@ Subdiffusive Solute Dynamics and Predicts Long Timescale Behavior in Nanoscale P
   then comparing the MSD calculated from AD model realizations to the MSD calculated
   from the second half of the equilibrated MD trajectory data. This metric is
   only meaningful if the ensemble of solute trajectories is stationary. In 
-  Figure~\ref{msd_comparison}, we show that urea and acetic acid show acceptable
+  Figure~\ref{fig:msd_comparison}, we show that urea and acetic acid show acceptable
   stationary behavior while methanol and ethylene glycol do not.
   
   \begin{figure}[h]
@@ -724,7 +724,7 @@ Subdiffusive Solute Dynamics and Predicts Long Timescale Behavior in Nanoscale P
   The under-estimate of the curvature of acetic acid's predicted MSD suggests that,
   in this case, the AD model over-estimates the Hurst parameter. This is not surprising
   because the Hurst parameter is challenging to quantify, especially with a relatively 
-  small amount of data (see Section~\ref{method:sfbm} for further discussion of this 
+  small amount of data (see Section~\ref{M-method:sfbm} of the main text for further discussion of this 
   challenge). A more accurate measurement of $H$ would fix the shape of the MSD curve,
   but also lower the predicted MSD meaning we are either underestimating the width of
   the hop length distribution, favoring longer dwell times, or both.
@@ -989,6 +989,35 @@ Subdiffusive Solute Dynamics and Predicts Long Timescale Behavior in Nanoscale P
   \newpage
 
   \section{Explanation of Under-Estimated MSDDM $\beta$ Values}\label{section:beta_estimates}
+  
+  The value of $\beta$ for the MSDDM is under-estimated due to assumptions of the model
+  itself as well as inaccuracies in the correlation structure of very long FLM trajectories.
+  Turning first to the model itself, we have designed it to ensure that the magnitude of the
+  hops in the series of transitions between states are anti-correlated from start to finish. 
+  This assumes that the transition correlation structure is unaffected by the
+  sub-trajectories between each state transition. Each time a state transition occurs, one
+  must initialize a new time series sub-trajectory with its own correlation structure. 
+  %Even with a low Hurst parameter, as exhibited by most trapped states, the time spent 
+  %in each state is relatively short making the accuracy of the correlation structure 
+  %questionable. Additionally, $\sigma$ of transitional hops is similar in magnitude to
+  %$\sigma$ in trapped states. 
+  Since we add the transitional hop lengths to each end of
+  trapped state sub-trajectories, the transitional hop lengths are shifted with respect 
+  to one another, decreasing correlation between them. We tested this reasoning by modifying the 
+  MSDDM to completely immobilize particles except when they transition between states. 
+  Suprisingly, $\beta$ is still close to the Brownian value. Further experimentation 
+  reveals that this is actually a consequence of the FLM simulation procedure. Simulating
+  FLM requires Riemann-sum approximations of the stochastic integrals defining the process.
+  To generate the curves in Figure~\ref{M-fig:flux_curves_msddm}, we needed to correlate 
+  25--1000 times more hops than for the MSD predictions in Figure~\ref{M-fig:msddm_performance}. 
+  In short, it is computationally infeasible to use enough terms to accurately incorporate
+  long timescale correlations into our long MSDDM realizations. Thus at long timescales, 
+  we lose correlation between transitional jumps. We confirmed this hypothesis by using 
+  fractional Brownian motion, for which we have an exact simulation method, in place of 
+  FLM in the MSDDM algorithm. When we use FBM, $\beta$ increases well above the Brownian 
+  value. $\beta$ increases even further if we immobilize the trapped states. Thus the low
+  value of $\beta$ of the MSDDM is a consequence of model assumptions and inexact simulation
+  of FLM.  
   
   \begin{figure}[h]
   \centering
