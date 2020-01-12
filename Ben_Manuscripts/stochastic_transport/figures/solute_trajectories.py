@@ -6,7 +6,7 @@ import mdtraj as md
 from LLC_Membranes.timeseries.coordinate_trace import CoordinateTrace
 from LLC_Membranes.llclib import file_rw
 
-solute = "ACH"
+solute = "MET"
 path = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/%s/10wt" % solute
 traj = "5ms_nojump.xtc"
 gro = "em.gro"

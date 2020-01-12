@@ -928,7 +928,7 @@ class Chain:
 
         if not self.fbm:
 
-            if state == 10:
+            if state != 8:
 
                 return np.zeros(l)
 

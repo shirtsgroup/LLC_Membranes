@@ -112,22 +112,20 @@ class DfError(Exception):
 
 
 class InfiniteHMM:
-    """
-    Python implementation of the infinite hidden markov model. Note that all functions for generating random numbers are
-    based on pulls from uniform distributions. This allows side-by-side comparison to MATLAB output
 
-    Original paper: http://mlg.eng.cam.ac.uk/zoubin/papers/ihmm.pdf
-
-    This implementation follows the MATLAB implementation of the Fox group. Variable and function names are mostly the
-    same (https://homes.cs.washington.edu/~ebfox/software-packages/HDPHMM_HDPSLDS_toolbox.zip)
-
-    A paper demonstrating their implementation: https://ieeexplore.ieee.org/abstract/document/5563110
-
-    Unfortunately their code is not well-documented and one can not easily learn the approach by following it. This
-    script attempts to reproduce their work in an easier to understand context. For now, it only uses an autoregressive
-    model because that is all I need.
-
-    """
+    # Python implementation of the infinite hidden markov model. Note that all functions for generating random numbers are
+    # based on pulls from uniform distributions. This allows side-by-side comparison to MATLAB output
+    #
+    # Original paper: http://mlg.eng.cam.ac.uk/zoubin/papers/ihmm.pdf
+    #
+    # This implementation follows the MATLAB implementation of the Fox group. Variable and function names are mostly the
+    # same (https://homes.cs.washington.edu/~ebfox/software-packages/HDPHMM_HDPSLDS_toolbox.zip)
+    #
+    # A paper demonstrating their implementation: https://ieeexplore.ieee.org/abstract/document/5563110
+    #
+    # Unfortunately their code is not well-documented and one can not easily learn the approach by following it. This
+    # script attempts to reproduce their work in an easier to understand context. For now, it only uses an autoregressive
+    # model because that is all I need.
 
     def __init__(self, data, gro=None, res=None, difference=True, observation_model='AR', prior='MNIW', order=1,
                  max_states=20, dim=None):
