@@ -37,10 +37,11 @@
 
 %BJC5: wondering about replacing "Predicts long timescale behavior" with "predicts selectivity"
 %MRS6: I would focus first on the outputs.  Not sure about the behavior/vs. selectivity.  Probably 
-% selelctivity since it's more results oriented. ``of varying complexity'' is unneeded in the titel
+% selelctivity since it's more results oriented. ``of varying complexity'' is unneeded in the tite
 %\title{Time Series Modeling of Varying Complexity Captures Subdiffusive Solute Dynamics
 %and Predicts Long Timescale Behavior in Nanoscale Pores.}
 % BJC6: The only issue with selectivity is that I don't think it would include a timescale.
+%MRS7: true, could just be ``predicting selectivity''
 \title{Capturing subdiffusive solute dynamics and predicting long timescale selectivity in nanoscale pores
 with time series modeling}
 \author{Benjamin J. Coscia \and Michael R. Shirts} 
@@ -149,6 +150,8 @@ with time series modeling}
   %BJC6: I said above how the QI phase is easier to synthesize, so I felt it necessary to 
   % quickly justify why we studied the HII phase. Reworded to make that clearer. I'm also open to
   % eliminating the sentence.
+  %MRS6: It was also becasue they thought it was more likely to be interesting initially.  I'm in favor of 
+  % cutting for simplicity. 
   We chose to study the H\textsubscript{II} phase because it is a simpler geometry to model than 
   the Q\textsubscript{I} phase.  
   In general, we observed subdiffusive transport behavior characterized by intermittent hops 
@@ -434,7 +437,7 @@ with time series modeling}
   
   %MRS6: next paragraph could be clearer.  Maybe motivate at the beginning why the importance of time. vs. ensemble averated. It's sprung a sort of a surprise there's a difference 
   %BJC6: reorganized a little and broke into paragraphs meant to convey separate ideas.
-  
+  %MRS7: definitely improved, I had a couple of comments to further refine.
   One can measure MSD in two ways. The time-averaged MSD measures all observed
   displacements over time lag $\tau$: 
   \begin{equation}
@@ -526,7 +529,8 @@ with time series modeling}
   frequency of our simulation trajectories, we fit the empirical dwell times
   to a discrete power law distribution whose maximum likelihood $\alpha$ 
   parameter we calculated by maximizing the likelihood function: 
-  %BJC6: I could move these MLE equations to Supporting
+  %BJC6: I could move these MLE equations to Supporting  
+  %MRS7: for PRE, can leave in.
   \begin{equation}
 	\mathcal{L}(\beta) = -n\ln \zeta(\beta, t_{min}) -
 	\beta\sum_{i=1}^{n} \ln t_i 
@@ -576,6 +580,7 @@ with time series modeling}
   When $H < 0.5$, hops are negatively correlated, when $H = 0.5$ we recover Brownian motion
   and when $H > 0.5$, one observes positive correlation between hops. 
   %BJC6: I could move the following to supporting and keep last sentence.
+  %MRS7: could simplify down to saying that it's hard to estimate when H > 0.5, but you only have to deal with H < 0.5, so the difficulties are not relevant. 
   There are many methods
   for estimating the Hurst parameter for a time series.~\cite{clegg_practical_2006} It can
   be a difficult task because Equation~\ref{eqn:fbm_autocorrelation} decays slowly to zero, 
@@ -705,6 +710,7 @@ with time series modeling}
   between fixed length sFBM simulations. 
   
   %BJC6: added this. Not sure how much detail is necessary
+  %MRS7: seems fine.
   We used Equation~\ref{eqn:tamsd} to calculate the time-averaged MSD of the MD
   and AD model trajectories then estimated their uncertainty using statistical 
   bootstrapping. For each bootstrap trial, we randomly chose $n$ solute trajectories,
@@ -712,7 +718,9 @@ with time series modeling}
   ensemble of trajectories and then calculated the MSD of the subset. We reported 
   the time-averaged MSD up to a 1000 ns time lag with corresponding 95\% confidence
   intervals. 
-  
+  %MRS6: somewhere you do talk about agreement to within 1 sigma
+  %instead of 95%, so probably should check for consistance.
+
   When simulating 2 mode models, we determined the state sequence based on random 
   draws weighted by the appropriate row of the probability transition matrix. We then
   drew hops and dwells based on the current state of the system. Since we calculated
@@ -815,7 +823,8 @@ with time series modeling}
   the current and previous state observation, we incremented the appropriate entry of an
   $n~\times~n$ count matrix by 1, where $n$ is the number of states.
   
-  %BJC6: could defer most of this to supporting. 
+  %BJC6: could defer most of this to supporting.  
+  %MRS7: yeah, supporting.  Should just be ``Verified the Markovianity of state transitions in MD as described in Section [X]. Generally, how one did verification of most things can be put in supporing, since that's not central to the argument. ''
   We verified the Markovianity of state transitions by solutes in our MD simulations 
   by analyzing the empirically measured transition matrix. An important condition
   of a Markov process is the satisfaction of detailed balance:
@@ -895,6 +904,7 @@ with time series modeling}
   For computational reasons dependent on the model used, we simulated 1,000-10,000 trajectory
   realizations, released at the pore entrance ($z=0$). 
   %BJC6: next two sentences might not be necessary  
+  %MRS7: kind of seems relevant here.
   In the case of 
   uncorrelated hops, one can continuously draw from the hop length distribution until 
   $z \geq L$ (or $-L$ for the sake of computational efficiency). The length of time 
@@ -909,6 +919,7 @@ with time series modeling}
   %be underestimated. 
   
   %BJC6: could probably remove this paragraph.
+  %MRS7: Maybe OK?
   We calculated the expected value of analytical fits to the passage time distributions
   in order to determine the MFPT for a given solute and pore length. One should not 
   use the mean of the empirical passage time distribution because it is highly likely
@@ -1061,6 +1072,7 @@ with time series modeling}
   \includegraphics[width=\textwidth]{GCL_trajectories.pdf}
   \caption{Ethylene glycol}\label{fig:GCL_trajectories}
   %BJC6: ^^ Should I capitalize glycol?
+  %MRS7: I'd probably just uncapitalize all. 
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{MET_trajectories.pdf}
@@ -1149,6 +1161,7 @@ with time series modeling}
   the MLE fits of both on top of urea's hop length distribution in 
   Figure~\ref{fig:hop_distribution_comparison}. 
   %BJC6: I say the next sentence in plot
+  %MRS7: seems OK here, since important description of distribution.
   The L\'evy distribution does a better job capturing the somewhat heavy tails and 
   high density near 0 of the hop length distribution.
   However, since there are no known exact simulation techniques for generating 
@@ -1263,7 +1276,8 @@ with time series modeling}
   equilibrated trajectories.}\label{table:stationarity}
   \end{table}
   
-  % BJC6: These next two paragraphs are a bit awkward without the figure being present. Not sure what the best course of action is.
+  %BJC6: These next two paragraphs are a bit awkward without the figure being present. Not sure what the best course of action is.
+  %MRS7: I think generally OK.
   Given stationary data, the AD model has satisfactory predictive capabilities. In 
   Figure~\ref{S-fig:train_test} of the Supporting Information, we parameterized 
   the AD model using the first half of the stationary solute equilibrated trajectories 
@@ -1299,6 +1313,7 @@ with time series modeling}
   and~\ref{fig:2mode_parameters}.
   
   %BJC6: combined 1 and 2 mode models. Easier to compare between and takes up less space. maybe a little cluttered with acetic acid.
+  %MRS7: I think OK
   \begin{figure}
   \centering
   \begin{subfigure}{0.45\textwidth}
@@ -1480,6 +1495,7 @@ with time series modeling}
   to make larger jumps to escape traps.
   
   %BJC6: Could delete this paragraph or move an abridged version to conclusions
+  %MRS7: Good question.  Seemed OK when I was reading it. Summarizing what was found in this section.
   Overall, the AD model does a reasonable job of predicting solute MSDs and its 
   parameters can help us further understand solute dynamics. Hops appear to be well
   modeled as anti-correlated draws from Gaussian and L\'evy stable distributions. 
@@ -1559,6 +1575,7 @@ with time series modeling}
   \subsubsection{Parameters of the MSDDM}\label{section:msddm_parameterization}
 
   %BJC6: could delete this paragraph since described in methods
+  %MRS7: yeahm could say you created one for each solute, as described in the methods.
   To create an MSDDM for each solute, we determined the state sequence associated
   with each solute trajectory and then generated emission distributions of fluctuations
   within each state as well as transitions between states. In theory, one could 
@@ -1879,6 +1896,7 @@ with time series modeling}
   % have each just show 1 point? 
 
   %BJC6: could move this paragraph to supporting
+  %MRS7: Could push more to supporting.  I think you just need to state that you ran with X number, as determined in the supporting, but because cheap did 10K for the non-MSDDM models.
   We determined that it is only necessary to simulate 1000 realizations of each model
   in order to parameterize Equation~\ref{eqn:flux_decay}. We used 10000 trajectory
   realizations in order to generate each point in Figure~\ref{fig:flux_curves_ad}, 
@@ -1894,6 +1912,7 @@ with time series modeling}
   between solute hops. In Figure~\ref{fig:beta}a, we show that $\beta$, as derived 
   from the sFBMcut model, is inversely related to the Hurst parameter. 
   % BJC6: I'm not sure this sentence adds anything
+  %MRS7: reminding people the physics behind models can be useful, though, maybe put back in?
   %This makes intuitive sense since higher degrees of anti-correlation should slow the rate at which solutes
   %cross the membrane pore. 
   $\beta$, as derived from the MSDDM, appears approximately constant which is 
@@ -2231,6 +2250,7 @@ with time series modeling}
   % BJC5: I'm not sure if this paragraph belongs here. Or if it should go at end
   % of previous section. Or just eliminate. What do you think?  \
   % BJC6: took out for now since I was questioning it. Can add back if reviewers ask about these considerations.
+  %MRS7: yeah, leave out for now.
 %  Of course, our approach to modeling LLC membrane selectivity neglects a number
 %  of factors that influence real-world aqueous membrane separations. The most 
 %  glaring is that we neglected convective flux which should work to increase 
