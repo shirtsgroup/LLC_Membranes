@@ -743,7 +743,7 @@ class SFBMParameters(object):
             fig, ax1 = plt.subplots(1, 1, figsize=(6, 5))
             ax = [ax1]
 
-        fontsize = 14
+        fontsize = 16
 
         for m in range(nmodes):
 
