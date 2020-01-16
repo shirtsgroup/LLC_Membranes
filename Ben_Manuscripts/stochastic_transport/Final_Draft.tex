@@ -1,19 +1,16 @@
-\documentclass[12pt]{article}
+\documentclass[aps,pre,preprint,groupedaddress]{revtex4-2}
+\usepackage{CJK}
 
-\usepackage{setspace}
-\doublespacing
 \usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage{subcaption}
-\usepackage[margin=1in]{geometry}
+\usepackage{caption}
 \usepackage{amsmath} % or simply amstext
 \usepackage{amssymb}
 \usepackage{siunitx}
 \usepackage{booktabs}
 \usepackage[export]{adjustbox}
-\newcommand{\angstrom}{\textup{\AA}}
-\newcommand{\colormap}{jet}  % colorbar to use
 \usepackage{cleveref}
 \usepackage{booktabs}
 \usepackage{gensymb}
@@ -22,6 +19,9 @@
 \usepackage{diagbox}
 \usepackage{array}
 
+\DeclareUnicodeCharacter{03C9}{$\omega$}
+\usepackage[english]{babel}
+
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
 \newcommand{\PreserveBackslash}[1]{\let\temp=\\#1\let\\=\temp}
@@ -29,29 +29,20 @@
 \newcolumntype{R}[1]{>{\PreserveBackslash\raggedleft}p{#1}}
 \newcolumntype{L}[1]{>{\PreserveBackslash\raggedright}p{#1}}
 
-\usepackage{titlesec}
-\titleformat{\subsubsection}[runin]
-  {\normalfont\normalsize\bfseries}{\thesubsubsection}{1em}{}
-
 \externaldocument[S-]{Supporting_Information}
 
-%BJC5: wondering about replacing "Predicts long timescale behavior" with "predicts selectivity"
-%MRS6: I would focus first on the outputs.  Not sure about the behavior/vs. selectivity.  Probably 
-% selelctivity since it's more results oriented. ``of varying complexity'' is unneeded in the tite
-%\title{Time Series Modeling of Varying Complexity Captures Subdiffusive Solute Dynamics
-%and Predicts Long Timescale Behavior in Nanoscale Pores.}
-% BJC6: The only issue with selectivity is that I don't think it would include a timescale.
-%MRS7: true, could just be ``predicting selectivity''
-\title{Capturing subdiffusive solute dynamics and predicting selectivity in nanoscale pores
-with time series modeling}
-\author{Benjamin J. Coscia \and Michael R. Shirts} 
-
 \begin{document}
-
-  \graphicspath{{./figures/}}
-  \maketitle
   
-  %BJC6: I could make abstract margins smaller
+  \title{Capturing Subdiffusive Solute Dynamics and Predicting Selectivity in Nanoscale Pores
+  with Time Series Modeling}
+  
+  \author{Benjamin J. Coscia}
+  \author{Michael R. Shirts}
+  
+  \affiliation{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, Colorado 80309, United States}
+
+  \date{\today}
+  
   \begin{abstract}
   
   Mathematically modeling complex transport phenomena at the molecular level 
@@ -65,9 +56,9 @@ with time series modeling}
   modeled as a fractional diffusion process subordinate to a continuous time 
   random walk. From the MD simulations, we parameterize the distribution of 
   dwell times, hop lengths between dwells and correlation between hops. We 
-  explore 2 variations of the anomalous diffusion model. The first variation
+  explore two variations of the anomalous diffusion model. The first variation
   applies a single set of parameters to the solute displacements and the second
-  applies 2 sets of parameters based on the solute's radial distance from the
+  applies two sets of parameters based on the solute's radial distance from the
   closest pore center. Next, we generalize Markov state models, treating the
   configurational state of the system as a Markov process, each
   of which has separate transport properties. For each state and transition
@@ -85,27 +76,12 @@ with time series modeling}
 
   \end{abstract}
 
+  \maketitle
+  
+  \graphicspath{{./figures/}}
+
   \section{Introduction}
 
-%  BJC4: Moved this paragraph to later
-%  Mathematical descriptions of transport in complex separations membranes are 
-%  a powerful way to understand mechanisms and formulate membrane design principles. 
-%  \cite{vinh-thang_predictive_2013,geens_transport_2006,darvishmanesh_mass_2016}
-%  The complexity of a model generally parallels the complexity of the transport 
-%  mechanism at hand, as well as the transport information the model conveys.
-%  In dense homogeneous membranes, the solution-diffusion model can extract 
-%  diffusion and partition coefficients and has successfully predicted solute 
-%  transport rates.~\cite{wijmans_solution-diffusion_1995} Analogously, pore-flow
-%  models yield predictions of diffusion coefficients and solute transport rates 
-%  in nanoporous membranes.~\cite{paul_diffusive_1974} Modern single particle 
-%  tracking approaches take us beyond continuum modeling and allow us to 
-%  characterize complex diffusive behavior.~\cite{manzo_review_2015} At the molecular
-%  level, one can use molecular dynamics (MD) simulations to study both single 
-%  particle dynamics and bulk transport properties with atomic-level insight.~\cite{coscia_chemically_2019,maginn_best_2018}
-%  All of these approaches facilitate speculation on the molecular origins of separations
-%  by attempting to give a more intuitive understanding of how solutes move as a function
-%  of their environment, in turn suggesting experiments that could be performed.
-  
   Highly selective separations membranes are desirable in numerous applications. 
   The ability to efficiently separate ions from saline water sources using membranes 
   has been actively pursued for years in an effort to create potable water for people 
@@ -115,8 +91,6 @@ with time series modeling}
   and personal care products.~\cite{barbosa_occurrence_2016} In the materials industry,
   there is a strong interest in creating breathable fabrics which selectively allow 
   passage of water vapor.~\cite{mondloch_destruction_2015}
-%  The pace at which we achieve these or any other selective separation goals will be 
-%  heavily influenced by the quality of insights gained by the modeling approaches above.
 
   Lyotropic liquid crystals (LLCs) are a class of amphiphilic molecules that can be 
   cross-linked into mechanically strong and highly selective nanoporous membranes.~\cite{gin_polymerized_2008}
@@ -406,7 +380,7 @@ with time series modeling}
   \end{subfigure}
   \begin{subfigure}{0.5\textwidth}
   \centering
-  \includegraphics[width=\textwidth]{membrane_profile.pdf}
+  \includegraphics[width=0.5\textwidth]{membrane_profile.pdf}
   \caption{}\label{fig:membrane_profile}
   \end{subfigure}
   \caption{(a) The wedge-shaped liquid crystal monomer Na-GA3C11 will form the inverted
@@ -416,6 +390,21 @@ with time series modeling}
   straight and uniform sized pores. Water present in the tail region is omitted 
   for clarity.}\label{fig:membrane_structure}
   \end{figure}
+  
+%  \begin{figure}
+%  \centering
+%  \subfloat[\label{fig:monomer_structure}]{%
+%  			\includegraphics[width=0.4\textwidth, valign=c]{NaGA3C11.pdf}%
+%  			\vphantom{\includegraphics[width=0.5\textwidth, valign=c]{membrane_profile.pdf}}
+%  			}\hfill
+%  \subfloat[\label{fig:membrane_profile}]{\includegraphics[width=0.5\textwidth, valign=c]{membrane_profile.pdf}}\hfill
+%  \caption{(a) The wedge-shaped liquid crystal monomer Na-GA3C11 will form the inverted
+%  hexagonal phase in the presence of water where the carboxylate head groups occupy the
+%  pore centers. (b) A cross-section of a periodically replicated atomistic unit cell 
+%  used for simulations in this study reveals the membrane's aqueous, hexagonally packed,
+%  straight and uniform sized pores. Water present in the tail region is omitted 
+%  for clarity.}\label{fig:membrane_structure}
+%  \end{figure}  
   
   We chose to study a subset of the 4 fastest moving solutes from our previous
   work: methanol, acetic acid, urea and ethylene glycol. For each solute we 
@@ -455,28 +444,45 @@ with time series modeling}
   \label{eqn:msd_form}
   \end{equation} 
   where $\alpha$ is the anomalous exponent and $K_{\alpha}$ is the generalized 
-  diffusion coefficient. We only calculate MSD with respect to the solutes' center of
-  mass $z$-coordinate, which is oriented along the pore axis. A value of $\alpha < 1$
-  indicates a subdiffusive process, while values of $\alpha = 1$ and $\alpha > 1$ 
-  are characteristic of Brownian and superdiffusive motion respectively.
+  diffusion coefficient. In this work, we only consider the MSD with respect to
+  the solutes' center of mass $z$-coordinate, which is oriented along the pore 
+  axis. A value of $\alpha < 1$ indicates a subdiffusive process, while values
+  of $\alpha = 1$ and $\alpha > 1$ are characteristic of Brownian and 
+  superdiffusive motion respectively.
+
+  %BJC7: added following two paragraphs to clarify our usage of the MSD as a tool. Modified a bit below too  
+  While it is theoretically possible to extract the value of $\alpha$ by fitting
+  Equation~\ref{eqn:msd_form} to an MSD generated directly from MD simulations, 
+  we do not simulate enough independent solute trajectories to obtain a reliable
+  estimate. We can obtain higher precision estimates of $\alpha$ using the dwell
+  time distributions described in subsequent sections.
   
-  %MRS6: next paragraph could be clearer.  Maybe motivate at the beginning why the importance of time. vs. ensemble averated. It's sprung a sort of a surprise there's a difference 
-  %BJC6: reorganized a little and broke into paragraphs meant to convey separate ideas.
-  %MRS7: definitely improved, I had a couple of comments to further refine.
-  One can measure MSD in two ways. The time-averaged MSD measures all observed
-  displacements over time lag $\tau$: 
-  \begin{equation}
-  \overline{z^2(\tau)} = \dfrac{1}{T - \tau}\int_{0}^{T - \tau} (z(t + \tau) - z(t))^2 dt
-  \label{eqn:tamsd}
-  \end{equation}
-  where T is the length of the trajectory. The ensemble averaged MSD measures
+  We primarily use the MSD as a tool for calculating the average properties of 
+  solute trajectories. We only compare MSDs calculated from MD simulations to 
+  those generated from our models. We do not use them to calculate diffusion 
+  constants or to relate our simulations to experimental measurements. Therefore
+  it is only important that we use a consistent definition for calculating the MSD.
+%  This approach is valid if we adhere to a consistent definition for MSD 
+%  calculations.
+  
+  One can measure MSD in two ways. The ensemble averaged MSD measures 
   displacements with respect to a particle's initial position:
   \begin{equation}
   \langle z^2(t) \rangle = \langle z(t) - z(0) \rangle^2
   \label{eqn:ensemble_msd}
   \end{equation}
   Fits to the \textit{ensemble} averaged MSD will always reproduce the form of 
-  Equation~\ref{eqn:msd_form}.
+  Equation~\ref{eqn:msd_form}. The time-averaged MSD measures all observed 
+  displacements over time lag $\tau$: 
+  \begin{equation}
+  \overline{z^2(\tau)} = \dfrac{1}{T - \tau}\int_{0}^{T - \tau} (z(t + \tau) - z(t))^2 dt
+  \label{eqn:tamsd}
+  \end{equation}
+  where T is the length of the trajectory. 
+  
+%  For a small number of solute 
+%  trajectories, this is a much more statistically robust measure of the 
+%  average distance a solute travels over time. 
   
   The time averaged and ensemble averaged MSDs will give identical results 
   unless a system displays non-ergodic behavior. For a pure CTRW, the power 
@@ -491,43 +497,15 @@ with time series modeling}
   
   We chose to analyze just the time-averaged MSD because, compared to the ensemble
   average, it is a more statistically robust measure of the average distance a 
-  solute travels over time. Although theoretically possible, we do not use the 
-  ensemble averaged MSD to calculate $\alpha$ because we can extract the same 
-  parameter with higher precision using the dwell time distributions as described below.
+  solute travels over time. The ensemble MSD of only 24 solute trajectories would
+  have much higher uncertainties.
   
-%  Only the \textit{ensemble} averaged MSD will reproduce the form of 
-%  Equation~\ref{eqn:msd_form} in all cases.
+%  It may be difficult to calculate  ensemble
+%  MSD to estimate $\alpha$ with only 24 solute trajectories.
 %  
-%  We analyzed the time-averaged MSD of the simulated trajectories by measuring
-%  all possible displacements over time lag $\tau$:
-%  \begin{equation}
-%  \overline{z^2(\tau)} = \dfrac{1}{T - \tau}\int_{0}^{T - \tau} (z(t + \tau) - z(t))^2 dt
-%  \end{equation}
-%  where T is the length of the trajectory. Note that only the \textit{ensemble} MSD
-%  will reproduce the form of Equation~\ref{eqn:msd_form} in all cases. The ensemble
-%  MSD is given by:
-%  \begin{equation}
-%  \langle z^2(t) \rangle = \langle z(t) - z(0) \rangle^2
-%  \label{eqn:ensemble_msd}
-%  \end{equation} 
-%  In a pure CTRW, for example, the power law distribution of trapping times leads to
-%  weak ergodicity breaking. In this case, the time-averaged MSD is linear while the ensemble averaged
-%  MSD has the form of Equation~\ref{eqn:msd_form}.~\cite{meroz_toolbox_2015} With power
-%  law trapping behavior, the time between hops diverges so there is no characteristic
-%  measurement time scale of solute motion. In fact, as measurement time increases, the 
-%  average MSD of a CTRW tends to decrease, a phenomenon called aging, because trajectories 
-%  with trapping times on the order of the measurement time get incorporated into the 
-%  calculation.~\cite{bel_weak_2005} We chose to analyze just the time-averaged MSD 
-%  because, compared to the ensemble average, it is a more statistically robust measure
-%  of the average distance a solute travels over time. 
-%  %MRS6: does it correspond properly to the physical situation of entry into the pore of new particles at each unit time?
-%  Although theoretically possible, we do
-%  not use the MSD to calculate $\alpha$ because we can extract the same parameter 
-%  with higher precision using the dwell time distributions as described below.
-  
-%  of the process is exhibits weak ergodicity breaking due to 
-%  If the underlying subdiffusive process is not ergodic, like a pure CTRW, the time
-%  averaged MSD becomes linear.
+%  Although theoretically possible, we do not use the 
+%  ensemble averaged MSD to calculate $\alpha$ because we can extract the same 
+%  parameter with higher precision using the dwell time distributions as described below.
   
   \subsubsection{Subordinated Fractional Brownian Motion}\label{method:sfbm}
 
@@ -554,8 +532,6 @@ with time series modeling}
   frequency of our simulation trajectories, we fit the empirical dwell times
   to a discrete power law distribution whose maximum likelihood $\alpha$ 
   parameter we calculated by maximizing the likelihood function: 
-  %BJC6: I could move these MLE equations to Supporting  
-  %MRS7: for PRE, can leave in.
   \begin{equation}
 	\mathcal{L}(\beta) = -n\ln \zeta(\beta, t_{min}) -
 	\beta\sum_{i=1}^{n} \ln t_i 
@@ -569,9 +545,10 @@ with time series modeling}
   arbitrarily long dwell times that are never observed in MD simulations. 
   %We cannot observe dwell times longer than the length of a single trajectory. 
   In order to directly compare our anomalous diffusion model to finite-length MD 
-  trajectories we need to bound the dwell time distribution. We do this by adding 
-  an exponential cut-off to the power law so the dwell time distribution is 
-  now proportional to $t^{-1 - \alpha}e^{-\lambda t}$.
+  trajectories we need to bound the dwell time distribution. A standard way of 
+  doing this, with easily estimated paramters, is by adding an exponential 
+  cut-off to the power law so the dwell time distribution is now proportional 
+  to $t^{-1 - \alpha}e^{-\lambda t}$.~\cite{newman_power_2005,clauset_power-law_2009}  % Clauset uses data from other papers and gives a bunch of example where the cut-off is the most favorable model. 
   %MRS6: are there papers to cite that this is a standard way to cut them off (i.e. rather than truncate, etc).
   % of the form:
 %  \begin{equation}  %BJC3: maybe make this equation in line? Else move regular power law to its own equation
@@ -1786,7 +1763,7 @@ with time series modeling}
 %  macroscopic timescales and estimate macroscopic observables such as solute 
 %  flux and selectivity.
   
-  \subsection{Solute Flux}\label{section:mfpt}
+  \subsection{Solute Flux and Selectivity}\label{section:mfpt}
   
   We used the one mode sFBMcut (see Table~\ref{table:anomalous_models}) AD
   model in order to demonstrate how one can use its realizations in order 
@@ -1808,8 +1785,8 @@ with time series modeling}
   less trajectories. In Figure~\ref{S-fig:flux_curve_sensitivity} of the Supporting 
   Information, we determined that one can simulate as few as 100 sFBMcut realizations
   in order to parameterize Equation~\ref{eqn:flux_decay}. For better precision, we 
-  recommend simulating at least 1000 realizations. Even with an order of magnitude
-  decrease in number of trajectories, it is still infeasible to simulate
+  recommend simulating at least 1000 realizations. However, even with an order of 
+  magnitude decrease in number of trajectories, it is still infeasible to simulate
   experimental-length pores.
   
   We used simulated trajectories which traverse computationally-reasonable length
@@ -1817,9 +1794,8 @@ with time series modeling}
   particle flux for arbitrary length pores. We fit Equation~\ref{eqn:passage_times}
   to the empirical distribution of first passage times in Figure~\ref{fig:fpt_distributions}
   and used the expected value of the analytical equation to calculate flux from 
-  Equation~\ref{eqn:hill_relation}. As shown in Figures~\ref{fig:flux_curves_ad} and
-  \ref{fig:flux_curves_msddm}, the flux appears to scale according to a power law 
-  of the form:
+  Equation~\ref{eqn:hill_relation}. As shown in Figure~\ref{fig:flux_curves_ad}, 
+  the flux appears to scale according to a power law of the form:
   \begin{equation}
   J(L) = AL^{-\beta} 
   \label{eqn:flux_decay}
@@ -1833,10 +1809,10 @@ with time series modeling}
   \end{subfigure}
   \begin{subfigure}{0.485\textwidth}
   \includegraphics[width=\textwidth]{flux_curves.pdf}
-  \caption{sFBMcut}\label{fig:flux_curves_ad}
+  \caption{}\label{fig:flux_curves_ad}
   \end{subfigure}
   \caption{(a) The distributions of first passage times generated from the sFBMcut model
-  fits well to Equation~\ref{eqn:passage_times}. We show similar fits for the remaining
+  fit well to Equation~\ref{eqn:passage_times}. We show similar fits for the remaining
   solutes in Figure~\ref{S-fig:ad_fpt_fits} of the Supporting Information. (b) The 
   single particle flux measured by the sFBMcut AD model decays with increasing pore 
   length. The rankings of solute fluxes are consistent with the MSDs predicted by each
@@ -1844,33 +1820,6 @@ with time series modeling}
   function of the form $AL^{-\beta}$ (dashed lines in (b) and (c)). 
   }\label{fig:flux_curves}
   \end{figure}
-  
-  
-  % BJC: could use better color scheme. Maybe outline hurst parameters
-%  \begin{subfigure}{0.475\textwidth}
-%  \includegraphics[width=\textwidth]{c_parameters.pdf}
-%  \caption{}\label{fig:c_parameters}
-%  \end{subfigure}
-%  \begin{subfigure}{0.475\textwidth}
-%  \includegraphics[width=\textwidth]{beta_parameters.pdf}
-%  \caption{}\label{fig:beta_parameters}
-%  \end{subfigure}
-%  \begin{subfigure}{0.475\textwidth}
-%  \includegraphics[width=\textwidth]{mfpt_curves.pdf}
-%  \caption{}\label{fig:mfpt_curves}
-%  \end{subfigure}
-  %BJC: going out to 3 decimal places seems silly
-  %BJC: might get closer to beta=2 if I use different curve fitting technique than fitting line to log-log
-%  \begin{subfigure}{0.325\textwidth}
-%  \includegraphics[width=\textwidth]{flux_curves_brownian.pdf}
-%  \caption{Fixed $H=0.5$}\label{fig:flux_curves_brownian}
-%  \end{subfigure}
-%  \begin{subfigure}{0.475\textwidth}
-%  \includegraphics[width=\textwidth]{mfpt_curves_brownian.pdf}
-%  \caption{}\label{fig:mfpt_curves_brownian}
-%  \end{subfigure}
-  %MRS5: the b) pane is a little messy.  If c) is moved to the supporting, maybe can make b into two figures, and 
-  % have each just show 1 point? 
 
   %BJC6: could move this paragraph to supporting
   %MRS7: Could push more to supporting.  I think you just need to state that you ran with X number, as determined in the supporting, but because cheap did 10K for the non-MSDDM models.
@@ -1888,225 +1837,78 @@ with time series modeling}
 %  realizations at each pore length. 
   
   The scaling of solute flux with pore length is primarily influenced by anti-correlation
-  between solute hops. In Figure~\ref{fig:beta}a, we show that $\beta$, as derived 
-  from the sFBMcut model, is inversely related to the Hurst parameter. 
-  % BJC6: I'm not sure this sentence adds anything
-  %MRS7: reminding people the physics behind models can be useful, though, maybe put back in?
-  %This makes intuitive sense since higher degrees of anti-correlation should slow the rate at which solutes
-  %cross the membrane pore. 
-  $\beta$, as derived from the MSDDM, appears approximately constant which is 
-  consistent with nearly invariant transitional Hurst parameters (see 
-  Figure~\ref{fig:H_v_state}). However, Figure~\ref{fig:beta}a does raise
-  the question as to why $\beta$ is so much lower than the sFBMcut model. The MSDDM 
-  is fundamentally similar to the AD model in that one makes correlated draws 
-  from a hop distribution, therefore, we should expect the $\beta$ value of the
-  MSDDM to be larger than that of Brownian motion.
-  
-  The length dependence of solute flux ($\beta$) for the MSDDM is under-estimated 
-  primarily due to innaccuracies in the correlation structure of very long FLM 
-  trajectories. To generate the curves in Figure~\ref{fig:flux_curves_msddm}, we 
-  needed to correlate 25--1000 times more hops than for the MSD predictions in 
-  Figure~\ref{fig:msddm_performance}. To understand the behavior of the MSDDM, we 
-  studied the $\beta$ parameter derived from variations on the SFBMcut model 
-  (see Figure~\ref{fig:beta}a), since we can generate exact realizations of FBM. 
-  First, we removed anti-correlation between hops in the sFBMcut trajectory (set
-  $H$=0.5). The $\beta$ parameter drops to values similar to the MSDDM. When we 
-  remove hop anti-correlation \textit{and} dwell times between hops (set dwell 
-  times equal to 1), effectively simulating Brownian motion, we observe similar 
-  $\beta$ parameters. These two variations imply that the $\beta$ parameter is 
-  only a function of $H$ and not dependent on dwell times ($\alpha$, $\lambda$) 
-  or hop lengths ($\sigma$). In Section~\ref{S-section:beta_estimates} of the 
-  Supporting Information we expand on this explanation and show that replacing 
-  inexact FLM realizations with exact FBM realizations recovers the pore length
-  dependence of solute flux.
-  
-  %Although the dwell times are
-  %insignificant compared to the AD model (compare Figures~\ref{fig:ad_eyetest} and
-  %\ref{fig:msddm_eyetest} for example), we have just shown 
-  
-%  The value of $\beta$ for the MSDDM is under-estimated due to assumptions of the model
-%  itself as well as inaccuracies in the correlation structure of very long FLM trajectories.
-%  Turning first to the model itself, we have designed it to ensure that the magnitude of the
-%  hops in the series of transitions between states are anti-correlated from start to finish. 
-%  This assumes that the transition correlation structure is unaffected by the
-%  sub-trajectories between each state transition. Each time a state transition occurs, one
-%  must initialize a new time series sub-trajectory with its own correlation structure. 
-%  %Even with a low Hurst parameter, as exhibited by most trapped states, the time spent 
-%  %in each state is relatively short making the accuracy of the correlation structure 
-%  %questionable. Additionally, $\sigma$ of transitional hops is similar in magnitude to
-%  %$\sigma$ in trapped states. 
-%  Since we add the transitional hop lengths to each end of
-%  trapped state sub-trajectories, the transitional hop lengths are shifted with respect 
-%  to one another, decreasing correlation between them. We tested this reasoning by modifying the 
-%  MSDDM to completely immobilize particles except when they transition between states. 
-%  Suprisingly, $\beta$ is still close to the Brownian value. Further experimentation 
-%  reveals that this is actually a consequence of the FLM simulation procedure. Simulating
-%  FLM requires Riemann-sum approximations of the stochastic integrals defining the process.
-%  To generate the curves in Figure~\ref{fig:flux_curves_msddm}, we needed to correlate 
-%  25--1000 times more hops than for the MSD predictions in Figure~\ref{fig:msddm_performance}. 
-%  In short, it is computationally infeasible to use enough terms to accurately incorporate
-%  long timescale correlations into our long MSDDM realizations. Thus at long timescales, 
-%  we lose correlation between transitional jumps. We confirmed this hypothesis by using 
-%  fractional Brownian motion, for which we have an exact simulation method, in place of 
-%  FLM in the MSDDM algorithm. When we use FBM, $\beta$ increases well above the Brownian 
-%  value. $\beta$ increases even further if we immobilize the trapped states. Thus the low
-%  value of $\beta$ of the MSDDM is a consequence of model assumptions and inexact simulation
-%  of FLM.  
-  
-%  \begin{figure}
-%  \centering
-%  \begin{subfigure}{0.43\textwidth}
-%  \includegraphics[width=\textwidth]{beta_hurst.pdf}
-%  \caption{}\label{fig:beta_hurst}
-%  \end{subfigure}
-%  \begin{subfigure}{0.52\textwidth}
-%  \includegraphics[width=\textwidth]{beta_parameters.pdf}
-%  \caption{}\label{fig:beta_parameters}
-%  \end{subfigure}
-%  %BJC5: need to update MSDDM (immobile states). Waiting on those simulations
-%  %MRS6: should try to lead with what the overall results/conclusions are.  What does it mean that parameters are larger or smaller?  What should the reader take from the discussion?  Should it be in supportinig?
-%  \caption{(a) The $\beta$ values of the sFBMcut model appear to be inversely proportional
-%  to the Hurst parameters. The $\beta$ values of the MSDDM are much lower with much less
-%  variation than the sFBMcut model. (b) The $\beta$ parameters of the MSDDM are low because
-%  sub-trajectories between state transitions decorrelate transitional hops and because
-%  our FLM simulation procedure does not accurately correlate hops after long time lags. 
-%  The high $\beta$ parameters of the sFBMcut model are a consequence of anti-correlation
-%  between hops. Removing hop correlations causes $\beta$ to drop down close to MSDDM
-%  values (sFBMcut ($H$=0.5)). Removing dwell times in addition to hop correlation
-%  yields a similar value of $\beta$ (Brownian). Immobilizing particles while in a trapped state
-%  also yields a similar value of $\beta$ (MSDDM (immobile states)). Replacing FLM with
-%  FBM in the MSDDM raises $\beta$ well above the Brownian value (MSDDM (FBM)). Replacing FLM with FBM and
-%  immobilizing particles in trapped states further raises the value of $\beta$.}\label{fig:beta}
-%  \end{figure}
+  between solute hops. In Figure~\ref{fig:beta}a, we show that $\beta$ is inversely 
+  related to the Hurst parameter. This makes intuitive sense since higher degrees of
+  anti-correlation should slow the rate at which solutes cross the membrane pore. 
+  When we remove anti-correlation between hops (set $H$=0.5), the length dependence 
+  becomes the same for all solutes, dropping to a value just below 2. This also 
+  implies that hop lengths and dwell times do not affect length dependence since 
+  each solute exhibits different hopping and trapping behavior yet are all parameterized
+  by the same value of $\beta$ when $H$=0.5.
+  %BJC7: is above argument enough to get rid of following sentence (and associated bar in the Figure)?
+  We further verified this claim by removing hop anti-correlation and setting all 
+  dwell times equal to one timestep, effectively simulating Brownian motion.
+  The length dependence remains unchanged. 
 
-  %BJC6: TODO: add (a), (b), (c)
+  %BJC6: TODO: add (a), (b), (c) labels
+  %BJC7: TODO: optimize figure dimensions
   \begin{figure}
   \centering
   \begin{subfigure}{\textwidth}
   \includegraphics[width=\textwidth]{hurst_beta_variations.pdf}
   \caption*{}\label{fig:beta_hurst}
   \end{subfigure}
-  \begin{subfigure}{0.42\textwidth}
-  \vspace{-2em}
-  % use c_parameters2.py
+  \begin{subfigure}{0.31\textwidth}
+  % use c_parameters3.py
+  %BJC7: I could plot bars with the MSD of each solute to show that trend is same.
   \includegraphics[width=\textwidth]{c_parameter_comparison.pdf}
   \caption*{}\label{fig:c_parameters}
   \end{subfigure}
-  \begin{subfigure}{0.53\textwidth}
-  \vspace{-2em}
-  \vspace{0.5em}
+  \begin{subfigure}{0.66\textwidth}
+%  \vspace{-2em}
+%  \vspace{0.5em}
   \includegraphics[width=\textwidth]{c_influence.pdf}
   \caption*{}\label{fig:c_influence}
   \end{subfigure}
+  \vspace{-1.5cm}
   \caption{(top) Increased anti-correlation between hops (decreased $H$) appears to 
   increase the length-dependence of solute flux (higher $\beta$) for the sFBMcut model.
-  The length dependence of the MSDDM model is much weaker because sub-trajectories 
-  between state transitions decorrelate transitional hops and because our FLM 
-  simulation procedure does not accurately correlate hops after long time lags. 
-  We support this claim by removing hop correlation from the sFBMcut model which
-  results in a drop in the $\beta$ value close to MSDDM. These values of $\beta$ are
-  consistent with Brownian motion (no hop correlation and unit-length dwell times).
-  (bottom left) As solute flux increases, the scaling of the flux curves, $c$, increases 
-  (compare ranking with Figures~\ref{fig:flux_curves_ad} and~\ref{fig:flux_curves_msddm}).
-  The $A$ parameters of the MSDDM are smaller than the sFBMcut AD model because the AD
-  model must compensate for its strong length dependence (higher $\beta$). 
+  If we remove anti-correlation, by setting $H$=0.5, the length dependence parameter
+  drops to a value near 2. When we remove hop anti-correlation and dwell times between
+  hops, effectively simulating Brownian motion, the $\beta$ parameter stays near 2. 
+  This suggests that $\beta$ does not depend on dwell times (parameterized by $\alpha$
+  and $\lambda$). (bottom left) As solute flux increases, the scaling of the flux 
+  curves, $A$, increases (compare ranking with Figure~\ref{fig:flux_curves_ad}).
   (bottom right) Physical processes which increase the rate of solute displacement 
   result in larger values of $A$. To test the dependence of $A$ on $\alpha$, $\sigma$, 
   $H$ and $\lambda$, we chose a single set of parameters, representative of solutes
   parameterized by the sFBMcut AD model, and generated realizations of the
-  model by each parameter independently about the same base parameter set. 
-  %Therefore, the middle bars for these four 4 parameters are 
-  %generated from the same set of parameters. 
+  model by varying each parameter independently about the same base parameter set. 
+%  Therefore, the middle bars for these four 4 parameters are 
+%  generated from the same set of parameters. 
   Decreased dwell times (increased $\alpha$), increased hop lengths (increased 
   $\sigma$), and a lower cut-off to the dwell time distribution (increased $\lambda$)
   lead to increases in $A$. 
-  %$c$ responds linearly to increases in $\sigma$ and $\lambda$
+  %$A$ responds linearly to increases in $\sigma$ and $\lambda$
   and non-linearly to $\alpha$.
   The data suggests that the $A$ parameters do not depend on hop anti-correlation ($H$).
-  To test $\alpha_h$, we used the set of parameters defining the MSDDM of Urea (since 
-  sFBMcut does not use a L\'evy distribution) and varied the $\alpha_h$ parameter of 
-  the transitional hops. As $\alpha_h$ increases, $A$ increases slightly since the 
-  density of the L\'evy stable PDF is shifted away from rare hops and broadened at 
-  its center. We expect similar dependence of $A$ on $\sigma$ and $H$ of the MSDDM.
   }\label{fig:beta}
   \end{figure}
-  
-  Parameters represented by physical processes which act to modify the rate at 
-  which solutes move through the membrane pores will affect the scaling pre-factor
-  of the solute flux curves ($A$). Comparison of Figure~\ref{fig:beta}b with 
-  Figures~\ref{fig:flux_curves_ad} and~\ref{fig:flux_curves_msddm} reveals that
-  the ranking of the $A$ parameters is consistent with the ranking of solute 
-  flux. In general, $A$ values generated by the MSDDM model are smaller than the
-  those generated by the sFBMcut AD model because the AD model has to compensate
-  for high $\beta$ values. In Figure~\ref{fig:beta}c we demonstrate that 
-  decreasing dwell times (increasing $\alpha$), increasing hop lengths (increasing 
-  $\sigma$), cutting off the dwell time distribution at shorter times (increasing
-  $\lambda$) and increasing tail weights of the hop length distribution (decreasing
-  $\alpha_h$) independently lead to an increase in $A$. Figure~\ref{fig:beta}c
-  also suggests that $A$ is not dependent on hop anti-correlation ($H$).
-  
-%  The values of $c$ are directly related to the magnitude of solute flux and, where
-%  applicable, are functions of $\sigma$, $\alpha$, $\lambda$ and $\alpha_h$. 
-%  In Figure~\ref{fig:beta}, we plot the $c$ values measured
-%  for each solute with each model from lowest to highest. In general, $c$ values generated
-%  by the MSDDM model are smaller than the those generated by the sFBMcut AD model 
-%  because the AD model has to compensate for high $\beta$ values. 
-%  Comparison 
-%  of Figure~\ref{fig:c_parameters} with Figures~\ref{fig:flux_curves_ad} 
-%  and~\ref{fig:flux_curves_msddm} reveals that the ranking of the $c$ parameters is
-%  consistent with the ranking of solute flux. 
-%  Therefore, it is reasonable to hypothesize
-%  that any parameter which acts to modify the rate at which solutes move through the
-%  membrane pores will affect $c$ for various physical reasons. 
-%  In 
-%  Figure~\ref{fig:c_influence} we demonstrate that decreased dwell times
-%  (increased $\alpha$), increased hop lengths (increased $\sigma$), cutting off the
-%  dwell time distribution at shorter times (increased $\lambda$) and decreased tail 
-%  weights of the hop length distribution (increased $\alpha_h$) independently lead to
-%  an increase in $c$. Figure~\ref{fig:c_influence} also suggests that $c$ is not dependent on hop
-%  anti-correlation ($H$).
+    
+%  Parameters represented by physical processes which act to modify the rate at 
+%  which solutes move through the membrane pores will affect the scaling pre-factor
+%  of the solute flux curves ($A$). 
 
-%  We showed earlier that $\beta$ is not a
-%  function of $\sigma$ or $\alpha$, therefore dwell times and hop lengths must
-%  influence $c$. In fact, any parameter which acts to modify the rate at which 
-%  solutes move through the membrane pores will affect $c$. Therefore it is 
-%  sensible to hypothesize that a higher degree of anti-correlation (lower $H$)
-%  should decrease $c$ and a higher value of $\alpha_h$ should also increase $c$.
-%  In Figure~\ref{fig:c_influence}, we verify these hypotheses by holding 
-  
-%  \begin{figure}
-%  \centering
-%  \begin{subfigure}{0.42\textwidth}
-%  % use c_parameters2.py
-%  \includegraphics[width=\textwidth]{c_parameter_comparison.pdf}
-%  \caption{}\label{fig:c_parameters}
-%  \end{subfigure}
-%  \begin{subfigure}{0.53\textwidth}
-%  \vspace{0.5em}
-%  \includegraphics[width=\textwidth]{c_influence.pdf}
-%  \caption{}\label{fig:c_influence}
-%  \end{subfigure}
-%  %BJC5: waiting on simulations for alpha_h
-%  \caption{(a) The $c$ parameter increases with solute flux (compare ranking with
-%  Figures~\ref{fig:flux_curves_ad} and~\ref{fig:flux_curves_msddm}). The $c$ parameters
-%  of the MSDDM are smaller than the sFBMcut AD model because the AD model must
-%  compensate for its strong length dependence (higher $\beta$). (b) Changes to parameters
-%  which increase the rate of solute displacement result in larger values of $c$. 
-%  To test the dependence of $c$ on $\alpha$, $\sigma$, $H$ and $\lambda$, we chose a 
-%  single set of parameters, representative of solutes parameterized by the sFBMcut AD model,
-%  and generated realizations of the model by varying each parameter independently about the
-%  same base parameter set. Therefore, the middle bars for these four 4 parameters are 
-%  generated from the same set of parameters. Decreased dwell times (increased $\alpha$),
-%  increased hop lengths (increased $\sigma$), and a lower cut-off to the dwell time
-%  distribution (increased $\lambda$) lead to increases in $c$. $c$ responds linearly
-%  to increases in $\sigma$ and $\lambda$ and non-linearly to $\alpha$. The data 
-%  suggests that the $c$ parameters do not depend on hop anti-correlation ($H$). To test 
-%  $\alpha_h$, we used the set of parameters defining the MSDDM of Urea (since sFBMcut does
-%  not use a L\'evy distribution) and varied the $\alpha_h$ parameter of the transitional
-%  hops. As $\alpha_h$ increases, $c$ increases slightly since the density of the L\'evy
-%  stable PDF is shifted away from rare hops and broadened at its center.
-%  We expect similar dependence of $c$ on $\sigma$ and $H$ of the MSDDM.}\label{fig:c}
-%  \end{figure}
+  Dwell times and hop lengths directly modify the rate at which solutes move 
+  through the membrane pores and are reflected in the scaling pre-factor of
+  the solute flux curves, $A$. Comparison of Figure~\ref{fig:beta}b with 
+  Figure~\ref{fig:flux_curves_ad} reveals that the ranking of the $A$ parameters
+  is consistent with the ranking of solute flux. In Figure~\ref{fig:beta}c we
+  demonstrate that decreasing dwell times (increasing $\alpha$), cutting off 
+  the dwell time distribution at shorter times (increasing $\lambda$), and increasing 
+  hop lengths (increasing $\sigma$) independently lead to an increase in $A$. 
+  Figure~\ref{fig:beta}c also suggests that $A$ is not dependent on hop 
+  anti-correlation ($H$).
   
   The power law decay of the flux with pore length implies the following relationship
   for selectivity via substitution of Equation~\ref{eqn:flux_decay} into 
@@ -2115,63 +1917,52 @@ with time series modeling}
   S_{ij}(L) = \bigg(\frac{A_i}{A_j}\bigg)L^{(\beta_i - \beta_j)}
   \label{eqn:selectivity_ratio}
   \end{equation}
-   
-  In Figure~\ref{fig:selectivity}, we plot Equation~\ref{eqn:selectivity_ratio} for pore
-  lengths ranging from those studied in Figure~\ref{fig:flux_curves} to macroscopic-length
-  pores. 
-  %Greater differences in $\beta$ values leads to selectivities that are stronger 
-  %functions of pore length. 
-  For $(A_i / A_j)=1$, LLC membranes will be more selective towards passage of solutes 
-  with less anti-correlated hopping behavior (lower $\beta$). 
-  %versus those with high $\beta$ values.
-  For the same degree of hop anti-correlation, 
-  %When $\beta$ values are equal, 
-  as is the case for uncorrelated motion, selectivity only
-  depends on the pre-factors, $A$. In most cases, the length dependence of selectivity 
-  plateaus quickly which implies that a coating of LLC membrane with a thickness on the 
-  order of those already made experimentally should be sufficiently optimal. 
 
   \begin{figure}
   \centering
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{selectivity.pdf}
-  \caption{sFBMcut}
-  \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{selectivity_msddm.pdf}
-  \caption{MSDDM}
-  \end{subfigure}
+  \includegraphics[width=0.5\textwidth]{selectivity.pdf}
   \caption{The selectivity of 2 species changes monotonically with pore length. The
   strength of dependence on pore length depends on the difference between $\beta$ values.
   The selectivities predicted by the sFBMcut AD model (a) are much larger in magnitude than
   those predicted by the MSDDM (b) because predictions of the AD model result in a much
-  larger variation in flux (compare Figures~\ref{fig:flux_curves_ad} and~\ref{fig:flux_curves_msddm}).}
+  larger variation in flux (compare Figures~\ref{fig:flux_curves_ad}).}
   \label{fig:selectivity}
   \end{figure}
+   
+  In Figure~\ref{fig:selectivity}, we plot Equation~\ref{eqn:selectivity_ratio} for pore
+  lengths ranging from those studied in Figure~\ref{fig:flux_curves_ad} to macroscopic-length
+  pores. For the same degree of hop anti-correlation, as is the case for uncorrelated motion, 
+  selectivity depends on solute hop lengths and dwell times ($A$). For $(A_i / A_j)=1$, LLC
+  membranes will be more selective towards passage of solutes with less anti-correlated hopping
+  behavior (lower $\beta$). The selectivity towards solutes with less length dependent flux
+  increases with membrane thickness. In most cases, the length dependence of selectivity 
+  plateaus quickly which implies that a coating of LLC membrane with a thickness on the 
+  order of those already made experimentally should be sufficiently optimal. 
   
-  The selectivities predicted by the sFBMcut model are both higher in magnitude and
-  ordered differently than the those predicted by the MSDDM. The magnitudes of the
-  sFBMcut predictions are higher because the predicted solute fluxes vary more widely
-  than those predicted by the MSDDM (compare Figures~\ref{fig:flux_curves_ad} 
-  and~\ref{fig:flux_curves_msddm}). The ordering is different mostly because the 
-  ordering of the flux predictions is different. 
+  %BJC7: I don't know why there is a big space before this paragraph when compiled
+  Of the solutes studied, the data suggests that this particular LLC membrane 
+  might be most useful for selectively separating ethylene glycol from methanol
+  and acetic acid. Relative to acetic acid, ethylene glycol takes larger hops 
+  and is trapped longer, leading to a larger $A$. There is also an appreciable 
+  difference in the scaling of each solute's flux with pore length ($\beta$) 
+  which gives the selectivity significant length dependence. Relative to methanol,
+  ethylene glycol takes similarly-sized hops and dwells which is why selectivity
+  is relatively low for very short pore lengths. However, the large difference in
+  hop correlation between the two solutes leads to the strongest pore length 
+  dependence of selectivity. 
+  %In both case, selectivity is enhanced as the pore 
+  %length increases which comes at the cost of lower solute flux, a phenomenon 
+  %ubiquitous in polymer separations membranes.~\cite{geise_water_2011}
   
-  We cannot say with absolute certainty which selectivity curves are more 
-  trustworthy. The sFBMcut model uses exact simulation techniques and yields 
-  qualitatively accurate solute trajectories, but it may overestimate long 
-  timescale correlation present in the real system. For this reason, we might
-  expect the $\beta$ values of the true flux curves to be closer to the 
-  Brownian value as exhibited by the MSDDM. But the MSDDM yields qualitatively
-  inaccurate solute trajectories and we do not have a good understanding of
-  how to precisely control the point at which solute hops become decorrelated.
-  
-  We may gain the most by using the two models in tandem. In both cases, the 
-  data suggests that this particular LLC membrane might be most useful for 
-  selectively separating ethylene glycol from acetic acid. Ethylene glycol
-  exhibits the highest flux while acetic acid has the lowest. Ethylene glycol
-  has the weakest dependence on pore length (lowest $\beta$) according to the
-  sFBMcut model, while acetic acid has the second highest dependence. This 
-  analysis certainly merits further experimental exploration.
+%  Ethylene glycol shows the least length dependent flux, likely because
+%  it spends the majority of its time in the pores (see Figure~\ref{fig:AD_mode_occupation}).
+%  %It also shows reasonable selectivity of Urea over acetic acid.  
+%  Ethylene glycol has the highest $c$ value and the lowest $\beta$ value. The high
+%  value of $c$ itself greatly enhances its selective passage. Even more importantly,
+%  the relatively large difference between its $\beta$ value and those of methanol 
+%  and acetic acid give rise to a strong pore length dependence. The selectivity is
+%  enhanced as the pore length increases at the cost of lower solute flux, a 
+%  phenomenon ubiquitous in polymer separations membranes.~\cite{geise_water_2011}
 
   \section{Conclusions}
   
@@ -2191,37 +1982,49 @@ with time series modeling}
   solutes among states as well as the type of stochastic behavior shown in each 
   state. 
   
-  In their current state, one should use the predictions of our models with caution.
+%  In their current state, one should use the predictions of our models with caution.
   Although large portions of the MSDs predicted by our models fall close to or 
   within the 1$\sigma$ confidence intervals of MD, it is not always for physically
   accurate reasons. Qualitatively, MSDDM trajectories do not display the same hopping
   and trapping behavior shown by MD trajectories. Frequent transitions drawn from a
   single, relatively broad transition emission distribution prevent long periods of
-  immobility. The best solution to this would be to have individual emission distributions
-  for each type of transition, but this would require orders of magnitude more data. 
-  AD model realizations show appropriate qualitative behavior, but the persistent 
-  curvature of the computed MSD curves, due to the correlation structure of fractional 
-  motion, under-estimate the MD MSD curves which appear to be trending towards linear
-  on $\mu$s timescales. In the future, we could address this by implementing a truncation
-  to the positional auto-correlation function.
+  immobility. The most obvious solution to this would be to generate individual emission
+  distributions for each type of transition, but this would require orders of magnitude
+  more data. This approach is further complicated by the need to make correlated draws
+  from a fractional L\'evy process with a frequently changing distribution width. 
+  A possible simplification could be to assume that correlation is lost every time a
+  state transition occurs.
+%  AD model realizations show appropriate qualitative behavior, but the persistent 
+%  curvature of the computed MSD curves, due to the correlation structure of fractional 
+%  motion, under-estimate the MD MSD curves which appear to be trending towards linear
+%  on $\mu$s timescales. In the future, we could address this by implementing a truncation
+%  to the positional auto-correlation function.
+
+  Although the AD model generates qualitatively accurate trajectories and 
+  predicts MSDs near or within the 1$\sigma$ confidence interval of our
+  MD simulations, the curvature of the predicted MSDs may not be consistent
+  with the MD simulations. The MSD curves calculated from MD simulations 
+  appear to straighten out on long timescales while those predicted by the
+  AD model continuously curve. This is because pure fractional Brownian motion
+  features hop correlation that persists indefinitely. We may be able to address
+  this by truncating the positional autocorrelation function, allowing 
+  correlation to diminish on the 100 ns timescale. 
   
-  We demonstrated how one could used our models in order to to determine
+  We demonstrated how one could use the one mode AD model in order to to determine
   macroscopic flux and selectivity. We showed that, when using the AD model, 
   solute flux decreases with pore length at a rate faster than pure 
-  Brownian motion due to anti-correlation between hops. However, using the
-  MSDDM, we observed a decay in flux similar to Brownian motion. This is
-  primarily due to the inexact method that we use to correlate hops of the 
-  fractional L\'evy motion process. 
-  %When we replace FLM with FBM in the 
-  %MSDDM algorithm, we observe a flux decay more consistent with that predicted
-  %by the AD model. 
-  We used the ratio of solute fluxes generated from each model in order to 
-  calculate selectivity. Due to differences in hop anti-correlation, we observe 
-  a length dependent selectivity. This length dependence may dissipate
-  once we gain a more complete understanding of the hop correlation structure. 
-  If the length dependence of a properly correlated model always converges to 
-  $\beta$=2, it will greatly influence the prediction of selectivity on 
-  macroscopic length scales.
+  Brownian motion due to anti-correlation between hops. We used the ratio of 
+  solute fluxes generated from each model in order to calculate selectivity. 
+  Due to differences in hop anti-correlation, we observe length dependent 
+  selectivity. Based on these calculations we can hypothesize that this 
+  particular LLC membrane may be a good candidate for the selective separation
+  of ethylene glycol from acetic acid or methanol.
+  
+%  This length dependence may dissipate once we gain a more 
+%  complete understanding of the hop correlation structure. 
+%  If the length dependence of a properly correlated model always converges to 
+%  $\beta$=2, it will greatly influence the prediction of selectivity on 
+%  macroscopic length scales.
 %  However, this length dependence mostly plateaus at length scales that can be
 %  synthesized experimentally. The data suggests that this particular membrane 
 %  may be useful for separating ethylene glycol and acetic acid.
@@ -2245,7 +2048,7 @@ with time series modeling}
 
   Despite their shortcomings, our mathematical models help us think about how 
   to design LLC monomers for solute-specific separations by forcing us to think
-  in terms of controlling solute trapping. The anomalous diffusion model is 
+  in terms of controlling solute transport. The anomalous diffusion model is 
   quite flexible because it does not require knowledge of specific trapping 
   mechanisms. Screening a set of solutes and applying the anomalous diffusion 
   model can help uncover trapping mechanisms by forcing the scientist to 
@@ -2256,8 +2059,7 @@ with time series modeling}
   sodium ion association is primarily responsible for trapping urea while 
   hydrogen bonding dominates ethylene glycol. If one re-designs an LLC monomer
   to eliminate one source of trapping, then high selectivities are possible.
-  Overall, in tandem or separately, our models facilitate new ways of approaching
-  complex separation problems.
+  Our models facilitate new ways of approaching complex separation problems.
   
   \section*{Supporting Information}
 
@@ -2266,6 +2068,11 @@ with time series modeling}
   available free of charge via the Internet at http://pubs.acs.org.
 
   \section*{Acknowledgments}
+  
+  We thank Richard Noble for helping us make the connection between the empirical 
+  mean first passage time distribution and the analytical equation to which we fit
+  the distributions (Equation~\ref{eqn:passage_times}).
+  
   %MRS: add people who contributed non-author level ideas. 
   %MRS3: add specific info for PRF and GAANN
   %BJC3: I wrote GAANN as I did on the last paper which is what Rob Davis told me to do
@@ -2281,13 +2088,9 @@ with time series modeling}
   ACI-1532236), the University of Colorado Boulder, and Colorado State
   University. The Summit supercomputer is a joint effort of the University of
   Colorado Boulder and Colorado State University.
-  
-  We would also like to thank Richard Noble for helping us make the connection 
-  between the empirical mean first passage time distribution and the analytical
-  equation to which we fit the distributions (Equation~\ref{eqn:passage_times}).
 
   %MRS6: look over and make bibliography consistent (i.e. no months, consistent journal abbreviations)
-  \bibliographystyle{ieeetr}
+  \bibliographystyle{apsrev4-2}
   \bibliography{stochastic_transport}
 
   \section*{TOC Graphic}
