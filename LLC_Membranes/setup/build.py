@@ -32,7 +32,9 @@ def initialize():
     parser.add_argument('-n', '--nopores', default=4, type=int, help='Number of pores (only works with 4 currently)')
     parser.add_argument('-d', '--dbwl', default=.37, type=float, help='Distance between vertically stacked monomers'
                                                                       '(nm)')
-    parser.add_argument('-m', '--monomers_per_column', default=20, type=int, help='Number of monomers to stack in each'
+    parser.add_argument('-m', '--monomers_per_column', default=20, type=int, help='Number of monomers to stack in each' #make sure that this number times ncolumns times nopores = a multiple of 3 and 5 (namely 420)
+
+   #parser.add_argument('-ion', '--ion_exchange', type=str, help= 'Ion you want to exchange in)
                                                                                   'column')
     parser.add_argument('-t', '--tilt', default=0, type=float, help='Tilt angle of monomer with respect to xy plane (degrees)')
     parser.add_argument('-L', '--correlation_length', type=float, help='Length over which distance correlation between'
@@ -136,6 +138,9 @@ if __name__ == "__main__":
                                     random_shift=args.no_column_shift, mole_fraction=args.mol_frac)
 
         system.reorder()
+        
+        print(system.xyz)
+        exit()
 
         if args.box_lengths:
             a, b, c = args.box_lengths

@@ -3,6 +3,8 @@
 import numpy as np
 from LLC_Membranes.llclib import file_rw, transform, topology
 
+charge = dict() #same as charge
+charge['NA'] = 1.0000
 
 def z_correlation(z, L, v=0.1):
     """ Calculate where to place monomers on the z-axis so that a given correlation length is obtained
@@ -231,3 +233,13 @@ class BuildHexagonal:
         self.xyz = self.xyz[ordered, :]
         self.all_residues = [self.all_residues[i] for i in ordered]
         self.names = [self.names[i] for i in ordered]
+
+        def exchange_ion(self, original_ion, new_ion):
+        """ This function will switch out the ion from the system and replace with a new ion.
+"""
+        #modify self.xyz (coordinates), self.names, self.all_residues get rid of all NA stuff and replace with something else.
+
+        charge[new_ion] #figuring out how many ions needed
+	#use some sodium position charges... for +2, use every second one. for +3, every third NA coordinate
+
+	#how to manipulate numpy array to do what I think I want it to do.
