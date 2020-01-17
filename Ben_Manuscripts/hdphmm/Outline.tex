@@ -1,0 +1,261 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{subcaption}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath} % or simply amstext
+\usepackage{amssymb}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage[export]{adjustbox}
+\newcommand{\angstrom}{\textup{\AA}}
+\newcommand{\colormap}{jet}  % colorbar to use
+\usepackage{cleveref}
+\usepackage{booktabs}
+\usepackage{gensymb}
+\usepackage{float}
+
+%MRS: better to have the first outline shorter to iterate more quickly!
+%BJC1: right, this one has been in the works for a while now. Wrote the anomalous diffusion methods a long time ago
+
+%MRS: better to have a title that described a finding, rather than the
+%approach used.  But we may need to wait a bit further until we can decide on a finding.
+%MRS: also 'stochastic modeling' is pretty vague.  should be more precise. 
+\title{Using Stochastic Modeling to Predict Long Timescale Transport Behavior of Solutes in an H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
+%MRS: we should discuss whether Chris Calderon would be on this one.  I would guess no, but I don't know for sure. 
+%BJC1: Yea maybe Chris as an acknowledgement on this one. He didn't directly contribute anything other than pointing
+%me towards Greg Morrin who pointed me towards useful anomalous diffusion literature.
+\author{Benjamin J. Coscia \and Michael R. Shirts} 
+
+\begin{document}
+
+  \graphicspath{{./figures/}}
+  \maketitle
+
+  \section{Introduction}
+  %BJC: obviously this section will get beefed up
+  We need highly selective membranes in order to perform efficient separations. \\
+
+  \noindent Amphiphilic molecules are capable of self-assembling into ordered nanostructures.\\
+
+  Lyotropic liquid crystals are a class of amphiphilic molecules that can be cross-linked
+  into mechanically strong membranes.
+  \begin{itemize}
+  	\item H\textsubscript{II} phase lyotropic liquid crystals have densely packed, uniform
+	sized pores and have the potential to disrupt conventional membrane separation
+	techniques by being selective based not only on size and charge, but on chemical
+	functionality as well.
+	\item Q\textsubscript{I} phase LLCs consist of a tortuous network of 3D interconnected
+	pores. They are easier to make.
+  \end{itemize}
+
+  We can only learn so much from experiment. MD can give us mechanistic insights with
+  atomistic resolution so that we can intelligently design new membranes for 
+  solute-specific separations.\\
+
+  \noindent In our previous work, we studied the transport of 20 small polar molecules
+  in an H\textsubscript{II} phase LLC membrane.
+  \begin{itemize}
+    \item In general, we observed subdiffusive transport behavior characterized by 
+    intermittent hops separated by periods of entrapment.
+    \item We identified three mechanisms responsible for the solute trapping behavior:
+    entanglement among monomer tails, hydrogen bonding with monomer head groups, and
+    association with sodium counter ions.
+  \end{itemize}
+
+  Unfortunately, the timescales that we can simulate with MD are insufficient to be
+  able to make well-converged predictions of macroscopic transport properties 
+  traditionally used to characterize membranes in the lab.
+  \begin{itemize}
+    \item However, if we use descriptive stochastic models that can capture solute
+    dynamics, then we could project long timescale behavior in addition to gaining
+    a deeper understanding of solute behavior on short timescales.
+  \end{itemize}
+  
+  In our previous work, we designed two different approaches which used
+  solute time series in order to parameterize stochastic models that could be used
+  to project transport on much longer timescales.
+  \begin{itemize}
+  	\item Brief description of anomalous diffusion
+  	\item Brief descritpion of MSDDM
+  \end{itemize}
+  
+  Although both models had reasonable success at predicting solute MSDs on simulation
+  timescales, they had shortcomings.
+  \begin{itemize}
+  	\item Why MSDDM failed
+  	\item Why anomalous diffusion model could be better.
+  \end{itemize}
+  
+  % BJC: Not sure whether to call it the infinite hidden markov model or hierarchical dirichlet process hidden markov model
+  % The former is definitely simpler.
+  In this work, we apply the infinite hidden markov model, a modeling that is agnostic
+  to the source of time series data, in order to detect and parameter an unknown number
+  of autoregressive modes.
+  
+    
+  \section{Methods}
+    
+  We ran all MD simulations and energy minimizations using GROMACS 2018. We  % needs gromacs citations
+  performed all post-simulation trajectory using python scripts which are available
+  %MRS: eventually want to say what scripts were used to do what, but that is not at the outline stage!
+  %BJC1: I usually put a table like that in the SI. Is that sufficient?
+  online at \\ \texttt{https://github.com/shirtsgroup/LLC\_Membranes}.
+
+  \subsection{Molecular Dynamics Simulations}
+
+  We studied transport of solutes in the H\textsubscript{II} phase using an
+  atomistic molecular model of four pores in a monoclinic unit cell with 
+  10 \% water by weight. 
+  \begin{itemize}
+    \item Approximately one third of the water molecules occupy the tail region 
+    with the rest near the pore center.
+    \item We chose to study the 10 wt \% water system because solutes move 
+    significantly faster than in the 5 wt \% system studied previously.
+    \item Appropriate stochastic modeling requires that solutes sample the 
+    accessible mechanisms with representative probability.  %BJC1: incorporated suggested phrasing
+  \end{itemize}
+  
+  We chose to study a subset of 4 of the fastest moving solutes from our previous
+  work: methanol, acetic acid, urea and ethylene glycol.
+  \begin{itemize} 
+    \item In addition to exploring membrane structural space the most, these solutes
+    have a relatively diverse set of chemical functionality.   
+    %MRS: do the solutes also have some diversity of mechanisms (that were observed previously?)
+    %BJC1: Yes. Need to put following into words
+    %BJC1: Ranking of time spent in pore region: AcOH > EG > URE > MeOH  (spans 4th most to 3rd least)
+    %BJC1: All have high hop frequency which is consistent with fast motion
+    %BJC1: Hbonding: Urea barely hbonds. AcOH and EG hbond a lot. AcOH has highest hbond lifetime of all 20 solutes. MeOH on par with all other simple alcohols
+    %BJC1: Sodium Association: Urea coordinates with sodium the most of all 20 solutes. AcOH, EG, MeOH spread out of rest of range. Lifetime similar 
+    \item For each solute we created a separate system and to each system we
+    added 6 solutes per pore for a total of 24 solutes.
+    \item This number of solutes per pore provides a balance of a low 
+    degree of interaction between solutes and sufficient amount of data from
+    which to generate statistics on the time scales which we simulate.
+    \item Further details on the setup and equilibration of these systems can
+    be found in our previous work.\cite{coscia_chemically_2019}
+  \end{itemize}
+  
+  \noindent We extended the 1 $\mu$s simulations of our previous work to 5 $\mu$s in order
+  to collect ample data.
+  \begin{itemize}
+    \item We simulated the system with a time step of 2 fs at a pressure of 1 bar
+    and 300 K controlled by the Parinello-Rahman barostat and the v-rescale thermostat
+    respectively.
+    \item We recorded frames every 0.5 ns
+  \end{itemize}
+
+  % BJC: can ignore this section for now. 
+  \subsection{The Infinite State Hidden Markov Model}\label{method:iHMM}  %BJC: potentially a separate paper
+  
+  Hidden Markov models (HMMs) are a useful and widely used technique
+  for modeling sequences of observations where the probability of the next observation
+  in a sequence depends only on a previous unobserved, or hidden, state.~\cite{beal_infinite_2002}
+  \begin{itemize}
+    \item In the context of our simulations, the observations correspond to 
+    the center of mass coordinates of the solutes versus time, and the states
+    correspond to the dynamical behavior which give rise to those types
+    of observations.
+    \item Unfortunately, standard HMMs require the number of hidden states to be known
+    a priori.
+    \item One can partially overcome this by testing a range of numbers of 
+    hidden states and determining which is the best representation of their
+    data.
+  \end{itemize}
+  
+  The infinite-state HMM overcomes this drawback by placing a hierarchical
+  Dirichlet process (HDP) prior on the transition probabilities.
+  \begin{itemize}
+    \item Using some base probability distribution, H, a Dirichlet process 
+    (DP) generates distributions over a countably infinite number of 
+    probability measures:
+    \begin{equation}
+      G_0 = \sum_{k=1}^{\infty} \beta_k \delta_{\theta_k} ~~ \theta_k \sim H, \beta \sim GEM(\gamma)
+    \end{equation}
+    where the $\theta_k$ are values drawn from the base distribution and the
+    weights $\beta_k$ come from a stick-breaking process parameterized by the concentration 
+    parameter $\gamma$ (equivalently referred to as GEM($\gamma$)). 
+    \item The concentration parameter expresses one's confidence in H relative to the posterior 
+    and is closely related to the number of data observations.
+    \item Each row, $G_j$, of the transition matrix is produced by drawing from a DP specified 
+    using the $\beta$ vector as a discrete base distribution and a separate concentration
+    parameter, $\alpha$.
+    \begin{equation}
+      G_j = \sum_{k=1}^{\infty} \pi_{jk} \delta_{\theta_k} ~~ \pi_j \sim DP(\alpha, \beta)
+    \end{equation}
+    \item This hierarchical specification ensures that the transition probabilities in 
+    each row share the same support points \{$\theta_1$, ..., $\theta_k$\}.
+    \item Once the model has converged only a finite number of states will have significant
+    sampling.
+  \end{itemize}
+   
+  \noindent We describe the dynamics of each state using a vector autoregressive (VAR) model. 
+  \begin{itemize}
+  	\item A VAR process is characterized by a vector of observations in a time series 
+  	that are dependent on $r$ previous values of the time series vector, weighted by a
+  	coefficient matrix $A_i$ in addition to a white noise term $\mathbf{e}_t$:
+  	\begin{equation}
+  	\mathbf{y}_t = \sum_{i=1}^r A_i\mathbf{y}_{t-i} + \mathbf{e}_t~~~~\mathbf{e}_t \sim N(0, \Sigma)
+  	\end{equation}
+  	\item We assumed multivariate Gaussian noise and limited our analysis to an 
+  	autoregressive order of $r=1$.
+  	\item We used a conjugate matrix-normal inverse-Wishart prior on parameters
+  	$A$ and $\Sigma$ in order to analytically draw from the posterior.
+  \end{itemize}   
+  
+  Based on the VAR parameters and matrix of transition probabilities, we calculated
+  the most likely sequence of hidden states.
+  \begin{itemize}
+    \item We repeated this process iteratively until we reached convergence % BJC: need to define convergence criteria
+    \item Our python implementation of this process is heavily adapted from the MATLAB code
+    of Fox et al.~\cite{fox_sticky_2007} 
+    \item We refer the interested reader to much more extensive descriptions of 
+    this process and its implementation. 
+    ~\cite{beal_infinite_2002,teh_hierarchical_2006,van_gael_beam_2008,fox_nonparametric_2009,fox_bayesian_2010}
+  \end{itemize}
+  \break
+  \section{Results and Discussion}
+ 
+  \section{Conclusion}
+  
+  We have tested two different mathematical frameworks for describing solute
+  motion in an H\textsubscript{II} phase LLC membrane.
+  \begin{itemize}
+    \item Markov state modeling with predefined states gives a nice description
+    of transitions between observed states as well as the type of stochastic 
+    behavior shown in each state. However, it doesn't accurately portray correlated
+    time series behavior leading to overpredicted MSDs.
+    \item Subordinated fractional Brownian motion has a nice theoretical foundation
+    in the anomalous diffusion literature. A two mode model that describes dynamics
+    based on whether a solute is in or out of the pore region leads to MSDs fairly
+    consistent with MD simulated trajectories.
+  \end{itemize}
+ 
+  \section*{Supporting Information}
+
+  Detailed explanations and expansions upon the results and procedures mentioned in
+  the main text are described in the Supporting Information. This information is
+  available free of charge via the Internet at http://pubs.acs.org.
+
+  \section*{Acknowledgements}
+
+  Molecular simulations were performed using the Extreme Science and
+  Engineering Discovery Environment (XSEDE), which is supported by National
+  Science Foundation grant number ACI-1548562. Specifically, it used the Bridges
+  system, which is supported by NSF award number ACI-1445606, at the Pittsburgh
+  Supercomputing Center (PSC). This work also utilized the RMACC Summit supercomputer,
+  which is supported by the National Science Foundation (awards ACI-1532235 and
+  ACI-1532236), the University of Colorado Boulder, and Colorado State
+  University. The Summit supercomputer is a joint effort of the University of
+  Colorado Boulder and Colorado State University.
+
+  \clearpage
+
+  \bibliographystyle{ieeetr}
+  \bibliography{stochastic_transport}
+
+  \newpage
+
+  \section*{TOC Graphic}
+
+\end{document}
