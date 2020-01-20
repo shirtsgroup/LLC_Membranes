@@ -84,9 +84,9 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \texttt{/analysis/sfbm\_parameters.py}     & 2.2 & Get subordinated fractional Brownian motion parameters by fitting to a solute's dwell and hop length distributions and positional autocorrelation function. \\\hline
   \texttt{/timeseries/ctrwsim.py}            & 2.2 & Generate realizations of a continuous time random walk with the user's choice of dwell and hop distributions \\\hline
   \texttt{/timeseries/forecast\_ctrw.py}     & 2.2 & Combines classes from \texttt{sfbm\_parameters.py} and \texttt{ctrwsim.py} to parameterize and predict MSD in one shot. \\\hline
-  \texttt{/analysis/ markov\_state\_dependent\_dynamics.py} & 2.3 & Identify frame-by-frame state of each solute, construct a transition matrix and simulate realizations of the MSDDM model. \\\hline
+  \texttt{/analysis/ Markov\_state\_dependent\_dynamics.py} & 2.3 & Identify frame-by-frame state of each solute, construct a transition matrix and simulate realizations of the MSDDM model. \\\hline
   \texttt{/timeseries/mfpt\_pore.py}          & 2.4 & Simulate mean first passage time distributions using the AD or MSDDM model. \\\hline
-  
+%MRS8: see main text discussion about ``the XXXX model''  
   \end{tabular}
 
   \caption{The first column provides the names of the python scripts available in
@@ -155,7 +155,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
 %	\langle x^2(t) \rangle \sim t ^ \alpha
 %	\label{eqn:msd}
 %  \end{equation}
-%  For brownian motion, $\alpha = 1$ and the MSD is linear. When $\alpha \neq
+%  For Brownian motion, $\alpha = 1$ and the MSD is linear. When $\alpha \neq
 %  1$, the particle of interest exhibits anomalous diffusion. Values of $\alpha$
 %  greater than 1 give rise to superdiffusion, while values of $\alpha$ less than
 %  1 give rise to subdiffusion.
@@ -269,10 +269,14 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \includegraphics[width=\textwidth]{flm_autocovariance.pdf}
   \caption{}\label{fig:flm_autocorrelation}
   \end{subfigure}
+  %MRS8: make clear in (b) the lines all lay on top so people don't miss it.  
   \caption{(a) The analytical autocorrelation function of FBM decays to zero faster
   when H $<$ 0.5 compared to when H $>$ 0.5. (b) The autocorrelation function of an 
   FLM process does not change with increasing sequence length (N). It shares the same
-  autocorrelation function as fractional Brownian motion (FBM). All sequenced used to
+  autocorrelation function as fractional Brownian motion (FBM). All 
+  %sequenced
+  sequences 
+  used to
   make this plot were generated using $H$=0.35 and, for FLM, $\alpha$=1.4.}\label{fig:hurst_parameters}
   \end{figure}
   
@@ -307,14 +311,14 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \textit{Determining where to truncate the hop distribution:} A pure
   L\'evy stable distribution has heavy tails which can lead to arbitrarily
   long hop lengths. Our distribution of hop lengths fits well to a L\'evy
-  distribution near the mean, but under samples the tails. In 
+  distribution near the mean, but under-samples the tails. In 
   Figure~\ref{fig:truncation_correction} we compare the empirically 
   measured transition emission distribution of the MSDDM for urea to its maximum likelihood fit to
   a L\'evy stable distribution. The ratio between the two distributions 
   at each bin is nearly 1 close to the center, indicating a near-perfect
   fit, larger than 1 slightly further from the center, suggesting that 
   we slightly over sample intermediate hop lengths, and below 1 far from 
-  the center, indicating under sampling of extremely long hop lengths.
+  the center, indicating undersampling of extremely long hop lengths.
   Based on the plot, we chose a cut-off of 1 nm in order to compensate for
   over sampled intermediate hop lengths. We chose the same cut-off for all
   solutes.
@@ -325,7 +329,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \caption{The ratio between the empirical and maximum likelihood theoretical
   distribution quantifies the quality of fit as function of hop length. The fit
   is near-perfect close to the mean. Intermediate hop lengths are over sampled, 
-  and the tails are under sampled. We used this type of plot to determine the
+  and the tails are undersampled. We used this type of plot to determine the
   appropriate place to truncate the L\'evy stable distributions.}\label{fig:truncation_cutoff}
   \end{figure}
   
@@ -440,6 +444,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \caption{The number of transitions from state $i$ to $j$ and $j$ to $i$ are very close
   indicating that our process obeys detailed balance. Detailed balance is conserved for 
   different sized time steps.}\label{fig:counts}
+  %MRS: would this be clearer to see if you plotted i-j/i+j for a relative error to see how different it is from symmetric jumps? 
   \end{figure}
   
   \begin{figure}
@@ -453,7 +458,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \caption{Ethylene Glycol}\label{fig:GCL_transitions}
   \end{subfigure}
   \caption{As the timestep between observations increases, the probability
-  transition matrix does not change signficantly.}\label{fig:transitions}
+  transition matrix does not change significantly.}\label{fig:transitions}
   \end{figure}
   
   \newpage  
@@ -506,7 +511,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   
   \section{Solute hopping and trapping behavior}\label{section:sfbm_other_solutes}
   
-  Analagous to Figure~\ref{M-fig:anticorrelated_hops} of the main text,
+  Analogous to Figure~\ref{M-fig:anticorrelated_hops} of the main text,
   Figure~\ref{fig:anticorrelated_hops} demonstrates that all solutes exhibit the
   same kind of anti-correlated hopping and trapping behavior.
   
@@ -639,8 +644,8 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \end{subfigure}
   \caption{The ensemble of solute trajectories may be stationary if the MSD
   calculated from different portions of the trajectory are the same. Here we
-  plot the MSD calcluated up to a 500 ns time lag of the first and second
-  halves of the equilibrated solute trajctories. Urea and acetic acid have
+  plot the MSD calculated up to a 500 ns time lag of the first and second
+  halves of the equilibrated solute trajectories. Urea and acetic acid have
   similar MSDs, providing evidence of stationarity, while the MSDs of 
   ethylene glycol and methanol are different suggesting that they are not.}\label{fig:msd_comparison}
   \end{figure}
@@ -671,12 +676,13 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \end{subfigure} 
   %MRS6: I'm not sure I see red in urea.  Is the uncertainty that low?
   %BJC6: I think red and orange are directly on top of each other with same error bars
+  %MRS8: point out that the _cut data is the same as the data in the main tex. 
   \caption{In most cases, when using power laws with exponential cut-offs 
   (sFBMcut and sFLMcut), the MSD curves predicted by the AD model trained on 
   the first half of the equilibrated data lie within the 1$\sigma$ confidence
   intervals of the MD MSD curves generated from the second half of the equilibrated
   solute data. The models which use pure power laws systematically under-predict
-  the MD MSD curves. Over and under-estimated curvature of the of urea and acetic acid's 
+  the MD MSD curves. Over- and under-estimated curvature of the of urea and acetic acid's 
   MSD curves respectively causes the magnitude of urea's predicted MSDs to be 
   under-predicted at long timescales and those of acetic acid to be under-predicted
   at short timescales.}\label{fig:train_test}
@@ -685,7 +691,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   The models are capable of reasonably predicting the MD MSD values of the second
   half of the solute trajectories based on parameters generated from the first half
   when the dwell time distributions are parameterized by a power law with an 
-  exponential cut-off. At long timescales, the MSD of Urea is under-predicted 
+  exponential cut-off. At long timescales, the MSD of urea is under-predicted 
   for both the 1 and 2 mode models with the same true of acetic acid on short 
   timescales. Without truncation of the power law distribution, the MD 
   MSDs are underestimated in all cases because dwell times on the order of the
@@ -703,12 +709,13 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   
   From a qualitative perspective, the models only have moderate success at predicting
   the shape of the MSD curves. Error in the MSD curvature can also help explain some of
-  the error in the predicted MSD magnitudes. The curves predicted for Urea with both 1 
+  the error in the predicted MSD magnitudes. The curves predicted for urea with both 1 
   and 2 modes appear to have too much curvature, which causes it to under-predict the 
   MSD at long timescales, while those of acetic acid lack curvature, leading the
   AD model to under-predict the MSD at short timescales. 
   
-  The under-estimate of Urea's MSD at long timescales is due to long timescale
+  %MRS8: how much of this is already in the main text?  Try to limit analysis that appears in the main text.
+  The under-estimate of urea's MSD at long timescales is due to long timescale
   positional anti-correlation which may not be present in the molecularly 
   detailed simulations of the system. The 
   %MRS6: I'm not following whether or not there should be positional anti-correlation.  I was thinking there should be,
@@ -772,8 +779,10 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   
   \newpage  
   
+  %MRS8: I think just ``Tables of Anomalous''.  Tabular sounds like it's a kind of anomalous diffusion.
   \section{Tabular Anomalous Diffusion Parameters}\label{section:tabular_AD_params}
-  
+
+  %MRS8: representations of the parameters, or representations of the graphs?  Or just tabulations of the data found in the graph.
   The tables in the section are tabular representations of the parameters depicted
   in Figures~\ref{M-fig:1mode_parameters} and~\ref{M-fig:2mode_parameters} of the 
   main text.
@@ -792,6 +801,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   Correlation   & $\gamma(H)$               & 0.37         & 0.40            & 0.30         & 0.34         \\
   \hline 
   \end{tabular}
+  %MRS: to what extent are these captions the same as the captions to equivalent graphs main text?  If it's the same, you probably should say so; if different, there should be some justification for the differences, and should be mentioned in the main text that more information is here. 
   \caption{To create a 1 mode model for each solute, we parameterized a pure power
   law ($P(\alpha_d)$) and a truncated power law ($P_T(\alpha_d, \lambda)$) distribution 
   to describe solute dwell times. Lower values of $\alpha_d$ lead to heavier power 
@@ -834,7 +844,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \end{table}
   
   \newpage
-  
+  %MRS8: ``Table of''. Same comments about captions being the same or different, since the data should be the same.
   \section{Tabular MSDDM parameters}\label{section:msddm_params}
   
   The following table is a tabular representation of the parameters 
@@ -887,6 +897,8 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   
   \section*{Analytical fits to MFPT distributions}\label{section:mfpt_fits}
   
+  %MRS8: See discussion in main text on ``the AD model''
+  %MRS8: fig:msddm_fpt_fits is commented out?  Or xr not working should this be main text?
   In Figures~\ref{fig:ad_fpt_fits} and~\ref{fig:msddm_fpt_fits}, we demonstrate
   the high quality of our analytical fits of Equation~\ref{eqn:passage_times} to 
   the distribution of solute first passage times derived from both the AD
@@ -980,7 +992,11 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   reliably calculate flux as a function of pore length. The uncertainty in
   the flux curves decreases as we add more independent trajectories.}\label{fig:flux_curve_sensitivity}
   \end{figure}
-  
+  %MRS8: is there a way to make it easier to see the fact that the data is relatively independent of length?
+  %MRS8: Right now, you essentially have to scan between the 4 charts to see the numbers are about right. Maybe
+  %MRS8: organize it so that the 4 charts are for 4 molecules, and each chart shows plot of 
+  %MRS8: trajectory number vs pore length, so one can see that the value stays about the same except for uncertainty as 
+  %MRS8: number of trajectories changes
   % equations here 
   % Analytical CDF: https://journals.aps.org/pre/pdf/10.1103/PhysRevE.73.046104
   % Analytical MFPT https://journals.aps.org/pre/pdf/10.1103/PhysRevE.62.6065
@@ -1005,7 +1021,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
 %  trapped state sub-trajectories, the transitional hop lengths are shifted with respect 
 %  to one another, decreasing correlation between them. We tested this reasoning by modifying the 
 %  MSDDM to completely immobilize particles except when they transition between states. 
-%  Suprisingly, $\beta$ is still close to the Brownian value. Further experimentation 
+%  Surprisingly, $\beta$ is still close to the Brownian value. Further experimentation 
 %  reveals that this is actually a consequence of the FLM simulation procedure. Simulating
 %  FLM requires Riemann-sum approximations of the stochastic integrals defining the process.
 %  To generate the curves in Figure~\ref{M-fig:flux_curves_msddm}, we needed to correlate 
@@ -1030,7 +1046,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
 %  \caption{}\label{fig:beta_parameters}
 %  \end{subfigure}
 %  %BJC5: need to update MSDDM (immobile states). Waiting on those simulations
-%  %MRS6: should try to lead with what the overall results/conclusions are.  What does it mean that parameters are larger or smaller?  What should the reader take from the discussion?  Should it be in supportinig?
+%  %MRS6: should try to lead with what the overall results/conclusions are.  What does it mean that parameters are larger or smaller?  What should the reader take from the discussion?  Should it be in supporting?
 %  \caption{(a) The $\beta$ values of the sFBMcut model appear to be inversely proportional
 %  to the Hurst parameters. The $\beta$ values of the MSDDM are much lower with much less
 %  variation than the sFBMcut model. (b) The $\beta$ parameters of the MSDDM are low because
@@ -1049,3 +1065,11 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \bibliography{stochastic_transport}
 
 \end{document}
+
+% LocalWords:  LLC solutes py equispaced solute's ctrw sfbm ctrwsim MSD solute
+% LocalWords:  MSDDM XXXX GitHub plateaued Meroz Sokolov superdiffusion MSDs wt
+% LocalWords:  subdiffusion msd PR nojump xtc gro ETH nboot pdf subdiffusive xr
+% LocalWords:  RWF brownian FBM CTRWs traj npt fracshow Taqqu recentering MFPT
+% LocalWords:  Markovianity timestep GCL acf ACH bothmode params BJC tex acid's
+% LocalWords:  sFBMcut sFLMcut urea's timescale msddm fpt CDF mfpt cdf hurst
+% LocalWords:  decorrelate
