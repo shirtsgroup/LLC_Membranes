@@ -53,15 +53,15 @@
   atomistic resolution so that we can intelligently design new membranes for 
   solute-specific separations.\\
 
-  \noindent In our previous work, we studied the transport of 20 small polar molecules
-  in an H\textsubscript{II} phase LLC membrane.
-  \begin{itemize}
-    \item In general, we observed subdiffusive transport behavior characterized by 
-    intermittent hops separated by periods of entrapment.
-    \item We identified three mechanisms responsible for the solute trapping behavior:
-    entanglement among monomer tails, hydrogen bonding with monomer head groups, and
-    association with sodium counter ions.
-  \end{itemize}
+%  \noindent In our previous work, we studied the transport of 20 small polar molecules
+%  in an H\textsubscript{II} phase LLC membrane.
+%  \begin{itemize}
+%    \item In general, we observed subdiffusive transport behavior characterized by 
+%    intermittent hops separated by periods of entrapment.
+%    \item We identified three mechanisms responsible for the solute trapping behavior:
+%    entanglement among monomer tails, hydrogen bonding with monomer head groups, and
+%    association with sodium counter ions.
+%  \end{itemize}
 
   Unfortunately, the timescales that we can simulate with MD are insufficient to be
   able to make well-converged predictions of macroscopic transport properties 
@@ -87,8 +87,13 @@
   	\item Why anomalous diffusion model could be better.
   \end{itemize}
   
-  In this work, we apply a 
+  % BJC: Not sure whether to call it the infinite hidden markov model or hierarchical dirichlet process hidden markov model
+  % The former is definitely simpler.
+  In this work, we apply the infinite hidden markov model, a modeling approach that is agnostic
+  to the source of time series data, in order to detect and parameterize an unknown number
+  of latent autoregressive dynamical modes.
   
+    
   \section{Methods}
     
   We ran all MD simulations and energy minimizations using GROMACS 2018. We  % needs gromacs citations
