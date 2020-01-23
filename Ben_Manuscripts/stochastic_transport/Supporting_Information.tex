@@ -85,8 +85,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \texttt{/timeseries/ctrwsim.py}            & 2.2 & Generate realizations of a continuous time random walk with the user's choice of dwell and hop distributions \\\hline
   \texttt{/timeseries/forecast\_ctrw.py}     & 2.2 & Combines classes from \texttt{sfbm\_parameters.py} and \texttt{ctrwsim.py} to parameterize and predict MSD in one shot. \\\hline
   \texttt{/analysis/ Markov\_state\_dependent\_dynamics.py} & 2.3 & Identify frame-by-frame state of each solute, construct a transition matrix and simulate realizations of the MSDDM model. \\\hline
-  \texttt{/timeseries/mfpt\_pore.py}          & 2.4 & Simulate mean first passage time distributions using the AD or MSDDM model. \\\hline
-%MRS8: see main text discussion about ``the XXXX model''  
+  \texttt{/timeseries/mfpt\_pore.py}          & 2.4 & Simulate mean first passage time distributions using the AD approach. \\\hline 
   \end{tabular}
 
   \caption{The first column provides the names of the python scripts available in
@@ -236,7 +235,6 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
 %	  be true here because both MSDs are in agreement. }\label{fig:msd_comparison}
 %  \end{figure}
 
-  
   \newpage
   
   \section{Estimating the Hurst Parameter}\label{section:H_estimate}
@@ -268,16 +266,13 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{flm_autocovariance.pdf}
   \caption{}\label{fig:flm_autocorrelation}
-  \end{subfigure}
-  %MRS8: make clear in (b) the lines all lay on top so people don't miss it.  
+  \end{subfigure}  
   \caption{(a) The analytical autocorrelation function of FBM decays to zero faster
   when H $<$ 0.5 compared to when H $>$ 0.5. (b) The autocorrelation function of an 
   FLM process does not change with increasing sequence length (N). It shares the same
-  autocorrelation function as fractional Brownian motion (FBM). All 
-  %sequenced
-  sequences 
-  used to
-  make this plot were generated using $H$=0.35 and, for FLM, $\alpha$=1.4.}\label{fig:hurst_parameters}
+  autocorrelation function as fractional Brownian motion (FBM). Note that all lines
+  plotted lie on top of each other. All sequences used to make this plot were generated
+  using $H$=0.35 and, for FLM, $\alpha$=1.4.}\label{fig:hurst_parameters}
   \end{figure}
   
   The autocovariance function of fractional L\'evy motion is different from fractional
@@ -612,7 +607,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   }\label{fig:pure_power_law_params}
   \end{figure} 
   
-  \newpage 
+  \newpage
   
   \section{Stationarity of Solute Trajectories}\label{section:msd_comparison}
   
@@ -623,6 +618,22 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   only meaningful if the ensemble of solute trajectories is stationary. In 
   Figure~\ref{fig:msd_comparison}, we show that urea and acetic acid show acceptable
   stationary behavior while methanol and ethylene glycol do not.
+  
+  We validated both the 1 and 2 mode AD models with urea and acetic acid, since their
+  trajectories appear stationary. The MSDs resulting from 1000 realizations of the AD
+  model are shown in Figure~\ref{fig:train_test}. We consider the model's prediction 
+  to match well if the MSD lies within the 1$\sigma$ confidence intervals of the MD MSDs.
+  We also look for qualitative agreement in the shape of the curves.
+  
+  The models are capable of reasonably predicting the MD MSD values of the second
+  half of the solute trajectories based on parameters generated from the first half
+  when the dwell time distributions are parameterized by a power law with an 
+  exponential cut-off. At long timescales, the MSD of urea is under-predicted 
+  for both the 1 and 2 mode models with the same true of acetic acid on short 
+  timescales. Without truncation of the power law distribution, the MD 
+  MSDs are underestimated in all cases because dwell times on the order of the
+  MD simulation length are sampled and incorporated into the simulated anomalous
+  diffusion trajectories. 
   
   \begin{figure}[h]
   \centering
@@ -650,11 +661,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   ethylene glycol and methanol are different suggesting that they are not.}\label{fig:msd_comparison}
   \end{figure}
 
-  We validated both the 1 and 2 mode AD models with urea and acetic acid, since their
-  trajectories appear stationary. The MSDs resulting from 1000 realizations of the AD
-  model are shown in Figure~\ref{fig:train_test}. We consider the model's prediction 
-  to match well if the MSD lies within the 1$\sigma$ confidence intervals of the MD MSDs.
-  We also look for qualitative agreement in the shape of the curves.
+  \newpage
   
   \begin{figure}
   \centering
@@ -674,9 +681,6 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \includegraphics[width=\textwidth]{2mode_msd_comparison_ACH_train_front.pdf}
   \caption{Acetic acid (2 modes)}\label{fig:2mode_msd_comparison_ACH_train_front}
   \end{subfigure} 
-  %MRS6: I'm not sure I see red in urea.  Is the uncertainty that low?
-  %BJC6: I think red and orange are directly on top of each other with same error bars
-  %MRS8: point out that the _cut data is the same as the data in the main tex. 
   \caption{In most cases, when using power laws with exponential cut-offs 
   (sFBMcut and sFLMcut), the MSD curves predicted by the AD model trained on 
   the first half of the equilibrated data lie within the 1$\sigma$ confidence
@@ -685,19 +689,12 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   the MD MSD curves. Over- and under-estimated curvature of the of urea and acetic acid's 
   MSD curves respectively causes the magnitude of urea's predicted MSDs to be 
   under-predicted at long timescales and those of acetic acid to be under-predicted
-  at short timescales.}\label{fig:train_test}
+  at short timescales. Note that the sFBMcut and sFLMcut models are the same as 
+  those in the main text.}\label{fig:train_test}
   \end{figure}
   
-  The models are capable of reasonably predicting the MD MSD values of the second
-  half of the solute trajectories based on parameters generated from the first half
-  when the dwell time distributions are parameterized by a power law with an 
-  exponential cut-off. At long timescales, the MSD of urea is under-predicted 
-  for both the 1 and 2 mode models with the same true of acetic acid on short 
-  timescales. Without truncation of the power law distribution, the MD 
-  MSDs are underestimated in all cases because dwell times on the order of the
-  MD simulation length are sampled and incorporated into the simulated anomalous
-  diffusion trajectories. Considering the longest observed dwell time among all
-  solutes was 1.3 $\mu$s by ethylene glycol, we believe truncation is well-justified.
+  %Considering the longest observed dwell time among all
+  %solutes was 1.3 $\mu$s by ethylene glycol, we believe truncation is well-justified.
   %Although in most cases, the predicted MSD curves overlap the 1-$\sigma$ confidence
   %intervals of the MD MSD curves, they appear to lie systematically below the mean. 
   %It is not clear whether this is a consistent feature of the AD model since we 
@@ -707,50 +704,48 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
 %  distribution generally predict higher MSDs. The heavy tails of the distribution 
 %  incorporate large jumps more frequently into the trajectories. 
   
-  From a qualitative perspective, the models only have moderate success at predicting
-  the shape of the MSD curves. Error in the MSD curvature can also help explain some of
-  the error in the predicted MSD magnitudes. The curves predicted for urea with both 1 
-  and 2 modes appear to have too much curvature, which causes it to under-predict the 
-  MSD at long timescales, while those of acetic acid lack curvature, leading the
-  AD model to under-predict the MSD at short timescales. 
+%  From a qualitative perspective, the models only have moderate success at predicting
+%  the shape of the MSD curves. Error in the MSD curvature can also help explain some of
+%  the error in the predicted MSD magnitudes. The curves predicted for urea with both 1 
+%  and 2 modes appear to have too much curvature, which causes it to under-predict the 
+%  MSD at long timescales, while those of acetic acid lack curvature, leading the
+%  AD model to under-predict the MSD at short timescales. 
   
   %MRS8: how much of this is already in the main text?  Try to limit analysis that appears in the main text.
-  The under-estimate of urea's MSD at long timescales is due to long timescale
-  positional anti-correlation which may not be present in the molecularly 
-  detailed simulations of the system. The 
-  %MRS6: I'm not following whether or not there should be positional anti-correlation.  I was thinking there should be,
-  %but perhaps I'm misunderstanding something here? 
-  persistent curvature of the predicted MSD curves is a direct consequence of 
-  the Hurst parameter. Without anti-correlation, the process would be 
-  a pure CTRW for which one would expect the time averaged MSD curves to become 
-  linear.~\cite{meroz_toolbox_2015} It may be true that on the $\mu$s time scale, 
-  positional correlation is lost which would manifest as a transition from a sub-linear
-  to linear MSD curve. A solution for more accurately modeling this behavior in  
-  the future may be to truncate the positional autocorrelation function.~\cite{molina-garcia_crossover_2018}
-  
-  The under-estimate of the curvature of acetic acid's predicted MSD suggests that,
-  in this case, the AD model over-estimates the Hurst parameter. This is not surprising
-  because the Hurst parameter is challenging to quantify, especially with a relatively 
-  small amount of data (see Section~\ref{M-method:sfbm} of the main text for further discussion of this 
-  challenge). A more accurate measurement of $H$ would fix the shape of the MSD curve,
-  but also lower the predicted MSD meaning we are either underestimating the width of
-  the hop length distribution, favoring longer dwell times, or both.
-  
-  This brief qualitative analysis suggests two shortcomings of the AD model. First, in
-  a real system, positional anti-correlation may dissipate after a sufficiently long 
-  time lag, dependent on the solute being studied. Second, it is difficult to reliably
-  parameterize the Hurst parameter which is important for accurately describing the 
-  curvature of the solute MSDs.
-  
-  This analysis also suggests that working with only half of the data we collected
-  ($\sim$ 2 $\mu$s post-equilibration) is not always sufficient for extracting reliable
-  parameter estimates. In most cases, the magnitude of the MSD predictions after a 
-  500 ns time lag are within or close to within error of the MD MSDs (for sFBMcut and
-  sFLMcut), but still appear to systematically under-predict the mean. We may be
-  operating on the border of the minimum amount of data required to accurately 
-  parameterize the AD model. Longer simulations and more independent trajectories may
-  be necessary. Therefore, in the next section we will work with parameters fit to the
-  full equilibrated portion of the solute trajectories, doubling the data.
+%  The under-estimate of urea's MSD at long timescales is due to long timescale
+%  positional anti-correlation which may not be present in the molecularly 
+%  detailed simulations of the system. The 
+%  persistent curvature of the predicted MSD curves is a direct consequence of 
+%  the Hurst parameter. Without anti-correlation, the process would be 
+%  a pure CTRW for which one would expect the time averaged MSD curves to become 
+%  linear.~\cite{meroz_toolbox_2015} It may be true that on the $\mu$s time scale, 
+%  positional correlation is lost which would manifest as a transition from a sub-linear
+%  to linear MSD curve. A solution for more accurately modeling this behavior in  
+%  the future may be to truncate the positional autocorrelation function.~\cite{molina-garcia_crossover_2018}
+%  
+%  The under-estimate of the curvature of acetic acid's predicted MSD suggests that,
+%  in this case, the AD model over-estimates the Hurst parameter. This is not surprising
+%  because the Hurst parameter is challenging to quantify, especially with a relatively 
+%  small amount of data (see Section~\ref{M-method:sfbm} of the main text for further discussion of this 
+%  challenge). A more accurate measurement of $H$ would fix the shape of the MSD curve,
+%  but also lower the predicted MSD meaning we are either underestimating the width of
+%  the hop length distribution, favoring longer dwell times, or both.
+%  
+%  This brief qualitative analysis suggests two shortcomings of the AD model. First, in
+%  a real system, positional anti-correlation may dissipate after a sufficiently long 
+%  time lag, dependent on the solute being studied. Second, it is difficult to reliably
+%  parameterize the Hurst parameter which is important for accurately describing the 
+%  curvature of the solute MSDs.
+%  
+%  This analysis also suggests that working with only half of the data we collected
+%  ($\sim$ 2 $\mu$s post-equilibration) is not always sufficient for extracting reliable
+%  parameter estimates. In most cases, the magnitude of the MSD predictions after a 
+%  500 ns time lag are within or close to within error of the MD MSDs (for sFBMcut and
+%  sFLMcut), but still appear to systematically under-predict the mean. We may be
+%  operating on the border of the minimum amount of data required to accurately 
+%  parameterize the AD model. Longer simulations and more independent trajectories may
+%  be necessary. Therefore, in the next section we will work with parameters fit to the
+%  full equilibrated portion of the solute trajectories, doubling the data.
   
 %MRS6: My instinct is to only show the graphs of the full model, with validation graphs shown in the supporting.  We can talk about this. We do what the focus to be on what we can learn physically.  The discussion gets pretty repetitive.
   
@@ -777,15 +772,15 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   % Or maybe a little later since acetic acid, although stationary
   % comment on acetic acid's trajectory shape.
   
-  \newpage  
-  
-  %MRS8: I think just ``Tables of Anomalous''.  Tabular sounds like it's a kind of anomalous diffusion.
-  \section{Tabular Anomalous Diffusion Parameters}\label{section:tabular_AD_params}
+  \clearpage 
+
+  \section{Tables of Anomalous Diffusion Parameters}\label{section:tabular_AD_params}
 
   %MRS8: representations of the parameters, or representations of the graphs?  Or just tabulations of the data found in the graph.
-  The tables in the section are tabular representations of the parameters depicted
-  in Figures~\ref{M-fig:1mode_parameters} and~\ref{M-fig:2mode_parameters} of the 
-  main text.
+  The tables in this section are tabular representations of the parameters depicted in
+  Figures~\ref{M-fig:1mode_parameters} and~\ref{M-fig:2mode_parameters} of the main text
+  and used to generate AD approach realizations whose MSDs are shown in Figure~\ref{M-fig:anomalous_msds}
+  of the main text.
   
   % BJC: note to self -- modes are flipped in simulation output because 
   % physical.partition() sets mode as booleans and when r <= 0.75, in-pore is True (1) instead of 0. 
@@ -801,18 +796,8 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   Correlation   & $\gamma(H)$               & 0.37         & 0.40            & 0.30         & 0.34         \\
   \hline 
   \end{tabular}
-  %MRS: to what extent are these captions the same as the captions to equivalent graphs main text?  If it's the same, you probably should say so; if different, there should be some justification for the differences, and should be mentioned in the main text that more information is here. 
-  \caption{To create a 1 mode model for each solute, we parameterized a pure power
-  law ($P(\alpha_d)$) and a truncated power law ($P_T(\alpha_d, \lambda)$) distribution 
-  to describe solute dwell times. Lower values of $\alpha_d$ lead to heavier power 
-  law tails and higher values of $\lambda$ truncate the distribution at lower
-  dwell times. We parameterized Gaussian ($\mathcal{N}(\sigma)$) and L\'evy stable 
-  ($L(\sigma, \alpha_h)$) distributions to describe solute hop lengths. We assume
-  the mean ($\mu$) to be zero for these distributions and there to be no skewness ($\beta=0$)
-  in the L\'evy stable distributions. High values of $\sigma$ and lower values of
-  $\alpha_h$ result in larger hops. Finally, we parameterized the hop autocorrelation
-  function ($\gamma(H)$) to describe the degree of correlation between hops. 
-  Higher values of $H$ display closer to Brownian behavior.}\label{table:sfbm_params}
+  \caption{Parameters of the one mode AD approach models. See the main
+  text for further details.}\label{table:sfbm_params}
   \end{table}
   
   \begin{table}[h]
@@ -833,19 +818,12 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   Correlation   & $\gamma(H)$                              & --   & 0.37         &  0.40           & 0.30         & 0.34         \\\cline{3-7}
   \hline 
   \end{tabular}
-  \caption{The two model parameterizes solute behavior in the pores and tails separately. 
-  Generally, movement is much more restricted in the tail region. To create a 2 mode model,
-  we generated a set of parameters based on solute behavior as function of distance from
-  the pore center. Mode 1 corresponds to solute behavior within 0.75 nm of the pore center
-  and mode 2 corresponds to behavior greater than or equal to 0.75 nm from the pore center.
-  Note that we used the same Hurst parameter for both modes due to a low number of 
-  sufficiently long sequences of hops in each mode. See Table~\ref{table:sfbm_params} for
-  descriptions of the parameters.}\label{table:sfbm_params_2mode}
+  \caption{Parameters of the 2 mode AD approach models. See the main text for further
+  details.}\label{table:sfbm_params_2mode}
   \end{table}
   
   \newpage
-  %MRS8: ``Table of''. Same comments about captions being the same or different, since the data should be the same.
-  \section{Tabular MSDDM parameters}\label{section:msddm_params}
+  \section{Table of MSDDM parameters}\label{section:msddm_params}
   
   The following table is a tabular representation of the parameters 
   depicted in Figure~\ref{M-fig:msddm_parameters} of the main text.
@@ -868,8 +846,8 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \end{tabular}
   \caption{We calculated values of $H$, $\alpha_h$ and $\sigma$ from MD simulation
   trajectories and used them to generate realizations of our MSDDM model. The states
-  are defined in Table~\ref{M-table:states} of the main text except state T which describes the transition
-  emissions.}\label{table:msddm_params}
+  are defined in Table~\ref{M-table:states} of the main text except state T which 
+  describes the transition emissions.}\label{table:msddm_params}
   \end{table}  
   
 % This is not used I think
@@ -899,14 +877,20 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   
   %MRS8: See discussion in main text on ``the AD model''
   %MRS8: fig:msddm_fpt_fits is commented out?  Or xr not working should this be main text?
-  In Figures~\ref{fig:ad_fpt_fits} and~\ref{fig:msddm_fpt_fits}, we demonstrate
+  %BJC8: yeah because 
+  In Figure~\ref{fig:ad_fpt_fits} 
+  %and~\ref{fig:msddm_fpt_fits},  % BJC8: didn't do solute flux with MSDDM so why mention
+  we demonstrate
   the high quality of our analytical fits of Equation~\ref{eqn:passage_times} to 
   the distribution of solute first passage times derived from both the AD
-  and MSDDM models. The histograms in Figure~\ref{fig:msddm_fpt_fits} are 
-  relatively noisy because we only generated 1000 realizations of the MSDDM 
-  versus 10000 of the AD model. In Figure~\ref{fig:flux_curve_sensitivity}, we
-  justify our use of fewer MSDDM realizations by using subsets of the 10000 AD 
-  model realizations to show that one needs as few as 100 independent trajectory
+  and MSDDM models. 
+  %The histograms in Figure~\ref{fig:msddm_fpt_fits} are 
+  %relatively noisy because we only generated 1000 realizations of the MSDDM 
+  %versus 10000 of the AD model. 
+  In Figure~\ref{fig:flux_curve_sensitivity}, we
+  %justify our use of fewer MSDDM realizations by using subsets of the 10000 AD 
+%  model realizations to 
+  show that one only needs as few as 100 independent trajectory
   realizations at each pore length in order to reliably fit Equation~\ref{eqn:passage_times}
   to the passage time distributions.
   
