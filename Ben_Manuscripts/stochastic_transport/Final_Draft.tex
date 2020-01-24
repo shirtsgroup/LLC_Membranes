@@ -569,22 +569,25 @@
 
 %BJC8: from author guidelines. Should there only be a line between column headings?
 %Use a single horizontal rule to separate the column headings from the entries in the table. Use horizontal space within the body of the table to separate broad groups of entries. Extra vertical space may be used between columns. Avoid vertical rules in tables. Use lower-case roman letters for footnotes placed at the bottom of a table.
-
+%MRS9: I'd go with what they said.  Looking at PRE, it looks like you can put double lines above and below the table, though - I added them 
   \begin{table}[!htb]
 	  \centering
 	  \begin{tabular}{ccc}
-	  %\hline
+            \hline
+	  \hline
 	  Dwell Distribution                & ~~~~~~~~~Hop Length Distribution~~~~~~~~~~~ & Abbreviation \\
 	  \hline
       Power Law                         & Gaussian                & sFBM         \\
       Power Law w/ Exponential Cut-off  & Gaussian                & sFBMcut      \\
       Power Law                         & L\'evy Stable           & sFLM         \\
       Power Law w/ Exponential Cut-off  & L\'evy Stable           & sFLMcut      \\
-	  %\hline
+	  \hline
+          \hline
 	  \end{tabular}
 	  \caption{We tested four anomalous diffusion models with various modifications 
 	  to the dwell and hop length distributions. We incorporate correlation structure
 	  into all models.}\label{table:anomalous_models}
+          
  \end{table}
 
   For each solute, we simulated 1,000 anomalous diffusion trajectories of length
@@ -614,6 +617,7 @@
   concentration parameters defined by the count matrix.~\cite{bacallado_bayesian_2009}
   
   %BJC3: not sure how to cite fbm
+  %MRS9: cite github page?
   We used the Python package \texttt{fbm} to generate exact simulations of FBM and our
   own Python implementation of the algorithm by Stoev and Taqqu to simulate FLM.
   \cite{stoev_simulation_2004} Note that, to our knowledge, there are no known exact
@@ -650,16 +654,20 @@
   previous work~\cite{coscia_chemically_2019}
   
   %BJC8: reformatted. I think this is what they want in terms of format
+  %MRS9: tweaked 
   \begin{table}[!htb]
 	  \centering
 	  \begin{tabular}{ll}
+            \hline
+            \hline
 	  \multicolumn{2}{c}{Markov State-Dependent Dynamical Model State Definitions} \\
 	  \hline
 	  1. In tails, not trapped                      & 5. In pores, not trapped                     \\
 	  2. In tails and hydrogen bonding              & 6. In pores and hydrogen bonding             \\
 	  3. In tails and associated with sodium        & 7. In pores and associated with sodium       \\
 	  4. In tails, hydrogen bonding and associated  ~~~~& 8. In pores, hydrogen bonding and associated \\
-	  %\hline
+	  \hline
+          \hline
 	  \end{tabular}
 	  \caption{We defined 8 discrete states based on all combinations of previously observed solute
 	  trapping mechanisms.}\label{table:states}  
@@ -1101,6 +1109,7 @@
   %laws to describe the dwell time distributions.
   %MRS8: maybe be a bit more explicit about which choices described above are used here. i.e. did you actually use a Gaussian  distribution because Levy was so close?
   %BJC8: I thought that sFBMcut and sFLMcut implied which distributions I used. It's in Table I
+  %MRS9: Maybe say ``both the Brownian (sFBMcut) and Levy (sFBMcut) version of both the one and two AD models''.  I think with the number of models floating around, it helps to be super explicit about what is being considered at any point.
   In most cases, the sFBMcut and sFLMcut models give very similar results, most 
   likely because their $\alpha_h$ parameter values are relatively close to 2, meaning
   the hop length distributions are nearly Gaussian even when fit to a more general 
@@ -1233,7 +1242,8 @@
 
   %MRS8: in section below, it would be useful to add a sentence that answers the ``so, what'' after the structural
   %detail for each molecule - just adds reader interest.
-  %BJC8: I'm interpreting this as, "how does this information relate to design"
+  %BJC8: I'm interpreting this as, "how does this information relate to design" 
+  %MRS9: yes.
   Urea spends the largest fraction of its time trapped via association with sodium ions.
   It does so 31\% of the total time while in the tails (state 3) and 21\% of the
   total time while in the pores (state 7). Note that sodium does not drift significantly 
@@ -1242,9 +1252,12 @@
   positively charged sodium ions. The nitrogen atoms of urea are only weak hydrogen bond
   donors. 
   %BJC8: something like this I think.   
-  Therefore the transport rate of urea may be enhanced the most by removing or changing 
+  Therefore the transport rate of urea 
+  %MRS9 tweak.
+  %may be enhanced the most
+  is likely to be most significantly modified
+  by removing or changing 
   the counter-ion identity.
-  %MRS8: above seems incomplete - are weak h-bond donors so what?
   
   Ethylene glycol spends the largest fraction of its time trapped in a hydrogen
   bonded state. It does so 24\% of the total time while in the tails (state 2)
@@ -1252,6 +1265,7 @@
   of ethylene glycol readily donate their hydrogen atoms to the carboxylate
   head groups and the ether linkages between the head groups and monomer tails.
   %BJC8: added following sentence
+  %MRS9: as above, maybe ``modified'' is the best rather than enhanced?  Maybe we want to slow it down as well. 
   The transport rate of ethylene glycol might be increased by removing hydrogen 
   bond accepting groups from the LLC monomers, especially those which stabilize
   the solute in the tails (i.e. the ether linkages). 
@@ -1261,6 +1275,7 @@
   Tail region hydrogen bonds are donated from methanol to the ether linkages between
   the monomer head groups and tails. 
   %BJC8: added  
+  %MRS9: see above.
   If one desires an increased methanol transport 
   rate, the LLC system may benefit most by preventing its partition into the monomer
   tails. This might be achieved by adding cross-linkable groups near the monomer
@@ -1271,9 +1286,13 @@
   structure, association with sodium ions in this environment is apparently a much 
   weaker interaction than hydrogen bonding. 
   %BJC8:added  
+  %MRS9: see above.
   As with ethylene glycol, one might increase
   the transport rate of acetic acid by removing hydrogen bond accepting constituents
-  of the LLC monomer. With this modification, we hypothesize that acetic acid would 
+  of the LLC monomer. With this modification, we hypothesize that acetic acid 
+  %MRS9: 
+  %would 
+  might 
   show similar transport rates to urea given their structural similarity.
   
   % BJC6: cut down the following paragraph by eliminating things that are in the methods. 
@@ -1735,6 +1754,7 @@
   %MRS8: There's a lot of complex interplay here that has the potentially to really lead to interesting 
   %MRS8: separations. Even if the models aren't quite right, they show how such selectivtiy CAN arise.
   %BJC8: added a new paragraph after this one.
+  %MRS9: looks good.
 
   Of the solutes studied, the data suggests that this particular LLC membrane 
   might be most useful for selectively separating ethylene glycol from methanol
