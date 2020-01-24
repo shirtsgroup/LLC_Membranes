@@ -136,6 +136,10 @@ if __name__ == "__main__":
                                     random_shift=args.no_column_shift, mole_fraction=args.mol_frac)
 
         system.reorder()
+        print(system.LC[0].residues)
+        exit()
+        
+        #system.exchange_ion()
 
         if args.box_lengths:
             a, b, c = args.box_lengths
