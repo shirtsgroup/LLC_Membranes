@@ -3,6 +3,7 @@
 import numpy as np
 from LLC_Membranes.llclib import file_rw, transform, topology
 
+charge['NA'] = 1.0000
 
 def z_correlation(z, L, v=0.1):
     """ Calculate where to place monomers on the z-axis so that a given correlation length is obtained
