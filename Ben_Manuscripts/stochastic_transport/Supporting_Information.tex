@@ -42,7 +42,7 @@
 \renewcommand{\thepage}{S\arabic{page}}
 \renewcommand{\thetable}{S\arabic{table}}
 
-\title{Supporting Information: Capturing Subdiffusive Solute Dynamics and 
+\title{Supplemental Material: Capturing Subdiffusive Solute Dynamics and 
 Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
 \author{Benjamin J. Coscia \and Michael R. Shirts} 
 
@@ -887,12 +887,13 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   %The histograms in Figure~\ref{fig:msddm_fpt_fits} are 
   %relatively noisy because we only generated 1000 realizations of the MSDDM 
   %versus 10000 of the AD model. 
-  In Figure~\ref{fig:flux_curve_sensitivity}, we
+  In Figures~\ref{fig:flux_curve_sensitivity}--~\ref{fig:beta_sensitivity}, we
   %justify our use of fewer MSDDM realizations by using subsets of the 10000 AD 
 %  model realizations to 
-  show that one only needs as few as 100 independent trajectory
-  realizations at each pore length in order to reliably fit Equation~\ref{eqn:passage_times}
-  to the passage time distributions.
+  show that one can reliably fit Equation~\ref{eqn:passage_times}
+  to the passage time distributions with as few as 100 independent trajectory
+  realizations at each pore length. For higher precision, we recommend using at least
+  1000 trajectories.
   
   \begin{figure}[h]
   \centering
@@ -970,7 +971,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{flux_curves_Nsensitivity_MET.pdf}
-  \caption{mehtanol}\label{fig:Nsensitivity_MET}
+  \caption{methanol}\label{fig:Nsensitivity_MET}
   \end{subfigure}
   \caption{Even using a small number of independent trajectories, one can
   reliably estimate solute flux across a pore 10 nm long. The uncertainty in 
@@ -994,11 +995,13 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{flux_curves_Asensitivity_MET.pdf}
-  \caption{mehtanol}\label{fig:Asensitivity_MET}
+  \caption{methanol}\label{fig:Asensitivity_MET}
   \end{subfigure}
-  \caption{Even using a small number of independent trajectories, one can
-  reliably estimate solute flux across a pore 10 nm long. The uncertainty in 
-  the flux values decreases as we add more independent trajectories.
+  \caption{The flux scaling parameter ($A$) can be reliably estimated using
+  as few as 100 independent realizations of the sFBMcut AD model. To estimate
+  $A$, we fit Equation~\ref{M-eqn:flux_decay} of the main text to a series of
+  flux measurements made with 10, 15, 20, 25, 30, 35, 40, 45 and 50 nm pores (see
+  Figure~\ref{M-fig:flux_curves_ad} of the main text).
   }\label{fig:A_sensitivity}
   \end{figure}
   
@@ -1018,11 +1021,12 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{flux_curves_betasensitivity_MET.pdf}
-  \caption{mehtanol}\label{fig:betasensitivity_MET}
+  \caption{methanol}\label{fig:betasensitivity_MET}
   \end{subfigure}
-  \caption{Even using a small number of independent trajectories, one can
-  reliably estimate solute flux across a pore 10 nm long. The uncertainty in 
-  the flux values decreases as we add more independent trajectories.
+  \caption{Similar to $A$, the parameter which describes the scaling of solute
+  flux with pore length, $\beta$, can be reliably estimated using as few as 100
+  independent realizations of the sFBMcut AD model. We estimated $\beta$ and
+  $A$ simultaneously as described in Figure~\ref{fig:A_sensitivity}.
   }\label{fig:beta_sensitivity}
   \end{figure}
   
