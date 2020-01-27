@@ -953,29 +953,102 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
 %  \includegraphics[width=0.45\textwidth]{mfpt_curves_brownian.pdf}
 %  \caption{}\label{fig:mfpt_curve_brownian}
 %  \end{figure}
+
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{flux_curves_Nsensitivity_URE.pdf}
+  \caption{urea}\label{fig:Nsensitivity_URE}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{flux_curves_Nsensitivity_ACH.pdf}
+  \caption{acetic acid}\label{fig:Nsensitivity_ACH}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{flux_curves_Nsensitivity_GCL.pdf}
+  \caption{ethylene glycol}\label{fig:Nsensitivity_GCL}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{flux_curves_Nsensitivity_MET.pdf}
+  \caption{mehtanol}\label{fig:Nsensitivity_MET}
+  \end{subfigure}
+  \caption{Even using a small number of independent trajectories, one can
+  reliably estimate solute flux across a pore 10 nm long. The uncertainty in 
+  the flux values decreases as we add more independent trajectories.
+  }\label{fig:flux_curve_sensitivity}
+  \end{figure}
   
   \begin{figure}
   \centering
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{flux_curves_N100.pdf}
-  \caption{100 Independent Trajectories}\label{fig:N100}
+  \includegraphics[width=\textwidth]{flux_curves_Asensitivity_URE.pdf}
+  \caption{urea}\label{fig:Asensitivity_URE}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{flux_curves_N1000.pdf}
-  \caption{1000 Independent Trajectories}\label{fig:N1000}
+  \includegraphics[width=\textwidth]{flux_curves_Asensitivity_ACH.pdf}
+  \caption{acetic acid}\label{fig:Asensitivity_ACH}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{flux_curves_N5000.pdf}
-  \caption{5000 Independent Trajectories}\label{fig:N5000}
+  \includegraphics[width=\textwidth]{flux_curves_Asensitivity_GCL.pdf}
+  \caption{ethylene glycol}\label{fig:Asensitivity_GCL}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{flux_curves_N9984.pdf}
-  \caption{10000 Independent Trajectories}\label{fig:N10000}
+  \includegraphics[width=\textwidth]{flux_curves_Asensitivity_MET.pdf}
+  \caption{mehtanol}\label{fig:Asensitivity_MET}
   \end{subfigure}
   \caption{Even using a small number of independent trajectories, one can
-  reliably calculate flux as a function of pore length. The uncertainty in
-  the flux curves decreases as we add more independent trajectories.}\label{fig:flux_curve_sensitivity}
+  reliably estimate solute flux across a pore 10 nm long. The uncertainty in 
+  the flux values decreases as we add more independent trajectories.
+  }\label{fig:A_sensitivity}
   \end{figure}
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{flux_curves_betasensitivity_URE.pdf}
+  \caption{urea}\label{fig:betasensitivity_URE}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{flux_curves_betasensitivity_ACH.pdf}
+  \caption{acetic acid}\label{fig:betasensitivity_ACH}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{flux_curves_betasensitivity_GCL.pdf}
+  \caption{ethylene glycol}\label{fig:betasensitivity_GCL}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{flux_curves_betasensitivity_MET.pdf}
+  \caption{mehtanol}\label{fig:betasensitivity_MET}
+  \end{subfigure}
+  \caption{Even using a small number of independent trajectories, one can
+  reliably estimate solute flux across a pore 10 nm long. The uncertainty in 
+  the flux values decreases as we add more independent trajectories.
+  }\label{fig:beta_sensitivity}
+  \end{figure}
+  
+  
+%  \begin{figure}
+%  \centering
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\textwidth]{flux_curves_N100.pdf}
+%  \caption{100 Independent Trajectories}\label{fig:N100}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\textwidth]{flux_curves_N1000.pdf}
+%  \caption{1000 Independent Trajectories}\label{fig:N1000}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\textwidth]{flux_curves_N5000.pdf}
+%  \caption{5000 Independent Trajectories}\label{fig:N5000}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\textwidth]{flux_curves_N9984.pdf}
+%  \caption{10000 Independent Trajectories}\label{fig:N10000}
+%  \end{subfigure}
+%  \caption{Even using a small number of independent trajectories, one can
+%  reliably calculate flux as a function of pore length. The uncertainty in
+%  the flux curves decreases as we add more independent trajectories.}\label{fig:flux_curve_sensitivity}
+%  \end{figure}
   %MRS8: is there a way to make it easier to see the fact that the data is relatively independent of length?
   %MRS8: Right now, you essentially have to scan between the 4 charts to see the numbers are about right. Maybe
   %MRS8: organize it so that the 4 charts are for 4 molecules, and each chart shows plot of 
