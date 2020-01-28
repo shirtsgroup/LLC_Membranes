@@ -106,7 +106,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   We collected all data used for model generation after the solutes were 
   equilibrated. We assumed a solute to be equilibrated when the partition of
   solutes in and out of the pore region stopped changing. The pore region is
-  defined as within 0.75 nm of the pore center. We've plotted the partition
+  defined as within 0.75 nm of the pore center. We plot the partition
   versus time in Figure~\ref{fig:equilibration} and indicated the chosen
   equilibration time points. 
   
@@ -440,6 +440,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \caption{The number of transitions from state $i$ to $j$ and $j$ to $i$ are very close
   indicating that our process obeys detailed balance. Detailed balance is conserved for 
   different sized time steps.}\label{fig:counts}
+  %MRS10: be clear why the graph shows detailed balance in the caption.
   %MRS: would this be clearer to see if you plotted i-j/i+j for a relative error to see how different it is from symmetric jumps? 
   \end{figure}
   
@@ -561,7 +562,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \section{AD model MSD Predictions with Pure Power Law Dwell Times}\label{section:pure_power_law}
   
   When we use a pure power law distribution to parameterize the dwell time 
-  distributions of the 1 and 2 mode AD models, the MD MSDs are severely 
+  distributions of the one and two mode AD models, the MD MSDs are severely 
   under-predicted because we are incorporating dwell times on the order of 
   the simulation length into simulated trajectories 
   (see Figure~\ref{fig:anomalous_msds_bothmode}). The parameters of the pure power law 
@@ -620,7 +621,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   Figure~\ref{fig:msd_comparison}, we show that urea and acetic acid show acceptable
   stationary behavior while methanol and ethylene glycol do not.
   
-  We validated both the 1 and 2 mode AD models with urea and acetic acid, since their
+  We validated both the one and two mode AD models with urea and acetic acid, since their
   trajectories appear stationary. The MSDs resulting from 1000 realizations of the AD
   model are shown in Figure~\ref{fig:train_test}. We consider the model's prediction 
   to match well if the MSD lies within the 1$\sigma$ confidence intervals of the MD MSDs.
@@ -630,7 +631,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   half of the solute trajectories based on parameters generated from the first half
   when the dwell time distributions are parameterized by a power law with an 
   exponential cut-off. At long timescales, the MSD of urea is under-predicted 
-  for both the 1 and 2 mode models with the same true of acetic acid on short 
+  for both the one and two mode models with the same true of acetic acid on short 
   timescales. Without truncation of the power law distribution, the MD 
   MSDs are underestimated in all cases because dwell times on the order of the
   MD simulation length are sampled and incorporated into the simulated anomalous
