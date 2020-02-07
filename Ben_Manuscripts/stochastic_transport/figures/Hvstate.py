@@ -54,7 +54,7 @@ for i, res in enumerate(sol):
 
     for j in range(9):
         ci = np.abs(np.array([[np.percentile(heights[j, :], 16)], [np.percentile(heights[j, :], 84)]]) - heights[j, :].mean())
-        plt.bar(bar_locations[j] + (i - 1)*bar_width - bar_width/2, heights[j, :].mean(), bar_width, label=names[res], color=colors[res], edgecolor='black', alpha=alpha, hatch=hatches[j], yerr=ci)
+        plt.bar(bar_locations[j] + (i - 1)*bar_width - bar_width/2, heights[j, :].mean(), bar_width, label=names[res], color=colors[res], edgecolor='black', alpha=alpha, yerr=ci)
 
 import matplotlib.patches as mpatches
 hatch1 = mpatches.Patch(facecolor='white', label='In Tails', edgecolor='black', hatch=hatch1)
@@ -66,13 +66,13 @@ patch4 = mpatches.Patch(facecolor=colors['ACH'], label=names['ACH'], edgecolor='
 #plt.rc('text', usetex=True)
 labels = ['1\n$^{t}$', '2\n$^{(t/h)}$', '3\n$^{(t/a)}$', '4\n$^{(t/h/a)}$', '5\n$^{(p)}$', '6\n$^{(p/h)}$', '7\n$^{(p/a)}$', '8\n$^{(p/h/a)}$', 'T']
 
-plt.legend(fontsize=14, handles=[patch1, patch2, patch3, patch4, hatch1, hatch2])
-plt.xticks(ticks=bar_locations, labels=labels)
-plt.xlabel('State', fontsize=14)
-plt.ylabel('Hurst Parameter', fontsize=14)
-plt.xlim(0.5, 9.5)
+plt.legend(fontsize=14, handles=[patch1, patch2, patch3, patch4])#, hatch1, hatch2])
+plt.xticks(ticks=bar_locations, labels=labels, fontsize=16)
+plt.xlabel('State', fontsize=16)
+plt.ylabel('Hurst Parameter', fontsize=16)
+#plt.xlim(0.5, 9.5)
 #plt.ylim(0, 0.40)
-plt.tick_params(labelsize=14)
+plt.tick_params(labelsize=16)
 plt.tight_layout()
 plt.savefig('H_v_state.pdf')
 plt.show()

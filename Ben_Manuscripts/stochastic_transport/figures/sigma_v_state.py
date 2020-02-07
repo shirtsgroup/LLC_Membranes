@@ -33,6 +33,7 @@ bar_width = 0.18
 bar_locations = np.arange(1, 10)
 alpha = 0.7
 nboot = 200
+load = True
 
 # each of the following rows corresponds to a residue
 sigma = [
@@ -52,20 +53,26 @@ hatches = [hatch1, hatch1, hatch1, hatch1, hatch2, hatch2, hatch2, hatch2, None]
 
 for i, res in enumerate(sol):
 
-    states = file_rw.load_object('%s/%s/10wt/states.pl' % (root_dir, res))
+    if load:
 
-    heights = np.zeros([nboot, 9]) 
+        heights = file_rw.load_object('msddm_sigma_%s.pl' % res)
+
+    else:
+
+        states = file_rw.load_object('%s/%s/10wt/states.pl' % (root_dir, res))
+        heights = np.zeros([nboot, 9]) 
     
-    for j in tqdm.tqdm(range(9), unit='States'):
+        for j in tqdm.tqdm(range(9), unit='States'):
         
-        for b in tqdm.tqdm(range(nboot), unit='bootstraps'):
-            emissions = np.random.choice(states.emissions[j], size=len(states.emissions[j]), replace=True)
-            heights[b, j] = levy.fit_levy(emissions, beta=0)[0].x[2]
+            for b in tqdm.tqdm(range(nboot), unit='bootstraps'):
+                emissions = np.random.choice(states.emissions[j], size=len(states.emissions[j]), replace=True)
+                heights[b, j] = levy.fit_levy(emissions, beta=0)[0].x[2]
 
+        file_rw.save_object(heights, 'msddm_sigma_%s.pl' % res)
 
-        plt.bar(bar_locations[j] + (i - 1)*bar_width - bar_width/2, heights[:, j].mean(axis=0), bar_width, label=names[res], color=colors[res], edgecolor='black', alpha=alpha, hatch=hatches[j], yerr=heights[:, j].std(axis=0))
+    for j in range(9):
+        plt.bar(bar_locations[j] + (i - 1)*bar_width - bar_width/2, heights[:, j].mean(axis=0), bar_width, label=names[res], color=colors[res], edgecolor='black', alpha=alpha, yerr=heights[:, j].std(axis=0))
 
-    file_rw.save_object(heights, 'msddm_sigma_%s.pl' % res)
 
 import matplotlib.patches as mpatches
 hatch1 = mpatches.Patch(facecolor='white', label='In Tails', edgecolor='black', hatch=hatch1)
@@ -78,15 +85,15 @@ patch4 = mpatches.Patch(facecolor=colors['ACH'], label=names['ACH'], edgecolor='
 labels = ['1\n$^{t}$', '2\n$^{(t/h)}$', '3\n$^{(t/a)}$', '4\n$^{(t/h/a)}$', '5\n$^{(p)}$', '6\n$^{(p/h)}$', '7\n$^{(p/a)}$', '8\n$^{(p/h/a)}$', 'T']
 
 #plt.legend(fontsize=14, handles=[patch1, patch2, patch3, patch4, hatch1, hatch2])
-plt.xticks(ticks=bar_locations, labels=labels)
+plt.xticks(ticks=bar_locations, labels=labels, fontsize=16)
 
 
 #plt.legend(fontsize=14)
 #plt.xticks(ticks=bar_locations, labels=[1, 2, 3, 4, 5, 6, 7, 8, 'T'])
-plt.xlabel('State', fontsize=14)
-plt.ylabel('$\sigma$', fontsize=14)
+plt.xlabel('State', fontsize=16)
+plt.ylabel('$\sigma$', fontsize=16)
 plt.ylim(0.02, 0.08)
-plt.tick_params(labelsize=14)
+plt.tick_params(labelsize=16)
 plt.tight_layout()
 plt.savefig('sigma_v_state.pdf')
 plt.show()

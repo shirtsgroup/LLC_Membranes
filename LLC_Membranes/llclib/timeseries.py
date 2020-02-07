@@ -648,11 +648,13 @@ class VectorAutoRegression:
         from statsmodels.tsa.api import VAR
 
         self.dim = timeseries.shape[1]  # number of dimensions
+        self.order = r
 
         # fit VAR model with statsmodels.tsa
         model = VAR(timeseries)
         results = model.fit(r)
-        print(results.summary())
+
+        self.summary = results.summary()
 
         # covariance matrix
         self.covariance = results.sigma_u_mle  # give same result as following commented out block
@@ -664,6 +666,7 @@ class VectorAutoRegression:
         # cov = D @ corr @ D  # convert correlation matrix to covariance matrix
 
         self.mu = results.params[0, :]
+
         self.mu_std = results.stderr[0, :]
 
         self.phi = results.coefs
@@ -671,6 +674,42 @@ class VectorAutoRegression:
 
         for i in range(self.dim):
             self.phi_std[:, i, :] = results.stderr[1:, i].reshape(r, self.dim)
+
+    def generate_trajectories(self, ndraws, ntraj):
+        """ Generate a mean-zero autoregressive timeseries based on the transition matrix and autoregressive parameters.
+        The timeseries is defined as:
+
+        yt = \sum_{n=1}^{r} phi_n * y_{t-n} + \epsilon_t
+
+        where r is autoregressive order and \epsilon_t is Gaussian white noise with state-dependent variance
+
+        :param ndraws: number of points to generate for timeseries
+        :param phis: autoregressive coefficients for each state (n_phis x n_states)
+
+        :type ndraws: int
+        :type phis: np.ndarray
+        """
+
+        # data = np.zeros([ndraws + self.order, self.dim])
+        self.traj = np.zeros([ndraws + self.order, ntraj, self.dim])
+
+        for n in range(ntraj):
+
+            for d in range(self.order, ndraws + self.order):
+
+                # calculate autoregressive terms
+                # data[d, :] = sum([self.phis[state, i, ...] @ data[d - (i + 1), :] for i in range(order)])
+                self.traj[d, n, :] = sum(
+                    [self.phi[i, ...] @ self.traj[d - (i + 1), n, :] for i in range(self.order)])
+
+                # add Gaussian noise by drawing from multivariate normal distribution
+                # data[d, :] += np.random.multivariate_normal(self.mu[state, ...], self.cov[state, ...])
+
+                self.traj[d, n, :] += np.random.multivariate_normal(self.mu, self.covariance)
+
+        self.traj = self.traj[self.order:, ...]
+
+        return self.traj
 
 
 def switch_points(sequence):

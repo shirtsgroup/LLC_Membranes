@@ -15,17 +15,10 @@
 \usepackage{gensymb}
 \usepackage{float}
 
-%MRS: better to have the first outline shorter to iterate more quickly!
-%BJC1: right, this one has been in the works for a while now. Wrote the anomalous diffusion methods a long time ago
+%Predicting Flux and Selectivity of Solutes in a Nanostructured Membrane using the Infinite Hidden Markov Model
+\title{Stochastic Models Parameterized by the Infinite Hidden Markov Model Can Predict Flux and Selectivity of Solutes in Nanostructured Membranes.}
 
-%MRS: better to have a title that described a finding, rather than the
-%approach used.  But we may need to wait a bit further until we can decide on a finding.
-%MRS: also 'stochastic modeling' is pretty vague.  should be more precise. 
-\title{Using Stochastic Modeling to Predict Long Timescale Transport Behavior of Solutes in an H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane}
-%MRS: we should discuss whether Chris Calderon would be on this one.  I would guess no, but I don't know for sure. 
-%BJC1: Yea maybe Chris as an acknowledgement on this one. He didn't directly contribute anything other than pointing
-%me towards Greg Morrin who pointed me towards useful anomalous diffusion literature.
-\author{Benjamin J. Coscia \and Michael R. Shirts} 
+\author{Benjamin J. Coscia, Chris Calderon \and Michael R. Shirts} 
 
 \begin{document}
 
@@ -33,35 +26,25 @@
   \maketitle
 
   \section{Introduction}
-  %BJC: obviously this section will get beefed up
+  
   We need highly selective membranes in order to perform efficient separations. \\
 
   \noindent Amphiphilic molecules are capable of self-assembling into ordered nanostructures.\\
 
   Lyotropic liquid crystals are a class of amphiphilic molecules that can be cross-linked
-  into mechanically strong membranes.
-  \begin{itemize}
-  	\item H\textsubscript{II} phase lyotropic liquid crystals have densely packed, uniform
-	sized pores and have the potential to disrupt conventional membrane separation
-	techniques by being selective based not only on size and charge, but on chemical
-	functionality as well.
-	\item Q\textsubscript{I} phase LLCs consist of a tortuous network of 3D interconnected
-	pores. They are easier to make.
-  \end{itemize}
+  into mechanically strong membranes.\\
+%  \begin{itemize}
+%  	\item H\textsubscript{II} phase lyotropic liquid crystals have densely packed, uniform
+%	sized pores and have the potential to disrupt conventional membrane separation
+%	techniques by being selective based not only on size and charge, but on chemical
+%	functionality as well.
+%	\item Q\textsubscript{I} phase LLCs consist of a tortuous network of 3D interconnected
+%	pores. They are easier to make.
+%  \end{itemize}
 
   We can only learn so much from experiment. MD can give us mechanistic insights with
   atomistic resolution so that we can intelligently design new membranes for 
   solute-specific separations.\\
-
-%  \noindent In our previous work, we studied the transport of 20 small polar molecules
-%  in an H\textsubscript{II} phase LLC membrane.
-%  \begin{itemize}
-%    \item In general, we observed subdiffusive transport behavior characterized by 
-%    intermittent hops separated by periods of entrapment.
-%    \item We identified three mechanisms responsible for the solute trapping behavior:
-%    entanglement among monomer tails, hydrogen bonding with monomer head groups, and
-%    association with sodium counter ions.
-%  \end{itemize}
 
   Unfortunately, the timescales that we can simulate with MD are insufficient to be
   able to make well-converged predictions of macroscopic transport properties 
@@ -77,7 +60,7 @@
   to project transport on much longer timescales.
   \begin{itemize}
   	\item Brief description of anomalous diffusion
-  	\item Brief descritpion of MSDDM
+  	\item Brief description of MSDDM
   \end{itemize}
   
   Although both models had reasonable success at predicting solute MSDs on simulation
@@ -89,20 +72,37 @@
   
   % BJC: Not sure whether to call it the infinite hidden markov model or hierarchical dirichlet process hidden markov model
   % The former is definitely simpler.
-  In this work, we apply the infinite hidden markov model, a modeling approach that is agnostic
-  to the source of time series data, in order to detect and parameterize an unknown number
-  of latent autoregressive dynamical modes.
+  In this work, we apply the infinite hidden markov model (iHMM), a modeling
+  approach that is agnostic to the source of time series data, in order to 
+  automatically detect and infer the parameters of an unknown number of latent
+  autoregressive modes.\\
   
+  We study the same four solutes from our previous work. \\
+  
+  We use the iHMM to generate stochastic trajectory realizations that share the same
+  dynamical characteristics as solute trajectories observed in our MD simulations. 
+  \begin{itemize}
+    \item The trajectories are qualitatively similar, showing expected hopping and trapping
+    behavior
+    \item They are quantitatively similar in that they reproduce the MSDs measured in MD
+  \end{itemize}
+  
+  Finally, we use the stochastic trajectory realizations in order to compute the MFPT 
+  of solutes in macroscopic length pores.
+  \begin{itemize}
+  	\item We relate the MFPT to flux and compare the fluxes between solutes to get selectivity.
+  \end{itemize}
     
   \section{Methods}
     
-  We ran all MD simulations and energy minimizations using GROMACS 2018. We  % needs gromacs citations
+  We ran all MD simulations and energy minimizations using GROMACS 2018. We
   performed all post-simulation trajectory using python scripts which are available
-  %MRS: eventually want to say what scripts were used to do what, but that is not at the outline stage!
-  %BJC1: I usually put a table like that in the SI. Is that sufficient?
   online at \\ \texttt{https://github.com/shirtsgroup/LLC\_Membranes}.
 
   \subsection{Molecular Dynamics Simulations}
+  
+  % BJC: Could I just reference previous work here? "MD simulations were run as 
+  % described in our previous work..."
 
   We studied transport of solutes in the H\textsubscript{II} phase using an
   atomistic molecular model of four pores in a monoclinic unit cell with 
@@ -113,7 +113,7 @@
     \item We chose to study the 10 wt \% water system because solutes move 
     significantly faster than in the 5 wt \% system studied previously.
     \item Appropriate stochastic modeling requires that solutes sample the 
-    accessible mechanisms with representative probability.  %BJC1: incorporated suggested phrasing
+    accessible mechanisms with representative probability.
   \end{itemize}
   
   We chose to study a subset of 4 of the fastest moving solutes from our previous
@@ -121,12 +121,6 @@
   \begin{itemize} 
     \item In addition to exploring membrane structural space the most, these solutes
     have a relatively diverse set of chemical functionality.   
-    %MRS: do the solutes also have some diversity of mechanisms (that were observed previously?)
-    %BJC1: Yes. Need to put following into words
-    %BJC1: Ranking of time spent in pore region: AcOH > EG > URE > MeOH  (spans 4th most to 3rd least)
-    %BJC1: All have high hop frequency which is consistent with fast motion
-    %BJC1: Hbonding: Urea barely hbonds. AcOH and EG hbond a lot. AcOH has highest hbond lifetime of all 20 solutes. MeOH on par with all other simple alcohols
-    %BJC1: Sodium Association: Urea coordinates with sodium the most of all 20 solutes. AcOH, EG, MeOH spread out of rest of range. Lifetime similar 
     \item For each solute we created a separate system and to each system we
     added 6 solutes per pore for a total of 24 solutes.
     \item This number of solutes per pore provides a balance of a low 
@@ -145,12 +139,12 @@
     \item We recorded frames every 0.5 ns
   \end{itemize}
 
-  % BJC: can ignore this section for now. 
-  \subsection{The Infinite State Hidden Markov Model}\label{method:iHMM}  %BJC: potentially a separate paper
+  \subsection{The Infinite State Hidden Markov Model}\label{method:iHMM}
+  %BJC: There is a fair amount of detail here just so I could understand better by writing it out
   
   Hidden Markov models (HMMs) are a useful and widely used technique
   for modeling sequences of observations where the probability of the next observation
-  in a sequence depends only on a previous unobserved, or hidden, state.~\cite{beal_infinite_2002}
+  in a sequence depends only on a previous unobserved, latent or hidden, state.~\cite{beal_infinite_2002}
   \begin{itemize}
     \item In the context of our simulations, the observations correspond to 
     the center of mass coordinates of the solutes versus time, and the states
@@ -159,10 +153,12 @@
     \item Unfortunately, standard HMMs require the number of hidden states to be known
     a priori.
     \item One can partially overcome this by testing a range of numbers of 
-    hidden states and determining which is the best representation of their
+    hidden states and determining which is the best representation of the
     data.
   \end{itemize}
   
+  %BJC: I'm not sure how much of this I should include. This is pretty much 
+  % a reproduction of Fox et al's explanation: https://ieeexplore.ieee.org/abstract/document/5563110
   The infinite-state HMM overcomes this drawback by placing a hierarchical
   Dirichlet process (HDP) prior on the transition probabilities.
   \begin{itemize}
@@ -188,49 +184,103 @@
     \item Once the model has converged only a finite number of states will have significant
     sampling.
   \end{itemize}
-   
+  
+  %BJC: I do need to include this
   \noindent We describe the dynamics of each state using a vector autoregressive (VAR) model. 
   \begin{itemize}
-  	\item A VAR process is characterized by a vector of observations in a time series 
-  	that are dependent on $r$ previous values of the time series vector, weighted by a
-  	coefficient matrix $A_i$ in addition to a white noise term $\mathbf{e}_t$:
+  	\item A VAR($r$) process is characterized by a vector of observations in a time series 
+  	that are linearly dependent on $r$ previous values of the time series vector:
   	\begin{equation}
-  	\mathbf{y}_t = \sum_{i=1}^r A_i\mathbf{y}_{t-i} + \mathbf{e}_t~~~~\mathbf{e}_t \sim N(0, \Sigma)
+  	\mathbf{y}_t = \mathbf{c} + \sum_{i=1}^r A_i\mathbf{y}_{t-i} + \mathbf{e}_t~~~~\mathbf{e}_t \sim N(0, \Sigma)
   	\end{equation}
-  	\item We assumed multivariate Gaussian noise and limited our analysis to an 
-  	autoregressive order of $r=1$.
+  	Previous observations are weighted by coefficient matrices $A_i$. The VAR($r$) 
+  	process is further characterized by a shift in the mean of each dimension by the
+  	vector $\mathbf{c}$ and a white noise term $\mathbf{e}_t$.~\cite{hamilton_time_1994}
+  	\item We assumed multivariate Gaussian noise, with mean zero and covariance, $\Sigma$.
+  	\item We limited our analysis to an autoregressive order of $r=1$. %BJC: might try higher orders, but probably not worth it
   	\item We used a conjugate matrix-normal inverse-Wishart prior on parameters
-  	$A$ and $\Sigma$ in order to analytically draw from the posterior.
+  	$A$ and $\Sigma$ and a conjugate Gaussian prior on $\mathbf{c}$ in order to analytically
+  	draw from the posterior.~\cite{fox_nonparametric_2009}
   \end{itemize}   
   
-  Based on the VAR parameters and matrix of transition probabilities, we calculated
-  the most likely sequence of hidden states.
+  %Based on the algorithms developed by Fox et al.~\cite{fox_sticky_2007}, 
+  Using the iHMM framework, we estimated the most likely number and sequence of hidden states
+  while simultaneously estimating VAR(1) parameters for each state and the overall 
+  state transition probability matrix, $T$.
   \begin{itemize}
-    \item We repeated this process iteratively until we reached convergence % BJC: need to define convergence criteria
-    \item Our python implementation of this process is heavily adapted from the MATLAB code
-    of Fox et al.~\cite{fox_sticky_2007} 
+    \item We created a python implementation of this process which we heavily adapted from
+    the MATLAB code of Fox et al.~\cite{fox_sticky_2007} 
+    \item Parameter estimation is iterative. Therefore, we looked for convergence 
+    as shown in SI.
     \item We refer the interested reader to much more extensive descriptions of 
     this process and its implementation. 
     ~\cite{beal_infinite_2002,teh_hierarchical_2006,van_gael_beam_2008,fox_nonparametric_2009,fox_bayesian_2010}
   \end{itemize}
-  \break
+  
+  We generated stochastic realizations by drawing state sequences based on the
+  rows of $T$. 
+  %BJC: lots more implementation details once that is ironed out
+  
+  \subsection{Estimating Flux and Selectivity}
+  %BJC: can make this discussion somewhat short since it's already in previous paper. 
+  % Should probably just hit all the main equations quickly.
+  
+  \noindent We calculate first passage times by propagating stochastic trajectories until they
+  reach distance $L$. \\
+  
+  We determine the mean first passage time (MFPT) using the following equation:~\cite{cussler_diffusion:_2009}
+  \begin{equation}
+  P(t) = -\frac{1}{\sqrt{\pi}}e^{-(L - vt)^2 / (4Dt)}\bigg(-\frac{D(L - vt)}{4(Dt)^{3/2}} - \frac{v}{2\sqrt{Dt}}\bigg)
+  \label{eqn:passage_times}
+  \end{equation}
+  
+  \noindent Flux, $J$, is simply 1 / MFPT by the Hill relation.~\cite{hill_free_1989} \\
+  
+  In our previous work, we showed that, in the absence of convective solute flux, selectivity
+  towards solute $i$ versus solute $j$ can be calculated by:  
+  \begin{equation}
+  S_{ij} = \frac{J_i / \Delta C_i}{J_j / \Delta C_j}
+  \label{eqn:selectivity}
+  \end{equation}
+  where $\Delta C_j$ is the trans-membrane concentration difference.
+
   \section{Results and Discussion}
+  
+  \noindent Trajectory realizations qualitatively match MD simulation trajectories.
+  \begin{itemize}
+    \item Look for hopping and trapping behavior
+  \end{itemize}
+  
+  \noindent MSDs generated from stochastic trajectories match those from MD.
+  \begin{itemize}
+  	\item Look at curvature and 1-$\sigma$ confidence intervals
+  \end{itemize}
+  
+  \noindent We can relate the identified states back to transport mechanisms.
+  \begin{itemize}
+  	\item More detailed discussion of identified states
+  	\item How size of fluctuations, autoregressive parameters are influenced by trapping mechanisms
+  	\item Any new states?
+  \end{itemize}
+  
+  \noindent We can predict macroscopic flux and selectivity.
+  \begin{itemize}
+  	\item Flux as function of pore length
+  	\item Selectivity as function of pore length (if flux scaling is length-dependent)
+  \end{itemize}
  
   \section{Conclusion}
   
-  We have tested two different mathematical frameworks for describing solute
-  motion in an H\textsubscript{II} phase LLC membrane.
-  \begin{itemize}
-    \item Markov state modeling with predefined states gives a nice description
-    of transitions between observed states as well as the type of stochastic 
-    behavior shown in each state. However, it doesn't accurately portray correlated
-    time series behavior leading to overpredicted MSDs.
-    \item Subordinated fractional Brownian motion has a nice theoretical foundation
-    in the anomalous diffusion literature. A two mode model that describes dynamics
-    based on whether a solute is in or out of the pore region leads to MSDs fairly
-    consistent with MD simulated trajectories.
-  \end{itemize}
- 
+  \noindent We have shown that the iHMM can be used to parameterize solute time series
+  with an unknown number of latent dynamical modes. \\
+  
+  \noindent We can use the iHMM to help identify mechanisms by relating the latent
+  states to observed solute behavior. \\
+  
+  \noindent We can use the iHMM to predict macroscopic transport properties. \\
+  
+  \noindent The iHMM is not limited to the H\textsubscript{II} phase.
+  
   \section*{Supporting Information}
 
   Detailed explanations and expansions upon the results and procedures mentioned in
@@ -252,7 +302,7 @@
   \clearpage
 
   \bibliographystyle{ieeetr}
-  \bibliography{stochastic_transport}
+  \bibliography{hdphmm}
 
   \newpage
 

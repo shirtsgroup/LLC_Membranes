@@ -67,7 +67,7 @@ for i, res in enumerate(sol):
                 heights[b, j] = levy.fit_levy(emissions, beta=0)[0].x[0]
 
     for j in range(9):
-        plt.bar(bar_locations[j] + (i - 1)*bar_width - bar_width/2, heights[:, j].mean(axis=0), bar_width, label=names[res], color=colors[res], edgecolor='black', alpha=alpha, hatch=hatches[j], yerr=heights[:, j].std(axis=0))
+        plt.bar(bar_locations[j] + (i - 1)*bar_width - bar_width/2, heights[:, j].mean(axis=0), bar_width, label=names[res], color=colors[res], edgecolor='black', alpha=alpha, yerr=heights[:, j].std(axis=0))
        
     file_rw.save_object(heights, 'msddm_alphah_%s.pl' % res)
 
@@ -82,14 +82,14 @@ patch4 = mpatches.Patch(facecolor=colors['ACH'], label=names['ACH'], edgecolor='
 labels = ['1\n$^{t}$', '2\n$^{(t/h)}$', '3\n$^{(t/a)}$', '4\n$^{(t/h/a)}$', '5\n$^{(p)}$', '6\n$^{(p/h)}$', '7\n$^{(p/a)}$', '8\n$^{(p/h/a)}$', 'T']
 
 #plt.legend(fontsize=14, handles=[patch1, patch2, patch3, patch4, hatch1, hatch2])
-plt.xticks(ticks=bar_locations, labels=labels)
+plt.xticks(ticks=bar_locations, labels=labels, fontsize=16)
 #plt.legend(fontsize=14)
 #plt.xticks(ticks=bar_locations, labels=[1, 2, 3, 4, 5, 6, 7, 8, 'T'])
-plt.xlabel('State', fontsize=14)
-plt.ylabel(r'$\alpha_h$', fontsize=14)
-plt.tick_params(labelsize=14)
-plt.tight_layout()
+plt.xlabel('State', fontsize=16)
+plt.ylabel(r'$\alpha_h$', fontsize=16)
+plt.tick_params(labelsize=16)
 plt.ylim(1, 2.15)
 plt.yticks([1, 1.25, 1.5, 1.75, 2.0])
+plt.tight_layout()
 plt.savefig('alpha_v_state.pdf')
 plt.show()
