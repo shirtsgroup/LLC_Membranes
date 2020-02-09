@@ -17,8 +17,10 @@
 
 %Predicting Flux and Selectivity of Solutes in a Nanostructured Membrane using the Infinite Hidden Markov Model
 \title{Stochastic Models Parameterized by the Infinite Hidden Markov Model Can Predict Flux and Selectivity of Solutes in Nanostructured Membranes.}
+%MRS: a little overly specific? Maybe something like below?
+%\title{Statistical inference of mechanism and long time scale behavior from timeseries of solute trajectories in nanostructured membranes}
 
-\author{Benjamin J. Coscia, Chris Calderon \and Michael R. Shirts} 
+\author{Benjamin J. Coscia, Christopher P. Calderon \and Michael R. Shirts} 
 
 \begin{document}
 
@@ -42,7 +44,10 @@
 %	pores. They are easier to make.
 %  \end{itemize}
 
-  We can only learn so much from experiment. MD can give us mechanistic insights with
+  %MRS: tweak phrasing.
+  %We can only learn so much from experiment. 
+  There are limits to what we can learn from experiment.
+  MD can give us mechanistic insights with
   atomistic resolution so that we can intelligently design new membranes for 
   solute-specific separations.\\
 
@@ -72,6 +77,7 @@
   
   % BJC: Not sure whether to call it the infinite hidden markov model or hierarchical dirichlet process hidden markov model
   % The former is definitely simpler.
+  % MRS: True.  I would probably see which is used more in the literature. 
   In this work, we apply the infinite hidden markov model (iHMM), a modeling
   approach that is agnostic to the source of time series data, in order to 
   automatically detect and infer the parameters of an unknown number of latent
@@ -86,7 +92,12 @@
     behavior
     \item They are quantitatively similar in that they reproduce the MSDs measured in MD
   \end{itemize}
-  
+
+  %MRS: we talked about inferring mechanisms from the trajectories (i.e. looking at the states 
+  %that were automatically identfied and seeing how those compared to previous studies)
+  %MRS: you do talk about it at the end - it should be discussed here as well (ask all the questions you are going to answer)  
+  %MRS: discuss the types of comparison you could do (though some details would be in methods
+
   Finally, we use the stochastic trajectory realizations in order to compute the MFPT 
   of solutes in macroscopic length pores.
   \begin{itemize}
