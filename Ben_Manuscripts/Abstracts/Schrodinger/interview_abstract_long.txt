@@ -1,0 +1,44 @@
+  Periodic, nanostructured porous polymer membranes made from the cross-linked
+inverted hexagonal phase of self-assembled lyotropic liquid crystals (LLCs) are
+a promising class of materials for selective aqueous separations. The wide
+design space available for liquid crystal monomer design can lead to a variety
+of complex chemical topologies with unique selective preferences. Currently, 
+the mechanisms of selectivity in these membranes is poorly understood which
+has hindered our ability to design them for solute-specific separations. In
+this work, we use atomistic molecular dynamics simulations in order to gain a
+more complete understanding of nanoscopic membrane structure and solute dynamics.
+
+First, we ensure that we are properly modeling the chemical environment within
+the pores. After determining the optimal build parameters, we refine the 
+membrane structure in order to ensure maximum consistent with experimental 
+2D wide angle X-ray scattering data.  
+
+We show that there is a gradual rather than abrupt transition from
+the hydrophilic pore region to hydrophobic monomer tail region. We simulated
+X-ray diffraction patterns in order ensure our structure is maximally
+consistent with experimental 2D wide angle X-ray scattering data 
+
+Using our most experimentally-consistent structural model, we observe transport
+of 20 small polar solutes within the membrane pores We find that the transport
+of a species is dependent not only on molecular size, but on chemical
+functionality as well. We observe that all solutes perform intermittent hops
+between lengthy periods of entrapment. Three different trapping mechanisms are
+responsible for this behavior. First, solutes that drift out of the pore can
+become entangled among the dense monomer tails.  Second, solutes can donate
+hydrogen bonds to the monomer head groups. Third, solutes can coordinate with
+sodium counter ions. The degree to which a solute is affected by each mechanism
+is dependent on the chemical functionality of the solute.
+
+Finally, we explore two different formulations of stochastic models that can be
+used to further our mecahnistic understanding and to project solute behavior on
+macroscopic timescales. Our first model, based on the anomalous diffusion
+literature, treats solute dyanamics as a fractional motion process subordinate
+to a continuous time random walk.  Our second model applies the infinite hidden
+Markov model to solute trajectories in order to automatically identify an
+unknown number of distinct dynamical modes as well as the probabilities of
+transitions between them.  We demonstrate how one can use these models to
+estimate flux of a solute across a macroscopic-length pore and, based on those
+quantities, the membrane's selectivity towards each solute.  This work helps to
+connect microscopic chemically-dependent solute motions that do not follow
+simple diffusive behavior with macroscopic membrane performance.
+
