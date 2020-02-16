@@ -10,10 +10,19 @@ simulations in order to gain a more complete understanding of nanoscopic
 membrane structure and solute dynamics.
 
 First, we ensure that we are properly modeling the chemical environment within
-the pores. After determining the optimal build parameters, we refine the
-membrane structure in order to ensure maximum consistent with experimental 2D
+the pores. After determining the optimal build parameters, 
+%MRS: what about the build parameters is optimal?
+we refine the
+membrane structure in order to 
+ensure maximum consistent 
+% MRS: I'd say "maximize consistency".  You haven't ensured anything, since there are still a lot of 
+% mismatches with the WAXS, but
+% you have maximized the consistency with respect to experiment within the simulation design space.
+with experimental 2D
 wide angle X-ray scattering data. Using our most experimentally-consistent
-structural model, we observe transport of 20 small polar solutes within the
+structural model, we observe 
+%MRS: maybe "study" or "model" instead of "observe"
+transport of 20 small polar solutes within the
 membrane pores. We find that the transport of a species is dependent not only
 on molecular size, but on chemical functionality as well. We uncover three
 different trapping mechanism which lead to subdiffusive dynamics. Finally, we
@@ -21,7 +30,10 @@ explore two different formulations of stochastic models that can be used to
 further our mecahnistic understanding and to project solute behavior on
 macroscopic timescales. We demonstrate how one can use these models to estimate
 flux of a solute across a macroscopic-length pore and, based on those
-quantities, the membrane's selectivity towards each solute. Overall, this work
+quantities, the membrane's selectivity towards each solute. 
+%MRS: probably the "overall" is unnecessary.  Also, I woould connect the last sentence back to the beginning - you go from
+monomer to structure to macroscopic behavior. 
+Overall, this work
 helps to connect microscopic chemically-dependent solute motions that do not
 follow simple diffusive behavior with macroscopic membrane performance.
 
