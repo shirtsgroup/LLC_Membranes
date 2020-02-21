@@ -3,37 +3,25 @@ inverted hexagonal phase of self-assembled lyotropic liquid crystals (LLCs) are
 a promising class of materials for selective aqueous separations. The wide
 design space available for liquid crystal monomer design facilitates the
 creation of a variety of complex chemical topologies with unique selective
-preferences. Currently, the mechanisms of selectivity in these membranes is
+preferences. Currently, the mechanisms of selectivity in these membranes are 
 poorly understood which has hindered our ability to design them for
 solute-specific separations. In this work, we use atomistic molecular dynamics
 simulations in order to gain a more complete understanding of nanoscopic
 membrane structure and solute dynamics.
 
-First, we ensure that we are properly modeling the chemical environment within
-the pores. After determining the optimal build parameters, 
-%MRS: what about the build parameters is optimal?
-we refine the
-membrane structure in order to 
-ensure maximum consistent 
-% MRS: I'd say "maximize consistency".  You haven't ensured anything, since there are still a lot of 
-% mismatches with the WAXS, but
-% you have maximized the consistency with respect to experiment within the simulation design space.
-with experimental 2D
-wide angle X-ray scattering data. Using our most experimentally-consistent
-structural model, we observe 
-%MRS: maybe "study" or "model" instead of "observe"
-transport of 20 small polar solutes within the
-membrane pores. We find that the transport of a species is dependent not only
-on molecular size, but on chemical functionality as well. We uncover three
-different trapping mechanism which lead to subdiffusive dynamics. Finally, we
-explore two different formulations of stochastic models that can be used to
-further our mecahnistic understanding and to project solute behavior on
-macroscopic timescales. We demonstrate how one can use these models to estimate
-flux of a solute across a macroscopic-length pore and, based on those
-quantities, the membrane's selectivity towards each solute. 
-%MRS: probably the "overall" is unnecessary.  Also, I woould connect the last sentence back to the beginning - you go from
-monomer to structure to macroscopic behavior. 
-Overall, this work
-helps to connect microscopic chemically-dependent solute motions that do not
-follow simple diffusive behavior with macroscopic membrane performance.
+First, we ensure that we can properly model the chemical environment within the
+pores. We refine the model's structure in order to maximize its consistency
+with experimental 1D small angle and 2D wide angle X-ray scattering data. Using
+our most experimentally-consistent structural model, we study transport of 20
+small polar solutes within the membrane pores. We find that the transport of a
+species is dependent not only on molecular size, but on chemical functionality
+as well. We uncover three different trapping mechanism which lead to
+subdiffusive dynamics. Finally, we explore two different formulations of
+stochastic models that can be used to further our mecahnistic understanding and
+to project solute behavior on macroscopic timescales. We demonstrate how one
+can use these models to estimate flux of a solute across a macroscopic-length
+pore and, based on those quantities, the membrane's selectivity towards each
+solute. This work helps to connect nanostructure and microscopic
+chemically-dependent solute motions that do not follow simple diffusive
+behavior with macroscopic membrane performance.
 

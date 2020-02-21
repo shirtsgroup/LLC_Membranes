@@ -85,7 +85,7 @@ def mfpt_analytical(passage_times, nbins, length, nboot, guess_params):
         return boot
 
 correlation = True 
-msddm = True 
+msddm = False 
 root_dir = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11/"
 nboot = 200 
 
@@ -160,7 +160,7 @@ for j, r in enumerate(residues):
     ax2.plot(x, np.exp(b.mean()) * x ** m.mean() , '--', color=colors[r], label = '%s' % names[r], lw=2)
     labels.append(Line2D([0], [0], color=colors[r], label='%s' % names[r], lw=2))
 
-labels.append(Line2D([0], [0], color='black', linestyle='--', label=r'Fits to $cL^{-\beta}$', lw=2))
+labels.append(Line2D([0], [0], color='black', linestyle='--', label=r'Fits to $AL^{-\beta}$', lw=2))
 
 ax1.set_xlabel('Pore Length, L (nm)', fontsize=14)
 ax1.set_ylabel('Flux ($\mu$s$^{-1}$)', fontsize=14)
@@ -173,6 +173,8 @@ ax2.set_ylabel('Mean First Passage Time ($\mu$s)', fontsize=14)
 ax2.tick_params(labelsize=14)
 ax2.legend(fontsize=14)
 fig2.tight_layout()
+plt.show()
+exit()
 
 if correlation:
     if msddm:
