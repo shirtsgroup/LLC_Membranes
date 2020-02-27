@@ -15,10 +15,8 @@
 \usepackage{gensymb}
 \usepackage{float}
 
-%Predicting Flux and Selectivity of Solutes in a Nanostructured Membrane using the Infinite Hidden Markov Model
-\title{Stochastic Models Parameterized by the Infinite Hidden Markov Model Can Predict Flux and Selectivity of Solutes in Nanostructured Membranes.}
-%MRS: a little overly specific? Maybe something like below?
-%\title{Statistical inference of mechanism and long time scale behavior from timeseries of solute trajectories in nanostructured membranes}
+\title{Statistical Inference of Transport Mechanisms and Long Time Scale Behavior from Time Series 
+       of Solute Trajectories in Nanostructured Membranes.}
 
 \author{Benjamin J. Coscia, Christopher P. Calderon \and Michael R. Shirts} 
 
@@ -29,27 +27,58 @@
 
   \section{Introduction}
   
-  We need highly selective membranes in order to perform efficient separations. \\
+  There is a need for highly selective membranes in order to perform efficient 
+  separations of components of complex aqueous streams.
+  \begin{itemize}
+    \item Organic micropollutants
+    \item Desalination and boric acid removal from seawater.
+    \item While many researchers focus on membrane permeability, we may be 
+    able to reduce costs of commercial nanofiltration and reverse osmosis with
+    higher selectivity.~\cite{werber_materials_2016}
+  \end{itemize}
 
-  \noindent Amphiphilic molecules are capable of self-assembling into ordered nanostructures.\\
-
-  Lyotropic liquid crystals are a class of amphiphilic molecules that can be cross-linked
-  into mechanically strong membranes.\\
+%  \noindent Amphiphilic molecules are capable of self-assembling into ordered nanostructures.
 %  \begin{itemize}
-%  	\item H\textsubscript{II} phase lyotropic liquid crystals have densely packed, uniform
-%	sized pores and have the potential to disrupt conventional membrane separation
-%	techniques by being selective based not only on size and charge, but on chemical
-%	functionality as well.
-%	\item Q\textsubscript{I} phase LLCs consist of a tortuous network of 3D interconnected
-%	pores. They are easier to make.
+%    \item 
 %  \end{itemize}
 
-  %MRS: tweak phrasing.
-  %We can only learn so much from experiment. 
-  There are limits to what we can learn from experiment.
-  MD can give us mechanistic insights with
-  atomistic resolution so that we can intelligently design new membranes for 
-  solute-specific separations.\\
+  Lyotropic liquid crystals (LLC) are a class of amphiphilic molecules whose ordered phases
+  can be cross-linked into mechanically strong membranes capable of highly selective
+  separations.
+  \begin{itemize}
+    \item The shape of the LLC monomers and water content dictates the ordered phase 
+    that they form. There are two phases of particular interest for membrane applications.
+  	\item H\textsubscript{II} phase lyotropic liquid crystals are characterized by 
+  	hexagonally packed, straight, pores while the Q\textsubscript{I} phase consists of
+  	a tortuous network of 3D interconnected pores. 
+  	\item In both cases the pores are uniform in size with radii on the order of 1 nm
+  	giving them a very strict molecular weight cut-off.
+	\item Additionally, they have the potential to disrupt conventional membrane separation
+	techniques by being selective based not only on size and charge, but on chemical
+	functionality as well.
+	\item Their pores are lined with LLC monomer functional groups which can potentially
+	be designed to interact with solutes in a chemically-specific manner
+  \end{itemize}
+
+  There are limits to what we can learn from experiment about LLC membrane design.
+  \begin{itemize}
+    \item Experimental observables like permeability and selectivity allow us to speculate
+    about the molecular origins of separation processes.
+    \item This drives an empirical design approach which can potentially neglect key
+    interactions which influence selectivity.
+    \item LLC membranes have been shown to exhibit selectivities which cannot be fully 
+    explained by relatively simple macroscopic models. 
+  \end{itemize}
+  
+  Molecular Dynamics (MD) simulations can give us mechanistic insights with atomistic 
+  resolution so that we can intelligently design new membranes for solute-specific 
+  separations.
+  \begin{itemize}
+    \item In our previous work, we built a detailed atomistic model which we used
+    to understand the nanoscopic structure of an LLC Membrane.~\cite{coscia_understanding_2019}
+    \item We also used the model in order to gain a qualitative understanding of 
+    trapping mechanisms which lead to subdiffusive transport behavior.~\cite{coscia_chemically_2019}
+  \end{itemize}
 
   Unfortunately, the timescales that we can simulate with MD are insufficient to be
   able to make well-converged predictions of macroscopic transport properties 
@@ -64,44 +93,77 @@
   solute time series in order to parameterize stochastic models that could be used
   to project transport on much longer timescales.
   \begin{itemize}
-  	\item Brief description of anomalous diffusion
-  	\item Brief description of MSDDM
+  	\item In our first approach we modeled solute trajectories as subordinated fractional
+  	Brownian and L\'evy motion, called the anomalous diffusion (AD) model. 
+  	\item We generated solute trajectories by generating a series
+  	of anti-correlated hops separated by random periods of entrapment drawn from a 
+  	power law distribution.
+  	\item Our second approach treated solute motion as a Markov state model with
+  	state-dependent dynamics, called the Markov state-dependent dynamical model (MSDDM).
+  	\item We parameterized the state transition probabilities between
+  	each of eight discrete states as well as the solute dynamics within each of these
+  	states. We generated stochastic trajectory realizations by drawing a state
+  	sequence based on the transition probability matrix and incorporating the state dynamics
+  	while solutes were trapped in each state.
+%  	\item Both models had moderate success reproducing the mean squared displacements (MSDs)
+%  	exhibited by solutes in our MD simulations.
   \end{itemize}
   
-  Although both models had reasonable success at predicting solute MSDs on simulation
-  timescales, they had shortcomings.
+  Although both models had reasonable success at predicting solute mean squared 
+  displacements (MSDs) on MD simulation timescales, they had shortcomings.
   \begin{itemize}
-  	\item Why MSDDM failed
-  	\item Why anomalous diffusion model could be better.
+  	\item The MSDDM failed to reproduce the hopping and trapping behavior that
+  	characterizes solute center-of-mass trajectories in our MD simulations.
+  	\item The AD model did not suffer this qualitative shortcoming, but the 
+  	persistent curvature of the predicted MSD curves suggested that the model
+  	might underestimate MSDs on long timescales. 
+  	\item The formulation of both models required careful examination and
+  	characterization of the interactions and dynamics exhibit by MD trajectories 
+  	which required considerable human effort.
   \end{itemize}
   
   % BJC: Not sure whether to call it the infinite hidden markov model or hierarchical dirichlet process hidden markov model
   % The former is definitely simpler.
   % MRS: True.  I would probably see which is used more in the literature. 
-  In this work, we apply the infinite hidden markov model (iHMM), a modeling
+  % BJC1: going with IHMM. HDPHMM seems to mostly be used by Emily Fox
+  In this work, we apply the infinite hidden markov model (IHMM), a modeling
   approach that is agnostic to the source of time series data, in order to 
   automatically detect and infer the parameters of an unknown number of latent
-  autoregressive modes. \\
+  autoregressive (AR) modes present in solute center-of-mass time series.
+  \begin{itemize}
+  	\item In addition to AR parameters for each state, the IHMM estimates the
+  	state transition probability matrix.
+  	\item The model helps simultaneously uncover underlying transport mechanisms which
+  	give rise to dynamical behavior and project that behavior on longer timescales so
+  	that we can estimate macroscopic transport observables.
+  \end{itemize}
   
-  We study the same four solutes from our previous work. \\
+  We use the parameters of the states identified by the IHMM in order to infer 
+  dominant solute-membrane interactions and transport mechanisms.
+  \begin{itemize}
+    \item We compare the inferred mechanisms to those which we manually
+    identified in our previous work. 
+    \item Some kind of conclusion here. Did we find more or less states. Any new states/ subdivisions of states?
+  \end{itemize}
   
-  We use the iHMM to generate stochastic trajectory realizations that share the same
-  dynamical characteristics as solute trajectories observed in our MD simulations. 
+  We can also use the IHMM to generate stochastic trajectory realizations that share
+  the same dynamical characteristics as solute trajectories observed in our MD 
+  simulations. 
   \begin{itemize}
     \item The trajectories are qualitatively similar, showing expected hopping and trapping
-    behavior
-    \item They are quantitatively similar in that they reproduce the MSDs measured in MD
+    behavior.
+    \item They are quantitatively similar in that they reproduce the MSDs measured in MD.
   \end{itemize}
 
-  %MRS: we talked about inferring mechanisms from the trajectories (i.e. looking at the states 
-  %that were automatically identfied and seeing how those compared to previous studies)
-  %MRS: you do talk about it at the end - it should be discussed here as well (ask all the questions you are going to answer)  
-  %MRS: discuss the types of comparison you could do (though some details would be in methods
-
-  Finally, we use the stochastic trajectory realizations in order to compute the MFPT 
-  of solutes in macroscopic length pores.
+  Finally, we use the stochastic trajectory realizations in order to compute the 
+  macroscopic flux of each solute and selectivity of the LLC membranes studied towards
+  each solute.
   \begin{itemize}
-  	\item We relate the MFPT to flux and compare the fluxes between solutes to get selectivity.
+    \item We relate these macroscopic properties to our nanoscopic model by simulating 
+    mean first passage time (MFPT).
+    \item Some kind of conclusion. This membrane is selective towards solutes with this
+    functionality. 
+    \item Does the conclusion agree with our previous work? Any length dependence? (I think not)
   \end{itemize}
     
   \section{Methods}
@@ -150,7 +212,7 @@
     \item We recorded frames every 0.5 ns
   \end{itemize}
 
-  \subsection{The Infinite State Hidden Markov Model}\label{method:iHMM}
+  \subsection{The Infinite State Hidden Markov Model}\label{method:IHMM}
   %BJC: There is a fair amount of detail here just so I could understand better by writing it out
   
   Hidden Markov models (HMMs) are a useful and widely used technique
@@ -215,7 +277,7 @@
   \end{itemize}   
   
   %Based on the algorithms developed by Fox et al.~\cite{fox_sticky_2007}, 
-  Using the iHMM framework, we estimated the most likely number and sequence of hidden states
+  Using the IHMM framework, we estimated the most likely number and sequence of hidden states
   while simultaneously estimating VAR(1) parameters for each state and the overall 
   state transition probability matrix, $T$.
   \begin{itemize}
@@ -228,9 +290,40 @@
     ~\cite{beal_infinite_2002,teh_hierarchical_2006,van_gael_beam_2008,fox_nonparametric_2009,fox_bayesian_2010}
   \end{itemize}
   
-  We generated stochastic realizations by drawing state sequences based on the
-  rows of $T$. 
-  %BJC: lots more implementation details once that is ironed out
+  We applied the IHMM algorithm to the radial and axial coordinates of each 
+  solute center-of-mass trajectory.
+  \begin{itemize}
+    \item We measured the radial coordinate as the distance from the closest
+    pore center.
+    \item Because the pores are somewhat tortuous, we approximated the pore 
+    center as a spline. See previous work.
+  \end{itemize}
+  
+  We clustered like parameter sets in order to reduce the state space to
+  a more easily interpretable size.
+  \begin{itemize}
+    \item Since the mean vector, $\mathbf{c}$ of each state can take on 
+    continuous values, the IHMM algorithm tends to find a large number of states,
+    with very few states revisited.
+    % BJC1: This will need to be updated depending on how I cluster. Might need to describe
+    % multiple clustering approaches.
+    \item However, $\mathbf{A_i}$ and $\mathbf{\Sigma}$ tend to share similarities with
+    independently identified states. Therefore, we clustered based on $\mathbf{A_i}$
+    and $\mathbf{\Sigma}$, ignoring the mean.
+    \item Since  we do not know the number of similar states beforehand, we used
+    a non-parametric Bayesian Gaussian mixture model % cite scikit-learn
+    \item We used the clustered parameters in order to relabel states in the estimated
+    state sequences and to recalculate the state transition probability matrix.
+  \end{itemize}
+  
+  We generated stochastic trajectory realizations by drawing state sequences 
+  based on the rows of $T$.
+  \begin{itemize}
+    \item While in a given state, we simulated motion according to the VAR(1)
+    parameterization of that state.
+    \item We set the unconditional mean of each state based on the position 
+    before the state transition occurred.
+  \end{itemize} 
   
   \subsection{Estimating Flux and Selectivity}
   %BJC: can make this discussion somewhat short since it's already in previous paper. 
@@ -257,6 +350,26 @@
 
   \section{Results and Discussion}
   
+  \subsection{Inferring Solute Transport Mechanisms}
+  
+  Clustering parameters sets results in X distinct dynamical modes.
+  \begin{itemize}
+    \item In the figure below, we show time series simulations that qualitatively
+    illustrate the difference in dynamical behavior between modes.
+  \end{itemize}
+   
+  %BJC1: a figure showing some representative fluctuations in each mode
+
+  \noindent We can relate the identified states back to transport mechanisms.
+  \begin{itemize}
+  	\item More detailed discussion of identified states
+  	\item How size of fluctuations, autoregressive parameters are influenced by trapping mechanisms
+  	\item How do these states compare to those identified in our previous work?
+  	\item Any new states?
+  \end{itemize}
+  
+  \subsection{Reproducing MD Trajectories and MSDs with the IHMM}
+  
   \noindent Trajectory realizations qualitatively match MD simulation trajectories.
   \begin{itemize}
     \item Look for hopping and trapping behavior
@@ -267,12 +380,7 @@
   	\item Look at curvature and 1-$\sigma$ confidence intervals
   \end{itemize}
   
-  \noindent We can relate the identified states back to transport mechanisms.
-  \begin{itemize}
-  	\item More detailed discussion of identified states
-  	\item How size of fluctuations, autoregressive parameters are influenced by trapping mechanisms
-  	\item Any new states?
-  \end{itemize}
+  \subsection{Estimating Solute Flux and Selectivity}  
   
   \noindent We can predict macroscopic flux and selectivity.
   \begin{itemize}
@@ -282,15 +390,15 @@
  
   \section{Conclusion}
   
-  \noindent We have shown that the iHMM can be used to parameterize solute time series
+  \noindent We have shown that the IHMM can be used to parameterize solute time series
   with an unknown number of latent dynamical modes. \\
   
-  \noindent We can use the iHMM to help identify mechanisms by relating the latent
+  \noindent We can use the IHMM to help identify mechanisms by relating the latent
   states to observed solute behavior. \\
   
-  \noindent We can use the iHMM to predict macroscopic transport properties. \\
+  \noindent We can use the IHMM to predict macroscopic transport properties. \\
   
-  \noindent The iHMM is not limited to the H\textsubscript{II} phase.
+  \noindent The IHMM is not limited to the H\textsubscript{II} phase.
   
   \section*{Supporting Information}
 
@@ -315,8 +423,8 @@
   \bibliographystyle{ieeetr}
   \bibliography{hdphmm}
 
-  \newpage
+  %\newpage
 
-  \section*{TOC Graphic}
+  %\section*{TOC Graphic}
 
 \end{document}
