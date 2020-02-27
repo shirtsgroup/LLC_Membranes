@@ -15,16 +15,16 @@
   % TFC membranes review -- "Composite reverse osmosis and nanofiltration membranes"
   \noindent Membrane design is completely dependent on the target particle separation. 
   \begin{itemize}
-    \item They can be classified based on the size of the particle they reject.
-    \item Microfiltration membranes contain 100-10000 nm pores. They can separate large
-    particles like bacteria and protozoa.~\cite{ma_functionalized_2014}
-    \item Ultrafiltration membranes have pore sizes about 5-500 nm and are useful for the 
-    separation of sugars, proteins, viruses and colloidal materials.~\cite{davey_ultrafiltration_2009}
-    \item Nanofiltration have pores on the order of 1 nm in size and can be used for the separation
+    \item Membranes are classified based on the size of the particle they reject.
+    \item Microfiltration membranes contain pores with diameters ranging from 100-10000 nm.
+    They can separate large particles like bacteria and protozoa.~\cite{ma_functionalized_2014}
+    \item Ultrafiltration membranes have pore diameters of about 5-500 nm and are useful for the 
+    separation of sugars, proteins, viruses and colloidal materials.~\cite{yanful_ultrafiltration_2009}
+    \item Nanofiltration have pores on the order of 1 nm in diameter and can be used for the separation
     of small organic molecules and charged species.~\cite{van_der_bruggen_review_2003}
     \item Reverse osmosis membranes are dense amorphous polymers with no explicit pores. Their
-    dense polymer architecture reject all solutes except water making them useful for 
-    separating hydrated ions from water.~\cite{warsinger_review_2018}
+    dense polymer architecture rejects all solutes to a high degree except for water making
+    them useful for separating hydrated ions from water.~\cite{warsinger_review_2018}
     \item We have summarized the uses of different classes of membrane 
     technologies in Figure~\ref{fig:size_regimes}.
     \item To deal with complex aqueous streams, and to prevent excessive membrane fouling, 
@@ -80,14 +80,18 @@
     pore sizes prevents perfect rejection.
   \end{itemize}
   
-  \noindent In amorphous membranes, water flux is modeled using the solution-diffusion 
+  In amorphous membranes, water and solute flux are modeled using the solution-diffusion 
   model.
   \begin{itemize}
     \item It is hypothesized that water and solute molecules partition into the
     membrane and diffuse across the polymer matrix due to a chemical potential
     gradient and then desorb into the permeate.
-    \item The solubility and diffusivity can be described in terms of the 
-    diffusive water and solute permeabilities ($P_w$ and $P_s$) respectively
+    \item The product of a component's solubility and diffusivity is commonly
+    referred to as its permeability, $P$.~\cite{wijmans_solution-diffusion_1995}
+    \item $P$ is an intrinsic material property and is thus independent of membrane
+    thickness.  % BJC: is intensive a more appropriate word than intrinsic?
+    \item The water permeability coefficient \textit{is} dependent on thickness, $\delta_m$,
+    and can be formulated in terms of the pure water permeability, $P_w$.
     \item \begin{equation}
     A = \frac{P_wV_w}{\delta_mR_gT}
     \end{equation}
@@ -97,7 +101,7 @@
     \begin{equation}
     J_s = \frac{P_s}{\delta_m}\Delta c_m = B\Delta c_m
     \end{equation}
-    where B is a solute permeability coefficient and \Delta c_m is the concentration
+    where B is a solute permeability coefficient and $\Delta c_m$ is the concentration
     difference across the selective membrane layer.
     \item Under these assumptions, rejection can be reformulated as
     \begin{equation}
@@ -118,7 +122,7 @@
     \item Perhaps the biggest detriment to energy consumption is the practical
 	need for multiple membrane passes in order to achieve a desired purity.
     \item Additionally, many membranes are not suited for high purity separations
-    of small neutral species which requires chemical and capital costs for
+    of small neutral species which necessitates chemical and capital costs for
     post-treatment
     \item Addressing these problems with highly selective separations may lead to 
     more gains.
@@ -133,20 +137,18 @@
   
   \subsection{Applications of Selective Membranes}
   
-  Selective separations are useful for a wide range of applications.  
+  Selective separations are useful in a wide range of applications.  
   
-  % Put this with the desalination section below maybe
-  % morton_environmental_1996,bhojwani_technology_2019
   \textit{Desalination}:
   Creating potable water from seawater or brackish water is of paramount importance
   in water-scarce areas. 
   \begin{itemize}
   	\item Compared with thermal distillation techniques, reverse osmosis has been 
   	shown to be more environmently friendly and economical due to its lower energy
-  	requirements.
+  	requirements.\cite{morton_environmental_1996}
   	\item Thermal techniques are still preferred where excess waste heat or cheap 
-  	thermal energy is available, such as cogeneration plants.
-  	\item RO has smaller footprint?
+  	thermal energy is available, such as cogeneration plants.\cite{bhojwani_technology_2019}
+  	\item RO has smaller footprint % BJC: need citation
   \end{itemize}
 
   \textit{Organic Micropollutants}:
@@ -154,14 +156,14 @@
   micropollutants, which have adverse effects on human health even at low 
   concentrations\cite{schwarzenbach_challenge_2006}
   \begin{itemize}
-    \item Micropollutants include pharmaceutical and personal care products, 
+    \item Micropollutants include pharmaceuticals, personal care products, 
     hormones, pesticides and industrial chemicals which find their way into
     our drinking water supply
     \item Is there any infrastructure built to combat this?
   \end{itemize}
   
   \textit{Recovery of Valuable Dissolved Species}: We can use highly selective
-  membranes in order to recover potentially valueable dissolved species from 
+  membranes in order to recover potentially valuable dissolved species from 
   complex waste streams. 
   
   Municipal waste-waters are rich in carbon, nitrogen and phosphorus-containing 
@@ -205,16 +207,16 @@
   Amorphous thin film composite (TFC) RO membranes are the current industry standard for
   high purity separations.
   \begin{itemize}  
-    \item Mostly desalination (?)
+    \item Desalination, concentration
     \item Typically you have a porous support layer for mechanical strength and 
     very thin active layer where the separations occur.
     \item Usually only let water through. Usually have to remineralize the
     water to make it drinkable.
   \end{itemize}
   
-  Operation requires high feed pressures.
+  Operation requires high feed pressures. (5 - 120 bar) ~\cite{van_der_bruggen_review_2003}
   
-  \subsection{Standard Nanofiltration}
+  \subsection{Standard Nanofiltration Membranes}
 
   Unlike RO membranes, NF membranes have explicitly defined pores. An
   ideal NF membrane should have densely packed, uniform-sized and
@@ -235,8 +237,8 @@
   \cite{apel_track_2001}. The pores are uniform, which benefits selectivity;
   however, the membranes have a low porosity and subsequently low permeability. 
   
-  Explicitly defined pores allows much lower feed pressures. However, polydispersity in
-  pore size lowers their selectivity relative to RO.
+  Explicitly defined pores allow lower feed pressures (3 - 20 bar),~\cite{van_der_bruggen_review_2003}
+  however, polydispersity in pore size lowers their selectivity relative to RO.
   
   \subsection{Nanostructured Membranes}
   
@@ -246,7 +248,8 @@
   issues with polydispersity. There have been a number explorations into different
   kinds of technologies for this application.
   
-  %BJC: format for following paragraphs maybe: Introduce tech, say how it would work, why it doesn't work 
+  %BJC: More detail on these sections to come.
+  % Probable format for following paragraphs: Introduce tech, say how it would work, then why it doesn't work 
   Ultrathin-film
   graphene and graphene oxide membranes are an active area of research because
   they are atomically thick and therefore offer potential for extremely high
@@ -302,11 +305,12 @@
     cylindrical aqueous channels. 
     \item These pore channels are lined with the chemical functionality of the LLC monomers
     and have the potential to interact with solutes in a chemically-dependent manner.
-    \item In theory, this topology is ideal for high flux and highly selective separations.
+    \item In theory, this pore topology and geometry is ideal for high flux and 
+    highly selective separations.
   \end{itemize}
   
   Unfortunately, it is a difficult task to align the self-assembled hexagonal
-  mesophases into continuous pores that traverse the width of the membrane.
+  mesophases into continuous pores that traverse the thickness of the membrane.
   \begin{itemize}
     \item Although the membranes have shown high experimental selectivity, their 
     flux has been very low due to misalignment of the hexagonal mesophases.
@@ -318,8 +322,8 @@
   alignment of the hexagonal mesophases.
   \begin{itemize}
     \item Feng et al. leverage the magnetic anisotropy of the columnar \
-    mesophases in order to control their alignment with a magnetic field~\cite{feng_scalable_2014}
-    \item Feng et al. also used an approach caused soft confinement which
+    mesophases in order to control their alignment with a magnetic field.~\cite{feng_scalable_2014}
+    \item Feng et al. also used an approach called soft confinement which
     takes advantage of the hexagonal columns preference towards anchoring
     perpendicular to either a PDMS or glass substrate.~\cite{feng_thin_2016}
     \item Finally, Feng et al. designed a third technique which uses a structure
@@ -341,7 +345,7 @@
   \end{itemize}
   
   The space group of the Q\textsubscript{I} phase configuration formed by
-  monomer 1 is uncertain and thought to be either Pn3m or Ia3d.
+  monomer 1 is uncertain and thought to be either Pn3m or Ia3d.  %BJC: will have accompanying figure
   \begin{itemize}
     \item 6 Q phase architectures have been identified in small molecule
     amphiphile systems.~\cite{mariani_cubic_1988}
@@ -477,7 +481,7 @@
     \item Mantha and Yethiraj as well as Roy et al. studied the dynamics of confined 
     water in these systems and showed orders of magnitude differences in their motion
     dependent on system geometry.~\cite{mantha_dynamics_2016,roy_water_2016}
-    \item Jackson et al. as well as Manthan et al. have combined experiment with simulation
+    \item Jackson et al. as well as Mantha et al. have combined experiment with simulation
     in order to show how the choice of monomer head group counterion regulate water 
     dynamics.~\cite{jackson_ion-specific_2018,mantha_counterion-regulated_2018}
     \item Sakamoto et al. and Nada et al. observed the dynamics of water molecules
