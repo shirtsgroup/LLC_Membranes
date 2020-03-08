@@ -10,6 +10,7 @@
     in size from microns down to nanometers
     \item Sediment, bacteria, algae, proteins, small organic molecules, and ions
     are all common components of aqueous streams.
+%MRS: maybe talk about molecular separations are particularly hard (to set up the work you do).
   \end{itemize}
   
   % TFC membranes review -- "Composite reverse osmosis and nanofiltration membranes"
@@ -22,6 +23,7 @@
     separation of sugars, proteins, viruses and colloidal materials.~\cite{yanful_ultrafiltration_2009}
     \item Nanofiltration have pores on the order of 1 nm in diameter and can be used for the separation
     of small organic molecules and charged species.~\cite{van_der_bruggen_review_2003}
+    %MRS: no explicit pores might not quite be right. . . because there are pores there, just not designed pores. tortuous Pores formed by collapsed polymer networks? 
     \item Reverse osmosis membranes are dense amorphous polymers with no explicit pores. Their
     dense polymer architecture rejects all solutes to a high degree except for water making
     them useful for separating hydrated ions from water.~\cite{warsinger_review_2018}
@@ -36,7 +38,10 @@
   \includegraphics[width=\textwidth]{figs/membrane_separation_size_regimes.pdf}
   \caption{}\label{fig:size_regimes}
   \end{figure}
-  
+
+%MRS: provide more of a context for this discussion.  Why are your reviewing this theory here?  
+%MRS: are you assuming solution/diffusion here? If so, state explicitly. 
+%MRS: OK after reading through, I have a suggestion.  Maybe the theory section should to nearer to the end.  At the beginning you talk more about membrane structure and applications, and talk about more traditional membranes, and then pivot to new membranes. Maybe you should stick with structure/function until you talk about the solute motion, and how it's NOT simple diffusioin, then talk about standard theory, then talk about the the need for alternative theory, and then introduce the ideas you will describe in much more detail in the chapters corresponding to your later papers.  Does that make sense as a strategy?
   \noindent Membrane permeation is the result of a chemical potential gradient, $\frac{d\mu_i}{dx}$.
   \begin{itemize}
 	  \item The flux of component $i$ is proportional to this gradient:
@@ -44,11 +49,13 @@
 	    J_i = -L_i \frac{d\mu_i}{dx}
 	  \end{equation}
 	  where $L_i$ is a coefficient of proportionality.~\cite{wijmans_solution-diffusion_1995}
+          %MRS2: mention what L depends on molecularly (even if uncalculatable)
 	  \item Chemical potential gradients can be induced by concentration, pressure, 
 	  temperature and electromotive forces.
-	  \item We will limit our discussion to concentration and pressure gradients.
+	  \item We will limit our discussion to concentration and pressure gradients. %MRS: mention why?
   \end{itemize}
-  
+
+  %MRS: is there are reason you are talkling about just water flux here?
   % This follows the discussion of werber_material_2016
   For pressure driven membrane processes, water flux through both porous and 
   amorphous membranes can be described by
@@ -59,7 +66,9 @@
   $\Delta P$ is the applied hydraulic pressure and $\Delta \pi_m$ is the 
   trans-membrane osmotic pressure difference. The water permeability coefficient
   is dependent on how one models flow through the membrane.
-  
+
+  %MRS: be clearer on presenting the context for this theory.  Will your findings be in contradiction?
+  %MRS: is this theory inadequate?  Will it be tested?
   In porous membrane architectures, water flux is modeled as laminar flow through 
   cylindrical pores.
   \begin{itemize}
@@ -114,6 +123,7 @@
   permeabilities, there is a case to be made that shifting the focus to membrane
   selectivity may offer a more effective route towards lowering the cost of 
   membrane separations.
+  %MRS: citation?
   \begin{itemize}
     \item Increasing permeabilities beyond those already achieved may have 
     only a small effect on energy requirements and capital costs. 
@@ -126,7 +136,8 @@
     post-treatment
     \item Addressing these problems with highly selective separations may lead to 
     more gains.
-  \end{itemize} 
+    %MRS: math (or citations) for this statement?
+ \end{itemize} 
   
 %  These equations provide a somewhat limited perspective on the molecular details
 %  of transport.
@@ -137,6 +148,7 @@
   
   \subsection{Applications of Selective Membranes}
   
+%MRS: Maybe the applications be presented before theory?
   Selective separations are useful in a wide range of applications.  
   
   \textit{Desalination}:
@@ -209,7 +221,10 @@
   \begin{itemize}  
     \item Desalination, concentration
     \item Typically you have a porous support layer for mechanical strength and 
-    very thin active layer where the separations occur.
+    very thin active layer where the 
+%MRS: added
+molecular/nanoscale
+separations occur.
     \item Usually only let water through. Usually have to remineralize the
     water to make it drinkable.
   \end{itemize}
@@ -217,7 +232,7 @@
   Operation requires high feed pressures. (5 - 120 bar) ~\cite{van_der_bruggen_review_2003}
   
   \subsection{Standard Nanofiltration Membranes}
-
+  %MRS: is explicitly defined the right word?  ``Created pores?''
   Unlike RO membranes, NF membranes have explicitly defined pores. An
   ideal NF membrane should have densely packed, uniform-sized and
   non-tortuous pores. This combination has been very difficult to realize.
@@ -263,7 +278,7 @@
   due to unprecedentedly fast water transport.\cite{humplik_nanostructured_2011,hummer_water_2001}
   \begin{itemize}
 	\item Practically, dispersing and aligning CNTs into a polymer matrix is extremely
-    difficult because they tend to agglomerate due to Van der Waals forces.~\cite{sahoo_polymer_2010}
+    difficult because they tend to agglomerate due to van der Waals forces.~\cite{sahoo_polymer_2010}
     \item Some work has been to functionalize the carbon nanotubes in order to better incorporate them. % need reference
   \end{itemize}
   
@@ -280,6 +295,9 @@
   \begin{itemize}
     \item They were orginally used for gas separations
   \end{itemize}
+
+%MRS: probably could generalize to self-assmbled porous materials as
+%the class in general, and the cross-linked LLC's as a particular exemplar.
   
   \section{Cross-linked Self Assembled Liquid Crystal Membranes for Selective Aqueous Separations}
   
@@ -292,7 +310,8 @@
   \end{itemize}
   
   %BJC: figure here showing each monomer and the phase they form
-  
+
+  %MRS: be more explicit what you mean by ``study''.
   In this work we study LLC membranes as an alternative nanostructured material for 
   highly selective aqueous separations.
   
@@ -305,6 +324,7 @@
     cylindrical aqueous channels. 
     \item These pore channels are lined with the chemical functionality of the LLC monomers
     and have the potential to interact with solutes in a chemically-dependent manner.
+    %MRS: could discuss concept that the effective pore size depends on the solute.
     \item In theory, this pore topology and geometry is ideal for high flux and 
     highly selective separations.
   \end{itemize}
@@ -360,7 +380,9 @@
     monomeric alkyltrimethylammonium salts used to synthesize the gemini LCs
     exhibit clear Ia3d symmetry.
   \end{itemize}
-  
+
+  %MRS: be more explicit that this is synthesis of usable amounts of
+  %actual separations membranes, not the molecules themselves.
   Due to its more facile synthesis, there has been significantly more development
   of Q\textsubscript{I} phase-forming monomers.
   \begin{itemize}
@@ -417,6 +439,7 @@
   study of rejection performance, it was shown that membranes formed by
   cross-linked Na-GA3C11 in the H\textsubscript{II} phase cannot separate solutes
   less than 1.2 nm in diameter because the pores are too large
+  %MRS: this above is interesting, since that seems somewhat inconsistent with the 
   \cite{zhou_supported_2005}. We do not yet understand how to controllably reduce
   the effective pore size or how to tune the chemical environment in the
   nanopores of this or related materials for small molecule separations. The only
@@ -511,6 +534,10 @@
     	  \item We characterize three different trapping mechanisms which lead
     	  to subdiffusive transport behavior.
     	\end{itemize}
+    %MRS: maybe talk more about the stochastic modeling itself; for example, could phrase it in terms of
+    %how you can test mechanistic models to see if they are consistent with the timeseries, and then how those models
+    %can be further extrapolated to physical observables even if the MD simulations cannot. 
+    %MRS: this MIGHT include using the effective diffusion in a solution/diffusion model.
     \item Can we estimate experimentally-relevant macroscopic properties?
     	\begin{itemize}
     	  \item Using our qualitative understanding of the dominant trapping mechanisms,
@@ -521,6 +548,7 @@
     	  \item We then show how we can use our most promsiing model in order to connect 
     	  microscopic transport to macroscopic flux and selectivity.
     	\end{itemize}
+    %MRS: this might be overly ambitions.  Maybe something more like: How can the timeseries data inform us about the mechanism directly?
     \item How can we learn mechanisms with minimal human intervention?  %BJC: i.e. machine learning methods
     	\begin{itemize}
     	  \item Although our stochastic models show great promise, their development 
