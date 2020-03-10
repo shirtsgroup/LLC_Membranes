@@ -53,8 +53,9 @@
   	hexagonally packed, straight, pores while the Q\textsubscript{I} phase consists of
   	a tortuous network of 3D interconnected pores. 
   	\item In both cases the pores are uniform in size with radii on the order of 1 nm
-         %MRS2: is it really a molecular weight cutoff?
-  	giving them a very strict molecular weight cut-off.
+    %MRS2: is it really a molecular weight cutoff?
+    %BJC2: is molecular size better? Obviously there are other factors like shape, but I don't want to get into that
+  	giving them a very strict molecular size cut-off.
 	\item Additionally, they have the potential to disrupt conventional membrane separation
 	techniques by being selective based not only on size and charge, but on chemical
 	functionality as well.
@@ -223,7 +224,7 @@
   
   Hidden Markov models (HMMs) are a useful and widely used technique
   for modeling sequences of observations where the probability of the next observation
-  in a sequence depends only on a previous unobserved, latent or hidden, state.~\cite{beal_infinite_2002}
+  in a sequence depends on a previous unobserved, latent or hidden, state.~\cite{beal_infinite_2002}
   %MRS2: it can depend on other things, but ALSO depends on the latent state.
   \begin{itemize}
     \item In the context of our simulations, the observations correspond to 
@@ -304,7 +305,7 @@
     \item We measured the radial coordinate as the distance from the closest
     pore center.
     \item Because the pores are somewhat tortuous, we approximated the pore 
-    center as a spline. See previous work.
+    center with a spline. See previous work.
     %MRS2: approximated the pore center line with a spline?
   \end{itemize}
   
@@ -428,6 +429,9 @@
   \section*{Acknowledgements}
 
   %MRS2: add GAANN and PRF here to cover bases.
+  This work was supported in part by the ACS Petroleum Research Fund
+  grant \#59814-ND7 and the Graduate Assistance in Areas of National Need (GAANN) 
+  fellowship which is funded by the U.S. Department of Education. 
   Molecular simulations were performed using the Extreme Science and
   Engineering Discovery Environment (XSEDE), which is supported by National
   Science Foundation grant number ACI-1548562. Specifically, it used the Bridges

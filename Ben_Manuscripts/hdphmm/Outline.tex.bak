@@ -29,6 +29,7 @@
   
   There is a need for highly selective membranes in order to perform efficient 
   separations of components of complex aqueous streams.
+  %MRS2: add some more examples (When you get around to it).
   \begin{itemize}
     \item Organic micropollutants
     \item Desalination and boric acid removal from seawater.
@@ -52,7 +53,9 @@
   	hexagonally packed, straight, pores while the Q\textsubscript{I} phase consists of
   	a tortuous network of 3D interconnected pores. 
   	\item In both cases the pores are uniform in size with radii on the order of 1 nm
-  	giving them a very strict molecular weight cut-off.
+    %MRS2: is it really a molecular weight cutoff?
+    %BJC2: is molecular size better? Obviously there are other factors like shape, but I don't want to get into that
+  	giving them a very strict molecular size cut-off.
 	\item Additionally, they have the potential to disrupt conventional membrane separation
 	techniques by being selective based not only on size and charge, but on chemical
 	functionality as well.
@@ -64,6 +67,7 @@
   \begin{itemize}
     \item Experimental observables like permeability and selectivity allow us to speculate
     about the molecular origins of separation processes.
+    %MRS2: not quite sure what you mean below?
     \item This drives an empirical design approach which can potentially neglect key
     interactions which influence selectivity.
     \item LLC membranes have been shown to exhibit selectivities which cannot be fully 
@@ -84,6 +88,7 @@
   able to make well-converged predictions of macroscopic transport properties 
   traditionally used to characterize membranes in the lab.
   \begin{itemize}
+    %MRS2: would be good to get this next point into the first line of a paragraph, since it's quite important. 
     \item However, if we use descriptive stochastic models that can capture solute
     dynamics, then we could project long timescale behavior in addition to gaining
     a deeper understanding of solute behavior on short timescales.
@@ -126,7 +131,7 @@
   % The former is definitely simpler.
   % MRS: True.  I would probably see which is used more in the literature. 
   % BJC1: going with IHMM. HDPHMM seems to mostly be used by Emily Fox
-  In this work, we apply the infinite hidden markov model (IHMM), a modeling
+  In this work, we apply the infinite hidden Markov Model (IHMM), a modeling
   approach that is agnostic to the source of time series data, in order to 
   automatically detect and infer the parameters of an unknown number of latent
   autoregressive (AR) modes present in solute center-of-mass time series.
@@ -143,7 +148,8 @@
   \begin{itemize}
     \item We compare the inferred mechanisms to those which we manually
     identified in our previous work. 
-    \item Some kind of conclusion here. Did we find more or less states. Any new states/ subdivisions of states?
+    %MRS2: don't put the conclusions in the introduction.  Instead, state clearly the questions you will ask and the hypotheses you will test.
+   \item Some kind of conclusion here. Did we find more or less states. Any new states/ subdivisions of states?
   \end{itemize}
   
   We can also use the IHMM to generate stochastic trajectory realizations that share
@@ -159,6 +165,7 @@
   macroscopic flux of each solute and selectivity of the LLC membranes studied towards
   each solute.
   \begin{itemize}
+    %MRS2: shouldn't reach conclusions in intro, just set up questions to be answered (conclusions SHOULD be in abstract).
     \item We relate these macroscopic properties to our nanoscopic model by simulating 
     mean first passage time (MFPT).
     \item Some kind of conclusion. This membrane is selective towards solutes with this
@@ -186,7 +193,7 @@
     \item We chose to study the 10 wt \% water system because solutes move 
     significantly faster than in the 5 wt \% system studied previously.
     \item Appropriate stochastic modeling requires that solutes sample the 
-    accessible mechanisms with representative probability.
+    accessible mechanisms with representative probability.%MRS: only possible on the ~1-10 \mu scale with relatively fast solutes.
   \end{itemize}
   
   We chose to study a subset of 4 of the fastest moving solutes from our previous
@@ -217,7 +224,8 @@
   
   Hidden Markov models (HMMs) are a useful and widely used technique
   for modeling sequences of observations where the probability of the next observation
-  in a sequence depends only on a previous unobserved, latent or hidden, state.~\cite{beal_infinite_2002}
+  in a sequence depends on a previous unobserved, latent or hidden, state.~\cite{beal_infinite_2002}
+  %MRS2: it can depend on other things, but ALSO depends on the latent state.
   \begin{itemize}
     \item In the context of our simulations, the observations correspond to 
     the center of mass coordinates of the solutes versus time, and the states
@@ -269,6 +277,7 @@
   	Previous observations are weighted by coefficient matrices $A_i$. The VAR($r$) 
   	process is further characterized by a shift in the mean of each dimension by the
   	vector $\mathbf{c}$ and a white noise term $\mathbf{e}_t$.~\cite{hamilton_time_1994}
+        %MRS2: mean is zero in Z, is it necessarily in R (I realize we've talked about this before, but wanted to get the clarification in text)
   	\item We assumed multivariate Gaussian noise, with mean zero and covariance, $\Sigma$.
   	\item We limited our analysis to an autoregressive order of $r=1$. %BJC: might try higher orders, but probably not worth it
   	\item We used a conjugate matrix-normal inverse-Wishart prior on parameters
@@ -296,13 +305,20 @@
     \item We measured the radial coordinate as the distance from the closest
     pore center.
     \item Because the pores are somewhat tortuous, we approximated the pore 
-    center as a spline. See previous work.
+    center with a spline. See previous work.
+    %MRS2: approximated the pore center line with a spline?
   \end{itemize}
   
   We clustered like parameter sets in order to reduce the state space to
   a more easily interpretable size.
   \begin{itemize}
-    \item Since the mean vector, $\mathbf{c}$ of each state can take on 
+    %MRS2: can you enforce that the mean in the z-component is zero?
+    %MRS2: I'm trying to think what other constraints should be enforced. 
+    %MRS2: the issue with state clustering is that when transitionin between two states that are clustered, 
+    %MRS2: it destroys the correlation that would have been within if it was all the same statee.
+    %MRS2: I'm not sure what the implications are. If the simulations are RUN with grouped states, 
+    %MRS2: then the correlation can be reintroduced, so maybe it doesn't matter?
+   \item Since the mean vector, $\mathbf{c}$ of each state can take on 
     continuous values, the IHMM algorithm tends to find a large number of states,
     with very few states revisited.
     % BJC1: This will need to be updated depending on how I cluster. Might need to describe
@@ -349,7 +365,7 @@
   where $\Delta C_j$ is the trans-membrane concentration difference.
 
   \section{Results and Discussion}
-  
+  %MRS2: how stable are the results to realizations of the system
   \subsection{Inferring Solute Transport Mechanisms}
   
   Clustering parameters sets results in X distinct dynamical modes.
@@ -371,12 +387,15 @@
   \subsection{Reproducing MD Trajectories and MSDs with the IHMM}
   
   \noindent Trajectory realizations qualitatively match MD simulation trajectories.
+
   \begin{itemize}
+    %MRS2: think about how to quantify the simiilarity of the hopping and trapping behavior.
     \item Look for hopping and trapping behavior
   \end{itemize}
   
   \noindent MSDs generated from stochastic trajectories match those from MD.
   \begin{itemize}
+    %MRS2: again, think about the best ways to quantify similar between MD and stochastic trajectories.
   	\item Look at curvature and 1-$\sigma$ confidence intervals
   \end{itemize}
   
@@ -398,6 +417,7 @@
   
   \noindent We can use the IHMM to predict macroscopic transport properties. \\
   
+  %MRS2: below probably doesn't need to be stated?
   \noindent The IHMM is not limited to the H\textsubscript{II} phase.
   
   \section*{Supporting Information}
@@ -408,6 +428,10 @@
 
   \section*{Acknowledgements}
 
+  %MRS2: add GAANN and PRF here to cover bases.
+  This work was supported in part by the ACS Petroleum Research Fund
+  grant \#59814-ND7 and the Graduate Assistance in Areas of National Need (GAANN) 
+  fellowship which is funded by the U.S. Department of Education. 
   Molecular simulations were performed using the Extreme Science and
   Engineering Discovery Environment (XSEDE), which is supported by National
   Science Foundation grant number ACI-1548562. Specifically, it used the Bridges

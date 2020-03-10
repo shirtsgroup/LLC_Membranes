@@ -10,38 +10,475 @@
     in size from microns down to nanometers
     \item Sediment, bacteria, algae, proteins, small organic molecules, and ions
     are all common components of aqueous streams.
-%MRS: maybe talk about molecular separations are particularly hard (to set up the work you do).
+    \item The diversity in size and chemical topology of contaminants makes the
+    design of membrane processes meant to separate these components complex.
+    \item To deal with complex aqueous streams, and to prevent excessive membrane
+    fouling, multiple types of membranes are often used in series, removing 
+    larger particles first.~\cite{goosen_fouling_2005}
   \end{itemize}
   
   % TFC membranes review -- "Composite reverse osmosis and nanofiltration membranes"
-  \noindent Membrane design is completely dependent on the target particle separation. 
+  \noindent Modern membrane design is completely dependent on the target particle 
+  separation. 
   \begin{itemize}
-    \item Membranes are classified based on the size of the particle they reject.
-    \item Microfiltration membranes contain pores with diameters ranging from 100-10000 nm.
-    They can separate large particles like bacteria and protozoa.~\cite{ma_functionalized_2014}
-    \item Ultrafiltration membranes have pore diameters of about 5-500 nm and are useful for the 
+    \item Separation membranes are most broadly classified based on the size of 
+    the particle they reject.
+    \item Microfiltration (MF) membranes contain pores with diameters ranging from 
+    100-10000 nm. They can separate large particles like bacteria and protozoa.~\cite{ma_functionalized_2014}
+    \item Ultrafiltration (UF) membranes have pore diameters of about 5-500 nm and are useful for the 
     separation of sugars, proteins, viruses and colloidal materials.~\cite{yanful_ultrafiltration_2009}
-    \item Nanofiltration have pores on the order of 1 nm in diameter and can be used for the separation
-    of small organic molecules and charged species.~\cite{van_der_bruggen_review_2003}
-    %MRS: no explicit pores might not quite be right. . . because there are pores there, just not designed pores. tortuous Pores formed by collapsed polymer networks? 
-    \item Reverse osmosis membranes are dense amorphous polymers with no explicit pores. Their
-    dense polymer architecture rejects all solutes to a high degree except for water making
-    them useful for separating hydrated ions from water.~\cite{warsinger_review_2018}
-    \item We have summarized the uses of different classes of membrane 
-    technologies in Figure~\ref{fig:size_regimes}.
-    \item To deal with complex aqueous streams, and to prevent excessive membrane fouling, 
-    these technologies are often used in series, removing larger particles first.~\cite{goosen_fouling_2005}
+    \item Nanofiltration (NF) membranes have pores on the order of 1 nm in diameter and can 
+    be used for the separation of small organic molecules and charged species.~\cite{van_der_bruggen_review_2003}
+    \item Reverse osmosis (RO) membranes are dense amorphous polymers with tortuous 
+    pathways formed by collapsed polymer networks. Their dense polymer architecture 
+    rejects all solutes to a high degree except for water making them useful for 
+    separating hydrated ions from water.~\cite{warsinger_review_2018}
+    \item We have summarized the uses of the different classes of membrane technologies in 
+    Figure~\ref{fig:size_regimes}.
   \end{itemize}
   
   \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{figs/membrane_separation_size_regimes.pdf}
-  \caption{}\label{fig:size_regimes}
+  \caption{Caption of the future}\label{fig:size_regimes}
   \end{figure}
+  
+  Membranes are generally designed to maximize two key performance metrics: 
+  permeability and selectivity.
+  \begin{itemize}
+    \item Permeability is used to quantify the rate at which solvent and solutes
+    pass through the membrane.
+    \item Selectivity quantifies the relative rates of passage of two substances.
+    \item A related quantity to selectivity, rejection, quantifies the fraction
+    of undesired solute that does not pass through the membrane.
+  \end{itemize}
+  
+  Although there has been considerable focus on creating membranes with high
+  permeabilities, there is a case to be made that shifting the focus to membrane
+  selectivity may offer a more effective route towards lowering the cost of 
+  membrane separations.~\cite{werber_materials_2016}
+  \begin{itemize}
+    \item Increasing permeabilities beyond those already achieved may have 
+    only a small effect on energy requirements and capital costs. 
+    \item Cohen-Tanugi et al. calculated that tripling membrane permeability
+    could reduce energy consumption up to 15\% in a seawater RO plant.~\cite{cohen-tanugi_quantifying_2014}
+    \item Perhaps the biggest detriment to energy consumption is the practical
+	need for multiple membrane passes in order to achieve a desired purity.
+    \item Additionally, many membranes are not suited for high purity separations
+    of small neutral species which necessitates chemical and capital costs for
+    post-treatment.
+    \item Addressing these problems with highly selective separations may lead to 
+    more gains.
+    %MRS: math (or citations) for this statement?
+ \end{itemize} 
+  
+  \subsection{Applications of Selective Membranes}
+  
+  %BJC2: this section needs meat and citations
+  
+  Selective separations are useful in a wide range of applications.  
+  
+  \textit{Desalination}:
+  Creating potable water from seawater or brackish water is of paramount importance
+  in water-scarce areas. 
+  \begin{itemize}
+  	\item Compared with thermal distillation techniques, RO has been shown to 
+  	be more environmently friendly and economical due to its lower energy
+  	requirements.\cite{morton_environmental_1997}
+ 	\item In general, RO has a smaller footprint % BJC: need citation
+  	\item Thermal techniques are still preferred where excess waste heat or cheap 
+  	thermal energy is available, such as cogeneration plants.\cite{bhojwani_technology_2019}
+  \end{itemize}
 
-%MRS: provide more of a context for this discussion.  Why are your reviewing this theory here?  
-%MRS: are you assuming solution/diffusion here? If so, state explicitly. 
-%MRS: OK after reading through, I have a suggestion.  Maybe the theory section should to nearer to the end.  At the beginning you talk more about membrane structure and applications, and talk about more traditional membranes, and then pivot to new membranes. Maybe you should stick with structure/function until you talk about the solute motion, and how it's NOT simple diffusioin, then talk about standard theory, then talk about the the need for alternative theory, and then introduce the ideas you will describe in much more detail in the chapters corresponding to your later papers.  Does that make sense as a strategy?
+  \textit{Organic Micropollutants}:
+  Municipal and industrial wastewaters are contaminated by harmful
+  micropollutants, which can have adverse effects on human health even at low 
+  concentrations.\cite{schwarzenbach_challenge_2006}
+  \begin{itemize}
+    \item Micropollutants include pharmaceuticals, personal care products, 
+    hormones, pesticides and industrial chemicals which find their way into
+    our drinking water supply.
+    %BJC2: There is a review I need to wade through to bulk this up.
+    \item Is there any infrastructure built to combat this?
+  \end{itemize}
+  
+  \textit{Recovery of Valuable Dissolved Species}: We can use highly selective
+  membranes in order to recover potentially valuable dissolved species from 
+  complex waste streams. 
+  
+  Municipal waste-waters are rich in carbon, nitrogen and phosphorus-containing 
+  compounds. % i.e. poop
+  \begin{itemize}  
+    \item The recovery of such products, which can be achieved using a 
+    selective membrane, has numerous potential uses.\cite{sales_resource_2015}
+    \item For example, nitrogen and phosphorus recovery can help sustain fertilizer 
+    production which will help meet global food demand as population continues
+    to increase.\cite{xie_membrane-based_2016}
+  \end{itemize}
+
+  Industrial waste-waters are often quite complex with up to six times more 
+  total dissolved solids than seawater\cite{werber_materials_2016}. 
+  \begin{itemize}
+    \item For example, flowback water, produced during hydraulic fracturing of
+    shale formations consists of relatively high concentrations of salts, metals,
+    and soluble organic compounds. 
+    \item The majority of this water is disposed through deep well injection, 
+    however there is a growing public concern about its management which has 
+    prompted the use of separation technologies such as RO and NF in order to 
+    reduce the volume of contaminated water.~\cite{gregory_water_2011}
+    \item Some of the dissolved organic compounds in flowback water, such as acetate, 
+    are potentially valuable and can be recovered with highly selective membranes
+    \cite{dischinger_application_2017}.
+  \end{itemize}
+  
+  \textit{Breathable barriers}:
+  
+  Finally, there is a great deal of military interest in creating breathable 
+  barriers which selectively allow the passage of water in both directions but
+  blocks out harmful contaminants.
+  \begin{itemize}
+    \item Need to allow sweating
+    \item Can even put catalytic groups in the pores to break down contaminants
+  \end{itemize}
+
+  \section{Competing Membrane Technologies}
+  %BJC2: maybe better to title this section "Historical Development of Membrane Technology"
+  
+  Membranes for separations are a relatively young technology. Over the past 60 years, 
+  the field has grown into a commercially viable technology and the focus has shifted
+  primarily towards incremental improvements in performance and most importantly,
+  targeted separations. This section will briefly cover a subset of the most relevant
+  membrane technologies which have ultimately inspired this thesis.
+  
+  \subsection{Reverse Osmosis Membranes}
+  
+  The first aqueous separations membranes were developed for RO applications 
+  in the 1960s and were made of the amorphous polymer cellulose acetate (CA).~\cite{kesting_semipermeable_1965}
+  \begin{itemize}
+    \item Reid and Spencer were among the first to show the ability of
+    these membranes to reject NaCl to high degrees ($\sim$ 99 \%) while subject 
+    to high applied pressures (270 atm).~\cite{reid_ultrafiltration_1960}
+    \item The most limiting drawback to CA membranes is their chemical instability, 
+    undergoing severe hydrolysis at pH values outside the range 4--6.~\cite{vos_kinetic_1966}
+  \end{itemize}
+  
+  Amorphous thin film composite (TFC) polyamide membranes are the current industry 
+  standard for high purity RO separations.~\cite{baker_membrane_2012}
+  \begin{itemize}  
+    \item Developed in the 1980s, polyamide membranes are capable of rejecting salt
+    to a higher degree and can operate at wider pH ranges and higher feed pressures than 
+    CA membranes.~\cite{cadotte_interfacial_1981}
+    \item TFC polyamide membranes are typically formed by the interfacial polymerization
+    of a polyamide selective layer on the surface of a microporous polysulfone support 
+    layer.    
+    \item The support layer gives the membrane mechanical strength without hindering the
+    flow of water thereby permitting a very thin selective layer where molecular 
+    separations occur.~\cite{kucera_biofouling_2019}
+  \end{itemize}
+  
+  The dense polyamide selective layers of TFC membranes require high feed pressures,
+  in the range of 5 -- 120 bar, in order to achieve a useful permeate flux.~\cite{van_der_bruggen_review_2003}
+  \begin{itemize}
+    \item While the energy requirements to attain these pressures are still less than 
+    the energy requirements of thermal distillation\cite{morton_environmental_1997}, it 
+    is often desirable to create membranes that can operate at lower feed pressures.
+    %BJC2: probably could use some citations here
+    \item It is not always necessary to achieve the high purity permeate streams
+    resulting from RO.
+    \item It is also possible that a target separation may be possible with 
+    membranes containing larger pores.
+    \item This has driven research into nanofiltration.
+  \end{itemize}
+  
+  \subsection{Nanofiltration Membranes}
+
+  Nanofiltration membranes have pores on the order of 1 nm in size. Larger pore sizes 
+  allow lower operating pressures (3 -- 20 bar) which lowers energy consumption.~\cite{van_der_bruggen_review_2003}
+  An ideal NF membrane should have densely packed, uniform-sized and non-tortuous pores.
+  This combination has been practically difficult to realize.
+
+  The most widely used methods of NF membrane fabrication are interfacial polymerization
+  and phase inversion.
+  \begin{itemize}
+    \item By modifying the monomer materials, one can control the structural morphology
+    produced by interfacial polymerization to create pores larger than those in RO
+    membranes.~\cite{seman_nanofiltration_2010}
+    \item During phase inversion, one submerges a polymer, dissolved in a solvent, in
+    a non-solvent. A solid, porous polymer membrane is all that remains once all
+    solvent has been removed by non-solvent exchange.~\cite{smolders_microstructures_1992}
+    \item Although commercially dominant, both of these techniques suffer from
+    tortuous pores and polydisperse pore sizes which results in far from ideal 
+    selectivities.
+  \end{itemize}  
+    
+  Track-etching is another technique which attempts to eliminate polydispersity and tortuosity.
+  During track-etching, a polymer film is bombarded with charged particles, then chemically 
+  etched to create pores.~\cite{apel_track_2001}
+  \begin{itemize}
+	\item Although the pores are uniform and non-tortuous, benefitting selectivity, the 
+	membranes have an extremely low pore density subsequently low permeability. 
+  \end{itemize}
+  
+  %BJC2: maybe one more paragraph here with applications
+  
+  \subsection{Nanostructured Membranes}
+  
+  Nanostructured membrane materials have the potential to achieve the high selectivity
+  of RO with the low feed pressure requirements of NF. Nanostructured materials of 
+  interest typically have explicit nm-size pores that are uniform in size, eliminating
+  issues with polydispersity. There have been a number of explorations into different
+  kinds of technologies for this application.
+  
+  %BJC2: would a figure showing the nanostructures go well here? (a graphene film, a carbon nanotube, a MOF, a zeolite)
+  
+  %BJC2: Each tecnhology below will likely have its own heading and be split into 2 or more 
+  % paragraphs.
+  
+  Ultrathin-film graphene and graphene oxide membranes are an active area of research because
+  they are atomically thick materials and therefore offer potential for extremely high
+  permeability membranes.~\cite{humplik_nanostructured_2011} 
+  \begin{itemize}
+    \item The tightly packed aromatic network of $sp^2$ hybridized carbon atoms that 
+    make up graphene sheets precludes the passage of even the smallest monoatomic species, helium.~\cite{bunch_impermeable_2008}
+    \item Controllably-sized pores have been created in pristine graphene by plasma etching
+    and by charged particle bombardment.~\cite{surwade_water_2015,russo_atom-by-atom_2012}
+    \item Graphene oxide (GO), a highly oxidized modification of graphene, consist of epoxy,
+    hydroxyl and carboxylate functional groups.~\cite{hegab_graphene_2015}
+    \item Many groups study GO membranes because they have improved antibacterial properties 
+    over graphene, leading to less membrane fouling, and because their functionality can be
+    modified in order to achieve solute-specific separations.~\cite{liu_antibacterial_2011,he_bioinspired_2013}
+    \item Despite their promise, scalable synthesis of monolayer graphene and GO membranes without
+    introducing microscopic, performance degrading defects has not yet been achieved.~\cite{cohen-tanugi_multilayer_2016,wei_multilayered_2018}
+    \item Multilayered GO membranes have shown considerably more progress since their 
+    synthesis procedures are low cost and scalable.~\cite{zhang_size-controlled_2009}
+    \item GO sheets are particularly easy to make into multilayered membranes since they 
+    stack on top of each other, held together by hydrogen bonds.~\cite{homaeigohar_graphene_2017}
+    \item The potential of graphene and GO membrane certainly merits their continued exploration. Many
+    groups are still working in order to work on better control and standardization of their synthesis,
+    improving their designability for specific separations, and further improving their scalability.~\cite{wei_multilayered_2018}
+  \end{itemize}    
+  
+  Carbon nanotubes (CNTs) have shown promise as aqueous separations membranes
+  due to unprecedentedly fast water transport.\cite{humplik_nanostructured_2011}
+  \begin{itemize}
+    \item CNTs are an allotrope of carbon consisting of tubular graphitic layers.~\cite{iijima_helical_1991}
+    \item One can control CNT diameters down to 0.5 nm in size which has inspired the
+    creation of CNT membranes for reverse osmosis applications.~\cite{sun_creating_2000}
+    \item Molecular dynamics simulations have predicted and experiments have confirmed that
+    CNTs are extremely fast transporters of water.~\cite{hummer_water_2001,joseph_why_2008}
+    \item MD simulations by Kalra et al. predicted water transport at rates comparable
+    to the transmembrane protein aquaporin-1.~\cite{kalra_osmotic_2003}
+    \item Experiments have exhibited water transport rates orders of magnitude higher than 
+    predictions by continuum modeling.~\cite{holt_fast_2006}
+    \item This enhancement has been explained as a result of nearly friction-less single-file water
+    flow through the hydrophobic CNT interiors.~\cite{kalra_osmotic_2003}
+    \item Functionalization of the CNT pore entrances can potentially lead to highly selective separations.~\cite{fornasiero_ion_2008}
+	\item Practically, dispersing and aligning CNTs into a polymer matrix is extremely
+    difficult because they tend to agglomerate due to van der Waals forces.~\cite{sahoo_polymer_2010}
+    \item Some work has been to functionalize the carbon nanotubes in order to better incorporate them,
+    however facile incorporation at scale remains a challenge yet to be overcome.~\cite{kim_polysulfone_2007}
+  \end{itemize}
+  
+  Zeolite membranes offer the potential for permeabilities comparable to ultrafiltration, 
+  with selectivities as good as NF and RO.~\cite{hoek_nanotechnology-based_2014}
+  \begin{itemize}  
+    \item Zeolites have highly uniform nm-sized crystalline structures with cage-like
+    cavities that allow movement and trapping of small solutes. 
+    \item The crystalline frameworks are typically formed by networks of silicon 
+    and aluminum each attached to 4 oxygen atoms in a tetrahedral arrangement.~\cite{auerbach_handbook_2003}
+    \item One can replace the silicon and aluminum atoms via ion exchange in order
+    to control the size of the cavities and hence its molecular-seiving properties.~\cite{li_novel_2007}
+    \item Zeolite-coated ceramic membranes have shown the most promise for RO applications
+    because of their mechanical stability under high applied pressure and chemical
+    stability for withstanding disinfectants.~\cite{pendergast_review_2011}
+    \item A number of studies have tested the permeability and sodium salt rejection
+    of various zeolite membranes, however their high permeabilities typcially come
+    at the cost of low selectivities and vice versa.~\cite{li_desalination_2004,duke_seawater_2009}
+    \item Zeolites are also prone to defects in the crystalline structure which 
+    would require substantial modification to the traditional synthesis procedures
+    in order to fix.~\cite{kumakiri_application_2000}
+  \end{itemize}
+
+  Finally, metal organic frameworks (MOFs) have been recently introduced to the
+  field of aqueous separations.
+  \begin{itemize}
+    \item MOFs are highly porous and flexible crystalline structures made of metal
+    clusters coordinated to organic ligands.~\cite{furukawa_chemistry_2013}
+    \item There is a much wider breadth of research into MOFs as gas separation membranes
+    because they tend to be unstable in water.~\cite{feng_construction_2013}
+    \item But a new generation of water-stable MOFs is making it possible to use them
+    in aqueous separations.~\cite{wang_ultrastable_2015}
+    \item Purification of both aqueous and gaseous streams using MOFs are 
+    typically achieved by selective adsorption or catalytic degradation.~\cite{li_metalorganic_2012}    
+    \item MOFs have been applied towards the removal of a number of common water 
+    contaminants including dyes, pesticides, endocrine disruptors, and pharmaceuticals.
+    \cite{zhang_fabrication_2015,seo_adsorptive_2015,li_metalorganic_2015,hasan_adsorptive_2012}
+    \item Although aqueous MOF separations are theorized to surpass the performance 
+    of conventional membrane separations, it is still a budding field. The stability and
+    reusability of the material must be guaranteed before they can be implemented
+    at scale.~\cite{dias_towards_2015}
+  \end{itemize}
+  
+  \section{Cross-linked Self Assembled Liquid Crystal Membranes for Selective Aqueous Separations}
+  
+  Amphiphilic molecules that self-assemble to form ordered nanostructures have shown
+  potential as nanoporous membranes.
+  \begin{itemize}
+    \item Block copolymers
+    \item Some other amphiphilic self-assembled thing
+    \item Liquid crystals as the guy we are studying because we have lots of 
+    experimental data.
+  \end{itemize}
+    
+  Under the right conditions, the shape and amphiphilic character of the monomers in 
+  Figure TBD drives their self assembly into ordered nanostructures.
+  \begin{itemize}
+    \item Monomer 1 can form the inverted hexagonal phase (H\textsubscript{II})
+    \item Monomer 2 will form the bicontinuous cubic phase (Q\textsubscript{I})
+    \item The tails have vinyl groups which can be cross-linked for mechanical strength.
+  \end{itemize}
+  
+  %BJC: figure here showing each monomer and the phase they form
+
+  In this work we attempt to understand how one can design LLC membranes as 
+  alternative nanostructured materials for highly selective aqueous separations.
+  
+  \subsection{The H\textsubscript{II} Phase}
+   
+  The H\textsubscript{II} phase is characterized by hexagonally packed, uniform-sized
+  and straight pores.
+  \begin{itemize}
+    \item The hydrophilic head groups aggregate in the pore centers to create
+    cylindrical aqueous channels. 
+    \item These pore channels are lined with the chemical functionality of the LLC monomers
+    and have the potential to interact with solutes in a chemically-dependent manner.
+    \item The inhomogeneity of the pores suggests that the effective pore size may depend
+    on the solute. Both the size, shape and chemical functionality will influence
+    how a solute partitions within the membrane. %BJC2: need to rework this sentence.
+    \item In theory, this pore topology and geometry is ideal for high flux and 
+    highly selective separations.
+  \end{itemize}
+  
+  Unfortunately, it is a difficult task to align the self-assembled hexagonal
+  mesophases into continuous pores that traverse the thickness of the membrane.
+  \begin{itemize}
+    \item Although the membranes have shown high experimental selectivity, their 
+    flux has been very low due to misalignment of the hexagonal mesophases.
+  \end{itemize}
+  
+%  Recently, Feng et al. has come up with two methods which can be used to 
+%  macroscopically align the hexagonal mesophases. 
+  Considerable recent efforts have made progress towards the macroscopic
+  alignment of the hexagonal mesophases.
+  \begin{itemize}
+    \item Feng et al. leverage the magnetic anisotropy of the columnar \
+    mesophases in order to control their alignment with a magnetic field.~\cite{feng_scalable_2014}
+    \item Feng et al. also used an approach called soft confinement which
+    takes advantage of the hexagonal columns preference towards anchoring
+    perpendicular to either a PDMS or glass substrate.~\cite{feng_thin_2016}
+    \item Finally, Feng et al. designed a third technique which uses a structure
+    directing molecule in order to template the assembly of a fatty acid 
+    molecule into ordered columnar phases.~\cite{feng_highly_2017}
+    \item Aligned hexagonal phase membranes exhibited an 85 fold increase in 
+    ionic conductivity.~\cite{feng_scalable_2014}
+  \end{itemize}
+  
+  \subsection{The Q\textsubscript{I} Phase}
+  
+  The bicontinuous cubic, or Q\textsubscript{I} phase, is a class 
+  of nanostructured phases characterized by a network of 3 dimensionally
+  interconnected pores.
+  \begin{itemize}
+    \item Aside from its tortuous pore architecture, it shares the 
+    uniform size and complex topological features of the H\textsubscript{II} phase
+    which lends itself to highly selective separations.
+    \item Although water and solutes must follow a longer path in order to pass
+    through Q\textsubscript{I} membranes, they are more practical to synthesize
+    because the mesophases do not require alignment. 
+  \end{itemize}
+  
+  The space group of the Q\textsubscript{I} phase configuration formed by
+  monomer 1 is uncertain and thought to be either Pn3m or Ia3d.  %BJC: will have accompanying figure
+  \begin{itemize}
+    \item 6 Q phase architectures have been identified in small molecule
+    amphiphile systems.~\cite{mariani_cubic_1988}
+    \item Of these, only 4 are consistent with diffraction data generated
+    by the gemini surfactant used here.~\cite{pindzola_cross-linked_2003}
+    \item Q$^{230}$ (Ia3d), Q$^{224}$ (Pn3m), Q$^{229}$ (Im3m) or Q$^{212}$ (P4\textsubscript{3}32) phase of type I configuration
+    \item The presence of $1 / \sqrt{6}$ and $1 / \sqrt{8}$ peaks rules out the
+    Q$^{227}$ (Fd3m) and Q$^{223}$ (Pm3n) configurations.
+    \item The Pn3m and Ia3d architectures are the most common~\cite{mariani_cubic_1988,wiesenauer_nanoporous_2012}
+    \item The most likely phase is the type I Q$^{230}$ (Ia3d) because it is the
+    most common phase observed between lamellar and hexagonal phases and the
+    monomeric alkyltrimethylammonium salts used to synthesize the gemini LCs
+    exhibit clear Ia3d symmetry.
+  \end{itemize}
+
+  Due to its more facile synthesis, there has been significantly more development
+  of Q\textsubscript{I} phase membranes.
+  \begin{itemize}
+    \item The first generation of Q\textsubscript{I} membranes was made by 
+    the self-assembly of a gemini phosphonium monomer in water.~\cite{pindzola_cross-linked_2003}
+    \item Hatakeyama et al. improved the industrial viability of Q\textsubscript{I} 
+    phase membranes by using a gemini ammonium monomer which is both easier and cheaper
+    to synthesize.~\cite{hatakeyama_nanoporous_2010}
+    \item Free standing films of both first and second generation Q\textsubscript{I} phase 
+    membranes cannot withstand high pressure. Because solution casting was ineffective, Zhou
+    et. al used a hot-pressing method to make mechanically strong membranes which involves 
+    heating the initial monomer mixture to 70\degree C and pressing it with 12 tons of force
+    into a thick microporous, hydrophilic polymer support.~\cite{zhou_new_2007}
+    \item The most recent generation of Q\textsubscript{I} membranes uses an imidazolium-based
+    gemini LLC monomer which is capable of being solution cast into defect-free thin films on
+    porous supports. This improvement resulted in a ten-fold increase in flux while retaining
+    selectivities similar to earlier generations.~\cite{carter_glycerol-based_2012}
+  \end{itemize}
+  
+  %BJC: figure with different generation Q1 monomers
+  
+  State of the art Q\textsubscript{I} membranes offer selectivities that
+  are competitive with existing commercial technologies.
+  \begin{itemize}
+    \item When separating organic solutes from NaCl, Q\textsubscript{I}-phase
+    membrane filtration experiments have shown selectivity 2--3 times higher than
+    commercial RO and 6--12 times higher than commercial NF membranes
+    \cite{dischinger_application_2017}.
+    \item Water permeability is higher than commercial RO membranes but
+    less than commercial NF. There is work being done to reduce the
+    thickness of the selective layer in order to increase permeability. 
+  \end{itemize}
+
+  %\section{Atomistic Molecular Simulation of LLC Membranes}
+  \section{Modeling Membrane Separations}
+  
+  %BJC2: taken from stochastic transport paper.
+  Mathematical descriptions of transport in complex separations membranes are a
+  powerful way to understand mechanisms and formulate design principles.
+  \cite{vinh-thang_predictive_2013,geens_transport_2006,darvishmanesh_mass_2016}
+  The complexity of a well-fit model generally parallels the complexity of the
+  transport mechanism being studied, as well as the transport information the
+  model conveys. In dense homogeneous membranes, the solution-diffusion model
+  can extract diffusion and partition coefficients and has successfully
+  predicted solute transport rates.~\cite{wijmans_solution-diffusion_1995}
+  Analogously, pore-flow models yield predictions of diffusion coefficients and
+  solute transport rates in nanoporous membranes.~\cite{paul_diffusive_1974}
+  Modern single particle tracking approaches have taken researchers beyond
+  continuum modeling allowing them to characterize complex diffusive
+  behavior.~\cite{manzo_review_2015} At the molecular level, one can use
+  molecular dynamics (MD) simulations to study both single particle dynamics
+  and bulk transport properties with atomic-level
+  insight.~\cite{coscia_chemically_2019,maginn_best_2018} All of these
+  approaches facilitate generation of hypotheses about the molecular origins of
+  separations by attempting to give a more intuitive understanding of how
+  solutes move as a function of their environment, in turn suggesting
+  experiments that could be performed.
+
+  \subsection{Macroscopic Treatments}
+  
+  The most widely used approaches to modeling transport in membranes of all types
+  are based on macroscopic theory. In this section we will discuss the two prevailing
+  theories: the pore flow model and the solution-diffusion model.
+  
+  %BJC2: add more citations
   \noindent Membrane permeation is the result of a chemical potential gradient, $\frac{d\mu_i}{dx}$.
   \begin{itemize}
 	  \item The flux of component $i$ is proportional to this gradient:
@@ -49,7 +486,7 @@
 	    J_i = -L_i \frac{d\mu_i}{dx}
 	  \end{equation}
 	  where $L_i$ is a coefficient of proportionality.~\cite{wijmans_solution-diffusion_1995}
-          %MRS2: mention what L depends on molecularly (even if uncalculatable)
+      %MRS2: mention what L depends on molecularly (even if uncalculatable)
 	  \item Chemical potential gradients can be induced by concentration, pressure, 
 	  temperature and electromotive forces.
 	  \item We will limit our discussion to concentration and pressure gradients. %MRS: mention why?
@@ -57,6 +494,7 @@
 
   %MRS: is there are reason you are talkling about just water flux here?
   % This follows the discussion of werber_material_2016
+  %BJC2: add solute flux
   For pressure driven membrane processes, water flux through both porous and 
   amorphous membranes can be described by
   \begin{equation}
@@ -89,6 +527,7 @@
     pore sizes prevents perfect rejection.
   \end{itemize}
   
+  % BJC: mention does not enter Brownian regime
   In amorphous membranes, water and solute flux are modeled using the solution-diffusion 
   model.
   \begin{itemize}
@@ -119,306 +558,22 @@
     which approaches unity as the solute flux tends towards zero.
   \end{itemize}  
   
-  Although there has been considerable focus on creating membranes with high
-  permeabilities, there is a case to be made that shifting the focus to membrane
-  selectivity may offer a more effective route towards lowering the cost of 
-  membrane separations.
-  %MRS: citation?
+  These equations provide a somewhat limited perspective on the molecular details
+  of transport.
   \begin{itemize}
-    \item Increasing permeabilities beyond those already achieved may have 
-    only a small effect on energy requirements and capital costs. 
-    \item Cohen-Tanugi et al. calculated that tripling membrane permeability
-    could reduce energy consumption up to 15\% in a seawater reverse osmosis plant.~\cite{cohen-tanugi_quantifying_2014}
-    \item Perhaps the biggest detriment to energy consumption is the practical
-	need for multiple membrane passes in order to achieve a desired purity.
-    \item Additionally, many membranes are not suited for high purity separations
-    of small neutral species which necessitates chemical and capital costs for
-    post-treatment
-    \item Addressing these problems with highly selective separations may lead to 
-    more gains.
-    %MRS: math (or citations) for this statement?
- \end{itemize} 
-  
-%  These equations provide a somewhat limited perspective on the molecular details
-%  of transport.
-%  \begin{itemize}
-%    \item The parameters are experimental observables which allow one to 
-%    speculate on the atomic-level 
-%  \end{itemize}
-  
-  \subsection{Applications of Selective Membranes}
-  
-%MRS: Maybe the applications be presented before theory?
-  Selective separations are useful in a wide range of applications.  
-  
-  \textit{Desalination}:
-  Creating potable water from seawater or brackish water is of paramount importance
-  in water-scarce areas. 
-  \begin{itemize}
-  	\item Compared with thermal distillation techniques, reverse osmosis has been 
-  	shown to be more environmently friendly and economical due to its lower energy
-  	requirements.\cite{morton_environmental_1996}
-  	\item Thermal techniques are still preferred where excess waste heat or cheap 
-  	thermal energy is available, such as cogeneration plants.\cite{bhojwani_technology_2019}
-  	\item RO has smaller footprint % BJC: need citation
-  \end{itemize}
-
-  \textit{Organic Micropollutants}:
-  Municipal and industrial wastewaters are contaminated by harmful
-  micropollutants, which have adverse effects on human health even at low 
-  concentrations\cite{schwarzenbach_challenge_2006}
-  \begin{itemize}
-    \item Micropollutants include pharmaceuticals, personal care products, 
-    hormones, pesticides and industrial chemicals which find their way into
-    our drinking water supply
-    \item Is there any infrastructure built to combat this?
+    \item The parameters are experimental observables which allow one to 
+    speculate on the atomic-level which cause them.
+    \item Further, this assumes that solutes undergo Brownian motion. As will
+    be discussed, solutes appear to undergo subdiffusive behavior on short
+    timescales. Therefore, we may need a more descriptive theory in order
+    to appropriately address questions of membrane design.
   \end{itemize}
   
-  \textit{Recovery of Valuable Dissolved Species}: We can use highly selective
-  membranes in order to recover potentially valuable dissolved species from 
-  complex waste streams. 
-  
-  Municipal waste-waters are rich in carbon, nitrogen and phosphorus-containing 
-  compounds. 
-  \begin{itemize}  
-    \item The recovery of such products, which can be achieved using a 
-    selective membrane, has numerous potential uses.\cite{sales_resource_2015}
-    \item For example, nitrogen and phosphorus recovery can help sustain fertilizer 
-    production which will help meet global food demand as population continues
-    to increase.\cite{xie_membrane-based_2016}
-  \end{itemize}
-
-  Industrial waste-waters are often quite complex with up to six times more 
-  total dissolved solids than seawater\cite{werber_materials_2016}. 
-  \begin{itemize}
-    \item For example, flowback water, produced during hydraulic fracturing of
-    shale formations consists of relatively high concentrations of salts, metals,
-    and soluble organic compounds. 
-    \item The majority of this water is disposed through deep well injection, 
-    however there is a growing public concern about its management which has 
-    prompted the use of separation technologies such as RO and NF in order to 
-    reduce the volume of contaminated water~\cite{gregory_water_2011}.
-    \item Some of the dissolved organic compounds in flowback water, such as acetate, 
-    are potentially valuable and can be recovered with highly selective membranes
-    \cite{dischinger_application_2017}.
-  \end{itemize}
-  
-  \textit{Breathable barriers}:
-  Finally, there is a great deal of military interest in creating breathable 
-  barriers which selectively allow the passage of water in both directions but
-  blocks out harmful contaminants.
-  \begin{itemize}
-    \item Need to allow sweating
-    \item Can even put catalytic groups in the pores to break down contaminants
-  \end{itemize}
-
-  \section{Competing Membrane Technologies}
-
-  \subsection{Amorphous Membranes}
-  
-  Amorphous thin film composite (TFC) RO membranes are the current industry standard for
-  high purity separations.
-  \begin{itemize}  
-    \item Desalination, concentration
-    \item Typically you have a porous support layer for mechanical strength and 
-    very thin active layer where the 
-%MRS: added
-molecular/nanoscale
-separations occur.
-    \item Usually only let water through. Usually have to remineralize the
-    water to make it drinkable.
-  \end{itemize}
-  
-  Operation requires high feed pressures. (5 - 120 bar) ~\cite{van_der_bruggen_review_2003}
-  
-  \subsection{Standard Nanofiltration Membranes}
-  %MRS: is explicitly defined the right word?  ``Created pores?''
-  Unlike RO membranes, NF membranes have explicitly defined pores. An
-  ideal NF membrane should have densely packed, uniform-sized and
-  non-tortuous pores. This combination has been very difficult to realize.
-  
-  NF membranes are typically made by a phase-inversion process. The most 
-  widely used phase-inversion process is immersion precipitation.
-  \begin{itemize}
-    \item During which one submerges a polymer, dissolved in a solvent, in
-    a non-solvent.
-    \item A solid, porous polymer membrane is all that remains once all
-    solvent has been removed by non-solvent exchange \cite{smolders_microstructures_1992}.
-    \item The resultant pores are polydisperse in size, which hurts membrane selectivity. 
-  \end{itemize}    
-    
-  A second technique used to create NF membranes is call track-etching in which a polymer
-  film is bombarded with charged particles, then chemically etched to create pores
-  \cite{apel_track_2001}. The pores are uniform, which benefits selectivity;
-  however, the membranes have a low porosity and subsequently low permeability. 
-  
-  Explicitly defined pores allow lower feed pressures (3 - 20 bar),~\cite{van_der_bruggen_review_2003}
-  however, polydispersity in pore size lowers their selectivity relative to RO.
-  
-  \subsection{Nanostructured Membranes}
-  
-  Nanostructured membrane materials have the potential to achieve the high selectivity
-  of RO with the low feed pressure requirements of NF. Nanostructured materials of 
-  interest typically have explicit nm-size pores that are uniform in size, eliminating
-  issues with polydispersity. There have been a number explorations into different
-  kinds of technologies for this application.
-  
-  %BJC: More detail on these sections to come.
-  % Probable format for following paragraphs: Introduce tech, say how it would work, then why it doesn't work 
-  Ultrathin-film
-  graphene and graphene oxide membranes are an active area of research because
-  they are atomically thick and therefore offer potential for extremely high
-  permeability membranes.~\cite{humplik_nanostructured_2011} 
-  \begin{itemize}  
-    \item However, scalable synthesis without introducing microscopic, performance
-    degrading defects has not yet been achieved.~\cite{cohen-tanugi_multilayer_2016,wei_multilayered_2018}
-  \end{itemize}    
-  
-  Carbon nanotubes (CNTs) have shown promise as aqueous separations membranes
-  due to unprecedentedly fast water transport.\cite{humplik_nanostructured_2011,hummer_water_2001}
-  \begin{itemize}
-	\item Practically, dispersing and aligning CNTs into a polymer matrix is extremely
-    difficult because they tend to agglomerate due to van der Waals forces.~\cite{sahoo_polymer_2010}
-    \item Some work has been to functionalize the carbon nanotubes in order to better incorporate them. % need reference
-  \end{itemize}
-  
-  Zeolite-coated ceramic membranes offer the potential for permeabilities
-  comparable to ultrafiltration, with selectivities as good as NF and RO.%BJC: werber a possible reference?
-  \begin{itemize}
-	\item A number of studies have tested the permeability and sodium salt rejection
-    of various zeolite membranes, however none have fully overcome the
-    permeability-selectivity tradeoff.~\cite{pendergast_review_2011,auerbach_handbook_2003,li_novel_2007}
-  \end{itemize}
-
-  Finally, metal organic frameworks (MOFs) have been recently introduced to the
-  field of aqueous separations.
-  \begin{itemize}
-    \item They were orginally used for gas separations
-  \end{itemize}
-
-%MRS: probably could generalize to self-assmbled porous materials as
-%the class in general, and the cross-linked LLC's as a particular exemplar.
-  
-  \section{Cross-linked Self Assembled Liquid Crystal Membranes for Selective Aqueous Separations}
-  
-  Under the right conditions, the shape and amphiphilic character of the monomers in 
-  Figure TBD drives their self assembly into ordered nanostructures.
-  \begin{itemize}
-    \item Monomer 1 can form the inverted hexagonal phase (H\textsubscript{II})
-    \item Monomer 2 will form the bicontinuous cubic phase (Q\textsubscript{I})
-    \item The tails have vinyl groups which can be cross-linked for mechanical strength.
-  \end{itemize}
-  
-  %BJC: figure here showing each monomer and the phase they form
-
-  %MRS: be more explicit what you mean by ``study''.
-  In this work we study LLC membranes as an alternative nanostructured material for 
-  highly selective aqueous separations.
-  
-  \subsection{The H\textsubscript{II} Phase}
-   
-  The H\textsubscript{II} phase is characterized by hexagonally packed, uniform-sized
-  and straight pores.
-  \begin{itemize}
-    \item The hydrophilic head groups aggregate in the pore centers to create
-    cylindrical aqueous channels. 
-    \item These pore channels are lined with the chemical functionality of the LLC monomers
-    and have the potential to interact with solutes in a chemically-dependent manner.
-    %MRS: could discuss concept that the effective pore size depends on the solute.
-    \item In theory, this pore topology and geometry is ideal for high flux and 
-    highly selective separations.
-  \end{itemize}
-  
-  Unfortunately, it is a difficult task to align the self-assembled hexagonal
-  mesophases into continuous pores that traverse the thickness of the membrane.
-  \begin{itemize}
-    \item Although the membranes have shown high experimental selectivity, their 
-    flux has been very low due to misalignment of the hexagonal mesophases.
-  \end{itemize}
-  
-%  Recently, Feng et al. has come up with two methods which can be used to 
-%  macroscopically align the hexagonal mesophases. 
-  Considerable recent efforts have made progress towards the macroscopic
-  alignment of the hexagonal mesophases.
-  \begin{itemize}
-    \item Feng et al. leverage the magnetic anisotropy of the columnar \
-    mesophases in order to control their alignment with a magnetic field.~\cite{feng_scalable_2014}
-    \item Feng et al. also used an approach called soft confinement which
-    takes advantage of the hexagonal columns preference towards anchoring
-    perpendicular to either a PDMS or glass substrate.~\cite{feng_thin_2016}
-    \item Finally, Feng et al. designed a third technique which uses a structure
-    directing molecule in order to template the assembly of a fatty acid 
-    molecule into ordered columnar phases.~\cite{feng_highly_2017}
-  \end{itemize}
-  
-  \subsection{The Q\textsubscript{I} Phase}
-  
-  The bicontinuous cubic, or Q\textsubscript{I} phase, is a class 
-  of nanostructured phases characterized by 3D interconnected pores.
-  \begin{itemize}
-    \item Aside from its tortuous pore architecture, it shares the 
-    uniform size and complex topological features of the H\textsubscript{II} phase
-    which lends itself to highly selective separations.
-    \item Although water and solutes must follow a longer path in order to pass
-    through Q\textsubscript{I} membranes, they are more practical to synthesize
-    because the mesophases do not require alignment. 
-  \end{itemize}
-  
-  The space group of the Q\textsubscript{I} phase configuration formed by
-  monomer 1 is uncertain and thought to be either Pn3m or Ia3d.  %BJC: will have accompanying figure
-  \begin{itemize}
-    \item 6 Q phase architectures have been identified in small molecule
-    amphiphile systems.~\cite{mariani_cubic_1988}
-    \item Of these, only 4 are consistent with diffraction data generated
-    by the gemini surfactant used here.~\cite{pindzola_cross-linked_2003}
-    \item Q$^{230}$ (Ia3d), Q$^{224}$ (Pn3m), Q$^{229}$ (Im3m) or Q$^{212}$ (P4\textsubscript{3}32) phase of type I configuration
-    \item The presence of $1 / \sqrt{6}$ and $1 / \sqrt{8}$ peaks rules out the
-    Q$^{227}$ (Fd3m) and Q$^{223}$ (Pm3n) configurations.
-    \item The Pn3m and Ia3d architectures are the most common~\cite{mariani_cubic_1988,wiesenauer_nanoporous_2012}
-    \item The most likely phase is the type I Q$^{230}$ (Ia3d) because it is the
-    most common phase observed between lamellar and hexagonal phases and the
-    monomeric alkyltrimethylammonium salts used to synthesize the gemini LCs
-    exhibit clear Ia3d symmetry.
-  \end{itemize}
-
-  %MRS: be more explicit that this is synthesis of usable amounts of
-  %actual separations membranes, not the molecules themselves.
-  Due to its more facile synthesis, there has been significantly more development
-  of Q\textsubscript{I} phase-forming monomers.
-  \begin{itemize}
-    \item The first generation of Q\textsubscript{I} membranes was made by 
-    the self-assembly of a gemini phosphonium monomer in water.~\cite{pindzola_cross-linked_2003}
-    \item Hatakeyama et al. improved the industrial viability of Q\textsubscript{I} 
-    phase membranes by using a gemini ammonium monomer which is both easier and cheaper
-    to synthesize.~\cite{hatakeyama_nanoporous_2010}
-    \item Free standing films of both first and second generation Q\textsubscript{I} phase 
-    membranes cannot withstand high pressure. Because solution casting was ineffective, Zhou
-    et. al used a hot-pressing method to make mechanically strong membranes which involves 
-    heating the initial monomer mixture to 70\degree C and pressing it with 12 tons of force
-    into a thick microporous, hydrophilic polymer support.~\cite{zhou_new_2007}
-    \item The most recent generation of Q\textsubscript{I} membranes uses an imidazolium-based
-    gemini LLC monomer which is capable of being solution cast into defect-free thin films on
-    porous supports. This improvement resulted in a ten-fold increase in flux while retaining
-    selectivities similar to earlier generations.~\cite{carter_glycerol-based_2012}
-  \end{itemize}
-  
-  %BJC: figure with different generation Q1 monomers
-  
-  State of the art Q\textsubscript{I} membranes offer selectivities that
-  are competitive with existing commercial technologies.
-  \begin{itemize}
-    \item When separating organic solutes from NaCl, Q\textsubscript{I}-phase
-    membrane filtration experiments have shown selectivity 2--3 times higher than
-    commercial RO and 6--12 times higher than commercial NF membranes
-    \cite{dischinger_application_2017}.
-    \item Water permeability is higher than commercial RO membranes but
-    less than commercial NF. There is work being done to reduce the
-    thickness of the selective layer in order to increase permeability. 
-  \end{itemize}
-
-  \section{Atomistic Molecular Simulation of LLC Membranes}
+  \subsection{Atomistic Molecular Simulation of LLC Membranes}  
   
   %BJC: following two paragraphs taken from first paper.
+  %BJC2: Could probably reorganize the sentences of these next two paragraphs 
+  % to flow better with rest of intro.
   Our current understanding of the molecular details of LLC polymer membranes'
   nanostructure is not sufficient to be able to precisely design them for
   specific separations. Dischinger et al.~attempted to use an empirical model
@@ -457,11 +612,9 @@ separations occur.
     \item Atomistic MD simulations can provide the required level of detail 
     (Figure \ref{fig:detailed_pore}), assuming the force fields are sufficiently accurate. 
     \item With such an atomistic model, we can directly observe
-  molecular-level solute transport and suggest governing mechanisms. 
-    \item We can also observe how the choice of head group interacts with solutes
-    of interest. 
-    \item In addition, we can interchange counterions which may influence both the pore size
-    and the strength of the Donnan potential.
+    molecular-level solute transport and suggest governing mechanisms. 
+    \item We can also observe how the choice of head group and counterions interacts
+    with solutes of interest. 
   \end{itemize}
 
   \begin{figure}[!htb]
@@ -538,7 +691,9 @@ separations occur.
     %how you can test mechanistic models to see if they are consistent with the timeseries, and then how those models
     %can be further extrapolated to physical observables even if the MD simulations cannot. 
     %MRS: this MIGHT include using the effective diffusion in a solution/diffusion model.
-    \item Can we estimate experimentally-relevant macroscopic properties?
+    %\item Can we estimate experimentally-relevant macroscopic properties?
+    \item Can we formulate mechanistic models whose dynamical properties are consistent with our
+    molecular simulations and can be used to extrapolate macroscopic behavior which MD simulations cannot.
     	\begin{itemize}
     	  \item Using our qualitative understanding of the dominant trapping mechanisms,
     	  we develop stochastic time series models which we can use to mimic solute dynamic
@@ -548,8 +703,8 @@ separations occur.
     	  \item We then show how we can use our most promsiing model in order to connect 
     	  microscopic transport to macroscopic flux and selectivity.
     	\end{itemize}
-    %MRS: this might be overly ambitions.  Maybe something more like: How can the timeseries data inform us about the mechanism directly?
-    \item How can we learn mechanisms with minimal human intervention?  %BJC: i.e. machine learning methods
+
+    \item How can time series data directly inform us about transport mechanisms?
     	\begin{itemize}
     	  \item Although our stochastic models show great promise, their development 
     	  require some qualitative and quantitative understanding of dominant transport
@@ -562,3 +717,43 @@ separations occur.
     	  which we can use to predict flux and selectivity. 
     	\end{itemize}
   \end{enumerate} 
+  
+  The next four chapters offer answers to each of the above questions and are adapted from 
+  various first author manuscripts at various stages in the publication process as described
+  below. The introduction to each adaptation is condensed in order to avoid redundancy and 
+  all other sections are left intact. The supporting information documents for each manuscript are
+  given in the appendices. \\
+  
+  %BJC2: Should I just put title with reference? Or full citation?
+  \noindent\textit{Chapter 2}: adapted from manuscript entitled ``Understanding the 
+  Nanoscale Structure of Inverted Hexagonal Phase Lyotropic Liquid Crystal Polymer Membranes." 
+  published in the Journal of Physical Chemistry B.~\cite{coscia_understanding_2019} \\
+
+  \noindent\textit{Chapter 3}: adapted from manuscript entitled ``Chemically Selective 
+  Transport in a Cross-Linked H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane."
+  published in the Journal of Physical Chemistry B.~\cite{coscia_chemically_2019} \\
+    
+  \noindent\textit{Chapter 4}: adapted from a manuscript in review with Physical Review E, entitled 
+  ``Capturing Subdiffusive Solute Dynamics and Predicting Selectivity in Nanoscale Pores
+  with Time Series Modeling". The final manuscript may change based on reviewer feedback. \\
+    
+  \noindent\textit{Chapter 5}: adapted from the draft of a manuscript in preparation with the working
+  title ``Statistical Inference of Transport Mechanisms and Long Time Scale Behavior from Time Series 
+  of Solute Trajectories in Nanostructured Membranes." The content will change as the
+  draft is finalized and after reviewer feedback.
+  
+%  Chapter 2 is adapted 
+%  \begin{itemize}
+%    %BJC2: Should I just put title with reference? Or full citation?
+%    \item Chapter 2 is adapted from Coscia, B. J.; Yelk, J.; Glaser, M. A.; Gin, D. L.; Feng, X.; Shirts,
+%    M. R. Understanding the Nanoscale Structure of Inverted Hexagonal Phase Lyotropic Liquid Crystal Polymer
+%    Membranes. J. Phys. Chem. B 2019, 123, 289-309.
+%    \item Chapter 3 is adapted Coscia and Shirts. Chemically Selective Transport in a Cross-Linked 
+%    H\textsubscript{II} Phase Lyotropic Liquid Crystal Membrane. J. Phys. Chem. B 2019, 123, 6314-6330. 
+%    \item Chapter 4 is adapted from a manuscript in review with Physical Review E, entitled 
+%    "Capturing Subdiffusive Solute Dynamics and Predicting Selectivity in Nanoscale Pores
+%    with Time Series Modeling". The final manuscript may change based on reviewer feedback.
+%    \item Chapter 5 is adapted from the draft of a manuscript in preparation with the working
+%    title "Statistical Inference of Transport Mechanisms and Long Time Scale Behavior from Time Series 
+%    of Solute Trajectories in Nanostructured Membranes."
+%  \end{itemize}
