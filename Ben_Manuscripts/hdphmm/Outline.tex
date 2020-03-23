@@ -224,11 +224,10 @@
   \end{itemize}
 
   \subsection{The Infinite State Hidden Markov Model}\label{method:IHMM}
-  %BJC: There is a fair amount of detail here just so I could understand better by writing it out
   
   Hidden Markov models (HMMs) are a useful and widely used technique
   for modeling sequences of observations where the probability of the next observation
-  in a sequence depends, at least in, part on a previous unobserved, latent or hidden, state.~\cite{beal_infinite_2002}
+  in a sequence depends, at least in part, on a previous unobserved, latent or hidden, state.~\cite{beal_infinite_2002}
   %MRS2: it can depend on other things, but ALSO depends on the latent state.
   %BJC2: added 'at least in part
   \begin{itemize}
@@ -236,8 +235,11 @@
     the center of mass coordinates of the solutes versus time, and the states
     correspond to the dynamical behavior which give rise to those types
     of observations.
-    \item Unfortunately, standard HMMs require the number of hidden states to be known
-    a priori.
+    \item The probability of transitioning to a state based on the current
+    state is mathematically defined in terms of an $n\times n$ transition
+    probability matrix, $T$, where $n$ is the number of states.
+    \item Unfortunately, standard HMMs require $n$ to be known
+    \textit{a priori}.
     \item One can partially overcome this by testing a range of numbers of 
     hidden states and determining which is the best representation of the
     data.
@@ -245,7 +247,6 @@
   
   %BJC: I'm not sure how much of this I should include. This is pretty much 
   % a reproduction of Fox et al's explanation: https://ieeexplore.ieee.org/abstract/document/5563110
-  % and it doesn't do a great job
   The infinite-state HMM overcomes this drawback by placing a hierarchical
   Dirichlet process (HDP) prior on the transition probabilities.
   \begin{itemize}
@@ -272,7 +273,6 @@
     sampling.
   \end{itemize}
   
-  %BJC: I do need to include this
   \noindent We describe the dynamics of each state using a first order vector autoregressive
    (VAR(1)) model. 
   \begin{itemize}
@@ -291,10 +291,14 @@
   	\item We assumed $\mathbf{e}_t$ to be multivariate Gaussian noise, with mean zero and
   	covariance, $\Sigma$.
   	\item We limited our analysis to an autoregressive order of $r=1$.
-  	\item We used a conjugate matrix-normal inverse-Wishart prior on parameters
-  	$A$ and $\Sigma$ and a conjugate Gaussian prior on $\mathbf{c}$ in order to analytically
-  	draw from the posterior.~\cite{fox_nonparametric_2009}
+  	\item We used a matrix-normal inverse-Wishart prior on parameters $A$ and $\Sigma$ 
+  	and a Gaussian prior on $\mathbf{c}$ in order to infer their values.~\cite{fox_nonparametric_2009}
+  	%BJC2: I'm not sure above is enough to make it clear how I got the parameters. Maybe I should
+  	% explicitly refer to the fox paper above which outlines the inference procedure in more detail?
   \end{itemize}   
+  
+  % BJC2: It might be useful to walk through the following procedure with an example 
+  % trajectory
   
   %Based on the algorithms developed by Fox et al.~\cite{fox_sticky_2007}, 
   Using the IHMM framework, we estimated the most likely number and sequence of hidden states
@@ -323,15 +327,14 @@
 %    dynamics in an interpretable number of states.
   \end{itemize}
   
-  %BJC2: this is hard to word clearly. Maybe a small figure would help
-  We first applied the IHMM algorithm to the 3D solute center-of-mass coordinate 
+  We first applied the IHMM algorithm to 3D solute center-of-mass coordinate 
   trajectories transformed relative to the closest pore center.
   \begin{itemize}
-    \item We tracked the solute's motion along the pore axis with center-of-mass
+    \item We tracked the solute's motion along the pore axis with the center-of-mass
     $z$ coordinate.
     \item Using the nearest pore center as the origin, we represented the radial 
     distance of each solute's center-of-mass from the pore center in 2 dimensions,
-    $x$ and $y$.
+    $x$ and $y$ (see Figure~\ref{fig:cartesian_cylinder}).
     \item By using 2 dimensions, rather than a single radial dimension, we
     increase the likelihood of finding more states since a single radial
     mean can be represented by an infinite number of $x$ and $y$ coordinate combinations.
@@ -364,44 +367,45 @@
   The states predicted by the IHMM are heavily influenced by the Gaussian prior
   placed on $c$ in Equation~\ref{eqn:var}.
   \begin{itemize}
-    \item The $A$ and $\mathbf{e}_t$ matrices do not vary over a wide range, so
+    \item The entries of the $A$ and $\mathbf{e}_t$ matrices do not vary over a wide range, so
     the final parameters were relatively insensitive to the priors.
     \item In order to maximally automate the IHMM procedure, we attempted to
-    parameterize the prior on $c$ in an intelligent way.
+    parameterize the prior on $\mathbf{c}$ in an intelligent way.
     \item The prior parameters should be chosen such that the means of 
     each state lie within a region of reasonable probability of the prior (see
     Figure~\ref{fig:prior_guesses}).
     \item In each dimension, we defined the prior mean to be halfway between the 
     maximum and minimum of each trajectory dimension. 
-    \item We defined the maximum and minimum to be 2 standard deviations from
-    the mean in order to parameterize the variance in each dimension.
+    \item To parameterize the prior's variance in each dimension, we defined the maximum and minimum
+    to be 2 standard deviations from the mean.
     \item Although this approach has worked quite well for the data in this work,
     it is important to check the results to determine whether further adjustments
     to the prior might be needed.
     \item In the Supporting Information, we show the result of a parameterization
-    where the prior parameters of $c$ were poorly chosen.
+    where the prior parameters of $c$ were poorly chosen. %TODO
   \end{itemize}
   
   %BJC2: I think it would be useful to continue using this trajectory to illustrate 
   % the parameterization process. It might be bunch of plots stacked on each other.
+  %BJC2: More labels might be useful if not cluttered
   \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{prior_guesses.pdf}
   \caption{The parameters of the prior on $c$ (black line) should be chosen such
-  that the means of each state identified in the trajectory (blue line) lie within
+  that the mean levels of each state identified in the trajectory (blue line) lie within
   regions of the prior with reasonable probability. We chose the mean of the prior 
-  as halfway between the maximum and minimum of each trajectory dimension. We also
-  defined the maximum and minimum to be 2 standard deviations from the mean in 
-  order to parameterize $\sigma$.}\label{fig:prior_guesses}
+  as halfway between the maximum and minimum of each trajectory dimension. We chose 
+  $\sigma$ of the prior by defining the maximum and minimum to be 2 standard deviations
+  from the mean (dashed lines).}\label{fig:prior_guesses}
   \end{figure}
   
   We ran 2000 iterations of the IHMM procedure in order to arrive at converged 
-  state sequence and parameters for each state.
+  state sequences and parameters for each state.
   \begin{itemize}  
     \item Most parameters converged quickly (within 50-100 iterations) while
     others took up to 1000 iterations.
-    \item We averaged the parameters from each iteration after the equilibration
-    time point.
+    \item We averaged the parameters from each iteration recorded after the
+    equilibration time point.
     \item We detected equilibration of the parameters using the module 
     \texttt{pymbar.timeseries.detect\_equilibration} on the time series of 
     parameter estimates. 
@@ -419,9 +423,9 @@
     \item It will also be clearer to analyze the final parameter set in
     terms of $r$ rather than $x$ and $y$.
     \item We converted the $x$ and $y$ center-of-mass coordinates to $r$.
-    \item In order to keep the same states found by applying the algorithm
-    in 3D, we reapplied the IHMM to the cylindrical trajectories, only allowing
-    inference on the VAR(1) parameters with a fixed state sequence. 
+    \item In order to keep the same states found when we applied the algorithm
+    in 3D, we reapplied the IHMM to the cylindrical trajectories with a fixed 
+    state sequence, only allowing inference on the VAR(1) parameters. 
   \end{itemize} 
   
   We clustered like parameter sets in order to reduce the state space to
@@ -435,9 +439,11 @@
    \item Since we do not know the number of states with shared dynamical behavior
    beforehand, we used a non-parametric Bayesian Gaussian mixture model in order
    to group them. % cite scikit-learn  
-   \item This is necessary for us to perform any kind of mechanistic speculation.
+%   \item This is necessary for us to perform any kind of mechanistic speculation.
   \end{itemize}   
  
+  % BJC2: this part may expand a bit if I try different clustering approaches. But
+  % this is the one I'm going with for now.
   We clustered based on 5 variables: the radial means of each state, the two
   eigenvalues of $A$ and the two eigenvalues of $e_t$.
   \begin{itemize}
@@ -446,11 +452,12 @@
    \item Ideally, we could use all of the entries of $A$ and $e_t$ in addition to 
    the radial means.
    \item It would not be helpful to use the means in the $z$ direction because solutes
-   are essentially unbound in that direction, while there tends to be radially
-   dependent behavior as shown in our previous work.~\cite{coscia_chemically_2019}  % cite new paper too.
+   are essentially unbound in that direction, while 
+   \item However, in our previous work, we observed radially dependent dynamical 
+   behavior.~\cite{coscia_chemically_2019}  % cite new paper too.
   \end{itemize}
 
-  We remapped the state sequence based on the clustered assignments and
+  We remapped the state sequence based on the cluster assignments and
   generated a state transition probability matrix, $T$.
   \begin{itemize}
    \item The IHMM algorithm also produces an estimate of $T$, but since we 
@@ -458,19 +465,19 @@
    counting the number of transitions between states.
   \end{itemize}  
   
-  We obtained clustered $\mathbf{c}$ vectors based on the means of 
-  $\mathbf{c}$ belonging to the same cluster.
+  We obtained $\mathbf{c}$ vectors of the clustered states by averaging 
+  each value of $\mathbf{c}$ assigned to the same cluster.
   \begin{itemize}
-   \item We only care about the $r$ component of $c$ because solute
-   trajectories are not boudn in the $z$ direction.
+   \item We only care about the $r$ component of $\mathbf{c}$ because solute
+   trajectories are not bound in the $z$ direction.
   \end{itemize}
   
-  We used the IHMM algorithm in order to infer $A$ and $e_t$ of the 
+  We used the IHMM algorithm in order to infer $A$ and $\mathbf{e}_t$ of the 
   clustered states.
   \begin{itemize}
    %BJC2: I'm unsure of the precise reasoning here.
    \item We could not simply take the mean of the clustered 
-   $A$ and $e_t$ parameters because it is not clear that this is a linear 
+   $A$ and $\mathbf{e}_t$ parameters because it is not clear that this is a linear 
    operation for this problem. 
    \item To circumvent this problem, we modified the ($r$, $z$) solute
    trajectories so that they had a mean of zero, leaving only the 
@@ -478,17 +485,20 @@
    \item We did this by subtracting the maximum likelihood estimate
    of the $\mathbf{c}$ vector from each same-state segement of the unclustered
    trajectory.   
-   \item We used the IHMM algorithm on modified this modified trajectory to infer
+   \item We used the IHMM algorithm on this modified trajectory to infer
    the clustered state parameters by fixing the clustered state sequence. 
   \end{itemize}
   
-  Finally, we generated stochastic trajectory realizations by drawing state sequences 
-  based on the rows of $T$.
+  Finally, we generated stochastic trajectory realizations using the clustered
+  parameter sets.
   \begin{itemize}
+    \item We drew state sequences with transition probabilities weighted by the 
+    the rows of $T$.
     \item While in a given state, we simulated motion according to the VAR(1)
     parameterization of that state.
-    \item We set the unconditional mean of each state based on the position 
-    before the state transition occurred.
+    \item After each state transition, we reset the unconditional mean of each 
+    state based on the particle's position immediately before the state transition
+    occurred.
   \end{itemize} 
   
   \subsection{Estimating Flux and Selectivity}
