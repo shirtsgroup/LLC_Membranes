@@ -228,8 +228,6 @@
   Hidden Markov models (HMMs) are a useful and widely used technique
   for modeling sequences of observations where the probability of the next observation
   in a sequence depends, at least in part, on a previous unobserved, latent or hidden, state.~\cite{beal_infinite_2002}
-  %MRS2: it can depend on other things, but ALSO depends on the latent state.
-  %BJC2: added 'at least in part
   \begin{itemize}
     \item In the context of our simulations, the observations correspond to 
     the center of mass coordinates of the solutes versus time, and the states
@@ -250,18 +248,23 @@
   The infinite-state HMM overcomes this drawback by placing a hierarchical
   Dirichlet process (HDP) prior on the transition probabilities.
   \begin{itemize}
-    \item Using some base probability distribution, H, a Dirichlet process 
-    (DP) generates distributions over a countably infinite number of 
-    probability measures:
+    \item Using some base probability distribution, $H$, a Dirichlet process 
+    (DP) generates discrete distributions, $G_0$, over a countably infinite 
+    number of probability measures:
     \begin{equation}
       G_0 = \sum_{k=1}^{\infty} \beta_k \delta_{\theta_k} ~~ \theta_k \sim H, \beta \sim GEM(\gamma)
     \end{equation}
     where the $\theta_k$ are values drawn from the base distribution and the
-    weights $\beta_k$ come from a stick-breaking process parameterized by the concentration 
-    parameter $\gamma$ (equivalently referred to as GEM($\gamma$)). 
+    weights $\beta_k$ come from a stick-breaking process parameterized by the  
+    concentration parameter $\gamma$ (equivalently referred to as GEM($\gamma$)). 
+    \item Also expressed $G_0 \sim DP(\gamma, H)$
     %MRS3: This next line is a bit vauge (expresses confidence, closely related)
-   \item The concentration parameter $\gamma$ expresses one's confidence in H relative to the posterior 
-    and is closely related to the number of data observations.
+    %BJC3: tried to make more clear
+    \item The concentration parameter, $\gamma$, expresses one's confidence in the 
+    base distribution $H$. 
+    \item When $\gamma\to 0$, the first weight of $G_0$, $\beta_1$, approaches 
+    unity and for $\gamma\to\infty$, the weights become uniform and $G_0$ closely
+    resembles $H$.
     \item Each row, $G_j$, of the transition matrix is produced by drawing from a DP specified 
     using the $\beta$ vector as a discrete base distribution and a separate concentration
     parameter, $\alpha$.
@@ -274,8 +277,8 @@
     sampling.
   \end{itemize}
   
-  \noindent We describe the dynamics of each state using a first order vector autoregressive
-   (VAR(1)) model. 
+  We describe the dynamics of each state visited by solutes using a first order vector 
+  autoregressive (VAR(1)) model. 
   \begin{itemize}
   	\item In general, a VAR($r$) process is characterized by a vector of observations in a time series 
   	that are linearly dependent on $r$ previous values of the time series vector:
@@ -283,7 +286,7 @@
   	\mathbf{y}_t = \mathbf{c} + \sum_{i=1}^r A_i\mathbf{y}_{t-i} + \mathbf{e}_t~~~~\mathbf{e}_t \sim \mathcal{N}(0, \Sigma)
   	\label{eqn:var}
   	\end{equation}
-  	Previous observations are weighted by coefficient matrices $A_i$. The VAR($r$) 
+  	Previous observations are weighted by coefficient matrices, $A_i$. The VAR($r$) 
   	process is further characterized by a shift in the mean of each dimension by the
   	vector $\mathbf{c}$ and a white noise term $\mathbf{e}_t$.~\cite{hamilton_time_1994}
         %MRS2: mean is zero in Z, is it necessarily in R (I realize we've talked about this before, but wanted to get the clarification in text)
@@ -292,6 +295,8 @@
   	\item We assumed $\mathbf{e}_t$ to be multivariate Gaussian noise, with mean zero and
   	covariance, $\Sigma$.
   	\item We limited our analysis to an autoregressive order of $r=1$.
+  	\item This means that we only parameterize $A_1$. To simplify notation, we will just
+  	call it $A$.
   	\item We used a matrix-normal inverse-Wishart prior on parameters $A$ and $\Sigma$ 
   	and a Gaussian prior on $\mathbf{c}$ in order to infer their values.~\cite{fox_nonparametric_2009}
   	%BJC2: I'm not sure above is enough to make it clear how I got the parameters. Maybe I should
@@ -302,38 +307,65 @@
   % trajectory
   
   %Based on the algorithms developed by Fox et al.~\cite{fox_sticky_2007}, 
-  Using the IHMM framework, we estimated the most likely number and sequence of hidden states
-  while simultaneously estimating VAR(1) parameters for each state and the overall 
-  state transition probability matrix, $T$.
+  Using the IHMM framework, we estimated the most likely number and sequence of hidden
+  states in each solute center-of-mass trajectory while simultaneously inferring VAR(1)
+  parameters for each state and the overall state transition probability matrix, $T$.
   \begin{itemize}
     \item We created a python implementation of this process which we heavily adapted from
     the MATLAB code of Fox et al.~\cite{fox_sticky_2007} 
+    %BJC3: I got the software from this page: https://homes.cs.washington.edu/~ebfox/software/
+    % Maybe I should reach out to emily fox to see how she would prefer I cite the software?
     %MRS3: be a bit more specific about what the criteria were for convergence.
+    %BJC3: See if that's better
     \item Parameter estimation is iterative. Therefore, we looked for convergence 
-    as shown in SI.
+    of each entry in the $c$ vector as well as the $A$ and $\Sigma$ matrices of 
+    Equation~\ref{eqn:var}.
+    \item Plots illustrating parameter convergence are available in the SI.
     \item We refer the interested reader to much more extensive descriptions of 
     %MRS3: be more specific about which parts from the above are in the references
-    this process and its implementation. 
+    %BJC3: made more specific
+    the inference and sampling procedures used to estimate the VAR(1) parameters
+    and the state sequence. 
     ~\cite{beal_infinite_2002,teh_hierarchical_2006,van_gael_beam_2008,fox_nonparametric_2009,fox_bayesian_2010}
   \end{itemize}
   
+  % BJC3: I tried again with this paragraph above. I want to set up the idea that we
+  % are performing this somewhat complex procedure for a good reason before jumping
+  % straight into it.
   %MRS3: be more specific - i.e. describe what are the ways you are going to apply it. 
-  There are many ways one can apply the IHMM algorithm to timeseries data. 
+%  There are many ways one can apply the IHMM algorithm to timeseries data. 
+%  \begin{itemize}
+%    %MRS3: it's not as many as possible, but identify one's supported by the data, right?
+%    \item We begin by trying to identify as many distinct states as possible
+%    in each solute trajectory and then take advantage of the system's cylindrical
+%    symmetry in order to cluster the parameter sets into an interpretable number
+%    of states.
+%    %MRS3: not clear why this is the case?
+%    \item Having a large number of states gives more reliable clustering results.
+%%    \item We believe the subsequent procedure is best suited for our data
+%%    because it can clearly distinguish different dynamical behavior, it takes
+%%    advantage of the system's cylindrical symmetry and represents distinct
+%%    dynamics in an interpretable number of states.
+%  \end{itemize}
+
+  We carefully applied the IHMM algorithm in a way which takes advantage of the
+  system's cylindrical symmetry.
   \begin{itemize}
-    %MRS3: it's not as many as possible, but identify one's supported by the data, right?
-    \item We begin by trying to identify as many distinct states as possible
-    in each solute trajectory and then take advantage of the system's cylindrical
-    symmetry in order to cluster the parameter sets into an interpretable number
-    of states.
-    %MRS3: not clear why this is the case?
-    \item Having a large number of states gives more reliable clustering results.
-%    \item We believe the subsequent procedure is best suited for our data
-%    because it can clearly distinguish different dynamical behavior, it takes
-%    advantage of the system's cylindrical symmetry and represents distinct
-%    dynamics in an interpretable number of states.
-  \end{itemize}
+%    \item In general we are interested in the time series created by tracing
+%    each solute's center of mass position. % ALready said this above
+    \item There are a number of viable ways in which one could choose to analyze 
+    these time series.
+    \item We could use all 3 dimensions straight from the output trajectory.
+    \item We could use just the $z$ dimensional coordinate since we are primarily
+    interested in through-plane membrane transport.
+    \item We chose to use a multi-step procedure that we believe adequately
+    distinguishes every type of distinct dynamical behavior exhibited by 
+    the solutes.
+    \item We work in cylindrical coordinates since each pore is cylindrical
+    and we expect solutes to exhibit radially symmetric dynamics.
+  \end{itemize}  
   
-  We first applied the IHMM algorithm to 3D solute center-of-mass coordinate 
+  We start by applying the IHMM algorithm to 3D solute center-of-mass coordinate 
   trajectories transformed relative to the closest pore center.
   \begin{itemize}
     \item We tracked the solute's motion along the pore axis with the center-of-mass
@@ -367,7 +399,7 @@
     \item Although the IHMM is capable of identifying an infinite number of states, 
     a Dirichlet Process tends to exhibit a ``rich get richer" effect, favoring
     a fewer number of states.
-    \item By applying the algorithm to each trajectory independently we reduce
+    \item By applying the algorithm to each trajectory independently, we reduce
     the possibility of lumping together multiple similar states which we
     would prefer to stay separated before clustering.
 %    \item From a practical implementation standpoint, the algorithm is written
@@ -378,22 +410,20 @@
     % each trajectory.
   \end{itemize}
   
-  The states predicted by the IHMM are heavily influenced by the Gaussian prior
-  placed on $c$ in Equation~\ref{eqn:var}.
+  The states identified by the IHMM are heavily influenced by the Gaussian prior
+  placed on $\mathbf{c}$ in Equation~\ref{eqn:var}.
   \begin{itemize}
-    \item The entries of the $A$ and $\mathbf{e}_t$ matrices do not vary over a wide range, so
+    \item The entries of $A$ and $\Sigma$ do not vary over a wide range, so
     the final parameters were relatively insensitive to the priors.
     \item In order to maximally automate the IHMM procedure, we attempted to
     parameterize the prior on $\mathbf{c}$ in an intelligent way.
     \item The prior parameters should be chosen such that the means of 
     each state lie within a region of reasonable probability of the prior (see
     Figure~\ref{fig:prior_guesses}).
-    \item In each dimension, we defined the prior mean to be halfway between the 
+    \item In each dimension, we defined the prior mean to lie halfway between the 
     maximum and minimum of each trajectory dimension. 
-    \item To parameterize the prior's variance in each dimension, we defined the maximum and minimum
-    to be 2 standard deviations 
-    %MRS3: from the mean of what?
-    from the mean.
+    \item To parameterize the prior's variance in each dimension, we defined the
+    maximum and minimum to be 2 standard deviations from the prior mean.
     \item Although this approach has worked quite well for the data in this work,
     it is important to check the results to determine whether further adjustments
     to the prior might be needed.
@@ -419,68 +449,72 @@
   state sequences and parameters for each state.
   \begin{itemize}  
     %MRS3: can you say more which categories converged quickly?
+    %BJC3: I imagine states with less sampling converge slower. But I'll need to
+    % look further into this.
    \item Most parameters converged quickly (within 50-100 iterations) while
     others took up to 1000 iterations.
-    \item We averaged the parameters from each iteration recorded after the
-    equilibration time point.
-    %MRS3: averaged and used this as estimate for running models later? 
-    %MRS3: other possbility is maximum a posteriori estimate, but for peaked symmetric distributions, it's essentially the same.
+    \item We defined the finalized parameters of each state as the average
+    of the parameters from each iteration recorded after the equilibration 
+    time point.
+    % MRS3: averaged and used this as estimate for running models later? 
+    % BJC3: yes, well for clustering. Tried to clarified above
+    % MRS3: other possbility is maximum a posteriori estimate, but for peaked 
+    % symmetric distributions, it's essentially the same.
     \item We detected equilibration of the parameters using the module 
     \texttt{pymbar.timeseries.detect\_equilibration} on the time series of 
     parameter estimates. 
-    %MRS3: not sure what you mean that they all were multidimensional?
-    \item Since all of the parameters are multidimensional, we found the 
-    equilibration time point of each component and then used the longest
+    \item We found the equilibration time point of each component of the 
+    $\mathbf{c}$ vector as well as $A$ and $\Sigma$ matrices, and then used the longest
     equilibration time of all dimensions as the equilibration time point.
   \end{itemize}
   
   % BJC2: It's probably possible to convert to from x, y, z to r, z but
   % I need to figure out the transformation of A. This approach works though.
   We reparameterized the time series, preserving the state sequence, in terms
-  of the radial and axial coordinates ($r$, $z$) because the mean in $r$ is 
-  a useful clustering variable.
-  %MRS3: because of the radial symmetry, x and y aren't really meaningful alone. 
+  of the radial and axial coordinates ($r$, $z$) because $x$ and $y$ aren't 
+  meaningful alone due to the system's radial symmetry.
+  % the mean in $r$ is a useful clustering variable.
   \begin{itemize}
     \item It will also be clearer to analyze the final parameter set in
     terms of $r$ rather than $x$ and $y$.
     \item We converted the $x$ and $y$ center-of-mass coordinates to $r$.
-    \item In order to keep the same states found when we applied the algorithm
-    in 3D, 
+%    \item In order to keep the same states found when we applied the algorithm
+%    in 3D, we reapplied the IHMM to the cylindrical trajectories with a fixed 
+%    state sequence, only allowing inference on the VAR(1) parameters.
     %MRS3: would it be clearer to say you appplied only the inference part of the process on the clustered data?
-    we reapplied the IHMM to the cylindrical trajectories with a fixed 
-    state sequence, only allowing inference on the VAR(1) parameters. 
-    %MRS3:did you cluster the state transitions as well? 
+    %BJC3: like this?
+    \item We fixed the state sequence from the 3D parmeterization and applied the
+    inference component of the IHMM procedure to the cylindrical trajectories in
+    order to estimate the VAR(1) parameters in terms of $r$ and $z$.
   \end{itemize} 
   
   We clustered like parameter sets in order to reduce the state space to
   a more easily interpretable size.
   \begin{itemize}
-  %MRS3: Maybe ``independent sets'' -> ``independent states, each with separate VAR(1) parameters?''
-  \item For each solute studied, we identified between 200-300 independent sets of
-   parameters. % BJC2: just a guess for now
+  \item For each solute studied, we identified 200-300 independent states, each
+  with separate VAR(1) parameters. % BJC2: just a guess for now
    \item Many of these states exhibit very similar dynamical behavior except their
    mean levels are different, especially in the axial direction where solutes could
    get trapped along a broad and continuous range of $z$ coordinates.
    \item Since we do not know the number of states with shared dynamical behavior
    beforehand, we used a non-parametric Bayesian Gaussian mixture model in order
-   %MRS3: group -> cluster
-   to group them. % cite scikit-learn  
+   to cluster them. % cite scikit-learn  
 %   \item This is necessary for us to perform any kind of mechanistic speculation.
   \end{itemize}   
  
   % BJC2: this part may expand a bit if I try different clustering approaches. But
   % this is the one I'm going with for now.
   We clustered based on 5 variables: the radial means of each state, the two
-  eigenvalues of $A$ and the two eigenvalues of $e_t$.
+  eigenvalues of $A$ and the two eigenvalues of $\Sigma$.
   \begin{itemize}
    \item Unfortunately, the number of independent parameter sets is too low for
    clustering in higher dimensions. 
-   \item Ideally, we could use all of the entries of $A$ and $e_t$ in addition to 
+   \item Ideally, we could use all of the entries of $A$ and $\Sigma$ in addition to 
    the radial means.
    \item It would not be helpful to use the means in the $z$ direction because solutes
-   are essentially unbound in that direction, while 
+   are essentially unbound in that direction.
    \item However, in our previous work, we observed radially dependent dynamical 
-   behavior.~\cite{coscia_chemically_2019}  % cite new paper too.
+   behavior.~\cite{coscia_chemically_2019}  % cite new paper eventually too.
   \end{itemize}
 
   We remapped the state sequence based on the cluster assignments and
@@ -488,8 +522,11 @@
   \begin{itemize}
    \item The IHMM algorithm also produces an estimate of $T$, but since we 
    fixed the state sequence, we decided to explicitly calculate $T$ by 
-   counting the number of transitions between states.
+   counting the number of transitions between states compiled across all 
+   trajectories.
    %MRS3: seems like you should just be able to lump together the IHMM states to generate the IHMM estimate of T?
+   %BJC3: That's what I do. Maybe I'm misunderstanding your suggestion. I added a little bit to the sentence
+   % above to try and make more clear.
   \end{itemize}  
   
   We obtained $\mathbf{c}$ vectors of the clustered states by averaging 
@@ -500,8 +537,8 @@
   \end{itemize}
 
   %MRS3: ``used the IHMM algorithm'' -> ``used the parameter inference part of the IHMM algorithm''?
-  We used the IHMM algorithm in order to infer $A$ and $\mathbf{e}_t$ of the 
-  clustered states.
+  We used the parameter inference component of the IHMM algorithm in order to 
+  infer $A$ and $\Sigma$ of the clustered states.
   \begin{itemize}
    %BJC2: I'm unsure of the precise reasoning here.
    \item We could not simply take the mean of the clustered 
@@ -520,9 +557,7 @@
   Finally, we generated stochastic trajectory realizations using the clustered
   parameter sets.
   \begin{itemize}
-    %MRS3: not sure what is meant by ``Weighted by the rows of T''? Should it just be given by T? 
-    \item We drew state sequences with transition probabilities weighted by the 
-    the rows of $T$.
+    \item We drew state sequences with transition probabilities given by $T$.
     \item While in a given state, we simulated motion according to the VAR(1)
     parameterization of that state.
     \item After each state transition, we reset the unconditional mean of each 

@@ -168,10 +168,8 @@ class CoordinateTrace(object):
 
             rd = self.radial_distance[:, i]
             trace = self.com[:, i, self.axis]
-
             points = np.array([self.time / 1000, trace]).T.reshape(-1, 1, 2)
             segments = np.concatenate([points[:-1], points[1:]], axis=1)
-
             lc = LineCollection(segments, cmap=colormap, norm=norm)
             # Set the values used for colormapping
             lc.set_array(rd)
