@@ -589,28 +589,87 @@
   where $\Delta C_j$ is the trans-membrane concentration difference.
 
   \section{Results and Discussion}
-  %MRS2: how stable are the results to realizations of the system
+
   \subsection{Inferring Solute Transport Mechanisms}
   
-  Clustering parameters sets results in X distinct dynamical modes.
+  % BJC: I'll use an example molecule for this section. I'll put files up so
+  % that people can look at any trajectory.  
+  
+  Solutes in this system show a wide range of behavior influenced by the 
+  heterogeneity of the nanostructure as well as the interactions between 
+  monomers and solute chemical functionality.
+  
+  The IHMM does a sufficient job of capturing differences in solute dynamics
+  for individual trajectories.
   \begin{itemize}
-    \item In the figure below, we show time series simulations that qualitatively
-    illustrate the difference in dynamical behavior between modes.
+    \item In Figure TBD, we show the states identified by the IHMM for a single
+    methanol trajectory. The IHMM found x number of states, with y of them 
+    existing for an appreciable amount of time (quantify this).
   \end{itemize}
-   
-  %BJC1: a figure showing some representative fluctuations in each mode
-
-  \noindent We can relate the identified states back to transport mechanisms.
+  
+  Depending on the path followed, solute trajectories show diverse behavior.
   \begin{itemize}
-  	\item More detailed discussion of identified states
-  	\item How size of fluctuations, autoregressive parameters are influenced by trapping mechanisms
-  	\item How do these states compare to those identified in our previous work?
-  	\item Any new states?
+    \item Some show lots of movement
+    \item Some show almost no movement
+    \item While all trajectories might not be the same, it is likely that 
+    multiple trajectories might share some similar behavior.
   \end{itemize}
+  
+  Appropriate clustering helps up group these similarities so that we can 
+  more easily interpret the MD trajectories.
+  
+  Although we want to narrow the sets of VAR parameters, it is
+  important not to prune too much.
+  \begin{itemize}
+    \item Since we are working with VAR parameters in two dimensions, there
+    is a potential for many distinct combinations of behavior.
+    \item If we only consider the diagonal entries of the $A$ and $\Sigma$ matrices,
+    a total of four independent variables, we can consider clustering each 
+    into at least two groups (higher versus lower values), which implies $2^4$ distinct
+    dynamical behaviors. 
+    %BJC: this might belong in methods
+    %BJC: need to come up with a good justification for choice of distance threshold.
+    \item If we set the distance threshold too high, visually non-similar states 
+    will be clustered together.
+    \item If we set the distance threshold too low, we will identify more states 
+    than are needed to sufficiently describe the system.
+    \item Maybe a plot showing what the trajectories look like with too much clustering. 
+  \end{itemize}
+  
+  In order to not negelect the large variety of behavior present in this system, we
+  aim to strike a balance between clustering and faithfully representing all of
+  the types of behavior observed. 
+  
+  % BJC: Show a trajectory that shares many states with another state. Color them the same to show that clustering did something
+  
+  As should be expected, it would be unlikely to expect only a handful of states.
+  However, we are well versed in the types of interactions that exist in this system:
+  \begin{itemize}
+    \item Hydrogen bonding
+    \item Sodium Ion association
+    \item Distance from pore center
+    \item Heterogeneous density
+    \item By simultaeneously viewing these metrics alongside state predictions, we 
+    can form a picture of how solute's behave in these systems.
+    \item And we can determine which of them contribute the most to MSD (?)
+  \end{itemize}
+  
+  A plot of the different states found and talk about how they are different
+  
+  Here are the major observations based on this trajectory.
+  
+  Say how this approach is useful and may be best applied carefully on a case by 
+  case basis in order to maximize undrestanding. But this is much simpler than
+  studying the MD trajectories.
+  
   
   \subsection{Reproducing MD Trajectories and MSDs with the IHMM}
-  
+  % BJC: don't forget to mention in the methods that clustering is necessary in order to
+  % construct a single set of parameters used to project MSDs
+    
   \noindent Trajectory realizations qualitatively match MD simulation trajectories.
+  
+  More distinct states generally leads to better qualitative matches.
 
   \begin{itemize}
     %MRS2: think about how to quantify the simiilarity of the hopping and trapping behavior.

@@ -25,18 +25,19 @@ class Cube(object):
 
 class LocalDensity:
 
-    def __init__(self, traj, gro):
+    def __init__(self, traj, gro, start_frame=0):
         """ Find the local density in a monoclinic unit cell
         """
 
         print('Loading Trajectory...', end='', flush=True)
-        t = md.load(traj, top=gro)
+        t = md.load(traj, top=gro)[start_frame:]
         print('Done!')
 
         keep = [a.index for a in t.topology.atoms if a.element.name is not 'hydrogen']  # don't include hydrogens
 
         self.pos = t.xyz[:, keep, :]
 
+        self.box_vectors = t.unitcell_vectors
         box = t.unitcell_vectors.mean(axis=0)
         self.xbox, self.ybox, self.zbox = box[0, 0], box[1, 1], box[2, 2]
         self.xshift = np.sqrt(self.xbox ** 2 - self.ybox ** 2)
