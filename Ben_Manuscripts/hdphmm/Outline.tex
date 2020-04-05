@@ -484,7 +484,7 @@
    	with separate VAR(1) parameters.
    	\item Many of these states exhibit very similar dynamical behavior except their
    	mean levels are different, especially in the axial direction where solutes could
-   	get trapped along a broad and continuous range of $z$ coordinates. 
+   	gßet trapped along a broad and continuous range of $z$ coordinates. 
   %MRS4: Maybe better to phrase above in terms of the symmetry in z. Why does it matter the range is continuous?
   \end{itemize}
   
@@ -533,6 +533,7 @@
 %    the diagonal entries of the $A$ and $\Sigma$ matrices, a total of four independent
 %    variables, we can consider clustering each into at least two groups (higher versus
 %    lower values), which implies $2^4$ distinct dynamical behaviors. 
+%MRS5: should be lower-case 's' on silhouette
     \item We used the Silhouette test in order to score the quality of
     clusters as a function of the number of clusters chosen.
     \item For our data, the Silhouette test generally favors the lowest number
@@ -668,17 +669,29 @@
   
   %BJC3: I still need labels for this plot
   %BJC4: Also, for some reason, when saving to a PDF, the colorbars are faded. I'll fix this eventually.
+  %MRS5: explicitly state how many states there are, and their colors.
   \begin{figure}
   \includegraphics[width=\textwidth]{mechanism_map.pdf}
   \caption{We can learn a significant amount of detail about solute motion by viewing 
   solute trajectories color-coded according to their clustered dynamical behavior alongside
   plots of the dominant molecular interactions and descriptions of the membrane's local 
-  environment. In the plot above, we show the radial and axial coordinates of a chosen 
+  environment. In the plot above, we show the radial and axial coordinates of a 
+  %MRS5:
+  %chosen
+  single
   methanol molecule over the course of the equilibrated portion of its MD simulation.
   Disjoint segments of the same color imply the solute behaves similarly at different 
-  points of the trajectory because their VAR parameters are represented by the same 
+  points of the trajectory because their VAR parameters %
+  %MRS5:
+  %are represented by 
+  place them in
+  the same 
   %BJC4: eventually I'll label the bars and probably put a picture of the monomer with different oxygens labeled
-  cluster. Above the plot are bars which represent different phyiscal interactions and
+  cluster. 
+  %MRS5:
+  %Above 
+  On the top of
+the plot are bars which represent different physical interactions and
   the membrane's local environment as a function of time. The top bar is colored green 
   at time points where solutes are associated with sodium. Methanol associates
   with sodium ions relatively rarely. The next bar down is colored when hydrogen bonds exist. Blue slivers
@@ -697,7 +710,7 @@
   is the same as shown by the radial coordinate but can be a helpful visual aid when
   studying the other bars.}\label{fig:mechanism_map}
   \end{figure}
-  
+  %MRS5: hmm, one sign that someting might be nonideal is the clustering in the light blue state (assuming 1 light blue state), looking at the 75 nm to 550 nm segment and the 900 - 1050 nm segment, the r is quite different (1 vs 3), and the h-bonding patterns are very different (Green vs. none). So it's not entirely clear these should necessarily be the same state. Thoughts?
   One can gain significant chemical intuition just by studying plots like
   Figure~\ref{fig:mechanism_map}.
   \begin{itemize}
@@ -774,6 +787,7 @@
   percentage of trajectories in which they appear are listed between the $r$ and $z$ plots. 
   All four of these states are exhibited in the trajectory shown in Figure~\ref{fig:mechanism_map}
   and are colored to match for easy visual comparison. All time series have a mean of zero and are
+  %MRS5: state how much shifted - or maybe plot a dotted line at the zero of each plot?
   shifted for the purpose of visualizing them. (b) Using the transition probabilities (p), 
   we estimated the average time spent within each of the states using 1000 simulations of a Bernoulli 
   process where we continued to draw until transitioning out of the state with probability 1 - p.
@@ -807,7 +821,9 @@
   \end{itemize}
   
   It is important to understand that the clustered parameter sets are
+  %MRS5: summaries-> averages?
   essentially summaries of many related behaviors. Therefore, the most thorough
+  %MRS5->Figure 6 does have show that there is variance between trajectories. 
   understanding of a specific segment will be gained using descriptive visualizations
   like Figure~\ref{fig:mechanism_map}. But this model very clearly tells the user where
   to look.
@@ -819,19 +835,29 @@
   % hydrogen bond about the same amount. So I think hbond lifetimes may be the key. 
   % I need to implement this first to test that hypothesis.
   %BJC4: I didn't put sodium ion assocaition in this because it's infrequent. 
+  %MRS5: is it correlated with specific states?
   %BJC4: If I compare to acetic acid or urea, I could add it back. I was thinking of splitting
   % the pi chart in half with slices corresponding to hbonds on one side and association on the other
   \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{hbond_pi_charts.pdf}
   \caption{With our clustering approach, methanol exhibits similar state behaviors
+  %MRS5: So this is a little counterintuitive, in that the separate states have similar behavior.
+  %MRS5: Are there charts that show what is _different_ about the states as well?  The previous figure
+  %      Shows that they are dynamically different, but this structural pie charge says the existance
+  %      of H-bonding is not the reason . . . 
   in all regions of the membrane. In all of the common states described in 
   Figure~\ref{fig:common_states_MET}, methanol, at some point, hydrogen bonds with 
   each region of the LLC monomer to an appreciable degree. However, methanol frequently
   is not hydrogen bonded at all.
   %BJC4: hypothesis yet to be tested. Somehow, I'll incorporate lifetimes into this plot
+  %MRS4: lifetimes would be good!
   We can learn more by looking at the hydrogen bond lifetime. In states 2 and 4, solutes
   stay hydrogen bonded for longer periods of time.
+  %MRS5: OK, here is some physical insight - local density is what determines trapping. Emphasize the physical mechanisms (wat does and doesn't come out physically because of these analyses) like this more explicitly.
+  %MRS5: can you make other graphs like the H-bond graph? like histogram/pie chart of local density
+  %MRS5: as a function of state?  What about r as a function of state?  what other ways are there to show
+  %MRS5: the characteristics of the states?
   These longer lifetimes exist because, when hydrogen bonded, the local density is higher, preventing the 
   bond from breaking so easily. In states 1 and 3, hbonds are fleeting interactions because
   the surrounding density is low, allowing solutes to move more freely.
@@ -859,6 +885,12 @@
   \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{trajectory_realizations_MET.pdf}
+  %MRS5: maybe it would be good to put a dotted line through each of the centers of the offset trajectories?
+  %MRS5: Do they really qualitatively reproduce?  the r behavior doesn't really look that similar, as it goes back
+  %      and forth, but not get stuck. 
+  %      Note: it's OK that if the model ends up not being able to describe the system, but we should be clear in 
+  %      what ways it does and doesn't. 
+
   \caption{We can qualitatively reproduce the average behavior of methanol trajectories
   using our model. Solute trajectories generated by our model (blue) show the same
   hopping and trapping behavior exhibited by MD (black). The behavior of individual 
@@ -869,6 +901,9 @@
   %BJC4: this observation is how I got the idea to calculate MSD by parameterizing
   % individual trajectories  
   %BJC4: Also note that I'm not currently happy with how I generate the radial dimension. 
+  %MRS5: how do you do that currently? We talked about generating dynamics in x, y, and z, 
+  %MRS5: (should be same parameters for x and y, because of symmetry), and then converting to r. 
+  %MRS5: could make this more clear in the methods. 
   % Improvements will not affect z or the MSD because the VAR parameters won't change except for c
    }\label{fig:trajectory_realizations_MET}
   \end{figure}
@@ -884,6 +919,17 @@
     MD and our realizations improves. 
     % BJC3: I'm not sure the best course of action. I've double checked the bootstrapping
     % procedure and it make sense to me.
+    % MRS3: Thinking out loud - if 4/24 trajectories are big, then 
+    % (5/6)^24 = 0.013 will contain none of the 'big' trajectories.
+    % 24*(1/6)*(5/6)^23 = 0.060 will contain 1.
+    % C(24,2)*(1/6)^2*(5/6)^22 = 0.139 will contain 2
+    % C(24,3)*(1/6)^3*(5/6)^21 = 0.204 will contain 3 
+    % C(24,4)*(1/6)^4*(5/6)^20 = 0.214 will contain 4
+    % C(24,5)*(1/6)^5*(5/6)^19 = 0.171 will contain 5
+    % C(24,6)*(1/6)^6*(5/6)^18 = 0.108 will contain 6
+    % MRS5: so I guess it makes sense that the median bootstrap trajectory will have 4 big trajectories,
+    % MRS5: and that the 1 sigma line on the lower end will be ones with 2 'big' trajectories.
+    % MRS5: You could also plot the 95% confidence intervals
     % BJC3: I could show how it's possible to get good agreeement with MD by only
     % generating 24 solute trajectories since in some cases, outliers heavily weight the averages.
     \item Acetic acid has no obvious outliers and shows good agreement between MD and
