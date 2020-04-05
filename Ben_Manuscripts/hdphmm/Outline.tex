@@ -258,11 +258,9 @@
     weights $\beta_k$ come from a stick-breaking process parameterized by the  
     concentration parameter $\gamma$ (equivalently referred to as GEM($\gamma$)). 
     \item Also expressed $G_0 \sim DP(\gamma, H)$
-    %MRS3: This next line is a bit vauge (expresses confidence, closely related)
-    %BJC3: tried to make more clear
-    %MRS4: physically mention what the base distribution is?
-   \item The concentration parameter, $\gamma$, expresses one's confidence in the 
-    base distribution $H$. 
+    \item The concentration parameter, $\gamma$, expresses one's confidence in the 
+    base distribution $H$.
+    \item We use a uniform base distribution.
     \item When $\gamma\to 0$, the first weight of $G_0$, $\beta_1$, approaches 
     unity and for $\gamma\to\infty$, the weights become uniform and $G_0$ closely
     resembles $H$.
@@ -435,7 +433,7 @@
   \centering
   \includegraphics[width=\textwidth]{prior_guesses.pdf}
   %MRS4: remind people what $c$ physically represents here. 
-  \caption{The parameters of the prior on $c$ (black line) should be chosen such
+  \caption{The parameters of the prior on the mean vector, $c$, (black line) should be chosen such
   that the mean levels of each state identified in the trajectory (blue line) lie within
   regions of the prior with reasonable probability. We chose the mean of the prior 
   as halfway between the maximum and minimum of each trajectory dimension. We chose 
@@ -471,6 +469,8 @@
   meaningful alone due to the system's radial symmetry.
   \begin{itemize}
     %MRS4: Do you need to convert the covariance to cylintrical coordinates here before clustereing? 
+    %BJC4: No because I only convert the coordinates to cylindrical and then use 
+    % the inference part of the IHMM to estimate the covariance.
     \item We converted the $x$ and $y$ center-of-mass coordinates to $r$.
     \item We fixed the state sequence from the 3D parmeterization and applied the
     inference component of the IHMM procedure to the cylindrical trajectories in
@@ -521,6 +521,7 @@
    to clustering on all four features at once, since there can be up to, but not 
    necessarily exactly, $mn$ states. 
    %MRS4: so no clustering based on transition probablity, correct?
+   %BJC4: not at the moment. That might have been more helpful if I was first-order differencing.
   \end{itemize} 
   
   Choosing the number of clusters can be somewhat subjective so
@@ -657,6 +658,7 @@
     solute's local environment and physical interactions that it undergoes at that
     time frame.
     %MRS: maybe number (1-4) or label (a-d) the rows as well. 
+    %BJC4: yeah, meant to do that. As it stands, I'm referring to 1 through 4 as bottom through top.
     \item From the top, they describe whether the solute is associated with sodium,
     whether the solute is hydrogen bonding with the monomer as well as what part of
     the monomer it is hydrogen bonding to, the local number density surrounding the
@@ -665,9 +667,35 @@
   \end{itemize}
   
   %BJC3: I still need labels for this plot
+  %BJC4: Also, for some reason, when saving to a PDF, the colorbars are faded. I'll fix this eventually.
   \begin{figure}
   \includegraphics[width=\textwidth]{mechanism_map.pdf}
-  \caption{}\label{fig:mechanism_map}
+  \caption{We can learn a significant amount of detail about solute motion by viewing 
+  solute trajectories color-coded according to their clustered dynamical behavior alongside
+  plots of the dominant molecular interactions and descriptions of the membrane's local 
+  environment. In the plot above, we show the radial and axial coordinates of a chosen 
+  methanol molecule over the course of the equilibrated portion of its MD simulation.
+  Disjoint segments of the same color imply the solute behaves similarly at different 
+  points of the trajectory because their VAR parameters are represented by the same 
+  %BJC4: eventually I'll label the bars and probably put a picture of the monomer with different oxygens labeled
+  cluster. Above the plot are bars which represent different phyiscal interactions and
+  the membrane's local environment as a function of time. The top bar is colored green 
+  at time points where solutes are associated with sodium. Methanol associates
+  with sodium ions relatively rarely. The next bar down is colored when hydrogen bonds exist. Blue slivers
+  correspond to hydrogen bonds donated to the monomer's carboxylate head group. Green slivers
+  corrrespond to  hydrogen bonds donated to the ether linkages between the head groups
+  and tails. Red slivers correspond to hydrogen bonds donated to the oxygens on the ends
+  of the monomer tails. Methanol exhibits significant hydrogen bonding with all parts of
+  the monomer. Which part of the monomer methanol is hydrogen bonds to is heavily correlated
+  to the solute's $r$ coordinate. The bar with the blue gradient represents the local 
+  membrane density based on the solute's ($r$, $z$) coordinate. Darker shades of blue
+  %BJC4: eventually I want some kind of color bar legend
+  correspond to higher membrane densities. The density appears to be higher when methanol
+  motion appears restricted (e.g. from 75 to 550 ns). It is low in areas where methanol's
+  position fluctuates significantly (e.g. from 550 to 700 ns). Finally, the bottom bar
+  simply color-codes the solute's radial distance from the pore center. This information
+  is the same as shown by the radial coordinate but can be a helpful visual aid when
+  studying the other bars.}\label{fig:mechanism_map}
   \end{figure}
   
   One can gain significant chemical intuition just by studying plots like
@@ -733,12 +761,32 @@
   \caption{}\label{fig:common_states_MET_lines}
   \end{subfigure}
   \begin{subfigure}{0.35\textwidth}
+  % BJC: I'll bootstrap some errorbars on this by drawing the transition probabilities 
+  % from a dirichlet distribution.
   \includegraphics[width=\textwidth]{dwell_times_MET.pdf}
   \caption{}\label{fig:dwell_times_MET}
   \includegraphics[width=\textwidth]{A_sigma_scatter_MET.pdf}
   \caption{}\label{fig:A_sigma_scatter_MET}
   \end{subfigure}
-  \caption{}\label{fig:common_states_MET}
+  \caption{We can learn the most about methanol's behavior by studying the dynamics
+  of the states common to the majority of methanol trajectories. In (a), we show representative
+  dynamics of four states that are common to more than half of the solute trajectories. The
+  percentage of trajectories in which they appear are listed between the $r$ and $z$ plots. 
+  All four of these states are exhibited in the trajectory shown in Figure~\ref{fig:mechanism_map}
+  and are colored to match for easy visual comparison. All time series have a mean of zero and are
+  shifted for the purpose of visualizing them. (b) Using the transition probabilities (p), 
+  we estimated the average time spent within each of the states using 1000 simulations of a Bernoulli 
+  process where we continued to draw until transitioning out of the state with probability 1 - p.
+  On average, methanol stay in states 2 and 4 for much longer periods of time than states 1 and 3.
+  This is qualitatively evident in Figure~\ref{fig:mechanism_map}. (c) We can use the understanding
+  from (a) and (b) in order to relate the state parameters to solute motion. States 1 and 3 have
+  large covariances relative to states 2 and 4. Paired with their short dwell times, it is reasonable
+  to hypothesize that states 1 and 3 contribute to hopping behavior while states 2 and 4 
+  correspond to trapped solute behavior. All states have positive autoregressive coefficients (A) in 
+  each dimension which implies motion that is positively correlated to its previous step. States 3 and
+  4 have higher autoregressive coefficients than 1 and 2. This implies that solutes in states 3 and 
+  4 tend to wander more from their mean position in each dimension. This appears to be the case when
+  comparing the behavior of states 2 and 4 in Figure~\ref{fig:mechanism_map}.}\label{fig:common_states_MET}
   \end{figure}
   
   %BJC3: I'm struggling a bit with this part of the analysis. The story isn't as clear
@@ -770,10 +818,24 @@
   % how often they are hydrogen bonded in general versus not hydrogen bond. They all
   % hydrogen bond about the same amount. So I think hbond lifetimes may be the key. 
   % I need to implement this first to test that hypothesis.
+  %BJC4: I didn't put sodium ion assocaition in this because it's infrequent. 
+  %BJC4: If I compare to acetic acid or urea, I could add it back. I was thinking of splitting
+  % the pi chart in half with slices corresponding to hbonds on one side and association on the other
   \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{hbond_pi_charts.pdf}
-  \caption{}\label{fig:hbond_pichart}
+  \caption{With our clustering approach, methanol exhibits similar state behaviors
+  in all regions of the membrane. In all of the common states described in 
+  Figure~\ref{fig:common_states_MET}, methanol, at some point, hydrogen bonds with 
+  each region of the LLC monomer to an appreciable degree. However, methanol frequently
+  is not hydrogen bonded at all.
+  %BJC4: hypothesis yet to be tested. Somehow, I'll incorporate lifetimes into this plot
+  We can learn more by looking at the hydrogen bond lifetime. In states 2 and 4, solutes
+  stay hydrogen bonded for longer periods of time.
+  These longer lifetimes exist because, when hydrogen bonded, the local density is higher, preventing the 
+  bond from breaking so easily. In states 1 and 3, hbonds are fleeting interactions because
+  the surrounding density is low, allowing solutes to move more freely.
+  }\label{fig:hbond_pichart}
   \end{figure}
     
   \subsection{Reproducing MD Trajectories and MSDs with the IHMM}
@@ -797,7 +859,18 @@
   \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{trajectory_realizations_MET.pdf}
-  \caption{}\label{fig:trajectory_realizations_MET}
+  \caption{We can qualitatively reproduce the average behavior of methanol trajectories
+  using our model. Solute trajectories generated by our model (blue) show the same
+  hopping and trapping behavior exhibited by MD (black). The behavior of individual 
+  MD trajectories tend to show wider variability than our model's realization because
+  the model effectively represents the average behavior of the MD trajectories. This 
+  implies that much longer simulations might be necessary in order to obtain a set
+  of trajectories that explore state space to the same extent.
+  %BJC4: this observation is how I got the idea to calculate MSD by parameterizing
+  % individual trajectories  
+  %BJC4: Also note that I'm not currently happy with how I generate the radial dimension. 
+  % Improvements will not affect z or the MSD because the VAR parameters won't change except for c
+   }\label{fig:trajectory_realizations_MET}
   \end{figure}
   
   \noindent The MSDs calculated by stochastic realizations of our model are
@@ -835,6 +908,14 @@
   \includegraphics[width=\textwidth]{msd_ACH.pdf}
   \caption{}\label{fig:msd_ACH}
   \end{subfigure}
+  \caption{The MSDs predicted based on 1000 realizations of our model (blue) tend to underpredict
+  the MSDs based on the MD trajectories (black). Due to the variability in solute behavior across MD trajectories,
+  as demonstrated in Figure~\ref{fig:trajectory_realizations_MET}, there are several 
+  individual solute MSD curves that are significantly higher than the rest and drive up the
+  mean of the MSD. If we remove those trajectories from the MSD calculation, we obtain 
+  estimates much closer to the IHMM estimate.(I haven't done it yet, but could plot a third curve
+  with outlier removed). Acetic acid, has no obvious outliers which is consistent with our model's
+  prediction which lies within the 1$\sigma$ confidence interval of MD after a 1000 ns time lag.}\label{fig:msds}
   \end{figure}
   
   % BJC3: maybe need to talk about the curvature. Our model shouldn't have noticeable

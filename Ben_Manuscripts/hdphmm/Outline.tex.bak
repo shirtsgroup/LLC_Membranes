@@ -24,6 +24,9 @@
 
   \graphicspath{{./figures/}}
   \maketitle
+  
+  % BJC2: I'm not putting a lot of effort into the introduction since I'll only write
+  % an abbreviated form for my dissertation. I'll work on the intro after my defense.  
 
   \section{Introduction}
   
@@ -176,13 +179,14 @@
   \section{Methods}
     
   We ran all MD simulations and energy minimizations using GROMACS 2018. We
-  performed all post-simulation trajectory using python scripts which are available
+  performed all post-simulation trajectory analysis using python scripts which are available
   online at \\ \texttt{https://github.com/shirtsgroup/LLC\_Membranes}.
 
   \subsection{Molecular Dynamics Simulations}
   
   % BJC: Could I just reference previous work here? "MD simulations were run as 
   % described in our previous work..."
+  % BJC2: Or I could just say that I'm using the same data from the last paper. See that paper.
 
   We studied transport of solutes in the H\textsubscript{II} phase using an
   atomistic molecular model of four pores in a monoclinic unit cell with 
@@ -220,19 +224,20 @@
   \end{itemize}
 
   \subsection{The Infinite State Hidden Markov Model}\label{method:IHMM}
-  %BJC: There is a fair amount of detail here just so I could understand better by writing it out
   
   Hidden Markov models (HMMs) are a useful and widely used technique
   for modeling sequences of observations where the probability of the next observation
-  in a sequence depends on a previous unobserved, latent or hidden, state.~\cite{beal_infinite_2002}
-  %MRS2: it can depend on other things, but ALSO depends on the latent state.
+  in a sequence depends, at least in part, on a previous unobserved, latent or hidden, state.~\cite{beal_infinite_2002}
   \begin{itemize}
     \item In the context of our simulations, the observations correspond to 
     the center of mass coordinates of the solutes versus time, and the states
     correspond to the dynamical behavior which give rise to those types
     of observations.
-    \item Unfortunately, standard HMMs require the number of hidden states to be known
-    a priori.
+    \item The probability of transitioning to a state based on the current
+    state is mathematically defined in terms of an $n\times n$ transition
+    probability matrix, $T$, where $n$ is the number of states.
+    \item Unfortunately, standard HMMs require $n$ to be known
+    \textit{a priori}.
     \item One can partially overcome this by testing a range of numbers of 
     hidden states and determining which is the best representation of the
     data.
@@ -243,17 +248,22 @@
   The infinite-state HMM overcomes this drawback by placing a hierarchical
   Dirichlet process (HDP) prior on the transition probabilities.
   \begin{itemize}
-    \item Using some base probability distribution, H, a Dirichlet process 
-    (DP) generates distributions over a countably infinite number of 
-    probability measures:
+    \item Using some base probability distribution, $H$, a Dirichlet process 
+    (DP) generates discrete distributions, $G_0$, over a countably infinite 
+    number of probability measures:
     \begin{equation}
       G_0 = \sum_{k=1}^{\infty} \beta_k \delta_{\theta_k} ~~ \theta_k \sim H, \beta \sim GEM(\gamma)
     \end{equation}
     where the $\theta_k$ are values drawn from the base distribution and the
-    weights $\beta_k$ come from a stick-breaking process parameterized by the concentration 
-    parameter $\gamma$ (equivalently referred to as GEM($\gamma$)). 
-    \item The concentration parameter expresses one's confidence in H relative to the posterior 
-    and is closely related to the number of data observations.
+    weights $\beta_k$ come from a stick-breaking process parameterized by the  
+    concentration parameter $\gamma$ (equivalently referred to as GEM($\gamma$)). 
+    \item Also expressed $G_0 \sim DP(\gamma, H)$
+    \item The concentration parameter, $\gamma$, expresses one's confidence in the 
+    base distribution $H$.
+    \item We use a uniform base distribution.
+    \item When $\gamma\to 0$, the first weight of $G_0$, $\beta_1$, approaches 
+    unity and for $\gamma\to\infty$, the weights become uniform and $G_0$ closely
+    resembles $H$.
     \item Each row, $G_j$, of the transition matrix is produced by drawing from a DP specified 
     using the $\beta$ vector as a discrete base distribution and a separate concentration
     parameter, $\alpha$.
@@ -266,83 +276,329 @@
     sampling.
   \end{itemize}
   
-  %BJC: I do need to include this
-  \noindent We describe the dynamics of each state using a vector autoregressive (VAR) model. 
+  We describe the dynamics of each state visited by solutes using a first order vector 
+  autoregressive (VAR(1)) model. 
   \begin{itemize}
-  	\item A VAR($r$) process is characterized by a vector of observations in a time series 
+  	\item In general, a VAR($r$) process is characterized by a vector of observations in a time series 
   	that are linearly dependent on $r$ previous values of the time series vector:
   	\begin{equation}
-  	\mathbf{y}_t = \mathbf{c} + \sum_{i=1}^r A_i\mathbf{y}_{t-i} + \mathbf{e}_t~~~~\mathbf{e}_t \sim N(0, \Sigma)
+  	\mathbf{y}_t = \mathbf{c} + \sum_{i=1}^r A_i\mathbf{y}_{t-i} + \mathbf{e}_t~~~~\mathbf{e}_t \sim \mathcal{N}(0, \Sigma)
+  	\label{eqn:var}
   	\end{equation}
-  	Previous observations are weighted by coefficient matrices $A_i$. The VAR($r$) 
+  	Previous observations are weighted by coefficient matrices, $A_i$. The VAR($r$) 
   	process is further characterized by a shift in the mean of each dimension by the
   	vector $\mathbf{c}$ and a white noise term $\mathbf{e}_t$.~\cite{hamilton_time_1994}
         %MRS2: mean is zero in Z, is it necessarily in R (I realize we've talked about this before, but wanted to get the clarification in text)
-  	\item We assumed multivariate Gaussian noise, with mean zero and covariance, $\Sigma$.
-  	\item We limited our analysis to an autoregressive order of $r=1$. %BJC: might try higher orders, but probably not worth it
-  	\item We used a conjugate matrix-normal inverse-Wishart prior on parameters
-  	$A$ and $\Sigma$ and a conjugate Gaussian prior on $\mathbf{c}$ in order to analytically
-  	draw from the posterior.~\cite{fox_nonparametric_2009}
+    %BJC2: The mean I'm talking about below is different than you are describing above.
+    % The multivariate Gausian noise is coming from N(0, \Sigma)
+  	\item We assumed $\mathbf{e}_t$ to be multivariate Gaussian noise, with mean zero and
+  	covariance, $\Sigma$.
+  	\item We limited our analysis to an autoregressive order of $r=1$.
+  	\item This means that we only parameterize $A_1$. To simplify notation, we will just
+  	call it $A$.
+  	\item We used a matrix-normal inverse-Wishart prior on parameters $A$ and $\Sigma$ 
+  	and a Gaussian prior on $\mathbf{c}$ in order to infer their values.~\cite{fox_nonparametric_2009}
+  	%BJC2: I'm not sure above is enough to make it clear how I got the parameters. Maybe I should
+  	% explicitly refer to the fox paper above which outlines the inference procedure in more detail?
   \end{itemize}   
   
+  % BJC2: It might be useful to walk through the following procedure with an example 
+  % trajectory
+  
   %Based on the algorithms developed by Fox et al.~\cite{fox_sticky_2007}, 
-  Using the IHMM framework, we estimated the most likely number and sequence of hidden states
-  while simultaneously estimating VAR(1) parameters for each state and the overall 
-  state transition probability matrix, $T$.
+  Using the IHMM framework, we estimated the most likely number and sequence of hidden
+  states in each solute center-of-mass trajectory while simultaneously inferring VAR(1)
+  parameters for each state and the overall state transition probability matrix, $T$.
   \begin{itemize}
     \item We created a python implementation of this process which we heavily adapted from
     the MATLAB code of Fox et al.~\cite{fox_sticky_2007} 
+    %BJC3: I got the software from this page: https://homes.cs.washington.edu/~ebfox/software/
+    % Maybe I should reach out to emily fox to see how she would prefer I cite the software?
+    %MRS4: yes, she how she wants to cite it.
+    %MRS3: be a bit more specific about what the criteria were for convergence.
+    %BJC3: See if that's better
+    %MRS4: But what quantitative criteria did you use to determine convergence?
     \item Parameter estimation is iterative. Therefore, we looked for convergence 
-    as shown in SI.
+    of each entry in the $\mathbf{c}$ vector as well as the $A$ and $\Sigma$ matrices of 
+    Equation~\ref{eqn:var}.
+    \item Plots illustrating parameter convergence are available in the SI.
     \item We refer the interested reader to much more extensive descriptions of 
-    this process and its implementation. 
+    the inference and sampling procedures used to estimate the VAR(1) parameters
+    and the state sequence. 
     ~\cite{beal_infinite_2002,teh_hierarchical_2006,van_gael_beam_2008,fox_nonparametric_2009,fox_bayesian_2010}
   \end{itemize}
   
-  We applied the IHMM algorithm to the radial and axial coordinates of each 
-  solute center-of-mass trajectory.
+  % BJC3: I tried again with this paragraph above. I want to set up the idea that we
+  % are performing this somewhat complex procedure for a good reason before jumping
+  % straight into it.
+  %MRS3: be more specific - i.e. describe what are the ways you are going to apply it. 
+%  There are many ways one can apply the IHMM algorithm to timeseries data. 
+%  \begin{itemize}
+%    %MRS3: it's not as many as possible, but identify one's supported by the data, right?
+%    \item We begin by trying to identify as many distinct states as possible
+%    in each solute trajectory and then take advantage of the system's cylindrical
+%    symmetry in order to cluster the parameter sets into an interpretable number
+%    of states.
+%    %MRS3: not clear why this is the case?
+%    \item Having a large number of states gives more reliable clustering results.
+%%    \item We believe the subsequent procedure is best suited for our data
+%%    because it can clearly distinguish different dynamical behavior, it takes
+%%    advantage of the system's cylindrical symmetry and represents distinct
+%%    dynamics in an interpretable number of states.
+%  \end{itemize}
+
+  We carefully applied the IHMM algorithm in a way which takes advantage of the
+  system's cylindrical symmetry.
   \begin{itemize}
-    \item We measured the radial coordinate as the distance from the closest
-    pore center.
-    \item Because the pores are somewhat tortuous, we approximated the pore 
-    center with a spline. See previous work.
-    %MRS2: approximated the pore center line with a spline?
+%    \item In general we are interested in the time series created by tracing
+%    each solute's center of mass position. % ALready said this above
+    \item There are a number of viable ways in which one could choose to analyze 
+    these time series.
+    \item We could use all 3 dimensions straight from the output trajectory.
+    \item We could use just the $z$ dimensional coordinate since we are primarily
+    interested in through-plane membrane transport.
+    \item We chose to use a multi-step procedure that we believe adequately
+    distinguishes every type of distinct dynamical behavior exhibited by 
+    the solutes.
+    \item We work in cylindrical coordinates since each pore is cylindrical
+    and we expect solutes to exhibit radially symmetric dynamics.
+  \end{itemize}  
+  
+  We start by applying the IHMM algorithm to 3D solute center-of-mass coordinate 
+  trajectories transformed relative to the closest pore center.
+  \begin{itemize}
+    \item We tracked the solute's motion along the pore axis with the center-of-mass
+    $z$ coordinate.
+    \item Using the nearest pore center as the origin, we represented the radial 
+    distance of each solute's center-of-mass from the pore center in 2 dimensions,
+    $x$ and $y$ (see Figure~\ref{fig:cartesian_cylinder}).
+    \item By working in cartesian coordinates, we avoid mathematical complexity
+    introduced by cylindrical coordinates while estimating the state sequence.
   \end{itemize}
+  
+  \begin{figure}
+  \centering
+  %MRS3: does this preserve the z-axis symmmetry? Is it just ensuring
+  %that you can't jump that far, or is it limitinig the values that
+  %the mean can take? Apologies if it's not clear to me yet.  I'm
+  %pretty sure it's just limiting the jump (since y_t = c + f(y_t-1)),
+  %but would be good to make that explicit - ``i.e. we need to make sure it doesn't jump too far'')
+  \includegraphics[width=0.2\textwidth]{cartesian_cylinder.pdf}
+  \caption{Using the nearest pore center as the origin, we represented the solute's
+  location along the pore axis in terms of the $z$ coordinates and their radial distance
+  from the pore centers in 2 dimensions, $x$ and $y$.}\label{fig:cartesian_cylinder}
+  \end{figure}
+  
+  We applied the IHMM to each of the 24 solute trajectories independently.
+  \begin{itemize}
+    \item Although the IHMM is capable of identifying an infinite number of states, 
+    a Dirichlet Process tends to exhibit a ``rich get richer" effect, favoring
+    a fewer number of states.
+    \item By applying the algorithm to each trajectory independently, we reduce
+    the possibility of lumping together multiple similar states which we
+    would prefer to stay separated before clustering.
+%    \item From a practical implementation standpoint, the algorithm is written
+%    such that we must put a cap on the maximum number of states. We chose to 
+%    allow up to 100 states for each trajectory although the algorithm typically
+%    finds within the range of 5-15 states. 
+    % BJC2: There will probably be a figure telling the number of states for 
+    % each trajectory.
+  \end{itemize}
+  
+  The states identified by the IHMM are heavily influenced by the Gaussian prior
+  placed on $\mathbf{c}$ in Equation~\ref{eqn:var}.
+  \begin{itemize}
+    \item The entries of $A$ and $\Sigma$ do not vary over a wide range, so
+    the final parameters were relatively insensitive to the priors.
+    \item In order to maximally automate the IHMM procedure, we attempted to
+    parameterize the prior on $\mathbf{c}$ in an intelligent way.
+    \item The prior parameters should be chosen such that the mean level of 
+    each state lies within a region of reasonable probability of the prior (see
+    Figure~\ref{fig:prior_guesses}).
+    \item In each dimension, we defined the prior mean to lie halfway between the 
+    maximum and minimum of each trajectory dimension. 
+    \item To parameterize the prior's variance in each dimension, we defined the
+    maximum and minimum to be 2 standard deviations from the prior mean.
+    \item Although this approach has worked quite well for the data in this work,
+    it is important to check the results to determine whether further adjustments
+    to the prior might be needed.
+    \item In the Supporting Information, we show the result of a parameterization
+    where the prior parameters of $c$ were poorly chosen. %TODO
+  \end{itemize}
+  
+  %BJC2: I think it would be useful to continue using this trajectory to illustrate 
+  % the parameterization process. It might be bunch of plots stacked on each other.
+  %BJC2: More labels might be useful if not cluttered
+  \begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{prior_guesses.pdf}
+  %MRS4: remind people what $c$ physically represents here. 
+  \caption{The parameters of the prior on the mean vector, $c$, (black line) should be chosen such
+  that the mean levels of each state identified in the trajectory (blue line) lie within
+  regions of the prior with reasonable probability. We chose the mean of the prior 
+  as halfway between the maximum and minimum of each trajectory dimension. We chose 
+  $\sigma$ of the prior by defining the maximum and minimum to be 2 standard deviations
+  from the mean (dashed lines).}\label{fig:prior_guesses}
+  \end{figure}
+  
+  We ran 2000 iterations of the IHMM procedure in order to arrive at converged 
+  state sequences and parameters for each state.
+  \begin{itemize}  
+    %MRS3: can you say more which categories converged quickly?
+    %BJC3: I imagine states with less sampling converge slower. But I'll need to
+    % look further into this.
+   \item Most parameters converged quickly (within 50-100 iterations) while
+    others took up to 1000 iterations.
+    \item We defined the finalized parameters of each state as the average
+    of the parameters from each iteration recorded after the equilibration 
+    time point.
+    % MRS3: averaged and used this as estimate for running models later? 
+    % BJC3: yes, well for clustering. Tried to clarified above
+    % MRS3: other possbility is maximum a posteriori estimate, but for peaked 
+    % symmetric distributions, it's essentially the same.
+    \item We detected equilibration of the parameters using the module 
+    \texttt{pymbar.timeseries.detect\_equilibration} on the time series of 
+    parameter estimates. 
+    \item We found the equilibration time point of each component of the 
+    $\mathbf{c}$ vector as well as $A$ and $\Sigma$ matrices, and then used the longest
+    equilibration time of all dimensions as the equilibration time point.
+  \end{itemize}
+  
+  We reparameterized the time series, preserving the state sequence, in terms
+  of the radial and axial coordinates ($r$, $z$) because $x$ and $y$ aren't 
+  meaningful alone due to the system's radial symmetry.
+  \begin{itemize}
+    %MRS4: Do you need to convert the covariance to cylintrical coordinates here before clustereing? 
+    %BJC4: No because I only convert the coordinates to cylindrical and then use 
+    % the inference part of the IHMM to estimate the covariance.
+    \item We converted the $x$ and $y$ center-of-mass coordinates to $r$.
+    \item We fixed the state sequence from the 3D parmeterization and applied the
+    inference component of the IHMM procedure to the cylindrical trajectories in
+    order to estimate the VAR(1) parameters in terms of $r$ and $z$.
+  \end{itemize} 
   
   We clustered like parameter sets in order to reduce the state space to
   a more easily interpretable size.
   \begin{itemize}
-    %MRS2: can you enforce that the mean in the z-component is zero?
-    %MRS2: I'm trying to think what other constraints should be enforced. 
-    %MRS2: the issue with state clustering is that when transitionin between two states that are clustered, 
-    %MRS2: it destroys the correlation that would have been within if it was all the same statee.
-    %MRS2: I'm not sure what the implications are. If the simulations are RUN with grouped states, 
-    %MRS2: then the correlation can be reintroduced, so maybe it doesn't matter?
-   \item Since the mean vector, $\mathbf{c}$ of each state can take on 
-    continuous values, the IHMM algorithm tends to find a large number of states,
-    with very few states revisited.
-    % BJC1: This will need to be updated depending on how I cluster. Might need to describe
-    % multiple clustering approaches.
-    \item However, $\mathbf{A_i}$ and $\mathbf{\Sigma}$ tend to share similarities with
-    independently identified states. Therefore, we clustered based on $\mathbf{A_i}$
-    and $\mathbf{\Sigma}$, ignoring the mean.
-    \item Since  we do not know the number of similar states beforehand, we used
-    a non-parametric Bayesian Gaussian mixture model % cite scikit-learn
-    \item We used the clustered parameters in order to relabel states in the estimated
-    state sequences and to recalculate the state transition probability matrix.
+  	\item For each solute studied, we identified 200-325 independent states, each
+   	with separate VAR(1) parameters.
+   	\item Many of these states exhibit very similar dynamical behavior except their
+   	mean levels are different, especially in the axial direction where solutes could
+   	get trapped along a broad and continuous range of $z$ coordinates. 
+  %MRS4: Maybe better to phrase above in terms of the symmetry in z. Why does it matter the range is continuous?
   \end{itemize}
   
-  We generated stochastic trajectory realizations by drawing state sequences 
-  based on the rows of $T$.
+  We reduced the parameter space used agglomerative clustering, a hierarchical
+  clustering approach which uses a linkage criteria in order to successively merge
+  similar clusters until a desired intracluster distance threshold or number of
+  clusters is reached. 
   \begin{itemize}
+   	\item We used the Ward linkage criteria, which works to minimize the sum of
+   	the squared differences within all clusters.
+   	\item We elected to choose the number of clusters rather than the distance
+   	threshold.
+   	\item For our data, non-parameteric methods such as Bayesian Gaussian mixture
+   	models tend to delocalize the clusters in parameter space (see Supporting
+   	Information).
+   	%BJC: will show Gaussian mixture model which has a cluster engulfing another cluster, so it's tails are on both sides of the center cluster.
+  \end{itemize}  
+  
+  % BJC2: this part may expand a bit if I try different clustering approaches. But
+  % this is the one I'm going with for now.
+  We clustered based on the two diagonal entries of $A$ and the two diagonal entries 
+  of $\Sigma$.
+  \begin{itemize}
+   \item One can choose alternative clustering features, such as the eigenvalues of
+   the $A$ and $\Sigma$ matrices, but we chose their diagonals because they can be
+   easily translated to solute behavior.
+   %MRS4: suggest translating them here into solute behavior for the reader!
+   \item We also chose to cluster the diagonals of each matrix independently before
+   combining the clusters to assign final state labels. 
+   \item If we divide the total states into $m$ clusters based on the diagonal entries
+   of $A$ and, separately, $n$ clusters based on the diagonal entries of $\Sigma$,
+   then there are a total of $mn$ possible cluster combinations.
+   \item This allows slightly more flexibility in the total number of states compared
+   to clustering on all four features at once, since there can be up to, but not 
+   necessarily exactly, $mn$ states. 
+   %MRS4: so no clustering based on transition probablity, correct?
+   %BJC4: not at the moment. That might have been more helpful if I was first-order differencing.
+  \end{itemize} 
+  
+  Choosing the number of clusters can be somewhat subjective so
+  we attempted to add some structure to the selection process by following
+  a set of qualitative and quantitative guidelines.
+  \begin{itemize}
+  	%BJC3: not sure if the commented point worth making.
+%    \item We should expect a relatively high number of states. If we only consider
+%    the diagonal entries of the $A$ and $\Sigma$ matrices, a total of four independent
+%    variables, we can consider clustering each into at least two groups (higher versus
+%    lower values), which implies $2^4$ distinct dynamical behaviors. 
+    \item We used the Silhouette test in order to score the quality of
+    clusters as a function of the number of clusters chosen.
+    \item For our data, the Silhouette test generally favors the lowest number
+    of clusters possible (see Supporting Information).
+    \item However, choosing too few clusters tends to result in 
+    inadequate distinguishment between visually obvious differences in 
+    dynamic behavior.
+    \item This results in finalized parameter sets that are averages of
+    distinct behavior which presents further problems with the predictive
+    modeling that we discuss later on.
+    \item We aimed to maintain the highest Silhouette score, and thus lowest
+    number of clusters, possible while verifying that visually distinct 
+    states stayed separated.
+    \item Based on these guidelines, we decided to group the $A$ and $\Sigma$
+    parameters into five clusters each. 
+	\item Of the 25 distinct states allowed by this formulation, the solutes
+	in this study clustered into 13--18 distinct clusters.
+  \end{itemize}
+
+  We remapped the state sequence based on the cluster assignments and
+  generated a state transition probability matrix, $T$.
+  \begin{itemize}
+   \item The IHMM algorithm also produces an estimate of $T$, but since we 
+   fixed the state sequence, we decided to explicitly calculate $T$ by 
+   counting the number of transitions between states compiled across all 
+   trajectories.
+  \end{itemize}  
+  
+  We obtained $\mathbf{c}$ vectors of the clustered states by averaging 
+  each value of $\mathbf{c}$ assigned to the same cluster.
+  \begin{itemize}
+   \item We only care about the $r$ component of $\mathbf{c}$ because solute
+   trajectories are not bound in the $z$ direction.
+  \end{itemize}
+
+  We used the parameter inference component of the IHMM algorithm in order to 
+  infer $A$ and $\Sigma$ of the clustered states.
+  \begin{itemize}
+   %BJC2: I'm unsure of the precise reasoning here.
+   \item We could not simply take the mean of the clustered 
+   $A$ and $\mathbf{e}_t$ parameters because it is not clear that this is a linear 
+   operation for this problem. 
+   \item To circumvent this problem, we modified the ($r$, $z$) solute
+   trajectories so that they had a mean of zero, leaving only the 
+   fluctations. 
+   \item We did this by subtracting the maximum likelihood estimate
+   of the $\mathbf{c}$ vector from each same-state segement of the unclustered
+   trajectory.   
+   \item We used the IHMM algorithm on this modified trajectory to infer
+   the clustered state parameters by fixing the clustered state sequence. 
+  \end{itemize}
+  
+  Finally, we generated stochastic trajectory realizations using the clustered
+  parameter sets.
+  \begin{itemize}
+    \item We drew state sequences with transition probabilities given by $T$.
     \item While in a given state, we simulated motion according to the VAR(1)
     parameterization of that state.
-    \item We set the unconditional mean of each state based on the position 
-    before the state transition occurred.
+    \item After each state transition, we reset the unconditional mean of each 
+    state based on the particle's position immediately before the state transition
+    occurred.
   \end{itemize} 
   
   \subsection{Estimating Flux and Selectivity}
   %BJC: can make this discussion somewhat short since it's already in previous paper. 
+  %MRS4: yes, can be short
   % Should probably just hit all the main equations quickly.
   
   \noindent We calculate first passage times by propagating stochastic trajectories until they
@@ -365,60 +621,353 @@
   where $\Delta C_j$ is the trans-membrane concentration difference.
 
   \section{Results and Discussion}
-  %MRS2: how stable are the results to realizations of the system
-  \subsection{Inferring Solute Transport Mechanisms}
   
-  Clustering parameters sets results in X distinct dynamical modes.
-  \begin{itemize}
-    \item In the figure below, we show time series simulations that qualitatively
-    illustrate the difference in dynamical behavior between modes.
-  \end{itemize}
-   
-  %BJC1: a figure showing some representative fluctuations in each mode
+  Solutes in this system show a wide range of behavior influenced by the 
+  heterogeneity of the membrane's nanostructure as well as the interactions 
+  between monomer and solute chemical functionality. 
+  \begin{itemize}  
+  	\item Our application of the IHMM does a good job of identifying and
+  	distinguishing these behaviors.   	
+  	\item Clustering the behaviors helps us to tell a coherent story which
+  	emphasizes those interactions which most heavily influence solute transport.
+  	\item This analysis approach helps us to break down the very complex behavior
+  	exhibited by solutes over long MD trajectories into discrete categories.
+  \end{itemize}  	
 
-  \noindent We can relate the identified states back to transport mechanisms.
+  \subsection{Automatic Detection of Distinct Dynamical Modes}\label{section:find_modes}
+  
+  %BJC3: I'm not sure if it's worth talking about all of the solutes in this section.
+  % there is a lot to talk about just with methanol (which is all I've done for now -- wanted to
+  % get feedback on analysis approach).
+  %BJC3: I see this more as a demonstration of the model. I think this work has higher
+  % impact potential so I don't want it to be 15 pages.
+  %BJC3: Although, it might be a good idea to include Urea or Acetic acid as a second example
+  % molecule because their behavior is pretty different since their carbonyl group tend to 
+  %MRS4: there should be SOME summary information on the other molecules, but it can just be the conclusions.
+  % associate with sodium a lot.
+  
+  %BJC3: obviously can use a better thesis.
+  We showcase this modeling approach by example. 
   \begin{itemize}
-  	\item More detailed discussion of identified states
-  	\item How size of fluctuations, autoregressive parameters are influenced by trapping mechanisms
-  	\item How do these states compare to those identified in our previous work?
-  	\item Any new states?
+    \item In Figure~\ref{fig:mechanism_map}, we plot a representative 2D methanol 
+    trajectory in cylindrical coordinates.
+    \item The coordinates are colored according to the cluster with which methanol's
+    dynamics are most consistent, which implies that this particular methanol 
+    trajctory exhibits 6 distinct dynamical behaviors. 
+    \item The solute timeseries are coupled with color coded bars which describe the
+    solute's local environment and physical interactions that it undergoes at that
+    time frame.
+    %MRS: maybe number (1-4) or label (a-d) the rows as well. 
+    %BJC4: yeah, meant to do that. As it stands, I'm referring to 1 through 4 as bottom through top.
+    \item From the top, they describe whether the solute is associated with sodium,
+    whether the solute is hydrogen bonding with the monomer as well as what part of
+    the monomer it is hydrogen bonding to, the local number density surrounding the
+    solute and the radial location of the solute with respect to the nearest pore
+    center (this information is redundant but can be a useful visual aid). %BJC3: still debating removing that bar
   \end{itemize}
   
+  %BJC3: I still need labels for this plot
+  %BJC4: Also, for some reason, when saving to a PDF, the colorbars are faded. I'll fix this eventually.
+  \begin{figure}
+  \includegraphics[width=\textwidth]{mechanism_map.pdf}
+  \caption{We can learn a significant amount of detail about solute motion by viewing 
+  solute trajectories color-coded according to their clustered dynamical behavior alongside
+  plots of the dominant molecular interactions and descriptions of the membrane's local 
+  environment. In the plot above, we show the radial and axial coordinates of a chosen 
+  methanol molecule over the course of the equilibrated portion of its MD simulation.
+  Disjoint segments of the same color imply the solute behaves similarly at different 
+  points of the trajectory because their VAR parameters are represented by the same 
+  %BJC4: eventually I'll label the bars and probably put a picture of the monomer with different oxygens labeled
+  cluster. Above the plot are bars which represent different phyiscal interactions and
+  the membrane's local environment as a function of time. The top bar is colored green 
+  at time points where solutes are associated with sodium. Methanol associates
+  with sodium ions relatively rarely. The next bar down is colored when hydrogen bonds exist. Blue slivers
+  correspond to hydrogen bonds donated to the monomer's carboxylate head group. Green slivers
+  corrrespond to  hydrogen bonds donated to the ether linkages between the head groups
+  and tails. Red slivers correspond to hydrogen bonds donated to the oxygens on the ends
+  of the monomer tails. Methanol exhibits significant hydrogen bonding with all parts of
+  the monomer. Which part of the monomer methanol is hydrogen bonds to is heavily correlated
+  to the solute's $r$ coordinate. The bar with the blue gradient represents the local 
+  membrane density based on the solute's ($r$, $z$) coordinate. Darker shades of blue
+  %BJC4: eventually I want some kind of color bar legend
+  correspond to higher membrane densities. The density appears to be higher when methanol
+  motion appears restricted (e.g. from 75 to 550 ns). It is low in areas where methanol's
+  position fluctuates significantly (e.g. from 550 to 700 ns). Finally, the bottom bar
+  simply color-codes the solute's radial distance from the pore center. This information
+  is the same as shown by the radial coordinate but can be a helpful visual aid when
+  studying the other bars.}\label{fig:mechanism_map}
+  \end{figure}
+  
+  One can gain significant chemical intuition just by studying plots like
+  Figure~\ref{fig:mechanism_map}.
+  \begin{itemize}
+    \item It is clear that, for methanol, association with sodium is a much rarer
+    interaction than hydrogen bonding with the LLC monomers.
+    \item Methanol hydrogen bonds to all regions of the monomers dependent on
+    its radial position.
+    \item Its fluctuations tend to be smallest when hydrogen bonded or in areas
+    of high local number density. 
+    \item For example, from approximately 75 to 525 ns, methanol appears to be trapped
+    in a high density region of the tails.
+    \item In the time that follows, it enters a region of relatively low density
+    where fluctuations are quite large. 
+    \item During this time period, there is intermittent, short-lived hydrogen 
+    bonding with the oxygen atoms at the tail ends, as suggested by the frequent 
+    state changes during that time period and red slivers in the bar above.
+  \end{itemize}
+
+  %BJC3: I think I'll just skip to the clustered results. I'd like to keep this
+  % paper on the shorter side.
+%  The IHMM does a sufficient job of capturing differences in solute dynamics
+%  for individual trajectories.
+%  \begin{itemize}
+%    \item In Figure TBD, we show the states identified by the IHMM for a single
+%    methanol trajectory. The IHMM found x number of states.
+%  \end{itemize}
+  
+%  Depending on the path followed, solute trajectories show diverse behavior.
+%  \begin{itemize}
+%    \item Some show lots of movement
+%    \item Some show almost no movement
+%    \item While all trajectories might not be the same, it is likely that 
+%    multiple trajectories might share some similar behavior.
+%  \end{itemize}
+  
+  We may learn the most by studying the dynamical modes common to the majority of 
+  the solute trajectories.
+  \begin{itemize}
+    \item Using the IHMM, we identified 13 total dynamical modes exhibited by 
+    methanol. 
+    \item Of those, 4 appear in at least 50 \% of the methanol trajectories, and
+    2 of them appear in over 90 \% of the methanol trajectories.
+    \item In Figure~\ref{fig:common_states_MET_lines}, we plot representative dynamics
+    of each of the 4 prevelant states.
+    \item Based on their self-transition probabilities, we estimated the average 
+    time spent by each solute in each state (Figure~\ref{fig:dwell_times_MET}).
+    \item States 2 and 4 have long dwell times relative to states 1 and 3 because
+    they have high self-transition probabilities.
+    \item States 1 and 3 show large fluctuations relative to the other states owing
+    to larger covariances in both the axial and radial dimensions. (Figure~\ref{fig:A_sigma_scatter_MET})
+    \item States 1 and 2 have lower autoregressive coefficients relative to states
+    3 and 4.
+    \item All of these states are present in Figure~\ref{fig:mechanism_map} and colored
+    accordingly.
+  \end{itemize} 
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.6\textwidth}
+  \includegraphics[width=\textwidth]{common_states_MET.pdf}
+  \caption{}\label{fig:common_states_MET_lines}
+  \end{subfigure}
+  \begin{subfigure}{0.35\textwidth}
+  % BJC: I'll bootstrap some errorbars on this by drawing the transition probabilities 
+  % from a dirichlet distribution.
+  \includegraphics[width=\textwidth]{dwell_times_MET.pdf}
+  \caption{}\label{fig:dwell_times_MET}
+  \includegraphics[width=\textwidth]{A_sigma_scatter_MET.pdf}
+  \caption{}\label{fig:A_sigma_scatter_MET}
+  \end{subfigure}
+  \caption{We can learn the most about methanol's behavior by studying the dynamics
+  of the states common to the majority of methanol trajectories. In (a), we show representative
+  dynamics of four states that are common to more than half of the solute trajectories. The
+  percentage of trajectories in which they appear are listed between the $r$ and $z$ plots. 
+  All four of these states are exhibited in the trajectory shown in Figure~\ref{fig:mechanism_map}
+  and are colored to match for easy visual comparison. All time series have a mean of zero and are
+  shifted for the purpose of visualizing them. (b) Using the transition probabilities (p), 
+  we estimated the average time spent within each of the states using 1000 simulations of a Bernoulli 
+  process where we continued to draw until transitioning out of the state with probability 1 - p.
+  On average, methanol stay in states 2 and 4 for much longer periods of time than states 1 and 3.
+  This is qualitatively evident in Figure~\ref{fig:mechanism_map}. (c) We can use the understanding
+  from (a) and (b) in order to relate the state parameters to solute motion. States 1 and 3 have
+  large covariances relative to states 2 and 4. Paired with their short dwell times, it is reasonable
+  to hypothesize that states 1 and 3 contribute to hopping behavior while states 2 and 4 
+  correspond to trapped solute behavior. All states have positive autoregressive coefficients (A) in 
+  each dimension which implies motion that is positively correlated to its previous step. States 3 and
+  4 have higher autoregressive coefficients than 1 and 2. This implies that solutes in states 3 and 
+  4 tend to wander more from their mean position in each dimension. This appears to be the case when
+  comparing the behavior of states 2 and 4 in Figure~\ref{fig:mechanism_map}.}\label{fig:common_states_MET}
+  \end{figure}
+  
+  %BJC3: I'm struggling a bit with this part of the analysis. The story isn't as clear
+  % cut as I want because it seems like states which contribute to the same cluster behave
+  % the way they do for somewhat varied reasons. Hence the short paragraph after this one.
+  We can attempt to understand the behavior described in Figure~\ref{fig:common_states_MET}
+  further by relating them to their interactions with the membrane. 
+  \begin{itemize}
+    \item It is clear that solutes can behave similar in different regions of the 
+    membrane because each state hydrogen bonds with LLC atoms located from the monomer head
+    groups to the tails. 
+    %BJC3: The following is a hypothesis to be tested.
+    \item The key difference is the lifetime of these interactions. 
+    \item When in a trapped state (one with smaller covariance like 2 and 4), hydrogen bond
+    lifetimes are generally longer.
+    \item While hydrogen bonds occur in states 1 and 3, the lifetimes are shorter, perhaps
+    broken by fluctuations in their local environment.
+  \end{itemize}
+  
+  It is important to understand that the clustered parameter sets are
+  essentially summaries of many related behaviors. Therefore, the most thorough
+  understanding of a specific segment will be gained using descriptive visualizations
+  like Figure~\ref{fig:mechanism_map}. But this model very clearly tells the user where
+  to look.
+  %BJC3: could do a case study of sorts on a chosen segment
+  
+  %BJC3: this figure is not even close to done
+  %BJC3: I've tried a couple different things to look at the hbonds. The other was 
+  % how often they are hydrogen bonded in general versus not hydrogen bond. They all
+  % hydrogen bond about the same amount. So I think hbond lifetimes may be the key. 
+  % I need to implement this first to test that hypothesis.
+  %BJC4: I didn't put sodium ion assocaition in this because it's infrequent. 
+  %BJC4: If I compare to acetic acid or urea, I could add it back. I was thinking of splitting
+  % the pi chart in half with slices corresponding to hbonds on one side and association on the other
+  \begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{hbond_pi_charts.pdf}
+  \caption{With our clustering approach, methanol exhibits similar state behaviors
+  in all regions of the membrane. In all of the common states described in 
+  Figure~\ref{fig:common_states_MET}, methanol, at some point, hydrogen bonds with 
+  each region of the LLC monomer to an appreciable degree. However, methanol frequently
+  is not hydrogen bonded at all.
+  %BJC4: hypothesis yet to be tested. Somehow, I'll incorporate lifetimes into this plot
+  We can learn more by looking at the hydrogen bond lifetime. In states 2 and 4, solutes
+  stay hydrogen bonded for longer periods of time.
+  These longer lifetimes exist because, when hydrogen bonded, the local density is higher, preventing the 
+  bond from breaking so easily. In states 1 and 3, hbonds are fleeting interactions because
+  the surrounding density is low, allowing solutes to move more freely.
+  }\label{fig:hbond_pichart}
+  \end{figure}
+    
   \subsection{Reproducing MD Trajectories and MSDs with the IHMM}
   
-  \noindent Trajectory realizations qualitatively match MD simulation trajectories.
-
+  We can use the IHMM in order to generate stochastic trajectory realizations
+  which bear qualitatively similar characteristics to those output
+  by our MD simulations.
   \begin{itemize}
-    %MRS2: think about how to quantify the simiilarity of the hopping and trapping behavior.
-    \item Look for hopping and trapping behavior
+    \item Because we clustered the data, we are left with a single transition
+    probability matrix which allows transitions between dynamical behaviors
+    shared by the 24 MD trajectories.
+    \item Therefore, the realizations generated by our model are representative
+    of the average behavior of solutes studied.
+    \item In Figure~\ref{fig:trajectory_realizations_MET}, we show some stochastic
+    realizations generated by our models compared directly to MD.
+    \item The trajectories show clear periods of entrapment with intermittent hops.
   \end{itemize}
   
-  \noindent MSDs generated from stochastic trajectories match those from MD.
+  % BJC3: It might be good to show a few MD trajectories since they vary somewhat widely
+  % in behavior.
+  \begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{trajectory_realizations_MET.pdf}
+  \caption{We can qualitatively reproduce the average behavior of methanol trajectories
+  using our model. Solute trajectories generated by our model (blue) show the same
+  hopping and trapping behavior exhibited by MD (black). The behavior of individual 
+  MD trajectories tend to show wider variability than our model's realization because
+  the model effectively represents the average behavior of the MD trajectories. This 
+  implies that much longer simulations might be necessary in order to obtain a set
+  of trajectories that explore state space to the same extent.
+  %BJC4: this observation is how I got the idea to calculate MSD by parameterizing
+  % individual trajectories  
+  %BJC4: Also note that I'm not currently happy with how I generate the radial dimension. 
+  % Improvements will not affect z or the MSD because the VAR parameters won't change except for c
+   }\label{fig:trajectory_realizations_MET}
+  \end{figure}
+  
+  \noindent The MSDs calculated by stochastic realizations of our model are
+  quantitatively similar to MD.
   \begin{itemize}
-    %MRS2: again, think about the best ways to quantify similar between MD and stochastic trajectories.
-  	\item Look at curvature and 1-$\sigma$ confidence intervals
+  	\item For all solutes except acetic acid, our predicted MSD curve lie close to
+  	but below the 1$\sigma$ confidence intervals of MD.
+  	\item However, in these cases, the average MD MSDs are driven up by single trajectories
+    with uncharacteristically large MSDs.
+    \item If we remove these uncharacteristic trajectories, the agreement between 
+    MD and our realizations improves. 
+    % BJC3: I'm not sure the best course of action. I've double checked the bootstrapping
+    % procedure and it make sense to me.
+    % BJC3: I could show how it's possible to get good agreeement with MD by only
+    % generating 24 solute trajectories since in some cases, outliers heavily weight the averages.
+    \item Acetic acid has no obvious outliers and shows good agreement between MD and
+    IHMM realizations.
   \end{itemize}
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{msd_MET.pdf}
+  \caption{}\label{fig:msd_MET}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{msd_GCL.pdf}
+  \caption{}\label{fig:msd_GCL}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{msd_URE.pdf}
+  \caption{}\label{fig:msd_URE}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{msd_ACH.pdf}
+  \caption{}\label{fig:msd_ACH}
+  \end{subfigure}
+  \caption{The MSDs predicted based on 1000 realizations of our model (blue) tend to underpredict
+  the MSDs based on the MD trajectories (black). Due to the variability in solute behavior across MD trajectories,
+  as demonstrated in Figure~\ref{fig:trajectory_realizations_MET}, there are several 
+  individual solute MSD curves that are significantly higher than the rest and drive up the
+  mean of the MSD. If we remove those trajectories from the MSD calculation, we obtain 
+  estimates much closer to the IHMM estimate.(I haven't done it yet, but could plot a third curve
+  with outlier removed). Acetic acid, has no obvious outliers which is consistent with our model's
+  prediction which lies within the 1$\sigma$ confidence interval of MD after a 1000 ns time lag.}\label{fig:msds}
+  \end{figure}
+  
+  % BJC3: maybe need to talk about the curvature. Our model shouldn't have noticeable
+  % curvature because it's only correlated with one step
   
   \subsection{Estimating Solute Flux and Selectivity}  
   
-  \noindent We can predict macroscopic flux and selectivity.
+  %BJC3: I still need to implement this into my mean first passage time code, but it will very closely follow the 
+  % methodology of the last paper. However, if I see that the decay in flux is
+  % near 2 (which I expect), then I may add a short section showing how you can
+  % simply use the ratio of the MSD slopes in order to estimate selectivity.
+  % I think they should give the same results. Haven't tested it yet though.  
+  
+  We can use realizations of our model in order to predict macropscopic flux and
+  selectivity.
   \begin{itemize}
-  	\item Flux as function of pore length
-  	\item Selectivity as function of pore length (if flux scaling is length-dependent)
+    \item For various length pores, we constructed distributions of first passage times for each solute and
+    fit them to Equation~\ref{eqn:passage_times} in order estimate the mean 
+    first passage time (MFPT). 
+    \item We plotted the inverse of MFPT, the solute flux, versus pore length
+    in Figure TBD.
+    \item Flux rapdily decays with pore length.
+    \item Selectivity is simply the ratio of the fluxes for this system.
   \end{itemize}
- 
+
+  %BJC3: this paragraph is speculative.
+  We can use the slopes of the MSD curves to estimate selectivity in a simpler way.
+  \begin{itemize}
+  	\item As in our previous work, we fit the flux curves to a decaying power law function
+  	of the form:
+  	\begin{equation}
+    	Ae^{-\beta}
+  	\end{equation}
+  	\item We find that in all cases, $\beta$ is equal to 2. This is consistent with Brownian
+	motion which implies long term linear behavior of the MSD curves. 
+	\item Since the diffusion constant is linearly proportional to the slope of the MSD, and 
+	selectivity in this system can be estimated as the ratio of diffusion constants, we can 
+	estimate selectivity directly based on the slopes of our stochastically simulated MSD curves.
+  \end{itemize}
+  
   \section{Conclusion}
   
   \noindent We have shown that the IHMM can be used to parameterize solute time series
   with an unknown number of latent dynamical modes. \\
   
+  \noindent We showcase this modeling approach by example, but it is important to
+  recognize the generality of this analysis.
+  
   \noindent We can use the IHMM to help identify mechanisms by relating the latent
   states to observed solute behavior. \\
   
-  \noindent We can use the IHMM to predict macroscopic transport properties. \\
-  
-  %MRS2: below probably doesn't need to be stated?
-  \noindent The IHMM is not limited to the H\textsubscript{II} phase.
+  \noindent We show how one can use the IHMM to predict macroscopic transport properties. \\
   
   \section*{Supporting Information}
 

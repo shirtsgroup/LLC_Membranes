@@ -11,6 +11,20 @@
 \usepackage{tcolorbox}
 \usepackage[export]{adjustbox}
 \usepackage{listings}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{booktabs}
+\usepackage{cleveref}
+\usepackage{booktabs}
+\usepackage{diagbox}
+\usepackage{array}
+
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\newcommand{\PreserveBackslash}[1]{\let\temp=\\#1\let\\=\temp}
+\newcolumntype{C}[1]{>{\PreserveBackslash\centering}p{#1}}
+\newcolumntype{R}[1]{>{\PreserveBackslash\raggedleft}p{#1}}
+\newcolumntype{L}[1]{>{\PreserveBackslash\raggedright}p{#1}}
 
 \DeclareUnicodeCharacter{03C9}{$\omega$}
 \DeclareUnicodeCharacter{03C0}{$\pi$}
@@ -201,7 +215,7 @@
 
 \begin{document}
 
-\graphicspath{{../transport/figures/}{../structure_paper/figures/}{../transport/supporting_figures/}}
+\graphicspath{{../transport/figures/}{../structure_paper/figures/}{../transport/supporting_figures/}{../stochastic_transport/figures/}{../stochastic_transport/supporting_figures/}}
 
 \input macros.tex
 \input intro.tex
@@ -212,6 +226,8 @@
 %\input transport.tex
 %\input transport_si.tex
 
+%\input stochastic_transport.tex
+
 %%%%%%%%%   then the Bibliography, if any   %%%%%%%%%
 \bibliographystyle{ieeetr}	% or "siam", or "alpha", etc.
 %\nocite{*}		% list all refs in database, cited or not
@@ -221,6 +237,7 @@
 \appendix
 %\input structure_si.tex
 %\input transport_si.tex
+%\input stochastic_transport_si.tex
 
 \end{document}
 

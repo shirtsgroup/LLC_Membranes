@@ -1,70 +1,67 @@
 \chapter{Chemically Selective Transport in the H\textsubscript{II} Phase}\label{chapter:transport}
 
-  %\graphicspath{{./figs/}}
-  %\graphicspath{{/home/bcoscia/PycharmProjects/LLC_Membranes/Ben_Manuscripts/transport/figures}}
-
   \section{Introduction}
 
-  Membranes capable of separating nm-sized solutes with high selectivity and
-  permeability are highly desirable for a number of applications. For example,
-  separation of salt from seawater or other briny sources can yield potable
-  drinking water.~\cite{fritzmann_state---art_2007} Removal of organic
-  micropollutants, such as personal care products, pesticides and
-  pharmaceuticals, from surface and groundwaters, can have large benefits for
-  public health.~\cite{schwarzenbach_challenge_2006} Finally, one can purify and
-  recover dissolved species present in complex hydraulic fracturing flowback
-  water waste streams which would help mitigate the effects of deep well
-  injection and can be sold for profit.~\cite{dischinger_application_2017} 
-
-  All of these separations are possible in part with current commercial
-  membrane separation techniques, but all still suffer from serious drawbacks.
-  Currently, reverse osmosis (RO) and nanofiltration (NF) dominate commercial
-  membrane separations of small molecules.~\cite{warsinger_review_2018} RO
-  membranes are typically dense polymer matrices that separate solutes based on
-  differences in their solubility and permeability in the membrane
-  material.~\cite{fritzmann_state---art_2007} Although they can perform highly
-  selective separations, high feed pressures and thus large amounts of energy are
-  necessary in order to generate a useful permeate
-  flux.~\cite{van_der_bruggen_review_2003} NF membranes have well-defined
-  nm-sized pores which can give the same permeate flux as RO with lower applied
-  pressure.~\cite{hilal_comprehensive_2004} However, the pores are not uniform in
-  size, limiting their selectivity.~\cite{werber_materials_2016}.
-
-  Under the right conditions, amphiphilic molecules can self-assemble into
-  ordered nanostructures that may be capable of performing highly selective
-  separations with permeabilities comparable to
-  NF.~\cite{alexandridis_amphiphilic_2000} The uniform-sized aqueous pores
-  characteristic of these types of systems enforce a molecular-size cut-off,
-  eliminating issues related to the polydisperity of NF
-  pores.~\cite{zhou_supported_2005} In addition to size-exclusion, it may be
-  possible to control the chemical environment within the nanopores by altering
-  the identities of the hydrophilic moieties that form the pores, affording
-  solute-specific separations.~\cite{dischinger_effect_2017}
-
-  Amphiphilic lyotropic liquid crystals (LLCs) are known to form the type I
-  bicontinuous cubic (Q\textsubscript{I}) and inverted hexagonal (H\textsubscript{II})
-  phases.~\cite{smith_ordered_1997,dischinger_application_2017,carter_glycerol-based_2012,hatakeyama_nanoporous_2010}
-  When cross-linked, these materials can function as mechanically strong
-  separations membranes.~\cite{zhou_supported_2005} The H\textsubscript{II} phase
-  has hexagonally packed, straight pores which is the ideal geometry for high
-  throughtput separations. However, the synthesis of H\textsubscript{II}
-  membranes with highly aligned hexagonal mesophases has been a challenge that
-  has been met with limited success and has prevented the material's viability as
-  a separations membrane.~\cite{feng_scalable_2014,feng_thin_2016} The
-  Q\textsubscript{I} phase consists of a three dimensional network of tortuous
-  and interconnected pores.  It's more facile synthesis has yielded it more
-  success. The latest Q\textsubscript{I} phase membranes have been shown to
-  exhibit selectivities higher than commercial NF and RO membranes with permeabilities
-  higher than commercial RO membranes.~\cite{dischinger_application_2017}
-
-  Although Q\textsubscript{I} membranes have shown promising results, it
-  is not clear how to controllably design them for specific separations
-  beyond what has already been achieved. Dischinger et al. found that they
-  do not separate purely on the basis of size. Empirical modeling revealed
-  correlations between various solute physicochemical properties and 
-  observed solute rejection. Although there was some agreement with their
-  empirical model, it does not offer a sufficiently detailed explanation
-  of governing molecular interactions.~\cite{dischinger_effect_2017}
+%  Membranes capable of separating nm-sized solutes with high selectivity and
+%  permeability are highly desirable for a number of applications. For example,
+%  separation of salt from seawater or other briny sources can yield potable
+%  drinking water.~\cite{fritzmann_state---art_2007} Removal of organic
+%  micropollutants, such as personal care products, pesticides and
+%  pharmaceuticals, from surface and groundwaters, can have large benefits for
+%  public health.~\cite{schwarzenbach_challenge_2006} Finally, one can purify and
+%  recover dissolved species present in complex hydraulic fracturing flowback
+%  water waste streams which would help mitigate the effects of deep well
+%  injection and can be sold for profit.~\cite{dischinger_application_2017} 
+%
+%  All of these separations are possible in part with current commercial
+%  membrane separation techniques, but all still suffer from serious drawbacks.
+%  Currently, reverse osmosis (RO) and nanofiltration (NF) dominate commercial
+%  membrane separations of small molecules.~\cite{warsinger_review_2018} RO
+%  membranes are typically dense polymer matrices that separate solutes based on
+%  differences in their solubility and permeability in the membrane
+%  material.~\cite{fritzmann_state---art_2007} Although they can perform highly
+%  selective separations, high feed pressures and thus large amounts of energy are
+%  necessary in order to generate a useful permeate
+%  flux.~\cite{van_der_bruggen_review_2003} NF membranes have well-defined
+%  nm-sized pores which can give the same permeate flux as RO with lower applied
+%  pressure.~\cite{hilal_comprehensive_2004} However, the pores are not uniform in
+%  size, limiting their selectivity.~\cite{werber_materials_2016}.
+%
+%  Under the right conditions, amphiphilic molecules can self-assemble into
+%  ordered nanostructures that may be capable of performing highly selective
+%  separations with permeabilities comparable to
+%  NF.~\cite{alexandridis_amphiphilic_2000} The uniform-sized aqueous pores
+%  characteristic of these types of systems enforce a molecular-size cut-off,
+%  eliminating issues related to the polydisperity of NF
+%  pores.~\cite{zhou_supported_2005} In addition to size-exclusion, it may be
+%  possible to control the chemical environment within the nanopores by altering
+%  the identities of the hydrophilic moieties that form the pores, affording
+%  solute-specific separations.~\cite{dischinger_effect_2017}
+%
+%  Amphiphilic lyotropic liquid crystals (LLCs) are known to form the type I
+%  bicontinuous cubic (Q\textsubscript{I}) and inverted hexagonal (H\textsubscript{II})
+%  phases.~\cite{smith_ordered_1997,dischinger_application_2017,carter_glycerol-based_2012,hatakeyama_nanoporous_2010}
+%  When cross-linked, these materials can function as mechanically strong
+%  separations membranes.~\cite{zhou_supported_2005} The H\textsubscript{II} phase
+%  has hexagonally packed, straight pores which is the ideal geometry for high
+%  throughtput separations. However, the synthesis of H\textsubscript{II}
+%  membranes with highly aligned hexagonal mesophases has been a challenge that
+%  has been met with limited success and has prevented the material's viability as
+%  a separations membrane.~\cite{feng_scalable_2014,feng_thin_2016} The
+%  Q\textsubscript{I} phase consists of a three dimensional network of tortuous
+%  and interconnected pores.  It's more facile synthesis has yielded it more
+%  success. The latest Q\textsubscript{I} phase membranes have been shown to
+%  exhibit selectivities higher than commercial NF and RO membranes with permeabilities
+%  higher than commercial RO membranes.~\cite{dischinger_application_2017}
+%
+%  Although Q\textsubscript{I} membranes have shown promising results, it
+%  is not clear how to controllably design them for specific separations
+%  beyond what has already been achieved. Dischinger et al. found that they
+%  do not separate purely on the basis of size. Empirical modeling revealed
+%  correlations between various solute physicochemical properties and 
+%  observed solute rejection. Although there was some agreement with their
+%  empirical model, it does not offer a sufficiently detailed explanation
+%  of governing molecular interactions.~\cite{dischinger_effect_2017}
 
   Molecular dynamics (MD) simulations can give us mechanistic insights with
   atomistic resolution so that we can provide detailed descriptions of small
@@ -278,11 +275,11 @@
   \section{Methods}
   
   Python scripts used to set up systems and conduct post-simulation trajectory 
-  analysis (as described below and in the Supporting Information) are available 
+  analysis (as described below and in Appendix B) are available 
   online at \\
   \texttt{https://github.com/shirtsgroup/LLC\_Membranes}. The 
   appropriate scripts to use for the subsequent calculations are summarized in 
-  Table~\ref{S-table:python_scripts_transport} of the Supporting Information. We ran all 
+  Table~\ref{S-table:python_scripts_transport} of Appendix B. We ran all 
   MD simulations and energy minimizations using GROMACS 2018.3.~\cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008} 
   
   \subsection{Molecule Parameterization}\label{method:molecule_parameterization}
@@ -318,7 +315,7 @@
   is close to zero at the membrane center, implying that there is a kinetic
   barrier to water filling the pores which we will be unable to overcome using
   conventional simulations. See Section~\ref{S-section:water_content_equil} 
-  of the Supporting Information for an expanded explanation and supporting figures. 
+  of Appendix B for an expanded explanation and supporting figures. 
 	  
   We observed that water enters into the distal tail region of our system. We
   define the distal tail region to be ca. 1.5 nm from the pore center based on
@@ -351,13 +348,13 @@
   molecules in each region plateaued. The 5 wt\% system did not plateau until
   $\sim$ 600 ns while the 10 wt \% water system equilibrated within the first 100
   ns of simulation (see Figure~\ref{S-fig:5wt_offset_equil} and
-  Figure~\ref{S-fig:10wt_offset_equil} of the Supporting Information). The
+  Figure~\ref{S-fig:10wt_offset_equil} of Appendix B). The
   equilibrated pores contain 72 \% and 69 \% of the total water in the 5 and 10
   wt \% systems respectively. We cross-linked the equilibrated solvated systems,
   then allowed them to equilibrate further for 100 ns. The water contents in
   each region does not change significantly in either case (see
-  Figure~\ref{S-fig:xlinked_solvation_equilibration} of the Supporting
-  Information). The `wet' equilibration and cross-linking procedures follow the
+  Figure~\ref{S-fig:xlinked_solvation_equilibration} of Appendix B). The `wet' 
+  equilibration and cross-linking procedures follow the
   methods outlined in our previous work.~\cite{coscia_understanding_2019}
   
   The equilibrated unit cells have different geometries depending on water
@@ -377,7 +374,7 @@
   center of each pore of the equilibrated cross-linked configuration, for a total of 24
   solute molecules. We chose 6 solutes per pore to provide a balance of a useful amount of 
   data for generating statistics and a low degree of interaction between solutes (see 
-  Section~\ref{S-section:solute_interaction} of the Supporting Information). At each
+  Section~\ref{S-section:solute_interaction} of Appendix B). At each
   insertion point we placed a randomly oriented solute molecule then ran a short 
   energy minimization. We allowed the solutes to equilibrate at 300K for 5 ns using Berendsen
   pressure control then collected transport data over the course of 1 $\mu$s MD simulations
@@ -430,7 +427,7 @@
   a diffusion constant as one might for a Brownian particle with a linear MSD. Instead,
   the reported MSD values represent the average MSD for a given	solute after a 400
   ns time lag. Our results are shown to be insensitive to our choice of time lag in 
-  Section~\ref{S-section:lag_sensitivity} of the Supporting Information.
+  Section~\ref{S-section:lag_sensitivity} of Appendix B.
   
   The $z$-direction MSD of water in the 10 wt\% system \textit{is} linear to within 
   statistical precision. Therefore, for the purpose of comparison, we calculated its
@@ -533,8 +530,7 @@
   pores. For 10 wt\% water systems, we consider a solute to be in the pore
   if it is within 0.75 nm of a pore center. This radial cut-off maximizes 
   the difference between average hop lengths in and out of the pore. 
-  See Section~\ref{S-section:pore-region} of the Supporting
-  Information for further details on this optimization.
+  See Section~\ref{S-section:pore-region} of Appendix B for further details on this optimization.
   
   \subsection{Time Spent in Pore Region}
   
@@ -563,7 +559,7 @@
   \texttt{hbonds} representation of the Visual Molecular Dynamics (VMD) software 
   package which allows us to directly check the validity of identified hydrogen 
   bonds~\cite{humphrey_VMD:_1996}. In Section~\ref{S-section:hbond_sensitivity} 
-  of the Supporting Information, we show that our conclusions are insensitive
+  of Appendix B, we show that our conclusions are insensitive
   to this definition within a reasonable range of distances and angles. 
   
   We determined the average percentage of solutes
@@ -609,8 +605,8 @@
   of these events into a distribution of association lifetimes.
   
   Hydrogen bond lifetimes appear to be distributed according to a power law or an
-  exponential function (see Figure~\ref{S-fig:lifetime_distributions} of the 
-  Supporting Information). A number of researchers provide evidence that supports a 
+  exponential function (see Figure~\ref{S-fig:lifetime_distributions} of
+  Appendix B). A number of researchers provide evidence that supports a 
   power law distribution~\cite{starr_fast_1999,martiniano_insights_2013}. However, these
   studies were done on extremely short timescales relative to ours, outputting positions
   every time step. Voloshin et al. studied hydrogen bonding on multiple timescales and 
@@ -644,7 +640,7 @@
   small degree of tortuosity which disrupts the RDF calculation. We 
   tried to mitigate the effects of tortuosity by calculating the RDF
   with respect to splines that run through the pore centers. See
-  Section~\ref{S-section:splines} of the Supporting Information for 
+  Section~\ref{S-section:splines} of Appendix B for 
   a graphical illustration. Each spline consists of 10 points, equally
   spaced in the $z$-direction, whose ($x$, $y$) coordinates are defined
   based on the COM of all head groups closest, in $z$, to the
@@ -728,7 +724,7 @@
   There is an appreciable amount of water that partitions into the distal tail
   region of both systems. 28\% and 31\% of the total water is present in the
   distal tail regions of the 5 and 10 wt\% water systems respectively. See 
-  Section~\ref{S-section:water_content_equil} of the Supporting Information 
+  Section~\ref{S-section:water_content_equil} of Appendix B 
   for more details on the equilibrations that led to this conclusion. The partition
   is due to a combination of the distal tail region's lower density (see 
   Figure~\ref{fig:total_density}) as well as oxygen atoms at the ends of each
