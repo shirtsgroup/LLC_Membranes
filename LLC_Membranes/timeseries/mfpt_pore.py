@@ -7,6 +7,7 @@ from LLC_Membranes.llclib import timeseries, file_rw, rand, stats, fitting_funct
 from LLC_Membranes.timeseries.fractional_levy_motion import FLM
 from LLC_Membranes.timeseries import flm_sim_params
 from LLC_Membranes.analysis.markov_state_dependent_dynamics import States, Chain
+from LLC_Membranes.timeseries import generate_timeseries
 from LLC_Membranes.analysis.sfbm_parameters import SFBMParameters
 from scipy.integrate import quad
 from scipy.optimize import curve_fit
@@ -186,8 +187,8 @@ class Dwell:
 
 class MeanFirstPassageTime:
 
-    def __init__(self, L, n, nT, model, pickled_parameters=None, hop_params=None, dwell_params=None, dt=1., nbins=25,
-                 nt=1, save=True, concentration_profile=False, load_passage_times=None, timeout=None):
+    def __init__(self, L, n, model, nT=2**10, pickled_parameters=None, hop_params=None, dwell_params=None, dt=1.,
+                 nbins=25, nt=1, save=True, concentration_profile=False, load_passage_times=None, timeout=None):
         """ Generate trajectories from which to calculate mean first passage times. One can also use them to calculate
         the concentration profile within the pore
 
@@ -240,12 +241,13 @@ class MeanFirstPassageTime:
         self.dt = dt
         self.passage_times = []
         self.nt = nt
-        self.discretization_points = discretization_points
+        # self.discretization_points = discretization_points
         self.nbins = nbins
         self.resample = False
         self.time_uniform = None
         self.model = model
         self.chains = None  # will hold Chain object if model is MSDDM
+        self.var_gen = None
         self.hop_realization = None
         self.dwell_realization = None
         self.nT = nT
@@ -272,6 +274,12 @@ class MeanFirstPassageTime:
                 self.hop_realization = self._msddm_hops
                 self.dwell_realization = self._msddm_dwells
 
+            elif self.model.lower() in ['ihmm', 'hdphmm']:
+
+                self._initialize_hmm(pickled_parameters)
+                self.hop_realization = self._ihmm_hops
+                self.dwell_realization = self._msddm_dwells
+
             else:
 
                 raise Exception("The model '%s' is not implemented" % self.model)
@@ -281,6 +289,10 @@ class MeanFirstPassageTime:
         else:
 
             self.passage_times = file_rw.load_object(load_passage_times)
+
+    def _initialize_hmm(self, final_parameters):
+
+        self.var_gen = generate_timeseries.GenARData(params=final_parameters)
 
     def _initialize_msddm(self, hop_params, pickled_parameters, speedup=True):
 
@@ -470,6 +482,10 @@ class MeanFirstPassageTime:
 
         return np.ones(n)
 
+    def _ihmm_hops(self):
+
+        return self.var_gen.gen_trajectory(length=self.length)
+
     @staticmethod
     def _crossings(x):
         """ Identify whenever a
@@ -494,7 +510,7 @@ class MeanFirstPassageTime:
 
         return traj
 
-    def generate_trajectories(self, save=True, savename='trajectories.npz'):
+    def generate_trajectories(self, save=True, savename='trajectories.pl'):
         """ Generate Brownian trajectories
 
         :param nt: number of threads
@@ -525,7 +541,7 @@ class MeanFirstPassageTime:
         print('\n%.2f %% of trajectories reached L' % percent_crossed_pore)
 
         if save:
-            file_rw.save_object((self.trajectories, self.time), 'trajectories.pl')
+            file_rw.save_object((self.trajectories, self.time), '%s' % savename)
 
     def mfpt(self, nboot, method='peak', percentile=99.5, tstart=0, show=False):
         """ Bootstrap the distribution of mean first passage times and report where the maximum occurs
