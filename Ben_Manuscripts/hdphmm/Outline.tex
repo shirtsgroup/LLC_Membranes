@@ -260,7 +260,8 @@
     \item Also expressed $G_0 \sim DP(\gamma, H)$
     %MRS3: This next line is a bit vauge (expresses confidence, closely related)
     %BJC3: tried to make more clear
-    \item The concentration parameter, $\gamma$, expresses one's confidence in the 
+    %MRS4: physically mention what the base distribution is?
+   \item The concentration parameter, $\gamma$, expresses one's confidence in the 
     base distribution $H$. 
     \item When $\gamma\to 0$, the first weight of $G_0$, $\beta_1$, approaches 
     unity and for $\gamma\to\infty$, the weights become uniform and $G_0$ closely
@@ -315,15 +316,15 @@
     the MATLAB code of Fox et al.~\cite{fox_sticky_2007} 
     %BJC3: I got the software from this page: https://homes.cs.washington.edu/~ebfox/software/
     % Maybe I should reach out to emily fox to see how she would prefer I cite the software?
+    %MRS4: yes, she how she wants to cite it.
     %MRS3: be a bit more specific about what the criteria were for convergence.
     %BJC3: See if that's better
+    %MRS4: But what quantitative criteria did you use to determine convergence?
     \item Parameter estimation is iterative. Therefore, we looked for convergence 
     of each entry in the $\mathbf{c}$ vector as well as the $A$ and $\Sigma$ matrices of 
     Equation~\ref{eqn:var}.
     \item Plots illustrating parameter convergence are available in the SI.
     \item We refer the interested reader to much more extensive descriptions of 
-    %MRS3: be more specific about which parts from the above are in the references
-    %BJC3: made more specific
     the inference and sampling procedures used to estimate the VAR(1) parameters
     and the state sequence. 
     ~\cite{beal_infinite_2002,teh_hierarchical_2006,van_gael_beam_2008,fox_nonparametric_2009,fox_bayesian_2010}
@@ -433,6 +434,7 @@
   \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{prior_guesses.pdf}
+  %MRS4: remind people what $c$ physically represents here. 
   \caption{The parameters of the prior on $c$ (black line) should be chosen such
   that the mean levels of each state identified in the trajectory (blue line) lie within
   regions of the prior with reasonable probability. We chose the mean of the prior 
@@ -468,6 +470,7 @@
   of the radial and axial coordinates ($r$, $z$) because $x$ and $y$ aren't 
   meaningful alone due to the system's radial symmetry.
   \begin{itemize}
+    %MRS4: Do you need to convert the covariance to cylintrical coordinates here before clustereing? 
     \item We converted the $x$ and $y$ center-of-mass coordinates to $r$.
     \item We fixed the state sequence from the 3D parmeterization and applied the
     inference component of the IHMM procedure to the cylindrical trajectories in
@@ -482,6 +485,7 @@
    	\item Many of these states exhibit very similar dynamical behavior except their
    	mean levels are different, especially in the axial direction where solutes could
    	get trapped along a broad and continuous range of $z$ coordinates. 
+  %MRS4: Maybe better to phrase above in terms of the symmetry in z. Why does it matter the range is continuous?
   \end{itemize}
   
   We reduced the parameter space used agglomerative clustering, a hierarchical
@@ -507,6 +511,7 @@
    \item One can choose alternative clustering features, such as the eigenvalues of
    the $A$ and $\Sigma$ matrices, but we chose their diagonals because they can be
    easily translated to solute behavior.
+   %MRS4: suggest translating them here into solute behavior for the reader!
    \item We also chose to cluster the diagonals of each matrix independently before
    combining the clusters to assign final state labels. 
    \item If we divide the total states into $m$ clusters based on the diagonal entries
@@ -515,6 +520,7 @@
    \item This allows slightly more flexibility in the total number of states compared
    to clustering on all four features at once, since there can be up to, but not 
    necessarily exactly, $mn$ states. 
+   %MRS4: so no clustering based on transition probablity, correct?
   \end{itemize} 
   
   Choosing the number of clusters can be somewhat subjective so
@@ -552,9 +558,6 @@
    fixed the state sequence, we decided to explicitly calculate $T$ by 
    counting the number of transitions between states compiled across all 
    trajectories.
-   %MRS3: seems like you should just be able to lump together the IHMM states to generate the IHMM estimate of T?
-   %BJC3: That's what I do. Maybe I'm misunderstanding your suggestion. I added a little bit to the sentence
-   % above to try and make more clear.
   \end{itemize}  
   
   We obtained $\mathbf{c}$ vectors of the clustered states by averaging 
@@ -594,6 +597,7 @@
   
   \subsection{Estimating Flux and Selectivity}
   %BJC: can make this discussion somewhat short since it's already in previous paper. 
+  %MRS4: yes, can be short
   % Should probably just hit all the main equations quickly.
   
   \noindent We calculate first passage times by propagating stochastic trajectories until they
@@ -638,6 +642,7 @@
   % impact potential so I don't want it to be 15 pages.
   %BJC3: Although, it might be a good idea to include Urea or Acetic acid as a second example
   % molecule because their behavior is pretty different since their carbonyl group tend to 
+  %MRS4: there should be SOME summary information on the other molecules, but it can just be the conclusions.
   % associate with sodium a lot.
   
   %BJC3: obviously can use a better thesis.
@@ -651,6 +656,7 @@
     \item The solute timeseries are coupled with color coded bars which describe the
     solute's local environment and physical interactions that it undergoes at that
     time frame.
+    %MRS: maybe number (1-4) or label (a-d) the rows as well. 
     \item From the top, they describe whether the solute is associated with sodium,
     whether the solute is hydrogen bonding with the monomer as well as what part of
     the monomer it is hydrogen bonding to, the local number density surrounding the
