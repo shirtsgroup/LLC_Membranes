@@ -33,7 +33,21 @@
   \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{figs/membrane_separation_size_regimes.pdf}
-  \caption{Caption of the future}\label{fig:size_regimes}
+  \caption{Choosing a membrane separation technology is entirely dependent on the
+  size of the particle to be removed. The diagram provides examples of the types 
+  of particles that each class of membranes is able to remove. Microfiltration (MF) 
+  membranes contain pores with diameters ranging from 100-10000 nm and can separate
+  large particles like bacteria and protozoa.~\cite{ma_functionalized_2014}
+  Ultrafiltration (UF) membranes have pore diameters of about 5-500 nm and are 
+  useful for the separation of sugars, proteins, viruses and colloidal 
+  materials.~\cite{yanful_ultrafiltration_2009} Nanofiltration (NF) membranes have
+  pores on the order of 1 nm in diameter and can be used for the separation of 
+  small organic molecules and charged species.~\cite{van_der_bruggen_review_2003}
+  Reverse osmosis (RO) membranes are dense amorphous polymers with tortuous 
+  pathways formed by collapsed polymer networks. Their dense polymer architecture 
+  rejects all solutes to a high degree except for water making them useful for 
+  separating hydrated ions from water.~\cite{warsinger_review_2018}
+  }\label{fig:size_regimes}
   \end{figure}
   
   Membranes are generally designed to optimize two key performance metrics: 
@@ -324,10 +338,21 @@
   \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{figs/lc_phases.pdf}
-  \caption{}\label{fig:lc_phases}
+  \caption{The amphiphilic character of liquid crystal monomers drives their
+  self-assembly into various nanostructured phases with uniform sized pores. 
+  The hydrophilic components of the monomers line the aqueous pores, offering
+  potential for selective interactions with passing solutes. The monomer on 
+  the top left will form the inverted hexagonal (H\textsubscript{II})
+  phase which is composed of aligned cylindrical pores packed in a hexagonal 
+  array. This geometry is theoretically ideal for high throughput transport. 
+  The monomer on the right will for the type I bicontinuous cubic phase
+  (Q\textsubscript{I}) in either the Ia3d (gyroid) or Pn3m (diamond) space group.
+  Although the Q\textsubscript{I} phase has a much more tortuous network of 
+  pores than the H\textsubscript{II}, which should lower its relative permeabily,
+  its synthesis is much more practical because it does not require alignment of
+  the nanostructured mesophases.
+  }\label{fig:lc_phases}
   \end{figure}
-   
-  %BJC: figure TBD here showing each monomer and the phase they form
 
   \subsection{The H\textsubscript{II} Phase}
    
@@ -440,15 +465,10 @@
   
   This thesis uses the high level of detail afforded by MD simulations in
   order to understand solute transport within LLC membranes with molecular 
-  detail. Before diving into atomistic model, we offer a brief survey of 
-  the most popular macroscopic treatments in order to highlight how an
-  atomistic model may be better suited to understanding how to design LLC
-  %TODO
-
-  %MRS3: one issue is that after this paragraph, it's not entirely
-  %clear where you are going.  This describes common models, but not
-  %how your research is placed in respect to them.
-  %BJC3: Added above connecting paragraph
+  detail. Before diving into an atomistic model, we offer a brief survey of 
+  the most popular macroscopic treatments in order to highlight how a 
+  nanoscopic perspective offered by atomistic modeling may be better suited to 
+  understanding how to design the next generation of LLC membranes.
 
   \subsection{Macroscopic Treatments}
   
@@ -462,9 +482,9 @@
     J_i = -L_i \frac{d\mu_i}{dx}
   \end{equation}
   where $L_i$ is a coefficient of proportionality.~\cite{wijmans_solution-diffusion_1995}
-  $L_i$ is an intrinsic materials property dependent on ... % Wijman's doesn't say. I don't want to speculate. Get book he referenced from library
-      %MRS2: mention what L depends on molecularly (even if uncalculatable)
-  Chemical potential gradients can be induced by concentration, pressure, temperature
+  $L_i$ is an intrinsic materials property dependent on the chemical makeup of
+  the membrane and usually determined via experiment. Chemical potential gradients
+  can be induced by concentration, pressure, temperature
   and electromotive forces. We will limit our discussion to concentration and pressure
   gradients because these are primarily forces used for separations with the types of 
   membranes we will be studying.

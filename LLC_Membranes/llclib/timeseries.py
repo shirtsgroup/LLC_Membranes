@@ -496,7 +496,7 @@ def ensemble_msd(x0, x, size):
         return np.linalg.norm(x0 - x, axis=1) ** 2
 
 
-def bootstrap_msd(msds, N, confidence=68):
+def bootstrap_msd(msds, N, confidence=68, median=False):
     """ Estimate error at each point in the MSD curve using bootstrapping
 
     :param msds: mean squared discplacements to sample
@@ -517,9 +517,17 @@ def bootstrap_msd(msds, N, confidence=68):
     print('Bootstrapping MSD curves...')
     for b in tqdm.tqdm(range(N)):
         indices = np.random.randint(0, nparticles, nparticles)  # randomly choose particles with replacement
-        for n in range(nparticles):
-            eMSDs[:, b] += msds[:, indices[n]]  # add the MSDs of a randomly selected particle
-        eMSDs[:, b] /= nparticles  # average the MSDs
+
+        if not median:
+            for n in range(nparticles):
+                eMSDs[:, b] += msds[:, indices[n]]  # add the MSDs of a randomly selected particle
+            eMSDs[:, b] /= nparticles  # average the MSDs
+        else:
+            final_msds = msds[-1, indices]
+            print(final_msds)
+            print(np.median(final_msds))
+            print(indices)
+
 
     lower_confidence = (100 - confidence) / 2
     upper_confidence = 100 - lower_confidence

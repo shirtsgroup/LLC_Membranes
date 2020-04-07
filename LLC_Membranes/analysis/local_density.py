@@ -77,7 +77,7 @@ class LocalDensity:
 
             pos = self._replicate_periodically(self.pos[t, ...], shrink_box=shrink_box)
 
-            d, edges = np.histogramdd(pos, bins=bins, range=(self.xrange, self.yrange, self.zrange), density=True)
+            d, edges = np.histogramdd(pos, bins=bins, range=(self.xrange, self.yrange, self.zrange), density=False)
 
             if create_interpolator:
                 self.density.append(self._interpolator(d, edges))

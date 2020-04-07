@@ -629,10 +629,14 @@
   \begin{itemize}  
   	\item Our application of the IHMM does a good job of identifying and
   	distinguishing these behaviors.   	
-  	\item Clustering the behaviors helps us to tell a coherent story which
-  	emphasizes those interactions which most heavily influence solute transport.
-  	\item This analysis approach helps us to break down the very complex behavior
-  	exhibited by solutes over long MD trajectories into discrete categories.
+  	\item The following approach to analysis demonstrates how one can break 
+  	down the very complex behavior exhibited by solutes over long MD trajectories 
+  	into discrete categories.
+%  	\item Clustering the behaviors helps us to tell a coherent story which
+%  	emphasizes those interactions which most heavily influence solute transport.
+	\item Further, we can use the IHMM in order to generate stochastic trajectories,
+	with dynamics similar to MD, so that we can estimate macroscopic transport
+	properties.
   \end{itemize}  	
 
   \subsection{Automatic Detection of Distinct Dynamical Modes}\label{section:find_modes}
@@ -647,71 +651,76 @@
   %MRS4: there should be SOME summary information on the other molecules, but it can just be the conclusions.
   % associate with sodium a lot.
   
-  %BJC3: obviously can use a better thesis.
-  We showcase this modeling approach by example. 
+  We applied the IHMM to all trajectories of each of the four solutes studied.
+  \begin{itemize}
+    \item Based on our choice of clustering, we identified over 30 distinct dynamical
+    modes for each solute.
+    \item Many of these modes are sampled very infrequently and thus do not merit significant study.
+    \item In this section, we explore a subset of this data, focusing on the states
+    and dominant interactions most common to solute trajectories. 
+  \end{itemize}  
+  
+  \noindent Methanol exhbits a range of dynamic behavior.
   \begin{itemize}
     \item In Figure~\ref{fig:mechanism_map}, we plot a representative 2D methanol 
     trajectory in cylindrical coordinates.
     \item The coordinates are colored according to the cluster with which methanol's
     dynamics are most consistent, which implies that this particular methanol 
-    trajctory exhibits 6 distinct dynamical behaviors. 
+    trajctory exhibits 8 distinct dynamical behaviors (in order of their first appearance,
+    they are colored dark yellow, red, light blue, light green, orange, blue, teal and lime green). 
     \item The solute timeseries are coupled with color coded bars which describe the
     solute's local environment and physical interactions that it undergoes at that
-    time frame.
-    %MRS: maybe number (1-4) or label (a-d) the rows as well. 
-    %BJC4: yeah, meant to do that. As it stands, I'm referring to 1 through 4 as bottom through top.
+    trajectory frame.
     \item From the top, they describe whether the solute is associated with sodium,
-    whether the solute is hydrogen bonding with the monomer as well as what part of
-    the monomer it is hydrogen bonding to, the local number density surrounding the
-    solute and the radial location of the solute with respect to the nearest pore
-    center (this information is redundant but can be a useful visual aid). %BJC3: still debating removing that bar
+    whether the solute is hydrogen bonding with the monomer as well as to what part of
+    the monomer it is hydrogen bonding, and finally, the local number density 
+    surrounding the solute. 
+    %and the radial location of the solute with respect to the nearest pore
+    %center (this information is redundant but can be a useful visual aid).
   \end{itemize}
   
-  %BJC3: I still need labels for this plot
-  %BJC4: Also, for some reason, when saving to a PDF, the colorbars are faded. I'll fix this eventually.
-  %MRS5: explicitly state how many states there are, and their colors.
   \begin{figure}
-  \includegraphics[width=\textwidth]{mechanism_map.pdf}
-  \caption{We can learn a significant amount of detail about solute motion by viewing 
+  \centering
+  \begin{subfigure}{0.75\textwidth}
+  \includegraphics[width=\textwidth]{mechanism_map.png}
+  \caption{}
+  \end{subfigure}
+  \begin{subfigure}{0.24\textwidth}
+  \includegraphics[width=\textwidth]{monomer_oxygens.png}
+  \caption{}
+  \end{subfigure}
+  \caption{(a) We can learn a significant amount of detail about solute motion by viewing 
   solute trajectories color-coded according to their clustered dynamical behavior alongside
   plots of the dominant molecular interactions and descriptions of the membrane's local 
-  environment. In the plot above, we show the radial and axial coordinates of a 
-  %MRS5:
-  %chosen
-  single
+  environment. In the plot above, we show the radial and axial coordinates of a single
   methanol molecule over the course of the equilibrated portion of its MD simulation.
   Disjoint segments of the same color imply the solute behaves similarly at different 
-  points of the trajectory because their VAR parameters %
-  %MRS5:
-  %are represented by 
-  place them in
-  the same 
-  %BJC4: eventually I'll label the bars and probably put a picture of the monomer with different oxygens labeled
-  cluster. 
-  %MRS5:
-  %Above 
-  On the top of
-the plot are bars which represent different physical interactions and
-  the membrane's local environment as a function of time. The top bar is colored green 
-  at time points where solutes are associated with sodium. Methanol associates
-  with sodium ions relatively rarely. The next bar down is colored when hydrogen bonds exist. Blue slivers
+  points of the trajectory because their VAR parameters place them in the same cluster. 
+  There are eight distinct dynamical modes exhibited by this trajectory. In order
+  of their first appearance, they are colored dark yellow, red, light blue, light green,
+  orange, blue, teal and lime green. On the top of the plot are bars which represent different
+  physical interactions and the membrane's local environment as a function of time. The top 
+  bar is colored green at time points where solutes are associated with sodium. Methanol 
+  associates with sodium ions relatively infrequently. The next bar down is colored when hydrogen
+  bonds exist. The colors match the enlarged oxygen atoms highlighted in (b). Blue slivers
   correspond to hydrogen bonds donated to the monomer's carboxylate head group. Green slivers
   corrrespond to  hydrogen bonds donated to the ether linkages between the head groups
   and tails. Red slivers correspond to hydrogen bonds donated to the oxygens on the ends
   of the monomer tails. Methanol exhibits significant hydrogen bonding with all parts of
-  the monomer. Which part of the monomer methanol is hydrogen bonds to is heavily correlated
-  to the solute's $r$ coordinate. The bar with the blue gradient represents the local 
+  the monomer. Which part of the monomer methanol hydrogen bonds to is heavily correlated
+  to the solute's $r$ coordinate. Finally, the bar with the blue gradient represents the local 
   membrane density based on the solute's ($r$, $z$) coordinate. Darker shades of blue
-  %BJC4: eventually I want some kind of color bar legend
   correspond to higher membrane densities. The density appears to be higher when methanol
-  motion appears restricted (e.g. from 75 to 550 ns). It is low in areas where methanol's
-  position fluctuates significantly (e.g. from 550 to 700 ns). Finally, the bottom bar
-  simply color-codes the solute's radial distance from the pore center. This information
-  is the same as shown by the radial coordinate but can be a helpful visual aid when
-  studying the other bars.}\label{fig:mechanism_map}
+  motion is restricted (e.g. from 75 to 550 ns). It is relatively low in areas where methanol's
+  position fluctuates significantly (e.g. from 550 to 700 ns). 
+  %Finally, the bottom bar
+  %simply color-codes the solute's radial distance from the pore center. This information
+  %is the same as shown by the radial coordinate but can be a helpful visual aid when
+  %studying the other bars.
+  }\label{fig:mechanism_map}
   \end{figure}
-  %MRS5: hmm, one sign that someting might be nonideal is the clustering in the light blue state (assuming 1 light blue state), looking at the 75 nm to 550 nm segment and the 900 - 1050 nm segment, the r is quite different (1 vs 3), and the h-bonding patterns are very different (Green vs. none). So it's not entirely clear these should necessarily be the same state. Thoughts?
-  One can gain significant chemical intuition just by studying plots like
+
+  \noindent One can gain useful chemical intuition just by studying plots like
   Figure~\ref{fig:mechanism_map}.
   \begin{itemize}
     \item It is clear that, for methanol, association with sodium is a much rarer
@@ -727,6 +736,11 @@ the plot are bars which represent different physical interactions and
     \item During this time period, there is intermittent, short-lived hydrogen 
     bonding with the oxygen atoms at the tail ends, as suggested by the frequent 
     state changes during that time period and red slivers in the bar above.
+    \item Signficant hops in the $z$ direction appear to be described by the blue
+    state.
+    \item After entering the blue state ca. 850 ns, methanol appears to jump
+    signficantly in the $z$ direction from a hydrogen bonded state with the ether 
+    linkages to a hydrogen bonded state with a head group in a monomer below it.
   \end{itemize}
 
   %BJC3: I think I'll just skip to the clustered results. I'd like to keep this
@@ -745,27 +759,87 @@ the plot are bars which represent different physical interactions and
 %    \item While all trajectories might not be the same, it is likely that 
 %    multiple trajectories might share some similar behavior.
 %  \end{itemize}
+
+  \noindent It is clear that there is a wealth of information in these plots. 
+  \begin{itemize}
+    \item One can analyze each segment sequentially and form a clear picture
+    of this instance of methanol's behavior without the need to visulize
+    the traejectory with software like VMD.
+    \item However, a more general understanding of methanol's average behavior
+    is necessary in order to formulate LLC membrane design principles.
+  \end{itemize}
   
-  We may learn the most by studying the dynamical modes common to the majority of 
+  %BJC: I'm not sure whether to spell out the numbers or not. 'six state' versus '6 states'; 'eight out of 24' or '8 out of 24'
+  % 'State one or State 1' 
+  \noindent We may learn the most by studying the dynamical modes common to the majority of 
   the solute trajectories.
   \begin{itemize}
-    \item Using the IHMM, we identified 13 total dynamical modes exhibited by 
+    \item Using the IHMM, we identified 33 total dynamical modes exhibited by 
     methanol. 
-    \item Of those, 4 appear in at least 50 \% of the methanol trajectories, and
-    2 of them appear in over 90 \% of the methanol trajectories.
+    \item Of those, only six states appear in a third (8 out of 24) or more methanol 
+    trajectories, and 3 of them appear in over 50 \% of the methanol trajectories.
+    \item 12 of the detected states are shared by two or less methanol trajectories.  % 23 in 3 or less -- not sure which is better to say
     \item In Figure~\ref{fig:common_states_MET_lines}, we plot representative dynamics
-    of each of the 4 prevelant states.
-    \item Based on their self-transition probabilities, we estimated the average 
-    time spent by each solute in each state (Figure~\ref{fig:dwell_times_MET}).
-    \item States 2 and 4 have long dwell times relative to states 1 and 3 because
+    of each of the six states which we determined to be prevelant.
+    \item We also chose to study a seventh state, which only appears in three out of
+    24 trajectories, because methanol experiences very long periods of entrapment
+    while in this state. Long trapping events, even if they are relatively rare, will
+    have a significant influence on solute flux.
+    \item No trajectory contains all seven states. However, the trajectory in 
+    Figure~\ref{fig:mechanism_map} exhibits all modes except states 6 and 7.
+    \item The states in Figure~\ref{fig:common_states_MET} are colored to match
+    states that also appear in Figure~\ref{fig:mechanism_map}.
+  \end{itemize}
+    
+  \noindent We can begin to dissect the dynamics of each state by studying their parameters.
+  \begin{itemize}
+    \item States 1, 3 and 5 have radial means near 1 nm or less (see y axis of $r$ direction plot in
+    Figure~\ref{fig:common_states_MET_lines}), which suggest that they occur
+    close to the pore centers. 
+    \item States 2, 4, 6 and 7 occur well within the tail region of the membrane.
+    \item States 1 and 2 have higher covariances in both the axial and radial
+    directions compared to all other states.
+    \item Covariance in each dimension appears to have a strong correlation.
+    \item States 3 and 5 as well as states 4, 6 and 7 are primarily distinguished based
+    on their autoregressive coefficients, A. 
+    \item Higher values of A generally lead to more wandering about the state mean.
+    \item One could argue that the parameters of states 3--7 are actually very close which
+    suggests that solutes might behave alike in topologically distinct regions of the 
+    membrane.
+  \end{itemize}
+
+  Despite some similarity in their VAR parameters, the length of time spent in states 3--7 
+  appears to be dependent on the solute's radial location.
+  \begin{itemize}
+    \item Based on the self-transition probabilities, we estimated the average time
+    spent by each solute in each state (Figure~\ref{fig:dwell_times_MET}).
+    \item States 3, 5 and 7 have long dwell times relative to the rest because
     they have high self-transition probabilities.
-    \item States 1 and 3 show large fluctuations relative to the other states owing
-    to larger covariances in both the axial and radial dimensions. (Figure~\ref{fig:A_sigma_scatter_MET})
-    \item States 1 and 2 have lower autoregressive coefficients relative to states
-    3 and 4.
-    \item All of these states are present in Figure~\ref{fig:mechanism_map} and colored
-    accordingly.
+    \item Somewhat surprisingly, both states 3 and 5 correspond to solutes located close to
+    a pore center, where one might expect solute motion to be less restricted.
+    \item Although solutes in states 4 and 6 are in the viscous tail region, their
+    dwell times are only intermediate. This could be due to imhomogeneity in the
+    tail region which causes transitions between many different trapped states but
+    with litle net effect on solute MSD. 
+    \item However, there are instances of states within the tail region with dwell 
+    times that exceed 100--200 ns, as shown by our inclusion of state 7.
+%    \item These long dwell times have a significant effect on dynamics and are
+%    worth studying.
+    \item There are no other states with dwell times longer than state 5 in the pore 
+    region.
   \end{itemize} 
+  
+  \noindent States 1 and 2 exhibit the shortest dwell times of the states studied.
+  \begin{itemize}
+      \item This is consistent with the trajectory in Figure~\ref{fig:mechanism_map}.
+      \item State 2 is the shortest lived state, appearing to bridge other tail region
+      states. 
+      \item State 1 appears to represent a significant hopping state. 
+      \item It has a high covariance and occurs near the pore center, where there is
+      less obstruction to solute motion.
+      \item It's dwell time of ca. 8 ns, suggests that solutes stay in this highly
+      mobile state for long enough to displace signficantly.
+  \end{itemize}
   
   \begin{figure}
   \centering
@@ -776,32 +850,106 @@ the plot are bars which represent different physical interactions and
   \begin{subfigure}{0.35\textwidth}
   % BJC: I'll bootstrap some errorbars on this by drawing the transition probabilities 
   % from a dirichlet distribution.
-  \includegraphics[width=\textwidth]{dwell_times_MET.pdf}
-  \caption{}\label{fig:dwell_times_MET}
   \includegraphics[width=\textwidth]{A_sigma_scatter_MET.pdf}
   \caption{}\label{fig:A_sigma_scatter_MET}
+  \includegraphics[width=\textwidth]{dwell_times_MET.pdf}  %BJC5: maybe better as 95 % confidence rather than mean
+  \caption{}\label{fig:dwell_times_MET}
   \end{subfigure}
   \caption{We can learn the most about methanol's behavior by studying the dynamics
-  of the states common to the majority of methanol trajectories. In (a), we show representative
-  dynamics of four states that are common to more than half of the solute trajectories. The
-  percentage of trajectories in which they appear are listed between the $r$ and $z$ plots. 
-  All four of these states are exhibited in the trajectory shown in Figure~\ref{fig:mechanism_map}
+  of the states common to many of the methanol trajectories. In (a), we show representative
+  dynamics of six states that are common to more than one third of the solute trajectories. 
+  The $y$-axis labels of the $r$ coordinate plot specify the radial mean of each clustered 
+  state. The percentage of trajectories in which the states appear are labeled to the right of
+  the $r$ plots. States 1--5 appear in the trajectory shown in Figure~\ref{fig:mechanism_map}
   and are colored to match for easy visual comparison. All time series have a mean of zero and are
-  %MRS5: state how much shifted - or maybe plot a dotted line at the zero of each plot?
-  shifted for the purpose of visualizing them. (b) Using the transition probabilities (p), 
-  we estimated the average time spent within each of the states using 1000 simulations of a Bernoulli 
-  process where we continued to draw until transitioning out of the state with probability 1 - p.
-  On average, methanol stay in states 2 and 4 for much longer periods of time than states 1 and 3.
-  This is qualitatively evident in Figure~\ref{fig:mechanism_map}. (c) We can use the understanding
-  from (a) and (b) in order to relate the state parameters to solute motion. States 1 and 3 have
-  large covariances relative to states 2 and 4. Paired with their short dwell times, it is reasonable
-  to hypothesize that states 1 and 3 contribute to hopping behavior while states 2 and 4 
-  correspond to trapped solute behavior. All states have positive autoregressive coefficients (A) in 
-  each dimension which implies motion that is positively correlated to its previous step. States 3 and
-  4 have higher autoregressive coefficients than 1 and 2. This implies that solutes in states 3 and 
-  4 tend to wander more from their mean position in each dimension. This appears to be the case when
-  comparing the behavior of states 2 and 4 in Figure~\ref{fig:mechanism_map}.}\label{fig:common_states_MET}
+  shifted to put the mean in line with the $y$-axis labels for the purpose of visualizing them. 
+  (b) We can begin to understand the solute behaviors demonstrated in (a) by understanding their VAR 
+  parameters. States 1 and 2 have higher covariances in both the axial and radial directions compared
+  to all other states. This should lead to signficant solute displacement. Covariance in each dimension
+  appears to have a strong correlation. States 3--6 all have relatively low covariances, which may
+  be characteristic of trapped states. They are primarily distinguished based on the magnitude of their 
+  autoregressive coefficients, A, and radial means. Higher values of A imply motion which wanders 
+  more about the mean. States 1, 3 and 5 have radial means near 1 nm or less, which suggest that they
+  occur close to the pore centers. States 2, 4 and 6 occur well within the tail region of the membrane.
+  (c) Using the transition probabilities (p), we estimated the average time spent within each 
+  of the states using 1000 simulations of a Bernoulli process where we continued to draw until transitioning
+  out of the state with probability 1 - p. Of the prevelent states, states 1 and 
+  2 exhbit the shortest dwell times alongside their high covariances. States 3 and 6 have the longest dwell
+  times where methanol appears to be trapped near the pore center.   
+  }\label{fig:common_states_MET}
   \end{figure}
+  
+  Our speculation so far is based purely on the parameters of our model compared to 
+  a single methanol trajectory.
+  \begin{itemize}
+    \item While we may be able to further corroborate our arguments by analyzing more
+    individual trajectories, it is more useful to correlate the state behavior with
+    solute-membrane interactions.
+  \end{itemize}   
+
+  The types of hydrogen bonding undergone by solutes is dependent on radial
+  location (see Figure~\ref{fig:hbond_pi_chart}).
+  \begin{itemize}
+    \item States with radial means near 1 nm or less (states 1, 3 and 5) typcially
+    hydrogen bond with the monomer carboxylate groups and ether linkages.
+    \item States with radial means greater than 1 nm (states 2, 4, 6 and 7) tend 
+    to hydrogen bond with the monomer tails.
+    \item In the past we've shown how there is a gradual transition from the
+  	hydrophilic to hydrophobic region in these membranes, meaning the monomer
+  	location is not tightly bound in $r$.
+  	\item Therefore, there are instances of hydrogen bond interactions that one
+  	might consider uncharacteristic based on the state's radial mean.
+  \end{itemize}  
+  
+  States which exhibit longer dwell times have longer hydrogen bond lifetimes.
+  \begin{itemize}
+    \item States 3--7 have significantly longer hydrogen bond lifetimes than states
+    1 and 2. 
+    \item It makes physical and mathematical sense that states 1 and 2 should not 
+    stay trapped by hydrogen bonding for long periods because they typically take large
+    hops as communicated by their large covariances.
+    \item In the tail states, hydrogen bond lifetimes appear to increase with 
+    their dwell times.
+    \item However, in the pores, this is not necessarily a linear relationship. 
+    \item For example, state 5 has the lowest hydrogen bond lifetime of states 3--6
+    despite having the second longest dwell times. 
+  \end{itemize}
+  
+  The local density experienced by solutes may have an impact on the length of solute 
+  entrapment.
+  \begin{itemize}
+    \item On average, solutes in state 5 are surrounded by an above average number of
+    particles. 
+    \item Based on its radial location and preference towards hydrogen bonding
+    with the ether linkages, it is reasonable to assume that while in state 5, methanol
+    spends most of its time just outside the pore region, sandwiched between the 
+    monomer head groups. 
+    \item Although state 5 hydrogen bonds break more frequently than one might expect for 
+    a state with long dwell times, it is possible that the solute's dense surroundings
+    prevent it from wandering off before the hydrogen bonding interaction can be
+    recovered.
+    \item This may explain the behavior of methanol in state 5 of the trajectory in
+    Figure~\ref{fig:mechanism_map} where the solute's center of mass appears to move
+    more freely about its mean than other trapped states.
+    \item The data suggests that methanol molecules in state 3 lie closer to the pore
+    center than state 5 because they tend to hydrogen bond most frequently with 
+    the carboxylate groups.
+    \item Methanol molecules which experience state 3 are subject to a lower density 
+    local environment and rely more heavily on hydrogen bonding interactions, 
+    evidenced by their longer lifetimes, to stay trapped.
+  \end{itemize}
+  
+  States describing behavior in the tail region show a direction relationship between 
+  hydrogen bond lifetimes and local density.
+  \begin{itemize}
+    \item Methanol molecules which experience state 2 are in a low density region of the
+    tails where they can easily break free of hydrogen bonds.
+    \item Methanol molecules in states 4 and 6 have hydrogen bond lifetimes that are similar
+    to the mean dwell times, which suggests
+    \item Finally, methanol molecules trapped in state 7 are in the densest region of all
+    states studied. It is likely difficult for methanol to esacpe these high density regions
+    and its position is further stabilized via hydrogen bonding.
+  \end{itemize}
   
   %BJC3: I'm struggling a bit with this part of the analysis. The story isn't as clear
   % cut as I want because it seems like states which contribute to the same cluster behave
@@ -840,7 +988,14 @@ the plot are bars which represent different physical interactions and
   % the pi chart in half with slices corresponding to hbonds on one side and association on the other
   \begin{figure}
   \centering
+  \begin{subfigure}{0.54\textwidth}
   \includegraphics[width=\textwidth]{hbond_pi_charts.pdf}
+  \caption{}\label{fig:hbond_pi_charts}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{hbond_lifetimes_density_MET.pdf}
+  \caption{}\label{fig:hbond_lifetimes_density_MET}
+  \end{subfigure}
   \caption{With our clustering approach, methanol exhibits similar state behaviors
   %MRS5: So this is a little counterintuitive, in that the separate states have similar behavior.
   %MRS5: Are there charts that show what is _different_ about the states as well?  The previous figure
