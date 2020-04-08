@@ -388,6 +388,7 @@
   
   % BJC5: For the paper, this paragraph and figure might be better suited for the supporting information
   % BJC5: maybe even for the thesis
+  % MRS6: I agree on the details in SI, the thesis belongs in the paper. 
   \noindent The states identified by the IHMM are heavily influenced by the Gaussian prior
   placed on $\mathbf{c}$ in Equation~\ref{eqn:var}.
   \begin{itemize}
@@ -468,6 +469,7 @@
    	with separate VAR(1) parameters.
    	\item Many of these states exhibit very similar dynamical behavior except their
    	mean levels are different.
+        %MRS6: should specify mean in both r and z if that's what you mean.
   \end{itemize}
   
   We reduced the parameter space used agglomerative clustering, a hierarchical
@@ -477,7 +479,8 @@
   \begin{itemize}
    	\item We used the Ward linkage criteria, which works to minimize the sum of
    	the squared differences within all clusters.
-   	\item We elected to choose the number of clusters rather than the distance
+        %MRS6: explain why Ward (make the cluster as minimally disperse?)
+   	\item We elected to choose the number of clusters rather than th distance
    	threshold.
    	\item For our data, non-parameteric methods such as Bayesian Gaussian mixture
    	models tend to delocalize the clusters in parameter space (see Supporting
@@ -581,6 +584,7 @@
   \end{itemize} 
   
   % BJC5: not sure what to title this. Or break it into more sections.
+  % MRS6: ``exploring mechanism?''
   \subsection{Calculation of Physical Interactions}\label{method:interactions}
   
   We determined the number of hydrogen bonds between each solute and the membrane
@@ -598,6 +602,7 @@
     \item We still counted sequences where hydrogen bonds were broken for
     a single frame before reforming.
     \item We reported the 95th percentile of hydrogen bond lifetimes.
+      %MRS6: why 95th percentile?
   \end{itemize}
   
   We also measured the degree of association between solutes and sodium ions on a
@@ -665,8 +670,9 @@
   heterogeneity of the membrane's nanostructure as well as the interactions 
   between monomer and solute chemical functionality. 
   \begin{itemize}  
-  	\item Our application of the IHMM does a good job of identifying and
+  	\item Our application of the IHMM does  good job of identifying and
   	distinguishing these behaviors.   	
+        %MRS6: will need to quantify ``good job''
   	\item The following approach to analysis demonstrates how one can discover and explain the very complex behavior exhibited by solutes over long MD trajectories 
    in terms of solute-membrane interactions.
 %  	\item Clustering the behaviors helps us to tell a coherent story which
@@ -693,10 +699,12 @@
     \item Based on our choice of clustering, we identified over 30 distinct dynamical
     modes for each solute.
     \item Many of these modes are sampled very infrequently and thus do not merit significant study.
+      %MRS6: explain why don't merit additional study - should relate to how does not affect final results.
     \item In this section, we explore a subset of this data, focusing on the states
     and dominant interactions most common to solute trajectories. 
   \end{itemize}  
-  
+
+  %MRS6: likely just the summary of the methanol behavior should go in the main paper - the rest should be SI.
   \noindent Methanol exhbits a range of dynamic behavior.
   \begin{itemize}
     \item In Figure~\ref{fig:mechanism_map}, we plot a representative 2D methanol 
@@ -1020,11 +1028,12 @@
   
   % BJC5: I think I want to do an abbreviated study here on acetic acid or urea 
   % since it will incorporate sodium ion association. 
-    
+
+  % MRS6: ideal for the paper would be summary infoormation about the 4 molecules, with more complete data from which the summary is drawn in SI.
   \subsection{Reproducing MD Trajectories and MSDs with the IHMM}
   
   %BJC5: something we can do for the supporting information to show that this approach is valid: Eliminate nonidealities in our MD trajectories (compared to a pure VAR process) and use toy data to generate trajectories based on some number of states with different parameters. Generate an MSD with those. See if we can reproduce with our model. Can also use this to test new strategies.
-  
+  %MRS6: toy data is actually a VERY good idea.  USe a VAR process that looks like MD, and then try to cluster it, and figure out why different.  
   We can use the IHMM in order to generate stochastic trajectory realizations
   which bear some qualitatively similar characteristics to those output
   by our MD simulations.
@@ -1039,8 +1048,10 @@
   
   %BJC5: the goal is to figure out how to fix this for the paper.
   %BJC5: this is more of a 'how can this be improved' section for the dissertation.
+  %MRS6: got it.
   The MD trajectories show much broader variability in their overall motion than realizations
   of the IHMM model. 
+  %MRS6: definitely an important poiint for the paper: clustering things togethere might make trajectories too typical.
   \begin{itemize}
   		\item Some trajectories span a wide range of $z$ coordinates, while others stay
   		trapped for nearly the entire simulation.
@@ -1050,10 +1061,13 @@
         of the average behavior of solutes studied.
         \item It is possible that certain states with long dwell times should have been
         clustered as their own, but the transition probabilities would have high uncertainties.
+        %MRS6: is it necessarily a problem that the transition probabiblities have high uncertainties? If one is drawing from the Dirichlet distribution, uncertainy isn't a big deal. The trapping just doesn't quite seem to be as long as MD.
+        %MRS6: the other issue is apparent surpression on variance in the jumps, but that may be harder to get. 
         \item It is also possible that we should not be using a static transition matrix in 
         order to generate stochastic trajectories, but rather sample the rows of the transition
         matrix from a Dirichlet distribution since average dwell times are highly sensitive to
         self transition probabilities.
+        %MRS6: right uncertainty matters less here.
   \end{itemize}
   %BJC5: maybe a figure showing the MSDs of all the MD trajectories versus a subset of 
   % stochastically generated trajectories. I image the stochastic ones will have a much
@@ -1129,7 +1143,8 @@
   % simply use the ratio of the MSD slopes in order to estimate selectivity.
   % I think they should give the same results. Haven't tested it yet though. 
   %BJC5: currently running these simulations then will write this section up. 
-  
+  %MRS6: it's possible that this section doesn't need to be in the paper, since it was describbed in the other one, and getting the selectivity isn't the main goal of this paper. 
+
   We can use realizations of our model in order to predict macropscopic flux and
   selectivity.
   \begin{itemize}
