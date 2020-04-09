@@ -56,104 +56,63 @@
 
   % \OnePageChapter	% use if abstract is less than one page
   
-  % BJC: spliced together abstracts from papers with some additions
-
   The ability to perform highly selective aqueous separations at low cost
-  is beneficial to a variety of chemical industries 
-	
-  Periodic, nanostructured porous polymer membranes made from the cross-linked
-  inverted hexagonal phase of self-assembled lyotropic liquid crystals (LLCs) are
-  a promising class of materials for selective separations. 
+  is beneficial to a variety of chemical industries. Periodic, nanostructured 
+  porous polymer membranes made from the cross-linked inverted hexagonal phase
+  of self-assembled lyotropic liquid crystals (LLCs) are a promising class of 
+  materials for selective separations. In this thesis, we use atomistic molecular 
+  modeling in order investigate an experimentally characterized LLC polymer 
+  membrane.
   
-  The uniform size and complex chemical topology of the pores formed by
-  self-assembled amphiphilic molecules such as liquid crystals make them
-  promising candidates for selective separations.
-  
-  In this work, we investigate an experimentally characterized LLC polymer 
-  membrane using atomistic molecular modeling. We 
-  
-  First, we gained a deep understanding of nanoscopic pore structure in order 
-  to make sure we got the chemical environment in the pores correct. 
- 
-  In particular, we compare simulated X-ray
-  diffraction (XRD) patterns with experimental XRD data to quantify and
-  understand the differences between simulation and experiment.  
-  
-%  We find that the
-%  nanopores are likely composed of 5 columns of stacked LLC monomers which
-%  surround each hydrophilic core. Evidence suggests that these columns likely
-%  move independently of each other over longer time scales than accessible via
-%  atomistic simulation. We also find that WAXS structural features previously
-%  attributed to monomer tail tilt is likely instead due to ordered tail packing.
-%  Although this system has been reported as dry, we show that small amounts of
-%  water are necessary to reproduce all features from the experimental XRD pattern
-%  due to asymmetries introduced by hydrogen bonds between the monomer head groups
-%  and water molecules. 
-  
-  Finally, we explore the composition and structure of the
-  nanopores and reveal that there exists a composition gradient rather than an
-  abrupt partition between the hydrophilic and hydrophobic regions. A caveat is
-  that the time scales of the dynamics are extremely long for this system,
+  First, we gain a deep understanding of nanoscopic pore structure in order 
+  to make sure we can appropriately model the chemical environment in the pores.
+  In particular, we compare simulated X-ray diffraction (XRD) patterns with 
+  experimental XRD data to quantify and understand the major structural
+  features that we must incorporate into our model. We explore the composition 
+  and structure of the nanopores and reveal that there exists a composition gradient
+  rather than an abrupt partition between the hydrophilic and hydrophobic regions.
+  A caveat is that the time scales of the dynamics are extremely long for this system,
   resulting in simulated structures that appear too ordered, thus requiring
   careful examination of the metastable states observed in order to draw any
   conclusions. 
   
-  %The clearer picture of the nanoscopic structure of these membranes
-  %provided in this study will enable a better understanding of the mechanisms of
-  %small molecule transport within these nanopores.	
+  We use our carefully constructed molecular model in order to observe transport of
+  water, sodium ions and 20 small polar solutes within the pores of a lyotropic 
+  liquid crystal (LLC) membrane using atomistic molecular simulations. We find 
+  that the transport of a species is dependent not only on molecular size, but on
+  chemical functionality as well. We observe that all solutes perform intermittent 
+  hops between lengthy periods of entrapment. Three different trapping mechanisms 
+  are responsible for this behavior. First, solutes that drift out of the pore can
+  become entangled among the dense monomer tails. Second, solutes can donate 
+  hydrogen bonds to the monomer head groups. Third, solutes can coordinate with 
+  sodium counter ions. The degree to which a solute is affected by each mechanism 
+  is dependent on the chemical functionality of the solute. 
   
-  We observe transport of water, sodium ions and 20 small polar
-  solutes within the pores of a lyotropic liquid crystal (LLC) membrane using
-  atomistic molecular simulations. We find that the transport of a species is
-  dependent not only on molecular size, but on chemical functionality as well.
-%  The membrane's inhomogeneous composition gives rise to radially dependent
-%  transport mechanisms with respect to the pore centers. 
-  We observe that all
-  solutes perform intermittent hops between lengthy periods of entrapment. Three
-  different trapping mechanisms are responsible for this behavior. First, solutes
-  that drift out of the pore can become entangled among the dense monomer tails.
-  Second, solutes can donate hydrogen bonds to the monomer head groups. Third,
-  solutes can coordinate with sodium counter ions. The degree to which a solute
-  is affected by each mechanism is dependent on the chemical functionality of the
-  solute. 
+  The remainder of this thesis focuses on developing stochastic models meant to 
+  generate realizations of solute trajectories with similar qualitative and
+  quantitative dynamics to our MD trajectories solute trajectories. Mathematically 
+  modeling complex transport phenomena at the molecular level can be a powerful tool
+  for connecting microscopic chemically-dependent solute motions that do not
+  follow simple diffusive behavior with macroscopic membrane performances. 
+  We develop three different stochastic time series models, parameterized by long 
+  molecular dynamics (MD) simulation trajectories.
   
-  %Using the insights developed in this study, we can begin to think about
-  %how to redesign existing LLC membranes in order to perform solute-specific
-  %separations.
-  
-  Mathematically modeling complex transport phenomena at the molecular level
-  can be a powerful tool for identifying transport mechanisms and predicting
-  macroscopic properties. We use two different stochastic time series models,
-  parameterized from long molecular dynamics (MD) simulation trajectories of
-  a cross-linked H\textsubscript{II} phase lyotropic liquid crystal (LLC)
-  membrane, in order to predict solute mean squared displacements (MSDs)
-  and solute flux, and thus solute selectivity, in macroscopic length pores.
-
   First, using anomalous diffusion theory, we show how solute dynamics can be
   modeled as a fractional diffusion process subordinate to a continuous time
-  random walk. From the MD simulations, we parameterize the distribution of
-  dwell times, hop lengths between dwells and correlation between hops. We
-  explore two variations of the anomalous diffusion modeling approach. The first variation
-  applies a single set of parameters to the solute displacements and the second
-  applies two sets of parameters based on the solute's radial distance from the
-  closest pore center.
+  random walk. From our MD simulations, we parameterize the distribution of
+  dwell times, hop lengths between dwells and correlation between hops.
 
-  Next, we generalize Markov state models, treating the
-  configurational states of the system as a Markov process where each
-  state has distinct transport properties. For each state and transition
-  between states, we parameterize the distribution and temporal correlation
-  structure of positional fluctuations as a means of characterization and to
-  allow us to predict solute MSDs. We show that both models reasonably reproduce
-  the MSDs calculated from MD simulations. However, qualitative differences
-  between MD and Markov state dependent model-generated trajectories may limit
-  its usefulness.
-
-  Finally, we demonstrate how one can use these models to
-  estimate flux of a solute across a macroscopic-length pore and, based on
-  those quantities, the membrane's selectivity towards each solute. This work
-  helps to connect microscopic chemically-dependent solute motions that do not
-  follow simple diffusive behavior with macroscopic membrane performance.
-
+  Next, we generalize Markov state models, treating the configurational states of 
+  the system as a Markov process where each state has distinct transport properties. 
+  For each state and transition between states, we parameterize the distribution 
+  and temporal correlation structure of positional fluctuations as a means of 
+  characterization and to allow us to predict solute MSDs.
+  
+  Building on what we learned from the first two models, we develop a third approach,
+  called the infinite hidden Markov model, which is capable of automatically 
+  distinguishing an unknown number of hidden dynamical modes in multidimensional
+  solute time series. This model offers a flexibile approach to modeling solute
+  motion and helps us to uncover mechanisms with minimal human effort.
   }
 
 \dedication[Dedication]{	% NEVER use \OnePageChapter here.
@@ -179,24 +138,22 @@
   effort creating the X-ray diffraction code on which our first paper relied.
   I thank Christopher Calderon for his guidance on applying Bayesian non-parametric
   techniques to solute time series.
-
-  % BJC: should I mention the start-up? If so, I'm not sure what to say for that.
-  I would like to acknowledge my financial support: The ACS Petroleum Research Fund
-  grant \#59814-ND7 and the Graduate Assistance in Areas of National Need (GAANN) 
-  fellowship which is funded by the U.S. Department of Education. 
-
-  % BJC: This acknowledgement is how they want to be cited in papers. Could I
-  % shorten it for this?
-  Finally, I would like to acknowledge my high performance computing resources:
-  Molecular simulations were performed using the Extreme Science and
-  Engineering Discovery Environment (XSEDE), which is supported by National
-  Science Foundation grant number ACI-1548562. Specifically, it used the Bridges
-  system, which is supported by NSF award number ACI-1445606, at the Pittsburgh
-  Supercomputing Center (PSC). This work also utilized the RMACC Summit supercomputer,
-  which is supported by the National Science Foundation (awards ACI-1532235 and
-  ACI-1532236), the University of Colorado Boulder, and Colorado State
-  University. The Summit supercomputer is a joint effort of the University of
-  Colorado Boulder and Colorado State University.  
+%  I would like to acknowledge my financial support: The ACS Petroleum Research Fund
+%  grant \#59814-ND7 and the Graduate Assistance in Areas of National Need (GAANN) 
+%  fellowship which is funded by the U.S. Department of Education. 
+%
+%  % BJC: This acknowledgement is how they want to be cited in papers. Could I
+%  % shorten it for this?
+%  Finally, I would like to acknowledge my high performance computing resources:
+%  Molecular simulations were performed using the Extreme Science and
+%  Engineering Discovery Environment (XSEDE), which is supported by National
+%  Science Foundation grant number ACI-1548562. Specifically, it used the Bridges
+%  system, which is supported by NSF award number ACI-1445606, at the Pittsburgh
+%  Supercomputing Center (PSC). This work also utilized the RMACC Summit supercomputer,
+%  which is supported by the National Science Foundation (awards ACI-1532235 and
+%  ACI-1532236), the University of Colorado Boulder, and Colorado State
+%  University. The Summit supercomputer is a joint effort of the University of
+%  Colorado Boulder and Colorado State University.  
 	
   }
 
