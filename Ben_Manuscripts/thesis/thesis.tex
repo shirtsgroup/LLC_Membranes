@@ -56,59 +56,39 @@
 
   % \OnePageChapter	% use if abstract is less than one page
   
-  The ability to perform highly selective aqueous separations at low cost
-  is beneficial to a variety of chemical industries. Periodic, nanostructured 
-  porous polymer membranes made from the cross-linked inverted hexagonal phase
-  of self-assembled lyotropic liquid crystals (LLCs) are a promising class of 
-  materials for selective separations. In this thesis, we use atomistic molecular 
-  modeling in order investigate an experimentally characterized LLC polymer 
-  membrane.
+  Periodic, nanostructured porous polymer membranes made from the cross-linked
+  inverted hexagonal phase of self-assembled lyotropic liquid crystals (LLCs) are
+  a promising class of materials for selective separations. Our current understanding
+  of these systems is not sufficient to design them for specific applications. In 
+  this thesis, we use detailed atomistic molecular modeling in order to investigate 
+  structure and transport of solutes within LLC polymer membrane.
   
-  First, we gain a deep understanding of nanoscopic pore structure in order 
-  to make sure we can appropriately model the chemical environment in the pores.
-  In particular, we compare simulated X-ray diffraction (XRD) patterns with 
-  experimental XRD data to quantify and understand the major structural
-  features that we must incorporate into our model. We explore the composition 
-  and structure of the nanopores and reveal that there exists a composition gradient
-  rather than an abrupt partition between the hydrophilic and hydrophobic regions.
-  A caveat is that the time scales of the dynamics are extremely long for this system,
-  resulting in simulated structures that appear too ordered, thus requiring
-  careful examination of the metastable states observed in order to draw any
-  conclusions. 
+  We begin by enhancing our understanding of the nanoscopic pore structure in order 
+  to ensure we appropriately model the chemical environment in the pores. We use radial
+  distribution functions and simulated X-ray diffraction patterns to quantify and 
+  understand the major structural features of the model.
   
   We use our carefully constructed molecular model in order to observe transport of
   water, sodium ions and 20 small polar solutes within the pores of a lyotropic 
-  liquid crystal (LLC) membrane using atomistic molecular simulations. We find 
-  that the transport of a species is dependent not only on molecular size, but on
-  chemical functionality as well. We observe that all solutes perform intermittent 
-  hops between lengthy periods of entrapment. Three different trapping mechanisms 
-  are responsible for this behavior. First, solutes that drift out of the pore can
-  become entangled among the dense monomer tails. Second, solutes can donate 
-  hydrogen bonds to the monomer head groups. Third, solutes can coordinate with 
-  sodium counter ions. The degree to which a solute is affected by each mechanism 
-  is dependent on the chemical functionality of the solute. 
+  liquid crystal (LLC) membrane using atomistic molecular simulations. We 
+  observe that solutes perform intermittent hops between lengthy periods of 
+  entrapment and describe how transport of a species is dependent not only on 
+  molecular size, but on chemical functionality as well. 
   
-  The remainder of this thesis focuses on developing stochastic models meant to 
-  generate realizations of solute trajectories with similar qualitative and
-  quantitative dynamics to our MD trajectories solute trajectories. Mathematically 
-  modeling complex transport phenomena at the molecular level can be a powerful tool
-  for connecting microscopic chemically-dependent solute motions that do not
-  follow simple diffusive behavior with macroscopic membrane performances. 
-  We develop three different stochastic time series models, parameterized by long 
-  molecular dynamics (MD) simulation trajectories.
+  Based on our qualitative understanding of solute transport, we focus the remainder
+  of our efforts on the development of three different stochastic models which can be
+  used to generate realizations of solute trajectories with qualitative and quantitative 
+  dynamics similar to our MD solute trajectories. Mathematically modeling complex 
+  transport phenomena at the molecular level can be a powerful tool for connecting 
+  microscopic chemically-dependent solute motions that do not follow simple diffusive
+  behavior with macroscopic membrane performance. 
   
   First, using anomalous diffusion theory, we show how solute dynamics can be
   modeled as a fractional diffusion process subordinate to a continuous time
-  random walk. From our MD simulations, we parameterize the distribution of
-  dwell times, hop lengths between dwells and correlation between hops.
-
-  Next, we generalize Markov state models, treating the configurational states of 
-  the system as a Markov process where each state has distinct transport properties. 
-  For each state and transition between states, we parameterize the distribution 
-  and temporal correlation structure of positional fluctuations as a means of 
-  characterization and to allow us to predict solute MSDs.
-  
-  Building on what we learned from the first two models, we develop a third approach,
+  random walk. We parameterize the distribution of dwell times, hop lengths between
+  dwells and correlation between hops. Next, we generalize Markov state models, treating
+  the configurational states of the system as a Markov process where each state has 
+  distinct transport properties. Finally we implement a third approach,
   called the infinite hidden Markov model, which is capable of automatically 
   distinguishing an unknown number of hidden dynamical modes in multidimensional
   solute time series. This model offers a flexibile approach to modeling solute
