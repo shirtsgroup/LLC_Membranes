@@ -43,7 +43,7 @@
   \begin{enumerate}
   	\item Parameterize in $x$, $y$, $z$ coordinates with $x$, $y$ coordinates relative to the nearest
   	pore center (see Figure~\ref{fig:xyz_hmm}). 	
-  	\item Convert x and y coordinates to radial coordinates, $r$, then fix the state sequence
+  	\item Convert $x$ and y coordinates to radial coordinates, $r$, then fix the state sequence
   	and use the inference component of the IHMM in order to estimate the parameters in terms
   	of $r$ and $z$ (see Figure~\ref{fig:rz_hmm}). 	 	
   	\item Cluster the VAR parameters from the states found in all 24 trajectories. Reassign the state
@@ -82,37 +82,8 @@
   	trajectory, and then fix the clustered state sequence to infer the parameters of each clustered 
   	state, assuming a mean of zero for all states. Note that the colors are no longer aligned with 
   	figures (a) and (b) because the states are relabeled in terms of their clusters. There are
-  	also significantly less states in this single trajectory.
+  	also less states in this single trajectory.
 	}\label{fig:hmm_demo}
-  \end{figure}
-  
-  \newpage
-  
-  \section{Parameter Convergence}\label{section:convergence}
-  
-  Given enough data, parameter estimates converge within only a few steps. In 
-  Figure~\ref{fig:convergence}, we plot the entries of $A$ and $\Sigma$ as 
-  a function of IHMM iteration. Some states are sampled far more frequently
-  than others. High sampling frequently results in higher certainty converged
-  parameter estimates.
-  
-  \begin{figure}[h]
-  \centering
-  \begin{subfigure}{0.7\textwidth}
-  \includegraphics[width=\textwidth]{convergence_MET_4.pdf}
-  \caption{15 total emissions}\label{fig:convergence_MET_low}
-  \end{subfigure}
-  \begin{subfigure}{0.7\textwidth}
-  \includegraphics[width=\textwidth]{convergence_MET_21.pdf}
-  \caption{1289 total emissions}\label{fig:convergence_MET_medium}
-  \end{subfigure}
-  \begin{subfigure}{0.7\textwidth}
-  \includegraphics[width=\textwidth]{convergence_MET_15.pdf}
-  \caption{24468 total emissions}\label{fig:convergence_MET_high}
-  \end{subfigure}
-  \caption{As the total number of emissions observed from each state
-  increases, the uncertainty in the converged parameters estimates
-  decreases.}\label{fig:fixed_state_convergence}
   \end{figure}
   
   \newpage
@@ -133,22 +104,88 @@
   be 2 standard deviations from the prior mean. Although this approach has 
   worked quite well for the data in this work, it is important to check the 
   results to determine whether further adjustments to the prior might be needed.
-  In Figure TBD, we show the result of a parameterization where the prior
-  parameters of $c$ were poorly chosen. %TODO
+%  In Figure TBD, we show the result of a parameterization where the prior
+%  parameters of $c$ were poorly chosen. %TODO
   
   \begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{prior_guesses.pdf}
-  \caption{The parameters of the prior on the mean vector, $c$, (black line), which
+  \caption{The parameters of the prior on the mean vector, $\mathbf{c}$, (black line), which
   represents the coordinates at which solute are trapped, should be chosen such
   that the mean levels of each state identified in the trajectory (blue line) lie within
   regions of the prior with reasonable probability. We chose the mean of the prior 
-  as halfway between the maximum and minimum of each trajectory dimension. We chose 
+  as halfway between the maximum and minimum (shown by the dashed lines) of each trajectory dimension. We chose 
   $\sigma$ of the prior by defining the maximum and minimum to be 2 standard deviations
-  from the mean (dashed lines).}\label{fig:prior_guesses}
+  from the mean.}\label{fig:prior_guesses}
   \end{figure}
   
-  \newpage
+  \pagebreak
+  
+  \section{Parameter Convergence}\label{section:convergence}
+  
+  The state sequence appears to converge within 500--1000 IHMM iterations. Step 1
+  in the procedure from the previous section is the only time the state sequence 
+  is determined. We ran 2000 iterations of the IHMM algorithm in order to arrive
+  at a finalized state sequence. Stabilization of the VAR parameters indicates 
+  that the state sequence has converged. In Figure~\ref{fig:convergence3d}, we plot
+  the diagonal entries of 3 different $A$ and $\Sigma$ matrices as well as the 
+  entries of the mean vector $\mathbf{c}$, fit to a single 3D methanol trajectory.
+  States with a relatively small number of observations are more highly influenced 
+  by the boundaries of the state segments and generally lead to much higher 
+  variance of the $A$ and $\Sigma$ parameters. In these cases, the mean is
+  a more reliable indicator of convergence since stabilized means imply that the
+  fluctuations assigned to each state come from motion about a static location.
+  
+  \begin{figure}[h]
+  \centering
+  \begin{subfigure}{0.8\textwidth}
+  \includegraphics[width=\textwidth]{convergence_MET_47.pdf}
+  \caption{706 total emissions}\label{fig:convergence3d_MET_low}
+  \end{subfigure}
+  \begin{subfigure}{0.8\textwidth}
+  \includegraphics[width=\textwidth]{convergence_MET_36.pdf}
+  \caption{1000 total emissions}\label{fig:convergence3d_MET_medium}
+  \end{subfigure}
+  \begin{subfigure}{0.8\textwidth}
+  \includegraphics[width=\textwidth]{convergence_MET_59.pdf}
+  \caption{201 total emissions}\label{fig:convergence3d_MET_high}
+  \end{subfigure}
+  \caption{Given a sufficient number of observations for a given mode, the VAR parameters
+  appear to converge within 500 -- 1000 iterations. States with too few observations
+  are more highly influenced by the boundaries of the state segments and generally
+  lead to much higher fluctuations in the VAR parameters.}\label{fig:convergence3d}
+  \end{figure}
+  
+  \clearpage
+  
+  When we fix the state sequence in subsequent steps of the procedure, parameter 
+  estimates converge within only a few steps. In Figure~\ref{fig:fixed_state_convergence}, we 
+  plot the entries of $A$ and $\Sigma$ as a function of IHMM iteration. Some states
+  are sampled far more frequently than others. High sampling frequently results in
+  higher certainty converged parameter estimates. Due to fast convergence, we only
+  run 100 iterations of the inference behavior when the state sequence is fixed.
+  
+  \begin{figure}[h]
+  \centering
+  \begin{subfigure}{0.6\textwidth}
+  \includegraphics[width=\textwidth]{convergence_MET_4.pdf}
+  \caption{15 total emissions}\label{fig:convergence_MET_low}
+  \end{subfigure}
+  \begin{subfigure}{0.6\textwidth}
+  \includegraphics[width=\textwidth]{convergence_MET_21.pdf}
+  \caption{1289 total emissions}\label{fig:convergence_MET_medium}
+  \end{subfigure}
+  \begin{subfigure}{0.6\textwidth}
+  \includegraphics[width=\textwidth]{convergence_MET_15.pdf}
+  \caption{24468 total emissions}\label{fig:convergence_MET_high}
+  \end{subfigure}
+  \caption{The VAR parameters converge quickly when we fix the state
+  sequence. As the total number of emissions observed from each state
+  increases, the uncertainty in the converged parameters estimates
+  decreases.}\label{fig:fixed_state_convergence}
+  \end{figure}
+  
+  \clearpage
   
   \section{Agglomerative Clustering Versus Gaussian Mixture Models}\label{section:agglomerative}
   
@@ -202,7 +239,7 @@
   our choice in number of clusters after careful consideration of the
   silhouette scores in conjunction with qualitative examination of the clusters
   formed by the choice. Although the test often
-  favors fewer states, we elected use intermediate number of states in 
+  favors fewer states, we elected to use an intermediate number of states in 
   the cases of $A$ and $\Sigma$ because choosing 2--3 clusters 
   insufficiently separates the dynamical modes. }\label{fig:silhouette}
   \end{figure}

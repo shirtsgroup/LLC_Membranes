@@ -1,4 +1,22 @@
 
+@article{meroz_toolbox_2015,
+	series = {A toolbox for determining subdiffusive mechanisms},
+	title = {A {Toolbox} for {Determining} {Subdiffusive} {Mechanisms}},
+	volume = {573},
+	issn = {0370-1573},
+	url = {http://www.sciencedirect.com/science/article/pii/S0370157315001404},
+	doi = {10.1016/j.physrep.2015.01.002},
+	abstract = {Subdiffusive processes have become a field of great interest in the last decades, due to amounting experimental evidence of subdiffusive behavior in complex systems, and especially in biological systems. Different physical scenarios leading to subdiffusion differ in the details of the dynamics. These differences are what allow to theoretically reconstruct the underlying physics from the results of observations, and will be the topic of this review. We review the main statistical analyses available today to distinguish between these scenarios, categorizing them according to the relevant characteristics. We collect the available tools and statistical tests, presenting them within a broader perspective. We also consider possible complications such as the subordination of subdiffusive mechanisms. Due to the advances in single particle tracking experiments in recent years, we focus on the relevant case of where the available experimental data is scant, at the level of single trajectories.},
+	urldate = {2018-12-03},
+	journal = {Phys. Rep.},
+	author = {Meroz, Yasmine and Sokolov, Igor M.},
+	month = apr,
+	year = {2015},
+	keywords = {Anomalous diffusion, Ergodicity, Single trajectories, Subdiffusion, Subordination},
+	pages = {1--29},
+	file = {ScienceDirect Full Text PDF:/home/ben/Zotero/storage/8X9V3D8Q/Meroz and Sokolov - 2015 - A toolbox for determining subdiffusive mechanisms.pdf:application/pdf;ScienceDirect Snapshot:/home/ben/Zotero/storage/DLPI6U8E/S0370157315001404.html:text/html}
+}
+
 @article{luzar_effect_1996,
 	title = {Effect of {Environment} on {Hydrogen} {Bond} {Dynamics} in {Liquid} {Water}},
 	volume = {76},
@@ -31,6 +49,61 @@
 	year = {2019},
 	pages = {289--309},
 	file = {ACS Full Text Snapshot:/home/ben/Zotero/storage/YITTBPW5/acs.jpcb.html:text/html;ACS Full Text PDF w/ Links:/home/ben/Zotero/storage/T3SYVPSS/Coscia et al. - 2019 - Understanding the Nanoscale Structure of Inverted .pdf:application/pdf}
+}
+
+@article{chodera_simple_2016,
+	title = {A {Simple} {Method} for {Automated} {Equilibration} {Detection} in {Molecular} {Simulations}},
+	volume = {12},
+	issn = {1549-9618},
+	url = {http://dx.doi.org/10.1021/acs.jctc.5b00784},
+	doi = {10.1021/acs.jctc.5b00784},
+	abstract = {Molecular simulations intended to compute equilibrium properties are often initiated from configurations that are highly atypical of equilibrium samples, a practice which can generate a distinct initial transient in mechanical observables computed from the simulation trajectory. Traditional practice in simulation data analysis recommends this initial portion be discarded to equilibration, but no simple, general, and automated procedure for this process exists. Here, we suggest a conceptually simple automated procedure that does not make strict assumptions about the distribution of the observable of interest in which the equilibration time is chosen to maximize the number of effectively uncorrelated samples in the production timespan used to compute equilibrium averages. We present a simple Python reference implementation of this procedure and demonstrate its utility on typical molecular simulation data.},
+	number = {4},
+	urldate = {2017-12-19},
+	journal = {J. Chem. Theory Comput.},
+	author = {Chodera, John D.},
+	month = apr,
+	year = {2016},
+	pages = {1799--1805},
+	file = {ACS Full Text Snapshot:/home/ben/Zotero/storage/GXSY4MCR/acs.jctc.html:text/html;ACS Full Text PDF w/ Links:/home/ben/Zotero/storage/8T3UE57Q/Chodera - 2016 - A Simple Method for Automated Equilibration Detect.pdf:application/pdf}
+}
+
+@article{berendsen_gromacs:_1995,
+	title = {{GROMACS}: {A} {Message}-{Passing} {Parallel} {Molecular} {Dynamics} {Implementation}},
+	volume = {91},
+	issn = {0010-4655},
+	shorttitle = {{GROMACS}},
+	url = {http://www.sciencedirect.com/science/article/pii/001046559500042E},
+	doi = {10.1016/0010-4655(95)00042-E},
+	abstract = {A parallel message-passing implementation of a molecular dynamics (MD) program that is useful for bio(macro)molecules in aqueous environment is described. The software has been developed for a custom-designed 32-processor ring GROMACS (GROningen MAchine for Chemical Simulation) with communication to and from left and right neighbours, but can run on any parallel system onto which a a ring of processors can be mapped and which supports PVM-like block send and receive calls. The GROMACS software consists of a preprocessor, a parallel MD and energy minimization program that can use an arbitrary number of processors (including one), an optional monitor, and several analysis tools. The programs are written in ANSI C and available by ftp (information: gromacs@chem.rug.nl). The functionality is based on the GROMOS (GROningen MOlecular Simulation) package (van Gunsteren and Berendsen, 1987; BIOMOS B.V., Nijenborgh 4, 9747 AG Groningen). Conversion programs between GROMOS and GROMACS formats are included. The MD program can handle rectangular periodic boundary conditions with temperature and pressure scaling. The interactions that can be handled without modification are variable non-bonded pair interactions with Coulomb and Lennard-Jones or Buckingham potentials, using a twin-range cut-off based on charge groups, and fixed bonded interactions of either harmonic or constraint type for bonds and bond angles and either periodic or cosine power series interactions for dihedral angles. Special forces can be added to groups of particles (for non-equilibrium dynamics or for position restraining) or between particles (for distance restraints). The parallelism is based on particle decomposition. Interprocessor communication is largely limited to position and force distribution over the ring once per time step.},
+	number = {1},
+	urldate = {2016-10-11},
+	journal = {Comput. Phys. Commun.},
+	author = {Berendsen, H. J. C. and van der Spoel, D. and van Drunen, R.},
+	month = sep,
+	year = {1995},
+	keywords = {Molecular dynamics, Parallel computing},
+	pages = {43--56},
+	file = {ScienceDirect Snapshot:/home/ben/Zotero/storage/PD7JBX4B/001046559500042E.html:text/html}
+}
+
+@article{van_der_spoel_gromacs:_2005,
+	title = {{GROMACS}: {Fast}, {Flexible}, and {Free}},
+	volume = {26},
+	issn = {1096-987X},
+	shorttitle = {{GROMACS}},
+	url = {http://onlinelibrary.wiley.com/doi/10.1002/jcc.20291/abstract},
+	doi = {10.1002/jcc.20291},
+	abstract = {This article describes the software suite GROMACS (Groningen MAchine for Chemical Simulation) that was developed at the University of Groningen, The Netherlands, in the early 1990s. The software, written in ANSI C, originates from a parallel hardware project, and is well suited for parallelization on processor clusters. By careful optimization of neighbor searching and of inner loop performance, GROMACS is a very fast program for molecular dynamics simulation. It does not have a force field of its own, but is compatible with GROMOS, OPLS, AMBER, and ENCAD force fields. In addition, it can handle polarizable shell models and flexible constraints. The program is versatile, as force routines can be added by the user, tabulated functions can be specified, and analyses can be easily customized. Nonequilibrium dynamics and free energy determinations are incorporated. Interfaces with popular quantum-chemical packages (MOPAC, GAMES-UK, GAUSSIAN) are provided to perform mixed MM/QM simulations. The package includes about 100 utility and analysis programs. GROMACS is in the public domain and distributed (with source code and documentation) under the GNU General Public License. It is maintained by a group of developers from the Universities of Groningen, Uppsala, and Stockholm, and the Max Planck Institute for Polymer Research in Mainz. Its Web site is http://www.gromacs.org. © 2005 Wiley Periodicals, Inc. J Comput Chem 26: 1701–1718, 2005},
+	number = {16},
+	urldate = {2016-10-11},
+	journal = {J. Comput. Chem.},
+	author = {Van Der Spoel, David and Lindahl, Erik and Hess, Berk and Groenhof, Gerrit and Mark, Alan E. and Berendsen, Herman J. C.},
+	month = dec,
+	year = {2005},
+	keywords = {free energy computation, GROMACS, Molecular dynamics, molecular simulation software, parallel computation},
+	pages = {1701--1718},
+	file = {Snapshot:/home/ben/Zotero/storage/DKP83FN8/abstract.html:text/html;Full Text PDF:/home/ben/Zotero/storage/4739VZSB/Van Der Spoel et al. - 2005 - GROMACS Fast, flexible, and free.pdf:application/pdf}
 }
 
 @article{teh_hierarchical_2006,
@@ -205,6 +278,24 @@
 	file = {Snapshot:/home/ben/Zotero/storage/RLYIG9WZ/328252.html:text/html}
 }
 
+@article{hess_gromacs_2008,
+	title = {{GROMACS} 4: {Algorithms} for {Highly} {Efficient}, {Load}-{Balanced}, and {Scalable} {Molecular} {Simulation}},
+	volume = {4},
+	issn = {1549-9618},
+	shorttitle = {{GROMACS} 4},
+	url = {http://dx.doi.org/10.1021/ct700301q},
+	doi = {10.1021/ct700301q},
+	abstract = {Molecular simulation is an extremely useful, but computationally very expensive tool for studies of chemical and biomolecular systems. Here, we present a new implementation of our molecular simulation toolkit GROMACS which now both achieves extremely high performance on single processors from algorithmic optimizations and hand-coded routines and simultaneously scales very well on parallel machines. The code encompasses a minimal-communication domain decomposition algorithm, full dynamic load balancing, a state-of-the-art parallel constraint solver, and efficient virtual site algorithms that allow removal of hydrogen atom degrees of freedom to enable integration time steps up to 5 fs for atomistic simulations also in parallel. To improve the scaling properties of the common particle mesh Ewald electrostatics algorithms, we have in addition used a Multiple-Program, Multiple-Data approach, with separate node domains responsible for direct and reciprocal space interactions. Not only does this combination of algorithms enable extremely long simulations of large systems but also it provides that simulation performance on quite modest numbers of standard cluster nodes.},
+	number = {3},
+	urldate = {2016-10-11},
+	journal = {J. Chem. Theory Comput.},
+	author = {Hess, Berk and Kutzner, Carsten and van der Spoel, David and Lindahl, Erik},
+	month = mar,
+	year = {2008},
+	pages = {435--447},
+	file = {ACS Full Text Snapshot:/home/ben/Zotero/storage/3G5DXIPR/ct700301q.html:text/html}
+}
+
 @book{cussler_diffusion:_2009,
 	edition = {3},
 	title = {Diffusion: {Mass} {Transfer} in {Fluid} {Systems}},
@@ -265,6 +356,33 @@
 	file = {ACS Full Text Snapshot:/home/ben/Zotero/storage/P8WHRG5K/acs.jpcb.html:text/html}
 }
 
+@article{humphrey_vmd:_1996,
+	title = {{VMD}: {Visual} {Molecular} {Dynamics}},
+	volume = {14},
+	issn = {0263-7855},
+	shorttitle = {{VMD}},
+	url = {http://www.sciencedirect.com/science/article/pii/0263785596000185},
+	doi = {10.1016/0263-7855(96)00018-5},
+	abstract = {VMD is a molecular graphics program designed for the display and analysis of molecular assemblies, in particular biopolymers such as proteins and nucleic acids. VMD can simultaneously display any number of structures using a wide variety of rendering styles and coloring methods. Molecules are displayed as one or more “representations,” in which each representation embodies a particular rendering method and coloring scheme for a selected subset of atoms. The atoms displayed in each representation are chosen using an extensive atom selection syntax, which includes Boolean operators and regular expressions. VMD provides a complete graphical user interface for program control, as well as a text interface using the Tcl embeddable parser to allow for complex scripts with variable substitution, control loops, and function calls. Full session logging is supported, which produces a VMD command script for later playback. High-resolution raster images of displayed molecules may be produced by generating input scripts for use by a number of photorealistic image-rendering applications. VMD has also been expressly designed with the ability to animate molecular dynamics (MD) simulation trajectories, imported either from files or from a direct connection to a running MD simulation. VMD is the visualization component of MDScope, a set of tools for interactive problem solving in structural biology, which also includes the parallel MD program NAMD, and the MDCOMM software used to connect the visualization and simulation programs. VMD is written in C++, using an object-oriented design; the program, including source code and extensive documentation, is freely available via anonymous ftp and through the World Wide Web.},
+	number = {1},
+	urldate = {2019-05-08},
+	journal = {J. Mol. Graphics},
+	author = {Humphrey, William and Dalke, Andrew and Schulten, Klaus},
+	month = feb,
+	year = {1996},
+	keywords = {interactive visualization, molecular dynamics visualization, molecular modeling},
+	pages = {33--38},
+	file = {ScienceDirect Full Text PDF:/home/ben/Zotero/storage/75AXKAKY/Humphrey et al. - 1996 - VMD Visual molecular dynamics.pdf:application/pdf;ScienceDirect Snapshot:/home/ben/Zotero/storage/JSD9J5RL/0263785596000185.html:text/html}
+}
+
+@book{bekker_gromacs:_1993,
+	title = {{GROMACS}: {A} {Parallel} {Computer} for {Molecular} {Dynamics} {Simulations}},
+	isbn = {981-02-1245-3},
+	publisher = {Physics Computing '92: Proceedings of the 4th International Conference, Praha, Czechoslovakia, Aug 24-28, 1992; World Scientific: Singapore},
+	author = {Bekker, H. and Berendsen, H. J. C. and Dijkstra, E. J. and Achterop, S. and van Drunen, R. and van der Spoel, D. and Sijbers, A. and Keegstra, H. and Reitsma, B. and Renardus, M. K. R.},
+	year = {1993}
+}
+
 @article{jochmann_modeling_2015,
 	title = {Modeling {U}.{S}. {Inflation} {Dynamics}: {A} {Bayesian} {Nonparametric} {Approach}},
 	volume = {34},
@@ -308,4 +426,189 @@
 	publisher = {Princeton University Press},
 	author = {Hamilton, James D.},
 	year = {1994}
+}
+
+@article{parrinello_polymorphic_1981,
+	title = {Polymorphic transitions in single crystals: {A} new molecular dynamics method},
+	volume = {52},
+	issn = {0021-8979},
+	shorttitle = {Polymorphic transitions in single crystals},
+	url = {https://aip.scitation.org/doi/abs/10.1063/1.328693},
+	doi = {10.1063/1.328693},
+	number = {12},
+	urldate = {2020-04-10},
+	journal = {Journal of Applied Physics},
+	author = {Parrinello, M. and Rahman, A.},
+	month = dec,
+	year = {1981},
+	note = {Publisher: American Institute of Physics},
+	pages = {7182--7190},
+	file = {Full Text PDF:/home/ben/Zotero/storage/4Y5R4WVP/Parrinello and Rahman - 1981 - Polymorphic transitions in single crystals A new .pdf:application/pdf;Snapshot:/home/ben/Zotero/storage/8Y2N3GLG/1.html:text/html}
+}
+
+@article{bussi_canonical_2007,
+	title = {Canonical sampling through velocity rescaling},
+	volume = {126},
+	issn = {0021-9606},
+	url = {https://aip.scitation.org/doi/full/10.1063/1.2408420},
+	doi = {10.1063/1.2408420},
+	abstract = {The authors present a new molecular dynamics algorithm for sampling the canonical distribution. In this approach the velocities of all the particles are rescaled by a properly chosen random factor. The algorithm is formally justified and it is shown that, in spite of its stochastic nature, a quantity can still be defined that remains constant during the evolution. In numerical applications this quantity can be used to measure the accuracy of the sampling. The authors illustrate the properties of this new method on Lennard-Jones and TIP4P water models in the solid and liquid phases. Its performance is excellent and largely independent of the thermostat parameter also with regard to the dynamic properties.},
+	number = {1},
+	urldate = {2020-04-10},
+	journal = {J. Chem. Phys.},
+	author = {Bussi, Giovanni and Donadio, Davide and Parrinello, Michele},
+	month = jan,
+	year = {2007},
+	note = {Publisher: American Institute of Physics},
+	pages = {014101},
+	file = {Full Text PDF:/home/ben/Zotero/storage/TQVYP4FJ/Bussi et al. - 2007 - Canonical sampling through velocity rescaling.pdf:application/pdf;Snapshot:/home/ben/Zotero/storage/PNHXK6CR/1.html:text/html}
+}
+
+@article{pohle_selecting_2017,
+	title = {Selecting the {Number} of {States} in {Hidden} {Markov} {Models}: {Pragmatic} {Solutions} {Illustrated} {Using} {Animal} {Movement}},
+	volume = {22},
+	issn = {1537-2693},
+	shorttitle = {Selecting the {Number} of {States} in {Hidden} {Markov} {Models}},
+	url = {https://doi.org/10.1007/s13253-017-0283-8},
+	doi = {10.1007/s13253-017-0283-8},
+	abstract = {We discuss the notorious problem of order selection in hidden Markov models, that is of selecting an adequate number of states, highlighting typical pitfalls and practical challenges arising when analyzing real data. Extensive simulations are used to demonstrate the reasons that render order selection particularly challenging in practice despite the conceptual simplicity of the task. In particular, we demonstrate why well-established formal procedures for model selection, such as those based on standard information criteria, tend to favor models with numbers of states that are undesirably large in situations where states shall be meaningful entities. We also offer a pragmatic step-by-step approach together with comprehensive advice for how practitioners can implement order selection. Our proposed strategy is illustrated with a real-data case study on muskox movement.},
+	language = {en},
+	number = {3},
+	urldate = {2020-04-10},
+	journal = {JABES},
+	author = {Pohle, Jennifer and Langrock, Roland and van Beest, Floris M. and Schmidt, Niels Martin},
+	month = sep,
+	year = {2017},
+	pages = {270--293},
+	file = {Springer Full Text PDF:/home/ben/Zotero/storage/SH2N89NN/Pohle et al. - 2017 - Selecting the Number of States in Hidden Markov Mo.pdf:application/pdf}
+}
+
+@article{halmos_random_1944,
+	title = {Random {Alms}},
+	volume = {15},
+	issn = {0003-4851},
+	url = {https://www.jstor.org/stable/2236198},
+	number = {2},
+	urldate = {2020-04-10},
+	journal = {The Annals of Mathematical Statistics},
+	author = {Halmos, Paul R.},
+	year = {1944},
+	note = {Publisher: Institute of Mathematical Statistics},
+	pages = {182--189}
+}
+
+@inproceedings{dreyer_discovering_2011,
+	address = {Edinburgh, United Kingdom},
+	series = {{EMNLP} '11},
+	title = {Discovering morphological paradigms from plain text using a {Dirichlet} process mixture model},
+	isbn = {978-1-937284-11-4},
+	abstract = {We present an inference algorithm that organizes observed words (tokens) into structured inflectional paradigms (types). It also naturally predicts the spelling of unobserved forms that are missing from these paradigms, and discovers inflectional principles (grammar) that generalize to wholly unobserved words. Our Bayesian generative model of the data explicitly represents tokens, types, inflections, paradigms, and locally conditioned string edits. It assumes that inflected word tokens are generated from an infinite mixture of inflectional paradigms (string tuples). Each paradigm is sampled all at once from a graphical model, whose potential functions are weighted finite-state transducers with language-specific parameters to be learned. These assumptions naturally lead to an elegant empirical Bayes inference procedure that exploits Monte Carlo EM, belief propagation, and dynamic programming. Given 50--100 seed paradigms, adding a 10-million-word corpus reduces prediction error for morphological inflections by up to 10\%.},
+	urldate = {2020-04-10},
+	booktitle = {Proceedings of the {Conference} on {Empirical} {Methods} in {Natural} {Language} {Processing}},
+	publisher = {Association for Computational Linguistics},
+	author = {Dreyer, Markus and Eisner, Jason},
+	month = jul,
+	year = {2011},
+	pages = {616--627},
+	file = {Full Text PDF:/home/ben/Zotero/storage/V7WAXHBH/Dreyer and Eisner - 2011 - Discovering morphological paradigms from plain tex.pdf:application/pdf}
+}
+
+@article{ward_hierarchical_1963,
+	title = {Hierarchical {Grouping} to {Optimize} an {Objective} {Function}},
+	volume = {58},
+	issn = {0162-1459},
+	url = {https://amstat.tandfonline.com/doi/abs/10.1080/01621459.1963.10500845},
+	doi = {10.1080/01621459.1963.10500845},
+	abstract = {A procedure for forming hierarchical groups of mutually exclusive subsets, each of which has members that are maximally similar with respect to specified characteristics, is suggested for use in large-scale (n {\textgreater} 100) studies when a precise optimal solution for a specified number of groups is not practical. Given n sets, this procedure permits their reduction to n − 1 mutually exclusive sets by considering the union of all possible n(n − 1)/2 pairs and selecting a union having a maximal value for the functional relation, or objective function, that reflects the criterion chosen by the investigator. By repeating this process until only one group remains, the complete hierarchical structure and a quantitative estimate of the loss associated with each stage in the grouping can be obtained. A general flowchart helpful in computer programming and a numerical example are included.},
+	number = {301},
+	urldate = {2020-04-10},
+	journal = {Journal of the American Statistical Association},
+	author = {Ward, Joe H.},
+	month = mar,
+	year = {1963},
+	note = {Publisher: Taylor \& Francis},
+	pages = {236--244},
+	file = {Snapshot:/home/ben/Zotero/storage/MUI7JNC5/01621459.1963.html:text/html}
+}
+
+@article{pedregosa_scikit-learn_2011,
+	title = {Scikit-learn: {Machine} {Learning} in {Python}},
+	volume = {12},
+	shorttitle = {Scikit-learn},
+	url = {http://jmlr.org/papers/v12/pedregosa11a.html},
+	abstract = {Scikit-learn is a Python module integrating a wide range of state-of-the-art machine learning algorithms for medium-scale supervised and unsupervised problems. This package focuses on bringing machine learning to non-specialists using a general-purpose high-level language.  Emphasis is put on ease of use, performance, documentation, and API consistency.  It has minimal dependencies and is distributed under the simplified BSD license, encouraging its use in both academic and commercial settings.  Source code, binaries, and documentation can be downloaded from http://scikit-learn.sourceforge.net.},
+	number = {85},
+	urldate = {2020-04-10},
+	journal = {Journal of Machine Learning Research},
+	author = {Pedregosa, Fabian and Varoquaux, Gaël and Gramfort, Alexandre and Michel, Vincent and Thirion, Bertrand and Grisel, Olivier and Blondel, Mathieu and Prettenhofer, Peter and Weiss, Ron and Dubourg, Vincent and Vanderplas, Jake and Passos, Alexandre and Cournapeau, David and Brucher, Matthieu and Perrot, Matthieu and Duchesnay, Edouard},
+	year = {2011},
+	pages = {2825--2830},
+	file = {Fulltext PDF:/home/ben/Zotero/storage/MET8YRU8/Pedregosa et al. - 2011 - Scikit-learn Machine Learning in Python.pdf:application/pdf}
+}
+
+@book{gelman_bayesian_2013,
+	title = {Bayesian {Data} {Analysis}, {Third} {Edition}},
+	isbn = {978-1-4398-4095-5},
+	abstract = {Now in its third edition, this classic book is widely considered the leading text on Bayesian methods, lauded for its accessible, practical approach to analyzing data and solving research problems. Bayesian Data Analysis, Third Edition continues to take an applied approach to analysis using up-to-date Bayesian methods. The authors—all leaders in the statistics community—introduce basic concepts from a data-analytic perspective before presenting advanced methods. Throughout the text, numerous worked examples drawn from real applications and research emphasize the use of Bayesian inference in practice. New to the Third Edition   Four new chapters on nonparametric modeling Coverage of weakly informative priors and boundary-avoiding priors Updated discussion of cross-validation and predictive information criteria Improved convergence monitoring and effective sample size calculations for iterative simulation Presentations of Hamiltonian Monte Carlo, variational Bayes, and expectation propagation New and revised software code   The book can be used in three different ways. For undergraduate students, it introduces Bayesian inference starting from first principles. For graduate students, the text presents effective current approaches to Bayesian modeling and computation in statistics and related fields. For researchers, it provides an assortment of Bayesian methods in applied statistics. Additional materials, including data sets used in the examples, solutions to selected exercises, and software instructions, are available on the book’s web page.},
+	language = {en},
+	publisher = {CRC Press},
+	author = {Gelman, Andrew and Carlin, John B. and Stern, Hal S. and Dunson, David B. and Vehtari, Aki and Rubin, Donald B.},
+	month = nov,
+	year = {2013},
+	note = {Google-Books-ID: ZXL6AQAAQBAJ},
+	keywords = {Computers / Mathematical \& Statistical Software, Mathematics / Probability \& Statistics / General, Psychology / Research \& Methodology}
+}
+
+@book{kaufman_finding_2009,
+	title = {Finding {Groups} in {Data}: {An} {Introduction} to {Cluster} {Analysis}},
+	isbn = {978-0-470-31748-8},
+	shorttitle = {Finding {Groups} in {Data}},
+	abstract = {The Wiley-Interscience Paperback Series consists of selected books that have been made more accessible to consumers in an effort to increase global appeal and general circulation. With these new unabridged softcover volumes, Wiley hopes to extend the lives of these works by making them available to future generations of statisticians, mathematicians, and scientists. "Cluster analysis is the increasingly important and practical subject of finding groupings in data. The authors set out to write a book for the user who does not necessarily have an extensive background in mathematics. They succeed very well." —Mathematical Reviews "Finding Groups in Data [is] a clear, readable, and interesting presentation of a small number of clustering methods. In addition, the book introduced some interesting innovations of applied value to clustering literature." —Journal of Classification "This is a very good, easy-to-read, and practical book. It has many nice features and is highly recommended for students and practitioners in various fields of study." —Technometrics An introduction to the practical application of cluster analysis, this text presents a selection of methods that together can deal with most applications. These methods are chosen for their robustness, consistency, and general applicability. This book discusses various types of data, including interval-scaled and binary variables as well as similarity data, and explains how these can be transformed prior to clustering.},
+	language = {en},
+	publisher = {John Wiley \& Sons},
+	author = {Kaufman, Leonard and Rousseeuw, Peter J.},
+	month = sep,
+	year = {2009},
+	note = {Google-Books-ID: YeFQHiikNo0C},
+	keywords = {Mathematics / Probability \& Statistics / General, Mathematics / Probability \& Statistics / Stochastic Processes}
+}
+
+@article{virtanen_scipy_2020,
+	title = {{SciPy} 1.0: fundamental algorithms for scientific computing in {Python}},
+	volume = {17},
+	copyright = {2020 The Author(s)},
+	issn = {1548-7105},
+	shorttitle = {{SciPy} 1.0},
+	url = {https://www.nature.com/articles/s41592-019-0686-2},
+	doi = {10.1038/s41592-019-0686-2},
+	abstract = {This Perspective describes the development and capabilities of SciPy 1.0, an open source scientific computing library for the Python programming language.},
+	language = {en},
+	number = {3},
+	urldate = {2020-04-10},
+	journal = {Nat Methods},
+	author = {Virtanen, Pauli and Gommers, Ralf and Oliphant, Travis E. and Haberland, Matt and Reddy, Tyler and Cournapeau, David and Burovski, Evgeni and Peterson, Pearu and Weckesser, Warren and Bright, Jonathan and Walt, Stéfan J. van der and Brett, Matthew and Wilson, Joshua and Millman, K. Jarrod and Mayorov, Nikolay and Nelson, Andrew R. J. and Jones, Eric and Kern, Robert and Larson, Eric and Carey, C. J. and Polat, Ilhan and Feng, Yu and Moore, Eric W. and VanderPlas, Jake and Laxalde, Denis and Perktold, Josef and Cimrman, Robert and Henriksen, Ian and Quintero, E. A. and Harris, Charles R. and Archibald, Anne M. and Ribeiro, Antônio H. and Pedregosa, Fabian and Mulbregt, Paul van},
+	month = mar,
+	year = {2020},
+	note = {Number: 3
+Publisher: Nature Publishing Group},
+	pages = {261--272},
+	file = {Full Text PDF:/home/ben/Zotero/storage/Q39F2P2W/Virtanen et al. - 2020 - SciPy 1.0 fundamental algorithms for scientific c.pdf:application/pdf;Snapshot:/home/ben/Zotero/storage/6EFT4ET3/s41592-019-0686-2.html:text/html}
+}
+
+@article{van_der_walt_numpy_2011,
+	title = {The {NumPy} {Array}: {A} {Structure} for {Efficient} {Numerical} {Computation}},
+	volume = {13},
+	issn = {1558-366X},
+	shorttitle = {The {NumPy} {Array}},
+	doi = {10.1109/MCSE.2011.37},
+	abstract = {In the Python world, NumPy arrays are the standard representation for numerical data and enable efficient implementation of numerical computations in a high-level language. As this effort shows, NumPy performance can be improved through three techniques: vectorizing calculations, avoiding copying data in memory, and minimizing operation counts.},
+	number = {2},
+	journal = {Computing in Science Engineering},
+	author = {van der Walt, Stefan and Colbert, S. Chris and Varoquaux, Gael},
+	month = mar,
+	year = {2011},
+	note = {Conference Name: Computing in Science Engineering},
+	keywords = {Arrays, Computational efficiency, data structures, Finite element methods, high level language, high level languages, mathematics computing, numerical analysis, Numerical analysis, numerical computation, numerical computations, numerical data, NumPy, numpy array, Performance evaluation, programming libraries, Python, Python programming language, Resource management, scientific programming, Vector quantization},
+	pages = {22--30},
+	file = {IEEE Xplore Full Text PDF:/home/ben/Zotero/storage/3WTYCGYI/van der Walt et al. - 2011 - The NumPy Array A Structure for Efficient Numeric.pdf:application/pdf;IEEE Xplore Abstract Record:/home/ben/Zotero/storage/5TT6M8UV/5725236.html:text/html}
 }

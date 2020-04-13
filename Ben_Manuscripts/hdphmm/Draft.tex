@@ -18,7 +18,7 @@
 \usepackage{xr}
 \usepackage{setspace}
 \doublespacing
-
+%\DeclareUnicodeCharacter{03C9}{$\omega$}
 \externaldocument[S-]{Supporting_Information}
 
 \title{Statistical Inference of Transport Mechanisms and Long Time Scale Behavior from Time Series 
@@ -30,10 +30,6 @@
 
   \graphicspath{{./figures/}}
   \maketitle
-  
-  % BJC2: I'm not putting a lot of effort into the introduction since I'll only write
-  % an abbreviated form for my dissertation. I'll work on the intro after my defense.  
-  %MRS7: sounds good, I won't look at this today.
 
   \section{Introduction}
   
@@ -106,10 +102,7 @@
   
   %%%%%%%%%%%%%%%%%%%%%%%% Thesis chapter starts here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-  In our previous 
-%MRS:work
-study,
-  we designed two different approaches which used
+  In our previous study, we designed two different approaches which used
   solute time series in order to parameterize stochastic models that could be used
   to project transport on much longer timescales. In our first approach we modeled 
   solute trajectories as subordinated fractional Brownian and L\'evy motion, called
@@ -134,9 +127,10 @@ study,
   by MD trajectories which required considerable human effort.
   
   In this work we attempt to minimize human effort by applying the infinite hidden 
-  Markov Model (IHMM), a nonparameteric Bayesian classification technique, in order to 
-  automatically detect and infer the parameters of an unknown number of latent
-  autoregressive (AR) modes present in solute center-of-mass time series trajectories.
+  Markov Model (IHMM)~\cite{beal_infinite_2002,calderon_inferring_2015}, a nonparameteric 
+  Bayesian classification technique, in order to automatically detect and infer the 
+  parameters of an unknown number of latent autoregressive (AR) modes present in solute
+  center-of-mass time series trajectories.
   We aim to address two primary scientific questions with this work. First, we want
   to know if the IHMM algorithm can help researchers efficiently uncover underlying
   transport mechanisms which give rise to different solute dynamical behavior.
@@ -156,12 +150,13 @@ study,
   realizations which sample from all behavior exhibited by MD. We verify that our
   stochastic realizations reproduce the expected hopping and trapping behavior 
   exhibited by MD. We quantitatively validate these trajectories by comparing 
-  their mean squared displacement (MSD) to MSDs measured by MD.
+  their mean squared displacement (MSD) to those measured by MD.
     
   \section{Methods}
     
-  We ran all MD simulations and energy minimizations using GROMACS 2018. Our 
-  python implementation of the IHMM algorithm is available online at 
+  We ran all MD simulations and energy minimizations using GROMACS 2018.
+  ~\cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008}  
+  Our python implementation of the IHMM algorithm is available online at 
   \texttt{https://github.com/bencoscia/hdphmm}. All other post-simulation 
   trajectory analysis tools are available online at \texttt{https://github.com/shirtsgroup/LLC\_Membranes}.
 
@@ -173,9 +168,10 @@ study,
   occupy the tail region with the rest near the pore center.
   
   We chose to study a subset of 4 of the fastest moving solutes from our previous
-  work: methanol, acetic acid, urea and ethylene glycol. In addition to exploring
-  membrane structural space the most, these solutes have a relatively diverse set
-  of chemical functionality. For each solute we created a separate system and to 
+  work: methanol, acetic acid, urea and ethylene glycol.
+  In addition to exploring membrane structural space the most, these solutes have a
+  relatively diverse set of chemical functionality. For each solute we created a 
+  separate system and to 
   each system we added 6 solutes per pore for a total of 24 solutes. This number 
   of solutes per pore provides a balance of a low degree of interaction between 
   solutes and a sufficient amount of data from which to generate statistics on the
@@ -184,7 +180,8 @@ study,
   
   We let each solute undergo 5 $\mu$s of MD simulation. We used a time step of 2 fs
   at a pressure of 1 bar and temperature of 300K controlled by the Parrinello-Rahman 
-  barostat~\cite{???} and velocity rescale thermostat~\cite{???} respectively. We recorded configurations every 0.5 ns.
+  barostat~\cite{parrinello_polymorphic_1981} and velocity rescale 
+  thermostat~\cite{bussi_canonical_2007} respectively. We recorded configurations every 0.5 ns.
 
   \subsection{The Infinite State Hidden Markov Model}\label{method:IHMM}
   
@@ -199,12 +196,12 @@ study,
   matrix, $T$, where $n$ is the number of states. Unfortunately, standard HMMs 
   require $n$ to be known \textit{a priori}. One can partially overcome this by 
   testing a range of numbers of hidden states and determining which is the best 
-  representation of the data.
+  representation of the data.~\cite{pohle_selecting_2017}
   
   %BJC: I'm not sure how much of this I should include. This is pretty much 
   % a reproduction of Fox et al's explanation: https://ieeexplore.ieee.org/abstract/document/5563110
   The infinite-state HMM overcomes this drawback by placing a hierarchical
-  Dirichlet process (HDP) prior on the transition probabilities. Using some 
+  Dirichlet process (HDP) prior on the transition probabilities.~\cite{fox_bayesian_2010} Using some 
   base probability distribution, $H$, a Dirichlet process (DP) generates discrete 
   distributions, $G_0$, over a countably infinite number of probability measures:
   \begin{equation}
@@ -212,7 +209,7 @@ study,
   \end{equation}
   where the $\theta_k$ are values drawn from the base distribution and the weights
   $\beta_k$ come from a stick-breaking process parameterized by the concentration 
-  parameter $\gamma$ (equivalently referred to as GEM($\gamma$)). In shorthand, this
+  parameter $\gamma$ (equivalently referred to as GEM($\gamma$)).~\cite{halmos_random_1944} In shorthand, this
   specification can be expressed as $G_0 \sim DP(\gamma, H)$. The concentration 
   parameter, $\gamma$, expresses one's confidence in the base distribution $H$.
   We use a uniform base distribution for $H$. When $\gamma\to 0$, the first 
@@ -246,10 +243,6 @@ study,
   $\Sigma$ and a Gaussian prior on $\mathbf{c}$ in order to infer their 
   values.~\cite{fox_nonparametric_2009}
   
-  % BJC2: It might be useful to walk through the following procedure with an example 
-  % trajectory
-  % TODO in the SI
-  
   %Based on the algorithms developed by Fox et al.~\cite{fox_sticky_2007}, 
   Using the IHMM framework, we estimated the most likely number and sequence of hidden
   states in each solute center-of-mass trajectory while simultaneously inferring VAR(1)
@@ -258,7 +251,7 @@ study,
   the MATLAB code of Fox et al.~\cite{fox_sticky_2007} Parameter estimation is iterative. 
   Therefore, we looked for convergence of each entry in the $\mathbf{c}$ vector as well
   as the $A$ and $\Sigma$ matrices of Equation~\ref{eqn:var}. We detected equilibration 
-  of the parameters using the module \texttt{pymbar.timeseries.detect\_equilibration} on
+  of the parameters using the module \texttt{pymbar.timeseries.detect\_equilibration}~\cite{chodera_simple_2016} on
   the time series of parameter estimates. Plots illustrating parameter convergence are 
   available in Section~\ref{S-section:convergence} of the Supporting Information. We refer the interested reader to 
   much more extensive descriptions of the inference and sampling procedures used to 
@@ -280,7 +273,7 @@ study,
   trajectories transformed relative to the closest pore center. We tracked the solute's
   motion along the pore axis with the center-of-mass $z$ coordinate. Using the nearest
   pore center as the origin, we represented the radial distance of each solute's 
-  center-of-mass from the pore center in 2 dimensions, $x$ and $y$ 
+  center-of-mass from the pore center in 2 dimensions, $x$ and $y$.
   %(see Figure~\ref{fig:cartesian_cylinder}). 
   By working in Cartesian coordinates, we avoid
   mathematical complexity introduced by cylindrical coordinates while estimating the 
@@ -306,7 +299,7 @@ study,
   We applied the IHMM to each of the 24 solute trajectories independently.
   Although the IHMM is capable of identifying an infinite number of states, 
   a Dirichlet process tends to exhibit a ``rich get richer" effect, favoring
-  a fewer number of states. By applying the algorithm to each trajectory 
+  a fewer number of states.~\cite{dreyer_discovering_2011} By applying the algorithm to each trajectory 
   independently, we reduce the possibility of lumping together multiple 
   similar states which we would prefer to stay separated before clustering.
   Note that the states identified by the IHMM are heavily influenced by 
@@ -315,19 +308,23 @@ study,
   choosing reliable prior parameters. The entries of $A$ and $\Sigma$ do 
   not vary over a wide range, so the final parameters were relatively insensitive
   to their priors.
-  
 
   We ran 2000 iterations of the IHMM procedure in order to arrive at converged 
-  state sequences and parameters for each state. Most parameters converged 
-  quickly (within 50-100 iterations) while others took up to 1000 iterations.
-  %BJC6: still need to make these figures.
+  state sequences. We evaluated the convergence of the state sequence based on
+  the convergence of the VAR parameters. The parameters of each states
+  generally converge within 500--1000 iterations. However, the boundaries of 
+  each state segment fluctuate which can lead to high variance in the $A$
+  and $\Sigma$ parameters in segments with a relatively low number of emissions.
+  In these cases, the mean in each dimension tends to be a more reliable indicator of
+  convergence (see Figure~\ref{S-fig:convergence3d} of the Supporting Information).
+
   We defined the finalized parameters of each state as the average of the 
   parameters from each iteration recorded after the equilibration time point.
   We found the equilibration time point of each component of the $\mathbf{c}$ 
   vector as well as $A$ and $\Sigma$ matrices, and then used the longest 
   equilibration time of all dimensions as the equilibration time point.
-  Further details are available in Section~\ref{S-section:convergence} of
-  the Supporting Information.
+%  Further details are available in Section~\ref{S-section:convergence} of
+%  the Supporting Information.
   
   We reparameterized the time series, preserving the state sequence, in terms
   of the radial and axial coordinates ($r$, $z$) because $x$ and $y$ aren't 
@@ -336,8 +333,8 @@ study,
   3D parameterization and applied the inference component of the IHMM procedure
   to the cylindrical trajectories in order to estimate the VAR(1) parameters in
   terms of $r$ and $z$. Since we fixed the state sequence, and we are using conjugate
-  priors, the VAR parameters converge very quickly (see Figure~\ref{S-fig:fixed_state_convergence}). Therefore, we only ran 
-  the inference procedure for 100 iterations. 
+  priors, the VAR parameters converge very quickly (see Figure~\ref{S-fig:fixed_state_convergence}).
+  Therefore, we only ran the inference procedure for 100 iterations. 
   %However, note that the uncertainty in their
   %estimates are a function of the number of data points used in their estimate.
   
@@ -350,13 +347,13 @@ study,
   We reduced the parameter space used agglomerative clustering, a hierarchical
   clustering approach which uses a linkage criteria in order to successively merge
   similar clusters until a desired intracluster distance threshold or number of
-  clusters is reached. We used the Ward linkage criteria, which works to minimize 
-  the sum of the squared differences within all clusters.
+  clusters is reached.~\cite{pedregosa_scikit-learn_2011} We used the Ward linkage criteria, which works to minimize 
+  the sum of the squared differences within all clusters.~\cite{ward_hierarchical_1963}
     %MRS6: explain why Ward (make the cluster as minimally disperse?)
    	%BJC6: I'll add some plots to the SI and then write a better justification for
 	% the paper. This is lower priority in mind for the thesis.
   We elected to choose the number of clusters rather than the distance threshold.
-  For our data, non-parametric methods such as Bayesian Gaussian mixture models tend
+  For our data, non-parametric methods such as Bayesian Gaussian mixture models~\cite{pedregosa_scikit-learn_2011,gelman_bayesian_2013} tend
   to delocalize the clusters in parameter space (see Section~\ref{S-section:agglomerative}
   of the Supporting Information).
   
@@ -380,7 +377,7 @@ study,
   we attempted to add some structure to the selection process by following
   a set of qualitative and quantitative guidelines. We used the silhouette 
   test in order to score the quality of clustering as a function of the number 
-  of clusters chosen. For our data, the silhouette test generally favors the 
+  of clusters chosen.~\cite{kaufman_finding_2009} For our data, the silhouette test generally favors the 
   lowest number of clusters possible (see Section~\ref{S-section:nclusters} of
   the Supporting Information). However, choosing too few clusters tends to 
   not distinguish between visually obvious differences in 
@@ -406,7 +403,7 @@ study,
   parameters because it is not clear that this is a linear 
   operation for this problem. To circumvent this problem, we modified the ($r$,
   $z$) solute trajectories so that they had a mean of zero, leaving only the 
-  fluctuations. We did this by the mean of each same-state segment of the 
+  fluctuations. We did this by subtracting the mean from each same-state segment of the 
   unclustered trajectory. We used the IHMM algorithm on this modified trajectory
   to infer the clustered state parameters by fixing the clustered state sequence. 
   
@@ -434,7 +431,7 @@ study,
   sequential frames where solutes remained hydrogen bonded. We still counted sequences
   where hydrogen bonds were broken for a single frame before reforming. Consistent
   with our previous work, we reported the 95th percentile of hydrogen bond lifetimes
-  since their distribution is not Gaussian and to emphasize longer trapping periods. 
+  since their distribution is not Gaussian and to emphasize longer trapping periods.~\cite{coscia_chemically_2019}
   
   We also measured the degree of association between solutes and sodium ions on a
   frame-by-frame basis. We define a sodium ion to be associated with an atom if they
@@ -445,11 +442,11 @@ study,
   Since our system is in a monoclinic unit cell, we periodically replicated
   the system in the +/- x, y and z directions and then chose the bounds on the
   histogram in order to create a rectangular box encompassing the unit cell with
-  a 1 nm buffer between the histogram and unit cell boundaries. We then used a regular
-  grid interpolator in order to allow interpolation at arbitrary points within the grid.
+  a 1 nm buffer between the histogram and unit cell boundaries.~\cite{van_der_walt_numpy_2011} We then used a regular
+  grid interpolator in order to allow interpolation at arbitrary points within the grid.~\cite{virtanen_scipy_2020} 
   
   We quantified solute motion using the time averaged mean squared displacement (MSD)
-  of the solute center of mass trajectories. The time-averaged MSD measures all observed
+  of the solute center of mass trajectories.~\cite{meroz_toolbox_2015} The time-averaged MSD measures all observed
   displacements over time lag $\tau$:
   \begin{equation}
   	\overline{z^2(\tau)} = \dfrac{1}{T - \tau}\int_{0}^{T - \tau} (z(t + \tau) - z(t))^2 dt
@@ -481,14 +478,12 @@ study,
   In this section, we explore a subset of this data, focusing on the states
   and dominant interactions most common to solute trajectories.
 
-  %MRS7: more descriptive title?  What about methanol?
-  \subsubsection*{The Case of Methanol}
+  \subsubsection*{The Dynamics of Methanol}
   
-  %MRS6: likely just the summary of the methanol behavior should go in the main paper - the rest should be SI.
   Methanol exhibits a range of dynamic behavior. In Figure~\ref{fig:mechanism_map}, we
   plot a representative 2D methanol trajectory in cylindrical coordinates. The coordinates
   are colored according to the cluster with which methanol's dynamics are most consistent,
-  which implies that this particular methanol trajectory exhibits 8 distinct dynamical 
+  which implies that this particular methanol trajectory exhibits eight distinct dynamical 
   behaviors (in order of their first appearance, they are colored dark yellow, red, light
   blue, light green, orange, blue, teal and lime green). The solute time series are coupled
   with color coded bars which describe the solute's local environment and physical 
@@ -553,7 +548,7 @@ study,
   It is clear that there is a wealth of information in these plots, but they don't give
   the complete picture needed in order to formulate LLC membrane design principles. One
   can analyze each segment sequentially and form a clear picture of this instance of 
-  methanol's behavior without the need to visualize the trajectory with software like VMD.
+  methanol's behavior without the need to visualize the trajectory with software like VMD.~\cite{humphrey_vmd:_1996}
   However, it is still possible to gain a more general understanding of methanol's average
   behavior.
   
@@ -628,8 +623,10 @@ study,
   dynamics of six states that are common to more than one third of the solute trajectories. 
   The $y$-axis labels of the $r$ coordinate plot specify the radial mean of each clustered 
   state. 
-  %MRS7: it's confusing to have the R not in order of r. Emphasize this more in the caption, maybe think of something a bit different for the final paper. Reads odd to have numbers not in order along an axis.
-The percentage of trajectories in which the states appear are labeled to the right of
+  %MRS7: it's confusing to have the R not in order of r. Emphasize this more in the caption, 
+  %maybe think of something a bit different for the final paper. Reads odd to have numbers not in order along an axis.
+  %BJC7: indeed
+  The percentage of trajectories in which the states appear are labeled to the right of
   the $r$ plots. States 1--5 appear in the trajectory shown in Figure~\ref{fig:mechanism_map}
   and are colored to match for easy visual comparison. All time series have a mean of zero and are
   shifted to put the mean in line with the $y$-axis labels for the purpose of visualizing them. 
@@ -711,21 +708,23 @@ The percentage of trajectories in which the states appear are labeled to the rig
   \includegraphics[width=\textwidth]{hbond_lifetimes_density_MET.pdf}
   \caption{}\label{fig:hbond_lifetimes_density_MET}
   \end{subfigure}
-  %MRS7: should it be ``methanol hydrogen bonding in different segments''? 
-  \caption{(a) Methanol hydrogen bonds with different segments of the LLC monomer
-    %MRS7: why are some wedges bigger? (green on 2 and 6 for example)
+  \caption{(a) Methanol hydrogen bonds in different segments of the LLC monomer
   dependent on the state. States with mean radial locations in the pore region tend to
   hydrogen bond with the head groups and ether linkages. States with mean radial
   locations in the tails tend to hydrogen bond with the tail oxygen atoms.
   (b) Hydrogen bond lifetimes and the local density experienced by methanol
   molecules can help us to understand dynamical states in terms of membrane 
-  interactions. States 1 and 2, which have large covariances, also have short
+  interactions. The bars are colored according to match the states in Figures~\ref{fig:mechanism_map}
+  and~\ref{fig:common_states_MET}. States 1 and 2, which have large covariances, also have short
   hydrogen bond lifetimes and exist in relatively low density regions. The
   hydrogen bond lifetimes of methanol in states with radial means in the tail
   region tend to increase with local density and mean dwell times. 
   %MRS7: not clear from graphic which ones are in the pore.
   %MRS7: is there any legend for the color for b? If same as above figure, indicate. Don't REALLY need color since they bars are already labeled, so it's 2 sources of duplicate information.
+  %BJC7: The state numbers are all you need to compare to the previous figure BUT the color make it easier 
+  %plot of the methanol trajectory where states aren't labeled.
   %MRS7: cross-hatching doesn't appear in the legend? Not sure which is which (I assume hatched is number density because closer to that axis).
+  %BJC7: Is it because the hatches aren't dense enough? I see them in the legend
   This monotonic
   relationship does not exist for states in the pore region. The high 
   local density experienced by state 5 methanol molecules may explain why 
@@ -741,25 +740,17 @@ The percentage of trajectories in which the states appear are labeled to the rig
   
   \subsubsection*{Behavior of Other Solutes}
 
-  %MRS7: should be texified below.
-
   We applied the IHMM to the other three solutes in this study: urea, acetic acid
-  and ethylene glycol. 
-  \begin{itemize}  
-    \item Not only can we use the model to study the dynamics of each solute 
-    individually, but we can compare their behavior in order to improve our
-    understanding of more subtle mechanistic details.
-  \end{itemize} 
+  and ethylene glycol. Not only can we use the model to study the dynamics of each 
+  solute individually, but we can compare their behavior in order to improve our
+  understanding of more subtle mechanistic details.
   
   The size and chemical functionality of the solutes dictates the interactions which
-  influence solute transport. 
-  \begin{itemize}  
-    \item In Figure~\ref{fig:hbonds_assoc_summary}, we show that the solutes 
-    donate hydrogen bonds and associate with sodium ions to varying degrees.
-    \item We also show the solute MSDs after a 1000 ns time lag. 
-    \item It is not immediately obvious why the MSDs follow this trend.
-    \item The states identified by the IHMM can help us shed some light.
-  \end{itemize}
+  influence solute transport. In Figure~\ref{fig:hbonds_assoc_summary}, we show that
+  the solutes donate hydrogen bonds and associate with sodium ions to varying degrees.
+  We also show the solute MSDs after a 1000 ns time lag. It is not immediately obvious
+  why the MSDs follow this trend. The states identified by the IHMM shed
+  some light on the reasoning.
   
   \begin{figure}
   \centering
@@ -775,21 +766,20 @@ The percentage of trajectories in which the states appear are labeled to the rig
   \includegraphics[width=\textwidth]{dwell_time_summary.pdf}
   \caption{}\label{fig:dwell_time_summary}
   \end{subfigure}
-  %MRS7: maybe in dwell time legend, say ``Max dwell in'' instead of ``Max of''
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{cov_summary.pdf}
   \caption{}\label{fig:cov_summary}
   \end{subfigure}
   %MRS7: is c) methanol?  I thought it wasn't associating with Na+ much.
+  %BJC7: looks about 5 %, certainly less than the other. I could add
+  % some discussion of this to previous section.
   %MRS7: methanol yellow is hard to see in c)
   \caption{(a) Solutes hydrogen bond and associate with sodium ions
   to different degrees. Sometimes, they participate in both interactions at
   once. The frequency at which solutes interact via either mechanism does
   not appear to be linearly related to the solute's mean squared displacement
   after a 1000 ns time lag. (b) We histogrammed the means of the clusters weighted
-  by the number of 
-  %MRS7: ``transitions out'' instead of emisssions?
-  emissions from that cluster. Most solutes spend the majority of
+  by the number of fluctuation within that cluster. Most solutes spend the majority of
   their time close to the pore center. Only methanol has a significant peak
   beyond 1.5 nm from the pore center. (c) The trend in the maximum dwell time
   among prevalent states for each solute is inversely related to the
@@ -803,53 +793,41 @@ The percentage of trajectories in which the states appear are labeled to the rig
   \end{figure}
   
   Hydrogen bonding and sodium ion association interactions are far more 
-  common when solutes stay near the pore centers.
-  \begin{itemize}
-    \item In Figure~\ref{fig:rdf_summary}, we plot the distribution of the 
-    radial means of each cluster weighted by the time spent in that cluster.
-    \item All solutes except methanol spend the majority of their time near
-    the pore centers (roughly defined as within 1.5 nm).
-    \item As we showed earlier, methanol spends a significant portion of its
-    time trapped in the dense tails.
-  \end{itemize}
+  common when solutes stay near the pore centers. In Figure~\ref{fig:rdf_summary},
+  we plot the distribution of the radial means of each cluster weighted by 
+  the time spent in that cluster. All solutes except methanol spend the 
+  majority of their time near the pore centers (roughly defined as within 
+  1.5 nm). As we showed earlier, methanol spends a significant portion of its
+  time trapped in the dense tails.
   
   % BJC: we can probably use this to create a new definition of the pore and tail region.
   % and perhaps focus on transitions between them.
   Solute size likely has a large effect on their preferred radial location within
-  the pores.
-  \begin{itemize}
-    \item The histograms in Figure~\ref{fig:rdf_summary} have a clear vacancy between
-    what one might consider the pore and tail region, most evident in methanol's 
-    distribution of radial positions.
-    \item The area between the head groups and the distal regions of the tails is
-    dense and hydrophobic which creates a considerable energy barrier to be overcome
-    in order to transition to that region.
-    %BJC: I wonder if there is a state which corresponds to the jump from pore to tail region. Might be hard to pick up.
-    \item Methanol is the smallest solute in this study and therefore appears to 
-    have the easiest time crossing into the tails. 
-  \end{itemize}
+  the pores. The histograms in Figure~\ref{fig:rdf_summary} have a clear vacancy 
+  between what one might consider the pore and tail region, most evident in methanol's 
+  distribution of radial positions. The area between the head groups and the distal
+  regions of the tails is dense and hydrophobic which creates a considerable energy 
+  barrier to be overcome in order to transition to that region.
+  %BJC: I wonder if there is a state which corresponds to the jump from pore to tail region. Might be hard to pick up.
+  Methanol is the smallest solute in this study and therefore appears to 
+  have the easiest time crossing into the tails.
 
   Despite their close proximity to the low density aqueous pore region, acetic
   acid, ethylene glycol and urea exhibit a range of trapping behavior.
-  \begin{itemize}
-    \item It is clear that the number of polar interactions is not directly
-    related to solute MSD. Acetic acid participates in a similar number of 
-    interactions relative to urea and ethylene glycol, but its MSD is considerably
-    lower.
-    \item For the purpose of this analysis, as in the previous section, we 
-    defined states that appear in more than one third of the trajectories to
-    be prevalent states.
-    \item In Figure~\ref{fig:dwell_time_summary}, we plot the longest dwell
-    times exhibited by each solute among the prevalent states as well 
-    as out of all the states.
-    \item The state which exhibits the longest dwell times among all acetic
-    acid states appears in 9 different trajectories, making it a prevalent state,
-    and occurs 1 nm from the pore center. %BJC: check exact radius
-    \item Although urea possesses the state with the longest dwell time among the
-    solutes studied, it occurs in the tail region with prevalent states having 
-    much shorter dwell times.  %BJC: get radius of long entrapment.
-    \item Ethylene glycol appears to be the least subject to trapping.
-  \end{itemize}
+  It is clear that the number of polar interactions is not directly
+  related to solute MSD. Acetic acid participates in a similar number of 
+  interactions relative to urea and ethylene glycol, but its MSD is considerably
+  lower. For the purpose of this analysis, as in the previous section, we 
+  defined states that appear in more than one third of the trajectories to
+  be prevalent states. In Figure~\ref{fig:dwell_time_summary}, we plot the\
+  longest dwell times exhibited by each solute among the prevalent states as 
+  well as out of all the states. The state which exhibits the longest dwell
+  times among all acetic acid states appears in 9 different trajectories, 
+  making it a prevalent state, and occurs 0.9 nm from the pore center.
+  Although urea possesses the state with the longest dwell time among the
+  solutes studied, it occurs in the tail region with prevalent states having 
+  much shorter dwell times. Ethylene glycol appears to be the least subject to
+  trapping.
 
 %  The combination of a carbonyl group, which binds strongly to sodium, and a 
 %  hydroxyl group, which can form strong hydrogen bonds, makes acetic acid
@@ -897,11 +875,7 @@ The percentage of trajectories in which the states appear are labeled to the rig
   \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{trajectory_realizations_MET.pdf}
-  %MRS5: maybe it would be good to put a dotted line through each of the centers of the offset trajectories?
-  %BJC5: TODO: redo these plots with r clusters
-  %MRS7: still odd it doesn't stay at large r.
-  %MRS7: can you restart the radial coordiante, so 0-3 just repeats, instead of going up tp 17.5?
- \caption{We can generate trajectories which bear some qualitative resemblance to the MD 
+  \caption{We can generate trajectories which bear some qualitative resemblance to the MD 
   trajectories. Solute trajectories generated by our model (blue) show the same
   hopping and trapping behavior exhibited by MD (black). The behavior of individual 
   MD trajectories tend to show wider variability than our model's realization because
@@ -909,11 +883,11 @@ The percentage of trajectories in which the states appear are labeled to the rig
   implies that much longer simulations or a different method of trajectory generation might
   be necessary in order to obtain stochastic realizations with the same range of behavior
   as MD.
-   }\label{fig:trajectory_realizations_MET}
+  }\label{fig:trajectory_realizations_MET}
   \end{figure}
   
   The MSDs calculated by stochastic realizations of our model are quantitatively similar to
-  MD. For all solutes except acetic acid, our predicted MSD curve lie close to but below the
+  MD. For all solutes except acetic acid, our predicted MSD curves lie close to but below the
   1$\sigma$ confidence intervals of MD. However, in these cases, the average MD MSDs are 
   driven up by single trajectories with uncharacteristically large MSDs. It is possible that
   an improved trajectory generation approach may allow for this highly variable behavior.
@@ -990,12 +964,12 @@ The percentage of trajectories in which the states appear are labeled to the rig
   \section*{Supporting Information}
 
   Detailed explanations and expansions upon the results and procedures mentioned in
-  the main text are described in the Supporting Information. This information is
-  available free of charge via the Internet at http://pubs.acs.org.
+  the main text are described in the Supporting Information. 
+  %This information is
+  %available free of charge via the Internet at http://pubs.acs.org.
 
   \section*{Acknowledgments}
 
-  %MRS2: add GAANN and PRF here to cover bases.
   This work was supported in part by the ACS Petroleum Research Fund
   grant \#59814-ND7 and the Graduate Assistance in Areas of National Need (GAANN) 
   fellowship which is funded by the U.S. Department of Education. 

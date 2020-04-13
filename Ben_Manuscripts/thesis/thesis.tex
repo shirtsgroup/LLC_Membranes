@@ -2,7 +2,7 @@
 
 \usepackage{amssymb}		% to get all AMS symbols
 \usepackage{graphicx}		% to insert figures
-%\usepackage{hyperref}		% PDF hyperreferences??
+\usepackage{hyperref}		% PDF hyperreferences??
 \usepackage{amsmath}
 \usepackage{siunitx}
 \usepackage{textcomp} % gets rid of \perthousand and \micro warnings that come from gensymb
@@ -56,52 +56,44 @@
 
   % \OnePageChapter	% use if abstract is less than one page
 
-  %MRS: I would use ``I'' instead of we.
-  %MRS: I would make the abstract higher level, instead of going step by step with one paragraph per chapter. 
-  % That will save some space, and read more concisely.
-
   Periodic, nanostructured porous polymer membranes made from the cross-linked
   inverted hexagonal phase of self-assembled lyotropic liquid crystals (LLCs) are
-  a promising class of materials for selective separations. Our current understanding
-  of these systems is not sufficient to design them for specific applications. In 
-  this thesis, we use detailed atomistic molecular modeling in order to investigate 
-  structure and transport of solutes within LLC polymer membrane.
+  a promising class of materials for selective separations. There is a wide 
+  design space available for liquid crystal monomer design which may allow one to
+  tailor solute interactions within the membrane pores. Our currrent
+  understanding of these membrane is based primarily on experimental measurements
+  and macroscopic modeling which limits our insight and ability to design them 
+  for specific applications. 
   
-  We begin by enhancing our understanding of the nanoscopic pore structure in order 
-  to ensure we appropriately model the chemical environment in the pores. We use radial
-  distribution functions and simulated X-ray diffraction patterns to quantify and 
-  understand the major structural features of the model.
+  In this thesis, I develop a detailed atomistic molecular model, maximally consistent
+  with experimental structural data, in order to investigate structure and transport
+  of solutes within LLC polymer membranes. I characterize the dynamics of water, sodium
+  ions and 20 small polar solutes within its pores. I present evidence which suggests that 
+  LLC membranes are characterized by a gradual, rather than abrupt, transition in 
+  composition from the primarily aqueous pore region to the hydrophobic monomer
+  tail region. Within this continuous and heterogeneous environment, solutes perform
+  intermittent hops between lengthy periods of entrapment. I show how transport rates
+  of these species are dependent not only on molecular size, but on chemical functionality
+  as well. 
   
-  %MRS: ``carefully'' is a bit of an opinion
-  We use our carefully constructed molecular model in order to observe transport of
-  water, sodium ions and 20 small polar solutes within the pores of a lyotropic 
-  liquid crystal (LLC) membrane using atomistic molecular simulations. We 
-  observe that solutes perform intermittent hops between lengthy periods of 
-  entrapment and describe how transport of a species is dependent not only on 
-  molecular size, but on chemical functionality as well. 
-  
-  Based on our qualitative understanding of solute transport, we focus the remainder
-  of our efforts on the development of three different stochastic models which can be
-  used to generate realizations of solute trajectories with qualitative and quantitative 
-  dynamics similar to our MD solute trajectories. Mathematically modeling complex 
-  transport phenomena at the molecular level can be a powerful tool for connecting 
-  microscopic chemically-dependent solute motions that do not follow simple diffusive
-  behavior with macroscopic membrane performance. 
-  
+  In order to connect these microscopic chemically-dependent solute motions to
+  macroscopic membrane performance, I develop three different stochastic models 
+  of varying complexity.  
   First, using anomalous diffusion theory, we show how solute dynamics can be
   modeled as a fractional diffusion process subordinate to a continuous time
   random walk. We parameterize the distribution of dwell times, hop lengths between
   dwells and correlation between hops. Next, we generalize Markov state models, treating
   the configurational states of the system as a Markov process where each state has 
-  distinct transport properties. Finally we implement a third approach,
-  called the infinite hidden Markov model, which is capable of automatically 
-  distinguishing an unknown number of hidden dynamical modes in multidimensional
-  solute time series. This model offers a flexibile approach to modeling solute
-  motion and helps us to uncover mechanisms with minimal human effort.
+  distinct transport properties. Finally apply the infinite hidden Markov model, 
+  an approach capable of automatically distinguishing and parameterizing an unknown 
+  number of hidden dynamical modes in multidimensional solute time series. This model
+  offers a flexibile approach to modeling solute motion and helps us to uncover 
+  mechanisms with minimal human effort.
+  
   }
 
 \dedication[Dedication]{	% NEVER use \OnePageChapter here.
-	To all of the fluffy kitties.
+	To my girls Jenna, Maclynn and Aria.
 	}
 
 %  Here's where you acknowledge folks who helped. But keep it short, i.e., no more than one page,
@@ -113,33 +105,22 @@
   guidance has not gone unnoticed. First, I thank my advisor, Michael Shirts, 
   who has been instrumental to my growth as a competent and confident researcher,
   pushing me to do high quality science. I thank the entire Shirts group for 
-  their feedback and encouragement as well as for making our lab an enjoyable to work.
-  I thank Richard Noble and Douglas Gin for their guidance on past and present 
-  experimental research on LLC membranes. I also thank Michael McGrath, Gregory 
-  Dwulet and Sarah Dischinger, members of the Gin and Noble groups, for providing
-  invaluable experimental perspective. I thank Matthew Glaser for his 
-  contributions to my understanding of liquid crystal systems. Our first paper 
-  would not have been complete without his insight. I thank Joseph Yelk for his 
-  effort creating the X-ray diffraction code on which our first paper relied.
-  I thank Christopher Calderon for his guidance on applying Bayesian non-parametric
-  techniques to solute time series.
-%  I would like to acknowledge my financial support: The ACS Petroleum Research Fund
-%  grant \#59814-ND7 and the Graduate Assistance in Areas of National Need (GAANN) 
-%  fellowship which is funded by the U.S. Department of Education. 
-%
-%  % BJC: This acknowledgement is how they want to be cited in papers. Could I
-%  % shorten it for this?
-%  Finally, I would like to acknowledge my high performance computing resources:
-%  Molecular simulations were performed using the Extreme Science and
-%  Engineering Discovery Environment (XSEDE), which is supported by National
-%  Science Foundation grant number ACI-1548562. Specifically, it used the Bridges
-%  system, which is supported by NSF award number ACI-1445606, at the Pittsburgh
-%  Supercomputing Center (PSC). This work also utilized the RMACC Summit supercomputer,
-%  which is supported by the National Science Foundation (awards ACI-1532235 and
-%  ACI-1532236), the University of Colorado Boulder, and Colorado State
-%  University. The Summit supercomputer is a joint effort of the University of
-%  Colorado Boulder and Colorado State University.  
+  their feedback and encouragement as well as for making our lab an enjoyable
+  place to work. I thank Richard Noble and Douglas Gin for their guidance on past
+  and present experimental research on LLC membranes as well as their
+  students Michael McGrath, Gregory Dwulet and Sarah Dischinger, for providing 
+  invaluable experimental perspective. I thank
+  Matthew Glaser for his contributions to my understanding of liquid crystal systems.
+  Our first paper would not have been complete without his insight. I thank Joseph
+  Yelk for his effort creating the X-ray diffraction code on which our first paper
+  relied. Finally, I thank Christopher Calderon for his guidance on applying 
+  Bayesian non-parametric techniques to solute time series, allowing a leap in
+  the flexibility of our dynamical modeling approaches.
 	
+  Outside of the University, I was fortunate enough to have full support of my
+  friends and family. Moving to Colorado was a big leap and I would not
+  have been successful without their encouragement.
+  
   }
 
 % BJC: The list of figures and tables is obnoxious because the captions are so long.
@@ -150,25 +131,27 @@
 % \ToCisShort	% use this only for 1-page Table of Contents
 
 % \LoFisShort	% use this only for 1-page Table of Figures
-% \emptyLoF	% use this if there is no List of Figures
+\emptyLoF	% use this if there is no List of Figures
 
 % \LoTisShort	% use this only for 1-page Table of Tables
-% \emptyLoT	% use this if there is no List of Tables
+\emptyLoT	% use this if there is no List of Tables
 
 \begin{document}
 
-\graphicspath{{../transport/figures/}{../structure_paper/figures/}{../transport/supporting_figures/}{../stochastic_transport/figures/}{../stochastic_transport/supporting_figures/}}
+\graphicspath{{../transport/figures/}{../structure_paper/figures/}{../transport/supporting_figures/}{../stochastic_transport/figures/}{../stochastic_transport/supporting_figures/}{../hdphmm/figures/}{../hdphmm/supporting_figures/}}
 
 \input macros.tex
 \input intro.tex
 
-%\input structure.tex
+\input structure.tex
 %\input structure_si.tex
 
-%\input transport.tex
+\input transport.tex
 %\input transport_si.tex
 
-%\input stochastic_transport.tex
+\input stochastic_transport.tex
+
+\input hdphmm.tex
 
 %%%%%%%%%   then the Bibliography, if any   %%%%%%%%%
 \bibliographystyle{ieeetr}	% or "siam", or "alpha", etc.
@@ -177,9 +160,10 @@
 
 %%%%%%%%%   then the Appendices, if any   %%%%%%%%%
 \appendix
-%\input structure_si.tex
-%\input transport_si.tex
-%\input stochastic_transport_si.tex
+\input structure_si.tex
+\input transport_si.tex
+\input stochastic_transport_si.tex
+\input hdphmm_si.tex
 
 \end{document}
 

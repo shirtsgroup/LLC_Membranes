@@ -385,16 +385,16 @@
   We measured the time-averaged $z$-direction (parallel to the pores) mean squared
   displacement (MSD) of the centers of mass (COM) of each solute over the course of 
   1 $\mu$s MD simulations using 
-  Equation~\ref{eqn:tamsd}:
+  Equation~\ref{eqn:ta_msd}:
   \begin{equation}
 	\overline{z^2(\tau)} = \dfrac{1}{T - \tau}\int_{0}^{T - \tau} (z(t + \tau) - z(t))^2 dt
-	\label{eqn:tamsd}
+	\label{eqn:ta_msd}
   \end{equation}
   where $\tau$ is the time lag and T is the length of the trajectory~\cite{meroz_toolbox_2015}. 
-  The MSD, in standard treatments, grows according to Equation~\ref{eqn:msd_form}:
+  The MSD, in standard treatments, grows according to Equation~\ref{eqn:msd_form1}:
   \begin{equation} 
 	\langle z^2(t) \rangle = K_{\alpha}t^\alpha
-	\label{eqn:msd_form}
+	\label{eqn:msd_form1}
   \end{equation} 
   where $\alpha$ is the anomalous exponent and $K_\alpha$ is the generalized diffusion 
   coefficient. A value of $\alpha < 1$ indicates a subdiffusive process, while a value 
@@ -897,7 +897,7 @@
   MSDs are not a monotonic function of molecular size (c and d). A significant
   number of solute MSDs fall below the theoretical lines predicted by the 
   Stokes-Einstein equation and Gierer and Wirtz' corrected Stokes-Einstein equation.
-  }\label{fig:msds}
+  }\label{fig:msds2}
   \end{figure}
     
   On the timescales simulated in our study, solutes exhibit subdiffusive
@@ -1225,7 +1225,7 @@
   9.5 ns compared to 7 ns for ethylene glycol. Somewhat counterintuitively, there is a 
   relatively high density of ethylene glycol molecules beyond the head group region
   probably due to its relatively small size. This likely contributes to the somewhat
-  large error bars on its MSD in Figure~\ref{fig:msds}. 
+  large error bars on its MSD in Figure~\ref{fig:msds2}. 
 
   \subsection{Transport of Ketones and Amides}
   
@@ -1357,7 +1357,7 @@
   pores and more readily partitions into the tail region.
   
   DMSO has a comparable MSD to acetone even though it is a larger molecule
-  (see Figure~\ref{fig:msds}). DMSO spends 17\% more time in the pore than acetone. 
+  (see Figure~\ref{fig:msds2}). DMSO spends 17\% more time in the pore than acetone. 
   On average, 35\% of DMSO molecules are coordinated to a sodium ion each
   frame compared with 26\% of acetone molecules. The pyramidal structure 
   of DMSO may force it to spend more time closer to the pore center which
