@@ -156,14 +156,18 @@
   squared displacement (MSD), preventing reliable long timescale predictions.
   We are in need of a way of studying the collective motion of a much larger
   set of solutes over much longer timescales.
-  
+  %MRS11: Maybe this last sentence could be changed. Because you aren't really finding a way to study larger sets of 
+  %solutes over larger timescales, you are using a limited amount of atomistic simulation into long time scale behavior efficiently. We can discuss variations as needed!
+
   %BJC: maybe this paragraph can be cut down?
   Mathematical descriptions of transport in complex separations membranes are a
   powerful way to understand mechanisms and formulate design principles.
   \cite{vinh-thang_predictive_2013,geens_transport_2006,darvishmanesh_mass_2016}
+  %MRS11: this next sentence could probably be cut - it's kind of vague.
   The complexity of a well-fit model generally parallels the complexity of the
   transport mechanism being studied, as well as the transport information the
-  model conveys. In dense homogeneous membranes, the solution-diffusion model
+  model conveys. 
+  In dense homogeneous membranes, the solution-diffusion model
   can extract diffusion and partition coefficients and has successfully
   predicted solute transport rates.~\cite{wijmans_solution-diffusion_1995}
   Analogously, pore-flow models yield predictions of diffusion coefficients and
@@ -178,6 +182,13 @@
   separations by attempting to give a more intuitive understanding of how
   solutes move as a function of their environment, in turn suggesting
   experiments that could be performed.
+
+  %MRS11: in this paragraph, the ``we can'' is vague, and doesn't
+  %abscribe agency.  Is ``We'' our group? Is it the field as whole?
+  %If it's something someone has done in the past, there should be
+  %citations. If it's something that can be done in the future, the
+  %phrasing should be a long the lines of ``it is possible to'', ``it
+  %can be done'', etc.
 
   Using a bottom-up modeling approach, we can parameterize single particle
   behavior by extracting particle trajectories from MD simulations and studying
@@ -211,6 +222,10 @@
 %  a type of anomalous diffusion exhibited by solutes in this
 %  study.~\cite{klages_anomalous_2008}
 
+  %MRS11: should be clear if first model is previous publications, or what is presented here.
+  %If what is presented here, should talk about how it will be presented, not that it was developed. 
+  %MRS11: research activities happened in the past, presentation of research is described in the present.
+  %or potentially future if describing what will be presented in the rest of the paper. 
   %BJC: replacement to above.
   We constructed our first model in order to characterize the hopping and
   trapping behavior displayed by solutes in our MD simulations. This type 
@@ -322,6 +337,12 @@
   explore membrane structural space, these solutes have a range of chemical 
   functionality and experience each of the three trapping mechanisms to different extents.
   
+  %MRS11: Introduction should not really give the answer so far.
+  %Introduction should describe the questions that will bbe asked, but
+  %not answer them.  That's not what is expected in an intro, it may confuse people (answers should be in the abstract).
+  %MRS11: this next paragraph could use tweaks/cutting the most, but review the previous paragraphs as well.
+  %MRS11: you can think about putting some of these results into conclusion, though - it reads well now, but might be benefitted from reemphasizing results if it's currently missing any of this.
+
   Finally, we use both models in order to predict solute flux and selectivity
   in pores of macroscopic length, thus achieving a better understanding of
   macroscopic properties on the basis of microscopic dynamics. We show that
@@ -1515,7 +1536,7 @@
   %MRS10: my feeling is (to keep in the back of the mind) that we may be able to add some sort of 
   %prior to fit the transition distributions. Lots of distributions can be fit with low amounts of data
   %if one makes enough assumptions about what the functional form of the distribution is. And we could
-  %presumaly come up with something reasonable. But that's for another time. 
+  %presumably come up with something reasonable. But that's for another time. 
   correlate emissions coming from different hop distributions. Many
   transitions occur between two trapped states where the transitional hops are
   actually very small. Our model ignores this physical restriction which can
@@ -1875,4 +1896,4 @@
 % LocalWords:  Katchalsky's nanofiltration ultrafiltration trans convective py
 % LocalWords:  bothmode todo eyetest Methanol's acid's subplots methanol's alt
 % LocalWords:  timestep pre selectivtiy foulants subfigures RWFs roman github
-% LocalWords:  al linkable nanopores
+% LocalWords:  al linkable nanopores klages
