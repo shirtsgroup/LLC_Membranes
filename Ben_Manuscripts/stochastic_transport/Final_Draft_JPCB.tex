@@ -149,13 +149,17 @@
   quantitative predictions of macroscopic observables such as solute flux and
   selectivity. Due to the size of the types of systems we are studying (at
   least 62,000 atoms) it is prohibitively expensive and time-consuming to run
-  simulations longer than those performed for this work ($\sim$5 $\mu$s).  Even
+  simulations longer than those performed for this work ($\sim$5 $\mu$s). Even
   with the relatively large size of our system, we only simulate 24 solute
   trajectories per unit cell in order to minimize solute-solute interactions.
-  This results in relatively high uncertainties in observables such as mean
-  squared displacement (MSD), preventing reliable long timescale predictions.
-  We are in need of a way of studying the collective motion of a much larger
-  set of solutes over much longer timescales.
+% BJC2: removed this sentence. High uncertainty MSDs don't really relate to long timescale predictions. Unless the MSDs were linear.
+%  This results in relatively high uncertainties in observables such as mean
+%  squared displacement (MSD), preventing reliable long timescale predictions.
+  We are in need of an efficient method which can use our limited atomistic 
+  simulation data sets in order to predict long timescale solute behavior.  
+  %BJC2: following sentence replaced with above
+%  We are in need of a way of studying the collective motion of a much larger
+%  set of solutes over much longer timescales.
   %MRS11: Maybe this last sentence could be changed. Because you aren't really finding a way to study larger sets of 
   %solutes over larger timescales, you are using a limited amount of atomistic simulation into long time scale behavior efficiently. We can discuss variations as needed!
 
@@ -164,9 +168,10 @@
   powerful way to understand mechanisms and formulate design principles.
   \cite{vinh-thang_predictive_2013,geens_transport_2006,darvishmanesh_mass_2016}
   %MRS11: this next sentence could probably be cut - it's kind of vague.
-  The complexity of a well-fit model generally parallels the complexity of the
-  transport mechanism being studied, as well as the transport information the
-  model conveys. 
+  %BJC2: True
+%  The complexity of a well-fit model generally parallels the complexity of the
+%  transport mechanism being studied, as well as the transport information the
+%  model conveys. 
   In dense homogeneous membranes, the solution-diffusion model
   can extract diffusion and partition coefficients and has successfully
   predicted solute transport rates.~\cite{wijmans_solution-diffusion_1995}
@@ -190,19 +195,19 @@
   %phrasing should be a long the lines of ``it is possible to'', ``it
   %can be done'', etc.
 
-  Using a bottom-up modeling approach, we can parameterize single particle
-  behavior by extracting particle trajectories from MD simulations and studying
-  the properties that have the greatest influence on solute dynamics. With this
-  information, we can learn how to construct an ensemble of characteristic
+  Using a bottom-up modeling approach, it may be possible to parameterize single
+  particle behavior by extracting particle trajectories from MD simulations and
+  studying the properties that have the greatest influence on solute dynamics.
+  With this information, one can learn how to construct an ensemble of characteristic
   single solute trajectories with these properties which would be useful for
   making long timescale predictions with computational ease and lower
   uncertainties. Fortunately, there is an abundance of information encoded in
-  the complex solute trajectories. We can incorporate fluctuations and 
+  the complex solute trajectories. One can incorporate fluctuations and 
   time-dependent correlations in solute position into transport models, 
-  as well as the length of time solutes are trapped. We can add further detail by integrating
-  this time series analysis with our knowledge of the primary trapping
-  mechanisms as well as the solute's changing chemical environment within the
-  heterogeneous membrane. 
+  as well as the length of time solutes are trapped. It is possible to add further
+  detail by integrating this time series analysis with existing knowledge of the
+  primary trapping mechanisms as well as the solute's changing chemical environment
+  within the heterogeneous membrane. 
 
   In this work, we use the output of our MD simulations to construct two
   classes of mathematical models which aim to predict membrane performance
@@ -227,14 +232,16 @@
   %MRS11: research activities happened in the past, presentation of research is described in the present.
   %or potentially future if describing what will be presented in the rest of the paper. 
   %BJC: replacement to above.
-  We constructed our first model in order to characterize the hopping and
-  trapping behavior displayed by solutes in our MD simulations. This type 
-  of non-Brownian dynamical behavior results in subdiffusive transport which
+  %BJC1: Made clear that this is talking about the first model of this work.
+  %BJC1: went through rest of intro to make sure tense is consistent
+  The first model that we develop in this work, allows us to characterize the 
+  hopping and trapping behavior displayed by solutes in our MD simulations. This 
+  type of non-Brownian dynamical behavior results in subdiffusive transport which
   is well-described by anomalous diffusion (AD) theory.~\cite{metzler_random_2000,bouchaud_anomalous_1990,klages_anomalous_2008}
   
   % BJC: focused following paragraph (RWF doesn't need to be talked about) and 
   % stole thesis from paragraph below it
-  We chose to treat our system in terms of two well-known classes of anomalous
+  We treat our system in terms of two well-known classes of anomalous
   subdiffusion: fractional Brownian motion (FBM) subordinate to a 
   continuous time random walk (CTRW), or subordinated FBM (sFBM) for short. 
   FBM is common in crowded, viscoelastic environments where each jump comes 
@@ -264,9 +271,9 @@
 
 %  We treated our system as an FBM process subordinate to a CTRW, or
 %  subordinated FBM (sFBM) for short. 
-  We fit sFBM models in two ways: First, we parameterized solute motion using
+  We fit sFBM models in two ways: First, we parameterize solute motion using
   a single set of parameters fit to a hypothesized anomalous diffusion (AD) model.
-  Second, we used a two-state approach by extracting two sets of model parameters
+  Second, we use a two-state approach by extracting two sets of model parameters
   calculated based on a solute's radial distance from the closest pore center. 
   This allows us to include the different dynamical behavior of solutes previously
   observed within the pore region versus within the monomer tails.
@@ -297,9 +304,9 @@
   solute trapping mechanisms. Standard MSMs are typically applied to determine
   equilibrium populations of states and the kinetics of transitions between
   those states.~\cite{bowman_using_2009} We extend the framework to include
-  state-dependent fluctuations and correlations in solute position. The
-  magnitude of a solute's fluctuations from its average trapped position and the
-  degree of correlation with previous fluctuations is determined by the current
+  state-dependent fluctuations and correlations in solute position. The model
+  determines the magnitude of a solute's fluctuations from its average trapped
+  position and the degree of correlation with previous fluctuations by its current
   state. To distinguish our approach from standard MSMs, we have named it the
   Markov state-dependent dynamical model (MSDDM).
   
@@ -342,19 +349,17 @@
   %not answer them.  That's not what is expected in an intro, it may confuse people (answers should be in the abstract).
   %MRS11: this next paragraph could use tweaks/cutting the most, but review the previous paragraphs as well.
   %MRS11: you can think about putting some of these results into conclusion, though - it reads well now, but might be benefitted from reemphasizing results if it's currently missing any of this.
-
-  Finally, we use both models in order to predict solute flux and selectivity
-  in pores of macroscopic length, thus achieving a better understanding of
-  macroscopic properties on the basis of microscopic dynamics. We show that
-  anti-correlated solute hopping behavior severely reduces flux relative to
-  uncorrelated behavior. We use the relative solute fluxes to estimate the
-  membrane's selectivity between all pairs of solutes and demonstrate that,
-  when solutes display different degrees of anti-correlated hopping behavior,
-  selectivity becomes a function of pore length. With this improved
-  understanding of macroscopic behavior, we can begin to think more critically
-  about how to design membranes in order to selectively pass or reject specific
-  solutes.
-
+  %BJC2: slight tweaks and removed conclusions from following paragraph. Also went back through previous
+  % paragraphs to look for conclusions.
+  
+  Finally, we demonstrate how one can use stochastically generated realizations
+  of our models in order to predict solute flux and selectivity in pores of 
+  macroscopic length, thus achieving a better understanding of macroscopic 
+  properties on the basis of microscopic dynamics. By improving our 
+  understanding of macroscopic behavior in this way, we can begin to think more
+  critically about how to design membranes in order to selectively pass or 
+  reject specific solutes.
+    
   \section{Methods}
     
   We ran all MD simulations and energy minimizations using GROMACS
@@ -1820,7 +1825,7 @@
   selectivity. Based on these calculations we can hypothesize that this
   particular LLC membrane may be a good candidate for the selective separation
   of ethylene glycol from acetic acid or methanol.
-  
+
   Despite their shortcomings, our mathematical models help us think about how
   to design LLC monomers for solute-specific separations by forcing us to think
   in terms of controlling solute transport. The anomalous diffusion modeling
