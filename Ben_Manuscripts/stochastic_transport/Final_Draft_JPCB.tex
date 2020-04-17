@@ -19,6 +19,7 @@
 \usepackage{diagbox}
 \usepackage{array}
 
+\usepackage[utf8]{inputenc}
 \DeclareUnicodeCharacter{03C9}{$\omega$}
 %\usepackage[en]{babel}
 
@@ -79,7 +80,7 @@
 
   \maketitle
   
-  \graphicspath{{./figures/}}
+  \graphicspath{{./figures/arxiv_figures/}}
 
   \section{Introduction}
 
@@ -368,7 +369,7 @@
   which are available online at
   \texttt{https://github.com/shirtsgroup/LLC\_Membranes}.  The appropriate
   scripts to use for subsequent calculations are summarized in
-  Table~\ref{S-table:python_scripts} of the Supplemental Material.
+  Table~\ref{S-table:python_scripts} of the Supporting Information.
   
   \subsection{Molecular Dynamics Simulations}
 
@@ -612,8 +613,7 @@
   under-sample the tails. We chose to truncate the L\'evy stable distributions
   based on where the theoretical probability distribution function (PDF) starts
   to deviate from the empirically measured PDF (see
-  Section~\ref{S-section:truncation} of the Supplemental
-  Material).~\cite{mantegna_stochastic_1994}
+  Section~\ref{S-section:truncation} of the Supporting Information).~\cite{mantegna_stochastic_1994}
 
   \subsubsection*{Multiple Anomalous Diffusion Regimes}
   
@@ -696,7 +696,7 @@
   distribution for the 2D case) with concentration parameters defined by the
   count matrix.~\cite{bacallado_bayesian_2009}
   
-  We used the Python package \texttt{fbm}~\cite{flynn_fbm_2019} to generate exact simulations of FBM
+  We used the Python package \texttt{fbm}~\cite{flynn_exact_2019} to generate exact simulations of FBM
   and our own Python implementation (see Table~\ref{S-table:python_scripts} of
   the Supporting Information) of the algorithm by Stoev and Taqqu to
   simulate FLM.~\cite{stoev_simulation_2004} Note that, to our knowledge, there
@@ -1005,8 +1005,8 @@
   do not truncate the dwell time distribution, the trajectories tend to
   incorporate very long dwell times as shown by the sFBM and sFLM models.
   Predictions made with these models consistently under-predict the MD MSDs
-  (see Figure~\ref{S-fig:anomalous_msds_bothmode} of the Supplemental
-  Material). Therefore, we will not include the pure sFBM or sFLM models in the
+  (see Figure~\ref{S-fig:anomalous_msds_bothmode} of the Supporting Information).
+  Therefore, we will not include the pure sFBM or sFLM models in the
   remainder of our analysis.   
   
   \begin{figure}
@@ -1594,8 +1594,8 @@
   performance scales greater than linearly and thus would take an infeasible
   amount of memory and time to simulate transport through a pore over 100 times
   longer. One could improve performance significantly by simulating less
-  trajectories. In Figure~\ref{S-fig:flux_curve_sensitivity} of the Supplemental
-  Material, we determined that one can simulate as few as 100 sFBMcut
+  trajectories. In Figure~\ref{S-fig:flux_curve_sensitivity} of the Supporting
+  Information, we determined that one can simulate as few as 100 sFBMcut
   realizations in order to parameterize Equation~\ref{eqn:flux_decay}. For
   better precision, we recommend simulating at least 1000 realizations.
   However, even with an order of magnitude decrease in number of trajectories,
@@ -1873,12 +1873,12 @@
   \bibliography{stochastic_transport}
 
   % No TOC image in PRE
-  %\section*{TOC Graphic}
+  \section*{TOC Graphic}
     
-  %\begin{figure}[!htb]
-  %\centering
-  %\includegraphics[width=3.25in]{toc.pdf}
-  %\end{figure}
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=3.25in]{toc.pdf}
+  \end{figure}
 
 \end{document}
 

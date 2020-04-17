@@ -1,11 +1,18 @@
-\documentclass[aps,pre,twocolumn,showpacs,preprintnumbers,amsmath,amssymb,footinbib]{revtex4-2}
-\usepackage{CJK}
+%\documentclass[aps,pre,twocolumn,showpacs,preprintnumbers,amsmath,amssymb,footinbib]{revtex4-1}
+\documentclass[journal=ancac3,manuscript=article,layout=twocolumn]{achemso}
+%\usepackage{CJK}
+
+\let\titlefont\undefined
+\makeatletter
+\let\l@addto@macro\relax
+\makeatother
+\usepackage[fontsize=10pt]{scrextend}
 
 \usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage{subcaption}
-%\usepackage{caption}
+%\usepackage[caption=false]{subfig}
 \usepackage{amsmath} % or simply amstext
 \usepackage{amssymb}
 \usepackage{siunitx}
@@ -15,9 +22,10 @@
 \usepackage{booktabs}
 \usepackage{gensymb}
 \usepackage{float}
-\usepackage{xr}
 \usepackage{diagbox}
 \usepackage{array}
+
+\SectionNumbersOn
 
 \DeclareUnicodeCharacter{03C9}{$\omega$}
 %\usepackage[en]{babel}
@@ -29,19 +37,24 @@
 \newcolumntype{R}[1]{>{\PreserveBackslash\raggedleft}p{#1}}
 \newcolumntype{L}[1]{>{\PreserveBackslash\raggedright}p{#1}}
 
-\externaldocument[S-]{Supporting_Information}
+\title{Capturing Subdiffusive Solute Dynamics and Predicting Selectivity in Nanoscale Pores with Time Series Modeling}
+\author{Benjamin J. Coscia}
+\affiliation{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, CO 80309, USA}
+\author{Michael R. Shirts}
+\email{michael.shirts@colorado.edu}
+\affiliation{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, CO 80309, USA}
 
 \begin{document}
 
-  \title{Capturing Subdiffusive Solute Dynamics and Predicting Selectivity in Nanoscale Pores
-  with Time Series Modeling}
-  
-  \author{Benjamin J. Coscia}
-  \author{Michael R. Shirts}
-  
-  \affiliation{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, Colorado 80309, United States}
-
-  \date{\today}
+%  \title{Capturing Subdiffusive Solute Dynamics and Predicting Selectivity in Nanoscale Pores
+%  with Time Series Modeling}
+%  
+%  \author{Benjamin J. Coscia}
+%  \author{Michael R. Shirts}
+%  
+%  \affiliation{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, Colorado 80309, United States}
+%
+%  \date{\today}
   
   \begin{abstract}
   
@@ -82,7 +95,7 @@
 
   \maketitle
   
-  \graphicspath{{./figures/}}
+  \graphicspath{{./figures/arxiv_figures/}{./supporting_figures/arxiv_figures/}}
 
   \section{Introduction}
 
@@ -371,7 +384,7 @@
   which are available online at
   \texttt{https://github.com/shirtsgroup/LLC\_Membranes}.  The appropriate
   scripts to use for subsequent calculations are summarized in
-  Table~\ref{S-table:python_scripts} of the Supplemental Material.
+  Table~\ref{table:python_scripts} of the Supporting Information.
   
   \subsection{Molecular Dynamics Simulations}
 
@@ -405,6 +418,26 @@
   the tail region are omitted for clarity.}\label{fig:membrane_structure}
   \end{figure*}
   
+%  \begin{figure*}
+%  \centering
+%  \subfloat[\label{fig:monomer_structure}]{%
+%  \vspace{1.1cm}
+%  \includegraphics[width=0.4\textwidth]{NaGA3C11.pdf}%
+%  \vspace{0.6cm}
+%  }\hfill
+%  \subfloat[\label{fig:membrane_profile}]{%
+%    \includegraphics[width=\textwidth]{membrane_profile.pdf}%
+%  }\hfill
+%  \caption{}\label{fig:membrane_profile}
+%  \end{subfigure}
+%  \caption{(a) The wedge-shaped liquid crystal monomer Na-GA3C11 will form the inverted
+%  hexagonal phase in the presence of water where the carboxylate head groups occupy the
+%  pore centers. (b) A cross-section of a periodically replicated atomistic unit cell 
+%  used for simulations in this study reveals the membrane's aqueous, hexagonally packed,
+%  straight and uniform sized pores. Water molecules (red and white spheres) present in 
+%  the tail region are omitted for clarity.}\label{fig:membrane_structure}
+%  \end{figure*}  
+  
   We chose to study a subset of the 4 fastest moving solutes from our previous
   work: methanol, acetic acid, urea and ethylene glycol. For each solute we 
   created a separate system and to each system we added 6 solutes per pore 
@@ -424,7 +457,7 @@
   We considered each system to be equilibrated when the solute partitioning between the 
   pore and tail region reached apparent equilibrium and use only data after that point
   in our analysis of solute kinetics. We plot the solute partition versus time in
-  Figure~\ref{S-fig:equilibration} of the Supporting Information in order to justify
+  Figure~\ref{fig:equilibration} of the Supporting Information in order to justify
   our choice of equilibration times for each solute.
 
   \subsection{The Anomalous Diffusion Model}\label{method:model_sFBM}
@@ -560,7 +593,7 @@
   $H > 0.5$, meaning one needs to study large time lags with high frequency.
   Fortunately (from a mathematical perspective), all of our solutes show anti-correlated motion, so most of the information in
   Equation~\ref{eqn:fbm_autocorrelation} is contained within the first few time lags (see 
-  Figure~\ref{S-fig:hurst_autocorrelation} of the Supporting Information). Any hope of
+  Figure~\ref{fig:hurst_autocorrelation} of the Supporting Information). Any hope of
   fitting longer time lags to our data is lost in the noise since the analytical values
   are so close to zero. Therefore, we obtained H by performing a least squares fit of 
   Equation~\ref{eqn:fbm_autocorrelation} to the first 
@@ -611,7 +644,7 @@
   have an undefined variance due to their heavy tails. However, normalizing
   Equation~\ref{eqn:flm_autocovariance} by the variance of a finite number of draws
   from a L\'evy stable distribution results in the same autocorrelation structure as FBM.
-  See Section~\ref{S-section:H_estimate} of the Supporting Information for numerical
+  See Section~\ref{section:H_estimate} of the Supporting Information for numerical
   simulations illustrating this point.
   
   Analogous to power law dwell times, the heavy tails of L\'evy stable hop
@@ -623,8 +656,7 @@
   under-sample the tails. We chose to truncate the L\'evy stable distributions
   based on where the theoretical probability distribution function (PDF) starts
   to deviate from the empirically measured PDF (see
-  Section~\ref{S-section:truncation} of the Supplemental
-  Material).~\cite{mantegna_stochastic_1994}
+  Section~\ref{section:truncation} of the Supporting Information).~\cite{mantegna_stochastic_1994}
 
   \subsubsection*{Multiple Anomalous Diffusion Regimes}
   
@@ -707,8 +739,8 @@
   distribution for the 2D case) with concentration parameters defined by the
   count matrix.~\cite{bacallado_bayesian_2009}
   
-  We used the Python package \texttt{fbm}~\cite{flynn_fbm_2019} to generate exact simulations of FBM
-  and our own Python implementation (see Table~\ref{S-table:python_scripts} of
+  We used the Python package \texttt{fbm}~\cite{flynn_exact_2019} to generate exact simulations of FBM
+  and our own Python implementation (see Table~\ref{table:python_scripts} of
   the Supporting Information) of the algorithm by Stoev and Taqqu to
   simulate FLM.~\cite{stoev_simulation_2004} Note that, to our knowledge, there
   are no known exact simulation algorithms for generating FLM trajectories.
@@ -716,7 +748,7 @@
   marginal L\'evy stable distribution and reasonably approximates the
   correlation structure on MD simulation timescales. We added an empirical
   correction to enhance the accuracy of the correlation structure (see
-  Section~\ref{S-section:flm_correlation} of the Supporting Information for
+  Section~\ref{section:flm_correlation} of the Supporting Information for
   validation of the approach).
 
   \subsection{The Markov State-Dependent Dynamical Model}\label{method:MSMs}  
@@ -773,7 +805,7 @@
   current and previous state observation, we incremented the appropriate entry
   of an $n~\times~n$ count matrix by 1, where $n$ is the number of states. We
   verified the Markovianity of state transitions as described in
-  Section~\ref{S-section:markov_validation} of the Supporting Information.
+  Section~\ref{section:markov_validation} of the Supporting Information.
   
   Adding to the standard MSM framework, we incorporated the dynamics of the
   solutes within each state as well as the dynamics of state transitions, which
@@ -871,7 +903,7 @@
   \end{equation} 
   where the only free parameters for fitting are $v$ and $D$. A derivation of
   Equation~\ref{eqn:passage_times} is given in
-  Section~\ref{S-section:fpt_derivation} of the Supporting Information. We
+  Section~\ref{section:fpt_derivation} of the Supporting Information. We
   calculated the expected value of Equation~\ref{eqn:passage_times} in order to
   get the MFPT.
 
@@ -983,7 +1015,7 @@
 	  combination, (a) -- (c) support modeling solutes as either
 	  subordinated fractional Brownian or L\'evy motion. All other solutes
 	  show similar distributions and autocorrelation functions (see
-	  Figure~\ref{S-fig:anticorrelated_hops} of the Supporting Information).
+	  Figure~\ref{fig:anticorrelated_hops} of the Supporting Information).
   }\label{fig:anticorrelated_hops}
   \end{figure*}
   
@@ -1019,8 +1051,8 @@
   do not truncate the dwell time distribution, the trajectories tend to
   incorporate very long dwell times as shown by the sFBM and sFLM models.
   Predictions made with these models consistently under-predict the MD MSDs
-  (see Figure~\ref{S-fig:anomalous_msds_bothmode} of the Supplemental
-  Material). Therefore, we will not include the pure sFBM or sFLM models in the
+  (see Figure~\ref{fig:anomalous_msds_bothmode} of the Supporting Information).
+  Therefore, we will not include the pure sFBM or sFLM models in the
   remainder of our analysis.   
   
   \begin{figure*}
@@ -1057,7 +1089,7 @@
   simulations display non-stationary behavior. We defined the perceived
   equilibration time point for each solute based on the time at which the
   number of solutes inside the pores and tails stabilized
-  (Figure~\ref{S-fig:equilibration}).  With this definition, we observe
+  (Figure~\ref{fig:equilibration}).  With this definition, we observe
   evidence of non-stationary solute behavior after the perceived equilibration
   point, on the $\mu$s timescale. In Table~\ref{table:stationarity}, we compare
   the MSD of the solutes calculated using trajectory data from the first and
@@ -1065,7 +1097,7 @@
   methanol show considerable differences between the MSDs of the two halves.
   Urea and acetic acid appear to demonstrate satisfactory stationarity. The
   shapes of urea and acetic acid's MSD curves are also very similar (see
-  Figure~\ref{S-fig:msd_comparison} of the Supporting Information).
+  Figure~\ref{fig:msd_comparison} of the Supporting Information).
   
   \begin{table}[h]
   \centering
@@ -1092,7 +1124,7 @@
 
   Given stationary data, the AD approach is capable of predicting solute MSDs
   measured from MD simulations within or near statistical uncertainty. In
-  Figure~\ref{S-fig:train_test} of the Supporting Information, we parameterized
+  Figure~\ref{fig:train_test} of the Supporting Information, we parameterized
   the AD models using the first half of the stationary solute equilibrated
   trajectories and then compared the model predictions to the MD MSD of the
   second half of the stationary trajectories. In most cases, the model
@@ -1407,7 +1439,7 @@
   between hops is consistent with that of FLM (Figure~\ref{fig:msddm_acf}).
   The parameters of the L\'evy stable distributions along with their Hurst
   parameters are visualized in Figure~\ref{fig:msddm_parameters} (and tabulated
-  in the Supporting Information, Table~\ref{S-table:msddm_params}). 
+  in the Supporting Information, Table~\ref{table:msddm_params}). 
   
   \begin{figure*}
   \centering
@@ -1608,8 +1640,8 @@
   performance scales greater than linearly and thus would take an infeasible
   amount of memory and time to simulate transport through a pore over 100 times
   longer. One could improve performance significantly by simulating less
-  trajectories. In Figure~\ref{S-fig:flux_curve_sensitivity} of the Supplemental
-  Material, we determined that one can simulate as few as 100 sFBMcut
+  trajectories. In Figure~\ref{fig:flux_curve_sensitivity} of the Supporting Information,
+  we determined that one can simulate as few as 100 sFBMcut
   realizations in order to parameterize Equation~\ref{eqn:flux_decay}. For
   better precision, we recommend simulating at least 1000 realizations.
   However, even with an order of magnitude decrease in number of trajectories,
@@ -1642,7 +1674,7 @@
   \caption{(a) The distributions of first passage times generated from the
 	  sFBMcut model fit well to Equation~\ref{eqn:passage_times}. We show
 	  similar fits for the remaining solutes in
-	  Figure~\ref{S-fig:ad_fpt_fits} of the Supporting Information. (b) The
+	  Figure~\ref{fig:ad_fpt_fits} of the Supporting Information. (b) The
 	  single particle flux measured by the sFBMcut AD model decays with
 	  increasing pore length. The rankings of solute fluxes are consistent
 	  with the MSDs predicted by each model. We fit the single particle
@@ -1857,12 +1889,12 @@
   higher selectivities may result. The modeling approaches presented in this paper 
   facilitate new ways of approaching complex separation problems.
   
-  \section*{Supporting Information}
-
-  Detailed explanations and expansions upon the results and procedures
-  mentioned in the main text are described in the Supporting Information. This
-  information is available free of charge via the Internet at
-  http://pubs.acs.org.
+%  \section*{Supporting Information}
+%
+%  Detailed explanations and expansions upon the results and procedures
+%  mentioned in the main text are described in the Supporting Information. This
+%  information is available free of charge via the Internet at
+%  http://pubs.acs.org.
 
   \section*{Acknowledgments}
   
@@ -1882,7 +1914,12 @@
   ACI-1532235 and ACI-1532236), the University of Colorado Boulder, and
   Colorado State University. The Summit supercomputer is a joint effort of the
   University of Colorado Boulder and Colorado State University.
+  
+  \section*{Supporting Information}
+  
+  \input si_arxiv.tex
 
+  \clearpage
   %\bibliographystyle{apsrev4-2}
   \bibliography{stochastic_transport}
 
