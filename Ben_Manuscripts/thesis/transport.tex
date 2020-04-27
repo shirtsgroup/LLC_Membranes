@@ -2,67 +2,6 @@
 
   \section{Introduction}
 
-%  Membranes capable of separating nm-sized solutes with high selectivity and
-%  permeability are highly desirable for a number of applications. For example,
-%  separation of salt from seawater or other briny sources can yield potable
-%  drinking water.~\cite{fritzmann_state---art_2007} Removal of organic
-%  micropollutants, such as personal care products, pesticides and
-%  pharmaceuticals, from surface and groundwaters, can have large benefits for
-%  public health.~\cite{schwarzenbach_challenge_2006} Finally, one can purify and
-%  recover dissolved species present in complex hydraulic fracturing flowback
-%  water waste streams which would help mitigate the effects of deep well
-%  injection and can be sold for profit.~\cite{dischinger_application_2017} 
-%
-%  All of these separations are possible in part with current commercial
-%  membrane separation techniques, but all still suffer from serious drawbacks.
-%  Currently, reverse osmosis (RO) and nanofiltration (NF) dominate commercial
-%  membrane separations of small molecules.~\cite{warsinger_review_2018} RO
-%  membranes are typically dense polymer matrices that separate solutes based on
-%  differences in their solubility and permeability in the membrane
-%  material.~\cite{fritzmann_state---art_2007} Although they can perform highly
-%  selective separations, high feed pressures and thus large amounts of energy are
-%  necessary in order to generate a useful permeate
-%  flux.~\cite{van_der_bruggen_review_2003} NF membranes have well-defined
-%  nm-sized pores which can give the same permeate flux as RO with lower applied
-%  pressure.~\cite{hilal_comprehensive_2004} However, the pores are not uniform in
-%  size, limiting their selectivity.~\cite{werber_materials_2016}.
-%
-%  Under the right conditions, amphiphilic molecules can self-assemble into
-%  ordered nanostructures that may be capable of performing highly selective
-%  separations with permeabilities comparable to
-%  NF.~\cite{alexandridis_amphiphilic_2000} The uniform-sized aqueous pores
-%  characteristic of these types of systems enforce a molecular-size cut-off,
-%  eliminating issues related to the polydisperity of NF
-%  pores.~\cite{zhou_supported_2005} In addition to size-exclusion, it may be
-%  possible to control the chemical environment within the nanopores by altering
-%  the identities of the hydrophilic moieties that form the pores, affording
-%  solute-specific separations.~\cite{dischinger_effect_2017}
-%
-%  Amphiphilic lyotropic liquid crystals (LLCs) are known to form the type I
-%  bicontinuous cubic (Q\textsubscript{I}) and inverted hexagonal (H\textsubscript{II})
-%  phases.~\cite{smith_ordered_1997,dischinger_application_2017,carter_glycerol-based_2012,hatakeyama_nanoporous_2010}
-%  When cross-linked, these materials can function as mechanically strong
-%  separations membranes.~\cite{zhou_supported_2005} The H\textsubscript{II} phase
-%  has hexagonally packed, straight pores which is the ideal geometry for high
-%  throughtput separations. However, the synthesis of H\textsubscript{II}
-%  membranes with highly aligned hexagonal mesophases has been a challenge that
-%  has been met with limited success and has prevented the material's viability as
-%  a separations membrane.~\cite{feng_scalable_2014,feng_thin_2016} The
-%  Q\textsubscript{I} phase consists of a three dimensional network of tortuous
-%  and interconnected pores.  It's more facile synthesis has yielded it more
-%  success. The latest Q\textsubscript{I} phase membranes have been shown to
-%  exhibit selectivities higher than commercial NF and RO membranes with permeabilities
-%  higher than commercial RO membranes.~\cite{dischinger_application_2017}
-%
-%  Although Q\textsubscript{I} membranes have shown promising results, it
-%  is not clear how to controllably design them for specific separations
-%  beyond what has already been achieved. Dischinger et al. found that they
-%  do not separate purely on the basis of size. Empirical modeling revealed
-%  correlations between various solute physicochemical properties and 
-%  observed solute rejection. Although there was some agreement with their
-%  empirical model, it does not offer a sufficiently detailed explanation
-%  of governing molecular interactions.~\cite{dischinger_effect_2017}
-
   Molecular dynamics (MD) simulations can give us mechanistic insights with
   atomistic resolution so that we can provide detailed descriptions of small
   solute transport within LLC membrane nanopores and intelligently design new
@@ -252,7 +191,9 @@
   the area in and around the central pores should be the focus of our mechanistic studies.
 
   In the remainder of the paper, we describe and quantify three trapping 
-  mechanisms which give rise to subdiffusive solute transport behavior. 
+  mechanisms which give rise to subdiffusive solute transport behavior
+  %BJCF: added
+  on timescales of hundreds of nanoseconds. 
   We describe the differences in solute motion, specifically their mean
   squared displacement (MSD), in conjunction with each solute's size and 
   chemical functionality. We show how distinct interactions with various
@@ -330,7 +271,7 @@
   To determine the approximate ratio of water in the pores to tails, we
   equilibrated 4 systems where we initially placed water in the pores and in the
   tails in addition to a water reservoir between periodic images. We filled the
-  pores of our initial configuraiton with water by running the GROMACS command
+  pores of our initial configuration with water by running the GROMACS command
   \texttt{gmx solvate} on our initial configuration followed by the removal of
   any water molecules placed in the distal tail region. This method requires that
   we vary the monomer starting radius since the vacant space dictates the pore's
@@ -416,14 +357,14 @@
   particular study,	we will only use the time-averaged MSD.
   
   We fixed the length of each simulated trajectory so that we could compare the total
-  MSD between different solutes without the influence of the ageing phenomenon.
+  MSD between different solutes without the influence of the aging phenomenon.
   In systems such as ours where solutes show hopping behavior between long periods 
-  of immobility, ageing is defined by the tendency of the average slope of an MSD 
+  of immobility, aging is defined by the tendency of the average slope of an MSD 
   curve to decrease as the length of trajectories are increased~\cite{metzler_anomalous_2014}.
   Since the maximum measured dwell time can be no longer than the total length of a simulated
   trajectory, longer dwell times are incorporated into the calculation as measurement
   time or trajectory length is increased, lowering the average MSD. Because the solute 
-  MSDs are non-linear and because of the ageing phenomenon, we did not attempt to calculate
+  MSDs are non-linear and because of the aging phenomenon, we did not attempt to calculate
   a diffusion constant as one might for a Brownian particle with a linear MSD. Instead,
   the reported MSD values represent the average MSD for a given	solute after a 400
   ns time lag. Our results are shown to be insensitive to our choice of time lag in 
@@ -501,7 +442,7 @@
   highest solute MSD. We assumed that the solute with the highest MSD exhibited
   the closest to Brownian behavior and therefore could set a rough boundary
   between subdiffusive, Brownian and superdiffusive MSDs. As a lower bound to our
-  appoximation, we also plotted the uncorrected version of
+  approximation, we also plotted the uncorrected version of
   Equation~\ref{eqn:stokes-einstein} ($f$=1), requiring it to converge to the
   same value as the corrected curve for large radii. 
 
@@ -918,13 +859,18 @@
   \includegraphics[width=\linewidth]{example_msd.pdf}
   \caption{}\label{fig:example_msd}
   \end{subfigure}
-  \caption{All solutes show subdiffusive transport behavior inside the membrane's
+  \caption{
+  On the timescales simulated in our study, %<-- BJCF: added
+  all solutes show subdiffusive transport behavior inside the membrane's
   nanopores, similar to that exhibited by ethanol. (a) The $z$-coordinate trace of
   3 representative ethanol COMs shows clear periods of entrapment separated by hops.
   In general, the longest dwell times occur when solutes are situated far from the
   pore center and more frequent hops occur when solutes are close to the pore center.
   (b) The time-averaged MSD of ethanol is sublinear which suggests transport is
-  governed by an anomalous subdiffusion process.}\label{fig:qualitative_mechanisms}
+  governed by an anomalous subdiffusion process
+  %BJCF: added
+  on the hundreds of nanoseconds timescales simulated in this study  
+  .}\label{fig:qualitative_mechanisms}
   \end{figure}
   
   The complex and inhomogeneous structure of the membrane leads to radially
@@ -1489,7 +1435,7 @@
   could also design the head groups so that counterions are negatively charged
   which may eliminate their interaction with most solutes.
   
-  Our work demonstrates that there are important, atomistic features of nanostructed, 
+  Our work demonstrates that there are important, atomistic features of nanostructured, 
   self-assembled materials that molecular simulation can play a key role in elucidating.
   The complex interplay between the inhomogeneous membrane structure, solute size and 
   solute functionality leads to a variety of solute-membrane interactions, many of which
