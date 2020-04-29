@@ -46,12 +46,10 @@
   Mathematically modeling complex transport phenomena can be a
   powerful tool for extracting important physical information from 
   molecular simulations. In this study, we present two new approaches 
-  that use stochastic time series modeling to predict long-time scale 
+  that use stochastic time series modeling to predict long time-scale 
   behavior and macroscopic properties from molecular simulation which
   can be generalized to other molecular systems where complex diffusion
   occurs.
-  %BJCA: eliminated repetition and merged paragraphs, since the following is one sentence
-  %In this study, we use two different stochastic time series modeling approaches parameterized 
   Specifically, we parameterize our models using long molecular dynamics (MD) simulation
   trajectories of a cross-linked H\textsubscript{II} phase lyotropic liquid
   crystal (LLC) membrane in order to predict solute mean squared displacements (MSDs)
@@ -73,20 +71,19 @@
   distribution and temporal correlation structure of positional
   fluctuations as a means of characterization and to allow us to
   predict solute MSDs. 
-  %BJCA: should we add a pargraph break here? Kind of short, but doesn't quite fit with above
-  We show that both models reasonably reproduce
-  the MSDs calculated from MD simulations. However, qualitative
-  differences between MD and Markov state dependent model-generated
-  trajectories may limit its usefulness.
-
-  Finally, we demonstrate how one can use these models to estimate
-  flux of a solute across a macroscopic-length pore and, based on
-  those quantities, the membrane's selectivity towards each
-  solute. This work therefore helps to connect microscopic,
-  chemically-dependent solute motions that do not follow simple
-  diffusive behavior with long-time scale behavior, in an approach
-  %BJCA: should hyphen in long-time scale be there? I would favor the pronunciation that goes with long time-scale with or w/o the hyphen
-  generalizable to many kinds of molecular systems with complex dynamics.
+ 
+  %MRS: combined the ``general'' material about models here.  
+  We show that both stochastic models reasonably reproduce the MSDs
+  calculated from MD simulations. However, qualitative differences
+  between MD and Markov state dependent model-generated trajectories
+  may in some cases limit their usefulness. With these parameterized
+  stochastic models, we demonstrate how one can estimate flux of a
+  solute across a macroscopic-length pore and, based on those
+  quantities, the membrane's selectivity towards each solute. This
+  work therefore helps to connect microscopic, chemically-dependent
+  solute motions that do not follow simple diffusive behavior with
+  long time-scale behavior, in an approach generalizable to many types
+  of molecular systems with complex dynamics.
 
   \end{abstract}
 
@@ -95,26 +92,23 @@
   \graphicspath{{./figures/}}
 
   \section{Introduction}
-  
+
+  %MRS: agreed.
   % BJCA: Would it make more sense to have the first paragraph less
   % applications-focused and more centered around a need for our new methods?
   % Something like .. 
-  There is a large disparity between the time scales accessible to atomistic
-  molecular dynamics (MD) simulations and experiment.
-  \begin{itemize}
-    \item The dynamics of molecules over nanoseconds of simulation may
-    tell a very different story than that inferred by bulk measurements
-    on the time scale of seconds.
-    %BJCA: can cite something about different diffusive regimes 
-    \item Understanding complex dynamical behavior on short timescales 
-    and connecting them with much longer timescales can provide 
-    fundamental insight which can be used for atomic level design of
-    materials.
-    \item In this work, we pursue this connection applied to highly 
-    selective aqueous filtration membranes and demonstrate how one can
-    gain chemical intuition which serves both theoretical and 
-    experimental researchers.
-  \end{itemize}
+
+There is a large disparity between the time scales accessible to
+atomistic molecular dynamics (MD) simulations and experiment. The
+dynamics of molecules over nanoseconds of simulation may tell a very
+different story than that inferred by bulk measurements on the time
+scale of seconds. Understanding complex dynamical behavior on short
+timescales and connecting them with much longer timescales can provide
+fundamental insight which can be used for atomic level design of
+materials. In this work, we pursue this connection applied to highly
+selective aqueous filtration membranes and demonstrate how one can
+gain chemical intuition which serves both theoretical and experimental
+researchers.
 
   Highly selective separations membranes are desirable in numerous
   applications. The ability to efficiently separate ions from saline water
@@ -130,6 +124,7 @@
 
   % BJCA: I could likely condense this paragraph to focus primarily on the HII phase
   % and its complex pores.
+  %MRS: yes.  QI not relevant
   Lyotropic liquid crystals (LLCs) are a class of amphiphilic molecules that
   can be cross-linked into mechanically strong and highly selective nanoporous
   membranes.~\cite{gin_polymerized_2008} They may provide a promising
@@ -194,6 +189,7 @@
   simulation data sets in order to predict long timescale solute behavior.  
 
   %BJCA: maybe this paragraph can be cut down?
+  %MRS: provides context, so OK?
   Mathematical descriptions of transport in complex separations membranes are a
   powerful way to understand mechanisms and formulate design principles.
   \cite{vinh-thang_predictive_2013,geens_transport_2006,darvishmanesh_mass_2016}
@@ -235,8 +231,14 @@
   these models are driven by mechanistic observations from our previous work and
   their inputs are parameterized using a substantial amount of data generated
   by long ($\geq 5~\mu$s) MD simulations. 
+  %MRS: moved from below
+  Where sufficiently close to observed data, these fitted models
+  provide a way to propagate information about solute trajectories gathered 
+  at the microsecond time scale to realistic experimental time scales. 
+
   
   % BJCA: resurrected this paragraph
+  % MRS: seems OK.
   We constructed our first model by applying the existing rigorous theoretical
   foundation which describes the motion of particles that exhibit non-Brownian,
   or anomalous, transport behavior.~\cite{metzler_random_2000,bouchaud_anomalous_1990} The tools
@@ -265,6 +267,7 @@
   the CTRW. In our case, we observe anti-correlated draws from the hop distribution
   suggesting an FBM process is subordinate to the CTRW.
 
+%MRS: more concise better.
 %BJCA: I could replace above with this, but I think I like the above better. It's more concise.
 %  Three well-known classes of behavior leading to anomalous subdiffusion are
 %  continuous time random walks (CTRWs), fractional Brownian motion (FBM) and
@@ -291,14 +294,13 @@
   observed within the pore region versus within the monomer tails.
  
   % BJCA: Is this paragraph needed? 
-  Where sufficiently close to observed data, these fitted sFBM models
-  provide a way to propagate information about solute trajectories gathered 
-  at the microsecond time scale to realistic experimental time scales. 
-  They can also confirm the importance of assumed solute-membrane interactions 
-  used to define the model's functional form, and
-  suggest missing components. They can help researchers formulate hypotheses to
-  explain why a certain set of parameters is characteristic to a specific
-  solute.
+  %MRS: the first sentence is key to the paper thesis and deserves to be emphasized, but I moved it up.
+  %MRS: rest is somewhat redundant.
+  %They can also confirm the importance of assumed solute-membrane interactions 
+  %used to define the model's functional form, and
+  %suggest missing components. They can help researchers formulate hypotheses to
+  %explain why a certain set of parameters is characteristic to a specific
+  %solute.
   
   If one has knowledge of the primary mechanisms leading to anomalous diffusion
   behavior, one may gain additional insight by formulating a state-based model,
@@ -465,6 +467,7 @@
   time distributions described in subsequent sections.
 
   % BJCA: Could move most of the following discussion to the SI and just present the time-averaged MSD.
+  %MRS: good call.
   In this study, we primarily use the MSD as a tool for characterizing the average
   dynamic behavior of solute trajectories. Rather than using them to calculate 
   diffusion constants or to relate our simulations to experimental measurements, we
@@ -663,6 +666,7 @@
   All models include correlation between hops.
 
   %BJCA: I could get rid of this table and define them in text. 
+  %MRS: eh, tables are a clear way to communicated data, so OK. 
   \begin{table}[!htb]
 	  \centering
 	  \begin{tabular}{ccc}
@@ -957,6 +961,7 @@
   \end{figure}
   
   %BJCA: maybe this to supporting?
+  %MRS: yeah, I think so. 
   \begin{figure}
   \centering
   % Next 3: /figures/sfbm_distributions
@@ -1054,7 +1059,8 @@
     
   %BJCA: This section to supporting
   \subsubsection{Stationarity of solute trajectories}\label{section:stationarity}
-  
+  %MRS: yes, though report the results in main text.
+
   We observe that in some cases, solute trajectories extracted from our MD
   simulations display non-stationary behavior. We defined the perceived
   equilibration time point for each solute based on the time at which the
@@ -1112,6 +1118,7 @@
   lower.
 
   % BJCA: could move 2 mode to SI
+  %MRS: Which parts specifically?  Why rationale of 2 mode to SI?  What parts of the results would be presented in main text?What is the main story? (Two model no good, but we tried it, see SI - but that story doesn't seem consistent with the data, they both seem OK)
   \subsubsection{Model predictions}\label{section:AD_all_data}
  
   We obtain reasonable predictions of the MD simulated MSDs when we
@@ -1152,7 +1159,8 @@
 	  transition between tails occurs.
   }\label{fig:anomalous_msds}
   \end{figure}
-  
+
+  %MRS: some of these discussions might belong in the SI, with just the top line information in the main text.  People don't really care about the details of the individual parameters, just what story that tells.   
   \begin{figure}
   \centering
   \begin{subfigure}{0.325\textwidth}
@@ -1256,6 +1264,9 @@
   curvature. This artificially solves the problem of long timescale
   correlation, however we do not recommend this as it has no physical basis.
   
+  %MRS: this paragraph below may be the sort of summary of the models that would
+  %go in the main text, with the details in the SI.
+
   The model parameters for the one and two mode models tell stories about each
   solute's behavior that help explain the difference between the MSDs of
   different solutes. Higher values of $\sigma$ and lower values of $\alpha_h$
@@ -1413,6 +1424,7 @@
   in the Supporting Information, Table~\ref{S-table:msddm_params}). 
   
   %BJCA: potentially move this to SI
+  %MRS: seems good.  Again, make sure that the conclusions are referenced in the main text. 
   \begin{figure}
   \centering
   \begin{subfigure}{0.49\textwidth}
@@ -1870,8 +1882,9 @@
 %  facilitate new ways of approaching complex separation problems.
   
   % BJCA: Perhaps replace above paragraph with the following:? 
+  % MRS: agreed!
   In a broader context, it is clear that time series modeling may be a useful way
-  to form a lucid connection between complex solute dynamics on the nanosecond 
+  to form a clear connection between complex solute dynamics on the nanosecond 
   timescale and macroscopic observables.
   \begin{itemize}
     \item On the nanoscopic scale, one can both learn and characterize dynamical
@@ -1902,7 +1915,6 @@
   We thank Richard Noble for helping us make the connection between the empirical 
   mean first passage time distribution and the analytical equation to which we fit
   the distributions (Equation~\ref{eqn:passage_times}).
-  
   This work was supported in part by the ACS Petroleum Research Fund grant
   \#59814-ND7 and the Graduate Assistance in Areas of National Need (GAANN)
   fellowship which is funded by the U.S. Department of Education.  Molecular
