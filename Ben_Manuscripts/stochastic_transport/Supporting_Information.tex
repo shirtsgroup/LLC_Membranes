@@ -238,6 +238,48 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
 
   \newpage
   
+  \section{Mean Squared Displacement}\label{section:msd}
+  
+  In this study, we primarily use the MSD as a tool for characterizing the average
+  dynamic behavior of solute trajectories. Rather than using them to calculate 
+  diffusion constants or to relate our simulations to experimental measurements, we
+  compare MSDs calculated from MD simulations to those generated from our models 
+  in order to validate those models. Therefore, it is only important that we use a
+  consistent definition for calculating the MSD between modeled trajectories and
+  directly observed MD trajectories.
+
+  One can measure MSD in two ways. The ensemble averaged MSD measures 
+  displacements with respect to a particle's initial position:
+  \begin{equation}
+  \langle z^2(t) \rangle = \langle z(t) - z(0) \rangle^2
+  \label{eqn:ensemble_msd}
+  \end{equation}
+  Fits to the ensemble averaged MSD will always reproduce the form of 
+  Equation~\ref{M-eqn:msd_form} of the main text. The time-averaged MSD measures all observed 
+  displacements over time lag $\tau$: 
+  \begin{equation}
+  \overline{z^2(\tau)} = \dfrac{1}{T - \tau}\int_{0}^{T - \tau} (z(t + \tau) - z(t))^2 dt
+  \label{eqn:tamsd}
+  \end{equation}
+  where T is the length of the trajectory. 
+  
+  The time averaged and ensemble averaged MSDs will give identical results 
+  unless a system displays non-ergodic behavior. For a pure CTRW, the power 
+  law distribution of trapping times leads to weak ergodicity breaking.
+  In this case, the time-averaged MSD is linear while the ensemble averaged
+  MSD has the form of Equation~\ref{M-eqn:msd_form} of the main text.~\cite{meroz_toolbox_2015} With
+  power law trapping behavior, the time between hops diverges so there is no 
+  characteristic measurement time scale of solute motion. In fact, as measurement 
+  time increases, the average MSD of a CTRW tends to decrease, a phenomenon called
+  aging, because trajectories with trapping times on the order of the measurement 
+  time get incorporated into the calculation.~\cite{bel_weak_2005}
+  
+  We chose to use just the time-averaged MSD to compare MD trajectories with
+  modeled trajectories, because, compared to the ensemble average, it is a more
+  statistically robust measure of the average distance a solute travels over
+  time. The ensemble MSD of only 24 solute trajectories would have much higher
+  uncertainties.
+  
   \section{Estimating the Hurst Parameter}\label{section:H_estimate}
   
   We chose to estimate the Hurst parameter, $H$ by a least squares fit to the analytical
@@ -516,6 +558,18 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \centering
   % /figures/distributions_sfbm.py
   \begin{subfigure}{0.3\textwidth}
+  \includegraphics[width=\textwidth]{gaussian_levy_comparison_anomalous_URE.pdf}
+  \caption{}\label{fig:hop_distribution_comparison}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+  \includegraphics[width=\textwidth]{URE_powerlaw.pdf}
+  \caption{}\label{fig:powerlaw}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+  \includegraphics[width=\textwidth]{URE_hop_acf.pdf}
+  \caption{}\label{fig:hop_acf}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
   \includegraphics[width=\textwidth]{gaussian_levy_comparison_anomalous_GCL.pdf}
   \caption{}\label{fig:GCL_hop_distribution_comparison}
   \end{subfigure}
@@ -552,8 +606,16 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \caption{}\label{fig:MET_hop_acf}
   \end{subfigure}
   \caption{Hop length distributions, dwell time distributions and hop autocorrelation functions
-  respectively for ethylene glycol (a-c), acetic acid (d-f) and methanol (g-i).
-  See Section~\ref{M-section:AD_parameterization} of the main text for a more detailed discussion.
+  respectively for urea (a-c), ethylene glycol (d-f), acetic acid (g-i), and methanol (j-l).
+  Using urea as an example, (a) the distribution of hop lengths can be fit by a Gaussian in
+  addition to a more general L\'evy stable distribution, though the L\'evy stable distribution
+  does a better job of capturing the heavier tails and increased density near 0. We explore
+  models fit to both distributions, as Gaussian hops are more convenient to model. (b) The 
+  distribution of dwell times is fit well by a power law but it over-estimates the probability
+  density at long dwell times. A power law truncated with an exponential cut-off better
+  describes the probability of long dwell times in our simulations. (c) The hops are negatively
+  correlated to their previous hop. In combination, (a) -- (c) support modeling solutes as either
+  subordinated fractional Brownian or L\'evy motion.
   }\label{fig:anticorrelated_hops}
   \end{figure}
   
@@ -612,10 +674,51 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \newpage
   
   \section{Stationarity of Solute Trajectories}\label{section:msd_comparison}
+
+  We observe that in some cases, solute trajectories extracted from our MD
+  simulations display non-stationary behavior. We defined the perceived
+  equilibration time point for each solute based on the time at which the
+  number of solutes inside the pores and tails stabilized
+  (Figure~\ref{fig:equilibration}). With this definition, we observe
+  evidence of non-stationary solute behavior after the perceived equilibration
+  point, on the $\mu$s timescale. 
   
-  We evaluated the predictive capabilities of the AD modeling approach by training
+%  In Table~\ref{table:stationarity}, we compare
+%  the MSD of the solutes calculated using trajectory data from the first and
+%  second halves of the ``equilibrated" simulation time. Ethylene glycol and
+%  methanol show considerable differences between the MSDs of the two halves.
+%  Urea and acetic acid appear to demonstrate satisfactory stationarity. The
+%  shapes of urea and acetic acid's MSD curves are also very similar (see
+%  Figure~\ref{S-fig:msd_comparison} of the Supporting Information).
+  
+% BJC: This table summarizes the main text
+%  \begin{table}[h]
+%  \centering
+%  \begin{tabular}{|c|c|c|}
+%  \hline
+%  \multirow{2}{*}{Residue} & \multicolumn{2}{c|}{MSD}            \\\cline{2-3}
+%                           & First Half       & Second Half      \\\hline
+%  urea                     & 0.31 (0.23, 0.40)& 0.35 (0.28, 0.43)\\\hline
+%  ethylene glycol          & 3.11 (2.06, 4.25)& 1.03 (0.76, 1.29)\\\hline
+%  methanol                 & 2.24 (1.61, 2.92)& 1.06 (0.77, 1.39)\\\hline
+%  acetic acid              & 1.58 (1.11, 2.03)& 1.43 (1.10, 1.73)\\\hline
+%
+%  \end{tabular}
+%  \caption{In order to be considered stationary, the MSD of the ensemble of
+%	  solute trajectories should be the same independent of the portion of
+%	  equilibrated trajectory that is analyzed. The MSD values in this
+%	  table are averages taken after a 500 ns time lag, calculated
+%	  independently from the first and second halves of the equilibrated
+%	  solute trajectories. Urea and acetic acid both appear to satisfy the
+%	  stationarity criteria, while ethylene glycol and methanol show
+%	  significantly smaller MSDs when calculated from the second half of
+%	  the equilibrated trajectories.}\label{table:stationarity}
+%  \end{table}
+  
+  %We evaluated the predictive capabilities of the AD modeling approach by training
+  We trained
   the model parameters on the first half of the equilibrated MD trajectory data and
-  then comparing the MSD calculated from AD model realizations to the MSD calculated
+  then compared the MSD calculated from AD model realizations to the MSD calculated
   from the second half of the equilibrated MD trajectory data. This metric is
   only meaningful if the ensemble of solute trajectories is stationary. In 
   Figure~\ref{fig:msd_comparison}, we show that urea and acetic acid show acceptable
@@ -636,6 +739,16 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   MSDs are underestimated in all cases because dwell times on the order of the
   MD simulation length are sampled and incorporated into the simulated anomalous
   diffusion trajectories. 
+  
+  This brief analysis suggests that we may be operating on the border of the
+  minimum amount of data required to accurately parameterize AD approach
+  models. Working with only half of the data we collected ($\sim$ 2 $\mu$s
+  post-equilibration) may not always be sufficient for extracting reliable
+  parameter estimates. Therefore, in the main text, we employ parameters fit
+  to the entire equilibrated portion of the solute trajectories. Even doubling
+  the data might not be good enough for molecules with statistical 
+  non-stationarity, meaning the predictive and interpretive power of the time
+  series modeling applied to these trajectories will be lower.
   
   \begin{figure}[h]
   \centering
@@ -687,12 +800,13 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   (sFBMcut and sFLMcut), the MSD curves predicted by the AD model trained on 
   the first half of the equilibrated data lie within the 1$\sigma$ confidence
   intervals of the MD MSD curves generated from the second half of the equilibrated
-  solute data. The models which use pure power laws systematically under-predict
-  the MD MSD curves. Over- and under-estimated curvature of the of urea and acetic acid's 
+  solute data. Over- and under-estimated curvature of the of urea and acetic acid's 
   MSD curves respectively causes the magnitude of urea's predicted MSDs to be 
   under-predicted at long timescales and those of acetic acid to be under-predicted
-  at short timescales. Note that the sFBMcut and sFLMcut models are the same as 
-  those in the main text.}\label{fig:train_test}
+  at short timescales. The models which use pure power laws systematically under-predict
+  the MD MSD curves. 
+  % Note that the sFBMcut and sFLMcut models are the same as those in the main text.
+  }\label{fig:train_test}
   \end{figure}
   
   %Considering the longest observed dwell time among all
@@ -825,7 +939,37 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \end{table}
   
   \newpage
-  \section{Table of MSDDM parameters}\label{section:msddm_params}
+  \section{MSDDM parameters}\label{section:msddm_params}
+  
+  We observe correlated emissions drawn from L\'evy stable distributions. The
+  deviation of the emission distributions from Gaussian behavior is far more
+  pronounced than that seen in the hop length distributions of the AD model.
+  (see Figure~\ref{fig:gaussian_levy_comparison}) We therefore did not consider
+  the Gaussian case for the MSDDM. The correlation structure between hops is 
+  consistent with that of FLM (Figure~\ref{fig:msddm_acf}).  
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{gaussian_levy_comparison.pdf}
+  \caption{}\label{fig:gaussian_levy_comparison}
+  \end{subfigure}
+  % /figures/msddm_acf.py
+  \begin{subfigure}{0.42\textwidth}
+  \includegraphics[width=\textwidth]{msddm_acf.pdf}
+  \caption{}\label{fig:msddm_acf}
+  \end{subfigure}
+  \caption{(a) The emission distributions of hop lengths are non-Gaussian and
+	  heavy-tailed. Shown here is the emission distribution for transitions
+	  between states. The maximum likelihood Gaussian fit severely
+	  underestimates the empirical density of hops near and far from zero
+	  while overestimating the density of hops at intermediate values. (b)
+	  Jumps drawn from the transition distribution are negatively
+	  correlated to each other. The normalized version of
+	  Equation~\ref{M-eqn:flm_autocovariance} fits well to the data
+	  suggesting FLM is an appropriate way to model jumps.}
+	  \label{fig:msddm_emissions}
+  \end{figure}
   
   The following table is a tabular representation of the parameters 
   depicted in Figure~\ref{M-fig:msddm_parameters} of the main text.
