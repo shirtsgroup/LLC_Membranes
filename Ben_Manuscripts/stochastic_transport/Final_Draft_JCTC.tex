@@ -109,9 +109,10 @@
   potentially harmful organic micropollutants such as fertilizers, pesticides,
   pharmaceuticals and personal care products.~\cite{barbosa_occurrence_2016} 
   %BJCB: could cut this last sentence. It's kind of awkward  
-  In the materials industry, there is a strong interest in creating breathable
-  fabrics which selectively allow passage of water
-  vapor.~\cite{mondloch_destruction_2015}
+  %MRSB: agree  
+  %In the materials industry, there is a strong interest in creating breathable
+  %fabrics which selectively allow passage of water
+  %vapor.~\cite{mondloch_destruction_2015}
 
   % BJCA: I could likely condense this paragraph to focus primarily on the HII phase
   % and its complex pores.
@@ -155,7 +156,8 @@
   order of 1 nm in size. A perfectly aligned H\textsubscript{II} phase has 
   an ideal geometry for high throughput separations.~\cite{feng_scalable_2014,feng_thin_2016}
   %BJCB: could add a sentence saying that in pracftice, alignment is hard. Not sure if worth acknowledging for this paper.
-  
+  %MRSB: nah, not here.
+
   Molecular modeling may make it possible to efficiently evaluate solute-specific
   separation membranes using the available chemical space of LLC monomers by 
   allowing researchers to understand their macroscopic behavior based on 
@@ -1139,6 +1141,7 @@
 
   %MRS: some of these discussions might belong in the SI, with just the top line information in the main text.  People don't really care about the details of the individual parameters, just what story that tells.
   %BJCB: I think the figures need to stay though   
+  %MRSB: Hmm. I'm not entirely convinced, but we can leave it in for now and see what the reviewers think.
   \begin{figure}
   \centering
   \begin{subfigure}{0.325\textwidth}
@@ -1237,16 +1240,19 @@
   % mention the reason in the above paragraph.
   The two mode models display curvature more consistent with MD but for
   non-physical reasons. Every time a switch between the pores and tails occurs,
-  the width of the distribution used to model hops changes. We are unaware of
-  an appropriate technique which can correlate hops that come from different
-  hop distributions, therefore every time a mode switch occurs, the correlation
-  structure is broken. Solutes that switch between modes the least show
+  the width of the distribution used to model hops changes, and the correlation structure is broken. 
+  %MRSB: I cut below.
+  %We are unaware of
+  %an appropriate technique which can correlate hops that come from different
+  %hop distribution every time a mode switch occurs, the correlation
+  %structure is broken. 
+  Solutes that switch between modes the least show
   predicted MSDs with the greatest curvature. Due to the much larger
   accessible volume that a smaller molecule has, methanol spends $>90\%$ of its
   time in the hydrophobic tails (see Figure~\ref{fig:AD_mode_occupation}), so
   mode transitions are relatively rare and the predicted MSDs have significant
-  curvature. This artificially solves the problem of long timescale
-  correlation, however we do not recommend this as it has no physical basis.
+  curvature. This artificially resolves the problem of long timescale
+  correlation, however, it has no physical basis.
   
   %MRS: this paragraph below may be the sort of summary of the models that would
   %go in the main text, with the details in the SI.
@@ -1262,6 +1268,7 @@
   behavior contribute to an overall increase in the predicted MSD.
 
   %BJCB: maybe move the next two paragraphs to the SI?
+  %MRSB: I think that this is more useful in the main text, since it connects models to the simulations and the physics.
   Examining first the parameters of the one mode model, we can begin to break
   down the trends in solute MSDs. The parameters belonging to ethylene glycol
   and methanol are relatively similar, which is consistent with their similar MD
@@ -1349,7 +1356,9 @@
   % BJCB: I could summarize the four following paragraphs in terms of key
   % takeaways, like you suggested with the AD model above.
 
-  Urea spends the largest fraction of its time trapped via association with
+  %MRSB: I think people like the physical intuition gained. I added bullet points to aid reading. 
+  \begin{itemize}
+  \item \textit{Urea} spends the largest fraction of its time trapped via association with
   sodium ions. It does so 31\% of the total time while in the tails (state 3)
   and 21\% of the total time while in the pores (state 7). Note that sodium
   does not drift significantly into the tails but sits close to the pore/tail
@@ -1359,7 +1368,7 @@
   transport rate of urea is likely to be most significantly modified by
   removing or changing the identity of the counter-ion.
   
-  Ethylene glycol spends the largest fraction of its time trapped in a hydrogen
+  \item \textit{Ethylene glycol} spends the largest fraction of its time trapped in a hydrogen
   bonded state. It does so 24\% of the total time while in the tails (state 2)
   and 32\% of the total time while in the pores (state 6). The two hydroxyl
   groups of ethylene glycol readily donate their hydrogen atoms to the
@@ -1368,7 +1377,7 @@
   removing hydrogen bond accepting groups from the LLC monomers, especially
   those which stabilize the solute in the tails (i.e. the ether linkages). 
   
-  Methanol spends most of its time unbound in the tail region (state 1) and
+  \item \textit{Methanol} spends most of its time unbound in the tail region (state 1) and
   spends a significant portion of time hydrogen bonded while in the tail
   region. Tail region hydrogen bonds are donated from methanol to the ether
   linkages between the monomer head groups and tails. One might modify the
@@ -1376,7 +1385,7 @@
   tails. This might be achieved by adding cross-linkable groups near the
   monomer head groups.
   
-  Finally, acetic acid spends the majority of its time hydrogen bonding both in
+  \item \textit{Acetic acid} spends the majority of its time hydrogen bonding both in
   and out of the pore (states 2 and 6). Although it has an unshielded carbonyl
   group in its structure, association with sodium ions in this environment is
   apparently a much weaker interaction than hydrogen bonding.  As with ethylene
@@ -1384,6 +1393,7 @@
   hydrogen bond accepting constituents of the LLC monomer. With this
   modification, we hypothesize that acetic acid might show similar transport
   rates to urea given their structural similarity.
+  \end{itemize}
   
   \subsubsection{Parameters of the MSDDM}\label{section:msddm_parameterization}
 
@@ -1429,7 +1439,8 @@
 %	  suggesting FLM is an appropriate way to model jumps.}
 %	  \label{fig:msddm_emissions}
 %  \end{figure}
-  
+
+  %MRSB: discussion of parameter specifics is a potential place to move.
   \begin{figure}
   \centering
   \begin{subfigure}{0.325\textwidth}
