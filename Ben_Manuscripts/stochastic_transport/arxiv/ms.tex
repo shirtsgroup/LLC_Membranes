@@ -27,6 +27,7 @@
 
 \SectionNumbersOn
 
+\usepackage[utf8]{inputenc}
 \DeclareUnicodeCharacter{03C9}{$\omega$}
 %\usepackage[en]{babel}
 
@@ -45,51 +46,46 @@
 \affiliation{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, CO 80309, USA}
 
 \begin{document}
-
-%  \title{Capturing Subdiffusive Solute Dynamics and Predicting Selectivity in Nanoscale Pores
-%  with Time Series Modeling}
-%  
-%  \author{Benjamin J. Coscia}
-%  \author{Michael R. Shirts}
-%  
-%  \affiliation{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, Colorado 80309, United States}
-%
-%  \date{\today}
   
   \begin{abstract}
   
-  Mathematically modeling complex transport phenomena at the molecular level 
-  can be a powerful tool for identifying transport mechanisms and predicting
-  macroscopic properties. We use two different stochastic time series models,
-  parameterized from long molecular dynamics (MD) simulation trajectories of
-  a cross-linked H\textsubscript{II} phase lyotropic liquid crystal (LLC) 
-  membrane, in order to predict solute mean squared displacements (MSDs) 
-  and solute flux, and thus solute selectivity, in macroscopic length pores. 
+  Mathematically modeling complex transport phenomena can be a powerful tool
+  for extracting important physical information from molecular simulations. 
+  In this study, we present two new approaches that use stochastic time series
+  modeling to predict long time-scale behavior and macroscopic properties 
+  from molecular simulation which can be generalized to other molecular systems
+  where complex diffusion occurs. Specifically, we parameterize our models using
+  long molecular dynamics (MD) simulation trajectories of a cross-linked 
+  H\textsubscript{II} phase lyotropic liquid crystal (LLC) membrane in order to
+  predict solute mean squared displacements (MSDs), solute flux, and
+  solute selectivity in macroscopic length pores.
 
   First, using anomalous diffusion theory, we show how solute dynamics can be
   modeled as a fractional diffusion process subordinate to a continuous time 
   random walk. From the MD simulations, we parameterize the distribution of 
   dwell times, hop lengths between dwells and correlation between hops. We 
-  explore two variations of the anomalous diffusion modeling approach. The first variation
-  applies a single set of parameters to the solute displacements and the second
-  applies two sets of parameters based on the solute's radial distance from the
-  closest pore center. 
+  explore two variations of the anomalous diffusion modeling approach. The first 
+  variation applies a single set of parameters to the solute displacements and 
+  the second applies two sets of parameters based on the solute's radial distance
+  from the closest pore center. 
 
-  Next, we generalize Markov state models, treating the
-  configurational states of the system as a Markov process where each
-  state has distinct transport properties. For each state and transition
-  between states, we parameterize the distribution and temporal correlation 
-  structure of positional fluctuations as a means of characterization and to 
-  allow us to predict solute MSDs. We show that both models reasonably reproduce
-  the MSDs calculated from MD simulations. However, qualitative differences 
-  between MD and Markov state dependent model-generated trajectories may limit 
-  its usefulness. 
-
-  Finally, we demonstrate how one can use these models to 
-  estimate flux of a solute across a macroscopic-length pore and, based on 
-  those quantities, the membrane's selectivity towards each solute. This work 
-  helps to connect microscopic chemically-dependent solute motions that do not
-  follow simple diffusive behavior with macroscopic membrane performance.
+  Next, we present an approach that generalizes Markov state models, treating 
+  the configurational states of the system as a Markov process where each 
+  state has distinct transport properties. For each state and transition between
+  states, we parameterize the distribution and temporal correlation structure of
+  positional fluctuations as a means of characterization and to allow us to
+  predict solute MSDs. 
+ 
+  We show that both stochastic models reasonably reproduce the MSDs calculated 
+  from MD simulations. However, qualitative differences between MD and Markov 
+  state dependent model-generated trajectories may in some cases limit their 
+  usefulness. With these parameterized stochastic models, we demonstrate how 
+  one can estimate flux of a solute across a macroscopic-length pore and, based
+  on those quantities, the membrane's selectivity towards each solute. This
+  work therefore helps to connect microscopic, chemically-dependent solute 
+  motions that do not follow simple diffusive behavior with long time-scale 
+  behavior, in an approach generalizable to many types of molecular systems 
+  with complex dynamics.
 
   \end{abstract}
 
@@ -99,18 +95,58 @@
 
   \section{Introduction}
 
-  Highly selective separations membranes are desirable in numerous
+  There is a large disparity between the time scales accessible to atomistic 
+  molecular dynamics (MD) simulations and experiment. The dynamics of molecules 
+  over nanoseconds of simulation may tell a very different story than that 
+  inferred by bulk measurements on the time-scale of seconds. Understanding 
+  complex dynamical behavior on short time-scales and connecting them with much
+  longer time-scales can provide fundamental insight which can be used for 
+  atomic level design of materials. In this work, we pursue this connection 
+  applied to highly selective aqueous filtration membranes and demonstrate how
+  one can gain chemical intuition which serves both theoretical and experimental
+  researchers.
+
+  Highly selective separation membranes are desirable in numerous
   applications. The ability to efficiently separate ions from saline water
   sources using membranes has been actively pursued for years in an effort to
   create potable water for people in water-scarce
   regions.~\cite{werber_materials_2016} Even in relatively safe municipal water
   supplies, there is a need for membranes that can specifically separate
   potentially harmful organic micropollutants such as fertilizers, pesticides,
-  pharmaceuticals and personal care products.~\cite{barbosa_occurrence_2016} In
-  the materials industry, there is a strong interest in creating breathable
-  fabrics which selectively allow passage of water
-  vapor.~\cite{mondloch_destruction_2015}
+  pharmaceuticals and personal care products.~\cite{barbosa_occurrence_2016} 
+  %BJCB: could cut this last sentence. It's kind of awkward  
+  %MRSB: agree  
+  %In the materials industry, there is a strong interest in creating breathable
+  %fabrics which selectively allow passage of water
+  %vapor.~\cite{mondloch_destruction_2015}
 
+  % BJCA: I could likely condense this paragraph to focus primarily on the HII phase
+  % and its complex pores.
+  %MRS: yes.  QI not relevant
+%  Lyotropic liquid crystals (LLCs) are a class of amphiphilic molecules that
+%  can be cross-linked into mechanically strong and highly selective nanoporous
+%  membranes.~\cite{gin_polymerized_2008} They may provide a promising
+%  alternative to conventional membrane separation techniques by being selective
+%  based not only on solute size and charge, but on solute chemical
+%  functionality as well.~\cite{dischinger_application_2017} One can tune the
+%  functionality of LLC monomers in order to enhance or weaken specific
+%  solute-membrane interactions.~\cite{dischinger_effect_2017} Two general
+%  morphologies of LLC membranes are being actively developed. The inverted
+%  hexagonal, H\textsubscript{II}, LLC phase has densely packed, uniform-sized
+%  pores on the order of 1 nm in size. A perfectly synthesized
+%  H\textsubscript{II} phase has an ideal geometry for high throughput
+%  separations. Unfortunately, aligning the microscopic hexagonal mesophases on
+%  a large scale as required for high permeability has shown limited
+%  success.~\cite{feng_scalable_2014,feng_thin_2016} Bicontinuous cubic,
+%  Q\textsubscript{I}, phase LLC membranes share the uniform and nm-sized chemically
+%  complex pores of the H\textsubscript{II} phase but its geometry consists of a
+%  tortuous network of 3D interconnected pores which do not require
+%  alignment.~\cite{carter_glycerol-based_2012} While its pore structure may
+%  decrease a Q\textsubscript{I} phase membrane's permeability relative to the
+%  H\textsubscript{II} phase, it is considerably easier to produce 
+%  at scale.~\cite{hatakeyama_nanoporous_2010}
+
+  %BJCB: removed discussion of Q1 from above paragraph
   Lyotropic liquid crystals (LLCs) are a class of amphiphilic molecules that
   can be cross-linked into mechanically strong and highly selective nanoporous
   membranes.~\cite{gin_polymerized_2008} They may provide a promising
@@ -118,27 +154,20 @@
   based not only on solute size and charge, but on solute chemical
   functionality as well.~\cite{dischinger_application_2017} One can tune the
   functionality of LLC monomers in order to enhance or weaken specific
-  solute-membrane interactions.~\cite{dischinger_effect_2017} Two general
-  morphologies of LLC membranes are being actively developed. The inverted
-  hexagonal, H\textsubscript{II}, LLC phase has densely packed, uniform-sized
-  pores on the order of 1 nm in size. A perfectly synthesized
-  H\textsubscript{II} phase has an ideal geometry for high throughput
-  separations. Unfortunately, aligning the microscopic hexagonal mesophases on
-  a large scale as required for high permeability has shown limited
-  success.~\cite{feng_scalable_2014,feng_thin_2016} Bicontinuous cubic,
-  Q\textsubscript{I}, phase LLC membranes share the uniform and nm-sized chemically
-  complex pores of the H\textsubscript{II} phase but its geometry consists of a
-  tortuous network of 3D interconnected pores which do not require
-  alignment.~\cite{carter_glycerol-based_2012} While its pore structure may
-  decrease a Q\textsubscript{I} phase membrane's permeability relative to the
-  H\textsubscript{II} phase, it is considerably easier to produce 
-  at scale.~\cite{hatakeyama_nanoporous_2010}
-  
-  Molecular modeling may make it possible to efficiently evaluate
-  solute-specific separation membranes using the available chemical space of
-  LLC monomers. To date, only a limited subset of LLC monomers have been
-  studied experimentally in membrane applications.
-  \cite{carter_glycerol-based_2012,hatakeyama_nanoporous_2010,smith_ordered_1997,zhou_assembly_2003,resel_structural_2000}
+  solute-membrane interactions.~\cite{dischinger_effect_2017} 
+
+  % BJCB: split into two paragraphs  
+  In this work, we study the inverted hexagonal, H\textsubscript{II}, LLC phase. 
+  The H\textsubscript{II} phase has densely packed, uniform-sized pores on the 
+  order of 1 nm in size. A perfectly aligned H\textsubscript{II} phase has 
+  an ideal geometry for high throughput separations.~\cite{feng_scalable_2014,feng_thin_2016}
+
+  Molecular modeling may make it possible to efficiently evaluate solute-specific
+  separation membranes using the available chemical space of LLC monomers by 
+  allowing researchers to understand their macroscopic behavior based on 
+  microscopic, chemically-dependent solute motions. To date, only a limited 
+  subset of H\textsubscript{II} phase-forming LLC monomers have been studied
+  experimentally in membrane applications.~\cite{carter_glycerol-based_2012,hatakeyama_nanoporous_2010,smith_ordered_1997,zhou_assembly_2003,resel_structural_2000}
   Even within this small subset, they have demonstrated selectivities that
   could not be explained beyond speculation and vague empirical
   correlations.~\cite{dischinger_application_2017} Atomistic molecular modeling
@@ -148,10 +177,12 @@
 
   In our previous work,~\cite{coscia_chemically_2019} we used molecular
   dynamics (MD) simulations to study the transport of 20 small polar molecules
-  in an H\textsubscript{II} phase LLC membrane. We chose to study the
-  H\textsubscript{II} phase because it is a simpler geometry to model than the
-  Q\textsubscript{I} phase and significantly more structural data is available
-  to help ensure molecular models are consistent with experiment. In general,
+  in an H\textsubscript{II} phase LLC membrane. 
+  %We chose to study the
+  %H\textsubscript{II} phase because it is a simpler geometry to model than the
+  %Q\textsubscript{I} phase and significantly more structural data is available
+  %to help ensure molecular models are consistent with experiment. 
+  In general,
   we observed subdiffusive transport behavior characterized by intermittent
   hops separated by periods of entrapment. We identified three mechanisms
   responsible for the solute trapping behavior: entanglement among monomer
@@ -168,26 +199,12 @@
   simulations longer than those performed for this work ($\sim$5 $\mu$s). Even
   with the relatively large size of our system, we only simulate 24 solute
   trajectories per unit cell in order to minimize solute-solute interactions.
-% BJC2: removed this sentence. High uncertainty MSDs don't really relate to long timescale predictions. Unless the MSDs were linear.
-%  This results in relatively high uncertainties in observables such as mean
-%  squared displacement (MSD), preventing reliable long timescale predictions.
   We are in need of an efficient method which can use our limited atomistic 
   simulation data sets in order to predict long timescale solute behavior.  
-  %BJC2: following sentence replaced with above
-%  We are in need of a way of studying the collective motion of a much larger
-%  set of solutes over much longer timescales.
-  %MRS11: Maybe this last sentence could be changed. Because you aren't really finding a way to study larger sets of 
-  %solutes over larger timescales, you are using a limited amount of atomistic simulation into long time scale behavior efficiently. We can discuss variations as needed!
 
-  %BJC: maybe this paragraph can be cut down?
   Mathematical descriptions of transport in complex separations membranes are a
   powerful way to understand mechanisms and formulate design principles.
   \cite{vinh-thang_predictive_2013,geens_transport_2006,darvishmanesh_mass_2016}
-  %MRS11: this next sentence could probably be cut - it's kind of vague.
-  %BJC2: True
-%  The complexity of a well-fit model generally parallels the complexity of the
-%  transport mechanism being studied, as well as the transport information the
-%  model conveys. 
   In dense homogeneous membranes, the solution-diffusion model
   can extract diffusion and partition coefficients and has successfully
   predicted solute transport rates.~\cite{wijmans_solution-diffusion_1995}
@@ -204,20 +221,13 @@
   solutes move as a function of their environment, in turn suggesting
   experiments that could be performed.
 
-  %MRS11: in this paragraph, the ``we can'' is vague, and doesn't
-  %ascribe agency.  Is ``We'' our group? Is it the field as whole?
-  %If it's something someone has done in the past, there should be
-  %citations. If it's something that can be done in the future, the
-  %phrasing should be a long the lines of ``it is possible to'', ``it
-  %can be done'', etc.
-
   Using a bottom-up modeling approach, it may be possible to parameterize single
   particle behavior by extracting particle trajectories from MD simulations and
   studying the properties that have the greatest influence on solute dynamics.
   With this information, one can learn how to construct an ensemble of characteristic
   single solute trajectories with these properties which would be useful for
   making long timescale predictions with computational ease and lower
-  uncertainties. Fortunately, there is an abundance of information encoded in
+  uncertainties. There is an abundance of information encoded in
   the complex solute trajectories. One can incorporate fluctuations and 
   time-dependent correlations in solute position into transport models, 
   as well as the length of time solutes are trapped. It is possible to add further
@@ -230,33 +240,21 @@
   while providing quantitative mechanistic insights. The functional forms of
   these models are driven by mechanistic observations from our previous work and
   their inputs are parameterized using a substantial amount of data generated
-  by long ($\geq 5~\mu$s) MD simulations. 
-  
-  % BJC: I'd say this is where the intro starts to get technical
-%  We constructed our first model by applying the existing rigorous theoretical
-%  foundation which describes the motion of particles that exhibit non-Brownian,
-%  or anomalous, transport behavior.~\cite{metzler_random_2000,bouchaud_anomalous_1990} The tools
-%  introduced by fractional calculus are instrumental to this
-%  theory.~\cite{gorenflo_fractional_1997} They allow us to generalize the
-%  normally linear diffusion equation to fractional derivative orders, providing
-%  descriptions of a much more diverse set of behavior, including subdiffusion,
-%  a type of anomalous diffusion exhibited by solutes in this
-%  study.~\cite{klages_anomalous_2008}
+  by long ($\geq 5~\mu$s) MD simulations. Where sufficiently close to observed data,
+  these fitted models provide a way to propagate information about solute 
+  trajectories gathered at the microsecond time scale to realistic experimental 
+  time scales. 
 
-  %MRS11: should be clear if first model is previous publications, or what is presented here.
-  %If what is presented here, should talk about how it will be presented, not that it was developed. 
-  %MRS11: research activities happened in the past, presentation of research is described in the present.
-  %or potentially future if describing what will be presented in the rest of the paper. 
-  %BJC: replacement to above.
-  %BJC1: Made clear that this is talking about the first model of this work.
-  %BJC1: went through rest of intro to make sure tense is consistent
-  The first model that we develop in this work allows us to characterize the 
-  hopping and trapping behavior displayed by solutes in our MD simulations. This 
-  type of non-Brownian dynamical behavior results in subdiffusive transport which
-  is well-described by anomalous diffusion (AD) theory.~\cite{metzler_random_2000,bouchaud_anomalous_1990,klages_anomalous_2008}
-  %MRS12: removing paragraph break
-  % BJC: focused following paragraph (RWF doesn't need to be talked about) and 
-  % stole thesis from paragraph below it
+  We constructed our first model by applying the existing rigorous theoretical
+  foundation which describes the motion of particles that exhibit non-Brownian,
+  or anomalous, transport behavior.~\cite{metzler_random_2000,bouchaud_anomalous_1990} 
+  The tools introduced by fractional calculus are instrumental to this 
+  theory.~\cite{gorenflo_fractional_1997} They allow us to generalize the normally
+  linear diffusion equation to fractional derivative orders, providing descriptions
+  of a much more diverse set of behavior, including subdiffusion, a type of 
+  anomalous diffusion exhibited by solutes on the simulation time scales of this
+  study.~\cite{klages_anomalous_2008}
+
   We treat our system in terms of two well-known classes of anomalous
   subdiffusion: fractional Brownian motion (FBM) subordinate to a 
   continuous time random walk (CTRW), or subordinated FBM (sFBM) for short. 
@@ -269,39 +267,14 @@
   then the hop sequence generation process can be described as subordinate to
   the CTRW. In our case, we observe anti-correlated draws from the hop distribution
   suggesting an FBM process is subordinate to the CTRW.
-
-%  Three well-known classes of behavior leading to anomalous subdiffusion are
-%  continuous time random walks (CTRWs), fractional Brownian motion (FBM) and
-%  random walks on fractals (RWFs).\cite{meroz_toolbox_2015} These types of
-%  motion are frequently used alone or in combination to describe single
-%  particle trajectories.~\cite{morrin_three_2018,metzler_anomalous_2014} A CTRW
-%  is characterized by a distribution of hop lengths and dwell times, where
-%  trajectories consist of sequential independent random draws from each
-%  distribution.\cite{montroll_random_1965} FBM is common in crowded,
-%  viscoelastic environments where each jump comes from a Gaussian distribution
-%  but is anti-correlated to its previous
-%  steps.~\cite{mandelbrot_fractional_1968,jeon_fractional_2010,banks_anomalous_2005}
-%  An RWF is imposed by a system's geometry. Systems with tortuous pathways and
-%  dead ends cause anti-correlated
-%  motion.\cite{meroz_toolbox_2015,neusius_subdiffusion_2008}
-
-%  We treated our system as an FBM process subordinate to a CTRW, or
-%  subordinated FBM (sFBM) for short. 
-  We fit sFBM models in two ways: First, we parameterize solute motion using
-  a single set of parameters fit to a hypothesized anomalous diffusion (AD) model.
-  Second, we use a two-state approach by extracting two sets of model parameters
-  calculated based on a solute's radial distance from the closest pore center. 
-  This allows us to include the different dynamical behavior of solutes previously
-  observed within the pore region versus within the monomer tails.
- 
-  Where sufficiently close to observed data, these fitted sFBM models
-  provide a way to propagate information about solute trajectories gathered 
-  at the microsecond time scale to realistic experimental time scales. 
-  They can also confirm the importance of assumed solute-membrane interactions 
-  used to define the model's functional form, and
-  suggest missing components. They can help researchers formulate hypotheses to
-  explain why a certain set of parameters is characteristic to a specific
-  solute.
+  
+% BJCC: I cut this, doesn't really seem to be necessary for intro
+%  We fit sFBM models in two ways: First, we parameterize solute motion using
+%  a single set of parameters fit to a hypothesized anomalous diffusion (AD) model.
+%  Second, we use a two-state approach by extracting two sets of model parameters
+%  calculated based on a solute's radial distance from the closest pore center. 
+%  This allows us to include the different dynamical behavior of solutes previously
+%  observed within the pore region versus within the monomer tails.
   
   If one has knowledge of the primary mechanisms leading to anomalous diffusion
   behavior, one may gain additional insight by formulating a state-based model,
@@ -360,14 +333,6 @@
   explore membrane structural space, these solutes have a range of chemical 
   functionality and experience each of the three trapping mechanisms to different extents.
   
-  %MRS11: Introduction should not really give the answer so far.
-  %Introduction should describe the questions that will be asked, but
-  %not answer them.  That's not what is expected in an intro, it may confuse people (answers should be in the abstract).
-  %MRS11: this next paragraph could use tweaks/cutting the most, but review the previous paragraphs as well.
-  %MRS11: you can think about putting some of these results into conclusion, though - it reads well now, but might be benefited from reemphasizing results if it's currently missing any of this.
-  %BJC2: slight tweaks and removed conclusions from following paragraph. Also went back through previous
-  % paragraphs to look for conclusions.
-  
   Finally, we demonstrate how one can use stochastically generated realizations
   of our models in order to predict solute flux and selectivity in pores of 
   macroscopic length, thus achieving a better understanding of macroscopic 
@@ -382,9 +347,9 @@
   2018~\cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008}.
   We performed all post-simulation trajectory analysis using Python scripts
   which are available online at
-  \texttt{https://github.com/shirtsgroup/LLC\_Membranes}.  The appropriate
+  \texttt{https://github.com/shirtsgroup/LLC\_Membranes}. The appropriate
   scripts to use for subsequent calculations are summarized in
-  Table~\ref{table:python_scripts} of the Supporting Information.
+  Table~\ref{S-table:python_scripts} of the Supporting Information.
   
   \subsection{Molecular Dynamics Simulations}
 
@@ -392,9 +357,11 @@
   atomistic molecular model of four pores in a monoclinic unit cell with 10\%
   water by weight (see Figure~\ref{fig:membrane_structure}). Approximately one
   third of the water molecules occupy the tail region with the rest near the
-  pore center. We chose to focus our study on the 10 wt\% water system because
-  solutes move significantly faster than in the 5 wt\% system studied
-  previously, thus allowing more statistically valid analyses.
+  pore center.
+%BJCC: I don't see a need to justify 10 over 5 wt% 
+%  We chose to focus our study on the 10 wt\% water system because
+%  solutes move significantly faster than in the 5 wt\% system studied
+%  previously, thus allowing more statistically valid analyses.
   
   \begin{figure*}
   \centering
@@ -418,26 +385,6 @@
   the tail region are omitted for clarity.}\label{fig:membrane_structure}
   \end{figure*}
   
-%  \begin{figure*}
-%  \centering
-%  \subfloat[\label{fig:monomer_structure}]{%
-%  \vspace{1.1cm}
-%  \includegraphics[width=0.4\textwidth]{NaGA3C11.pdf}%
-%  \vspace{0.6cm}
-%  }\hfill
-%  \subfloat[\label{fig:membrane_profile}]{%
-%    \includegraphics[width=\textwidth]{membrane_profile.pdf}%
-%  }\hfill
-%  \caption{}\label{fig:membrane_profile}
-%  \end{subfigure}
-%  \caption{(a) The wedge-shaped liquid crystal monomer Na-GA3C11 will form the inverted
-%  hexagonal phase in the presence of water where the carboxylate head groups occupy the
-%  pore centers. (b) A cross-section of a periodically replicated atomistic unit cell 
-%  used for simulations in this study reveals the membrane's aqueous, hexagonally packed,
-%  straight and uniform sized pores. Water molecules (red and white spheres) present in 
-%  the tail region are omitted for clarity.}\label{fig:membrane_structure}
-%  \end{figure*}  
-  
   We chose to study a subset of the 4 fastest moving solutes from our previous
   work: methanol, acetic acid, urea and ethylene glycol. For each solute we 
   created a separate system and to each system we added 6 solutes per pore 
@@ -451,21 +398,22 @@
   We extended the 1 $\mu$s simulations of our previous work to 5 $\mu$s in order
   to collect ample data. We ran MD simulations using the leapfrog integrator with 
   hydrogen bonds constrained by the LINCS algorithm. We simulated a time step of 2 fs at
-  a pressure of 1 bar and 300 K controlled by the Parrinello-Rahman barostat and
+  a pressure of 1 bar and 300K controlled by the Parrinello-Rahman barostat and
   the v-rescale thermostat respectively. We recorded frames every 0.5 ns.
   
   We considered each system to be equilibrated when the solute partitioning between the 
   pore and tail region reached apparent equilibrium and use only data after that point
   in our analysis of solute kinetics. We plot the solute partition versus time in
-  Figure~\ref{fig:equilibration} of the Supporting Information in order to justify
+  Figure~\ref{S-fig:equilibration} of the Supporting Information in order to justify
   our choice of equilibration times for each solute.
 
   \subsection{The Anomalous Diffusion Model}\label{method:model_sFBM}
 
-  Solutes in this system very clearly exhibit subdiffusive behavior, a type of
-  anomalous diffusion. During an anomalous diffusion process, the mean squared 
-  displacement (MSD) does not grow linearly with time, but instead it follows 
-  a power law of the form: 
+  On the time scales simulated in this study, solutes in this system very 
+  clearly exhibit subdiffusive behavior, a type of anomalous diffusion. 
+  During an anomalous diffusion process, the mean squared displacement (MSD)
+  does not grow linearly with time, but instead it follows a power law of 
+  the form: 
   \begin{equation} 
   \langle z^2(t) \rangle = K_{\alpha}t^{\alpha}
   \label{eqn:msd_form}
@@ -480,48 +428,69 @@
   While it is theoretically possible to extract the value of $\alpha$ by fitting
   Equation~\ref{eqn:msd_form} to an MSD generated directly from MD simulations, 
   we do not simulate enough independent solute trajectories to obtain a reliable
-  estimate. We can obtain higher precision estimates of $\alpha$ using the dwell
-  time distributions described in subsequent sections.
-
+  estimate. It is also possible that solute dynamics will become diffusive on
+  long simulation timescales. Therefore, the transition from subdiffusion to regular
+  diffusion may interfere with estimates of $\alpha$ obtained by fitting to the MSD
+  curves. We can obtain higher precision estimates of $\alpha$ using the dwell
+  time distributions as described in subsequent sections.
+  
+  % BJCB: condensed commented out section that follows into this paragraph
   In this study, we primarily use the MSD as a tool for characterizing the average
-  dynamic behavior of solute trajectories. Rather than using them to calculate 
-  diffusion constants or to relate our simulations to experimental measurements, we
-  compare MSDs calculated from MD simulations to those generated from our models 
-  in order to validate those models. Therefore, it is only important that we use a
+  dynamic behavior of solute trajectories. Therefore, it is only important that we use a
   consistent definition for calculating the MSD between modeled trajectories and
-  directly observed MD trajectories.
-
-  One can measure MSD in two ways. The ensemble averaged MSD measures 
-  displacements with respect to a particle's initial position:
-  \begin{equation}
-  \langle z^2(t) \rangle = \langle z(t) - z(0) \rangle^2
-  \label{eqn:ensemble_msd}
-  \end{equation}
-  Fits to the ensemble averaged MSD will always reproduce the form of 
-  Equation~\ref{eqn:msd_form}. The time-averaged MSD measures all observed 
-  displacements over time lag $\tau$: 
+  directly observed MD trajectories. We chose to calculate the time-averaged MSD from 
+  our MD simulations and stochastic models which measures all observed displacements
+  over time lag $\tau$: 
   \begin{equation}
   \overline{z^2(\tau)} = \dfrac{1}{T - \tau}\int_{0}^{T - \tau} (z(t + \tau) - z(t))^2 dt
   \label{eqn:tamsd}
   \end{equation}
-  where T is the length of the trajectory. 
-  
-  The time averaged and ensemble averaged MSDs will give identical results 
-  unless a system displays non-ergodic behavior. For a pure CTRW, the power 
-  law distribution of trapping times leads to weak ergodicity breaking.
-  In this case, the time-averaged MSD is linear while the ensemble averaged
-  MSD has the form of Equation~\ref{eqn:msd_form}.~\cite{meroz_toolbox_2015} With
-  power law trapping behavior, the time between hops diverges so there is no 
-  characteristic measurement time scale of solute motion. In fact, as measurement 
-  time increases, the average MSD of a CTRW tends to decrease, a phenomenon called
-  aging, because trajectories with trapping times on the order of the measurement 
-  time get incorporated into the calculation.~\cite{bel_weak_2005}
-  
-  We chose to use just the time-averaged MSD to compare MD trajectories with
-  modeled trajectories, because, compared to the ensemble average, it is a more
-  statistically robust measure of the average distance a solute travels over
-  time. The ensemble MSD of only 24 solute trajectories would have much higher
-  uncertainties.
+  where T is the length of the trajectory. In some situations, it may make
+  more sense to use the ensemble MSD. We present further discussion of this
+  choice in Section~\ref{S-section:msd} of the Supporting Information.
+
+  % BJCA: Could move most of the following discussion to the SI and just present the time-averaged MSD.
+  % MRS: good call.
+
+%  In this study, we primarily use the MSD as a tool for characterizing the average
+%  dynamic behavior of solute trajectories. Rather than using them to calculate 
+%  diffusion constants or to relate our simulations to experimental measurements, we
+%  compare MSDs calculated from MD simulations to those generated from our models 
+%  in order to validate those models. Therefore, it is only important that we use a
+%  consistent definition for calculating the MSD between modeled trajectories and
+%  directly observed MD trajectories.
+%
+%  One can measure MSD in two ways. The ensemble averaged MSD measures 
+%  displacements with respect to a particle's initial position:
+%  \begin{equation}
+%  \langle z^2(t) \rangle = \langle z(t) - z(0) \rangle^2
+%  \label{eqn:ensemble_msd}
+%  \end{equation}
+%  Fits to the ensemble averaged MSD will always reproduce the form of 
+%  Equation~\ref{eqn:msd_form}. The time-averaged MSD measures all observed 
+%  displacements over time lag $\tau$: 
+%  \begin{equation}
+%  \overline{z^2(\tau)} = \dfrac{1}{T - \tau}\int_{0}^{T - \tau} (z(t + \tau) - z(t))^2 dt
+%  \label{eqn:tamsd}
+%  \end{equation}
+%  where T is the length of the trajectory. 
+%  
+%  The time averaged and ensemble averaged MSDs will give identical results 
+%  unless a system displays non-ergodic behavior. For a pure CTRW, the power 
+%  law distribution of trapping times leads to weak ergodicity breaking.
+%  In this case, the time-averaged MSD is linear while the ensemble averaged
+%  MSD has the form of Equation~\ref{eqn:msd_form}.~\cite{meroz_toolbox_2015} With
+%  power law trapping behavior, the time between hops diverges so there is no 
+%  characteristic measurement time scale of solute motion. In fact, as measurement 
+%  time increases, the average MSD of a CTRW tends to decrease, a phenomenon called
+%  aging, because trajectories with trapping times on the order of the measurement 
+%  time get incorporated into the calculation.~\cite{bel_weak_2005}
+%  
+%  We chose to use just the time-averaged MSD to compare MD trajectories with
+%  modeled trajectories, because, compared to the ensemble average, it is a more
+%  statistically robust measure of the average distance a solute travels over
+%  time. The ensemble MSD of only 24 solute trajectories would have much higher
+%  uncertainties.
   
   \subsubsection{Subordinated Fractional Brownian Motion}\label{method:sfbm}
 
@@ -557,6 +526,10 @@
   to $t^{-1 - \alpha}e^{-\lambda t}$.~\cite{newman_power_2005,clauset_power-law_2009}  % Clauset uses data from other papers and gives a bunch of example where the cut-off is the most favorable model. 
   We determine MLEs of $\alpha$ and $\lambda$ by maximizing the log 
   likelihood function:~\cite{clauset_power-law_2009}
+%  \begin{equation}
+%    \mathcal{L}(\alpha, \lambda) = n(1 - \alpha)\ln\lambda - n\ln\Gamma(1 - \alpha, t_{min}\lambda) - \alpha\sum_{i=1}^{n}\ln t_i - \lambda\sum_{i=1}^n t_i
+%  \label{eqn:powerlaw_cutoff_likelihood}
+%  \end{equation}
   \begin{equation}
   	\begin{split}
     \mathcal{L}(\alpha, \lambda) = n(1 - \alpha)\ln\lambda - n\ln\Gamma(1 - \alpha, t_{min}\lambda) \\
@@ -586,18 +559,23 @@
   Equation~\ref{eqn:fbm_autocorrelation} normalized by the variance.  When $H <
   0.5$, hops are negatively correlated, when $H = 0.5$ we recover Brownian
   motion and when $H > 0.5$, one observes positive correlation between hops. 
+  We obtained $H$ by performing a least squares fit of 
+  Equation~\ref{eqn:fbm_autocorrelation} to the first ten 0.5 ns time lags of 
+  the empirically measured autocorrelation function (see section~\ref{S-section:H_estimate}
+  of the Supporting Information for a more in depth justification of this method).
  
-  There are many methods for estimating the Hurst parameter for a time series.
-  \cite{clegg_practical_2006} It can be a difficult task because 
-  Equation~\ref{eqn:fbm_autocorrelation} decays slowly to zero, especially when 
-  $H > 0.5$, meaning one needs to study large time lags with high frequency.
-  Fortunately (from a mathematical perspective), all of our solutes show anti-correlated motion, so most of the information in
-  Equation~\ref{eqn:fbm_autocorrelation} is contained within the first few time lags (see 
-  Figure~\ref{fig:hurst_autocorrelation} of the Supporting Information). Any hope of
-  fitting longer time lags to our data is lost in the noise since the analytical values
-  are so close to zero. Therefore, we obtained H by performing a least squares fit of 
-  Equation~\ref{eqn:fbm_autocorrelation} to the first 
-  ten 0.5 ns time lags of the empirically measured autocorrelation function.
+% BJCC: left this discussion for supporting. Added last sentence above
+%  There are many methods for estimating the Hurst parameter for a time series.
+%  \cite{clegg_practical_2006} It can be a difficult task because 
+%  Equation~\ref{eqn:fbm_autocorrelation} decays slowly to zero, especially when 
+%  $H > 0.5$, meaning one needs to study large time lags with high frequency.
+%  Fortunately (from a mathematical perspective), all of our solutes show anti-correlated motion, so most of the information in
+%  Equation~\ref{eqn:fbm_autocorrelation} is contained within the first few time lags (see 
+%  Figure~\ref{S-fig:hurst_autocorrelation} of the Supporting Information). Any hope of
+%  fitting longer time lags to our data is lost in the noise since the analytical values
+%  are so close to zero. Therefore, we obtained $H$ by performing a least squares fit of 
+%  Equation~\ref{eqn:fbm_autocorrelation} to the first 
+%  ten 0.5 ns time lags of the empirically measured autocorrelation function.
 
   \subsubsection{Subordinated Fractional L\'evy Motion}\label{method:sflm}
 
@@ -608,6 +586,9 @@
   associated probability distribution function (PDF) to a L\'evy stable PDF.
   \cite{klages_anomalous_2008} The characteristic equation which describes the
   Fourier transform of a L\'evy stable PDF is: 
+%  \begin{equation}
+%    p_{\alpha_h, \beta}(k;\mu,\sigma) =\exp\left[i\mu k - \sigma^{\alpha_h}|k|^{\alpha_h}\left(1 - i\beta\frac{k}{|k|}\omega(k, \alpha_h)\right)\right]
+%  \end{equation}
   \begin{equation}
   \begin{split}
     p_{\alpha_h, \beta}(k;\mu,\sigma) =~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \\
@@ -631,6 +612,11 @@
   describe hop correlations because they share the same autocorrelation
   structure.~\cite{tikanmaki_fractional_2010} The autocovariance function for
   FLM is:
+%  \begin{equation}
+%    \gamma(k) = \dfrac{C}{2}\bigg[|k-1|^{2H} - 2|k|^{2H} + |k+1|^{2H}\bigg],
+%    ~C = \frac{E\big[L(1)^2\big]}{\Gamma(2H + 1)\sin(\pi H)}
+%    \label{eqn:flm_autocovariance}
+%  \end{equation}
   \begin{equation}
   \begin{gathered}
     \gamma(k) = \dfrac{C}{2}\bigg[|k-1|^{2H} - 2|k|^{2H} + |k+1|^{2H}\bigg], \\
@@ -644,7 +630,7 @@
   have an undefined variance due to their heavy tails. However, normalizing
   Equation~\ref{eqn:flm_autocovariance} by the variance of a finite number of draws
   from a L\'evy stable distribution results in the same autocorrelation structure as FBM.
-  See Section~\ref{section:H_estimate} of the Supporting Information for numerical
+  See Section~\ref{S-section:H_estimate} of the Supporting Information for numerical
   simulations illustrating this point.
   
   Analogous to power law dwell times, the heavy tails of L\'evy stable hop
@@ -654,9 +640,9 @@
   distribution of hops observed in our MD simulations are well approximated by
   L\'evy stable distributions close to the mean, but they significantly
   under-sample the tails. We chose to truncate the L\'evy stable distributions
-  based on where the theoretical probability distribution function (PDF) starts
+  based on where the theoretical PDF starts
   to deviate from the empirically measured PDF (see
-  Section~\ref{section:truncation} of the Supporting Information).~\cite{mantegna_stochastic_1994}
+  Section~\ref{S-section:truncation} of the Supporting Information).~\cite{mantegna_stochastic_1994}
 
   \subsubsection*{Multiple Anomalous Diffusion Regimes}
   
@@ -688,15 +674,12 @@
   distributions described above, summarized in Table~\ref{table:anomalous_models}.
   All models include correlation between hops.
 
-%BJC8: from author guidelines. Should there only be a line between column headings?
-%Use a single horizontal rule to separate the column headings from the entries in the table. Use horizontal space within the body of the table to separate broad groups of entries. Extra vertical space may be used between columns. Avoid vertical rules in tables. Use lower-case roman letters for footnotes placed at the bottom of a table.
-%MRS9: I'd go with what they said.  Looking at PRE, it looks like you can put double lines above and below the table, though - I added them 
   \begin{table*}[!htb]
 	  \centering
 	  \begin{tabular}{ccc}
             \hline
 	  \hline
-	  Dwell Distribution                & ~~~~~~~~~Hop Length Distribution~~~~~~~~~~~ & Abbreviation \\
+	  Dwell Distribution                & ~~~~~~Hop Length Distribution~~~~~~ & Abbreviation \\
 	  \hline
       Power Law                         & Gaussian                & sFBM         \\
       Power Law w/ Exponential Cut-off  & Gaussian                & sFBMcut      \\
@@ -740,7 +723,7 @@
   count matrix.~\cite{bacallado_bayesian_2009}
   
   We used the Python package \texttt{fbm}~\cite{flynn_exact_2019} to generate exact simulations of FBM
-  and our own Python implementation (see Table~\ref{table:python_scripts} of
+  and our own Python implementation (see Table~\ref{S-table:python_scripts} of
   the Supporting Information) of the algorithm by Stoev and Taqqu to
   simulate FLM.~\cite{stoev_simulation_2004} Note that, to our knowledge, there
   are no known exact simulation algorithms for generating FLM trajectories.
@@ -748,14 +731,14 @@
   marginal L\'evy stable distribution and reasonably approximates the
   correlation structure on MD simulation timescales. We added an empirical
   correction to enhance the accuracy of the correlation structure (see
-  Section~\ref{section:flm_correlation} of the Supporting Information for
+  Section~\ref{S-section:flm_correlation} of the Supporting Information for
   validation of the approach).
 
   \subsection{The Markov State-Dependent Dynamical Model}\label{method:MSMs}  
 
   A Markov state model (MSM) decomposes a time series into a set of discrete
   states with transitions between states defined by a transition probability
-  matrix, $T$.  $T$ describes the conditional probability of moving to a
+  matrix, $T$. $T$ describes the conditional probability of moving to a
   specific state given the previously observed
   state.~\cite{pande_everything_2010,wehmeyer_introduction_2018}
 %  Software packages such as MSMbuilder~\cite{beauchamp_msmbuilder2:_2011} and 
@@ -805,7 +788,7 @@
   current and previous state observation, we incremented the appropriate entry
   of an $n~\times~n$ count matrix by 1, where $n$ is the number of states. We
   verified the Markovianity of state transitions as described in
-  Section~\ref{section:markov_validation} of the Supporting Information.
+  Section~\ref{S-section:markov_validation} of the Supporting Information.
   
   Adding to the standard MSM framework, we incorporated the dynamics of the
   solutes within each state as well as the dynamics of state transitions, which
@@ -903,7 +886,7 @@
   \end{equation} 
   where the only free parameters for fitting are $v$ and $D$. A derivation of
   Equation~\ref{eqn:passage_times} is given in
-  Section~\ref{section:fpt_derivation} of the Supporting Information. We
+  Section~\ref{S-section:fpt_derivation} of the Supporting Information. We
   calculated the expected value of Equation~\ref{eqn:passage_times} in order to
   get the MFPT.
 
@@ -949,15 +932,16 @@
   for each solute. They are characterized by intermittent hops between periods
   of entrapment. The near-Gaussian distribution of jump lengths and power law
   distribution of dwell times are both characteristic of CTRWs
-  (Figures~\ref{fig:hop_distribution_comparison} and~\ref{fig:powerlaw}).  The
-  apparent anti-correlation between hops suggests a fractional diffusion
-  process is subordinate to the CTRW. Of the different models, a process
-  subordinated by FBM or FLM is best supported by the data because the
-  analytical correlation structures of hop lengths are close to those observed
-  in our simulations (Figure~\ref{fig:hop_acf}). Fractional motion is common
-  in crowded viscoelastic environments where motion is highly influenced by
-  the movement of surrounding components, such as monomer tails in our
-  case.~\cite{ernst_fractional_2012}
+  (See Figure~\ref{S-fig:anticorrelated_hops} of the Supporting Information). 
+  %The apparent
+  Anti-correlation between hops suggests a fractional diffusion process is 
+  subordinate to the CTRW. Of the different models, a process subordinated by 
+  FBM or FLM is best supported by the data because the analytical correlation 
+  structures of hop lengths are close to those observed in our simulations 
+  (See Figure~\ref{S-fig:anticorrelated_hops} of the Supporting Information). Fractional 
+  motion is common in crowded viscoelastic environments where motion is highly
+  influenced by the movement of surrounding components, such as monomer tails 
+  in our case.~\cite{ernst_fractional_2012}
   
   \begin{figure*}
   \centering
@@ -987,60 +971,62 @@
   }\label{fig:solute_trajectories}
   \end{figure*}
   
-  \begin{figure*}
-  \centering
-  % Next 3: /figures/sfbm_distributions
-  \begin{subfigure}{0.325\textwidth}
-  \includegraphics[width=\textwidth]{gaussian_levy_comparison_anomalous_URE.pdf}
-  \caption{}\label{fig:hop_distribution_comparison}
-  \end{subfigure}
-  \begin{subfigure}{0.325\textwidth}
-  \includegraphics[width=\textwidth]{URE_powerlaw.pdf}
-  \caption{}\label{fig:powerlaw}
-  \end{subfigure}
-  \begin{subfigure}{0.325\textwidth}
-  \includegraphics[width=\textwidth]{URE_hop_acf.pdf}
-  \caption{}\label{fig:hop_acf}
-  \end{subfigure}
-  \caption{Using urea as an example, (a) the distribution of hop lengths can be
-	  fit by a Gaussian in addition to a more general L\'evy stable
-	  distribution, though the L\'evy stable distribution does a better job of
-	  capturing the heavier tails and increased density near 0. We explore
-	  models fit to both distributions, as Gaussian hops are more convenient
-	  to model. (b) The distribution of dwell times is fit well by a power
-	  law but it over-estimates the probability density at long dwell
-	  times. A power law truncated with an exponential cut-off better
-	  describes the probability of long dwell times in our simulations. (c)
-	  The hops are negatively correlated to their previous hop. In
-	  combination, (a) -- (c) support modeling solutes as either
-	  subordinated fractional Brownian or L\'evy motion. All other solutes
-	  show similar distributions and autocorrelation functions (see
-	  Figure~\ref{fig:anticorrelated_hops} of the Supporting Information).
-  }\label{fig:anticorrelated_hops}
-  \end{figure*}
+%  %BJCA: maybe this to supporting?
+%  %MRS: yeah, I think so. 
+%  \begin{figure}
+%  \centering
+%  % Next 3: /figures/sfbm_distributions
+%  \begin{subfigure}{0.325\textwidth}
+%  \includegraphics[width=\textwidth]{gaussian_levy_comparison_anomalous_URE.pdf}
+%  \caption{}\label{fig:hop_distribution_comparison}
+%  \end{subfigure}
+%  \begin{subfigure}{0.325\textwidth}
+%  \includegraphics[width=\textwidth]{URE_powerlaw.pdf}
+%  \caption{}\label{fig:powerlaw}
+%  \end{subfigure}
+%  \begin{subfigure}{0.325\textwidth}
+%  \includegraphics[width=\textwidth]{URE_hop_acf.pdf}
+%  \caption{}\label{fig:hop_acf}
+%  \end{subfigure}
+%  \caption{Using urea as an example, (a) the distribution of hop lengths can be
+%	  fit by a Gaussian in addition to a more general L\'evy stable
+%	  distribution, though the L\'evy stable distribution does a better job of
+%	  capturing the heavier tails and increased density near 0. We explore
+%	  models fit to both distributions, as Gaussian hops are more convenient
+%	  to model. (b) The distribution of dwell times is fit well by a power
+%	  law but it over-estimates the probability density at long dwell
+%	  times. A power law truncated with an exponential cut-off better
+%	  describes the probability of long dwell times in our simulations. (c)
+%	  The hops are negatively correlated to their previous hop. In
+%	  combination, (a) -- (c) support modeling solutes as either
+%	  subordinated fractional Brownian or L\'evy motion. All other solutes
+%	  show similar distributions and autocorrelation functions (see
+%	  Figure~\ref{S-fig:anticorrelated_hops} of the Supporting Information).
+%  }\label{fig:anticorrelated_hops}
+%  \end{figure}
   
   We modeled the distributions of hop lengths in two ways. First, we assumed
   the distribution to be Gaussian since it is possible to exactly simulate
   realizations of fractional Brownian motion. Second, we fit the distributions
   to L\'evy stable distributions since it is more general than the Gaussian
-  distribution. We plotted the MLE fits of both on top of urea's hop length
-  distribution in Figure~\ref{fig:hop_distribution_comparison}. The L\'evy
-  distribution does a better job capturing the somewhat heavy tails and high
-  density near 0 of the hop length distribution. However, since there are no
-  known exact simulation techniques for generating realizations of fractional
-  L\'evy motion, this more general fit may not be worthwhile. In fact, we
-  typically observe very little difference between model predictions
-  parameterized with FLM versus FBM (see Figure~\ref{fig:anomalous_msds}).
+  distribution. We plotted the MLE fits of both on top of each solute's hop length
+  distribution in Figure~\ref{S-fig:anticorrelated_hops} of the
+  Supporting Information. The L\'evy distribution does a better job capturing
+  the somewhat heavy tails and high density near 0 of the hop length distributions. 
+  However, since there are no known exact simulation techniques for generating 
+  realizations of fractional L\'evy motion, this more general fit may not be 
+  worthwhile. In fact, we typically observe very little difference between model
+  predictions parameterized with FLM versus FBM.% (see Figure~\ref{fig:anomalous_msds}).
 
   We also modeled the distribution of dwell times in two ways. First, we
   assumed pure power law behavior since it is consistent with most theoretical
   descriptions of CTRWs. The data fits well to this model at short dwell times
   but the density of long dwell times is over-estimated. In our second
   approach, we truncate the power law distribution with an exponential cut-off,
-  lowering the probability of extremely long dwell times. We demonstrate this
-  effect in the inset to Figure~\ref{fig:powerlaw}, where the density of the
-  truncated power law drops below that of the pure power law and tends towards
-  0 near a dwell time of 250 ns.
+  lowering the probability of extremely long dwell times. 
+  %We demonstrate this effect in the inset to Figure~\ref{fig:powerlaw}, where 
+  On long time scales, the density of the truncated power law drops below that
+  of the pure power law and tends towards 0. % near a dwell time of 250 ns.
   
   Several of the choices of AD models and parameters we have described yield
   qualitatively similar trajectories to those seen in our MD simulations.  In
@@ -1051,7 +1037,7 @@
   do not truncate the dwell time distribution, the trajectories tend to
   incorporate very long dwell times as shown by the sFBM and sFLM models.
   Predictions made with these models consistently under-predict the MD MSDs
-  (see Figure~\ref{fig:anomalous_msds_bothmode} of the Supporting Information).
+  (see Figure~\ref{S-fig:anomalous_msds_bothmode} of the Supporting Information).
   Therefore, we will not include the pure sFBM or sFLM models in the
   remainder of our analysis.   
   
@@ -1082,74 +1068,81 @@
   }\label{fig:ad_eyetest}
   \end{figure*}
     
-  
-  \subsubsection{Stationarity of solute trajectories}\label{section:stationarity}
-  
-  We observe that in some cases, solute trajectories extracted from our MD
-  simulations display non-stationary behavior. We defined the perceived
-  equilibration time point for each solute based on the time at which the
-  number of solutes inside the pores and tails stabilized
-  (Figure~\ref{fig:equilibration}).  With this definition, we observe
-  evidence of non-stationary solute behavior after the perceived equilibration
-  point, on the $\mu$s timescale. In Table~\ref{table:stationarity}, we compare
-  the MSD of the solutes calculated using trajectory data from the first and
-  second halves of the ``equilibrated" simulation time. Ethylene glycol and
-  methanol show considerable differences between the MSDs of the two halves.
-  Urea and acetic acid appear to demonstrate satisfactory stationarity. The
-  shapes of urea and acetic acid's MSD curves are also very similar (see
-  Figure~\ref{fig:msd_comparison} of the Supporting Information).
-  
-  \begin{table}[h]
-  \centering
-  \begin{tabular}{|c|c|c|}
-  \hline
-  \multirow{2}{*}{Residue} & \multicolumn{2}{c|}{MSD}            \\\cline{2-3}
-                           & First Half       & Second Half      \\\hline
-  urea                     & 0.31 (0.23, 0.40)& 0.35 (0.28, 0.43)\\\hline
-  ethylene glycol          & 3.11 (2.06, 4.25)& 1.03 (0.76, 1.29)\\\hline
-  methanol                 & 2.24 (1.61, 2.92)& 1.06 (0.77, 1.39)\\\hline
-  acetic acid              & 1.58 (1.11, 2.03)& 1.43 (1.10, 1.73)\\\hline
-
-  \end{tabular}
-  \caption{In order to be considered stationary, the MSD of the ensemble of
-	  solute trajectories should be the same independent of the portion of
-	  equilibrated trajectory that is analyzed. The MSD values in this
-	  table are averages taken after a 500 ns time lag, calculated
-	  independently from the first and second halves of the equilibrated
-	  solute trajectories. Urea and acetic acid both appear to satisfy the
-	  stationarity criteria, while ethylene glycol and methanol show
-	  significantly smaller MSDs when calculated from the second half of
-	  the equilibrated trajectories.}\label{table:stationarity}
-  \end{table}
-
-  Given stationary data, the AD approach is capable of predicting solute MSDs
-  measured from MD simulations within or near statistical uncertainty. In
-  Figure~\ref{fig:train_test} of the Supporting Information, we parameterized
-  the AD models using the first half of the stationary solute equilibrated
-  trajectories and then compared the model predictions to the MD MSD of the
-  second half of the stationary trajectories. In most cases, the model
-  predictions fall within the 1$\sigma$ confidence intervals of the MD MSD.
-  
-  This brief analysis suggests that we may be operating on the border of the
-  minimum amount of data required to accurately parameterize AD approach
-  models. Working with only half of the data we collected ($\sim$ 2 $\mu$s
-  post-equilibration) may not always be sufficient for extracting reliable
-  parameter estimates. Therefore, for the remainder of this work, we will
-  employ parameters fit to the entire equilibrated portion of the solute
-  trajectories. Even doubling the data might not be good enough for molecules
-  with statistical non-stationarity, meaning the predictive and interpretive
-  power of the time series modeling applied to these trajectories will be
-  lower.
+  %BJCA: This section to supporting
+%  \subsubsection{Stationarity of solute trajectories}\label{section:stationarity}
+%  %MRS: yes, though report the results in main text.
+%
+%  We observe that in some cases, solute trajectories extracted from our MD
+%  simulations display non-stationary behavior. We defined the perceived
+%  equilibration time point for each solute based on the time at which the
+%  number of solutes inside the pores and tails stabilized
+%  (Figure~\ref{S-fig:equilibration}). With this definition, we observe
+%  evidence of non-stationary solute behavior after the perceived equilibration
+%  point, on the $\mu$s timescale. In Table~\ref{table:stationarity}, we compare
+%  the MSD of the solutes calculated using trajectory data from the first and
+%  second halves of the ``equilibrated" simulation time. Ethylene glycol and
+%  methanol show considerable differences between the MSDs of the two halves.
+%  Urea and acetic acid appear to demonstrate satisfactory stationarity. The
+%  shapes of urea and acetic acid's MSD curves are also very similar (see
+%  Figure~\ref{S-fig:msd_comparison} of the Supporting Information).
+%  
+%  \begin{table}[h]
+%  \centering
+%  \begin{tabular}{|c|c|c|}
+%  \hline
+%  \multirow{2}{*}{Residue} & \multicolumn{2}{c|}{MSD}            \\\cline{2-3}
+%                           & First Half       & Second Half      \\\hline
+%  urea                     & 0.31 (0.23, 0.40)& 0.35 (0.28, 0.43)\\\hline
+%  ethylene glycol          & 3.11 (2.06, 4.25)& 1.03 (0.76, 1.29)\\\hline
+%  methanol                 & 2.24 (1.61, 2.92)& 1.06 (0.77, 1.39)\\\hline
+%  acetic acid              & 1.58 (1.11, 2.03)& 1.43 (1.10, 1.73)\\\hline
+%
+%  \end{tabular}
+%  \caption{In order to be considered stationary, the MSD of the ensemble of
+%	  solute trajectories should be the same independent of the portion of
+%	  equilibrated trajectory that is analyzed. The MSD values in this
+%	  table are averages taken after a 500 ns time lag, calculated
+%	  independently from the first and second halves of the equilibrated
+%	  solute trajectories. Urea and acetic acid both appear to satisfy the
+%	  stationarity criteria, while ethylene glycol and methanol show
+%	  significantly smaller MSDs when calculated from the second half of
+%	  the equilibrated trajectories.}\label{table:stationarity}
+%  \end{table}
+%
+%  Given stationary data, the AD approach is capable of predicting solute MSDs
+%  measured from MD simulations within or near statistical uncertainty. In
+%  Figure~\ref{S-fig:train_test} of the Supporting Information, we parameterized
+%  the AD models using the first half of the stationary solute equilibrated
+%  trajectories and then compared the model predictions to the MD MSD of the
+%  second half of the stationary trajectories. In most cases, the model
+%  predictions fall within the 1$\sigma$ confidence intervals of the MD MSD.
+%  
+%  This brief analysis suggests that we may be operating on the border of the
+%  minimum amount of data required to accurately parameterize AD approach
+%  models. Working with only half of the data we collected ($\sim$ 2 $\mu$s
+%  post-equilibration) may not always be sufficient for extracting reliable
+%  parameter estimates. Therefore, for the remainder of this work, we will
+%  employ parameters fit to the entire equilibrated portion of the solute
+%  trajectories. Even doubling the data might not be good enough for molecules
+%  with statistical non-stationarity, meaning the predictive and interpretive
+%  power of the time series modeling applied to these trajectories will be
+%  lower.
 
   \subsubsection{Model predictions}\label{section:AD_all_data}
- 
+  
   We obtain reasonable predictions of the MD simulated MSDs when we
   parameterize AD models with all available data after the perceived
-  equilibration time. The MSD curves generated from both the one and 
-  two mode models are overlayed with the MD simulated MSDs for comparison in
-  Figure~\ref{fig:anomalous_msds}. The associated parameters for the one and two
-  mode models are presented in Figures~\ref{fig:1mode_parameters}
-  and~\ref{fig:2mode_parameters}.
+  equilibration time.   
+  %BJCB: added next two sentences point towards non-stationarity discussion
+  We observe that in some cases, solute trajectories extracted from our MD
+  simulations may display non-stationary behavior. Our brief analysis 
+  in Section~\ref{S-section:msd_comparison} of the Supporting Information 
+  suggests that we may be operating on the border of the minimum amount of
+  data required to accurately parameterize AD approach models.
+  The MSD curves generated from both the one and two mode models are overlaid
+  with the MD simulated MSDs for comparison in Figure~\ref{fig:anomalous_msds}.
+  The associated parameters for the one and two mode models are presented in
+  Figures~\ref{fig:1mode_parameters} and~\ref{fig:2mode_parameters}.
   
   \begin{figure*}
   \centering
@@ -1181,7 +1174,10 @@
 	  transition between tails occurs.
   }\label{fig:anomalous_msds}
   \end{figure*}
-  
+
+  %MRS: some of these discussions might belong in the SI, with just the top line information in the main text.  People don't really care about the details of the individual parameters, just what story that tells.
+  %BJCB: I think the figures need to stay though   
+  %MRSB: Hmm. I'm not entirely convinced, but we can leave it in for now and see what the reviewers think.
   \begin{figure*}
   \centering
   \begin{subfigure}{0.325\textwidth}
@@ -1254,37 +1250,48 @@
   The one and two mode AD models do a fairly good job of predicting the
   magnitude of the MD MSD curves examined up to a 1000 ns time lag. In most
   cases, both the Brownian (sFBMcut) and L\'evy (sFLMcut) versions of both the
-  one and two mode AD models give very similar results, most likely because
-  their $\alpha_h$ parameter values are relatively close to 2, meaning the hop
-  length distributions are nearly Gaussian even when fit to a more general
-  L\'evy distribution. 
+  one and two mode AD models give very similar results, 
+  %most likely because
+  %their $\alpha_h$ parameter values are relatively close to 2, meaning
+  because  
+  the hop length distributions are nearly Gaussian even when fit to a more general
+  L\'evy distribution ($\alpha_h \sim 2$). 
   
+  % BJCB: I'm not sure I want to move this paragraph because I think the curvature
+  % is important to discuss and I mention its implications in the conclusion
   The deviation between the one mode MSD predictions and MD are primarily due
   to differences in their curvature at long time lags. The shape and magnitude
   of the predicted curves appears accurate relative to MD at short time lags.
   However, the modeled trajectories undershoot the mean MD MSD as the time lag
-  increases. As discussed in the previous section, long time positional
-  anti-correlation, on the order of hundreds of ns, may not exist in the MD
-  system. Eventual loss of correlation would result in a shift from sub-linear
-  to linear MSD behavior, as observed in the MD trajectories. Acetic acid
-  exemplifies this point. At first glance, acetic acid's predicted MSD appears
-  to match the curvature of MD quite well, but closer examination reveals that
+  increases. Long time positional anti-correlation, on the order of hundreds of
+  ns, may not exist in the MD system. Eventual loss of correlation would result 
+  in a shift from sub-linear, or subdiffusive, to linear, or diffusive, MSD behavior, as observed in the MD 
+  trajectories. Acetic acid exemplifies this point. At first glance, acetic acid's
+  predicted MSD appears to match the curvature of MD quite well, but closer 
+  examination reveals that
   the MD MSD curve may actually shift from a sub-linear to a linear regime around
   500 ns.
   
+  % BJCB: I might be able to get away with moving this paragraph to SI if I briefly
+  % mention the reason in the above paragraph.
   The two mode models display curvature more consistent with MD but for
   non-physical reasons. Every time a switch between the pores and tails occurs,
-  the width of the distribution used to model hops changes. We are unaware of
-  an appropriate technique which can correlate hops that come from different
-  hop distributions, therefore every time a mode switch occurs, the correlation
-  structure is broken. Solutes that switch between modes the least show
+  the width of the distribution used to model hops changes, and the correlation structure is broken. 
+  %MRSB: I cut below.
+  %We are unaware of
+  %an appropriate technique which can correlate hops that come from different
+  %hop distribution every time a mode switch occurs, the correlation
+  %structure is broken. 
+  Solutes that switch between modes the least show
   predicted MSDs with the greatest curvature. Due to the much larger
   accessible volume that a smaller molecule has, methanol spends $>90\%$ of its
   time in the hydrophobic tails (see Figure~\ref{fig:AD_mode_occupation}), so
   mode transitions are relatively rare and the predicted MSDs have significant
-  curvature. This artificially solves the problem of long timescale
-  correlation, however we do not recommend this as it has no physical basis.
+  curvature. This artificially resolves the problem of long timescale
+  correlation, however, it has no physical basis.
   
+  %MRS: this paragraph below may be the sort of summary of the models that would
+  %go in the main text, with the details in the SI.
   The model parameters for the one and two mode models tell stories about each
   solute's behavior that help explain the difference between the MSDs of
   different solutes. Higher values of $\sigma$ and lower values of $\alpha_h$
@@ -1296,10 +1303,12 @@
   degree of negative correlation between hops. All of these changes in physical
   behavior contribute to an overall increase in the predicted MSD.
 
+  %BJCB: maybe move the next two paragraphs to the SI?
+  %MRSB: I think that this is more useful in the main text, since it connects models to the simulations and the physics.
   Examining first the parameters of the one mode model, we can begin to break
   down the trends in solute MSDs. The parameters belonging to ethylene glycol
   and methanol are relatively similar, which is consistent with their similar MD
-  MSDs and qualitatively similar MD timeseries.
+  MSDs and qualitatively similar MD time series.
   Relative to ethylene glycol, methanol tends to stay trapped for less
   time and takes larger hops but the most substantial difference is with
   respect to their Hurst parameters. Methanol has the lowest $H$ of all the
@@ -1337,11 +1346,6 @@
   occasionally slip through gaps in the tails. Meanwhile, methanol is small
   enough that it does not need to make larger jumps to escape traps.
 
-  %MRS10: A thought going through this - a diagram with a picture of
-  %the molecule pointing to features that promote certain behavior
-  %would be interesting here.  I would suggest waiting until we get
-  %reviews back, though.  You should get this submitted.
-
   Overall, the AD approach does a reasonable job of predicting solute MSDs and
   its parameters can help us further understand solute dynamics. Hops appear to
   be well modeled as anti-correlated draws from either Gaussian or L\'evy
@@ -1367,7 +1371,7 @@
   Solute size and chemical functionality influence which states are visited
   most frequently.  In Figure~\ref{fig:state_probabilities}, we plotted the
   probabilities of occupying a given state at any time. Solutes tend to favor
-  the same types of interactions independent of which region they are in.  We
+  the same types of interactions independent of which region they are in. We
   can relate these interactions to solute chemical functionality and use that
   intuition to hypothesize new designs for LLC monomers which control the
   transport rate of specific solutes.
@@ -1384,8 +1388,13 @@
 	  associating with sodium ions) independent of whether they are in the
 	  pores or the tails.}\label{fig:state_probabilities}
   \end{figure}
+  
+  % BJCB: I could summarize the four following paragraphs in terms of key
+  % takeaways, like you suggested with the AD model above.
 
-  Urea spends the largest fraction of its time trapped via association with
+  %MRSB: I think people like the physical intuition gained. I added bullet points to aid reading. 
+  \begin{itemize}
+  \item \textit{Urea} spends the largest fraction of its time trapped via association with
   sodium ions. It does so 31\% of the total time while in the tails (state 3)
   and 21\% of the total time while in the pores (state 7). Note that sodium
   does not drift significantly into the tails but sits close to the pore/tail
@@ -1395,7 +1404,7 @@
   transport rate of urea is likely to be most significantly modified by
   removing or changing the identity of the counter-ion.
   
-  Ethylene glycol spends the largest fraction of its time trapped in a hydrogen
+  \item \textit{Ethylene glycol} spends the largest fraction of its time trapped in a hydrogen
   bonded state. It does so 24\% of the total time while in the tails (state 2)
   and 32\% of the total time while in the pores (state 6). The two hydroxyl
   groups of ethylene glycol readily donate their hydrogen atoms to the
@@ -1404,15 +1413,16 @@
   removing hydrogen bond accepting groups from the LLC monomers, especially
   those which stabilize the solute in the tails (i.e. the ether linkages). 
   
-  Methanol spends most of its time unbound in the tail region (state 1) and
+  \item \textit{Methanol} spends most of its time unbound in the tail region (state 1) and
   spends a significant portion of time hydrogen bonded while in the tail
   region. Tail region hydrogen bonds are donated from methanol to the ether
-  linkages between the monomer head groups and tails. One might modify the
+  linkages between the monomer head groups and tails, as well as to the ester groups
+  at the ends of the tails. One might modify the
   rate of methanol transport by controlling its partition into the monomer
   tails. This might be achieved by adding cross-linkable groups near the
   monomer head groups.
   
-  Finally, acetic acid spends the majority of its time hydrogen bonding both in
+  \item \textit{Acetic acid} spends the majority of its time hydrogen bonding both in
   and out of the pore (states 2 and 6). Although it has an unshielded carbonyl
   group in its structure, association with sodium ions in this environment is
   apparently a much weaker interaction than hydrogen bonding.  As with ethylene
@@ -1420,6 +1430,7 @@
   hydrogen bond accepting constituents of the LLC monomer. With this
   modification, we hypothesize that acetic acid might show similar transport
   rates to urea given their structural similarity.
+  \end{itemize}
   
   \subsubsection{Parameters of the MSDDM}\label{section:msddm_parameterization}
 
@@ -1434,36 +1445,39 @@
   We observe correlated emissions drawn from L\'evy stable distributions. The
   deviation of the emission distributions from Gaussian behavior is far more
   pronounced than that seen in the hop length distributions of the previous
-  section. We therefore did not consider the Gaussian case (see
-  Figure~\ref{fig:gaussian_levy_comparison}). The correlation structure
-  between hops is consistent with that of FLM (Figure~\ref{fig:msddm_acf}).
-  The parameters of the L\'evy stable distributions along with their Hurst
-  parameters are visualized in Figure~\ref{fig:msddm_parameters} (and tabulated
-  in the Supporting Information, Table~\ref{table:msddm_params}). 
+  section (see Figure~\ref{S-fig:gaussian_levy_comparison} of the Supporting
+  Information). We therefore did not consider the Gaussian case. The correlation
+  structure between hops is consistent with that of FLM (see 
+  Figure~\ref{S-fig:msddm_acf}). The parameters of the L\'evy stable distributions
+  along with their Hurst parameters are visualized in Figure~\ref{fig:msddm_parameters}
+  (and tabulated in the Supporting Information, Table~\ref{S-table:msddm_params}). 
   
-  \begin{figure*}
-  \centering
-  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{gaussian_levy_comparison.pdf}
-  \caption{}\label{fig:gaussian_levy_comparison}
-  \end{subfigure}
-  % /figures/msddm_acf.py
-  \begin{subfigure}{0.42\textwidth}
-  \includegraphics[width=\textwidth]{msddm_acf.pdf}
-  \caption{}\label{fig:msddm_acf}
-  \end{subfigure}
-  \caption{(a) The emission distributions of hop lengths are non-Gaussian and
-	  heavy-tailed. Shown here is the emission distribution for transitions
-	  between states. The maximum likelihood Gaussian fit severely
-	  underestimates the empirical density of hops near and far from zero
-	  while overestimating the density of hops at intermediate values. (b)
-	  Jumps drawn from the transition distribution are negatively
-	  correlated to each other. The normalized version of
-	  Equation~\ref{eqn:flm_autocovariance} fits well to the data
-	  suggesting FLM is an appropriate way to model jumps.}
-	  \label{fig:msddm_emissions}
-  \end{figure*}
-  
+  %BJCA: potentially move this to SI
+  %MRS: seems good.  Again, make sure that the conclusions are referenced in the main text. 
+%  \begin{figure}
+%  \centering
+%  \begin{subfigure}{0.49\textwidth}
+%  \includegraphics[width=\textwidth]{gaussian_levy_comparison.pdf}
+%  \caption{}\label{fig:gaussian_levy_comparison}
+%  \end{subfigure}
+%  % /figures/msddm_acf.py
+%  \begin{subfigure}{0.42\textwidth}
+%  \includegraphics[width=\textwidth]{msddm_acf.pdf}
+%  \caption{}\label{fig:msddm_acf}
+%  \end{subfigure}
+%  \caption{(a) The emission distributions of hop lengths are non-Gaussian and
+%	  heavy-tailed. Shown here is the emission distribution for transitions
+%	  between states. The maximum likelihood Gaussian fit severely
+%	  underestimates the empirical density of hops near and far from zero
+%	  while overestimating the density of hops at intermediate values. (b)
+%	  Jumps drawn from the transition distribution are negatively
+%	  correlated to each other. The normalized version of
+%	  Equation~\ref{eqn:flm_autocovariance} fits well to the data
+%	  suggesting FLM is an appropriate way to model jumps.}
+%	  \label{fig:msddm_emissions}
+%  \end{figure}
+
+  %MRSB: discussion of parameter specifics is a potential place to move.
   \begin{figure*}
   \centering
   \begin{subfigure}{0.325\textwidth}
@@ -1502,7 +1516,7 @@
   highly anti-correlated as indicated by their consistently low Hurst
   parameters. There is a weak negative trend in the Hurst parameter values as
   the number of simultaneously influencing trapping mechanisms increases
-  (Figure~\ref{fig:H_v_state}).  The Hurst parameters for transitional (T)
+  (Figure~\ref{fig:H_v_state}). The Hurst parameters for transitional (T)
   emissions are up to 18 times higher than emissions from trapped states. The
   value of $\alpha_h$ for transition emissions is also relatively low giving
   higher probabilities to larger hops.
@@ -1584,10 +1598,6 @@
   second reason is a consequence of using a single hop length distribution for
   transitions. This was necessary because we could not collect enough data to
   fit all of the possible transition distributions and because we could not
-  %MRS10: my feeling is (to keep in the back of the mind) that we may be able to add some sort of 
-  %prior to fit the transition distributions. Lots of distributions can be fit with low amounts of data
-  %if one makes enough assumptions about what the functional form of the distribution is. And we could
-  %presumably come up with something reasonable. But that's for another time. 
   correlate emissions coming from different hop distributions. Many
   transitions occur between two trapped states where the transitional hops are
   actually very small. Our model ignores this physical restriction which can
@@ -1640,8 +1650,8 @@
   performance scales greater than linearly and thus would take an infeasible
   amount of memory and time to simulate transport through a pore over 100 times
   longer. One could improve performance significantly by simulating less
-  trajectories. In Figure~\ref{fig:flux_curve_sensitivity} of the Supporting Information,
-  we determined that one can simulate as few as 100 sFBMcut
+  trajectories. In Figure~\ref{S-fig:flux_curve_sensitivity} of the Supporting
+  Information, we determined that one can simulate as few as 100 sFBMcut
   realizations in order to parameterize Equation~\ref{eqn:flux_decay}. For
   better precision, we recommend simulating at least 1000 realizations.
   However, even with an order of magnitude decrease in number of trajectories,
@@ -1674,12 +1684,12 @@
   \caption{(a) The distributions of first passage times generated from the
 	  sFBMcut model fit well to Equation~\ref{eqn:passage_times}. We show
 	  similar fits for the remaining solutes in
-	  Figure~\ref{fig:ad_fpt_fits} of the Supporting Information. (b) The
+	  Figure~\ref{S-fig:ad_fpt_fits} of the Supporting Information. (b) The
 	  single particle flux measured by the sFBMcut AD model decays with
 	  increasing pore length. The rankings of solute fluxes are consistent
 	  with the MSDs predicted by each model. We fit the single particle
 	  solute flux versus pore length, $L$, to a power law function of the
-	  form $AL^{-\beta}$ (dashed lines in (b) and (c)). 
+	  form $AL^{-\beta}$ (dashed lines). 
   }\label{fig:flux_curves}
   \end{figure*}
 
@@ -1687,7 +1697,7 @@
   anti-correlation between solute hops. In Figure~\ref{fig:beta}a, we show that
   $\beta$ is inversely related to the Hurst parameter. This makes intuitive
   sense since higher degrees of anti-correlation should slow the rate at which
-  solutes cross the membrane pore. When we remove anti-correlation between
+  solutes cross a membrane pore of a given length. When we remove anti-correlation between
   hops (set $H$=0.5), the length dependence becomes the same for all solutes,
   dropping to a value just below 2. This also implies that hop lengths and
   dwell times do not affect length dependence since each solute exhibits
@@ -1821,8 +1831,11 @@
   
   \section{Conclusions}
   
-  We have tested two different mathematical frameworks for describing solute
-  motion by applying them to an H\textsubscript{II} phase LLC membrane. The
+  We have tested two different mathematical frameworks for
+  %BJCA: rephrase
+  % describing solute motion
+  describing complex solute dynamics
+  by applying them to an H\textsubscript{II} phase LLC membrane. The
   values obtained for the parameters when fitting the models to the time series
   data offer important mechanistic insight on the molecular details of
   transport. Subordinated fractional Brownian and L\'evy motion have a strong
@@ -1830,7 +1843,7 @@
   AD model quantifies and allows comparison of the hopping and trapping behavior
   among solutes. A two mode model that describes dynamics based on whether a
   solute is in or out of the pore region allows us to break down individual
-  solute motion into the two distinct regimes and we showed that solute motion
+  solute motion into two distinct regimes and we showed that solute motion
   is clearly restricted while in the tail region. Our Markov state-dependent
   dynamical model uses explicitly defined trapping mechanisms and gives a nice
   description of transitions between these observed states, the equilibrium
@@ -1856,38 +1869,58 @@
   simulations, the curvature of the predicted MSDs does not appear to be
   consistent with the MD simulations. The MSD curves calculated from MD
   simulations appear to straighten out on long timescales while those predicted
-  AD models continuously curve. This is because pure fractional Brownian motion
-  features hop correlation that persists indefinitely. We may be able to
-  address this by truncating the positional autocorrelation function, allowing
-  correlation to diminish on the 100 ns timescale as suggested by the physical
-  trajectories.
+  from the AD models continuously curve. This is because pure fractional Brownian motion
+  features hop correlation that persists indefinitely.
+  However, it is likely that on longer timescales, hops become decorrelated, 
+  causing solute dynamics to transition from subdiffusive to diffusive behavior.
+  We may be able to incorporate this transition by truncating the positional 
+  autocorrelation function, allowing correlation to diminish on the 100 ns 
+  time scale as suggested by the physical trajectories.
 
-  We demonstrated how one could use the one mode AD model in order to to
+  We demonstrated how one could use the one mode AD model,
+  %BJCA: added
+  or any stochastic time series model,
+  in order to to
   determine macroscopic flux and selectivity. We showed that, when using the AD
   model, solute flux decreases with pore length at a rate faster than pure
-  Brownian motion due to anti-correlation between hops. We used the ratio of
-  solute fluxes generated from each model in order to calculate selectivity.
+  Brownian motion due to anti-correlation between hops.
+  % We used the ratio of
+  % solute fluxes generated from each model in order to calculate selectivity.
   Due to differences in hop anti-correlation, we observe length dependent
   selectivity. Based on these calculations we can hypothesize that this
   particular LLC membrane may be a good candidate for the selective separation
   of ethylene glycol from acetic acid or methanol.
 
-  Despite their shortcomings, our mathematical models help us think about how
-  to design LLC monomers for solute-specific separations by forcing us to think
-  in terms of controlling solute transport. The anomalous diffusion modeling
-  approach is quite flexible because it does not require knowledge of specific
-  trapping mechanisms. Screening a set of solutes and applying the anomalous
-  diffusion approach can help uncover trapping mechanisms by forcing the
-  scientist to identify features common to solutes with long or short hop
-  lengths and dwell times. 
-  The MSDDM is a powerful way to characterize explicit
-  trapping mechanisms. It clearly partitions a trajectory into discrete
-  mechanisms and quantifies their relative dominance in the real system. For
-  example, it is clear that sodium ion association is primarily responsible for
-  trapping urea while hydrogen bonding dominates ethylene glycol. If one
-  re-designs an LLC monomer to eliminate one source of trapping, then 
-  higher selectivities may result. The modeling approaches presented in this paper 
-  facilitate new ways of approaching complex separation problems.
+%  Despite their shortcomings, our mathematical models help us think about how
+%  to design LLC monomers for solute-specific separations by forcing us to think
+%  in terms of controlling solute transport. The anomalous diffusion modeling
+%  approach is quite flexible because it does not require knowledge of specific
+%  trapping mechanisms. Screening a set of solutes and applying the anomalous
+%  diffusion approach can help uncover trapping mechanisms by forcing the
+%  scientist to identify features common to solutes with long or short hop
+%  lengths and dwell times. The MSDDM is a powerful way to characterize explicit
+%  trapping mechanisms. It clearly partitions a trajectory into discrete
+%  mechanisms and quantifies their relative dominance in the real system. For
+%  example, it is clear that sodium ion association is primarily responsible for
+%  trapping urea while hydrogen bonding dominates ethylene glycol. If one
+%  re-designs an LLC monomer to eliminate one source of trapping, then 
+%  higher selectivities may result. The modeling approaches presented in this paper 
+%  facilitate new ways of approaching complex separation problems.
+  
+  In a broader context, it is clear that time series modeling may be a useful way
+  to form a clear connection between complex solute dynamics on the nanosecond 
+  timescale and macroscopic observables. On the nanoscopic scale, one can both 
+  learn and characterize dynamical modes in order to identify areas of potentially
+  impactful molecular-level design changes. For example, it may be possible to 
+  modify solute transport rates and selectivities in LLC membranes by redesigning 
+  the LLC monomers to mitigate or enhance their chemically dependent interactions
+  with different solutes. With these models, dynamics can be propagated onto much 
+  longer time with computational ease. This allows one not only to predict a 
+  macroscopic observable for a specific system, but to explicitly calculate the 
+  effect of perturbations to model parameters that may result from a monomer 
+  design change. Overall, we hope that this work can advance the reader's 
+  understanding of how one can apply time series analysis in order to understand 
+  complex diffusive behavior in any system of interest.
   
 %  \section*{Supporting Information}
 %
@@ -1917,19 +1950,19 @@
   
   \section*{Supporting Information}
   
-  \input si_arxiv.tex
-
+  \input si_arxiv_v2.tex
+ 
   \clearpage
   %\bibliographystyle{apsrev4-2}
   \bibliography{stochastic_transport}
 
   % No TOC image in PRE
-  %\section*{TOC Graphic}
-    
-  %\begin{figure}[!htb]
-  %\centering
-  %\includegraphics[width=3.25in]{toc.pdf}
-  %\end{figure}
+%  \section*{TOC Graphic}
+%    
+%  \begin{figure}[!htb]
+%  \centering
+%  \includegraphics[width=3.25in]{toc.pdf}
+%  \end{figure}
 
 \end{document}
 

@@ -85,7 +85,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \texttt{/analysis/sfbm\_parameters.py}     & 2.2 & Get subordinated fractional Brownian motion parameters by fitting to a solute's dwell and hop length distributions and positional autocorrelation function. \\\hline
   \texttt{/timeseries/ctrwsim.py}            & 2.2 & Generate realizations of a continuous time random walk with the user's choice of dwell and hop distributions \\\hline
   \texttt{/timeseries/forecast\_ctrw.py}     & 2.2 & Combines classes from \texttt{sfbm\_parameters.py} and \texttt{ctrwsim.py} to parameterize and predict MSD in one shot. \\\hline
-  \texttt{/analysis/ Markov\_state\_dependent\_dynamics.py} & 2.3 & Identify frame-by-frame state of each solute, construct a transition matrix and simulate realizations of the MSDDM model. \\\hline
+  \texttt{/analysis/ markov\_state\_dependent\_dynamics.py} & 2.3 & Identify frame-by-frame state of each solute, construct a transition matrix and simulate realizations of the MSDDM model. \\\hline
   \texttt{/timeseries/mfpt\_pore.py}          & 2.4 & Simulate mean first passage time distributions using the AD approach. \\\hline 
   \end{tabular}
 
@@ -291,12 +291,18 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \label{eqn:fbm_autocorrelation}
   \end{equation}  
   
-  In Figure~\ref{fig:hurst_autocorrelation}, we plotted Equation~\ref{eqn:fbm_autocorrelation}
-  for different values of $H$. When $H > 0.5$, Equation~\ref{eqn:fbm_autocorrelation} decays
-  slowly to zero meaning one needs to study large time lags with high frequency in order to
-  accurately estimate $H$ from the data. Fortunately, all of our solutes show anti-correlated
-  motion, so most of the information in Equation \ref{eqn:fbm_autocorrelation} is contained
-  within the first few lags. 
+  There are many methods for estimating the Hurst parameter for a time series.
+  \cite{clegg_practical_2006} It can be a difficult task because 
+  Equation~\ref{eqn:fbm_autocorrelation} decays slowly to zero, especially when 
+  $H > 0.5$, meaning one needs to study large time lags with high frequency.
+  
+  Fortunately, from a mathematical perspective, all of our solutes show anti-correlated
+  motion, so most of the information in Equation~\ref{eqn:fbm_autocorrelation} is contained
+  within the first few time lags. In Figure~\ref{fig:hurst_autocorrelation}, we plotted
+  Equation~\ref{eqn:fbm_autocorrelation} for different values of $H$. When $H > 0.5$, 
+  Equation~\ref{eqn:fbm_autocorrelation} decays slowly to zero meaning one needs to study
+  large time lags with high frequency in order to accurately estimate $H$ from the data. 
+  However, when $H < 0.5$, the autocorrelation function quickly decays towards zero.
 
   % /supporting_figures/hurst_autocorrelation.py
   \begin{figure}
@@ -350,7 +356,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   L\'evy stable distribution has heavy tails which can lead to arbitrarily
   long hop lengths. Our distribution of hop lengths fits well to a L\'evy
   distribution near the mean, but under-samples the tails. In 
-  Figure~\ref{fig:truncation_correction} we compare the empirically 
+  Figure~\ref{fig:truncation_cutoff} we compare the empirically 
   measured transition emission distribution of the MSDDM for urea to its maximum likelihood fit to
   a L\'evy stable distribution. The ratio between the two distributions 
   at each bin is nearly 1 close to the center, indicating a near-perfect
@@ -407,14 +413,26 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   
   \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{truncation_correction.pdf}
-  \caption{We can accurately truncate the marginal distribution of FLM innovations by
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{truncation_correction.pdf}
+  \caption{}\label{fig:truncation_correction}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{hurst_correction.pdf}
+  \caption{}\label{fig:hurst_correction}
+  \end{subfigure}
+  \caption{(a) We can accurately truncate the marginal distribution of FLM innovations by
   applying a correction to the input truncation parameter. We generated FLM sequences
   and truncated the initial L\'evy stable distribution (before Fourier transforming) at 
   a value of 0.5. After correlation structure is added, the width of the distribution 
   of fractional L\'evy noise decreases significantly. We corrected the input truncation
   parameter with our database resulting in a distribution close to the theoretical
-  distribution (black dashed line) with a maximum value close to 0.5.}\label{fig:truncation_correction}
+  distribution (black dashed line) with a maximum value close to 0.5.
+  (b) Correcting the Hurst parameter input to the algorithm of Stoev and Taqqu
+  results in an FLM process with a more accurate correlation structure. We generated
+  sequences with an input $H$ of 0.35. We estimated $H$ by fitting the autocorrelation
+  function. Without the correction, $H$ is underestimated, meaning realizations are 
+  more negatively correlated than they should be. }
   \end{figure}
   
   \subsection{Achieving the right correlation structure}\label{section:flm_correlation}
@@ -440,16 +458,16 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   more negatively correlated. This would result in under-predicted mean squared
   displacements when applying the model.
   
-  % /supporting_figures/demonstrate_hurst_correction.py
-  \begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{hurst_correction.pdf}
-  \caption{Correcting the Hurst parameter input to the algorithm of Stoev and Taqqu
-  results in an FLM process with a more accurate correlation structure. We generated
-  sequences with an input $H$ of 0.35. We estimated $H$ by fitting the autocorrelation
-  function. Without the correction, $H$ is underestimated, meaning realizations are 
-  more negatively correlated than they should be.}\label{fig:hurst_correction}
-  \end{figure}
+%  % /supporting_figures/demonstrate_hurst_correction.py
+%  \begin{figure}
+%  \centering
+%  \includegraphics[width=0.5\textwidth]{hurst_correction.pdf}
+%  \caption{Correcting the Hurst parameter input to the algorithm of Stoev and Taqqu
+%  results in an FLM process with a more accurate correlation structure. We generated
+%  sequences with an input $H$ of 0.35. We estimated $H$ by fitting the autocorrelation
+%  function. Without the correction, $H$ is underestimated, meaning realizations are 
+%  more negatively correlated than they should be.}\label{fig:hurst_correction}
+%  \end{figure}
   
   \newpage
   
@@ -552,21 +570,21 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   
   Figure~\ref{fig:anticorrelated_hops} demonstrates that all solutes exhibit the
   same kind of anti-correlated hopping and trapping behavior.
-  
-  \begin{figure}[h]
+%  
+  \begin{figure}[htb!]
   \centering
   % /figures/distributions_sfbm.py
   \begin{subfigure}{0.3\textwidth}
   \includegraphics[width=\textwidth]{gaussian_levy_comparison_anomalous_URE.pdf}
-  \caption{}\label{fig:hop_distribution_comparison}
+  \caption{}\label{fig:URE_hop_distribution_comparison}
   \end{subfigure}
   \begin{subfigure}{0.3\textwidth}
   \includegraphics[width=\textwidth]{URE_powerlaw.pdf}
-  \caption{}\label{fig:powerlaw}
+  \caption{}\label{fig:URE_powerlaw}
   \end{subfigure}
   \begin{subfigure}{0.3\textwidth}
   \includegraphics[width=\textwidth]{URE_hop_acf.pdf}
-  \caption{}\label{fig:hop_acf}
+  \caption{}\label{fig:URE_hop_acf}
   \end{subfigure}
   \begin{subfigure}{0.3\textwidth}
   \includegraphics[width=\textwidth]{gaussian_levy_comparison_anomalous_GCL.pdf}
@@ -606,15 +624,15 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
   \end{subfigure}
   \caption{Hop length distributions, dwell time distributions and hop autocorrelation functions
   respectively for urea (a-c), ethylene glycol (d-f), acetic acid (g-i), and methanol (j-l).
-  Using urea as an example, (a) the distribution of hop lengths can be fit by a Gaussian in
-  addition to a more general L\'evy stable distribution, though the L\'evy stable distribution
-  does a better job of capturing the heavier tails and increased density near 0. We explore
-  models fit to both distributions, as Gaussian hops are more convenient to model. (b) The 
-  distribution of dwell times is fit well by a power law but it over-estimates the probability
-  density at long dwell times. A power law truncated with an exponential cut-off better
-  describes the probability of long dwell times in our simulations. (c) The hops are negatively
-  correlated to their previous hop. In combination, (a) -- (c) support modeling solutes as either
-  subordinated fractional Brownian or L\'evy motion.
+%  Using urea as an example, (a) the distribution of hop lengths can be fit by a Gaussian in
+%  addition to a more general L\'evy stable distribution, though the L\'evy stable distribution
+%  does a better job of capturing the heavier tails and increased density near 0. We explore
+%  models fit to both distributions, as Gaussian hops are more convenient to model. (b) The 
+%  distribution of dwell times is fit well by a power law but it over-estimates the probability
+%  density at long dwell times. A power law truncated with an exponential cut-off better
+%  describes the probability of long dwell times in our simulations. (c) The hops are negatively
+%  correlated to their previous hop. In combination, (a) -- (c) support modeling solutes as either
+%  subordinated fractional Brownian or L\'evy motion.
   }\label{fig:anticorrelated_hops}
   \end{figure}
   
@@ -965,7 +983,7 @@ Predicting Selectivity in Nanoscale Pores with Time Series Modeling.}
 	  while overestimating the density of hops at intermediate values. (b)
 	  Jumps drawn from the transition distribution are negatively
 	  correlated to each other. The normalized version of
-	  Equation~\ref{M-eqn:flm_autocovariance} fits well to the data
+	  Equation~\ref{M-eqn:flm_autocovariance} of the main text fits well to the data
 	  suggesting FLM is an appropriate way to model jumps.}
 	  \label{fig:msddm_emissions}
   \end{figure}

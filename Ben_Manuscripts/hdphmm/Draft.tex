@@ -1,73 +1,193 @@
-\documentclass{article}
+\documentclass[journal=jpcbfk,manuscript=article]{achemso}
 
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage{subcaption}
-\usepackage[margin=1in]{geometry}
 \usepackage{amsmath} % or simply amstext
 \usepackage{amssymb}
 \usepackage{siunitx}
 \usepackage{booktabs}
 \usepackage[export]{adjustbox}
 \newcommand{\angstrom}{\textup{\AA}}
-\newcommand{\colormap}{jet}  % colorbar to use
 \usepackage{cleveref}
 \usepackage{booktabs}
 \usepackage{gensymb}
 \usepackage{float}
 \usepackage{xr}
-\usepackage{setspace}
-\doublespacing
 %\DeclareUnicodeCharacter{03C9}{$\omega$}
 \externaldocument[S-]{Supporting_Information}
 
 \title{Statistical Inference of Transport Mechanisms and Long Time Scale Behavior from Time Series 
-       of Solute Trajectories in Nanostructured Membranes.}
-
-\author{Benjamin J. Coscia, Christopher P. Calderon, Michael R. Shirts} 
+       of Solute Trajectories in Nanostructured Membranes}
+\author{Benjamin J. Coscia}
+\affiliation{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, CO 80309, USA}
+\author{Christopher P. Calderon}
+\affiliation{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, CO 80309, USA}
+\author{Michael R. Shirts}
+\email{michael.shirts@colorado.edu}
+\affiliation{Department of Chemical and Biological Engineering, University of Colorado Boulder, Boulder, CO 80309, USA}
 
 \begin{document}
 
   \graphicspath{{./figures/}}
   \maketitle
+  
+  \begin{abstract}
 
+  Appropriate time series modeling of complex diffusion on the microsecond time scale
+  can provide a path towards inferring transport mechanisms and predicting bulk properties
+  characteristic of much longer time scales. In this work we apply the infinite hidden 
+  Markov model (IHMM) to solute center-of-mass trajectories generated from long 
+  molecular dynamics simulations in a cross-linked inverted hexagonal phase lyotropic 
+  liquid crystal (LLC) membrane in order to automatically detect and parameterize an unknown 
+  number of distinct latent vector autoregressive dynamical modes. 
+  
+  We group similar solute behavior into clusters, analyze the dynamics characteristic
+  to each cluster and relate them to physical interactions between solutes and the 
+  membrane. This enhancement to our understanding of the diverse range of influential 
+  solute-membrane interactions allows us hypothesize design changes to LLC monomers 
+  aimed towards controlling the rates of solute passage, thus improving the selective 
+  performance of LLC membranes. 
+  
+  Along with parameters of individual states, the IHMM simultaneously infers a transition
+  matrix which allows us to stochastically propagate solute behavior from all of the 
+  independent trajectories onto much longer time scales while still preserving the 
+  qualitative behavior characteristic of the MD trajectories. This affords a direct 
+  connection to important macroscopic observables used to characterize performance like
+  solute flux and selectivity. 
+  
+  Overall, this work provides an effective way to simultaneously identify transport 
+  mechanisms and project complex diffusive behavior on long time scales.  
+   
+  \end{abstract}  
+  
+  
   \section{Introduction}
   
-%  There is a need for highly selective membranes in order to perform efficient 
-%  separations of components of complex aqueous streams.
-%  %MRS2: add some more examples (When you get around to it).
-%  \begin{itemize}
-%    \item Organic micropollutants
-%    \item Desalination and boric acid removal from seawater.
-%    \item While many researchers focus on membrane permeability, we may be 
-%    able to reduce costs of commercial nanofiltration and reverse osmosis with
-%    higher selectivity.~\cite{werber_materials_2016}
-%  \end{itemize}
+  % BJC: Not sure if this should be the first paragraph, or if I could just
+  % delete this paragraph and start with the next one. 
+  There is a need for highly selective membranes in order to perform efficient 
+  separations of the components of complex aqueous streams.
+  \begin{itemize}
+    \item Desalination and boric acid removal from seawater.
+    \item Organic micropollutants
+    \item Hydraulic fracturing flowback water
+    \item Breathable chemical warfare agent barriers
+    \item High purity chemicals
+    \item While many researchers focus on membrane permeability, we may be 
+    able to reduce costs of commercial nanofiltration and reverse osmosis with
+    higher selectivity.~\cite{werber_materials_2016}
+  \end{itemize}
+  
+  The ability to efficiently design novel membrane materials for selective separations would be 
+  greatly enhanced by easily interpretable methods for connecting microscopic fluctuations
+  with macroscopic observables.
+  \begin{itemize}
+  	\item If one could apply molecular dynamics (MD) simulations to explain important
+  	experimental metrics such as solute flux and selectivity in terms of detailed 
+  	chemically dependent solute motion, then we can more easily bridge the disconnect
+  	between theory and application.
+  	%BJC: this could potentially be moved further down
+  	\item There are two main challenges associated with this goal.
+  	%since complex and
+  	%diverse diffusive motion on time scales accessible to molecular simulations prevents
+  	%us from easily relating chemically dependent solute motion to experimental time scales.
+  	\item First, we need a simple way to identify and parameterize the fluctuations
+  	characteristic to dominant solute-membrane interactions.
+  	\item Second, we need a way to propagate this behavior far beyond the time scales
+  	afforded by MD.
+  \end{itemize}
+  
+  In this work, we are particularly interested in the design of lyotropic liquid crystal (LLC)
+  monomers, a class of amphiphilic molecules whose ordered self-assembled phases can be 
+  cross-linked into mechanically strong membranes capable of highly selective separations.
+  \begin{itemize}
+  	\item Inverted hexagonal, H\textsubscript{II}, phase LLC membranes are characterized
+  	by hexagonally packed, uniform-sized and straight pores, an ideal geometry for high 
+  	throughput transport.
+	\item Their pores are lined with the LLC monomer functional groups which can
+	potentially be designed to interact with solutes in a chemically-specific manner.
+	\item It would be extremely useful to experimentalists if we could connect LLC monomer
+	design with measurable quantities.
+  \end{itemize}
+  
+  We have already progressed our understanding of LLC monomer design in our previous work
+  by building stochastic time series models based on the chemical intuition gained
+  from qualitative MD studies of solute transport in an H\textsubscript{II} phase LLC
+  membrane.~\cite{coscia_chemically_2019,coscia_capturing_2020}
+  \begin{itemize}
+    \item We identified three classes of trapping behavior which result in short time scale
+    subdiffusion.
+    \item In our first approach to stochastically model this behavior, we treated the
+    system's dynamics as a sequence of anti-correlated hops between power law distributed
+    periods of entrapment, a framework called subordinated fractional Brownian or L\'evy
+    motion.
+    \item In a second approach, we treated solute motion as a Markov state model with 
+    state-dependent dynamics, where we parameterized the state transition probabilities 
+    between each of eight discrete states, defined by the observed trapping mechanism, 
+    as well as the solute dynamics within each of these states. 
+    \item We showed how one could use realizations of any stochastic model like these in
+    order to predict macroscopic flux and selectivity. 
+  \end{itemize}
+  
+  Although powerful and insightful, our previous work required considerable human effort
+  in order to analyze the MD trajectories and to hypothesize stochastic models which
+  matched the behavior of solutes.
+  \begin{itemize}
+    \item It would be significantly more useful and broadly applicable if we could 
+    design an approach which automatically distinguishes and parameterizes varied solute 
+    dynamics and leaves a facile way to generate an ensemble of stochastic trajectory
+    realizations that can be used to predict macroscopic transport properties.
+  \end{itemize}
+  
+  In this work we attempt to minimize human effort by applying the infinite hidden 
+  Markov Model (IHMM)~\cite{beal_infinite_2002,calderon_inferring_2015}, a nonparameteric 
+  Bayesian classification technique, in order to automatically detect and infer the 
+  parameters of an unknown number of latent vector autoregressive (VAR) modes present 
+  in solute center-of-mass time series trajectories. 
+  \begin{itemize}
+    \item The IHMM has not been used much for MD trajectory analysis.
+    \item It's been used extensively for speaker diarization and has found some application
+    in single particle trajectory analysis.
+  \end{itemize}
+  
+  We aim to address two primary scientific 
+  questions with this work. 
+  %BJC: this may be redundant from the second paragraph. Maybe better suited here?
+  First, we want
+  to know if the IHMM algorithm can help researchers efficiently uncover underlying
+  transport mechanisms which give rise to different solute dynamical behavior.
+  Second, we want to evaluate the ability of our model to reproduce solute trajectories
+  in a stochastic manner so that we can use it to predict macroscopic transport 
+  properties which would otherwise require much longer MD simulations.
+  
+  We use the parameters of the states identified by the IHMM in order to infer 
+  dominant solute-membrane interactions and transport mechanisms. We cluster similar 
+  state parameters in order to reduce the state space and to understand which segments 
+  of the solute trajectories exhibit similar behavior. We support our mechanistic 
+  hypotheses via quantitative comparison to various physical membrane properties and
+  solute-membrane interactions.
+  
+  Finally, we use the VAR parameters and state transition probability matrix in
+  order to generate stochastic trajectory realizations with behavior similar to that
+  exhibited by MD. 
+  \begin{itemize}  
+    \item One can project these realizations onto much longer timescales with 
+    computational ease and use them to predict macroscopic properties.
+  \end{itemize}
+  
+%  Because independent solute trajectories generated by MD simulations share 
+%  similar state dynamics, we can use the IHMM to generate stochastic trajectory 
+%  realizations which sample from all behavior exhibited by MD. We verify that our
+%  stochastic realizations reproduce the expected hopping and trapping behavior 
+%  exhibited by MD. We quantitatively validate these trajectories by comparing 
+%  their mean squared displacement (MSD) to those measured by MD.
+
 %
 %%  \noindent Amphiphilic molecules are capable of self-assembling into ordered nanostructures.
 %%  \begin{itemize}
 %%    \item 
 %%  \end{itemize}
-%
-%  Lyotropic liquid crystals (LLC) are a class of amphiphilic molecules whose ordered phases
-%  can be cross-linked into mechanically strong membranes capable of highly selective
-%  separations.
-%  \begin{itemize}
-%    \item The shape of the LLC monomers and water content dictates the ordered phase 
-%    that they form. There are two phases of particular interest for membrane applications.
-%  	\item H\textsubscript{II} phase lyotropic liquid crystals are characterized by 
-%  	hexagonally packed, straight, pores while the Q\textsubscript{I} phase consists of
-%  	a tortuous network of 3D interconnected pores. 
-%  	\item In both cases the pores are uniform in size with radii on the order of 1 nm
-%    %MRS2: is it really a molecular weight cutoff?
-%    %BJC2: is molecular size better? Obviously there are other factors like shape, but I don't want to get into that
-%  	giving them a very strict molecular size cut-off.
-%	\item Additionally, they have the potential to disrupt conventional membrane separation
-%	techniques by being selective based not only on size and charge, but on chemical
-%	functionality as well.
-%	\item Their pores are lined with LLC monomer functional groups which can potentially
-%	be designed to interact with solutes in a chemically-specific manner
-%  \end{itemize}
 %
 %  There are limits to what we can learn from experiment about LLC membrane design.
 %  \begin{itemize}
@@ -97,68 +217,17 @@
 %    %MRS2: would be good to get this next point into the first line of a paragraph, since it's quite important. 
 %    \item However, if we use descriptive stochastic models that can capture solute
 %    dynamics, then we could project long timescale behavior in addition to gaining
-%    a deeper understanding of solute behavior on short timescales.
+%    a deeper understanding of solute behavior on short timescales. 
 %  \end{itemize}
-  
-  %%%%%%%%%%%%%%%%%%%%%%%% Thesis chapter starts here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
-  In our previous study, we designed two different approaches which used
-  solute time series in order to parameterize stochastic models that could be used
-  to project transport on much longer timescales. In our first approach we modeled 
-  solute trajectories as subordinated fractional Brownian and L\'evy motion, called
-  the anomalous diffusion (AD) model. We generated solute trajectories by generating
-  a series of anti-correlated hops separated by random periods of entrapment drawn 
-  from a power law distribution. Our second approach treated solute motion as a Markov
-  state model with state-dependent dynamics, called the Markov state-dependent dynamical
-  model (MSDDM). We parameterized the state transition probabilities between
-  each of eight discrete states as well as the solute dynamics within each of these
-  states. We generated stochastic trajectory realizations by drawing a state
-  sequence based on the transition probability matrix and incorporating the state dynamics
-  while solutes were trapped in each state.
-  
-  Although both models had reasonable success at predicting solute mean squared 
-  displacements (MSDs) on MD simulation timescales, they had shortcomings.
-  The MSDDM failed to reproduce the hopping and trapping behavior that
-  characterizes solute center-of-mass trajectories in our MD simulations.
-  The AD model did not suffer this qualitative shortcoming, but the persistent 
-  curvature of the predicted MSD curves suggested that the model might 
-  underestimate MSDs on long timescales. The formulation of both models required
-  careful examination and characterization of the interactions and dynamics exhibit
-  by MD trajectories which required considerable human effort.
-  
-  In this work we attempt to minimize human effort by applying the infinite hidden 
-  Markov Model (IHMM)~\cite{beal_infinite_2002,calderon_inferring_2015}, a nonparameteric 
-  Bayesian classification technique, in order to automatically detect and infer the 
-  parameters of an unknown number of latent autoregressive (AR) modes present in solute
-  center-of-mass time series trajectories.
-  We aim to address two primary scientific questions with this work. First, we want
-  to know if the IHMM algorithm can help researchers efficiently uncover underlying
-  transport mechanisms which give rise to different solute dynamical behavior.
-  Second, we want to evaluate the ability of our model to reproduce solute trajectories
-  in a stochastic manner so that we can use it to predict macroscopic transport 
-  properties which would otherwise require much longer MD simulations.
-  
-  We use the parameters of the states identified by the IHMM in order to infer 
-  dominant solute-membrane interactions and transport mechanisms. We cluster similar 
-  state parameters in order to reduce the state space and to understand which segments 
-  of the solute trajectories exhibit similar behavior. We support our mechanistic 
-  hypotheses via quantitative comparison to various physical membrane properties and
-  solute-membrane interactions.
-  
-  Because independent solute trajectories generated by MD simulations share 
-  similar state dynamics, we can use the IHMM to generate stochastic trajectory 
-  realizations which sample from all behavior exhibited by MD. We verify that our
-  stochastic realizations reproduce the expected hopping and trapping behavior 
-  exhibited by MD. We quantitatively validate these trajectories by comparing 
-  their mean squared displacement (MSD) to those measured by MD.
     
   \section{Methods}
     
   We ran all MD simulations and energy minimizations using GROMACS 2018.
   ~\cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008}  
-  Our python implementation of the IHMM algorithm is available online at 
+  Our python implementation of the IHMM algorithm is available online at \\
   \texttt{https://github.com/bencoscia/hdphmm}. All other post-simulation 
-  trajectory analysis tools are available online at \texttt{https://github.com/shirtsgroup/LLC\_Membranes}.
+  trajectory analysis tools are available online at
+  \texttt{https://github.com/shirtsgroup/LLC\_Membranes}.
 
   \subsection{Molecular Dynamics Simulations}
 
@@ -242,32 +311,36 @@
   call it $A$. We used a matrix-normal inverse-Wishart prior on parameters $A$ and 
   $\Sigma$ and a Gaussian prior on $\mathbf{c}$ in order to infer their 
   values.~\cite{fox_nonparametric_2009}
-  
-  %Based on the algorithms developed by Fox et al.~\cite{fox_sticky_2007}, 
-  Using the IHMM framework, we estimated the most likely number and sequence of hidden
-  states in each solute center-of-mass trajectory while simultaneously inferring VAR(1)
+   
+  Using the IHMM framework, we estimated the most likely sequence of hidden states in
+  each solute center-of-mass trajectory while simultaneously inferring VAR(1)
   parameters for each state and the overall state transition probability matrix, $T$.
   We created a python implementation of this process which we heavily adapted from
-  the MATLAB code of Fox et al.~\cite{fox_sticky_2007} Parameter estimation is iterative. 
+  %BJC: fox_bayesian is citation Emily Fox asked me to use.
+  the MATLAB code of Fox et al.~\cite{fox_bayesian_2010} Parameter estimation is iterative. 
   Therefore, we looked for convergence of each entry in the $\mathbf{c}$ vector as well
   as the $A$ and $\Sigma$ matrices of Equation~\ref{eqn:var}. We detected equilibration 
   of the parameters using the module \texttt{pymbar.timeseries.detect\_equilibration}~\cite{chodera_simple_2016} on
   the time series of parameter estimates. Plots illustrating parameter convergence are 
-  available in Section~\ref{S-section:convergence} of the Supporting Information. We refer the interested reader to 
-  much more extensive descriptions of the inference and sampling procedures used to 
-  estimate the VAR(1) parameters and the state sequence. ~\cite{beal_infinite_2002,teh_hierarchical_2006,van_gael_beam_2008,fox_nonparametric_2009,fox_bayesian_2010}
+  available in Section~\ref{S-section:convergence} of the Supporting Information. We 
+  refer the interested reader to much more extensive descriptions of the inference and 
+  sampling procedures used to estimate the VAR(1) parameters and the state sequence. ~\cite{beal_infinite_2002,teh_hierarchical_2006,van_gael_beam_2008,fox_nonparametric_2009,fox_bayesian_2010}
 
+  %BJC: This paragraph could probably be cut down quite a bit. Leave justification for SI
   We carefully applied the IHMM algorithm in a way which takes advantage of the
-  system's cylindrical symmetry. There are a number of viable ways in which one 
-  could choose to analyze these time series. We could use all 3 dimensions straight
-  from the output trajectory. We could use just the $z$ dimensional coordinate 
-  since we are primarily interested in through-plane membrane transport. Ultimately, 
+  system's cylindrical symmetry. While there
+  %There 
+  are a number of viable ways in which one could choose to analyze these time series,
+  %BJC: cutting down on verbosity
+  % We could use all 3 dimensions straight
+  %from the output trajectory. We could use just the $z$ dimensional coordinate 
+  %since we are primarily interested in through-plane membrane transport. Ultimately, 
   we chose to use a multi-step procedure that we believe adequately distinguishes 
   every type of distinct dynamical behavior exhibited by the solutes. The final
   parameterization of the model is in cylindrical coordinates since each pore is a
   cylinder where we expect solutes to exhibit radially symmetric dynamics. We 
-  present a step-by-step demonstration of our procedure in Section~\ref{S-section:ihmm_procedure}
-  of the Supporting Information.
+  present a step-by-step demonstration of the procedure that follows in 
+  Section~\ref{S-section:ihmm_procedure} of the Supporting Information.
   
   We start by applying the IHMM algorithm to the 3D solute center-of-mass coordinate 
   trajectories transformed relative to the closest pore center. We tracked the solute's
@@ -304,27 +377,20 @@
   similar states which we would prefer to stay separated before clustering.
   Note that the states identified by the IHMM are heavily influenced by 
   the Gaussian prior placed on $\mathbf{c}$ in Equation~\ref{eqn:var}. 
-  In Section~\ref{S-section:prior_guesses} of the Supporting Information we outline our method for 
-  choosing reliable prior parameters. The entries of $A$ and $\Sigma$ do 
-  not vary over a wide range, so the final parameters were relatively insensitive
-  to their priors.
+  In Section~\ref{S-section:prior_guesses} of the Supporting Information we 
+  outline our method for choosing reliable prior parameters. 
+%  The entries of $A$ and $\Sigma$ do 
+%  not vary over a wide range, so the final parameters were relatively insensitive
+%  to their priors.
 
   We ran 2000 iterations of the IHMM procedure in order to arrive at converged 
   state sequences. We evaluated the convergence of the state sequence based on
-  the convergence of the VAR parameters. The parameters of each states
+  the convergence of the VAR parameters. The parameters of each state
   generally converge within 500--1000 iterations. However, the boundaries of 
   each state segment fluctuate which can lead to high variance in the $A$
   and $\Sigma$ parameters in segments with a relatively low number of emissions.
   In these cases, the mean in each dimension tends to be a more reliable indicator of
   convergence (see Figure~\ref{S-fig:convergence3d} of the Supporting Information).
-
-  We defined the finalized parameters of each state as the average of the 
-  parameters from each iteration recorded after the equilibration time point.
-  We found the equilibration time point of each component of the $\mathbf{c}$ 
-  vector as well as $A$ and $\Sigma$ matrices, and then used the longest 
-  equilibration time of all dimensions as the equilibration time point.
-%  Further details are available in Section~\ref{S-section:convergence} of
-%  the Supporting Information.
   
   We reparameterized the time series, preserving the state sequence, in terms
   of the radial and axial coordinates ($r$, $z$) because $x$ and $y$ aren't 
@@ -338,6 +404,22 @@
   %However, note that the uncertainty in their
   %estimates are a function of the number of data points used in their estimate.
   
+  We defined the finalized parameters of each state as the average of the parameters 
+  from each iteration recorded after the equilibration time point. We found the 
+  equilibration time point of each component of the $\mathbf{c}$ vector as well as 
+  $A$ and $\Sigma$ matrices, and then used the longest equilibration time of all 
+  dimensions as the equilibration time point. 
+  
+  %BJC: I'll need to expand on this a bit to make it clear. Talk about the bootstrapping etc.
+  Finally, we generated stochastic trajectory realizations using the finalized
+  parameter sets. We drew state sequences with transition probabilities given by
+  $T$. While in a given state, we simulated motion according to the VAR(1)
+  parameterization of that state. After each state transition, we reset the 
+  unconditional mean of each state based on the particle's position immediately
+  before the state transition occurred.
+  
+  \subsection{Parameter Clustering}\label{method:clustering}  
+  
   We clustered like parameter sets in order to reduce the state space to
   a more easily interpretable size. For each solute studied, we identified 200-325
   independent states, each with separate VAR(1) parameters. Many of these states
@@ -347,32 +429,41 @@
   We reduced the parameter space used agglomerative clustering, a hierarchical
   clustering approach which uses a linkage criteria in order to successively merge
   similar clusters until a desired intracluster distance threshold or number of
-  clusters is reached.~\cite{pedregosa_scikit-learn_2011} We used the Ward linkage criteria, which works to minimize 
-  the sum of the squared differences within all clusters.~\cite{ward_hierarchical_1963}
-    %MRS6: explain why Ward (make the cluster as minimally disperse?)
-   	%BJC6: I'll add some plots to the SI and then write a better justification for
-	% the paper. This is lower priority in mind for the thesis.
-  We elected to choose the number of clusters rather than the distance threshold.
-  For our data, non-parametric methods such as Bayesian Gaussian mixture models~\cite{pedregosa_scikit-learn_2011,gelman_bayesian_2013} tend
-  to delocalize the clusters in parameter space (see Section~\ref{S-section:agglomerative}
+  clusters is reached.~\cite{pedregosa_scikit-learn_2011} We used the Ward linkage 
+  criteria, which works to minimize the sum of the squared differences within all
+  clusters.~\cite{ward_hierarchical_1963} We elected to choose the number of clusters
+  rather than the distance threshold. For our data, non-parametric methods such as 
+  Bayesian Gaussian mixture models~\cite{pedregosa_scikit-learn_2011,gelman_bayesian_2013}
+  tend to delocalize the clusters in parameter space (see Section~\ref{S-section:agglomerative}
   of the Supporting Information).
   
-  We clustered based on the two diagonal entries of $A$ and $\Sigma$ as well as the
-  radial means, $\mu_r$, for a total of 5 variables. One can choose alternative clustering
-  features, such as the eigenvalues of the $A$ and $\Sigma$ matrices, but we chose their 
-  diagonals because they can be easily translated to solute behavior. The diagonals of $A$
-  describe the correlation between sequential hops while the diagonals of $\Sigma$ describe
-  the size of the hops in each dimension. We assume that cross correlations in the parameters
-  are negligible for clustering.
-   
-  We also chose to cluster the diagonals of each matrix and the radial means
-  independently before combining the clusters to assign final state labels. If we divide
-  the total states into $m$ clusters based on the diagonal entries of $A$, $n$ more clusters 
-  based on the diagonal entries of $\Sigma$, and $k$ clusters based on $\mu_r$, then there
-  are a total of $mnk$ possible cluster combinations. This allows slightly more flexibility
-  in the total number of states compared to clustering on all five features at once, since 
-  there can be up to, but not necessarily exactly, $mnk$ states. 
+  We clustered based on the eigenvalues of $A$ and $\Sigma$, the radial means, $\mu_r$, 
+  and the self-transition probabilities, $T_{ii}$, of each state for a total of 6 clustering
+  dimensions. The means in $r$ are likely meaningful since the membrane is inhomogeneous, 
+  transitioning from hydrophilic pores to hydrophobic tails. To cluster on $T_{ii}$, we first
+  cast it in terms of the expected dwell times. The expected value of the number of sequential
+  self-transitions is simply $\frac{1}{1 - T_{ii}}$. This relationship correctly implies that 
+  dwell times approach infinity as $T_{ii}$ approaches 1. There we found the most success with
+  agglomerative clustering by linearizing this relationship and clustering on $-log(1 - T_{ii})$
+  (see Section\ref{S-section:selfT_cluster} of the Supporting Information for a graphical
+  illustration).
   
+%  One can choose alternative clustering
+%  features, such as the eigenvalues of the $A$ and $\Sigma$ matrices, but we chose their 
+%  diagonals because they can be easily translated to solute behavior. The diagonals of $A$
+%  describe the correlation between sequential hops while the diagonals of $\Sigma$ describe
+%  the size of the hops in each dimension. We assume that cross correlations in the parameters
+%  are negligible for clustering.
+%   
+%  We also chose to cluster the diagonals of each matrix and the radial means
+%  independently before combining the clusters to assign final state labels. If we divide
+%  the total states into $m$ clusters based on the diagonal entries of $A$, $n$ more clusters 
+%  based on the diagonal entries of $\Sigma$, and $k$ clusters based on $\mu_r$, then there
+%  are a total of $mnk$ possible cluster combinations. This allows slightly more flexibility
+%  in the total number of states compared to clustering on all five features at once, since 
+%  there can be up to, but not necessarily exactly, $mnk$ states. 
+  
+  %BJC: to be reworked after I have a working procedure.
   Choosing the number of clusters can be somewhat subjective so
   we attempted to add some structure to the selection process by following
   a set of qualitative and quantitative guidelines. We used the silhouette 
@@ -391,33 +482,35 @@
   the solutes in this study showed behavior from 32--36 distinct clusters. While
   this may seem like a high number of states, many are sampled infrequently.
 
-  We remapped the state sequence based on the cluster assignments and generated a
-  state transition probability matrix, $T$. The IHMM algorithm also produces an estimate
-  of $T$, but since we fixed the state sequence, we decided to explicitly calculate $T$ 
-  by counting the number of transitions between states compiled across all trajectories.
-
-  We used the parameter inference component of the IHMM algorithm in order to 
-  infer $A$ and $\Sigma$ of the clustered states.
-   %BJC2: I'm unsure of the precise reasoning here.
-  We could not simply take the mean of the clustered $A$ and $\mathbf{e}_t$ 
-  parameters because it is not clear that this is a linear 
-  operation for this problem. To circumvent this problem, we modified the ($r$,
-  $z$) solute trajectories so that they had a mean of zero, leaving only the 
-  fluctuations. We did this by subtracting the mean from each same-state segment of the 
-  unclustered trajectory. We used the IHMM algorithm on this modified trajectory
-  to infer the clustered state parameters by fixing the clustered state sequence. 
+  We remapped the state sequence based on the cluster assignments and parameterized
+  the clusters using the inference component of the IHMM algorithm. 
+%  generated a
+%  state transition probability matrix, $T$. The IHMM algorithm also produces an estimate
+%  of $T$, but since we fixed the state sequence, we decided to explicitly calculate $T$ 
+%  by counting the number of transitions between states compiled across all trajectories.
+%  We used the parameter inference component of the IHMM algorithm in order to 
+%  infer $A$ and $\Sigma$ of the clustered states.
+%  We could not simply take the mean of the clustered $A$ and $\mathbf{e}_t$ 
+%  parameters because it is not clear that this is a linear 
+%  operation for this problem. To circumvent this problem, 
+  First, we modified the ($r$, $z$) solute trajectories so that they had a mean of zero,
+  leaving only the fluctuations. We did this by subtracting the mean from each 
+  same-state segment of the unclustered trajectory. We used the IHMM algorithm on this
+  modified trajectory to infer the clustered state parameters by fixing the clustered 
+  state sequence. 
   
   We obtained $\mathbf{c}$ vectors of the clustered states by averaging 
   each value of $\mathbf{c}$ assigned to the same cluster. Note that we only care
   about the $r$ component of $\mathbf{c}$ because solute trajectories are not 
   bound in the $z$ direction.
   
-  Finally, we generated stochastic trajectory realizations using the clustered
-  parameter sets. We drew state sequences with transition probabilities given by
-  $T$. While in a given state, we simulated motion according to the VAR(1)
-  parameterization of that state. After each state transition, we reset the 
-  unconditional mean of each state based on the particle's position immediately
-  before the state transition occurred.
+  %BJC:This next paragraph can probably be moved
+%  Finally, we generated stochastic trajectory realizations using the clustered
+%  parameter sets. We drew state sequences with transition probabilities given by
+%  $T$. While in a given state, we simulated motion according to the VAR(1)
+%  parameterization of that state. After each state transition, we reset the 
+%  unconditional mean of each state based on the particle's position immediately
+%  before the state transition occurred.
   
   \subsection{Tools for Exploring Mechanisms}\label{method:interactions}
   
@@ -458,6 +551,9 @@
   $n$ is the number of trajectories.
 
   \section{Results and Discussion}
+  
+  % BJC: It probably makes sense to put the trajectory generation and MSD predictions
+  % first since it will be part of how we justify our clustering choices.
   
   Solutes in this system show a wide range of behavior influenced by the 
   heterogeneity of the membrane's nanostructure as well as the interactions 
@@ -834,6 +930,7 @@
 %  particularly prone to trapping.
 %  BJC6: more complicated than this. I will revisit.
 
+%BJC: will move this earlier
   \subsection{Reproducing MD Trajectories and MSDs with the IHMM}
   
   %BJC5: something we can do for the supporting information to show that this approach is valid: Eliminate nonidealities in our MD trajectories (compared to a pure VAR process) and use toy data to generate trajectories based on some number of states with different parameters. Generate an MSD with those. See if we can reproduce with our model. Can also use this to test new strategies.

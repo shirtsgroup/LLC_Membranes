@@ -38,56 +38,71 @@
 	\newcommand{\ManuscriptTitle}{Capturing Subdiffusive Solute Dynamics and 
 	Predicting Selectivity in Nanoscale Pores with Time Series Modeling}
 	
-	We are submitting ``\ManuscriptTitle'' by Benjamin J. Coscia
-        and Michael R.  Shirts, for consideration for publication as
-        an Article in the Journal of Chemical Theory and
-        Computation. We expect this work to be of significant interest
-        to researchers who study complex transport at the molecular
-        level, as it describes important new approaches for estimating long
-        time scale behavior and bulk transport behavior from shorter
-        molecular trajectories exhibiting anomalous diffusion rather
-        than Brownian motion. Please note that the content of this article
-        %BJC: see if you agree with these changes
-        has been uploaded to arXiv: \href{https://arxiv.org/abs/2004.07905}{https://arxiv.org/abs/2004.07905}.
-        For submission to JCTC, we have made minor changes to the introduction,
-        abstract and conclusion in order to make it more suited for readers of 
-        the journal. We also made efforts to shorten the manuscript by moving 
-        certain discussions and figures to the supporting information. \\
+	We are submitting ``\ManuscriptTitle'' by Benjamin J. Coscia and Michael 
+	R.  Shirts, for consideration for publication as an Article in the Journal
+	of Chemical Theory and Computation. We expect this work to be of significant
+	interest to researchers who study complex transport at the molecular level,
+	as it describes important new approaches for estimating long time scale 
+	behavior and bulk transport behavior from shorter molecular trajectories 
+	exhibiting anomalous diffusion rather than Brownian motion. Please note 
+	that this article has been uploaded to arXiv with differences only in 
+	formatting: \href{https://arxiv.org/abs/2004.07905}{https://arxiv.org/abs/2004.07905}. \\        
+%        Please note that the content of this article
+%        %BJC: see if you agree with these changes
+%        has been uploaded to arXiv: \href{https://arxiv.org/abs/2004.07905}{https://arxiv.org/abs/2004.07905}.
+%        For submission to JCTC, we have made minor changes to the introduction,
+%        abstract and conclusion in order to make it more suited for readers of 
+%        the journal. We also made efforts to shorten the manuscript by moving 
+%        certain discussions and figures to the supporting information. \\
 	
-	In this article, we analyze solute trajectories generated from
-        5$\mu$s molecular dynamics (MD) simulations of an inverted
-        hexagonal (H\textsubscript{II}) phase self-assembled lyotropic
-        liquid crystal (LLC) polymer membrane to parameterize two
-        different stochastic time series approaches capable of
-        predicting solute flux and selectivity on a macroscopic
-        scale. Both approaches quantitatively reproduce the mean
-        squared displacements (MSDs) exhibited by solutes in MD
-        simulations. This is among the first studies to apply time
-        series modeling of molecular simulations in order to infer
-        behavior at long time scales and estimate bulk
-        materials properties with complex anomalous diffusion
-        mechanisms.\\
-
-	This article builds on recent work of ours published in
-        J. Phys. Chem. B where we characterized transport mechanisms
-        exhibited by a series of small polar solutes in an LLC
-        Membrane (Coscia and Shirts \textit{J. Phys.  Chem. B}, 123,
-        6314--6330 (2019)). In this work, we build on the chemical
-        intuition gained from our previous study in order to formulate
-        stochastic models which produce trajectory realizations that
-        share the same dynamical properties as those exhibited by
-        solutes in our MD simulations. We explore two main modeling
-        approaches. First, using anomalous diffusion theory, we
-        parameterize solute motion as subordinated fractional Brownian
-        and L\'evy motion processes, based on the observation that
-        solutes experience a series of dwell times separated by
-        anti-correlated hop lengths. Secondly, we add state-dependent
-        dynamics to standard Markov state modeling approaches, where
-        we model solute motion as a series of transitions between
-        various trapped states, each with different dynamical
-        properties.  Finally, we demonstrate how one can project models 
-        onto macroscopic timescales in order to estimate
-        solute flux and selectivity.\\
+    In this work, we build on the chemical intuition gained from our previous 
+    study (Coscia and Shirts \textit{J. Phys.  Chem. B}, 123, 6314--6330 (2019))
+    in order to formulate two different stochastic time series modeling approaches,
+    %which produce trajectory realizations that share the same dynamical properties as 
+    %those exhibited by solutes in our 5~$\mu$s molecular dynamics (MD) simulations.
+    parameterized from 5~$\mu$s molecular dynamics (MD) simulations, capable of 
+    predicting solute flux and selectivity on a macroscopic scale. 
+    First, using anomalous diffusion theory, we parameterize solute motion as 
+    subordinated fractional Brownian and L\'evy motion processes, based on the 
+    observation that solutes experience a series of dwell times separated by
+    anti-correlated hop lengths. Secondly, we add state-dependent dynamics to 
+    standard Markov state modeling approaches, where we model solute motion as 
+    a series of transitions between various trapped states, each with different
+    dynamical properties. We demonstrate how one can project these models 
+    onto macroscopic timescales in order to estimate solute flux and selectivity.
+    This is among the first studies to apply time series modeling of molecular 
+    simulations in order to infer behavior at long time scales and estimate bulk
+    materials properties with complex anomalous diffusion mechanisms.
+	
+%	In this article, we analyze solute trajectories generated from 5~$\mu$s molecular 
+%	dynamics (MD) simulations of an inverted hexagonal (H\textsubscript{II}) phase self-assembled lyotropic
+%        liquid crystal (LLC) polymer membrane to parameterize two
+%        different stochastic time series approaches capable of
+%        predicting solute flux and selectivity on a macroscopic
+%        scale. Both approaches quantitatively reproduce the mean
+%        squared displacements (MSDs) exhibited by solutes in MD
+%        simulations. This is among the first studies to apply time
+%        series modeling of molecular simulations in order to infer
+%        behavior at long time scales and estimate bulk
+%        materials properties with complex anomalous diffusion
+%        mechanisms.\\
+%
+%	This article builds on recent work of ours published in
+%        J. Phys. Chem. B where we characterized transport mechanisms
+%        exhibited by a series of small polar solutes in an LLC
+%        Membrane (Coscia and Shirts \textit{J. Phys.  Chem. B}, 123,
+%        6314--6330 (2019)).  We explore two main modeling
+%        approaches. First, using anomalous diffusion theory, we
+%        parameterize solute motion as subordinated fractional Brownian
+%        and L\'evy motion processes, based on the observation that
+%        solutes experience a series of dwell times separated by
+%        anti-correlated hop lengths. Secondly, we add state-dependent
+%        dynamics to standard Markov state modeling approaches, where
+%        we model solute motion as a series of transitions between
+%        various trapped states, each with different dynamical
+%        properties.  Finally, we demonstrate how one can project models 
+%        onto macroscopic timescales in order to estimate
+%        solute flux and selectivity.\\
 	
 	%BJC: included phone numbers because it asked to do so in author's guide.
 	\noindent Some suggestions for reviewers are:
@@ -95,15 +110,27 @@
 	
 		\item Francisco Hung has used molecular simulations to study nematic liquid crystals
 		and transport under confinement within various nanostructured materials 
-		(Northeastern University, 617-373-8619,\\ \href{mailto:f.hung@northeastern.edu}{f.hung@northeastern.edu})
+		(Northeastern University, 617-373-8619,\\ \href{mailto:f.hung@northeastern.edu}{f.hung@northeastern.edu}).
 		
 		\item Mahesh Mahanthappa has experience modeling soft materials using molecular dynamics
 		including work on ion transport in various ordered liquid crystalline phases. 
-		(University of Minnesota, 612-625-4599, \href{mailto:maheshkm@umn.edu}{maheshkm@umn.edu})
+		(University of Minnesota, 612-625-4599, \href{mailto:maheshkm@umn.edu}{maheshkm@umn.edu}).
 		
 		\item Stephen Paddison uses various levels of molecular simulation theory to understand
 		proton transport in nanostructured and charged polymer membranes. (The University of Tennessee 
-		Knoxville, 865-974-2026, \href{mailto:spaddison@utk.edu}{spaddison@utk.edu})
+		Knoxville, 865-974-2026, \href{mailto:spaddison@utk.edu}{spaddison@utk.edu}).
+		
+		\item Coray Colina uses various simulation techniques to understand structure-property relations
+		in functional materials including nanoporous materials for separation applications. (University
+		of Florida, 352-294-3488, \href{mailto:colina@chem.ufl.edu}{colina@chem.ufl.edu}).
+		
+		\item Venkat Ganesan uses multiscale modeling to study solute and ion transport in complex
+		nanostructured morphologies in order to learn how to design novel materials. (The University
+		of Texas at Austin, 512-471-4856, \href{mailto:venkat@che.utexas.edu}{venkat@che.utexas.edu}).
+		
+%		\item Ralf Metzler is an expert in anomalous stochastic processes, with interest in the physical
+%		origins of anomalous diffusion as well as the inference of the parameters which govern these
+%		processes. (Universität Potsdam, +49 331 977 5715, \href{mailto:rmetzler@uni-potsdam.de}{rmetzler@uni-potsdam.de}).
 		
 	\end{enumerate}
 	
