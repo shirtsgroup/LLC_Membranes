@@ -44,22 +44,13 @@
   phase lyotropic liquid crystal (LLC) membrane in order to automatically detect a
   variety of solute dynamical states which can be further explained in terms of 
   solute-membrane interactions.
-% order to automatically detect and parameterize an unknown number of
-%  latent vector autoregressive dynamical modes. 
-  %MRS: in above sentence: try to rephrase around the physical information obtained (mechanism or properties) rather than the mathematical route to it.
-  %BJC2: gave a try 
 
-  %MRS: below - it's not the solute behavior, though, it's states identified by them model. Rephrase?
-  %BJC2: I think this is better?
   We group the states identified by the IHMM into clusters based on multiple metrics
   aimed at distinguishing solute behavior based on their fluctuations, dwell times
   in each state and position within the inhomogeneous membrane structure. We analyze
   prevalent clusters in order to relate their parameters to physical interactions between 
-  solutes and the membrane. This enhancement to our understanding of the diverse range 
-  of influential solute-membrane interactions allows us to hypothesize design changes 
-  to LLC monomers aimed towards controlling the rates of solute passage, thus improving 
-  the selective performance of LLC membranes. 
-  
+  solutes and the membrane. 
+
   Along with parameters of individual states, the IHMM simultaneously infers a transition
   matrix which allows us to stochastically propagate solute behavior from all of the 
   independent trajectories onto much longer time scales while still preserving the 
@@ -68,11 +59,13 @@
   solute flux and selectivity. 
   
   Overall, this work provides an effective way to simultaneously identify transport 
-  mechanisms in 
-  %BJC2: porous nanoscale to nanoporous? 
-  %porous nanoscale 
-  nanoporous materials and project complex diffusive behavior on
-  long time scales.  
+  mechanisms in  nanoporous materials and project complex diffusive behavior on
+  long time scales.  This enhancement to our understanding of the diverse range 
+  of solute behavior allows us to hypothesize design changes 
+  to LLC monomers aimed towards controlling the rates of solute passage, thus improving 
+  the selective performance of LLC membranes. 
+  
+
    
   \end{abstract}  
   
@@ -108,7 +101,9 @@
   	constants.\cite{}
   	\item Unfortunately, for systems which exhibit complex subdiffusive dynamics on the
   	time scales accessible to MD simulation, one cannot calculate reliable diffusion 
-  	constants since solute mean square displacements (MSDs) are non-linear.
+  	constants since solute mean square displacements (MSDs) are non-linear 
+        %MRS2: added
+        on timescales accessible to molecular simulation.
   	\item Therefore, we are in need of a more flexible approach for modeling solute 
   	dynamics which makes less assumptions about the solute's average behavior.
   	%BJC2: I'm moving these towards the end
@@ -178,7 +173,7 @@
     %MRS: start with where it has been used before (to establish utility) a
     \item It's been used extensively for speaker diarization and has found some application
     in single particle trajectory analysis.
-    %MRS: Then say it hasn't been used in this context (do we know of any, if not say so).
+    %MRS: Then say it hasn't been used in this context (do we know of any, then cite, if none we have found, say so.)
     \item The IHMM has not been used much for MD trajectory analysis.
 
   \end{itemize}
@@ -249,9 +244,15 @@
   sequence depends, at least in part, on a previous unobserved, latent or hidden,
   state.~\cite{beal_infinite_2002} In the context of our simulations, the observations
   correspond to the center of mass coordinates of the solutes versus time, and the
-  states correspond to the dynamical behavior which give rise to those types
+  states correspond to 
+  % MRS2: added - ``states'' aren't quite ``behavior''
+  segments of the trajectory with similar
+  dynamical behavior which gives rise to those types
   of observations. The probability of transitioning to a state based on the current
-  state is mathematically defined in terms of an $n\times n$ transition probability
+  state is 
+  %MRS2: redundant
+  % mathematically 
+  defined in terms of an $n\times n$ transition probability
   matrix, $T$, where $n$ is the number of states. Unfortunately, standard HMMs 
   require $n$ to be known \textit{a priori}. One can partially overcome this by 
   testing a range of numbers of hidden states and determining which is the best 
@@ -259,6 +260,7 @@
   
   %BJC: I'm not sure how much of this I should include. This is pretty much 
   % a reproduction of Fox et al's explanation: https://ieeexplore.ieee.org/abstract/document/5563110
+  %MRS2: this is fine.
   The infinite-state HMM overcomes this drawback by placing a hierarchical
   Dirichlet process (HDP) prior on the transition probabilities.~\cite{fox_bayesian_2010} Using some 
   base probability distribution, $H$, a Dirichlet process (DP) generates discrete 
@@ -309,8 +311,9 @@
   Using the IHMM framework, we estimated the most likely sequence of hidden states in
   each solute center-of-mass trajectory while simultaneously inferring VAR(1)
   parameters for each state and the overall state transition probability matrix, $T$.
-  We created a python implementation of this process which we heavily adapted from
+  We created a Python implementation of this process which we heavily adapted from
   the MATLAB code of Fox et al.~\cite{fox_bayesian_2010} Parameter estimation is iterative. 
+  %MRS2: give location for the code here where you introduce it.
   Therefore, we looked for convergence of the parameters in Equation~\ref{eqn:var}.
   % each entry in the $\mathbf{c}$ vector as well as the $A$ and $\Sigma$ matrices of Equation~\ref{eqn:var}. 
   We detected equilibration 
@@ -370,7 +373,7 @@
   Therefore, we only ran the inference procedure for 100 iterations. 
   % MRS: hmm. Here the new covariance parameters is redone in r - does there need to be any transformation applied? 
   % MRS: though might be OK, since x^2 + y^2 = r^2 so maybe covariance are additive if x and y uncorrelated (which they should be)
-  
+  % MRS2: As I mentioned before, the issue is if the likelihood for the covariance matrix is properly defined for radial diffusion.  We can check over the equations.  It likely wouldn't change the qualitative results much, but should ne checked.  Would not affect the clustering.
   We defined the final parameters of each state as the mean of the parameters 
   from each iteration recorded after the equilibration time point. We found the 
   equilibration time point of each component of the $\mathbf{c}$ vector as well as 
@@ -389,8 +392,8 @@
   
   \subsection{State Clustering}\label{method:clustering}  
 
-  %MRS: maybe add subsubsections naming/labeling each part of the process so that people have a sense of the steps,
-  %MRS: makes it easier to read.
+  %MRS2: maybe add subsubsections naming/labeling each part of the process so that people have a sense of the steps,
+  %MRS2: makes it easier to read.
   We clustered like parameter sets in order to reduce the state space to
   a more easily interpretable size. For each solute studied, we identified 200-325
   independent states, each with separate VAR(1) parameters. Many of these states
@@ -411,8 +414,13 @@
 
   We clustered based on the eigenvalues of $A$ and $\Sigma$, the radial means, $\mu_r$, 
   and the self-transition probabilities, $T_{ii}$, of each state for a total of 6 clustering
-  dimensions. The means in $r$ are likely meaningful since the membrane is inhomogeneous, 
-  transitioning from hydrophilic pores to hydrophobic tails. To cluster on $T_{ii}$, we first
+  dimensions. The means in $r$ are likely meaningful since the membrane is 
+  %MRS2: added
+  radially inhomogeneous from each pore, 
+  transitioning from hydrophilic pores to hydrophobic tails. 
+  %MRS2: 
+  However, the channels are isotropic in $z$ so we do not cluster on $\mu_z$.
+  To cluster on $T_{ii}$, we first
   cast it in terms of the expected dwell times. The expected value of the number of sequential
   self-transitions is simply $\frac{1}{1 - T_{ii}}$. This relationship correctly implies that 
   dwell times approach infinity as $T_{ii}$ approaches 1. There we found the most success with
@@ -495,7 +503,7 @@
   We measure the local density of the membrane at arbitrary
   points in the unit cell as follows. We histogrammed the positions in three dimensions
   Since our system is in a monoclinic unit cell, we periodically replicated
-  the system in the +/- x, y and z directions and then chose the bounds on the
+  the system in the $\pm$$x$, $y$ and $z$ directions and then chose the bounds on the
   histogram in order to create a rectangular box encompassing the unit cell with
   a 1 nm buffer between the histogram and unit cell boundaries.~\cite{van_der_walt_numpy_2011} We then used a regular
   grid interpolator in order to allow interpolation at arbitrary points within the grid.~\cite{virtanen_scipy_2020} 
@@ -507,7 +515,7 @@
   	\overline{z^2(\tau)} = \dfrac{1}{T - \tau}\int_{0}^{T - \tau} (z(t + \tau) - z(t))^2 dt
   \label{eqn:tamsd}
   \end{equation}
-  where T is the length of the trajectory. We reported 1$\sigma$ confidence intervals 
+  where T is the length of the trajectory. We reported $1 \sigma$ confidence intervals 
   based on the results of 200 bootstrap trials. For each trail, we calculated the mean of 
   $n$ random trajectories chosen with replacement from the pool of trajectories, where 
   $n$ is the number of trajectories.
@@ -591,8 +599,10 @@
   \caption{The MD MSDs (black) of methanol and urea are under-predicted by 
   the IHMM (orange), while the predictions match within uncertainty for ethylene
   glycol and urea.}\label{fig:unclustered_msds}
+  %MRS2: to save space, could consider the graphs in 1x4 across the top, with a single legend (since all have the same), and slightly thicker lines  %There are only 2 lines per plot, so it's not too noisy to be that size
   \end{figure}
   
+  %MRS2: I'd make this a separate subsection ``Deviations of the IMMM from molecular motion'' or something like that.
   \noindent The IHMM under-predicts MD MSD due to its tendency to favor fewer states.\cite{}
   \begin{itemize}
     \item Disjoint segments with similar VAR parameters, but different lengths of 
@@ -674,6 +684,7 @@
   }\label{fig:short_timelags}
   \end{figure}
   
+  %MRS2: reference not working?
   Also apparent from Figure~\ref{fig:unclustered_msd_MET_shortlag} is that the 
   curvature of the MD MSD is far more gradual than that generated by the IHMM.
   \begin{itemize}
@@ -786,7 +797,10 @@
   \end{subfigure}
   %MRS: a lot of this caption test is duplicated from the main text. I would suggest reducing the duplication.
   %BJC: you think better to have more detail in text or in caption?
-  \caption{(a) We can learn a significant amount of detail about solute motion by viewing 
+  %MRS2: at a certain point, it should be in the text.  In the caption, I would just state what the point of the plot is, 
+  % and define the colors/data/etc.  But full explanation would be better in the text. Captions should be scannable quickly,
+  % based on how people process papers, and this should be significantly shorter for readability. 
+ \caption{(a) We can learn a significant amount of detail about solute motion by viewing 
   solute trajectories color-coded according to their clustered dynamical behavior alongside
   plots of the dominant molecular interactions and descriptions of the membrane's local 
   environment. In the plot above, we show the radial and axial coordinates of a single
@@ -813,6 +827,9 @@
   }\label{fig:mechanism_map}
   \end{figure}
 
+  %MRS2: suggest subsubcaptions/italics at the start of parentheses to make it easier for a reader to see the structure.
+  %MRS2: like \textit{hydrogen bonding patterns}: etc.
+
   One can gain useful chemical intuition just by studying plots like
   Figure~\ref{fig:mechanism_map}. It is clear that, for methanol, association 
   with sodium is a much rarer interaction than hydrogen bonding with the 
@@ -829,6 +846,8 @@
   significantly in the $z$ direction from a hydrogen bonded state with the ether 
   linkages to a hydrogen bonded state with a head group in a monomer below it.
 
+  %MRS2: not entirely clear about the purpose of this paragraph? Seems to be just saying it's possible to learn more?
+  %MRS2: should clarify.
   It is clear that there is a wealth of information in these plots, but they don't give
   the complete picture needed in order to formulate LLC membrane design principles. One
   can analyze each segment sequentially and form a clear picture of this instance of 
@@ -914,7 +933,9 @@
   (b) We can begin to understand the solute behaviors demonstrated in (a) by understanding their VAR 
   parameters. States 1 and 2 have higher covariances in both the axial and radial directions compared
   to all other states. This should lead to significant solute displacement. Covariance in each dimension
-  appears to have a strong correlation. States 3--6 all have relatively low covariances, which may
+  appears to have a strong correlation. 
+  %MRS2: correlation with what?
+  States 3--6 all have relatively low covariances, which may
   be characteristic of trapped states. They are primarily distinguished based on the magnitude of their 
   autoregressive coefficients, A, and radial means. Higher values of A imply motion which wanders 
   more about the mean. States 1, 3 and 5 have radial means near 1 nm or less, which suggest that they
@@ -1034,7 +1055,9 @@
   influence solute transport. In Figure~\ref{fig:hbonds_assoc_summary}, we show that
   the solutes donate hydrogen bonds and associate with sodium ions to varying degrees.
   We also show the solute MSDs after a 1000 ns time lag. It is not immediately obvious
-  why the MSDs follow this trend. The states identified by the IHMM shed
+  why the MSDs follow this trend. 
+  %MRS2: be more precise what ``this trend'' is.
+  The states identified by the IHMM shed
   some light on the reasoning.
   
   \begin{figure}
