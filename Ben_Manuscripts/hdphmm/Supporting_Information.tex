@@ -108,32 +108,35 @@
   
   \begin{enumerate}
   	\item Parameterize in $x$, $y$, $z$ coordinates with $x$, $y$ coordinates relative to the nearest
-  	pore center (see Figure~\ref{fig:xyz_hmm}). 	
-  	\item Convert $x$ and $y$ coordinates to radial coordinates, $r$, then fix the state sequence
-  	and use the inference component of the IHMM in order to estimate the parameters in terms
-  	of $r$ and $z$ (see Figure~\ref{fig:rz_hmm}). 	 	
-  	\item Cluster the VAR parameters from the states found in all 24 trajectories. Reassign the state
-  	sequence so that segments which belong to the same cluster are labeled the same across all solute
-  	trajectories.
-  	\item Subtract the mean of each segment, obtained before clustering, in order to zero out the
-  	trajectory.
+  	pore center (see Figure~\ref{fig:xyz_hmm}). 		
+  	\item Cluster the VAR parameters from the states found in all 24 trajectories (See 
+  	Section~\ref{method:clustering} of the main text). Reassign the state sequence so that segments
+  	which belong to the same cluster are labeled the same across all solute trajectories.
+  	\item Zero the trajectories. First, zero out the $y$ dimension by rotating each segment of 
+  	the trajectory, as partitioned before clustering, about the $z$ axis, in order to align the 
+  	mean $xy$ vector with the $x$ axis (see Figure~\ref{fig:y_zeroed}). Then, subtract the mean in
+  	$x$ and $z$ (Figure~\ref{fig:xyz_zeroed}.
   	\item Fix clustered state sequence and infer parameters of each state, assuming a mean of zero
-  	for all states (see Figure~\ref{fig:zeroed_hmm}). 
+  	for all states (see Figure~\ref{fig:zeroed_clustered_hmm}). 
   \end{enumerate}
   
   \begin{figure}
     \centering
-	\begin{subfigure}{0.8\textwidth}
-		\includegraphics[width=\textwidth]{xyz_hmm.pdf}
+	\begin{subfigure}{0.6\textwidth}
+	\includegraphics[width=\textwidth]{xyz_hmm.pdf}
 		\caption{}\label{fig:xyz_hmm}
-	\end{subfigure}  	
-	\begin{subfigure}{0.8\textwidth}
-		\includegraphics[width=\textwidth]{rz_hmm.pdf}
-		\caption{}\label{fig:rz_hmm}
 	\end{subfigure}  
-	\begin{subfigure}{0.8\textwidth}
-		\includegraphics[width=\textwidth]{zeroed_hmm.pdf}
-		\caption{}\label{fig:zeroed_hmm}
+		\begin{subfigure}{0.6\textwidth}
+		\includegraphics[width=\textwidth]{y_zeroed.pdf}
+		\caption{}\label{fig:y_zeroed}
+	\end{subfigure}  	
+	\begin{subfigure}{0.6\textwidth}
+		\includegraphics[width=\textwidth]{xyz_zeroed.pdf}
+		\caption{}\label{fig:xyz_zeroed}
+	\end{subfigure}  		
+	\begin{subfigure}{0.6\textwidth}
+		\includegraphics[width=\textwidth]{zeroed_clustered_hmm.pdf}
+		\caption{}\label{fig:zeroed_clustered_hmm}
 	\end{subfigure}  
 	\caption{IHMM parameterization is a multi-step procedure. In the above plots, distinct colors
 	correspond to distinct state behavior. (a) First we parameterize the trajectories in terms of
