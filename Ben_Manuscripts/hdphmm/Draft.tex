@@ -281,6 +281,7 @@
   %MRS2: give location for the code here where you introduce it.
   %BJC3: I emailed Emily Fox and she just asked me to use this citation. I'm happy to add a 
   %link to where she stores the code. Would that be best in the form of a reference?
+  %MRS3: I was thinking of citing YOUR code here.
   Therefore, we looked for convergence of the parameters in Equation~\ref{eqn:var}.
   We detected equilibration of the parameters using the module \texttt{pymbar.timeseries.detect\_equilibration}~\cite{chodera_simple_2016} 
   on the time series of parameter estimates. Plots illustrating parameter convergence are 
@@ -304,10 +305,11 @@
   motion along the pore axis with the center-of-mass $z$ coordinate. Using the nearest
   pore center as the origin, we represented the radial distance of each solute's 
   center-of-mass from the pore center in 2 dimensions, $x$ and $y$. By working in 
-  Cartesian coordinates, we avoid mathematical complexity introduced by cylindrical 
+  Cartesian coordinates, we avoid mathematical complexity introduced by change of coordinates into cylindrical 
   coordinates while estimating the state sequence.
-  %BJC3: maybe could say something about multivariate guassian noise with VAR in cylindrical doesnt work with current code.
-  
+  %BJC3: maybe could say something about multivariate Gaussian noise with VAR in cylindrical doesn't work with current code.
+  %MRS3: tweaked above, probably OK.
+
   We parameterized each of the 24 solute trajectories independently.
   Although the IHMM is capable of identifying an infinite number of states, 
   a Dirichlet process tends to exhibit a ``rich get richer" effect, favoring
@@ -349,6 +351,8 @@
 %  dimensions as the equilibration time point. 
   
   \subsubsection*{Predicting Mean Squared Displacement}\label{method:realizations}
+
+  %MRS3: I think these belong after clustering.
   
   %BJC3: expanded
   \textit{Generating Stochastic IHMM Trajectory Realizations}: For each independent 
@@ -359,6 +363,7 @@
   mean of the new state to the particle's position immediately before the state 
   transition occurred.
   
+
   %BJC3: this is new, not sure of clarity
   \textit{Calculating MSD}: The MSD reported for each solute measured by our MD 
   simulations is a distribution created from the 24 independent MSD curves. We predicted 
@@ -400,12 +405,16 @@
   We normalized each clustering dimension by its variance and shifted the mean to zero.
   
   To take advantage of the system's cylindrical symmetry, we converted the parameters that
-  are directly related to solute position into cylindrical coordinates before clustering. We 
-  converted the $x$ and $y$ eigenvalues of $\Sigma$ and $A$ as $\lambda_x$ + $\lambda_y$
-  and $\lambda_x^2$ + $\lambda_y^2$ respectively. %BJC3: possibly could use some justification of these definitions. 
-  We obtained means in $r$, $\mu_r$, using the norm of the $x$ and $y$ means, 
-  $\sqrt{\mu_x^2 + \mu_y^2}$. We squared $\mu_r$ for clustering in order to cast it in the
-  same units as $A$ and $\Sigma$.
+  are directly related to solute position into cylindrical coordinates before clustering. 
+  %MRS3: tweaked: 
+  %We converted the $x$ and $y$ eigenvalues of $\Sigma$ and $A$ as $\lambda_x$ + $\lambda_y$
+  We replaced the $x$ and $y$ eigenvalues of $\Sigma$ and $A$ with
+  $\lambda_x$ + $\lambda_y$ and $\lambda_x^2$ + $\lambda_y^2$
+  respectively, which are invariant with rotation around the $z$ axis,
+  in both cases reducing the dimensionality from 3 to 2.  We clustered
+  on squared means in $r$, $\mu_r^2 = \mu_x^2 + \mu_y^2$, rather than
+  $\mu_x$ and $\mu_y$ individually, with the square $\mu_r$ converting
+  it into the same units as $A$ and $\Sigma$.
 
   To cluster on $T_{ii}$, we first cast it in terms of the expected dwell times. The expected
   value of the number of sequential self-transitions is simply $\frac{1}{1 - T_{ii}}$. This 
@@ -447,20 +456,25 @@
 
   \subsubsection*{Obtaining Parameters of Clustered States}
   
-  %BJC3: modified
-  We remapped and fixed the state sequence based on the cluster assignments and
-  parameterized the clusters using the inference component of the IHMM algorithm. 
-  First, we modified the ($x$, $y$, $z$) solute trajectories so that they had a 
-  mean of zero, leaving only the fluctuations. First, we zeroed the $y$ component
-  of the trajectories by rotating the coordinates about the pore axis such that 
-  the mean vector of each separate segment was aligned with the $x$ axis. Next, 
-  we subtracted the means from each separate segment in the $x$ and $z$ dimensions.
-  We used the IHMM algorithm on this modified trajectory to infer the clustered 
-  state parameters by fixing the clustered state sequence. 
+  %BJC3: modified 
+
+  We remapped and fixed the state sequence based on
+  the cluster assignments and parameterized the clusters using the
+  inference component of the IHMM algorithm.  First, we modified the
+  ($x$, $y$, $z$) solute trajectories so that they had a mean of zero,
+  leaving only the fluctuations. Next, we took advantage of the
+  rotational invariance of the system by rotating the
+  coordinates about the pore axis such that the mean vector of each
+  separate segment was aligned with the $x$ axis. Next, we subtracted
+  the means from each separate segment in the $x$ and $z$ dimensions,
+  with the mean in $y$ being zeroed by the rotation.  We used the IHMM
+  algorithm on this modified trajectory to infer the clustered state
+  parameters by fixing the clustered state sequence.
   
   We obtained $\mathbf{c}$ vectors of the clustered states by averaging 
   each value of the rotated $\mathbf{c}$ vectors assigned to the same cluster. Note
-  that we only care about the $x$ and $y$ component of $\mathbf{c}$ because solute 
+  %MRS: tweaked
+  that we only care about the $r=\sqrt{x^2+y^2}$ portion of $\mathbf{c}$ because solute 
   trajectories are not bound in the $z$ direction.
 
   \subsection{Tools for using the Parameterized Model to Explore Mechanisms}\label{method:interactions}
@@ -588,6 +602,7 @@
   %MRS2: I'd make this a separate subsection ``Deviations of the IMMM from molecular motion'' or something like that.
   % BJC3: would these subsubsection headers look better as just italicized and on 
   % the same line as where the next paragraph starts?
+  %MRS3: yes, that's what I'm thinking of.
   \subsubsection*{Deviations of the IHMM from Molecular Motion}
   
   \noindent The IHMM under-predicts MD MSD due to its tendency to favor fewer states.%\cite{}
@@ -1069,7 +1084,7 @@
   %MRS7: is c) methanol?  I thought it wasn't associating with Na+ much.
   %BJC7: looks about 5 %, certainly less than the other. I could add
   % some discussion of this to previous section.
-  %MRS: methanol yellow is hard to see in (b). Maybe add outlines to histogram?  I guess they are, increase alpha or something for yello?
+  %MRS: methanol yellow is hard to see in (b). Maybe add outlines to histogram?  I guess they are, increase alpha or something for yellow?
   %MRS: check consistency of capitalization in legend in (c) 
   \caption{(a) Solutes hydrogen bond and associate with sodium ions
   to different degrees. Sometimes, they participate in both interactions at
@@ -1205,4 +1220,9 @@
 % LocalWords:  nonparametric bayesian solute's reparameterized intracluster ca
 % LocalWords:  delocalize Luzar Chandler histogrammed interpolator methanol's
 % LocalWords:  nanostructure carboxylate VMD nonidealities hbonds outlier GAANN
-% LocalWords:  autogregressive PRF ACS XSEDE ACI
+% LocalWords:  autogregressive PRF ACS XSEDE ACI IHMM nanoporous flowback evy
+% LocalWords:  timescale subdiffusive coscia subdiffusion calderon GROMACS der
+% LocalWords:  berendsen gromacs spoel hess emailed plateauing hmm ne gelman AR
+% LocalWords:  walt numpy GCL URE ACH IMMM subsubsection modT convective vmd Na
+% LocalWords:  scannable subsubcaptions errorbars uncharacteristicness facelift
+% LocalWords:  PSC RMACC hdphmm TOC
