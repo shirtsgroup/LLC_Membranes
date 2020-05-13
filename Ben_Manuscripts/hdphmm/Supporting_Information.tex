@@ -218,43 +218,238 @@
   
   \newpage
   
-  \subsection{Clustering on the self-transition probabilities}\label{section:selfT_cluster}
+%  \subsection{Clustering on the self-transition probabilities}\label{section:selfT_cluster}
+%  
+%  To cluster on $T_{ii}$, we first cast it in terms of the expected dwell times. The expected 
+%  value of the number of sequential self-transitions is simply $\frac{1}{1 - T_{ii}}$. This 
+%  relationship correctly implies that dwell times approach infinity as $T_{ii}$ approaches 1. 
+%  There we found the most success with agglomerative clustering by linearizing this 
+%  relationship and clustering on $-log(1 - T_{ii})$.
   
-  To cluster on $T_{ii}$, we first
-  cast it in terms of the expected dwell times. The expected value of the number of sequential
-  self-transitions is simply $\frac{1}{1 - T_{ii}}$. This relationship correctly implies that 
-  dwell times approach infinity as $T_{ii}$ approaches 1. There we found the most success with
-  agglomerative clustering by linearizing this relationship and clustering on $-log(1 - T_{ii})$.
+  \subsection{Choosing Linkage Criteria and the Number of Clusters}\label{section:nclusters}
   
-  \subsection{Choosing the Number of Clusters}\label{section:nclusters}
+  In this section, we determine the optimal linkage criteria and number of clusters
+  for studying methanol's parameters. We applied the same workflow to make analogous
+  decisions for ethylene glycol, urea and acetic acid. In all cases, we found that
+  the `ward' linkage criteria resulted in the most useful clustering. We chose to 
+  use x number of clusters for each solute, the minimum number of clusters, by our
+  analysis, needed to adequately distinguish state dynamics. 
   
-  \begin{figure}[h]
+  In order to cluster the parameter sets, we need to determine the linkage criteria 
+  that will be used to measure the distance between clusters as well as an appropriate
+  total number of clusters. In Figure~\ref{fig:linkages}, we show the result of clustering
+  with each type of linkage criteria available with the 
+  \texttt{sklearn.cluster.AgglomerativeClustering} class of the \texttt{scikit-learn} 
+  python package. It is clear that both the `average' and `single' linkage criteria 
+  do not sufficiently cluster the data. The `ward' criteria appears to result in the 
+  highest number of large population clusters.
+  
+  \begin{figure}
   \centering
+  \begin{subfigure}{0.24\textwidth}
+  \includegraphics[width=\textwidth]{nclusters_ward.pdf}
+  \caption{`ward'}\label{fig:nclusters_ward}
+  \end{subfigure}
+  \begin{subfigure}{0.24\textwidth}
+  \includegraphics[width=\textwidth]{nclusters_complete.pdf}
+  \caption{`complete'}\label{fig:silhouette_URE}
+  \end{subfigure}
+  \begin{subfigure}{0.24\textwidth}
+  \includegraphics[width=\textwidth]{nclusters_average.pdf}
+  \caption{`average'}\label{fig:nclusters_average}
+  \end{subfigure}
+  \begin{subfigure}{0.24\textwidth}
+  \includegraphics[width=\textwidth]{nclusters_single.pdf}
+  \caption{`single'}\label{fig:nclusters_single}
+  \end{subfigure}
+  \caption{In each column we tested a different linkage criteria for clustering
+  of the methanol parameters. In each row, we varied the number of total clusters. 
+  Both `ward' and `complete' linkage appear to induce clustering
+  while the `average' and `single' criteria tend to concentrate parameters in
+  only a fraction of the available clusters.}\label{fig:linkages}
+  \end{figure}
+  
+  We can help to further narrow our decision of linkage criteria by analyzing 
+  the parameters of the clusters which it produces. In particular, we should 
+  look for well-distinguished clusters on the radial means so that it will be
+  easier to connect solute behavior to the membrane pore structure. One way to
+  concisely visualize the radial clusters is by their spread. An optimal number
+  of clusters should have the same spread in radial means as the unclustered
+  data. In Figure~\ref{fig:rspread}, we show that `ward' linkage results in 
+  the highest spread in the radials means of the clusters across a range of
+  4--30 total clusters. For a low to intermediate number of clusters, the 
+  spread of `ward' clusters is significantly larger than of the other linkage
+  methods. Therefore, we have chosen to use `ward' clustering.
+  
+  We use the Silhouette score in order to aid us in choosing the total number of
+  clusters. In Figure~\ref{fig:silhouette_MET}, we plot the Silhouette score as
+  a function of the total number of clusters using the `ward' linkage criteria. 
+  A Silhouette score of 1 indicates the best clustering possible, values near
+  0 indicate overlapping clusters, and negative values indicate samples belong to
+  the wrong clusters. For the methanol parameters, the Silhouette score drops off
+  quickly with number of clusters before plateauing around 7 total clusters. 
+  However, given the low spread in $\mu_r$, it is not clear that using 7 or less 
+  clusters will give useful clustering results.
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.53\textwidth}
+  \includegraphics[width=\textwidth]{rspread_nclusters.pdf}
+  \caption{}\label{fig:rspread}
+  \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
   \includegraphics[width=\textwidth]{silhouette_MET.pdf}
-  \caption{methanol}\label{fig:silhouette_MET}
+  \caption{}\label{fig:silhouette_MET}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{silhouette_URE.pdf}
-  \caption{urea}\label{fig:silhouette_URE}
+  \caption{(a) The `ward' linkage criteria maintains the highest standard 
+  deviation in radial means, $\mu_r$, of the clusters for a given total 
+  number of clusters as compared to other linkage criteria. (b) The 
+  Silhouette score, used to evaluate the quality of clustering with the 
+  `ward' distance criteria drops precipitously as a function of the chosen
+  total number of clusters before plateauing.}\label{fig:idk}
+  \end{figure}
+  
+  We incorporate qualitative feedback into the decision on the number of 
+  clusters. Despite its high Silhouette score, Figure~\ref{fig:4cluster_state_sequence}
+  illustrates that using 4 clusters clearly does not distinguish dynamical 
+  modes. We do not see visually acceptable clustering on the example trajectory
+  until we use at least twenty total clusters (Figure~\ref{fig:20cluster_state_sequence}).
+  
+  \begin{figure}
+  \begin{subfigure}{0.9\textwidth}
+  \includegraphics[width=1\textwidth]{clustered_traj_MET_ward_4.pdf}
+  \caption{4 total clusters}\label{fig:4cluster_state_sequence}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{silhouette_GCL.pdf}
-  \caption{ethylene glycol}\label{fig:silhouette_GCL}
+  \begin{subfigure}{0.9\textwidth}
+  \includegraphics[width=1\textwidth]{clustered_traj_MET_ward_12.pdf}
+  \caption{12 total clusters}\label{fig:12cluster_state_sequence}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{silhouette_ACH.pdf}
-  \caption{acetic acid}\label{fig:silhouette_ACH}
+  \begin{subfigure}{0.9\textwidth}
+  \includegraphics[width=1\textwidth]{clustered_traj_MET_ward_20.pdf}
+  \caption{20 total clusters}\label{fig:20cluster_state_sequence}
   \end{subfigure}
-  \caption{We used the silhouette score test in order to quantitatively
-  inform our decision on the numbrer of clusters. Silhouette scores 
-  closer to one indicate good clustering. The crosses on the plot indicate
-  our choice in number of clusters after careful consideration of the
-  silhouette scores in conjunction with qualitative examination of the clusters
-  formed by the choice. Although the test often
-  favors fewer states, we elected to use an intermediate number of states in 
-  the cases of $A$ and $\Sigma$ because choosing 2--3 clusters 
-  insufficiently separates the dynamical modes. }\label{fig:silhouette}
+  \caption{Although the Silhouette score for four total clusters is high, we do
+  not see adequate distinction between clusters until we group the parameters
+  from the 24 trajectories into 20 total clusters. When we use 12 total clusters,
+  the distinction appears acceptable except that the segment from ~50--550 ns
+  and from 1200--1500 ns (both colored orange) are clustered together. The radial
+  means of these two segments correspond to two very different morphological
+  regions of the membrane.}\label{fig:clustered_state_sequences}
+  \end{figure}
+  
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{nclusters_msd_MET_ward.pdf}
+  \caption{The total MSD predicted by stochastic realizations of the clustered
+  model is relatively insensitive to the total number of clusters. All
+  predictions are less than the predictions of MD and the unclustered trajectories.
+  This behavior is expected due to underestimation of the short dwell time 
+  densities as described in Section~\ref{M-section:unclustered_MSD_prediction}
+  of the main text.}\label{fig:MET_nclusters} 
+  \end{figure}
+  
+  This clustering analysis will be finished after some mechanistic studies. It is
+  clear that we will need some understanding of mechanisms in order to 
+  arrive at a cluster recommendation.
+  
+%  \begin{figure}[h]
+%  \centering
+%  \begin{subfigure}{0.475\textwidth}
+%  \includegraphics[width=\textwidth]{nclusters_msd_MET_ward.pdf}
+%  \caption{ward}\label{fig:nclusters_msd_MET_ward}
+%  \end{subfigure}
+%  \begin{subfigure}{0.475\textwidth}
+%  \includegraphics[width=\textwidth]{nclusters_msd_MET_complete.pdf}
+%  \caption{complete}\label{fig:nclusters_msd_MET_complete}
+%  \end{subfigure}
+%  \begin{subfigure}{0.475\textwidth}
+%  \includegraphics[width=\textwidth]{nclusters_msd_MET_average.pdf}
+%  \caption{average}\label{fig:nclusters_msd_MET_average}
+%  \end{subfigure}
+%  \begin{subfigure}{0.475\textwidth}
+%  \includegraphics[width=\textwidth]{nclusters_msd_MET_single.pdf}
+%  \caption{single}\label{fig:nclusters_msd_MET_single}
+%  \end{subfigure} 
+%  \caption{}\label{fig:MET_nclusters} 
+%  \end{figure}
+  
+  \subsection{Tips for Reliable State Sequence Identification}\label{section:fitting_tips}
+  
+  The IHMM is quite powerful on its own, but requires some critical thinking by
+  the user in order to ensure maximum effectiveness. One can obtain 
+  the best results with some simple checks and, where necessary, improved 
+  state sequence initialization.
+  
+  The best way to ensure reliable MSD predictions is to ensure proper reproduction
+  of the individual MD MSDs by realizations of the IHMM. Over-predictions and 
+  under-predictions are usually the result of a poorly identified state sequence. (see
+  Figure TBD for example)
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.35\textwidth}
+  \includegraphics[width=\textwidth]{overestimate_ACH_21.pdf}
+  \caption{}\label{fig:msd_overestimate}
+  \end{subfigure}
+  \begin{subfigure}{0.63\textwidth}
+  \includegraphics[width=\textwidth]{state_sequence_before_ACH_21.pdf}
+  \caption{}\label{fig:state_sequence_before}
+  \end{subfigure}
+  \begin{subfigure}{0.35\textwidth}
+  \includegraphics[width=\textwidth]{msd_improvement_ACH_21.pdf}
+  \caption{}\label{fig:msd_improvement}
+  \end{subfigure}
+  \begin{subfigure}{0.63\textwidth}
+  \includegraphics[width=\textwidth]{state_sequence_after_ACH_21.pdf}
+  \caption{}\label{fig:state_sequence_after}
+  \end{subfigure}
+  \caption{(a, b) In some cases, the state segmentation leads to over- or 
+  under-prediction of the MSD, usually due to poor initialization of the state
+  sequence. In (b), state transitions are too frequent and lead to an
+  overprediction of the MD MSD. (c) We can greatly improve MSD predictions by
+  giving the IHMM a good guess at the initial state sequence. (d) A better
+  initial state segmentation via seeding, gives more reasonable estimates
+  of the final state sequence.}\label{fig:improvement_state_sequence}
+  \end{figure}
+  
+  There are two primary approaches we have implemented in order to improve the final 
+  state sequence predictions. Both attempt to aid the initial state assignments 
+  algorithmically. First, we always initialize the prior on $\mathbf{c}$ in 
+  Equation~\ref{M-eqn:var} of the main text as described in 
+  Section~\ref{section:prior_guesses}. In particularly tricky cases, the initial
+  state sequence estimate is so poor that qualitative trajectory realizations
+  and MSD predictions are irreconcilable with MD. In our second approach, we can
+  seed the initial state sequence with a guess made by applying the IHMM to 
+  smaller segments of the trajectory. 
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.48\textwidth}
+  \includegraphics[width=\textwidth]{seed_ACH21_segment0.pdf}
+  \caption{Found 4 Unique States}\label{fig:segment1}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+  \includegraphics[width=\textwidth]{seed_ACH21_segment1.pdf}
+  \caption{Found 14 Unique States}\label{fig:segment2}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+  \includegraphics[width=\textwidth]{seed_ACH21_segment2.pdf}
+  \caption{Found 13 Unique States}\label{fig:segment3}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+  \includegraphics[width=\textwidth]{seed_ACH21_segment3.pdf}
+  \caption{Found 12 Unique States}\label{fig:segment4}
+  \end{subfigure}
+  \begin{subfigure}{1\textwidth}
+  \includegraphics[width=\textwidth]{seed_ACH21_full.pdf}
+  \caption{Initial state sequence seeded with states found in (a)--(d)}\label{fig:full}
+  \end{subfigure}
+  \caption{In (a--d), we show the state sequence resulting from 5 iterations
+  of the IHMM on each of the four quarters of the center-of-mass trajectory in
+  (e) after splitting it into 4 separate segments. We use the concatenation 
+  of the four state sequences as the initial sequence for the IHMM run on the 
+  fully trajectory in (e).
+  }\label{fig:seed_sequence}
   \end{figure}
   
 \end{document}
