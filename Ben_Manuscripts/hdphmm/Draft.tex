@@ -552,7 +552,7 @@
   \subsection{Automatic Detection of Distinct Dynamical Modes}\label{section:find_modes}
   
   We applied the IHMM independently to all 24 trajectories of each of the four solutes studied.
-  The number of states found for each trajectory varied between 5 and 30.  %BJC2: MET: (5, 28)
+  The number of states found for each trajectory varied between 5 and 30.  %BJC4: MET: (5, 28), need to finalized
   In Figure~\ref{fig:rz_unclustered}, we show the state sequence determined by the IHMM for
   an example methanol trajectory. The model distinguishes many of the states due to 
   differences in their mean levels while their fluctuations about those means are often 
@@ -597,7 +597,7 @@
   }\label{fig:qualitative_unclustered}
   \end{figure}
   
-  In Figure~\ref{fig:unclustered_msds}, we show that we can reproduce the 
+  In Figure~\ref{fig:unclustered_msds}, we show that in most cases we can reproduce the 
   MD MSDs on long timescales within uncertainty using realizations of the 
   IHMM.
   \begin{itemize}
@@ -605,6 +605,12 @@
     Section~\ref{method:realizations} of the methods.
     \item Our ability to reproduce these curves gives use confidence
     in their long term predictions.
+    \item We underestimate the MSD of Urea because of a small number of MD 
+    trajectories with uncharacteristically high MSDs. Despite our best efforts, 
+    we could not adequately parameterize an IHMM which reproduced said 
+    behavior. (see SI)  %BJC4: TODO
+    \item On long timescales, the model appear to have the same slope as 
+    the MD trajectory.
   \end{itemize}
   
   \begin{figure}
@@ -640,9 +646,10 @@
     in Section~\ref{method:selectivity}.
   \end{itemize}  
   
-  %BJC4: figure here
+  % BJC4: figure here
   
-  %BJC4: some kind of brief selectivity analysis here
+  % BJC4: some kind of brief selectivity analysis here. This easy, I'll get that done 
+  % tonight or tomorrow.
   
   \subsection{Learning Mechanisms from the IHMM}\label{section:mechanisms}
   
@@ -732,135 +739,18 @@
   \caption{}\label{fig:clustered_MSD}
   \end{subfigure}
   \caption{(a) Stochastic trajectory realizations generated from our model (blue) based on
-  the clustered methanol parameters do not qualit}\label{fig:clustered_dynamics}
+  the clustered methanol parameters do not qualitatively reproduce the diversity of behavior
+  seen in our MD trajectories. (b) MSD predictions by clustered parameter sets consistently
+  under-predict MD MSD. They appear to do a better job of predicting MSDs as the number
+  of clusters increases.}\label{fig:clustered_dynamics}
   \end{figure}
-    
-%  \begin{figure}
-%  \centering
-%  % BJC4: combine (a) and (b). Add figure with MSD prediction
-%  \begin{subfigure}{0.32\textwidth}
-%  \includegraphics[width=\textwidth]{dwell_distributions.pdf}
-%  \caption{}\label{fig:dwell_distributions}
-%  \end{subfigure}
-%  \begin{subfigure}{0.32\textwidth}
-%  \includegraphics[width=\textwidth]{dwell_distributions_modT.pdf}
-%  \caption{}\label{fig:dwell_distributions_modT}
-%  \end{subfigure}
-%  \begin{subfigure}{0.32\textwidth}
-%  \includegraphics[width=\textwidth]{unclustered_msd_MET_modT.pdf}
-%  \caption{}\label{fig:msd_modT}
-%  \end{subfigure}
-%  \caption{(a) The density of short dwell times compiled from realizations of
-%  the IHMM fit to methanol trajectories is below that measured directly from 
-%  the MD trajectories. If we modify the transition matrix in order to favor 
-%  transitions towards states with short dwell times, we can more closely match
-%  the (b) dwell time distributions and (c) MSDs.}\label{fig:slow_T}
-%  \end{figure}
-  
-% BJC: probably a bad idea
-%  It may still be possible to use these hybrid trajectories in order to predict
-%  selectivity since they undershoot the MD MSD by a consistent number and 
-%  the ratios will stay the same.
-  
-  % BJC2: the numbers and choices of states in this paragraph will change, but I think we
-  % can still use this framework to study mechanisms.
-
-%  \subsubsection*{Relating Clusters to Mechanisms}
-%  
-%  The parameters of each cluster can be related to dominant solute-membrane interactions.
-%  \begin{itemize}
-%    \item Based on our previous work, we know that hydrogen bonding, sodium ion 
-%    association and radial location within the membrane pores will have a significant
-%    influence on transport properties. 
-%    \item Even without our previous work, it would still be easy to speculate that these 
-%    interactions might occur and could therefore be used to help understand the 
-%    states identified by the IHMM.
-%    \item We have also incorporated membrane density as a physical metric because we 
-%    know the membrane has an inhomogeneous structure.
-%  \end{itemize}
-  
-%  \textit{Learning from individual trajectories}: In Figure~\ref{fig:mechanism_map}, 
-%  we demonstrate the wide range of behavior exhibited by a representative 2D methanol
-%  trajectory.
-%%BJC2: reducing duplication
-%%  The coordinates
-%%  are colored according to the cluster with which methanol's dynamics are most consistent,
-%%  which implies that this particular methanol trajectory exhibits eight distinct dynamical 
-%%  behaviors (in order of their first appearance, they are colored dark yellow, red, light
-%%  blue, light green, orange, blue, teal and lime green).
-%  The solute time series are coupled with color coded bars which describe the solute's
-%  local environment and physical interactions that it undergoes at each trajectory frame. 
-%%  From the top, they describe 
-%%  whether the solute is associated with sodium, whether the solute is hydrogen bonding
-%%  with the monomer as well as to what part of the monomer it is hydrogen bonding, and 
-%%  finally, the local number density surrounding the solute. 
-%
-%  %BJC2: the exact figure will change, but most of what I say shouldn't
-%  \begin{figure}
-%  \centering
-%  \begin{subfigure}{0.75\textwidth}
-%  \includegraphics[width=\textwidth]{mechanism_map.png}
-%  \caption{}
-%  \end{subfigure}
-%  \begin{subfigure}{0.24\textwidth}
-%  \includegraphics[width=\textwidth]{monomer_oxygens.png}
-%  \caption{}
-%  \end{subfigure}
-%  %MRS: a lot of this caption test is duplicated from the main text. I would suggest reducing the duplication.
-%  %BJC: you think better to have more detail in text or in caption?
-%  %MRS2: at a certain point, it should be in the text.  In the caption, I would just state what the point of the plot is, 
-%  % and define the colors/data/etc.  But full explanation would be better in the text. Captions should be scannable quickly,
-%  % based on how people process papers, and this should be significantly shorter for readability. 
-% \caption{(a) We can learn a significant amount of detail about solute motion by viewing 
-%  solute trajectories color-coded according to their clustered dynamical behavior alongside
-%  plots of the dominant molecular interactions and descriptions of the membrane's local 
-%  environment. In the plot above, we show the radial and axial coordinates of a single
-%  methanol molecule over the course of the equilibrated portion of its MD simulation.
-%  Disjoint segments of the same color imply the solute behaves similarly at different 
-%  points of the trajectory because their VAR parameters place them in the same cluster. 
-%  There are eight distinct dynamical modes exhibited by this trajectory. In order
-%  of their first appearance, they are colored dark yellow, red, light blue, light green,
-%  orange, blue, teal and lime green. On the top of the plot are bars which represent different
-%  physical interactions and the membrane's local environment as a function of time. The top 
-%  bar is colored green at time points where solutes are associated with sodium. Methanol 
-%  associates with sodium ions relatively infrequently. The next bar down is colored when hydrogen
-%  bonds exist. The colors match the enlarged oxygen atoms highlighted in (b). Blue slivers
-%  correspond to hydrogen bonds donated to the monomer's carboxylate head group. Green slivers
-%  correspond to  hydrogen bonds donated to the ether linkages between the head groups
-%  and tails. Red slivers correspond to hydrogen bonds donated to the oxygens on the ends
-%  of the monomer tails. Methanol exhibits significant hydrogen bonding with all parts of
-%  the monomer. Which part of the monomer methanol hydrogen bonds to is heavily correlated
-%  to the solute's $r$ coordinate. Finally, the bar with the blue gradient represents the local 
-%  membrane density based on the solute's ($r$, $z$) coordinate. Darker shades of blue
-%  correspond to higher membrane densities. The density appears to be higher when methanol
-%  motion is restricted (e.g. from 75 to 550 ns). It is relatively low in areas where methanol's
-%  position fluctuates significantly (e.g. from 550 to 700 ns). 
-%  }\label{fig:mechanism_map}
-%  \end{figure}
-%
-%  One can gain useful chemical intuition just by studying plots like 
-%  Figure~\ref{fig:mechanism_map}. It is clear that, for methanol, association 
-%  with sodium is a much rarer interaction than hydrogen bonding with the 
-%  LLC monomers. Methanol hydrogen bonds to all regions of the monomers dependent
-%  on its radial position. Its fluctuations tend to be smallest when hydrogen bonded
-%  or in areas of high local number density. For example, from approximately 75 to 
-%  525 ns, methanol appears to be trapped in a high density region of the tails.
-%  In the time that follows, it enters a region of relatively low density where 
-%  fluctuations are quite large. During this time period, there is intermittent, 
-%  short-lived hydrogen bonding with the oxygen atoms at the tail ends, as suggested
-%  by the frequent state changes during that time period and red slivers in the bar
-%  above. Significant hops in the $z$ direction appear to be described by the dark blue
-%  state. After entering the dark blue state ca. 850 ns, methanol appears to jump
-%  significantly in the $z$ direction from a hydrogen bonded state with the ether 
-%  linkages to a hydrogen bonded state with a head group in a monomer below it.
-
   
   \textit{The dynamics of frequently occurring states}: We may learn the most by 
   studying the dynamical modes common to the majority of the solute trajectories.
   \begin{itemize}
   	\item Of the 10 state clusters, only 5 appear in a significant number of 
   	solute trajectories (Figure~\ref{fig:prevalence}).
-  	\item Although a majority of the solutes visit these 5 states the
+  	\item Although a majority of the solutes visit these 5 dominant states the
   	amount of time spent in each varies widely. 
   \end{itemize} 
   
@@ -906,7 +796,7 @@
   	with off-diagonals both matrices near zero.
   	\item The most notable exception is state 3, which has a much higher radial 
   	eigenvalue of the covariance matrix.
-  	\item Both eigenvalues are actually of state 3's covariance are actually quite
+  	\item Both eigenvalues of state 3's covariance are actually quite
   	large. This implies relatively large fluctuations in the $z$ direction and even
   	bigger fluctuations in the $r$ direction.
   	\item All states have slightly lower covariance in the axial direction. It's
@@ -920,14 +810,14 @@
   \begin{itemize}
     \item On average, state 4 has the longest dwell times and state 3 has
     the shortest dwell times while the rest have intermediate dwell times.
-    \item This is partially confirmed via inspection of Figure~\ref{fig:clustered_traj_MET},
+    \item This is somewhat supported by inspection of Figure~\ref{fig:clustered_traj_MET},
     however. 
-    \item Once again, since we clustered, it is important to avoid distraction
-    by the exact dwell time values, and to focus on their relative magnitudes
+	\item The expected dwell times of the clusters incorporate all 24 trajectories.
+%    \item Once again, since we clustered, it is important to avoid studying
+%    the exact dwell time values, and to focus on their relative magnitudes.
   \end{itemize}
   
-  % BJC4: Not sure if this is useful. Maybe can replace above three paragraphs 
-  % with this. Helps us look for mechanisms.
+  % BJC4: Not sure if this is useful.
   By studying the parameters, it is now easier to describe the state behavior.
   \begin{enumerate}[label={State \theenumi :}, leftmargin=3.5\parindent]
      \item This state has intermediate dwell times with high past-hop dependence.
@@ -971,46 +861,10 @@
   of the states.
   }\label{fig:common_states_MET}
   \end{figure}
-  
-  % BJC2: Again, this will change, but will follow the same general flow
-%  We can begin to dissect the dynamics of each state by studying their parameters.
-%  States 1, 3 and 5 have radial means near 1 nm or less (see y axis of $r$ direction 
-%  plot in Figure~\ref{fig:common_states_MET_lines}), which suggest that they occur
-%  close to the pore centers. States 2, 4, 6 and 7 occur well within the tail region
-%  of the membrane. States 1 and 2 have higher covariances in both the axial and radial
-%  directions compared to all other states. Covariance in each dimension appears to have
-%  a strong correlation. States 3 and 5 (in the pore region) as well as states 4, 6 and
-%  7 (in the tail region) are primarily distinguished based on their autoregressive 
-%  coefficients, A. Higher values of A generally lead to more wandering about the state
-%  mean. One could argue that the parameters of states 3--7 are actually very close which
-%  suggests that solutes might behave alike in morphologically distinct regions of the 
-%  membrane.
-%
-%  Despite some similarity in their VAR parameters, the length of time spent in states 
-%  3--7 appears to be dependent on the solute's radial location. Based on the 
-%  self-transition probabilities, we estimated the average time spent by each solute in
-%  each state (Figure~\ref{fig:dwell_times_MET}). States 3, 5 and 7 have long dwell times
-%  relative to the rest because they have high self-transition probabilities. Somewhat 
-%  surprisingly, both states 3 and 5 correspond to solutes located close to a pore center,
-%  where one might expect solute motion to be less restricted. Although solutes in states
-%  4 and 6 are in the viscous tail region, their dwell times are only intermediate. This
-%  could be due to inhomogeneity in the tail region which causes transitions between many
-%  different trapped states but with little net effect on solute MSD. However, there are
-%  instances of states within the tail region with dwell times that exceed 100--200 ns,
-%  as shown by our inclusion of state 7. There are no other states with dwell times longer
-%  than state 5 in the pore region.
-%  
-%  States 1 and 2 exhibit the shortest dwell times of the states studied. This is 
-%  consistent with the trajectory in Figure~\ref{fig:mechanism_map}. State 2 is the 
-%  shortest lived state, appearing to bridge other tail region states. State 1 
-%  appears to represent a significant hopping state. It has a high covariance and
-%  occurs near the pore center, where there is less obstruction to solute motion.
-%  It's dwell time of ca.~8 ns, suggests that solutes stay in this highly mobile 
-%  state for long enough for their positions to displace significantly.
-  
+   
   \textit{Relating Parameters to Solute-Membrane Interactions}: Based on the
-  molecules and ions in the system, it is straightforward to hypothesize two types
-  interactions that might occur.
+  molecules and ions which constitute the membrane, it is straightforward to 
+  hypothesize two types interactions that might occur.
   \begin{itemize}  
     \item All of the solutes are polar and have hydrogen bond donating and 
     accepting groups. 
@@ -1048,7 +902,7 @@
     since it is likely a jumping state.
     \item Methanol molecules in state 5 hydrogen bond almost exclusively to the 
     carboxylate head groups and ether linkages which is consistent with the radial
-    ean of the cluster.
+    mean of the cluster.
   \end{itemize}
   
   \begin{figure}
@@ -1214,130 +1068,103 @@
 %  \end{figure}
   
   \subsubsection*{Comparison of Solute Behavior}
-  %BJC2: Again, most of this section will get a facelift, but will try to follow same flow 
-  We applied similar analysis to the other three solutes in this study: urea, acetic acid
-  and ethylene glycol. Not only can we use the model to study the dynamics of each 
-  solute individually, but we can compare their behavior in order to improve our
-  understanding of more subtle mechanistic details.
+  
+  We can apply a similar analysis to the other solutes in this study. We can likely
+  learn new information through comparison of solute behavior with metrics based on
+  the chemical intuition gained by studying methanol.
   
   The size and chemical functionality of the solutes dictates the interactions which
-  influence solute transport. In Figure~\ref{fig:hbonds_assoc_summary}, we show that
-  the solutes donate hydrogen bonds and associate with sodium ions to varying degrees.
-  We also show the solute MSDs after a 1000 ns time lag. It is not immediately obvious
-  why the MSDs follow this trend. 
-  %MRS2: be more precise what ``this trend'' is.
-  The states identified by the IHMM shed
-  some light on the reasoning.
+  influence solute transport.
+  \begin{itemize}
+    \item In Figure~\ref{fig:hbonds_assoc_summary}, we show that the solutes donate
+    hydrogen bonds and associate with sodium ions to varying degrees.
+    \item In fact methanol, by far, interacts the least by these mechanisms.
+    \item This is likely because methanol is very small and it is easier for it to partition
+    into the tail region where there are fewer groups with which it can interact (see
+    Figure~\ref{fig:rdf_summary}).
+    \item Acetic acid, urea and ethylene glycol are slightly larger than methanol
+    and contain multiple polar substituents which stabilize them closer to the 
+    pore region.
+    \item These three solutes also participate in significantly more sodium ion
+    association. 
+    \item In our previous work, we showed that the sodium ions frequently associate
+    with the carbonyl groups of acetic acid and urea.
+  \end{itemize}
   
   \begin{figure}
   \centering
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.325\textwidth}
   \includegraphics[width=\textwidth]{hbonds_assoc_summary.pdf}
   \caption{}\label{fig:hbonds_assoc_summary}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.325\textwidth}
   \includegraphics[width=\textwidth]{rdf_summary.pdf}
   \caption{}\label{fig:rdf_summary}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
+  \begin{subfigure}{0.325\textwidth}
   \includegraphics[width=\textwidth]{dwell_time_summary.pdf}
   \caption{}\label{fig:dwell_time_summary}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{cov_summary.pdf}
-  \caption{}\label{fig:cov_summary}
-  \end{subfigure}
-  %MRS7: is c) methanol?  I thought it wasn't associating with Na+ much.
-  %BJC7: looks about 5 %, certainly less than the other. I could add
-  % some discussion of this to previous section.
-  %MRS: methanol yellow is hard to see in (b). Maybe add outlines to histogram?  I guess they are, increase alpha or something for yellow?
-  %MRS: check consistency of capitalization in legend in (c) 
   \caption{(a) Solutes hydrogen bond and associate with sodium ions
   to different degrees. Sometimes, they participate in both interactions at
-  once. The frequency at which solutes interact via either mechanism does
-  not appear to be linearly related to the solute's mean squared displacement
-  after a 1000 ns time lag. (b) We histogrammed the means of the clusters weighted
-  by the number of fluctuation within that cluster. Most solutes spend the majority of
-  their time close to the pore center. Only methanol has a significant peak
-  beyond 1.5 nm from the pore center. (c) The trend in the maximum dwell time
-  among prevalent states for each solute is inversely related to the
-  solute's MSD. In some cases, non-prevalent states show very long dwell times,
-  which may have a significant impact on solute MSD. (d) All solutes tend to
-  take larger hops in the $z$ direction when they are in the pore versus in 
-  the tails. All solutes except urea make slightly larger radial hops while 
-  in the tails.
-  %BJC6: I made this plot out of curiosity, not sure if I'll use it yet.
+  once. (b) We histogrammed the radial means of the unclustered states weighted
+  by the length of time spent in that state. Most solutes spend the majority of
+  their time close to the pore center. Only methanol has a significant density
+  far from the pore center. (c) The largest expected dwell time among the dominant 
+  clustered states for each solute are inversely related to the solute's MSD. 
   }\label{fig:summaries}
   \end{figure}
   
-  Hydrogen bonding and sodium ion association interactions are far more 
-  common when solutes stay near the pore centers. In Figure~\ref{fig:rdf_summary},
-  we plot the distribution of the radial means of each cluster weighted by 
-  the time spent in that cluster. All solutes except methanol spend the 
-  majority of their time near the pore centers (roughly defined as within 
-  1.5 nm). As we showed earlier, methanol spends a significant portion of its
-  time trapped in the dense tails.
-  
-  % BJC: we can probably use this to create a new definition of the pore and tail region.
-  % and perhaps focus on transitions between them.
-  Solute size likely has a large effect on their preferred radial location within
-  the pores. The histograms in Figure~\ref{fig:rdf_summary} have a clear vacancy 
-  between what one might consider the pore and tail region, most evident in methanol's 
-  distribution of radial positions. The area between the head groups and the distal
-  regions of the tails is dense and hydrophobic which creates a considerable energy 
-  barrier to be overcome in order to transition to that region.
-  %BJC: I wonder if there is a state which corresponds to the jump from pore to tail region. Might be hard to pick up.
-  Methanol is the smallest solute in this study and therefore appears to 
-  have the easiest time crossing into the tails.
-
-  Despite their close proximity to the low density aqueous pore region, acetic
-  acid, ethylene glycol and urea exhibit a range of trapping behavior.
-  It is clear that the number of polar interactions is not directly
-  related to solute MSD. Acetic acid participates in a similar number of 
-  interactions relative to urea and ethylene glycol, but its MSD is considerably
-  lower. For the purpose of this analysis, as in the previous section, we 
-  defined states that appear in more than one third of the trajectories to
-  be prevalent states. In Figure~\ref{fig:dwell_time_summary}, we plot the\
-  longest dwell times exhibited by each solute among the prevalent states as 
-  well as out of all the states. The state which exhibits the longest dwell
-  times among all acetic acid states appears in 9 different trajectories, 
-  making it a prevalent state, and occurs 0.9 nm from the pore center.
-  Although urea possesses the state with the longest dwell time among the
-  solutes studied, it occurs in the tail region with prevalent states having 
-  much shorter dwell times. Ethylene glycol appears to be the least subject to
-  trapping.
-
-%  The combination of a carbonyl group, which binds strongly to sodium, and a 
-%  hydroxyl group, which can form strong hydrogen bonds, makes acetic acid
-%  particularly prone to trapping.
-%  BJC6: more complicated than this. I will revisit.
+  Solutes with dominant clusters characterized by long dwell times tend to 
+  have lower MSDs.
+  \begin{itemize}
+    \item In Figure~\ref{fig:dwell_time_summary}, we plot the expected dwell
+    time of each solute in the dominant state which has the the highest
+    self-transition probability. 
+    \item The trend in MSDs is inversely related to the trend in maximum
+    expected dwell times.
+    \item Both acetic acid and urea participate in many hydrogen bonds and
+    sodium ion association interactions and the states visited by both solutes
+    have similar distributions of radial means, however acetic acid is 
+    subject to much longer dwell times, and hence a lower MSD.
+    % BJC4: I could dig further into this. Not sure if worth it.
+    \item This may be because acetic acid is a stronger hydrogen bond donor
+    than urea. 
+    \item Could also be that the urea is still mobile while paired with sodium ions.
+  \end{itemize}
   
   \section{Conclusion}
   
   We have shown that the IHMM can be used to automatically parameterize solute 
   time series with an unknown number of latent dynamical modes. Initially, we applied
-  the algorithm to each trajectory independently. For each solute studied, this resulted
-  in over 300 distinct states. By clustering the parameter sets we were able to reduce 
-  the state space to 10\% of its original size by grouping states with similar VAR
-  parameters.
-  
-  We coupled analysis of the clustered parameter sets with measurements of membrane 
-  properties and solute-membrane interactions in order to gain a detailed understanding
-  of the diverse sets behavior exhibited by solutes in these membranes. We showed how
-  solute motion is influenced by hydrogen bonding, sodium ion association and local
-  membrane density. These interactions have a direct impact on the size and
-  correlation of sequential solute steps.
-  
-  Finally, we show how one can generate stochastic realizations of our model that
+  the algorithm to each trajectory independently. Using the model parameters fit
+  to each trajectory, we generated stochastic realizations of solute trajectories that
   can qualitatively and quantitatively reproduce the behavior of MD solute 
   trajectories. The realizations show the hopping and trapping behavior that is
-  characteristic of polar solutes in this system. We can also use them to reproduce
-  the solute MSDs measured from the MD trajectories. The low computational expense 
-  of generating these stochastic trajectories allows one to project solute behavior
-  on much longer timescales and thus predict experimentally-relevant macroscopic 
-  transport properties like solute flux and selectivity.
+  characteristic of polar solutes in this system. 
   
-  We showcase this modeling approach by example, but it is important to
+  By pooling MSDs predicted by models fit to each trajectory, we can reproduce
+  the solute MSDs measured directly from the our MD-simulated trajectories. 
+  The low computational expense of generating these stochastic trajectories allows
+  one to project solute behavior on much longer timescales, allowing us to predict
+  selectivity, an experimentally-relevant quantity.
+  
+  In order to gain a mechanistic understanding of solute motion, we showed how 
+  we could cluster the parameter sets in order to reduce the state space down
+  to an interpretable size. We coupled analysis of the clustered parameter sets
+  with measurements of membrane properties and solute-membrane interactions 
+  in order to gain a detailed understanding of the diverse sets behavior 
+  exhibited by solutes in these membranes. We showed how
+  solute motion is influenced by hydrogen bonding, sodium ion association and local
+  membrane density.
+  
+  When clustering, our goal was to create the simplest model possible that gave
+  clear mechanistic insight. This is important for systems where transport mechanisms
+  are not easily hypothesized. However, once one gains some mechanistic understanding,
+  as we have in this work, the clustering procedure can be modified in order to 
+  study specific interactions or radially dependent behavior.
+  
+  Although we showcase this modeling approach by example, but it is important to
   recognize the generality of this analysis, especially in the context of molecular
   simulations. Vector autogregressive models can describe a diverse set of behavior
   and so the IHMM may be suited to study many types motion, including those not 
