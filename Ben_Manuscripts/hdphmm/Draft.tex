@@ -433,7 +433,7 @@
   solute trajectories are not bound in the $z$ direction.
   
   \subsection{Predicting Mean Squared Displacement}\label{method:realizations}
-
+  %BJC4: reworked this section
   \textit{Generating Stochastic IHMM Trajectory Realizations}: We used two 
   different methods to stochastically generate trajectories:
   \begin{enumerate}[label={Method \theenumi :}, leftmargin=3.5\parindent]
@@ -476,6 +476,7 @@
   
   For MD trajectories, we bootstrapped according to Method 2.
   
+  %BJC4: new section below
   \subsection{Predicting Selectivity}\label{method:selectivity}
   
   In our previous work, we showed that in systems without convective flux, such
@@ -559,7 +560,6 @@
   similar. In Section~\ref{section:mechanisms}, we use clustering to reduce the total state
   space for each solute in order to more easily interpret the state parameters.
   
-  %BJC4: It might be good to add a panel to this figure which gives a radial view of the pore
   \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{rz_unclustered_MET.pdf}
@@ -969,103 +969,6 @@
   is clear that solutes which experience longer dwells times are also surrounded by more 
   heavy atoms on average.}\label{fig:local_densities}
   \end{figure}
-   
-%BJC4: the following has pretty all been replaced.
-%  Most of what we 
-%  have learned thus far has been based on the parameters of our model with some 
-%  qualitative validation using a single methanol trajectory. While 
-%  we may be able to further corroborate our arguments by analyzing more
-%  individual trajectories, it is more useful to correlate the state behavior with
-%  solute-membrane interactions.
-%
-%  %BJC2: A lot of the following will probably be reworked with different clustering scheme
-%%  \textit{Hydrogen Bonding Patterns}: 
-%  The types of hydrogen bonding undergone by solutes is dependent on radial
-%  location (see Figure~\ref{fig:hbond_pichart}). States with radial means near 1 nm
-%  or less (states 1, 3 and 5) typically hydrogen bond with the monomer carboxylate
-%  groups and ether linkages. States with radial means greater than 1 nm (states 2,
-%  4, 6 and 7) tend to hydrogen bond with the monomer tails. Our previous work has
-%  shown that there is a gradual transition from the hydrophilic to hydrophobic region in
-%  these membranes, meaning the monomer location is not tightly bound in $r$. 
-%  %MRS: above logic is not clear?
-%  Therefore, there are instances of hydrogen bond interactions that one might consider 
-%  uncharacteristic based on the state's radial mean.
-%  %MRS: what is implication of ``uncharacteristicness''? 
-%
-%  States which exhibit longer dwell times have longer hydrogen bond lifetimes (see
-%  Figure~\ref{fig:hbond_pichart}). States 3--7 have significantly longer hydrogen 
-%  bond lifetimes than states 1 and 2. It makes physical and mathematical sense that
-%  states 1 and 2 should not stay trapped by hydrogen bonding for long periods because
-%  they typically take large hops as communicated by their large covariances.
-%  In the tail states, hydrogen bond lifetimes appear to increase with their dwell 
-%  times. However, in the pores, the same linear relationship does not hold.
-%  For example, state 5 has the lowest hydrogen bond lifetime of states 3--7
-%  despite having the second longest dwell times. 
-  
-%  The local density experienced by solutes may have an impact on the length of solute 
-%  entrapment. On average, solutes in state 5 are surrounded by a relatively high density
-%  of particles. Based on its radial location and preference towards hydrogen bonding
-%  with the ether linkages (see Figure~\ref{fig:hbond_pi_charts}), it is reasonable to
-%  assume that while in state 5, methanol spends most of its time just outside the 
-%  pore region, sandwiched between the monomer head groups. Although state 5 hydrogen
-%  bonds break more frequently than one might expect for a state with long dwell times,
-%  it is possible that the solute's dense surroundings prevent it from wandering off 
-%  before the hydrogen bonding interaction can be recovered. This may explain the 
-%  behavior of the methanol in state 5 of the trajectory in Figure~\ref{fig:mechanism_map}
-%  where the solute's center of mass appears to move more freely about its mean than 
-%  other trapped states. The data suggests that methanol molecules in state 3 lie closer
-%  to the pore center than state 5 because they tend to hydrogen bond most frequently 
-%  with the carboxylate groups. Methanol molecules which experience state 3 are subject 
-%  to a lower density local environment and rely more heavily on hydrogen bonding interactions, 
-%  evidenced by their longer lifetimes, to stay trapped.
-%  
-%  States describing behavior in the tail region show a direct relationship between 
-%  hydrogen bond lifetimes and local density. Methanol molecules which experience state 2 
-%  spend their time in a low density region of the tails where they can easily break free
-%  of hydrogen bonds. Conversely, methanol molecules trapped in state 7 are in the densest 
-%  region of all states studied. It is likely difficult for methanol to escape these high 
-%  density regions and its position is further stabilized via hydrogen bonding.
-%  
-%  %BJC: I didn't put sodium ion association in this figure because it's infrequent. 
-%  %BJC: If I compare to acetic acid or urea, I could add it back. I was thinking of splitting
-%  % the pi chart in half with slices corresponding to hbonds on one side and association on the other
-%  \begin{figure}
-%  \centering
-%  \begin{subfigure}{0.54\textwidth}
-%  \includegraphics[width=\textwidth]{hbond_pi_charts.pdf}
-%  \caption{}\label{fig:hbond_pi_charts}
-%  \end{subfigure}
-%  \begin{subfigure}{0.45\textwidth}
-%  \includegraphics[width=\textwidth]{hbond_lifetimes_density_MET.pdf}
-%  \caption{}\label{fig:hbond_lifetimes_density_MET}
-%  \end{subfigure}
-%  %MRS: legend doesn't show stripes.
-%  \caption{(a) Methanol hydrogen bonds in different segments of the LLC monomer
-%  dependent on the state. States with mean radial locations in the pore region tend to
-%  hydrogen bond with the head groups and ether linkages. States with mean radial
-%  locations in the tails tend to hydrogen bond with the tail oxygen atoms.
-%  (b) Hydrogen bond lifetimes and the local density experienced by methanol
-%  molecules can help us to understand dynamical states in terms of membrane 
-%  interactions. The bars are colored according to match the states in Figures~\ref{fig:mechanism_map}
-%  and~\ref{fig:common_states_MET}. States 1 and 2, which have large covariances, also have short
-%  hydrogen bond lifetimes and exist in relatively low density regions. The
-%  hydrogen bond lifetimes of methanol in states with radial means in the tail
-%  region tend to increase with local density and mean dwell times. 
-%  %MRS7: not clear from graphic which ones are in the pore.
-%  %MRS7: is there any legend for the color for b? If same as above figure, indicate. Don't REALLY need color since they bars are already labeled, so it's 2 sources of duplicate information.
-%  %BJC7: The state numbers are all you need to compare to the previous figure BUT the color make it easier 
-%  %plot of the methanol trajectory where states aren't labeled.
-%  %MRS7: cross-hatching doesn't appear in the legend? Not sure which is which (I assume hatched is number density because closer to that axis).
-%  %BJC7: Is it because the hatches aren't dense enough? I see them in the legend
-%  This monotonic
-%  relationship does not exist for states in the pore region. The high 
-%  local density experienced by state 5 methanol molecules may explain why 
-%  hydrogen bond lifetimes are short but dwell times are high. State 5 methanol's
-%  preference towards hydrogen bonds with ether linkages suggests that the solute
-%  sits between LLC monomer head group which prevent it from wandering to far
-%  before recovering its previous hydrogen bond.
-%  }\label{fig:hbond_pichart}
-%  \end{figure}
   
   \subsubsection*{Comparison of Solute Behavior}
   
