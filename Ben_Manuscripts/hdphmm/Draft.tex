@@ -1008,101 +1008,210 @@
 %  It's dwell time of ca.~8 ns, suggests that solutes stay in this highly mobile 
 %  state for long enough for their positions to displace significantly.
   
-  \textit{Relating Parameters to Solute-Membrane Interactions}: Most of what we 
-  have learned thus far has been based on the parameters of our model with some 
-  qualitative validation using a single methanol trajectory. While 
-  we may be able to further corroborate our arguments by analyzing more
-  individual trajectories, it is more useful to correlate the state behavior with
-  solute-membrane interactions.
-
-  %BJC2: A lot of the following will probably be reworked with different clustering scheme
-%  \textit{Hydrogen Bonding Patterns}: 
-  The types of hydrogen bonding undergone by solutes is dependent on radial
-  location (see Figure~\ref{fig:hbond_pichart}). States with radial means near 1 nm
-  or less (states 1, 3 and 5) typically hydrogen bond with the monomer carboxylate
-  groups and ether linkages. States with radial means greater than 1 nm (states 2,
-  4, 6 and 7) tend to hydrogen bond with the monomer tails. Our previous work has
-  shown that there is a gradual transition from the hydrophilic to hydrophobic region in
-  these membranes, meaning the monomer location is not tightly bound in $r$. 
-  %MRS: above logic is not clear?
-  Therefore, there are instances of hydrogen bond interactions that one might consider 
-  uncharacteristic based on the state's radial mean.
-  %MRS: what is implication of ``uncharacteristicness''? 
-
-  States which exhibit longer dwell times have longer hydrogen bond lifetimes (see
-  Figure~\ref{fig:hbond_pichart}). States 3--7 have significantly longer hydrogen 
-  bond lifetimes than states 1 and 2. It makes physical and mathematical sense that
-  states 1 and 2 should not stay trapped by hydrogen bonding for long periods because
-  they typically take large hops as communicated by their large covariances.
-  In the tail states, hydrogen bond lifetimes appear to increase with their dwell 
-  times. However, in the pores, the same linear relationship does not hold.
-  For example, state 5 has the lowest hydrogen bond lifetime of states 3--7
-  despite having the second longest dwell times. 
+  \textit{Relating Parameters to Solute-Membrane Interactions}: Based on the
+  molecules and ions in the system, it is straightforward to hypothesize two types
+  interactions that might occur.
+  \begin{itemize}  
+    \item All of the solutes are polar and have hydrogen bond donating and 
+    accepting groups. 
+    \item The monomers have 10 oxygen atoms distributed from head to tail that are 
+    capable of accepting hydrogen bonds. 
+    \item Also, the ionic bond between the head groups and sodium ions can
+    be easily broken since both components can be stabilized by surrounding 
+    water molecules and solutes.
+    \item Therefore, it is logical to search for hydrogen bonding interactions
+    and solute assocation with sodium ions.
+  \end{itemize}
   
-  The local density experienced by solutes may have an impact on the length of solute 
-  entrapment. On average, solutes in state 5 are surrounded by a relatively high density
-  of particles. Based on its radial location and preference towards hydrogen bonding
-  with the ether linkages (see Figure~\ref{fig:hbond_pi_charts}), it is reasonable to
-  assume that while in state 5, methanol spends most of its time just outside the 
-  pore region, sandwiched between the monomer head groups. Although state 5 hydrogen
-  bonds break more frequently than one might expect for a state with long dwell times,
-  it is possible that the solute's dense surroundings prevent it from wandering off 
-  before the hydrogen bonding interaction can be recovered. This may explain the 
-  behavior of the methanol in state 5 of the trajectory in Figure~\ref{fig:mechanism_map}
-  where the solute's center of mass appears to move more freely about its mean than 
-  other trapped states. The data suggests that methanol molecules in state 3 lie closer
-  to the pore center than state 5 because they tend to hydrogen bond most frequently 
-  with the carboxylate groups. Methanol molecules which experience state 3 are subject 
-  to a lower density local environment and rely more heavily on hydrogen bonding interactions, 
-  evidenced by their longer lifetimes, to stay trapped.
+  For methanol, hydrogen bonding is a much more dominant interaction than sodium
+  ion association. 
+  \begin{itemize}
+    \item In Figure~\ref{fig:hbond_fractions}, we show that methanol participates
+    in hydrogen bonds to various parts of the monomer between 27 and 45 \% of the
+    total time it occupies the dominant states.
+    \item Methanol associates with sodium ions less than 10 \% of the time in 
+    dominant states.
+  \end{itemize}  
   
-  States describing behavior in the tail region show a direct relationship between 
-  hydrogen bond lifetimes and local density. Methanol molecules which experience state 2 
-  spend their time in a low density region of the tails where they can easily break free
-  of hydrogen bonds. Conversely, methanol molecules trapped in state 7 are in the densest 
-  region of all states studied. It is likely difficult for methanol to escape these high 
-  density regions and its position is further stabilized via hydrogen bonding.
+  The distribution of types of hydrogen bonds and associated hydrogen bond lifetimes
+  varies by dominant state.
+  \begin{itemize}
+    \item States 1 and 2 are dominated by hydrogen bonds to the head groups and, to 
+    a smaller extent, the ether linkages.
+    \item State 1 methanol molecules that donate hydrogen bonds to the tail oxygen 
+    atoms exhibit by far the longest hydrogen bond lifetimes among all states.
+    \item States 3 and 4 hydrogen bond to all regions of the monomer relatively 
+    evenly, which is consistent with our earlier observation that states 3 and 4
+    are representative of behavior seen radially throughout the membrane pores.
+    \item State 3 has the lowest hydrogen bond and sodium association lifetimes 
+    which is consistent with its short dwell times. These are fleeting interactions
+    since it is likely a jumping state.
+    \item Methanol molecules in state 5 hydrogen bond almost exclusively to the 
+    carboxylate head groups and ether linkages which is consistent with the radial
+    ean of the cluster.
+  \end{itemize}
   
-  %BJC4: I didn't put sodium ion association in this figure because it's infrequent. 
-  %BJC4: If I compare to acetic acid or urea, I could add it back. I was thinking of splitting
-  % the pi chart in half with slices corresponding to hbonds on one side and association on the other
   \begin{figure}
   \centering
-  \begin{subfigure}{0.54\textwidth}
-  \includegraphics[width=\textwidth]{hbond_pi_charts.pdf}
-  \caption{}\label{fig:hbond_pi_charts}
+  \begin{subfigure}{0.475\textwidth}
+  \centering
+  \includegraphics[width=0.6\textwidth, angle=0]{monomer_oxygens.png}
+  \caption{}\label{fig:monomer_oxygens}
   \end{subfigure}
-  \begin{subfigure}{0.45\textwidth}
-  \includegraphics[width=\textwidth]{hbond_lifetimes_density_MET.pdf}
-  \caption{}\label{fig:hbond_lifetimes_density_MET}
+  \begin{subfigure}{0.475\textwidth}
+  \includegraphics[width=\textwidth]{hbond_fractions.pdf}
+  \caption{}\label{fig:hbond_fractions}
   \end{subfigure}
-  %MRS: legend doesn't show stripes.
-  \caption{(a) Methanol hydrogen bonds in different segments of the LLC monomer
-  dependent on the state. States with mean radial locations in the pore region tend to
-  hydrogen bond with the head groups and ether linkages. States with mean radial
-  locations in the tails tend to hydrogen bond with the tail oxygen atoms.
-  (b) Hydrogen bond lifetimes and the local density experienced by methanol
-  molecules can help us to understand dynamical states in terms of membrane 
-  interactions. The bars are colored according to match the states in Figures~\ref{fig:mechanism_map}
-  and~\ref{fig:common_states_MET}. States 1 and 2, which have large covariances, also have short
-  hydrogen bond lifetimes and exist in relatively low density regions. The
-  hydrogen bond lifetimes of methanol in states with radial means in the tail
-  region tend to increase with local density and mean dwell times. 
-  %MRS7: not clear from graphic which ones are in the pore.
-  %MRS7: is there any legend for the color for b? If same as above figure, indicate. Don't REALLY need color since they bars are already labeled, so it's 2 sources of duplicate information.
-  %BJC7: The state numbers are all you need to compare to the previous figure BUT the color make it easier 
-  %plot of the methanol trajectory where states aren't labeled.
-  %MRS7: cross-hatching doesn't appear in the legend? Not sure which is which (I assume hatched is number density because closer to that axis).
-  %BJC7: Is it because the hatches aren't dense enough? I see them in the legend
-  This monotonic
-  relationship does not exist for states in the pore region. The high 
-  local density experienced by state 5 methanol molecules may explain why 
-  hydrogen bond lifetimes are short but dwell times are high. State 5 methanol's
-  preference towards hydrogen bonds with ether linkages suggests that the solute
-  sits between LLC monomer head group which prevent it from wandering to far
-  before recovering its previous hydrogen bond.
-  }\label{fig:hbond_pichart}
+  \begin{subfigure}{0.475\textwidth}
+  \includegraphics[width=\textwidth]{hbond_lifetimes.pdf}
+  \caption{}\label{fig:hbond_lifetimes}
+  \end{subfigure}
+  % BJC4: I put this one here for compact-ness. Not sure if I should separate into own figure
+  \begin{subfigure}{0.475\textwidth}
+  \includegraphics[width=\textwidth]{association_fraction_lifetimes.pdf}
+  \caption{}\label{fig:association_fraction_lifetimes}
+  \end{subfigure}
+  \caption{(a) We analyzed hydrogen bond donation to the highlighted oxygen atoms in three 
+  regions of the monomer: the carboxylate groups (blue), the ether linkages (green) and the
+  tails (red). (b) For each dominant state, we plotted the fraction of the total time in
+  that state spent hydrogen bonding to various regions of the monomer, color coded to match (a).
+  (c) For each type of hydrogen bond in each dominant state, we calculated the 95th percentile
+  of hydrogen bond lifetimes. (d) We also analyzed the frequency and lifetimes of solute 
+  association with sodium ions. Methanol associates with sodium less than 10 \% of the total 
+  time it occupies any of the dominant state.
+  %Relative to hydrogen bonding, it is a relatively infrequenct interaction
+  %for methanol molecules, but the 
+  }
+  \label{fig:hydrogen_bonding}
   \end{figure}
+  
+  The local number density of heavy atoms surrounding solutes help round out methanol's
+  mechanistic picture.
+  \begin{itemize}
+    \item Although hydrogen bonding interactions are relatively frequent, methanol molecules
+    are unbound by any measurable electrostatic interactions about half or more of the 
+    simulation time.  
+    \item Figure~\ref{fig:local_densities} helps to illustrate how the local density of 
+    membrane components can aid in solute entrapment.
+    \item When solutes experience long trapping times, the local number density of heavy 
+    atoms is larger.
+    \item Even when hydrogen bonds break, surrounding alkane density likely helps keep
+    the solutes in place allowing them to eventually reform. This can happen deep in the
+    tails or close to the monomer head groups.
+    \item Methanol molecules which experience State 3 have by far the smallest local 
+    number density which is likely responsible for their mobility, as suggested by the state's
+    large covariance.
+  \end{itemize}
+  
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{local_densities.pdf}
+  \caption{We measured the local number density of heavy atoms surrounding solutes in each
+  state. In blue, we plot the local number density experienced by solutes averaged over all
+  frames in which the solute occupied the given state. We broke down this overall average 
+  number density into number densities measured from instances when the state is occupied 
+  for long (orange) versus short(red) dwell time states. We define define `long' dwells times
+  as the 50th percentile of all dwell times in the given state, and short as all others. It
+  is clear that solutes which experience longer dwells times are also surrounded by more 
+  heavy atoms on average.}\label{fig:local_densities}
+  \end{figure}
+   
+%BJC4: the following has pretty all been replaced.
+%  Most of what we 
+%  have learned thus far has been based on the parameters of our model with some 
+%  qualitative validation using a single methanol trajectory. While 
+%  we may be able to further corroborate our arguments by analyzing more
+%  individual trajectories, it is more useful to correlate the state behavior with
+%  solute-membrane interactions.
+%
+%  %BJC2: A lot of the following will probably be reworked with different clustering scheme
+%%  \textit{Hydrogen Bonding Patterns}: 
+%  The types of hydrogen bonding undergone by solutes is dependent on radial
+%  location (see Figure~\ref{fig:hbond_pichart}). States with radial means near 1 nm
+%  or less (states 1, 3 and 5) typically hydrogen bond with the monomer carboxylate
+%  groups and ether linkages. States with radial means greater than 1 nm (states 2,
+%  4, 6 and 7) tend to hydrogen bond with the monomer tails. Our previous work has
+%  shown that there is a gradual transition from the hydrophilic to hydrophobic region in
+%  these membranes, meaning the monomer location is not tightly bound in $r$. 
+%  %MRS: above logic is not clear?
+%  Therefore, there are instances of hydrogen bond interactions that one might consider 
+%  uncharacteristic based on the state's radial mean.
+%  %MRS: what is implication of ``uncharacteristicness''? 
+%
+%  States which exhibit longer dwell times have longer hydrogen bond lifetimes (see
+%  Figure~\ref{fig:hbond_pichart}). States 3--7 have significantly longer hydrogen 
+%  bond lifetimes than states 1 and 2. It makes physical and mathematical sense that
+%  states 1 and 2 should not stay trapped by hydrogen bonding for long periods because
+%  they typically take large hops as communicated by their large covariances.
+%  In the tail states, hydrogen bond lifetimes appear to increase with their dwell 
+%  times. However, in the pores, the same linear relationship does not hold.
+%  For example, state 5 has the lowest hydrogen bond lifetime of states 3--7
+%  despite having the second longest dwell times. 
+  
+%  The local density experienced by solutes may have an impact on the length of solute 
+%  entrapment. On average, solutes in state 5 are surrounded by a relatively high density
+%  of particles. Based on its radial location and preference towards hydrogen bonding
+%  with the ether linkages (see Figure~\ref{fig:hbond_pi_charts}), it is reasonable to
+%  assume that while in state 5, methanol spends most of its time just outside the 
+%  pore region, sandwiched between the monomer head groups. Although state 5 hydrogen
+%  bonds break more frequently than one might expect for a state with long dwell times,
+%  it is possible that the solute's dense surroundings prevent it from wandering off 
+%  before the hydrogen bonding interaction can be recovered. This may explain the 
+%  behavior of the methanol in state 5 of the trajectory in Figure~\ref{fig:mechanism_map}
+%  where the solute's center of mass appears to move more freely about its mean than 
+%  other trapped states. The data suggests that methanol molecules in state 3 lie closer
+%  to the pore center than state 5 because they tend to hydrogen bond most frequently 
+%  with the carboxylate groups. Methanol molecules which experience state 3 are subject 
+%  to a lower density local environment and rely more heavily on hydrogen bonding interactions, 
+%  evidenced by their longer lifetimes, to stay trapped.
+%  
+%  States describing behavior in the tail region show a direct relationship between 
+%  hydrogen bond lifetimes and local density. Methanol molecules which experience state 2 
+%  spend their time in a low density region of the tails where they can easily break free
+%  of hydrogen bonds. Conversely, methanol molecules trapped in state 7 are in the densest 
+%  region of all states studied. It is likely difficult for methanol to escape these high 
+%  density regions and its position is further stabilized via hydrogen bonding.
+%  
+%  %BJC: I didn't put sodium ion association in this figure because it's infrequent. 
+%  %BJC: If I compare to acetic acid or urea, I could add it back. I was thinking of splitting
+%  % the pi chart in half with slices corresponding to hbonds on one side and association on the other
+%  \begin{figure}
+%  \centering
+%  \begin{subfigure}{0.54\textwidth}
+%  \includegraphics[width=\textwidth]{hbond_pi_charts.pdf}
+%  \caption{}\label{fig:hbond_pi_charts}
+%  \end{subfigure}
+%  \begin{subfigure}{0.45\textwidth}
+%  \includegraphics[width=\textwidth]{hbond_lifetimes_density_MET.pdf}
+%  \caption{}\label{fig:hbond_lifetimes_density_MET}
+%  \end{subfigure}
+%  %MRS: legend doesn't show stripes.
+%  \caption{(a) Methanol hydrogen bonds in different segments of the LLC monomer
+%  dependent on the state. States with mean radial locations in the pore region tend to
+%  hydrogen bond with the head groups and ether linkages. States with mean radial
+%  locations in the tails tend to hydrogen bond with the tail oxygen atoms.
+%  (b) Hydrogen bond lifetimes and the local density experienced by methanol
+%  molecules can help us to understand dynamical states in terms of membrane 
+%  interactions. The bars are colored according to match the states in Figures~\ref{fig:mechanism_map}
+%  and~\ref{fig:common_states_MET}. States 1 and 2, which have large covariances, also have short
+%  hydrogen bond lifetimes and exist in relatively low density regions. The
+%  hydrogen bond lifetimes of methanol in states with radial means in the tail
+%  region tend to increase with local density and mean dwell times. 
+%  %MRS7: not clear from graphic which ones are in the pore.
+%  %MRS7: is there any legend for the color for b? If same as above figure, indicate. Don't REALLY need color since they bars are already labeled, so it's 2 sources of duplicate information.
+%  %BJC7: The state numbers are all you need to compare to the previous figure BUT the color make it easier 
+%  %plot of the methanol trajectory where states aren't labeled.
+%  %MRS7: cross-hatching doesn't appear in the legend? Not sure which is which (I assume hatched is number density because closer to that axis).
+%  %BJC7: Is it because the hatches aren't dense enough? I see them in the legend
+%  This monotonic
+%  relationship does not exist for states in the pore region. The high 
+%  local density experienced by state 5 methanol molecules may explain why 
+%  hydrogen bond lifetimes are short but dwell times are high. State 5 methanol's
+%  preference towards hydrogen bonds with ether linkages suggests that the solute
+%  sits between LLC monomer head group which prevent it from wandering to far
+%  before recovering its previous hydrogen bond.
+%  }\label{fig:hbond_pichart}
+%  \end{figure}
   
   \subsubsection*{Comparison of Solute Behavior}
   %BJC2: Again, most of this section will get a facelift, but will try to follow same flow 
