@@ -218,6 +218,85 @@
   
   \newpage
   
+  \section{Tips for Reliable State Sequence Identification}\label{section:fitting_tips}
+  
+  The IHMM is quite powerful on its own, but requires some critical thinking by
+  the user in order to ensure maximum effectiveness. One can obtain 
+  the best results with some simple checks and, where necessary, improved 
+  state sequence initialization.
+  
+  The best way to ensure reliable MSD predictions is to ensure proper reproduction
+  of the individual MD MSDs by realizations of the IHMM. Over-predictions and 
+  under-predictions are usually the result of a poorly identified state sequence. (see
+  Figure TBD for example)
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.35\textwidth}
+  \includegraphics[width=\textwidth]{overestimate_ACH_21.pdf}
+  \caption{}\label{fig:msd_overestimate}
+  \end{subfigure}
+  \begin{subfigure}{0.63\textwidth}
+  \includegraphics[width=\textwidth]{state_sequence_before_ACH_21.pdf}
+  \caption{}\label{fig:state_sequence_before}
+  \end{subfigure}
+  \begin{subfigure}{0.35\textwidth}
+  \includegraphics[width=\textwidth]{msd_improvement_ACH_21.pdf}
+  \caption{}\label{fig:msd_improvement}
+  \end{subfigure}
+  \begin{subfigure}{0.63\textwidth}
+  \includegraphics[width=\textwidth]{state_sequence_after_ACH_21.pdf}
+  \caption{}\label{fig:state_sequence_after}
+  \end{subfigure}
+  \caption{(a, b) In some cases, the state segmentation leads to over- or 
+  under-prediction of the MSD, usually due to poor initialization of the state
+  sequence. In (b), state transitions are too frequent and lead to an
+  overprediction of the MD MSD. (c) We can greatly improve MSD predictions by
+  giving the IHMM a good guess at the initial state sequence. (d) A better
+  initial state segmentation via seeding, gives more reasonable estimates
+  of the final state sequence.}\label{fig:improvement_state_sequence}
+  \end{figure}
+  
+  There are two primary approaches we have implemented in order to improve the final 
+  state sequence predictions. Both attempt to aid the initial state assignments 
+  algorithmically. First, we always initialize the prior on $\mathbf{c}$ in 
+  Equation~\ref{M-eqn:var} of the main text as described in 
+  Section~\ref{section:prior_guesses}. In particularly tricky cases, the initial
+  state sequence estimate is so poor that qualitative trajectory realizations
+  and MSD predictions are irreconcilable with MD. In our second approach, we can
+  seed the initial state sequence with a guess made by applying the IHMM to 
+  smaller segments of the trajectory. 
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.48\textwidth}
+  \includegraphics[width=\textwidth]{seed_ACH21_segment0.pdf}
+  \caption{Found 4 Unique States}\label{fig:segment1}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+  \includegraphics[width=\textwidth]{seed_ACH21_segment1.pdf}
+  \caption{Found 14 Unique States}\label{fig:segment2}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+  \includegraphics[width=\textwidth]{seed_ACH21_segment2.pdf}
+  \caption{Found 13 Unique States}\label{fig:segment3}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+  \includegraphics[width=\textwidth]{seed_ACH21_segment3.pdf}
+  \caption{Found 12 Unique States}\label{fig:segment4}
+  \end{subfigure}
+  \begin{subfigure}{1\textwidth}
+  \includegraphics[width=\textwidth]{seed_ACH21_full.pdf}
+  \caption{Initial state sequence seeded with states found in (a)--(d)}\label{fig:full}
+  \end{subfigure}
+  \caption{In (a--d), we show the state sequence resulting from 5 iterations
+  of the IHMM on each of the four quarters of the center-of-mass trajectory in
+  (e) after splitting it into 4 separate segments. We use the concatenation 
+  of the four state sequences as the initial sequence for the IHMM run on the 
+  fully trajectory in (e).
+  }\label{fig:seed_sequence}
+  \end{figure}
+  
 %  \subsection{Clustering on the self-transition probabilities}\label{section:selfT_cluster}
 %  
 %  To cluster on $T_{ii}$, we first cast it in terms of the expected dwell times. The expected 
@@ -373,85 +452,7 @@
 %  \caption{}\label{fig:MET_nclusters} 
 %  \end{figure}
   
-  \section{Tips for Reliable State Sequence Identification}\label{section:fitting_tips}
-  
-  The IHMM is quite powerful on its own, but requires some critical thinking by
-  the user in order to ensure maximum effectiveness. One can obtain 
-  the best results with some simple checks and, where necessary, improved 
-  state sequence initialization.
-  
-  The best way to ensure reliable MSD predictions is to ensure proper reproduction
-  of the individual MD MSDs by realizations of the IHMM. Over-predictions and 
-  under-predictions are usually the result of a poorly identified state sequence. (see
-  Figure TBD for example)
-  
-  \begin{figure}
-  \centering
-  \begin{subfigure}{0.35\textwidth}
-  \includegraphics[width=\textwidth]{overestimate_ACH_21.pdf}
-  \caption{}\label{fig:msd_overestimate}
-  \end{subfigure}
-  \begin{subfigure}{0.63\textwidth}
-  \includegraphics[width=\textwidth]{state_sequence_before_ACH_21.pdf}
-  \caption{}\label{fig:state_sequence_before}
-  \end{subfigure}
-  \begin{subfigure}{0.35\textwidth}
-  \includegraphics[width=\textwidth]{msd_improvement_ACH_21.pdf}
-  \caption{}\label{fig:msd_improvement}
-  \end{subfigure}
-  \begin{subfigure}{0.63\textwidth}
-  \includegraphics[width=\textwidth]{state_sequence_after_ACH_21.pdf}
-  \caption{}\label{fig:state_sequence_after}
-  \end{subfigure}
-  \caption{(a, b) In some cases, the state segmentation leads to over- or 
-  under-prediction of the MSD, usually due to poor initialization of the state
-  sequence. In (b), state transitions are too frequent and lead to an
-  overprediction of the MD MSD. (c) We can greatly improve MSD predictions by
-  giving the IHMM a good guess at the initial state sequence. (d) A better
-  initial state segmentation via seeding, gives more reasonable estimates
-  of the final state sequence.}\label{fig:improvement_state_sequence}
-  \end{figure}
-  
-  There are two primary approaches we have implemented in order to improve the final 
-  state sequence predictions. Both attempt to aid the initial state assignments 
-  algorithmically. First, we always initialize the prior on $\mathbf{c}$ in 
-  Equation~\ref{M-eqn:var} of the main text as described in 
-  Section~\ref{section:prior_guesses}. In particularly tricky cases, the initial
-  state sequence estimate is so poor that qualitative trajectory realizations
-  and MSD predictions are irreconcilable with MD. In our second approach, we can
-  seed the initial state sequence with a guess made by applying the IHMM to 
-  smaller segments of the trajectory. 
-  
-  \begin{figure}
-  \centering
-  \begin{subfigure}{0.48\textwidth}
-  \includegraphics[width=\textwidth]{seed_ACH21_segment0.pdf}
-  \caption{Found 4 Unique States}\label{fig:segment1}
-  \end{subfigure}
-  \begin{subfigure}{0.48\textwidth}
-  \includegraphics[width=\textwidth]{seed_ACH21_segment1.pdf}
-  \caption{Found 14 Unique States}\label{fig:segment2}
-  \end{subfigure}
-  \begin{subfigure}{0.48\textwidth}
-  \includegraphics[width=\textwidth]{seed_ACH21_segment2.pdf}
-  \caption{Found 13 Unique States}\label{fig:segment3}
-  \end{subfigure}
-  \begin{subfigure}{0.48\textwidth}
-  \includegraphics[width=\textwidth]{seed_ACH21_segment3.pdf}
-  \caption{Found 12 Unique States}\label{fig:segment4}
-  \end{subfigure}
-  \begin{subfigure}{1\textwidth}
-  \includegraphics[width=\textwidth]{seed_ACH21_full.pdf}
-  \caption{Initial state sequence seeded with states found in (a)--(d)}\label{fig:full}
-  \end{subfigure}
-  \caption{In (a--d), we show the state sequence resulting from 5 iterations
-  of the IHMM on each of the four quarters of the center-of-mass trajectory in
-  (e) after splitting it into 4 separate segments. We use the concatenation 
-  of the four state sequences as the initial sequence for the IHMM run on the 
-  fully trajectory in (e).
-  }\label{fig:seed_sequence}
-  \end{figure}
-  
+
   \section{Deviations of the IHMM from Molecular Motion}\label{section:shorttimes_msd}
   
    At extremely short time lags, the MSD is generally over-predicted by the IHMM
