@@ -93,66 +93,122 @@
   easily bridge the disconnect between theory and application. In many systems, it's 
   possible to achieve this by calculating diffusion constants. Unfortunately, for 
   systems which exhibit complex short timescale subdiffusive dynamics, one cannot 
-  calculate reliable diffusion constants since solute mean square displacements (MSDs)
-  are non-linear on the timescales accessible to molecular simulation. Therefore, we
-  are in need of a more flexible approach for modeling solute dynamics which makes 
-  less assumptions about the solute's average behavior.
+  calculate reliably compute diffusion constants since solute mean square 
+  displacements (MSDs) are non-linear on the timescales accessible to molecular simulation.
+  Therefore, we are in need of a more flexible approach for modeling solute dynamics
+  which makes less assumptions about the solute's short time scale behavior.
   
-  In this work, we are particularly interested in the design of lyotropic liquid crystal (LLC)
-  monomers, a class of amphiphilic molecules whose ordered self-assembled phases can be 
-  cross-linked into mechanically strong membranes capable of highly selective separations.
-  \begin{itemize}
-  	\item Inverted hexagonal, H\textsubscript{II}, phase LLC membranes are characterized
-  	by hexagonally packed, uniform-sized and straight pores, an ideal geometry for high 
-  	throughput transport.
-	\item Their pores are lined with the LLC monomer functional groups which can
-	potentially be designed to interact with solutes in a chemically-specific manner.
-	\item It would be extremely useful to experimentalists if we could connect LLC monomer
-	design with measurable quantities.
-	\item This goal is complicated by the non-Brownian hopping and trapping behavior induced
-	by the membrane's diverse topology and inhomogeneous structure.~\cite{coscia_understanding_2019,coscia_chemically_2019}
-  \end{itemize}
+  In this work, we are particularly interested in the design of lyotropic liquid 
+  crystal (LLC) monomers, a class of amphiphilic molecules whose ordered self-assembled
+  phases can be cross-linked into mechanically strong membranes capable of highly 
+  selective separations. Inverted hexagonal, H\textsubscript{II}, phase LLC membranes
+  are characterized	by hexagonally packed, uniform-sized and straight pores, an ideal
+  geometry for high throughput transport. Their pores are lined with the LLC monomer's
+  functional groups which can potentially be designed to interact with solutes in a 
+  chemically-specific manner. It would be extremely useful to experimentalists if we 
+  could connect LLC monomer design with measurable quantities. This goal is complicated
+  by the non-Brownian hopping and trapping behavior induced by the membrane's diverse
+  topology and inhomogeneous structure.~\cite{coscia_understanding_2019,coscia_chemically_2019}
   
   We have already progressed our understanding of LLC monomer design in our previous work
   by building stochastic time series models based on the chemical intuition gained
   from qualitative MD studies of solute transport in an H\textsubscript{II} phase LLC
-  membrane.~\cite{coscia_chemically_2019,coscia_capturing_2020}
-  \begin{itemize}
-    \item We identified three classes of trapping behavior which result in short time scale
-    subdiffusion.
-    \item In our first approach to stochastically model this behavior, we treated the
-    system's dynamics as a sequence of anti-correlated hops between power law distributed
-    periods of entrapment, a framework called subordinated fractional Brownian or L\'evy
-    motion.
-    \item In a second approach, we treated solute motion as a Markov state model with 
-    state-dependent dynamics, where we parameterized the state transition probabilities 
-    between each of eight discrete states, defined by the observed trapping mechanism, 
-    as well as the solute dynamics within each of these states. 
-    \item We showed how one could use realizations of any stochastic model like these in
-    order to predict macroscopic flux and selectivity. 
-  \end{itemize}
+  membrane.~\cite{coscia_chemically_2019,coscia_capturing_2020} We identified three 
+  classes of trapping behavior which result in short time scale subdiffusion. In our 
+  first approach to stochastically model this behavior, we treated the system's dynamics
+  as a sequence of anti-correlated hops between power law distributed periods of 
+  entrapment, a framework called subordinated fractional Brownian or L\'evy
+  motion.~\cite{thiel_weak_2014,teuerle_modeling_2013} In a second approach, we treated 
+  solute motion as a Markov state model~\cite{pande_everything_2010} with state-dependent
+  dynamics, where we parameterized the state transition probabilities between each of
+  eight discrete states, defined by the observed trapping mechanisms, as well as the 
+  solute dynamics within each of these states. We showed how one could use realizations
+  of any stochastic model like these in order to predict macroscopic flux and selectivity. 
   
   Although powerful and insightful, our previous work required considerable human effort
   in order to analyze the MD trajectories and to hypothesize stochastic models which
-  matched the behavior of solutes.
+  matched the behavior of solutes. It would be significantly more useful and broadly 
+  applicable if we could design an approach which automatically distinguishes and 
+  parameterizes varied solute dynamics and leaves a facile way to generate an ensemble
+  of stochastic trajectory realizations that can be used to predict macroscopic transport
+  properties.
+  
+  In this work we attempt to minimize human effort through a novel application of the 
+  the sticky hierarchical Dirichlet process autoregressive hidden markov model 
+  (HDP-AR-HMM), nonparameteric Bayesian classification technique that allows us to 
+  automatically detect and infer the parameters of an unknown number of latent vector
+  autoregressive (VAR) modes present in solute center-of-mass time series 
+  trajectories.~\cite{fox_bayesian_2010} The sticky HDP-AR-HMM greatly extends the 
+  basic framework of more limited finite hidden Markov modeling approaches.
+    
+  In their most basic form, hidden Markov models (HMMs) are used to generate
+  a series of latent, or hidden, states dependent only on the previous state.~\cite{rabiner_tutorial_1989}
+  Propagating an HMM generates sequential but independent observations from 
+  the emission distributions associated with each hidden state. Transitions 
+  between states are mathematically defined by a matrix of transition probabilities.
+  Given a series of observations and a known number of hidden states, the 
+  Baum-Welch algorithm is the most commonly used way to determine the hidden
+  state sequence and the underlying parameters of a standard HMM.~\cite{baum_maximization_1970}
+  It also possible to achieve the same results using a Bayesian 
+  framework.~\cite{scott_bayesian_2002,jasra_markov_2005} One can place priors
+  on the transition probabilities and parameters of the hidden states' emission
+  distributions in order to iteratively infer their values and to estimate the hidden state
+  sequence. HMMs have been used in a broad range of applications including speech
+  recognition, weather forecasting and bioinformatics.~\cite{juang_on_1984,hughes_non-homogeneous_1999,yoon_hidden_2009}
+  %BJC4: comment on usage in MD simulations. MSMs?
+  
+  By placing a hierarchical Dirichlet process (HDP) prior on the transition 
+  probabilities, it is possible to extend HMMs to an unknown number of hidden
+  states.~\cite{teh_hierarchical_2006}
   \begin{itemize}
-    \item It would be significantly more useful and broadly applicable if we could 
-    design an approach which automatically distinguishes and parameterizes varied solute 
-    dynamics and leaves a facile way to generate an ensemble of stochastic trajectory
-    realizations that can be used to predict macroscopic transport properties.
+    \item We will refer to this as the HDP-HMM, although in literature it is 
+    often called the infinite hidden Markov model.~\cite{beal_infinite_2002}
+    \item The HDP-HMM elegantly overcomes the main shortcoming of standard
+    HMMs, the need to choose the number of states, making its use more 
+    advantageous in a diversity of applications.
+    \item 
+    
+    diverse applicability and improvement upon the shortcoming 
+    of standard HMMs
+    \item Applications...speaker diarization, etc.
+  \end{itemize}    
+  
+  One issue with the original formulation of HDP-HMM, is that it does not 
+  distinguish self-transitions and transitions between different states.
+  \begin{itemize}
+    \item Practically, this can result in rapid switching between states and
+    inferred state sequence representations that do a poor job of describing
+    the observations. 
+    \item Fox et al. addressed this issue by adding a `sticky' parameter.~\cite{fox_sticky_2007}
+    \item The sticky HDP-HMM is useful in situations where the user has
+    prior knowledge that state persistence is likely.
+    \item This is important for our work where we expect state persistence 
+    due to trapping.
+    \item Applications: Speaker diarization, SPT (Chris' diffusion papers)
   \end{itemize}
   
-  In this work we attempt to minimize human effort by applying the infinite hidden 
-  Markov Model (IHMM)~\cite{beal_infinite_2002,calderon_inferring_2015}, a nonparameteric 
-  Bayesian classification technique, in order to automatically detect and infer the 
-  parameters of an unknown number of latent vector autoregressive (VAR) modes present 
-  in solute center-of-mass time series trajectories. 
+  The usefulness of the sticky HDP-HMM has been further extended to include 
+  temporal dependencies common to many real datasets.
   \begin{itemize}
-    %MRS: start with where it has been used before (to establish utility) a
-    \item It's been used extensively for speaker diarization and has found some application
-    in single particle trajectory analysis.~\cite{calderon_inferring_2015,fox_sticky_2011}
-    %MRS: Then say it hasn't been used in this context (do we know of any, then cite, if none we have found, say so.)
-    \item The IHMM has not been used much for MD trajectory analysis.
+    \item Fox et al. showed how to incorporate Markov jump linear systems (MJLSs)
+    into infinite state models.~\cite{fox_nonparameteric_2009}
+    \item An MJLS models each dynamical mode as a linear dynamical process.
+    \item There are two MJLS classes: switching linear dynamical systems (SLDSs) 
+    and switching vector autoregressive (VAR) processes.
+    \item Switching VAR processes are similar to SLDSs except that they do not
+    incorporate measurement noise.
+    \item Since MD simulations do not contain measurement noise, we will model
+    describe the dynamical modes exhibited by solutes in our MD simulations as 
+    VAR processes and we will refer to our model as an application of the 
+    HDP-AR-HMM, maintaining a distinction from HDP-SLDS models which can
+    be useful for experimental measurement where there is measurement noise.
+  \end{itemize}
+  
+  To our knowledge, this is a novel application of the HDP-AR-HMM.
+  \begin{itemize}
+    \item We use the temporally-correlated parameters of the model in order
+    to learn physical mechanisms and describe solute kinetics.
+    \item We go beyond the typical application of IHMMs.
   \end{itemize}
   
   We aim to address two primary scientific questions with this work:
