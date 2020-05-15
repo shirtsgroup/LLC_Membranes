@@ -154,63 +154,59 @@
   on the transition probabilities and parameters of the hidden states' emission
   distributions in order to iteratively infer their values and to estimate the hidden state
   sequence. HMMs have been used in a broad range of applications including speech
-  recognition, weather forecasting and bioinformatics.~\cite{juang_on_1984,hughes_non-homogeneous_1999,yoon_hidden_2009}
+  recognition, weather forecasting and bioinformatics.~\cite{juang_hidden_1984,hughes_non-homogeneous_1999,yoon_hidden_2009}
   %BJC4: comment on usage in MD simulations. MSMs?
   
   By placing a hierarchical Dirichlet process (HDP) prior on the transition 
   probabilities, it is possible to extend HMMs to an unknown number of hidden
-  states.~\cite{teh_hierarchical_2006}
-  \begin{itemize}
-    \item We will refer to this as the HDP-HMM, although in literature it is 
-    often called the infinite hidden Markov model.~\cite{beal_infinite_2002}
-    \item The HDP-HMM elegantly overcomes the main shortcoming of standard
-    HMMs, the need to choose the number of states, making its use more 
-    advantageous in a diversity of applications.
-    \item 
-    
-    diverse applicability and improvement upon the shortcoming 
-    of standard HMMs
-    \item Applications...speaker diarization, etc.
-  \end{itemize}    
+  states.~\cite{teh_hierarchical_2006} We will refer to this as the HDP-HMM,
+  although in literature it is often called the infinite hidden Markov 
+  model.~\cite{beal_infinite_2002} The HDP-HMM elegantly overcomes the main
+  shortcoming of standard HMMs, the need to choose the number of states 
+  \textit{a priori}, making its use more advantageous in a diversity of 
+  applications including single particle trajectory analysis and economic 
+  data interpretation.~\cite{hines_analyzing_2015,shi_identifying_2016} 
+  This approach allows the complexity of the data to drive the complexity
+  of the model.
   
-  One issue with the original formulation of HDP-HMM, is that it does not 
-  distinguish self-transitions and transitions between different states.
-  \begin{itemize}
-    \item Practically, this can result in rapid switching between states and
-    inferred state sequence representations that do a poor job of describing
-    the observations. 
-    \item Fox et al. addressed this issue by adding a `sticky' parameter.~\cite{fox_sticky_2007}
-    \item The sticky HDP-HMM is useful in situations where the user has
-    prior knowledge that state persistence is likely.
-    \item This is important for our work where we expect state persistence 
-    due to trapping.
-    \item Applications: Speaker diarization, SPT (Chris' diffusion papers)
-  \end{itemize}
+  One issue with the original formulation of the HDP-HMM, is that it does 
+  not distinguish self-transitions and transitions between different states.
+  Practically, this can result in rapid switching between states and inferred
+  state sequence representations that do a poor job of describing the 
+  observations. Fox et al. addressed this issue by adding a `sticky' 
+  parameter.~\cite{fox_sticky_2007} The sticky HDP-HMM is useful in situations
+  where the user has prior knowledge that state persistence is likely.
+  For example, it is unlikely that a conversation between two people would 
+  rapidly switch between speakers.~\cite{fox_sticky_2011} This is also 
+  important for our work where we expect state persistence due to trapping.   
   
   The usefulness of the sticky HDP-HMM has been further extended to include 
-  temporal dependencies common to many real datasets.
-  \begin{itemize}
-    \item Fox et al. showed how to incorporate Markov jump linear systems (MJLSs)
-    into infinite state models.~\cite{fox_nonparameteric_2009}
-    \item An MJLS models each dynamical mode as a linear dynamical process.
-    \item There are two MJLS classes: switching linear dynamical systems (SLDSs) 
-    and switching vector autoregressive (VAR) processes.
-    \item Switching VAR processes are similar to SLDSs except that they do not
-    incorporate measurement noise.
-    \item Since MD simulations do not contain measurement noise, we will model
-    describe the dynamical modes exhibited by solutes in our MD simulations as 
-    VAR processes and we will refer to our model as an application of the 
-    HDP-AR-HMM, maintaining a distinction from HDP-SLDS models which can
-    be useful for experimental measurement where there is measurement noise.
-  \end{itemize}
+  temporal dependencies common to many real datasets. State dynamics and 
+  relaxation into new states are often correlated.~\cite{calderon_data-driven_2014}
+  Fox et al. showed formulated a method that accounts for this behavior by
+  incorporating Markov jump linear systems (MJLSs) into infinite state 
+  models.~\cite{fox_nonparametric_2009} An MJLS models each dynamical mode
+  as a linear dynamical process. Two MJLS sub-classes are switching linear
+  dynamical systems (SLDSs) and switching vector autoregressive (VAR) processes.
+  Switching VAR processes are similar to SLDSs except that they do not
+  incorporate measurement noise. Since MD simulations do not contain measurement
+  noise, we will model the dynamical modes exhibited by MD solute trajectories 
+  as VAR processes and we will refer to our model as an application of the 
+  sticky HDP-AR-HMM in order to maintaining its the even more general sticky
+  HDP-SLDS models.
   
-  To our knowledge, this is a novel application of the HDP-AR-HMM.
-  \begin{itemize}
-    \item We use the temporally-correlated parameters of the model in order
-    to learn physical mechanisms and describe solute kinetics.
-    \item We go beyond the typical application of IHMMs.
-  \end{itemize}
+  To our knowledge, this is a novel application and analysis of the sticky 
+  HDP-AR-HMM. Typical applications center around determining the number of
+  states, the state sequence and occasional analysis of the emission 
+  distributions. The addition of temporal correlation to the inference 
+  procedure has primarily been used to improve state sequence 
+  identification.~\cite{calderon_inferring_2015,hamada_modeling_2016}
+  Not only do we use the HDP-AR-HMM to segment MD time series into distinct
+  dynamical modes, but we use temporally-correlated parameters of the model
+  in order to learn physical mechanisms and describe solute kinetics. 
+  %Further, we use the model parameters to generate new time series trajectories.
   
+  %BJC4: enumerate?
   We aim to address two primary scientific questions with this work:
   First, we want to know whether it is possible to predict macroscopic transport
   properties. We use the VAR parameters and state transition probability matrix of
