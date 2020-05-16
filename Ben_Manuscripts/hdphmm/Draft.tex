@@ -41,9 +41,11 @@
   Appropriate time series modeling of complex diffusion in soft matter systems on the
   microsecond time scale can provide a path towards inferring transport mechanisms and
   predicting bulk properties characteristic of much longer time scales. In this work 
-  we apply the sticky hierarchical Dirichlet process hidden Markov model (HDP-AR-HMM) 
+  we apply the sticky hierarchical Dirichlet process hidden Markov model (HPD-AR-HMM) 
+  %MRS: might be confusing to have the AR in there when the words ``Auto-regressive'' 
+  %don't appear; then they would try to figure out where the AR is. 
   to solute center-of-mass trajectories generated from long molecular dynamics 
-  simulations in a cross-linked inverted hexagonal phase lyotropic liquid crystal 
+  simulations in a cross-linked inverted hexagonal phase lyotropic liquid crystal
   (LLC) membrane in order to automatically detect a variety of solute dynamical states
   which can be further explained in terms of solute-membrane interactions.
 
@@ -52,17 +54,21 @@
   in each state and position within the inhomogeneous membrane structure. We analyze
   prevalent clusters in order to relate their parameters to physical interactions between 
   solutes and the membrane. 
-
   Along with parameters of individual states, the HDP-AR-HMM simultaneously infers a transition
   matrix which allows us to stochastically propagate solute behavior from all of the 
   independent trajectories onto much longer time scales while still preserving the 
   qualitative behavior characteristic of the MD trajectories. This affords a direct 
   connection to important macroscopic observables used to characterize performance like
   solute flux and selectivity. 
-  
+
+  %MRS: we have to decide if ``effective'' is the right word. Alternative is ``promising''.
   Overall, this work provides an effective way to simultaneously identify transport 
   mechanisms in nanoporous materials and project complex diffusive behavior on
-  long time scales.  This enhancement to our understanding of the diverse range 
+  long time scales.  
+  %MRS: simplify by removing nominalizations.
+  %This enhancement to our understanding 
+  Our enhanced understanding
+  of the diverse range 
   of solute behavior allows us to hypothesize design changes 
   to LLC monomers aimed towards controlling the rates of solute passage, thus improving 
   the selective performance of LLC membranes. 
@@ -73,7 +79,7 @@
   
   There is a need for highly selective membranes in order to perform efficient 
   separations of the components of complex aqueous streams. Seawater and
-  bracksih water desalination, separation of organic micropollutants from 
+  brackish water desalination, separation of organic micropollutants from 
   municipal water supplies, recovering valuable dissolved species from 
   waste stream and creating breathable barriers to harmful contaminants are just a
   subset of the broad range of applications for selective membrane separations.~\cite{fritzmann_state---art_2007,fonseca_couto_critical_2018,dischinger_evaluation_2019,ramaseshan_functionalized_2006}
@@ -86,14 +92,14 @@
   fluctuations with macroscopic observables. If one could apply molecular dynamics 
   (MD) simulations to explain important experimental metrics such as solute flux and 
   selectivity in terms of detailed chemically dependent solute motion, then we can more
-  easily bridge the disconnect between theory and application. In many systems, it's 
+  easily bridge the disconnect between theory and application. In many systems, it is 
   possible to achieve this by calculating diffusion constants. 
   % BJC4: even if we could calculate diffusion constants, wouldn't there still be value 
   % in understanding chemical detail?
   % BJC4: It might not be a good idea to blame our need for this modeling on non-linear MSDs, 
   % especially since our MSDs appear to be at or nearing a linear regime.
   % BJC4: seems like we should be addressing the problem as short time scale subdiffusive 
-  % dynamics that dictates measureable long time scale diffusion. Although curves become linear,
+  % dynamics that dictates measurable long time scale diffusion. Although curves become linear,
   % the slopes should be a product of the short time scale motion.
   Unfortunately, for 
   systems which exhibit complex short timescale subdiffusive dynamics, one cannot 
@@ -112,13 +118,17 @@
   chemically-specific manner. It would be extremely useful to experimentalists if we 
   could connect LLC monomer design with measurable quantities. This goal is complicated
   by the non-Brownian hopping and trapping behavior induced by the membrane's diverse
-  topology and inhomogeneous structure.~\cite{coscia_understanding_2019,coscia_chemically_2019}
-  
-  We have already progressed our understanding of LLC monomer design in our previous work
+  topology and inhomogeneous structure result in subdiffusive behaviour out to multiple microseconds of simulation.~\cite{coscia_understanding_2019,coscia_chemically_2019}
+  %MRS: to sentence above added to come back to main theme
+
+  We have already advanced our understanding of LLC monomer design in our previous work
   by building stochastic time series models based on the chemical intuition gained
   from qualitative MD studies of solute transport in an H\textsubscript{II} phase LLC
   membrane.~\cite{coscia_chemically_2019,coscia_capturing_2020} We identified three 
-  classes of trapping behavior which result in short time scale subdiffusion. In our 
+  classes of trapping behavior which result in 
+  %MRS: tweaked
+  subdiffusion out to the microsecond time scale. 
+  In our 
   first approach to stochastically model this behavior, we treated the system's dynamics
   as a sequence of anti-correlated hops between power law distributed periods of 
   entrapment, a framework called subordinated fractional Brownian or L\'evy
@@ -132,8 +142,13 @@
   Although powerful and insightful, our previous work required considerable human effort
   in order to analyze the MD trajectories and to hypothesize stochastic models which
   matched the behavior of solutes. It would be significantly more useful and broadly 
-  applicable if we could design an approach which automatically distinguishes and 
-  parameterizes varied solute dynamics and leaves a facile way to generate an ensemble
+  applicable if we could design an approach which 
+  %MRS: tweaked to sound more machine-learning-y
+  %automatically 
+  distinguishes and 
+  parameterizes varied solute dynamics 
+  in a data-driven way
+  and leaves a facile way to generate an ensemble
   of stochastic trajectory realizations that can be used to predict macroscopic transport
   properties.
   
@@ -154,14 +169,18 @@
   Baum-Welch algorithm is the most commonly used way to determine the hidden
   state sequence and the underlying parameters of a standard HMM.~\cite{baum_maximization_1970}
   It also possible to achieve the same results using a Bayesian 
-  framework.~\cite{scott_bayesian_2002,jasra_markov_2005} One can place priors
+  framework.~\cite{scott_bayesian_2002,jasra_markov_2005} 
+  %MRS: not entirely clear what purpose of above sentence its - it sort of implied you will use Bayesian framework?
+  One can place priors
   on the transition probabilities and parameters of the hidden states' emission
   distributions in order to iteratively infer their values and to estimate the hidden state
-  sequence. HMMs have been used in a broad range of applications including speech
-  recognition, weather forecasting and bioinformatics.~\cite{juang_hidden_1984,hughes_non-homogeneous_1999,yoon_hidden_2009}. In molecular simulations, HMMs have been
+  sequence. 
+  HMMs have been used in a broad range of applications including speech
+  recognition, weather forecasting and bioinformatics.~\cite{juang_hidden_1984,hughes_non-homogeneous_1999,yoon_hidden_2009}.
+  In molecular simulations, HMMs have been
   used to characterize molecular kinetics in order to determine the equilibrium 
   distribution of various observables.~\cite{noe_probability_2008}
-  
+  %MRS: probably a few more citations that should be added above, since there has been a lot.
   By placing a hierarchical Dirichlet process (HDP) prior on the transition 
   probabilities, it is possible to extend HMMs to an unknown number of hidden
   states, thus allowing the model's complexity to be driven by the complexity
@@ -173,7 +192,7 @@
   applications including economic data and single particle trajectory 
   analysis.~\cite{shi_identifying_2016,hines_analyzing_2015} 
 
-  One issue with the original formulation of the HDP-HMM, is that it does 
+  One issue with the original formulation of the HDP-HMM is that it does 
   not distinguish self-transitions and transitions between different states.
   Practically, this can result in rapid switching between states and inferred
   state sequence representations that do a poor job of describing the 
@@ -200,6 +219,7 @@
   sticky HDP-AR-HMM in order to maintaining its distinction from the even more
   general sticky HDP-SLDS models.
   
+  %MRS: define what ``this'' is - important claim, make it clear what it is you are claiming.
   To our knowledge, this is a novel application and analysis of the sticky 
   HDP-AR-HMM. Typical applications center around determining the number of
   states, the state sequence and occasional analysis of the emission 
@@ -235,9 +255,9 @@
   
   \section{Methods}
     
-  We ran all MD simulations and energy minimizations using GROMACS 2018.
-  ~\cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008}  
-  Our python implementation of the HDP-AR-HMM algorithm is available online at \\
+  We ran all MD simulations and energy minimizations using GROMACS 2018.~\cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008}  
+  Our Python implementation of the HDP-AR-HMM algorithm is available online at \\
+  %MRS: possibly should give the permanent reference to a shirtsgroup fork?  We can discuss which is likely to be more permenant
   \texttt{https://github.com/bencoscia/hdphmm}. All other post-simulation 
   trajectory analysis tools are available online at
   \texttt{https://github.com/shirtsgroup/LLC\_Membranes}.
@@ -246,8 +266,8 @@
 
   We studied transport of solutes in the H\textsubscript{II} phase using an
   atomistic molecular model of four pores in a monoclinic unit cell with 
-  10 \% water by weight. Approximately one third of the water molecules 
-  occupy the tail region with the rest near the pore center.
+  10\% water by weight. Approximately one third of the water molecules 
+  occupy the tail region with the rest near the pore center.%MRS: cite previous paper here on this.
   
   We chose to study a subset of 4 of the fastest moving solutes from our previous
   work: methanol, acetic acid, urea and ethylene glycol.
@@ -259,8 +279,12 @@
   time scales which we simulate. Further details on the setup and equilibration of
   these systems are detailed in our previous work.\cite{coscia_chemically_2019}
   
-  We let each solute undergo 5 $\mu$s of MD simulation. We used a time step of 2 fs
+  %MRS: tweaked
+  %We let each solute undergo 
+  Each solute system was simulated for 5 $\mu$s of molecular dynamics  simulation. We used a time step of 2 fs
   at a pressure of 1 bar and temperature of 300K controlled by the Parrinello-Rahman 
+  %MRS: just wondering, was this semiisotropic, or isotropic?  If isotropic, do we know how different the diagonals of the 
+  pressure tensor were (since the system is not totally isotropic)
   barostat~\cite{parrinello_polymorphic_1981} and velocity rescale 
   thermostat~\cite{bussi_canonical_2007} respectively. We recorded configurations every 0.5 ns.
 
@@ -329,7 +353,8 @@
   transformed relative to the nearest pore center. By working in Cartesian coordinates,
   we avoid mathematical complexity introduced by change of coordinates into cylindrical
   coordinates while estimating the state sequence.
-  
+
+  %MRS: some of this is a repetition of what you said above.
   We implemented the sticky HDP-AR-HMM in Python 
   (\texttt{https://github.com/bencoscia/hdphmm}) which we heavily adapted from
   the MATLAB code of Fox et al.~\cite{fox_nonparametric_2009} Since we do not incorporate
@@ -352,8 +377,8 @@
   vector $\mathbf{c}$ and a white noise term $\mathbf{e}_t$.~\cite{hamilton_time_1994}
   We assumed $\mathbf{e}_t$ to be multivariate Gaussian noise, with mean zero and
   covariance, $\Sigma$. We limited our analysis to an autoregressive order of $r=1$.
-  This means that we only parameterize $A_1$. To simplify notation, we will just
-  call it $A$. We used conjugate matrix-normal inverse-Wishart (MNIW) prior on parameters 
+  This means that we only parameterize $A_1$. To simplify notation, we will call it $A$. 
+  We used a conjugate matrix-normal inverse-Wishart (MNIW) prior on parameters 
   $A$ and $\Sigma$ and a Gaussian prior on $\mathbf{c}$ in order to infer their 
   values.~\cite{fox_nonparametric_2009}
    
@@ -404,7 +429,7 @@
   criteria, which works to minimize the sum of the squared differences within all
   clusters.~\cite{ward_hierarchical_1963} We elected to choose the number of clusters
   rather than the distance threshold. For our data, non-parametric methods such as 
-  Dirchlet process Gaussian mixture models~\cite{pedregosa_scikit-learn_2011,gelman_bayesian_2013}
+  Dirichlet process Gaussian mixture models~\cite{pedregosa_scikit-learn_2011,gelman_bayesian_2013}
   tend to delocalize the clusters in parameter space (see Section~\ref{S-section:agglomerative}
   of the Supporting Information), which could cause the clustered model to combine 
   distinct behavior into a non-physical hybrid state.
@@ -415,14 +440,20 @@
   related to the average time spent in each state. The distance from the closest pore 
   center is likely meaningful since the membrane is radially inhomogeneous from each 
   pore, transitioning from hydrophilic pores to hydrophobic tails. However, the 
-  channels are isotropic along the pore axis so we do not in means in the $z$ dimension.
+  channels are isotropic along the pore axis so we do not 
+  %MRS: added this?  Grammar didn't make sense without.
+  cluster
+  in means in the $z$ dimension.
   We normalized each clustering dimension by its variance and shifted the mean to zero.
   
   To take advantage of the system's cylindrical symmetry, we converted the parameters that
   are directly related to solute position into cylindrical coordinates before clustering. 
   We replaced the $x$ and $y$ eigenvalues of $\Sigma$ and $A$ with $\lambda_x$ + 
   $\lambda_y$ and $\lambda_x^2$ + $\lambda_y^2$ respectively, which are invariant with 
-  rotation around the $z$ axis, in both cases reducing the dimensionality from 3 to 2.  
+  rotation around the $z$ axis. 
+  %MRS: maybe reduntant and not quite right, since it reduces the dimensionality of the paraameter su
+  % bspace from 3 to 2, but the overall paameter space is bigger than 3
+  %in both cases reducing the dimensionality from 3 to 2.  
   We clustered on squared means in $r$, $\mu_r^2 = \mu_x^2 + \mu_y^2$, rather than
   $\mu_x$ and $\mu_y$ individually, with the square $\mu_r$ converting it into the 
   same units as $A$ and $\Sigma$.
@@ -449,7 +480,7 @@
   beneficial to incorporate other physically motivated variables into the clustering
   procedure. For example, one can gain a thorough understanding of the dynamics of
   different kinds of trapping behavior related to hydrogen bonding and sodium ion association.
- 
+  %MRS: last sentence is a little weird. Audience may be left without knowing how this could be achieved.
   %\subsubsection*{Choosing the Number of Clusters}
 
   \textit{Choosing the Number of Clusters}: To aid interpretation, our goal was to
@@ -496,6 +527,7 @@
   
   \subsection{Predicting Mean Squared Displacement}\label{method:realizations}
   %BJC4: reworked this section
+  %MRS: should explain why here there are two approaches.
   \textit{Generating Stochastic HDP-AR-HMM Trajectory Realizations}: We used two 
   different methods to stochastically generate trajectories:
   \begin{enumerate}[label={Method \theenumi :}, leftmargin=3.5\parindent]
@@ -535,7 +567,8 @@
     the clustered parameter sets. For each trial, we calculated the MSD of 1000 
     trajectories sampled, with replacement, from the ensemble.
   \end{enumerate}
-  
+
+  %MRS: this doesn't make sense - there aren't 1000 trajectories.  You mean method 1?
   For MD trajectories, we bootstrapped according to Method 2.
   
   %BJC4: new section below
@@ -575,7 +608,11 @@
     \label{eqn:msd_D}
   \end{equation}
   where $n$ is the number of spatial dimensions (1 in our case). Since the MSD
-  of our models enters a linear regime, we can estimate diffusion constants 
+  %MRS: tweaked
+  %of our models 
+  of the realizations of our models 
+  enters a linear regime, we can estimate diffusion constants 
+  %MRS: maybe can say what the timescale of the linear regime, and how much longer the stochastic realizations are?
   based on the slope of the linear region of the predicted MSD curves. 
 
   \subsection{Tools for using the Parameterized Model to Explore Mechanisms}\label{method:interactions}
@@ -591,7 +628,11 @@
   We still counted sequences where hydrogen bonds were broken for a single frame 
   before reforming. Consistent with our previous work, we reported the 95th 
   percentile of hydrogen bond lifetimes since their distribution is not Gaussian
-  and to emphasize longer trapping periods.~\cite{coscia_chemically_2019}
+  and to 
+  %MRS: 
+  %emphasize 
+  accentuate
+  longer trapping periods.~\cite{coscia_chemically_2019}
   
   \textit{Sodium ion association detection}: We also measured the degree of association
   between solutes and sodium ions on a frame-by-frame basis. We define a sodium ion to
@@ -624,7 +665,7 @@
   \centering
   \includegraphics[width=\textwidth]{rz_unclustered_MET.pdf}
   \caption{The HDP-AR-HMM found 24 distinct VAR(1) states in this representative methanol trajectory.
-  We performed the parameterization in 3D cartesian coordinates, but for this figure, we 
+  We performed the parameterization in 3D Cartesian coordinates, but for this figure, we 
   converted to cylindrical coordinates, with $r$ the distance from the pore center, to 
   provide a clearer picture of solute motion.}\label{fig:rz_unclustered}
   \end{figure}
@@ -665,7 +706,7 @@
     Section~\ref{method:realizations} of the methods.
     \item Our ability to reproduce these curves gives use confidence
     in their long term predictions.
-    \item We underestimate the MSD of Urea because of a small number of MD 
+    \item We underestimate the MSD of urea because of a small number of MD 
     trajectories with uncharacteristically high MSDs. Despite our best efforts, 
     we could not adequately parameterize an HDP-AR-HMM which reproduced said 
     behavior. (see SI)  %BJC4: TODO
@@ -818,7 +859,7 @@
   \centering
   \includegraphics[width=0.5\textwidth]{prevalence.pdf}
   \caption{5 out of the 10 clustered states are visited by 15 or more of the solute
-  trajecotries. The solutes spend varying amounts of time in each of these states.
+  trajectories. The solutes spend varying amounts of time in each of these states.
   }
   \label{fig:prevalence}
   \end{figure}
@@ -934,16 +975,16 @@
     be easily broken since both components can be stabilized by surrounding 
     water molecules and solutes.
     \item Therefore, it is logical to search for hydrogen bonding interactions
-    and solute assocation with sodium ions.
+    and solute association with sodium ions.
   \end{itemize}
   
   For methanol, hydrogen bonding is a much more dominant interaction than sodium
   ion association. 
   \begin{itemize}
     \item In Figure~\ref{fig:hbond_fractions}, we show that methanol participates
-    in hydrogen bonds to various parts of the monomer between 27 and 45 \% of the
+    in hydrogen bonds to various parts of the monomer between 27 and 45\% of the
     total time it occupies the dominant states.
-    \item Methanol associates with sodium ions less than 10 \% of the time in 
+    \item Methanol associates with sodium ions less than 10\% of the time in 
     dominant states.
   \end{itemize}  
   
@@ -991,9 +1032,9 @@
   that state spent hydrogen bonding to various regions of the monomer, color coded to match (a).
   (c) For each type of hydrogen bond in each dominant state, we calculated the 95th percentile
   of hydrogen bond lifetimes. (d) We also analyzed the frequency and lifetimes of solute 
-  association with sodium ions. Methanol associates with sodium less than 10 \% of the total 
+  association with sodium ions. Methanol associates with sodium less than 10\% of the total 
   time it occupies any of the dominant state.
-  %Relative to hydrogen bonding, it is a relatively infrequenct interaction
+  %Relative to hydrogen bonding, it is a relatively infrequent interaction
   %for methanol molecules, but the 
   }
   \label{fig:hydrogen_bonding}
@@ -1181,4 +1222,8 @@
 % LocalWords:  berendsen gromacs spoel hess emailed plateauing hmm ne gelman AR
 % LocalWords:  walt numpy GCL URE ACH IMMM subsubsection modT convective vmd Na
 % LocalWords:  scannable subsubcaptions errorbars uncharacteristicness facelift
-% LocalWords:  PSC RMACC hdphmm TOC
+% LocalWords:  PSC RMACC hdphmm TOC nominalizations dischinger ramaseshan Baum
+% LocalWords:  functionalized teuerle jasra markov bioinformatics hughes yoon
+% LocalWords:  hines diarization MJLSs MJLS SLDSs SLDS hamada jk params MNIW
+% LocalWords:  plateaued nclusters leftmargin trans diffusivity sorption alkane
+% LocalWords:  ness substituents
