@@ -655,7 +655,7 @@
   
   We applied the HDP-AR-HMM independently to all 24 trajectories of each of the four solutes studied.
   The number of states found for each trajectory varied between 5 and 30.  %BJC4: MET: (5, 28), need to finalized
-  In Figure~\ref{fig:rz_unclustered}, we show the state sequence determined by the HDP-AR-HMM for
+  Figure~\ref{fig:rz_unclustered}, shows the state sequence determined by the HDP-AR-HMM for
   an example methanol trajectory. The model distinguishes many of the states due to 
   differences in their mean levels while their fluctuations about those means are often 
   similar. In Section~\ref{section:mechanisms}, we use clustering to reduce the total state
@@ -679,12 +679,16 @@
   Section~\ref{method:realizations}.
   
   As shown in Figure~\ref{fig:qualitative_unclustered}, realizations of our model 
+  %MRS: would it be accurate to show ``produces trajectories that show . . . ``  Saying that it ``can 
+  %produce trajectories'' is a little weasly - sounds like it usually doesn't.  
+  % 
   can produce trajectories that show qualitatively similar hopping and trapping 
   behavior to the MD trajectories to which they were fit. It is important that our
   model reproduces this behavior so that we can have confidence in its usefulness
   for quantitative predictions.
   
   % BJC4: This figure needs to be redone with new trajectory generation procedure
+  %MRS: is this still the old one?
   \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{qualitative_unclustered_MET2.pdf}
@@ -704,8 +708,10 @@
   \begin{itemize}
     \item We generated the MSD curves using Method 1 described in 
     Section~\ref{method:realizations} of the methods.
+    %MRS: should be clearer about what ``reproduce these curves mean'', since you aren't reproducing.
     \item Our ability to reproduce these curves gives use confidence
     in their long term predictions.
+    %MRS: not match under any circumstance, or without clustering (?  Not clear. 
     \item We underestimate the MSD of urea because of a small number of MD 
     trajectories with uncharacteristically high MSDs. Despite our best efforts, 
     we could not adequately parameterize an HDP-AR-HMM which reproduced said 
@@ -739,6 +745,8 @@
   
   \subsection{Using HDP-AR-HMM Parameters to Predict Selectivity}\label{section:macroscopic_properties}
   
+  %MRS: seems odd not at least mention clustering here. 
+
   Since we can generate trajectories that share features similar to MD simulations, 
   it is now reasonable to project solute behavior onto much longer time scales.
   \begin{itemize}
@@ -919,15 +927,19 @@
   \end{itemize}
   
   % BJC4: Not sure if this is useful.
-  By studying the parameters, it is now easier to describe the state behavior.
+  % MRS: it does give a good summary. But you should make it clear how you selected these 5.
+  % MRS: it's implied in one of the figures, but should be stated explicitly
+  By examining the parameters, it is now easier to describe the state behavior.
   \begin{enumerate}[label={State \theenumi :}, leftmargin=3.5\parindent]
      \item This state has intermediate dwell times with high past-hop dependence.
      The radial mean and evidence from Figure~\ref{fig:clustered_traj_MET} suggests
+     %MRS: ``tail and pore region'' sounds the same as ``everywhere''.
      that this state is common in the tail and pore region.
      \item This state seems to occur exclusively in the tail region based on its radial
      mean. Its fluctuations are small and there is little past hop dependence
      \item This is likely a hopping state that strongly contribute to the solute's MSD. 
      It is short lived and takes very large hops. This type of behavior is exhibited 
+     %MRS: ``near and far'' also sounds like everywhere 
      near and far from the pore center as discussed earlier.
      \item This is a trapping state with a strong dependence on its previous fluctuation.
      Evidence from Figure~\ref{fig:clustered_traj_MET} and a radial mean of 1.8 suggest
@@ -977,7 +989,7 @@
     \item Therefore, it is logical to search for hydrogen bonding interactions
     and solute association with sodium ions.
   \end{itemize}
-  
+  %MRS: above, start with the last point; state what the interactions are, and then give the reasoning.
   For methanol, hydrogen bonding is a much more dominant interaction than sodium
   ion association. 
   \begin{itemize}
@@ -1046,6 +1058,7 @@
     \item Although hydrogen bonding interactions are relatively frequent, methanol molecules
     are unbound by any measurable electrostatic interactions about half or more of the 
     simulation time.  
+    %MRS: this above doesn't support the thesis statement?
     \item Figure~\ref{fig:local_densities} helps to illustrate how the local density of 
     membrane components can aid in solute entrapment.
     \item When solutes experience long trapping times, the local number density of heavy 
