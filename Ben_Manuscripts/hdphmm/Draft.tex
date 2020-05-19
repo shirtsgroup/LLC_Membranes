@@ -41,10 +41,8 @@
   Appropriate time series modeling of complex diffusion in soft matter systems on the
   microsecond time scale can provide a path towards inferring transport mechanisms and
   predicting bulk properties characteristic of much longer time scales. In this work 
-  we apply the sticky hierarchical Dirichlet process hidden Markov model (HPD-AR-HMM) 
-  %MRS: might be confusing to have the AR in there when the words ``Auto-regressive'' 
-  %don't appear; then they would try to figure out where the AR is. 
-  to solute center-of-mass trajectories generated from long molecular dynamics 
+  we apply the sticky hierarchical Dirichlet process autoregressive hidden Markov model
+  (HPD-AR-HMM) to solute center-of-mass trajectories generated from long molecular dynamics 
   simulations in a cross-linked inverted hexagonal phase lyotropic liquid crystal
   (LLC) membrane in order to automatically detect a variety of solute dynamical states
   which can be further explained in terms of solute-membrane interactions.
@@ -62,16 +60,12 @@
   solute flux and selectivity. 
 
   %MRS: we have to decide if ``effective'' is the right word. Alternative is ``promising''.
-  Overall, this work provides an effective way to simultaneously identify transport 
+  %BJC5: ``promising'' seems safer
+  Overall, this work provides a promising way to simultaneously identify transport 
   mechanisms in nanoporous materials and project complex diffusive behavior on
-  long time scales.  
-  %MRS: simplify by removing nominalizations.
-  %This enhancement to our understanding 
-  Our enhanced understanding
-  of the diverse range 
-  of solute behavior allows us to hypothesize design changes 
-  to LLC monomers aimed towards controlling the rates of solute passage, thus improving 
-  the selective performance of LLC membranes. 
+  long time scales. Our enhanced understanding of the diverse range of solute behavior
+  allows us to hypothesize design changes to LLC monomers aimed towards controlling the
+  rates of solute passage, thus improving the selective performance of LLC membranes. 
   
   \end{abstract}  
   
@@ -118,19 +112,16 @@
   chemically-specific manner. It would be extremely useful to experimentalists if we 
   could connect LLC monomer design with measurable quantities. This goal is complicated
   by the non-Brownian hopping and trapping behavior induced by the membrane's diverse
-  topology and inhomogeneous structure result in subdiffusive behaviour out to multiple microseconds of simulation.~\cite{coscia_understanding_2019,coscia_chemically_2019}
-  %MRS: to sentence above added to come back to main theme
+  topology and inhomogeneous structure resulting in subdiffusive behavior out to 
+  multiple microseconds of simulation.~\cite{coscia_understanding_2019,coscia_chemically_2019}
 
   We have already advanced our understanding of LLC monomer design in our previous work
   by building stochastic time series models based on the chemical intuition gained
   from qualitative MD studies of solute transport in an H\textsubscript{II} phase LLC
   membrane.~\cite{coscia_chemically_2019,coscia_capturing_2020} We identified three 
-  classes of trapping behavior which result in 
-  %MRS: tweaked
-  subdiffusion out to the microsecond time scale. 
-  In our 
-  first approach to stochastically model this behavior, we treated the system's dynamics
-  as a sequence of anti-correlated hops between power law distributed periods of 
+  classes of trapping behavior which result in subdiffusion out to the microsecond 
+  time scale. In our first approach to stochastically model this behavior, we treated 
+  the system's dynamics as a sequence of anti-correlated hops between power law distributed periods of 
   entrapment, a framework called subordinated fractional Brownian or L\'evy
   motion.~\cite{thiel_weak_2014,teuerle_modeling_2013} In a second approach, we treated 
   solute motion as a Markov state model~\cite{pande_everything_2010} with state-dependent
@@ -142,13 +133,8 @@
   Although powerful and insightful, our previous work required considerable human effort
   in order to analyze the MD trajectories and to hypothesize stochastic models which
   matched the behavior of solutes. It would be significantly more useful and broadly 
-  applicable if we could design an approach which 
-  %MRS: tweaked to sound more machine-learning-y
-  %automatically 
-  distinguishes and 
-  parameterizes varied solute dynamics 
-  in a data-driven way
-  and leaves a facile way to generate an ensemble
+  applicable if we could design an approach which distinguishes and parameterizes varied
+  solute dynamics in a data-driven way and leaves a facile way to generate an ensemble
   of stochastic trajectory realizations that can be used to predict macroscopic transport
   properties.
   
@@ -166,21 +152,20 @@
   the emission distributions associated with each hidden state. Transitions 
   between states are mathematically defined by a matrix of transition probabilities.
   Given a series of observations and a known number of hidden states, the 
-  Baum-Welch algorithm is the most commonly used way to determine the hidden
-  state sequence and the underlying parameters of a standard HMM.~\cite{baum_maximization_1970}
-  It also possible to achieve the same results using a Bayesian 
-  framework.~\cite{scott_bayesian_2002,jasra_markov_2005} 
+  Baum-Welch algorithm, an expectation maximization technique, is the most commonly 
+  used way to determine the hidden state sequence and the underlying parameters of
+  a standard HMM.~\cite{baum_maximization_1970} It also possible to achieve the same
+  results using a Bayesian framework.~\cite{scott_bayesian_2002,jasra_markov_2005} 
   %MRS: not entirely clear what purpose of above sentence its - it sort of implied you will use Bayesian framework?
-  One can place priors
-  on the transition probabilities and parameters of the hidden states' emission
-  distributions in order to iteratively infer their values and to estimate the hidden state
-  sequence. 
-  HMMs have been used in a broad range of applications including speech
-  recognition, weather forecasting and bioinformatics.~\cite{juang_hidden_1984,hughes_non-homogeneous_1999,yoon_hidden_2009}.
-  In molecular simulations, HMMs have been
-  used to characterize molecular kinetics in order to determine the equilibrium 
-  distribution of various observables.~\cite{noe_probability_2008}
-  %MRS: probably a few more citations that should be added above, since there has been a lot.
+  % BJC5: Baum welch is most widely used for pure HMM but is an expectation maximization algorithm
+  % There are pure Bayesian ways to do it. Tried to clarify above.
+  One can place priors on the transition probabilities and parameters of the hidden 
+  states' emission distributions in order to iteratively infer their values and to
+  estimate the hidden state sequence. HMMs have been used in a broad range of applications
+  including speech recognition, weather forecasting and bioinformatics.~\cite{juang_hidden_1984,hughes_non-homogeneous_1999,yoon_hidden_2009}.
+  In molecular simulations, HMMs have been used to characterize molecular kinetics
+  in order to determine the equilibrium distribution of various observables.~\cite{thayer_hidden_2002,singhal_using_2004,noe_probability_2008,noe_projected_2013}
+  
   By placing a hierarchical Dirichlet process (HDP) prior on the transition 
   probabilities, it is possible to extend HMMs to an unknown number of hidden
   states, thus allowing the model's complexity to be driven by the complexity
@@ -220,17 +205,20 @@
   general sticky HDP-SLDS models.
   
   %MRS: define what ``this'' is - important claim, make it clear what it is you are claiming.
-  To our knowledge, this is a novel application and analysis of the sticky 
-  HDP-AR-HMM. Typical applications center around determining the number of
-  states, the state sequence and occasional analysis of the emission 
-  distributions. The addition of temporal correlation to the inference 
-  procedure has primarily been used to improve state sequence 
+  To our knowledge, applying the HDP-AR-HMM in order to gain kinetic and
+  mechanistic insight from MD simulation trajectories has not been done
+  before.
+  % this is a novel application and analysis of the sticky HDP-AR-HMM.
+  Typical applications of the HDP-AR-HMM center around determining the 
+  number of states, the state sequence and occasional analysis of the emission 
+  distributions of a time series. The addition of temporal correlation to 
+  the inference procedure has primarily been used to improve state sequence 
   identification.~\cite{calderon_inferring_2015,hamada_modeling_2016}
   Not only do we use the HDP-AR-HMM to segment MD time series into distinct
   dynamical modes, but we cluster and analyze the temporally-correlated 
   parameters of the model in order to learn physical mechanisms and describe
   solute kinetics. Further, we use the model parameters to generate new 
-  time series trajectories which enable projections of MD simulations on 
+  time series trajectories which enables projections of MD simulations on 
   much longer time scales.
   
   %BJC4: enumerate?
@@ -256,10 +244,14 @@
   \section{Methods}
     
   We ran all MD simulations and energy minimizations using GROMACS 2018.~\cite{bekker_gromacs:_1993,berendsen_gromacs:_1995,van_der_spoel_gromacs:_2005,hess_gromacs_2008}  
-  Our Python implementation of the HDP-AR-HMM algorithm is available online at \\
-  %MRS: possibly should give the permanent reference to a shirtsgroup fork?  We can discuss which is likely to be more permenant
-  \texttt{https://github.com/bencoscia/hdphmm}. All other post-simulation 
-  trajectory analysis tools are available online at
+  We implemented the sticky HDP-AR-HMM in Python 
+  (\texttt{https://github.com/bencoscia/hdphmm}) which we heavily adapted from
+  the MATLAB code of Fox et al.~\cite{fox_nonparametric_2009} Since we do not incorporate
+  any novel methodology to the HDP-AR-HMM inference procedure, we refer the 
+  interested reader to an excellent and in-depth description of the formulation of
+  the HDP-AR-HMM and related models.~\cite{fox_bayesian_2010} 
+  %MRS: possibly should give the permanent reference to a shirtsgroup fork?  We can discuss which is likely to be more permenant  
+  All other post-simulation trajectory analysis tools are available online at
   \texttt{https://github.com/shirtsgroup/LLC\_Membranes}.
 
   \subsection{Molecular Dynamics Simulations}
@@ -279,88 +271,32 @@
   time scales which we simulate. Further details on the setup and equilibration of
   these systems are detailed in our previous work.\cite{coscia_chemically_2019}
   
-  %MRS: tweaked
-  %We let each solute undergo 
-  Each solute system was simulated for 5 $\mu$s of molecular dynamics  simulation. We used a time step of 2 fs
-  at a pressure of 1 bar and temperature of 300K controlled by the Parrinello-Rahman 
-  %MRS: just wondering, was this semiisotropic, or isotropic?  If isotropic, do we know how different the diagonals of the 
-  pressure tensor were (since the system is not totally isotropic)
+  Each solute system was simulated for 5 $\mu$s of molecular dynamics simulation. We
+  used a time step of 2 fs at a pressure of 1 bar and temperature of 300K controlled
+  by the semi-isotropic Parrinello-Rahman 
+  %MRS: just wondering, was this semiisotropic, or isotropic?  If isotropic, do we know how different the diagonals of the pressure tensor were (since the system is not totally isotropic)
+  %BJC5: I use semi-isotropic (xy together and z separate)
   barostat~\cite{parrinello_polymorphic_1981} and velocity rescale 
   thermostat~\cite{bussi_canonical_2007} respectively. We recorded configurations every 0.5 ns.
 
   \subsection{Applying the sticky HDP-AR-HMM to MD Trajectories}\label{method:HDP-AR-HMM}
 
-  % BJC4: Chris' general comment for this section: 'the problem with this section is 
-  % that it doesn't help the expert or novice figure out what is being done (either 
-  % expand more or relegate details to references and talk bigger picture)'
-  
-  % BJC4: I think it makes sense to stick to bigger picture since there are much
-  % better descriptions in literature. I haven't made any modifications to what's already been done
-  
-  % BJC4: replaced with what follows. Lots of the big picture is in the intro
-  
-%  \subsubsection*{Extending Hidden Markov Modeling to an Unknown Number of States}
-%  
-%  Hidden Markov models (HMMs) are a useful and widely used technique for modeling
-%  sequences of observations where the probability of the next observation in a 
-%  sequence depends, at least in part, on a previous unobserved, latent or hidden,
-%  state.~\cite{beal_infinite_2002} In the context of our simulations, the observations
-%  correspond to the center of mass coordinates of the solutes versus time, and the
-%  states correspond to segments of the trajectory with similar dynamical behavior 
-%  which gives rise to those types of observations. The probability of transitioning 
-%  to a state based on the current state is defined in terms of an $n\times n$ 
-%  transition probability matrix, $T$, where $n$ is the number of states. Unfortunately,
-%  standard HMMs require $n$ to be known \textit{a priori}. One can partially overcome
-%  this by testing a range of numbers of hidden states and determining which is the
-%  best representation of the data.~\cite{pohle_selecting_2017}
-%  
-%  The infinite-state HMM overcomes this drawback by placing a hierarchical
-%  Dirichlet process (HDP) prior on the transition probabilities.~\cite{fox_bayesian_2010} Using some 
-%  base probability distribution, $H$, a Dirichlet process (DP) generates discrete 
-%  distributions, $G_0$, over a countably infinite number of probability measures:
-%  \begin{equation}
-%      G_0 = \sum_{k=1}^{\infty} \beta_k \delta_{\theta_k} ~~ \theta_k \sim H, \beta \sim GEM(\gamma)
-%  \end{equation}
-%  where the $\theta_k$ are values drawn from the base distribution and the weights
-%  $\beta_k$ come from a stick-breaking process parameterized by the concentration 
-%  parameter $\gamma$ (equivalently referred to as GEM($\gamma$)).~\cite{halmos_random_1944} In shorthand, this
-%  specification can be expressed as $G_0 \sim DP(\gamma, H)$. The concentration 
-%  parameter, $\gamma$, expresses one's confidence in the base distribution $H$.
-%  We use a uniform base distribution for $H$. When $\gamma\to 0$, the first 
-%  weight of $G_0$, $\beta_1$, approaches unity and for $\gamma\to\infty$, the weights
-%  become uniform and $G_0$ closely resembles $H$. Each row, $G_j$, of the transition 
-%  matrix is produced by drawing from a DP specified using the $\beta$ vector as a 
-%  discrete base distribution and a separate concentration parameter, $\alpha$.
-%  \begin{equation}
-%      G_j = \sum_{k=1}^{\infty} \pi_{jk} \delta_{\theta_k} ~~ \pi_j \sim DP(\alpha, \beta)
-%  \end{equation}
-%  This hierarchical specification ensures that the transition probabilities in 
-%  each row share the same support points \{$\theta_1$, ..., $\theta_k$\}.
-%  Once the model has converged only a finite number of states will have significant
-%  sampling.
-
   We use the sticky HDP-AR-HMM in order to assign the time-correlated positional 
   fluctuations of solute center-of-mass MD trajectories to discrete dynamical modes while 
   simultaneously inferring the VAR parameters of those modes. We use the sticky model
   in order to emphasize self-transitions since we expect solutes to stay trapped in
-  states for appreciable amounts of time. We analyze solute motion in terms of their
-  cylindrical coordinates, $(r, z)$, with the $z$ axis oriented along the membrane 
-  pores and the radial dimension, $r$, measured from the closest pore center. 
+  states for appreciable amounts of time. 
+%  We analyze solute motion in terms of their
+%  cylindrical coordinates, $(r, z)$, with the $z$ axis oriented along the membrane 
+%  pores and the radial dimension, $r$, measured from the closest pore center. 
   
   Although the discussion will be presented in terms of 2D cylindrical coordinates, we
   applied the HDP-AR-HMM algorithm to 3D solute center-of-mass coordinate trajectories 
   with the radial dimension represented by the solute's $x$ and $y$ coordinates 
-  transformed relative to the nearest pore center. By working in Cartesian coordinates,
-  we avoid mathematical complexity introduced by change of coordinates into cylindrical
-  coordinates while estimating the state sequence.
-
-  %MRS: some of this is a repetition of what you said above.
-  We implemented the sticky HDP-AR-HMM in Python 
-  (\texttt{https://github.com/bencoscia/hdphmm}) which we heavily adapted from
-  the MATLAB code of Fox et al.~\cite{fox_nonparametric_2009} Since we do not incorporate
-  any novel methodology to the HDP-AR-HMM inference procedure, we refer the 
-  interested reader to an excellent and in-depth description of the formulation of
-  the HDP-AR-HMM and related models.~\cite{fox_bayesian_2010}
+  transformed relative to the nearest pore center, and the $z$ axis oriented along 
+  the membrane pore. By working in Cartesian coordinates, we avoid mathematical 
+  complexity introduced by change of coordinates into cylindrical coordinates while
+  estimating the state sequence.
   
   %\subsubsection*{Parameterizing the Hidden States}\label{method:var_params}
   \textit{Parameterizing the Hidden States}: We describe the dynamics of each 
@@ -440,27 +376,20 @@
   related to the average time spent in each state. The distance from the closest pore 
   center is likely meaningful since the membrane is radially inhomogeneous from each 
   pore, transitioning from hydrophilic pores to hydrophobic tails. However, the 
-  channels are isotropic along the pore axis so we do not 
-  %MRS: added this?  Grammar didn't make sense without.
-  cluster
-  in means in the $z$ dimension.
-  We normalized each clustering dimension by its variance and shifted the mean to zero.
+  channels are isotropic along the pore axis so we do not cluster in means in the 
+  $z$ dimension. We normalized each clustering dimension by its variance and shifted
+  the mean to zero.
   
   To take advantage of the system's cylindrical symmetry, we converted the parameters that
   are directly related to solute position into cylindrical coordinates before clustering. 
   We replaced the $x$ and $y$ eigenvalues of $\Sigma$ and $A$ with $\lambda_x$ + 
   $\lambda_y$ and $\lambda_x^2$ + $\lambda_y^2$ respectively, which are invariant with 
-  rotation around the $z$ axis. 
-  %MRS: maybe reduntant and not quite right, since it reduces the dimensionality of the paraameter su
-  % bspace from 3 to 2, but the overall paameter space is bigger than 3
-  %in both cases reducing the dimensionality from 3 to 2.  
-  We clustered on squared means in $r$, $\mu_r^2 = \mu_x^2 + \mu_y^2$, rather than
-  $\mu_x$ and $\mu_y$ individually, with the square $\mu_r$ converting it into the 
-  same units as $A$ and $\Sigma$.
+  rotation around the $z$ axis. We clustered on squared means in $r$, 
+  $\mu_r^2 = \mu_x^2 + \mu_y^2$, rather than $\mu_x$ and $\mu_y$ individually, with the
+  square $\mu_r$ converting it into the same units as $A$ and $\Sigma$.
 
   To cluster on $T_{ii}$, we first cast it in terms of the expected dwell times. The expected
   value of the number of sequential self-transitions is simply:
-  % BJC4: I numbered this equation because I reference it later.
   \begin{equation}  
    E[dwell~time] = \frac{1}{1 - T_{ii}}
    \label{eqn:dwell_times}
@@ -469,7 +398,6 @@
   1. Therefore we found the most success with agglomerative clustering by linearizing this
   relationship and clustering on $-\log(1 - T_{ii})$.
   
-  %BJC4: Added
   There are alternative ways to cluster the data dependent on one's goals. Our goal is
   to derive the simplest set of parameter which adequately describe solute motion. 
   However, one may want a more detailed understand of specific dimensions of the 
@@ -478,10 +406,10 @@
   clusters but may result in a large number of them. Once one has achieved a better 
   understanding of solute-membrane interactions, perhaps by using the HDP-AR-HMM, it may be
   beneficial to incorporate other physically motivated variables into the clustering
-  procedure. For example, one can gain a thorough understanding of the dynamics of
-  different kinds of trapping behavior related to hydrogen bonding and sodium ion association.
+  procedure. 
+  %For example, one can gain a thorough understanding of the dynamics of
+  %different kinds of trapping behavior related to hydrogen bonding and sodium ion association.
   %MRS: last sentence is a little weird. Audience may be left without knowing how this could be achieved.
-  %\subsubsection*{Choosing the Number of Clusters}
 
   \textit{Choosing the Number of Clusters}: To aid interpretation, our goal was to
   use the lowest number of clusters that adequately distinguished the dynamics of 
@@ -495,19 +423,6 @@
   justification of our approach to choosing the number of clusters in 
   Section~\ref{S-section:nclusters} of the Supporting Information.  
   
-%  We aimed to maintain the highest silhouette score, and thus lowest number of clusters,
-%  possible while preserving the dynamics of each trajectory.
-%  %verifying that visually distinct states stayed separated. 
-%  We verified preservation of the dynamics by comparing the MSDs of stochastic trajectory
-%  realizations based on clustered HDP-AR-HMM parameter sets to the pooled MSDs of stochastic 
-%  realizations of HDP-AR-HMMs fit to individual trajectories (see Section~\ref{method:realizations}).
-%%  We chose the lowest number of clusters that reasonably reproduced the pooled MSDs at 
-%%  short and long time lags (See Figure~\ref{S-fig:MET_nclusters} of the Supporting 
-%%  Information).
-
-  %\subsubsection*{Obtaining Parameters of Clustered States}
-  
-  %BJC3: modified 
   \textit{Obtaining Parameters of Clustered States}: We remapped and fixed the
   state sequence based on the cluster assignments and 
   parameterized the clusters using the inference component of the HDP-AR-HMM algorithm.
@@ -529,7 +444,10 @@
   %BJC4: reworked this section
   %MRS: should explain why here there are two approaches.
   \textit{Generating Stochastic HDP-AR-HMM Trajectory Realizations}: We used two 
-  different methods to stochastically generate trajectories:
+  different methods to stochastically generate trajectories because generating
+  trajectories from clustered parameter sets can give results that are qualitatively 
+  and quantitatively different from those generated by unclustered parameter sets.
+  In our discussion we evaluate both methods:
   \begin{enumerate}[label={Method \theenumi :}, leftmargin=3.5\parindent]
     \item For each independent MD trajectory, we generated stochastic trajectory
     realizations using the finalized parameters of the associated HDP-AR-HMM. This 
@@ -568,8 +486,8 @@
     trajectories sampled, with replacement, from the ensemble.
   \end{enumerate}
 
-  %MRS: this doesn't make sense - there aren't 1000 trajectories.  You mean method 1?
-  For MD trajectories, we bootstrapped according to Method 2.
+  For the MD MSDs, we bootstrapped according to Method 1, sampling with 
+  replacement from the ensemble of 24 solute trajectories.
   
   %BJC4: new section below
   \subsection{Predicting Selectivity}\label{method:selectivity}
@@ -608,11 +526,10 @@
     \label{eqn:msd_D}
   \end{equation}
   where $n$ is the number of spatial dimensions (1 in our case). Since the MSD
-  %MRS: tweaked
-  %of our models 
-  of the realizations of our models 
-  enters a linear regime, we can estimate diffusion constants 
-  %MRS: maybe can say what the timescale of the linear regime, and how much longer the stochastic realizations are?
+  of the realizations of our models enters a linear regime, we can estimate 
+  diffusion constants 
+  % MRS: maybe can say what the timescale of the linear regime, and how much 
+  % longer the stochastic realizations are?
   based on the slope of the linear region of the predicted MSD curves. 
 
   \subsection{Tools for using the Parameterized Model to Explore Mechanisms}\label{method:interactions}
@@ -628,18 +545,13 @@
   We still counted sequences where hydrogen bonds were broken for a single frame 
   before reforming. Consistent with our previous work, we reported the 95th 
   percentile of hydrogen bond lifetimes since their distribution is not Gaussian
-  and to 
-  %MRS: 
-  %emphasize 
-  accentuate
-  longer trapping periods.~\cite{coscia_chemically_2019}
+  and to accentuate longer trapping periods.~\cite{coscia_chemically_2019}
   
   \textit{Sodium ion association detection}: We also measured the degree of association
   between solutes and sodium ions on a frame-by-frame basis. We define a sodium ion to
   be associated with an atom if they are within 2.5 \AA~of each other, as determined 
   in our previous work.~\cite{coscia_chemically_2019}
   
-  %We developed a way to 
   \textit{Local density measurements}: We measured the local density of the membrane at
   arbitrary points in the unit cell as follows. We histogrammed the positions in three 
   dimensions. Since our system is in a monoclinic unit cell, we periodically replicated
@@ -679,16 +591,11 @@
   Section~\ref{method:realizations}.
   
   As shown in Figure~\ref{fig:qualitative_unclustered}, realizations of our model 
-  %MRS: would it be accurate to show ``produces trajectories that show . . . ``  Saying that it ``can 
-  %produce trajectories'' is a little weasly - sounds like it usually doesn't.  
-  % 
-  can produce trajectories that show qualitatively similar hopping and trapping 
+  produce trajectories that show qualitatively similar hopping and trapping 
   behavior to the MD trajectories to which they were fit. It is important that our
   model reproduces this behavior so that we can have confidence in its usefulness
   for quantitative predictions.
   
-  % BJC4: This figure needs to be redone with new trajectory generation procedure
-  %MRS: is this still the old one?
   \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{qualitative_unclustered_MET2.pdf}
@@ -702,23 +609,19 @@
   }\label{fig:qualitative_unclustered}
   \end{figure}
   
-  In Figure~\ref{fig:unclustered_msds}, we show that in most cases we can reproduce the 
-  MD MSDs on long timescales within uncertainty using realizations of the 
-  HDP-AR-HMM.
-  \begin{itemize}
-    \item We generated the MSD curves using Method 1 described in 
-    Section~\ref{method:realizations} of the methods.
-    %MRS: should be clearer about what ``reproduce these curves mean'', since you aren't reproducing.
-    \item Our ability to reproduce these curves gives use confidence
-    in their long term predictions.
-    %MRS: not match under any circumstance, or without clustering (?  Not clear. 
-    \item We underestimate the MSD of urea because of a small number of MD 
-    trajectories with uncharacteristically high MSDs. Despite our best efforts, 
-    we could not adequately parameterize an HDP-AR-HMM which reproduced said 
-    behavior. (see SI)  %BJC4: TODO
-    \item On long timescales, the model appear to have the same slope as 
-    the MD trajectory.
-  \end{itemize}
+  In Figure~\ref{fig:unclustered_msds}, we show that in most cases we can 
+  reproduce the magnitude of the MD MSDs on long timescales within uncertainty
+  using realizations of the HDP-AR-HMM. We generated the MSD curves using Method
+  1 described in Section~\ref{method:realizations} of the methods. Our ability
+  to reproduce the MSDs gives us confidence in their long term predictions.
+  %MRS: not match under any circumstance, or without clustering (?  Not clear. 
+  %BJC5: not exactly sure what you're asking here. This section has no clustering 
+  We underestimate the MSD of urea because of a small number of MD trajectories
+  with uncharacteristically high MSDs. Despite our best efforts, we could not 
+  adequately parameterize an HDP-AR-HMM which reproduced the uncharacteristic
+  behavior. (see SI)  %BJC4: TODO
+  On long timescales, the model appear to have the same slope as the MD 
+  trajectory.
   
   \begin{figure}
   \centering
@@ -748,17 +651,14 @@
   %MRS: seems odd not at least mention clustering here. 
 
   Since we can generate trajectories that share features similar to MD simulations, 
-  it is now reasonable to project solute behavior onto much longer time scales.
-  \begin{itemize}
-    \item The HDP-AR-HMM MSD predictions quickly enter a linear regime, therefore we can 
-    project long timescale MSDs based on the predicted diffusion constant as described
-    in Section~\ref{method:selectivity}.
-  \end{itemize}  
+  it is now reasonable to project solute behavior onto much longer time scales. The 
+  HDP-AR-HMM MSD predictions quickly enter a linear regime, therefore we can project
+  long timescale MSDs based on the predicted diffusion constant as described in 
+  Section~\ref{method:selectivity}.
   
   % BJC4: figure here
   
-  % BJC4: some kind of brief selectivity analysis here. This easy, I'll get that done 
-  % tonight or tomorrow.
+  % BJC4: some kind of brief selectivity analysis here.
   
   \subsection{Learning Mechanisms from the HDP-AR-HMM}\label{section:mechanisms}
   
@@ -799,29 +699,24 @@
   solute behavior.
   
   Realizations based on the 10 clustered parameter sets do not show the same
-  qualitative dynamics as the MD simulation trajectories. 
-  \begin{itemize}  
-    \item In Figure~\ref{fig:qualitative_clustered_MET}, we compare MD 
-    trajectories to realizations of our model using the clustered parameter sets.
-    \item They lack the diversity of behavior which we see in the MD simulation trajectories.
-    \item They do not show the same range of trapping times and hop lengths.
-    \item If we use a higher number of clusters, the qualitative match improves, but
-    at the cost of a larger state space to interpret (see Figure~\ref{S-fig:qualitative_improvement}
-    of the Supporting Information).
-  \end{itemize}
+  qualitative dynamics as the MD simulation trajectories. In 
+  Figure~\ref{fig:qualitative_clustered_MET}, we compare MD trajectories to 
+  realizations of our model using the clustered parameter sets. They lack the
+  diversity of behavior which we see in the MD simulation trajectories.
+  They do not show the same range of trapping times and hop lengths. If we use
+  a higher number of clusters, the qualitative match improves, but at the cost
+  of a larger state space to interpret (see Figure~\ref{S-fig:qualitative_improvement}
+  of the Supporting Information).
   
   In addition to qualitative mismatches, realizations of the clustered HDP-AR-HMM 
-  under-predict the unclustered MSD predictions and the MD MSD. 
-  \begin{itemize}
-    \item Much of a solute's MSD is likely a consequence of short-lived trapping states
-    with high variances.
-    \item When clustering, disjoint segments with similar enough parameters are
-    re-parameterized together as part of the same state, lengthening the lifetimes 
-    of very short-lived states and suppressing the fluctuations of high variance states.
-    \item In Figure~\ref{fig:clustered_MSD}, it is evident that increasing the number
-    of clusters increases the predicted MSD.
-    \item Matching the unclustered MSDs would likely require many more clusters, at 
-    which point the benefits of clustering are lost. 
+  under-predict the unclustered MSD predictions and the MD MSD. Much of a solute's 
+  MSD is likely a consequence of short-lived trapping states with high variances.
+  When clustering, disjoint segments with similar enough parameters are re-parameterized
+  together as part of the same state, lengthening the lifetimes of very short-lived 
+  states and suppressing the fluctuations of high variance states. In 
+  Figure~\ref{fig:clustered_MSD}, it is evident that increasing the number of clusters
+  increases the predicted MSD. Matching the unclustered MSDs would likely require many
+  more clusters, at which point the benefits of clustering are lost. 
     %BJC: I don't think the following discussion is necessary anymore.
 %    \item In Figure~\ref{fig:dwell_distributions}, we compare the overall dwell time
 %    distributions generated directly from MD simulations to that generated from 
@@ -834,7 +729,6 @@
 %    shorter dwell times, we can more closely reproduce the dwell time distribution and 
 %    MSD of MD. This is because most solute motion is a consequence of transitions between
 %    trapped states.
-  \end{itemize}
   
   \begin{figure}
   \centering
@@ -854,14 +748,25 @@
   of clusters increases.}\label{fig:clustered_dynamics}
   \end{figure}
   
+  %BJC5: new
+  It is possible that we could improve the MSD predictions generated by the 
+  clustered parameter sets by modifying the transformations made to the
+  unclustered parameters. For example, it maybe possible to rescale the
+  parameters in order to better distinguish states with long dwell times
+  and high variance when clustering.
+%  Since we hypothesized that the lack of short dwell
+%  times is largely responsible for the under-prediction of the MSDs, we could
+%  modify the dwell time clustering procedure in order to better emphasize short
+%  dwells times.
+  However, we do not go too far in order to prevent over-fitting.
+  %BJC5: maybe an SI figure showing some different approaches
+  
   \textit{The dynamics of frequently occurring states}: We may learn the most by 
   studying the dynamical modes common to the majority of the solute trajectories.
-  \begin{itemize}
-  	\item Of the 10 state clusters, only 5 appear in a significant number of 
-  	solute trajectories (Figure~\ref{fig:prevalence}).
-  	\item Although a majority of the solutes visit these 5 dominant states the
-  	amount of time spent in each varies widely. 
-  \end{itemize} 
+  Of the 10 state clusters, only 5 appear in a significant number of solute 
+  trajectories (Figure~\ref{fig:prevalence}). All of which are present in 
+  Figure~\ref{fig:clustered_traj_MET}. Although a majority of the solutes
+  visit these 5 dominant states the amount of time spent in each varies widely. 
   
   \begin{figure}
   \centering
@@ -872,66 +777,12 @@
   \label{fig:prevalence}
   \end{figure}
   
-  We can begin to hypothesize mechanisms by studying the behaviors defined by the 
-  state parameters.
-  \begin{itemize}
-  	\item In Figure~\ref{fig:common_states_lines}, we plot representative 
-  	dynamics of each of the five most visited states.
-  	\item The states exhibit a range of autoregressive and trapping behavior
-  	throughout the membrane pores.
-%  	\item There is good representation by states across a range of radial distances
-%  	from the pore centers. 
-  \end{itemize}
-  
-  Since the radial means are weighted averages of the states used to parameterize
-  each cluster, for interpretive purposes, it is important to recognize that the means
-  only provide clues towards the general location of the solute. 
-  \begin{itemize}
-  	\item For example, the radial mean of state 3 is 1.4 nm from the pore center. 
-  	\item However, inspection of Figure~\ref{fig:clustered_traj_MET} suggests that this 
-  	type of behavior actually occurs radially throughout the pore.
-  	\item There are instances of state 3 less than 1 nm from the pore center and more 
-  	than 2 nm from the pore center. 
-  	\item In this case, the radial mean only suggests that this type of behavior 
-  	happens in both regions somewhat equally.
-  \end{itemize}
-  
-  Solutes exhibit a range of autoregressive behavior as shown by the representative 
-  solute trajectories in Figure~\ref{fig:common_states_lines} and the scatter
-  plot in Figure~\ref{fig:A_sigma_scatter}.
-  \begin{itemize}
-  	\item In most cases, the eigenvalues of $A$ and $\Sigma$ appear nearly paired
-  	in their radial and axial dimensions, which implies nearly symmetric behavior 
-  	with off-diagonals both matrices near zero.
-  	\item The most notable exception is state 3, which has a much higher radial 
-  	eigenvalue of the covariance matrix.
-  	\item Both eigenvalues of state 3's covariance are actually quite
-  	large. This implies relatively large fluctuations in the $z$ direction and even
-  	bigger fluctuations in the $r$ direction.
-  	\item All states have slightly lower covariance in the axial direction. It's
-  	likely easier for solutes to move laterally rather than to move up through the
-  	alkane chains.
-  	\item States 3 and 4 show a strong previous-hop dependence (high $A$) while
-  	the rest of the states have a somewhat weaker dependence.
-  \end{itemize}
-
-  Solutes are trapped for various lengths of time.
-  \begin{itemize}
-    \item On average, state 4 has the longest dwell times and state 3 has
-    the shortest dwell times while the rest have intermediate dwell times.
-    \item This is somewhat supported by inspection of Figure~\ref{fig:clustered_traj_MET},
-    however. 
-	\item The expected dwell times of the clusters incorporate all 24 trajectories.
-%    \item Once again, since we clustered, it is important to avoid studying
-%    the exact dwell time values, and to focus on their relative magnitudes.
-  \end{itemize}
-  
-  % BJC4: Not sure if this is useful.
-  % MRS: it does give a good summary. But you should make it clear how you selected these 5.
-  % MRS: it's implied in one of the figures, but should be stated explicitly
-  By examining the parameters, it is now easier to describe the state behavior.
+  The parameters of the five dominant states provide clues about the associated solute
+  behavior. Characteristic dynamics of the following states appear in 
+  Figure~\ref{fig:clustered_traj_MET}. A more in-depth analysis of the state parameters
+  is given in Section~\ref{S-section:clustered_parmeters} of the Supporting Information.
   \begin{enumerate}[label={State \theenumi :}, leftmargin=3.5\parindent]
-     \item This state has intermediate dwell times with high past-hop dependence.
+     \item This state has intermediate dwell times with high past-hop dependence (high entries of $A$).
      The radial mean and evidence from Figure~\ref{fig:clustered_traj_MET} suggests
      %MRS: ``tail and pore region'' sounds the same as ``everywhere''.
      that this state is common in the tail and pore region.
@@ -948,32 +799,6 @@
      center. It's fluctuations are tight and relatively independent of its previous 
      fluctuation.
   \end{enumerate}
-  
-  \begin{figure}
-  \centering
-  \begin{subfigure}{0.58\textwidth}
-  \includegraphics[width=\textwidth]{common_states.pdf}
-  \caption{}\label{fig:common_states_lines}
-  \end{subfigure}
-  \begin{subfigure}{0.41\textwidth}
-  \includegraphics[width=\textwidth]{A_sigma_scatter.pdf}
-  \caption{}\label{fig:A_sigma_scatter}
-  \includegraphics[width=\textwidth]{dwell_times.pdf}
-  \caption{}\label{fig:dwell_times}
-  \end{subfigure}
-  \caption{The 5 most visited states by methanol show a range of dynamical behavior. In 
-  (a), we show representative dynamics of these states. All time series have a mean of zero and are
-  shifted to put the mean in line with the $y$-axis labels for the purpose of visualizing them.
-  The $y$-axis labels of the $r$ coordinate plot specify the radial mean of each clustered 
-  state. All of the states pictured appear in the trajectory shown in 
-  Figure~\ref{fig:clustered_traj_MET} and are colored to match.
-  (b) We can begin to understand the solute behaviors demonstrated in (a) by understanding their VAR 
-  parameters. Higher values of $\lambda_{\Sigma}$ generally are indicative of large fluctuations
-  and higher values of $\lambda_A$ indicate strong previous-hop dependence of the fluctuations.
-  (c) Using Equation~\ref{eqn:dwell_times}, we estimated the expected time spent within each 
-  of the states.
-  }\label{fig:common_states_MET}
-  \end{figure}
    
   \textit{Relating Parameters to Solute-Membrane Interactions}: Based on the
   molecules and ions which constitute the membrane, it is straightforward to 

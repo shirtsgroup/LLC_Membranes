@@ -523,4 +523,89 @@
   at the cost of a larger state space to interpret.}\label{fig:qualitative_improvement}
   \end{figure}
   
+  \section{Clustered Parameters}\label{section:clustered_parmeters}
+  
+  We can begin to hypothesize mechanisms by studying the behaviors defined by the 
+  state parameters. In Figure~\ref{fig:common_states_lines}, we plot representative 
+  dynamics of each of the five most visited states (see Figure~\ref{M-fig:prevalence}
+  of the main text). The states exhibit a range of autoregressive and trapping 
+  behavior throughout the membrane pores.
+  
+  Since the radial means are weighted averages of the states used to parameterize
+  each cluster, for interpretive purposes, it is important to recognize that the means
+  only provide clues towards the general location of the solute. For example, the 
+  radial mean of state 3 is 1.4 nm from the pore center. However, inspection of 
+  Figure~\ref{fig:clustered_traj_MET} suggests that this type of behavior actually
+  occurs radially throughout the pore. There are instances of state 3 less than 1 nm
+  from the pore center and more than 2 nm from the pore center. In this case, the 
+  radial mean only suggests that this type of behavior happens in both regions somewhat
+  equally.
+  
+  Solutes exhibit a range of autoregressive behavior as shown by the representative 
+  solute trajectories in Figure~\ref{fig:common_states_lines} and the scatter
+  plot in Figure~\ref{fig:A_sigma_scatter}. In most cases, the eigenvalues of $A$ and
+  $\Sigma$ appear nearly paired in their radial and axial dimensions, which implies 
+  nearly symmetric behavior with off-diagonals both matrices near zero. The most 
+  notable exception is state 3, which has a much higher radial eigenvalue of the 
+  covariance matrix. Both eigenvalues of state 3's covariance are actually quite
+  large. This implies relatively large fluctuations in the $z$ direction and even
+  bigger fluctuations in the $r$ direction. All states have slightly lower covariance
+  in the axial direction. It's likely easier for solutes to move laterally rather 
+  than to move up through the alkane chains. States 3 and 4 show a strong previous-hop
+  dependence (high $A$) while the rest of the states have a somewhat weaker dependence.
+
+  Solutes stay trapped for various lengths of time. On average, state 4 has the longest 
+  dwell times and state 3 has the shortest dwell times while the rest have intermediate
+  dwell times. This is somewhat supported by inspection of Figure~\ref{fig:clustered_traj_MET},
+  however. The expected dwell times of the clusters incorporate all 24 trajectories.
+  
+  % BJC4: Not sure if this is useful.
+  % MRS: it does give a good summary. But you should make it clear how you selected these 5.
+  % MRS: it's implied in one of the figures, but should be stated explicitly
+%  By examining the parameters, it is now easier to describe the state behavior.
+%  \begin{enumerate}[label={State \theenumi :}, leftmargin=3.5\parindent]
+%     \item This state has intermediate dwell times with high past-hop dependence.
+%     The radial mean and evidence from Figure~\ref{fig:clustered_traj_MET} suggests
+%     %MRS: ``tail and pore region'' sounds the same as ``everywhere''.
+%     that this state is common in the tail and pore region.
+%     \item This state seems to occur exclusively in the tail region based on its radial
+%     mean. Its fluctuations are small and there is little past hop dependence
+%     \item This is likely a hopping state that strongly contribute to the solute's MSD. 
+%     It is short lived and takes very large hops. This type of behavior is exhibited 
+%     %MRS: ``near and far'' also sounds like everywhere 
+%     near and far from the pore center as discussed earlier.
+%     \item This is a trapping state with a strong dependence on its previous fluctuation.
+%     Evidence from Figure~\ref{fig:clustered_traj_MET} and a radial mean of 1.8 suggest
+%     that it tends to occur at intermediate distances from the pore center.
+%     \item This is an intermediate-length trapping state that occurs close to the pore
+%     center. It's fluctuations are tight and relatively independent of its previous 
+%     fluctuation.
+%  \end{enumerate}  
+  
+  \begin{figure}
+  \centering
+  \begin{subfigure}{0.58\textwidth}
+  \includegraphics[width=\textwidth]{common_states.pdf}
+  \caption{}\label{fig:common_states_lines}
+  \end{subfigure}
+  \begin{subfigure}{0.41\textwidth}
+  \includegraphics[width=\textwidth]{A_sigma_scatter.pdf}
+  \caption{}\label{fig:A_sigma_scatter}
+  \includegraphics[width=\textwidth]{dwell_times.pdf}
+  \caption{}\label{fig:dwell_times}
+  \end{subfigure}
+  \caption{The 5 most visited states by methanol show a range of dynamical behavior. In 
+  (a), we show representative dynamics of these states. All time series have a mean of zero and are
+  shifted to put the mean in line with the $y$-axis labels for the purpose of visualizing them.
+  The $y$-axis labels of the $r$ coordinate plot specify the radial mean of each clustered 
+  state. All of the states pictured appear in the trajectory shown in 
+  Figure~\ref{M-fig:clustered_traj_MET} of the main text and are colored to match.
+  (b) We can begin to understand the solute behaviors demonstrated in (a) by understanding their VAR 
+  parameters. Higher values of $\lambda_{\Sigma}$ generally are indicative of large fluctuations
+  and higher values of $\lambda_A$ indicate strong previous-hop dependence of the fluctuations.
+  (c) Using Equation~\ref{M-eqn:dwell_times} of the main text, we estimated the expected time spent within each 
+  of the states.
+  }\label{fig:common_states_MET}
+  \end{figure}
+  
 \end{document}
