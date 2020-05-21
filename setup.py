@@ -21,5 +21,6 @@ setup(
     author='Ben Coscia',
     license='BSD-3-Clause',
     install_requires=['numpy', 'mdtraj', 'matplotlib', 'ruptures', 'scipy', 'tqdm', 'fbm'], 
-    packages = ['LLC_Membranes', 'LLC_Membranes.setup', 'LLC_Membranes.analysis', 'LLC_Membranes.llclib', 'LLC_Membranes.timeseries'],
+#    packages = ['LLC_Membranes', 'LLC_Membranes.setup', 'LLC_Membranes.analysis', 'LLC_Membranes.llclib', 'LLC_Membranes.timeseries'],
+    packages = ['LLC_Membranes', 'LLC_Membranes.setup', 'LLC_Membranes.analysis', 'LLC_Membranes.llclib', 'LLC_Membranes.timeseries','LLC_Membranes.top.topologies'],
 )
