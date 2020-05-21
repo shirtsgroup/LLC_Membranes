@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
         system.reorder()
         print(system.LC[0].residues)
-        exit()
+
         
         #system.exchange_ion()
 
