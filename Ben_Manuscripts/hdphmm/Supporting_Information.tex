@@ -1,5 +1,15 @@
 \documentclass{article}
 
+\usepackage{tocloft}
+
+\renewcommand\cftsecfont{\normalfont}
+\renewcommand\cftsecpagefont{\normalfont}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftsecdotsep}}
+\renewcommand\cftsecdotsep{\cftdot}
+\renewcommand\cftsubsecdotsep{\cftdot}
+\cftsetindents{section}{0em}{3em}
+%\cftsetindents{subsection}{1em}{3em}
+
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage{subcaption}
@@ -33,21 +43,22 @@
 
   \graphicspath{{./supporting_figures/}}
   \maketitle
+  \tableofcontents
   
   \section{Parameter Convergence}\label{section:convergence}
   
-  The state sequence appears to converge within 500--1000 IHMM iterations. Step 1
-  in the procedure from the previous section is the only time the state sequence 
-  is determined. We ran 2000 iterations of the IHMM algorithm in order to arrive
-  at a finalized state sequence. Stabilization of the VAR parameters indicates 
+  The state sequence appears to converge within 500--1000 IHMM iterations. To
+  be sure, we ran 2000 iterations of the IHMM algorithm in order to arrive at a 
+  finalized state sequence. Stabilization of the VAR parameters indicates 
   that the state sequence has converged. In Figure~\ref{fig:convergence3d}, we plot
-  the diagonal entries of 3 different $A$ and $\Sigma$ matrices as well as the 
-  entries of the mean vector $\mathbf{c}$, fit to a single 3D methanol trajectory.
-  States with a relatively small number of observations are more highly influenced 
-  by the boundaries of the state segments and generally lead to much higher 
-  variance of the $A$ and $\Sigma$ parameters. In these cases, the mean is
-  a more reliable indicator of convergence since stabilized means imply that the
-  fluctuations assigned to each state come from motion about a static location.
+  the diagonal entries of the $A$ and $\Sigma$ matrices as well as the entries of
+  the mean vector $\mathbf{c}$, for three different states identified in a 3D 
+  methanol trajectory. States with a relatively small number of observations are
+  more highly influenced by the boundaries of the state segments and generally 
+  lead to much higher variance of the $A$ and $\Sigma$ parameters. In these cases,
+  the mean is a more reliable indicator of convergence since stabilized means 
+  imply that the fluctuations assigned to each state come from motion about a 
+  static location.
   
   \begin{figure}[h]
   \centering
@@ -64,19 +75,18 @@
   \caption{201 total emissions}\label{fig:convergence3d_MET_high}
   \end{subfigure}
   \caption{Given a sufficient number of observations for a given mode, the VAR parameters
-  appear to converge within 500 -- 1000 iterations. States with too few observations
-  are more highly influenced by the boundaries of the state segments and generally
+  appear to converge within 500 -- 1000 iterations. States with fewer observations
+  are more highly influenced by the boundaries of the state segments which can
   lead to much higher fluctuations in the VAR parameters.}\label{fig:convergence3d}
   \end{figure}
   
-  \clearpage
-  
-  When we fix the state sequence in subsequent steps of the procedure, parameter 
-  estimates converge within only a few steps. In Figure~\ref{fig:fixed_state_convergence}, we 
-  plot the entries of $A$ and $\Sigma$ as a function of IHMM iteration. Some states
-  are sampled far more frequently than others. High sampling frequently results in
-  higher certainty converged parameter estimates. Due to fast convergence, we only
-  run 100 iterations of the inference behavior when the state sequence is fixed.
+  When we fix the state sequence during the steps of the procedure following the 
+  initial state sequence determination, the parameter estimates converge within 
+  only a few steps. In Figure~\ref{fig:fixed_state_convergence}, we plot the 
+  entries of $A$ and $\Sigma$ as a function of IHMM iteration. Some states are 
+  sampled far more frequently than others. High sampling frequently results in 
+  higher certainty converged parameter estimates. Due to fast convergence, we 
+  only ran 100 iterations of the inference behavior when the state sequence is fixed.
   
   \begin{figure}[h]
   \centering
@@ -99,65 +109,13 @@
   \end{figure}
   
   \clearpage
-  
-  \section{Demonstration of IHMM Parameterization Procedure}\label{section:ihmm_procedure}
-  
-  Parameterization of trajectories by the IHMM is a multi-stepped procedure. In the steps and
-  figures that follow, we graphically illustrate the procedure which is described in detail 
-  in Section~\ref{M-method:IHMM} of the main text.
-  
-  \begin{enumerate}
-  	\item Parameterize in $x$, $y$, $z$ coordinates with $x$, $y$ coordinates relative to the nearest
-  	pore center (see Figure~\ref{fig:xyz_hmm}). 		
-  	\item Cluster the VAR parameters from the states found in all 24 trajectories (See 
-  	Section~\ref{method:clustering} of the main text). Reassign the state sequence so that segments
-  	which belong to the same cluster are labeled the same across all solute trajectories.
-  	\item Zero the trajectories. First, zero out the $y$ dimension by rotating each segment of 
-  	the trajectory, as partitioned before clustering, about the $z$ axis, in order to align the 
-  	mean $xy$ vector with the $x$ axis (see Figure~\ref{fig:y_zeroed}). Then, subtract the mean in
-  	$x$ and $z$ (Figure~\ref{fig:xyz_zeroed}.
-  	\item Fix clustered state sequence and infer parameters of each state, assuming a mean of zero
-  	for all states (see Figure~\ref{fig:zeroed_clustered_hmm}). 
-  \end{enumerate}
-  
-  \begin{figure}
-    \centering
-	\begin{subfigure}{0.6\textwidth}
-	\includegraphics[width=\textwidth]{xyz_hmm.pdf}
-		\caption{}\label{fig:xyz_hmm}
-	\end{subfigure}  
-		\begin{subfigure}{0.6\textwidth}
-		\includegraphics[width=\textwidth]{y_zeroed.pdf}
-		\caption{}\label{fig:y_zeroed}
-	\end{subfigure}  	
-	\begin{subfigure}{0.6\textwidth}
-		\includegraphics[width=\textwidth]{xyz_zeroed.pdf}
-		\caption{}\label{fig:xyz_zeroed}
-	\end{subfigure}  		
-	\begin{subfigure}{0.6\textwidth}
-		\includegraphics[width=\textwidth]{zeroed_clustered_hmm.pdf}
-		\caption{}\label{fig:zeroed_clustered_hmm}
-	\end{subfigure}  
-	\caption{IHMM parameterization is a multi-step procedure. In the above plots, distinct colors
-	correspond to distinct state behavior. (a) First we parameterize the trajectories in terms of
-	the $x$, $y$, $z$ solute center-of-mass coordinates with the $x$ and $y$ coordinates relative
-	to the nearest pore center (b) Next, we convert the $x$ and $y$ 	
-	coordinates to radial coordinates, $r$, then fix the state sequence and use the inference 
-	component of the IHMM in order to estimate the parameters in terms of $r$ and $z$. Note that
-	the segment colors in (b) are the same as (a) because we fixed the state sequence.
-	(c) After clustering the VAR parameters and reassigning the state sequence so that segments 
-	which belong to the same cluster are labeled the same across all solute trajectories, we subtract
-	the mean of each segment, obtained before clustering, in order to zero out the
-  	trajectory, and then fix the clustered state sequence to infer the parameters of each clustered 
-  	state, assuming a mean of zero for all states. Note that the colors are no longer aligned with 
-  	figures (a) and (b) because the states are relabeled in terms of their clusters. There are
-  	also less states in this single trajectory.
-	}\label{fig:hmm_demo}
-  \end{figure}
-  
-  \newpage
     
   \section{Tips for Reliable State Sequence Identification}\label{section:fitting_tips}
+  
+  The IHMM is quite powerful on its own, but requires some critical thinking by
+  the user in order to ensure maximum effectiveness. One can obtain 
+  the best results with some simple checks and, where necessary, improved 
+  state sequence initialization.  
   
   \textit{Choosing Prior Parameters}: The states identified by the IHMM are 
   heavily influenced by the Gaussian prior placed on $\mathbf{c}$ in 
@@ -174,8 +132,6 @@
   be 2 standard deviations from the prior mean. Although this approach has 
   worked quite well for the data in this work, it is important to check the 
   results to determine whether further adjustments to the prior might be needed.
-%  In Figure TBD, we show the result of a parameterization where the prior
-%  parameters of $c$ were poorly chosen. %TODO
   
   \begin{figure}[h]
   \centering
@@ -189,17 +145,21 @@
   from the mean.}\label{fig:prior_guesses}
   \end{figure}
   
-  \pagebreak
+  \textit{Seeding the initial state sequence}: We always initialize the prior on
+  $\mathbf{c}$ as described above but in some 
+  particularly tricky cases, the initial state sequence estimate is so poor that
+  qualitative trajectory realizations and MSD predictions are irreconcilable with
+  MD. A simple way to identify bad parameterizations is to check whether the MD 
+  MSD of individual trajectories can be reasonably reproduced by realizations of
+  the HDP-AR-HMM fit to the same trajectory. In Figure~\ref{fig:msd_overestimate},
+  the MSD predicted by the HDP-AR-HMM dwarfs that calculated from MD, due to 
+  rapid switching between states in the final state sequence.
   
-  The IHMM is quite powerful on its own, but requires some critical thinking by
-  the user in order to ensure maximum effectiveness. One can obtain 
-  the best results with some simple checks and, where necessary, improved 
-  state sequence initialization.
-  
-  The best way to ensure reliable MSD predictions is to ensure proper reproduction
-  of the individual MD MSDs by realizations of the IHMM. Over-predictions and 
-  under-predictions are usually the result of a poorly identified state sequence. (see
-  Figure TBD for example)
+  We can improve the final state sequence estimate by seeding the initial state 
+  sequence with a guess made by applying the HDP-AR-HMM to smaller segments of the 
+  trajectory. In Figure~\ref{fig:seed_sequence}, we illustrate this process. In
+  Figure~\ref{fig:msd_improvement}, the MSD predicted by the HDP-AR-HMM is
+  much more consistent with MD after applying this approach.
   
   \begin{figure}
   \centering
@@ -221,23 +181,14 @@
   \end{subfigure}
   \caption{(a, b) In some cases, the state segmentation leads to over- or 
   under-prediction of the MSD, usually due to poor initialization of the state
-  sequence. In (b), state transitions are too frequent and lead to an
-  overprediction of the MD MSD. (c) We can greatly improve MSD predictions by
-  giving the IHMM a good guess at the initial state sequence. (d) A better
-  initial state segmentation via seeding, gives more reasonable estimates
-  of the final state sequence.}\label{fig:improvement_state_sequence}
+  sequence. In (b), state transitions are too frequent, particularly between 
+  the light blue and light green states, and ultimately causes an over-prediction
+  of the MD MSD. (c) We can greatly improve MSD predictions by giving the HDP-AR-HMM a good
+  guess at the initial state sequence. (d) A better initial state segmentation
+  via seeding, gives more reasonable estimates of the final state sequence
+  as illustrated in Figure~\ref{fig:seed_sequence}.}\label{fig:improvement_state_sequence}
   \end{figure}
-  
-  There are two primary approaches we have implemented in order to improve the final 
-  state sequence predictions. Both attempt to aid the initial state assignments 
-  algorithmically. First, we always initialize the prior on $\mathbf{c}$ in 
-  Equation~\ref{M-eqn:var} of the main text as described in 
-  Section~\ref{section:prior_guesses}. In particularly tricky cases, the initial
-  state sequence estimate is so poor that qualitative trajectory realizations
-  and MSD predictions are irreconcilable with MD. In our second approach, we can
-  seed the initial state sequence with a guess made by applying the IHMM to 
-  smaller segments of the trajectory. 
-  
+
   \begin{figure}
   \centering
   \begin{subfigure}{0.48\textwidth}
@@ -258,13 +209,12 @@
   \end{subfigure}
   \begin{subfigure}{1\textwidth}
   \includegraphics[width=\textwidth]{seed_ACH21_full.pdf}
-  \caption{Initial state sequence seeded with states found in (a)--(d)}\label{fig:full}
+  \caption{Final state sequence seeded with states found in (a)--(d)}\label{fig:full}
   \end{subfigure}
-  \caption{In (a--d), we show the state sequence resulting from 5 iterations
-  of the IHMM on each of the four quarters of the center-of-mass trajectory in
-  (e) after splitting it into 4 separate segments. We use the concatenation 
-  of the four state sequences as the initial sequence for the IHMM run on the 
-  fully trajectory in (e).
+  \caption{In (a--d), we show the state sequences which result from 5 iterations
+  of the HDP-AR-HMM on each of the four quarters of the center-of-mass trajectory
+  in (e). We use the concatenation of the four state sequences as the initial 
+  sequence for the HDP-AR-HMM inference run on the fully trajectory in (e).
   }\label{fig:seed_sequence}
   \end{figure}
   
@@ -272,23 +222,20 @@
   
   \subsection{Agglomerative Clustering Versus Gaussian Mixture Models}\label{section:agglomerative}
   
-  % BJC: will show Gaussian mixture model which has a cluster engulfing another cluster, so
-  % it's tails are on both sides of the center cluster.
-  
   \begin{figure}[h]
   \centering
   \begin{subfigure}{0.95\textwidth}
   \includegraphics[width=\textwidth]{bayesian_A.pdf}
-  \caption{Bayesian Gaussian mixture model}\label{fig:bayesian_A}
+  \caption{Dirichlet process Gaussian mixture model}\label{fig:bayesian_A}
   \end{subfigure}
   \begin{subfigure}{0.95\textwidth}
   \includegraphics[width=\textwidth]{agglomerative_A.pdf}
   \caption{Agglomerative Clustering}\label{fig:agglomerative_A}
   \end{subfigure}
-  \caption{To reduce the state space, we prefer agglomerative clustering over Bayesian
-  Gaussian mixture modeling. In the plots above we show the results of clustering the
+  \caption{To reduce the state space, we prefer agglomerative clustering over non-parametric
+  Dirichlet process Gaussian mixture modeling. In the plots above we show the results of clustering the
   diagonal entries of the autoregressive coefficient matrices, $A$, of methanol. (a) 
-  Bayesian Gaussian mixture models tend to delocalize the clusters in parameter space
+  Dirichlet process Gaussian mixture models tend to delocalize the clusters in parameter space
   since the Gaussians can overlap. Agglomerative clustering prevents overlap of 
   clusters and ensures that all states within each cluster have similar parameters.
   }\label{fig:clustering_choice}
@@ -296,27 +243,19 @@
   
   \newpage
   
-%  \subsection{Clustering on the self-transition probabilities}\label{section:selfT_cluster}
-%  
-%  To cluster on $T_{ii}$, we first cast it in terms of the expected dwell times. The expected 
-%  value of the number of sequential self-transitions is simply $\frac{1}{1 - T_{ii}}$. This 
-%  relationship correctly implies that dwell times approach infinity as $T_{ii}$ approaches 1. 
-%  There we found the most success with agglomerative clustering by linearizing this 
-%  relationship and clustering on $-log(1 - T_{ii})$.
-  
   \subsection{Choosing Linkage Criteria and the Number of Clusters}\label{section:nclusters}
   
   In this section, we determine the optimal linkage criteria and number of clusters
-  for studying methanol's parameters. We applied the same workflow to make analogous
-  decisions for ethylene glycol, urea and acetic acid. In all cases, we found that
-  the `ward' linkage criteria resulted in the most useful clustering. We chose to 
-  use x number of clusters for each solute, the minimum number of clusters, by our
-  analysis, needed to adequately distinguish state dynamics. 
+  for studying methanol's parameters. We applied the same workflow in order to make
+  analogous decisions for ethylene glycol, urea and acetic acid. In all cases, we 
+  found that the `ward' linkage criteria resulted in the most useful clustering. 
+  We chose to use 10 clusters for each solute, the minimum number of clusters, by our
+  analysis, needed to adequately distinguish state dynamics.
   
   In order to cluster the parameter sets, we need to determine the linkage criteria 
   that will be used to measure the distance between clusters as well as an appropriate
   total number of clusters. In Figure~\ref{fig:linkages}, we show the result of clustering
-  with each type of linkage criteria available with the 
+  with each type of linkage criteria available with the \\
   \texttt{sklearn.cluster.AgglomerativeClustering} class of the \texttt{scikit-learn} 
   python package. It is clear that both the `average' and `single' linkage criteria 
   do not sufficiently cluster the data. The `ward' criteria appears to result in the 
@@ -363,7 +302,7 @@
   clusters. In Figure~\ref{fig:silhouette_MET}, we plot the Silhouette score as
   a function of the total number of clusters using the `ward' linkage criteria. 
   A Silhouette score of 1 indicates the best clustering possible, values near
-  0 indicate overlapping clusters, and negative values indicate samples belong to
+  0 indicate overlapping clusters, and negative values indicate that samples belong to
   the wrong clusters. For the methanol parameters, the Silhouette score drops off
   quickly with number of clusters before plateauing around 7 total clusters. 
   However, given the low spread in $\mu_r$, it is not clear that using 7 or less 
@@ -399,78 +338,131 @@
   \caption{4 total clusters}\label{fig:4cluster_state_sequence}
   \end{subfigure}
   \begin{subfigure}{0.9\textwidth}
-  \includegraphics[width=1\textwidth]{clustered_traj_MET_ward_12.pdf}
-  \caption{12 total clusters}\label{fig:12cluster_state_sequence}
-  \end{subfigure}
-  \begin{subfigure}{0.9\textwidth}
-  \includegraphics[width=1\textwidth]{clustered_traj_MET_ward_20.pdf}
-  \caption{20 total clusters}\label{fig:20cluster_state_sequence}
+  \includegraphics[width=1\textwidth]{clustered_traj_MET_ward_10_nolabel.pdf}
+  \caption{10 total clusters}\label{fig:20cluster_state_sequence}
   \end{subfigure}
   \caption{Although the Silhouette score for four total clusters is high, we do
   not see adequate distinction between clusters until we group the parameters
-  from the 24 trajectories into 20 total clusters. When we use 12 total clusters,
-  the distinction appears acceptable except that the segment from ~50--550 ns
-  and from 1200--1500 ns (both colored orange) are clustered together. The radial
-  means of these two segments correspond to two very different morphological
-  regions of the membrane.}\label{fig:clustered_state_sequences}
+  from the 24 trajectories into at least 10 total clusters.}\label{fig:clustered_state_sequences}
   \end{figure}
+
+  \section{Obtaining clustered state parameters}\label{section:ihmm_procedure}
+  
+  Parameterization the clustered states with the HDP-AR-HMM is a multi-stepped procedure. 
+  In the steps and figures that follow, we graphically illustrate the procedure which is
+  described with additional detail in Section~\ref{M-method:clustering} of the main text.
+  
+  \begin{enumerate}
+  	\item Parameterize in $x$, $y$, $z$ coordinates with $x$, $y$ coordinates relative to the nearest
+  	pore center (see Figure~\ref{fig:xyz_hmm}). 		
+  	\item Cluster the VAR parameters from the states found in all 24 trajectories (See 
+  	Section~\ref{M-method:clustering} of the main text). Reassign the state sequence so that segments
+  	which belong to the same cluster are labeled the same across all solute trajectories.
+  	\item Zero the trajectories. First, zero out the $y$ dimension by rotating each segment of 
+  	the trajectory, as partitioned before clustering, about the $z$ axis, in order to align the 
+  	mean $xy$ vector with the $x$ axis (see Figure~\ref{fig:y_zeroed}). Then, subtract the mean in
+  	$x$ and $z$ (Figure~\ref{fig:xyz_zeroed}).
+  	\item Fix clustered state sequence and infer parameters of each state, assuming a mean of zero
+  	for all states (see Figure~\ref{fig:zeroed_clustered_hmm}). 
+  \end{enumerate}
   
   \begin{figure}
-  \centering
-  \includegraphics[width=0.7\textwidth]{nclusters_msd_MET_ward.pdf}
-  \caption{The total MSD predicted by stochastic realizations of the clustered
-  model is relatively insensitive to the total number of clusters. All
-  predictions are less than the predictions of MD and the unclustered trajectories.
-  This behavior is expected due to underestimation of the short dwell time 
-  densities as described in Section~\ref{M-section:unclustered_MSD_prediction}
-  of the main text.}\label{fig:MET_nclusters} 
+    \centering
+	\begin{subfigure}{0.6\textwidth}
+	\includegraphics[width=\textwidth]{xyz_hmm.pdf}
+		\caption{}\label{fig:xyz_hmm}
+	\end{subfigure}  
+		\begin{subfigure}{0.6\textwidth}
+		\includegraphics[width=\textwidth]{y_zeroed.pdf}
+		\caption{}\label{fig:y_zeroed}
+	\end{subfigure}  	
+	\begin{subfigure}{0.6\textwidth}
+		\includegraphics[width=\textwidth]{xyz_zeroed.pdf}
+		\caption{}\label{fig:xyz_zeroed}
+	\end{subfigure}  		
+	\begin{subfigure}{0.6\textwidth}
+		\includegraphics[width=\textwidth]{zeroed_clustered_hmm.pdf}
+		\caption{}\label{fig:zeroed_clustered_hmm}
+	\end{subfigure}  
+	\caption{In the above plots, distinct colors correspond to distinct state behavior. 
+	(a) First we parameterize the trajectories in terms of the $x$, $y$, $z$ solute 
+	center-of-mass coordinates with the $x$ and $y$ coordinates relative to the nearest 
+	pore center. The parameters of these states are used to predict the unclustered MSDs
+	according to method 1 described in Section~\ref{M-method:realizations} of the main
+	text. (b) Next, we zeroed out the $y$ dimension by rotating each segment of the 
+	trajectory, as partitioned before clustering, about the $z$ axis, in order to align the 
+  	mean $xy$ vector with the $x$ axis. (c) We then subtracted the $x$ and $y$ means of
+  	each segment in order to fully zero the trajectory. (d) Finally, we applied the 
+  	inference component of the HDP-AR-HMM in order to infer the parameters of the 
+  	clustered states.
+	}\label{fig:hmm_demo}
   \end{figure}
   
-  This clustering analysis will be finished after some mechanistic studies. It is
-  clear that we will need some understanding of mechanisms in order to 
-  arrive at a cluster recommendation.
-  
-%  \begin{figure}[h]
-%  \centering
-%  \begin{subfigure}{0.475\textwidth}
-%  \includegraphics[width=\textwidth]{nclusters_msd_MET_ward.pdf}
-%  \caption{ward}\label{fig:nclusters_msd_MET_ward}
-%  \end{subfigure}
-%  \begin{subfigure}{0.475\textwidth}
-%  \includegraphics[width=\textwidth]{nclusters_msd_MET_complete.pdf}
-%  \caption{complete}\label{fig:nclusters_msd_MET_complete}
-%  \end{subfigure}
-%  \begin{subfigure}{0.475\textwidth}
-%  \includegraphics[width=\textwidth]{nclusters_msd_MET_average.pdf}
-%  \caption{average}\label{fig:nclusters_msd_MET_average}
-%  \end{subfigure}
-%  \begin{subfigure}{0.475\textwidth}
-%  \includegraphics[width=\textwidth]{nclusters_msd_MET_single.pdf}
-%  \caption{single}\label{fig:nclusters_msd_MET_single}
-%  \end{subfigure} 
-%  \caption{}\label{fig:MET_nclusters} 
-%  \end{figure}
-  
+  \newpage
 
-  \section{Deviations of the IHMM from Molecular Motion}\label{section:shorttimes_msd}
+  \section{Cause of underestimate of urea's MD MSD}\label{section:urea_underestimate}
   
-   At extremely short time lags, the MSD is generally over-predicted by the IHMM
+  Realizations of the HDP-AR-HMM underestimate the MD MSD of urea due to MD
+  trajectories with axial motion correlation that is likely uncharacteristic and
+  unable to be captured by ensembles of stochastic HDP-AR-HMM realizations. One
+  such trajectory is plotted in Figure~\ref{fig:urea_underestimate}. Axial hops 
+  appear positively correlated, jumping consistently in the negative $z$ direction, 
+  leading to a high MSD. The parabolic trajectory of the MD MSD curve implies
+  underlying superdiffusion which would require some kind of facilitating
+  driving force. It is likely that running the trajectory longer would reduce
+  the slope of the MSD curve, making it more consistent with the HDP-AR-HMM 
+  prediction.
+  
+  \begin{figure}[h]
+  \centering
+  \begin{subfigure}{0.35\textwidth}
+  \includegraphics[width=\textwidth]{underestimate_URE_13.pdf}
+  \caption{}\label{fig:underestimate_msd}
+  \end{subfigure}
+  \begin{subfigure}{0.63\textwidth}
+  \includegraphics[width=\textwidth]{state_sequence_before_URE_13.pdf}
+  \caption{}\label{fig:underestimate_traj}
+  \end{subfigure}
+  \caption{(a) The HDP-AR-HMM under-predicts the MD MSD of urea when fit
+  to the trajectory in (b) because axial hops are highly correlated, 
+  behavior our model is unable to reproduce.}\label{fig:urea_underestimate}
+  \end{figure}
+  
+  \section{Influence of number of clusters on qualitative hybrid trajectories}\label{section:qualitative}
+  
+  \begin{figure}[h]
+  \begin{subfigure}{0.48\textwidth}
+  \includegraphics[width=\textwidth]{qualitative_clustered_MET_20.pdf}
+  \caption{20 clusters}\label{fig:qualitative_20}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+  \includegraphics[width=\textwidth]{qualitative_clustered_MET_30.pdf}
+  \caption{30 clusters}\label{fig:qualitative_30}
+  \end{subfigure}
+  \caption{The quality of hybrid trajectories resulting from clustered parameters
+  sets qualitatively improves as the number of clusters is increased. This comes 
+  at the cost of a larger state space to interpret.}\label{fig:qualitative_improvement}
+  \end{figure}
+
+  \section{Deviations of the HDP-AR-HMM from Molecular Motion}\label{section:shorttimes_msd}
+  
+  At extremely short time lags, the MSD is generally over-predicted by the HDP-AR-HMM
   (see Figure~\ref{fig:unclustered_msd_shortlag}) because the VAR(1) model assumes
   multivariate Gaussian noise while the MD data suggests the noise is better 
   modeled by more general L\'evy stable noise. The first time lag of the MSD is
-  equivalent to the variance of all observed fluctuations (first-order difference). 
-  The IHMM simulation appears to over-estimate the variance because the actual 
+  equivalent to the variance of all observed fluctuations. 
+  The HDP-AR-HMM simulation appears to over-estimate the variance because the actual 
   distribution of solute fluctuations has heavy tails with a smaller variance (Figure~\ref{fig:emission_widths}).
   The total distribution of hops is expected to be heavy tailed because it is a
   combination of hop distributions from many states with different variances. More
   interestingly, in Figure ~\ref{fig:state_emission_widths}, we show that the 
-  emission distribution of a single state picked out by the IHMM is fit better by
-  a more general L\'evy distribution while the emissions from IHMM realizations are
-  Gaussian, as expected. An improvement to the IHMM that may allow dynamics more 
+  emission distribution of a single state picked out by the HDP-AR-HMM is fit better by
+  a more general L\'evy distribution while the emissions from HDP-AR-HMM realizations are
+  Gaussian, as expected. An improvement to the HDP-AR-HMM that may allow dynamics more 
   faithful to MD would use an autoregressive model with L\'evy stable noise. However,
   this would be less computationally efficient due to lack of conjugate priors.
   
-  \begin{figure}
+  \begin{figure}[h]
   \centering
   \begin{subfigure}{0.32\textwidth}
   \includegraphics[width=\textwidth]{unclustered_msd_MET_shortlag.pdf}
@@ -484,18 +476,18 @@
   \includegraphics[width=\textwidth]{state_emission_widths.pdf}
   \caption{}\label{fig:state_emission_widths}
   \end{subfigure}
-  \caption{(a) At short time lags, the MD MSD (black) and the IHMM MSD (orange)
+  \caption{(a) At short time lags, the MD MSD (black) and the HDP-AR-HMM MSD (orange)
   differ significantly in their shape and curvature. (b) While the 
   fluctuations in $z$ of both distributions are heavy-tailed, fitting well to zero-centered
-  symmetric L\'evy stable distributions with stability parameters, $\alpha$, the IHMM has
+  symmetric L\'evy stable distributions with stability parameters, $\alpha$, the HDP-AR-HMM has
   a wider variance. (c) The distribution of fluctuations in a chosen state frequently
-  visited by methanol is heavy tailed, but the IHMM is constrained to produce fluctuations
+  visited by methanol is heavy tailed, but the HDP-AR-HMM is constrained to produce fluctuations
   from a multivariate normal distribution ($\alpha$=2 in each dimension).
   }\label{fig:short_timelags}
   \end{figure}
   
   Also apparent from Figure~\ref{fig:unclustered_msd_shortlag} is that the 
-  curvature of the MD MSD is far more gradual than that generated by the IHMM.
+  curvature of the MD MSD is far more gradual than that generated by the HDP-AR-HMM.
   This is because the VAR(1) model is only correlated to its previous fluctuation
   while the MD simulations suggest that correlation persists for at least tens
   of nanoseconds.
@@ -506,23 +498,20 @@
   are interested in reproducing longer time scale behavior, it is not an issue of
   great concern.
   
-  \section{Influence of number of clusters on qualitative hybrid trajectories}
+%  \section{MSDs predicted from clustered parameter sets}\label{section:clustered_msds}  
+%  
+%  \begin{figure}[h]
+%  \centering
+%  \includegraphics[width=0.7\textwidth]{nclusters_msd_MET_ward.pdf}
+%  \caption{The total MSD predicted by stochastic realizations of the clustered
+%  model is relatively insensitive to the total number of clusters. All
+%  predictions are less than the predictions of MD and the unclustered trajectories.
+%  This behavior is expected due to underestimation of the short dwell time 
+%  densities as described in Section~\ref{M-section:unclustered_MSD_prediction}
+%  of the main text.}\label{fig:MET_nclusters} 
+%  \end{figure}
   
-  \begin{figure}
-  \begin{subfigure}{0.48\textwidth}
-  \includegraphics[width=\textwidth]{qualitative_clustered_MET_20.pdf}
-  \caption{20 clusters}\label{fig:qualitative_20}
-  \end{subfigure}
-  \begin{subfigure}{0.48\textwidth}
-  \includegraphics[width=\textwidth]{qualitative_clustered_MET_30.pdf}
-  \caption{30 clusters}\label{fig:qualitative_30}
-  \end{subfigure}
-  \caption{The quality of hybrid trajectories resulting from clustered parameters
-  sets qualitatively improves as the number of clusters is increased. This comes 
-  at the cost of a larger state space to interpret.}\label{fig:qualitative_improvement}
-  \end{figure}
-  
-  \section{Clustered Parameters}\label{section:clustered_parmeters}
+  \section{Relating clustered parameters to mechanisms}\label{section:clustered_parmeters}
   
   We can begin to hypothesize mechanisms by studying the behaviors defined by the 
   state parameters. In Figure~\ref{fig:common_states_lines}, we plot representative 
@@ -534,7 +523,7 @@
   each cluster, for interpretive purposes, it is important to recognize that the means
   only provide clues towards the general location of the solute. For example, the 
   radial mean of state 3 is 1.4 nm from the pore center. However, inspection of 
-  Figure~\ref{fig:clustered_traj_MET} suggests that this type of behavior actually
+  Figure~\ref{M-fig:clustered_traj_MET} of the main text suggests that this type of behavior actually
   occurs radially throughout the pore. There are instances of state 3 less than 1 nm
   from the pore center and more than 2 nm from the pore center. In this case, the 
   radial mean only suggests that this type of behavior happens in both regions somewhat
@@ -555,31 +544,8 @@
 
   Solutes stay trapped for various lengths of time. On average, state 4 has the longest 
   dwell times and state 3 has the shortest dwell times while the rest have intermediate
-  dwell times. This is somewhat supported by inspection of Figure~\ref{fig:clustered_traj_MET},
-  however. The expected dwell times of the clusters incorporate all 24 trajectories.
-  
-  % BJC4: Not sure if this is useful.
-  % MRS: it does give a good summary. But you should make it clear how you selected these 5.
-  % MRS: it's implied in one of the figures, but should be stated explicitly
-%  By examining the parameters, it is now easier to describe the state behavior.
-%  \begin{enumerate}[label={State \theenumi :}, leftmargin=3.5\parindent]
-%     \item This state has intermediate dwell times with high past-hop dependence.
-%     The radial mean and evidence from Figure~\ref{fig:clustered_traj_MET} suggests
-%     %MRS: ``tail and pore region'' sounds the same as ``everywhere''.
-%     that this state is common in the tail and pore region.
-%     \item This state seems to occur exclusively in the tail region based on its radial
-%     mean. Its fluctuations are small and there is little past hop dependence
-%     \item This is likely a hopping state that strongly contribute to the solute's MSD. 
-%     It is short lived and takes very large hops. This type of behavior is exhibited 
-%     %MRS: ``near and far'' also sounds like everywhere 
-%     near and far from the pore center as discussed earlier.
-%     \item This is a trapping state with a strong dependence on its previous fluctuation.
-%     Evidence from Figure~\ref{fig:clustered_traj_MET} and a radial mean of 1.8 suggest
-%     that it tends to occur at intermediate distances from the pore center.
-%     \item This is an intermediate-length trapping state that occurs close to the pore
-%     center. It's fluctuations are tight and relatively independent of its previous 
-%     fluctuation.
-%  \end{enumerate}  
+  dwell times. This is somewhat supported by inspection of Figure~\ref{M-fig:clustered_traj_MET},
+  however, the expected dwell times of the clusters incorporate all 24 trajectories.
   
   \begin{figure}
   \centering
@@ -619,7 +585,7 @@
   State 3 have by far the smallest local number density which is likely responsible for 
   their mobility, as suggested by the state's large covariance.
   
-  \begin{figure}
+  \begin{figure}[h]
   \centering
   \includegraphics[width=0.5\textwidth]{local_densities.pdf}
   \caption{We measured the local number density of heavy atoms surrounding solutes in each
