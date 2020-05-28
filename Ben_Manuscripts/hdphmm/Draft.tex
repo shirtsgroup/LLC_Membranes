@@ -52,7 +52,10 @@
   the states identified by the HDP-AR-HMM into clusters based on multiple metrics
   aimed at distinguishing solute behavior based on their fluctuations, dwell times
   in each state and position within the inhomogeneous membrane structure. We analyze
-  prevalent clusters in order to relate their parameters to physical interactions between 
+  prevalent clusters in order to relate their 
+  %MRS: suggestion to add:
+  dynamical
+  parameters to physical interactions between 
   solutes and the membrane. 
 
   Along with parameters of individual states, the HDP-AR-HMM simultaneously infers a 
@@ -178,7 +181,11 @@
   observations.
   %BJC: added by Chris  
   Rapid state switching in the original HDP-HMM not only reduces the predictive
-  ability of the model, but it is also physically unrealistic and can complicate
+  ability of the model, but 
+  %MRS: tweaked; sometimes it might be physical.
+  % it
+  in many cases
+  is also physically unrealistic and can complicate
   model interpretation. 
   Fox et al. addressed this issue by adding a `sticky' 
   parameter.~\cite{fox_sticky_2007} The sticky HDP-HMM is useful in situations
@@ -208,7 +215,7 @@
   general sticky HDP-SLDS models.
   
   % BJC: fair number of changes to this paragraph based on Chris' suggestions.
-  % BJC: he really wants use to emphasize our contribution with this part
+  % BJC: he really wants us to emphasize our contribution with this part
   To our knowledge, applying the HDP-AR-HMM in order to gain kinetic and
   mechanistic insight from MD simulation trajectories has not been done
   before. Typical applications of the HDP-AR-HMM center around determining the 
@@ -333,7 +340,11 @@
   indicator of convergence (see Figure~\ref{S-fig:convergence3d} of the Supporting
   Information).
   
-  It is usually beneficial to employ intelligent state sequence initialization procedures
+  It is usually beneficial to employ 
+  %MRS: tweak
+  %intelligent 
+  well-informed
+  state sequence initialization procedures
   in nonparametric Bayesian approaches.~\cite{fox_bayesian_2010}
   Most importantly in this work, the states identified by the HDP-AR-HMM are heavily 
   influenced by the Gaussian prior placed on $\mathbf{c}$ in Equation~\ref{eqn:var}. In 
@@ -345,8 +356,12 @@
   % I moved it down here as suggested by Chris below. What do you think in terms of flow?  
   We inferred the state sequence and parameters for each of the 24 solute 
   trajectories independently. Although the HDP-AR-HMM is capable of identifying 
-  an infinite number of states, a Dirichlet process tends to exhibit a 
+  an infinite number of states, a Dirichlet process 
+  %MRS: tweak
+  %tends to exhibit a 
+  exhibits a 
   ``rich get richer" effect, favoring a fewer number of states.~\cite{dreyer_discovering_2011}
+  %MRS: this next sentence is a bit vauge.  Why would we prefer thtem to stay separated?
   By applying the algorithm to each trajectory independently, we reduce the 
   possibility of lumping together multiple similar states which we would prefer
   to stay separated before clustering. 
@@ -374,6 +389,8 @@
   %BJC: added following in response to Chris' below comment. I think I'm interpretting what he's saying right
   % CPC: perhaps keep hammering home not only reducing, but also reemphasize why absolute
   % value of some parameters really not of interest 
+  %MRS: explain why parameters of single states don't give insight; more context needed?  Is CPC talking about
+  %MRS: some some of the parmameters not being interesting in general, not just the values for some states?
   and because the parameters of a single states does not always give meaningful physical insight. 
   For each solute studied, we identified approximately 300-500 independent states, 
   each with separate VAR(1) parameters. Many of these states exhibit very similar
@@ -466,11 +483,15 @@
   (see Figure~\ref{S-fig:xyz_zeroed}). 
   
   We obtained estimates of clustered $A$ and $\Sigma$ parameters as well as a
+  %MRS: did you mean to change to T to P here?
+  %MRS: also, maybe ``consensus'' or ``merged'' instead of ``single''
   single $T$, describing transitions between all possible clustered states exhibited by
   the ensemble of trajectories, using the inference component of the HDP-AR-HMM
   algorithm. We applied the HDP-AR-HMM simultaneously on all 24 zeroed solute
   trajectories with state sequences fixed according to the remapped clustered 
-  state assignments. This is only possible because the state sequence is fixed. 
+  state assignments. 
+  %MRS: be specific what ``This'' is in the sentence.
+  This is only possible because the state sequence is fixed. 
   In cases where one does not know the state sequence and would like to 
   incorporate data from multiple trajectories, one can apply the beta process (BP)
   AR-HMM.~\cite{fox_sharing_2009} However the data requirements may be quite high
@@ -509,6 +530,7 @@
   For both approaches, we drew state sequences with transition probabilities given 
   % BJC: Chris wasn't clear where T came from for method 2. I tried to make it clearer in 
   % last paragraph of previous section. Let me know if it's not
+  %MRS: P vs. T agin?
   by $T$ of the HDP-AR-HMM. While in a given state, we simulated motion according to the 
   VAR(1) parameterization of that state. After each state transition, we set the 
   unconditional mean of the new state to the particle's position immediately before
@@ -579,6 +601,7 @@
   \end{equation}
   where $n$ is the number of spatial dimensions (1 in our case). In general, the 
   MSD of the realizations of our models enters a linear regime near a 5 ns time lag
+  %MRS: ref below to figure not recognized?
   (see Figure~\ref{S-fig:MET_nclusters} of the Supporting Information for example).
   Since MSD sampling decreases with increasing time lag, longer trajectory 
   realizations help to extend the linear region.
@@ -681,6 +704,7 @@
   MSD.
   
   %BJC6: added. Should I add a figure?
+  %MRS: I think fine as supporting.
   A potential shortcoming of the HDP-AR-HMM applied to MD simulations is its 
   inability to reproduce the short time scale MSD curves. The MSDs predicted
   by the model tend to enter a linear regime much more quickly than the MD MSDs
@@ -730,9 +754,11 @@
   methanol.
   }\label{fig:selectivity}
   \end{figure}
-  
-  The data suggests that the particular LLC membrane studied in this work is
-  capable of selectively separating urea and acetic acid from ethylene glycol
+
+  %MRS: I feel like this should be caveatted a bt. 
+  The data suggests that the particular LLC membrane studied in this work, 
+  up to the resolution of the moleceular modeling,
+  is capable of selectively separating urea and acetic acid from ethylene glycol
   and methanol. Ethylene glycol and methanol have comparable diffusivities
   while urea and acetic acid have much lower diffusivities. 
 
@@ -865,7 +891,7 @@
      suggests that this state occurs essentially evenly across possible radial
      distances from the pore center.
      \item This state's radial mean of 2.4 nm implies that it occurs exclusively in the
-     tail region based. Its fluctuations are small and there is little past hop dependence.
+     tail region based. Fluctuations are small and there is little past hop dependence.
      \item This is likely a hopping state that strongly contributes to the solute's MSD. 
      It is short lived and has large fluctuations which often results in very large hops.
      Like State 1, we see this type of behavior near the pore center and near the ends of the tails.
@@ -875,7 +901,7 @@
      occur at intermediate distances from the pore center with perhaps a higher tendency
      to occur deeper within the tails.
      \item This is an intermediate-length trapping state that occurs 0.9 nm from the pore 
-     center on average. It's fluctuations are tight and relatively independent of its previous 
+     center on average. Fluctuations are small and relatively independent of its previous 
      fluctuation.
   \end{enumerate}
    
@@ -987,6 +1013,7 @@
   far from the pore center. (c) The largest expected value (see 
   Equation~\ref{eqn:dwell_times}) of dwell times among the dominant clustered 
   states for each solute are inversely related to the solute's MSD. 
+  %MRS: is the c) point actually made in the figure?  There's no MSD in that graph.  
   % BJC: Copying Chris' comments below:
   % CPC: Discussion is confusing. guessing error bars are from measured simulation 
   % dwell times in dominant state.  
@@ -1002,20 +1029,20 @@
   % expand/clarify discussion on connection of fig 9c to other panels just lots
   % of ambiguity here, but results seem promising.
   % BJC: is it worth plotting bars with the MSD after 1000 ns as part of (c)? 
-  %MRS5: not clear what ``largest expected'' means here.
-  %BJC6: modified to 'expected value' and referenced equation   
   (d) The expected dwell time of solutes increases 
   in states with high local number density of surrounding heavy atoms.
   }\label{fig:summaries}
   \end{figure}
   
   % BJC: Chris was confused by this paragraph
+  %MRS: maybe switch ``dominant'' for something else, like predominant, or consensus
   Solutes with dominant states characterized by long dwell times tend to 
   have lower MSDs. We define the dominant states exhibited by each solute
   as any state visited by at least half (12) of the solute trajectories.
   By our definition and based on our choice to study 10 clusters for each 
   solute, methanol, ethylene glycol, urea and acetic acid are characterized
   %BJC: added this supporting figure 
+  %MRS: for some reason Not referencing this figure in supporting despite xr? 
   by 5, 6, 5 and 4 dominant states respectively (see Figure~\ref{fig:state_prevalence}
   of the Supporting Information). In Figure~\ref{fig:dwell_time_summary}, we
   plot the expected dwell time of each solute in the dominant state which 
@@ -1060,7 +1087,7 @@
   membrane density.
   
   When clustering, our goal was to create the simplest model possible that gave
-  clear mechanistic insight. This is important for systems where transport mechanisms
+  clear mechanistic insight. This is particularly important for systems where transport mechanisms
   are not easily hypothesized. However, once one gains some mechanistic understanding,
   as we have in this work, the clustering procedure can be modified in order to 
   study specific interactions or radially dependent behavior.
