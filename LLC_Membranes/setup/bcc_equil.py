@@ -478,7 +478,7 @@ if __name__ == "__main__":
 #    exit()
 
     equil.generate_topology(name='topol.top', restrained=True)  # creates an output file
-    equil.generate_mdps(length=50, frames=2, T=sim_params['temperature'])  # creates an object
+    equil.generate_mdps(length=50, em_steps=sim_params['em_steps'], frames=2, T=sim_params['temperature'])  # creates an object
     equil.mdp.write_em_mdp(out='em')
 
     if not args.continue_dry and not args.continue_solvated and not args.continue_xlinked:
