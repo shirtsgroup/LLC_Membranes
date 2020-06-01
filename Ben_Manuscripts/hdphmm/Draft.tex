@@ -111,7 +111,7 @@
   by the non-Brownian hopping and trapping behavior induced by the membrane's diverse
   topology and inhomogeneous structure resulting in subdiffusive behavior out to 
   multiple microseconds of simulation.~\cite{coscia_understanding_2019,coscia_chemically_2019}
-
+  %MRS: citation missing for coscia_chemically_2019
   We have already advanced our understanding of LLC monomer design in our previous work
   by building stochastic time series models based on the chemical intuition gained
   from qualitative MD studies of solute transport in an H\textsubscript{II} phase LLC
@@ -163,7 +163,7 @@
   By placing a hierarchical Dirichlet process (HDP) prior on the observed time
   series data, it is possible to extend HMMs to an unknown number of hidden
   states, thus allowing the model's complexity to be driven by the complexity
-  of the data.~\cite{teh_hierarchical_2006} We will refer a model calibrated with
+  of the data.~\cite{teh_hierarchical_2006} We will refer to a model calibrated with
   this type of prior as an HDP-HMM; this model class is sometimes referred to
   as an infinite hidden Markov model.~\cite{beal_infinite_2002} The HDP-HMM 
   elegantly overcomes the main shortcoming of standard HMMs, the need to choose
@@ -191,7 +191,7 @@
   datasets. For example, in both MD and single particle tracking, there is 
   strong temporal dependence/correlation between successive measurements even
   within a fixed state.~\cite{calderon_data-driven_2014}
-  Fox et al. formulated a method that accounts for temporal dependence betwee
+  Fox et al. formulated a method that accounts for temporal dependence between
   successive observations by incorporating Markov jump linear systems (MJLSs)
   into infinite state models.~\cite{fox_nonparametric_2009} An MJLS models 
   each dynamical mode as a linear dynamical process. Two MJLS sub-classes are 
@@ -213,7 +213,7 @@
   HDP-AR-HMM not only to segment a collection of MD time series into distinct 
   dynamical modes, but to uncover unknown transport mechanisms and to create 
   improved predictive models. We cluster the parameters of individual states
-  in order to reduce the total state space down to an interpretable size
+  in order to reduce the total state space down to an interpretable size.
   This allows us to learn the implied dominant physical mechanisms and describe
   solute kinetics based on interpretation of distinct parameters that dominate
   the ensemble of MD trajectories. We can use the model parameters determined 
@@ -237,8 +237,16 @@
   
   \item Second, we want to know if the HDP-AR-HMM algorithm can help
   efficiently uncover underlying transport mechanisms which give rise to different 
-  solute dynamical behavior. We cluster similar state parameters across all
-  trajectories in order to reduce the total state space and to understand which
+  solute dynamical behavior. We cluster 
+  %MRS:
+  %similar state parameters 
+  states with similar parameters
+  across all
+  trajectories in order to reduce the total state space and to 
+  %MRS:
+  identify
+  %understand 
+  which
   segments of the solute trajectories exhibit similar behavior. We use the 
   parameters of the clustered states identified by the HDP-AR-HMM in order to 
   infer dominant solute-membrane interactions and transport mechanisms. We 
@@ -265,7 +273,8 @@
   atomistic molecular model of four pores in a monoclinic unit cell with 
   10\% water by weight. Approximately one third of the water molecules 
   occupy the tail region with the rest are near the pore center.~\cite{coscia_chemically_2019}
-  
+  %MRS: fix citation above.
+
   We chose to study a subset of 4 of the fastest moving solutes from our previous
   work: methanol, acetic acid, urea and ethylene glycol. In addition to exploring 
   membrane structural space the most, these solutes have a relatively diverse set
@@ -288,6 +297,7 @@
   fluctuations of solute center-of-mass MD trajectories to discrete dynamical modes while 
   simultaneously inferring the VAR parameters of those modes. We use the sticky model
   in order to encourage higher self-transition probabilities since we physically expect
+  %MRS: maybe ``physically observe?'' instead of physically expect.
   solutes to stay trapped in states for appreciable amounts of time. 
   
   Although the discussion will be presented in terms of 2D cylindrical coordinates, we
@@ -357,7 +367,7 @@
   % CPC: perhaps keep hammering home not only reducing, but also reemphasize why absolute
   % value of some parameters really not of interest 
   %MRS: explain why parameters of single states don't give insight; more context needed?  Is CPC talking about
-  %MRS: some some of the parmameters not being interesting in general, not just the values for some states?
+  %MRS: some some of the parameters not being interesting in general, not just the values for some states?
   and because the parameters of a single state alone does not always have enough context
   to provide meaningful physical insight. For each solute studied, we identified 
   approximately 300-500 independent states, each with separate VAR(1) parameters.
@@ -448,7 +458,9 @@
   (see Figure~\ref{S-fig:xyz_zeroed}). 
   
   We obtained estimates of clustered $A$ and $\Sigma$ parameters as well as a
+  %MRS: check again agreement on $T$ and $P$ - you switched to $P$, right? Or are they 2 different things?
   consensus $T$ matrices, describing transitions between all possible clustered states 
+  %MRS: do you explicitly say how to get the consensus transition matrices?
   exhibited by the ensemble of trajectories, using the inference component of 
   the HDP-AR-HMM algorithm. We applied the HDP-AR-HMM simultaneously to all 24
   zeroed solute trajectories with state sequences fixed according to the remapped 
@@ -510,6 +522,9 @@
   We reported the mean and $1 \sigma$ confidence intervals of the MSDs based on the 
   results of 200 bootstrap trials. Our bootstrapping procedure varied dependent on the
   method of trajectory generation:
+  %MRS: this is a bit confusing.  Is there an expectation these should give consistent parameters?
+  %MRS: the second is boostrapping an MSD over 1000 trajectories, and the first is boostrapping an MSD over 24 trajectories.
+  %MRS: these should have different amounts of noise, making them hard to compare? Is this an issue?
   \begin{enumerate}[label={Method \theenumi :}, leftmargin=3.5\parindent]
   	\item For each bootstrap trial, we generated 24 stochastic trajectories, one from
   	each of the 24 independent HDP-AR-HMM models. The result of the trial is the mean
@@ -707,7 +722,10 @@
   \begin{figure}
   \centering
   \includegraphics[width=0.6\textwidth]{selectivity.pdf}
-  \caption{Of the solutes studied, the current generation of H\textsubscript{II}
+  \caption{Of the solutes studied, 
+  %MRS: add qualifier.
+  the models predict that 
+  the current generation of H\textsubscript{II}
   LLC membranes may have the most success selectively removing acetic acid and,
   to a lesser extent, urea from solution containing either ethylene glycol or 
   methanol.
@@ -839,7 +857,7 @@
   is given in Section~\ref{S-section:clustered_parmeters} of the Supporting Information.
   \begin{enumerate}[label={State \theenumi :}, leftmargin=3.5\parindent]
   
-     \item This state has intermediate dwell times with high past-hop dependence (high
+     \item This state has intermediate dwell times with high past-hop dependence (large
      entries of $A$). The cluster's radial mean is 1.5 nm which is about halfway between
      the pore center and tail ends. Evidence from Figure~\ref{fig:clustered_traj_MET} 
      suggests that this state occurs essentially evenly across possible radial
@@ -1090,7 +1108,8 @@
 % LocalWords:  scannable subsubcaptions errorbars uncharacteristicness facelift
 % LocalWords:  PSC RMACC hdphmm TOC nominalizations dischinger ramaseshan Baum
 % LocalWords:  functionalized teuerle jasra markov bioinformatics hughes yoon
-% LocalWords:  hines diarization MJLSs MJLS SLDSs SLDS hamada jk params MNIW
+% LocalWords:  hines diarization MJLSs MJLS SLDSs SLDS hamada jk params MNIW BP
 % LocalWords:  plateaued nclusters leftmargin trans diffusivity sorption alkane
 % LocalWords:  ness substituents desalination fonseca couto welch singhal noe
-% LocalWords:  shirtsgroup superdiffusive diffusivities
+% LocalWords:  shirtsgroup superdiffusive diffusivities jazani wang persson CPC
+% LocalWords:  shortlag jupyter ester
