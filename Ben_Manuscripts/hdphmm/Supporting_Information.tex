@@ -48,7 +48,7 @@
   \section{Parameter Convergence}\label{section:convergence}
   
   The state sequence appears to converge within 500--1000 IHMM iterations. To
-  be sure, we ran 2000 iterations of the IHMM algorithm in order to arrive at a 
+  be certain, we ran 2000 iterations of the IHMM algorithm in order to arrive at a 
   finalized state sequence. Stabilization of the VAR parameters indicates 
   that the state sequence has converged. In Figure~\ref{fig:convergence3d}, we plot
   the diagonal entries of the $A$ and $\Sigma$ matrices as well as the entries of
@@ -185,7 +185,7 @@
   the light blue and light green states, and ultimately causes an over-prediction
   of the MD MSD. (c) We can greatly improve MSD predictions by giving the HDP-AR-HMM a good
   guess at the initial state sequence. (d) A better initial state segmentation
-  via seeding, gives more reasonable estimates of the final state sequence
+  via seeding gives more reasonable estimates of the final state sequence
   as illustrated in Figure~\ref{fig:seed_sequence}.}\label{fig:improvement_state_sequence}
   \end{figure}
 
@@ -293,17 +293,17 @@
   concisely visualize the radial clusters is by their spread. An optimal number
   of clusters should have the same spread in radial means as the unclustered
   data. In Figure~\ref{fig:rspread}, we show that `ward' linkage results in 
-  the highest spread in the radials means of the clusters across a range of
+  the highest spread in the radial means of the clusters across a range of
   4--30 total clusters. For a low to intermediate number of clusters, the 
   spread of `ward' clusters is significantly larger than of the other linkage
   methods. Therefore, we have chosen to use `ward' clustering.
   
-  We use the Silhouette score in order to aid us in choosing the total number of
-  clusters. In Figure~\ref{fig:silhouette_MET}, we plot the Silhouette score as
+  We use the silhouette score in order to aid us in choosing the total number of
+  clusters. In Figure~\ref{fig:silhouette_MET}, we plot the silhouette score as
   a function of the total number of clusters using the `ward' linkage criteria. 
-  A Silhouette score of 1 indicates the best clustering possible, values near
+  A wilhouette score of 1 indicates the best clustering possible, values near
   0 indicate overlapping clusters, and negative values indicate that samples belong to
-  the wrong clusters. For the methanol parameters, the Silhouette score drops off
+  the wrong clusters. For the methanol parameters, the silhouette score drops off
   quickly with number of clusters before plateauing around 7 total clusters. 
   However, given the low spread in $\mu_r$, it is not clear that using 7 or less 
   clusters will give useful clustering results.
@@ -321,13 +321,13 @@
   \caption{(a) The `ward' linkage criteria maintains the highest standard 
   deviation in radial means, $\mu_r$, of the clusters for a given total 
   number of clusters as compared to other linkage criteria. (b) The 
-  Silhouette score, used to evaluate the quality of clustering with the 
+  silhouette score, used to evaluate the quality of clustering with the 
   `ward' distance criteria drops precipitously as a function of the chosen
   total number of clusters before plateauing.}\label{fig:idk}
   \end{figure}
   
   We incorporate qualitative feedback into the decision on the number of 
-  clusters. Despite its high Silhouette score, Figure~\ref{fig:4cluster_state_sequence}
+  clusters. Despite its high silhouette score, Figure~\ref{fig:4cluster_state_sequence}
   illustrates that using 4 clusters clearly does not distinguish dynamical 
   modes. We do not see visually acceptable clustering on the example trajectory
   until we use at least twenty total clusters (Figure~\ref{fig:20cluster_state_sequence}).
@@ -341,7 +341,7 @@
   \includegraphics[width=1\textwidth]{clustered_traj_MET_ward_10_nolabel.pdf}
   \caption{10 total clusters}\label{fig:20cluster_state_sequence}
   \end{subfigure}
-  \caption{Although the Silhouette score for four total clusters is high, we do
+  \caption{Although the silhouette score for four total clusters is high, we do
   not see adequate distinction between clusters until we group the parameters
   from the 24 trajectories into at least 10 total clusters.}\label{fig:clustered_state_sequences}
   \end{figure}
@@ -408,7 +408,7 @@
   such trajectory is plotted in Figure~\ref{fig:urea_underestimate}. Axial hops 
   appear positively correlated, jumping consistently in the negative $z$ direction, 
   leading to a high MSD. The parabolic trajectory of the MD MSD curve implies
-  underlying superdiffusion which would require some kind of facilitating
+  underlying super-diffusion which would require some kind of facilitating
   driving force. It is likely that running the trajectory longer would reduce
   the slope of the MSD curve, making it more consistent with the HDP-AR-HMM 
   prediction.
@@ -452,7 +452,9 @@
   modeled by more general L\'evy stable noise. The first time lag of the MSD is
   equivalent to the variance of all observed fluctuations. 
   The HDP-AR-HMM simulation appears to over-estimate the variance because the actual 
-  distribution of solute fluctuations has heavy tails with a smaller variance (Figure~\ref{fig:emission_widths}).
+  distribution of solute fluctuations has 
+  %MRS: heavy tails should mean larger variance? Clarify?
+  heavy tails with a smaller variance (Figure~\ref{fig:emission_widths}).
   The total distribution of hops is expected to be heavy tailed because it is a
   combination of hop distributions from many states with different variances. More
   interestingly, in Figure ~\ref{fig:state_emission_widths}, we show that the 
@@ -460,7 +462,7 @@
   a more general L\'evy distribution while the emissions from HDP-AR-HMM realizations are
   Gaussian, as expected. An improvement to the HDP-AR-HMM that may allow dynamics more 
   faithful to MD would use an autoregressive model with L\'evy stable noise. However,
-  this would be less computationally efficient due to lack of conjugate priors.
+  this would be less computationally feasible due to lack of conjugate priors.
   
   \begin{figure}[h]
   \centering
@@ -592,13 +594,13 @@
   state. In blue, we plot the local number density experienced by solutes averaged over all
   frames in which the solute occupied the given state. We broke down this overall average 
   number density into number densities measured from instances when the state is occupied 
-  for long (orange) versus short(red) dwell time states. We define define `long' dwells times
+  for long (orange) versus short (red) dwell time states. We define define `long' dwells times
   as the 50th percentile of all dwell times in the given state, and short as all others. It
   is clear that solutes which experience longer dwells times are also surrounded by more 
   heavy atoms on average.}\label{fig:local_densities}
   \end{figure}
   
-  \subsection{Dominant States}\label{section:state_prevelance}
+  \subsection{Predominant States}\label{section:state_prevelance}
   
   \begin{figure}[h]
   \centering
@@ -622,3 +624,6 @@
   \end{figure}
   
 \end{document}
+% LocalWords:  IHMM pdf prior's solute MSD AR HMM ACH Dirichlet delocalize hmm
+% LocalWords:  Gaussians methanol's scikit plateauing nolabel MSDs urea's URE
+% LocalWords:  shortlag evy BJC SI msds msd nclusters Solutes solutes alkane
