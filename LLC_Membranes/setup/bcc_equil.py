@@ -285,7 +285,7 @@ class EquilibrateBCC(topology.LC):
             self.scale_unit_cell(f)
             print('Attempting energy minimization with box lengths %.4f times desired size' % i, end='', flush=True)
             nrg = gromacs.simulate(self.em_mdp, self.top_name, self.gro_name, self.em_mdp.split('.')[0],
-                                   em_energy=True, verbose=False, mpi=self.mpi, nprocesses=self.nprocesses)
+                                   em_energy=True, verbose=False, mpi=self.mpi, nprocesses=self.nprocesses, restraints=True)
 
             if nrg >= 0:
                 print('...Failed. Will shrink slower on next iteration.')
