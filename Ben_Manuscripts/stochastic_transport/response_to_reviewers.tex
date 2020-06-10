@@ -10,6 +10,7 @@
 \usepackage{subcaption}
 \usepackage{enumitem}
 \usepackage{scrextend}
+\usepackage[normalem]{ulem}
 
 \externaldocument[S-]{Supporting_Information}
 \externaldocument[M-]{Final_Draft}
@@ -135,8 +136,159 @@ followed by the new text (denoted by ``New text:").
 		y-axis and the caption to make this clear.}
 		
 		Author reply:
-		%BJC: modify figures
-		%BJC: cut down on interpretation in all figures
+		
+		We thank the reviewer for their constructive feedback. The fontsize in the figure is indeed too small.
+		We have modified the plots in the figure to have larger, more readable font and we took this opportunity
+		to increase the font size on Figures 6--8 as well.
+		
+		The reviewer is correct in their interpretation of the figures. For clarity, we modified the y axes as
+		well as the caption in order to further aid the reader. We also made efforts to cut down on the interpretation
+		that is already presented in the main text. We made similar modifications to Figure 6 since it is an
+		analogous figure. Our caption changes are presented below.
+		
+		This comment caused us to reconsider the detail in the captions of other figures as well. We feel
+		the level of the detail is justified in most cases. However, we decided to remove some redundant
+		information from Figure 13, as shown below.
+		
+		Figure 5, original caption:
+		
+		\begin{quote}
+		
+		  The parameters of the one mode model reveal differences in dynamics
+	      between solutes. (a) We parameterized Gaussian,
+	      $\mathcal{N}(\sigma)$, and L\'evy stable, $L(\sigma, \alpha_h)$,
+	      distributions to describe solute hop lengths. We assume the mean
+	      ($\mu$) to be zero for these distributions and no
+	      skewness ($\beta = 0$) in the L\'evy stable distributions. High
+	      values of $\sigma$ and lower values of $\alpha_h$ result in larger
+	      hops. (b) We parameterized a pure power law, $P(\alpha)$, and a
+	      truncated power law, $P_T(\alpha, \lambda)$, distribution to describe
+	      solute dwell times. Lower values of $\alpha$ lead to heavier power
+	      law tails and higher values of $\lambda$ truncate the distribution at
+	      lower dwell times. (c) Finally, we parameterized the hop
+	      autocorrelation function, $\gamma(H)$, to describe the degree of
+	      correlation between hops. Simulations with higher values of $H$ display
+	      behavior closer to the Brownian limit.
+	      
+		\end{quote}
+		
+		Figure 5, modified caption:
+		
+		\begin{quote}
+		
+		  The parameters of the one mode model reveal differences in dynamics
+	      between solutes. (a) We parameterized Gaussian, $\mathcal{N}(\sigma)$, 
+	      and L\'evy stable, $L(\sigma, \alpha_h)$, distributions to describe
+	      solute hop lengths. 
+		  % BJC: added	      
+	      Each bar represents the value of a single parameter,
+	      highlighted in bold, of the associated hop distribution.
+		  % BJC: removed	      
+	      % We assume the mean ($\mu$) to be zero for these distributions and no
+%	      skewness ($\beta = 0$) in the L\'evy stable distributions. 
+	      In general, higher values of $\sigma$ and lower values of $\alpha_h$ 
+	      result in larger hops. 
+	      (b) We parameterized 
+	      % BJC: removed. I think this was left over from when the pure power law was still in the paper
+	      % a pure power law, $P(\alpha)$, and 
+	      a truncated power law distribution, $P_T(\alpha, \lambda)$,  to describe
+	      solute dwell times. 
+		  % BJC: not sure if should reiterate the bold highlights here.	      
+	      Lower values of $\alpha$ lead to heavier power
+	      law tails and higher values of $\lambda$ truncate the distribution at
+	      lower dwell times. (c) Finally, we parameterized the hop
+	      autocorrelation function, $\gamma(H)$, to describe the degree of
+	      correlation between hops. Simulations with higher values of $H$ display
+	      behavior closer to the Brownian limit.
+	      
+		\end{quote}
+		
+		Figure 6, original caption:
+	 
+	    \begin{quote}
+
+		  The two mode model parameterizes solute behavior in the pore and tails
+	      separately. We consider solutes to be within the pore region if they
+	      are 0.75 nm from a given pore center, otherwise they are in the
+	      tails. (a) Generally, movement is much more restricted in the tail
+	      region, parameterized by lower $\sigma$ values (smaller hops) for the
+	      Gaussian and L\'evy stable distributions. Values of $\alpha_h$ are
+	      significantly lower for urea and acetic acid meaning there is a
+	      larger probability that they will take large hops. (b) Dwell times
+	      are longer in the tails. Lower values of $\alpha$ correspond to power
+	      laws with heavier tails and thus higher probabilities of long dwell
+	      times. There is no easily discernible trend in $\lambda$ of the
+	      truncated power law distribution. Note that we used the same Hurst
+	      parameter for both modes (shown in Figure~\ref{fig:hurst_barchart})
+	      due to a low number of sufficiently long sequences of hops in each
+	      mode. (c) Solutes spend various amounts of time in the tail and pore
+	      region dependent on their size, shape and chemical functionality.
+	      Methanol's small size favors occupation of the much larger accessible
+	      volume in the tails. Urea and acetic acid are fairly stable in both
+	      regions since they are small and hydrophilic. Ethylene glycol has a
+	      slight preference for the pores likely because it is a larger
+	      molecule with two hydrophilic hydroxyl groups.
+	  
+        \end{quote}
+	
+	    Figure 6, modified caption:
+	 
+	    \begin{quote}
+		  % Figure 6 caption
+		  The two mode model parameterizes solute behavior in the pore and tails
+	      separately. We consider solutes to be within the pore region if they
+	      are 0.75 nm from a given pore center, otherwise they are in the
+	      tails. 
+	      %BJC: added next two sentences
+	      For (a) and (b), each bar represents the value of a single parameter, 
+	      highlighted in bold, of the associated hop or dwell time distribution.
+	      Parameterizations of solute motion in the pores are visualized as bars
+	      in the upper half of the plots, while the parameters describing motion 
+	      in the tails are reflected into the lower half of the plots.
+	      %BJC: modified this sentence to cut down on detail
+	      (a) Generally, movement is more restricted in the tail region, but 
+	      with occasionally large hops, as implied by lower $\sigma$ (smaller
+	      hops) and $\alpha_h$ (heavier tails of the hop distribution) values.
+	      %for the Gaussian and L\'evy stable distributions. 
+%	      Values of $\alpha_h$ are significantly lower for urea and acetic acid
+%	      meaning there is a larger probability that they will take large hops.
+	      (b) Dwell times are longer in the tails as implied by lower values 
+	      of $\alpha$.
+	      %correspond to power laws with heavier tails and thus higher probabilities of long dwell
+	      %times. 
+	      There is no easily discernible trend in $\lambda$ of the
+	      truncated power law distribution. Note that we used the same Hurst
+	      parameter for both modes (shown in Figure~\ref{fig:hurst_barchart})
+	      due to a low number of sufficiently long sequences of hops in each
+	      mode. (c) Solutes spend various amounts of time in the tail and pore
+	      region dependent on their size, shape and chemical functionality.
+	      %BJC: removing details that is already in the text
+%	      Methanol's small size favors occupation of the much larger accessible
+%	      volume in the tails. Urea and acetic acid are fairly stable in both
+%	      regions since they are small and hydrophilic. Ethylene glycol has a
+%	      slight preference for the pores likely because it is a larger
+%	      molecule with two hydrophilic hydroxyl groups.
+	  
+        \end{quote}
+        
+        Figure 13, modified caption:
+        
+        \begin{quote}
+        
+          The selectivity between pairs of species changes monotonically with
+	      pore length. The strength of dependence on pore length depends on
+	      the difference between $\beta$ values. 
+		  %BJC: All of this is in the text.	      
+	      \sout{The largest differences in solute
+	      flux result in high selectivities at any pore length. This membrane
+	      may be a good candidate for the separation of ethylene glycol from
+	      acetic acid. Ethylene glycol has the lowest $\beta$ value while
+	      acetic acid has the second highest, leading to strong length
+	      dependence. Ethylene glycol also has the highest flux and acetic acid
+	      has the lowest resulting in relatively high selectivities independent
+	      of pore length.}
+	  
+        \end{quote}
 		
   \item \textit{\textbf{Page 6 line 55}: The second measure of success is based on the qualitative
         comparison between individual realizations of solute trajectories generated ...\\ \\

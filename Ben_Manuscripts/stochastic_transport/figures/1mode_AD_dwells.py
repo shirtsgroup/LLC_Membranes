@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
-root_dir = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11"
+root_dir = "/home/ben/Documents/gromacs/stochastic_transport_data"
 sol = ['URE', 'GCL', 'MET', 'ACH']
 colors = {'URE':'xkcd:blue', 'GCL':'xkcd:orange', 'MET':'xkcd:green', 'ACH':'xkcd:magenta'}
 colors = {'powerlaw_alpha': 'xkcd:magenta', 'powercut_alpha': 'xkcd:orange', 'powercut_lambda': 'xkcd:blue'}
@@ -64,16 +64,19 @@ hatch1 = mpatches.Patch(facecolor=colors['powerlaw_alpha'], label=r'$P(\mathbf{\
 hatch2 = mpatches.Patch(facecolor=colors['powercut_alpha'], label=r'$P_T(\mathbf{\alpha}, \lambda)$', edgecolor='black')
 hatch3 = mpatches.Patch(facecolor=colors['powercut_lambda'], label=r'$P_T(\alpha, \mathbf{\lambda})$', edgecolor='black')
 
-plt.legend(handles=[hatch2, hatch3], fontsize=14, loc='upper left')
+
+fs = 18
+
+plt.legend(handles=[hatch2, hatch3], fontsize=fs, loc='upper left', frameon=False, bbox_to_anchor=(-0.02, 1.03))
 plt.xticks([1.0, 2.0, 3.0, 4.0], names2)
 #for xtick, res in zip(ax1.get_xticklabels(), sol):
 #    xtick.set_color(colors[res])
-
 #ax1.set_xlabel('Solute', fontsize=14)
-ax1.set_ylabel(r'$\alpha$', fontsize=14)
-ax2.set_ylabel('$\lambda$', fontsize=14)
-ax1.tick_params(labelsize=14)
-ax2.tick_params(labelsize=14)
+ax1.set_ylabel(r'Scaling Parameter ($\alpha$)', fontsize=fs)
+ax2.set_ylabel('Truncation Parameter ($\lambda$)', fontsize=fs)
+ax1.tick_params(labelsize=fs)
+ax2.tick_params(labelsize=fs)
+ax1.tick_params(axis='x', labelsize=16)
 ax1.set_ylim(0.0, 1)
 #ax2.set_ylim(0.2, 0.45)
 plt.tight_layout()

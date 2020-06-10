@@ -9,7 +9,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
-root_dir = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11"
+#root_dir = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11"
+root_dir = "/home/ben/Documents/gromacs/stochastic_transport_data"
 sol = ['URE', 'GCL', 'MET', 'ACH']
 colors = {'URE':'xkcd:blue', 'GCL':'xkcd:orange', 'MET':'xkcd:green', 'ACH':'xkcd:magenta'}
 colors = {'sigma_normal': (0.667, 0.361, 0.224), 'sigma_levy': (0.165, 0.306, 0.431), 'alpha': (0.361, 0.588, 0.196)}
@@ -73,15 +74,18 @@ hatch1 = mpatches.Patch(facecolor=colors['sigma_normal'], label=r'$\mathcal{N}(\
 hatch2 = mpatches.Patch(facecolor=colors['sigma_levy'], label=r'$L(\mathbf{\sigma}, \alpha_h)$', edgecolor='black')
 hatch3 = mpatches.Patch(facecolor=colors['alpha'], label=r'$L(\sigma, \mathbf{\alpha_h})$', edgecolor='black')
 
-plt.legend(handles=[hatch1, hatch2, hatch3], fontsize=14, loc='upper right')
+fs = 18
+
+plt.legend(handles=[hatch1, hatch2, hatch3], fontsize=17, loc='upper right', ncol=3, frameon=False, columnspacing=0.75, handletextpad=0.2, bbox_to_anchor=(1.03, 1.03))
 plt.xticks([1.0, 2.0, 3.0, 4.0], names2)
 #for xtick, res in zip(ax1.get_xticklabels(), sol):
 #    xtick.set_color(colors[res])
 
-ax1.set_ylabel('$\sigma$', fontsize=14)
-ax2.set_ylabel(r'$\alpha_h$', fontsize=14)
-ax1.tick_params(labelsize=14)
-ax2.tick_params(labelsize=14)
+ax1.set_ylabel('Width of Hop Distributions ($\sigma$)', fontsize=fs)
+ax2.set_ylabel(r'L$\acute{e}$vy Stability Parameter ($\alpha_h$)', fontsize=fs)
+ax1.tick_params(labelsize=fs)
+ax2.tick_params(labelsize=fs)
+ax1.tick_params(axis='x', labelsize=16)
 ax1.set_ylim(0.0, 0.40)
 ax2.set_ylim(1.0, 2.15)
 plt.tight_layout()

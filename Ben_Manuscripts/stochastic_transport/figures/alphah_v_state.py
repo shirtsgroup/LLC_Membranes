@@ -29,11 +29,12 @@ root_dir = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11"
 names = {'URE': 'urea', 'GCL': 'ethylene glycol', 'MET': 'methanol', 'ACH': 'acetic acid'}
 colors = {'URE':'xkcd:blue', 'GCL':'xkcd:orange', 'MET':'xkcd:green', 'ACH':'xkcd:magenta'}
 path = '/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11'
-bar_width = 0.18
+bar_width = 0.20
 bar_locations = np.arange(1, 10)
 alpha = 0.7
 nboot = 200
 load = True  # load bootstrapped parameters 
+fs = 20
 
 # each of the following rows corresponds to a residue
 alphah = [
@@ -82,12 +83,12 @@ patch4 = mpatches.Patch(facecolor=colors['ACH'], label=names['ACH'], edgecolor='
 labels = ['1\n$^{t}$', '2\n$^{(t/h)}$', '3\n$^{(t/a)}$', '4\n$^{(t/h/a)}$', '5\n$^{(p)}$', '6\n$^{(p/h)}$', '7\n$^{(p/a)}$', '8\n$^{(p/h/a)}$', 'T']
 
 #plt.legend(fontsize=14, handles=[patch1, patch2, patch3, patch4, hatch1, hatch2])
-plt.xticks(ticks=bar_locations, labels=labels, fontsize=16)
+plt.xticks(ticks=bar_locations, labels=labels, fontsize=fs + 2)
 #plt.legend(fontsize=14)
 #plt.xticks(ticks=bar_locations, labels=[1, 2, 3, 4, 5, 6, 7, 8, 'T'])
-plt.xlabel('State', fontsize=16)
-plt.ylabel(r'$\alpha_h$', fontsize=16)
-plt.tick_params(labelsize=16)
+plt.xlabel('State', fontsize=fs)
+plt.ylabel(r'Stability Parameters ($\alpha_h$)', fontsize=fs)
+plt.tick_params(labelsize=fs)
 plt.ylim(1, 2.15)
 plt.yticks([1, 1.25, 1.5, 1.75, 2.0])
 plt.tight_layout()
