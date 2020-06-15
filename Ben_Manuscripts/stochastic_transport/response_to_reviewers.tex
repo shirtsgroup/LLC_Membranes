@@ -28,8 +28,9 @@ Authors: Benjamin J. Coscia and Michael R. Shirts
 We thank the reviewers for carefully reading over our manuscript and providing
 helpful comments. We have taken the suggestions into consideration and made
 appropriate revisions to the manuscript document. The comments have been reproduced
-in italics and all changes to the text have been documented below. In cases where 
-we modified the text we included the original text (denoted by ``Original text:") 
+in italics and all changes to the text have been documented below. 
+%BJC: Need to modify this to be more in line with what I did.
+In cases where we modified the text we included the original text (denoted by ``Original text:") 
 followed by the new text (denoted by ``New text:").
 
 \section*{Response to Reviewer 1}
@@ -87,7 +88,7 @@ followed by the new text (denoted by ``New text:").
   
   New text:
   \begin{quote}
-  Each unit cell is contained $\sim$ 62,000 total atoms. % BJC: do you think he want unit cell dimensions? X x Y x Z? 
+  Each unit cell contains $\sim$ 62,000 total atoms. % BJC: do you think they want unit cell dimensions? X x Y x Z? 
   \end{quote}
   
   We added the following text to address comments related to our choice of force field:
@@ -96,7 +97,7 @@ followed by the new text (denoted by ``New text:").
   \begin{quote}
   We parameterized monomers and solutes using the Generalized Amber Force Field (GAFF) and
   water molecules using the TIP3P water model.~\cite{} We made each choice in order to
-  ensure that our approach is accessible and reproducible for a wide audience and so that
+  ensure that our approach is accessible and reproducible to a wide audience and so that
   it is easy to study a broad range of solutes and monomer chemistries in high throughput. 
   The main goal of this work is to develop stochastic models which can reproduce solute
   behavior on MD time scales regardless of the force field. In future work, it may be 
@@ -110,20 +111,13 @@ followed by the new text (denoted by ``New text:").
   feel they are not of great concern for this work. While the tails of the monomers from
   different pores interact across periodic boundaries, we are not interested in their
   diffusion. In our previous work, we have shown that monomer motion is negligible on 
-  simulation time scales. Our main focus is on the time series of the solutes in the \
-  membrane pores. On the 5 $\mu s$ time scales which we simulate we do not see any 
-  solutes cross between pores. Therefore, we expect similar solute behavior in larger
+  simulation time scales. Our main focus is on the time series of the solutes in the
+  membrane pores. On the 5 $\mu s$ time scales which we simulate, we do not observe any 
+  solutes that cross between pores. Therefore, we expect similar solute behavior in larger
   arrays of pores. A study of finite size effects may be interesting in future work, but
   we do not feel it is justified for this study given the computational cost of studying
   larger systems. We also believe it would have little influence on the way in which 
   we fit our models to the time series.
-      
-  % BJC: easy to specify force field.
-  % BJC: what to say about polarizable force fields? Focus on methods? Maybe throw in some 
-  % references to solute transport with polarizable force fields?
-  % finite size effects -- ?? sufficiently long pores in z?
-  % BJC: no gaurantee polarizable would be good since there aren't any out of the box 
-  % polarizable force fields
         
   \item \textit{\textbf{Figure 5 page 25:} \\
 		First, the symbols within the figure are very small and barely readable, and probably not
@@ -138,8 +132,8 @@ followed by the new text (denoted by ``New text:").
 		Author reply:
 		
 		We thank the reviewer for their constructive feedback. The fontsize in the figure is indeed too small.
-		We have modified the plots in the figure to have larger, more readable font and we took this opportunity
-		to increase the font size on Figures 6--8 as well.
+		We have modified the plots in the figure to have larger, more readable font. We also took this 
+		opportunity to increase the font size on Figures 6--8.
 		
 		The reviewer is correct in their interpretation of the figures. For clarity, we modified the y axes as
 		well as the caption in order to further aid the reader. We also made efforts to cut down on the interpretation
@@ -219,7 +213,7 @@ followed by the new text (denoted by ``New text:").
 	      laws with heavier tails and thus higher probabilities of long dwell
 	      times. There is no easily discernible trend in $\lambda$ of the
 	      truncated power law distribution. Note that we used the same Hurst
-	      parameter for both modes (shown in Figure~\ref{fig:hurst_barchart})
+	      parameter for both modes (shown in Figure~\ref{M-fig:hurst_barchart})
 	      due to a low number of sufficiently long sequences of hops in each
 	      mode. (c) Solutes spend various amounts of time in the tail and pore
 	      region dependent on their size, shape and chemical functionality.
@@ -258,7 +252,7 @@ followed by the new text (denoted by ``New text:").
 	      %times. 
 	      There is no easily discernible trend in $\lambda$ of the
 	      truncated power law distribution. Note that we used the same Hurst
-	      parameter for both modes (shown in Figure~\ref{fig:hurst_barchart})
+	      parameter for both modes (shown in Figure~\ref{M-fig:hurst_barchart})
 	      due to a low number of sufficiently long sequences of hops in each
 	      mode. (c) Solutes spend various amounts of time in the tail and pore
 	      region dependent on their size, shape and chemical functionality.
@@ -310,11 +304,12 @@ followed by the new text (denoted by ``New text:").
   		one dimension and not two (for example using cylindrical coordinates)?}
   		
   		Author reply: We thank the reviewer for their sensible question. The simplest answer
-  		to this is that ultimately we are only concerned with transport along the pore axis. Radial
+  		to this is that ultimately, we are only concerned with transport along the pore axis. Radial
   		solute transport (with respect to the pore center) is effectively bounded and only 
-  		contributes to axial MSD to the extent that it influences axial transport. We 
+  		contributes to the axial MSD to the extent that it influences axial transport. We 
   		do acknowledge that the radial location of solutes has an influence on solute
   		hopping behavior which is why attempted to create the two mode anomalous diffusion model.
+		
 		From a more mathematical standpoint, there are two factors which pose challenges with
 		increasing dimensionality. First, we have a relatively low amount of data, and therefore
 		it is challenging to adequately parameterize behavior as a continuous function of both 
@@ -338,7 +333,7 @@ followed by the new text (denoted by ``New text:").
         would be technically simple to apply the same mathematical framework to study the long time
         scale performance of the two-mode model, we feel it may be misleading to the reader.
         As described in the text, the predicted MSDs of the two-mode model may indeed show better 
-        qualitative behavior than the one-mode model. Specifically, the two-mode model becomes
+        qualitative MSD behavior than the one-mode model. Specifically, the two-mode model becomes
         linear on long timescales which may be more consistent with our MD results. However, this 
         long time scale linear behavior of the two-mode model has only a mathematical basis and
         no physical basis. As discussed in the text, the one-mode model has persistent curvature
@@ -350,7 +345,7 @@ followed by the new text (denoted by ``New text:").
         
         Perhaps, most importantly, Section 3.3 is primarily used to demonstrate our mathematical
         framework. Applying it to the two mode model would be trivial. We chose to use the one-mode 
-        model to demonstrate because it passes our qualitative and quantitative checks and is
+        model for demonstration because it passes our qualitative and quantitative checks and is
         mathematically sound. As the reviewer points out, it is likely that our approach to 
         modeling the solute time series is not yet suitable to make quantitative predictions of 
         flux and selectivity. But our approach opens the door for applying the same analysis to 
@@ -375,7 +370,7 @@ followed by the new text (denoted by ``New text:").
 		before fitting them to Equation 9. This is especially challenging with slow-moving solutes
 		like acetic acid. We needed to simulate over 2 million timesteps in order to sufficiently
 		sample the MFPT over a 50 nm pore. This procedure becomes computationally expensive very
-		quickly, and requires ample RAM to store the trajectories as they constructed.
+		quickly, and requires ample RAM to store the trajectories as they are constructed.
 		
 		Given the quality of our fits in Figure 11b, we felt it was not necessary to carry out the
 		calculation for longer pores which would likely offer little extra benefit to the insight we
@@ -395,9 +390,20 @@ followed by the new text (denoted by ``New text:").
 		  Are there no experimental data or mathematical models which act as a reference for 
 		  the models? Please elaborate.}
 		  
-		  Author reply:
-		  % BJC: maybe just give some background on this project overall. Could add a paragraph
-		  % to explain this
+		  Author reply: The reviewer makes a valid point. This work started in parallel with experimental
+		  work which promised solute flux and selectivities that we could compare directly to our
+		  simulations. However, synthesizing an aligned hexagonal phase membrane has been a practical
+		  challenge for our experimental collaborators and much of their focus has shifted to 
+		  membranes formed by liquid crystals that self-assemble into bicontinuous cubic architectures
+		  which are much simpler to synthesize. We have also started to shift our focus towards models 
+		  of the bicontinuous cubic phase. However our research into generated physically accurate 
+		  molecular models of that phase lags our work on time series modeling. In future work, we will
+		  be able to apply this technique to systems for which we have experimental data.
+		  
+		  %BJC: I'm not sure this is worth bringing up
+		  As far as mathematical models, there are none that we know of to which we can reasonably
+		  compare. Some work has been done to apply Donnan steric pore models to experimental data, 
+		  but these models are continuum-based and have not been used in a predictive capacity.
 		  
   \end{enumerate}
 
@@ -408,7 +414,7 @@ followed by the new text (denoted by ``New text:").
 	and accessibility of the manuscript would be greatly improved by writing the full names of the
 	random walks in the text while keeping acronyms in figures. \\}
 
-    %BJC: I have no problem with this	
+    %BJC: I'll address this once I incorporate things into the text.
 	
 \end{addmargin}
 
@@ -429,6 +435,7 @@ followed by the new text (denoted by ``New text:").
 
 \end{addmargin}
 
+%BJC: TODO
 Author reply: We thank the reviewer for catching these errors and have corrected all of the instances
 we could identify.
 
