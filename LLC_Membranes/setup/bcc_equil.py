@@ -233,7 +233,6 @@ class EquilibrateBCC(topology.LC):
         :type factor: float
         :type name: str
         """
-
         t = md.load(self.gro_name)  # load up unit cell
         box = t.unitcell_lengths[0]
 
@@ -246,14 +245,12 @@ class EquilibrateBCC(topology.LC):
             indices.append([a.index for a in t.topology.atoms if a.residue.name == res])  # indices that are part of residue
 
         for m in range(self.system.nmon):
-
             ndx = []
             for r in range(len(atoms_per_residue)):
                 ndx += indices[r][m*atoms_per_residue[r]:(m + 1)*atoms_per_residue[r]]
 
             before = t.xyz[0, ndx[0], :]  # a reference atom
             after = before * factor  # isotropically scale it's position
-
             # coordinates of all atoms in group to be moved
             initial = t.xyz[0, ndx, :]
 
@@ -263,6 +260,7 @@ class EquilibrateBCC(topology.LC):
         self.system.write_final_configuration(name=name, box=[factor*x for x in box])
 
         self.gro_name = name
+        
 
     def shrink_unit_cell(self, start, stop, step):
         """ shrink the Q1 phase unit cell by isotropically scaling monomer positions and box lengths. Runs an energy
@@ -278,15 +276,12 @@ class EquilibrateBCC(topology.LC):
         :type stop: float
         :type step: float
         """
-
         for i in np.linspace(start - step, stop, int(round((start - stop) / step))):
-
             f = i / (i + step)
             self.scale_unit_cell(f)
             print('Attempting energy minimization with box lengths %.4f times desired size' % i, end='', flush=True)
             nrg = gromacs.simulate(self.em_mdp, self.top_name, self.gro_name, self.em_mdp.split('.')[0],
                                    em_energy=True, verbose=False, mpi=self.mpi, nprocesses=self.nprocesses, restraints=True)
-
             if nrg >= 0:
                 print('...Failed. Will shrink slower on next iteration.')
                 self.gro_name = 'scaled_%.4f.gro' % (i + step)
@@ -295,6 +290,7 @@ class EquilibrateBCC(topology.LC):
                 print('...Success!')
 
             cp = 'cp em.gro scaled_%.4f.gro' % i
+
             p = subprocess.Popen(cp.split())
             p.wait()
 
@@ -331,13 +327,13 @@ class EquilibrateBCC(topology.LC):
             self.topology.add_residue(self.solvent, n=delta, write=True, topname=self.top_name)
             print('Energy minimizing...', end='', flush=True)
             gromacs.simulate(self.em_mdp, self.top_name, 'solvated.gro', 'em_%d' % total, mpi=self.mpi,
-                             nprocesses=self.nprocesses)  # energy minimize
+                             nprocesses=self.nprocesses, restraints=True)  # energy minimize
             print('Done!')
 
             # short simulation
             print('Running %s simulation...' % ensemble.upper(), end='', flush=True)
             gromacs.simulate(mdp, self.top_name, 'em_%d' % total, 'solvated_%s_%d' % (ensemble.lower(), total),
-                             mpi=self.mpi, nprocesses=self.nprocesses)
+                             mpi=self.mpi, nprocesses=self.nprocesses, restraints=True)
             print('Done!')
 
             self.gro_name = 'solvated_%s_%d.gro' % (ensemble.lower(), total)
@@ -397,12 +393,13 @@ class EquilibrateBCC(topology.LC):
         print("Running %d ps NVT equilibration" % nvt_length)
         self.mdp.write_nvt_mdp(length=nvt_length)
         gromacs.simulate(self.nvt_mdp, self.top_name, self.gro_name, 'nvt_equil', mpi=self.mpi,
-                         nprocesses=self.nprocesses)
+                         nprocesses=self.nprocesses, restraints=True, verbose=False)
 
         # run a short NPT simulation
         self.mdp.write_npt_mdp(length=50)
-        gromacs.simulate(self.npt_mdp, self.top_name, 'nvt_equil.gro', 'npt_%d' % total, mpi=self.mpi,
-                         nprocesses=self.nprocesses)
+        mdp_name = self.npt_mdp + ' -maxwarn 1' # The -maxwarn to overcome halting of simulation due to warning
+        gromacs.simulate(mdp_name, self.top_name, 'nvt_equil.gro', 'npt_%d' % total, mpi=self.mpi,
+                         nprocesses=self.nprocesses, restraints=True, verbose=False)
         self.gro_name = 'npt_%d.gro' % total
 
         # run series of NPT simulations to try and stuff more solutes in
@@ -413,8 +410,9 @@ class EquilibrateBCC(topology.LC):
         # run a longer NPT simulation
         print("Running %d ps NPT equilibration" % npt_length)
         self.mdp.write_npt_mdp(length=npt_length)
-        gromacs.simulate(self.npt_mdp, self.top_name, self.gro_name, 'npt_equil', mpi=self.mpi,
-                         nprocesses=self.nprocesses)
+        mdp_name = self.npt_mdp + ' -maxwarn 1' # The -maxwarn to overcome halting of simulation due to warning
+        gromacs.simulate(mdp_name, self.top_name, self.gro_name, 'npt_equil', mpi=self.mpi,
+                         nprocesses=self.nprocesses, restraints=True, verbose=False)
         self.gro_name = 'npt_equil.gro'
 
         # rename things to desired final output name
@@ -475,14 +473,13 @@ if __name__ == "__main__":
 
     equil.build_initial_config(grid_points=build_params['grid'], r=0.4)
     equil.scale_unit_cell(sim_params['scale_factor'])
-#    exit()
 
+    
     equil.generate_topology(name='topol.top', restrained=True)  # creates an output file
-    equil.generate_mdps(length=50, em_steps=sim_params['em_steps'], frames=2, T=sim_params['temperature'])  # creates an object
+    equil.generate_mdps(length=50, frames=2, T=sim_params['temperature'])  # creates an object
     equil.mdp.write_em_mdp(out='em')
 
     if not args.continue_dry and not args.continue_solvated and not args.continue_xlinked:
-
         nrg = gromacs.simulate('em.mdp', 'topol.top', equil.gro_name, 'em', em_energy=True, verbose=True,
                                mpi=parallelize['mpi'], nprocesses=parallelize['nprocesses'], restraints=True)
 
@@ -528,7 +525,7 @@ if __name__ == "__main__":
 
         equil.gro_name = 'solvated_final.gro'
 
-    exit()
+#    exit()
 
     if not args.continue_xlinked:
         # cross-linking
