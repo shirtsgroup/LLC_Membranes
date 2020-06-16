@@ -39,15 +39,15 @@ def adjust_yaxis(ax,ydif,v):
         nminy = maxy*(miny+dy)/(maxy+dy)
     ax.set_ylim(nminy+v, nmaxy+v)
 
-root_dir = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11"
+root_dir = "/home/ben/Documents/gromacs/stochastic_transport_data"
 sol = ['URE', 'GCL', 'MET', 'ACH']
 colors = {'URE':'xkcd:blue', 'GCL':'xkcd:orange', 'MET':'xkcd:green', 'ACH':'xkcd:magenta'}
 colors = {'powerlaw_alpha': 'xkcd:magenta', 'powercut_alpha': 'xkcd:orange', 'powercut_lambda': 'xkcd:blue'}
 names = {'URE': 'urea', 'GCL': 'ethylene glycol', 'MET': 'methanol', 'ACH': 'acetic acid'}
-names2 = ['urea', 'ethylene\nglycol', 'methanol', 'acetic\nacid']
-bar_width = 0.3
+names2 = ['urea', 'ethylene\nglycol', '   methanol', 'acetic\nacid']
+bar_width = 0.4
 bar_locations = np.arange(1, 5)
-fontsize=16
+fontsize=20
 opacity = 1
 
 fig, ax1 = plt.subplots(figsize=(8,6))
@@ -128,26 +128,26 @@ for i, res in enumerate(sol):
 hatch2 = mpatches.Patch(facecolor=colors['powercut_alpha'], label=r'$P_T(\mathbf{\alpha}, \lambda)$', edgecolor='black')
 hatch3 = mpatches.Patch(facecolor=colors['powercut_lambda'], label=r'$P_T(\alpha, \mathbf{\lambda})$', edgecolor='black')
 
-plt.legend(handles=[hatch2, hatch3], fontsize=fontsize, loc=0)
+plt.legend(handles=[hatch2, hatch3], fontsize=fontsize, loc='upper center', frameon=False, ncol=2, bbox_to_anchor=(0.5, 1.15))
 plt.xticks([1.0, 2.0, 3.0, 4.0], names2)
 #ax1.set_yticklabels([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1.0], labels=[1, 0.75, 0.5, 0.25, 0, 0.25, 0.5, 0.75, 1.0])
-ax1.set_yticklabels([1, 0.75, 0.5, 0.25, 0, 0.25, 0.5, 0.75, 1.0])
-ax2.set_yticklabels([0.006, 0.004, 0.002, 0, 0.002, 0.004, 0.006])
+#ax1.set_yticklabels([1, 0.75, 0.5, 0.25, 0, 0.25, 0.5, 0.75, 1.0])
+ax2.set_yticklabels([0.006, 0.004, 0.002, 0, 0.002, 0.004, 0.006, 0.008])
 #for xtick, res in zip(ax1.get_xticklabels(), sol):
 #    xtick.set_color(colors[res])
 
-ax1.text(2.4, 1.0, 'Pores', verticalalignment='center', horizontalalignment='center', fontsize=18, fontweight='bold')#, bbox=props, fontweight='bold')
-ax1.text(2.4, -0.9, 'Tails', verticalalignment='center', horizontalalignment='center', fontsize=18, fontweight='bold')#, bbox=props, fontweight='bold')
+ax1.text(2.5, 1.2, 'Pores', verticalalignment='center', horizontalalignment='center', fontsize=18, fontweight='bold')#, bbox=props, fontweight='bold')
+ax2.text(2.5, -0.0055, 'Tails', verticalalignment='center', horizontalalignment='center', fontsize=18, fontweight='bold')#, bbox=props, fontweight='bold')
 
 #ax1.set_xlabel('Solute', fontsize=14)
-ax1.set_ylabel(r'$\alpha$', fontsize=fontsize)
-ax2.set_ylabel('$\lambda$', fontsize=fontsize)
+ax1.set_ylabel(r'Scaling Parameter ($\alpha$)', fontsize=fontsize)
+ax2.set_ylabel('Truncation Parmeter ($\lambda$)', fontsize=fontsize)
 ax1.tick_params(labelsize=fontsize)
 ax2.tick_params(labelsize=fontsize)
-ax1.plot([0.6, 4.6], [0, 0], lw=2, color='black')
-ax1.set_xlim(0.6, 4.6)
+ax1.plot([0.4, 4.6], [0, 0], lw=2, color='black')
+ax1.set_xlim(0.4, 4.6)
 ax2.set_ylim(-0.006, 0.0045)
-ax1.set_ylim(-0.65, 1.1)
+ax1.set_ylim(-0.5, 1.3)
 align_yaxis(ax1, 0, ax2, 0)
 plt.tight_layout()
 plt.savefig('2mode_AD_dwells.pdf')

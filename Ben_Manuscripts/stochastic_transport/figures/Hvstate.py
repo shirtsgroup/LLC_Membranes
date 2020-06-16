@@ -23,13 +23,16 @@ def transition_matrix(t):
 
 sol = ['URE', 'GCL', 'MET', 'ACH']
 #sol = ['MET', 'ACH', 'URE', 'GCL']
-root_dir = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11"
+#root_dir = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11"
+root_dir = "/home/ben/Documents/gromacs/stochastic_transport_data"
+
 names = {'URE': 'urea', 'GCL': 'ethylene glycol', 'MET': 'methanol', 'ACH': 'acetic acid'}
 colors = {'URE':'xkcd:blue', 'GCL':'xkcd:orange', 'MET':'xkcd:green', 'ACH':'xkcd:magenta'}
 path = '/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11'
-bar_width = 0.18
+bar_width = 0.2
 bar_locations = np.arange(1, 10)
 alpha = 0.7
+fs = 20 
 
 # each of the following rows corresponds to a residue
 H = [
@@ -66,13 +69,13 @@ patch4 = mpatches.Patch(facecolor=colors['ACH'], label=names['ACH'], edgecolor='
 #plt.rc('text', usetex=True)
 labels = ['1\n$^{t}$', '2\n$^{(t/h)}$', '3\n$^{(t/a)}$', '4\n$^{(t/h/a)}$', '5\n$^{(p)}$', '6\n$^{(p/h)}$', '7\n$^{(p/a)}$', '8\n$^{(p/h/a)}$', 'T']
 
-plt.legend(fontsize=14, handles=[patch1, patch2, patch3, patch4])#, hatch1, hatch2])
-plt.xticks(ticks=bar_locations, labels=labels, fontsize=16)
-plt.xlabel('State', fontsize=16)
-plt.ylabel('Hurst Parameter', fontsize=16)
+plt.legend(fontsize=18, handles=[patch1, patch2, patch3, patch4], frameon=False)#, hatch1, hatch2])
+plt.xticks(ticks=bar_locations, labels=labels, fontsize=fs+2)
+plt.xlabel('State', fontsize=fs)
+plt.ylabel('Hurst Parameter ($H$)', fontsize=fs)
 #plt.xlim(0.5, 9.5)
 #plt.ylim(0, 0.40)
-plt.tick_params(labelsize=16)
+plt.tick_params(labelsize=fs)
 plt.tight_layout()
 plt.savefig('H_v_state.pdf')
 plt.show()

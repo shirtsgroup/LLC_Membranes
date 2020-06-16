@@ -40,15 +40,15 @@ def adjust_yaxis(ax,ydif,v):
     ax.set_ylim(nminy+v, nmaxy+v)
 
 
-root_dir = "/home/bcoscia/Documents/Gromacs/Transport/NaGA3C11"
+root_dir = "/home/ben/Documents/gromacs/stochastic_transport_data"
 sol = ['URE', 'GCL', 'MET', 'ACH']
 colors = {'URE':'xkcd:magenta', 'GCL':'xkcd:orange', 'MET':'xkcd:green', 'ACH':'xkcd:magenta'}
 colors = {'sigma_normal': 'xkcd:magenta', 'sigma_levy': 'xkcd:orange', 'alpha': 'xkcd:blue'}
 names = {'URE': 'urea', 'GCL': 'ethylene glycol', 'MET': 'methanol', 'ACH': 'acetic acid'}
 names2 = ['urea', 'ethylene\nglycol', 'methanol', 'acetic\nacid']
-bar_width = 0.2
+bar_width = 0.3
 bar_locations = np.arange(1, 5)
-fontsize=16
+fontsize=20
 opacity=1
 
 fig, ax1 = plt.subplots(figsize=(8, 6))
@@ -133,7 +133,7 @@ hatch1 = mpatches.Patch(facecolor=colors['sigma_normal'], label=r'$\mathcal{N}(\
 hatch2 = mpatches.Patch(facecolor=colors['sigma_levy'], label=r'$L(\mathbf{\sigma}, \alpha_h)$', edgecolor='black')
 hatch3 = mpatches.Patch(facecolor=colors['alpha'], label=r'$L(\sigma, \mathbf{\alpha_h})$', edgecolor='black')
 
-plt.legend(handles=[hatch1, hatch2, hatch3], fontsize=14, loc='lower left')
+plt.legend(handles=[hatch1, hatch2, hatch3], fontsize=fontsize, loc='upper right', ncol=3, frameon=False, bbox_to_anchor=(1.05, 1.15))
 plt.xticks([1.0, 2.0, 3.0, 4.0], names2)
 #ax1.set_yticklabels([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1.0], labels=[1, 0.75, 0.5, 0.25, 0, 0.25, 0.5, 0.75, 1.0])
 #ax1.set_yticklabels([1, 0.75, 0.5, 0.25, 0, 0.25, 0.5, 0.75, 1.0])
@@ -142,21 +142,23 @@ plt.xticks([1.0, 2.0, 3.0, 4.0], names2)
 #    xtick.set_color(colors[res])
 
 props = dict(boxstyle='square', facecolor='grey', alpha=0.3, lw=0, fill=False)
-ax1.text(2.6, 1.2, 'Pores', verticalalignment='center', horizontalalignment='center', fontsize=18, fontweight='bold')#, bbox=props, fontweight='bold')
-ax1.text(2.6, -1.2, 'Tails', verticalalignment='center', horizontalalignment='center', fontsize=18, fontweight='bold')#, bbox=props, fontweight='bold')
+ax1.text(2.6, .67, 'Pores', verticalalignment='center', horizontalalignment='center', fontsize=18, fontweight='bold')#, bbox=props, fontweight='bold')
+ax1.text(2.6, -.67, 'Tails', verticalalignment='center', horizontalalignment='center', fontsize=18, fontweight='bold')#, bbox=props, fontweight='bold')
 
-ax1.set_yticklabels([1.5, 1, 0.5, 0, 0.5, 1])#, 0.75, 0.5, 0.25, 0, 0.25, 0.5, 0.75, 1.0])
+#ax1.set_yticklabels([1.5, 1, 0.5, 0, 0.5, 1])#, 0.75, 0.5, 0.25, 0, 0.25, 0.5, 0.75, 1.0])
+ax1.set_yticklabels([0.8, 0.6, 0.4, 0.2, 0, 0.2, 0.4, 0.6])#, 0.75, 0.5, 0.25, 0, 0.25, 0.5, 0.75, 1.0])
+
 ax2.set_yticklabels([3, 2, 1, 0, 1, 2])#0.006, 0.004, 0.002, 0, 0.002, 0.004, 0.006])
 
 ax1.plot([0, 5], [0, 0], color='black', lw=2)
 #ax1.set_xlabel('Solute', fontsize=14)
-ax1.set_ylabel('$\sigma$', fontsize=fontsize)
-ax2.set_ylabel(r'$\alpha_h$', fontsize=fontsize)
+ax1.set_ylabel('Width of Hop Distribution ($\sigma$)', fontsize=fontsize)
+ax2.set_ylabel(r'L$\acute{e}vy$ Stability Parameter ($\alpha_h$)', fontsize=fontsize)
 ax1.tick_params(labelsize=fontsize)
 ax2.tick_params(labelsize=fontsize)
 ax2.set_ylim(-2.5, 2.5)
-ax1.set_ylim(-1.3, 1.3)
-ax1.set_xlim(0.6, 4.6)
+ax1.set_ylim(-.75, .75)
+ax1.set_xlim(0.4, 4.6)
 align_yaxis(ax1, 0, ax2, 0)
 plt.tight_layout()
 plt.savefig('2mode_AD_hops.pdf')
