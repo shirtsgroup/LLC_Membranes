@@ -45,14 +45,10 @@ followed by the new text (denoted by ``New text:").
         \textbf{continuous time random walk (CTRW)}, or subordinated FBM (sFBM) for short. \\ \\
         I am a little confused by these sentences, does the two well-known classes correspond to FBM
         and CTRW, or refer to different classes of modeling approaches used later in the manuscript?}
-  
-  %BJC: use a different word?
-    %MRS: this is fine.
     
   Author reply: We thank the reviewer for identifying our potentially confusing choice of words.
   The first sentence (Page 5, line 19) refers more broadly to the two types of stochastic models 
   formulated in this work: the anomalous diffusion model and the Markov state-dependent dynamical
-  %MRS: removed the capitalization on anomolous diffusion, not grammatical generally.
   model. The second quoted sentence (Page 5, line 47) refers to the different types of
   motion (FBM and CTRW) that give rise to anomalous diffusion specifically. The paragraph expands
   upon the introduction given in the previous paragraph. We have modified the second quoted 
@@ -66,7 +62,7 @@ followed by the new text (denoted by ``New text:").
   New text:
   \begin{quote}
   In this first approach, we treat our system in terms of two well-known types of molecular
-  motion that leads to anomalous subdiffusion: 
+  motion which lead to anomalous subdiffusion: 
   \end{quote}
   
   \item \textit{\textbf{MD-section} \\
@@ -86,42 +82,25 @@ followed by the new text (denoted by ``New text:").
   We added the following text to address comments related to our choice of force field:
   
   New text:
-  %MRS: add what tools used to parameterize them, like tleap, also that charges are AM1-BCC.
-  %MRS: can mention that files are available in supporting information of previous paper, though
-  %MRS: less relevant to this comment.
   \begin{quote}
-  We parameterized monomers and solutes using the Generalized Amber Force Field (GAFF)~\cite{??} and
-  water molecules using the TIP3P water model,~\cite{}
-  %MRS: tweaked
-  % We made each choice in order to
-  % ensure that our approach is accessible and reproducible to a wide audience and so that
-  %it is easy to study a broad range of solutes and monomer
-  %chemistries in high throughput.
-  GAFF is very commonly used in simulations with diverse organic chemical functionality, and was developed for consistency
-  within the AMBER ecosystem, which used TIP3P as the water mode.
-  We chose these standard force
-  fields and generalizable parameterization approaches so that a range
-  of solutes and monomers could self-consistently and easily be
-  studied.  The main goal of this work is to develop stochastic models
-  which can reproduce solute behavior on MD time scales, independent
-  of the choice of force field. In future work, it may be beneficial
-  to employ specialized force fields, including polarizable force
-  fields or other higher-order effects in order to improve
-  the accuracy of structure parameters and selectivity predictions.
+  We modeled water molecules using the TIP3P water model,~\cite{} We used the
+  antechamber module shipped with AmberTools18 to parameterize monomers and solutes
+  using the Generalized Amber Force Field (GAFF).~\cite{??} We assigned charges using
+  the AM1-BCC model. GAFF is very commonly used in simulations with diverse organic
+  chemical functionality, and was developed for consistency within the AMBER ecosystem,
+  which used TIP3P as the water model. We chose these standard force fields and
+  generalizable parameterization approaches so that a range of solutes and monomers 
+  could self-consistently and easily be studied.  The main goal of this work is to 
+  develop stochastic models which can reproduce solute behavior on MD time scales, 
+  independent of the choice of force field. In future work, it may be beneficial
+  to employ specialized force fields, including polarizable force fields or other 
+  higher-order effects in order to improve the accuracy of structure parameters and
+  selectivity predictions.
   \end{quote}
   
-  %BJC: not sure if anything should be added to text
-
-  %MRS: generally, something should be added to the text for any
-  %reviewer comment, even if just expanding what is already there to
-  %include some of the points raised by the reviewers. It shows
-  %good-faith efforts, and also if a reviewer has a concern, some
-  %readers will have it as well, so might as well head it off.
-  
-  %BJC: I could use some help on justification
-\item \textit{Next, reading this section I would 
-        also like to know how well finite size effects are controlled for with this specific 
-        membrane and these specific solutes.}
+\item \textit{Next, reading this section I would also like to know how well finite 
+			  size effects are controlled for with this specific membrane and these 
+			  specific solutes.}
 
         %MRS: so I'm looking at
         %https://pubs.acs.org/doi/10.1021/jp0477147 and .  I think the
@@ -130,40 +109,24 @@ followed by the new text (denoted by ``New text:").
         %in.  I THINK that we can consider the viscosity essentially infinite, or at least
         %really really high, and therefore the corrections 
 
-        %MRS: also, I cut out the part about diffusing between pores,
-        %but I don't think that's what they were getting at.
-
-        %MRS: Do the solutes cross the boundary
-        %conditions in the z direction much? You say they don't cross
-        %between pores.  I don't think that's real point, though.
-
-        We have not made any explicit finite size corrections, but
-        they are less important for this work than for diffusion in
-        other soft matter systems where diffusion is studied. In our
-        previous work, we have shown that monomer diffusion is
-        negligible on simulation time scales. Finite-size corrections
-        to diffusion are primarily due to the hydrodynamics of the surroundings (cite two
-        papers I sent), and the LLC membrane (outside of
-        intramolecular motion and quasiharmonic vibration around it's
-        average position) is therefore mostly motionless, with a very
-        high effective viscosity.  This high surrounding viscosity
-        should nearly eliminate these typical finite size effects.
-        Additionally, we are usually comparing ratios of diffusion
-        when we look at selectivity, and thus finite size effects
+        We have not made any explicit finite size corrections, but they are less 
+        important for this work than for diffusion in other soft matter systems 
+        where diffusion is studied. In our previous work, we have shown that 
+        monomer diffusion is negligible on simulation time scales. Finite-size 
+        corrections to diffusion are primarily due to the hydrodynamics of the 
+        surroundings (cite two papers I sent), and the LLC membrane (outside of
+        intramolecular motion and quasiharmonic vibration around it's average 
+        position) is therefore mostly motionless, with a very high effective 
+        viscosity. This high surrounding viscosity should nearly eliminate these
+        typical finite size effects. Additionally, we are usually comparing ratios
+        of diffusion when we look at selectivity, and thus finite size effects
         should also mostly cancel out there.
 
-        Verifying that there are indeed negligible finite size effects
-        may be interesting in future work, but we do not feel it is
-        justified for this study given the computational cost of
-        studying larger systems. We also believe it would have little
-        influence on the way in which we fit our models to the time
-        series.
-
-        %Our main focus is on the time series of the solutes in the
-        %membrane pores. On the 5 $\mu s$ time scales which we
-        %simulate, we do not observe any solutes that cross between
-        %pores. Therefore, we expect similar solute behavior in larger
-        %arrays of pores.
+        Verifying that there are indeed negligible finite size effects may be 
+        interesting in future work, but we do not feel it is justified for this 
+        study given the computational cost of studying larger systems. We also 
+        believe it would have little influence on the way in which we fit our models
+        to the time series.
         
   %MRS: I think it's always good practice to have a text change
   %corresponding to every reviewer comment, even if it's just to
@@ -176,9 +139,9 @@ followed by the new text (denoted by ``New text:").
     Think about text here once we agree on the approach to response.
     \end{quote}
         
-\item \textit{Lastly, it would be natural to report the size of the
-  system in this section (I found it eventually in the introduction
-  after searching for it throughout the manuscript).}
+\item \textit{Lastly, it would be natural to report the size of the system in this
+              section (I found it eventually in the introduction after searching for it 
+              throughout the manuscript).}
 
   We added the following text in order to inform the reader of the system's size:
   
@@ -207,9 +170,8 @@ followed by the new text (denoted by ``New text:").
 		
 		The reviewer is correct in their interpretation of the figures. For clarity, we modified the y-axes as
 		well as the caption in order to further aid the reader in reading them. We also made efforts to cut
-                down on the interpretatio that is already presented in the main text.
-                We made similar modifications to Figure 6 since it is an
-		analogous figure. Our caption changes are presented below.
+        down on the interpretation that is already presented in the main text. We made similar modifications
+        to Figure 6 since it is an analogous figure. Our caption changes are presented below.
 		
 		This comment caused us to reconsider the detail in the captions of other figures as well. We feel
 		the level of the detail is justified in most cases. However, we decided to remove some redundant
@@ -375,13 +337,14 @@ followed by the new text (denoted by ``New text:").
   		one dimension and not two (for example using cylindrical coordinates)?}
 
     %MRS: we probably want to phrase it a bit differently. I'm thinking you should you lead with the fact that it is quasi-2D, since radial information is built into having different states in the pores and the tails for the MSDDM and the 2-state anomalous diffusion models, then go into the other details.  Thoughts?
+    %BJC: modified to lead with quasi-2D
     
-  		Author reply: We thank the reviewer for their sensible question. The simplest answer
-  		to this is that ultimately, we are only concerned with transport along the pore axis. Radial
-  		solute transport (with respect to the pore center) is effectively bounded and only 
-  		contributes to the axial MSD to the extent that it influences axial transport. We 
-  		do acknowledge that the radial location of solutes has an influence on solute
-  		hopping behavior which is why attempted to create the two mode anomalous diffusion model.
+  		Author reply: We thank the reviewer for their sensible question. First, we would like
+  		to point out that the two mode anomalous diffusion model was a quasi-2D 
+  		modeling approach. In the paper, we do acknowledge that the radial location of solutes has
+  		an influence on solute hopping behavior. However, we are primarily interested in axial 
+  		transport, therefore the radial behavior is only important to the extent that it
+  		affects solute motion in that direction. 
 		
 		From a more mathematical standpoint, there are two factors which pose challenges with
 		increasing dimensionality. First, we have a relatively low amount of data, and therefore
@@ -408,16 +371,12 @@ followed by the new text (denoted by ``New text:").
         As described in the text, the predicted MSDs of the two-mode model may indeed show better 
         qualitative MSD behavior than the one-mode model. Specifically, the two-mode model becomes
         linear on long timescales which may be more consistent with our MD results. However, this 
-        long time scale linear behavior of the two-mode model has
-        %MRS: one  could argue that the fact the behavior is wrong means there's no mathematical basis - or the wrong mathematical basis, so simplifying.
-        %only a mathematical basis and
-        no physical basis.
-        As discussed in the text, the one-mode model has persistent curvature
-        since hop correlation persists indefinitely for fractional motion. However, for the two-mode
-        model, each time a solute transitions between the pore and tail regions, we must generate a
-        new FBM process because we lack a proven technique for simulating fractional 
-        motion that incorporates time-dependent variation in the width of the hop length 
-        distributions.
+        long time scale linear behavior of the two-mode model has no physical basis. As discussed
+        in the text, the one-mode model has persistent curvature since hop correlation persists 
+        indefinitely for fractional motion. However, for the two-mode model, each time a solute 
+        transitions between the pore and tail regions, we must generate a new FBM process because
+        we lack a proven technique for simulating fractional motion that incorporates time-dependent
+        variation in the width of the hop length distributions.
         
         Perhaps, most importantly, Section 3.3 is primarily used to demonstrate our mathematical
         framework. Applying it to the two mode model would be trivial. We chose to use the one-mode 
