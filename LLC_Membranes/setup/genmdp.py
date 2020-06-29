@@ -162,17 +162,17 @@ class SimulationMdp(object):
         a.append(['tc-grps = system\n'])
         a.append(['tau-t = %s\n' % self.tau_t])
         a.append(['ref-t = %s\n' % self.temperature])
-        if not self.restraints:
-            a.append(['Pcoupl = %s\n' % self.barostat])
-            a.append(['Pcoupltype = %s\n' % self.p_coupling])
-            if self.barostat == 'Parrinello-Rahman':
-                a.append(['tau-p = 20\n'])  # tau-p should be at least  20 times larger than nstpcouple*dt. nstpcoupl defaults to the value of nstlist (40)
-            if self.p_coupling == 'Isotropic':
-                a.append(['ref-p = 1\n'])
-                a.append(['compressibility = 4.5e-5\n'])
-            else:
-                a.append(['ref-p = %s\n' % ' '.join(['1', '1'])])
-                a.append(['compressibility = 4.5e-5 4.5e-5\n'])
+        #if not self.restraints:
+        a.append(['Pcoupl = %s\n' % self.barostat])
+        a.append(['Pcoupltype = %s\n' % self.p_coupling])
+        if self.barostat == 'Parrinello-Rahman':
+            a.append(['tau-p = 20\n'])  # tau-p > 20* nstpcouple*dt. nstpcoupl defaults to nstlist (40)
+        if self.p_coupling == 'Isotropic':
+            a.append(['ref-p = 1\n'])
+            a.append(['compressibility = 4.5e-5\n'])
+        else:
+            a.append(['ref-p = %s\n' % ' '.join(['1', '1'])])
+            a.append(['compressibility = 4.5e-5 4.5e-5\n'])
         if self.genvel:
             a.append(['gen-vel = yes\n'])
             a.append(['gen-temp = %s\n' % self.temperature])
