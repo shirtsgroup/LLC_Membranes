@@ -318,7 +318,7 @@ class EquilibrateBCC(topology.LC):
             raise EnsembleError("%s is not a valid (or not implemented) thermodynamic ensemble" % ensemble)
 
         delta = gromacs.insert_molecules(self.gro_name, self.solvent.name, self.nsolvent, 'solvated.gro',
-                                         scale=scale)
+                                         scale=scale, mpi=self.mpi)
         total += delta
         print('Inserted %d %s molecules for a total of %d' % (delta, self.solvent.name, total))
 
@@ -393,13 +393,13 @@ class EquilibrateBCC(topology.LC):
         print("Running %d ps NVT equilibration" % nvt_length)
         self.mdp.write_nvt_mdp(length=nvt_length)
         gromacs.simulate(self.nvt_mdp, self.top_name, self.gro_name, 'nvt_equil', mpi=self.mpi,
-                         nprocesses=self.nprocesses, restraints=True, verbose=False)
+                         nprocesses=self.nprocesses, restraints=True, verbose=True)
 
         # run a short NPT simulation
         self.mdp.write_npt_mdp(length=50)
         mdp_name = self.npt_mdp + ' -maxwarn 1' # The -maxwarn to overcome halting of simulation due to warning
         gromacs.simulate(mdp_name, self.top_name, 'nvt_equil.gro', 'npt_%d' % total, mpi=self.mpi,
-                         nprocesses=self.nprocesses, restraints=True, verbose=False)
+                         nprocesses=self.nprocesses, restraints=True, verbose=True)
         self.gro_name = 'npt_%d.gro' % total
 
         # run series of NPT simulations to try and stuff more solutes in
@@ -412,7 +412,7 @@ class EquilibrateBCC(topology.LC):
         self.mdp.write_npt_mdp(length=npt_length)
         mdp_name = self.npt_mdp + ' -maxwarn 1' # The -maxwarn to overcome halting of simulation due to warning
         gromacs.simulate(mdp_name, self.top_name, self.gro_name, 'npt_equil', mpi=self.mpi,
-                         nprocesses=self.nprocesses, restraints=True, verbose=False)
+                         nprocesses=self.nprocesses, restraints=True, verbose=True)
         self.gro_name = 'npt_equil.gro'
 
         # rename things to desired final output name
