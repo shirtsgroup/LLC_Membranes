@@ -193,7 +193,7 @@ class EquilibrateBCC(topology.LC):
         self.topology.write_top(name=name)
 
     def generate_mdps(self, T=300, em_steps=-1, time_step=0.002, length=1000, p_coupling='isotropic',
-                      barostat='berendsen', genvel='yes', restraints=False, xlink=False, tau_p=20, tau_t=0.1,
+                      barostat='berendsen', genvel='yes', restraints=True, xlink=False, tau_p=20, tau_t=0.1,
                       nstxout=5000, nstvout=5000, nstfout=5000, nstenergy=5000, frames=None):
 
         """ Create an object that can be used to generate GROMACS .mdp files
