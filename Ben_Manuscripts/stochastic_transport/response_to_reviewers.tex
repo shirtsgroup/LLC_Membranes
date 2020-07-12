@@ -26,17 +26,17 @@ Authors: Benjamin J. Coscia and Michael R. Shirts
 \end{center}
 
 We thank the reviewers for carefully reading over our manuscript and providing
-helpful comments. We have taken the suggestions into consideration and made
-appropriate revisions to the manuscript document. The comments have been reproduced
-in italics and all changes to the text have been documented below. 
-%BJC: Need to modify this to be more in line with what I did.
-In cases where we modified the text we included the original text (denoted by ``Original text:") 
-followed by the new text (denoted by ``New text:").
+thoughtful and constructive feedback. We have taken the suggestions into consideration 
+and made appropriate revisions to the manuscript document. The comments have been reproduced
+in italics and all changes to the text have been documented below them. Any newly added
+references are given in the bibliography of this document and are placed in the main 
+text with appropriate numbering.
 
 \section*{Response to Reviewer 1}
 
 \begin{enumerate}[label={Comment \theenumi :}, leftmargin=3.9\parindent]
 
+  % comment 1
   \item \textit{\textbf{Page 5 line 19:} In this work, we use the output of our MD simulations
         to construct \textbf{two classes} of mathematical models which aim to predict membrane 
         performance while providing quantitative mechanistic insights. \\
@@ -65,6 +65,7 @@ followed by the new text (denoted by ``New text:").
   motion which lead to anomalous subdiffusion: 
   \end{quote}
   
+  % comment 2  
   \item \textit{\textbf{MD-section} \\
         \textbf{Page 8 and 9} \\
         The authors refer to ref 13 (where these simulations have been performed before), 
@@ -83,24 +84,27 @@ followed by the new text (denoted by ``New text:").
   
   New text:
   \begin{quote}
-  We modeled water molecules using the TIP3P water model,~\cite{} We used the
-  antechamber module shipped with AmberTools18 to parameterize monomers and solutes
-  using the Generalized Amber Force Field (GAFF).~\cite{??} We assigned charges using
-  the AM1-BCC model. GAFF is very commonly used in simulations with diverse organic
-  chemical functionality, and was developed for consistency within the AMBER ecosystem,
-  which used TIP3P as the water model. We chose these standard force fields and
-  generalizable parameterization approaches so that a range of solutes and monomers 
-  could self-consistently and easily be studied.  The main goal of this work is to 
-  develop stochastic models which can reproduce solute behavior on MD time scales, 
-  independent of the choice of force field. In future work, it may be beneficial
-  to employ specialized force fields, including polarizable force fields or other 
-  higher-order effects in order to improve the accuracy of structure parameters and
-  selectivity predictions.
+  We modeled water molecules using the TIP3P water model,~\cite{jorgensen_comparison_1983}
+  We used the antechamber module shipped with AmberTools18 to parameterize monomers and 
+  solutes using the Generalized Amber Force Field (GAFF).~\cite{wang_development_2004} We 
+  assigned charges using the AM1-BCC model.~\cite{jakalian_fast_2000,jakalian_fast_2002}
+  GAFF is very commonly used in simulations with diverse organic chemical functionality, 
+  and was developed for consistency within the AMBER ecosystem, which used TIP3P as the
+  water model. We chose these standard force fields and generalizable parameterization 
+  approaches so that a range of solutes and monomers could be self-consistently and easily 
+  studied. The main goal of this work is to develop stochastic models which can reproduce
+  solute behavior on MD time scales, independent of the choice of force field. In future 
+  work, it may be beneficial to employ specialized force fields, including polarizable 
+  force fields or other higher-order effects in order to improve the accuracy of structure 
+  parameters and selectivity predictions.
   \end{quote}
   
-\item \textit{Next, reading this section I would also like to know how well finite 
+  % comment 3
+  \item \textit{Next, reading this section I would also like to know how well finite 
 			  size effects are controlled for with this specific membrane and these 
 			  specific solutes.}
+			  
+		Author reply:
 
         %MRS: so I'm looking at
         %https://pubs.acs.org/doi/10.1021/jp0477147 and .  I think the
@@ -114,13 +118,13 @@ followed by the new text (denoted by ``New text:").
         where diffusion is studied. In our previous work, we have shown that 
         monomer diffusion is negligible on simulation time scales. Finite-size 
         corrections to diffusion are primarily due to the hydrodynamics of the 
-        surroundings (cite two papers I sent), and the LLC membrane (outside of
-        intramolecular motion and quasiharmonic vibration around it's average 
-        position) is therefore mostly motionless, with a very high effective 
-        viscosity. This high surrounding viscosity should nearly eliminate these
-        typical finite size effects. Additionally, we are usually comparing ratios
-        of diffusion when we look at selectivity, and thus finite size effects
-        should also mostly cancel out there.
+        surroundings~\cite{venable_lipid_2017,yeh_system-size_2004}, and the LLC
+        membrane (outside of intramolecular motion and quasiharmonic vibration 
+        around its average position) is therefore mostly motionless, with a very
+        high effective viscosity. This high surrounding viscosity should nearly 
+        eliminate these typical finite size effects. Additionally, we are usually 
+        comparing ratios of diffusion when we look at selectivity, and thus finite 
+        size effects should also mostly cancel out there.
 
         Verifying that there are indeed negligible finite size effects may be 
         interesting in future work, but we do not feel it is justified for this 
@@ -133,25 +137,34 @@ followed by the new text (denoted by ``New text:").
   %clarify.  This proves that MRS: we are taking the reviewer
   %seriously.
 
-  To clarify this logic, we have added the following text:
-
+  %BJC: MRS, can you check my placement of this paragraph in main text (search "r1_comment3" in Final_Draft_JCTC.tex)
+  To clarify this logic, we have added the following text and citations:
   \begin{quote}
-    Think about text here once we agree on the approach to response.
-    \end{quote}
-        
-\item \textit{Lastly, it would be natural to report the size of the system in this
-              section (I found it eventually in the introduction after searching for it 
-              throughout the manuscript).}
-
-  We added the following text in order to inform the reader of the system's size:
-  
-  New text:
-  \begin{quote}
-  %MRS: couldn't hurt to add cell dimensions  
-  Each unit cell contains $\sim$ 62,000 total atoms. % BJC: do you think they want unit cell dimensions? X x Y x Z? 
+    Although we studied diffusion, we did not explicitly account for finite size effects
+    in this system. Finite size corrections to diffusion are primarily due to the
+    hydrodynamics of the surroundings~\cite{venable_lipid_2017,yeh_system-size_2004}, and
+    as discussed in our previous work~\cite{coscia_understanding_2019} the LLC membrane
+    (outside of intramolecular motion and quasiharmonic vibration around it's average 
+    position) is mostly motionless, and therefore has a very high effective viscosity.
+    Nonetheless, studies of finite size effects in this system may be worthwhile in
+    future work. However, it likely would not affect the modeling approach described in
+    this work.
   \end{quote}
   
-
+  % comment 4      
+  \item \textit{Lastly, it would be natural to report the size of the system in this
+              section (I found it eventually in the introduction after searching for it 
+              throughout the manuscript).}
+              
+              Author reply:
+              
+              We thank the reviewer for pointing out this missing piece of information. We
+              have added the following text in order to inform the reader of the system's size:
+			  \begin{quote} 
+			  Each unit cell contains $\sim$ 62,000 total atoms.
+			  \end{quote}
+  
+  %comment 5
   \item \textit{\textbf{Figure 5 page 25:} \\
 		First, the symbols within the figure are very small and barely readable, and probably not
 		according to authors guidelines for figures. Second, the caption, as with the other captions of
@@ -317,6 +330,7 @@ followed by the new text (denoted by ``New text:").
 	  
         \end{quote}
 		
+  % comment 6
   \item \textit{\textbf{Page 6, line 55}: The second measure of success is based on the qualitative
         comparison between individual realizations of solute trajectories generated ...\\ \\
 		Here I am a little curious. Are there no measures which can be used to quantify the similarity of
@@ -325,7 +339,7 @@ followed by the new text (denoted by ``New text:").
 		
 		Author reply: In short, we do not believe there are any other suitable methods for comparing
 		similarity beyond the checks which we show in this work. Autocorrelation is indeed an input 
-		to the anomalous diffusion and Markov state-dependent dynamical model, specifically through
+		to the anomalous diffusion and Markov state-dependent dynamical models, specifically through
 		the Hurst parameter which is generated by fitting to autocorrelation of solute jumps. The
 		anomalous diffusion model is only parameterized by the distribution of hop length, the 
 		distribution of dwell times and the degree of autocorrelation between hops, all of which
@@ -333,6 +347,9 @@ followed by the new text (denoted by ``New text:").
 		for the Markov state-dependent dynamical model, but it fails the qualitative test and
 		thus does not merit any further checks.
 		
+		%BJC: I don't think we need to modify the text for this comment?
+
+  % comment 7
   \item \textit{One question that came to mind reading the paper was: why is the model only in 
   		one dimension and not two (for example using cylindrical coordinates)?}
 
@@ -340,7 +357,7 @@ followed by the new text (denoted by ``New text:").
     %BJC: modified to lead with quasi-2D
     
   		Author reply: We thank the reviewer for their sensible question. First, we would like
-  		to point out that the two mode anomalous diffusion model was a quasi-2D 
+  		to point out that the two mode anomalous diffusion model is a quasi-2D 
   		modeling approach. In the paper, we do acknowledge that the radial location of solutes has
   		an influence on solute hopping behavior. However, we are primarily interested in axial 
   		transport, therefore the radial behavior is only important to the extent that it
@@ -357,8 +374,11 @@ followed by the new text (denoted by ``New text:").
 		
 		However, we would like to acknowledge that we have a strong desire to incorporate data
 		from multiple dimensions. We are actively investigating a new modeling approach which 
-		allows us to overcome these issues and to use cylindrical representations with ease. %MRS: could cite the arXiv paperhere.
+		allows us to overcome these issues and to use cylindrical representations with ease. 
+		%MRS: could cite the arXiv paper here.
+		%BJC: currently not on arXiv
 
+  % comment 8
   \item \textit{\textbf{Page 35 line 12-14}: \\
    		We do not consider the two mode AD model because it has a broken correlation structure \\ \\
         I was a little disappointed to see only the single mode being used. Could the authors 
@@ -385,12 +405,24 @@ followed by the new text (denoted by ``New text:").
         modeling the solute time series is not yet suitable to make quantitative predictions of 
         flux and selectivity. But our approach opens the door for applying the same analysis to 
         improved time series modeling techniques.
-
-        To clarify this, we have modified the text
+        
+        Original text:
         \begin{quote}
-          Text here:
-          %MRS: Ben, choose where to put this.  It could be a simple one sentence modification or addition - you probably do explain why no 2-mode model, don't you?
+        We do not consider the two mode AD model because it has a broken correlation structure 
+        and we do not consider the MSDDM because its realizations do not display the expected 
+        hopping and trapping behavior. 
         \end{quote}
+        
+        New text:
+        \begin{quote}
+        Although it would be trivial to test the two mode model as well, we chose not to because
+        we feel the results would be misleading to the reader since the stochastic trajectories
+        generated by this method lack a firm physical basis as discussed in Section~\ref{M-section:AD_all_data}. 
+        We also do not consider the MSDDM because its realizations do not display the expected 
+        hopping and trapping behavior. 
+        \end{quote}
+  
+  % comment 9
   \item \textit{\textbf{Page 35 line 20-42:}\\
         A pore-length of 50 nm is a little underwhelming compared to 7 micrometers. Reading the paper
 		I do not understand what lies behind this limitation - what hinders the sampling one really would
@@ -418,19 +450,24 @@ followed by the new text (denoted by ``New text:").
 		 	
 	  	This may be an issue that could be overcome by developing specialized algorithms and perhaps 
 	  	by using a compiled computer language like C++. 
-	  	  
-	  	%BJC: Could reasonably go beyond 50 nm but 7 microns becomes tough
-                %MRS: probably should explain that you COULD have gone beyond 50 nm, but there was no need, since it didn't improve the fit (if that is true).
-                
-	  	%BJC: building in the correlation structure is computationally expensive. Reference a paper describing how FBM is simulated
-	  	%BJC: could benefit from optimized libraries, but python isn't fast enough
-	  	%BJC: also need to specify the number of steps to take beforehand
-	  	%BJC: truncated correlation functions may allow us to surpass the limitation
-
-                %MRS: could also point out that we have come up with a
-                %better approach along similar lines now (could cite arXiv paper), and so
-                %continuing down this route is probably unnneeded.
-                
+	  	
+        We have modified the text to express the current limitations in a more straightforward manner:	  	
+	  	
+	  	Original text:
+	  	\begin{quote}
+	  	The RAM requirements and performance scales greater than linearly and thus would take an 
+	  	infeasible amount of memory and time to simulate transport through a pore over 100 times
+        longer. 
+	  	\end{quote}
+	  	
+	  	Modified text:
+	  	\begin{quote}
+	  	At this time, it is infeasible for us to simulate transport through a pore over 100 times
+	  	longer without investing significant effort into writing and optimizing new code that can
+	  	handle simulation of large trajectories with correlation between all steps.
+	  	\end{quote}
+  
+  % comment 10        
   \item \textit{In this paper the models are only evaluated by their ability of achieving 
 		  self-consistency with the trajectories used as input. This is conceptually not ideal. 
 		  Are there no experimental data or mathematical models which act as a reference for 
@@ -442,10 +479,10 @@ followed by the new text (denoted by ``New text:").
 		  challenge for our experimental collaborators and much of their focus has shifted to 
 		  membranes formed by liquid crystals that self-assemble into bicontinuous cubic architectures
 		  which are much simpler to synthesize. We have also started to shift our focus towards models 
-		  of the bicontinuous cubic phase, which do have much more experiemntal data. However, our research
-                  into generating physically accurate 
-		  molecular models of that phase lags our work on time series modeling. In future work, we will
-		  be able to apply this technique to these bicontinuous systems for which we have experimental data.
+		  of the bicontinuous cubic phase, which do have much more experimental data. However, our 
+		  research into generating physically accurate molecular models of that phase lags our work on
+		  time series modeling. In future work, we will be able to apply this technique to these 
+		  bicontinuous systems for which we have experimental data.
 		  
 		  %BJC: I'm not sure this is worth bringing up
 
@@ -459,6 +496,14 @@ followed by the new text (denoted by ``New text:").
 		  compare. Some work has been done to apply Donnan steric pore models to experimental data, 
 		  but these models are continuum-based and have not been used in a predictive capacity.
 		  
+		  We have added a mention of these mathematical models to the introduction in order to give
+		  a more complete picture of the modeling approaches which preceded molecular dynamics:
+		  \begin{quote}
+		    Some work has been done to apply Donnan steric pore models to experimental LLC membrane 
+		    data, but these models are continuum-based and are not effective as tools for explaining
+		    complex solute-membrane interactions.~\cite{hatakeyama_water_2011}
+		  \end{quote}
+		  
   \end{enumerate}
 
 \noindent Optional comment to consider:\\
@@ -467,9 +512,9 @@ followed by the new text (denoted by ``New text:").
 	walks. Given that this is not a journal of stochastic processes, it is my opinion that the readability
 	and accessibility of the manuscript would be greatly improved by writing the full names of the
 	random walks in the text while keeping acronyms in figures. \\}
-
-    %BJC: I'll address this once I incorporate things into the text.
-    %MRS: yeah, we don't want people to have to read thoroughly twice.
+	
+	We thank the reviewer for their constructive feedback. In response we have reduced our usage of
+	acronyms for the various stochastic models in favor of their full unabbreviated form for clarity.
 	
 \end{addmargin}
 
@@ -483,6 +528,7 @@ followed by the new text (denoted by ``New text:").
   \item \textit{Page 10 line 28: T should be in symbol form.} \\ \\
   		
   \item \textit{Symbol T is used for both time and transition matrix, perhaps use some matrix notation.} \\ \\
+  %BJC: Maybe change matrix to bold italic? https://tex.stackexchange.com/questions/199789/which-bold-style-is-recommended-for-matrix-notation
   		
   \item \textit{The references should be checked thoroughly by the authors. Ref 13, which is arguably
   the most important reference for this paper is missing the volume number.} \\ \\
@@ -490,7 +536,6 @@ followed by the new text (denoted by ``New text:").
 
 \end{addmargin}
 
-%BJC: TODO
 Author reply: We thank the reviewer for catching these errors and have corrected all of the instances
 we could identify.
 
@@ -498,6 +543,7 @@ we could identify.
 
 \begin{enumerate}[label={Comment \theenumi :}, leftmargin=3.9\parindent]  
 
+    % comment 1
     \item \textit{ Abstract: here it is difficult to understand what is meant with "dwell times, hop 
     lengths between dwells and correlation between hops", without reading the whole Introduction (and 
     possibly reference 13, which by the way is not completely listed in the References section). The 
@@ -505,7 +551,8 @@ we could identify.
     these systems (for example, by including information from the Introduction, i.e., the last paragraph
     of page 3 and first paragraph of page 4).}
     
-    Author reply: We thank the reviewer for pushing us to increase the clarity of the abstract. 
+    Author reply: We thank the reviewer for pushing us to increase the clarity of the abstract. We have
+    made the following changes in order to give more immediate context to our work.
     
     Original text:
     
@@ -543,25 +590,52 @@ we could identify.
     displacements (MSDs), solute flux, and solute selectivity in macroscopic length pores.
     \end{quote}
   
+    % comment 2
     \item \textit{Some of the acronyms were not defined (or perhaps I missed them), for example 'AD' 
     (page 7) and 'MLE' (page 11)}
     
     Author reply:
+    
+    We thank the reviewer for pointing out these oversights. We have also defined MLE as maximum
+    likelihood estimate before its first usage. In consideration of this comment and a similar
+    comment by reviewer 1, we have decided to reduce the number of abbreviations in the main text 
+    in order to eliminate confusion over acronyms. 
 
+    % comment 3
     \item \textit{In the Introduction, specifically the last paragraph of page 3 and first paragraph
     of page 4, the authors should refer to Figure 1 to complement their description of the complex solute
     dynamics.}
     
     Author reply:
+    
+    We thank the reviewer for this suggested improvement and we have added the appropriate
+    figure reference with some modifications to maintain the overall sentence flow:
+    
+    Original text:
+    \begin{quote}  
+    We identified three mechanisms responsible for the solute trapping behavior: 
+    \end{quote}
+    
+    Modified text:
+    \begin{quote}
+    The complex membrane topology (see~\ref{M-fig:membrane_structure}) gives rise to
+    three mechanisms responsible for the solute trapping behavior: 
+    \end{quote}
 
     \item \textit{Caption of Figure 7 should refer the reader to Table 2 for completeness}
     
     Author reply:
+    
+    We thank the reviewer for helping increase the clarity of the manuscript. We have added
+    the following text to the caption of Figure 7:
+    \begin{quote}
+    The state numbers correspond to those described in Table 2.
+	\end{quote}
 
 \end{enumerate}
 
-%\bibliographystyle{ieeetr}
-%\bibliography{transport}
+\bibliographystyle{ieeetr}
+\bibliography{stochastic_transport}
 
 \end{document}
 
