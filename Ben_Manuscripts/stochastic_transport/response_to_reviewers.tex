@@ -85,11 +85,11 @@ text with appropriate numbering.
   New text:
   \begin{quote}
   We modeled water molecules using the TIP3P water model,~\cite{jorgensen_comparison_1983}
-  We used the antechamber module shipped with AmberTools18 to parameterize monomers and 
+  We used the Antechamber module shipped with AmberTools18 to parameterize monomers and 
   solutes using the Generalized Amber Force Field (GAFF).~\cite{wang_development_2004} We 
   assigned charges using the AM1-BCC model.~\cite{jakalian_fast_2000,jakalian_fast_2002}
   GAFF is very commonly used in simulations with diverse organic chemical functionality, 
-  and was developed for consistency within the AMBER ecosystem, which used TIP3P as the
+  and was developed for consistency within the AMBER ecosystem, which uses TIP3P as the
   water model. We chose these standard force fields and generalizable parameterization 
   approaches so that a range of solutes and monomers could be self-consistently and easily 
   studied. The main goal of this work is to develop stochastic models which can reproduce
@@ -440,7 +440,7 @@ text with appropriate numbering.
 		parameter also increases. Therefore, we need to generate very long trajectories, with 
 		correlation between all data points, in order to sufficiently sample the MFPT distribution 
 		before fitting them to Equation 9. This is especially challenging with slow-moving solutes
-		like acetic acid. We needed to simulate over 2 million timesteps in order to sufficiently
+		like acetic acid. We needed to simulate over 2 million time steps in order to sufficiently
 		sample the MFPT over a 50 nm pore. This procedure becomes computationally expensive very
 		quickly, and requires ample RAM to store the trajectories as they are constructed.
 		
@@ -459,7 +459,9 @@ text with appropriate numbering.
 	  	infeasible amount of memory and time to simulate transport through a pore over 100 times
         longer. 
 	  	\end{quote}
-	  	
+
+	  	%MRS: scanning over this, it's probably more important to say that we probably didn't need to do it, since
+                %the analytical fit was so good.
 	  	Modified text:
 	  	\begin{quote}
 	  	At this time, it is infeasible for us to simulate transport through a pore over 100 times
@@ -639,3 +641,11 @@ we could identify.
 
 \end{document}
 
+
+% LocalWords:  Subdiffusive Solute Nanoscale Coscia leftmargin FBM vy
+% LocalWords:  subdiffusion CTRW sFBM ref solutes antechamber solute
+% LocalWords:  polarizable LLC intramolecular quasiharmonic BJC JCTC
+% LocalWords:  tex fontsize evy Methanol's selectivities MSDDM arXiv
+% LocalWords:  parametrization MSDs MSD timescales renormalizing MFPT
+% LocalWords:  bicontinuous Donnan steric em dt lyotropic
+% LocalWords:  subdiffusive
