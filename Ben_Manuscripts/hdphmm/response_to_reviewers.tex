@@ -1,0 +1,269 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{xr}
+\usepackage{xcolor}
+\usepackage{siunitx}
+\usepackage{gensymb}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{scrextend}
+\usepackage[normalem]{ulem}
+
+\externaldocument[S-]{Supporting_Information}
+\externaldocument[M-]{Final_Draft}
+
+\begin{document}
+
+\graphicspath{{./figures/}}
+
+\begin{center}
+\textbf{Response to reviewers: Statistical Inference of Transport Mechanisms and Long
+        Time Scale Behavior from Time Series of Solute Trajectories in Nanostructured Membranes} \\
+Authors: Benjamin J. Coscia, Christopher P. Calderon and Michael R. Shirts
+\end{center}
+
+We thank the reviewers for carefully reading over our manuscript and providing
+thoughtful and constructive feedback. We have taken the suggestions into consideration 
+and made appropriate revisions to the manuscript document. The comments have been reproduced
+in italics and all changes to the text have been documented below them. Any newly added
+references are given in the bibliography of this document and are placed in the main 
+text with appropriate numbering.
+
+\section*{Response to Reviewer 1}
+
+\begin{enumerate}[label={Comment \theenumi :}, leftmargin=3.9\parindent]
+
+    \item \textit{The manuscript by Coscia et al. analyzes diffusion and transport of solute molecules
+    in a low water content lyotropic liquid crystal using a statistical model developed on the basis 
+    of molecular dynamics simulations. The purpose of the statistical model is two-fold; first to 
+    extrapolate computed MSDs to longer times to obtain diffusion coefficients, and second to attempt
+    to gain increased physical insight on diffusion mechanisms. These issues are important in 
+    highly-confined/low-water content nanoporous materials, in which diffusion occurs through complex
+    mechanisms and over long timescales. The manuscript will most likely be of interest to the community
+    interested in nanoporous materials for separations.}
+    
+    Author reply:
+    
+    \item \textit {Unfortunately, because there is no comparison with alternative techniques, it is 
+    very difficult to evaluate this new approach relative to previous work that has examined similar 
+    issues. There exist numerous other methods for extrapolating MSDs to longer time, which the 
+    authors have not discussed. One such method is the “trajectory-extending kinetic Monte Carlo” 
+    (TEKMC) approach of Brown and coworkers see e.g. Macromolecules 2010, 43, 9210-9214, 
+    Macromolecules 2015, 48, 7346-7358, and J. Phys Chem. B, 2012, 116, 95-103. The authors should 
+    add a comprehensive discussion of how their approach compares to this and similar methods. The 
+    paper would be significantly improved if the authors were to perform and present TEKMC results 
+    for their system, so that one could better evaluate the performance of their proposed method.}
+    
+    Author reply:
+    
+    %BJC: not sure if I should ignore the JCTC part completely or basically just say what the editor said.
+    \item \textit{Much of the writing seems more suitable for JCTC rather than JPC. I encourage the
+    authors to better emphasize and discuss “new physical insight” and “chemical details”, and spend
+    less time on methodology. For example pages 5-16 are all on methodology, yet it is not until 
+    Figure 8 of the paper (page 26) that the authors give any description of what the LLC system 
+    they are studying is actually composed of. Presumably the LLC is made up of self-assembled 
+    monomers (in water) shown in Figure 8a). I would encourage the authors to describe their 
+    system more concretely much earlier in the paper... there is also no information on system 
+    size, box dimensions, etc.}
+    
+    Author reply: We thank the reviewer for pushing us to include more details about our 
+  molecular simulations in order to boost reproducibility. The length of the manuscript made
+  us wary to include information that could be accessed elsewhere, however there are 
+  benefits to keep this very important section self-contained.
+  
+  We added the following text to address comments related to our choice of force field:
+  
+  New text:
+  \begin{quote}
+  We modeled water molecules using the TIP3P water model,~\cite{jorgensen_comparison_1983}
+  We used the Antechamber module shipped with AmberTools18 to parameterize monomers and 
+  solutes using the Generalized Amber Force Field (GAFF).~\cite{wang_development_2004} We 
+  assigned charges using the AM1-BCC model.~\cite{jakalian_fast_2000,jakalian_fast_2002}
+  GAFF is very commonly used in simulations with diverse organic chemical functionality, 
+  and was developed for consistency within the AMBER ecosystem, which uses TIP3P as the
+  water model. We chose these standard force fields and generalizable parameterization 
+  approaches so that a range of solutes and monomers could be self-consistently and easily 
+  studied. The main goal of this work is to develop stochastic models which can reproduce
+  solute behavior on MD time scales, independent of the choice of force field. In future 
+  work, it may be beneficial to employ specialized force fields, including polarizable 
+  force fields or other higher-order effects in order to improve the accuracy of structure 
+  parameters and selectivity predictions.
+  \end{quote}
+  
+  % comment 4      
+  \item \textit{Lastly, it would be natural to report the size of the system in this
+              section (I found it eventually in the introduction after searching for it 
+              throughout the manuscript).}
+              
+              Author reply:
+              
+              We thank the reviewer for pointing out this missing piece of information. We
+              have added the following text in order to inform the reader of the system's size:
+			  \begin{quote} 
+			  Each unit cell contains $\sim$ 62,000 total atoms.
+			  \end{quote}
+    
+    Author reply:
+
+    \item \textit{The authors should more clearly note that their discussion largely applies only 
+    to very low water content LLC regimes (such as the 10\% LLC studied). For higher water content 
+    LLCs (e.g. > 15-20\%) it is straightforward to obtain the diffusion limit from standard MD 
+    simulations. While the authors are surely well aware of this, the reader may not be, and it is
+    important to clearly distinguish the regimes.}
+
+    \item \textit{In the HDP-AR-HMM method, it is not clear to me how the solute molecules are 
+    constrained to be confined within the pore radius (which they must be on physical grounds 
+    based on steric interactions). From Figure 2, it “looks” like this happens to work out, but
+    for more complicated systems (e.g. gyroid LLCs with 3D channels) such a constraint may be 
+    necessary and it is unclear how the method would generalize. This should be discussed.}
+    
+    \item \textit{As stated in the introduction, one motivation for the work is that “...one 
+    cannot reliably compute diffusion constants because MSDs are often non-linear on the timescales
+    accessible to molecular simulation”. Later on in section 2.4, the authors state “For the 
+    purposes of our analysis, we assume ergodicity of the 24 solute trajectories.” These are 
+    contradictory statements. If the trajectories are ergodic, then MSDs will be linear by 
+    definition The authors should clarify. Similarly, in Figure 7, if the simulations are indeed 
+    ergodic the red and blue bars should be proportional to each other.}
+    
+    \item \textit{There are no units on Figure 1 y-axis, presumably these are nanometer like the 
+    other figures?}
+    
+    \item \textit{Figure captions need to be improved. Wording such as “we plotted...”, “we 
+    calculated...”, “We also analyzed...” should be omitted in figure captions.}
+  
+%  Original text:
+%  \begin{quote}
+%  We treat our system in terms of two well-known classes of anomalous subdiffusion: 
+%  \end{quote}
+%  
+%  New text:
+%  \begin{quote}
+%  In this first approach, we treat our system in terms of two well-known types of molecular
+%  motion which lead to anomalous subdiffusion: 
+%  \end{quote}
+  
+		  
+  \end{enumerate}
+
+
+\section*{Response to Reviewer 2}
+
+\begin{enumerate}[label={Comment \theenumi :}, leftmargin=3.9\parindent]  
+
+    %r2_comment1
+    \item \textit{This paper presents an approach to study transport mechanisms of solutes within
+    membranes by applying the sticky hierarchical Dirichlet process autoregressive hidden Markov model
+    (HDP-AR-HMM) to molecular dynamics simulation trajectories spanning long times (5 microseconds). 
+    Using this method, the authors reveal different dynamic states associated with the transport of 
+    solute across a membrane, and interpret them on the basis of solute-membrane interactions. The 
+    paper is clear, well written, and relevant to the Journal of Physical Chemistry. I only have a 
+    couple of suggestions and minor corrections:}
+    
+    Author reply: We thank the reviewer for their kind assessment of our work.
+
+    %r2_comment2
+    \item \textit{A motivation for the study is providing a computational tool to guide experimentalists
+    in designing membrane materials. However, given the length of the molecular dynamics simulations 
+    required, it is presumably impractical to carry a large-scale screening in this way. It would be 
+    useful if the authors were more explicit about the role of this approach in guiding experiments, 
+    and what would be its advantages and limitations compared to a purely experimental search.}
+    
+    Author reply: We thank the reviewer for pushing us to further evaluate the practicality of our
+    method as a tool for experimentalists. In short, there are many ways we can envision that 
+    would make this approach more amenable to high throughput simulations. The length of our 
+    simulations in this paper are indeed quite long. The dynamics of the solutes are somewhat 
+    slow and we wanted to ensure we gathered enough data for a sufficient parameterization. 
+    Putting aside brute force high throughput simulations that could be enabled by the 
+    ever-increasing availability of HPC resources, it would be to our benefit to use the system
+    in this work as a benchmark to explore much less expensive models.
+    %BJC: I'm not exactly sure where to put this. Originally I thought conclusions because it's
+    %not really a method, but seemed to make the most sense near the system description.
+    We propose some ideas to this end in the text we have added to the end of Section 2.1, where
+    our simulations are described:
+    \begin{quote}
+    In consideration of our ultimate goal, which is to use high-throughput simulations to 
+    facilitate our understanding of LLC membrane design for solute-specific separations, the size 
+    of our system and length of the accompanying molecular simulations appears to be somewhat 
+    impractical. We would like to emphasize that our large, fully atomistic models will be
+    extremely valuable as a benchmark systems used to explore less expensive models. For example, we 
+    could explore systems built with fewer LLC monomers by making the membrane pores shorter. We 
+    could also build systems with higher concentrations of solutes in order to gather more 
+    dynamical data on shorter timescales. Using what we have learned about the radial distribution
+    functions of these solutes in this and our previous work\cite{}, it may be possible to 
+    learn how to create initial configurations with solutes initially distributed in a way that
+    is close to their equilibrium distribution, allowing solutes to thoroughly explore the 
+    accessible membrane structural space more quickly and reducing the amount unequilibrated
+    data that must be discarded. % could mention GCMC?
+    Finally, it may be possible to speed up our simulations by 
+    reducing the number of atoms using united-atom representations of the liquid crystal monomers.
+    %BJC: How strong of an influence would hydrogen mass repartitioning have on hydrogen bonding?
+    %, or by using hydrogen mass repartitioning to allow us to increase the MD time step. 
+    
+    \end{quote}
+    
+    %r2_comment3
+    \item \textit{Have the authors attempted to compare their results directly to experimental data? 
+    It would be useful to clarify whether the predicted selectivities are expected to be quantitatively
+    accurate or just reflect trends.}
+		 
+    %BJC: This is copied straight from the reviewer response for the previous paper.
+    Author reply: The reviewer makes a valid point. This work started in parallel with experimental
+    work which promised solute flux and selectivities that we could compare directly to our
+	simulations. However, synthesizing an aligned hexagonal phase membrane has been a practical
+	challenge for our experimental collaborators and much of their focus has shifted to 
+	membranes formed by liquid crystals that self-assemble into bicontinuous cubic architectures
+	which are much simpler to synthesize. We have also started to shift our focus towards models 
+	of the bicontinuous cubic phase, which do have much more experimental data. However, our 
+	research into generating physically accurate molecular models of that phase lags our work on
+	time series modeling. In future work, we will be able to apply this technique to these 
+	bicontinuous systems for which we have experimental data.
+
+    %r2_comment4    
+    \item \textit{As two very minor corrections, in page 15 line 8 it should say "Method 1", and in 
+    page 17 line 5 the angle should be H-D-A.}
+    
+    % BJC: reviewer is right, VMD docs are misleading: https://www.ks.uiuc.edu/Research/vmd/plugins/hbonds/
+    Author reply: We thank the reviewer for pointing out our potential errors. For the hydrogen bond
+    criteria we have updated the text from "D-H-A" to "H-D-A". Regarding page 15 line 8 (\textit{"Method 2:
+    Since trajectories generated by Method 2..."}), changing "Method 2" to "Method 1" would actually be 
+    incorrect. At the beginning of Section 2.4, we defined two techniques for generating stochastic 
+    trajectories. 'Method 2' on page 15 line 8 describes the bootstrapping procedures for Method 2 of
+    trajectory generation. This is a clear lack of clarity on the author's part and therefore we 
+    have made an effort to avoid to change our wording to avoid confusion.
+    
+    First, we added additional clarification before describing the bootstrapping procedure (added text
+    is highlighted in red):
+    \begin{quote}
+    Our bootstrapping procedure varied dependent on the method of trajectory generation. \textcolor{red}{
+    The following procedures correspond to the methods described above:}
+    \end{quote}
+    
+    We have also modified the text on page 15 line 8 from the orginal text:
+    \begin{quote}
+    Since trajectories generated by Method 2 are based on the clustered parameter set used to define a
+    single model, we can bootstrap on trajectory ensembles of arbitrary size.
+    \end{quote}
+    to:
+    \begin{quote}
+    Since in our second approach to stochastic trajectory generation described above we use clustered 
+    parameter sets to define each model, we can bootstrap on trajectory ensembles of arbitrary size.
+    \end{quote}
+
+\end{enumerate}
+
+\bibliographystyle{ieeetr}
+\bibliography{stochastic_transport}
+
+\end{document}
+
+
+% LocalWords:  Subdiffusive Solute Nanoscale Coscia leftmargin FBM vy
+% LocalWords:  subdiffusion CTRW sFBM ref solutes antechamber solute
+% LocalWords:  polarizable LLC intramolecular quasiharmonic BJC JCTC
+% LocalWords:  tex fontsize evy Methanol's selectivities MSDDM arXiv
+% LocalWords:  parametrization MSDs MSD timescales renormalizing MFPT
+% LocalWords:  bicontinuous Donnan steric em dt lyotropic
+% LocalWords:  subdiffusive
