@@ -11,6 +11,7 @@
 \usepackage{enumitem}
 \usepackage{scrextend}
 \usepackage[normalem]{ulem}
+\usepackage{soul}
 
 \externaldocument[S-]{Supporting_Information}
 \externaldocument[M-]{Final_Draft}
@@ -36,6 +37,7 @@ text with appropriate numbering.
 
 \begin{enumerate}[label={Comment \theenumi :}, leftmargin=3.9\parindent]
 
+    %r1_comment1
     \item \textit{The manuscript by Coscia et al. analyzes diffusion and transport of solute molecules
     in a low water content lyotropic liquid crystal using a statistical model developed on the basis 
     of molecular dynamics simulations. The purpose of the statistical model is two-fold; first to 
@@ -45,20 +47,53 @@ text with appropriate numbering.
     mechanisms and over long timescales. The manuscript will most likely be of interest to the community
     interested in nanoporous materials for separations.}
     
-    Author reply:
+    Author reply: We thank the reviewer for their thoughtful assessment of our work.
     
+    %r1_comment2
     \item \textit {Unfortunately, because there is no comparison with alternative techniques, it is 
     very difficult to evaluate this new approach relative to previous work that has examined similar 
     issues. There exist numerous other methods for extrapolating MSDs to longer time, which the 
     authors have not discussed. One such method is the “trajectory-extending kinetic Monte Carlo” 
     (TEKMC) approach of Brown and coworkers see e.g. Macromolecules 2010, 43, 9210-9214, 
     Macromolecules 2015, 48, 7346-7358, and J. Phys Chem. B, 2012, 116, 95-103. The authors should 
+    %BJC: well Venkat Ganesan just relinquished his anonymity
     add a comprehensive discussion of how their approach compares to this and similar methods. The 
     paper would be significantly improved if the authors were to perform and present TEKMC results 
     for their system, so that one could better evaluate the performance of their proposed method.}
     
-    Author reply:
+    Author reply: We thank the reviewer for bringing our attention to these other interesting 
+    approaches. They certainly merit discussion as alternative approaches for measuring diffusivity
+    and selectivity. We have added some discussion of these methods to the introduction.
     
+    \begin{quote}
+    TBD
+    \end{quote} 
+    
+    We agree that a full comparison of our method to other methods for computing long timescale 
+    diffusion such as TEKMC would be very interesting and instructive but feel it would be better 
+    suited as a separate study where we could include a number of approaches, including perhaps
+    recent approaches we have developed within our research group.~\cite{} We would also prefer to have
+    sufficient time to appropriately implement the technique for our system. Although it seems a
+    fairly straightforward approach to implement, it is not immediately clear how we could
+    optimally adapt the methodology to a monoclinic unit cell with two dimensional order. 
+%    the grids that divide the homogeneous cubic unit cells of the referenced TEKMC studies to 
+%    our system which uses a monoclinic unit cell and has 2 dimensional order. 
+    
+    As stated by the reviewer, there are two goals of our work: to obtain long timescale MSDs and
+    to understand mechanisms leading to diffusive behavior. TEKMC may be a suitable alternative 
+    approach to obtaining our first goal, but it is not clear that it could give the same level
+    of mechanistic insight that the HDP-AR-HMM offers. Although the work by Hansen et al.
+    (J. Phys Chem. B, 2012, 116, 95-103) is able to provide physical insight into the effect of
+    nanoparticles on diffusion of gaseous penetrants in a polystyrene polymer matrix, it does so
+    by testing hypotheses motivated by observations of the diffusion constant (predicted by TEKMC)
+    in response to different temperatures and nanoparticle concentrations. This is actually pretty
+    in line with the type of analysis we performed in our initial LLC work where we used the
+    mean squared displacement and the qualitative characteristic of the solute time series in
+    order to hypothesize transport mechanisms. In this work we "re-discover" these mechanisms
+    and characterize them in detail using the HDP-AR-HMM while simultaneously providing a method 
+    to estimate diffusion constants.
+    
+    %r1_comment3
     %BJC: not sure if I should ignore the JCTC part completely or basically just say what the editor said.
     \item \textit{Much of the writing seems more suitable for JCTC rather than JPC. I encourage the
     authors to better emphasize and discuss “new physical insight” and “chemical details”, and spend
@@ -69,57 +104,102 @@ text with appropriate numbering.
     system more concretely much earlier in the paper... there is also no information on system 
     size, box dimensions, etc.}
     
-    Author reply: We thank the reviewer for pushing us to include more details about our 
-  molecular simulations in order to boost reproducibility. The length of the manuscript made
-  us wary to include information that could be accessed elsewhere, however there are 
-  benefits to keep this very important section self-contained.
-  
-  We added the following text to address comments related to our choice of force field:
-  
-  New text:
-  \begin{quote}
-  We modeled water molecules using the TIP3P water model,~\cite{jorgensen_comparison_1983}
-  We used the Antechamber module shipped with AmberTools18 to parameterize monomers and 
-  solutes using the Generalized Amber Force Field (GAFF).~\cite{wang_development_2004} We 
-  assigned charges using the AM1-BCC model.~\cite{jakalian_fast_2000,jakalian_fast_2002}
-  GAFF is very commonly used in simulations with diverse organic chemical functionality, 
-  and was developed for consistency within the AMBER ecosystem, which uses TIP3P as the
-  water model. We chose these standard force fields and generalizable parameterization 
-  approaches so that a range of solutes and monomers could be self-consistently and easily 
-  studied. The main goal of this work is to develop stochastic models which can reproduce
-  solute behavior on MD time scales, independent of the choice of force field. In future 
-  work, it may be beneficial to employ specialized force fields, including polarizable 
-  force fields or other higher-order effects in order to improve the accuracy of structure 
-  parameters and selectivity predictions.
-  \end{quote}
-  
-  % comment 4      
-  \item \textit{Lastly, it would be natural to report the size of the system in this
-              section (I found it eventually in the introduction after searching for it 
-              throughout the manuscript).}
-              
-              Author reply:
-              
-              We thank the reviewer for pointing out this missing piece of information. We
-              have added the following text in order to inform the reader of the system's size:
-			  \begin{quote} 
-			  Each unit cell contains $\sim$ 62,000 total atoms.
-			  \end{quote}
+    Author reply: We thank the reviewer for encouraging us to include more physical insight and
+    further details about our molecular simulations. Regarding physical insight, it is our 
+    understanding that the scope of JPC has been expanded to welcome papers which focus on 
+    methodology. We have studied the structure of and transport within this particular LLC system
+    extensively in our previous work.\cite{} We feel strongly that our current work should 
+    emphasize the HDP-AR-HMM as a more general tool for understanding complex dynamics in 
+    systems beyond our example system. We would prefer not to cut any methodological details, as
+    this would hurt the paper's reproducibilty, and lengthening the paper by including additional
+    physical insight may narrow the audience willing to dive in.
     
-    Author reply:
+    %BJC: probably could add a picture of the system. Or is it okay to just reference another
+    % paper? I would probably use the same pic anyways or something very similar.
+  
+    We do agree that there are certain basic simulation details that we have neglected to 
+    mention. Therefore we have made the following edits to section 2.1 of the methods:
+    
+    We added the highlight text to the first sentence of the section:
+    \begin{quote}
+      We studied transport of solutes in the H\textsubscript{II} phase using an atomistic 
+      molecular model of four pores in a monoclinic unit cell with 10\% water by weight, 
+      \hl{totaling 62,000 atoms}.    
+    \end{quote}
+    
+    We have also added the following text describing the model: %BJC: not actually added yet
+    \begin{quote}
+    %BJC: this is verbatim from last response to reviewers.
+    We modeled water molecules using the TIP3P water model,~\cite{jorgensen_comparison_1983}
+    We used the Antechamber module shipped with AmberTools18 to parameterize monomers and 
+    solutes using the Generalized Amber Force Field (GAFF).~\cite{wang_development_2004} We 
+    assigned charges using the AM1-BCC model.~\cite{jakalian_fast_2000,jakalian_fast_2002}
+    GAFF is very commonly used in simulations with diverse organic chemical functionality, 
+    and was developed for consistency within the AMBER ecosystem, which uses TIP3P as the
+    water model. We chose these standard force fields and generalizable parameterization 
+    approaches so that a range of solutes and monomers could be self-consistently and easily 
+    studied. The main goal of this work is to develop stochastic models which can reproduce
+    solute behavior on MD time scales, independent of the choice of force field. In future 
+    work, it may be beneficial to employ specialized force fields, including polarizable 
+    force fields or other higher-order effects in order to improve the accuracy of structure 
+    parameters and selectivity predictions.
+    \end{quote}
 
+    %r1_comment4
     \item \textit{The authors should more clearly note that their discussion largely applies only 
     to very low water content LLC regimes (such as the 10\% LLC studied). For higher water content 
     LLCs (e.g. > 15-20\%) it is straightforward to obtain the diffusion limit from standard MD 
     simulations. While the authors are surely well aware of this, the reader may not be, and it is
     important to clearly distinguish the regimes.}
+    
+    Author reply: We thank the reviewer for making this point. In higher water content systems, 
+    the time scales necessary to reach a diffusive regime will be much more attainable with 
+    standard MD. However, we do contend that our method would still be very useful for studying
+    solute dynamics in these higher water content systems. Interactions characterized by different
+    dynamical behavior even on short time scales can still be highly informative. This is the
+    basis for the point we make in the introduction: "...direct calculations of diffusion 
+    constants may obscure the molecular mechanisms controlling transport". Therefore we would
+    prefer not to limit the range of application of this method. 
+    %BJC: could add something to the effect. If you only care about diffusivity, then this level of modeling isn't necessary in many systems.
 
+    %r1_comment5
     \item \textit{In the HDP-AR-HMM method, it is not clear to me how the solute molecules are 
     constrained to be confined within the pore radius (which they must be on physical grounds 
     based on steric interactions). From Figure 2, it “looks” like this happens to work out, but
     for more complicated systems (e.g. gyroid LLCs with 3D channels) such a constraint may be 
     necessary and it is unclear how the method would generalize. This should be discussed.}
     
+    Author reply: We thank the reviewer for posing this question as this a constraint to which 
+    we gave thought but neglected to emphasize in the main text. 
+    %BJC: he's not saying that solutes should stay in the aqueous pore region right? We talk pretty
+    % extensively about solute behavior in the tails so his steric argument is confusing me.  
+%    First, we would like to clarify
+%    that our simulations suggest that small solutes can partition out of the pores and into
+%    the dense tail region. This is not a particularly favorable move as evidenced by our radial
+%    distribution functions, but it does happen and could conceivably lead to rare jumps of solutes
+%    between pores (although we have not observed any).
+    The constraint on our stochastic simulations is built into the trajectory generation procedure.
+    Each state is parameterized by a mean in the radial direction computed based on the solute's 
+    distance from the \textit{nearest pore center}, making it impossible for the solute to get 
+    further than the pore radius away. Each time a state change occurs, the mean position of the
+    solute in the $r$ dimension jumps to the appropriate mean. However, in the axial direction, 
+    we do not parameterize the mean since it should be unbounded in that dimension. The $z$ mean
+    of each segment is set based on the position immediately before the state change occurred.
+    
+    The generalization of this procedure to three dimensions will be under active investigation 
+    in the near future. As mentioned, we are interested in applying this approach to bicontinuous
+    cubic phases like the gyroid. Based on our current understanding, we would model solute dynamics
+    in three dimensions and set the mean vector, $\mathbf{c}$ equal to $\mathbf{0}$. Of course, this
+    may result in solutes exploring a three dimensional shape that does not share the geometric 
+    features of the studied phase. Our hypothesis is that we can add one or more additional 
+    dimensions to the time series passed to the HDP-AR-HMM that includes a distance from the pore centers. 
+    We could define the pore center using a spline or a surface and transitions would likely
+    favor moves towards states that exist closer to the pore interiors. Alternatively, it may prove
+    necessary to constrain solute positions to the means in each dimension. However, this would require 
+    much more data and would likely require us to explore less expensive models as described in
+    the response to Reviewer 2 below.
+    
+    %r1_comment6
     \item \textit{As stated in the introduction, one motivation for the work is that “...one 
     cannot reliably compute diffusion constants because MSDs are often non-linear on the timescales
     accessible to molecular simulation”. Later on in section 2.4, the authors state “For the 
@@ -128,23 +208,35 @@ text with appropriate numbering.
     definition The authors should clarify. Similarly, in Figure 7, if the simulations are indeed 
     ergodic the red and blue bars should be proportional to each other.}
     
+    Author reply: We thank the reviewer for identifying the potential confusion that could be
+    caused by our use of the word 'ergodic'. Figure 7 clearly demonstrates that individual trajectories
+    are not by themselves ergodic. Our intention was to communicate our assumption that all 24 
+    trajectories visit all possible dynamic states with representative probability. This is 
+    necessary in order to make accurate long timescale predictions. The 5 $\mu_s$ length of our 
+    simulations was intended to increase the validity of this assumption. 
+    
+    The use of the word 'ergodic' is not necessary, therefore we have modified the text as follow
+    to remove the source of miscommunication:
+    
+    %r1_comment7
+    \begin{quote}
+    For the purposes of our analysis, \sout{we assume ergodicity of the 24 solute trajectories. That is,}
+    we assume our MD simulations sample all possible states with the correct frequency.
+    \end{quote}    
+    
     \item \textit{There are no units on Figure 1 y-axis, presumably these are nanometer like the 
     other figures?}
     
+    Author reply: We thank the reviewer for catching our oversight. We double-checked the 
+    other plots in the paper and found the same mistake on the y-axes of Figure 5. Units of nanometers
+    have been added to the y-axes of both plots.
+    
+    %r1_comment8
     \item \textit{Figure captions need to be improved. Wording such as “we plotted...”, “we 
-    calculated...”, “We also analyzed...” should be omitted in figure captions.}
-  
-%  Original text:
-%  \begin{quote}
-%  We treat our system in terms of two well-known classes of anomalous subdiffusion: 
-%  \end{quote}
-%  
-%  New text:
-%  \begin{quote}
-%  In this first approach, we treat our system in terms of two well-known types of molecular
-%  motion which lead to anomalous subdiffusion: 
-%  \end{quote}
-  
+    calculated...”, “We also analyzed...” should be omitted in figure captions.}  
+    % BJC: This seems like the reviewer forcing his own style on us. And seems like a generalization
+    % based on only looking at figure 8. I could just modify parts of figure 8 to please him. But I
+    % think the rest are fine. What do you think?
 		  
   \end{enumerate}
 
