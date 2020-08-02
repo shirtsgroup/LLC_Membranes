@@ -107,16 +107,35 @@
   geometry for high throughput transport. Their pores are lined with the LLC monomer's
   functional groups which can potentially be designed to interact with solutes in a 
   chemically-specific manner. It would be extremely useful to experimentalists if we 
-  could connect LLC monomer design with measurable quantities. This goal is complicated
-  by the non-Brownian hopping and trapping behavior induced by the membrane's diverse
-  topology and inhomogeneous structure resulting in subdiffusive behavior out to 
-  multiple microseconds of simulation.~\cite{coscia_understanding_2019,coscia_chemically_2019}
+  could connect LLC monomer design with measurable quantities such as diffusivity and
+  selectivity. This goal is complicated by the non-Brownian hopping and trapping behavior
+  induced by the membrane's diverse topology and inhomogeneous structure resulting in 
+  subdiffusive behavior out to multiple microseconds of simulation.~\cite{coscia_understanding_2019,coscia_chemically_2019}
+  
+  %r1_comment2
+  A number of approaches have been explored to inexpensively extend the relatively short
+  trajectories output by molecular simulations which exhibit complex diffusive behaviors
+  onto much longer timescales. The trajectory extending kinetic Monte Carlo (TEKMC) approach
+  divides a unit cell into a three dimensional grid and quantifies the transition 
+  probabilities of particles that can move between each subdivision allowing one to generate
+  stochastic trajectories that reach the diffusive regime~\cite{neyertz_trajectory-extending_2010}
+  It is possible to parameterize TEKMC models with relatively short simulation trajectories 
+  which facilitates systematic studies of small perturbations to material constituents.~\cite{hanson_computer_2012}
+  In a related approach, dynamic bond percolation (DBP) theory can be used to quantify the
+  rate of transition between sites in a dynamically disordered medium and long timescale
+  behavior can be propagated using kinetic Monte Carlo simulations.~\cite{druger_dynamic_1983}
+  Webb et al. extended this approach by defining sites based on the molecular details of 
+  a polymer electrolyte system, thus allowing them to explain ion diffusivities predicted by
+  the model in terms of chemically specific interactions.~\cite{webb_chemically_2015}
 
-  We have already advanced our understanding of LLC monomer design in our previous work
-  by building stochastic time series models based on the chemical intuition gained
-  from qualitative MD studies of solute transport in an H\textsubscript{II} phase LLC
-  membrane.~\cite{coscia_chemically_2019,coscia_capturing_2020} We identified three 
-  classes of trapping behavior which result in subdiffusion out to the microsecond 
+%  We have already advanced our understanding of LLC monomer design in our previous work
+%  by building stochastic time series models based on the chemical intuition gained
+%  from qualitative MD studies of solute transport in an H\textsubscript{II} phase LLC
+%  membrane.~\cite{coscia_chemically_2019,coscia_capturing_2020} 
+  Based on the chemical intuition gained from our previous qualitative MD studies of 
+  solute transport in an H\textsubscript{II} phase LLC membrane, we have contributed our
+  own stochastic modeling approaches with goals similar to both TEKMC and DBP.~\cite{coscia_chemically_2019,coscia_capturing_2020}
+  We identified three classes of trapping behavior which result in subdiffusion out to the microsecond 
   time scale. In our first approach to stochastically model this behavior, we treated 
   the system's dynamics as a sequence of anti-correlated hops between power law distributed periods of 
   entrapment, a framework called subordinated fractional Brownian or L\'evy
@@ -127,9 +146,9 @@
   solute dynamics within each of these states. We showed how one could use realizations
   of any stochastic model like these in order to predict macroscopic flux and selectivity. 
   
-  Although powerful and insightful, our previous work required considerable human effort
-  in order to analyze the MD trajectories and to hypothesize stochastic models which
-  matched the behavior of solutes. It would be significantly more useful and broadly 
+  Although powerful and insightful, TEKMC, DBP and our previous work required considerable
+  human effort in order to analyze the MD trajectories and to hypothesize stochastic models 
+  which matched the behavior of solutes. It would be significantly more useful and broadly 
   applicable if we could design an approach which distinguishes and parameterizes varied
   solute dynamics in a data-driven way and leaves a facile way to generate an ensemble
   of stochastic trajectory realizations that can be used to predict macroscopic transport
@@ -261,12 +280,27 @@
 
   \subsection{Molecular Dynamics Simulations}
 
-  We studied transport of solutes in the H\textsubscript{II} phase using an
-  atomistic molecular model of four pores in a monoclinic unit cell with 
-  10\% water by weight, totaling 62,000 atoms. Approximately one third of 
-  the water molecules occupy the tail region with the rest are near the pore 
-  center.~\cite{coscia_chemically_2019}
+  We studied transport of solutes in the H\textsubscript{II} phase using our
+  previously developed atomistic molecular model of four pores in a $9.4\times9.4\times7.6$ nm 
+  monoclinic unit cell with 10\% water by weight, totaling 62,000 atoms. Approximately
+  one third of the water molecules occupy the tail region with the rest are near the
+  pore center.~\cite{coscia_chemically_2019}
 
+  %r1_comment3  
+  We modeled water molecules using the TIP3P water model,~\cite{jorgensen_comparison_1983}
+  We used the Antechamber module shipped with AmberTools18 to parameterize monomers and 
+  solutes using the Generalized Amber Force Field (GAFF).~\cite{wang_development_2004} We 
+  assigned charges using the AM1-BCC model.~\cite{jakalian_fast_2000,jakalian_fast_2002}
+  GAFF is very commonly used in simulations with diverse organic chemical functionality, 
+  and was developed for consistency within the AMBER ecosystem, which uses TIP3P as the
+  water model. We chose these standard force fields and generalizable parameterization 
+  approaches so that a range of solutes and monomers could be self-consistently and easily 
+  studied. The main goal of this work is to develop stochastic models which can reproduce
+  solute behavior on MD time scales, independent of the choice of force field. In future 
+  work, it may be beneficial to employ specialized force fields, including polarizable 
+  force fields or other higher-order effects in order to improve the accuracy of structure 
+  parameters and selectivity predictions.
+    
   We chose to study a subset of 4 of the fastest moving solutes from our previous
   work: methanol, acetic acid, urea and ethylene glycol. In addition to exploring 
   membrane structural space the most, these solutes have a relatively diverse set

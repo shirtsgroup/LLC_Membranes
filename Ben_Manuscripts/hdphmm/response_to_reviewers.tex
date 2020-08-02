@@ -14,7 +14,7 @@
 \usepackage{soul}
 
 \externaldocument[S-]{Supporting_Information}
-\externaldocument[M-]{Final_Draft}
+\externaldocument[M-]{Draft}
 
 \begin{document}
 
@@ -62,17 +62,49 @@ text with appropriate numbering.
     for their system, so that one could better evaluate the performance of their proposed method.}
     
     Author reply: We thank the reviewer for bringing our attention to these other interesting 
-    approaches. They certainly merit discussion as alternative approaches for measuring diffusivity
-    and selectivity. We have added some discussion of these methods to the introduction.
+    approaches. They certainly merit discussion as alternative approaches for estimating mean 
+    squared displacements on long timescales. We have added some discussion of these methods to 
+    the introduction.
     
     \begin{quote}
-    TBD
+    A number of approaches have been explored to inexpensively extend the relatively short
+    trajectories output by molecular simulations which exhibit complex diffusive behaviors
+    onto much longer timescales. The trajectory extending kinetic Monte Carlo (TEKMC) approach
+    divides a unit cell into a three dimensional grid and quantifies the transition 
+    probabilities of particles that can move between each subdivision allowing one to generate
+    stochastic trajectories that reach the diffusive regime~\cite{neyertz_trajectory-extending_2010}
+    It is possible to parameterize TEKMC models with relatively short simulation trajectories 
+    which facilitates systematic studies of small perturbations to material constituents.~\cite{hanson_computer_2012}
+    In a related approach, dynamic bond percolation (DBP) theory can be used to quantify the
+    rate of transition between sites in a dynamically disordered medium and long timescale
+    behavior can be propagated using kinetic Monte Carlo simulations.~\cite{druger_dynamic_1983}
+    Webb et al. extended this approach by defining sites based on the molecular details of 
+    a polymer electrolyte system, thus allowing them to explain ion diffusivities predicted by
+    the model in terms of chemically specific interactions.~\cite{webb_chemically_2015}
     \end{quote} 
+    
+    We have also modified the first sentence of the paragraph that follows in order to maintain
+    good flow.
+    
+    Original text:
+    \begin{quote}
+    We have already advanced our understanding of LLC monomer design in our previous work
+    by building stochastic time series models based on the chemical intuition gained
+    from qualitative MD studies of solute transport in an H\textsubscript{II} phase LLC
+    membrane.
+    \end{quote}
+    
+    Modified text:
+    \begin{quote}
+    Based on the chemical intuition gained from our previous qualitative MD studies of 
+    solute transport in an H\textsubscript{II} phase LLC membrane, we have contributed our
+    own stochastic modeling approaches with goals similar to both TEKMC and DBP.
+    \end{quote}
     
     We agree that a full comparison of our method to other methods for computing long timescale 
     diffusion such as TEKMC would be very interesting and instructive but feel it would be better 
     suited as a separate study where we could include a number of approaches, including perhaps
-    recent approaches we have developed within our research group.~\cite{} We would also prefer to have
+    recent approaches we have developed within our research group.~\cite{coscia_capturing_2020} We would also prefer to have
     sufficient time to appropriately implement the technique for our system. Although it seems a
     fairly straightforward approach to implement, it is not immediately clear how we could
     optimally adapt the methodology to a monoclinic unit cell with two dimensional order. 
@@ -82,7 +114,7 @@ text with appropriate numbering.
     As stated by the reviewer, there are two goals of our work: to obtain long timescale MSDs and
     to understand mechanisms leading to diffusive behavior. TEKMC may be a suitable alternative 
     approach to obtaining our first goal, but it is not clear that it could give the same level
-    of mechanistic insight that the HDP-AR-HMM offers. Although the work by Hansen et al.
+    of mechanistic insight that the HDP-AR-HMM offers. Although the work by Hanson et al.
     (J. Phys Chem. B, 2012, 116, 95-103) is able to provide physical insight into the effect of
     nanoparticles on diffusion of gaseous penetrants in a polystyrene polymer matrix, it does so
     by testing hypotheses motivated by observations of the diffusion constant (predicted by TEKMC)
@@ -90,8 +122,8 @@ text with appropriate numbering.
     in line with the type of analysis we performed in our initial LLC work where we used the
     mean squared displacement and the qualitative characteristic of the solute time series in
     order to hypothesize transport mechanisms. In this work we "re-discover" these mechanisms
-    and characterize them in detail using the HDP-AR-HMM while simultaneously providing a method 
-    to estimate diffusion constants.
+    with minimal human intervention and characterize them in detail using the HDP-AR-HMM while 
+    \textit{simultaneously} providing a method to estimate diffusion constants.
     
     %r1_comment3
     %BJC: not sure if I should ignore the JCTC part completely or basically just say what the editor said.
@@ -107,8 +139,8 @@ text with appropriate numbering.
     Author reply: We thank the reviewer for encouraging us to include more physical insight and
     further details about our molecular simulations. Regarding physical insight, it is our 
     understanding that the scope of JPC has been expanded to welcome papers which focus on 
-    methodology. We have studied the structure of and transport within this particular LLC system
-    extensively in our previous work.\cite{} We feel strongly that our current work should 
+    methodology. We have studied the structure of and transport of solutes within this 
+    particular LLC system extensively in our previous work.\cite{coscia_chemically_2019} We feel strongly that our current work should 
     emphasize the HDP-AR-HMM as a more general tool for understanding complex dynamics in 
     systems beyond our example system. We would prefer not to cut any methodological details, as
     this would hurt the paper's reproducibilty, and lengthening the paper by including additional
@@ -122,14 +154,15 @@ text with appropriate numbering.
     
     We added the highlight text to the first sentence of the section:
     \begin{quote}
-      We studied transport of solutes in the H\textsubscript{II} phase using an atomistic 
-      molecular model of four pores in a monoclinic unit cell with 10\% water by weight, 
+      We studied transport of solutes in the H\textsubscript{II} phase using \hl{our
+      previously developed} atomistic molecular model of four pores in a 
+      \hl{$9.4\times9.4\times7.6$ nm} monoclinic unit cell with 10\% water by weight, 
       \hl{totaling 62,000 atoms}.    
     \end{quote}
     
     We have also added the following text describing the model: %BJC: not actually added yet
     \begin{quote}
-    %BJC: this is verbatim from last response to reviewers.
+    %BJC: this is verbatim from last response to reviewers so far
     We modeled water molecules using the TIP3P water model,~\cite{jorgensen_comparison_1983}
     We used the Antechamber module shipped with AmberTools18 to parameterize monomers and 
     solutes using the Generalized Amber Force Field (GAFF).~\cite{wang_development_2004} We 
@@ -138,7 +171,9 @@ text with appropriate numbering.
     and was developed for consistency within the AMBER ecosystem, which uses TIP3P as the
     water model. We chose these standard force fields and generalizable parameterization 
     approaches so that a range of solutes and monomers could be self-consistently and easily 
-    studied. The main goal of this work is to develop stochastic models which can reproduce
+    studied. 
+    %BJC: The following wasn't explicitly asked for, so I could omit    
+    The main goal of this work is to develop stochastic models which can reproduce
     solute behavior on MD time scales, independent of the choice of force field. In future 
     work, it may be beneficial to employ specialized force fields, including polarizable 
     force fields or other higher-order effects in order to improve the accuracy of structure 
@@ -148,7 +183,7 @@ text with appropriate numbering.
     %r1_comment4
     \item \textit{The authors should more clearly note that their discussion largely applies only 
     to very low water content LLC regimes (such as the 10\% LLC studied). For higher water content 
-    LLCs (e.g. > 15-20\%) it is straightforward to obtain the diffusion limit from standard MD 
+    LLCs (e.g. $>$ 15-20\%) it is straightforward to obtain the diffusion limit from standard MD 
     simulations. While the authors are surely well aware of this, the reader may not be, and it is
     important to clearly distinguish the regimes.}
     
@@ -157,10 +192,11 @@ text with appropriate numbering.
     standard MD. However, we do contend that our method would still be very useful for studying
     solute dynamics in these higher water content systems. Interactions characterized by different
     dynamical behavior even on short time scales can still be highly informative. This is the
-    basis for the point we make in the introduction: "...direct calculations of diffusion 
+    basis for the point we make in the introduction:``...direct calculations of diffusion 
     constants may obscure the molecular mechanisms controlling transport". Therefore we would
     prefer not to limit the range of application of this method. 
-    %BJC: could add something to the effect. If you only care about diffusivity, then this level of modeling isn't necessary in many systems.
+    %BJC: If it would be better to modify the text, then we could add something to the effect: If you only care about diffusivity, then this level of
+    % modeling isn't necessary in many systems.
 
     %r1_comment5
     \item \textit{In the HDP-AR-HMM method, it is not clear to me how the solute molecules are 
@@ -199,6 +235,8 @@ text with appropriate numbering.
     much more data and would likely require us to explore less expensive models as described in
     the response to Reviewer 2 below.
     
+    %BJC: figured I'd get your feedback on above before writing the part that will go into the text.
+    
     %r1_comment6
     \item \textit{As stated in the introduction, one motivation for the work is that “...one 
     cannot reliably compute diffusion constants because MSDs are often non-linear on the timescales
@@ -210,13 +248,13 @@ text with appropriate numbering.
     
     Author reply: We thank the reviewer for identifying the potential confusion that could be
     caused by our use of the word 'ergodic'. Figure 7 clearly demonstrates that individual trajectories
-    are not by themselves ergodic. Our intention was to communicate our assumption that all 24 
+    are not by themselves ergodic. Our intention was to communicate our assumption that collectively all 24 
     trajectories visit all possible dynamic states with representative probability. This is 
-    necessary in order to make accurate long timescale predictions. The 5 $\mu_s$ length of our 
+    necessary in order to make accurate long timescale predictions. The 5 $\mu s$ length of our 
     simulations was intended to increase the validity of this assumption. 
     
-    The use of the word 'ergodic' is not necessary, therefore we have modified the text as follow
-    to remove the source of miscommunication:
+    The use of the word `ergodic' is not necessary, therefore we have modified the text as follows
+    to remove the source of potential miscommunication:
     
     %r1_comment7
     \begin{quote}
@@ -284,10 +322,10 @@ text with appropriate numbering.
     could explore systems built with fewer LLC monomers by making the membrane pores shorter. We 
     could also build systems with higher concentrations of solutes in order to gather more 
     dynamical data on shorter timescales. Using what we have learned about the radial distribution
-    functions of these solutes in this and our previous work\cite{}, it may be possible to 
+    functions of these solutes in this and our previous work~\cite{coscia_chemically_2019}, it may be possible to 
     learn how to create initial configurations with solutes initially distributed in a way that
     is close to their equilibrium distribution, allowing solutes to thoroughly explore the 
-    accessible membrane structural space more quickly and reducing the amount unequilibrated
+    accessible membrane structural space more quickly and reducing the amount of unequilibrated
     data that must be discarded. % could mention GCMC?
     Finally, it may be possible to speed up our simulations by 
     reducing the number of atoms using united-atom representations of the liquid crystal monomers.
@@ -319,12 +357,12 @@ text with appropriate numbering.
     
     % BJC: reviewer is right, VMD docs are misleading: https://www.ks.uiuc.edu/Research/vmd/plugins/hbonds/
     Author reply: We thank the reviewer for pointing out our potential errors. For the hydrogen bond
-    criteria we have updated the text from "D-H-A" to "H-D-A". Regarding page 15 line 8 (\textit{"Method 2:
-    Since trajectories generated by Method 2..."}), changing "Method 2" to "Method 1" would actually be 
+    criteria we have updated the text from ``D-H-A" to ``H-D-A". Regarding page 15 line 8 (``Method 2:
+    Since trajectories generated by Method 2..."), changing ``Method 2" to ``Method 1" would actually be 
     incorrect. At the beginning of Section 2.4, we defined two techniques for generating stochastic 
-    trajectories. 'Method 2' on page 15 line 8 describes the bootstrapping procedures for Method 2 of
+    trajectories. ``Method 2'' on page 15 line 8 describes the bootstrapping procedures for Method 2 of
     trajectory generation. This is a clear lack of clarity on the author's part and therefore we 
-    have made an effort to avoid to change our wording to avoid confusion.
+    have made an effort to modify our wording to avoid confusion.
     
     First, we added additional clarification before describing the bootstrapping procedure (added text
     is highlighted in red):
@@ -347,7 +385,7 @@ text with appropriate numbering.
 \end{enumerate}
 
 \bibliographystyle{ieeetr}
-\bibliography{stochastic_transport}
+\bibliography{hdphmm}
 
 \end{document}
 
