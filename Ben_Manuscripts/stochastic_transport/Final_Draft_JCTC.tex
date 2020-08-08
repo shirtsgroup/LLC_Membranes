@@ -342,7 +342,7 @@
   they both have potential value dependent on a given research study's goals.
   The anomalous diffusion approach provides a systematic way to compare the
   dynamical behavior of different solutes based solely on the time series of 
-  their center of mass positions. The process of choosing the correct anomlous
+  their center of mass positions. The process of choosing the correct anomalous
   diffusion modeling approach provides its own mechanistic insight since it 
   requires a thorough analysis of solute time series behavior. One can simulate
   different solutes, compare the fit model parameters and relate them back to 
@@ -417,11 +417,11 @@
   
   \label{r1_comment2} % BJCR: description of force field.   
   We modeled water molecules using the TIP3P water model,~\cite{jorgensen_comparison_1983}
-  We used the antechamber module shipped with AmberTools18 to parameterize monomers and 
+  We used the Antechamber module shipped with AmberTools18 to parameterize monomers and 
   solutes using the Generalized Amber Force Field (GAFF).~\cite{wang_development_2004} We 
   assigned charges using the AM1-BCC model.~\cite{jakalian_fast_2000,jakalian_fast_2002}
   GAFF is very commonly used in simulations with diverse organic chemical functionality, 
-  and was developed for consistency within the AMBER ecosystem, which used TIP3P as the
+  and was developed for consistency within the AMBER ecosystem, which uses TIP3P as the
   water model. We chose these standard force fields and generalizable parameterization 
   approaches so that a range of solutes and monomers could be self-consistently and easily 
   studied. The main goal of this work is to develop stochastic models which can reproduce
@@ -1648,7 +1648,7 @@
   \end{figure}
   
   Despite relatively good predictions of the MD MSD, qualitative mismatch
-  between stoachastic and MD simulated trajectories suggest that the Markov
+  between stochastic and MD simulated trajectories suggest that the Markov
   state-dependent dynamical model may be giving the right answers for the
   wrong reasons. We plotted typical realizations of the Markov state-dependent
   dynamical model for each solute and compared them to MD in 
@@ -1786,7 +1786,7 @@
   dwell times do not affect length dependence since each solute exhibits
   different hopping and trapping behavior yet are all parameterized by the same
   value of $\beta$ when $H$=0.5. We further verified this claim by removing
-  hop anti-correlation and setting all dwell times equal to one timestep,
+  hop anti-correlation and setting all dwell times equal to one time step,
   effectively simulating Brownian motion.  The length dependence remains
   unchanged. 
 
@@ -1987,7 +1987,7 @@
   
   In a broader context, it is clear that time series modeling may be a useful way
   to form a clear connection between complex solute dynamics on the nanosecond 
-  timescale and macroscopic observables. On the nanoscopic scale, one can both 
+  timescale and macroscopic observables. On the nanoscale, one can both 
   learn and characterize dynamical modes in order to identify areas of potentially
   impactful molecular-level design changes. For example, it may be possible to 
   modify solute transport rates and selectivities in LLC membranes by redesigning 
@@ -2056,5 +2056,8 @@
 % LocalWords:  msmbuilder diffusivity Eq vt dz erfc permeabilities Kedem zoubi
 % LocalWords:  Katchalsky's nanofiltration ultrafiltration trans convective py
 % LocalWords:  bothmode todo eyetest Methanol's acid's subplots methanol's alt
-% LocalWords:  timestep pre selectivtiy foulants subfigures RWFs roman github
-% LocalWords:  al linkable nanopores klages
+% LocalWords:  time step pre selectivtiy foulants subfigures RWFs roman github
+% LocalWords:  al linkable nanopores klages BJCR BJCB MRSB BJCA BJCC
+% LocalWords:  Donnan steric Antechamber polarizable intramolecular
+% LocalWords:  quasiharmonic ester decorrelated nanoscale
+% LocalWords:  nanoscopic impactful
