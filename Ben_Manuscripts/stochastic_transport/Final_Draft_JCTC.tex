@@ -58,17 +58,6 @@
   we use our models to parameterize the behavior of the same systems, so we can generate
   characteristic trajectory realizations that can be used to predict solute mean squared 
   displacements, solute flux, and solute selectivity in macroscopic length pores.
-  
-%  Mathematically modeling complex transport phenomena can be a powerful tool
-%  for extracting important physical information from molecular simulations. 
-%  In this study, we present two new approaches that use stochastic time series
-%  modeling to predict long timescale behavior and macroscopic properties 
-%  from molecular simulation which can be generalized to other molecular systems
-%  where complex diffusion occurs. Specifically, we parameterize our models using
-%  long molecular dynamics (MD) simulation trajectories of a cross-linked 
-%  H\textsubscript{II} phase lyotropic liquid crystal (LLC) membrane in order to
-%  predict solute mean squared displacements (MSDs), solute flux, and
-%  solute selectivity in macroscopic length pores.
 
   First, using anomalous diffusion theory, we show how solute dynamics can be
   modeled as a fractional diffusion process subordinate to a continuous time 
@@ -1726,7 +1715,8 @@
   At this time, it is infeasible for us to simulate transport through a pore over 100 times 
   longer without investing significant effort into writing and optimizing 
   new code that can handle simulation of long trajectories with correlation
-  between all steps.
+  between all steps. However, the high quality of our fits suggests that 
+  additional effort on this front may be misplaced at this time. 
   % old text
 %  The RAM requirements and
 %  performance scales greater than linearly and thus would take an infeasible

@@ -93,7 +93,7 @@
   and the macroscopic diffusion constant. However, for systems which exhibit complex 
   short timescale subdiffusive dynamics, one cannot reliably compute diffusion 
   constants because MSDs are often non-linear on the timescales accessible to molecular
-  simulation. Additionally, direct calculations of diffusion constant may obscure the
+  simulation. Additionally, direct calculations of diffusion constants may obscure the
   molecular mechanisms controlling transport, hindering the ability to understand or 
   modulate these mechanisms in new membrane materials. We are therefore in need of a 
   more flexible approach for modeling solute dynamics which makes less assumptions 
@@ -107,16 +107,35 @@
   geometry for high throughput transport. Their pores are lined with the LLC monomer's
   functional groups which can potentially be designed to interact with solutes in a 
   chemically-specific manner. It would be extremely useful to experimentalists if we 
-  could connect LLC monomer design with measurable quantities. This goal is complicated
-  by the non-Brownian hopping and trapping behavior induced by the membrane's diverse
-  topology and inhomogeneous structure resulting in subdiffusive behavior out to 
-  multiple microseconds of simulation.~\cite{coscia_understanding_2019,coscia_chemically_2019}
+  could connect LLC monomer design with measurable quantities such as diffusivity and
+  selectivity. This goal is complicated by the non-Brownian hopping and trapping behavior
+  induced by the membrane's diverse topology and inhomogeneous structure resulting in 
+  subdiffusive behavior out to multiple microseconds of simulation.~\cite{coscia_understanding_2019,coscia_chemically_2019}
+  
+  %r1_comment2
+  A number of approaches have been explored to inexpensively extend the relatively short
+  trajectories output by molecular simulations which exhibit complex diffusive behaviors
+  onto much longer timescales. The trajectory extending kinetic Monte Carlo (TEKMC) approach
+  divides a unit cell into a three dimensional grid and quantifies the transition 
+  probabilities of particles that can move between each subdivision allowing one to generate
+  stochastic trajectories that reach the diffusive regime~\cite{neyertz_trajectory-extending_2010}
+  It is possible to parameterize TEKMC models with relatively short simulation trajectories 
+  which facilitates systematic studies of small perturbations to material constituents.~\cite{hanson_computer_2012}
+  In a related approach, dynamic bond percolation (DBP) theory can be used to quantify the
+  rate of transition between sites in a dynamically disordered medium and long timescale
+  behavior can be propagated using kinetic Monte Carlo simulations.~\cite{druger_dynamic_1983}
+  Webb et al. extended this approach by defining sites based on the molecular details of 
+  a polymer electrolyte system, thus allowing them to explain ion diffusivities predicted by
+  the model in terms of chemically specific interactions.~\cite{webb_chemically_2015}
 
-  We have already advanced our understanding of LLC monomer design in our previous work
-  by building stochastic time series models based on the chemical intuition gained
-  from qualitative MD studies of solute transport in an H\textsubscript{II} phase LLC
-  membrane.~\cite{coscia_chemically_2019,coscia_capturing_2020} We identified three 
-  classes of trapping behavior which result in subdiffusion out to the microsecond 
+%  We have already advanced our understanding of LLC monomer design in our previous work
+%  by building stochastic time series models based on the chemical intuition gained
+%  from qualitative MD studies of solute transport in an H\textsubscript{II} phase LLC
+%  membrane.~\cite{coscia_chemically_2019,coscia_capturing_2020} 
+  Based on the chemical intuition gained from our previous qualitative MD studies of 
+  solute transport in an H\textsubscript{II} phase LLC membrane, we have contributed our
+  own stochastic modeling approaches with goals similar to both TEKMC and DBP.~\cite{coscia_chemically_2019,coscia_capturing_2020}
+  We identified three classes of trapping behavior which result in subdiffusion out to the microsecond 
   time scale. In our first approach to stochastically model this behavior, we treated 
   the system's dynamics as a sequence of anti-correlated hops between power law distributed periods of 
   entrapment, a framework called subordinated fractional Brownian or L\'evy
@@ -127,9 +146,9 @@
   solute dynamics within each of these states. We showed how one could use realizations
   of any stochastic model like these in order to predict macroscopic flux and selectivity. 
   
-  Although powerful and insightful, our previous work required considerable human effort
-  in order to analyze the MD trajectories and to hypothesize stochastic models which
-  matched the behavior of solutes. It would be significantly more useful and broadly 
+  Although powerful and insightful, TEKMC, DBP and our previous work required considerable
+  human effort in order to analyze the MD trajectories and to hypothesize stochastic models 
+  which matched the behavior of solutes. It would be significantly more useful and broadly 
   applicable if we could design an approach which distinguishes and parameterizes varied
   solute dynamics in a data-driven way and leaves a facile way to generate an ensemble
   of stochastic trajectory realizations that can be used to predict macroscopic transport
@@ -261,11 +280,27 @@
 
   \subsection{Molecular Dynamics Simulations}
 
-  We studied transport of solutes in the H\textsubscript{II} phase using an
-  atomistic molecular model of four pores in a monoclinic unit cell with 
-  10\% water by weight. Approximately one third of the water molecules 
-  occupy the tail region with the rest are near the pore center.~\cite{coscia_chemically_2019}
+  We studied transport of solutes in the H\textsubscript{II} phase using our
+  previously developed atomistic molecular model of four pores in a $9.4\times9.4\times7.6$ nm 
+  monoclinic unit cell with 10\% water by weight, totaling 62,000 atoms. Approximately
+  one third of the water molecules occupy the tail region with the rest are near the
+  pore center.~\cite{coscia_chemically_2019}
 
+  %r1_comment3  
+  We modeled water molecules using the TIP3P water model,~\cite{jorgensen_comparison_1983}
+  We used the Antechamber module shipped with AmberTools18 to parameterize monomers and 
+  solutes using the Generalized Amber Force Field (GAFF).~\cite{wang_development_2004} We 
+  assigned charges using the AM1-BCC model.~\cite{jakalian_fast_2000,jakalian_fast_2002}
+  GAFF is very commonly used in simulations with diverse organic chemical functionality, 
+  and was developed for consistency within the AMBER ecosystem, which uses TIP3P as the
+  water model. We chose these standard force fields and generalizable parameterization 
+  approaches so that a range of solutes and monomers could be self-consistently and easily 
+  studied. The main goal of this work is to develop stochastic models which can reproduce
+  solute behavior on MD time scales, independent of the choice of force field. In future 
+  work, it may be beneficial to employ specialized force fields, including polarizable 
+  force fields or other higher-order effects in order to improve the accuracy of structure 
+  parameters and selectivity predictions.
+    
   We chose to study a subset of 4 of the fastest moving solutes from our previous
   work: methanol, acetic acid, urea and ethylene glycol. In addition to exploring 
   membrane structural space the most, these solutes have a relatively diverse set
@@ -472,8 +507,10 @@
   trajectories from clustered parameter sets can give results that are qualitatively 
   and quantitatively different from those generated by unclustered parameter sets.
   %BJC: added based on Chris' suggestion.
-  For the purposes of our analysis, we assume ergodicity of the 24 solute trajectories.
-  That is, we assume our MD simulations sample all possible states with the correct 
+  For the purposes of our analysis,
+  % we assume ergodicity of the 24 solute trajectories.
+  %That is, 
+  we assume our MD simulations sample all possible states with the correct 
   frequency.
   In our discussion we evaluate both methods:
   \begin{enumerate}[label={Method \theenumi :}, leftmargin=3.5\parindent]
@@ -505,19 +542,21 @@
   
   We reported the mean and $1 \sigma$ confidence intervals of the MSDs based on the 
   results of 200 bootstrap trials. Our bootstrapping procedure varied dependent on the
-  method of trajectory generation:
-  %MRS: this is a bit confusing.  Is there an expectation these should give consistent parameters?
-  %MRS: the second is boostrapping an MSD over 1000 trajectories, and the first is boostrapping an MSD over 24 trajectories.
-  %MRS: these should have different amounts of noise, making them hard to compare? Is this an issue?
-  %BJC: added some clarification to Method 2
+  method of trajectory generation. The following procedures correspond to the methods
+  described above:
   \begin{enumerate}[label={Method \theenumi :}, leftmargin=3.5\parindent]
   	\item For each bootstrap trial, we generated 24 stochastic trajectories since we
   	are constrained to sample with replacement from the 24 independent HDP-AR-HMM models.
     The result of each trial is the mean of the MSDs of the trajectories
-    constituting the bootstrapped ensemble. 
-    \item Since trajectories generated by Method 2 are based on the clustered parameter 
-    set used to define a single model, we can bootstrap on trajectory ensembles of
-    arbitrary size. For each bootstrap trial, we generated an ensemble of 1000 independent
+    constituting the bootstrapped ensemble.
+    %r2_comment4
+    \item Since in our second approach to stochastic trajectory generation described 
+    above we use clustered parameter sets to define each model, we can bootstrap on 
+    trajectory ensembles of arbitrary size. 
+%    \item Since trajectories generated by Method 2 are based on the clustered parameter 
+%    set used to define a single model, we can bootstrap on trajectory ensembles of
+%    arbitrary size. 
+    For each bootstrap trial, we generated an ensemble of 1000 independent
     stochastic trajectories, calculated the MSD of each and then sampled, with replacement,
     from the ensemble. This larger ensemble allows us to achieve lower uncertainties with
     the same number of bootstrap trials as Method 1. 
@@ -583,7 +622,7 @@
   between each solute and the membrane as a function of time. Based on the 
   geometric criteria of Luzar and Chandler, we define a hydrogen bond to exist 
   if the distance between donor, D, and acceptor, A, atoms is less than 
-  3.5\AA~and the angle formed by $D-H \cdots A$ is less than $30\degree$.~\cite{luzar_effect_1996}
+  3.5\AA~and the angle formed by $H-D-A$ is less than $30\degree$.~\cite{luzar_effect_1996}
   
   \textit{Hydrogen bond lifetimes}: We estimated the lifetime of hydrogen bonds by 
   recording the length of sequential frames where solutes remained hydrogen bonded.
