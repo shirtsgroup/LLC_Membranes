@@ -164,6 +164,6 @@ for i, dists in enumerate(zip(dwell_dist, hop_dist)):
 plt.legend(labels, loc='upper left', fontsize=14)
 plt.tight_layout()
 #plt.savefig('toc_msd.png')
-plt.savefig('%dmode_msd_comparison_%s.pdf' % (nmodes,res))
+#plt.savefig('%dmode_msd_comparison_%s.pdf' % (nmodes,res))
 if not args.noshow:
 	plt.show()

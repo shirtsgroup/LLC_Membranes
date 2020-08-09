@@ -103,14 +103,22 @@
   crystal (LLC) monomers, a class of amphiphilic molecules whose ordered self-assembled
   phases can be cross-linked into mechanically strong membranes capable of highly 
   selective separations. Inverted hexagonal phase, or H\textsubscript{II}, LLC membranes
-  are characterized by hexagonally packed, uniform-sized and straight pores, an ideal
-  geometry for high throughput transport. Their pores are lined with the LLC monomer's
-  functional groups which can potentially be designed to interact with solutes in a 
-  chemically-specific manner. It would be extremely useful to experimentalists if we 
-  could connect LLC monomer design with measurable quantities such as diffusivity and
-  selectivity. This goal is complicated by the non-Brownian hopping and trapping behavior
-  induced by the membrane's diverse topology and inhomogeneous structure resulting in 
-  subdiffusive behavior out to multiple microseconds of simulation.~\cite{coscia_understanding_2019,coscia_chemically_2019}
+  are synthesized with 10 \% water by weight and are characterized by hexagonally packed,
+  uniform-sized and straight pores, an ideal geometry for high throughput transport. 
+  Their pores are lined with the LLC monomer's functional groups which can potentially 
+  be designed to interact with solutes in a chemically-specific manner. It would be 
+  extremely useful to experimentalists if we could connect LLC monomer design with 
+  measurable quantities such as diffusivity and selectivity.
+  %r1_comment4
+  In many systems, including LLC membranes with higher water contents, making this 
+  connection is a relatively straightforward calculation since small solutes and water
+  can move relatively unimpeded and therefore enter a diffusive regime on timescales
+  accessible to MD. When possible, we encourage the reader to take advantage of the
+  simplest approach possible.
+  However, in the systems of interested to us,
+  this goal is complicated by the non-Brownian hopping and trapping behavior induced by the membrane's diverse
+  topology and inhomogeneous structure resulting in subdiffusive behavior out to 
+  multiple microseconds of simulation.~\cite{coscia_understanding_2019,coscia_chemically_2019}
   
   %r1_comment2
   A number of approaches have been explored to inexpensively extend the relatively short
@@ -290,7 +298,7 @@
   We modeled water molecules using the TIP3P water model,~\cite{jorgensen_comparison_1983}
   We used the Antechamber module shipped with AmberTools18 to parameterize monomers and 
   solutes using the Generalized Amber Force Field (GAFF).~\cite{wang_development_2004} We 
-  assigned charges using the AM1-BCC model.~\cite{jakalian_fast_2000,jakalian_fast_2002}
+  assigned charges using the AM1-BCC model as implemented in Antechamber.~\cite{jakalian_fast_2000,jakalian_fast_2002}
   GAFF is very commonly used in simulations with diverse organic chemical functionality, 
   and was developed for consistency within the AMBER ecosystem, which uses TIP3P as the
   water model. We chose these standard force fields and generalizable parameterization 
@@ -992,7 +1000,7 @@
   because methanol is very small and it is easier for it to partition into the tail
   region where there are fewer groups with which it can interact (see Figure~\ref{fig:rdf_summary}).
   Acetic acid, urea and ethylene glycol are slightly larger than methanol and contain 
-  multiple polar substituents which stabilize them closer to the pore region.
+  multiple polar substituents which stabilize them closer to the pore center.
   These three solutes also participate in significantly more sodium ion association. 
   In our previous work, we showed that sodium ions frequently associate with the 
   carbonyl groups of acetic acid and urea because the carbonyl oxygen atoms are

@@ -56,8 +56,6 @@ text with appropriate numbering.
     authors have not discussed. One such method is the “trajectory-extending kinetic Monte Carlo” 
     (TEKMC) approach of Brown and coworkers see e.g. Macromolecules 2010, 43, 9210-9214, 
     Macromolecules 2015, 48, 7346-7358, and J. Phys Chem. B, 2012, 116, 95-103. The authors should 
-    %BJC: well Venkat Ganesan just relinquished his anonymity
-    %MRS: the paper will get in, I'm sure, and now we know better how he thinks, so all good.
     add a comprehensive discussion of how their approach compares to this and similar methods. The 
     paper would be significantly improved if the authors were to perform and present TEKMC results 
     for their system, so that one could better evaluate the performance of their proposed method.}
@@ -107,12 +105,10 @@ text with appropriate numbering.
     diffusion such as TEKMC would be very interesting and instructive but feel it would be better 
     suited as a separate study where we could include a number of approaches, including perhaps
     recent approaches we have developed within our research group.~\cite{coscia_capturing_2020}
-    Such a large-scale comparison would take more space and time than would be appropriate for the current paper.
-    % We would also prefer to have
-    %sufficient time to appropriately implement the technique for our system.
-    Although method such as TEKMC seems a
-    fairly straightforward approach to implement, it is not immediately clear how we could
-    optimally adapt the methodology to a monoclinic unit cell with two dimensional order. 
+    Such a large-scale comparison would take more space and time than would be appropriate for 
+    the current paper. Although method such as TEKMC seems a fairly straightforward approach to
+    implement, it is not immediately clear how we could optimally adapt the methodology to a 
+    monoclinic unit cell with two dimensional order. 
 %    the grids that divide the homogeneous cubic unit cells of the referenced TEKMC studies to 
 %    our system which uses a monoclinic unit cell and has 2 dimensional order. 
     
@@ -124,12 +120,11 @@ text with appropriate numbering.
     nanoparticles on diffusion of gaseous penetrants in a polystyrene polymer matrix, it does so
     by testing hypotheses motivated by observations of the diffusion constant (predicted by TEKMC)
     in response to different temperatures and nanoparticle concentrations. This is actually pretty
-    in line with the type of analysis we performed in our initial LLC work
-    %MRS: you mean your 2nd paper? refer specifically
-    where we used the mean squared displacement and the qualitative characteristic of the solute time series in
-    order to hypothesize transport mechanisms. In this work we "re-discover" these mechanisms
-    with minimal human intervention and characterize them in detail using the HDP-AR-HMM while 
-    \textit{simultaneously} providing a method to estimate diffusion constants.
+    in line with the type of analysis we performed in our initial LLC transport work (J. Phys Chem. B, 2019, 123, 6314-6330)
+    where we used the mean squared displacement and the qualitative characteristics of the solute
+    time series in order to hypothesize transport mechanisms. In this work we "re-discover" these
+    mechanisms with minimal human intervention and characterize them in detail using the 
+    HDP-AR-HMM while \textit{simultaneously} providing a method to estimate diffusion constants.
     
     %r1_comment3
     %BJC: not sure if I should ignore the JCTC part completely or basically just say what the editor said.
@@ -143,19 +138,18 @@ text with appropriate numbering.
     system more concretely much earlier in the paper... there is also no information on system 
     size, box dimensions, etc.}
     
-    Author reply: We thank the reviewer for encouraging us to include
-    more physical insight and further details about our molecular
-    simulations. We received feedback from the editor along with these
-    comments that the scope of JPC has been expanding, and that the
-    methodological details are appropriate.
-    We have studied the structure of and transport of solutes within this 
-    particular LLC system extensively in our previous work.\cite{coscia_chemically_2019}
-    We feel strongly that our current work should 
-    emphasize the HDP-AR-HMM as a more general tool for understanding complex dynamics in 
-    systems beyond our example system. We would prefer not to cut any methodological details, as
-    this would hurt the paper's reproducibility, and lengthening the paper by including additional
-    physical insight may narrow the audience willing to dive in.
-    
+    Author reply: We thank the reviewer for encouraging us to include more physical insight and
+    further details about our molecular simulations. We received feedback from the editor along 
+    with these comments that the scope of JPC has been expanding, and that the methodological 
+    details are appropriate. We have studied the structure of and transport of solutes within 
+    this particular LLC system extensively in our previous work.~\cite{coscia_chemically_2019}
+    We feel strongly that our current work should emphasize the HDP-AR-HMM as a more general 
+    tool for understanding complex dynamics in systems beyond our example system. We would prefer
+    not to cut any methodological details, as this would hurt the paper's reproducibility, and
+    lengthening the paper by including additional physical insight may narrow the audience willing
+    to dive in.
+
+    %TODO    
     %BJC: probably could add a picture of the system. Or is it okay to just reference another
     % paper? I would probably use the same pic anyways or something very similar.
     %MRS: never bad to include pictures of the system, so go ahead.
@@ -163,7 +157,7 @@ text with appropriate numbering.
     We do agree that there are certain basic simulation details that we have neglected to 
     mention. Therefore we have made the following edits to section 2.1 of the methods:
     
-    We added the highlight text to the first sentence of the section:
+    We added the highlighted text to the first sentence of the section:
     \begin{quote}
       We studied transport of solutes in the H\textsubscript{II} phase using \hl{our
       previously developed} atomistic molecular model of four pores in a 
@@ -171,23 +165,17 @@ text with appropriate numbering.
       \hl{totaling 62,000 atoms}.    
     \end{quote}
     
-    We have also added the following text describing the model: %BJC: not actually added yet
+    We have also added the following text describing the model:
     \begin{quote}
-    %BJC: this is verbatim from last response to reviewers so far
     We modeled water molecules using the TIP3P water model,~\cite{jorgensen_comparison_1983}
     We used the Antechamber module shipped with AmberTools18 to parameterize monomers and 
     solutes using the Generalized Amber Force Field (GAFF).~\cite{wang_development_2004} We 
-    assigned charges using the AM1-BCC model
-    %MRS: added (here, not in text)
-    as implemented in Antechamber.~\cite{jakalian_fast_2000,jakalian_fast_2002}
+    assigned charges using the AM1-BCC model as implemented in Antechamber.~\cite{jakalian_fast_2000,jakalian_fast_2002}
     GAFF is very commonly used in simulations with diverse organic chemical functionality, 
     and was developed for consistency within the AMBER ecosystem, which uses TIP3P as the
     water model. We chose these standard force fields and generalizable parameterization 
     approaches so that a range of solutes and monomers could be self-consistently and easily 
-    studied. 
-    %BJC: The following wasn't explicitly asked for, so I could omit
-    %MRS: I think it's appropriate to include.
-    The main goal of this work is to develop stochastic models which can reproduce
+    studied. The main goal of this work is to develop stochastic models which can reproduce
     solute behavior on MD time scales, independent of the choice of force field. In future 
     work, it may be beneficial to employ specialized force fields, including polarizable 
     force fields or other higher-order effects in order to improve the accuracy of structure 
@@ -201,21 +189,48 @@ text with appropriate numbering.
     simulations. While the authors are surely well aware of this, the reader may not be, and it is
     important to clearly distinguish the regimes.}
     
-    Author reply: We thank the reviewer for making this point. In higher water content systems, 
-    the time scales necessary to reach a diffusive regime will be much more attainable with 
-    standard MD.
-    %MRS2: is this always the case?  I think a more appropriate response would be "in systems with relatively unimpeded cores, such as in many cases LLCs with a higher water content, most waters will be relatively unimpeded, and diffusion constants can be obtained by standard techniques.   
+    Author reply: We thank the reviewer for making this point. 
+    %BJC2: modded based on MRS suggestion    
+    In systems with less obstructions to motion, such as LLCs with a higher water content, most 
+    solutes and water will be relatively unimpeded, and diffusion constants can be obtained by 
+    standard techniques.    
     However, we do contend that our method would still be very useful for studying
-    solute dynamics in these higher water content systems.
-    %MRS: maybe "including the dynamics of solutes that have longer residence times and interact with portions of the system away from the pore center."
-    Interactions characterized by different
-    dynamical behavior even on short time scales can still be highly informative. This is the
-    basis for the point we make in the introduction:``...direct calculations of diffusion 
+    solute dynamics in these higher water content systems 
+    %BJC2: incorporated MRS suggestion with small modifications    
+    by allowing one to study the dynamics of solutes that have longer residence times and interact
+    with moieties in a complex medium. %portions of the system away from the pore center.
+    %Interactions characterized by different dynamical behavior even on short time scales can
+    %still be highly informative. 
+    This is the basis for the point we make in the introduction:``...direct calculations of diffusion 
     constants may obscure the molecular mechanisms controlling transport". Therefore we would
     prefer not to limit the range of application of this method. 
-    %BJC: If it would be better to modify the text, then we could add something to the effect: If you only care about diffusivity, then this level of
-    % modeling isn't necessary in many systems.
-    %MRS: I think good to talk about.
+    %BJC2: added    
+    However, we do agree that it would be helpful to the reader to clarify that the level of modeling 
+    which we present in this work is certainly not merited in cases where they are only interested in
+    diffusion constants. Therefore, we have modified a paragraph in the introduction in order to
+    encourage readers to pursue simpler approaches if the system allows it.
+    
+    Updated text with additions highlighted in yellow:
+    
+    In this work, we are particularly interested in the design of lyotropic liquid 
+    crystal (LLC) monomers, a class of amphiphilic molecules whose ordered self-assembled
+    phases can be cross-linked into mechanically strong membranes capable of highly 
+    selective separations. Inverted hexagonal phase, or H\textsubscript{II}, LLC membranes
+    are characterized by hexagonally packed, uniform-sized and straight pores, an ideal 
+    geometry for high throughput transport. Their pores are lined with the LLC monomer's
+    functional groups which can potentially be designed to interact with solutes in a 
+    chemically-specific manner. It would be extremely useful to experimentalists if we 
+    could connect LLC monomer design with measurable quantities such as diffusivity and
+    selectivity.\hl{In many systems, including LLC membranes with water contents higher
+    than the 10 wt\% water system studied here, making this connection can be relatively 
+    straightforward calculation with standard techniques since small solutes and water 
+    can move relatively unimpeded and therefore enter a diffusive regime on timescales 
+    accessible to MD. When possible, we encourage the reader to take advantage of the 
+    simplest approach possible. However, for the system that has capture our interest,} 
+    this goal is complicated by the non-Brownian hopping and trapping behavior induced 
+    by the membrane's diverse topology and inhomogeneous structure resulting in subdiffusive
+    behavior out to multiple microseconds of simulation.~\cite{coscia_understanding_2019,coscia_chemically_2019}
+        
     %r1_comment5
     \item \textit{In the HDP-AR-HMM method, it is not clear to me how the solute molecules are 
     constrained to be confined within the pore radius (which they must be on physical grounds 
@@ -232,6 +247,7 @@ text with appropriate numbering.
     %radius", since the structure of the pore makes it very hard to
     %define a single pore radius.  The term "pore region" is used once
     %(about line 995), that that should probably be "pore center".
+    %BJC2: changed pore region to pore center
     %Second, it's not clear what is meant when they say it's not clear
     %how they are constrained when they must be by steric
     %interactions.  Since steric interactions do NOT keep them in the
@@ -243,43 +259,49 @@ text with appropriate numbering.
 %    distribution functions, but it does happen and could conceivably lead to rare jumps of solutes
 %    between pores (although we have not observed any).
 
-    %MRS: how about this?  We are grateful for the opportunity to
-    clarify some of the details of the simulation geometries.  We
-    avoid defining a ``pore radius'' in most cases, since many solutes
-    can easily partition partially into the pores, and the radial
-    distribution of head groups and even tail groups is changes over
-    several angstroms.~\cite{yourpapers} This partitioning occurs to the extent that smaller molecules like water and methanol can in fact
-    move between pores in rare instances.~\cite{yourpapers} However the rarity of the events and the fact that they occur parallel to transport means that they do not really affect transport, and can be interpreted mathematically as simply going deep into the wall and coming back again into the same pore.
+    %MRS: how about this?  
+    %BJC2: seems good. made some minor edits
+    We are grateful for the opportunity to clarify some of the details of the simulation 
+    geometries. We avoid defining a ``pore radius'' because the radial distribution of 
+    head groups and even tail groups is spread over several nanometers and we have
+    observed clear evidence that solutes can similarly partition radially throughout 
+    the pores.~\cite{coscia_understanding_2019,coscia_chemically_2019} 
+%    This partitioning occurs to the extent that smaller molecules like water and methanol
+%    can in fact move between pores in rare instances.
+    %BJC2: I don't think I've actually published anything stating or proving the above. 
+    %I think it's particularly hard to get by the crosslinks. But I do believe it could happen.
+    %rephrased with that in mind.
+    Therefore, it may be possible that, in rare instances, smaller molecules like water and
+    methanol may move between pores. However the rarity of these events and the fact that 
+    they occur orthogonal to the transport dimension means that they do not significantly 
+    affect transport, and can be interpreted mathematically as simply going deep into the 
+    dense tail region before returning to the same pore.
     
-    Because of this, our stochastic simulations are constrained to remain close to a single pore by the trajectory generation procedure.
-    Each state is parameterized by a mean in the radial direction computed based on the solute's 
-    distance from the \textit{nearest pore center}, making it impossible for the solute to get 
-    further than
-    %MRS: maybe this instead?
-    %the pore radius.
-    half the pore-to-pore distance away.
+    Because of this, our stochastic simulations are constrained to remain close to a single 
+    pore by the trajectory generation procedure. Each state is parameterized by a mean in 
+    the radial direction computed based on the solute's distance from the \textit{nearest 
+    pore center}, making it impossible for the solute to get further than approximately half
+    the pore-to-pore distance away (the exact maximum distance is an an angle-dependent 
+    quantity due to the hexagonally packed pore configuration).
     %MRS: though I'm not QUITE sure that's right, since the hexagonal packing means that the transition between pores
     %occurs at different distances depending on the angle. 
-    Each time a state change occurs, the mean position of the
-    solute in the $r$ dimension jumps to the appropriate mean. However, in the axial direction, 
-    we do not parameterize the mean since it should be unbounded in that dimension. The $z$ mean
-    of each segment is set based on the position immediately before the state change occurred.
+    %BJC: Yeah, I know what you mean. I added the bit in parentheses above to acknowledge that.
+    Each time a state change occurs, the mean position of the solute in the $r$ dimension 
+    jumps to the appropriate mean. However, in the axial direction, we do not parameterize 
+    the mean since it should be unbounded in that dimension. The $z$ mean of each segment 
+    is set based on the position immediately before the state change occurred.
     
     The generalization of this procedure to three dimensions will be under active investigation 
     in the near future. As mentioned, we are interested in applying this approach to bicontinuous
     cubic phases like the gyroid. Based on our current understanding, we would model solute dynamics
     in three dimensions and set the mean vector, $\mathbf{c}$ equal to $\mathbf{0}$. Of course, this
-    may result in solutes exploring a three dimensional shape that does not share the geometric 
+    may result in solutes exploring a three dimensional space that does not share the geometric 
     features of the studied phase. Our hypothesis is that we can add one or more additional 
     dimensions to the time series passed to the HDP-AR-HMM that includes a distance from the pore centers. 
     We could define the pore center using a spline or a surface and transitions would likely
     favor moves towards states that exist closer to the pore interiors. Alternatively, it may prove
-    necessary to constrain solute positions to the means in each dimension. However, these extension
+    necessary to constrain solute positions to the means in each dimension. However, these extensions
     are beyond the scope of the current paper.
-    %MRS: below not really needed.
-    %would require 
-    %much more data and would likely require us to explore less expensive models as described in
-    %the response to Reviewer 2 below.
     
     %BJC: figured I'd get your feedback on above before writing the part that will go into the text.
     
