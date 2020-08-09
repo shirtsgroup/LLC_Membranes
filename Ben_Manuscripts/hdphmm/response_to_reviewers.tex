@@ -464,6 +464,57 @@ text with appropriate numbering.
 
 \end{document}
 
+%MRS: additional thoughts:
+
+%1. Dynamic Bond Percolation theory (both the original version and the
+%chemically specific one) an and TEKMC are based on spatial clustering
+%and coarse-graining. Our approach is based on clustering and
+%coarse-graining the dynamics.  Can be more powerful, doesn't assume
+%(or minimally assumes - in some cases we assume pore vs. nono-pore)
+%which configurations are important, which matters when there are a
+%diversity of different types of bound states, and diversity of
+%dynamics (in the pore, associated with the head groups, etc).
+
+%2. Dynamical behavior is more complex with our solutes than ion
+%interactions because of the richer range of interactions involved
+%(ionic binding PLUS hydrophobic binding, i.e. more types of bound
+%states; it's not just binding and hopping, and thus something
+
+%3. Configurational behavior is more complex with the nanostructures,
+%because one cannot simply divide the structure into cubes
+%isotropically.  It may be easier to use our approach with more
+%diverse configurations, because we don't need to worry about
+%partitioning correctly.  This does push some of the difficulty into
+%choosing the coordinate system for the dynamics, but we have a lot
+%more freedom about choosing coordinate systems for the model than one
+%would using a uniform (or even nonuniform) partitioning of the
+%system. Yes, there are difficult choices to make but the model has
+%the freedom to make these choices.
+
+%4. One reason our simulations are longer because the timescales of
+%events observed generally are longer, and the number of solutes we
+%can put into the simulation is smaller (since the total pore volume
+%is smaller than it would be in an amorphous polymer).
+
+%5. We could probably construct our model it with a larger number of
+%more shorter simulations as well. Rare events require long timescale
+%sisulations.  However, the equilibration times for these simulations
+%(since we build from geometry, not from amorphous melts) are such
+%that we probably get more efficient use of simulations by running
+%fewer, longer simulations.
+
+
+%6. So it's not clear that this method is better than DBP or TEKMC
+% (especially since the results are a big ambiguous); one could define
+% bound states, and look at hops betwen then.  But it's definitely
+% DIFFERENT, it's not really the same thing at all, and we should push
+% back that it is similar.  We can argue that our approach is more
+% suited to our systems than the two configuration-based approaches -
+% one COULD try to use those approaches and they could be made to
+% work, but it's not a trivial thing to do, and we wanted to try
+% something where the data informed our model more completely and we
+% wouldn't have to try those modifications.
+
 
 % LocalWords:  Subdiffusive Solute Nanoscale Coscia leftmargin FBM vy
 % LocalWords:  subdiffusion CTRW sFBM ref solutes antechamber solute
