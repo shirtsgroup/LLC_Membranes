@@ -2,10 +2,11 @@
 
 import argparse
 from LLC_Membranes.setup.bcc_build import BicontinuousCubicBuild
-from LLC_Membranes.setup.gentop import SystemTopology
 from LLC_Membranes.setup.genmdp import SimulationMdp
 from LLC_Membranes.llclib import topology, transform, gromacs, file_rw
-from LLC_Membranes.setup import xlink, restrain
+from LLC_Membranes.setup import restrain
+import xlink
+from gentop import SystemTopology
 import warnings
 import mdtraj as md
 import os
@@ -464,6 +465,8 @@ if __name__ == "__main__":
         sys.exit('Using argparse for most arguments in this script is no longer supported. Please make a .yaml file')
 
     os.environ["GMX_MAXBACKUP"] = "-1"  # stop GROMACS from making backups
+    if not os.path.isdir("./intermediates"):
+        os.mkdir('intermediates')
 
     equil = EquilibrateBCC(build_params['build_monomer'], build_params['space_group'], build_params['box_length'],
                            build_params['weight_percent'], build_params['density'], build_params['restraints'],
@@ -474,7 +477,6 @@ if __name__ == "__main__":
     equil.build_initial_config(grid_points=build_params['grid'], r=0.4)
     equil.scale_unit_cell(sim_params['scale_factor'])
 
-    
     equil.generate_topology(name='topol.top', restrained=True)  # creates an output file
     equil.generate_mdps(length=50, frames=2, T=sim_params['temperature'])  # creates an object
     equil.mdp.write_em_mdp(out='em')
@@ -500,9 +502,6 @@ if __name__ == "__main__":
         equil.shrink_unit_cell(sim_params['scale_factor'], 1.0, 0.1)  # EquilibrateBCC object, start, stop, step
 
         # CLEAN UP -- move all scaled unit cells into a separate directory
-        if not os.path.isdir("./intermediates"):
-            os.mkdir('intermediates')
-
         mv = "mv scaled*.gro intermediates"
         p = subprocess.Popen(mv, shell=True)  # don't split mv because shell=True
         p.wait()
@@ -517,7 +516,7 @@ if __name__ == "__main__":
 
         equil.add_solvent(build_params['solvent'])
 
-        mv = "mv solvated_nvt* solvated_npt* npt_equil* nvt_equil* em_* intermediates"
+        mv = "mv solvated_nvt* solvated_npt* npt_equil* npt_* nvt_equil* em_* intermediates"
         p = subprocess.Popen(mv, shell=True)  # don't split mv because shell=True
         p.wait()
 
@@ -525,19 +524,23 @@ if __name__ == "__main__":
 
         equil.gro_name = 'solvated_final.gro'
 
-#    exit()
-
     if not args.continue_xlinked:
         # cross-linking
         xlink.crosslink(xlink_params)  # run cross-linking algorithm
 
+        #clean
+        mv = "mv dummies.* nvt*.* em*.* intermediates"
+        p = subprocess.Popen(mv, shell=True)  # don't split mv because shell=True
+        p.wait()
+
     equil.gro_name = xlink_params['output_gro']
 
     # system is cross-linked with glycerol. Now time to flush out the glycerol and replace with water
-
-    # This block is just for development
     equil.solvent = topology.Residue(build_params['solvent'])  # get solvent properties
-
-    # This is the real stuff
     equil.remove_solvent(xlink_params['output_gro'])
-    equil.add_solvent('HOH')  # add that water
+    equil.add_solvent('HOH', out='solvated_water.gro', scale=0.8)  # add that water
+
+    #clean
+    mv = "mv solvated_nvt* solvated_npt* npt_equil* npt_* nvt_equil* em_* intermediates"
+    p = subprocess.Popen(mv, shell=True)  # don't split mv because shell=True
+    p.wait()
