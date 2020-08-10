@@ -465,12 +465,19 @@
   justification of our approach to choosing the number of clusters in 
   Section~\ref{S-section:nclusters} of the Supporting Information.  
   
-  %BJC: reworked this section for better clarity as it confused Chris
-  \textit{Obtaining Parameters of Clustered States}: We obtained the 
-  mean vectors, $\mathbf{c}$, of the clustered states by averaging each 
-  value of the $\mathbf{c}$ vectors assigned to the same cluster. Note 
-  that we only care about the $r=\sqrt{x^2+y^2}$ portion of $\mathbf{c}$ 
-  because solute trajectories are not bound in the $z$ direction.
+  %BJC: r1_comment5
+  \textit{Obtaining Parameters of Clustered States}: We obtained the mean vectors,
+  $\mathbf{c}$, of the clustered states by averaging each value of the $\mathbf{c}$
+  vectors assigned to the same cluster. Note that we only care about the 
+  $r=\sqrt{x^2+y^2}$ portion of $\mathbf{c}$. We do not parameterize the mean
+  $z$ position of particles because solute trajectories should not be bound to discrete
+  points in the axial direction. However, we do intentionally limit the radial location 
+  of particles in our stochastic trajectories to discrete values of $r$, effectively 
+  constraining them to stay within a single pore. While it's possible that, in rare cases,
+  solutes might move between adjacent pores, it would have no effect on axial transport
+  since this motion is orthogonal to the pore axis and because all pores are structurally
+  similar. This treatment assumes that a move between pores is equivalent to a solute 
+  which travels deep into the monomer tail region before returning to the same pore. 
   
   In order to determine $A$ and $\Sigma$ of the clusters, we modified the 
   ($x$, $y$, $z$) solute trajectories to have a mean of zero, leaving only
@@ -503,10 +510,13 @@
   % Method 2: Link all 24 trajectories by adding a coffin state (basically a 
   % state that is a vector of zeros) between each traj
   % Method 3: Parameterize each trajectory independently, average together. T is
-  % estimated by making a count matrix based on inputs from each trajectory
-  
-%  In Section~\ref{S-section:ihmm_procedure} of the Supporting
-%  Information, we provide a step-by-step illustration of the following process.  
+  % estimated by making a count matrix based on inputs from each trajectory  
+
+  %r1_comment5
+  The parameterization of $\mathbf{c}$, $A$ and $\Sigma$ as presented above has been designed 
+  specifically for the cylindrical pore geometry at hand. Our group is actively investigating
+  appropriate ways to parameterize more complicated geometries such as bicontinuous cubic phase
+  LLC membranes. 
   
   \subsection{Predicting Mean Squared Displacement}\label{method:realizations}
 

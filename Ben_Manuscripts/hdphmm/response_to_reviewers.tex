@@ -126,6 +126,57 @@ text with appropriate numbering.
     mechanisms with minimal human intervention and characterize them in detail using the 
     HDP-AR-HMM while \textit{simultaneously} providing a method to estimate diffusion constants.
     
+%MRS: additional thoughts:
+
+%1. Dynamic Bond Percolation theory (both the original version and the
+%chemically specific one) an and TEKMC are based on spatial clustering
+%and coarse-graining. Our approach is based on clustering and
+%coarse-graining the dynamics.  Can be more powerful, doesn't assume
+%(or minimally assumes - in some cases we assume pore vs. nono-pore)
+%which configurations are important, which matters when there are a
+%diversity of different types of bound states, and diversity of
+%dynamics (in the pore, associated with the head groups, etc).
+
+%2. Dynamical behavior is more complex with our solutes than ion
+%interactions because of the richer range of interactions involved
+%(ionic binding PLUS hydrophobic binding, i.e. more types of bound
+%states; it's not just binding and hopping, and thus something
+
+%3. Configurational behavior is more complex with the nanostructures,
+%because one cannot simply divide the structure into cubes
+%isotropically.  It may be easier to use our approach with more
+%diverse configurations, because we don't need to worry about
+%partitioning correctly.  This does push some of the difficulty into
+%choosing the coordinate system for the dynamics, but we have a lot
+%more freedom about choosing coordinate systems for the model than one
+%would using a uniform (or even nonuniform) partitioning of the
+%system. Yes, there are difficult choices to make but the model has
+%the freedom to make these choices.
+
+%4. One reason our simulations are longer because the timescales of
+%events observed generally are longer, and the number of solutes we
+%can put into the simulation is smaller (since the total pore volume
+%is smaller than it would be in an amorphous polymer).
+
+%5. We could probably construct our model it with a larger number of
+%more shorter simulations as well. Rare events require long timescale
+%sisulations.  However, the equilibration times for these simulations
+%(since we build from geometry, not from amorphous melts) are such
+%that we probably get more efficient use of simulations by running
+%fewer, longer simulations.
+
+
+%6. So it's not clear that this method is better than DBP or TEKMC
+% (especially since the results are a big ambiguous); one could define
+% bound states, and look at hops betwen then.  But it's definitely
+% DIFFERENT, it's not really the same thing at all, and we should push
+% back that it is similar.  We can argue that our approach is more
+% suited to our systems than the two configuration-based approaches -
+% one COULD try to use those approaches and they could be made to
+% work, but it's not a trivial thing to do, and we wanted to try
+% something where the data informed our model more completely and we
+% wouldn't have to try those modifications.
+    
     %r1_comment3
     %BJC: not sure if I should ignore the JCTC part completely or basically just say what the editor said.
     %MRS: my response below (Basically, saying what the editor said, in case it is send back out).
@@ -148,11 +199,6 @@ text with appropriate numbering.
     not to cut any methodological details, as this would hurt the paper's reproducibility, and
     lengthening the paper by including additional physical insight may narrow the audience willing
     to dive in.
-
-    %TODO    
-    %BJC: probably could add a picture of the system. Or is it okay to just reference another
-    % paper? I would probably use the same pic anyways or something very similar.
-    %MRS: never bad to include pictures of the system, so go ahead.
     
     We do agree that there are certain basic simulation details that we have neglected to 
     mention. Therefore we have made the following edits to section 2.1 of the methods:
@@ -181,6 +227,17 @@ text with appropriate numbering.
     force fields or other higher-order effects in order to improve the accuracy of structure 
     parameters and selectivity predictions.
     \end{quote}
+    
+    Finally, we have added a figure with a picture of the system which we are studying:
+    \begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{membrane_side_profile.pdf}
+    \caption{When combined with 10 wt\% water, the LLC monomer studied in this work forms the 
+    H\textsubscript{II} phase which is characterized by hexagonally packed columns with 
+    hydrophilic pores. In the figure, white and red water molecules mark the membrane pores.
+    The monomer fills the rest of the space. Note that water molecules are present in the 
+    tails, but they are hidden for the sake of clarity. }\label{fig:membrane_side_profile}
+    \end{figure}
 
     %r1_comment4
     \item \textit{The authors should more clearly note that their discussion largely applies only 
@@ -275,7 +332,7 @@ text with appropriate numbering.
     methanol may move between pores. However the rarity of these events and the fact that 
     they occur orthogonal to the transport dimension means that they do not significantly 
     affect transport, and can be interpreted mathematically as simply going deep into the 
-    dense tail region before returning to the same pore.
+    tail region before returning to the same pore.
     
     Because of this, our stochastic simulations are constrained to remain close to a single 
     pore by the trajectory generation procedure. Each state is parameterized by a mean in 
@@ -291,6 +348,32 @@ text with appropriate numbering.
     the mean since it should be unbounded in that dimension. The $z$ mean of each segment 
     is set based on the position immediately before the state change occurred.
     
+    We have strengthened Section 2.3 of the methods by adding a clearer discussion of the above.
+    
+    Original text:
+    \begin{quote}
+    We obtained the mean vectors, $\mathbf{c}$, of the clustered states by averaging each 
+    value of the $\mathbf{c}$ vectors assigned to the same cluster. Note that we only care 
+    about the $r=\sqrt{x^2+y^2}$ portion of $\mathbf{c}$ because solute trajectories are not 
+    bound in the $z$ direction.
+    \end{quote}
+    
+    Modified text:
+    
+    \begin{quote}
+    We obtained the mean vectors, $\mathbf{c}$, of the clustered states by averaging each 
+    value of the $\mathbf{c}$ vectors assigned to the same cluster. Note that we only care 
+    about the $r=\sqrt{x^2+y^2}$ portion of $\mathbf{c}$. We do not parameterize the mean
+    $z$ position of particles because solute trajectories should not be bound to discrete
+    points in the axial direction. However, we do intentionally limit the radial location 
+    of particles in our stochastic trajectories to discrete values of $r$, effectively 
+    constraining them to stay within a single pore. While it's possible that, in rare cases,
+    solutes might move between adjacent pores, it would have no effect on axial transport
+    since this motion is orthogonal to the pore axis and because all pores are structurally
+    similar. This treatment assumes that a move between pores is equivalent to a solute 
+    which travels deep into the monomer tail region before returning to the same pore. 
+    \end{quote}
+    
     The generalization of this procedure to three dimensions will be under active investigation 
     in the near future. As mentioned, we are interested in applying this approach to bicontinuous
     cubic phases like the gyroid. Based on our current understanding, we would model solute dynamics
@@ -302,6 +385,15 @@ text with appropriate numbering.
     favor moves towards states that exist closer to the pore interiors. Alternatively, it may prove
     necessary to constrain solute positions to the means in each dimension. However, these extensions
     are beyond the scope of the current paper.
+    
+    We have added the following text to the end of Section 2.3 in order to make it clear that
+    the trajectory generation procedure will require more thought for different geometries:
+    \begin{quote}
+    The parameterization of $\mathbf{c}$, $A$ and $\Sigma$ as presented above has been designed 
+    specifically for the cylindrical pore geometry at hand. Our group is actively investigating
+    appropriate ways to parameterize more complicated geometries such as bicontinuous cubic phase
+    LLC membranes. 
+    \end{quote}
     
     %BJC: figured I'd get your feedback on above before writing the part that will go into the text.
     
@@ -340,13 +432,38 @@ text with appropriate numbering.
     %r1_comment8
     \item \textit{Figure captions need to be improved. Wording such as “we plotted...”, “we 
     calculated...”, “We also analyzed...” should be omitted in figure captions.}  
-    % BJC: This seems like the reviewer forcing his own style on us. And seems like a generalization
-    % based on only looking at figure 8. I could just modify parts of figure 8 to please him. But I
-    % think the rest are fine. What do you think?
-
-    %MRS: So, I think they have a partial point, in that the caption
-    %should describe the figure, and the conclusions proved by the
-    %figure, not the process used to get to the figure so much.  So maybe figure 8 should be "hydrogen bonds donated to the methanol to the highlighted oxygen atoms in three regions of the monomer are are shown: the carboxylate . . For each type of hydrogen bond in each predominant state, we show the 95th percentile of hydrogen bond lifetimes."  Does that make sense?
+    
+    %BJC2: okay, modified as suggested
+    Author reply: We agree with the reviewer that the type of wording described should not be
+    included in captions as their primary purpose should be to explain the conclusions drawn
+    by the figure rather the process of generating the figure. However, we believe that the 
+    only real offender among our captions was Figure 8. Therefore we have modified the language
+    of that figure:
+    
+    Original caption:
+    \begin{quote}
+    (a) We analyzed hydrogen bonds donated by methanol to the highlighted oxygen
+    atoms in three regions of the monomer: the carboxylate groups (blue), the ether linkages
+    (green) and the tails (red). (b) For each predominant state (states 1--5 described in 
+    Figure~\ref{M-fig:prevalence}), we plotted the fraction of the total time in that state 
+    spent hydrogen bonding to various regions of the monomer, color coded to match (a).
+    (c) For each type of hydrogen bond in each predominant state, we calculated the 95th percentile
+    of hydrogen bond lifetimes. (d) We also analyzed the frequency and lifetimes of solute 
+    association with sodium ions. Methanol associates with sodium less than 10\% of the total 
+    time it occupies any of the predominant states.
+    \end{quote}    
+    
+    Modified caption:
+    \begin{quote}
+    (a) Hydrogen bonds can be donated by methanol to the highlighted oxygen atoms in three 
+    regions of the monomer: the carboxylate groups (blue), the ether linkages (green) and the
+    tails (red). (b) For each predominant state (states 1--5 described in Figure~\ref{M-fig:prevalence}),
+    we show the fraction of the total time in that state spent hydrogen bonding to various regions
+    of the monomer, color coded to match (a). (c) For each type of hydrogen bond in each predominant
+    state, we show the 95th percentile of hydrogen bond lifetimes. (d) We also show the 
+    frequency and lifetimes of solute association with sodium ions. Methanol associates with sodium
+    less than 10\% of the total time it occupies any of the predominant states.    
+    \end{quote}
 
 \end{enumerate}
 
@@ -373,40 +490,53 @@ text with appropriate numbering.
     useful if the authors were more explicit about the role of this approach in guiding experiments, 
     and what would be its advantages and limitations compared to a purely experimental search.}
     
+    % BJC2: shifted initial focus towards mechnistic understanding. Still kept part about speeding up simulations
+    % as I think it's worth discussing ways to make this an actual high throughput technique. 
     Author reply: We thank the reviewer for pushing us to further evaluate the practicality of our
-    method as a tool for experimentalists. In short, there are many ways we can envision that 
-    would make this approach more amenable to high throughput simulations. The length of our 
-    simulations in this paper are indeed quite long. The dynamics of the solutes are somewhat 
-    slow and we wanted to ensure we gathered enough data for a sufficient parameterization. 
-    Putting aside brute force high throughput simulations that could be enabled by the 
-    ever-increasing availability of HPC resources, it would be to our benefit to use the system
-    in this work as a benchmark to explore much less expensive models.
-    %MRS: maybe focus more on understanding mechanisms, rather than screening?  So the length is not SO impractical.
-    We propose some ideas to this end in the text we have added to the end of Section 2.1, where
-    our simulations are described:
+    method as a tool for experimentalists. The length of our simulations in this paper are indeed 
+    quite long. 
+    %The dynamics of the solutes are somewhat slow and we wanted to ensure we gathered
+    %enough data for a sufficient parameterization. 
+    However, the length of the simulations primarily influences the reliability of the long
+    timescale predictions of our model. We believe one of our method's greatest strengths is its 
+    ability to elucidate transport mechanisms by automatically detecting shifts in dynamical
+    behavior, which can be achieved with much shorter simulations. 
+    In our previous work, we showed that one can use shorter simulations to uncover the same 
+    mechanisms which we described in our current work.~\cite{coscia_chemically_2019} However, the
+    HDP-AR-HMM makes it much simpler to identify these mechanisms. Our approach allows one to 
+    quickly identify behavior characteristic of solutes in terms of chemical functionality, 
+    allowing them to eliminate sets of potential LLC monomers on the basis of this more general
+    mechanistic understanding. 
+    
+    There is also value in considering ways to make high throughput simulation of this type of 
+    system attainable. Putting aside brute force high throughput simulations that could be enabled 
+    by the ever-increasing availability of HPC resources, it would be to our benefit to use the
+    system in this work as a benchmark to explore much less expensive models. We propose some ideas
+    to this end in the text we have added to the end of Section 2.1, where our simulations are described:
     \begin{quote}
     In consideration of our ultimate goal, which is to use high-throughput simulations to 
     facilitate our understanding of LLC membrane design for solute-specific separations, the size 
     of our system and length of the accompanying molecular simulations appears to be somewhat 
-    impractical.
-    We would like to emphasize that our large, fully atomistic models will be
-    extremely valuable as a benchmark systems used to explore less expensive models. For example, we 
-    could explore systems built with fewer LLC monomers by making the membrane pores shorter. We 
-    could also build systems with higher concentrations of solutes in order to gather more 
+    impractical. Dependent on one's goals, it may not be necessary to run such long simulations in order 
+    to extract valuable mechanistic insight. We originally uncovered the mechanisms discussed
+    in this study using trajectories a fraction of the length here.\cite{coscia_chemically_2019} A 
+    strong mechanistic understanding of solute transport with respect to the chemical features of a 
+    given LLC monomer may be enough for experimentalists to eliminate entire subsets of potential
+    design changes. However, it may still be valuable to consider how one might make these simulations
+    amenable to high-throughput studies. We would like to emphasize that our large, fully atomistic 
+    models will be extremely valuable as a benchmark system used to explore less expensive models. 
+    For example, we could explore systems built with fewer LLC monomers by making the membrane pores
+    shorter. We could also build systems with higher concentrations of solutes in order to gather more 
     dynamical data on shorter timescales. Using what we have learned about the radial distribution
     functions of these solutes in this and our previous work~\cite{coscia_chemically_2019}, it may be possible to 
     learn how to create initial configurations with solutes initially distributed in a way that
     is close to their equilibrium distribution, allowing solutes to thoroughly explore the 
     accessible membrane structural space more quickly and reducing the amount of unequilibrated
-    data that must be discarded. % could mention GCMC?
-    %MRS: sure.
-    Finally, it may be possible to speed up our simulations by 
-    reducing the number of atoms using united-atom representations of the liquid crystal monomers.
-    %BJC: How strong of an influence would hydrogen mass repartitioning have on hydrogen bonding?
-    %, or by using hydrogen mass repartitioning to allow us to increase the MD time step. 
-    %MRS: zero on hydrogen bonding strength, which is thermodynamics.  It may affect H-bonding kinetics by
-    % increasing the timescales of tumbling (larger rotational inertia, slower rotational diffusion).  If molecules aren't free to tumble anyway, though,
-    % then the kinetics may be affected less. 
+    data that must be discarded. Alternatively, we could use grand canonical Monte Carlo simulations
+    to load solutes into the membrane~\cite{snurr_prediction_1993}. Finally, it may be possible 
+    to speed up our simulations by reducing the number of atoms using united-atom representations
+    of the liquid crystal monomers~\cite{horta_gromos-compatible_2016} or by using hydrogen mass 
+    repartitioning to allow us to increase the MD time step.~\cite{hopkins_long-time-step_2015}
     \end{quote}
     
     %r2_comment3
@@ -415,6 +545,7 @@ text with appropriate numbering.
     accurate or just reflect trends.}
 		 
     %BJC: This is copied straight from the reviewer response for the previous paper.
+    %BJC2: do you think I should reword this at all to make it different?
     Author reply: The reviewer makes a valid point. This work started in parallel with experimental
     work which promised solute flux and selectivities that we could compare directly to our
 	simulations. However, synthesizing an aligned hexagonal phase membrane has been a practical
@@ -451,6 +582,7 @@ text with appropriate numbering.
     Since trajectories generated by Method 2 are based on the clustered parameter set used to define a
     single model, we can bootstrap on trajectory ensembles of arbitrary size.
     \end{quote}
+    
     to:
     \begin{quote}
     Since in our second approach to stochastic trajectory generation described above we use clustered 
@@ -463,57 +595,6 @@ text with appropriate numbering.
 \bibliography{hdphmm}
 
 \end{document}
-
-%MRS: additional thoughts:
-
-%1. Dynamic Bond Percolation theory (both the original version and the
-%chemically specific one) an and TEKMC are based on spatial clustering
-%and coarse-graining. Our approach is based on clustering and
-%coarse-graining the dynamics.  Can be more powerful, doesn't assume
-%(or minimally assumes - in some cases we assume pore vs. nono-pore)
-%which configurations are important, which matters when there are a
-%diversity of different types of bound states, and diversity of
-%dynamics (in the pore, associated with the head groups, etc).
-
-%2. Dynamical behavior is more complex with our solutes than ion
-%interactions because of the richer range of interactions involved
-%(ionic binding PLUS hydrophobic binding, i.e. more types of bound
-%states; it's not just binding and hopping, and thus something
-
-%3. Configurational behavior is more complex with the nanostructures,
-%because one cannot simply divide the structure into cubes
-%isotropically.  It may be easier to use our approach with more
-%diverse configurations, because we don't need to worry about
-%partitioning correctly.  This does push some of the difficulty into
-%choosing the coordinate system for the dynamics, but we have a lot
-%more freedom about choosing coordinate systems for the model than one
-%would using a uniform (or even nonuniform) partitioning of the
-%system. Yes, there are difficult choices to make but the model has
-%the freedom to make these choices.
-
-%4. One reason our simulations are longer because the timescales of
-%events observed generally are longer, and the number of solutes we
-%can put into the simulation is smaller (since the total pore volume
-%is smaller than it would be in an amorphous polymer).
-
-%5. We could probably construct our model it with a larger number of
-%more shorter simulations as well. Rare events require long timescale
-%sisulations.  However, the equilibration times for these simulations
-%(since we build from geometry, not from amorphous melts) are such
-%that we probably get more efficient use of simulations by running
-%fewer, longer simulations.
-
-
-%6. So it's not clear that this method is better than DBP or TEKMC
-% (especially since the results are a big ambiguous); one could define
-% bound states, and look at hops betwen then.  But it's definitely
-% DIFFERENT, it's not really the same thing at all, and we should push
-% back that it is similar.  We can argue that our approach is more
-% suited to our systems than the two configuration-based approaches -
-% one COULD try to use those approaches and they could be made to
-% work, but it's not a trivial thing to do, and we wanted to try
-% something where the data informed our model more completely and we
-% wouldn't have to try those modifications.
 
 
 % LocalWords:  Subdiffusive Solute Nanoscale Coscia leftmargin FBM vy
