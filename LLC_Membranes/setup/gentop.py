@@ -137,6 +137,7 @@ class SystemTopology(object):
 
         ion_count = 0
         for r in self.residues:
+            if r=='SOL' : r='HOH'  #the itp file should be 'HOH.itp' for water
             if r in self.ions:
                 if ion_count == 0:
                     top.append(';Ion Topology\n')
@@ -145,7 +146,7 @@ class SystemTopology(object):
                 ion_count += 1
             else:
                 top.append(';%s Topology\n' % r)
-                if self.restraints:
+                if self.restraints and not self.xlink:
                     if r in self.restraints:
                         if not restraints_included:
                             top.append('#include "%s"\n' % restrained_top_name)  # need to modify so this is not hardcoded.
@@ -167,7 +168,7 @@ class SystemTopology(object):
 
         restraints_included = False
         for r in self.residues:
-            if self.restraints:
+            if self.restraints and not self.xlink:
                 if r in self.restraints:
                     if not restraints_included:
                         top.append('{:10s}{:>10d}\n'.format('restrained', 1))
@@ -200,6 +201,9 @@ class SystemTopology(object):
         """
 
         resname = residue.name
+
+        if resname == 'HOH' : resname='SOL' #SOL is the resname in HOH.itp
+        
         if residue.is_ion:
             self.ions.append(resname)
 
