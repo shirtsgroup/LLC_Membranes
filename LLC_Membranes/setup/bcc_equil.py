@@ -2,11 +2,10 @@
 
 import argparse
 from LLC_Membranes.setup.bcc_build import BicontinuousCubicBuild
+from LLC_Membranes.setup.gentop import SystemTopology
 from LLC_Membranes.setup.genmdp import SimulationMdp
 from LLC_Membranes.llclib import topology, transform, gromacs, file_rw
-from LLC_Membranes.setup import restrain
-import xlink
-from gentop import SystemTopology
+from LLC_Membranes.setup import xlink, restrain
 import warnings
 import mdtraj as md
 import os
