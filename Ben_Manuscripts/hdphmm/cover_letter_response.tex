@@ -1,0 +1,129 @@
+\documentclass[fontsize=11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{subcaption}
+\usepackage{amsmath} 
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{gensymb}
+\usepackage{hyperref}
+\usepackage[export]{adjustbox}
+\usepackage{anyfontsize}
+
+\begin{document}
+
+	\graphicspath{{./figures/}}
+
+	%BJC: check address, phone number and fax (?) number
+	\begin{figure}
+	\centering
+	\begin{minipage}{0.37\textwidth}
+	\includegraphics[width=2.14in,left]{CUBoulder.pdf}
+	\end{minipage}
+	\begin{minipage}{0.62\textwidth}
+	\scriptsize
+	\noindent Department of Chemical and Biological Engineering \hfill t 303-735-7860~~~~~~~~~~~~~~~~~~ \\
+	\noindent 596 UCB \hfill f 303-492-8425~~~~~~~~~~~~~~~~~~ \\
+	\noindent Boulder, Colorado 80309 \hfill michael.shirts@colorado.edu \\
+	\end{minipage}
+	\end{figure}
+	
+	%\noindent May 3\textsuperscript{rd}, 2019\\
+	\noindent \today
+
+	\noindent Dear Editors,\\
+	
+	\newcommand{\ManuscriptTitle}{Statistical Inference of Transport Mechanisms and
+	Long Time Scale Behavior from Time Series of Solute Trajectories in 
+	Nanostructured Membranes}
+	
+	We are submitting revisions to our manuscript ``\ManuscriptTitle'' by Benjamin 
+	J. Coscia, Christopher P. Calderon and Michael R. Shirts, for consideration for 
+	publication as a Research Article in the ``Machine Learning in Physical Chemistry"
+	special issue of the Journal of Physical Chemistry, specifically in part B, section
+	B4: Fluid Interfaces, Colloids, Polymers, Soft Matter, Surfactants, and Glassy Materials.
+	We have received generally positive and constructive feedback from two reviewers
+	which we have used to further strengthen our work. We expect this work to be of 
+	significant interest to researchers who study complex dynamics in both structured
+	and amorphous soft materials.
+	
+	%BJC: should I summarize the changes that were made here?
+
+	% BJC: not sure if I should summarize again (this is from the original cover letter
+	In this article, we apply the sticky hierarchical Dirichlet process autoregressive
+	hidden Markov model (HDP-AR-HMM), a non-parametric Bayesian time series
+	classification technique, to solute center-of-mass trajectories generated from
+	5 $\mu s$ molecular dynamics (MD) simulations in a cross-linked inverted hexagonal
+	phase lyotropic liquid crystal (LLC) membrane in order to automatically detect a
+	variety of solute dynamical modes. We can use this information in order to 
+	better understand the complex transport mechanisms exhibited by the solutes in 
+	our simulation which will greatly increase the efficiency with which we 
+	design LLC membranes for solute-specific separations.
+	
+	Our work represents a considerable advancement over our most recent study 
+	characterizing the same set of solute center-of-mass time series trajectories
+	(Coscia and Shirts, arXiv:2004.07905 [cond-mat.soft]). In that work, we used
+	our previously gained qualitative understanding of solute transport (Coscia 
+	and Shirts \textit{J. Phys. Chem. B}, 123, 6314--6330 (2019)) in order to 
+	formulate stochastic models which could be used to project solute behavior
+	on macroscopic time scales, thus allowing prediction of experimentally relevant
+	properties like membrane selectivity. Using the HDP-AR-HMM, we can analyze solute
+	trajectories with no prior knowledge of their dynamic behavior and easily produce
+	models which quantitatively describe their long time scale dynamics. Since the 
+	approach is non-parametric, the complexity of our data drives the complexity of
+	the model. We cluster the parameter sets in order to reduce the total space of 
+	dynamical states to a small set of distinct parameters which allow us to clearly
+	understand physical	mechanisms in terms of solute-membrane interactions. To our 
+	knowledge, this is the first application of the HDP-AR-HMM to MD data and it is
+	the first time this framework has been used to gain both mechanistic and kinetic
+	insight. 
+	
+	%BJC: I assume I can get rid of this?
+	\noindent Some suggestions for reviewers are:
+	\begin{enumerate}
+	
+		\item Francisco Hung has used molecular simulations to study nematic liquid crystals
+		and transport under confinement within various nanostructured materials 
+		(Northeastern University, 617-373-8619,\\ \href{mailto:f.hung@northeastern.edu}{f.hung@northeastern.edu}).
+		
+		\item Mahesh Mahanthappa has experience modeling soft materials using molecular dynamics
+		including work on ion transport in various ordered liquid crystalline phases. 
+		(University of Minnesota, 612-625-4599, \href{mailto:maheshkm@umn.edu}{maheshkm@umn.edu}).
+		
+		\item Stephen Paddison uses various levels of molecular simulation theory to understand
+		proton transport in nanostructured and charged polymer membranes. (The University of Tennessee 
+		Knoxville, 865-974-2026, \href{mailto:spaddison@utk.edu}{spaddison@utk.edu}).
+		
+		\item Venkat Ganesan uses multiscale modeling to study solute and ion transport in complex
+		nanostructured morphologies in order to learn how to design novel materials. (The University
+		of Texas at Austin, 512-471-4856, \href{mailto:venkat@che.utexas.edu}{venkat@che.utexas.edu}).
+		
+		%BJC: from structure paper
+		\item Eric Jankowski has experience modeling soft materials using molecular dynamics.
+		(Boise State University, 208-426-5681, \href{mailto:ericjankowski@boisestate.edu}{ericjankowski@boisestate.edu})
+		
+		\item Coray Colina uses various simulation techniques to understand structure-property relations
+		in functional materials including nanoporous materials for separation applications. (University
+		of Florida, 352-294-3488, \href{mailto:colina@chem.ufl.edu}{colina@chem.ufl.edu}).
+		
+%		\item Martin Lindén has use variational Bayesian treatments of hidden Markov models in
+%		order to learn from thousands of single-particle trajectories.
+%		
+%		\item Steve Presse
+%		
+	\end{enumerate}
+	
+	\noindent Please send correspondence regarding this paper to Michael R. Shirts (contact
+	details in letterhead).\\	
+	
+	\noindent Sincerely,
+	
+	\noindent Michael R. Shirts \\
+	\noindent Benjamin J. Coscia \\
+	\noindent Christopher P. Calderon \\
+	
+\end{document}
+
+% LocalWords:  BJC
