@@ -18,8 +18,8 @@ def initialize():
 
     parser = argparse.ArgumentParser(description='Crosslink LLC structure')  # allow input from user
 
-    parser.add_argument('-i', '--initial', default='initial.gro', help='Name of input file')
-    parser.add_argument('-b', '--build_mon', default='NAcarb11Vd', type=str, help='Monomer the system is built with')
+    parser.add_argument('-i', '--initial', default='solvated_final.gro', help='Name of input file')
+    parser.add_argument('-b', '--build_mon', default='Dibrpyr14', type=str, help='Monomer the system is built with')
     parser.add_argument('-c', '--cutoff', default=5, type=float, help='Cutoff percentage for cross-linking. Bottom x %'
                                                               ' of the distribution of distances will be cross-linked ')
     parser.add_argument('-e', '--term_prob', default=5, type=float, help='Termination probability (%)')
@@ -28,7 +28,7 @@ def initialize():
     parser.add_argument('-itp', '--xlink_top_name', default='assembly.itp', help='Name of .itp topology file describing'
                         'assembly of cross-linked monomers.')
     parser.add_argument('-top', '--topname', default='topol.top', help='Name of topology file')
-    parser.add_argument('-T', '--temperature', default=300, type=float, help='Temperature at which to run system (K)')
+    parser.add_argument('-T', '--temperature', default=343, type=float, help='Temperature at which to run system (K)')
     parser.add_argument('--em_steps', default=5000, type=int, help='Maximum number of steps to run during energy'
                                                                   'minimization')
     parser.add_argument('-dt', '--dt', default=0.002, type=float, help='Time step for NVT simulations (ps)')
@@ -36,8 +36,8 @@ def initialize():
     parser.add_argument('-ff', '--forcefield', default='gaff', help='Name of forcefield used during simulation')
     parser.add_argument('-mdp_em', '--mdp_em', default='em.mdp', help='Name of energy minimization .mdp file')
     parser.add_argument('-mdp_nvt', '--mdp_nvt', default='nvt.mdp', help='Name of energy minimization .mdp file')
-    parser.add_argument('-res', '--residue', default='HII', help='Name of residue to be cross-linked')
-    parser.add_argument('-resd', '--dummy_residue', default='HIId', help='Name of residue to be cross-linked with '
+    parser.add_argument('-res', '--residue', default='MOL', help='Name of residue to be cross-linked')
+    parser.add_argument('-resd', '--dummy_residue', default='MOLd', help='Name of residue to be cross-linked with '
                                                                          'dummy atoms included in the topology')
     parser.add_argument('-density', '--density', default=95, type=float, help='Cross-link density (percent of x-links'
                         'that need to be cross-linked for procedure to terminate')
@@ -768,7 +768,8 @@ class System(Topology):
 
         file_rw.write_gro_pos(self.t.xyz[-1, keep, :], out, ids=ids, res=res, ucell=ucell)
 
-        #self.xlink_residue_name = self.original_residue_name  # Untested! I think this should fix the final residue name #SS removed
+        self.nresidues[self.original_residue_name] = self.nresidues.pop(self.xlink_residue_name)  # SS Update dictionary key
+        self.xlink_residue_name = self.original_residue_name  # Untested! I think this should fix the final residue name #SS fixed with the line just above
         self.write_assembly_topology(virtual_sites=False, vsite_atom_name=dummy_atom_name)
 
 
@@ -916,11 +917,16 @@ def crosslink(params):
     print('Done!')
 
     print('Removing remaining dummy atoms from .gro and .itp files...', end='', flush=True)
-    sys.cleanup(out=params['output_gro'])
+    sys.cleanup(out='xlinked_temp.gro')
     print('Done!')
 
+    # generate new top file
+    new_top = SystemTopology('xlinked_temp.gro', ff=params['forcefield'], xlink=True,
+                             xlinked_top_name=params['xlink_top_name'])
+    new_top.write_top(name=params['topname'])
+
     print('Energy minimizing %s...' % params['output_gro'], end='', flush=True)
-    gromacs.simulate(params['mdp_em'], params['topname'], params['output_gro'], params['output_gro'].split('.')[0],
+    gromacs.simulate(params['mdp_em'], params['topname'], 'xlinked_temp.gro', params['output_gro'].split('.')[0],
                      mpi=params['parallelize'], nprocesses=params['nproc'])
     print('Done!')
 
