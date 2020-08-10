@@ -104,21 +104,32 @@
   phases can be cross-linked into mechanically strong membranes capable of highly 
   selective separations. Inverted hexagonal phase, or H\textsubscript{II}, LLC membranes
   are synthesized with 10 \% water by weight and are characterized by hexagonally packed,
-  uniform-sized and straight pores, an ideal geometry for high throughput transport. 
+  uniform-sized and straight pores, an ideal geometry for high throughput transport (see
+  Figure~\ref{fig:membrane_side_profile}). 
   Their pores are lined with the LLC monomer's functional groups which can potentially 
   be designed to interact with solutes in a chemically-specific manner. It would be 
   extremely useful to experimentalists if we could connect LLC monomer design with 
   measurable quantities such as diffusivity and selectivity.
   %r1_comment4
-  In many systems, including LLC membranes with higher water contents, making this 
-  connection is a relatively straightforward calculation since small solutes and water
-  can move relatively unimpeded and therefore enter a diffusive regime on timescales
-  accessible to MD. When possible, we encourage the reader to take advantage of the
-  simplest approach possible.
-  However, in the systems of interested to us,
-  this goal is complicated by the non-Brownian hopping and trapping behavior induced by the membrane's diverse
+  In many systems, including LLC membranes with water contents higher than the 10 wt\% 
+  water system studied here, making this connection can be relatively straightforward 
+  calculation with standard techniques since small solutes and water can move relatively
+  unimpeded and therefore enter a diffusive regime on timescales accessible to MD. When
+  possible, we encourage the reader to take advantage of the simplest approach possible. 
+  However, for the system that has captured our interest, this goal is complicated by 
+  the non-Brownian hopping and trapping behavior induced by the membrane's diverse
   topology and inhomogeneous structure resulting in subdiffusive behavior out to 
   multiple microseconds of simulation.~\cite{coscia_understanding_2019,coscia_chemically_2019}
+  
+  \begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{membrane_side_profile.pdf}
+  \caption{When combined with 10 wt\% water, the LLC monomer studied in this work forms the 
+    H\textsubscript{II} phase which is characterized by hexagonally packed columns with 
+    hydrophilic pores. In the figure, white and red water molecules mark the membrane pores.
+    The monomer fills the rest of the space. Note that water molecules are present in the 
+    tails, but they are hidden for the sake of clarity.}\label{fig:membrane_side_profile}
+  \end{figure}
   
   %r1_comment2
   A number of approaches have been explored to inexpensively extend the relatively short
@@ -324,6 +335,30 @@
   fs at a pressure of 1 bar and temperature of 300K controlled by the semi-isotropic 
   Parrinello-Rahman barostat~\cite{parrinello_polymorphic_1981} and velocity rescale 
   thermostat~\cite{bussi_canonical_2007} respectively. We recorded configurations every 0.5 ns.
+  
+  In consideration of our ultimate goal, which is to use high-throughput simulations to 
+  facilitate our understanding of LLC membrane design for solute-specific separations, the size 
+  of our system and length of the accompanying molecular simulations appears to be somewhat 
+  impractical. Dependent on one's goals, it may not be necessary to run such long simulations in order 
+  to extract valuable mechanistic insight. We originally uncovered the mechanisms discussed
+  in this study using trajectories a fraction of the length here.\cite{coscia_chemically_2019} A 
+  strong mechanistic understanding of solute transport with respect to the chemical features of a 
+  given LLC monomer may be enough for experimentalists to eliminate entire subsets of potential
+  design changes. However, it may still be valuable to consider how one might make these simulations
+  amenable to high-throughput studies. We would like to emphasize that our large, fully atomistic 
+  models will be extremely valuable as a benchmark system used to explore less expensive models. 
+  For example, we could explore systems built with fewer LLC monomers by making the membrane pores
+  shorter. We could also build systems with higher concentrations of solutes in order to gather more 
+  dynamical data on shorter timescales. Using what we have learned about the radial distribution
+  functions of these solutes in this and our previous work~\cite{coscia_chemically_2019}, it may be possible to 
+  learn how to create initial configurations with solutes initially distributed in a way that
+  is close to their equilibrium distribution, allowing solutes to thoroughly explore the 
+  accessible membrane structural space more quickly and reducing the amount of unequilibrated
+  data that must be discarded. Alternatively, we could use grand canonical Monte Carlo simulations
+  to load solutes into the membrane~\cite{snurr_prediction_1993}. Finally, it may be possible 
+  to speed up our simulations by reducing the number of atoms using united-atom representations
+  of the liquid crystal monomers~\cite{horta_gromos-compatible_2016} or by using hydrogen mass 
+  repartitioning to allow us to increase the MD time step.~\cite{hopkins_long-time-step_2015}
 
   \subsection{Applying the sticky HDP-AR-HMM to MD Trajectories}\label{method:HDP-AR-HMM}
 
@@ -1126,7 +1161,7 @@
 
   \clearpage
 
-  \bibliographystyle{ieeetr}
+  % \bibliographystyle{ieeetr}
   \bibliography{hdphmm}
   
   \newpage

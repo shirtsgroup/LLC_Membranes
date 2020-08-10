@@ -72,8 +72,9 @@ text with appropriate numbering.
     divides a unit cell into a three dimensional grid and quantifies the transition 
     probabilities of particles that can move between each subdivision allowing one to generate
     stochastic trajectories that reach the diffusive regime~\cite{neyertz_trajectory-extending_2010}
-    It is possible to parameterize TEKMC models with relatively short simulation trajectories 
-    which facilitates systematic studies of small perturbations to material constituents.~\cite{hanson_computer_2012}
+    If the dynamics of the system are fast enough, it is possible to parameterize TEKMC models with
+    relatively short simulation trajectories which facilitates systematic studies of small perturbations
+    to material constituents.~\cite{hanson_computer_2012}
     In a related approach, dynamic bond percolation (DBP) theory can be used to quantify the
     rate of transition between sites in a dynamically disordered medium and long timescale
     behavior can be propagated using kinetic Monte Carlo simulations.~\cite{druger_dynamic_1983}
@@ -100,17 +101,26 @@ text with appropriate numbering.
     own stochastic modeling approaches with goals similar to both TEKMC and DBP.
     \end{quote}
 
-    %MRS: tweaked below.
+    %BJC2: 
     We agree that a full comparison of our method to other methods for computing long timescale 
     diffusion such as TEKMC would be very interesting and instructive but feel it would be better 
-    suited as a separate study where we could include a number of approaches, including perhaps
+    suited as a separate study where we could evaluate a number of approaches, including perhaps
     recent approaches we have developed within our research group.~\cite{coscia_capturing_2020}
+    %BJC2: added to make the point about our system being more complicated than those studied.
+    It would be illuminating to test these methods on systems such as ours where there is
+    a rich diversity of intermolecular interactions that work to immobilize solutes.
     Such a large-scale comparison would take more space and time than would be appropriate for 
-    the current paper. Although method such as TEKMC seems a fairly straightforward approach to
+    the current paper. Although methods such as TEKMC seems a fairly straightforward approach to
     implement, it is not immediately clear how we could optimally adapt the methodology to a 
-    monoclinic unit cell with two dimensional order. 
-%    the grids that divide the homogeneous cubic unit cells of the referenced TEKMC studies to 
-%    our system which uses a monoclinic unit cell and has 2 dimensional order. 
+    monoclinic unit cell with two dimensional order without in-depth testing.
+    % the grids that divide the homogeneous cubic unit cells of the referenced TEKMC studies to 
+    % our system which uses a monoclinic unit cell and has 2 dimensional order. 
+    %BJC2: maybe push back on the CS-DBP here? 
+    Regarding the CS-DBP model, we are not convinced it would be suitable for our goals because
+    it relies on defining bound states and modeling hops between them. There are numerous potential
+    locations within our LLC system where solutes can become bound in some way. The HDP-AR-HMM
+    circumvents the need for relatively complicated methods used to identify binding sites 
+    by automatically identifying distinct dynamics characteristic of a class of bound states. 
     
     As stated by the reviewer, there are two goals of our work: to obtain long timescale MSDs and
     to understand mechanisms leading to diffusive behavior. TEKMC may be a suitable alternative 
@@ -125,7 +135,7 @@ text with appropriate numbering.
     time series in order to hypothesize transport mechanisms. In this work we "re-discover" these
     mechanisms with minimal human intervention and characterize them in detail using the 
     HDP-AR-HMM while \textit{simultaneously} providing a method to estimate diffusion constants.
-    
+
 %MRS: additional thoughts:
 
 %1. Dynamic Bond Percolation theory (both the original version and the
@@ -142,6 +152,7 @@ text with appropriate numbering.
 %(ionic binding PLUS hydrophobic binding, i.e. more types of bound
 %states; it's not just binding and hopping, and thus something
 
+%BJC2: I believe I had orginally addressed this briefly as well. Feel free to expand if you feel there is more to be said
 %3. Configurational behavior is more complex with the nanostructures,
 %because one cannot simply divide the structure into cubes
 %isotropically.  It may be easier to use our approach with more
@@ -165,7 +176,7 @@ text with appropriate numbering.
 %that we probably get more efficient use of simulations by running
 %fewer, longer simulations.
 
-
+% BJC2: assuming this comment about CS-DBP?
 %6. So it's not clear that this method is better than DBP or TEKMC
 % (especially since the results are a big ambiguous); one could define
 % bound states, and look at hops betwen then.  But it's definitely
@@ -228,7 +239,8 @@ text with appropriate numbering.
     parameters and selectivity predictions.
     \end{quote}
     
-    Finally, we have added a figure with a picture of the system which we are studying:
+    Finally, we have added a figure with a picture of the system which we are studying 
+    (see~\ref{fig:membrane_side_profile}).
     \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{membrane_side_profile.pdf}
@@ -269,6 +281,7 @@ text with appropriate numbering.
     
     Updated text with additions highlighted in yellow:
     
+    \begin{quote}
     In this work, we are particularly interested in the design of lyotropic liquid 
     crystal (LLC) monomers, a class of amphiphilic molecules whose ordered self-assembled
     phases can be cross-linked into mechanically strong membranes capable of highly 
@@ -278,16 +291,17 @@ text with appropriate numbering.
     functional groups which can potentially be designed to interact with solutes in a 
     chemically-specific manner. It would be extremely useful to experimentalists if we 
     could connect LLC monomer design with measurable quantities such as diffusivity and
-    selectivity.\hl{In many systems, including LLC membranes with water contents higher
+    selectivity. \hl{In many systems, including LLC membranes with water contents higher
     than the 10 wt\% water system studied here, making this connection can be relatively 
     straightforward calculation with standard techniques since small solutes and water 
     can move relatively unimpeded and therefore enter a diffusive regime on timescales 
     accessible to MD. When possible, we encourage the reader to take advantage of the 
-    simplest approach possible. However, for the system that has capture our interest,} 
+    simplest approach possible. However, for the system that has captured our interest,} 
     this goal is complicated by the non-Brownian hopping and trapping behavior induced 
     by the membrane's diverse topology and inhomogeneous structure resulting in subdiffusive
     behavior out to multiple microseconds of simulation.~\cite{coscia_understanding_2019,coscia_chemically_2019}
-        
+    \end{quote}
+    
     %r1_comment5
     \item \textit{In the HDP-AR-HMM method, it is not clear to me how the solute molecules are 
     constrained to be confined within the pore radius (which they must be on physical grounds 
@@ -295,8 +309,9 @@ text with appropriate numbering.
     for more complicated systems (e.g. gyroid LLCs with 3D channels) such a constraint may be 
     necessary and it is unclear how the method would generalize. This should be discussed.}
     
-    Author reply: We thank the reviewer for posing this question as this a constraint to which 
-    we gave thought but neglected to emphasize in the main text. 
+    Author reply: 
+    %We thank the reviewer for posing this question as this a constraint to which 
+    %we gave thought but neglected to emphasize in the main text. 
     %BJC: he's not saying that solutes should stay in the aqueous pore region right? We talk pretty
     % extensively about solute behavior in the tails so his steric argument is confusing me.  
 
@@ -407,7 +422,7 @@ text with appropriate numbering.
     ergodic the red and blue bars should be proportional to each other.}
     
     Author reply: We thank the reviewer for identifying the potential confusion that could be
-    caused by our use of the word 'ergodic'. Figure 7 clearly demonstrates that individual trajectories
+    caused by our use of the word `ergodic'. Figure 7 clearly demonstrates that individual trajectories
     are not by themselves ergodic. Our intention was to communicate our assumption that collectively all 24 
     trajectories visit all possible dynamic states with representative probability. This is 
     necessary in order to make accurate long timescale predictions. The 5 $\mu s$ length of our 
