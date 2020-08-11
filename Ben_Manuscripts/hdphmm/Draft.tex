@@ -62,7 +62,7 @@
   affords a direct connection to important macroscopic observables used to characterize
   performance like solute flux and selectivity. 
 
-  Overall, this work provides a promising way to simultaneously identify transport 
+  This work provides a promising way to simultaneously identify transport 
   mechanisms in nanoporous materials and project complex diffusive behavior on
   long time scales. Our enhanced understanding of the diverse range of solute behavior
   allows us to hypothesize design changes to LLC monomers aimed towards controlling the
@@ -154,7 +154,7 @@
   Based on the chemical intuition gained from our previous qualitative MD studies of 
   solute transport in an H\textsubscript{II} phase LLC membrane, we have contributed our
   own stochastic modeling approaches with goals similar to both TEKMC and DBP.~\cite{coscia_chemically_2019,coscia_capturing_2020}
-  We identified three classes of trapping behavior which result in subdiffusion out to the microsecond 
+  In previous studies, we identified three classes of trapping behavior which result in subdiffusion out to the microsecond 
   time scale. In our first approach to stochastically model this behavior, we treated 
   the system's dynamics as a sequence of anti-correlated hops between power law distributed periods of 
   entrapment, a framework called subordinated fractional Brownian or L\'evy
@@ -173,13 +173,19 @@
   of stochastic trajectory realizations that can be used to predict macroscopic transport
   properties.
   
-  In this work we attempt to uncover similar physical meaning through a data-driven process. 
-  We utilize the sticky hierarchical Dirichlet process autoregressive hidden Markov model 
-  (HDP-AR-HMM), a nonparameteric Bayesian classification technique that allows the user to 
-  automatically detect and infer the parameters of an unknown number of latent vector
-  autoregressive (VAR) modes present in solute center-of-mass MD 
-  trajectories.~\cite{fox_bayesian_2010} The sticky HDP-AR-HMM greatly extends the 
-  basic framework of simpler but more limited finite hidden Markov modeling approaches.
+  In this work we attempt to uncover similar physical meaning through
+  a data-driven process in which we characterize the local behavior of
+  the system through analysis of the dynamical characteristics o
+  particle trajectories.  This differs from other other approaches
+  such as TEKMC and DBP than cluster based on configurations visited
+  to extend the trajectories. We utilize the sticky hierarchical
+  Dirichlet process autoregressive hidden Markov model (HDP-AR-HMM), a
+  nonparameteric Bayesian classification technique that allows the
+  user to automatically detect and infer the parameters of an unknown
+  number of latent vector autoregressive (VAR) modes present in solute
+  center-of-mass MD trajectories.~\cite{fox_bayesian_2010} The sticky
+  HDP-AR-HMM greatly extends the basic framework of simpler but more
+  limited finite hidden Markov modeling approaches.
     
   In their most basic form, hidden Markov models (HMMs) are used to generate
   a series of latent, or hidden, states dependent only on the previous state.~\cite{rabiner_tutorial_1989}
@@ -1194,4 +1200,5 @@
 % LocalWords:  plateaued nclusters leftmargin trans diffusivity sorption alkane
 % LocalWords:  ness substituents desalination fonseca couto welch singhal noe
 % LocalWords:  shirtsgroup superdiffusive diffusivities jazani wang persson CPC
-% LocalWords:  shortlag jupyter ester
+% LocalWords:  shortlag jupyter ester wt TEKMC DBP Webb Antechamber
+% LocalWords:  polarizable unequilibrated traj bicontinuous
