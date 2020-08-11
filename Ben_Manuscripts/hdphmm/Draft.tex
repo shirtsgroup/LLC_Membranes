@@ -336,22 +336,22 @@
   solute clustering facilitating our study of pure solute-membrane interactions. 
   Further details on the setup and equilibration of these systems are detailed 
   in our previous work.~\cite{coscia_chemically_2019}
-  
+   
   Each solute system was simulated for 5 $\mu$s using MD. We used a time step of 2 
   fs at a pressure of 1 bar and temperature of 300K controlled by the semi-isotropic 
   Parrinello-Rahman barostat~\cite{parrinello_polymorphic_1981} and velocity rescale 
   thermostat~\cite{bussi_canonical_2007} respectively. We recorded configurations every 0.5 ns.
   
-  In consideration of our ultimate goal, which is to use high-throughput simulations to 
+  Given our ultimate goal, to use high-throughput simulations to 
   facilitate our understanding of LLC membrane design for solute-specific separations, the size 
-  of our system and length of the accompanying molecular simulations appears to be somewhat 
-  impractical. Dependent on one's goals, it may not be necessary to run such long simulations in order 
+  of our system and length of the accompanying molecular simulations appears may be somewhat 
+  impractical. In many situations, it may not be necessary to run such long simulations in order 
   to extract valuable mechanistic insight. We originally uncovered the mechanisms discussed
-  in this study using trajectories a fraction of the length here.\cite{coscia_chemically_2019} A 
+  in this study using trajectories a fraction of the length here~\cite{coscia_chemically_2019}. A 
   strong mechanistic understanding of solute transport with respect to the chemical features of a 
   given LLC monomer may be enough for experimentalists to eliminate entire subsets of potential
-  design changes. However, it may still be valuable to consider how one might make these simulations
-  amenable to high-throughput studies. We would like to emphasize that our large, fully atomistic 
+  design changes. However, it is still valuable to consider how one might make these simulations
+  amenable to high-throughput studies. We emphasize that our large, fully atomistic 
   models will be extremely valuable as a benchmark system used to explore less expensive models. 
   For example, we could explore systems built with fewer LLC monomers by making the membrane pores
   shorter. We could also build systems with higher concentrations of solutes in order to gather more 
@@ -361,9 +361,14 @@
   is close to their equilibrium distribution, allowing solutes to thoroughly explore the 
   accessible membrane structural space more quickly and reducing the amount of unequilibrated
   data that must be discarded. Alternatively, we could use grand canonical Monte Carlo simulations
-  to load solutes into the membrane~\cite{snurr_prediction_1993}. Finally, it may be possible 
-  to speed up our simulations by reducing the number of atoms using united-atom representations
-  of the liquid crystal monomers~\cite{horta_gromos-compatible_2016} or by using hydrogen mass 
+  to load solutes into the membrane~\cite{snurr_prediction_1993}.
+  If simulation resources are available, the simulations could be split up into larger numbers of shorter simulations.
+  Finally, it may be possible 
+  to speed up our simulations
+  %MRS2: united atom would screw up the kinetics too much. 
+  %by reducing the number of atoms using united-atom representations
+  %of the liquid crystal monomers~\cite{horta_gromos-compatible_2016} or
+  by using hydrogen mass 
   repartitioning to allow us to increase the MD time step.~\cite{hopkins_long-time-step_2015}
 
   \subsection{Applying the sticky HDP-AR-HMM to MD Trajectories}\label{method:HDP-AR-HMM}
