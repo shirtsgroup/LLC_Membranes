@@ -112,7 +112,7 @@
   measurable quantities such as diffusivity and selectivity.
   %r1_comment4
   In many systems, including LLC membranes with water contents higher than the 10 wt\% 
-  water system studied here, making this connection can be relatively straightforward 
+  water system studied here, making this connection can be a relatively straightforward 
   calculation with standard techniques since small solutes and water can move relatively
   unimpeded and therefore enter a diffusive regime on timescales accessible to MD. When
   possible, we encourage the reader to take advantage of the simplest approach possible. 
@@ -138,8 +138,9 @@
   divides a unit cell into a three dimensional grid and quantifies the transition 
   probabilities of particles that can move between each subdivision allowing one to generate
   stochastic trajectories that reach the diffusive regime~\cite{neyertz_trajectory-extending_2010}
-  It is possible to parameterize TEKMC models with relatively short simulation trajectories 
-  which facilitates systematic studies of small perturbations to material constituents.~\cite{hanson_computer_2012}
+  If the dynamics of the system are fast enough, it is possible to parameterize TEKMC models with
+  relatively short simulation trajectories which facilitates systematic studies of small perturbations
+  to material constituents.~\cite{hanson_computer_2012}
   In a related approach, dynamic bond percolation (DBP) theory can be used to quantify the
   rate of transition between sites in a dynamically disordered medium and long timescale
   behavior can be propagated using kinetic Monte Carlo simulations.~\cite{druger_dynamic_1983}
@@ -310,7 +311,7 @@
   monoclinic unit cell with 10\% water by weight, totaling 62,000 atoms. Approximately
   one third of the water molecules occupy the tail region with the rest are near the
   pore center.~\cite{coscia_chemically_2019}
-
+  
   %r1_comment3  
   We modeled water molecules using the TIP3P water model,~\cite{jorgensen_comparison_1983}
   We used the Antechamber module shipped with AmberTools18 to parameterize monomers and 
@@ -342,17 +343,17 @@
   Parrinello-Rahman barostat~\cite{parrinello_polymorphic_1981} and velocity rescale 
   thermostat~\cite{bussi_canonical_2007} respectively. We recorded configurations every 0.5 ns.
   
-  Given our ultimate goal, to use high-throughput simulations to 
-  facilitate our understanding of LLC membrane design for solute-specific separations, the size 
-  of our system and length of the accompanying molecular simulations appears may be somewhat 
-  impractical. In many situations, it may not be necessary to run such long simulations in order 
-  to extract valuable mechanistic insight. We originally uncovered the mechanisms discussed
-  in this study using trajectories a fraction of the length here~\cite{coscia_chemically_2019}. A 
+  Given our ultimate goal, to use high-throughput simulations to facilitate our understanding 
+  of LLC membrane design for solute-specific separations, the size of our system and length 
+  of the accompanying molecular simulations may be somewhat impractical. In many 
+  situations, it may not be necessary to run such long simulations in order to extract 
+  valuable mechanistic insight. We originally uncovered the mechanisms discussed in this
+  study using trajectories a fraction of the length here~\cite{coscia_chemically_2019}. A 
   strong mechanistic understanding of solute transport with respect to the chemical features of a 
   given LLC monomer may be enough for experimentalists to eliminate entire subsets of potential
   design changes. However, it is still valuable to consider how one might make these simulations
   amenable to high-throughput studies. We emphasize that our large, fully atomistic 
-  models will be extremely valuable as a benchmark system used to explore less expensive models. 
+  model will be extremely valuable as a benchmark system used to explore less expensive models. 
   For example, we could explore systems built with fewer LLC monomers by making the membrane pores
   shorter. We could also build systems with higher concentrations of solutes in order to gather more 
   dynamical data on shorter timescales. Using what we have learned about the radial distribution
@@ -361,14 +362,9 @@
   is close to their equilibrium distribution, allowing solutes to thoroughly explore the 
   accessible membrane structural space more quickly and reducing the amount of unequilibrated
   data that must be discarded. Alternatively, we could use grand canonical Monte Carlo simulations
-  to load solutes into the membrane~\cite{snurr_prediction_1993}.
-  If simulation resources are available, the simulations could be split up into larger numbers of shorter simulations.
-  Finally, it may be possible 
-  to speed up our simulations
-  %MRS2: united atom would screw up the kinetics too much. 
-  %by reducing the number of atoms using united-atom representations
-  %of the liquid crystal monomers~\cite{horta_gromos-compatible_2016} or
-  by using hydrogen mass 
+  to load solutes into the membrane~\cite{snurr_prediction_1993}. If simulation resources are
+  available, the simulations could be split up into larger numbers of shorter simulations.
+  Finally, it may be possible to speed up our simulations by using hydrogen mass 
   repartitioning to allow us to increase the MD time step.~\cite{hopkins_long-time-step_2015}
 
   \subsection{Applying the sticky HDP-AR-HMM to MD Trajectories}\label{method:HDP-AR-HMM}
@@ -1026,16 +1022,14 @@
   \includegraphics[width=\textwidth]{association_fraction_lifetimes.pdf}
   \caption{}\label{fig:association_fraction_lifetimes}
   \end{subfigure}
-  %y-axis label being cut off?
-  \caption{(a) We analyzed hydrogen bonds donated by methanol to the highlighted oxygen
-  atoms in three regions of the monomer: the carboxylate groups (blue), the ether linkages
-  (green) and the tails (red). (b) For each predominant state (states 1--5 described in 
-  Figure~\ref{fig:prevalence}), we plotted the fraction of the total time in that state 
-  spent hydrogen bonding to various regions of the monomer, color coded to match (a).
-  (c) For each type of hydrogen bond in each predominant state, we calculated the 95th percentile
-  of hydrogen bond lifetimes. (d) We also analyzed the frequency and lifetimes of solute 
-  association with sodium ions. Methanol associates with sodium less than 10\% of the total 
-  time it occupies any of the predominant states.
+  \caption{(a) Hydrogen bonds can be donated by methanol to the highlighted oxygen atoms in three 
+    regions of the monomer: the carboxylate groups (blue), the ether linkages (green) and the
+    tails (red). (b) For each predominant state (states 1--5 described in Figure~\ref{M-fig:prevalence}),
+    the fraction of the total time in that state spent hydrogen bonding to various regions
+    of the monomer, color coded to match (a). (c) The 95th percentile of hydrogen bond lifetimes for
+    each type of hydrogen bond in each predominant state (d) The frequency and lifetimes of solute 
+    association with sodium ions. Methanol associates with sodium less than 10\% of the total time 
+    it occupies any of the predominant states.   
   }
   \label{fig:hydrogen_bonding}
   \end{figure}
