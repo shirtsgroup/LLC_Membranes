@@ -9,7 +9,7 @@ import os
 script_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
-def simulate(mdp, top, gro, out, verbose=False, em_energy=False, mpi=False, nprocesses=4, dd=None, restraints=False):
+def simulate(mdp, top, gro, out, verbose=True, em_energy=False, mpi=False, nprocesses=4, dd=None, restraints=False):
     """ A wrapper for running GROMACS molecular dynamics simulations
 
     :param mdp: name of GROMACS Molecular Dynamics Paramters (mdp) file

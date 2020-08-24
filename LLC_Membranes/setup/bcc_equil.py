@@ -318,15 +318,19 @@ class EquilibrateBCC(topology.LC):
             raise EnsembleError("%s is not a valid (or not implemented) thermodynamic ensemble" % ensemble)
 
         delta = gromacs.insert_molecules(self.gro_name, self.solvent.name, self.nsolvent, 'solvated.gro',
-                                         scale=scale, mpi=self.mpi)
+                                         scale=scale, mpi=False)
         total += delta
         print('Inserted %d %s molecules for a total of %d' % (delta, self.solvent.name, total))
 
+        mv = 'mv solvated.gro solv_%d.gro' % total
+        p = subprocess.Popen(mv.split())
+        p.wait()
+        
         if delta != 0:  # prevents unnecessary energy minimizations
 
             self.topology.add_residue(self.solvent, n=delta, write=True, topname=self.top_name)
             print('Energy minimizing...', end='', flush=True)
-            gromacs.simulate(self.em_mdp, self.top_name, 'solvated.gro', 'em_%d' % total, mpi=self.mpi,
+            gromacs.simulate(self.em_mdp, self.top_name, 'solv_%d.gro' % total, 'em_%d' % total, mpi=self.mpi,
                              nprocesses=self.nprocesses, restraints=True)  # energy minimize
             print('Done!')
 
@@ -341,7 +345,7 @@ class EquilibrateBCC(topology.LC):
 
         return delta
 
-    def add_solvent(self, solvent, tol=10, scale=0.45, nvt_length=1000, npt_length=1000, out='solvated_final.gro',
+    def add_solvent(self, solvent, tol=10, scale=0.45, nvt_length=1000, npt_length=5000, out='solvated_final.gro',
                     nolimit=False):
         """ Name of solvent residue to add to structure. This is an iterative process of solvent insertion, energy
         minimzation, and an nvt simulation
@@ -464,8 +468,6 @@ if __name__ == "__main__":
         sys.exit('Using argparse for most arguments in this script is no longer supported. Please make a .yaml file')
 
     os.environ["GMX_MAXBACKUP"] = "-1"  # stop GROMACS from making backups
-    if not os.path.isdir("./intermediates"):
-        os.mkdir('intermediates')
 
     equil = EquilibrateBCC(build_params['build_monomer'], build_params['space_group'], build_params['box_length'],
                            build_params['weight_percent'], build_params['density'], build_params['restraints'],
@@ -501,7 +503,9 @@ if __name__ == "__main__":
         equil.shrink_unit_cell(sim_params['scale_factor'], 1.0, 0.1)  # EquilibrateBCC object, start, stop, step
 
         # CLEAN UP -- move all scaled unit cells into a separate directory
-        mv = "mv scaled*.gro intermediates"
+        if not os.path.isdir("./temp-scaling"):
+            os.mkdir('temp-scaling')
+        mv = "mv scaled*.gro temp-scaling"
         p = subprocess.Popen(mv, shell=True)  # don't split mv because shell=True
         p.wait()
 
@@ -513,22 +517,26 @@ if __name__ == "__main__":
 
     if not args.continue_solvated and not args.continue_xlinked:
 
-        equil.add_solvent(build_params['solvent'])
+        equil.add_solvent(build_params['solvent'], out='solvated_gly.gro')
 
-        mv = "mv solvated_nvt* solvated_npt* npt_equil* npt_* nvt_equil* em_* intermediates"
+        if not os.path.isdir("./temp-gly"):
+            os.mkdir('temp-gly')
+        mv = "mv solv_* solvated_nvt* solvated_npt* npt_equil* npt_* nvt_equil* em_* temp-gly"
         p = subprocess.Popen(mv, shell=True)  # don't split mv because shell=True
         p.wait()
 
     else:
 
-        equil.gro_name = 'solvated_final.gro'
+        equil.gro_name = 'solvated_gly.gro'
 
     if not args.continue_xlinked:
         # cross-linking
         xlink.crosslink(xlink_params)  # run cross-linking algorithm
 
         #clean
-        mv = "mv dummies.* nvt*.* em*.* intermediates"
+        if not os.path.isdir("./temp-xlink"):
+            os.mkdir('temp-xlink')
+        mv = "mv dummies.* em_dummies.* temp-xlink"
         p = subprocess.Popen(mv, shell=True)  # don't split mv because shell=True
         p.wait()
 
@@ -540,6 +548,8 @@ if __name__ == "__main__":
     equil.add_solvent('HOH', out='solvated_water.gro', scale=0.8)  # add that water
 
     #clean
-    mv = "mv solvated_nvt* solvated_npt* npt_equil* npt_* nvt_equil* em_* intermediates"
+    if not os.path.isdir("./temp-water"):
+        os.mkdir('temp-water')
+    mv = "mv solvated_nvt* solvated_npt* npt_equil* npt_* nvt_equil* em_* temp-water"
     p = subprocess.Popen(mv, shell=True)  # don't split mv because shell=True
     p.wait()
