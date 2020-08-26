@@ -517,7 +517,7 @@ if __name__ == "__main__":
 
     if not args.continue_solvated and not args.continue_xlinked:
 
-        equil.add_solvent(build_params['solvent'], out='solvated_gly.gro')
+        equil.add_solvent(build_params['solvent'], out=xlink_params['initial'])
 
         if not os.path.isdir("./temp-gly"):
             os.mkdir('temp-gly')
@@ -527,7 +527,7 @@ if __name__ == "__main__":
 
     else:
 
-        equil.gro_name = 'solvated_gly.gro'
+        equil.gro_name = xlink_params['initial']
 
     if not args.continue_xlinked:
         # cross-linking
@@ -550,6 +550,6 @@ if __name__ == "__main__":
     #clean
     if not os.path.isdir("./temp-water"):
         os.mkdir('temp-water')
-    mv = "mv solvated_nvt* solvated_npt* npt_equil* npt_* nvt_equil* em_* temp-water"
+    mv = "mv solvated_nvt* solvated_npt* npt_equil* npt_* nvt_equil* em_* solv_* temp-water"
     p = subprocess.Popen(mv, shell=True)  # don't split mv because shell=True
     p.wait()
