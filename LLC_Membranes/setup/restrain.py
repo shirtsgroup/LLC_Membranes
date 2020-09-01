@@ -257,9 +257,13 @@ class RestrainedTopology(object):
                 self.atom_numbers.append(ndx + 1)
 
             file_rw.write_gro_pos(self.all_coords, '%s.gro' % self.name, ids=self.ids, res=self.res, box=self.box_gromacs)
-        else:
+        elif not xlink:
 
             file_rw.write_assembly(res, '%s.itp' % self.name, self.nmon, xlink=xlink)
+
+        else:
+            self.name = 'assembly'
+
 
         with open('%s.itp' % self.name, 'r') as f:
             self.topology = []
