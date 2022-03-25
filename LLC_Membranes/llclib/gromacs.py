@@ -52,7 +52,10 @@ def simulate(mdp, top, gro, out, verbose=True, em_energy=False, mpi=False, nproc
 
     p1.wait()
 
-    mdrun = '%s mdrun -deffnm %s' % (gmx, out)
+    if mpi:
+        mdrun = '%s mdrun -deffnm %s -ntomp 1' % (gmx, out)
+    else:
+        mdrun = '%s mdrun -deffnm %s -nt %d -ntomp 1' % (gmx, out, nprocesses)
 
     if dd and mpi:
         mdrun += ' -dd %s %s %s' % tuple(dd)
