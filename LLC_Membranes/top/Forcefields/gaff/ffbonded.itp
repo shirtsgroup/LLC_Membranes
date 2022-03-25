@@ -42,7 +42,7 @@
   c2  h4	1    1.0868e-01    2.8836e+05
   c2  c2	1    1.3343e-01    4.7647e+05
   os  c2	 1    1.3596e-01    3.2568e+05
-  c3  ca	1    1.5156e-01    2.6861e+05i
+  c3  ca	1    1.5156e-01    2.6861e+05
 
 [ angletypes ]
 ;ai aj  ak   func    theta       cth
@@ -150,6 +150,7 @@ c3  ca  ca	1    1.2077e+02    5.3137e+02
 c3  c3  ca	1    1.1207e+02    5.2802e+02
 c2  c2  c3      1    1.2363e+02    5.3639e+02 ; for xlinking
 c2  c2  c2      1    123.080    550.030 ; same as ce ce c2 for xlinking
+c3  c2  c3      1    123.080    550.030 ; same as ce ce c2 for xlinking: SS added new
 
 [ dihedraltypes ]
 ;i   j   k   l     func     C0        C1          C2        C3         C4        C5
@@ -345,6 +346,7 @@ c2  c2  c3  c3          3    0.00000    0.00000    0.00000    0.00000    0.00000
 ha  c2  c2  ha          3   55.64720    0.00000  -55.64720    0.00000    0.00000    0.00000
 c2  c2  c2  ha          3   55.64720   0.00000   -55.64720    0.00000    0.00000    0.00000 ; Radical intermediate during xlinking. Same as ha c2 ce ce 
 c2  c2  c2  c3          3   66.64720    0.00000  -55.64720    0.00000    0.00000    0.00000 ; Radical intermediate during xlinking. Same as c3 c2 ce ce
+c2  c3  c2  c3          3   66.64720    0.00000  -55.64720    0.00000    0.00000    0.00000 ; Radical intermediate during xlinking. Same as c3 c2 ce ce SS added
 c3  c2  c2  ha          3   55.64720    0.00000  -55.64720    0.00000    0.00000    0.00000  
 c3  c2  c2  c3          3   63.59680    7.94960  -55.64720    0.00000    0.00000    0.00000
 c2  c3  c3  c2          3    0.65084    1.95253    0.00000   -2.60338    0.00000    0.00000 
