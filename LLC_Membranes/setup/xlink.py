@@ -20,8 +20,7 @@ def initialize():
 
     parser.add_argument('-i', '--initial', default='solvated_final.gro', help='Name of input file')
     parser.add_argument('-b', '--build_mon', default='Dibrpyr14', type=str, help='Monomer the system is built with')
-    parser.add_argument('-c', '--cutoff', default=5, type=float, help='Cutoff percentage for cross-linking. Bottom x %'
-                                                              ' of the distribution of distances will be cross-linked ')
+    parser.add_argument('-c', '--cutoff', default=0.6, type=float, help='Cutoff distances for cross-linking ')
     parser.add_argument('-e', '--term_prob', default=5, type=float, help='Termination probability (%)')
     parser.add_argument('-d', '--dummy_name', default='dummies.gro', help='Name of initial .gro file after dummies are '
                                                                           'added')
@@ -37,7 +36,7 @@ def initialize():
     parser.add_argument('-mdp_em', '--mdp_em', default='em.mdp', help='Name of energy minimization .mdp file')
     parser.add_argument('-mdp_nvt', '--mdp_nvt', default='nvt.mdp', help='Name of energy minimization .mdp file')
     parser.add_argument('-res', '--residue', default='MOL', help='Name of residue to be cross-linked')
-    parser.add_argument('-resd', '--dummy_residue', default='MOLd', help='Name of residue to be cross-linked with '
+    parser.add_argument('-resd', '--dummy_residue', default='MOL', help='Name of residue to be cross-linked with '
                                                                          'dummy atoms included in the topology')
     parser.add_argument('-density', '--density', default=95, type=float, help='Cross-link density (percent of x-links'
                         'that need to be cross-linked for procedure to terminate')
@@ -332,6 +331,7 @@ class System(Topology):
                                       and a.residue.name == self.xlink_residue.name])
 
         self.bond_chain1, self.bond_chain2 = [], []
+        self.xlinked_indices = [] #SS added this to trak all xlinked atoms
         self.reaction_type = []
 
         # Mostly informational variables
@@ -352,6 +352,7 @@ class System(Topology):
         self.former_radicals = None
         self.rad_frac_term = radical_termination_fraction / 100.
         self.chain_numbers = []  # this is used to ensure that the same atoms don't react twice
+        self.crosslinked_chains = [] #SS track all crosslinked chains
 
         # Variables for topology modification
         self.rm_impropers = []
@@ -434,13 +435,21 @@ class System(Topology):
         if self.radicals:
             eligible_c_rad, eligible_rad = [], []
             for i, c in enumerate(self.chain1_atoms):
-                d = self.generate_ordered_distances(c + self.chain2_atoms[i], self.radicals)
+                c1 = c + self.chain2_atoms[i]
+                c2 = self.radicals
+                if len(c1)*len(c2)!=0:
+                    d = self.generate_ordered_distances(c1, c2)
+                else:
+                    d = np.array([[],[]])
                 eligible_c_rad += d[0].tolist()  # list of numpy arrays
                 eligible_rad += d[1].tolist()
 
             bonds = self.bond_filter(np.array(eligible_c_rad), np.array(eligible_rad), radical=True)
             self.bond_chain1 += bonds[0]
             self.bond_chain2 += bonds[1]
+            self.xlinked_indices += bonds[0]
+            self.xlinked_indices += bonds[1]
+
             for i, x in enumerate(self.bond_chain1):
                 print(x, self.bond_chain2[i])
             print('----------------------------------')
@@ -454,14 +463,20 @@ class System(Topology):
 
         eligible_c1, eligible_c2 = [], []
         for i, c in enumerate(self.chain1_atoms):
-
-            d = self.generate_ordered_distances(c, self.chain2_atoms[i])
+            c1 = c
+            c2 = self.chain2_atoms[i]
+            if len(c1) * len(c2) != 0:
+                d = self.generate_ordered_distances(c1, c2)
+            else:
+                d = np.array([[], []])
             eligible_c1 += d[0].tolist()  # list of numpy arrays
             eligible_c2 += d[1].tolist()
 
         bonds = self.bond_filter(np.array(eligible_c1), np.array(eligible_c2))
         self.bond_chain1 += bonds[0]
         self.bond_chain2 += bonds[1]
+        self.xlinked_indices += bonds[0]
+        self.xlinked_indices += bonds[1]
 
         for i, x in enumerate(self.bond_chain1):
             print(x, self.bond_chain2[i], self.reaction_type[i])
@@ -520,8 +535,9 @@ class System(Topology):
         percent = self.reaction_percentage
         if radical:
             percent = self.radical_reaction_percentage
-        nreact = int(percent * len(eligible_chain2))  # total number of reactions
-
+        #nreact = int(percent * len(eligible_chain2))  # total number of reactions 
+        nreact = np.ceil(percent * len(eligible_chain2))  # SS: Changed nreact
+        #if nreact>20: nreact = 20 #SS: changed: limit cross-linking to 5 at a time; cannot be below 5 or n_rxn_per_type are all zero
         reactions = self.reaction.scheme.reaction_weights
         if radical:
             reactions = self.reaction.scheme.radical_reaction_weights
@@ -539,10 +555,11 @@ class System(Topology):
                     print('chain1 equals chain2!')
                 if chain1 not in self.chain_numbers and chain2 not in self.chain_numbers:  # make sure its always new independent chains reacting
                     bond_chain1.append(eligible_chain1[i] + 1)  # convert to serial
-                    bond_chain2.append(eligible_chain2[i] + 1)
+                    bond_chain2.append(eligible_chain2[i] + 1)                   
                     n_rxn_count[r] += 1
                     self.reaction_type.append(r)
                     self.chain_numbers += [chain1, chain2]
+                    self.crosslinked_chains += [chain1, chain2] #SS
 
         return bond_chain1, bond_chain2
 
@@ -645,7 +662,8 @@ class System(Topology):
         # It could be a return in the reaction schemes
         if 'radical' in reaction_type:
             ndx = list(atoms.values())[1] - 1
-            self.radicals.remove(ndx)
+            if ndx in self.radicals:
+                self.radicals.remove(ndx)
             self.terminated_radicals.append(ndx)
 
         if 'terminate' in reaction_type:
@@ -718,7 +736,8 @@ class System(Topology):
             f.write('Iteration Number: %d \n' % self.iteration)
             f.write('Number of new cross-links: %d\n' % len(self.bond_chain1))
             f.write('Total system cross-links: %d\n' % self.nxlinks)
-            f.write('Cross-link density: %.2f %%\n' % (100. * (self.nxlinks / self.total_possible_xlinks)))
+            #f.write('Cross-link density: %.2f %%\n' % (100. * (self.nxlinks / self.total_possible_xlinks)))
+            f.write('Cross-link density: %.2f %%\n' % (100. * (len(np.unique(self.crosslinked_chains)) / self.total_possible_xlinks)))
             f.write('+-----------------------------------+\n')
             f.write('| Serial indices of new cross-links |\n')
             f.write('+------+------+---------------------+\n')
@@ -808,15 +827,15 @@ def crosslink(params):
     print('#' * len(initial_message))
 
     # if needed
-    dt_short = 0.0005  # simulation time step (ps) (unstable if timestep is too large)
-    length_short = .025  # (integer for now, so this is as low as it goes) length of short nvt simulation in picoseconds
+    dt_short = 0.001  # simulation time step (ps) (unstable if timestep is too large)
+    length_short = 0.5  # length of short nvt simulation in picoseconds
 
     # get the system ready for cross-linking
     # Add dummy atoms create topology for entire assembly
     print('Initializing system and adding dummy atoms...', end='', flush=True)
     sys = System(params['initial'], params['residue'], params['dummy_residue'], dummy_name=params['dummy_name'],
                  radical_reaction_percentage=params['rad_percent'], reaction_percentage=params['percent'],
-                 radical_termination_fraction=params['rad_frac_term'])
+                 radical_termination_fraction=params['rad_frac_term'], cutoff=params['cutoff'])
     print('Done!\n%s created' % params['dummy_name'])
 
     print('Generating input files: %s, %s, %s and %s...' % (params['xlink_top_name'], params['topname'],
@@ -828,7 +847,7 @@ def crosslink(params):
                               xlinked_top_name=params['xlink_top_name'])  # topology with other residues and forcefield
     full_top.write_top(name=params['topname'])
     mdpshort = SimulationMdp(params['dummy_name'], T=params['temperature'], em_steps=params['em_steps'],
-                             time_step=params['dt'], length=params['length'], p_coupling='semiisotropic',
+                             time_step=dt_short, length=length_short, p_coupling='semiisotropic',
                              barostat='berendsen', genvel='yes', restraints=False, xlink=True, bcc=False)
     mdpshort.write_em_mdp(out='%s' % params['mdp_em'].split('.')[0])
     mdpshort.write_nvt_mdp(out='%s' % params['mdp_nvt'].split('.')[0])
@@ -849,8 +868,7 @@ def crosslink(params):
 
     # Rest of iterations
     stagnated_iterations = 0  # number of iterations without forming a cross-link
-    while (len(sys.terminate) / sys.total_possible_terminated) < (params['density'] / 100.) and stagnated_iterations < \
-            params['stagnation']:
+    while (len(sys.terminate) / sys.total_possible_terminated) < (params['density'] / 100.) and stagnated_iterations < params['stagnation']:
 
         #### FOR TESTING ####
         # sys.iteration = 2
@@ -875,25 +893,29 @@ def crosslink(params):
 
         print('Total new bonds: %d' % len(sys.bond_chain1))
         np.savez_compressed('radicals', radicals=sys.radicals, term=sys.terminate)
-
+      
         # energy minimize then run short NVT simulation
         print('Energy minimizing new cross-links...', end='', flush=True)
         if sys.iteration == 1:
             gromacs.simulate(params['mdp_em'], params['topname'], 'em_%s' % params['dummy_name'], 'em',
                              mpi=params['parallelize'], nprocesses=params['nproc'], dd=params['domain_decomposition'])
         else:
+            subprocess.Popen("mv em.tpr em.gro em.edr em.log intermediates", shell=True) # remove old runs
             gromacs.simulate(params['mdp_em'], params['topname'], 'nvt.gro', 'em', mpi=params['parallelize'],
                              nprocesses=params['nproc'], dd=params['domain_decomposition'])
         print('Done!')
 
         print('Running %.1f ps NVT simulation...' % params['length'], end='', flush=True)
+        subprocess.Popen("mv nvt.tpr nvt.gro nvt.edr nvt.log intermediates", shell=True) # remove old runs
         gromacs.simulate(params['mdp_nvt'], params['topname'], 'em.gro', 'nvt', mpi=params['parallelize'],
                          nprocesses=params['nproc'], dd=params['domain_decomposition'])
         print('Done!')
 
+
         print('\nTotal new cross-links: %d' % len(sys.bond_chain1))
         print('Total system cross-links: %d' % sys.nxlinks)
-        print('Cross-link density: %.2f %%' % (100. * (sys.nxlinks / sys.total_possible_xlinks)))
+        #print('Cross-link density: %.2f %%' % (100. * (sys.nxlinks / sys.total_possible_xlinks)))
+        print('Cross-link density: %.2f %%' % (100. * (len(np.unique(sys.crosslinked_chains)) / sys.total_possible_xlinks)))
         print('Total radicals terminated: %.2d' % len(sys.terminated_radicals))
         print('Total radicals left in system: %d' % len(sys.radicals))
         print('Percent terminated: %.2f' % (100 * len(sys.terminate) / sys.total_possible_terminated))
@@ -932,6 +954,8 @@ def crosslink(params):
 
     print('Finished cross-linking in %.2f seconds' % (time.time() - start))
 
+
+    
 
 if __name__ == "__main__":
 

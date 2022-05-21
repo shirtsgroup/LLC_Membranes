@@ -116,8 +116,8 @@ class SimulationMdp(object):
         constraints = 'constraints = h-bonds'
 
         f = open('%s.mdp' % out, 'w')
-        f.writelines([title + '\n', integrator + '\n', nsteps + '\n', cutoff_scheme + '\n', nstlist + '\n', constraints
-                      + '\n'])
+        f.writelines([title + '\n', integrator + '\n', nsteps + '\n', cutoff_scheme + '\n', nstlist 
+                      + '\n', constraints + '\n'])
 
         if self.xlink:
             f.write('periodic-molecules = yes\n')
@@ -182,7 +182,7 @@ class SimulationMdp(object):
         a.append(['DispCorr = EnerPres\n'])
         if self.xlink:
             a.append(['periodic-molecules = yes\n'])
-            a.append(['lincs-iter=4'])  # I don't think this is necessary
+            a.append(['lincs-iter=4\n'])  # I don't think this is necessary
         if self.restraints:
             a.append(['refcoord-scaling = all\n'])
 

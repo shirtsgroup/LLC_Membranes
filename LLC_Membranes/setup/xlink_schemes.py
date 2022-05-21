@@ -60,13 +60,16 @@ class DieneScheme:
             **radical_reaction_weights**: the same as reaction weights, but applied to the radical reactions.
         """
 
-        self.monomer = getattr(importlib.import_module("LLC_Membranes.setup.xlink_schemes"), '%s' % monomer)()
+        self.monomer = getattr(importlib.import_module("LLC_Membranes.setup.xlink_schemes"), '%s' % monomer)() #SS this like gave me problems
 
         # keys: type of carbon carbon bond; values: dict with (keys: name of reaction, values: likelihood of reaction)
         self.weights = {'C1-C2': {'head2tail': 0.5, 'head2head': 0.5},
-                        'C1-C2_radical': {'radical_c2': 1}}  # probabilities must sum to 1
-        self.reaction_weights = {'head2tail': 0.5, 'head2head': 0.5, '13addition': 0}
-        self.radical_reaction_weights = {'radical_c2': 1.}
+                        'C1-C2_radical': {'radical_c2': 1},
+                        'C1-C4': {'C1C4': 1},
+                        'C1-C4_radical': {'radical_c4': 1},
+                        }  # probabilities must sum to 1
+        self.reaction_weights = {'head2tail': 0.3, 'head2head': 0.3, '13addition': 0, 'C1C4': 0.4}
+        self.radical_reaction_weights = {'radical_c2': 0.5, 'radical_c4': 0.5}
 
     def determine_chains(self, c):
         """ Determine to which chain carbon atoms come from
@@ -128,6 +131,14 @@ class DieneScheme:
 
             return self.head2head(atoms)
 
+        elif reaction_type == 'C1C4':
+
+            return self.C1C4(atoms)
+
+        elif reaction_type == 'radical_c4':
+
+            return self.radical_c4(atoms)
+
         else:
             raise UndefinedReactionError('Reaction %s undefined' % reaction_type)  # replace with custom exception
 
@@ -168,7 +179,9 @@ class DieneScheme:
         bonds += [[c2_ndx + self.monomer.indices[chain2]['C1'], c2_ndx + self.monomer.indices[chain2]['D1'], 'dummy']]
 
         # define indices of left-over radicals
-        radicals = [c1_ndx + self.monomer.indices[chain1]['C2']]
+        cr = np.random.choice(['C2', 'C4'], p=[0.5, 0.5])
+        ter = [x for x in ['C2', 'C4'] if x != cr][0]
+        radicals = [c1_ndx + self.monomer.indices[chain1][cr]]
 
         chain1_impropers = ['C1']
         chain2_impropers = ['C1', 'C2']
@@ -180,7 +193,8 @@ class DieneScheme:
 
         # define terminated atoms
         terminated = [c1_ndx + self.monomer.indices[chain1]['C1'], c2_ndx + self.monomer.indices[chain2]['C2'], c2_ndx +
-                      self.monomer.indices[chain2]['C1']]
+                      self.monomer.indices[chain2]['C1'], c2_ndx + self.monomer.indices[chain2]['C4'],
+                      c1_ndx + self.monomer.indices[chain1][ter]] #SS added C4
 
         return reacted_types, bonds, radicals, rm_improper, terminated
 
@@ -218,11 +232,13 @@ class DieneScheme:
         # bond between carbons
         bonds = [[c1_ndx + self.monomer.indices[chain1]['C1'], c2_ndx + self.monomer.indices[chain2]['C1'], 'carbon']]
 
-        # dummy bonds - 1 new bond between dummy atoms and carbon
+        # dummy bonds - 1 new bond between dummy atoms and carbon SS: Shold C4 be C2 instead?
         bonds += [[c2_ndx + self.monomer.indices[chain2]['C4'], c2_ndx + self.monomer.indices[chain2]['D4'], 'dummy']]
 
         # define indices of left-over radicals
-        radicals = [c1_ndx + self.monomer.indices[chain1]['C2']]
+        cr = np.random.choice(['C2', 'C4'], p=[0.5, 0.5])
+        ter = [x for x in ['C2', 'C4'] if x != cr][0]
+        radicals = [c1_ndx + self.monomer.indices[chain1][cr]]
 
         chain1_impropers = ['C1']  # [1]
         chain2_impropers = ['C1', 'C4']  # [1, 2]
@@ -234,9 +250,66 @@ class DieneScheme:
 
         # define terminated atoms
         terminated = [c1_ndx + self.monomer.indices[chain1]['C1'], c2_ndx + self.monomer.indices[chain2]['C1'],
-                      c2_ndx + self.monomer.indices[chain2]['C2']]  # C2 terminated for now even though still alkene
+                      c2_ndx + self.monomer.indices[chain2]['C2'], c2_ndx + self.monomer.indices[chain2]['C4'],
+                      c1_ndx + self.monomer.indices[chain1][ter]]
+                       # C2 terminated for now even though still alkene SS aded C4
 
         return reacted_types, bonds, radicals, rm_improper, terminated
+
+    def C1C4(self, atoms):
+        """ Define the 1-4 crosslinking reaction
+        :param atoms: dictionary of atom names (keys) and their indices (values) in the context of an entire unit cell
+        :type atoms: dict
+        :return: atom indicies and therir corresponding types after reaction
+
+        """
+        c1, c2 = atoms.keys()
+        c1_ndx, c2_ndx = atoms.values()
+
+        chain1, chain2 = self.determine_chains([c1, c2])
+
+        #to get indexing right
+        c1_ndx -= self.monomer.indices[chain1]['C1']
+        c2_ndx -= self.monomer.indices[chain2]['C4']
+
+
+        types = {'chain1': {'C1': 'c3', 'C2': 'c2', 'C3': 'c2', 'C4': 'c2', 'H1': 'hc', 'H2': 'hc', 'H3': 'ha',
+                            'H4': 'ha', 'H5': 'ha'},
+                 'chain2': {'C1': 'c3', 'C2': 'c2', 'C3': 'c2', 'C4': 'c3', 'H1': 'hc', 'H2': 'hc', 'H3': 'ha',
+                            'H4': 'ha', 'H5': 'hc', 'D1': 'hc'}}
+        
+        #update types
+        reacted_types = {'chain1': {c1_ndx + self.monomer.indices[chain1][a]: types['chain1'][a]
+                                    for a in types['chain1'].keys()},
+                         'chain2': {c2_ndx + self.monomer.indices[chain2][a]: types['chain2'][a]
+                                    for a in types['chain2'].keys()}}
+
+        # bond between carbons. Format [c1, c2, type]
+        bonds = [[c1_ndx + self.monomer.indices[chain1]['C1'], c2_ndx + self.monomer.indices[chain2]['C4'], 'carbon']]
+
+        # dummy bonds -1 new bond between dummy atoms and carbon
+        bonds += [[c2_ndx + self.monomer.indices[chain2]['C1'], c2_ndx + self.monomer.indices[chain2]['D1'], 'dummy']]
+
+        # define indices of left-over radicals
+        cr = np.random.choice(['C2', 'C4'], p=[0.5, 0.5])
+        ter = [x for x in ['C2', 'C4'] if x != cr][0]
+        radicals = [c1_ndx + self.monomer.indices[chain1] [cr]]
+
+        chain1_impropers = ['C1']
+        chain2_impropers = ['C1', 'C4']
+        rm_improper = []
+        for c in chain1_impropers:
+            rm_improper.append([c1_ndx + self.monomer.indices[chain1][x] for x in self.monomer.impropers[chain1][c]])
+        for c in chain2_impropers:
+            rm_improper.append([c2_ndx + self.monomer.indices[chain2][x] for x in self.monomer.impropers[chain2][c]])
+
+        # define terminated atoms
+        terminated = [c1_ndx + self.monomer.indices[chain1]['C1'], c2_ndx + self.monomer.indices[chain2]['C4'],
+                        c2_ndx + self.monomer.indices[chain2]['C1'], c2_ndx + self.monomer.indices[chain2]['C2'],
+                      c1_ndx + self.monomer.indices[chain1][ter]] #SS added C2
+
+        return reacted_types, bonds, radicals, rm_improper, terminated
+
 
     def radical_c2(self, atoms):
         """ Define the reaction of a radical c2 with unreacted c1
@@ -275,7 +348,9 @@ class DieneScheme:
         # no dummy bonds to add
 
         # define indices of left-over radicals
-        radicals = [c1_ndx + self.monomer.indices[chain1]['C2']]
+        cr = np.random.choice(['C2', 'C4'], p=[0.5, 0.5])
+        ter = [x for x in ['C2', 'C4'] if x != cr][0]
+        radicals = [c1_ndx + self.monomer.indices[chain1][cr]]
 
         chain1_impropers = ['C1']  # [1]
         chain2_impropers = ['C2']  # [2]
@@ -286,9 +361,65 @@ class DieneScheme:
             rm_improper.append([c2_ndx + self.monomer.indices[chain2][x] for x in self.monomer.impropers[chain2][c]])
 
         # define terminated atoms
-        terminated = [c1_ndx + self.monomer.indices[chain1]['C1'], c2_ndx + self.monomer.indices[chain2]['C2']]
+        terminated = [c1_ndx + self.monomer.indices[chain1]['C1'], c1_ndx + self.monomer.indices[chain1][ter],
+                      c2_ndx + self.monomer.indices[chain2]['C2'], c2_ndx + self.monomer.indices[chain2]['C4']] #SS added
 
         return reacted_types, bonds, radicals, rm_improper, terminated
+
+
+    def radical_c4(self, atoms):
+        """ Define teh reaction of a radical c4 with unreacted c1
+        :param atoms: dictrionary of atom names (keys) and their indiex (values) in teh contex of an entire unit cell
+        :type atoms: dict
+        :return: reacted_types, dummy_bonds, radicals, rm_improper, terminated
+        """
+
+        c1, c2 = atoms.keys()
+        c1_ndx, c2_ndx = atoms.values()
+
+        chain1, chain2 = self.determine_chains([c1, c2])
+
+        # to get indexing right
+        c1_ndx -= self.monomer.indices[chain1]['C1']
+        c2_ndx -= self.monomer.indices[chain2]['C4']
+
+        #types after reaction
+        types = {'chain1': {'C1': 'c3', 'C2': 'c2', 'C3': 'c2', 'C4': 'c2', 'H1': 'hc', 'H2': 'hc', 'H3': 'ha',
+                            'H4': 'ha', 'H5': 'ha'}, #chain1 contaion c1
+                 'chain2': {'C1': 'c3', 'C2': 'c2', 'C3': 'c2', 'C4': 'c3', 'H1': 'hc', 'H2': 'hc', 'H3': 'ha',
+                            'H4': 'ha', 'H5': 'hc'}} #chain2 cointain c4
+
+        # update types
+        reacted_types = {'chain1': {c1_ndx + self.monomer.indices[chain1][a]: types['chain1'][a]
+                                    for a in types['chain1'].keys()},
+                         'chain2': {c2_ndx + self.monomer.indices[chain2][a]: types['chain2'][a]
+                                    for a in types['chain2'].keys()}}
+
+        #new bonds
+        bonds = [[c1_ndx + self.monomer.indices[chain1]['C1'], c2_ndx + self.monomer.indices[chain2]['C4'], 'carbon']]
+
+        #no dummy bonds to add
+
+        #define indices of left-over radicals
+        cr = np.random.choice(['C2', 'C4'], p=[0.5, 0.5])
+        ter = [x for x in ['C2', 'C4'] if x != cr][0]
+        radicals = [c1_ndx + self.monomer.indices[chain1][cr]]
+
+        chain1_impropers = ['C1']
+        chain2_impropers = ['C4']
+        rm_improper = []
+        for c in chain1_impropers:
+            rm_improper.append([c1_ndx + self.monomer.indices[chain1][x] for x in self.monomer.impropers[chain1][c]])
+        for c in chain2_impropers:
+            rm_improper.append([c2_ndx + self.monomer.indices[chain2][x] for x in self.monomer.impropers[chain2][c]])
+
+        #define terminated atoms
+        terminated = [c1_ndx + self.monomer.indices[chain1]['C1'], c1_ndx + self.monomer.indices[chain1][ter],
+                      c2_ndx + self.monomer.indices[chain2]['C2'], c2_ndx + self.monomer.indices[chain2]['C4']]
+
+        return reacted_types, bonds, radicals, rm_improper, terminated
+
+
 
     def terminate(self, atoms):
         """ Define the termination reaction. i.e. a dummy atom attaches to a radical carbon atoms. The hybridization of
@@ -321,7 +452,10 @@ class DieneScheme:
                                    for a in types['chain'].keys()}}
 
         # add dummy atom bond
-        bonds = [[c_ndx + self.monomer.indices[chain]['C2'], c_ndx + self.monomer.indices[chain]['D2'], 'dummy']]
+        if c_name == 'C2':
+            bonds = [[c_ndx + self.monomer.indices[chain]['C2'], c_ndx + self.monomer.indices[chain]['D2'], 'dummy']]
+        elif c_name == 'C4':
+            bonds = [[c_ndx + self.monomer.indices[chain]['C4'], c_ndx + self.monomer.indices[chain]['D4'], 'dummy']]
 
         radicals = []
 
@@ -420,7 +554,7 @@ class Dibrpyr14:
         # self.carbons['C2']: self.carbons['C1']. Otherwise, computational expense goes up and a new reaction has
         # to be defined below.
         self.carbons = {'C1': ['C', 'C45'], 'C2': ['C1', 'C44'], 'C3': ['C2', 'C43'], 'C4': ['C3', 'C42']}
-        self.bonds_with = [[self.carbons['C1'], self.carbons['C2']]]
+        self.bonds_with = [[self.carbons['C1'], self.carbons['C2']+self.carbons['C4']]]
 
         # define which improper dihedrals to remove -- written in same order as .itp file!!!
         # note that the order of the atoms may be different for each chain
