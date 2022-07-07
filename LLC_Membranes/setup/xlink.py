@@ -337,8 +337,9 @@ class System(Topology):
         # Mostly informational variables
         self.nxlinks = 0
         # self.total_possible_xlinks = len(self.c1_atoms)
-        # self.total_possible_terminated = len(self.c1_atoms) + len(self.c2_atoms)
-        self.total_possible_xlinks = sum([len(i) for i in self.chain1_atoms])  # TODO: need to think about this more.
+        self.N_chains = 2*self.nresidues[self.xlink_residue_name] # SS count total number of chain
+
+        self.total_possible_xlinks = sum([len(i) for i in self.chain2_atoms])  # TODO: need to think about this more.
         self.total_possible_terminated = sum([len(i) for i in self.chain1_atoms]) + \
                                          sum([len(i) for i in self.chain2_atoms])
         self.iteration = 1
@@ -433,18 +434,24 @@ class System(Topology):
             self.t.xyz[..., 0] = self.t.xyz[..., 0] - self.t.xyz[..., 1]*np.cos(theta)
 
         if self.radicals:
-            eligible_c_rad, eligible_rad = [], []
+            eligible_rad, eligible_c_rad = [], []
             for i, c in enumerate(self.chain1_atoms):
-                c1 = c + self.chain2_atoms[i]
-                c2 = self.radicals
+                c1 = self.radicals
+                c2 = self.chain2_atoms[i]
+                #c1 = c + self.chain2_atoms[i]
+                #c2 = self.radicals
                 if len(c1)*len(c2)!=0:
                     d = self.generate_ordered_distances(c1, c2)
                 else:
                     d = np.array([[],[]])
-                eligible_c_rad += d[0].tolist()  # list of numpy arrays
-                eligible_rad += d[1].tolist()
+                    
+                eligible_rad += d[0].tolist()
+                eligible_c_rad += d[1].tolist()  # list of numpy arrays
 
-            bonds = self.bond_filter(np.array(eligible_c_rad), np.array(eligible_rad), radical=True)
+
+            #bonds = self.bond_filter(np.array(eligible_c_rad), np.array(eligible_rad), radical=True)
+            bonds = self.bond_filter(np.array(eligible_rad), np.array(eligible_c_rad), radical=True)
+
             self.bond_chain1 += bonds[0]
             self.bond_chain2 += bonds[1]
             self.xlinked_indices += bonds[0]
@@ -454,12 +461,6 @@ class System(Topology):
                 print(x, self.bond_chain2[i])
             print('----------------------------------')
 
-            # eligible_c1_rad, eligible_rad = self.generate_ordered_distances(self.chain1_atoms, self.radicals)
-            # bonds = self.bond_filter(eligible_c1_rad, eligible_rad, radical=True)
-            # self.bond_chain1 += bonds[0]
-            # self.bond_chain2 += bonds[1]
-            # for i in range(len(bonds[0])):
-            #     self.reaction_type.append('radical_c2')
 
         eligible_c1, eligible_c2 = [], []
         for i, c in enumerate(self.chain1_atoms):
@@ -481,16 +482,6 @@ class System(Topology):
         for i, x in enumerate(self.bond_chain1):
             print(x, self.bond_chain2[i], self.reaction_type[i])
 
-        # for i in range(len(bonds[0])):
-        #     self.reaction_type.append('head2tail')
-
-        # eligible_c1, eligible_c2 = self.generate_ordered_distances(self.c1_atoms, self.c2_atoms)
-        # nreact = int(self.reaction_percentage * len(eligible_c1))
-        # bonds = self.bond_filter(eligible_c1, eligible_c2, nreact)
-        # self.bond_c1 += bonds[0]
-        # self.bond_c2 += bonds[1]
-        # for i in range(len(bonds[0])):
-        #     self.reaction_type.append('head2tail')
 
     def bond_filter(self, eligible_chain1, eligible_chain2, radical=False):
         """ Choose which carbons to bond based on proximity. In the process filter out bonds that should not form --
@@ -535,20 +526,20 @@ class System(Topology):
         percent = self.reaction_percentage
         if radical:
             percent = self.radical_reaction_percentage
-        #nreact = int(percent * len(eligible_chain2))  # total number of reactions 
+            
+
         nreact = np.ceil(percent * len(eligible_chain2))  # SS: Changed nreact
-        #if nreact>20: nreact = 20 #SS: changed: limit cross-linking to 5 at a time; cannot be below 5 or n_rxn_per_type are all zero
         reactions = self.reaction.scheme.reaction_weights
         if radical:
             reactions = self.reaction.scheme.radical_reaction_weights
 
-        n_rxn_per_type = {k: int(reactions[k]*nreact) for k in list(reactions.keys())}  # number reactions of each type
+        #n_rxn_per_type = {k: int(reactions[k]*nreact) for k in list(reactions.keys())}  # number reactions of each type
         n_rxn_count = {k: 0 for k in list(reactions.keys())}  # counter for number of reactions of each type so far
 
         bond_chain1 = []
         bond_chain2 = []
         for i, r in enumerate(rxn_types):
-            if n_rxn_count[r] < n_rxn_per_type[r]:
+            if np.sum(list(n_rxn_count.values())) < nreact:
                 chain1 = self.chain_number(eligible_chain1[i])
                 chain2 = self.chain_number(eligible_chain2[i])
                 if chain1 == chain2:  # this shouldn't happen, but this will let me know if it does.
@@ -598,7 +589,8 @@ class System(Topology):
                 # # add chain1--chain2 bond
                 # self.all_bonds.append([x, self.bond_chain2[i]])
 
-                self.react(self.reaction_type[i], {c1_name: x, c2_name: self.bond_chain2[i]})
+                self.react(self.reaction_type[i], {x: c1_name, self.bond_chain2[i]: c2_name})
+
 
         self.terminate_radicals(quench=quench)  # this needs to go here since termination requires an improper to be removed
 
@@ -627,12 +619,6 @@ class System(Topology):
         """
 
         types, bonds, radicals, rm_impropers, terminate = self.reaction.scheme.react(reaction_type, atoms)
-        # print(types)
-        # print(bonds)
-        # print(radicals)
-        # print(rm_impropers)
-        # print(terminate)
-        # exit()
 
         # add bonds between dummy atoms (made real) and carbon atoms
         for b in bonds:
@@ -661,7 +647,7 @@ class System(Topology):
         # remove radical if this is a radical reaction -- this will need to be improved to be more general. 
         # It could be a return in the reaction schemes
         if 'radical' in reaction_type:
-            ndx = list(atoms.values())[1] - 1
+            ndx = list(atoms.keys())[0] - 1
             if ndx in self.radicals:
                 self.radicals.remove(ndx)
             self.terminated_radicals.append(ndx)
@@ -690,7 +676,7 @@ class System(Topology):
 
             name = self.xlink_residue_atoms.name[t]  # self.radicals indexing starts at 0
 
-            self.react('terminate', {name: t + 1})
+            self.react('terminate', {t + 1: name})
 
     def remove_virtual_sites(self):
 
@@ -737,7 +723,8 @@ class System(Topology):
             f.write('Number of new cross-links: %d\n' % len(self.bond_chain1))
             f.write('Total system cross-links: %d\n' % self.nxlinks)
             #f.write('Cross-link density: %.2f %%\n' % (100. * (self.nxlinks / self.total_possible_xlinks)))
-            f.write('Cross-link density: %.2f %%\n' % (100. * (len(np.unique(self.crosslinked_chains)) / self.total_possible_xlinks)))
+            f.write('Cross-link density: %.2f %%\n' % (100. * (len(np.unique(self.crosslinked_chains)) / self.N_chains)))
+
             f.write('+-----------------------------------+\n')
             f.write('| Serial indices of new cross-links |\n')
             f.write('+------+------+---------------------+\n')
@@ -868,7 +855,8 @@ def crosslink(params):
 
     # Rest of iterations
     stagnated_iterations = 0  # number of iterations without forming a cross-link
-    while (len(sys.terminate) / sys.total_possible_terminated) < (params['density'] / 100.) and stagnated_iterations < params['stagnation']:
+    #while (len(sys.terminate) / sys.total_possible_terminated) < (params['density'] / 100.) and stagnated_iterations < params['stagnation']:
+    while (len(np.unique(sys.crosslinked_chains)) / sys.N_chains) < (params['density'] / 100.) and stagnated_iterations < params['stagnation']:
 
         #### FOR TESTING ####
         # sys.iteration = 2
@@ -915,7 +903,7 @@ def crosslink(params):
         print('\nTotal new cross-links: %d' % len(sys.bond_chain1))
         print('Total system cross-links: %d' % sys.nxlinks)
         #print('Cross-link density: %.2f %%' % (100. * (sys.nxlinks / sys.total_possible_xlinks)))
-        print('Cross-link density: %.2f %%' % (100. * (len(np.unique(sys.crosslinked_chains)) / sys.total_possible_xlinks)))
+        print('Cross-link density: %.2f %%' % (100. * (len(np.unique(sys.crosslinked_chains)) / sys.N_chains)))
         print('Total radicals terminated: %.2d' % len(sys.terminated_radicals))
         print('Total radicals left in system: %d' % len(sys.radicals))
         print('Percent terminated: %.2f' % (100 * len(sys.terminate) / sys.total_possible_terminated))
